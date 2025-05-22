@@ -92,26 +92,17 @@ const StickyInput = (props: StickyInputProps) => {
       label: 'Claude 3.7 Sonnet',
     },
     {
-      value: 'anthropic/claude-3-5-sonnet' as CompletionModel,
-      label: 'Claude 3.5 Sonnet',
-    },
-    {
       value: 'anthropic/claude-3-5-haiku' as CompletionModel,
       label: 'Claude 3.5 Haiku',
     },
     {
-      value: 'anthropic/claude-3-haiku' as CompletionModel,
-      label: 'Claude 3 Haiku',
-    },
-    {
-      value: 'google/gemini-flash-1-5' as CompletionModel,
+      value: 'google/gemini-flash-1.5' as CompletionModel,
       label: 'Gemini Flash 1.5',
     },
     {
-      value: 'google/gemini-pro-1-5' as CompletionModel,
+      value: 'google/gemini-pro-1.5' as CompletionModel,
       label: 'Gemini Pro 1.5',
     },
-    { value: 'google/gemini-pro' as CompletionModel, label: 'Gemini Pro' },
   ];
 
   const MAX_MODELS_SELECTABLE = 4;
