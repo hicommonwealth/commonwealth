@@ -34,7 +34,6 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       ghost_address,
       wallet_id,
       block_info,
-      is_user_default,
       role
     ) VALUES (
       '${testAddress}',
@@ -48,7 +47,6 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       false,
       'metamask',
       '${blockInfo}',
-      false,
       'member'
     ) ON CONFLICT DO NOTHING
   `);

@@ -11,7 +11,6 @@ export type RoleAttributes = {
   permission: Role;
   id?: number;
   community_id: string;
-  is_user_default?: boolean;
   created_at?: Date;
   updated_at?: Date;
 

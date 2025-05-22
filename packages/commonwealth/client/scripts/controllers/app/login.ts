@@ -23,7 +23,6 @@ import { FarcasterExtension } from '@magic-ext/farcaster';
 import { OAuthExtension } from '@magic-ext/oauth';
 import { OAuthExtension as OAuthExtensionV2 } from '@magic-ext/oauth2';
 import axios from 'axios';
-import { BASE_API_PATH } from 'client/scripts/utils/trpcClient';
 import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
@@ -58,14 +57,6 @@ function storeActiveAccount(account: Account) {
 
 export async function setActiveAccount(account: Account): Promise<void> {
   try {
-    await axios.post(
-      `${BASE_API_PATH}/community.setDefaultRole`,
-      {
-        community_id: account.community.id,
-        jwt: userStore.getState().jwt,
-      },
-      { headers: { address: account.address } },
-    );
     storeActiveAccount(account);
   } catch (err) {
     // Failed to set the user's active address to this account.

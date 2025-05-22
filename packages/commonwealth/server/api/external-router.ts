@@ -42,7 +42,6 @@ const {
   joinCommunity,
   banAddress,
   updateRole,
-  setDefaultRole,
 } = community.trpcRouter;
 const {
   createThread,
@@ -131,7 +130,6 @@ const api = {
   joinCommunity,
   banAddress,
   updateRole,
-  setDefaultRole,
   toggleCommentSpam,
   createToken,
   createTrade,
