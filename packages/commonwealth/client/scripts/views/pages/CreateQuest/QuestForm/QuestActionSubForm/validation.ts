@@ -42,7 +42,7 @@ export const buildQuestSubFormValidationSchema = (
     config?.with_optional_token_trade_threshold;
   const requiresTwitterEngagement = config?.requires_twitter_tweet_link;
   const requiresDiscordServerId = config?.requires_discord_server_id;
-  const requiresMembersGoalCount = config?.requires_members_goal_count;
+  const requiresGoalConfig = config?.requires_goal_config;
   const requiresChainEvent = config?.requires_chain_event;
   const requiresGroupId = config?.requires_group_id;
   const requiresStartLink = config?.requires_start_link;
@@ -58,7 +58,7 @@ export const buildQuestSubFormValidationSchema = (
     allowsOptionalContentId ||
     requiresTwitterEngagement ||
     requiresDiscordServerId ||
-    requiresMembersGoalCount ||
+    requiresGoalConfig ||
     requiresGroupId ||
     requiresStartLink ||
     allowsChainIdAsContentId ||
@@ -208,7 +208,7 @@ export const buildQuestSubFormValidationSchema = (
         },
       ) as unknown as typeof baseSchema;
   }
-  if (requiresDiscordServerId || requiresMembersGoalCount) {
+  if (requiresDiscordServerId || requiresGoalConfig) {
     baseSchema = baseSchema.extend({
       contentIdentifier: stringHasNumbersOnlyValidationSchema,
     }) as unknown as typeof baseSchema;

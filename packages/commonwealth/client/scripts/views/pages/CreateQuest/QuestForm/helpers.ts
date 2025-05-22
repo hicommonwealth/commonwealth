@@ -5,8 +5,8 @@ import {
   doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
   doesActionRequireDiscordServerId,
+  doesActionRequireGoalConfig,
   doesActionRequireGroupId,
-  doesActionRequireMembersGoalCount,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
 import {
@@ -37,8 +37,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.TwitterTweet;
     if (doesActionRequireDiscordServerId(action as QuestAction))
       return QuestActionContentIdScope.DiscordServer;
-    if (doesActionRequireMembersGoalCount(action as QuestAction))
-      return QuestActionContentIdScope.MemberGoalCount;
+    if (doesActionRequireGoalConfig(action as QuestAction))
+      return QuestActionContentIdScope.Goal;
     if (doesActionAllowThreadId(action as QuestAction))
       return QuestActionContentIdScope.Thread;
     if (doesActionAllowChainId(action as QuestAction))
@@ -59,7 +59,7 @@ export const inferContentIdTypeFromContentId = (
     case 'discord_server_id':
       return QuestActionContentIdScope.DiscordServer;
     case 'goal':
-      return QuestActionContentIdScope.MemberGoalCount;
+      return QuestActionContentIdScope.Goal;
     case 'chain':
       return QuestActionContentIdScope.Chain;
     case 'group':
@@ -174,7 +174,7 @@ export const doesConfigAllowContentIdField = (
     config?.with_optional_topic_id ||
     config?.requires_twitter_tweet_link ||
     config?.requires_discord_server_id ||
-    config?.requires_members_goal_count ||
+    config?.requires_goal_config ||
     config?.with_optional_chain_id ||
     config?.requires_group_id ||
     config?.with_optional_token_trade_threshold

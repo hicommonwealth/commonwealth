@@ -20,8 +20,8 @@ import {
   doesActionRequireBasicRewardAmount,
   doesActionRequireChainEvent,
   doesActionRequireDiscordServerId,
+  doesActionRequireGoalConfig,
   doesActionRequireGroupId,
-  doesActionRequireMembersGoalCount,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
@@ -147,9 +147,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   requires_discord_server_id:
                     allowsContentId &&
                     doesActionRequireDiscordServerId(chosenAction),
-                  requires_members_goal_count:
+                  requires_goal_config:
                     allowsContentId &&
-                    doesActionRequireMembersGoalCount(chosenAction),
+                    doesActionRequireGoalConfig(chosenAction),
                   requires_chain_event:
                     doesActionRequireChainEvent(chosenAction),
                   with_optional_chain_id:
@@ -263,7 +263,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (scope === QuestActionContentIdScope.Topic) return 'topic';
         if (scope === QuestActionContentIdScope.Chain) return 'chain';
         if (scope === QuestActionContentIdScope.Group) return 'group';
-        if (scope === QuestActionContentIdScope.MemberGoalCount) return 'goal';
+        if (scope === QuestActionContentIdScope.Goal) return 'goal';
         if (scope === QuestActionContentIdScope.TokenTradeThreshold) {
           return 'threshold';
         }

@@ -95,7 +95,7 @@ export const doesActionRequireAmountMultipler = (action: QuestActionType) => {
   return action === 'LaunchpadTokenTraded';
 };
 
-export const doesActionRequireMembersGoalCount = (action: QuestActionType) => {
+export const doesActionRequireGoalConfig = (action: QuestActionType) => {
   return action === 'CommunityGoalReached';
 };
 

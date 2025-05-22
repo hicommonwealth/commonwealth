@@ -11,8 +11,8 @@ import {
   doesActionRequireBasicRewardAmount,
   doesActionRequireChainEvent,
   doesActionRequireDiscordServerId,
+  doesActionRequireGoalConfig,
   doesActionRequireGroupId,
-  doesActionRequireMembersGoalCount,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
@@ -160,8 +160,7 @@ const useQuestActionMultiFormsState = ({
         allowsContentId && doesActionRequireTwitterTweetURL(chosenAction);
       const requiresDiscordServerId =
         doesActionRequireDiscordServerId(chosenAction);
-      const requiresMembersGoalCount =
-        doesActionRequireMembersGoalCount(chosenAction);
+      const requiresGoalConfig = doesActionRequireGoalConfig(chosenAction);
       const requiresGroupId =
         allowsContentId && doesActionRequireGroupId(chosenAction);
       const allowsTokenTradeThreshold =
@@ -183,7 +182,7 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
         requires_chain_event: doesActionRequireChainEvent(chosenAction),
         requires_discord_server_id: requiresDiscordServerId,
-        requires_members_goal_count: requiresMembersGoalCount,
+        requires_goal_config: requiresGoalConfig,
         with_optional_chain_id:
           allowsContentId && doesActionAllowChainId(chosenAction),
         requires_group_id: requiresGroupId,
@@ -246,7 +245,7 @@ const useQuestActionMultiFormsState = ({
         }
         case 'CommunityGoalReached': {
           updatedSubForms[index].values.contentIdScope =
-            QuestActionContentIdScope.MemberGoalCount;
+            QuestActionContentIdScope.Goal;
           break;
         }
         default: {
@@ -272,8 +271,8 @@ const useQuestActionMultiFormsState = ({
             QuestActionContentIdScope.DiscordServer &&
             !requiresDiscordServerId) ||
           (updatedSubForms[index].values.contentIdScope ===
-            QuestActionContentIdScope.MemberGoalCount &&
-            !requiresMembersGoalCount) ||
+            QuestActionContentIdScope.Goal &&
+            !requiresGoalConfig) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.Chain &&
             !allowsChainId) ||
