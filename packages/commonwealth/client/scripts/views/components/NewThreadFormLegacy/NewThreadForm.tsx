@@ -64,6 +64,7 @@ import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import Poll from 'client/scripts/models/Poll';
 // eslint-disable-next-line max-len
 import { useGetTokenByCommunityId } from 'state/api/tokens';
+// eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
