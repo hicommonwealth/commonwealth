@@ -17,12 +17,19 @@ module.exports = {
         `
 CREATE OR REPLACE VIEW "GatedThreads" AS
 SELECT
-  t.*, a.address as gated_address
+	t.*,
+	g.address_id as gated_address_id
 FROM
-  "Threads" t
-  LEFT JOIN "GroupGatedActions" ga ON t.topic_id = ga.topic_id AND ga.is_private = true 
-  LEFT JOIN "Memberships" m ON ga.group_id = m.group_id AND m.reject_reason IS NULL
-  LEFT JOIN "Addresses" a ON m.address_id = a.id;
+	"Threads" t
+	LEFT JOIN (
+		SELECT DISTINCT ga.topic_id, m.address_id 
+		FROM
+			"GroupGatedActions" ga
+			JOIN "Memberships" m ON ga.group_id = m.group_id
+		WHERE
+			ga.is_private = TRUE
+      AND m.reject_reason IS NULL
+  ) g ON t.topic_id = g.topic_id;
     `,
         { transaction },
       );
