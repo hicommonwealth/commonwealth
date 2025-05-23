@@ -6,15 +6,14 @@ import { systemActor } from '../middleware';
 
 const log = logger(import.meta);
 
-// @eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function debounceRefresh<T extends (...args: any[]) => Promise<void>>(
-  fn: T,
+export function debounceRefresh<Args extends unknown[]>(
+  fn: (...args: Args) => Promise<void>,
   delay: number,
-): (...args: Parameters<T>) => Promise<void> {
+): (...args: Args) => Promise<void> {
   const timeouts = new Map<string, NodeJS.Timeout>();
   const timestamps = new Map<string, number>();
 
-  return (...args: Parameters<T>) => {
+  return (...args: Args) => {
     const now = Date.now();
     const key = JSON.stringify(args);
 
