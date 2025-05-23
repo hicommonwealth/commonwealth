@@ -11,6 +11,7 @@ import {
   doesActionRequireBasicRewardAmount,
   doesActionRequireChainEvent,
   doesActionRequireDiscordServerId,
+  doesActionRequireGoalConfig,
   doesActionRequireGroupId,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
@@ -159,6 +160,7 @@ const useQuestActionMultiFormsState = ({
         allowsContentId && doesActionRequireTwitterTweetURL(chosenAction);
       const requiresDiscordServerId =
         doesActionRequireDiscordServerId(chosenAction);
+      const requiresGoalConfig = doesActionRequireGoalConfig(chosenAction);
       const requiresGroupId =
         allowsContentId && doesActionRequireGroupId(chosenAction);
       const allowsTokenTradeThreshold =
@@ -180,6 +182,7 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
         requires_chain_event: doesActionRequireChainEvent(chosenAction),
         requires_discord_server_id: requiresDiscordServerId,
+        requires_goal_config: requiresGoalConfig,
         with_optional_chain_id:
           allowsContentId && doesActionAllowChainId(chosenAction),
         requires_group_id: requiresGroupId,
@@ -240,6 +243,11 @@ const useQuestActionMultiFormsState = ({
             QuestActionContentIdScope.TokenTradeThreshold;
           break;
         }
+        case 'CommunityGoalReached': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.Goal;
+          break;
+        }
         default: {
           break;
         }
@@ -262,6 +270,9 @@ const useQuestActionMultiFormsState = ({
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.DiscordServer &&
             !requiresDiscordServerId) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.Goal &&
+            !requiresGoalConfig) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.Chain &&
             !allowsChainId) ||
