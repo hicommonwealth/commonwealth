@@ -80,7 +80,7 @@ export const factoryContracts = {
   [ValidChains.SepoliaBase]: {
     factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
     communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
-    launchpad: '0x0d3b664431FEB91E630DBAB864917DA60e1915b',
+    launchpad: '0x0d3b664431FEB91E630DBAB864917DA60e1915b8',
     lpBondingCurve: '0x40F620b5191fF99d0290F27194383c6979011a68',
     tokenCommunityManager: '0x5620cfb48748c1be2dfb919eee7414b491ccba20',
     referralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
