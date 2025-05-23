@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CommentsView, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   CanvasSignedData,
+  CompletionModel,
   DEFAULT_NAME,
   deserializeCanvas,
   GatedActionEnum,
@@ -87,6 +88,8 @@ type CommentCardProps = {
   onAIReply?: (commentText?: string) => Promise<void>;
   // AI streaming props
   isStreamingAIReply?: boolean;
+  streamingModelId?: string;
+  modelName?: string;
   parentCommentText?: string;
   onStreamingComplete?: () => void;
   // voting
@@ -135,6 +138,8 @@ export const CommentCard = ({
   weightType,
   onAIReply,
   isStreamingAIReply,
+  streamingModelId,
+  modelName,
   parentCommentText,
   onStreamingComplete,
   tokenNumDecimals,
@@ -243,7 +248,7 @@ export const CommentCard = ({
   const activeUserAddress = user.activeAccount?.address;
 
   useEffect(() => {
-    if (!isStreamingAIReply) return;
+    if (!isStreamingAIReply || !streamingModelId) return;
 
     let mounted = true;
     let finalText = '';
@@ -251,9 +256,6 @@ export const CommentCard = ({
 
     const generateAIReply = async () => {
       try {
-        // Build context by combining thread context with parent comment if available
-
-        // Construct extended context with community details
         const communityName = community?.name || 'this community';
         const communityDescription =
           community?.description || 'No specific description provided.';
@@ -273,7 +275,7 @@ Community Description: ${communityDescription}`;
 
         const originalContext = [originalThreadPart, originalParentPart]
           .filter(Boolean)
-          .join('\n\n'); // Separator between thread context and parent comment context
+          .join('\n\n');
 
         const contextText =
           `${extendedCommunityContext}\n\n` +
@@ -282,11 +284,11 @@ Community Description: ${communityDescription}`;
 
         const { userPrompt, systemPrompt } = generateCommentPrompt(contextText);
 
-        setStreamingText(''); // Clear previous streaming text
+        setStreamingText('');
 
         await generateCompletion(userPrompt, {
           systemPrompt: systemPrompt,
-          model: 'gpt-4o-mini',
+          model: streamingModelId as CompletionModel,
           stream: true,
           onChunk: (chunk) => {
             if (mounted) {
@@ -295,29 +297,48 @@ Community Description: ${communityDescription}`;
               finalText = accumulatedText;
             }
           },
+          onError: (error) => {
+            if (mounted) {
+              console.error(
+                `Error streaming for model ${streamingModelId}:`,
+                error,
+              );
+              setStreamingText(
+                `Error generating reply from ${modelName || 'AI'}.`,
+              );
+              onStreamingCompleteRef.current?.();
+            }
+          },
         });
 
-        if (mounted && finalText) {
-          if (!activeUserAddress) {
-            throw new Error('No active account found');
+        if (mounted) {
+          if (finalText && !finalText.startsWith('Error generating reply')) {
+            if (!activeUserAddress) {
+              throw new Error('No active account found');
+            }
+            const input = await buildCreateCommentInput({
+              communityId: comment.community_id,
+              address: activeUserAddress,
+              threadId: comment.thread_id,
+              parentCommentId: isRootComment ? null : comment.id,
+              threadMsgId: null,
+              unescapedText: finalText,
+              parentCommentMsgId: null,
+              existingNumberOfComments: 0,
+            });
+            await createCommentRef.current(input);
           }
-
-          const input = await buildCreateCommentInput({
-            communityId: comment.community_id,
-            address: activeUserAddress,
-            threadId: comment.thread_id,
-            parentCommentId: isRootComment ? null : comment.id,
-            threadMsgId: null,
-            unescapedText: finalText,
-            parentCommentMsgId: null,
-            existingNumberOfComments: 0,
-          });
-
-          await createCommentRef.current(input);
           onStreamingCompleteRef.current?.();
         }
       } catch (error) {
         if (mounted) {
+          console.error(
+            `Error in AI reply process for model ${streamingModelId}:`,
+            error,
+          );
+          setStreamingText(
+            `Failed to process reply from ${modelName || 'AI'}.`,
+          );
           onStreamingCompleteRef.current?.();
         }
       }
@@ -329,6 +350,8 @@ Community Description: ${communityDescription}`;
     };
   }, [
     isStreamingAIReply,
+    streamingModelId,
+    modelName,
     isRootComment,
     threadContext,
     threadTitle,
@@ -422,7 +445,7 @@ Community Description: ${communityDescription}`;
           {isStreamingAIReply && (
             <div className="streaming-indicator">
               <CWIcon iconName="sparkle" iconSize="small" />
-              <CWText type="caption">AI Assistant</CWText>
+              <CWText type="caption">{modelName || 'AI Assistant'}</CWText>
             </div>
           )}
         </div>

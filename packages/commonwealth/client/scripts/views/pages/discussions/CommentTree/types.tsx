@@ -6,6 +6,7 @@ import Permissions from 'utils/Permissions';
 import Thread from '../../../../models/Thread';
 import { CommentViewParams } from '../CommentCard/CommentCard';
 import './CommentTree.scss';
+import { StreamingReplyInstance } from './TreeHierarchy';
 
 const actionPermissions = [
   GatedActionEnum.CREATE_COMMENT,
@@ -23,8 +24,12 @@ export type CommentsTreeProps = {
   canComment: boolean;
   onThreadCreated?: (threadId: number) => Promise<void>;
   aiCommentsToggleEnabled?: boolean;
-  streamingReplyIds: number[];
-  setStreamingReplyIds: React.Dispatch<React.SetStateAction<number[]>>;
+  streamingInstances: StreamingReplyInstance[];
+  setStreamingInstances: (
+    instances:
+      | StreamingReplyInstance[]
+      | ((prevInstances: StreamingReplyInstance[]) => StreamingReplyInstance[]),
+  ) => void;
   permissions: ReturnType<
     typeof Permissions.getMultipleActionsPermission<typeof actionPermissions>
   >;
@@ -47,11 +52,7 @@ export type CommentFiltersProps = Pick<CommentsTreeProps, 'commentsRef'> & {
 
 export type TreeHierarchyProps = Pick<
   CommentsTreeProps,
-  | 'pageRef'
-  | 'thread'
-  | 'permissions'
-  | 'streamingReplyIds'
-  | 'setStreamingReplyIds'
+  'pageRef' | 'thread' | 'permissions'
 > & {
   parentCommentId?: number;
   isThreadLocked: boolean;

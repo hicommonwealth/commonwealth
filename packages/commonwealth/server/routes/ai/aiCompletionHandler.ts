@@ -1,3 +1,4 @@
+import { logger } from '@hicommonwealth/core';
 import { CompletionOptions } from '@hicommonwealth/shared';
 import { Request, Response } from 'express';
 import { OpenAI } from 'openai';
@@ -14,6 +15,8 @@ interface StructuredPrompt {
 type RequestBody = Omit<CompletionOptions, 'prompt'> & {
   prompt: string | StructuredPrompt;
 };
+
+const log = logger(import.meta);
 
 export const aiCompletionHandler = async (req: Request, res: Response) => {
   try {
@@ -71,42 +74,45 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       });
     }
 
-    // Determine actual model ID based on provider
-    // OpenRouter needs full model path, OpenAI uses shorter names
-    let modelId: string = model; // Start with the original model, explicitly typed as string
+    // Model selection logic based on useWebSearch flag
+    let modelId: string = model;
     let addOpenAiWebSearchOptions = false;
 
     if (useOR) {
-      // For OpenRouter, append :online if not already present
-      if (!model.endsWith(':online')) {
+      // OpenRouter: append :online if web search is enabled
+      if (useWebSearch) {
         modelId = `${model}:online`;
+      } else {
+        modelId = model;
       }
     } else {
-      // For OpenAI, strip provider prefix and map to search-preview models
-      // or use existing -search-preview models
-      const baseModel = model.includes('/') ? model.split('/')[1] : model;
-      if (baseModel === 'gpt-4o') {
-        modelId = 'gpt-4o-search-preview';
-        addOpenAiWebSearchOptions = true;
-      } else if (baseModel === 'gpt-4o-mini') {
-        modelId = 'gpt-4o-mini-search-preview';
-        addOpenAiWebSearchOptions = true;
-      } else if (baseModel.endsWith('-search-preview')) {
-        // If user explicitly passes a search-preview model
-        modelId = baseModel;
-        addOpenAiWebSearchOptions = true;
+      // OpenAI: only gpt-4o or gpt-4o-mini support web search
+      if (useWebSearch) {
+        if (model === 'gpt-4o') {
+          modelId = 'gpt-4o-search-preview';
+          addOpenAiWebSearchOptions = true;
+        } else if (model === 'gpt-4o-mini') {
+          modelId = 'gpt-4o-mini-search-preview';
+          addOpenAiWebSearchOptions = true;
+        } else {
+          return res.status(400).json({
+            error:
+              'Web search is only supported for gpt-4o and gpt-4o-mini with OpenAI',
+          });
+        }
       } else {
-        modelId = baseModel; // Use the stripped model name if no specific search preview version
+        modelId = model;
+        addOpenAiWebSearchOptions = false;
       }
     }
 
-    // Append :online suffix if using OpenRouter and web search is enabled
-    if (useOR && useWebSearch) {
-      // Avoid appending if already present (e.g., if client sent it directly)
-      if (!modelId.endsWith(':online')) {
-        modelId = `${modelId}:online`;
-      }
-    }
+    // Log the final model, provider, and web search status
+    log.info(
+      `AI completion request: 
+      \n modelId=${modelId}, 
+      \n provider=${useOR ? 'OpenRouter' : 'OpenAI'}, 
+      \n webSearch=${!!useWebSearch}`,
+    );
 
     // Initialize client
     const openAIConfig = {

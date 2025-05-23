@@ -44,6 +44,9 @@ export const useAiCompletion = () => {
           stream: streamMode,
           useOpenRouter: options?.useOpenRouter,
           jwt: userStore.getState().jwt,
+          ...(typeof options?.useWebSearch === 'boolean'
+            ? { useWebSearch: options.useWebSearch }
+            : {}),
         };
 
         if (typeof options?.temperature === 'number') {
