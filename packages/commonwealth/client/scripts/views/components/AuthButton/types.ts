@@ -21,7 +21,12 @@ export type CosmosWallets = 'keplr' | 'leap';
 export type SubstrateWallets = 'polkadot';
 export type SolanaWallets = 'phantom' | 'backpack' | 'solflare';
 export type SuiWallets = 'sui-wallet';
-export type EVMWallets = 'walletconnect' | 'metamask' | 'coinbase' | 'okx';
+export type EVMWallets =
+  | 'walletconnect'
+  | 'metamask'
+  | 'coinbase'
+  | 'okx'
+  | 'binance';
 export type CommunitySpecificWallets =
   | 'terrastation'
   | 'terra-walletconnect'
