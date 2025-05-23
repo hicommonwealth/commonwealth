@@ -6,6 +6,7 @@ import { systemActor } from '../middleware';
 
 const log = logger(import.meta);
 
+// @eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function debounceRefresh<T extends (...args: any[]) => Promise<void>>(
   fn: T,
   delay: number,
