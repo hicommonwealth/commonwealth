@@ -1,4 +1,5 @@
 import { GatedActionEnum, UserFriendlyActionMap } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWToggle } from 'client/scripts/views/components/component_kit/cw_toggle';
 import React from 'react';
@@ -12,6 +13,8 @@ const TopicPermissionToggleGroupSubForm = ({
   PermissionFormData,
   onChange,
 }: TopicPermissionFormToggleGroupSubFormProps) => {
+  const privateTopicsEnabled = useFlag('privateTopics');
+
   const topics = PermissionFormData.map((item) => item.topic);
 
   const toggle = (selectedTopics: Topic[], gatedAction: GatedActionEnum) => {
@@ -67,9 +70,11 @@ const TopicPermissionToggleGroupSubForm = ({
               {perm}
             </CWText>
           ))}
-          <CWText key="is_private" className="header-item" fontWeight="bold">
-            Private View
-          </CWText>
+          {privateTopicsEnabled && (
+            <CWText key="is_private" className="header-item" fontWeight="bold">
+              Private View
+            </CWText>
+          )}
         </div>
       </div>
 
@@ -90,12 +95,14 @@ const TopicPermissionToggleGroupSubForm = ({
               </div>
             ),
           )}
-          <div className="toggle" key="is_private">
-            <CWToggle
-              checked={topic.is_private}
-              onChange={() => handleIsPrivateChange(topic)}
-            />
-          </div>
+          {privateTopicsEnabled && (
+            <div className="toggle" key="is_private">
+              <CWToggle
+                checked={topic.is_private}
+                onChange={() => handleIsPrivateChange(topic)}
+              />
+            </div>
+          )}
         </div>
       ))}
 
@@ -115,12 +122,14 @@ const TopicPermissionToggleGroupSubForm = ({
             </div>
           ),
         )}
-        <div className="toggle" key="is_private">
-          <CWToggle
-            checked={topics.every((topic) => topic.is_private)}
-            onChange={() => handleIsPrivateChange()}
-          />
-        </div>
+        {privateTopicsEnabled && (
+          <div className="toggle" key="is_private">
+            <CWToggle
+              checked={topics.every((topic) => topic.is_private)}
+              onChange={() => handleIsPrivateChange()}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { UserFriendlyActionMap } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { useState } from 'react';
@@ -30,6 +31,7 @@ const GroupCard = ({
   onEditClick = () => {},
   profiles,
 }: GroupCardProps) => {
+  const privateTopicsEnabled = useFlag('privateTopics');
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [currentAllowlistPage, setCurrentAllowlistPage] = useState(1);
 
@@ -169,10 +171,14 @@ const GroupCard = ({
                 <div className="row topic-row">
                   <CWText type="b2" className="topic-name">
                     {t.name}
-                    {t.is_private ? <CWIcon iconName="lock" /> : ''}
+                    {privateTopicsEnabled && t.is_private ? (
+                      <CWIcon iconName="lock" />
+                    ) : (
+                      ''
+                    )}
                   </CWText>
                   <div className="actions-container">
-                    {(t.permissions || ['None']).map((p, idx) => (
+                    {(t.permissions || ['None']).sort().map((p, idx) => (
                       <span key={idx} className="action-tag">
                         <CWTag
                           label={UserFriendlyActionMap[p]}
