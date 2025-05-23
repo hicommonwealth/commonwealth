@@ -37,40 +37,37 @@ export async function getLogs({
   lastBlockNum: number;
   blockDetails: Record<number, EvmBlockDetails>;
 }> {
-  console.log(
-    `getLogs called with startingBlockNum: ${startingBlockNum} and endingBlockNum: ${endingBlockNum}`,
-  );
   let startBlock = startingBlockNum;
   let endBlock = endingBlockNum;
-  if (startBlock > endingBlockNum) {
+  if (startBlock > endBlock) {
     logger.error(
       'Starting block number is greater than the latest/current block number!',
       undefined,
       {
         startBlock,
-        endingBlockNum,
+        endBlock,
       },
     );
-    return { logs: [], lastBlockNum: endingBlockNum, blockDetails: {} };
+    return { logs: [], lastBlockNum: endBlock, blockDetails: {} };
   }
 
   if (contractAddresses.length === 0) {
     logger.error(`No contracts given`);
-    return { logs: [], lastBlockNum: endingBlockNum, blockDetails: {} };
+    return { logs: [], lastBlockNum: endBlock, blockDetails: {} };
   }
 
   // Limit the number of blocks to fetch to avoid rate limiting on some public EVM nodes like Celo
   // maxBlockRange = -1 indicates there is no rate limiting (though chunking
   // may still be required - see the next condition)
   if (maxBlockRange !== -1 && endBlock - startBlock > maxBlockRange) {
-    startBlock = endingBlockNum - maxBlockRange;
+    startBlock = endBlock - maxBlockRange;
     logger.error(
       'Block span too large. The number of fetch blocked is reduced to 500.',
       undefined,
       {
         contractAddresses,
         startBlock,
-        endingBlockNum,
+        endBlock,
       },
     );
   } else if (
