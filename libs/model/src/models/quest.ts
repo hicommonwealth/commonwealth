@@ -84,6 +84,7 @@ export const QuestActionMeta = (
       },
       instructions_link: { type: Sequelize.STRING, allowNull: true },
       content_id: { type: Sequelize.STRING, allowNull: true },
+      community_goal_meta_id: { type: Sequelize.INTEGER, allowNull: true },
       start_link: { type: Sequelize.STRING, allowNull: true },
     },
     {

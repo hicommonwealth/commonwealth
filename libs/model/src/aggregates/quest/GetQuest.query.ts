@@ -30,6 +30,10 @@ export function GetQuest(): Query<typeof schemas.GetQuest> {
                   },
                 ],
               },
+              {
+                model: models.CommunityGoalMeta,
+                required: false,
+              },
             ],
           },
         ],
