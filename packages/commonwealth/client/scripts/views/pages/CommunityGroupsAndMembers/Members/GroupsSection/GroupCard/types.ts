@@ -18,7 +18,12 @@ export type GroupCardProps = {
   requirements?: RequirementCardProps[]; // This represents erc requirements
   requirementsToFulfill: 'ALL' | number;
   allowLists?: string[];
-  topics: { id: number; name: string; permissions?: GatedActionEnum[] }[];
+  topics: {
+    id: number;
+    name: string;
+    is_private: boolean;
+    permissions?: GatedActionEnum[];
+  }[];
   canEdit?: boolean;
   onEditClick?: () => void;
   profiles?: Map<string, MinimumProfile>;

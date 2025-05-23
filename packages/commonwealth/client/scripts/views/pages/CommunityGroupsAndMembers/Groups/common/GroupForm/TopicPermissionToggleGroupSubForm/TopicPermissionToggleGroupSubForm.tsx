@@ -1,4 +1,5 @@
 import { GatedActionEnum, UserFriendlyActionMap } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWToggle } from 'client/scripts/views/components/component_kit/cw_toggle';
 import React from 'react';
@@ -12,43 +13,9 @@ const TopicPermissionToggleGroupSubForm = ({
   PermissionFormData,
   onChange,
 }: TopicPermissionFormToggleGroupSubFormProps) => {
+  const privateTopicsEnabled = useFlag('privateTopics');
+
   const topics = PermissionFormData.map((item) => item.topic);
-
-  const handlePermissionChange = (
-    topic: Topic,
-    gatedAction: GatedActionEnum,
-  ) => {
-    const updatedData = PermissionFormData.map((item) => {
-      if (item.topic === topic) {
-        const updatedPermissions = item.permission.filter(
-          (perm) => perm !== gatedAction,
-        );
-
-        if (!item.permission.some((perm) => perm === gatedAction)) {
-          updatedPermissions.push(gatedAction);
-        }
-
-        return { ...item, permission: updatedPermissions };
-      }
-      return item;
-    });
-
-    onChange(updatedData);
-  };
-
-  const toggleAllPermissionsForAction = (
-    gatedAction: GatedActionEnum,
-    toggleValue: boolean,
-  ) => {
-    const updatedData = PermissionFormData.map((item) => {
-      const updatedPermissions = toggleValue
-        ? [...new Set([...item.permission, gatedAction])]
-        : item.permission.filter((perm) => perm !== gatedAction);
-      return { ...item, permission: updatedPermissions };
-    });
-
-    onChange(updatedData);
-  };
 
   const toggle = (selectedTopics: Topic[], gatedAction: GatedActionEnum) => {
     const value = selectedTopics.every((topic) =>
@@ -57,6 +24,38 @@ const TopicPermissionToggleGroupSubForm = ({
       )?.permission.includes(gatedAction),
     );
     return !value;
+  };
+
+  const handlePermissionChange = (
+    gatedAction: GatedActionEnum,
+    topic?: Topic,
+  ) => {
+    if (topic) {
+      const data = PermissionFormData.find((p) => p.topic.id === topic.id);
+      if (data) {
+        const enable = !data.permission.some((p) => p === gatedAction);
+        data.permission = enable
+          ? [...new Set([...data.permission, gatedAction])]
+          : data.permission.filter((perm) => perm !== gatedAction);
+      }
+    } else {
+      const enable = toggle(topics, gatedAction);
+      PermissionFormData.forEach((item) => {
+        item.permission = enable
+          ? [...new Set([...item.permission, gatedAction])]
+          : item.permission.filter((perm) => perm !== gatedAction);
+      });
+    }
+    onChange(PermissionFormData.map((item) => ({ ...item })));
+  };
+
+  const handleIsPrivateChange = (topic?: Topic) => {
+    if (topic) topic.is_private = !topic.is_private;
+    else {
+      const enabled = !topics.every((t) => t.is_private);
+      topics.forEach((t) => (t.is_private = enabled));
+    }
+    onChange(PermissionFormData.map((item) => ({ ...item })));
   };
 
   return (
@@ -71,6 +70,11 @@ const TopicPermissionToggleGroupSubForm = ({
               {perm}
             </CWText>
           ))}
+          {privateTopicsEnabled && (
+            <CWText key="is_private" className="header-item" fontWeight="bold">
+              Private View
+            </CWText>
+          )}
         </div>
       </div>
 
@@ -86,10 +90,18 @@ const TopicPermissionToggleGroupSubForm = ({
                   checked={PermissionFormData.find(
                     (item) => item.topic === topic,
                   )?.permission.includes(gatedAction)}
-                  onChange={() => handlePermissionChange(topic, gatedAction)}
+                  onChange={() => handlePermissionChange(gatedAction, topic)}
                 />
               </div>
             ),
+          )}
+          {privateTopicsEnabled && (
+            <div className="toggle" key="is_private">
+              <CWToggle
+                checked={topic.is_private}
+                onChange={() => handleIsPrivateChange(topic)}
+              />
+            </div>
           )}
         </div>
       ))}
@@ -105,15 +117,18 @@ const TopicPermissionToggleGroupSubForm = ({
                     (item) => item.topic === topic,
                   )?.permission.includes(gatedAction),
                 )}
-                onChange={() =>
-                  toggleAllPermissionsForAction(
-                    gatedAction,
-                    toggle(topics, gatedAction),
-                  )
-                }
+                onChange={() => handlePermissionChange(gatedAction)}
               />
             </div>
           ),
+        )}
+        {privateTopicsEnabled && (
+          <div className="toggle" key="is_private">
+            <CWToggle
+              checked={topics.every((topic) => topic.is_private)}
+              onChange={() => handleIsPrivateChange()}
+            />
+          </div>
         )}
       </div>
     </div>

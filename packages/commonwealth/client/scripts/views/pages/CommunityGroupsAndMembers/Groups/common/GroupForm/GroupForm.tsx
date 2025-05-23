@@ -225,15 +225,18 @@ const GroupForm = ({
 
     if (initialValues.topics) {
       const updatedInitialValues: TopicPermissionToggleGroupSubFormsState[] =
-        initialValues.topics.map(({ label, value, permission }) => ({
-          topic: {
-            id: Number(value),
-            name: label,
-          },
-          permission: (Array.isArray(permission)
-            ? permission.filter(isGatedAction)
-            : []) as Permission[],
-        }));
+        initialValues.topics.map(
+          ({ label, value, is_private, permission }) => ({
+            topic: {
+              id: Number(value),
+              is_private,
+              name: label,
+            },
+            permission: (Array.isArray(permission)
+              ? permission.filter(isGatedAction)
+              : []) as Permission[],
+          }),
+        );
       setTopicPermissionsToggleGroupSubForms(updatedInitialValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -412,6 +415,7 @@ const GroupForm = ({
       ...values,
       topics: topicPermissionsToggleGroupSubForms.map((t) => ({
         id: t.topic.id,
+        is_private: t.topic.is_private,
         permissions: t.permission,
       })),
       requirementsToFulfill,
@@ -427,6 +431,7 @@ const GroupForm = ({
         values.topics.map((topic) => ({
           topic: {
             id: Number(topic.value),
+            is_private: false,
             name: topic.label,
           },
           permission: [],

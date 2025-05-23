@@ -133,6 +133,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           topics: (foundGroup.topics || []).map((topic) => ({
             label: topic.name,
             value: topic.id,
+            is_private: topic.is_private,
             permission: topic.permissions || [],
           })),
         }}

@@ -258,18 +258,22 @@ async function checkGatedActions(
 
   // Get the groups and gated actions
   // TODO: we can probably cache this
+  // TODO: @timolegros let's try to use this query to also join memberships
+  // so we don't have to keep querying the database below
   const groups = await models.sequelize.query<
     z.infer<typeof Group> & {
       gated_actions?: GroupGatedActionKey[];
     }
   >(
     `
-      SELECT g.*, gp.topic_id, gp.gated_actions
-      FROM "Groups" as g
-             JOIN "GroupGatedActions" gp ON g.id = gp.group_id
-      WHERE g.community_id = :community_id
+      SELECT g.*, gp.topic_id, gp.gated_actions, gp.is_private
+      FROM
+        "Groups" as g
+        JOIN "GroupGatedActions" gp ON g.id = gp.group_id
+      WHERE
+        g.community_id = :community_id
         AND gp.topic_id = :topic_id
-        AND :action = ANY(gp.gated_actions)
+        AND (:action = ANY(gp.gated_actions) OR gp.is_private = true)
     `,
     {
       type: QueryTypes.SELECT,

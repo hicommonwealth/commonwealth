@@ -19,12 +19,14 @@ export function buildTopicPermissionsMap(groups: GroupAttributes[]) {
     if (entry)
       entry.push({
         id: p.topic_id,
+        is_private: p.is_private,
         permissions: p.gated_actions,
       });
     else
       map.set(p.group_id, [
         {
           id: p.topic_id,
+          is_private: p.is_private,
           permissions: p.gated_actions,
         },
       ]);
@@ -52,7 +54,12 @@ export function GetMemberships(): Query<typeof schemas.GetMemberships> {
           include: [
             {
               model: models.GroupGatedAction,
-              attributes: ['group_id', 'topic_id', 'gated_actions'],
+              attributes: [
+                'group_id',
+                'topic_id',
+                'is_private',
+                'gated_actions',
+              ],
               where: topic_id ? { topic_id } : undefined,
             },
           ],

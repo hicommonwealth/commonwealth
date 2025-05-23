@@ -61,17 +61,23 @@ export function UpdateGroup(): Command<typeof schemas.UpdateGroup> {
                   .join(', ')}]::"enum_GroupGatedActions_gated_actions"[]`;
                 await models.sequelize.query(
                   `
-                  INSERT INTO "GroupGatedActions" (group_id, topic_id, gated_actions, created_at, updated_at)
-                  VALUES (:group_id, :topic_id, ${gatedActions}, NOW(), NOW())
+                  INSERT INTO "GroupGatedActions" (
+                    group_id, topic_id, is_private,gated_actions, created_at, updated_at
+                  )
+                  VALUES (
+                    :group_id, :topic_id, :is_private, ${gatedActions}, NOW(), NOW()
+                  )
                   ON CONFLICT(group_id, topic_id) DO UPDATE
                     SET gated_actions = EXCLUDED.gated_actions,
-                        updated_at      = NOW();
+                        is_private = EXCLUDED.is_private,
+                        updated_at = NOW();
                 `,
                   {
                     transaction,
                     replacements: {
                       group_id,
                       topic_id: t.id,
+                      is_private: !!t.is_private,
                     },
                   },
                 );
