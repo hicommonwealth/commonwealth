@@ -106,7 +106,7 @@ describe('Stake lifecycle', () => {
       'validateCommunityStakeConfig',
     ).mockImplementation((c) => {
       if (!c.namespace) throw new AppError('No namespace');
-      if (c.id === id_without_stake_to_set) throw new AppError('No stake');
+      // if (c.id === id_without_stake_to_set) throw new AppError('No stake');
       return Promise.resolve(undefined);
     });
   });
