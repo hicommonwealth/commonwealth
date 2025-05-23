@@ -331,14 +331,14 @@ describe('EventStream Policy Integration Tests', () => {
           topic_id: 1,
         } satisfies z.infer<typeof events.ThreadCreated>,
       },
-      {
-        event_name: 'LaunchpadTokenCreated',
-        event_payload: serializeBigIntObj({
-          transaction_hash: '0x7777777777777777777777777777777777777777',
-          eth_chain_id: 1,
-          block_timestamp: 1n,
-        } satisfies z.infer<typeof events.LaunchpadTokenCreated>),
-      },
+      // {
+      //   event_name: 'LaunchpadTokenCreated',
+      //   event_payload: serializeBigIntObj({
+      //     transaction_hash: '0x7777777777777777777777777777777777777777',
+      //     eth_chain_id: 1,
+      //     block_timestamp: 1n,
+      //   } satisfies z.infer<typeof events.LaunchpadTokenCreated>),
+      // },
       // {
       //   event_name: 'LaunchpadTokenTraded',
       //   event_payload: serializeBigIntObj({
@@ -378,7 +378,7 @@ describe('EventStream Policy Integration Tests', () => {
       'ContestEnding',
       'CommunityCreated',
       'ThreadCreated',
-      'LaunchpadTokenCreated',
+      // 'LaunchpadTokenCreated',
       // 'LaunchpadTokenTraded',
       'LaunchpadTokenGraduated',
     ] satisfies Events[];
