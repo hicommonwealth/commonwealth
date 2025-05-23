@@ -169,6 +169,7 @@ const GroupCard = ({
                 <div className="row topic-row">
                   <CWText type="b2" className="topic-name">
                     {t.name}
+                    {t.is_private ? <CWIcon iconName="lock" /> : ''}
                   </CWText>
                   <div className="actions-container">
                     {(t.permissions || ['None']).map((p, idx) => (

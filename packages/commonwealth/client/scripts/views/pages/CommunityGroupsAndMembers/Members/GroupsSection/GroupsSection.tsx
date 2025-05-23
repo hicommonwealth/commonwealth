@@ -116,6 +116,7 @@ const GroupsSection = ({
               topics={(group?.topics || []).map((x) => ({
                 id: x.id,
                 name: x.name,
+                is_private: x.is_private,
                 permissions: x.permissions,
               }))}
               canEdit={canManageGroups}

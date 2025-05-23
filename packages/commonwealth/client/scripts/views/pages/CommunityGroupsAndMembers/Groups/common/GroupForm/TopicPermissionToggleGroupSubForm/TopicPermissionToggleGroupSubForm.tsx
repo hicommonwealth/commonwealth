@@ -36,6 +36,10 @@ const TopicPermissionToggleGroupSubForm = ({
     onChange(updatedData);
   };
 
+  const handlePrivateChange = () => {
+    onChange(PermissionFormData.map((item) => ({ ...item })));
+  };
+
   const toggleAllPermissionsForAction = (
     gatedAction: GatedActionEnum,
     toggleValue: boolean,
@@ -71,6 +75,9 @@ const TopicPermissionToggleGroupSubForm = ({
               {perm}
             </CWText>
           ))}
+          <CWText key="is_private" className="header-item" fontWeight="bold">
+            Private
+          </CWText>
         </div>
       </div>
 
@@ -91,6 +98,15 @@ const TopicPermissionToggleGroupSubForm = ({
               </div>
             ),
           )}
+          <div className="toggle" key="is_private">
+            <CWToggle
+              checked={topic.is_private}
+              onChange={() => {
+                topic.is_private = !topic.is_private;
+                handlePrivateChange();
+              }}
+            />
+          </div>
         </div>
       ))}
 
@@ -115,6 +131,16 @@ const TopicPermissionToggleGroupSubForm = ({
             </div>
           ),
         )}
+        <div className="toggle" key="is_private">
+          <CWToggle
+            checked={topics.every((topic) => topic.is_private)}
+            onChange={() => {
+              const value = !topics.every((topic) => topic.is_private);
+              topics.forEach((topic) => (topic.is_private = value));
+              handlePrivateChange();
+            }}
+          />
+        </div>
       </div>
     </div>
   );
