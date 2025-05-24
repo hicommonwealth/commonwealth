@@ -36,7 +36,7 @@ const CommonTrade = ({ tradeConfig }: CommonTradeProps) => {
     <div className="CommonTrade">
       <CWText type="h4" className="token-info">
         Trade Token - {tradeConfig.token.symbol}{' '}
-        {trading.token.icon_url && (
+        {trading.token && trading.token.icon_url && (
           <TokenIcon size="large" url={trading.token.icon_url} />
         )}
       </CWText>
