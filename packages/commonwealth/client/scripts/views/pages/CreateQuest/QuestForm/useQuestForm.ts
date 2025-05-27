@@ -38,7 +38,10 @@ import {
   useCreateQuestMutation,
   useUpdateQuestMutation,
 } from 'state/api/quests';
-import { useCreateGoalMetaMutation } from 'state/api/superAdmin';
+import {
+  useCreateGoalMetaMutation,
+  useGetGoalMetasQuery,
+} from 'state/api/superAdmin';
 import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
@@ -191,6 +194,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
   const { mutateAsync: createQuest } = useCreateQuestMutation();
   const { mutateAsync: updateQuest } = useUpdateQuestMutation();
   const { mutateAsync: createGoalMeta } = useCreateGoalMetaMutation();
+  const { data: goalMetas = [] } = useGetGoalMetasQuery({
+    apiEnabled: true,
+  });
 
   const navigate = useCommonNavigate();
 
@@ -397,7 +403,21 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     const { goalTarget, goalType } =
       questActionSubForms[foundCommunityGoalReachedActionIndex]?.values || {};
     if (goalTarget && goalType) {
-      // TODO: find existing goal meta, use its id if present
+      // find existing goal meta, use its id if present
+      const foundMeta = goalMetas.find(
+        (m) => m.type === goalType && m.target === parseInt(`${goalTarget}`),
+      );
+      if (foundMeta) {
+        // TODO: fix - api throws unique constraint error if goal id is repeated
+        console.log('foundMeta => ', foundMeta);
+        // updateSubFormByIndex(
+        //   {
+        //     contentIdentifier: `${foundMeta.id || ''}`,
+        //   },
+        //   foundCommunityGoalReachedActionIndex,
+        // );
+        // return true;
+      }
 
       try {
         // create goal meta
