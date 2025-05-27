@@ -46,6 +46,12 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
     });
 
+  db.CommunityGoalMeta.withMany(db.QuestActionMeta, {
+    foreignKey: 'community_goal_meta_id',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  });
+
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
     onUpdate: 'CASCADE',
@@ -133,7 +139,7 @@ export const buildAssociations = (db: DB) => {
     onUpdate: 'CASCADE',
     onDelete: 'SET NULL',
   })
-    .withMany(db.GroupPermission, {
+    .withMany(db.GroupGatedAction, {
       foreignKey: 'topic_id',
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
@@ -185,7 +191,7 @@ export const buildAssociations = (db: DB) => {
     onDelete: 'CASCADE',
   });
 
-  db.Group.withMany(db.GroupPermission, {
+  db.Group.withMany(db.GroupGatedAction, {
     foreignKey: 'group_id',
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',

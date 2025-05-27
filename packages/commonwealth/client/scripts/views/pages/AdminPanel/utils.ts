@@ -17,29 +17,6 @@ export const updateCommunityCustomDomain = async ({
   });
 };
 
-export const updateSiteAdmin = async ({
-  address,
-  siteAdmin,
-}: {
-  address: string;
-  siteAdmin: boolean;
-}) => {
-  await axios.post(`${SERVER_URL}/updateSiteAdmin`, {
-    address,
-    siteAdmin,
-    jwt: userStore.getState().jwt,
-  });
-};
-
-export const getCSVContent = async ({ id }: { id: string }) => {
-  const res = await axios.post(`${SERVER_URL}/exportMembersList`, {
-    communityId: id,
-    jwt: userStore.getState().jwt,
-  });
-
-  return res.data.result.data[0];
-};
-
 type CSVRow = Record<string, string | number | string[] | number[]>;
 
 export function downloadCSV(rows: CSVRow[], filename: string) {

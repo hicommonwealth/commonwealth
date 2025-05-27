@@ -12,7 +12,6 @@ import {
   CommentContext,
   CommentContextInput,
   Group,
-  GroupPermissionAction,
   PollContext,
   PollContextInput,
   ReactionContext,
@@ -24,7 +23,7 @@ import {
   VerifiedContext,
   VerifiedContextInput,
 } from '@hicommonwealth/schemas';
-import { Role } from '@hicommonwealth/shared';
+import { GroupGatedActionKey, Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
 import { ZodSchema, z } from 'zod';
 import { models } from '../database';
@@ -125,6 +124,12 @@ async function findReaction(
 async function findPoll(actor: Actor, poll_id: number) {
   const poll = await models.Poll.findOne({
     where: { id: poll_id },
+    include: [
+      {
+        model: models.Thread,
+        required: true,
+      },
+    ],
   });
   if (!poll) {
     throw new InvalidInput('Must provide a valid poll id to authorize');
@@ -239,10 +244,10 @@ async function findAddress(
 /**
  * Checks if actor address passes a set of requirements and grants access for all groups of the given topic
  */
-async function hasTopicPermissions(
+async function checkGatedActions(
   actor: Actor,
   address_id: number,
-  action: GroupPermissionAction,
+  action: GroupGatedActionKey,
   topic_id: number,
 ): Promise<void> {
   if (!topic_id)
@@ -251,22 +256,20 @@ async function hasTopicPermissions(
   const topic = await models.Topic.findOne({ where: { id: topic_id } });
   if (!topic) throw new InvalidInput('Topic not found');
 
-  if (topic.group_ids?.length === 0) return;
-
-  // check if user has permission to perform "action" in 'topic_id'
-  // the 'topic_id' can belong to any group where user has membership
-  // the group with 'topic_id' having higher permissions will take precedence
+  // Get the groups and gated actions
+  // TODO: we can probably cache this
   const groups = await models.sequelize.query<
     z.infer<typeof Group> & {
-      allowed_actions?: GroupPermissionAction[];
+      gated_actions?: GroupGatedActionKey[];
     }
   >(
     `
-        SELECT g.*, gp.topic_id, gp.allowed_actions
-        FROM "Groups" as g
-                 JOIN "GroupPermissions" gp ON g.id = gp.group_id
-        WHERE g.community_id = :community_id
-          AND gp.topic_id = :topic_id
+      SELECT g.*, gp.topic_id, gp.gated_actions
+      FROM "Groups" as g
+             JOIN "GroupGatedActions" gp ON g.id = gp.group_id
+      WHERE g.community_id = :community_id
+        AND gp.topic_id = :topic_id
+        AND :action = ANY(gp.gated_actions)
     `,
     {
       type: QueryTypes.SELECT,
@@ -274,34 +277,25 @@ async function hasTopicPermissions(
       replacements: {
         community_id: topic.community_id,
         topic_id: topic.id,
+        action,
       },
     },
   );
 
-  // There are 2 cases here. We either have the old group permission system where the group doesn't have
-  // any group_allowed_actions, or we have the new fine-grained permission system where the action must be in
-  // the group_allowed_actions list.
-  const allowedActions = groups.filter(
-    (g) => !g.allowed_actions || g.allowed_actions.includes(action),
-  );
-  if (allowedActions.length === 0)
-    throw new NonMember(actor, topic.name, action);
+  // if the action is not gated by any group then allow
+  if (!groups.length) return;
 
-  // check membership for all groups of topic
+  // if action is gated by 1 or more groups search for membership in those groups
   const memberships = await models.Membership.findAll({
     where: {
-      group_id: { [Op.in]: allowedActions.map((g) => g.id!) },
       address_id,
+      group_id: { [Op.in]: groups.map((g) => g.id!) },
     },
-    include: [
-      {
-        model: models.Group,
-        as: 'group',
-      },
-    ],
   });
-  if (memberships.length === 0) throw new NonMember(actor, topic.name, action);
+  // if not a member in any group then this is not a member
+  if (!memberships.length) throw new NonMember(actor, topic.name, action);
 
+  // if all memberships are rejected, return reject reasons
   const rejects = memberships.filter((m) => m.reject_reason);
   if (rejects.length === memberships.length)
     throw new RejectedMember(
@@ -310,6 +304,7 @@ async function hasTopicPermissions(
         reject.reject_reason!.map((reason) => reason.message),
       ),
     );
+  // a membership in one of the groups was found so the user has required permissions
 }
 
 /**
@@ -320,7 +315,7 @@ async function mustBeAuthorized(
   check: {
     permissions?: {
       topic_id: number;
-      action: GroupPermissionAction;
+      action: GroupGatedActionKey;
     };
     author?: boolean;
     collaborators?: z.infer<typeof Address>[];
@@ -347,7 +342,7 @@ async function mustBeAuthorized(
 
   // Allows when actor has group permissions in topic
   if (check.permissions)
-    return await hasTopicPermissions(
+    return await checkGatedActions(
       actor,
       context.address!.id!,
       check.permissions.action,
@@ -442,7 +437,7 @@ export function authRoles(...roles: Role[]) {
 
 type AggregateAuthOptions = {
   roles?: Role[];
-  action?: GroupPermissionAction;
+  action?: GroupGatedActionKey;
   author?: boolean;
   collaborators?: boolean;
 };
@@ -588,6 +583,7 @@ export function authPoll({ action }: AggregateAuthOptions) {
       ctx.actor,
       threadAuth.community_id,
       ['admin', 'moderator', 'member'],
+      poll.Thread!.address_id,
     );
 
     if (threadAuth.thread.archived_at)

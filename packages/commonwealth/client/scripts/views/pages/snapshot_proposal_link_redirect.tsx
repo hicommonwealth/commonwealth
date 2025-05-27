@@ -2,7 +2,7 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { getSnapshotProposalQuery } from 'state/api/snapshots';
-import { PageLoading } from './loading';
+import { LoadingIndicator } from '../components/LoadingIndicator/LoadingIndicator';
 
 type SnapshotProposalLinkRedirectProps = {
   identifier: string;
@@ -41,7 +41,7 @@ const SnapshotProposalLinkRedirect = ({
     fetchSnapshotData();
   }, [navigate]);
 
-  return <PageLoading />;
+  return <LoadingIndicator />;
 };
 
 export default SnapshotProposalLinkRedirect;

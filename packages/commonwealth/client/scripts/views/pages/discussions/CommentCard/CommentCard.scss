@@ -13,6 +13,13 @@
     }
   }
 
+  .streaming-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
   &.is-streaming {
     .comment-text {
       animation: pulse 1.5s infinite;
@@ -22,13 +29,6 @@
       border-radius: 6px;
       margin-top: 8px;
       border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    .streaming-indicator {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-bottom: 8px;
     }
 
     .streaming-text {
@@ -58,6 +58,7 @@
       align-items: center;
       display: flex;
       gap: 8px;
+      flex-wrap: wrap;
 
       .User {
         align-items: center;

@@ -266,9 +266,9 @@ export function EventStreamPolicy(): Policy<{
         );
       },
       LaunchpadTokenCreated: async ({ payload }) => {
-        await pushToEventStream(
-          await eventStreamMappers.LaunchpadTokenCreated(payload),
-        );
+        // await pushToEventStream(
+        //   await eventStreamMappers.LaunchpadTokenCreated(payload),
+        // );
       },
       LaunchpadTokenTraded: async ({ payload }) => {
         // await pushToEventStream(
