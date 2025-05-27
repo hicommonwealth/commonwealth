@@ -127,6 +127,10 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     eventSignature: subForm.eventSignature,
                     transactionHash: subForm.transactionHash,
                   }),
+                  ...(doesActionRequireGoalConfig(chosenAction) && {
+                    goalTarget: subForm.goalTarget,
+                    goalType: subForm.goalType,
+                  }),
                   participationLimit: subForm.participationLimit,
                   participationPeriod: subForm.participationPeriod,
                   participationTimesPerPeriod:
