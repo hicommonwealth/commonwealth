@@ -174,7 +174,7 @@ export const doesConfigAllowContentIdField = (
     config?.with_optional_topic_id ||
     config?.requires_twitter_tweet_link ||
     config?.requires_discord_server_id ||
-    config?.requires_goal_config ||
+    // config?.requires_goal_config || // hidden, will be set programatically
     config?.with_optional_chain_id ||
     config?.requires_group_id ||
     config?.with_optional_token_trade_threshold

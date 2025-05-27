@@ -40,6 +40,9 @@ export type QuestActionSubFormErrors = {
   ethChainId?: string;
   eventSignature?: string;
   transactionHash?: string;
+  // specific to community goal quests
+  goalType?: string;
+  goalTarget?: string;
 };
 
 export type QuestActionSubFormFields = {
@@ -68,6 +71,9 @@ export type QuestActionSubFormFields = {
   ethChainId?: string | number;
   eventSignature?: string;
   transactionHash?: string;
+  // specific to community goal quests
+  goalType?: string;
+  goalTarget?: string | number;
 };
 
 export type QuestActionSubFormConfig = {
