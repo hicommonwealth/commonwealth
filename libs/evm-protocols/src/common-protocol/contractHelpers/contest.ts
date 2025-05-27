@@ -10,11 +10,7 @@ import {
   decodeLog,
   factoryContracts,
 } from '@hicommonwealth/evm-protocols';
-import {
-  CONTEST_FEE_PERCENT,
-  ZERO_ADDRESS,
-  logger,
-} from '@hicommonwealth/shared';
+import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import {
   Chain,
@@ -30,8 +26,6 @@ import {
   mapToAbiRes,
 } from '../utils';
 import { getNamespace } from './namespace';
-
-const log = logger('evm-protocols:contest');
 
 export const getTotalContestBalance = async (
   contestAddress: string,
@@ -54,7 +48,7 @@ export const getTotalContestBalance = async (
         feeManagerAddressPromise = contestContract.read.FeeMangerAddress();
       }
     } catch (err) {
-      log.warn('Error using fee manager', err);
+      console.warn('Error using fee manager', { err: (err as Error).message });
     }
   }
 
