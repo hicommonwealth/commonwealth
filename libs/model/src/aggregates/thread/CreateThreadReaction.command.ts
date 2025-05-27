@@ -74,6 +74,7 @@ export function CreateThreadReaction(): Command<
         ...reaction!.toJSON(),
         community_id: thread.community_id,
         thread_id: thread.id!,
+        topic_id: thread.topic_id!,
       };
     },
   };
