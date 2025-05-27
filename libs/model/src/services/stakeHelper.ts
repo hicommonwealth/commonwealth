@@ -86,7 +86,6 @@ export async function getVotingWeight(
     if (numTokens === BigInt(0)) {
       throw new InvalidState('Insufficient token balance');
     }
-    return numTokens;
   } else if (topic.weighted_voting === TopicWeightedVoting.SPL) {
     // SPL Token support
     mustExist('Topic Token Address', topic.token_address);

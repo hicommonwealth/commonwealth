@@ -49,7 +49,7 @@ export const CWImageInput = ({
   onAddCurrentToReference,
   canAddCurrentToReference,
   referenceImageUrls,
-  model,
+  model = 'runware:100@1',
 }: CWImageInputProps) => {
   return (
     <div className={clsx('CWImageInput', containerClassname)}>

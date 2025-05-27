@@ -1,5 +1,6 @@
-import { ChainBase, Roles } from '@hicommonwealth/shared';
+import { ChainBase, Roles, WalletId } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
+import { VerifiedContext } from '../context';
 import { ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { USER_TIER, UserProfile } from '../entities/user.schemas';
@@ -11,6 +12,7 @@ import {
   CommentView,
   CommentViewType,
   ThreadView,
+  UserView,
 } from './thread.schemas';
 
 export const UserProfileAddressView = AddressView.extend({
@@ -58,6 +60,39 @@ export const GetUserProfile = {
 export const GetUser = {
   input: z.object({}),
   output: z.union([User, z.object({})]),
+};
+
+export const UserStatusAddressView = z.object({
+  id: PG_INT,
+  address: z.string(),
+  role: z.enum(['member', 'moderator', 'admin']),
+  wallet_id: z.nativeEnum(WalletId),
+  oauth_provider: z.string().nullish(),
+  ghost_address: z.boolean().nullish(),
+  last_active: z.coerce.date().or(z.string()).nullish(),
+  Community: z.object({
+    id: z.string(),
+    base: z.nativeEnum(ChainBase),
+    ss58_prefix: PG_INT.nullish(),
+  }),
+});
+
+export const UserStatusCommunityView = z.object({
+  id: z.string(),
+  name: z.string(),
+  icon_url: z.string(),
+  redirect: z.string().nullish(),
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  starred_at: z.date().or(z.string()).nullish(),
+});
+
+export const GetStatus = {
+  input: z.object({}),
+  output: UserView.omit({ profile: true }).extend({
+    addresses: z.array(UserStatusAddressView),
+    communities: z.array(UserStatusCommunityView),
+  }),
 };
 
 export const SearchUserProfilesView = z.object({
@@ -201,3 +236,15 @@ export const RandomResourceIdsView = z.object({
   thread_id: z.number(),
   comment_id: z.number(),
 });
+
+export const GetAddressStatus = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({
+    exists: z.boolean(),
+    belongs_to_user: z.boolean(),
+  }),
+  context: VerifiedContext,
+};

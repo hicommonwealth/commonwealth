@@ -2,6 +2,7 @@ import z from 'zod';
 import { events } from '../events';
 import { PG_INT } from '../utils';
 import { ChainEventXpSource } from './chain-event-xp-source.schemas';
+import { CommunityGoalMeta } from './community.schemas';
 
 export const ChannelQuestEvents = {
   DiscordServerJoined: events.DiscordServerJoined,
@@ -32,7 +33,7 @@ export const QuestEvents = {
   RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
   OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
   ContestEnded: events.ContestEnded,
-  LaunchpadTokenCreated: events.LaunchpadTokenCreated,
+  LaunchpadTokenRecordCreated: events.LaunchpadTokenRecordCreated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
@@ -82,8 +83,8 @@ export const QuestTweet = z
 
 export const QuestActionMeta = z
   .object({
-    id: z.number().nullish(),
-    quest_id: z.number(),
+    id: z.number().nullish(), // to allow negative system quests
+    quest_id: z.number(), // to allow negative system quests
     //event names instead of enums for flexibility when adding new events
     event_name: z.enum([
       ...(Object.keys(QuestEvents) as [
@@ -105,6 +106,7 @@ export const QuestActionMeta = z
         /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_id:\d+)/,
       )
       .nullish(),
+    community_goal_meta_id: PG_INT.nullish(),
     start_link: z.string().url().nullish(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
@@ -112,6 +114,7 @@ export const QuestActionMeta = z
     // associations
     QuestTweet: QuestTweet.nullish(),
     ChainEventXpSource: ChainEventXpSource.nullish(),
+    CommunityGoalMeta: CommunityGoalMeta.nullish(),
   })
   .describe('Quest action metadata associated to a quest instance');
 

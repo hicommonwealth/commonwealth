@@ -37,11 +37,6 @@ export default (
         defaultValue: 'member',
         allowNull: false,
       },
-      is_user_default: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-        allowNull: false,
-      },
       verification_token: { type: Sequelize.STRING, allowNull: false },
       verification_token_expires: { type: Sequelize.DATE, allowNull: true },
       verified: { type: Sequelize.DATE, allowNull: true },

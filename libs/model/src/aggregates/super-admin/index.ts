@@ -1,6 +1,9 @@
 export * from './CreateChainNode.command';
+export * from './CreateCommunityGoalMeta.command';
 export * from './EnableDigestEmail';
 export * from './GetChainNodes.query';
+export * from './GetCommunityGoalMetas.query';
+export * from './GetCommunityMembersStats.query';
 export * from './GetStats.query';
 export * from './GetTopUsers.query';
 export * from './SetCommunityTier.command';
@@ -8,3 +11,4 @@ export * from './SetUserTier.command';
 export * from './TriggerNotificationsWorkflow.command';
 export * from './UpdateCommunityId.command';
 export * from './UpdateResourceTimestamps.command';
+export * from './UpdateSiteAdmin.command';

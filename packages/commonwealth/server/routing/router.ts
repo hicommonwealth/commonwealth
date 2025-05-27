@@ -10,59 +10,31 @@ import {
   registerRoute,
 } from '../middleware/methodNotAllowed';
 
-import communityStats from '../routes/communityStats';
-import domain from '../routes/domain';
-import finishUpdateEmail from '../routes/finishUpdateEmail';
-import getAddressStatus from '../routes/getAddressStatus';
 import { healthHandler } from '../routes/health';
-import reactionsCounts from '../routes/reactionsCounts';
-import starCommunity from '../routes/starCommunity';
-import { status } from '../routes/status';
-import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
-import updateBanner from '../routes/updateBanner';
-import updateEmail from '../routes/updateEmail';
-import updateSiteAdmin from '../routes/updateSiteAdmin';
 
-import setDefaultRole from '../routes/setDefaultRole';
-
-import getUploadSignature from '../routes/getUploadSignature';
-
-import logout from '../routes/logout';
-import writeUserSetting from '../routes/writeUserSetting';
-
-import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
-import updateCommunityPriority from '../routes/updateCommunityPriority';
-
-import { type DB } from '@hicommonwealth/model';
-import setAddressWallet from '../routes/setAddressWallet';
-
-import { generateTokenIdea } from '@hicommonwealth/model';
-import type DatabaseValidationService from '../middleware/databaseValidationService';
+import {
+  CacheDecorator,
+  express as expressAdapter,
+} from '@hicommonwealth/adapters';
+import { AppError, query } from '@hicommonwealth/core';
+import { Community, generateTokenIdea, User } from '@hicommonwealth/model';
+import { get_feed_router } from 'server/api/get-feed-router';
+import { get_status_handler } from 'server/api/get-status-handler';
+import { get_threads_router } from 'server/api/get-threads-router';
 import generateImageHandler from '../routes/generateImage';
+import getUploadSignature from '../routes/getUploadSignature';
+import logout from '../routes/logout';
 
-import * as controllers from '../controller';
-
-import { CacheDecorator } from '@hicommonwealth/adapters';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
-import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
 import { config } from '../config';
 import { aiCompletionHandler } from '../routes/ai';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
-import exportMembersList from '../routes/exportMembersList';
-import { getFeedHandler } from '../routes/feed';
-import { getThreadsHandler } from '../routes/threads/get_threads_handler';
 import { failure } from '../types';
 import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from '../util/ipfsProxy';
 import setupUniswapProxy from '../util/uniswapProxy';
 
-function setupRouter(
-  endpoint: string,
-  app: Express,
-  models: DB,
-  databaseValidationService: DatabaseValidationService,
-  cacheDecorator: CacheDecorator,
-) {
+function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
   const router = express.Router();
   router.use(useragent.express());
 
@@ -71,120 +43,45 @@ function setupRouter(
   app.use(api.external.PATH, useragent.express(), api.external.router);
   app.use(api.integration.PATH, api.integration.build());
 
-  registerRoute(
-    router,
-    'post',
-    '/updateSiteAdmin',
-    passport.authenticate('jwt', { session: false }),
-    updateSiteAdmin.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/exportMembersList',
-    passport.authenticate('jwt', { session: false }),
-    exportMembersList.bind(this, models),
-  );
-  registerRoute(router, 'get', '/domain', domain.bind(this, models));
-  registerRoute(router, 'get', '/status', status.bind(this, models));
-
-  // Creating and Managing Addresses
-  registerRoute(
-    router,
-    'post',
-    '/getAddressStatus',
-    passport.authenticate('jwt', { session: false }),
-    getAddressStatus.bind(this, models),
-  );
-
+  // TODO: review and refactor to api/internal/external if necessary
+  // TODO: these routers should be decomposed into smaller routes to individual queries
+  registerRoute(router, 'get', '/threads', get_threads_router);
+  registerRoute(router, 'get', '/feed', get_feed_router);
+  registerRoute(router, 'get', '/status', get_status_handler);
   registerRoute(
     router,
     'get',
     '/namespaceMetadata/:namespace/:stake_id',
-    getNamespaceMetadata.bind(this, models),
+    expressAdapter.query(Community.GetNamespaceMetadata()),
   );
-
-  registerRoute(
-    router,
-    'post',
-    '/starCommunity',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    starCommunity.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/threads',
-    databaseValidationService.validateCommunity,
-    getThreadsHandler.bind(this),
-  );
-
-  registerRoute(
-    router,
-    'get',
-    '/feed',
-    databaseValidationService.validateCommunity,
-    getFeedHandler.bind(this, models),
-  );
-
-  // reactions
-  registerRoute(
-    router,
-    'post',
-    '/reactionsCounts',
-    reactionsCounts.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/threadsUsersCountAndAvatars',
-    threadsUsersCountAndAvatars.bind(this, models),
-  );
-
-  // roles
-  registerRoute(
-    router,
-    'get',
-    '/roles',
-    databaseValidationService.validateCommunity,
-    controllers.listRoles.bind(this, models),
-  );
-
-  // user model update
-  registerRoute(
-    router,
-    'post',
-    '/updateEmail',
-    passport.authenticate('jwt', { session: false }),
-    updateEmail.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/finishUpdateEmail',
-    finishUpdateEmail.bind(this, models),
-  );
-
-  // community banners (update or create)
-  registerRoute(
-    router,
-    'post',
-    '/updateBanner',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    updateBanner.bind(this, models),
-  );
-
-  // roles
-  registerRoute(
-    router,
-    'post',
-    '/setDefaultRole',
-    passport.authenticate('jwt', { session: false }),
-    setDefaultRole.bind(this, models),
-  );
+  registerRoute(router, 'get', '/domain', async (req, res) => {
+    const hostname = req.headers['x-forwarded-host'] || req.hostname;
+    // return the community id matching the hostname's custom domain
+    try {
+      const result = await query(Community.GetByDomain(), {
+        actor: { user: { id: 0, email: '' } },
+        payload: { custom_domain: hostname as string },
+      });
+      if (result?.community_id)
+        return res.json({ customDomain: result.community_id });
+    } catch (e) {
+      // do nothing
+    }
+    // otherwise, return false
+    return res.json({ customDomain: null });
+  });
+  registerRoute(router, 'get', '/finishUpdateEmail', async (req, res) => {
+    const { token, email } = req.query;
+    try {
+      const result = await query(User.FinishUpdateEmail(), {
+        actor: { user: { id: 0, email: '' } },
+        payload: { token: token as string, email: email as string },
+      });
+      return res.redirect(result!.redirect_path);
+    } catch {
+      throw new AppError('Error verifying email');
+    }
+  });
 
   // uploads
   registerRoute(
@@ -192,40 +89,7 @@ function setupRouter(
     'post',
     '/getUploadSignature',
     passport.authenticate('jwt', { session: false }),
-    getUploadSignature.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/setAddressWallet',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    setAddressWallet.bind(this, models),
-  );
-
-  // settings
-  registerRoute(
-    router,
-    'post',
-    '/writeUserSetting',
-    passport.authenticate('jwt', { session: false }),
-    writeUserSetting.bind(this, models),
-  );
-
-  // Custom domain update route
-  registerRoute(
-    router,
-    'post',
-    '/updateCommunityCustomDomain',
-    updateCommunityCustomDomain.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/updateCommunityPriority',
-    updateCommunityPriority.bind(this, models),
+    getUploadSignature.bind(this),
   );
 
   registerRoute(
@@ -238,7 +102,7 @@ function setupRouter(
     }),
     passport.authenticate('jwt', { session: false }),
     aiTieredMiddleware({ images: true }),
-    generateImageHandler.bind(this, models),
+    generateImageHandler.bind(this),
   );
 
   registerRoute(
@@ -287,21 +151,12 @@ function setupRouter(
     '/auth/magic',
     passport.authenticate('magic'),
     (req, res) => {
-      // @ts-expect-error StrictNullChecks
-      return res.json({ status: 'Success', result: req.user.toJSON() });
+      return res.json({ status: 'Success', result: req.user!.toJSON() });
     },
   );
 
   // logout
-  registerRoute(router, 'get', '/logout', logout.bind(this, models));
-
-  registerRoute(
-    router,
-    'get',
-    '/communityStats',
-    databaseValidationService.validateCommunity,
-    communityStats.bind(this, models),
-  );
+  registerRoute(router, 'get', '/logout', logout.bind(this));
 
   registerRoute(
     router,
@@ -326,7 +181,7 @@ function setupRouter(
   setupIpfsProxy(router, cacheDecorator);
   setupUniswapProxy(router, cacheDecorator);
 
-  app.use(endpoint, router);
+  app.use('/api', router);
 
   app.use(methodNotAllowedMiddleware());
 
