@@ -1302,11 +1302,12 @@ describe('Thread lifecycle', () => {
         payload: {
           community_id: thread.community_id,
           limit: 100,
+          cursor: 1,
         },
       });
 
       // console.log(response);
-      expect(response!.threads.length).to.equal(7);
+      expect(response!.results.length).to.equal(7);
     });
 
     test('should search comments', async () => {

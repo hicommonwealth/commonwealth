@@ -17,72 +17,75 @@ type GetUserActivityFeedParams = z.infer<typeof schemas.ActivityFeed.input> & {
 
 export const baseActivityQuery = `
   SELECT
-    jsonb_set(
-      jsonb_build_object(
-        'community_id', T.community_id,
-        'community_icon', T.icon_url,
-        'id', T.id,
-        'user_id', U.id,
-        'user_tier', U.tier,
-        'user_address', A.address,
-        'profile_name', U.profile->>'name',
-        'profile_avatar', U.profile->>'avatar_url',
-        'body', T.body,
-        'content_url', T.content_url,
-        'title', T.title,
-        'kind', T.kind,
-        'stage', T.stage,
-        'number_of_comments', coalesce(T.comment_count, 0),
-        'created_at', T.created_at::text,
-        'updated_at', T.updated_at::text,
-        'deleted_at', T.deleted_at::text,
-        'locked_at', T.locked_at::text,
-        'archived_at', T.archived_at::text,
-        'marked_as_spam_at', T.marked_as_spam_at::text,
-        'read_only', T.read_only,
-        'has_poll', T.has_poll,
-        'discord_meta', T.discord_meta,
-        'is_linking_token', T.is_linking_token,
-        'topic', jsonb_build_object(
-          'id', T.topic_id,
-          'name', Tp.name,
-          'description', Tp.description
-                 )
-      ),
-      '{recent_comments}',
-      COALESCE(
-        (SELECT jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
-          'id', C.id,
-          'address', C.address,
-          'user_id', C.user_id,
-          'user_tier', C.user_tier,
-          'profile_name', C.profile_name,
-          'profile_avatar', C.profile_avatar,
-          'body', C.body,
-          'content_url', C.content_url,
-          'created_at', C.created_at::text,
-          'updated_at', C.updated_at::text,
-          'deleted_at', C.deleted_at::text,
-          'marked_as_spam_at', C.marked_as_spam_at::text,
-          'discord_meta', C.discord_meta
-                                            )) ORDER BY C.created_at DESC)
-         FROM (
-                SELECT
-                  C.*,
-                  A.address,
-                  U.id as user_id,
-                  U.tier as user_tier,
-                  U.profile->>'name' as profile_name,
-                  U.profile->>'avatar_url' as profile_avatar,
-                  ROW_NUMBER() OVER (PARTITION BY C.thread_id ORDER BY C.created_at DESC) AS rn
-                FROM "Comments" C
-                       JOIN "Addresses" A on C.address_id = A.id
-                       JOIN "Users" U on A.user_id = U.id
-                WHERE
-                  C.thread_id = T.id
-                  AND C.deleted_at IS NULL
-              ) C WHERE C.rn <= :comment_limit), '[]')
-    ) AS thread
+    T.community_id,
+    T.icon_url as community_icon,
+    T.id,
+    T.address_id,
+    json_build_object(
+        'id', A.id,
+        'address', A.address,
+        'community_id', A.community_id
+    ) as "Address",
+    U.id as user_id,
+    U.tier as user_tier,
+    A.last_active as address_last_active,
+    U.profile->>'avatar_url' as avatar_url,
+    U.profile->>'name' as profile_name,
+    T.body,
+    T.content_url,
+    T.title,
+    T.kind,
+    T.stage,
+    coalesce(T.comment_count, 0) as number_of_comments,
+    T.created_at::text,
+    T.updated_at::text,
+    T.deleted_at::text,
+    T.locked_at::text,
+    T.archived_at::text,
+    T.marked_as_spam_at::text,
+    T.read_only,
+    T.has_poll,
+    T.discord_meta,
+    T.is_linking_token,
+    T.topic_id,
+    jsonb_build_object(
+      'community_id', T.community_id,
+      'id', T.topic_id,
+      'name', Tp.name,
+      'description', Tp.description
+    ) as topic,
+    COALESCE(
+      (SELECT jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
+        'id', C.id,
+        'address', C.address,
+        'user_id', C.user_id,
+        'user_tier', C.user_tier,
+        'profile_name', C.profile_name,
+        'profile_avatar', C.profile_avatar,
+        'body', C.body,
+        'content_url', C.content_url,
+        'created_at', C.created_at::text,
+        'updated_at', C.updated_at::text,
+        'deleted_at', C.deleted_at::text,
+        'marked_as_spam_at', C.marked_as_spam_at::text,
+        'discord_meta', C.discord_meta
+      )) ORDER BY C.created_at DESC)
+        FROM (
+          SELECT
+            C.*,
+            A.address,
+            U.id as user_id,
+            U.tier as user_tier,
+            U.profile->>'name' as profile_name,
+            U.profile->>'avatar_url' as profile_avatar,
+            ROW_NUMBER() OVER (PARTITION BY C.thread_id ORDER BY C.created_at DESC) AS rn
+          FROM "Comments" C
+                  JOIN "Addresses" A on C.address_id = A.id
+                  JOIN "Users" U on A.user_id = U.id
+          WHERE
+            C.thread_id = T.id
+            AND C.deleted_at IS NULL
+        ) C WHERE C.rn <= :comment_limit), '[]') as comments
   FROM
     top_threads T
       JOIN "Addresses" A ON A.id = T.address_id AND A.community_id = T.community_id
@@ -106,14 +109,16 @@ user_communities AS (
 ),
 top_threads AS (
   SELECT T.*, count(*) OVER() AS total, C.icon_url
-  FROM "Threads" T
+  FROM "GatedThreads" T
   ${
     user_id
       ? 'JOIN user_communities UC ON UC.community_id = T.community_id'
       : ''
   }
   JOIN "Communities" C ON C.id = T.community_id
-  WHERE T.deleted_at IS NULL 
+  WHERE 
+      T.gated_address_id IS NULL
+      AND T.deleted_at IS NULL 
       AND T.marked_as_spam_at IS NULL 
       AND C.active IS TRUE 
       AND C.tier != ${CommunityTierMap.SpamCommunity}
@@ -126,22 +131,16 @@ ORDER BY T.activity_rank_date DESC NULLS LAST
 `;
 
   const threads = await models.sequelize.query<
-    z.infer<typeof schemas.ActivityThreadWrapper> & { total?: number }
+    z.infer<typeof schemas.ThreadView> & { total?: number }
   >(query, {
     type: QueryTypes.SELECT,
     raw: true,
     replacements: { user_id, limit, comment_limit, offset },
   });
+  console.log(threads);
 
-  const formattedThreads = threads.map((item) => ({
-    ...item?.thread,
-  }));
-  return schemas.buildPaginatedResponse(
-    formattedThreads,
-    +(threads.at(0)?.total ?? 0),
-    {
-      limit,
-      offset,
-    },
-  );
+  return schemas.buildPaginatedResponse(threads, +(threads.at(0)?.total ?? 0), {
+    limit,
+    offset,
+  });
 }

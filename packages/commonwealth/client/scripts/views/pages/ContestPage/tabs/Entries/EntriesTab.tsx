@@ -1,6 +1,5 @@
 import { ThreadFeaturedFilterTypes } from 'client/scripts/models/types';
 import useFetchFarcasterCastsQuery from 'client/scripts/state/api/contests/getFarcasterCasts';
-import useFetchThreadsQuery from 'client/scripts/state/api/threads/fetchThreads';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 
@@ -9,6 +8,8 @@ import CommonEntriesList from '../../CommonEntriesList';
 import FarcasterEntriesList from '../../FarcasterEntriesList';
 import { SortType } from '../../types';
 
+import { Thread } from 'client/scripts/models/Thread';
+import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import './EntriesTab.scss';
 
 export interface EntriesTabProps {
@@ -44,14 +45,13 @@ const EntriesTab = ({
       ? ThreadFeaturedFilterTypes.Newest
       : ThreadFeaturedFilterTypes.MostLikes;
 
-  const { data: threads, isLoading: isThreadsLoading } = useFetchThreadsQuery({
-    communityId: communityId || '',
-    queryType: 'bulk',
-    page: 1,
+  const { data: threads, isLoading: isThreadsLoading } = useGetThreadsQuery({
+    community_id: communityId || '',
+    cursor: 1,
     limit: 30,
-    topicId,
-    orderBy: threadSort,
-    apiEnabled: !isFarcasterContest,
+    topic_id: topicId,
+    order_by: threadSort,
+    enabled: !isFarcasterContest,
     contestAddress,
   });
 
@@ -59,7 +59,10 @@ const EntriesTab = ({
     setSelectedSort(sort);
   };
 
-  const sortedThreads = sortByFeaturedFilter(threads || [], threadSort);
+  const sortedThreads = sortByFeaturedFilter(
+    (threads?.pages[0]?.results || []).map((t) => new Thread(t)),
+    threadSort,
+  );
 
   return (
     <div className="EntriesTab">

@@ -3,18 +3,19 @@ import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
+import { authOptional } from '../../middleware';
 
 export function GetThreads(): Query<typeof schemas.GetThreads> {
   return {
     ...schemas.GetThreads,
-    auth: [],
-    secure: false,
-    body: async ({ payload }) => {
+    auth: [authOptional],
+    secure: true,
+    body: async ({ context, payload }) => {
       const {
         community_id,
         stage,
         topic_id,
-        page,
+        cursor,
         limit,
         order_by,
         from_date,
@@ -35,7 +36,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
 
       // query params that bind to sql query
       const _limit = limit ? Math.min(limit, 500) : 20;
-      const _page = page || 1;
+      const _page = cursor || 1;
       const replacements = {
         page: _page,
         limit: _limit,
@@ -43,6 +44,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         from_date,
         to_date: to_date || new Date().toISOString(),
         community_id,
+        address_id: context?.address?.id || -1, // only match nulls
         stage,
         topic_id,
         contestAddress,
@@ -87,9 +89,10 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_signed_data,
                 canvas_msg_id, last_edited, address_id, reaction_count,
                 (COUNT(id) OVER())::INTEGER AS total_num_thread_results
-            FROM "Threads" T
+            FROM "GatedThreads" T
             WHERE
               community_id = :community_id AND
+              COALESCE(gated_address_id, :address_id) = :address_id AND
               deleted_at IS NULL AND
               archived_at IS ${archived ? 'NOT' : ''} NULL
               ${topic_id ? ' AND topic_id = :topic_id' : ''}
@@ -255,12 +258,11 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         },
       );
 
-      return {
-        limit: replacements.limit,
-        page: replacements.page,
+      return schemas.buildPaginatedResponse(
         threads,
-        threadCount: threads.at(0)?.total_num_thread_results || 0,
-      };
+        threads.at(0)?.total_num_thread_results || 0,
+        { limit: replacements.limit, cursor: replacements.page },
+      );
     },
   };
 }

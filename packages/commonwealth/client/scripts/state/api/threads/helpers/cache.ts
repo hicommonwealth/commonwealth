@@ -1,6 +1,6 @@
 import Thread from 'models/Thread';
 import type { Topic } from 'models/Topic';
-import { ApiEndpoints, queryClient } from 'state/api/config';
+import { queryClient } from 'state/api/config';
 
 /**
  * What is this file?
@@ -259,9 +259,11 @@ const cacheUpdater = ({
     : [];
 
   // get all query keys for threads
-  const keysForThreads = queryKeys.filter(
-    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
-  );
+  const keysForThreads = [];
+  // TODO: fix this
+  // const keysForThreads = queryKeys.filter(
+  //   (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
+  // );
 
   keysForThreads.map((cacheKey: any[]) => {
     const [, , queryType] = cacheKey;
@@ -351,9 +353,12 @@ const updateThreadTopicInAllCaches = (
 ) => {
   const queryCache = queryClient.getQueryCache();
   const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
-  const keysForThreads = queryKeys.filter(
-    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
-  );
+
+  const keysForThreads = [];
+  // TODO: fix this
+  // const keysForThreads = queryKeys.filter(
+  //   (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
+  // );
 
   keysForThreads.map((k) => {
     // 1- for single and active thread queries - just update the topic
@@ -417,9 +422,12 @@ const addThreadInAllCaches = (communityId: string, newThread: Thread) => {
   // refetch all caches for the thread topic and also the general cache
   const queryCache = queryClient.getQueryCache();
   const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
-  const keysForThreads = queryKeys.filter(
-    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
-  );
+
+  const keysForThreads = [];
+  // TODO: fix this
+  // const keysForThreads = queryKeys.filter(
+  //   (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
+  // );
 
   keysForThreads.map((k) => {
     // TODO: this is improper, we are essentially clearing cache when a thread is added. This is done to ensure
@@ -441,9 +449,12 @@ const addThreadInAllCaches = (communityId: string, newThread: Thread) => {
 const clearThreadCache = (communityId: string) => {
   const queryCache = queryClient.getQueryCache();
   const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
-  const keysForThreads = queryKeys.filter(
-    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
-  );
+
+  const keysForThreads = [];
+  // TODO: fix this
+  // const keysForThreads = queryKeys.filter(
+  //   (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
+  // );
 
   keysForThreads.map((k) => {
     queryClient.cancelQueries(k).catch(console.error);

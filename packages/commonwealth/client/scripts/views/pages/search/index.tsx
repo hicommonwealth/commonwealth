@@ -115,14 +115,10 @@ const SearchPage = () => {
     // @ts-expect-error <StrictNullChecks/>
     SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
 
-  const sharedQueryOptions = {
-    communityId: community,
-    searchTerm: queryParams.q || '',
-    limit: 20,
-    orderBy,
-    orderDirection,
-    includeCount: true,
-  };
+  const search_term = queryParams.q || '';
+  const community_id = community;
+  const order_by = orderBy;
+  const order_direction = orderDirection;
 
   const {
     data: threadsData,
@@ -130,10 +126,15 @@ const SearchPage = () => {
     fetchNextPage: threadsFetchNextPage,
     isLoading: threadsIsLoading,
   } = useSearchThreadsQuery({
-    ...sharedQueryOptions,
-    enabled:
-      activeTab === SearchScope.Threads &&
-      sharedQueryOptions?.searchTerm?.length > 3,
+    community_id,
+    search_term,
+    cursor: 1,
+    limit: 20,
+    order_by,
+    order_direction,
+    thread_title_only: true,
+    include_count: true,
+    enabled: activeTab === SearchScope.Threads && search_term?.length > 3,
   });
 
   const {
@@ -142,17 +143,13 @@ const SearchPage = () => {
     fetchNextPage: commentsFetchNextPage,
     isLoading: commentsIsLoading,
   } = useSearchCommentsQuery({
-    ...{
-      community_id: sharedQueryOptions.communityId,
-      search: sharedQueryOptions.searchTerm,
-      cursor: 1,
-      limit: sharedQueryOptions.limit,
-      order_by: sharedQueryOptions.orderBy,
-      order_direction: sharedQueryOptions.orderDirection,
-    },
-    enabled:
-      activeTab === SearchScope.Replies &&
-      sharedQueryOptions?.searchTerm?.length > 3,
+    community_id,
+    search: search_term,
+    cursor: 1,
+    limit: 20,
+    order_by,
+    order_direction,
+    enabled: activeTab === SearchScope.Replies && search_term.length > 3,
   });
 
   const {
@@ -161,16 +158,12 @@ const SearchPage = () => {
     fetchNextPage: chainsFetchNextPage,
     isLoading: communityIsLoading,
   } = useSearchCommunitiesQuery({
-    ...{
-      search: sharedQueryOptions.searchTerm,
-      cursor: 1,
-      limit: sharedQueryOptions.limit,
-      order_by: sharedQueryOptions.orderBy,
-      order_direction: sharedQueryOptions.orderDirection,
-    },
-    enabled:
-      activeTab === SearchScope.Communities &&
-      sharedQueryOptions?.searchTerm?.length > 0,
+    search: search_term,
+    cursor: 1,
+    limit: 20,
+    order_by,
+    order_direction,
+    enabled: activeTab === SearchScope.Communities && search_term.length > 0,
   });
 
   const {
@@ -179,10 +172,12 @@ const SearchPage = () => {
     fetchNextPage: profilesFetchNextPage,
     isLoading: profilesIsLoading,
   } = useSearchProfilesQuery({
-    ...sharedQueryOptions,
-    enabled:
-      activeTab === SearchScope.Members &&
-      sharedQueryOptions?.searchTerm?.length > 0,
+    communityId: community,
+    searchTerm: search_term,
+    limit: 20,
+    orderBy,
+    orderDirection,
+    enabled: activeTab === SearchScope.Members && search_term.length > 0,
   });
 
   const results = useMemo(() => {
@@ -247,7 +242,7 @@ const SearchPage = () => {
     const err =
       threadsError || commentsError || communityError || profilesError;
     if (err) {
-      notifyError((err as Error).message);
+      notifyError(err.message);
     }
   }, [communityError, commentsError, profilesError, threadsError]);
 
@@ -316,10 +311,10 @@ const SearchPage = () => {
             </CWTabsRow>
           </div>
           <>
-            {sharedQueryOptions?.searchTerm?.length === 0 && (
+            {search_term.length === 0 && (
               <ErrorPage message="No search term provided!" />
             )}
-            {sharedQueryOptions?.searchTerm?.length > 0 && (
+            {search_term.length > 0 && (
               <>
                 {isLoading ? (
                   <LoadingIndicator />

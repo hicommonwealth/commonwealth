@@ -2,29 +2,39 @@ import * as schemas from '@hicommonwealth/schemas';
 import { trpc } from 'utils/trpcClient';
 import { z } from 'zod';
 
-const SEARCH_THREADS_STALE_TIME = 10 * 1_000; // 10 s
+const GET_THREADS_STALE_TIME = 10 * 1_000; // 10 s
 
-const useSearchThreadsQuery = ({
+const useGetThreadsQuery = ({
   community_id,
-  search_term,
   limit,
   order_by,
   order_direction,
-  thread_title_only,
-  include_count,
+  stage,
+  topic_id,
+  from_date,
+  to_date,
+  archived,
+  contestAddress,
+  status,
+  withXRecentComments = 0,
   enabled = true,
-}: z.infer<(typeof schemas.SearchThreads)['input']> & {
+}: z.infer<(typeof schemas.GetThreads)['input']> & {
   enabled?: boolean;
 }) => {
-  return trpc.thread.searchThreads.useInfiniteQuery(
+  return trpc.thread.getThreads.useInfiniteQuery(
     {
       community_id,
-      search_term,
       limit,
       order_by,
       order_direction,
-      thread_title_only,
-      include_count,
+      stage,
+      topic_id,
+      from_date,
+      to_date,
+      archived,
+      contestAddress,
+      status,
+      withXRecentComments,
     },
     {
       getNextPageParam: (lastPage) => {
@@ -34,10 +44,10 @@ const useSearchThreadsQuery = ({
         }
         return undefined;
       },
-      staleTime: SEARCH_THREADS_STALE_TIME,
+      staleTime: GET_THREADS_STALE_TIME,
       enabled,
     },
   );
 };
 
-export default useSearchThreadsQuery;
+export default useGetThreadsQuery;
