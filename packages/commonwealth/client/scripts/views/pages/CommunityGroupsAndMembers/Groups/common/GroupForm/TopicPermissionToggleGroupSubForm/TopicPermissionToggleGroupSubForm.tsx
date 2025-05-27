@@ -1,9 +1,8 @@
+import { GatedActionEnum, UserFriendlyActionMap } from '@hicommonwealth/shared';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWToggle } from 'client/scripts/views/components/component_kit/cw_toggle';
 import React from 'react';
-import { PermissionLabel, togglePermissionMap } from '../constants';
 import {
-  PermissionLabelType,
   Topic,
   TopicPermissionFormToggleGroupSubFormProps,
 } from '../index.types';
@@ -17,20 +16,16 @@ const TopicPermissionToggleGroupSubForm = ({
 
   const handlePermissionChange = (
     topic: Topic,
-    permissionLabel: PermissionLabelType,
+    gatedAction: GatedActionEnum,
   ) => {
-    const permissionsToToggle = togglePermissionMap[permissionLabel] || [];
-
     const updatedData = PermissionFormData.map((item) => {
       if (item.topic === topic) {
         const updatedPermissions = item.permission.filter(
-          (perm) => !permissionsToToggle.includes(perm),
+          (perm) => perm !== gatedAction,
         );
 
-        if (
-          !item.permission.some((perm) => permissionsToToggle.includes(perm))
-        ) {
-          updatedPermissions.push(...permissionsToToggle);
+        if (!item.permission.some((perm) => perm === gatedAction)) {
+          updatedPermissions.push(gatedAction);
         }
 
         return { ...item, permission: updatedPermissions };
@@ -41,41 +36,25 @@ const TopicPermissionToggleGroupSubForm = ({
     onChange(updatedData);
   };
 
-  const togglePermission = (
-    topic: Topic,
-    permissionLabel: PermissionLabelType,
-  ) => {
-    handlePermissionChange(topic, permissionLabel);
-  };
-
   const toggleAllPermissionsForAction = (
-    permissionLabel: PermissionLabelType,
+    gatedAction: GatedActionEnum,
     toggleValue: boolean,
   ) => {
-    const permissionsToToggle = togglePermissionMap[permissionLabel] || [];
-
     const updatedData = PermissionFormData.map((item) => {
       const updatedPermissions = toggleValue
-        ? [...new Set([...item.permission, ...permissionsToToggle])]
-        : item.permission.filter((perm) => !permissionsToToggle.includes(perm));
-
+        ? [...new Set([...item.permission, gatedAction])]
+        : item.permission.filter((perm) => perm !== gatedAction);
       return { ...item, permission: updatedPermissions };
     });
 
     onChange(updatedData);
   };
 
-  const toggle = (
-    selectedTopics: Topic[],
-    permissionLabel: PermissionLabelType,
-  ) => {
-    const permissionsToCheck = togglePermissionMap[permissionLabel] || [];
+  const toggle = (selectedTopics: Topic[], gatedAction: GatedActionEnum) => {
     const value = selectedTopics.every((topic) =>
-      permissionsToCheck.every((perm) =>
-        PermissionFormData.find(
-          (item) => item.topic === topic,
-        )?.permission.includes(perm),
-      ),
+      PermissionFormData.find(
+        (item) => item.topic === topic,
+      )?.permission.includes(gatedAction),
     );
     return !value;
   };
@@ -87,7 +66,7 @@ const TopicPermissionToggleGroupSubForm = ({
           Topic
         </CWText>
         <div className="header-permissions">
-          {PermissionLabel.map((perm, index) => (
+          {Object.values(UserFriendlyActionMap).map((perm, index) => (
             <CWText key={index} className="header-item" fontWeight="regular">
               {perm}
             </CWText>
@@ -100,42 +79,42 @@ const TopicPermissionToggleGroupSubForm = ({
           <CWText className="topic-name" fontWeight="regular">
             {topic?.name}
           </CWText>
-          {PermissionLabel.map((permission, permIndex) => (
-            <div className="toggle" key={permIndex}>
-              <CWToggle
-                checked={togglePermissionMap[permission]?.every((perm) =>
-                  PermissionFormData.find(
+          {(Object.keys(UserFriendlyActionMap) as GatedActionEnum[]).map(
+            (gatedAction, permIndex) => (
+              <div className="toggle" key={permIndex}>
+                <CWToggle
+                  checked={PermissionFormData.find(
                     (item) => item.topic === topic,
-                  )?.permission.includes(perm),
-                )}
-                onChange={() => togglePermission(topic, permission)}
-              />
-            </div>
-          ))}
+                  )?.permission.includes(gatedAction)}
+                  onChange={() => handlePermissionChange(topic, gatedAction)}
+                />
+              </div>
+            ),
+          )}
         </div>
       ))}
 
       <div className="permissions-row all-row">
         <div className="topic-name">All</div>
-        {PermissionLabel.map((permission, permIndex) => (
-          <div className="toggle" key={permIndex}>
-            <CWToggle
-              checked={topics.every((topic) =>
-                togglePermissionMap[permission]?.every((perm) =>
+        {(Object.keys(UserFriendlyActionMap) as GatedActionEnum[]).map(
+          (gatedAction, permIndex) => (
+            <div className="toggle" key={permIndex}>
+              <CWToggle
+                checked={topics.every((topic) =>
                   PermissionFormData.find(
                     (item) => item.topic === topic,
-                  )?.permission.includes(perm),
-                ),
-              )}
-              onChange={() =>
-                toggleAllPermissionsForAction(
-                  permission,
-                  toggle(topics, permission),
-                )
-              }
-            />
-          </div>
-        ))}
+                  )?.permission.includes(gatedAction),
+                )}
+                onChange={() =>
+                  toggleAllPermissionsForAction(
+                    gatedAction,
+                    toggle(topics, gatedAction),
+                  )
+                }
+              />
+            </div>
+          ),
+        )}
       </div>
     </div>
   );

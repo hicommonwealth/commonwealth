@@ -4,14 +4,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CommentsView, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   CanvasSignedData,
+  CompletionModel,
   DEFAULT_NAME,
   deserializeCanvas,
+  GatedActionEnum,
   UserTierMap,
   verify,
 } from '@hicommonwealth/shared';
 import { useAiCompletion } from 'client/scripts/state/api/ai';
 import clsx from 'clsx';
-import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
@@ -39,14 +40,19 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { z } from 'zod';
+import Permissions from '../../../../utils/Permissions';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 import { ToggleCommentSubscribe } from './ToggleCommentSubscribe';
 
 export type CommentViewParams = z.infer<typeof CommentsView>;
 
+const actionPermissions = [
+  GatedActionEnum.CREATE_COMMENT,
+  GatedActionEnum.CREATE_COMMENT_REACTION,
+] as const;
+
 type CommentCardProps = {
-  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   // Edit
   canEdit?: boolean;
   onEditStart?: () => any;
@@ -82,6 +88,8 @@ type CommentCardProps = {
   onAIReply?: (commentText?: string) => Promise<void>;
   // AI streaming props
   isStreamingAIReply?: boolean;
+  streamingModelId?: string;
+  modelName?: string;
   parentCommentText?: string;
   onStreamingComplete?: () => void;
   // voting
@@ -90,10 +98,12 @@ type CommentCardProps = {
   isRootComment?: boolean;
   threadContext?: string;
   threadTitle?: string;
+  permissions: ReturnType<
+    typeof Permissions.getMultipleActionsPermission<typeof actionPermissions>
+  >;
 };
 
 export const CommentCard = ({
-  disabledActionsTooltipText = '',
   // edit
   editDraft,
   canEdit,
@@ -128,12 +138,15 @@ export const CommentCard = ({
   weightType,
   onAIReply,
   isStreamingAIReply,
+  streamingModelId,
+  modelName,
   parentCommentText,
   onStreamingComplete,
   tokenNumDecimals,
   isRootComment,
   threadContext,
   threadTitle,
+  permissions,
 }: CommentCardProps) => {
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
@@ -235,7 +248,7 @@ export const CommentCard = ({
   const activeUserAddress = user.activeAccount?.address;
 
   useEffect(() => {
-    if (!isStreamingAIReply) return;
+    if (!isStreamingAIReply || !streamingModelId) return;
 
     let mounted = true;
     let finalText = '';
@@ -243,9 +256,6 @@ export const CommentCard = ({
 
     const generateAIReply = async () => {
       try {
-        // Build context by combining thread context with parent comment if available
-
-        // Construct extended context with community details
         const communityName = community?.name || 'this community';
         const communityDescription =
           community?.description || 'No specific description provided.';
@@ -265,7 +275,7 @@ Community Description: ${communityDescription}`;
 
         const originalContext = [originalThreadPart, originalParentPart]
           .filter(Boolean)
-          .join('\n\n'); // Separator between thread context and parent comment context
+          .join('\n\n');
 
         const contextText =
           `${extendedCommunityContext}\n\n` +
@@ -274,11 +284,11 @@ Community Description: ${communityDescription}`;
 
         const { userPrompt, systemPrompt } = generateCommentPrompt(contextText);
 
-        setStreamingText(''); // Clear previous streaming text
+        setStreamingText('');
 
         await generateCompletion(userPrompt, {
           systemPrompt: systemPrompt,
-          model: 'gpt-4o-mini',
+          model: streamingModelId as CompletionModel,
           stream: true,
           onChunk: (chunk) => {
             if (mounted) {
@@ -287,29 +297,48 @@ Community Description: ${communityDescription}`;
               finalText = accumulatedText;
             }
           },
+          onError: (error) => {
+            if (mounted) {
+              console.error(
+                `Error streaming for model ${streamingModelId}:`,
+                error,
+              );
+              setStreamingText(
+                `Error generating reply from ${modelName || 'AI'}.`,
+              );
+              onStreamingCompleteRef.current?.();
+            }
+          },
         });
 
-        if (mounted && finalText) {
-          if (!activeUserAddress) {
-            throw new Error('No active account found');
+        if (mounted) {
+          if (finalText && !finalText.startsWith('Error generating reply')) {
+            if (!activeUserAddress) {
+              throw new Error('No active account found');
+            }
+            const input = await buildCreateCommentInput({
+              communityId: comment.community_id,
+              address: activeUserAddress,
+              threadId: comment.thread_id,
+              parentCommentId: isRootComment ? null : comment.id,
+              threadMsgId: null,
+              unescapedText: finalText,
+              parentCommentMsgId: null,
+              existingNumberOfComments: 0,
+            });
+            await createCommentRef.current(input);
           }
-
-          const input = await buildCreateCommentInput({
-            communityId: comment.community_id,
-            address: activeUserAddress,
-            threadId: comment.thread_id,
-            parentCommentId: isRootComment ? null : comment.id,
-            threadMsgId: null,
-            unescapedText: finalText,
-            parentCommentMsgId: null,
-            existingNumberOfComments: 0,
-          });
-
-          await createCommentRef.current(input);
           onStreamingCompleteRef.current?.();
         }
       } catch (error) {
         if (mounted) {
+          console.error(
+            `Error in AI reply process for model ${streamingModelId}:`,
+            error,
+          );
+          setStreamingText(
+            `Failed to process reply from ${modelName || 'AI'}.`,
+          );
           onStreamingCompleteRef.current?.();
         }
       }
@@ -321,6 +350,8 @@ Community Description: ${communityDescription}`;
     };
   }, [
     isStreamingAIReply,
+    streamingModelId,
+    modelName,
     isRootComment,
     threadContext,
     threadTitle,
@@ -414,7 +445,7 @@ Community Description: ${communityDescription}`;
           {isStreamingAIReply && (
             <div className="streaming-indicator">
               <CWIcon iconName="sparkle" iconSize="small" />
-              <CWText type="caption">AI Assistant</CWText>
+              <CWText type="caption">{modelName || 'AI Assistant'}</CWText>
             </div>
           )}
         </div>
@@ -465,11 +496,7 @@ Community Description: ${communityDescription}`;
                   <CommentReactionButton
                     comment={comment}
                     disabled={!canReact}
-                    tooltipText={
-                      typeof disabledActionsTooltipText === 'function'
-                        ? disabledActionsTooltipText?.('upvote')
-                        : disabledActionsTooltipText
-                    }
+                    tooltipText={permissions.CREATE_COMMENT_REACTION.tooltip}
                     onReaction={handleReaction}
                     weightType={weightType}
                     tokenNumDecimals={tokenNumDecimals}
@@ -509,9 +536,7 @@ Community Description: ${communityDescription}`;
                       label={`Reply${repliesCount ? ` (${repliesCount})` : ''}`}
                       disabled={maxReplyLimitReached || !canReply}
                       tooltipText={
-                        (typeof disabledActionsTooltipText === 'function'
-                          ? disabledActionsTooltipText?.('reply')
-                          : disabledActionsTooltipText) ||
+                        permissions.CREATE_COMMENT.tooltip ||
                         (canReply && maxReplyLimitReached
                           ? 'Further replies not allowed'
                           : '')
@@ -529,9 +554,7 @@ Community Description: ${communityDescription}`;
                           label="AI Reply"
                           disabled={maxReplyLimitReached || !canReply}
                           tooltipText={
-                            (typeof disabledActionsTooltipText === 'function'
-                              ? disabledActionsTooltipText?.('reply')
-                              : disabledActionsTooltipText) ||
+                            permissions.CREATE_COMMENT.tooltip ||
                             (canReply && maxReplyLimitReached
                               ? 'Further replies not allowed'
                               : '')

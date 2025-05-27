@@ -5,15 +5,16 @@ import {
   AddressAttributes,
   AddressInstance,
   CommunityInstance,
-  DB,
   emitEvent,
   getVerifiedUserInfo,
+  models,
   sequelize,
   UserInstance,
   VerifiedUserInfo,
 } from '@hicommonwealth/model';
 import { Address, MagicLogin } from '@hicommonwealth/schemas';
 import {
+  ALL_COMMUNITIES,
   bumpUserTier,
   CANVAS_TOPIC,
   ChainBase,
@@ -30,13 +31,11 @@ import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction, WhereOptions } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../config';
-import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
 
 const log = logger(import.meta);
 
 type MagicLoginContext = {
-  models: DB;
   decodedMagicToken: MagicUser;
   magicUserMetadata: MagicUserMetadata;
   generatedAddresses: Array<{ address: string; community_id: string }>;
@@ -89,7 +88,6 @@ async function getVerifiedInfo(
 }
 
 async function updateAddressesOauth(
-  models: DB,
   {
     oauth_provider,
     oauth_email,
@@ -143,30 +141,27 @@ async function bumpTier(
 }
 
 // Creates a trusted address in a community
-async function createMagicAddressInstances(
-  models: DB,
-  {
-    generatedAddresses,
-    user,
-    isNewUser,
-    decodedMagicToken,
-    magicUserMetadata,
-    walletSsoSource,
-    transaction,
-    accessToken,
-    oauthInfo,
-  }: {
-    generatedAddresses: Array<{ address: string; community_id: string }>;
-    user: UserInstance;
-    isNewUser: boolean;
-    decodedMagicToken: MagicUser;
-    magicUserMetadata: MagicUserMetadata;
-    walletSsoSource: WalletSsoSource;
-    accessToken?: string;
-    transaction?: Transaction;
-    oauthInfo?: OauthInfo;
-  },
-): Promise<AddressInstance[]> {
+async function createMagicAddressInstances({
+  generatedAddresses,
+  user,
+  isNewUser,
+  decodedMagicToken,
+  magicUserMetadata,
+  walletSsoSource,
+  transaction,
+  accessToken,
+  oauthInfo,
+}: {
+  generatedAddresses: Array<{ address: string; community_id: string }>;
+  user: UserInstance;
+  isNewUser: boolean;
+  decodedMagicToken: MagicUser;
+  magicUserMetadata: MagicUserMetadata;
+  walletSsoSource: WalletSsoSource;
+  accessToken?: string;
+  transaction?: Transaction;
+  oauthInfo?: OauthInfo;
+}): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
 
@@ -199,7 +194,6 @@ async function createMagicAddressInstances(
         verified: new Date(), // trust addresses from magic
         last_active: new Date(),
         role: 'member',
-        is_user_default: false,
         ghost_address: false,
         is_banned: false,
         oauth_provider,
@@ -250,12 +244,7 @@ async function createMagicAddressInstances(
     }
 
     if (!created) {
-      await updateAddressesOauth(
-        models,
-        verifiedInfo,
-        addressInstance,
-        transaction,
-      );
+      await updateAddressesOauth(verifiedInfo, addressInstance, transaction);
       // Update used magic token to prevent replay attacks
       addressInstance.verification_token = decodedMagicToken.claim.tid;
 
@@ -268,7 +257,6 @@ async function createMagicAddressInstances(
 
 // User is logged out + selects magic, and provides a new email. Create a new user for them.
 async function createNewMagicUser({
-  models,
   decodedMagicToken,
   magicUserMetadata,
   generatedAddresses,
@@ -318,7 +306,7 @@ async function createNewMagicUser({
     }
 
     const addressInstances: AddressAttributes[] =
-      await createMagicAddressInstances(models, {
+      await createMagicAddressInstances({
         generatedAddresses,
         user: newUser,
         isNewUser: true,
@@ -357,7 +345,6 @@ async function createNewMagicUser({
 async function replaceGhostAddresses(
   existingUserInstance: UserInstance,
   addressInstances: AddressInstance[],
-  models: DB,
   transaction: Transaction,
 ) {
   const ghostAddresses = (existingUserInstance?.Addresses?.filter(
@@ -408,7 +395,6 @@ async function replaceGhostAddresses(
 
 // User is logged out + selects magic, and provides an existing magic account. Log them in.
 async function loginExistingMagicUser({
-  models,
   existingUserInstance,
   decodedMagicToken,
   generatedAddresses,
@@ -454,16 +440,11 @@ async function loginExistingMagicUser({
       );
 
       await bumpTier(existingUserInstance, verifiedInfo, transaction);
-      await updateAddressesOauth(
-        models,
-        verifiedInfo,
-        ssoToken.Address!,
-        transaction,
-      );
+      await updateAddressesOauth(verifiedInfo, ssoToken.Address!, transaction);
 
       log.trace('SSO TOKEN HANDLED NORMALLY');
     } else {
-      const addressInstances = await createMagicAddressInstances(models, {
+      const addressInstances = await createMagicAddressInstances({
         generatedAddresses,
         user: existingUserInstance,
         isNewUser: false,
@@ -499,7 +480,6 @@ async function loginExistingMagicUser({
       await replaceGhostAddresses(
         existingUserInstance,
         addressInstances,
-        models,
         transaction,
       );
       log.info(`Created SsoToken for user ${existingUserInstance.id}`);
@@ -518,7 +498,7 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
 
   // first, verify the existing magic user to ensure they're not performing a replay attack
   await loginExistingMagicUser(ctx);
-  const { models, loggedInUser, existingUserInstance } = ctx;
+  const { loggedInUser, existingUserInstance } = ctx;
 
   // update previously-registered magic addresses for incoming magic user
   // to be owned by currently logged in user
@@ -543,7 +523,6 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
 // User is logged in + selects magic, and provides a totally new email.
 // Add the new Magic address to the existing User.
 async function addMagicToUser({
-  models,
   generatedAddresses,
   loggedInUser,
   decodedMagicToken,
@@ -556,7 +535,7 @@ async function addMagicToUser({
   }
 
   // create new address on logged-in user
-  const addressInstances = await createMagicAddressInstances(models, {
+  const addressInstances = await createMagicAddressInstances({
     generatedAddresses,
     user: loggedInUser,
     isNewUser: false,
@@ -589,14 +568,13 @@ async function addMagicToUser({
 // Entrypoint into the magic passport strategy
 async function magicLoginRoute(
   magic: Magic,
-  models: DB,
   req: TypedRequestBody<z.infer<typeof MagicLogin>>,
   decodedMagicToken: MagicUser,
   cb: DoneFunc,
 ) {
   const body = MagicLogin.parse(req.body);
   log.trace(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
-  let communityToJoin: CommunityInstance | undefined,
+  let communityToJoin: CommunityInstance | undefined | null,
     error,
     loggedInUser: UserInstance | null | undefined;
 
@@ -630,9 +608,17 @@ async function magicLoginRoute(
   }
 
   // validate community if provided (i.e. logging in on community page)
-  if (body.community_id) {
-    [communityToJoin, error] = await validateCommunity(models, body);
-    if (error) return cb(error);
+  if (body.community_id && body.community_id !== ALL_COMMUNITIES) {
+    communityToJoin = await models.Community.findOne({
+      where: { id: body.community_id },
+      include: [
+        {
+          model: models.ChainNode,
+          required: true,
+        },
+      ],
+    });
+    if (!communityToJoin) return cb('Community does not exist');
   }
 
   // check if the user is logged in already (provided valid JWT)
@@ -786,7 +772,7 @@ async function magicLoginRoute(
     // already logged in as existing user, just ensure generated addresses are all linked
     // we don't need to setup a canonical address/SsoToken, that should already be done
     log.trace('CASE 0: LOGGING IN USER SAME AS EXISTING USER');
-    await createMagicAddressInstances(models, {
+    await createMagicAddressInstances({
       generatedAddresses,
       user: loggedInUser,
       isNewUser: false,
@@ -800,7 +786,6 @@ async function magicLoginRoute(
 
   let finalUser: UserInstance;
   const magicContext: MagicLoginContext = {
-    models,
     decodedMagicToken,
     magicUserMetadata,
     generatedAddresses,
@@ -856,7 +841,7 @@ async function magicLoginRoute(
   return cb(null, finalUser);
 }
 
-export function initMagicAuth(models: DB) {
+export function initMagicAuth() {
   // allow magic login if configured with key
   if (config.MAGIC_API_KEY) {
     // TODO: verify we are in a community that supports magic login
@@ -864,7 +849,7 @@ export function initMagicAuth(models: DB) {
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
         try {
-          return await magicLoginRoute(magic, models, req, user, cb);
+          return await magicLoginRoute(magic, req, user, cb);
         } catch (e) {
           return cb(e, user);
         }

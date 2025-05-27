@@ -2,6 +2,7 @@ import {
   ChainBase,
   ChainNetwork,
   CommunityType,
+  GatedActionEnum,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
@@ -16,7 +17,6 @@ import {
   Group,
   Membership,
   MembershipRejectReason,
-  PermissionEnum,
   PinnedTokenWithPrices,
   Topic,
 } from '../entities';
@@ -102,7 +102,7 @@ export const GetCommunity = {
 
 export const TopicPermissionsView = z.object({
   id: z.number(),
-  permissions: z.array(z.nativeEnum(PermissionEnum)),
+  permissions: z.array(z.nativeEnum(GatedActionEnum)),
 });
 
 export const MembershipView = z.object({
@@ -132,7 +132,11 @@ export const GetCommunityStake = {
       .optional()
       .describe('The stake id or all stakes when undefined'),
   }),
-  output: CommunityStake.optional(),
+  output: z.object({
+    stake: CommunityStake.extend({
+      Community: z.object({ namespace: z.string().nullish() }).optional(),
+    }).nullish(),
+  }),
 };
 
 export const GetCommunityMembers = {
@@ -324,7 +328,7 @@ export const GetTopHolders = {
   }),
 };
 
-export const GroupView = Group.omit({ GroupPermissions: true }).extend({
+export const GroupView = Group.omit({ GroupGatedActions: true }).extend({
   id: PG_INT,
   name: z.string(),
   created_at: z.coerce.date().or(z.string()).optional(),
@@ -336,7 +340,7 @@ export const GroupView = Group.omit({ GroupPermissions: true }).extend({
   ),
   topics: z.array(
     TopicView.omit({ total_threads: true }).extend({
-      permissions: z.array(z.nativeEnum(PermissionEnum)),
+      permissions: z.array(z.nativeEnum(GatedActionEnum)),
     }),
   ),
 });
@@ -350,4 +354,94 @@ export const GetGroups = {
     include_topics: z.coerce.boolean().optional(),
   }),
   output: z.array(GroupView),
+};
+
+export const RelatedCommunityView = z.object({
+  id: z.string(),
+  community: z.string(),
+  icon_url: z.string().nullish(),
+  lifetime_thread_count: z.number(),
+  profile_count: z.number(),
+  description: z.string().nullish(),
+  namespace: z.string().nullish(),
+  chain_node_id: z.number(),
+  tag_ids: z.array(z.string()),
+});
+
+export const GetRelatedCommunities = {
+  input: z.object({ chain_node_id: z.number() }),
+  output: z.array(RelatedCommunityView),
+};
+
+export const SearchCommunityView = z.object({
+  id: z.string(),
+  name: z.string(),
+  default_symbol: z.string().nullish(),
+  type: z.string(),
+  icon_url: z.string().nullish(),
+  created_at: z.coerce.date().or(z.string()),
+});
+
+export const SearchCommunities = {
+  input: PaginationParamsSchema.extend({
+    search: z.string(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(SearchCommunityView),
+  }),
+};
+
+export const Batchable = z.object({
+  date: z.string(),
+  new_items: z.string(),
+});
+
+export const GetCommunityStats = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({
+    batches: z.object({
+      active_accounts: z.array(Batchable),
+      comments: z.array(Batchable),
+      roles: z.array(Batchable),
+      threads: z.array(Batchable),
+    }),
+    totals: z.object({
+      total_comments: z.number(),
+      total_roles: z.number(),
+      total_threads: z.number(),
+    }),
+  }),
+  context: AuthContext,
+};
+
+export const GetRoles = {
+  input: z.object({
+    community_id: z.string(),
+    roles: z.string(),
+  }),
+  output: z.array(
+    z.object({
+      address: z.string(),
+      role: z.enum(['moderator', 'admin']),
+    }),
+  ),
+  context: AuthContext,
+};
+
+export const GetNamespaceMetadata = {
+  input: z.object({
+    namespace: z.string(),
+    stake_id: z.string().regex(/^[0-9a-f]{64}$/),
+  }),
+  output: z.object({
+    name: z.string(),
+    image: z.string().nullish(),
+  }),
+};
+
+export const GetByDomain = {
+  input: z.object({ custom_domain: z.string() }),
+  output: z.object({ community_id: z.string().optional() }),
 };

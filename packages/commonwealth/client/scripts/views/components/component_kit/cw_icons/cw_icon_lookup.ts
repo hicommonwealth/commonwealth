@@ -13,6 +13,7 @@ import {
   BellSimple,
   BellSimpleRinging,
   BellSimpleSlash,
+  Binoculars,
   BookOpenText,
   Brain,
   CalendarBlank,
@@ -343,6 +344,7 @@ export const iconLookup = {
   socialVerified: Icons.CWSocialVerified,
   sandClock: Icons.CWSandClock,
   stopSymbol: Icons.CWStopSymbol,
+  binoculars: withPhosphorIcon(Binoculars),
 };
 
 export const customIconLookup = {

@@ -108,17 +108,17 @@ const SignTransactionsStep = ({
       ? CUSTOM_CONTEST_DURATION_IN_SECONDS
       : contestFormData?.contestDuration || 0;
 
-    const stakeId = stakeData?.stake_id;
+    const stakeId = stakeData?.stake?.stake_id || 0;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
-    const weight = stakeData?.vote_weight;
+    const weight = stakeData?.stake?.vote_weight || 0;
     const contestInterval = devContest
       ? CUSTOM_CONTEST_DURATION_IN_SECONDS
       : contestFormData?.contestDuration;
     const prizeShare = contestFormData?.prizePercentage;
     const exchangeToken = isDirectDepositSelected
       ? contestFormData?.fundingTokenAddress || ZERO_ADDRESS
-      : stakeData?.stake_token;
+      : stakeData?.stake?.stake_token;
     const winnerShares = contestFormData?.payoutStructure;
     const voteToken = contestFormData?.isFarcasterContest
       ? exchangeToken

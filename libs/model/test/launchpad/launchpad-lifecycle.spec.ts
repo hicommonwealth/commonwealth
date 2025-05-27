@@ -61,54 +61,18 @@ describe('Launchpad Lifecycle', () => {
       user: { email: '', id: user!.id },
     };
 
-    vi.spyOn(
-      protocols,
-      'getLaunchpadTokenCreatedTransaction',
-    ).mockResolvedValue({
-      txReceipt: {
-        blockNumber: 1,
-        transactionHash: CREATE_TOKEN_TXN_HASH,
-        transactionIndex: 1,
-        blockHash: '0x123',
-        from: '123',
-        to: '456',
-        cumulativeGasUsed: 1,
-        gasUsed: 1,
-        logs: [],
-        status: 1,
-        logsBloom: '0x123',
-        root: '0x123',
-      },
-      parsedArgs: {
-        namespace: community!.namespace!,
-        tokenAddress: TOKEN_ADDRESS,
-        launchpadLiquidity: 594115082271506067334n,
-        curveId: 1n,
-        totalSupply: 1000n,
-        reserveRation: 1n,
-        initialPurchaseEthAmount: 1n,
-      },
-      block: {
-        number: 1n,
-        parentHash: '0x123',
-        timestamp: 1n,
-        transactions: [],
-        transactionsRoot: '0x123',
-        stateRoot: '0x123',
-        receiptsRoot: '0x123',
-        miner: '0x123',
-        difficulty: 1n,
-        totalDifficulty: 1n,
-        extraData: '0x123',
-        size: 1n,
-        gasLimit: 1n,
-        gasUsed: 1n,
-        baseFeePerGas: 1n,
-        sha3Uncles: '0x123',
-        uncles: [],
-        nonce: 1n,
-        mixHash: '0x123',
-      },
+    vi.spyOn(protocols, 'getLaunchpadTokenDetails').mockResolvedValue({
+      name: 'Test Token',
+      symbol: 'DMLND',
+      created_at: new Date(),
+      creator_address: actor.address!,
+      namespace: community!.namespace!,
+      token_address: TOKEN_ADDRESS,
+      launchpad_liquidity: '594115082271506067334',
+      curve_id: '1',
+      total_supply: '1000',
+      reserve_ration: '1',
+      initial_purchase_eth_amount: '1',
     });
   });
 
@@ -118,17 +82,15 @@ describe('Launchpad Lifecycle', () => {
   });
 
   test('Create Token works given txHash and chainNodeId', async () => {
-    const payload = {
-      transaction_hash: CREATE_TOKEN_TXN_HASH,
-      chain_node_id: node!.id!,
-      description: 'test',
-      icon_url: 'test',
-      community_id: community_id!,
-    };
-
     const results = await command(CreateToken(), {
       actor,
-      payload,
+      payload: {
+        transaction_hash: CREATE_TOKEN_TXN_HASH,
+        eth_chain_id: node.eth_chain_id!,
+        description: 'test',
+        icon_url: 'test',
+        community_id: community_id!,
+      },
     });
 
     expect(equalEvmAddresses(results?.token_address, TOKEN_ADDRESS)).to.be.true;

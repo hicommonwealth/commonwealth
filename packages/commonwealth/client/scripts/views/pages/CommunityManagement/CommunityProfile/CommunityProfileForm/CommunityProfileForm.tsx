@@ -129,6 +129,13 @@ const CommunityProfileForm = () => {
     community?.id?.toLowerCase() || '',
   );
 
+  const handleImageProcessingChange = useCallback(
+    ({ isGenerating, isUploading }) => {
+      setIsProcessingProfileImage(isGenerating || isUploading);
+    },
+    [],
+  );
+
   const onSubmit = async (values: FormSubmitValues) => {
     if (
       !community?.id ||
@@ -149,8 +156,8 @@ const CommunityProfileForm = () => {
       });
 
       await editBanner({
-        communityId: community.id,
-        bannerText: values.communityBanner ?? '',
+        community_id: community.id,
+        banner_text: values.communityBanner ?? '',
       });
 
       await updateCommunity(
@@ -295,9 +302,7 @@ const CommunityProfileForm = () => {
               name="communityProfileImageURL"
               canSelectImageBehavior={false}
               imageBehavior={ImageBehavior.Circle}
-              onImageProcessingChange={({ isGenerating, isUploading }) =>
-                setIsProcessingProfileImage(isGenerating || isUploading)
-              }
+              onImageProcessingChange={handleImageProcessingChange}
               label="Community Profile Image (Accepts JPG and PNG files)"
             />
           </section>

@@ -98,7 +98,6 @@ export function SetDiscordBotConfig(): Command<
               verified: new Date(),
               last_active: new Date(),
               ghost_address: false,
-              is_user_default: false,
               is_banned: false,
             },
             { transaction },

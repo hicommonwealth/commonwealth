@@ -1,4 +1,5 @@
 import { trpc } from '@hicommonwealth/adapters';
+import { command } from '@hicommonwealth/core';
 import {
   Community,
   middleware,
@@ -73,13 +74,29 @@ export const trpcRouter = trpc.router({
     Community.GetCommunitySelectedTagsAndCommunities,
     trpc.Tag.Community,
   ),
-  getStake: trpc.query(Community.GetCommunityStake, trpc.Tag.Community),
-  getTransactions: trpc.query(Community.GetTransactions, trpc.Tag.Community),
+  getCommunityStake: trpc.query(
+    Community.GetCommunityStake,
+    trpc.Tag.Community,
+  ),
+  setCommunityStake: trpc.command(
+    Community.SetCommunityStake,
+    trpc.Tag.Community,
+    [
+      trpc.fireAndForget(async ({ community_id }, _, { actor }) => {
+        // TODO: this is to reprocude the existing functionality, but it should be part of the command transaction
+        // From legacy: since the stake is already created, generate group in background so this request doesn't fail
+        await command(Community.GenerateStakeholderGroups(), {
+          actor,
+          payload: { id: community_id },
+        });
+      }),
+    ],
+  ),
   getStakeHistoricalPrice: trpc.query(
     Community.GetStakeHistoricalPrice,
     trpc.Tag.Community,
   ),
-  setStake: trpc.command(Community.SetCommunityStake, trpc.Tag.Community),
+  getTransactions: trpc.query(Community.GetTransactions, trpc.Tag.Community),
   createGroup: trpc.command(Community.CreateGroup, trpc.Tag.Community, [
     (_, output) => refreshMemberships(output.id!, output.groups?.at(0)?.id),
     trpc.trackAnalytics([
@@ -180,4 +197,27 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   getTopHolders: trpc.query(Community.GetTopHolders, trpc.Tag.Community),
+  getRelatedCommunities: trpc.query(
+    Community.GetRelatedCommunities,
+    trpc.Tag.Community,
+  ),
+  searchCommunities: trpc.query(
+    Community.SearchCommunities,
+    trpc.Tag.Community,
+  ),
+  getCommunityStats: trpc.query(
+    Community.GetCommunityStats,
+    trpc.Tag.Community,
+    { ttlSecs: 60 * 60 },
+  ),
+  updateBanner: trpc.command(Community.UpdateBanner, trpc.Tag.Community),
+  toggleCommunityStar: trpc.command(
+    Community.ToggleCommunityStar,
+    trpc.Tag.Community,
+  ),
+  setAddressWallet: trpc.command(
+    Community.SetAddressWallet,
+    trpc.Tag.Community,
+  ),
+  getRoles: trpc.query(Community.GetRoles, trpc.Tag.Community),
 });
