@@ -1,46 +1,46 @@
-import { devtools, persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';
+
+export type AIModelOption = {
+  value: string;
+  label: string;
+};
+
 interface LocalAISettingsStore {
   aiInteractionsToggleEnabled: boolean;
   aiCommentsToggleEnabled: boolean;
   setAIInteractionsToggleEnabled: (enabled: boolean) => void;
   setAICommentsToggleEnabled: (enabled: boolean) => void;
+  selectedModels: AIModelOption[];
+  setSelectedModels: (models: AIModelOption[]) => void;
 }
 
-export const LocalAISettingsStore = createStore<LocalAISettingsStore>()(
-  devtools(
-    persist(
-      (set) => ({
-        aiInteractionsToggleEnabled: false,
-        aiCommentsToggleEnabled: false,
-        setAIInteractionsToggleEnabled: (enabled) => {
-          set(() => {
-            return {
-              aiInteractionsToggleEnabled: enabled,
-              ...(!enabled && { aiCommentsToggleEnabled: false }),
-            };
-          });
-        },
-
-        setAICommentsToggleEnabled: (enabled) => {
-          set(() => {
-            return { aiCommentsToggleEnabled: enabled };
-          });
-        },
-      }),
-      {
-        name: 'local-ai-settings-store', // unique name
-        partialize: (state) => ({
-          aiInteractionsToggleEnabled: state.aiInteractionsToggleEnabled,
-          aiCommentsToggleEnabled: state.aiCommentsToggleEnabled,
-        }), // persist only these states
+const localAISettingsStore = createStore<LocalAISettingsStore>()(
+  persist(
+    (set) => ({
+      aiInteractionsToggleEnabled: true,
+      aiCommentsToggleEnabled: true,
+      setAIInteractionsToggleEnabled: (enabled: boolean) => {
+        set({ aiInteractionsToggleEnabled: enabled });
       },
-    ),
+      setAICommentsToggleEnabled: (enabled: boolean) => {
+        set({ aiCommentsToggleEnabled: enabled });
+      },
+      selectedModels: [],
+      setSelectedModels: (models) => set({ selectedModels: models }),
+    }),
+    {
+      name: 'local-ai-settings-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        aiInteractionsToggleEnabled: state.aiInteractionsToggleEnabled,
+        aiCommentsToggleEnabled: state.aiCommentsToggleEnabled,
+        selectedModels: state.selectedModels,
+      }),
+    },
   ),
 );
 
-const useLocalAISettingsStore = createBoundedUseStore(LocalAISettingsStore);
-
-export { useLocalAISettingsStore };
-export default useLocalAISettingsStore;
+export const useLocalAISettingsStore =
+  createBoundedUseStore(localAISettingsStore);
