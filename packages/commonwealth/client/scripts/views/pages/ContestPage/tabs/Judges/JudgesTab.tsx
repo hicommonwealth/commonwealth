@@ -11,6 +11,7 @@ import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { User } from 'views/components/user/user';
 import { ManageOnchainModal } from 'views/pages/CommunityGroupsAndMembers/Members/MembersSection/ManageOnchainModal';
+import { AddressInfo } from 'views/pages/CommunityGroupsAndMembers/Members/MembersSection/MembersSection';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
@@ -25,8 +26,9 @@ interface JudgesTabProps {
 const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
-  const [selectedAddressInfo, setSelectedAddressInfo] =
-    useState<any>(undefined);
+  const [selectedAddressInfo, setSelectedAddressInfo] = useState<
+    AddressInfo[] | undefined
+  >(undefined);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [optimisticJudges, setOptimisticJudges] = useState<string[]>(judges);
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 300);
@@ -86,12 +88,13 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
 
   const searchList = filteredSearchResults.map((member) => {
     const address = member.addresses[0]?.address || '';
-    const addressInfo = member.addresses.map((addr) => ({
+    const addressInfo: AddressInfo[] = member.addresses.map((addr) => ({
       id: addr.id || 0,
       community_id: communityId,
       address: addr.address,
       stake_balance: 0,
       role: 'member',
+      referred_by: null,
     }));
     return {
       user: (
@@ -233,7 +236,7 @@ const JudgesTab = ({ contestAddress, judges }: JudgesTabProps) => {
             refetch={() => {
               if (selectedAddressInfo && selectedAddressInfo.length > 0) {
                 const newAddresses = selectedAddressInfo
-                  .map((info: any) => info.address)
+                  .map((info: AddressInfo) => info.address)
                   .filter((addr: string) => !optimisticJudges.includes(addr));
                 if (newAddresses.length > 0) {
                   setOptimisticJudges((prev) => [...prev, ...newAddresses]);

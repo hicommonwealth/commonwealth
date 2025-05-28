@@ -1,3 +1,4 @@
+import { ChainBase } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'client/scripts/helpers';
 import { getChainIcon } from 'client/scripts/utils/chainUtils';
 import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
@@ -42,7 +43,7 @@ export const AddressItem: React.FC<AddressItemProps> = ({
         <CWTag
           label={formatAddressShort(address.address)}
           type="address"
-          iconName={getChainIcon(address, communityBase as any)}
+          iconName={getChainIcon(address, communityBase as ChainBase)}
         />
       </div>
       <div className="role-selection">
