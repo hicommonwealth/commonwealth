@@ -31,6 +31,7 @@ runs:
       run: |
         set -e
         echo "Checking if Neon branch $PR_BRANCH exists..."
+        echo "Request URL: https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches/$PR_BRANCH"
         response=$(curl -s -o response.json -w "%{http_code}" \
           -H "Authorization: Bearer $NEON_API_KEY" \
           "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches/$PR_BRANCH")
