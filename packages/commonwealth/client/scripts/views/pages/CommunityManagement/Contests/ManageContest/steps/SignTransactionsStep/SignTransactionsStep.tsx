@@ -16,6 +16,7 @@ import {
   useDeployRecurringContestOnchainMutation,
   useDeploySingleERC20ContestOnchainMutation,
   useDeploySingleJudgedContestOnchainMutation,
+  useNominateJudgesMutation,
 } from 'state/api/contests';
 import { DeploySingleERC20ContestOnchainProps } from 'state/api/contests/deploySingleERC20ContestOnchain';
 import { DeploySingleJudgedContestOnchainProps } from 'state/api/contests/deploySingleJudgedContestOnchain';
@@ -69,6 +70,11 @@ const SignTransactionsStep = ({
     errorText: '',
   });
 
+  const [nominateSelfData, setNominateSelfData] = useState({
+    state: 'not-started' as ActionStepProps['state'],
+    errorText: '',
+  });
+
   const { stakeData } = useCommunityStake();
 
   const { mutateAsync: deployRecurringContestOnchainMutation } =
@@ -79,6 +85,8 @@ const SignTransactionsStep = ({
     useDeploySingleJudgedContestOnchainMutation();
   const { mutateAsync: configureNominationsMutation } =
     useConfigureNominationsMutation();
+
+  const { mutateAsync: nominateJudges } = useNominateJudgesMutation();
 
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
   const { data: judgeStatus } = useGetJudgeStatusQuery(app.activeChainId());
@@ -252,6 +260,42 @@ const SignTransactionsStep = ({
     }
   };
 
+  const nominateSelf = async () => {
+    try {
+      setNominateSelfData((prevState) => ({
+        ...prevState,
+        state: 'loading',
+      }));
+
+      if (!walletAddress) {
+        throw new Error('Wallet Address Not Found');
+      }
+
+      const judgeId = (judgeStatus?.current_judge_id || 100) + 1;
+
+      await nominateJudges({
+        namespace: namespaceName,
+        judges: [walletAddress],
+        judgeId,
+        walletAddress,
+        ethChainId,
+        chainRpc,
+      });
+
+      setNominateSelfData((prevState) => ({
+        ...prevState,
+        state: 'completed',
+      }));
+    } catch (error) {
+      console.log('Error nominating self as judge', error);
+      setNominateSelfData((prevState) => ({
+        ...prevState,
+        state: 'not-started',
+        errorText: 'Failed to nominate self as judge. Please try again.',
+      }));
+    }
+  };
+
   const handleBack = () => {
     onSetLaunchContestStep('DetailsForm');
   };
@@ -279,6 +323,8 @@ const SignTransactionsStep = ({
             isJudgedContest: judgedContest,
             configureNominationsData,
             configureNominations,
+            nominateSelfData,
+            nominateSelf,
             isDirectDepositSelected,
             launchContestData,
             signTransaction,

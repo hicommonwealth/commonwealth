@@ -1,5 +1,6 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { Op } from 'sequelize';
 import { models } from '../../database';
 
 export function GetJudgeStatus(): Query<typeof schemas.GetJudgeStatus> {
@@ -11,6 +12,9 @@ export function GetJudgeStatus(): Query<typeof schemas.GetJudgeStatus> {
       const lastContestManager = await models.ContestManager.findOne({
         where: {
           community_id: payload.community_id,
+          namespace_judge_token_id: {
+            [Op.ne]: null,
+          },
         },
         paranoid: false, // also include deleted contest managers
         order: [['namespace_judge_token_id', 'DESC']],
