@@ -140,7 +140,6 @@ ORDER BY T.activity_rank_date DESC NULLS LAST
     raw: true,
     replacements: { user_id, limit, comment_limit, offset },
   });
-  console.log(threads);
 
   return schemas.buildPaginatedResponse(threads, +(threads.at(0)?.total ?? 0), {
     limit,
