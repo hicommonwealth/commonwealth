@@ -288,7 +288,7 @@ GROUP BY
   // address not a member in any group with this action?
   if (!gated.memberships) throw new NonMember(actor, gated.topic, action);
   // all memberships rejected?
-  if (gated.memberships === gated.rejects.length)
+  if (gated.memberships === gated.rejects?.length)
     throw new RejectedMember(actor, gated.rejects);
   // a membership in one of the groups was found so the user has required permissions
 }
