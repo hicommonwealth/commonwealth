@@ -11,7 +11,6 @@ import {
   AuthContextInput,
   CommentContext,
   CommentContextInput,
-  Group,
   PollContext,
   PollContextInput,
   ReactionContext,
@@ -250,64 +249,48 @@ async function checkGatedActions(
   action: GroupGatedActionKey,
   topic_id: number,
 ): Promise<void> {
-  if (!topic_id)
-    throw new InvalidInput('Must provide a valid topic id to authorize');
-
-  const topic = await models.Topic.findOne({ where: { id: topic_id } });
-  if (!topic) throw new InvalidInput('Topic not found');
-
-  // Get the groups and gated actions
-  // TODO: we can probably cache this
-  // TODO: @timolegros let's try to use this query to also join memberships
-  // so we don't have to keep querying the database below
-  const groups = await models.sequelize.query<
-    z.infer<typeof Group> & {
-      gated_actions?: GroupGatedActionKey[];
-    }
-  >(
+  const [gated] = await models.sequelize.query<{
+    topic: string;
+    groups: string[];
+    memberships: number;
+    rejects: string[];
+  }>(
     `
-      SELECT g.*, gp.topic_id, gp.gated_actions, gp.is_private
-      FROM
-        "Groups" as g
-        JOIN "GroupGatedActions" gp ON g.id = gp.group_id
-      WHERE
-        g.community_id = :community_id
-        AND gp.topic_id = :topic_id
-        AND (:action = ANY(gp.gated_actions) OR gp.is_private = true)
-    `,
+SELECT
+  t.name as topic,
+  ARRAY_AGG(g.metadata->>'name') as groups,
+  COUNT(m.address_id)::INTEGER as memberships,
+  ARRAY_AGG(g.metadata->>'name' || ': ' || rejects.messages) FILTER (WHERE rejects.messages IS NOT NULL) as rejects
+FROM
+  "Groups" g
+  JOIN "GroupGatedActions" ga ON g.id = ga.group_id 
+  JOIN "Topics" t ON t.id = ga.topic_id
+  LEFT JOIN "Memberships" m ON g.id = m.group_id AND m.address_id = :address_id
+  LEFT JOIN LATERAL (
+    SELECT STRING_AGG(r->>'message', '; ') as messages 
+    FROM JSONB_ARRAY_ELEMENTS(m.reject_reason) as r
+	) AS rejects ON m.reject_reason IS NOT NULL
+WHERE
+  ga.topic_id = :topic_id
+  AND (:action = ANY(ga.gated_actions) OR ga.is_private = true)
+GROUP BY
+  t.name;
+`,
     {
       type: QueryTypes.SELECT,
       raw: true,
-      replacements: {
-        community_id: topic.community_id,
-        topic_id: topic.id,
-        action,
-      },
+      replacements: { address_id, topic_id, action },
     },
   );
+  console.log({ gated });
 
-  // if the action is not gated by any group then allow
-  if (!groups.length) return;
-
-  // if action is gated by 1 or more groups search for membership in those groups
-  const memberships = await models.Membership.findAll({
-    where: {
-      address_id,
-      group_id: { [Op.in]: groups.map((g) => g.id!) },
-    },
-  });
-  // if not a member in any group then this is not a member
-  if (!memberships.length) throw new NonMember(actor, topic.name, action);
-
-  // if all memberships are rejected, return reject reasons
-  const rejects = memberships.filter((m) => m.reject_reason);
-  if (rejects.length === memberships.length)
-    throw new RejectedMember(
-      actor,
-      rejects.flatMap((reject) =>
-        reject.reject_reason!.map((reason) => reason.message),
-      ),
-    );
+  // action not gated by any group? allow it
+  if (!gated) return;
+  // address not a member in any group with this action?
+  if (!gated.memberships) throw new NonMember(actor, gated.topic, action);
+  // all memberships rejected?
+  if (gated.memberships === gated.rejects.length)
+    throw new RejectedMember(actor, gated.rejects);
   // a membership in one of the groups was found so the user has required permissions
 }
 
