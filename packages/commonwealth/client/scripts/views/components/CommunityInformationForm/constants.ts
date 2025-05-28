@@ -73,6 +73,8 @@ export const chainTypes =
         // @ts-expect-error StrictNullChecks
         hasStakeEnabled: chainIdsWithStakeEnabled.includes(chain.ethChainId),
         chainNodeId: chain.id,
+        ethChainId: chain.ethChainId,
+        alchemyMetadata: chain.alchemyMetadata,
       };
 
       return result;
