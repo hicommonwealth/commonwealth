@@ -223,6 +223,27 @@ const updateCacheForSingleAndActiveThreads = ({
   return updatedThreads;
 };
 
+// get all query keys for /threads
+function getThreadKeys(communityId: string) {
+  const queryCache = queryClient.getQueryCache();
+  const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
+  return queryKeys.filter(([a, b]) => {
+    if (
+      a &&
+      b &&
+      Array.isArray(a) &&
+      a[0] === 'thread' &&
+      ['searchThreads', 'getThreads', 'getActiveThreads'].includes(a[1])
+    ) {
+      return (
+        (b as { input: { community_id: string } }).input.community_id ===
+        communityId
+      );
+    }
+    return false;
+  });
+}
+
 const cacheUpdater = ({
   communityId,
   threadId,
@@ -250,21 +271,12 @@ const cacheUpdater = ({
     },
   });
 
-  const queryCache = queryClient.getQueryCache();
-  const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
-
   // get all array fields from the update body
   const arrayFieldsFromUpdateBody = updateBody
     ? Object.keys(updateBody).filter((k) => Array.isArray(updateBody[k]))
     : [];
 
-  // get all query keys for threads
-  const keysForThreads = [];
-  // TODO: fix this
-  // const keysForThreads = queryKeys.filter(
-  //   (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
-  // );
-
+  const keysForThreads = getThreadKeys(communityId);
   keysForThreads.map((cacheKey: any[]) => {
     const [, , queryType] = cacheKey;
 
@@ -351,15 +363,7 @@ const updateThreadTopicInAllCaches = (
   newTopic: Topic,
   oldTopicId: number,
 ) => {
-  const queryCache = queryClient.getQueryCache();
-  const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
-
-  const keysForThreads = [];
-  // TODO: fix this
-  // const keysForThreads = queryKeys.filter(
-  //   (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
-  // );
-
+  const keysForThreads = getThreadKeys(communityId);
   keysForThreads.map((k) => {
     // 1- for single and active thread queries - just update the topic
     if (
@@ -420,15 +424,7 @@ const updateThreadTopicInAllCaches = (
 
 const addThreadInAllCaches = (communityId: string, newThread: Thread) => {
   // refetch all caches for the thread topic and also the general cache
-  const queryCache = queryClient.getQueryCache();
-  const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
-
-  const keysForThreads = [];
-  // TODO: fix this
-  // const keysForThreads = queryKeys.filter(
-  //   (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
-  // );
-
+  const keysForThreads = getThreadKeys(communityId);
   keysForThreads.map((k) => {
     // TODO: this is improper, we are essentially clearing cache when a thread is added. This is done to ensure
     // we have the correct thread ordering when refetching threads, but ideally we should find a way to correctly
@@ -447,15 +443,7 @@ const addThreadInAllCaches = (communityId: string, newThread: Thread) => {
 };
 
 const clearThreadCache = (communityId: string) => {
-  const queryCache = queryClient.getQueryCache();
-  const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
-
-  const keysForThreads = [];
-  // TODO: fix this
-  // const keysForThreads = queryKeys.filter(
-  //   (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
-  // );
-
+  const keysForThreads = getThreadKeys(communityId);
   keysForThreads.map((k) => {
     queryClient.cancelQueries(k).catch(console.error);
     queryClient.refetchQueries(k).catch(console.error);
