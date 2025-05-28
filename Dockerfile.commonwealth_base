@@ -1,4 +1,5 @@
-FROM datadog-base AS base
+ARG BASE_IMAGE=datadog-base
+FROM ${BASE_IMAGE} AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
