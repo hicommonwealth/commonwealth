@@ -130,7 +130,7 @@ jobs:
 
       - name: Copy .env for build
         run: |
-          ENV_PATH=./packages/commonwealth/deploy/environments/.env.public.${{ env.HEROKU_APP_NAME }}
+          ENV_PATH=./packages/commonwealth/deploy/environments/.env.public.review-apps
           if [ ! -f "$ENV_PATH" ]; then
             echo "Error: $ENV_PATH not found"
             exit 1
