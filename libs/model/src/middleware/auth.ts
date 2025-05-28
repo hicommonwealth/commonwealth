@@ -282,7 +282,6 @@ GROUP BY
       replacements: { address_id, topic_id, action },
     },
   );
-  console.log({ gated });
 
   // action not gated by any group? allow it
   if (!gated) return;
