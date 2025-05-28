@@ -15,6 +15,10 @@ jobs:
     name: Delete Review DB
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
       - name: Set PR Number
         id: set_pr_number
         run: |
@@ -44,6 +48,9 @@ jobs:
     needs: delete_review_db
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set PR Number
         id: set_pr_number
         run: |

@@ -25,6 +25,11 @@ jobs:
         node: [ 22 ]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: refs/pull/${{ github.event.issue.number }}/head
+          
       - name: Set PR Number
         id: set_pr_number
         run: |
@@ -42,11 +47,6 @@ jobs:
           api_key: ${{ secrets.NEON_API_KEY }}
           branch_name: preview/pr-${{ steps.set_pr_number.outputs.pr_number }}
 
-      - uses: actions/checkout@v4
-        if: steps.check_branch.outputs.exists == 'false'
-        with:
-          fetch-depth: 0
-          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
       - uses: ./.github/actions/setup
         if: steps.check_branch.outputs.exists == 'false'
         with:
@@ -96,6 +96,11 @@ jobs:
       matrix:
         node: [ 22 ]
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: refs/pull/${{ github.event.issue.number }}/head
+          
       - name: Set PR Number
         id: set_pr_number
         run: |
@@ -105,10 +110,6 @@ jobs:
             echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
           fi
 
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
