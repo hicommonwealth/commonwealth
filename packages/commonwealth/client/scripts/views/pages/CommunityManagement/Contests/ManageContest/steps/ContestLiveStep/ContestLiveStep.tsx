@@ -72,7 +72,7 @@ const ContestLiveStep = ({
                   containerClassName="cta-btn"
                   label="Nominate judges"
                   buttonType="secondary"
-                  onClick={() => navigate('/members?tab=groups')}
+                  onClick={() => navigate(`/contests/${createdContestAddress}`)}
                 />
               )}
               <CWButton
