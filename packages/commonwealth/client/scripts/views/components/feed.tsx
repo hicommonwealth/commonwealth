@@ -132,9 +132,10 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
   if (isError) {
     return <PageNotFound message="There was an error rendering the feed." />;
   }
-  const allThreads = (
-    feed?.pages ? feed.pages.flatMap((page) => page.results || []) : []
-  ).map((t) => new Thread(t));
+
+  // TODO: replace Thread with ThreadView
+  const allThreads =
+    feed?.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [];
 
   if (!allThreads?.length) {
     return (

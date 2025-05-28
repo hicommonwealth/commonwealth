@@ -85,7 +85,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
             top_threads AS (
             SELECT id, title, url, body, kind, stage, read_only, discord_meta, content_url,
                 pinned, community_id, T.created_at, updated_at, locked_at as thread_locked, links,
-                has_poll, last_commented_on, comment_count as "numberOfComments",
+                has_poll, last_commented_on, comment_count,
                 marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_signed_data,
                 canvas_msg_id, last_edited, address_id, reaction_count,
                 (COUNT(id) OVER())::INTEGER AS total_num_thread_results

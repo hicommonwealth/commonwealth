@@ -152,8 +152,9 @@ const TrendingThreadList = ({
       : [];
   } else if (feed?.pages) {
     allThreads = feed.pages
-      .flatMap((page) => page.results || [])
-      .filter((thread) => !thread.marked_as_spam_at);
+      .flatMap((p) => p.results)
+      .filter((t) => !t.marked_as_spam_at)
+      .map((t) => new Thread(t));
   }
   const redirectPath = communityId ? '/discussions' : '/explore?tab=threads';
 

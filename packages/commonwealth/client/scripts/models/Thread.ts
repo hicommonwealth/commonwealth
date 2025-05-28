@@ -229,8 +229,6 @@ export class Thread implements IUniqueId {
   constructor(
     t: ThreadView & {
       // TODO: fix other type variants
-      numberOfComments?: number;
-      number_of_comments?: number;
       reactionIds?: number[];
       addressesReacted?: z.infer<typeof schemas.Address>[];
       reactedProfileName?: string[];
@@ -294,8 +292,7 @@ export class Thread implements IUniqueId {
       : undefined;
     this.archivedAt = t.archived_at ? moment(t.archived_at) : null;
     this.lockedAt = t.locked_at ? moment(t.locked_at) : undefined;
-    this.numberOfComments =
-      t.numberOfComments ?? t.number_of_comments ?? t.comment_count ?? 0;
+    this.numberOfComments = t.comment_count ?? 0;
     this.canvasSignedData = t.canvas_signed_data ?? undefined;
     this.canvasMsgId = t.canvas_msg_id ?? undefined;
     this.links = t.links || [];

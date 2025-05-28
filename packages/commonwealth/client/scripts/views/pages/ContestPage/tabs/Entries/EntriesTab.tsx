@@ -59,8 +59,9 @@ const EntriesTab = ({
     setSelectedSort(sort);
   };
 
+  // TODO: Replace Thread with ThreadView -> should we use Memo here?
   const sortedThreads = sortByFeaturedFilter(
-    (threads?.pages[0]?.results || []).map((t) => new Thread(t)),
+    threads?.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [],
     threadSort,
   );
 

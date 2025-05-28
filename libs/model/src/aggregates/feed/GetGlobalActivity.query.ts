@@ -9,7 +9,7 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
   return {
     ...schemas.GlobalFeed,
     auth: [],
-    secure: true,
+    secure: false,
     body: async ({ payload }) => {
       const { comment_limit = 3, limit = 10, cursor = 1 } = payload;
 

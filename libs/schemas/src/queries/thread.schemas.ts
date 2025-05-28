@@ -209,7 +209,6 @@ export const BulkThreadView = ThreadView.extend({
     address: z.string(),
     community_id: z.string(),
   }),
-  numberOfComments: PG_INT,
   reactionIds: z.string().array(),
   reactionTimestamps: z.coerce.date().array(),
   reactionWeights: PG_INT.array(),

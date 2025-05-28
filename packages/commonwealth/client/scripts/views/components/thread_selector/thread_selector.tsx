@@ -30,22 +30,23 @@ export const ThreadSelector = ({
   const queryEnabled = debouncedSearchTerm?.trim().length > 0 && !!communityId;
 
   const { data: threadsData, isLoading } = useSearchThreadsQuery({
-    ...{
-      community_id: communityId,
-      search_term: debouncedSearchTerm,
-      cursor: 1,
-      limit: 5,
-      order_by: APIOrderBy.Rank,
-      order_direction: APIOrderDirection.Desc,
-      thread_title_only: true,
-      include_count: true,
-    },
+    community_id: communityId,
+    search_term: debouncedSearchTerm,
+    cursor: 1,
+    limit: 5,
+    order_by: APIOrderBy.Rank,
+    order_direction: APIOrderDirection.Desc,
+    thread_title_only: true,
+    include_count: true,
     enabled: queryEnabled,
   });
 
   const searchResults = useMemo(() => {
-    const threads = threadsData?.pages?.[0]?.results || [];
-    return threads.map((t) => new Thread(t));
+    // TODO: replace Thread with ThreadView
+    return (
+      threadsData?.pages.flatMap((p) => p.results.map((t) => new Thread(t))) ||
+      []
+    );
   }, [threadsData]);
 
   const getEmptyContentMessage = () => {

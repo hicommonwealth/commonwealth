@@ -33,7 +33,7 @@ WITH TH AS (
 		links,
 		has_poll,
 		last_commented_on,
-		comment_count AS "numberOfComments",
+		comment_count,
 		marked_as_spam_at,
 		archived_at,
 		topic_id,

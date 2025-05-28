@@ -36,7 +36,7 @@ export const baseActivityQuery = `
     T.title,
     T.kind,
     T.stage,
-    coalesce(T.comment_count, 0) as number_of_comments,
+    T.comment_count,
     T.created_at::text,
     T.updated_at::text,
     T.deleted_at::text,
