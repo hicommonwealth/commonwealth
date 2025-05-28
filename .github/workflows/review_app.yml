@@ -283,6 +283,7 @@ jobs:
 
       - name: Terraform Init with PR-specific state
         id: init
+        working-directory: terraform
         run: |
           PR_NUMBER="${{ steps.set_pr_number.outputs.pr_number }}"
           terraform init \
@@ -290,6 +291,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
+        working-directory: terraform
         run: terraform plan -var="do_token=${{ secrets.DIGITALOCEAN_TOKEN }}" -var="vault_token=${{ secrets.VAULT_TOKEN }}" -out=tfplan
         continue-on-error: false
 
