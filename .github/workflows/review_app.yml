@@ -1,0 +1,291 @@
+name: Review App
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  setup_review_db:
+    name: Create Review DB
+    outputs:
+      db_url: ${{ steps.create_neon_branch.outputs.db_url }}
+      db_url_with_pooler: ${{ steps.create_neon_branch.outputs.db_url_with_pooler }}
+    # Only run when a /deploy comment is created on a PR
+    if: |
+      github.event.issue.pull_request &&
+      github.event.comment.body == '/deploy'
+    strategy:
+      matrix:
+        node: [ 22 ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: refs/pull/${{ github.event.issue.number }}/head
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Create Neon Branch
+        id: create_neon_branch
+        uses: neondatabase/create-branch-action@v5
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          branch_name: preview/pr-${{ github.event.issue.number }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+          username: 'commonwealth'
+          database: 'commonwealth'
+          suspend_timeout: 300 # scale to 0 compute after 5 minutes
+          ssl: require # DO NOT CHANGE THIS - we must use SSL since we are branching off prod
+
+      - name: Migrate DB
+        id: migrate_db
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+        run: pnpm migrate-db
+
+      # TODO: check if this posts a new comment for each commit to an open PR if this updates the comment
+      # TODO: if this creates a new comment for each commit, we need to update if so it only posts a
+      # new comment when a migration changes in one of the commits since last execution
+    #   - name: Post Schema Diff Comment to PR
+    #     uses: neondatabase/schema-diff-action@v1
+    #     if: |
+    #       contains(join(github.event.issue.pull_request.changed_files.*.filename, '\n'), 'packages/commonwealth/server/migrations/')
+    #     with:
+    #       project_id: ${{ secrets.NEON_PROJECT_ID }}
+    #       compare_branch: production # TODO: need to ensure this doesn't cause undue stress on main DB (maybe use a read replica?)
+    #       api_key: ${{ secrets.NEON_API_KEY }}
+
+  deploy_review_app:
+    name: Deploy Review App
+    if: |
+      github.event.issue.pull_request &&
+      github.event.comment.body == '/deploy'
+    runs-on: ubuntu-latest
+    needs: setup_review_db
+    strategy:
+      matrix:
+        node: [ 22 ]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: refs/pull/${{ github.event.issue.number }}/head
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Copy .env for build
+        run: |
+          ENV_PATH=./packages/commonwealth/deploy/environments/.env.public.${{ env.HEROKU_APP_NAME }}
+          if [ ! -f "$ENV_PATH" ]; then
+            echo "Error: $ENV_PATH not found"
+            exit 1
+          fi
+          cp "$ENV_PATH" .env
+
+      - name: Build and Push datadog-base image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.datadog
+          push: true
+          tags: ghcr.io/hicommonwealth/datadog-base:latest
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/datadog-base:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/datadog-base:buildcache,mode=max
+
+      - name: Build and Push commonwealth base image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.commonwealth_base
+          target: commonwealth
+          push: true
+          tags: ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/commonwealth:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/commonwealth:buildcache,mode=max
+
+      - name: Build and Push Docker Image (web)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.web
+          push: true
+          tags: ghcr.io/hicommonwealth/web:${{ github.sha }}
+          build-args: |
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/web:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/web:buildcache,mode=max
+          provenance: false
+
+      - name: Build and Push Docker Image (consumer)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.consumer
+          push: true
+          tags: ghcr.io/hicommonwealth/consumer:${{ github.sha }}
+          build-args: |
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/consumer:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/consumer:buildcache,mode=max
+          provenance: false
+
+      - name: Build and Push Docker Image (discord_listener)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.discord_listener
+          push: true
+          tags: ghcr.io/hicommonwealth/discord_listener:${{ github.sha }}
+          build-args: |
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/discord_listener:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/discord_listener:buildcache,mode=max
+          provenance: false
+
+      - name: Build and Push Docker Image (evm_ce)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.evm_ce
+          push: true
+          tags: ghcr.io/hicommonwealth/evm_ce:${{ github.sha }}
+          build-args: |
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/evm_ce:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/evm_ce:buildcache,mode=max
+          provenance: false
+
+      - name: Build and Push Docker Image (graphile_worker)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.graphile_worker
+          push: true
+          tags: ghcr.io/hicommonwealth/graphile_worker:${{ github.sha }}
+          build-args: |
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/graphile_worker:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/graphile_worker:buildcache,mode=max
+          provenance: false
+
+      - name: Build and Push Docker Image (knock)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.knock
+          push: true
+          tags: ghcr.io/hicommonwealth/knock:${{ github.sha }}
+          build-args: |
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/knock:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/knock:buildcache,mode=max
+          provenance: false
+
+      - name: Build and Push Docker Image (message_relayer)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.message_relayer
+          push: true
+          tags: ghcr.io/hicommonwealth/message_relayer:${{ github.sha }}
+          build-args: |
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/message_relayer:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/message_relayer:buildcache,mode=max
+          provenance: false
+
+      - name: Build and Push Docker Image (release)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.release
+          push: true
+          tags: ghcr.io/hicommonwealth/release:${{ github.sha }}
+          build-args: |
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/release:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/release:buildcache,mode=max
+          provenance: false
+
+      - name: Build and Push Docker Image (twitter)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.twitter
+          push: true
+          tags: ghcr.io/hicommonwealth/twitter:${{ github.sha }}
+          build-args: |
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache,mode=max
+          provenance: false
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
+
+      # This is for accessing Terraform state in S3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Terraform Init with PR-specific state
+        id: init
+        run: |
+          PR_NUMBER="${{ github.event.issue.number }}"
+          terraform init \
+            -backend-config="key=commonwealth-pr-environments/pr-${PR_NUMBER}/terraform.tfstate"
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -var="do_token=${{ secrets.DIGITALOCEAN_TOKEN }}" -out=tfplan
+        continue-on-error: false
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve tfplan
+
+      - name: Export Kubeconfig
+        run: |
+          echo "Exporting kubeconfig to access the cluster..."
+          terraform output -raw kubeconfig > kubeconfig.yaml
+          echo "KUBECONFIG=$(pwd)/kubeconfig.yaml" >> $GITHUB_ENV
+
+      - name: Deploy App Configuration
+        run: |
+          echo "Cluster is ready, web service external IP is: $(terraform output -raw web_service_ip)"
+          echo "Adding PR comment with deployment info..."
+
+      - name: Comment PR with Deployment Info
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const output = require('child_process').execSync('terraform output -json').toString();
+            const outputs = JSON.parse(output);
+            const webIP = outputs.web_service_ip.value;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 **Review App Deployed!**\n\nYour PR environment has been successfully deployed:\n\n- **Web Application URL**: http://${webIP}\n- **Environment ID**: pr-${context.issue.number}\n- **Image Tag**: ${process.env.TF_VAR_image_tag}\n\nThis environment will be automatically deleted when the PR is closed.`
+            });

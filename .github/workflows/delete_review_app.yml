@@ -1,0 +1,95 @@
+name: Delete Review App
+
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  delete_review_db:
+    name: Delete Review DB
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if Neon Branch Exists
+        id: check_branch
+        env:
+          NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          PR_BRANCH: preview/pr-${{ github.event.number }}
+        run: |
+          set -e
+          echo "Checking if Neon branch $PR_BRANCH exists..."
+          response=$(curl -s -o response.json -w "%{http_code}" \
+            -H "Authorization: Bearer $NEON_API_KEY" \
+            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches/$PR_BRANCH")
+          if [ "$response" = "404" ]; then
+            echo "Branch $PR_BRANCH does not exist. Skipping deletion."
+            echo "exists=false" >> $GITHUB_OUTPUT
+            exit 0
+          elif [ "$response" = "200" ]; then
+            echo "Branch $PR_BRANCH exists. Proceeding with deletion."
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Unexpected response from Neon API: $response"
+            cat response.json
+            exit 1
+          fi
+      - name: Delete Neon Branch
+        if: steps.check_branch.outputs.exists == 'true'
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          branch: preview/pr-${{ github.event.number }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+  delete_review_app:
+    name: Delete Review AP
+    needs: delete_review_db
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if Terraform State File Exists in S3
+        id: check_state
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+          PR_NUMBER: ${{ github.event.number }}
+          S3_BUCKET: <YOUR_S3_BUCKET_NAME>
+        run: |
+          set -e
+          STATE_KEY="commonwealth-pr-environments/pr-${PR_NUMBER}/terraform.tfstate"
+          echo "Checking for state file: $STATE_KEY in bucket: $S3_BUCKET"
+          if aws s3 ls "s3://$S3_BUCKET/$STATE_KEY" > /dev/null 2>&1; then
+            echo "state_exists=true" >> $GITHUB_OUTPUT
+            echo "Terraform state file exists."
+          else
+            echo "state_exists=false" >> $GITHUB_OUTPUT
+            echo "Terraform state file does not exist. Skipping destroy."
+          fi
+      # This is for accessing Terraform state in S3
+      - name: Configure AWS Credentials
+        if: steps.check_state.outputs.state_exists == 'true'
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        if: steps.check_state.outputs.state_exists == 'true'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
+
+      - name: Terraform Init with PR-specific state
+        if: steps.check_state.outputs.state_exists == 'true'
+        id: init
+        run: |
+          PR_NUMBER="${{ github.event.number }}"
+          terraform init \
+            -backend-config="key=commonwealth-pr-environments/pr-${PR_NUMBER}/terraform.tfstate"
+
+      - name: Terraform Destroy
+        if: steps.check_state.outputs.state_exists == 'true'
+        run: |
+          echo "PR was closed, destroying environment..."
+          terraform destroy -auto-approve -var="do_token=${{ secrets.DIGITALOCEAN_TOKEN }}"
