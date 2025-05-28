@@ -23,6 +23,7 @@ export type Permission = (typeof Permissions)[keyof typeof Permissions];
 export type Topic = {
   id: number;
   name: string;
+  is_private: boolean;
 };
 
 export type TopicPermissionToggleGroupSubFormsState = {
@@ -81,7 +82,7 @@ export type GroupInitialValuesTypeWithLabel = {
   groupImageUrl?: string;
   requirements?: RequirementSubTypeWithLabel[];
   requirementsToFulfill?: 'ALL' | number;
-  topics: (LabelType & { permission: GatedActionEnum })[];
+  topics: (LabelType & { is_private: boolean; permission: GatedActionEnum })[];
 };
 
 export type FormSubmitValues = {

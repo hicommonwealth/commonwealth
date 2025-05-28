@@ -30,6 +30,11 @@ export default (
         allowNull: false,
         primaryKey: true,
       },
+      is_private: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       gated_actions: {
         // This needs to be a string[] because enum[] will break sequelize.sync and fail tests
         type: Sequelize.ARRAY(Sequelize.STRING),
