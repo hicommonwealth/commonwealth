@@ -1301,7 +1301,7 @@ describe('Thread lifecycle', () => {
         actor: actors.member,
         payload: {
           community_id: thread.community_id,
-          limit: 100,
+          limit: 50,
           cursor: 1,
         },
       });
