@@ -35,10 +35,10 @@ runs:
           "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches/$PR_BRANCH")
         if [ "$response" = "404" ]; then
           echo "Branch $PR_BRANCH does not exist."
-          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "exists='false'" >> $GITHUB_OUTPUT
         elif [ "$response" = "200" ]; then
           echo "Branch $PR_BRANCH exists."
-          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "exists='true'" >> $GITHUB_OUTPUT
         else
           echo "Unexpected response from Neon API: $response"
           cat response.json
