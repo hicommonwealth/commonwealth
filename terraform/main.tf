@@ -3,7 +3,7 @@ terraform {
   # Note: The key will be set dynamically in the GitHub Actions workflow
   # with: terraform init -backend-config="key=commonwealth-pr-environments/pr-${PR_NUMBER}/terraform.tfstate"
   backend "s3" {
-    bucket = "your-terraform-states-bucket"
+    bucket = "terraform-common-dev"
     key = "commonwealth-pr-environments/default/terraform.tfstate" # This will be overridden
     region = "us-east-1"
     # TODO: add state locking via DynamoDB?
