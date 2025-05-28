@@ -49,6 +49,7 @@ export const getTotalContestBalance = async (
       }
     } catch (err) {
       console.warn('Error using fee manager', { err: (err as Error).message });
+      useFeeManager = false;
     }
   }
 
