@@ -48,7 +48,7 @@ export const getTotalContestBalance = async (
         feeManagerAddressPromise = contestContract.read.FeeMangerAddress();
       }
     } catch (err) {
-      console.warn('Error using fee manager', { err: (err as Error).message });
+      console.warn(`Error using fee manager ${(err as Error).message}`);
       useFeeManager = false;
     }
   }
