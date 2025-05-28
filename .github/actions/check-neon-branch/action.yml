@@ -31,18 +31,16 @@ runs:
       run: |
         set -e
         echo "Checking if Neon branch $PR_BRANCH exists..."
-        echo "Request URL: https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches/$PR_BRANCH"
-        response=$(curl -s -o response.json -w "%{http_code}" \
-          -H "Authorization: Bearer $NEON_API_KEY" \
-          "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches/$PR_BRANCH")
-        if [ "$response" = "404" ]; then
-          echo "Branch $PR_BRANCH does not exist."
-          echo "exists=false" >> $GITHUB_OUTPUT
-        elif [ "$response" = "200" ]; then
+        echo "Request URL: https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches?sort_by=updated_at&sort_order=desc&limit=1000"
+        response=$(curl -s \
+          -H "accept: application/json" \
+          -H "authorization: Bearer $NEON_API_KEY" \
+          "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches?sort_by=updated_at&sort_order=desc&limit=1000")
+        branch_exists=$(echo "$response" | jq --arg name "$PR_BRANCH" '.branches[] | select(.name == $name)' | wc -l)
+        if [ "$branch_exists" -gt 0 ]; then
           echo "Branch $PR_BRANCH exists."
           echo "exists=true" >> $GITHUB_OUTPUT
         else
-          echo "Unexpected response from Neon API: $response"
-          cat response.json
-          exit 1
+          echo "Branch $PR_BRANCH does not exist."
+          echo "exists=false" >> $GITHUB_OUTPUT
         fi 
