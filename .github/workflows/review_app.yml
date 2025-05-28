@@ -47,6 +47,10 @@ jobs:
           api_key: ${{ secrets.NEON_API_KEY }}
           branch_name: preview/pr-${{ steps.set_pr_number.outputs.pr_number }}
 
+      - name: Debug Neon Branch Exists
+        run: |
+            echo "Neon branch exists: '${{ steps.check_branch.outputs.exists }}'"
+
       - uses: ./.github/actions/setup
         if: steps.check_branch.outputs.exists == 'false'
         with:
