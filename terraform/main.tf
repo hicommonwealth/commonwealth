@@ -11,7 +11,7 @@ terraform {
   required_providers {
     digitalocean = {
       source  = "digitalocean/digitalocean"
-      version = "2.46.0"
+      version = "2.54.0"
     }
   }
 }
@@ -26,6 +26,15 @@ provider "kubernetes" {
   host  = digitalocean_kubernetes_cluster.main.endpoint
   token = digitalocean_kubernetes_cluster.main.kube_config[0].token
   cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate)
+}
+
+# External Secrets Operator (ESO) via Helm
+provider "helm" {
+  kubernetes {
+    host                   = digitalocean_kubernetes_cluster.main.endpoint
+    token                  = digitalocean_kubernetes_cluster.main.kube_config[0].token
+    cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate)
+  }
 }
 
 # Variables
@@ -60,6 +69,12 @@ variable "environment" {
   default     = "pr"
 }
 
+variable "vault_token" {
+  description = "Vault token for External Secrets Operator"
+  type        = string
+  sensitive   = true
+}
+
 # Local values for naming resources
 locals {
   name_prefix = "${var.environment}-${var.pr_number}-"
@@ -85,7 +100,7 @@ resource "kubernetes_namespace" "cw" {
 resource "digitalocean_kubernetes_cluster" "main" {
   name    = "${local.name_prefix}cluster"
   region  = var.region
-  version = "1.29.1-do.0"
+  version = "1.32.2-do.1"
 
   # Web node pool - smaller since we only need 1 pod
   node_pool {
@@ -306,6 +321,94 @@ resource "kubernetes_service" "web" {
     }
     type = "LoadBalancer"
   }
+}
+
+# External Secrets Operator (ESO) via Helm
+resource "helm_release" "external_secrets" {
+  name       = "external-secrets"
+  namespace  = kubernetes_namespace.cw.metadata[0].name
+  repository = "https://charts.external-secrets.io"
+  chart      = "external-secrets"
+  version    = "0.16.0"
+  create_namespace = false
+  values = [
+    <<-EOF
+    installCRDs: true
+    EOF
+  ]
+}
+
+# --- Vault SecretStore ---
+resource "kubernetes_secret" "vault_token" {
+  metadata {
+    name      = "vault-token"
+    namespace = kubernetes_namespace.cw.metadata[0].name
+  }
+  data = {
+    token = var.vault_token # Value is passed from workflow as a Terraform variable
+  }
+}
+
+resource "kubernetes_manifest" "vault_secretstore" {
+  manifest = {
+    "apiVersion" = "external-secrets.io/v1beta1"
+    "kind" = "SecretStore"
+    "metadata" = {
+      "name" = "vault-backend"
+      "namespace" = kubernetes_namespace.cw.metadata[0].name
+    }
+    "spec" = {
+      "provider" = {
+        "vault" = {
+          "server" = "<VAULT_ADDR>" # <-- Set your Vault address here
+          "path" = "<VAULT_KV_PATH>" # <-- Set your Vault KV path here (e.g., secret/)
+          "version" = "v2"
+          "auth" = {
+            "tokenSecretRef" = {
+              "name" = kubernetes_secret.vault_token.metadata[0].name
+              "key" = "token"
+            }
+          }
+        }
+      }
+    }
+  }
+  depends_on = [helm_release.external_secrets]
+}
+
+# --- External Secrets (secrets list managed in secrets.auto.tfvars) ---
+resource "kubernetes_manifest" "external_secret" {
+  for_each = { for s in var.secrets : s.name => s }
+  manifest = {
+    apiVersion = "external-secrets.io/v1beta1"
+    kind       = "ExternalSecret"
+    metadata = {
+      name      = each.value.name
+      namespace = kubernetes_namespace.cw.metadata[0].name
+    }
+    spec = {
+      refreshInterval = "10m"
+      secretStoreRef = {
+        name = kubernetes_manifest.vault_secretstore.manifest["metadata"]["name"]
+        kind = "SecretStore"
+      }
+      target = {
+        name = each.value.target_name
+      }
+      data = each.value.data
+    }
+  }
+}
+
+# --- Stakater Reloader (auto-restart pods on secret/configmap change) ---
+resource "helm_release" "reloader" {
+  name       = "reloader"
+  namespace  = kubernetes_namespace.cw.metadata[0].name
+  repository = "https://stakater.github.io/stakater-charts"
+  chart      = "reloader"
+  version    = "1.4.2"
+  create_namespace = false
+  depends_on = [kubernetes_namespace.cw]
 }
 
 # Output cluster and load balancer info

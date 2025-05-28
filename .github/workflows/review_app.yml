@@ -249,7 +249,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.7.0
+          terraform_version: 1.12.0
 
       # This is for accessing Terraform state in S3
       - name: Configure AWS Credentials
@@ -268,36 +268,37 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -var="do_token=${{ secrets.DIGITALOCEAN_TOKEN }}" -out=tfplan
+        run: terraform plan -var="do_token=${{ secrets.DIGITALOCEAN_TOKEN }}" -var="vault_token=${{ secrets.VAULT_TOKEN }}" -out=tfplan
         continue-on-error: false
 
-      - name: Terraform Apply
-        id: apply
-        run: terraform apply -auto-approve tfplan
+    #   - name: Terraform Apply
+    #     id: apply
+    #     run: terraform apply -auto-approve tfplan
 
-      - name: Export Kubeconfig
-        run: |
-          echo "Exporting kubeconfig to access the cluster..."
-          terraform output -raw kubeconfig > kubeconfig.yaml
-          echo "KUBECONFIG=$(pwd)/kubeconfig.yaml" >> $GITHUB_ENV
+    # TODO: send kubeconfig somewhere private?
+    #   - name: Export Kubeconfig
+    #     run: |
+    #       echo "Exporting kubeconfig to access the cluster..."
+    #       terraform output -raw kubeconfig > kubeconfig.yaml
+    #       echo "KUBECONFIG=$(pwd)/kubeconfig.yaml" >> $GITHUB_ENV
 
-      - name: Deploy App Configuration
-        run: |
-          echo "Cluster is ready, web service external IP is: $(terraform output -raw web_service_ip)"
-          echo "Adding PR comment with deployment info..."
+    #   - name: Deploy App Configuration
+    #     run: |
+    #       echo "Cluster is ready, web service external IP is: $(terraform output -raw web_service_ip)"
+    #       echo "Adding PR comment with deployment info..."
 
-      - name: Comment PR with Deployment Info
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const output = require('child_process').execSync('terraform output -json').toString();
-            const outputs = JSON.parse(output);
-            const webIP = outputs.web_service_ip.value;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `🚀 **Review App Deployed!**\n\nYour PR environment has been successfully deployed:\n\n- **Web Application URL**: http://${webIP}\n- **Environment ID**: pr-${context.issue.number}\n- **Image Tag**: ${process.env.TF_VAR_image_tag}\n\nThis environment will be automatically deleted when the PR is closed.`
-            });
+    #   - name: Comment PR with Deployment Info
+    #     uses: actions/github-script@v6
+    #     with:
+    #       github-token: ${{ secrets.GITHUB_TOKEN }}
+    #       script: |
+    #         const fs = require('fs');
+    #         const output = require('child_process').execSync('terraform output -json').toString();
+    #         const outputs = JSON.parse(output);
+    #         const webIP = outputs.web_service_ip.value;
+    #         github.rest.issues.createComment({
+    #           issue_number: context.issue.number,
+    #           owner: context.repo.owner,
+    #           repo: context.repo.repo,
+    #           body: `🚀 **Review App Deployed!**\n\nYour PR environment has been successfully deployed:\n\n- **Web Application URL**: http://${webIP}\n- **Environment ID**: pr-${context.issue.number}\n- **Image Tag**: ${process.env.TF_VAR_image_tag}\n\nThis environment will be automatically deleted when the PR is closed.`
+    #         });
