@@ -64,7 +64,7 @@ jobs:
           project_id: ${{ secrets.NEON_PROJECT_ID }}
           branch_name: preview/pr-${{ steps.set_pr_number.outputs.pr_number }}
           api_key: ${{ secrets.NEON_API_KEY }}
-          username: 'commonwealth'
+          username: 'neondb_owner'
           database: 'commonwealth'
           suspend_timeout: 300 # scale to 0 compute after 5 minutes
           ssl: require # DO NOT CHANGE THIS - we must use SSL since we are branching off prod
