@@ -69,7 +69,6 @@ export const CreateThreadReaction = {
   output: Reaction.extend({
     community_id: z.string(),
     thread_id: PG_INT,
-    topic_id: PG_INT,
   }),
   context: ThreadContext,
 };
