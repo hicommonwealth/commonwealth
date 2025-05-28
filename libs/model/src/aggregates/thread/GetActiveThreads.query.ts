@@ -4,6 +4,7 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authOptional } from '../../middleware';
+import { PrivateTopics } from '../../utils/privateTopics';
 
 export function GetActiveThreads(): Query<typeof schemas.GetActiveThreads> {
   return {
@@ -16,40 +17,41 @@ export function GetActiveThreads(): Query<typeof schemas.GetActiveThreads> {
       const sql = `
 WITH TH AS (
 	SELECT
-		id,
-		title,
-		url,
-		body,
-		kind,
-		stage,
-		READ_ONLY,
-		discord_meta,
-		content_url,
-		pinned,
-		community_id,
+		T.id,
+		T.title,
+		T.url,
+		T.body,
+		T.kind,
+		T.stage,
+		T.READ_ONLY,
+		T.discord_meta,
+		T.content_url,
+		T.pinned,
+		T.community_id,
 		T.created_at,
-		updated_at,
-		locked_at AS thread_locked,
-		links,
-		has_poll,
-		last_commented_on,
-		comment_count,
-		marked_as_spam_at,
-		archived_at,
-		topic_id,
-		reaction_weights_sum,
-		canvas_signed_data,
-		canvas_msg_id,
-		last_edited,
-		address_id,
-		reaction_count,
-		row_number() OVER (PARTITION BY topic_id ORDER BY created_at DESC,
-			last_commented_on DESC) AS topic_rank
+		T.updated_at,
+		T.locked_at AS thread_locked,
+		T.links,
+		T.has_poll,
+		T.last_commented_on,
+		T.comment_count,
+		T.marked_as_spam_at,
+		T.archived_at,
+		T.topic_id,
+		T.reaction_weights_sum,
+		T.canvas_signed_data,
+		T.canvas_msg_id,
+		T.last_edited,
+		T.address_id,
+		T.reaction_count,
+		row_number() OVER (
+      PARTITION BY T.topic_id ORDER BY created_at DESC,	last_commented_on DESC) AS topic_rank
 	FROM
-		"GatedThreads" T
+		"Threads" T
+    LEFT JOIN ${PrivateTopics} ON T.topic_id = PrivateTopics.topic_id
 	WHERE
 		community_id = :community_id
-		AND COALESCE(gated_address_id, :address_id) = :address_id
+		AND COALESCE(PrivateTopics.address_id, :address_id) = :address_id
 		AND deleted_at IS NULL
 		AND archived_at IS NULL
 ),
@@ -57,19 +59,19 @@ T AS ( -- select top by topic and get the thread authors and their profiles
 SELECT
   TH.*,
   json_build_object(
-      'id', T.id,
-      'name', T.name,
-      'description', T.description,
-      'community_id', T.community_id,
-      'telegram', T.telegram,
-      'weighted_voting', T.weighted_voting,
-      'token_decimals', T.token_decimals,
-      'vote_weight_multiplier', T.vote_weight_multiplier
+    'id', T.id,
+    'name', T.name,
+    'description', T.description,
+    'community_id', T.community_id,
+    'telegram', T.telegram,
+    'weighted_voting', T.weighted_voting,
+    'token_decimals', T.token_decimals,
+    'vote_weight_multiplier', T.vote_weight_multiplier
   ) as topic,
   json_build_object(
-      'id', A.id,
-      'address', A.address,
-      'community_id', A.community_id
+    'id', A.id,
+    'address', A.address,
+    'community_id', A.community_id
   ) as "Address",
   U.id as user_id,
   U.tier as user_tier,
@@ -92,19 +94,19 @@ collaborator_data AS ( -- get the thread collaborators and their profiles
     T.id as thread_id,
     CASE WHEN max(A.id) IS NOT NULL THEN
         json_agg(json_strip_nulls(json_build_object(
-            'address', A.address,
-            'community_id', A.community_id,
-            'User', json_build_object(
-              'id', editor_profiles.id,
-              'profile', json_build_object(
-                'userId', editor_profiles.id,
-                'name', editor_profiles.profile->>'name',
-                'address', A.address,
-                'lastActive', A.last_active::text,
-                'avatarUrl', editor_profiles.profile->>'avatar_url'
-              ),
-              'tier', editor_profiles.tier
-            )
+          'address', A.address,
+          'community_id', A.community_id,
+          'User', json_build_object(
+            'id', editor_profiles.id,
+            'profile', json_build_object(
+              'userId', editor_profiles.id,
+              'name', editor_profiles.profile->>'name',
+              'address', A.address,
+              'lastActive', A.last_active::text,
+              'avatarUrl', editor_profiles.profile->>'avatar_url'
+            ),
+            'tier', editor_profiles.tier
+          )
         )))
       ELSE '[]'::json
     END AS collaborators

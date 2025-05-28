@@ -5,6 +5,7 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authOptional } from '../../middleware';
+import { PrivateTopics } from '../../utils/privateTopics';
 
 export function SearchThreads(): Query<typeof schemas.SearchThreads> {
   return {
@@ -81,18 +82,20 @@ SELECT
   COUNT(*) OVER()::INTEGER AS total_count, 
   ts_rank_cd(T.search, tsquery) as rank
 FROM 
-  "GatedThreads" T
+    "Threads" T
     JOIN "Addresses" A ON T.address_id = A.id
-    JOIN "Users" U ON A.user_id = U.id,
-    websearch_to_tsquery('english', $searchTerm) as tsquery
+    JOIN "Users" U ON A.user_id = U.id
+    LEFT JOIN ${PrivateTopics} ON T.topic_id = PrivateTopics.topic_id
+    , websearch_to_tsquery('english', $searchTerm) as tsquery
 WHERE
-  COALESCE(T.gated_address_id, $address_id) = $address_id AND   
+  COALESCE(PrivateTopics.address_id, $address_id) = $address_id AND   
   T.deleted_at IS NULL AND
   T.marked_as_spam_at IS NULL
   ${bind.community ? 'AND T.community_id = $community' : ''} 
   AND (T.title ILIKE '%' || $searchTerm || '%' 
   ${!thread_title_only ? 'OR tsquery @@ T.search' : ''})
-${paginationSort}`;
+${paginationSort}
+`;
 
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ThreadView> & { total_count: number }

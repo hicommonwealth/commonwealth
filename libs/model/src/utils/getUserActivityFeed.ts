@@ -3,6 +3,7 @@ import { CommunityTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
+import { PrivateTopics } from './privateTopics';
 
 /**
  * Gets last updated threads and their recent comments
@@ -108,22 +109,24 @@ user_communities AS (
     WHERE user_id = :user_id
 ),
 top_threads AS (
-  SELECT T.*, count(*) OVER() AS total, C.icon_url
-  FROM "GatedThreads" T
-  ${
-    user_id
-      ? 'JOIN user_communities UC ON UC.community_id = T.community_id'
-      : ''
-  }
-  JOIN "Communities" C ON C.id = T.community_id
+  SELECT
+    T.*,
+    count(*) OVER() AS total,
+    C.icon_url
+  FROM
+    "Threads" T
+    ${user_id ? 'JOIN user_communities UC ON UC.community_id = T.community_id' : ''}
+    JOIN "Communities" C ON C.id = T.community_id
+    LEFT JOIN ${PrivateTopics} ON T.topic_id = PrivateTopics.topic_id
   WHERE 
-      T.gated_address_id IS NULL
-      AND T.deleted_at IS NULL 
-      AND T.marked_as_spam_at IS NULL 
-      AND C.active IS TRUE 
-      AND C.tier != ${CommunityTierMap.SpamCommunity}
-      AND C.id NOT IN ('ethereum', 'cosmos', 'polkadot')
-  ORDER BY T.activity_rank_date DESC NULLS LAST
+    PrivateTopics.address_id IS NULL -- only include threads that are not gated
+    AND T.deleted_at IS NULL 
+    AND T.marked_as_spam_at IS NULL 
+    AND C.active IS TRUE 
+    AND C.tier != ${CommunityTierMap.SpamCommunity}
+    AND C.id NOT IN ('ethereum', 'cosmos', 'polkadot')
+  ORDER BY
+    T.activity_rank_date DESC NULLS LAST
   LIMIT :limit OFFSET :offset 
 )
 ${baseActivityQuery}
