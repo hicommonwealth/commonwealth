@@ -82,6 +82,7 @@ import { useCosmosProposal } from '../NewProposalViewPage/useCosmosProposal';
 import { useSnapshotProposal } from '../NewProposalViewPage/useSnapshotProposal';
 import { SnapshotPollCardContainer } from '../Snapshots/ViewSnapshotProposal/SnapshotPollCard';
 import { CommentTree } from '../discussions/CommentTree';
+import { StreamingReplyInstance } from '../discussions/CommentTree/TreeHierarchy';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { LinkedUrlCard } from './LinkedUrlCard';
 import { ThreadPollCard } from './ThreadPollCard';
@@ -263,17 +264,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     thread?.topic?.id,
   );
 
-  const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
+  const { aiCommentsToggleEnabled, selectedModels } = useLocalAISettingsStore();
 
-  const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
+  const [streamingInstances, setStreamingInstances] = useState<
+    StreamingReplyInstance[]
+  >([]);
 
   const handleGenerateAIComment = useCallback(
     async (mainThreadId: number): Promise<void> => {
-      if (!aiCommentsToggleEnabled || !user.activeAccount) {
+      if (
+        !aiCommentsToggleEnabled ||
+        !user.activeAccount ||
+        selectedModels.length === 0
+      ) {
         return;
       }
 
-      // Only generate AI comment if there are no existing comments
       if (
         (thread?.numberOfComments && thread.numberOfComments > 0) ||
         initalAiCommentPosted.current
@@ -281,13 +287,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         return;
       }
 
-      // Using await to satisfy the linter requirement
-      await Promise.resolve();
+      const newInstances: StreamingReplyInstance[] = selectedModels.map(
+        (model) => ({
+          targetCommentId: mainThreadId,
+          modelId: model.value,
+          modelName: model.label,
+        }),
+      );
 
-      setStreamingReplyIds([mainThreadId]);
+      setStreamingInstances(newInstances);
       initalAiCommentPosted.current = true;
     },
-    [aiCommentsToggleEnabled, user.activeAccount, thread],
+    [aiCommentsToggleEnabled, user.activeAccount, thread, selectedModels],
   );
 
   useEffect(() => {
@@ -1104,8 +1115,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 fromDiscordBot={fromDiscordBot}
                 onThreadCreated={handleGenerateAIComment}
                 aiCommentsToggleEnabled={aiCommentsToggleEnabled}
-                streamingReplyIds={streamingReplyIds}
-                setStreamingReplyIds={setStreamingReplyIds}
+                streamingInstances={streamingInstances}
+                setStreamingInstances={setStreamingInstances}
                 permissions={permissions}
               />
             </>
