@@ -3,6 +3,12 @@ name: Review App
 on:
   issue_comment:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Pull Request Number'
+        required: true
+        type: number
 
 jobs:
   setup_review_db:
@@ -10,28 +16,37 @@ jobs:
     outputs:
       db_url: ${{ steps.create_neon_branch.outputs.db_url }}
       db_url_with_pooler: ${{ steps.create_neon_branch.outputs.db_url_with_pooler }}
-    # Only run when a /deploy comment is created on a PR
+    # Only run when a /deploy comment is created on a PR or when manually triggered
     if: |
-      github.event.issue.pull_request &&
-      github.event.comment.body == '/deploy'
+      (github.event.issue.pull_request && github.event.comment.body == '/deploy') ||
+      github.event_name == 'workflow_dispatch'
     strategy:
       matrix:
         node: [ 22 ]
     runs-on: ubuntu-latest
     steps:
+      - name: Set PR Number
+        id: set_pr_number
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+          else
+            echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Check if Neon Branch Exists
         id: check_branch
         uses: ./.github/actions/check-neon-branch
         with:
           project_id: ${{ secrets.NEON_PROJECT_ID }}
           api_key: ${{ secrets.NEON_API_KEY }}
-          branch_name: preview/pr-${{ github.event.number }}
+          branch_name: preview/pr-${{ steps.set_pr_number.outputs.pr_number }}
 
       - uses: actions/checkout@v4
         if: steps.check_branch.outputs.exists == 'false'
         with:
           fetch-depth: 0
-          ref: refs/pull/${{ github.event.issue.number }}/head
+          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
       - uses: ./.github/actions/setup
         if: steps.check_branch.outputs.exists == 'false'
         with:
@@ -43,7 +58,7 @@ jobs:
         uses: neondatabase/create-branch-action@v5
         with:
           project_id: ${{ secrets.NEON_PROJECT_ID }}
-          branch_name: preview/pr-${{ github.event.issue.number }}
+          branch_name: preview/pr-${{ steps.set_pr_number.outputs.pr_number }}
           api_key: ${{ secrets.NEON_API_KEY }}
           username: 'commonwealth'
           database: 'commonwealth'
@@ -73,18 +88,27 @@ jobs:
   deploy_review_app:
     name: Deploy Review App
     if: |
-      github.event.issue.pull_request &&
-      github.event.comment.body == '/deploy'
+      (github.event.issue.pull_request && github.event.comment.body == '/deploy') ||
+      github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: setup_review_db
     strategy:
       matrix:
         node: [ 22 ]
     steps:
+      - name: Set PR Number
+        id: set_pr_number
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+          else
+            echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+          fi
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: refs/pull/${{ github.event.issue.number }}/head
+          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -262,7 +286,7 @@ jobs:
       - name: Terraform Init with PR-specific state
         id: init
         run: |
-          PR_NUMBER="${{ github.event.issue.number }}"
+          PR_NUMBER="${{ steps.set_pr_number.outputs.pr_number }}"
           terraform init \
             -backend-config="key=commonwealth-pr-environments/pr-${PR_NUMBER}/terraform.tfstate"
 
