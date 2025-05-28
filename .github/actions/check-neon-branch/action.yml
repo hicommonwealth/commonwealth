@@ -1,0 +1,46 @@
+name: Check Neon Branch
+
+description: Checks if a Neon branch exists for a given project and branch name
+
+inputs:
+  project_id:
+    description: Neon project ID
+    required: true
+  api_key:
+    description: Neon API key
+    required: true
+  branch_name:
+    description: Neon branch name (e.g. preview/pr-123)
+    required: true
+
+outputs:
+  exists:
+    description: 'Whether the Neon branch exists (true/false)'
+
+runs:
+  using: composite
+  steps:
+    - name: Check if Neon Branch Exists
+      id: check
+      shell: bash
+      env:
+        NEON_PROJECT_ID: ${{ inputs.project_id }}
+        NEON_API_KEY: ${{ inputs.api_key }}
+        PR_BRANCH: ${{ inputs.branch_name }}
+      run: |
+        set -e
+        echo "Checking if Neon branch $PR_BRANCH exists..."
+        response=$(curl -s -o response.json -w "%{http_code}" \
+          -H "Authorization: Bearer $NEON_API_KEY" \
+          "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches/$PR_BRANCH")
+        if [ "$response" = "404" ]; then
+          echo "Branch $PR_BRANCH does not exist."
+          echo "exists=false" >> $GITHUB_OUTPUT
+        elif [ "$response" = "200" ]; then
+          echo "Branch $PR_BRANCH exists."
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "Unexpected response from Neon API: $response"
+          cat response.json
+          exit 1
+        fi 

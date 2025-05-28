@@ -19,15 +19,26 @@ jobs:
         node: [ 22 ]
     runs-on: ubuntu-latest
     steps:
+      - name: Check if Neon Branch Exists
+        id: check_branch
+        uses: ./.github/actions/check-neon-branch
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+          branch_name: preview/pr-${{ github.event.number }}
+
       - uses: actions/checkout@v4
+        if: steps.check_branch.outputs.exists == 'false'
         with:
           fetch-depth: 0
           ref: refs/pull/${{ github.event.issue.number }}/head
       - uses: ./.github/actions/setup
+        if: steps.check_branch.outputs.exists == 'false'
         with:
           node-version: ${{ matrix.node }}
 
       - name: Create Neon Branch
+        if: steps.check_branch.outputs.exists == 'false'
         id: create_neon_branch
         uses: neondatabase/create-branch-action@v5
         with:
@@ -40,6 +51,7 @@ jobs:
           ssl: require # DO NOT CHANGE THIS - we must use SSL since we are branching off prod
 
       - name: Migrate DB
+        if: steps.check_branch.outputs.exists == 'false'
         id: migrate_db
         env:
           NODE_ENV: production

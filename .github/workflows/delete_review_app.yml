@@ -11,28 +11,12 @@ jobs:
     steps:
       - name: Check if Neon Branch Exists
         id: check_branch
-        env:
-          NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
-          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
-          PR_BRANCH: preview/pr-${{ github.event.number }}
-        run: |
-          set -e
-          echo "Checking if Neon branch $PR_BRANCH exists..."
-          response=$(curl -s -o response.json -w "%{http_code}" \
-            -H "Authorization: Bearer $NEON_API_KEY" \
-            "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches/$PR_BRANCH")
-          if [ "$response" = "404" ]; then
-            echo "Branch $PR_BRANCH does not exist. Skipping deletion."
-            echo "exists=false" >> $GITHUB_OUTPUT
-            exit 0
-          elif [ "$response" = "200" ]; then
-            echo "Branch $PR_BRANCH exists. Proceeding with deletion."
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "Unexpected response from Neon API: $response"
-            cat response.json
-            exit 1
-          fi
+        uses: ./.github/actions/check-neon-branch
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+          branch_name: preview/pr-${{ github.event.number }}
+          
       - name: Delete Neon Branch
         if: steps.check_branch.outputs.exists == 'true'
         uses: neondatabase/delete-branch-action@v3
