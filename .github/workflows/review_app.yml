@@ -9,8 +9,6 @@ on:
         description: 'Pull Request Number'
         required: true
         type: number
-  pull_request:
-    types: [opened, synchronize, reopened]
 
 jobs:
   setup_review_db:

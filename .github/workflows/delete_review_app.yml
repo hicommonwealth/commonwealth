@@ -2,7 +2,7 @@ name: Delete Review App
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, closed]
+    types: [ closed ]
   workflow_dispatch:
     inputs:
       pr_number:
