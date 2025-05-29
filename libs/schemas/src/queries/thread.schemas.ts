@@ -79,6 +79,8 @@ export const UserView = z.object({
   ProfileTags: z.array(ProfileTagsView).optional(),
   unsubscribe_uuid: z.string().uuid().nullish().optional(),
   tier: z.number().nullish().optional(),
+  referred_by_address: z.string().nullish(),
+  xp_referrer_points: PG_INT.default(0).nullish(),
 });
 type UserView = z.infer<typeof UserView>;
 

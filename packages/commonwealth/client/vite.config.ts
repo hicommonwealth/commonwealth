@@ -63,6 +63,10 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_PARTNERSHIP_WALLET': JSON.stringify(
       env.FLAG_PARTNERSHIP_WALLET,
     ),
+    'process.env.FLAG_NEW_PROFILE_PAGE': JSON.stringify(
+      env.FLAG_NEW_PROFILE_PAGE,
+    ),
+    'process.env.FLAG_PRIVATE_TOPICS': JSON.stringify(env.FLAG_PRIVATE_TOPICS),
   };
 
   const config = {

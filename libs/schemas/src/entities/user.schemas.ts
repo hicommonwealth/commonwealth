@@ -86,7 +86,6 @@ export const Address = z.object({
   ghost_address: z.boolean().default(false),
   wallet_id: z.nativeEnum(WalletId).nullish(),
   block_info: z.string().max(255).nullish(),
-  is_user_default: z.boolean().default(false),
   role: z.enum(Roles).default('member'),
   is_banned: z.boolean().default(false),
   hex: z.string().max(64).nullish(),

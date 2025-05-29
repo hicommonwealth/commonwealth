@@ -1,4 +1,5 @@
 import { config } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import { expect, test } from '@playwright/test';
 import _ from 'lodash';
 import { e2eSeeder, login, type E2E_Seeder } from '../utils/e2eUtils';
@@ -15,7 +16,7 @@ test.describe('Discussion Page Tests', () => {
   test.beforeEach(async ({ page }) => {
     // @ts-expect-error StrictNullChecks
     threadId = (
-      await seeder.testDb.sequelize.query(`
+      await models.sequelize.query(`
         INSERT INTO "Threads" (address_id, title, body, community_id, topic_id, kind, created_at, updated_at)
         VALUES (-1, 'Example Title', 'Example Body', 'cmntest', -1, 'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         RETURNING id;

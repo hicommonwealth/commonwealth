@@ -30,4 +30,20 @@ export const trpcRouter = trpc.router({
   setUserTier: trpc.command(SuperAdmin.SetUserTier, trpc.Tag.SuperAdmin),
   getStats: trpc.query(SuperAdmin.GetStats, trpc.Tag.SuperAdmin),
   getTopUsers: trpc.query(SuperAdmin.GetTopUsers, trpc.Tag.SuperAdmin),
+  updateSiteAdmin: trpc.command(
+    SuperAdmin.UpdateSiteAdmin,
+    trpc.Tag.SuperAdmin,
+  ),
+  getCommunityMembersStats: trpc.query(
+    SuperAdmin.GetCommunityMembersStats,
+    trpc.Tag.SuperAdmin,
+  ),
+  createCommunityGoalMeta: trpc.command(
+    SuperAdmin.CreateCommunityGoalMeta,
+    trpc.Tag.SuperAdmin,
+  ),
+  getCommunityGoalMetas: trpc.query(
+    SuperAdmin.GetCommunityGoalMetas,
+    trpc.Tag.SuperAdmin,
+  ),
 });

@@ -47,7 +47,6 @@ describe.skip('Check Contests', () => {
           id: topicId,
           name: 'hello',
           community_id: communityId,
-          group_ids: [],
         },
       ],
       contest_managers: [
