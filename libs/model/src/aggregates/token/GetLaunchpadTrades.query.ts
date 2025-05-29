@@ -46,7 +46,7 @@ export function GetLaunchpadTrades(): Query<typeof schemas.GetLaunchpadTrades> {
           LEFT JOIN 
             "Communities" c ON c.namespace = tokens.namespace
           LEFT JOIN LATERAL (
-            SELECT DISTINCT ON (address) address, user_id
+            SELECT DISTINCT ON (address) user_id
             FROM "Addresses"
             WHERE address = trades.trader_address
             ORDER BY address, id
