@@ -8,7 +8,7 @@ export function SearchCommunities(): Query<typeof schemas.SearchCommunities> {
   return {
     ...schemas.SearchCommunities,
     auth: [],
-    secure: true,
+    secure: false,
     body: async ({ payload }) => {
       const { search, limit, cursor, order_by, order_direction } = payload;
 
