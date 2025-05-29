@@ -43,6 +43,8 @@ export const GetLaunchpadTrades = {
     symbol: z.string(),
     community_id: z.string(),
     community_icon_url: z.string(),
+    user_id: z.string(),
+    user_name: z.string(),
   }).array(),
 };
 
