@@ -30,11 +30,6 @@ export function GetLaunchpadTrades(): Query<typeof schemas.GetLaunchpadTrades> {
 
       const trades = await models.sequelize.query(
         `
-          WITH addresses AS (
-            SELECT DISTINCT ON (address) *
-            FROM "Addresses"
-            ORDER BY address, id DESC
-          )
           SELECT 
             trades.*,
             tokens.name,
@@ -50,8 +45,12 @@ export function GetLaunchpadTrades(): Query<typeof schemas.GetLaunchpadTrades> {
             "LaunchpadTokens" tokens ON trades.token_address = tokens.token_address
           LEFT JOIN 
             "Communities" c ON c.namespace = tokens.namespace
-          LEFT JOIN
-            addresses a ON a.address = trades.trader_address
+          LEFT JOIN LATERAL (
+            SELECT DISTINCT ON (address) address, user_id
+            FROM "Addresses"
+            WHERE address = trades.trader_address
+            ORDER BY address, id
+          ) a ON true
           LEFT JOIN
             "Users" u ON u.id = a.user_id
           ${whereClauseCondition}
