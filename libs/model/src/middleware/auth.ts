@@ -272,7 +272,7 @@ FROM
 	) AS rejects ON m.reject_reason IS NOT NULL
 WHERE
   ga.topic_id = :topic_id
-  AND (:action = ANY(ga.gated_actions) OR ga.is_private = true)
+  AND :action = ANY(ga.gated_actions)
 GROUP BY
   t.name;
 `,
