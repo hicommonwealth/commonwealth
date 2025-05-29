@@ -426,7 +426,8 @@ export function authVerified() {
 export async function authOptional(
   ctx: Context<typeof AuthContextInput, typeof AuthContext>,
 ) {
-  if (!ctx.actor.user || !ctx.actor.address) return;
+  if (!ctx.actor.user || !ctx.actor.address || !ctx.payload.community_id)
+    return;
   if (ctx.payload.community_id === ALL_COMMUNITIES) return;
 
   try {
@@ -441,8 +442,10 @@ export async function authOptional(
       is_author,
       community_id: ctx.payload.community_id,
     };
-  } catch {
-    // ignore as optional
+  } catch (err) {
+    // ignore InvalidActor errors
+    if (err instanceof InvalidActor) return;
+    throw err;
   }
 }
 
