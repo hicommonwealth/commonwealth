@@ -28,7 +28,7 @@ import { Op, QueryTypes } from 'sequelize';
 import { ZodSchema, z } from 'zod';
 import { models } from '../database';
 import { AddressInstance } from '../models';
-import { BannedActor, RejectedMember } from './errors';
+import { BannedActor, NonMember, RejectedMember } from './errors';
 
 async function findComment(actor: Actor, comment_id: number) {
   const comment = await models.Comment.findOne({
@@ -257,7 +257,7 @@ async function checkGatedActions(
       group_name: string;
       actions: GroupGatedActionKey[];
       is_private: boolean;
-      membership: {
+      membership?: {
         is_member: boolean;
         reject_reason: z.infer<typeof MembershipRejectReason>;
       };
@@ -305,19 +305,21 @@ GROUP BY
   const auth_gates = topic.gates.filter(
     ({ actions, is_private, membership }) =>
       actions.includes(action) || (is_private && actions.length === 0)
-        ? membership.is_member
+        ? membership?.is_member || false
         : false,
   );
   // at least one gate is open
   if (auth_gates.length > 0) return;
 
   // throw with detailed rejection reasons
-  const rejects = topic.gates.map(({ membership }) =>
-    membership.reject_reason
-      ? membership.reject_reason.map(({ message }) => message).join('; ')
-      : 'private topic',
-  );
-  throw new RejectedMember(actor, rejects);
+  const rejects = topic.gates
+    .filter(({ membership }) => !!membership?.reject_reason)
+    .map(({ membership }) =>
+      membership!.reject_reason!.map(({ message }) => message).join('; '),
+    );
+
+  if (rejects.length) throw new RejectedMember(actor, rejects);
+  else throw new NonMember(actor, topic.topic_name, action);
 }
 
 /**
