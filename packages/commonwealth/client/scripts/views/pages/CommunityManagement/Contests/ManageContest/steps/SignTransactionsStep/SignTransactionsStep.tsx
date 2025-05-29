@@ -1,10 +1,11 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import useGetJudgeStatusQuery from 'client/scripts/state/api/contests/getJudgeStatus';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useFlag } from 'hooks/useFlag';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelContestEvents,
@@ -93,6 +94,23 @@ const SignTransactionsStep = ({
 
   const user = useUserStore();
 
+  const communityId = app.activeChainId() || '';
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
+
+  const judgeIdToUse = useMemo(() => {
+    if (judgedContest && community?.pending_namespace_judge_token_id) {
+      return community.pending_namespace_judge_token_id;
+    }
+    return (judgeStatus?.current_judge_id || 100) + 1;
+  }, [
+    judgedContest,
+    community?.pending_namespace_judge_token_id,
+    judgeStatus?.current_judge_id,
+  ]);
+
   const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
@@ -144,8 +162,6 @@ const SignTransactionsStep = ({
       exchangeToken,
     } as DeploySingleERC20ContestOnchainProps;
 
-    const judgeId = (judgeStatus?.current_judge_id || 100) + 1;
-
     const singleJudged = {
       ethChainId,
       chainRpc,
@@ -155,7 +171,7 @@ const SignTransactionsStep = ({
       voterShare,
       walletAddress,
       exchangeToken,
-      judgeId,
+      judgeId: judgeIdToUse,
     } as DeploySingleJudgedContestOnchainProps;
 
     const recurring = {
@@ -207,7 +223,7 @@ const SignTransactionsStep = ({
         is_farcaster_contest: contestFormData.isFarcasterContest,
         decimals: fundingTokenDecimals,
         vote_weight_multiplier: contestFormData.voteWeightMultiplier,
-        namespace_judge_token_id: judgedContest ? singleJudged.judgeId : null,
+        namespace_judge_token_id: judgedContest ? judgeIdToUse : null,
       });
 
       onSetLaunchContestStep('ContestLive');
@@ -234,8 +250,6 @@ const SignTransactionsStep = ({
         state: 'loading',
       }));
 
-      const judgeId = (judgeStatus?.current_judge_id || 100) + 1;
-
       await configureNominationsMutation({
         namespaceName,
         creatorOnly: true,
@@ -243,7 +257,7 @@ const SignTransactionsStep = ({
         maxNominations: 5,
         ethChainId,
         chainRpc,
-        judgeId,
+        judgeId: judgeIdToUse,
       });
 
       setConfigureNominationsData((prevState) => ({
@@ -271,12 +285,10 @@ const SignTransactionsStep = ({
         throw new Error('Wallet Address Not Found');
       }
 
-      const judgeId = (judgeStatus?.current_judge_id || 100) + 1;
-
       await nominateJudges({
         namespace: namespaceName,
         judges: [walletAddress],
-        judgeId,
+        judgeId: judgeIdToUse,
         walletAddress,
         ethChainId,
         chainRpc,

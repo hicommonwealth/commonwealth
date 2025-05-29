@@ -2,6 +2,8 @@ import { useMutation } from '@tanstack/react-query';
 
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
+import app from 'state';
+import { trpc } from 'utils/trpcClient';
 
 export interface ConfigureNominationsProps {
   namespaceName: string;
@@ -25,13 +27,23 @@ const configureNominations = async ({
   const factoryAddress = commonProtocol.factoryContracts[ethChainId]?.factory;
   const namespaceFactory = new NamespaceFactory(factoryAddress, chainRpc);
 
-  return await namespaceFactory.configureNominations(
+  const txReceipt = await namespaceFactory.configureNominations(
     namespaceName,
     creatorOnly,
     walletAddress,
     judgeId,
     maxNominations,
   );
+
+  const communityId = app.activeChainId();
+  if (communityId) {
+    await trpc.contest.configureNominationsMetadata.mutate({
+      community_id: communityId,
+      judge_token_id: judgeId,
+    });
+  }
+
+  return txReceipt;
 };
 
 const useConfigureNominationsMutation = () => {
