@@ -1,3 +1,5 @@
+import { CommunityGoalTypes } from '@hicommonwealth/shared';
+import { capitalize } from 'lodash';
 import React from 'react';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -12,7 +14,10 @@ const CommunityGoals = ({
   // only render if config allows
   if (!config?.requires_goal_config) return <></>;
 
-  const goalTypeOptions = [{ value: 'members', label: 'Members' }];
+  const goalTypeOptions = CommunityGoalTypes.map((goal) => ({
+    value: goal as string,
+    label: capitalize(goal),
+  }))?.sort((a, b) => a.label.localeCompare(b.label));
 
   return (
     <>
