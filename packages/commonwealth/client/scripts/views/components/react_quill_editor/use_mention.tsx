@@ -389,8 +389,19 @@ export const useMention = ({
     searchResultsRef.current = searchResults;
     isLoadingRef.current = isLoading;
 
-    // Process pending callback if we have results and not loading
-    if (pendingCallbackRef.current && searchResults && !isLoading) {
+    // Clear pending callback if search term is too short
+    if (mentionTerm.length < MENTION_CONFIG.MIN_SEARCH_LENGTH) {
+      pendingCallbackRef.current = null;
+      return;
+    }
+
+    // Only process if we have a valid search term and pending callback
+    if (
+      pendingCallbackRef.current &&
+      searchResults &&
+      !isLoading &&
+      mentionTerm.length >= MENTION_CONFIG.MIN_SEARCH_LENGTH
+    ) {
       try {
         const results = searchResults.results || [];
         const formattedMatches = results.map((result: any) => {
@@ -414,7 +425,7 @@ export const useMention = ({
         }
       }
     }
-  }, [searchResults, isLoading, createEntityMentionItem]);
+  }, [searchResults, isLoading, createEntityMentionItem, mentionTerm]);
 
   const mention = useMemo(() => {
     return {
@@ -438,15 +449,9 @@ export const useMention = ({
           const mentionSearchConfig = DENOTATION_SEARCH_CONFIG[mentionChar];
           if (!mentionSearchConfig) return;
 
-          // Update search configuration state
-          setCurrentSearchScope(mentionSearchConfig.scopes || ['All']);
-          setCurrentCommunityId(
-            mentionSearchConfig.communityScoped
-              ? app.activeChainId() || ''
-              : undefined,
-          );
-
           if (searchTerm.length < MENTION_CONFIG.MIN_SEARCH_LENGTH) {
+            // Don't update search state for short terms to avoid unnecessary re-renders
+            // Only show the tip message
             const node = document.createElement('div');
             const tip = document.createElement('span');
             tip.innerText = `Type to ${mentionSearchConfig.description.toLowerCase()}`;
@@ -460,6 +465,14 @@ export const useMention = ({
             ];
             renderList(formattedMatches, searchTerm);
           } else {
+            // Only update search configuration and term for valid searches
+            setCurrentSearchScope(mentionSearchConfig.scopes || ['All']);
+            setCurrentCommunityId(
+              mentionSearchConfig.communityScoped
+                ? app.activeChainId() || ''
+                : undefined,
+            );
+
             // Update the search term to trigger the hook
             setMentionTerm(searchTerm);
 
