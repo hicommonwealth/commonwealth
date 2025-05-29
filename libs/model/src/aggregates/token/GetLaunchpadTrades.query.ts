@@ -42,7 +42,8 @@ export function GetLaunchpadTrades(): Query<typeof schemas.GetLaunchpadTrades> {
             c.id as community_id,
             c.icon_url as community_icon_url,
             u.id as user_id,
-            u.profile->>'name' as user_name
+            u.profile->>'name' as user_name,
+            u.profile->>'avatar_url' as user_avatar_url
           FROM 
             "LaunchpadTrades" trades
           LEFT JOIN 
