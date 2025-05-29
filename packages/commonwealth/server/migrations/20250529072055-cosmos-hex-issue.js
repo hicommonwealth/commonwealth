@@ -129,14 +129,18 @@ module.exports = {
         );
       }
 
-      // await queryInterface.sequelize.query(
-      //   `
-      //     CREATE UNIQUE INDEX idx_addresses_hex_user_id_unique
-      //       ON "Addresses" (hex, user_id)
-      //       WHERE hex IS NOT NULL AND user_id IS NOT NULL;
-      //   `,
-      //   { transaction },
-      // );
+      // create constraint preventing a hex from being associated with more than 1 user
+      await queryInterface.sequelize.query(
+        `
+          CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+          ALTER TABLE "Addresses"
+              ADD CONSTRAINT addresses_hex_single_user_excl
+                  EXCLUDE USING gist (hex WITH =, user_id WITH <>)
+                  WHERE (hex IS NOT NULL AND user_id IS NOT NULL);
+        `,
+        { transaction },
+      );
     });
 
     // TODO: need another migration to delete all orphaned users
