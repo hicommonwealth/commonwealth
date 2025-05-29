@@ -1,12 +1,19 @@
 import { RangeStatic } from 'quill';
 import QuillMention from 'quill-mention';
-import { MutableRefObject, useCallback, useMemo, useState } from 'react';
+import {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import MinimumProfile from '../../../models/MinimumProfile';
 
 import { UserTierMap } from '@hicommonwealth/shared';
+import app from 'client/scripts/state';
 import _ from 'lodash';
-import app from 'state';
 import { useUnifiedSearch } from 'state/api/search/useUnifiedSearch';
 import {
   DENOTATION_SEARCH_CONFIG,
@@ -34,20 +41,28 @@ export const useMention = ({
 }: UseMentionProps) => {
   const [mentionTerm, setMentionTerm] = useState('');
   const [currentMentionChar, setCurrentMentionChar] = useState<string>('@');
+  const [currentSearchScope, setCurrentSearchScope] = useState<string[]>([
+    'All',
+  ]);
+  const [currentCommunityId, setCurrentCommunityId] = useState<
+    string | undefined
+  >(undefined);
 
-  // Get the search configuration for the current mention character
-  const searchConfig = DENOTATION_SEARCH_CONFIG[currentMentionChar];
-  const searchScope = searchConfig?.scopes || ['All'];
-  const communityId = searchConfig?.communityScoped
-    ? app.activeChainId() || ''
-    : undefined;
+  // Use refs to avoid React re-renders affecting Quill
+  const searchResultsRef = useRef<any>(null);
+  const isLoadingRef = useRef(false);
+  const pendingCallbackRef = useRef<{
+    renderList: (matches: QuillMention[], searchTerm: string) => null;
+    searchTerm: string;
+  } | null>(null);
 
-  const { data: searchResults, refetch } = useUnifiedSearch({
+  const { data: searchResults, isLoading } = useUnifiedSearch({
     searchTerm: mentionTerm,
-    communityId,
-    searchScope,
+    communityId: currentCommunityId,
+    searchScope: currentSearchScope,
     enabled:
-      mentionTerm.length >= MENTION_CONFIG.MIN_SEARCH_LENGTH && !!searchConfig,
+      mentionTerm.length >= MENTION_CONFIG.MIN_SEARCH_LENGTH &&
+      !!currentMentionChar,
   });
 
   const selectMention = useCallback(
@@ -282,7 +297,7 @@ export const useMention = ({
   const createCommunityMentionItem = useCallback(
     (result: any, node: HTMLElement) => {
       const communityName = result.name;
-      const communityId = result.id;
+      const communityResultId = result.id;
       const memberCount = result.member_count || 0;
       const status = result.status;
 
@@ -306,11 +321,11 @@ export const useMention = ({
       node.appendChild(textWrap);
 
       return {
-        link: `/${communityId}`,
+        link: `/${communityResultId}`,
         name: communityName,
         component: node.outerHTML,
         type: MentionEntityType.COMMUNITY,
-        community_id: communityId,
+        community_id: communityResultId,
       };
     },
     [],
@@ -369,6 +384,38 @@ export const useMention = ({
     [],
   );
 
+  // Update refs when search results change
+  useEffect(() => {
+    searchResultsRef.current = searchResults;
+    isLoadingRef.current = isLoading;
+
+    // Process pending callback if we have results and not loading
+    if (pendingCallbackRef.current && searchResults && !isLoading) {
+      try {
+        const results = searchResults.results || [];
+        const formattedMatches = results.map((result: any) => {
+          const entityType = getEntityTypeFromSearchResult(result);
+          return createEntityMentionItem(entityType, result);
+        });
+
+        pendingCallbackRef.current.renderList(
+          formattedMatches,
+          pendingCallbackRef.current.searchTerm,
+        );
+        pendingCallbackRef.current = null; // Clear the callback
+      } catch (error) {
+        console.error('Error processing search results:', error);
+        if (pendingCallbackRef.current) {
+          pendingCallbackRef.current.renderList(
+            [],
+            pendingCallbackRef.current.searchTerm,
+          );
+          pendingCallbackRef.current = null;
+        }
+      }
+    }
+  }, [searchResults, isLoading, createEntityMentionItem]);
+
   const mention = useMemo(() => {
     return {
       allowedChars: /^[A-Za-z0-9\sÅÄÖåäö\-_.]*$/,
@@ -388,49 +435,44 @@ export const useMention = ({
           setCurrentMentionChar(mentionChar);
 
           // Get search configuration for this denotation character
-          const searchConfig = DENOTATION_SEARCH_CONFIG[mentionChar];
-          if (!searchConfig) return;
+          const mentionSearchConfig = DENOTATION_SEARCH_CONFIG[mentionChar];
+          if (!mentionSearchConfig) return;
 
-          let formattedMatches = [];
+          // Update search configuration state
+          setCurrentSearchScope(mentionSearchConfig.scopes || ['All']);
+          setCurrentCommunityId(
+            mentionSearchConfig.communityScoped
+              ? app.activeChainId() || ''
+              : undefined,
+          );
 
           if (searchTerm.length < MENTION_CONFIG.MIN_SEARCH_LENGTH) {
             const node = document.createElement('div');
             const tip = document.createElement('span');
-            tip.innerText = `Type to ${searchConfig.description.toLowerCase()}`;
+            tip.innerText = `Type to ${mentionSearchConfig.description.toLowerCase()}`;
             node.appendChild(tip);
-            formattedMatches = [
+            const formattedMatches: QuillMention[] = [
               {
                 link: '#',
                 name: '',
                 component: node.outerHTML,
               },
             ];
+            renderList(formattedMatches, searchTerm);
           } else {
+            // Update the search term to trigger the hook
             setMentionTerm(searchTerm);
 
-            // Trigger the unified search with updated parameters
-            try {
-              const { data } = await refetch();
-              const results = data?.results || [];
-
-              formattedMatches = results.map((result: any) => {
-                const entityType = getEntityTypeFromSearchResult(result);
-                return createEntityMentionItem(entityType, result);
-              });
-            } catch (error) {
-              console.error('Error fetching search results:', error);
-              formattedMatches = [];
-            }
+            // Store the callback to be executed when results are available
+            pendingCallbackRef.current = { renderList, searchTerm };
           }
-
-          renderList(formattedMatches, searchTerm);
         },
         MENTION_CONFIG.SEARCH_DEBOUNCE_MS,
       ),
       isolateChar: true,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createEntityMentionItem, selectMention, refetch]);
+  }, [selectMention, createEntityMentionItem]);
 
   return { mention };
 };

@@ -42,14 +42,18 @@ export const SearchEntityResult = z.object({
   type: z.nativeEnum(SearchEntityType),
   name: z.string(),
   description: z.string().optional(),
-  avatar_url: z.string().optional(),
+  avatar_url: z.string().optional().nullable(),
   community_id: z.string().optional(),
-  community_name: z.string().optional(),
-  author: z.string().optional(),
+  community_name: z.string().optional().nullable(),
+  author: z.string().optional().nullable(),
   created_at: z.date(),
-  member_count: z.number().optional(),
-  status: z.string().optional(),
-  relevance_score: z.number().optional(),
+  member_count: z.number().optional().nullable(),
+  status: z.string().optional().nullable(),
+  relevance_score: z
+    .union([z.number(), z.string()])
+    .transform((val) => (typeof val === 'string' ? parseFloat(val) : val))
+    .optional()
+    .nullable(),
 });
 
 export const SearchEntitiesOutput = z.object({

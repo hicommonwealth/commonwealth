@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
 import { trpc } from 'utils/trpcClient';
 import { MENTION_CONFIG } from '../../../views/components/react_quill_editor/mention-config';
 
@@ -24,29 +23,20 @@ export const useUnifiedSearch = ({
   // Convert searchScope array to comma-separated string for API compatibility
   const searchScopeString = searchScope.join(',');
 
-  return useQuery({
-    queryKey: [
-      'unifiedSearch',
+  return trpc.search.searchEntities.useQuery(
+    {
       searchTerm,
       communityId,
-      searchScopeString,
+      searchScope: searchScopeString,
       limit,
+      page: 1,
       orderBy,
       orderDirection,
-    ],
-    queryFn: () =>
-      trpc.search.searchEntities.query({
-        searchTerm,
-        communityId,
-        searchScope: searchScopeString,
-        limit,
-        page: 1,
-        orderBy,
-        orderDirection,
-        includeCount: false,
-      }),
-    enabled: enabled && searchTerm.length >= MENTION_CONFIG.MIN_SEARCH_LENGTH,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
-  });
+      includeCount: false,
+    },
+    {
+      enabled: enabled && searchTerm.length >= MENTION_CONFIG.MIN_SEARCH_LENGTH,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  );
 };
