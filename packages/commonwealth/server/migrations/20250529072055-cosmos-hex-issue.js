@@ -164,8 +164,6 @@ module.exports = {
     });
 
     // TODO: need another migration to delete all orphaned users
-    // TODO: need to check all columns that reference user_id to see if they
-    //  should be referencing address_id instead given that address can change ownership
   },
 
   async down(queryInterface, Sequelize) {
