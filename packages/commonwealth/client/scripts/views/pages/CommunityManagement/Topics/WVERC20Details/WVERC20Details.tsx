@@ -106,6 +106,9 @@ const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
         disabled={editMode || tokenValue == ZERO_ADDRESS}
         fullWidth
         tokenError={getTokenError()}
+        tokenAddress={tokenValue}
+        chainName={selectedChain?.label || ''}
+        chainEthId={selectedChain?.ethChainId || 0}
       />
       <CWCheckbox
         label="Use native token"

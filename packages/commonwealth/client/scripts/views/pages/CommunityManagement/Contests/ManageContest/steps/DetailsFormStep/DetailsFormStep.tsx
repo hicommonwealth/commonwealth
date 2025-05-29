@@ -440,6 +440,13 @@ const DetailsFormStep = ({
                     fullWidth
                     label="Token Address"
                     disabled={editMode}
+                    tokenAddress={
+                      editMode
+                        ? contestFormData?.fundingTokenAddress || ''
+                        : tokenValue
+                    }
+                    chainName={app.chain.meta.ChainNode?.name || ''}
+                    chainEthId={app.chain.meta.ChainNode?.eth_chain_id || 0}
                   />
                 </>
               ) : watch('contestTopic')?.weightedVoting ===
@@ -508,6 +515,9 @@ const DetailsFormStep = ({
                     )}
                     hookToForm
                     name="fundingTokenAddress"
+                    tokenAddress="0x1234567890123456789012345678901234567890"
+                    chainName="Ethereum"
+                    chainEthId={1}
                   />
 
                   <CWText type="h5">Vote weight voteWeightMultiplier</CWText>

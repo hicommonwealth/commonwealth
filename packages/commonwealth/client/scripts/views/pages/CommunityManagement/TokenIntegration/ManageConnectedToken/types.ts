@@ -9,7 +9,7 @@ export type ManageConnectedTokenProps = {
     contract_address: string;
     ChainNode?: {
       name: string;
-      eth_chain_id?: number;
+      eth_chain_id?: number | null;
     };
   };
   isLoadingToken: boolean;
