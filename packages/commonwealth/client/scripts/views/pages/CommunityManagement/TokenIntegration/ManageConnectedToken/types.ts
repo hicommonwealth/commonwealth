@@ -1,6 +1,16 @@
 import { GetTokenMetadataResponse } from 'state/api/tokens/getTokenMetadata';
 
 export type ManageConnectedTokenProps = {
-  tokenInfo?: GetTokenMetadataResponse;
+  tokenInfo?: Pick<
+    GetTokenMetadataResponse,
+    'name' | 'symbol' | 'logo' | 'decimals'
+  >;
+  pinnedToken?: {
+    contract_address: string;
+    ChainNode?: {
+      name: string;
+      eth_chain_id?: number;
+    };
+  };
   isLoadingToken: boolean;
 };
