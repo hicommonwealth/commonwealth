@@ -156,7 +156,8 @@ module.exports = {
           ALTER TABLE "Addresses"
               ADD CONSTRAINT addresses_hex_single_user_excl
                   EXCLUDE USING gist (hex WITH =, user_id WITH <>)
-                  WHERE (hex IS NOT NULL AND user_id IS NOT NULL);
+                  WHERE (hex IS NOT NULL AND user_id IS NOT NULL)
+                  DEFERRABLE INITIALLY DEFERRED;
         `,
         { transaction },
       );

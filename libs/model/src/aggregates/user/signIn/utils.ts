@@ -352,9 +352,11 @@ export async function signInUser({
     // and the user is not new then transfer ownership to the signed-in user
     transferredUser = await transferAddressOwnership({
       foundUser: foundOrCreatedUser,
-      address: payload.address,
-      ssoInfo: verifiedSsoInfo,
-      hex: payload.hex,
+      ...(payload.hex
+        ? { hex: payload.hex }
+        : verifiedSsoInfo
+          ? { ssoInfo: verifiedSsoInfo }
+          : { address: payload.address }),
       newUser,
       signedInUser,
       transaction,
