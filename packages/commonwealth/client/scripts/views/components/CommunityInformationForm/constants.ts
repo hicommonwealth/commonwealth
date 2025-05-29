@@ -10,7 +10,7 @@ export const BASE_ID = '8453';
 export const OSMOSIS_ID = 'osmosis';
 export const BLAST_ID = '81457';
 export const SKALE_ID = '974399131';
-export const SONIEUM_ID = '1868';
+export const SONEIUM_ID = '1868';
 
 const removeTestCosmosNodes = (nodeInfo: NodeInfo): boolean => {
   return !(
@@ -73,6 +73,8 @@ export const chainTypes =
         // @ts-expect-error StrictNullChecks
         hasStakeEnabled: chainIdsWithStakeEnabled.includes(chain.ethChainId),
         chainNodeId: chain.id,
+        ethChainId: chain.ethChainId,
+        alchemyMetadata: chain.alchemyMetadata,
       };
 
       return result;

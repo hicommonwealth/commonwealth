@@ -31,6 +31,7 @@ import {
 } from '@hicommonwealth/shared';
 import Thread from 'client/scripts/models/Thread';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
+import { useFetchNodesQuery } from 'client/scripts/state/api/nodes';
 import { useDateCursor } from 'client/scripts/state/api/threads/dateCursor';
 import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
@@ -129,16 +130,16 @@ const DiscussionsPage = () => {
     ({ name }) =>
       sanitizeTopicName(name) === topicIdentifiersFromURL?.topicName,
   );
+
+  const { data: chainNodes } = useFetchNodesQuery();
   const topicId = topicObj?.id;
+  const chainNode = chainNodes?.find(
+    (node) => node.ethChainId === topicObj?.eth_chain_id,
+  );
 
   const user = useUserStore();
 
-  const {
-    groups = [],
-    memberships,
-    actionGroups,
-    bypassGating,
-  } = useTopicGating({
+  const { actionGroups, bypassGating } = useTopicGating({
     communityId: communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
@@ -396,6 +397,9 @@ const DiscussionsPage = () => {
             name={tokenMetadata?.name}
             ticker={topicObj?.token_symbol}
             avatarUrl={tokenMetadata?.logo}
+            tokenAddress={topicObj?.token_address || ''}
+            chainName={chainNode?.name}
+            chainEthId={topicObj?.eth_chain_id || 0}
             voteWeight={voteWeight}
             popover={{
               title: tokenMetadata?.name,
