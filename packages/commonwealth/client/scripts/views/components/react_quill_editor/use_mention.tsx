@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { RangeStatic } from 'quill';
 import QuillMention from 'quill-mention';
 import { MutableRefObject, useCallback, useMemo, useState } from 'react';
@@ -8,11 +7,7 @@ import MinimumProfile from '../../../models/MinimumProfile';
 import { UserTierMap } from '@hicommonwealth/shared';
 import _ from 'lodash';
 import app from 'state';
-import { useSearchProfilesQuery } from 'state/api/profiles';
-import {
-  APIOrderBy,
-  APIOrderDirection,
-} from '../../../../scripts/helpers/constants';
+import { useUnifiedSearch } from 'state/api/search/useUnifiedSearch';
 import {
   DENOTATION_SEARCH_CONFIG,
   ENTITY_TYPE_INDICATORS,
@@ -40,15 +35,19 @@ export const useMention = ({
   const [mentionTerm, setMentionTerm] = useState('');
   const [currentMentionChar, setCurrentMentionChar] = useState<string>('@');
 
-  const { refetch } = useSearchProfilesQuery({
+  // Get the search configuration for the current mention character
+  const searchConfig = DENOTATION_SEARCH_CONFIG[currentMentionChar];
+  const searchScope = searchConfig?.scopes || ['All'];
+  const communityId = searchConfig?.communityScoped
+    ? app.activeChainId() || ''
+    : undefined;
+
+  const { data: searchResults, refetch } = useUnifiedSearch({
     searchTerm: mentionTerm,
-    communityId: app.activeChainId() || '',
-    limit: MENTION_CONFIG.MAX_SEARCH_RESULTS,
+    communityId,
+    searchScope,
     enabled:
-      mentionTerm.length >= MENTION_CONFIG.MIN_SEARCH_LENGTH &&
-      !!app.activeChainId(),
-    orderBy: APIOrderBy.LastActive,
-    orderDirection: APIOrderDirection.Desc,
+      mentionTerm.length >= MENTION_CONFIG.MIN_SEARCH_LENGTH && !!searchConfig,
   });
 
   const selectMention = useCallback(
@@ -147,58 +146,48 @@ export const useMention = ({
 
   const createUserMentionItem = useCallback(
     (result: any, node: HTMLElement) => {
-      const userId = result.user_id;
-      const profileAddress = result.addresses?.[0]?.address;
-      const profileName = result.profile_name;
-      const profileCommunity = result.addresses?.[0]?.community_id;
+      const userId = result.id;
+      const profileName = result.name;
       const avatarUrl = result.avatar_url;
+      const communityName = result.community_name;
 
-      const profile = new MinimumProfile(profileAddress, profileCommunity);
+      // Create a minimal profile for avatar generation
+      const profile = new MinimumProfile('', '');
       profile.initialize(
         userId,
         profileName,
-        profileAddress,
+        '',
         avatarUrl,
-        profileCommunity,
+        '',
         null,
         UserTierMap.IncompleteUser,
       );
 
       let avatar;
-      if (profile.avatarUrl) {
+      if (avatarUrl) {
         avatar = document.createElement('img');
-        (avatar as HTMLImageElement).src = profile.avatarUrl;
+        (avatar as HTMLImageElement).src = avatarUrl;
         avatar.className = 'ql-mention-avatar';
       } else {
         avatar = document.createElement('div');
         avatar.className = 'ql-mention-avatar';
-        avatar.innerHTML = MinimumProfile.getSVGAvatar(profileAddress, 20);
+        avatar.innerHTML = MinimumProfile.getSVGAvatar('', 20);
       }
 
       const nameSpan = document.createElement('span');
       nameSpan.innerText = profileName;
       nameSpan.className = 'ql-mention-name';
 
-      const addrSpan = document.createElement('span');
-      addrSpan.innerText =
-        profileCommunity === 'near'
-          ? profileAddress
-          : `${profileAddress?.slice(0, 6)}...`;
-      addrSpan.className = 'ql-mention-addr';
-
-      const lastActiveSpan = document.createElement('span');
-      lastActiveSpan.innerText = profile.lastActive
-        ? `Last active ${moment(profile.lastActive).fromNow()}`
-        : '';
-      lastActiveSpan.className = 'ql-mention-la';
+      const communitySpan = document.createElement('span');
+      communitySpan.innerText = communityName || '';
+      communitySpan.className = 'ql-mention-addr';
 
       const textWrap = document.createElement('div');
       textWrap.className = 'ql-mention-text-wrap';
 
       node.appendChild(avatar);
       textWrap.appendChild(nameSpan);
-      textWrap.appendChild(addrSpan);
-      textWrap.appendChild(lastActiveSpan);
+      if (communityName) textWrap.appendChild(communitySpan);
       node.appendChild(textWrap);
 
       return {
@@ -215,9 +204,10 @@ export const useMention = ({
 
   const createTopicMentionItem = useCallback(
     (result: any, node: HTMLElement) => {
-      const topicName = result.name || result.topic_name;
-      const topicId = result.id || result.topic_id;
+      const topicName = result.name;
+      const topicId = result.id;
       const description = result.description || '';
+      const status = result.status || '';
 
       const nameSpan = document.createElement('span');
       nameSpan.innerText = topicName;
@@ -228,10 +218,15 @@ export const useMention = ({
         description.slice(0, 50) + (description.length > 50 ? '...' : '');
       descSpan.className = 'ql-mention-desc';
 
+      const statusSpan = document.createElement('span');
+      statusSpan.innerText = status;
+      statusSpan.className = 'ql-mention-status';
+
       const textWrap = document.createElement('div');
       textWrap.className = 'ql-mention-text-wrap';
       textWrap.appendChild(nameSpan);
-      textWrap.appendChild(descSpan);
+      if (description) textWrap.appendChild(descSpan);
+      if (status) textWrap.appendChild(statusSpan);
       node.appendChild(textWrap);
 
       return {
@@ -248,22 +243,28 @@ export const useMention = ({
 
   const createThreadMentionItem = useCallback(
     (result: any, node: HTMLElement) => {
-      const threadTitle = result.title || result.thread_title;
-      const threadId = result.id || result.thread_id;
-      const author = result.author || result.created_by;
+      const threadTitle = result.name;
+      const threadId = result.id;
+      const author = result.author;
+      const communityName = result.community_name;
 
       const titleSpan = document.createElement('span');
       titleSpan.innerText = threadTitle;
       titleSpan.className = 'ql-mention-name';
 
       const authorSpan = document.createElement('span');
-      authorSpan.innerText = `by ${author}`;
+      authorSpan.innerText = author ? `by ${author}` : '';
       authorSpan.className = 'ql-mention-desc';
+
+      const communitySpan = document.createElement('span');
+      communitySpan.innerText = communityName ? `in ${communityName}` : '';
+      communitySpan.className = 'ql-mention-addr';
 
       const textWrap = document.createElement('div');
       textWrap.className = 'ql-mention-text-wrap';
       textWrap.appendChild(titleSpan);
-      textWrap.appendChild(authorSpan);
+      if (author) textWrap.appendChild(authorSpan);
+      if (communityName) textWrap.appendChild(communitySpan);
       node.appendChild(textWrap);
 
       return {
@@ -280,9 +281,10 @@ export const useMention = ({
 
   const createCommunityMentionItem = useCallback(
     (result: any, node: HTMLElement) => {
-      const communityName = result.name || result.community_name;
-      const communityId = result.id || result.community_id;
+      const communityName = result.name;
+      const communityId = result.id;
       const memberCount = result.member_count || 0;
+      const status = result.status;
 
       const nameSpan = document.createElement('span');
       nameSpan.innerText = communityName;
@@ -292,10 +294,15 @@ export const useMention = ({
       memberSpan.innerText = `${memberCount} members`;
       memberSpan.className = 'ql-mention-desc';
 
+      const statusSpan = document.createElement('span');
+      statusSpan.innerText = status || '';
+      statusSpan.className = 'ql-mention-status';
+
       const textWrap = document.createElement('div');
       textWrap.className = 'ql-mention-text-wrap';
       textWrap.appendChild(nameSpan);
       textWrap.appendChild(memberSpan);
+      if (status) textWrap.appendChild(statusSpan);
       node.appendChild(textWrap);
 
       return {
@@ -304,7 +311,6 @@ export const useMention = ({
         component: node.outerHTML,
         type: MentionEntityType.COMMUNITY,
         community_id: communityId,
-        name: communityName,
       };
     },
     [],
@@ -312,8 +318,8 @@ export const useMention = ({
 
   const createProposalMentionItem = useCallback(
     (result: any, node: HTMLElement) => {
-      const proposalTitle = result.title || result.proposal_title;
-      const proposalId = result.id || result.proposal_id;
+      const proposalTitle = result.name;
+      const proposalId = result.id;
       const status = result.status || 'Unknown';
 
       const titleSpan = document.createElement('span');
@@ -402,24 +408,19 @@ export const useMention = ({
           } else {
             setMentionTerm(searchTerm);
 
-            // For now, we'll use the existing user search API
-            // TODO: Replace with unified search API that supports all entity types
-            if (
-              mentionChar === '@' ||
-              searchConfig.scopes.includes('Members' as any)
-            ) {
+            // Trigger the unified search with updated parameters
+            try {
               const { data } = await refetch();
-              const profiles = data?.pages?.[0]?.results || [];
+              const results = data?.results || [];
 
-              formattedMatches = profiles.map((result: any) => {
+              formattedMatches = results.map((result: any) => {
                 const entityType = getEntityTypeFromSearchResult(result);
                 return createEntityMentionItem(entityType, result);
               });
+            } catch (error) {
+              console.error('Error fetching search results:', error);
+              formattedMatches = [];
             }
-
-            // TODO: Add other entity type searches here
-            // This is a placeholder - the actual implementation will need
-            // to call different APIs based on the search scope
           }
 
           renderList(formattedMatches, searchTerm);
@@ -429,7 +430,7 @@ export const useMention = ({
       isolateChar: true,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createEntityMentionItem, selectMention]);
+  }, [createEntityMentionItem, selectMention, refetch]);
 
   return { mention };
 };
