@@ -47,13 +47,13 @@ export async function findUserByAddressOrHex(
   log.trace(`findUserByAddressOrHex: ${JSON.stringify(searchTerm)}`);
   const users = await models.sequelize.query(
     `
-        WITH user_ids AS (SELECT DISTINCT(user_id) as user_id
-                          FROM "Addresses"
-                          WHERE user_id IS NOT NULL
-                            AND ${'address' in searchTerm ? 'address=:address' : 'hex=:hex'})
-        SELECT U.*
-        FROM "Users" U
-        WHERE U.id IN (SELECT user_id FROM user_ids)
+      WITH user_ids AS (SELECT DISTINCT(user_id) as user_id
+                        FROM "Addresses"
+                        WHERE user_id IS NOT NULL
+                          AND ${'address' in searchTerm ? 'address=:address' : 'hex=:hex'})
+      SELECT U.*
+      FROM "Users" U
+      WHERE U.id IN (SELECT user_id FROM user_ids)
     `,
     {
       model: models.User,
@@ -77,11 +77,11 @@ export async function findUserBySso(
   log.trace(`findAddressesBySso: ${JSON.stringify(ssoInfo)}`);
   const users = await models.sequelize.query(
     `
-        WITH user_ids AS (SELECT DISTINCT(user_id) as user_id
-                          FROM "Addresses" ${constructFindAddressBySsoQueryFilter(ssoInfo)})
-        SELECT U.*
-        FROM "Users" U
-        WHERE U.id IN (SELECT user_id FROM user_ids);
+      WITH user_ids AS (SELECT DISTINCT(user_id) as user_id
+                        FROM "Addresses" ${constructFindAddressBySsoQueryFilter(ssoInfo)})
+      SELECT U.*
+      FROM "Users" U
+      WHERE U.id IN (SELECT user_id FROM user_ids);
     `,
     {
       model: models.User,
@@ -224,40 +224,51 @@ export async function findOrCreateUser({
   return { newUser: true, user };
 }
 
+type BaseOpts = {
+  foundUser: UserAttributes;
+  newUser: boolean;
+  signedInUser?: UserAttributes | null;
+  transaction: Transaction;
+};
+
+/**
+ * Transferring ownership of Cosmos is done via Hex i.e. "wallet account" since
+ * we use hex rather than address for sign in. This is because the Cosmos
+ * address is different depending on the Cosmos community you join even though
+ * the hex is still the same. If we don't transfer all addresses with the same
+ * hex then we can't pick which user to sign in to on next sign in.
+ */
 async function transferAddressOwnership({
   foundUser,
   newUser,
-  ssoInfo,
-  address,
   signedInUser,
   transaction,
-}: {
-  foundUser: UserAttributes;
-  newUser: boolean;
-  address?: string;
-  ssoInfo?: VerifiedUserInfo;
-  signedInUser?: UserAttributes | null;
-  transaction: Transaction;
-}) {
+  ...findByOpts
+}:
+  | (BaseOpts & { address: string })
+  | (BaseOpts & {
+      hex: string;
+    })
+  | (BaseOpts & { ssoInfo: VerifiedUserInfo })) {
   if (signedInUser && !newUser && signedInUser?.id !== foundUser.id) {
-    if (ssoInfo) {
+    if ('ssoInfo' in findByOpts) {
       await models.sequelize.query(
         `
-            WITH addresses AS (SELECT id
-                               FROM "Addresses" ${constructFindAddressBySsoQueryFilter(ssoInfo)})
-            UPDATE "Addresses"
-            SET user_id = :signedInUserId
-            FROM addresses
-            WHERE addresses.id = "Addresses".id
+          WITH addresses AS (SELECT id
+                             FROM "Addresses" ${constructFindAddressBySsoQueryFilter(findByOpts.ssoInfo)})
+          UPDATE "Addresses"
+          SET user_id = :signedInUserId
+          FROM addresses
+          WHERE addresses.id = "Addresses".id
         `,
         {
           transaction,
           replacements: {
             signedInUserId: signedInUser.id!,
-            oauthProvider: ssoInfo.provider,
-            oauthUsername: ssoInfo.username,
-            oauthEmail: ssoInfo.email,
-            oauthPhoneNumber: ssoInfo.phoneNumber,
+            oauthProvider: findByOpts.ssoInfo.provider,
+            oauthUsername: findByOpts.ssoInfo.username,
+            oauthEmail: findByOpts.ssoInfo.email,
+            oauthPhoneNumber: findByOpts.ssoInfo.phoneNumber,
           },
         },
       );
@@ -267,15 +278,17 @@ async function transferAddressOwnership({
           user_id: signedInUser.id!,
         },
         {
-          where: {
-            address,
-          },
+          where: findByOpts,
           transaction,
         },
       );
     }
     log.trace(
-      `Addresses ${address} transferred from user ${foundUser.id} to user ${signedInUser.id}`,
+      `Addresses ${
+        'hex' in findByOpts
+          ? `${findByOpts.hex} (by hex)`
+          : `${(findByOpts as { address: string })['address']}`
+      } transferred from user ${foundUser.id} to user ${signedInUser.id}`,
     );
     return true;
   }
@@ -341,6 +354,7 @@ export async function signInUser({
       foundUser: foundOrCreatedUser,
       address: payload.address,
       ssoInfo: verifiedSsoInfo,
+      hex: payload.hex,
       newUser,
       signedInUser,
       transaction,
