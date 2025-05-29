@@ -115,6 +115,7 @@ interface NewThreadFormProps {
   setContentDelta?: (delta: DeltaStatic) => void;
   webSearchEnabled?: boolean;
   setWebSearchEnabled?: (enabled: boolean) => void;
+  communityId?: string;
 }
 
 export interface NewThreadFormHandles {
@@ -136,6 +137,7 @@ export const NewThreadForm = forwardRef<
       setContentDelta,
       webSearchEnabled,
       setWebSearchEnabled,
+      communityId,
     },
     ref,
   ) => {
@@ -558,6 +560,8 @@ export const NewThreadForm = forwardRef<
           model: 'gpt-4o-mini',
           stream: true,
           systemPrompt: bodySystemPrompt,
+          includeContextualMentions: true,
+          communityId: communityId || selectedCommunityId,
           onError: (error) => {
             console.error('Error generating AI thread body:', error);
             notifyError('Failed to generate AI thread content');
@@ -581,6 +585,8 @@ export const NewThreadForm = forwardRef<
                   model: 'gpt-4o-mini',
                   stream: false,
                   systemPrompt: titleSystemPrompt,
+                  includeContextualMentions: true,
+                  communityId: communityId || selectedCommunityId,
                   onComplete(fullTitle) {
                     setThreadTitle(fullTitle.trim());
                     setIsGenerating(false);

@@ -61,6 +61,7 @@ interface StickyInputProps extends CommentEditorProps {
   topic?: Topic;
   parentType: ContentType;
   thread?: Thread;
+  communityId?: string;
 }
 
 const StickyInput = (props: StickyInputProps) => {
@@ -166,6 +167,8 @@ const StickyInput = (props: StickyInputProps) => {
           stream: true,
           systemPrompt,
           useWebSearch: webSearchEnabled,
+          includeContextualMentions: true,
+          communityId: props.communityId,
           onError: (error) => {
             console.error('Error generating AI thread:', error);
             notifyError('Failed to generate AI thread content');
@@ -195,6 +198,8 @@ const StickyInput = (props: StickyInputProps) => {
           stream: true,
           systemPrompt,
           useWebSearch: webSearchEnabled,
+          includeContextualMentions: true,
+          communityId: props.communityId,
           onError: (error) => {
             console.error('Error generating AI comment:', error);
           },
@@ -219,6 +224,7 @@ const StickyInput = (props: StickyInputProps) => {
     setContentDelta,
     webSearchEnabled,
     selectedModels,
+    props.communityId,
   ]);
 
   const getActionPillLabel = () => {
@@ -521,6 +527,7 @@ const StickyInput = (props: StickyInputProps) => {
                 setContentDelta={setContentDelta}
                 webSearchEnabled={webSearchEnabled}
                 setWebSearchEnabled={setWebSearchEnabled}
+                communityId={props.communityId}
               />
             ) : (
               <CommentEditor
@@ -538,6 +545,7 @@ const StickyInput = (props: StickyInputProps) => {
                 setContentDelta={setContentDelta}
                 webSearchEnabled={webSearchEnabled}
                 setWebSearchEnabled={setWebSearchEnabled}
+                communityId={props.communityId}
               />
             )}
           </div>

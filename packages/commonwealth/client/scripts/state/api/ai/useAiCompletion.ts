@@ -1,11 +1,16 @@
 import { CompletionOptions } from '@hicommonwealth/shared';
 import { useCallback, useState } from 'react';
 import { userStore } from 'state/ui/user';
+import { useMentionExtractor } from '../../../hooks/useMentionExtractor';
 
 interface AiCompletionOptions extends Partial<CompletionOptions> {
   onChunk?: (chunk: string) => void;
   onComplete?: (fullText: string) => void;
   onError?: (error: Error) => void;
+  // New option to include contextual mentions
+  includeContextualMentions?: boolean;
+  // Optional community ID for context scoping
+  communityId?: string;
 }
 
 interface CompletionError {
@@ -15,14 +20,103 @@ interface CompletionError {
   metadata?: any;
 }
 
+interface ContextAggregationResponse {
+  success: boolean;
+  data?: {
+    contextResults: Array<{
+      entityType: string;
+      entityId: string;
+      entityName: string;
+      contextData: string;
+    }>;
+    formattedContext: string;
+    totalMentions: number;
+    processedAt: string;
+  };
+  error?: string;
+}
+
 /**
  * Hook for streaming AI completions from the server
- * Supports both OpenAI and OpenRouter
+ * Supports both OpenAI and OpenRouter with contextual mention integration
  */
 export const useAiCompletion = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [completion, setCompletion] = useState<string>('');
+
+  const { extractMentionsFromText, validateMentionLimits } =
+    useMentionExtractor();
+
+  const fetchContextForMentions = useCallback(
+    async (
+      userPrompt: string,
+      communityId?: string,
+    ): Promise<string | null> => {
+      try {
+        // Extract mentions from the user prompt
+        const mentions = extractMentionsFromText(userPrompt);
+
+        if (mentions.length === 0) {
+          return null;
+        }
+
+        // Validate mention limits
+        const { validMentions, hasExceededLimit } =
+          validateMentionLimits(mentions);
+
+        if (hasExceededLimit) {
+          console.warn('Some mentions were ignored due to limits');
+        }
+
+        if (validMentions.length === 0) {
+          return null;
+        }
+
+        // Prepare mentions for context aggregation
+        const mentionsForContext = validMentions.map((mention) => ({
+          id: mention.id,
+          type: mention.type,
+          name: mention.name,
+        }));
+
+        // Call context aggregation API
+        const response = await fetch('/api/ai/aggregate-context', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${userStore.getState().jwt}`,
+          },
+          body: JSON.stringify({
+            mentions: mentionsForContext,
+            communityId,
+            contextDataDays: 30, // Use default from config
+          }),
+        });
+
+        if (!response.ok) {
+          console.error(
+            'Failed to fetch context for mentions:',
+            response.statusText,
+          );
+          return null;
+        }
+
+        const contextData: ContextAggregationResponse = await response.json();
+
+        if (!contextData.success || !contextData.data) {
+          console.error('Context aggregation failed:', contextData.error);
+          return null;
+        }
+
+        return contextData.data.formattedContext;
+      } catch (contextError) {
+        console.error('Error fetching context for mentions:', contextError);
+        return null;
+      }
+    },
+    [extractMentionsFromText, validateMentionLimits],
+  );
 
   const generateCompletion = useCallback(
     async (userPrompt: string, options?: AiCompletionOptions) => {
@@ -34,6 +128,32 @@ export const useAiCompletion = () => {
       const streamMode = options?.stream !== false; // Default to true
 
       try {
+        // Fetch contextual data for mentions if enabled
+        let contextualData: string | null = null;
+        if (options?.includeContextualMentions !== false) {
+          // Default to true
+          contextualData = await fetchContextForMentions(
+            userPrompt,
+            options?.communityId,
+          );
+        }
+
+        // Prepare enhanced system prompt with context
+        let enhancedSystemPrompt = options?.systemPrompt;
+        if (contextualData) {
+          const contextSection = `
+
+CONTEXTUAL INFORMATION:
+The user has mentioned the following entities in their message. Use this context to provide more informed and relevant responses:
+
+${contextualData}
+
+---
+
+`;
+          enhancedSystemPrompt = contextSection + (enhancedSystemPrompt || '');
+        }
+
         const requestBody: Partial<CompletionOptions> & {
           jwt?: string | null;
           prompt: string;
@@ -53,8 +173,8 @@ export const useAiCompletion = () => {
           requestBody.temperature = options.temperature;
         }
 
-        if (options?.systemPrompt) {
-          requestBody.systemPrompt = options.systemPrompt;
+        if (enhancedSystemPrompt) {
+          requestBody.systemPrompt = enhancedSystemPrompt;
         }
 
         const response = await fetch('/api/aicompletion', {

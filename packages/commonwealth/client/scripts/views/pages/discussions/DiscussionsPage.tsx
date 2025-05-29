@@ -549,6 +549,7 @@ const DiscussionsPage = () => {
               editorValue={getTextFromDelta(threadContentDelta)}
               tooltipText=""
               topic={topicObj}
+              communityId={communityId}
             />
           )}
         </WithDefaultStickyComment>
