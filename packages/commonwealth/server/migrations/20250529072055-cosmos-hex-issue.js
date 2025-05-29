@@ -24,11 +24,13 @@ module.exports = {
           WITH user_stats AS (SELECT U.id,
                                      U.profile,
                                      COUNT(*)         as total_addresses,
-                                     MAX(last_active) as last_active
+                                     MAX(last_active) as last_active,
+                                     xp_points,
+                                     xp_referrer_points
                               FROM "Addresses" A
                                      JOIN duplicate_hexes dh ON dh.hex = A.hex
                                      JOIN "Users" U ON U.id = A.user_id
-                              GROUP BY U.id, U.profile)
+                              GROUP BY U.id, U.profile, U.xp_points, U.xp_referrer_points)
           SELECT json_object_agg(
                    id::text,
                    json_build_object(
@@ -36,7 +38,9 @@ module.exports = {
                      'bio', profile ->> 'bio',
                      'name', profile ->> 'name',
                      'total_addresses', total_addresses,
-                     'last_active', last_active
+                     'last_active', last_active,
+                     'xp_points', xp_points,
+                     'xp_referrer_points', xp_referrer_points
                    )
                  ) as user_data
           FROM user_stats;
@@ -55,9 +59,9 @@ module.exports = {
       const hexes = (
         await queryInterface.sequelize.query(
           `
-          SELECT *
-          FROM duplicate_hexes;
-        `,
+            SELECT *
+            FROM duplicate_hexes;
+          `,
           {
             transaction,
             type: queryInterface.sequelize.QueryTypes.SELECT,
@@ -72,11 +76,11 @@ module.exports = {
         const hexUserIds = (
           await queryInterface.sequelize.query(
             `
-            SELECT DISTINCT user_id
-            FROM "Addresses"
-            WHERE hex = :hex
-              AND user_id IS NOT NULL;
-          `,
+              SELECT DISTINCT user_id
+              FROM "Addresses"
+              WHERE hex = :hex
+                AND user_id IS NOT NULL;
+            `,
             {
               transaction,
               type: queryInterface.sequelize.QueryTypes.SELECT,
@@ -92,24 +96,39 @@ module.exports = {
         console.log(`Users found for hex: ${hexUserIds}`);
 
         // Determine the user that should be owner of all the addresses.
-        // Picks the user with the most connected address or if all have the same
+        // tldr: 1. xp, 2. num addresses, 3. bio/name, 4. last active
+
+        // Picks the user with the most XP first. If they all have the same XP,
+        // picks the user with the most connected addresses. If all have the same
         // number it picks the user with a bio or name set. If no name or bio
         // picks the user that was most recently active.
         let topUser = userData[hexUserIds[0]];
         for (let i = 1; i > hexUserIds.length; i++) {
           const hexUser = userData[hexUserIds[i]];
-          if (hexUser['total_addresses'] > topUser['total_addresses']) {
+          if (
+            (hexUser['xp_points'] ?? 0) > (topUser['xp_points'] ?? 0) ||
+            (hexUser['xp_referrer_points'] ?? 0) >
+              (topUser['xp_referrer_points'] ?? 0)
+          ) {
             topUser = hexUser;
           } else if (
-            hexUser['total_addresses'] === topUser['total_addresses']
+            (hexUser['xp_points'] ?? 0) === (topUser['xp_points'] ?? 0) &&
+            (hexUser['xp_referrer_points'] ?? 0) ===
+              (topUser['xp_referrer_points'] ?? 0)
           ) {
-            if (
-              (hexUser['bio'] && !topUser['bio']) ||
-              (hexUser['name'] && !topUser['name']) ||
-              new Date(hexUser['last_active']) >
-                new Date(topUser['last_active'])
-            ) {
+            if (hexUser['total_addresses'] > topUser['total_addresses']) {
               topUser = hexUser;
+            } else if (
+              hexUser['total_addresses'] === topUser['total_addresses']
+            ) {
+              if (
+                (hexUser['bio'] && !topUser['bio']) ||
+                (hexUser['name'] && !topUser['name']) ||
+                new Date(hexUser['last_active']) >
+                  new Date(topUser['last_active'])
+              ) {
+                topUser = hexUser;
+              }
             }
           }
         }
