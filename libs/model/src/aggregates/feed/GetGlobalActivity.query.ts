@@ -4,7 +4,6 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { baseActivityQuery } from '../../utils/getUserActivityFeed';
-import { PrivateTopics } from '../../utils/privateTopics';
 
 export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
   return {
@@ -38,10 +37,10 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
           FROM
             "Threads" T
             JOIN "Communities" C ON C.id = T.community_id
-            LEFT JOIN ${PrivateTopics} ON T.topic_id = PrivateTopics.topic_id
+            LEFT JOIN "GroupGatedActions" GA ON T.topic_id = GA.topic_id
           WHERE
             T.id IN (:threadIds)
-            AND PrivateTopics.address_id IS NULL -- only include threads that are not gated
+            AND COALESCE(GA.is_private, FALSE) = FALSE -- only include public gates
         )
         ${baseActivityQuery}
         ORDER BY ARRAY_POSITION(ARRAY[:threadIds], T.id);

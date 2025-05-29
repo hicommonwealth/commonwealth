@@ -125,7 +125,7 @@ const TrendingThreadList = ({
     data: feed,
     isLoading: feedIsLoading,
     isError: feedIsError,
-  } = query({ limit: 3 });
+  } = query({ limit: 10 });
 
   const {
     data: communityThreads,
@@ -154,7 +154,8 @@ const TrendingThreadList = ({
     allThreads = feed.pages
       .flatMap((p) => p.results)
       .filter((t) => !t.marked_as_spam_at)
-      .map((t) => new Thread(t));
+      .map((t) => new Thread(t))
+      .slice(0, 3);
   }
   const redirectPath = communityId ? '/discussions' : '/explore?tab=threads';
 

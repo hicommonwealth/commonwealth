@@ -3,7 +3,6 @@ import { CommunityTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
-import { PrivateTopics } from './privateTopics';
 
 /**
  * Gets last updated threads and their recent comments
@@ -117,9 +116,9 @@ top_threads AS (
     "Threads" T
     ${user_id ? 'JOIN user_communities UC ON UC.community_id = T.community_id' : ''}
     JOIN "Communities" C ON C.id = T.community_id
-    LEFT JOIN ${PrivateTopics} ON T.topic_id = PrivateTopics.topic_id
-  WHERE 
-    PrivateTopics.address_id IS NULL -- only include threads that are not gated
+    LEFT JOIN "GroupGatedActions" GA ON T.topic_id = GA.topic_id
+  WHERE
+    COALESCE(GA.is_private, FALSE) = FALSE -- only include public gates
     AND T.deleted_at IS NULL 
     AND T.marked_as_spam_at IS NULL 
     AND C.active IS TRUE 
