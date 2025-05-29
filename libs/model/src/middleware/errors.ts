@@ -27,7 +27,7 @@ export class RejectedMember extends InvalidActor {
     public actor: Actor,
     public reasons: string[],
   ) {
-    super(actor, reasons.join(', '));
+    super(actor, `Not authorized to perform action in topic`);
     this.name = INVALID_ACTOR_ERROR;
   }
 }

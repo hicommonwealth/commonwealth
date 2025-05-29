@@ -11,6 +11,7 @@ import {
   AuthContextInput,
   CommentContext,
   CommentContextInput,
+  MembershipRejectReason,
   PollContext,
   PollContextInput,
   ReactionContext,
@@ -27,7 +28,7 @@ import { Op, QueryTypes } from 'sequelize';
 import { ZodSchema, z } from 'zod';
 import { models } from '../database';
 import { AddressInstance } from '../models';
-import { BannedActor, NonMember, RejectedMember } from './errors';
+import { BannedActor, RejectedMember } from './errors';
 
 async function findComment(actor: Actor, comment_id: number) {
   const comment = await models.Comment.findOne({
@@ -249,32 +250,47 @@ async function checkGatedActions(
   action: GroupGatedActionKey,
   topic_id: number,
 ): Promise<void> {
-  const [gated] = await models.sequelize.query<{
-    topic: string;
-    groups: string[];
-    memberships: number;
-    rejects: string[];
+  const [topic] = await models.sequelize.query<{
+    topic_name: string;
+    gates: Array<{
+      group_id: number;
+      group_name: string;
+      actions: GroupGatedActionKey[];
+      is_private: boolean;
+      membership: {
+        is_member: boolean;
+        reject_reason: z.infer<typeof MembershipRejectReason>;
+      };
+    }>;
   }>(
     `
 SELECT
-  t.name as topic,
-  ARRAY_AGG(g.metadata->>'name') as groups,
-  COUNT(m.address_id)::INTEGER as memberships,
-  ARRAY_AGG(g.metadata->>'name' || ': ' || rejects.messages) FILTER (WHERE rejects.messages IS NOT NULL) as rejects
+  T.name AS topic_name,
+  JSONB_AGG(
+    JSONB_BUILD_OBJECT(
+      'group_id', G.id,
+      'group_name', G.metadata->>'name',
+      'actions', GA.gated_actions,
+      'is_private', GA.is_private,
+      'membership', (
+        SELECT JSONB_BUILD_OBJECT(
+          'is_member', (M.reject_reason IS NULL),
+          'reject_reason', M.reject_reason
+        )
+        FROM "Memberships" M
+        WHERE M.group_id = G.id AND M.address_id = :address_id
+      )
+    )
+  ) AS gates
 FROM
-  "Groups" g
-  JOIN "GroupGatedActions" ga ON g.id = ga.group_id 
-  JOIN "Topics" t ON t.id = ga.topic_id
-  LEFT JOIN "Memberships" m ON g.id = m.group_id AND m.address_id = :address_id
-  LEFT JOIN LATERAL (
-    SELECT STRING_AGG(r->>'message', '; ') as messages 
-    FROM JSONB_ARRAY_ELEMENTS(m.reject_reason) as r
-	) AS rejects ON m.reject_reason IS NOT NULL
+  "Topics" T
+  JOIN "GroupGatedActions" GA ON GA.topic_id = T.id
+  JOIN "Groups" G ON GA.group_id = G.id
 WHERE
-  ga.topic_id = :topic_id
-  AND :action = ANY(ga.gated_actions)
+  T.id = :topic_id
+  AND (:action = ANY(GA.gated_actions) OR GA.is_private = TRUE)
 GROUP BY
-  t.name;
+  T.name;
 `,
     {
       type: QueryTypes.SELECT,
@@ -283,14 +299,25 @@ GROUP BY
     },
   );
 
-  // action not gated by any group? allow it
-  if (!gated) return;
-  // address not a member in any group with this action?
-  if (!gated.memberships) throw new NonMember(actor, gated.topic, action);
-  // all memberships rejected?
-  if (gated.memberships === gated.rejects?.length)
-    throw new RejectedMember(actor, gated.rejects);
-  // a membership in one of the groups was found so the user has required permissions
+  // action not gated and public topic... allow it
+  if (!topic) return;
+
+  const auth_gates = topic.gates.filter(
+    ({ actions, is_private, membership }) =>
+      actions.includes(action) || (is_private && actions.length === 0)
+        ? membership.is_member
+        : false,
+  );
+  // at least one gate is open
+  if (auth_gates.length > 0) return;
+
+  // throw with detailed rejection reasons
+  const rejects = topic.gates.map(({ membership }) =>
+    membership.reject_reason
+      ? membership.reject_reason.map(({ message }) => message).join('; ')
+      : 'private topic',
+  );
+  throw new RejectedMember(actor, rejects);
 }
 
 /**
