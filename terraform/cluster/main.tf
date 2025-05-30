@@ -27,7 +27,6 @@ variable "region" {
 variable "pr_number" {
   description = "PR number for environment naming"
   type        = string
-  default     = "dev"
 }
 
 variable "environment" {

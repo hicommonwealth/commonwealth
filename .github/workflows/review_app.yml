@@ -352,10 +352,7 @@ jobs:
         run: |
           terraform plan \
             -var="do_token=${{ secrets.DO_REVIEW_APPS_API_KEY }}" \
-            -var="vault_token=${{ secrets.VAULT_TOKEN }}" \
             -var="pr_number=${{ steps.set_pr_number.outputs.pr_number }}" \
-            -var="environment=pr" \
-            -var="region=us-east-1" \
             -out=tfplan.cluster
 
       - name: Terraform Apply (Cluster)
@@ -391,9 +388,9 @@ jobs:
             -var="k8s_host=$K8S_HOST" \
             -var="k8s_token=$K8S_TOKEN" \
             -var="k8s_ca=$K8S_CA" \
+            -var="vault_token=${{ secrets.VAULT_TOKEN }}" \
             -var="image_tag=${{ steps.set_effective_sha.outputs.sha }}" \
             -var="pr_number=${{ steps.set_pr_number.outputs.pr_number }}" \
-            -var="environment=pr" \
             -out=tfplan.k8s
 
       # - name: Terraform Apply (K8s)
