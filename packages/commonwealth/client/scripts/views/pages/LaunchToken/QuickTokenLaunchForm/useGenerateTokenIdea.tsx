@@ -4,6 +4,28 @@ import { useRef, useState } from 'react';
 import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 
+const RATE_LIMIT_MESSAGE =
+  'You are being rate limited. Please wait and try again.';
+
+const isRateLimitError = (err: any) => {
+  const status =
+    err?.data?.httpStatus || err?.status || err?.response?.status;
+  if (status === 429) return true;
+
+  if (status === 401) {
+    const msg =
+      err?.data?.message || err?.message || err?.response?.data?.message || '';
+    const lowerMsg = String(msg).toLowerCase();
+    return (
+      lowerMsg.includes('image') &&
+      lowerMsg.includes('prompt') &&
+      lowerMsg.includes('overload')
+    );
+  }
+
+  return false;
+};
+
 type TokenIdea = {
   name: string;
   description: string;
@@ -129,7 +151,12 @@ export const useGenerateTokenIdea = ({
         };
         return temp;
       });
-      notifyError(error.message);
+
+      if (isRateLimitError(error)) {
+        notifyError(RATE_LIMIT_MESSAGE);
+      } else {
+        notifyError(error.message);
+      }
       console.error('Error fetching token idea:', error.message);
     } finally {
       setTimeout(() => {
