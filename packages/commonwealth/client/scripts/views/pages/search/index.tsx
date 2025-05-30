@@ -161,8 +161,8 @@ const SearchPage = () => {
     search: search_term,
     cursor: 1,
     limit: 20,
-    order_by,
-    order_direction,
+    order_by: 'tier',
+    order_direction: 'DESC',
     enabled: activeTab === SearchScope.Communities && search_term.length > 0,
   });
 
