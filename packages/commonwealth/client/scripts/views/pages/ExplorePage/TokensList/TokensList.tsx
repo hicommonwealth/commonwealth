@@ -64,12 +64,7 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
     limit: 8,
     with_stats: true,
     order_by: (() => {
-      if (
-        filters?.withTokenSortBy &&
-        [TokenSortOptions.MarketCap, TokenSortOptions.Price].includes(
-          filters?.withTokenSortBy,
-        )
-      ) {
+      if (filters?.withTokenSortBy) {
         return tokenSortOptionsLabelToKeysMap[
           filters?.withTokenSortBy
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -82,6 +77,7 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
       TokenSortDirectionsToEnumMap[
         filters.withTokenSortOrder || TokenSortDirections.Descending
       ],
+    is_graduated: filters.isGraduated,
     enabled: launchpadEnabled,
   });
   const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
@@ -97,6 +93,13 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
       ...filters,
       withTokenSortBy: undefined,
       withTokenSortOrder: undefined,
+    });
+  };
+
+  const removeIsGraduatedFilter = () => {
+    setFilters({
+      ...filters,
+      isGraduated: false,
     });
   };
 
@@ -144,6 +147,13 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
                         `}
             type="filter"
             onCloseClick={removeCommunitySortByFilter}
+          />
+        )}
+        {filters.isGraduated && (
+          <CWTag
+            label="Graduated"
+            type="filter"
+            onCloseClick={removeIsGraduatedFilter}
           />
         )}
         <FiltersDrawer

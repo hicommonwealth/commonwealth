@@ -19,6 +19,7 @@ export const TokenSortDirectionsToEnumMap = {
 export type TokenFilters = {
   withTokenSortBy?: TokenSortOptions;
   withTokenSortOrder?: TokenSortDirections;
+  isGraduated?: boolean;
 };
 
 export type FiltersDrawerProps = {
