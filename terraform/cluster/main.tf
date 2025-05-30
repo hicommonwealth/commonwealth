@@ -50,18 +50,21 @@ resource "digitalocean_kubernetes_cluster" "main" {
 
   node_pool {
     name       = "${local.name_prefix}web-pool"
-    size       = "s-2vcpu-4gb"
+    size       = "s-1vcpu-2gb"
     node_count = 1
     labels = {
       "node-type" = "web"
     }
+    max_nodes = 1
+    min_nodes = 1 // TODO: figure out if we can do min 0 and scale on first request
+    auto_scale = false
   }
 }
 
 resource "digitalocean_kubernetes_node_pool" "worker" {
   cluster_id = digitalocean_kubernetes_cluster.main.id
   name       = "${local.name_prefix}worker-pool"
-  size       = "s-6vcpu-16gb"
+  size       = "s-4vcpu-8gb"
   node_count = 2
   labels = {
     "node-type" = "worker"

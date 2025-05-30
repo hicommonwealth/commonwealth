@@ -127,11 +127,11 @@ resource "kubernetes_deployment" "web" {
           resources {
             requests = {
               cpu    = "800m"
-              memory = "2.5Gi"
+              memory = "1Gi"
             }
             limits = {
               cpu    = "900m"
-              memory = "2.5Gi"
+              memory = "1Gi"
             }
           }
           env {
@@ -224,11 +224,11 @@ resource "kubernetes_deployment" "worker" {
           resources {
             requests = {
               cpu    = "500m"
-              memory = "2.5Gi"
+              memory = "0.5Gi"
             }
             limits = {
               cpu    = "1000m"
-              memory = "2.5Gi"
+              memory = "0.5Gi"
             }
           }
         }
