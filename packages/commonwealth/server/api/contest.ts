@@ -29,4 +29,8 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Integration,
   ),
   getJudgeStatus: trpc.query(Contest.GetJudgeStatus, trpc.Tag.Community),
+  configureNominationsMetadata: trpc.command(
+    Contest.ConfigureNominationsMetadata,
+    trpc.Tag.Community,
+  ),
 });

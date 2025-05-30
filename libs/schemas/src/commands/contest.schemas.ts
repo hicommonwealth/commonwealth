@@ -222,3 +222,16 @@ export const DeleteContestManagerMetadata = {
   }),
   context: AuthContext,
 };
+
+export const ConfigureNominationsMetadata = {
+  input: z.object({
+    community_id: z.string(),
+    judge_token_id: PG_INT,
+  }),
+  output: z.object({
+    community_id: z.string(),
+    judge_token_id: PG_INT,
+    success: z.boolean(),
+  }),
+  context: AuthContext,
+};
