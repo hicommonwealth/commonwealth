@@ -45,9 +45,23 @@ const MAX_IDEAS_LIMIT = 5;
 const RATE_LIMIT_MESSAGE =
   'You are being rate limited. Please wait and try again.';
 
-const isRateLimitError = (err: any) => {
-  const status =
-    err?.data?.httpStatus || err?.status || err?.response?.status;
+interface RateLimitErrorType {
+  data?: {
+    httpStatus?: number;
+    message?: string;
+  };
+  status?: number;
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
+const isRateLimitError = (err: RateLimitErrorType) => {
+  const status = err?.data?.httpStatus || err?.status || err?.response?.status;
   if (status === 429) return true;
 
   if (status === 401) {
@@ -328,7 +342,9 @@ export const QuickTokenLaunchForm = ({
         } else if (e?.name === 'TransactionBlockTimeoutError') {
           notifyError('Transaction not timely signed. Please try again!');
         } else if (
-          e?.message?.toLowerCase().includes('user denied transaction signature')
+          e?.message
+            ?.toLowerCase()
+            .includes('user denied transaction signature')
         ) {
           notifyError('Transaction rejected!');
         } else if (
