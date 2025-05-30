@@ -15,6 +15,7 @@ const useFetchTokensQuery = ({
   search,
   with_stats = false,
   enabled = true,
+  is_graduated,
 }: UseFetchTokensProps) => {
   return trpc.launchpadToken.getTokens.useInfiniteQuery(
     {
@@ -23,6 +24,7 @@ const useFetchTokensQuery = ({
       order_direction,
       search,
       with_stats,
+      is_graduated,
     },
     {
       cacheTime: FETCH_TOKENS_STALE_TIME,

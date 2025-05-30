@@ -17,6 +17,7 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
         order_by,
         order_direction,
         with_stats,
+        is_graduated,
       } = payload;
 
       // pagination configuration
@@ -41,6 +42,11 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
         direction,
         limit,
       };
+
+      const where_conditions = [
+        search ? 'WHERE LOWER(T.name) LIKE :search' : '',
+        is_graduated ? 'WHERE T.liquidity_transferred IS TRUE' : '',
+      ].filter(Boolean);
 
       const sql = `
           ${
@@ -70,7 +76,7 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
               JOIN "Communities" as C
           ON T.namespace = C.namespace
               ${includeStats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
-              ${search ? 'WHERE LOWER(T.name) LIKE :search' : ''}
+              ${where_conditions.join(' AND ')}
           ORDER BY ${order_col} ${direction}
           LIMIT :limit OFFSET :offset
       `;

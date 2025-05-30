@@ -6,6 +6,7 @@ import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
+import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import './FiltersDrawer.scss';
 import {
   sortOrderLabelsToDirectionsMap,
@@ -49,6 +50,13 @@ export const FiltersDrawer = ({
     });
   };
 
+  const onIsGraduatedChange = (isGraduated: boolean) => {
+    onFiltersChange({
+      ...filters,
+      isGraduated,
+    });
+  };
+
   const hasAppliedFilters =
     Object.values(filters).filter(Boolean).length === 1
       ? !filters.withTokenSortOrder
@@ -67,6 +75,17 @@ export const FiltersDrawer = ({
         <div className="content-container">
           <CWText type="h3">Token Filters</CWText>
           <div className="filter-content">
+            <div className="graduated-filter">
+              <CWText type="h5" fontWeight="semiBold">
+                Graduated
+              </CWText>
+              <CWToggle
+                size="small"
+                checked={filters.isGraduated}
+                onChange={() => onIsGraduatedChange(!filters.isGraduated)}
+              />
+            </div>
+
             {launchpadEnabled && (
               <>
                 <CWAccordion
