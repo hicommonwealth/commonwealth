@@ -22,6 +22,7 @@ export function SearchCommunities(): Query<typeof schemas.SearchCommunities> {
           limit: Math.min(limit || 10, 100),
           page: cursor || 1,
           orderBy: `C.${orderBy}`,
+          orderBySecondary: `C.id ILIKE $searchTerm`, // exact matches come first
           orderDirection: order_direction || 'ASC',
         });
       const bind = { searchTerm: search, ...paginationBind };
