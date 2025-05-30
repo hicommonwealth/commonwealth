@@ -1,3 +1,15 @@
+variable "pr_number" {
+  description = "PR number for environment naming"
+  type        = string
+  default     = "dev"
+}
+
+variable "environment" {
+  description = "Environment name (e.g., pr, dev, staging, prod)"
+  type        = string
+  default     = "pr"
+}
+
 variable "k8s_host" {
   description = "Kubernetes API server host URL"
   type        = string
@@ -41,6 +53,7 @@ variable "secrets" {
 }
 
 locals {
+  name_prefix = "${var.environment}-${var.pr_number}-",
   worker_images = [
     "twitter",
     "message-relayer",

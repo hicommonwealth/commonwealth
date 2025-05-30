@@ -340,19 +340,17 @@ jobs:
 
       - name: Terraform Init (Cluster)
         id: init_cluster
-        working-directory: terraform
+        working-directory: terraform/cluster
         run: |
-          terraform init -backend-config="key=commonwealth-pr-environments/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
+          terraform init -backend-config="key=commonwealth-pr-environments/cluster/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
 
       - name: Terraform Plan (Cluster)
         id: plan_cluster
-        working-directory: terraform
+        working-directory: terraform/cluster
         env:
           TF_LOG: DEBUG
         run: |
           terraform plan \
-            -target=digitalocean_kubernetes_cluster.main \
-            -target=digitalocean_kubernetes_node_pool.worker \
             -var="do_token=${{ secrets.DO_REVIEW_APPS_API_KEY }}" \
             -var="vault_token=${{ secrets.VAULT_TOKEN }}" \
             -var="pr_number=${{ steps.set_pr_number.outputs.pr_number }}" \
@@ -362,30 +360,30 @@ jobs:
 
       - name: Terraform Apply (Cluster)
         id: apply_cluster
-        working-directory: terraform
+        working-directory: terraform/cluster
         env:
           TF_LOG: DEBUG
         run: terraform apply -auto-approve tfplan.cluster
 
       - name: Export Kubeconfig
         id: export_kubeconfig
-        working-directory: terraform
+        working-directory: terraform/cluster
         run: terraform output -raw kubeconfig > kubeconfig.yaml
 
       - name: Terraform Init (K8s)
         id: init_k8s
-        working-directory: terraform
+        working-directory: terraform/k8s
         run: |
-          terraform init -backend-config="key=commonwealth-pr-environments/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
+          terraform init -backend-config="key=commonwealth-pr-environments/k8s/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
 
       - name: Terraform Plan (K8s)
         id: plan_k8s
-        working-directory: terraform
+        working-directory: terraform/k8s
         env:
-          KUBECONFIG: ${{ github.workspace }}/terraform/kubeconfig.yaml
+          KUBECONFIG: ${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
           TF_LOG: DEBUG
         run: |
-          export KUBECONFIG=${{ github.workspace }}/terraform/kubeconfig.yaml
+          export KUBECONFIG=${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
           export K8S_HOST=$(yq e '.clusters[0].cluster.server' $KUBECONFIG)
           export K8S_TOKEN=$(yq e '.users[0].user.token' $KUBECONFIG)
           export K8S_CA=$(yq e '.clusters[0].cluster.certificate-authority-data' $KUBECONFIG)
@@ -400,9 +398,9 @@ jobs:
 
       # - name: Terraform Apply (K8s)
       #   id: apply_k8s
-      #   working-directory: terraform
+      #   working-directory: terraform/k8s
       #   env:
-      #     KUBECONFIG: ${{ github.workspace }}/terraform/kubeconfig.yaml
+      #     KUBECONFIG: ${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
       #     TF_LOG: DEBUG
       #   run: terraform apply -auto-approve tfplan.k8s
 
