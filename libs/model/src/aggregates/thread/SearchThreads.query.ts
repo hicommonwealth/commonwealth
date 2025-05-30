@@ -84,7 +84,6 @@ LIMIT :limit OFFSET :offset
         type: QueryTypes.SELECT,
         replacements,
         raw: true,
-        logging: true,
       });
 
       const totalResults = include_count
