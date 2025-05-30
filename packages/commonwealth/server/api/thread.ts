@@ -206,4 +206,8 @@ export const trpcRouter = trpc.router({
       }),
     ],
   ),
+  searchThreads: trpc.query(Thread.SearchThreads, trpc.Tag.Thread),
+  getActiveThreads: trpc.query(Thread.GetActiveThreads, trpc.Tag.Thread, {
+    ttlSecs: 60,
+  }),
 });

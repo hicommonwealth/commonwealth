@@ -1,4 +1,4 @@
-import { SearchUserProfilesView } from '@hicommonwealth/schemas';
+import { SearchUserProfilesView, ThreadView } from '@hicommonwealth/schemas';
 import { getDecodedString } from '@hicommonwealth/shared';
 import moment from 'moment';
 import React, { useMemo } from 'react';
@@ -15,19 +15,8 @@ import { QuillRenderer } from '../../components/react_quill_editor/quill_rendere
 import { User } from '../../components/user/user';
 import './index.scss';
 
-export type ThreadResult = {
-  id: number;
-  community_id: string;
-  title: string;
-  body: string;
-  address_id: number;
-  address_user_id: number;
-  address: string;
-  address_community_id: string;
-  created_at: string;
-};
 type ThreadResultRowProps = {
-  thread: ThreadResult;
+  thread: z.infer<typeof ThreadView>;
   searchTerm: string;
   setRoute: any;
 };
@@ -65,11 +54,9 @@ const ThreadResultRow = ({
         </CWText>
         <div className="search-results-thread-subtitle">
           <User
-            userAddress={thread?.address}
-            userCommunityId={thread?.address_community_id}
-            shouldShowAsDeleted={
-              !thread?.address && !thread?.address_community_id
-            }
+            userAddress={thread?.Address?.address || ''}
+            userCommunityId={thread?.community_id}
+            shouldShowAsDeleted={!thread?.Address && !thread?.community_id}
           />
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}

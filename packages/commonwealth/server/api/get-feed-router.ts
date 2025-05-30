@@ -26,12 +26,12 @@ function sortByDateDesc(a: SortByDate, b: SortByDate) {
 }
 
 function computeUpdated(bulkThreads: z.infer<typeof GetThreads.output>) {
-  if (bulkThreads.threads.length === 0) {
+  if (bulkThreads.results.length === 0) {
     // there are no threads
     return new Date();
   }
 
-  const sortedByDateDesc = [...bulkThreads.threads].sort(sortByDateDesc);
+  const sortedByDateDesc = [...bulkThreads.results].sort(sortByDateDesc);
 
   // return the most recent thread and get its date
   return toDate(sortedByDateDesc[0]);
@@ -85,8 +85,8 @@ export const get_feed_router = async (req, res) => {
     const bulkThreads = await query(Thread.GetThreads(), {
       actor: { user: { email: '' } },
       payload: {
-        page,
-        limit,
+        cursor: page || 1,
+        limit: limit || 20,
         community_id,
         stage,
         topic_id,
@@ -117,7 +117,7 @@ export const get_feed_router = async (req, res) => {
       },
     });
 
-    bulkThreads!.threads.forEach((thread) => {
+    bulkThreads!.results.forEach((thread) => {
       const title = getDecodedString(thread.title);
       const slug = slugify(title);
       feed.addItem({

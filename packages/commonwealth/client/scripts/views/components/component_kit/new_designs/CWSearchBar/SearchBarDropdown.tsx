@@ -12,15 +12,15 @@ import {
   CommentSearchView,
   SearchCommunityView,
   SearchUserProfilesView,
+  ThreadView,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { SearchResults } from '../../../../../hooks/useSearchResults';
-import { SearchThreadsResponse } from '../../../../../state/api/threads/searchThreads';
 import './SearchBarDropdown.scss';
 
 interface SearchBarPreviewSectionProps {
   searchResults:
-    | SearchThreadsResponse['results']
+    | z.infer<typeof ThreadView>[]
     | z.infer<typeof CommentSearchView>[]
     | z.infer<typeof SearchCommunityView>[]
     | z.infer<typeof SearchUserProfilesView>[];

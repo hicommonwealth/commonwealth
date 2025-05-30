@@ -21,7 +21,7 @@ const ThreadRedirect = ({ identifier }: { identifier: string }) => {
         : navigate(
             `/discussion/${identifier}${window.location.search}`,
             { replace: true },
-            foundThread?.community_id,
+            foundThread?.communityId,
           );
     },
     shouldRun: !!(foundThread || error),

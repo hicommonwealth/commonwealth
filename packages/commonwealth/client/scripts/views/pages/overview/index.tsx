@@ -3,12 +3,12 @@ import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import useTopicGating from 'client/scripts/hooks/useTopicGating';
 import { ThreadFeaturedFilterTypes } from 'client/scripts/models/types';
+import useGetActiveThreadsQuery from 'client/scripts/state/api/threads/getActiveThreads';
 import useUserStore from 'client/scripts/state/ui/user';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo } from 'react';
 import app from 'state';
-import { useFetchThreadsQuery } from 'state/api/threads';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTable } from '../../components/component_kit/new_designs/CWTable';
 import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
@@ -49,12 +49,11 @@ const OverviewPage = ({
   });
 
   const communityId = app.activeChainId() || '';
-  const { data: recentlyActiveThreads } = useFetchThreadsQuery({
-    queryType: 'active',
-    communityId,
-    topicsPerThread: 3,
+  const { data: recentlyActiveThreads } = useGetActiveThreadsQuery({
+    community_id: communityId,
+    threads_per_topic: 3,
     withXRecentComments: 3,
-    apiEnabled: !!communityId,
+    enabled: !!communityId,
   });
 
   const { actionGroups, bypassGating } = useTopicGating({
@@ -68,7 +67,7 @@ const OverviewPage = ({
     let newData = recentlyActiveThreads || [];
 
     if (topicId) {
-      newData = newData.filter((thread) => thread.topic.id === topicId);
+      newData = newData.filter((thread) => thread.topic?.id === topicId);
     }
     if (timelineFilter) {
       if (
@@ -81,8 +80,7 @@ const OverviewPage = ({
         const to = new Date(toDate);
 
         newData = newData.filter((thread) => {
-          const threadDate = new Date(thread.createdAt);
-          return threadDate >= from && threadDate <= to;
+          thread.createdAt.isBetween(from, to);
         });
       }
     }
@@ -91,26 +89,21 @@ const OverviewPage = ({
         // Spread to avoid mutating original array
         switch (featuredFilter) {
           case ThreadFeaturedFilterTypes.Newest:
-            return (
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
+            return b.createdAt.diff(a.createdAt);
 
           case ThreadFeaturedFilterTypes.Oldest:
-            return (
-              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-            );
+            return a.createdAt.diff(b.createdAt);
 
           case ThreadFeaturedFilterTypes.MostLikes:
-            return (b.reactionWeightsSum ?? 0) - (a.reactionWeightsSum ?? 0);
+            return (
+              +(b.reactionWeightsSum ?? '0') - +(a.reactionWeightsSum ?? '0')
+            );
 
           case ThreadFeaturedFilterTypes.MostComments:
             return (b.numberOfComments ?? 0) - (a.numberOfComments ?? 0);
 
           case ThreadFeaturedFilterTypes.LatestActivity:
-            return (
-              new Date(b.lastActivityAt).getTime() -
-              new Date(a.lastActivityAt).getTime()
-            );
+            return b.latestActivity?.diff(a.latestActivity) || 0;
 
           default:
             return 0;
@@ -159,10 +152,10 @@ const OverviewPage = ({
           topic: {
             customElement: (
               <div
-                onClick={() => navigate(`/discussions/${thread.topic.name}`)}
+                onClick={() => navigate(`/discussions/${thread.topic?.name}`)}
               >
                 <CWText fontWeight="regular" type="b2">
-                  {thread.topic.name}
+                  {thread.topic?.name}
                 </CWText>
               </div>
             ),

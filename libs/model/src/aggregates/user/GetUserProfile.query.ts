@@ -53,7 +53,23 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
           address_id: { [Op.in]: addressIds },
           community_id: { [Op.in]: communityIds },
         },
-        include: [{ model: models.Address, as: 'Address' }],
+        include: [
+          {
+            model: models.Address,
+            as: 'Address',
+            include: [
+              {
+                model: models.User,
+                attributes: ['id', 'profile', 'tier'],
+              },
+            ],
+          },
+          {
+            model: models.Topic,
+            as: 'topic',
+            attributes: ['id', 'name', 'community_id'],
+          },
+        ],
       });
 
       const comments = await models.Comment.findAll({
