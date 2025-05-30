@@ -305,7 +305,7 @@ GROUP BY
   const closed_gates = topic.gates.filter(
     ({ actions, is_private, membership }) =>
       actions.includes(action) || (is_private && actions.length === 0)
-        ? membership?.is_member === false
+        ? (membership?.is_member || false) === false
         : false,
   );
 
