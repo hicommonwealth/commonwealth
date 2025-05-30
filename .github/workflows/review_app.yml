@@ -153,7 +153,13 @@ jobs:
       - name: Check if datadog-base image exists
         id: check_datadog_base_image
         run: |
-          if docker manifest inspect ghcr.io/hicommonwealth/datadog-base:latest > /dev/null 2>&1; then
+          set -x
+          output=$(docker manifest inspect ghcr.io/hicommonwealth/datadog-base:latest 2>&1)
+          status=$?
+          echo "Manifest inspect output for datadog-base:"
+          echo "$output"
+          echo "Exit code: $status"
+          if [ $status -eq 0 ]; then
             echo "exists=true" >> $GITHUB_OUTPUT
           else
             echo "exists=false" >> $GITHUB_OUTPUT
@@ -173,7 +179,13 @@ jobs:
       - name: Check if commonwealth base image exists
         id: check_base_image
         run: |
-          if docker manifest inspect ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }} > /dev/null 2>&1; then
+          set -x
+          output=$(docker manifest inspect ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }} 2>&1)
+          status=$?
+          echo "Manifest inspect output for commonwealth base:"
+          echo "$output"
+          echo "Exit code: $status"
+          if [ $status -eq 0 ]; then
             echo "exists=true" >> $GITHUB_OUTPUT
           else
             echo "exists=false" >> $GITHUB_OUTPUT
