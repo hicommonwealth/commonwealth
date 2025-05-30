@@ -150,7 +150,17 @@ jobs:
             echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check if datadog-base image exists
+        id: check_datadog_base_image
+        run: |
+          if docker manifest inspect ghcr.io/hicommonwealth/datadog-base:latest > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and Push datadog-base image
+        if: steps.check_datadog_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -159,9 +169,18 @@ jobs:
           tags: ghcr.io/hicommonwealth/datadog-base:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/datadog-base:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/datadog-base:buildcache,mode=max
-          pull: true
+
+      - name: Check if commonwealth base image exists
+        id: check_base_image
+        run: |
+          if docker manifest inspect ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }} > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Build and Push commonwealth base image
+        if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -173,9 +192,10 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/datadog-base:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/commonwealth:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/commonwealth:buildcache,mode=max
-          pull: true
 
+      # If the base image exists, we assume all other images exist and skip their builds
       - name: Build and Push Docker Image (web)
+        if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -186,9 +206,9 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/web:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/web:buildcache,mode=max
-          pull: true
 
       - name: Build and Push Docker Image (consumer)
+        if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -199,9 +219,9 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/consumer:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/consumer:buildcache,mode=max
-          pull: true
 
       - name: Build and Push Docker Image (discord_listener)
+        if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -212,9 +232,9 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/discord_listener:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/discord_listener:buildcache,mode=max
-          pull: true
 
       - name: Build and Push Docker Image (evm_ce)
+        if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -225,9 +245,9 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/evm_ce:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/evm_ce:buildcache,mode=max
-          pull: true
 
       - name: Build and Push Docker Image (graphile_worker)
+        if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -238,9 +258,9 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/graphile_worker:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/graphile_worker:buildcache,mode=max
-          pull: true
 
       - name: Build and Push Docker Image (knock)
+        if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -251,9 +271,9 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/knock:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/knock:buildcache,mode=max
-          pull: true
 
       - name: Build and Push Docker Image (message_relayer)
+        if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -264,9 +284,9 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/message_relayer:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/message_relayer:buildcache,mode=max
-          pull: true
 
       - name: Build and Push Docker Image (release)
+        if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -277,9 +297,9 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/release:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/release:buildcache,mode=max
-          pull: true
 
       - name: Build and Push Docker Image (twitter)
+        if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -290,7 +310,6 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache,mode=max
-          pull: true
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -316,7 +335,12 @@ jobs:
       - name: Terraform Plan
         id: plan
         working-directory: terraform
-        run: terraform plan -var="do_token=${{ secrets.DO_REVIEW_APPS_API_KEY }}" -var="vault_token=${{ secrets.VAULT_TOKEN }}" -out=tfplan
+        run: |
+          terraform plan \
+            -var="do_token=${{ secrets.DO_REVIEW_APPS_API_KEY }}" -var="vault_token=${{ secrets.VAULT_TOKEN }}" \
+            -var="image_tag=${{ steps.set_effective_sha.outputs.sha }}" \
+            -var="pr_number=${{ steps.set_pr_number.outputs.pr_number }}" \
+            -out=tfplan
         continue-on-error: false
 
     #   - name: Terraform Apply
