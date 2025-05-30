@@ -3,7 +3,7 @@ import { CommunityTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
-import { filterPrivateTopics, joinPrivateTopics } from './privateTopics';
+import { filterGates, joinGates, withGates } from './gating';
 
 /**
  * Gets last updated threads and their recent comments
@@ -102,7 +102,7 @@ export async function getUserActivityFeed({
 }: GetUserActivityFeedParams) {
   const offset = (cursor - 1) * limit;
   const query = `
-WITH 
+${withGates()},
 user_communities AS (
     SELECT DISTINCT community_id 
     FROM "Addresses" 
@@ -117,14 +117,14 @@ top_threads AS (
     "Threads" T
     ${user_id ? 'JOIN user_communities UC ON UC.community_id = T.community_id' : ''}
     JOIN "Communities" C ON C.id = T.community_id
-    ${joinPrivateTopics()}
+    ${joinGates()}
   WHERE
     T.deleted_at IS NULL 
     AND T.marked_as_spam_at IS NULL 
     AND C.active IS TRUE 
     AND C.tier != ${CommunityTierMap.SpamCommunity}
     AND C.id NOT IN ('ethereum', 'cosmos', 'polkadot')
-    ${filterPrivateTopics()}
+    ${filterGates()}
   ORDER BY
     T.activity_rank_date DESC NULLS LAST
   LIMIT :limit OFFSET :offset 

@@ -4,10 +4,7 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authOptional } from '../../middleware';
-import {
-  filterPrivateTopics,
-  joinPrivateTopics,
-} from '../../utils/privateTopics';
+import { filterGates, joinGates, withGates } from '../../utils/gating';
 
 export function GetThreads(): Query<typeof schemas.GetThreads> {
   return {
@@ -74,7 +71,8 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
       };
 
       const sql = `
-            WITH contest_ids as (
+            ${withGates(address_id)},
+            contest_ids as (
               SELECT DISTINCT(CA.thread_id)
               FROM "Contests" CON
               JOIN "ContestActions" CA ON CON.contest_id = CA.contest_id
@@ -117,12 +115,12 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 (COUNT(id) OVER())::INTEGER AS total_num_thread_results
               FROM
                 "Threads" T
-                ${joinPrivateTopics(address_id)}
+                ${joinGates(address_id)}
               WHERE
                 community_id = :community_id
                 AND deleted_at IS NULL
                 AND archived_at IS ${archived ? 'NOT' : ''} NULL
-                ${filterPrivateTopics(address_id)}
+                ${filterGates(address_id)}
                 ${topic_id ? ' AND T.topic_id = :topic_id' : ''}
                 ${stage ? ' AND stage = :stage' : ''}
                 ${from_date ? ' AND T.created_at > :from_date' : ''}

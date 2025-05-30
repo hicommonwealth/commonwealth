@@ -3,11 +3,8 @@ import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
+import { filterGates, joinGates, withGates } from '../../utils/gating';
 import { baseActivityQuery } from '../../utils/getUserActivityFeed';
-import {
-  filterPrivateTopics,
-  joinPrivateTopics,
-} from '../../utils/privateTopics';
 
 export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
   return {
@@ -34,17 +31,18 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
 
       // TODO: add deleted_at, marked_as_spam_at and default community filters?
       const query = `
-        WITH top_threads AS (
+        ${withGates()},
+        top_threads AS (
           SELECT
             T.*,
             count(*) OVER () AS total, C.icon_url
           FROM
             "Threads" T
             JOIN "Communities" C ON C.id = T.community_id
-            ${joinPrivateTopics()}
+            ${joinGates()}
           WHERE
             T.id IN (:threadIds)
-            ${filterPrivateTopics()}
+            ${filterGates()}
         )
         ${baseActivityQuery}
         ORDER BY ARRAY_POSITION(ARRAY[:threadIds], T.id);

@@ -5,10 +5,7 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authOptional } from '../../middleware';
-import {
-  filterPrivateTopics,
-  joinPrivateTopics,
-} from '../../utils/privateTopics';
+import { filterGates, joinGates, withGates } from '../../utils/gating';
 
 export function SearchThreads(): Query<typeof schemas.SearchThreads> {
   return {
@@ -40,6 +37,7 @@ export function SearchThreads(): Query<typeof schemas.SearchThreads> {
       };
 
       const sql = `
+${withGates(address_id)}
 SELECT 
   'thread' as type,
   T.community_id,
@@ -65,13 +63,13 @@ FROM
     "Threads" T
     JOIN "Addresses" A ON T.address_id = A.id
     JOIN "Users" U ON A.user_id = U.id
-    ${joinPrivateTopics(address_id)}
+    ${joinGates(address_id)}
     , websearch_to_tsquery('english', :search_term) as tsquery
 WHERE
   T.deleted_at IS NULL
   AND T.marked_as_spam_at IS NULL
   ${replacements.community_id ? 'AND T.community_id = :community_id' : ''} 
-  ${filterPrivateTopics(address_id)}
+  ${filterGates(address_id)}
   AND (T.title ILIKE '%' || :search_term || '%' ${!thread_title_only ? 'OR tsquery @@ T.search' : ''})
 ORDER BY
   ${order_by === 'created_at' ? `T.${order_by} ${order_direction || 'DESC'}` : `rank, T.created_at DESC`}
@@ -84,6 +82,7 @@ LIMIT :limit OFFSET :offset
         type: QueryTypes.SELECT,
         replacements,
         raw: true,
+        logging: true,
       });
 
       const totalResults = include_count

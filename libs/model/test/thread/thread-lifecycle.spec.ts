@@ -1306,7 +1306,6 @@ describe('Thread lifecycle', () => {
         },
       });
 
-      // console.log(response);
       expect(response!.results.length).to.equal(7);
     });
 

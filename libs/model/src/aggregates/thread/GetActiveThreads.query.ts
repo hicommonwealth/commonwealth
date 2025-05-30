@@ -4,10 +4,7 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authOptional } from '../../middleware';
-import {
-  filterPrivateTopics,
-  joinPrivateTopics,
-} from '../../utils/privateTopics';
+import { filterGates, joinGates, withGates } from '../../utils/gating';
 
 export function GetActiveThreads(): Query<typeof schemas.GetActiveThreads> {
   return {
@@ -19,7 +16,8 @@ export function GetActiveThreads(): Query<typeof schemas.GetActiveThreads> {
       const address_id = context?.address?.id;
 
       const sql = `
-WITH TH AS (
+${withGates(address_id)},
+TH AS (
 	SELECT
 		T.id,
 		T.title,
@@ -52,12 +50,12 @@ WITH TH AS (
       PARTITION BY T.topic_id ORDER BY T.created_at DESC,	T.last_commented_on DESC) AS topic_rank
 	FROM
 		"Threads" T
-    ${joinPrivateTopics(address_id)}
+    ${joinGates(address_id)}
 	WHERE
 		community_id = :community_id
 		AND deleted_at IS NULL
 		AND archived_at IS NULL
-		${filterPrivateTopics(address_id)}
+		${filterGates(address_id)}
 ),
 T AS ( -- select top by topic and get the thread authors and their profiles
 SELECT
