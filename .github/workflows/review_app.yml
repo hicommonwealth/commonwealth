@@ -347,6 +347,8 @@ jobs:
       - name: Terraform Plan (Cluster)
         id: plan_cluster
         working-directory: terraform
+        env:
+          TF_LOG: DEBUG
         run: |
           terraform plan \
             -target=digitalocean_kubernetes_cluster.main \
@@ -361,6 +363,8 @@ jobs:
       - name: Terraform Apply (Cluster)
         id: apply_cluster
         working-directory: terraform
+        env:
+          TF_LOG: DEBUG
         run: terraform apply -auto-approve tfplan.cluster
 
       - name: Export Kubeconfig
@@ -379,6 +383,7 @@ jobs:
         working-directory: terraform
         env:
           KUBECONFIG: ${{ github.workspace }}/terraform/kubeconfig.yaml
+          TF_LOG: DEBUG
         run: |
           export KUBECONFIG=${{ github.workspace }}/terraform/kubeconfig.yaml
           export K8S_HOST=$(yq e '.clusters[0].cluster.server' $KUBECONFIG)
@@ -398,6 +403,7 @@ jobs:
       #   working-directory: terraform
       #   env:
       #     KUBECONFIG: ${{ github.workspace }}/terraform/kubeconfig.yaml
+      #     TF_LOG: DEBUG
       #   run: terraform apply -auto-approve tfplan.k8s
 
     #   - name: Terraform Apply
