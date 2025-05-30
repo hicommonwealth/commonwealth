@@ -50,7 +50,7 @@ resource "digitalocean_kubernetes_cluster" "main" {
 
   node_pool {
     name       = "${local.name_prefix}web-pool"
-    size       = "s-1vcpu-3gb"
+    size       = "s-2vcpu-4gb"
     node_count = 1
     labels = {
       "node-type" = "web"
@@ -61,8 +61,8 @@ resource "digitalocean_kubernetes_cluster" "main" {
 resource "digitalocean_kubernetes_node_pool" "worker" {
   cluster_id = digitalocean_kubernetes_cluster.main.id
   name       = "${local.name_prefix}worker-pool"
-  size       = "s-4vcpu-8gb"
-  node_count = 3
+  size       = "s-6vcpu-16gb"
+  node_count = 2
   labels = {
     "node-type" = "worker"
   }
