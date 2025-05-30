@@ -302,24 +302,25 @@ GROUP BY
   // action not gated and public topic... allow it
   if (!topic) return;
 
-  const auth_gates = topic.gates.filter(
+  const closed_gates = topic.gates.filter(
     ({ actions, is_private, membership }) =>
       actions.includes(action) || (is_private && actions.length === 0)
-        ? membership?.is_member || false
+        ? membership?.is_member === false
         : false,
   );
-  // at least one gate is open
-  if (auth_gates.length > 0) return;
 
-  // throw with detailed rejection reasons
-  const rejects = topic.gates
-    .filter(({ membership }) => !!membership?.reject_reason)
-    .map(({ membership }) =>
-      membership!.reject_reason!.map(({ message }) => message).join('; '),
-    );
+  // throw when at least one gate is closed (AND gates)
+  if (closed_gates.length > 0) {
+    const rejects = topic.gates
+      .filter(({ membership }) => !!membership?.reject_reason)
+      .map(({ membership }) =>
+        membership!.reject_reason!.map(({ message }) => message).join('; '),
+      );
+    if (rejects.length) throw new RejectedMember(actor, rejects);
+    else throw new NonMember(actor, topic.topic_name, action);
+  }
 
-  if (rejects.length) throw new RejectedMember(actor, rejects);
-  else throw new NonMember(actor, topic.topic_name, action);
+  // all gates are open!
 }
 
 /**
