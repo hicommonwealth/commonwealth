@@ -75,6 +75,21 @@ variable "vault_token" {
   sensitive   = true
 }
 
+variable "secrets" {
+  description = "List of secrets to be managed by External Secrets"
+  type = list(object({
+    name        = string
+    target_name = string
+    data        = list(object({
+      secretKey = string
+      remoteRef = object({
+        key      = string
+        property = string
+      })
+    }))
+  }))
+}
+
 # Local values for naming resources
 locals {
   name_prefix = "${var.environment}-${var.pr_number}-"
@@ -195,7 +210,7 @@ resource "kubernetes_deployment" "web" {
             value = var.environment
           }
 
-          ports {
+          port {
             container_port = 8080
           }
         }

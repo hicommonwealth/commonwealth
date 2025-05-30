@@ -159,6 +159,7 @@ jobs:
           tags: ghcr.io/hicommonwealth/datadog-base:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/datadog-base:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/datadog-base:buildcache,mode=max
+          pull: true
 
       - name: Build and Push commonwealth base image
         uses: docker/build-push-action@v5
@@ -172,6 +173,7 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/datadog-base:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/commonwealth:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/commonwealth:buildcache,mode=max
+          pull: true
 
       - name: Build and Push Docker Image (web)
         uses: docker/build-push-action@v5
@@ -184,6 +186,7 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/web:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/web:buildcache,mode=max
+          pull: true
 
       - name: Build and Push Docker Image (consumer)
         uses: docker/build-push-action@v5
@@ -196,6 +199,7 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/consumer:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/consumer:buildcache,mode=max
+          pull: true
 
       - name: Build and Push Docker Image (discord_listener)
         uses: docker/build-push-action@v5
@@ -208,6 +212,7 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/discord_listener:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/discord_listener:buildcache,mode=max
+          pull: true
 
       - name: Build and Push Docker Image (evm_ce)
         uses: docker/build-push-action@v5
@@ -220,6 +225,7 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/evm_ce:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/evm_ce:buildcache,mode=max
+          pull: true
 
       - name: Build and Push Docker Image (graphile_worker)
         uses: docker/build-push-action@v5
@@ -232,6 +238,7 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/graphile_worker:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/graphile_worker:buildcache,mode=max
+          pull: true
 
       - name: Build and Push Docker Image (knock)
         uses: docker/build-push-action@v5
@@ -244,6 +251,7 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/knock:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/knock:buildcache,mode=max
+          pull: true
 
       - name: Build and Push Docker Image (message_relayer)
         uses: docker/build-push-action@v5
@@ -256,6 +264,7 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/message_relayer:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/message_relayer:buildcache,mode=max
+          pull: true
 
       - name: Build and Push Docker Image (release)
         uses: docker/build-push-action@v5
@@ -268,6 +277,7 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/release:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/release:buildcache,mode=max
+          pull: true
 
       - name: Build and Push Docker Image (twitter)
         uses: docker/build-push-action@v5
@@ -280,6 +290,7 @@ jobs:
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache,mode=max
+          pull: true
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
