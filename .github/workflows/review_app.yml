@@ -9,6 +9,10 @@ on:
         description: 'Pull Request Number'
         required: true
         type: number
+      commit_sha:
+        description: 'Override commit SHA for Docker builds (optional)'
+        required: false
+        type: string
 
 jobs:
   setup_review_db:
@@ -137,6 +141,15 @@ jobs:
           fi
           cp "$ENV_PATH" .env
 
+      - name: Set Effective SHA
+        id: set_effective_sha
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.commit_sha }}" ]; then
+            echo "sha=${{ github.event.inputs.commit_sha }}" >> $GITHUB_OUTPUT
+          else
+            echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and Push datadog-base image
         uses: docker/build-push-action@v5
         with:
@@ -154,7 +167,7 @@ jobs:
           file: Dockerfile.commonwealth_base
           target: commonwealth
           push: true
-          tags: ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+          tags: ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
             BASE_IMAGE=ghcr.io/hicommonwealth/datadog-base:latest
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/commonwealth:buildcache
@@ -166,9 +179,9 @@ jobs:
           context: .
           file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.web
           push: true
-          tags: ghcr.io/hicommonwealth/web:${{ github.sha }}
+          tags: ghcr.io/hicommonwealth/web:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
-            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/web:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/web:buildcache,mode=max
 
@@ -178,9 +191,9 @@ jobs:
           context: .
           file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.consumer
           push: true
-          tags: ghcr.io/hicommonwealth/consumer:${{ github.sha }}
+          tags: ghcr.io/hicommonwealth/consumer:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
-            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/consumer:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/consumer:buildcache,mode=max
 
@@ -190,9 +203,9 @@ jobs:
           context: .
           file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.discord_listener
           push: true
-          tags: ghcr.io/hicommonwealth/discord_listener:${{ github.sha }}
+          tags: ghcr.io/hicommonwealth/discord_listener:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
-            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/discord_listener:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/discord_listener:buildcache,mode=max
 
@@ -202,9 +215,9 @@ jobs:
           context: .
           file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.evm_ce
           push: true
-          tags: ghcr.io/hicommonwealth/evm_ce:${{ github.sha }}
+          tags: ghcr.io/hicommonwealth/evm_ce:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
-            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/evm_ce:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/evm_ce:buildcache,mode=max
 
@@ -214,9 +227,9 @@ jobs:
           context: .
           file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.graphile_worker
           push: true
-          tags: ghcr.io/hicommonwealth/graphile_worker:${{ github.sha }}
+          tags: ghcr.io/hicommonwealth/graphile_worker:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
-            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/graphile_worker:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/graphile_worker:buildcache,mode=max
 
@@ -226,9 +239,9 @@ jobs:
           context: .
           file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.knock
           push: true
-          tags: ghcr.io/hicommonwealth/knock:${{ github.sha }}
+          tags: ghcr.io/hicommonwealth/knock:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
-            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/knock:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/knock:buildcache,mode=max
 
@@ -238,9 +251,9 @@ jobs:
           context: .
           file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.message_relayer
           push: true
-          tags: ghcr.io/hicommonwealth/message_relayer:${{ github.sha }}
+          tags: ghcr.io/hicommonwealth/message_relayer:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
-            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/message_relayer:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/message_relayer:buildcache,mode=max
 
@@ -250,9 +263,9 @@ jobs:
           context: .
           file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.release
           push: true
-          tags: ghcr.io/hicommonwealth/release:${{ github.sha }}
+          tags: ghcr.io/hicommonwealth/release:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
-            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/release:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/release:buildcache,mode=max
 
@@ -262,9 +275,9 @@ jobs:
           context: .
           file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.twitter
           push: true
-          tags: ghcr.io/hicommonwealth/twitter:${{ github.sha }}
+          tags: ghcr.io/hicommonwealth/twitter:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
-            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ github.sha }}
+            BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache,mode=max
 
