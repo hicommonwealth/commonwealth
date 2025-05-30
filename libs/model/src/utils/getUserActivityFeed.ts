@@ -3,6 +3,7 @@ import { CommunityTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
+import { filterPrivateTopics, joinPrivateTopics } from './privateTopics';
 
 /**
  * Gets last updated threads and their recent comments
@@ -116,14 +117,14 @@ top_threads AS (
     "Threads" T
     ${user_id ? 'JOIN user_communities UC ON UC.community_id = T.community_id' : ''}
     JOIN "Communities" C ON C.id = T.community_id
-    LEFT JOIN "GroupGatedActions" GA ON T.topic_id = GA.topic_id
+    ${joinPrivateTopics()}
   WHERE
-    COALESCE(GA.is_private, FALSE) = FALSE -- only include public gates
-    AND T.deleted_at IS NULL 
+    T.deleted_at IS NULL 
     AND T.marked_as_spam_at IS NULL 
     AND C.active IS TRUE 
     AND C.tier != ${CommunityTierMap.SpamCommunity}
     AND C.id NOT IN ('ethereum', 'cosmos', 'polkadot')
+    ${filterPrivateTopics()}
   ORDER BY
     T.activity_rank_date DESC NULLS LAST
   LIMIT :limit OFFSET :offset 

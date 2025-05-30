@@ -5,7 +5,10 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authOptional } from '../../middleware';
-import { PrivateTopics } from '../../utils/privateTopics';
+import {
+  filterPrivateTopics,
+  joinPrivateTopics,
+} from '../../utils/privateTopics';
 
 export function SearchThreads(): Query<typeof schemas.SearchThreads> {
   return {
@@ -23,40 +26,17 @@ export function SearchThreads(): Query<typeof schemas.SearchThreads> {
         order_direction,
         include_count,
       } = payload;
+      const address_id = context?.address?.id;
 
-      // sort by rank by default
-      let sortOptions: schemas.PaginationSqlOptions = {
-        limit: limit || 10,
-        page: cursor || 1,
-        orderDirection: order_direction || 'DESC',
-      };
-      switch (order_by) {
-        case 'created_at':
-          sortOptions = {
-            ...sortOptions,
-            orderBy: `T.${order_by}`,
-          };
-          break;
-        default:
-          sortOptions = {
-            ...sortOptions,
-            orderBy: `rank`,
-            orderBySecondary: `T.created_at`,
-            orderDirectionSecondary: 'DESC',
-          };
-      }
-
-      const { sql: paginationSort, bind: paginationBind } =
-        schemas.buildPaginationSql(sortOptions);
-
-      const bind = {
-        address_id: context?.address?.id || -1,
-        community:
+      const replacements = {
+        address_id,
+        community_id:
           community_id && community_id !== ALL_COMMUNITIES
             ? community_id
             : undefined,
-        searchTerm: search_term,
-        ...paginationBind,
+        search_term,
+        limit,
+        offset: limit * (cursor - 1),
       };
 
       const sql = `
@@ -85,24 +65,26 @@ FROM
     "Threads" T
     JOIN "Addresses" A ON T.address_id = A.id
     JOIN "Users" U ON A.user_id = U.id
-    LEFT JOIN ${PrivateTopics} ON T.topic_id = PrivateTopics.topic_id
-    , websearch_to_tsquery('english', $searchTerm) as tsquery
+    ${joinPrivateTopics(address_id)}
+    , websearch_to_tsquery('english', :search_term) as tsquery
 WHERE
-  COALESCE(PrivateTopics.address_id, $address_id) = $address_id AND   
-  T.deleted_at IS NULL AND
-  T.marked_as_spam_at IS NULL
-  ${bind.community ? 'AND T.community_id = $community' : ''} 
-  AND (T.title ILIKE '%' || $searchTerm || '%' 
-  ${!thread_title_only ? 'OR tsquery @@ T.search' : ''})
-${paginationSort}
+  T.deleted_at IS NULL
+  AND T.marked_as_spam_at IS NULL
+  ${replacements.community_id ? 'AND T.community_id = :community_id' : ''} 
+  ${filterPrivateTopics(address_id)}
+  AND (T.title ILIKE '%' || :search_term || '%' ${!thread_title_only ? 'OR tsquery @@ T.search' : ''})
+ORDER BY
+  ${order_by === 'created_at' ? `T.${order_by} ${order_direction || 'DESC'}` : `rank, T.created_at DESC`}
+LIMIT :limit OFFSET :offset
 `;
 
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ThreadView> & { total_count: number }
       >(sql, {
-        bind,
         type: QueryTypes.SELECT,
+        replacements,
         raw: true,
+        logging: true,
       });
 
       const totalResults = include_count
@@ -111,7 +93,10 @@ ${paginationSort}
           : 0
         : results.length;
 
-      return schemas.buildPaginatedResponse(results, totalResults, bind);
+      return schemas.buildPaginatedResponse(results, totalResults, {
+        cursor,
+        limit,
+      });
     },
   };
 }

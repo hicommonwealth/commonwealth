@@ -4,7 +4,10 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authOptional } from '../../middleware';
-import { PrivateTopics } from '../../utils/privateTopics';
+import {
+  filterPrivateTopics,
+  joinPrivateTopics,
+} from '../../utils/privateTopics';
 
 export function GetActiveThreads(): Query<typeof schemas.GetActiveThreads> {
   return {
@@ -13,6 +16,7 @@ export function GetActiveThreads(): Query<typeof schemas.GetActiveThreads> {
     secure: true,
     body: async ({ context, payload }) => {
       const { community_id, threads_per_topic, withXRecentComments } = payload;
+      const address_id = context?.address?.id;
 
       const sql = `
 WITH TH AS (
@@ -45,15 +49,15 @@ WITH TH AS (
 		T.address_id,
 		T.reaction_count,
 		row_number() OVER (
-      PARTITION BY T.topic_id ORDER BY created_at DESC,	last_commented_on DESC) AS topic_rank
+      PARTITION BY T.topic_id ORDER BY T.created_at DESC,	T.last_commented_on DESC) AS topic_rank
 	FROM
 		"Threads" T
-    LEFT JOIN ${PrivateTopics} ON T.topic_id = PrivateTopics.topic_id
+    ${joinPrivateTopics(address_id)}
 	WHERE
 		community_id = :community_id
-		AND COALESCE(PrivateTopics.address_id, :address_id) = :address_id
 		AND deleted_at IS NULL
 		AND archived_at IS NULL
+		${filterPrivateTopics(address_id)}
 ),
 T AS ( -- select top by topic and get the thread authors and their profiles
 SELECT
@@ -165,7 +169,7 @@ SELECT
         {
           replacements: {
             community_id,
-            address_id: context?.address?.id || -1, // only match nulls
+            address_id,
             threads_per_topic: threads_per_topic || 3,
             withXRecentComments,
           },

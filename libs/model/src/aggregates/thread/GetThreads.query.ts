@@ -4,7 +4,10 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authOptional } from '../../middleware';
-import { PrivateTopics } from '../../utils/privateTopics';
+import {
+  filterPrivateTopics,
+  joinPrivateTopics,
+} from '../../utils/privateTopics';
 
 export function GetThreads(): Query<typeof schemas.GetThreads> {
   return {
@@ -26,6 +29,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         status,
         withXRecentComments = 0,
       } = payload;
+      const address_id = context?.address?.id;
 
       if (stage && status)
         throw new InvalidInput('Cannot provide both stage and status');
@@ -45,7 +49,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         from_date,
         to_date: to_date || new Date().toISOString(),
         community_id,
-        address_id: context?.address?.id || -1, // only match nulls
+        address_id,
         stage,
         topic_id,
         contestAddress,
@@ -68,10 +72,8 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         pastWinners: ' AND CON.end_time <= NOW()',
         all: '',
       };
-      const threads = await models.sequelize.query<
-        z.infer<typeof schemas.ThreadView>
-      >(
-        `
+
+      const sql = `
             WITH contest_ids as (
               SELECT DISTINCT(CA.thread_id)
               FROM "Contests" CON
@@ -115,18 +117,19 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 (COUNT(id) OVER())::INTEGER AS total_num_thread_results
               FROM
                 "Threads" T
-                LEFT JOIN ${PrivateTopics} ON T.topic_id = PrivateTopics.topic_id
+                ${joinPrivateTopics(address_id)}
               WHERE
-                community_id = :community_id AND
-                COALESCE(PrivateTopics.address_id, :address_id) = :address_id AND
-                deleted_at IS NULL AND
-                archived_at IS ${archived ? 'NOT' : ''} NULL
+                community_id = :community_id
+                AND deleted_at IS NULL
+                AND archived_at IS ${archived ? 'NOT' : ''} NULL
+                ${filterPrivateTopics(address_id)}
                 ${topic_id ? ' AND T.topic_id = :topic_id' : ''}
                 ${stage ? ' AND stage = :stage' : ''}
                 ${from_date ? ' AND T.created_at > :from_date' : ''}
                 ${to_date ? ' AND T.created_at < :to_date' : ''}
                 ${contestAddress ? ' AND id IN (SELECT * FROM "contest_ids")' : ''}
-              ORDER BY pinned DESC, ${orderByQueries[order_by ?? 'newest']}
+              ORDER BY
+                pinned DESC, ${orderByQueries[order_by ?? 'newest']}
               LIMIT :limit OFFSET :offset
             ), thread_metadata AS ( -- get the thread authors and their profiles
               SELECT
@@ -272,12 +275,14 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
             ? `LEFT JOIN recent_comments RC ON TT.id = RC.thread_id;`
             : ''
         }
-      `,
-        {
-          replacements,
-          type: QueryTypes.SELECT,
-        },
-      );
+      `;
+
+      const threads = await models.sequelize.query<
+        z.infer<typeof schemas.ThreadView>
+      >(sql, {
+        replacements,
+        type: QueryTypes.SELECT,
+      });
 
       return schemas.buildPaginatedResponse(
         threads,
