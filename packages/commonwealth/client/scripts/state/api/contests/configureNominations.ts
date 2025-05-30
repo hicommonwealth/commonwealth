@@ -35,23 +35,24 @@ const configureNominations = async ({
     maxNominations,
   );
 
-  const { mutate: configureNominationsMetadata } =
-    trpc.contest.configureNominationsMetadata.useMutation();
-
-  const communityId = app.activeChainId();
-  if (communityId) {
-    await configureNominationsMetadata({
-      community_id: communityId,
-      judge_token_id: judgeId,
-    });
-  }
-
-  return txReceipt;
+  return { txReceipt, judgeId };
 };
 
 const useConfigureNominationsMutation = () => {
+  const { mutate: configureNominationsMetadata } =
+    trpc.contest.configureNominationsMetadata.useMutation();
+
   return useMutation({
     mutationFn: configureNominations,
+    onSuccess: (data) => {
+      const communityId = app.activeChainId();
+      if (communityId) {
+        configureNominationsMetadata({
+          community_id: communityId,
+          judge_token_id: data.judgeId,
+        });
+      }
+    },
   });
 };
 

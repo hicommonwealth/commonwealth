@@ -128,8 +128,10 @@ export const ReactionButton = ({
           notifyError(
             'You must have the requisite tokens to upvote in this topic',
           );
-        } else if (e.message.includes('Must be a judge')) {
-          notifyError('You must be a judge contest to upvote');
+        } else if (e.message.includes('Must be judge')) {
+          notifyError(
+            'You must be a judge contest to upvote. Ask community admin for nomination',
+          );
         } else if (e.message.includes('Insufficient balance')) {
           notifyError('You must have the requisite tokens to upvote');
         } else {
