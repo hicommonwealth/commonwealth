@@ -42,9 +42,14 @@ export const getTotalContestBalance = async (
   let useFeeManager = false;
   let feeManagerAddressPromise: Promise<`0x${string}`> | undefined;
   if (!oneOff) {
-    useFeeManager = await contestContract.read.useFeeManager();
-    if (useFeeManager) {
-      feeManagerAddressPromise = contestContract.read.FeeMangerAddress();
+    try {
+      useFeeManager = await contestContract.read.useFeeManager();
+      if (useFeeManager) {
+        feeManagerAddressPromise = contestContract.read.FeeMangerAddress();
+      }
+    } catch (err) {
+      console.warn(`Error using fee manager ${(err as Error).message}`);
+      useFeeManager = false;
     }
   }
 
