@@ -18,6 +18,7 @@ export const actionCopies = {
     ['XpChainEventCreated']: 'Engage on Blockchain',
     ['LaunchpadTokenCreated']: 'Launch a Token on Common',
     ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
+    ['OneOffContestManagerDeployed']: 'Create a 1-time contest',
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: () => '',
@@ -33,10 +34,11 @@ export const actionCopies = {
       `Requires Twitter/X profile linked to ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
     ['DiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
-    ['MembershipsRefreshed']: () => '',
+    ['MembershipsRefreshed']: '',
     ['XpChainEventCreated']: () => '',
-    ['LaunchpadTokenCreated']: () => '',
     ['LaunchpadTokenTraded']: () => '',
+    ['LaunchpadTokenCreated']: '',
+    ['OneOffContestManagerDeployed']: '',
   },
   explainer: {
     ['SignUpFlowCompleted']: () => '',
@@ -136,6 +138,16 @@ export const actionCopies = {
         </ul>
       </div>
     ),
+    // eslint-disable-next-line react/no-multi-comp
+    ['OneOffContestManagerDeployed']: () => (
+      <div>
+        <ul>
+          <li>● Contest must be funded with a prize pool</li>
+          <li>● Aura is awarded when the contest is successfully deployed</li>
+          <li>● Only the contest creator receives Aura for this action</li>
+        </ul>
+      </div>
+    ),
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -154,5 +166,6 @@ export const actionCopies = {
     ['XpChainEventCreated']: '',
     ['LaunchpadTokenCreated']: '',
     ['LaunchpadTokenTraded']: '',
+    ['OneOffContestManagerDeployed']: '',
   },
 };

@@ -304,6 +304,19 @@ const QuestDetails = ({ id }: { id: number }) => {
         navigate(`/createTokenCommunity`, {}, null);
         break;
       }
+      case 'OneOffContestManagerDeployed': {
+        if (quest.community_id) {
+          navigate(
+            `/${quest.community_id}/contests/launch`,
+            {},
+            quest.community_id || null,
+          );
+        } else {
+          // If no community context, navigate to community selection for contest creation
+          navigate('/explore?tab=communities', {}, null);
+        }
+        break;
+      }
       case 'LaunchpadTokenTraded': {
         if (quest.community_id) {
           navigate(`/${quest.community_id}/discussions`, {}, null);
