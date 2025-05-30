@@ -102,6 +102,7 @@ export const GetCommunity = {
 
 export const TopicPermissionsView = z.object({
   id: z.number(),
+  is_private: z.boolean(),
   permissions: z.array(z.nativeEnum(GatedActionEnum)),
 });
 
@@ -338,6 +339,7 @@ export const GroupView = Group.omit({ GroupGatedActions: true }).extend({
   ),
   topics: z.array(
     TopicView.omit({ total_threads: true }).extend({
+      is_private: z.boolean(),
       permissions: z.array(z.nativeEnum(GatedActionEnum)),
     }),
   ),
