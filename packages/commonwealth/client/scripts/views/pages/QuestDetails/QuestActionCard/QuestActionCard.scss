@@ -76,6 +76,12 @@
           color: $neutral-700;
         }
 
+        li {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+        }
+
         .points-row {
           display: flex;
           gap: 12px;

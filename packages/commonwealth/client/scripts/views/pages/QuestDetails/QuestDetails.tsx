@@ -312,6 +312,14 @@ const QuestDetails = ({ id }: { id: number }) => {
         navigate(`/explore?tab=tokens`);
         break;
       }
+      case 'CommunityGoalReached': {
+        if (quest.community_id) {
+          navigate(`/${quest.community_id}/discussions`, {}, null);
+          return;
+        }
+        navigate(`/explore?tab=communities`);
+        break;
+      }
       default:
         return;
     }
