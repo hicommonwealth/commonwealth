@@ -2,7 +2,7 @@ import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import NodeInfo from 'models/NodeInfo';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { fetchNodes } from 'state/api/nodes';
 import useUserStore from 'state/ui/user';
@@ -37,13 +37,15 @@ const useCommonTradeTokenForm = ({
   const [selectedAddress, setSelectedAddress] = useState<string>();
 
   // base chain node info
-  const [baseNode, setBaseNode] = useState<NodeInfo>();
+  const [baseNode, setBaseNode] = useState<NodeInfo | undefined>();
   useEffect(() => {
     fetchNodes()
       .then((nodes) =>
         setBaseNode(
           nodes.find(
-            (n) => n.ethChainId === parseInt(process.env.LAUNCHPAD_CHAIN_ID || '8453'),
+            (n) =>
+              n.ethChainId ===
+              parseInt(process.env.LAUNCHPAD_CHAIN_ID || '8453'),
           ) as NodeInfo,
         ),
       )
