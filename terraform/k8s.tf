@@ -13,28 +13,16 @@ variable "k8s_ca" {
   type        = string
 }
 
-variable "image_tag" {
-  description = "Docker image tag (usually the commit SHA)"
-  type        = string
-  default     = "latest"
-}
-
-variable "pr_number" {
-  description = "PR number for environment naming"
-  type        = string
-  default     = "dev"
-}
-
-variable "environment" {
-  description = "Environment name (e.g., pr, dev, staging, prod)"
-  type        = string
-  default     = "pr"
-}
-
 variable "vault_token" {
   description = "Vault token for External Secrets Operator"
   type        = string
   sensitive   = true
+}
+
+variable "image_tag" {
+  description = "Docker image tag (usually the commit SHA)"
+  type        = string
+  default     = "latest"
 }
 
 variable "secrets" {
@@ -355,4 +343,4 @@ output "environment_info" {
     namespace   = kubernetes_namespace.cw.metadata[0].name
   }
   description = "Information about the deployed environment"
-} 
+}
