@@ -67,6 +67,15 @@ export function CreateContestManagerMetadata(): Command<
             },
             { transaction },
           );
+
+          // Clear the pending judge token ID from the community since it's now used by the contest
+          if (payload.namespace_judge_token_id) {
+            await models.Community.update(
+              { pending_namespace_judge_token_id: null },
+              { where: { id: community_id }, transaction },
+            );
+          }
+
           return manager;
         },
       );
