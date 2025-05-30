@@ -1,3 +1,5 @@
+import { APIOrderDirection } from 'helpers/constants';
+
 export enum TokenSortOptions {
   MostRecent = 'Most Recent',
   MarketCap = 'Market Cap',
@@ -8,6 +10,11 @@ export enum TokenSortDirections {
   Ascending = 'Ascending',
   Descending = 'Descending',
 }
+
+export const TokenSortDirectionsToEnumMap = {
+  [TokenSortDirections.Ascending]: APIOrderDirection.Asc,
+  [TokenSortDirections.Descending]: APIOrderDirection.Desc,
+};
 
 export type TokenFilters = {
   withTokenSortBy?: TokenSortOptions;

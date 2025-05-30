@@ -21,6 +21,7 @@ import TokenCard from '../../../components/TokenCard';
 import FiltersDrawer, {
   TokenFilters,
   TokenSortDirections,
+  TokenSortDirectionsToEnumMap,
   TokenSortOptions,
   tokenSortOptionsLabelToKeysMap,
 } from './FiltersDrawer';
@@ -77,6 +78,10 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
 
       return undefined;
     })(),
+    order_direction:
+      TokenSortDirectionsToEnumMap[
+        filters.withTokenSortOrder || TokenSortDirections.Descending
+      ],
     enabled: launchpadEnabled,
   });
   const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
