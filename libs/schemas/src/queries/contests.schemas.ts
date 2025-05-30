@@ -63,6 +63,9 @@ export const GetActiveContestManagers = {
         'demo',
         'production',
       ]),
+      namespace_judge_token_id: z.number().nullish(),
+      namespace_judges: z.array(z.string()).nullish(),
+      funding_token_address: z.string().nullish(),
     }),
   ),
 };

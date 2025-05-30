@@ -76,10 +76,6 @@ const MembersSection = ({
     includeGroups: true,
   });
 
-  const chainRpc =
-    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url || '';
-  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
-  const namespace = community?.namespace || '';
   const chainId = community?.id || app.activeChainId() || '';
 
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
@@ -217,9 +213,6 @@ const MembersSection = ({
             }}
             Addresses={selectedUserAddresses}
             refetch={refetch}
-            namespace={namespace}
-            chainRpc={chainRpc}
-            ethChainId={ethChainId}
             chainId={chainId}
             communityNamespace={!!community?.namespace}
           />
