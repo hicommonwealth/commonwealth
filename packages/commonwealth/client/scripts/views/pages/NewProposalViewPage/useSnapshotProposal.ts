@@ -37,17 +37,23 @@ export const useSnapshotProposal = ({
   const [isLoading, setIsLoading] = useState(true);
 
   const user = useUserStore();
-  const { data: spaceData, isLoading: isSpaceLoading } =
-    useGetSnapshotSpaceQuery({
-      space: snapshotId,
-      enabled: enabled,
-    });
+  const {
+    data: spaceData,
+    isLoading: isSpaceLoading,
+    error: spaceDataError,
+  } = useGetSnapshotSpaceQuery({
+    space: snapshotId,
+    enabled: enabled,
+  });
 
-  const { data: proposalsData, isLoading: isProposalsLoading } =
-    useGetSnapshotProposalsQuery({
-      space: snapshotId,
-      enabled: enabled,
-    });
+  const {
+    data: proposalsData,
+    isLoading: isProposalsLoading,
+    error: proposalLoadingError,
+  } = useGetSnapshotProposalsQuery({
+    space: snapshotId,
+    enabled: enabled,
+  });
 
   const {
     data: threadsData,
@@ -165,6 +171,11 @@ export const useSnapshotProposal = ({
     totals,
     proposalAuthor,
     activeUserAddress,
+    error:
+      proposalLoadingError ||
+      spaceDataError ||
+      proposalLoadingError ||
+      threadsError,
     loadVotes: () => loadVotes(identifier),
   };
 };
