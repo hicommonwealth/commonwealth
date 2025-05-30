@@ -35,9 +35,12 @@ const configureNominations = async ({
     maxNominations,
   );
 
+  const { mutate: configureNominationsMetadata } =
+    trpc.contest.configureNominationsMetadata.useMutation();
+
   const communityId = app.activeChainId();
   if (communityId) {
-    await trpc.contest.configureNominationsMetadata.mutate({
+    await configureNominationsMetadata({
       community_id: communityId,
       judge_token_id: judgeId,
     });

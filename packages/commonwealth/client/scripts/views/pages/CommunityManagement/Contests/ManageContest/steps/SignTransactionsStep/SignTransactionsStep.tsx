@@ -100,17 +100,6 @@ const SignTransactionsStep = ({
     enabled: !!communityId,
   });
 
-  const judgeIdToUse = useMemo(() => {
-    if (judgedContest && community?.pending_namespace_judge_token_id) {
-      return community.pending_namespace_judge_token_id;
-    }
-    return (judgeStatus?.current_judge_id || 100) + 1;
-  }, [
-    judgedContest,
-    community?.pending_namespace_judge_token_id,
-    judgeStatus?.current_judge_id,
-  ]);
-
   const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
@@ -128,6 +117,17 @@ const SignTransactionsStep = ({
   const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
   const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
   const walletAddress = user.activeAccount?.address || '';
+
+  const judgeIdToUse = useMemo(() => {
+    if (judgedContest && community?.pending_namespace_judge_token_id) {
+      return community.pending_namespace_judge_token_id;
+    }
+    return (judgeStatus?.current_judge_id || 100) + 1;
+  }, [
+    judgedContest,
+    community?.pending_namespace_judge_token_id,
+    judgeStatus?.current_judge_id,
+  ]);
 
   const signTransaction = async () => {
     const contestLength = devContest
