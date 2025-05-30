@@ -3,7 +3,7 @@ import NodeInfo, { ChainNode } from 'models/NodeInfo';
 import { BASE_API_PATH, trpc } from 'utils/trpcClient';
 import { queryClient } from '../config';
 
-const NODES_STALE_TIME = 3 * 60 * 1_000; // 3 min
+const NODES_STALE_TIME = Infinity;
 const NODES_CACHE_TIME = Infinity;
 
 // this is a default query that should be used to get list of nodes
