@@ -234,44 +234,44 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/consumer:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/consumer:buildcache,mode=max
 
-      - name: Build and Push Docker Image (discord_listener)
+      - name: Build and Push Docker Image (discord-listener)
         if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.discord_listener
           push: true
-          tags: ghcr.io/hicommonwealth/discord_listener:${{ steps.set_effective_sha.outputs.sha }}
+          tags: ghcr.io/hicommonwealth/discord-listener:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
-          cache-from: type=registry,ref=ghcr.io/hicommonwealth/discord_listener:buildcache
-          cache-to: type=registry,ref=ghcr.io/hicommonwealth/discord_listener:buildcache,mode=max
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/discord-listener:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/discord-listener:buildcache,mode=max
 
-      - name: Build and Push Docker Image (evm_ce)
+      - name: Build and Push Docker Image (evm-ce)
         if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.evm_ce
           push: true
-          tags: ghcr.io/hicommonwealth/evm_ce:${{ steps.set_effective_sha.outputs.sha }}
+          tags: ghcr.io/hicommonwealth/evm-ce:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
-          cache-from: type=registry,ref=ghcr.io/hicommonwealth/evm_ce:buildcache
-          cache-to: type=registry,ref=ghcr.io/hicommonwealth/evm_ce:buildcache,mode=max
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/evm-ce:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/evm-ce:buildcache,mode=max
 
-      - name: Build and Push Docker Image (graphile_worker)
+      - name: Build and Push Docker Image (graphile-worker)
         if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.graphile_worker
           push: true
-          tags: ghcr.io/hicommonwealth/graphile_worker:${{ steps.set_effective_sha.outputs.sha }}
+          tags: ghcr.io/hicommonwealth/graphile-worker:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
-          cache-from: type=registry,ref=ghcr.io/hicommonwealth/graphile_worker:buildcache
-          cache-to: type=registry,ref=ghcr.io/hicommonwealth/graphile_worker:buildcache,mode=max
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/graphile-worker:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/graphile-worker:buildcache,mode=max
 
       - name: Build and Push Docker Image (knock)
         if: steps.check_base_image.outputs.exists == 'false'
@@ -286,18 +286,18 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/knock:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/knock:buildcache,mode=max
 
-      - name: Build and Push Docker Image (message_relayer)
+      - name: Build and Push Docker Image (message-relayer)
         if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./packages/commonwealth/deploy/dockerfiles/Dockerfile.message_relayer
           push: true
-          tags: ghcr.io/hicommonwealth/message_relayer:${{ steps.set_effective_sha.outputs.sha }}
+          tags: ghcr.io/hicommonwealth/message-relayer:${{ steps.set_effective_sha.outputs.sha }}
           build-args: |
             BASE_IMAGE=ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }}
-          cache-from: type=registry,ref=ghcr.io/hicommonwealth/message_relayer:buildcache
-          cache-to: type=registry,ref=ghcr.io/hicommonwealth/message_relayer:buildcache,mode=max
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/message-relayer:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/message-relayer:buildcache,mode=max
 
       - name: Build and Push Docker Image (release)
         if: steps.check_base_image.outputs.exists == 'false'
@@ -338,24 +338,67 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Terraform Init with PR-specific state
-        id: init
+      - name: Terraform Init (Cluster)
+        id: init_cluster
         working-directory: terraform
         run: |
-          PR_NUMBER="${{ steps.set_pr_number.outputs.pr_number }}"
-          terraform init \
-            -backend-config="key=commonwealth-pr-environments/pr-${PR_NUMBER}/terraform.tfstate"
+          terraform init -backend-config="key=commonwealth-pr-environments/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
 
-      - name: Terraform Plan
-        id: plan
+      - name: Terraform Plan (Cluster)
+        id: plan_cluster
         working-directory: terraform
         run: |
           terraform plan \
-            -var="do_token=${{ secrets.DO_REVIEW_APPS_API_KEY }}" -var="vault_token=${{ secrets.VAULT_TOKEN }}" \
+            -target=digitalocean_kubernetes_cluster.main \
+            -target=digitalocean_kubernetes_node_pool.worker \
+            -var="do_token=${{ secrets.DO_REVIEW_APPS_API_KEY }}" \
+            -var="vault_token=${{ secrets.VAULT_TOKEN }}" \
+            -var="pr_number=${{ steps.set_pr_number.outputs.pr_number }}" \
+            -var="environment=pr" \
+            -var="region=us-east-1" \
+            -out=tfplan.cluster
+
+      - name: Terraform Apply (Cluster)
+        id: apply_cluster
+        working-directory: terraform
+        run: terraform apply -auto-approve tfplan.cluster
+
+      - name: Export Kubeconfig
+        id: export_kubeconfig
+        working-directory: terraform
+        run: terraform output -raw kubeconfig > kubeconfig.yaml
+
+      - name: Terraform Init (K8s)
+        id: init_k8s
+        working-directory: terraform
+        run: |
+          terraform init -backend-config="key=commonwealth-pr-environments/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
+
+      - name: Terraform Plan (K8s)
+        id: plan_k8s
+        working-directory: terraform
+        env:
+          KUBECONFIG: ${{ github.workspace }}/terraform/kubeconfig.yaml
+        run: |
+          export KUBECONFIG=${{ github.workspace }}/terraform/kubeconfig.yaml
+          export K8S_HOST=$(yq e '.clusters[0].cluster.server' $KUBECONFIG)
+          export K8S_TOKEN=$(yq e '.users[0].user.token' $KUBECONFIG)
+          export K8S_CA=$(yq e '.clusters[0].cluster.certificate-authority-data' $KUBECONFIG)
+          terraform plan \
+            -var="k8s_host=$K8S_HOST" \
+            -var="k8s_token=$K8S_TOKEN" \
+            -var="k8s_ca=$K8S_CA" \
             -var="image_tag=${{ steps.set_effective_sha.outputs.sha }}" \
             -var="pr_number=${{ steps.set_pr_number.outputs.pr_number }}" \
-            -out=tfplan
-        continue-on-error: false
+            -var="environment=pr" \
+            -out=tfplan.k8s
+
+      # - name: Terraform Apply (K8s)
+      #   id: apply_k8s
+      #   working-directory: terraform
+      #   env:
+      #     KUBECONFIG: ${{ github.workspace }}/terraform/kubeconfig.yaml
+      #   run: terraform apply -auto-approve tfplan.k8s
 
     #   - name: Terraform Apply
     #     id: apply
