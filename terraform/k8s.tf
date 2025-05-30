@@ -41,7 +41,6 @@ variable "secrets" {
 }
 
 locals {
-  name_prefix = "${var.environment}-${var.pr_number}-"
   worker_images = [
     "twitter",
     "message-relayer",
