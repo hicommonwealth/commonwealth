@@ -66,7 +66,6 @@ const {
   updateContestMetadata,
   cancelContestMetadata,
   deleteContestMetadata,
-  farcasterWebhook,
 } = contest.trpcRouter;
 const { createToken, createTrade, getLaunchpadTrades, getTokenInfoAlchemy } =
   launchpad.trpcRouter;
@@ -118,12 +117,6 @@ const api = {
   getContestLog: trpc.query(Contest.GetContestLog, trpc.Tag.Contest, {
     forceSecure: true,
   }),
-  getFarcasterCasts: trpc.query(
-    Contest.GetFarcasterContestCasts,
-    trpc.Tag.Contest,
-    { forceSecure: true },
-  ),
-  farcasterWebhook,
   getJudgeStatus: trpc.query(Contest.GetJudgeStatus, trpc.Tag.Contest, {
     forceSecure: true,
   }),
