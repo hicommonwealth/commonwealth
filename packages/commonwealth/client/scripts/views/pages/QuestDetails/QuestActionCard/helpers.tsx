@@ -16,7 +16,7 @@ export const actionCopies = {
     ['DiscordServerJoined']: 'Join Discord Community',
     ['MembershipsRefreshed']: 'Join a Group',
     ['XpChainEventCreated']: 'Engage on Blockchain',
-    ['LaunchpadTokenCreated']: 'Launch a Token on Common',
+    ['LaunchpadTokenRecordCreated']: 'Launch a Token on Common',
     ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
   },
   pre_reqs: {
@@ -35,7 +35,7 @@ export const actionCopies = {
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
     ['MembershipsRefreshed']: () => '',
     ['XpChainEventCreated']: () => '',
-    ['LaunchpadTokenCreated']: () => '',
+    ['LaunchpadTokenRecordCreated']: () => '',
     ['LaunchpadTokenTraded']: () => '',
   },
   explainer: {
@@ -107,7 +107,7 @@ export const actionCopies = {
         </ul>
       </div>
     ),
-    ['LaunchpadTokenCreated']: () => '',
+    ['LaunchpadTokenRecordCreated']: () => '',
     // eslint-disable-next-line react/no-multi-comp
     ['LaunchpadTokenTraded']: (
       amountMultipler: string | number,
@@ -152,7 +152,7 @@ export const actionCopies = {
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
     ['XpChainEventCreated']: '',
-    ['LaunchpadTokenCreated']: '',
+    ['LaunchpadTokenRecordCreated']: '',
     ['LaunchpadTokenTraded']: '',
   },
 };
