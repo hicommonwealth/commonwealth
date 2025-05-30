@@ -6,7 +6,7 @@ import { useCallback } from 'react';
 import { useSignIn } from 'state/api/user';
 import { PrivySignInSSOProvider } from 'views/components/Privy/types';
 import { useIdentityTokenRef } from 'views/components/Privy/useIdentityTokenRef';
-import { useSignMessageMemo } from 'views/components/Privy/useSignMessageMemo';
+import { useSignMessageWithRequestMemo } from 'views/components/Privy/useSignMessageWithRequestMemo';
 
 type UsePrivySignOnProps = {
   onSuccess: (address: string, isNewlyCreated: boolean) => void;
@@ -18,7 +18,7 @@ type UsePrivySignOnProps = {
 
 export function usePrivySignOn() {
   const { signIn } = useSignIn();
-  const signMessage = useSignMessageMemo();
+  const signMessage = useSignMessageWithRequestMemo();
   const identityTokenRef = useIdentityTokenRef();
 
   return useCallback(

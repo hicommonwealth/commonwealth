@@ -1,20 +1,29 @@
 import { useCallback } from 'react';
 import { useConnectedWallet } from 'views/components/Privy/useConnectedWallet';
 
+type Input = {
+  message: string;
+};
+
+type Output = {
+  signature: string;
+};
+
 export function useSignMessageWithRequestMemo() {
   const wallet = useConnectedWallet();
 
   return useCallback(
-    async (message: string): Promise<{ signature: string }> => {
+    async (input: Input, uiOpts?: any): Promise<Output> => {
       if (!wallet) {
         throw new Error('No connected wallet');
       }
 
       const provider = await wallet?.getEthereumProvider();
 
+      console.log('FIXME: calling personal sign. ');
       const signature = await provider.request({
         method: 'personal_sign',
-        params: [message, wallet.address],
+        params: [input.message, wallet.address],
       });
 
       if (typeof signature === 'string') {
