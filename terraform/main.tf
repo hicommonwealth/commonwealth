@@ -102,7 +102,6 @@ resource "digitalocean_kubernetes_cluster" "main" {
   region  = var.region
   version = "1.32.2-do.1"
 
-  # Web node pool - smaller since we only need 1 pod
   node_pool {
     name = "${local.name_prefix}web-pool"
     size = "s-1vcpu-3gb"  # 1 vCPU, 3GB memory (smallest DO size that meets requirements)
@@ -111,20 +110,21 @@ resource "digitalocean_kubernetes_cluster" "main" {
       "node-type" = "web"
     }
   }
+}
 
-  # Worker node pool - sized for worker requirements
-  node_pool {
-    name = "${local.name_prefix}worker-pool"
-    size = "s-4vcpu-8gb"  # 4 vCPUs, 8GB memory (good fit for 3-4 worker pods)
-    node_count = 3              # 3 nodes can fit all 7 workers (with ~2 workers per node)
-    labels = {
-      "node-type" = "worker"
-    }
-    taint {
-      key    = "workload"
-      value  = "worker"
-      effect = "NoSchedule"
-    }
+# Worker node pool
+resource "digitalocean_kubernetes_node_pool" "worker" {
+  cluster_id = digitalocean_kubernetes_cluster.main.id
+  name       = "${local.name_prefix}worker-pool"
+  size       = "s-4vcpu-8gb"  # 4 vCPUs, 8GB memory (good fit for 3-4 worker pods)
+  node_count = 3              # 3 nodes can fit all 7 workers (with ~2 workers per node)
+  labels = {
+    "node-type" = "worker"
+  }
+  taint {
+    key    = "workload"
+    value  = "worker"
+    effect = "NoSchedule"
   }
 }
 
