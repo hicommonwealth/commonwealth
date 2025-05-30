@@ -1,4 +1,3 @@
-import { APIOrderBy } from 'helpers/constants';
 import React, { useState } from 'react';
 import { components } from 'react-select';
 import { useSearchCommunitiesQuery } from 'state/api/communities';
@@ -36,7 +35,6 @@ const CWCommunityInput = (props: CWCommunityInputProps) => {
     search: debouncedSearchTerm.trim(), // we want to display the common community as a default
     limit: debouncedSearchTerm === DEFAULT_COMMUNITY_SEARCH ? 1 : 50,
     cursor: 1,
-    order_by: APIOrderBy.Rank,
     enabled: debouncedSearchTerm.trim().length > 0,
   });
   const communities = (communityResults?.pages || []).flatMap(
