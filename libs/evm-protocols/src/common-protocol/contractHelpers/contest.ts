@@ -17,10 +17,13 @@ import {
   HttpTransport,
   PublicClient,
   TransactionReceipt,
+  createPublicClient,
   getContract,
+  http,
 } from 'viem';
 import {
   EvmProtocolChain,
+  ViemChains,
   getPublicClient,
   getWalletClient,
   mapToAbiRes,
@@ -32,44 +35,51 @@ export const getTotalContestBalance = async (
   client: PublicClient<HttpTransport, Chain>,
   oneOff?: boolean,
 ): Promise<string> => {
-  // NOTE: only recurring contests have a fee manager
   const contestContract = getContract({
     address: contestAddress as `0x${string}`,
     abi: oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
     client,
   });
 
-  let useFeeManager = false;
-  let feeManagerAddressPromise: Promise<`0x${string}`> | undefined;
-  if (!oneOff) {
-    useFeeManager = await contestContract.read.useFeeManager();
-    if (useFeeManager) {
-      feeManagerAddressPromise = contestContract.read.FeeMangerAddress();
-    }
-  }
-
-  const { 0: contestToken, 1: feeManagerAddress } = await Promise.all([
-    contestContract.read.contestToken(),
-    feeManagerAddressPromise,
-  ]);
-
-  let beneficiaryBalancePromise: Promise<bigint> | undefined;
-  if (!oneOff && feeManagerAddress && useFeeManager) {
-    beneficiaryBalancePromise = client.readContract({
-      address: feeManagerAddress,
-      abi: FeeManagerAbi,
-      functionName: 'getBeneficiaryBalance',
-      args: [contestAddress as `0x${string}`, contestToken],
-    });
-  }
-
-  let contestBalancePromise: Promise<bigint>;
-  if (contestToken === ZERO_ADDRESS) {
-    contestBalancePromise = client.getBalance({
+  const calls = [
+    {
       address: contestAddress as `0x${string}`,
+      abi: oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
+      functionName: 'contestToken',
+    },
+  ];
+
+  if (!oneOff) {
+    calls.push({
+      address: contestAddress as `0x${string}`,
+      abi: ContestGovernorAbi,
+      functionName: 'useFeeManager',
     });
-  } else {
-    contestBalancePromise = client.readContract({
+    calls.push({
+      address: contestAddress as `0x${string}`,
+      abi: ContestGovernorAbi,
+      functionName: 'FeeMangerAddress',
+    });
+  }
+
+  const initialResults = await client.multicall({
+    contracts: calls as any[],
+    allowFailure: false,
+  });
+
+  const contestToken = initialResults[0] as `0x${string}`;
+  let useFeeManager = false;
+  let feeManagerAddress: `0x${string}` | undefined;
+
+  if (!oneOff) {
+    useFeeManager = initialResults[1] as boolean;
+    feeManagerAddress = initialResults[2] as `0x${string}`;
+  }
+
+  const balanceCalls = [];
+
+  if (contestToken !== ZERO_ADDRESS) {
+    balanceCalls.push({
       address: contestToken,
       abi: [
         {
@@ -85,15 +95,45 @@ export const getTotalContestBalance = async (
     });
   }
 
-  const { 0: contestBalance, 1: beneficiaryBalance } = await Promise.all([
-    contestBalancePromise,
-    beneficiaryBalancePromise,
-  ]);
+  if (!oneOff && feeManagerAddress && useFeeManager) {
+    balanceCalls.push({
+      address: feeManagerAddress,
+      abi: FeeManagerAbi,
+      functionName: 'getBeneficiaryBalance',
+      args: [contestAddress as `0x${string}`, contestToken],
+    });
+  }
 
-  const balance = beneficiaryBalance
-    ? contestBalance + beneficiaryBalance
-    : contestBalance;
+  let contestBalance: bigint = BigInt(0);
+  let beneficiaryBalance: bigint = BigInt(0);
 
+  if (contestToken === ZERO_ADDRESS) {
+    contestBalance = await client.getBalance({
+      address: contestAddress as `0x${string}`,
+    });
+
+    if (balanceCalls.length > 0) {
+      const multiResults = await client.multicall({
+        contracts: balanceCalls as any[],
+        allowFailure: false,
+      });
+      beneficiaryBalance = multiResults[0] as bigint;
+    }
+  } else if (balanceCalls.length > 0) {
+    const multiResults = await client.multicall({
+      contracts: balanceCalls as any[],
+      allowFailure: false,
+    });
+
+    if (balanceCalls.length === 2) {
+      contestBalance = multiResults[0] as bigint;
+      beneficiaryBalance = multiResults[1] as bigint;
+    } else {
+      contestBalance = multiResults[0] as bigint;
+    }
+  }
+
+  const balance = contestBalance + beneficiaryBalance;
   return balance.toString();
 };
 
@@ -117,57 +157,83 @@ export const getContestStatus = async (
   voterShare: number;
   contestToken: `0x${string}`;
 }> => {
-  const client = getPublicClient(chain);
+  const client = createPublicClient({
+    chain: ViemChains[chain.eth_chain_id],
+    transport: http(chain.rpc),
+    batch: {
+      multicall: true,
+    },
+  });
   const contract = {
     address: contest as `0x${string}`,
     abi: oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
   };
 
-  const promises = [
-    client.readContract({
+  const callsBase = [
+    {
       ...contract,
       functionName: 'startTime',
-    }),
-    client.readContract({
+    },
+    {
       ...contract,
       functionName: 'endTime',
-    }),
-    client.readContract({
+    },
+    {
       ...contract,
       functionName: 'currentContentId',
-    }),
-    client.readContract({
+    },
+    {
       ...contract,
       functionName: oneOff ? 'contestLength' : 'contestInterval',
-    }),
-    client.readContract({
+    },
+    {
       ...contract,
       functionName: 'voterShare',
-    }),
-    client.readContract({
+    },
+    {
       ...contract,
       functionName: 'contestToken',
-    }),
+    },
   ];
 
-  if (!oneOff) {
-    promises.push(
-      client.readContract({
-        ...contract,
-        functionName: 'prizeShare',
-      }),
-    );
-  }
+  const calls = !oneOff
+    ? [...callsBase, { ...contract, functionName: 'prizeShare' }]
+    : callsBase;
 
-  const [
-    startTime,
+  const results = await client.multicall({
+    contracts: calls as any[],
+    allowFailure: false,
+  });
+
+  let startTime,
     endTime,
     currentContentId,
     contestInterval,
     voterShare,
     contestToken,
-    prizeShare,
-  ] = await Promise.all(promises);
+    prizeShare;
+
+  if (oneOff) {
+    [
+      startTime,
+      endTime,
+      currentContentId,
+      contestInterval,
+      voterShare,
+      contestToken,
+    ] = results;
+    prizeShare = 0; // Default value for oneOff contests
+  } else {
+    [
+      startTime,
+      endTime,
+      currentContentId,
+      contestInterval,
+      voterShare,
+      contestToken,
+      prizeShare,
+    ] = results;
+  }
 
   return {
     startTime: Number(startTime),
@@ -230,10 +296,10 @@ export const getContestScore = async (
     client,
   });
 
-  const { 0: winnerIds, 1: contestBalance } = await Promise.all([
+  const [winnerIds, contestBalance] = await Promise.all([
     oneOff || getCurrentScores
-      ? contestInstance.read.getWinnerIds() // gets current contest winners
-      : contestInstance.read.getPastWinners([BigInt(contestId!)]), // gets past recurring contest winners
+      ? contestInstance.read.getWinnerIds()
+      : contestInstance.read.getPastWinners([BigInt(contestId!)]),
     getContestBalance(chain, contest, oneOff),
   ]);
 
@@ -244,15 +310,26 @@ export const getContestScore = async (
     return { contestBalance, scores: [] };
   }
 
-  const contentMeta = await Promise.all(
-    winnerIds.map((winnerId) => contestInstance.read.content([winnerId])),
+  const contentMetaContracts = winnerIds.map(
+    (winnerId) =>
+      ({
+        address: contest as `0x${string}`,
+        abi: oneOff ? ContestGovernorSingleAbi : ContestGovernorAbi,
+        functionName: 'content',
+        args: [winnerId],
+      }) as const,
   );
+
+  const contentMeta = await client.multicall({
+    contracts: contentMetaContracts as any[],
+    allowFailure: false,
+  });
 
   const scores = winnerIds.map((v, i) => {
     const parsedMeta = mapToAbiRes(
       ContestGovernorAbi,
       'content',
-      contentMeta[i],
+      contentMeta[i] as any,
     );
     return {
       winningContent: v,
