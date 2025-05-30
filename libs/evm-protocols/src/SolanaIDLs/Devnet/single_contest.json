@@ -37,9 +37,13 @@
           }
         },
         {
-          "name": "creator",
+          "name": "authority",
           "writable": true,
-          "signer": true
+          "signer": true,
+          "relations": ["contest"]
+        },
+        {
+          "name": "creator"
         },
         {
           "name": "system_program",
@@ -56,6 +60,42 @@
           "type": "string"
         }
       ]
+    },
+    {
+      "name": "claim_all_rewards",
+      "discriminator": [132, 203, 246, 173, 206, 240, 85, 120],
+      "accounts": [
+        {
+          "name": "contest",
+          "writable": true
+        },
+        {
+          "name": "prize_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "contest"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": ["contest"]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
     },
     {
       "name": "claim_protocol_fee",
@@ -88,49 +128,6 @@
           "name": "authority",
           "signer": true,
           "relations": ["contest"]
-        },
-        {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "claim_reward",
-      "discriminator": [149, 95, 181, 242, 94, 90, 158, 162],
-      "accounts": [
-        {
-          "name": "contest",
-          "writable": true
-        },
-        {
-          "name": "prize_vault",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [118, 97, 117, 108, 116]
-              },
-              {
-                "kind": "account",
-                "path": "contest"
-              }
-            ]
-          }
-        },
-        {
-          "name": "content"
-        },
-        {
-          "name": "creator",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "creator_token_account",
-          "writable": true
         },
         {
           "name": "token_program",
@@ -316,9 +313,13 @@
           }
         },
         {
-          "name": "voter",
+          "name": "authority",
           "writable": true,
-          "signer": true
+          "signer": true,
+          "relations": ["contest"]
+        },
+        {
+          "name": "voter"
         },
         {
           "name": "voter_token_account"
@@ -491,6 +492,16 @@
       "code": 6023,
       "name": "InternalError",
       "msg": "Internal error during calculation."
+    },
+    {
+      "code": 6024,
+      "name": "IncorrectNumberOfAccounts",
+      "msg": "Incorrect number of accounts provided."
+    },
+    {
+      "code": 6025,
+      "name": "InvalidContentId",
+      "msg": "Invalid content ID provided."
     }
   ],
   "types": [
@@ -640,7 +651,11 @@
             "type": "pubkey"
           },
           {
-            "name": "interval",
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
             "type": "i64"
           },
           {
