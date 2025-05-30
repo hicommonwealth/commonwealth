@@ -210,6 +210,7 @@ export const useMention = ({
         name: profileName,
         component: node.outerHTML,
         type: MentionEntityType.USER,
+        id: userId,
         user_id: userId,
         profile_name: profileName,
       };
@@ -245,10 +246,11 @@ export const useMention = ({
       node.appendChild(textWrap);
 
       return {
-        link: `/topic/${topicId}`,
+        link: `/discussion/topic/${topicId}`,
         name: topicName,
         component: node.outerHTML,
         type: MentionEntityType.TOPIC,
+        id: topicId,
         topic_id: topicId,
         topic_name: topicName,
       };
@@ -287,6 +289,7 @@ export const useMention = ({
         name: threadTitle,
         component: node.outerHTML,
         type: MentionEntityType.THREAD,
+        id: threadId,
         thread_id: threadId,
         title: threadTitle,
       };
@@ -325,6 +328,7 @@ export const useMention = ({
         name: communityName,
         component: node.outerHTML,
         type: MentionEntityType.COMMUNITY,
+        id: communityResultId,
         community_id: communityResultId,
       };
     },
@@ -356,6 +360,7 @@ export const useMention = ({
         name: proposalTitle,
         component: node.outerHTML,
         type: MentionEntityType.PROPOSAL,
+        id: proposalId,
         proposal_id: proposalId,
         title: proposalTitle,
       };
@@ -431,7 +436,21 @@ export const useMention = ({
     return {
       allowedChars: /^[A-Za-z0-9\sÅÄÖåäö\-_.]*$/,
       mentionDenotationChars: Object.keys(MENTION_DENOTATION_CHARS),
-      dataAttributes: ['name', 'link', 'component', 'type'],
+      dataAttributes: [
+        'name',
+        'link',
+        'component',
+        'type',
+        'id',
+        'user_id',
+        'topic_id',
+        'thread_id',
+        'community_id',
+        'proposal_id',
+        'profile_name',
+        'topic_name',
+        'title',
+      ],
       renderItem: (item) => item.component,
       onSelect: selectMention,
       source: _.debounce(

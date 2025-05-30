@@ -57,15 +57,15 @@ export const ENTITY_TO_SEARCH_SCOPE = {
 // Mention link format patterns
 export const MENTION_LINK_FORMATS = {
   [MentionEntityType.USER]: (name: string, id: string) =>
-    `[@${name}](user:${id})`,
+    `[@${name}](/profile/id/${id})`,
   [MentionEntityType.TOPIC]: (name: string, id: string) =>
-    `[#${name}](topic:${id})`,
+    `[#${name}](/discussion/topic/${id})`,
   [MentionEntityType.THREAD]: (name: string, id: string) =>
-    `[!${name}](thread:${id})`,
+    `[!${name}](/discussion/${id})`,
   [MentionEntityType.COMMUNITY]: (name: string, id: string) =>
-    `[~${name}](community:${id})`,
+    `[~${name}](/${id})`,
   [MentionEntityType.PROPOSAL]: (name: string, id: string) =>
-    `[${name}](proposal:${id})`,
+    `[${name}](/proposal/${id})`,
 } as const;
 
 // Search scope configurations for each denotation character

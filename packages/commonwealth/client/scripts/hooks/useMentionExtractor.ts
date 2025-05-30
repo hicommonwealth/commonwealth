@@ -15,16 +15,16 @@ export interface ExtractedMention {
 
 // Regular expressions to match different mention formats
 const MENTION_PATTERNS = {
-  // [@UserName](user:userId)
-  user: /\[@([^\]]+)\]\(user:([^)]+)\)/g,
-  // [#TopicName](topic:topicId)
-  topic: /\[#([^\]]+)\]\(topic:([^)]+)\)/g,
-  // [!ThreadTitle](thread:threadId)
-  thread: /\[!([^\]]+)\]\(thread:([^)]+)\)/g,
-  // [~CommunityName](community:communityId)
-  community: /\[~([^\]]+)\]\(community:([^)]+)\)/g,
-  // [ProposalTitle](proposal:proposalId)
-  proposal: /\[([^\]]+)\]\(proposal:([^)]+)\)/g,
+  // [@UserName](/profile/id/userId)
+  user: /\[@([^\]]+)\]\(\/profile\/id\/([^)]+)\)/g,
+  // [#TopicName](/discussion/topic/topicId)
+  topic: /\[#([^\]]+)\]\(\/discussion\/topic\/([^)]+)\)/g,
+  // [!ThreadTitle](/discussion/threadId)
+  thread: /\[!([^\]]+)\]\(\/discussion\/([^)]+)\)/g,
+  // [~CommunityName](/communityId)
+  community: /\[~([^\]]+)\]\(\/([^)]+)\)/g,
+  // [ProposalTitle](/proposal/proposalId)
+  proposal: /\[([^\]]+)\]\(\/proposal\/([^)]+)\)/g,
 };
 
 export const useMentionExtractor = () => {
@@ -40,7 +40,7 @@ export const useMentionExtractor = () => {
           id: match[2],
           type: MentionEntityType.USER,
           name: match[1],
-          link: `user:${match[2]}`,
+          link: `/profile/id/${match[2]}`,
         });
       }
 
@@ -51,7 +51,7 @@ export const useMentionExtractor = () => {
           id: match[2],
           type: MentionEntityType.TOPIC,
           name: match[1],
-          link: `topic:${match[2]}`,
+          link: `/discussion/topic/${match[2]}`,
         });
       }
 
@@ -62,7 +62,7 @@ export const useMentionExtractor = () => {
           id: match[2],
           type: MentionEntityType.THREAD,
           name: match[1],
-          link: `thread:${match[2]}`,
+          link: `/discussion/${match[2]}`,
         });
       }
 
@@ -73,7 +73,7 @@ export const useMentionExtractor = () => {
           id: match[2],
           type: MentionEntityType.COMMUNITY,
           name: match[1],
-          link: `community:${match[2]}`,
+          link: `/${match[2]}`,
         });
       }
 
@@ -84,7 +84,7 @@ export const useMentionExtractor = () => {
           id: match[2],
           type: MentionEntityType.PROPOSAL,
           name: match[1],
-          link: `proposal:${match[2]}`,
+          link: `/proposal/${match[2]}`,
         });
       }
 
@@ -168,7 +168,6 @@ export const useMentionExtractor = () => {
         [MentionEntityType.THREAD]: [],
         [MentionEntityType.COMMUNITY]: [],
         [MentionEntityType.PROPOSAL]: [],
-        [MentionEntityType.COMMENT]: [], // Included for completeness
       };
 
       mentions.forEach((mention) => {
