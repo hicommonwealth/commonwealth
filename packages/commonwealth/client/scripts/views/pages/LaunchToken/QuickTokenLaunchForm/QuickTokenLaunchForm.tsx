@@ -42,6 +42,42 @@ type QuickTokenLaunchFormProps = {
 
 const MAX_IDEAS_LIMIT = 5;
 
+const RATE_LIMIT_MESSAGE =
+  'You are being rate limited. Please wait and try again.';
+
+interface RateLimitErrorType {
+  data?: {
+    httpStatus?: number;
+    message?: string;
+  };
+  status?: number;
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
+const isRateLimitError = (err: RateLimitErrorType) => {
+  const status = err?.data?.httpStatus || err?.status || err?.response?.status;
+  if (status === 429) return true;
+
+  if (status === 401) {
+    const msg =
+      err?.data?.message || err?.message || err?.response?.data?.message || '';
+    const lowerMsg = String(msg).toLowerCase();
+    return (
+      lowerMsg.includes('image') &&
+      lowerMsg.includes('prompt') &&
+      lowerMsg.includes('overload')
+    );
+  }
+
+  return false;
+};
+
 export const QuickTokenLaunchForm = ({
   onCancel,
   onCommunityCreated,
@@ -212,6 +248,9 @@ export const QuickTokenLaunchForm = ({
             try {
               response = await createCommunityMutation(communityPayload);
             } catch (e) {
+              if (isRateLimitError(e)) {
+                throw e;
+              }
               const errorMsg = e?.message?.toLowerCase() || '';
               if (
                 errorMsg.includes('name') &&
@@ -220,6 +259,8 @@ export const QuickTokenLaunchForm = ({
               ) {
                 // this is not a unique community name error, abort token creation
                 response = 'invalid_state';
+              } else {
+                throw e;
               }
             }
             if (response === 'invalid_state') {
@@ -296,7 +337,9 @@ export const QuickTokenLaunchForm = ({
       } catch (e) {
         console.error(`Error creating token: `, e, e.name);
 
-        if (e?.name === 'TransactionBlockTimeoutError') {
+        if (isRateLimitError(e)) {
+          notifyError(RATE_LIMIT_MESSAGE);
+        } else if (e?.name === 'TransactionBlockTimeoutError') {
           notifyError('Transaction not timely signed. Please try again!');
         } else if (
           e?.message
