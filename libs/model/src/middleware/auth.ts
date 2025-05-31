@@ -257,10 +257,10 @@ async function checkGatedActions(
       group_name: string;
       actions: GroupGatedActionKey[];
       is_private: boolean;
-      membership?: {
+      membership: {
         is_member: boolean;
-        reject_reason: z.infer<typeof MembershipRejectReason>;
-      };
+        reject_reason: z.infer<typeof MembershipRejectReason> | null;
+      } | null;
     }>;
   }>(
     `
@@ -316,7 +316,8 @@ GROUP BY
       .map(({ membership }) =>
         membership!.reject_reason!.map(({ message }) => message).join('; '),
       );
-    if (rejects.length) throw new RejectedMember(actor, rejects);
+    if (rejects.length)
+      throw new RejectedMember(actor, topic.topic_name, action, rejects);
     else throw new NonMember(actor, topic.topic_name, action);
   }
 
