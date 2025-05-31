@@ -1,4 +1,5 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import { GatedActionEnum } from '@hicommonwealth/shared';
 import Chance from 'chance';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -18,6 +19,24 @@ describe('Gating lifecycle', () => {
   let topic_id: number;
 
   beforeAll(async () => {
+    // add missing enum_GroupGatedActions_gated_actions type
+    // since it's not defined in the model
+    await models.sequelize.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_GroupGatedActions_gated_actions') THEN
+          CREATE TYPE "enum_GroupGatedActions_gated_actions" AS ENUM (
+            'CREATE_THREAD',
+            'CREATE_COMMENT',
+            'CREATE_THREAD_REACTION',
+            'CREATE_COMMENT_REACTION',
+            'UPDATE_POLL'
+          );
+        END IF;
+      END
+      $$;
+    `);
+
     const { community, actors } = await seedCommunity({
       roles: ['admin', 'member', 'rejected'],
     });
