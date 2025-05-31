@@ -472,7 +472,7 @@ export const NewThreadForm = forwardRef<
         }
 
         console.error('NewThreadForm: Unhandled error:', err?.message);
-        notifyError('Failed to create thread');
+        notifyError(err.message);
 
         // Reset turnstile if there's an error
         resetTurnstile();

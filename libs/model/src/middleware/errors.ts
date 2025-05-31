@@ -25,9 +25,14 @@ export class NonMember extends InvalidActor {
 export class RejectedMember extends InvalidActor {
   constructor(
     public actor: Actor,
+    public topic: string,
+    public action: GroupGatedActionKey,
     public reasons: string[],
   ) {
-    super(actor, reasons.join(', '));
+    super(
+      actor,
+      `User does not have permission to perform action ${action} in topic ${topic}`,
+    );
     this.name = INVALID_ACTOR_ERROR;
   }
 }
