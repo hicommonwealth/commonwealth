@@ -1,4 +1,5 @@
-import { ContentType } from '@hicommonwealth/shared';
+import { CompletionModel, ContentType } from '@hicommonwealth/shared';
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { notifyError } from 'controllers/app/notifications';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
@@ -19,10 +20,14 @@ import {
 } from 'state/api/ai/prompts';
 import useSidebarStore from 'state/ui/sidebar';
 import { useLocalAISettingsStore } from 'state/ui/user';
+import { AIModelSelector } from 'views/components/AIModelSelector';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
@@ -34,9 +39,21 @@ import {
   ReactQuillEditor,
 } from 'views/components/react_quill_editor';
 import { useTurnstile } from 'views/components/useTurnstile';
+import {
+  handleIconClick,
+  handleMouseEnter,
+  handleMouseLeave,
+} from 'views/menus/utils';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import { StickCommentContext } from '../context/StickCommentProvider';
 import { useActiveStickCommentReset } from '../context/UseActiveStickCommentReset';
+import { useDynamicPlaceholder } from './useDynamicPlaceholder';
+import {
+  AI_SELECTOR_TITLE,
+  availableModels,
+  getCompletionModelValue,
+  MAX_MODELS_SELECTABLE,
+} from './utils';
 
 import './StickyInput.scss';
 
@@ -56,6 +73,7 @@ const StickyInput = (props: StickyInputProps) => {
     thread: originalThread,
     parentCommentText,
     canComment,
+    handleIsReplying,
   } = props;
   const { isWindowExtraSmall: isMobile } = useBrowserWindow({});
   const { menuVisible } = useSidebarStore();
@@ -64,14 +82,26 @@ const StickyInput = (props: StickyInputProps) => {
     aiCommentsToggleEnabled,
     aiInteractionsToggleEnabled,
     setAICommentsToggleEnabled,
+    selectedModels,
+    setSelectedModels,
   } = useLocalAISettingsStore();
   const stickyCommentReset = useActiveStickCommentReset();
   const { generateCompletion } = useAiCompletion();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
+  const aiModelPopover = usePopover();
+
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [webSearchEnabled, setWebSearchEnabled] = useState(false);
+
+  const placeholderText = useDynamicPlaceholder({
+    mode,
+    isReplying: !!isReplying,
+    replyingToAuthor,
+    isMobile,
+  });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const newThreadFormRef = useRef<NewThreadFormHandles>(null);
@@ -125,6 +155,7 @@ const StickyInput = (props: StickyInputProps) => {
 
     setIsGenerating(true);
     bodyAccumulatedRef.current = '';
+    const modelToUse = getCompletionModelValue(selectedModels[0]);
 
     try {
       if (mode === 'thread') {
@@ -132,11 +163,13 @@ const StickyInput = (props: StickyInputProps) => {
         let lastUpdateTime = Date.now();
 
         await generateCompletion(userPrompt, {
-          model: 'gpt-4o-mini',
+          model: modelToUse,
           stream: true,
           systemPrompt,
+          useWebSearch: webSearchEnabled,
           onError: (error) => {
             console.error('Error generating AI thread:', error);
+            notifyError('Failed to generate AI thread content');
           },
           onChunk: (chunk) => {
             bodyAccumulatedRef.current += chunk;
@@ -159,9 +192,10 @@ const StickyInput = (props: StickyInputProps) => {
         const { systemPrompt, userPrompt } = generateCommentPrompt(context);
 
         await generateCompletion(userPrompt, {
-          model: 'gpt-4o-mini',
+          model: modelToUse,
           stream: true,
           systemPrompt,
+          useWebSearch: webSearchEnabled,
           onError: (error) => {
             console.error('Error generating AI comment:', error);
           },
@@ -184,6 +218,8 @@ const StickyInput = (props: StickyInputProps) => {
     originalThread,
     parentCommentText,
     setContentDelta,
+    webSearchEnabled,
+    selectedModels,
   ]);
 
   const getActionPillLabel = () => {
@@ -275,31 +311,120 @@ const StickyInput = (props: StickyInputProps) => {
     }
   }, [isExpanded, openModalOnExpand, mode]);
 
-  // Add toggle handler for the AI auto reply feature
-  const handleToggleAiAutoReply = (e: React.MouseEvent) => {
+  const handleModelSelectionChange = (
+    newSelectedModelValues: CompletionModel[],
+  ) => {
+    const newAiModelOptions = newSelectedModelValues.map((value) => {
+      const modelDetails = availableModels.find((m) => m.value === value);
+      return {
+        value: value,
+        label: modelDetails ? modelDetails.label : value,
+      };
+    });
+    setSelectedModels(newAiModelOptions);
+
+    if (newAiModelOptions.length > 0 && !aiCommentsToggleEnabled) {
+      setAICommentsToggleEnabled(true);
+    } else if (newAiModelOptions.length === 0 && aiCommentsToggleEnabled) {
+      setAICommentsToggleEnabled(false);
+    }
+  };
+
+  const handleToggleWebSearch = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+    setWebSearchEnabled((prev) => !prev);
   };
 
   const renderStickyInput = () => {
+    const isAnyModelSelected = selectedModels.length > 0;
+    const showModelCountBadge = selectedModels.length > 1;
+
     const buttonGroup = (
       <div className="button-group">
         {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
           <CWTooltip
-            content={`${aiCommentsToggleEnabled ? 'Disable' : 'Enable'} 
-        AI ${mode === 'thread' ? 'initial comment' : 'auto reply'}`}
+            content={`${webSearchEnabled ? 'Disable' : 'Enable'} Web Search`}
             placement="top"
-            renderTrigger={(handleInteraction) => (
+            renderTrigger={(tooltipInteractionHandler) => (
               <button
-                className={`ai-toggle-button ${aiCommentsToggleEnabled ? 'active' : 'inactive'}`}
-                onClick={handleToggleAiAutoReply}
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
+                className={`web-search-toggle-button ${webSearchEnabled ? 'active' : 'inactive'}`}
+                onClick={handleToggleWebSearch}
+                onMouseEnter={tooltipInteractionHandler}
+                onMouseLeave={tooltipInteractionHandler}
               >
-                <CWIcon iconName="sparkle" iconSize="small" weight="bold" />
+                <CWIcon iconName="binoculars" iconSize="small" weight="bold" />
               </button>
             )}
           />
+        )}
+        {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+          <ClickAwayListener onClickAway={() => aiModelPopover.dispose()}>
+            <div className="popover-container">
+              <CWTooltip
+                content="Select AI models to generate replies"
+                placement="top"
+                renderTrigger={(tooltipInteractionHandler, isTooltipOpen) => (
+                  <button
+                    className={`ai-toggle-button ${isAnyModelSelected ? 'active' : 'inactive'}`}
+                    onClick={(e) =>
+                      handleIconClick({
+                        e,
+                        isMenuOpen: aiModelPopover.open,
+                        isTooltipOpen,
+                        handleInteraction: tooltipInteractionHandler,
+                        onClick: aiModelPopover.handleInteraction,
+                      })
+                    }
+                    onMouseEnter={(e) => {
+                      handleMouseEnter({
+                        e,
+                        isMenuOpen: aiModelPopover.open,
+                        handleInteraction: tooltipInteractionHandler,
+                      });
+                    }}
+                    onMouseLeave={(e) => {
+                      handleMouseLeave({
+                        e,
+                        isTooltipOpen,
+                        handleInteraction: tooltipInteractionHandler,
+                      });
+                    }}
+                  >
+                    <CWIcon iconName="sparkle" iconSize="small" weight="bold" />
+                    {showModelCountBadge && (
+                      <span className="model-count-badge">
+                        {selectedModels.length}
+                      </span>
+                    )}
+                  </button>
+                )}
+              />
+              <CWPopover
+                {...aiModelPopover}
+                placement="top"
+                modifiers={[
+                  {
+                    name: 'offset',
+                    options: {
+                      offset: [0, 8],
+                    },
+                  },
+                ]}
+                content={
+                  <AIModelSelector
+                    title={AI_SELECTOR_TITLE}
+                    availableModels={availableModels}
+                    selectedModelValues={selectedModels.map((m) =>
+                      getCompletionModelValue(m),
+                    )}
+                    onSelectionChange={handleModelSelectionChange}
+                    maxSelection={MAX_MODELS_SELECTABLE}
+                    popoverId={aiModelPopover.id}
+                  />
+                }
+              />
+            </div>
+          </ClickAwayListener>
         )}
 
         <CWTooltip
@@ -351,6 +476,7 @@ const StickyInput = (props: StickyInputProps) => {
               disabled={
                 !canComment ||
                 !contentDelta?.ops?.length ||
+                isGenerating ||
                 (isTurnstileEnabled && !turnstileToken)
               }
               onMouseEnter={handleInteraction}
@@ -396,19 +522,25 @@ const StickyInput = (props: StickyInputProps) => {
                 onContentAppended={handleThreadContentAppended}
                 contentDelta={contentDelta}
                 setContentDelta={setContentDelta}
+                webSearchEnabled={webSearchEnabled}
+                setWebSearchEnabled={setWebSearchEnabled}
               />
             ) : (
               <CommentEditor
                 {...props}
                 shouldFocus={true}
                 onCancel={handleCancel}
-                aiCommentsToggleEnabled={aiCommentsToggleEnabled}
+                aiCommentsToggleEnabled={
+                  aiCommentsToggleEnabled && selectedModels.length > 0
+                }
                 handleSubmitComment={customHandleSubmitComment}
                 onAiReply={handleAiReply}
                 streamingReplyIds={streamingReplyIds}
                 triggerImageModalOpen={openModalOnExpand && mode === 'comment'}
                 contentDelta={contentDelta}
                 setContentDelta={setContentDelta}
+                webSearchEnabled={webSearchEnabled}
+                setWebSearchEnabled={setWebSearchEnabled}
               />
             )}
           </div>
@@ -439,20 +571,23 @@ const StickyInput = (props: StickyInputProps) => {
                   setContentDelta={props.setContentDelta}
                   isDisabled={!canComment}
                   onKeyDown={handleKeyDown}
-                  placeholder={
-                    mode === 'thread'
-                      ? 'Create a thread...'
-                      : isReplying
-                        ? `Reply to ${replyingToAuthor}...`
-                        : isMobile
-                          ? 'Comment on thread...'
-                          : 'Write a comment...'
-                  }
+                  placeholder={placeholderText}
                 />
               </div>
+
               {!isMobile && buttonGroup}
             </div>
-
+            {isReplying && (
+              <div
+                className="cancel-reply-button"
+                onClick={() => {
+                  handleIsReplying?.(false);
+                }}
+              >
+                <CWIcon iconName="close" iconSize="small" weight="bold" />
+                <CWText type="caption">Cancel reply</CWText>
+              </div>
+            )}
             {isTurnstileEnabled && (
               <div className="turnstile-container">
                 <TurnstileWidget />

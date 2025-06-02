@@ -146,18 +146,16 @@ const QuestCard = ({
           />
         </div>
         <CWDivider />
-        <div className="xp-row">
-          {xpPointsElement}
-          <CWButton
-            iconLeft="upvote"
-            label="Leaderboard"
-            onClick={onLeaderboardClick}
-            containerClassName="leaderboard-btn"
-            buttonWidth="narrow"
-            buttonType="secondary"
-            buttonHeight="sm"
-          />
-        </div>
+        <div className="xp-row">{xpPointsElement}</div>
+        <CWButton
+          iconLeft="upvote"
+          label="Leaderboard"
+          onClick={onLeaderboardClick}
+          containerClassName="leaderboard-btn"
+          buttonWidth="full"
+          buttonType="secondary"
+          buttonHeight="sm"
+        />
         {/* action cta */}
         <CWButton
           label="See Details"

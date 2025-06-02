@@ -13,6 +13,7 @@ import { ManageConnectedTokenProps } from './types';
 const ManageConnectedToken = ({
   isLoadingToken,
   tokenInfo,
+  pinnedToken,
 }: ManageConnectedTokenProps) => {
   const [isChangingToken, setIsChangingToken] = useState(false);
 
@@ -55,6 +56,9 @@ const ManageConnectedToken = ({
           avatarUrl={tokenInfo?.logo}
           name={tokenInfo?.name}
           ticker={tokenInfo?.symbol}
+          tokenAddress={pinnedToken?.contract_address}
+          chainName={pinnedToken?.ChainNode?.name}
+          chainEthId={pinnedToken?.ChainNode?.eth_chain_id || 0}
         />
         <CWDivider />
         {isActionPending && <CWCircleMultiplySpinner />}

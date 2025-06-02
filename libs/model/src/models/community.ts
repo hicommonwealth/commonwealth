@@ -180,6 +180,10 @@ export default (
         type: Sequelize.STRING,
         allowNull: true,
       },
+      pending_namespace_judge_token_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
     },
     {
       tableName: 'Communities',

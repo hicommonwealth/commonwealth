@@ -337,7 +337,6 @@ describe('Community lifecycle', () => {
         user_id: superAdminActor.user.id,
         address: superAdminActor.address!,
         community_id: community.id,
-        is_user_default: true,
         role: 'admin',
         last_active: new Date(),
         ghost_address: false,
@@ -845,7 +844,12 @@ describe('Community lifecycle', () => {
       expect(address?.address).toBe(ethActor.address);
       const members = await query(GetMembers(), {
         actor: superAdminActor,
-        payload: { community_id: community.id, limit: 10, cursor: 1 },
+        payload: {
+          community_id: community.id,
+          limit: 10,
+          cursor: 1,
+          searchByNameAndAddress: false,
+        },
       });
       expect(members?.results.length).toBe(3);
     });

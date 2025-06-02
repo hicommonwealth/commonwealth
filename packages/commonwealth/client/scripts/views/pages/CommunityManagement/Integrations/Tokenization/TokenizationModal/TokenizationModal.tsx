@@ -237,6 +237,9 @@ const TokenizationModal = ({
             tokenMetadataLoading={tokenMetadataLoading}
             tokenMetadata={tokenMetadata}
             placeholder="Enter token address"
+            tokenAddress={community?.thread_purchase_token || ''}
+            chainName={app.chain.meta.ChainNode?.name || ''}
+            chainEthId={app.chain.meta.ChainNode?.eth_chain_id || 0}
           />
         </div>
       </CWModalBody>

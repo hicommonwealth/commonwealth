@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ChainNode } from '../entities';
+import { ChainNode, CommunityGoalMeta } from '../entities';
 
 export const GetChainNodes = {
   input: z.void(),
@@ -59,4 +59,14 @@ export const GetCommunityMembersStats = {
   output: z.object({
     members: z.array(MembersStatsView),
   }),
+};
+
+export const GetCommunityGoalMetas = {
+  input: z.void(),
+  output: z.array(
+    CommunityGoalMeta.extend({
+      created_at: z.date().or(z.string()).optional(),
+      updated_at: z.date().or(z.string()).optional(),
+    }),
+  ),
 };

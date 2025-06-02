@@ -41,6 +41,7 @@ const featureFlags = {
   tokenizedThreads: buildFlag(process.env.FLAG_TOKENIZED_THREADS),
   partnershipWallet: buildFlag(process.env.FLAG_PARTNERSHIP_WALLET),
   newProfilePage: buildFlag(process.env.FLAG_NEW_PROFILE_PAGE),
+  privateTopics: buildFlag(process.env.FLAG_PRIVATE_TOPICS),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

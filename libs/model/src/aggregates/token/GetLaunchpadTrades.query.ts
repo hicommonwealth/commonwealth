@@ -35,14 +35,24 @@ export function GetLaunchpadTrades(): Query<typeof schemas.GetLaunchpadTrades> {
             tokens.name,
             tokens.symbol,
             c.id as community_id,
-            c.icon_url as community_icon_url
+            c.icon_url as community_icon_url,
+            u.id as user_id,
+            u.profile->>'name' as user_name,
+            u.profile->>'avatar_url' as user_avatar_url
           FROM 
             "LaunchpadTrades" trades
           LEFT JOIN 
             "LaunchpadTokens" tokens ON trades.token_address = tokens.token_address
           LEFT JOIN 
             "Communities" c ON c.namespace = tokens.namespace
-          
+          LEFT JOIN LATERAL (
+            SELECT DISTINCT ON (address) user_id
+            FROM "Addresses"
+            WHERE address = trades.trader_address
+            ORDER BY address, id
+          ) a ON true
+          LEFT JOIN
+            "Users" u ON u.id = a.user_id
           ${whereClauseCondition}
         `,
         {

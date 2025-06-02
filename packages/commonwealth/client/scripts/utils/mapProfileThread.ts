@@ -8,7 +8,6 @@ export function mapProfileThread(thread): Thread {
       address: thread.author,
       community_id: thread.authorCommunity,
       ghost_address: false,
-      is_user_default: false,
       is_banned: false,
       role: 'member',
     },

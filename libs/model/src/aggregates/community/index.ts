@@ -35,7 +35,6 @@ export * from './SearchCommunities.query';
 export * from './SelectCommunity.command';
 export * from './SetAddressWallet.command';
 export * from './SetCommunityStake.command';
-export * from './SetDefaultRole.command';
 export * from './SetReachedGoal.command';
 export * from './ToggleArchiveTopic.command';
 export * from './ToggleCommunityStar.command';
