@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
@@ -44,6 +44,7 @@ const TrendingTokensList = () => {
     shouldRunTrigger: user.isLoggedIn,
   });
 
+  // fetch launchpad tokens
   const {
     data: launchpadTokensList,
     isInitialLoading: isLoadingLaunchpadTokens,
@@ -54,18 +55,53 @@ const TrendingTokensList = () => {
     enabled: launchpadEnabled,
   });
 
+  // fetch pinned tokens
   const { data: pinnedTokensList, isInitialLoading: isLoadingPinnedTokens } =
     useGetPinnedTokensByCommunityId({
       cursor: 1,
       limit: 3,
       with_chain_node: true,
       with_price: true,
-      enabled: !!launchpadTokensList,
+      enabled: launchpadEnabled,
     });
 
   const launchpadTokens = (launchpadTokensList?.pages || [])
     .flatMap((page) => page.results)
     .slice(0, 3);
+
+  const pinnedTokens = (pinnedTokensList?.pages || [])
+    .flatMap((page) => page.results)
+    .slice(0, 3);
+
+  // convert pinned tokens to LaunchpadToken format for display
+  const pinnedTokensAsLaunchpad: LaunchpadToken[] = useMemo(() => {
+    return pinnedTokens.map(
+      (token): LaunchpadToken => ({
+        name: token.name,
+        symbol: token.symbol,
+        icon_url: token.icon_url || '',
+        community_id: token.community_id,
+        token_address: token.contract_address || '',
+        namespace: '',
+        initial_supply: 0,
+        liquidity_transferred: true,
+        launchpad_liquidity: '0',
+        eth_market_cap_target: 0,
+        creator_address: null,
+        description: null,
+        created_at: undefined,
+        updated_at: undefined,
+      }),
+    );
+  }, [pinnedTokens]);
+
+  // combine launchpad and pinned tokens
+  const allTokens = [...launchpadTokens, ...pinnedTokensAsLaunchpad].slice(
+    0,
+    5,
+  );
+
+  const isInitialLoading = isLoadingLaunchpadTokens || isLoadingPinnedTokens;
 
   const openAuthModalOrTriggerCallback = () => {
     if (user.isLoggedIn) {
@@ -106,7 +142,7 @@ const TrendingTokensList = () => {
       </div>
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
-      ) : tokens.length === 0 ? (
+      ) : allTokens.length === 0 ? (
         <div
           className={clsx('empty-placeholder', { 'my-16': launchpadEnabled })}
         >
@@ -117,7 +153,7 @@ const TrendingTokensList = () => {
         </div>
       ) : (
         <div className="list">
-          {(tokens || []).map((token) => {
+          {allTokens.map((token) => {
             return (
               <TrendingToken
                 key={token.name}
@@ -128,44 +164,6 @@ const TrendingTokensList = () => {
                       handleCTAClick(
                         mode,
                         token as z.infer<typeof TokenWithCommunity>,
-                      );
-                    },
-                  });
-                  openAuthModalOrTriggerCallback();
-                }}
-                onCardBodyClick={() =>
-                  navigateToCommunity({
-                    navigate,
-                    path: '',
-                    chain: token.community_id,
-                  })
-                }
-              />
-            );
-          })}
-          {pinnedTokens.map((token) => {
-            return (
-              <TreandingToken
-                key={token.name}
-                name={token.name}
-                communityId={token.community_id}
-                symbol={token.symbol}
-                price={0}
-                pricePercentage24HourChange={0}
-                isPinnedToken={true}
-                marketCap={{
-                  current: 0,
-                  goal: 0,
-                  isCapped: false,
-                }}
-                mode={TradingMode.Swap}
-                iconURL={token.icon_url || ''}
-                onCTAClick={(mode) => {
-                  register({
-                    cb: () => {
-                      handleCTAClick(
-                        mode,
-                        token as z.infer<typeof PinnedTokenWithPrices>,
                       );
                     },
                   });
