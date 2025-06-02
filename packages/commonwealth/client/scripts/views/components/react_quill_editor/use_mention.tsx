@@ -32,7 +32,6 @@ export const useMention = ({
   editorRef,
   lastSelectionRef,
 }: UseMentionProps) => {
-  // Create a ref to store the current search parameters
   const searchParamsRef = useRef<{
     searchTerm: string;
     communityId?: string;
@@ -42,11 +41,11 @@ export const useMention = ({
     searchScope: ['All'],
   });
 
-  const { refetch } = useUnifiedSearch({
+  const { isLoading, refetch } = useUnifiedSearch({
     searchTerm: searchParamsRef.current.searchTerm,
     communityId: searchParamsRef.current.communityId,
     searchScope: searchParamsRef.current.searchScope,
-    enabled: false, // We'll trigger manually
+    enabled: false, // We'll trigger manually with refetch
   });
 
   const selectMention = useCallback(
@@ -393,7 +392,6 @@ export const useMention = ({
             }
 
             if (searchTerm.length < MENTION_CONFIG.MIN_SEARCH_LENGTH) {
-              // Show tip message for short search terms
               const node = document.createElement('div');
               node.className = 'mention-empty-state';
               node.innerText = `Type at least ${MENTION_CONFIG.MIN_SEARCH_LENGTH} characters to 
@@ -417,14 +415,30 @@ export const useMention = ({
               ? app.activeChainId() || ''
               : undefined;
 
-            // Update search parameters
+            // Update search parameters in ref
             searchParamsRef.current = {
               searchTerm,
               communityId,
               searchScope,
             };
 
-            // Trigger the search using refetch
+            // Show loading state first
+            if (isLoading) {
+              const loadingNode = document.createElement('div');
+              loadingNode.className = 'mention-loading-state';
+              loadingNode.innerText = 'Searching...';
+              renderList(
+                [
+                  {
+                    link: '#',
+                    name: '',
+                    component: loadingNode.outerHTML,
+                  },
+                ],
+                searchTerm,
+              );
+            }
+
             const { data } = await refetch();
 
             const results = data?.results || [];
@@ -460,7 +474,7 @@ export const useMention = ({
       ),
       isolateChar: true,
     };
-  }, [selectMention, createEntityMentionItem, refetch]);
+  }, [selectMention, createEntityMentionItem, isLoading, refetch]);
 
   return { mention };
 };
