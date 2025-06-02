@@ -1,5 +1,5 @@
 import { pluralize } from 'helpers';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 export const actionCopies = {
   title: {
@@ -18,6 +18,7 @@ export const actionCopies = {
     ['XpChainEventCreated']: 'Engage on Blockchain',
     ['LaunchpadTokenRecordCreated']: 'Launch a Token on Common',
     ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
+    ['CommunityGoalReached']: 'Complete the community goal',
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: () => '',
@@ -37,6 +38,7 @@ export const actionCopies = {
     ['XpChainEventCreated']: () => '',
     ['LaunchpadTokenRecordCreated']: () => '',
     ['LaunchpadTokenTraded']: () => '',
+    ['CommunityGoalReached']: () => '',
   },
   explainer: {
     ['SignUpFlowCompleted']: () => '',
@@ -136,6 +138,16 @@ export const actionCopies = {
         </ul>
       </div>
     ),
+    // eslint-disable-next-line react/no-multi-comp
+    ['CommunityGoalReached']: (type: ReactNode, target: ReactNode) => (
+      <div>
+        <ul>
+          <li>
+            ● Reach {target} {type} before quest ends.
+          </li>
+        </ul>
+      </div>
+    ),
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -154,5 +166,6 @@ export const actionCopies = {
     ['XpChainEventCreated']: '',
     ['LaunchpadTokenRecordCreated']: '',
     ['LaunchpadTokenTraded']: '',
+    ['CommunityGoalReached']: '',
   },
 };
