@@ -339,7 +339,7 @@ jobs:
         id: init_cluster
         working-directory: terraform/review_apps/cluster
         run: |
-          terraform init -backend-config="key=commonwealth-pr-environments/cluster/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
+          terraform init -backend-config="key=commonwealth-pr-environments/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
 
       - name: Terraform Plan (Cluster - Stage 1)
         id: plan_cluster
