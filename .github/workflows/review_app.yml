@@ -313,8 +313,10 @@ jobs:
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache,mode=max
 
       - name: Authenticate to HCP
-        id: 'Authenticate to HCP'
         uses: 'hashicorp/hcp-auth-action@v0'
+        with:
+          client_id: ${{ secrets.HCP_CLIENT_ID }}
+          client_secret: ${{ secrets.HCP_CLIENT_SECRET }}
 
       - name: 'Download hcp CLI'
         uses: 'hashicorp/hcp-setup-action@v0'
