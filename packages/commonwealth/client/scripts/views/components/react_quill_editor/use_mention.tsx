@@ -267,6 +267,18 @@ export const useMention = ({
     const communityName = result.name;
     const communityResultId = result.id;
     const memberCount = result.member_count || 0;
+    const avatarUrl = result.avatar_url;
+
+    let avatar;
+    if (avatarUrl) {
+      avatar = document.createElement('img');
+      (avatar as HTMLImageElement).src = avatarUrl;
+      avatar.className = 'ql-mention-avatar';
+    } else {
+      avatar = document.createElement('div');
+      avatar.className = 'ql-mention-avatar';
+      avatar.innerText = communityName ? communityName[0].toUpperCase() : '';
+    }
 
     const nameSpan = document.createElement('span');
     nameSpan.innerText = communityName;
@@ -278,6 +290,8 @@ export const useMention = ({
 
     const textWrap = document.createElement('div');
     textWrap.className = 'ql-mention-text-wrap';
+
+    node.appendChild(avatar);
     textWrap.appendChild(nameSpan);
     textWrap.appendChild(memberSpan);
     node.appendChild(textWrap);
