@@ -10,6 +10,7 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { ContestWorker, models } from '@hicommonwealth/model';
+import { CronJob } from 'cron';
 import { Client } from 'pg';
 import { config } from 'server/config';
 import { setupListener } from './pgListener';
