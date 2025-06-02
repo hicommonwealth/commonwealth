@@ -11,7 +11,6 @@ export enum SearchEntityType {
   TOPIC = 'topic',
   THREAD = 'thread',
   PROPOSAL = 'proposal',
-  COMMENT = 'comment',
 }
 
 // Define search scope options
@@ -21,12 +20,11 @@ export type SearchScope =
   | 'Communities'
   | 'Topics'
   | 'Threads'
-  | 'Proposals'
-  | 'Replies';
+  | 'Proposals';
 
 // Input schema for unified search
 export const SearchEntitiesInput = z.object({
-  searchTerm: z.string().min(1),
+  searchTerm: z.string(),
   communityId: z.string().optional(),
   searchScope: z.string().optional().default('All'),
   limit: z.number().min(1).max(50).optional(),
@@ -207,34 +205,6 @@ export function SearchEntities(): Query<typeof SearchEntitiesSchema> {
         `);
       }
 
-      // Comments/Replies search
-      if (entityTypesToSearch.includes(SearchEntityType.COMMENT)) {
-        searchQueries.push(`
-          SELECT 
-            CM.id::text as id,
-            '${SearchEntityType.COMMENT}' as type,
-            COALESCE(LEFT(CM.body, 100), 'Comment') as name,
-            COALESCE(LEFT(CM.body, 200), '') as description,
-            NULL as avatar_url,
-            T.community_id,
-            C.name as community_name,
-            U.profile->>'name' as author,
-            CM.created_at,
-            NULL::integer as member_count,
-            'Active' as status,
-            ts_rank_cd(CM.search, websearch_to_tsquery('english', $searchTerm)) as relevance_score
-          FROM "Comments" CM
-          JOIN "Threads" T ON CM.thread_id = T.id
-          JOIN "Addresses" A ON CM.address_id = A.id
-          JOIN "Users" U ON A.user_id = U.id
-          JOIN "Communities" C ON T.community_id = C.id
-          WHERE CM.deleted_at IS NULL 
-            AND CM.marked_as_spam_at IS NULL
-            AND websearch_to_tsquery('english', $searchTerm) @@ CM.search
-            ${communityFilter.replace('community_id', 'T.community_id')}
-        `);
-      }
-
       if (searchQueries.length === 0) {
         return {
           results: [],
@@ -322,7 +292,13 @@ function getEntityTypesFromScope(
   for (const scope of searchScope) {
     switch (scope) {
       case 'All':
-        return Object.values(SearchEntityType);
+        return [
+          SearchEntityType.USER,
+          SearchEntityType.COMMUNITY,
+          SearchEntityType.TOPIC,
+          SearchEntityType.THREAD,
+          SearchEntityType.PROPOSAL,
+        ];
       case 'Members':
         entityTypes.push(SearchEntityType.USER);
         break;
@@ -337,9 +313,6 @@ function getEntityTypesFromScope(
         break;
       case 'Proposals':
         entityTypes.push(SearchEntityType.PROPOSAL);
-        break;
-      case 'Replies':
-        entityTypes.push(SearchEntityType.COMMENT);
         break;
     }
   }

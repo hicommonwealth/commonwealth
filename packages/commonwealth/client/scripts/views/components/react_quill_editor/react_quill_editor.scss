@@ -252,12 +252,19 @@
         padding: 0;
         cursor: pointer;
 
-        li {
+        li.ql-mention-list-item {
           padding: 8px;
           border-bottom: 1px solid $neutral-200;
           margin: 0;
           display: flex;
           align-items: center;
+          justify-content: center;
+          @include multiline-text-ellipsis(2);
+
+          .mention-entity-indicator {
+            margin-right: 8px;
+            font-size: 14px;
+          }
 
           > div {
             font-size: 17px;

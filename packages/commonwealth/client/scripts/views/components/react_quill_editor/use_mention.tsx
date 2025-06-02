@@ -202,27 +202,14 @@ export const useMention = ({
   const createTopicMentionItem = (result: any, node: HTMLElement) => {
     const topicName = result.name;
     const topicId = result.id;
-    const description = result.description || '';
-    const status = result.status || '';
 
     const nameSpan = document.createElement('span');
     nameSpan.innerText = topicName;
     nameSpan.className = 'ql-mention-name';
 
-    const descSpan = document.createElement('span');
-    descSpan.innerText =
-      description.slice(0, 50) + (description.length > 50 ? '...' : '');
-    descSpan.className = 'ql-mention-desc';
-
-    const statusSpan = document.createElement('span');
-    statusSpan.innerText = status;
-    statusSpan.className = 'ql-mention-status';
-
     const textWrap = document.createElement('div');
     textWrap.className = 'ql-mention-text-wrap';
     textWrap.appendChild(nameSpan);
-    if (description) textWrap.appendChild(descSpan);
-    if (status) textWrap.appendChild(statusSpan);
     node.appendChild(textWrap);
 
     return {
@@ -276,7 +263,6 @@ export const useMention = ({
     const communityName = result.name;
     const communityResultId = result.id;
     const memberCount = result.member_count || 0;
-    const status = result.status;
 
     const nameSpan = document.createElement('span');
     nameSpan.innerText = communityName;
@@ -286,15 +272,10 @@ export const useMention = ({
     memberSpan.innerText = `${memberCount} members`;
     memberSpan.className = 'ql-mention-desc';
 
-    const statusSpan = document.createElement('span');
-    statusSpan.innerText = status || '';
-    statusSpan.className = 'ql-mention-status';
-
     const textWrap = document.createElement('div');
     textWrap.className = 'ql-mention-text-wrap';
     textWrap.appendChild(nameSpan);
     textWrap.appendChild(memberSpan);
-    if (status) textWrap.appendChild(statusSpan);
     node.appendChild(textWrap);
 
     return {
@@ -395,7 +376,20 @@ export const useMention = ({
 
             if (searchTerm.length < MENTION_CONFIG.MIN_SEARCH_LENGTH) {
               // Show tip message for short search terms
-              renderList([], searchTerm);
+              const node = document.createElement('div');
+              node.className = 'mention-empty-state';
+              node.innerText = `Type at least ${MENTION_CONFIG.MIN_SEARCH_LENGTH} characters to 
+              ${mentionSearchConfig.description.toLowerCase()}`;
+              renderList(
+                [
+                  {
+                    link: '#',
+                    name: '',
+                    component: node.outerHTML,
+                  },
+                ],
+                searchTerm,
+              );
               return;
             }
 
@@ -416,6 +410,23 @@ export const useMention = ({
             const { data } = await refetch();
 
             const results = data?.results || [];
+            if (results.length === 0) {
+              const node = document.createElement('div');
+              node.className = 'mention-empty-state';
+              node.innerText = `No results found for "${searchTerm}".`;
+              renderList(
+                [
+                  {
+                    link: '#',
+                    name: '',
+                    component: node.outerHTML,
+                  },
+                ],
+                searchTerm,
+              );
+              return;
+            }
+
             const formattedMatches = results.map((result: any) => {
               const entityType = getEntityTypeFromSearchResult(result);
               return createEntityMentionItem(entityType, result);
