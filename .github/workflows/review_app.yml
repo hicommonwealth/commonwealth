@@ -323,6 +323,20 @@ jobs:
         with:
           version: 'latest'
 
+      - name: Debug DATABASE_URL
+        run: |
+          if [ -z "${{ needs.setup_review_db.outputs.db_url_with_pooler }}" ]; then
+            echo "DATABASE_URL_WITH_POOLER is NOT set"
+          else
+            echo "DATABASE_URL_WITH_POOLER is set"
+          fi
+          
+          if [ -z "${{ needs.setup_review_db.outputs.db_url }}" ]; then
+            echo "DATABASE_URL is NOT set"
+          else
+            echo "DATABASE_URL is set"
+          fi
+
       - name: Create HCP Vault Secrets App
         uses: ./.github/actions/hcp-app-manager
         env:
