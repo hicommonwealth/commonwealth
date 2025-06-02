@@ -293,9 +293,11 @@
           .ql-mention-name {
             font-size: 16px;
             margin-right: 16px;
+            @include multiline-text-ellipsis(2);
           }
 
-          .ql-mention-addr {
+          .ql-mention-addr,
+          .ql-mention-desc {
             float: right;
             color: $neutral-500;
             font-size: 14px;

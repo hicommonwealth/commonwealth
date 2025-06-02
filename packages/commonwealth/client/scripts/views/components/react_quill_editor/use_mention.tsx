@@ -233,19 +233,23 @@ export const useMention = ({
     titleSpan.innerText = threadTitle;
     titleSpan.className = 'ql-mention-name';
 
-    const authorSpan = document.createElement('span');
-    authorSpan.innerText = author ? `by ${author}` : '';
-    authorSpan.className = 'ql-mention-desc';
-
-    const communitySpan = document.createElement('span');
-    communitySpan.innerText = communityName ? `in ${communityName}` : '';
-    communitySpan.className = 'ql-mention-addr';
+    // Combine author and community name into a single span
+    let metaText = '';
+    if (author && communityName) {
+      metaText = `by ${author} in ${communityName}`;
+    } else if (author) {
+      metaText = `by ${author}`;
+    } else if (communityName) {
+      metaText = `in ${communityName}`;
+    }
+    const metaSpan = document.createElement('span');
+    metaSpan.innerText = metaText;
+    metaSpan.className = 'ql-mention-desc';
 
     const textWrap = document.createElement('div');
     textWrap.className = 'ql-mention-text-wrap';
     textWrap.appendChild(titleSpan);
-    if (author) textWrap.appendChild(authorSpan);
-    if (communityName) textWrap.appendChild(communitySpan);
+    if (metaText) textWrap.appendChild(metaSpan);
     node.appendChild(textWrap);
 
     return {
