@@ -85,7 +85,7 @@ jobs:
           HCP_PROJECT_ID: ${{ secrets.HCP_PROJECT_ID }}
           HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
           HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
-          DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url_with_pooler }}
+          DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }} # TODO: update to db_url_with_pool?
         with:
           action: 'create'
           app-name: 'PR-${{ steps.set_pr_number.outputs.pr_number }}'
