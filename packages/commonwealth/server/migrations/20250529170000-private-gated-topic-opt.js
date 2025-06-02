@@ -18,13 +18,27 @@ module.exports = {
         name: 'memberships_group_id_address_id_accepted',
         transaction,
       });
+      // add index to non rejected memberships
+      await queryInterface.addIndex('GroupGatedActions', {
+        fields: ['is_private', 'topic_id'],
+        name: 'groupgatedactions_is_private',
+        transaction,
+      });
     });
   },
 
   down: async (queryInterface) => {
-    await queryInterface.removeIndex(
-      'Memberships',
-      'memberships_group_id_address_id_accepted',
-    );
+    await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.removeIndex(
+        'Memberships',
+        'memberships_group_id_address_id_accepted',
+        { transaction },
+      );
+      await queryInterface.removeIndex(
+        'GroupGatedActions',
+        'groupgatedactions_is_private',
+        { transaction },
+      );
+    });
   },
 };
