@@ -40,7 +40,7 @@ export const useMention = ({
   lastSelectionRef,
 }: UseMentionProps) => {
   const [mentionTerm, setMentionTerm] = useState('');
-  const [currentMentionChar, setCurrentMentionChar] = useState<string>('@');
+  const [currentMentionChar, setCurrentMentionChar] = useState<string>('');
   const [currentSearchScope, setCurrentSearchScope] = useState<string[]>([
     'All',
   ]);
@@ -159,238 +159,221 @@ export const useMention = ({
     [],
   );
 
-  const createUserMentionItem = useCallback(
-    (result: any, node: HTMLElement) => {
-      const userId = result.id;
-      const profileName = result.name;
-      const avatarUrl = result.avatar_url;
-      const communityName = result.community_name;
+  const createUserMentionItem = (result: any, node: HTMLElement) => {
+    const userId = result.id;
+    const profileName = result.name;
+    const avatarUrl = result.avatar_url;
+    const communityName = result.community_name;
 
-      // Create a minimal profile for avatar generation
-      const profile = new MinimumProfile('', '');
-      profile.initialize(
-        userId,
-        profileName,
-        '',
-        avatarUrl,
-        '',
-        null,
-        UserTierMap.IncompleteUser,
-      );
+    // Create a minimal profile for avatar generation
+    const profile = new MinimumProfile('', '');
+    profile.initialize(
+      userId,
+      profileName,
+      '',
+      avatarUrl,
+      '',
+      null,
+      UserTierMap.IncompleteUser,
+    );
 
-      let avatar;
-      if (avatarUrl) {
-        avatar = document.createElement('img');
-        (avatar as HTMLImageElement).src = avatarUrl;
-        avatar.className = 'ql-mention-avatar';
-      } else {
-        avatar = document.createElement('div');
-        avatar.className = 'ql-mention-avatar';
-        avatar.innerHTML = MinimumProfile.getSVGAvatar('', 20);
-      }
+    let avatar;
+    if (avatarUrl) {
+      avatar = document.createElement('img');
+      (avatar as HTMLImageElement).src = avatarUrl;
+      avatar.className = 'ql-mention-avatar';
+    } else {
+      avatar = document.createElement('div');
+      avatar.className = 'ql-mention-avatar';
+      avatar.innerHTML = MinimumProfile.getSVGAvatar('', 20);
+    }
 
-      const nameSpan = document.createElement('span');
-      nameSpan.innerText = profileName;
-      nameSpan.className = 'ql-mention-name';
+    const nameSpan = document.createElement('span');
+    nameSpan.innerText = profileName;
+    nameSpan.className = 'ql-mention-name';
 
-      const communitySpan = document.createElement('span');
-      communitySpan.innerText = communityName || '';
-      communitySpan.className = 'ql-mention-addr';
+    const communitySpan = document.createElement('span');
+    communitySpan.innerText = communityName || '';
+    communitySpan.className = 'ql-mention-addr';
 
-      const textWrap = document.createElement('div');
-      textWrap.className = 'ql-mention-text-wrap';
+    const textWrap = document.createElement('div');
+    textWrap.className = 'ql-mention-text-wrap';
 
-      node.appendChild(avatar);
-      textWrap.appendChild(nameSpan);
-      if (communityName) textWrap.appendChild(communitySpan);
-      node.appendChild(textWrap);
+    node.appendChild(avatar);
+    textWrap.appendChild(nameSpan);
+    if (communityName) textWrap.appendChild(communitySpan);
+    node.appendChild(textWrap);
 
-      return {
-        link: `/profile/id/${userId}`,
-        name: profileName,
-        component: node.outerHTML,
-        type: MentionEntityType.USER,
-        id: userId,
-        user_id: userId,
-        profile_name: profileName,
-      };
-    },
-    [],
-  );
+    return {
+      link: `/profile/id/${userId}`,
+      name: profileName,
+      component: node.outerHTML,
+      type: MentionEntityType.USER,
+      id: userId,
+      user_id: userId,
+      profile_name: profileName,
+    };
+  };
 
-  const createTopicMentionItem = useCallback(
-    (result: any, node: HTMLElement) => {
-      const topicName = result.name;
-      const topicId = result.id;
-      const description = result.description || '';
-      const status = result.status || '';
+  const createTopicMentionItem = (result: any, node: HTMLElement) => {
+    const topicName = result.name;
+    const topicId = result.id;
+    const description = result.description || '';
+    const status = result.status || '';
 
-      const nameSpan = document.createElement('span');
-      nameSpan.innerText = topicName;
-      nameSpan.className = 'ql-mention-name';
+    const nameSpan = document.createElement('span');
+    nameSpan.innerText = topicName;
+    nameSpan.className = 'ql-mention-name';
 
-      const descSpan = document.createElement('span');
-      descSpan.innerText =
-        description.slice(0, 50) + (description.length > 50 ? '...' : '');
-      descSpan.className = 'ql-mention-desc';
+    const descSpan = document.createElement('span');
+    descSpan.innerText =
+      description.slice(0, 50) + (description.length > 50 ? '...' : '');
+    descSpan.className = 'ql-mention-desc';
 
-      const statusSpan = document.createElement('span');
-      statusSpan.innerText = status;
-      statusSpan.className = 'ql-mention-status';
+    const statusSpan = document.createElement('span');
+    statusSpan.innerText = status;
+    statusSpan.className = 'ql-mention-status';
 
-      const textWrap = document.createElement('div');
-      textWrap.className = 'ql-mention-text-wrap';
-      textWrap.appendChild(nameSpan);
-      if (description) textWrap.appendChild(descSpan);
-      if (status) textWrap.appendChild(statusSpan);
-      node.appendChild(textWrap);
+    const textWrap = document.createElement('div');
+    textWrap.className = 'ql-mention-text-wrap';
+    textWrap.appendChild(nameSpan);
+    if (description) textWrap.appendChild(descSpan);
+    if (status) textWrap.appendChild(statusSpan);
+    node.appendChild(textWrap);
 
-      return {
-        link: `/discussion/topic/${topicId}`,
-        name: topicName,
-        component: node.outerHTML,
-        type: MentionEntityType.TOPIC,
-        id: topicId,
-        topic_id: topicId,
-        topic_name: topicName,
-      };
-    },
-    [],
-  );
+    return {
+      link: `/discussion/topic/${topicId}`,
+      name: topicName,
+      component: node.outerHTML,
+      type: MentionEntityType.TOPIC,
+      id: topicId,
+      topic_id: topicId,
+      topic_name: topicName,
+    };
+  };
 
-  const createThreadMentionItem = useCallback(
-    (result: any, node: HTMLElement) => {
-      const threadTitle = result.name;
-      const threadId = result.id;
-      const author = result.author;
-      const communityName = result.community_name;
+  const createThreadMentionItem = (result: any, node: HTMLElement) => {
+    const threadTitle = result.name;
+    const threadId = result.id;
+    const author = result.author;
+    const communityName = result.community_name;
 
-      const titleSpan = document.createElement('span');
-      titleSpan.innerText = threadTitle;
-      titleSpan.className = 'ql-mention-name';
+    const titleSpan = document.createElement('span');
+    titleSpan.innerText = threadTitle;
+    titleSpan.className = 'ql-mention-name';
 
-      const authorSpan = document.createElement('span');
-      authorSpan.innerText = author ? `by ${author}` : '';
-      authorSpan.className = 'ql-mention-desc';
+    const authorSpan = document.createElement('span');
+    authorSpan.innerText = author ? `by ${author}` : '';
+    authorSpan.className = 'ql-mention-desc';
 
-      const communitySpan = document.createElement('span');
-      communitySpan.innerText = communityName ? `in ${communityName}` : '';
-      communitySpan.className = 'ql-mention-addr';
+    const communitySpan = document.createElement('span');
+    communitySpan.innerText = communityName ? `in ${communityName}` : '';
+    communitySpan.className = 'ql-mention-addr';
 
-      const textWrap = document.createElement('div');
-      textWrap.className = 'ql-mention-text-wrap';
-      textWrap.appendChild(titleSpan);
-      if (author) textWrap.appendChild(authorSpan);
-      if (communityName) textWrap.appendChild(communitySpan);
-      node.appendChild(textWrap);
+    const textWrap = document.createElement('div');
+    textWrap.className = 'ql-mention-text-wrap';
+    textWrap.appendChild(titleSpan);
+    if (author) textWrap.appendChild(authorSpan);
+    if (communityName) textWrap.appendChild(communitySpan);
+    node.appendChild(textWrap);
 
-      return {
-        link: `/discussion/${threadId}`,
-        name: threadTitle,
-        component: node.outerHTML,
-        type: MentionEntityType.THREAD,
-        id: threadId,
-        thread_id: threadId,
-        title: threadTitle,
-      };
-    },
-    [],
-  );
+    return {
+      link: `/discussion/${threadId}`,
+      name: threadTitle,
+      component: node.outerHTML,
+      type: MentionEntityType.THREAD,
+      id: threadId,
+      thread_id: threadId,
+      title: threadTitle,
+    };
+  };
 
-  const createCommunityMentionItem = useCallback(
-    (result: any, node: HTMLElement) => {
-      const communityName = result.name;
-      const communityResultId = result.id;
-      const memberCount = result.member_count || 0;
-      const status = result.status;
+  const createCommunityMentionItem = (result: any, node: HTMLElement) => {
+    const communityName = result.name;
+    const communityResultId = result.id;
+    const memberCount = result.member_count || 0;
+    const status = result.status;
 
-      const nameSpan = document.createElement('span');
-      nameSpan.innerText = communityName;
-      nameSpan.className = 'ql-mention-name';
+    const nameSpan = document.createElement('span');
+    nameSpan.innerText = communityName;
+    nameSpan.className = 'ql-mention-name';
 
-      const memberSpan = document.createElement('span');
-      memberSpan.innerText = `${memberCount} members`;
-      memberSpan.className = 'ql-mention-desc';
+    const memberSpan = document.createElement('span');
+    memberSpan.innerText = `${memberCount} members`;
+    memberSpan.className = 'ql-mention-desc';
 
-      const statusSpan = document.createElement('span');
-      statusSpan.innerText = status || '';
-      statusSpan.className = 'ql-mention-status';
+    const statusSpan = document.createElement('span');
+    statusSpan.innerText = status || '';
+    statusSpan.className = 'ql-mention-status';
 
-      const textWrap = document.createElement('div');
-      textWrap.className = 'ql-mention-text-wrap';
-      textWrap.appendChild(nameSpan);
-      textWrap.appendChild(memberSpan);
-      if (status) textWrap.appendChild(statusSpan);
-      node.appendChild(textWrap);
+    const textWrap = document.createElement('div');
+    textWrap.className = 'ql-mention-text-wrap';
+    textWrap.appendChild(nameSpan);
+    textWrap.appendChild(memberSpan);
+    if (status) textWrap.appendChild(statusSpan);
+    node.appendChild(textWrap);
 
-      return {
-        link: `/${communityResultId}`,
-        name: communityName,
-        component: node.outerHTML,
-        type: MentionEntityType.COMMUNITY,
-        id: communityResultId,
-        community_id: communityResultId,
-      };
-    },
-    [],
-  );
+    return {
+      link: `/${communityResultId}`,
+      name: communityName,
+      component: node.outerHTML,
+      type: MentionEntityType.COMMUNITY,
+      id: communityResultId,
+      community_id: communityResultId,
+    };
+  };
 
-  const createProposalMentionItem = useCallback(
-    (result: any, node: HTMLElement) => {
-      const proposalTitle = result.name;
-      const proposalId = result.id;
-      const status = result.status || 'Unknown';
+  const createProposalMentionItem = (result: any, node: HTMLElement) => {
+    const proposalTitle = result.name;
+    const proposalId = result.id;
+    const status = result.status || 'Unknown';
 
-      const titleSpan = document.createElement('span');
-      titleSpan.innerText = proposalTitle;
-      titleSpan.className = 'ql-mention-name';
+    const titleSpan = document.createElement('span');
+    titleSpan.innerText = proposalTitle;
+    titleSpan.className = 'ql-mention-name';
 
-      const statusSpan = document.createElement('span');
-      statusSpan.innerText = `Status: ${status}`;
-      statusSpan.className = 'ql-mention-desc';
+    const statusSpan = document.createElement('span');
+    statusSpan.innerText = `Status: ${status}`;
+    statusSpan.className = 'ql-mention-desc';
 
-      const textWrap = document.createElement('div');
-      textWrap.className = 'ql-mention-text-wrap';
-      textWrap.appendChild(titleSpan);
-      textWrap.appendChild(statusSpan);
-      node.appendChild(textWrap);
+    const textWrap = document.createElement('div');
+    textWrap.className = 'ql-mention-text-wrap';
+    textWrap.appendChild(titleSpan);
+    textWrap.appendChild(statusSpan);
+    node.appendChild(textWrap);
 
-      return {
-        link: `/proposal/${proposalId}`,
-        name: proposalTitle,
-        component: node.outerHTML,
-        type: MentionEntityType.PROPOSAL,
-        id: proposalId,
-        proposal_id: proposalId,
-        title: proposalTitle,
-      };
-    },
-    [],
-  );
+    return {
+      link: `/proposal/${proposalId}`,
+      name: proposalTitle,
+      component: node.outerHTML,
+      type: MentionEntityType.PROPOSAL,
+      id: proposalId,
+      proposal_id: proposalId,
+      title: proposalTitle,
+    };
+  };
 
-  const createGenericMentionItem = useCallback(
-    (result: any, node: HTMLElement) => {
-      const name = result.name || result.title || 'Unknown';
-      const id = result.id || '';
+  const createGenericMentionItem = (result: any, node: HTMLElement) => {
+    const name = result.name || result.title || 'Unknown';
+    const id = result.id || '';
 
-      const nameSpan = document.createElement('span');
-      nameSpan.innerText = name;
-      nameSpan.className = 'ql-mention-name';
+    const nameSpan = document.createElement('span');
+    nameSpan.innerText = name;
+    nameSpan.className = 'ql-mention-name';
 
-      node.appendChild(nameSpan);
+    node.appendChild(nameSpan);
 
-      return {
-        link: `#${id}`,
-        name: name,
-        component: node.outerHTML,
-        id: id,
-      };
-    },
-    [],
-  );
+    return {
+      link: `#${id}`,
+      name: name,
+      component: node.outerHTML,
+      id: id,
+    };
+  };
 
   // Update refs when search results change
   useEffect(() => {
+    console.log('searchResults', searchResults);
     searchResultsRef.current = searchResults;
     isLoadingRef.current = isLoading;
 
@@ -464,6 +447,8 @@ export const useMention = ({
         ) => {
           setCurrentMentionChar(mentionChar);
 
+          console.log('mentionChar', mentionChar);
+
           // Get search configuration for this denotation character
           const mentionSearchConfig = DENOTATION_SEARCH_CONFIG[mentionChar];
           if (!mentionSearchConfig) return;
@@ -482,6 +467,8 @@ export const useMention = ({
                 component: node.outerHTML,
               },
             ];
+            console.log('tutaj!1', formattedMatches);
+            console.log('tutaj!2', mentionChar);
             renderList(formattedMatches, searchTerm);
           } else {
             // Only update search configuration and term for valid searches
