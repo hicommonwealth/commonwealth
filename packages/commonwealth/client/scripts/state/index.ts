@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { updateActiveUser } from 'controllers/app/login';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
@@ -7,12 +6,13 @@ import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { EventEmitter } from 'events';
 import type IChainAdapter from 'models/IChainAdapter';
-import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
+import { queryClient, QueryKeys } from 'state/api/config';
 import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
 import { errorStore } from 'state/ui/error';
 import SuiAccount from '../controllers/chain/sui/account';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
 import { fetchNodes } from './api/nodes';
+import { fetchStatus } from './api/user/fetchStatus';
 import { userStore } from './ui/user';
 
 export enum ApiStatus {
@@ -67,51 +67,65 @@ export async function initAppState(
   updateSelectedCommunity = true,
 ): Promise<void> {
   try {
-    const { data: statusRes } = await axios.get(`${SERVER_URL}/status`);
-
     await fetchNodes();
     await fetchCustomDomainQuery();
 
+    // set evmTestEnv in configuration cache
     queryClient.setQueryData([QueryKeys.CONFIGURATION], {
-      evmTestEnv: statusRes.result.evmTestEnv,
+      evmTestEnv: {
+        ETH_RPC: process.env.TEST_EVM_ETH_RPC,
+        PROVIDER_URL: process.env.TEST_EVM_PROVIDER_URL,
+      },
     });
 
-    // store community redirect's map in configuration cache
-    const communityWithRedirects =
-      statusRes.result?.communityWithRedirects || [];
-    if (communityWithRedirects.length > 0) {
-      communityWithRedirects.map(({ id, redirect }) => {
-        const cachedConfig = queryClient.getQueryData<Configuration>([
-          QueryKeys.CONFIGURATION,
-        ]);
+    const user = userStore.getState();
+    const address =
+      user.addressSelectorSelectedAddress ||
+      user.activeAccount?.address ||
+      user.addresses?.at(0)?.address;
+    if (address) {
+      try {
+        const status = await fetchStatus(address);
 
-        queryClient.setQueryData([QueryKeys.CONFIGURATION], {
-          ...cachedConfig,
-          redirects: {
-            ...cachedConfig?.redirects,
-            [redirect]: id,
-          },
-        });
-      });
+        // store community redirect's map in configuration cache
+        const communityWithRedirects =
+          status.communities?.filter((c) => c.redirect) || [];
+        if (communityWithRedirects.length > 0) {
+          communityWithRedirects.map(({ id, redirect }) => {
+            const cachedConfig = queryClient.getQueryData<Configuration>([
+              QueryKeys.CONFIGURATION,
+            ]);
+            queryClient.setQueryData([QueryKeys.CONFIGURATION], {
+              ...cachedConfig,
+              redirects: {
+                ...cachedConfig?.redirects,
+                [redirect!]: id,
+              },
+            });
+          });
+        }
+
+        // update the selectedCommunity, unless we explicitly want to avoid
+        // changing the current state (e.g. when logging in through link_new_address_modal)
+        if (updateSelectedCommunity && status?.selected_community_id) {
+          userStore.getState().setData({
+            // TODO: api should be updated to get relevant data
+            activeCommunity: await EXCEPTION_CASE_VANILLA_getCommunityById(
+              status.selected_community_id,
+              true,
+            ),
+          });
+        }
+        // signed in - update status
+        updateActiveUser(status);
+        return;
+      } catch (e) {
+        // error fetching status
+        console.error(e);
+      }
     }
-
-    // it is either user object or undefined
-    const userResponse = statusRes.result.user;
-
-    // update the login status
-    updateActiveUser(userResponse);
-
-    // update the selectedCommunity, unless we explicitly want to avoid
-    // changing the current state (e.g. when logging in through link_new_address_modal)
-    if (updateSelectedCommunity && userResponse?.selected_community_id) {
-      userStore.getState().setData({
-        // TODO: api should be updated to get relevant data
-        activeCommunity: await EXCEPTION_CASE_VANILLA_getCommunityById(
-          userResponse.selected_community_id,
-          true,
-        ),
-      });
-    }
+    // not signed in
+    updateActiveUser();
   } catch (err) {
     errorStore
       .getState()

@@ -174,12 +174,7 @@ export async function updateActiveAddresses(chainId: string) {
 }
 
 // called from the server, which returns public keys
-export function updateActiveUser(
-  data: z.infer<(typeof GetStatus)['output']> & {
-    jwt: string;
-    knockJwtToken: string;
-  },
-) {
+export function updateActiveUser(data?: z.infer<(typeof GetStatus)['output']>) {
   const user = userStore.getState();
 
   if (!data) {
@@ -530,6 +525,7 @@ export async function handleSocialLoginCallback({
     walletSsoSource,
     referrer_address,
   };
+  console.log({ data });
 
   try {
     response = await axios.post(`${SERVER_URL}/auth/magic`, data, {

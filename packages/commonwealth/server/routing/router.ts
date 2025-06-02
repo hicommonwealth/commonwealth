@@ -19,7 +19,6 @@ import {
 import { AppError, query } from '@hicommonwealth/core';
 import { Community, generateTokenIdea, User } from '@hicommonwealth/model';
 import { get_feed_router } from 'server/api/get-feed-router';
-import { get_status_handler } from 'server/api/get-status-handler';
 import { get_threads_router } from 'server/api/get-threads-router';
 import generateImageHandler from '../routes/generateImage';
 import getUploadSignature from '../routes/getUploadSignature';
@@ -47,7 +46,6 @@ function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
   // TODO: these routers should be decomposed into smaller routes to individual queries
   registerRoute(router, 'get', '/threads', get_threads_router);
   registerRoute(router, 'get', '/feed', get_feed_router);
-  registerRoute(router, 'get', '/status', get_status_handler);
   registerRoute(
     router,
     'get',
