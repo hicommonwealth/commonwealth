@@ -28,7 +28,8 @@
 
   .searchbar {
     width: 608px;
-
+    display: flex;
+    gap: 4px;
     .SearchBar {
       @include extraSmall {
         display: none;
@@ -77,6 +78,11 @@
           align-items: center;
           justify-content: center;
           cursor: pointer;
+          gap: 4px;
+
+          .Text {
+            color: $neutral-500;
+          }
 
           .earnings {
             margin-inline: 4px;

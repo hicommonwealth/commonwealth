@@ -7,6 +7,7 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
@@ -37,6 +38,7 @@ describe('Stake lifecycle', () => {
     const [node] = await seed('ChainNode', {});
     const [user] = await seed('User', { isAdmin: true });
     const [community_with_stake] = await seed('Community', {
+      tier: CommunityTierMap.ManuallyVerified,
       active: true,
       chain_node_id: node!.id!,
       namespace: 'test1',
@@ -60,6 +62,7 @@ describe('Stake lifecycle', () => {
       ],
     });
     const [community_without_stake_to_set] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       active: true,
       chain_node_id: node!.id!,
       namespace: 'test2',
@@ -75,6 +78,7 @@ describe('Stake lifecycle', () => {
       ],
     });
     const [community_without_stake] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       active: true,
       chain_node_id: node!.id!,
       lifetime_thread_count: 0,
@@ -102,7 +106,7 @@ describe('Stake lifecycle', () => {
       'validateCommunityStakeConfig',
     ).mockImplementation((c) => {
       if (!c.namespace) throw new AppError('No namespace');
-      if (c.id === id_without_stake_to_set) throw new AppError('No stake');
+      // if (c.id === id_without_stake_to_set) throw new AppError('No stake');
       return Promise.resolve(undefined);
     });
   });
@@ -150,7 +154,7 @@ describe('Stake lifecycle', () => {
       actor,
       payload: { community_id: id_without_stake_to_set },
     });
-    expect(qr).to.deep.include({ ...payload });
+    expect(qr?.stake).to.deep.include({ ...payload });
 
     const commr = await query(GetCommunities(), {
       actor,
@@ -188,6 +192,6 @@ describe('Stake lifecycle', () => {
       actor,
       payload: { community_id: id_without_stake },
     });
-    expect(qr).to.be.undefined;
+    expect(qr?.stake).to.be.undefined;
   });
 });

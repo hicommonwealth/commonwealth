@@ -11,6 +11,7 @@ import useCreateCommunityMutation, {
   buildCreateCommunityInput,
 } from 'state/api/communities/createCommunity';
 import CommunityInformationForm from 'views/components/CommunityInformationForm/CommunityInformationForm';
+import { useTurnstile } from 'views/components/useTurnstile';
 // eslint-disable-next-line max-len
 import { alphabeticallyStakeWiseSortedChains as sortedChains } from 'views/components/CommunityInformationForm/constants';
 import { CommunityInformationFormSubmitValues } from 'views/components/CommunityInformationForm/types';
@@ -35,6 +36,15 @@ const CommunityInformationStep = ({
 }: CommunityInformationStepProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
 
+  const {
+    turnstileToken,
+    isTurnstileEnabled,
+    TurnstileWidget,
+    resetTurnstile,
+  } = useTurnstile({
+    action: 'create-community',
+  });
+
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
   >({
@@ -49,9 +59,17 @@ const CommunityInformationStep = ({
   const handleSubmit = async (
     values: CommunityInformationFormSubmitValues & { communityId: string },
   ) => {
+    // Simplified logic: Find the chain node by comparing stringified values.
+    // This works for Sui chains (e.g., "sui-123") and other chains (e.g., "1", "osmosis")
+    // because values.chain.value from the form now directly matches chain.value in sortedChains.
     const selectedChainNode = sortedChains.find(
-      (chain) => String(chain.value) === values?.chain?.value,
+      (chain) => String(chain.value) === String(values?.chain?.value),
     );
+
+    if (isTurnstileEnabled && !turnstileToken) {
+      notifyError('Please complete the verification');
+      return;
+    }
 
     try {
       const input = buildCreateCommunityInput({
@@ -62,11 +80,17 @@ const CommunityInformationStep = ({
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
         chainNodeId: selectedChainNode!.id!,
+        turnstileToken: turnstileToken || undefined,
+        tokenizeCommunity: values.tokenizeCommunity,
       });
       await createCommunityMutation(input);
       handleContinue(values.communityId, values.communityName);
     } catch (err) {
       notifyError(err.message);
+      // Reset turnstile if there's an error
+      if (isTurnstileEnabled) {
+        resetTurnstile();
+      }
     }
   };
 
@@ -96,7 +120,17 @@ const CommunityInformationStep = ({
   };
 
   const handleWatchForm = (values: CommunityInformationFormSubmitValues) => {
-    values?.chain?.value && handleSelectedChainId(values.chain.value);
+    // Extract the chain ID value, handling the Sui special case
+    if (values?.chain?.value) {
+      if (values.chain.value.toString().startsWith('sui-')) {
+        // For Sui chains, pass the node ID directly
+        const chainNodeId = values.chain.value.split('-')[1];
+        handleSelectedChainId(chainNodeId);
+      } else {
+        // For regular chains, pass the value as before
+        handleSelectedChainId(values.chain.value);
+      }
+    }
   };
 
   return (
@@ -111,7 +145,8 @@ const CommunityInformationStep = ({
       <FeatureHint
         title="Chain selection cannot be changed"
         hint={`
-              Choose the chain that your Ethereum project is built on. Chain selection 
+              Choose the chain your project is built on. You can choose between Solana, Ethereum,
+               or Cosmos based chains. Chain selection 
               determines availability of features such as Contests, Stakes, and Weighted Voting.
             `}
       />
@@ -124,6 +159,9 @@ const CommunityInformationStep = ({
         withSocialLinks={false} // TODO: Set this when design figures out how we will integrate the social links
         isCreatingCommunity={createCommunityLoading}
         submitBtnLabel="Launch Community"
+        isTurnstileEnabled={isTurnstileEnabled}
+        turnstileToken={turnstileToken}
+        TurnstileWidget={isTurnstileEnabled ? TurnstileWidget : undefined}
       />
     </div>
   );

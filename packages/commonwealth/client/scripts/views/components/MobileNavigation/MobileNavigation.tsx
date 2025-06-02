@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 
 import { useCommonNavigate } from 'navigation/helpers';
@@ -20,6 +20,7 @@ const MobileNavigation = () => {
   const rewardsEnabled = useFlag('rewardsPage');
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const navigationRef = useRef<HTMLDivElement>(null);
 
   const matchesDashboard = matchRoutes([{ path: '/dashboard/*' }], location);
   const matchesExplore = matchRoutes([{ path: '/explore' }], location);
@@ -60,9 +61,9 @@ const MobileNavigation = () => {
     ...(user.isLoggedIn && rewardsEnabled
       ? [
           {
-            type: 'rewards' as const,
-            onClick: () => navigate('/rewards', {}, null),
-            selected: !!matchRoutes([{ path: '/rewards' }], location),
+            type: 'wallet' as const,
+            onClick: () => navigate('/wallet', {}, null),
+            selected: !!matchRoutes([{ path: '/wallet' }], location),
           },
         ]
       : []),
@@ -75,10 +76,25 @@ const MobileNavigation = () => {
   const isDiscussionsPage = window.location?.pathname?.includes('/discussion');
   const shouldHideQuickPost = isNewThreadPage || isDiscussionsPage;
 
+  useEffect(() => {
+    const node = navigationRef.current;
+    if (!node) return;
+
+    const preventScroll = (event: TouchEvent) => {
+      event.preventDefault();
+    };
+
+    node.addEventListener('touchmove', preventScroll, { passive: false });
+
+    return () => {
+      node.removeEventListener('touchmove', preventScroll);
+    };
+  }, []);
+
   return (
     <>
       {newMobileNav && !shouldHideQuickPost && <QuickPostButton />}
-      <div className="MobileNavigation">
+      <div className="MobileNavigation" ref={navigationRef}>
         <div id="MobileNavigationHead">
           {/*react portal container for anyone that wants to put content*/}
           {/*into the bottom nav.*/}

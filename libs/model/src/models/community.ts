@@ -53,6 +53,8 @@ export default (
     'Community',
     {
       id: { type: Sequelize.STRING, primaryKey: true },
+      tier: { type: Sequelize.INTEGER, allowNull: false },
+      spam_tier_level: { type: Sequelize.INTEGER, allowNull: false },
       chain_node_id: { type: Sequelize.INTEGER, allowNull: true }, // only null if starter community
       name: { type: Sequelize.STRING, allowNull: false },
       discord_config_id: { type: Sequelize.INTEGER, allowNull: true }, // null if no bot enabled
@@ -127,8 +129,26 @@ export default (
         defaultValue: 0,
       },
       namespace: { type: Sequelize.STRING, allowNull: true, unique: true },
+      namespace_verified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       namespace_address: {
         type: Sequelize.STRING,
+        allowNull: true,
+      },
+      namespace_creator_address: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      namespace_verification_configured: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      namespace_nominations: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: true,
       },
       created_at: { type: Sequelize.DATE, allowNull: true },
@@ -151,10 +171,22 @@ export default (
         type: Sequelize.STRING,
         allowNull: true,
       },
+      environment: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       allow_tokenized_threads: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: false,
+      },
+      thread_purchase_token: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      pending_namespace_judge_token_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
       },
     },
     {

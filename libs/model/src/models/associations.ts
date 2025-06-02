@@ -35,7 +35,7 @@ export const buildAssociations = (db: DB) => {
     foreignKey: 'action_meta_id',
     asOne: 'quest_action_meta',
   })
-    .withMany(db.ChainEventXpSource, {
+    .withOne(db.ChainEventXpSource, {
       foreignKey: 'quest_action_meta_id',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
@@ -45,6 +45,12 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });
+
+  db.CommunityGoalMeta.withMany(db.QuestActionMeta, {
+    foreignKey: 'community_goal_meta_id',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  });
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -75,6 +81,11 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     });
 
+  db.DiscordBotConfig.withOne(db.Community, {
+    foreignKey: 'discord_config_id',
+    targetKey: 'id',
+  });
+
   db.Community.withMany(db.Group, { asMany: 'groups' })
     .withMany(db.Topic, {
       asOne: 'community',
@@ -100,7 +111,8 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     })
     .withOne(db.DiscordBotConfig, {
-      targetKey: 'discord_config_id',
+      foreignKey: 'community_id',
+      targetKey: 'id',
       onDelete: 'CASCADE',
     })
     .withOne(db.User, {
@@ -132,7 +144,7 @@ export const buildAssociations = (db: DB) => {
     onUpdate: 'CASCADE',
     onDelete: 'SET NULL',
   })
-    .withMany(db.GroupPermission, {
+    .withMany(db.GroupGatedAction, {
       foreignKey: 'topic_id',
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
@@ -147,7 +159,10 @@ export const buildAssociations = (db: DB) => {
       asMany: 'reactions',
     })
     .withMany(db.Comment)
-    .withMany(db.ThreadVersionHistory);
+    .withMany(db.ThreadVersionHistory)
+    .withOne(db.ThreadRank, {
+      onDelete: 'CASCADE',
+    });
 
   db.Comment.withMany(db.Reaction, {
     asMany: 'reactions',
@@ -181,7 +196,7 @@ export const buildAssociations = (db: DB) => {
     onDelete: 'CASCADE',
   });
 
-  db.Group.withMany(db.GroupPermission, {
+  db.Group.withMany(db.GroupGatedAction, {
     foreignKey: 'group_id',
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',

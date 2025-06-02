@@ -1,17 +1,27 @@
-import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
+import {
+  config,
+  InvalidInput,
+  InvalidState,
+  type Command,
+} from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
+  bech32ToHex,
   ChainBase,
   ChainNetwork,
   ChainType,
+  CommunityTierMap,
   DefaultPage,
-  bech32ToHex,
+  DisabledCommunitySpamTier,
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { models } from '../../database';
-import { tiered } from '../../middleware';
-import { authVerified } from '../../middleware/auth';
-import { mustBeSuperAdmin, mustExist } from '../../middleware/guards';
+import {
+  authVerified,
+  mustBeSuperAdmin,
+  mustExist,
+  tiered,
+} from '../../middleware';
 import { emitEvent } from '../../utils';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';
 
@@ -46,13 +56,19 @@ function baseToNetwork(n: ChainBase): ChainNetwork {
       return ChainNetwork.NEAR;
     case ChainBase.Solana:
       return ChainNetwork.Solana;
+    case ChainBase.Sui:
+      return ChainNetwork.Sui;
   }
 }
 
 export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
   return {
     ...schemas.CreateCommunity,
-    auth: [authVerified(), tiered({ creates: true })],
+    auth: [
+      authVerified(),
+      tiered({ creates: true }),
+      // turnstile({ widgetName: 'create-community' }),
+    ],
     body: async ({ actor, payload }) => {
       const {
         id,
@@ -74,6 +90,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
         token_address,
         tags,
         allow_tokenized_threads,
+        thread_purchase_token,
       } = payload;
 
       const community = await models.Community.findOne({
@@ -140,6 +157,8 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           {
             id,
             name,
+            tier: CommunityTierMap.Unverified,
+            spam_tier_level: DisabledCommunitySpamTier,
             default_symbol,
             icon_url,
             description,
@@ -160,6 +179,10 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             stages_enabled: true,
             community_indexer_id,
             allow_tokenized_threads,
+            thread_purchase_token,
+            namespace_verified: false,
+            environment: config.APP_ENV,
+            profile_count: 1,
           },
           { transaction },
         );
@@ -203,7 +226,6 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             description: 'General discussions',
             featured_in_sidebar: true,
             featured_in_new_post: false,
-            group_ids: [],
             allow_tokenized_threads: false,
           },
           { transaction },
@@ -223,7 +245,6 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
               admin_address.verification_token_expires,
             verified: admin_address.verified,
             wallet_id: admin_address.wallet_id,
-            is_user_default: true,
             role: 'admin',
             last_active: new Date(),
             ghost_address: false,

@@ -1,7 +1,7 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
 import * as protocols from '@hicommonwealth/evm-protocols';
 import { config, equalEvmAddresses } from '@hicommonwealth/model';
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { ChainNodeAttributes } from '../../src';
@@ -32,6 +32,7 @@ describe('Launchpad Lifecycle', () => {
     });
 
     const [community] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       namespace: 'DogeMoonLanding',
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
@@ -60,54 +61,18 @@ describe('Launchpad Lifecycle', () => {
       user: { email: '', id: user!.id },
     };
 
-    vi.spyOn(
-      protocols,
-      'getLaunchpadTokenCreatedTransaction',
-    ).mockResolvedValue({
-      txReceipt: {
-        blockNumber: 1,
-        transactionHash: CREATE_TOKEN_TXN_HASH,
-        transactionIndex: 1,
-        blockHash: '0x123',
-        from: '123',
-        to: '456',
-        cumulativeGasUsed: 1,
-        gasUsed: 1,
-        logs: [],
-        status: 1,
-        logsBloom: '0x123',
-        root: '0x123',
-      },
-      parsedArgs: {
-        namespace: community!.namespace!,
-        tokenAddress: TOKEN_ADDRESS,
-        launchpadLiquidity: 1000n,
-        curveId: 1n,
-        totalSupply: 1000n,
-        reserveRation: 1n,
-        initialPurchaseEthAmount: 1n,
-      },
-      block: {
-        number: 1n,
-        parentHash: '0x123',
-        timestamp: 1n,
-        transactions: [],
-        transactionsRoot: '0x123',
-        stateRoot: '0x123',
-        receiptsRoot: '0x123',
-        miner: '0x123',
-        difficulty: 1n,
-        totalDifficulty: 1n,
-        extraData: '0x123',
-        size: 1n,
-        gasLimit: 1n,
-        gasUsed: 1n,
-        baseFeePerGas: 1n,
-        sha3Uncles: '0x123',
-        uncles: [],
-        nonce: 1n,
-        mixHash: '0x123',
-      },
+    vi.spyOn(protocols, 'getLaunchpadTokenDetails').mockResolvedValue({
+      name: 'Test Token',
+      symbol: 'DMLND',
+      created_at: new Date(),
+      creator_address: actor.address!,
+      namespace: community!.namespace!,
+      token_address: TOKEN_ADDRESS,
+      launchpad_liquidity: '594115082271506067334',
+      curve_id: '1',
+      total_supply: '1000',
+      reserve_ration: '1',
+      initial_purchase_eth_amount: '1',
     });
   });
 
@@ -117,21 +82,20 @@ describe('Launchpad Lifecycle', () => {
   });
 
   test('Create Token works given txHash and chainNodeId', async () => {
-    const payload = {
-      transaction_hash: CREATE_TOKEN_TXN_HASH,
-      chain_node_id: node!.id!,
-      description: 'test',
-      icon_url: 'test',
-      community_id: community_id!,
-    };
-
     const results = await command(CreateToken(), {
       actor,
-      payload,
+      payload: {
+        transaction_hash: CREATE_TOKEN_TXN_HASH,
+        eth_chain_id: node.eth_chain_id!,
+        description: 'test',
+        icon_url: 'test',
+        community_id: community_id!,
+      },
     });
 
     expect(equalEvmAddresses(results?.token_address, TOKEN_ADDRESS)).to.be.true;
     expect(results?.symbol).to.equal('DMLND');
+    expect(results?.creator_address).to.equal(actor.address);
   });
 
   test('Get a launchpad trade txn and project it', async () => {
@@ -147,7 +111,7 @@ describe('Launchpad Lifecycle', () => {
       eth_chain_id: protocols.commonProtocol.ValidChains.SepoliaBase,
       transaction_hash: TRADE_TOKEN_TXN_HASH,
       token_address: TOKEN_ADDRESS.toLowerCase(),
-      trader_address: '0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE',
+      trader_address: '0x2ce1f5d4f84b583ab320cac0948adde52a131fbe',
       is_buy: true,
       community_token_amount: '534115082271506067334',
       price: 3.98859030778e-7,

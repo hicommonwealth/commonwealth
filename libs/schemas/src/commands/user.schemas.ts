@@ -12,6 +12,29 @@ export const SignIn = {
     session: z.string(),
     block_info: z.string().nullish(),
     referrer_address: z.string().nullish(),
+    privy: z
+      .object({
+        identityToken: z.string(),
+        ssoOAuthToken: z
+          .string()
+          .optional()
+          .describe(
+            'The OAuth token of the SSO service the user signed in with e.g. Google, Github, etc.',
+          ),
+        ssoProvider: z
+          .union([
+            z.literal('google_oauth'),
+            z.literal('github_oauth'),
+            z.literal('discord_oauth'),
+            z.literal('apple_oauth'),
+            z.literal('twitter_oauth'),
+            z.literal('phone'),
+            z.literal('farcaster'),
+            z.literal('email'),
+          ])
+          .optional(),
+      })
+      .optional(),
   }),
   output: Address.extend({
     community_base: z.nativeEnum(ChainBase),
@@ -87,5 +110,32 @@ export const DistributeSkale = {
         message: `eth_chain_id must be a Skale chain Id`,
       }),
   }),
-  output: z.object({}),
+  output: z.undefined(),
+};
+
+export const UpdateSettings = {
+  input: z.object({
+    disable_rich_text: z.boolean().optional(),
+    enable_promotional_emails: z.boolean().optional(),
+    email_interval: z.enum(['never', 'weekly']).optional(),
+  }),
+  output: z.boolean(),
+  context: VerifiedContext,
+};
+
+export const UpdateEmail = {
+  input: z.object({
+    email: z.string().email(),
+  }),
+  output: User.extend({ email: z.string() }),
+  context: VerifiedContext,
+};
+
+export const FinishUpdateEmail = {
+  input: z.object({
+    email: z.string().email(),
+    token: z.string(),
+  }),
+  output: z.object({ redirect_path: z.string() }),
+  context: VerifiedContext,
 };

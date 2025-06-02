@@ -7,6 +7,9 @@ export enum BalanceSourceType {
   CW20 = 'cw20',
   CW721 = 'cw721',
   SPL = 'spl',
+  SOLNFT = 'metaplex',
+  SuiNative = 'sui_native',
+  SuiToken = 'sui_token',
 }
 
 export enum BalanceType {
@@ -16,17 +19,35 @@ export enum BalanceType {
   Cosmos = 'cosmos',
   NEAR = 'near',
   Substrate = 'substrate',
+  Sui = 'sui',
 }
 
 export type ContractSource = {
   source_type:
     | BalanceSourceType.ERC20
     | BalanceSourceType.ERC721
-    | BalanceSourceType.ERC1155
-    | BalanceSourceType.SPL;
+    | BalanceSourceType.ERC1155;
   evm_chain_id: number;
   contract_address: string;
   token_id?: string;
+};
+
+export type SolanaSource = {
+  source_type: BalanceSourceType.SPL | BalanceSourceType.SOLNFT;
+  solana_network: string;
+  contract_address: string;
+};
+
+export type SuiSource = {
+  source_type: BalanceSourceType.SuiNative;
+  sui_network: string;
+  object_id?: string;
+};
+
+export type SuiTokenSource = {
+  source_type: BalanceSourceType.SuiToken;
+  sui_network: string;
+  coin_type: string;
 };
 
 export type NativeSource = {
@@ -48,7 +69,14 @@ export type CosmosContractSource = {
 
 export type ThresholdData = {
   threshold: string;
-  source: ContractSource | NativeSource | CosmosSource | CosmosContractSource;
+  source:
+    | ContractSource
+    | NativeSource
+    | CosmosSource
+    | CosmosContractSource
+    | SolanaSource
+    | SuiSource
+    | SuiTokenSource;
 };
 
 export type AbiType = Record<string, unknown>[];
@@ -58,6 +86,7 @@ export type AbiType = Record<string, unknown>[];
 
 export enum WalletId {
   Magic = 'magic',
+  Privy = 'privy',
   Polkadot = 'polkadot',
   Metamask = 'metamask',
   WalletConnect = 'walletconnect',
@@ -73,6 +102,8 @@ export enum WalletId {
   Solflare = 'solflare',
   Coinbase = 'coinbase',
   Farcaster = 'farcaster',
+  OKX = 'okx',
+  SuiWallet = 'sui-wallet',
 }
 
 // Passed directly to Magic login.
@@ -88,6 +119,8 @@ export enum WalletSsoSource {
   Email = 'email',
   Farcaster = 'farcaster',
   SMS = 'SMS',
+
+  // TODO: remove
   Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }
 
@@ -97,6 +130,7 @@ export enum ChainBase {
   Ethereum = 'ethereum',
   NEAR = 'near',
   Solana = 'solana',
+  Sui = 'sui',
 }
 
 export enum ChainType {
@@ -125,24 +159,7 @@ export enum ChainNetwork {
   Evmos = 'evmos',
   Kava = 'kava',
   Kyve = 'kyve',
-  ArbitrumMainnet = 'arbitrum_mainnet',
-  Base = 'base',
-  Blast = 'blast',
-  EthereumMainnet = 'ethereum_mainnet',
-  Linea = 'linea',
-  Optimism = 'optimism',
-  Polygon = 'polygon',
-  HorizenEON = 'horizen_eon',
-  Harmony = 'harmony',
-  Gnosis = 'gnosis',
-  FuseMainnet = 'fuse_mainnet',
-  Fantom = 'fantom',
-  Soneium = 'soneium',
-  Core = 'core',
-  Celo = 'celo',
-  BSC = 'bsc',
-  Avalanche = 'avalanche',
-  Arthera = 'arthera',
+  Sui = 'sui',
 }
 
 /**

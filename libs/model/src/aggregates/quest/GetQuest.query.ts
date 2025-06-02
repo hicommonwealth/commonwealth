@@ -11,7 +11,32 @@ export function GetQuest(): Query<typeof schemas.GetQuest> {
       const { quest_id } = payload;
       const quest = await models.Quest.findOne({
         where: { id: quest_id },
-        include: { model: models.QuestActionMeta, as: 'action_metas' },
+        include: [
+          {
+            model: models.QuestActionMeta,
+            as: 'action_metas',
+            include: [
+              {
+                model: models.QuestTweets,
+                required: false,
+              },
+              {
+                model: models.ChainEventXpSource,
+                required: false,
+                include: [
+                  {
+                    model: models.ChainNode,
+                    required: true,
+                  },
+                ],
+              },
+              {
+                model: models.CommunityGoalMeta,
+                required: false,
+              },
+            ],
+          },
+        ],
       });
       return quest
         ? {

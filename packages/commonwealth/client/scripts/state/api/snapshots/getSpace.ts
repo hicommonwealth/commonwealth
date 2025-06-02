@@ -68,6 +68,7 @@ interface SpaceQueryResponse {
 
 interface UseGetSnapshotSpaceQueryProps {
   space: string;
+  enabled?: boolean;
 }
 
 const getSpace = async ({ space }: UseGetSnapshotSpaceQueryProps) => {
@@ -84,7 +85,11 @@ const getSpace = async ({ space }: UseGetSnapshotSpaceQueryProps) => {
 
 export const getSnapshotSpaceQuery = async ({
   space,
+  enabled = true,
 }: UseGetSnapshotSpaceQueryProps) => {
+  if (!enabled) {
+    return null;
+  }
   return await queryClient.fetchQuery({
     queryKey: [ExternalEndpoints.snapshotHub.url, 'space', space],
     queryFn: () => getSpace({ space }),
@@ -92,11 +97,15 @@ export const getSnapshotSpaceQuery = async ({
   });
 };
 
-const useGetSnapshotSpaceQuery = ({ space }: UseGetSnapshotSpaceQueryProps) => {
+const useGetSnapshotSpaceQuery = ({
+  space,
+  enabled = true,
+}: UseGetSnapshotSpaceQueryProps) => {
   return useQuery({
     queryKey: [ExternalEndpoints.snapshotHub.url, 'space', space],
     queryFn: () => getSpace({ space }),
     staleTime: SPACE_STALE_TIME,
+    enabled: enabled,
   });
 };
 

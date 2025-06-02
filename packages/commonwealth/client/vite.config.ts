@@ -33,6 +33,9 @@ export default defineConfig(({ mode }) => {
 
   // WARN: only used locally never in remote (Heroku) apps
   const featureFlags = {
+    'process.env.FLAG_MOBILE_DOWNLOAD': JSON.stringify(
+      env.FLAG_MOBILE_DOWNLOAD,
+    ),
     'process.env.FLAG_NEW_EDITOR': JSON.stringify(env.FLAG_NEW_EDITOR),
     'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
     'process.env.FLAG_LAUNCHPAD': JSON.stringify(env.FLAG_LAUNCHPAD),
@@ -51,7 +54,19 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_NEW_GOVERNANCE_PAGE': JSON.stringify(
       env.FLAG_NEW_GOVERNANCE_PAGE,
     ),
+    'process.env.FLAG_PRIVY': JSON.stringify(env.FLAG_PRIVY),
     'process.env.FLAG_JUDGE_CONTEST': JSON.stringify(env.FLAG_JUDGE_CONTEST),
+    'process.env.FLAG_TOKENIZED_THREADS': JSON.stringify(
+      env.FLAG_TOKENIZED_THREADS,
+    ),
+    'process.env.FLAG_TRUST_LEVEL': JSON.stringify(env.FLAG_TRUST_LEVEL),
+    'process.env.FLAG_PARTNERSHIP_WALLET': JSON.stringify(
+      env.FLAG_PARTNERSHIP_WALLET,
+    ),
+    'process.env.FLAG_NEW_PROFILE_PAGE': JSON.stringify(
+      env.FLAG_NEW_PROFILE_PAGE,
+    ),
+    'process.env.FLAG_PRIVATE_TOPICS': JSON.stringify(env.FLAG_PRIVATE_TOPICS),
   };
 
   const config = {
@@ -90,6 +105,26 @@ export default defineConfig(({ mode }) => {
       (env.NODE_ENV || '').trim() === 'test'
         ? JSON.stringify(env.ALCHEMY_PUBLIC_APP_KEY)
         : undefined,
+    'process.env.PRIVY_APP_ID': JSON.stringify(env.PRIVY_APP_ID),
+    'process.env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY': JSON.stringify(
+      env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY,
+    ),
+    'process.env.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY': JSON.stringify(
+      env.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY,
+    ),
+    'process.env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY': JSON.stringify(
+      env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY,
+    ),
+    'process.env.LAUNCHPAD_CHAIN_ID':
+      JSON.stringify(env.LAUNCHPAD_CHAIN_ID) || JSON.stringify('8543'),
+    'process.env.LAUNCHPAD_CONNECTOR_WEIGHT':
+      JSON.stringify(env.LAUNCHPAD_CONNECTOR_WEIGHT) ||
+      JSON.stringify('830000'),
+    'process.env.LAUNCHPAD_INITIAL_PRICE':
+      JSON.stringify(env.LAUNCHPAD_INITIAL_PRICE) ||
+      JSON.stringify('416700000'),
+    'process.env.ENABLED_TRPC_BATCHING':
+      JSON.stringify(env.ENABLED_TRPC_BATCHING) || JSON.stringify('true'),
   };
 
   return {
@@ -146,6 +181,9 @@ export default defineConfig(({ mode }) => {
         'numeral',
         'firebase/app',
         'firebase/messaging',
+        'eventsource-client',
+        'react-datepicker',
+        'moment/moment',
       ],
     },
     build: {

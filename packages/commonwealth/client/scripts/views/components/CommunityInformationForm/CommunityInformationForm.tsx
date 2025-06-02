@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import {
   CWImageInput,
@@ -14,6 +15,7 @@ import { CommunityType } from 'views/components/component_kit/new_designs/CWComm
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWToggle } from '../component_kit/new_designs/cw_toggle';
 import './CommunityInformationForm.scss';
 import {
   BASE_ID,
@@ -22,6 +24,7 @@ import {
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
   SKALE_ID,
+  SONEIUM_ID,
   alphabeticallyStakeWiseSortedChains as sortedChains,
 } from './constants';
 import {
@@ -43,7 +46,12 @@ const CommunityInformationForm = ({
   initialValues,
   isCreatingCommunity,
   submitBtnLabel,
+  isTurnstileEnabled,
+  turnstileToken,
+  TurnstileWidget,
 }: CommunityInformationFormProps) => {
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+
   const [communityName, setCommunityName] = useState(
     initialValues?.communityName || '',
   );
@@ -90,6 +98,12 @@ const CommunityInformationForm = ({
         .map(mappedChainValue);
     }
 
+    if (withChainsConfig?.community?.type === CommunityType.Sui) {
+      return sortedChains
+        .filter((chainType) => chainType.chainBase === CommunityType.Sui)
+        .map(mappedChainValue);
+    }
+
     return sortedChains
       .filter(
         (chainType) =>
@@ -119,12 +133,17 @@ const CommunityInformationForm = ({
               return options?.find((o) => o.value === BLAST_ID);
             case CommunityType.Skale:
               return options?.find((o) => o.value === SKALE_ID);
+            case CommunityType.Soneium:
+              return options?.find((o) => o.value === SONEIUM_ID);
             case CommunityType.Polygon:
             case CommunityType.Solana:
               return options?.[0];
           }
         })(),
       }),
+      tokenizeCommunity: tokenizedThreadsEnabled
+        ? (initialValues?.tokenizeCommunity ?? true)
+        : false,
     };
   };
 
@@ -137,6 +156,12 @@ const CommunityInformationForm = ({
 
     await onSubmit({ ...values, communityId }).catch(console.error);
   };
+
+  // Check if the submit button should be disabled
+  const isSubmitDisabled =
+    isCreatingCommunity ||
+    isProcessingProfileImage ||
+    (isTurnstileEnabled && !turnstileToken);
 
   return (
     <CWForm
@@ -202,6 +227,28 @@ const CommunityInformationForm = ({
         withAIImageGeneration
       />
 
+      {tokenizedThreadsEnabled && (
+        <div className="tokenize-toggle">
+          <div className="token-toggle-header">
+            <CWText type="h5">Tokenization</CWText>
+            <CWToggle name="tokenizeCommunity" hookToForm size="small" />
+          </div>
+          <CWText type="buttonSm" fontWeight="regular">
+            All threads created in selected communities will be minted as an
+            ERC20 token and able to be bought and sold by members of the
+            community.
+          </CWText>
+          <CWText type="caption">
+            Tokenization is enabled by default. You can change this later in
+            Admin Capabilities under Integrations.
+          </CWText>
+          <CWText type="caption">
+            If you have a community token you would like to use, add it in Admin
+            Capabilities under Integrations.
+          </CWText>
+        </div>
+      )}
+
       {withSocialLinks ? (
         <>
           <section className="header">
@@ -265,6 +312,9 @@ const CommunityInformationForm = ({
         <></>
       )}
 
+      {/* Add Turnstile verification */}
+      {isTurnstileEnabled && TurnstileWidget && <TurnstileWidget />}
+
       {/* Action buttons */}
       <section className="action-buttons">
         <CWButton
@@ -278,7 +328,7 @@ const CommunityInformationForm = ({
           type="submit"
           buttonWidth="wide"
           label={submitBtnLabel}
-          disabled={isCreatingCommunity || isProcessingProfileImage}
+          disabled={isSubmitDisabled}
         />
       </section>
     </CWForm>

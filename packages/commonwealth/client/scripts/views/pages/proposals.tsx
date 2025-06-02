@@ -11,10 +11,10 @@ import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
 } from 'state/api/proposals';
+import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import { ProposalCard } from 'views/components/ProposalCard';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
-import { PageLoading } from 'views/pages/loading';
 import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
 import { CardsCollection } from '../components/cards_collection';
 import { CWText } from '../components/component_kit/cw_text';
@@ -76,7 +76,7 @@ const ProposalsPage = () => {
       );
     }
 
-    return <PageLoading message="Connecting to chain" />;
+    return <LoadingIndicator message="Connecting to chain" />;
   }
 
   const activeProposalContent = isLoadingCosmosActiveProposals ? (

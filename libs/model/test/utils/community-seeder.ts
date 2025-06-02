@@ -1,6 +1,12 @@
 import { Actor } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  CommunityTierMap,
+  GatedActionEnum,
+  UserTierMap,
+  WalletId,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { seed, seedRecord } from '../../src/tester';
 import { getSignersInfo } from './canvas-signers';
@@ -15,7 +21,7 @@ export type CommunitySeedOptions = {
   ss58_prefix?: number;
   groups?: {
     id: number;
-    permissions: schemas.PermissionEnum[];
+    permissions: GatedActionEnum[];
   }[];
   custom_stages?: string[];
   namespace_address?: string;
@@ -59,12 +65,13 @@ export async function seedCommunity({
     referral_count: 0,
     referral_eth_earnings: 0,
     xp_points: 0,
-    tier: 4,
+    tier: UserTierMap.ManuallyVerified,
     emailVerified: false,
   }));
 
   // seed base community
   const [base] = await seed('Community', {
+    tier: CommunityTierMap.ManuallyVerified,
     chain_node_id: node!.id!,
     base: chain_base,
     active: true,
@@ -83,6 +90,7 @@ export async function seedCommunity({
   });
 
   const [community] = await seed('Community', {
+    tier: CommunityTierMap.ChainVerified,
     chain_node_id: node!.id!,
     base: chain_base,
     bech32_prefix,
@@ -101,22 +109,17 @@ export async function seedCommunity({
       };
     }),
     groups: groups.map(({ id }) => ({ id })),
-    topics: [
-      {
-        group_ids: groups.map(({ id }) => id),
-        weighted_voting,
-      },
-    ],
+    topics: [{ weighted_voting }],
     CommunityStakes: stakes ?? [],
     custom_stages,
   });
 
   await Promise.all(
     groups.map((g) =>
-      seed('GroupPermission', {
+      seed('GroupGatedAction', {
         group_id: g.id,
         topic_id: community?.topics?.[0]?.id || 0,
-        allowed_actions: g.permissions,
+        gated_actions: g.permissions,
       }),
     ),
   );

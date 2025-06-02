@@ -1,9 +1,11 @@
 import z from 'zod';
 import { events } from '../events';
 import { PG_INT } from '../utils';
+import { ChainEventXpSource } from './chain-event-xp-source.schemas';
+import { CommunityGoalMeta } from './community.schemas';
 
 export const ChannelQuestEvents = {
-  CommonDiscordServerJoined: events.CommonDiscordServerJoined,
+  DiscordServerJoined: events.DiscordServerJoined,
   XpChainEventCreated: events.XpChainEventCreated,
   TwitterCommonMentioned: events.TwitterCommonMentioned,
 } as const;
@@ -31,7 +33,7 @@ export const QuestEvents = {
   RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
   OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
   ContestEnded: events.ContestEnded,
-  LaunchpadTokenCreated: events.LaunchpadTokenCreated,
+  LaunchpadTokenRecordCreated: events.LaunchpadTokenRecordCreated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
@@ -81,8 +83,8 @@ export const QuestTweet = z
 
 export const QuestActionMeta = z
   .object({
-    id: z.number().nullish(),
-    quest_id: z.number(),
+    id: z.number().nullish(), // to allow negative system quests
+    quest_id: z.number(), // to allow negative system quests
     //event names instead of enums for flexibility when adding new events
     event_name: z.enum([
       ...(Object.keys(QuestEvents) as [
@@ -93,30 +95,26 @@ export const QuestActionMeta = z
     ]),
     reward_amount: z.number(),
     creator_reward_weight: z.number().min(0).max(1).default(0),
-    amount_multiplier: z.number().min(0).optional(),
-    participation_limit: z.nativeEnum(QuestParticipationLimit).optional(),
-    participation_period: z.nativeEnum(QuestParticipationPeriod).optional(),
+    amount_multiplier: z.number().min(0).nullish(),
+    participation_limit: z.nativeEnum(QuestParticipationLimit).nullish(),
+    participation_period: z.nativeEnum(QuestParticipationPeriod).nullish(),
     instructions_link: z.string().url().optional().nullish(),
-    participation_times_per_period: z.number().optional(),
+    participation_times_per_period: z.number().nullish(),
     content_id: z
       .string()
       .regex(
-        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(sso:\w+)|(goal:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)/,
+        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_id:\d+)/,
       )
-      .optional()
       .nullish(),
-    tweet_engagement_caps: z
-      .object({
-        likes: z.number().positive().max(100),
-        retweets: z.number().positive().max(100),
-        replies: z.number().positive().max(100),
-      })
-      .optional(),
+    community_goal_meta_id: PG_INT.nullish(),
+    start_link: z.string().url().nullish(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
 
     // associations
-    QuestTweet: QuestTweet.optional(),
+    QuestTweet: QuestTweet.nullish(),
+    ChainEventXpSource: ChainEventXpSource.nullish(),
+    CommunityGoalMeta: CommunityGoalMeta.nullish(),
   })
   .describe('Quest action metadata associated to a quest instance');
 

@@ -1,6 +1,8 @@
 import {
+  ActionGroups,
   CanvasSignedData,
   deserializeCanvas,
+  GatedActionEnum,
   verify,
 } from '@hicommonwealth/shared';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
@@ -8,13 +10,12 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { pluralize } from 'helpers';
-import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { downloadDataAsFile } from 'utils/downloadDataAsFile';
-import { SharePopover } from 'views/components/SharePopover';
+import ShareButton from 'views/components/ShareButton';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ToggleThreadSubscribe } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
@@ -31,7 +32,6 @@ type OptionsProps = AdminActionsProps & {
   canReact?: boolean;
   canComment?: boolean;
   totalComments?: number;
-  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   onCommentBtnClick?: () => any;
   upvoteDrawerBtnBelow?: boolean;
   hideUpvoteDrawerButton?: boolean;
@@ -42,6 +42,8 @@ type OptionsProps = AdminActionsProps & {
   showCommentVisible?: boolean;
   toggleShowComments?: () => void;
   showOnlyThreadActionIcons?: boolean;
+  actionGroups: ActionGroups;
+  bypassGating: boolean;
 };
 
 export const ThreadOptions = ({
@@ -50,8 +52,6 @@ export const ThreadOptions = ({
   commentBtnVisible = true,
   shareEndpoint,
   canUpdateThread,
-  canReact = true,
-  canComment = true,
   totalComments,
   onLockToggle,
   onCollaboratorsEdit,
@@ -64,7 +64,6 @@ export const ThreadOptions = ({
   onSnapshotProposalFromThread,
   onSpamToggle,
   hasPendingEdits,
-  disabledActionsTooltipText = '',
   onCommentBtnClick = () => null,
   upvoteDrawerBtnBelow,
   hideUpvoteDrawerButton = false,
@@ -75,6 +74,8 @@ export const ThreadOptions = ({
   showCommentVisible,
   toggleShowComments,
   showOnlyThreadActionIcons = false,
+  actionGroups,
+  bypassGating,
 }: OptionsProps) => {
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   const userStore = useUserStore();
@@ -82,6 +83,16 @@ export const ThreadOptions = ({
   const handleDownloadMarkdown = () => {
     downloadDataAsFile(thread.body, 'text/markdown', thread.title + '.md');
   };
+
+  const permissions = Permissions.getMultipleActionsPermission({
+    actions: [
+      GatedActionEnum.CREATE_THREAD_REACTION,
+      GatedActionEnum.CREATE_COMMENT,
+    ] as const,
+    thread,
+    actionGroups,
+    bypassGating,
+  });
 
   const [verifiedCanvasSignedData, setVerifiedCanvasSignedData] =
     useState<CanvasSignedData | null>(null);
@@ -119,13 +130,9 @@ export const ThreadOptions = ({
             <ReactionButton
               thread={thread}
               size="small"
-              disabled={!canReact}
+              disabled={!permissions.CREATE_THREAD_REACTION.allowed}
               undoUpvoteDisabled={editingDisabled}
-              tooltipText={
-                typeof disabledActionsTooltipText === 'function'
-                  ? disabledActionsTooltipText?.('upvote')
-                  : disabledActionsTooltipText
-              }
+              tooltipText={permissions.CREATE_THREAD_REACTION.tooltip}
             />
           )}
 
@@ -139,25 +146,25 @@ export const ThreadOptions = ({
                     pluralize(totalComments, 'Comment')
               }
               action="comment"
-              disabled={!canComment}
+              disabled={!permissions.CREATE_COMMENT.allowed}
               onClick={(e) => {
                 e.preventDefault();
                 onCommentBtnClick();
                 onCommentClick && onCommentClick();
               }}
-              tooltipText={
-                typeof disabledActionsTooltipText === 'function'
-                  ? disabledActionsTooltipText?.('comment')
-                  : disabledActionsTooltipText
-              }
+              tooltipText={permissions.CREATE_COMMENT.tooltip}
             />
           )}
 
-          <SharePopover
-            // @ts-expect-error <StrictNullChecks/>
-            linkToShare={shareEndpoint}
-            buttonLabel={showOnlyThreadActionIcons ? '' : 'Share'}
-          />
+          {shareEndpoint && (
+            <ShareButton
+              url={shareEndpoint}
+              title={thread.title}
+              text="See my thread and join me on Common"
+              shareType="thread"
+              buttonLabel={showOnlyThreadActionIcons ? '' : 'Share'}
+            />
+          )}
 
           {userStore.id > 0 && (
             <ToggleThreadSubscribe

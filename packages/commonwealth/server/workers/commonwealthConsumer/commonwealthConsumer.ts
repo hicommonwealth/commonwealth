@@ -1,10 +1,19 @@
 import {
+  config,
   HotShotsStats,
+<<<<<<< HEAD
   S3BlobStorage,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { blobStorage, logger, stats } from '@hicommonwealth/core';
+=======
+  RedisCache,
+  ServiceKey,
+  startHealthCheckLoop,
+} from '@hicommonwealth/adapters';
+import { cache, logger, stats } from '@hicommonwealth/core';
+>>>>>>> master
 import {
   bootstrapBindings,
   bootstrapContestRolloverLoop,
@@ -17,6 +26,11 @@ stats({ adapter: HotShotsStats() });
 blobStorage({
   adapter: S3BlobStorage(),
 });
+
+config.CACHE.REDIS_URL &&
+  cache({
+    adapter: new RedisCache(config.CACHE.REDIS_URL),
+  });
 
 let isServiceHealthy = false;
 

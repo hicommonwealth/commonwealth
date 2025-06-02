@@ -1,4 +1,4 @@
-import { Roles, WalletId } from '@hicommonwealth/shared';
+import { Roles, UserTierMap, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 import { Tags } from './tag.schemas';
@@ -35,12 +35,15 @@ export const ProfileTags = z.object({
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 
+  // associations
   Tag: Tags.nullish(),
 });
 
+export const USER_TIER = z.nativeEnum(UserTierMap);
+
 export const User = z.object({
   id: PG_INT.optional(),
-  tier: z.number().int().min(0).max(5),
+  tier: USER_TIER,
   email: z.string().max(255).email().nullish(),
   isAdmin: z.boolean().default(false).nullish(),
   disableRichText: z.boolean().default(false).optional(),
@@ -62,6 +65,7 @@ export const User = z.object({
   referral_eth_earnings: z.number().optional(),
   xp_points: PG_INT.default(0).nullish(),
   xp_referrer_points: PG_INT.default(0).nullish(),
+  privy_id: z.string().max(255).nullish(),
 
   ProfileTags: z.array(ProfileTags).optional(),
   ApiKey: ApiKey.optional(),
@@ -82,7 +86,6 @@ export const Address = z.object({
   ghost_address: z.boolean().default(false),
   wallet_id: z.nativeEnum(WalletId).nullish(),
   block_info: z.string().max(255).nullish(),
-  is_user_default: z.boolean().default(false),
   role: z.enum(Roles).default('member'),
   is_banned: z.boolean().default(false),
   hex: z.string().max(64).nullish(),
@@ -112,6 +115,7 @@ export const SsoToken = z.object({
 
 export const CommunityMember = z.object({
   user_id: PG_INT,
+  tier: USER_TIER,
   profile_name: z.string().nullish(),
   avatar_url: z.string().nullish(),
   addresses: z.array(

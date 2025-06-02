@@ -8,7 +8,6 @@ export function mapProfileThread(thread): Thread {
       address: thread.author,
       community_id: thread.authorCommunity,
       ghost_address: false,
-      is_user_default: false,
       is_banned: false,
       role: 'member',
     },
@@ -24,7 +23,6 @@ export function mapProfileThread(thread): Thread {
       created_at: '',
       featured_in_sidebar: false,
       featured_in_new_post: false,
-      group_ids: [],
       active_contest_managers: [],
       total_threads: 0,
       allow_tokenized_threads: thread?.topic?.allow_tokenized_threads,
@@ -53,6 +51,9 @@ export function mapProfileThread(thread): Thread {
     search: '',
     ContestActions: thread.associatedContests ?? [],
     numberOfComments: thread.numberOfComments,
+    is_linking_token: thread.isLinkingToken,
+    launchpad_token_address: thread.tokenAddress,
+    user_tier: thread.user_tier,
     recentComments:
       thread.recentComments?.map((c) => ({
         id: c.id ?? 0,

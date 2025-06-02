@@ -3,39 +3,27 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { useGetPinnedTokensByCommunityId } from 'client/scripts/state/api/communities';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import clsx from 'clsx';
-import { calculateTokenPricing } from 'helpers/launchpad';
 import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { AuthModal } from 'views/modals/AuthModal';
 import TradeTokenModal, { TradingMode } from 'views/modals/TradeTokenModel';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { z } from 'zod';
-import {
-  CommunityFilters,
-  CommunitySortOptions,
-  communitySortOptionsLabelToKeysMap,
-} from '../../Communities/FiltersDrawer';
-import TreandingToken from '../TrendingToken/TrendingToken';
+import TrendingToken from '../TrendingToken/TrendingToken';
 import './TrendingTokenList.scss';
 
 const TokenWithCommunity = TokenView.extend({
   community_id: z.string(),
 });
 
-type TokensListProps = {
-  filters?: CommunityFilters;
-};
-
-const TrendingTokensList = ({
-  filters = { withCommunitySortBy: CommunitySortOptions.MarketCap },
-}: TokensListProps) => {
+const TrendingTokensList = () => {
   const user = useUserStore();
   const navigate = useCommonNavigate();
   const launchpadEnabled = useFlag('launchpad');
@@ -63,21 +51,6 @@ const TrendingTokensList = ({
     cursor: 1,
     limit: 3,
     with_stats: true,
-    order_by: (() => {
-      if (
-        filters.withCommunitySortBy &&
-        [CommunitySortOptions.MarketCap, CommunitySortOptions.Price].includes(
-          filters.withCommunitySortBy,
-        )
-      ) {
-        return communitySortOptionsLabelToKeysMap[
-          filters.withCommunitySortBy
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ] as any;
-      }
-
-      return undefined;
-    })(),
     enabled: launchpadEnabled,
   });
 
@@ -93,20 +66,6 @@ const TrendingTokensList = ({
   const launchpadTokens = (launchpadTokensList?.pages || [])
     .flatMap((page) => page.results)
     .slice(0, 3);
-
-  const pinnedTokens = (pinnedTokensList?.pages || [])
-    .flatMap((page) => page.results)
-    .slice(0, 3);
-
-  const tokens = [...launchpadTokens, ...pinnedTokens];
-
-  const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
-    useFetchTokenUsdRateQuery({
-      tokenSymbol: 'ETH',
-    });
-  const ethToUsdRate = parseFloat(
-    ethToCurrencyRateData?.data?.data?.amount || '0',
-  );
 
   const openAuthModalOrTriggerCallback = () => {
     if (user.isLoggedIn) {
@@ -145,49 +104,24 @@ const TrendingTokensList = ({
           </div>
         </Link>
       </div>
-      {isLoadingLaunchpadTokens ||
-      isLoadingPinnedTokens ||
-      isLoadingETHToCurrencyRate ? (
+      {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
         <div
           className={clsx('empty-placeholder', { 'my-16': launchpadEnabled })}
         >
-          <CWText type="h2">
-            No tokens found Launch a new token&nbsp;
+          <CWText type="h3">
+            No tokens found. Launch a new token&nbsp;
             <Link to="/createTokenCommunity">here</Link>.
           </CWText>
         </div>
       ) : (
         <div className="list">
-          {launchpadTokens.map((token) => {
-            const pricing = calculateTokenPricing(
-              token as z.infer<typeof TokenView>,
-              ethToUsdRate,
-            );
-
+          {(tokens || []).map((token) => {
             return (
-              <TreandingToken
+              <TrendingToken
                 key={token.name}
-                name={token.name}
-                communityId={token.community_id}
-                symbol={token.symbol}
-                price={pricing.currentPrice}
-                pricePercentage24HourChange={
-                  pricing.pricePercentage24HourChange
-                }
-                isPinnedToken={false}
-                marketCap={{
-                  current: pricing.marketCapCurrent,
-                  goal: pricing.marketCapGoal,
-                  isCapped: pricing.isMarketCapGoalReached,
-                }}
-                mode={
-                  pricing.isMarketCapGoalReached
-                    ? TradingMode.Swap
-                    : TradingMode.Buy
-                }
-                iconURL={token.icon_url || ''}
+                token={token as LaunchpadToken}
                 onCTAClick={(mode) => {
                   register({
                     cb: () => {

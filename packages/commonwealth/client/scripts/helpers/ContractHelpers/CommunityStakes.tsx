@@ -1,4 +1,5 @@
 import { CommunityStakeAbi } from '@commonxyz/common-protocol-abis';
+import Web3 from 'web3';
 import { toBigInt } from 'web3-utils';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
@@ -13,7 +14,6 @@ class CommunityStakes extends ContractBase {
   namespaceFactoryAddress: string;
   namespaceFactory: NamespaceFactory;
   addressCache = { address: '0x0', name: '' };
-  chainId?: string;
 
   constructor(
     contractAddress: string,
@@ -23,7 +23,7 @@ class CommunityStakes extends ContractBase {
   ) {
     super(contractAddress, CommunityStakeAbi, rpc);
     this.namespaceFactoryAddress = factoryAddress;
-    this.chainId = chainId;
+    this.chainId = chainId || '1';
   }
 
   async initialize(withWallet: boolean = false): Promise<void> {
@@ -55,10 +55,19 @@ class CommunityStakes extends ContractBase {
       await this.initialize();
     }
     const namespaceAddress = await this.getNamespaceAddress(name);
+    const calldata = `0xf1220bbf${this.web3.eth.abi
+      .encodeParameters(
+        ['address', 'uint256', 'uint256'],
+        [namespaceAddress, id, amount],
+      )
+      .substring(2)}`;
+    const result = await this.web3.eth.call({
+      to: this.contractAddress,
+      data: calldata,
+    });
     const totalPrice = toBigInt(
-      await this.contract.methods
-        .getBuyPriceAfterFee(namespaceAddress, id, amount)
-        .call(),
+      // @ts-expect-error StrictNullChecks
+      this.web3.eth.abi.decodeParameter('uint256', result).toString(),
     );
     const feeFreePrice = toBigInt(
       await this.contract.methods
@@ -124,9 +133,24 @@ class CommunityStakes extends ContractBase {
     }
 
     const namespaceAddress = await this.getNamespaceAddress(name);
-    const totalPrice = await this.contract.methods
-      .getBuyPriceAfterFee(namespaceAddress, id.toString(), amount.toString())
-      .call();
+
+    // Create a specific Web3 instance just for this call
+    const specificWeb3 = new Web3(this.rpc);
+
+    const calldata = `0xf1220bbf${specificWeb3.eth.abi
+      .encodeParameters(
+        ['address', 'uint256', 'uint256'],
+        [namespaceAddress, id.toString(), amount.toString()],
+      )
+      .substring(2)}`;
+    const result = await specificWeb3.eth.call({
+      to: this.contractAddress,
+      data: calldata,
+    });
+    const totalPrice = (
+      specificWeb3.eth.abi.decodeParameter('uint256', result) as bigint | number
+    ).toString();
+
     const maxFeePerGasEst = await this.estimateGas();
     let txReceipt;
     try {

@@ -113,7 +113,7 @@ const PersonalInformationStep = ({
     formMethodsRef.current.trigger('username').catch(console.error);
     setCurrentUsername(randomUsername);
     // Auto-select the generated username
-    setIsUserNameChangeDisabled(true);
+    setIsUserNameChangeDisabled(false);
   };
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -155,7 +155,7 @@ const PersonalInformationStep = ({
     }
     // enable/disable promotional emails flag for user
     await updateEmailSettings({
-      promotionalEmailsEnabled: values.enableProductUpdates,
+      enable_promotional_emails: values.enableProductUpdates,
     });
 
     // refetch profile data

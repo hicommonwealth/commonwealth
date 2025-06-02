@@ -1,4 +1,4 @@
-import { splitAndDecodeURL } from '@hicommonwealth/shared';
+import { generateTopicIdentifiersFromUrl } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import useTopicGating from 'client/scripts/hooks/useTopicGating';
@@ -32,18 +32,20 @@ const OverviewPage = ({
 }: OverViewPageProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
-  const topicNameFromURL = splitAndDecodeURL(location.pathname);
+  const topicIndentifiersFromURL = generateTopicIdentifiersFromUrl(
+    window.location.href,
+  );
 
   useRunOnceOnCondition({
     callback: () => {
-      if (topicNameFromURL === 'overview') {
+      if (topicIndentifiersFromURL?.topicName === 'overview') {
         const params = new URLSearchParams();
         params.set('tab', 'overview');
         const url = `/discussions?${params.toString()}`;
         navigate(url);
       }
     },
-    shouldRun: topicNameFromURL === 'overview',
+    shouldRun: topicIndentifiersFromURL?.topicName === 'overview',
   });
 
   const communityId = app.activeChainId() || '';
@@ -55,10 +57,11 @@ const OverviewPage = ({
     apiEnabled: !!communityId,
   });
 
-  const { memberships, topicPermissions } = useTopicGating({
+  const { actionGroups, bypassGating } = useTopicGating({
     communityId: communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
+    topicId: typeof topicId === 'string' ? parseInt(topicId) : topicId,
   });
 
   const filterList = useMemo(() => {
@@ -148,8 +151,8 @@ const OverviewPage = ({
             customElement: (
               <ThreadCell
                 thread={thread}
-                memberships={memberships}
-                topicPermissions={topicPermissions}
+                actionGroups={actionGroups}
+                bypassGating={bypassGating}
               />
             ),
           },

@@ -1,5 +1,5 @@
 import { dispose } from '@hicommonwealth/core';
-import type { ThreadAttributes } from '@hicommonwealth/model';
+import { ThreadAttributes, models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
@@ -14,7 +14,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('User Dashboard API', () => {
-  const chain = 'ethereum';
+  const chain = 'sushi';
   const chain2 = 'alex';
   // The createThread util uses the chainId parameter to determine
   // author_chain, which is required for authorship lookup.
@@ -45,22 +45,18 @@ describe('User Dashboard API', () => {
   beforeAll(async () => {
     server = await testServer();
 
-    const topic = await server.models.Topic.findOne({
-      where: {
-        community_id: chain,
-        group_ids: [],
-      },
+    const topic = await models.Topic.findOne({
+      where: { community_id: chain },
     });
     // @ts-expect-error StrictNullChecks
     topicId = topic.id;
 
-    const topic2 = await server.models.Topic.create({
+    const topic2 = await models.Topic.create({
       name: 'Test Topic',
       description: 'A topic made for testing',
       community_id: chain2,
       featured_in_sidebar: false,
       featured_in_new_post: false,
-      group_ids: [],
     });
     // @ts-expect-error StrictNullChecks
     topicId2 = topic2.id;
@@ -151,7 +147,7 @@ describe('User Dashboard API', () => {
       topicId,
     };
     //
-    // // create a thread in both 'ethereum' and 'alex' communities
+    // // create a thread in both 'sushi' and 'alex' communities
     const threadTwo = await server.seeder.createThread(threadTwoArgs);
     expect(threadTwo.status).to.equal('Success');
     expect(threadTwo.result).to.not.be.null;
@@ -187,7 +183,7 @@ describe('User Dashboard API', () => {
       expect(res.text).to.not.be.null;
       const resBody = JSON.parse(res.text);
       const threadIds = resBody?.results?.map((a) => a.id);
-      const chains = await server.models.Thread.findAll({
+      const chains = await models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
           id: {
@@ -196,7 +192,7 @@ describe('User Dashboard API', () => {
         },
         raw: true,
       });
-      expect(chains).to.deep.equal([{ community_id: 'ethereum' }]);
+      expect(chains).to.deep.equal([{ community_id: chain }]);
     });
 
     test('should return user activity for newly joined communities', async () => {
@@ -221,7 +217,7 @@ describe('User Dashboard API', () => {
 
       const resBody = JSON.parse(res.text);
       const threadIds = resBody?.results.map((a) => a.id);
-      const chains = await server.models.Thread.findAll({
+      const chains = await models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
           id: {
@@ -232,8 +228,8 @@ describe('User Dashboard API', () => {
         raw: true,
       });
       expect(chains).to.deep.equal([
-        { community_id: 'alex' },
-        { community_id: 'ethereum' },
+        { community_id: chain2 },
+        { community_id: chain },
       ]);
     });
 
@@ -270,7 +266,7 @@ describe('User Dashboard API', () => {
       const resBody = JSON.parse(res.text);
       const threadIds = resBody.results.map((a) => a.id);
       const chains = (
-        await server.models.Thread.findAll({
+        await models.Thread.findAll({
           attributes: attributesOf<ThreadAttributes>('community_id'),
           where: {
             id: {

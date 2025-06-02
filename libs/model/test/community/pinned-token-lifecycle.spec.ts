@@ -1,6 +1,7 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import * as shared from '@hicommonwealth/shared';
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import {
   MockInstance,
   afterAll,
@@ -50,6 +51,7 @@ describe('Pinned token lifecycle', () => {
     const [admin] = await seed('User', { isAdmin: false });
     const [user] = await seed('User', { isAdmin: false });
     const [community] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: randomNode!.id!,
       base: shared.ChainBase.Ethereum,
       active: true,
@@ -71,6 +73,7 @@ describe('Pinned token lifecycle', () => {
       namespace: null,
     });
     const [secondCommunity] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: randomNode!.id!,
       base: shared.ChainBase.Ethereum,
       active: true,
@@ -92,6 +95,7 @@ describe('Pinned token lifecycle', () => {
       namespace: 'namespaceOne',
     });
     const [thirdCommunity] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: randomNode!.id!,
       base: shared.ChainBase.Ethereum,
       active: true,

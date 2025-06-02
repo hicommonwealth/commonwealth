@@ -5,6 +5,7 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
+  CommunityTierMap,
 } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -104,6 +105,7 @@ describe('Seed functions', () => {
       const user = await testSeed('User', { selected_community_id: null });
       await testSeed('Community', {
         id: 'ethereum',
+        tier: CommunityTierMap.ChainVerified,
         network: ChainNetwork.Ethereum,
         default_symbol: 'ETH',
         name: 'Ethereum',
@@ -123,13 +125,13 @@ describe('Seed functions', () => {
             verification_token_expires: undefined,
             verified: new Date(),
             role: 'admin',
-            is_user_default: false,
           },
         ],
       });
 
       await testSeed('Community', {
         id: 'superEth',
+        tier: CommunityTierMap.ChainVerified,
         network: ChainNetwork.Ethereum,
         default_symbol: 'SETH',
         name: 'Super Eth',
@@ -149,7 +151,6 @@ describe('Seed functions', () => {
             verification_token_expires: undefined,
             verified: new Date(),
             role: 'admin',
-            is_user_default: false,
           },
         ],
         groups: [

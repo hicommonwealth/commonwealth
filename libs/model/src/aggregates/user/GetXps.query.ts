@@ -8,7 +8,7 @@ export function GetXps(): Query<typeof schemas.GetXps> {
   return {
     ...schemas.GetXps,
     auth: [],
-    secure: true,
+    secure: false,
     body: async ({ payload }) => {
       const {
         user_id,
@@ -45,7 +45,7 @@ export function GetXps(): Query<typeof schemas.GetXps> {
               attributes: ['id', 'name'],
               where: {
                 ...(community_id && { community_id }),
-                ...(quest_id ? { id: quest_id } : { id: { [Op.gt]: 0 } }),
+                ...(quest_id && { id: quest_id }),
               },
             },
           ],
@@ -69,6 +69,7 @@ export function GetXps(): Query<typeof schemas.GetXps> {
         },
         include,
         order: [['created_at', 'DESC']],
+        limit: 1000, // TODO: paginate this query, system quests are too big
       });
 
       const finalXps = xps

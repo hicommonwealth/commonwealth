@@ -3,7 +3,7 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
+import { composeSequelizeLogger, logger, stats } from '@hicommonwealth/core';
 import {
   emitEvent,
   getMentions,
@@ -19,7 +19,7 @@ import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { createMentionEvents } from './utils';
 
-const log = logger(import.meta);
+const log = logger(import.meta, undefined, config.TWITTER.LOG_LEVEL);
 
 stats({ adapter: HotShotsStats() });
 
@@ -47,7 +47,7 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
     });
 
     const startTime = cachedStartTime
-      ? new Date(cachedStartTime.last_polled_timestamp)
+      ? new Date(Number(cachedStartTime.last_polled_timestamp))
       : DEFAULT_POLL_START_TIME;
     const endTime = new Date();
 
@@ -69,7 +69,7 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
       await models.TwitterCursor.upsert(
         {
           bot_name: twitterBotConfig.name,
-          last_polled_timestamp: res.endTime.getTime(),
+          last_polled_timestamp: BigInt(res.endTime.getTime()),
         },
         { transaction },
       );
@@ -81,7 +81,6 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
   try {
     const quests = await models.Quest.findAll({
@@ -93,6 +92,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
       include: [
         {
           model: models.QuestActionMeta,
+          as: 'action_metas',
           required: true,
           include: [
             {
@@ -100,9 +100,24 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
               required: true,
               where: {
                 [Op.or]: [
-                  { like_xp_awarded: false },
-                  { reply_xp_awarded: false },
-                  { retweet_xp_awarded: false },
+                  {
+                    [Op.and]: [
+                      { like_xp_awarded: false },
+                      { like_cap: { [Op.gt]: 0 } },
+                    ],
+                  },
+                  {
+                    [Op.and]: [
+                      { reply_xp_awarded: false },
+                      { replies_cap: { [Op.gt]: 0 } },
+                    ],
+                  },
+                  {
+                    [Op.and]: [
+                      { retweet_xp_awarded: false },
+                      { retweet_cap: { [Op.gt]: 0 } },
+                    ],
+                  },
                 ],
               },
               // Rotates through tweets so that all tweets are updated eventually
@@ -112,8 +127,14 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
           ],
         },
       ],
+      logging: composeSequelizeLogger(log, config.TWITTER.LOG_LEVEL),
     });
+    log.trace(`QuestTweets found ${quests.length}`);
 
+    if (quests.length === 0) {
+      log.trace('No quest tweets found');
+      return;
+    }
     const tweets = await getTweets({
       twitterBotConfig,
       tweetIds: quests.map((t) => t.action_metas![0].QuestTweet!.tweet_id),
@@ -130,6 +151,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
     const capReachedEvents: EventPair<'TweetEngagementCapReached'>[] = [];
 
     for (const t of tweets) {
+      log.trace(`Processing tweet ${t.id}`);
       const quest = quests.find(
         (q) => q.action_metas![0].QuestTweet!.tweet_id === t.id,
       )!;
@@ -145,37 +167,52 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
 
       if (!queryTweet) throw new Error('Tweet not found');
 
-      if (queryTweet.like_cap !== queryTweet.num_likes) {
+      if (
+        queryTweet.like_cap !== 0 &&
+        queryTweet.like_cap !== queryTweet.num_likes
+      ) {
+        const newValue =
+          t.public_metrics.like_count >= queryTweet.like_cap!
+            ? queryTweet.like_cap!
+            : t.public_metrics.like_count;
         tweetUpdates.num_likes.push({
-          newValue:
-            t.public_metrics.like_count >= queryTweet.like_cap!
-              ? queryTweet.like_cap!
-              : t.public_metrics.like_count,
-          whenCaseValue: t.id,
+          newValue,
+          whenCaseValue: `'${t.id}'`,
         });
         capReachedEvent.event_payload.like_cap_reached = true;
+        log.trace(`Updating num_likes to ${newValue}`);
       }
 
-      if (queryTweet.replies_cap !== queryTweet.num_replies) {
+      if (
+        queryTweet.replies_cap !== 0 &&
+        queryTweet.replies_cap !== queryTweet.num_replies
+      ) {
+        const newValue =
+          t.public_metrics.reply_count >= queryTweet.replies_cap!
+            ? queryTweet.replies_cap!
+            : t.public_metrics.reply_count;
         tweetUpdates.num_replies.push({
-          newValue:
-            t.public_metrics.reply_count >= queryTweet.replies_cap!
-              ? queryTweet.replies_cap!
-              : t.public_metrics.reply_count,
-          whenCaseValue: t.id,
+          newValue,
+          whenCaseValue: `'${t.id}'`,
         });
         capReachedEvent.event_payload.reply_cap_reached = true;
+        log.trace(`Updating num_replies to ${newValue}`);
       }
 
-      if (queryTweet.retweet_cap !== queryTweet.num_retweets) {
+      if (
+        queryTweet.retweet_cap !== 0 &&
+        queryTweet.retweet_cap !== queryTweet.num_retweets
+      ) {
+        const newValue =
+          t.public_metrics.retweet_count >= queryTweet.retweet_cap!
+            ? queryTweet.retweet_cap!
+            : t.public_metrics.retweet_count;
         tweetUpdates.num_retweets.push({
-          newValue:
-            t.public_metrics.retweet_count >= queryTweet.retweet_cap!
-              ? queryTweet.retweet_cap!
-              : t.public_metrics.retweet_count,
-          whenCaseValue: t.id,
+          newValue,
+          whenCaseValue: `'${t.id}'`,
         });
         capReachedEvent.event_payload.retweet_cap_reached = true;
+        log.trace(`Updating num_retweets to ${newValue}`);
       }
 
       if (
@@ -188,7 +225,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
     }
 
     await models.sequelize.transaction(async (transaction) => {
-      await pgMultiRowUpdate(
+      const questTweetsUpdated = await pgMultiRowUpdate(
         'QuestTweets',
         [
           {
@@ -207,6 +244,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
         'tweet_id',
         transaction,
       );
+      questTweetsUpdated && log.info('Quest tweets updated');
       await emitEvent(models.Outbox, capReachedEvents, transaction);
     });
   } catch (error) {
@@ -256,7 +294,16 @@ async function main() {
           ),
       );
     });
+    log.info(`Mentions polling started`);
 
+    await pollTweetMetrics(TwitterBotConfigs.Common);
+    setInterval(
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      pollTweetMetrics,
+      config.TWITTER.WORKER_POLL_INTERVAL,
+      TwitterBotConfigs.Common,
+    );
+    log.info(`Tweet metrics polling started`);
     isServiceHealthy = true;
     log.info('Twitter Worker started');
   } catch (e) {

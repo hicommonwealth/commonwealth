@@ -26,8 +26,11 @@ import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
+  CommunityTierMap,
+  GatedActionEnum,
   MAX_COMMENT_DEPTH,
   MAX_TRUNCATED_CONTENT_LENGTH,
+  UserTierMap,
 } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { z } from 'zod';
@@ -37,6 +40,7 @@ import {
   CreateCommentReaction,
   DeleteComment,
   GetComments,
+  SearchComments,
   UpdateComment,
 } from '../../src/aggregates/comment';
 import { DeleteReaction } from '../../src/aggregates/reaction';
@@ -98,9 +102,14 @@ describe('Thread lifecycle', () => {
     const users = await seedRecord('User', roles, (role) => ({
       profile: { name: role },
       isAdmin: role === 'admin',
-      tier: 4,
+      tier:
+        role === 'member'
+          ? UserTierMap.NewlyVerifiedWallet
+          : UserTierMap.ManuallyVerified,
     }));
     const [_community] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
+      spam_tier_level: UserTierMap.NewlyVerifiedWallet,
       chain_node_id: node!.id!,
       namespace_address: '0x123',
       active: true,
@@ -121,18 +130,11 @@ describe('Thread lifecycle', () => {
       ],
       topics: [
         {
-          name: 'topic with permissions',
-          group_ids: [threadGroupId, commentGroupId],
+          name: 'topic with gating',
           weighted_voting: TopicWeightedVoting.Stake,
         },
-        {
-          name: 'topic without thread permissions',
-          group_ids: [emptyGroupId],
-        },
-        {
-          name: 'topic without groups',
-          group_ids: [],
-        },
+        { name: 'topic without gating' },
+        { name: 'topic without groups' },
       ],
       CommunityStakes: [
         {
@@ -144,24 +146,25 @@ describe('Thread lifecycle', () => {
       ],
       custom_stages: ['one', 'two'],
     });
-    await seed('GroupPermission', {
+    await seed('GroupGatedAction', {
       group_id: threadGroupId,
-      topic_id: _community?.topics?.[0]?.id || 0,
-      allowed_actions: [
-        schemas.PermissionEnum.CREATE_THREAD,
-        schemas.PermissionEnum.CREATE_THREAD_REACTION,
-        schemas.PermissionEnum.CREATE_COMMENT_REACTION,
+      topic_id: _community!.topics![0]!.id,
+      gated_actions: [
+        GatedActionEnum.CREATE_THREAD,
+        GatedActionEnum.CREATE_THREAD_REACTION,
+        GatedActionEnum.CREATE_COMMENT_REACTION,
+        GatedActionEnum.UPDATE_POLL,
       ],
     });
-    await seed('GroupPermission', {
+    await seed('GroupGatedAction', {
       group_id: commentGroupId,
-      topic_id: _community?.topics?.[0]?.id || 0,
-      allowed_actions: [schemas.PermissionEnum.CREATE_COMMENT],
+      topic_id: _community!.topics![0]!.id,
+      gated_actions: [GatedActionEnum.CREATE_COMMENT],
     });
-    await seed('GroupPermission', {
+    await seed('GroupGatedAction', {
       group_id: emptyGroupId,
-      topic_id: _community?.topics?.[1]?.id || 0,
-      allowed_actions: [],
+      topic_id: _community!.topics![1]!.id,
+      gated_actions: [],
     });
 
     community = _community!;
@@ -275,6 +278,11 @@ describe('Thread lifecycle', () => {
           });
           expect(_thread?.title).to.equal(instancePayload.title);
           expect(_thread?.stage).to.equal(instancePayload.stage);
+          if (role === 'member')
+            // below spam tier level
+            expect(_thread?.marked_as_spam_at).to.be.toBeDefined();
+          else expect(_thread?.marked_as_spam_at).to.be.toBeNull();
+
           // capture as admin author for other tests
           if (!thread) thread = _thread!;
 
@@ -326,7 +334,7 @@ describe('Thread lifecycle', () => {
           actor: actors.nonmember,
           payload: await signCreateThread(actors.nonmember.address!, {
             ...payload,
-            topic_id: community!.topics!.at(1)!.id!,
+            topic_id: community!.topics!.at(0)!.id!,
           }),
         }),
       ).rejects.toThrowError(NonMember);
@@ -477,6 +485,22 @@ describe('Thread lifecycle', () => {
       expect(updated?.marked_as_spam_at).toBeDefined;
     });
 
+    test('should update launchpad_token_address and is_linking_token', async () => {
+      const body = {
+        is_linking_token: true,
+        launchpad_token_address: '0x0',
+      };
+      const updated = await command(UpdateThread(), {
+        actor: actors.admin,
+        payload: {
+          thread_id: thread.id!,
+          ...body,
+        },
+      });
+      expect(updated?.is_linking_token).to.eq(true);
+      expect(updated?.launchpad_token_address).to.eq('0x0');
+    });
+
     test('should fail when collaborator actor non admin/moderator', async () => {
       await expect(
         command(UpdateThread(), {
@@ -612,6 +636,7 @@ describe('Thread lifecycle', () => {
         body: body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
         community_id: thread!.community_id,
       });
+      expect(firstComment?.marked_as_spam_at).toBeDefined();
       expect(firstComment?.content_url).toBeTruthy();
       expect(
         await blobStorage({ key: R2_ADAPTER_KEY }).exists({
@@ -1282,6 +1307,25 @@ describe('Thread lifecycle', () => {
 
       // console.log(response);
       expect(response!.threads.length).to.equal(7);
+    });
+
+    test('should search comments', async () => {
+      const comments = await query(SearchComments(), {
+        actor: actors.member,
+        payload: {
+          community_id: thread.community_id,
+          search: 'hello',
+          limit: 5,
+          cursor: 1,
+          order_by: 'created_at',
+          order_direction: 'DESC',
+        },
+      });
+      expect(comments!.results).to.have.length(1);
+      expect(comments!.limit).to.equal(5);
+      expect(comments!.page).to.equal(1);
+      expect(comments!.totalPages).to.equal(1);
+      expect(comments!.totalResults).to.equal(1);
     });
   });
 });

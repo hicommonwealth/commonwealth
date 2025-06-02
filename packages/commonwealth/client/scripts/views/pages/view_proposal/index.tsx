@@ -16,14 +16,15 @@ import {
   useCosmosProposalVotesQuery,
 } from 'state/api/proposals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { PageLoading } from 'views/pages/loading';
+import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import type { AnyProposal } from '../../../models/types';
-import { Skeleton } from '../../components/Skeleton';
-import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
+import CWAccordView from '../../components/component_kit/CWAccordView/CWAccordView';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
-import { VotingActions } from '../../components/proposals/voting_actions';
+import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
+import TimeLineCard from '../../components/proposals/TimeLineCard';
 import { VotingResults } from '../../components/proposals/voting_results';
+import { Skeleton } from '../../components/Skeleton';
 import { PageNotFound } from '../404';
 import { JSONDisplay } from './JSONDisplay';
 import { ProposalSubheader } from './proposal_components';
@@ -41,10 +42,8 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
 
   // @ts-expect-error <StrictNullChecks/>
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
-  const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [title, setTitle] = useState<string>(proposal?.title);
   const [description, setDescription] = useState<string>(proposal?.description);
-  const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const {
     data: cosmosProposal,
@@ -96,7 +95,7 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   }, [isAdapterLoaded, proposalId]);
 
   if (isFetchingProposal || !isAdapterLoaded) {
-    return <PageLoading message="Loading..." />;
+    return <LoadingIndicator message="Loading..." />;
   }
 
   if (cosmosError) {
@@ -123,14 +122,6 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
     }
   }
 
-  const toggleVotingModal = (newModalState: boolean) => {
-    setVotingModalOpen(newModalState);
-  };
-
-  const onModalClose = () => {
-    setVotingModalOpen(false);
-  };
-
   return (
     <CWPageLayout>
       <CWContentPage
@@ -141,12 +132,7 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
         // @ts-expect-error <StrictNullChecks/>
         updatedAt={null}
         subHeader={<ProposalSubheader proposal={proposal} />}
-        body={() =>
-          proposalDescription && (
-            <CollapsibleProposalBody doc={proposalDescription} />
-          )
-        }
-        subBody={
+        body={() => (
           <>
             {isFetchingMetadata ? (
               <Skeleton height={94.4} />
@@ -155,6 +141,10 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
                 <JSONDisplay data={metadata} title="Metadata" />
               )
             )}
+            <CWAccordView title="Description" defaultOpen={false}>
+              <MarkdownViewerWithFallback markdown={proposalDescription} />
+            </CWAccordView>
+
             {!_.isEmpty(proposal?.data?.messages) && (
               <JSONDisplay data={proposal.data.messages} title="Messages" />
             )}
@@ -167,17 +157,16 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
                 title="Community Spend Proposal"
               />
             )}
-            <VotingResults proposal={proposal} />
-            <VotingActions
-              onModalClose={onModalClose}
-              proposal={proposal}
-              toggleVotingModal={toggleVotingModal}
-              votingModalOpen={votingModalOpen}
-              redrawProposals={redrawProposals}
-              proposalRedrawState={proposalRedrawState}
-            />
           </>
-        }
+        )}
+        showSidebar={true}
+        sidebarComponents={[
+          {
+            label: 'Links',
+            item: <TimeLineCard proposalData={proposal?.data} />,
+          },
+          { label: 'Results', item: <VotingResults proposal={proposal} /> },
+        ]}
       />
     </CWPageLayout>
   );

@@ -7,7 +7,11 @@ import {
 import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { events } from '@hicommonwealth/schemas';
-import { BalanceType, getCommunityUrl } from '@hicommonwealth/shared';
+import {
+  BalanceType,
+  CommunityTierMap,
+  getCommunityUrl,
+} from '@hicommonwealth/shared';
 import {
   Mock,
   afterAll,
@@ -49,6 +53,7 @@ describe('chainEventCreated Event Handler', () => {
     );
     [user] = await tester.seed('User', {});
     [community] = await tester.seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: chainNode!.id,
       namespace_address: namespaceAddress,
       lifetime_thread_count: 0,

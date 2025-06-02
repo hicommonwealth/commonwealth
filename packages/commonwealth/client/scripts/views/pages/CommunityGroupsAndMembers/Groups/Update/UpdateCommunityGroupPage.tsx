@@ -3,15 +3,15 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import app from 'state';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
 import useAppStatus from '../../../../../hooks/useAppStatus';
+import { LoadingIndicator } from '../../../../components/LoadingIndicator/LoadingIndicator';
 import { PageNotFound } from '../../../404';
-import { PageLoading } from '../../../loading';
 import {
   AMOUNT_CONDITIONS,
   chainTypes,
@@ -56,12 +56,6 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
 
   const { isAddedToHomeScreen } = useAppStatus();
 
-  useEffect(() => {
-    if (initialAllowlist) {
-      setAllowedAddresses(initialAllowlist);
-    }
-  }, [initialAllowlist]);
-
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.GROUPS_EDIT_PAGE_VIEW,
@@ -77,7 +71,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   }
 
   if (isLoading) {
-    return <PageLoading />;
+    return <LoadingIndicator />;
   }
 
   return (
@@ -87,7 +81,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
         initialValues={{
           groupName: foundGroup.name,
           groupDescription: foundGroup.description,
-          groupImageUrl: foundGroup.groupImageUrl,
+          groupImageUrl: foundGroup.groupImageUrl || '',
           // @ts-expect-error <StrictNullChecks/>
           requirements: foundGroup.requirements
             .filter((r) => r?.data?.source) // filter erc groups
@@ -109,17 +103,24 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                 value: `${
                   requirement.data.source.cosmos_chain_id ||
                   requirement.data.source.evm_chain_id ||
+                  requirement.data.source.solana_network ||
+                  requirement.data.source.sui_network ||
                   0
                 }`,
                 label: chainTypes?.find(
                   (chain) =>
                     chain.value ==
                     (requirement.data.source.cosmos_chain_id ||
-                      requirement.data.source.evm_chain_id),
+                      requirement.data.source.evm_chain_id ||
+                      requirement.data.source.solana_network ||
+                      requirement.data.source.sui_network),
                 )?.label,
               },
               requirementContractAddress:
-                requirement.data.source.contract_address || '',
+                requirement.data.source.contract_address ||
+                requirement.data.source.object_id ||
+                '',
+              requirementCoinType: requirement.data.source.coin_type || '',
               // API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
               requirementCondition: conditionTypes.find(
                 (condition) => condition.value === AMOUNT_CONDITIONS.MORE,
@@ -132,6 +133,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           topics: (foundGroup.topics || []).map((topic) => ({
             label: topic.name,
             value: topic.id,
+            is_private: topic.is_private,
             permission: topic.permissions || [],
           })),
         }}

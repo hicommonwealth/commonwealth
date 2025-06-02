@@ -55,6 +55,51 @@
     }
   }
 
+  &.pill {
+    background-color: $primary-100;
+    padding: 2px 8px;
+    height: 28px;
+    border-radius: 14px;
+    cursor: pointer;
+
+    .Text {
+      color: $primary-600;
+      font-weight: 500;
+    }
+
+    .close-container {
+      background-color: $primary-100;
+      display: flex;
+      margin-left: 6px;
+
+      svg {
+        width: 14px;
+        height: 14px;
+        color: $primary-600;
+      }
+
+      &:hover {
+        > svg {
+          background-color: $primary-200;
+        }
+      }
+    }
+
+    .pill-close-icon {
+      color: $primary-600 !important;
+      width: 14px !important;
+      height: 14px !important;
+    }
+
+    &:hover {
+      background-color: $primary-200;
+
+      .close-container {
+        background-color: $primary-200;
+      }
+    }
+  }
+
   &.poll {
     background-color: $purple-50;
 
@@ -293,6 +338,9 @@
     &:hover {
       cursor: pointer;
       color: $neutral-600;
+    }
+    &.pill-close-icon {
+      color: $primary-600 !important;
     }
   }
 

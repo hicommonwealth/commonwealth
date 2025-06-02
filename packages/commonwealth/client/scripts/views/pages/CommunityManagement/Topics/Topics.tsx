@@ -5,12 +5,16 @@ import app from 'state';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import StakeIntegration from 'views/pages/CommunityManagement/StakeIntegration';
+import CommunityOnchainTransactions from 'views/pages/CreateCommunity/steps/CommunityOnchainTransactions';
+import { TransactionType } from 'views/pages/CreateCommunity/steps/CommunityOnchainTransactions/helpers';
 
-import CommunityStakeStep from '../../CreateCommunity/steps/CommunityStakeStep';
 import TopicDetails from './TopicDetails';
 import WVConsent from './WVConsent';
 import WVERC20Details from './WVERC20Details';
 import WVMethodSelection from './WVMethodSelection';
+import WVSPLDetails from './WVSPLDetails';
+import WVSuiNativeDetails from './WVSuiNativeDetails';
+import WVSuiTokenDetails from './WVSuiTokenDetails';
 import { CreateTopicStep, getCreateTopicSteps } from './utils';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -40,16 +44,49 @@ export interface TopicFormERC20 {
   weightedVoting?: TopicWeightedVoting | null;
 }
 
+export interface TopicFormSPL {
+  tokenAddress?: string;
+  tokenSymbol?: string;
+  tokenDecimals?: number;
+  voteWeightMultiplier?: number;
+  weightedVoting?: TopicWeightedVoting | null;
+}
+
+export interface TopicFormSuiNative {
+  tokenSymbol?: string;
+  tokenDecimals?: number;
+  voteWeightMultiplier?: number;
+  chainNodeId?: number;
+  weightedVoting?: TopicWeightedVoting | null;
+}
+
+export interface TopicFormSuiToken {
+  tokenAddress?: string;
+  tokenSymbol?: string;
+  tokenDecimals?: number;
+  voteWeightMultiplier?: number;
+  chainNodeId?: number;
+  weightedVoting?: TopicWeightedVoting | null;
+}
+
 export interface TopicFormStake {
   weightedVoting?: TopicWeightedVoting | null;
 }
 
 export type HandleCreateTopicProps = {
   erc20?: TopicFormERC20;
+  spl?: TopicFormSPL;
+  suiNative?: TopicFormSuiNative;
+  suiToken?: TopicFormSuiToken;
   stake?: TopicFormStake;
 };
 
-export interface TopicForm extends TopicFormRegular, TopicFormERC20 {}
+export interface TopicForm
+  extends TopicFormRegular,
+    TopicFormERC20,
+    TopicFormSPL,
+    TopicFormSuiNative,
+    TopicFormSuiToken {}
 
 export const Topics = () => {
   const [topicFormData, setTopicFormData] = useState<TopicForm | null>(null);
@@ -86,6 +123,9 @@ export const Topics = () => {
 
   const handleCreateTopic = async ({
     erc20,
+    spl,
+    suiNative,
+    suiToken,
     stake,
   }: HandleCreateTopicProps) => {
     if (!topicFormData) {
@@ -108,6 +148,34 @@ export const Topics = () => {
               vote_weight_multiplier: erc20.voteWeightMultiplier,
               chain_node_id: erc20.chainNodeId,
               weighted_voting: erc20.weightedVoting,
+            }
+          : {}),
+        ...(spl
+          ? {
+              token_address: spl.tokenAddress,
+              token_symbol: spl.tokenSymbol,
+              token_decimals: spl.tokenDecimals,
+              vote_weight_multiplier: spl.voteWeightMultiplier,
+              weighted_voting: spl.weightedVoting,
+            }
+          : {}),
+        ...(suiNative
+          ? {
+              token_symbol: suiNative.tokenSymbol,
+              token_decimals: suiNative.tokenDecimals,
+              vote_weight_multiplier: suiNative.voteWeightMultiplier,
+              chain_node_id: suiNative.chainNodeId,
+              weighted_voting: suiNative.weightedVoting,
+            }
+          : {}),
+        ...(suiToken
+          ? {
+              token_address: suiToken.tokenAddress,
+              token_symbol: suiToken.tokenSymbol,
+              token_decimals: suiToken.tokenDecimals,
+              vote_weight_multiplier: suiToken.voteWeightMultiplier,
+              chain_node_id: suiToken.chainNodeId,
+              weighted_voting: suiToken.weightedVoting,
             }
           : {}),
         ...(stake
@@ -146,31 +214,49 @@ export const Topics = () => {
           />
         );
       case CreateTopicStep.WVMethodSelection:
-        return (
-          <WVMethodSelection
-            onStepChange={setCreateTopicStep}
-            hasNamespace={!!community?.namespace}
-          />
-        );
+        return <WVMethodSelection onStepChange={setCreateTopicStep} />;
       case CreateTopicStep.WVNamespaceEnablement:
         return (
-          <CommunityStakeStep
+          <CommunityOnchainTransactions
             createdCommunityName={community?.name}
             createdCommunityId={community?.id || ''}
             selectedAddress={selectedAddress!}
             chainId={String(community?.ChainNode?.eth_chain_id)}
-            onlyNamespace
+            transactionTypes={[TransactionType.DeployNamespace]}
             isTopicFlow
-            onEnableStakeStepCancel={goToMethodSelectionStep}
-            onSignTransactionsStepReserveNamespaceSuccess={() =>
-              setCreateTopicStep(CreateTopicStep.WVERC20Details)
-            }
+            onConfirmNamespaceDataStepCancel={goToMethodSelectionStep}
+            onSignTransaction={(type) => {
+              if (type === TransactionType.DeployNamespace) {
+                setCreateTopicStep(CreateTopicStep.WVERC20Details);
+              }
+            }}
             onSignTransactionsStepCancel={goToMethodSelectionStep}
           />
         );
       case CreateTopicStep.WVERC20Details:
         return (
           <WVERC20Details
+            onStepChange={setCreateTopicStep}
+            onCreateTopic={handleCreateTopic}
+          />
+        );
+      case CreateTopicStep.WVSPLDetails:
+        return (
+          <WVSPLDetails
+            onStepChange={setCreateTopicStep}
+            onCreateTopic={handleCreateTopic}
+          />
+        );
+      case CreateTopicStep.WVSuiNativeDetails:
+        return (
+          <WVSuiNativeDetails
+            onStepChange={setCreateTopicStep}
+            onCreateTopic={handleCreateTopic}
+          />
+        );
+      case CreateTopicStep.WVSuiTokenDetails:
+        return (
+          <WVSuiTokenDetails
             onStepChange={setCreateTopicStep}
             onCreateTopic={handleCreateTopic}
           />

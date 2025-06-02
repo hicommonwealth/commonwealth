@@ -26,13 +26,23 @@ export function DeleteThread(): Command<typeof schemas.DeleteThread> {
           where: { thread_id: thread.id! },
           transaction,
         });
-        await thread.destroy({ transaction });
+
+        await models.sequelize.query(
+          `
+          UPDATE "Threads"
+          SET search     = null,
+              deleted_at = NOW()
+          WHERE id = :threadId
+        `,
+          { transaction, replacements: { threadId: thread.id } },
+        );
       });
 
       return {
         thread_id: thread.id!,
         canvas_signed_data: thread.canvas_signed_data,
         canvas_msg_id: thread.canvas_msg_id,
+        community_id: thread.community_id,
       };
     },
   };

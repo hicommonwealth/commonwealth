@@ -1,4 +1,5 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, DefaultPage } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import { isS3URL } from 'helpers/awsHelpers';
@@ -41,6 +42,42 @@ type QuickTokenLaunchFormProps = {
 
 const MAX_IDEAS_LIMIT = 5;
 
+const RATE_LIMIT_MESSAGE =
+  'You are being rate limited. Please wait and try again.';
+
+interface RateLimitErrorType {
+  data?: {
+    httpStatus?: number;
+    message?: string;
+  };
+  status?: number;
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
+const isRateLimitError = (err: RateLimitErrorType) => {
+  const status = err?.data?.httpStatus || err?.status || err?.response?.status;
+  if (status === 429) return true;
+
+  if (status === 401) {
+    const msg =
+      err?.data?.message || err?.message || err?.response?.data?.message || '';
+    const lowerMsg = String(msg).toLowerCase();
+    return (
+      lowerMsg.includes('image') &&
+      lowerMsg.includes('prompt') &&
+      lowerMsg.includes('overload')
+    );
+  }
+
+  return false;
+};
+
 export const QuickTokenLaunchForm = ({
   onCancel,
   onCommunityCreated,
@@ -48,6 +85,8 @@ export const QuickTokenLaunchForm = ({
   generateIdeaOnMount = false,
   isSmallScreen = false,
 }: QuickTokenLaunchFormProps) => {
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const {
     generateIdea,
@@ -180,6 +219,7 @@ export const QuickTokenLaunchForm = ({
                 prompt: `Generate an image for a web3 token named "${
                   sanitizedTokenInfo.name
                 }" having a ticker/symbol of "${sanitizedTokenInfo.symbol}"`,
+                model: 'runware:100@1',
               });
           }
 
@@ -201,27 +241,34 @@ export const QuickTokenLaunchForm = ({
               iconUrl: generatedCommunityInfo.communityProfileImageURL,
               socialLinks: [],
               chainNodeId: baseNode.id,
+              tokenizeCommunity: tokenizedThreadsEnabled ? true : false,
             });
-            const response = await createCommunityMutation(communityPayload)
-              .then(() => true)
-              .catch((e) => {
-                const errorMsg = e?.message?.toLowerCase() || '';
-                if (
-                  !(
-                    errorMsg.includes('name') &&
-                    errorMsg.includes('already') &&
-                    errorMsg.includes('exists')
-                  )
-                ) {
-                  // this is not a unique community name error, abort token creation
-                  return 'invalid_state';
-                }
-                return false;
-              });
 
-            if (response === 'invalid_state') return;
+            let response;
+            try {
+              response = await createCommunityMutation(communityPayload);
+            } catch (e) {
+              if (isRateLimitError(e)) {
+                throw e;
+              }
+              const errorMsg = e?.message?.toLowerCase() || '';
+              if (
+                errorMsg.includes('name') &&
+                errorMsg.includes('already') &&
+                errorMsg.includes('exists')
+              ) {
+                // this is not a unique community name error, abort token creation
+                response = 'invalid_state';
+              } else {
+                throw e;
+              }
+            }
+            if (response === 'invalid_state') {
+              notifyError('Community name already taken.');
+              return;
+            }
 
-            if (response === true) {
+            if (response) {
               // store community id for this submitted token info, incase user submits
               // the form again we won't create another community for the same token info
               setCreatedCommunityIdsToTokenInfoMap((prev) => ({
@@ -258,11 +305,11 @@ export const QuickTokenLaunchForm = ({
         });
 
         const token = await createToken({
-          transaction_hash: txReceipt.transactionHash,
-          chain_node_id: baseNode.id,
           community_id: communityId,
-          icon_url: sanitizedTokenInfo.imageURL,
+          eth_chain_id: baseNode.ethChainId!,
+          transaction_hash: txReceipt.transactionHash,
           description: sanitizedTokenInfo.description,
+          icon_url: sanitizedTokenInfo.imageURL,
         });
 
         // 4. update community to reference the created token
@@ -281,6 +328,8 @@ export const QuickTokenLaunchForm = ({
           ...(sanitizedTokenInfo.imageURL && {
             icon_url: sanitizedTokenInfo.imageURL,
           }),
+          default_page: DefaultPage.Homepage,
+          launchpad_weighted_voting: true,
         }).catch(() => undefined); // failure of this call shouldn't break this handler
 
         setCreatedCommunityId(communityId);
@@ -288,7 +337,9 @@ export const QuickTokenLaunchForm = ({
       } catch (e) {
         console.error(`Error creating token: `, e, e.name);
 
-        if (e?.name === 'TransactionBlockTimeoutError') {
+        if (isRateLimitError(e)) {
+          notifyError(RATE_LIMIT_MESSAGE);
+        } else if (e?.name === 'TransactionBlockTimeoutError') {
           notifyError('Transaction not timely signed. Please try again!');
         } else if (
           e?.message
@@ -296,6 +347,10 @@ export const QuickTokenLaunchForm = ({
             .includes('user denied transaction signature')
         ) {
           notifyError('Transaction rejected!');
+        } else if (
+          e?.data?.message?.toLowerCase().includes('insufficient funds')
+        ) {
+          notifyError('Insufficient funds to launch token!');
         } else {
           notifyError('Failed to create token!');
         }
@@ -431,7 +486,7 @@ export const QuickTokenLaunchForm = ({
             <>
               <CWBanner
                 type="info"
-                body={`Launching token will create a complimentary community. 
+                body={`Launching token will create a complimentary community.
                         You can edit your community post launch.`}
               />
               <div className="cta-elements">

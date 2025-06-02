@@ -10,6 +10,7 @@ import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
 import { ClankerToken } from '../entities/community-indexer.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
+import { LaunchpadToken } from '../entities/launchpad-token.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
@@ -221,7 +222,8 @@ export const events = {
     parent_channel_id: true,
   }),
 
-  CommonDiscordServerJoined: z.object({
+  DiscordServerJoined: z.object({
+    server_id: z.string(),
     user_id: z.number().nullish(),
     discord_username: z.string(),
     joined_date: z.coerce.date(),
@@ -236,6 +238,8 @@ export const events = {
       .int()
       .positive()
       .describe('Recurring constest interval'),
+    transaction_hash: z.string().describe('Transaction hash'),
+    eth_chain_id: z.number().int().positive().describe('Ethereum chain id'),
     block_number: z
       .number()
       .int()
@@ -247,6 +251,8 @@ export const events = {
     namespace: z.string().describe('Community namespace'),
     contest_address: z.string().describe('Contest manager address'),
     length: z.number().int().positive().describe('Length of contest in days'),
+    transaction_hash: z.string().describe('Transaction hash'),
+    eth_chain_id: z.number().int().positive().describe('Ethereum chain id'),
     block_number: z
       .number()
       .int()
@@ -394,6 +400,25 @@ export const events = {
     eth_chain_id: z.number(),
   }),
 
+  LaunchpadTokenRecordCreated: z.object({
+    name: z.string(),
+    symbol: z.string(),
+    created_at: z.date(),
+    eth_chain_id: z.number(),
+    creator_address: EVM_ADDRESS_STRICT,
+    token_address: EVM_ADDRESS_STRICT,
+    namespace: z.string(),
+    curve_id: z.string(),
+    total_supply: z.string(),
+    launchpad_liquidity: z.string(),
+    reserve_ration: z.string(),
+    initial_purchase_eth_amount: z.string(),
+  }),
+
+  LaunchpadTokenGraduated: z.object({
+    token: LaunchpadToken,
+  }),
+
   LaunchpadTokenTraded: z.object({
     block_timestamp: z.coerce.bigint(),
     transaction_hash: z.string(),
@@ -431,6 +456,7 @@ export const events = {
     new_user: z.boolean(),
     wallet_id: z.nativeEnum(WalletId),
     community_id: z.string(),
+    balance: z.string(),
     created_at: z.coerce.date(),
   }),
 
@@ -444,7 +470,7 @@ export const events = {
 
   XpChainEventCreated: z.object({
     eth_chain_id: z.number(),
-    quest_action_meta_id: z.number(),
+    quest_action_meta_ids: z.array(z.number()),
     transaction_hash: z.string(),
     created_at: z.coerce.date(),
   }),
@@ -502,6 +528,32 @@ export const events = {
     }),
   }),
   ClankerTokenFound: ClankerToken,
+
+  JudgeNominated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+      judge: EVM_ADDRESS_STRICT.describe('Judge address'),
+      judgeId: z.coerce.bigint().describe('Judge ID'),
+      nominator: EVM_ADDRESS_STRICT.describe('Nominator address'),
+      currentNominations: z.coerce
+        .bigint()
+        .describe('Current nomination count'),
+    }),
+  }).describe('Contest judge nominated'),
+
+  NominatorNominated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+      nominator: EVM_ADDRESS_STRICT.describe('Nominator address'),
+    }),
+  }).describe('Nomination token (ID 3) minted'),
+
+  NominatorSettled: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+    }),
+  }).describe('Nomination configured'),
+
   NamespaceLinked: z.object({
     namespace_address: z.string(),
     deployer_address: z.string(),
@@ -542,6 +594,13 @@ export const events = {
         rejected: z.boolean().optional(),
       })
       .array(),
+    created_at: z.coerce.date(),
+  }),
+
+  CommunityDirectoryTagsUpdated: z.object({
+    community_id: z.string(),
+    tag_names: z.array(z.string()),
+    selected_community_ids: z.array(z.string()),
     created_at: z.coerce.date(),
   }),
 } as const;

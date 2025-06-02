@@ -1,3 +1,4 @@
+import type { ImageGenerationModel } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import React from 'react';
 import { MessageRow } from '../cw_text_input';
@@ -13,6 +14,11 @@ type CWImageInputProps = UploadControlProps &
   ImageBehaviorSelectorProps & {
     label?: string;
     containerClassname?: string;
+    usePersistentPromptMode?: boolean;
+    onAddCurrentToReference?: (image: string) => void;
+    canAddCurrentToReference?: boolean;
+    referenceImageUrls?: string[];
+    model?: ImageGenerationModel;
   };
 
 export const CWImageInput = ({
@@ -39,6 +45,11 @@ export const CWImageInput = ({
   label = 'Accepts JPG and PNG files.',
   disabled,
   containerClassname,
+  usePersistentPromptMode,
+  onAddCurrentToReference,
+  canAddCurrentToReference,
+  referenceImageUrls,
+  model = 'runware:100@1',
 }: CWImageInputProps) => {
   return (
     <div className={clsx('CWImageInput', containerClassname)}>
@@ -58,6 +69,11 @@ export const CWImageInput = ({
         onImageProcessingChange={onImageProcessingChange}
         onProcessedImagesListChange={onProcessedImagesListChange}
         processedImages={processedImages}
+        usePersistentPromptMode={usePersistentPromptMode}
+        onAddCurrentToReference={onAddCurrentToReference}
+        canAddCurrentToReference={canAddCurrentToReference}
+        referenceImageUrls={referenceImageUrls}
+        model={model}
       />
       <ImageBehaviorSelector
         imageBehavior={imageBehavior}

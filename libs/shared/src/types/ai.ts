@@ -1,6 +1,7 @@
 // Direct OpenAI models (without provider prefix)
 export type OpenAIModel =
   | 'gpt-4o'
+  | 'gpt-4o-mini'
   | 'gpt-4-turbo'
   | 'gpt-3.5-turbo'
   | 'o1'
@@ -31,8 +32,8 @@ export type OpenRouterModel =
 
   // Google models
   | 'google/gemini-pro'
-  | 'google/gemini-pro-1-5'
-  | 'google/gemini-flash-1-5'
+  | 'google/gemini-pro-1.5'
+  | 'google/gemini-flash-1.5'
 
   // Mistral models
   | 'mistralai/mistral-large'
@@ -49,13 +50,18 @@ export type OpenRouterModel =
 // Union type that includes both OpenAI and OpenRouter models
 export type CompletionModel = OpenAIModel | OpenRouterModel;
 
+// Supported image generation models
+export type ImageGenerationModel = 'gpt-image-1' | 'runware:100@1';
+
 export interface CompletionOptions {
   prompt: string;
+  systemPrompt?: string;
   model?: CompletionModel;
   temperature?: number;
   maxTokens?: number;
   stream?: boolean;
   useOpenRouter?: boolean;
+  useWebSearch?: boolean;
 }
 
 export interface CompletionResponse {

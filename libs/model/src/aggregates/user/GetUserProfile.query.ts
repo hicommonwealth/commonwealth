@@ -85,6 +85,7 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
 
       return {
         userId: user_id!,
+        tier: user!.tier,
         profile: user!.profile,
         totalUpvotes,
         addresses: addresses.map((a) => {

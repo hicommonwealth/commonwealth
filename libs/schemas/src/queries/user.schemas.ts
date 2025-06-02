@@ -1,8 +1,9 @@
-import { ChainBase, Roles } from '@hicommonwealth/shared';
+import { ChainBase, Roles, WalletId } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
+import { VerifiedContext } from '../context';
 import { ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
-import { UserProfile } from '../entities/user.schemas';
+import { USER_TIER, UserProfile } from '../entities/user.schemas';
 import { XpLog } from '../entities/xp.schemas';
 import { EVM_ADDRESS, PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
@@ -11,6 +12,7 @@ import {
   CommentView,
   CommentViewType,
   ThreadView,
+  UserView,
 } from './thread.schemas';
 
 export const UserProfileAddressView = AddressView.extend({
@@ -28,6 +30,7 @@ type UserProfileAddressView = z.infer<typeof UserProfileAddressView>;
 
 export const UserProfileView = z.object({
   userId: PG_INT,
+  tier: USER_TIER,
   profile: UserProfile,
   totalUpvotes: z.number().int(),
   addresses: z.array(UserProfileAddressView) as ZodType<
@@ -57,6 +60,39 @@ export const GetUserProfile = {
 export const GetUser = {
   input: z.object({}),
   output: z.union([User, z.object({})]),
+};
+
+export const UserStatusAddressView = z.object({
+  id: PG_INT,
+  address: z.string(),
+  role: z.enum(['member', 'moderator', 'admin']),
+  wallet_id: z.nativeEnum(WalletId),
+  oauth_provider: z.string().nullish(),
+  ghost_address: z.boolean().nullish(),
+  last_active: z.coerce.date().or(z.string()).nullish(),
+  Community: z.object({
+    id: z.string(),
+    base: z.nativeEnum(ChainBase),
+    ss58_prefix: PG_INT.nullish(),
+  }),
+});
+
+export const UserStatusCommunityView = z.object({
+  id: z.string(),
+  name: z.string(),
+  icon_url: z.string(),
+  redirect: z.string().nullish(),
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  starred_at: z.date().or(z.string()).nullish(),
+});
+
+export const GetStatus = {
+  input: z.object({}),
+  output: UserView.omit({ profile: true }).extend({
+    addresses: z.array(UserStatusAddressView),
+    communities: z.array(UserStatusCommunityView),
+  }),
 };
 
 export const SearchUserProfilesView = z.object({
@@ -101,6 +137,7 @@ export const GetUserAddresses = {
       address: z.string(),
       lastActive: z.date().or(z.string()),
       avatarUrl: z.string().nullish(),
+      tier: z.number().nullish(),
     }),
   ),
 };
@@ -175,17 +212,39 @@ export const GetXps = {
   output: z.array(XpLogView),
 };
 
+export const XpRankedUser = z.object({
+  user_id: PG_INT,
+  xp_points: z.number(),
+  tier: z.number(),
+  user_name: z.string().nullish(),
+  avatar_url: z.string().nullish(),
+});
+
+export const GetXpsRanked = {
+  input: z.object({
+    top: z.number(),
+    quest_id: z
+      .number()
+      .optional()
+      .describe('Filters events by a specific quest id'),
+  }),
+  output: z.array(XpRankedUser),
+};
+
 export const RandomResourceIdsView = z.object({
   community_id: z.string(),
   thread_id: z.number(),
   comment_id: z.number(),
 });
 
-export const GetRandomResourceIds = {
-  input: PaginationParamsSchema.extend({
-    exclude_joined_communities: z.boolean().optional(),
+export const GetAddressStatus = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
   }),
-  output: PaginatedResultSchema.extend({
-    results: z.array(RandomResourceIdsView),
+  output: z.object({
+    exists: z.boolean(),
+    belongs_to_user: z.boolean(),
   }),
+  context: VerifiedContext,
 };

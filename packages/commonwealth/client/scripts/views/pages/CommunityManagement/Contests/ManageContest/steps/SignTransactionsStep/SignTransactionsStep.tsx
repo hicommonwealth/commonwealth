@@ -1,20 +1,26 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
+import useGetJudgeStatusQuery from 'client/scripts/state/api/contests/getJudgeStatus';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useFlag } from 'hooks/useFlag';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelContestEvents,
 } from 'shared/analytics/types';
 import app from 'state';
 import {
+  useConfigureNominationsMutation,
   useCreateContestMutation,
   useDeployRecurringContestOnchainMutation,
   useDeploySingleERC20ContestOnchainMutation,
+  useDeploySingleJudgedContestOnchainMutation,
+  useNominateJudgesMutation,
 } from 'state/api/contests';
 import { DeploySingleERC20ContestOnchainProps } from 'state/api/contests/deploySingleERC20ContestOnchain';
+import { DeploySingleJudgedContestOnchainProps } from 'state/api/contests/deploySingleJudgedContestOnchain';
 import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -22,10 +28,8 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import ActionSteps from 'views/pages/CreateCommunity/components/ActionSteps';
-import {
-  ActionStepProps,
-  ActionStepsProps,
-} from 'views/pages/CreateCommunity/components/ActionSteps/types';
+import { ActionStepProps } from 'views/pages/CreateCommunity/components/ActionSteps/types';
+import { isJudgedContest } from '../../../utils';
 import {
   ContestFeeType,
   ContestFormData,
@@ -33,6 +37,7 @@ import {
   LaunchContestStep,
 } from '../../types';
 import './SignTransactionsStep.scss';
+import { getActionSteps } from './utils';
 
 interface SignTransactionsStepProps {
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
@@ -61,15 +66,39 @@ const SignTransactionsStep = ({
     errorText: '',
   });
 
+  const [configureNominationsData, setConfigureNominationsData] = useState({
+    state: 'not-started' as ActionStepProps['state'],
+    errorText: '',
+  });
+
+  const [nominateSelfData, setNominateSelfData] = useState({
+    state: 'not-started' as ActionStepProps['state'],
+    errorText: '',
+  });
+
   const { stakeData } = useCommunityStake();
 
   const { mutateAsync: deployRecurringContestOnchainMutation } =
     useDeployRecurringContestOnchainMutation();
   const { mutateAsync: deploySingleERC20ContestOnchainMutation } =
     useDeploySingleERC20ContestOnchainMutation();
+  const { mutateAsync: deploySingleJudgedContestOnchainMutation } =
+    useDeploySingleJudgedContestOnchainMutation();
+  const { mutateAsync: configureNominationsMutation } =
+    useConfigureNominationsMutation();
+
+  const { mutateAsync: nominateJudges } = useNominateJudgesMutation();
 
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
+  const { data: judgeStatus } = useGetJudgeStatusQuery(app.activeChainId());
+
   const user = useUserStore();
+
+  const communityId = app.activeChainId() || '';
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -81,29 +110,41 @@ const SignTransactionsStep = ({
     contestFormData.contestRecurring === ContestRecurringType.Yes;
   const isDirectDepositSelected =
     contestFormData.feeType === ContestFeeType.DirectDeposit;
-
   const devContest = useFlag('contestDev');
+  const judgedContest = isJudgedContest(contestFormData?.contestTopic);
+
+  const namespaceName = app?.chain?.meta?.namespace || '';
+  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
+  const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
+  const walletAddress = user.activeAccount?.address || '';
+
+  const judgeIdToUse = useMemo(() => {
+    if (judgedContest && community?.pending_namespace_judge_token_id) {
+      return community.pending_namespace_judge_token_id;
+    }
+    return (judgeStatus?.current_judge_id || 100) + 1;
+  }, [
+    judgedContest,
+    community?.pending_namespace_judge_token_id,
+    judgeStatus?.current_judge_id,
+  ]);
 
   const signTransaction = async () => {
-    const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
-    const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
-    const namespaceName = app?.chain?.meta?.namespace;
     const contestLength = devContest
       ? CUSTOM_CONTEST_DURATION_IN_SECONDS
-      : contestFormData?.contestDuration;
+      : contestFormData?.contestDuration || 0;
 
-    const stakeId = stakeData?.stake_id;
+    const stakeId = stakeData?.stake?.stake_id || 0;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
-    const weight = stakeData?.vote_weight;
+    const weight = stakeData?.stake?.vote_weight || 0;
     const contestInterval = devContest
       ? CUSTOM_CONTEST_DURATION_IN_SECONDS
       : contestFormData?.contestDuration;
     const prizeShare = contestFormData?.prizePercentage;
-    const walletAddress = user.activeAccount?.address;
     const exchangeToken = isDirectDepositSelected
       ? contestFormData?.fundingTokenAddress || ZERO_ADDRESS
-      : stakeData?.stake_token;
+      : stakeData?.stake?.stake_token;
     const winnerShares = contestFormData?.payoutStructure;
     const voteToken = contestFormData?.isFarcasterContest
       ? exchangeToken
@@ -121,18 +162,30 @@ const SignTransactionsStep = ({
       exchangeToken,
     } as DeploySingleERC20ContestOnchainProps;
 
+    const singleJudged = {
+      ethChainId,
+      chainRpc,
+      namespaceName,
+      contestInterval: contestLength,
+      winnerShares,
+      voterShare,
+      walletAddress,
+      exchangeToken,
+      judgeId: judgeIdToUse,
+    } as DeploySingleJudgedContestOnchainProps;
+
     const recurring = {
       ethChainId,
       chainRpc,
       namespaceName,
-      contestInterval,
-      winnerShares,
+      contestInterval: contestInterval || 0,
+      winnerShares: winnerShares || [],
       stakeId,
       prizeShare,
       voterShare,
       feeShare,
       weight,
-      walletAddress,
+      walletAddress: walletAddress || '',
     };
 
     let contestAddress: string;
@@ -143,13 +196,15 @@ const SignTransactionsStep = ({
         state: 'loading',
       }));
 
-      isContestRecurring
-        ? (contestAddress = await deployRecurringContestOnchainMutation(
-            // @ts-expect-error <StrictNullChecks/>
-            recurring,
-          ))
-        : (contestAddress =
-            await deploySingleERC20ContestOnchainMutation(singleERC20));
+      if (isContestRecurring) {
+        contestAddress = await deployRecurringContestOnchainMutation(recurring);
+      } else if (judgedContest) {
+        contestAddress =
+          await deploySingleJudgedContestOnchainMutation(singleJudged);
+      } else {
+        contestAddress =
+          await deploySingleERC20ContestOnchainMutation(singleERC20);
+      }
 
       await createContestMutation({
         contest_address: contestAddress,
@@ -168,6 +223,7 @@ const SignTransactionsStep = ({
         is_farcaster_contest: contestFormData.isFarcasterContest,
         decimals: fundingTokenDecimals,
         vote_weight_multiplier: contestFormData.voteWeightMultiplier,
+        namespace_judge_token_id: judgedContest ? judgeIdToUse : null,
       });
 
       onSetLaunchContestStep('ContestLive');
@@ -187,28 +243,73 @@ const SignTransactionsStep = ({
     }
   };
 
-  const handleBack = () => {
-    onSetLaunchContestStep('DetailsForm');
+  const configureNominations = async () => {
+    try {
+      setConfigureNominationsData((prevState) => ({
+        ...prevState,
+        state: 'loading',
+      }));
+
+      await configureNominationsMutation({
+        namespaceName,
+        creatorOnly: true,
+        walletAddress,
+        maxNominations: 5,
+        ethChainId,
+        chainRpc,
+        judgeId: judgeIdToUse,
+      });
+
+      setConfigureNominationsData((prevState) => ({
+        ...prevState,
+        state: 'completed',
+      }));
+    } catch (error) {
+      console.log('Error configuring nominations', error);
+      setConfigureNominationsData((prevState) => ({
+        ...prevState,
+        state: 'not-started',
+        errorText: 'Failed to configure nominations. Please try again.',
+      }));
+    }
   };
 
-  const getActionSteps = (): ActionStepsProps['steps'] => {
-    return [
-      {
-        label: isDirectDepositSelected
-          ? 'Launch contest'
-          : 'Launch contest & re-route fees',
-        state: launchContestData.state,
-        errorText: launchContestData.errorText,
-        actionButton: {
-          label: launchContestData.state === 'completed' ? 'Signed' : 'Sign',
-          disabled:
-            launchContestData.state === 'loading' ||
-            launchContestData.state === 'completed',
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onClick: signTransaction,
-        },
-      },
-    ];
+  const nominateSelf = async () => {
+    try {
+      setNominateSelfData((prevState) => ({
+        ...prevState,
+        state: 'loading',
+      }));
+
+      if (!walletAddress) {
+        throw new Error('Wallet Address Not Found');
+      }
+
+      await nominateJudges({
+        namespace: namespaceName,
+        judges: [walletAddress],
+        judgeId: judgeIdToUse,
+        walletAddress,
+        ethChainId,
+        chainRpc,
+      });
+
+      setNominateSelfData((prevState) => ({
+        ...prevState,
+        state: 'completed',
+      }));
+    } catch (error) {
+      console.log('Error nominating self as judge', error);
+      setNominateSelfData((prevState) => ({
+        ...prevState,
+        state: 'not-started',
+        errorText: 'Failed to nominate self as judge. Please try again.',
+      }));
+    }
+  };
+
+  const handleBack = () => {
+    onSetLaunchContestStep('DetailsForm');
   };
 
   const cancelDisabled = launchContestData.state === 'loading';
@@ -229,7 +330,18 @@ const SignTransactionsStep = ({
           complete.
         </CWText>
 
-        <ActionSteps steps={getActionSteps()} />
+        <ActionSteps
+          steps={getActionSteps({
+            isJudgedContest: judgedContest,
+            configureNominationsData,
+            configureNominations,
+            nominateSelfData,
+            nominateSelf,
+            isDirectDepositSelected,
+            launchContestData,
+            signTransaction,
+          })}
+        />
 
         <CWDivider />
 

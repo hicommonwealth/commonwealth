@@ -28,6 +28,8 @@ type ActivityResponse = {
     user_address: string;
     topic: Topic;
     community_id: string;
+    is_linking_token: boolean;
+    launchpad_token_address?: string;
   };
   recentcomments?: [];
 };
@@ -55,13 +57,14 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
         archived_at: x.thread.archived_at,
         locked_at: x.thread.locked_at,
         has_poll: x.thread.has_poll,
+        is_linking_token: x.thread.is_linking_token,
+        launchpad_token_address: x.thread.launchpad_token_address,
         Address: {
           id: 0,
           address: x.thread.user_address,
           community_id: x.thread.community_id,
           ghost_address: false,
           is_banned: false,
-          is_user_default: false,
           role: 'member',
         },
         topic: x.thread.topic,

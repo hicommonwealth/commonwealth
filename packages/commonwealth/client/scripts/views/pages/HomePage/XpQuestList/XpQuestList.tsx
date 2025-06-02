@@ -1,16 +1,16 @@
+import { QuestActionMeta } from '@hicommonwealth/schemas';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import app from 'state';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-
-import { QuestAction, calculateTotalXPForQuestActions } from 'helpers/quest';
-import app from 'state';
-import useUserStore from 'state/ui/user';
+import { z } from 'zod';
+import TotalQuestXPTag from '../../QuestDetails/TotalQuestXPTag';
 import XpQuestCard from '../XpQuestCard/XpQuestCard';
 import './XpQuestList.scss';
 
@@ -21,14 +21,13 @@ interface XpQuestListProps {
 const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
-  const user = useUserStore();
 
   const { data: questsList, isInitialLoading } = useFetchQuestsQuery({
     community_id: communityIdFilter,
     cursor: 1,
     limit: 3,
     // dont show system quests in quest lists for communities
-    include_system_quests: communityIdFilter ? false : !user.isLoggedIn,
+    include_system_quests: communityIdFilter ? false : true,
     end_after: moment().startOf('week').toDate(),
     enabled: xpEnabled,
   });
@@ -79,12 +78,6 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
         ) : (
           <div className="content">
             {quests.map((quest) => {
-              const totalUserXP = calculateTotalXPForQuestActions({
-                questActions: (quest.action_metas as QuestAction[]) || [],
-                isUserReferred: !!user.referredByAddress,
-                questStartDate: new Date(quest.start_date),
-                questEndDate: new Date(quest.end_date),
-              });
               return (
                 <XpQuestCard
                   key={quest.name}
@@ -92,7 +85,19 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
                   description={quest.description}
                   community_id={quest.community_id}
                   iconURL={quest.image_url}
-                  xpPoints={totalUserXP}
+                  xpPointsElement={
+                    <TotalQuestXPTag
+                      questId={quest.id}
+                      questStartDate={new Date(quest.start_date)}
+                      questEndDate={new Date(quest.end_date)}
+                      questActions={
+                        (quest.action_metas as z.infer<
+                          typeof QuestActionMeta
+                        >[]) || []
+                      }
+                      hideGainedXp
+                    />
+                  }
                   startDate={new Date(quest.start_date)}
                   endDate={new Date(quest.end_date)}
                   onCTAClick={() => handleCTAClick(quest.id)}

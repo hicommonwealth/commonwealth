@@ -6,9 +6,14 @@ import {
   uploadIfLarge,
 } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
+import { GatedActionEnum, MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import { models } from '../../database';
-import { authThread, tiered } from '../../middleware';
+import {
+  authThread,
+  mustBeValidCommunity,
+  tiered,
+  turnstile,
+} from '../../middleware';
 import { verifyCommentSignature } from '../../middleware/canvas';
 import { mustBeAuthorizedThread, mustExist } from '../../middleware/guards';
 import {
@@ -30,10 +35,11 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
     ...schemas.CreateComment,
     auth: [
       authThread({
-        action: schemas.PermissionEnum.CREATE_COMMENT,
+        action: GatedActionEnum.CREATE_COMMENT,
       }),
       verifyCommentSignature,
       tiered({ creates: true }),
+      turnstile({ widgetName: 'create-comment' }),
     ],
     body: async ({ actor, payload, context }) => {
       const { address, thread } = mustBeAuthorizedThread(actor, context);
@@ -55,6 +61,24 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
         if (depth === MAX_COMMENT_DEPTH)
           throw new InvalidState(CreateCommentErrors.NestingTooDeep);
       }
+
+      const community = await models.Community.findOne({
+        where: { id: thread.community_id },
+        attributes: ['spam_tier_level', 'tier', 'active'],
+      });
+      mustExist('Community', community);
+      mustBeValidCommunity(community);
+
+      const user = await models.User.findOne({
+        where: { id: actor.user.id },
+        attributes: ['tier'],
+      });
+      mustExist('User', user);
+
+      const marked_as_spam_at =
+        address.role === 'member' && user.tier <= community.spam_tier_level
+          ? new Date()
+          : null;
 
       const body = decodeContent(payload.body);
       const mentions = uniqueMentions(parseUserMentions(body));
@@ -78,6 +102,8 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               content_url: contentUrl,
               comment_level: parent ? parent.comment_level + 1 : 0,
               reply_count: 0,
+              marked_as_spam_at,
+              user_tier_at_creation: user.tier,
             },
             {
               transaction,
@@ -114,20 +140,22 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
             { transaction },
           );
 
-          await emitEvent(
-            models.Outbox,
-            [
-              {
-                event_name: 'CommentCreated',
-                event_payload: {
-                  ...comment.toJSON(),
-                  community_id: thread.community_id,
-                  users_mentioned: mentions.map((u) => parseInt(u.userId)),
+          if (!marked_as_spam_at) {
+            await emitEvent(
+              models.Outbox,
+              [
+                {
+                  event_name: 'CommentCreated',
+                  event_payload: {
+                    ...comment.toJSON(),
+                    community_id: thread.community_id,
+                    users_mentioned: mentions.map((u) => parseInt(u.userId)),
+                  },
                 },
-              },
-            ],
-            transaction,
-          );
+              ],
+              transaction,
+            );
+          }
 
           mentions.length &&
             (await emitMentions(transaction, {

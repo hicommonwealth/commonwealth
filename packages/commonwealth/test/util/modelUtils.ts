@@ -11,10 +11,10 @@ import type {
 } from '@canvas-js/interfaces';
 import { Action, Session } from '@canvas-js/interfaces';
 import { createEvmSigner } from '@hicommonwealth/evm-protocols';
-import type {
+import {
   CommunityAttributes,
-  DB,
   ThreadAttributes,
+  models,
 } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import {
@@ -23,10 +23,10 @@ import {
   CanvasSignedData,
   SubstrateSignerCW,
   TEST_BLOCK_INFO_STRING,
+  UserTierMap,
   serializeCanvas,
   toCanvasSignedDataApiArgs,
   type Link,
-  type LinkSource,
   type Role,
 } from '@hicommonwealth/shared';
 import chai from 'chai';
@@ -89,15 +89,9 @@ export interface ThreadArgs {
 }
 
 type createDeleteLinkArgs = {
+  address: string;
   thread_id: number;
   links: Link[];
-  jwt: any;
-};
-
-type getLinksArgs = {
-  thread_id?: number;
-  linkType?: LinkSource[];
-  link?: Link;
   jwt: any;
 };
 
@@ -217,7 +211,6 @@ export type ModelSeeder = {
   ) => Promise<{ status: string; result?: ThreadAttributes; error?: Error }>;
   createLink: (args: createDeleteLinkArgs) => Promise<any>;
   deleteLink: (args: createDeleteLinkArgs) => Promise<any>;
-  getLinks: (args: getLinksArgs) => Promise<any>;
   createComment: (args: CommentArgs) => Promise<any>;
   editComment: (args: EditCommentArgs) => Promise<any>;
   createReaction: (args: CreateReactionArgs) => Promise<any>;
@@ -241,7 +234,7 @@ export type ModelSeeder = {
   setSiteAdmin: (args: SetSiteAdminArgs) => Promise<boolean>;
 };
 
-export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
+export const modelSeeder = (app: Application): ModelSeeder => ({
   getTopicId: async ({ chain }: { chain: string }) => {
     const res = await chai.request
       .agent(app)
@@ -258,7 +251,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     let wallet_id: string;
     let chain_id: string;
     let sessionSigner: SessionSigner;
-    if (chain === 'ethereum' || chain === 'alex') {
+    if (chain === 'ethereum' || chain === 'alex' || chain === 'sushi') {
       wallet_id = 'metamask';
       chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
       sessionSigner = new SIWESigner({
@@ -290,7 +283,10 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       });
 
     // update tier for testing
-    await models.User.update({ tier: 4 }, { where: { id: res.body.user_id } });
+    await models.User.update(
+      { tier: UserTierMap.ManuallyVerified },
+      { where: { id: res.body.user_id } },
+    );
 
     const address_id = res.body.id;
     const user_id = res.body.user_id;
@@ -381,8 +377,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   createLink: async (args: createDeleteLinkArgs) => {
     const res = await chai.request
       .agent(app)
-      .post('/api/linking/addThreadLinks')
+      .post('/api/v1/addLinks')
       .set('Accept', 'application/json')
+      .set('address', args.address)
       .send(args);
     return res.body;
   },
@@ -390,17 +387,9 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   deleteLink: async (args: createDeleteLinkArgs) => {
     const res = await chai.request
       .agent(app)
-      .delete('/api/linking/deleteLinks')
+      .post('/api/v1/deleteLinks')
       .set('Accept', 'application/json')
-      .send(args);
-    return res.body;
-  },
-
-  getLinks: async (args: getLinksArgs) => {
-    const res = await chai.request
-      .agent(app)
-      .post('/api/linking/getLinks')
-      .set('Accept', 'application/json')
+      .set('address', args.address)
       .send(args);
     return res.body;
   },
@@ -656,24 +645,6 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         });
     } catch (e) {
       console.error('Failed to link an existing address to a chain');
-      console.error(e);
-      return false;
-    }
-
-    try {
-      await chai.request
-        .agent(app)
-        .post('/api/setDefaultRole')
-        .set('Accept', 'application/json')
-        .send({
-          address,
-          author_chain: chain,
-          chain,
-          jwt,
-          auth: 'true',
-        });
-    } catch (e) {
-      console.error('Failed to set default role');
       console.error(e);
       return false;
     }

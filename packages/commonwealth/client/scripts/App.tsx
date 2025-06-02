@@ -9,7 +9,10 @@ import { HelmetProvider } from 'react-helmet-async';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
+import { DefaultPrivyProvider } from 'views/components/DefaultPrivyProvider/DefaultPrivyProvider';
+import { DisableMavaOnMobile } from 'views/components/DisableMavaOnMobile';
 import ForceMobileAuth from 'views/components/ForceMobileAuth';
+import { PrivyMobileAuthenticator } from 'views/components/PrivyMobile/PrivyMobileAuthenticator';
 import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
 import { ReactNativeLogForwarder } from 'views/components/ReactNativeBridge/ReactNativeLogForwarder';
 import { ReactNativeScrollToTopListener } from 'views/components/ReactNativeBridge/ReactNativeScrollToTopListener';
@@ -28,22 +31,25 @@ const App = () => {
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
           <trpc.Provider client={trpcClient} queryClient={queryClient}>
+            <DisableMavaOnMobile />
+            <ReactNativeLogForwarder />
             <FarcasterFrameProvider>
               {/*@ts-expect-error StrictNullChecks*/}
               <OpenFeatureProvider client={undefined}>
                 {isLoading ? (
                   <Splash />
                 ) : (
-                  <>
-                    <ForceMobileAuth>
-                      <OnBoardingWrapperForMobile>
-                        <ReactNativeBridgeUser />
-                        <ReactNativeLogForwarder />
-                        <ReactNativeScrollToTopListener />
-                        <RouterProvider router={router()} />
-                      </OnBoardingWrapperForMobile>
-                    </ForceMobileAuth>
-                  </>
+                  <PrivyMobileAuthenticator>
+                    <DefaultPrivyProvider>
+                      <ForceMobileAuth>
+                        <OnBoardingWrapperForMobile>
+                          <ReactNativeBridgeUser />
+                          <ReactNativeScrollToTopListener />
+                          <RouterProvider router={router()} />
+                        </OnBoardingWrapperForMobile>
+                      </ForceMobileAuth>
+                    </DefaultPrivyProvider>
+                  </PrivyMobileAuthenticator>
                 )}
                 <ToastContainer />
                 {import.meta.env.DEV && <ReactQueryDevtools />}

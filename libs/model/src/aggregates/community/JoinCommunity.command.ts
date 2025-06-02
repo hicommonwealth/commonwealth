@@ -6,7 +6,11 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase, addressSwapper } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  CountAggregatorKeys,
+  addressSwapper,
+} from '@hicommonwealth/shared';
 import { models } from '../../database';
 import { authVerified } from '../../middleware/auth';
 import { mustExist } from '../../middleware/guards';
@@ -102,7 +106,6 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
               hex: selectedAddress.hex,
               last_active: new Date(),
               role: 'member',
-              is_user_default: false,
               ghost_address: false,
               is_banned: false,
               oauth_provider: selectedAddress.oauth_provider,
@@ -114,10 +117,10 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
             { transaction },
           );
 
-          await cache().setKey(
-            CacheNamespaces.Community_Profile_Count_Changed,
+          await cache().addToSet(
+            CacheNamespaces.CountAggregator,
+            CountAggregatorKeys.CommunityProfileCount,
             community_id,
-            'true',
           );
 
           await emitEvent(
