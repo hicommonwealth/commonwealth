@@ -31,7 +31,6 @@ runs:
       run: |
         set -e
         echo "Checking if Neon branch $PR_BRANCH exists..."
-        echo "Request URL: https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches?sort_by=updated_at&sort_order=desc&limit=1000"
         response=$(curl -s \
           -H "accept: application/json" \
           -H "authorization: Bearer $NEON_API_KEY" \

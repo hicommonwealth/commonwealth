@@ -17,11 +17,13 @@ variable "k8s_host" {
 variable "k8s_token" {
   description = "Kubernetes API token"
   type        = string
+  sensitive   = true
 }
 
 variable "k8s_ca" {
   description = "Kubernetes cluster CA certificate (base64)"
   type        = string
+  sensitive   = true
 }
 
 variable "image_tag" {

@@ -38,30 +38,7 @@ jobs:
             echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
           fi
 
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
-
-      - name: Check if Neon Branch Exists
-        id: check_branch
-        uses: ./.github/actions/check-neon-branch
-        with:
-          project_id: ${{ secrets.NEON_PROJECT_ID }}
-          api_key: ${{ secrets.NEON_API_KEY }}
-          branch_name: preview/pr-${{ steps.set_pr_number.outputs.pr_number }}
-
-      - name: Debug Neon Branch Exists
-        run: |
-            echo "Neon branch exists: '${{ steps.check_branch.outputs.exists }}'"
-
-      - uses: ./.github/actions/setup
-        if: steps.check_branch.outputs.exists == 'false'
-        with:
-          node-version: ${{ matrix.node }}
-
       - name: Create Neon Branch
-        if: steps.check_branch.outputs.exists == 'false'
         id: create_neon_branch
         uses: neondatabase/create-branch-action@v5
         with:
@@ -73,8 +50,19 @@ jobs:
           suspend_timeout: 300 # scale to 0 compute after 5 minutes
           ssl: require # DO NOT CHANGE THIS - we must use SSL since we are branching off prod
 
+      - uses: actions/checkout@v4
+        if: steps.create_neon_branch.outputs.created == 'false'
+        with:
+          fetch-depth: 0
+          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
+
+      - uses: ./.github/actions/setup
+        if: steps.create_neon_branch.outputs.created == 'false'
+        with:
+          node-version: ${{ matrix.node }}
+
       - name: Migrate DB
-        if: steps.check_branch.outputs.exists == 'false'
+        if: steps.create_neon_branch.outputs.created == 'false'
         id: migrate_db
         env:
           NODE_ENV: production
@@ -113,6 +101,15 @@ jobs:
             echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Set Effective SHA
+        id: set_effective_sha
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.commit_sha }}" ]; then
+            echo "sha=${{ github.event.inputs.commit_sha }}" >> $GITHUB_OUTPUT
+          else
+            echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -140,15 +137,6 @@ jobs:
             exit 1
           fi
           cp "$ENV_PATH" .env
-
-      - name: Set Effective SHA
-        id: set_effective_sha
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.commit_sha }}" ]; then
-            echo "sha=${{ github.event.inputs.commit_sha }}" >> $GITHUB_OUTPUT
-          else
-            echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
-          fi
 
       - name: Check if datadog-base image exists
         id: check_datadog_base_image
@@ -416,7 +404,7 @@ jobs:
             -var="hcp_client_secret=${{ secrets.HCP_CLIENT_SECRET }}" \
             -var="hcp_organization_id=${{ secrets.HCP_ORGANIZATION_ID }}" \
             -var="hcp_project_id=${{ secrets.HCP_PROJECT_ID }}" \
-            -var="hcp_app_name=PR-${{ steps.set_pr_number.outputs.pr_number }}"
+            -var="hcp_app_name=PR-${{ steps.set_pr_number.outputs.pr_number }}" \
             -var="image_tag=${{ steps.set_effective_sha.outputs.sha }}" \
             -var="pr_number=${{ steps.set_pr_number.outputs.pr_number }}" \
             -out=tfplan.k8s
