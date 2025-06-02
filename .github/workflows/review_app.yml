@@ -312,6 +312,18 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache,mode=max
 
+      - name: Create HCP Vault Secrets App
+        uses: ./.github/actions/hcp-app-manager
+        env:
+          HCP_PROJECT_ID: ${{ secrets.HCP_PROJECT_ID }}
+          HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
+          HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
+          DATABASE_URL: ${{ needs.setup_review_db.outputs.db_url_with_pooler }}
+        with:
+          action: 'create'
+          app-name: 'PR-${{ steps.set_pr_number.outputs.pr_number }}'
+          clone-app-name: 'Production' # TODO: update to beta/frick/other
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -375,7 +387,11 @@ jobs:
             -var="k8s_host=$K8S_HOST" \
             -var="k8s_token=$K8S_TOKEN" \
             -var="k8s_ca=$K8S_CA" \
-            -var="vault_token=${{ secrets.VAULT_TOKEN }}" \
+            -var="hcp_client_id=${{ secrets.HCP_CLIENT_ID }}" \
+            -var="hcp_client_secret=${{ secrets.HCP_CLIENT_SECRET }}" \
+            -var="hcp_organization_id=${{ secrets.HCP_ORGANIZATION_ID }}" \
+            -var="hcp_project_id=${{ secrets.HCP_PROJECT_ID }}" \
+            -var="hcp_app_name=PR-${{ steps.set_pr_number.outputs.pr_number }}"
             -var="image_tag=${{ steps.set_effective_sha.outputs.sha }}" \
             -var="pr_number=${{ steps.set_pr_number.outputs.pr_number }}" \
             -out=tfplan.k8s

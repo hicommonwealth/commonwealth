@@ -24,12 +24,6 @@ variable "k8s_ca" {
   type        = string
 }
 
-variable "vault_token" {
-  description = "Vault token for External Secrets Operator"
-  type        = string
-  sensitive   = true
-}
-
 variable "image_tag" {
   description = "Docker image tag (usually the commit SHA)"
   type        = string
@@ -50,6 +44,104 @@ variable "secrets" {
     }))
   }))
 }
+
+###### HCP Vault + Env Var Management ######
+
+variable "hcp_app_name" {
+  description = "The name of the app to use on HCP Vault Secrets"
+  type        = string
+}
+
+variable "hcp_client_id" {
+  description = "HCP service principal client ID (shared across environments)"
+  type        = string
+  sensitive   = true
+}
+
+variable "hcp_client_secret" {
+  description = "HCP service principal client secret (shared across environments)"
+  type        = string
+  sensitive   = true
+}
+
+variable "hcp_organization_id" {
+  description = "HCP organization ID"
+  type        = string
+}
+
+variable "hcp_project_id" {
+  description = "HCP project ID"
+  type        = string
+}
+
+resource "kubernetes_secret" "hcp_vault_credentials" {
+  metadata {
+    name      = "hcp-vault-credentials"
+    namespace = kubernetes_namespace.cw.metadata[0].name
+  }
+  data = {
+    client-id     = var.hcp_client_id
+    client-secret = var.hcp_client_secret
+  }
+  type = "Opaque"
+}
+
+resource "kubernetes_manifest" "hcp_vault_secretstore" {
+  manifest = {
+    "apiVersion" = "external-secrets.io/v1beta1"
+    "kind" = "SecretStore"
+    "metadata" = {
+      "name" = "hcp-vault-backend"
+      "namespace" = kubernetes_namespace.cw.metadata[0].name
+    }
+    "spec" = {
+      "provider" = {
+        "hashicorpvaultsecrets" = {
+          "organization" = var.hcp_organization_id
+          "projectId"    = var.hcp_project_id
+          "appName"      = var.hcp_app_name
+          "auth" = {
+            "secretRef" = {
+              "clientId" = {
+                "name" = kubernetes_secret.hcp_vault_credentials.metadata[0].name
+                "key"  = "client-id"
+              }
+              "clientSecret" = {
+                "name" = kubernetes_secret.hcp_vault_credentials.metadata[0].name
+                "key"  = "client-secret"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  depends_on = [helm_release.external_secrets]
+}
+
+resource "kubernetes_manifest" "external_secret" {
+  for_each = { for s in var.secrets : s.name => s }
+  manifest = {
+    apiVersion = "external-secrets.io/v1beta1"
+    kind       = "ExternalSecret"
+    metadata = {
+      name      = each.value.name
+      namespace = kubernetes_namespace.cw.metadata[0].name
+    }
+    spec = {
+      refreshInterval = "10m"
+      secretStoreRef = {
+        name = kubernetes_manifest.hcp_vault_secretstore.manifest["metadata"]["name"]
+        kind = "SecretStore"
+      }
+      target = {
+        name = each.value.target_name
+      }
+      data = each.value.data
+    }
+  }
+}
+###### End of HCP ######
 
 locals {
   name_prefix = "${var.environment}-${var.pr_number}-"
@@ -270,66 +362,6 @@ resource "helm_release" "external_secrets" {
     installCRDs: true
     EOF
   ]
-}
-
-resource "kubernetes_secret" "vault_token" {
-  metadata {
-    name      = "vault-token"
-    namespace = kubernetes_namespace.cw.metadata[0].name
-  }
-  data = {
-    token = var.vault_token
-  }
-}
-
-resource "kubernetes_manifest" "vault_secretstore" {
-  manifest = {
-    "apiVersion" = "external-secrets.io/v1beta1"
-    "kind" = "SecretStore"
-    "metadata" = {
-      "name" = "vault-backend"
-      "namespace" = kubernetes_namespace.cw.metadata[0].name
-    }
-    "spec" = {
-      "provider" = {
-        "vault" = {
-          "server" = "<VAULT_ADDR>"
-          "path" = "<VAULT_KV_PATH>"
-          "version" = "v2"
-          "auth" = {
-            "tokenSecretRef" = {
-              "name" = kubernetes_secret.vault_token.metadata[0].name
-              "key" = "token"
-            }
-          }
-        }
-      }
-    }
-  }
-  depends_on = [helm_release.external_secrets]
-}
-
-resource "kubernetes_manifest" "external_secret" {
-  for_each = { for s in var.secrets : s.name => s }
-  manifest = {
-    apiVersion = "external-secrets.io/v1beta1"
-    kind       = "ExternalSecret"
-    metadata = {
-      name      = each.value.name
-      namespace = kubernetes_namespace.cw.metadata[0].name
-    }
-    spec = {
-      refreshInterval = "10m"
-      secretStoreRef = {
-        name = kubernetes_manifest.vault_secretstore.manifest["metadata"]["name"]
-        kind = "SecretStore"
-      }
-      target = {
-        name = each.value.target_name
-      }
-      data = each.value.data
-    }
-  }
 }
 
 resource "helm_release" "reloader" {

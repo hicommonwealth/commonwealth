@@ -1,0 +1,193 @@
+name: 'HCP Vault Secrets App Manager'
+description: 'Create or cleanup HCP Vault Secrets apps for PR environments'
+inputs:
+  action:
+    description: 'Action to perform: create or cleanup'
+    required: true
+    default: 'create'
+  app-name:
+    description: 'The name of the new/existing app on HCP Vault Secrets'
+    required: true
+  clone-app-name:
+    description: 'Name of the app to clone from when creating a new app'
+    required: false
+    default: 'Production'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup HCP CLI
+      shell: bash
+      run: |
+        # Install HCP CLI if not already available
+        if ! command -v hcp &> /dev/null; then
+          echo "Installing HCP CLI..."
+          curl -fsSL https://releases.hashicorp.com/hcp/0.4.0/hcp_0.4.0_linux_amd64.zip -o hcp.zip
+          unzip hcp.zip
+          sudo mv hcp /usr/local/bin/
+          rm hcp.zip
+        fi
+        echo "HCP CLI version:"
+        hcp version
+
+    - name: Execute HCP Vault Secrets Management
+      shell: bash
+      env:
+        CLONE_APP_NAME: ${{ inputs.clone-app-name }}
+        APP_NAME: ${{ inputs.app-name }}
+        HCP_PROJECT_ID: ${{ env.HCP_PROJECT_ID }}
+        HCP_CLIENT_ID: ${{ env.HCP_CLIENT_ID }}
+        HCP_CLIENT_SECRET: ${{ env.HCP_CLIENT_SECRET }}
+        DATABASE_URL: ${{ env.DATABASE_URL }}
+      run: |
+        #!/bin/bash
+        set -e
+        
+        # Mask sensitive values immediately
+        echo "::add-mask::${HCP_CLIENT_ID}"
+        echo "::add-mask::${HCP_CLIENT_SECRET}"
+        echo "::add-mask::${HCP_PROJECT_ID}"
+        echo "::add-mask::${DATABASE_URL}"
+
+        # Configuration
+        CLONE_APP_NAME="${CLONE_APP_NAME}"
+        APP_NAME="${APP_NAME}"
+        HCP_PROJECT_ID="${HCP_PROJECT_ID}"
+        HCP_CLIENT_ID="${HCP_CLIENT_ID}"
+        HCP_CLIENT_SECRET="${HCP_CLIENT_SECRET}"
+        DATABASE_URL="${DATABASE_URL}"
+
+        # Functions
+        log() {
+            echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
+        }
+
+        hcp_login() {
+            log "Authenticating with HCP..."
+            # Redirect stderr to avoid potential credential leakage in error messages
+            hcp auth login --client-id="${HCP_CLIENT_ID}" --client-secret="${HCP_CLIENT_SECRET}" 2>/dev/null || {
+                log "Authentication failed"
+                exit 1
+            }
+        }
+
+        check_app_exists() {
+            local app_name=$1
+            hcp vault-secrets apps read "${app_name}" --project-id="${HCP_PROJECT_ID}" >/dev/null 2>&1
+        }
+
+        create_pr_app() {
+            log "Creating PR app: ${APP_NAME}"
+            hcp vault-secrets apps create "${APP_NAME}" \
+                --project-id="${HCP_PROJECT_ID}" \
+                --description="Cloned app - Created $(date)" 2>/dev/null || {
+                log "Failed to create PR app"
+                exit 1
+            }
+        }
+
+        clone_secrets() {
+            log "Cloning secrets from ${CLONE_APP_NAME} to ${APP_NAME}"
+        
+            # Get list of secrets from production app
+            local secrets
+            secrets=$(hcp vault-secrets secrets list \
+                --app="${CLONE_APP_NAME}" \
+                --project-id="${HCP_PROJECT_ID}" \
+                --format=json 2>/dev/null | jq -r '.[].name' 2>/dev/null) || {
+                log "Failed to list secrets from clone app"
+                exit 1
+            }
+        
+            if [ -z "$secrets" ]; then
+                log "No secrets found in clone app"
+                return 0
+            fi
+        
+            # Clone each secret
+            while IFS= read -r secret_name; do
+                log "Cloning secret: ${secret_name}"
+        
+                local temp_file
+                temp_file=$(mktemp)
+        
+                if [ "$secret_name" = "DATABASE_URL" ]; then
+                    echo -n "${DATABASE_URL}" > "${temp_file}"
+                else
+                    # Get the secret from production
+                    local secret_data
+                    secret_data=$(hcp vault-secrets secrets open "${secret_name}" \
+                        --app="${CLONE_APP_NAME}" \
+                        --project-id="${HCP_PROJECT_ID}" \
+                        --format=json 2>/dev/null) || {
+                        log "Failed to read secret: ${secret_name}"
+                        rm -f "${temp_file}"
+                        continue
+                    }
+        
+                    echo "${secret_data}" | jq '.static_version.value' > "${temp_file}" 2>/dev/null || {
+                        log "Failed to process secret data for: ${secret_name}"
+                        rm -f "${temp_file}"
+                        continue
+                    }
+                fi
+        
+                # Create the secret in PR app
+                hcp vault-secrets secrets create "${secret_name}" \
+                    --app="${APP_NAME}" \
+                    --project-id="${HCP_PROJECT_ID}" \
+                    --data-file="${temp_file}" 2>/dev/null || {
+                    log "Failed to create secret: ${secret_name}"
+                }
+        
+                # Securely remove temp file
+                rm -f "${temp_file}"
+        
+            done <<< "$secrets"
+        }
+
+        cleanup_pr_app() {
+            log "Cleaning up app: ${APP_NAME}"
+            if check_app_exists "${APP_NAME}"; then
+                hcp vault-secrets apps delete "${APP_NAME}" \
+                    --project-id="${HCP_PROJECT_ID}" \
+                    --force 2>/dev/null || {
+                    log "Failed to delete PR app"
+                    exit 1
+                }
+                log "PR app deleted successfully"
+            else
+                log "PR app does not exist, nothing to clean up"
+            fi
+        }
+
+        # Main execution
+        hcp_login
+        
+        case "${{ inputs.action }}" in
+            "create")
+                log "Starting PR app creation process..."
+        
+                if check_app_exists "${APP_NAME}"; then
+                    log "PR app already exists"
+                    exit 0
+                fi
+        
+                create_pr_app
+                log "PR app created"
+                clone_secrets
+                log "PR app setup completed successfully"
+                ;;
+        
+            "cleanup")
+                log "Starting PR app cleanup process..."
+                cleanup_pr_app
+                log "PR app destroyed"
+                ;;
+        
+            *)
+                echo "Error: Invalid action '${{ inputs.action }}'"
+                echo "Valid actions: create, cleanup"
+                exit 1
+                ;;
+        esac
