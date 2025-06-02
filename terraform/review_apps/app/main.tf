@@ -45,9 +45,8 @@ variable "secrets" {
       })
     }))
   }))
+  default = []
 }
-
-###### HCP Vault + Env Var Management ######
 
 variable "hcp_app_name" {
   description = "The name of the app to use on HCP Vault Secrets"
@@ -55,13 +54,13 @@ variable "hcp_app_name" {
 }
 
 variable "hcp_client_id" {
-  description = "HCP service principal client ID (shared across environments)"
+  description = "HCP service principal client ID"
   type        = string
   sensitive   = true
 }
 
 variable "hcp_client_secret" {
-  description = "HCP service principal client secret (shared across environments)"
+  description = "HCP service principal client secret"
   type        = string
   sensitive   = true
 }
@@ -76,6 +75,52 @@ variable "hcp_project_id" {
   type        = string
 }
 
+locals {
+  name_prefix = "pr-${var.pr_number}-"
+  namespace_name = "${local.name_prefix}commonwealth"
+  worker_images = [
+    "twitter",
+    "message-relayer",
+    "knock",
+    "graphile-worker",
+    "evm-ce",
+    "discord-listener",
+    "consumer"
+  ]
+}
+
+provider "kubernetes" {
+  host                   = var.k8s_host
+  token                  = var.k8s_token
+  cluster_ca_certificate = base64decode(var.k8s_ca)
+}
+
+# Import the namespace resource that was created in the CRDs stage
+# Since we're using shared state, we need to reference the existing resource
+terraform {
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.37"
+    }
+  }
+}
+
+# Import existing namespace from shared state
+resource "kubernetes_namespace" "cw" {
+  metadata {
+    name = local.namespace_name
+  }
+
+  lifecycle {
+    # Prevent destruction since this was created in CRDs stage
+    prevent_destroy = false
+    # Ignore changes since CRDs stage manages this
+    ignore_changes = all
+  }
+}
+
+# HCP Vault credentials secret
 resource "kubernetes_secret" "hcp_vault_credentials" {
   metadata {
     name      = "hcp-vault-credentials"
@@ -88,13 +133,14 @@ resource "kubernetes_secret" "hcp_vault_credentials" {
   type = "Opaque"
 }
 
+# HCP Vault SecretStore
 resource "kubernetes_manifest" "hcp_vault_secretstore" {
   manifest = {
     "apiVersion" = "external-secrets.io/v1beta1"
     "kind" = "SecretStore"
     "metadata" = {
       "name" = "hcp-vault-backend"
-      "namespace" = kubernetes_namespace.cw.metadata[0].name
+      "namespace" = data.kubernetes_namespace.cw.metadata[0].name
     }
     "spec" = {
       "provider" = {
@@ -118,12 +164,13 @@ resource "kubernetes_manifest" "hcp_vault_secretstore" {
       }
     }
   }
+
   computed_fields = [
     "spec.provider.hashicorpvaultsecrets"
   ]
-  depends_on = [helm_release.external_secrets]
 }
 
+# External Secrets
 resource "kubernetes_manifest" "external_secret" {
   for_each = { for s in var.secrets : s.name => s }
   manifest = {
@@ -131,7 +178,7 @@ resource "kubernetes_manifest" "external_secret" {
     kind       = "ExternalSecret"
     metadata = {
       name      = each.value.name
-      namespace = kubernetes_namespace.cw.metadata[0].name
+      namespace = data.kubernetes_namespace.cw.metadata[0].name
     }
     spec = {
       refreshInterval = "10m"
@@ -146,45 +193,12 @@ resource "kubernetes_manifest" "external_secret" {
     }
   }
 }
-###### End of HCP ######
 
-locals {
-  name_prefix = "${var.environment}-${var.pr_number}-"
-  worker_images = [
-    "twitter",
-    "message-relayer",
-    "knock",
-    "graphile-worker",
-    "evm-ce",
-    "discord-listener",
-    "consumer"
-  ]
-}
-
-provider "kubernetes" {
-  host                   = var.k8s_host
-  token                  = var.k8s_token
-  cluster_ca_certificate = base64decode(var.k8s_ca)
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = var.k8s_host
-    token                  = var.k8s_token
-    cluster_ca_certificate = base64decode(var.k8s_ca)
-  }
-}
-
-resource "kubernetes_namespace" "cw" {
-  metadata {
-    name = "${local.name_prefix}commonwealth"
-  }
-}
-
+# Application deployments
 resource "kubernetes_deployment" "web" {
   metadata {
     name      = "web"
-    namespace = kubernetes_namespace.cw.metadata[0].name
+    namespace = data.kubernetes_namespace.cw.metadata[0].name
     labels = {
       app = "web"
       pr  = var.pr_number
@@ -252,7 +266,7 @@ resource "kubernetes_deployment" "worker" {
   for_each = toset(local.worker_images)
   metadata {
     name      = each.key
-    namespace = kubernetes_namespace.cw.metadata[0].name
+    namespace = data.kubernetes_namespace.cw.metadata[0].name
     labels = {
       app = each.key
       pr  = var.pr_number
@@ -337,7 +351,7 @@ resource "kubernetes_deployment" "worker" {
 resource "kubernetes_service" "web" {
   metadata {
     name      = "web"
-    namespace = kubernetes_namespace.cw.metadata[0].name
+    namespace = data.kubernetes_namespace.cw.metadata[0].name
     labels = {
       app = "web"
       pr  = var.pr_number
@@ -355,30 +369,6 @@ resource "kubernetes_service" "web" {
   }
 }
 
-resource "helm_release" "external_secrets" {
-  name       = "external-secrets"
-  namespace  = kubernetes_namespace.cw.metadata[0].name
-  repository = "https://charts.external-secrets.io"
-  chart      = "external-secrets"
-  version    = "0.16.0"
-  create_namespace = false
-  values = [
-    <<-EOF
-    installCRDs: true
-    EOF
-  ]
-}
-
-resource "helm_release" "reloader" {
-  name       = "reloader"
-  namespace  = kubernetes_namespace.cw.metadata[0].name
-  repository = "https://stakater.github.io/stakater-charts"
-  chart      = "reloader"
-  version    = "1.4.2"
-  create_namespace = false
-  depends_on = [kubernetes_namespace.cw]
-}
-
 output "web_service_ip" {
   value       = kubernetes_service.web.status[0].load_balancer[0].ingress[0].ip
   description = "The external IP of the web service (load balancer)"
@@ -388,7 +378,7 @@ output "environment_info" {
   value = {
     pr_number   = var.pr_number
     environment = var.environment
-    namespace   = kubernetes_namespace.cw.metadata[0].name
+    namespace   = data.kubernetes_namespace.cw.metadata[0].name
   }
   description = "Information about the deployed environment"
 }

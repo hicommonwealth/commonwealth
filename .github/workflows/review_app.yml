@@ -335,15 +335,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Terraform Init (Cluster)
+      - name: Terraform Init (Cluster - Stage 1)
         id: init_cluster
-        working-directory: terraform/cluster
+        working-directory: terraform/review_apps/cluster
         run: |
           terraform init -backend-config="key=commonwealth-pr-environments/cluster/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
 
-      - name: Terraform Plan (Cluster)
+      - name: Terraform Plan (Cluster - Stage 1)
         id: plan_cluster
-        working-directory: terraform/cluster
+        working-directory: terraform/review_apps/cluster
         env:
           TF_LOG: DEBUG
         run: |
@@ -352,79 +352,67 @@ jobs:
             -var="pr_number=${{ steps.set_pr_number.outputs.pr_number }}" \
             -out=tfplan.cluster
 
-      - name: Terraform Apply (Cluster)
+      - name: Terraform Apply (Cluster - Stage 1)
         id: apply_cluster
-        working-directory: terraform/cluster
+        working-directory: terraform/review_apps/cluster
         env:
           TF_LOG: DEBUG
         run: terraform apply -auto-approve tfplan.cluster
 
       - name: Export Kubeconfig
         id: export_kubeconfig
-        working-directory: terraform/cluster
+        working-directory: terraform/review_apps/cluster
         run: terraform output -raw kubeconfig > kubeconfig.yaml
 
-      - name: Terraform Init (K8s)
-        id: init_k8s
-        working-directory: terraform/k8s
+      - name: Terraform Init (CRDs - Stage 2)
+        working-directory: terraform/review_apps/crds
         run: |
-          terraform init -backend-config="key=commonwealth-pr-environments/k8s/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
+          terraform init -backend-config="key=commonwealth-pr-environments/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
 
-      - name: Terraform Plan K8s Stage 1
-        id: plan_k8s_stage1
-        working-directory: terraform/k8s
+      - name: Terraform Plan (CRDs - Stage 2)
+        working-directory: terraform/review_apps/crds
         env:
-          KUBECONFIG: ${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
-          TF_LOG: DEBUG
+          KUBECONFIG: ${{ github.workspace }}/terraform/review_apps/cluster/kubeconfig.yaml
         run: |
-          export KUBECONFIG=${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
+          export KUBECONFIG=${{ github.workspace }}/terraform/review_apps/cluster/kubeconfig.yaml
           export K8S_HOST=$(yq e '.clusters[0].cluster.server' $KUBECONFIG)
           export K8S_TOKEN=$(yq e '.users[0].user.token' $KUBECONFIG)
           export K8S_CA=$(yq e '.clusters[0].cluster.certificate-authority-data' $KUBECONFIG)
           terraform plan \
-            -target="helm_release.external_secrets" \
-            -target="kubernetes_namespace.cw" \
-            -target="kubernetes_secret.hcp_vault_credentials" \
             -var="k8s_host=$K8S_HOST" \
             -var="k8s_token=$K8S_TOKEN" \
             -var="k8s_ca=$K8S_CA" \
-            -var="hcp_client_id=${{ secrets.HCP_CLIENT_ID }}" \
-            -var="hcp_client_secret=${{ secrets.HCP_CLIENT_SECRET }}" \
-            -var="hcp_organization_id=${{ secrets.HCP_ORGANIZATION_ID }}" \
-            -var="hcp_project_id=${{ secrets.HCP_PROJECT_ID }}" \
-            -var="hcp_app_name=PR-${{ steps.set_pr_number.outputs.pr_number }}" \
-            -var="image_tag=${{ steps.set_effective_sha.outputs.sha }}" \
             -var="pr_number=${{ steps.set_pr_number.outputs.pr_number }}" \
-            -out=tfplan.k8s.stage1
+            -out=tfplan.crds
 
-      - name: Terraform Apply K8s Stage 1
-        id: apply_k8s_stage1
-        working-directory: terraform/k8s
+      - name: Terraform Apply (CRDs - Stage 2)
+        working-directory: terraform/review_apps/crds
         env:
-          KUBECONFIG: ${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
-          TF_LOG: DEBUG
+          KUBECONFIG: ${{ github.workspace }}/terraform/review_apps/cluster/kubeconfig.yaml
         run: |
-          export KUBECONFIG=${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
-          terraform apply -auto-approve tfplan.k8s.stage1
+          export KUBECONFIG=${{ github.workspace }}/terraform/review_apps/cluster/kubeconfig.yaml
+          terraform apply -auto-approve tfplan.crds
 
-      # Wait for CRDs to be ready
-      - name: Wait for External Secrets CRDs
+      - name: Wait for CRDs to be Ready
         env:
-          KUBECONFIG: ${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
+          KUBECONFIG: ${{ github.workspace }}/terraform/review_apps/cluster/kubeconfig.yaml
         run: |
-          echo "Waiting for External Secrets CRDs to be available..."
-          kubectl wait --for condition=established --timeout=60s crd/secretstores.external-secrets.io
-          kubectl wait --for condition=established --timeout=60s crd/externalsecrets.external-secrets.io
+          kubectl wait --for condition=established --timeout=120s crd/secretstores.external-secrets.io
+          kubectl wait --for condition=established --timeout=120s crd/externalsecrets.external-secrets.io
           echo "CRDs are ready!"
 
-      - name: Terraform Plan K8s Stage 2
-        id: plan_k8s_stage_2
-        working-directory: terraform/k8s
+      - name: Terraform Init (App - Stage 3)
+        working-directory: terraform/review_apps/app
+        run: |
+          terraform init -backend-config="key=commonwealth-pr-environments/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
+
+      - name: Terraform Plan (App - Stage 3)
+        working-directory: terraform/review_apps/app
         env:
-          KUBECONFIG: ${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
+          KUBECONFIG: ${{ github.workspace }}/terraform/review_apps/cluster/kubeconfig.yaml
           TF_LOG: DEBUG
         run: |
-          export KUBECONFIG=${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
+          export KUBECONFIG=${{ github.workspace }}/terraform/review_apps/cluster/kubeconfig.yaml
           export K8S_HOST=$(yq e '.clusters[0].cluster.server' $KUBECONFIG)
           export K8S_TOKEN=$(yq e '.users[0].user.token' $KUBECONFIG)
           export K8S_CA=$(yq e '.clusters[0].cluster.certificate-authority-data' $KUBECONFIG)
@@ -439,13 +427,13 @@ jobs:
             -var="hcp_app_name=PR-${{ steps.set_pr_number.outputs.pr_number }}" \
             -var="image_tag=${{ steps.set_effective_sha.outputs.sha }}" \
             -var="pr_number=${{ steps.set_pr_number.outputs.pr_number }}" \
-            -out=tfplan.k8s
+            -out=tfplan.apps
 
-      # - name: Terraform Apply K8s Stage 2
+      # - name: Terraform Apply (App - Stage 3)
       #   id: apply_k8s
-      #   working-directory: terraform/k8s
+      #   working-directory: terraform/review_apps/app
       #   env:
-      #     KUBECONFIG: ${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
+      #     KUBECONFIG: ${{ github.workspace }}/terraform/review_apps/cluster/kubeconfig.yaml
       #     TF_LOG: DEBUG
       #   run: terraform apply -auto-approve tfplan.k8s
 
