@@ -45,6 +45,9 @@ describe('generateUniqueId', () => {
     tags: [],
     user_id: testActor.user.id,
     token_address: MOCK_TOKEN_ADDRESS,
+    tier: 0,
+    spam_tier_level: 0,
+    environment: 'test',
   };
 
   beforeAll(async () => {
