@@ -15,7 +15,7 @@ on:
         type: string
 
 jobs:
-  setup_review_db:
+  setup_db_and_vault: # Cannot pass secrets (e.g. DB_URL) between jobs so must initialize vault here
     name: Create Review DB
     outputs:
       db_url: ${{ steps.create_neon_branch.outputs.db_url }}
@@ -69,6 +69,29 @@ jobs:
           DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
         run: pnpm migrate-db
 
+      - name: Authenticate to HCP
+        uses: 'hashicorp/hcp-auth-action@v0'
+        with:
+          client_id: ${{ secrets.HCP_CLIENT_ID }}
+          client_secret: ${{ secrets.HCP_CLIENT_SECRET }}
+
+      - name: 'Download hcp CLI'
+        uses: 'hashicorp/hcp-setup-action@v0'
+        with:
+          version: 'latest'
+
+      - name: Create HCP Vault Secrets App
+        uses: ./.github/actions/hcp-app-manager
+        env:
+          HCP_PROJECT_ID: ${{ secrets.HCP_PROJECT_ID }}
+          HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
+          HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
+          DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_urlwith_pooler }}
+        with:
+          action: 'create'
+          app-name: 'PR-${{ steps.set_pr_number.outputs.pr_number }}'
+          clone-app-name: 'Production' # TODO: update to beta/frick/other
+
       # TODO: check if this posts a new comment for each commit to an open PR if this updates the comment
       # TODO: if this creates a new comment for each commit, we need to update if so it only posts a
       # new comment when a migration changes in one of the commits since last execution
@@ -87,7 +110,7 @@ jobs:
       (github.event.issue.pull_request && github.event.comment.body == '/deploy') ||
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    needs: setup_review_db
+    needs: setup_db_and_vault
     strategy:
       matrix:
         node: [ 22 ]
@@ -300,43 +323,6 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache,mode=max
 
-      - name: Authenticate to HCP
-        uses: 'hashicorp/hcp-auth-action@v0'
-        with:
-          client_id: ${{ secrets.HCP_CLIENT_ID }}
-          client_secret: ${{ secrets.HCP_CLIENT_SECRET }}
-
-      - name: 'Download hcp CLI'
-        uses: 'hashicorp/hcp-setup-action@v0'
-        with:
-          version: 'latest'
-
-      - name: Debug DATABASE_URL
-        run: |
-          if [ -z "${{ needs.setup_review_db.outputs.db_url_with_pooler }}" ]; then
-            echo "DATABASE_URL_WITH_POOLER is NOT set"
-          else
-            echo "DATABASE_URL_WITH_POOLER is set"
-          fi
-          
-          if [ -z "${{ needs.setup_review_db.outputs.db_url }}" ]; then
-            echo "DATABASE_URL is NOT set"
-          else
-            echo "DATABASE_URL is set"
-          fi
-
-      - name: Create HCP Vault Secrets App
-        uses: ./.github/actions/hcp-app-manager
-        env:
-          HCP_PROJECT_ID: ${{ secrets.HCP_PROJECT_ID }}
-          HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
-          HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
-          DATABASE_URL: ${{ needs.setup_review_db.outputs.db_url_with_pooler }}
-        with:
-          action: 'create'
-          app-name: 'PR-${{ steps.set_pr_number.outputs.pr_number }}'
-          clone-app-name: 'Production' # TODO: update to beta/frick/other
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -385,7 +371,54 @@ jobs:
         run: |
           terraform init -backend-config="key=commonwealth-pr-environments/k8s/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
 
-      - name: Terraform Plan (K8s)
+      - name: Terraform Plan K8s Stage 1
+        id: plan_k8s_stage1
+        working-directory: terraform/k8s
+        env:
+          KUBECONFIG: ${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
+          TF_LOG: DEBUG
+        run: |
+          export KUBECONFIG=${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
+          export K8S_HOST=$(yq e '.clusters[0].cluster.server' $KUBECONFIG)
+          export K8S_TOKEN=$(yq e '.users[0].user.token' $KUBECONFIG)
+          export K8S_CA=$(yq e '.clusters[0].cluster.certificate-authority-data' $KUBECONFIG)
+          terraform plan \
+            -target="helm_release.external_secrets" \
+            -target="kubernetes_namespace.cw" \
+            -target="kubernetes_secret.hcp_vault_credentials" \
+            -var="k8s_host=$K8S_HOST" \
+            -var="k8s_token=$K8S_TOKEN" \
+            -var="k8s_ca=$K8S_CA" \
+            -var="hcp_client_id=${{ secrets.HCP_CLIENT_ID }}" \
+            -var="hcp_client_secret=${{ secrets.HCP_CLIENT_SECRET }}" \
+            -var="hcp_organization_id=${{ secrets.HCP_ORGANIZATION_ID }}" \
+            -var="hcp_project_id=${{ secrets.HCP_PROJECT_ID }}" \
+            -var="hcp_app_name=PR-${{ steps.set_pr_number.outputs.pr_number }}" \
+            -var="image_tag=${{ steps.set_effective_sha.outputs.sha }}" \
+            -var="pr_number=${{ steps.set_pr_number.outputs.pr_number }}" \
+            -out=tfplan.k8s.stage1
+
+      - name: Terraform Apply K8s Stage 1
+        id: apply_k8s_stage1
+        working-directory: terraform/k8s
+        env:
+          KUBECONFIG: ${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
+          TF_LOG: DEBUG
+        run: |
+          export KUBECONFIG=${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
+          terraform apply -auto-approve tfplan.k8s.stage1
+
+      # Wait for CRDs to be ready
+      - name: Wait for External Secrets CRDs
+        env:
+          KUBECONFIG: ${{ github.workspace }}/terraform/cluster/kubeconfig.yaml
+        run: |
+          echo "Waiting for External Secrets CRDs to be available..."
+          kubectl wait --for condition=established --timeout=60s crd/secretstores.external-secrets.io
+          kubectl wait --for condition=established --timeout=60s crd/externalsecrets.external-secrets.io
+          echo "CRDs are ready!"
+
+      - name: Terraform Plan K8s Stage 2
         id: plan_k8s
         working-directory: terraform/k8s
         env:
@@ -409,7 +442,7 @@ jobs:
             -var="pr_number=${{ steps.set_pr_number.outputs.pr_number }}" \
             -out=tfplan.k8s
 
-      # - name: Terraform Apply (K8s)
+      # - name: Terraform Apply K8s Stage 2
       #   id: apply_k8s
       #   working-directory: terraform/k8s
       #   env:
