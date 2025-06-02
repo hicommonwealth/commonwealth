@@ -77,6 +77,7 @@ variable "hcp_project_id" {
 
 locals {
   name_prefix = "pr-${var.pr_number}-"
+  # MUST be the same name as created in crds/main.tf
   namespace_name = "${local.name_prefix}commonwealth"
   worker_images = [
     "twitter",
@@ -89,14 +90,6 @@ locals {
   ]
 }
 
-provider "kubernetes" {
-  host                   = var.k8s_host
-  token                  = var.k8s_token
-  cluster_ca_certificate = base64decode(var.k8s_ca)
-}
-
-# Import the namespace resource that was created in the CRDs stage
-# Since we're using shared state, we need to reference the existing resource
 terraform {
   required_providers {
     kubernetes = {
@@ -106,25 +99,17 @@ terraform {
   }
 }
 
-# Import existing namespace from shared state
-resource "kubernetes_namespace" "cw" {
-  metadata {
-    name = local.namespace_name
-  }
-
-  lifecycle {
-    # Prevent destruction since this was created in CRDs stage
-    prevent_destroy = false
-    # Ignore changes since CRDs stage manages this
-    ignore_changes = all
-  }
+provider "kubernetes" {
+  host                   = var.k8s_host
+  token                  = var.k8s_token
+  cluster_ca_certificate = base64decode(var.k8s_ca)
 }
 
 # HCP Vault credentials secret
 resource "kubernetes_secret" "hcp_vault_credentials" {
   metadata {
     name      = "hcp-vault-credentials"
-    namespace = kubernetes_namespace.cw.metadata[0].name
+    namespace = local.namespace_name
   }
   data = {
     client-id     = var.hcp_client_id
@@ -140,7 +125,7 @@ resource "kubernetes_manifest" "hcp_vault_secretstore" {
     "kind" = "SecretStore"
     "metadata" = {
       "name" = "hcp-vault-backend"
-      "namespace" = data.kubernetes_namespace.cw.metadata[0].name
+      "namespace" = local.namespace_name
     }
     "spec" = {
       "provider" = {
@@ -178,7 +163,7 @@ resource "kubernetes_manifest" "external_secret" {
     kind       = "ExternalSecret"
     metadata = {
       name      = each.value.name
-      namespace = data.kubernetes_namespace.cw.metadata[0].name
+      namespace = local.namespace_name
     }
     spec = {
       refreshInterval = "10m"
@@ -198,7 +183,7 @@ resource "kubernetes_manifest" "external_secret" {
 resource "kubernetes_deployment" "web" {
   metadata {
     name      = "web"
-    namespace = data.kubernetes_namespace.cw.metadata[0].name
+    namespace = local.namespace_name
     labels = {
       app = "web"
       pr  = var.pr_number
@@ -266,7 +251,7 @@ resource "kubernetes_deployment" "worker" {
   for_each = toset(local.worker_images)
   metadata {
     name      = each.key
-    namespace = data.kubernetes_namespace.cw.metadata[0].name
+    namespace = local.namespace_name
     labels = {
       app = each.key
       pr  = var.pr_number
@@ -351,7 +336,7 @@ resource "kubernetes_deployment" "worker" {
 resource "kubernetes_service" "web" {
   metadata {
     name      = "web"
-    namespace = data.kubernetes_namespace.cw.metadata[0].name
+    namespace = local.namespace_name
     labels = {
       app = "web"
       pr  = var.pr_number
@@ -378,7 +363,7 @@ output "environment_info" {
   value = {
     pr_number   = var.pr_number
     environment = var.environment
-    namespace   = data.kubernetes_namespace.cw.metadata[0].name
+    namespace   = local.namespace_name
   }
   description = "Information about the deployed environment"
 }
