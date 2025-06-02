@@ -38,6 +38,11 @@ jobs:
             echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
           fi
 
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
+
       - name: Create Neon Branch
         id: create_neon_branch
         uses: neondatabase/create-branch-action@v5
@@ -49,12 +54,6 @@ jobs:
           database: 'commonwealth'
           suspend_timeout: 300 # scale to 0 compute after 5 minutes
           ssl: require # DO NOT CHANGE THIS - we must use SSL since we are branching off prod
-
-      - uses: actions/checkout@v4
-        if: steps.create_neon_branch.outputs.created == 'false'
-        with:
-          fetch-depth: 0
-          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
 
       - uses: ./.github/actions/setup
         if: steps.create_neon_branch.outputs.created == 'false'
