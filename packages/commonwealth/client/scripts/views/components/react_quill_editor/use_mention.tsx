@@ -1,13 +1,6 @@
 import { RangeStatic } from 'quill';
 import QuillMention from 'quill-mention';
-import {
-  MutableRefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { MutableRefObject, useCallback, useMemo, useRef } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import MinimumProfile from '../../../models/MinimumProfile';
 
@@ -39,30 +32,21 @@ export const useMention = ({
   editorRef,
   lastSelectionRef,
 }: UseMentionProps) => {
-  const [mentionTerm, setMentionTerm] = useState('');
-  const [currentMentionChar, setCurrentMentionChar] = useState<string>('');
-  const [currentSearchScope, setCurrentSearchScope] = useState<string[]>([
-    'All',
-  ]);
-  const [currentCommunityId, setCurrentCommunityId] = useState<
-    string | undefined
-  >(undefined);
-
-  // Use refs to avoid React re-renders affecting Quill
-  const searchResultsRef = useRef<any>(null);
-  const isLoadingRef = useRef(false);
-  const pendingCallbackRef = useRef<{
-    renderList: (matches: QuillMention[], searchTerm: string) => null;
+  // Create a ref to store the current search parameters
+  const searchParamsRef = useRef<{
     searchTerm: string;
-  } | null>(null);
+    communityId?: string;
+    searchScope: string[];
+  }>({
+    searchTerm: '',
+    searchScope: ['All'],
+  });
 
-  const { data: searchResults, isLoading } = useUnifiedSearch({
-    searchTerm: mentionTerm,
-    communityId: currentCommunityId,
-    searchScope: currentSearchScope,
-    enabled:
-      mentionTerm.length >= MENTION_CONFIG.MIN_SEARCH_LENGTH &&
-      !!currentMentionChar,
+  const { refetch } = useUnifiedSearch({
+    searchTerm: searchParamsRef.current.searchTerm,
+    communityId: searchParamsRef.current.communityId,
+    searchScope: searchParamsRef.current.searchScope,
+    enabled: false, // We'll trigger manually
   });
 
   const selectMention = useCallback(
@@ -82,7 +66,7 @@ export const useMention = ({
       const cursorIdx = lastSelection.index;
 
       // Find the mention character and calculate mention length
-      let mentionChar = currentMentionChar;
+      let mentionChar = '';
       let mentionLength = 0;
 
       for (const char of Object.keys(MENTION_DENOTATION_CHARS)) {
@@ -126,7 +110,7 @@ export const useMention = ({
         0,
       );
     },
-    [editorRef, lastSelectionRef, currentMentionChar],
+    [editorRef, lastSelectionRef],
   );
 
   const createEntityMentionItem = useCallback(
@@ -371,50 +355,6 @@ export const useMention = ({
     };
   };
 
-  // Update refs when search results change
-  useEffect(() => {
-    console.log('searchResults', searchResults);
-    searchResultsRef.current = searchResults;
-    isLoadingRef.current = isLoading;
-
-    // Clear pending callback if search term is too short
-    if (mentionTerm.length < MENTION_CONFIG.MIN_SEARCH_LENGTH) {
-      pendingCallbackRef.current = null;
-      return;
-    }
-
-    // Only process if we have a valid search term and pending callback
-    if (
-      pendingCallbackRef.current &&
-      searchResults &&
-      !isLoading &&
-      mentionTerm.length >= MENTION_CONFIG.MIN_SEARCH_LENGTH
-    ) {
-      try {
-        const results = searchResults.results || [];
-        const formattedMatches = results.map((result: any) => {
-          const entityType = getEntityTypeFromSearchResult(result);
-          return createEntityMentionItem(entityType, result);
-        });
-
-        pendingCallbackRef.current.renderList(
-          formattedMatches,
-          pendingCallbackRef.current.searchTerm,
-        );
-        pendingCallbackRef.current = null; // Clear the callback
-      } catch (error) {
-        console.error('Error processing search results:', error);
-        if (pendingCallbackRef.current) {
-          pendingCallbackRef.current.renderList(
-            [],
-            pendingCallbackRef.current.searchTerm,
-          );
-          pendingCallbackRef.current = null;
-        }
-      }
-    }
-  }, [searchResults, isLoading, createEntityMentionItem, mentionTerm]);
-
   const mention = useMemo(() => {
     return {
       allowedChars: /^[A-Za-z0-9\sÅÄÖåäö\-_.]*$/,
@@ -445,53 +385,53 @@ export const useMention = ({
           ) => null,
           mentionChar: string,
         ) => {
-          setCurrentMentionChar(mentionChar);
+          try {
+            // Get search configuration for this denotation character
+            const mentionSearchConfig = DENOTATION_SEARCH_CONFIG[mentionChar];
+            if (!mentionSearchConfig) {
+              renderList([], searchTerm);
+              return;
+            }
 
-          console.log('mentionChar', mentionChar);
+            if (searchTerm.length < MENTION_CONFIG.MIN_SEARCH_LENGTH) {
+              // Show tip message for short search terms
+              renderList([], searchTerm);
+              return;
+            }
 
-          // Get search configuration for this denotation character
-          const mentionSearchConfig = DENOTATION_SEARCH_CONFIG[mentionChar];
-          if (!mentionSearchConfig) return;
+            // Determine search scope and community
+            const searchScope = mentionSearchConfig.scopes || ['All'];
+            const communityId = mentionSearchConfig.communityScoped
+              ? app.activeChainId() || ''
+              : undefined;
 
-          if (searchTerm.length < MENTION_CONFIG.MIN_SEARCH_LENGTH) {
-            // Don't update search state for short terms to avoid unnecessary re-renders
-            // Only show the tip message
-            const node = document.createElement('div');
-            const tip = document.createElement('span');
-            tip.innerText = `Type to ${mentionSearchConfig.description.toLowerCase()}`;
-            node.appendChild(tip);
-            const formattedMatches: QuillMention[] = [
-              {
-                link: '#',
-                name: '',
-                component: node.outerHTML,
-              },
-            ];
-            console.log('tutaj!1', formattedMatches);
-            console.log('tutaj!2', mentionChar);
+            // Update search parameters
+            searchParamsRef.current = {
+              searchTerm,
+              communityId,
+              searchScope,
+            };
+
+            // Trigger the search using refetch
+            const { data } = await refetch();
+
+            const results = data?.results || [];
+            const formattedMatches = results.map((result: any) => {
+              const entityType = getEntityTypeFromSearchResult(result);
+              return createEntityMentionItem(entityType, result);
+            });
+
             renderList(formattedMatches, searchTerm);
-          } else {
-            // Only update search configuration and term for valid searches
-            setCurrentSearchScope(mentionSearchConfig.scopes || ['All']);
-            setCurrentCommunityId(
-              mentionSearchConfig.communityScoped
-                ? app.activeChainId() || ''
-                : undefined,
-            );
-
-            // Update the search term to trigger the hook
-            setMentionTerm(searchTerm);
-
-            // Store the callback to be executed when results are available
-            pendingCallbackRef.current = { renderList, searchTerm };
+          } catch (error) {
+            console.error('Error searching mentions:', error);
+            renderList([], searchTerm);
           }
         },
         MENTION_CONFIG.SEARCH_DEBOUNCE_MS,
       ),
       isolateChar: true,
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectMention, createEntityMentionItem]);
+  }, [selectMention, createEntityMentionItem, refetch]);
 
   return { mention };
 };
