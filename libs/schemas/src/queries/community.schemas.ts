@@ -102,6 +102,7 @@ export const GetCommunity = {
 
 export const TopicPermissionsView = z.object({
   id: z.number(),
+  is_private: z.boolean(),
   permissions: z.array(z.nativeEnum(GatedActionEnum)),
 });
 
@@ -159,6 +160,8 @@ export const GetCommunityMembers = {
     order_by: z
       .enum(['last_active', 'name', 'referrals', 'earnings'])
       .optional(),
+    /** If true, search will match both profile name and address. */
+    searchByNameAndAddress: z.boolean().optional().default(false),
   }),
   output: PaginatedResultSchema.extend({
     results: CommunityMember.array(),
@@ -338,6 +341,7 @@ export const GroupView = Group.omit({ GroupGatedActions: true }).extend({
   ),
   topics: z.array(
     TopicView.omit({ total_threads: true }).extend({
+      is_private: z.boolean(),
       permissions: z.array(z.nativeEnum(GatedActionEnum)),
     }),
   ),

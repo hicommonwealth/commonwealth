@@ -11,6 +11,9 @@ type TokenFinderProps = {
   debouncedTokenValue: string;
   tokenMetadataLoading: boolean;
   tokenMetadata?: GetTokenMetadataResponse;
+  tokenAddress?: string;
+  chainName?: string;
+  chainEthId?: number;
 } & TextInputProps;
 
 const TokenFinder = ({
@@ -20,6 +23,9 @@ const TokenFinder = ({
   debouncedTokenValue,
   tokenMetadataLoading,
   tokenMetadata,
+  tokenAddress,
+  chainName,
+  chainEthId,
   ...rest
 }: TokenFinderProps) => {
   return (
@@ -40,6 +46,9 @@ const TokenFinder = ({
           avatarUrl={tokenMetadata?.logo}
           name={tokenMetadata?.name}
           ticker={tokenMetadata?.symbol}
+          tokenAddress={tokenAddress}
+          chainName={chainName}
+          chainEthId={chainEthId}
         />
       )}
     </>

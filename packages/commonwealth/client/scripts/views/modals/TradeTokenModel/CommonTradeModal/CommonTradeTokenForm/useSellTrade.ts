@@ -57,7 +57,7 @@ const useSellTrade = ({
     data: unitTokenToEthSellExchangeRate = 0,
     isLoading: isLoadingUnitTokenToEthSellExchangeRate,
   } = useTokenEthExchangeRateQuery({
-    chainRpc: chainNode.url,
+    chainRpc: chainNode?.url || '',
     ethChainId,
     mode: 'sell',
     tokenAmount: 1 * 1e18, // convert to wei - get exchange rate of 1 unit token to eth
@@ -108,7 +108,6 @@ const useSellTrade = ({
 
   const handleTokenSell = async () => {
     try {
-      // this condition wouldn't be called, but adding to avoid typescript issues
       if (
         !chainNode?.url ||
         !ethChainId ||

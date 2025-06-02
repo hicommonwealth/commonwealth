@@ -17,7 +17,8 @@ import { withTooltip } from 'views/components/component_kit/new_designs/CWToolti
 import { AuthModal } from 'views/modals/AuthModal';
 import { NetworkIndicator } from 'views/modals/TradeTokenModel/NetworkIndicator';
 
-import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
+import NodeInfo from 'client/scripts/models/NodeInfo';
+import { fetchNodes } from 'client/scripts/state/api/nodes';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { formatJsonRpcMap } from 'views/modals/TradeTokenModel/UniswapTradeModal/useJsonRpcUrlMap';
@@ -54,7 +55,10 @@ const UniswapTrade = ({ tradeConfig }: UniswapTradeProps) => {
       provider: uniswapWidget.provider,
     });
 
-  const nodes = fetchCachedNodes();
+  const [nodes, setNodes] = useState<NodeInfo[]>();
+  useEffect(() => {
+    fetchNodes().then(setNodes).catch(console.error);
+  }, []);
   const jsonRpcUrlMap = formatJsonRpcMap(nodes);
 
   const logo =

@@ -844,7 +844,12 @@ describe('Community lifecycle', () => {
       expect(address?.address).toBe(ethActor.address);
       const members = await query(GetMembers(), {
         actor: superAdminActor,
-        payload: { community_id: community.id, limit: 10, cursor: 1 },
+        payload: {
+          community_id: community.id,
+          limit: 10,
+          cursor: 1,
+          searchByNameAndAddress: false,
+        },
       });
       expect(members?.results.length).toBe(3);
     });

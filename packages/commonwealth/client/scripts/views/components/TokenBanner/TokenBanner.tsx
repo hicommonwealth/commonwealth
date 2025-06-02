@@ -11,12 +11,16 @@ import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 
+import { formatAddressShort } from 'client/scripts/helpers';
 import './TokenBanner.scss';
 
 interface TokenBannerProps {
   avatarUrl?: string;
   name?: string;
   ticker?: string | null;
+  tokenAddress?: string;
+  chainName?: string;
+  chainEthId?: number;
   value?: number;
   change?: number;
   isLoading?: boolean;
@@ -28,6 +32,9 @@ const TokenBanner = ({
   avatarUrl,
   name,
   ticker,
+  tokenAddress,
+  chainName,
+  chainEthId,
   value,
   change,
   isLoading,
@@ -43,17 +50,35 @@ const TokenBanner = ({
   return (
     <div className="TokenBanner">
       <div className="token-identification">
-        {avatarUrl ? (
-          <Avatar url={avatarUrl} size={40} />
-        ) : (
-          <div className="avatar-placeholder">
-            {(name || 'ETH').charAt(0).toUpperCase()}
+        <div className="token-details-avatar">
+          {avatarUrl ? (
+            <Avatar url={avatarUrl} size={40} />
+          ) : (
+            <div className="avatar-placeholder">
+              {(name || 'ETH').charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+        <div className="token-details-info">
+          <div className="token-details-row">
+            <CWText fontWeight="medium">{name || 'ETH'}</CWText>
+            <CWText fontWeight="medium" className="ticker">
+              {ticker}
+            </CWText>
           </div>
-        )}
-        <CWText fontWeight="medium">{name || 'ETH'}</CWText>
-        <CWText fontWeight="medium" className="ticker">
-          {ticker}
-        </CWText>
+          <div className="token-details-row">
+            {tokenAddress && (
+              <CWText type="caption" className="token-address">
+                {formatAddressShort(tokenAddress)}
+              </CWText>
+            )}
+            {chainName && chainEthId && (
+              <CWText type="caption" className="chain-info">
+                • {chainName} ({chainEthId})
+              </CWText>
+            )}
+          </div>
+        </div>
       </div>
 
       {value && change && (

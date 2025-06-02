@@ -8,6 +8,7 @@ import useFundContestOnchainMutation from './fundContestOnchain';
 import useGetContestBalanceQuery from './getContestBalance';
 import useGetContestsQuery from './getContests';
 import useFetchFarcasterCastsQuery from './getFarcasterCasts';
+import useNominateJudgesMutation from './nominateJudges';
 
 export {
   useConfigureNominationsMutation,
@@ -20,4 +21,5 @@ export {
   useFundContestOnchainMutation,
   useGetContestBalanceQuery,
   useGetContestsQuery,
+  useNominateJudgesMutation,
 };

@@ -47,7 +47,7 @@ const AllTabContent: React.FC<AllTabContentProps> = ({ containerRef }) => {
             onSeeAllClick={() => navigate('/explore?tab=quests')}
           />
           <div className="horizontal-scroll-container">
-            <QuestList hideHeader />
+            <QuestList hideHeader hideFilters hideSeeMore />
           </div>
         </div>
       )}
