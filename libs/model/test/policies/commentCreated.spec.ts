@@ -5,7 +5,7 @@ import {
   notificationsProvider,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -61,6 +61,7 @@ describe('CommentCreated Event Handler', () => {
     [mentionedUser] = await tester.seed('User', {});
 
     [community] = await tester.seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       custom_domain: customDomain,
       chain_node_id: chainNode?.id,
       lifetime_thread_count: 0,

@@ -153,6 +153,8 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
       group_ids: [],
       active_contest_managers: [],
       total_threads: 0,
+      // If we expect to do tokenized stuff on the feed, modify this
+      allow_tokenized_threads: false,
     },
     kind: thread.kind as ThreadKind,
     stage: thread.stage as ThreadStage,
@@ -169,6 +171,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     profile_name: thread.profile_name ?? '',
     avatar_url: thread.profile_avatar ?? '',
     user_id: thread.user_id,
+    user_tier: thread.user_tier,
     userId: thread.user_id,
     last_edited: thread.updated_at ?? '',
     last_commented_on: '',
@@ -178,6 +181,8 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     search: '',
     ContestActions: [],
     numberOfComments: thread.number_of_comments,
+    is_linking_token: thread.is_linking_token,
+    launchpad_token_address: thread.launchpad_token_address ?? undefined,
     recentComments:
       thread.recent_comments?.map((c) => ({
         id: c.id,

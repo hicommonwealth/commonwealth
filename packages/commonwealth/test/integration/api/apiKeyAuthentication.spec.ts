@@ -11,6 +11,7 @@ import {
 } from '@hicommonwealth/core';
 import { models, tester, User } from '@hicommonwealth/model';
 import { ApiKey, User as UserSchema } from '@hicommonwealth/schemas';
+import { UserTierMap } from '@hicommonwealth/shared';
 import { NextFunction, Request, Response } from 'express';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
@@ -32,6 +33,7 @@ describe('API KeyAuthentication', () => {
       emailVerified: true,
       promotional_emails_enabled: false,
       profile: {},
+      tier: UserTierMap.ManuallyVerified,
     });
     admin = await models.User.create({
       email: 'admin@gmail.com',
@@ -39,6 +41,7 @@ describe('API KeyAuthentication', () => {
       emailVerified: true,
       promotional_emails_enabled: false,
       profile: {},
+      tier: UserTierMap.ManuallyVerified,
     });
     await tester.seed('Community', {
       chain_node_id: node!.id!,

@@ -1,6 +1,9 @@
-import { CacheNamespaces, config, dispose } from '@hicommonwealth/core';
+import { RedisCache } from '@hicommonwealth/adapters';
+import { cache, CacheNamespaces, config, dispose } from '@hicommonwealth/core';
+import * as evm from '@hicommonwealth/evm-protocols';
 import { models, tester } from '@hicommonwealth/model';
-import { ContestManager, events } from '@hicommonwealth/schemas';
+import { ContestManager, Events, events } from '@hicommonwealth/schemas';
+import { serializeBigIntObj } from '@hicommonwealth/shared';
 import {
   afterAll,
   afterEach,
@@ -12,14 +15,12 @@ import {
 } from 'vitest';
 import { z } from 'zod';
 import {
-  EVENT_STREAM_FN_CACHE_KEY,
   EVENT_STREAM_WINDOW_SIZE,
   EventStreamPolicy,
   getEventStream,
+  getEventStreamCacheKey,
 } from '../../src/policies/EventStream.policy';
 import { drainOutbox } from '../utils/outbox-drain';
-
-const inMemoryStore = new Map<string, any>();
 
 const isValidUrl = (urlString: string): boolean => {
   try {
@@ -35,37 +36,33 @@ const isValidUrl = (urlString: string): boolean => {
   }
 };
 
-const mockCache = {
-  getKey: vi.fn().mockImplementation(async (namespace, key) => {
-    const cacheKey = `${namespace}:${key}`;
-    return inMemoryStore.get(cacheKey) || null;
-  }),
-  setKey: vi.fn().mockImplementation(async (namespace, key, value) => {
-    const cacheKey = `${namespace}:${key}`;
-    inMemoryStore.set(cacheKey, value);
-    return true;
-  }),
-};
-
-vi.mock('@hicommonwealth/core', async () => {
-  const actual = await vi.importActual('@hicommonwealth/core');
-  return {
-    ...(actual as object),
-    cache: () => mockCache,
-  };
-});
-
 describe('EventStream Policy Integration Tests', () => {
   const communityId = 'test-community';
   const threadId = 123;
   let contestManagers: z.infer<typeof ContestManager>[];
 
   beforeAll(async () => {
+    cache({
+      adapter: new RedisCache('redis://localhost:6379'),
+    });
+    await cache().ready();
+    await cache().deleteKey(
+      CacheNamespaces.Function_Response,
+      getEventStreamCacheKey(),
+    );
+
+    await tester.seed('ChainNode', {
+      eth_chain_id: 1,
+      url: 'https://example.com',
+      private_url: 'https://example.com',
+    });
+
     const [community] = await tester.seed('Community', {
       id: communityId,
       name: 'Test Community',
       icon_url: 'https://example.com/icon.png',
       profile_count: 0,
+      namespace: 'test',
       // seed enough contest managers to fill the event stream window
       contest_managers: [
         ...Array.from({ length: EVENT_STREAM_WINDOW_SIZE }, (_, i) => ({
@@ -104,15 +101,38 @@ describe('EventStream Policy Integration Tests', () => {
       topic_id: community!.topics![0].id,
     });
 
-    inMemoryStore.clear();
+    const [launchpadToken] = await tester.seed('LaunchpadToken', {
+      token_address: '0x7777777777777777777777777777777777777777',
+      namespace: community!.namespace!,
+      name: 'Test Token',
+      symbol: 'TEST',
+      initial_supply: 1000,
+      liquidity_transferred: false,
+      launchpad_liquidity: 1n,
+      eth_market_cap_target: 1000,
+    });
 
-    mockCache.getKey.mockClear();
-    mockCache.setKey.mockClear();
+    vi.spyOn(evm, 'getLaunchpadTokenCreatedTransaction').mockResolvedValue({
+      txReceipt: {} as any,
+      block: {} as any,
+      parsedArgs: {
+        namespace: community!.namespace!,
+        tokenAddress: launchpadToken!.token_address!,
+        curveId: 1n,
+        totalSupply: 1n,
+        launchpadLiquidity: 1n,
+        reserveRation: 1n,
+        initialPurchaseEthAmount: 1n,
+      },
+    });
   });
 
   afterEach(async () => {
     await models.Outbox.truncate();
-    inMemoryStore.clear();
+    await cache().deleteKey(
+      CacheNamespaces.Function_Response,
+      getEventStreamCacheKey(),
+    );
     vi.clearAllMocks();
   });
 
@@ -217,9 +237,11 @@ describe('EventStream Policy Integration Tests', () => {
       url: `https://development.commonwealth.gg/community/${communityId}`,
     };
 
-    inMemoryStore.set(
-      `${CacheNamespaces.Function_Response}:${EVENT_STREAM_FN_CACHE_KEY}`,
-      JSON.stringify([existingEvent]),
+    await cache().lpushAndTrim(
+      CacheNamespaces.Function_Response,
+      getEventStreamCacheKey(),
+      JSON.stringify(existingEvent),
+      EVENT_STREAM_WINDOW_SIZE,
     );
 
     const threadCreatedEvent: z.infer<typeof events.ThreadCreated> = {
@@ -242,23 +264,53 @@ describe('EventStream Policy Integration Tests', () => {
     const eventStreamItems = await getEventStream();
 
     expect(eventStreamItems).toHaveLength(2);
-    expect(eventStreamItems[0].type).toBe(existingEvent.type);
+    expect(eventStreamItems[0].type).toBe('ThreadCreated');
 
-    const firstItemData = eventStreamItems[0].data as any;
-    expect(firstItemData.id).toBe(existingEvent.data.id);
+    const threadData = eventStreamItems[0].data as any;
+    expect(threadData.id).toBe(threadCreatedEvent.id!);
+    expect(eventStreamItems[0].url).toContain(
+      threadCreatedEvent.id!.toString(),
+    );
     expect(isValidUrl(eventStreamItems[0].url)).toBe(true);
 
-    expect(eventStreamItems[1].type).toBe('ThreadCreated');
-
-    const secondItemData = eventStreamItems[1].data as any;
-    expect(secondItemData.id).toBe(threadCreatedEvent.id!);
+    expect(eventStreamItems[1].type).toBe(existingEvent.type);
+    const communityData = eventStreamItems[1].data as any;
+    expect(communityData.id).toBe(existingEvent.data.id);
+    expect(eventStreamItems[1].url).toContain(existingEvent.data.id);
     expect(isValidUrl(eventStreamItems[1].url)).toBe(true);
   });
 
   test('should process multiple events of different types through the outbox', async () => {
-    mockCache.getKey.mockImplementationOnce(() => null);
-
     const outboxEvents = [
+      {
+        event_name: 'ContestStarted',
+        event_payload: {
+          contest_address: contestManagers[0].contest_address,
+          contest_id: 1,
+          start_time: new Date(),
+          end_time: new Date(),
+          is_one_off: true,
+        } satisfies z.infer<typeof events.ContestStarted>,
+      },
+      {
+        event_name: 'ContestEnded',
+        event_payload: {
+          contest_address: contestManagers[0].contest_address,
+          contest_id: 1,
+          is_one_off: true,
+          winners: [],
+          created_at: new Date(),
+        } satisfies z.infer<typeof events.ContestEnded>,
+      },
+      {
+        event_name: 'ContestEnding',
+        event_payload: {
+          contest_address: contestManagers[0].contest_address,
+          contest_id: 1,
+          is_one_off: true,
+          created_at: new Date(),
+        } satisfies z.infer<typeof events.ContestEnding>,
+      },
       {
         event_name: 'CommunityCreated',
         event_payload: {
@@ -280,33 +332,76 @@ describe('EventStream Policy Integration Tests', () => {
         } satisfies z.infer<typeof events.ThreadCreated>,
       },
       {
-        event_name: 'ContestStarted',
-        event_payload: {
-          contest_address: contestManagers[0].contest_address,
-          contest_id: 1,
-          start_time: new Date(),
-          end_time: new Date(),
-          is_one_off: true,
-        } satisfies z.infer<typeof events.ContestStarted>,
+        event_name: 'LaunchpadTokenCreated',
+        event_payload: serializeBigIntObj({
+          transaction_hash: '0x7777777777777777777777777777777777777777',
+          eth_chain_id: 1,
+          block_timestamp: 1n,
+        } satisfies z.infer<typeof events.LaunchpadTokenCreated>),
+      },
+      {
+        event_name: 'LaunchpadTokenTraded',
+        event_payload: serializeBigIntObj({
+          block_timestamp: 1n,
+          transaction_hash: '0x1111111111111111111111111111111111111111',
+          trader_address: '0x1111111111111111111111111111111111111111',
+          token_address: '0x7777777777777777777777777777777777777777',
+          is_buy: true,
+          eth_chain_id: 1,
+          eth_amount: 1n,
+          community_token_amount: 1n,
+          floating_supply: 1n,
+        } satisfies z.infer<typeof events.LaunchpadTokenTraded>),
+      },
+      {
+        event_name: 'LaunchpadTokenGraduated',
+        event_payload: serializeBigIntObj({
+          token: {
+            token_address: '0x7777777777777777777777777777777777777777',
+            symbol: 'TEST',
+            name: 'Test Token',
+            namespace: 'test',
+            initial_supply: 1000,
+            liquidity_transferred: true,
+            launchpad_liquidity: 1n,
+            eth_market_cap_target: 1000,
+          },
+          launchpadLiquidity: 1n,
+          poolLiquidity: 1n,
+          curveId: 1n,
+          scalar: 1n,
+          reserveRation: 1n,
+          LPhook: '0x123',
+          funded: true,
+        } satisfies z.infer<typeof events.LaunchpadTokenGraduated>),
       },
     ];
 
     await models.Outbox.bulkCreate(outboxEvents);
 
-    await drainOutbox(
-      ['CommunityCreated', 'ThreadCreated', 'ContestStarted'],
-      EventStreamPolicy,
-    );
+    const eventNames = [
+      'ContestStarted',
+      'ContestEnded',
+      'ContestEnding',
+      'CommunityCreated',
+      'ThreadCreated',
+      'LaunchpadTokenCreated',
+      'LaunchpadTokenTraded',
+      'LaunchpadTokenGraduated',
+    ] satisfies Events[];
+
+    await drainOutbox(eventNames, EventStreamPolicy);
 
     const eventStreamItems = await getEventStream();
 
-    expect(eventStreamItems).toHaveLength(3);
-    expect(eventStreamItems[0].type).toBe(outboxEvents[0].event_name);
-    expect(isValidUrl(eventStreamItems[0].url)).toBe(true);
-    expect(eventStreamItems[1].type).toBe(outboxEvents[1].event_name);
-    expect(isValidUrl(eventStreamItems[1].url)).toBe(true);
-    expect(eventStreamItems[2].type).toBe(outboxEvents[2].event_name);
-    expect(isValidUrl(eventStreamItems[2].url)).toBe(true);
+    expect(eventStreamItems).toHaveLength(eventNames.length);
+    for (let i = 0; i < eventNames.length; i++) {
+      // events are drained from the outbox in reverse order
+      expect(eventStreamItems[i].type).toBe(
+        outboxEvents[eventNames.length - i - 1].event_name,
+      );
+      expect(isValidUrl(eventStreamItems[i].url)).toBe(true);
+    }
   });
 
   test('should only keep the most recent events when exceeding the window size', async () => {
@@ -330,6 +425,7 @@ describe('EventStream Policy Integration Tests', () => {
 
     // event stream length should be max
     expect(eventStreamItems).toHaveLength(EVENT_STREAM_WINDOW_SIZE);
+
     // verify all URLs are valid with http prefix
     eventStreamItems.forEach((item) => {
       expect(isValidUrl(item.url)).toBe(true);
@@ -359,9 +455,8 @@ describe('EventStream Policy Integration Tests', () => {
     });
 
     // oldest event should be removed
-    const oldestEvent = eventStreamItemsAfter[0].data as z.infer<
-      typeof ContestManager
-    >;
+    const oldestEvent = eventStreamItemsAfter[EVENT_STREAM_WINDOW_SIZE - 1]
+      .data as z.infer<typeof ContestManager>;
     expect(oldestEvent.name).toEqual('Test Contest #2');
   });
 });

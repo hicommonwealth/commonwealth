@@ -1,6 +1,8 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { PinnedTokenWithPrices } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { GetTokenMetadataResponse } from 'state/api/tokens/getTokenMetadata';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { z } from 'zod';
 import { TradingMode } from '../types';
 
@@ -18,7 +20,7 @@ export type ExternalToken = z.infer<typeof PinnedTokenWithPrices> &
 
 export type UniswapTradingConfig = {
   mode: TradingMode.Swap;
-  token: ExternalToken;
+  token: ExternalToken | LaunchpadToken;
   addressType: ChainBase;
 };
 
@@ -29,5 +31,28 @@ export type UniswapTradeTokenModalProps = {
 };
 
 export type UseUniswapTradeModalProps = {
+  ethChainId?: number | null;
+  rpcUrl?: string | null;
+  blockExplorerUrl?: string | null;
   tradeConfig: UniswapTradingConfig;
+};
+
+export type UniswapWidgetConfig = {
+  isReady: boolean;
+  provider?: Web3Provider;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  theme: any;
+  tokensList?: UniswapToken[];
+  defaultTokenAddress: {
+    input: string;
+    output: string;
+  };
+  convenienceFee: {
+    percentage: number;
+    recipient: Record<number, string>;
+  };
+  routerURLs: {
+    default: string;
+  };
+  connectWallet: () => Promise<boolean>;
 };

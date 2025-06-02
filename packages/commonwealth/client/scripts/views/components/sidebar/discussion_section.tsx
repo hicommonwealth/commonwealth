@@ -1,4 +1,5 @@
-import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
+import { generateUrlPartForTopicIdentifiers } from '@hicommonwealth/shared';
+import { useGetMembershipsQuery } from 'client/scripts/state/api/groups/getMemberships';
 import useUserStore from 'client/scripts/state/ui/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -76,10 +77,10 @@ export const DiscussionSection = ({
     apiEnabled: !!communityId,
   });
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
-    communityId,
+  const { data: memberships = [] } = useGetMembershipsQuery({
+    community_id: communityId,
     address: user.activeAccount?.address || '',
-    apiEnabled: !!communityId,
+    enabled: !!communityId,
   });
   const isTopicGated = (topicId: number) =>
     !!memberships.find((membership) =>
@@ -200,14 +201,18 @@ export const DiscussionSection = ({
         onClick: (e, toggle: boolean) => {
           e.preventDefault();
           resetSidebarState();
+          const identifier = generateUrlPartForTopicIdentifiers(
+            topic?.id,
+            topic.name,
+          );
           handleRedirectClicks(
             navigate,
             e,
-            `/discussions/${encodeURI(topic.name)}`,
+            `/discussions/${encodeURI(identifier)}`,
             communityId,
             () => {
               setDiscussionsToggleTree(
-                `children.${topic.name}.toggledState`,
+                `children.${identifier}.toggledState`,
                 toggle,
               );
             },

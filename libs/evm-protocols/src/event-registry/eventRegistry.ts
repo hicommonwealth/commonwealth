@@ -1,4 +1,5 @@
 import {
+  CommunityNominationsAbi,
   CommunityStakeAbi,
   ContestGovernorAbi,
   ContestGovernorSingleAbi,
@@ -16,6 +17,11 @@ type ContractAddresses = {
   [key in ValidChains]:
     | (typeof factoryContracts)[key]['factory']
     | (typeof factoryContracts)[key]['communityStake']
+    | (key extends keyof typeof factoryContracts
+        ? 'communityNomination' extends keyof (typeof factoryContracts)[key]
+          ? (typeof factoryContracts)[key]['communityNomination']
+          : never
+        : never)
     | (key extends keyof typeof factoryContracts
         ? 'launchpad' extends keyof (typeof factoryContracts)[key]
           ? (typeof factoryContracts)[key]['launchpad']
@@ -96,6 +102,15 @@ const namespaceFactorySource = {
   },
 } satisfies ContractSource;
 
+const communityNominationsSource = {
+  abi: CommunityNominationsAbi,
+  eventSignatures: [
+    EvmEventSignatures.CommunityNominations.NominatorSettled,
+    EvmEventSignatures.CommunityNominations.NominatorNominated,
+    EvmEventSignatures.CommunityNominations.JudgeNominated,
+  ],
+} satisfies ContractSource;
+
 const communityStakesSource = {
   abi: CommunityStakeAbi,
   eventSignatures: [EvmEventSignatures.CommunityStake.Trade],
@@ -151,6 +166,8 @@ export const EventRegistry = {
   },
   [ValidChains.SepoliaBase]: {
     [factoryContracts[ValidChains.SepoliaBase].factory]: namespaceFactorySource,
+    [factoryContracts[ValidChains.SepoliaBase].communityNomination]:
+      communityNominationsSource,
     [factoryContracts[ValidChains.SepoliaBase].communityStake]:
       communityStakesSource,
     [factoryContracts[ValidChains.SepoliaBase].launchpad]: launchpadSource,
@@ -202,10 +219,14 @@ export const EventRegistry = {
   [ValidChains.Anvil]: {
     [factoryContracts[ValidChains.Anvil].factory]: namespaceFactorySource,
     [factoryContracts[ValidChains.Anvil].communityStake]: communityStakesSource,
+    [factoryContracts[ValidChains.Anvil].communityNomination]:
+      communityNominationsSource,
     [factoryContracts[ValidChains.Anvil].launchpad]: launchpadSource,
     [factoryContracts[ValidChains.Anvil].lpBondingCurve]: lpBondingCurveSource,
     [factoryContracts[ValidChains.Anvil].tokenCommunityManager]:
       tokenCommunityManagerSource,
+    [factoryContracts[ValidChains.Anvil].referralFeeManager]:
+      referralFeeManagerSource,
     [factoryContracts[ValidChains.Anvil].veBridge]: tokenStakingSource,
   },
 } as const satisfies EventRegistryType;

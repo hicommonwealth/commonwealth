@@ -36,7 +36,10 @@ type CommonProps = {
   isLoggedIn: boolean;
   addressSelectorSelectedAddress: string | undefined;
   hasMagicWallet: boolean;
+  xpPoints: number;
+  xpReferrerPoints: number;
   referredByAddress?: string;
+  tier: number;
 };
 
 export type UserStoreProps = CommonProps & {
@@ -64,7 +67,10 @@ export const userStore = createStore<UserStoreProps>()(
     isLoggedIn: false,
     addressSelectorSelectedAddress: undefined,
     hasMagicWallet: false,
+    xpPoints: 0,
+    xpReferrerPoints: 0,
     referredByAddress: undefined,
+    tier: 0,
     // when logged-in, set the auth-user values
     setData: (data) => {
       if (Object.keys(data).length > 0) {

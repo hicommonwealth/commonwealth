@@ -5,7 +5,7 @@ import {
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
 import { Chance } from 'chance';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import {
@@ -228,7 +228,7 @@ describe('Quest lifecycle', () => {
           },
         }),
       ).rejects.toThrowError(
-        `Start date ${moment(now).format('YYYY-MM-DD')} already passed`,
+        `Start date ${dayjs(now).format('YYYY-MM-DD')} already passed`,
       );
     });
 
@@ -246,28 +246,6 @@ describe('Quest lifecycle', () => {
           quest_type: 'common',
         },
       });
-
-      await expect(
-        command(UpdateQuest(), {
-          actor: superadmin,
-          payload: {
-            quest_id: quest!.id!,
-            action_metas: [
-              {
-                event_name: 'CommentUpvoted',
-                reward_amount: 200,
-                participation_limit: QuestParticipationLimit.OncePerPeriod,
-                participation_period: QuestParticipationPeriod.Monthly,
-                participation_times_per_period: 3,
-                creator_reward_weight: 0.1,
-                content_id: 'comment:1000',
-              },
-            ],
-          },
-        }),
-      ).rejects.toThrowError(
-        `CommentUpvoted action must be scoped to a thread`,
-      );
 
       await expect(
         command(UpdateQuest(), {

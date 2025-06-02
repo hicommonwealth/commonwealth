@@ -49,6 +49,7 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      user_tier_at_creation: { type: Sequelize.INTEGER, allowNull: true },
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
@@ -79,7 +80,7 @@ export default (
       },
       search: {
         type: Sequelize.TSVECTOR,
-        allowNull: false,
+        allowNull: true,
       },
       content_url: { type: Sequelize.STRING, allowNull: true },
     },

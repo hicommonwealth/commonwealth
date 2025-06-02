@@ -1,7 +1,7 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
 import * as protocols from '@hicommonwealth/evm-protocols';
 import { config, equalEvmAddresses } from '@hicommonwealth/model';
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { ChainNodeAttributes } from '../../src';
@@ -32,6 +32,7 @@ describe('Launchpad Lifecycle', () => {
     });
 
     const [community] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       namespace: 'DogeMoonLanding',
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
@@ -81,7 +82,7 @@ describe('Launchpad Lifecycle', () => {
       parsedArgs: {
         namespace: community!.namespace!,
         tokenAddress: TOKEN_ADDRESS,
-        launchpadLiquidity: 1000n,
+        launchpadLiquidity: 594115082271506067334n,
         curveId: 1n,
         totalSupply: 1000n,
         reserveRation: 1n,
@@ -132,6 +133,7 @@ describe('Launchpad Lifecycle', () => {
 
     expect(equalEvmAddresses(results?.token_address, TOKEN_ADDRESS)).to.be.true;
     expect(results?.symbol).to.equal('DMLND');
+    expect(results?.creator_address).to.equal(actor.address);
   });
 
   test('Get a launchpad trade txn and project it', async () => {
@@ -147,7 +149,7 @@ describe('Launchpad Lifecycle', () => {
       eth_chain_id: protocols.commonProtocol.ValidChains.SepoliaBase,
       transaction_hash: TRADE_TOKEN_TXN_HASH,
       token_address: TOKEN_ADDRESS.toLowerCase(),
-      trader_address: '0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE',
+      trader_address: '0x2ce1f5d4f84b583ab320cac0948adde52a131fbe',
       is_buy: true,
       community_token_amount: '534115082271506067334',
       price: 3.98859030778e-7,

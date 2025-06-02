@@ -6,8 +6,14 @@ on:
       - frick
       - frack
       - beta
-      - demo
       - production
+      - master
+
+  workflow_run:
+    workflows:
+      - "Pre-Release Notes & Merge"  # Match the name in `cut_release.yml`
+    types:
+      - completed
 
 jobs:
   deploy:
@@ -16,7 +22,12 @@ jobs:
       - name: Set Heroku app name based on branch
         id: set-heroku-app-name
         run: |
-          BRANCH_NAME=${GITHUB_REF##*/}
+          if [ "${{ github.event_name }}" == "workflow_run" ]; then
+            BRANCH_NAME="beta" 
+          else
+            BRANCH_NAME=${GITHUB_REF##*/}
+          fi
+          
           case $BRANCH_NAME in
             frick)
               APP_NAME="commonwealth-frick"
@@ -27,7 +38,7 @@ jobs:
             beta)
               APP_NAME="commonwealth-beta"
               ;;
-            demo)
+            master)
               APP_NAME="commonwealth-demo"
               ;;
             production)

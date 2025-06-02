@@ -55,7 +55,10 @@ export const KnockFeedWrapper = memo(function KnockFeedWrapper({
     return () => knock.teardown();
   }, [user.id, user.email, user.isLoggedIn, user.knockJWT]);
 
-  if (!user.id || !user.isLoggedIn || !user.knockJWT) return null;
+  if (!user.id || !user.isLoggedIn || !user.knockJWT) {
+    // Render children directly if user is not logged in or authenticated
+    return <>{children}</>;
+  }
 
   return (
     <KnockProvider

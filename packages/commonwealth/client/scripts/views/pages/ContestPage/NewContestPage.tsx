@@ -2,6 +2,8 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 
+import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import ContestCard from '../../components/ContestCard';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -44,6 +46,12 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
     sortedContests,
     contestAddress,
   );
+
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId() || '',
+    enabled: !!app.activeChainId(),
+    includeNodeInfo: true,
+  });
 
   const handleNavigateContest = (direction: 'prev' | 'next') => {
     const newIndex =
@@ -92,6 +100,13 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
                 contest?.contests?.[0]?.contest_balance || '0',
                 10,
               )}
+              community={{
+                name: community?.name || '',
+                iconUrl: community?.icon_url || '',
+                id: community?.id || '',
+                ethChainId: community?.ChainNode?.eth_chain_id || 0,
+                chainNodeUrl: community?.ChainNode?.url || '',
+              }}
             />
           )}
 
@@ -134,7 +149,7 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
           {address && (
             <CWMobileTab
               label={MobileTabType.TokenSwap}
-              icon="arrowClockwise"
+              icon="arrowsClockwise"
               isActive={selectedMobileTab === MobileTabType.TokenSwap}
               onClick={() => setSelectedMobileTab(MobileTabType.TokenSwap)}
             />

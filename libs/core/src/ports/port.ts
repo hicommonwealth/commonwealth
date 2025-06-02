@@ -259,6 +259,7 @@ export const cache = port(function cacheFactory(cacheAdapter?: Cache) {
       ready: () => Promise.resolve(true),
       isReady: () => true,
       getKey: () => Promise.resolve(''),
+      scan: () => Promise.resolve(null),
       setKey: () => Promise.resolve(false),
       getKeys: () => Promise.resolve(false),
       setKeys: () => Promise.resolve(false),
@@ -270,6 +271,26 @@ export const cache = port(function cacheFactory(cacheAdapter?: Cache) {
       decrementKey: () => Promise.resolve(0),
       getKeyTTL: () => Promise.resolve(0),
       setKeyTTL: () => Promise.resolve(false),
+      lpushAndTrim: () => Promise.resolve(0),
+      getList: () => Promise.resolve([]),
+
+      // hash
+      incrementHashKey: () => Promise.resolve(0),
+      getHash: () => Promise.resolve({}),
+      setHashKey: () => Promise.resolve(0),
+
+      // set
+      addToSet: () => Promise.resolve(0),
+      getSet: () => Promise.resolve([]),
+
+      // Sorted Set
+      sliceSortedSetWithScores: () => Promise.resolve([]),
+      sliceSortedSet: () => Promise.resolve([]),
+      getSortedSetSize: () => Promise.resolve(0),
+      delSortedSetItemsByRank: () => Promise.resolve(0),
+      addToSortedSet: () => Promise.resolve(0),
+      sortedSetPopMin: () => Promise.resolve([]),
+      delSortedSetItemsByValue: () => Promise.resolve(0),
     }
   );
 });

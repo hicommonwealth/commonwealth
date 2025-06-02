@@ -17,7 +17,7 @@ const XPProgressIndicator = ({
   mode = XPProgressIndicatorMode.Detailed,
   className,
 }: XPProgressIndicatorProps) => {
-  const { weeklyGoal } = useXPProgress();
+  const { weeklyGoal } = useXPProgress({ includeSystemQuests: true }); // dont show system quests in xp progression bar
 
   const user = useUserStore();
 
@@ -34,7 +34,7 @@ const XPProgressIndicator = ({
         >
           {mode === XPProgressIndicatorMode.Compact ? (
             <CWText type="b2" fontWeight="semiBold">
-              XP
+              Aura
             </CWText>
           ) : (
             <WeeklyProgressGoal

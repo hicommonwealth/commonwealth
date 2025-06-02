@@ -1,6 +1,7 @@
 export interface ActionStepProps {
   state: 'not-started' | 'completed' | 'loading';
   label: string;
+  description?: string;
   index: number;
   actionButton?: {
     label: string;

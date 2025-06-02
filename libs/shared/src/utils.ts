@@ -5,13 +5,18 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+import utc from 'dayjs/plugin/utc';
 import {
   CONTEST_FEE_PERCENT,
   PRODUCTION_DOMAIN,
   S3_ASSET_BUCKET_CDN,
   S3_RAW_ASSET_BUCKET_DOMAIN,
 } from './constants';
+
+dayjs.extend(isBetween);
+dayjs.extend(utc);
 
 /**
  * Decamelizes a string
@@ -40,15 +45,43 @@ export const slugify = (str: string): string => {
 };
 /* eslint-disable */
 
-export const splitAndDecodeURL = (locationPathname: string) => {
+export const generateTopicIdentifiersFromUrl = (url: string) => {
   //checks if a url is custom or not and decodes the url after splitting it
   //this is to check for malformed urls on a topics page in /discussions
-  const splitURLPath = locationPathname.split('/');
+  const urlObj = new URL(url);
+  const splitURLPath = urlObj.pathname.split('/');
+
+  const generateTopicIdentifiersFromUrlPart = (urlPart: string) => {
+    const topicIdentifier = decodeURIComponent(urlPart);
+    const [_topicIdOrName, ..._remainingTopicNameParts] =
+      topicIdentifier.split('-');
+    const joinedTopicNameParts = _remainingTopicNameParts.join('-');
+    const topicName = !!joinedTopicNameParts
+      ? joinedTopicNameParts
+      : _topicIdOrName; // for this case, it will have the topic name instead of id
+    const topicId: number | null =
+      !!_topicIdOrName && !!joinedTopicNameParts
+        ? parseInt(_topicIdOrName, 10)
+        : null;
+    return { topicName, topicId };
+  };
+
   if (splitURLPath[2] === 'discussions') {
-    return splitURLPath[3] ? decodeURIComponent(splitURLPath[3]) : null;
+    return splitURLPath[3]
+      ? generateTopicIdentifiersFromUrlPart(splitURLPath?.[3] || '')
+      : null;
   }
-  splitURLPath[1] === 'discussions';
-  return splitURLPath[2] ? decodeURIComponent(splitURLPath[2]) : null;
+
+  if (!splitURLPath[2]) return null;
+
+  return generateTopicIdentifiersFromUrlPart(splitURLPath?.[2] || '');
+};
+
+export const generateUrlPartForTopicIdentifiers = (
+  topicId: string | number | undefined,
+  topicName: string,
+) => {
+  return topicId ? `${topicId}-${topicName}` : `${topicName}`;
 };
 
 // WARN: Using process.env to avoid webpack failures
@@ -363,14 +396,16 @@ export function buildFarcasterContestFrameUrl(contestAddress: string) {
 }
 
 // Date utils
+export type UnitOfTime = 'day' | 'week' | 'month';
 export function isWithinPeriod(
   refDate: Date,
   targetDate: Date,
-  period: moment.unitOfTime.Base,
+  period: UnitOfTime,
 ): boolean {
-  const start = moment(refDate).startOf(period);
-  const end = moment(refDate).endOf(period);
-  return moment(targetDate).isBetween(start, end, null, '[]');
+  const ref = dayjs(refDate);
+  const start = ref.startOf(period);
+  const end = ref.endOf(period);
+  return dayjs(targetDate).isBetween(start, end, null, '[]');
 }
 
 export async function alchemyGetTokenPrices({
@@ -463,11 +498,15 @@ export const calculateNetContestBalance = (originalBalance: number) => {
 // returns array of prize amounts
 export const buildContestPrizes = (
   contestBalance: number,
+  prizePercentage?: number,
   payoutStructure?: number[],
   decimals?: number,
 ): string[] => {
-  // 10% fee deducted from prize pool
-  const netContestBalance = calculateNetContestBalance(Number(contestBalance));
+  let netContestBalance = calculateNetContestBalance(Number(contestBalance));
+  // for recurring contests, apply prize percentage
+  if (prizePercentage) {
+    netContestBalance = netContestBalance * (prizePercentage / 100);
+  }
   return netContestBalance && payoutStructure
     ? payoutStructure.map((percentage) => {
         const prize =
@@ -485,9 +524,10 @@ export const formatWeiToDecimal = (wei: string): string => {
 
 export const formatDecimalToWei = (
   decimal: string,
+  numDecimals: number = 18,
   defaultValue: number = 0,
 ): string => {
-  const value = parseFloat(decimal) * 10 ** 18;
+  const value = parseFloat(decimal) * 10 ** numDecimals;
   return (value || defaultValue).toString();
 };
 
@@ -524,3 +564,14 @@ export function serializeBigIntObj(
 
   return traverse(obj) as Record<string | number | symbol, unknown>;
 }
+
+export type TurnstileWidgetNames =
+  | 'create-community'
+  | 'create-thread'
+  | 'create-comment';
+
+export const CountAggregatorKeys = {
+  ThreadViewCount: 'thread_view_count',
+  CommunityProfileCount: 'community_profile_count_changed',
+  CommunityThreadCount: 'community_thread_count_changed',
+};

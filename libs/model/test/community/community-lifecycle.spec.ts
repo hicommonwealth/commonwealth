@@ -7,8 +7,14 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
+import { ChainEventPolicy, emitEvent } from '@hicommonwealth/model';
 import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { ChainBase, ChainType } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  ChainType,
+  CommunityTierMap,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
@@ -39,6 +45,7 @@ import type {
   TopicAttributes,
 } from '../../src/models';
 import { seed } from '../../src/tester';
+import { drainOutbox } from '../utils';
 
 const chance = Chance();
 
@@ -101,18 +108,35 @@ describe('Community lifecycle', () => {
     cosmosNode = _cosmosNode!;
     substrateNode = _substrateNode!;
 
-    const [superadmin] = await seed('User', { isAdmin: true });
-    const [admin] = await seed('User', { isAdmin: false });
-    const [member] = await seed('User', { isAdmin: false });
-    const [cosmosMember] = await seed('User', { isAdmin: false });
-    const [substrateMember] = await seed('User', { isAdmin: false });
+    const [superadmin] = await seed('User', {
+      isAdmin: true,
+      tier: UserTierMap.ManuallyVerified,
+    });
+    const [admin] = await seed('User', {
+      isAdmin: false,
+      tier: UserTierMap.ManuallyVerified,
+    });
+    const [member] = await seed('User', {
+      isAdmin: false,
+      tier: UserTierMap.ManuallyVerified,
+    });
+    const [cosmosMember] = await seed('User', {
+      isAdmin: false,
+      tier: UserTierMap.ManuallyVerified,
+    });
+    const [substrateMember] = await seed('User', {
+      isAdmin: false,
+      tier: UserTierMap.ManuallyVerified,
+    });
 
     const [ethBase] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: _ethNode!.id!,
       base: ChainBase.Ethereum,
       active: true,
       lifetime_thread_count: 0,
       profile_count: 1,
+      allow_tokenized_threads: true,
       Addresses: [
         {
           role: 'member',
@@ -135,6 +159,7 @@ describe('Community lifecycle', () => {
     });
 
     const [cosmosBase] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: _cosmosNode!.id!,
       base: ChainBase.CosmosSDK,
       active: true,
@@ -162,6 +187,7 @@ describe('Community lifecycle', () => {
     });
 
     const [substrateBase] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: _substrateNode!.id!,
       base: ChainBase.Substrate,
       active: true,
@@ -255,6 +281,7 @@ describe('Community lifecycle', () => {
           directory_page_enabled: false,
           tags: [],
           chain_node_id: ethNode.id!,
+          allow_tokenized_threads: true,
         },
       });
       expect(eth_result?.community?.id).toBe(eth_name);
@@ -467,6 +494,7 @@ describe('Community lifecycle', () => {
             description: 'abc',
             featured_in_sidebar: false,
             featured_in_new_post: false,
+            allow_tokenized_threads: true,
           },
         }),
       ).rejects.toThrow('User is not admin in the community');
@@ -483,6 +511,7 @@ describe('Community lifecycle', () => {
           description: 'bbb',
           featured_in_sidebar: false,
           featured_in_new_post: false,
+          allow_tokenized_threads: true,
         },
       });
       expect(result).to.haveOwnProperty('topic');
@@ -512,6 +541,7 @@ describe('Community lifecycle', () => {
           featured_in_sidebar: false,
           featured_in_new_post: false,
           weighted_voting: TopicWeightedVoting.Stake,
+          allow_tokenized_threads: true,
         },
       });
       const { topic } = result!;
@@ -556,6 +586,18 @@ describe('Community lifecycle', () => {
         },
       }))!;
       expect(updatedTopic.description).to.eq('newDesc by system actor');
+    });
+
+    test('Ensure not supplying allow_tokenized_threads does not override old value', async () => {
+      const { topic: updatedTopic } = (await command(UpdateTopic(), {
+        actor: systemActor({}),
+        payload: {
+          topic_id: createdTopic.id!,
+          community_id: community.id,
+          description: 'newDesc by system actor',
+        },
+      }))!;
+      expect(updatedTopic.allow_tokenized_threads).to.eq(true);
     });
 
     test('should archive a topic', async () => {
@@ -672,6 +714,22 @@ describe('Community lifecycle', () => {
       assert.equal(updated?.type, 'offchain');
     });
 
+    test('ensure update community does not override allow_tokenized_threads', async () => {
+      const updated = await command(UpdateCommunity(), {
+        actor: ethAdminActor,
+        payload: {
+          ...baseRequest,
+          community_id: community.id,
+          chain_node_id: ethNode.id,
+          directory_page_enabled: true,
+          directory_page_chain_node_id: ethNode.id,
+          type: ChainType.Offchain,
+        },
+      });
+
+      assert.equal(updated?.allow_tokenized_threads, true);
+    });
+
     test('should remove directory', async () => {
       const updated = await command(UpdateCommunity(), {
         actor: ethAdminActor,
@@ -773,7 +831,7 @@ describe('Community lifecycle', () => {
             community_id: community.id,
           },
         }),
-      ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
+      ).rejects.toThrow();
     });
 
     test('should join Ethereum community with evm compatible address', async () => {
@@ -905,6 +963,89 @@ describe('Community lifecycle', () => {
           payload: { address: ethActor.address!, community_id: community.id! },
         }),
       ).rejects.toThrow(BanAddressErrors.AlreadyExists);
+    });
+  });
+  describe('namespace', () => {
+    test('should set namespace creator address on NamespaceDeployed event', async () => {
+      const namespaceAddress =
+        '0x1235761A3770DdceED4156E2Fb603072a34044d9' as `0x${string}`;
+
+      const namespaceCreatorAddress =
+        '0x2345761A3770DdceED4156E2Fb603072a34044d9' as `0x${string}`;
+
+      await models.Community.update(
+        {
+          namespace_address: namespaceAddress,
+        },
+        {
+          where: {
+            id: community.id,
+          },
+        },
+      );
+
+      const namespaceDeployedPayload = {
+        block: {
+          hash: '0xf26c4aeb50fb6350e280c2443b086ef8034a8c81ea49f7483862c928541468dc',
+          miner: '0x4200000000000000000000000000000000000011',
+          nonce: '0x0000000000000000',
+          number: '27208156',
+          gasLimit: '112000000',
+          logsBloom:
+            '0xeb31f7dabdd3d8b9ceebf798ee0bfb46f7f5febf3dfbdfcf62c706aeabff9f57df7afbee17b8fdbe3e5afe5ffec77ffe63fddebfd5bf72ceeeebf6fff7bca7dee56feebee7ffce5ed3cddfeff76efbbc85dffdeddefdcaff37fafdd0bff9ff6ff7ec7ef5bedcb7e2f1e6dfeeff6eddbff76fff63acffdfec77feda5ef7bfb6fa76976be7ddf97e5b47afcfbfb74f0edf6dfbd76bedfdeca8f0ffdf7e74f5f53e9fcbfff7eab5bcdaeff0d3773fedd4cf7d97fd7b22df7d7f9dff67dffdfec9d7cc777d7fefcb6d6fbdebdeffaffb15da5ebaf35ef77cff3efb79dfdeeefcefe7c77699f94dfffbf7f9f76feedf87eff4fbf6defe7f726edaff57cf54eeefee7f',
+          timestamp: '1741205659',
+          parentHash:
+            '0x3ae6e694f44c7827c498abdb8bbfbcd75ef88dc7fb382681aa87da2cbc2b2708',
+        },
+        rawLog: {
+          data: '0x00000000000000000000000000000000000000000000000000000000000000a00000000000000000000000007485761a3770ddceed4156e2fb603072a34044d900000000000000000000000000000000000000000000000000000000000000e00000000000000000000000007485761a3770ddceed4156e2fb603072a34044d90000000000000000000000009e091d81053af8f6dce46d42e5c04a4a8f0f0cba000000000000000000000000000000000000000000000000000000000000000561737261660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+          topics: [
+            '0xc8451dcd95e7ca3d8608dfc9d43e7bf4187f43cf5e07d5143b6c2be3cf73d175',
+          ],
+          address: '0xedf43c919f59900c82d963e99d822da3f95575ea',
+          removed: false,
+          logIndex: 701,
+          blockHash:
+            '0xf26c4aeb50fb6350e280c2443b086ef8034a8c81ea49f7483862c928541468dc',
+          blockNumber: '27208156',
+          transactionHash:
+            '0x1b4523eddb2ad5904b8b0b5b9ae4cf3d5b6d4853c6dccf1c9a0d118f2c3abc38',
+          transactionIndex: 357,
+        },
+        parsedArgs: {
+          name: 'asraf',
+          _signature: '0x' as `0x${string}`,
+          _feeManager:
+            '0x7485761A3770DdceED4156E2Fb603072a34044d9' as `0x${string}`,
+          nameSpaceAddress: namespaceAddress as `0x${string}`,
+          _namespaceDeployer: namespaceCreatorAddress as `0x${string}`,
+        },
+        eventSource: {
+          ethChainId: 8453,
+          eventSignature:
+            '0xc8451dcd95e7ca3d8608dfc9d43e7bf4187f43cf5e07d5143b6c2be3cf73d175',
+        },
+      };
+
+      await emitEvent(models.Outbox, [
+        {
+          event_name: 'NamespaceDeployed',
+          event_payload: namespaceDeployedPayload as any,
+        },
+      ]);
+      await drainOutbox(['NamespaceDeployed'], ChainEventPolicy);
+
+      const communityAfterNamespaceDeployed = await models.Community.findOne({
+        where: {
+          id: community.id,
+        },
+      });
+      expect(communityAfterNamespaceDeployed?.namespace_address).toBe(
+        namespaceAddress,
+      );
+      expect(communityAfterNamespaceDeployed?.namespace_creator_address).toBe(
+        namespaceCreatorAddress,
+      );
     });
   });
 });

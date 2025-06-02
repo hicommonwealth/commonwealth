@@ -5,17 +5,20 @@ import './XPExplainerCard.scss';
 const XPExplainerCard = () => {
   return (
     <section className="XPExplainerCard">
-      <CWText type="h4">What is XP?</CWText>
+      <CWText type="h4">What is Aura?</CWText>
       <CWText type="b2">
-        Experience Points (XP) are what Common users earn when they engage on
-        the platform, play games on our Telegram Bot, and complete quests from
-        the communities they&apos;re apart of!
+        Aura is what Common users earn when they engage on the platform, play
+        games on our Telegram Bot, and complete quests from the communities you
+        join!
         <br />
         <br />
-        XP can be converted to community tokens, which in turn hold real
-        value.&nbsp;
-        <a href="#" target="_blank" rel="noopener noreferrer" className="link">
-          Learn more about ways to earn XP here.
+        <a
+          href="https://blog.common.xyz/what-is-common-aura/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="link"
+        >
+          Learn more about ways to earn Aura here.
         </a>
       </CWText>
     </section>

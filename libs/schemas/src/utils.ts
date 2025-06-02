@@ -40,15 +40,22 @@ export const linksSchema = {
 
 export const PG_INT = z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT);
 
-export const PG_ETH = z.bigint().min(MIN_SCHEMA_ETH).max(MAX_SCHEMA_ETH);
+export const PG_ETH = z.coerce.bigint().min(MIN_SCHEMA_ETH).max(MAX_SCHEMA_ETH);
 
 export const zBoolean = z.preprocess((v) => v && v !== 'false', z.boolean());
 
-export const EVM_ADDRESS = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
+export const EVM_ADDRESS_STRICT_REGEX = /^0x[0-9a-fA-F]{40}$/;
+
+export const EVM_EVENT_SIGNATURE_STRICT_REGEX = /^0x[0-9a-fA-F]{64}$/;
+
+export const EVM_ADDRESS = z.string().regex(EVM_ADDRESS_STRICT_REGEX);
 
 // Primarily used by Viem since they return strict `0x${string}` types instead of `string`
 export const EVM_ADDRESS_STRICT = z.custom<`0x${string}`>((val) =>
-  /^0x[0-9a-fA-F]{40}$/.test(val as string),
+  EVM_ADDRESS_STRICT_REGEX.test(val as string),
+);
+export const EVM_EVENT_SIGNATURE_STRICT = z.custom<`0x${string}`>((val) =>
+  EVM_EVENT_SIGNATURE_STRICT_REGEX.test(val as string),
 );
 export const EVM_BYTES = z.custom<`0x${string}`>((val) =>
   /^0x[0-9a-fA-F]*$/.test(val as string),

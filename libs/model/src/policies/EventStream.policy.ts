@@ -2,13 +2,16 @@ import {
   cache,
   CacheNamespaces,
   config,
+  InvalidState,
   logger,
   Policy,
 } from '@hicommonwealth/core';
+import * as evm from '@hicommonwealth/evm-protocols';
 import {
   Community,
   ContestManager,
   events,
+  LaunchpadToken,
   Thread,
 } from '@hicommonwealth/schemas';
 import {
@@ -16,7 +19,6 @@ import {
   buildContestLeaderboardUrl,
   getBaseUrl,
 } from '@hicommonwealth/shared';
-import { Mutex } from 'async-mutex';
 import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
@@ -25,28 +27,41 @@ import { buildThreadContentUrl } from '../utils';
 const log = logger(import.meta);
 
 export const EVENT_STREAM_WINDOW_SIZE = 50;
+export const EVENT_STREAM_FN_CACHE_KEY = 'EVENT_STREAM';
 
 // lists all the events that can be added to the event stream
 const EventStreamSchemas = {
   ContestStarted: {
     input: events.ContestStarted,
-    output: ContestManager.extend({}),
+    output: ContestManager,
   },
   ContestEnding: {
     input: events.ContestEnding,
-    output: ContestManager.extend({}),
+    output: ContestManager,
   },
   ContestEnded: {
     input: events.ContestEnded,
-    output: ContestManager.extend({}),
+    output: ContestManager,
   },
   CommunityCreated: {
     input: events.CommunityCreated,
-    output: Community.extend({}),
+    output: Community,
   },
   ThreadCreated: {
     input: events.ThreadCreated,
-    output: Thread.extend({}),
+    output: Thread,
+  },
+  LaunchpadTokenCreated: {
+    input: events.LaunchpadTokenCreated,
+    output: LaunchpadToken,
+  },
+  LaunchpadTokenTraded: {
+    input: events.LaunchpadTokenTraded,
+    output: LaunchpadToken,
+  },
+  LaunchpadTokenGraduated: {
+    input: events.LaunchpadTokenGraduated,
+    output: LaunchpadToken,
   },
 } as const;
 
@@ -135,6 +150,76 @@ const eventStreamMappers: EventStreamMappers = {
       url: threadUrl,
     };
   },
+  LaunchpadTokenCreated: async (payload) => {
+    const { eth_chain_id, transaction_hash } = payload;
+    const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
+      where: { eth_chain_id },
+      attributes: ['eth_chain_id', 'url', 'private_url'],
+    });
+    mustExist('Chain Node', chainNode);
+    const tokenData = await evm.getLaunchpadTokenCreatedTransaction({
+      rpc: chainNode.private_url! || chainNode.url!,
+      transactionHash: transaction_hash,
+    });
+    if (!tokenData) {
+      throw new InvalidState('Transaction not found');
+    }
+    const launchpadToken = await models.LaunchpadToken.findOne({
+      where: { token_address: tokenData.parsedArgs.tokenAddress },
+    });
+    mustExist('LaunchpadToken', launchpadToken);
+    const community = await models.Community.findOne({
+      where: { namespace: launchpadToken.namespace },
+    });
+    mustExist('Community', community);
+    const communityUrl = buildCommunityUrl(
+      getBaseUrl(config.APP_ENV),
+      community.id,
+    );
+    return {
+      type: 'LaunchpadTokenCreated',
+      data: launchpadToken.get({ plain: true }),
+      url: communityUrl,
+    };
+  },
+  LaunchpadTokenTraded: async (payload) => {
+    const launchpadToken = await models.LaunchpadToken.findOne({
+      where: { token_address: payload.token_address },
+    });
+    mustExist('LaunchpadToken', launchpadToken);
+    const community = await models.Community.findOne({
+      where: { namespace: launchpadToken.namespace },
+    });
+    mustExist('Community', community);
+    const communityUrl = buildCommunityUrl(
+      getBaseUrl(config.APP_ENV),
+      community.id,
+    );
+    return {
+      type: 'LaunchpadTokenTraded',
+      data: launchpadToken.get({ plain: true }),
+      url: communityUrl,
+    };
+  },
+  LaunchpadTokenGraduated: async (payload) => {
+    const launchpadToken = await models.LaunchpadToken.findOne({
+      where: { token_address: payload.token.token_address },
+    });
+    mustExist('LaunchpadToken', launchpadToken);
+    const community = await models.Community.findOne({
+      where: { namespace: launchpadToken.namespace },
+    });
+    mustExist('Community', community);
+    const communityUrl = buildCommunityUrl(
+      getBaseUrl(config.APP_ENV),
+      community.id,
+    );
+    return {
+      type: 'LaunchpadTokenGraduated',
+      data: launchpadToken.get({ plain: true }),
+      url: communityUrl,
+    };
+  },
 };
 
 export function EventStreamPolicy(): Policy<{
@@ -147,26 +232,48 @@ export function EventStreamPolicy(): Policy<{
       ContestEnded: EventStreamSchemas.ContestEnded.input,
       CommunityCreated: EventStreamSchemas.CommunityCreated.input,
       ThreadCreated: EventStreamSchemas.ThreadCreated.input,
+      LaunchpadTokenCreated: EventStreamSchemas.LaunchpadTokenCreated.input,
+      LaunchpadTokenTraded: EventStreamSchemas.LaunchpadTokenTraded.input,
+      LaunchpadTokenGraduated: EventStreamSchemas.LaunchpadTokenGraduated.input,
     },
     body: {
       ContestStarted: async ({ payload }) => {
-        await addToEventStream(
+        await pushToEventStream(
           await eventStreamMappers.ContestStarted(payload),
         );
       },
       ContestEnding: async ({ payload }) => {
-        await addToEventStream(await eventStreamMappers.ContestEnding(payload));
+        await pushToEventStream(
+          await eventStreamMappers.ContestEnding(payload),
+        );
       },
       ContestEnded: async ({ payload }) => {
-        await addToEventStream(await eventStreamMappers.ContestEnded(payload));
+        await pushToEventStream(await eventStreamMappers.ContestEnded(payload));
       },
       CommunityCreated: async ({ payload }) => {
-        await addToEventStream(
+        await pushToEventStream(
           await eventStreamMappers.CommunityCreated(payload),
         );
       },
       ThreadCreated: async ({ payload }) => {
-        await addToEventStream(await eventStreamMappers.ThreadCreated(payload));
+        await pushToEventStream(
+          await eventStreamMappers.ThreadCreated(payload),
+        );
+      },
+      LaunchpadTokenCreated: async ({ payload }) => {
+        await pushToEventStream(
+          await eventStreamMappers.LaunchpadTokenCreated(payload),
+        );
+      },
+      LaunchpadTokenTraded: async ({ payload }) => {
+        await pushToEventStream(
+          await eventStreamMappers.LaunchpadTokenTraded(payload),
+        );
+      },
+      LaunchpadTokenGraduated: async ({ payload }) => {
+        await pushToEventStream(
+          await eventStreamMappers.LaunchpadTokenGraduated(payload),
+        );
       },
     },
   };
@@ -186,51 +293,36 @@ export type EventStreamMappers = {
   ) => Promise<EventStreamItem<K>>;
 };
 
-const eventStreamMutex = new Mutex();
-
-const addToEventStream = async (
-  eventToAdd: EventStreamItem<keyof typeof EventStreamSchemas>,
-) => {
-  await eventStreamMutex.runExclusive(async () => {
-    const oldEventStream = await getEventStream();
-    const newEventStream = [...oldEventStream, eventToAdd];
-    if (newEventStream.length > EVENT_STREAM_WINDOW_SIZE) {
-      newEventStream.shift();
-    }
-    await setEventStream(newEventStream);
-  });
-};
-
-export const EVENT_STREAM_FN_CACHE_KEY = 'EVENT_STREAM';
+export const getEventStreamCacheKey = () => EVENT_STREAM_FN_CACHE_KEY;
 
 export const getEventStream = async (): Promise<
   EventStreamItem<keyof typeof EventStreamSchemas>[]
 > => {
   try {
-    const cachedEventStream = await cache().getKey(
+    const items = await cache().getList(
       CacheNamespaces.Function_Response,
-      EVENT_STREAM_FN_CACHE_KEY,
+      getEventStreamCacheKey(),
+      0,
+      EVENT_STREAM_WINDOW_SIZE - 1,
     );
-    if (cachedEventStream) {
-      return JSON.parse(cachedEventStream);
-    }
-    return [];
+    return items.map((item) => JSON.parse(item));
   } catch (err) {
     log.error(`Error getting event stream from cache`, err as Error);
     return [];
   }
 };
 
-const setEventStream = async (
-  eventStream: EventStreamItem<keyof typeof EventStreamSchemas>[],
+const pushToEventStream = async (
+  eventItem: EventStreamItem<keyof typeof EventStreamSchemas>,
 ) => {
   try {
-    await cache().setKey(
+    await cache().lpushAndTrim(
       CacheNamespaces.Function_Response,
-      EVENT_STREAM_FN_CACHE_KEY,
-      JSON.stringify(eventStream),
+      getEventStreamCacheKey(),
+      JSON.stringify(eventItem),
+      EVENT_STREAM_WINDOW_SIZE,
     );
   } catch (err) {
-    log.error(`Error setting event stream in cache`, err as Error);
+    log.error(`Error adding to event stream in cache`, err as Error);
   }
 };

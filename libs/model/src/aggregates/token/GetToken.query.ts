@@ -11,7 +11,7 @@ export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { community_id, with_stats } = payload;
+      const { community_id, thread_id, with_stats } = payload;
 
       const community = await models.Community.findOne({
         where: {
@@ -24,6 +24,19 @@ export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
         return null;
       }
 
+      const threadTokenSql = `
+        JOIN "Threads" AS TT ON TT.launchpad_token_address = T.token_address
+        WHERE TT.thread_id = :threadId
+      `;
+
+      const replacements = community_id
+        ? {
+            namespace: community.namespace,
+          }
+        : {
+            threadId: thread_id,
+          };
+
       const sql = `
           ${
             with_stats
@@ -32,7 +45,7 @@ export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
                     ORDER BY token_address, timestamp DESC),
                     older_trades AS (SELECT DISTINCT ON (token_address) *
                       FROM "LaunchpadTrades"
-                      WHERE timestamp >=
+                      WHERE timestamp <=
                             (SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP - INTERVAL '24 hours'))
                       ORDER BY token_address, timestamp ASC),
                     trades AS (SELECT lt.token_address,
@@ -46,15 +59,13 @@ export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
           SELECT T.*${with_stats ? ', trades.latest_price, trades.old_price' : ''}
           FROM "LaunchpadTokens" as T
           ${with_stats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
-          WHERE T.namespace = :namespace;
+          ${community_id ? 'WHERE T.namespace = :namespace' : threadTokenSql};
       `;
 
       const token = await models.sequelize.query<
         z.infer<typeof schemas.TokenView>
       >(sql, {
-        replacements: {
-          namespace: community.namespace,
-        },
+        replacements,
         type: QueryTypes.SELECT,
       });
       if (!token || !Array.isArray(token) || token.length !== 1) return null;

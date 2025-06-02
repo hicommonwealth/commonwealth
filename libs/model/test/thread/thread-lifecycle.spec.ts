@@ -26,8 +26,10 @@ import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
+  CommunityTierMap,
   MAX_COMMENT_DEPTH,
   MAX_TRUNCATED_CONTENT_LENGTH,
+  UserTierMap,
 } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { z } from 'zod';
@@ -98,8 +100,14 @@ describe('Thread lifecycle', () => {
     const users = await seedRecord('User', roles, (role) => ({
       profile: { name: role },
       isAdmin: role === 'admin',
+      tier:
+        role === 'member'
+          ? UserTierMap.NewlyVerifiedWallet
+          : UserTierMap.ManuallyVerified,
     }));
     const [_community] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
+      spam_tier_level: UserTierMap.NewlyVerifiedWallet,
       chain_node_id: node!.id!,
       namespace_address: '0x123',
       active: true,
@@ -274,6 +282,11 @@ describe('Thread lifecycle', () => {
           });
           expect(_thread?.title).to.equal(instancePayload.title);
           expect(_thread?.stage).to.equal(instancePayload.stage);
+          if (role === 'member')
+            // below spam tier level
+            expect(_thread?.marked_as_spam_at).to.be.toBeDefined();
+          else expect(_thread?.marked_as_spam_at).to.be.toBeNull();
+
           // capture as admin author for other tests
           if (!thread) thread = _thread!;
 
@@ -476,6 +489,22 @@ describe('Thread lifecycle', () => {
       expect(updated?.marked_as_spam_at).toBeDefined;
     });
 
+    test('should update launchpad_token_address and is_linking_token', async () => {
+      const body = {
+        is_linking_token: true,
+        launchpad_token_address: '0x0',
+      };
+      const updated = await command(UpdateThread(), {
+        actor: actors.admin,
+        payload: {
+          thread_id: thread.id!,
+          ...body,
+        },
+      });
+      expect(updated?.is_linking_token).to.eq(true);
+      expect(updated?.launchpad_token_address).to.eq('0x0');
+    });
+
     test('should fail when collaborator actor non admin/moderator', async () => {
       await expect(
         command(UpdateThread(), {
@@ -611,6 +640,7 @@ describe('Thread lifecycle', () => {
         body: body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
         community_id: thread!.community_id,
       });
+      expect(firstComment?.marked_as_spam_at).toBeDefined();
       expect(firstComment?.content_url).toBeTruthy();
       expect(
         await blobStorage({ key: R2_ADAPTER_KEY }).exists({

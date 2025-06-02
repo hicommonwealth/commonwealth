@@ -1,4 +1,5 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, DefaultPage } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import { isS3URL } from 'helpers/awsHelpers';
@@ -22,6 +23,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import TokenLaunchButton from 'views/components/sidebar/TokenLaunchButton';
+import { useTurnstile } from 'views/components/useTurnstile';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import useCreateTokenCommunity from '../useCreateTokenCommunity';
 import './QuickTokenLaunchForm.scss';
@@ -36,6 +38,7 @@ type QuickTokenLaunchFormProps = {
   onCommunityCreated: (communityId: string) => void;
   initialIdeaPrompt?: string;
   generateIdeaOnMount?: boolean;
+  isSmallScreen?: boolean;
 };
 
 const MAX_IDEAS_LIMIT = 5;
@@ -45,7 +48,19 @@ export const QuickTokenLaunchForm = ({
   onCommunityCreated,
   initialIdeaPrompt,
   generateIdeaOnMount = false,
+  isSmallScreen = false,
 }: QuickTokenLaunchFormProps) => {
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+
+  const {
+    turnstileToken,
+    isTurnstileEnabled,
+    TurnstileWidget,
+    resetTurnstile,
+  } = useTurnstile({
+    action: 'create-community',
+  });
+
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const {
     generateIdea,
@@ -178,6 +193,7 @@ export const QuickTokenLaunchForm = ({
                 prompt: `Generate an image for a web3 token named "${
                   sanitizedTokenInfo.name
                 }" having a ticker/symbol of "${sanitizedTokenInfo.symbol}"`,
+                model: 'runware:100@1',
               });
           }
 
@@ -199,27 +215,30 @@ export const QuickTokenLaunchForm = ({
               iconUrl: generatedCommunityInfo.communityProfileImageURL,
               socialLinks: [],
               chainNodeId: baseNode.id,
+              tokenizeCommunity: tokenizedThreadsEnabled ? true : false,
+              turnstileToken: turnstileToken || undefined,
             });
-            const response = await createCommunityMutation(communityPayload)
-              .then(() => true)
-              .catch((e) => {
-                const errorMsg = e?.message?.toLowerCase() || '';
-                if (
-                  !(
-                    errorMsg.includes('name') &&
-                    errorMsg.includes('already') &&
-                    errorMsg.includes('exists')
-                  )
-                ) {
-                  // this is not a unique community name error, abort token creation
-                  return 'invalid_state';
-                }
-                return false;
-              });
 
-            if (response === 'invalid_state') return;
+            let response;
+            try {
+              response = await createCommunityMutation(communityPayload);
+            } catch (e) {
+              const errorMsg = e?.message?.toLowerCase() || '';
+              if (
+                errorMsg.includes('name') &&
+                errorMsg.includes('already') &&
+                errorMsg.includes('exists')
+              ) {
+                // this is not a unique community name error, abort token creation
+                response = 'invalid_state';
+              }
+            }
+            if (response === 'invalid_state') {
+              notifyError('Community name already taken.');
+              return;
+            }
 
-            if (response === true) {
+            if (response) {
               // store community id for this submitted token info, incase user submits
               // the form again we won't create another community for the same token info
               setCreatedCommunityIdsToTokenInfoMap((prev) => ({
@@ -279,11 +298,16 @@ export const QuickTokenLaunchForm = ({
           ...(sanitizedTokenInfo.imageURL && {
             icon_url: sanitizedTokenInfo.imageURL,
           }),
+          default_page: DefaultPage.Homepage,
+          launchpad_weighted_voting: true,
         }).catch(() => undefined); // failure of this call shouldn't break this handler
 
         setCreatedCommunityId(communityId);
         onCommunityCreated(communityId);
       } catch (e) {
+        if (isTurnstileEnabled) {
+          resetTurnstile();
+        }
         console.error(`Error creating token: `, e, e.name);
 
         if (e?.name === 'TransactionBlockTimeoutError') {
@@ -294,6 +318,10 @@ export const QuickTokenLaunchForm = ({
             .includes('user denied transaction signature')
         ) {
           notifyError('Transaction rejected!');
+        } else if (
+          e?.data?.message?.toLowerCase().includes('insufficient funds')
+        ) {
+          notifyError('Insufficient funds to launch token!');
         } else {
           notifyError('Failed to create token!');
         }
@@ -388,6 +416,8 @@ export const QuickTokenLaunchForm = ({
         </CWText>
       )}
 
+      {isTurnstileEnabled && <TurnstileWidget />}
+
       {isCreatingQuickToken && <CWCircleMultiplySpinner />}
 
       {createdCommunityId ? (
@@ -405,9 +435,11 @@ export const QuickTokenLaunchForm = ({
           {...(generatedTokenIdea?.chunkingField && {
             focusField: generatedTokenIdea.chunkingField,
           })}
-          {...(generatedTokenIdea?.token && {
-            forceFormValues: generatedTokenIdea?.token,
-          })}
+          forceFormValues={{
+            ...generatedTokenIdea?.token,
+            description:
+              initialIdeaPrompt || generatedTokenIdea?.token?.description || '',
+          }}
           containerClassName={clsx('shortened-token-information-form', {
             'display-none': isCreatingQuickToken,
           })}
@@ -427,7 +459,7 @@ export const QuickTokenLaunchForm = ({
             <>
               <CWBanner
                 type="info"
-                body={`Launching token will create a complimentary community. 
+                body={`Launching token will create a complimentary community.
                         You can edit your community post launch.`}
               />
               <div className="cta-elements">
@@ -455,7 +487,7 @@ export const QuickTokenLaunchForm = ({
                       >
                         <CWButton
                           iconLeft="brain"
-                          label="Randomize"
+                          label={isSmallScreen ? 'Random' : 'Randomize'}
                           containerClassName="ml-auto"
                           type="button"
                           disabled={
@@ -473,7 +505,7 @@ export const QuickTokenLaunchForm = ({
                 ) : (
                   <CWButton
                     iconLeft="brain"
-                    label="Randomize"
+                    label={isSmallScreen ? 'Random' : 'Randomize'}
                     containerClassName="ml-auto"
                     type="button"
                     disabled={
@@ -488,8 +520,9 @@ export const QuickTokenLaunchForm = ({
                 )}
 
                 <TokenLaunchButton
-                  buttonWidth="wide"
+                  buttonWidth="narrow"
                   buttonType="submit"
+                  buttonLabel={isSmallScreen ? 'Launch' : 'Launch Token'}
                   disabled={
                     isProcessingProfileImage ||
                     isCreatingQuickToken ||

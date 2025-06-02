@@ -1,4 +1,4 @@
-import { stats } from '@hicommonwealth/core';
+import { middleware } from '@hicommonwealth/model';
 import {
   NextFunction,
   Request,
@@ -11,27 +11,6 @@ import { ValidationChain } from 'express-validator';
 const routesMethods: { [key: string]: string[] } = {};
 
 type ValidateThenHandle = [ValidationChain[], ...RequestHandler[]];
-
-// middleware to capture route traffic and latency
-const statsMiddleware = (method: string, path: string) => (req, res, next) => {
-  try {
-    const routePattern = `${method.toUpperCase()} ${path}`;
-    stats().increment('cw.path.called', {
-      path: routePattern,
-    });
-    const start = Date.now();
-    res.on('finish', () => {
-      const latency = Date.now() - start;
-      stats().histogram(`cw.path.latency`, latency, {
-        path: routePattern,
-        statusCode: `${res.statusCode}`,
-      });
-    });
-  } catch (err) {
-    console.error(err);
-  }
-  next();
-};
 
 /**
  * Use this function to register a route on a given Express Router. This function updates an object that stores the
@@ -50,7 +29,7 @@ export const registerRoute = (
   ...handlers: RequestHandler[] | ValidateThenHandle
 ) => {
   const realPath = `/api${path}`;
-  router[method](path, statsMiddleware(method, realPath), ...handlers);
+  router[method](path, ...handlers);
   if (!routesMethods[realPath]) routesMethods[realPath] = [];
   routesMethods[realPath].push(method.toUpperCase());
 };
@@ -71,5 +50,26 @@ export const methodNotAllowedMiddleware = () => {
     } else {
       return next();
     }
+  };
+};
+
+export const aiTieredMiddleware = (ai: {
+  images?: boolean;
+  text?: boolean;
+}) => {
+  return async (req: Request, _: Response, next: NextFunction) => {
+    const id = req.user?.id;
+    if (!id) throw Error('Unauthorized'); // this should never happen
+
+    await middleware.tiered({ ai })({
+      actor: { user: { id, email: '' } },
+      payload: {},
+    });
+
+    // increment in input middleware, even if request fails we still count it
+    ai.images && (await middleware.incrementUserCount(id, 'ai-images'));
+    ai.text && (await middleware.incrementUserCount(id, 'ai-text'));
+
+    next();
   };
 };

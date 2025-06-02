@@ -1,8 +1,15 @@
-import { WalletId, WalletSsoSource } from '@hicommonwealth/shared';
+import {
+  CommunityGoalTypes,
+  Roles,
+  WalletId,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
+import { NamespaceReferral } from '../commands/community.schemas';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
+import { LaunchpadToken } from '../entities/launchpad-token.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
@@ -99,8 +106,17 @@ export const events = {
   }),
 
   GroupCreated: z.object({
-    groupId: z.string(),
-    userId: z.string(),
+    community_id: z.string(),
+    group_id: z.number(),
+    creator_user_id: z.number(),
+    created_at: z.coerce.date(),
+  }),
+
+  RoleUpdated: z.object({
+    community_id: z.string(),
+    address: z.string(),
+    role: z.enum(Roles),
+    created_at: z.coerce.date(),
   }),
 
   UserMentioned: z.object({
@@ -117,6 +133,14 @@ export const events = {
     community_id: z.string(),
     user_id: z.number(),
     referrer_address: z.string().optional(),
+    social_links: z.array(z.string()).optional(),
+    created_at: z.coerce.date(),
+  }),
+
+  CommunityUpdated: z.object({
+    community_id: z.string(),
+    user_id: z.number(),
+    social_links: z.array(z.string().nullish()).optional(),
     created_at: z.coerce.date(),
   }),
 
@@ -197,7 +221,8 @@ export const events = {
     parent_channel_id: true,
   }),
 
-  CommonDiscordServerJoined: z.object({
+  DiscordServerJoined: z.object({
+    server_id: z.string(),
     user_id: z.number().nullish(),
     discord_username: z.string(),
     joined_date: z.coerce.date(),
@@ -212,6 +237,8 @@ export const events = {
       .int()
       .positive()
       .describe('Recurring constest interval'),
+    transaction_hash: z.string().describe('Transaction hash'),
+    eth_chain_id: z.number().int().positive().describe('Ethereum chain id'),
     block_number: z
       .number()
       .int()
@@ -223,6 +250,8 @@ export const events = {
     namespace: z.string().describe('Community namespace'),
     contest_address: z.string().describe('Contest manager address'),
     length: z.number().int().positive().describe('Length of contest in days'),
+    transaction_hash: z.string().describe('Transaction hash'),
+    eth_chain_id: z.number().int().positive().describe('Ethereum chain id'),
     block_number: z
       .number()
       .int()
@@ -370,6 +399,17 @@ export const events = {
     eth_chain_id: z.number(),
   }),
 
+  LaunchpadTokenGraduated: z.object({
+    token: LaunchpadToken.extend({}),
+    launchpadLiquidity: z.coerce.bigint(),
+    poolLiquidity: z.coerce.bigint(),
+    curveId: z.coerce.bigint(),
+    scalar: z.coerce.bigint(),
+    reserveRation: z.coerce.bigint(),
+    LPhook: z.string(),
+    funded: z.boolean(),
+  }),
+
   LaunchpadTokenTraded: z.object({
     block_timestamp: z.coerce.bigint(),
     transaction_hash: z.string(),
@@ -407,6 +447,7 @@ export const events = {
     new_user: z.boolean(),
     wallet_id: z.nativeEnum(WalletId),
     community_id: z.string(),
+    balance: z.string(),
     created_at: z.coerce.date(),
   }),
 
@@ -420,7 +461,7 @@ export const events = {
 
   XpChainEventCreated: z.object({
     eth_chain_id: z.number(),
-    quest_action_meta_id: z.number(),
+    quest_action_meta_ids: z.array(z.number()),
     transaction_hash: z.string(),
     created_at: z.coerce.date(),
   }),
@@ -476,5 +517,80 @@ export const events = {
       newAmount: z.coerce.bigint().describe('New amount'),
       newEnd: z.coerce.bigint().describe('New duration (in seconds)'),
     }),
+  }),
+
+  JudgeNominated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+      judge: EVM_ADDRESS_STRICT.describe('Judge address'),
+      judgeId: z.coerce.bigint().describe('Judge ID'),
+      nominator: EVM_ADDRESS_STRICT.describe('Nominator address'),
+      currentNominations: z.coerce
+        .bigint()
+        .describe('Current nomination count'),
+    }),
+  }).describe('Contest judge nominated'),
+
+  NominatorNominated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+      nominator: EVM_ADDRESS_STRICT.describe('Nominator address'),
+    }),
+  }).describe('Nomination token (ID 3) minted'),
+
+  NominatorSettled: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+    }),
+  }).describe('Nomination configured'),
+
+  NamespaceLinked: z.object({
+    namespace_address: z.string(),
+    deployer_address: z.string(),
+    community_id: z.string(),
+    referral: NamespaceReferral.optional(),
+    created_at: z.coerce.date(),
+  }),
+
+  CommunityGoalReached: z.object({
+    community_goal_meta_id: PG_INT,
+    goal_type: z.enum(CommunityGoalTypes),
+    community_id: z.string(),
+    created_at: z.coerce.date(),
+  }),
+
+  TweetEngagementCapReached: z.object({
+    quest_id: z.number(),
+    quest_ended: z.boolean(),
+    like_cap_reached: z.boolean().optional(),
+    retweet_cap_reached: z.boolean().optional(),
+    reply_cap_reached: z.boolean().optional(),
+  }),
+
+  CommunityTagsUpdated: z.object({
+    community_id: z.string(),
+    tag_ids: z.array(z.number()),
+    created_at: z.coerce.date(),
+  }),
+
+  MembershipsRefreshed: z.object({
+    community_id: z.string(),
+    membership: z
+      .object({
+        group_id: z.number(),
+        address_id: z.number(),
+        user_id: z.number(),
+        created: z.boolean(),
+        rejected: z.boolean().optional(),
+      })
+      .array(),
+    created_at: z.coerce.date(),
+  }),
+
+  CommunityDirectoryTagsUpdated: z.object({
+    community_id: z.string(),
+    tag_names: z.array(z.string()),
+    selected_community_ids: z.array(z.string()),
+    created_at: z.coerce.date(),
   }),
 } as const;

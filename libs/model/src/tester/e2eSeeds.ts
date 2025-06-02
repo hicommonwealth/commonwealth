@@ -1,4 +1,12 @@
-import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
+import { config } from '@hicommonwealth/core';
+import {
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+  CommunityTierMap,
+  DisabledCommunitySpamTier,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import type {
   AddressInstance,
   ChainNodeAttributes,
@@ -55,6 +63,7 @@ export const e2eTestEntities = async function (
                     avatar_url: `testAvatarUrl${-i - 1}`,
                     email: `test${-i - 1}@gmail.com`,
                   },
+                  tier: UserTierMap.ManuallyVerified,
                 },
               })
             )[0],
@@ -94,6 +103,8 @@ export const e2eTestEntities = async function (
         [
           {
             id: 'cmntest',
+            tier: CommunityTierMap.Unverified,
+            spam_tier_level: DisabledCommunitySpamTier,
             chain_node_id: 9999,
             name: 'cmntest',
             network: ChainNetwork.Ethereum,
@@ -104,9 +115,12 @@ export const e2eTestEntities = async function (
             active: true,
             default_symbol: 'cmn',
             custom_domain: 'customdomain.com',
+            allow_tokenized_threads: false,
           },
           {
             id: 'cmntest2',
+            tier: CommunityTierMap.Unverified,
+            spam_tier_level: DisabledCommunitySpamTier,
             chain_node_id: 99999,
             name: 'cmntest2',
             network: ChainNetwork.Ethereum,
@@ -117,6 +131,7 @@ export const e2eTestEntities = async function (
             active: true,
             default_symbol: 'cmntest2',
             custom_domain: 'customdomain.com',
+            allow_tokenized_threads: false,
           },
         ].map((x) => ({
           ...x,
@@ -128,6 +143,8 @@ export const e2eTestEntities = async function (
           has_homepage: 'false' as any,
           collapsed_on_homepage: false,
           directory_page_enabled: false,
+          namespace_verified: false,
+          environment: config.APP_ENV,
         })),
       )),
     );

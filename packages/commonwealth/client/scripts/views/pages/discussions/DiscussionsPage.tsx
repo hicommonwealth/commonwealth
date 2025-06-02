@@ -25,13 +25,15 @@ import {
   ContentType,
   ZERO_ADDRESS,
   formatDecimalToWei,
-  splitAndDecodeURL,
+  generateTopicIdentifiersFromUrl,
+  generateUrlPartForTopicIdentifiers,
 } from '@hicommonwealth/shared';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
+import { ThreadKind } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
 import { prettyVoteWeight } from 'shared/adapters/currency';
@@ -41,7 +43,7 @@ import useCreateThreadMutation, {
 } from 'state/api/threads/createThread';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import { saveToClipboard } from 'utils/clipboard';
-import { StickyEditorContainer } from 'views/components/StickEditorContainer';
+import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 // eslint-disable-next-line max-len
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
@@ -52,6 +54,7 @@ import {
   createDeltaFromText,
   getTextFromDelta,
 } from 'views/components/react_quill_editor';
+import { serializeDelta } from 'views/components/react_quill_editor/utils';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
@@ -65,7 +68,7 @@ import './DiscussionsPage.scss';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 import { RenderThreadCard } from './RenderThreadCard';
 
-type DiscussionsPageProps = {
+export type DiscussionsPageProps = {
   tabs?: { value: string; label: string };
   selectedView?: string;
   topicName?: string;
@@ -81,7 +84,8 @@ const VIEWS = [
   { value: 'overview', label: 'Overview' },
   { value: 'cardview', label: 'Cardview' },
 ];
-const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
+
+const DiscussionsPage = () => {
   const [selectedView, setSelectedView] = useState<string>();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -91,8 +95,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
   const [searchParams] = useSearchParams();
-  // @ts-expect-error <StrictNullChecks/>
-  const stageName: string = searchParams.get('stage');
+  const stageName: string = searchParams.get('stage') || '';
 
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -120,7 +123,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     }
   }, [tabStatus]);
 
-  const topicObj = topics?.find(({ name }) => name === topicName);
+  const topicIdentifiersFromURL = generateTopicIdentifiersFromUrl(
+    window.location.href,
+  );
+  const topicObj = topics?.find(
+    ({ name }) => name === topicIdentifiersFromURL?.topicName,
+  );
   const topicId = topicObj?.id;
 
   const user = useUserStore();
@@ -204,16 +212,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     return t;
   });
 
-  //splitAndDecodeURL checks if a url is custom or not and decodes the url after splitting it
-  const topicNameFromURL = splitAndDecodeURL(location.pathname);
-
   //checks for malformed url in topics and redirects if the topic does not exist
   useEffect(() => {
     if (
       !isLoadingTopics &&
-      topicNameFromURL &&
-      topicNameFromURL !== 'archived' &&
-      topicNameFromURL !== 'overview' &&
+      topicIdentifiersFromURL &&
+      topicIdentifiersFromURL.topicName !== 'archived' &&
+      topicIdentifiersFromURL.topicName !== 'overview' &&
       tabStatus !== 'overview'
     ) {
       // Don't redirect if we're on a discussion page
@@ -221,19 +226,30 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         return;
       }
 
-      const validTopics = topics?.some(
-        (topic) => topic?.name === topicNameFromURL,
+      const validTopic = topics?.find(
+        (topic) => topic?.name === topicIdentifiersFromURL.topicName,
       );
-      if (!validTopics) {
+      if (!validTopic) {
         navigate('/discussions');
       }
+      if (
+        validTopic &&
+        (!topicIdentifiersFromURL.topicId ||
+          topicIdentifiersFromURL.topicId !== validTopic.id)
+      ) {
+        const identifier = generateUrlPartForTopicIdentifiers(
+          validTopic?.id,
+          validTopic.name,
+        );
+        navigate(`/discussions/${encodeURI(identifier)}`, { replace: true });
+      }
     }
-    if (topicNameFromURL === 'overview') {
+    if (topicIdentifiersFromURL?.topicName === 'overview') {
       setSelectedView(VIEWS[1].value);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topics, topicNameFromURL, isLoadingTopics]);
+  }, [topics, topicIdentifiersFromURL, isLoadingTopics]);
 
   useManageDocumentTitle('Discussions');
 
@@ -254,7 +270,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const voteWeight =
     isTopicWeighted && voteBalance
       ? prettyVoteWeight(
-          formatDecimalToWei(voteBalance),
+          formatDecimalToWei(voteBalance, topicObj!.token_decimals ?? 18),
           topicObj!.token_decimals,
           topicObj!.weighted_voting,
           topicObj!.vote_weight_multiplier || 1,
@@ -268,66 +284,80 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     setSelectedView(activeTab);
   };
 
-  // Add sticky editor state
+  const [threadTitle, setThreadTitle] = useState<string>('');
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
     createDeltaFromText(''),
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { mutateAsync: createThread } = useCreateThreadMutation({
-    communityId: communityId,
+    communityId,
   });
 
-  const handleCreateThread = async (): Promise<number> => {
-    if (!user.activeAccount) {
-      notifyError('You must be logged in to create a thread');
-      throw new Error('Not logged in');
+  const handleCancel = () => {
+    setThreadTitle('');
+    setThreadContentDelta(createDeltaFromText(''));
+  };
+
+  const handleSubmitThread = async (): Promise<number> => {
+    if (isSubmitting) return -1;
+
+    let useTopicObj = topicObj;
+
+    if (!useTopicObj && topics && topics.length > 0) {
+      useTopicObj = topics.find((t) => t.name.toLowerCase() === 'general');
+
+      if (!useTopicObj) {
+        useTopicObj = topics[0];
+      }
     }
 
-    if (!topicObj) {
-      notifyError('You must select a topic to create a thread');
-      throw new Error('No topic selected');
+    if (!useTopicObj) {
+      notifyError('No topics available to create a thread');
+      return -1;
     }
 
-    if (!user.activeAccount.community?.base) {
-      notifyError('Invalid community configuration');
-      throw new Error('Invalid community configuration');
+    if (!getTextFromDelta(threadContentDelta).trim()) {
+      notifyError('Please enter content for your thread');
+      return -1;
     }
 
     try {
-      const input = await buildCreateThreadInput({
-        address: user.activeAccount.address,
-        kind: 'discussion',
-        stage: 'Discussion',
-        communityId: communityId,
-        communityBase: user.activeAccount.community.base,
-        title: 'New Thread',
-        topic: topicObj,
-        body: getTextFromDelta(threadContentDelta),
+      setIsSubmitting(true);
+
+      const title =
+        threadTitle || getTextFromDelta(threadContentDelta).substring(0, 60);
+
+      const communityBase = app?.chain?.base || '';
+
+      const threadInput = await buildCreateThreadInput({
+        communityId,
+        communityBase,
+        address: user.activeAccount?.address || '',
+        title: title,
+        body: serializeDelta(threadContentDelta),
+        kind: ThreadKind.Discussion,
+        stage: '',
+        topic: useTopicObj,
+        url: '',
       });
 
-      const thread = await createThread(input);
+      const newThread = await createThread(threadInput);
 
-      if (!thread?.id) {
-        throw new Error('Failed to create thread - no ID returned');
-      }
-
+      setThreadTitle('');
       setThreadContentDelta(createDeltaFromText(''));
 
-      // Construct the correct navigation path
-      const communityPrefix = communityId ? `/${communityId}` : '';
-      const threadUrl = `${communityPrefix}/discussion/${thread.id}-${thread.title}`;
+      navigate(`/discussion/${newThread.id}`);
 
-      navigate(threadUrl);
-
-      return thread.id;
-    } catch (error) {
+      // Fix for TypeScript error - ensure we return a number
+      return newThread.id ?? -1;
+    } catch (err) {
+      console.error('Error creating thread:', err);
       notifyError('Failed to create thread');
-      throw error;
+      return -1;
+    } finally {
+      setIsSubmitting(false);
     }
-  };
-
-  const handleCancel = () => {
-    setThreadContentDelta(createDeltaFromText(''));
   };
 
   return (
@@ -374,8 +404,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         )}
 
         <HeaderWithFilters
-          // @ts-expect-error <StrictNullChecks/>
-          topic={topicName}
+          topic={topicIdentifiersFromURL?.topicName || ''}
           stage={stageName}
           featuredFilter={featuredFilter}
           dateRange={dateRange}
@@ -426,24 +455,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 ),
               }}
             />
-            <WithDefaultStickyComment>
-              {user.isLoggedIn && user.activeAccount && (
-                <StickyEditorContainer
-                  parentType={ContentType.Thread}
-                  canComment={true}
-                  handleSubmitComment={handleCreateThread}
-                  errorMsg=""
-                  contentDelta={threadContentDelta}
-                  setContentDelta={setThreadContentDelta}
-                  disabled={false}
-                  onCancel={handleCancel}
-                  author={user.activeAccount}
-                  editorValue={getTextFromDelta(threadContentDelta)}
-                  tooltipText=""
-                  topic={topicObj}
-                />
-              )}
-            </WithDefaultStickyComment>
           </>
         ) : selectedView === VIEWS[1].value ? (
           <OverviewPage
@@ -502,6 +513,25 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             overscan={50}
           />
         )}
+
+        <WithDefaultStickyComment>
+          {user.isLoggedIn && user.activeAccount && (
+            <StickyInput
+              parentType={ContentType.Thread}
+              canComment={true}
+              handleSubmitComment={handleSubmitThread}
+              errorMsg=""
+              contentDelta={threadContentDelta}
+              setContentDelta={setThreadContentDelta}
+              disabled={isSubmitting}
+              onCancel={handleCancel}
+              author={user.activeAccount}
+              editorValue={getTextFromDelta(threadContentDelta)}
+              tooltipText=""
+              topic={topicObj}
+            />
+          )}
+        </WithDefaultStickyComment>
 
         <StickyCommentElementSelector />
       </CWPageLayout>

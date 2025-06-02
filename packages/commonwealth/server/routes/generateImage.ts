@@ -1,18 +1,11 @@
-import {
-  AppError,
-  ServerError,
-  blobStorage,
-  logger,
-} from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
-import fetch from 'node-fetch';
+import { AppError, ServerError, logger } from '@hicommonwealth/core';
+import { DB, generateImage } from '@hicommonwealth/model';
+import type { ImageGenerationModel } from '@hicommonwealth/shared';
 import { OpenAI } from 'openai';
-import { v4 as uuidv4 } from 'uuid';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
 let openai: OpenAI | undefined = undefined;
-
 const log = logger(import.meta);
 
 if (process.env.OPENAI_API_KEY) {
@@ -23,7 +16,7 @@ if (process.env.OPENAI_API_KEY) {
       apiKey: process.env.OPENAI_API_KEY,
     });
   } catch (e) {
-    log.error('OpenAI initialization failed.', e);
+    log.error('OpenAI initialization failed', e);
   }
 } else {
   log.warn(
@@ -33,55 +26,78 @@ if (process.env.OPENAI_API_KEY) {
 
 type generateImageReq = {
   description: string;
+  model?: ImageGenerationModel;
+  n?: number;
+  quality?: 'standard' | 'hd' | 'low' | 'medium' | 'high';
+  response_format?: 'url' | 'b64_json';
+  size?:
+    | '256x256'
+    | '512x512'
+    | '1024x1024'
+    | '1792x1024'
+    | '1024x1792'
+    | '1536x1024'
+    | '1024x1536'
+    | 'auto';
+  style?: 'vivid' | 'natural';
+  referenceImageUrls?: string[];
+  maskUrl?: string;
 };
 
 type generateImageResp = {
   imageUrl: string;
 };
 
-const generateImage = async (
+const generateImageHandler = async (
   models: DB,
   req: TypedRequestBody<generateImageReq>,
   res: TypedResponse<generateImageResp>,
 ) => {
-  const { description } = req.body;
+  log.info('Received /generateImage request with body:', req.body);
 
-  if (!openai) {
-    throw new ServerError('OpenAI not initialized');
-  }
+  const {
+    description,
+    model,
+    n,
+    quality,
+    response_format,
+    size,
+    style,
+    referenceImageUrls,
+    maskUrl,
+  } = req.body;
 
   if (!description) {
+    log.warn('/generateImage: No description provided in request body');
     throw new AppError('No description provided');
   }
 
-  let image;
-  try {
-    const response = await openai.images.generate({
-      model: 'dall-e-2',
-      n: 1,
-      prompt: description,
-      size: '256x256',
-      response_format: 'url',
-    });
+  const options: Parameters<typeof generateImage>[2] = {
+    model,
+    n,
+    quality,
+    response_format,
+    size,
+    style,
+    referenceImageUrls,
+    maskUrl,
+  };
 
-    image = response.data[0].url;
+  log.info('/generateImage: Calling generateImage function with options:', {
+    promptLength: description.length,
+    ...options,
+  });
+
+  try {
+    const imageUrl = await generateImage(description, openai, options);
+    log.info('/generateImage: Successfully generated and uploaded image', {
+      imageUrl,
+    });
+    return success(res, { imageUrl });
   } catch (e) {
+    log.error('Problem generating image in handler', e);
     throw new ServerError('Problem Generating Image!', e);
-  }
-
-  try {
-    const resp = await fetch(image);
-    const buffer = await resp.buffer();
-    const { url } = await blobStorage().upload({
-      key: `${uuidv4()}.png`,
-      bucket: 'assets',
-      content: buffer,
-      contentType: 'image/png',
-    });
-    return success(res, { imageUrl: url });
-  } catch (e) {
-    throw new ServerError('Problem uploading image!', e);
   }
 };
 
-export default generateImage;
+export default generateImageHandler;

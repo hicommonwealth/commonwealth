@@ -10,11 +10,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
-import { StickyEditorContainer } from 'views/components/StickEditorContainer';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
+import { StickyInput } from '../StickEditorContainer';
 import { ArchiveMsg } from './ArchiveMsg';
 
 type CreateCommentProps = {
@@ -29,6 +29,7 @@ type CreateCommentProps = {
   onCancel?: (event: React.MouseEvent) => void;
   onCommentCreated?: (commentId: number, hasAI: boolean) => void;
   aiCommentsToggleEnabled?: boolean;
+  parentCommentText?: string;
 };
 
 export const CreateComment = ({
@@ -43,6 +44,7 @@ export const CreateComment = ({
   onCancel,
   onCommentCreated,
   aiCommentsToggleEnabled = false,
+  parentCommentText,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -89,7 +91,7 @@ export const CreateComment = ({
     existingNumberOfComments: rootThread.numberOfComments || 0,
   });
 
-  const handleSubmitComment = async () => {
+  const handleSubmitComment = async (turnstileToken?: string | null) => {
     if (!user.activeAccount) {
       throw new Error('No active account');
     }
@@ -108,6 +110,7 @@ export const CreateComment = ({
         parentCommentId: parentCommentId ?? null,
         parentCommentMsgId: parentCommentMsgId ?? null,
         existingNumberOfComments: rootThread.numberOfComments || 0,
+        turnstileToken,
       });
 
       const newComment = await createComment(input);
@@ -170,7 +173,7 @@ export const CreateComment = ({
   }, [handleIsReplying, saveDraft, contentDelta]);
 
   return rootThread.archivedAt === null ? (
-    <StickyEditorContainer
+    <StickyInput
       parentType={parentType}
       canComment={canComment}
       handleSubmitComment={handleSubmitComment}
@@ -184,6 +187,8 @@ export const CreateComment = ({
       tooltipText={tooltipText}
       isReplying={isReplying}
       replyingToAuthor={replyingToAuthor}
+      thread={rootThread}
+      parentCommentText={parentCommentText}
     />
   ) : (
     <ArchiveMsg archivedAt={rootThread.archivedAt!} />

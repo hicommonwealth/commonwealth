@@ -75,6 +75,10 @@ export class RedisCache implements Cache {
     return 'RedisCache';
   }
 
+  public get client(): RedisClientType {
+    return this._client;
+  }
+
   public async dispose(): Promise<void> {
     try {
       await this._client.disconnect();
@@ -251,16 +255,26 @@ export class RedisCache implements Cache {
    * @param namespace The namespace of the key to increment.
    * @param key The key whose value is to be incremented.
    * @param increment The amount by which the key's value should be incremented.
+   * @param duration Optional duration for the key to live in the cache. (in seconds)
    * @returns The new value of the key after the increment.
    */
   public async incrementKey(
     namespace: CacheNamespaces,
     key: string,
     increment = 1,
+    duration?: number,
   ): Promise<number | null> {
     if (!this.isReady()) return null;
     try {
       const finalKey = RedisCache.getNamespaceKey(namespace, key);
+      if (duration) {
+        const multi = this._client.multi();
+        multi.incrBy(finalKey, increment);
+        multi.expire(finalKey, duration, 'NX');
+        const [incr] = (await multi.exec()) as [number, boolean];
+        return incr;
+      }
+      // plain increment
       return await this._client.incrBy(finalKey, increment);
     } catch (e) {
       const msg = `An error occurred while incrementing the key: ${key}`;
@@ -363,7 +377,14 @@ export class RedisCache implements Cache {
         keys.push(key);
       }
       for (const key of keys) {
-        data[key] = await this._client.get(key);
+        const keyType = await this._client.type(key);
+        if (keyType === 'string') {
+          data[key] = await this._client.get(key);
+        } else {
+          this._log.warn(
+            `Skipping key with non-string type: ${key} (type: ${keyType})`,
+          );
+        }
       }
       return data;
     } catch (e) {
@@ -417,6 +438,217 @@ export class RedisCache implements Cache {
     }
   }
 
+  /**
+   * Returns the paginated matching namespace:keys in the namespace.
+   * @param namespace The prefix to check for keys in.
+   * @param cursor Start index of the scan.
+   * @param count How many keys to return.
+   * @returns The cursor pointing to the next pagination and the keys scanned.
+   */
+  public async scan(
+    namespace: CacheNamespaces,
+    cursor: number,
+    count: number,
+  ): Promise<{ cursor: number; keys: string[] } | null> {
+    if (!this.isReady()) return null;
+    try {
+      return this._client.scan(cursor, {
+        MATCH: `${namespace}*`,
+        COUNT: count,
+      });
+    } catch (e) {
+      const msg = 'An error occurred while running scan';
+      this._log.error(msg, e as Error);
+      return null;
+    }
+  }
+
+  public async incrementHashKey(
+    namespace: CacheNamespaces,
+    key: string,
+    field: string,
+    increment: number = 1,
+  ): Promise<number> {
+    if (!this.isReady()) return 0;
+    try {
+      return this._client.HINCRBY(
+        RedisCache.getNamespaceKey(namespace, key),
+        field,
+        increment,
+      );
+    } catch (e) {
+      this._log.error(
+        'An error occurred while incrementing hash key',
+        e as Error,
+      );
+    }
+    return 0;
+  }
+
+  public async getHash(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<Record<string, string>> {
+    if (!this.isReady()) return {};
+    try {
+      return this._client.HGETALL(RedisCache.getNamespaceKey(namespace, key));
+    } catch (e) {
+      this._log.error('An error occurred while getting hash', e as Error);
+    }
+    return {};
+  }
+
+  public async setHashKey(
+    namespace: CacheNamespaces,
+    key: string,
+    field: string,
+    value: string,
+  ): Promise<number> {
+    if (!this.isReady()) return 0;
+    try {
+      return this._client.HSET(
+        RedisCache.getNamespaceKey(namespace, key),
+        field,
+        value,
+      );
+    } catch (e) {
+      this._log.error('An error occurred while getting hash', e as Error);
+    }
+    return 0;
+  }
+
+  public async addToSet(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+  ): Promise<number> {
+    if (!this.isReady()) return 0;
+    try {
+      return this._client.SADD(
+        RedisCache.getNamespaceKey(namespace, key),
+        value,
+      );
+    } catch (e) {
+      this._log.error('An error occurred while adding item to set', e as Error);
+    }
+    return 0;
+  }
+
+  public async getSet(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<string[]> {
+    if (!this.isReady()) return [];
+    try {
+      return this._client.SMEMBERS(RedisCache.getNamespaceKey(namespace, key));
+    } catch (e) {
+      this._log.error('An error occurred while getting set', e as Error);
+    }
+    return [];
+  }
+
+  public async getSortedSetSize(
+    namespace: CacheNamespaces,
+    key: string,
+  ): Promise<number> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zCard(RedisCache.getNamespaceKey(namespace, key));
+  }
+
+  public async sliceSortedSetWithScores(
+    namespace: CacheNamespaces,
+    key: string,
+    start = 0,
+    stop = 0,
+    options?: { order?: 'ASC' | 'DESC' },
+  ): Promise<{ value: string; score: number }[]> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zRangeWithScores(
+      RedisCache.getNamespaceKey(namespace, key),
+      start,
+      stop,
+      {
+        ...(options?.order === 'ASC' ? { REV: true } : {}),
+      },
+    );
+  }
+
+  public async sliceSortedSet(
+    namespace: CacheNamespaces,
+    key: string,
+    start = 0,
+    stop = 0,
+    options?: { order?: 'ASC' | 'DESC' },
+  ): Promise<string[]> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zRange(
+      RedisCache.getNamespaceKey(namespace, key),
+      start,
+      stop,
+      {
+        ...(options?.order === 'ASC' ? { REV: true } : {}),
+      },
+    );
+  }
+
+  public async delSortedSetItemsByRank(
+    namespace: CacheNamespaces,
+    key: string,
+    start = 0,
+    stop = 0,
+  ): Promise<number> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zRemRangeByRank(
+      RedisCache.getNamespaceKey(namespace, key),
+      start,
+      stop,
+    );
+  }
+
+  public async addToSortedSet(
+    namespace: CacheNamespaces,
+    key: string,
+    items:
+      | { value: string; score: number }[]
+      | { value: string; score: number },
+    options?: {
+      updateOnly?: boolean;
+    },
+  ): Promise<number> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zAdd(
+      RedisCache.getNamespaceKey(namespace, key),
+      items,
+      {
+        ...(options?.updateOnly ? { XX: true } : {}),
+      },
+    );
+  }
+
+  public async sortedSetPopMin(
+    namespace: CacheNamespaces,
+    key: string,
+    numToPop = 1,
+  ): Promise<{ value: string; score: number }[]> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zPopMinCount(
+      RedisCache.getNamespaceKey(namespace, key),
+      numToPop,
+    );
+  }
+
+  public async delSortedSetItemsByValue(
+    namespace: CacheNamespaces,
+    key: string,
+    values: string[] | string,
+  ): Promise<number> {
+    if (!this.isReady()) throw new Error('Redis is not ready');
+    return this._client.zRem(
+      RedisCache.getNamespaceKey(namespace, key),
+      values,
+    );
+  }
+
   public async flushAll(): Promise<void> {
     if (!this.isReady()) return;
     try {
@@ -429,5 +661,62 @@ export class RedisCache implements Cache {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async sendCommand(args: string[]): Promise<any> {
     return await this._client.sendCommand(args);
+  }
+
+  /**
+   * Push a value to the beginning of a list and trim it to a specific size in a single transaction.
+   * This is an atomic operation that adds an item to a list and ensures the list doesn't exceed the specified max length.
+   *
+   * @param namespace The namespace of the key
+   * @param key The key of the list
+   * @param value The value to push to the list
+   * @param maxLength The maximum length to maintain for the list
+   * @returns The new length of the list after the push operation, or false if an error occurred
+   */
+  public async lpushAndTrim(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+    maxLength: number,
+  ): Promise<number | false> {
+    if (!this.isReady()) return false;
+    try {
+      const finalKey = RedisCache.getNamespaceKey(namespace, key);
+      const multi = this._client.multi();
+      multi.lPush(finalKey, value);
+      multi.lTrim(finalKey, 0, maxLength - 1);
+      const [newLength] = (await multi.exec()) as [number, unknown];
+      return newLength;
+    } catch (e) {
+      const msg = `An error occurred during lpushAndTrim for key: ${key}`;
+      this._log.error(msg, e as Error);
+      return false;
+    }
+  }
+
+  /**
+   * Retrieve a range of elements from a list stored at the specified key.
+   *
+   * @param namespace The namespace of the key
+   * @param key The key of the list
+   * @param start The starting index (0-based, inclusive)
+   * @param stop The ending index (0-based, inclusive)
+   * @returns Array of elements in the specified range, or an empty array if the key doesn't exist or an error occurred
+   */
+  public async getList(
+    namespace: CacheNamespaces,
+    key: string,
+    start: number = 0,
+    stop: number = -1,
+  ): Promise<string[]> {
+    if (!this.isReady()) return [];
+    try {
+      const finalKey = RedisCache.getNamespaceKey(namespace, key);
+      return await this._client.lRange(finalKey, start, stop);
+    } catch (e) {
+      const msg = `An error occurred while getting list range for key: ${key}`;
+      this._log.error(msg, e as Error);
+      return [];
+    }
   }
 }

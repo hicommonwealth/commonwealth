@@ -2,6 +2,7 @@ import {
   Actor,
   InvalidActor,
   InvalidInput,
+  InvalidState,
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
@@ -103,8 +104,14 @@ function getAdminOrModeratorPatch(
 
   typeof pinned !== 'undefined' && (patch.pinned = pinned);
 
-  typeof spam !== 'undefined' &&
-    (patch.marked_as_spam_at = spam ? new Date() : null);
+  if (typeof spam !== 'undefined') {
+    if (spam) {
+      patch.marked_as_spam_at = new Date();
+      patch.search = null;
+    } else if (!spam) {
+      patch.marked_as_spam_at = null;
+    }
+  }
 
   if (Object.keys(patch).length > 0) {
     const authorized =
@@ -213,17 +220,38 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
         contentUrl = result.contentUrl;
       }
 
+      let spamToggled = false;
+      if (
+        typeof adminPatch.marked_as_spam_at !== 'undefined' &&
+        thread.marked_as_spam_at !== adminPatch.marked_as_spam_at
+      ) {
+        spamToggled = true;
+      }
+
+      let newBody = content.body || thread.body || '';
+      if (
+        adminPatch.marked_as_spam_at === null &&
+        !content.body &&
+        thread.content_url
+      ) {
+        const res = await fetch(thread.content_url);
+        newBody = await res.text();
+      }
+
       // == mutation transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {
         const searchUpdate =
-          content.title || content.body
+          content.title || content.body || adminPatch.marked_as_spam_at === null
             ? {
                 search: getThreadSearchVector(
                   content.title || thread.title,
-                  content.body || thread.body || '',
+                  newBody,
                 ),
               }
             : {};
+        const tokenAddress = payload.launchpad_token_address && {
+          launchpad_token_address: payload.launchpad_token_address,
+        };
         await thread.update(
           {
             // TODO: body should be set to truncatedBody once client renders content_url
@@ -232,7 +260,9 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
             ...ownerPatch,
             last_edited: new Date(),
             ...searchUpdate,
+            ...tokenAddress,
             content_url: contentUrl,
+            is_linking_token: payload.is_linking_token,
           },
           { transaction },
         );
@@ -297,84 +327,89 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
       });
       // == end of transaction boundary ==
 
+      const result = await models.Thread.findOne({
+        where: { id: thread_id },
+        include: [
+          {
+            model: models.Address,
+            as: 'Address',
+            include: [
+              {
+                model: models.User,
+                required: true,
+                attributes: ['id', 'profile', 'tier'],
+              },
+            ],
+          },
+          {
+            model: models.Address,
+            as: 'collaborators',
+            include: [
+              {
+                model: models.User,
+                required: true,
+                attributes: ['id', 'profile', 'tier'],
+              },
+            ],
+          },
+          { model: models.Topic, as: 'topic' },
+          {
+            model: models.Reaction,
+            as: 'reactions',
+            include: [
+              {
+                model: models.Address,
+                required: true,
+                include: [
+                  {
+                    model: models.User,
+                    required: true,
+                    attributes: ['id', 'profile', 'tier'],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            model: models.Comment,
+            limit: 3, // This could me made configurable, atm we are using 3 recent comments with threads in frontend.
+            order: [['created_at', 'DESC']],
+            attributes: [
+              'id',
+              'address_id',
+              'body',
+              'created_at',
+              'updated_at',
+              'deleted_at',
+              'marked_as_spam_at',
+              'discord_meta',
+            ],
+            include: [
+              {
+                model: models.Address,
+                attributes: ['address'],
+                include: [
+                  {
+                    model: models.User,
+                    attributes: ['profile', 'tier'],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            model: models.ThreadVersionHistory,
+          },
+        ],
+      });
+
+      if (!result) throw new InvalidState(UpdateThreadErrors.ThreadNotFound);
+
       // TODO: should we make a query out of this, or do we have one already?
-      return (
-        await models.Thread.findOne({
-          where: { id: thread_id },
-          include: [
-            {
-              model: models.Address,
-              as: 'Address',
-              include: [
-                {
-                  model: models.User,
-                  required: true,
-                  attributes: ['id', 'profile'],
-                },
-              ],
-            },
-            {
-              model: models.Address,
-              as: 'collaborators',
-              include: [
-                {
-                  model: models.User,
-                  required: true,
-                  attributes: ['id', 'profile'],
-                },
-              ],
-            },
-            { model: models.Topic, as: 'topic' },
-            {
-              model: models.Reaction,
-              as: 'reactions',
-              include: [
-                {
-                  model: models.Address,
-                  required: true,
-                  include: [
-                    {
-                      model: models.User,
-                      required: true,
-                      attributes: ['id', 'profile'],
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              model: models.Comment,
-              limit: 3, // This could me made configurable, atm we are using 3 recent comments with threads in frontend.
-              order: [['created_at', 'DESC']],
-              attributes: [
-                'id',
-                'address_id',
-                'body',
-                'created_at',
-                'updated_at',
-                'deleted_at',
-                'marked_as_spam_at',
-                'discord_meta',
-              ],
-              include: [
-                {
-                  model: models.Address,
-                  attributes: ['address'],
-                  include: [
-                    {
-                      model: models.User,
-                      attributes: ['profile'],
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              model: models.ThreadVersionHistory,
-            },
-          ],
-        })
-      )?.toJSON();
+      return {
+        ...result.toJSON(),
+        spam_toggled: spamToggled,
+      };
     },
   };
 }

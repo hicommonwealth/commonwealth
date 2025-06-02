@@ -1,11 +1,16 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase } from '@hicommonwealth/shared';
+import {
+  bumpCommunityTier,
+  ChainBase,
+  CommunityTierMap,
+} from '@hicommonwealth/shared';
+import { z } from 'zod';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
-import { checkSnapshotObjectExists } from '../../services';
+import { checkSnapshotObjectExists, commonProtocol } from '../../services';
+import { emitEvent } from '../../utils/utils';
 
 export const UpdateCommunityErrors = {
   SnapshotOnlyOnEthereum:
@@ -41,6 +46,10 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         custom_stages,
         namespace,
         transactionHash,
+        allow_tokenized_threads,
+        spam_tier_level,
+        thread_purchase_token,
+        launchpad_weighted_voting,
       } = payload;
 
       const community = await models.Community.findOne({
@@ -94,8 +103,10 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
             actor.address!,
             community,
           );
+        bumpCommunityTier(CommunityTierMap.ChainVerified, community);
       }
 
+      // TODO: use getDeltas to determine which fields to update
       default_page && (community.default_page = default_page);
       name && (community.name = name);
       description && (community.description = description);
@@ -116,8 +127,62 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
       social_links?.length && (community.social_links = social_links);
       hide_projects !== undefined && (community.hide_projects = hide_projects);
       custom_stages && (community.custom_stages = custom_stages);
+      allow_tokenized_threads &&
+        (community.allow_tokenized_threads = allow_tokenized_threads);
+      spam_tier_level !== undefined &&
+        (community.spam_tier_level = spam_tier_level);
+      thread_purchase_token &&
+        (community.thread_purchase_token = thread_purchase_token);
 
-      await community.save();
+      let weightedVotingProps: Partial<z.infer<typeof schemas.Topic>> | null =
+        null;
+
+      if (launchpad_weighted_voting) {
+        const foundNamespace = namespace || community.namespace;
+        if (foundNamespace) {
+          const launchpadToken = await models.LaunchpadToken.findOne({
+            where: { namespace: foundNamespace },
+          });
+          if (launchpadToken) {
+            weightedVotingProps = {
+              weighted_voting: schemas.TopicWeightedVoting.ERC20,
+              token_address: launchpadToken?.token_address,
+              token_symbol: launchpadToken?.symbol,
+              token_decimals: 18,
+              vote_weight_multiplier: 1,
+              chain_node_id: community.chain_node_id,
+            };
+          }
+        }
+      }
+
+      await models.sequelize.transaction(async (transaction) => {
+        await community.save({ transaction });
+
+        if (weightedVotingProps) {
+          // update general topic to use weighted voting
+          await models.Topic.update(weightedVotingProps, {
+            where: { name: 'General', community_id: community.id },
+            transaction,
+          });
+        }
+
+        await emitEvent(
+          models.Outbox,
+          [
+            {
+              event_name: 'CommunityUpdated',
+              event_payload: {
+                community_id: community.id,
+                user_id: actor.user.id!,
+                social_links: social_links?.length ? social_links : undefined,
+                created_at: new Date(),
+              },
+            },
+          ],
+          transaction,
+        );
+      });
       return community.toJSON();
     },
   };

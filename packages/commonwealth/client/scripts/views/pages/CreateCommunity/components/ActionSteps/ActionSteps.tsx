@@ -14,23 +14,26 @@ const ActionSteps = ({ steps }: ActionStepsProps) => {
 
   return (
     <div className="ActionSteps">
-      {steps.map(({ label, state, actionButton, errorText }, index) => (
-        <React.Fragment key={`${label}-${state}`}>
-          <ActionStep
-            label={label}
-            index={index + 1}
-            state={state}
-            actionButton={actionButton}
-          />
-          {errorText && (
-            <MessageRow
-              hasFeedback
-              statusMessage={errorText}
-              validationStatus="failure"
+      {steps.map(
+        ({ label, description, state, actionButton, errorText }, index) => (
+          <React.Fragment key={`${label}-${state}`}>
+            <ActionStep
+              label={label}
+              index={index + 1}
+              state={state}
+              actionButton={actionButton}
+              description={description}
             />
-          )}
-        </React.Fragment>
-      ))}
+            {errorText && (
+              <MessageRow
+                hasFeedback
+                statusMessage={errorText}
+                validationStatus="failure"
+              />
+            )}
+          </React.Fragment>
+        ),
+      )}
     </div>
   );
 };

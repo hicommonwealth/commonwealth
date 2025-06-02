@@ -10,6 +10,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import './AdminPanel.scss';
 import Analytics from './Analytics';
 import ChangeResourceTimestamps from './ChangeResourceTimestamps';
+import CommunityTier from './CommunityTier';
 import ConnectChainToCommunity from './ConnectChainToCommunityTask';
 import DeleteChainTask from './DeleteChainTask';
 import DownloadMembersListTask from './DownloadMembersListTask';
@@ -19,6 +20,7 @@ import RPCEndpointTask from './RPCEndpointTask';
 import RefreshCustomDomainTask from './RefreshCustomDomainTask';
 import TopUsers from './TopUsers';
 import TriggerNotificationsWorkflow from './TriggerNotificationsWorkflow';
+import UserTier from './UserTier';
 
 const AdminPanelPage = () => {
   const navigate = useCommonNavigate();
@@ -42,6 +44,10 @@ const AdminPanelPage = () => {
         <CWDivider />
         <CWText type="h2">Site Analytics</CWText>
         <Analytics />
+        <CWDivider />
+        <CWText type="h2">Spam Tools</CWText>
+        <CommunityTier />
+        <UserTier />
         <CWDivider />
         <CWText type="h2">Site Admin Tasks</CWText>
         <DeleteChainTask />

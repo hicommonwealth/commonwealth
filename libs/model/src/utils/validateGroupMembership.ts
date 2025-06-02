@@ -1,3 +1,4 @@
+import { MembershipRejectReason } from '@hicommonwealth/schemas';
 import {
   AllowlistData,
   BalanceSourceType,
@@ -5,13 +6,14 @@ import {
   ThresholdData,
 } from '@hicommonwealth/shared';
 import { toBigInt } from 'web3-utils';
-import type { MembershipRejectReason } from '../models/membership';
+import { z } from 'zod';
 import type { OptionsWithBalances } from '../services';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
-  messages?: MembershipRejectReason;
+  messages?: z.infer<typeof MembershipRejectReason>;
   numRequirementsMet?: number;
+  balance?: bigint;
 };
 
 /**
@@ -36,10 +38,11 @@ export function validateGroupMembership(
   let numRequirementsMet = 0;
 
   requirements.forEach((requirement) => {
-    let checkResult: { result: boolean; message: string };
+    let checkResult: { result: boolean; message: string; balance?: bigint };
     switch (requirement.rule) {
       case 'threshold': {
         checkResult = _thresholdCheck(userAddress, requirement.data, balances);
+        response.balance = checkResult.balance;
         break;
       }
       case 'allow': {
@@ -74,7 +77,7 @@ export function validateGroupMembership(
 
   if (allowListOverride) {
     // allow if address is whitelisted
-    return { isValid: true };
+    return { isValid: true, messages: undefined };
   }
 
   if (numRequiredRequirements) {
@@ -92,17 +95,37 @@ function _thresholdCheck(
   userAddress: string,
   thresholdData: ThresholdData,
   balances: OptionsWithBalances[],
-): { result: boolean; message: string } {
+): { result: boolean; message: string; balance?: bigint } {
   try {
     let balanceSourceType: BalanceSourceType;
     let contractAddress: string;
     let chainId: string;
     let tokenId: string;
+    let objectId: string;
+
     switch (thresholdData.source.source_type) {
       case 'spl': {
         balanceSourceType = BalanceSourceType.SPL;
         contractAddress = thresholdData.source.contract_address;
-        chainId = thresholdData.source.evm_chain_id.toString();
+        chainId = thresholdData.source.solana_network.toString();
+        break;
+      }
+      case 'metaplex': {
+        balanceSourceType = BalanceSourceType.SOLNFT;
+        contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.solana_network.toString();
+        break;
+      }
+      case 'sui_native': {
+        balanceSourceType = BalanceSourceType.SuiNative;
+        chainId = thresholdData.source.sui_network.toString();
+        objectId = thresholdData.source.object_id!;
+        break;
+      }
+      case 'sui_token': {
+        balanceSourceType = BalanceSourceType.SuiToken;
+        chainId = thresholdData.source.sui_network.toString();
+        contractAddress = thresholdData.source.coin_type;
         break;
       }
       case 'erc20': {
@@ -152,7 +175,7 @@ function _thresholdCheck(
         break;
     }
 
-    const balance = balances
+    const _balance = balances
       .filter((b) => b.options.balanceSourceType === balanceSourceType)
       .find((b) => {
         switch (b.options.balanceSourceType) {
@@ -178,23 +201,40 @@ function _thresholdCheck(
               b.options.sourceOptions.contractAddress == contractAddress &&
               b.options.sourceOptions.cosmosChainId.toString() === chainId
             );
+          case BalanceSourceType.SOLNFT:
           case BalanceSourceType.SPL:
             return b.options.mintAddress == contractAddress;
+          case BalanceSourceType.SuiNative:
+            if (objectId) {
+              return (
+                b.options.sourceOptions.suiNetwork === chainId &&
+                b.options.sourceOptions.objectId === objectId
+              );
+            }
+            return b.options.sourceOptions.suiNetwork === chainId;
+          case BalanceSourceType.SuiToken:
+            return (
+              b.options.sourceOptions.suiNetwork === chainId &&
+              b.options.sourceOptions.coinType === contractAddress
+            );
           default:
             return null;
         }
       })?.balances[userAddress];
 
-    if (typeof balance !== 'string') {
+    if (typeof _balance !== 'string') {
       throw new Error(`Failed to get balance for address`);
     }
 
-    const result = toBigInt(balance) > toBigInt(thresholdData.threshold);
+    const balance = BigInt(_balance);
+    const result = balance > toBigInt(thresholdData.threshold);
+
     return {
       result,
       message: !result
-        ? `User Balance of ${balance} below threshold ${thresholdData.threshold}`
+        ? `User Balance of ${_balance} below threshold ${thresholdData.threshold}`
         : 'pass',
+      balance,
     };
   } catch (error) {
     return {

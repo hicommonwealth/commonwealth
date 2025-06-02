@@ -1,5 +1,7 @@
 import { config, dispose, handleEvent, query } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { emitEvent, models } from '../../src';
@@ -21,7 +23,9 @@ describe('Contest Worker Policy Lifecycle', () => {
   const topicId: number = 0;
 
   beforeAll(async () => {
-    const [chainNode] = await seed('ChainNode');
+    const [chainNode] = await seed('ChainNode', {
+      eth_chain_id: ValidChains.SepoliaBase,
+    });
     const [user] = await seed(
       'User',
       {
@@ -31,6 +35,7 @@ describe('Contest Worker Policy Lifecycle', () => {
       //{ mock: true, log: true },
     );
     await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       id: communityId,
       chain_node_id: chainNode!.id,
       lifetime_thread_count: 0,

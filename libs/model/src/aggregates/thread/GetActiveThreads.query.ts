@@ -32,7 +32,7 @@ export function GetActiveThreads(): Query<typeof schemas.GetActiveThreads> {
                 include: [
                   {
                     model: models.User,
-                    attributes: ['id', 'profile'],
+                    attributes: ['id', 'profile', 'tier'],
                   },
                 ],
               },
@@ -61,7 +61,7 @@ export function GetActiveThreads(): Query<typeof schemas.GetActiveThreads> {
                     include: [
                       {
                         model: models.User,
-                        attributes: ['id', 'profile'],
+                        attributes: ['id', 'profile', 'tier'],
                       },
                     ],
                   },

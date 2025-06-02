@@ -1,6 +1,6 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { analytics } from '@hicommonwealth/core';
-import { User, refreshProfileCount } from '@hicommonwealth/model';
+import { refreshProfileCount, User } from '@hicommonwealth/model';
 import {
   MixpanelLoginEvent,
   MixpanelUserSignupEvent,
@@ -62,5 +62,7 @@ export const trpcRouter = trpc.router({
   getUserReferrals: trpc.query(User.GetUserReferrals, trpc.Tag.User),
   getUserReferralFees: trpc.query(User.GetUserReferralFees, trpc.Tag.User),
   getXps: trpc.query(User.GetXps, trpc.Tag.User),
-  getRandomResourceIds: trpc.query(User.GetRandomResourceIds, trpc.Tag.User),
+  getXpsRanked: trpc.query(User.GetXpsRanked, trpc.Tag.User),
+  // Not really part of the user, but no better place to put it
+  distributeSkale: trpc.command(User.DistributeSkale, trpc.Tag.Token),
 });

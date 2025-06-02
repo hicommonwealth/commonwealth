@@ -1,10 +1,11 @@
 import {
   ChainBase,
-  WalletId,
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
   getSessionSigners,
+  WalletId,
 } from '@hicommonwealth/shared';
+import { usePrivy } from '@privy-io/react-auth';
 import axios from 'axios';
 import {
   LocalStorageKeys,
@@ -30,14 +31,14 @@ import {
 } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
-import { MobileTabType } from '../../pages/RewardsPage/types';
-import { mobileTabParam } from '../../pages/RewardsPage/utils';
+import { MobileTabType } from '../../pages/WalletPage/types';
+import { mobileTabParam } from '../../pages/WalletPage/utils';
 import { useCommunityStake } from '../CommunityStake';
-import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
+import UserMenuItem from './UserMenuItem';
 
 const resetWalletConnectSession = async () => {
   /**
@@ -48,24 +49,6 @@ const resetWalletConnectSession = async () => {
   );
   // @ts-expect-error <StrictNullChecks/>
   await walletConnectWallet.reset();
-};
-
-export const handleLogout = async () => {
-  try {
-    await axios.get(`${SERVER_URL}/logout`);
-    await initAppState();
-    await resetWalletConnectSession();
-    for (const signer of getSessionSigners()) {
-      signer.target.clear();
-    }
-    notifySuccess('Signed out');
-    darkModeStore.getState().setDarkMode(false);
-    setLocalStorageItem(LocalStorageKeys.HasSeenNotifications, 'true');
-    setLocalStorageItem(LocalStorageKeys.HasSeenOnboarding, 'true');
-  } catch (err) {
-    notifyError('Something went wrong during logging out.');
-    window.location.reload();
-  }
 };
 
 interface UseUserMenuItemsProps {
@@ -93,6 +76,9 @@ const useUserMenuItems = ({
   const rewardsEnabled = useFlag('rewardsPage');
   const referralsEnabled = useFlag('referrals');
   const xpEnabled = useFlag('xp');
+  const privyEnabled = useFlag('privy');
+
+  const { authenticated, logout } = usePrivy();
 
   const userData = useUserStore();
   const hasMagic = userData.hasMagicWallet;
@@ -118,6 +104,27 @@ const useUserMenuItems = ({
     app.activeChainId() &&
     !userData?.activeAccount &&
     uniqueChainAddresses?.length > 0;
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await axios.get(`${SERVER_URL}/logout`);
+      await initAppState();
+      await resetWalletConnectSession();
+      for (const signer of getSessionSigners()) {
+        signer.target.clear();
+      }
+      if (privyEnabled && authenticated) {
+        await logout();
+      }
+      notifySuccess('Signed out');
+      darkModeStore.getState().setDarkMode(false);
+      setLocalStorageItem(LocalStorageKeys.HasSeenNotifications, 'true');
+      setLocalStorageItem(LocalStorageKeys.HasSeenOnboarding, 'true');
+    } catch (err) {
+      notifyError('Something went wrong during logging out.');
+      window.location.reload();
+    }
+  }, [authenticated, logout, privyEnabled]);
 
   useEffect(() => {
     // if a user is in a stake enabled community without membership, set first user address as active that
@@ -249,17 +256,18 @@ const useUserMenuItems = ({
               label: 'Addresses',
             },
             ...addresses,
-            {
-              type: 'default',
-              label: 'Connect a new address',
-              onClick: () => {
-                onAuthModalOpen();
-                onAddressItemClick?.();
-              },
-            },
             { type: 'divider' },
           ] as PopoverMenuItem[])
         : []),
+      {
+        type: 'default',
+        label: 'Connect a new address',
+        onClick: () => {
+          onAuthModalOpen();
+          onAddressItemClick?.();
+        },
+      },
+      { type: 'divider' },
       {
         type: 'header',
         label: 'Settings',
@@ -305,7 +313,7 @@ const useUserMenuItems = ({
         onClick: () =>
           navigate(
             rewardsEnabled
-              ? `/rewards?tab=${mobileTabParam[MobileTabType.WalletBalance]}`
+              ? `/wallet?tab=${mobileTabParam[MobileTabType.WalletBalance]}`
               : `/myTransactions`,
             {},
             null,

@@ -17,16 +17,14 @@
     "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run ./test/**/*.spec.ts",
-    "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
-    "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run ./test/**/*.spec.ts"
   },
   "dependencies": {
     "@alchemy/aa-alchemy": "^3.17.0",
     "@alchemy/aa-core": "^3.16.0",
     "@hicommonwealth/shared": "workspace:*",
+    "abitype": "^1.0.8",
     "async-mutex": "^0.5.0",
-    "moment": "^2.23.0",
     "viem": "^2.23.2",
     "web3": "^4.7.0",
     "web3-eth-abi": "^4.2.1",

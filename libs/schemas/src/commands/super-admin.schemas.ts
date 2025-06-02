@@ -1,3 +1,4 @@
+import { CommunityTierMap, UserTierMap } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 export const TriggerNotificationsWorkflow = {
@@ -14,6 +15,26 @@ export const TriggerNotificationsWorkflow = {
       .describe(
         'The number of users for which triggering the workflow succeeded',
       ),
+  }),
+};
+
+export const SetCommunityTier = {
+  input: z.object({
+    community_id: z.string(),
+    tier: z.nativeEnum(CommunityTierMap),
+  }),
+  output: z.object({
+    success: z.boolean(),
+  }),
+};
+
+export const SetUserTier = {
+  input: z.object({
+    user_id: z.number(),
+    tier: z.nativeEnum(UserTierMap),
+  }),
+  output: z.object({
+    success: z.boolean(),
   }),
 };
 

@@ -1,5 +1,6 @@
 import { Actor, dispose, query } from '@hicommonwealth/core';
 import { Address, Topic } from '@hicommonwealth/schemas';
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { z } from 'zod';
@@ -17,6 +18,7 @@ describe('New Content lifecycle', () => {
     const [user1] = await seed('User');
     const [user2] = await seed('User');
     const [community] = await seed('Community', {
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
       profile_count: 2,
