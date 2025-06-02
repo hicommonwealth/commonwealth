@@ -1,4 +1,4 @@
-import { Actor, command, dispose } from '@hicommonwealth/core';
+import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { GatedActionEnum } from '@hicommonwealth/shared';
 import Chance from 'chance';
@@ -7,7 +7,12 @@ import {
   CreateGroup,
   RefreshCommunityMemberships,
 } from '../../src/aggregates/community';
-import { CreateThread } from '../../src/aggregates/thread';
+import {
+  CreateThread,
+  GetActiveThreads,
+  GetThreads,
+  SearchThreads,
+} from '../../src/aggregates/thread';
 import { NonMember, RejectedMember } from '../../src/middleware/errors';
 import { seedCommunity } from '../utils/community-seeder';
 
@@ -81,8 +86,8 @@ describe('Gating lifecycle', () => {
           payload: {
             community_id,
             topic_id,
-            title: 'thread title',
-            body: 'thread body',
+            title: 'failed thread title',
+            body: 'failed thread body',
             kind: 'discussion',
             stage: '',
             read_only: false,
@@ -101,8 +106,8 @@ describe('Gating lifecycle', () => {
         payload: {
           community_id,
           topic_id,
-          title: 'thread title',
-          body: 'thread body',
+          title: 'thread title 1',
+          body: 'thread body 1',
           kind: 'discussion',
           stage: '',
           read_only: false,
@@ -118,8 +123,8 @@ describe('Gating lifecycle', () => {
           payload: {
             community_id,
             topic_id,
-            title: 'thread title',
-            body: 'thread body',
+            title: 'failed thread title',
+            body: 'failed thread body',
             kind: 'discussion',
             stage: '',
             read_only: false,
@@ -159,8 +164,8 @@ describe('Gating lifecycle', () => {
           payload: {
             community_id,
             topic_id,
-            title: 'thread title',
-            body: 'thread body',
+            title: 'failed thread title',
+            body: 'failed thread body',
             kind: 'discussion',
             stage: '',
             read_only: false,
@@ -179,8 +184,8 @@ describe('Gating lifecycle', () => {
         payload: {
           community_id,
           topic_id,
-          title: 'thread title',
-          body: 'thread body',
+          title: 'thread title 2',
+          body: 'thread body 2',
           kind: 'discussion',
           stage: '',
           read_only: false,
@@ -220,8 +225,8 @@ describe('Gating lifecycle', () => {
           payload: {
             community_id,
             topic_id,
-            title: 'thread title',
-            body: 'thread body',
+            title: 'failed thread title',
+            body: 'failed thread body',
             kind: 'discussion',
             stage: '',
             read_only: false,
@@ -240,8 +245,8 @@ describe('Gating lifecycle', () => {
         payload: {
           community_id,
           topic_id,
-          title: 'thread title',
-          body: 'thread body',
+          title: 'thread title 3',
+          body: 'thread body 3',
           kind: 'discussion',
           stage: '',
           read_only: false,
@@ -257,8 +262,8 @@ describe('Gating lifecycle', () => {
           payload: {
             community_id,
             topic_id,
-            title: 'thread title',
-            body: 'thread body',
+            title: 'failed thread title',
+            body: 'failed thread body',
             kind: 'discussion',
             stage: '',
             read_only: false,
@@ -298,8 +303,8 @@ describe('Gating lifecycle', () => {
           payload: {
             community_id,
             topic_id,
-            title: 'thread title',
-            body: 'thread body',
+            title: 'failed thread title',
+            body: 'failed thread body',
             kind: 'discussion',
             stage: '',
             read_only: false,
@@ -318,8 +323,8 @@ describe('Gating lifecycle', () => {
         payload: {
           community_id,
           topic_id,
-          title: 'thread title',
-          body: 'thread body',
+          title: 'thread title 4',
+          body: 'thread body 4',
           kind: 'discussion',
           stage: '',
           read_only: false,
@@ -335,14 +340,77 @@ describe('Gating lifecycle', () => {
           payload: {
             community_id,
             topic_id,
-            title: 'thread title',
-            body: 'thread body',
+            title: 'failed thread title',
+            body: 'failed thread body',
             kind: 'discussion',
             stage: '',
             read_only: false,
           },
         }),
       ).rejects.toThrowError(RejectedMember);
+    });
+
+    it('should be able to view threads in private topics', async () => {
+      const getResults = await query(GetThreads(), {
+        actor: member,
+        payload: {
+          community_id,
+          topic_id,
+        },
+      });
+      expect(getResults?.threads.length).to.equal(4);
+
+      const searchResults = await query(SearchThreads(), {
+        actor: member,
+        payload: {
+          communityId: community_id,
+          searchTerm: 'thread title',
+          threadTitleOnly: true,
+          includeCount: true,
+        },
+      });
+      expect(searchResults?.results.length).to.equal(4);
+
+      const activeResults = await query(GetActiveThreads(), {
+        actor: member,
+        payload: {
+          community_id,
+          threads_per_topic: 5,
+        },
+      });
+      expect(activeResults?.length).to.equal(4);
+    });
+
+    // TODO: fix after merging #12261
+    it('should not be able to view threads in private topics', async () => {
+      const getResults = await query(GetThreads(), {
+        actor: rejected,
+        payload: {
+          community_id,
+          topic_id,
+        },
+      });
+      expect(getResults?.threads.length).to.equal(4);
+
+      const searchResults = await query(SearchThreads(), {
+        actor: rejected,
+        payload: {
+          communityId: community_id,
+          searchTerm: 'thread title',
+          threadTitleOnly: true,
+          includeCount: true,
+        },
+      });
+      expect(searchResults?.results.length).to.equal(4);
+
+      const activeResults = await query(GetActiveThreads(), {
+        actor: rejected,
+        payload: {
+          community_id,
+          threads_per_topic: 5,
+        },
+      });
+      expect(activeResults?.length).to.equal(4);
     });
   });
 });
