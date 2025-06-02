@@ -5,7 +5,7 @@ import {
   CommunityIndexer as CommunityIndexerSchema,
   EventPairs,
 } from '@hicommonwealth/schemas';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { z } from 'zod';
 import { models } from '../../database';
 import { paginateClankerTokens } from '../../policies/utils/community-indexer-utils';
@@ -70,7 +70,7 @@ export function IndexCommunities(): Command<typeof schemas.IndexCommunities> {
 const indexClankerTokens = async (
   indexer: z.infer<typeof CommunityIndexerSchema>,
 ) => {
-  const cutoffDate = moment(indexer.last_checked).toDate();
+  const cutoffDate = dayjs(indexer.last_checked).toDate();
 
   // Fetch pages descending and add to buffer
   // so they can be inserted in ascending order.
@@ -88,9 +88,7 @@ const indexClankerTokens = async (
 
   // Sort from oldest to newest,
   // id reflects clanker's sorting better than created timestamp.
-  tokensBuffer.sort(
-    (a, b) => moment(a.id!).valueOf() - moment(b.id!).valueOf(),
-  );
+  tokensBuffer.sort((a, b) => dayjs(a.id!).valueOf() - dayjs(b.id!).valueOf());
 
   const eventsBuffer: Array<EventPairs> = tokensBuffer.map((token) => ({
     event_name: 'ClankerTokenFound',

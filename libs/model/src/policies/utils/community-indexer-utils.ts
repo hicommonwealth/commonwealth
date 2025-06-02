@@ -9,8 +9,8 @@ import {
 } from '@hicommonwealth/shared';
 import axios, { AxiosError } from 'axios';
 import axiosRetry from 'axios-retry';
+import dayjs from 'dayjs';
 import lo from 'lodash';
-import moment from 'moment';
 import { Op } from 'sequelize';
 import { uuidV4 } from 'web3-utils';
 import { z } from 'zod';
@@ -79,7 +79,7 @@ export async function* paginateClankerTokens({
 
       // Filter tokens by cutoffDate
       const validTokens = res.data.data.filter((t) =>
-        moment(t.created_at).isAfter(cutoffDate),
+        dayjs(t.created_at).isAfter(cutoffDate),
       );
 
       // Yield valid tokens
@@ -89,7 +89,7 @@ export async function* paginateClankerTokens({
 
       // Check if the oldest token is older than our cutoff date
       const oldestToken = res.data.data[res.data.data.length - 1];
-      if (moment(oldestToken.created_at).isBefore(cutoffDate)) {
+      if (dayjs(oldestToken.created_at).isBefore(cutoffDate)) {
         break;
       }
 
