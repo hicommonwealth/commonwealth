@@ -312,6 +312,15 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache
           cache-to: type=registry,ref=ghcr.io/hicommonwealth/twitter:buildcache,mode=max
 
+      - name: Authenticate to HCP
+        id: 'Authenticate to HCP'
+        uses: 'hashicorp/hcp-auth-action@v0'
+
+      - name: 'Download hcp CLI'
+        uses: 'hashicorp/hcp-setup-action@v0'
+        with:
+          version: 'latest'
+
       - name: Create HCP Vault Secrets App
         uses: ./.github/actions/hcp-app-manager
         env:

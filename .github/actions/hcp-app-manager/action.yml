@@ -16,20 +16,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Setup HCP CLI
-      shell: bash
-      run: |
-        # Install HCP CLI if not already available
-        if ! command -v hcp &> /dev/null; then
-          echo "Installing HCP CLI..."
-          curl -fsSL https://releases.hashicorp.com/hcp/0.4.0/hcp_0.4.0_linux_amd64.zip -o hcp.zip
-          unzip hcp.zip
-          sudo mv hcp /usr/local/bin/
-          rm hcp.zip
-        fi
-        echo "HCP CLI version:"
-        hcp version
-
     - name: Execute HCP Vault Secrets Management
       shell: bash
       env:
@@ -49,6 +35,23 @@ runs:
         echo "::add-mask::${HCP_PROJECT_ID}"
         echo "::add-mask::${DATABASE_URL}"
 
+        # Log which env vars are set (not their values)
+        log_env_var() {
+          local var_name="$1"
+          local var_value="${!var_name}"
+          if [ -n "$var_value" ]; then
+            echo "[ENV] $var_name is set"
+          else
+            echo "[ENV] $var_name is NOT set"
+          fi
+        }
+        log_env_var "HCP_PROJECT_ID"
+        log_env_var "HCP_CLIENT_ID"
+        log_env_var "HCP_CLIENT_SECRET"
+        log_env_var "DATABASE_URL"
+        log_env_var "CLONE_APP_NAME"
+        log_env_var "APP_NAME"
+
         # Configuration
         CLONE_APP_NAME="${CLONE_APP_NAME}"
         APP_NAME="${APP_NAME}"
@@ -62,15 +65,6 @@ runs:
             echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
         }
 
-        hcp_login() {
-            log "Authenticating with HCP..."
-            # Redirect stderr to avoid potential credential leakage in error messages
-            hcp auth login --client-id="${HCP_CLIENT_ID}" --client-secret="${HCP_CLIENT_SECRET}" 2>/dev/null || {
-                log "Authentication failed"
-                exit 1
-            }
-        }
-
         check_app_exists() {
             local app_name=$1
             hcp vault-secrets apps read "${app_name}" --project-id="${HCP_PROJECT_ID}" >/dev/null 2>&1
@@ -78,12 +72,13 @@ runs:
 
         create_pr_app() {
             log "Creating PR app: ${APP_NAME}"
-            hcp vault-secrets apps create "${APP_NAME}" \
+            if ! output=$(hcp vault-secrets apps create "${APP_NAME}" \
                 --project-id="${HCP_PROJECT_ID}" \
-                --description="Cloned app - Created $(date)" 2>/dev/null || {
+                --description="Cloned app - Created $(date)" 2>&1); then
                 log "Failed to create PR app"
+                echo "$output"
                 exit 1
-            }
+            fi
         }
 
         clone_secrets() {
@@ -162,8 +157,6 @@ runs:
         }
 
         # Main execution
-        hcp_login
-        
         case "${{ inputs.action }}" in
             "create")
                 log "Starting PR app creation process..."
