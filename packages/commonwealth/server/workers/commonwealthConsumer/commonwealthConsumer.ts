@@ -1,19 +1,12 @@
 import {
   config,
   HotShotsStats,
-<<<<<<< HEAD
+  RedisCache,
   S3BlobStorage,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { blobStorage, logger, stats } from '@hicommonwealth/core';
-=======
-  RedisCache,
-  ServiceKey,
-  startHealthCheckLoop,
-} from '@hicommonwealth/adapters';
-import { cache, logger, stats } from '@hicommonwealth/core';
->>>>>>> master
+import { blobStorage, cache, logger, stats } from '@hicommonwealth/core';
 import {
   bootstrapBindings,
   bootstrapContestRolloverLoop,
