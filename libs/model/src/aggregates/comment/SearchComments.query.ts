@@ -8,6 +8,7 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
   return {
     ...schemas.SearchComments,
     auth: [],
+    secure: false,
     body: async ({ payload }) => {
       const { community_id, search, limit, cursor, order_by, order_direction } =
         payload;
