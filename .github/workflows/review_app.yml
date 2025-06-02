@@ -418,7 +418,7 @@ jobs:
           echo "CRDs are ready!"
 
       - name: Terraform Plan K8s Stage 2
-        id: plan_k8s
+        id: plan_k8s_stage_2
         working-directory: terraform/k8s
         env:
           KUBECONFIG: ${{ github.workspace }}/terraform/cluster/kubeconfig.yaml

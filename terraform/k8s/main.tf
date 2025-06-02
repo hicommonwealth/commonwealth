@@ -118,6 +118,9 @@ resource "kubernetes_manifest" "hcp_vault_secretstore" {
       }
     }
   }
+  computed_fields = [
+    "spec.provider.hashicorpvaultsecrets"
+  ]
   depends_on = [helm_release.external_secrets]
 }
 
