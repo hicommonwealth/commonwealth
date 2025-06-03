@@ -15,7 +15,6 @@ export function sanitizeDeletedComment(
       community_id: '',
       verification_token: '',
       role: 'member',
-      is_user_default: false,
       ghost_address: false,
       is_banned: false,
     },

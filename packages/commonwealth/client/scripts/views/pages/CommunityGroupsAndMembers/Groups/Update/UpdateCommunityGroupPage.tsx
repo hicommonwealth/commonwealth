@@ -65,7 +65,8 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
 
   if (
     !user.isLoggedIn ||
-    !(Permissions.isCommunityAdmin() || Permissions.isSiteAdmin())
+    !(Permissions.isCommunityAdmin() || Permissions.isSiteAdmin()) ||
+    (!foundGroup && !isLoading)
   ) {
     return <PageNotFound />;
   }
@@ -133,6 +134,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           topics: (foundGroup.topics || []).map((topic) => ({
             label: topic.name,
             value: topic.id,
+            is_private: topic.is_private,
             permission: topic.permissions || [],
           })),
         }}

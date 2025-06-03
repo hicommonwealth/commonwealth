@@ -70,8 +70,8 @@ const useSearchResults = (
       search: sharedQueryOptions.searchTerm,
       cursor: 1,
       limit: sharedQueryOptions.limit,
-      order_by: sharedQueryOptions.orderBy,
-      order_direction: sharedQueryOptions.orderDirection,
+      order_by: 'tier',
+      order_direction: APIOrderDirection.Desc,
     },
     enabled: queryEnabled && filters.includes('communities'),
   });

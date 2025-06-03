@@ -54,6 +54,7 @@ type PollEditorModalProps = {
   thread?: Thread;
   pollData?: string;
   isAIresponseCompleted: boolean;
+  onGeneratePoll: () => void;
   setLocalPoll?: SetLocalPolls;
 };
 
@@ -62,6 +63,7 @@ export const PollEditorModal = ({
   thread,
   pollData,
   isAIresponseCompleted,
+  onGeneratePoll,
   setLocalPoll,
 }: PollEditorModalProps) => {
   const [customDuration, setCustomDuration] = useState(
@@ -233,6 +235,13 @@ export const PollEditorModal = ({
               buttonType="secondary"
               buttonHeight="sm"
               onClick={onModalClose}
+            />
+            <CWButton
+              iconLeft="sparkle"
+              label="Generate poll"
+              buttonType="secondary"
+              buttonHeight="sm"
+              onClick={onGeneratePoll}
             />
             <CWButton
               label="Save changes"

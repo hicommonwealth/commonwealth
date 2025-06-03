@@ -118,6 +118,8 @@ interface NewThreadFormProps {
   onContentDeltaChange?: (markdown: string) => void;
   contentDelta?: DeltaStatic;
   setContentDelta?: (delta: DeltaStatic) => void;
+  webSearchEnabled?: boolean;
+  setWebSearchEnabled?: (enabled: boolean) => void;
 }
 
 export interface NewThreadFormHandles {
@@ -137,6 +139,8 @@ export const NewThreadForm = forwardRef<
       onContentDeltaChange,
       contentDelta,
       setContentDelta,
+      webSearchEnabled,
+      setWebSearchEnabled,
     },
     ref,
   ) => {
@@ -177,8 +181,6 @@ export const NewThreadForm = forwardRef<
     useAppStatus();
 
     const isInsideCommunity = !!app.chain; // if this is not set user is not inside community
-
-    const [isCollapsed, setIsCollapsed] = useState(false);
 
     const [selectedCommunityId, setSelectedCommunityId] = useState(
       app.activeChainId() || '',
@@ -333,6 +335,14 @@ export const NewThreadForm = forwardRef<
     // Define default values for title and body
     const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
     const DEFAULT_THREAD_BODY = 'No content provided.';
+
+    const [localWebSearchEnabled, setLocalWebSearchEnabled] = useState(false);
+    const effectiveWebSearchEnabled =
+      typeof webSearchEnabled === 'boolean'
+        ? webSearchEnabled
+        : localWebSearchEnabled;
+    const effectiveSetWebSearchEnabled =
+      setWebSearchEnabled || setLocalWebSearchEnabled;
 
     const { data: tokenizedThreadsAllowed } =
       useGetTokenizedThreadsAllowedQuery({
@@ -666,6 +676,8 @@ export const NewThreadForm = forwardRef<
       },
       [handleNewThreadCreation],
     );
+
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     const snapshotLink = linkedProposals?.source === 'snapshot';
     const cosmosLink = linkedProposals?.source === 'proposal';
@@ -1168,6 +1180,26 @@ export const NewThreadForm = forwardRef<
                       label="Cancel"
                       containerClassName="no-pad cancel-button"
                     />
+
+                    {aiCommentsFeatureEnabled &&
+                      aiInteractionsToggleEnabled && (
+                        <div className="ai-toggle-wrapper">
+                          <CWToggle
+                            className="ai-toggle"
+                            icon="binoculars"
+                            iconColor="#757575"
+                            checked={effectiveWebSearchEnabled}
+                            onChange={() =>
+                              effectiveSetWebSearchEnabled(
+                                !effectiveWebSearchEnabled,
+                              )
+                            }
+                          />
+                          <CWText type="caption" className="toggle-label">
+                            Web search
+                          </CWText>
+                        </div>
+                      )}
 
                     {aiCommentsFeatureEnabled &&
                       aiInteractionsToggleEnabled && (

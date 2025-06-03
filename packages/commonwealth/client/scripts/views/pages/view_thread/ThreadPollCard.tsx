@@ -128,20 +128,28 @@ export const ThreadPollCard = ({
     });
   };
 
-  // votes by weighted voting power
-  const totalVoteWeight = pollVotes.reduce(
-    (sum, vote) => sum + BigInt(vote.calculated_voting_weight || '0'),
-    0n,
-  );
+  const totalVoteWeight = pollVotes.reduce((sum, vote) => {
+    const weight =
+      vote.calculated_voting_weight &&
+      BigInt(vote.calculated_voting_weight) > 0n
+        ? BigInt(vote.calculated_voting_weight)
+        : 1n;
+    return sum + weight;
+  }, 0n);
+
   const voteInformation = poll.options.map((option) => ({
     label: option,
     value: option,
     voteCount: pollVotes
       .filter((v) => v.option === option)
-      .reduce(
-        (sum, val) => sum + BigInt(val.calculated_voting_weight || '0'),
-        0n,
-      ),
+      .reduce((sum, val) => {
+        const weight =
+          val.calculated_voting_weight &&
+          BigInt(val.calculated_voting_weight) > 0n
+            ? BigInt(val.calculated_voting_weight)
+            : 1n;
+        return sum + weight;
+      }, 0n),
   }));
 
   return (

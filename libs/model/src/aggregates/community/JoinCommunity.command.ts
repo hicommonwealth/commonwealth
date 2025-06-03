@@ -106,7 +106,6 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
               hex: selectedAddress.hex,
               last_active: new Date(),
               role: 'member',
-              is_user_default: false,
               ghost_address: false,
               is_banned: false,
               oauth_provider: selectedAddress.oauth_provider,

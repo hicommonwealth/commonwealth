@@ -269,6 +269,7 @@ export const CreateGroup = {
       .array(
         z.object({
           id: PG_INT,
+          is_private: z.boolean().optional(),
           permissions: z.array(z.nativeEnum(GatedActionEnum)),
         }),
       )
@@ -306,6 +307,7 @@ export const UpdateGroup = {
       .array(
         z.object({
           id: PG_INT,
+          is_private: z.boolean().optional(),
           permissions: z.array(z.nativeEnum(GatedActionEnum)),
         }),
       )
@@ -463,12 +465,6 @@ export const UpdateBanner = {
     community_id: z.string(),
     banner_text: z.string(),
   }),
-  output: z.boolean(),
-  context: AuthContext,
-};
-
-export const SetDefaultRole = {
-  input: z.object({ community_id: z.string() }),
   output: z.boolean(),
   context: AuthContext,
 };

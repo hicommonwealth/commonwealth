@@ -8,11 +8,11 @@ export function SearchCommunities(): Query<typeof schemas.SearchCommunities> {
   return {
     ...schemas.SearchCommunities,
     auth: [],
-    secure: true,
+    secure: false,
     body: async ({ payload }) => {
       const { search, limit, cursor, order_by, order_direction } = payload;
 
-      const orderBy = ['name', 'created_at', 'default_symbol'].includes(
+      const orderBy = ['name', 'created_at', 'default_symbol', 'tier'].includes(
         order_by || '',
       )
         ? order_by
@@ -22,6 +22,7 @@ export function SearchCommunities(): Query<typeof schemas.SearchCommunities> {
           limit: Math.min(limit || 10, 100),
           page: cursor || 1,
           orderBy: `C.${orderBy}`,
+          orderBySecondary: `C.id ILIKE $searchTerm`, // exact matches come first
           orderDirection: order_direction || 'ASC',
         });
       const bind = { searchTerm: search, ...paginationBind };

@@ -38,7 +38,8 @@ export const doesActionAllowContentId = (action: QuestActionType) => {
     action === 'CommunityCreated' ||
     action === 'DiscordServerJoined' ||
     action === 'MembershipsRefreshed' ||
-    action === 'LaunchpadTokenTraded'
+    action === 'LaunchpadTokenTraded' ||
+    action === 'CommunityGoalReached'
   );
 };
 
@@ -94,6 +95,10 @@ export const doesActionRequireAmountMultipler = (action: QuestActionType) => {
   return action === 'LaunchpadTokenTraded';
 };
 
+export const doesActionRequireGoalConfig = (action: QuestActionType) => {
+  return action === 'CommunityGoalReached';
+};
+
 export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
   const commonQuests: QuestActionType[] = [
     'CommunityCreated',
@@ -107,6 +112,7 @@ export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
     'DiscordServerJoined',
     'MembershipsRefreshed',
     'LaunchpadTokenRecordCreated',
+    'CommunityGoalReached',
   ];
   const channelQuest: QuestActionType[] = [
     'TweetEngagement',

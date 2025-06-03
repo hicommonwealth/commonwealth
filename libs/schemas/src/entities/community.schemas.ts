@@ -76,6 +76,7 @@ export const Community = z.object({
   allow_tokenized_threads: z.boolean().optional(),
   thread_purchase_token: z.string().nullish(),
   environment: z.string().optional(),
+  pending_namespace_judge_token_id: PG_INT.nullish(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),

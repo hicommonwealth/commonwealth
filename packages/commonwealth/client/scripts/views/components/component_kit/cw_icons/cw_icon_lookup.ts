@@ -13,6 +13,7 @@ import {
   BellSimple,
   BellSimpleRinging,
   BellSimpleSlash,
+  Binoculars,
   BookOpenText,
   Brain,
   CalendarBlank,
@@ -49,6 +50,7 @@ import {
   Eye,
   Flag,
   FunnelSimple,
+  Gavel,
   Gear,
   Heart,
   House,
@@ -233,6 +235,7 @@ export const iconLookup = {
   github: Icons.CWGithub,
   octocat: Icons.CWOctocat,
   google: Icons.CWGoogle,
+  gavel: withPhosphorIcon(Gavel),
   hamburger: Icons.CWHamburger,
   hash: Icons.CWHash,
   heart: withPhosphorIcon(Heart),
@@ -341,6 +344,7 @@ export const iconLookup = {
   socialVerified: Icons.CWSocialVerified,
   sandClock: Icons.CWSandClock,
   stopSymbol: Icons.CWStopSymbol,
+  binoculars: withPhosphorIcon(Binoculars),
 };
 
 export const customIconLookup = {
