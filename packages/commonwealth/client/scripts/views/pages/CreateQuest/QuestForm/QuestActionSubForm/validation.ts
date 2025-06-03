@@ -6,6 +6,7 @@ import {
 } from '@hicommonwealth/schemas';
 import {
   linkValidationSchema,
+  numberDecimalGTZeroValidationSchema,
   numberDecimalValidationSchema,
   numberNonDecimalGTZeroValidationSchema,
   numberNonDecimalValidationSchema,
@@ -296,8 +297,8 @@ export const buildQuestSubFormValidationSchema = (
                 `0x0000000000000000000000000000000000000000`,
               ),
             }),
-          minOutputAmount: numberNonDecimalGTZeroValidationSchema,
-          minVolumeUSD: numberNonDecimalGTZeroValidationSchema,
+          minOutputAmount: numberDecimalGTZeroValidationSchema.required,
+          minVolumeUSD: numberDecimalGTZeroValidationSchema.required,
         }),
       }) as unknown as typeof baseSchema;
     }
