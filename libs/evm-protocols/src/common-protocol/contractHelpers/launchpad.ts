@@ -358,8 +358,11 @@ export async function getLaunchpadTokenDetails({
   initial_purchase_eth_amount: string;
 }> {
   const tx = await withRetries(async () => {
-    const { tx } = await getTransaction({ rpc, txHash: transactionHash });
-    return tx;
+    const { tx: innerTx } = await getTransaction({
+      rpc,
+      txHash: transactionHash,
+    });
+    return innerTx;
   });
 
   const tokenData = await getLaunchpadTokenCreatedTransaction({
