@@ -56,6 +56,7 @@ type ReactQuillEditorProps = {
   cancelEditing?: () => void;
   fromManageTopic?: boolean;
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
+  justClosed?: (isOpen: boolean) => void;
 } & ReactQuillEditorFormValidationProps;
 
 const TABS = [
@@ -79,6 +80,7 @@ const ReactQuillEditor = ({
   name,
   fromManageTopic = false,
   onKeyDown,
+  justClosed,
 }: ReactQuillEditorProps) => {
   const toolbarId = useMemo(() => {
     return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
@@ -127,6 +129,7 @@ const ReactQuillEditor = ({
     // @ts-expect-error <StrictNullChecks/>
     editorRef,
     lastSelectionRef,
+    justClosed,
   });
 
   // handle image upload for drag and drop

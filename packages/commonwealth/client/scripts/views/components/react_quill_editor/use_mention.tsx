@@ -26,11 +26,13 @@ Quill.register('modules/mention', QuillMention);
 type UseMentionProps = {
   editorRef: MutableRefObject<ReactQuill>;
   lastSelectionRef: MutableRefObject<RangeStatic | null>;
+  justClosed?: (isOpen: boolean) => void;
 };
 
 export const useMention = ({
   editorRef,
   lastSelectionRef,
+  justClosed,
 }: UseMentionProps) => {
   const searchParamsRef = useRef<{
     searchTerm: string;
@@ -374,6 +376,12 @@ export const useMention = ({
       ],
       renderItem: (item) => item.component,
       onSelect: selectMention,
+      onOpen: () => {
+        justClosed?.(false);
+      },
+      onClose: (e: Event) => {
+        justClosed?.(true);
+      },
       source: _.debounce(
         async (
           searchTerm: string,
@@ -457,7 +465,7 @@ export const useMention = ({
       ),
       isolateChar: true,
     };
-  }, [selectMention, createEntityMentionItem, refetch]);
+  }, [selectMention, createEntityMentionItem, refetch, justClosed]);
 
   return { mention };
 };
