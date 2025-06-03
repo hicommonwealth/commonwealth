@@ -41,7 +41,7 @@ export const useMention = ({
     searchScope: ['All'],
   });
 
-  const { isLoading, refetch } = useUnifiedSearch({
+  const { refetch } = useUnifiedSearch({
     searchTerm: searchParamsRef.current.searchTerm,
     communityId: searchParamsRef.current.communityId,
     searchScope: searchParamsRef.current.searchScope,
@@ -422,23 +422,6 @@ export const useMention = ({
               searchScope,
             };
 
-            // Show loading state first
-            if (isLoading) {
-              const loadingNode = document.createElement('div');
-              loadingNode.className = 'mention-loading-state';
-              loadingNode.innerText = 'Searching...';
-              renderList(
-                [
-                  {
-                    link: '#',
-                    name: '',
-                    component: loadingNode.outerHTML,
-                  },
-                ],
-                searchTerm,
-              );
-            }
-
             const { data } = await refetch();
 
             const results = data?.results || [];
@@ -474,7 +457,7 @@ export const useMention = ({
       ),
       isolateChar: true,
     };
-  }, [selectMention, createEntityMentionItem, isLoading, refetch]);
+  }, [selectMention, createEntityMentionItem, refetch]);
 
   return { mention };
 };

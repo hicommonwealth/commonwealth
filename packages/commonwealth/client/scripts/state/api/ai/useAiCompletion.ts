@@ -54,14 +54,12 @@ export const useAiCompletion = () => {
       communityId?: string,
     ): Promise<string | null> => {
       try {
-        // Extract mentions from the user prompt
         const mentions = extractMentionsFromText(userPrompt);
 
         if (mentions.length === 0) {
           return null;
         }
 
-        // Validate mention limits
         const { validMentions, hasExceededLimit } =
           validateMentionLimits(mentions);
 
@@ -73,14 +71,12 @@ export const useAiCompletion = () => {
           return null;
         }
 
-        // Prepare mentions for context aggregation
         const mentionsForContext = validMentions.map((mention) => ({
           id: mention.id,
           type: mention.type,
           name: mention.name,
         }));
 
-        // Call context aggregation API
         const response = await fetch('/api/ai/aggregate-context', {
           method: 'POST',
           headers: {
@@ -90,7 +86,7 @@ export const useAiCompletion = () => {
           body: JSON.stringify({
             mentions: mentionsForContext,
             communityId,
-            contextDataDays: 30, // Use default from config
+            contextDataDays: 30,
           }),
         });
 
@@ -125,7 +121,7 @@ export const useAiCompletion = () => {
       setCompletion('');
 
       let accumulatedText = '';
-      const streamMode = options?.stream !== false; // Default to true
+      const streamMode = options?.stream !== false;
 
       try {
         // Fetch contextual data for mentions if enabled
@@ -144,7 +140,8 @@ export const useAiCompletion = () => {
           const contextSection = `
 
 CONTEXTUAL INFORMATION:
-The user has mentioned the following entities in their message. Use this context to provide more informed and relevant responses:
+The user has mentioned the following entities in their message. 
+Use this context to provide more informed and relevant responses:
 
 ${contextualData}
 

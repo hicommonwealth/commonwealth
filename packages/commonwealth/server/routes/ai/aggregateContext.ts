@@ -289,7 +289,7 @@ class ContextAggregator {
 
         if (threadResult.body) {
           const bodyPreview = threadResult.body
-            .slice(0, CONTEXT_CONFIG.MAX_DESCRIPTION_LENGTH)
+            .slice(0, CONTEXT_CONFIG.MAX_CONTEXT_LENGTH)
             .replace(/\n/g, ' ');
           contextData += `Content: ${bodyPreview}...\n`;
         }
