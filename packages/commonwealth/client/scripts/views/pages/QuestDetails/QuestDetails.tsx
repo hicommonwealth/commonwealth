@@ -324,6 +324,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         navigate(`/explore?tab=communities`);
         break;
       }
+      case 'KyoFinanceLpQuestVerified':
       case 'KyoFinanceSwapQuestVerified': {
         if (!action.id) {
           notifyError(`Failed to start quest`);
