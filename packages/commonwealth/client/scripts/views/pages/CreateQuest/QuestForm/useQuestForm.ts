@@ -70,6 +70,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'SSOLinked',
       'DiscordServerJoined',
       'MembershipsRefreshed',
+      'RecurringContestManagerDeployed',
       'LaunchpadTokenRecordCreated',
       'LaunchpadTokenTraded',
       'CommunityGoalReached',
