@@ -277,23 +277,22 @@ export const buildQuestSubFormValidationSchema = (
       baseSchema = baseSchema.extend({
         metadata: z.object({
           chainId: KYOFinanceChainIdVaidationSchema,
-          // TODO: malik - format?
           minTimestamp: z
             .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
             .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-          // TODO: malik - address validation
+          // TODO: 11963 - malik - address validation
           outputToken: z
             .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
             .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-          // TODO: malik - address validation
+          // TODO: 11963 - malik - address validation
           inputToken: z
             .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
             .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-          // TODO: malik - amount unit? + validation
+          // TODO: 11963 - malik - amount unit? + validation
           minOutputAmount: z
             .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
             .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-          // TODO: malik - unit/ranges?  + validation
+          // TODO: 11963 - malik - unit/ranges?  + validation
           minVolumeUSD: z
             .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
             .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),

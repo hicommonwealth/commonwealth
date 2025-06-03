@@ -219,7 +219,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         isUserReferred: false, // we assume user is not referred to calculate the max lower/upper limit,
         questActions: [...questActionSubForms].map(({ values }) => ({
           creator_reward_weight: parseInt(`${values.creatorRewardAmount || 0}`),
-          event_name: values.action as QuestAction as any, // TODO: tim - fix type in API
+          event_name: values.action as QuestAction as any, // TODO: 11963 - tim - fix type in API
           quest_id: Math.random(),
           reward_amount: parseInt(`${values.rewardAmount || 0}`),
           participation_times_per_period: parseInt(
@@ -330,7 +330,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       })();
 
       return {
-        event_name: subForm.values.action as QuestAction as any, // TODO: tim - fix type in API
+        event_name: subForm.values.action as QuestAction as any, // TODO: 11963 - tim - fix type in API
         reward_amount: parseInt(`${subForm.values.rewardAmount || 0}`, 10),
         ...(subForm.values.creatorRewardAmount && {
           creator_reward_weight: calculateRemainingPercentageChangeFractional(
@@ -501,7 +501,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     if (!isAssigned) return;
 
     const subFormErrors = validateSubForms();
-    console.log('values => ', { values, questActionSubForms, subFormErrors });
 
     if (subFormErrors || (mode === 'update' ? !questId : false)) {
       return;

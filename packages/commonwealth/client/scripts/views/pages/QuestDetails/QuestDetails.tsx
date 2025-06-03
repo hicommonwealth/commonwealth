@@ -332,7 +332,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         try {
           verifyQuestAction({
             quest_action_meta_id: action.id,
-            // TODO: malik - allow user to select a specific address?
+            // TODO: 11963 - malik - allow user to select a specific address?
             address: user.addresses[0].address,
           })
             .then(() => {

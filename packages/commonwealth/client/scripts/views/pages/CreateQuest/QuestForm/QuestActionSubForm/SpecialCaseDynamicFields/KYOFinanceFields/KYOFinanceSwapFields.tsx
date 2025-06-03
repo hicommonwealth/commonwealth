@@ -21,9 +21,9 @@ const KYOFinanceSwapFields = ({
         key={`metadata-minTimestamp-${defaultValues?.action}`}
         name="metadata-minTimestamp"
         label="Min Timestamp"
-        //  placeholderText='' // TODO: malik - what here?
-        // minDate={new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000)} // TODO: malik - do we need this?
-        // maxDate={new Date(new Date().getTime() + 5 * 24 * 60 * 60 * 1000)} // TODO: malik - do we need this?
+        //  placeholderText='' // TODO: 11963 - malik - what here?
+        // minDate={new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000)} // TODO: 11963 - malik - do we need this?
+        // maxDate={new Date(new Date().getTime() + 5 * 24 * 60 * 60 * 1000)} // TODO: 11963 - malik - do we need this?
         containerClassName="span-3"
         fullWidth
         {...(defaultValues?.metadata?.minTimestamp && {
@@ -45,7 +45,7 @@ const KYOFinanceSwapFields = ({
         key={`metadata-outputToken-${defaultValues?.action}`}
         name="metadata-outputToken"
         label="Output Token"
-        placeholder="0x5C69bEe701ef814a2B6a3EDD4B2A6b45b6f72f2F" // TODO: malik - is this fine?
+        placeholder="0x5C69bEe701ef814a2B6a3EDD4B2A6b45b6f72f2F"
         containerClassName="span-3"
         fullWidth
         {...(defaultValues?.metadata?.outputToken && {
@@ -67,7 +67,7 @@ const KYOFinanceSwapFields = ({
         key={`metadata-inputToken-${defaultValues?.action}`}
         name="metadata-inputToken"
         label="Input Token"
-        placeholder="0x5C69bEe701ef814a2B6a3EDD4B2A6b45b6f72f2F" // TODO: malik - is this fine?
+        placeholder="0x5C69bEe701ef814a2B6a3EDD4B2A6b45b6f72f2F"
         containerClassName="span-3"
         fullWidth
         {...(defaultValues?.metadata?.inputToken && {
@@ -89,7 +89,7 @@ const KYOFinanceSwapFields = ({
         key={`metadata-minOutputAmount-${defaultValues?.action}`}
         name="metadata-minOutputAmount"
         label="Min Output Amount"
-        placeholder="0.0001 ETH" // TODO: malik - is it in ETH?
+        placeholder="0.0001 ETH"
         containerClassName="span-3"
         fullWidth
         {...(defaultValues?.metadata?.minOutputAmount && {
@@ -111,7 +111,7 @@ const KYOFinanceSwapFields = ({
         key={`metadata-minVolumeUSD-${defaultValues?.action}`}
         name="metadata-minVolumeUSD"
         label="Min Volume USD"
-        placeholder="$100" // TODO: malik - is it in ETH?
+        placeholder="$100"
         containerClassName="span-3"
         fullWidth
         {...(defaultValues?.metadata?.minVolumeUSD && {
