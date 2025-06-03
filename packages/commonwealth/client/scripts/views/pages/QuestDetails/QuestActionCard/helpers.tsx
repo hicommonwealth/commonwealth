@@ -19,6 +19,7 @@ export const actionCopies = {
     ['LaunchpadTokenRecordCreated']: 'Launch a Token on Common',
     ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
     ['CommunityGoalReached']: 'Complete the community goal',
+    ['RecurringContestManagerDeployed']: 'Create a Recurring Contest',
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: () => '',
@@ -39,6 +40,7 @@ export const actionCopies = {
     ['LaunchpadTokenRecordCreated']: () => '',
     ['LaunchpadTokenTraded']: () => '',
     ['CommunityGoalReached']: () => '',
+    ['RecurringContestManagerDeployed']: '',
   },
   explainer: {
     ['SignUpFlowCompleted']: () => '',
@@ -148,6 +150,16 @@ export const actionCopies = {
         </ul>
       </div>
     ),
+    // eslint-disable-next-line react/no-multi-comp
+    ['RecurringContestManagerDeployed']: () => (
+      <div>
+        <ul>
+          <li>● Contest must be funded with a prize pool</li>
+          <li>● Aura is awarded when the contest is successfully deployed</li>
+          <li>● Only the contest creator receives Aura for this action</li>
+        </ul>
+      </div>
+    ),
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -167,5 +179,6 @@ export const actionCopies = {
     ['LaunchpadTokenRecordCreated']: '',
     ['LaunchpadTokenTraded']: '',
     ['CommunityGoalReached']: '',
+    ['RecurringContestManagerDeployed']: '',
   },
 };
