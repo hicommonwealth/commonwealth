@@ -39,7 +39,6 @@ import {
 } from 'state/api/ai/prompts';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
-import { useFetchGroupsQuery } from 'state/api/groups';
 import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import {
   useAddThreadLinksMutation,
@@ -77,6 +76,7 @@ import {
   useGetTokenizedThreadsAllowedQuery,
 } from 'client/scripts/state/api/tokens';
 import { ExtendedPoll, LocalPoll, parseCustomDuration } from 'utils/polls';
+// eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
@@ -227,7 +227,6 @@ export const NewThreadForm = forwardRef<
       clearDraft,
       canShowGatingBanner,
       setCanShowGatingBanner,
-      canShowTopicPermissionBanner,
       setCanShowTopicPermissionBanner,
     } = useNewThreadForm(selectedCommunityId, topicsForSelector, {
       contentDelta,
@@ -266,12 +265,7 @@ export const NewThreadForm = forwardRef<
     const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
     const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
 
-    const { data: groups = [] } = useFetchGroupsQuery({
-      communityId: selectedCommunityId,
-      includeTopics: true,
-      enabled: !!selectedCommunityId,
-    });
-    const { memberships, actionGroups, bypassGating } = useTopicGating({
+    const { actionGroups, bypassGating } = useTopicGating({
       communityId: selectedCommunityId,
       userAddress: userSelectedAddress || '',
       apiEnabled: !!userSelectedAddress && !!selectedCommunityId,
@@ -534,34 +528,37 @@ export const NewThreadForm = forwardRef<
       }
     }, [
       community,
-      createThread,
-      isInsideCommunity,
-      isDiscussion,
-      threadUrl,
-      threadTopic,
-      threadKind,
-      threadContentDelta,
-      threadTitle,
-      setIsSaving,
-      setThreadContentDelta,
-      clearDraft,
-      navigate,
-      selectedCommunityId,
       userSelectedAddress,
-      hasTopics,
-      checkForSessionKeyRevalidationErrors,
-      user,
-      aiInteractionsToggleEnabled,
+      selectedCommunityId,
       isTurnstileEnabled,
       turnstileToken,
-      resetTurnstile,
-      addThreadLinks,
+      actionGroups,
+      bypassGating,
+      isDiscussion,
+      threadUrl,
+      aiInteractionsToggleEnabled,
+      threadTitle,
+      threadContentDelta,
+      setIsSaving,
+      threadKind,
+      threadTopic,
+      hasTopics,
+      createThread,
+      tokenizedThreadsAllowed?.tokenized_threads_enabled,
       linkedProposals,
-      createPoll,
       pollsData,
+      setThreadContentDelta,
+      clearDraft,
+      isInsideCommunity,
+      navigate,
+      communityToken.token_address,
+      communityToken.symbol,
       createThreadToken,
-      tokenizedThreadsAllowed,
-      communityToken,
+      addThreadLinks,
+      createPoll,
+      resetTurnstile,
+      checkForSessionKeyRevalidationErrors,
+      user,
     ]);
 
     const handleCancel = (e: React.MouseEvent | undefined) => {

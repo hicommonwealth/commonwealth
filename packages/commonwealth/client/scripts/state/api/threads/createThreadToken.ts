@@ -1,4 +1,8 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import {
+  commonProtocol,
+  mustBeProtocolChainId,
+  toContractObject,
+} from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
 import TokenLaunchpad from 'helpers/ContractHelpers/tokenLaunchpad';
 
@@ -29,20 +33,22 @@ export const createThreadToken = async ({
   ethChainId,
   chainRpc,
 }: CreateThreadTokenProps) => {
+  mustBeProtocolChainId(ethChainId);
+  const factoryContracts = toContractObject(
+    commonProtocol.factoryContracts[ethChainId],
+  );
+
   if (
-    !commonProtocol.factoryContracts ||
-    !commonProtocol.factoryContracts[ethChainId] ||
-    !commonProtocol.factoryContracts[ethChainId].factory
+    !factoryContracts?.postTokenLaunchpad ||
+    !factoryContracts?.postTokenBondingCurve
   ) {
     throw new Error(
       `Factory configuration is missing for chain ID ${ethChainId}. Please check your commonProtocol configuration.`,
     );
   }
 
-  const factoryAddress =
-    commonProtocol.factoryContracts[ethChainId].postTokenLaunchpad;
-  const bondingCurve =
-    commonProtocol.factoryContracts[ethChainId].postTokenBondingCurve;
+  const factoryAddress = factoryContracts.postTokenLaunchpad;
+  const bondingCurve = factoryContracts.postTokenBondingCurve;
 
   const launchpad = new TokenLaunchpad(
     factoryAddress,
@@ -62,7 +68,7 @@ export const createThreadToken = async ({
       initPurchaseAmount,
       authorAddress,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      (communityTreasuryAddress = '0x0771bf1205506a1d8ad2340dee334c1eb031e48c'),
+      communityTreasuryAddress,
     );
   } catch (error) {
     console.error('Error in createThreadToken:', {
