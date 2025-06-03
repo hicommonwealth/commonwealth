@@ -280,14 +280,22 @@ export const buildQuestSubFormValidationSchema = (
           minTimestamp: z
             .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
             .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-          // TODO: 11963 - malik - address validation
           outputToken: z
             .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-          // TODO: 11963 - malik - address validation
+            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+            .refine((val) => EVM_ADDRESS_STRICT_REGEX.test(val), {
+              message: VALIDATION_MESSAGES.MUST_BE_FORMAT(
+                `0x0000000000000000000000000000000000000000`,
+              ),
+            }),
           inputToken: z
             .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+            .refine((val) => EVM_ADDRESS_STRICT_REGEX.test(val), {
+              message: VALIDATION_MESSAGES.MUST_BE_FORMAT(
+                `0x0000000000000000000000000000000000000000`,
+              ),
+            }),
           // TODO: 11963 - malik - amount unit? + validation
           minOutputAmount: z
             .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
