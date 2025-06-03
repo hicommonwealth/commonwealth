@@ -424,11 +424,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [fetchedProfiles]);
 
-  if (
-    typeof identifier !== 'string' ||
-    !(threadId && isLoading) ||
-    fetchThreadError
-  ) {
+  if (typeof identifier !== 'string' || fetchThreadError) {
     return <PageNotFound />;
   }
 
