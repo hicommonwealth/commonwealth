@@ -525,7 +525,6 @@ export async function handleSocialLoginCallback({
     walletSsoSource,
     referrer_address,
   };
-  console.log({ data });
 
   try {
     response = await axios.post(`${SERVER_URL}/auth/magic`, data, {
