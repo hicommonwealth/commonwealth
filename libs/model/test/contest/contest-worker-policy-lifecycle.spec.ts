@@ -35,7 +35,7 @@ describe('Contest Worker Policy Lifecycle', () => {
       //{ mock: true, log: true },
     );
     await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       id: communityId,
       chain_node_id: chainNode!.id,
       lifetime_thread_count: 0,
@@ -53,7 +53,6 @@ describe('Contest Worker Policy Lifecycle', () => {
           id: topicId,
           name: 'hello',
           community_id: communityId,
-          group_ids: [],
         },
       ],
       contest_managers: [

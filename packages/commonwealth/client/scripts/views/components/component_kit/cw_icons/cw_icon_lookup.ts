@@ -1,6 +1,7 @@
 import {
   ArchiveTray,
   ArrowBendUpRight,
+  ArrowClockwise,
   ArrowFatDown,
   ArrowFatUp,
   ArrowLeft,
@@ -12,6 +13,7 @@ import {
   BellSimple,
   BellSimpleRinging,
   BellSimpleSlash,
+  Binoculars,
   BookOpenText,
   Brain,
   CalendarBlank,
@@ -48,6 +50,7 @@ import {
   Eye,
   Flag,
   FunnelSimple,
+  Gavel,
   Gear,
   Heart,
   House,
@@ -140,7 +143,8 @@ export const iconLookup = {
   arrowUpHalfGreen: Icons.CWArrowUpHalfGreen,
   arrowDownHalfOrange: Icons.CWArrowDownHalfOrange,
   arrowFatUpBlue500: Icons.CWArrowFatUpBlue500,
-  arrowClockwise: withPhosphorIcon(ArrowsClockwise),
+  arrowsClockwise: withPhosphorIcon(ArrowsClockwise),
+  arrowClockwise: withPhosphorIcon(ArrowClockwise),
   arrowFatUpBlue600: Icons.CWArrowFatUpBlue600,
   arrowUpBlue500: Icons.CWArrowUpBlue500,
   arrowUpNeutral400: Icons.CWArrowUpNeutral400,
@@ -231,6 +235,7 @@ export const iconLookup = {
   github: Icons.CWGithub,
   octocat: Icons.CWOctocat,
   google: Icons.CWGoogle,
+  gavel: withPhosphorIcon(Gavel),
   hamburger: Icons.CWHamburger,
   hash: Icons.CWHash,
   heart: withPhosphorIcon(Heart),
@@ -339,6 +344,7 @@ export const iconLookup = {
   socialVerified: Icons.CWSocialVerified,
   sandClock: Icons.CWSandClock,
   stopSymbol: Icons.CWStopSymbol,
+  binoculars: withPhosphorIcon(Binoculars),
 };
 
 export const customIconLookup = {
@@ -363,6 +369,8 @@ export const customIconLookup = {
   phantom: CustomIcons.CWPhantom,
   backpack: CustomIcons.CWBackpack,
   solflare: CustomIcons.CWSolflare,
+  sui: CustomIcons.CWSui,
+  'sui-wallet': CustomIcons.CWSui,
   terrastation: CustomIcons.CWTerraStation2,
   unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,

@@ -1,295 +1,616 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { CompletionModel, ContentType } from '@hicommonwealth/shared';
+import ClickAwayListener from '@mui/base/ClickAwayListener';
+import { notifyError } from 'controllers/app/notifications';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
+import { Thread } from 'models/Thread';
+import type { Topic } from 'models/Topic';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { createPortal } from 'react-dom';
+import { useAiCompletion } from 'state/api/ai';
+import {
+  generateCommentPrompt,
+  generateThreadPrompt,
+} from 'state/api/ai/prompts';
+import useSidebarStore from 'state/ui/sidebar';
+import { useLocalAISettingsStore } from 'state/ui/user';
+import { AIModelSelector } from 'views/components/AIModelSelector';
+import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
+import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import CWTextInput from 'views/components/component_kit/new_designs/CWTextInput/CWTextInput';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import {
+  NewThreadForm,
+  NewThreadFormHandles,
+} from 'views/components/NewThreadFormLegacy/NewThreadForm';
+import {
+  createDeltaFromText,
+  ReactQuillEditor,
+} from 'views/components/react_quill_editor';
+import { useTurnstile } from 'views/components/useTurnstile';
+import {
+  handleIconClick,
+  handleMouseEnter,
+  handleMouseLeave,
+} from 'views/menus/utils';
+import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
+import { StickCommentContext } from '../context/StickCommentProvider';
+import { useActiveStickCommentReset } from '../context/UseActiveStickCommentReset';
+import { useDynamicPlaceholder } from './useDynamicPlaceholder';
+import {
+  AI_SELECTOR_TITLE,
+  availableModels,
+  getCompletionModelValue,
+  MAX_MODELS_SELECTABLE,
+} from './utils';
+
 import './StickyInput.scss';
-import { MENTION_ITEMS, ModelItem, MODELS, ThreadItem, THREADS } from './utils';
 
-export type ThreadMentionTagType = 'threadMention' | 'modelMention';
+interface StickyInputProps extends CommentEditorProps {
+  topic?: Topic;
+  parentType: ContentType;
+  thread?: Thread;
+}
 
-const StickyInput = () => {
-  const [inputValue, setInputValue] = useState('');
-  const [threadTags, setThreadTags] = useState<ThreadItem[]>([]);
-  const [showMentionPopover, setShowMentionPopover] = useState(false);
-  const [showModelSelector, setShowModelSelector] = useState(false);
-  const [mentionSearch, setMentionSearch] = useState('');
-  const [selectedModels, setSelectedModels] = useState<ModelItem[]>([
-    MODELS[0], // Claude 3.7 Sonnet is default
-  ]);
-  const inputRef = useRef<HTMLInputElement>(null);
+const StickyInput = (props: StickyInputProps) => {
+  const {
+    handleSubmitComment,
+    isReplying,
+    replyingToAuthor,
+    setContentDelta,
+    contentDelta,
+    thread: originalThread,
+    parentCommentText,
+    canComment,
+    handleIsReplying,
+  } = props;
+  const { isWindowExtraSmall: isMobile } = useBrowserWindow({});
+  const { menuVisible } = useSidebarStore();
+  const { mode, setIsExpanded, isExpanded } = useContext(StickCommentContext);
+  const {
+    aiCommentsToggleEnabled,
+    aiInteractionsToggleEnabled,
+    setAICommentsToggleEnabled,
+    selectedModels,
+    setSelectedModels,
+  } = useLocalAISettingsStore();
+  const stickyCommentReset = useActiveStickCommentReset();
+  const { generateCompletion } = useAiCompletion();
+  const aiCommentsFeatureEnabled = useFlag('aiComments');
+
+  const aiModelPopover = usePopover();
+
+  const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
+  const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [webSearchEnabled, setWebSearchEnabled] = useState(false);
+
+  const placeholderText = useDynamicPlaceholder({
+    mode,
+    isReplying: !!isReplying,
+    replyingToAuthor,
+    isMobile,
+  });
+
   const containerRef = useRef<HTMLDivElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const modelSelectorRef = useRef<HTMLDivElement>(null);
+  const newThreadFormRef = useRef<NewThreadFormHandles>(null);
+  const bodyAccumulatedRef = useRef('');
 
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setInputValue(value);
+  const {
+    turnstileToken,
+    isTurnstileEnabled,
+    TurnstileWidget,
+    resetTurnstile,
+  } = useTurnstile({
+    action: mode === 'thread' ? 'create-thread' : 'create-comment',
+  });
 
-    const lastChar = value[value.length - 1];
-    if (lastChar === '@') {
-      setShowMentionPopover(true);
-      setMentionSearch('');
-    } else if (showMentionPopover) {
-      const atIndex = value.lastIndexOf('@');
-      if (atIndex >= 0) {
-        setMentionSearch(value.slice(atIndex + 1));
-      } else {
-        setShowMentionPopover(false);
+  const handleThreadContentAppended = useCallback(
+    (markdown: string) => {
+      if (markdown !== contentDelta) {
+        setContentDelta(createDeltaFromText(markdown));
       }
+    },
+    [contentDelta, setContentDelta],
+  );
+
+  const handleCancel = useCallback(() => {
+    setIsExpanded(false);
+    setOpenModalOnExpand(false);
+    stickyCommentReset();
+
+    if (isTurnstileEnabled) {
+      resetTurnstile();
     }
-  };
+  }, [stickyCommentReset, isTurnstileEnabled, resetTurnstile, setIsExpanded]);
 
-  const handleMentionSelect = (item: {
-    id: string;
-    name: string;
-    type: 'thread' | 'model';
-  }) => {
-    let isUnselecting = false;
-
-    if (item.type === 'thread') {
-      const threadItem = THREADS.find((thread) => thread.id === item.id);
-      if (!threadItem) return;
-
-      const existingTagIndex = threadTags.findIndex(
-        (tag) => tag.id === item.id,
-      );
-      if (existingTagIndex >= 0) {
-        setThreadTags(threadTags.filter((tag) => tag.id !== item.id));
-        isUnselecting = true;
-      } else {
-        setThreadTags([...threadTags, threadItem]);
+  const handleAiReply = useCallback(
+    (commentId: number) => {
+      if (streamingReplyIds.includes(commentId)) {
+        return;
       }
+      setStreamingReplyIds((prev) => [...prev, commentId]);
+    },
+    [streamingReplyIds],
+  );
+
+  const handleImageClick = useCallback(() => {
+    setOpenModalOnExpand(true);
+    setIsExpanded(true);
+  }, [setOpenModalOnExpand, setIsExpanded]);
+
+  const handleGenerateAIContent = useCallback(async () => {
+    if (!aiCommentsFeatureEnabled || !aiInteractionsToggleEnabled) return;
+
+    setIsGenerating(true);
+    bodyAccumulatedRef.current = '';
+    const modelToUse = getCompletionModelValue(selectedModels[0]);
+
+    try {
+      if (mode === 'thread') {
+        const { systemPrompt, userPrompt } = generateThreadPrompt('');
+        let lastUpdateTime = Date.now();
+
+        await generateCompletion(userPrompt, {
+          model: modelToUse,
+          stream: true,
+          systemPrompt,
+          useWebSearch: webSearchEnabled,
+          onError: (error) => {
+            console.error('Error generating AI thread:', error);
+            notifyError('Failed to generate AI thread content');
+          },
+          onChunk: (chunk) => {
+            bodyAccumulatedRef.current += chunk;
+
+            const currentTime = Date.now();
+            if (currentTime - lastUpdateTime >= 500) {
+              setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
+              lastUpdateTime = currentTime;
+            }
+          },
+        });
+
+        setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
+      } else {
+        const context = `
+          Thread: ${originalThread?.title || ''}
+          ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
+        `;
+
+        const { systemPrompt, userPrompt } = generateCommentPrompt(context);
+
+        await generateCompletion(userPrompt, {
+          model: modelToUse,
+          stream: true,
+          systemPrompt,
+          useWebSearch: webSearchEnabled,
+          onError: (error) => {
+            console.error('Error generating AI comment:', error);
+          },
+          onChunk: (chunk) => {
+            bodyAccumulatedRef.current += chunk;
+            setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Error generating AI content:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [
+    aiCommentsFeatureEnabled,
+    aiInteractionsToggleEnabled,
+    generateCompletion,
+    mode,
+    originalThread,
+    parentCommentText,
+    setContentDelta,
+    webSearchEnabled,
+    selectedModels,
+  ]);
+
+  const getActionPillLabel = () => {
+    if (mode === 'thread') {
+      return 'Draft thread';
+    } else if (isReplying) {
+      return 'Draft reply';
     } else {
-      const modelItem = MODELS.find((model) => model.id === item.id);
-      if (!modelItem) return;
-
-      const existingModelIndex = selectedModels.findIndex(
-        (model) => model.id === item.id,
-      );
-      if (existingModelIndex >= 0) {
-        setSelectedModels(
-          selectedModels.filter((model) => model.id !== item.id),
-        );
-        isUnselecting = true;
-      } else {
-        setSelectedModels([...selectedModels, modelItem]);
-      }
+      return 'Draft comment';
     }
-
-    const atIndex = inputValue.lastIndexOf('@');
-    if (atIndex >= 0) {
-      if (isUnselecting) {
-        setInputValue(inputValue.substring(0, atIndex));
-      } else {
-        const beforeMention = inputValue.substring(0, atIndex);
-        const afterSearchText = inputValue.substring(
-          atIndex + mentionSearch.length + 1,
-        );
-        setInputValue(`${beforeMention}@${item.name} ${afterSearchText}`);
-      }
-    }
-
-    setShowMentionPopover(false);
   };
 
-  const filteredMentions = MENTION_ITEMS.filter((item) =>
-    item.name.toLowerCase().includes(mentionSearch.toLowerCase()),
-  );
+  const customHandleSubmitComment = useCallback(async (): Promise<number> => {
+    if (isTurnstileEnabled && !turnstileToken) {
+      notifyError('Please complete the verification');
+      return Promise.reject(new Error('Turnstile verification required'));
+    }
 
-  const handleRemoveThreadTag = (tagId: string) => {
-    setThreadTags(threadTags.filter((tag) => tag.id !== tagId));
-  };
+    setOpenModalOnExpand(false);
+    stickyCommentReset();
 
-  const handleRemoveModel = (modelId: string) => {
-    setSelectedModels(selectedModels.filter((model) => model.id !== modelId));
+    try {
+      const commentId = await handleSubmitComment(turnstileToken);
+
+      if (typeof commentId !== 'number' || isNaN(commentId)) {
+        console.error('StickyInput - Invalid comment ID:', commentId);
+        throw new Error('Invalid comment ID');
+      }
+
+      // Also reset the editor content since it's separate from the store
+      setContentDelta(createDeltaFromText(''));
+
+      if (isTurnstileEnabled) {
+        resetTurnstile();
+      }
+
+      if (aiCommentsToggleEnabled) {
+        handleAiReply(commentId);
+      }
+
+      try {
+        await listenForComment(commentId, aiCommentsToggleEnabled);
+      } catch (error) {
+        console.warn('StickyInput - Failed to jump to comment:', error);
+      }
+
+      return commentId;
+    } catch (error) {
+      console.error('StickyInput - Failed to submit comment:', error);
+      if (isTurnstileEnabled) {
+        resetTurnstile();
+      }
+      throw error;
+    }
+  }, [
+    handleSubmitComment,
+    aiCommentsToggleEnabled,
+    handleAiReply,
+    turnstileToken,
+    setContentDelta,
+    stickyCommentReset,
+    isTurnstileEnabled,
+    resetTurnstile,
+  ]);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (
+      event.key === 'Enter' &&
+      !event.shiftKey &&
+      !isExpanded &&
+      contentDelta?.ops?.length > 0 &&
+      (!isTurnstileEnabled || turnstileToken)
+    ) {
+      event.preventDefault();
+      void customHandleSubmitComment();
+    }
   };
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        showMentionPopover &&
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setShowMentionPopover(false);
+    if (isExpanded && openModalOnExpand) {
+      if (mode === 'thread') {
+        setTimeout(() => {
+          newThreadFormRef.current?.openImageModal();
+        }, 0);
+        setOpenModalOnExpand(false);
+      } else if (mode === 'comment') {
+        setOpenModalOnExpand(false);
       }
-      if (
-        showModelSelector &&
-        modelSelectorRef.current &&
-        !modelSelectorRef.current.contains(event.target as Node)
-      ) {
-        setShowModelSelector(false);
-      }
-    };
+    }
+  }, [isExpanded, openModalOnExpand, mode]);
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showMentionPopover, showModelSelector]);
+  const handleModelSelectionChange = (
+    newSelectedModelValues: CompletionModel[],
+  ) => {
+    const newAiModelOptions = newSelectedModelValues.map((value) => {
+      const modelDetails = availableModels.find((m) => m.value === value);
+      return {
+        value: value,
+        label: modelDetails ? modelDetails.label : value,
+      };
+    });
+    setSelectedModels(newAiModelOptions);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        if (showMentionPopover) setShowMentionPopover(false);
-        if (showModelSelector) setShowModelSelector(false);
-      }
-    };
+    if (newAiModelOptions.length > 0 && !aiCommentsToggleEnabled) {
+      setAICommentsToggleEnabled(true);
+    } else if (newAiModelOptions.length === 0 && aiCommentsToggleEnabled) {
+      setAICommentsToggleEnabled(false);
+    }
+  };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [showMentionPopover, showModelSelector]);
+  const handleToggleWebSearch = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setWebSearchEnabled((prev) => !prev);
+  };
 
-  return (
-    <div className="StickyInput" ref={containerRef}>
-      {threadTags.length > 0 && (
-        <div className="thread-tags-container">
-          <div className="tags-row">
-            {threadTags.map((tag) => (
-              <CWTag
-                key={tag.id}
-                type="pill"
-                label={tag.label}
-                trimAt={20}
-                onCloseClick={() => handleRemoveThreadTag(tag.id)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+  const renderStickyInput = () => {
+    const isAnyModelSelected = selectedModels.length > 0;
+    const showModelCountBadge = selectedModels.length > 1;
 
-      {/* Action tags - static buttons */}
-      <div className="action-tags-container">
-        <div className="tags-row">
-          <CWTag
-            key="summarize"
-            type="pill"
-            classNames="action-pill"
-            label="Summarize thread"
-            onClick={() => console.log('Summarize thread clicked')}
-          />
-          <CWTag
-            key="generate"
-            type="pill"
-            classNames="action-pill"
-            label="Generate replies"
-            onClick={() => console.log('Generate replies clicked')}
-          />
-          <CWTag
-            key="draft"
-            type="pill"
-            classNames="action-pill"
-            label="Draft response"
-            onClick={() => console.log('Draft response clicked')}
-          />
-        </div>
-      </div>
-
-      {/* Input row */}
-      <div className="input-row">
-        <div className="text-input-container">
-          {/* Mention popover - appears above input */}
-          {showMentionPopover && (
-            <div
-              className="mention-dropdown mention-dropdown-above"
-              ref={dropdownRef}
-            >
-              <div className="mention-items">
-                {filteredMentions.length > 0 ? (
-                  filteredMentions.map((item) => {
-                    const isSelected =
-                      (item.type === 'thread' &&
-                        threadTags.some((tag) => tag.id === item.id)) ||
-                      (item.type === 'model' &&
-                        selectedModels.some((model) => model.id === item.id));
-
-                    return (
-                      <div
-                        key={item.id}
-                        className={`mention-item ${item.type} ${isSelected ? 'selected' : ''}`}
-                        onClick={() => handleMentionSelect(item)}
-                      >
-                        <span className="mention-item-text">{item.name}</span>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="mention-empty">No matches found</div>
-                )}
-              </div>
-            </div>
-          )}
-
-          <CWTextInput
-            inputRef={inputRef}
-            fullWidth
-            isCompact
-            value={inputValue}
-            onInput={handleInputChange}
-            placeholder="Create thread or mention a model..."
-          />
-        </div>
-
-        {/* Model selector */}
-        <div className="model-selector" ref={modelSelectorRef}>
-          <button
-            className="model-selector-button"
-            onClick={() => setShowModelSelector(!showModelSelector)}
-          >
-            {selectedModels.length === 0 ? (
-              <CWIcon iconName="starFour" iconSize="small" weight="bold" />
-            ) : (
-              <>
-                <CWIcon iconName="starFour" iconSize="small" weight="bold" />
-                <span className="model-name">{selectedModels[0].label}</span>
-                {selectedModels.length > 1 && (
-                  <span className="model-count">
-                    +{selectedModels.length - 1}
-                  </span>
-                )}
-              </>
+    const buttonGroup = (
+      <div className="button-group">
+        {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+          <CWTooltip
+            content={`${webSearchEnabled ? 'Disable' : 'Enable'} Web Search`}
+            placement="top"
+            renderTrigger={(tooltipInteractionHandler) => (
+              <button
+                className={`web-search-toggle-button ${webSearchEnabled ? 'active' : 'inactive'}`}
+                onClick={handleToggleWebSearch}
+                onMouseEnter={tooltipInteractionHandler}
+                onMouseLeave={tooltipInteractionHandler}
+              >
+                <CWIcon iconName="binoculars" iconSize="small" weight="bold" />
+              </button>
             )}
-          </button>
-          {showModelSelector && (
-            <div className="mention-dropdown mention-dropdown-above model-selector-dropdown">
-              <div className="mention-items">
-                {MODELS.map((model) => {
-                  const isSelected = selectedModels.some(
-                    (m) => m.id === model.id,
-                  );
-                  return (
-                    <div
-                      key={model.id}
-                      className={`mention-item model ${isSelected ? 'selected' : ''}`}
-                      onClick={() => {
-                        const existingModelIndex = selectedModels.findIndex(
-                          (m) => m.id === model.id,
-                        );
-                        if (existingModelIndex >= 0) {
-                          handleRemoveModel(model.id);
-                        } else {
-                          setSelectedModels([...selectedModels, model]);
-                        }
-                      }}
-                    >
-                      <span className="mention-item-text">{model.label}</span>
-                    </div>
-                  );
-                })}
+          />
+        )}
+        {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+          <ClickAwayListener onClickAway={() => aiModelPopover.dispose()}>
+            <div className="popover-container">
+              <CWTooltip
+                content="Select AI models to generate replies"
+                placement="top"
+                renderTrigger={(tooltipInteractionHandler, isTooltipOpen) => (
+                  <button
+                    className={`ai-toggle-button ${isAnyModelSelected ? 'active' : 'inactive'}`}
+                    onClick={(e) =>
+                      handleIconClick({
+                        e,
+                        isMenuOpen: aiModelPopover.open,
+                        isTooltipOpen,
+                        handleInteraction: tooltipInteractionHandler,
+                        onClick: aiModelPopover.handleInteraction,
+                      })
+                    }
+                    onMouseEnter={(e) => {
+                      handleMouseEnter({
+                        e,
+                        isMenuOpen: aiModelPopover.open,
+                        handleInteraction: tooltipInteractionHandler,
+                      });
+                    }}
+                    onMouseLeave={(e) => {
+                      handleMouseLeave({
+                        e,
+                        isTooltipOpen,
+                        handleInteraction: tooltipInteractionHandler,
+                      });
+                    }}
+                  >
+                    <CWIcon iconName="sparkle" iconSize="small" weight="bold" />
+                    {showModelCountBadge && (
+                      <span className="model-count-badge">
+                        {selectedModels.length}
+                      </span>
+                    )}
+                  </button>
+                )}
+              />
+              <CWPopover
+                {...aiModelPopover}
+                placement="top"
+                modifiers={[
+                  {
+                    name: 'offset',
+                    options: {
+                      offset: [0, 8],
+                    },
+                  },
+                ]}
+                content={
+                  <AIModelSelector
+                    title={AI_SELECTOR_TITLE}
+                    availableModels={availableModels}
+                    selectedModelValues={selectedModels.map((m) =>
+                      getCompletionModelValue(m),
+                    )}
+                    onSelectionChange={handleModelSelectionChange}
+                    maxSelection={MAX_MODELS_SELECTABLE}
+                    popoverId={aiModelPopover.id}
+                  />
+                }
+              />
+            </div>
+          </ClickAwayListener>
+        )}
+
+        <CWTooltip
+          content="Add or generate image"
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <button
+              className="image-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleImageClick();
+              }}
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            >
+              <CWIcon iconName="image" iconSize="small" weight="bold" />
+            </button>
+          )}
+        />
+
+        <CWTooltip
+          content="Expand editor"
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <button
+              className="expand-button"
+              onClick={() => setIsExpanded(true)}
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            >
+              <CWIcon
+                iconName="arrowsOutSimple"
+                iconSize="small"
+                weight="bold"
+              />
+            </button>
+          )}
+        />
+
+        <CWTooltip
+          content={`Submit ${mode === 'thread' ? 'thread' : isReplying ? 'reply' : 'comment'}`}
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <button
+              className="send-button"
+              onClick={() => {
+                customHandleSubmitComment().catch(console.error);
+              }}
+              disabled={
+                !canComment ||
+                !contentDelta?.ops?.length ||
+                isGenerating ||
+                (isTurnstileEnabled && !turnstileToken)
+              }
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            >
+              <CWIcon
+                iconName="paperPlaneTilt"
+                iconSize="small"
+                weight="bold"
+              />
+            </button>
+          )}
+        />
+      </div>
+    );
+
+    const inputContent = (
+      <div
+        className={`StickyInput ${isExpanded ? 'expanded' : 'not-expanded'} ${isMobile ? 'mobile' : 'desktop'} ${mode === 'thread' ? 'thread-mode' : ''}`}
+        ref={containerRef}
+        style={isMobile && menuVisible ? { zIndex: -1 } : undefined}
+      >
+        {isExpanded ? (
+          <div
+            className={`${isMobile ? 'MobileStickyInputFocused' : 'DesktopStickyInputExpanded'}`}
+          >
+            {isMobile && (
+              <div className="mobile-editor-container">
+                <div className="header-row">
+                  <div className="left-section">
+                    <CWText type="h4">
+                      {mode === 'thread' ? 'Create Thread' : 'Write Comment'}
+                    </CWText>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {mode === 'thread' ? (
+              <NewThreadForm
+                ref={newThreadFormRef}
+                onCancel={handleCancel}
+                onContentAppended={handleThreadContentAppended}
+                contentDelta={contentDelta}
+                setContentDelta={setContentDelta}
+                webSearchEnabled={webSearchEnabled}
+                setWebSearchEnabled={setWebSearchEnabled}
+              />
+            ) : (
+              <CommentEditor
+                {...props}
+                shouldFocus={true}
+                onCancel={handleCancel}
+                aiCommentsToggleEnabled={
+                  aiCommentsToggleEnabled && selectedModels.length > 0
+                }
+                handleSubmitComment={customHandleSubmitComment}
+                onAiReply={handleAiReply}
+                streamingReplyIds={streamingReplyIds}
+                triggerImageModalOpen={openModalOnExpand && mode === 'comment'}
+                contentDelta={contentDelta}
+                setContentDelta={setContentDelta}
+                webSearchEnabled={webSearchEnabled}
+                setWebSearchEnabled={setWebSearchEnabled}
+              />
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="action-tags-container">
+              <div className="tags-row">
+                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                  <CWTag
+                    key="draft"
+                    type="pill"
+                    classNames={`action-pill ${isGenerating ? 'disabled' : ''}`}
+                    label={
+                      isGenerating ? 'Generating...' : getActionPillLabel()
+                    }
+                    onClick={isGenerating ? undefined : handleGenerateAIContent}
+                  />
+                )}
+                {isMobile && buttonGroup}
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Send button */}
-        <button className="send-button">
-          <CWIcon iconName="paperPlaneTilt" iconSize="small" weight="bold" />
-        </button>
+            <div className="input-row">
+              <div className="text-input-container">
+                <ReactQuillEditor
+                  className="sticky-editor"
+                  contentDelta={props.contentDelta}
+                  setContentDelta={props.setContentDelta}
+                  isDisabled={!canComment}
+                  onKeyDown={handleKeyDown}
+                  placeholder={placeholderText}
+                />
+              </div>
+
+              {!isMobile && buttonGroup}
+            </div>
+            {isReplying && (
+              <div
+                className="cancel-reply-button"
+                onClick={() => {
+                  handleIsReplying?.(false);
+                }}
+              >
+                <CWIcon iconName="close" iconSize="small" weight="bold" />
+                <CWText type="caption">Cancel reply</CWText>
+              </div>
+            )}
+            {isTurnstileEnabled && (
+              <div className="turnstile-container">
+                <TurnstileWidget />
+              </div>
+            )}
+          </>
+        )}
       </div>
-    </div>
-  );
+    );
+
+    if (isMobile) {
+      const parent = document.getElementById('MobileNavigationHead');
+      if (!parent) {
+        console.warn('No parent container for mobile StickyInput');
+        return null;
+      }
+      return createPortal(inputContent, parent);
+    }
+
+    return <div className="DesktopStickyInput">{inputContent}</div>;
+  };
+
+  return renderStickyInput();
 };
 
 export default StickyInput;

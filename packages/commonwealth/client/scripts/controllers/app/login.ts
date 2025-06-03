@@ -5,7 +5,11 @@ import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { Session } from '@canvas-js/interfaces';
 
 import { getEvmAddress } from '@hicommonwealth/evm-protocols';
-import { ExtendedCommunity, MagicLogin } from '@hicommonwealth/schemas';
+import {
+  ExtendedCommunity,
+  GetStatus,
+  MagicLogin,
+} from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
   ChainBase,
@@ -23,14 +27,10 @@ import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
 import { Magic } from 'magic-sdk';
+import moment from 'moment';
 import app, { initAppState } from 'state';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import { SERVER_URL } from 'state/api/config';
-import {
-  onUpdateEmailError,
-  onUpdateEmailSuccess,
-  updateEmail,
-} from 'state/api/user/updateEmail';
 import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
 import { userStore } from 'state/ui/user';
 import { z } from 'zod';
@@ -56,20 +56,7 @@ function storeActiveAccount(account: Account) {
 }
 
 export async function setActiveAccount(account: Account): Promise<void> {
-  const community = app.activeChainId();
   try {
-    const response = await axios.post(`${SERVER_URL}/setDefaultRole`, {
-      address: account.address,
-      author_community_id: account.community.id,
-      community_id: community,
-      jwt: userStore.getState().jwt,
-      auth: true,
-    });
-
-    if (response.data.status !== 'Success') {
-      throw Error(`Unsuccessful status: ${response.status}`);
-    }
-
     storeActiveAccount(account);
   } catch (err) {
     // Failed to set the user's active address to this account.
@@ -187,10 +174,15 @@ export async function updateActiveAddresses(chainId: string) {
 }
 
 // called from the server, which returns public keys
-export function updateActiveUser(data) {
+export function updateActiveUser(
+  data: z.infer<(typeof GetStatus)['output']> & {
+    jwt: string;
+    knockJwtToken: string;
+  },
+) {
   const user = userStore.getState();
 
-  if (!data || data.loggedIn === false) {
+  if (!data) {
     user.setData({
       id: 0,
       email: '',
@@ -222,13 +214,13 @@ export function updateActiveUser(data) {
         id: a.id,
         address: a.address,
         community: {
-          id: a.community_id,
+          id: a.Community.id,
           base: a.Community.base,
-          ss58Prefix: a.Community.ss58_prefix,
+          ss58Prefix: a.Community.ss58_prefix || undefined,
         },
         walletId: a.wallet_id,
-        ghostAddress: a.ghost_address,
-        lastActive: a.last_active,
+        ghostAddress: a.ghost_address || undefined,
+        lastActive: a.last_active ? moment(a.last_active) : undefined,
         walletSsoSource: ssoSource,
       });
     });
@@ -236,7 +228,7 @@ export function updateActiveUser(data) {
     user.setData({
       id: data.id || 0,
       email: data.email || '',
-      emailNotificationInterval: data.emailInterval || '',
+      emailNotificationInterval: data.emailNotificationInterval || '',
       knockJWT: data.knockJwtToken || '',
       addresses,
       jwt: data.jwt || null,
@@ -249,13 +241,13 @@ export function updateActiveUser(data) {
         id: c.id || '',
         iconUrl: c.icon_url || '',
         name: c.name || '',
-        isStarred: c.is_starred || false,
+        isStarred: !!c.starred_at,
       })),
       isLoggedIn: true,
-      referredByAddress: data?.referred_by_address,
-      xpPoints: data?.xp_points,
-      xpReferrerPoints: data?.xp_referrer_points,
-      tier: data?.tier,
+      xpPoints: data.xp_points || undefined,
+      referredByAddress: data.referred_by_address || undefined,
+      xpReferrerPoints: data.xp_referrer_points || undefined,
+      tier: data.tier || undefined,
     });
   }
 }
@@ -568,15 +560,7 @@ export async function handleSocialLoginCallback({
       chainInfo && (await updateActiveAddresses(chainInfo.id || ''));
     }
 
-    const { Profiles: profiles, email: ssoEmail } = response.data.result;
-
-    // if email is not set, set the SSO email as the default email
-    // only if its a standalone account (no account linking)
-    if (!userStore.getState().email && ssoEmail && profiles?.length === 1) {
-      await updateEmail({ email: ssoEmail })
-        .then(onUpdateEmailSuccess)
-        .catch(() => onUpdateEmailError(false));
-    }
+    const { Profiles: profiles } = response.data.result;
 
     // if account is newly created and user has not completed onboarding flow
     // then open the welcome modal.

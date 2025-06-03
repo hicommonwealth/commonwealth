@@ -31,6 +31,8 @@ select
   cm.topic_id,
   cm.is_farcaster_contest,
   cm.vote_weight_multiplier,
+  cm.namespace_judge_token_id,
+  cm.namespace_judges,
   coalesce((
     select jsonb_agg(json_build_object('id', t.id, 'name', t.name) order by t.name)
     from "ContestManagers" cm2
@@ -88,6 +90,8 @@ group by
   cm.prize_percentage,
   cm.payout_structure,
   cm.cancelled,
+  cm.namespace_judge_token_id,
+  cm.namespace_judges,
   c.contests
 order by
   cm.name;

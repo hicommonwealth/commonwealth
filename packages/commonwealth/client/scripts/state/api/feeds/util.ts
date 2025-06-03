@@ -65,7 +65,6 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
           community_id: x.thread.community_id,
           ghost_address: false,
           is_banned: false,
-          is_user_default: false,
           role: 'member',
         },
         topic: x.thread.topic,

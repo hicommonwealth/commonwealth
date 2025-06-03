@@ -37,7 +37,9 @@ export const doesActionAllowContentId = (action: QuestActionType) => {
     action === 'TweetEngagement' ||
     action === 'CommunityCreated' ||
     action === 'DiscordServerJoined' ||
-    action === 'MembershipsRefreshed'
+    action === 'MembershipsRefreshed' ||
+    action === 'LaunchpadTokenTraded' ||
+    action === 'CommunityGoalReached'
   );
 };
 
@@ -83,6 +85,41 @@ export const doesActionRequireGroupId = (action: QuestActionType) => {
 
 export const doesActionRequireStartLink = (action: QuestActionType) => {
   return action === 'DiscordServerJoined';
+};
+
+export const doesActionAllowTokenTradeThreshold = (action: QuestActionType) => {
+  return action === 'LaunchpadTokenTraded';
+};
+
+export const doesActionRequireAmountMultipler = (action: QuestActionType) => {
+  return action === 'LaunchpadTokenTraded';
+};
+
+export const doesActionRequireGoalConfig = (action: QuestActionType) => {
+  return action === 'CommunityGoalReached';
+};
+
+export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
+  const commonQuests: QuestActionType[] = [
+    'CommunityCreated',
+    'CommunityJoined',
+    'ThreadCreated',
+    'ThreadUpvoted',
+    'CommentCreated',
+    'CommentUpvoted',
+    'WalletLinked',
+    'SSOLinked',
+    'DiscordServerJoined',
+    'MembershipsRefreshed',
+    'LaunchpadTokenRecordCreated',
+    'CommunityGoalReached',
+  ];
+  const channelQuest: QuestActionType[] = [
+    'TweetEngagement',
+    'XpChainEventCreated',
+  ];
+
+  return [...commonQuests, ...channelQuest].includes(action);
 };
 
 const convertTimeRemainingToLabel = ({
@@ -154,7 +191,7 @@ export const calculateTotalXPForQuestActions = ({
   questEndDate: Date;
   questActions: QuestAction[];
 }) => {
-  return (
+  const totalXpFixed =
     questActions
       ?.map((action) => {
         // calc reward per attempt with option creator share
@@ -179,8 +216,16 @@ export const calculateTotalXPForQuestActions = ({
         // calc final reward for action
         return finalRewardPerAttempt * totalAttemptsPerSession * totalSessions;
       })
-      .reduce((accumulator, currentValue) => accumulator + currentValue, 0) || 0
-  );
+      .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
+    0;
+  const launchpadTokenTradedMultiplerAura =
+    questActions?.find(
+      (action) =>
+        (action?.amount_multiplier || 0) > 0 &&
+        action.event_name === 'LaunchpadTokenTraded',
+    )?.amount_multiplier || 0;
+
+  return { totalXpFixed, launchpadTokenTradedMultiplerAura };
 };
 
 export const getTotalRepititionCountsForQuestAction = (
@@ -232,15 +277,40 @@ export const isQuestActionComplete = (
   xpLogs: XPLog[],
 ) => {
   // if action repeats, then its only labeled as completed if all the repeatitions are complete
-  return questAction.participation_limit ===
-    QuestParticipationLimit.OncePerQuest
-    ? !!xpLogs.find((p) => p.action_meta_id === questAction.id)
-    : xpLogs.filter((p) => p.action_meta_id === questAction.id).length ===
-        getTotalRepititionCountsForQuestAction(
-          questStartDate,
-          questEndDate,
-          questAction,
-        ).totalRepititions;
+  if (questAction.participation_limit === QuestParticipationLimit.OncePerQuest)
+    return !!xpLogs.find((p) => p.action_meta_id === questAction.id);
+
+  return (
+    xpLogs.filter((p) => p.action_meta_id === questAction.id).length ===
+    getTotalRepititionCountsForQuestAction(
+      questStartDate,
+      questEndDate,
+      questAction,
+    ).totalRepititions
+  );
+};
+
+export const isQuestComplete = ({
+  questStartDate,
+  questEndDate,
+  questActions,
+  xpLogs,
+}: {
+  questStartDate: Date;
+  questEndDate: Date;
+  questActions: QuestAction[];
+  xpLogs: XPLog[];
+}) => {
+  const isStarted = moment().isSameOrAfter(moment(questStartDate));
+  const completedActionsCount = questActions
+    .map((action) =>
+      isQuestActionComplete(questStartDate, questEndDate, action, xpLogs),
+    )
+    .filter(Boolean).length;
+  const isCompleted = completedActionsCount === questActions.length;
+  isStarted;
+
+  return isCompleted;
 };
 
 export const resetXPCacheForUser = (

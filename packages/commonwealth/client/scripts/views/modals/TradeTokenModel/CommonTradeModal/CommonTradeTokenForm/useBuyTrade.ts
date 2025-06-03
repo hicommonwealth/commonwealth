@@ -92,6 +92,7 @@ const useBuyTrade = ({
     const fetchTokenGainAmount = async () => {
       if (
         !launchPad ||
+        !chainNode ||
         baseCurrencyBuyAmountDecimals <= 0 ||
         commonPlatformFeeForBuyTradeInEth >= baseCurrencyBuyAmountDecimals
       ) {
@@ -122,6 +123,7 @@ const useBuyTrade = ({
     void fetchTokenGainAmount();
   }, [
     launchPad,
+    chainNode,
     baseCurrencyBuyAmountDecimals,
     commonPlatformFeeForBuyTradeInEth,
     ethChainId,
@@ -157,7 +159,6 @@ const useBuyTrade = ({
 
   const handleTokenBuy = async () => {
     try {
-      // this condition wouldn't be called, but adding to avoid typescript issues
       if (
         !chainNode?.url ||
         !ethChainId ||

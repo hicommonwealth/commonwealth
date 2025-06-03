@@ -24,7 +24,7 @@ import {
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
   SKALE_ID,
-  SONIEUM_ID,
+  SONEIUM_ID,
   alphabeticallyStakeWiseSortedChains as sortedChains,
 } from './constants';
 import {
@@ -98,6 +98,12 @@ const CommunityInformationForm = ({
         .map(mappedChainValue);
     }
 
+    if (withChainsConfig?.community?.type === CommunityType.Sui) {
+      return sortedChains
+        .filter((chainType) => chainType.chainBase === CommunityType.Sui)
+        .map(mappedChainValue);
+    }
+
     return sortedChains
       .filter(
         (chainType) =>
@@ -127,8 +133,8 @@ const CommunityInformationForm = ({
               return options?.find((o) => o.value === BLAST_ID);
             case CommunityType.Skale:
               return options?.find((o) => o.value === SKALE_ID);
-            case CommunityType.Sonieum:
-              return options?.find((o) => o.value === SONIEUM_ID);
+            case CommunityType.Soneium:
+              return options?.find((o) => o.value === SONEIUM_ID);
             case CommunityType.Polygon:
             case CommunityType.Solana:
               return options?.[0];
