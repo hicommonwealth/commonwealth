@@ -61,7 +61,7 @@ const app: IApp = {
   isModuleReady: false,
 };
 
-// On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
+// On login: called to initialize the logged-in state, available chains, and other metadata
 // On logout: called to reset everything
 export async function initAppState(
   updateSelectedCommunity = true,
@@ -78,11 +78,18 @@ export async function initAppState(
       },
     });
 
+    // TODO: @masvelio how can we get the user's address here without
+    // having to call the server to go through the passport login flow?
+    // - should we set the active account after logging in?
+    // - should we reset the active account after logging out?
+    // - should we store the active account in local storage?
+    // - should we use the current wallet address as the active account?
     const user = userStore.getState();
     const address =
       user.addressSelectorSelectedAddress ||
       user.activeAccount?.address ||
       user.addresses?.at(0)?.address;
+
     if (address) {
       try {
         const status = await fetchStatus(address);
