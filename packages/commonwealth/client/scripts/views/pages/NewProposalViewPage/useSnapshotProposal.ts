@@ -54,14 +54,13 @@ export const useSnapshotProposal = ({
     error: threadsError,
     isLoading: isThreadsLoading,
   } = useGetThreadsByLinkQuery({
-    communityId: app.activeChainId() || '',
     link: {
       source: LinkSource.Snapshot,
       identifier: `${snapshotId}/${proposal?.id}`,
     },
     enabled: !!(app.activeChainId() && proposal?.id),
   });
-  const threads = threadsData || [];
+  const threads = threadsData?.threads || [];
 
   useEffect(() => {
     if (!isThreadsLoading && threadsError) {

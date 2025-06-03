@@ -1,7 +1,5 @@
-import {
-  MembershipRejectReason,
-  PermissionEnum,
-} from '@hicommonwealth/schemas';
+import { MembershipRejectReason } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { z } from 'node_modules/zod';
 
@@ -16,7 +14,7 @@ interface GetMembershipsProps {
 
 export interface Memberships {
   groupId: number;
-  topics: { id: number; permissions: PermissionEnum[] }[];
+  topics: { id: number; permissions: GatedActionEnum[] }[];
   isAllowed: boolean;
   rejectReason?: z.infer<typeof MembershipRejectReason>;
 }

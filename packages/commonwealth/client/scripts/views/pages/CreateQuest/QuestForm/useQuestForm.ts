@@ -1,10 +1,15 @@
 import {
+  EVM_ADDRESS_STRICT,
+  EVM_EVENT_SIGNATURE_STRICT,
   KyoFinanceLpQuestRequestParams,
   KyoFinanceSwapQuestRequestParams,
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { getDefaultContestImage } from '@hicommonwealth/shared';
+import {
+  CommunityGoalType,
+  getDefaultContestImage,
+} from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
 import {
@@ -14,8 +19,13 @@ import {
   doesActionAllowContentId,
   doesActionAllowRepetition,
   doesActionAllowThreadId,
+  doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
+  doesActionRequireAmountMultipler,
+  doesActionRequireBasicRewardAmount,
+  doesActionRequireChainEvent,
   doesActionRequireDiscordServerId,
+  doesActionRequireGoalConfig,
   doesActionRequireGroupId,
   doesActionRequireKYOFinanceLpMetadata,
   doesActionRequireKYOFinanceSwapMetadata,
@@ -32,13 +42,20 @@ import {
   useCreateQuestMutation,
   useUpdateQuestMutation,
 } from 'state/api/quests';
+import {
+  useCreateGoalMetaMutation,
+  useGetGoalMetasQuery,
+} from 'state/api/superAdmin';
 import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
 import './QuestForm.scss';
-import { buildContentIdFromIdentifier } from './helpers';
+import {
+  buildContentIdFromIdentifier,
+  doesConfigAllowContentIdField,
+} from './helpers';
 import { QuestFormProps } from './types';
 import { buildDynamicQuestFormValidationSchema } from './validation';
 
@@ -57,11 +74,13 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'SSOLinked',
       'DiscordServerJoined',
       'MembershipsRefreshed',
-      'LaunchpadTokenCreated',
+      'LaunchpadTokenRecordCreated',
+      'LaunchpadTokenTraded',
+      'CommunityGoalReached',
       'KyoFinanceSwapQuestVerified',
       'KyoFinanceLpQuestVerified',
     ] as QuestAction[],
-    channel: ['TweetEngagement'] as QuestAction[],
+    channel: ['TweetEngagement', 'XpChainEventCreated'] as QuestAction[],
   };
   const [availableQuestActions, setAvailableQuestActions] = useState<
     QuestAction[]
@@ -108,6 +127,19 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     noOfRetweets: subForm.noOfRetweets || 0,
                     noOfReplies: subForm.noOfReplies || 0,
                   }),
+                  ...(doesActionRequireAmountMultipler(chosenAction) && {
+                    amountMultipler: subForm.amountMultipler || 0,
+                  }),
+                  ...(doesActionRequireChainEvent(chosenAction) && {
+                    contractAddress: subForm.contractAddress,
+                    ethChainId: subForm.ethChainId,
+                    eventSignature: subForm.eventSignature,
+                    transactionHash: subForm.transactionHash,
+                  }),
+                  ...(doesActionRequireGoalConfig(chosenAction) && {
+                    goalTarget: subForm.goalTarget,
+                    goalType: subForm.goalType,
+                  }),
                   participationLimit: subForm.participationLimit,
                   participationPeriod: subForm.participationPeriod,
                   participationTimesPerPeriod:
@@ -116,6 +148,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                 },
                 errors: {},
                 config: {
+                  requires_basic_points:
+                    doesActionRequireBasicRewardAmount(chosenAction),
                   requires_creator_points:
                     doesActionRequireRewardShare(chosenAction),
                   is_action_repeatable: doesActionAllowRepetition(chosenAction),
@@ -131,11 +165,20 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   requires_discord_server_id:
                     allowsContentId &&
                     doesActionRequireDiscordServerId(chosenAction),
+                  requires_goal_config:
+                    doesActionRequireGoalConfig(chosenAction),
+                  requires_chain_event:
+                    doesActionRequireChainEvent(chosenAction),
                   with_optional_chain_id:
                     allowsContentId && doesActionAllowChainId(chosenAction),
                   requires_group_id:
                     allowsContentId && doesActionRequireGroupId(chosenAction),
                   requires_start_link: doesActionRequireStartLink(chosenAction),
+                  requires_amount_multipler:
+                    doesActionRequireAmountMultipler(chosenAction),
+                  with_optional_token_trade_threshold:
+                    allowsContentId &&
+                    doesActionAllowTokenTradeThreshold(chosenAction),
                   requires_kyo_finance_swap_metadata:
                     doesActionRequireKYOFinanceSwapMetadata(chosenAction),
                   requires_kyo_finance_lp_metadata:
@@ -161,6 +204,10 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
 
   const { mutateAsync: createQuest } = useCreateQuestMutation();
   const { mutateAsync: updateQuest } = useUpdateQuestMutation();
+  const { mutateAsync: createGoalMeta } = useCreateGoalMetaMutation();
+  const { data: goalMetas = [] } = useGetGoalMetasQuery({
+    apiEnabled: true,
+  });
 
   const navigate = useCommonNavigate();
 
@@ -187,7 +234,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           formMethodsRef?.current?.getValues('end_date') || new Date(),
         questStartDate:
           formMethodsRef?.current?.getValues('start_date') || new Date(),
-      }),
+      })?.totalXpFixed, // Note: dynamic xp calculation is not needed here
     );
   }, [questActionSubForms]);
 
@@ -241,13 +288,16 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (scope === QuestActionContentIdScope.Topic) return 'topic';
         if (scope === QuestActionContentIdScope.Chain) return 'chain';
         if (scope === QuestActionContentIdScope.Group) return 'group';
+        if (scope === QuestActionContentIdScope.Goal) return 'goal';
+        if (scope === QuestActionContentIdScope.TokenTradeThreshold) {
+          return 'threshold';
+        }
         if (scope === QuestActionContentIdScope.Thread) {
           if (subForm.config?.with_optional_comment_id) return 'comment';
           return 'thread';
         }
         return 'thread';
       })();
-
       const metadata = (() => {
         if (!subForm.values?.metadata?.chainId) return null;
 
@@ -281,7 +331,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
 
       return {
         event_name: subForm.values.action as QuestAction as any, // TODO: tim - fix type in API
-        reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
+        reward_amount: parseInt(`${subForm.values.rewardAmount || 0}`, 10),
         ...(subForm.values.creatorRewardAmount && {
           creator_reward_weight: calculateRemainingPercentageChangeFractional(
             parseInt(`${subForm.values.rewardAmount}`, 10),
@@ -289,13 +339,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           ),
         }),
         ...(subForm.values.contentIdentifier &&
-          (subForm.config?.with_optional_comment_id ||
-            subForm.config?.with_optional_thread_id ||
-            subForm.config?.with_optional_chain_id ||
-            subForm.config?.with_optional_topic_id ||
-            subForm.config?.requires_twitter_tweet_link ||
-            subForm.config?.requires_discord_server_id ||
-            subForm.config?.requires_group_id) && {
+          subForm.config &&
+          (doesConfigAllowContentIdField(subForm.config) ||
+            subForm.config.requires_goal_config) && {
             content_id: buildContentIdFromIdentifier(
               subForm.values.contentIdentifier,
               contentIdScope,
@@ -313,6 +359,20 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             replies: parseInt(`${subForm.values.noOfReplies || 0}`) || 0,
           },
         }),
+        ...(subForm.config?.requires_chain_event && {
+          chain_event: {
+            eth_chain_id: parseInt(`${subForm.values.ethChainId}`, 10),
+            contract_address: subForm.values.contractAddress! as z.infer<
+              typeof EVM_ADDRESS_STRICT
+            >,
+            event_signature: subForm.values.eventSignature! as z.infer<
+              typeof EVM_EVENT_SIGNATURE_STRICT
+            >,
+            tx_hash: subForm.values.transactionHash! as z.infer<
+              typeof EVM_EVENT_SIGNATURE_STRICT
+            >,
+          },
+        }),
         participation_limit: subForm.values.participationLimit,
         participation_period: subForm.values
           .participationPeriod as QuestParticipationPeriod,
@@ -322,7 +382,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         ...(subForm.values.instructionsLink && {
           instructions_link: subForm.values.instructionsLink.trim(),
         }),
-        amount_multiplier: 0,
+        amount_multiplier: subForm.config?.requires_amount_multipler
+          ? parseInt(`${subForm.values.amountMultipler || 0}`)
+          : 0,
         metadata,
       };
     });
@@ -376,21 +438,79 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     });
   };
 
-  const handleSubmit = (
+  const handleGoalMetaAssignment = async () => {
+    const foundCommunityGoalReachedActionIndex = questActionSubForms.findIndex(
+      (f) => f.values.action === 'CommunityGoalReached',
+    );
+    const { goalTarget, goalType } =
+      questActionSubForms[foundCommunityGoalReachedActionIndex]?.values || {};
+    if (goalTarget && goalType) {
+      // find existing goal meta, use its id if present
+      const foundMeta = goalMetas.find(
+        (m) => m.type === goalType && m.target === parseInt(`${goalTarget}`),
+      );
+      if (foundMeta) {
+        // TODO: fix - api throws unique constraint error if goal id is repeated
+        console.log('foundMeta => ', foundMeta);
+        // updateSubFormByIndex(
+        //   {
+        //     contentIdentifier: `${foundMeta.id || ''}`,
+        //   },
+        //   foundCommunityGoalReachedActionIndex,
+        // );
+        // return true;
+      }
+
+      try {
+        // create goal meta
+        const name = [String(goalType), String(goalTarget)]
+          .sort((a, b) => b.localeCompare(a))
+          .join('-'); // creating manually, ensure dups aren't created
+        const goal = await createGoalMeta({
+          name,
+          description: name,
+          target: parseInt(`${goalTarget}`),
+          type: goalType as CommunityGoalType,
+        });
+        updateSubFormByIndex(
+          {
+            contentIdentifier: `${goal.id || ''}`,
+          },
+          foundCommunityGoalReachedActionIndex,
+        );
+        await new Promise((r) => setTimeout(r, 500));
+        return true;
+      } catch (error) {
+        const subFormErrors = validateSubForms();
+        if (subFormErrors) {
+          return false;
+        }
+        notifyError(
+          `Failed to create goal config for 'Community Goal Reached' action`,
+        );
+        return false;
+      }
+    }
+  };
+
+  const handleSubmit = async (
     values: z.infer<ReturnType<typeof buildDynamicQuestFormValidationSchema>>,
   ) => {
+    const isAssigned = await handleGoalMetaAssignment().catch(() => false);
+    if (!isAssigned) return;
+
     const subFormErrors = validateSubForms();
 
     if (subFormErrors || (mode === 'update' ? !questId : false)) {
       return;
     }
 
-    const handleAsync = async () => {
+    const handleMutation = async () => {
       try {
         if (mode === 'create') {
           await handleCreateQuest(values);
           notifySuccess(`Quest ${mode}d!`);
-          navigate('/explore');
+          navigate('/explore?tab=quests');
         }
         if (mode === 'update') {
           await handleUpdateQuest(values);
@@ -530,6 +650,26 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           setQuestActionSubForms([...tempForm]);
           return;
         }
+        if (error.includes('tweet url is already part of a quest')) {
+          const tempForm = [...questActionSubForms];
+          const foundSubForm = tempForm.find(
+            (form) => form.values?.action === 'TweetEngagement',
+          );
+          if (foundSubForm) {
+            foundSubForm.errors = {
+              ...(foundSubForm.errors || {}),
+              contentIdentifier: `This tweet is already part of another quest.`,
+            };
+          }
+          setQuestActionSubForms([...tempForm]);
+          return;
+        }
+        if (error.includes('community id is required when setting goals')) {
+          notifyError(
+            `Community scope is required for setting a community goal`,
+          );
+          return;
+        }
         notifyError(`Failed to ${mode} quest!`);
       }
     };
@@ -540,10 +680,10 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     // request confirmation from user if quest is being created <=6 hours in advance
     if (questStartHoursDiffFromNow <= 6) {
       handleQuestMutateConfirmation(questStartHoursDiffFromNow)
-        .then(() => handleAsync().catch(console.error))
+        .then(() => handleMutation().catch(console.error))
         .catch(console.error);
     } else {
-      handleAsync().catch(console.error);
+      handleMutation().catch(console.error);
     }
   };
 

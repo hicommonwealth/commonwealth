@@ -1,32 +1,30 @@
-import {
-  QuestActionMeta,
-  QuestParticipationLimit,
-} from '@hicommonwealth/schemas';
+import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
-import { roundDecimalsOrReturnWhole } from 'helpers/number';
 import {
-  doesActionRequireRewardShare,
-  doesActionRewardShareForReferrer,
   getTotalRepititionCountsForQuestAction,
+  QuestAction,
 } from 'helpers/quest';
 import React from 'react';
 import { fetchCachedNodes } from 'state/api/nodes';
+import { useGetGoalMetasQuery } from 'state/api/superAdmin';
 import useUserStore from 'state/ui/user';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWCircleRingSpinner from 'views/components/component_kit/new_designs/CWCircleRingSpinner';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { z } from 'zod';
-import './QuestActionCard.scss';
 import { actionCopies } from './helpers';
+import './QuestActionCard.scss';
+import QuestActionXpShares from './QuestActionXPShares';
+import TotalQuestActionXPTag from './TotalQuestActionXPTag';
 
 type QuestActionCardProps = {
   isActionCompleted?: boolean;
-  onActionStart: (action: z.infer<typeof QuestActionMeta>) => void;
+  onActionStart: (action: QuestAction) => void;
   actionNumber: number;
-  questAction: z.infer<typeof QuestActionMeta>;
+  questAction: QuestAction;
   isActionInEligible?: boolean;
   xpLogsForActions?: { id: number; createdAt: Date }[];
   inEligibilityReason?: string;
@@ -49,18 +47,16 @@ const QuestActionCard = ({
   questStartDate,
   questEndDate,
 }: QuestActionCardProps) => {
-  const creatorXP = {
-    percentage: roundDecimalsOrReturnWhole(
-      questAction.creator_reward_weight * 100,
-      2,
-    ),
-    value: questAction.creator_reward_weight * questAction.reward_amount,
-  };
-
   const user = useUserStore();
-  const isUserReferred = !!user.referredByAddress;
-  const hideShareSplit =
-    doesActionRewardShareForReferrer(questAction.event_name) && !isUserReferred;
+
+  const { data: goalMetas } = useGetGoalMetasQuery({
+    apiEnabled: questAction.event_name === 'CommunityGoalReached',
+  });
+  const foundGoalsMetaMeta = goalMetas?.find(
+    (m) =>
+      m.id ===
+      parseInt((questAction?.content_id || '')?.split(':').at(-1) || ''),
+  );
 
   // Function to determine the button label based on quest action type
   const getButtonLabel = () => {
@@ -128,6 +124,9 @@ const QuestActionCard = ({
               'TweetEngagement',
               'DiscordServerJoined',
               'CommunityCreated',
+              'LaunchpadTokenTraded',
+              'XpChainEventCreated',
+              'CommunityGoalReached',
               'KyoFinanceSwapQuestVerified',
               'KyoFinanceLpQuestVerified',
             ].includes(questAction.event_name) && (
@@ -164,6 +163,33 @@ const QuestActionCard = ({
                       )}
                     </CWText>
                   )}
+                {questAction.event_name === 'LaunchpadTokenTraded' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction.amount_multiplier || 0,
+                      `${questAction?.content_id?.split(':').at(-1) || ''}`,
+                    )}
+                  </CWText>
+                )}
+                {questAction.event_name === 'XpChainEventCreated' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction?.ChainEventXpSource?.contract_address || '',
+                      questAction?.ChainEventXpSource?.ChainNode
+                        ?.eth_chain_id || '',
+                    )}
+                  </CWText>
+                )}
+                {questAction.event_name === 'CommunityGoalReached' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      foundGoalsMetaMeta?.type || (
+                        <CWCircleRingSpinner size="small" />
+                      ),
+                      foundGoalsMetaMeta?.target || <></>,
+                    )}
+                  </CWText>
+                )}
                 {questAction.event_name === 'KyoFinanceSwapQuestVerified' && (
                   <CWText type="caption">
                     {actionCopies.explainer[questAction.event_name](
@@ -185,25 +211,9 @@ const QuestActionCard = ({
                 )}
               </>
             )}
-            {!hideShareSplit &&
-              doesActionRequireRewardShare(questAction.event_name) &&
-              creatorXP.percentage > 0 && (
-                <CWText type="caption" className="xp-shares">
-                  <span className="creator-share">
-                    {creatorXP.percentage}% (
-                    {roundDecimalsOrReturnWhole(creatorXP.value, 2)} Aura)
-                  </span>
-                  &nbsp; shared with{' '}
-                  {actionCopies.shares[questAction.event_name]}. Your share ={' '}
-                  {Math.abs(questAction.reward_amount - creatorXP.value)} Aura
-                  {isRepeatableQuest ? ` / attempt` : ''}
-                </CWText>
-              )}
+            <QuestActionXpShares questAction={questAction} />
             <div className="points-row">
-              <CWTag
-                label={`${questAction.reward_amount} Aura${isRepeatableQuest ? ` / attempt` : ''}`}
-                type="proposal"
-              />
+              <TotalQuestActionXPTag questAction={questAction} />
               {isRepeatableQuest &&
                 attemptsLeft !== 0 &&
                 attemptsLeft !== totalActionRepititions && (

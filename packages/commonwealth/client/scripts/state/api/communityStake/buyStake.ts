@@ -28,7 +28,7 @@ const buyStake = async ({
     commonProtocol.factoryContracts[ethChainId].communityStake,
     commonProtocol.factoryContracts[ethChainId].factory,
     chainRpc,
-    chainId,
+    `${ethChainId}`,
   );
 
   return await communityStakes.buyStake(

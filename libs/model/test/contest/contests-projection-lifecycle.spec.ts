@@ -368,6 +368,8 @@ describe('Contests projection lifecycle', () => {
         topics: [{ id: topic_id, name: 'General' }],
         is_farcaster_contest: true,
         vote_weight_multiplier: null,
+        namespace_judge_token_id: null,
+        namespace_judges: null,
         contests: [
           {
             contest_id,

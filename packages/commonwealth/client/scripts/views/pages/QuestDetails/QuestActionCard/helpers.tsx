@@ -1,5 +1,5 @@
 import { pluralize } from 'helpers';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 export const actionCopies = {
   title: {
@@ -15,12 +15,15 @@ export const actionCopies = {
     ['TweetEngagement']: 'Engage on Tweet',
     ['DiscordServerJoined']: 'Join Discord Community',
     ['MembershipsRefreshed']: 'Join a Group',
-    ['LaunchpadTokenCreated']: 'Launch a Token on Common',
+    ['XpChainEventCreated']: 'Engage on Blockchain',
+    ['LaunchpadTokenRecordCreated']: 'Launch a Token on Common',
+    ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
+    ['CommunityGoalReached']: 'Complete the community goal',
     ['KyoFinanceSwapQuestVerified']: 'Complete a token swap on Kyo Finance',
     ['KyoFinanceLpQuestVerified']: 'Provide liquidity to a Kyo Finance pool',
   },
   pre_reqs: {
-    ['SignUpFlowCompleted']: '',
+    ['SignUpFlowCompleted']: () => '',
     ['CommunityCreated']: () => '',
     ['CommunityJoined']: () => '',
     ['ThreadCreated']: () => '',
@@ -33,15 +36,18 @@ export const actionCopies = {
       `Requires Twitter/X profile linked to ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
     ['DiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
-    ['MembershipsRefreshed']: '',
-    ['LaunchpadTokenCreated']: '',
+    ['MembershipsRefreshed']: () => '',
+    ['XpChainEventCreated']: () => '',
+    ['LaunchpadTokenRecordCreated']: () => '',
+    ['LaunchpadTokenTraded']: () => '',
+    ['CommunityGoalReached']: () => '',
     ['KyoFinanceSwapQuestVerified']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires a wallet connected to Soneium chain on ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
     ['KyoFinanceLpQuestVerified']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires a wallet connected to Soneium chain on ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
   },
   explainer: {
-    ['SignUpFlowCompleted']: '',
+    ['SignUpFlowCompleted']: () => '',
     ['CommunityCreated']: (chainName?: string) =>
       chainName ? `● Must be created on the ${chainName} chain.` : '',
     ['CommunityJoined']: () => '',
@@ -88,10 +94,66 @@ export const actionCopies = {
         </ul>
       </div>
     ),
-    ['DiscordServerJoined']: '',
-    ['MembershipsRefreshed']: '',
-    ['LaunchpadTokenCreated']: '',
+    ['DiscordServerJoined']: () => '',
+    ['MembershipsRefreshed']: () => '',
     // eslint-disable-next-line react/no-multi-comp
+    ['XpChainEventCreated']: (
+      contractAddress: string,
+      ethChainId: number | string,
+    ) => (
+      <div>
+        <ul>
+          <li>
+            ● Any user address who&apos;s transaction emits the event on the
+            ethereum chain: {ethChainId} and contract: {contractAddress}, will
+            receive Aura.
+          </li>
+          <li>
+            ● Aura goes to the initiator of the transaction, and not the
+            receiver/target of it.
+          </li>
+        </ul>
+      </div>
+    ),
+    ['LaunchpadTokenRecordCreated']: () => '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['LaunchpadTokenTraded']: (
+      amountMultipler: string | number,
+      ethAmount?: string | number,
+    ) => (
+      <div>
+        <ul>
+          <li>
+            ● This action rewards aura based on your trade volume ex: You trade
+            1 ETH tokens worth, you get 1 Aura.
+          </li>
+          <li>
+            ● This action has an aura multipler of {amountMultipler}x. You trade
+            1 ETH tokens worth, you get {amountMultipler} Aura.
+          </li>
+          {ethAmount && (
+            <li>
+              ● Aura is only awarded after a miminum {ethAmount} ETH worth of
+              launchpad token is traded.
+            </li>
+          )}
+          <li>
+            ● No Aura is awarded if your trade amount multiplied by the aura
+            multiplier does not equal at least 1 Aura.
+          </li>
+        </ul>
+      </div>
+    ),
+    // eslint-disable-next-line react/no-multi-comp
+    ['CommunityGoalReached']: (type: ReactNode, target: ReactNode) => (
+      <div>
+        <ul>
+          <li>
+            ● Reach {target} {type} before quest ends.
+          </li>
+        </ul>
+      </div>
+    ), // eslint-disable-next-line react/no-multi-comp
     ['KyoFinanceSwapQuestVerified']: (
       chainId?: number,
       minOutputAmount?: string,
@@ -160,7 +222,10 @@ export const actionCopies = {
     ['TweetEngagement']: '',
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
-    ['LaunchpadTokenCreated']: '',
+    ['XpChainEventCreated']: '',
+    ['LaunchpadTokenRecordCreated']: '',
+    ['LaunchpadTokenTraded']: '',
+    ['CommunityGoalReached']: '',
     ['KyoFinanceSwapQuestVerified']: '',
     ['KyoFinanceLpQuestVerified']: '',
   },

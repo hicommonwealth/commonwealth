@@ -1,7 +1,7 @@
 import type { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { BASE_API_PATH } from 'client/scripts/utils/trpcClient';
 import app from 'state';
-import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
@@ -16,6 +16,7 @@ import OkxWebWalletController from './webWallets/okx_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
 import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
 import SolflareWebWalletController from './webWallets/solflare_web_wallet';
+import SuiWebWalletController from './webWallets/sui_web_wallet';
 import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
 import TerraWalletConnectWebWalletController from './webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';
@@ -64,13 +65,17 @@ export default class WebWalletController {
     }
     // do nothing on failure
     try {
-      await axios.post(`${SERVER_URL}/setAddressWallet`, {
-        address: account.address,
-        author_community_id: account.community.id,
-        wallet_id: wallet,
-        wallet_sso_source: null,
-        jwt: userStore.getState().jwt,
-      });
+      await axios.post(
+        `${BASE_API_PATH}/community.setAddressWallet`,
+        {
+          community_id: account.community.id,
+          wallet_id: wallet,
+          jwt: userStore.getState().jwt,
+        },
+        {
+          headers: { address: account.address },
+        },
+      );
     } catch (e) {
       console.error(`Failed to set wallet for address: ${e.message}`);
     }
@@ -130,6 +135,7 @@ export default class WebWalletController {
       new CoinbaseWebWalletController(),
       new BackpackWebWalletController(),
       new SolflareWebWalletController(),
+      new SuiWebWalletController(),
     ];
   }
 }

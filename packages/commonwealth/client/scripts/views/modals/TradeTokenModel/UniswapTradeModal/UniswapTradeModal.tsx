@@ -2,7 +2,8 @@ import { getChainName } from '@hicommonwealth/evm-protocols';
 import { ChainBase } from '@hicommonwealth/shared';
 import { SupportedChainId, SwapWidget } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
-import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
+import NodeInfo from 'client/scripts/models/NodeInfo';
+import { fetchNodes } from 'client/scripts/state/api/nodes';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
 import React, { useEffect, useState } from 'react';
@@ -118,7 +119,10 @@ const UniswapTradeModal = ({
     }
   }, [isOpen, isWrongNetwork, promptNetworkSwitch]);
 
-  const nodes = fetchCachedNodes();
+  const [nodes, setNodes] = useState<NodeInfo[]>();
+  useEffect(() => {
+    fetchNodes().then(setNodes).catch(console.error);
+  }, []);
   const jsonRpcUrlMap = formatJsonRpcMap(nodes);
 
   const logo =

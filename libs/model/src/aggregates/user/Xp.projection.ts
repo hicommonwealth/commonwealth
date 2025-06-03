@@ -5,7 +5,11 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { WalletSsoSource, isWithinPeriod } from '@hicommonwealth/shared';
+import {
+  isWithinPeriod,
+  UserTierMap,
+  WalletSsoSource,
+} from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../../database';
@@ -15,14 +19,34 @@ async function getUserByAddressId(address_id: number) {
   const addr = await models.Address.findOne({
     where: { id: address_id },
     attributes: ['user_id'],
+    include: [
+      {
+        model: models.User,
+        attributes: ['id'],
+        required: true,
+        where: {
+          tier: { [Op.ne]: UserTierMap.BannedUser },
+        },
+      },
+    ],
   });
   return addr?.user_id ?? undefined;
 }
 
 async function getUserByAddress(address: string) {
   const addr = await models.Address.findOne({
-    where: { address },
+    where: { address: { [Op.iLike]: address }, user_id: { [Op.not]: null } },
     attributes: ['user_id'],
+    include: [
+      {
+        model: models.User,
+        attributes: ['id'],
+        required: true,
+        where: {
+          tier: { [Op.ne]: UserTierMap.BannedUser },
+        },
+      },
+    ],
   });
   return addr?.user_id ?? undefined;
 }
@@ -31,7 +55,11 @@ async function getUserByAddress(address: string) {
  * Finds all active quest action metas for a given event
  */
 async function getQuestActionMetas(
-  event_payload: { community_id?: string; created_at?: Date },
+  event_payload: {
+    community_id?: string;
+    created_at?: Date;
+    quest_action_meta_ids?: number[];
+  },
   event_name: keyof typeof schemas.QuestEvents,
 ) {
   // make sure quest was active when event was created
@@ -46,7 +74,12 @@ async function getQuestActionMetas(
         required: true,
         model: models.QuestActionMeta,
         as: 'action_metas',
-        where: { event_name },
+        where: {
+          event_name,
+          ...(event_payload.quest_action_meta_ids && {
+            id: event_payload.quest_action_meta_ids,
+          }),
+        },
       },
     ],
   });
@@ -231,7 +264,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
     body: {
       SignUpFlowCompleted: async ({ payload }) => {
         const referee_address = await models.User.findOne({
-          where: { id: payload.user_id },
+          where: {
+            id: payload.user_id,
+            tier: { [Op.ne]: UserTierMap.BannedUser },
+          },
         });
         const action_metas = await getQuestActionMetas(
           payload,
@@ -269,7 +305,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           'CommunityJoined',
         );
         const user = await models.User.findOne({
-          where: { id: payload.user_id },
+          where: {
+            id: payload.user_id,
+            tier: { [Op.ne]: UserTierMap.BannedUser },
+          },
         });
         if (action_metas.length > 0) {
           await recordXpsForQuest(
@@ -462,26 +501,42 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           { amount: total_prize },
         );
       },
-      LaunchpadTokenCreated: async ({ payload }) => {
-        const created_at = new Date(Number(payload.block_timestamp));
+      LaunchpadTokenRecordCreated: async ({ payload }) => {
+        const user_id = await getUserByAddress(payload.creator_address);
+        if (!user_id) return;
+
+        const created_at = payload.created_at;
         const action_metas = await getQuestActionMetas(
           { created_at },
-          'LaunchpadTokenCreated',
+          'LaunchpadTokenRecordCreated',
         );
-        const user_id = 0; // TODO: @kurtassad how we find user who launched the token?
         await recordXpsForQuest(user_id, created_at, action_metas);
       },
       LaunchpadTokenTraded: async ({ payload }) => {
         const user_id = await getUserByAddress(payload.trader_address);
         if (!user_id) return;
 
-        const created_at = new Date(Number(payload.block_timestamp));
+        const token = await models.LaunchpadToken.findOne({
+          where: { token_address: payload.token_address.toLowerCase() },
+        });
+        if (!token) return;
+
+        const community = await models.Community.findOne({
+          where: { namespace: token.namespace },
+        });
+
+        const created_at = new Date(Number(payload.block_timestamp) * 1000);
         const action_metas = await getQuestActionMetas(
-          { created_at },
+          { community_id: community?.id, created_at },
           'LaunchpadTokenTraded',
         );
+
+        // payload eth_amount is in wei, a little misleading
+        const eth_amount = Number(payload.eth_amount) / 1e18;
+        //console.log({ payload, action_metas, eth_amount });
         await recordXpsForQuest(user_id, created_at, action_metas, undefined, {
-          amount: Number(payload.eth_amount),
+          amount: eth_amount,
+          threshold: eth_amount,
         });
       },
       WalletLinked: async ({ payload }) => {
@@ -593,13 +648,19 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
         });
         const user_id = await getUserByAddress(getEvmAddress(tx.from));
         if (!user_id) return;
-        const action_meta = await models.QuestActionMeta.findOne({
-          where: {
-            id: payload.quest_action_meta_id,
-          },
-        });
-        if (!action_meta) return;
-        await recordXpsForQuest(user_id, payload.created_at, [action_meta]);
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'XpChainEventCreated',
+        );
+
+        // should never happen
+        if (action_metas.length > 1)
+          throw new Error(
+            'Too many action metas for XpChainEventCreated event',
+          );
+
+        if (action_metas.length === 0) return;
+        await recordXpsForQuest(user_id, payload.created_at, action_metas);
       },
       MembershipsRefreshed: async ({ payload }) => {
         const action_metas = await getQuestActionMetas(

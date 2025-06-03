@@ -112,7 +112,7 @@ const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 
-const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+const WalletPage = lazy(() => import('views/pages/WalletPage'));
 const CommunityHomePage = lazy(
   () => import('../views/pages/CommunityHome/CommunityHomePage'),
 );
@@ -240,9 +240,9 @@ const CustomDomainRoutes = () => {
       element={withLayout(MyTransactions, { type: 'common' })}
     />,
     <Route
-      key="/rewards"
-      path="/rewards"
-      element={withLayout(RewardsPage, { type: 'common' })}
+      key="/wallet"
+      path="/wallet"
+      element={withLayout(WalletPage, { type: 'common' })}
     />,
 
     // NOTIFICATIONS
@@ -737,7 +737,7 @@ const CustomDomainRoutes = () => {
       element={<Navigate to="/profile/edit" />}
     />,
 
-    // LEGACY LINKING REDIRECTS
+    // LEGACY LINKING REDIRECTS!
     // These redirects exist so we can land on a properly identified page
     // without loading additional metadata on the view thread page to construct
     // a proper link. Each of these routes will:
@@ -750,6 +750,11 @@ const CustomDomainRoutes = () => {
       element={withLayout(SnapshotProposalLinkRedirectPage, {
         scoped: true,
       })}
+    />,
+    <Route
+      key="/rewards"
+      path="/rewards"
+      element={<Navigate to="/wallet" />}
     />,
   ];
 };

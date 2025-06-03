@@ -2,7 +2,7 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
-import { PageLoading } from './loading';
+import { LoadingIndicator } from '../components/LoadingIndicator/LoadingIndicator';
 
 const ThreadRedirect = ({ identifier }: { identifier: string }) => {
   const navigate = useCommonNavigate();
@@ -27,7 +27,7 @@ const ThreadRedirect = ({ identifier }: { identifier: string }) => {
     shouldRun: !!(foundThread || error),
   });
 
-  return <PageLoading />;
+  return <LoadingIndicator />;
 };
 
 export default ThreadRedirect;

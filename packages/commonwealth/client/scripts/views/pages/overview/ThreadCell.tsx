@@ -1,14 +1,18 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
-import { slugify } from '@hicommonwealth/shared';
+import { ActionGroups, GatedActionEnum, slugify } from '@hicommonwealth/shared';
 import { pluralize } from 'client/scripts/helpers';
 import { extractImages } from 'client/scripts/helpers/feed';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
+import {
+  getScopePrefix,
+  useCommonNavigate,
+} from 'client/scripts/navigation/helpers';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import useUserStore from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
 import moment from 'moment';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import threadPlaceholder from '../../../../assets/img/threadplaceholder.png';
 import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
 import { SharePopover } from '../../components/SharePopover';
@@ -20,78 +24,25 @@ import { NewThreadTag } from '../discussions/NewThreadTag';
 import { ReactionButton } from '../discussions/ThreadCard/ThreadOptions/ReactionButton';
 import { ToggleThreadSubscribe } from '../discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
 import { isHot, removeImageFormMarkDown } from '../discussions/helpers';
-
-import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
-import {
-  getScopePrefix,
-  useCommonNavigate,
-} from 'client/scripts/navigation/helpers';
-import { Memberships } from 'client/scripts/state/api/groups/getMemberships';
-import { Link } from 'react-router-dom';
 import './ThreadCell.scss';
-
-type TopicPermission = { id: number; permissions: PermissionEnum[] };
 
 export type RenderThreadCellProps = {
   thread: Thread;
-  memberships?: Memberships[];
-  topicPermissions?: TopicPermission[];
+  actionGroups: ActionGroups;
+  bypassGating: boolean;
 };
 const ThreadCell = ({
   thread,
-  memberships,
-  topicPermissions,
+  actionGroups,
+  bypassGating,
 }: RenderThreadCellProps) => {
   const user = useUserStore();
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
-  const isTopicGated = !!(memberships || []).find(
-    (membership) =>
-      thread?.topic?.id &&
-      membership.topics.find((t) => t.id === thread.topic!.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      thread?.topic?.id &&
-      membership.topics.find((t) => t.id === thread.topic!.id) &&
-      membership.isAllowed,
-  );
-
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
-
-  const foundTopicPermissions = topicPermissions?.find(
-    (tp) => tp.id === thread.topic!.id,
-  );
-
-  const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!user.activeAccount,
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: isRestrictedMembership,
-  });
-
-  const disabledReactPermissionTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!user.activeAccount,
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_THREAD_REACTION,
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
-  });
-
-  const disabledCommentPermissionTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!user.activeAccount,
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT,
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
+  const permissions = Permissions.getGeneralActionPermission({
+    thread,
+    action: GatedActionEnum.CREATE_THREAD_REACTION,
+    actionGroups,
+    bypassGating,
   });
 
   const image = extractImages(thread?.body);
@@ -117,20 +68,9 @@ const ThreadCell = ({
         <ReactionButton
           thread={thread}
           size="big"
-          disabled={false}
+          disabled={permissions.allowed}
           undoUpvoteDisabled={false}
-          tooltipText={
-            typeof disabledActionsTooltipText === 'function'
-              ? disabledActionsTooltipText?.('upvote')
-              : disabledActionsTooltipText ||
-                (typeof disabledReactPermissionTooltipText === 'function'
-                  ? disabledReactPermissionTooltipText?.('upvote')
-                  : disabledReactPermissionTooltipText) ||
-                (typeof disabledCommentPermissionTooltipText === 'function'
-                  ? disabledCommentPermissionTooltipText?.('upvote')
-                  : disabledCommentPermissionTooltipText) ||
-                'upvote'
-          }
+          tooltipText={permissions.tooltip}
         />
         <img src={image[0] || threadPlaceholder} alt="Thread content" />
         <div className="thread-details">

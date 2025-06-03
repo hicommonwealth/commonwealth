@@ -129,6 +129,11 @@ export default (
         defaultValue: 0,
       },
       namespace: { type: Sequelize.STRING, allowNull: true, unique: true },
+      namespace_verified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       namespace_address: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -137,10 +142,14 @@ export default (
         type: Sequelize.STRING,
         allowNull: true,
       },
-      namespace_verified: {
+      namespace_verification_configured: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
+      },
+      namespace_nominations: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        allowNull: true,
       },
       created_at: { type: Sequelize.DATE, allowNull: true },
       updated_at: { type: Sequelize.DATE, allowNull: true },
@@ -158,6 +167,10 @@ export default (
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      environment: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       allow_tokenized_threads: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
@@ -165,6 +178,10 @@ export default (
       },
       thread_purchase_token: {
         type: Sequelize.STRING,
+        allowNull: true,
+      },
+      pending_namespace_judge_token_id: {
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
     },

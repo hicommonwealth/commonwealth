@@ -6,12 +6,15 @@ import { TokenView } from '../queries';
 export const CreateToken = {
   input: z.object({
     community_id: z.string(),
+    eth_chain_id: z.number(),
     transaction_hash: z.string().length(66),
-    chain_node_id: z.number(),
     description: z.string().nullish(),
     icon_url: z.string().nullish(),
   }),
-  output: TokenView,
+  output: TokenView.extend({
+    community_id: z.string().nullish(),
+    group_id: z.number().nullish(),
+  }),
   context: AuthContext,
 };
 
@@ -40,6 +43,9 @@ export const GetLaunchpadTrades = {
     symbol: z.string(),
     community_id: z.string(),
     community_icon_url: z.string(),
+    user_id: z.number().nullish(),
+    user_name: z.string().nullish(),
+    user_avatar_url: z.string().nullish(),
   }).array(),
 };
 

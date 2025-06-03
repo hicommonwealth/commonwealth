@@ -16,13 +16,13 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { PageLoading } from 'views/pages/loading';
+import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import {
   APIOrderBy,
   APIOrderDirection,
 } from '../../../../scripts/helpers/constants';
-import { useSearchChainsQuery } from '../../../../scripts/state/api/chains';
 import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
+import { useSearchCommunitiesQuery } from '../../../../scripts/state/api/communities';
 import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
 import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
 import { useCommonNavigate } from '../../../navigation/helpers';
@@ -142,7 +142,14 @@ const SearchPage = () => {
     fetchNextPage: commentsFetchNextPage,
     isLoading: commentsIsLoading,
   } = useSearchCommentsQuery({
-    ...sharedQueryOptions,
+    ...{
+      community_id: sharedQueryOptions.communityId,
+      search: sharedQueryOptions.searchTerm,
+      cursor: 1,
+      limit: sharedQueryOptions.limit,
+      order_by: sharedQueryOptions.orderBy,
+      order_direction: sharedQueryOptions.orderDirection,
+    },
     enabled:
       activeTab === SearchScope.Replies &&
       sharedQueryOptions?.searchTerm?.length > 3,
@@ -153,8 +160,14 @@ const SearchPage = () => {
     error: communityError,
     fetchNextPage: chainsFetchNextPage,
     isLoading: communityIsLoading,
-  } = useSearchChainsQuery({
-    ...sharedQueryOptions,
+  } = useSearchCommunitiesQuery({
+    ...{
+      search: sharedQueryOptions.searchTerm,
+      cursor: 1,
+      limit: sharedQueryOptions.limit,
+      order_by: 'tier',
+      order_direction: APIOrderDirection.Desc,
+    },
     enabled:
       activeTab === SearchScope.Communities &&
       sharedQueryOptions?.searchTerm?.length > 0,
@@ -309,7 +322,7 @@ const SearchPage = () => {
             {sharedQueryOptions?.searchTerm?.length > 0 && (
               <>
                 {isLoading ? (
-                  <PageLoading />
+                  <LoadingIndicator />
                 ) : (
                   <>
                     <CWText className="search-results-caption">

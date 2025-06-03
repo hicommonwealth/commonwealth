@@ -1,39 +1,33 @@
-export interface ThreadItem {
-  id: string;
-  label: string;
-}
+import { CompletionModel } from '@hicommonwealth/shared';
+import { AIModelOption } from 'state/ui/user/localAISettings';
+import { ModelOption } from 'views/components/AIModelSelector';
 
-export interface ModelItem {
-  id: string;
-  label: string;
-}
+const createModelOption = <T extends CompletionModel>(
+  value: T,
+  label: string,
+): ModelOption => ({
+  value,
+  label,
+});
 
-export const MODELS: ModelItem[] = [
-  { id: 'claude-3-7-sonnet', label: 'Claude 3.7 Sonnet' },
-  { id: 'claude-3-opus', label: 'Claude 3 Opus' },
-  { id: 'claude', label: 'Claude' },
-  { id: 'gpt-4o', label: 'GPT-4o' },
-  { id: 'gemini-pro', label: 'Gemini Pro' },
+export const getCompletionModelValue = (
+  modelOption: ModelOption | AIModelOption | undefined,
+  fallback: CompletionModel = 'gpt-4o',
+): CompletionModel => {
+  if (!modelOption?.value) return fallback;
+  return modelOption.value as string as CompletionModel;
+};
+
+export const availableModels: ModelOption[] = [
+  createModelOption('gpt-4o', 'GPT-4o'),
+  createModelOption('gpt-4o-mini', 'GPT-4o Mini'),
+  createModelOption('anthropic/claude-3-7-sonnet', 'Claude 3.7 Sonnet'),
+  createModelOption('anthropic/claude-3-5-haiku', 'Claude 3.5 Haiku'),
+  createModelOption('google/gemini-flash-1.5', 'Gemini Flash 1.5'),
+  createModelOption('google/gemini-pro-1.5', 'Gemini Pro 1.5'),
 ];
 
-export const THREADS: ThreadItem[] = [
-  {
-    id: 'thread-1',
-    label: 'Thread 1',
-  },
-  { id: 'thread-2', label: 'Thread 2' },
-  { id: 'thread-3', label: 'Thread 3' },
-];
+export const AI_SELECTOR_TITLE =
+  'Select up to 4 models to generate a variety of auto replies';
 
-export const MENTION_ITEMS = [
-  ...THREADS.map((thread) => ({
-    id: thread.id,
-    name: thread.label,
-    type: 'thread' as const,
-  })),
-  ...MODELS.map((model) => ({
-    id: model.id,
-    name: model.label,
-    type: 'model' as const,
-  })),
-];
+export const MAX_MODELS_SELECTABLE = 4;

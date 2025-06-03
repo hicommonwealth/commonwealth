@@ -1,23 +1,25 @@
 import { useMemo } from 'react';
 import { useDebounce } from 'usehooks-ts';
 
-import { SearchUserProfilesView } from '@hicommonwealth/schemas';
+import {
+  CommentSearchView,
+  SearchCommunityView,
+  SearchUserProfilesView,
+} from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
 import { SearchScope } from '../models/SearchQuery';
 import app from '../state';
-import { useSearchChainsQuery } from '../state/api/chains';
-import { SearchChainsResponse } from '../state/api/chains/searchChains';
 import { useSearchCommentsQuery } from '../state/api/comments';
-import { SearchCommentsResponse } from '../state/api/comments/searchComments';
+import { useSearchCommunitiesQuery } from '../state/api/communities';
 import { useSearchProfilesQuery } from '../state/api/profiles';
 import { useSearchThreadsQuery } from '../state/api/threads';
 import { SearchThreadsResponse } from '../state/api/threads/searchThreads';
 
 export type SearchResults = {
   [SearchScope.Threads]: SearchThreadsResponse['results'];
-  [SearchScope.Replies]: SearchCommentsResponse['results'];
-  [SearchScope.Communities]: SearchChainsResponse['results'];
+  [SearchScope.Replies]: z.infer<typeof CommentSearchView>[];
+  [SearchScope.Communities]: z.infer<typeof SearchCommunityView>[];
   [SearchScope.Members]: z.infer<typeof SearchUserProfilesView>[];
 };
 
@@ -52,12 +54,25 @@ const useSearchResults = (
   });
 
   const { data: commentsData } = useSearchCommentsQuery({
-    ...sharedQueryOptions,
+    ...{
+      community_id: sharedQueryOptions.communityId,
+      search: sharedQueryOptions.searchTerm,
+      cursor: 1,
+      limit: sharedQueryOptions.limit,
+      order_by: sharedQueryOptions.orderBy,
+      order_direction: sharedQueryOptions.orderDirection,
+    },
     enabled: queryEnabled && filters.includes('replies'),
   });
 
-  const { data: communityData } = useSearchChainsQuery({
-    ...sharedQueryOptions,
+  const { data: communityData } = useSearchCommunitiesQuery({
+    ...{
+      search: sharedQueryOptions.searchTerm,
+      cursor: 1,
+      limit: sharedQueryOptions.limit,
+      order_by: 'tier',
+      order_direction: APIOrderDirection.Desc,
+    },
     enabled: queryEnabled && filters.includes('communities'),
   });
 

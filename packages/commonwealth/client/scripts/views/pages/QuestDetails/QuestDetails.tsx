@@ -3,8 +3,8 @@ import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
-  calculateTotalXPForQuestActions,
   isQuestActionComplete,
+  isQuestComplete,
   QuestAction as QuestActionType,
   XPLog,
 } from 'helpers/quest';
@@ -14,6 +14,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
+import { fetchCachedNodes } from 'state/api/nodes';
 import { useGetQuestByIdQuery } from 'state/api/quest';
 import {
   useCancelQuestMutation,
@@ -40,10 +41,11 @@ import { AuthOptions, AuthOptionTypes } from 'views/modals/AuthModal/types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
-import QuestCard from '../Communities/QuestList/QuestCard';
 import { buildRedirectURLFromContentId } from '../CreateQuest/QuestForm/helpers';
+import QuestCard from '../ExplorePage/QuestList/QuestCard';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
+import TotalQuestXPTag from './TotalQuestXPTag';
 
 const QuestDetails = ({ id }: { id: number }) => {
   const questId = parseInt(`${id}`) || 0;
@@ -118,23 +120,6 @@ const QuestDetails = ({ id }: { id: number }) => {
   if (!quest) {
     return <PageNotFound />;
   }
-
-  const gainedXP =
-    xpProgressions
-      .filter((p) => p.quest_id === quest.id)
-      .map((p) => p.xp_points)
-      .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
-    0;
-
-  const isUserReferred = !!user.referredByAddress;
-  // this only includes end user xp gain, creator/referrer xp is not included in this
-  const totalUserXP = calculateTotalXPForQuestActions({
-    isUserReferred,
-    questStartDate: new Date(quest.start_date),
-    questEndDate: new Date(quest.end_date),
-    questActions:
-      (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
-  });
 
   const isSystemQuest = quest.id < 0;
 
@@ -299,8 +284,44 @@ const QuestDetails = ({ id }: { id: number }) => {
         }
         break;
       }
-      case 'LaunchpadTokenCreated': {
+      case 'XpChainEventCreated': {
+        // build block explorer url with contract address and redirect to it
+        try {
+          const foundAction = quest?.action_metas?.find(
+            (x) => x.event_name === `XpChainEventCreated`,
+          );
+          if (!foundAction) throw new Error(`Invalid url`);
+
+          const foundBlockExplorer = fetchCachedNodes()?.find(
+            (x) => x.id === foundAction?.ChainEventXpSource?.chain_node_id,
+          )?.block_explorer;
+          if (!foundBlockExplorer) throw new Error(`Invalid url`);
+
+          const url = `${foundBlockExplorer}/address/${foundAction?.ChainEventXpSource?.contract_address}`;
+          window.open(url, '_blank');
+        } catch {
+          notifyError(`Failed to redirect to block explorer`);
+        }
+        break;
+      }
+      case 'LaunchpadTokenRecordCreated': {
         navigate(`/createTokenCommunity`, {}, null);
+        break;
+      }
+      case 'LaunchpadTokenTraded': {
+        if (quest.community_id) {
+          navigate(`/${quest.community_id}/discussions`, {}, null);
+          return;
+        }
+        navigate(`/explore?tab=tokens`);
+        break;
+      }
+      case 'CommunityGoalReached': {
+        if (quest.community_id) {
+          navigate(`/${quest.community_id}/discussions`, {}, null);
+          return;
+        }
+        navigate(`/explore?tab=communities`);
         break;
       }
       case 'KyoFinanceSwapQuestVerified': {
@@ -399,10 +420,15 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const xpAwarded = Math.min(quest.xp_awarded, quest.max_xp_to_end);
 
-  const isCompleted = gainedXP === totalUserXP && isStarted;
+  const isCompleted = isQuestComplete({
+    questStartDate: new Date(quest.start_date),
+    questEndDate: new Date(quest.end_date),
+    questActions:
+      (quest.action_metas as z.infer<typeof QuestActionMeta>[]) || [],
+    xpLogs: xpProgressions as unknown as XPLog[],
+  });
 
   const getQuestActionBlockedReason = () => {
-    if (isPendingAction) return `Another action is being proceessed`;
     if ((isSystemQuest && user.isLoggedIn) || !isStarted || isEnded) {
       if (isSystemQuest && user.isLoggedIn)
         return 'Only available for new users';
@@ -542,11 +568,16 @@ const QuestDetails = ({ id }: { id: number }) => {
           <div className="quest-actions">
             <div className="header">
               <CWText type="h4" fontWeight="semiBold">
-                Create action to earn aura
+                Complete action to earn aura
               </CWText>
-              <CWTag
-                label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalUserXP} Aura`}
-                type="proposal"
+              <TotalQuestXPTag
+                questId={quest.id}
+                questStartDate={new Date(quest.start_date)}
+                questEndDate={new Date(quest.end_date)}
+                questActions={
+                  (quest.action_metas as z.infer<typeof QuestActionMeta>[]) ||
+                  []
+                }
               />
             </div>
             <CWDivider />
@@ -591,7 +622,19 @@ const QuestDetails = ({ id }: { id: number }) => {
                     description={q.description}
                     communityId={q.community_id || ''}
                     iconURL={q.image_url}
-                    xpPoints={totalUserXP}
+                    xpPointsElement={
+                      <TotalQuestXPTag
+                        questId={q.id}
+                        questStartDate={new Date(q.start_date)}
+                        questEndDate={new Date(q.end_date)}
+                        questActions={
+                          (q.action_metas as z.infer<
+                            typeof QuestActionMeta
+                          >[]) || []
+                        }
+                        hideGainedXp
+                      />
+                    }
                     tasks={{
                       total: q.action_metas?.length || 0,
                       completed: (quest.action_metas || [])

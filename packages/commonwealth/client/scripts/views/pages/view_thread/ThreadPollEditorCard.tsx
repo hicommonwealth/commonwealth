@@ -2,6 +2,7 @@ import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { useAiCompletion } from 'client/scripts/state/api/ai';
 import { generatePollPrompt } from 'client/scripts/state/api/ai/prompts';
 import React, { useState } from 'react';
+import { SetLocalPolls } from 'utils/polls';
 import type Thread from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -14,7 +15,7 @@ import './poll_cards.scss';
 type ThreadPollEditorCardProps = {
   thread?: Thread;
   threadAlreadyHasPolling: boolean;
-  setLocalPoll?: (params) => void;
+  setLocalPoll?: SetLocalPolls;
   isCreateThreadPage?: boolean;
   aiInteractionsToggleEnabled?: boolean;
   threadContentDelta?: string;
@@ -33,12 +34,14 @@ export const ThreadPollEditorCard = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pollData, setPollData] = useState<string>();
 
-  const [isAIresponseCompleted, setIsAIresponseCompleted] = useState(false);
+  const [isAIresponseCompleted, setIsAIresponseCompleted] = useState(true);
 
   const { generateCompletion } = useAiCompletion();
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
   const DEFAULT_THREAD_BODY = 'No content provided.';
   const handleGeneratePoll = () => {
+    setIsAIresponseCompleted(false);
+    setPollData('');
     let effectiveTitle;
     let effectiveBody;
 
@@ -57,15 +60,16 @@ export const ThreadPollEditorCard = ({
     let text = '';
     const context = `
     Thread: ${thread?.title || effectiveTitle || ''}
-    ${`body ${thread?.body || effectiveBody || ''}`}
+    body ${thread?.body || effectiveBody || ''}
     `;
 
     setPollData(text);
-    const prompt = generatePollPrompt(context);
+    const { systemPrompt, userPrompt } = generatePollPrompt(context);
 
-    generateCompletion(prompt, {
+    generateCompletion(userPrompt, {
       model: 'gpt-4o-mini',
       stream: true,
+      systemPrompt,
       onError: (error) => {
         console.error('Error generating Poll:', error);
         notifyError('Failed to generate  Poll');
@@ -100,7 +104,8 @@ export const ThreadPollEditorCard = ({
               onClick={(e) => {
                 e.preventDefault();
                 setIsModalOpen(true);
-                handleGeneratePoll();
+                setIsAIresponseCompleted(true);
+                setPollData('');
               }}
             />
           </div>
@@ -113,17 +118,18 @@ export const ThreadPollEditorCard = ({
             thread={thread}
             onModalClose={() => {
               setIsModalOpen(false);
-              setIsAIresponseCompleted(false);
+              setIsAIresponseCompleted(true);
               setPollData('');
             }}
             pollData={pollData}
             isAIresponseCompleted={isAIresponseCompleted}
+            onGeneratePoll={handleGeneratePoll}
             setLocalPoll={setLocalPoll}
           />
         }
         onClose={() => {
           setIsModalOpen(false);
-          setIsAIresponseCompleted(false);
+          setIsAIresponseCompleted(true);
           setPollData('');
         }}
         open={isModalOpen}
