@@ -154,7 +154,7 @@ const CommonDomainRoutes = () => [
 
   <Route
     key="ExportPrivateKeyFromMagic"
-    path="/_internal/export-private-key-from-magic"
+    path="/export-magic"
     element={<ExportPrivateKeyFromMagic />}
   />,
 
