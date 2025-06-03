@@ -114,12 +114,6 @@ const api = {
   updateContestMetadata,
   cancelContestMetadata,
   deleteContestMetadata,
-  getContestLog: trpc.query(Contest.GetContestLog, trpc.Tag.Contest, {
-    forceSecure: true,
-  }),
-  getJudgeStatus: trpc.query(Contest.GetJudgeStatus, trpc.Tag.Contest, {
-    forceSecure: true,
-  }),
   createCommunity,
   updateCommunity,
   createTopic,
