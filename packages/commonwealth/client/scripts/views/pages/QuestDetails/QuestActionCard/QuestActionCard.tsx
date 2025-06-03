@@ -194,7 +194,6 @@ const QuestActionCard = ({
                   <CWText type="caption">
                     {actionCopies.explainer[questAction.event_name](
                       questAction.metadata.chainId,
-                      // TODO: 11963 - malik - Should make input/output tokens optional? else display here?
                       questAction.metadata.minOutputAmount || '',
                       questAction.metadata.minVolumeUSD || '',
                     )}
