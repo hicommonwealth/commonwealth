@@ -296,14 +296,8 @@ export const buildQuestSubFormValidationSchema = (
                 `0x0000000000000000000000000000000000000000`,
               ),
             }),
-          // TODO: 11963 - malik - amount unit? + validation
-          minOutputAmount: z
-            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-          // TODO: 11963 - malik - unit/ranges?  + validation
-          minVolumeUSD: z
-            .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-            .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+          minOutputAmount: numberNonDecimalGTZeroValidationSchema,
+          minVolumeUSD: numberNonDecimalGTZeroValidationSchema,
         }),
       }) as unknown as typeof baseSchema;
     }
