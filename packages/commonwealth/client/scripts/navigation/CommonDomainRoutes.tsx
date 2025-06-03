@@ -1,11 +1,11 @@
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
-import { ExportPrivateKeyFromMagic } from 'views/components/ExportPrivateKeyFromMagic';
 import { SignIn } from 'views/components/SignIn/SignIn';
 import { withLayout } from 'views/Layout';
 import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
 import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
+import ExportPrivateKeyFromMagic from '../views/components/ExportPrivateKeyFromMagic';
 
 const QuillPage = lazy(() => import('views/pages/QuillPage'));
 const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
