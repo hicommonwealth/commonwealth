@@ -15,6 +15,7 @@ import ActionContentIdScopeSelector from './SpecialCaseDynamicFields/ActionConte
 import AmountMultipler from './SpecialCaseDynamicFields/AmountMultipler';
 import BasicPointsInput from './SpecialCaseDynamicFields/BasicPointsInput';
 import ChainEventFields from './SpecialCaseDynamicFields/ChainEventFields';
+import CommunityGoals from './SpecialCaseDynamicFields/CommunityGoal';
 import ContentIdInput from './SpecialCaseDynamicFields/ContentIdInput';
 import CreatorPointsInput from './SpecialCaseDynamicFields/CreatorPointsInput';
 import StartLinkInput from './SpecialCaseDynamicFields/StartLinkInput';
@@ -171,6 +172,12 @@ const QuestActionSubForm = (props: QuestActionSubFormProps) => {
             config={config}
           />
           <ActionContentIdScopeSelector
+            defaultValues={defaultValues}
+            errors={errors}
+            onChange={onChange}
+            config={config}
+          />
+          <CommunityGoals
             defaultValues={defaultValues}
             errors={errors}
             onChange={onChange}

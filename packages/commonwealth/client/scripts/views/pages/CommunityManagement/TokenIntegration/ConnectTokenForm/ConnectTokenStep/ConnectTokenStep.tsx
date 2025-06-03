@@ -140,6 +140,9 @@ const ConnectTokenStep = ({
           hookToForm
           fullWidth
           placeholder="Please enter primary token address"
+          tokenAddress={tokenValue}
+          chainName={baseNode.name}
+          chainEthId={baseNode.ethChainId}
         />
       </div>
       <CWDivider />

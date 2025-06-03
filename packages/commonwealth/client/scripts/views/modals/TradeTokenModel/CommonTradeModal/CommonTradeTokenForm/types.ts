@@ -20,7 +20,7 @@ export type UseCommonTradeTokenFormProps = {
 
 export type UseBuyTradeProps = UseCommonTradeTokenFormProps & {
   enabled: boolean;
-  chainNode: NodeInfo;
+  chainNode: NodeInfo | undefined;
   tokenCommunity?: z.infer<typeof ExtendedCommunity>;
   selectedAddress?: string;
   commonFeePercentage: number;

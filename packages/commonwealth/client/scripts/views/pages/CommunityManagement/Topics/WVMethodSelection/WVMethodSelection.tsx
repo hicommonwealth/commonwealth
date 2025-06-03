@@ -15,7 +15,6 @@ import './WVMethodSelection.scss';
 
 interface WVMethodSelectionProps {
   onStepChange: (step: CreateTopicStep) => void;
-  hasNamespace: boolean;
 }
 
 enum WVMethod {
@@ -26,10 +25,7 @@ enum WVMethod {
   Stake = 'Stake',
 }
 
-const WVMethodSelection = ({
-  onStepChange,
-  hasNamespace,
-}: WVMethodSelectionProps) => {
+const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
   const [selectedWVMethod, setSelectedWVMethod] = useState<WVMethod | null>(
     null,
   );
@@ -52,11 +48,7 @@ const WVMethodSelection = ({
       return onStepChange(CreateTopicStep.WVSuiTokenDetails);
     }
 
-    onStepChange(
-      hasNamespace
-        ? CreateTopicStep.WVERC20Details
-        : CreateTopicStep.WVNamespaceEnablement,
-    );
+    onStepChange(CreateTopicStep.WVERC20Details);
   };
 
   const canEnableStake = chainIdsWithStakeEnabled.includes(

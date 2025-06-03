@@ -269,6 +269,7 @@ export const CreateGroup = {
       .array(
         z.object({
           id: PG_INT,
+          is_private: z.boolean().optional(),
           permissions: z.array(z.nativeEnum(GatedActionEnum)),
         }),
       )
@@ -306,6 +307,7 @@ export const UpdateGroup = {
       .array(
         z.object({
           id: PG_INT,
+          is_private: z.boolean().optional(),
           permissions: z.array(z.nativeEnum(GatedActionEnum)),
         }),
       )

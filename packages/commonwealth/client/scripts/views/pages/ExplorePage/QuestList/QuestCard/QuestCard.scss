@@ -97,24 +97,24 @@
       display: flex;
       gap: 8px;
       align-items: center;
+    }
 
-      .leaderboard-btn {
+    .leaderboard-btn {
+      border-width: 0 !important;
+      border-color: transparent !important;
+      padding: 0 !important;
+      margin: 0 !important;
+
+      .Text,
+      .Button {
+        font-weight: normal !important;
+        color: $neutral-500 !important;
+      }
+
+      &:focus-within {
         border-width: 0 !important;
-        border-color: transparent !important;
         padding: 0 !important;
         margin: 0 !important;
-
-        .Text,
-        .Button {
-          font-weight: normal !important;
-          color: $neutral-500 !important;
-        }
-
-        &:focus-within {
-          border-width: 0 !important;
-          padding: 0 !important;
-          margin: 0 !important;
-        }
       }
     }
 

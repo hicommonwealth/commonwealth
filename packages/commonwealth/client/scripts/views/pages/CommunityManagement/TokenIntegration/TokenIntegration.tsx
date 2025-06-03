@@ -73,6 +73,7 @@ const TokenIntegration = () => {
         {isExternalTokenLinked ? (
           <ManageConnectedToken
             tokenInfo={tokenMetadata}
+            pinnedToken={communityPinnedToken}
             isLoadingToken={isLoadingTokenMetadata}
           />
         ) : (

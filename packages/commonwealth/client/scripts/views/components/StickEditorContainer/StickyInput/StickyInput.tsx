@@ -73,6 +73,7 @@ const StickyInput = (props: StickyInputProps) => {
     contentDelta,
     thread: originalThread,
     parentCommentText,
+    canComment,
     handleIsReplying,
   } = props;
   const { isWindowExtraSmall: isMobile } = useBrowserWindow({});
@@ -293,6 +294,7 @@ const StickyInput = (props: StickyInputProps) => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (
       event.key === 'Enter' &&
+      !event.shiftKey &&
       !isExpanded &&
       contentDelta?.ops?.length > 0 &&
       (!isTurnstileEnabled || turnstileToken)
@@ -478,6 +480,7 @@ const StickyInput = (props: StickyInputProps) => {
                 customHandleSubmitComment().catch(console.error);
               }}
               disabled={
+                !canComment ||
                 !contentDelta?.ops?.length ||
                 isGenerating ||
                 (isTurnstileEnabled && !turnstileToken)
@@ -498,7 +501,7 @@ const StickyInput = (props: StickyInputProps) => {
 
     const inputContent = (
       <div
-        className={`StickyInput ${isExpanded ? 'expanded' : 'not-expanded'} ${isMobile ? 'mobile' : 'desktop'}`}
+        className={`StickyInput ${isExpanded ? 'expanded' : 'not-expanded'} ${isMobile ? 'mobile' : 'desktop'} ${mode === 'thread' ? 'thread-mode' : ''}`}
         ref={containerRef}
         style={isMobile && menuVisible ? { zIndex: -1 } : undefined}
       >
@@ -574,6 +577,7 @@ const StickyInput = (props: StickyInputProps) => {
                   className="sticky-editor"
                   contentDelta={props.contentDelta}
                   setContentDelta={props.setContentDelta}
+                  isDisabled={!canComment}
                   onKeyDown={handleKeyDown}
                   placeholder={placeholderText}
                 />

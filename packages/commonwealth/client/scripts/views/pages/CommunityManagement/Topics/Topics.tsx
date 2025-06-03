@@ -214,12 +214,7 @@ export const Topics = () => {
           />
         );
       case CreateTopicStep.WVMethodSelection:
-        return (
-          <WVMethodSelection
-            onStepChange={setCreateTopicStep}
-            hasNamespace={!!community?.namespace}
-          />
-        );
+        return <WVMethodSelection onStepChange={setCreateTopicStep} />;
       case CreateTopicStep.WVNamespaceEnablement:
         return (
           <CommunityOnchainTransactions
