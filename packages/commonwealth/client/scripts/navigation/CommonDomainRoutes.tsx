@@ -1,7 +1,7 @@
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
-import { ExportPrivateKeyFromMagic } from 'views/components/ExportPrivateKeyFromMagic/ExportPrivateKeyFromMagic';
+import { ExportPrivateKeyFromMagic } from 'views/components/ExportPrivateKeyFromMagic';
 import { SignIn } from 'views/components/SignIn/SignIn';
 import { withLayout } from 'views/Layout';
 import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
