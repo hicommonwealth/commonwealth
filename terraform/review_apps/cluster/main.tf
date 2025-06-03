@@ -46,7 +46,7 @@ locals {
 resource "digitalocean_kubernetes_cluster" "main" {
   name    = "${local.name_prefix}cluster"
   region  = var.region
-  version = "1.32.2-do.1"
+  version = "1.32.2-do.2"
 
   node_pool {
     name       = "${local.name_prefix}web-pool"
