@@ -447,7 +447,7 @@ export const NewThreadForm = forwardRef<
             walletAddress: userSelectedAddress,
             authorAddress: userSelectedAddress,
             communityTreasuryAddress:
-              (app.chain?.meta as any)?.communityTreasuryAddress || '',
+              app.chain?.meta?.communityTreasuryAddress || '',
             chainRpc: community.ChainNode?.url || '',
             paymentTokenAddress: communityToken.token_address,
           });
@@ -551,8 +551,8 @@ export const NewThreadForm = forwardRef<
       clearDraft,
       isInsideCommunity,
       navigate,
-      communityToken.token_address,
-      communityToken.symbol,
+      communityToken?.token_address,
+      communityToken?.symbol,
       createThreadToken,
       addThreadLinks,
       createPoll,
