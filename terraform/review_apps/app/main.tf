@@ -129,7 +129,7 @@ resource "kubernetes_manifest" "hcp_vault_secretstore" {
     }
     "spec" = {
       "provider" = {
-        "hashicorpvaultsecrets" = {
+        "hcpvault" = {
           "organization" = var.hcp_organization_id
           "projectId"    = var.hcp_project_id
           "appName"      = var.hcp_app_name
