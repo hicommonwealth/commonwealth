@@ -17,6 +17,7 @@ const TopHolders = ({ supply }: { supply: number }) => {
   const { data: topHolders, isLoading } = useGetTopHoldersQuery({
     community_id: communityId,
     limit: 10,
+    shouldPolling: true,
   });
 
   const columnInfo: CWTableColumnInfo[] = [
