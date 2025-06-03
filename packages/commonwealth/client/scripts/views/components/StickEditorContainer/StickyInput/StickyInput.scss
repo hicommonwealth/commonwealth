@@ -190,6 +190,11 @@
         .ql-container {
           min-height: unset !important;
           max-height: 152px !important;
+          overflow: unset !important;
+
+          .ql-editor {
+            max-height: 72px !important;
+          }
         }
       }
     }
@@ -200,6 +205,14 @@
       border-radius: 0;
       display: flex;
       flex-direction: column;
+
+      .CWEditor {
+        .ql-container {
+          .ql-editor {
+            max-height: 412px !important;
+          }
+        }
+      }
     }
 
     &.not-expanded.thread-mode {
