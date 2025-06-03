@@ -241,6 +241,19 @@
     &.expanded {
       padding: 0;
     }
+
+    &.not-expanded {
+      .CWEditor {
+        .ql-container {
+          overflow: unset !important;
+
+          .ql-editor {
+            overflow: auto !important;
+            max-height: 72px !important;
+          }
+        }
+      }
+    }
   }
 
   // Common components styled regardless of mobile/desktop
@@ -301,7 +314,6 @@
 
             .ql-editor {
               min-height: unset !important;
-              max-height: unset !important;
               padding: 8px !important;
               font-size: 14px !important;
 
