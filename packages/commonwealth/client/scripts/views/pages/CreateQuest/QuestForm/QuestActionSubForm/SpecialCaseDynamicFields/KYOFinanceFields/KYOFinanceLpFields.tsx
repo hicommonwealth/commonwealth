@@ -20,11 +20,10 @@ const KYOFinanceLpFields = ({
         key={`metadata-poolAddresses-${defaultValues?.action}`}
         name="metadata-poolAddresses"
         label="Pool Addresses"
-        // TODO: malik - is this fine?
         placeholder="0x5C69bEe701ef814a2B6a3EDD4B2A6b45b6f72f2F, 0x5C69bEe701ef814a2B6a3EDD4B2A6b45b6f72f2F, ...."
         containerClassName="span-6"
         {...(defaultValues?.metadata?.poolAddresses && {
-          defaultValue: defaultValues?.metadata?.poolAddresses,
+          value: defaultValues?.metadata?.poolAddresses,
         })}
         onInput={(e) =>
           onChange?.({
@@ -43,11 +42,10 @@ const KYOFinanceLpFields = ({
         key={`metadata-minUSDValues-${defaultValues?.action}`}
         name="metadata-minUSDValues"
         label="USD Values (Min)"
-        // TODO: malik - is this fine?
         placeholder="0.9, 9000, ...."
         containerClassName="span-6"
         {...(defaultValues?.metadata?.minUSDValues && {
-          defaultValue: defaultValues?.metadata?.minUSDValues,
+          value: defaultValues?.metadata?.minUSDValues,
         })}
         onInput={(e) =>
           onChange?.({
