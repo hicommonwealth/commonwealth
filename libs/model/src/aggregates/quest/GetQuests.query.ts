@@ -72,6 +72,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
                 'participation_limit', QAS.participation_limit,
                 'participation_period', QAS.participation_period,
                 'participation_times_per_period', QAS.participation_times_per_period,
+                'metadata', QAS.metadata,
                 'created_at', QAS.created_at,
                 'updated_at', QAS.updated_at,
                 'CommunityGoalMeta', 
