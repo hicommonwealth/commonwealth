@@ -4,7 +4,6 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 
-// Define the entity types that can be searched
 export enum SearchEntityType {
   USER = 'user',
   COMMUNITY = 'community',
@@ -13,7 +12,6 @@ export enum SearchEntityType {
   PROPOSAL = 'proposal',
 }
 
-// Define search scope options
 export type SearchScope =
   | 'All'
   | 'Members'
@@ -22,7 +20,6 @@ export type SearchScope =
   | 'Threads'
   | 'Proposals';
 
-// Input schema for unified search
 export const SearchEntitiesInput = z.object({
   searchTerm: z.string(),
   communityId: z.string().optional(),
@@ -34,7 +31,6 @@ export const SearchEntitiesInput = z.object({
   includeCount: z.boolean().optional(),
 });
 
-// Output schema for unified search results
 export const SearchEntityResult = z.object({
   id: z.string(),
   type: z.nativeEnum(SearchEntityType),
@@ -87,25 +83,20 @@ export function SearchEntities(): Query<typeof SearchEntitiesSchema> {
         includeCount = true,
       } = payload;
 
-      // Parse searchScope string into array (comma-separated values)
       const searchScopeArray = searchScope
         .split(',')
         .map((s: string) => s.trim()) as SearchScope[];
 
-      // Determine which entity types to search based on scope
       const entityTypesToSearch = getEntityTypesFromScope(searchScopeArray);
 
-      // Build community filter
       const communityFilter =
         communityId && communityId !== ALL_COMMUNITIES
           ? 'AND community_id = $communityId'
           : '';
 
-      // Build pagination
       const offset = (page - 1) * limit;
       const paginationSql = `LIMIT $limit OFFSET $offset`;
 
-      // Build the unified search query using UNION ALL
       const searchQueries: string[] = [];
 
       // Users search
@@ -283,7 +274,6 @@ export function SearchEntities(): Query<typeof SearchEntitiesSchema> {
   };
 }
 
-// Helper function to determine entity types from search scope
 function getEntityTypesFromScope(
   searchScope: SearchScope[],
 ): SearchEntityType[] {

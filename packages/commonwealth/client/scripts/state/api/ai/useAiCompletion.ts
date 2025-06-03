@@ -7,9 +7,7 @@ interface AiCompletionOptions extends Partial<CompletionOptions> {
   onChunk?: (chunk: string) => void;
   onComplete?: (fullText: string) => void;
   onError?: (error: Error) => void;
-  // New option to include contextual mentions
   includeContextualMentions?: boolean;
-  // Optional community ID for context scoping
   communityId?: string;
 }
 
@@ -124,17 +122,14 @@ export const useAiCompletion = () => {
       const streamMode = options?.stream !== false;
 
       try {
-        // Fetch contextual data for mentions if enabled
         let contextualData: string | null = null;
         if (options?.includeContextualMentions !== false) {
-          // Default to true
           contextualData = await fetchContextForMentions(
             userPrompt,
             options?.communityId,
           );
         }
 
-        // Prepare enhanced system prompt with context
         let enhancedSystemPrompt = options?.systemPrompt;
         if (contextualData) {
           const contextSection = `

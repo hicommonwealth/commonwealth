@@ -5,7 +5,6 @@ import {
   MentionEntityType,
 } from '../views/components/react_quill_editor/mention-config';
 
-// Define the structure for extracted mentions
 export interface ExtractedMention {
   id: string;
   type: MentionEntityType;
@@ -13,7 +12,6 @@ export interface ExtractedMention {
   link: string;
 }
 
-// Regular expressions to match different mention formats
 const MENTION_PATTERNS = {
   // [@UserName](/profile/id/userId)
   user: /\[@([^\]]+)\]\(\/profile\/id\/([^)]+)\)/g,
@@ -32,7 +30,6 @@ export const useMentionExtractor = () => {
     (text: string): ExtractedMention[] => {
       const mentions: ExtractedMention[] = [];
 
-      // Extract user mentions
       let match;
       const userPattern = new RegExp(MENTION_PATTERNS.user);
       while ((match = userPattern.exec(text)) !== null) {

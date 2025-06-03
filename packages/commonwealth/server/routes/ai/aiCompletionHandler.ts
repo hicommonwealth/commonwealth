@@ -14,7 +14,6 @@ interface StructuredPrompt {
 // Define a type for the request body that can handle both string and structured prompt
 type RequestBody = Omit<CompletionOptions, 'prompt'> & {
   prompt: string | StructuredPrompt;
-  // Add optional context field for enhanced prompts
   contextualMentions?: boolean;
 };
 

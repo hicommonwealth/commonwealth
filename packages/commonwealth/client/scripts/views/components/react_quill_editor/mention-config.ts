@@ -1,6 +1,5 @@
 import { SearchScope } from '../../../models/SearchQuery';
 
-// Configurable limits
 export const MENTION_CONFIG = {
   MAX_SEARCH_RESULTS: 10,
   MAX_MENTIONS_PER_POST: 3,
@@ -9,7 +8,6 @@ export const MENTION_CONFIG = {
   SEARCH_DEBOUNCE_MS: 500,
 } as const;
 
-// Entity type definitions
 export enum MentionEntityType {
   USER = 'user',
   TOPIC = 'topic',
@@ -18,15 +16,13 @@ export enum MentionEntityType {
   PROPOSAL = 'proposal',
 }
 
-// Denotation character mappings
 export const MENTION_DENOTATION_CHARS = {
-  '@': 'global', // Multi-entity search
+  '@': 'global',
   '#': MentionEntityType.TOPIC,
   '!': MentionEntityType.THREAD,
   '~': MentionEntityType.COMMUNITY,
 } as const;
 
-// Entity type indicators (configurable for Phosphor icons)
 export const ENTITY_TYPE_INDICATORS = {
   [MentionEntityType.USER]: '👤',
   [MentionEntityType.COMMUNITY]: '🏘️',
@@ -36,7 +32,6 @@ export const ENTITY_TYPE_INDICATORS = {
   deleted: '❌',
 } as const;
 
-// Search priority order for global '@' search
 export const GLOBAL_SEARCH_PRIORITY = [
   MentionEntityType.USER,
   MentionEntityType.COMMUNITY,
@@ -45,16 +40,14 @@ export const GLOBAL_SEARCH_PRIORITY = [
   MentionEntityType.PROPOSAL,
 ] as const;
 
-// Search scope mappings
 export const ENTITY_TO_SEARCH_SCOPE = {
   [MentionEntityType.USER]: SearchScope.Members,
   [MentionEntityType.COMMUNITY]: SearchScope.Communities,
-  [MentionEntityType.TOPIC]: SearchScope.Topics, // Note: Need to add this to SearchScope
+  [MentionEntityType.TOPIC]: SearchScope.Topics,
   [MentionEntityType.THREAD]: SearchScope.Threads,
   [MentionEntityType.PROPOSAL]: SearchScope.Proposals,
 } as const;
 
-// Mention link format patterns
 export const MENTION_LINK_FORMATS = {
   [MentionEntityType.USER]: (name: string, id: string) =>
     `[@${name}](/profile/id/${id})`,
@@ -68,31 +61,29 @@ export const MENTION_LINK_FORMATS = {
     `[${name}](/proposal/${id})`,
 } as const;
 
-// Search scope configurations for each denotation character
 export const DENOTATION_SEARCH_CONFIG = {
   '@': {
     scopes: [SearchScope.All],
-    communityScoped: false, // Global search
+    communityScoped: false,
     description: 'Search all entity types',
   },
   '#': {
     scopes: [SearchScope.Topics],
-    communityScoped: true, // Current community only
+    communityScoped: true,
     description: 'Search topics in current community',
   },
   '!': {
     scopes: [SearchScope.Threads],
-    communityScoped: true, // Current community only
+    communityScoped: true,
     description: 'Search threads in current community',
   },
   '~': {
     scopes: [SearchScope.Communities],
-    communityScoped: false, // All communities
+    communityScoped: false,
     description: 'Search all communities',
   },
 } as const;
 
-// Helper function to get entity type from search result
 export const getEntityTypeFromSearchResult = (
   result: any,
 ): MentionEntityType => {
@@ -110,7 +101,6 @@ export const getEntityTypeFromSearchResult = (
   return MentionEntityType.USER; // Default fallback
 };
 
-// Helper function to format entity display name
 export const formatEntityDisplayName = (
   entityType: MentionEntityType,
   result: any,
@@ -131,7 +121,6 @@ export const formatEntityDisplayName = (
   }
 };
 
-// Helper function to get entity ID
 export const getEntityId = (
   entityType: MentionEntityType,
   result: any,

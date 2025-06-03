@@ -20,7 +20,6 @@ export const useUnifiedSearch = ({
   orderBy = 'relevance',
   orderDirection = 'DESC',
 }: UseUnifiedSearchProps) => {
-  // Convert searchScope array to comma-separated string for API compatibility
   const searchScopeString = searchScope.join(',');
 
   return trpc.search.searchEntities.useQuery(
@@ -36,7 +35,7 @@ export const useUnifiedSearch = ({
     },
     {
       enabled: enabled && searchTerm.length >= MENTION_CONFIG.MIN_SEARCH_LENGTH,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
     },
   );
 };
