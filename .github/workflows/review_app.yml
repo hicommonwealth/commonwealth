@@ -369,6 +369,14 @@ jobs:
         run: |
           terraform init -backend-config="key=commonwealth-pr-environments/pr-${{ steps.set_pr_number.outputs.pr_number }}/terraform.tfstate"
 
+      - name: Terraform Refresh (CRDs - Stage 2)
+        working-directory: terraform/review_apps/crds
+        env:
+          KUBECONFIG: ${{ github.workspace }}/terraform/review_apps/cluster/kubeconfig.yaml
+        run: |
+          export KUBECONFIG=${{ github.workspace }}/terraform/review_apps/cluster/kubeconfig.yaml
+          terraform refresh
+
       - name: Terraform Plan (CRDs - Stage 2)
         working-directory: terraform/review_apps/crds
         env:
