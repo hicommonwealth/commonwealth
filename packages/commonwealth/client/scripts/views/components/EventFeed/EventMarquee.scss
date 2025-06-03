@@ -1,0 +1,41 @@
+.EventMarquee {
+  height: 50px;
+  width: 100%;
+  background: linear-gradient(90deg, #ff80d7 5.5%, #0079cc 26%, #ff1f00 42%);
+  border-radius: 0;
+  overflow: hidden;
+  margin: 0;
+  display: flex;
+  color: white;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  &.sticky {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .event-marquee-content {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    animation: scrollLeft 30s linear infinite;
+    padding: 0 16px;
+    will-change: transform;
+    transform: translateZ(0);
+
+    &:hover {
+      animation-play-state: paused;
+    }
+  }
+}
+
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}

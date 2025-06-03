@@ -24,6 +24,7 @@ import './Sublayout.scss';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
+import EventMarquee from './components/EventFeed/EventMarquee';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
 import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate';
@@ -44,6 +45,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const [resizing, setResizing] = useState(false);
   const { JoinCommunityModals, handleJoinCommunity } = useJoinCommunity();
   const growlEnabled = useFlag('growl');
+  const eventMarqueeEnabled = useFlag('eventMarquee');
 
   const location = useLocation();
 
@@ -125,6 +127,11 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     location,
   );
 
+  const routesWithEventMarquee = matchRoutes(
+    [{ path: '/dashboard/*' }, { path: '/explore/*' }],
+    location,
+  );
+
   const routesWithoutGenericSliders = matchRoutes(
     [
       { path: '/discussions/*' },
@@ -197,6 +204,13 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             resizing,
           )}
         >
+          {eventMarqueeEnabled && routesWithEventMarquee && (
+            <EventMarquee
+              isSticky={true}
+              elementId="event-marquee-sticky"
+              zIndex={25}
+            />
+          )}
           <SublayoutBanners banner={banner || ''} terms={terms || ''} />
 
           <div className="Body">

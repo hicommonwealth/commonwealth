@@ -14,11 +14,11 @@ export const CollapsableSidebarButton = ({
   const { setMenu, menuName, menuVisible, setUserToggledVisibility } =
     useSidebarStore();
 
-  const handleToggle = () => {
+  const handleToggle = React.useCallback(() => {
     const isVisible = !menuVisible;
     setMenu({ name: menuName, isVisible });
     setUserToggledVisibility(isVisible ? 'open' : 'closed');
-  };
+  }, [menuVisible, menuName, setMenu, setUserToggledVisibility]);
 
   return (
     <div className={clsx('CollapsableSidebarButton', { onMobile })}>
@@ -38,6 +38,8 @@ export const CollapsableSidebarButton = ({
             'collapse-scoped': !menuVisible && isInsideCommunity,
             'collapse-unscoped': !menuVisible && !isInsideCommunity,
           })}
+          aria-label={menuVisible ? 'Collapse sidebar' : 'Expand sidebar'}
+          aria-expanded={menuVisible}
         />
       </div>
     </div>

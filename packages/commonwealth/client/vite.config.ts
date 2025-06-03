@@ -54,6 +54,7 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_NEW_GOVERNANCE_PAGE': JSON.stringify(
       env.FLAG_NEW_GOVERNANCE_PAGE,
     ),
+    'process.env.FLAG_EVENT_MARQUEE': JSON.stringify(env.FLAG_EVENT_MARQUEE),
     'process.env.FLAG_PRIVY': JSON.stringify(env.FLAG_PRIVY),
     'process.env.FLAG_JUDGE_CONTEST': JSON.stringify(env.FLAG_JUDGE_CONTEST),
     'process.env.FLAG_TOKENIZED_THREADS': JSON.stringify(
