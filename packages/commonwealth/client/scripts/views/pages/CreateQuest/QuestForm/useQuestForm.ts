@@ -442,6 +442,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     const foundCommunityGoalReachedActionIndex = questActionSubForms.findIndex(
       (f) => f.values.action === 'CommunityGoalReached',
     );
+    if (foundCommunityGoalReachedActionIndex < 0) return true;
     const { goalTarget, goalType } =
       questActionSubForms[foundCommunityGoalReachedActionIndex]?.values || {};
     if (goalTarget && goalType) {
@@ -500,6 +501,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     if (!isAssigned) return;
 
     const subFormErrors = validateSubForms();
+    console.log('values => ', { values, questActionSubForms, subFormErrors });
 
     if (subFormErrors || (mode === 'update' ? !questId : false)) {
       return;
