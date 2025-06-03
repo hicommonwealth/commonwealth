@@ -1,6 +1,7 @@
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
+import { ExportPrivateKeyFromMagic } from 'views/components/ExportPrivateKeyFromMagic/ExportPrivateKeyFromMagic';
 import { SignIn } from 'views/components/SignIn/SignIn';
 import { withLayout } from 'views/Layout';
 import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
@@ -149,6 +150,12 @@ const CommonDomainRoutes = () => [
     key="mobile-app-redirect"
     path="/_internal/mobile-app-redirect"
     element={<MobileAppRedirect />}
+  />,
+
+  <Route
+    key="ExportPrivateKeyFromMagic"
+    path="/_internal/export-private-key-from-magic"
+    element={<ExportPrivateKeyFromMagic />}
   />,
 
   <Route
