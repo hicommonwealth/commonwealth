@@ -243,6 +243,9 @@ jobs:
       (github.event.issue.pull_request && github.event.comment.body == '/deploy') ||
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ 22 ]
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     steps:
@@ -263,114 +266,115 @@ jobs:
             echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
           fi
 
-      # - name: Create Railway Environment
-      #   run: |
-      #     set +e
-      #     output=$(railway environment pr-${{ github.event.inputs.pr_number }} 2>&1)
-      #     echo "$output"
-      #     if echo "$output" | grep -q "Environment not found"; then
-      #       echo "Environment not found, creating..."
-      #       railway environment create pr-${{ github.event.inputs.pr_number }}
-      #     else
-      #       echo "Environment exists or was linked successfully."
-      #     fi
-      #     set -e
-
       - name: Create Railway environment and deploy
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ steps.set_pr_number.outputs.pr_number }}
+          EFFECTIVE_SHA: ${{ steps.set_effective_sha.outputs.sha }}
         run: |
-          PROJECT_ID=${{ secrets.RAILWAY_PROJECT_ID }}
-          SERVICE_NAME="web"
-          ENV_NAME="pr-${{ steps.set_pr_number.outputs.pr_number }}"
-          IMAGE_TAG="ghcr.io/${{ github.repository }}/web:${{ steps.set_effective_sha.outputs.sha }}"
-          
-          # Step 1: Check if environment already exists
-          ENV_CHECK=$(curl -s -X POST \
-            -H "Authorization: Bearer $RAILWAY_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "{\"query\": \"query { project(id: \\\"$PROJECT_ID\\\") { environments(filter: { name: \\\"$ENV_NAME\\\" }) { edges { node { id name } } } } }\"}" \
-            https://backboard.railway.app/graphql)
-          echo "ENV_CHECK response: $ENV_CHECK"
-          
-          ENV_ID=$(echo $ENV_CHECK | jq -r '.data.project.environments.edges[0].node.id // empty')
-          
-          if [ -z "$ENV_ID" ] || [ "$ENV_ID" = "null" ]; then
-            echo "Cloning production environment to: $ENV_NAME"
-            # Find the production environment ID
-            PROD_ENV_ID=$(curl -s -X POST \
-              -H "Authorization: Bearer $RAILWAY_TOKEN" \
-              -H "Content-Type: application/json" \
-              -d "{\"query\": \"query { project(id: \\\"$PROJECT_ID\\\") { environments(filter: { name: \\\"production\\\" }) { edges { node { id name } } } } }\"}" \
-              https://backboard.railway.app/graphql | jq -r '.data.project.environments.edges[0].node.id')
-            echo "PROD_ENV_ID: $PROD_ENV_ID"
-            if [ -z "$PROD_ENV_ID" ] || [ "$PROD_ENV_ID" = "null" ]; then
-              echo "Error: Could not find production environment ID"
-              exit 1
-            fi
-            # Clone the production environment
-            ENV_RESPONSE=$(curl -s -X POST \
-              -H "Authorization: Bearer $RAILWAY_TOKEN" \
-              -H "Content-Type: application/json" \
-              -d "{\"query\": \"mutation { environmentClone(input: { name: \\\"$ENV_NAME\\\", environmentId: \\\"$PROD_ENV_ID\\\" }) { id name } }\"}" \
-              https://backboard.railway.app/graphql)
-            echo "ENV_RESPONSE: $ENV_RESPONSE"
-            ENV_ID=$(echo $ENV_RESPONSE | jq -r '.data.environmentClone.id')
-            echo "Cloned environment: $ENV_ID"
-          else
-            echo "Environment already exists: $ENV_ID"
-          fi
-          
-          # Step 2: Check if service already exists in this environment
-          SERVICE_CHECK=$(curl -s -X POST \
-            -H "Authorization: Bearer $RAILWAY_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "{\"query\": \"query { environment(id: \\\"$ENV_ID\\\") { serviceInstances { edges { node { id service { name } } } } } }\"}" \
-            https://backboard.railway.app/graphql)
-          echo "SERVICE_CHECK: $SERVICE_CHECK"
-          
-          SERVICE_INSTANCE_ID=$(echo $SERVICE_CHECK | jq -r ".data.environment.serviceInstances.edges[] | select(.node.service.name == \"$SERVICE_NAME\") | .node.id // empty")
-          
-          if [ -z "$SERVICE_INSTANCE_ID" ] || [ "$SERVICE_INSTANCE_ID" = "null" ]; then
-            echo "Creating new service instance: $SERVICE_NAME"
-            
-            # First create the service if it doesn't exist in the project
-            SERVICE_CREATE=$(curl -s -X POST \
-              -H "Authorization: Bearer $RAILWAY_TOKEN" \
-              -H "Content-Type: application/json" \
-              -d "{\"query\": \"mutation { serviceCreate(input: { name: \\\"$SERVICE_NAME\\\", projectId: \\\"$PROJECT_ID\\\", source: { image: \\\"$IMAGE_TAG\\\" } }) { id } }\"}" \
-              https://backboard.railway.app/graphql)
-            echo "SERVICE_CREATE: $SERVICE_CREATE"
-            
-            SERVICE_ID=$(echo $SERVICE_CREATE | jq -r '.data.serviceCreate.id')
-            echo "Created service: $SERVICE_ID"
-            
-            # Then create the service instance in the environment
-            INSTANCE_CREATE=$(curl -s -X POST \
-              -H "Authorization: Bearer $RAILWAY_TOKEN" \
-              -H "Content-Type: application/json" \
-              -d "{\"query\": \"mutation { serviceInstanceCreate(input: { environmentId: \\\"$ENV_ID\\\", serviceId: \\\"$SERVICE_ID\\\", source: { image: \\\"$IMAGE_TAG\\\" } }) { id } }\"}" \
-              https://backboard.railway.app/graphql)
-            echo "INSTANCE_CREATE: $INSTANCE_CREATE"
-            
-            SERVICE_INSTANCE_ID=$(echo $INSTANCE_CREATE | jq -r '.data.serviceInstanceCreate.id')
-            echo "Created service instance: $SERVICE_INSTANCE_ID"
-          else
-            echo "Service instance already exists: $SERVICE_INSTANCE_ID"
-            
-            # Update existing service instance with new image
-            UPDATE_RESPONSE=$(curl -s -X POST \
-              -H "Authorization: Bearer $RAILWAY_TOKEN" \
-              -H "Content-Type: application/json" \
-              -d "{\"query\": \"mutation { serviceInstanceUpdate(input: { id: \\\"$SERVICE_INSTANCE_ID\\\", source: { image: \\\"$IMAGE_TAG\\\" } }) { id } }\"}" \
-              https://backboard.railway.app/graphql)
-            echo "UPDATE_RESPONSE: $UPDATE_RESPONSE"
-            
-            echo "Updated service instance: $UPDATE_RESPONSE"
-          fi
-          
-          echo "ENV_ID=$ENV_ID" >> $GITHUB_ENV
-          echo "SERVICE_INSTANCE_ID=$SERVICE_INSTANCE_ID" >> $GITHUB_ENV
+          node <<'EOF' 
+          const RAILWAY_TOKEN = process.env.RAILWAY_TOKEN;
+          const PROJECT_ID = process.env.RAILWAY_PROJECT_ID;
+          const SERVICE_NAME = 'web';
+          const ENV_NAME = `pr-${process.env.PR_NUMBER}`;
+          const IMAGE_TAG = `ghcr.io/${process.env.GITHUB_REPOSITORY}/web:${process.env.EFFECTIVE_SHA}`;
+
+          const headers = {
+            'Authorization': `Bearer ${RAILWAY_TOKEN}`,
+            'Content-Type': 'application/json',
+          };
+
+          async function railwayGraphQL(query) {
+            const res = await fetch('https://backboard.railway.app/graphql', {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({ query }),
+            });
+
+            // Check HTTP status code
+            if (!res.ok) {
+              const text = await res.text();
+              throw new Error(`HTTP error! status: ${res.status} - ${res.statusText}\nResponse: ${text}`);
+            }
+
+            const json = await res.json();
+
+            // Check for GraphQL errors
+            if (json.errors && json.errors.length > 0) {
+              console.error('GraphQL errors:', JSON.stringify(json.errors));
+              throw new Error(`GraphQL errors: ${JSON.stringify(json.errors)}`);
+            }
+
+            return json;
+          }
+
+          (async () => {
+            try {
+              // Step 1: Check if environment already exists
+              let envCheck = await railwayGraphQL(`query { project(id: \"${PROJECT_ID}\") { environments(filter: { name: \"${ENV_NAME}\" }) { edges { node { id name } } } } }`);
+              console.log('ENV_CHECK:', JSON.stringify(envCheck));
+              let envEdges = envCheck?.data?.project?.environments?.edges || [];
+              let ENV_ID = envEdges[0]?.node?.id;
+
+              if (!ENV_ID) {
+                console.log(`Cloning production environment to: ${ENV_NAME}`);
+                // Find the production environment ID
+                let prodEnvCheck = await railwayGraphQL(`query { project(id: \"${PROJECT_ID}\") { environments(filter: { name: \"production\" }) { edges { node { id name } } } } }`);
+                console.log('PROD_ENV_CHECK:', JSON.stringify(prodEnvCheck));
+                let prodEnvId = prodEnvCheck?.data?.project?.environments?.edges?.[0]?.node?.id;
+                if (!prodEnvId) {
+                  throw new Error('Could not find production environment ID');
+                }
+                // Clone the production environment
+                let envClone = await railwayGraphQL(`mutation { environmentClone(input: { name: \"${ENV_NAME}\", environmentId: \"${prodEnvId}\" }) { id name } }`);
+                console.log('ENV_CLONE:', JSON.stringify(envClone));
+                ENV_ID = envClone?.data?.environmentClone?.id;
+                if (!ENV_ID) throw new Error('Failed to clone environment');
+                console.log('Cloned environment:', ENV_ID);
+              } else {
+                console.log('Environment already exists:', ENV_ID);
+              }
+
+              // Step 2: Check if service already exists in this environment
+              let serviceCheck = await railwayGraphQL(`query { environment(id: \"${ENV_ID}\") { serviceInstances { edges { node { id service { name } } } } } }`);
+              console.log('SERVICE_CHECK:', JSON.stringify(serviceCheck));
+              let serviceEdges = serviceCheck?.data?.environment?.serviceInstances?.edges || [];
+              let serviceInstance = serviceEdges.find(e => e.node.service.name === SERVICE_NAME);
+              let SERVICE_INSTANCE_ID = serviceInstance?.node?.id;
+
+              if (!SERVICE_INSTANCE_ID) {
+                console.log('Creating new service instance:', SERVICE_NAME);
+                // First create the service if it doesn't exist in the project
+                let serviceCreate = await railwayGraphQL(`mutation { serviceCreate(input: { name: \"${SERVICE_NAME}\", projectId: \"${PROJECT_ID}\", source: { image: \"${IMAGE_TAG}\" } }) { id } }`);
+                console.log('SERVICE_CREATE:', JSON.stringify(serviceCreate));
+                let SERVICE_ID = serviceCreate?.data?.serviceCreate?.id;
+                if (!SERVICE_ID) throw new Error('Failed to create service');
+                // Then create the service instance in the environment
+                let instanceCreate = await railwayGraphQL(`mutation { serviceInstanceCreate(input: { environmentId: \"${ENV_ID}\", serviceId: \"${SERVICE_ID}\", source: { image: \"${IMAGE_TAG}\" } }) { id } }`);
+                console.log('INSTANCE_CREATE:', JSON.stringify(instanceCreate));
+                SERVICE_INSTANCE_ID = instanceCreate?.data?.serviceInstanceCreate?.id;
+                if (!SERVICE_INSTANCE_ID) throw new Error('Failed to create service instance');
+                console.log('Created service instance:', SERVICE_INSTANCE_ID);
+              } else {
+                console.log('Service instance already exists:', SERVICE_INSTANCE_ID);
+                // Update existing service instance with new image
+                let updateResponse = await railwayGraphQL(`mutation { serviceInstanceUpdate(input: { id: \"${SERVICE_INSTANCE_ID}\", source: { image: \"${IMAGE_TAG}\" } }) { id } }`);
+                console.log('UPDATE_RESPONSE:', JSON.stringify(updateResponse));
+                console.log('Updated service instance:', SERVICE_INSTANCE_ID);
+              }
+
+              // Export ENV_ID and SERVICE_INSTANCE_ID for next steps
+              const fs = require('fs');
+              fs.appendFileSync(process.env.GITHUB_ENV, `ENV_ID=${ENV_ID}\n`);
+              fs.appendFileSync(process.env.GITHUB_ENV, `SERVICE_INSTANCE_ID=${SERVICE_INSTANCE_ID}\n`);
+            } catch (err) {
+              console.error('Error in Railway deploy step:', err);
+              process.exit(1);
+            }
+          })();
+          EOF
 
       - name: Get deployment URL
         id: deployment
