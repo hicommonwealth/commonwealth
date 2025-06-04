@@ -28,7 +28,6 @@ export const useUnifiedSearch = ({
       communityId,
       searchScope: searchScopeString,
       limit,
-      page: 1,
       orderBy,
       orderDirection,
       includeCount: false,

@@ -51,7 +51,6 @@ export const SearchEntitiesInput = z.object({
       },
     ),
   limit: z.number().min(1).max(50).optional(),
-  page: z.number().min(1).optional(),
   orderBy: z.enum(['relevance', 'created_at', 'name']).optional(),
   orderDirection: z.enum(['ASC', 'DESC']).optional(),
   includeCount: z.boolean().optional(),
@@ -80,7 +79,6 @@ export const SearchEntitiesOutput = z.object({
   results: z.array(SearchEntityResult),
   totalResults: z.number(),
   limit: z.number(),
-  page: z.number(),
 });
 
 export const SearchEntitiesSchema = {
@@ -103,7 +101,6 @@ export function SearchEntities(): Query<typeof SearchEntitiesSchema> {
         communityId,
         searchScope = 'All',
         limit = 10,
-        page = 1,
         orderBy = 'relevance',
         orderDirection = 'DESC',
         includeCount = true,
@@ -119,9 +116,6 @@ export function SearchEntities(): Query<typeof SearchEntitiesSchema> {
         communityId && communityId !== ALL_COMMUNITIES
           ? 'AND community_id = $communityId'
           : '';
-
-      const offset = (page - 1) * limit;
-      const paginationSql = `LIMIT $limit OFFSET $offset`;
 
       const searchQueries: string[] = [];
 
@@ -227,14 +221,13 @@ export function SearchEntities(): Query<typeof SearchEntitiesSchema> {
           results: [],
           totalResults: 0,
           limit,
-          page,
         };
       }
 
       // Combine all search queries
       const unionQuery = searchQueries.join(' UNION ALL ');
 
-      // Apply ordering and pagination
+      // Apply ordering and limit directly
       let orderBySql = '';
       switch (orderBy) {
         case 'created_at':
@@ -255,7 +248,7 @@ export function SearchEntities(): Query<typeof SearchEntitiesSchema> {
         )
         SELECT * FROM search_results
         ${orderBySql}
-        ${paginationSql}
+        LIMIT $limit
       `;
 
       const countQuery = `
@@ -269,7 +262,6 @@ export function SearchEntities(): Query<typeof SearchEntitiesSchema> {
         searchTerm,
         communityId,
         limit,
-        offset,
       };
 
       // Execute queries
@@ -294,7 +286,6 @@ export function SearchEntities(): Query<typeof SearchEntitiesSchema> {
         results,
         totalResults,
         limit,
-        page,
       };
     },
   };
