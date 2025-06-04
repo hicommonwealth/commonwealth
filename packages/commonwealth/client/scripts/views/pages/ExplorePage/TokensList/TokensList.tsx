@@ -72,6 +72,7 @@ const TokensList = ({
     hasNextPage,
     fetchNextPage,
   } = useFetchTokensQuery({
+    search: searchText?.trim(),
     cursor: 1,
     limit: 8,
     with_stats: true,

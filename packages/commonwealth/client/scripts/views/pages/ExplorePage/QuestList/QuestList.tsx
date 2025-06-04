@@ -57,6 +57,7 @@ const QuestList = ({
     hasNextPage,
     fetchNextPage,
   } = useFetchQuestsQuery({
+    search: searchText?.trim(),
     ...(questsForCommunityId && {
       community_id: questsForCommunityId,
     }),
