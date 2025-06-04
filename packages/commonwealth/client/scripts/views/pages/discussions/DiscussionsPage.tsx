@@ -8,9 +8,7 @@ import React, {
   useState,
 } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import useFetchThreadsQuery, {
-  useDateCursor,
-} from 'state/api/threads/fetchThreads';
+import useGetThreadsQuery from 'state/api/threads/getThreads';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -31,8 +29,10 @@ import {
   sanitizeTopicName,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
+import Thread from 'client/scripts/models/Thread';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import { useFetchNodesQuery } from 'client/scripts/state/api/nodes';
+import { useDateCursor } from 'client/scripts/state/api/threads/dateCursor';
 import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
@@ -178,46 +178,57 @@ const DiscussionsPage = () => {
       topicObj?.eth_chain_id || app?.chain.meta?.ChainNode?.eth_chain_id || 0,
   });
 
-  const { fetchNextPage, data, isInitialLoading, hasNextPage, threadCount } =
-    useFetchThreadsQuery({
-      communityId: communityId,
-      queryType: 'bulk',
-      page: 1,
-      limit: 20,
-      topicId,
-      stage: stageName ?? undefined,
-      includePinnedThreads: true,
-      ...(featuredFilter && {
-        orderBy: featuredFilter,
-      }),
-      ...(dateCursor.fromDate && {
-        toDate: dateCursor.toDate,
-        fromDate: dateCursor.fromDate,
-      }),
-      includeArchivedThreads: isOnArchivePage || includeArchivedThreads,
-      // @ts-expect-error <StrictNullChecks/>
-      contestAddress,
-      // @ts-expect-error <StrictNullChecks/>
-      contestStatus,
-      apiEnabled:
-        !!communityId &&
-        (selectedView === 'all' || selectedView === 'cardview'),
-    });
-
-  const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
-
-  // Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
-  // Checks both for mobile device and inner window size for desktop responsiveness
-  const filteredThreads = threads.filter((t) => {
-    if (!includeSpamThreads && t.markedAsSpamAt) return null;
-
-    if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt)
-      return null;
-
-    if (isOnArchivePage && !t.archivedAt) return null;
-
-    return t;
+  const {
+    data,
+    hasNextPage,
+    fetchNextPage,
+    isLoading: isInitialLoading,
+  } = useGetThreadsQuery({
+    community_id: communityId,
+    cursor: 1,
+    limit: 20,
+    topic_id: topicId,
+    stage: stageName ?? undefined,
+    ...(featuredFilter && {
+      order_by: featuredFilter,
+    }),
+    ...(dateCursor.fromDate && {
+      to_date: dateCursor.toDate,
+      from_date: dateCursor.fromDate,
+    }),
+    archived: isOnArchivePage || includeArchivedThreads,
+    contestAddress: contestAddress || undefined,
+    enabled:
+      !!communityId && (selectedView === 'all' || selectedView === 'cardview'),
   });
+  const [filteredThreads, setFilteredThreads] = useState<Thread[]>([]);
+
+  useEffect(() => {
+    if (isInitialLoading || !data) return;
+    const threads = sortPinned(
+      sortByFeaturedFilter(
+        data.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [],
+        featuredFilter,
+      ),
+    );
+    // Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
+    // Checks both for mobile device and inner window size for desktop responsiveness
+    const filtered = threads.filter((t) => {
+      if (!includeSpamThreads && t.markedAsSpamAt) return null;
+      if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt)
+        return null;
+      if (isOnArchivePage && !t.archivedAt) return null;
+      return t;
+    });
+    setFilteredThreads(filtered);
+  }, [
+    data,
+    featuredFilter,
+    includeSpamThreads,
+    includeArchivedThreads,
+    isOnArchivePage,
+    isInitialLoading,
+  ]);
 
   //checks for malformed url in topics and redirects if the topic does not exist
   useEffect(() => {
@@ -431,9 +442,7 @@ const DiscussionsPage = () => {
           totalThreadCount={
             isOnArchivePage
               ? filteredThreads.length || 0
-              : threads
-                ? threadCount || 0
-                : 0
+              : data?.pages[0]?.totalResults || 0
           }
           isIncludingSpamThreads={includeSpamThreads}
           onIncludeSpamThreads={setIncludeSpamThreads}

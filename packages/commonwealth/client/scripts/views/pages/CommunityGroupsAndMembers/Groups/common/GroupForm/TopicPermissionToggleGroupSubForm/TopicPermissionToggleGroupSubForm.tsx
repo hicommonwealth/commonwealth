@@ -71,7 +71,7 @@ const TopicPermissionToggleGroupSubForm = ({
             </CWText>
           ))}
           {privateTopicsEnabled && (
-            <CWText key="is_private" className="header-item" fontWeight="bold">
+            <CWText className="header-item" fontWeight="bold">
               Private View
             </CWText>
           )}
@@ -96,7 +96,7 @@ const TopicPermissionToggleGroupSubForm = ({
             ),
           )}
           {privateTopicsEnabled && (
-            <div className="toggle" key="is_private">
+            <div className="toggle">
               <CWToggle
                 checked={topic.is_private}
                 onChange={() => handleIsPrivateChange(topic)}
@@ -123,7 +123,7 @@ const TopicPermissionToggleGroupSubForm = ({
           ),
         )}
         {privateTopicsEnabled && (
-          <div className="toggle" key="is_private">
+          <div className="toggle">
             <CWToggle
               checked={topics.every((topic) => topic.is_private)}
               onChange={() => handleIsPrivateChange()}

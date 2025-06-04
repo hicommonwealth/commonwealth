@@ -10,7 +10,6 @@ import {
 } from 'client/scripts/helpers/snapshot_utils';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
-import { Thread, ThreadView } from 'client/scripts/models/Thread';
 import { AnyProposal } from 'client/scripts/models/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -162,8 +161,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   });
 
   const thread = useMemo(() => {
-    const t = data?.at(0);
-    return t ? new Thread(t as ThreadView) : undefined;
+    return data?.at(0);
   }, [data]);
 
   //  snapshot proposal hook
