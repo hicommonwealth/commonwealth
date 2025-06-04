@@ -181,7 +181,6 @@ const SearchPage = () => {
   });
 
   const results = useMemo(() => {
-    console.log({ commentsData });
     switch (activeTab) {
       case SearchScope.Threads:
         return (
