@@ -1,5 +1,4 @@
-import { logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { Actor, logger } from '@hicommonwealth/core';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
@@ -8,168 +7,179 @@ import {
   ListResourceTemplatesRequestSchema,
   ListToolsRequestSchema,
   ReadResourceRequestSchema,
-  Tool,
 } from '@modelcontextprotocol/sdk/types.js';
+import cors from 'cors';
 import express, { Request, Response } from 'express';
-import { z } from 'zod';
-import { zodToJsonSchema } from 'zod-to-json-schema';
+import { z, ZodSchema } from 'zod';
+import { api as externalApi, trpcRouter } from './external-router';
 
 const log = logger(import.meta);
 
-export function buildMCPRouter() {
-  // Input validation schema for fetching communities
-  const FetchNewCommunitiesSchema = z.object({
-    limit: z
-      .number()
-      .int()
-      .max(50)
-      .optional()
-      .default(10)
-      .describe('Number of communities to fetch per page'),
+type CommonMCPTool = {
+  name: string;
+  description: string;
+  inputSchema: z.ZodSchema;
+  fn: (actor: Actor, args: unknown) => Promise<unknown>;
+};
+
+// map external trpc router procedures to MCP tools
+export const buildMCPTools = (): Array<CommonMCPTool> => {
+  const procedures = Object.entries(externalApi);
+  const tools = procedures.map(([key, procedure]) => {
+    console.log(key, procedure);
+    const inputSchema = procedure._def.inputs[0] as ZodSchema;
+    if (!inputSchema) {
+      throw new Error(`No input schema for ${key}`);
+    }
+    return {
+      name: key,
+      description: inputSchema._def.description,
+      inputSchema: z.any(), // schema is validated at runtime
+      fn: async (user: Actor, args: unknown) => {
+        const trpcCaller = trpcRouter.createCaller({
+          req: {
+            user,
+            headers: {},
+          } as any,
+          res: {} as any,
+          actor: user,
+        });
+        const procedurePath = key.split('.');
+        let currentCaller: any = trpcCaller;
+        for (const segment of procedurePath) {
+          currentCaller = currentCaller[segment];
+          if (!currentCaller) {
+            throw new Error(`Procedure ${key} not found`);
+          }
+        }
+        return await currentCaller(args);
+      },
+    };
   });
+  return tools;
+};
 
-  enum ToolName {
-    FETCH_COMMUNITIES = 'fetch_new_communities',
-  }
+const createMCPServer = (tools: CommonMCPTool[]): Server => {
+  const toolsMap = tools.reduce(
+    (acc, tool) => {
+      acc[tool.name] = tool;
+      return acc;
+    },
+    {} as Record<string, CommonMCPTool>,
+  );
 
-  // Initialize the MCP server
   const mcpServer = new Server(
     {
-      name: 'Commonwealth MCP Server',
+      name: 'Common MCP Server',
       version: '0.0.1',
     },
     {
       capabilities: {
         resources: {},
-        tools: {
-          fetch_new_communities: {
-            description: 'Fetch the newest communities on Commonwealth',
-            inputSchema: zodToJsonSchema(FetchNewCommunitiesSchema) as any,
-          },
-        },
+        tools: toolsMap,
       },
     },
   );
 
-  // Handle tool listing requests
   mcpServer.setRequestHandler(ListToolsRequestSchema, async () => {
-    const tools: Tool[] = [
-      {
-        name: ToolName.FETCH_COMMUNITIES,
-        description: 'Fetch communities from Commonwealth',
-        inputSchema: zodToJsonSchema(FetchNewCommunitiesSchema) as any,
-      },
-    ];
-    return { tools };
+    return {
+      tools: tools.map((tool) => ({
+        name: tool.name,
+        description: tool.description,
+        inputSchema: tool.inputSchema,
+      })),
+    };
   });
 
-  // Handle tool execution requests
   mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
 
-    if (name === ToolName.FETCH_COMMUNITIES) {
-      try {
-        const validatedArgs = FetchNewCommunitiesSchema.parse(args);
-        log.info('Fetching communities with params:', validatedArgs);
-
-        const communities = await models.Community.findAll({
-          limit: validatedArgs.limit || 10,
-          order: [['created_at', 'DESC']],
-        });
-
-        return {
-          content: [
-            {
-              type: 'text',
-              text: JSON.stringify(communities, null, 2),
-            },
-          ],
-        };
-      } catch (error) {
-        log.error('Error fetching communities:', error);
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `Error fetching communities: ${error instanceof Error ? error.message : 'Unknown error'}`,
-            },
-          ],
-          isError: true,
-        };
-      }
+    if (!(name in toolsMap)) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Unknown tool: ${name}`,
+          },
+        ],
+        isError: true,
+      };
     }
 
-    throw new Error(`Unknown tool: ${name}`);
+    console.log('request', JSON.stringify(request, null, 2));
+
+    try {
+      const validatedArgs = toolsMap[name].inputSchema.parse(args);
+      log.info(
+        `Executing tool: ${name} with params: ${JSON.stringify(validatedArgs)}`,
+      );
+      const actor = {
+        user: {
+          id: -1,
+          email: 'mcp@common.im',
+          isAdmin: true,
+        },
+      };
+      const result = await toolsMap[name].fn(actor, validatedArgs);
+      console.log(result);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      log.error(`Error executing tool ${name}:`, error);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error executing tool ${name}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+        isError: true,
+      };
+    }
   });
 
-  // Handle resource template listing
   mcpServer.setRequestHandler(ListResourceTemplatesRequestSchema, async () => {
     return {
       resourceTemplates: [],
     };
   });
 
-  // Handle resource listing
   mcpServer.setRequestHandler(ListResourcesRequestSchema, async () => {
     return {
-      resources: [
-        {
-          uri: 'commonwealth://server/info',
-          name: 'Server Info',
-          description: 'Information about the Commonwealth MCP Server',
-          mimeType: 'application/json',
-        },
-      ],
+      resources: [],
     };
   });
 
-  // Handle resource reading
   mcpServer.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-    const uri = request.params.uri;
-
-    if (uri === 'commonwealth://server/info') {
-      return {
-        contents: [
-          {
-            uri: uri,
-            text: JSON.stringify(
-              {
-                name: 'Commonwealth MCP Server',
-                version: '1.0.0',
-                description:
-                  'An MCP server that provides access to Commonwealth community data',
-                tools: [
-                  {
-                    name: 'fetch_new_communities',
-                    description:
-                      'Fetch all communities with optional filtering and pagination',
-                  },
-                ],
-              },
-              null,
-              2,
-            ),
-          },
-        ],
-      };
-    }
-
-    throw new Error(`Unknown resource: ${uri}`);
+    throw new Error(`Unknown resource: ${request.params.uri}`);
   });
+
+  return mcpServer;
+};
+
+export function buildMCPRouter() {
+  const tools = buildMCPTools();
+
+  log.info(`Adding ${tools.length} MCP Tools`);
+
+  const mcpServer = createMCPServer(tools);
 
   const router = express.Router();
 
   // allow all origins
-  router.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', '*');
-    if (req.method === 'OPTIONS') {
-      res.status(204).end();
-      return;
-    }
-    next();
-  });
+  router.use(
+    cors({
+      origin: '*',
+      methods: ['GET', 'POST', 'DELETE'],
+      allowedHeaders: ['Authorization'],
+    }),
+  );
 
   // handle post requests
   router.post('/', async (req: Request, res: Response) => {
