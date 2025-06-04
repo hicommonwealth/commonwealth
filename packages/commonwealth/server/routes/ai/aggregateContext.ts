@@ -70,21 +70,31 @@ class ContextAggregator {
         type: QueryTypes.SELECT,
       });
 
-      // Get recent comments
+      // Get most liked comments
       const commentsQuery = `
         SELECT 
           C.body,
           C.created_at,
           T.title as thread_title,
-          COM.name as community_name
+          COM.name as community_name,
+          COALESCE(like_counts.like_count, 0) as like_count
         FROM "Comments" C
         JOIN "Addresses" A ON C.address_id = A.id
         JOIN "Threads" T ON C.thread_id = T.id
         JOIN "Communities" COM ON T.community_id = COM.id
+        LEFT JOIN (
+          SELECT 
+            comment_id,
+            COUNT(*) as like_count
+          FROM "Reactions" 
+          WHERE reaction = 'like' 
+            AND comment_id IS NOT NULL
+          GROUP BY comment_id
+        ) like_counts ON C.id = like_counts.comment_id
         WHERE A.user_id = $userId
           AND C.deleted_at IS NULL
           ${this.getDateFilter().replace('created_at', 'C.created_at')}
-        ORDER BY C.created_at DESC
+        ORDER BY COALESCE(like_counts.like_count, 0) DESC, C.created_at DESC
         LIMIT ${CONTEXT_CONFIG.MAX_RECENT_COMMENTS}
       `;
 
@@ -93,6 +103,7 @@ class ContextAggregator {
         created_at: Date;
         thread_title: string;
         community_name: string;
+        like_count: number;
       }>(commentsQuery, {
         bind: { userId },
         type: QueryTypes.SELECT,
@@ -108,10 +119,12 @@ class ContextAggregator {
       contextData += `Member since: ${moment(userResult?.created_at).format('YYYY-MM-DD')}\n`;
 
       if (comments.length > 0) {
-        contextData += `\nRecent Comments:\n`;
+        contextData += `\nMost Liked Comments:\n`;
         comments.forEach((comment, index) => {
           const commentPreview = comment.body.slice(0, 200).replace(/\n/g, ' ');
-          contextData += `${index + 1}. In "${comment.thread_title}" (${comment.community_name}): ${commentPreview}...\n`;
+          const likeText =
+            comment.like_count > 0 ? ` (${comment.like_count} likes)` : '';
+          contextData += `${index + 1}. In "${comment.thread_title}" (${comment.community_name})${likeText}: ${commentPreview}...\n`;
         });
       }
 
@@ -253,19 +266,29 @@ class ContextAggregator {
         type: QueryTypes.SELECT,
       });
 
-      // Get recent comments
+      // Get most liked comments
       const commentsQuery = `
         SELECT 
           C.body,
           C.created_at,
-          U.profile->>'name' as commenter_name
+          U.profile->>'name' as commenter_name,
+          COALESCE(like_counts.like_count, 0) as like_count
         FROM "Comments" C
         JOIN "Addresses" A ON C.address_id = A.id
         JOIN "Users" U ON A.user_id = U.id
+        LEFT JOIN (
+          SELECT 
+            comment_id,
+            COUNT(*) as like_count
+          FROM "Reactions" 
+          WHERE reaction = 'like' 
+            AND comment_id IS NOT NULL
+          GROUP BY comment_id
+        ) like_counts ON C.id = like_counts.comment_id
         WHERE C.thread_id = $threadId
           AND C.deleted_at IS NULL
           ${this.getDateFilter().replace('created_at', 'C.created_at')}
-        ORDER BY C.created_at DESC
+        ORDER BY COALESCE(like_counts.like_count, 0) DESC, C.created_at DESC
         LIMIT ${CONTEXT_CONFIG.MAX_RECENT_COMMENTS}
       `;
 
@@ -273,6 +296,7 @@ class ContextAggregator {
         body: string;
         created_at: Date;
         commenter_name: string;
+        like_count: number;
       }>(commentsQuery, {
         bind: { threadId },
         type: QueryTypes.SELECT,
@@ -296,10 +320,12 @@ class ContextAggregator {
       }
 
       if (comments.length > 0) {
-        contextData += `\nRecent Comments:\n`;
+        contextData += `\nMost Liked Comments:\n`;
         comments.forEach((comment, index) => {
           const commentPreview = comment.body.slice(0, 150).replace(/\n/g, ' ');
-          contextData += `${index + 1}. ${comment.commenter_name}: ${commentPreview}...\n`;
+          const likeText =
+            comment.like_count > 0 ? ` (${comment.like_count} likes)` : '';
+          contextData += `${index + 1}. ${comment.commenter_name}${likeText}: ${commentPreview}...\n`;
         });
       }
 
