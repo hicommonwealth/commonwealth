@@ -88,6 +88,7 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
     isInitialLoading: isInitialCommunitiesLoading,
   } = useFetchCommunitiesQuery({
     limit: 50,
+    search: searchText?.trim(),
     include_node_info: true,
     order_by: (() => {
       if (

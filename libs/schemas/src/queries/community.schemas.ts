@@ -26,6 +26,7 @@ import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const GetCommunities = {
   input: PaginationParamsSchema.extend({
+    search: z.string().optional(),
     // eslint-disable-next-line max-len
     relevance_by: z
       .enum(['tag_ids', 'membership'])

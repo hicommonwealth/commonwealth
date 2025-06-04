@@ -38,6 +38,7 @@ export const TrendingCommunitiesPreview = ({
     ...(user.isLoggedIn && {
       relevance_by: 'membership',
     }),
+    search: searchText?.trim(),
     include_last_30_day_thread_count: true,
     order_by: 'last_30_day_thread_count',
     order_direction: 'DESC',
