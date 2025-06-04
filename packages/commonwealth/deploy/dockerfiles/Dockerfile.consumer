@@ -1,2 +1,4 @@
-FROM commonwealth
+ARG BASE_IMAGE=commonwealth
+FROM ${BASE_IMAGE}
+
 CMD NODE_ENV=production ./datadog-entrypoint.sh node --import=extensionless/register --max_old_space_size=$(./scripts/get-max-old-space-size.sh) --enable-source-maps build/server/workers/commonwealthConsumer/commonwealthConsumer.js

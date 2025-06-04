@@ -1,4 +1,6 @@
-FROM commonwealth
+ARG BASE_IMAGE=commonwealth
+FROM ${BASE_IMAGE}
+
 RUN apt-get update && apt-get install -y curl # Needed for heroku
 CMD node --import=extensionless/register --enable-source-maps build/server/scripts/releasePhaseEnvCheck.js && \
   npx sequelize-cli db:migrate --config server/sequelize.json && \
