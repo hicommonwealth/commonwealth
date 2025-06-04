@@ -12,18 +12,44 @@ export enum SearchEntityType {
   PROPOSAL = 'proposal',
 }
 
-export type SearchScope =
-  | 'All'
-  | 'Members'
-  | 'Communities'
-  | 'Topics'
-  | 'Threads'
-  | 'Proposals';
+export const SearchScope = z.enum([
+  'All',
+  'Members',
+  'Communities',
+  'Topics',
+  'Threads',
+  'Proposals',
+]);
+
+export type SearchScope = z.infer<typeof SearchScope>;
+
+const VALID_SEARCH_SCOPES = [
+  'All',
+  'Members',
+  'Communities',
+  'Topics',
+  'Threads',
+  'Proposals',
+] as const;
 
 export const SearchEntitiesInput = z.object({
   searchTerm: z.string(),
   communityId: z.string().optional(),
-  searchScope: z.string().optional().default('All'),
+  searchScope: z
+    .string()
+    .optional()
+    .default('All')
+    .refine(
+      (value) => {
+        const scopes = value.split(',').map((s) => s.trim());
+        return scopes.every((scope) =>
+          VALID_SEARCH_SCOPES.includes(scope as any),
+        );
+      },
+      {
+        message: `searchScope must contain only valid values: ${VALID_SEARCH_SCOPES.join(', ')}`,
+      },
+    ),
   limit: z.number().min(1).max(50).optional(),
   page: z.number().min(1).optional(),
   orderBy: z.enum(['relevance', 'created_at', 'name']).optional(),
