@@ -385,7 +385,6 @@ describe('Gating lifecycle', () => {
       expect(activeResults?.length).to.equal(4);
     });
 
-    // TODO: fix after merging #12261
     it('should not be able to view threads in private topics', async () => {
       const getResults = await query(GetThreads(), {
         actor: rejected,
