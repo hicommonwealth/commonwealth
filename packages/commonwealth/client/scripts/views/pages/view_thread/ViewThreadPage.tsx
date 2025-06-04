@@ -107,7 +107,7 @@ type VoterProfileData = {
 };
 
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
-  const threadId = identifier.split('-')[0];
+  const threadId = parseInt(`${identifier.split('-')?.[0] || 0}`);
   const [searchParams] = useSearchParams();
   const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
@@ -125,9 +125,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [imageActionModalOpen, setImageActionModalOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [voterProfiles, setVoterProfiles] = useState<
-    Record<string, VoterProfileData>
-  >({});
   const [uniqueVoterAddresses, setUniqueVoterAddresses] = useState<string[]>(
     [],
   );
@@ -143,7 +140,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
 
   const communityId = app.activeChainId() || '';
-  const { data: groups = [] } = useFetchGroupsQuery({
+  useFetchGroupsQuery({
     communityId,
     includeTopics: true,
     enabled: !!communityId,
@@ -320,13 +317,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
 
-  const { actionGroups, bypassGating, memberships, isTopicGated } =
-    useTopicGating({
-      communityId,
-      apiEnabled: !!user?.activeAccount?.address && !!communityId,
-      userAddress: user?.activeAccount?.address || '',
-      topicId: thread?.topic?.id || 0,
-    });
+  const { actionGroups, bypassGating, isTopicGated } = useTopicGating({
+    communityId,
+    apiEnabled: !!user?.activeAccount?.address && !!communityId,
+    userAddress: user?.activeAccount?.address || '',
+    topicId: thread?.topic?.id || 0,
+  });
 
   const { isWindowLarge } = useBrowserWindow({
     onResize: () =>
@@ -408,24 +404,25 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       apiCallEnabled: !!communityId && uniqueVoterAddresses.length > 0,
     });
 
-  // Effect to transform fetched profiles into the voterProfiles map
-  useEffect(() => {
-    if (fetchedProfiles && fetchedProfiles.length > 0) {
-      const profilesMap: Record<string, VoterProfileData> = {};
-      fetchedProfiles.forEach((profile) => {
-        if (profile.address) {
-          profilesMap[profile.address] = {
-            address: profile.address,
-            name: profile.name || '', // Provide fallback for name
-            avatarUrl: profile.avatarUrl,
-          };
-        }
-      });
-      setVoterProfiles(profilesMap);
+  const voterProfiles = useMemo(() => {
+    if (!fetchedProfiles || fetchedProfiles.length === 0) {
+      return {};
     }
+
+    const profilesMap: Record<string, VoterProfileData> = {};
+    fetchedProfiles.forEach((profile) => {
+      if (profile.address) {
+        profilesMap[profile.address] = {
+          address: profile.address,
+          name: profile.name || '', // Provide fallback for name
+          avatarUrl: profile.avatarUrl,
+        };
+      }
+    });
+    return profilesMap;
   }, [fetchedProfiles]);
 
-  if (typeof identifier !== 'string') {
+  if (typeof identifier !== 'string' || fetchThreadError) {
     return <PageNotFound />;
   }
 

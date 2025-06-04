@@ -4,6 +4,16 @@
   div.h3 {
     margin-bottom: 16px;
   }
+  .debugTxHashGap {
+    padding-top: 36px;
+  }
+  .debugTxHash {
+    color: $neutral-500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 
   .display-none {
     display: none !important;

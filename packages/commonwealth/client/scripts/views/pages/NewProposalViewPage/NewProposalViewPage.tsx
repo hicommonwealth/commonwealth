@@ -65,7 +65,7 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
     isLoading,
     error: cosmosError,
     threads: cosmosThreads,
-  } = useCosmosProposal({ proposalId });
+  } = useCosmosProposal({ proposalId, enabled: queryType === 'cosmos' });
 
   const {
     proposal: snapshotProposal,
@@ -80,10 +80,11 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
     loadVotes,
     power,
     threads,
+    error: snapshotProposalError,
   } = useSnapshotProposal({
     identifier: proposalId,
     snapshotId: querySnapshotId!,
-    enabled: queryType === 'cosmos' ? false : true,
+    enabled: queryType !== 'cosmos',
   });
   const snapShotVotingResult = React.useMemo(() => {
     if (!snapshotProposal || !votes) return [];
@@ -139,7 +140,11 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
     return <LoadingIndicator message="Loading..." />;
   }
 
-  if (cosmosError) {
+  if (
+    (queryType === 'cosmos' && (cosmosError || !(proposal && isLoading))) ||
+    (queryType !== 'cosmos' &&
+      (snapshotProposalError || !(snapshotProposal && isSnapshotLoading)))
+  ) {
     return (
       <PageNotFound
         message={"We couldn't find what you searched for. Try searching again."}
