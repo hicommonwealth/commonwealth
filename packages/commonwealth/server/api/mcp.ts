@@ -11,6 +11,7 @@ import {
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 import { z, ZodSchema } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import { api as externalApi, trpcRouter } from './external-router';
 
 const log = logger(import.meta);
@@ -24,17 +25,19 @@ type CommonMCPTool = {
 
 // map external trpc router procedures to MCP tools
 export const buildMCPTools = (): Array<CommonMCPTool> => {
-  const procedures = Object.entries(externalApi);
-  const tools = procedures.map(([key, procedure]) => {
-    console.log(key, procedure);
+  const procedures = Object.keys(externalApi) as Array<
+    keyof typeof externalApi
+  >;
+  const tools = procedures.map((key) => {
+    const procedure = externalApi[key];
     const inputSchema = procedure._def.inputs[0] as ZodSchema;
     if (!inputSchema) {
       throw new Error(`No input schema for ${key}`);
     }
     return {
       name: key,
-      description: inputSchema._def.description,
-      inputSchema: z.any(), // schema is validated at runtime
+      description: inputSchema._def.description || '',
+      inputSchema,
       fn: async (user: Actor, args: unknown) => {
         const trpcCaller = trpcRouter.createCaller({
           req: {
@@ -86,7 +89,7 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
       tools: tools.map((tool) => ({
         name: tool.name,
         description: tool.description,
-        inputSchema: tool.inputSchema,
+        inputSchema: zodToJsonSchema(tool.inputSchema),
       })),
     };
   });
@@ -106,8 +109,6 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
       };
     }
 
-    console.log('request', JSON.stringify(request, null, 2));
-
     try {
       const validatedArgs = toolsMap[name].inputSchema.parse(args);
       log.info(
@@ -121,7 +122,6 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
         },
       };
       const result = await toolsMap[name].fn(actor, validatedArgs);
-      console.log(result);
       return {
         content: [
           {
