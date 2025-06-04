@@ -1,6 +1,7 @@
 import * as anchor from '@coral-xyz/anchor';
-import { AnchorProvider, BN, Program } from '@coral-xyz/anchor';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
+import BN from 'bn.js';
 import { SingleContest } from '../../solanaTypes/single_contest';
 
 // Define constants from Rust program

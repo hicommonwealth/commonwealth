@@ -113,8 +113,8 @@ const singleContestStartedMapper: SolanaMapper<'ContestStarted'> = (
     event_payload: {
       contest_address: event.data.contest.toString(),
       contest_id: 0,
-      start_time: new Date(Number(event.data.start_time)),
-      end_time: new Date(Number(event.data.end_time)),
+      start_time: new Date(Number(event.data.start_time) * 1000),
+      end_time: new Date(Number(event.data.end_time) * 1000),
       is_one_off: true,
     },
   };
