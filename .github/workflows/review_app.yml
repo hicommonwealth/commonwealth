@@ -13,17 +13,13 @@ on:
         description: 'Override commit SHA for Docker builds (optional)'
         required: false
         type: string
-  pull_request:
-  push:
-    branches:
-      - tim/railway
 
 env:
   RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
 jobs:
   build:
-    name: Build Docker Contains
+    name: Build Docker Containers
     if: |
       (github.event.issue.pull_request && github.event.comment.body == '/deploy') ||
       github.event_name == 'workflow_dispatch'
@@ -263,6 +259,7 @@ jobs:
 
   deploy:
     name: Deploy to Railway
+    needs: build
     if: |
       (github.event.issue.pull_request && github.event.comment.body == '/deploy') ||
       github.event_name == 'workflow_dispatch'
