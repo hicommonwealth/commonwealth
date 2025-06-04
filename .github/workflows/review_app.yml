@@ -286,23 +286,31 @@ jobs:
             'Content-Type': 'application/json',
           };
 
-          async function railwayGraphQL(query) {
+          async function railwayGraphQL(query, { allow404 = false } = {}) {
             const res = await fetch('https://backboard.railway.app/graphql', {
               method: 'POST',
               headers,
               body: JSON.stringify({ query }),
             });
 
-            // Check HTTP status code
             if (!res.ok) {
               const text = await res.text();
+              if (res.status === 404 && allow404) {
+                return null;
+              }
               throw new Error(`HTTP error! status: ${res.status} - ${res.statusText}\nResponse: ${text}`);
             }
 
             const json = await res.json();
 
-            // Check for GraphQL errors
             if (json.errors && json.errors.length > 0) {
+              // Some GraphQL APIs return errors for not found, so you may want to check for that here too
+              if (
+                allow404 &&
+                json.errors.some(e => e.message && e.message.toLowerCase().includes('not found'))
+              ) {
+                return null;
+              }
               console.error('GraphQL errors:', JSON.stringify(json.errors));
               throw new Error(`GraphQL errors: ${JSON.stringify(json.errors)}`);
             }
@@ -313,7 +321,7 @@ jobs:
           (async () => {
             try {
               // Step 1: Check if environment already exists
-              let envCheck = await railwayGraphQL(`query { project(id: \"${PROJECT_ID}\") { environments(filter: { name: \"${ENV_NAME}\" }) { edges { node { id name } } } } }`);
+              let envCheck = await railwayGraphQL(`query { project(id: \"${PROJECT_ID}\") { environments(filter: { name: \"${ENV_NAME}\" }) { edges { node { id name } } } } }`, { allow404: true });
               console.log('ENV_CHECK:', JSON.stringify(envCheck));
               let envEdges = envCheck?.data?.project?.environments?.edges || [];
               let ENV_ID = envEdges[0]?.node?.id;
@@ -321,7 +329,7 @@ jobs:
               if (!ENV_ID) {
                 console.log(`Cloning production environment to: ${ENV_NAME}`);
                 // Find the production environment ID
-                let prodEnvCheck = await railwayGraphQL(`query { project(id: \"${PROJECT_ID}\") { environments(filter: { name: \"production\" }) { edges { node { id name } } } } }`);
+                let prodEnvCheck = await railwayGraphQL(`query { project(id: \"${PROJECT_ID}\") { environments(filter: { name: \"production\" }) { edges { node { id name } } } } }`, { allow404: true });
                 console.log('PROD_ENV_CHECK:', JSON.stringify(prodEnvCheck));
                 let prodEnvId = prodEnvCheck?.data?.project?.environments?.edges?.[0]?.node?.id;
                 if (!prodEnvId) {
@@ -338,7 +346,7 @@ jobs:
               }
 
               // Step 2: Check if service already exists in this environment
-              let serviceCheck = await railwayGraphQL(`query { environment(id: \"${ENV_ID}\") { serviceInstances { edges { node { id service { name } } } } } }`);
+              let serviceCheck = await railwayGraphQL(`query { environment(id: \"${ENV_ID}\") { serviceInstances { edges { node { id service { name } } } } } }`, { allow404: true });
               console.log('SERVICE_CHECK:', JSON.stringify(serviceCheck));
               let serviceEdges = serviceCheck?.data?.environment?.serviceInstances?.edges || [];
               let serviceInstance = serviceEdges.find(e => e.node.service.name === SERVICE_NAME);
