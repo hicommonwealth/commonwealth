@@ -291,6 +291,7 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{\"query\": \"query { project(id: \\\"$PROJECT_ID\\\") { environments(filter: { name: \\\"$ENV_NAME\\\" }) { edges { node { id name } } } } }\"}" \
             https://backboard.railway.app/graphql)
+          echo "ENV_CHECK response: $ENV_CHECK"
           
           ENV_ID=$(echo $ENV_CHECK | jq -r '.data.project.environments.edges[0].node.id // empty')
           
@@ -302,6 +303,7 @@ jobs:
               -H "Content-Type: application/json" \
               -d "{\"query\": \"query { project(id: \\\"$PROJECT_ID\\\") { environments(filter: { name: \\\"production\\\" }) { edges { node { id name } } } } }\"}" \
               https://backboard.railway.app/graphql | jq -r '.data.project.environments.edges[0].node.id')
+            echo "PROD_ENV_ID: $PROD_ENV_ID"
             if [ -z "$PROD_ENV_ID" ] || [ "$PROD_ENV_ID" = "null" ]; then
               echo "Error: Could not find production environment ID"
               exit 1
@@ -312,6 +314,7 @@ jobs:
               -H "Content-Type: application/json" \
               -d "{\"query\": \"mutation { environmentClone(input: { name: \\\"$ENV_NAME\\\", environmentId: \\\"$PROD_ENV_ID\\\" }) { id name } }\"}" \
               https://backboard.railway.app/graphql)
+            echo "ENV_RESPONSE: $ENV_RESPONSE"
             ENV_ID=$(echo $ENV_RESPONSE | jq -r '.data.environmentClone.id')
             echo "Cloned environment: $ENV_ID"
           else
@@ -324,6 +327,7 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{\"query\": \"query { environment(id: \\\"$ENV_ID\\\") { serviceInstances { edges { node { id service { name } } } } } }\"}" \
             https://backboard.railway.app/graphql)
+          echo "SERVICE_CHECK: $SERVICE_CHECK"
           
           SERVICE_INSTANCE_ID=$(echo $SERVICE_CHECK | jq -r ".data.environment.serviceInstances.edges[] | select(.node.service.name == \"$SERVICE_NAME\") | .node.id // empty")
           
@@ -336,6 +340,7 @@ jobs:
               -H "Content-Type: application/json" \
               -d "{\"query\": \"mutation { serviceCreate(input: { name: \\\"$SERVICE_NAME\\\", projectId: \\\"$PROJECT_ID\\\", source: { image: \\\"$IMAGE_TAG\\\" } }) { id } }\"}" \
               https://backboard.railway.app/graphql)
+            echo "SERVICE_CREATE: $SERVICE_CREATE"
             
             SERVICE_ID=$(echo $SERVICE_CREATE | jq -r '.data.serviceCreate.id')
             echo "Created service: $SERVICE_ID"
@@ -346,6 +351,7 @@ jobs:
               -H "Content-Type: application/json" \
               -d "{\"query\": \"mutation { serviceInstanceCreate(input: { environmentId: \\\"$ENV_ID\\\", serviceId: \\\"$SERVICE_ID\\\", source: { image: \\\"$IMAGE_TAG\\\" } }) { id } }\"}" \
               https://backboard.railway.app/graphql)
+            echo "INSTANCE_CREATE: $INSTANCE_CREATE"
             
             SERVICE_INSTANCE_ID=$(echo $INSTANCE_CREATE | jq -r '.data.serviceInstanceCreate.id')
             echo "Created service instance: $SERVICE_INSTANCE_ID"
@@ -358,6 +364,7 @@ jobs:
               -H "Content-Type: application/json" \
               -d "{\"query\": \"mutation { serviceInstanceUpdate(input: { id: \\\"$SERVICE_INSTANCE_ID\\\", source: { image: \\\"$IMAGE_TAG\\\" } }) { id } }\"}" \
               https://backboard.railway.app/graphql)
+            echo "UPDATE_RESPONSE: $UPDATE_RESPONSE"
             
             echo "Updated service instance: $UPDATE_RESPONSE"
           fi
