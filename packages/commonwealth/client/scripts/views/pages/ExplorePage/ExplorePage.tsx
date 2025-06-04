@@ -157,13 +157,11 @@ const ExplorePage = () => {
           </div>
         )}
         {activeTab === 'users' && (
-          <div className="users-tab">
-            <div className="users-xp-table">
-              <XPTable
-                searchText={searchText}
-                onClearSearch={() => setSearchText('')}
-              />
-            </div>
+          <div className="users-xp-table">
+            <XPTable
+              searchText={searchText}
+              onClearSearch={() => setSearchText('')}
+            />
           </div>
         )}
 
