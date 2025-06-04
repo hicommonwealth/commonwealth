@@ -265,7 +265,7 @@ jobs:
           fi
 
       - name: Link to Railway project
-        run: railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
 
       # - name: Create Railway Environment
       #   run: |
