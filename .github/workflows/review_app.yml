@@ -243,7 +243,6 @@ jobs:
       (github.event.issue.pull_request && github.event.comment.body == '/deploy') ||
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    container: ghcr.io/railwayapp/cli:latest
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     steps:
@@ -263,9 +262,6 @@ jobs:
           else
             echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
           fi
-
-      - name: Link to Railway project
-        run: RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
 
       # - name: Create Railway Environment
       #   run: |
