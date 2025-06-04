@@ -389,15 +389,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [thread?.versionHistory]);
 
+  // FIXME it's here ... this is the problem.
+  // it must be triggering useEffect loops.
+
   // Effect to gather unique voter addresses from all polls
-  useEffect(() => {
-    if (pollsData && pollsData.length > 0) {
-      const allAddresses = pollsData.flatMap((poll) =>
-        (poll.votes || []).map((vote) => vote.address),
-      );
-      setUniqueVoterAddresses(Array.from(new Set(allAddresses)));
-    }
-  }, [pollsData]);
+  // useEffect(() => {
+  //   if (pollsData && pollsData.length > 0) {
+  //     const allAddresses = pollsData.flatMap((poll) =>
+  //       (poll.votes || []).map((vote) => vote.address),
+  //     );
+  //     setUniqueVoterAddresses(Array.from(new Set(allAddresses)));
+  //   }
+  // }, [pollsData]);
 
   const { data: fetchedProfiles, isLoading: isLoadingProfiles } =
     useFetchProfilesByAddressesQuery({
