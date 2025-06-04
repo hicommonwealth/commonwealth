@@ -42,6 +42,9 @@ function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
   app.use(api.external.PATH, useragent.express(), api.external.router);
   app.use(api.integration.PATH, api.integration.build());
 
+  // MCP endpoint
+  app.use(api.mcp.PATH, api.mcp.router);
+
   // TODO: review and refactor to api/internal/external if necessary
   // TODO: these routers should be decomposed into smaller routes to individual queries
   registerRoute(router, 'get', '/feed', get_feed_router);

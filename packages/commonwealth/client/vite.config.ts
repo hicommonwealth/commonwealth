@@ -202,6 +202,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
         },
+        '/mcp': {
+          target: env.BACKEND_PROXY_URL || 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
+        },
         // farcaster manifest is dynamically generated, not a static file
         '/.well-known/farcaster.json': {
           target: env.BACKEND_PROXY_URL || 'http://localhost:3000',
