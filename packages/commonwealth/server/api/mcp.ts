@@ -79,7 +79,7 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
     {
       capabilities: {
         resources: {},
-        tools: toolsMap,
+        tools: {},
       },
     },
   );
@@ -111,10 +111,7 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
 
     try {
       const validatedArgs = toolsMap[name].inputSchema.parse(args);
-      log.info(
-        `Executing tool: ${name} with params: ${JSON.stringify(validatedArgs)}`,
-      );
-      const actor = {
+      const actor: Actor = {
         user: {
           id: -1,
           email: 'mcp@common.im',
@@ -166,7 +163,7 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
 export function buildMCPRouter() {
   const tools = buildMCPTools();
 
-  log.info(`Adding ${tools.length} MCP Tools`);
+  log.info(`Initializing MCP server with ${tools.length} tools`);
 
   const mcpServer = createMCPServer(tools);
 
