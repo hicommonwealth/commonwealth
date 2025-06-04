@@ -45,60 +45,6 @@ jobs:
             echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
           fi
 
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
-
-      - uses: ./.github/actions/setup
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Copy .env for build
-        run: |
-          ENV_PATH=./packages/commonwealth/deploy/environments/.env.public.review-apps
-          if [ ! -f "$ENV_PATH" ]; then
-            echo "Error: $ENV_PATH not found"
-            exit 1
-          fi
-          cp "$ENV_PATH" .env
-      - name: Check if datadog-base image exists
-        id: check_datadog_base_image
-        run: |
-          set +e
-          output=$(docker manifest inspect ghcr.io/hicommonwealth/datadog-base:latest 2>&1)
-          status=$?
-          echo "Manifest inspect output for datadog-base:"
-          echo "$output"
-          echo "Exit code: $status"
-          if [ $status -eq 0 ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-          exit 0
-
-      - name: Build and Push datadog-base image
-        if: steps.check_datadog_base_image.outputs.exists == 'false'
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: Dockerfile.datadog
-          push: true
-          tags: ghcr.io/hicommonwealth/datadog-base:latest
-          cache-from: type=registry,ref=ghcr.io/hicommonwealth/datadog-base:buildcache
-          cache-to: type=registry,ref=ghcr.io/hicommonwealth/datadog-base:buildcache,mode=max
-
       - name: Check if commonwealth base image exists
         id: check_base_image
         run: |
@@ -114,6 +60,40 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
           exit 0
+
+      - uses: actions/checkout@v4
+        if: steps.check_base_image.outputs.exists == 'false'
+        with:
+          fetch-depth: 0
+          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
+
+      - uses: ./.github/actions/setup
+        if: steps.check_base_image.outputs.exists == 'false'
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Login to GitHub Container Registry
+        if: steps.check_base_image.outputs.exists == 'false'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        if: steps.check_base_image.outputs.exists == 'false'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Copy .env for build
+        if: steps.check_base_image.outputs.exists == 'false'
+        run: |
+          ENV_PATH=./packages/commonwealth/deploy/environments/.env.public.review-apps
+          if [ ! -f "$ENV_PATH" ]; then
+            echo "Error: $ENV_PATH not found"
+            exit 1
+          fi
+          cp "$ENV_PATH" .env
+
       - name: Build and Push commonwealth base image
         if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
@@ -286,7 +266,7 @@ jobs:
           fi
 
       - name: Link to Railway project
-        run: railway link ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: railway link 0c581521-a4fd-4a7f-934a-305d621b828c
 
       # - name: Create Railway Environment
       #   run: |
