@@ -1,4 +1,6 @@
-import { SearchScope } from '../../../models/SearchQuery';
+import { SearchScope } from 'models/SearchQuery';
+import { z } from 'zod';
+import { SearchEntityResult } from '../../../../../../../libs/model/src/aggregates/search';
 
 export const MENTION_CONFIG = {
   MAX_SEARCH_RESULTS: 10,
@@ -84,38 +86,30 @@ export const DENOTATION_SEARCH_CONFIG = {
   },
 } as const;
 
+// Type alias for search results from SearchEntities query
+export type SearchResult = z.infer<typeof SearchEntityResult>;
+
 export const getEntityTypeFromSearchResult = (
-  result: any,
+  result: SearchResult,
 ): MentionEntityType => {
-  if (result.type) {
-    return result.type as MentionEntityType;
-  }
-
-  // Fallback type detection based on result properties
-  if (result.user_id || result.profile_name) return MentionEntityType.USER;
-  if (result.topic_id || result.topic_name) return MentionEntityType.TOPIC;
-  if (result.thread_id || result.title) return MentionEntityType.THREAD;
-  if (result.community_id && result.name) return MentionEntityType.COMMUNITY;
-  if (result.proposal_id) return MentionEntityType.PROPOSAL;
-
-  return MentionEntityType.USER; // Default fallback
+  return result.type as unknown as MentionEntityType;
 };
 
 export const formatEntityDisplayName = (
   entityType: MentionEntityType,
-  result: any,
+  result: SearchResult,
 ): string => {
   switch (entityType) {
     case MentionEntityType.USER:
-      return result.profile_name || result.name || 'Unknown User';
+      return result.name || 'Unknown User';
     case MentionEntityType.TOPIC:
-      return result.topic_name || result.name || 'Unknown Topic';
+      return result.name || 'Unknown Topic';
     case MentionEntityType.THREAD:
-      return result.title || result.thread_title || 'Unknown Thread';
+      return result.name || 'Unknown Thread';
     case MentionEntityType.COMMUNITY:
-      return result.name || result.community_name || 'Unknown Community';
+      return result.name || 'Unknown Community';
     case MentionEntityType.PROPOSAL:
-      return result.title || result.proposal_title || 'Unknown Proposal';
+      return result.name || 'Unknown Proposal';
     default:
       return 'Unknown Entity';
   }
@@ -123,20 +117,7 @@ export const formatEntityDisplayName = (
 
 export const getEntityId = (
   entityType: MentionEntityType,
-  result: any,
+  result: SearchResult,
 ): string => {
-  switch (entityType) {
-    case MentionEntityType.USER:
-      return result.user_id || result.id || '';
-    case MentionEntityType.TOPIC:
-      return result.topic_id || result.id || '';
-    case MentionEntityType.THREAD:
-      return result.thread_id || result.id || '';
-    case MentionEntityType.COMMUNITY:
-      return result.community_id || result.id || '';
-    case MentionEntityType.PROPOSAL:
-      return result.proposal_id || result.id || '';
-    default:
-      return '';
-  }
+  return result.id || '';
 };

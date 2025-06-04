@@ -15,6 +15,7 @@ import {
   MENTION_DENOTATION_CHARS,
   MENTION_LINK_FORMATS,
   MentionEntityType,
+  SearchResult,
   formatEntityDisplayName,
   getEntityId,
   getEntityTypeFromSearchResult,
@@ -115,7 +116,7 @@ export const useMention = ({
   );
 
   const createEntityMentionItem = useCallback(
-    (entityType: MentionEntityType, result: any) => {
+    (entityType: MentionEntityType, result: SearchResult) => {
       const node = document.createElement('div');
       node.className = 'mention-item';
 
@@ -144,7 +145,7 @@ export const useMention = ({
     [],
   );
 
-  const createUserMentionItem = (result: any, node: HTMLElement) => {
+  const createUserMentionItem = (result: SearchResult, node: HTMLElement) => {
     const userId = result.id;
     const profileName = result.name;
     const avatarUrl = result.avatar_url;
@@ -200,7 +201,7 @@ export const useMention = ({
     };
   };
 
-  const createTopicMentionItem = (result: any, node: HTMLElement) => {
+  const createTopicMentionItem = (result: SearchResult, node: HTMLElement) => {
     const topicName = result.name;
     const topicId = result.id;
 
@@ -224,7 +225,7 @@ export const useMention = ({
     };
   };
 
-  const createThreadMentionItem = (result: any, node: HTMLElement) => {
+  const createThreadMentionItem = (result: SearchResult, node: HTMLElement) => {
     const threadTitle = result.name;
     const threadId = result.id;
     const author = result.author;
@@ -264,7 +265,10 @@ export const useMention = ({
     };
   };
 
-  const createCommunityMentionItem = (result: any, node: HTMLElement) => {
+  const createCommunityMentionItem = (
+    result: SearchResult,
+    node: HTMLElement,
+  ) => {
     const communityName = result.name;
     const communityResultId = result.id;
     const memberCount = result.member_count || 0;
@@ -307,7 +311,10 @@ export const useMention = ({
     };
   };
 
-  const createProposalMentionItem = (result: any, node: HTMLElement) => {
+  const createProposalMentionItem = (
+    result: SearchResult,
+    node: HTMLElement,
+  ) => {
     const proposalTitle = result.name;
     const proposalId = result.id;
     const status = result.status || 'Unknown';
@@ -337,8 +344,11 @@ export const useMention = ({
     };
   };
 
-  const createGenericMentionItem = (result: any, node: HTMLElement) => {
-    const name = result.name || result.title || 'Unknown';
+  const createGenericMentionItem = (
+    result: SearchResult,
+    node: HTMLElement,
+  ) => {
+    const name = result.name || 'Unknown';
     const id = result.id || '';
 
     const nameSpan = document.createElement('span');
@@ -450,7 +460,7 @@ export const useMention = ({
               return;
             }
 
-            const formattedMatches = results.map((result: any) => {
+            const formattedMatches = results.map((result: SearchResult) => {
               const entityType = getEntityTypeFromSearchResult(result);
               return createEntityMentionItem(entityType, result);
             });

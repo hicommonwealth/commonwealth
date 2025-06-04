@@ -43,7 +43,7 @@ export const SearchEntitiesInput = z.object({
       (value) => {
         const scopes = value.split(',').map((s) => s.trim());
         return scopes.every((scope) =>
-          VALID_SEARCH_SCOPES.includes(scope as any),
+          (VALID_SEARCH_SCOPES as readonly string[]).includes(scope),
         );
       },
       {

@@ -143,6 +143,7 @@ class ContextAggregator {
           const commentPreview = comment.body.slice(0, 200).replace(/\n/g, ' ');
           const likeText =
             comment.like_count > 0 ? ` (${comment.like_count} likes)` : '';
+          // eslint-disable-next-line max-len
           contextData += `${index + 1}. In "${comment.thread_title}" (${comment.community_name})${likeText}: ${commentPreview}...\n`;
         });
       }
@@ -415,6 +416,7 @@ class ContextAggregator {
 
       if (communityResult) {
         if (communityResult.description) {
+          // eslint-disable-next-line max-len
           contextData += `Description: ${communityResult.description.slice(0, CONTEXT_CONFIG.MAX_DESCRIPTION_LENGTH)}\n`;
         }
         contextData += `Members: ${communityResult.member_count}\n`;
@@ -448,10 +450,10 @@ class ContextAggregator {
     }
   }
 
-  async aggregateProposalContext(
+  aggregateProposalContext(
     proposalId: string,
     proposalTitle: string,
-  ): Promise<ContextResult> {
+  ): ContextResult {
     // Note: This is a placeholder implementation since proposal structure may vary
     // You'll need to adapt this based on your actual proposal/governance system
     try {
@@ -539,7 +541,7 @@ export function AggregateContext(): Query<typeof AggregateContextSchema> {
             );
             break;
           case 'proposal':
-            result = await aggregator.aggregateProposalContext(
+            result = aggregator.aggregateProposalContext(
               mention.id,
               mention.name,
             );
