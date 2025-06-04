@@ -7,7 +7,7 @@ export function withGates(address_id?: number) {
   return address_id
     ? `
 WITH OpenGates AS (
-  SELECT DISTINCT T.id as topic_id
+  SELECT T.id as topic_id
   FROM
   	"Topics" T
   	LEFT JOIN "GroupGatedActions" G ON T.id = G.topic_id
@@ -16,7 +16,13 @@ WITH OpenGates AS (
       AND M.reject_reason IS NULL
   WHERE
   	T.community_id = :community_id
-  	AND (COALESCE(G.is_private, FALSE) = FALSE OR M.address_id IS NOT NULL)
+  GROUP BY
+    T.id
+  HAVING
+    BOOL_AND(
+      COALESCE(G.is_private, FALSE) = FALSE
+      OR M.address_id IS NOT NULL
+    )
 )
 `
     : `

@@ -356,17 +356,21 @@ describe('Gating lifecycle', () => {
         payload: {
           community_id,
           topic_id,
+          cursor: 1,
+          limit: 30,
         },
       });
-      expect(getResults?.threads.length).to.equal(4);
+      expect(getResults?.results.length).to.equal(4);
 
       const searchResults = await query(SearchThreads(), {
         actor: member,
         payload: {
-          communityId: community_id,
-          searchTerm: 'thread title',
-          threadTitleOnly: true,
-          includeCount: true,
+          community_id,
+          search_term: 'thread title',
+          thread_title_only: true,
+          include_count: true,
+          cursor: 1,
+          limit: 30,
         },
       });
       expect(searchResults?.results.length).to.equal(4);
@@ -388,20 +392,24 @@ describe('Gating lifecycle', () => {
         payload: {
           community_id,
           topic_id,
+          cursor: 1,
+          limit: 30,
         },
       });
-      expect(getResults?.threads.length).to.equal(4);
+      expect(getResults?.results.length).to.equal(0);
 
       const searchResults = await query(SearchThreads(), {
         actor: rejected,
         payload: {
-          communityId: community_id,
-          searchTerm: 'thread title',
-          threadTitleOnly: true,
-          includeCount: true,
+          community_id,
+          search_term: 'thread title',
+          thread_title_only: true,
+          include_count: true,
+          cursor: 1,
+          limit: 30,
         },
       });
-      expect(searchResults?.results.length).to.equal(4);
+      expect(searchResults?.results.length).to.equal(0);
 
       const activeResults = await query(GetActiveThreads(), {
         actor: rejected,
@@ -410,7 +418,7 @@ describe('Gating lifecycle', () => {
           threads_per_topic: 5,
         },
       });
-      expect(activeResults?.length).to.equal(4);
+      expect(activeResults?.length).to.equal(0);
     });
   });
 });
