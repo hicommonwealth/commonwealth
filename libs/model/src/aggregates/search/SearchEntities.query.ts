@@ -65,7 +65,7 @@ export const SearchEntityResult = z.object({
   community_id: z.string().optional(),
   community_name: z.string().optional().nullable(),
   author: z.string().optional().nullable(),
-  created_at: z.date().optional().nullable(),
+  created_at: z.date().or(z.string()).nullable(),
   member_count: z.number().optional().nullable(),
   status: z.string().optional().nullable(),
   relevance_score: z

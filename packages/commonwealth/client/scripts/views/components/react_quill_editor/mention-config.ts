@@ -87,17 +87,17 @@ export const DENOTATION_SEARCH_CONFIG = {
 } as const;
 
 // Type alias for search results from SearchEntities query
-export type SearchResult = z.infer<typeof SearchEntityResult>;
+export type MentionSearchResult = z.infer<typeof SearchEntityResult>;
 
 export const getEntityTypeFromSearchResult = (
-  result: SearchResult,
+  result: MentionSearchResult,
 ): MentionEntityType => {
   return result.type as unknown as MentionEntityType;
 };
 
 export const formatEntityDisplayName = (
   entityType: MentionEntityType,
-  result: SearchResult,
+  result: MentionSearchResult,
 ): string => {
   switch (entityType) {
     case MentionEntityType.USER:
@@ -117,7 +117,7 @@ export const formatEntityDisplayName = (
 
 export const getEntityId = (
   entityType: MentionEntityType,
-  result: SearchResult,
+  result: MentionSearchResult,
 ): string => {
   return result.id || '';
 };
