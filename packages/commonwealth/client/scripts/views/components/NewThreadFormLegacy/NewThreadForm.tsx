@@ -108,6 +108,7 @@ import {
 } from '../react_quill_editor/utils';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
+import { TokenWidget } from './ToketWidget';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
@@ -817,8 +818,7 @@ export const NewThreadForm = forwardRef<
         label: 'Links',
         item: (
           <div className="cards-colum">
-            {/* Note : Hiding this as the CommonTrade Modal is Broken for base sepollia. */}
-            {/* <TokenWidget /> */}
+            <TokenWidget />
           </div>
         ),
       },
