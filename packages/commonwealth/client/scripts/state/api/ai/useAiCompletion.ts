@@ -1,6 +1,7 @@
 import { CompletionOptions } from '@hicommonwealth/shared';
 import { useCallback, useState } from 'react';
 import { userStore } from 'state/ui/user';
+import { trpc } from 'utils/trpcClient';
 import { useMentionExtractor } from '../../../hooks/useMentionExtractor';
 
 interface AiCompletionOptions extends Partial<CompletionOptions> {
@@ -18,22 +19,6 @@ interface CompletionError {
   metadata?: any;
 }
 
-interface ContextAggregationResponse {
-  success: boolean;
-  data?: {
-    contextResults: Array<{
-      entityType: string;
-      entityId: string;
-      entityName: string;
-      contextData: string;
-    }>;
-    formattedContext: string;
-    totalMentions: number;
-    processedAt: string;
-  };
-  error?: string;
-}
-
 /**
  * Hook for streaming AI completions from the server
  * Supports both OpenAI and OpenRouter with contextual mention integration
@@ -45,6 +30,8 @@ export const useAiCompletion = () => {
 
   const { extractMentionsFromText, validateMentionLimits } =
     useMentionExtractor();
+
+  const utils = trpc.useUtils();
 
   const fetchContextForMentions = useCallback(
     async (
@@ -75,41 +62,19 @@ export const useAiCompletion = () => {
           name: mention.name,
         }));
 
-        const response = await fetch('/api/ai/aggregate-context', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${userStore.getState().jwt}`,
-          },
-          body: JSON.stringify({
-            mentions: mentionsForContext,
-            communityId,
-            contextDataDays: 30,
-          }),
+        const contextData = await utils.search.aggregateContext.fetch({
+          mentions: JSON.stringify(mentionsForContext),
+          communityId,
+          contextDataDays: 30,
         });
 
-        if (!response.ok) {
-          console.error(
-            'Failed to fetch context for mentions:',
-            response.statusText,
-          );
-          return null;
-        }
-
-        const contextData: ContextAggregationResponse = await response.json();
-
-        if (!contextData.success || !contextData.data) {
-          console.error('Context aggregation failed:', contextData.error);
-          return null;
-        }
-
-        return contextData.data.formattedContext;
+        return contextData.formattedContext;
       } catch (contextError) {
         console.error('Error fetching context for mentions:', contextError);
         return null;
       }
     },
-    [extractMentionsFromText, validateMentionLimits],
+    [extractMentionsFromText, validateMentionLimits, utils],
   );
 
   const generateCompletion = useCallback(
@@ -256,7 +221,7 @@ ${contextualData}
 
       return accumulatedText;
     },
-    [],
+    [fetchContextForMentions],
   );
 
   return {
