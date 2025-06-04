@@ -1,3 +1,4 @@
+import Thread from 'client/scripts/models/Thread';
 import { trpc } from 'client/scripts/utils/trpcClient';
 
 const THREAD_STALE_TIME = 5000; // 5 seconds
@@ -21,6 +22,7 @@ const useGetThreadsByIdQuery = ({
     {
       staleTime: THREAD_STALE_TIME,
       enabled: apiCallEnabled,
+      select: (data) => data.map((t) => new Thread(t)),
     },
   );
 };

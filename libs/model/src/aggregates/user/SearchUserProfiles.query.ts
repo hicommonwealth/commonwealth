@@ -9,7 +9,7 @@ export function SearchUserProfiles(): Query<typeof schemas.SearchUserProfiles> {
   return {
     ...schemas.SearchUserProfiles,
     auth: [],
-    secure: true,
+    secure: false,
     body: async ({ payload }) => {
       const {
         community_id,

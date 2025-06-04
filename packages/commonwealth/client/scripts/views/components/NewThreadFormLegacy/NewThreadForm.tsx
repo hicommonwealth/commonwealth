@@ -47,7 +47,6 @@ import {
   useCreateThreadPollMutation,
 } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
-import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
@@ -70,8 +69,9 @@ import {
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 
 import { DeltaStatic } from 'quill';
-// eslint-disable-next-line max-len
 import { ExtendedPoll, LocalPoll, parseCustomDuration } from 'utils/polls';
+// eslint-disable-next-line max-len
+import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
@@ -228,12 +228,12 @@ export const NewThreadForm = forwardRef<
       setContentDelta,
     });
 
-    const { data: recentThreads } = useFetchThreadsQuery({
-      queryType: 'bulk',
+    const { data: recentThreads } = useGetThreadsQuery({
+      cursor: 1,
       limit: 2,
-      communityId: selectedCommunityId,
-      apiEnabled: !!selectedCommunityId && !!threadTopic?.id,
-      topicId: threadTopic?.id,
+      community_id: selectedCommunityId,
+      enabled: !!selectedCommunityId && !!threadTopic?.id,
+      topic_id: threadTopic?.id,
     });
 
     const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
@@ -539,11 +539,11 @@ export const NewThreadForm = forwardRef<
       setThreadContentDelta(createDeltaFromText(''));
       bodyAccumulatedRef.current = '';
 
-      const recentThreadsContext = recentThreads
-        ?.map((thread) => {
+      const recentThreadsContext = recentThreads?.pages[0]?.results
+        .map((thread) => {
           return (
             `Title: ${thread.title}\nBody: ${thread.body}\n` +
-            `Topic: ${thread.topic?.name || 'N/A'}\nCommunity: ${thread.communityName || 'N/A'}`
+            `Topic: ${thread.topic?.name || 'N/A'}\nCommunity: ${thread.community_id || 'N/A'}`
           );
         })
         .join('\n\n');

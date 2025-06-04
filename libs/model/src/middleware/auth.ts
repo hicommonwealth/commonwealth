@@ -23,7 +23,11 @@ import {
   VerifiedContext,
   VerifiedContextInput,
 } from '@hicommonwealth/schemas';
-import { GroupGatedActionKey, Role } from '@hicommonwealth/shared';
+import {
+  ALL_COMMUNITIES,
+  GroupGatedActionKey,
+  Role,
+} from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
 import { ZodSchema, z } from 'zod';
 import { models } from '../database';
@@ -425,6 +429,37 @@ export function authVerified() {
     const { address } = await findVerifiedAddress(ctx.actor);
     (ctx as { context: VerifiedContext }).context = { address };
   };
+}
+
+/**
+ * Creates an authorization context for the actor when authenticated,
+ * but anonymous access is allowed.
+ * This is mainly used when querying communities with gating conditions.
+ */
+export async function authOptional(
+  ctx: Context<typeof AuthContextInput, typeof AuthContext>,
+) {
+  if (!ctx.actor.user || !ctx.actor.address || !ctx.payload.community_id)
+    return;
+  if (ctx.payload.community_id === ALL_COMMUNITIES) return;
+
+  try {
+    const { address, is_author } = await findAddress(
+      ctx.actor,
+      ctx.payload.community_id,
+      ['admin', 'moderator', 'member'],
+    );
+
+    (ctx as { context: AuthContext }).context = {
+      address,
+      is_author,
+      community_id: ctx.payload.community_id,
+    };
+  } catch (err) {
+    // ignore InvalidActor errors
+    if (err instanceof InvalidActor) return;
+    throw err;
+  }
 }
 
 /**

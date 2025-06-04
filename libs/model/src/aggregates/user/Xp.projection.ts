@@ -34,7 +34,7 @@ async function getUserByAddressId(address_id: number) {
 
 async function getUserByAddress(address: string) {
   const addr = await models.Address.findOne({
-    where: { address, user_id: { [Op.not]: null } },
+    where: { address: { [Op.iLike]: address }, user_id: { [Op.not]: null } },
     attributes: ['user_id'],
     include: [
       {
