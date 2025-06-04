@@ -1,5 +1,6 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { Op } from 'sequelize';
 import { models } from '../../database';
 
 export function GetMutualConnections(): Query<
@@ -10,47 +11,37 @@ export function GetMutualConnections(): Query<
     auth: [],
     secure: true,
     body: async ({ payload }) => {
-      const { user_id_1: currentUserId, user_id_2: profileUserId } = payload;
+      const {
+        user_id_1: currentUserId,
+        user_id_2: profileUserId,
+        limit,
+      } = payload;
 
-      const [currentUserCommunities, profileUserCommunities] =
-        await Promise.all([
-          models.Community.findAll({
-            include: [
-              {
-                model: models.Address,
-                where: { user_id: currentUserId },
-                required: true,
-                attributes: [],
-              },
-            ],
-            attributes: ['id', 'name', 'base', 'icon_url'],
-          }),
-          models.Community.findAll({
-            include: [
-              {
-                model: models.Address,
-                where: { user_id: profileUserId },
-                required: true,
-                attributes: [],
-              },
-            ],
-            attributes: ['id', 'name', 'base', 'icon_url'],
-          }),
-        ]);
-
-      const mutualCommunityIds = currentUserCommunities
-        .map((c) => c.id)
-        .filter((id) => profileUserCommunities.some((c) => c.id === id));
+      const mutualCommunities = await models.Community.findAll({
+        where: {
+          id: {
+            [Op.in]: models.sequelize.literal(`(
+              SELECT community_id 
+              FROM "Addresses" 
+              WHERE user_id = ${currentUserId}
+              INTERSECT
+              SELECT community_id 
+              FROM "Addresses" 
+              WHERE user_id = ${profileUserId}
+            )`),
+          },
+        },
+        attributes: ['id', 'name', 'base', 'icon_url'],
+        limit,
+      });
 
       return {
-        mutual_communities: currentUserCommunities
-          .filter((c) => mutualCommunityIds.includes(c.id))
-          .map((c) => ({
-            id: c.id,
-            name: c.name,
-            base: c.base,
-            icon_url: c.icon_url,
-          })),
+        mutual_communities: mutualCommunities.map((c) => ({
+          id: c.id,
+          name: c.name,
+          base: c.base,
+          icon_url: c.icon_url,
+        })),
       };
     },
   };

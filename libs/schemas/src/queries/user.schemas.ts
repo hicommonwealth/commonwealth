@@ -253,6 +253,7 @@ export const GetMutualConnections = {
   input: z.object({
     user_id_1: PG_INT,
     user_id_2: PG_INT,
+    limit: z.number().int().min(1).max(100).optional().default(10),
   }),
   output: z.object({
     mutual_communities: z.array(
