@@ -1,5 +1,6 @@
 export * from './ChainEventCreated.policy';
 export * from './CommunityGoals.policy';
+export * from './CommunityIndexerWorker.policy';
 export * from './ContestWorker.policy';
 export * from './CreateUnverifiedUser.policy';
 export * from './DiscordBot.policy';
@@ -9,3 +10,4 @@ export * from './Launchpad.policy';
 export * from './Nominations.policy';
 export * from './Notifications.policy';
 export * from './TwitterEngagement.policy';
+export * from './utils/community-indexer-utils';

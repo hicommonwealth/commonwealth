@@ -1,7 +1,7 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import React from 'react';
 import app from 'state';
-import { useGetPinnedTokenByCommunityId } from 'state/api/communities';
+import { useGetPinnedTokensByCommunityId } from 'state/api/communities';
 import {
   useGetTokenByCommunityId,
   useTokenMetadataQuery,
@@ -27,12 +27,14 @@ const TokenIntegration = () => {
     });
 
   const { data: communityPinnedTokens, isLoading: isLoadingPinnedToken } =
-    useGetPinnedTokenByCommunityId({
-      community_ids: [communityId],
+    useGetPinnedTokensByCommunityId({
+      community_ids: communityId,
       with_chain_node: true,
+      limit: 1,
+      cursor: 1,
       enabled: !!communityId,
     });
-  const communityPinnedToken = communityPinnedTokens?.[0];
+  const communityPinnedToken = communityPinnedTokens?.pages?.[0]?.results?.[0];
 
   const { data: tokenMetadata, isLoading: isLoadingTokenMetadata } =
     useTokenMetadataQuery({

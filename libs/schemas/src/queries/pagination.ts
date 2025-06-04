@@ -118,11 +118,14 @@ export function buildPaginatedResponse<T>(
     limit?: number;
     offset?: number;
     cursor?: number;
+    is_page_cursor?: boolean;
   },
 ): TypedPaginatedResult<T> {
   const limit = options.limit || 10;
-  let page;
-  if (options.offset !== undefined) {
+  let page: number;
+  if (options.cursor && options.is_page_cursor) {
+    page = options.cursor;
+  } else if (options.offset !== undefined) {
     page = Math.floor(options.offset! / limit) + 1;
   } else {
     page = Math.floor(options.cursor! / limit) + 1;

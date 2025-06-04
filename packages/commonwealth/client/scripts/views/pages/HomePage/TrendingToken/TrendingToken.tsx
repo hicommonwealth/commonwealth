@@ -6,11 +6,11 @@ import PricePercentageChange from 'client/scripts/views/components/TokenCard/Pri
 import { TokenCardProps } from 'client/scripts/views/components/TokenCard/TokenCard';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { TradingMode } from 'client/scripts/views/modals/TradeTokenModel';
 import clsx from 'clsx';
 import { useTokenPricing } from 'hooks/useTokenPricing';
 import React from 'react';
 import { smartTrim } from 'shared/utils';
-import { TradingMode } from 'views/modals/TradeTokenModel';
 import './TrendingToken.scss';
 
 const TrendingToken = ({
@@ -93,7 +93,7 @@ const TrendingToken = ({
           buttonWidth="full"
           buttonHeight="sm"
           buttonType="primary"
-          onClick={() => onCTAClick?.(mode)}
+          onClick={() => onCTAClick?.(isPinnedToken ? TradingMode.Swap : mode)}
         />
       </div>
     </div>

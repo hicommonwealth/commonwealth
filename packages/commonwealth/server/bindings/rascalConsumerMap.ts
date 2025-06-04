@@ -3,6 +3,7 @@ import { Consumer, RoutingKeyTags, stats } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
   CommunityGoalsPolicy,
+  CommunityIndexerWorker,
   Contest,
   ContestWorker,
   CreateUnverifiedUser,
@@ -25,6 +26,7 @@ export const rascalConsumerMap: Consumer[] = [
   FarcasterWorker,
   EventStreamPolicy,
   NotificationsSettingsPolicy,
+  CommunityIndexerWorker,
   CreateUnverifiedUser,
   TwitterEngagementPolicy,
   CommunityGoalsPolicy,

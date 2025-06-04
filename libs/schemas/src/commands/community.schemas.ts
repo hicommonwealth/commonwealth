@@ -39,22 +39,30 @@ export const CreateCommunity = {
     icon_url: z
       .string()
       .url()
-      .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
+      .superRefine(async (val, ctx) => {
+        if (val.startsWith('http://commonblob.com')) {
+          return;
+        }
+        await checkIconSize(val, ctx);
+      })
       .optional(),
     social_links: z.array(z.string().url()).default([]),
     tags: z.array(z.string()).default([]), // community tags are dynamic, tags should be validated in service method
     directory_page_enabled: z.boolean().default(false),
     type: z.nativeEnum(ChainType).default(ChainType.Offchain),
     base: z.nativeEnum(ChainBase),
+    default_symbol: z.string().max(100),
     allow_tokenized_threads: z.boolean().optional(),
     thread_purchase_token: z.string().optional(),
 
     // hidden optional params
     token_name: z.string().optional(),
+    referrer_address: z.string().optional(),
+    website: z.string().url().optional(),
+    community_indexer_id: z.string().optional(),
+    token_address: z.string().optional(),
 
     // deprecated params to be removed
-    default_symbol: z.string().max(9),
-    website: z.string().url().optional(),
     github: z.string().url().startsWith('https://github.com/').optional(),
     telegram: z.string().url().startsWith('https://t.me/').optional(),
     element: z.string().url().startsWith('https://matrix.to/').optional(),
@@ -439,6 +447,10 @@ export const UnpinToken = {
   context: AuthContext,
 };
 
+export const IndexCommunities = {
+  input: z.object({}),
+  output: z.object({}),
+};
 export const SetReachedGoal = {
   input: z.object({
     community_id: z.string(),

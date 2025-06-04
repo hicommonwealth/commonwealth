@@ -1,5 +1,6 @@
-import { TokenView } from '@hicommonwealth/schemas';
+import { PinnedTokenWithPrices, TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
+import { useGetPinnedTokensByCommunityId } from 'client/scripts/state/api/communities';
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
@@ -55,7 +56,7 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
 
   const {
     data: tokensList,
-    isInitialLoading,
+    isInitialLoading: isLoadingLaunchpadTokens,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
@@ -80,7 +81,23 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
     is_graduated: filters.isGraduated,
     enabled: launchpadEnabled,
   });
-  const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
+  const launchpadTokens = (tokensList?.pages || []).flatMap(
+    (page) => page.results,
+  );
+
+  // fetch pinned tokens
+  const { data: pinnedTokensList, isInitialLoading: isLoadingPinnedTokens } =
+    useGetPinnedTokensByCommunityId({
+      cursor: 1,
+      limit: 8,
+      with_chain_node: true,
+      with_price: true,
+    });
+  const pinnedTokens = (pinnedTokensList?.pages || []).flatMap(
+    (page) => page.results,
+  );
+
+  const tokens = [...launchpadTokens, ...pinnedTokens];
 
   const handleFetchMoreTokens = () => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -105,12 +122,15 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
 
   const handleCTAClick = (
     mode: TradingMode,
-    token: z.infer<typeof TokenWithCommunity>,
+    token:
+      | z.infer<typeof TokenWithCommunity>
+      | z.infer<typeof PinnedTokenWithPrices>,
   ) => {
+    const isPinnedToken = 'community_indexer_id' in token;
     setTokenLaunchModalConfig({
       isOpen: true,
       tradeConfig: {
-        mode: mode,
+        mode: isPinnedToken ? TradingMode.Swap : mode,
         token: token,
         addressType: ChainBase.Ethereum,
       } as TradingConfig,
@@ -189,6 +209,35 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
                     mode,
                     token as z.infer<typeof TokenWithCommunity>,
                   );
+                }}
+                onCardBodyClick={() =>
+                  navigateToCommunity({
+                    navigate,
+                    path: '',
+                    chain: token.community_id,
+                  })
+                }
+              />
+            );
+          })}
+          {pinnedTokens.map((token) => {
+            return (
+              <TokenCard
+                key={token.name}
+                name={token.name}
+                symbol={token.symbol}
+                price={0}
+                pricePercentage24HourChange={0}
+                isPinnedToken={true}
+                marketCap={{
+                  current: 0,
+                  goal: 0,
+                  isCapped: false,
+                }}
+                mode={TradingMode.Swap}
+                iconURL={token.icon_url || ''}
+                onCTAClick={() => {
+                  // TODO: implement
                 }}
                 onCardBodyClick={() =>
                   navigateToCommunity({

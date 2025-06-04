@@ -373,18 +373,22 @@ describe('Pinned token lifecycle', () => {
       payload: {
         community_ids: 'random_community_id',
         with_chain_node: true,
+        limit: 10,
+        cursor: 1,
       },
     });
-    expect(res).to.deep.equal([]);
+    expect(res?.results || []).to.deep.equal([]);
 
     res = await query(GetPinnedTokens(), {
       actor: userActor,
       payload: {
         community_ids: 'random_community_id',
         with_chain_node: true,
+        limit: 10,
+        cursor: 1,
       },
     });
-    expect(res).to.deep.equal([]);
+    expect(res?.results || []).to.deep.equal([]);
   });
 
   test('should get a pinned token', async () => {
@@ -393,35 +397,43 @@ describe('Pinned token lifecycle', () => {
       payload: {
         community_ids: `${community_id}`,
         with_chain_node: true,
+        limit: 10,
+        cursor: 1,
       },
     });
     if (!res) expect.fail('Result is null');
-    expect(res[0].community_id).to.equal(community_id);
-    expect(res[0].chain_node_id).to.equal(chain_node_id);
-    expect(res[0].contract_address).to.equal(ethMainnetUSDC);
+    expect(res.results[0].community_id).to.equal(community_id);
+    expect(res.results[0].chain_node_id).to.equal(chain_node_id);
+    expect(res.results[0].contract_address).to.equal(ethMainnetUSDC);
 
     res = await query(GetPinnedTokens(), {
       actor: userActor,
       payload: {
         community_ids: `${community_id}`,
         with_chain_node: true,
+        limit: 10,
+        cursor: 1,
       },
     });
     if (!res) expect.fail('Result is null');
-    expect(res[0].community_id).to.equal(community_id);
-    expect(res[0].chain_node_id).to.equal(chain_node_id);
-    expect(res[0].contract_address).to.equal(ethMainnetUSDC);
+    expect(res.results[0].community_id).to.equal(community_id);
+    expect(res.results[0].chain_node_id).to.equal(chain_node_id);
+    expect(res.results[0].contract_address).to.equal(ethMainnetUSDC);
 
     res = await query(GetPinnedTokens(), {
       actor: userActor,
       payload: {
         community_ids: `${community_id},${second_community_id}`,
         with_chain_node: true,
+        limit: 10,
+        cursor: 1,
       },
     });
     if (!res) expect.fail('Result is null');
-    const pinnedToken1 = res.find((x) => x.community_id === community_id);
-    const pinnedToken2 = res.find(
+    const pinnedToken1 = res.results.find(
+      (x) => x.community_id === community_id,
+    );
+    const pinnedToken2 = res.results.find(
       (x) => x.community_id === second_community_id,
     );
     expect(pinnedToken1).to.exist;

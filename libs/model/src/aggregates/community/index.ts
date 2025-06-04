@@ -26,6 +26,7 @@ export * from './GetTopHolders.query';
 export * from './GetTopicById.query';
 export * from './GetTopics.query';
 export * from './GetTransactions.query';
+export * from './IndexCommunities.command';
 export * from './JoinCommunity.command';
 export * from './LinkNamespace.command';
 export * from './PinToken.command';

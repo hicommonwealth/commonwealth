@@ -94,6 +94,9 @@ export const Community = z.object({
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),
+
+  // Token indexer
+  community_indexer_id: z.string().nullish(),
 });
 
 export const ExtendedCommunity = Community.extend({
