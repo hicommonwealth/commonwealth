@@ -223,6 +223,7 @@ export const XpRankedUser = z.object({
 export const GetXpsRanked = {
   input: z.object({
     top: z.number(),
+    search: z.string().optional(),
     quest_id: z
       .number()
       .optional()

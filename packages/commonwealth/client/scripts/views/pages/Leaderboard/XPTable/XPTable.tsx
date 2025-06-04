@@ -74,6 +74,7 @@ const XPTable = ({ searchText, onClearSearch }: XPTableProps) => {
   const { data = [], isLoading } = useGetXPsRanked({
     top: currentPage * USERS_PER_PAGE,
     quest_id: selectedQuest ? parseInt(selectedQuest.value) : undefined,
+    search: searchText?.trim(),
   });
 
   const rankings = data.map((rank, index) => ({
@@ -89,8 +90,8 @@ const XPTable = ({ searchText, onClearSearch }: XPTableProps) => {
   }));
 
   return (
-    <section className="XPTable">
-      <div className="filters">
+    <>
+      <div className="xp-filters">
         {searchText?.trim() && (
           <CWTag
             label={`Search: ${searchText?.trim()}`}
@@ -112,49 +113,50 @@ const XPTable = ({ searchText, onClearSearch }: XPTableProps) => {
           />
         </div>
       </div>
-
-      {!isLoading && rankings.length === 0 ? (
-        <CWText type="h2" className="empty-rankings">
-          No Users have earned aura yet{' '}
-          {selectedQuest ? `for "${selectedQuest.label}" quest` : ''}
-        </CWText>
-      ) : (
-        <>
-          <CWTable
-            columnInfo={tableState.columns}
-            sortingState={tableState.sorting}
-            setSortingState={tableState.setSorting}
-            rowData={rankings.map((rank) => ({
-              ...rank,
-              username: {
-                sortValue: rank.user_profile.name,
-                customElement: (
-                  <div className="table-cell">
-                    <Link
-                      to={`/profile/id/${rank.user_profile.id}`}
-                      className="user-info"
-                    >
-                      <Avatar
-                        url={rank.user_profile.avatar_url ?? ''}
-                        size={24}
-                        address={rank.user_profile.id}
-                      />
-                      <p>
-                        {rank.user_profile.name}
-                        <TrustLevelRole
-                          type="user"
-                          level={rank.user_profile.tier}
+      <section className="XPTable">
+        {!isLoading && rankings.length === 0 ? (
+          <CWText type="h2" className="empty-rankings">
+            No Users have earned aura yet{' '}
+            {selectedQuest ? `for "${selectedQuest.label}" quest` : ''}
+          </CWText>
+        ) : (
+          <>
+            <CWTable
+              columnInfo={tableState.columns}
+              sortingState={tableState.sorting}
+              setSortingState={tableState.setSorting}
+              rowData={rankings.map((rank) => ({
+                ...rank,
+                username: {
+                  sortValue: rank.user_profile.name,
+                  customElement: (
+                    <div className="table-cell">
+                      <Link
+                        to={`/profile/id/${rank.user_profile.id}`}
+                        className="user-info"
+                      >
+                        <Avatar
+                          url={rank.user_profile.avatar_url ?? ''}
+                          size={24}
+                          address={rank.user_profile.id}
                         />
-                      </p>
-                    </Link>
-                  </div>
-                ),
-              },
-            }))}
-          />
-        </>
-      )}
-    </section>
+                        <p>
+                          {rank.user_profile.name}
+                          <TrustLevelRole
+                            type="user"
+                            level={rank.user_profile.tier}
+                          />
+                        </p>
+                      </Link>
+                    </div>
+                  ),
+                },
+              }))}
+            />
+          </>
+        )}
+      </section>
+    </>
   );
 };
 
