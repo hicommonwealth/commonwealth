@@ -156,6 +156,7 @@ export const NewThreadForm = forwardRef<
     const [linkedProposals, setLinkedProposals] =
       useState<ProposalState | null>();
     const [pollsData, setPollData] = useState<LocalPoll[]>();
+    const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
     // --- State for Image Modal Context ---
     const [imageModalContext, setImageModalContext] = useState<{
@@ -814,14 +815,16 @@ export const NewThreadForm = forwardRef<
     );
 
     const sidebarComponent = [
-      {
-        label: 'Links',
-        item: (
-          <div className="cards-colum">
-            <TokenWidget />
-          </div>
-        ),
-      },
+      tokenizedThreadsEnabled
+        ? {
+            label: 'Links',
+            item: (
+              <div className="cards-colum">
+                <TokenWidget />
+              </div>
+            ),
+          }
+        : {},
       {
         label: 'Links',
         item: (
@@ -1092,7 +1095,7 @@ export const NewThreadForm = forwardRef<
                     />
                   )}
 
-                  {tokenizedThreadsAllowed && (
+                  {tokenizedThreadsAllowed && tokenizedThreadsEnabled && (
                     <div className="tokenized-status">
                       <CWText
                         type="caption"
