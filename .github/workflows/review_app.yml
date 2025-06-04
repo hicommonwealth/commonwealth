@@ -46,7 +46,6 @@ jobs:
           fi
 
       - name: Login to GitHub Container Registry
-        if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
