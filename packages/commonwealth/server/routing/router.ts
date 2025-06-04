@@ -28,7 +28,6 @@ import logout from '../routes/logout';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { config } from '../config';
 import { aiCompletionHandler } from '../routes/ai';
-import { aggregateContextHandler } from '../routes/ai/aggregateContext';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
 import { failure } from '../types';
 import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
@@ -175,14 +174,6 @@ function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
     passport.authenticate('jwt', { session: false }),
     aiTieredMiddleware({ text: true }),
     aiCompletionHandler,
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/ai/aggregate-context',
-    passport.authenticate('jwt', { session: false }),
-    aggregateContextHandler,
   );
 
   // proxies
