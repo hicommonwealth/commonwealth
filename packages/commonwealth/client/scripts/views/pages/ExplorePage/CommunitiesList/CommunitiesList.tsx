@@ -48,6 +48,8 @@ interface CommunitiesListProps {
     | undefined;
   ethUsdRate: number;
   setSelectedCommunityId: (id: string) => void;
+  searchText?: string;
+  onClearSearch?: () => void;
 }
 
 const CommunitiesList: React.FC<CommunitiesListProps> = ({
@@ -56,6 +58,8 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
   historicalPrices,
   ethUsdRate,
   setSelectedCommunityId,
+  searchText,
+  onClearSearch,
 }) => {
   const launchpadEnabled = useFlag('launchpad');
   const user = useUserStore();
@@ -76,6 +80,7 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
     withNetwork: undefined,
   });
 
+  // TODO: 11814 - add param to api to search communities
   const {
     data: communities,
     fetchNextPage: fetchMoreCommunitiesOriginal,
@@ -217,6 +222,13 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
           buttonType="secondary"
           onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
         />
+        {searchText?.trim() && (
+          <CWTag
+            label={`Search: ${searchText?.trim()}`}
+            type="filter"
+            onCloseClick={onClearSearch}
+          />
+        )}
         {filters.withCommunitySortBy && (
           <CWTag
             label={`${filters.withCommunitySortBy}${

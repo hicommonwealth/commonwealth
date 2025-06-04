@@ -6,13 +6,26 @@ import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
 import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 
+import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
 import './ExploreContestList.scss';
 
 type ExploreContestListProps = {
   hideHeader?: boolean;
+  hideFilters?: boolean;
+  hideSeeMore?: boolean;
+  searchText?: string;
+  onClearSearch?: () => void;
+  hideSearchTag?: boolean;
 };
 
-const ExploreContestList = ({ hideHeader }: ExploreContestListProps) => {
+const ExploreContestList = ({
+  hideHeader,
+  hideFilters,
+  hideSeeMore,
+  searchText,
+  onClearSearch,
+  hideSearchTag,
+}: ExploreContestListProps) => {
   const {
     contestsData: { active: activeContests },
     isContestDataLoading,
@@ -47,7 +60,14 @@ const ExploreContestList = ({ hideHeader }: ExploreContestListProps) => {
   return (
     <div className="ExploreContestList">
       {!hideHeader && <CWText type="h2">Contests</CWText>}
-      <>
+      <div className="filters">
+        {!hideSearchTag && searchText?.trim() && (
+          <CWTag
+            label={`Search: ${searchText?.trim()}`}
+            type="filter"
+            onCloseClick={onClearSearch}
+          />
+        )}
         {!isContestDataLoading && activeContests.length === 0 && (
           <CWText type="h2" className="empty-contests">
             No active contests found
@@ -94,7 +114,7 @@ const ExploreContestList = ({ hideHeader }: ExploreContestListProps) => {
             })}
           </div>
         )}
-      </>
+      </div>
     </div>
   );
 };

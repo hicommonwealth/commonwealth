@@ -24,6 +24,9 @@ type QuestListProps = {
   hideHeader?: boolean;
   hideFilters?: boolean;
   hideSeeMore?: boolean;
+  searchText?: string;
+  onClearSearch?: () => void;
+  hideSearchTag?: boolean;
 };
 
 const QuestList = ({
@@ -32,6 +35,9 @@ const QuestList = ({
   hideHeader,
   hideFilters = false,
   hideSeeMore = false,
+  searchText,
+  onClearSearch,
+  hideSearchTag,
 }: QuestListProps) => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
@@ -103,6 +109,13 @@ const QuestList = ({
             buttonType="secondary"
             onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
           />
+          {!hideSearchTag && searchText?.trim() && (
+            <CWTag
+              label={`Search: ${searchText?.trim()}`}
+              type="filter"
+              onCloseClick={onClearSearch}
+            />
+          )}
           <CWTag
             label={`Ending After: ${moment(filters.endingAfter).utc().local().format('Do MMMM, YYYY h:mm A')}`}
             type="filter"

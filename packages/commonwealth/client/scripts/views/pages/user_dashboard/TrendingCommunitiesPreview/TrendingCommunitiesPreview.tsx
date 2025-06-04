@@ -1,3 +1,4 @@
+import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -10,7 +11,23 @@ import { CWText } from '../../../components/component_kit/cw_text';
 import { CommunityPreviewCard } from './CommunityPreviewCard';
 import './TrendingCommunitiesPreview.scss';
 
-export const TrendingCommunitiesPreview = () => {
+type TrendingCommunitiesPreviewProps = {
+  hideHeader?: boolean;
+  hideFilters?: boolean;
+  hideSeeMore?: boolean;
+  searchText?: string;
+  onClearSearch?: () => void;
+  hideSearchTag?: boolean;
+};
+
+export const TrendingCommunitiesPreview = ({
+  hideHeader,
+  hideFilters,
+  hideSeeMore,
+  searchText,
+  onClearSearch,
+  hideSearchTag,
+}: TrendingCommunitiesPreviewProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
@@ -58,6 +75,15 @@ export const TrendingCommunitiesPreview = () => {
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
           </div>
         </Link>
+      </div>
+      <div className="filters">
+        {!hideSearchTag && searchText?.trim() && (
+          <CWTag
+            label={`Search: ${searchText?.trim()}`}
+            type="filter"
+            onCloseClick={onClearSearch}
+          />
+        )}
       </div>
       <div className="community-preview-cards-collection">
         {trendingCommunities.map((sortedCommunity) => (

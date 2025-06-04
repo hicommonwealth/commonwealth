@@ -101,10 +101,17 @@ type FeedProps = {
   query: typeof useFetchGlobalActivityQuery | typeof useFetchUserActivityQuery;
   defaultCount?: number;
   customScrollParent?: HTMLElement;
+  searchText?: string;
+  onClearSearch?: () => void;
 };
 
 // eslint-disable-next-line react/no-multi-comp
-export const Feed = ({ query, customScrollParent }: FeedProps) => {
+export const Feed = ({
+  query,
+  customScrollParent,
+  searchText,
+  onClearSearch,
+}: FeedProps) => {
   const {
     data: feed,
     isLoading,
@@ -158,6 +165,7 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
   };
 
   return (
+    // TODO: add search text to the feed - 11814
     <div className="Feed">
       <Virtuoso
         overscan={50}

@@ -10,6 +10,7 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import TrustLevelRole from 'views/components/TrustLevelRole';
 
 import './XPTable.scss';
@@ -37,7 +38,12 @@ const columns: CWTableColumnInfo[] = [
   },
 ];
 
-const XPTable = () => {
+type XPTableProps = {
+  searchText?: string;
+  onClearSearch?: () => void;
+};
+
+const XPTable = ({ searchText, onClearSearch }: XPTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedQuest, setSelectedQuest] = useState<{
     value: string;
@@ -85,6 +91,13 @@ const XPTable = () => {
   return (
     <section className="XPTable">
       <div className="filters">
+        {searchText?.trim() && (
+          <CWTag
+            label={`Search: ${searchText?.trim()}`}
+            type="filter"
+            onCloseClick={onClearSearch}
+          />
+        )}
         <div className="quest-filter">
           <CWSelectList
             placeholder="Filter by Quest"
