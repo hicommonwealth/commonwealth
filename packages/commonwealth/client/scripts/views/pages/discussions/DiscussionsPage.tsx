@@ -372,7 +372,7 @@ const DiscussionsPage = () => {
       return newThread.id ?? -1;
     } catch (err) {
       console.error('Error creating thread:', err);
-      notifyError('Failed to create thread');
+      notifyError(err.message);
       return -1;
     } finally {
       setIsSubmitting(false);

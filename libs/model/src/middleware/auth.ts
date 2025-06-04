@@ -11,7 +11,7 @@ import {
   AuthContextInput,
   CommentContext,
   CommentContextInput,
-  Group,
+  MembershipRejectReason,
   PollContext,
   PollContextInput,
   ReactionContext,
@@ -254,65 +254,78 @@ async function checkGatedActions(
   action: GroupGatedActionKey,
   topic_id: number,
 ): Promise<void> {
-  if (!topic_id)
-    throw new InvalidInput('Must provide a valid topic id to authorize');
-
-  const topic = await models.Topic.findOne({ where: { id: topic_id } });
-  if (!topic) throw new InvalidInput('Topic not found');
-
-  // Get the groups and gated actions
-  // TODO: we can probably cache this
-  // TODO: @timolegros let's try to use this query to also join memberships
-  // so we don't have to keep querying the database below
-  const groups = await models.sequelize.query<
-    z.infer<typeof Group> & {
-      gated_actions?: GroupGatedActionKey[];
-    }
-  >(
+  const [topic] = await models.sequelize.query<{
+    topic_name: string;
+    gates: Array<{
+      group_id: number;
+      group_name: string;
+      actions: GroupGatedActionKey[];
+      is_private: boolean;
+      membership: {
+        is_member: boolean;
+        reject_reason: z.infer<typeof MembershipRejectReason> | null;
+      } | null;
+    }>;
+  }>(
     `
-      SELECT g.*, gp.topic_id, gp.gated_actions, gp.is_private
-      FROM
-        "Groups" as g
-        JOIN "GroupGatedActions" gp ON g.id = gp.group_id
-      WHERE
-        g.community_id = :community_id
-        AND gp.topic_id = :topic_id
-        AND (:action = ANY(gp.gated_actions) OR gp.is_private = true)
-    `,
+SELECT
+  T.name AS topic_name,
+  JSONB_AGG(
+    JSONB_BUILD_OBJECT(
+      'group_id', G.id,
+      'group_name', G.metadata->>'name',
+      'actions', GA.gated_actions,
+      'is_private', GA.is_private,
+      'membership', (
+        SELECT JSONB_BUILD_OBJECT(
+          'is_member', (M.reject_reason IS NULL),
+          'reject_reason', M.reject_reason
+        )
+        FROM "Memberships" M
+        WHERE M.group_id = G.id AND M.address_id = :address_id
+      )
+    )
+  ) AS gates
+FROM
+  "Topics" T
+  JOIN "GroupGatedActions" GA ON GA.topic_id = T.id
+  JOIN "Groups" G ON GA.group_id = G.id
+WHERE
+  T.id = :topic_id
+  AND (:action = ANY(GA.gated_actions) OR GA.is_private = TRUE)
+GROUP BY
+  T.name;
+`,
     {
       type: QueryTypes.SELECT,
       raw: true,
-      replacements: {
-        community_id: topic.community_id,
-        topic_id: topic.id,
-        action,
-      },
+      replacements: { address_id, topic_id, action },
     },
   );
 
-  // if the action is not gated by any group then allow
-  if (!groups.length) return;
+  // action not gated and public topic... allow it
+  if (!topic) return;
 
-  // if action is gated by 1 or more groups search for membership in those groups
-  const memberships = await models.Membership.findAll({
-    where: {
-      address_id,
-      group_id: { [Op.in]: groups.map((g) => g.id!) },
-    },
-  });
-  // if not a member in any group then this is not a member
-  if (!memberships.length) throw new NonMember(actor, topic.name, action);
+  const closed_gates = topic.gates.filter(
+    ({ actions, is_private, membership }) =>
+      actions.includes(action) || (is_private && actions.length === 0)
+        ? (membership?.is_member || false) === false
+        : false,
+  );
 
-  // if all memberships are rejected, return reject reasons
-  const rejects = memberships.filter((m) => m.reject_reason);
-  if (rejects.length === memberships.length)
-    throw new RejectedMember(
-      actor,
-      rejects.flatMap((reject) =>
-        reject.reject_reason!.map((reason) => reason.message),
-      ),
-    );
-  // a membership in one of the groups was found so the user has required permissions
+  // throw when at least one gate is closed (AND gates)
+  if (closed_gates.length > 0) {
+    const rejects = topic.gates
+      .filter(({ membership }) => !!membership?.reject_reason)
+      .map(({ membership }) =>
+        membership!.reject_reason!.map(({ message }) => message).join('; '),
+      );
+    if (rejects.length)
+      throw new RejectedMember(actor, topic.topic_name, action, rejects);
+    else throw new NonMember(actor, topic.topic_name, action);
+  }
+
+  // all gates are open!
 }
 
 /**
