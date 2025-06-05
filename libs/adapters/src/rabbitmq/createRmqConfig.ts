@@ -1,12 +1,7 @@
 import { config as EnvConfig } from '@hicommonwealth/adapters';
 import { Consumer, logger, outboxEvents } from '@hicommonwealth/core';
 import { Events } from '@hicommonwealth/schemas';
-import {
-  BindingConfig,
-  BrokerConfig,
-  ConnectionConfig,
-  QueueConfig,
-} from 'rascal';
+import { BindingConfig, BrokerConfig, QueueConfig } from 'rascal';
 
 const log = logger(import.meta);
 
@@ -68,7 +63,12 @@ export function createRmqConfig({
   const config: BrokerConfig = {
     vhosts: {
       [vhost]: {
-        connection: <ConnectionConfig>rabbitMqUri,
+        connection: {
+          url: rabbitMqUri,
+          options: {
+            frameMax: 8192,
+          },
+        },
         exchanges: {
           [RascalExchanges.DeadLetter]: {
             ...exchangeConfig,
