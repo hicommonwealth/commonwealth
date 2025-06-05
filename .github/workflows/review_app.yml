@@ -498,6 +498,7 @@ jobs:
                   service {
                     name
                   }
+                }
               }
             `,
               {
@@ -519,12 +520,14 @@ jobs:
           }
           
           async function waitForDeploymentCompletion(deploymentId) {
-            const maxWaitTime = 1_000 * 3; // 3 minutes
+            const maxWaitTime = 1_000 * 60 * 3; // 3 minutes
             const pollInterval = 1_000 * 60; // 60 seconds - avg is 45 seconds
             const startTime = Date.now();
           
             while (Date.now() - startTime < maxWaitTime) {
+              console.log(`Fetching status for deployment: ${deploymentId}`)
               const dep = await getDeploymentStatus(deploymentId);
+              console.log(`Deployment '${deploymentId}' status: ${dep.status}`);
           
               if (['SUCCESS', 'SLEEPING'].includes(dep.status)) {
                 console.log(`Deployment of '${dep.serviceName} succeeded!'`);
@@ -549,7 +552,10 @@ jobs:
                   dep.status,
                 )
               ) {
-                await new Promise((resolve) => setTimeout(resolve, pollInterval));
+                await new Promise((resolve) => {
+                  console.log(`Deployment not finished, retrying in ${pollInterval}`)
+                  return setTimeout(resolve, pollInterval)
+                });
               } else {
                 throw new Error(
                   `Unknown status '${dep.status}' for service ${dep.serviceName}`,
@@ -563,7 +569,6 @@ jobs:
           (async () => {
             try {
               const envId = await getEnvironmentId();
-              console.log(envId);
               const serviceMap = await getServices(envId);
               console.log(serviceMap);
           
@@ -576,17 +581,17 @@ jobs:
                 deploymentIds.push(await deploy(envId, serviceId));
               }
           
-              let deploymentUrl = ''
+              let deploymentUrl = '';
               for (const id of deploymentIds) {
                 const deployment = await waitForDeploymentCompletion(id);
                 if (typeof deployment.url === 'string' && deployment.url.length > 0) {
                   if (deploymentUrl.length > 0) {
-                    console.error('Multiple deployment URLs found!')
+                    console.error('Multiple deployment URLs found!');
                     throw new Error('Multiple deployment URLs found!');
                   }
                 }
               }
-              
+          
               try {
                 if (deploymentUrl) {
                   const fs = require('fs');
@@ -600,6 +605,7 @@ jobs:
                 throw new Error('Failed to save deployment URL');
               }
             } catch (e) {
+              console.error(e);
               process.exit(1);
             }
           })();
