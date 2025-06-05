@@ -1,5 +1,5 @@
 import { logger } from '@hicommonwealth/core';
-import { AuthInfo, Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
   CallToolRequestSchema,
@@ -17,8 +17,18 @@ import {
   api as externalApi,
   trpcRouter as externalTrpcRouter,
 } from './external-router';
+import { apiKeyAuthMiddleware } from './external-router-middleware';
 
 const log = logger(import.meta);
+
+type MCPRequest = Partial<Express.Request> & {
+  headers: Record<string, string>;
+  body: unknown;
+  method: string;
+  url: string;
+  isMCPRequest: boolean;
+  user?: any;
+};
 
 type CommonMCPTool = {
   name: string;
@@ -43,16 +53,40 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
       description: inputSchema._def.description || '',
       inputSchema,
       fn: async (token: string | null, input: unknown) => {
-        const trpcCaller = externalTrpcRouter.createCaller({
-          req: {
-            user: {},
-            headers: {
-              Authorization: token ? `Bearer ${token}` : undefined,
-            },
-          } as any,
-          res: {} as any,
-          actor: {} as any,
+        const [address, apiKey] = token?.split(':') || [];
+
+        // build request and response objects to pass to the middleware
+        const req = {
+          headers: {
+            address,
+            'x-api-key': apiKey,
+          },
+          path: `/${key}`,
+        } as any;
+
+        const res = {} as any;
+
+        // execute api key middleware
+        let err: any;
+        await apiKeyAuthMiddleware(req, res, (error?: any) => {
+          if (error) {
+            err = error;
+          }
         });
+        if (err) {
+          throw err;
+        }
+
+        // trigger trcp procedure pipeline
+        const trpcCaller = externalTrpcRouter.createCaller({
+          req,
+          res,
+          actor: {
+            user: req.user,
+            address: req.headers['address'] as string,
+          },
+        });
+
         return await trpcCaller[key](input as any);
       },
     };
@@ -110,7 +144,7 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
     try {
       const validatedArgs = toolsMap[name].inputSchema.parse(args);
       const result = await toolsMap[name].fn(
-        extra?.authInfo?.['token'] || null,
+        extra?.authInfo?.token || null,
         validatedArgs,
       );
       return {
@@ -189,7 +223,7 @@ export function buildMCPRouter() {
       });
       await mcpServer.connect(transport);
 
-      (req as IncomingMessage & { auth?: AuthInfo }).auth = {
+      (req as IncomingMessage & { auth?: { token: string } }).auth = {
         token: authToken,
       };
       await transport.handleRequest(req, res, req.body);
