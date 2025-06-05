@@ -190,7 +190,7 @@ export const event = <
       },
     })
     .input(z.object(md.inputs))
-    .output(md.output ?? z.object({}).optional())
+    .output((md.output || z.object({})).optional())
     .mutation(async ({ input }) => {
       try {
         const [[name, payload]] = Object.entries(input as object);

@@ -1,4 +1,5 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { getQueryKey } from '@trpc/react-query';
 import axios from 'axios';
 import { BASE_API_PATH, trpc } from 'utils/trpcClient';
 import { z } from 'zod/v4';
@@ -37,7 +38,7 @@ export const updateCommunityThreadCount = (
   const count = type === 'increment' ? 1 : -1;
 
   queryKeys.map((key) => {
-    const queryKey = trpc.community.getCommunity.getQueryKey(key);
+    const queryKey = getQueryKey(trpc.community.getCommunity, key);
 
     // update react query cache
     const rqData =
@@ -75,7 +76,7 @@ export const invalidateAllQueriesForCommunity = async (communityId: string) => {
     await Promise.all(
       queryKeys.map(async (key) => {
         const params = {
-          queryKey: trpc.community.getCommunity.getQueryKey(key),
+          queryKey: getQueryKey(trpc.community.getCommunity, key),
         };
         await queryClient.cancelQueries(params);
         await queryClient.invalidateQueries(params);
@@ -89,7 +90,7 @@ export const EXCEPTION_CASE_VANILLA_getCommunityById = async (
   includeNodeInfo = false,
 ): Promise<z.infer<typeof ExtendedCommunity> | undefined> => {
   // make trpc query key for this request
-  const queryKey = trpc.community.getCommunity.getQueryKey({
+  const queryKey = getQueryKey(trpc.community.getCommunity, {
     id: communityId,
     include_node_info: includeNodeInfo,
   });

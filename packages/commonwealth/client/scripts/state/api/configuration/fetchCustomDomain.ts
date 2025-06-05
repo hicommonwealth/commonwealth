@@ -32,7 +32,7 @@ export const fetchCustomDomainQuery = async () => {
   return await queryClient.fetchQuery({
     queryKey: [ApiEndpoints.FETCH_DOMAIN],
     queryFn: fetchCustomDomain,
-    cacheTime: DOMAIN_CACHE_TIME,
+    //cacheTime: DOMAIN_CACHE_TIME,
     staleTime: DOMAIN_STALE_TIME,
   });
 };
@@ -41,7 +41,7 @@ const useFetchCustomDomainQuery = () => {
   return useQuery({
     queryKey: [ApiEndpoints.FETCH_DOMAIN],
     queryFn: fetchCustomDomain,
-    cacheTime: DOMAIN_CACHE_TIME,
+    //cacheTime: DOMAIN_CACHE_TIME,
     staleTime: DOMAIN_STALE_TIME,
   });
 };
