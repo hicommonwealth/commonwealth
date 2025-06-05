@@ -111,7 +111,10 @@ export const KyoFinanceSwapQuestRequestParams = z
       .string()
       .optional()
       .describe('Minimum amount of output token swapped'),
-    minTimestamp: z.string().optional().describe('Minimum timestamp of swap'),
+    minTimestamp: z
+      .string()
+      .optional()
+      .describe('Minimum timestamp of swap in seconds'),
     minVolumeUSD: z.string().optional().describe('Minimum volume of swap'),
   })
   .describe(
@@ -170,6 +173,7 @@ const sharedQuestActionMeta = z.object({
     )
     .nullish(),
   start_link: z.string().url().nullish(),
+  community_goal_meta_id: PG_INT.nullish(),
   metadata: z.null().nullish(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),

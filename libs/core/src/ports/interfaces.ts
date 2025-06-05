@@ -1,6 +1,6 @@
 import { Events } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
-import { z, ZodSchema } from 'zod';
+import { z, ZodSchema, ZodUndefined } from 'zod';
 import {
   EventContext,
   EventSchemas,
@@ -447,13 +447,16 @@ export type ConsumerHooks = {
 
 export type Consumer =
   | {
-      consumer: () => EventsHandlerMetadata<EventSchemas>;
+      consumer: () => EventsHandlerMetadata<
+        EventSchemas,
+        ZodSchema | ZodUndefined
+      >;
       worker?: string;
       retryStrategy?: RetryStrategyFn;
       hooks?: ConsumerHooks;
       overrides: Record<string, string | null | undefined>;
     }
-  | (() => EventsHandlerMetadata<EventSchemas>);
+  | (() => EventsHandlerMetadata<EventSchemas, ZodSchema | ZodUndefined>);
 
 type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
 
