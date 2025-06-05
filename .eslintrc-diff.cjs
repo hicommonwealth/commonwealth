@@ -125,7 +125,7 @@ module.exports = {
     ],
     '@tanstack/query/exhaustive-deps': 'error',
     //'@tanstack/query/prefer-query-object-syntax': 'error',
-    '@tanstack/query/no-deprecated-options': 1,
+    //'@tanstack/query/no-deprecated-options': 1,
     'react/destructuring-assignment': [1, 'always'],
     'react/function-component-definition': [
       1,
