@@ -1,7 +1,7 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, config, dispose } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
-import { models, tester } from '@hicommonwealth/model';
+import { models, OutboxInstance, tester } from '@hicommonwealth/model';
 import { ContestManager, Events, events } from '@hicommonwealth/schemas';
 import { serializeBigIntObj } from '@hicommonwealth/shared';
 import {
@@ -368,7 +368,7 @@ describe('EventStream Policy Integration Tests', () => {
           },
         } satisfies z.infer<typeof events.LaunchpadTokenGraduated>),
       },
-    ];
+    ] as OutboxInstance[];
 
     await models.Outbox.bulkCreate(outboxEvents);
 
@@ -408,7 +408,7 @@ describe('EventStream Policy Integration Tests', () => {
         end_time: new Date(),
         is_one_off: true,
       } satisfies z.infer<typeof events.ContestStarted>,
-    }));
+    })) as OutboxInstance[];
 
     await models.Outbox.bulkCreate(initialEvents);
 

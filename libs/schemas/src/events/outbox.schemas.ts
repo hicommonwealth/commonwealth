@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { PG_INT } from '../utils';
 import { events } from './events.schemas';
 
@@ -19,18 +19,15 @@ export type EventPairs = {
 export const outboxEvents = Object.keys(events) as OutboxEvents[];
 export const Outbox = z.union(
   outboxEvents.map((event_name) =>
-    z
-      .object({
-        event_name: z.literal(event_name),
-        event_payload: events[event_name],
-      })
-      .extend({
-        event_id: PG_INT.optional(),
-        relayed: z.boolean().optional(),
-        created_at: z.coerce.date().optional(),
-        updated_at: z.coerce.date().optional(),
-      }),
-  ) as unknown as readonly [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]],
+    z.object({
+      event_id: PG_INT.optional(),
+      event_name: z.literal(event_name),
+      event_payload: events[event_name],
+      relayed: z.boolean().optional(),
+      created_at: z.coerce.date().optional(),
+      updated_at: z.coerce.date().optional(),
+    }),
+  ),
 );
 
 export { events };
