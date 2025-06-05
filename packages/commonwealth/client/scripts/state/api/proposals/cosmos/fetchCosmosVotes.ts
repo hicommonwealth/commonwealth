@@ -55,7 +55,7 @@ const useCosmosProposalVotesQuery = (
       !_.isEmpty(proposal) &&
       !proposal.completed,
     staleTime: VOTES_STALE_TIME,
-    cacheTime: VOTES_CACHE_TIME,
+    //cacheTime: VOTES_CACHE_TIME,
   });
 };
 

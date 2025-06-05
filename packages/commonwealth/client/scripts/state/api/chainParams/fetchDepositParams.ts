@@ -9,7 +9,7 @@ import {
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import app from 'state';
 
-const DEPOSIT_PARAMS_CACHE_TIME = Infinity;
+//const DEPOSIT_PARAMS_CACHE_TIME = Infinity;
 const DEPOSIT_PARAMS_STALE_TIME = 1000 * 60 * 15;
 
 const fetchDepositParams = async (
@@ -33,7 +33,7 @@ const useDepositParamsQuery = (stakingDenom: string, chainTtype?: string) => {
     queryKey: ['depositParams', communityId, stakingDenom, chainTtype],
     queryFn: () => fetchDepositParams(stakingDenom, chainTtype),
     enabled: app.chain?.base === ChainBase.CosmosSDK && !!stakingDenom,
-    cacheTime: DEPOSIT_PARAMS_CACHE_TIME,
+    //cacheTime: DEPOSIT_PARAMS_CACHE_TIME,
     staleTime: DEPOSIT_PARAMS_STALE_TIME,
   });
 };

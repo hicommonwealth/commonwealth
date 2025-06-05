@@ -6,7 +6,7 @@ export function useThreadSubscriptionsQuery() {
   return trpc.subscriptions.getThreadSubscriptions.useQuery(
     {},
     {
-      cacheTime: GET_THREAD_SUBSCRIPTIONS_STALE_TIME,
+      //cacheTime: GET_THREAD_SUBSCRIPTIONS_STALE_TIME,
       staleTime: GET_THREAD_SUBSCRIPTIONS_STALE_TIME,
     },
   );

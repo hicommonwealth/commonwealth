@@ -53,7 +53,7 @@ const useEthPerTokenQuery = ({
         tokenAddress,
       }),
     staleTime: TOKEN_ETH_EXCHANGE_TIME,
-    cacheTime: TOKEN_ETH_EXCHANGE_TIME,
+    //cacheTime: TOKEN_ETH_EXCHANGE_TIME,
     enabled,
   });
 };

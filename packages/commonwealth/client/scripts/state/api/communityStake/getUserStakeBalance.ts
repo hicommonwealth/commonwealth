@@ -47,7 +47,7 @@ const useGetUserStakeBalanceQuery = ({
   apiEnabled,
   chainRpc,
   walletAddress,
-  keepPreviousData = false,
+  //keepPreviousData = false,
   ethChainId,
 }: UseGetUserStakeBalanceQueryProps) => {
   return useQuery({
@@ -69,7 +69,7 @@ const useGetUserStakeBalanceQuery = ({
       }),
     staleTime: GET_USER_STAKE_BALANCE_STALE_TIME,
     enabled: apiEnabled,
-    keepPreviousData,
+    //keepPreviousData,
   });
 };
 
