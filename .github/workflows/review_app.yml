@@ -272,113 +272,290 @@ jobs:
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ steps.set_pr_number.outputs.pr_number }}
-          EFFECTIVE_SHA: ${{ steps.set_effective_sha.outputs.sha }}
+          COMMIT_SHA: ${{ steps.set_effective_sha.outputs.sha }}
+          PARENT_ENV_ID: ${{ RAILWAY_PARENT_ENV_ID }}
         run: |
           node <<'EOF' 
           const RAILWAY_TOKEN = process.env.RAILWAY_TOKEN;
-          const PROJECT_ID = process.env.RAILWAY_PROJECT_ID;
-          const SERVICE_NAME = 'web';
+          const PROJECT_ID = process.env.PROJECT_ID;
           const ENV_NAME = `pr-${process.env.PR_NUMBER}`;
-          const IMAGE_TAG = `ghcr.io/${process.env.GITHUB_REPOSITORY}/web:${process.env.EFFECTIVE_SHA}`;
+          const PARENT_ENV_ID = process.env.PARENT_ENV_ID;
+          const COMMIT_SHA = process.env.COMMIT_SHA
+          const API_URL = 'https://backboard.railway.app/graphql/v2';
 
-          const headers = {
-            'Authorization': `Bearer ${RAILWAY_TOKEN}`,
-            'Content-Type': 'application/json',
-          };
-
-          async function railwayGraphQL(query, { allow404 = false } = {}) {
-            const res = await fetch('https://backboard.railway.app/graphql', {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({ query }),
-            });
-
-            if (!res.ok) {
-              const text = await res.text();
-              if (res.status === 404 && allow404) {
-                return null;
-              }
-              throw new Error(`HTTP error! status: ${res.status} - ${res.statusText}\nResponse: ${text}`);
+          async function railwayQuery(query, variables, errorMsg) {
+            const res = await (
+              await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${RAILWAY_TOKEN}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  query,
+                  variables,
+                }),
+              })
+            ).json();
+          
+            if ('errors' in res) {
+              console.error(res);
+              throw new Error(errorMsg);
             }
-
-            const json = await res.json();
-
-            if (json.errors && json.errors.length > 0) {
-              // Some GraphQL APIs return errors for not found, so you may want to check for that here too
-              if (
-                allow404 &&
-                json.errors.some(e => e.message && e.message.toLowerCase().includes('not found'))
-              ) {
-                return null;
-              }
-              console.error('GraphQL errors:', JSON.stringify(json.errors));
-              throw new Error(`GraphQL errors: ${JSON.stringify(json.errors)}`);
-            }
-
-            return json;
+            return res;
           }
-
+          
+          async function getEnvironmentId() {
+            console.log('Fetching environments...');
+            const envs = await railwayQuery(
+              `
+                query environments($projectId: String!) {
+                  environments(projectId: $projectId) {
+                    edges {
+                      node {
+                        id
+                        name
+                      }
+                    }
+                  }
+                }
+              `,
+              {
+                projectId: PROJECT_ID,
+              },
+              'Failed to get environments list',
+            );
+          
+            let envId;
+            for (const edge of envs.data?.environments?.edges) {
+              if (edge.node.name === ENV_NAME) {
+                console.log(`Environment ${ENV_NAME} found!`);
+                envId = edge.node.id;
+                break;
+              }
+            }
+          
+            if (!envId) {
+              console.log('Environment not found. Creating new environment...');
+              const newEnv = await railwayQuery(
+                `
+                mutation environmentCreate($input: EnvironmentCreateInput!) {
+                  environmentCreate(input: $input) {
+                    id
+                    name
+                    projectId
+                  }
+                }
+              `,
+                {
+                  input: {
+                    projectId: PROJECT_ID,
+                    name: ENV_NAME,
+                    sourceEnvironmentId: PARENT_ENV_ID,
+                  },
+                },
+                'Failed to create new environment',
+              );
+          
+              if (!newEnv.data?.environmentCreate?.id) {
+                console.error(newEnv);
+                throw new Error('Environment id missing!');
+              }
+              envId = newEnv.data.environmentCreate.id;
+              console.log(`Environment ${ENV_NAME} created!`);
+            }
+            return envId;
+          }
+          
+          async function getServices(envId) {
+            console.log('Fetching services...');
+            const services = await railwayQuery(
+              `
+              query environment($id: String!) {
+                environment(id: $id) {
+                  serviceInstances {
+                    edges {
+                      node {
+                        serviceId
+                        serviceName
+                      }
+                    }
+                  }
+                }
+              }
+            `,
+              {
+                id: envId,
+              },
+              'Failed to fetch services',
+            );
+          
+            const serviceMap = {};
+            for (const edge of services.data?.environment?.serviceInstances?.edges) {
+              serviceMap[edge.node.serviceName] = edge.node.serviceId;
+            }
+            if (!Object.keys(serviceMap).length) {
+              throw new Error('No services found! Check the parent environment.');
+            }
+          
+            return serviceMap;
+          }
+          
+          async function updateServiceImage(envId, serviceId, serviceName) {
+            const image = `ghcr.io/hicommonwealth/${serviceName}:${COMMIT_SHA}`;
+            console.log(`Updating image for service '${serviceName}' to ${image}...`);
+          
+            const res = await railwayQuery(
+              `
+              mutation serviceInstanceUpdate($serviceId: String!, $environmentId: String, $input: ServiceInstanceUpdateInput!) {
+                serviceInstanceUpdate(
+                  serviceId: $serviceId
+                  environmentId: $environmentId
+                  input: $input
+                )
+              }
+            `,
+              {
+                serviceId: serviceId,
+                environmentId: envId,
+                input: {
+                  source: {
+                    image,
+                  },
+                },
+              },
+              `Failed to update image for service ${serviceName}`,
+            );
+          
+            console.log('Service image updated!');
+            return res.data?.serviceInstanceUpdate === true;
+          }
+          
+          async function deploy(envId, serviceId) {
+            const res = await railwayQuery(
+              `
+              mutation serviceInstanceDeployV2($serviceId: String!, $environmentId: String!) {
+                serviceInstanceDeployV2(
+                  serviceId: $serviceId
+                  environmentId: $environmentId
+                )
+              }
+            `,
+              {
+                environmentId: envId,
+                serviceId,
+              },
+              'Failed to deploy',
+            );
+          
+            if (!('data' in res) || !res.data.serviceInstanceDeployV2) {
+              console.error(res);
+              throw new Error('Failed to get deployment id');
+            }
+          
+            console.log('Service deploy started!');
+            return res.data.serviceInstanceDeployV2;
+          }
+          
+          async function getDeploymentStatus(deploymentId) {
+            const res = await railwayQuery(
+              `
+              query deployment($id: String!) {
+                deployment(id: $id) {
+                  status
+                  staticUrl
+                  service {
+                    name
+                  }
+              }
+            `,
+              {
+                id: deploymentId,
+              },
+              'Failed to get deployment status',
+            );
+          
+            if (!('data' in res) || !res.data.deployment) {
+              console.log(res);
+              throw new Error('Failed to get deployment status data');
+            }
+          
+            return {
+              status: res.data.deployment.status,
+              url: res.data.deployment.staticUrl,
+              serviceName: res.data.deployment.service?.name,
+            };
+          }
+          
+          async function waitForDeploymentCompletion(deploymentId) {
+            const maxWaitTime = 1_000 * 3; // 3 minutes
+            const pollInterval = 1_000 * 60; // 60 seconds - avg is 45 seconds
+            const startTime = Date.now();
+          
+            while (Date.now() - startTime < maxWaitTime) {
+              const dep = await getDeploymentStatus(deploymentId);
+          
+              if (['SUCCESS', 'SLEEPING'].includes(dep.status)) {
+                console.log(`Deployment of '${dep.serviceName} succeeded!'`);
+                return dep;
+              } else if (
+                [
+                  'CRASHED',
+                  'FAILED',
+                  'REMOVED',
+                  'REMOVING',
+                  'NEEDS_APPROVAL',
+                  'SKIPPED',
+                ].includes(dep.status)
+              ) {
+                throw new Error(
+                  `Deployment of '${dep.serviceName}' failed with status: ${dep.status}`,
+                );
+              }
+          
+              if (
+                ['QUEUED', 'WAITING', 'BUILDING', 'INITIALIZING', 'DEPLOYING'].includes(
+                  dep.status,
+                )
+              ) {
+                await new Promise((resolve) => setTimeout(resolve, pollInterval));
+              } else {
+                throw new Error(
+                  `Unknown status '${dep.status}' for service ${dep.serviceName}`,
+                );
+              }
+            }
+          
+            throw new Error(`Failed to await deployment status`);
+          }
+          
           (async () => {
             try {
-              // Step 1: Check if environment already exists
-              let envCheck = await railwayGraphQL(`query { project(id: \"${PROJECT_ID}\") { environments(filter: { name: \"${ENV_NAME}\" }) { edges { node { id name } } } } }`, { allow404: true });
-              console.log('ENV_CHECK:', JSON.stringify(envCheck));
-              let envEdges = envCheck?.data?.project?.environments?.edges || [];
-              let ENV_ID = envEdges[0]?.node?.id;
-
-              if (!ENV_ID) {
-                console.log(`Cloning production environment to: ${ENV_NAME}`);
-                // Find the production environment ID
-                let prodEnvCheck = await railwayGraphQL(`query { project(id: \"${PROJECT_ID}\") { environments(filter: { name: \"production\" }) { edges { node { id name } } } } }`, { allow404: true });
-                console.log('PROD_ENV_CHECK:', JSON.stringify(prodEnvCheck));
-                let prodEnvId = prodEnvCheck?.data?.project?.environments?.edges?.[0]?.node?.id;
-                if (!prodEnvId) {
-                  throw new Error('Could not find production environment ID');
+              const envId = await getEnvironmentId();
+              console.log(envId);
+              const serviceMap = await getServices(envId);
+              console.log(serviceMap);
+          
+              for (const [serviceName, serviceId] of Object.entries(serviceMap)) {
+                await updateServiceImage(envId, serviceId, serviceName);
+              }
+          
+              const deploymentIds = [];
+              for (const serviceId of Object.values(serviceMap)) {
+                deploymentIds.push(await deploy(envId, serviceId));
+              }
+          
+              for (const id of deploymentIds) {
+                const deployment = await waitForDeploymentCompletion(id);
+                if (typeof deployment.url === 'string' && deployment.url.length > 0) {
+                  const fs = require('fs');
+                  fs.appendFileSync(
+                    process.env.GITHUB_ENV,
+                    `DEPLOYMENT_URL=${deployment.url}`,
+                  );
                 }
-                // Clone the production environment
-                let envClone = await railwayGraphQL(`mutation { environmentClone(input: { name: \"${ENV_NAME}\", environmentId: \"${prodEnvId}\" }) { id name } }`);
-                console.log('ENV_CLONE:', JSON.stringify(envClone));
-                ENV_ID = envClone?.data?.environmentClone?.id;
-                if (!ENV_ID) throw new Error('Failed to clone environment');
-                console.log('Cloned environment:', ENV_ID);
-              } else {
-                console.log('Environment already exists:', ENV_ID);
               }
-
-              // Step 2: Check if service already exists in this environment
-              let serviceCheck = await railwayGraphQL(`query { environment(id: \"${ENV_ID}\") { serviceInstances { edges { node { id service { name } } } } } }`, { allow404: true });
-              console.log('SERVICE_CHECK:', JSON.stringify(serviceCheck));
-              let serviceEdges = serviceCheck?.data?.environment?.serviceInstances?.edges || [];
-              let serviceInstance = serviceEdges.find(e => e.node.service.name === SERVICE_NAME);
-              let SERVICE_INSTANCE_ID = serviceInstance?.node?.id;
-
-              if (!SERVICE_INSTANCE_ID) {
-                console.log('Creating new service instance:', SERVICE_NAME);
-                // First create the service if it doesn't exist in the project
-                let serviceCreate = await railwayGraphQL(`mutation { serviceCreate(input: { name: \"${SERVICE_NAME}\", projectId: \"${PROJECT_ID}\", source: { image: \"${IMAGE_TAG}\" } }) { id } }`);
-                console.log('SERVICE_CREATE:', JSON.stringify(serviceCreate));
-                let SERVICE_ID = serviceCreate?.data?.serviceCreate?.id;
-                if (!SERVICE_ID) throw new Error('Failed to create service');
-                // Then create the service instance in the environment
-                let instanceCreate = await railwayGraphQL(`mutation { serviceInstanceCreate(input: { environmentId: \"${ENV_ID}\", serviceId: \"${SERVICE_ID}\", source: { image: \"${IMAGE_TAG}\" } }) { id } }`);
-                console.log('INSTANCE_CREATE:', JSON.stringify(instanceCreate));
-                SERVICE_INSTANCE_ID = instanceCreate?.data?.serviceInstanceCreate?.id;
-                if (!SERVICE_INSTANCE_ID) throw new Error('Failed to create service instance');
-                console.log('Created service instance:', SERVICE_INSTANCE_ID);
-              } else {
-                console.log('Service instance already exists:', SERVICE_INSTANCE_ID);
-                // Update existing service instance with new image
-                let updateResponse = await railwayGraphQL(`mutation { serviceInstanceUpdate(input: { id: \"${SERVICE_INSTANCE_ID}\", source: { image: \"${IMAGE_TAG}\" } }) { id } }`);
-                console.log('UPDATE_RESPONSE:', JSON.stringify(updateResponse));
-                console.log('Updated service instance:', SERVICE_INSTANCE_ID);
-              }
-
-              // Export ENV_ID and SERVICE_INSTANCE_ID for next steps
-              const fs = require('fs');
-              fs.appendFileSync(process.env.GITHUB_ENV, `ENV_ID=${ENV_ID}\n`);
-              fs.appendFileSync(process.env.GITHUB_ENV, `SERVICE_INSTANCE_ID=${SERVICE_INSTANCE_ID}\n`);
-            } catch (err) {
-              console.error('Error in Railway deploy step:', err);
+            } catch (e) {
               process.exit(1);
             }
           })();
