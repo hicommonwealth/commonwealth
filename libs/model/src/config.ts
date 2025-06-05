@@ -79,6 +79,8 @@ const {
   COMMUNITY_TIER_WEIGHT,
   DISABLE_TIER_RATE_LIMITS,
   TIER_SOCIAL_VERIFIED_MIN_ETH,
+  MCP_DEMO_CLIENT_SERVER_URL,
+  MCP_DEMO_CLIENT_KEY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -270,6 +272,10 @@ export const config = configure(
       SOCIAL_VERIFIED_MIN_ETH: parseFloat(
         TIER_SOCIAL_VERIFIED_MIN_ETH || DEFAULTS.TIER_SOCIAL_VERIFIED_MIN_ETH,
       ),
+    },
+    MCP: {
+      MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
+      MCP_DEMO_CLIENT_KEY: MCP_DEMO_CLIENT_KEY,
     },
   },
   z.object({
@@ -573,6 +579,10 @@ export const config = configure(
       ),
     TIER: z.object({
       SOCIAL_VERIFIED_MIN_ETH: z.number(),
+    }),
+    MCP: z.object({
+      MCP_DEMO_CLIENT_SERVER_URL: z.string().optional(),
+      MCP_DEMO_CLIENT_KEY: z.string().optional(),
     }),
   }),
 );
