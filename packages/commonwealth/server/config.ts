@@ -120,7 +120,7 @@ export const config = configure(
       ),
       LOG_TRACE: process.env.SOLANA_CE_LOG_TRACE !== 'false',
       MAX_SLOT_RANGE: parseInt(
-        process.env.SOLANA_CE_MAX_SLOT_RANGE ?? '100',
+        process.env.SOLANA_CE_MAX_SLOT_RANGE ?? '10000',
         10,
       ),
       // No need for CHAIN_CONFIGS as we now use IDLs to get program IDs

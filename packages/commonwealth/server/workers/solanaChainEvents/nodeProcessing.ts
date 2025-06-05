@@ -46,7 +46,7 @@ export async function processChainNode(
         chain_node_id: chainNode.id!,
       },
     });
-    console.log(chainNode.private_url);
+
     const connection = new Connection(chainNode.private_url!, 'finalized');
     const currentSlot = await connection.getSlot();
 
@@ -81,20 +81,24 @@ export async function processChainNode(
 
     allEvents.push(...events);
 
-    // Emit all events
-    if (allEvents.length > 0) {
-      await emitEvent(
-        models.Outbox,
-        allEvents,
-        // No transaction is provided, events are emitted directly
-      );
-    }
+    // Emit all events and update the last processed slot in a transaction
+    if (allEvents.length > 0 || lastSlot > 0) {
+      await models.sequelize.transaction(async (transaction) => {
+        // Emit all events
+        if (allEvents.length > 0) {
+          await emitEvent(models.Outbox, allEvents, transaction);
+        }
 
-    // Update the last processed slot
-    if (lastSlot > 0) {
-      await models.LastProcessedSolanaSlot.upsert({
-        chain_node_id: chainNode.id!,
-        slot_number: lastSlot,
+        // Update the last processed slot
+        if (lastSlot > 0) {
+          await models.LastProcessedSolanaSlot.upsert(
+            {
+              chain_node_id: chainNode.id!,
+              slot_number: lastSlot,
+            },
+            { transaction },
+          );
+        }
       });
     }
 
