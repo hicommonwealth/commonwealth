@@ -176,6 +176,15 @@ const ReactQuillEditor = ({
   });
 
   const handleChange = (value, delta, source, editor) => {
+    // Check if this change is coming from ReactQuill's internal setEditorContents
+    // by examining the stack trace for setEditorContents
+    const stack = new Error().stack || '';
+    const isInternalPropSync = stack.includes('setEditorContents');
+
+    if (isInternalPropSync) {
+      return;
+    }
+
     const newContent = convertTwitterLinksToEmbeds(editor.getContents());
 
     setContentDeltaToUse({
