@@ -66,7 +66,7 @@ export function createRmqConfig({
         connection: {
           url: rabbitMqUri,
           options: {
-            frameMax: 8192,
+            frameMax: 131072,
           },
         },
         exchanges: {
