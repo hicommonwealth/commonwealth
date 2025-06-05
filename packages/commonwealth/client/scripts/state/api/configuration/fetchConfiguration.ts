@@ -19,7 +19,7 @@ const useFetchConfigurationQuery = () => {
     queryKey: [QueryKeys.CONFIGURATION],
     queryFn: fetchCachedConfiguration,
     staleTime: CONFIGURATION_STALE_TIME,
-    cacheTime: CONFIGURATION_CACHE_TIME,
+    //cacheTime: CONFIGURATION_CACHE_TIME,
   });
 };
 

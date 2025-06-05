@@ -11,7 +11,7 @@ const NODES_CACHE_TIME = Infinity;
 const useFetchNodesQuery = () => {
   return trpc.superAdmin.getChainNodes.useQuery(undefined, {
     staleTime: NODES_STALE_TIME,
-    cacheTime: NODES_CACHE_TIME,
+    //cacheTime: NODES_CACHE_TIME,
     select: (data) => data.map((node) => new NodeInfo(node as ChainNode)),
   });
 };
