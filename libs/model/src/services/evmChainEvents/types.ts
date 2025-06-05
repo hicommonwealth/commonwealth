@@ -1,4 +1,4 @@
-import { EventPair, Events } from '@hicommonwealth/schemas';
+import { EventPair, Events, OutboxEvents } from '@hicommonwealth/schemas';
 
 export type EvmBlockDetails = {
   number: bigint;
@@ -48,7 +48,9 @@ export type EvmEvent = {
   meta: EvmEventMeta;
 };
 
-export type EvmMapper<E extends Events> = (evmEvent: EvmEvent) => EventPair<E>;
+export type EvmMapper<E extends OutboxEvents> = (
+  evmEvent: EvmEvent,
+) => EventPair<E>;
 
 export type EvmEventSource = {
   eth_chain_id: number;

@@ -1,6 +1,6 @@
-import { Broker, Outbox, logger, stats } from '@hicommonwealth/core';
+import { Broker, logger, stats } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { Events } from '@hicommonwealth/schemas';
+import { Outbox } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod/v4';
 import { config } from '../config';
