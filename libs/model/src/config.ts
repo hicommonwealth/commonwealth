@@ -81,6 +81,7 @@ const {
   TIER_SOCIAL_VERIFIED_MIN_ETH,
   MCP_DEMO_CLIENT_SERVER_URL,
   MCP_DEMO_CLIENT_KEY,
+  EVM_CHAINS_WHITELIST,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -113,6 +114,7 @@ export const config = configure(
       PRIVATE_KEY: PRIVATE_KEY || '',
       LAUNCHPAD_PRIVATE_KEY: LAUNCHPAD_PRIVATE_KEY || '',
       CONTEST_BOT_PRIVATE_KEY: CONTEST_BOT_PRIVATE_KEY || '',
+      EVM_CHAINS_WHITELIST: EVM_CHAINS_WHITELIST || '',
     },
     TBC: {
       TTL_SECS: TBC_BALANCE_TTL_SECONDS
@@ -325,6 +327,13 @@ export const config = configure(
         .refine(
           (data) => !(target.APP_ENV === 'production' && !data),
           'CONTEST_BOT_PRIVATE_KEY must be set to a non-default value in production.',
+        ),
+      EVM_CHAINS_WHITELIST: z
+        .string()
+        .optional()
+        .refine(
+          () => target.APP_ENV !== 'production',
+          'EVM_CHAINS_WHITELIST cannot be set in production.',
         ),
     }),
     TBC: z.object({
