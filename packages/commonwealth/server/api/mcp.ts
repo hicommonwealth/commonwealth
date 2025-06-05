@@ -21,15 +21,6 @@ import { apiKeyAuthMiddleware } from './external-router-middleware';
 
 const log = logger(import.meta);
 
-type MCPRequest = Partial<Express.Request> & {
-  headers: Record<string, string>;
-  body: unknown;
-  method: string;
-  url: string;
-  isMCPRequest: boolean;
-  user?: any;
-};
-
 type CommonMCPTool = {
   name: string;
   description: string;
