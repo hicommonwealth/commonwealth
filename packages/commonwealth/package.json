@@ -63,6 +63,7 @@
     "start-message-relayer": "tsx ./server/workers/messageRelayer/messageRelayer.ts",
     "start-twitter": "tsx server/workers/twitterWorker/twitterWorker.ts",
     "start-mcp-client": "tsx scripts/mcp-client.ts",
+    "start-mcp-inspector": "CLIENT_PORT=3003 npx @modelcontextprotocol/inspector",
     "stylelint": "stylelint client/styles/*",
     "test": "pnpm test-unit",
     "test-api": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run ./test/integration/api",
