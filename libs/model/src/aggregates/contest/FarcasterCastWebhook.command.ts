@@ -24,6 +24,7 @@ export function FarcasterCastWebhook(): Command<
       } else {
         log.warn(`payload not supported: ${JSON.stringify(payload, null, 2)}`);
       }
+      return { status: 'ok' };
     },
   };
 }

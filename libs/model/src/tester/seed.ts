@@ -14,6 +14,7 @@ import z, {
   ZodObject,
   ZodOptional,
   ZodString,
+  ZodTypeAny,
   ZodUnknown,
 } from 'zod/v4';
 import { models } from '../database';
@@ -100,7 +101,7 @@ async function _seed(
   records: State[],
   level: number,
 ) {
-  const schema = schemas[model.name as schemas.Entities];
+  const schema = schemas[model.name as schemas.Entities] as ZodTypeAny;
   if (schema && options.mock && schema instanceof ZodObject) {
     if (model.name === 'User' && !('tier' in values)) {
       values['tier'] = UserTierMap.ManuallyVerified;
@@ -111,7 +112,7 @@ async function _seed(
       if (!('spam_tier_level' in values))
         values['spam_tier_level'] = DisabledCommunitySpamTier;
     }
-    const mocked = generateMock(schema, {});
+    const mocked = generateMock(schema as any, {});
     // force undefined associations
     const undefs = {} as State;
     Object.entries(schema.shape).forEach(([key, value]) => {

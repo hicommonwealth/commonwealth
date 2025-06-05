@@ -111,7 +111,7 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
         log.warn(
           `Community not found for namespace ${namespace_address}, skipping link`,
         );
-        return;
+        return false;
       }
 
       if (!log_removed)

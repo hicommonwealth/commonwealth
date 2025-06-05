@@ -18,7 +18,7 @@ export function taskFactory<Input extends ZodType | ZodUndefined>({
   fn,
 }: GraphileTask<Input>) {
   const task: Task = async (payload, helpers) => {
-    const parsedPayload: z.infer<Input> = input.parse(payload);
+    const parsedPayload = input.parse(payload) as z.infer<typeof input>;
     await fn(parsedPayload, helpers);
   };
   return task;

@@ -573,8 +573,8 @@ importers:
   libs/model:
     dependencies:
       '@anatine/zod-mock':
-        specifier: ^3.13.3
-        version: 3.13.4(@faker-js/faker@8.4.1)(zod@3.25.46)
+        specifier: ^3.14.0
+        version: 3.14.0(@faker-js/faker@8.4.1)(zod@3.25.46)
       '@canvas-js/chain-ethereum':
         specifier: ^0.13.14
         version: 0.13.14(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -1540,10 +1540,10 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@anatine/zod-mock@3.13.4':
-    resolution: {integrity: sha512-yO/KeuyYsEDCTcQ+7CiRuY3dnafMHIZUMok6Ci7aERRCTQ+/XmsiPk/RnMx5wlLmWBTmX9kw+PavbMsjM+sAJA==}
+  '@anatine/zod-mock@3.14.0':
+    resolution: {integrity: sha512-pTYyn9dlszUl5gMGWtE7DBRvx1EcqpBJ1iJ73rlJYCZr9lgIEdZ6PCZQqoXIdlC8DYIwuT1M3/N8arkJa7A10Q==}
     peerDependencies:
-      '@faker-js/faker': ^7.0.0 || ^8.0.0
+      '@faker-js/faker': ^7.0.0 || ^8.0.0 || ^9.0.0
       zod: ^3.21.4
 
   '@apidevtools/json-schema-ref-parser@9.0.9':
@@ -19484,7 +19484,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@anatine/zod-mock@3.13.4(@faker-js/faker@8.4.1)(zod@3.25.46)':
+  '@anatine/zod-mock@3.14.0(@faker-js/faker@8.4.1)(zod@3.25.46)':
     dependencies:
       '@faker-js/faker': 8.4.1
       randexp: 0.5.3

@@ -130,13 +130,20 @@ export type EventContext<Name extends Events> = {
  * @returns mutated state
  * @throws {@link InvalidActor} when unauthorized
  */
-export type Handler<
+export type BodyHandler<
   Input extends ZodType,
   Output extends ZodType,
   _Context extends ZodType,
-> = (
+> = (context: Context<Input, _Context>) => Promise<z.infer<Output>>;
+
+/**
+ * Middleware handler
+ * @param context command execution context
+ * @throws {@link InvalidActor} when unauthorized
+ */
+export type AuthHandler<Input extends ZodType, _Context extends ZodType> = (
   context: Context<Input, _Context>,
-) => Promise<z.infer<Output> | undefined | void>;
+) => Promise<void>;
 
 /**
  * Event handler
@@ -164,8 +171,8 @@ export type Metadata<
   readonly input: Input;
   readonly output: Output;
   readonly context?: _Context;
-  readonly auth: Handler<Input, Output, _Context>[];
-  readonly body: Handler<Input, Output, _Context>;
+  readonly auth: AuthHandler<Input, _Context>[];
+  readonly body: BodyHandler<Input, Output, _Context>;
   readonly secure?: boolean;
   readonly authStrategy?: AuthStrategies<Input>;
 };

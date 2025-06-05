@@ -59,7 +59,7 @@ export const events = {
     community_id: z.string(),
     address: z.string(),
     user_id: z.number(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
     referrer_address: z.string().nullish(),
   }),
 
@@ -69,7 +69,7 @@ export const events = {
     user_id: z.number(),
     old_user_id: z.number(),
     old_user_email: z.string().nullish(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   ThreadCreated: Thread.omit({
@@ -109,14 +109,14 @@ export const events = {
     community_id: z.string(),
     group_id: z.number(),
     creator_user_id: z.number(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   RoleUpdated: z.object({
     community_id: z.string(),
     address: z.string(),
     role: z.enum(Roles),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   UserMentioned: z.object({
@@ -134,14 +134,14 @@ export const events = {
     user_id: z.number(),
     referrer_address: z.string().optional(),
     social_links: z.array(z.string()).optional(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   CommunityUpdated: z.object({
     community_id: z.string(),
     user_id: z.number(),
     social_links: z.array(z.string().nullish()).optional(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   CommunityJoined: z.object({
@@ -149,7 +149,7 @@ export const events = {
     user_id: z.number(),
     oauth_provider: z.string().nullish(),
     referrer_address: z.string().nullish(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   SnapshotProposalCreated: z.object({
@@ -225,7 +225,7 @@ export const events = {
     server_id: z.string(),
     user_id: z.number().nullish(),
     discord_username: z.string(),
-    joined_date: z.coerce.date(),
+    joined_date: z.date(),
   }),
 
   // on-chain contest manager events
@@ -262,8 +262,8 @@ export const events = {
   // Contest Events
   ContestStarted: ContestManagerEvent.extend({
     contest_id: z.number().int().gte(0),
-    start_time: z.coerce.date().describe('Contest start time'),
-    end_time: z.coerce.date().describe('Contest end time'),
+    start_time: z.date().describe('Contest start time'),
+    end_time: z.date().describe('Contest end time'),
     is_one_off: z.boolean().describe('Is this a one-off contest'),
   }).describe('When a contest instance gets started'),
 
@@ -347,7 +347,7 @@ export const events = {
     user_id: z.number(),
     address: z.string(),
     referred_by_address: z.string().nullish(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   QuestStarted: z.object({
@@ -355,8 +355,8 @@ export const events = {
     name: z.string().max(255),
     description: z.string().max(1000),
     image_url: z.string(),
-    start_date: z.coerce.date(),
-    end_date: z.coerce.date(),
+    start_date: z.date(),
+    end_date: z.date(),
     community_id: z.string().nullish(),
   }),
 
@@ -402,7 +402,7 @@ export const events = {
   LaunchpadTokenRecordCreated: z.object({
     name: z.string(),
     symbol: z.string(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
     eth_chain_id: z.number(),
     creator_address: EVM_ADDRESS_STRICT,
     token_address: EVM_ADDRESS_STRICT,
@@ -456,7 +456,7 @@ export const events = {
     wallet_id: z.nativeEnum(WalletId),
     community_id: z.string(),
     balance: z.string(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   SSOLinked: z.object({
@@ -464,14 +464,14 @@ export const events = {
     new_user: z.boolean(),
     oauth_provider: z.nativeEnum(WalletSsoSource),
     community_id: z.string(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   XpChainEventCreated: z.object({
     eth_chain_id: z.number(),
     quest_action_meta_ids: z.array(z.number()),
     transaction_hash: z.string(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   // TokenStaking - TODO: review mapping rules with @timolegros
@@ -557,14 +557,14 @@ export const events = {
     deployer_address: z.string(),
     community_id: z.string(),
     referral: NamespaceReferral.optional(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   CommunityGoalReached: z.object({
     community_goal_meta_id: PG_INT,
     goal_type: z.enum(CommunityGoalTypes),
     community_id: z.string(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   TweetEngagementCapReached: z.object({
@@ -578,7 +578,7 @@ export const events = {
   CommunityTagsUpdated: z.object({
     community_id: z.string(),
     tag_ids: z.array(z.number()),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   MembershipsRefreshed: z.object({
@@ -592,13 +592,13 @@ export const events = {
         rejected: z.boolean().optional(),
       })
       .array(),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 
   CommunityDirectoryTagsUpdated: z.object({
     community_id: z.string(),
     tag_names: z.array(z.string()),
     selected_community_ids: z.array(z.string()),
-    created_at: z.coerce.date(),
+    created_at: z.date(),
   }),
 } as const;
