@@ -29,10 +29,9 @@ function chainEvent<
 ): EventPair<E> {
   return {
     event_name: eventName,
+    // @ts-expect-error
     event_payload: {
-      eventSource: {
-        ethChainId: 1,
-      },
+      eventSource: { ethChainId: 1 },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       parsedArgs: parsedArgs as any,
       rawLog: {

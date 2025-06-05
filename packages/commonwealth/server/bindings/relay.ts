@@ -1,5 +1,6 @@
 import { Broker, Outbox, logger, stats } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { Events } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod/v4';
 import { config } from '../config';
@@ -9,7 +10,11 @@ const log = logger(import.meta);
 export async function relay(broker: Broker, models: DB): Promise<number> {
   const publishedEventIds: number[] = [];
   await models.sequelize.transaction(async (transaction) => {
-    const events = await models.sequelize.query<z.infer<typeof Outbox>>(
+    const events = await models.sequelize.query<{
+      event_id: number;
+      event_name: Events;
+      event_payload: z.infer<typeof Outbox>;
+    }>(
       `
       SELECT *
       FROM "Outbox"

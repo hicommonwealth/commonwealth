@@ -30,7 +30,7 @@ async function testSeed<T extends schemas.Aggregates>(
   // perform schema validation on created entity (throws)
   const schema = schemas[name];
   const model: ModelStatic<Model> = models[name];
-  const data: ReturnType<typeof schema.parse> = schema.parse(record);
+  const data = schema.parse(record) as z.infer<(typeof schemas)[T]>;
 
   // attempt to find entity that was created
   const existingEntity = await model.findOne({

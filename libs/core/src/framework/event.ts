@@ -33,7 +33,9 @@ export const handleEvent = async <
     return (
       (await body[name]({
         name,
-        payload: validate ? inputs[name]!.parse(payload) : payload,
+        payload: validate
+          ? (inputs[name]!.parse(payload) as z.infer<Input>)
+          : payload,
       })) || {}
     );
   } catch (error) {
