@@ -1,3 +1,4 @@
+import { getQueryKey } from '@trpc/react-query';
 import axios from 'axios';
 import NodeInfo, { ChainNode } from 'models/NodeInfo';
 import { BASE_API_PATH, trpc } from 'utils/trpcClient';
@@ -16,12 +17,12 @@ const useFetchNodesQuery = () => {
 };
 
 export const fetchCachedNodes = (): NodeInfo[] | undefined => {
-  const queryKey = trpc.superAdmin.getChainNodes.getQueryKey();
+  const queryKey = getQueryKey(trpc.superAdmin.getChainNodes);
   return queryClient.getQueryData<NodeInfo[]>(queryKey);
 };
 
 export const fetchNodes = async (): Promise<NodeInfo[]> => {
-  const queryKey = trpc.superAdmin.getChainNodes.getQueryKey();
+  const queryKey = getQueryKey(trpc.superAdmin.getChainNodes);
   const cache = queryClient.getQueryData<NodeInfo[]>(queryKey);
   if (cache) return cache;
 

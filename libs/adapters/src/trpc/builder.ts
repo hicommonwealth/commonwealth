@@ -79,9 +79,9 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
 }: BuildProcOptions<Input, Output>) => {
   const { secure, optional } = isSecure(md, forceSecure);
   return trpc.procedure
-    .use(async ({ ctx, rawInput, next }) => {
+    .use(async ({ ctx, next, getRawInput }) => {
       if (secure)
-        await authenticate(ctx.req, rawInput, md.authStrategy, optional);
+        await authenticate(ctx.req, getRawInput(), md.authStrategy, optional);
       return next({
         ctx: {
           ...ctx,
@@ -92,11 +92,11 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
         },
       });
     })
-    .use(async ({ ctx, rawInput, next }) => {
+    .use(async ({ ctx, next, getRawInput }) => {
       const result = await next();
       if (result.ok && outMiddlewares?.length) {
         for (const omw of outMiddlewares) {
-          await omw(rawInput, result.data, ctx);
+          await omw(getRawInput(), result.data, ctx);
         }
       }
       return result;
