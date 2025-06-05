@@ -22,7 +22,7 @@ const useGetXPsRanked = ({
     {
       enabled,
       staleTime: FETCH_XP_RANKED_STALE_TIME,
-      cacheTime: FETCH_XP_RANKED_CACHE_TIME,
+      //cacheTime: FETCH_XP_RANKED_CACHE_TIME,
     },
   );
 };

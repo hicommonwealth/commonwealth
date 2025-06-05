@@ -8,7 +8,7 @@ const useGetJudgeStatusQuery = (communityId: string | null | undefined) => {
     {
       enabled: !!communityId,
       staleTime: 0,
-      cacheTime: 0,
+      //cacheTime: 0,
       refetchOnMount: 'always',
     },
   );

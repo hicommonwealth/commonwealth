@@ -19,7 +19,7 @@ const useGetTokenInfoAlchemy = ({
       token_address,
     },
     {
-      cacheTime: FETCH_TOKENS_STALE_TIME,
+      //cacheTime: FETCH_TOKENS_STALE_TIME,
       enabled,
     },
   );
