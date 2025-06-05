@@ -53,7 +53,7 @@ describe('buildMCPTools', () => {
     await dispose()();
   });
 
-  it('should return an array of MCP tools', async () => {
+  it('should return an array of MCP tools and be able to call them', async () => {
     const tools = buildMCPTools();
     expect(Array.isArray(tools)).to.be.true;
     expect(tools.length).to.be.greaterThan(0);
