@@ -324,6 +324,19 @@ const QuestDetails = ({ id }: { id: number }) => {
         navigate(`/explore?tab=communities`);
         break;
       }
+      case 'RecurringContestManagerDeployed': {
+        if (quest.community_id) {
+          navigate(
+            `/${quest.community_id}/contests/launch`,
+            {},
+            quest.community_id || null,
+          );
+        } else {
+          // If no community context, navigate to community selection for contest creation
+          navigate('/explore?tab=communities', {}, null);
+        }
+        break;
+      }
       case 'KyoFinanceLpQuestVerified':
       case 'KyoFinanceSwapQuestVerified': {
         if (!action.id) {

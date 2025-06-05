@@ -402,7 +402,7 @@ export const events = {
   LaunchpadTokenRecordCreated: z.object({
     name: z.string(),
     symbol: z.string(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
     eth_chain_id: z.number(),
     creator_address: EVM_ADDRESS_STRICT,
     token_address: EVM_ADDRESS_STRICT,

@@ -19,6 +19,7 @@ export const actionCopies = {
     ['LaunchpadTokenRecordCreated']: 'Launch a Token on Common',
     ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
     ['CommunityGoalReached']: 'Complete the community goal',
+    ['RecurringContestManagerDeployed']: 'Create a Recurring Contest',
     ['KyoFinanceSwapQuestVerified']: 'Complete a token swap on Kyo Finance',
     ['KyoFinanceLpQuestVerified']: 'Provide liquidity to a Kyo Finance pool',
   },
@@ -41,6 +42,7 @@ export const actionCopies = {
     ['LaunchpadTokenRecordCreated']: () => '',
     ['LaunchpadTokenTraded']: () => '',
     ['CommunityGoalReached']: () => '',
+    ['RecurringContestManagerDeployed']: '',
     ['KyoFinanceSwapQuestVerified']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires a wallet connected to Soneium chain on ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
     ['KyoFinanceLpQuestVerified']: (displayFor: 'user' | 'admin' = 'user') =>
@@ -207,6 +209,16 @@ export const actionCopies = {
         </ul>
       </div>
     ),
+    // eslint-disable-next-line react/no-multi-comp
+    ['RecurringContestManagerDeployed']: () => (
+      <div>
+        <ul>
+          <li>● Contest must be funded with a prize pool</li>
+          <li>● Aura is awarded when the contest is successfully deployed</li>
+          <li>● Only the contest creator receives Aura for this action</li>
+        </ul>
+      </div>
+    ),
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -226,6 +238,7 @@ export const actionCopies = {
     ['LaunchpadTokenRecordCreated']: '',
     ['LaunchpadTokenTraded']: '',
     ['CommunityGoalReached']: '',
+    ['RecurringContestManagerDeployed']: '',
     ['KyoFinanceSwapQuestVerified']: '',
     ['KyoFinanceLpQuestVerified']: '',
   },
