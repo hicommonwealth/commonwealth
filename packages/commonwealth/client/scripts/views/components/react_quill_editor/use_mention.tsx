@@ -1,13 +1,13 @@
 import { RangeStatic } from 'quill';
 import QuillMention from 'quill-mention';
-import { MutableRefObject, useCallback, useMemo, useRef } from 'react';
+import { MutableRefObject, useCallback, useMemo } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import MinimumProfile from '../../../models/MinimumProfile';
 
 import { UserTierMap } from '@hicommonwealth/shared';
 import app from 'client/scripts/state';
 import _ from 'lodash';
-import { useUnifiedSearch } from 'state/api/search/useUnifiedSearch';
+import { trpc } from 'utils/trpcClient';
 import {
   DENOTATION_SEARCH_CONFIG,
   ENTITY_TYPE_INDICATORS,
@@ -35,21 +35,7 @@ export const useMention = ({
   lastSelectionRef,
   justClosed,
 }: UseMentionProps) => {
-  const searchParamsRef = useRef<{
-    searchTerm: string;
-    communityId?: string;
-    searchScope: string[];
-  }>({
-    searchTerm: '',
-    searchScope: ['All'],
-  });
-
-  const { refetch } = useUnifiedSearch({
-    searchTerm: searchParamsRef.current.searchTerm,
-    communityId: searchParamsRef.current.communityId,
-    searchScope: searchParamsRef.current.searchScope,
-    enabled: false, // We'll trigger manually with refetch
-  });
+  const utils = trpc.useUtils();
 
   const selectMention = useCallback(
     (item: QuillMention) => {
@@ -398,7 +384,7 @@ export const useMention = ({
       onOpen: () => {
         justClosed?.(false);
       },
-      onClose: (e: Event) => {
+      onClose: () => {
         justClosed?.(true);
       },
       source: _.debounce(
@@ -442,14 +428,15 @@ export const useMention = ({
               ? app.activeChainId() || ''
               : undefined;
 
-            // Update search parameters in ref
-            searchParamsRef.current = {
+            const data = await utils.search.searchEntities.fetch({
               searchTerm,
               communityId,
-              searchScope,
-            };
-
-            const { data } = await refetch();
+              searchScope: searchScope.join(','),
+              limit: MENTION_CONFIG.MAX_SEARCH_RESULTS,
+              orderBy: 'relevance',
+              orderDirection: 'DESC',
+              includeCount: false,
+            });
 
             const results = data?.results || [];
             if (results.length === 0) {
@@ -486,7 +473,7 @@ export const useMention = ({
       ),
       isolateChar: true,
     };
-  }, [selectMention, createEntityMentionItem, refetch, justClosed]);
+  }, [selectMention, createEntityMentionItem, justClosed]);
 
   return { mention };
 };

@@ -25,65 +25,52 @@ const MENTION_PATTERNS = {
   proposal: /\[([^\]]+)\]\(\/proposal\/([^)]+)\)/g,
 };
 
+const mentionConfigs = [
+  {
+    pattern: MENTION_PATTERNS.user,
+    type: MentionEntityType.USER,
+    getLinkPath: (id: string) => `/profile/id/${id}`,
+  },
+  {
+    pattern: MENTION_PATTERNS.topic,
+    type: MentionEntityType.TOPIC,
+    getLinkPath: (id: string) => `/discussion/topic/${id}`,
+  },
+  {
+    pattern: MENTION_PATTERNS.thread,
+    type: MentionEntityType.THREAD,
+    getLinkPath: (id: string) => `/discussion/${id}`,
+  },
+  {
+    pattern: MENTION_PATTERNS.community,
+    type: MentionEntityType.COMMUNITY,
+    getLinkPath: (id: string) => `/${id}`,
+  },
+  {
+    pattern: MENTION_PATTERNS.proposal,
+    type: MentionEntityType.PROPOSAL,
+    getLinkPath: (id: string) => `/proposal/${id}`,
+  },
+];
+
 export const useMentionExtractor = () => {
   const extractMentionsFromText = useCallback(
     (text: string): ExtractedMention[] => {
       const mentions: ExtractedMention[] = [];
 
-      let match;
-      const userPattern = new RegExp(MENTION_PATTERNS.user);
-      while ((match = userPattern.exec(text)) !== null) {
-        mentions.push({
-          id: match[2],
-          type: MentionEntityType.USER,
-          name: match[1],
-          link: `/profile/id/${match[2]}`,
-        });
-      }
+      mentionConfigs.forEach(({ pattern, type, getLinkPath }) => {
+        const regex = new RegExp(pattern);
+        let match;
 
-      // Extract topic mentions
-      const topicPattern = new RegExp(MENTION_PATTERNS.topic);
-      while ((match = topicPattern.exec(text)) !== null) {
-        mentions.push({
-          id: match[2],
-          type: MentionEntityType.TOPIC,
-          name: match[1],
-          link: `/discussion/topic/${match[2]}`,
-        });
-      }
-
-      // Extract thread mentions
-      const threadPattern = new RegExp(MENTION_PATTERNS.thread);
-      while ((match = threadPattern.exec(text)) !== null) {
-        mentions.push({
-          id: match[2],
-          type: MentionEntityType.THREAD,
-          name: match[1],
-          link: `/discussion/${match[2]}`,
-        });
-      }
-
-      // Extract community mentions
-      const communityPattern = new RegExp(MENTION_PATTERNS.community);
-      while ((match = communityPattern.exec(text)) !== null) {
-        mentions.push({
-          id: match[2],
-          type: MentionEntityType.COMMUNITY,
-          name: match[1],
-          link: `/${match[2]}`,
-        });
-      }
-
-      // Extract proposal mentions
-      const proposalPattern = new RegExp(MENTION_PATTERNS.proposal);
-      while ((match = proposalPattern.exec(text)) !== null) {
-        mentions.push({
-          id: match[2],
-          type: MentionEntityType.PROPOSAL,
-          name: match[1],
-          link: `/proposal/${match[2]}`,
-        });
-      }
+        while ((match = regex.exec(text)) !== null) {
+          mentions.push({
+            id: match[2],
+            type,
+            name: match[1],
+            link: getLinkPath(match[2]),
+          });
+        }
+      });
 
       return mentions;
     },

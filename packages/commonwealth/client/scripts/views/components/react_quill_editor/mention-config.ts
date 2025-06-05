@@ -4,7 +4,7 @@ import { SearchEntityResult } from '../../../../../../../libs/model/src/aggregat
 
 export const MENTION_CONFIG = {
   MAX_SEARCH_RESULTS: 10,
-  MAX_MENTIONS_PER_POST: 3,
+  MAX_MENTIONS_PER_POST: 5,
   CONTEXT_DATA_DAYS: 30,
   MIN_SEARCH_LENGTH: 3,
   SEARCH_DEBOUNCE_MS: 500,

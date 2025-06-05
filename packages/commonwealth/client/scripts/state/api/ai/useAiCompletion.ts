@@ -1,4 +1,5 @@
 import { CompletionOptions } from '@hicommonwealth/shared';
+import { notifyInfo } from 'client/scripts/controllers/app/notifications';
 import { useCallback, useState } from 'react';
 import { userStore } from 'state/ui/user';
 import { trpc } from 'utils/trpcClient';
@@ -50,6 +51,7 @@ export const useAiCompletion = () => {
 
         if (hasExceededLimit) {
           console.warn('Some mentions were ignored due to limits');
+          notifyInfo('Some mentions were ignored due to limits');
         }
 
         if (validMentions.length === 0) {
