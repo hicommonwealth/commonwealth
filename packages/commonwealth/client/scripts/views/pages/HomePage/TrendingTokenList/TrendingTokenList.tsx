@@ -14,7 +14,7 @@ import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/
 import { AuthModal } from 'views/modals/AuthModal';
 import TradeTokenModal, { TradingMode } from 'views/modals/TradeTokenModel';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import TrendingToken from '../TrendingToken/TrendingToken';
 import './TrendingTokenList.scss';
 

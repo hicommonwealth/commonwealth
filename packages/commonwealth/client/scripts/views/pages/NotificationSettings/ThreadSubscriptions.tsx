@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ThreadSubscriptionEntry } from 'views/pages/NotificationSettings/ThreadSubscriptionEntry';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const ThreadSubscriptions = () => {
   const threadSubscriptions = useThreadSubscriptions();

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { Community } from '../entities/community.schemas';
 import { Thread } from '../entities/thread.schemas';
 import { PG_INT } from '../utils';

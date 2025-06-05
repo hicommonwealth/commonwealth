@@ -6,7 +6,7 @@ import {
   ThresholdData,
 } from '@hicommonwealth/shared';
 import { toBigInt } from 'web3-utils';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import type { OptionsWithBalances } from '../services';
 
 export type ValidateGroupMembershipResponse = {

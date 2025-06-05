@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { CommunityMember } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { useCommonNavigate } from '../../../../../navigation/helpers';
 import { User } from '../../../user/user';
 

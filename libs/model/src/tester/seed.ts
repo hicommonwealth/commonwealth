@@ -15,7 +15,7 @@ import z, {
   ZodOptional,
   ZodString,
   ZodUnknown,
-} from 'zod';
+} from 'zod/v4';
 import { models } from '../database';
 import type { State } from '../models';
 

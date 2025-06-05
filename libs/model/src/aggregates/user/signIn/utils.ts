@@ -7,7 +7,7 @@ import {
 } from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
 import { Transaction } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { config } from '../../../config';
 import { models } from '../../../database';
 import { AddressAttributes } from '../../../models/address';

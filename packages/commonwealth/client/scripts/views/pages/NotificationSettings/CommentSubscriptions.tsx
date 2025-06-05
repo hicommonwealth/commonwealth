@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CommentSubscriptionEntry } from 'views/pages/NotificationSettings/CommentSubscriptionEntry';
 import { useCommentSubscriptions } from 'views/pages/NotificationSettings/useCommentSubscriptions';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const CommentSubscriptions = () => {
   const commentSubscriptions = useCommentSubscriptions();

@@ -1,6 +1,6 @@
 import { InvalidState } from '@hicommonwealth/core';
 import { SubscriptionPreference } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { emitEvent } from './utils';

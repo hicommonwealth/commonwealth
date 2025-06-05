@@ -16,7 +16,7 @@ import TradeTokenModal, {
   TradingMode,
 } from 'views/modals/TradeTokenModel';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import TokenCard from '../../../components/TokenCard';
 import FiltersDrawer, {
   TokenFilters,

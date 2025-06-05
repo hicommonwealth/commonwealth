@@ -4,7 +4,7 @@ import { CWDateTimeInput } from 'views/components/component_kit/CWDateTimeInput'
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const validation = z.object({
   date: z

@@ -6,7 +6,7 @@ import { NextFunction, Request, Response } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import { RedisStore } from 'rate-limit-redis';
 import { Op } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';

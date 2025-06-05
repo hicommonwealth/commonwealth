@@ -4,7 +4,7 @@ import { emitEvent, tokenBalanceCache } from '@hicommonwealth/model';
 import { Community, EventPair, User } from '@hicommonwealth/schemas';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import {
   UPGRADE_MIN_USDC_BALANCE,
   UpgradeTierPolicy,

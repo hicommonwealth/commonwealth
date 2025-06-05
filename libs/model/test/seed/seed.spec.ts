@@ -11,7 +11,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Model, ValidationError, type ModelStatic } from 'sequelize';
 import { afterAll, describe, test } from 'vitest';
-import z from 'zod';
+import z from 'zod/v4';
 import { models } from '../../src/database';
 import { SeedOptions, seed } from '../../src/tester';
 

@@ -9,7 +9,7 @@ import {
 import { getDecodedString, slugify } from '@hicommonwealth/shared';
 import { Feed } from 'feed';
 import moment from 'moment';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { formatErrorPretty } from '../util/errorFormat';
 
 type SortByDate = {

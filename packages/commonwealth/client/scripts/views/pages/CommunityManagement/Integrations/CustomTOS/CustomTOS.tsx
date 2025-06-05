@@ -11,7 +11,7 @@ import {
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { ZodError } from 'zod';
+import { ZodError } from 'zod/v4';
 import './CustomTOS.scss';
 
 const CustomTOS = () => {

@@ -21,7 +21,7 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
-import { ZodError, ZodObject } from 'zod';
+import { ZodError, ZodObject } from 'zod/v4';
 import {
   AMOUNT_CONDITIONS,
   ERC_SPECIFICATIONS,

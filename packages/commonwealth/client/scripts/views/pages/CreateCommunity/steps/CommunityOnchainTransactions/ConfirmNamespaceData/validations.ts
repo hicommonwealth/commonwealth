@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const validationSchema = z.object({
   namespace: z.string().min(1, 'Namespace is required'),

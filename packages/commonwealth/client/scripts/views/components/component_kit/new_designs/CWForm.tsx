@@ -6,7 +6,7 @@ import React, {
   useImperativeHandle,
 } from 'react';
 import { FormProvider, UseFormReturn, useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 type FormProps = {
   id?: string;

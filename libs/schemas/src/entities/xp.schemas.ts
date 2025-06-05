@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { PG_INT } from '../utils';
 import { QuestActionMeta } from './quest.schemas';
 import { User } from './user.schemas';

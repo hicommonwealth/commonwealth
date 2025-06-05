@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { Comment } from './entities/comment.schemas';
 import { Poll } from './entities/poll.schemas';
 import { Reaction } from './entities/reaction.schemas';

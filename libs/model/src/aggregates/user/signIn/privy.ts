@@ -5,7 +5,7 @@ import {
   LinkedAccountWithMetadata,
   User as PrivyUser,
 } from '@privy-io/server-auth';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../../database';
 import { UserAttributes } from '../../../models/user';
 import { getVerifiedUserInfo } from '../../../utils/oauth/getVerifiedUserInfo';

@@ -22,7 +22,7 @@ import {
 } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { privateKeyToAccount } from 'viem/accounts';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { EvmEventSourceAttributes } from '../../models';

@@ -1,4 +1,4 @@
-import { SafeParseError } from 'zod';
+import { SafeParseError } from 'zod/v4';
 
 export function formatErrorPretty(
   validationResult: SafeParseError<any>,

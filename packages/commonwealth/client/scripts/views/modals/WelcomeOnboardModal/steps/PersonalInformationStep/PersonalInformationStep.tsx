@@ -25,7 +25,7 @@ import {
   CWFormRef,
 } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import './PersonalInformationStep.scss';
 import { personalInformationFormValidation } from './validations';
 

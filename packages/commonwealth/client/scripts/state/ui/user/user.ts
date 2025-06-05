@@ -2,7 +2,7 @@ import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { WalletId } from '@hicommonwealth/shared';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';

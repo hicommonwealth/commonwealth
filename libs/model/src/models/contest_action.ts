@@ -1,6 +1,6 @@
 import { CONTEST_ACTIONS, ContestAction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { ContestManagerAttributes } from './contest_manager';
 import type { ModelInstance } from './types';
 

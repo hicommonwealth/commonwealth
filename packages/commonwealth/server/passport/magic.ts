@@ -29,7 +29,7 @@ import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction, WhereOptions } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { config } from '../config';
 import { TypedRequestBody } from '../types';
 

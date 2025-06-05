@@ -6,7 +6,7 @@ import {
 } from '@hicommonwealth/shared';
 import { UserProfile, addressToUserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import Comment from './Comment';
 import type { Topic } from './Topic';
 import type { IUniqueId } from './interfaces';

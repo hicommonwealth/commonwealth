@@ -14,7 +14,7 @@ import {
 } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { parseAbiItem } from 'viem';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { QuestActionSubFormConfig } from './types';
 
 const questSubFormValidationSchema = z.object({

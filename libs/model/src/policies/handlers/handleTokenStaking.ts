@@ -1,5 +1,5 @@
 import { EventHandler } from '@hicommonwealth/core';
-import { ZodUndefined } from 'zod';
+import { ZodUndefined } from 'zod/v4';
 
 export const handleTokenLocked: EventHandler<
   'TokenLocked',

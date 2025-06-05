@@ -1,4 +1,4 @@
-import z from 'zod';
+import z from 'zod/v4';
 import { Poll, Vote } from '../entities';
 import { PG_INT } from '../utils';
 

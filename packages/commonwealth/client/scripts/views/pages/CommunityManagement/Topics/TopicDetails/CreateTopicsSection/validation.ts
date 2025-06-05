@@ -1,7 +1,7 @@
 import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
-import z from 'zod';
+import z from 'zod/v4';
 
 export const topicCreationValidationSchema = z.object({
   topicName: z

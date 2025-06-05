@@ -1,7 +1,7 @@
 import { Query } from '@hicommonwealth/core';
 import { ALL_COMMUNITIES, UserTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 
 export enum SearchEntityType {

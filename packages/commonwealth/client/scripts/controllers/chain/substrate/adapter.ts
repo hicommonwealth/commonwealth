@@ -3,7 +3,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateAccounts from 'controllers/chain/substrate/account';
 import type { IApp } from 'state';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import IChainAdapter from '../../../models/IChainAdapter';
 
 // The 'any' type here is only used as type for the Coin on the chain property in IChainAdapter.

@@ -3,7 +3,7 @@ import {
   COMMUNITY_NAME_REGEX,
 } from '@hicommonwealth/shared';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
-import z from 'zod';
+import z from 'zod/v4';
 
 export const baseCommunityInformationFormValidationSchema = z.object({
   communityName: z

@@ -9,7 +9,7 @@ import {
 } from 'state/api/launchPad';
 import { fetchCachedNodes } from 'state/api/nodes';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const useTokenPricing = ({ token }: { token: LaunchpadToken }) => {
   const { data: tokenCommunity } = useGetCommunityByIdQuery({

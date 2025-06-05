@@ -6,7 +6,7 @@ import {
   MIN_SCHEMA_INT,
   getFileSizeBytes,
 } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const paginationSchema = {
   limit: z.coerce

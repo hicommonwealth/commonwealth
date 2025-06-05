@@ -12,7 +12,7 @@ import chaiHttp from 'chai-http';
 import { Express } from 'express';
 import jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 

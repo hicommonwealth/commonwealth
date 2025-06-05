@@ -5,7 +5,7 @@ import axios from 'axios';
 import MinimumProfile from 'models/MinimumProfile';
 import { queryClient } from 'state/api/config';
 import { BASE_API_PATH, trpc } from 'utils/trpcClient';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { userStore } from '../../ui/user';
 const PROFILES_STALE_TIME = 30 * 1_000; // 3 minutes
 

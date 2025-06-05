@@ -8,7 +8,7 @@ import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type SolanaAccount from './account';
 
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { getChainDecimals } from '../../app/webWallets/utils';
 import { SolanaToken } from './types';
 

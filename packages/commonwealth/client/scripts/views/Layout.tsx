@@ -15,7 +15,7 @@ import { MobileScrollBuffer } from 'views/components/MobileNavigation/MobileScro
 import { ReactNativeBridgeRouter } from 'views/components/ReactNativeBridge';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import useAppStatus from '../hooks/useAppStatus';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import { useGetCommunityByIdQuery } from '../state/api/communities';

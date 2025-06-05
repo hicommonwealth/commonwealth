@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 // All events should carry this common metadata
 export const EventMetadata = z.object({

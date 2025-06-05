@@ -2,7 +2,7 @@ import { logger } from '@hicommonwealth/core';
 import { Address } from '@hicommonwealth/schemas';
 import { WalletId } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
 import type { SsoTokenInstance } from './sso_token';

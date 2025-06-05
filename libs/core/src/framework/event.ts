@@ -1,5 +1,5 @@
 import { Events } from '@hicommonwealth/schemas';
-import { ZodError, ZodSchema, ZodUndefined, z } from 'zod';
+import { ZodError, ZodType, ZodUndefined, z } from 'zod/v4';
 import {
   InvalidInput,
   type EventContext,
@@ -19,7 +19,7 @@ import {
 export const handleEvent = async <
   Name extends Events,
   Input extends EventSchemas,
-  Output extends ZodSchema | ZodUndefined = ZodUndefined,
+  Output extends ZodType | ZodUndefined = ZodUndefined,
 >(
   { inputs, body }: EventsHandlerMetadata<Input, Output>,
   { name, payload }: EventContext<Name>,
@@ -33,7 +33,9 @@ export const handleEvent = async <
     return (
       (await body[name]({
         name,
-        payload: validate ? inputs[name]!.parse(payload) : payload,
+        payload: validate
+          ? (inputs[name]!.parse(payload) as z.infer<Input>)
+          : payload,
       })) ?? undefined
     );
   } catch (error) {

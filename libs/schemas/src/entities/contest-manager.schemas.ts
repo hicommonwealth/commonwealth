@@ -1,6 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { MAX_SCHEMA_INT } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { Contest } from '../projections';
 import { PG_INT } from '../utils';
 import { Topic } from './topic.schemas';

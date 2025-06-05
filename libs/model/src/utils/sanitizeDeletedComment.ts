@@ -1,5 +1,5 @@
 import { Comment } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export function sanitizeDeletedComment(
   comment: z.infer<typeof Comment>,

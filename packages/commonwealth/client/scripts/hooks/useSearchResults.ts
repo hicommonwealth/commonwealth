@@ -7,7 +7,7 @@ import {
   SearchUserProfilesView,
   ThreadView,
 } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
 import { SearchScope } from '../models/SearchQuery';
 import app from '../state';

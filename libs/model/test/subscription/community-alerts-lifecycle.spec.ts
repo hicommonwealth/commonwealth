@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
-import z from 'zod';
+import z from 'zod/v4';
 import {
   CreateCommunityAlert,
   DeleteCommunityAlerts,

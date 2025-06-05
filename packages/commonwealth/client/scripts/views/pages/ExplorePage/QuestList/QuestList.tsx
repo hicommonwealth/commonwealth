@@ -12,7 +12,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import TotalQuestXPTag from '../../QuestDetails/TotalQuestXPTag';
 import FiltersDrawer, { QuestFilters } from './FiltersDrawer';
 import QuestCard from './QuestCard';

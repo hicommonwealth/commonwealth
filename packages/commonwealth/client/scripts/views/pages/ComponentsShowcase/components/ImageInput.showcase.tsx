@@ -7,7 +7,7 @@ import {
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const CWImageInputShowCase = () => {
   const sampleImageUrl =

@@ -1,5 +1,5 @@
 import { Roles, UserTierMap, WalletId } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { PG_INT } from '../utils';
 import { Tags } from './tag.schemas';
 

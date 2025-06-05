@@ -23,7 +23,7 @@ import {
   test,
   vi,
 } from 'vitest';
-import z from 'zod';
+import z from 'zod/v4';
 // eslint-disable-next-line max-len
 import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/subscriptionPreferencesUpdated';
 

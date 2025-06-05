@@ -1,7 +1,7 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import axios from 'axios';
 import { BASE_API_PATH, trpc } from 'utils/trpcClient';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { queryClient } from '../config';
 
 const COMMUNITIY_STALE_TIME = 60 * 3_000; // 3 mins

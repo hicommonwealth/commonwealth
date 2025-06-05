@@ -1,6 +1,6 @@
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { useState } from 'react';
-import { ZodError } from 'zod';
+import { ZodError } from 'zod/v4';
 import { SocialLinkField } from './types';
 
 const useSocialLinks = () => {

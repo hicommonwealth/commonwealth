@@ -2,7 +2,7 @@ import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { SupportedCurrencies } from 'helpers/currency';
 import NodeInfo from 'models/NodeInfo';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { CommonTradingConfig } from '../types';
 import useCommonTradeTokenFormProps from './useCommonTradeTokenForm';
 

@@ -1,5 +1,5 @@
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
-import z from 'zod';
+import z from 'zod/v4';
 
 export const tokenInformationFormValidationSchema = z.object({
   chain: z

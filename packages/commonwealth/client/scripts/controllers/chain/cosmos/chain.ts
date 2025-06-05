@@ -22,7 +22,7 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import {
   IChainModule,
   ITXData,

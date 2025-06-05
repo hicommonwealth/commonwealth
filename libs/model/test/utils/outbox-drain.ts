@@ -1,7 +1,7 @@
 import { Policy, Projection, handleEvent } from '@hicommonwealth/core';
 import { Events, events } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
-import { ZodUndefined } from 'zod';
+import { ZodUndefined } from 'zod/v4';
 import { models } from '../../src/database';
 
 type EventSchemas = typeof events;

@@ -17,7 +17,7 @@ import { ReactNativeAboutSection } from 'views/pages/NotificationSettings/ReactN
 import { ThreadSubscriptions } from 'views/pages/NotificationSettings/ThreadSubscriptions';
 import { useSupportsPushNotifications } from 'views/pages/NotificationSettings/useSupportsPushNotifications';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { CWText } from '../../components/component_kit/cw_text';
 import { LoadingIndicator } from '../../components/LoadingIndicator/LoadingIndicator';
 import './index.scss';

@@ -1,5 +1,5 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { useGetBuyPriceQuery } from '../state/api/communityStake/index';
 import { convertTokenAmountToUsd } from '../views/modals/ManageCommunityStakeModal/utils';
 

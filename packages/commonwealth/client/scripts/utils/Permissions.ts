@@ -8,7 +8,7 @@ import {
   UserFriendlyActionMap,
 } from '@hicommonwealth/shared';
 import app from 'state';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import Thread from '../models/Thread';
 import { userStore } from '../state/ui/user';
 

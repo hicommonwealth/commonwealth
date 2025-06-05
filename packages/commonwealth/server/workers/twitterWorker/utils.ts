@@ -4,7 +4,7 @@ import {
   twitterMentions,
 } from '@hicommonwealth/model';
 import { Tweet } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export function createMentionEvents(
   twitterBotConfig: TwitterBotConfig,

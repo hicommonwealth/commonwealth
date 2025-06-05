@@ -1,6 +1,6 @@
 import { Outbox } from '@hicommonwealth/core';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { ModelInstance } from './types';
 
 export type OutboxAttributes = z.infer<typeof Outbox>;

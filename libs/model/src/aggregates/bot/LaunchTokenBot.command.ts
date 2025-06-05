@@ -17,7 +17,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import _ from 'lodash';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { CreateCommunity } from '../community';

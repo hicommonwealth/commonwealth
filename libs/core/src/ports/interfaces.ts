@@ -1,6 +1,6 @@
 import { Events } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import {
   EventContext,
   EventSchemas,

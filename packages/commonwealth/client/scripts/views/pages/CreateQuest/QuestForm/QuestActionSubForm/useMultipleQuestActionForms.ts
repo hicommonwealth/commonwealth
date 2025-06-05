@@ -19,7 +19,7 @@ import {
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useState } from 'react';
-import { ZodError } from 'zod';
+import { ZodError } from 'zod/v4';
 import './QuestActionSubForm.scss';
 import {
   QuestAction,

@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { CommentsView } from '@hicommonwealth/schemas';
 import { DEFAULT_NAME, getRandomAvatar } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 import { sanitizeDeletedComment } from '../../utils';
 

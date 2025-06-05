@@ -1,6 +1,6 @@
 import { SearchCommunities } from '@hicommonwealth/schemas';
 import { trpc } from 'utils/trpcClient';
-import z from 'zod';
+import z from 'zod/v4';
 
 const SEARCH_CHAINS_STALE_TIME = 2 * 60 * 60 * 1_000; // 2 h
 

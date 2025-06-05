@@ -2,7 +2,7 @@ import { command } from '@hicommonwealth/core';
 import { CreateSnapshotProposal as CreateSnapshotProposalSchema } from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { afterEach, beforeAll, describe, expect, test } from 'vitest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models, tester } from '../../src';
 import { CreateSnapshotProposal } from '../../src/aggregates/snapshot';
 

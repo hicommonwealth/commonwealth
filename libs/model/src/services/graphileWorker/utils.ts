@@ -1,7 +1,7 @@
 import { models } from '@hicommonwealth/model';
 import { DbJob, Job, TaskSpec } from 'graphile-worker';
 import { QueryTypes, Transaction } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { preset } from './graphile.config';
 import { GraphileTaskNames, TaskPayloads } from './types';
 

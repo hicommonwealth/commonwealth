@@ -5,7 +5,7 @@ import {
   awardTweetEngagementXpTask,
 } from '@hicommonwealth/model';
 import { Task } from 'graphile-worker';
-import { ZodSchema, ZodUndefined, z } from 'zod';
+import { ZodType, ZodUndefined, z } from 'zod/v4';
 import { archiveOutboxTask } from './tasks/archiveOutbox';
 import { cleanChainEventXpSourcesTask } from './tasks/cleanChainEventXpSources';
 import { cleanSubscriptionsTask } from './tasks/cleanSubscriptions';
@@ -13,7 +13,7 @@ import { countAggregatorTask } from './tasks/countAggregator';
 import { runDbMaintenanceTask } from './tasks/runDbMaintenance';
 import { sitemapTask } from './tasks/sitemap-runner';
 
-export function taskFactory<Input extends ZodSchema | ZodUndefined>({
+export function taskFactory<Input extends ZodType | ZodUndefined>({
   input,
   fn,
 }: GraphileTask<Input>) {

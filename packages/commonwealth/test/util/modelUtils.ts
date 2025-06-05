@@ -31,7 +31,7 @@ import {
 } from '@hicommonwealth/shared';
 import chai from 'chai';
 import type { Application } from 'express';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
   const sessionMessage = {

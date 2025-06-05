@@ -1,5 +1,5 @@
 import { Image, UserProfile } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 class NewProfile {
   private _userId: number;

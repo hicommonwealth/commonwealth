@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { VoteView } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import {
   CWModalBody,
   CWModalHeader,

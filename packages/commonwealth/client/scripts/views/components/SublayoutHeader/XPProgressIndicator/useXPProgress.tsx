@@ -5,7 +5,7 @@ import moment from 'moment';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import './XPProgressIndicator.scss';
 
 const WEEKLY_XP_GOAL = 100; // Hardcoded in client per product spec.

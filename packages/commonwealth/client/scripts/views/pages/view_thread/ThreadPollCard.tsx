@@ -8,7 +8,7 @@ import { useDeletePollMutation, useVotePollMutation } from 'state/api/polls';
 import useUserStore from 'state/ui/user';
 import { SetLocalPolls } from 'utils/polls';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import Permissions from '../../../utils/Permissions';
 import { PollCard } from '../../components/Polls';
 import { getPollTimestamp } from './helpers';

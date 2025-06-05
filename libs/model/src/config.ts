@@ -5,7 +5,7 @@ import {
   config as target,
 } from '@hicommonwealth/core';
 import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const {
   SENDGRID_API_KEY,

@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import z from 'zod';
+import z from 'zod/v4';
 import { Contest, TopicAttributes } from '../../src/index';
 import { seed } from '../../src/tester';
 

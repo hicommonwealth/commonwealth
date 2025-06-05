@@ -3,7 +3,7 @@ import {
   numberNonDecimalGTZeroValidationSchema,
 } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { QuestTypes } from './types';
 
 // update in future if required

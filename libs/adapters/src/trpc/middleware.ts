@@ -1,6 +1,6 @@
 import { analytics, logger } from '@hicommonwealth/core';
 import type { Request } from 'express';
-import { ZodSchema, z } from 'zod';
+import { ZodType, z } from 'zod/v4';
 import { config } from '../config';
 import type { Context, OutputMiddleware, Track } from './types';
 
@@ -9,10 +9,7 @@ const log = logger(import.meta);
 /**
  * Fire and forget wrapper for output middleware
  */
-export function fireAndForget<
-  Input extends ZodSchema,
-  Output extends ZodSchema,
->(
+export function fireAndForget<Input extends ZodType, Output extends ZodType>(
   fn: (
     input: z.infer<Input>,
     output: z.infer<Output>,
@@ -61,7 +58,7 @@ export function getAnalyticsPayload(
   };
 }
 
-async function resolveTrack<Input extends ZodSchema, Output extends ZodSchema>(
+async function resolveTrack<Input extends ZodType, Output extends ZodType>(
   track: Track<Input, Output>,
   input: z.infer<Input>,
   output: z.infer<Output>,
@@ -74,10 +71,9 @@ async function resolveTrack<Input extends ZodSchema, Output extends ZodSchema>(
 /**
  * Output middleware that tracks analytics in fire-and-forget mode
  */
-export function trackAnalytics<
-  Input extends ZodSchema,
-  Output extends ZodSchema,
->(track: Track<Input, Output>): OutputMiddleware<Input, Output> {
+export function trackAnalytics<Input extends ZodType, Output extends ZodType>(
+  track: Track<Input, Output>,
+): OutputMiddleware<Input, Output> {
   return (input, output, ctx) => {
     void resolveTrack(track, input, output)
       .then(([event, data]) => {

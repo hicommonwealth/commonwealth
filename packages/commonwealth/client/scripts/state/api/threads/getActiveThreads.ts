@@ -1,7 +1,7 @@
 import * as schemas from '@hicommonwealth/schemas';
 import Thread from 'client/scripts/models/Thread';
 import { trpc } from 'utils/trpcClient';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const GET_THREADS_STALE_TIME = 100 * 1_000; // 100 s
 

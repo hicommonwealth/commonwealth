@@ -11,7 +11,7 @@ import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { User } from 'views/components/user/user';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import './ViewPollVotesDrawer.scss';
 

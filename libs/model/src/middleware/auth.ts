@@ -29,7 +29,7 @@ import {
   Role,
 } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
-import { ZodSchema, z } from 'zod';
+import { ZodType, z } from 'zod/v4';
 import { models } from '../database';
 import { AddressInstance } from '../models';
 import { BannedActor, NonMember, RejectedMember } from './errors';
@@ -332,7 +332,7 @@ GROUP BY
  * Generic authorization guard used by all middleware once the authorization context is loaded
  */
 async function mustBeAuthorized(
-  { actor, context }: Context<ZodSchema, ZodSchema>,
+  { actor, context }: Context<ZodType, ZodType>,
   check: {
     permissions?: {
       topic_id: number;
@@ -413,7 +413,7 @@ export const systemActor = ({
   is_system_actor: true,
 });
 
-export async function isSuperAdmin(ctx: Context<ZodSchema, ZodSchema>) {
+export async function isSuperAdmin(ctx: Context<ZodType, ZodType>) {
   if (!ctx.actor.user.isAdmin)
     await Promise.reject(new InvalidActor(ctx.actor, 'Must be a super admin'));
 }

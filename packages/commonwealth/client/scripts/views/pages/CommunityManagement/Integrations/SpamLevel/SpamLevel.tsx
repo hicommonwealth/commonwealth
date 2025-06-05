@@ -12,7 +12,7 @@ import {
 } from 'state/api/communities';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import './SpamLevel.scss';
 import { SpamLevelOptions } from './utils';
 const SpamLevel = () => {

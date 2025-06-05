@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { fetchNodes } from 'state/api/nodes';
 import useUserStore from 'state/ui/user';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { TradingMode } from '../../types';
 import { UseCommonTradeTokenFormProps } from './types';
 import useBuyTrade from './useBuyTrade';

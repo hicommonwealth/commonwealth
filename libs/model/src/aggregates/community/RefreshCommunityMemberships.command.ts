@@ -8,7 +8,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType, type Requirement } from '@hicommonwealth/shared';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { config } from '../../config';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';

@@ -13,7 +13,7 @@ import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,

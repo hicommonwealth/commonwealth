@@ -1,7 +1,7 @@
 import { Broker, Outbox, logger, stats } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { config } from '../config';
 
 const log = logger(import.meta);

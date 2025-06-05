@@ -13,7 +13,7 @@ import {
 } from '@hicommonwealth/schemas';
 import { CommunityTierMap } from '@hicommonwealth/shared';
 import dayjs from 'dayjs';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import type {
   AddressInstance,
   CommentInstance,

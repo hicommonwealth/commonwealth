@@ -5,7 +5,7 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
-import z from 'zod';
+import z from 'zod/v4';
 import { models } from '../../database';
 import { getProfileUrl, getThreadUrl } from '../utils/utils';
 

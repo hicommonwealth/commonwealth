@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { PG_ETH } from '../utils';
 
 export const LaunchpadToken = z.object({

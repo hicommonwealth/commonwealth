@@ -1,6 +1,6 @@
 import { GetPinnedTokens } from '@hicommonwealth/schemas';
 import { trpc } from 'utils/trpcClient';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const FETCH_PINNED_TOKEN_STALE_TIME = 60 * 3_000; // 3 mins
 

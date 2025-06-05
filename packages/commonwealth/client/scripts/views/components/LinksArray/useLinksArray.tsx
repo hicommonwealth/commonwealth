@@ -1,6 +1,6 @@
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { useState } from 'react';
-import { ZodError } from 'zod';
+import { ZodError } from 'zod/v4';
 import { Link, LinksArrayHookProps } from './types';
 
 const useLinksArray = ({

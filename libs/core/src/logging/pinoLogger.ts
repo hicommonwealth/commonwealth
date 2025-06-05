@@ -1,5 +1,5 @@
 import pino, { DestinationStream } from 'pino';
-import { ZodError } from 'zod';
+import { ZodError } from 'zod/v4';
 import { config } from '../config';
 import { LogLevel } from '../ports/enums';
 import { GetLogger, LogContext, LoggerIds } from './interfaces';

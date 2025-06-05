@@ -11,7 +11,7 @@ import {
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models, sequelize } from '../../database';
 
 async function getUserByAddressId(address_id: number) {

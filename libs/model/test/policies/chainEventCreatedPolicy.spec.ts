@@ -5,7 +5,7 @@ import { Community } from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { handleCommunityStakeTrades } from '../../src/policies/handlers/handleCommunityStakeTrades';
 
 // These are all values for a real txn on the Ethereum Sepolia Testnet

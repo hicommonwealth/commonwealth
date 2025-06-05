@@ -7,7 +7,7 @@ import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import Web3, { Web3BaseProvider } from 'web3';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type EthereumAccount from './account';
 

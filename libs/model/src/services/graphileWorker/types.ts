@@ -1,6 +1,6 @@
 import { events } from '@hicommonwealth/schemas';
 import { CronItem, JobHelpers, PromiseOrDirect } from 'graphile-worker';
-import { z, ZodSchema, ZodUndefined } from 'zod';
+import { z, ZodType, ZodUndefined } from 'zod/v4';
 
 export enum GraphileTaskNames {
   ArchiveOutbox = 'ArchiveOutbox',
@@ -12,7 +12,7 @@ export enum GraphileTaskNames {
   CountAggregator = 'CountAggregator',
 }
 
-export type GraphileTask<Input extends ZodSchema> = {
+export type GraphileTask<Input extends ZodType> = {
   readonly input: Input;
   readonly fn: (
     payload: z.infer<Input>,
@@ -32,4 +32,4 @@ export const TaskPayloads = {
   RunDbMaintenance: z.object({}),
   AwardTweetEngagementXp: events.TweetEngagementCapReached,
   CountAggregator: z.object({}),
-} as const satisfies Record<GraphileTaskNames, ZodSchema | ZodUndefined>;
+} as const satisfies Record<GraphileTaskNames, ZodType | ZodUndefined>;

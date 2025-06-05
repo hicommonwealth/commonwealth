@@ -11,7 +11,7 @@ import {
   Roles,
   WalletId,
 } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { AuthContext, TopicContext, VerifiedContext } from '../context';
 import { Community } from '../entities/community.schemas';
 import { Group, Requirement } from '../entities/group.schemas';

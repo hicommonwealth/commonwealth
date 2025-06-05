@@ -1,5 +1,5 @@
 import { configure, logger, config as target } from '@hicommonwealth/core';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const log = logger(import.meta);
 

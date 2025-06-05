@@ -8,7 +8,7 @@ import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import { userStore } from 'state/ui/user';
 import { hexToNumber } from 'web3-utils';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import BlockInfo from '../../../models/BlockInfo';
 import IWebWallet from '../../../models/IWebWallet';
 

@@ -1,7 +1,7 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { ContestFeeType } from 'views/pages/CommunityManagement/Contests/ManageContest/types';
-import z from 'zod';
+import z from 'zod/v4';
 
 export const detailsFormValidationSchema = (isFarcasterContest: boolean) => {
   return z.object({

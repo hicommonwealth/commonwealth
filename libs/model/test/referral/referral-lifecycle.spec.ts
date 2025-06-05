@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { EventPair, EventSchemas } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import {
   CreateCommunity,
   UpdateCommunity,

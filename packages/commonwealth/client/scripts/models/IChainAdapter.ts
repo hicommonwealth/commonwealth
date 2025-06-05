@@ -5,7 +5,7 @@ import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { darkModeStore } from '../state/ui/darkMode/darkMode';
 import Account from './Account';
 import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';

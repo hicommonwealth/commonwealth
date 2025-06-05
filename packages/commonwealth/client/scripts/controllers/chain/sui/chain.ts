@@ -8,7 +8,7 @@ import { ApiStatus } from 'state';
 import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type SuiAccount from './account';
 
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { getChainDecimals } from '../../app/webWallets/utils';
 import { SuiToken } from './types';
 

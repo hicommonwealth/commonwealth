@@ -2,7 +2,7 @@ import { logger } from '@hicommonwealth/core';
 import { XpLogName } from '@hicommonwealth/schemas';
 import { WalletSsoSource } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { config } from '../../config';
 import { models, sequelize } from '../../database';
 import { QuestActionMetaAttributes, QuestAttributes } from '../../models/quest';

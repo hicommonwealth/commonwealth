@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { EVM_ADDRESS } from '../utils';
 import { ChainNode } from './chain.schemas';
 

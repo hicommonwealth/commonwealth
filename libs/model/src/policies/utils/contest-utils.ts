@@ -4,7 +4,7 @@ import {
   voteContentBatch,
 } from '@hicommonwealth/evm-protocols';
 import { ContestAction } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { config } from '../../config';
 
 const log = logger(import.meta);
