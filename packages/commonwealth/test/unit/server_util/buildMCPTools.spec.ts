@@ -27,16 +27,9 @@ describe('buildMCPTools', () => {
     expect(getCommunityTool).to.exist;
     expect(getCommunityTool!.inputSchema).to.exist;
     expect(getCommunityTool!.fn).to.exist;
-    const community = (await getCommunityTool!.fn(
-      {
-        user: {
-          id: -1,
-          email: 'mcp@common.im',
-          isAdmin: true,
-        },
-      },
-      { id: 'ethereum' },
-    )) as any;
+    const community = (await getCommunityTool!.fn('test', {
+      id: 'ethereum',
+    })) as any;
     expect(community).to.exist;
     expect(community!.id).to.equal('ethereum');
     expect(community!.name).to.equal('Ethereum');

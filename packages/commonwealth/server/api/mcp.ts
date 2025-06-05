@@ -1,5 +1,5 @@
-import { Actor, logger } from '@hicommonwealth/core';
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { logger } from '@hicommonwealth/core';
+import { AuthInfo, Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
   CallToolRequestSchema,
@@ -10,9 +10,13 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
+import { IncomingMessage } from 'http';
 import { z, ZodSchema } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
-import { api as externalApi, trpcRouter } from './external-router';
+import {
+  api as externalApi,
+  trpcRouter as externalTrpcRouter,
+} from './external-router';
 
 const log = logger(import.meta);
 
@@ -20,7 +24,7 @@ type CommonMCPTool = {
   name: string;
   description: string;
   inputSchema: z.ZodSchema;
-  fn: (actor: Actor, args: unknown) => Promise<unknown>;
+  fn: (token: string | null, input: unknown) => Promise<unknown>;
 };
 
 // map external trpc router procedures to MCP tools
@@ -38,24 +42,18 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
       name: key,
       description: inputSchema._def.description || '',
       inputSchema,
-      fn: async (user: Actor, args: unknown) => {
-        const trpcCaller = trpcRouter.createCaller({
+      fn: async (token: string | null, input: unknown) => {
+        const trpcCaller = externalTrpcRouter.createCaller({
           req: {
-            user,
-            headers: {},
+            user: {},
+            headers: {
+              Authorization: token ? `Bearer ${token}` : undefined,
+            },
           } as any,
           res: {} as any,
-          actor: user,
+          actor: {} as any,
         });
-        const procedurePath = key.split('.');
-        let currentCaller: any = trpcCaller;
-        for (const segment of procedurePath) {
-          currentCaller = currentCaller[segment];
-          if (!currentCaller) {
-            throw new Error(`Procedure ${key} not found`);
-          }
-        }
-        return await currentCaller(args);
+        return await trpcCaller[key](input as any);
       },
     };
   });
@@ -94,7 +92,7 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
     };
   });
 
-  mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
+  mcpServer.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
     const { name, arguments: args } = request.params;
 
     if (!(name in toolsMap)) {
@@ -111,14 +109,10 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
 
     try {
       const validatedArgs = toolsMap[name].inputSchema.parse(args);
-      const actor: Actor = {
-        user: {
-          id: -1,
-          email: 'mcp@common.im',
-          isAdmin: true,
-        },
-      };
-      const result = await toolsMap[name].fn(actor, validatedArgs);
+      const result = await toolsMap[name].fn(
+        extra?.authInfo?.['token'] || null,
+        validatedArgs,
+      );
       return {
         content: [
           {
@@ -181,6 +175,12 @@ export function buildMCPRouter() {
   // handle post requests
   router.post('/', async (req: Request, res: Response) => {
     try {
+      const authHeader =
+        req.headers['authorization'] || req.headers['Authorization'];
+      const authToken = authHeader?.toString().split(' ')[1];
+      if (!authToken) {
+        throw new Error('No authorization token provided');
+      }
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined,
       });
@@ -188,6 +188,10 @@ export function buildMCPRouter() {
         transport.close();
       });
       await mcpServer.connect(transport);
+
+      (req as IncomingMessage & { auth?: AuthInfo }).auth = {
+        token: authToken,
+      };
       await transport.handleRequest(req, res, req.body);
     } catch (error) {
       log.error('Error handling MCP request:', error);
