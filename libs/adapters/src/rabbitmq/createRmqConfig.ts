@@ -32,8 +32,16 @@ export function createRmqConfig({
   map: Array<Consumer>;
 }) {
   let vhost: string;
+  let connection = <ConnectionConfig>rabbitMqUri;
   if (rabbitMqUri.includes('localhost') || rabbitMqUri.includes('127.0.0.1')) {
     vhost = '/';
+    // necessary until rascal upgrades amqp version >= 0.10.6
+    connection = {
+      url: rabbitMqUri,
+      options: {
+        frameMax: 131072,
+      },
+    };
   } else {
     const count = (rabbitMqUri.match(/\//g) || []).length;
     if (count == 3) {
@@ -65,7 +73,7 @@ export function createRmqConfig({
   const config: BrokerConfig = {
     vhosts: {
       [vhost]: {
-        connection: <ConnectionConfig>rabbitMqUri,
+        connection,
         exchanges: {
           [RascalExchanges.DeadLetter]: {
             ...exchangeConfig,
