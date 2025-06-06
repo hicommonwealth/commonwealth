@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { logger, User } from '@hicommonwealth/core';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
@@ -21,11 +21,11 @@ import { apiKeyAuthMiddleware } from './external-router-middleware';
 
 const log = logger(import.meta);
 
-type CommonMCPTool = {
+type CommonMCPTool<T extends z.ZodSchema = z.ZodSchema> = {
   name: string;
   description: string;
-  inputSchema: z.ZodSchema;
-  fn: (token: string | null, input: unknown) => Promise<unknown>;
+  inputSchema: T;
+  fn: (token: string | null, input: z.infer<T>) => Promise<unknown>;
 };
 
 // map external trpc router procedures to MCP tools
@@ -43,7 +43,7 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
       name: key,
       description: inputSchema._def.description || '',
       inputSchema,
-      fn: async (token: string | null, input: unknown) => {
+      fn: async (token: string | null, input: z.infer<typeof inputSchema>) => {
         const [address, apiKey] = token?.split(':') || [];
 
         // build request and response objects to pass to the middleware
@@ -53,15 +53,15 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
             'x-api-key': apiKey,
           },
           path: `/${key}`,
-        } as any;
+        } as unknown as Request & { user: User };
 
-        const res = {} as any;
+        const res = {} as Response;
 
         // execute api key middleware
-        let err: any;
-        await apiKeyAuthMiddleware(req, res, (error?: any) => {
+        let err: Error | null = null;
+        await apiKeyAuthMiddleware(req, res, (error?: unknown) => {
           if (error) {
-            err = error;
+            err = error as Error;
           }
         });
         if (err) {
@@ -78,7 +78,7 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
           },
         });
 
-        return await trpcCaller[key](input as any);
+        return await trpcCaller[key](input);
       },
     };
   });
@@ -107,7 +107,7 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
     },
   );
 
-  mcpServer.setRequestHandler(ListToolsRequestSchema, async () => {
+  mcpServer.setRequestHandler(ListToolsRequestSchema, () => {
     return {
       tools: tools.map((tool) => ({
         name: tool.name,
@@ -117,7 +117,7 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
     };
   });
 
-  mcpServer.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
+  mcpServer.setRequestHandler(CallToolRequestSchema, (request, extra) => {
     const { name, arguments: args } = request.params;
 
     if (!(name in toolsMap)) {
@@ -160,23 +160,34 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
     }
   });
 
-  mcpServer.setRequestHandler(ListResourceTemplatesRequestSchema, async () => {
+  mcpServer.setRequestHandler(ListResourceTemplatesRequestSchema, () => {
     return {
       resourceTemplates: [],
     };
   });
 
-  mcpServer.setRequestHandler(ListResourcesRequestSchema, async () => {
+  mcpServer.setRequestHandler(ListResourcesRequestSchema, () => {
     return {
       resources: [],
     };
   });
 
-  mcpServer.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+  mcpServer.setRequestHandler(ReadResourceRequestSchema, (request) => {
     throw new Error(`Unknown resource: ${request.params.uri}`);
   });
 
   return mcpServer;
+};
+
+const unsupportedMethodHandler = (req: Request, res: Response) => {
+  res.status(405).json({
+    jsonrpc: '2.0',
+    error: {
+      code: -32000,
+      message: 'Method not allowed.',
+    },
+    id: null,
+  });
 };
 
 export function buildMCPRouter() {
@@ -198,6 +209,8 @@ export function buildMCPRouter() {
   );
 
   // handle post requests
+
+  // eslint-disable-next-line
   router.post('/', async (req: Request, res: Response) => {
     try {
       const authHeader =
@@ -209,8 +222,10 @@ export function buildMCPRouter() {
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined,
       });
-      res.on('close', () => {
-        transport.close();
+
+      // eslint-disable-next-line
+      res.on('close', async () => {
+        await transport.close();
       });
       await mcpServer.connect(transport);
 
@@ -234,28 +249,9 @@ export function buildMCPRouter() {
   });
 
   // handle unsupported methods
-  router.get('/', async (req: Request, res: Response) => {
-    res.status(405).json({
-      jsonrpc: '2.0',
-      error: {
-        code: -32000,
-        message: 'Method not allowed.',
-      },
-      id: null,
-    });
-  });
-
-  // handle delete requests
-  router.delete('/', async (req: Request, res: Response) => {
-    res.status(405).json({
-      jsonrpc: '2.0',
-      error: {
-        code: -32000,
-        message: 'Method not allowed.',
-      },
-      id: null,
-    });
-  });
+  router.get('/', unsupportedMethodHandler);
+  router.put('/', unsupportedMethodHandler);
+  router.delete('/', unsupportedMethodHandler);
 
   return router;
 }

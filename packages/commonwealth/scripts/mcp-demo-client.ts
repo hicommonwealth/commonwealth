@@ -92,27 +92,16 @@ async function startChatBot() {
       previousResponseId = resp.id;
 
       // Display the response
-      console.log(
-        `🤖 Assistant: ${(resp as any).output_text || (resp as any).output}\n`,
-      );
-
-      // Handle any tool calls if present in the response
-      if ((resp as any).items) {
-        const toolCalls = (resp as any).items.filter(
-          (item: any) => item.type === 'mcp_tool_call',
-        );
-        if (toolCalls.length > 0) {
-          console.log('🔧 Tool calls made:', toolCalls.length);
-        }
-      }
-    } catch (error: any) {
-      console.error('❌ Error:', error?.message || error);
+      console.log(`🤖 Assistant: ${resp.output_text || resp.output}\n`);
+    } catch (error: unknown) {
+      const err = error as Error;
+      console.error('❌ Error:', err.message);
       console.log('Please try again.\n');
 
       // If there's an authentication or server error, show more details
-      if (error?.status === 401) {
+      if (err.message.includes('401')) {
         console.log('Check your OpenAI API key and MCP server credentials.\n');
-      } else if (error?.status === 404) {
+      } else if (err.message.includes('404')) {
         console.log("Check your MCP server URL and ensure it's accessible.\n");
       }
     }
