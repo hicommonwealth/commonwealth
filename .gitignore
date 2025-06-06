@@ -21,3 +21,5 @@ redis-data
 **/*.dump.sql.gz
 external-production-openapi.json
 external-openapi.json
+**/terraform.tfvars
+**/.terraform
