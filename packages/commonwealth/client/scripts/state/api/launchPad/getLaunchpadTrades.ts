@@ -15,7 +15,6 @@ const useGetLaunchpadTradesQuery = ({
     },
     {
       gcTime: FETCH_TOKENS_STALE_TIME,
-      staleTime: FETCH_TOKENS_STALE_TIME,
     },
   );
 };
