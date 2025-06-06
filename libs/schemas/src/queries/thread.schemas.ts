@@ -1,5 +1,5 @@
 import { LinkSource } from '@hicommonwealth/shared';
-import { ZodType, z } from 'zod/v4';
+import { z } from 'zod/v4';
 import { AuthContext } from '../context';
 import {
   Address,
@@ -84,7 +84,6 @@ export const UserView = z.object({
   referred_by_address: z.string().nullish(),
   xp_referrer_points: PG_INT.default(0).nullish(),
 });
-type UserView = z.infer<typeof UserView>;
 
 export const AddressView = Address.extend({
   id: PG_INT,
@@ -93,7 +92,7 @@ export const AddressView = Address.extend({
   last_active: z.date().or(z.string()).nullish(),
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
-  User: UserView.optional().nullish() as ZodType<UserView | null | undefined>,
+  User: UserView.nullish(),
 }).omit({
   oauth_email: true,
   oauth_provider: true,
@@ -128,18 +127,16 @@ export const CommentVersionHistoryView = CommentVersionHistory.extend({
   timestamp: z.date().or(z.string()),
 });
 
-export const CommentView = Comment.extend({
+export const CommentView = Comment.omit({ Thread: true, search: true }).extend({
   id: PG_INT,
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
   deleted_at: z.date().or(z.string()).nullish(),
   marked_as_spam_at: z.date().or(z.string()).nullish(),
   Address: AddressView.nullish(),
-  Thread: z.undefined(),
   community_id: z.string(),
   last_active: z.date().or(z.string()).nullish(),
   Reaction: ReactionView.nullish(),
-  search: z.undefined(),
   // this is returned by GetThreads
   address: z.string(),
   profile_name: z.string().optional(),

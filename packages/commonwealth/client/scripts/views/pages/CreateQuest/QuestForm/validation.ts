@@ -19,17 +19,15 @@ export const buildDynamicQuestFormValidationSchema = ({
   return z
     .object({
       start_date: z
-        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+        .string()
         .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-      end_date: z
-        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-        .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+      end_date: z.string().nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
       name: z
-        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+        .string()
         .min(5, { message: VALIDATION_MESSAGES.MIN_CHAR_LIMIT_REQUIRED(5) })
         .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
       description: z
-        .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+        .string()
         .min(10, { message: VALIDATION_MESSAGES.MIN_CHAR_LIMIT_REQUIRED(10) })
         .max(250, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
         .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
@@ -58,18 +56,13 @@ export const buildDynamicQuestFormValidationSchema = ({
       ),
       quest_type: z.enum([QuestTypes.Channel, QuestTypes.Common]),
       community: z
-        .object(
-          {
-            value: z.string(),
-            label: z.object({
-              name: z.string(),
-              imageURL: z.string(),
-            }),
-          },
-          {
-            invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-          },
-        )
+        .object({
+          value: z.string(),
+          label: z.object({
+            name: z.string(),
+            imageURL: z.string(),
+          }),
+        })
         .optional()
         .nullish(),
     })

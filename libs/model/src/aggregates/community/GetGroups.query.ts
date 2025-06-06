@@ -81,7 +81,6 @@ export function GetGroups(): Query<typeof schemas.GetGroups> {
               topic &&
                 g.topics.push({
                   ...topic!,
-                  contest_topics: undefined,
                   is_private: p.is_private,
                   permissions: p.permissions,
                 });

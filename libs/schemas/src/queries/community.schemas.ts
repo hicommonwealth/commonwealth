@@ -207,11 +207,12 @@ export const GetStakeHistoricalPrice = {
     .array(),
 };
 
-export const ConstestManagerView = ContestManager.extend({
+export const ConstestManagerView = ContestManager.omit({
+  contests: true,
+  topics: true,
+}).extend({
   created_at: z.string(),
   deleted_at: z.string().nullish(),
-  topics: z.undefined(),
-  contests: z.undefined(),
   content: z.array(
     projections.ContestAction.extend({
       cast_deleted_at: z.string().nullish(),
@@ -225,7 +226,6 @@ export const TopicView = Topic.extend({
   updated_at: z.date().or(z.string()).nullish(),
   deleted_at: z.date().or(z.string()).nullish(),
   archived_at: z.date().or(z.string()).nullish(),
-  contest_topics: z.undefined(),
   total_threads: z.number().default(0),
   active_contest_managers: z.array(ConstestManagerView).optional(),
   allow_tokenized_threads: z.boolean().optional(),

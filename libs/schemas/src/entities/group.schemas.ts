@@ -117,6 +117,8 @@ export const MembershipRejectReason = z
   .array()
   .optional();
 
+export type MembershipRejectReason = z.infer<typeof MembershipRejectReason>;
+
 export const Membership = z.object({
   group_id: z.number(),
   address_id: z.number(),
