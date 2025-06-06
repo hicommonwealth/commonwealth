@@ -19,6 +19,7 @@ export const GetQuest = {
 
 export const GetQuests = {
   input: PaginationParamsSchema.extend({
+    search: z.string().optional(),
     community_id: z.string().optional(),
     start_after: z.coerce.date().optional(),
     start_before: z.coerce.date().optional(),
@@ -27,6 +28,6 @@ export const GetQuests = {
     include_system_quests: z.boolean().default(false).optional(),
   }),
   output: PaginatedResultSchema.extend({
-    results: z.array(QuestView),
+    results: z.array(z.any()),
   }),
 };

@@ -11,6 +11,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
     secure: false,
     body: async ({ payload }) => {
       const {
+        search = '',
         community_id,
         cursor,
         limit,
@@ -27,6 +28,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
       const order = order_by || 'created_at';
       const offset = limit! * (cursor! - 1);
       const replacements = {
+        search: search ? `%${search.toLowerCase()}%` : '',
         direction,
         community_id,
         order,
@@ -44,6 +46,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         start_before ? `Q.start_date <= :start_before` : '',
         end_after ? `Q.end_date > :end_after` : '',
         end_before ? `Q.end_date <= :end_before` : '',
+        search ? 'LOWER(Q.name) LIKE :search' : '',
       ].filter(Boolean);
 
       const sql = `

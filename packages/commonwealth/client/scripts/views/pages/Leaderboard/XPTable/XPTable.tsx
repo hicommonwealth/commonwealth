@@ -10,6 +10,7 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import TrustLevelRole from 'views/components/TrustLevelRole';
 
 import './XPTable.scss';
@@ -37,7 +38,12 @@ const columns: CWTableColumnInfo[] = [
   },
 ];
 
-const XPTable = () => {
+type XPTableProps = {
+  searchText?: string;
+  onClearSearch?: () => void;
+};
+
+const XPTable = ({ searchText, onClearSearch }: XPTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedQuest, setSelectedQuest] = useState<{
     value: string;
@@ -68,6 +74,7 @@ const XPTable = () => {
   const { data = [], isLoading } = useGetXPsRanked({
     top: currentPage * USERS_PER_PAGE,
     quest_id: selectedQuest ? parseInt(selectedQuest.value) : undefined,
+    search: searchText?.trim(),
   });
 
   const rankings = data.map((rank, index) => ({
@@ -83,8 +90,15 @@ const XPTable = () => {
   }));
 
   return (
-    <section className="XPTable">
-      <div className="filters">
+    <>
+      <div className="xp-filters">
+        {searchText?.trim() && (
+          <CWTag
+            label={`Search: ${searchText?.trim()}`}
+            type="filter"
+            onCloseClick={onClearSearch}
+          />
+        )}
         <div className="quest-filter">
           <CWSelectList
             placeholder="Filter by Quest"
@@ -99,49 +113,50 @@ const XPTable = () => {
           />
         </div>
       </div>
-
-      {!isLoading && rankings.length === 0 ? (
-        <CWText type="h2" className="empty-rankings">
-          No Users have earned aura yet{' '}
-          {selectedQuest ? `for "${selectedQuest.label}" quest` : ''}
-        </CWText>
-      ) : (
-        <>
-          <CWTable
-            columnInfo={tableState.columns}
-            sortingState={tableState.sorting}
-            setSortingState={tableState.setSorting}
-            rowData={rankings.map((rank) => ({
-              ...rank,
-              username: {
-                sortValue: rank.user_profile.name,
-                customElement: (
-                  <div className="table-cell">
-                    <Link
-                      to={`/profile/id/${rank.user_profile.id}`}
-                      className="user-info"
-                    >
-                      <Avatar
-                        url={rank.user_profile.avatar_url ?? ''}
-                        size={24}
-                        address={rank.user_profile.id}
-                      />
-                      <p>
-                        {rank.user_profile.name}
-                        <TrustLevelRole
-                          type="user"
-                          level={rank.user_profile.tier}
+      <section className="XPTable">
+        {!isLoading && rankings.length === 0 ? (
+          <CWText type="h2" className="empty-rankings">
+            No Users have earned aura yet{' '}
+            {selectedQuest ? `for "${selectedQuest.label}" quest` : ''}
+          </CWText>
+        ) : (
+          <>
+            <CWTable
+              columnInfo={tableState.columns}
+              sortingState={tableState.sorting}
+              setSortingState={tableState.setSorting}
+              rowData={rankings.map((rank) => ({
+                ...rank,
+                username: {
+                  sortValue: rank.user_profile.name,
+                  customElement: (
+                    <div className="table-cell">
+                      <Link
+                        to={`/profile/id/${rank.user_profile.id}`}
+                        className="user-info"
+                      >
+                        <Avatar
+                          url={rank.user_profile.avatar_url ?? ''}
+                          size={24}
+                          address={rank.user_profile.id}
                         />
-                      </p>
-                    </Link>
-                  </div>
-                ),
-              },
-            }))}
-          />
-        </>
-      )}
-    </section>
+                        <p>
+                          {rank.user_profile.name}
+                          <TrustLevelRole
+                            type="user"
+                            level={rank.user_profile.tier}
+                          />
+                        </p>
+                      </Link>
+                    </div>
+                  ),
+                },
+              }))}
+            />
+          </>
+        )}
+      </section>
+    </>
   );
 };
 

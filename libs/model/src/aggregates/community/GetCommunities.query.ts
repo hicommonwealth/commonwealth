@@ -32,6 +32,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         eth_chain_id,
         cosmos_chain_id,
         community_type,
+        search = '',
       } = payload;
 
       // pagination configuration
@@ -46,12 +47,14 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         user_id?: number;
         eth_chain_id?: number;
         cosmos_chain_id?: string;
+        search?: string;
       } = {};
       if (eth_chain_id) replacements.eth_chain_id = eth_chain_id;
       if (cosmos_chain_id) replacements.cosmos_chain_id = cosmos_chain_id;
       if (filtering_tags) replacements.tag_ids = tag_ids;
       if (relevance_by === 'membership')
         replacements.user_id = actor?.user?.id || 0;
+      if (search?.trim()) replacements.search = `%${search}%`;
 
       const date30DaysAgo = new Date(+new Date() - 1000 * 24 * 60 * 60 * 30);
       const communityCTE = `
@@ -109,6 +112,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
           WHERE  "Community"."active" = true AND "Community".tier != ${CommunityTierMap.SpamCommunity}
               ${iQ(base, `AND "Community"."base" = '${base}'`)}
               ${iQ(network, `AND "Community"."network" = '${network}'`)}
+              ${iQ(search, `AND LOWER("Community"."name") LIKE LOWER(:search)`)}
               ${iQ(
                 community_type,
                 `

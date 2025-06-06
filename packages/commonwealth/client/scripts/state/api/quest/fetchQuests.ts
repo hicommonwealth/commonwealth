@@ -18,6 +18,7 @@ const useFetchQuestsQuery = ({
   order_by,
   order_direction,
   include_system_quests,
+  search,
   enabled = true,
 }: UseFetchQuestsProps) => {
   return trpc.quest.getQuests.useInfiniteQuery(
@@ -31,6 +32,7 @@ const useFetchQuestsQuery = ({
       order_by,
       order_direction,
       include_system_quests,
+      search,
     },
     {
       cacheTime: FETCH_QUESTS_STALE_TIME,
