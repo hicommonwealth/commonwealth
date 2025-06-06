@@ -78,7 +78,8 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
           },
         });
 
-        return await trpcCaller[key](input);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return await (trpcCaller as any)[key](input);
       },
     };
   });
