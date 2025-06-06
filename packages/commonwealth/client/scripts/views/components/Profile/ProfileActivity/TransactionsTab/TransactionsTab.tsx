@@ -19,7 +19,7 @@ import TransactionsHistory from './TransactionHistory';
 import './TransactionsTab.scss';
 import useTransactionHistory from './useTransactionHistory';
 
-type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._type;
+type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._output;
 
 type TransactionHistoryItem = {
   address: string;

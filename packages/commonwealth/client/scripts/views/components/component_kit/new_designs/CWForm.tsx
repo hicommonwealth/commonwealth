@@ -40,7 +40,7 @@ const CWForm = forwardRef<UseFormReturn, FormProps>(
     ref,
   ) => {
     const formMethods: UseFormReturn = useForm({
-      resolver: zodResolver(validationSchema),
+      resolver: zodResolver(validationSchema as any),
       defaultValues: initialValues,
       mode: 'all',
     });

@@ -67,10 +67,6 @@ export const groupValidationSchema = z.object({
           value: z.any().default(-1).optional(),
           label: z.string().default('').optional(),
         }),
-        {
-          invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-          required_error: VALIDATION_MESSAGES.NO_INPUT,
-        },
       )
       .optional(),
     z.literal('').transform(() => []),

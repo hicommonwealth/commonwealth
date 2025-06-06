@@ -99,7 +99,7 @@ const useQuestActionMultiFormsState = ({
       schema.parse(values);
     } catch (e) {
       const zodError = e as ZodError;
-      zodError.errors.map((error) => {
+      zodError.issues.map((error) => {
         errors = {
           ...errors,
           [error.path[0] as keyof QuestActionSubFormErrors]: error.message,

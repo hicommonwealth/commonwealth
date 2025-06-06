@@ -21,7 +21,7 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
-import { ZodError, ZodObject } from 'zod/v4';
+import { ZodError, ZodObject, prettifyError } from 'zod/v4';
 import {
   AMOUNT_CONDITIONS,
   ERC_SPECIFICATIONS,
@@ -322,7 +322,7 @@ const GroupForm = ({
       };
     } catch (e: any) {
       const zodError = e as ZodError;
-      const message = zodError.errors[0].message;
+      const message = prettifyError(zodError);
 
       allRequirements[index] = {
         ...allRequirements[index],
@@ -378,14 +378,9 @@ const GroupForm = ({
         };
       } catch (e: any) {
         const zodError = e as ZodError;
-        const errors = {};
-        zodError.errors.map((x) => {
-          errors[x.path[0]] = x.message;
-        });
-
         updatedSubForms[index] = {
           ...updatedSubForms[index],
-          errors: errors as any,
+          errors: prettifyError(zodError) as any,
         };
       }
     });

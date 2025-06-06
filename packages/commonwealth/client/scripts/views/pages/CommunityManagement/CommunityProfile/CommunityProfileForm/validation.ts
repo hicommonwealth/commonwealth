@@ -17,13 +17,9 @@ export const communityProfileValidationSchema = z.object({
     .string()
     .max(250, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-  communityProfileImageURL: z.string({
-    invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-  }),
+  communityProfileImageURL: z.string(),
   defaultPage: z.string(),
-  hasStagesEnabled: z.boolean({
-    invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-  }),
+  hasStagesEnabled: z.boolean(),
   customStages: z.string().refine(
     (data) => {
       if (data) {
@@ -45,7 +41,5 @@ export const communityProfileValidationSchema = z.object({
       message: `${VALIDATION_MESSAGES.INVALID_INPUT}: must follow this pattern [“Stage 1”, “Stage 2”]`,
     },
   ),
-  communityBanner: z.string({
-    invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-  }),
+  communityBanner: z.string(),
 });
