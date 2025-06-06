@@ -1,0 +1,35 @@
+{
+  "name": "@hicommonwealth/railway",
+  "private": "true",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Railway API Interface",
+  "files": [
+    "build"
+  ],
+  "exports": {
+    ".": {
+      "default": "./build/index.js",
+      "devmode": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b ./tsconfig.build.json",
+    "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
+    "check-types": "tsc --noEmit",
+    "test": "echo No tests for @hicommonwealth/railway",
+    "codegen": "graphql-codegen --config codegen.yml"
+  },
+  "dependencies": {
+    "@hicommonwealth/core": "workspace:*",
+    "graphql": "^16.9.0",
+    "graphql-request": "^7.1.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.7",
+    "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-codegen/typescript-graphql-request": "^6.3.0",
+    "@graphql-codegen/typescript-operations": "^4.6.1"
+  }
+}

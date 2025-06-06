@@ -1,0 +1,9 @@
+query deployment($id: String!) {
+  deployment(id: $id) {
+    status
+    staticUrl
+    service {
+      name
+    }
+  }
+}

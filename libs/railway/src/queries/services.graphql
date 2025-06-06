@@ -1,0 +1,15 @@
+mutation serviceInstanceUpdate(
+  $serviceId: String!
+  $environmentId: String
+  $input: ServiceInstanceUpdateInput!
+) {
+  serviceInstanceUpdate(
+    serviceId: $serviceId
+    environmentId: $environmentId
+    input: $input
+  )
+}
+
+mutation serviceInstanceDeployV2($serviceId: String!, $environmentId: String!) {
+  serviceInstanceDeployV2(serviceId: $serviceId, environmentId: $environmentId)
+}
