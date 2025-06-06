@@ -33,7 +33,7 @@ export const useGetMembershipsQuery = ({
     },
     {
       enabled,
-      //cacheTime: GET_MEMBERSHIPS_STALE_TIME,
+      gcTime: GET_MEMBERSHIPS_STALE_TIME,
       staleTime: GET_MEMBERSHIPS_STALE_TIME,
     },
   );

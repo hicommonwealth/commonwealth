@@ -33,7 +33,7 @@ const useFetchQuestsQuery = ({
       include_system_quests,
     },
     {
-      //cacheTime: FETCH_QUESTS_STALE_TIME,
+      gcTime: FETCH_QUESTS_STALE_TIME,
       enabled,
       initialCursor: 1,
       getNextPageParam: (lastPage) => {

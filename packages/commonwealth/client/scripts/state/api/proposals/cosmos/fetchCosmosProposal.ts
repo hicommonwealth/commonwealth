@@ -37,7 +37,7 @@ const useCosmosProposalQuery = ({
     queryFn: () => fetchCosmosProposal(proposalId),
     enabled: app.chain?.base === ChainBase.CosmosSDK && isApiReady,
     staleTime: PROPOSAL_STALE_TIME,
-    //cacheTime: PROPOSAL_CACHE_TIME,
+    gcTime: PROPOSAL_CACHE_TIME,
   });
 };
 

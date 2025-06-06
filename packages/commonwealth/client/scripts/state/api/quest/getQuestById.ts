@@ -17,7 +17,7 @@ const useGetQuestByIdQuery = ({
       quest_id,
     },
     {
-      //cacheTime: FETCH_QUESTS_STALE_TIME,
+      gcTime: FETCH_QUESTS_STALE_TIME,
       enabled,
     },
   );
