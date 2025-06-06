@@ -12,7 +12,15 @@ export function GetStatus(): Query<typeof schemas.GetStatus> {
     ...schemas.GetStatus,
     auth: [],
     secure: true,
+    authStrategy: {
+      type: 'custom',
+      name: 'Status',
+      userResolver: async (_, signedInUser) =>
+        signedInUser || { id: -1, email: '' },
+    },
     body: async ({ actor }) => {
+      if (actor.user.id === -1) return;
+
       const user = await models.User.scope('withPrivateData').findOne({
         where: { id: actor.user.id },
       });

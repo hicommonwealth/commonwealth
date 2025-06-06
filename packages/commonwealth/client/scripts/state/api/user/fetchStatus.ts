@@ -5,14 +5,7 @@ import { z } from 'zod';
 
 type Status = z.infer<(typeof schemas.GetStatus)['output']>;
 
-export const fetchStatus = async (address: string): Promise<Status> => {
-  const { data } = await axios.get(`${BASE_API_PATH}/user.getStatus`, {
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      address,
-    },
-  });
-  const status = data?.result?.data;
-  return status;
+export const fetchStatus = async (): Promise<Status | undefined> => {
+  const { data } = await axios.get(`${BASE_API_PATH}/user.getStatus`);
+  return data?.result?.data;
 };

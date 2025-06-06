@@ -78,61 +78,39 @@ export async function initAppState(
       },
     });
 
-    // TODO: @masvelio how can we get the user's address here without
-    // having to call the server to go through the passport login flow?
-    // - should we set the active account after logging in?
-    // - should we reset the active account after logging out?
-    // - should we store the active account in local storage?
-    // - should we use the current wallet address as the active account?
-    const user = userStore.getState();
-    const address =
-      user.addressSelectorSelectedAddress ||
-      user.activeAccount?.address ||
-      user.addresses?.at(0)?.address;
-
-    if (address) {
-      try {
-        const status = await fetchStatus(address);
-
-        // store community redirect's map in configuration cache
-        const communityWithRedirects =
-          status.communities?.filter((c) => c.redirect) || [];
-        if (communityWithRedirects.length > 0) {
-          communityWithRedirects.map(({ id, redirect }) => {
-            const cachedConfig = queryClient.getQueryData<Configuration>([
-              QueryKeys.CONFIGURATION,
-            ]);
-            queryClient.setQueryData([QueryKeys.CONFIGURATION], {
-              ...cachedConfig,
-              redirects: {
-                ...cachedConfig?.redirects,
-                [redirect!]: id,
-              },
-            });
+    const status = await fetchStatus();
+    updateActiveUser(status);
+    if (status) {
+      // store community redirect's map in configuration cache
+      const communityWithRedirects =
+        status.communities?.filter((c) => c.redirect) || [];
+      if (communityWithRedirects.length > 0) {
+        communityWithRedirects.map(({ id, redirect }) => {
+          const cachedConfig = queryClient.getQueryData<Configuration>([
+            QueryKeys.CONFIGURATION,
+          ]);
+          queryClient.setQueryData([QueryKeys.CONFIGURATION], {
+            ...cachedConfig,
+            redirects: {
+              ...cachedConfig?.redirects,
+              [redirect!]: id,
+            },
           });
-        }
+        });
+      }
 
-        // update the selectedCommunity, unless we explicitly want to avoid
-        // changing the current state (e.g. when logging in through link_new_address_modal)
-        if (updateSelectedCommunity && status?.selected_community_id) {
-          userStore.getState().setData({
-            // TODO: api should be updated to get relevant data
-            activeCommunity: await EXCEPTION_CASE_VANILLA_getCommunityById(
-              status.selected_community_id,
-              true,
-            ),
-          });
-        }
-        // signed in - update status
-        updateActiveUser(status);
-        return;
-      } catch (e) {
-        // error fetching status
-        console.error(e);
+      // update the selectedCommunity, unless we explicitly want to avoid
+      // changing the current state (e.g. when logging in through link_new_address_modal)
+      if (updateSelectedCommunity && status?.selected_community_id) {
+        userStore.getState().setData({
+          // TODO: api should be updated to get relevant data
+          activeCommunity: await EXCEPTION_CASE_VANILLA_getCommunityById(
+            status.selected_community_id,
+            true,
+          ),
+        });
       }
     }
-    // not signed in
-    updateActiveUser();
   } catch (err) {
     errorStore
       .getState()
