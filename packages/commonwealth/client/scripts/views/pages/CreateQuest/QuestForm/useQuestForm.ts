@@ -401,6 +401,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     const foundCommunityGoalReachedActionIndex = questActionSubForms.findIndex(
       (f) => f.values.action === 'CommunityGoalReached',
     );
+    if (foundCommunityGoalReachedActionIndex < 0) return true;
     const { goalTarget, goalType } =
       questActionSubForms[foundCommunityGoalReachedActionIndex]?.values || {};
     if (goalTarget && goalType) {

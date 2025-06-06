@@ -148,5 +148,10 @@
   },
   "engines": {
     "node": "22.x"
+  },
+  "pnpm": {
+    "overrides": {
+      "ws": "^8.13.0"
+    }
   }
 }
