@@ -4,7 +4,7 @@ import {
   CommunityTierMap,
   UserTierMap,
 } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { Community, CommunityGoalMeta } from '../entities';
 
 export const CreateChainNode = {
@@ -31,7 +31,7 @@ export const UpdateCommunityId = {
 export const TriggerNotificationsWorkflow = {
   input: z.object({
     workflow_key: z.string(),
-    data: z.record(z.any()),
+    data: z.record(z.string(), z.any()),
   }),
   output: z.object({
     numFailed: z

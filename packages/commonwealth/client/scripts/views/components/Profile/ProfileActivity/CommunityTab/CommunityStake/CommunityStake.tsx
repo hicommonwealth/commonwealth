@@ -6,7 +6,7 @@ import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake/index';
 import { trpc } from 'utils/trpcClient';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import './CommunityStake.scss';
 
 interface CommunityStakeProps {

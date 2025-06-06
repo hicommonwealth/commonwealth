@@ -2,7 +2,7 @@ import { logger, type Command } from '@hicommonwealth/core';
 import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 import { emitEvent, publishCast } from '../../utils';
 
@@ -24,6 +24,7 @@ export function FarcasterCastWebhook(): Command<
       } else {
         log.warn(`payload not supported: ${JSON.stringify(payload, null, 2)}`);
       }
+      return { status: 'ok' };
     },
   };
 }

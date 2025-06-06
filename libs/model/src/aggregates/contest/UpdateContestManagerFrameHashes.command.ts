@@ -44,7 +44,7 @@ export function UpdateContestManagerFrameHashes(): Command<
         mustExist('Contest Manager', contestManager);
         if (new Date() > contestManager.contests![0]!.end_time) {
           log.warn(`${Errors.ContestEnded}: ${contestManager.contest_address}`);
-          return;
+          return {};
         }
 
         // find webhook by ID
@@ -103,6 +103,8 @@ export function UpdateContestManagerFrameHashes(): Command<
           await contestManager.save();
         }
       });
+
+      return {};
     },
   };
 }

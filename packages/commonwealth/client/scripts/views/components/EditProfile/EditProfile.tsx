@@ -12,7 +12,7 @@ import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import ManageApiKey from 'views/components/EditProfile/ManageAPIKeys';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { PageNotFound } from '../../pages/404';
 import { AvatarUpload } from '../Avatar';
 import { LinksArray, useLinksArray } from '../LinksArray';
@@ -75,7 +75,7 @@ const EditProfile = () => {
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
-  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+  const { mutateAsync: updateUser, isPending: isUpdatingProfile } =
     useUpdateUserMutation({
       addressesWithChainsToUpdate: addresses?.map((a) => ({
         address: a.address,

@@ -12,7 +12,7 @@ import {
 } from 'state/api/communities';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import './SpamLevel.scss';
 import { SpamLevelOptions } from './utils';
 const SpamLevel = () => {
@@ -24,7 +24,7 @@ const SpamLevel = () => {
       includeNodeInfo: false,
     });
 
-  const { mutateAsync: updateCommunity, isLoading } =
+  const { mutateAsync: updateCommunity, isPending } =
     useUpdateCommunityMutation({
       communityId: community?.id || '',
     });
@@ -54,7 +54,7 @@ const SpamLevel = () => {
 
   const onSaveChanges = useCallback(async () => {
     if (
-      isLoading ||
+      isPending ||
       !community?.id ||
       spamTierLevel === community?.spam_tier_level
     )
@@ -72,7 +72,7 @@ const SpamLevel = () => {
       notifyError('Failed to update auto spam level!');
     }
   }, [
-    isLoading,
+    isPending,
     community?.id,
     community?.spam_tier_level,
     spamTierLevel,

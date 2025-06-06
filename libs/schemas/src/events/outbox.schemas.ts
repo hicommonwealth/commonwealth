@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { PG_INT } from '../utils';
 import { events } from './events.schemas';
 
@@ -30,7 +30,7 @@ export const Outbox = z.union(
       created_at: z.coerce.date().optional(),
       updated_at: z.coerce.date().optional(),
     }),
-  ) as unknown as readonly [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]],
+  ),
 );
 
 export { events };

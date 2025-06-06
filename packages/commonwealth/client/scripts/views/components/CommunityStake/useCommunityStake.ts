@@ -76,14 +76,13 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
 
   const { isInitialLoading: buyPriceDataLoading, data: buyPriceData } =
     useGetBuyPriceQuery({
-      // @ts-expect-error StrictNullChecks
-      namespace: activeCommunityNamespace,
+      namespace: activeCommunityNamespace!,
       stakeId: commonProtocol.STAKE_ID,
       amount: Number(userStakeBalanceData),
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
       chainRpc,
       ethChainId,
-      keepPreviousData: true,
+      //keepPreviousData: true,
     });
 
   const currentVoteWeight = commonProtocol.calculateVoteWeight(

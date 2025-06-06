@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { GetAllContests } from '@hicommonwealth/schemas';
 import { trpc } from 'utils/trpcClient';
@@ -26,12 +26,12 @@ const useGetContestsQuery = ({
     {
       enabled: fetchAll ? true : !!community_id,
       staleTime: CONTESTS_STALE_TIME,
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
         if (!shouldPolling) {
           return false;
         }
 
-        const doesEveryContestManagerHasContest = data?.every(
+        const doesEveryContestManagerHasContest = query.state.data?.every(
           (contestManager) =>
             Array.isArray(contestManager?.contests) &&
             contestManager?.contests?.length > 0,

@@ -2,7 +2,7 @@ import { config as adapters_config } from '@hicommonwealth/adapters';
 import { configure, config as target } from '@hicommonwealth/core';
 import { config as model_config } from '@hicommonwealth/model';
 import { ChainBase, TwitterBotName } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const {
   TELEGRAM_BOT_TOKEN,

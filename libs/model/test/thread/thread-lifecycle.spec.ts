@@ -33,7 +33,7 @@ import {
   UserTierMap,
 } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import {
   CreateComment,
   CreateCommentErrors,
@@ -1134,7 +1134,7 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      const tempReaction = { ...reaction };
+      const tempReaction = { ...reaction } as Partial<typeof reaction>;
       if (tempReaction) {
         if (tempReaction.community_id) delete tempReaction.community_id;
         if (tempReaction.Address) delete tempReaction.Address;
@@ -1260,7 +1260,7 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      const tempReaction = { ...reaction };
+      const tempReaction: Partial<typeof reaction> = { ...reaction };
       if (tempReaction) {
         if (tempReaction.community_id) delete tempReaction.community_id;
         if (tempReaction.Address) delete tempReaction.Address;

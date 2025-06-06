@@ -17,7 +17,7 @@ const ManageConnectedToken = ({
 }: ManageConnectedTokenProps) => {
   const [isChangingToken, setIsChangingToken] = useState(false);
 
-  const { mutateAsync: unpinToken, isLoading: isUnpinningToken } =
+  const { mutateAsync: unpinToken, isPending: isUnpinningToken } =
     useUnpinTokenFromCommunityMutation({
       resetCacheOnSuccess: true,
     });

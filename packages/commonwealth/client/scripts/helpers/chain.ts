@@ -3,7 +3,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { updateActiveAddresses } from 'controllers/app/login';
 import { DEFAULT_CHAIN } from 'helpers/constants';
 import app, { ApiStatus } from 'state';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from '../state/api/communities/getCommuityById';
 import { userStore } from '../state/ui/user';
 

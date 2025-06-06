@@ -6,7 +6,7 @@ import {
 } from '@hicommonwealth/core';
 import { generateUnsubscribeLink, models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
   return {

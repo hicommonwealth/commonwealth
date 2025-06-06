@@ -39,7 +39,7 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import Permissions from '../../../../utils/Permissions';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';

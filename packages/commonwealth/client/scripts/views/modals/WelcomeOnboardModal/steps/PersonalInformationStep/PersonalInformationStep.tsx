@@ -25,7 +25,7 @@ import {
   CWFormRef,
 } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import './PersonalInformationStep.scss';
 import { personalInformationFormValidation } from './validations';
 
@@ -37,7 +37,7 @@ const PersonalInformationStep = ({
   onComplete,
 }: PersonalInformationStepProps) => {
   const formMethodsRef = useRef<CWFormRef>();
-  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+  const { mutateAsync: updateUser, isPending: isUpdatingProfile } =
     useUpdateUserMutation();
   const [isEmailChangeDisabled, setIsEmailChangeDisabled] = useState(false);
   const [isUserNameChangeDisabled, setIsUserNameChangeDisabled] =

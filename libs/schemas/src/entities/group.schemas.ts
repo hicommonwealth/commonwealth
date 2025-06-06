@@ -1,5 +1,5 @@
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { PG_INT } from '../utils';
 import { GroupGatedAction } from './group-permission.schemas';
 import { Address } from './user.schemas';
@@ -110,12 +110,14 @@ export const MembershipRejectReason = z
   .object({
     message: z.string(),
     requirement: z.object({
-      data: z.any(),
+      data: z.any().optional(),
       rule: z.string(),
     }),
   })
   .array()
   .optional();
+
+export type MembershipRejectReason = z.infer<typeof MembershipRejectReason>;
 
 export const Membership = z.object({
   group_id: z.number(),

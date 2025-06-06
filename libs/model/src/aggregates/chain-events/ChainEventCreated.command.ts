@@ -148,6 +148,8 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
       // if (events.length > 0) {
       //   await emitEvent(models.Outbox, events);
       // }
+
+      return {};
     },
   };
 }

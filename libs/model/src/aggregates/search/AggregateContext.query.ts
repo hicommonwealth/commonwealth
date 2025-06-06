@@ -1,37 +1,7 @@
 import { Query } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
 import { models } from '../../database';
-
-export const AggregateContextInput = z.object({
-  // Use a JSON string for mentions to make it OpenAPI-compatible
-  mentions: z
-    .string()
-    .describe(
-      'JSON string array of mention objects with id, type, and name properties',
-    ),
-  communityId: z.string().optional(),
-  contextDataDays: z.number().optional().default(30),
-});
-
-export const AggregateContextOutput = z.object({
-  contextResults: z.array(
-    z.object({
-      entityType: z.string(),
-      entityId: z.string(),
-      entityName: z.string(),
-      contextData: z.string(),
-    }),
-  ),
-  formattedContext: z.string(),
-  totalMentions: z.number(),
-  processedAt: z.string(),
-});
-
-export const AggregateContextSchema = {
-  input: AggregateContextInput,
-  output: AggregateContextOutput,
-};
 
 // Configuration for context limits
 const CONTEXT_CONFIG = {
@@ -479,16 +449,12 @@ class ContextAggregator {
   }
 }
 
-export function AggregateContext(): Query<typeof AggregateContextSchema> {
+export function AggregateContext(): Query<typeof schemas.AggregateContext> {
   return {
-    ...AggregateContextSchema,
+    ...schemas.AggregateContext,
     auth: [],
     secure: true,
-    body: async ({
-      payload,
-    }: {
-      payload: z.infer<typeof AggregateContextInput>;
-    }) => {
+    body: async ({ payload }) => {
       const { mentions: mentionsJson, contextDataDays = 30 } = payload;
 
       // Parse the mentions JSON string

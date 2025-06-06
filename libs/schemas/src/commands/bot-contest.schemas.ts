@@ -3,7 +3,7 @@ import {
   COMMUNITY_NAME_ERROR,
   COMMUNITY_NAME_REGEX,
 } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { Community } from '../entities';
 import { TokenView } from '../queries';
 import { checkIconSize } from '../utils';

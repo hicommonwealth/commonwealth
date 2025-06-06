@@ -53,7 +53,7 @@ const CommunityInformationStep = ({
 
   const {
     mutateAsync: createCommunityMutation,
-    isLoading: createCommunityLoading,
+    isPending: createCommunityLoading,
   } = useCreateCommunityMutation();
 
   const handleSubmit = async (

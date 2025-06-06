@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { ReactionContext, ThreadContext, TopicContext } from '../context';
 import { COMMUNITY_TIER, Link, Reaction, Thread } from '../entities';
 import { DiscordMetaSchema, PG_INT } from '../utils';

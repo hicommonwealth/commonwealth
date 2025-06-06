@@ -1,6 +1,6 @@
 import { GetToken } from '@hicommonwealth/schemas';
 import { trpc } from 'utils/trpcClient';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const FETCH_TOKEN_STALE_TIME = 60 * 3_000; // 3 mins
 
@@ -19,7 +19,7 @@ const useGetTokenByCommunityId = ({
       with_stats,
     },
     {
-      cacheTime: FETCH_TOKEN_STALE_TIME,
+      gcTime: FETCH_TOKEN_STALE_TIME,
       enabled,
     },
   );

@@ -1,5 +1,5 @@
 import { ChainBase, Roles, WalletId } from '@hicommonwealth/shared';
-import { ZodType, z } from 'zod';
+import { ZodType, z } from 'zod/v4';
 import { VerifiedContext } from '../context';
 import { ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';

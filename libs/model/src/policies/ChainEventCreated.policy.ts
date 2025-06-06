@@ -1,6 +1,6 @@
 import { Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import { ZodUndefined } from 'zod';
+import { ZodUndefined } from 'zod/v4';
 import { handleCommunityStakeTrades } from './handlers/handleCommunityStakeTrades';
 import { handleNamespaceDeployed } from './handlers/handleNamespaceDeployed';
 import { handleNamespaceDeployedWithReferral } from './handlers/handleNamespaceDeployedWithReferral';

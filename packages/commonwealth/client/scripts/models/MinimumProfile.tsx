@@ -1,7 +1,7 @@
 import { AddressView } from '@hicommonwealth/schemas';
 import { DEFAULT_NAME, UserTierMap } from '@hicommonwealth/shared';
 import jdenticon from 'jdenticon';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export type UserProfile = {
   userId: number;

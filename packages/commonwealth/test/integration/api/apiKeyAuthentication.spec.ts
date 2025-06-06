@@ -14,7 +14,7 @@ import { ApiKey, User as UserSchema } from '@hicommonwealth/schemas';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { NextFunction, Request, Response } from 'express';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { apiKeyAuthMiddleware } from '../../../server/api/external-router-middleware';
 
 describe('API KeyAuthentication', () => {

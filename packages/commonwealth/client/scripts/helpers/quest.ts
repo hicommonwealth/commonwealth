@@ -1,15 +1,15 @@
 import {
-  QuestActionMeta,
+  QuestActionView,
   QuestParticipationLimit,
   QuestParticipationPeriod,
   XpLogView,
 } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import { trpc } from 'utils/trpcClient';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { QuestAction as QuestActionType } from '../views/pages/CreateQuest/QuestForm/QuestActionSubForm/types';
 
-export type QuestAction = z.infer<typeof QuestActionMeta>;
+export type QuestAction = z.infer<typeof QuestActionView>;
 export type XPLog = z.infer<typeof XpLogView>;
 
 export const doesActionRequireRewardShare = (action: QuestActionType) => {

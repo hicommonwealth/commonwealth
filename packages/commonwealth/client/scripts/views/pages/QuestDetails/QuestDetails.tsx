@@ -38,7 +38,7 @@ import { withTooltip } from 'views/components/component_kit/new_designs/CWToolti
 import { AuthModal, AuthModalType } from 'views/modals/AuthModal';
 import { AuthOptions, AuthOptionTypes } from 'views/modals/AuthModal/types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { PageNotFound } from '../404';
 import { buildRedirectURLFromContentId } from '../CreateQuest/QuestForm/helpers';
 import QuestCard from '../ExplorePage/QuestList/QuestCard';
@@ -73,9 +73,9 @@ const QuestDetails = ({ id }: { id: number }) => {
     specificAuthOption: undefined,
   });
 
-  const { mutateAsync: deleteQuest, isLoading: isDeletingQuest } =
+  const { mutateAsync: deleteQuest, isPending: isDeletingQuest } =
     useDeleteQuestMutation();
-  const { mutateAsync: cancelQuest, isLoading: isCancelingQuest } =
+  const { mutateAsync: cancelQuest, isPending: isCancelingQuest } =
     useCancelQuestMutation();
 
   const isPendingAction = isDeletingQuest || isCancelingQuest;

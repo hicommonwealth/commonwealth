@@ -21,7 +21,7 @@
     "test-select": "NODE_ENV=test vitest --config ../../vite.config.ts run"
   },
   "dependencies": {
-    "@anatine/zod-mock": "^3.13.3",
+    "@anatine/zod-mock": "^3.14.0",
     "@canvas-js/chain-ethereum": "^0.13.14",
     "@canvas-js/interfaces": "^0.12.1",
     "@canvas-js/signatures": "^0.12.1",

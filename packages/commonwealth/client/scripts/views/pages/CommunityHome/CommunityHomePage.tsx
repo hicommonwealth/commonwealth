@@ -52,7 +52,7 @@ const CommunityHome = () => {
     apiEnabled: !!communityId,
   });
 
-  const { mutateAsync: createThread, isLoading: isCreatingThread } =
+  const { mutateAsync: createThread, isPending: isCreatingThread } =
     useCreateThreadMutation({ communityId });
 
   const {

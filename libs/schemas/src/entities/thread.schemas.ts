@@ -1,5 +1,5 @@
 import { LinkSource } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 import { Reaction } from './reaction.schemas';
 import { Topic } from './topic.schemas';
@@ -66,7 +66,7 @@ export const Thread = z.object({
   created_by: z.string().nullish(),
   profile_name: z.string().nullish(),
 
-  search: z.union([z.string(), z.record(z.any())]).nullish(),
+  search: z.union([z.string(), z.record(z.string(), z.any())]).nullish(),
   is_linking_token: z.boolean().optional(),
   launchpad_token_address: z.string().nullable().optional(),
 

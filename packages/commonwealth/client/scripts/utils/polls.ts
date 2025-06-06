@@ -1,6 +1,6 @@
 import { PollView } from '@hicommonwealth/schemas';
 import { DEFAULT_POLL_DURATION } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export interface ExtendedPoll extends z.infer<typeof PollView> {
   custom_duration?: string;

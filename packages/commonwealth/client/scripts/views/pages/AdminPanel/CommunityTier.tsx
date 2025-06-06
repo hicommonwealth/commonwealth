@@ -42,7 +42,7 @@ const CommunityTier = () => {
   const [selectedCommunityTier, setSelectedCommunityTier] =
     useState<CommunityTierMap>(CommunityTierMap.Unverified);
 
-  const { mutateAsync: setCommunityTier, isLoading } =
+  const { mutateAsync: setCommunityTier, isPending } =
     useSetCommunityTierMutation();
 
   useEffect(() => {
@@ -123,7 +123,7 @@ const CommunityTier = () => {
             isLoadingCommunity ||
             communityNotFound ||
             !debouncedCommunityId ||
-            isLoading
+            isPending
           }
           onClick={openConfirmationModal}
         />

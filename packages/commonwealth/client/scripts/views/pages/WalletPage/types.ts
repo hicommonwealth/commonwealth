@@ -3,7 +3,7 @@ import {
   ReferralFeesView,
   ReferralView,
 } from '@hicommonwealth/schemas';
-import type { z } from 'zod';
+import type { z } from 'zod/v4';
 
 export enum MobileTabType {
   WalletBalance = 'Wallet Balance',

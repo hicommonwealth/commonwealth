@@ -17,7 +17,7 @@ const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
   const { preferenceTags, toggleTagFromSelection } = usePreferenceTags();
   const user = useUserStore();
 
-  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+  const { mutateAsync: updateUser, isPending: isUpdatingProfile } =
     useUpdateUserMutation();
 
   const handleSavePreferences = () => {

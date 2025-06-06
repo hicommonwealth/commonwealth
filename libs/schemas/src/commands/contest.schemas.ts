@@ -1,5 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import z from 'zod';
+import z from 'zod/v4';
 import { AuthContext } from '../context';
 import { ContestManager } from '../entities/contest-manager.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';

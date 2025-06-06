@@ -19,7 +19,7 @@ import {
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useState } from 'react';
-import { ZodError } from 'zod';
+import { ZodError } from 'zod/v4';
 import './QuestActionSubForm.scss';
 import {
   QuestAction,
@@ -99,7 +99,7 @@ const useQuestActionMultiFormsState = ({
       schema.parse(values);
     } catch (e) {
       const zodError = e as ZodError;
-      zodError.errors.map((error) => {
+      zodError.issues.map((error) => {
         errors = {
           ...errors,
           [error.path[0] as keyof QuestActionSubFormErrors]: error.message,

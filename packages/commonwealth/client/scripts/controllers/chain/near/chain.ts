@@ -1,7 +1,7 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type { NearAccount } from './account';
 

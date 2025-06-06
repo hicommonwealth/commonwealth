@@ -7,7 +7,7 @@ import {
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 import { authThread } from '../../middleware';
 import { mustBeAuthorizedThread, mustExist } from '../../middleware/guards';

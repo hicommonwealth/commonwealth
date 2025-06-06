@@ -126,7 +126,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
           },
         );
 
-        return updated;
+        return updated!;
       }
 
       // nothing changed
