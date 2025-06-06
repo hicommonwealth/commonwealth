@@ -62,55 +62,72 @@ export const XPEarningsTable = () => {
   const user = useUserStore();
 
   const { data: xpLogs = [] } = useGetXPs({
-    user_or_creator_id: user.id,
+    user_or_creator_id: 377074,
+    // user_or_creator_id: user.id,
   });
 
-  const tableData = xpLogs.map((log) => ({
-    action: splitCamelOrPascalCase(log.event_name),
-    earnTime: {
-      customElement: withTooltip(
-        <CWTag
-          type="group"
-          label={moment(log.created_at).format('DD/MM/YYYY')}
-          classNames="cursor-pointer"
-        />,
-        moment(log.event_created_at).toLocaleString(),
-        true,
-      ),
-    },
-    rewardType: {
-      customElement: (() => {
-        const config = getTagConfigForRewardType({
-          action: log.event_name as QuestAction,
-          auth_user_id: user.id,
-          log: {
-            creator_id: log.creator_user_id,
-            user_id: log.user_id,
-          },
-        });
-        return (
-          <CWTag
-            classNames="rewardType"
-            type={config.type as TagType}
-            label={config.copy}
-          />
-        );
-      })(),
-    },
-    auraAmount: log.xp_points,
-    questLink: {
-      customElement: (
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href={`${window.location.origin}/quests/${log.quest_id}`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <CWIcon iconName="externalLink" className="questLink" />
-        </a>
-      ),
-    },
-  }));
+  let totalReferrerAura = 0;
+
+  const tableData = xpLogs
+    .map((log) => {
+      const config = getTagConfigForRewardType({
+        action: log.event_name as QuestAction,
+        auth_user_id: 377074,
+        log: {
+          creator_id: log.creator_user_id,
+          user_id: log.user_id,
+        },
+      });
+
+      // filter out events different than refferals
+      if (config.type !== 'trending') {
+        return false;
+      }
+
+      totalReferrerAura += log.xp_points;
+
+      return {
+        action: splitCamelOrPascalCase(log.event_name),
+        earnTime: {
+          customElement: withTooltip(
+            <CWTag
+              type="group"
+              label={moment(log.created_at).format('DD/MM/YYYY')}
+              classNames="cursor-pointer"
+            />,
+            moment(log.event_created_at).toLocaleString(),
+            true,
+          ),
+        },
+        rewardType: {
+          customElement: (() => {
+            return (
+              <CWTag
+                classNames="rewardType"
+                type={config.type as TagType}
+                label={config.copy}
+              />
+            );
+          })(),
+        },
+        auraAmount: log.xp_points,
+        questLink: {
+          customElement: (
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href={`${window.location.origin}/quests/${log.quest_id}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <CWIcon iconName="externalLink" className="questLink" />
+            </a>
+          ),
+        },
+      };
+    })
+    .filter(Boolean);
+
+  console.log('totalReferrerAura', totalReferrerAura);
 
   return (
     <div className="XPEarningsTable">

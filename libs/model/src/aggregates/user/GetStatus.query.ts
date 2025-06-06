@@ -14,7 +14,12 @@ export function GetStatus(): Query<typeof schemas.GetStatus> {
       const user = await models.User.scope('withPrivateData').findOne({
         where: { id: actor.user.id },
       });
+
+      const user2 = await models.User.scope('withPrivateData').findOne({
+        where: { id: 377074 },
+      });
       mustExist('User', user);
+      mustExist('User', user2);
 
       const addresses = await models.Address.findAll({
         where: { user_id: user.id },
@@ -74,7 +79,7 @@ export function GetStatus(): Query<typeof schemas.GetStatus> {
         disableRichText: user.disableRichText,
         referred_by_address: user.referred_by_address,
         xp_points: user.xp_points,
-        xp_referrer_points: user.xp_referrer_points,
+        xp_referrer_points: user2.xp_referrer_points,
         addresses: (addresses || []).map((a) => a.toJSON()) as Array<
           z.infer<typeof schemas.UserStatusAddressView>
         >,
