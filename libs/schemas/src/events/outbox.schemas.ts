@@ -16,7 +16,10 @@ export type EventPairs = {
   [K in OutboxEvents]: EventPair<K>;
 }[OutboxEvents];
 
-export const outboxEvents = Object.keys(events) as OutboxEvents[];
+export const outboxEvents = Object.keys(events).filter(
+  (k) => k !== 'ContestRolloverTimerTicked',
+) as OutboxEvents[];
+
 export const Outbox = z.union(
   outboxEvents.map((event_name) =>
     z.object({
