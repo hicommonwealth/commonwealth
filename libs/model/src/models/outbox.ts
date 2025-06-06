@@ -1,4 +1,4 @@
-import { Outbox } from '@hicommonwealth/core';
+import { Outbox } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import { ModelInstance } from './types';
