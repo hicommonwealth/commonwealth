@@ -20,8 +20,8 @@
     "test": "echo No tests for @hicommonwealth/schemas"
   },
   "dependencies": {
-    "@hicommonwealth/shared": "workspace:*",
     "@hicommonwealth/evm-protocols": "workspace:*",
-    "zod": "^3.22.4"
+    "@hicommonwealth/shared": "workspace:*",
+    "zod": "^3.25.46"
   }
 }

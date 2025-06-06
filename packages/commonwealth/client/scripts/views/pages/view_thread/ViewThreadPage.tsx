@@ -10,7 +10,6 @@ import {
 } from 'client/scripts/helpers/snapshot_utils';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
-import { Thread, ThreadView } from 'client/scripts/models/Thread';
 import { AnyProposal } from 'client/scripts/models/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -125,9 +124,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [imageActionModalOpen, setImageActionModalOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [voterProfiles, setVoterProfiles] = useState<
-    Record<string, VoterProfileData>
-  >({});
   const [uniqueVoterAddresses, setUniqueVoterAddresses] = useState<string[]>(
     [],
   );
@@ -165,8 +161,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   });
 
   const thread = useMemo(() => {
-    const t = data?.at(0);
-    return t ? new Thread(t as ThreadView) : undefined;
+    return data?.at(0);
   }, [data]);
 
   //  snapshot proposal hook
@@ -407,21 +402,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       apiCallEnabled: !!communityId && uniqueVoterAddresses.length > 0,
     });
 
-  // Effect to transform fetched profiles into the voterProfiles map
-  useEffect(() => {
-    if (fetchedProfiles && fetchedProfiles.length > 0) {
-      const profilesMap: Record<string, VoterProfileData> = {};
-      fetchedProfiles.forEach((profile) => {
-        if (profile.address) {
-          profilesMap[profile.address] = {
-            address: profile.address,
-            name: profile.name || '', // Provide fallback for name
-            avatarUrl: profile.avatarUrl,
-          };
-        }
-      });
-      setVoterProfiles(profilesMap);
+  const voterProfiles = useMemo(() => {
+    if (!fetchedProfiles || fetchedProfiles.length === 0) {
+      return {};
     }
+
+    const profilesMap: Record<string, VoterProfileData> = {};
+    fetchedProfiles.forEach((profile) => {
+      if (profile.address) {
+        profilesMap[profile.address] = {
+          address: profile.address,
+          name: profile.name || '', // Provide fallback for name
+          avatarUrl: profile.avatarUrl,
+        };
+      }
+    });
+    return profilesMap;
   }, [fetchedProfiles]);
 
   if (typeof identifier !== 'string' || fetchThreadError) {

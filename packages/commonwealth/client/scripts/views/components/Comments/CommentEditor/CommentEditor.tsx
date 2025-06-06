@@ -53,6 +53,7 @@ export type CommentEditorProps = {
   placeholder?: string;
   webSearchEnabled?: boolean;
   setWebSearchEnabled?: (enabled: boolean) => void;
+  communityId?: string;
 };
 
 // eslint-disable-next-line react/display-name
@@ -80,6 +81,7 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
       placeholder,
       webSearchEnabled,
       setWebSearchEnabled,
+      communityId,
     },
     _ref,
   ) => {
@@ -143,6 +145,8 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
         model: 'gpt-4o-mini',
         stream: true,
         systemPrompt,
+        includeContextualMentions: true,
+        communityId: communityId || thread?.communityId,
         onError: (error) => {
           console.error('Error generating AI comment:', error);
           notifyError('Failed to generate AI comment');

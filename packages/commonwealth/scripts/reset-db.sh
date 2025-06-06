@@ -16,8 +16,8 @@ app=${1:-local}
 
 if [ "$app" == "local" ]; then
   psql -h localhost -d postgres -U commonwealth -c 'DROP DATABASE commonwealth WITH (FORCE);'; npx sequelize db:create
-elif [ "$app" == "frick" ] || [ "$app" == "frack" ] || [ "$app" == "beta" ]; then
+elif [ "$app" == "frick" ] || [ "$app" == "frack" ] || [ "$app" == "beta" ]|| [ "$app" == "demo" ]; then
   heroku pg:copy commonwealth-beta::HEROKU_POSTGRESQL_MAROON_URL DATABASE_URL --app commonwealth-"$app" --confirm commonwealth-"$app"
 else
-  echo "Invalid app argument. Please use 'local', 'frick', 'frack', or 'beta'."
+  echo "Invalid app argument. Please use 'local', 'frick', 'frack', 'beta' or 'demo'.."
 fi
