@@ -117,7 +117,7 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
     };
   });
 
-  mcpServer.setRequestHandler(CallToolRequestSchema, (request, extra) => {
+  mcpServer.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
     const { name, arguments: args } = request.params;
 
     if (!(name in toolsMap)) {
