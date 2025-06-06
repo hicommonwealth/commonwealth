@@ -5,6 +5,7 @@ export * from './DeleteLinks.command';
 export * from './DeleteThread.command';
 export * from './GetActiveThreads.query';
 export * from './GetLinks.query';
+export * from './GetThreadById.query';
 export * from './GetThreadCount.query';
 export * from './GetThreads.query';
 export * from './GetThreadsByIds.query';

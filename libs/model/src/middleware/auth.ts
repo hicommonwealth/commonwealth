@@ -463,6 +463,37 @@ export async function authOptional(
 }
 
 /**
+ * Creates an authorization context for the actor when authenticated,
+ * but anonymous access is allowed.
+ * This is mainly used when querying threads with gating conditions.
+ */
+export async function authOptionalForThread(
+  ctx: Context<typeof ThreadContextInput, typeof ThreadContext>,
+) {
+  if (!ctx.actor.user || !ctx.actor.address || !ctx.payload.thread_id) return;
+
+  try {
+    const auth = await findThread(ctx.actor, ctx.payload.thread_id, false);
+    const { address, is_author } = await findAddress(
+      ctx.actor,
+      auth.community_id,
+      ['admin', 'moderator', 'member'],
+      auth.author_address_id,
+    );
+
+    (ctx as { context: AuthContext }).context = {
+      address,
+      is_author,
+      community_id: auth.community_id,
+    };
+  } catch (err) {
+    // ignore InvalidActor errors
+    if (err instanceof InvalidActor) return;
+    throw err;
+  }
+}
+
+/**
  * Validates if actor's address is authorized
  * @param roles specific community roles - all by default
  * @throws InvalidActor when not authorized

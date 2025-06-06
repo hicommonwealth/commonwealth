@@ -36,3 +36,10 @@ export class RejectedMember extends InvalidActor {
     this.name = INVALID_ACTOR_ERROR;
   }
 }
+
+export class UnauthorizedView extends InvalidActor {
+  constructor(public actor: Actor) {
+    super(actor, `User does not have permission to view this topic`);
+    this.name = INVALID_ACTOR_ERROR;
+  }
+}

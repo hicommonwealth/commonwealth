@@ -1,9 +1,9 @@
+import useGetThreadByIdQuery from 'client/scripts/state/api/threads/getThreadById';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
-import { useGetThreadsByIdQuery } from 'state/api/threads';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
@@ -44,27 +44,26 @@ export const Breadcrumbs = () => {
   const currentProposalTitle = snapshotProposal?.title || proposalTitle;
 
   const getThreadId = location.pathname.match(/\/(\d+)-/);
+  const thread_id = getThreadId ? Number(getThreadId[1]) : undefined;
 
   const communityId = app.activeChainId() || '';
 
-  const { data: linkedThreads } = useGetThreadsByIdQuery({
-    community_id: communityId,
-    thread_ids: getThreadId ? [Number(getThreadId[1])] : [],
-    apiCallEnabled:
-      // Only call when in discussion pages prevents unnecessary calls.
+  const { data: linkedThread } = useGetThreadByIdQuery(
+    thread_id!,
+    // Only call when in discussion pages prevents unnecessary calls.
+    !!thread_id &&
       location.pathname.split('/')[1].toLowerCase() === 'discussion' &&
       !!communityId,
-  });
+  );
 
   const currentDiscussion = {
-    currentThreadName: linkedThreads?.[0]?.title || '',
-    currentTopic: linkedThreads?.[0]?.topic?.name || '',
+    currentThreadName: linkedThread?.title || '',
+    currentTopic: linkedThread?.topic?.name || '',
     topicURL: communityId
       ? `/${communityId}/discussions/${encodeURI(
-          linkedThreads?.[0]?.topic?.name || '',
+          linkedThread?.topic?.name || '',
         )}`
-      : `/discussions/${encodeURI(linkedThreads?.[0]?.topic?.name || '')}` ||
-        '',
+      : `/discussions/${encodeURI(linkedThread?.topic?.name || '')}` || '',
   };
 
   let standalone = false;

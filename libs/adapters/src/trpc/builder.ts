@@ -17,7 +17,8 @@ const isSecure = <Input extends ZodSchema, Output extends ZodSchema>(
 ) => {
   const firstAuth = md.auth?.at(0);
   const optional =
-    typeof firstAuth === 'function' && firstAuth.name === 'authOptional';
+    typeof firstAuth === 'function' &&
+    firstAuth.name.startsWith('authOptional');
   return {
     secure: forceSecure || md.secure !== false || !!firstAuth,
     optional,

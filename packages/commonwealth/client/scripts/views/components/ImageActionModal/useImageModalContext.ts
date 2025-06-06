@@ -1,7 +1,7 @@
+import useGetThreadByIdQuery from 'client/scripts/state/api/threads/getThreadById';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import { useGetThreadsByIdQuery } from 'state/api/threads';
 import { getImageUrlsFromMarkdown } from '../react_quill_editor/utils';
 
 interface ImageContextHookProps {
@@ -34,14 +34,8 @@ export const useImageModalContext = ({
       enabled: !!communityId,
     });
 
-  const { data: threadsData, isLoading: isLoadingThread } =
-    useGetThreadsByIdQuery({
-      thread_ids: threadId ? [threadId] : [],
-      community_id: communityId || '',
-    });
-
-  // Extract the single thread data if available
-  const threadData = threadsData?.[0];
+  const { data: threadData, isLoading: isLoadingThread } =
+    useGetThreadByIdQuery(threadId!, !!threadId);
 
   // Parse the URL to extract context IDs
   const parseUrlForContext = useCallback((): ParsedUrlContext => {
