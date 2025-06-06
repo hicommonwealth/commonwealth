@@ -308,14 +308,12 @@ jobs:
         run: |
           node <<'EOF' 
           const RAILWAY_TOKEN = process.env.RAILWAY_TOKEN;
-          const PROJECT_ID = process.env.PROJECT_ID;
+          const PROJECT_ID = process.env.RAILWAY_PROJECT_ID;
           const ENV_NAME = `pr-${process.env.PR_NUMBER}`;
           const PARENT_ENV_ID = process.env.PARENT_ENV_ID;
           const COMMIT_SHA = process.env.COMMIT_SHA;
           const API_URL = 'https://backboard.railway.app/graphql/v2';
           
-          console.log(`projectId: ${PROJECT_ID}, commit: ${COMMIT_SHA}`)
-
           async function railwayQuery(query, variables, errorMsg) {
             const res = await (
               await fetch(API_URL, {
