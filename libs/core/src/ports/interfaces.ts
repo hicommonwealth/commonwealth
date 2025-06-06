@@ -773,4 +773,9 @@ export interface NotificationsProvider extends Disposable {
     token: string,
     channelType: 'FCM' | 'APNS',
   ): Promise<boolean>;
+
+  signUserToken(
+    userId: number,
+    expiresInSeconds: number,
+  ): Promise<string | undefined>;
 }

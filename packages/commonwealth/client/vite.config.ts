@@ -125,6 +125,10 @@ export default defineConfig(({ mode }) => {
       JSON.stringify('416700000'),
     'process.env.ENABLED_TRPC_BATCHING':
       JSON.stringify(env.ENABLED_TRPC_BATCHING) || JSON.stringify('true'),
+    'process.env.TEST_EVM_PROVIDER_URL': JSON.stringify(
+      env.PROVIDER_URL || 'http://127.0.0.1:8545',
+    ),
+    'process.env.TEST_EVM_ETH_RPC': JSON.stringify(env.ETH_RPC || 'prod'),
   };
 
   return {

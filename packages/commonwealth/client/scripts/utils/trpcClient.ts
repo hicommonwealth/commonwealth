@@ -17,8 +17,8 @@ export const trpcClient = trpc.createClient({
           authorization: user.jwt || '',
           isPWA: user.isOnPWA?.toString(),
           address:
-            user.addressSelectorSelectedAddress ??
-            user.activeAccount?.address ??
+            user.addressSelectorSelectedAddress ||
+            user.activeAccount?.address ||
             user.addresses?.at(0)?.address,
         };
       },
