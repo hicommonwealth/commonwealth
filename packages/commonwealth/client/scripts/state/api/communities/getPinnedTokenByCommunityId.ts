@@ -26,7 +26,6 @@ const useGetPinnedTokensByCommunityId = ({
     },
     {
       gcTime: FETCH_PINNED_TOKEN_STALE_TIME,
-      staleTime: FETCH_PINNED_TOKEN_STALE_TIME,
       enabled,
     },
   );
