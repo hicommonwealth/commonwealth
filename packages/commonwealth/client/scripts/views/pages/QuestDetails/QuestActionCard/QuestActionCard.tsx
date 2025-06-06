@@ -127,6 +127,8 @@ const QuestActionCard = ({
               'LaunchpadTokenTraded',
               'XpChainEventCreated',
               'CommunityGoalReached',
+              'KyoFinanceSwapQuestVerified',
+              'KyoFinanceLpQuestVerified',
             ].includes(questAction.event_name) && (
               <>
                 {questAction.event_name === 'CommunityCreated' &&
@@ -135,7 +137,7 @@ const QuestActionCard = ({
                 ) : (
                   <CWDivider />
                 )}
-                {actionCopies.pre_reqs[questAction.event_name]() && (
+                {actionCopies.pre_reqs?.[questAction.event_name]?.() && (
                   <CWText type="caption" fontWeight="semiBold">
                     {actionCopies.pre_reqs[questAction.event_name]()}
                   </CWText>
@@ -185,6 +187,24 @@ const QuestActionCard = ({
                         <CWCircleRingSpinner size="small" />
                       ),
                       foundGoalsMetaMeta?.target || <></>,
+                    )}
+                  </CWText>
+                )}
+                {questAction.event_name === 'KyoFinanceSwapQuestVerified' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction.metadata.chainId,
+                      questAction.metadata.minOutputAmount || '',
+                      questAction.metadata.minVolumeUSD || '',
+                    )}
+                  </CWText>
+                )}
+                {questAction.event_name === 'KyoFinanceLpQuestVerified' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction.metadata.chainId,
+                      questAction.metadata.poolAddresses,
+                      questAction.metadata.minUSDValues,
                     )}
                   </CWText>
                 )}

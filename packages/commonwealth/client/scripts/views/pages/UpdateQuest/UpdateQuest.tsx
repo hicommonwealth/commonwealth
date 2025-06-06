@@ -196,6 +196,21 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 // important to use readable signature instead of event signature here
                 eventSignature: `${action.ChainEventXpSource?.readable_signature || ''}`,
                 transactionHash: `${action.ChainEventXpSource?.transaction_hash || ''}`,
+                metadata: action.metadata
+                  ? {
+                      ...action.metadata,
+                      ...((action.metadata as any).poolAddresses && {
+                        poolAddresses: (
+                          action.metadata as any
+                        ).poolAddresses.join(', '),
+                      }),
+                      ...((action.metadata as any).minUSDValues && {
+                        minUSDValues: (
+                          action.metadata as any
+                        ).minUSDValues.join(', '),
+                      }),
+                    }
+                  : undefined,
               })),
             }}
           />

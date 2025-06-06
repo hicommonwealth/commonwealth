@@ -4,7 +4,13 @@ import {
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { AuthContext } from '../context';
-import { Quest, QuestActionMeta } from '../entities';
+import {
+  GeneralQuestAction,
+  KyoFinanceLpQuestAction,
+  KyoFinanceSwapQuestAction,
+  Quest,
+  QuestParticipationLimit,
+} from '../entities';
 
 const QuestView = Quest.omit({ scheduled_job_id: true });
 
@@ -23,31 +29,39 @@ export const CreateQuest = {
   context: AuthContext,
 };
 
-export const ActionMetaInput = QuestActionMeta.omit({ quest_id: true })
-  .extend({
-    tweet_engagement_caps: z
-      .object({
-        likes: z.number().gte(0).max(100),
-        retweets: z.number().gte(0).max(100),
-        replies: z.number().gte(0).max(100),
-      })
-      .optional()
-      .refine(
-        (data) => !(data && !data.likes && !data.retweets && !data.replies),
-      ),
-    chain_event: z
-      .object({
-        eth_chain_id: z.number(),
-        contract_address: EVM_ADDRESS_STRICT,
-        event_signature: z.string(),
-        tx_hash: EVM_EVENT_SIGNATURE_STRICT,
-      })
-      .optional(),
-  })
-  .refine(
-    (data) =>
-      !(data.content_id?.includes('discord_server_id') && !data.start_link),
-  );
+export const ActionMetaInput = z.union([
+  GeneralQuestAction.omit({ quest_id: true })
+    .extend({
+      tweet_engagement_caps: z
+        .object({
+          likes: z.number().gte(0).max(100),
+          retweets: z.number().gte(0).max(100),
+          replies: z.number().gte(0).max(100),
+        })
+        .optional()
+        .refine(
+          (data) => !(data && !data.likes && !data.retweets && !data.replies),
+        ),
+      chain_event: z
+        .object({
+          eth_chain_id: z.number(),
+          contract_address: EVM_ADDRESS_STRICT,
+          event_signature: z.string(),
+          tx_hash: EVM_EVENT_SIGNATURE_STRICT,
+        })
+        .optional(),
+    })
+    .refine(
+      (data) =>
+        !(data.content_id?.includes('discord_server_id') && !data.start_link),
+    ),
+  KyoFinanceSwapQuestAction.omit({ quest_id: true }).refine(
+    (data) => data.participation_limit === QuestParticipationLimit.OncePerQuest,
+  ),
+  KyoFinanceLpQuestAction.omit({ quest_id: true }).refine(
+    (data) => data.participation_limit === QuestParticipationLimit.OncePerQuest,
+  ),
+]);
 
 export const UpdateQuest = {
   input: z.object({
@@ -62,6 +76,15 @@ export const UpdateQuest = {
     action_metas: z.array(ActionMetaInput).optional(),
   }),
   output: QuestView,
+  context: AuthContext,
+};
+
+export const VerifyQuestAction = {
+  input: z.object({
+    address: z.string(),
+    quest_action_meta_id: z.number(),
+  }),
+  output: z.boolean(),
   context: AuthContext,
 };
 
