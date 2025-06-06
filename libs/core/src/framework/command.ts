@@ -20,7 +20,7 @@ export const command = async <
   { input, auth, body }: Metadata<Input, Output, _Context>,
   { actor, payload }: Context<Input, _Context>,
   validate = true,
-): Promise<z.infer<Output> | undefined> => {
+): Promise<z.infer<Output>> => {
   try {
     const context: Context<Input, _Context> = {
       actor,
@@ -29,7 +29,7 @@ export const command = async <
     for (const fn of auth) {
       await fn(context);
     }
-    return (await body(context)) ?? undefined;
+    return await body(context);
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === 'ZodError') {

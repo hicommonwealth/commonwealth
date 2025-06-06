@@ -47,7 +47,7 @@ const useTokensMetadataQuery = ({
     queryKey: [...tokenIds, nodeEthChainId, 'alchemy_getTokenMetadata'],
     queryFn: () => getTokensMetadata({ tokenIds, nodeEthChainId }),
     enabled: !!(tokenIds.filter(Boolean).length > 0 && apiEnabled),
-    cacheTime: FETCH_TOKENS_METADATA_STALE_TIME,
+    gcTime: FETCH_TOKENS_METADATA_STALE_TIME,
     retry: false,
   });
 };

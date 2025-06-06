@@ -24,7 +24,7 @@ export const handleEvent = async <
   { inputs, body }: EventsHandlerMetadata<Input, Output>,
   { name, payload }: EventContext<Name>,
   validate = true,
-): Promise<Partial<z.infer<Output>> | undefined> => {
+): Promise<Partial<z.infer<Output>>> => {
   if (!body[name])
     throw new InvalidInput(
       `Unhandled event: ${name} not found in ${Object.keys(body)}`,
@@ -34,7 +34,7 @@ export const handleEvent = async <
       (await body[name]({
         name,
         payload: validate ? inputs[name]!.parse(payload) : payload,
-      })) ?? undefined
+      })) || {}
     );
   } catch (error) {
     if (error instanceof Error) {

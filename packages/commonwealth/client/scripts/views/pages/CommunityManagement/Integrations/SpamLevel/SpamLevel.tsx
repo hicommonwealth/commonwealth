@@ -24,7 +24,7 @@ const SpamLevel = () => {
       includeNodeInfo: false,
     });
 
-  const { mutateAsync: updateCommunity, isLoading } =
+  const { mutateAsync: updateCommunity, isPending } =
     useUpdateCommunityMutation({
       communityId: community?.id || '',
     });
@@ -54,7 +54,7 @@ const SpamLevel = () => {
 
   const onSaveChanges = useCallback(async () => {
     if (
-      isLoading ||
+      isPending ||
       !community?.id ||
       spamTierLevel === community?.spam_tier_level
     )
@@ -72,7 +72,7 @@ const SpamLevel = () => {
       notifyError('Failed to update auto spam level!');
     }
   }, [
-    isLoading,
+    isPending,
     community?.id,
     community?.spam_tier_level,
     spamTierLevel,

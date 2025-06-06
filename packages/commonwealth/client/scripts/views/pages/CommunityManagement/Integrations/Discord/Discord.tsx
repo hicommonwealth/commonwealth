@@ -76,7 +76,7 @@ const Discord = () => {
 
   const {
     mutateAsync: removeDiscordBotConfig,
-    isLoading: isRemovingDiscordBotConfig,
+    isPending: isRemovingDiscordBotConfig,
   } = useRemoveDiscordBotConfigMutation();
 
   useEffect(() => {

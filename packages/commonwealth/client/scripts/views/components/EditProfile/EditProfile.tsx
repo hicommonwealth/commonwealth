@@ -75,7 +75,7 @@ const EditProfile = () => {
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
-  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+  const { mutateAsync: updateUser, isPending: isUpdatingProfile } =
     useUpdateUserMutation({
       addressesWithChainsToUpdate: addresses?.map((a) => ({
         address: a.address,

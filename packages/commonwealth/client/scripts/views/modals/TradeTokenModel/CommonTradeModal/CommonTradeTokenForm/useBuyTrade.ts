@@ -129,10 +129,10 @@ const useBuyTrade = ({
     ethChainId,
   ]);
 
-  const { mutateAsync: buyToken, isLoading: isBuyingToken } =
+  const { mutateAsync: buyToken, isPending: isBuyingToken } =
     useBuyTokenMutation();
 
-  const { mutateAsync: createTokenTrade, isLoading: isCreatingTokenTrade } =
+  const { mutateAsync: createTokenTrade, isPending: isCreatingTokenTrade } =
     useCreateTokenTradeMutation();
 
   const onBaseCurrencyBuyAmountChange = (

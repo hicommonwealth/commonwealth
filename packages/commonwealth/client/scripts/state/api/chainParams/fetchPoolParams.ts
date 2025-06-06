@@ -18,7 +18,7 @@ const usePoolParamsQuery = () => {
     queryKey: ['poolParams', communityId],
     queryFn: fetchPoolParams,
     enabled: app.chain?.base === ChainBase.CosmosSDK,
-    cacheTime: POOL_PARAMS_CACHE_TIME,
+    gcTime: POOL_PARAMS_CACHE_TIME,
     staleTime: POOL_PARAMS_STALE_TIME,
   });
 };

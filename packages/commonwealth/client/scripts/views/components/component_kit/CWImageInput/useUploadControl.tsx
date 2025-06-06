@@ -63,7 +63,7 @@ export const useUploadControl = ({
 
   const {
     data: uploadedImageURL,
-    isLoading: isUploadingImage,
+    isPending: isUploadingImage,
     mutateAsync: uploadPickedImage,
     error: imageUploadError,
   } = useUploadFileMutation({
@@ -72,7 +72,7 @@ export const useUploadControl = ({
 
   const {
     data: generatedImageURL,
-    isLoading: isGeneratingImage,
+    isPending: isGeneratingImage,
     mutateAsync: generateImage,
     error: generateImageError,
   } = useGenerateImageMutation({

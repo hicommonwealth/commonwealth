@@ -1,5 +1,5 @@
 import { Events, events, PG_INT } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z, ZodRawShape } from 'zod';
 
 export const BaseOutboxProperties = z.object({
   event_id: PG_INT.optional(),
@@ -18,5 +18,9 @@ export const Outbox = z.union(
         event_payload: events[event_name],
       })
       .merge(BaseOutboxProperties),
-  ) as unknown as readonly [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]],
+  ) as unknown as readonly [
+    z.ZodObject<ZodRawShape>,
+    z.ZodObject<ZodRawShape>,
+    ...z.ZodObject<ZodRawShape>[],
+  ],
 );
