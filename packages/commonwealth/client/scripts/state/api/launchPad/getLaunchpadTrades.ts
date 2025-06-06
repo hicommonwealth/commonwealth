@@ -14,8 +14,7 @@ const useGetLaunchpadTradesQuery = ({
       trader_addresses: trader_addresses.join(','),
     },
     {
-      //cacheTime: FETCH_TOKENS_STALE_TIME,
-      staleTime: FETCH_TOKENS_STALE_TIME,
+      gcTime: FETCH_TOKENS_STALE_TIME,
     },
   );
 };

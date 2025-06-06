@@ -29,7 +29,7 @@ const useCompletedCosmosProposalsQuery = ({
     queryFn: fetchCompletedProposals,
     enabled: app.chain?.base === ChainBase.CosmosSDK && isApiReady,
     retry: 3,
-    //cacheTime: COMPLETED_PROPOSALS_CACHE_TIME,
+    gcTime: COMPLETED_PROPOSALS_CACHE_TIME,
     staleTime: COMPLETED_PROPOSALS_STALE_TIME,
   });
 };

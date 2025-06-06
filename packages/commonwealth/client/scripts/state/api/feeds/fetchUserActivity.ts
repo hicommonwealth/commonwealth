@@ -1,7 +1,7 @@
 import { trpc } from 'client/scripts/utils/trpcClient';
 
 const USER_ACTIVITY_STALE_TIME = 60 * 1_000; // 1 minute
-//const USER_ACTIVITY_CACHE_TIME = 5 * 60 * 1_000; // 5 minutes
+const USER_ACTIVITY_CACHE_TIME = 5 * 60 * 1_000; // 5 minutes
 const GLOBAL_ACTIVITY_STALE_TIME = 5 * 60 * 1_000; // 5 minutes (backend caches for 5 minutes as well)
 
 export const useFetchGlobalActivityQuery = ({ limit }: { limit: number }) => {
@@ -11,7 +11,7 @@ export const useFetchGlobalActivityQuery = ({ limit }: { limit: number }) => {
     },
     {
       staleTime: GLOBAL_ACTIVITY_STALE_TIME,
-      //cacheTime: USER_ACTIVITY_CACHE_TIME,
+      gcTime: USER_ACTIVITY_CACHE_TIME,
       initialCursor: 1,
       getNextPageParam: (lastPage) => {
         if (lastPage.results.length === 0) return undefined;
@@ -29,7 +29,7 @@ export const useFetchUserActivityQuery = ({ limit }: { limit: number }) => {
     },
     {
       staleTime: USER_ACTIVITY_STALE_TIME,
-      //cacheTime: USER_ACTIVITY_CACHE_TIME,
+      gcTime: USER_ACTIVITY_CACHE_TIME,
       initialCursor: 1,
       getNextPageParam: (lastPage) => {
         const nextPageNum = lastPage.page + 1;
