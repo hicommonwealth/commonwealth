@@ -9,19 +9,19 @@ export const VALIDATION_MESSAGES = {
 
 export const requirementSubFormValidationSchema = z.object({
   requirementType: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string()
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   requirementChain: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string()
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   requirementContractAddress: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string()
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   requirementCondition: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string()
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   requirementAmount: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string()
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
     .refine(
       (value) => {
@@ -30,7 +30,7 @@ export const requirementSubFormValidationSchema = z.object({
       { message: VALIDATION_MESSAGES.INVALID_INPUT },
     ),
   requirementTokenId: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string()
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
     .refine(
       (value) => {
@@ -42,11 +42,11 @@ export const requirementSubFormValidationSchema = z.object({
 
 export const groupValidationSchema = z.object({
   groupName: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string()
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
     .max(40, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED }),
   groupDescription: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string()
     .max(250, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
     .optional()
     .default(''),
@@ -58,7 +58,7 @@ export const groupValidationSchema = z.object({
     ])
     .optional(),
   requirementsToFulfill: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string()
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   topics: z.union([
     z

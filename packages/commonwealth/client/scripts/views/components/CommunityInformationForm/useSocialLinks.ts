@@ -1,6 +1,6 @@
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { useState } from 'react';
-import { ZodError } from 'zod/v4';
+import { prettifyError, ZodError } from 'zod/v4';
 import { SocialLinkField } from './types';
 
 const useSocialLinks = () => {
@@ -41,7 +41,7 @@ const useSocialLinks = () => {
         const zodError = e as ZodError;
         updatedSocialLinks[index] = {
           ...updatedSocialLinks[index],
-          error: zodError.errors[0].message,
+          error: prettifyError(zodError),
         };
       }
     });
@@ -71,7 +71,7 @@ const useSocialLinks = () => {
       const zodError = e as ZodError;
       updatedSocialLinks[index] = {
         ...updatedSocialLinks[index],
-        error: zodError.errors[0].message,
+        error: prettifyError(zodError),
       };
     }
     setSocialLinks([...updatedSocialLinks]);

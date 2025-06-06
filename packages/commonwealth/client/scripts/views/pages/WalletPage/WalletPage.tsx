@@ -34,7 +34,7 @@ import {
   typeToIcon,
 } from './utils';
 
-type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._type;
+type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._output;
 
 const WalletPage = () => {
   const user = useUserStore();

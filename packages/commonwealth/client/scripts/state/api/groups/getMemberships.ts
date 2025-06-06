@@ -15,7 +15,7 @@ export interface Memberships {
   groupId: number;
   topics: { id: number; permissions: GatedActionEnum[] }[];
   isAllowed: boolean;
-  rejectReason: MembershipRejectReason;
+  rejectReason?: MembershipRejectReason;
 }
 
 export const useGetMembershipsQuery = ({

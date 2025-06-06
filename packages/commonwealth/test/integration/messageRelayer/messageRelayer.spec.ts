@@ -1,5 +1,5 @@
 import { disposeAdapter } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models, OutboxAttributes } from '@hicommonwealth/model';
 import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import {
@@ -42,7 +42,7 @@ describe('messageRelayer', { timeout: 20_000 }, () => {
         } as any,
         relayed: false,
       },
-    ]);
+    ] as unknown as OutboxAttributes[]);
 
     const pgClient = await startMessageRelayer(-1);
     await pgClient.end();

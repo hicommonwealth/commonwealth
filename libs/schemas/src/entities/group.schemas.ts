@@ -110,7 +110,7 @@ export const MembershipRejectReason = z
   .object({
     message: z.string(),
     requirement: z.object({
-      data: z.any(),
+      data: z.any().optional(),
       rule: z.string(),
     }),
   })

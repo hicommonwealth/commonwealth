@@ -15,7 +15,7 @@ type FormProps = {
   children?: any | ((formMethods: UseFormReturn) => ReactNode);
   className?: string;
   initialValues?: Object;
-  validationSchema: z.Schema<any, any>;
+  validationSchema: z.ZodType;
   onWatch?: (values: any) => void;
 };
 

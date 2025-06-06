@@ -1,6 +1,5 @@
-import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { useState } from 'react';
-import { ZodError } from 'zod/v4';
+import { prettifyError, ZodError } from 'zod/v4';
 import { Link, LinksArrayHookProps } from './types';
 
 const useLinksArray = ({
@@ -36,7 +35,7 @@ const useLinksArray = ({
       return '';
     } catch (e: any) {
       const zodError = e as ZodError;
-      return zodError.errors[0].message || VALIDATION_MESSAGES.INVALID_INPUT;
+      return prettifyError(zodError);
     }
   };
 
