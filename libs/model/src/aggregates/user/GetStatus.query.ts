@@ -15,8 +15,8 @@ export function GetStatus(): Query<typeof schemas.GetStatus> {
     authStrategy: {
       type: 'custom',
       name: 'Status',
-      userResolver: async (_, signedInUser) =>
-        signedInUser || { id: -1, email: '' },
+      userResolver: (_, signedInUser) =>
+        Promise.resolve(signedInUser || { id: -1, email: '' }),
     },
     body: async ({ actor }) => {
       if (actor.user.id === -1) return;
