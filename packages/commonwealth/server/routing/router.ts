@@ -142,11 +142,6 @@ function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
     },
   );
 
-  // to get the address of the signed in user
-  registerRoute(router, 'get', '/me', (req, res) => {
-    return res.json({ status: 'Success', result: req.user!.toJSON() });
-  });
-
   // login
   registerRoute(
     router,
