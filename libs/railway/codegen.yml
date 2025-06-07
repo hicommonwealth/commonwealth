@@ -1,0 +1,16 @@
+overwrite: true
+schema: 'https://backboard.railway.app/graphql/v2'
+documents: 'src/queries/*.graphql'
+generates:
+  src/generated/graphql.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-graphql-request'
+      - 'typescript-operations'
+    config:
+      rawRequest: false
+      inlineFragmentTypes: combine
+      skipTypename: false
+      exportFragmentSpreadSubTypes: true
+      dedupeFragments: true
+      gqlImport: 'graphql-request#gql'
