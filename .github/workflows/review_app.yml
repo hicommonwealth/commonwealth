@@ -99,7 +99,6 @@ jobs:
         with:
           context: .
           file: Dockerfile.commonwealth_ephemeral
-          target: commonwealth-ephemeral
           push: true
           tags: ghcr.io/hicommonwealth/commonwealth-ephemeral:${{ steps.set_effective_sha.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/hicommonwealth/commonwealth-ephemeral:buildcache
