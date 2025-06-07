@@ -19,7 +19,8 @@
     "check-types": "tsc --noEmit",
     "test": "echo No tests for @hicommonwealth/railway",
     "codegen": "graphql-codegen --config codegen.yml",
-    "deploy-review-app": "tsx "
+    "deploy-review-app": "tsx src/scripts/deployReviewApp.ts",
+    "upsert-env-var": "tsx src/scripts/upsertEnvVariables.ts"
   },
   "dependencies": {
     "@hicommonwealth/core": "workspace:*",

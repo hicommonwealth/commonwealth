@@ -5179,6 +5179,11 @@ export const EnvironmentDocument = gql`
     }
   }
 `;
+export const VariableCollectionUpsertDocument = gql`
+  mutation variableCollectionUpsert($input: VariableCollectionUpsertInput!) {
+    variableCollectionUpsert(input: $input)
+  }
+`;
 export const ServiceInstanceUpdateDocument = gql`
   mutation serviceInstanceUpdate(
     $serviceId: String!
@@ -5201,6 +5206,27 @@ export const ServiceInstanceDeployV2Document = gql`
       serviceId: $serviceId
       environmentId: $environmentId
     )
+  }
+`;
+export const ServiceCreateDocument = gql`
+  mutation serviceCreate($input: ServiceCreateInput!) {
+    serviceCreate(input: $input) {
+      createdAt
+      deletedAt
+      featureFlags
+      id
+      name
+      projectId
+      updatedAt
+    }
+  }
+`;
+export const ServiceDomainCreateDocument = gql`
+  mutation serviceDomainCreate($input: ServiceDomainCreateInput!) {
+    serviceDomainCreate(input: $input) {
+      id
+      domain
+    }
   }
 `;
 
@@ -5295,6 +5321,24 @@ export function getSdk(
         variables,
       );
     },
+    variableCollectionUpsert(
+      variables: VariableCollectionUpsertMutationVariables,
+      requestHeaders?: GraphQLClientRequestHeaders,
+      signal?: RequestInit['signal'],
+    ): Promise<VariableCollectionUpsertMutation> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<VariableCollectionUpsertMutation>({
+            document: VariableCollectionUpsertDocument,
+            variables,
+            requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders },
+            signal,
+          }),
+        'variableCollectionUpsert',
+        'mutation',
+        variables,
+      );
+    },
     serviceInstanceUpdate(
       variables: ServiceInstanceUpdateMutationVariables,
       requestHeaders?: GraphQLClientRequestHeaders,
@@ -5327,6 +5371,42 @@ export function getSdk(
             signal,
           }),
         'serviceInstanceDeployV2',
+        'mutation',
+        variables,
+      );
+    },
+    serviceCreate(
+      variables: ServiceCreateMutationVariables,
+      requestHeaders?: GraphQLClientRequestHeaders,
+      signal?: RequestInit['signal'],
+    ): Promise<ServiceCreateMutation> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<ServiceCreateMutation>({
+            document: ServiceCreateDocument,
+            variables,
+            requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders },
+            signal,
+          }),
+        'serviceCreate',
+        'mutation',
+        variables,
+      );
+    },
+    serviceDomainCreate(
+      variables: ServiceDomainCreateMutationVariables,
+      requestHeaders?: GraphQLClientRequestHeaders,
+      signal?: RequestInit['signal'],
+    ): Promise<ServiceDomainCreateMutation> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<ServiceDomainCreateMutation>({
+            document: ServiceDomainCreateDocument,
+            variables,
+            requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders },
+            signal,
+          }),
+        'serviceDomainCreate',
         'mutation',
         variables,
       );
@@ -5399,6 +5479,15 @@ export type EnvironmentQuery = {
   };
 };
 
+export type VariableCollectionUpsertMutationVariables = Exact<{
+  input: VariableCollectionUpsertInput;
+}>;
+
+export type VariableCollectionUpsertMutation = {
+  __typename?: 'Mutation';
+  variableCollectionUpsert: boolean;
+};
+
 export type ServiceInstanceUpdateMutationVariables = Exact<{
   serviceId: Scalars['String']['input'];
   environmentId?: InputMaybe<Scalars['String']['input']>;
@@ -5418,4 +5507,35 @@ export type ServiceInstanceDeployV2MutationVariables = Exact<{
 export type ServiceInstanceDeployV2Mutation = {
   __typename?: 'Mutation';
   serviceInstanceDeployV2: string;
+};
+
+export type ServiceCreateMutationVariables = Exact<{
+  input: ServiceCreateInput;
+}>;
+
+export type ServiceCreateMutation = {
+  __typename?: 'Mutation';
+  serviceCreate: {
+    __typename?: 'Service';
+    createdAt: any;
+    deletedAt?: any | null;
+    featureFlags: Array<ActiveServiceFeatureFlag>;
+    id: string;
+    name: string;
+    projectId: string;
+    updatedAt: any;
+  };
+};
+
+export type ServiceDomainCreateMutationVariables = Exact<{
+  input: ServiceDomainCreateInput;
+}>;
+
+export type ServiceDomainCreateMutation = {
+  __typename?: 'Mutation';
+  serviceDomainCreate: {
+    __typename?: 'ServiceDomain';
+    id: string;
+    domain: string;
+  };
 };

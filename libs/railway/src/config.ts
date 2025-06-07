@@ -29,6 +29,11 @@ export const config = configure(
             ),
           PARENT_ENV_ID: z
             .string()
+            .optional()
+            .refine(
+              (data) => !(target.IS_CI && !data),
+              'Railway environment parent id must be set in CI for review app deployments to work',
+            )
             .describe(
               'The environment id to fork from when deploying a new review app',
             ),

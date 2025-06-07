@@ -1,5 +1,7 @@
 export const RailWayAPI = 'https://backboard.railway.app/graphql/v2';
 
+export const RailwayParentEnvName = 'apex';
+
 /**
  * The name of the services on Railway. This should match the name of the Docker
  * file that is deployed to the service.
@@ -22,3 +24,5 @@ export const ExecutableFiles: Record<ServiceName, string> = {
  */
 export const StartCommandPrefix =
   'NODE_ENV=production node --enable-source-maps';
+
+export const WEB_PORT = 8080;

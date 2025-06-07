@@ -1,34 +1,16 @@
 import { dispose, logger } from '@hicommonwealth/core';
-import { GraphQLClient } from 'graphql-request';
 import { config } from '../config';
 import {
   ExecutableFiles,
-  RailWayAPI,
   ServiceName,
   ServiceNames,
   StartCommandPrefix,
 } from '../constants';
-import {
-  DeploymentStatus,
-  getSdk,
-  RestartPolicyType,
-} from '../generated/graphql';
-import { getDockerImageUrl } from '../utils';
+import { RestartPolicyType } from '../generated/graphql';
+import { sdk } from '../sdk';
+import { getDockerImageUrl, waitForDeploymentCompletion } from '../utils';
 
 const log = logger(import.meta);
-
-// Poll for deployment status every 60 seconds (avg deployment takes 45 seconds)
-const STATUS_POLL_INTERVAL = 1_000 * 60;
-// Wait for max 3 minutes for deployment to complete (3 retries)
-const STATUS_MAX_WAIT_TIME = 1_000 * 60 * 3;
-
-const client = new GraphQLClient(RailWayAPI, {
-  headers: {
-    authorization: `Bearer ${config.RAILWAY!.TOKEN}`,
-  },
-});
-
-const sdk = getSdk(client);
 
 async function getEnvironmentId(envName: string) {
   log.info('Fetching environments...');
@@ -37,13 +19,18 @@ async function getEnvironmentId(envName: string) {
   });
 
   let envId: string | undefined;
+  let parentEnvFound = false;
   for (const edge of envs.environments.edges) {
-    if (edge.node.name === envName) {
+    if (edge.node.id === config.RAILWAY!.REVIEW_APPS.PARENT_ENV_ID) {
+      parentEnvFound = true;
+    } else if (edge.node.name === envName) {
       log.info(`Environment ${envName} found!`);
       envId = edge.node.id;
-      break;
     }
   }
+
+  if (!envId && !parentEnvFound)
+    throw new Error('Parent environment to fork not found!');
 
   if (!envId) {
     log.info(`Environment ${envName} not found. Creating new environment...`);
@@ -123,79 +110,31 @@ async function deploy({
   return deployment.serviceInstanceDeployV2;
 }
 
-async function getDeploymentStatus(deploymentId: string) {
-  const res = await sdk.deployment({
-    id: deploymentId,
-  });
-  return {
-    status: res.deployment.status,
-    url: res.deployment.staticUrl,
-    serviceName: res.deployment.service.name,
-  };
-}
-
-async function waitForDeploymentCompletion(deploymentId: string) {
-  const startTime = Date.now();
-
-  while (Date.now() - startTime < STATUS_MAX_WAIT_TIME) {
-    console.log(`Fetching status for deployment: ${deploymentId}`);
-    const dep = await getDeploymentStatus(deploymentId);
-    console.log(`Deployment '${deploymentId}' status: ${dep.status}`);
-
-    if (['SUCCESS', 'SLEEPING'].includes(dep.status)) {
-      console.log(`Deployment of '${dep.serviceName} succeeded!'`);
-      return dep;
-    } else if (
-      [
-        DeploymentStatus.Crashed,
-        DeploymentStatus.Failed,
-        DeploymentStatus.Removed,
-        DeploymentStatus.Removing,
-        DeploymentStatus.NeedsApproval,
-        DeploymentStatus.Skipped,
-      ].includes(dep.status)
-    ) {
-      throw new Error(
-        `Deployment of '${dep.serviceName}' failed with status: ${dep.status}`,
-      );
-    }
-
-    if (
-      [
-        DeploymentStatus.Queued,
-        DeploymentStatus.Waiting,
-        DeploymentStatus.Building,
-        DeploymentStatus.Initializing,
-        DeploymentStatus.Deploying,
-      ].includes(dep.status)
-    ) {
-      await new Promise((resolve) => {
-        console.log(
-          `Deployment not finished, retrying in ${STATUS_POLL_INTERVAL}`,
-        );
-        return setTimeout(resolve, STATUS_POLL_INTERVAL);
-      });
-    } else {
-      throw new Error(
-        `Unknown status '${dep.status}' for service ${dep.serviceName}`,
-      );
-    }
-  }
-
-  throw new Error(`Failed to await deployment status`);
-}
-
 export async function deployReviewApp({
   envName,
   commitSha,
+  dbUrl,
 }: {
   envName: string;
   commitSha: string;
+  dbUrl?: string;
 }) {
   try {
     const envId = await getEnvironmentId(envName);
     const serviceMap = await getServices(envId);
     log.info(JSON.stringify(serviceMap));
+
+    if (dbUrl) {
+      await sdk.variableCollectionUpsert({
+        input: {
+          projectId: config.RAILWAY!.REVIEW_APPS.PROJECT_ID!,
+          environmentId: envId,
+          variables: {
+            DATABASE_URL: dbUrl,
+          },
+        },
+      });
+    }
 
     for (const [serviceName, serviceId] of Object.entries(serviceMap)) {
       await updateService({
@@ -241,22 +180,32 @@ export async function deployReviewApp({
   }
 }
 
-if (import.meta.url.endsWith(process.argv[1])) {
+async function main() {
+  if (!config.RAILWAY || !config.RAILWAY.REVIEW_APPS.PARENT_ENV_ID) {
+    throw new Error('Invalid Railway config');
+  }
+
   const args = process.argv.slice(2);
   const envArg = args.find((arg) => arg.startsWith('--env='));
   const commitArg = args.find((arg) => arg.startsWith('--commit='));
+  const dbUrlArg = args.find((arg) => arg.startsWith('--db-url='));
 
   if (!envArg || !commitArg) {
     console.error(
-      'Usage: node deployReviewApp.js --env=<environment-name> --commit=<commit-sha>',
+      'Usage: tsx deployReviewApp.ts --env=<environment-name> --commit=<commit-sha> [--db-url=<database-url>]',
     );
     process.exit(1);
   }
 
   const envName = envArg.split('=')[1];
   const commitSha = commitArg.split('=')[1];
+  const dbUrl = dbUrlArg ? dbUrlArg.split('=')[1] : undefined;
 
-  deployReviewApp({ envName, commitSha })
+  await deployReviewApp({ envName, commitSha, dbUrl });
+}
+
+if (import.meta.url.endsWith(process.argv[1])) {
+  main()
     .then(() => {
       console.log('Success!');
       // eslint-disable-next-line @typescript-eslint/no-floating-promises

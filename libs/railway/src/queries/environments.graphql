@@ -29,3 +29,7 @@ query environment($id: String!) {
     }
   }
 }
+
+mutation variableCollectionUpsert($input: VariableCollectionUpsertInput!) {
+  variableCollectionUpsert(input: $input)
+}

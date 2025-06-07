@@ -13,3 +13,24 @@ mutation serviceInstanceUpdate(
 mutation serviceInstanceDeployV2($serviceId: String!, $environmentId: String!) {
   serviceInstanceDeployV2(serviceId: $serviceId, environmentId: $environmentId)
 }
+
+mutation serviceCreate($input: ServiceCreateInput!) {
+  serviceCreate(input: $input) {
+    createdAt
+    deletedAt
+    # deployments
+    featureFlags
+    id
+    name
+    projectId
+    # serviceInstances
+    updatedAt
+  }
+}
+
+mutation serviceDomainCreate($input: ServiceDomainCreateInput!) {
+  serviceDomainCreate(input: $input) {
+    id
+    domain
+  }
+}
