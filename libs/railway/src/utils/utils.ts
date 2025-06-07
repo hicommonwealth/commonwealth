@@ -1,5 +1,3 @@
-import { ServiceName } from '../constants';
-
-export function getDockerImageUrl(serviceName: ServiceName, commitSha: string) {
-  return `ghcr.io/hicommonwealth/${serviceName}:${commitSha}`;
+export function getDockerImageUrl(commitSha: string) {
+  return `ghcr.io/hicommonwealth/commonwealth-ephemeral:${commitSha}`;
 }

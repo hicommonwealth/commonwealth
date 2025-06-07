@@ -19,6 +19,7 @@ async function getEnvironmentId(envName: string) {
   });
 
   let envId: string | undefined;
+  let existingEnv = false;
   let parentEnvFound = false;
   for (const edge of envs.environments.edges) {
     if (edge.node.id === config.RAILWAY!.REVIEW_APPS.PARENT_ENV_ID) {
@@ -26,6 +27,7 @@ async function getEnvironmentId(envName: string) {
     } else if (edge.node.name === envName) {
       log.info(`Environment ${envName} found!`);
       envId = edge.node.id;
+      existingEnv = true;
     }
   }
 
@@ -46,7 +48,7 @@ async function getEnvironmentId(envName: string) {
     envId = newEnv.environmentCreate.id;
   }
 
-  return envId;
+  return { envId, created: !existingEnv };
 }
 
 async function getServices(envId: string) {
@@ -85,7 +87,7 @@ async function updateService({
     environmentId: envId,
     input: {
       source: {
-        image: getDockerImageUrl(serviceName, commitSha),
+        image: getDockerImageUrl(commitSha),
       },
       restartPolicyType: restartPolicy,
       startCommand: `${StartCommandPrefix} ${ExecutableFiles[serviceName]}`,
@@ -120,11 +122,11 @@ export async function deployReviewApp({
   dbUrl?: string;
 }) {
   try {
-    const envId = await getEnvironmentId(envName);
+    const { envId, created } = await getEnvironmentId(envName);
     const serviceMap = await getServices(envId);
     log.info(JSON.stringify(serviceMap));
 
-    if (dbUrl) {
+    if (dbUrl && created) {
       await sdk.variableCollectionUpsert({
         input: {
           projectId: config.RAILWAY!.REVIEW_APPS.PROJECT_ID!,
@@ -162,18 +164,7 @@ export async function deployReviewApp({
       }
     }
 
-    try {
-      if (deploymentUrl) {
-        const fs = require('fs');
-        fs.appendFileSync(
-          process.env.GITHUB_ENV,
-          `DEPLOYMENT_URL=${deploymentUrl}`,
-        );
-      }
-    } catch (e) {
-      console.error('Failed to save deployment URL');
-      throw new Error('Failed to save deployment URL');
-    }
+    return deploymentUrl;
   } catch (e) {
     console.error(e);
     process.exit(1);
@@ -191,7 +182,7 @@ async function main() {
   const dbUrlArg = args.find((arg) => arg.startsWith('--db-url='));
 
   if (!envArg || !commitArg) {
-    console.error(
+    log.error(
       'Usage: tsx deployReviewApp.ts --env=<environment-name> --commit=<commit-sha> [--db-url=<database-url>]',
     );
     process.exit(1);
@@ -201,7 +192,21 @@ async function main() {
   const commitSha = commitArg.split('=')[1];
   const dbUrl = dbUrlArg ? dbUrlArg.split('=')[1] : undefined;
 
-  await deployReviewApp({ envName, commitSha, dbUrl });
+  const deploymentUrl = await deployReviewApp({ envName, commitSha, dbUrl });
+  log.info(`Deployment URL: ${deploymentUrl}`);
+
+  try {
+    if (deploymentUrl && (config.APP_ENV === 'CI' || config.IS_CI)) {
+      const fs = require('fs');
+      fs.appendFileSync(
+        process.env.GITHUB_ENV,
+        `DEPLOYMENT_URL=${deploymentUrl}`,
+      );
+    }
+  } catch (e) {
+    log.error('Failed to save deployment URL');
+    throw new Error('Failed to save deployment URL');
+  }
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {

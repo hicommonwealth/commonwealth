@@ -50,7 +50,7 @@ async function createServices({
         projectId: config.RAILWAY!.REVIEW_APPS.PROJECT_ID,
         name: serviceName,
         source: {
-          image: getDockerImageUrl(serviceName, commitSha),
+          image: getDockerImageUrl(commitSha),
         },
       },
     });
