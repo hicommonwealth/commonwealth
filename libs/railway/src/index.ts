@@ -1,1 +1,1 @@
-export * from './deployReviewApp';
+export * from './scripts/deployReviewApp';

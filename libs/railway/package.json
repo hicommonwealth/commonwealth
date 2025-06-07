@@ -18,18 +18,20 @@
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
     "test": "echo No tests for @hicommonwealth/railway",
-    "codegen": "graphql-codegen --config codegen.yml"
+    "codegen": "graphql-codegen --config codegen.yml",
+    "deploy-review-app": "tsx "
   },
   "dependencies": {
     "@hicommonwealth/core": "workspace:*",
     "graphql": "^16.9.0",
     "graphql-request": "^7.1.0",
-    "zod": "^3.22.4"
+    "zod": "^3.25.46"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-codegen/typescript-graphql-request": "^6.3.0",
-    "@graphql-codegen/typescript-operations": "^4.6.1"
+    "@graphql-codegen/typescript-operations": "^4.6.1",
+    "tsx": "^4.7.2"
   }
 }
