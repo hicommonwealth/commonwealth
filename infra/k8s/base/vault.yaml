@@ -22,6 +22,20 @@ spec:
           value: 'true'
         - name: ui.serviceType
           value: LoadBalancer
+        # Enable Kubernetes auth method
+        - name: server.authMethods[0].type
+          value: kubernetes
+        - name: server.authMethods[0].path
+          value: demo-auth-mount
+        - name: server.authMethods[0].config.kubernetes_host
+          value: https://kubernetes.default.svc
+        # Required permissions for Kubernetes auth
+        - name: server.serviceAccount.create
+          value: 'true'
+        - name: server.serviceAccount.name
+          value: vault
+        - name: server.rbac.create
+          value: 'true'
   sources: []
   project: default
   syncPolicy:
@@ -31,3 +45,32 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ApplyOutOfSyncOnly=true
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault-secrets-operator
+spec:
+  destination:
+    namespace: vault-secrets-operator
+    server: https://kubernetes.default.svc
+  source:
+    path: ''
+    repoURL: https://helm.releases.hashicorp.com
+    targetRevision: 0.10.0
+    chart: vault-secrets-operator
+    helm:
+      parameters:
+        - name: defaultVaultConnection.enabled
+          value: 'true'
+        - name: defaultVaultConnection.address
+          value: 'http://vault.vault.svc.cluster.local:8200'
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

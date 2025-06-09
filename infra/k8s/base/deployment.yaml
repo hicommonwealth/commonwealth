@@ -1,0 +1,13 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: commonwealth
+  namespace: argocd
+spec:
+  source:
+    repoURL: http://host.docker.internal:8000 # For Docker Desktop
+    path: ./ # Path to kustomization.yaml
+    kustomize: {}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: commonwealth
