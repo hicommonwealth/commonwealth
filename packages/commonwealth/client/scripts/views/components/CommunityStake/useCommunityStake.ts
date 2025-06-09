@@ -82,11 +82,10 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
       chainRpc,
       ethChainId,
-      //keepPreviousData: true,
+      keepPreviousData: true,
     });
 
   const currentVoteWeight = commonProtocol.calculateVoteWeight(
-    // @ts-expect-error StrictNullChecks
     userStakeBalanceData,
     stakeData?.stake?.vote_weight,
   );
