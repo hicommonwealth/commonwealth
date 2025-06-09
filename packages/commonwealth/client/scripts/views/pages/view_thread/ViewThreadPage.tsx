@@ -124,10 +124,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [imageActionModalOpen, setImageActionModalOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [uniqueVoterAddresses, setUniqueVoterAddresses] = useState<string[]>(
-    [],
-  );
-
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   useInitChainIfNeeded(app);
@@ -308,10 +304,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       setIsGloballyEditing(true);
       setIsEditingBody(true);
     }
-    if (thread && thread?.title) {
+    if (thread && thread?.title && !draftTitle) {
       setDraftTitle(thread.title);
     }
-  }, [isEdit, thread, isAdmin]);
+  }, [isEdit, thread, isAdmin, draftTitle]);
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
 
@@ -384,14 +380,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [thread?.versionHistory]);
 
-  // Effect to gather unique voter addresses from all polls
-  useEffect(() => {
+  // Compute unique voter addresses from all polls
+  const uniqueVoterAddresses = useMemo(() => {
     if (pollsData && pollsData.length > 0) {
       const allAddresses = pollsData.flatMap((poll) =>
         (poll.votes || []).map((vote) => vote.address),
       );
-      setUniqueVoterAddresses(Array.from(new Set(allAddresses)));
+      return Array.from(new Set(allAddresses));
     }
+    return [];
   }, [pollsData]);
 
   const { data: fetchedProfiles, isLoading: isLoadingProfiles } =
