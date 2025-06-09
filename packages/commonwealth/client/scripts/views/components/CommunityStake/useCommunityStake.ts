@@ -86,6 +86,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     });
 
   const currentVoteWeight = commonProtocol.calculateVoteWeight(
+    // @ts-expect-error StrictNullChecks
     userStakeBalanceData,
     stakeData?.stake?.vote_weight,
   );
