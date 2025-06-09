@@ -4,8 +4,10 @@ import {
   InvalidState,
   type Command,
 } from '@hicommonwealth/core';
+import { config as modelConfig } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import {
+  alchemyGetTokenPrices,
   bech32ToHex,
   ChainBase,
   ChainNetwork,
@@ -188,11 +190,24 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
         );
 
         if (community_indexer_id && token_address) {
+          const price = await alchemyGetTokenPrices({
+            alchemyApiKey: modelConfig.ALCHEMY.APP_KEYS.PRIVATE,
+            tokenSources: [
+              {
+                contractAddress: token_address,
+                alchemyNetworkId: node.alchemy_metadata!.network_id!,
+              },
+            ],
+          });
+          console.log('price', price);
+          const hasPricing =
+            Array.isArray(price?.data) && price.data.length > 0;
           await models.PinnedToken.create(
             {
               community_id: id,
               contract_address: token_address,
               chain_node_id: node.id!,
+              has_pricing: hasPricing,
             },
             { transaction },
           );

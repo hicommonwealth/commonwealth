@@ -40,6 +40,7 @@ export function GetStatus(): Query<typeof schemas.GetStatus> {
           'ghost_address',
           'last_active',
         ],
+        limit: 300,
         include: [
           {
             required: true,

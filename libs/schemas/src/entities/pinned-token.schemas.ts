@@ -6,6 +6,7 @@ export const PinnedToken = z.object({
   contract_address: z.string(),
   community_id: z.string(),
   chain_node_id: PG_INT,
+  has_pricing: z.boolean().default(false),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   ChainNode: ChainNode.optional(),
