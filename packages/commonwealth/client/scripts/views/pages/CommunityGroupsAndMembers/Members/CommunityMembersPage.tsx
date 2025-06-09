@@ -151,7 +151,6 @@ const CommunityMembersPage = () => {
 
   const tableState = useCWTableState({
     columns,
-    // initialSortColumn: 'lastActive',
     initialSortDirection: APIOrderDirection.Desc,
   });
 
