@@ -46,7 +46,7 @@ const GET_PROPOSALS_QUERY = gql`
   }
 `;
 
-interface ProposalsQueryResponse {
+export interface ProposalsQueryResponse {
   proposals: {
     id: string;
     ipfs: string;
