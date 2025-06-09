@@ -28,6 +28,10 @@ export default (
         type: Sequelize.INTEGER,
         allowNull: false,
       },
+      has_pricing: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,

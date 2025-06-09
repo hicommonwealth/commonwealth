@@ -199,9 +199,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
               },
             ],
           });
-          console.log('price', price);
-          const hasPricing =
-            Array.isArray(price?.data) && price.data.length > 0;
+          const hasPricing = !!price?.data?.[0]?.prices?.length;
           await models.PinnedToken.create(
             {
               community_id: id,
