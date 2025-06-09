@@ -358,6 +358,7 @@ export const notificationsProvider = port(function notificationsProviderFactory(
         Promise.resolve({ id: options.user_id }),
       registerClientRegistrationToken: () => Promise.resolve(false),
       unregisterClientRegistrationToken: () => Promise.resolve(false),
+      signUserToken: () => Promise.resolve(undefined),
     }
   );
 });
