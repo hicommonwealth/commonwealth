@@ -16,7 +16,16 @@ import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
 import { DiscordEventBase, Tweet } from '../integrations';
 import { EVM_ADDRESS_STRICT, EVM_BYTES, PG_INT } from '../utils';
-import { EventMetadata } from './util.schemas';
+
+// All events should carry this common metadata
+export const EventMetadata = z.object({
+  created_at: z.coerce.date().optional().describe('When the event was emitted'),
+  // TODO: TBD
+  // aggregateType: z.enum(Aggregates).describe("Event emitter aggregate type")
+  // aggregateId: z.string().describe("Event emitter aggregate id")
+  // correlation: z.string().describe("Event correlation key")
+  // causation: z.object({}).describe("Event causation")
+});
 
 const ChainEventBase = z.object({
   eventSource: z.object({
@@ -403,7 +412,7 @@ export const events = {
   LaunchpadTokenRecordCreated: z.object({
     name: z.string(),
     symbol: z.string(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
     eth_chain_id: z.number(),
     creator_address: EVM_ADDRESS_STRICT,
     token_address: EVM_ADDRESS_STRICT,

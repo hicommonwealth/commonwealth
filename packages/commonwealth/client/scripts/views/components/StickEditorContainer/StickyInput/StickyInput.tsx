@@ -61,6 +61,7 @@ interface StickyInputProps extends CommentEditorProps {
   topic?: Topic;
   parentType: ContentType;
   thread?: Thread;
+  communityId?: string;
 }
 
 const StickyInput = (props: StickyInputProps) => {
@@ -72,6 +73,7 @@ const StickyInput = (props: StickyInputProps) => {
     contentDelta,
     thread: originalThread,
     parentCommentText,
+    canComment,
     handleIsReplying,
   } = props;
   const { isWindowExtraSmall: isMobile } = useBrowserWindow({});
@@ -94,6 +96,8 @@ const StickyInput = (props: StickyInputProps) => {
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
+  const [justClosedMentionDropdown, setJustClosedMentionDropdown] =
+    useState(false);
 
   const placeholderText = useDynamicPlaceholder({
     mode,
@@ -166,6 +170,8 @@ const StickyInput = (props: StickyInputProps) => {
           stream: true,
           systemPrompt,
           useWebSearch: webSearchEnabled,
+          includeContextualMentions: true,
+          communityId: props.communityId,
           onError: (error) => {
             console.error('Error generating AI thread:', error);
             notifyError('Failed to generate AI thread content');
@@ -195,6 +201,8 @@ const StickyInput = (props: StickyInputProps) => {
           stream: true,
           systemPrompt,
           useWebSearch: webSearchEnabled,
+          includeContextualMentions: true,
+          communityId: props.communityId,
           onError: (error) => {
             console.error('Error generating AI comment:', error);
           },
@@ -219,6 +227,7 @@ const StickyInput = (props: StickyInputProps) => {
     setContentDelta,
     webSearchEnabled,
     selectedModels,
+    props.communityId,
   ]);
 
   const getActionPillLabel = () => {
@@ -285,11 +294,18 @@ const StickyInput = (props: StickyInputProps) => {
   ]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (justClosedMentionDropdown && event.key === 'Enter') {
+      setJustClosedMentionDropdown(false);
+      return;
+    }
+
     if (
       event.key === 'Enter' &&
+      !event.shiftKey &&
       !isExpanded &&
       contentDelta?.ops?.length > 0 &&
-      (!isTurnstileEnabled || turnstileToken)
+      (!isTurnstileEnabled || turnstileToken) &&
+      !justClosedMentionDropdown
     ) {
       event.preventDefault();
       void customHandleSubmitComment();
@@ -472,6 +488,7 @@ const StickyInput = (props: StickyInputProps) => {
                 customHandleSubmitComment().catch(console.error);
               }}
               disabled={
+                !canComment ||
                 !contentDelta?.ops?.length ||
                 isGenerating ||
                 (isTurnstileEnabled && !turnstileToken)
@@ -492,7 +509,7 @@ const StickyInput = (props: StickyInputProps) => {
 
     const inputContent = (
       <div
-        className={`StickyInput ${isExpanded ? 'expanded' : 'not-expanded'} ${isMobile ? 'mobile' : 'desktop'}`}
+        className={`StickyInput ${isExpanded ? 'expanded' : 'not-expanded'} ${isMobile ? 'mobile' : 'desktop'} ${mode === 'thread' ? 'thread-mode' : ''}`}
         ref={containerRef}
         style={isMobile && menuVisible ? { zIndex: -1 } : undefined}
       >
@@ -521,6 +538,7 @@ const StickyInput = (props: StickyInputProps) => {
                 setContentDelta={setContentDelta}
                 webSearchEnabled={webSearchEnabled}
                 setWebSearchEnabled={setWebSearchEnabled}
+                communityId={props.communityId}
               />
             ) : (
               <CommentEditor
@@ -538,6 +556,7 @@ const StickyInput = (props: StickyInputProps) => {
                 setContentDelta={setContentDelta}
                 webSearchEnabled={webSearchEnabled}
                 setWebSearchEnabled={setWebSearchEnabled}
+                communityId={props.communityId}
               />
             )}
           </div>
@@ -566,7 +585,9 @@ const StickyInput = (props: StickyInputProps) => {
                   className="sticky-editor"
                   contentDelta={props.contentDelta}
                   setContentDelta={props.setContentDelta}
+                  isDisabled={!canComment}
                   onKeyDown={handleKeyDown}
+                  justClosed={setJustClosedMentionDropdown}
                   placeholder={placeholderText}
                 />
               </div>

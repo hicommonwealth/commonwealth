@@ -189,7 +189,12 @@
       .CWEditor {
         .ql-container {
           min-height: unset !important;
-          max-height: 76px !important;
+          max-height: 152px !important;
+          overflow: unset !important;
+
+          .ql-editor {
+            max-height: 72px !important;
+          }
         }
       }
     }
@@ -200,6 +205,22 @@
       border-radius: 0;
       display: flex;
       flex-direction: column;
+
+      .CWEditor {
+        .ql-container {
+          .ql-editor {
+            max-height: 412px !important;
+          }
+        }
+      }
+    }
+
+    &.not-expanded.thread-mode {
+      .CWEditor {
+        .ql-container {
+          max-height: unset !important;
+        }
+      }
     }
 
     .MobileStickyInputFocused {
@@ -240,6 +261,19 @@
 
     &.expanded {
       padding: 0;
+    }
+
+    &.not-expanded {
+      .CWEditor {
+        .ql-container {
+          overflow: unset !important;
+
+          .ql-editor {
+            overflow: auto !important;
+            max-height: 72px !important;
+          }
+        }
+      }
     }
   }
 
@@ -301,7 +335,6 @@
 
             .ql-editor {
               min-height: unset !important;
-              max-height: unset !important;
               padding: 8px !important;
               font-size: 14px !important;
 
@@ -335,8 +368,8 @@
 .DesktopStickyInput {
   position: sticky;
   bottom: 0;
-  padding-bottom: 12px;
-  margin-top: auto;
+  padding: 12px 0 12px 0;
+  margin-top: 12px;
   z-index: 70;
   width: 100%;
   display: flex;

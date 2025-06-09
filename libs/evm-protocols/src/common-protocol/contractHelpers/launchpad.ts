@@ -1,7 +1,7 @@
 import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
+import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
-import { EvmEventSignatures } from '../../event-registry/eventSignatures';
-import { createPrivateEvmClient, getTransaction } from '../utils';
+import { createPrivateEvmClient, getTransaction, withRetries } from '../utils';
 import { getErc20TokenInfo } from './tokens';
 
 export const launchToken = async (
@@ -358,7 +358,13 @@ export async function getLaunchpadTokenDetails({
   reserve_ration: string;
   initial_purchase_eth_amount: string;
 }> {
-  const { tx } = await getTransaction({ rpc, txHash: transactionHash });
+  const tx = await withRetries(async () => {
+    const { tx: innerTx } = await getTransaction({
+      rpc,
+      txHash: transactionHash,
+    });
+    return innerTx;
+  });
 
   const tokenData = await getLaunchpadTokenCreatedTransaction({
     rpc,

@@ -13,12 +13,22 @@ export const procedure = trpc.procedure;
 
 const isSecure = <Input extends ZodSchema, Output extends ZodSchema>(
   md: Metadata<Input, Output>,
-) => md.secure !== false || (md.auth ?? []).length > 0;
+  forceSecure?: boolean,
+) => {
+  const firstAuth = md.auth?.at(0);
+  const optional =
+    typeof firstAuth === 'function' && firstAuth.name === 'authOptional';
+  return {
+    secure: forceSecure || md.secure !== false || !!firstAuth,
+    optional,
+  };
+};
 
 const authenticate = async <Input extends ZodSchema>(
   req: Request,
   rawInput: z.infer<Input>,
   authStrategy: AuthStrategies<Input> = { type: 'jwt' },
+  optional: boolean,
 ) => {
   // Bypass when user is already authenticated via JWT or token
   // Authentication overridden at router level e.g. external-router.ts
@@ -47,7 +57,7 @@ const authenticate = async <Input extends ZodSchema>(
     } else {
       await passport.authenticate(authStrategy.type, { session: false });
     }
-    if (!req.user) throw new Error('Not authenticated');
+    if (!req.user && !optional) throw new Error('Not authenticated');
   } catch (error) {
     throw new TRPCError({
       message: error instanceof Error ? error.message : (error as string),
@@ -67,10 +77,11 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
   outMiddlewares,
   forceSecure,
 }: BuildProcOptions<Input, Output>) => {
-  const secure = forceSecure ?? isSecure(md);
+  const { secure, optional } = isSecure(md, forceSecure);
   return trpc.procedure
     .use(async ({ ctx, rawInput, next }) => {
-      if (secure) await authenticate(ctx.req, rawInput, md.authStrategy);
+      if (secure)
+        await authenticate(ctx.req, rawInput, md.authStrategy, optional);
       return next({
         ctx: {
           ...ctx,
@@ -93,6 +104,7 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
     .meta({
       openapi: {
         method,
+        description: md.input._def.description, // zod property description
         path: `/${name}`,
         tags: [tag],
         headers: [
