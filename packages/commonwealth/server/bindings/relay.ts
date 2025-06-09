@@ -29,6 +29,7 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
     for (const event of events) {
       try {
         const res = await broker.publish({
+          id: event.event_id,
           name: event.event_name,
           payload: event.event_payload,
         });

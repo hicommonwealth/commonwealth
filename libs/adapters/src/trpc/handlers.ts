@@ -194,7 +194,11 @@ export const event = <
     .mutation(async ({ input }) => {
       try {
         const [[name, payload]] = Object.entries(input as object);
-        return await handleEvent(md, { name: name as Events, payload }, false);
+        return await handleEvent(
+          md,
+          { id: 0, name: name as Events, payload },
+          false,
+        );
       } catch (error) {
         throw trpcerror(error);
       }
