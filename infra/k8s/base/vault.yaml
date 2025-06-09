@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault
+  namespace: argocd
+spec:
+  destination:
+    namespace: vault
+    server: https://kubernetes.default.svc
+  source:
+    path: ''
+    repoURL: https://helm.releases.hashicorp.com
+    targetRevision: 0.30.0
+    chart: vault
+    helm:
+      parameters:
+        - name: server.dev.enabled
+          value: 'true'
+        - name: ui.enabled
+          value: 'true'
+        - name: server.dev.enabled
+          value: 'true'
+        - name: ui.serviceType
+          value: LoadBalancer
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

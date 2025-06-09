@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault-secrets-operator
+  namespace: argocd
+spec:
+  destination:
+    namespace: review-apps
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    helm:
+      valueFiles:
+        - values.yaml
+      values: |
+        defaultVaultConnection:
+          authMethod: token
+          tokenSecretRef:
+            name: vault-token
+            key: token
+    path: chart
+    repoURL: https://github.com/hashicorp/vault-secrets-operator
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultConnection
+metadata:
+  name: vault-connection
+  namespace: argocd
+spec:
+  address: 'https://your-vault-server.example.com:8200'

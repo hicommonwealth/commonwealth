@@ -9,27 +9,24 @@ terraform {
       source  = "digitalocean/digitalocean"
       version = "2.54.0"
     }
-    vault = {
-      source  = "hashicorp/vault"
-      version = "5.0.0"
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.37.1"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 2.17.0"
     }
   }
 }
 
-provider "aws" {
-  region = "us-east-1"
-}
-
-data "hcp_vault_secrets_app" "vault" {
-  app_name = var.VAULT_APP_NAME
-}
-
+# Digital Ocean K8 Setup
 provider "digitalocean" {
-  token = data.hcp_vault_secrets_app.vault.secrets["DIGITALOCEAN_TOKEN"]
+  token = var.DIGITALOCEAN_TOKEN
 }
 
 resource "digitalocean_kubernetes_cluster" "main" {
-  name    = var.VAULT_APP_NAME
+  name    = var.ENV_NAME
   region  = "nyc1"
   version = "1.32.2-do.3"
 
@@ -38,7 +35,7 @@ resource "digitalocean_kubernetes_cluster" "main" {
     size       = "s-1vcpu-2gb"
     node_count = 1
     max_nodes = 1
-    min_nodes = 1 // TODO: figure out if we can do min 0 and scale on first request
+    min_nodes = 1
     auto_scale = false
   }
 }
@@ -51,6 +48,7 @@ provider "kubernetes" {
   )
 }
 
+# Import helm for ArgoCD bootstrapping
 provider "helm" {
   kubernetes {
     host  = digitalocean_kubernetes_cluster.main.endpoint

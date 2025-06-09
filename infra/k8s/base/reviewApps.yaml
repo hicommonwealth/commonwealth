@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: preview-services
+spec:
+  goTemplate: true
+  generators:
+    - pullRequest:
+        github:
+          owner: hicommonwealth
+          repo: commonwealth
+          tokenRef:
+            secretName: github-token
+            key: token
+          labels:
+            - preview
+        requeueAfterSeconds: 16001
+
+  template:
+    metadata:
+      name: '{{.environment}}-preview-{{.branch}}-{{.number}}'
+    spec:
+      project: default
+      sources:
+        # RabbitMQ
+        - repoURL: https://charts.bitnami.com/bitnami
+          targetRevision: 16.0.6
+          chart: rabbitmq
+          helm:
+            releaseName: rabbitmq-{{.number}}
+            values: |
+              auth:
+                username: pr-{{.number}}
+                password: "{{randAlphaNum 16 | toString}}"
+              namespace: {{.environment}}-preview-{{.branch}}-{{.number}}
+
+        # Redis
+        - repoURL: https://charts.bitnami.com/bitnami
+          targetRevision: 21.2.0
+          chart: redis
+          helm:
+            releaseName: redis-{{.number}}
+            values: |
+              auth:
+                password: "{{randAlphaNum 16 | toString}}"
+              namespace: {{.environment}}-preview-{{.branch}}-{{.number}}
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: {{.environment}}-preview-{{.branch}}-{{.number}}
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ApplyOutOfSyncOnly=true
