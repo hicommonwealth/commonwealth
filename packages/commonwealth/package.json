@@ -150,7 +150,7 @@
     "@popperjs/core": "^2.0.6",
     "@privy-io/react-auth": "^2.12.0",
     "@privy-io/server-auth": "^1.19.0",
-    "@snapshot-labs/snapshot.js": "^0.4.35",
+    "@snapshot-labs/snapshot.js": "^0.12.63",
     "@solana/web3.js": "^1.30.2",
     "@tanstack/react-query": "^4.29.7",
     "@tanstack/react-query-devtools": "^4.29.7",
@@ -298,8 +298,8 @@
     "web3-utils": "^4.2.2",
     "web3-validator": "2.0.5",
     "yargs": "^17.7.2",
-    "zod-to-json-schema": "^3.24.5",
     "zod": "^3.25.46",
+    "zod-to-json-schema": "^3.24.5",
     "zustand": "^4.3.8"
   },
   "devDependencies": {
