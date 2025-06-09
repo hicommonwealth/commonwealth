@@ -180,4 +180,4 @@ const oasOptions: trpc.OasOptions = {
 const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, oasOptions);
 
-export { oasOptions, PATH, router, trpcRouter };
+export { api, oasOptions, PATH, router, trpcRouter };
