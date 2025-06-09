@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { NamespaceReferral } from '../commands/community.schemas';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
+import { ClankerToken } from '../entities/community-indexer.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
 import { LaunchpadToken } from '../entities/launchpad-token.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
@@ -535,6 +536,7 @@ export const events = {
       newEnd: z.coerce.bigint().describe('New duration (in seconds)'),
     }),
   }),
+  ClankerTokenFound: ClankerToken,
 
   JudgeNominated: ChainEventBase.extend({
     parsedArgs: z.object({

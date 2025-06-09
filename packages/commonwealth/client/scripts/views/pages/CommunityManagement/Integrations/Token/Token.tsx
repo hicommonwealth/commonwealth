@@ -2,7 +2,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
-import { useGetPinnedTokenByCommunityId } from 'state/api/communities';
+import { useGetPinnedTokensByCommunityId } from 'state/api/communities';
 import { useGetTokenByCommunityId } from 'state/api/tokens';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -21,12 +21,14 @@ const Token = () => {
       enabled: !!communityId,
     });
 
-  const { data: communityTokens } = useGetPinnedTokenByCommunityId({
-    community_ids: [communityId],
+  const { data: communityTokens } = useGetPinnedTokensByCommunityId({
+    community_ids: communityId,
     with_chain_node: true,
     enabled: !!communityId,
+    limit: 10,
+    cursor: 1,
   });
-  const communityPinnedToken = communityTokens?.[0];
+  const communityPinnedToken = communityTokens?.pages?.[0]?.results?.[0];
   const isExternalTokenLinked = communityPinnedToken;
   const canAddToken = app?.chain?.base === ChainBase.Ethereum; // only ethereum communities can add a token
 

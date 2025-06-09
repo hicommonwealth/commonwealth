@@ -6,12 +6,20 @@ export const PinnedToken = z.object({
   contract_address: z.string(),
   community_id: z.string(),
   chain_node_id: PG_INT,
+  has_pricing: z.boolean().default(false),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   ChainNode: ChainNode.optional(),
+  community_indexer_id: z.string().optional(),
 });
 
-export const PinnedTokenWithPrices = PinnedToken.extend({
+export const PinnedTokenView = PinnedToken.extend({
+  name: z.string(),
+  symbol: z.string(),
+  icon_url: z.string().optional(),
+});
+
+export const PinnedTokenWithPrices = PinnedTokenView.extend({
   prices: z
     .array(
       z.object({

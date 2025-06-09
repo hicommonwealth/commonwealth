@@ -9,6 +9,7 @@ export enum GraphileTaskNames {
   CleanChainEventXpSources = 'CleanChainEventXpSources',
   RunDbMaintenance = 'RunDbMaintenance',
   AwardTwitterQuestXp = 'AwardTweetEngagementXp',
+  IndexCommunities = 'IndexCommunities',
   CountAggregator = 'CountAggregator',
 }
 
@@ -31,5 +32,6 @@ export const TaskPayloads = {
   CleanChainEventXpSources: z.object({}),
   RunDbMaintenance: z.object({}),
   AwardTweetEngagementXp: events.TweetEngagementCapReached,
+  IndexCommunities: z.object({}),
   CountAggregator: z.object({}),
 } as const satisfies Record<GraphileTaskNames, ZodSchema | ZodUndefined>;

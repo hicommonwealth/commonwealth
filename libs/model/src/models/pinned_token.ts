@@ -1,9 +1,12 @@
 import { PinnedToken } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
+import { CommunityAttributes } from './community';
 import type { ModelInstance } from './types';
 
-export type PinnedTokenAttributes = z.infer<typeof PinnedToken>;
+export type PinnedTokenAttributes = z.infer<typeof PinnedToken> & {
+  Community?: CommunityAttributes;
+};
 
 export type PinnedTokenInstance = ModelInstance<PinnedTokenAttributes>;
 
@@ -23,6 +26,10 @@ export default (
       },
       chain_node_id: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      has_pricing: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
       },
       created_at: {

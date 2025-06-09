@@ -2,10 +2,11 @@ import {
   config,
   HotShotsStats,
   RedisCache,
+  S3BlobStorage,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { cache, logger, stats } from '@hicommonwealth/core';
+import { blobStorage, cache, logger, stats } from '@hicommonwealth/core';
 import {
   bootstrapBindings,
   bootstrapContestRolloverLoop,
@@ -15,6 +16,9 @@ import { fileURLToPath } from 'url';
 const log = logger(import.meta);
 
 stats({ adapter: HotShotsStats() });
+blobStorage({
+  adapter: S3BlobStorage(),
+});
 
 config.CACHE.REDIS_URL &&
   cache({

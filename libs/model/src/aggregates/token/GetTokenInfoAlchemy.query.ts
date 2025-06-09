@@ -1,6 +1,7 @@
 import { logger, type Query } from '@hicommonwealth/core';
 import { config, models } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { mustExist } from '../../middleware';
 
 const errorObject = {
   network: '',
@@ -24,6 +25,7 @@ export function GetTokenInfoAlchemy(): Query<
         where: { eth_chain_id },
         attributes: ['alchemy_metadata'],
       });
+      mustExist('ChainNode', node);
 
       const network = node?.alchemy_metadata?.network_id;
 
@@ -68,6 +70,25 @@ export function GetTokenInfoAlchemy(): Query<
         );
         return errorObject;
       }
+
+      // Update has_pricing for any pinned tokens with this address
+      const pinnedTokens = await models.PinnedToken.findAll({
+        where: {
+          contract_address: token_address,
+          chain_node_id: node.id!,
+        },
+      });
+
+      if (pinnedTokens.length > 0) {
+        const hasPricing = Array.isArray(json.data) && json.data.length > 0;
+        console.log('hasPricing', hasPricing);
+        await Promise.all(
+          pinnedTokens.map((token) =>
+            token.update({ has_pricing: hasPricing }),
+          ),
+        );
+      }
+
       return schemas.GetTokenInfoAlchemy.output.parse(json);
     },
   };

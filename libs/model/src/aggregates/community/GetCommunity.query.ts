@@ -52,6 +52,7 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
         return;
       }
 
+      // TODO: set limit?
       const adminsAndMods = await models.Address.findAll({
         where: {
           community_id: payload.id,

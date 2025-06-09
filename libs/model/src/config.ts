@@ -53,6 +53,7 @@ const {
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
   CONTEST_BOT_NAMESPACE,
+  COMMUNITY_INDEXER_CRON,
   TWITTER_LOG_LEVEL,
   TWITTER_APP_BEARER_TOKEN,
   TWITTER_CONSUMER_KEY,
@@ -206,6 +207,9 @@ export const config = configure(
     },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
+    },
+    COMMUNITY_INDEXER: {
+      CRON: COMMUNITY_INDEXER_CRON,
     },
     TWITTER: {
       LOG_LEVEL: (TWITTER_LOG_LEVEL as LogLevel) || target.LOGGING.LOG_LEVEL,
@@ -505,6 +509,9 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && !data),
           'CONTEST_BOT_NAMESPACE must be set to a non-default value in production.',
         ),
+    }),
+    COMMUNITY_INDEXER: z.object({
+      CRON: z.coerce.string().optional(),
     }),
     TWITTER: z.object({
       LOG_LEVEL: z.enum(LogLevels),

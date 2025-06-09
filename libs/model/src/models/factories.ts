@@ -13,6 +13,7 @@ import Community from './community';
 import CommunityAlert from './community_alerts';
 import CommunityDirectoryTags from './community_directory_tags';
 import { CommunityGoalMeta, CommunityGoalReached } from './community_goal';
+import CommunityIndexer from './community_indexer';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
 import Contest from './contest';
@@ -67,6 +68,7 @@ export const Factories = {
   CommunityGoalReached,
   CommunityStake,
   CommunityTags,
+  CommunityIndexer,
   CommunityDirectoryTags,
   Contest,
   ContestAction,

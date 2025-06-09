@@ -1,5 +1,4 @@
 import { InvalidState, logger, type Command } from '@hicommonwealth/core';
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { alchemyGetTokenPrices } from '@hicommonwealth/shared';
@@ -24,47 +23,27 @@ export function PinToken(): Command<typeof schemas.PinToken> {
     body: async ({ payload }) => {
       const { community_id, contract_address, chain_node_id } = payload;
 
-      const chainNode = await models.ChainNode.scope('withPrivateData').findOne(
-        {
-          where: {
-            id: chain_node_id,
-          },
-        },
-      );
-      mustExist('ChainNode', chainNode);
-
-      if (chainNode.eth_chain_id !== cp.ValidChains.Base)
-        throw new InvalidState(PinTokenErrors.OnlyBaseSupport);
-
-      const community = await models.Community.findOne({
-        where: {
-          id: community_id,
-        },
+      const chainNode = await models.ChainNode.findOne({
+        where: { id: chain_node_id },
       });
-      mustExist('Community', community);
-
-      if (community.namespace) {
-        const launchpadToken = await models.LaunchpadToken.findOne({
-          where: {
-            namespace: community.namespace,
-          },
-        });
-
-        if (launchpadToken)
-          throw new InvalidState(
-            PinTokenErrors.LaunchpadTokenFound(community_id),
-          );
-      }
-
-      if (
-        !chainNode.url.includes('alchemy') ||
-        !chainNode.private_url?.includes('alchemy') ||
-        !chainNode.alchemy_metadata?.price_api_supported
-      ) {
+      mustExist('ChainNode', chainNode);
+      if (!chainNode.alchemy_metadata?.network_id) {
         throw new InvalidState(PinTokenErrors.NotSupported);
       }
 
-      let price: Awaited<ReturnType<typeof alchemyGetTokenPrices>> | undefined;
+      const existingToken = await models.PinnedToken.findOne({
+        where: { community_id },
+      });
+
+      if (existingToken) {
+        throw new InvalidState(
+          PinTokenErrors.LaunchpadTokenFound(community_id),
+        );
+      }
+
+      let price;
+      let hasPricing = false;
+
       try {
         price = await alchemyGetTokenPrices({
           alchemyApiKey: config.ALCHEMY.APP_KEYS.PRIVATE,
@@ -75,6 +54,15 @@ export function PinToken(): Command<typeof schemas.PinToken> {
             },
           ],
         });
+
+        if (
+          Array.isArray(price?.data) &&
+          price.data.length === 1 &&
+          !price.data[0].error &&
+          price.data[0].prices?.length > 0
+        ) {
+          hasPricing = true;
+        }
       } catch (e: unknown) {
         if (e instanceof Error)
           log.error(e.message, e, {
@@ -89,21 +77,11 @@ export function PinToken(): Command<typeof schemas.PinToken> {
         }
       }
 
-      if (
-        !Array.isArray(price?.data) ||
-        price.data.length !== 1 ||
-        price.data[0].error
-      ) {
-        log.error(PinTokenErrors.FailedToFetchPrice, undefined, {
-          price,
-        });
-        throw new InvalidState(PinTokenErrors.FailedToFetchPrice);
-      }
-
       return await models.PinnedToken.create({
         community_id,
         chain_node_id,
         contract_address,
+        has_pricing: hasPricing,
       });
     },
   };

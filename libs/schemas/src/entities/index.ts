@@ -1,6 +1,7 @@
 export * from './chain-event-xp-source.schemas';
 export * from './chain.schemas';
 export * from './comment.schemas';
+export * from './community-indexer.schemas';
 export * from './community.schemas';
 export * from './contest-manager.schemas';
 export * from './discordBotConfig.schemas';

@@ -1,6 +1,5 @@
 import { Command, logger } from '@hicommonwealth/core';
 import {
-  createPrivateEvmClient,
   getContestScore,
   mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
@@ -9,14 +8,10 @@ import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { createOnchainContestVote } from '../../policies/utils/contest-utils';
+import { getPrivateWalletAddress } from '../../utils/getPrivateWalletAddress';
 import { emitEvent, getChainNodeUrl } from '../../utils/utils';
 
 const log = logger(import.meta);
-
-const getPrivateWalletAddress = (): string => {
-  const web3 = createPrivateEvmClient({ privateKey: config.WEB3.PRIVATE_KEY });
-  return web3.eth.defaultAccount!;
-};
 
 export function SetContestEnding(): Command<typeof schemas.SetContestEnding> {
   return {

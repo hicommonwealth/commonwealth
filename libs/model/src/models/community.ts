@@ -167,6 +167,10 @@ export default (
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      community_indexer_id: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       environment: {
         type: Sequelize.STRING,
         allowNull: false,

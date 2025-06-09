@@ -125,6 +125,11 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     });
 
+  db.CommunityIndexer.withMany(db.Community, {
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  });
+
   db.Tags.withMany(db.ProfileTags, {
     foreignKey: 'tag_id',
     onDelete: 'CASCADE',

@@ -8,6 +8,7 @@ const TradeTokenModal = ({
   onModalClose,
   tradeConfig,
 }: TradeTokenModalProps) => {
+  console.log('tradeConfig', tradeConfig);
   if (tradeConfig.mode === TradingMode.Swap) {
     return (
       <UniswapTradeModal

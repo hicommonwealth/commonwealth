@@ -60,6 +60,7 @@ export const buyToken = async (
   value: number,
   maxFeePerGas?: bigint,
 ) => {
+  console.log({ contract, tokenAddress, walletAddress, value });
   const contractCall = contract.methods.buyToken(tokenAddress, 0);
   const gasResult = await contractCall.estimateGas({
     from: walletAddress,
