@@ -332,7 +332,7 @@ export const config = configure(
         .string()
         .optional()
         .refine(
-          () => target.APP_ENV !== 'production',
+          (data) => !(target.APP_ENV === 'production' && data),
           'EVM_CHAINS_WHITELIST cannot be set in production.',
         ),
     }),
