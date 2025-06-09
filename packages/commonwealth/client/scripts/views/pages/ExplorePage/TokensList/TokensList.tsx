@@ -99,6 +99,8 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
 
   const tokens = [...launchpadTokens, ...pinnedTokens];
 
+  const isInitialLoading = isLoadingLaunchpadTokens || isLoadingPinnedTokens;
+
   const handleFetchMoreTokens = () => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage().catch(console.error);
@@ -209,35 +211,6 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
                     mode,
                     token as z.infer<typeof TokenWithCommunity>,
                   );
-                }}
-                onCardBodyClick={() =>
-                  navigateToCommunity({
-                    navigate,
-                    path: '',
-                    chain: token.community_id,
-                  })
-                }
-              />
-            );
-          })}
-          {pinnedTokens.map((token) => {
-            return (
-              <TokenCard
-                key={token.name}
-                name={token.name}
-                symbol={token.symbol}
-                price={0}
-                pricePercentage24HourChange={0}
-                isPinnedToken={true}
-                marketCap={{
-                  current: 0,
-                  goal: 0,
-                  isCapped: false,
-                }}
-                mode={TradingMode.Swap}
-                iconURL={token.icon_url || ''}
-                onCTAClick={() => {
-                  // TODO: implement
                 }}
                 onCardBodyClick={() =>
                   navigateToCommunity({
