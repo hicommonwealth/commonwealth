@@ -932,6 +932,21 @@ describe('User lifecycle', () => {
     });
 
     it('should query ranked by xp points', async () => {
+      // dump xp logs to debug xp ranking
+      const logs = await query(GetXps(), {
+        actor: admin,
+        payload: {},
+      });
+      const table = logs?.map((x) => ({
+        quest: x.quest_id,
+        user: x.user_profile?.name,
+        event: x.event_name,
+        xp: x.xp_points,
+        creator: x.creator_profile?.name,
+        creator_xp: x.creator_xp_points,
+      }));
+      console.table(table);
+
       const xps1 = await query(GetXpsRanked(), {
         actor: admin,
         payload: { top: 10 },
@@ -944,7 +959,9 @@ describe('User lifecycle', () => {
         payload: { top: 10, quest_id: -1 },
       });
       expect(xps2!.length).to.equal(2);
-      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([20, 10]);
+      // new_user has 16 for SignUpFlowCompleted
+      // member has 10 for WalletLinked and 4 for SignUpFlowCompleted as referrer
+      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([16, 14]);
     });
   });
 });
