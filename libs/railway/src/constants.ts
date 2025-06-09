@@ -1,6 +1,6 @@
 export const RailWayAPI = 'https://backboard.railway.app/graphql/v2';
 
-export const RailwayParentEnvName = 'apex';
+export const RailwayParentEnvName = 'Parent Env';
 
 /**
  * The name of the services on Railway. This should match the name of the Docker
