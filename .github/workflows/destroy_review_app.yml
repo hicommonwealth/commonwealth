@@ -12,6 +12,9 @@ on:
         required: true
         type: number
 
+env:
+  APP_ENV: CI
+
 jobs:
   delete_review_app:
     name: Delete Review App
