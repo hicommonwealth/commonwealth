@@ -1,13 +1,9 @@
+import { MCPServer } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
+import { z } from 'zod';
 import type { ModelInstance } from './types';
 
-export type MCPServerAttributes = {
-  id?: number;
-  name: string;
-  server_url: string;
-  created_at?: Date;
-  updated_at?: Date;
-};
+export type MCPServerAttributes = z.infer<typeof MCPServer>;
 
 export type MCPServerInstance = ModelInstance<MCPServerAttributes>;
 
@@ -20,6 +16,8 @@ export default (sequelize: Sequelize.Sequelize): MCPServerModelStatic =>
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
       name: { type: Sequelize.STRING, allowNull: false },
       server_url: { type: Sequelize.STRING, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       timestamps: true,

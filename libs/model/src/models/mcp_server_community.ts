@@ -1,14 +1,13 @@
+import { MCPServerCommunity } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
+import { z } from 'zod';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import type { MCPServerAttributes, MCPServerInstance } from './mcp_server';
 import type { ModelInstance } from './types';
 
-export type MCPServerCommunityAttributes = {
-  mcp_server_id: number;
-  community_id: string;
-  created_at?: Date;
-  updated_at?: Date;
-
+export type MCPServerCommunityAttributes = z.infer<
+  typeof MCPServerCommunity
+> & {
   // associations
   MCPServer?: MCPServerAttributes;
   Community?: CommunityAttributes;
@@ -47,6 +46,8 @@ export default (
         allowNull: false,
         primaryKey: true,
       },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       timestamps: true,
