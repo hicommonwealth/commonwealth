@@ -163,8 +163,6 @@ const CommunityProfileForm = () => {
         banner_text: values.communityBanner ?? '',
       });
 
-      console.log('values', values.aiFeaturesEnabled);
-
       await updateCommunity(
         buildUpdateCommunityInput({
           communityId: community.id,
