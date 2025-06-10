@@ -1,4 +1,5 @@
 import { dispose, logger } from '@hicommonwealth/core';
+import fs from 'fs';
 import { config } from '../config';
 import {
   ExecutableFiles,
@@ -227,7 +228,6 @@ async function main() {
       (config.APP_ENV === 'CI' || config.IS_CI) &&
       process.env.GITHUB_ENV
     ) {
-      const fs = require('fs');
       fs.appendFileSync(
         process.env.GITHUB_ENV,
         `DEPLOYMENT_URL=${deploymentUrl}`,
