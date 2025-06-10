@@ -57,7 +57,7 @@ jobs:
         id: check_base_image
         run: |
           set +e
-          output=$(docker manifest inspect ghcr.io/hicommonwealth/commonwealth:${{ steps.set_effective_sha.outputs.sha }} 2>&1)
+          output=$(docker manifest inspect ghcr.io/hicommonwealth/commonwealth-ephemeral:${{ steps.set_effective_sha.outputs.sha }} 2>&1)
           status=$?
           echo "Manifest inspect output for commonwealth base:"
           echo "$output"
