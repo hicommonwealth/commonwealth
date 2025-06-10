@@ -169,10 +169,11 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
           RAILWAY_PARENT_ENV_ID: ${{ secrets.RAILWAY_PARENT_ENV_ID }}
-        run: pnpm -F railway deploy-review-app \
-          --env=pr-${{ steps.set_pr_number.outputs.pr_number }} \
-          --commit=${{ steps.set_effective_sha.outputs.sha }} \
-          --db-url=${{ steps.create_neon_branch.outputs.db_url }}
+        run: |
+          pnpm -F railway deploy-review-app \
+            --env=pr-${{ steps.set_pr_number.outputs.pr_number }} \
+            --commit=${{ steps.set_effective_sha.outputs.sha }} \
+            --db-url=${{ steps.create_neon_branch.outputs.db_url }}
 
       - name: Comment on PR with Deployment URL
         if: |
