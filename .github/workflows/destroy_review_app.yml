@@ -30,6 +30,11 @@ jobs:
             echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
           fi
 
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
+
       - uses: ./.github/actions/setup
         if: steps.check_base_image.outputs.exists == 'false'
         with:
@@ -42,14 +47,6 @@ jobs:
           project_id: ${{ secrets.NEON_PROJECT_ID }}
           branch: preview/pr-${{ steps.set_pr_number.outputs.pr_number }}
           api_key: ${{ secrets.NEON_API_KEY }}
-#      - name: Install Neonctl
-#        run: npm install -g neonctl
-#
-#      - name: Delete Review DB Branch
-#        env:
-#          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
-#        run: neonctl branches delete preview/pr-${{ steps.set_pr_number.outputs.pr_number }} --project-id=${{ secrets.NEON_PROJECT_ID }}
-
 
       - name: Delete environment
         env:
