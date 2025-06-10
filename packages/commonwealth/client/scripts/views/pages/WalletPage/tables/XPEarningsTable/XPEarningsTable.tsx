@@ -97,7 +97,8 @@ export const XPEarningsTable = () => {
         );
       })(),
     },
-    auraAmount: log.xp_points,
+    auraAmount:
+      user.id === log.creator_user_id ? log.creator_xp_points : log.xp_points,
     questLink: {
       customElement: (
         <a
