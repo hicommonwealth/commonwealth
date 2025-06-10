@@ -421,7 +421,7 @@ const CommunityProfileForm = () => {
           {aiCommentsFeatureEnabled && (
             <section className="ai-features-section">
               <div className="header">
-                <CWText type="h4">AI Features</CWText>
+                <CWText type="h4">Enable AI Features</CWText>
                 <div className="controls">
                   <CWText type="b1">
                     Control AI functionality for your community. When disabled,
