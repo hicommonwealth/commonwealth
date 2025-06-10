@@ -59,7 +59,9 @@ jobs:
           fi
 
       - name: Delete environment
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          railway link -p 'PR Review Apps' -e 'pr-${{ steps.set_pr_number.outputs.pr_number }}'
-          railway environment delete
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }} railway link -p 'PR Review Apps' -e 'pr-${{ steps.set_pr_number.outputs.pr_number }}'
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }} railway environment delete
           
