@@ -121,54 +121,50 @@ export async function deployReviewApp({
   commitSha: string;
   dbUrl?: string;
 }) {
-  try {
-    const { envId, created } = await getEnvironmentId(envName);
-    const serviceMap = await getServices(envId);
-    log.info(JSON.stringify(serviceMap));
+  const { envId, created } = await getEnvironmentId(envName);
+  const serviceMap = await getServices(envId);
+  log.info(JSON.stringify(serviceMap));
 
-    if (dbUrl && created) {
-      await sdk.variableCollectionUpsert({
-        input: {
-          projectId: config.RAILWAY!.REVIEW_APPS.PROJECT_ID!,
-          environmentId: envId,
-          variables: {
-            DATABASE_URL: dbUrl,
-          },
+  if (dbUrl && created) {
+    await sdk.variableCollectionUpsert({
+      input: {
+        projectId: config.RAILWAY!.REVIEW_APPS.PROJECT_ID!,
+        environmentId: envId,
+        variables: {
+          DATABASE_URL: dbUrl,
         },
-      });
-    }
-
-    for (const [serviceName, serviceId] of Object.entries(serviceMap)) {
-      await updateService({
-        envId,
-        serviceId,
-        serviceName: serviceName as ServiceName,
-        restartPolicy: RestartPolicyType.Never,
-        commitSha,
-      });
-    }
-
-    const deploymentIds: string[] = [];
-    for (const serviceId of Object.values(serviceMap)) {
-      deploymentIds.push(await deploy({ envId, serviceId }));
-    }
-
-    let deploymentUrl = '';
-    for (const id of deploymentIds) {
-      const deployment = await waitForDeploymentCompletion(id);
-      if (typeof deployment.url === 'string' && deployment.url.length > 0) {
-        if (deploymentUrl.length > 0) {
-          console.error('Multiple deployment URLs found!');
-          throw new Error('Multiple deployment URLs found!');
-        }
-      }
-    }
-
-    return deploymentUrl;
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
+      },
+    });
   }
+
+  for (const [serviceName, serviceId] of Object.entries(serviceMap)) {
+    await updateService({
+      envId,
+      serviceId,
+      serviceName: serviceName as ServiceName,
+      restartPolicy: RestartPolicyType.Never,
+      commitSha,
+    });
+  }
+
+  const deploymentIds: string[] = [];
+  for (const serviceId of Object.values(serviceMap)) {
+    deploymentIds.push(await deploy({ envId, serviceId }));
+  }
+
+  let deploymentUrl = '';
+  for (const id of deploymentIds) {
+    const deployment = await waitForDeploymentCompletion(id);
+    if (typeof deployment.url === 'string' && deployment.url.length > 0) {
+      if (deploymentUrl.length > 0) {
+        console.error('Multiple deployment URLs found!');
+        throw new Error('Multiple deployment URLs found!');
+      }
+      deploymentUrl = deployment.url;
+    }
+  }
+
+  return deploymentUrl;
 }
 
 async function main() {
@@ -182,10 +178,9 @@ async function main() {
   const dbUrlArg = args.find((arg) => arg.startsWith('--db-url='));
 
   if (!envArg || !commitArg) {
-    log.error(
+    throw new Error(
       'Usage: tsx deployReviewApp.ts --env=<environment-name> --commit=<commit-sha> [--db-url=<database-url>]',
     );
-    process.exit(1);
   }
 
   const envName = envArg.split('=')[1];
