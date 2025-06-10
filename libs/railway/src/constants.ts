@@ -3,10 +3,9 @@ export const RailWayAPI = 'https://backboard.railway.app/graphql/v2';
 export const RailwayParentEnvName = 'Parent Env';
 
 /**
- * The name of the services on Railway. This should match the name of the Docker
- * file that is deployed to the service.
+ * The name of the services on Railway.
  */
-export const ServiceNames = ['web', 'consumer'] as const;
+export const ServiceNames = ['web'] as const;
 export type ServiceName = (typeof ServiceNames)[number];
 
 /**
@@ -15,7 +14,6 @@ export type ServiceName = (typeof ServiceNames)[number];
  */
 export const ExecutableFiles: Record<ServiceName, string> = {
   web: 'build/server.js',
-  consumer: 'build/server/workers/commonwealthConsumer/commonwealthConsumer.js',
 } as const;
 
 /**
