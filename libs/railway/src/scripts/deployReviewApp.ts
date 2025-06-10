@@ -36,16 +36,44 @@ async function getEnvironmentId(envName: string) {
 
   if (!envId) {
     log.info(`Environment ${envName} not found. Creating new environment...`);
-    const newEnv = await sdk.environmentCreate({
-      input: {
-        name: envName,
-        projectId: config.RAILWAY!.REVIEW_APPS.PROJECT_ID!,
-        sourceEnvironmentId: config.RAILWAY!.REVIEW_APPS.PARENT_ENV_ID,
-        skipInitialDeploys: true,
-        stageInitialChanges: false,
-      },
-    });
-    envId = newEnv.environmentCreate.id;
+    try {
+      const newEnv = await sdk.environmentCreate({
+        input: {
+          name: envName,
+          projectId: config.RAILWAY!.REVIEW_APPS.PROJECT_ID!,
+          sourceEnvironmentId: config.RAILWAY!.REVIEW_APPS.PARENT_ENV_ID,
+          skipInitialDeploys: true,
+          stageInitialChanges: false,
+        },
+      });
+      envId = newEnv.environmentCreate.id;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      // If timeout, poll for the environment
+      if (e.message && e.message.includes('504')) {
+        log.warn('Timeout creating environment, polling for existence...');
+        for (let i = 0; i < 6; i++) {
+          await new Promise((res) => setTimeout(res, 30_000)); // wait 30 seconds
+          const envsRetry = await sdk.environments({
+            projectId: config.RAILWAY!.REVIEW_APPS.PROJECT_ID!,
+          });
+          const found = envsRetry.environments.edges.find(
+            (edge) => edge.node.name === envName,
+          );
+          if (found) {
+            envId = found.node.id;
+            log.info(`Environment ${envName} found after timeout!`);
+            break;
+          }
+        }
+        if (!envId)
+          throw new Error(
+            'Environment creation timed out and not found after polling.',
+          );
+      } else {
+        throw e;
+      }
+    }
   }
 
   return { envId, created: !existingEnv };
@@ -59,10 +87,9 @@ async function getServices(envId: string) {
 
   const serviceMap: Partial<Record<ServiceName, string>> = {};
   for (const edge of services.environment.serviceInstances.edges) {
-    if (!ServiceNames.includes(edge.node.serviceName as ServiceName)) {
-      throw new Error('Unrecognized service');
+    if (ServiceNames.includes(edge.node.serviceName as ServiceName)) {
+      serviceMap[edge.node.serviceName as ServiceName] = edge.node.serviceId;
     }
-    serviceMap[edge.node.serviceName as ServiceName] = edge.node.serviceId;
   }
   return serviceMap;
 }
@@ -80,6 +107,10 @@ async function updateService({
   commitSha: string;
   restartPolicy: RestartPolicyType;
 }) {
+  if (!ServiceNames.includes(serviceName)) {
+    log.info(`Configuring service '${serviceName}' not needed. Skipping...`);
+    return;
+  }
   log.info(`Updating service '${serviceName}' image to sha: ${commitSha}...`);
 
   const serviceUpdate = await sdk.serviceInstanceUpdate({

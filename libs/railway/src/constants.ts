@@ -20,7 +20,6 @@ export const ExecutableFiles: Record<ServiceName, string> = {
  * This prefix is combined with one of the executable file paths from above to
  * dynamically build a start command
  */
-export const StartCommandPrefix =
-  'NODE_ENV=production node --enable-source-maps';
+export const StartCommandPrefix = 'node --import=extensionless/register';
 
 export const WEB_PORT = 8080;
