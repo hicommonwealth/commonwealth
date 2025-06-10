@@ -179,7 +179,7 @@ export const ThreadView = Thread.extend({
   ContestActions: z.array(ContestActionView).optional(),
   Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
-  search: z.union([z.string(), z.record(z.any())]).nullish(),
+  search: z.union([z.string(), z.record(z.string(), z.any())]).nullish(),
   total_num_thread_results: z
     .number()
     .nullish()
