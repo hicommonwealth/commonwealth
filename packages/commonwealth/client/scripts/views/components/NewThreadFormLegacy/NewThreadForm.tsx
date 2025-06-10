@@ -65,10 +65,10 @@ import {
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 
-import { useAIFeatureEnabled } from 'client/scripts/hooks/useAIFeatureEnabled';
 import useTopicGating from 'client/scripts/hooks/useTopicGating';
 import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import { DeltaStatic } from 'quill';
+import { useAIFeatureEnabled } from 'state/ui/user';
 import { ExtendedPoll, LocalPoll, parseCustomDuration } from 'utils/polls';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
@@ -500,6 +500,8 @@ export const NewThreadForm = forwardRef<
       resetTurnstile,
       addThreadLinks,
       linkedProposals,
+      actionGroups,
+      bypassGating,
       createPoll,
       pollsData,
       isAIEnabled,

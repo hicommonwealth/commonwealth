@@ -1,8 +1,8 @@
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { useAiCompletion } from 'client/scripts/state/api/ai';
 import { generatePollPrompt } from 'client/scripts/state/api/ai/prompts';
-import { useAIFeatureEnabled } from 'hooks/useAIFeatureEnabled';
 import React, { useState } from 'react';
+import { useAIFeatureEnabled } from 'state/ui/user';
 import { SetLocalPolls } from 'utils/polls';
 import type Thread from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
