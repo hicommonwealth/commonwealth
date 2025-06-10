@@ -35,7 +35,7 @@ jobs:
         uses: neondatabase/delete-branch-action@v3
         with:
           project_id: ${{ secrets.RAILWAY_PROJECT_ID }}
-          branch: pr-${{ steps.set_pr_number.outputs.pr_number }}
+          branch: preview/pr-${{ steps.set_pr_number.outputs.pr_number }}
           api_key: ${{ secrets.NEON_API_KEY }}
 
   delete_review_app:
@@ -62,6 +62,6 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }} railway link -p 'PR Review Apps' -e 'pr-${{ steps.set_pr_number.outputs.pr_number }}'
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }} railway environment delete
+          RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} railway link -p 'PR Review Apps' -e 'pr-${{ steps.set_pr_number.outputs.pr_number }}'
+          RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} railway environment delete
           
