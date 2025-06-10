@@ -4,6 +4,8 @@ import WebWalletController from '../../controllers/app/web_wallets';
 import {
   addContentWithPhantom,
   depositPrizeWithPhantom,
+  getContestStatusWithPhantom,
+  getPrizeVaultBalanceWithPhantom,
   initializeContestWithPhantom,
   voteForContentWithPhantom,
 } from '../../helpers/SolanaContractHelpers/solanaContest';
@@ -11,7 +13,7 @@ import {
 // Component for testing Solana contest initialization
 const SolanaContestInitializer = () => {
   // Tab selection state
-  const [activeTab, setActiveTab] = useState('initialize'); // Options: initialize, deposit, submit, vote
+  const [activeTab, setActiveTab] = useState('initialize'); // Options: initialize, deposit, submit, vote, balance
 
   // Form state
   const [formData, setFormData] = useState({
@@ -57,6 +59,22 @@ const SolanaContestInitializer = () => {
   const [voteResult, setVoteResult] = useState(null);
   const [isVoteLoading, setIsVoteLoading] = useState(false);
   const [voteErrorMessage, setVoteErrorMessage] = useState('');
+
+  // State for balance checking
+  const [balanceForm, setBalanceForm] = useState({
+    contestPda: '',
+  });
+  const [balanceResult, setBalanceResult] = useState(null);
+  const [isBalanceLoading, setIsBalanceLoading] = useState(false);
+  const [balanceErrorMessage, setBalanceErrorMessage] = useState('');
+
+  // State for contest status checking
+  const [statusForm, setStatusForm] = useState({
+    contestPda: '',
+  });
+  const [statusResult, setStatusResult] = useState(null);
+  const [isStatusLoading, setIsStatusLoading] = useState(false);
+  const [statusErrorMessage, setStatusErrorMessage] = useState('');
 
   // Initialize connection to Solana devnet
   useEffect(() => {
@@ -174,6 +192,24 @@ const SolanaContestInitializer = () => {
     }
   };
 
+  // Handle balance form input changes
+  const handleBalanceInputChange = (e) => {
+    const { name, value } = e.target;
+    setBalanceForm({
+      ...balanceForm,
+      [name]: value,
+    });
+  };
+
+  // Handle status form input changes
+  const handleStatusInputChange = (e) => {
+    const { name, value } = e.target;
+    setStatusForm({
+      ...statusForm,
+      [name]: value,
+    });
+  };
+
   // When a contest is created successfully, pre-fill the deposit form with the contest PDA
   useEffect(() => {
     if (transactionResult && transactionResult.contestPda) {
@@ -188,6 +224,14 @@ const SolanaContestInitializer = () => {
       });
       setVoteForm({
         ...voteForm,
+        contestPda: contestPdaString,
+      });
+      setBalanceForm({
+        ...balanceForm,
+        contestPda: contestPdaString,
+      });
+      setStatusForm({
+        ...statusForm,
         contestPda: contestPdaString,
       });
     }
@@ -406,6 +450,90 @@ const SolanaContestInitializer = () => {
     }
   };
 
+  // Handle balance check form submission
+  const handleBalanceCheckSubmit = async (e) => {
+    e.preventDefault();
+    setIsBalanceLoading(true);
+    setBalanceErrorMessage('');
+    setBalanceResult(null);
+
+    try {
+      // Validate input
+      if (!connection) {
+        throw new Error('Solana connection not established');
+      }
+
+      if (!isWalletConnected) {
+        throw new Error('Please connect your Phantom wallet first');
+      }
+
+      // Validate fields
+      if (!balanceForm.contestPda) {
+        throw new Error('Contest PDA is required');
+      }
+
+      // Convert string inputs to PublicKeys
+      const contestPdaPublicKey = new PublicKey(balanceForm.contestPda);
+
+      // Get prize vault balance
+      const balance = await getPrizeVaultBalanceWithPhantom(
+        phantomWallet,
+        connection,
+        contestPdaPublicKey,
+      );
+
+      setBalanceResult({
+        balance,
+      });
+    } catch (error) {
+      console.error('Failed to check balance:', error);
+      setBalanceErrorMessage(`Failed to check balance: ${error.message}`);
+    } finally {
+      setIsBalanceLoading(false);
+    }
+  };
+
+  // Handle contest status check form submission
+  const handleStatusCheckSubmit = async (e) => {
+    e.preventDefault();
+    setIsStatusLoading(true);
+    setStatusErrorMessage('');
+    setStatusResult(null);
+
+    try {
+      // Validate input
+      if (!connection) {
+        throw new Error('Solana connection not established');
+      }
+
+      if (!isWalletConnected) {
+        throw new Error('Please connect your Phantom wallet first');
+      }
+
+      // Validate fields
+      if (!statusForm.contestPda) {
+        throw new Error('Contest PDA is required');
+      }
+
+      // Convert string input to PublicKey
+      const contestPdaPublicKey = new PublicKey(statusForm.contestPda);
+
+      // Get contest status
+      const result = await getContestStatusWithPhantom(
+        phantomWallet,
+        connection,
+        contestPdaPublicKey,
+      );
+
+      setStatusResult(result);
+    } catch (error) {
+      console.error('Failed to check contest status:', error);
+      setStatusErrorMessage(`Failed to check contest status: ${error.message}`);
+    } finally {
+      setIsStatusLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Solana Contest Initializer</h1>
@@ -463,6 +591,7 @@ const SolanaContestInitializer = () => {
           <li>
             Vote for content using the voting form (you'll need the content ID)
           </li>
+          <li>Check the prize vault balance using the balance checking form</li>
         </ol>
         <p className="mt-2 text-xs">
           This interface uses the Solana devnet. Transactions won't cost real
@@ -512,6 +641,26 @@ const SolanaContestInitializer = () => {
         >
           Vote for Content
         </button>
+        <button
+          onClick={() => setActiveTab('balance')}
+          className={`py-3 px-4 text-sm font-medium rounded-t-lg ${
+            activeTab === 'balance'
+              ? 'bg-teal-600 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          Check Balance
+        </button>
+        <button
+          onClick={() => setActiveTab('status')}
+          className={`py-3 px-4 text-sm font-medium rounded-t-lg ${
+            activeTab === 'status'
+              ? 'bg-orange-600 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          Contest Status
+        </button>
       </div>
 
       {/* Tab Navigation */}
@@ -556,6 +705,26 @@ const SolanaContestInitializer = () => {
             }`}
           >
             Vote for Content
+          </button>
+          <button
+            onClick={() => setActiveTab('balance')}
+            className={`px-4 py-2 rounded-lg font-medium transition-all flex-1 text-center ${
+              activeTab === 'balance'
+                ? 'bg-purple-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Check Balance
+          </button>
+          <button
+            onClick={() => setActiveTab('status')}
+            className={`px-4 py-2 rounded-lg font-medium transition-all flex-1 text-center ${
+              activeTab === 'status'
+                ? 'bg-purple-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Contest Status
           </button>
         </div>
       </div>
@@ -1102,6 +1271,224 @@ const SolanaContestInitializer = () => {
                         >
                           {voteResult.txSignature}
                         </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Balance Checking Form - Only shown when activeTab is 'balance' */}
+      {activeTab === 'balance' && (
+        <div>
+          <h2 className="text-xl font-bold mb-4">Check Prize Vault Balance</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Check the balance of the prize vault for a contest by providing the
+            contest PDA.
+            <br />
+            This shows you how many prize tokens are currently in the vault.
+          </p>
+
+          <form onSubmit={handleBalanceCheckSubmit} className="mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="form-group">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Contest PDA
+                </label>
+                <input
+                  type="text"
+                  name="contestPda"
+                  value={balanceForm.contestPda}
+                  onChange={handleBalanceInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                  placeholder="Enter the contest PDA public key"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  The public key of the contest
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <button
+                type="submit"
+                disabled={!isWalletConnected || isBalanceLoading}
+                className={`w-full px-4 py-3 text-white rounded font-medium ${
+                  !isWalletConnected || isBalanceLoading
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-teal-600 hover:bg-teal-700 transition-colors'
+                }`}
+              >
+                {isBalanceLoading ? 'Checking...' : 'Check Balance'}
+              </button>
+            </div>
+          </form>
+
+          {/* Balance Error Message */}
+          {balanceErrorMessage && (
+            <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+              {balanceErrorMessage}
+            </div>
+          )}
+
+          {/* Balance Result */}
+          {balanceResult && balanceResult.balance && (
+            <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+              <h3 className="font-semibold mb-2">
+                Prize Vault Balance Information:
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <tbody>
+                    <tr>
+                      <td className="font-medium pr-4 py-1">Balance:</td>
+                      <td className="font-mono">
+                        {balanceResult.balance.balance} tokens
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="font-medium pr-4 py-1">Prize Mint:</td>
+                      <td className="font-mono">
+                        {balanceResult.balance.prizeMint.toString()}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="font-medium pr-4 py-1">
+                        Prize Vault PDA:
+                      </td>
+                      <td className="font-mono">
+                        {balanceResult.balance.prizeVaultPda.toString()}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Contest Status Checking Form - Only shown when activeTab is 'status' */}
+      {activeTab === 'status' && (
+        <div>
+          <h2 className="text-xl font-bold mb-4">Check Contest Status</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Get the current status of a Solana contest by providing its PDA.
+            <br />
+            This will retrieve information like start time, end time, contest
+            interval, and more.
+          </p>
+
+          <form onSubmit={handleStatusCheckSubmit} className="mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="form-group">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Contest PDA
+                </label>
+                <input
+                  type="text"
+                  name="contestPda"
+                  value={statusForm.contestPda}
+                  onChange={handleStatusInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                  placeholder="Enter the contest PDA public key"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  The public key of the contest you want to check status for
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <button
+                type="submit"
+                disabled={!isWalletConnected || isStatusLoading}
+                className={`w-full px-4 py-3 text-white rounded font-medium ${
+                  !isWalletConnected || isStatusLoading
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-orange-600 hover:bg-orange-700 transition-colors'
+                }`}
+              >
+                {isStatusLoading ? 'Loading Status...' : 'Get Contest Status'}
+              </button>
+            </div>
+          </form>
+
+          {/* Status Error Message */}
+          {statusErrorMessage && (
+            <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+              {statusErrorMessage}
+            </div>
+          )}
+
+          {/* Status Result */}
+          {statusResult && (
+            <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+              <h3 className="font-semibold mb-2">Contest Status</h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <tbody>
+                    <tr>
+                      <td className="font-medium pr-4 py-1">Start Time:</td>
+                      <td>
+                        {new Date(
+                          statusResult.startTime * 1000,
+                        ).toLocaleString()}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="font-medium pr-4 py-1">End Time:</td>
+                      <td>
+                        {new Date(statusResult.endTime * 1000).toLocaleString()}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="font-medium pr-4 py-1">
+                        Contest Interval:
+                      </td>
+                      <td>
+                        {Math.floor(statusResult.contestInterval / 86400)} days,{' '}
+                        {Math.floor(
+                          (statusResult.contestInterval % 86400) / 3600,
+                        )}{' '}
+                        hours,{' '}
+                        {Math.floor((statusResult.contestInterval % 3600) / 60)}{' '}
+                        minutes
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="font-medium pr-4 py-1">
+                        Last Content ID:
+                      </td>
+                      <td className="font-mono">
+                        {statusResult.lastContentId}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="font-medium pr-4 py-1">Prize Share:</td>
+                      <td>{statusResult.prizeShare / 100}%</td>
+                    </tr>
+                    <tr>
+                      <td className="font-medium pr-4 py-1">Contest Token:</td>
+                      <td className="font-mono">{statusResult.contestToken}</td>
+                    </tr>
+                    <tr>
+                      <td className="font-medium pr-4 py-1">Status:</td>
+                      <td>
+                        {Date.now() > statusResult.endTime * 1000 ? (
+                          <span className="text-red-600 font-medium">
+                            Ended
+                          </span>
+                        ) : (
+                          <span className="text-green-600 font-medium">
+                            Active
+                          </span>
+                        )}
                       </td>
                     </tr>
                   </tbody>

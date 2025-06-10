@@ -509,3 +509,184 @@ export async function voteForContentWithPhantom(
     programId,
   );
 }
+
+/**
+ * Interface for the result of getting prize vault balance
+ */
+export interface PrizeVaultBalanceResult {
+  balance: number;
+  prizeMint: PublicKey;
+  prizeVaultPda: PublicKey;
+}
+
+/**
+ * Gets the balance of a contest's prize vault
+ *
+ * @param connection Solana connection
+ * @param contestPda Public key of the contest
+ * @param programId Optional program ID (uses default if not provided)
+ * @returns Object containing balance information
+ */
+export async function getPrizeVaultBalance(
+  connection: Connection,
+  contestPda: PublicKey,
+  programId?: PublicKey,
+): Promise<PrizeVaultBalanceResult> {
+  // Use provided programId or default
+  const actualProgramId =
+    programId || new PublicKey('Emx5wMhCNPULbwyY5SJpFVr1UFpgyPqugtkNvMUBoh9n');
+
+  // Create a program instance using a temporary provider
+  // Since we're only reading data, we don't need a real wallet
+  const provider = new anchor.AnchorProvider(
+    connection,
+    // Create a read-only wallet
+    {
+      publicKey: PublicKey.default,
+      signTransaction: async () => {
+        throw new Error('Wallet is read-only');
+      },
+      signAllTransactions: async () => {
+        throw new Error('Wallet is read-only');
+      },
+    },
+    { commitment: 'confirmed' },
+  );
+
+  // Create the program using the imported IDL
+  const program = new anchor.Program(
+    singleContestIdl,
+    provider,
+  ) as Program<SingleContest>;
+
+  // Fetch the contest account to get the prize vault PDA and mint
+  const contestAccount = await program.account.contest.fetch(contestPda);
+  const prizeMint = contestAccount.prizeMint;
+  const prizeVaultPda = contestAccount.prizeVault;
+
+  // Get the token account info for the prize vault
+  const tokenAccountInfo =
+    await connection.getTokenAccountBalance(prizeVaultPda);
+
+  // Return the balance and related information
+  return {
+    balance: Number(tokenAccountInfo.value.amount),
+    prizeMint,
+    prizeVaultPda,
+  };
+}
+
+/**
+ * Helper function to get prize vault balance using a PhantomWebWalletController
+ *
+ * @param phantomWallet An instance of PhantomWebWalletController
+ * @param connection Solana connection
+ * @param contestPda Public key of the contest
+ * @param programId Optional program ID (uses default if not provided)
+ * @returns Object containing balance information
+ */
+export async function getPrizeVaultBalanceWithPhantom(
+  phantomWallet: any, // Using any to avoid importing the specific controller type
+  connection: Connection,
+  contestPda: PublicKey,
+  programId?: PublicKey,
+): Promise<PrizeVaultBalanceResult> {
+  // For read-only operations, we don't need to create a provider from the wallet
+  // Just pass the connection directly
+  return getPrizeVaultBalance(connection, contestPda, programId);
+}
+
+/**
+ * Interface for contest status information
+ */
+export interface ContestStatus {
+  startTime: number;
+  endTime: number;
+  contestInterval: number;
+  lastContentId: string;
+  prizeShare: number;
+  contestToken: `0x${string}`;
+}
+
+/**
+ * Gets relevant contest state information, similar to EVM's getContestStatus but without voterShare
+ *
+ * @param connection Solana connection
+ * @param contestPda Public key of the contest
+ * @param programId Optional program ID (uses default if not provided)
+ * @returns ContestStatus object
+ */
+export async function getContestStatus(
+  connection: Connection,
+  contestPda: PublicKey,
+  programId?: PublicKey,
+): Promise<ContestStatus> {
+  // Use provided programId or default
+  const actualProgramId =
+    programId || new PublicKey('Emx5wMhCNPULbwyY5SJpFVr1UFpgyPqugtkNvMUBoh9n');
+
+  // Create a program instance using a temporary provider
+  // Since we're only reading data, we don't need a real wallet
+  const provider = new anchor.AnchorProvider(
+    connection,
+    // Create a read-only wallet
+    {
+      publicKey: PublicKey.default,
+      signTransaction: async () => {
+        throw new Error('Wallet is read-only');
+      },
+      signAllTransactions: async () => {
+        throw new Error('Wallet is read-only');
+      },
+    },
+    { commitment: 'confirmed' },
+  );
+
+  // Create the program using the imported IDL
+  const program = new anchor.Program(
+    singleContestIdl,
+    provider,
+  ) as Program<SingleContest>;
+
+  // Fetch the contest account
+  const contestAccount = await program.account.contest.fetch(contestPda);
+
+  // Extract relevant contest data
+  const startTime = contestAccount.startTime.toNumber();
+  const endTime = contestAccount.endTime.toNumber();
+  const contestInterval = endTime - startTime; // Calculate interval from start and end time
+  const lastContentId = contestAccount.contentCount.toString();
+  const prizeShare = contestAccount.prizeShare || 100; // Default to 100% if not specified
+
+  // Convert prizeMint to hex string format to match EVM interface
+  const contestToken = `0x${new PublicKey(contestAccount.prizeMint).toString()}`;
+
+  return {
+    startTime,
+    endTime,
+    contestInterval,
+    lastContentId,
+    prizeShare,
+    contestToken,
+  };
+}
+
+/**
+ * Helper function to get contest status using a PhantomWebWalletController
+ *
+ * @param phantomWallet An instance of PhantomWebWalletController
+ * @param connection Solana connection
+ * @param contestPda Public key of the contest
+ * @param programId Optional program ID (uses default if not provided)
+ * @returns ContestStatus object
+ */
+export async function getContestStatusWithPhantom(
+  phantomWallet: any, // Using any to avoid importing the specific controller type
+  connection: Connection,
+  contestPda: PublicKey,
+  programId?: PublicKey,
+): Promise<ContestStatus> {
+  // For read-only operations, we don't need to create a provider from the wallet
+  // Just pass the connection directly
+  return getContestStatus(connection, contestPda, programId);
+}
