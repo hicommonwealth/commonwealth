@@ -10,7 +10,6 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import CWTab from 'views/components/component_kit/new_designs/CWTabs/CWTab';
 import CWTabsRow from 'views/components/component_kit/new_designs/CWTabs/CWTabsRow';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { Feed } from 'views/components/feed';
 import CreateCommunityButton from 'views/components/sidebar/CreateCommunityButton';
 import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/index';
 import { useFetchGlobalActivityQuery } from '../../../state/api/feeds/fetchUserActivity';
@@ -24,6 +23,7 @@ import ExploreContestList from './ExploreContestList';
 import './ExplorePage.scss';
 import IdeaLaunchpad from './IdeaLaunchpad';
 import QuestList from './QuestList';
+import { ThreadFeed } from './ThreadFeed/ThreadFeed';
 import TokensList from './TokensList';
 
 const ExplorePage = () => {
@@ -148,7 +148,7 @@ const ExplorePage = () => {
         )}
         {activeTab === 'threads' && (
           <div className="threads-tab">
-            <Feed
+            <ThreadFeed
               query={useFetchGlobalActivityQuery}
               customScrollParent={containerRef.current}
               searchText={searchText}

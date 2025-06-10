@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
-import './feed.scss';
-
-import { PageNotFound } from '../pages/404';
-import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
+import './ThreadFeed.scss';
 
 import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
-import { extractImages } from 'client/scripts/helpers/feed';
+import { extractImages } from 'helpers/feed';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { Thread } from 'models/Thread';
@@ -19,9 +16,14 @@ import {
   useFetchUserActivityQuery,
 } from 'state/api/feeds/fetchUserActivity';
 import useUserStore from 'state/ui/user';
-import ThreadPreviewModal from '../modals/ThreadPreviewModal';
-import { ThreadCard } from '../pages/discussions/ThreadCard';
-import { CWModal } from './component_kit/new_designs/CWModal';
+import { CWButton } from '../../../components/component_kit/new_designs/CWButton';
+import { CWModal } from '../../../components/component_kit/new_designs/CWModal';
+import { CWTag } from '../../../components/component_kit/new_designs/CWTag';
+import ThreadPreviewModal from '../../../modals/ThreadPreviewModal';
+import { PageNotFound } from '../../404';
+import { ThreadCard } from '../../discussions/ThreadCard';
+import { UserDashboardRowSkeleton } from '../../user_dashboard/user_dashboard_row';
+import { FiltersDrawer, ThreadFilters } from './FiltersDrawer/FiltersDrawer';
 
 const DEFAULT_COUNT = 10;
 
@@ -103,25 +105,37 @@ type FeedProps = {
   customScrollParent?: HTMLElement;
   searchText?: string;
   onClearSearch?: () => void;
+  hideFilters?: boolean;
 };
 
 // eslint-disable-next-line react/no-multi-comp
-export const Feed = ({
+export const ThreadFeed = ({
   query,
   customScrollParent,
   searchText,
   onClearSearch,
+  hideFilters,
 }: FeedProps) => {
+  const [isThreadModalOpen, setIsThreadModalOpen] = useState<boolean>(false);
+  const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const user = useUserStore();
+
+  const [filters, setFilters] = useState<ThreadFilters>({
+    in_community_id: undefined,
+  });
+
   const {
     data: feed,
     isLoading,
     hasNextPage,
     fetchNextPage,
     isError,
-  } = query({ limit: 10 });
-
-  const [isThreadModalOpen, setIsThreadModalOpen] = useState<boolean>(false);
-  const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
+  } = query({
+    limit: 10,
+    ...(filters.in_community_id && { community_id: filters.in_community_id }),
+    ...(searchText?.trim() && { search: searchText.trim() }),
+  });
 
   if (isLoading) {
     return (
@@ -140,19 +154,14 @@ export const Feed = ({
     return <PageNotFound message="There was an error rendering the feed." />;
   }
 
-  // TODO: replace Thread with ThreadView
   const allThreads =
     feed?.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [];
 
-  if (!allThreads?.length) {
-    return (
-      <div className="Feed">
-        <div className="no-feed-message">
-          Join some communities to see Activity!
-        </div>
-      </div>
-    );
-  }
+  // if () {
+  //   return (
+
+  //   );
+  // }
 
   const openModal = (thread: Thread) => {
     setSelectedThread(thread);
@@ -164,26 +173,71 @@ export const Feed = ({
     setSelectedThread(null);
   };
 
+  const removeCommunityFilter = () => {
+    setFilters({
+      ...filters,
+      in_community_id: undefined,
+    });
+  };
+
+  const selectedCommunity = user.communities?.find(
+    (c) => c.id === (filters.in_community_id || ''),
+  );
+
   return (
-    // TODO: add search text to the feed - 11814
     <div className="Feed">
-      <Virtuoso
-        overscan={50}
-        customScrollParent={customScrollParent}
-        totalCount={allThreads?.length || DEFAULT_COUNT}
-        data={allThreads || []}
-        style={{ height: '100%' }}
-        itemContent={(i, thread) => (
-          <FeedThread
-            key={i}
-            thread={thread}
-            onClick={() => openModal(thread)}
+      {!hideFilters && (
+        <div className="filters">
+          <CWButton
+            label="Filters"
+            iconRight="funnelSimple"
+            buttonType="secondary"
+            onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
           />
-        )}
-        endReached={() => {
-          hasNextPage && fetchNextPage().catch(console.error);
-        }}
-      />
+          {searchText?.trim() && (
+            <CWTag
+              label={`Search: ${searchText.trim()}`}
+              type="filter"
+              onCloseClick={onClearSearch}
+            />
+          )}
+          {filters.in_community_id && selectedCommunity && (
+            <CWTag
+              label={`Community: ${selectedCommunity.name}`}
+              type="filter"
+              onCloseClick={removeCommunityFilter}
+            />
+          )}
+          <FiltersDrawer
+            isOpen={isFilterDrawerOpen}
+            onClose={() => setIsFilterDrawerOpen(false)}
+            filters={filters}
+            onFiltersChange={(newFilters) => setFilters(newFilters)}
+          />
+        </div>
+      )}
+
+      {!allThreads?.length ? (
+        <div className="no-feed-message">No threads found!</div>
+      ) : (
+        <Virtuoso
+          overscan={50}
+          customScrollParent={customScrollParent}
+          totalCount={allThreads?.length || DEFAULT_COUNT}
+          data={allThreads || []}
+          style={{ height: '100%' }}
+          itemContent={(i, thread) => (
+            <FeedThread
+              key={i}
+              thread={thread}
+              onClick={() => openModal(thread)}
+            />
+          )}
+          endReached={() => {
+            hasNextPage && fetchNextPage().catch(console.error);
+          }}
+        />
+      )}
       {selectedThread && (
         <CWModal
           size="large"

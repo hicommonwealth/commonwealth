@@ -132,7 +132,7 @@ const TrendingThreadList = ({
     data: feed,
     isLoading: feedIsLoading,
     isError: feedIsError,
-  } = query({ limit: 10 });
+  } = query({ limit: 10, search: searchText?.trim() });
 
   const {
     data: communityThreads,
