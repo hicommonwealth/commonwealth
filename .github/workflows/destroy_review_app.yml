@@ -13,23 +13,6 @@ on:
         type: number
 
 jobs:
-  delete_review_db:
-    name: Delete Review DB
-    if: |
-      (github.event.pull_request && github.event.action == 'closed') ||
-      (github.event.issue.pull_request && github.event.comment.body == '/destroy') ||
-      github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set PR Number
-        id: set_pr_number
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
-          else
-            echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
-          fi
-
   delete_review_app:
     name: Delete Review App
     if: |
