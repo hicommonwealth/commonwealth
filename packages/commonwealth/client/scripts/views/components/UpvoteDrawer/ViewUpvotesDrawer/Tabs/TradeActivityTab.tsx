@@ -7,12 +7,6 @@ interface TradeActivityTabProps {
   tokenAddress: string;
 }
 
-const NoTradeActivity = () => (
-  <div className="trade-activity-tab">
-    <CWText type="b1">No trade activity found</CWText>
-  </div>
-);
-
 export const TradeActivityTab = ({ tokenAddress }: TradeActivityTabProps) => {
   const { data: trades, isLoading } =
     trpc.launchpadToken.getLaunchpadTrades.useQuery({
@@ -28,7 +22,11 @@ export const TradeActivityTab = ({ tokenAddress }: TradeActivityTabProps) => {
   }
 
   if (!trades || trades.length === 0) {
-    return <NoTradeActivity />;
+    return (
+      <div className="trade-activity-tab">
+        <CWText type="b1">No trade activity found</CWText>
+      </div>
+    );
   }
 
   return <TradeActivityTable trades={trades} />;
