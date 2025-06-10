@@ -25,6 +25,8 @@ export type Aggregates = Extract<
   | 'ContractAbi'
   | 'LaunchpadToken'
   | 'Group'
+  | 'MCPServer'
+  | 'MCPServerCommunity'
 >;
 
 export * from './commands';

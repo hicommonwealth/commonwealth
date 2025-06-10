@@ -279,11 +279,9 @@ export const buildAssociations = (db: DB) => {
   db.MCPServerCommunity.withManyToMany(
     {
       model: db.MCPServer,
-      asOne: 'mcp_server_id',
     },
     {
       model: db.Community,
-      asOne: 'community_id',
     },
   );
 };

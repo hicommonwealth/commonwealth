@@ -43,6 +43,19 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
         });
       }
 
+      if (payload.include_mcp_servers) {
+        include.push({
+          model: models.MCPServerCommunity,
+          required: false,
+          include: [
+            {
+              model: models.MCPServer,
+              required: false,
+            },
+          ],
+        });
+      }
+
       const result = await models.Community.findOne({
         where,
         include,
