@@ -40,13 +40,25 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Install Neonctl
+        run: npm install -g neonctl
+
+      - name: Check if Review DB Branch Exists
+        id: check_neon_branch
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+        run: |
+          if neonctl branches list --project-id=${{ secrets.NEON_PROJECT_ID }} | grep -q "preview/pr-${{ steps.set_pr_number.outputs.pr_number }}"; then
+            echo "branch_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "branch_exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Delete Review DB Branch
-        id: delete_neon_branch
-        uses: neondatabase/delete-branch-action@v3
-        with:
-          project_id: ${{ secrets.NEON_PROJECT_ID }}
-          branch: preview/pr-${{ steps.set_pr_number.outputs.pr_number }}
-          api_key: ${{ secrets.NEON_API_KEY }}
+        if: steps.check_neon_branch.outputs.branch_exists == 'true'
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+        run: neonctl branches delete preview/pr-${{ steps.set_pr_number.outputs.pr_number }} --project-id=${{ secrets.NEON_PROJECT_ID }}
 
       - name: Delete environment
         env:
