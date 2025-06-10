@@ -14,6 +14,18 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      description: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      handle: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      source: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       server_url: {
         type: Sequelize.STRING,
         allowNull: false,

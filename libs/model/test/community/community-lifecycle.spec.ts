@@ -269,7 +269,10 @@ describe('Community lifecycle', () => {
     const [server] = await seed('MCPServer', {
       id: 1,
       name: 'mcp-server',
-      server_url: 'https://mcp-server.com',
+      description: 'A test MCP server',
+      handle: 'mcp',
+      source: 'test',
+      server_url: 'https://mcp.example.com',
     });
     mcpServer = server!;
   });
