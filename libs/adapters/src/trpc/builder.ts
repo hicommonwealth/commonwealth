@@ -17,7 +17,8 @@ const isSecure = <Input extends ZodType, Output extends ZodType>(
 ) => {
   const firstAuth = md.auth?.at(0);
   const optional =
-    typeof firstAuth === 'function' && firstAuth.name === 'authOptional';
+    typeof firstAuth === 'function' &&
+    firstAuth.name.startsWith('authOptional');
   return {
     secure: forceSecure || md.secure !== false || !!firstAuth,
     optional,
@@ -107,6 +108,7 @@ export const buildproc = <Input extends ZodType, Output extends ZodType>({
     .meta({
       openapi: {
         method,
+        description: md.input._def.description, // zod property description
         path: `/${name}`,
         tags: [tag],
         headers: [

@@ -80,7 +80,7 @@ export const UserStatusAddressView = z.object({
 export const UserStatusCommunityView = z.object({
   id: z.string(),
   name: z.string(),
-  icon_url: z.string(),
+  icon_url: z.string().nullish(),
   redirect: z.string().nullish(),
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
@@ -88,11 +88,15 @@ export const UserStatusCommunityView = z.object({
 });
 
 export const GetStatus = {
-  input: z.object({}),
-  output: UserView.omit({ profile: true }).extend({
-    addresses: z.array(UserStatusAddressView),
-    communities: z.array(UserStatusCommunityView),
-  }),
+  input: z.void(),
+  output: UserView.omit({ profile: true })
+    .extend({
+      addresses: z.array(UserStatusAddressView),
+      communities: z.array(UserStatusCommunityView),
+      jwt: z.string(),
+      knockJwtToken: z.string().optional(),
+    })
+    .optional(),
 };
 
 export const SearchUserProfilesView = z.object({

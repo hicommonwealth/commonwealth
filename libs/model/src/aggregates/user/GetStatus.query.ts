@@ -1,7 +1,9 @@
-import { type Query } from '@hicommonwealth/core';
+import { notificationsProvider, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { QueryTypes } from 'sequelize';
+import jwt from 'jsonwebtoken';
+import { Op, QueryTypes } from 'sequelize';
 import { z } from 'zod/v4';
+import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware';
 
@@ -9,15 +11,26 @@ export function GetStatus(): Query<typeof schemas.GetStatus> {
   return {
     ...schemas.GetStatus,
     auth: [],
-    secure: false, // TODO: this should be secure
+    secure: true,
+    authStrategy: {
+      type: 'custom',
+      name: 'Status',
+      userResolver: (_, signedInUser) =>
+        Promise.resolve(signedInUser || { id: -1, email: '' }),
+    },
     body: async ({ actor }) => {
+      if (actor.user.id === -1) return;
+
       const user = await models.User.scope('withPrivateData').findOne({
         where: { id: actor.user.id },
       });
       mustExist('User', user);
 
       const addresses = await models.Address.findAll({
-        where: { user_id: user.id },
+        where: {
+          user_id: user.id,
+          wallet_id: { [Op.not]: null },
+        },
         attributes: [
           'id',
           'address',
@@ -61,7 +74,7 @@ export function GetStatus(): Query<typeof schemas.GetStatus> {
         },
       );
 
-      return {
+      const status = {
         id: user.id!,
         tier: user.tier,
         email: user.email,
@@ -80,6 +93,16 @@ export function GetStatus(): Query<typeof schemas.GetStatus> {
         >,
         communities: communities || [],
       };
+
+      const jwtToken = jwt.sign({ id: status.id }, config.AUTH.JWT_SECRET, {
+        expiresIn: config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
+      });
+      const knockJwtToken = await notificationsProvider().signUserToken(
+        status.id,
+        config.AUTH.SESSION_EXPIRY_MILLIS / 1000,
+      );
+
+      return { ...status, jwt: jwtToken, knockJwtToken };
     },
   };
 }
