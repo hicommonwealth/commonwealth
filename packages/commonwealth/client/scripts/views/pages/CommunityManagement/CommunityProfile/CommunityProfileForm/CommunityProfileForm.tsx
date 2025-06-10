@@ -4,6 +4,7 @@ import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
+import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useCallback, useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
@@ -58,6 +59,8 @@ const CommunityProfileForm = () => {
       error: string;
     }[]
   >([]);
+
+  const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isCommunityLoading } =
@@ -160,6 +163,8 @@ const CommunityProfileForm = () => {
         banner_text: values.communityBanner ?? '',
       });
 
+      console.log('values', values.aiFeaturesEnabled);
+
       await updateCommunity(
         buildUpdateCommunityInput({
           communityId: community.id,
@@ -172,6 +177,7 @@ const CommunityProfileForm = () => {
             : [],
           iconUrl: values.communityProfileImageURL,
           defaultPage: values.defaultPage,
+          aiFeaturesEnabled: values.aiFeaturesEnabled,
         }),
       );
 
@@ -224,6 +230,7 @@ const CommunityProfileForm = () => {
             ? JSON.stringify(community?.custom_stages || [])
             : '',
         communityBanner: community.communityBanner || '',
+        aiFeaturesEnabled: community.ai_features_enabled,
       }}
       validationSchema={communityProfileValidationSchema}
       onSubmit={onSubmit}
@@ -312,8 +319,8 @@ const CommunityProfileForm = () => {
               <CWText type="h4">Verification Status</CWText>
               <CWText type="b1">
                 Build trust through verification. Each completed level below
-                enhances your community’s credibility and provides members with
-                greater confidence.
+                enhances your community&apos;s credibility and provides members
+                with greater confidence.
               </CWText>
             </div>
             <CommunityTrustLevel />
@@ -410,6 +417,24 @@ const CommunityProfileForm = () => {
               hookToForm
             />
           </section>
+
+          {aiCommentsFeatureEnabled && (
+            <section className="ai-features-section">
+              <div className="header">
+                <CWText type="h4">AI Features</CWText>
+                <div className="controls">
+                  <CWText type="b1">
+                    Control AI functionality for your community. When disabled,
+                    AI features like smart replies, comment suggestions and AI
+                    assistants will be hidden from all community members,
+                    regardless of their personal settings.
+                  </CWText>
+
+                  <CWToggle name="aiFeaturesEnabled" hookToForm size="large" />
+                </div>
+              </div>
+            </section>
+          )}
 
           <section className="default-page-section">
             <div className="header">

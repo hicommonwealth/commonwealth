@@ -1,6 +1,7 @@
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { useAiCompletion } from 'client/scripts/state/api/ai';
 import { generatePollPrompt } from 'client/scripts/state/api/ai/prompts';
+import { useAIFeatureEnabled } from 'hooks/useAIFeatureEnabled';
 import React, { useState } from 'react';
 import { SetLocalPolls } from 'utils/polls';
 import type Thread from '../../../models/Thread';
@@ -17,7 +18,6 @@ type ThreadPollEditorCardProps = {
   threadAlreadyHasPolling: boolean;
   setLocalPoll?: SetLocalPolls;
   isCreateThreadPage?: boolean;
-  aiInteractionsToggleEnabled?: boolean;
   threadContentDelta?: string;
   threadTitle?: string;
 };
@@ -27,7 +27,6 @@ export const ThreadPollEditorCard = ({
   threadAlreadyHasPolling,
   setLocalPoll,
   isCreateThreadPage = false,
-  aiInteractionsToggleEnabled = false,
   threadTitle,
   threadContentDelta,
 }: ThreadPollEditorCardProps) => {
@@ -37,6 +36,7 @@ export const ThreadPollEditorCard = ({
   const [isAIresponseCompleted, setIsAIresponseCompleted] = useState(true);
 
   const { generateCompletion } = useAiCompletion();
+  const { isAIEnabled } = useAIFeatureEnabled();
   const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
   const DEFAULT_THREAD_BODY = 'No content provided.';
   const handleGeneratePoll = () => {
@@ -46,11 +46,11 @@ export const ThreadPollEditorCard = ({
     let effectiveBody;
 
     if (isCreateThreadPage && threadContentDelta && threadTitle) {
-      effectiveTitle = aiInteractionsToggleEnabled
+      effectiveTitle = isAIEnabled
         ? threadTitle?.trim() || DEFAULT_THREAD_TITLE
         : threadTitle;
 
-      effectiveBody = aiInteractionsToggleEnabled
+      effectiveBody = isAIEnabled
         ? getTextFromDelta(threadContentDelta).trim()
           ? serializeDelta(threadContentDelta)
           : DEFAULT_THREAD_BODY

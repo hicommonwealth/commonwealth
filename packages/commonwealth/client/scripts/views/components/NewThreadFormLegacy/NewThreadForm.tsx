@@ -18,9 +18,7 @@ import {
 } from 'controllers/server/sessions';
 import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL } from 'helpers/threads';
-import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, {
@@ -39,7 +37,6 @@ import {
 } from 'state/api/ai/prompts';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
-import { useFetchGroupsQuery } from 'state/api/groups';
 import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import {
   useAddThreadLinksMutation,
@@ -68,10 +65,12 @@ import {
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 
+import { useAIFeatureEnabled } from 'client/scripts/hooks/useAIFeatureEnabled';
+import useTopicGating from 'client/scripts/hooks/useTopicGating';
+import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import { DeltaStatic } from 'quill';
 import { ExtendedPoll, LocalPoll, parseCustomDuration } from 'utils/polls';
 // eslint-disable-next-line max-len
-import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
@@ -167,12 +166,9 @@ export const NewThreadForm = forwardRef<
       apiCallEnabled: !!user.id,
     });
 
-    const {
-      aiInteractionsToggleEnabled,
-      aiCommentsToggleEnabled,
-      setAICommentsToggleEnabled,
-    } = useLocalAISettingsStore();
-    const aiCommentsFeatureEnabled = useFlag('aiComments');
+    const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
+      useLocalAISettingsStore();
+    const { isAIEnabled } = useAIFeatureEnabled();
 
     useAppStatus();
 
@@ -223,7 +219,6 @@ export const NewThreadForm = forwardRef<
       clearDraft,
       canShowGatingBanner,
       setCanShowGatingBanner,
-      canShowTopicPermissionBanner,
       setCanShowTopicPermissionBanner,
     } = useNewThreadForm(selectedCommunityId, topicsForSelector, {
       contentDelta,
@@ -262,12 +257,7 @@ export const NewThreadForm = forwardRef<
     const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
     const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
 
-    const { data: groups = [] } = useFetchGroupsQuery({
-      communityId: selectedCommunityId,
-      includeTopics: true,
-      enabled: !!selectedCommunityId,
-    });
-    const { memberships, actionGroups, bypassGating } = useTopicGating({
+    const { actionGroups, bypassGating } = useTopicGating({
       communityId: selectedCommunityId,
       userAddress: userSelectedAddress || '',
       apiEnabled: !!userSelectedAddress && !!selectedCommunityId,
@@ -368,17 +358,17 @@ export const NewThreadForm = forwardRef<
       }
 
       // In AI mode, provide default values so the backend validation is not broken.
-      const effectiveTitle = aiInteractionsToggleEnabled
+      const effectiveTitle = isAIEnabled
         ? threadTitle.trim() || DEFAULT_THREAD_TITLE
         : threadTitle;
 
-      const effectiveBody = aiInteractionsToggleEnabled
+      const effectiveBody = isAIEnabled
         ? getTextFromDelta(threadContentDelta).trim()
           ? serializeDelta(threadContentDelta)
           : DEFAULT_THREAD_BODY
         : serializeDelta(threadContentDelta);
 
-      if (!aiInteractionsToggleEnabled) {
+      if (!isAIEnabled) {
         const deltaString = JSON.stringify(threadContentDelta);
         checkNewThreadErrors(
           { threadKind, threadUrl, threadTitle, threadTopic },
@@ -505,7 +495,6 @@ export const NewThreadForm = forwardRef<
       hasTopics,
       checkForSessionKeyRevalidationErrors,
       user,
-      aiInteractionsToggleEnabled,
       isTurnstileEnabled,
       turnstileToken,
       resetTurnstile,
@@ -513,6 +502,7 @@ export const NewThreadForm = forwardRef<
       linkedProposals,
       createPoll,
       pollsData,
+      isAIEnabled,
     ]);
 
     const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -1110,57 +1100,54 @@ export const NewThreadForm = forwardRef<
                       containerClassName="no-pad cancel-button"
                     />
 
-                    {aiCommentsFeatureEnabled &&
-                      aiInteractionsToggleEnabled && (
-                        <div className="ai-toggle-wrapper">
-                          <CWToggle
-                            className="ai-toggle"
-                            icon="binoculars"
-                            iconColor="#757575"
-                            checked={effectiveWebSearchEnabled}
-                            onChange={() =>
-                              effectiveSetWebSearchEnabled(
-                                !effectiveWebSearchEnabled,
-                              )
-                            }
-                          />
-                          <CWText type="caption" className="toggle-label">
-                            Web search
-                          </CWText>
-                        </div>
-                      )}
+                    {isAIEnabled && (
+                      <div className="ai-toggle-wrapper">
+                        <CWToggle
+                          className="ai-toggle"
+                          icon="binoculars"
+                          iconColor="#757575"
+                          checked={effectiveWebSearchEnabled}
+                          onChange={() =>
+                            effectiveSetWebSearchEnabled(
+                              !effectiveWebSearchEnabled,
+                            )
+                          }
+                        />
+                        <CWText type="caption" className="toggle-label">
+                          Web search
+                        </CWText>
+                      </div>
+                    )}
 
-                    {aiCommentsFeatureEnabled &&
-                      aiInteractionsToggleEnabled && (
-                        <CWThreadAction
-                          action="ai-reply"
-                          label="Draft thread with AI"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleGenerateAIThread().catch(console.error);
+                    {isAIEnabled && (
+                      <CWThreadAction
+                        action="ai-reply"
+                        label="Draft thread with AI"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleGenerateAIThread().catch(console.error);
+                        }}
+                      />
+                    )}
+
+                    {isAIEnabled && (
+                      <div className="ai-toggle-wrapper">
+                        <CWToggle
+                          className="ai-toggle"
+                          icon="sparkle"
+                          iconColor="#757575"
+                          checked={aiCommentsToggleEnabled}
+                          onChange={() => {
+                            setAICommentsToggleEnabled(
+                              !aiCommentsToggleEnabled,
+                            );
                           }}
                         />
-                      )}
-
-                    {aiCommentsFeatureEnabled &&
-                      aiInteractionsToggleEnabled && (
-                        <div className="ai-toggle-wrapper">
-                          <CWToggle
-                            className="ai-toggle"
-                            icon="sparkle"
-                            iconColor="#757575"
-                            checked={aiCommentsToggleEnabled}
-                            onChange={() => {
-                              setAICommentsToggleEnabled(
-                                !aiCommentsToggleEnabled,
-                              );
-                            }}
-                          />
-                          <CWText type="caption" className="toggle-label">
-                            AI initial comment
-                          </CWText>
-                        </div>
-                      )}
+                        <CWText type="caption" className="toggle-label">
+                          AI initial comment
+                        </CWText>
+                      </div>
+                    )}
 
                     <CWButton
                       label="Create"

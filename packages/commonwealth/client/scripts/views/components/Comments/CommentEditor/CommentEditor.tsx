@@ -2,7 +2,7 @@ import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import { isCommandClick } from 'helpers';
-import { useFlag } from 'hooks/useFlag';
+import { useAIFeatureEnabled } from 'hooks/useAIFeatureEnabled';
 import Account from 'models/Account';
 import Thread from 'models/Thread';
 import type { DeltaStatic } from 'quill';
@@ -85,12 +85,9 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
     },
     _ref,
   ) => {
-    const aiCommentsFeatureEnabled = useFlag('aiComments');
-    const {
-      aiCommentsToggleEnabled,
-      aiInteractionsToggleEnabled,
-      setAICommentsToggleEnabled,
-    } = useLocalAISettingsStore();
+    const { isAIEnabled } = useAIFeatureEnabled();
+    const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
+      useLocalAISettingsStore();
 
     const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
 
@@ -336,7 +333,7 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
                 label="Add or Generate Image"
                 onClick={handleOpenImageModal}
               />
-              {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+              {isAIEnabled && (
                 <CWThreadAction
                   action="ai-reply"
                   label={`Draft AI ${!isReplying ? 'Comment' : 'Reply'}`}
@@ -346,7 +343,7 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
               )}
             </div>
 
-            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+            {isAIEnabled && (
               <div className="ai-toggle-wrapper">
                 <CWTooltip
                   content={`${aiCommentsToggleEnabled ? 'Disable' : 'Enable'} AI auto reply`}
@@ -368,7 +365,7 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
                 </CWText>
               </div>
             )}
-            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+            {isAIEnabled && (
               <div className="ai-toggle-wrapper">
                 <CWTooltip
                   content={`${effectiveWebSearchEnabled ? 'Disable' : 'Enable'} Web Search`}
