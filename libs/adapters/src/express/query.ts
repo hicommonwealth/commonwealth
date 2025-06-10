@@ -18,7 +18,7 @@ export const query =
   ): RequestHandler =>
   async (
     req: Request,
-    res: Response<z.infer<Output> | undefined>,
+    res: Response<z.infer<Output> | undefined | void>,
     next: NextFunction,
   ) => {
     try {

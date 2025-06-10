@@ -19,7 +19,7 @@ export const query = async <
   { input, auth, body }: Metadata<Input, Output, _Context>,
   { actor, payload }: Context<Input, _Context>,
   validate = true,
-): Promise<z.infer<Output> | undefined> => {
+): Promise<z.infer<Output> | undefined | void> => {
   try {
     const context: Context<Input, _Context> = {
       actor,
