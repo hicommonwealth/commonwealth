@@ -1,7 +1,0 @@
-apiVersion: secrets.hashicorp.com/v1beta1
-kind: VaultConnection
-metadata:
-  name: vault-connection
-  namespace: argocd
-spec:
-  address: 'https://your-vault-server.example.com:8200'

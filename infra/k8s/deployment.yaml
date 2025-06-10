@@ -5,8 +5,8 @@ metadata:
   namespace: argocd
 spec:
   source:
-    repoURL: http://host.docker.internal:8000 # For Docker Desktop
-    path: ./ # Path to kustomization.yaml
+    repoURL: http://host.docker.internal:8000
+    path: ./
     kustomize: {}
   destination:
     server: https://kubernetes.default.svc
