@@ -16,6 +16,7 @@ on:
 
 env:
   RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  APP_ENV: CI
 
 jobs:
   build:

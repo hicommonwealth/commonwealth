@@ -196,7 +196,11 @@ async function main() {
   log.info(`Deployment URL: ${deploymentUrl}`);
 
   try {
-    if (deploymentUrl && (config.APP_ENV === 'CI' || config.IS_CI)) {
+    if (
+      deploymentUrl &&
+      (config.APP_ENV === 'CI' || config.IS_CI) &&
+      process.env.GITHUB_ENV
+    ) {
       const fs = require('fs');
       fs.appendFileSync(
         process.env.GITHUB_ENV,
