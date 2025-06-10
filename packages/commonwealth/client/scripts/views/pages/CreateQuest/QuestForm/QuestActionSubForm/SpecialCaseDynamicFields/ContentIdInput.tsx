@@ -1,5 +1,6 @@
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import React from 'react';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import { fetchCachedNodes } from 'state/api/nodes';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -29,6 +30,7 @@ const ContentIdInput = ({
       chainId: `Select community chain`,
       groupId: `https://${PRODUCTION_DOMAIN}/common/members?tab=groups&groupId=1234`,
       tokenThresholdAmount: '0.00001',
+      sso: 'Select SSO provider',
     },
     labels: {
       threadId: 'Thread Link (optional)',
@@ -39,6 +41,7 @@ const ContentIdInput = ({
       discordServerId: 'Discord Server Id',
       groupId: 'Group Link',
       tokenThresholdAmount: 'Min ETH Trade Amount (optional)',
+      sso: 'SSO Provider',
     },
     instructionalMessages: {
       threadId: '',
@@ -50,6 +53,7 @@ const ContentIdInput = ({
       groupId: '',
       tokenThresholdAmount:
         'Aura is awarded after this amount of token is traded',
+      sso: '',
     },
   };
 
@@ -115,6 +119,14 @@ const ContentIdInput = ({
       };
     }
 
+    if (config?.requires_sso_source) {
+      return {
+        label: inputConfig.labels.sso,
+        placeholder: inputConfig.placeholders.sso,
+        instructionalMessages: inputConfig.instructionalMessages.sso,
+      };
+    }
+
     if (config?.with_optional_token_trade_threshold) {
       return {
         label: inputConfig.labels.tokenThresholdAmount,
@@ -165,6 +177,33 @@ const ContentIdInput = ({
       })}
       customError={errors?.contentIdentifier}
     />;
+  }
+
+  if (config?.requires_sso_source) {
+    return (
+      <CWSelectList
+        isClearable={true}
+        key={`contentIdentifier-${defaultValues?.action}`}
+        name="contentIdentifier"
+        label={inputConfig.labels.sso}
+        placeholder={inputConfig.placeholders.sso}
+        containerClassname="span-3"
+        options={Object.values(WalletSsoSource).map((v) => ({
+          label: v,
+          value: v,
+        }))}
+        onChange={(v) =>
+          onChange?.({ contentIdentifier: `${v?.value || ''}` })
+        }
+        {...(defaultValues?.contentIdentifier && {
+          value: {
+            value: defaultValues?.contentIdentifier,
+            label: defaultValues?.contentIdentifier,
+          },
+        })}
+        customError={errors?.contentIdentifier}
+      />
+    );
   }
 
   return (

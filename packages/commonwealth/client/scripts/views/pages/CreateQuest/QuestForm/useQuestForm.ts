@@ -279,6 +279,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (scope === QuestActionContentIdScope.Chain) return 'chain';
         if (scope === QuestActionContentIdScope.Group) return 'group';
         if (scope === QuestActionContentIdScope.Goal) return 'goal';
+        if (scope === QuestActionContentIdScope.Sso) return 'sso';
         if (scope === QuestActionContentIdScope.TokenTradeThreshold) {
           return 'threshold';
         }

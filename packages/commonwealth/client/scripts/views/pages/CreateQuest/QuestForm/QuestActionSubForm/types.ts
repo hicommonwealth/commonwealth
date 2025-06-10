@@ -15,6 +15,7 @@ export enum QuestActionContentIdScope {
   DiscordServer = 'discord_server',
   Chain = 'chain',
   Group = 'group',
+  Sso = 'sso',
   TokenTradeThreshold = 'threshold',
   Goal = 'goal',
 }
@@ -92,6 +93,7 @@ export type QuestActionSubFormConfig = {
   requires_start_link: boolean;
   requires_amount_multipler: boolean;
   with_optional_token_trade_threshold: boolean;
+  requires_sso_source?: boolean;
 };
 
 export type QuestActionSubFormInternalRefs = {
