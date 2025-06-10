@@ -844,6 +844,7 @@ export type GitHubBranch = {
 export type GitHubRepo = {
   __typename?: 'GitHubRepo';
   defaultBranch: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
   fullName: Scalars['String']['output'];
   id: Scalars['Int']['output'];
   installationId: Scalars['String']['output'];
@@ -866,6 +867,7 @@ export type GitHubRepoUpdateInput = {
 export type GitHubRepoWithoutInstallation = {
   __typename?: 'GitHubRepoWithoutInstallation';
   defaultBranch: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
   fullName: Scalars['String']['output'];
   id: Scalars['Int']['output'];
   isPrivate: Scalars['Boolean']['output'];
@@ -5184,6 +5186,11 @@ export const VariableCollectionUpsertDocument = gql`
     variableCollectionUpsert(input: $input)
   }
 `;
+export const EnvironmentDeleteDocument = gql`
+  mutation environmentDelete($id: String!) {
+    environmentDelete(id: $id)
+  }
+`;
 export const ServiceInstanceUpdateDocument = gql`
   mutation serviceInstanceUpdate(
     $serviceId: String!
@@ -5339,6 +5346,24 @@ export function getSdk(
         variables,
       );
     },
+    environmentDelete(
+      variables: EnvironmentDeleteMutationVariables,
+      requestHeaders?: GraphQLClientRequestHeaders,
+      signal?: RequestInit['signal'],
+    ): Promise<EnvironmentDeleteMutation> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<EnvironmentDeleteMutation>({
+            document: EnvironmentDeleteDocument,
+            variables,
+            requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders },
+            signal,
+          }),
+        'environmentDelete',
+        'mutation',
+        variables,
+      );
+    },
     serviceInstanceUpdate(
       variables: ServiceInstanceUpdateMutationVariables,
       requestHeaders?: GraphQLClientRequestHeaders,
@@ -5486,6 +5511,15 @@ export type VariableCollectionUpsertMutationVariables = Exact<{
 export type VariableCollectionUpsertMutation = {
   __typename?: 'Mutation';
   variableCollectionUpsert: boolean;
+};
+
+export type EnvironmentDeleteMutationVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+export type EnvironmentDeleteMutation = {
+  __typename?: 'Mutation';
+  environmentDelete: boolean;
 };
 
 export type ServiceInstanceUpdateMutationVariables = Exact<{

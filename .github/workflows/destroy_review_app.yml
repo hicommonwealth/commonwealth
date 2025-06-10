@@ -30,14 +30,6 @@ jobs:
             echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Delete Review DB Branch
-        id: delete_neon_branch
-        uses: neondatabase/delete-branch-action@v3
-        with:
-          project_id: ${{ secrets.RAILWAY_PROJECT_ID }}
-          branch: preview/pr-${{ steps.set_pr_number.outputs.pr_number }}
-          api_key: ${{ secrets.NEON_API_KEY }}
-
   delete_review_app:
     name: Delete Review App
     if: |
@@ -45,9 +37,6 @@ jobs:
       (github.event.issue.pull_request && github.event.comment.body == '/destroy') ||
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    container: ghcr.io/railwayapp/cli:latest
-    env:
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     steps:
       - name: Set PR Number
         id: set_pr_number
@@ -58,10 +47,22 @@ jobs:
             echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
           fi
 
+      - uses: ./.github/actions/setup
+        if: steps.check_base_image.outputs.exists == 'false'
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Delete Review DB Branch
+        id: delete_neon_branch
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ secrets.RAILWAY_PROJECT_ID }}
+          branch: preview/pr-${{ steps.set_pr_number.outputs.pr_number }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
       - name: Delete environment
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: |
-          RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} railway link -p 'PR Review Apps' -e 'pr-${{ steps.set_pr_number.outputs.pr_number }}'
-          RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} railway environment delete
-          
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: pnpm -F railway delete-env --env=pr-${{ steps.set_pr_number.outputs.pr_number }}
+

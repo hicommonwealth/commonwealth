@@ -33,3 +33,7 @@ query environment($id: String!) {
 mutation variableCollectionUpsert($input: VariableCollectionUpsertInput!) {
   variableCollectionUpsert(input: $input)
 }
+
+mutation environmentDelete($id: String!) {
+  environmentDelete(id: $id)
+}
