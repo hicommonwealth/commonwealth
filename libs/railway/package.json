@@ -20,7 +20,8 @@
     "test": "echo No tests for @hicommonwealth/railway",
     "codegen": "graphql-codegen --config codegen.yml",
     "deploy-review-app": "tsx src/scripts/deployReviewApp.ts",
-    "upsert-env-var": "tsx src/scripts/upsertEnvVariables.ts"
+    "upsert-env-var": "tsx src/scripts/upsertEnvVariables.ts",
+    "create-parent-env": "tsx src/scripts/createParentReviewApp.ts"
   },
   "dependencies": {
     "@hicommonwealth/core": "workspace:*",
