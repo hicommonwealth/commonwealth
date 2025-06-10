@@ -20,6 +20,9 @@ jobs:
       (github.event.issue.pull_request && github.event.comment.body == '/destroy') ||
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          node: [ 22 ]
     steps:
       - name: Set PR Number
         id: set_pr_number
@@ -36,7 +39,6 @@ jobs:
           ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
 
       - uses: ./.github/actions/setup
-        if: steps.check_base_image.outputs.exists == 'false'
         with:
           node-version: ${{ matrix.node }}
 
