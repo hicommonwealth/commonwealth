@@ -7,6 +7,10 @@ import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
 import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
 import ExportPrivateKeyFromMagic from '../views/components/ExportPrivateKeyFromMagic';
 
+const SolanaContestInitializer = lazy(
+  () => import('views/pages/SolanaContestInitializer'),
+);
+
 const QuillPage = lazy(() => import('views/pages/QuillPage'));
 const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
 const MarkdownViewerPage = lazy(() => import('views/pages/MarkdownViewerPage'));
@@ -192,6 +196,11 @@ const CommonDomainRoutes = () => [
     key="/"
     path="/"
     element={withLayout(DashboardPage, { type: 'common' })}
+  />,
+  <Route
+    key="/solana-contest-initializer"
+    path="/solana-contest-initializer"
+    element={withLayout(SolanaContestInitializer, { type: 'common' })}
   />,
   <Route
     key="/home"

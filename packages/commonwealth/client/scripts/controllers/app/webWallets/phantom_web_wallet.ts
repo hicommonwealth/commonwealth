@@ -1,12 +1,14 @@
 declare let window: any;
 
 import { SolanaSigner } from '@canvas-js/chain-solana';
+import { AnchorProvider } from '@coral-xyz/anchor';
 import {
   ChainBase,
   ChainNetwork,
   SOLANA_MAINNET_CHAIN_ID,
   WalletId,
 } from '@hicommonwealth/shared';
+import { Connection, PublicKey } from '@solana/web3.js';
 import IWebWallet from '../../../models/IWebWallet';
 
 class PhantomWebWalletController implements IWebWallet<string> {
@@ -50,6 +52,46 @@ class PhantomWebWalletController implements IWebWallet<string> {
     return new SolanaSigner({
       signer: window.solana,
       chainId: this.getChainId(),
+    });
+  }
+
+  /**
+   * Returns an Anchor-compatible wallet for use with Anchor programs
+   * @returns An object compatible with anchor.Wallet interface
+   */
+  public getAnchorWallet() {
+    if (!this.enabled) {
+      throw new Error('Phantom wallet not enabled! Call enable() first.');
+    }
+
+    return {
+      publicKey: new PublicKey(this.accounts[0]),
+      signTransaction: async (tx: any) => {
+        return await window.solana.signTransaction(tx);
+      },
+      signAllTransactions: async (txs: any[]) => {
+        return await window.solana.signAllTransactions(txs);
+      },
+    };
+  }
+
+  /**
+   * Creates an AnchorProvider using this wallet and the provided connection
+   * @param connection Solana Connection to use
+   * @param opts Optional provider options
+   * @returns An AnchorProvider instance ready to use with Anchor programs
+   */
+  public createAnchorProvider(
+    connection: Connection,
+    opts: { commitment?: string; preflightCommitment?: string } = {},
+  ) {
+    // Get the anchor wallet interface
+    const wallet = this.getAnchorWallet();
+
+    // Create and return the provider
+    return new AnchorProvider(connection, wallet, {
+      commitment: opts.commitment || 'confirmed',
+      preflightCommitment: opts.preflightCommitment || 'confirmed',
     });
   }
 
