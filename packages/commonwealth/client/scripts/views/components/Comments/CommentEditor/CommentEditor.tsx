@@ -9,7 +9,7 @@ import React, { forwardRef, useCallback, useEffect, useState } from 'react';
 import { useAiCompletion } from 'state/api/ai';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
-import { useAIFeatureEnabled, useLocalAISettingsStore } from 'state/ui/user';
+import { useAIFeatureEnabled, useUserAiSettingsStore } from 'state/ui/user';
 import { useTurnstile } from 'views/components/useTurnstile';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
@@ -86,7 +86,7 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
   ) => {
     const { isAIEnabled } = useAIFeatureEnabled();
     const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
-      useLocalAISettingsStore();
+      useUserAiSettingsStore();
 
     const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
 

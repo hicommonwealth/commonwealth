@@ -39,7 +39,7 @@ import {
   useGetThreadPollsQuery,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import useUserStore, { useUserAiSettingsStore } from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
@@ -257,7 +257,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     thread?.topic?.id,
   );
 
-  const { aiCommentsToggleEnabled, selectedModels } = useLocalAISettingsStore();
+  const { aiCommentsToggleEnabled, selectedModels } = useUserAiSettingsStore();
 
   const [streamingInstances, setStreamingInstances] = useState<
     StreamingReplyInstance[]

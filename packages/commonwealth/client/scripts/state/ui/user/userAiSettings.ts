@@ -7,7 +7,7 @@ export type AIModelOption = {
   label: string;
 };
 
-interface LocalAISettingsStore {
+interface UserAiSettingsStore {
   aiInteractionsToggleEnabled: boolean;
   aiCommentsToggleEnabled: boolean;
   setAIInteractionsToggleEnabled: (enabled: boolean) => void;
@@ -16,7 +16,7 @@ interface LocalAISettingsStore {
   setSelectedModels: (models: AIModelOption[]) => void;
 }
 
-const localAISettingsStore = createStore<LocalAISettingsStore>()(
+const userAiSettingsStore = createStore<UserAiSettingsStore>()(
   persist(
     (set) => ({
       aiInteractionsToggleEnabled: true,
@@ -42,5 +42,5 @@ const localAISettingsStore = createStore<LocalAISettingsStore>()(
   ),
 );
 
-export const useLocalAISettingsStore =
-  createBoundedUseStore(localAISettingsStore);
+export const useUserAiSettingsStore =
+  createBoundedUseStore(userAiSettingsStore);

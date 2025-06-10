@@ -1,7 +1,7 @@
 import { useFlag } from 'hooks/useFlag';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import { useLocalAISettingsStore } from 'state/ui/user';
+import { useUserAiSettingsStore } from 'state/ui/user';
 
 /**
  * Hook to determine if AI features are enabled for the current user and community.
@@ -10,7 +10,7 @@ import { useLocalAISettingsStore } from 'state/ui/user';
  */
 export const useAIFeatureEnabled = () => {
   const aiCommentsFeatureEnabled = useFlag('aiComments');
-  const { aiInteractionsToggleEnabled } = useLocalAISettingsStore();
+  const { aiInteractionsToggleEnabled } = useUserAiSettingsStore();
 
   const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({

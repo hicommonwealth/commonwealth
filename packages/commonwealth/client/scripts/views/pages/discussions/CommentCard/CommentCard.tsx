@@ -12,6 +12,7 @@ import {
   verify,
 } from '@hicommonwealth/shared';
 import { useAiCompletion } from 'client/scripts/state/api/ai';
+import { useUserAiSettingsStore } from 'client/scripts/state/ui/user/userAiSettings';
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -22,7 +23,6 @@ import { buildCreateCommentInput } from 'state/api/comments/createComment';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore from 'state/ui/user';
-import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import ShareButton from 'views/components/ShareButton';
@@ -165,7 +165,7 @@ export const CommentCard = ({
     communityId: comment.community_id,
     existingNumberOfComments: 0,
   });
-  const { aiInteractionsToggleEnabled } = useLocalAISettingsStore();
+  const { aiInteractionsToggleEnabled } = useUserAiSettingsStore();
   const [commentText, setCommentText] = useState(comment.body);
   const commentBody = React.useMemo(() => {
     const rawContent = editDraft || commentText || comment.body;

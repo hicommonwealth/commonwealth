@@ -46,7 +46,7 @@ import {
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import useUserStore, { useUserAiSettingsStore } from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import CustomTopicOption from 'views/components/NewThreadFormLegacy/CustomTopicOption';
@@ -167,7 +167,7 @@ export const NewThreadForm = forwardRef<
     });
 
     const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
-      useLocalAISettingsStore();
+      useUserAiSettingsStore();
     const { isAIEnabled } = useAIFeatureEnabled();
 
     useAppStatus();

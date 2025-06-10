@@ -18,7 +18,7 @@ import {
   generateThreadPrompt,
 } from 'state/api/ai/prompts';
 import useSidebarStore from 'state/ui/sidebar';
-import { useAIFeatureEnabled, useLocalAISettingsStore } from 'state/ui/user';
+import { useAIFeatureEnabled, useUserAiSettingsStore } from 'state/ui/user';
 import { AIModelSelector } from 'views/components/AIModelSelector';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -83,7 +83,7 @@ const StickyInput = (props: StickyInputProps) => {
     setAICommentsToggleEnabled,
     selectedModels,
     setSelectedModels,
-  } = useLocalAISettingsStore();
+  } = useUserAiSettingsStore();
   const stickyCommentReset = useActiveStickCommentReset();
   const { generateCompletion } = useAiCompletion();
   const { isAIEnabled } = useAIFeatureEnabled();
