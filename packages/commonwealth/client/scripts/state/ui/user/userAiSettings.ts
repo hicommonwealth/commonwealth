@@ -8,7 +8,9 @@ export type AIModelOption = {
 };
 
 interface UserAiSettingsStore {
+  // AI interactions toggle in Edit profile page - personal preference
   aiInteractionsToggleEnabled: boolean;
+  // AI reply toggle in thread / comment creation page - personal preference
   aiCommentsToggleEnabled: boolean;
   setAIInteractionsToggleEnabled: (enabled: boolean) => void;
   setAICommentsToggleEnabled: (enabled: boolean) => void;
