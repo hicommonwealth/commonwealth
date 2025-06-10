@@ -60,7 +60,7 @@ export const ReactionButton = ({
   const popoverProps = usePopover();
 
   const communityId = app.activeChainId() || '';
-  const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
+  const { mutateAsync: createThreadReaction, isPending: isAddingReaction } =
     useCreateThreadReactionMutation({
       communityId,
       threadId: thread.id,
@@ -68,7 +68,7 @@ export const ReactionButton = ({
       currentReactionCount: thread.reactionCount || 0,
       currentReactionWeightsSum: `${thread?.reactionWeightsSum || 0}`,
     });
-  const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
+  const { mutateAsync: deleteThreadReaction, isPending: isDeletingReaction } =
     useDeleteThreadReactionMutation({
       communityId,
       address: user.activeAccount?.address || '',
