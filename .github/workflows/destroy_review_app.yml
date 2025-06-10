@@ -1,0 +1,59 @@
+name: Destroy Review App
+
+on:
+  pull_request:
+    types: [closed]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Pull Request Number'
+        required: true
+        type: number
+
+jobs:
+  delete_review_db:
+    name: Delete Review DB
+    if: |
+      (github.event.pull_request && github.event.action == 'closed') ||
+      (github.event.issue.pull_request && github.event.comment.body == '/destroy') ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder
+        run: echo "Delete Review DB step goes here"
+
+  delete_review_app:
+    name: Delete Review App
+    if: |
+      (github.event.pull_request && github.event.action == 'closed') ||
+      (github.event.issue.pull_request && github.event.comment.body == '/destroy') ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    steps:
+      - name: Set PR Number
+        id: set_pr_number
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+          else
+            echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Delete Review DB Branch
+        id: delete_neon_branch
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ secrets.RAILWAY_PROJECT_ID }}
+          branch: pr-${{ steps.set_pr_number.outputs.pr_number }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+      - name: Delete environment
+        run: |
+          railway link -p 'PR Review Apps' -e 'pr-${{ steps.set_pr_number.outputs.pr_number }}'
+          railway environment delete
+          
