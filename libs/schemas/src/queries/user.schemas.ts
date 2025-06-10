@@ -186,7 +186,10 @@ export const XpLogView = XpLog.extend({
   quest_id: z.number(),
   quest_action_meta_id: z.number(),
   event_name: z.string(),
+  reward_amount: z.number(),
   creator_profile: UserProfile.nullish(),
+  is_creator: z.boolean().describe('Actor is the creator or referrer'),
+  is_referral: z.boolean().describe('Is a referral event'),
 });
 
 export const GetXps = {
