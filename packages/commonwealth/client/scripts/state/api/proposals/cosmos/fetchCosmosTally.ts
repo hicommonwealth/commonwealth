@@ -47,7 +47,7 @@ const useCosmosProposalTallyQuery = (proposal: AnyProposal) => {
       !_.isEmpty(proposal) &&
       !proposal.completed,
     staleTime: TALLY_STALE_TIME,
-    cacheTime: TALLY_CACHE_TIME,
+    gcTime: TALLY_CACHE_TIME,
   });
 };
 

@@ -17,7 +17,7 @@ const useStakingParamsQuery = () => {
     queryKey: ['stakingParams', communityId],
     queryFn: fetchStakingParams,
     enabled: app.chain?.base === ChainBase.CosmosSDK,
-    cacheTime: STAKING_PARAMS_CACHE_TIME,
+    gcTime: STAKING_PARAMS_CACHE_TIME,
     staleTime: STAKING_PARAMS_STALE_TIME,
   });
 };
