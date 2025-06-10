@@ -49,37 +49,40 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
       ].filter(Boolean);
 
       const sql = `
-          ${
-            includeStats
-              ? `WITH latest_trades AS (SELECT DISTINCT ON (token_address) *
-                                 FROM "LaunchpadTrades"
-                                 ORDER BY token_address, timestamp DESC),
-               older_trades AS (SELECT DISTINCT ON (token_address) *
-                                FROM "LaunchpadTrades"
-                                WHERE timestamp <= (SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP - INTERVAL '24 hours'))
-                                ORDER BY token_address, timestamp ASC),
-               trades AS (SELECT lt.token_address,
-                                 lt.price as latest_price,
-                                 ot.price as old_price
-                          FROM latest_trades lt
-                                   LEFT JOIN
-                               older_trades ot
-                               ON
-                                   lt.token_address = ot.token_address)`
-              : ''
-          }
-          SELECT T.*,
-                 C.id as community_id,
-                 ${includeStats ? 'trades.latest_price, trades.old_price,' : ''}
-                         count(*) OVER () AS total
-          FROM "LaunchpadTokens" as T
-              JOIN "Communities" as C
-          ON T.namespace = C.namespace
-              ${includeStats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
-              ${where_conditions.join(' AND ')}
-          ORDER BY ${order_col} ${direction}
-          LIMIT :limit OFFSET :offset
-      `;
+      ${
+        includeStats
+          ? `WITH latest_trades AS (
+                SELECT DISTINCT ON (token_address) *
+                FROM "LaunchpadTrades"
+                ORDER BY token_address, timestamp DESC
+            ),
+            older_trades AS (
+                SELECT DISTINCT ON (token_address) *
+                FROM "LaunchpadTrades"
+                WHERE timestamp <= EXTRACT(EPOCH FROM CURRENT_TIMESTAMP - INTERVAL '24 hours')
+                ORDER BY token_address, timestamp ASC
+            ),
+            trades AS (
+                SELECT lt.token_address,
+                        lt.price AS latest_price,
+                        ot.price AS old_price
+                FROM latest_trades lt
+                LEFT JOIN older_trades ot ON lt.token_address = ot.token_address
+            )`
+          : ''
+      }
+      SELECT DISTINCT ON (T.token_address) 
+            T.*,
+            C.id AS community_id,
+            ${includeStats ? 'trades.latest_price, trades.old_price,' : ''}
+            count(*) OVER () AS total
+      FROM "LaunchpadTokens" AS T
+      JOIN "Communities" AS C ON T.namespace = C.namespace
+      ${includeStats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
+      ${where_conditions.join(' AND ')}
+      ORDER BY T.token_address, ${order_col} ${direction}
+      LIMIT :limit OFFSET :offset
+    `;
 
       const tokens = await models.sequelize.query<
         z.infer<typeof schemas.TokenView> & {
