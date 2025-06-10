@@ -52,7 +52,7 @@ export default (
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      tableName: 'mcp_server_communities',
+      tableName: 'MCPServerCommunities',
       underscored: true,
       indexes: [{ fields: ['mcp_server_id'] }, { fields: ['community_id'] }],
     },

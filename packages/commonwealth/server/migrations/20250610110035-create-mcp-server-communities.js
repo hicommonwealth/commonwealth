@@ -3,13 +3,13 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('mcp_server_communities', {
+    await queryInterface.createTable('MCPServerCommunities', {
       mcp_server_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         primaryKey: true,
         references: {
-          model: 'mcp_servers',
+          model: 'MCPServers',
           key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -36,18 +36,18 @@ module.exports = {
       },
     });
 
-    await queryInterface.addIndex('mcp_server_communities', {
+    await queryInterface.addIndex('MCPServerCommunities', {
       fields: ['mcp_server_id'],
-      name: 'mcp_server_communities_mcp_server_id_index',
+      name: 'MCPServerCommunities_mcp_server_id_index',
     });
 
-    await queryInterface.addIndex('mcp_server_communities', {
+    await queryInterface.addIndex('MCPServerCommunities', {
       fields: ['community_id'],
-      name: 'mcp_server_communities_community_id_index',
+      name: 'MCPServerCommunities_community_id_index',
     });
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable('mcp_server_communities');
+    await queryInterface.dropTable('MCPServerCommunities');
   },
 };

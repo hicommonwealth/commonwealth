@@ -25,7 +25,7 @@ export default (sequelize: Sequelize.Sequelize): MCPServerModelStatic =>
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      tableName: 'mcp_servers',
+      tableName: 'MCPServers',
       underscored: true,
       indexes: [{ fields: ['name'], unique: true }],
     },

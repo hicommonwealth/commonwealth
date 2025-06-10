@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('mcp_servers', {
+    await queryInterface.createTable('MCPServers', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -28,14 +28,14 @@ module.exports = {
       },
     });
 
-    await queryInterface.addIndex('mcp_servers', {
+    await queryInterface.addIndex('MCPServers', {
       fields: ['name'],
       unique: true,
-      name: 'mcp_servers_name_unique',
+      name: 'MCPServers_name_unique',
     });
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable('mcp_servers');
+    await queryInterface.dropTable('MCPServers');
   },
 };
