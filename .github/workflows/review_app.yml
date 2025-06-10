@@ -149,6 +149,7 @@ jobs:
         uses: neondatabase/create-branch-action@v5
         with:
           project_id: ${{ secrets.NEON_PROJECT_ID }}
+          parent: 'Review App Parent'
           branch_name: preview/pr-${{ steps.set_pr_number.outputs.pr_number }}
           api_key: ${{ secrets.NEON_API_KEY }}
           username: 'neondb_owner'
@@ -172,7 +173,6 @@ jobs:
           --env=pr-${{ steps.set_pr_number.outputs.pr_number }} \
           --commit=${{ steps.set_effective_sha.outputs.sha }} \
           --db-url=${{ steps.create_neon_branch.outputs.db_url }}
-        # TODO: check that db-url is not exposed in logs
 
       - name: Comment on PR with Deployment URL
         if: |
@@ -194,8 +194,6 @@ jobs:
             } else {
               console.log('No deployment URL found to comment on PR');
             }
-
-      # TODO: update DATABASE_URL in the Railway environment
 
       # TODO: check if this posts a new comment for each commit to an open PR if this updates the comment
       # TODO: if this creates a new comment for each commit, we need to update if so it only posts a
