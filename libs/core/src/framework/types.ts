@@ -126,8 +126,8 @@ export type EventContext<Name extends Events> = {
 
 /**
  * Command/Query handler
- * @param context command execution context
- * @returns mutated state
+ * @param context execution context
+ * @returns output of the command/query
  * @throws {@link InvalidActor} when unauthorized
  */
 export type BodyHandler<

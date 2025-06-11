@@ -12,11 +12,7 @@ export const query =
   <Input extends ZodType, Output extends ZodType, Context extends ZodType>(
     md: Metadata<Input, Output, Context>,
   ): RequestHandler =>
-  async (
-    req: Request,
-    res: Response<z.infer<Output> | undefined | void>,
-    next: NextFunction,
-  ) => {
+  async (req: Request, res: Response<z.infer<Output>>, next: NextFunction) => {
     try {
       const results = await core.query(md, {
         actor: { user: req.user as User, address: req.body.address },
