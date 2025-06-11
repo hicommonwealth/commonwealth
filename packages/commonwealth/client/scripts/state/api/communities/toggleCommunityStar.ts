@@ -5,12 +5,14 @@ const useToggleCommunityStarMutation = () => {
   const user = useUserStore();
 
   return trpc.community.toggleCommunityStar.useMutation({
-    onSuccess: (starred, { community_id }) => {
-      user.communities
-        .filter((c) => c.id === community_id)
-        .forEach((c) => {
-          c.isStarred = starred;
-        });
+    onSuccess: (starred, variables) => {
+      if (variables && variables.community_id) {
+        user.communities
+          .filter((c) => c.id === variables.community_id)
+          .forEach((c) => {
+            c.isStarred = starred;
+          });
+      }
     },
   });
 };

@@ -143,6 +143,7 @@ export const e2eTestEntities = async function (): Promise<E2E_TestEntities> {
           directory_page_enabled: false,
           namespace_verified: false,
           environment: config.APP_ENV,
+          ai_features_enabled: true,
         })),
       )),
     );
