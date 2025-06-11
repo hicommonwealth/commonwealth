@@ -80,7 +80,7 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
       JOIN "Communities" AS C ON T.namespace = C.namespace
       ${includeStats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
       ${where_conditions.join(' AND ')}
-      ORDER BY T.token_address, ${order_col} ${direction}
+      ORDER BY T.token_address ${direction}, ${order_col} ${direction}
       LIMIT :limit OFFSET :offset
     `;
 
