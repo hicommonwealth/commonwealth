@@ -167,6 +167,11 @@ export default (
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      ai_features_enabled: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
       environment: {
         type: Sequelize.STRING,
         allowNull: false,

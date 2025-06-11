@@ -10,7 +10,7 @@ import {
   UserTierMap,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
-import { Op, Transaction } from 'sequelize';
+import { Op, Sequelize, Transaction } from 'sequelize';
 import { z } from 'zod/v4';
 import { models, sequelize } from '../../database';
 
@@ -34,16 +34,22 @@ async function getUserByAddressId(address_id: number) {
 
 async function getUserByAddress(address: string) {
   const addr = await models.Address.findOne({
-    where: { address: { [Op.iLike]: address }, user_id: { [Op.not]: null } },
+    where: {
+      [Op.and]: [
+        Sequelize.where(
+          Sequelize.fn('LOWER', Sequelize.col('address')),
+          Sequelize.fn('LOWER', address),
+        ),
+        { user_id: { [Op.not]: null } },
+      ],
+    },
     attributes: ['user_id'],
     include: [
       {
         model: models.User,
         attributes: ['id'],
         required: true,
-        where: {
-          tier: { [Op.ne]: UserTierMap.BannedUser },
-        },
+        where: { tier: { [Op.ne]: UserTierMap.BannedUser } },
       },
     ],
   });

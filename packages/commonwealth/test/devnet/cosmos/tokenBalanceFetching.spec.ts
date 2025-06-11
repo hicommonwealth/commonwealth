@@ -110,6 +110,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
         snapshot_spaces: [],
         stages_enabled: true,
         social_links: [],
+        ai_features_enabled: true,
       } as unknown as CommunityAttributes);
     }
 

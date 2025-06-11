@@ -232,6 +232,7 @@ export const TopicView = Topic.extend({
   chain_node_id: z.number().nullish().optional(),
   chain_node_url: z.string().nullish().optional(),
   eth_chain_id: z.number().nullish().optional(),
+  token_symbol: z.string().nullish().optional(),
 });
 
 export const GetTopics = {

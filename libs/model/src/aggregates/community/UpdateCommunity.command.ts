@@ -50,6 +50,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         spam_tier_level,
         thread_purchase_token,
         launchpad_weighted_voting,
+        ai_features_enabled,
       } = payload;
 
       const community = await models.Community.findOne({
@@ -133,6 +134,8 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         (community.spam_tier_level = spam_tier_level);
       thread_purchase_token &&
         (community.thread_purchase_token = thread_purchase_token);
+      ai_features_enabled !== undefined &&
+        (community.ai_features_enabled = ai_features_enabled);
 
       let weightedVotingProps: Partial<z.infer<typeof schemas.Topic>> | null =
         null;
