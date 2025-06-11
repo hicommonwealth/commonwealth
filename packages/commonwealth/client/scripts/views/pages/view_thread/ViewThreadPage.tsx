@@ -11,6 +11,7 @@ import {
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
 import { AnyProposal } from 'client/scripts/models/types';
+import useGetThreadByIdQuery from 'client/scripts/state/api/threads/getThreadById';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -37,7 +38,6 @@ import useFetchProfilesByAddressesQuery from 'state/api/profiles/fetchProfilesBy
 import {
   useAddThreadLinksMutation,
   useGetThreadPollsQuery,
-  useGetThreadsByIdQuery,
 } from 'state/api/threads';
 import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
@@ -142,14 +142,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   });
 
   const {
-    data,
+    data: threadView,
     error: fetchThreadError,
     isLoading,
-  } = useGetThreadsByIdQuery({
-    community_id: communityId,
-    thread_ids: [+threadId].filter(Boolean),
-    apiCallEnabled: !!threadId && !!communityId, // only call the api if we have thread id
-  });
+  } = useGetThreadByIdQuery(
+    threadId,
+    !!threadId && !!communityId, // only call the api if we have thread id
+  );
 
   const { data: pollsData = [] } = useGetThreadPollsQuery({
     threadId: +threadId,
@@ -157,8 +156,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   });
 
   const thread = useMemo(() => {
-    return data?.at(0);
-  }, [data]);
+    return threadView;
+  }, [threadView]);
 
   //  snapshot proposal hook
   const snapshotLink = thread?.links?.find(
@@ -418,7 +417,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [fetchedProfiles]);
 
   if (typeof identifier !== 'string' || fetchThreadError) {
-    return <PageNotFound />;
+    return <PageNotFound message={fetchThreadError?.message} />;
   }
 
   if (
