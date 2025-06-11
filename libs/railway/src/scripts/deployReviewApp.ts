@@ -157,7 +157,9 @@ export async function deployReviewApp({
   const serviceMap = await getServices(envId);
   log.info(JSON.stringify(serviceMap));
 
+  console.log(dbUrl, created);
   if (dbUrl && created) {
+    log.info('Updating database URL env var...');
     await sdk.variableCollectionUpsert({
       input: {
         projectId: config.RAILWAY!.REVIEW_APPS.PROJECT_ID!,
@@ -167,6 +169,7 @@ export async function deployReviewApp({
         },
       },
     });
+    log.info('Database URL successfully updated!');
   }
 
   for (const [serviceName, serviceId] of Object.entries(serviceMap)) {
