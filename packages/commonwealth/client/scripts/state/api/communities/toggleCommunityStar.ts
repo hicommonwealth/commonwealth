@@ -6,7 +6,7 @@ const useToggleCommunityStarMutation = () => {
 
   return trpc.community.toggleCommunityStar.useMutation({
     onSuccess: (starred, variables) => {
-      if (variables?.community_id) {
+      if (variables && variables.community_id) {
         user.communities
           .filter((c) => c.id === variables.community_id)
           .forEach((c) => {
