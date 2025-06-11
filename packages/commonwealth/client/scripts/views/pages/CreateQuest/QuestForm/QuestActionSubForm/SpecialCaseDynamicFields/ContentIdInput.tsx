@@ -1,6 +1,6 @@
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import { PRODUCTION_DOMAIN, WalletSsoSource } from '@hicommonwealth/shared';
+import { capitalize } from 'lodash';
 import React from 'react';
-import { WalletSsoSource } from '@hicommonwealth/shared';
 import { fetchCachedNodes } from 'state/api/nodes';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -119,7 +119,7 @@ const ContentIdInput = ({
       };
     }
 
-    if (config?.requires_sso_source) {
+    if (config?.with_optional_sso_type) {
       return {
         label: inputConfig.labels.sso,
         placeholder: inputConfig.placeholders.sso,
@@ -179,7 +179,15 @@ const ContentIdInput = ({
     />;
   }
 
-  if (config?.requires_sso_source) {
+  const ssoOptions = Object.values(WalletSsoSource)
+    .filter((x) => x !== WalletSsoSource.Unknown)
+    .map((v) => ({
+      label: capitalize(v),
+      value: v,
+    }));
+  console.log('defaultValues => ', defaultValues);
+
+  if (config?.with_optional_sso_type) {
     return (
       <CWSelectList
         isClearable={true}
@@ -188,17 +196,14 @@ const ContentIdInput = ({
         label={inputConfig.labels.sso}
         placeholder={inputConfig.placeholders.sso}
         containerClassname="span-3"
-        options={Object.values(WalletSsoSource).map((v) => ({
-          label: v,
-          value: v,
-        }))}
-        onChange={(v) =>
-          onChange?.({ contentIdentifier: `${v?.value || ''}` })
-        }
+        options={ssoOptions}
+        onChange={(v) => {
+          onChange?.({ contentIdentifier: `${v?.value || ''}` });
+        }}
         {...(defaultValues?.contentIdentifier && {
           value: {
             value: defaultValues?.contentIdentifier,
-            label: defaultValues?.contentIdentifier,
+            label: `${ssoOptions.find((x) => x.value === defaultValues?.contentIdentifier)?.label}`,
           },
         })}
         customError={errors?.contentIdentifier}

@@ -4,6 +4,7 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import {
   linkValidationSchema,
   numberDecimalValidationSchema,
@@ -15,7 +16,6 @@ import {
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { parseAbiItem } from 'viem';
 import { z } from 'zod';
-import { WalletSsoSource } from '@hicommonwealth/shared';
 import { QuestActionSubFormConfig } from './types';
 
 const questSubFormValidationSchema = z.object({
@@ -41,7 +41,7 @@ export const buildQuestSubFormValidationSchema = (
     config?.with_optional_topic_id ||
     config?.with_optional_chain_id ||
     config?.with_optional_token_trade_threshold ||
-    config?.requires_sso_source;
+    config?.with_optional_sso_type;
   const requiresTwitterEngagement = config?.requires_twitter_tweet_link;
   const requiresDiscordServerId = config?.requires_discord_server_id;
   const requiresGoalConfig = config?.requires_goal_config;
@@ -54,7 +54,7 @@ export const buildQuestSubFormValidationSchema = (
   const allowsChainIdAsContentId = config?.with_optional_chain_id;
   const allowsTokenThresholdAmountAsContentId =
     config?.with_optional_token_trade_threshold;
-  const requiresSsoSource = config?.requires_sso_source;
+  const requiresSsoSource = config?.with_optional_sso_type;
 
   const needsExtension =
     requiresCreatorPoints ||

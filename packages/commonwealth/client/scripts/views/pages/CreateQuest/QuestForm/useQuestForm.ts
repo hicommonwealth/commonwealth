@@ -16,6 +16,7 @@ import {
   doesActionAllowCommentId,
   doesActionAllowContentId,
   doesActionAllowRepetition,
+  doesActionAllowSSOType,
   doesActionAllowThreadId,
   doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
@@ -173,6 +174,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   with_optional_token_trade_threshold:
                     allowsContentId &&
                     doesActionAllowTokenTradeThreshold(chosenAction),
+                  with_optional_sso_type:
+                    allowsContentId && doesActionAllowSSOType(chosenAction),
                 },
               };
             }),
@@ -289,6 +292,20 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         }
         return 'thread';
       })();
+
+      console.log('x => ', {
+        questActionSubForms,
+        contentIdScope,
+        x: subForm.values.contentIdentifier &&
+          subForm.config &&
+          (doesConfigAllowContentIdField(subForm.config) ||
+            subForm.config.requires_goal_config) && {
+            content_id: buildContentIdFromIdentifier(
+              subForm.values.contentIdentifier,
+              contentIdScope,
+            ),
+          },
+      });
 
       return {
         event_name: subForm.values.action as QuestAction,
