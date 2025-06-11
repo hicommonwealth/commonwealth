@@ -43,7 +43,7 @@ async function getEnvironmentId(envName: string) {
           name: envName,
           projectId: config.RAILWAY!.REVIEW_APPS.PROJECT_ID!,
           sourceEnvironmentId: config.RAILWAY!.REVIEW_APPS.PARENT_ENV_ID,
-          skipInitialDeploys: true,
+          skipInitialDeploys: false,
           stageInitialChanges: false,
         },
       });
