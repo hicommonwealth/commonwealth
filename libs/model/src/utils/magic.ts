@@ -1,17 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
 import { logger, ServerError } from '@hicommonwealth/core';
-import {
-  AddressAttributes,
-  AddressInstance,
-  CommunityInstance,
-  emitEvent,
-  getVerifiedUserInfo,
-  models,
-  sequelize,
-  UserInstance,
-  VerifiedUserInfo,
-} from '@hicommonwealth/model';
 import { Address, MagicLogin } from '@hicommonwealth/schemas';
 import {
   ALL_COMMUNITIES,
@@ -26,12 +14,17 @@ import {
 } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import jsonwebtoken from 'jsonwebtoken';
-import passport from 'passport';
-import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
+import { DoneFunc, MagicUser } from 'passport-magic';
 import { Op, Transaction, WhereOptions } from 'sequelize';
 import { z } from 'zod';
+import { emitSignInEvents } from '../aggregates/user/signIn/emitSignInEvents';
 import { config } from '../config';
-import { TypedRequestBody } from '../types';
+import { models, sequelize } from '../database';
+import { AddressAttributes, AddressInstance } from '../models/address';
+import { CommunityInstance } from '../models/community';
+import { UserInstance } from '../models/user';
+import { getVerifiedUserInfo } from './oauth/getVerifiedUserInfo';
+import { VerifiedUserInfo } from './oauth/types';
 
 const log = logger(import.meta);
 
@@ -70,7 +63,7 @@ async function getVerifiedInfo(
       walletSsoSource,
     });
   } catch (e) {
-    log.error('Failed to fetch verified SSO user info', e, {
+    log.error('Failed to fetch verified SSO user info', e as Error, {
       magicUserMetadata,
     });
     throw new ServerError('Could not verify user');
@@ -206,31 +199,14 @@ async function createMagicAddressInstances({
     });
 
     if (created) {
-      await emitEvent(
-        models.Outbox,
-        [
-          {
-            event_name: 'CommunityJoined',
-            event_payload: {
-              community_id,
-              user_id: addressInstance.user_id!,
-              created_at: addressInstance.created_at!,
-              oauth_provider,
-            },
-          },
-          {
-            event_name: 'SSOLinked',
-            event_payload: {
-              user_id: addressInstance.user_id!,
-              new_user: isNewUser,
-              oauth_provider,
-              community_id,
-              created_at: addressInstance.created_at!,
-            },
-          },
-        ],
-        transaction,
-      );
+      await emitSignInEvents({
+        newAddress: true,
+        newUser: isNewUser,
+        transferredUser: false,
+        address: addressInstance,
+        user,
+        transaction: transaction!,
+      });
     }
 
     // case should not happen, but if somehow a to-be-created address is owned
@@ -347,9 +323,10 @@ async function replaceGhostAddresses(
   addressInstances: AddressInstance[],
   transaction: Transaction,
 ) {
-  const ghostAddresses = (existingUserInstance?.Addresses?.filter(
-    ({ ghost_address }: AddressAttributes) => !!ghost_address,
-  ) || []) as AddressAttributes[];
+  const ghostAddresses =
+    existingUserInstance?.Addresses?.filter(
+      ({ ghost_address }) => !!ghost_address,
+    ) || [];
 
   for (const ghost of ghostAddresses) {
     const replacementAddress = addressInstances.find(
@@ -566,16 +543,14 @@ async function addMagicToUser({
 }
 
 // Entrypoint into the magic passport strategy
-async function magicLoginRoute(
+export async function magicLogin(
   magic: Magic,
-  req: TypedRequestBody<z.infer<typeof MagicLogin>>,
+  body: z.infer<typeof MagicLogin>,
   decodedMagicToken: MagicUser,
   cb: DoneFunc,
 ) {
-  const body = MagicLogin.parse(req.body);
   log.trace(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
   let communityToJoin: CommunityInstance | undefined | null,
-    error,
     loggedInUser: UserInstance | null | undefined;
 
   const generatedAddresses = [
@@ -839,21 +814,4 @@ async function magicLoginRoute(
 
   log.trace(`LOGGING IN FINAL USER: ${JSON.stringify(finalUser, null, 2)}`);
   return cb(null, finalUser);
-}
-
-export function initMagicAuth() {
-  // allow magic login if configured with key
-  if (config.MAGIC_API_KEY) {
-    // TODO: verify we are in a community that supports magic login
-    const magic = new Magic(config.MAGIC_API_KEY);
-    passport.use(
-      new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
-        try {
-          return await magicLoginRoute(magic, req, user, cb);
-        } catch (e) {
-          return cb(e, user);
-        }
-      }),
-    );
-  }
 }

@@ -1,5 +1,5 @@
 import { logger } from '@hicommonwealth/core';
-import * as schemas from '@hicommonwealth/schemas';
+import { EventPair } from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { models } from '../../../database';
@@ -36,7 +36,7 @@ export async function emitSignInEvents({
     wallet_id,
   } = addressInstance;
   const { referred_by_address: referrer_address } = user;
-  const events = [] as Array<schemas.EventPairs>;
+  const events = [];
 
   if (newAddress) {
     events.push({
@@ -47,7 +47,7 @@ export async function emitSignInEvents({
         referrer_address,
         created_at: created_at!,
       },
-    });
+    } as EventPair<'CommunityJoined'>);
 
     // check if this is a new wallet
     const existingWallet = await models.Address.findOne({
@@ -66,14 +66,37 @@ export async function emitSignInEvents({
       events.push({
         event_name: 'WalletLinked',
         event_payload: {
+          community_id,
           user_id: user.id!,
           new_user: newUser,
           wallet_id: wallet_id!,
           balance: balances[address] || '0',
-          community_id,
           created_at: created_at!,
         },
+      } as EventPair<'WalletLinked'>);
+    }
+
+    // check if this is a new SSO provider
+    if (addressInstance.oauth_provider) {
+      const existingSso = await models.Address.findOne({
+        where: {
+          user_id: user.id,
+          oauth_provider: addressInstance.oauth_provider,
+          address: { [Op.ne]: address },
+        },
       });
+      if (!existingSso) {
+        events.push({
+          event_name: 'SSOLinked',
+          event_payload: {
+            community_id,
+            user_id: user.id!,
+            new_user: newUser,
+            oauth_provider: addressInstance.oauth_provider!,
+            created_at: created_at!,
+          },
+        } as EventPair<'SSOLinked'>);
+      }
     }
   }
 
@@ -87,30 +110,7 @@ export async function emitSignInEvents({
         created_at: created_at!,
         referrer_address,
       },
-    });
-
-  // check if this is a new SSO provider
-  if (addressInstance.oauth_provider) {
-    const existingSso = await models.Address.findOne({
-      where: {
-        user_id: user.id,
-        oauth_provider: addressInstance.oauth_provider,
-        address: { [Op.ne]: address },
-      },
-    });
-    if (!existingSso) {
-      events.push({
-        event_name: 'SSOLinked',
-        event_payload: {
-          community_id,
-          user_id: user.id!,
-          oauth_provider: addressInstance.oauth_provider,
-          created_at: created_at!,
-          new_user: newUser,
-        },
-      });
-    }
-  }
+    } as EventPair<'UserCreated'>);
 
   if (transferredUser && originalUserId) {
     const originalOwner = await models.User.findByPk(originalUserId);
@@ -124,7 +124,7 @@ export async function emitSignInEvents({
         old_user_email: originalOwner?.email,
         created_at: new Date(),
       },
-    });
+    } as EventPair<'AddressOwnershipTransferred'>);
   }
 
   log.trace(

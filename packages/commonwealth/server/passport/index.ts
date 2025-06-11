@@ -1,12 +1,14 @@
 import { stats } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { magicLogin, models } from '@hicommonwealth/model';
+import { MagicLogin } from '@hicommonwealth/schemas';
 import { UserTierMap } from '@hicommonwealth/shared';
+import { Magic } from '@magic-sdk/admin';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
+import { Strategy as MagicStrategy } from 'passport-magic';
 import { Op } from 'sequelize';
 import { config } from '../config';
 import '../types';
-import { initMagicAuth } from './magic';
 // import { initTokenAuth } from './tokenAuth';
 
 const JWTStrategy = passportJWT.Strategy;
@@ -46,6 +48,24 @@ function initDefaultUserAuth() {
       },
     ),
   );
+}
+
+function initMagicAuth() {
+  // allow magic login if configured with key
+  if (config.MAGIC_API_KEY) {
+    // TODO: verify we are in a community that supports magic login
+    const magic = new Magic(config.MAGIC_API_KEY);
+    passport.use(
+      new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
+        try {
+          const body = MagicLogin.parse(req.body);
+          return await magicLogin(magic, body, user, cb);
+        } catch (e) {
+          return cb(e, user);
+        }
+      }),
+    );
+  }
 }
 
 export function setupPassport() {
