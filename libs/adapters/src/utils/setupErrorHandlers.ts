@@ -27,6 +27,7 @@ export const setupErrorHandlers = (app: Express) => {
   // Handle our ServerErrors (500), AppErrors (400), or unknown errors.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+    console.log(error);
     const reqContext = {
       url: req.url,
       method: req.method,
