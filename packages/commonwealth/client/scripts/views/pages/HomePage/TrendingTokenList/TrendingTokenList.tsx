@@ -8,6 +8,7 @@ import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchTokensQuery } from 'state/api/tokens';
+import { APIOrderDirection } from 'helpers/constants';
 import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -22,7 +23,24 @@ const TokenWithCommunity = TokenView.extend({
   community_id: z.string(),
 });
 
-const TrendingTokensList = () => {
+type TrendingTokensListProps = {
+  /**
+   * Which tokens to show. Defaults to `trending` for backwards compatibility.
+   */
+  variant?: 'trending' | 'recent' | 'marketcap' | 'graduated';
+  /**
+   * Heading text displayed above the list. Defaults to `Tokens`.
+   */
+  heading?: string;
+  /** Number of tokens to fetch. Defaults to `3` to preserve existing behaviour. */
+  limit?: number;
+};
+
+const TrendingTokensList = ({
+  variant = 'trending',
+  heading = 'Tokens',
+  limit = 3,
+}: TrendingTokensListProps) => {
   const user = useUserStore();
   const navigate = useCommonNavigate();
   const launchpadEnabled = useFlag('launchpad');
@@ -43,13 +61,20 @@ const TrendingTokensList = () => {
 
   const { data: tokensList, isInitialLoading } = useFetchTokensQuery({
     cursor: 1,
-    limit: 3,
+    limit,
     with_stats: true,
+    order_by: (() => {
+      if (variant === 'recent') return 'created_at';
+      if (variant === 'marketcap' || variant === 'graduated') return 'market_cap';
+      return 'price';
+    })(),
+    order_direction: APIOrderDirection.Desc,
+    is_graduated: variant === 'graduated',
     enabled: launchpadEnabled,
   });
   const tokens = (tokensList?.pages || [])
     .flatMap((page) => page.results)
-    .slice(0, 3);
+    .slice(0, limit);
 
   const openAuthModalOrTriggerCallback = () => {
     if (user.isLoggedIn) {
@@ -78,7 +103,7 @@ const TrendingTokensList = () => {
   return (
     <div className="TokensList">
       <div className="heading-container">
-        <CWText type="h2">Tokens</CWText>
+        <CWText type="h2">{heading}</CWText>
         <Link to="/explore?tab=tokens">
           <div className="link-right">
             <CWText className="link">Tokens</CWText>
