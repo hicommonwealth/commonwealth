@@ -10,4 +10,5 @@ export type FormSubmitValues = {
   hasStagesEnabled?: boolean;
   customStages?: string;
   communityBanner?: string;
+  aiFeaturesEnabled?: boolean;
 };
