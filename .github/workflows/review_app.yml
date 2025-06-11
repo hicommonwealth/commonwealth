@@ -184,7 +184,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             if (process.env.DEPLOYMENT_URL) {
-              const message = `🚀 Review app deployed!\n\nYou can access the review app at: ${process.env.DEPLOYMENT_URL}`;
+              const message = `🚀 Review app deployed!\n\nYou can access the review app at: [${process.env.DEPLOYMENT_URL}](${process.env.DEPLOYMENT_URL})`;
               
               github.rest.issues.createComment({
                 issue_number: ${{ steps.set_pr_number.outputs.pr_number }},
