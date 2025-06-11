@@ -636,9 +636,14 @@ export async function magicLogin(
     if (communityToJoin) {
       if (isCosmos) {
         // (magic bug?): magic typing doesn't match data, so we need to cast as any
-        const magicWallets = magicUserMetadata.wallets as any[];
-        const magicUserMetadataCosmosAddress = magicWallets?.find(
+        // TODO: fix this, the types below should be used instead
+        // const magicUserMetadataCosmosAddress = magicUserMetadata.wallets?.find(
+        //   (wallet) => wallet.walletType === WalletType.COSMOS,
+        // )?.publicAddress;
+        const magicUserMetadataCosmosAddress = magicUserMetadata.wallets?.find(
+          // @ts-expect-error types are wrong
           (wallet) => wallet.wallet_type === WalletType.COSMOS,
+          // @ts-expect-error types are wrong
         )?.public_address;
 
         if (body.magicAddress !== magicUserMetadataCosmosAddress) {

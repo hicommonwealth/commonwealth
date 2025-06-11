@@ -59,7 +59,7 @@ function initMagicAuth() {
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
         try {
           const body = MagicLogin.parse(req.body);
-          return await magicLogin(magic, body, user, cb);
+          await magicLogin(magic, body, user, cb);
         } catch (e) {
           return cb(e, user);
         }
