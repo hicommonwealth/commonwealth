@@ -56,10 +56,12 @@ function initMagicAuth() {
     // TODO: verify we are in a community that supports magic login
     const magic = new Magic(config.MAGIC_API_KEY);
     passport.use(
-      new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
+      new MagicStrategy({ passReqToCallback: true }, (req, user, cb) => {
         try {
           const body = MagicLogin.parse(req.body);
-          await magicLogin(magic, body, user, cb);
+          magicLogin(magic, body, user)
+            .then((signed) => cb(null, signed))
+            .catch((e) => cb(e, user));
         } catch (e) {
           return cb(e, user);
         }

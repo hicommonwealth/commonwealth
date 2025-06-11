@@ -14,7 +14,7 @@ import {
 } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import jsonwebtoken from 'jsonwebtoken';
-import { DoneFunc, MagicUser } from 'passport-magic';
+import { MagicUser } from 'passport-magic';
 import { Op, Transaction, WhereOptions } from 'sequelize';
 import { z } from 'zod';
 import { emitSignInEvents } from '../aggregates/user/signIn/emitSignInEvents';
@@ -547,7 +547,6 @@ export async function magicLogin(
   magic: Magic,
   body: z.infer<typeof MagicLogin>,
   decodedMagicToken: MagicUser,
-  cb: DoneFunc,
 ) {
   log.trace(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
   let communityToJoin: CommunityInstance | undefined | null,
@@ -593,7 +592,7 @@ export async function magicLogin(
         },
       ],
     });
-    if (!communityToJoin) return cb('Community does not exist');
+    if (!communityToJoin) throw Error('Community does not exist');
   }
 
   // check if the user is logged in already (provided valid JWT)
@@ -612,7 +611,7 @@ export async function magicLogin(
         throw new Error('User not found');
       }
     } catch (e) {
-      return cb('Could not verify login');
+      throw Error('Could not verify login');
     }
   }
 
@@ -761,7 +760,7 @@ export async function magicLogin(
       accessToken: body.access_token,
       magicUserMetadata,
     });
-    return cb(null, existingUserInstance);
+    return existingUserInstance;
   }
 
   let finalUser: UserInstance;
@@ -781,12 +780,12 @@ export async function magicLogin(
   };
 
   if (loggedInUser && loggedInUser.tier === UserTierMap.BannedUser) {
-    return cb('User is banned');
+    throw Error('User is banned');
   } else if (
     existingUserInstance &&
     existingUserInstance.tier === UserTierMap.BannedUser
   ) {
-    return cb('User is banned');
+    throw Error('User is banned');
   }
 
   try {
@@ -810,13 +809,13 @@ export async function magicLogin(
     }
   } catch (e) {
     log.error(`Failed to sign in user ${JSON.stringify(e, null, 2)}`);
-    return cb(e);
+    throw e;
   }
 
   if (finalUser.tier === UserTierMap.BannedUser) {
-    return cb('User is banned');
+    throw Error('User is banned');
   }
 
   log.trace(`LOGGING IN FINAL USER: ${JSON.stringify(finalUser, null, 2)}`);
-  return cb(null, finalUser);
+  return finalUser;
 }
