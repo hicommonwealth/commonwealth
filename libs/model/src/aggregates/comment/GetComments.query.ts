@@ -23,13 +23,61 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         order_by,
         include_spam_comments,
       } = payload;
-      const offset = (cursor - 1) * limit;
 
-      const orderByQueries = {
-        newest: '"created_at" DESC',
-        oldest: '"created_at" ASC',
-        mostLikes: '"reaction_count" DESC',
-      };
+      // Chat mode: reverse pagination for 'oldest' order
+      const isChatMode = order_by === 'oldest';
+      let offset, actualOrderBy, actualPage;
+
+      if (isChatMode) {
+        // For chat mode, we need to calculate reverse pagination
+        // First, get total count to determine the actual page mapping
+        const countSql = `
+          SELECT COUNT(*) as total_count
+          FROM "Comments" AS C
+          WHERE
+              (C."deleted_at" IS NULL OR C."reply_count" > 0)
+              AND C."parent_id" ${parent_id ? '= :parent_id' : 'IS NULL'}
+              ${thread_id ? `AND C."thread_id" = :thread_id` : ''}
+              ${comment_id ? ' AND C."id" = :comment_id' : ''}
+              ${!include_spam_comments ? 'AND C."marked_as_spam_at" IS NULL' : ''}
+        `;
+
+        const [countResult] = await models.sequelize.query<{
+          total_count: string;
+        }>(countSql, {
+          replacements: {
+            thread_id,
+            comment_id,
+            ...(parent_id && { parent_id: `${parent_id}` }),
+          },
+          type: QueryTypes.SELECT,
+        });
+
+        const totalCount = parseInt(countResult?.total_count || '0');
+        const totalPages = Math.ceil(totalCount / limit);
+
+        // For chat mode: page 1 should show newest comments (last page of ASC order)
+        // page 2 should show older comments (second-to-last page of ASC order), etc.
+        actualPage = totalPages - cursor + 1;
+
+        // Ensure actualPage is within valid bounds
+        if (actualPage < 1) {
+          actualPage = 1;
+        }
+
+        offset = (actualPage - 1) * limit;
+        actualOrderBy = '"created_at" ASC'; // Always ASC for chat mode to get proper chronological order
+      } else {
+        // Normal pagination for non-chat modes
+        offset = (cursor - 1) * limit;
+        const orderByQueries = {
+          newest: '"created_at" DESC',
+          oldest: '"created_at" ASC',
+          mostLikes: '"reaction_count" DESC',
+        };
+        actualOrderBy = orderByQueries[order_by || 'newest'];
+        actualPage = cursor;
+      }
 
       const sql = `
         SELECT
@@ -117,7 +165,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             CU.profile->>'name',
             CU.profile->>'avatar_url'
         ORDER BY
-            C.${orderByQueries[order_by || 'newest']}
+            C.${actualOrderBy}
         LIMIT :limit OFFSET :offset;      
       `;
 
@@ -146,11 +194,19 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         } as unknown as z.infer<typeof CommentsView>;
       });
 
-      return schemas.buildPaginatedResponse(
-        sanitizedComments,
-        comments?.length ? parseInt(`${comments!.at(0)!.total_count}`) : 0,
-        { ...payload, offset },
-      );
+      const totalCount = comments?.length
+        ? parseInt(`${comments!.at(0)!.total_count}`)
+        : 0;
+
+      // For chat mode, we need to return the results in reverse order so newest appears at bottom
+      const finalResults = isChatMode
+        ? sanitizedComments.reverse()
+        : sanitizedComments;
+
+      return schemas.buildPaginatedResponse(finalResults, totalCount, {
+        ...payload,
+        offset: isChatMode ? (cursor - 1) * limit : offset,
+      });
     },
   };
 }
