@@ -11,7 +11,7 @@ import {
 } from '@hicommonwealth/shared';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
-import { ZodSchema } from 'zod';
+import { ZodType } from 'zod';
 import { config } from '../config';
 import { models } from '../database';
 
@@ -51,7 +51,7 @@ export function tiered({
   ai?: { images?: boolean; text?: boolean };
   minTier?: UserTierMap;
 }) {
-  return async function ({ actor }: Context<ZodSchema, ZodSchema>) {
+  return async function ({ actor }: Context<ZodType, ZodType>) {
     if (!actor.user.id) throw new InvalidActor(actor, 'Must be a user');
 
     const user = await models.User.findOne({
