@@ -80,6 +80,12 @@ export const TreeHierarchy = ({
   const communityId = app.activeChainId() || '';
   const { selectedModels } = useLocalAISettingsStore();
 
+  // Derive chat mode from sort type - no separate state needed
+  const isChatMode = commentFilters.sortType === 'oldest';
+
+  const virtuosoRef = useRef<any>(null);
+  const previousChatModeRef = useRef(isChatMode);
+
   const {
     data: paginatedComments,
     fetchNextPage: fetchMoreComments,
@@ -167,6 +173,43 @@ export const TreeHierarchy = ({
     Permissions.isCommunityModerator();
 
   const commentRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Auto-scroll to bottom when entering chat mode or when new comments are added in chat mode
+  useEffect(() => {
+    if (
+      isChatMode &&
+      commentFilters.sortType === 'oldest' &&
+      !parentCommentId
+    ) {
+      const shouldAutoScroll =
+        // When first entering chat mode
+        (!previousChatModeRef.current && isChatMode) ||
+        // When new comments are added (allComments length increased)
+        (isChatMode && previousChatModeRef.current);
+
+      if (shouldAutoScroll && virtuosoRef.current && allComments.length > 0) {
+        // Small delay to ensure comments are rendered
+        setTimeout(() => {
+          try {
+            virtuosoRef.current?.scrollToIndex({
+              index: allComments.length - 1,
+              behavior: 'smooth',
+              align: 'end',
+            });
+          } catch (error) {
+            console.warn('Auto-scroll failed:', error);
+          }
+        }, 100);
+      }
+    }
+
+    previousChatModeRef.current = isChatMode;
+  }, [
+    isChatMode,
+    allComments.length,
+    commentFilters.sortType,
+    parentCommentId,
+  ]);
 
   const triggerStreamingForNewComment = useCallback(
     (commentId: number, useDefaultModelOnly = false) => {
@@ -273,12 +316,19 @@ export const TreeHierarchy = ({
         })}
       >
         <Virtuoso
+          ref={virtuosoRef}
           className="comments-list"
           style={{ height: '100%', width: '100%' }}
           data={isInitialCommentsLoading ? [] : allComments}
-          {...(pageRef.current && {
-            customScrollParent: pageRef.current,
-          })}
+          {...(pageRef.current &&
+            !isChatMode && {
+              customScrollParent: pageRef.current,
+            })}
+          {...(isChatMode &&
+            commentFilters.sortType === 'oldest' && {
+              followOutput: true,
+              alignToBottom: true,
+            })}
           itemContent={(index, comment) => {
             const isCommentAuthor =
               comment.address === user.activeAccount?.address;
