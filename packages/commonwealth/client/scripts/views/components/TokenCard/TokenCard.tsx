@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
 import { useTokenPricing } from 'hooks/useTokenPricing';
+import { useGetTokenStatsQuery } from 'state/api/tokens';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -8,6 +9,7 @@ import { withTooltip } from 'views/components/component_kit/new_designs/CWToolti
 import { TradingMode } from 'views/modals/TradeTokenModel';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import FractionalValue from '../FractionalValue';
+import FormattedDisplayNumber from '../FormattedDisplayNumber/FormattedDisplayNumber';
 import MarketCapProgress from './MarketCapProgress';
 import PricePercentageChange from './PricePercentageChange';
 import './TokenCard.scss';
@@ -32,6 +34,10 @@ const TokenCard = ({
   const { name, symbol, icon_url } = token;
 
   const { pricing } = useTokenPricing({ token });
+  const { data: stats } = useGetTokenStatsQuery(
+    { token_address: token.token_address },
+    { staleTime: 30_000, refetchInterval: 30_000 },
+  );
 
   const currencySymbol = currencyNameToSymbolMap[currency];
 
@@ -102,6 +108,20 @@ const TokenCard = ({
         currency={currency}
         onBodyClick={handleBodyClick}
       />
+      {stats && (
+        <div className="token-stats" onClick={handleBodyClick}>
+          <CWText type="caption" className="text-light">
+            Holders {stats.holder_count}
+          </CWText>
+          <CWText type="caption" className="ml-auto text-light">
+            Vol 24h {currencySymbol}
+            <FormattedDisplayNumber
+              value={stats.volume_24h}
+              options={{ decimals: 1, useShortSuffixes: true }}
+            />
+          </CWText>
+        </div>
+      )}
       {/* action cta */}
       <CWButton
         label={mode}

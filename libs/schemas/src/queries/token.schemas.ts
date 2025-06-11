@@ -35,3 +35,10 @@ export const GetToken = {
     ),
   output: z.union([TokenView, z.null()]),
 };
+export const GetTokenStats = {
+  input: z.object({ token_address: z.string() }),
+  output: z.object({
+    holder_count: z.number(),
+    volume_24h: z.number(),
+  }),
+};
