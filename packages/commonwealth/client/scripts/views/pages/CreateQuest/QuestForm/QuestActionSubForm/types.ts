@@ -93,7 +93,7 @@ export type QuestActionSubFormConfig = {
   requires_start_link: boolean;
   requires_amount_multipler: boolean;
   with_optional_token_trade_threshold: boolean;
-  requires_sso_source?: boolean;
+  with_optional_sso_type?: boolean;
 };
 
 export type QuestActionSubFormInternalRefs = {

@@ -4,6 +4,7 @@ import {
   doesActionAllowCommentId,
   doesActionAllowContentId,
   doesActionAllowRepetition,
+  doesActionAllowSSOType,
   doesActionAllowThreadId,
   doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
@@ -190,7 +191,8 @@ const useQuestActionMultiFormsState = ({
         requires_amount_multipler:
           doesActionRequireAmountMultipler(chosenAction),
         with_optional_token_trade_threshold: allowsTokenTradeThreshold,
-        requires_sso_source: chosenAction === 'SSOLinked',
+        with_optional_sso_type:
+          allowsContentId && doesActionAllowSSOType(chosenAction),
       };
 
       // set fixed action repitition per certain actions
@@ -290,7 +292,7 @@ const useQuestActionMultiFormsState = ({
             !allowsTokenTradeThreshold) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.Sso &&
-            !updatedSubForms[index].config?.requires_sso_source)
+            !updatedSubForms[index].config?.with_optional_sso_type)
         ) {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.Thread;

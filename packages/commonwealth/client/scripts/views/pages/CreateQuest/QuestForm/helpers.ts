@@ -168,7 +168,7 @@ export const buildRedirectURLFromContentId = (
     return `${idOrURL}`;
   }
   if (idType === 'sso') {
-    return '';
+    return `${idOrURL}`;
   }
 
   return '';
@@ -187,6 +187,6 @@ export const doesConfigAllowContentIdField = (
     config?.with_optional_chain_id ||
     config?.requires_group_id ||
     config?.with_optional_token_trade_threshold ||
-    config?.requires_sso_source
+    config?.with_optional_sso_type
   );
 };
