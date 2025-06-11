@@ -2,13 +2,13 @@ import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import clsx from 'clsx';
+import { APIOrderDirection } from 'helpers/constants';
 import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchTokensQuery } from 'state/api/tokens';
-import { APIOrderDirection } from 'helpers/constants';
 import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -24,15 +24,8 @@ const TokenWithCommunity = TokenView.extend({
 });
 
 type TrendingTokensListProps = {
-  /**
-   * Which tokens to show. Defaults to `trending` for backwards compatibility.
-   */
   variant?: 'trending' | 'recent' | 'marketcap' | 'graduated';
-  /**
-   * Heading text displayed above the list. Defaults to `Tokens`.
-   */
   heading?: string;
-  /** Number of tokens to fetch. Defaults to `3` to preserve existing behaviour. */
   limit?: number;
 };
 
@@ -65,7 +58,8 @@ const TrendingTokensList = ({
     with_stats: true,
     order_by: (() => {
       if (variant === 'recent') return 'created_at';
-      if (variant === 'marketcap' || variant === 'graduated') return 'market_cap';
+      if (variant === 'marketcap' || variant === 'graduated')
+        return 'market_cap';
       return 'price';
     })(),
     order_direction: APIOrderDirection.Desc,
