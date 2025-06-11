@@ -53,9 +53,9 @@ const trpcerror = (error: unknown): TRPCError => {
  * @returns tRPC mutation procedure
  */
 export const command = <
-  Input extends ZodType,
-  Output extends ZodType,
-  Context extends ZodType,
+  Input extends ZodType<any>,
+  Output extends ZodType<any>,
+  Context extends ZodType<any>,
 >(
   factory: () => Metadata<Input, Output, Context>,
   tag: Tag,

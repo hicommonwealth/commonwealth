@@ -108,7 +108,7 @@ export const buildproc = <Input extends ZodType, Output extends ZodType>({
     .meta({
       openapi: {
         method,
-        description: md.input._def.description, // zod property description
+        description: md.input.description, // zod property description
         path: `/${name}`,
         tags: [tag],
         headers: [
