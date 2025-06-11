@@ -313,6 +313,7 @@ export const seedDb = async () => {
         directory_page_enabled: false,
         namespace_verified: false,
         environment: config.APP_ENV,
+        ai_features_enabled: true,
       })),
     );
 
