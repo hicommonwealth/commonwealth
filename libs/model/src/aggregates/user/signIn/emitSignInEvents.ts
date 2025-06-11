@@ -89,6 +89,29 @@ export async function emitSignInEvents({
       },
     });
 
+  // check if this is a new SSO provider
+  if (addressInstance.oauth_provider) {
+    const existingSso = await models.Address.findOne({
+      where: {
+        user_id: user.id,
+        oauth_provider: addressInstance.oauth_provider,
+        address: { [Op.ne]: address },
+      },
+    });
+    if (!existingSso) {
+      events.push({
+        event_name: 'SSOLinked',
+        event_payload: {
+          community_id,
+          user_id: user.id!,
+          oauth_provider: addressInstance.oauth_provider,
+          created_at: created_at!,
+          new_user: newUser,
+        },
+      });
+    }
+  }
+
   if (transferredUser && originalUserId) {
     const originalOwner = await models.User.findByPk(originalUserId);
     events.push({
