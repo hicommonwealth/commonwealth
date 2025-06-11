@@ -4,6 +4,7 @@ import WebWalletController from '../../controllers/app/web_wallets';
 import {
   addContentWithPhantom,
   depositPrizeWithPhantom,
+  getContestScoreWithPhantom,
   getContestStatusWithPhantom,
   getPrizeVaultBalanceWithPhantom,
   initializeContestWithPhantom,
@@ -75,6 +76,14 @@ const SolanaContestInitializer = () => {
   const [statusResult, setStatusResult] = useState(null);
   const [isStatusLoading, setIsStatusLoading] = useState(false);
   const [statusErrorMessage, setStatusErrorMessage] = useState('');
+
+  // State for contest score checking
+  const [scoreForm, setScoreForm] = useState({
+    contestPda: '',
+  });
+  const [scoreResult, setScoreResult] = useState(null);
+  const [isScoreLoading, setIsScoreLoading] = useState(false);
+  const [scoreErrorMessage, setScoreErrorMessage] = useState('');
 
   // Initialize connection to Solana devnet
   useEffect(() => {
@@ -210,6 +219,15 @@ const SolanaContestInitializer = () => {
     });
   };
 
+  // Handle score form input changes
+  const handleScoreInputChange = (e) => {
+    const { name, value } = e.target;
+    setScoreForm({
+      ...scoreForm,
+      [name]: value,
+    });
+  };
+
   // When a contest is created successfully, pre-fill the deposit form with the contest PDA
   useEffect(() => {
     if (transactionResult && transactionResult.contestPda) {
@@ -232,6 +250,10 @@ const SolanaContestInitializer = () => {
       });
       setStatusForm({
         ...statusForm,
+        contestPda: contestPdaString,
+      });
+      setScoreForm({
+        ...scoreForm,
         contestPda: contestPdaString,
       });
     }
@@ -534,6 +556,47 @@ const SolanaContestInitializer = () => {
     }
   };
 
+  // Handle contest score check form submission
+  const handleScoreCheckSubmit = async (e) => {
+    e.preventDefault();
+    setIsScoreLoading(true);
+    setScoreErrorMessage('');
+    setScoreResult(null);
+
+    try {
+      // Validate input
+      if (!connection) {
+        throw new Error('Solana connection not established');
+      }
+
+      if (!isWalletConnected) {
+        throw new Error('Please connect your Phantom wallet first');
+      }
+
+      // Validate fields
+      if (!scoreForm.contestPda) {
+        throw new Error('Contest PDA is required');
+      }
+
+      // Convert string input to PublicKey
+      const contestPdaPublicKey = new PublicKey(scoreForm.contestPda);
+
+      // Get contest score
+      const result = await getContestScoreWithPhantom(
+        phantomWallet,
+        connection,
+        contestPdaPublicKey,
+      );
+
+      setScoreResult(result);
+    } catch (error) {
+      console.error('Failed to check contest score:', error);
+      setScoreErrorMessage(`Failed to check contest score: ${error.message}`);
+    } finally {
+      setIsScoreLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Solana Contest Initializer</h1>
@@ -661,72 +724,16 @@ const SolanaContestInitializer = () => {
         >
           Contest Status
         </button>
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="mb-6">
-        <div className="flex space-x-4">
-          <button
-            onClick={() => setActiveTab('initialize')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all flex-1 text-center ${
-              activeTab === 'initialize'
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Initialize Contest
-          </button>
-          <button
-            onClick={() => setActiveTab('deposit')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all flex-1 text-center ${
-              activeTab === 'deposit'
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Deposit Prize Tokens
-          </button>
-          <button
-            onClick={() => setActiveTab('submit')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all flex-1 text-center ${
-              activeTab === 'submit'
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Submit Content
-          </button>
-          <button
-            onClick={() => setActiveTab('vote')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all flex-1 text-center ${
-              activeTab === 'vote'
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Vote for Content
-          </button>
-          <button
-            onClick={() => setActiveTab('balance')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all flex-1 text-center ${
-              activeTab === 'balance'
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Check Balance
-          </button>
-          <button
-            onClick={() => setActiveTab('status')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all flex-1 text-center ${
-              activeTab === 'status'
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Contest Status
-          </button>
-        </div>
+        <button
+          onClick={() => setActiveTab('score')}
+          className={`py-3 px-4 text-sm font-medium rounded-t-lg ${
+            activeTab === 'score'
+              ? 'bg-pink-600 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          Contest Score
+        </button>
       </div>
 
       {/* Initialize Contest Form - Only shown when activeTab is 'initialize' */}
@@ -1494,6 +1501,194 @@ const SolanaContestInitializer = () => {
                   </tbody>
                 </table>
               </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Contest Score Checking Form - Only shown when activeTab is 'score' */}
+      {activeTab === 'score' && (
+        <div>
+          <h2 className="text-xl font-bold mb-4">Check Contest Score</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Get the winner scores and prize distribution for a Solana contest by
+            providing its PDA.
+            <br />
+            This will retrieve information about the total prize, protocol fee,
+            and winner details.
+          </p>
+
+          <form onSubmit={handleScoreCheckSubmit} className="mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="form-group">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Contest PDA
+                </label>
+                <input
+                  type="text"
+                  name="contestPda"
+                  value={scoreForm.contestPda}
+                  onChange={handleScoreInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                  placeholder="Enter the contest PDA public key"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  The public key of the contest you want to check scores for
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <button
+                type="submit"
+                disabled={!isWalletConnected || isScoreLoading}
+                className={`w-full px-4 py-3 text-white rounded font-medium ${
+                  !isWalletConnected || isScoreLoading
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-pink-600 hover:bg-pink-700 transition-colors'
+                }`}
+              >
+                {isScoreLoading ? 'Loading Scores...' : 'Get Contest Scores'}
+              </button>
+            </div>
+          </form>
+
+          {/* Score Error Message */}
+          {scoreErrorMessage && (
+            <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+              {scoreErrorMessage}
+            </div>
+          )}
+
+          {/* Score Result */}
+          {scoreResult && (
+            <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+              <h3 className="font-semibold mb-2">Contest Score</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="p-3 bg-white rounded shadow">
+                  <div className="text-xs text-gray-500">Total Prize</div>
+                  <div className="text-xl font-bold">
+                    {scoreResult.totalPrize} tokens
+                  </div>
+                </div>
+                <div className="p-3 bg-white rounded shadow">
+                  <div className="text-xs text-gray-500">Protocol Fee</div>
+                  <div className="text-xl font-bold">
+                    {scoreResult.protocolFee} tokens
+                  </div>
+                </div>
+                <div className="p-3 bg-white rounded shadow">
+                  <div className="text-xs text-gray-500">Contest Status</div>
+                  <div className="text-xl font-bold">
+                    {scoreResult.isContestEnded ? (
+                      <span className="text-red-600">Ended</span>
+                    ) : (
+                      <span className="text-green-600">Active</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <h4 className="font-semibold mt-4 mb-2">
+                {scoreResult.isContestEnded ? 'Winners' : 'Current Leaders'}
+              </h4>
+              {scoreResult.winners.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full border text-sm">
+                    <thead>
+                      <tr className="bg-gray-200">
+                        <th className="py-2 px-3 text-left">Rank</th>
+                        <th className="py-2 px-3 text-left">Content ID</th>
+                        <th className="py-2 px-3 text-left">Creator</th>
+                        <th className="py-2 px-3 text-left">Content URL</th>
+                        <th className="py-2 px-3 text-right">Votes</th>
+                        <th className="py-2 px-3 text-right">
+                          {scoreResult.isContestEnded
+                            ? 'Prize Amount'
+                            : 'Projected Prize'}
+                        </th>
+                        <th className="py-2 px-3 text-center">
+                          {scoreResult.isContestEnded ? 'Claimed' : 'Status'}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {scoreResult.winners.map((winner, index) => (
+                        <tr
+                          key={winner.contentId}
+                          className="border-t hover:bg-gray-50"
+                        >
+                          <td className="py-2 px-3">{index + 1}</td>
+                          <td className="py-2 px-3 font-mono">
+                            {winner.contentId}
+                          </td>
+                          <td
+                            className="py-2 px-3 font-mono truncate max-w-[100px]"
+                            title={winner.creator}
+                          >
+                            {winner.creator.substring(0, 4)}...
+                            {winner.creator.substring(
+                              winner.creator.length - 4,
+                            )}
+                          </td>
+                          <td
+                            className="py-2 px-3 truncate max-w-[150px]"
+                            title={winner.contentUrl}
+                          >
+                            <a
+                              href={winner.contentUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline"
+                            >
+                              {winner.contentUrl}
+                            </a>
+                          </td>
+                          <td className="py-2 px-3 text-right">
+                            {winner.votes}
+                          </td>
+                          <td className="py-2 px-3 text-right">
+                            {winner.prizeAmount} tokens
+                          </td>
+                          <td className="py-2 px-3 text-center">
+                            {scoreResult.isContestEnded ? (
+                              winner.isPrizeClaimed ? (
+                                <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
+                                  Claimed
+                                </span>
+                              ) : (
+                                <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">
+                                  Unclaimed
+                                </span>
+                              )
+                            ) : (
+                              <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                                Pending
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="p-4 bg-yellow-50 text-yellow-700 rounded">
+                  {scoreResult.isContestEnded ? (
+                    <p>
+                      Contest has ended, but no winners have been determined
+                      yet.
+                    </p>
+                  ) : (
+                    <p>
+                      No current leaders found in this contest. Winners will be
+                      finalized when the contest ends.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

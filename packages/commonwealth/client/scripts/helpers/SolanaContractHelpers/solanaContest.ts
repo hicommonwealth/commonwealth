@@ -690,3 +690,156 @@ export async function getContestStatusWithPhantom(
   // Just pass the connection directly
   return getContestStatus(connection, contestPda, programId);
 }
+
+/**
+ * Interface for winner information
+ */
+export interface WinnerInfo {
+  contentId: number;
+  creator: string;
+  contentUrl: string;
+  votes: number;
+  prizeAmount: number;
+  isPrizeClaimed: boolean;
+}
+
+/**
+ * Interface for contest score information
+ */
+export interface ContestScore {
+  totalPrize: number;
+  protocolFee: number;
+  isContestEnded: boolean;
+  winners: WinnerInfo[];
+}
+
+/**
+ * Gets the contest score, including winners and prize distribution information
+ *
+ * @param connection Solana connection
+ * @param contestPda Public key of the contest
+ * @param programId Optional program ID (uses default if not provided)
+ * @returns ContestScore object
+ */
+export async function getContestScore(
+  connection: Connection,
+  contestPda: PublicKey,
+  programId?: PublicKey,
+): Promise<ContestScore> {
+  // Use provided programId or default
+  const actualProgramId =
+    programId || new PublicKey('Emx5wMhCNPULbwyY5SJpFVr1UFpgyPqugtkNvMUBoh9n');
+
+  // Create a program instance using a temporary provider
+  // Since we're only reading data, we don't need a real wallet
+  const provider = new anchor.AnchorProvider(
+    connection,
+    // Create a read-only wallet
+    {
+      publicKey: PublicKey.default,
+      signTransaction: async () => {
+        throw new Error('Wallet is read-only');
+      },
+      signAllTransactions: async () => {
+        throw new Error('Wallet is read-only');
+      },
+    },
+    { commitment: 'confirmed' },
+  );
+
+  // Create the program using the imported IDL
+  const program = new anchor.Program(
+    singleContestIdl,
+    provider,
+  ) as Program<SingleContest>;
+
+  // Fetch the contest account
+  const contestAccount = await program.account.contest.fetch(contestPda);
+
+  // Get the prize vault PDA from the contest account
+  const prizeVaultPda = contestAccount.prizeVault;
+
+  // Get the token account info for the prize vault to determine the actual balance
+  const tokenAccountInfo =
+    await connection.getTokenAccountBalance(prizeVaultPda);
+  const vaultBalance = Number(tokenAccountInfo.value.amount);
+
+  // Initialize the result object
+  const result: ContestScore = {
+    totalPrize: vaultBalance,
+    protocolFee: contestAccount.protocolFee.toNumber(),
+    isContestEnded: contestAccount.contestEnded,
+    winners: [],
+  };
+  console.log('totalPrize (from vault):', vaultBalance);
+
+  // Check if there are any winner IDs (regardless of contest status)
+  if (contestAccount.winnerIds && contestAccount.winnerIds.length > 0) {
+    // Calculate the prize distribution based on winner shares
+    const winnerShares = contestAccount.winnerShares;
+    const claimedMask = contestAccount.claimedMask.toNumber();
+
+    // Calculate the prize pool (after protocol fee is taken out)
+    const prizePool = result.totalPrize - result.protocolFee;
+    console.log('Prize pool:', prizePool);
+    console.log('winnerIDs', contestAccount.winnerIds[0].toNumber());
+    // Fetch content info for each winner
+    const winnerPromises = contestAccount.winnerIds.map(
+      async (contentId, index) => {
+        // Calculate content PDA
+        const [contentPda] = PublicKey.findProgramAddressSync(
+          [
+            Buffer.from('content'),
+            contestPda.toBuffer(),
+            contentId.toArrayLike(Buffer, 'le', 8),
+          ],
+          program.programId,
+        );
+
+        // Fetch content account
+        const contentAccount = await program.account.content.fetch(contentPda);
+
+        // Calculate prize amount based on winner share
+        const sharePercentage = winnerShares[index] / 10000; // Convert basis points to decimal
+        const prizeAmount = Math.floor(prizePool * sharePercentage);
+
+        // Check if prize has been claimed (using bitmask)
+        const isPrizeClaimed = Boolean((claimedMask >> index) & 1);
+
+        return {
+          contentId: contentId.toNumber(),
+          creator: contentAccount.creator.toString(),
+          contentUrl: contentAccount.url,
+          votes: contentAccount.cumulativeVotes.toNumber(),
+          prizeAmount,
+          isPrizeClaimed,
+        };
+      },
+    );
+
+    // Wait for all winner info to be collected
+    result.winners = await Promise.all(winnerPromises);
+  }
+
+  return result;
+}
+
+/**
+ * Helper function to get contest score using a PhantomWebWalletController
+ *
+ * @param phantomWallet An instance of PhantomWebWalletController
+ * @param connection Solana connection
+ * @param contestPda Public key of the contest
+ * @param programId Optional program ID (uses default if not provided)
+ * @returns ContestScore object
+ */
+export async function getContestScoreWithPhantom(
+  phantomWallet: any, // Using any to avoid importing the specific controller type
+  connection: Connection,
+  contestPda: PublicKey,
+  programId?: PublicKey,
+): Promise<ContestScore> {
+  // For read-only operations, we don't need to create a provider from the wallet
+  // Just pass the connection directly
+  return getContestScore(connection, contestPda, programId);
+}
