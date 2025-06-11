@@ -10,4 +10,25 @@
     padding-left: 24px;
     margin-left: 28px;
   }
+
+  .comments-list {
+    // Chat mode specific styling
+    .chat-load-older-container {
+      padding: 16px;
+      text-align: center;
+      border-bottom: 1px solid $neutral-200;
+      background-color: $neutral-50;
+    }
+  }
+
+  // Chat mode layout - inherit height from parent container
+  &.chat-mode {
+    height: 100%;
+    min-height: 0;
+
+    .comments-list {
+      height: 100%;
+      min-height: 0;
+    }
+  }
 }

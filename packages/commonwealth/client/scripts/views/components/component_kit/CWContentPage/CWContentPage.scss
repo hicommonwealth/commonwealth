@@ -63,6 +63,33 @@
       flex-direction: column;
       gap: 16px;
     }
+
+    // Chat Mode Layout
+    &.chat-mode {
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
+
+      .thread-content {
+        &.chat-mode-thread {
+          max-height: 40vh;
+          overflow-y: auto;
+          border-bottom: 1px solid $neutral-200;
+          padding-bottom: 16px;
+          margin-bottom: 16px;
+        }
+      }
+
+      .comments-section {
+        &.chat-mode-comments {
+          flex: 1;
+          min-height: 0;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+        }
+      }
+    }
   }
 }
 

@@ -20,6 +20,7 @@ export const CommentTree = ({
   streamingInstances,
   setStreamingInstances,
   permissions,
+  onChatModeChange,
 }: CommentsTreeProps) => {
   const user = useUserStore();
   const [hasTriggeredAIComment, setHasTriggeredAIComment] = useState(false);
@@ -82,7 +83,10 @@ export const CommentTree = ({
         <CommentFilters
           commentsRef={commentsRef}
           filters={commentFilters}
-          onFiltersChange={onFiltersChange}
+          onFiltersChange={(f) => {
+            onFiltersChange(f);
+            onChatModeChange?.(f.sortType === 'oldest');
+          }}
         />
       )}
       <TreeHierarchy

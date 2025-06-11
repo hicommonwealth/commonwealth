@@ -313,6 +313,7 @@ export const TreeHierarchy = ({
       <div
         className={clsx('CommentsTree', {
           'replies-container': !!parentCommentId,
+          'chat-mode': isChatMode && !parentCommentId,
         })}
       >
         <Virtuoso
@@ -505,20 +506,42 @@ export const TreeHierarchy = ({
           overscan={50}
           components={{
             EmptyPlaceholder: () => <></>,
-            Footer: () =>
-              hasNextPage ? (
-                <CWButton
-                  containerClassName="m-auto"
-                  label="Load more"
-                  disabled={isLoadingComments}
-                  onClick={() => {
-                    !isLoadingComments &&
-                      fetchMoreComments().catch(console.error);
-                  }}
-                />
-              ) : (
-                <></>
-              ),
+            ...(isChatMode
+              ? {
+                  Header: () =>
+                    hasNextPage ? (
+                      <div className="chat-load-older-container">
+                        <CWButton
+                          containerClassName="m-auto"
+                          label="Load older messages"
+                          buttonSize="sm"
+                          disabled={isLoadingComments}
+                          onClick={() => {
+                            !isLoadingComments &&
+                              fetchMoreComments().catch(console.error);
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <></>
+                    ),
+                }
+              : {
+                  Footer: () =>
+                    hasNextPage ? (
+                      <CWButton
+                        containerClassName="m-auto"
+                        label="Load more"
+                        disabled={isLoadingComments}
+                        onClick={() => {
+                          !isLoadingComments &&
+                            fetchMoreComments().catch(console.error);
+                        }}
+                      />
+                    ) : (
+                      <></>
+                    ),
+                }),
           }}
         />
       </div>
