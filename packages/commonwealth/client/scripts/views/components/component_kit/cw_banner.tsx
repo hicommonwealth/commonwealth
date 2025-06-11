@@ -3,7 +3,7 @@ import React from 'react';
 import './cw_banner.scss';
 import { CWIconButton } from './cw_icon_button';
 
-import RenderTextWithLink from './RenderTextWithLink';
+import { QuillRenderer } from '../react_quill_editor/quill_renderer';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
@@ -45,7 +45,7 @@ export const CWMessageBanner = ({
         ComponentType.MessageBanner,
       )}
     >
-      <RenderTextWithLink text={bannerContent} />
+      <QuillRenderer doc={bannerContent} hideFormatting />
       {onClose && (
         <CWIconButton
           iconName="close"
