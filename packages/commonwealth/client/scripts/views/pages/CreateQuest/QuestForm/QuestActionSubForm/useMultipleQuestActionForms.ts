@@ -4,6 +4,7 @@ import {
   doesActionAllowCommentId,
   doesActionAllowContentId,
   doesActionAllowRepetition,
+  doesActionAllowSSOType,
   doesActionAllowThreadId,
   doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
@@ -190,6 +191,8 @@ const useQuestActionMultiFormsState = ({
         requires_amount_multipler:
           doesActionRequireAmountMultipler(chosenAction),
         with_optional_token_trade_threshold: allowsTokenTradeThreshold,
+        with_optional_sso_type:
+          allowsContentId && doesActionAllowSSOType(chosenAction),
       };
 
       // set fixed action repitition per certain actions
@@ -238,6 +241,11 @@ const useQuestActionMultiFormsState = ({
             QuestActionContentIdScope.Group;
           break;
         }
+        case 'SSOLinked': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.Sso;
+          break;
+        }
         case 'LaunchpadTokenTraded': {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.TokenTradeThreshold;
@@ -281,7 +289,10 @@ const useQuestActionMultiFormsState = ({
             !requiresGroupId) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.TokenTradeThreshold &&
-            !allowsTokenTradeThreshold)
+            !allowsTokenTradeThreshold) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.Sso &&
+            !updatedSubForms[index].config?.with_optional_sso_type)
         ) {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.Thread;
