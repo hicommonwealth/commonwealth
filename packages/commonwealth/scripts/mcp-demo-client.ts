@@ -1,12 +1,15 @@
-import { config } from '@hicommonwealth/model';
+import { config, models } from '@hicommonwealth/model';
+import { MCPServer } from '@hicommonwealth/schemas';
 import { delay } from '@hicommonwealth/shared';
+import inquirer from 'inquirer';
 import OpenAI from 'openai';
 import { exit } from 'process';
 import * as readline from 'readline';
+import { z } from 'zod';
 
 // run with `pnpm run start-mcp-demo-client`
 
-const help = `
+const demoHelp = `
 MCP_DEMO_CLIENT_SERVER_URL must be set to the (ngrok) URL of the MCP server, just the domain.
 MCP_DEMO_CLIENT_KEY must be set to the key of the MCP server in format <address>:<api-key>.
 
@@ -16,21 +19,9 @@ MCP_DEMO_CLIENT_KEY=0x1234567890:myApiKey
 `;
 
 const { MCP_DEMO_CLIENT_SERVER_URL, MCP_DEMO_CLIENT_KEY } = config.MCP;
-if (!MCP_DEMO_CLIENT_SERVER_URL || !MCP_DEMO_CLIENT_KEY) {
-  console.log(help);
-  exit(1);
-}
-
-const serverUrl = `https://${MCP_DEMO_CLIENT_SERVER_URL}/mcp`;
 
 const client = new OpenAI({
   apiKey: config.OPENAI.API_KEY,
-});
-
-// Create readline interface for user input
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
 });
 
 // Conversation history - using OpenAI's Responses API format
@@ -45,45 +36,103 @@ function getUserInput(prompt: string): Promise<string> {
   });
 }
 
-// Main chat loop
+// Function to display server selection menu using inquirer
+async function selectServers(
+  availableServers: z.infer<typeof MCPServer>[],
+): Promise<z.infer<typeof MCPServer>[]> {
+  console.clear();
+  console.log('🤖 Commonwealth AI Chatbot - Server Selection\n');
+  const { selectedServers } = await inquirer.prompt([
+    {
+      type: 'checkbox',
+      name: 'selectedServers',
+      message: 'Select one or more servers:',
+      choices: availableServers.map((server, idx) => ({
+        name: server.name + ' (' + server.server_url + ')',
+        value: idx,
+        checked: false, // check no servers by default
+      })),
+      validate: (answer) => {
+        console.log('ANSWER');
+        if (answer.length === 0) {
+          return 'You must select at least one server';
+        }
+        return true;
+      },
+    },
+  ]);
+  return selectedServers.map((idx: number) => availableServers[idx]);
+}
+
+let rl: readline.Interface;
+
 async function startChatBot() {
-  // wait for warning message to be printed
   await delay(1000);
 
-  console.clear();
+  const availableServers: z.infer<typeof MCPServer>[] = [];
 
-  console.log('🤖 Commonwealth AI Chatbot started! Type "exit" to quit.\n');
-  console.log(
-    'Ask me anything about Commonwealth communities, threads, or users!\n',
+  // add local MCP server if env vars are set
+  if (MCP_DEMO_CLIENT_SERVER_URL && MCP_DEMO_CLIENT_KEY) {
+    availableServers.push({
+      id: 0,
+      name: 'Local MCP Server',
+      description: 'Local MCP Server',
+      source: 'local',
+      server_url: `https://${MCP_DEMO_CLIENT_SERVER_URL}/mcp`,
+      handle: MCP_DEMO_CLIENT_KEY,
+    });
+  }
+
+  const dbServers = (await models.MCPServer.findAll()).filter(
+    (server) => server.id !== 1, // exclude common prod server
   );
+  availableServers.push(...dbServers);
+
+  const selectedServers = await selectServers(availableServers);
+
+  console.clear();
+  console.log(
+    `🤖 Common AI Chatbot started! Connected to ${selectedServers.length} servers:\n`,
+  );
+  selectedServers.forEach((server) => {
+    console.log(`- ${server.name} (${server.server_url})`);
+  });
+  console.log(
+    '\n\nAsk me anything about Common communities, threads, or users!\n\n',
+  );
+
+  rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
 
   while (true) {
     try {
-      // Get user input
       const userInput = await getUserInput('You: ');
 
-      // Check for exit condition
       if (userInput.toLowerCase().trim() === 'exit') {
         console.log('👋 Goodbye!');
         break;
       }
 
-      console.log('🤔 Thinking...\n');
+      console.log('\n\n🤔 Thinking...\n\n');
 
-      // Make request to OpenAI Responses API with MCP tools
+      console.log(JSON.stringify(selectedServers, null, 2));
+
       const resp = await client.responses.create({
-        model: 'gpt-4.1',
-        tools: [
-          {
-            type: 'mcp',
-            server_label: 'commonwealth',
-            server_url: serverUrl,
-            require_approval: 'never',
-            headers: {
-              Authorization: `Bearer ${MCP_DEMO_CLIENT_KEY}`,
-            },
-          },
-        ],
+        model: 'gpt-4o-mini',
+        tools: selectedServers.map((server) => ({
+          type: 'mcp',
+          server_label: server.handle!,
+          server_url: server.server_url!,
+          require_approval: 'never',
+          headers:
+            server.id === 0
+              ? {
+                  Authorization: `Bearer ${server.handle || MCP_DEMO_CLIENT_KEY}`,
+                }
+              : undefined,
+        })),
         input: userInput,
         previous_response_id: previousResponseId,
       });
@@ -91,28 +140,19 @@ async function startChatBot() {
       // Update the previous response ID for next iteration
       previousResponseId = resp.id;
 
-      // Display the response
       console.log(`🤖 Assistant: ${resp.output_text || resp.output}\n`);
     } catch (error: unknown) {
       const err = error as Error;
       console.error('❌ Error:', err.message);
       console.log('Please try again.\n');
-
-      // If there's an authentication or server error, show more details
-      if (err.message.includes('401')) {
-        console.log('Check your OpenAI API key and MCP server credentials.\n');
-      } else if (err.message.includes('404')) {
-        console.log("Check your MCP server URL and ensure it's accessible.\n");
-      }
     }
   }
 
-  rl.close();
+  rl?.close();
 }
 
-// Start the chatbot
 startChatBot().catch((error) => {
   console.error('Fatal error:', error);
-  rl.close();
+  rl?.close();
   exit(1);
 });
