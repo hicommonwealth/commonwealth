@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
+import { trpc } from 'utils/trpcClient';
 import { CommentFilters } from './CommentFilters';
 import './CommentTree.scss';
 import { TreeHierarchy } from './TreeHierarchy';
@@ -24,6 +25,7 @@ export const CommentTree = ({
 }: CommentsTreeProps) => {
   const user = useUserStore();
   const [hasTriggeredAIComment, setHasTriggeredAIComment] = useState(false);
+  const utils = trpc.useUtils();
 
   const {
     commentFilters,
@@ -77,16 +79,25 @@ export const CommentTree = ({
     }
   }, [thread?.id, thread?.numberOfComments]);
 
+  const handleFiltersChange = async (newFilters: typeof commentFilters) => {
+    // Check if sort type is changing (which affects pagination and ordering)
+    if (newFilters.sortType !== commentFilters.sortType) {
+      await utils.comment.getComments.reset({
+        thread_id: thread.id,
+      });
+    }
+
+    onFiltersChange(newFilters);
+    onChatModeChange?.(newFilters.sortType === 'oldest');
+  };
+
   return (
     <>
       {thread?.numberOfComments > 0 && (
         <CommentFilters
           commentsRef={commentsRef}
           filters={commentFilters}
-          onFiltersChange={(f) => {
-            onFiltersChange(f);
-            onChatModeChange?.(f.sortType === 'oldest');
-          }}
+          onFiltersChange={handleFiltersChange}
         />
       )}
       <TreeHierarchy
