@@ -65,6 +65,7 @@ export const trpcRouter = trpc.router({
   getXpsRanked: trpc.query(User.GetXpsRanked, trpc.Tag.User),
   updateSettings: trpc.command(User.UpdateSettings, trpc.Tag.User),
   getAddressStatus: trpc.query(User.GetAddressStatus, trpc.Tag.User),
+  getStatus: trpc.query(User.GetStatus, trpc.Tag.User),
   updateEmail: trpc.command(User.UpdateEmail, trpc.Tag.User),
   getMutualConnections: trpc.query(User.GetMutualConnections, trpc.Tag.User),
   // Not really part of the user, but no better place to put it

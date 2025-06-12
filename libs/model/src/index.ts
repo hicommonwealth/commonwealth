@@ -11,6 +11,7 @@ export * as LoadTest from './aggregates/load-testing';
 export * as Poll from './aggregates/poll';
 export * as Quest from './aggregates/quest';
 export * as Reaction from './aggregates/reaction';
+export * as Search from './aggregates/search';
 export * as Snapshot from './aggregates/snapshot';
 export * as Subscription from './aggregates/subscription';
 export * as SuperAdmin from './aggregates/super-admin';

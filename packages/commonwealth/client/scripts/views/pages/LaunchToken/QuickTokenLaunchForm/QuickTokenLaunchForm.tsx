@@ -86,6 +86,7 @@ export const QuickTokenLaunchForm = ({
   isSmallScreen = false,
 }: QuickTokenLaunchFormProps) => {
   const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+  const [transactionHash, setTransactionHash] = useState('');
 
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const {
@@ -303,6 +304,8 @@ export const QuickTokenLaunchForm = ({
           // this gets reset after creating token on api
           addressSelectorSelectedAddress: selectedAddress.address,
         });
+
+        setTransactionHash(txReceipt.transactionHash);
 
         const token = await createToken({
           community_id: communityId,
@@ -560,6 +563,17 @@ export const QuickTokenLaunchForm = ({
             </>
           )}
         />
+      )}
+
+      {!!transactionHash && (
+        <>
+          <CWText type="b1" className="debugTxHash debugTxHashGap">
+            Transaction hash is
+          </CWText>
+          <CWText type="b1" className="debugTxHash">
+            {transactionHash}
+          </CWText>
+        </>
       )}
     </div>
   );

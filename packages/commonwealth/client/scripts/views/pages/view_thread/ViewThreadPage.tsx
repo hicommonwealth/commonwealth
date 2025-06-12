@@ -10,8 +10,8 @@ import {
 } from 'client/scripts/helpers/snapshot_utils';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
-import { Thread, ThreadView } from 'client/scripts/models/Thread';
 import { AnyProposal } from 'client/scripts/models/types';
+import useGetThreadByIdQuery from 'client/scripts/state/api/threads/getThreadById';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -38,9 +38,11 @@ import useFetchProfilesByAddressesQuery from 'state/api/profiles/fetchProfilesBy
 import {
   useAddThreadLinksMutation,
   useGetThreadPollsQuery,
-  useGetThreadsByIdQuery,
 } from 'state/api/threads';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import useUserStore, {
+  useAIFeatureEnabled,
+  useUserAiSettingsStore,
+} from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
@@ -107,7 +109,7 @@ type VoterProfileData = {
 };
 
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
-  const threadId = identifier.split('-')[0];
+  const threadId = parseInt(`${identifier.split('-')?.[0] || 0}`);
   const [searchParams] = useSearchParams();
   const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
@@ -125,13 +127,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
   const [imageActionModalOpen, setImageActionModalOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [voterProfiles, setVoterProfiles] = useState<
-    Record<string, VoterProfileData>
-  >({});
-  const [uniqueVoterAddresses, setUniqueVoterAddresses] = useState<string[]>(
-    [],
-  );
-
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   useInitChainIfNeeded(app);
@@ -143,21 +138,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
 
   const communityId = app.activeChainId() || '';
-  const { data: groups = [] } = useFetchGroupsQuery({
+  useFetchGroupsQuery({
     communityId,
     includeTopics: true,
     enabled: !!communityId,
   });
 
   const {
-    data,
+    data: threadView,
     error: fetchThreadError,
     isLoading,
-  } = useGetThreadsByIdQuery({
-    community_id: communityId,
-    thread_ids: [+threadId].filter(Boolean),
-    apiCallEnabled: !!threadId && !!communityId, // only call the api if we have thread id
-  });
+  } = useGetThreadByIdQuery(
+    threadId,
+    !!threadId && !!communityId, // only call the api if we have thread id
+  );
 
   const { data: pollsData = [] } = useGetThreadPollsQuery({
     threadId: +threadId,
@@ -165,9 +159,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   });
 
   const thread = useMemo(() => {
-    const t = data?.at(0);
-    return t ? new Thread(t as ThreadView) : undefined;
-  }, [data]);
+    return threadView;
+  }, [threadView]);
 
   //  snapshot proposal hook
   const snapshotLink = thread?.links?.find(
@@ -266,7 +259,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     thread?.topic?.id,
   );
 
-  const { aiCommentsToggleEnabled, selectedModels } = useLocalAISettingsStore();
+  const { isAIEnabled } = useAIFeatureEnabled();
+
+  const { aiCommentsToggleEnabled, selectedModels } = useUserAiSettingsStore();
+
+  const effectiveAiCommentsToggleEnabled =
+    isAIEnabled && aiCommentsToggleEnabled;
 
   const [streamingInstances, setStreamingInstances] = useState<
     StreamingReplyInstance[]
@@ -275,7 +273,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const handleGenerateAIComment = useCallback(
     async (mainThreadId: number): Promise<void> => {
       if (
-        !aiCommentsToggleEnabled ||
+        !effectiveAiCommentsToggleEnabled ||
         !user.activeAccount ||
         selectedModels.length === 0
       ) {
@@ -300,7 +298,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       setStreamingInstances(newInstances);
       initalAiCommentPosted.current = true;
     },
-    [aiCommentsToggleEnabled, user.activeAccount, thread, selectedModels],
+    [
+      effectiveAiCommentsToggleEnabled,
+      user.activeAccount,
+      thread,
+      selectedModels,
+    ],
   );
 
   useEffect(() => {
@@ -313,20 +316,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       setIsGloballyEditing(true);
       setIsEditingBody(true);
     }
-    if (thread && thread?.title) {
+    if (thread && thread?.title && !draftTitle) {
       setDraftTitle(thread.title);
     }
-  }, [isEdit, thread, isAdmin]);
+  }, [isEdit, thread, isAdmin, draftTitle]);
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
 
-  const { actionGroups, bypassGating, memberships, isTopicGated } =
-    useTopicGating({
-      communityId,
-      apiEnabled: !!user?.activeAccount?.address && !!communityId,
-      userAddress: user?.activeAccount?.address || '',
-      topicId: thread?.topic?.id || 0,
-    });
+  const { actionGroups, bypassGating, isTopicGated } = useTopicGating({
+    communityId,
+    apiEnabled: !!user?.activeAccount?.address && !!communityId,
+    userAddress: user?.activeAccount?.address || '',
+    topicId: thread?.topic?.id || 0,
+  });
 
   const { isWindowLarge } = useBrowserWindow({
     onResize: () =>
@@ -390,14 +392,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [thread?.versionHistory]);
 
-  // Effect to gather unique voter addresses from all polls
-  useEffect(() => {
+  // Compute unique voter addresses from all polls
+  const uniqueVoterAddresses = useMemo(() => {
     if (pollsData && pollsData.length > 0) {
       const allAddresses = pollsData.flatMap((poll) =>
         (poll.votes || []).map((vote) => vote.address),
       );
-      setUniqueVoterAddresses(Array.from(new Set(allAddresses)));
+      return Array.from(new Set(allAddresses));
     }
+    return [];
   }, [pollsData]);
 
   const { data: fetchedProfiles, isLoading: isLoadingProfiles } =
@@ -408,25 +411,26 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       apiCallEnabled: !!communityId && uniqueVoterAddresses.length > 0,
     });
 
-  // Effect to transform fetched profiles into the voterProfiles map
-  useEffect(() => {
-    if (fetchedProfiles && fetchedProfiles.length > 0) {
-      const profilesMap: Record<string, VoterProfileData> = {};
-      fetchedProfiles.forEach((profile) => {
-        if (profile.address) {
-          profilesMap[profile.address] = {
-            address: profile.address,
-            name: profile.name || '', // Provide fallback for name
-            avatarUrl: profile.avatarUrl,
-          };
-        }
-      });
-      setVoterProfiles(profilesMap);
+  const voterProfiles = useMemo(() => {
+    if (!fetchedProfiles || fetchedProfiles.length === 0) {
+      return {};
     }
+
+    const profilesMap: Record<string, VoterProfileData> = {};
+    fetchedProfiles.forEach((profile) => {
+      if (profile.address) {
+        profilesMap[profile.address] = {
+          address: profile.address,
+          name: profile.name || '', // Provide fallback for name
+          avatarUrl: profile.avatarUrl,
+        };
+      }
+    });
+    return profilesMap;
   }, [fetchedProfiles]);
 
-  if (typeof identifier !== 'string') {
-    return <PageNotFound />;
+  if (typeof identifier !== 'string' || fetchThreadError) {
+    return <PageNotFound message={fetchThreadError?.message} />;
   }
 
   if (
@@ -1116,7 +1120,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 canReply={permissions.CREATE_COMMENT.allowed}
                 fromDiscordBot={fromDiscordBot}
                 onThreadCreated={handleGenerateAIComment}
-                aiCommentsToggleEnabled={aiCommentsToggleEnabled}
+                aiCommentsToggleEnabled={!!effectiveAiCommentsToggleEnabled}
                 streamingInstances={streamingInstances}
                 setStreamingInstances={setStreamingInstances}
                 permissions={permissions}
@@ -1137,7 +1141,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <CreateComment
                 rootThread={thread}
                 canComment={permissions.CREATE_COMMENT.allowed}
-                aiCommentsToggleEnabled={aiCommentsToggleEnabled}
+                aiCommentsToggleEnabled={!!effectiveAiCommentsToggleEnabled}
                 tooltipText={permissions.CREATE_COMMENT.tooltip}
               />
             )}

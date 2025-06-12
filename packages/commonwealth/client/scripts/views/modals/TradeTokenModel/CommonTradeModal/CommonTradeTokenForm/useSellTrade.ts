@@ -24,10 +24,10 @@ const useSellTrade = ({
     useState<string>(`0`); // can be fractional
   const tokenSellAmountDecimals = parseFloat(tokenSellAmountString) || 0;
 
-  const { mutateAsync: createTokenTrade, isLoading: isCreatingTokenTrade } =
+  const { mutateAsync: createTokenTrade, isPending: isCreatingTokenTrade } =
     useCreateTokenTradeMutation();
 
-  const { mutateAsync: sellToken, isLoading: isSellingToken } =
+  const { mutateAsync: sellToken, isPending: isSellingToken } =
     useSellTokenMutation();
 
   const isSelectedAddressTokenBalanceQueryEnabled = !!(

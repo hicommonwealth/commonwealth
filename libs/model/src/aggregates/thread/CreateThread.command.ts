@@ -36,7 +36,6 @@ export const CreateThreadErrors = {
   ParseMentionsFailed: 'Failed to parse mentions',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only discussion and link posts supported',
-  FailedCreateThread: 'Failed to create thread',
   DiscussionMissingTitle: 'Discussion posts must include a title',
   NoBody: 'Thread body cannot be blank',
   PostLimitReached: 'Post limit reached',

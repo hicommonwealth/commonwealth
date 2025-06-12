@@ -73,9 +73,9 @@ const QuestDetails = ({ id }: { id: number }) => {
     specificAuthOption: undefined,
   });
 
-  const { mutateAsync: deleteQuest, isLoading: isDeletingQuest } =
+  const { mutateAsync: deleteQuest, isPending: isDeletingQuest } =
     useDeleteQuestMutation();
-  const { mutateAsync: cancelQuest, isLoading: isCancelingQuest } =
+  const { mutateAsync: cancelQuest, isPending: isCancelingQuest } =
     useCancelQuestMutation();
 
   const isPendingAction = isDeletingQuest || isCancelingQuest;

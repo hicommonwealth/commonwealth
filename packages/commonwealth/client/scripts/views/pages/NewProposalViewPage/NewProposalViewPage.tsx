@@ -1,3 +1,4 @@
+import { ChainBase } from '@hicommonwealth/shared';
 import {
   SnapshotProposal,
   SnapshotSpace,
@@ -29,16 +30,19 @@ import { JSONDisplay } from '../view_proposal/JSONDisplay';
 import ProposalVotesDrawer from './ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from './useCosmosProposal';
 import { useSnapshotProposal } from './useSnapshotProposal';
+
 type ViewProposalPageProps = {
   id: string;
   scope: string;
   identifier: string;
   type?: string;
 };
+
 export enum CodeEditorType {
   Code,
   Preview,
 }
+
 const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [title, setTitle] = useState('');
@@ -62,10 +66,10 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
     proposal,
     title: proposalTitle,
     description,
-    isLoading,
+    isLoading: isCosmosLoading,
     error: cosmosError,
     threads: cosmosThreads,
-  } = useCosmosProposal({ proposalId });
+  } = useCosmosProposal({ proposalId, enabled: queryType === 'cosmos' });
 
   const {
     proposal: snapshotProposal,
@@ -80,10 +84,11 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
     loadVotes,
     power,
     threads,
+    error: snapshotProposalError,
   } = useSnapshotProposal({
     identifier: proposalId,
     snapshotId: querySnapshotId!,
-    enabled: queryType === 'cosmos' ? false : true,
+    enabled: queryType !== 'cosmos',
   });
   const snapShotVotingResult = React.useMemo(() => {
     if (!snapshotProposal || !votes) return [];
@@ -135,11 +140,18 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
     }
   }, [snapshotProposal, proposal, queryType]);
 
-  if (isLoading || isSnapshotLoading) {
+  const isCosmosChain = app.chain.base === ChainBase.CosmosSDK;
+  if ((isCosmosChain && isCosmosLoading) || isSnapshotLoading) {
     return <LoadingIndicator message="Loading..." />;
   }
 
-  if (cosmosError) {
+  if (
+    isCosmosChain &&
+    ((queryType === 'cosmos' &&
+      (cosmosError || !(proposal && isCosmosLoading))) ||
+      (queryType !== 'cosmos' &&
+        (snapshotProposalError || !(snapshotProposal && isSnapshotLoading))))
+  ) {
     return (
       <PageNotFound
         message={"We couldn't find what you searched for. Try searching again."}

@@ -1,7 +1,6 @@
-import { QuestActionMeta } from '@hicommonwealth/schemas';
+import { QuestAction } from 'client/scripts/helpers/quest';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { z } from 'node_modules/zod';
 import React from 'react';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import TotalQuestXPTag from 'views/pages/QuestDetails/TotalQuestXPTag';
@@ -53,10 +52,7 @@ const TaskList = ({ className }: TaskListProps) => {
                   questId={quest.id}
                   questStartDate={new Date(quest.start_date)}
                   questEndDate={new Date(quest.end_date)}
-                  questActions={
-                    (quest.action_metas as z.infer<typeof QuestActionMeta>[]) ||
-                    []
-                  }
+                  questActions={(quest.action_metas as QuestAction[]) || []}
                 />
               ),
             }))}
@@ -77,10 +73,7 @@ const TaskList = ({ className }: TaskListProps) => {
                   questId={quest.id}
                   questStartDate={new Date(quest.start_date)}
                   questEndDate={new Date(quest.end_date)}
-                  questActions={
-                    (quest.action_metas as z.infer<typeof QuestActionMeta>[]) ||
-                    []
-                  }
+                  questActions={(quest.action_metas as QuestAction[]) || []}
                   hideGainedXp
                 />
               ),

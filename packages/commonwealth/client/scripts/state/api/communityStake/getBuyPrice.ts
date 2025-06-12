@@ -56,7 +56,9 @@ const useGetBuyPriceQuery = ({
       getBuyPrice({ namespace, stakeId, amount, chainRpc, ethChainId }),
     enabled: apiEnabled,
     staleTime: GET_BUY_PRICE_STALE_TIME,
-    keepPreviousData,
+    placeholderData: keepPreviousData
+      ? (previousData) => previousData
+      : undefined,
   });
 };
 
