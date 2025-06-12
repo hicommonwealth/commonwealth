@@ -88,6 +88,7 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
                   role: 'member',
                   ghost_address: false,
                   is_banned: false,
+                  verification_token: address.verification_token,
                 },
                 transaction,
               });
