@@ -1,4 +1,4 @@
-import { Projection } from '@hicommonwealth/core';
+import { logger, Projection } from '@hicommonwealth/core';
 import { getEvmAddress, getTransaction } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import {
@@ -12,7 +12,10 @@ import {
 } from '@hicommonwealth/shared';
 import { Op, Sequelize, Transaction } from 'sequelize';
 import { z } from 'zod';
+import { config } from '../../config';
 import { models, sequelize } from '../../database';
+
+const log = logger(import.meta);
 
 async function getUserByAddressId(address_id: number) {
   const addr = await models.Address.findOne({
@@ -502,6 +505,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       },
       LaunchpadTokenRecordCreated: async ({ payload }) => {
         const user_id = await getUserByAddress(payload.creator_address);
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenRecordCreated', { payload, user_id });
         if (!user_id) return;
 
         const created_at = payload.created_at;
@@ -509,15 +514,25 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           { created_at },
           'LaunchpadTokenRecordCreated',
         );
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenRecordCreated', {
+            payload,
+            user_id,
+            action_metas,
+          });
         await recordXpsForQuest(user_id, created_at, action_metas);
       },
       LaunchpadTokenTraded: async ({ payload }) => {
         const user_id = await getUserByAddress(payload.trader_address);
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenTraded', { payload, user_id });
         if (!user_id) return;
 
         const token = await models.LaunchpadToken.findOne({
           where: { token_address: payload.token_address.toLowerCase() },
         });
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenTraded', { payload, user_id, token });
         if (!token) return;
 
         const community = await models.Community.findOne({
@@ -532,7 +547,14 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
 
         // payload eth_amount is in wei, a little misleading
         const eth_amount = Number(payload.eth_amount) / 1e18;
-        //console.log({ payload, action_metas, eth_amount });
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenTraded', {
+            payload,
+            user_id,
+            created_at,
+            action_metas,
+            eth_amount,
+          });
         await recordXpsForQuest(user_id, created_at, action_metas, undefined, {
           amount: eth_amount,
           threshold: eth_amount,
