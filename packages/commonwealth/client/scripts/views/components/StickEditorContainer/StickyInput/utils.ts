@@ -1,5 +1,5 @@
 import { CompletionModel } from '@hicommonwealth/shared';
-import { AIModelOption } from 'state/ui/user/localAISettings';
+import { AIModelOption } from 'client/scripts/state/ui/user/userAiSettings';
 import { ModelOption } from 'views/components/AIModelSelector';
 
 const createModelOption = <T extends CompletionModel>(

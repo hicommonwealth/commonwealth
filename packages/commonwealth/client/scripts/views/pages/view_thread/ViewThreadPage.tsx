@@ -39,7 +39,10 @@ import {
   useAddThreadLinksMutation,
   useGetThreadPollsQuery,
 } from 'state/api/threads';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import useUserStore, {
+  useAIFeatureEnabled,
+  useUserAiSettingsStore,
+} from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
@@ -256,7 +259,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     thread?.topic?.id,
   );
 
-  const { aiCommentsToggleEnabled, selectedModels } = useLocalAISettingsStore();
+  const { isAIEnabled } = useAIFeatureEnabled();
+
+  const { aiCommentsToggleEnabled, selectedModels } = useUserAiSettingsStore();
+
+  const effectiveAiCommentsToggleEnabled =
+    isAIEnabled && aiCommentsToggleEnabled;
 
   const [streamingInstances, setStreamingInstances] = useState<
     StreamingReplyInstance[]
@@ -265,7 +273,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const handleGenerateAIComment = useCallback(
     async (mainThreadId: number): Promise<void> => {
       if (
-        !aiCommentsToggleEnabled ||
+        !effectiveAiCommentsToggleEnabled ||
         !user.activeAccount ||
         selectedModels.length === 0
       ) {
@@ -290,7 +298,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       setStreamingInstances(newInstances);
       initalAiCommentPosted.current = true;
     },
-    [aiCommentsToggleEnabled, user.activeAccount, thread, selectedModels],
+    [
+      effectiveAiCommentsToggleEnabled,
+      user.activeAccount,
+      thread,
+      selectedModels,
+    ],
   );
 
   useEffect(() => {
@@ -1107,7 +1120,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 canReply={permissions.CREATE_COMMENT.allowed}
                 fromDiscordBot={fromDiscordBot}
                 onThreadCreated={handleGenerateAIComment}
-                aiCommentsToggleEnabled={aiCommentsToggleEnabled}
+                aiCommentsToggleEnabled={!!effectiveAiCommentsToggleEnabled}
                 streamingInstances={streamingInstances}
                 setStreamingInstances={setStreamingInstances}
                 permissions={permissions}
@@ -1128,7 +1141,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <CreateComment
                 rootThread={thread}
                 canComment={permissions.CREATE_COMMENT.allowed}
-                aiCommentsToggleEnabled={aiCommentsToggleEnabled}
+                aiCommentsToggleEnabled={!!effectiveAiCommentsToggleEnabled}
                 tooltipText={permissions.CREATE_COMMENT.tooltip}
               />
             )}

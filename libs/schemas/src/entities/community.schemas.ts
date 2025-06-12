@@ -53,6 +53,7 @@ export const Community = z.object({
   has_homepage: z.enum(['true', 'false']).default('false').nullish(),
   terms: z.string().trim().or(z.literal('')).or(z.string().url()).nullish(),
   admin_only_polling: z.boolean().nullish(),
+  ai_features_enabled: z.boolean(),
   bech32_prefix: z.string().nullish(),
   hide_projects: z.boolean().nullish(),
   token_name: z.string().nullish(),

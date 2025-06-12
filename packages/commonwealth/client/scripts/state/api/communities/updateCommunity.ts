@@ -30,6 +30,7 @@ interface UpdateCommunityProps {
   chainNodeId?: string;
   type?: ChainType;
   defaultPage?: DefaultPage;
+  aiFeaturesEnabled?: boolean;
   spamTierLevel?:
     | typeof DisabledCommunitySpamTier
     | UserTierMap.NewlyVerifiedWallet
@@ -57,6 +58,7 @@ export const buildUpdateCommunityInput = ({
   chainNodeId,
   type,
   defaultPage,
+  aiFeaturesEnabled,
   spamTierLevel,
 }: UpdateCommunityProps) => {
   return {
@@ -98,6 +100,9 @@ export const buildUpdateCommunityInput = ({
     ...(typeof type !== 'undefined' && { type: type }),
     ...(typeof defaultPage !== 'undefined' && {
       default_page: defaultPage,
+    }),
+    ...(typeof aiFeaturesEnabled !== 'undefined' && {
+      ai_features_enabled: aiFeaturesEnabled,
     }),
     ...(typeof spamTierLevel !== 'undefined' && {
       spam_tier_level: spamTierLevel,
