@@ -293,20 +293,6 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         return 'thread';
       })();
 
-      console.log('x => ', {
-        questActionSubForms,
-        contentIdScope,
-        x: subForm.values.contentIdentifier &&
-          subForm.config &&
-          (doesConfigAllowContentIdField(subForm.config) ||
-            subForm.config.requires_goal_config) && {
-            content_id: buildContentIdFromIdentifier(
-              subForm.values.contentIdentifier,
-              contentIdScope,
-            ),
-          },
-      });
-
       return {
         event_name: subForm.values.action as QuestAction,
         reward_amount: parseInt(`${subForm.values.rewardAmount || 0}`, 10),
