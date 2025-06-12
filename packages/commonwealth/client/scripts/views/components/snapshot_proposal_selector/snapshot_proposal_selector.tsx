@@ -63,8 +63,8 @@ export const SnapshotProposalSelector = ({
 
   const renderItem = useCallback(
     (i: number, snapshot: SnapshotProposal) => {
-      const isSelected = !!snapshotProposalsToSet.find(
-        ({ id }) => id === snapshot.id,
+      const isSelected = !!snapshotProposalsToSet.find(({ id }) =>
+        id.includes(snapshot.id),
       );
 
       return (
