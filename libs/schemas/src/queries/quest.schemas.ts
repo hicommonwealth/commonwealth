@@ -28,6 +28,6 @@ export const GetQuests = {
     include_system_quests: z.boolean().default(false).optional(),
   }),
   output: PaginatedResultSchema.extend({
-    results: z.array(z.any()),
+    results: z.array(QuestView),
   }),
 };

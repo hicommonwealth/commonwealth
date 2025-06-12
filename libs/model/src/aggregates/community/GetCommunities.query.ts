@@ -140,23 +140,23 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
               ${iQ(
                 has_launchpad_token,
                 `
-                          AND (
+                          AND EXISTS (
                             SELECT 1
                             FROM   "LaunchpadTokens" AS "LaunchpadTokens"
                             WHERE  ( "LaunchpadTokens"."namespace" = "Community"."namespace" )
                             LIMIT  1
-                          ) IS NOT NULL
+                          )
                         `,
               )}
               ${iQ(
                 has_pinned_token,
                 `
-                          AND (
+                          AND EXISTS (
                             SELECT 1
                             FROM   "PinnedTokens" AS "PinnedTokens"
                             WHERE  ( "PinnedTokens"."community_id" = "Community"."id" )
                             LIMIT  1
-                          ) IS NOT NULL
+                          )
                         `,
               )}
               ${iQ(
