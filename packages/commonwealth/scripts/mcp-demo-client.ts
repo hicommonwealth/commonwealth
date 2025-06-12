@@ -9,16 +9,20 @@ import { z } from 'zod';
 
 // run with `pnpm run start-mcp-demo-client`
 
+type Server = z.infer<typeof MCPServer> & {
+  headers?: Record<string, string>;
+};
+
 const demoHelp = `
 MCP_DEMO_CLIENT_SERVER_URL must be set to the (ngrok) URL of the MCP server, just the domain.
-MCP_DEMO_CLIENT_KEY must be set to the key of the MCP server in format <address>:<api-key>.
+MCP_KEY_BYPASS must be set to the key of the MCP server in format <address>:<api-key>.
 
 Example:
 MCP_DEMO_CLIENT_SERVER_URL=my-mcp-server.ngrok.io
-MCP_DEMO_CLIENT_KEY=0x1234567890:myApiKey
+MCP_KEY_BYPASS=0x1234567890:myApiKey
 `;
 
-const { MCP_DEMO_CLIENT_SERVER_URL, MCP_DEMO_CLIENT_KEY } = config.MCP;
+const { MCP_DEMO_CLIENT_SERVER_URL, MCP_KEY_BYPASS } = config.MCP;
 
 const client = new OpenAI({
   apiKey: config.OPENAI.API_KEY,
@@ -39,7 +43,7 @@ function getUserInput(prompt: string): Promise<string> {
 // Function to display server selection menu using inquirer
 async function selectServers(
   availableServers: z.infer<typeof MCPServer>[],
-): Promise<z.infer<typeof MCPServer>[]> {
+): Promise<Server[]> {
   console.clear();
   console.log('🤖 Commonwealth AI Chatbot - Server Selection\n');
   const { selectedServers } = await inquirer.prompt([
@@ -69,17 +73,20 @@ let rl: readline.Interface;
 async function startChatBot() {
   await delay(1000);
 
-  const availableServers: z.infer<typeof MCPServer>[] = [];
+  const availableServers: Server[] = [];
 
   // add local MCP server if env vars are set
-  if (MCP_DEMO_CLIENT_SERVER_URL && MCP_DEMO_CLIENT_KEY) {
+  if (MCP_DEMO_CLIENT_SERVER_URL && MCP_KEY_BYPASS) {
     availableServers.push({
       id: 0,
       name: 'Local MCP Server',
       description: 'Local MCP Server',
       source: 'local',
       server_url: `https://${MCP_DEMO_CLIENT_SERVER_URL}/mcp`,
-      handle: MCP_DEMO_CLIENT_KEY,
+      handle: 'local',
+      headers: {
+        Authorization: `Bearer ${MCP_KEY_BYPASS}`,
+      },
     });
   }
 
@@ -117,8 +124,6 @@ async function startChatBot() {
 
       console.log('\n\n🤔 Thinking...\n\n');
 
-      console.log(JSON.stringify(selectedServers, null, 2));
-
       const resp = await client.responses.create({
         model: 'gpt-4o-mini',
         tools: selectedServers.map((server) => ({
@@ -126,12 +131,7 @@ async function startChatBot() {
           server_label: server.handle!,
           server_url: server.server_url!,
           require_approval: 'never',
-          headers:
-            server.id === 0
-              ? {
-                  Authorization: `Bearer ${server.handle || MCP_DEMO_CLIENT_KEY}`,
-                }
-              : undefined,
+          headers: server.headers,
         })),
         input: userInput,
         previous_response_id: previousResponseId,

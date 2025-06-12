@@ -1,4 +1,5 @@
 import { logger, User } from '@hicommonwealth/core';
+import { config } from '@hicommonwealth/model';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
@@ -58,14 +59,19 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
         const res = {} as Response;
 
         // execute api key middleware
-        let err: Error | null = null;
-        await apiKeyAuthMiddleware(req, res, (error?: unknown) => {
-          if (error) {
-            err = error as Error;
+        const shouldBypass =
+          config.MCP.MCP_KEY_BYPASS &&
+          req.headers['authorization'] === config.MCP.MCP_KEY_BYPASS;
+        if (!shouldBypass) {
+          let err: Error | null = null;
+          await apiKeyAuthMiddleware(req, res, (error?: unknown) => {
+            if (error) {
+              err = error as Error;
+            }
+          });
+          if (err) {
+            throw err;
           }
-        });
-        if (err) {
-          throw err;
         }
 
         // trigger trcp procedure pipeline
