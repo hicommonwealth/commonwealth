@@ -21,16 +21,6 @@ export default defineConfig(({ mode }) => {
   const envPath = path.dirname(path.dirname(process.cwd())); // root project .env
   const env = loadEnv(mode, envPath, '');
 
-  const unleashConfig = {
-    'process.env.UNLEASH_FRONTEND_SERVER_URL': JSON.stringify(
-      env.UNLEASH_FRONTEND_SERVER_URL,
-    ),
-    'process.env.UNLEASH_FRONTEND_API_TOKEN': JSON.stringify(
-      env.UNLEASH_FRONTEND_API_TOKEN,
-    ),
-    'process.env.HEROKU_APP_NAME': JSON.stringify(env.HEROKU_APP_NAME),
-  };
-
   // WARN: only used locally never in remote (Heroku) apps
   const featureFlags = {
     'process.env.FLAG_MOBILE_DOWNLOAD': JSON.stringify(
@@ -71,15 +61,6 @@ export default defineConfig(({ mode }) => {
 
   const config = {
     'process.version': JSON.stringify(''), // necessary to avoid readable-stream error
-    'process.env.APP_ENV': JSON.stringify(env.APP_ENV),
-    'process.env.NODE_ENV': JSON.stringify('development'),
-    'process.env.SERVER_URL': JSON.stringify(env.SERVER_URL),
-    'process.env.KNOCK_PUBLIC_API_KEY': JSON.stringify(
-      env.KNOCK_PUBLIC_API_KEY,
-    ),
-    'process.env.KNOCK_IN_APP_FEED_ID': JSON.stringify(
-      env.KNOCK_IN_APP_FEED_ID,
-    ),
     // FARCASTER_NGROK_DOMAIN should only be setup on local development
     'process.env.FARCASTER_NGROK_DOMAIN': JSON.stringify(
       env.FARCASTER_NGROK_DOMAIN,
@@ -87,44 +68,12 @@ export default defineConfig(({ mode }) => {
     'process.env.CONTEST_DURATION_IN_SEC': JSON.stringify(
       env.CONTEST_DURATION_IN_SEC,
     ),
-    'process.env.MIXPANEL_DEV_TOKEN':
-      JSON.stringify(env.MIXPANEL_DEV_TOKEN) ||
-      JSON.stringify('312b6c5fadb9a88d98dc1fb38de5d900'),
-    'process.env.MIXPANEL_PROD_TOKEN': JSON.stringify(env.MIXPANEL_PROD_TOKEN),
-    'process.env.MAGIC_PUBLISHABLE_KEY':
-      JSON.stringify(env.MAGIC_PUBLISHABLE_KEY) ||
-      JSON.stringify('pk_live_EF89AABAFB87D6F4'),
-    'process.env.DISCORD_CLIENT_ID':
-      JSON.stringify(env.DISCORD_CLIENT_ID) ||
-      JSON.stringify('1027997517964644453'),
-    'process.env.SNAPSHOT_HUB_URL': JSON.stringify(env.SNAPSHOT_HUB_URL),
-    'process.env.COSMOS_REGISTRY_API': JSON.stringify(env.COSMOS_REGISTRY_API),
     'process.env.ETH_RPC': JSON.stringify(env.ETH_RPC),
     'process.env.ALCHEMY_PUBLIC_APP_KEY':
       (env.ETH_RPC || '').trim() === 'e2e-test' &&
       (env.NODE_ENV || '').trim() === 'test'
         ? JSON.stringify(env.ALCHEMY_PUBLIC_APP_KEY)
         : undefined,
-    'process.env.PRIVY_APP_ID': JSON.stringify(env.PRIVY_APP_ID),
-    'process.env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY': JSON.stringify(
-      env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY,
-    ),
-    'process.env.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY': JSON.stringify(
-      env.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY,
-    ),
-    'process.env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY': JSON.stringify(
-      env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY,
-    ),
-    'process.env.LAUNCHPAD_CHAIN_ID':
-      JSON.stringify(env.LAUNCHPAD_CHAIN_ID) || JSON.stringify('8543'),
-    'process.env.LAUNCHPAD_CONNECTOR_WEIGHT':
-      JSON.stringify(env.LAUNCHPAD_CONNECTOR_WEIGHT) ||
-      JSON.stringify('830000'),
-    'process.env.LAUNCHPAD_INITIAL_PRICE':
-      JSON.stringify(env.LAUNCHPAD_INITIAL_PRICE) ||
-      JSON.stringify('416700000'),
-    'process.env.ENABLED_TRPC_BATCHING':
-      JSON.stringify(env.ENABLED_TRPC_BATCHING) || JSON.stringify('true'),
     'process.env.TEST_EVM_PROVIDER_URL': JSON.stringify(
       env.PROVIDER_URL || 'http://127.0.0.1:8545',
     ),
@@ -268,9 +217,8 @@ export default defineConfig(({ mode }) => {
     },
     // Vite built env var are disabled in all remote apps (only enabled in local/CI environments)
     define: !['local', 'CI'].includes((env.APP_ENV ?? '')!.trim())
-      ? { ...unleashConfig, ...config }
+      ? { ...config }
       : {
-          ...unleashConfig,
           ...config,
           ...featureFlags,
         },

@@ -17,6 +17,9 @@ const {
   NO_SSL,
   PRIVATE_KEY,
   LAUNCHPAD_PRIVATE_KEY,
+  LAUNCHPAD_CHAIN_ID,
+  LAUNCHPAD_CONNECTOR_WEIGHT,
+  LAUNCHPAD_INITIAL_PRICE,
   TBC_BALANCE_TTL_SECONDS,
   BLACKLISTED_EVENTS,
   MAX_USER_POSTS_PER_CONTEST,
@@ -82,6 +85,10 @@ const {
   MCP_DEMO_CLIENT_SERVER_URL,
   MCP_DEMO_CLIENT_KEY,
   EVM_CHAINS_WHITELIST,
+  KNOCK_PUBLIC_API_KEY,
+  KNOCK_IN_APP_FEED_ID,
+  UNLEASH_FRONTEND_API_TOKEN,
+  MIXPANEL_TOKEN,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -115,6 +122,15 @@ export const config = configure(
       LAUNCHPAD_PRIVATE_KEY: LAUNCHPAD_PRIVATE_KEY || '',
       CONTEST_BOT_PRIVATE_KEY: CONTEST_BOT_PRIVATE_KEY || '',
       EVM_CHAINS_WHITELIST: EVM_CHAINS_WHITELIST || '',
+      LAUNCHPAD_CHAIN_ID: LAUNCHPAD_CHAIN_ID
+        ? parseInt(LAUNCHPAD_CHAIN_ID)
+        : 8543,
+      LAUNCHPAD_CONNECTOR_WEIGHT: LAUNCHPAD_CONNECTOR_WEIGHT
+        ? parseInt(LAUNCHPAD_CONNECTOR_WEIGHT)
+        : 830000,
+      LAUNCHPAD_INITIAL_PRICE: LAUNCHPAD_INITIAL_PRICE
+        ? parseInt(LAUNCHPAD_INITIAL_PRICE)
+        : 416700000,
     },
     TBC: {
       TTL_SECS: TBC_BALANCE_TTL_SECONDS
@@ -195,7 +211,7 @@ export const config = configure(
       10,
     ),
     DISCORD: {
-      CLIENT_ID: DISCORD_CLIENT_ID,
+      CLIENT_ID: DISCORD_CLIENT_ID || '1027997517964644453',
       BOT_TOKEN: DISCORD_TOKEN,
     },
     OPENAI: {
@@ -226,6 +242,9 @@ export const config = configure(
     IMAGE_GENERATION: {
       FLAG_USE_RUNWARE: FLAG_USE_RUNWARE === 'true' || false,
       RUNWARE_API_KEY: RUNWARE_API_KEY,
+    },
+    ANALYTICS: {
+      MIXPANEL_TOKEN: MIXPANEL_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
     },
     CLOUDFLARE: {
       TURNSTILE: {
@@ -278,6 +297,13 @@ export const config = configure(
     MCP: {
       MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
       MCP_DEMO_CLIENT_KEY: MCP_DEMO_CLIENT_KEY,
+    },
+    NOTIFICATIONS: {
+      KNOCK_PUBLIC_API_KEY,
+      KNOCK_IN_APP_FEED_ID,
+    },
+    UNLEASH: {
+      FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
     },
   },
   z.object({
@@ -334,6 +360,27 @@ export const config = configure(
         .refine(
           (data) => !(target.APP_ENV === 'production' && data),
           'EVM_CHAINS_WHITELIST cannot be set in production.',
+        ),
+      LAUNCHPAD_CHAIN_ID: z
+        .number()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'LAUNCHPAD_CHAIN_ID must be set in production',
+        ),
+      LAUNCHPAD_CONNECTOR_WEIGHT: z
+        .number()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'LAUNCHPAD_CONNECTOR_WEIGHT must be set in production',
+        ),
+      LAUNCHPAD_INITIAL_PRICE: z
+        .number()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'LAUNCHPAD_INITIAL_PRICE must be set in production',
         ),
     }),
     TBC: z.object({
@@ -466,18 +513,7 @@ export const config = configure(
     MEMBERSHIP_REFRESH_BATCH_SIZE: z.number().int().positive(),
     MEMBERSHIP_REFRESH_TTL_SECONDS: z.number().int().positive(),
     DISCORD: z.object({
-      CLIENT_ID: z
-        .string()
-        .optional()
-        .refine(
-          (data) =>
-            !(
-              ['production', 'frick', 'beta', 'demo'].includes(
-                target.APP_ENV,
-              ) && !data
-            ),
-          'DISCORD_CLIENT_ID is required in production, frick, beta (QA), and demo',
-        ),
+      CLIENT_ID: z.string(),
       BOT_TOKEN: z
         .string()
         .optional()
@@ -592,6 +628,29 @@ export const config = configure(
     MCP: z.object({
       MCP_DEMO_CLIENT_SERVER_URL: z.string().optional(),
       MCP_DEMO_CLIENT_KEY: z.string().optional(),
+    }),
+    NOTIFICATIONS: z
+      .object({
+        KNOCK_PUBLIC_API_KEY: z.string().optional(),
+        KNOCK_IN_APP_FEED_ID: z.string().optional(),
+      })
+      .refine(
+        (data) =>
+          !(
+            (!data.KNOCK_PUBLIC_API_KEY || !data.KNOCK_IN_APP_FEED_ID) &&
+            target.APP_ENV === 'production'
+          ),
+      ),
+    UNLEASH: z.object({
+      FRONTEND_API_TOKEN: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(!['local', 'CI'].includes(target.APP_ENV) && !data),
+        ),
+    }),
+    ANALYTICS: z.object({
+      MIXPANEL_TOKEN: z.string(),
     }),
   }),
 );
