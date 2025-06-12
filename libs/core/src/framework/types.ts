@@ -1,5 +1,5 @@
 import { Events, events } from '@hicommonwealth/schemas';
-import z, { ZodSchema, ZodUndefined } from 'zod';
+import z, { ZodType, ZodUndefined } from 'zod';
 
 /**
  * Error names as constants
@@ -13,7 +13,7 @@ export const ExternalServiceUserIds = {
   K6: -2,
 } as const;
 
-export type AuthStrategies<Input extends ZodSchema> =
+export type AuthStrategies<Input extends ZodType> =
   | {
       type: 'jwt' | 'authtoken';
       userId?: (typeof ExternalServiceUserIds)[keyof typeof ExternalServiceUserIds];
@@ -108,7 +108,7 @@ export class InvalidState extends Error {
  * - `payload`: validated command payload
  * - `auth`: authorization context
  */
-export type Context<Input extends ZodSchema, _Context extends ZodSchema> = {
+export type Context<Input extends ZodType, _Context extends ZodType> = {
   readonly actor: Actor;
   readonly payload: z.infer<Input>;
   readonly context?: z.infer<_Context>;
@@ -131,9 +131,9 @@ export type EventContext<Name extends Events> = {
  * @throws {@link InvalidActor} when unauthorized
  */
 export type BodyHandler<
-  Input extends ZodSchema,
-  Output extends ZodSchema,
-  _Context extends ZodSchema,
+  Input extends ZodType,
+  Output extends ZodType,
+  _Context extends ZodType,
 > = (context: Context<Input, _Context>) => Promise<z.infer<Output>>;
 
 /**
@@ -141,7 +141,7 @@ export type BodyHandler<
  * @param context execution context
  * @throws {@link InvalidActor} when unauthorized
  */
-export type AuthHandler<Input extends ZodSchema, _Context extends ZodSchema> = (
+export type AuthHandler<Input extends ZodType, _Context extends ZodType> = (
   context: Context<Input, _Context>,
 ) => Promise<void>;
 
@@ -152,7 +152,7 @@ export type AuthHandler<Input extends ZodSchema, _Context extends ZodSchema> = (
  */
 export type EventHandler<
   Name extends Events,
-  Output extends ZodSchema | ZodUndefined,
+  Output extends ZodType | ZodUndefined,
 > = (context: EventContext<Name>) => Promise<Partial<z.infer<Output>> | void>;
 
 /**
@@ -164,9 +164,9 @@ export type EventHandler<
  * - `secure`: true when user requires authentication
  */
 export type Metadata<
-  Input extends ZodSchema,
-  Output extends ZodSchema,
-  _Context extends ZodSchema,
+  Input extends ZodType,
+  Output extends ZodType,
+  _Context extends ZodType,
 > = {
   readonly input: Input;
   readonly output: Output;
@@ -192,7 +192,7 @@ export type EventSchemas = {
  */
 export type EventsHandlerMetadata<
   Inputs extends EventSchemas,
-  Output extends ZodSchema | ZodUndefined = ZodUndefined,
+  Output extends ZodType | ZodUndefined = ZodUndefined,
 > = {
   readonly inputs: Inputs;
   readonly output?: Output;
@@ -203,9 +203,9 @@ export type EventsHandlerMetadata<
 
 // =========== PUBLIC ARTIFACT FACTORY INTERFACE ===========
 export type Schemas<
-  Input extends ZodSchema,
-  Output extends ZodSchema,
-  _Context extends ZodSchema,
+  Input extends ZodType,
+  Output extends ZodType,
+  _Context extends ZodType,
 > = {
   input: Input;
   output: Output;
@@ -233,7 +233,7 @@ export type Query<Schema> =
  */
 export type Policy<
   Inputs,
-  Output extends ZodSchema | ZodUndefined = ZodUndefined,
+  Output extends ZodType | ZodUndefined = ZodUndefined,
 > = Inputs extends EventSchemas ? EventsHandlerMetadata<Inputs, Output> : never;
 
 /**
@@ -241,5 +241,5 @@ export type Policy<
  */
 export type Projection<
   Inputs,
-  Output extends ZodSchema | ZodUndefined = ZodUndefined,
+  Output extends ZodType | ZodUndefined = ZodUndefined,
 > = Inputs extends EventSchemas ? EventsHandlerMetadata<Inputs, Output> : never;
