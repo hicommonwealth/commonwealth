@@ -40,8 +40,8 @@ import { AuthOptions, AuthOptionTypes } from 'views/modals/AuthModal/types';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
-import QuestCard from '../Communities/QuestList/QuestCard';
 import { buildRedirectURLFromContentId } from '../CreateQuest/QuestForm/helpers';
+import QuestCard from '../ExplorePage/QuestList/QuestCard';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 import TotalQuestXPTag from './TotalQuestXPTag';
@@ -73,9 +73,9 @@ const QuestDetails = ({ id }: { id: number }) => {
     specificAuthOption: undefined,
   });
 
-  const { mutateAsync: deleteQuest, isLoading: isDeletingQuest } =
+  const { mutateAsync: deleteQuest, isPending: isDeletingQuest } =
     useDeleteQuestMutation();
-  const { mutateAsync: cancelQuest, isLoading: isCancelingQuest } =
+  const { mutateAsync: cancelQuest, isPending: isCancelingQuest } =
     useCancelQuestMutation();
 
   const isPendingAction = isDeletingQuest || isCancelingQuest;
@@ -300,7 +300,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         }
         break;
       }
-      case 'LaunchpadTokenCreated': {
+      case 'LaunchpadTokenRecordCreated': {
         navigate(`/createTokenCommunity`, {}, null);
         break;
       }
@@ -310,6 +310,27 @@ const QuestDetails = ({ id }: { id: number }) => {
           return;
         }
         navigate(`/explore?tab=tokens`);
+        break;
+      }
+      case 'CommunityGoalReached': {
+        if (quest.community_id) {
+          navigate(`/${quest.community_id}/discussions`, {}, null);
+          return;
+        }
+        navigate(`/explore?tab=communities`);
+        break;
+      }
+      case 'RecurringContestManagerDeployed': {
+        if (quest.community_id) {
+          navigate(
+            `/${quest.community_id}/contests/launch`,
+            {},
+            quest.community_id || null,
+          );
+        } else {
+          // If no community context, navigate to community selection for contest creation
+          navigate('/explore?tab=communities', {}, null);
+        }
         break;
       }
       case 'ContestEnded': {

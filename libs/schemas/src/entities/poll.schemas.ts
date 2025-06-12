@@ -8,8 +8,10 @@ const _vote = z.object({
   poll_id: z.number(),
   option: z.string(),
   address: z.string(),
+  user_id: PG_INT.nullish(),
   author_community_id: z.string(),
   community_id: z.string(),
+  calculated_voting_weight: z.string().nullish(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });
@@ -19,15 +21,15 @@ export const Poll = z.object({
   community_id: z.string(),
   thread_id: z.number(),
   prompt: z.string(),
-  options: z.string(),
-  ends_at: z.coerce.date(),
+  options: z.array(z.string()),
+  ends_at: z.coerce.date().nullish(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 
   // associations
   Thread: Thread.optional(),
   Community: Community.optional(),
-  votes: _vote.optional(),
+  votes: _vote.array().optional(),
 });
 
 export const Vote = _vote.extend({

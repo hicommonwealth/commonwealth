@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ReactionContext, ThreadContext, TopicContext } from '../context';
-import { COMMUNITY_TIER, Reaction, Thread } from '../entities';
+import { COMMUNITY_TIER, Link, Reaction, Thread } from '../entities';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 
 export const CanvasThread = z.object({
@@ -66,7 +66,10 @@ export const ThreadCanvasReaction = z.object({
 
 export const CreateThreadReaction = {
   input: ThreadCanvasReaction,
-  output: Reaction.extend({ community_id: z.string(), thread_id: PG_INT }),
+  output: Reaction.extend({
+    community_id: z.string(),
+    thread_id: PG_INT,
+  }),
   context: ThreadContext,
 };
 
@@ -94,4 +97,24 @@ export const DeleteReaction = {
   }),
   output: Reaction,
   context: ReactionContext,
+};
+
+export const AddLinks = {
+  input: z.object({
+    thread_id: PG_INT,
+    links: z.array(Link),
+  }),
+  output: Thread.extend({
+    new_links: z.array(Link),
+  }),
+  context: ThreadContext,
+};
+
+export const DeleteLinks = {
+  input: z.object({
+    thread_id: PG_INT,
+    links: z.array(Link),
+  }),
+  output: Thread,
+  context: ThreadContext,
 };

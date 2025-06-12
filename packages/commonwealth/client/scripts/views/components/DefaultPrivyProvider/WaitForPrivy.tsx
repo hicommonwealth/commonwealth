@@ -1,6 +1,6 @@
 import { usePrivy } from '@privy-io/react-auth';
 import React, { memo } from 'react';
-import { PageLoading } from 'views/pages/loading';
+import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import './WaitForPrivy.scss';
 
 type WaitForPrivyProps = {
@@ -17,7 +17,7 @@ export const WaitForPrivy = memo(function WaitForPrivy(
   if (!ready) {
     return (
       <div className="WaitForPrivy">
-        <PageLoading />;
+        <LoadingIndicator />;
       </div>
     );
   }

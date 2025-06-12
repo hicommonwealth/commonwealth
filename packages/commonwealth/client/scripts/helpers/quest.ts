@@ -1,5 +1,5 @@
 import {
-  QuestActionMeta,
+  QuestActionView,
   QuestParticipationLimit,
   QuestParticipationPeriod,
   XpLogView,
@@ -9,7 +9,7 @@ import { trpc } from 'utils/trpcClient';
 import { z } from 'zod';
 import { QuestAction as QuestActionType } from '../views/pages/CreateQuest/QuestForm/QuestActionSubForm/types';
 
-export type QuestAction = z.infer<typeof QuestActionMeta>;
+export type QuestAction = z.infer<typeof QuestActionView>;
 export type XPLog = z.infer<typeof XpLogView>;
 
 export const doesActionRequireRewardShare = (action: QuestActionType) => {
@@ -38,7 +38,8 @@ export const doesActionAllowContentId = (action: QuestActionType) => {
     action === 'CommunityCreated' ||
     action === 'DiscordServerJoined' ||
     action === 'MembershipsRefreshed' ||
-    action === 'LaunchpadTokenTraded'
+    action === 'LaunchpadTokenTraded' ||
+    action === 'CommunityGoalReached'
   );
 };
 
@@ -94,6 +95,10 @@ export const doesActionRequireAmountMultipler = (action: QuestActionType) => {
   return action === 'LaunchpadTokenTraded';
 };
 
+export const doesActionRequireGoalConfig = (action: QuestActionType) => {
+  return action === 'CommunityGoalReached';
+};
+
 export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
   const commonQuests: QuestActionType[] = [
     'CommunityCreated',
@@ -106,8 +111,9 @@ export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
     'SSOLinked',
     'DiscordServerJoined',
     'MembershipsRefreshed',
-    'LaunchpadTokenCreated',
     'ContestEnded',
+    'LaunchpadTokenRecordCreated',
+    'CommunityGoalReached',
   ];
   const channelQuest: QuestActionType[] = [
     'TweetEngagement',

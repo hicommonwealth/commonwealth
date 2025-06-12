@@ -4,15 +4,22 @@ const path = require('path');
  * Needed for the diff plugin. Note that if you change this variable you MUST
  * invalidate the eslint cache.
  *
- * Now that this has to run over a BRANCH not a tag!
- *
- * To create a branch just run:
- *
- * git checkout -b my_branch {checksum_id}
- * git push origin my_branch
- *
+ * Note that this has to run over a BRANCH not a tag!
  */
-process.env.ESLINT_PLUGIN_DIFF_COMMIT = 'origin/MASTER_CIRCA_2024_04_09';
+// Check if running in GitHub Actions
+if (process.env.GITHUB_ACTIONS === 'true') {
+  // In GitHub Actions, use the PR's base branch
+  // This value will be set by the GitHub Actions workflow
+  // Don't override it if already set
+  if (!process.env.ESLINT_PLUGIN_DIFF_COMMIT) {
+    console.warn(
+      'ESLINT_PLUGIN_DIFF_COMMIT not set in GitHub Actions environment',
+    );
+  }
+} else {
+  // For local development, compare with master branch
+  process.env.ESLINT_PLUGIN_DIFF_COMMIT = 'origin/master';
+}
 
 const ENABLE_ESLINT_DIFF_PLUGIN =
   process.env.ENABLE_ESLINT_DIFF_PLUGIN || 'true';
@@ -21,12 +28,27 @@ module.exports = {
   settings: {
     react: {
       version: 'detect',
+      defaultVersion: '18.3.1',
     },
   },
   plugins: ['@tanstack/query'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: `./tsconfig.json`,
+    project: [
+      './tsconfig.json',
+      './libs/tsconfig.json',
+      './libs/evm-protocols/tsconfig.json',
+      './libs/core/tsconfig.json',
+      './libs/adapters/tsconfig.json',
+      './libs/evm-testing/tsconfig.json',
+      './libs/model/tsconfig.json',
+      './libs/schemas/tsconfig.json',
+      './libs/shared/tsconfig.json',
+      './libs/sitemaps/tsconfig.json',
+      './packages/tsconfig.json',
+      './packages/commonwealth/tsconfig.json',
+      './packages/load-testing/tsconfig.json',
+    ],
     suppressDeprecatedPropertyWarnings: true,
   },
   rules: {
@@ -102,8 +124,6 @@ module.exports = {
       },
     ],
     '@tanstack/query/exhaustive-deps': 'error',
-    '@tanstack/query/prefer-query-object-syntax': 'error',
-    '@tanstack/query/no-deprecated-options': 1,
     'react/destructuring-assignment': [1, 'always'],
     'react/function-component-definition': [
       1,
@@ -155,6 +175,7 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
+    'prettier',
     ENABLE_ESLINT_DIFF_PLUGIN !== 'false' ? 'plugin:diff/diff' : null,
   ].filter((current) => current !== null),
 };

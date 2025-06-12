@@ -8,19 +8,26 @@ import {
   useGetCommunityByIdQuery,
   useUpdateRoleMutation,
 } from 'client/scripts/state/api/communities';
+import useNominateJudgesMutation from 'client/scripts/state/api/contests/nominateJudges';
 import useMintAdminTokenMutation from 'client/scripts/state/api/members/mintAdminRoleonChain';
 import useUserStore from 'client/scripts/state/ui/user';
-import { getChainIcon } from 'client/scripts/utils/chainUtils';
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
-import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
-import { CWRadioButton } from 'client/scripts/views/components/component_kit/new_designs/cw_radio_button';
-import React, { useState } from 'react';
+import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList/CWSelectList';
+import {
+  CWTab,
+  CWTabsRow,
+} from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
+import useCommunityContests from 'client/scripts/views/pages/CommunityManagement/Contests/useCommunityContests';
+import { useFlag } from 'hooks/useFlag';
+import React, { useMemo, useState } from 'react';
 import app from 'state';
+import { AddressItem, CheckboxOption, RadioOption } from './AddressItem';
 import './ManageOnchainModal.scss';
 import { AddressInfo } from './MembersSection';
 
@@ -28,42 +35,112 @@ type ManageOnchainModalProps = {
   onClose: () => void;
   Addresses: AddressInfo[] | undefined;
   refetch?: () => void;
-  namespace: string;
-  chainRpc: string;
-  ethChainId: number;
   chainId: string;
-  communityNamespace: boolean;
+  communityNamespace?: boolean;
+  forceJudgeTab?: boolean;
+  contestAddress?: string;
+};
+
+type ContestOption = {
+  label: string;
+  value: string;
 };
 
 export const ManageOnchainModal = ({
   onClose,
   Addresses,
   refetch,
-  namespace,
-  chainRpc,
-  ethChainId,
   chainId,
   communityNamespace,
+  forceJudgeTab = false,
+  contestAddress,
 }: ManageOnchainModalProps) => {
+  const judgeContestEnabled = useFlag('judgeContest');
+
   const [userRole, setUserRole] = useState(Addresses);
+  const [judgeRoles, setJudgeRoles] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
+
+  const { contestsData, isContestDataLoading } = useCommunityContests({
+    shouldPolling: false,
+    fetchAll: false,
+  });
+
+  const contestOptions = useMemo<ContestOption[]>(() => {
+    const allOptions: ContestOption[] = [];
+    if (contestsData?.active && contestsData.active.length > 0) {
+      contestsData.active.forEach((contest) => {
+        if (contest.contests && contest.namespace_judge_token_id) {
+          contest.contests.forEach(() => {
+            allOptions.push({
+              label: contest.name || '',
+              value: contest.contest_address || '',
+            });
+          });
+        }
+      });
+    }
+    return allOptions;
+  }, [contestsData]);
+
+  const initialSelectedContest = useMemo(() => {
+    if (contestAddress && contestOptions.length > 0) {
+      const found = contestOptions.find((c) => c.value === contestAddress);
+      if (found) return found;
+    }
+    return null;
+  }, [contestAddress, contestOptions]);
+
+  const initialActiveTab = forceJudgeTab ? 'judgedContest' : 'adminId';
+
+  const [activeTab, setActiveTab] = useState(initialActiveTab);
+  const [selectedContest, setSelectedContest] = useState<ContestOption | null>(
+    initialSelectedContest,
+  );
+
   const { mutateAsync: updateRole } = useUpdateRoleMutation();
+  const { mutateAsync: nominateJudges } = useNominateJudgesMutation();
 
   const userData = useUserStore();
   const mintAdminTokenMutation = useMintAdminTokenMutation();
 
-  // Get community data to determine chain base
   const { data: community } = useGetCommunityByIdQuery({
     id: chainId,
     enabled: !!chainId,
+    includeNodeInfo: true,
   });
+
+  const selectedContestData = useMemo(() => {
+    if (!selectedContest?.value || !contestsData?.active) return null;
+
+    return contestsData.active.find(
+      (contest) => contest.contest_address === selectedContest.value,
+    );
+  }, [selectedContest, contestsData]);
+
+  const hasActiveContests = contestOptions.length > 0;
+
+  const hasRoleChanges = useMemo(() => {
+    if (!userRole || !Addresses) return false;
+
+    return userRole.some((user, index) => user.role !== Addresses[index]?.role);
+  }, [userRole, Addresses]);
+
+  const hasJudgeChanges = useMemo(() => {
+    if (!selectedContestData || Object.keys(judgeRoles).length === 0)
+      return false;
+
+    return Object.entries(judgeRoles).some(([address, isJudge]) => {
+      const isAlreadyJudge =
+        selectedContestData.namespace_judges?.includes(address) || false;
+      return isJudge !== isAlreadyJudge;
+    });
+  }, [judgeRoles, selectedContestData]);
 
   const handleRoleChange = (id: number, newRole: string) => {
     setUserRole((prevData) =>
       (prevData || []).map((user) => {
         if (user.id === id && user.role !== newRole) {
-          setHasChanges(true);
           return { ...user, role: newRole };
         }
         return user;
@@ -71,8 +148,16 @@ export const ManageOnchainModal = ({
     );
   };
 
+  const handleJudgeRoleChange = (id: number, address: string) => {
+    setJudgeRoles((prev) => {
+      const isCurrentlyChecked = prev[address];
+      const newState = { ...prev, [address]: !isCurrentlyChecked };
+      return newState;
+    });
+  };
+
   const updateRolesOnServer = async () => {
-    if (!hasChanges) return;
+    if (!hasRoleChanges) return;
     try {
       setLoading(true);
       if (!userRole || !Addresses) return;
@@ -89,7 +174,8 @@ export const ManageOnchainModal = ({
           }),
         ),
       );
-      if (refetch) refetch();
+
+      refetch?.();
     } catch (error) {
       console.error('Error upgrading members:', error);
       notifyError(error?.response?.data?.error || error.message);
@@ -116,11 +202,11 @@ export const ManageOnchainModal = ({
         await Promise.all(
           adminUpdates.map(async (update) => {
             await mintAdminTokenMutation.mutateAsync({
-              namespace,
+              namespace: community?.namespace || '',
               walletAddress,
               adminAddress: update.address,
-              chainRpc,
-              ethChainId,
+              chainRpc: community?.ChainNode?.url || '',
+              ethChainId: community?.ChainNode?.eth_chain_id || 0,
               chainId,
             });
             notifySuccess(
@@ -140,11 +226,126 @@ export const ManageOnchainModal = ({
     try {
       if (communityNamespace) await mintPermission();
       await updateRolesOnServer();
+
+      // Here you would add logic to update judges for the selected contest
+      if (selectedContest && Object.keys(judgeRoles).length > 0) {
+        // API call to update judges would go here
+        console.log('Updating judges:', judgeRoles);
+      }
     } catch (err) {
       console.error(err);
       notifyError('Minting failed, permissions were not updated.');
     } finally {
       onClose();
+    }
+  };
+
+  const handleNominateJudge = async () => {
+    try {
+      setLoading(true);
+
+      if (!selectedContest || !selectedContestData) {
+        throw new Error('No contest selected');
+      }
+
+      const walletAddress = userData.activeAccount?.address;
+      if (!walletAddress) {
+        throw new Error('Wallet Address Not Found');
+      }
+
+      const judgeTokenId = selectedContestData.namespace_judge_token_id;
+      if (!judgeTokenId) {
+        throw new Error('Judge token ID not found for this contest');
+      }
+
+      const selectedJudges = Object.entries(judgeRoles)
+        .filter(([address, isSelected]) => {
+          const isAlreadyJudge =
+            selectedContestData.namespace_judges?.includes(address) || false;
+          return isSelected && !isAlreadyJudge;
+        })
+        .map(([address]) => address);
+
+      if (selectedJudges.length === 0) {
+        throw new Error('No new judges selected');
+      }
+
+      await nominateJudges({
+        namespace: community?.namespace || '',
+        judges: selectedJudges,
+        judgeId: judgeTokenId,
+        walletAddress,
+        ethChainId: community?.ChainNode?.eth_chain_id || 0,
+        chainRpc: community?.ChainNode?.url || '',
+      });
+
+      notifySuccess('Judges nominated successfully');
+
+      refetch?.();
+    } catch (err) {
+      console.error(err);
+      notifyError(err.message || 'Failed to nominate judges');
+    } finally {
+      setLoading(false);
+      onClose();
+    }
+  };
+
+  const handleContestSelect = (option: ContestOption) => {
+    setSelectedContest(option);
+  };
+
+  const getRadioOptions = (address: AddressInfo): RadioOption[] => {
+    return [
+      { label: 'Admin', value: 'admin', checked: address.role === 'admin' },
+      { label: 'Member', value: 'member', checked: address.role === 'member' },
+    ];
+  };
+
+  const getJudgeCheckboxOptions = (address: AddressInfo): CheckboxOption[] => {
+    const isAlreadyJudge = !!selectedContestData?.namespace_judges?.includes(
+      address.address,
+    );
+
+    return [
+      {
+        label: isAlreadyJudge ? 'Active Judge' : 'Judge',
+        value: 'judge',
+        checked: isAlreadyJudge || !!judgeRoles[address.address],
+        disabled: isAlreadyJudge,
+      },
+    ];
+  };
+
+  const renderFooterButtons = () => {
+    if (activeTab === 'adminId') {
+      return (
+        <>
+          <CWButton label="Close" onClick={onClose} buttonHeight="sm" />
+          <CWButton
+            label={communityNamespace ? 'Confirm & Mint' : 'Confirm'}
+            buttonType="secondary"
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onClick={handleUpdate}
+            buttonHeight="sm"
+            disabled={loading || !hasRoleChanges}
+          />
+        </>
+      );
+    } else if (activeTab === 'judgedContest') {
+      return (
+        <>
+          <CWButton label="Close" onClick={onClose} buttonHeight="sm" />
+          <CWButton
+            label="Nominate Judge"
+            buttonType="secondary"
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onClick={handleNominateJudge}
+            buttonHeight="sm"
+            disabled={loading || !hasJudgeChanges || !selectedContest}
+          />
+        </>
+      );
     }
   };
 
@@ -156,47 +357,76 @@ export const ManageOnchainModal = ({
         onModalClose={onClose}
       />
       <CWModalBody>
-        <div className="address-list">
-          {userRole?.map((address) => (
-            <div key={address.id} className="address-item">
-              <div className="address-info">
-                <CWTag
-                  label={formatAddressShort(address.address)}
-                  type="address"
-                  iconName={getChainIcon(address, community?.base)}
+        <CWTabsRow>
+          <CWTab
+            label="Admin ID"
+            isSelected={activeTab === 'adminId'}
+            onClick={() => setActiveTab('adminId')}
+            isDisabled={forceJudgeTab}
+          />
+          {judgeContestEnabled && (
+            <CWTab
+              label="Judged Contest"
+              isSelected={activeTab === 'judgedContest'}
+              onClick={() => setActiveTab('judgedContest')}
+            />
+          )}
+        </CWTabsRow>
+
+        {activeTab === 'adminId' && (
+          <div className="address-list">
+            {userRole?.map((address) => (
+              <AddressItem
+                key={address.id}
+                address={address}
+                communityBase={community?.base}
+                radioOptions={getRadioOptions(address)}
+                onChange={handleRoleChange}
+              />
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'judgedContest' && judgeContestEnabled && (
+          <div className="judged-contest-content">
+            {isContestDataLoading ? (
+              <CWText type="b1">Loading contests...</CWText>
+            ) : hasActiveContests ? (
+              <>
+                <CWSelectList
+                  label="Select Contest to Judge"
+                  options={contestOptions}
+                  value={selectedContest}
+                  onChange={handleContestSelect}
+                  placeholder="Select a contest..."
+                  isDisabled={!!contestAddress}
                 />
-              </div>
-              <div className="role-selection">
-                <CWRadioButton
-                  label="Admin"
-                  name={`role-${address.id}`}
-                  value="admin"
-                  checked={address.role === 'admin'}
-                  onChange={() => handleRoleChange(address.id, 'admin')}
-                />
-                <CWRadioButton
-                  label="Member"
-                  name={`role-${address.id}`}
-                  value="member"
-                  checked={address.role === 'member'}
-                  onChange={() => handleRoleChange(address.id, 'member')}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
+
+                {selectedContest && (
+                  <div className="address-list" style={{ marginTop: '16px' }}>
+                    {userRole?.map((address) => (
+                      <AddressItem
+                        key={address.id}
+                        address={address}
+                        communityBase={community?.base}
+                        checkboxOptions={getJudgeCheckboxOptions(address)}
+                        onChange={(id) =>
+                          handleJudgeRoleChange(id, address.address)
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <CWText type="b1">
+                No active contests available in this community.
+              </CWText>
+            )}
+          </div>
+        )}
       </CWModalBody>
-      <CWModalFooter>
-        <CWButton
-          label={communityNamespace ? 'Confirm & Mint' : 'Confirm'}
-          buttonType="secondary"
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onClick={handleUpdate}
-          buttonHeight="sm"
-          disabled={loading || !hasChanges}
-        />
-        <CWButton label="Close" onClick={onClose} buttonHeight="sm" />
-      </CWModalFooter>
+      <CWModalFooter>{renderFooterButtons()}</CWModalFooter>
     </div>
   );
 };

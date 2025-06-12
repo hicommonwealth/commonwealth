@@ -219,6 +219,9 @@ export const stats = port(function statsFactory(statsAdapter?: Stats) {
       histogram: (key, value, tags) => {
         log.trace('stats.histogram', { key, value, tags });
       },
+      distribution: (key, value, sampleRate, tags) => {
+        log.trace('stats.distribution', { key, value, sampleRate, tags });
+      },
       set: () => {},
       increment: (key, tags) => {
         log.trace('stats.increment', { key, tags });
@@ -271,6 +274,8 @@ export const cache = port(function cacheFactory(cacheAdapter?: Cache) {
       decrementKey: () => Promise.resolve(0),
       getKeyTTL: () => Promise.resolve(0),
       setKeyTTL: () => Promise.resolve(false),
+      lpushAndTrim: () => Promise.resolve(0),
+      getList: () => Promise.resolve([]),
 
       // hash
       incrementHashKey: () => Promise.resolve(0),
@@ -353,6 +358,7 @@ export const notificationsProvider = port(function notificationsProviderFactory(
         Promise.resolve({ id: options.user_id }),
       registerClientRegistrationToken: () => Promise.resolve(false),
       unregisterClientRegistrationToken: () => Promise.resolve(false),
+      signUserToken: () => Promise.resolve(undefined),
     }
   );
 });

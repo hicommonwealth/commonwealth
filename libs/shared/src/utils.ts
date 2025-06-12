@@ -77,11 +77,18 @@ export const generateTopicIdentifiersFromUrl = (url: string) => {
   return generateTopicIdentifiersFromUrlPart(splitURLPath?.[2] || '');
 };
 
+export const DISALLOWED_TOPIC_NAMES_REGEX = /["<>%{}|\\/^`?]/g;
+
+export const sanitizeTopicName = (name: string) => {
+  return name.replaceAll(`?`, '');
+};
+
 export const generateUrlPartForTopicIdentifiers = (
   topicId: string | number | undefined,
   topicName: string,
 ) => {
-  return topicId ? `${topicId}-${topicName}` : `${topicName}`;
+  const _topicName = sanitizeTopicName(topicName);
+  return topicId ? `${topicId}-${_topicName}` : `${_topicName}`;
 };
 
 // WARN: Using process.env to avoid webpack failures
@@ -478,6 +485,10 @@ export const buildContestLeaderboardUrl = (
   contestAddress: string,
 ) => {
   return `${baseUrl}/${communityId}/contests/${contestAddress}`;
+};
+
+export const buildCommunityUrl = (baseUrl: string, communityId: string) => {
+  return `${baseUrl}/${communityId}`;
 };
 
 export const smallNumberFormatter = new Intl.NumberFormat('en-US', {

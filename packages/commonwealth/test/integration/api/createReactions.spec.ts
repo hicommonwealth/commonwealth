@@ -1,5 +1,5 @@
 import { dispose } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/model';
+import { commonProtocol, models } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
@@ -42,7 +42,7 @@ describe('createReaction Integration Tests', () => {
   const getUniqueCommentText = async () => {
     const time = new Date().getMilliseconds();
     const body = `testCommentCreated at ${time}`;
-    const comment = await server.models.Comment.findOne({
+    const comment = await models.Comment.findOne({
       where: { body },
     });
     chai.assert.isNull(comment);
@@ -68,11 +68,8 @@ describe('createReaction Integration Tests', () => {
     );
     userSession = { session: res.session, sign: res.sign };
 
-    const topic = await server.models.Topic.findOne({
-      where: {
-        community_id: communityId,
-        group_ids: [],
-      },
+    const topic = await models.Topic.findOne({
+      where: { community_id: communityId },
     });
 
     const { result: thread } = await server.seeder.createThread({
@@ -113,7 +110,7 @@ describe('createReaction Integration Tests', () => {
       sign: userSession.sign,
     });
 
-    const comment = await server.models.Comment.findOne({
+    const comment = await models.Comment.findOne({
       where: { body },
     });
 
@@ -152,7 +149,7 @@ describe('createReaction Integration Tests', () => {
   });
 
   test('should create thread reactions and verify thread reaction count', async () => {
-    const thread = await server.models.Thread.findOne({
+    const thread = await models.Thread.findOne({
       where: { id: threadId },
     });
     chai.assert.isNotNull(thread);

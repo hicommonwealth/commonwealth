@@ -1,5 +1,5 @@
 import { pluralize } from 'helpers';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 export const actionCopies = {
   title: {
@@ -16,9 +16,11 @@ export const actionCopies = {
     ['DiscordServerJoined']: 'Join Discord Community',
     ['MembershipsRefreshed']: 'Join a Group',
     ['XpChainEventCreated']: 'Engage on Blockchain',
-    ['LaunchpadTokenCreated']: 'Launch a Token on Common',
+    ['LaunchpadTokenRecordCreated']: 'Launch a Token on Common',
     ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
     ['ContestEnded']: 'Engage on a Contest till completion',
+    ['CommunityGoalReached']: 'Complete the community goal',
+    ['RecurringContestManagerDeployed']: 'Create a Recurring Contest',
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: () => '',
@@ -36,9 +38,11 @@ export const actionCopies = {
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
     ['MembershipsRefreshed']: () => '',
     ['XpChainEventCreated']: () => '',
-    ['LaunchpadTokenCreated']: () => '',
+    ['LaunchpadTokenRecordCreated']: () => '',
     ['LaunchpadTokenTraded']: () => '',
     ['ContestEnded']: '',
+    ['CommunityGoalReached']: () => '',
+    ['RecurringContestManagerDeployed']: '',
   },
   explainer: {
     ['SignUpFlowCompleted']: () => '',
@@ -109,7 +113,7 @@ export const actionCopies = {
         </ul>
       </div>
     ),
-    ['LaunchpadTokenCreated']: () => '',
+    ['LaunchpadTokenRecordCreated']: () => '',
     // eslint-disable-next-line react/no-multi-comp
     ['LaunchpadTokenTraded']: (
       amountMultipler: string | number,
@@ -131,6 +135,30 @@ export const actionCopies = {
               launchpad token is traded.
             </li>
           )}
+          <li>
+            ● No Aura is awarded if your trade amount multiplied by the aura
+            multiplier does not equal at least 1 Aura.
+          </li>
+        </ul>
+      </div>
+    ),
+    // eslint-disable-next-line react/no-multi-comp
+    ['CommunityGoalReached']: (type: ReactNode, target: ReactNode) => (
+      <div>
+        <ul>
+          <li>
+            ● Reach {target} {type} before quest ends.
+          </li>
+        </ul>
+      </div>
+    ),
+    // eslint-disable-next-line react/no-multi-comp
+    ['RecurringContestManagerDeployed']: () => (
+      <div>
+        <ul>
+          <li>● Contest must be funded with a prize pool</li>
+          <li>● Aura is awarded when the contest is successfully deployed</li>
+          <li>● Only the contest creator receives Aura for this action</li>
         </ul>
       </div>
     ),
@@ -160,8 +188,10 @@ export const actionCopies = {
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
     ['XpChainEventCreated']: '',
-    ['LaunchpadTokenCreated']: '',
+    ['LaunchpadTokenRecordCreated']: '',
     ['LaunchpadTokenTraded']: '',
     ['ContestEnded']: '',
+    ['CommunityGoalReached']: '',
+    ['RecurringContestManagerDeployed']: '',
   },
 };

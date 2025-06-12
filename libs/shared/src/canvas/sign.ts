@@ -41,6 +41,11 @@ export async function sign(
   args: Args,
   getClock: () => Promise<[number, string[]]>,
 ): Promise<CanvasSignResult | null> {
+  // Special handling for Sui wallet sessions - bypass and return null
+  if (did.startsWith('did:pkh:sui:')) {
+    return null;
+  }
+
   const sessionSigners = getSessionSigners();
   for (const signer of sessionSigners) {
     if (signer.match(did)) {

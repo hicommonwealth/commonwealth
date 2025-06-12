@@ -12,7 +12,7 @@ import {
   decodeLog,
   getEvmAddress,
 } from '@hicommonwealth/evm-protocols';
-import { Events } from '@hicommonwealth/schemas';
+import { OutboxEvents } from '@hicommonwealth/schemas';
 import { EvmEvent, EvmMapper } from './types';
 
 const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
@@ -142,23 +142,22 @@ const contestManagerDeployedMapper: EvmMapper<
     transaction_hash: event.rawLog.transactionHash,
     eth_chain_id: event.eventSource.ethChainId,
   };
-  if (decoded.args.oneOff) {
-    return {
-      event_name: 'OneOffContestManagerDeployed',
-      event_payload: {
-        ...event_payload,
-        length: Number(interval),
-      },
-    };
-  }
 
-  return {
-    event_name: 'RecurringContestManagerDeployed',
-    event_payload: {
-      ...event_payload,
-      interval: Number(interval),
-    },
-  };
+  return decoded.args.oneOff
+    ? {
+        event_name: 'OneOffContestManagerDeployed',
+        event_payload: {
+          ...event_payload,
+          length: Number(interval),
+        },
+      }
+    : {
+        event_name: 'RecurringContestManagerDeployed',
+        event_payload: {
+          ...event_payload,
+          interval: Number(interval),
+        },
+      };
 };
 
 const recurringContestStartedMapper: EvmMapper<'ContestStarted'> = (
@@ -346,7 +345,7 @@ const judgeNominatedMapper: EvmMapper<'JudgeNominated'> = (event: EvmEvent) => {
 };
 
 // TODO: type should match EventRegistry event signatures
-export const chainEventMappers: Record<string, EvmMapper<Events>> = {
+export const chainEventMappers: Record<string, EvmMapper<OutboxEvents>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]:
     namespaceDeployedMapper,
 
