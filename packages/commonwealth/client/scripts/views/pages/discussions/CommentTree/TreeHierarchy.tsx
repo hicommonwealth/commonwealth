@@ -329,6 +329,7 @@ export const TreeHierarchy = ({
             commentFilters.sortType === 'oldest' && {
               followOutput: true,
               alignToBottom: true,
+              reversed: true,
             })}
           itemContent={(index, comment) => {
             const isCommentAuthor =
@@ -514,7 +515,6 @@ export const TreeHierarchy = ({
                         <CWButton
                           containerClassName="m-auto"
                           label="Load older messages"
-                          buttonSize="sm"
                           disabled={isLoadingComments}
                           onClick={() => {
                             !isLoadingComments &&

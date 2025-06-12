@@ -54,26 +54,25 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         });
 
         const totalCount = parseInt(countResult?.total_count || '0');
-        const totalPages = Math.ceil(totalCount / limit);
 
-        // For chat mode: page 1 should show newest comments (last page of ASC order)
-        // page 2 should show older comments (second-to-last page of ASC order), etc.
-        actualPage = totalPages - cursor + 1;
+        // For chat mode: cursor=1 should show the most recent LIMIT comments
+        // cursor=2 should show the next older LIMIT comments, etc.
+        // We calculate offset from the end of all comments
+        offset = Math.max(0, totalCount - cursor * limit);
 
-        // Ensure actualPage is within valid bounds
-        if (actualPage < 1) {
-          actualPage = 1;
-        }
+        console.log(
+          `Chat Mode Debug - totalCount: ${totalCount}, cursor: ${cursor}, limit: ${limit}, offset: ${offset}`,
+        );
 
-        offset = (actualPage - 1) * limit;
-        actualOrderBy = '"created_at" ASC'; // Always ASC for chat mode to get proper chronological order
+        actualPage = Math.floor(offset / limit) + 1;
+        actualOrderBy = 'C."created_at" ASC'; // Always ASC for chat mode to get proper chronological order
       } else {
         // Normal pagination for non-chat modes
         offset = (cursor - 1) * limit;
         const orderByQueries = {
-          newest: '"created_at" DESC',
-          oldest: '"created_at" ASC',
-          mostLikes: '"reaction_count" DESC',
+          newest: 'C."created_at" DESC',
+          oldest: 'C."created_at" ASC',
+          mostLikes: 'C."reaction_count" DESC',
         };
         actualOrderBy = orderByQueries[order_by || 'newest'];
         actualPage = cursor;
@@ -165,7 +164,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             CU.profile->>'name',
             CU.profile->>'avatar_url'
         ORDER BY
-            C.${actualOrderBy}
+            ${actualOrderBy}
         LIMIT :limit OFFSET :offset;      
       `;
 
@@ -198,15 +197,26 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         ? parseInt(`${comments!.at(0)!.total_count}`)
         : 0;
 
-      // For chat mode, we need to return the results in reverse order so newest appears at bottom
-      const finalResults = isChatMode
-        ? sanitizedComments.reverse()
-        : sanitizedComments;
+      // For chat mode, results should be in chronological order (oldest first, newest last)
+      // The reverse pagination logic handles which "page" of chronological comments to return
+      const finalResults = sanitizedComments;
 
-      return schemas.buildPaginatedResponse(finalResults, totalCount, {
-        ...payload,
-        offset: isChatMode ? (cursor - 1) * limit : offset,
-      });
+      const paginatedResponse = schemas.buildPaginatedResponse(
+        finalResults,
+        totalCount,
+        {
+          ...payload,
+          offset,
+        },
+      );
+
+      if (isChatMode) {
+        console.log(
+          `Chat Mode Response - page: ${paginatedResponse.page}, totalPages: ${paginatedResponse.totalPages}, results: ${finalResults.length}`,
+        );
+      }
+
+      return paginatedResponse;
     },
   };
 }

@@ -33,7 +33,6 @@ import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
-import { useFetchGroupsQuery } from 'state/api/groups';
 import useFetchProfilesByAddressesQuery from 'state/api/profiles/fetchProfilesByAddress';
 import {
   useAddThreadLinksMutation,
@@ -135,11 +134,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
 
   const communityId = app.activeChainId() || '';
-  useFetchGroupsQuery({
-    communityId,
-    includeTopics: true,
-    enabled: !!communityId,
-  });
 
   const {
     data: threadView,
