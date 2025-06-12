@@ -16,8 +16,8 @@ export {
   useGetERC20BalanceQuery,
   useGetLaunchpadTradesQuery,
   useGetTokenByCommunityId,
+  useGetTokenStatsQuery,
   useTokenBalanceQuery,
   useTokenMetadataQuery,
   useTokensMetadataQuery,
-  useGetTokenStatsQuery,
 };
