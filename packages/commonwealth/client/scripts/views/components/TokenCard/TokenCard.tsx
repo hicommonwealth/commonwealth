@@ -1,18 +1,31 @@
 import clsx from 'clsx';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
 import { useTokenPricing } from 'hooks/useTokenPricing';
-import { useGetTokenStatsQuery } from 'state/api/tokens';
 import React from 'react';
+import { useGetTokenStatsQuery } from 'state/api/tokens';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { TradingMode } from 'views/modals/TradeTokenModel';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
-import FractionalValue from '../FractionalValue';
 import FormattedDisplayNumber from '../FormattedDisplayNumber/FormattedDisplayNumber';
+import FractionalValue from '../FractionalValue';
 import MarketCapProgress from './MarketCapProgress';
 import PricePercentageChange from './PricePercentageChange';
 import './TokenCard.scss';
+
+interface TokenPricing {
+  currentPrice: number;
+  pricePercentage24HourChange: number;
+  marketCapCurrent: number;
+  marketCapGoal: number;
+  isMarketCapGoalReached: boolean;
+}
+
+interface TokenStats {
+  holder_count: number;
+  volume_24h: number;
+}
 
 export interface TokenCardProps {
   token: LaunchpadToken;
@@ -33,11 +46,11 @@ const TokenCard = ({
 }: TokenCardProps) => {
   const { name, symbol, icon_url } = token;
 
-  const { pricing } = useTokenPricing({ token });
+  const { pricing } = useTokenPricing({ token }) as { pricing: TokenPricing };
   const { data: stats } = useGetTokenStatsQuery(
     { token_address: token.token_address },
     { staleTime: 30_000, refetchInterval: 30_000 },
-  );
+  ) as { data: TokenStats | undefined };
 
   const currencySymbol = currencyNameToSymbolMap[currency];
 
@@ -98,12 +111,11 @@ const TokenCard = ({
           </CWText>
         </div>
       </div>
-      {/* market cap row */}
       <MarketCapProgress
         marketCap={{
-          current: pricing.marketCapCurrent,
-          goal: pricing.marketCapGoal,
-          isCapped: pricing.isMarketCapGoalReached,
+          current: Number(pricing.marketCapCurrent),
+          goal: Number(pricing.marketCapGoal),
+          isCapped: Boolean(pricing.isMarketCapGoalReached),
         }}
         currency={currency}
         onBodyClick={handleBodyClick}
