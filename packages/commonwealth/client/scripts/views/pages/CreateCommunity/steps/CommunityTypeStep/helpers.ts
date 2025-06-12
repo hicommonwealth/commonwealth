@@ -5,7 +5,7 @@ import ethereumImg from 'assets/img/communitySelector/ethereum.svg';
 import polygonImg from 'assets/img/communitySelector/polygon.svg';
 import skaleImg from 'assets/img/communitySelector/skale.svg';
 import solanaImg from 'assets/img/communitySelector/solana.svg';
-import sonieumImg from 'assets/img/communitySelector/sonieum.png';
+import soneiumImg from 'assets/img/communitySelector/soneium.png';
 import suiImg from 'assets/img/communitySelector/sui.svg'; // Add Sui image import
 import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 
@@ -55,10 +55,10 @@ export const communityTypeOptions = [
       'Allowing quick deployment of interoperable EVM-compatible chains without compromising security or decentralization',
   },
   {
-    type: CommunityType.Sonieum,
-    img: sonieumImg,
+    type: CommunityType.Soneium,
+    img: soneiumImg,
     chainBase: ChainBase.Ethereum,
-    title: 'Sonieum',
+    title: 'Soneium',
     isRecommended: false,
     description:
       'Empowering individuals and communities to collaborate, create and fill the world ' +

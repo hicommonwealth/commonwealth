@@ -1,10 +1,8 @@
 import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
-import {
-  commonProtocol,
-  createPrivateEvmClient,
-  EvmEventSignatures,
-} from '@hicommonwealth/evm-protocols';
+import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
+import { createPrivateEvmClient, getTransaction, withRetries } from '../utils';
+import { getErc20TokenInfo } from './tokens';
 
 export const launchToken = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -332,10 +330,71 @@ export async function transferLaunchpadLiquidityToUniswap({
       BigInt(web3.utils.toNumber(maxPriorityFeePerGas));
   }
 
-  return await commonProtocol.transferLiquidity(
+  return await transferLiquidity(
     contract,
     tokenAddress,
     web3.eth.defaultAccount!,
     maxFeePerGas,
   );
+}
+
+export async function getLaunchpadTokenDetails({
+  rpc,
+  transactionHash,
+}: {
+  rpc: string;
+  transactionHash: string;
+}): Promise<{
+  name: string;
+  symbol: string;
+  created_at: Date;
+  creator_address: string;
+  token_address: string;
+  namespace: string;
+  curve_id: string;
+  total_supply: string;
+  launchpad_liquidity: string;
+  reserve_ration: string;
+  initial_purchase_eth_amount: string;
+}> {
+  const tx = await withRetries(async () => {
+    const { tx: innerTx } = await getTransaction({
+      rpc,
+      txHash: transactionHash,
+    });
+    return innerTx;
+  });
+
+  const tokenData = await getLaunchpadTokenCreatedTransaction({
+    rpc,
+    transactionHash,
+  });
+  if (!tokenData) throw Error('Token data not found');
+
+  let tokenInfo: { name: string; symbol: string; totalSupply: bigint };
+  try {
+    tokenInfo = await getErc20TokenInfo({
+      rpc,
+      tokenAddress: tokenData.parsedArgs.tokenAddress,
+    });
+  } catch (e) {
+    throw Error(
+      `Failed to get erc20 token properties for token ${tokenData.parsedArgs.tokenAddress}`,
+    );
+  }
+
+  return {
+    name: tokenInfo.name,
+    symbol: tokenInfo.symbol,
+    created_at: new Date(Number(tokenData.block.timestamp) * 1000),
+    creator_address: tx.from,
+    token_address: tokenData.parsedArgs.tokenAddress,
+    namespace: tokenData.parsedArgs.namespace,
+    curve_id: tokenData.parsedArgs.curveId.toString(),
+    total_supply: tokenData.parsedArgs.totalSupply.toString(),
+    launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity.toString(),
+    reserve_ration: tokenData.parsedArgs.reserveRation.toString(),
+    initial_purchase_eth_amount:
+      tokenData.parsedArgs.initialPurchaseEthAmount.toString(),
+  };
 }

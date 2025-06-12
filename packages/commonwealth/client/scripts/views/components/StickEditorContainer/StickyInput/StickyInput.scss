@@ -4,10 +4,10 @@
 .StickyInput {
   display: flex;
   flex-direction: column;
-  background-color: white;
+  background-color: $white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  border: 1px solid #e8e8e8;
+  border: 1px solid $neutral-200;
   padding: 12px;
   width: 100%;
   max-width: 100%;
@@ -51,8 +51,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #4285f4;
-    color: white;
+    background-color: $primary-500;
+    color: $white;
     border: none;
     border-radius: 50%;
     width: 38px;
@@ -65,37 +65,111 @@
     padding: 0;
 
     &:hover {
-      background-color: #3367d6;
+      background-color: $primary-600;
     }
 
     &:disabled {
-      background-color: #a4c1f7;
+      background-color: $primary-200;
       cursor: not-allowed;
     }
 
     &.active {
-      background-color: #4285f4;
+      background-color: $primary-500;
 
       &:hover {
-        background-color: #3367d6;
+        background-color: $primary-600;
       }
     }
 
     &.inactive {
-      background-color: white;
-      border: 1px solid #e0e0e0;
+      background-color: $white;
+      border: 1px solid $neutral-200;
 
       &:hover {
-        background-color: #f5f5f5;
+        background-color: $neutral-50;
       }
 
       svg {
-        color: #757575;
+        color: $neutral-500;
       }
     }
 
     svg {
-      color: white;
+      color: $white;
+    }
+  }
+
+  .web-search-toggle-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $primary-500;
+    color: $white;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    aspect-ratio: 1/1;
+    padding: 0;
+
+    &:hover {
+      background-color: $primary-600;
+    }
+
+    &:disabled {
+      background-color: $primary-200;
+      cursor: not-allowed;
+    }
+
+    &.active {
+      background-color: $primary-500;
+
+      &:hover {
+        background-color: $primary-600;
+      }
+    }
+
+    &.inactive {
+      background-color: $white;
+      border: 1px solid $neutral-200;
+
+      &:hover {
+        background-color: $neutral-50;
+      }
+
+      svg {
+        color: $neutral-500;
+      }
+    }
+
+    svg {
+      color: $white;
+    }
+  }
+
+  .ai-toggle-button {
+    position: relative;
+
+    .model-count-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background-color: $primary-700;
+      color: $white;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      border: 1px solid $white;
+      line-height: 1;
     }
   }
 
@@ -115,7 +189,12 @@
       .CWEditor {
         .ql-container {
           min-height: unset !important;
-          max-height: 76px !important;
+          max-height: 152px !important;
+          overflow: unset !important;
+
+          .ql-editor {
+            max-height: 72px !important;
+          }
         }
       }
     }
@@ -126,6 +205,22 @@
       border-radius: 0;
       display: flex;
       flex-direction: column;
+
+      .CWEditor {
+        .ql-container {
+          .ql-editor {
+            max-height: 412px !important;
+          }
+        }
+      }
+    }
+
+    &.not-expanded.thread-mode {
+      .CWEditor {
+        .ql-container {
+          max-height: unset !important;
+        }
+      }
     }
 
     .MobileStickyInputFocused {
@@ -136,7 +231,7 @@
       bottom: 0;
       display: flex;
       flex-direction: column;
-      background-color: white;
+      background-color: $white;
       z-index: 1100;
       padding: 16px;
 
@@ -167,6 +262,19 @@
     &.expanded {
       padding: 0;
     }
+
+    &.not-expanded {
+      .CWEditor {
+        .ql-container {
+          overflow: unset !important;
+
+          .ql-editor {
+            overflow: auto !important;
+            max-height: 72px !important;
+          }
+        }
+      }
+    }
   }
 
   // Common components styled regardless of mobile/desktop
@@ -181,8 +289,8 @@
     }
 
     .action-pill {
-      background-color: #f5f5f5;
-      color: #333;
+      background-color: $neutral-50;
+      color: $neutral-800;
       font-size: 13px;
       cursor: pointer;
 
@@ -227,7 +335,6 @@
 
             .ql-editor {
               min-height: unset !important;
-              max-height: unset !important;
               padding: 8px !important;
               font-size: 14px !important;
 
@@ -242,10 +349,18 @@
   }
 
   .turnstile-container {
-    margin-top: 8px;
+    padding: 8px 16px 0;
+  }
+
+  .cancel-reply-button {
     display: flex;
-    justify-content: center;
-    width: 100%;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    background-color: $neutral-100;
+    width: fit-content;
+    padding: 2px 4px;
+    border-radius: 6px;
   }
 }
 
@@ -253,8 +368,8 @@
 .DesktopStickyInput {
   position: sticky;
   bottom: 0;
-  padding-bottom: 12px;
-  margin-top: auto;
+  padding: 12px 0 12px 0;
+  margin-top: 12px;
   z-index: 70;
   width: 100%;
   display: flex;
@@ -265,10 +380,17 @@
 .DesktopStickyInputExpanded {
   padding: 0 !important;
 
+  .PageLayout {
+    padding: 0 !important;
+    .layout-container {
+      padding: 0 !important;
+    }
+  }
+
   .NewThreadForm,
   .CommentEditor {
     width: 100%;
-    background: white;
+    background: $white;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);

@@ -44,7 +44,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
 
   const {
     isInitialLoading: communityStakeLoading,
-    data: stakeResponse,
+    data: stakeData,
     refetch: refetchStakeQuery,
   } = useFetchCommunityStakeQuery({
     communityId: activeCommunityId,
@@ -52,8 +52,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     apiEnabled: !!activeCommunityId,
   });
 
-  const stakeData = stakeResponse?.data?.result;
-  const stakeEnabled = stakeData?.stake_enabled;
+  const stakeEnabled = stakeData?.stake?.stake_enabled;
   const apiEnabled = Boolean(
     stakeEnabled &&
       (walletAddress || activeAccountAddress) &&
@@ -77,8 +76,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
 
   const { isInitialLoading: buyPriceDataLoading, data: buyPriceData } =
     useGetBuyPriceQuery({
-      // @ts-expect-error StrictNullChecks
-      namespace: activeCommunityNamespace,
+      namespace: activeCommunityNamespace!,
       stakeId: commonProtocol.STAKE_ID,
       amount: Number(userStakeBalanceData),
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
@@ -90,7 +88,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const currentVoteWeight = commonProtocol.calculateVoteWeight(
     // @ts-expect-error StrictNullChecks
     userStakeBalanceData,
-    stakeData?.vote_weight,
+    stakeData?.stake?.vote_weight,
   );
   const stakeBalance = Number(userStakeBalanceData);
   const stakeValue = Number(buyPriceData?.price);

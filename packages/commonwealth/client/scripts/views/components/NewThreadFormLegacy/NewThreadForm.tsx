@@ -1,14 +1,24 @@
-import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import {
+  canUserPerformGatedAction,
+  DisabledCommunitySpamTier,
+  GatedActionEnum,
+  LinkSource,
+} from '@hicommonwealth/shared';
+import {
+  SnapshotProposal,
+  SnapshotSpace,
+} from 'client/scripts/helpers/snapshot_utils';
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
+import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import { notifyError } from 'controllers/app/notifications';
 import {
-  SessionKeyError,
   getEthChainIdOrBech32Prefix,
+  SessionKeyError,
 } from 'controllers/server/sessions';
 import { weightedVotingValueToLabel } from 'helpers';
-import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
-import { useFlag } from 'hooks/useFlag';
+import { detectURL } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, {
@@ -27,7 +37,6 @@ import {
 } from 'state/api/ai/prompts';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
-import { useFetchGroupsQuery } from 'state/api/groups';
 import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import {
   useAddThreadLinksMutation,
@@ -35,10 +44,9 @@ import {
   useCreateThreadPollMutation,
 } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
-import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import useUserStore, { useUserAiSettingsStore } from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import CustomTopicOption from 'views/components/NewThreadFormLegacy/CustomTopicOption';
@@ -57,16 +65,11 @@ import {
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 
-import { DisabledCommunitySpamTier, LinkSource } from '@hicommonwealth/shared';
-import {
-  SnapshotProposal,
-  SnapshotSpace,
-} from 'client/scripts/helpers/snapshot_utils';
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
-import useForceRerender from 'client/scripts/hooks/useForceRerender';
-
-import Poll from 'client/scripts/models/Poll';
+import useTopicGating from 'client/scripts/hooks/useTopicGating';
+import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import { DeltaStatic } from 'quill';
+import { useAIFeatureEnabled } from 'state/ui/user';
+import { ExtendedPoll, LocalPoll, parseCustomDuration } from 'utils/polls';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
@@ -80,7 +83,6 @@ import { ImageActionCard } from '../ImageActionCard/ImageActionCard';
 import { ImageActionModal } from '../ImageActionModal/ImageActionModal';
 import { ProposalState } from '../NewThreadFormModern/NewThreadForm';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
-import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWText } from '../component_kit/cw_text';
 import CWBanner from '../component_kit/new_designs/CWBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
@@ -110,15 +112,14 @@ interface NewThreadFormProps {
   onContentDeltaChange?: (markdown: string) => void;
   contentDelta?: DeltaStatic;
   setContentDelta?: (delta: DeltaStatic) => void;
+  webSearchEnabled?: boolean;
+  setWebSearchEnabled?: (enabled: boolean) => void;
+  communityId?: string;
 }
 
 export interface NewThreadFormHandles {
   openImageModal: () => void;
   appendContent: (markdown: string) => void;
-}
-
-export interface ExtendedPoll extends Poll {
-  customDuration?: string;
 }
 
 // eslint-disable-next-line react/display-name
@@ -133,6 +134,9 @@ export const NewThreadForm = forwardRef<
       onContentDeltaChange,
       contentDelta,
       setContentDelta,
+      webSearchEnabled,
+      setWebSearchEnabled,
+      communityId,
     },
     ref,
   ) => {
@@ -146,7 +150,7 @@ export const NewThreadForm = forwardRef<
     const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
     const [linkedProposals, setLinkedProposals] =
       useState<ProposalState | null>();
-    const [pollsData, setPollData] = useState<ExtendedPoll[]>();
+    const [pollsData, setPollData] = useState<LocalPoll[]>();
 
     // --- State for Image Modal Context ---
     const [imageModalContext, setImageModalContext] = useState<{
@@ -162,12 +166,9 @@ export const NewThreadForm = forwardRef<
       apiCallEnabled: !!user.id,
     });
 
-    const {
-      aiInteractionsToggleEnabled,
-      aiCommentsToggleEnabled,
-      setAICommentsToggleEnabled,
-    } = useLocalAISettingsStore();
-    const aiCommentsFeatureEnabled = useFlag('aiComments');
+    const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
+      useUserAiSettingsStore();
+    const { isAIEnabled } = useAIFeatureEnabled();
 
     useAppStatus();
 
@@ -218,19 +219,18 @@ export const NewThreadForm = forwardRef<
       clearDraft,
       canShowGatingBanner,
       setCanShowGatingBanner,
-      canShowTopicPermissionBanner,
       setCanShowTopicPermissionBanner,
     } = useNewThreadForm(selectedCommunityId, topicsForSelector, {
       contentDelta,
       setContentDelta,
     });
 
-    const { data: recentThreads } = useFetchThreadsQuery({
-      queryType: 'bulk',
+    const { data: recentThreads } = useGetThreadsQuery({
+      cursor: 1,
       limit: 2,
-      communityId: selectedCommunityId,
-      apiEnabled: !!selectedCommunityId && !!threadTopic?.id,
-      topicId: threadTopic?.id,
+      community_id: selectedCommunityId,
+      enabled: !!selectedCommunityId && !!threadTopic?.id,
+      topic_id: threadTopic?.id,
     });
 
     const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
@@ -257,12 +257,7 @@ export const NewThreadForm = forwardRef<
     const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
     const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
 
-    const { data: groups = [] } = useFetchGroupsQuery({
-      communityId: selectedCommunityId,
-      includeTopics: true,
-      enabled: !!selectedCommunityId,
-    });
-    const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
+    const { actionGroups, bypassGating } = useTopicGating({
       communityId: selectedCommunityId,
       userAddress: userSelectedAddress || '',
       apiEnabled: !!userSelectedAddress && !!selectedCommunityId,
@@ -288,12 +283,6 @@ export const NewThreadForm = forwardRef<
 
     const isDiscussion = threadKind === ThreadKind.Discussion;
 
-    const gatedGroupNames = groups
-      .filter((group) =>
-        group.topics.find((topic) => topic.id === threadTopic?.id),
-      )
-      .map((group) => group.name);
-
     const bodyAccumulatedRef = useRef('');
 
     const isWalletBalanceErrorEnabled = false;
@@ -303,16 +292,9 @@ export const NewThreadForm = forwardRef<
       isWalletBalanceErrorEnabled &&
       parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
 
-    const disabledActionsTooltipText = getThreadActionTooltipText({
-      isCommunityMember: !!userSelectedAddress,
-      isThreadTopicGated: isRestrictedMembership,
-      threadTopicInteractionRestrictions:
-        !isAdmin &&
-        !foundTopicPermissions?.permissions?.includes(
-          PermissionEnum.CREATE_THREAD,
-        )
-          ? foundTopicPermissions?.permissions
-          : undefined,
+    const threadPermissions = Permissions.getCreateThreadPermission({
+      actionGroups,
+      bypassGating,
     });
 
     const {
@@ -329,7 +311,7 @@ export const NewThreadForm = forwardRef<
       !userSelectedAddress ||
       walletBalanceError ||
       contestTopicError ||
-      (selectedCommunityId && !!disabledActionsTooltipText) ||
+      (selectedCommunityId && !threadPermissions.allowed) ||
       isLoadingCommunity ||
       (isInsideCommunity && (!userSelectedAddress || !selectedCommunityId)) ||
       isDisabled ||
@@ -339,6 +321,14 @@ export const NewThreadForm = forwardRef<
     // Define default values for title and body
     const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
     const DEFAULT_THREAD_BODY = 'No content provided.';
+
+    const [localWebSearchEnabled, setLocalWebSearchEnabled] = useState(false);
+    const effectiveWebSearchEnabled =
+      typeof webSearchEnabled === 'boolean'
+        ? webSearchEnabled
+        : localWebSearchEnabled;
+    const effectiveSetWebSearchEnabled =
+      setWebSearchEnabled || setLocalWebSearchEnabled;
 
     const handleNewThreadCreation = useCallback(async () => {
       if (!community || !userSelectedAddress || !selectedCommunityId) {
@@ -351,7 +341,13 @@ export const NewThreadForm = forwardRef<
         return;
       }
 
-      if (isRestrictedMembership) {
+      if (
+        !canUserPerformGatedAction(
+          actionGroups,
+          GatedActionEnum.CREATE_THREAD,
+          bypassGating,
+        )
+      ) {
         notifyError('Topic is gated!');
         return;
       }
@@ -362,17 +358,17 @@ export const NewThreadForm = forwardRef<
       }
 
       // In AI mode, provide default values so the backend validation is not broken.
-      const effectiveTitle = aiInteractionsToggleEnabled
+      const effectiveTitle = isAIEnabled
         ? threadTitle.trim() || DEFAULT_THREAD_TITLE
         : threadTitle;
 
-      const effectiveBody = aiInteractionsToggleEnabled
+      const effectiveBody = isAIEnabled
         ? getTextFromDelta(threadContentDelta).trim()
           ? serializeDelta(threadContentDelta)
           : DEFAULT_THREAD_BODY
         : serializeDelta(threadContentDelta);
 
-      if (!aiInteractionsToggleEnabled) {
+      if (!isAIEnabled) {
         const deltaString = JSON.stringify(threadContentDelta);
         checkNewThreadErrors(
           { threadKind, threadUrl, threadTitle, threadTopic },
@@ -423,16 +419,11 @@ export const NewThreadForm = forwardRef<
         }
 
         if (thread && pollsData && pollsData?.length) {
-          const custom_duration = pollsData[0]?.customDuration
-            ? pollsData[0]?.customDuration === 'Infinite'
-              ? null
-              : parseInt(pollsData[0]?.customDuration)
-            : 5;
           await createPoll({
             thread_id: thread.id!,
             prompt: pollsData[0]?.prompt,
             options: pollsData[0]?.options,
-            custom_duration,
+            duration: parseCustomDuration(pollsData[0]?.custom_duration),
           });
         }
 
@@ -473,7 +464,7 @@ export const NewThreadForm = forwardRef<
         }
 
         console.error('NewThreadForm: Unhandled error:', err?.message);
-        notifyError('Failed to create thread');
+        notifyError(err.message);
 
         // Reset turnstile if there's an error
         resetTurnstile();
@@ -489,7 +480,6 @@ export const NewThreadForm = forwardRef<
       community,
       createThread,
       isInsideCommunity,
-      isRestrictedMembership,
       isDiscussion,
       threadUrl,
       threadTopic,
@@ -505,14 +495,16 @@ export const NewThreadForm = forwardRef<
       hasTopics,
       checkForSessionKeyRevalidationErrors,
       user,
-      aiInteractionsToggleEnabled,
       isTurnstileEnabled,
       turnstileToken,
       resetTurnstile,
       addThreadLinks,
       linkedProposals,
+      actionGroups,
+      bypassGating,
       createPoll,
       pollsData,
+      isAIEnabled,
     ]);
 
     const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -541,11 +533,11 @@ export const NewThreadForm = forwardRef<
       setThreadContentDelta(createDeltaFromText(''));
       bodyAccumulatedRef.current = '';
 
-      const recentThreadsContext = recentThreads
-        ?.map((thread) => {
+      const recentThreadsContext = recentThreads?.pages[0]?.results
+        .map((thread) => {
           return (
             `Title: ${thread.title}\nBody: ${thread.body}\n` +
-            `Topic: ${thread.topic?.name || 'N/A'}\nCommunity: ${thread.communityName || 'N/A'}`
+            `Topic: ${thread.topic?.name || 'N/A'}\nCommunity: ${thread.community_id || 'N/A'}`
           );
         })
         .join('\n\n');
@@ -560,6 +552,8 @@ export const NewThreadForm = forwardRef<
           model: 'gpt-4o-mini',
           stream: true,
           systemPrompt: bodySystemPrompt,
+          includeContextualMentions: true,
+          communityId: communityId || selectedCommunityId,
           onError: (error) => {
             console.error('Error generating AI thread body:', error);
             notifyError('Failed to generate AI thread content');
@@ -583,6 +577,8 @@ export const NewThreadForm = forwardRef<
                   model: 'gpt-4o-mini',
                   stream: false,
                   systemPrompt: titleSystemPrompt,
+                  includeContextualMentions: true,
+                  communityId: communityId || selectedCommunityId,
                   onComplete(fullTitle) {
                     setThreadTitle(fullTitle.trim());
                     setIsGenerating(false);
@@ -789,16 +785,13 @@ export const NewThreadForm = forwardRef<
               label: 'Polls',
               item: (
                 <div className="cards-column">
-                  {[
-                    ...new Map(
-                      pollsData?.map((poll) => [poll?.id, poll]),
-                    ).values(),
-                  ].map((poll: Poll) => {
+                  {(pollsData || []).map((poll) => {
                     return (
                       <ThreadPollCard
-                        poll={poll}
-                        key={poll.id}
-                        isTopicMembershipRestricted={isRestrictedMembership}
+                        poll={poll as unknown as ExtendedPoll}
+                        key={(poll as unknown as ExtendedPoll).id}
+                        actionGroups={actionGroups}
+                        bypassGating={bypassGating}
                         showDeleteButton={true}
                         isCreateThreadPage={true}
                         setLocalPoll={setPollData}
@@ -1070,14 +1063,8 @@ export const NewThreadForm = forwardRef<
                     contentDelta={threadContentDelta}
                     setContentDelta={setThreadContentDeltaWithCallback}
                     {...(selectedCommunityId && {
-                      isDisabled:
-                        isRestrictedMembership ||
-                        !!disabledActionsTooltipText ||
-                        !userSelectedAddress,
-                      tooltipLabel:
-                        typeof disabledActionsTooltipText === 'function'
-                          ? disabledActionsTooltipText?.('submit')
-                          : disabledActionsTooltipText,
+                      isDisabled: !threadPermissions.allowed,
+                      tooltipLabel: threadPermissions.tooltip,
                     })}
                     // eslint-disable-next-line max-len
                     placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
@@ -1115,37 +1102,54 @@ export const NewThreadForm = forwardRef<
                       containerClassName="no-pad cancel-button"
                     />
 
-                    {aiCommentsFeatureEnabled &&
-                      aiInteractionsToggleEnabled && (
-                        <CWThreadAction
-                          action="ai-reply"
-                          label="Draft thread with AI"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleGenerateAIThread().catch(console.error);
+                    {isAIEnabled && (
+                      <div className="ai-toggle-wrapper">
+                        <CWToggle
+                          className="ai-toggle"
+                          icon="binoculars"
+                          iconColor="#757575"
+                          checked={effectiveWebSearchEnabled}
+                          onChange={() =>
+                            effectiveSetWebSearchEnabled(
+                              !effectiveWebSearchEnabled,
+                            )
+                          }
+                        />
+                        <CWText type="caption" className="toggle-label">
+                          Web search
+                        </CWText>
+                      </div>
+                    )}
+
+                    {isAIEnabled && (
+                      <CWThreadAction
+                        action="ai-reply"
+                        label="Draft thread with AI"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleGenerateAIThread().catch(console.error);
+                        }}
+                      />
+                    )}
+
+                    {isAIEnabled && (
+                      <div className="ai-toggle-wrapper">
+                        <CWToggle
+                          className="ai-toggle"
+                          icon="sparkle"
+                          iconColor="#757575"
+                          checked={aiCommentsToggleEnabled}
+                          onChange={() => {
+                            setAICommentsToggleEnabled(
+                              !aiCommentsToggleEnabled,
+                            );
                           }}
                         />
-                      )}
-
-                    {aiCommentsFeatureEnabled &&
-                      aiInteractionsToggleEnabled && (
-                        <div className="ai-toggle-wrapper">
-                          <CWToggle
-                            className="ai-toggle"
-                            icon="sparkle"
-                            iconColor="#757575"
-                            checked={aiCommentsToggleEnabled}
-                            onChange={() => {
-                              setAICommentsToggleEnabled(
-                                !aiCommentsToggleEnabled,
-                              );
-                            }}
-                          />
-                          <CWText type="caption" className="toggle-label">
-                            AI initial comment
-                          </CWText>
-                        </div>
-                      )}
+                        <CWText type="caption" className="toggle-label">
+                          AI initial comment
+                        </CWText>
+                      </div>
+                    )}
 
                     <CWButton
                       label="Create"
@@ -1167,28 +1171,16 @@ export const NewThreadForm = forwardRef<
                     />
                   )}
 
-                  {isRestrictedMembership && canShowGatingBanner && (
+                  {canShowGatingBanner && (
                     <div>
                       <CWGatedTopicBanner
-                        groupNames={gatedGroupNames}
+                        actions={[GatedActionEnum.CREATE_THREAD]}
+                        actionGroups={actionGroups}
+                        bypassGating={bypassGating}
                         onClose={() => setCanShowGatingBanner(false)}
                       />
                     </div>
                   )}
-
-                  {canShowTopicPermissionBanner &&
-                    foundTopicPermissions &&
-                    !isAdmin &&
-                    !foundTopicPermissions?.permissions?.includes(
-                      PermissionEnum.CREATE_THREAD,
-                    ) && (
-                      <CWGatedTopicPermissionLevelBanner
-                        topicPermissions={
-                          foundTopicPermissions?.permissions as PermissionEnum[]
-                        }
-                        onClose={() => setCanShowTopicPermissionBanner(false)}
-                      />
-                    )}
                 </div>
               </div>
               <>

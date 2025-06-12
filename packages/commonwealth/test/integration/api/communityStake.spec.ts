@@ -1,15 +1,16 @@
-import { dispose } from '@hicommonwealth/core';
-import { commonProtocol, type UserInstance } from '@hicommonwealth/model';
+import { command, dispose, query } from '@hicommonwealth/core';
+import {
+  commonProtocol,
+  Community,
+  models,
+  type UserInstance,
+} from '@hicommonwealth/model';
 import { UserTierMap } from '@hicommonwealth/shared';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
-import jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
-import { config } from '../../../server/config';
-import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
-import { get, post } from '../../util/httpUtils';
 
 chai.use(chaiHttp);
 chai.should();
@@ -41,11 +42,8 @@ describe('POST communityStakes Tests', () => {
     await dispose()();
   });
 
-  test('The handler creates and updates community stake', async () => {
-    // @ts-expect-error StrictNullChecks
-    const controller = new ServerCommunitiesController(server.models, null);
-    const user: UserInstance = buildUser({
-      models: server.models,
+  test('Should create and update community stake', async () => {
+    buildUser({
       userAttributes: {
         email: '',
         id: 1,
@@ -54,102 +52,60 @@ describe('POST communityStakes Tests', () => {
         tier: UserTierMap.ManuallyVerified,
       },
     }) as UserInstance;
+    const actor = {
+      address: server.e2eTestEntities.testAddresses[0].address,
+      user: {
+        id: server.e2eTestEntities.testAddresses[0].user_id!,
+        email: '',
+        isAdmin: true,
+      },
+    };
 
-    const createResponse = await controller.createCommunityStake({
-      communityStake: baseRequest,
-      user: user,
+    const community = await command(Community.SetCommunityStake(), {
+      actor,
+      payload: baseRequest,
     });
+    const createResponse = community!.CommunityStakes?.[0];
 
-    assert.equal(createResponse.community_id, expectedCreateResp.community_id);
-    assert.equal(createResponse.stake_id, expectedCreateResp.stake_id);
-    assert.equal(createResponse.stake_token, expectedCreateResp.stake_token);
-    assert.equal(createResponse.vote_weight, expectedCreateResp.vote_weight);
+    assert.equal(createResponse!.community_id, expectedCreateResp.community_id);
+    assert.equal(createResponse!.stake_id, expectedCreateResp.stake_id);
+    assert.equal(createResponse!.stake_token, expectedCreateResp.stake_token);
+    assert.equal(createResponse!.vote_weight, expectedCreateResp.vote_weight);
     assert.equal(
-      createResponse.stake_enabled,
+      createResponse!.stake_enabled,
       expectedCreateResp.stake_enabled,
     );
 
     let error;
     try {
       // try to change vote weight
-      await controller.createCommunityStake({
-        communityStake: { ...baseRequest, vote_weight: 20 },
-        user: user,
+      await command(Community.SetCommunityStake(), {
+        actor,
+        payload: { ...baseRequest, vote_weight: 20 },
       });
     } catch (e) {
       error = e;
     }
 
-    assert.equal(error.message, 'Community stake already exists');
+    assert.equal(error.message, 'Community stake already configured');
 
-    await controller.getCommunityStake({
-      community_id: baseRequest.community_id,
-      stake_id: baseRequest.stake_id,
+    const found = await query(Community.GetCommunityStake(), {
+      actor,
+      payload: {
+        community_id: baseRequest.community_id,
+        stake_id: baseRequest.stake_id,
+      },
     });
 
-    assert.equal(createResponse.community_id, expectedCreateResp.community_id);
-    assert.equal(createResponse.stake_id, expectedCreateResp.stake_id);
-    assert.equal(createResponse.stake_token, expectedCreateResp.stake_token);
-    assert.equal(createResponse.vote_weight, expectedCreateResp.vote_weight);
-    assert.equal(
-      createResponse.stake_enabled,
-      expectedCreateResp.stake_enabled,
-    );
-  });
-
-  test('The community stake routes work correctly', async () => {
-    const stake_id = 3;
-    const jwtToken = jwt.sign(
-      { id: 2, email: server.e2eTestEntities.testUsers[0].email },
-      config.AUTH.JWT_SECRET,
-    );
-
-    const actualPutResponse = (
-      await post(
-        `/api/communityStakes/${baseRequest.community_id}/${stake_id}`,
-        { ...baseRequest, stake_id, jwt: jwtToken },
-        true,
-        server.app,
-      )
-    ).result;
-
-    assert.equal(
-      actualPutResponse.community_id,
-      expectedCreateResp.community_id,
-    );
-    assert.equal(actualPutResponse.stake_id, stake_id);
-    assert.equal(actualPutResponse.stake_token, expectedCreateResp.stake_token);
-    assert.equal(actualPutResponse.vote_weight, expectedCreateResp.vote_weight);
-    assert.equal(
-      actualPutResponse.stake_enabled,
-      expectedCreateResp.stake_enabled,
-    );
-
-    const actualGetResponse = (
-      await get(
-        `/api/communityStakes/${baseRequest.community_id}/${stake_id}`,
-        // @ts-expect-error StrictNullChecks
-        null,
-        true,
-        server.app,
-      )
-    ).result;
-
-    assert.equal(
-      actualGetResponse.community_id,
-      expectedCreateResp.community_id,
-    );
-    assert.equal(actualGetResponse.stake_id, stake_id);
-    assert.equal(actualGetResponse.stake_token, expectedCreateResp.stake_token);
-    assert.equal(actualGetResponse.vote_weight, expectedCreateResp.vote_weight);
-    assert.equal(
-      actualGetResponse.stake_enabled,
-      expectedCreateResp.stake_enabled,
-    );
+    assert.equal(found!.stake!.community_id, expectedCreateResp.community_id);
+    assert.equal(found!.stake!.stake_id, expectedCreateResp.stake_id);
+    assert.equal(found!.stake!.stake_token, expectedCreateResp.stake_token);
+    assert.equal(found!.stake!.vote_weight, expectedCreateResp.vote_weight);
+    assert.equal(found!.stake!.stake_enabled, expectedCreateResp.stake_enabled);
   });
 
   test('The integration with protocol works', async () => {
-    const community = await server.models.Community.findOne({
+    const community = await models.Community.findOne({
       where: {
         id: 'common-protocol',
       },

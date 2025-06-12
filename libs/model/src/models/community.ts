@@ -167,6 +167,11 @@ export default (
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      ai_features_enabled: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
       environment: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -178,6 +183,10 @@ export default (
       },
       thread_purchase_token: {
         type: Sequelize.STRING,
+        allowNull: true,
+      },
+      pending_namespace_judge_token_id: {
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
     },

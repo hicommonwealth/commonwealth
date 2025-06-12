@@ -37,6 +37,7 @@ export function SpyNotificationsProvider(stubs?: {
     unregisterClientRegistrationToken:
       stubs?.unregisterClientRegistrationToken ||
       vi.fn(() => Promise.resolve(true)),
+    signUserToken: vi.fn(() => Promise.resolve(undefined)),
   };
 }
 
@@ -76,5 +77,6 @@ export function ThrowingSpyNotificationsProvider(stubs?: {
     unregisterClientRegistrationToken:
       stubs?.unregisterClientRegistrationToken ||
       vi.fn(() => Promise.reject(ProviderError)),
+    signUserToken: vi.fn(() => Promise.resolve(undefined)),
   };
 }

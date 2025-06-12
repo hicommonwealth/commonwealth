@@ -11,7 +11,7 @@ export const useFetchGlobalActivityQuery = ({ limit }: { limit: number }) => {
     },
     {
       staleTime: GLOBAL_ACTIVITY_STALE_TIME,
-      cacheTime: USER_ACTIVITY_CACHE_TIME,
+      gcTime: USER_ACTIVITY_CACHE_TIME,
       initialCursor: 1,
       getNextPageParam: (lastPage) => {
         if (lastPage.results.length === 0) return undefined;
@@ -29,7 +29,7 @@ export const useFetchUserActivityQuery = ({ limit }: { limit: number }) => {
     },
     {
       staleTime: USER_ACTIVITY_STALE_TIME,
-      cacheTime: USER_ACTIVITY_CACHE_TIME,
+      gcTime: USER_ACTIVITY_CACHE_TIME,
       initialCursor: 1,
       getNextPageParam: (lastPage) => {
         const nextPageNum = lastPage.page + 1;

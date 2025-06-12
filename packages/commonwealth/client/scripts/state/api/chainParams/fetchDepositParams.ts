@@ -33,7 +33,7 @@ const useDepositParamsQuery = (stakingDenom: string, chainTtype?: string) => {
     queryKey: ['depositParams', communityId, stakingDenom, chainTtype],
     queryFn: () => fetchDepositParams(stakingDenom, chainTtype),
     enabled: app.chain?.base === ChainBase.CosmosSDK && !!stakingDenom,
-    cacheTime: DEPOSIT_PARAMS_CACHE_TIME,
+    gcTime: DEPOSIT_PARAMS_CACHE_TIME,
     staleTime: DEPOSIT_PARAMS_STALE_TIME,
   });
 };

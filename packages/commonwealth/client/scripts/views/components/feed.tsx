@@ -6,14 +6,11 @@ import './feed.scss';
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
 
-import { ActivityThread, PermissionEnum } from '@hicommonwealth/schemas';
 import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
 import { extractImages } from 'client/scripts/helpers/feed';
-import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { Thread } from 'models/Thread';
-import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
@@ -22,8 +19,6 @@ import {
   useFetchUserActivityQuery,
 } from 'state/api/feeds/fetchUserActivity';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
-import { z } from 'zod';
 import ThreadPreviewModal from '../modals/ThreadPreviewModal';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
 import { CWModal } from './component_kit/new_designs/CWModal';
@@ -56,50 +51,29 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
     (a) => a?.community?.id === thread?.communityId,
   );
 
-  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
+  const { actionGroups, bypassGating } = useTopicGating({
     communityId: thread.communityId,
     userAddress: account?.address || '',
     apiEnabled: !!account?.address && !!thread.communityId,
     topicId: thread?.topic?.id || 0,
   });
 
-  const isAdmin =
-    Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin({
-      id: community?.id || '',
-      adminsAndMods: community?.adminsAndMods || [],
-    });
-
-  const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: isRestrictedMembership,
-  });
-
-  const disabledCommentActionTooltipText = getThreadActionTooltipText({
-    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT, // on this page we only show comment option
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
-  });
-
   // edge case for deleted communities with orphaned posts
   if (!community) {
     return (
-      <ThreadCard thread={thread} layoutType="community-first" showSkeleton />
+      <ThreadCard
+        thread={thread}
+        layoutType="community-first"
+        showSkeleton
+        actionGroups={actionGroups}
+        bypassGating={bypassGating}
+      />
     );
   }
 
   return (
     <ThreadCard
       thread={thread}
-      canReact={!disabledActionsTooltipText}
-      canComment={!disabledCommentActionTooltipText}
       canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
       onStageTagClick={() => {
         navigate(
@@ -110,11 +84,6 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       }}
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledActionsTooltipText={
-        disabledCommentActionTooltipText
-          ? disabledCommentActionTooltipText
-          : disabledActionsTooltipText
-      }
       customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer
@@ -122,87 +91,11 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       onImageClick={onClick}
       maxChars={MIN_CHARS_TO_SHOW_MORE}
       cutoffLines={4}
+      actionGroups={actionGroups}
+      bypassGating={bypassGating}
     />
   );
 };
-
-// TODO: Reconcile client state with query schemas
-function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
-  return new Thread({
-    Address: {
-      id: 0,
-      address: thread.user_address,
-      community_id: thread.community_id,
-      ghost_address: false,
-      is_user_default: false,
-      is_banned: false,
-      role: 'member',
-    },
-    title: thread.title,
-    id: thread.id,
-    created_at: thread.created_at ?? '',
-    updated_at: thread.updated_at ?? thread.created_at ?? '',
-    topic: {
-      community_id: thread.community_id,
-      id: thread.topic.id,
-      name: thread.topic.name,
-      description: thread.topic.description,
-      created_at: '',
-      featured_in_sidebar: false,
-      featured_in_new_post: false,
-      group_ids: [],
-      active_contest_managers: [],
-      total_threads: 0,
-      // If we expect to do tokenized stuff on the feed, modify this
-      allow_tokenized_threads: false,
-    },
-    kind: thread.kind as ThreadKind,
-    stage: thread.stage as ThreadStage,
-    ThreadVersionHistories: [],
-    community_id: thread.community_id,
-    read_only: thread.read_only,
-    body: thread.body,
-    content_url: thread.content_url || null,
-    locked_at: thread.locked_at ?? '',
-    archived_at: thread.archived_at ?? '',
-    has_poll: thread.has_poll ?? false,
-    marked_as_spam_at: thread.marked_as_spam_at ?? '',
-    discord_meta: thread.discord_meta!,
-    profile_name: thread.profile_name ?? '',
-    avatar_url: thread.profile_avatar ?? '',
-    user_id: thread.user_id,
-    user_tier: thread.user_tier,
-    userId: thread.user_id,
-    last_edited: thread.updated_at ?? '',
-    last_commented_on: '',
-    reaction_weights_sum: '0',
-    address_last_active: '',
-    address_id: 0,
-    search: '',
-    ContestActions: [],
-    numberOfComments: thread.number_of_comments,
-    is_linking_token: thread.is_linking_token,
-    launchpad_token_address: thread.launchpad_token_address ?? undefined,
-    recentComments:
-      thread.recent_comments?.map((c) => ({
-        id: c.id,
-        address: c.address,
-        user_id: c.user_id ?? 0,
-        created_at: c.created_at,
-        updated_at: c.updated_at,
-        profile_avatar: c.profile_avatar ?? '',
-        profile_name: c.profile_name ?? '',
-        body: c.body,
-        content_url: c.content_url || null,
-        thread_id: 0,
-        address_id: 0,
-        reaction_count: 0,
-        comment_level: 0,
-        reply_count: 0,
-        community_id: thread.community_id,
-      })) ?? [],
-  });
-}
 
 type FeedProps = {
   query: typeof useFetchGlobalActivityQuery | typeof useFetchUserActivityQuery;
@@ -239,9 +132,10 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
   if (isError) {
     return <PageNotFound message="There was an error rendering the feed." />;
   }
-  const allThreads = feed?.pages
-    ? feed.pages.flatMap((page) => page.results || [])
-    : [];
+
+  // TODO: replace Thread with ThreadView
+  const allThreads =
+    feed?.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [];
 
   if (!allThreads?.length) {
     return (
@@ -253,8 +147,8 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
     );
   }
 
-  const openModal = (thread: z.infer<typeof ActivityThread>) => {
-    setSelectedThread(mapThread(thread));
+  const openModal = (thread: Thread) => {
+    setSelectedThread(thread);
     setIsThreadModalOpen(true);
   };
 
@@ -274,7 +168,7 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
         itemContent={(i, thread) => (
           <FeedThread
             key={i}
-            thread={mapThread(thread)}
+            thread={thread}
             onClick={() => openModal(thread)}
           />
         )}

@@ -8,6 +8,7 @@ import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
+  SENDGRID_API_KEY,
   DATABASE_URL,
   DATABASE_LOG_TRACE,
   DEFAULT_COMMONWEALTH_LOGO,
@@ -78,6 +79,10 @@ const {
   COMMUNITY_TIER_WEIGHT,
   DISABLE_TIER_RATE_LIMITS,
   TIER_SOCIAL_VERIFIED_MIN_ETH,
+  MCP_DEMO_CLIENT_SERVER_URL,
+  MCP_DEMO_CLIENT_KEY,
+  EVM_CHAINS_WHITELIST,
+  LOG_XP_LAUNCHPAD,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -97,6 +102,9 @@ const DEFAULTS = {
 export const config = configure(
   [target],
   {
+    SENDGRID: {
+      API_KEY: SENDGRID_API_KEY,
+    },
     DB: {
       URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
       NAME,
@@ -107,6 +115,7 @@ export const config = configure(
       PRIVATE_KEY: PRIVATE_KEY || '',
       LAUNCHPAD_PRIVATE_KEY: LAUNCHPAD_PRIVATE_KEY || '',
       CONTEST_BOT_PRIVATE_KEY: CONTEST_BOT_PRIVATE_KEY || '',
+      EVM_CHAINS_WHITELIST: EVM_CHAINS_WHITELIST || '',
     },
     TBC: {
       TTL_SECS: TBC_BALANCE_TTL_SECONDS
@@ -267,8 +276,22 @@ export const config = configure(
         TIER_SOCIAL_VERIFIED_MIN_ETH || DEFAULTS.TIER_SOCIAL_VERIFIED_MIN_ETH,
       ),
     },
+    MCP: {
+      MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
+      MCP_DEMO_CLIENT_KEY: MCP_DEMO_CLIENT_KEY,
+    },
+    LOG_XP_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
   },
   z.object({
+    SENDGRID: z.object({
+      API_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'SENDGRID_API_KEY is required in production',
+        ),
+    }),
     DB: z.object({
       URI: z
         .string()
@@ -306,6 +329,13 @@ export const config = configure(
         .refine(
           (data) => !(target.APP_ENV === 'production' && !data),
           'CONTEST_BOT_PRIVATE_KEY must be set to a non-default value in production.',
+        ),
+      EVM_CHAINS_WHITELIST: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && data),
+          'EVM_CHAINS_WHITELIST cannot be set in production.',
         ),
     }),
     TBC: z.object({
@@ -561,5 +591,10 @@ export const config = configure(
     TIER: z.object({
       SOCIAL_VERIFIED_MIN_ETH: z.number(),
     }),
+    MCP: z.object({
+      MCP_DEMO_CLIENT_SERVER_URL: z.string().optional(),
+      MCP_DEMO_CLIENT_KEY: z.string().optional(),
+    }),
+    LOG_XP_LAUNCHPAD: z.boolean().default(false),
   }),
 );

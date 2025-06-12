@@ -1,16 +1,4 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
-import { PermissionLabel, TOPIC_PERMISSIONS } from './constants';
-
-export enum GroupTopicPermissionEnum {
-  UPVOTE = 'UPVOTE',
-  COMMENT = 'COMMENT',
-  POST = 'POST',
-  POST_AND_COMMENT = 'POST_AND_COMMENT',
-  UPVOTE_AND_COMMENT = 'UPVOTE_AND_COMMENT',
-  UPVOTE_AND_POST = 'UPVOTE_AND_POST',
-  UPVOTE_AND_COMMENT_AND_POST = 'UPVOTE_AND_COMMENT_AND_POST',
-  NONE = 'NONE',
-}
+import { GatedActionEnum } from '@hicommonwealth/shared';
 
 export type RequirementSubFormsState = {
   defaultValues?: RequirementSubTypeWithLabel;
@@ -28,31 +16,18 @@ export type RequirementSubType = {
   requirementCoinType?: string;
 };
 
-export type TopicPermissions =
-  (typeof TOPIC_PERMISSIONS)[keyof typeof TOPIC_PERMISSIONS];
-
-export type TopicPermissionsSubFormsState = {
-  topic: TopicPermissionsSubFormType['topic'];
-  permission: TopicPermissions;
-};
-
-export type TopicPermissionsSubFormType = {
-  topic: { id: number; name: string };
-  defaultPermission?: TopicPermissions;
-  onPermissionChange: (permission: string) => void;
-};
-
-export const Permissions = PermissionEnum;
+export const Permissions = GatedActionEnum;
 
 export type Permission = (typeof Permissions)[keyof typeof Permissions];
 
 export type Topic = {
   id: number;
   name: string;
+  is_private: boolean;
 };
 
 export type TopicPermissionToggleGroupSubFormsState = {
-  permission: Permission[];
+  permission: GatedActionEnum[];
   topic: Topic;
 };
 
@@ -62,8 +37,6 @@ export type TopicPermissionFormToggleGroupSubFormProps = {
     updatedPermissions: TopicPermissionToggleGroupSubFormsState[],
   ) => void;
 };
-
-export type PermissionLabelType = (typeof PermissionLabel)[number];
 
 export type LabelType = {
   label: string;
@@ -109,7 +82,7 @@ export type GroupInitialValuesTypeWithLabel = {
   groupImageUrl?: string;
   requirements?: RequirementSubTypeWithLabel[];
   requirementsToFulfill?: 'ALL' | number;
-  topics: (LabelType & { permission: TopicPermissions })[];
+  topics: (LabelType & { is_private: boolean; permission: GatedActionEnum })[];
 };
 
 export type FormSubmitValues = {

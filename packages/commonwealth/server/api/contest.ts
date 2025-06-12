@@ -24,9 +24,9 @@ export const trpcRouter = trpc.router({
     Contest.GetFarcasterContestCasts,
     trpc.Tag.Community,
   ),
-  farcasterWebhook: trpc.command(
-    Contest.FarcasterCastWebhook,
-    trpc.Tag.Integration,
-  ),
   getJudgeStatus: trpc.query(Contest.GetJudgeStatus, trpc.Tag.Community),
+  configureNominationsMetadata: trpc.command(
+    Contest.ConfigureNominationsMetadata,
+    trpc.Tag.Community,
+  ),
 });

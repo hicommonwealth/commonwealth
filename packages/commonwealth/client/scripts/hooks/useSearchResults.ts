@@ -3,23 +3,23 @@ import { useDebounce } from 'usehooks-ts';
 
 import {
   CommentSearchView,
+  SearchCommunityView,
   SearchUserProfilesView,
+  ThreadView,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
 import { SearchScope } from '../models/SearchQuery';
 import app from '../state';
-import { useSearchChainsQuery } from '../state/api/chains';
-import { SearchChainsResponse } from '../state/api/chains/searchChains';
 import { useSearchCommentsQuery } from '../state/api/comments';
+import { useSearchCommunitiesQuery } from '../state/api/communities';
 import { useSearchProfilesQuery } from '../state/api/profiles';
 import { useSearchThreadsQuery } from '../state/api/threads';
-import { SearchThreadsResponse } from '../state/api/threads/searchThreads';
 
 export type SearchResults = {
-  [SearchScope.Threads]: SearchThreadsResponse['results'];
+  [SearchScope.Threads]: z.infer<typeof ThreadView>[];
   [SearchScope.Replies]: z.infer<typeof CommentSearchView>[];
-  [SearchScope.Communities]: SearchChainsResponse['results'];
+  [SearchScope.Communities]: z.infer<typeof SearchCommunityView>[];
   [SearchScope.Members]: z.infer<typeof SearchUserProfilesView>[];
 };
 
@@ -49,7 +49,16 @@ const useSearchResults = (
   const queryEnabled = debouncedSearchTerm.length > 0 && !!communityId;
 
   const { data: threadsData } = useSearchThreadsQuery({
-    ...sharedQueryOptions,
+    ...{
+      community_id: sharedQueryOptions.communityId,
+      search_term: sharedQueryOptions.searchTerm,
+      cursor: 1,
+      limit: sharedQueryOptions.limit,
+      order_by: sharedQueryOptions.orderBy,
+      order_direction: sharedQueryOptions.orderDirection,
+      thread_title_only: false,
+      include_count: false,
+    },
     enabled: queryEnabled && filters.includes('threads'),
   });
 
@@ -65,8 +74,14 @@ const useSearchResults = (
     enabled: queryEnabled && filters.includes('replies'),
   });
 
-  const { data: communityData } = useSearchChainsQuery({
-    ...sharedQueryOptions,
+  const { data: communityData } = useSearchCommunitiesQuery({
+    ...{
+      search: sharedQueryOptions.searchTerm,
+      cursor: 1,
+      limit: sharedQueryOptions.limit,
+      order_by: 'tier',
+      order_direction: APIOrderDirection.Desc,
+    },
     enabled: queryEnabled && filters.includes('communities'),
   });
 

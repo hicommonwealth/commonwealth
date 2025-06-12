@@ -10,6 +10,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import './AdminPanel.scss';
 import Analytics from './Analytics';
 import ChangeResourceTimestamps from './ChangeResourceTimestamps';
+import CommunityTagsManagementTask from './CommunityTagsManagement';
 import CommunityTier from './CommunityTier';
 import ConnectChainToCommunity from './ConnectChainToCommunityTask';
 import DeleteChainTask from './DeleteChainTask';
@@ -57,6 +58,7 @@ const AdminPanelPage = () => {
         <DownloadMembersListTask />
         <RPCEndpointTask />
         <ConnectChainToCommunity />
+        <CommunityTagsManagementTask />
         <MakeSiteAdminTask />
         <TopUsers />
         <TriggerNotificationsWorkflow />

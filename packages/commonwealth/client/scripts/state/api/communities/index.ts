@@ -7,6 +7,7 @@ import useGetMembersQuery from './getMembers';
 import useGetPinnedTokenByCommunityId from './getPinnedTokenByCommunityId';
 import usePinTokenToCommunityMutation from './pinTokenToCommunity';
 import useRefreshCustomDomainQuery from './refreshCustomDomain';
+import useSearchCommunitiesQuery from './searchCommunities';
 import useToggleCommunityStarMutation from './toggleCommunityStar';
 import useUnpinTokenFromCommunityMutation from './unpinTokenFromCommunity';
 import useUpdateCommunityMutation from './updateCommunity';
@@ -24,6 +25,7 @@ export {
   useGetPinnedTokenByCommunityId,
   usePinTokenToCommunityMutation,
   useRefreshCustomDomainQuery,
+  useSearchCommunitiesQuery,
   useToggleCommunityStarMutation,
   useUnpinTokenFromCommunityMutation,
   useUpdateCommunityDirectoryTags,

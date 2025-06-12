@@ -186,9 +186,11 @@ export const CreateComment = ({
       editorValue={editorValue}
       tooltipText={tooltipText}
       isReplying={isReplying}
+      handleIsReplying={handleIsReplying}
       replyingToAuthor={replyingToAuthor}
       thread={rootThread}
       parentCommentText={parentCommentText}
+      communityId={app.activeChainId() || ''}
     />
   ) : (
     <ArchiveMsg archivedAt={rootThread.archivedAt!} />

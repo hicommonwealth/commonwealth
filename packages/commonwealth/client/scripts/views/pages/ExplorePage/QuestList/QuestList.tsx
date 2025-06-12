@@ -4,15 +4,17 @@ import { isQuestActionComplete, QuestAction, XPLog } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useState } from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { z } from 'zod';
 import TotalQuestXPTag from '../../QuestDetails/TotalQuestXPTag';
+import FiltersDrawer, { QuestFilters } from './FiltersDrawer';
 import QuestCard from './QuestCard';
 import './QuestList.scss';
 
@@ -20,16 +22,27 @@ type QuestListProps = {
   minQuests?: number;
   questsForCommunityId?: string;
   hideHeader?: boolean;
+  hideFilters?: boolean;
+  hideSeeMore?: boolean;
 };
 
 const QuestList = ({
   minQuests = 8,
   questsForCommunityId,
   hideHeader,
+  hideFilters = false,
+  hideSeeMore = false,
 }: QuestListProps) => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
   const user = useUserStore();
+
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+
+  const [filters, setFilters] = useState<QuestFilters>({
+    endingAfter: moment().startOf('week').toDate(),
+    startingBefore: moment().endOf('year').toDate(),
+  });
 
   const {
     data: questsList,
@@ -43,7 +56,8 @@ const QuestList = ({
     }),
     cursor: 1,
     limit: minQuests,
-    end_after: moment().startOf('week').toDate(),
+    end_after: filters.endingAfter,
+    start_before: filters.startingBefore,
     // dont show system quests in quest lists for communities
     include_system_quests: questsForCommunityId ? false : true,
     enabled: xpEnabled,
@@ -77,6 +91,37 @@ const QuestList = ({
   return (
     <div className="QuestList">
       {!hideHeader && <CWText type="h2">Quests</CWText>}
+      {!hideFilters && (
+        <div
+          className={clsx('filters', {
+            hasAppliedFilter: Object.values(filters).filter(Boolean).length > 0,
+          })}
+        >
+          <CWButton
+            label="Filters"
+            iconRight="funnelSimple"
+            buttonType="secondary"
+            onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
+          />
+          <CWTag
+            label={`Ending After: ${moment(filters.endingAfter).utc().local().format('Do MMMM, YYYY h:mm A')}`}
+            type="filter"
+          />
+          <CWTag
+            label={`Starting Before: ${moment(filters.startingBefore).utc().local().format('Do MMMM, YYYY h:mm A')}`}
+            type="filter"
+            onCloseClick={() =>
+              setFilters((f) => ({ ...f, startingBefore: undefined }))
+            }
+          />
+          <FiltersDrawer
+            isOpen={isFilterDrawerOpen}
+            onClose={() => setIsFilterDrawerOpen(false)}
+            filters={filters}
+            onFiltersChange={(newFilters) => setFilters(newFilters)}
+          />
+        </div>
+      )}
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : quests.length === 0 ? (
@@ -141,12 +186,18 @@ const QuestList = ({
           <CWCircleMultiplySpinner />
         </div>
       ) : hasNextPage && quests.length > 0 ? (
-        <CWButton
-          label="See more"
-          buttonType="tertiary"
-          containerClassName="ml-auto"
-          onClick={handleFetchMoreQuests}
-        />
+        <>
+          {hideSeeMore ? (
+            <></>
+          ) : (
+            <CWButton
+              label="See more"
+              buttonType="tertiary"
+              containerClassName="ml-auto"
+              onClick={handleFetchMoreQuests}
+            />
+          )}
+        </>
       ) : (
         <></>
       )}

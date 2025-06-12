@@ -185,6 +185,21 @@ export const trpcRouter = trpc.router({
   deleteLinks: trpc.command(Thread.DeleteLinks, trpc.Tag.Thread),
   getLinks: trpc.query(Thread.GetLinks, trpc.Tag.Thread),
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread),
+  getThreadById: trpc.query(
+    Thread.GetThreadById,
+    trpc.Tag.Thread,
+    { ttlSecs: 10 },
+    [
+      trpc.fireAndForget(async (input) => {
+        log.trace('incrementing thread view count', { id: input.thread_id });
+        await cache().incrementHashKey(
+          CacheNamespaces.CountAggregator,
+          CountAggregatorKeys.ThreadViewCount,
+          input.thread_id.toString(),
+        );
+      }),
+    ],
+  ),
   getThreadsByIds: trpc.query(
     Thread.GetThreadsByIds,
     trpc.Tag.Thread,
@@ -206,4 +221,8 @@ export const trpcRouter = trpc.router({
       }),
     ],
   ),
+  searchThreads: trpc.query(Thread.SearchThreads, trpc.Tag.Thread),
+  getActiveThreads: trpc.query(Thread.GetActiveThreads, trpc.Tag.Thread, {
+    ttlSecs: 60,
+  }),
 });

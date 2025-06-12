@@ -1,7 +1,6 @@
-import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import React, { useState } from 'react';
 import { components } from 'react-select';
-import { useSearchChainsQuery } from 'state/api/chains';
+import { useSearchCommunitiesQuery } from 'state/api/communities';
 import { useDebounce } from 'usehooks-ts';
 import CommunityInfo from '../component_kit/CommunityInfo';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
@@ -32,13 +31,11 @@ const CWCommunityInput = (props: CWCommunityInputProps) => {
   );
   const debouncedSearchTerm = useDebounce<string>(communitySearch, 300);
 
-  const { data: communityResults } = useSearchChainsQuery({
-    searchTerm: debouncedSearchTerm, // we want to display the common community as a default
-    limit: debouncedSearchTerm === DEFAULT_COMMUNITY_SEARCH ? 1 : 100,
-    orderBy: APIOrderBy.Rank,
-    orderDirection: APIOrderDirection.Desc,
+  const { data: communityResults } = useSearchCommunitiesQuery({
+    search: debouncedSearchTerm.trim(), // we want to display the common community as a default
+    limit: debouncedSearchTerm === DEFAULT_COMMUNITY_SEARCH ? 1 : 50,
+    cursor: 1,
     enabled: debouncedSearchTerm.trim().length > 0,
-    communityId: '',
   });
   const communities = (communityResults?.pages || []).flatMap(
     (page) => page.results,

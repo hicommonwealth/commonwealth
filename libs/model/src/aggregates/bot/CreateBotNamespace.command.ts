@@ -81,6 +81,7 @@ export function CreateBotNamespace(): Command<
         snapshot_spaces: [],
         stages_enabled: true,
         namespace_verified: false,
+        ai_features_enabled: true,
       });
       return {
         community,

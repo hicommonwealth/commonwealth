@@ -64,12 +64,14 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
         ...result.toJSON(),
         adminsAndMods,
         communityBanner: result.banner_text,
+        ai_features_enabled: result.ai_features_enabled,
       } as CommunityAttributes & {
         adminsAndMods: Array<{
           address: string;
           role: 'admin' | 'moderator';
         }>;
         communityBanner: string | undefined;
+        ai_features_enabled: boolean;
       };
     },
   };
