@@ -6,8 +6,8 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
 import {
-  useFetchConfigurationQuery,
   useFetchCustomDomainQuery,
+  useFetchPublicEnvVarQuery,
 } from 'state/api/configuration';
 import useErrorStore from 'state/ui/error';
 import useUserStore from 'state/ui/user';
@@ -58,7 +58,7 @@ const LayoutComponent = ({
   const [isLoading, setIsLoading] = useState<boolean>();
 
   const { mutateAsync: selectCommunity } = useSelectCommunityMutation();
-  const { data: configurationData } = useFetchConfigurationQuery();
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -73,7 +73,8 @@ const LayoutComponent = ({
   // redirect to new community id ex: `${PRODUCTION_DOMAIN}/{new-community-id}/**/*`
   useNecessaryEffect(() => {
     // @ts-expect-error <StrictNullChecks/>
-    const redirectTo = configurationData?.redirects?.[providedCommunityScope];
+    const redirectTo =
+      configurationData?.COMMUNITY_REDIRECTS?.[providedCommunityScope];
     // @ts-expect-error <StrictNullChecks/>
     if (redirectTo && redirectTo !== providedCommunityScope.toLowerCase()) {
       // @ts-expect-error <StrictNullChecks/>

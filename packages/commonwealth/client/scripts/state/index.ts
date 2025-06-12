@@ -6,9 +6,7 @@ import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { EventEmitter } from 'events';
 import type IChainAdapter from 'models/IChainAdapter';
-import { queryClient, QueryKeys } from 'state/api/config';
 import {
-  Configuration,
   fetchCustomDomainQuery,
   fetchPublicEnvVar,
 } from 'state/api/configuration';
@@ -71,39 +69,15 @@ export async function initAppState(
   updateSelectedCommunity = true,
 ): Promise<void> {
   try {
-    await fetchNodes();
-    await fetchCustomDomainQuery();
-    await fetchPublicEnvVar();
+    const [status] = await Promise.all([
+      fetchStatus(),
+      fetchNodes(),
+      fetchCustomDomainQuery(),
+      fetchPublicEnvVar(),
+    ]);
 
-    // set evmTestEnv in configuration cache
-    queryClient.setQueryData([QueryKeys.CONFIGURATION], {
-      evmTestEnv: {
-        ETH_RPC: process.env.TEST_EVM_ETH_RPC,
-        PROVIDER_URL: process.env.TEST_EVM_PROVIDER_URL,
-      },
-    });
-
-    const status = await fetchStatus();
     updateActiveUser(status);
     if (status) {
-      // store community redirect's map in configuration cache
-      const communityWithRedirects =
-        status.communities?.filter((c) => c.redirect) || [];
-      if (communityWithRedirects.length > 0) {
-        communityWithRedirects.map(({ id, redirect }) => {
-          const cachedConfig = queryClient.getQueryData<Configuration>([
-            QueryKeys.CONFIGURATION,
-          ]);
-          queryClient.setQueryData([QueryKeys.CONFIGURATION], {
-            ...cachedConfig,
-            redirects: {
-              ...cachedConfig?.redirects,
-              [redirect!]: id,
-            },
-          });
-        });
-      }
-
       // update the selectedCommunity, unless we explicitly want to avoid
       // changing the current state (e.g. when logging in through link_new_address_modal)
       if (updateSelectedCommunity && status?.selected_community_id) {

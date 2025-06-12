@@ -1,4 +1,5 @@
 import { GetPublicEnvVar } from '@hicommonwealth/schemas';
+import { useQuery } from '@tanstack/react-query';
 import { getQueryKey } from '@trpc/react-query';
 import axios from 'axios';
 import { BASE_API_PATH, trpc } from 'utils/trpcClient';
@@ -30,3 +31,15 @@ export const fetchPublicEnvVar = async () => {
   data && queryClient.setQueryData(queryKey, data);
   return data;
 };
+
+const useFetchPublicEnvVarQuery = () => {
+  const queryKey = getQueryKey(trpc.configuration.getPublicEnvVar);
+  return useQuery({
+    queryKey,
+    queryFn: fetchCachedPublicEnvVar,
+    staleTime: Infinity,
+    gcTime: Infinity,
+  });
+};
+
+export default useFetchPublicEnvVarQuery;

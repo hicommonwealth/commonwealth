@@ -1,24 +1,17 @@
-import useFetchConfigurationQuery, {
-  fetchCachedConfiguration,
-} from './fetchConfiguration';
 import useFetchCustomDomainQuery, {
   fetchCachedCustomDomain,
   fetchCustomDomainQuery,
 } from './fetchCustomDomain';
-import {
+import useFetchPublicEnvVarQuery, {
   fetchCachedPublicEnvVar,
   fetchPublicEnvVar,
 } from './fetchPublicEnvVar';
 
-import type { Configuration } from './fetchConfiguration';
-
 export {
-  fetchCachedConfiguration,
   fetchCachedCustomDomain,
   fetchCachedPublicEnvVar,
   fetchCustomDomainQuery,
   fetchPublicEnvVar,
-  useFetchConfigurationQuery,
   useFetchCustomDomainQuery,
+  useFetchPublicEnvVarQuery,
 };
-export type { Configuration };
