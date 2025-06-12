@@ -67,7 +67,6 @@ export const createThreadToken = async ({
       chainId.toString(),
       initPurchaseAmount,
       authorAddress,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       communityTreasuryAddress,
     );
   } catch (error) {
