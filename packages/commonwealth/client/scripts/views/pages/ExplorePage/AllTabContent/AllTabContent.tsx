@@ -94,6 +94,7 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
         <div className="horizontal-scroll-container">
           <ExploreContestList
             hideHeader
+            hideFilters
             hideSearchTag
             searchText={searchText}
             onClearSearch={onClearSearch}
@@ -126,7 +127,11 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
           onSeeAllClick={() => navigate('/explore?tab=users')}
         />
         <div className="users-xp-table">
-          <XPTable searchText={searchText} onClearSearch={onClearSearch} />
+          <XPTable
+            hideFilters
+            searchText={searchText}
+            onClearSearch={onClearSearch}
+          />
         </div>
       </div>
     </div>

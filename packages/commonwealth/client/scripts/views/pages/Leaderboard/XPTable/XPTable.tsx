@@ -40,10 +40,15 @@ const columns: CWTableColumnInfo[] = [
 
 type XPTableProps = {
   searchText?: string;
+  hideFilters?: boolean;
   onClearSearch?: () => void;
 };
 
-const XPTable = ({ searchText, onClearSearch }: XPTableProps) => {
+const XPTable = ({
+  searchText,
+  hideFilters = false,
+  onClearSearch,
+}: XPTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedQuest, setSelectedQuest] = useState<{
     value: string;
@@ -91,28 +96,30 @@ const XPTable = ({ searchText, onClearSearch }: XPTableProps) => {
 
   return (
     <>
-      <div className="xp-filters">
-        {searchText?.trim() && (
-          <CWTag
-            label={`Search: ${searchText?.trim()}`}
-            type="filter"
-            onCloseClick={onClearSearch}
-          />
-        )}
-        <div className="quest-filter">
-          <CWSelectList
-            placeholder="Filter by Quest"
-            value={selectedQuest}
-            onChange={(option) => {
-              setSelectedQuest(option as { value: string; label: string });
-              setCurrentPage(1);
-            }}
-            options={questOptions}
-            isClearable
-            isSearchable
-          />
+      {!hideFilters && (
+        <div className="xp-filters">
+          {searchText?.trim() && (
+            <CWTag
+              label={`Search: ${searchText?.trim()}`}
+              type="filter"
+              onCloseClick={onClearSearch}
+            />
+          )}
+          <div className="quest-filter">
+            <CWSelectList
+              placeholder="Filter by Quest"
+              value={selectedQuest}
+              onChange={(option) => {
+                setSelectedQuest(option as { value: string; label: string });
+                setCurrentPage(1);
+              }}
+              options={questOptions}
+              isClearable
+              isSearchable
+            />
+          </div>
         </div>
-      </div>
+      )}
       <section className="XPTable">
         {!isLoading && rankings.length === 0 ? (
           <CWText type="h2" className="empty-rankings">
