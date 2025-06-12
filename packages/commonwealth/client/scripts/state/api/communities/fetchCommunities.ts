@@ -24,6 +24,8 @@ const useFetchCommunitiesQuery = ({
   order_direction = 'DESC',
   order_by = 'lifetime_thread_count',
   search,
+  has_launchpad_token,
+  has_pinned_token,
   enabled = true,
 }: UseFetchCommunitiesProps) => {
   return trpc.community.getCommunities.useInfiniteQuery(
@@ -42,6 +44,8 @@ const useFetchCommunitiesQuery = ({
       tag_ids,
       has_groups,
       search,
+      has_launchpad_token,
+      has_pinned_token,
       relevance_by,
       ...(tag_ids &&
         tag_ids?.length > 0 && {

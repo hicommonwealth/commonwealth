@@ -33,6 +33,8 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         cosmos_chain_id,
         community_type,
         search = '',
+        has_launchpad_token,
+        has_pinned_token,
       } = payload;
 
       // pagination configuration
@@ -131,6 +133,28 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                             SELECT "community_id"
                             FROM   "Groups" AS "Groups"
                             WHERE  ( "Groups"."community_id" = "Community"."id" )
+                            LIMIT  1
+                          ) IS NOT NULL
+                        `,
+              )}
+              ${iQ(
+                payload.has_launchpad_token,
+                `
+                          AND (
+                            SELECT 1
+                            FROM   "LaunchpadTokens" AS "LaunchpadTokens"
+                            WHERE  ( "LaunchpadTokens"."namespace" = "Community"."namespace_address" )
+                            LIMIT  1
+                          ) IS NOT NULL
+                        `,
+              )}
+              ${iQ(
+                payload.has_pinned_token,
+                `
+                          AND (
+                            SELECT 1
+                            FROM   "PinnedTokens" AS "PinnedTokens"
+                            WHERE  ( "PinnedTokens"."community_id" = "Community"."id" )
                             LIMIT  1
                           ) IS NOT NULL
                         `,

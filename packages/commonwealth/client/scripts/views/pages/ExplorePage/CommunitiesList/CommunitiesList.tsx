@@ -72,6 +72,8 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
   const [filters, setFilters] = useState<CommunityFilters>({
     withCommunityEcosystem: undefined,
     withStakeEnabled: undefined,
+    withLaunchpadToken: undefined,
+    withPinnedToken: undefined,
     withTagsIds: undefined,
     withCommunitySortBy: CommunitySortOptions.MemberCount,
     withCommunitySortOrder: CommunitySortDirections.Descending,
@@ -125,6 +127,8 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
       ? ChainNetwork[filters.withNetwork]
       : undefined,
     stake_enabled: filters.withStakeEnabled,
+    has_launchpad_token: filters.withLaunchpadToken,
+    has_pinned_token: filters.withPinnedToken,
     cursor: 1,
     tag_ids: filters.withTagsIds,
     community_type: filters.withCommunityType
@@ -156,6 +160,20 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
     setFilters({
       ...filters,
       withStakeEnabled: false,
+    });
+  };
+
+  const removeLaunchpadTokenFilter = () => {
+    setFilters({
+      ...filters,
+      withLaunchpadToken: false,
+    });
+  };
+
+  const removePinnedTokenFilter = () => {
+    setFilters({
+      ...filters,
+      withPinnedToken: false,
     });
   };
 
@@ -276,7 +294,25 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
           />
         )}
         {filters.withStakeEnabled && (
-          <CWTag label="Stake" type="filter" onCloseClick={removeStakeFilter} />
+          <CWTag
+            label="With: Stake"
+            type="filter"
+            onCloseClick={removeStakeFilter}
+          />
+        )}
+        {filters.withLaunchpadToken && (
+          <CWTag
+            label="With: Launchpad Token"
+            type="filter"
+            onCloseClick={removeLaunchpadTokenFilter}
+          />
+        )}
+        {filters.withPinnedToken && (
+          <CWTag
+            label="With: External Token"
+            type="filter"
+            onCloseClick={removePinnedTokenFilter}
+          />
         )}
         {filters.withTagsIds &&
           filters.withTagsIds.map((id) => (
