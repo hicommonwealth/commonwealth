@@ -93,4 +93,17 @@
     gap: 24px;
     flex-wrap: wrap;
   }
+
+  .ai-features-section {
+    .controls {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: 16px;
+
+      .Toggle {
+        min-width: 44px;
+      }
+    }
+  }
 }

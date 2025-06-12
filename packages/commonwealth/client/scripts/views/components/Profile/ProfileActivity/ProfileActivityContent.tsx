@@ -20,14 +20,12 @@ type ProfileActivityContentProps = {
   option: ProfileActivityType;
   threads: Thread[];
   comments: CommentWithAssociatedThread[];
-  mapProfileThread: (thread: Thread) => Thread;
 };
 
 const ProfileActivityContent = ({
   option,
   comments,
   threads,
-  mapProfileThread,
 }: ProfileActivityContentProps) => {
   if (option === ProfileActivityType.Threads) {
     if (threads.length === 0) {
@@ -47,10 +45,7 @@ const ProfileActivityContent = ({
         {threads
           .sort((a, b) => +b.createdAt - +a.createdAt)
           .map((thread, i) => (
-            <ProfileThread
-              thread={mapProfileThread(thread) as Thread}
-              key={i}
-            />
+            <ProfileThread thread={thread} key={i} />
           ))}
       </>
     );

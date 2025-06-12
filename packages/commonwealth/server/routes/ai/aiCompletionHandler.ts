@@ -14,6 +14,7 @@ interface StructuredPrompt {
 // Define a type for the request body that can handle both string and structured prompt
 type RequestBody = Omit<CompletionOptions, 'prompt'> & {
   prompt: string | StructuredPrompt;
+  contextualMentions?: boolean;
 };
 
 const log = logger(import.meta);
@@ -111,7 +112,8 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       `AI completion request: 
       \n modelId=${modelId}, 
       \n provider=${useOR ? 'OpenRouter' : 'OpenAI'}, 
-      \n webSearch=${!!useWebSearch}`,
+      \n webSearch=${!!useWebSearch}
+      \n contextualMentions=${!!(finalSystemPrompt && finalSystemPrompt.includes('CONTEXTUAL INFORMATION:'))}`,
     );
 
     // Initialize client

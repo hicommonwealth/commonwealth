@@ -46,7 +46,7 @@ const UserTier = () => {
     UserTierMap.IncompleteUser,
   );
 
-  const { mutateAsync: setUserTier, isLoading } = useSetUserTierMutation();
+  const { mutateAsync: setUserTier, isPending } = useSetUserTierMutation();
 
   useEffect(() => {
     if (user) {
@@ -121,7 +121,7 @@ const UserTier = () => {
           label="Update"
           className="TaskButton"
           disabled={
-            isLoadingUser || userNotFound || !debouncedUserId || isLoading
+            isLoadingUser || userNotFound || !debouncedUserId || isPending
           }
           onClick={openConfirmationModal}
         />

@@ -33,6 +33,7 @@ export enum Tag {
   Quest = 'Quest',
   Bot = 'Bot',
   Tag = 'Tag',
+  Search = 'Search',
 }
 
 /**

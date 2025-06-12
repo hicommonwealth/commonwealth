@@ -24,7 +24,7 @@ export function FarcasterUpvoteAction(): Command<
         log.warn(
           'Farcaster verified address not found for upvote action- upvote will be ignored.',
         );
-        return;
+        return { message: '' };
       }
       const { parent_hash, hash } = payload.cast;
       const contentUrlWithoutFid = buildFarcasterContentUrl(parent_hash!, hash);

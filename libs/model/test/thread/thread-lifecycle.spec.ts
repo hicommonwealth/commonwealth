@@ -1134,7 +1134,7 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      const tempReaction = { ...reaction };
+      const tempReaction = { ...reaction } as Partial<typeof reaction>;
       if (tempReaction) {
         if (tempReaction.community_id) delete tempReaction.community_id;
         if (tempReaction.Address) delete tempReaction.Address;
@@ -1260,7 +1260,7 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      const tempReaction = { ...reaction };
+      const tempReaction: Partial<typeof reaction> = { ...reaction };
       if (tempReaction) {
         if (tempReaction.community_id) delete tempReaction.community_id;
         if (tempReaction.Address) delete tempReaction.Address;
@@ -1301,12 +1301,12 @@ describe('Thread lifecycle', () => {
         actor: actors.member,
         payload: {
           community_id: thread.community_id,
-          limit: 100,
+          limit: 50,
+          cursor: 1,
         },
       });
 
-      // console.log(response);
-      expect(response!.threads.length).to.equal(7);
+      expect(response!.results.length).to.equal(7);
     });
 
     test('should search comments', async () => {

@@ -126,17 +126,24 @@ export type EventContext<Name extends Events> = {
 
 /**
  * Command/Query handler
- * @param context command execution context
- * @returns mutated state
+ * @param context execution context
+ * @returns output of the command/query
  * @throws {@link InvalidActor} when unauthorized
  */
-export type Handler<
+export type BodyHandler<
   Input extends ZodSchema,
   Output extends ZodSchema,
   _Context extends ZodSchema,
-> = (
+> = (context: Context<Input, _Context>) => Promise<z.infer<Output>>;
+
+/**
+ * Middleware handler
+ * @param context execution context
+ * @throws {@link InvalidActor} when unauthorized
+ */
+export type AuthHandler<Input extends ZodSchema, _Context extends ZodSchema> = (
   context: Context<Input, _Context>,
-) => Promise<z.infer<Output> | undefined | void>;
+) => Promise<void>;
 
 /**
  * Event handler
@@ -164,8 +171,8 @@ export type Metadata<
   readonly input: Input;
   readonly output: Output;
   readonly context?: _Context;
-  readonly auth: Handler<Input, Output, _Context>[];
-  readonly body: Handler<Input, Output, _Context>;
+  readonly auth: AuthHandler<Input, _Context>[];
+  readonly body: BodyHandler<Input, Output, _Context>;
   readonly secure?: boolean;
   readonly authStrategy?: AuthStrategies<Input>;
 };

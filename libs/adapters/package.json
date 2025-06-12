@@ -28,7 +28,7 @@
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
     "@knocklabs/node": "^0.6.13",
-    "@trpc/server": "^10.45.1",
+    "@trpc/server": "^11.3.0",
     "amqplib": "^0.10.3",
     "async-rwlock": "^1.1.1",
     "express": "^4.18.2",
@@ -44,9 +44,9 @@
     "rollbar": "^2.6.1",
     "sequelize": "^6.32.1",
     "swagger-ui-express": "^5.0.0",
-    "trpc-swagger": "^1.2.6",
+    "trpc-swagger": "^2.0.0",
     "typescript-logging": "^0.6.4",
-    "zod": "^3.22.4"
+    "zod": "^3.25.46"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",

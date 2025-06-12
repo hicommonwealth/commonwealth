@@ -18,9 +18,7 @@ import {
 } from 'controllers/server/sessions';
 import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL } from 'helpers/threads';
-import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, {
@@ -46,10 +44,9 @@ import {
   useCreateThreadPollMutation,
 } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
-import useFetchThreadsQuery from 'state/api/threads/fetchThreads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import useUserStore, { useUserAiSettingsStore } from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import CustomTopicOption from 'views/components/NewThreadFormLegacy/CustomTopicOption';
@@ -75,6 +72,7 @@ import {
   useGetTokenByCommunityId,
   useGetTokenizedThreadsAllowedQuery,
 } from 'client/scripts/state/api/tokens';
+import { useAIFeatureEnabled } from 'state/ui/user';
 import { ExtendedPoll, LocalPoll, parseCustomDuration } from 'utils/polls';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
@@ -121,6 +119,7 @@ interface NewThreadFormProps {
   setContentDelta?: (delta: DeltaStatic) => void;
   webSearchEnabled?: boolean;
   setWebSearchEnabled?: (enabled: boolean) => void;
+  communityId?: string;
 }
 
 export interface NewThreadFormHandles {
@@ -142,6 +141,7 @@ export const NewThreadForm = forwardRef<
       setContentDelta,
       webSearchEnabled,
       setWebSearchEnabled,
+      communityId,
     },
     ref,
   ) => {
@@ -173,12 +173,9 @@ export const NewThreadForm = forwardRef<
       apiCallEnabled: !!user.id,
     });
 
-    const {
-      aiInteractionsToggleEnabled,
-      aiCommentsToggleEnabled,
-      setAICommentsToggleEnabled,
-    } = useLocalAISettingsStore();
-    const aiCommentsFeatureEnabled = useFlag('aiComments');
+    const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
+      useUserAiSettingsStore();
+    const { isAIEnabled } = useAIFeatureEnabled();
 
     useAppStatus();
 
@@ -235,12 +232,12 @@ export const NewThreadForm = forwardRef<
       setContentDelta,
     });
 
-    const { data: recentThreads } = useFetchThreadsQuery({
-      queryType: 'bulk',
+    const { data: recentThreads } = useGetThreadsQuery({
+      cursor: 1,
       limit: 2,
-      communityId: selectedCommunityId,
-      apiEnabled: !!selectedCommunityId && !!threadTopic?.id,
-      topicId: threadTopic?.id,
+      community_id: selectedCommunityId,
+      enabled: !!selectedCommunityId && !!threadTopic?.id,
+      topic_id: threadTopic?.id,
     });
 
     const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
@@ -380,17 +377,17 @@ export const NewThreadForm = forwardRef<
       }
 
       // In AI mode, provide default values so the backend validation is not broken.
-      const effectiveTitle = aiInteractionsToggleEnabled
+      const effectiveTitle = isAIEnabled
         ? threadTitle.trim() || DEFAULT_THREAD_TITLE
         : threadTitle;
 
-      const effectiveBody = aiInteractionsToggleEnabled
+      const effectiveBody = isAIEnabled
         ? getTextFromDelta(threadContentDelta).trim()
           ? serializeDelta(threadContentDelta)
           : DEFAULT_THREAD_BODY
         : serializeDelta(threadContentDelta);
 
-      if (!aiInteractionsToggleEnabled) {
+      if (!isAIEnabled) {
         const deltaString = JSON.stringify(threadContentDelta);
         checkNewThreadErrors(
           { threadKind, threadUrl, threadTitle, threadTopic },
@@ -516,7 +513,7 @@ export const NewThreadForm = forwardRef<
         }
 
         console.error('NewThreadForm: Unhandled error:', err?.message);
-        notifyError('Failed to create thread');
+        notifyError(err.message);
 
         // Reset turnstile if there's an error
         resetTurnstile();
@@ -553,14 +550,26 @@ export const NewThreadForm = forwardRef<
       clearDraft,
       isInsideCommunity,
       navigate,
+      selectedCommunityId,
+      userSelectedAddress,
+      hasTopics,
+      checkForSessionKeyRevalidationErrors,
+      user,
+      isTurnstileEnabled,
+      turnstileToken,
+      resetTurnstile,
       communityToken?.token_address,
       communityToken?.symbol,
       createThreadToken,
       addThreadLinks,
+      linkedProposals,
+      actionGroups,
+      bypassGating,
       createPoll,
       resetTurnstile,
       checkForSessionKeyRevalidationErrors,
       user,
+      isAIEnabled,
     ]);
 
     const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -589,11 +598,11 @@ export const NewThreadForm = forwardRef<
       setThreadContentDelta(createDeltaFromText(''));
       bodyAccumulatedRef.current = '';
 
-      const recentThreadsContext = recentThreads
-        ?.map((thread) => {
+      const recentThreadsContext = recentThreads?.pages[0]?.results
+        .map((thread) => {
           return (
             `Title: ${thread.title}\nBody: ${thread.body}\n` +
-            `Topic: ${thread.topic?.name || 'N/A'}\nCommunity: ${thread.communityName || 'N/A'}`
+            `Topic: ${thread.topic?.name || 'N/A'}\nCommunity: ${thread.community_id || 'N/A'}`
           );
         })
         .join('\n\n');
@@ -608,6 +617,8 @@ export const NewThreadForm = forwardRef<
           model: 'gpt-4o-mini',
           stream: true,
           systemPrompt: bodySystemPrompt,
+          includeContextualMentions: true,
+          communityId: communityId || selectedCommunityId,
           onError: (error) => {
             console.error('Error generating AI thread body:', error);
             notifyError('Failed to generate AI thread content');
@@ -631,6 +642,8 @@ export const NewThreadForm = forwardRef<
                   model: 'gpt-4o-mini',
                   stream: false,
                   systemPrompt: titleSystemPrompt,
+                  includeContextualMentions: true,
+                  communityId: communityId || selectedCommunityId,
                   onComplete(fullTitle) {
                     setThreadTitle(fullTitle.trim());
                     setIsGenerating(false);
@@ -1181,57 +1194,54 @@ export const NewThreadForm = forwardRef<
                       containerClassName="no-pad cancel-button"
                     />
 
-                    {aiCommentsFeatureEnabled &&
-                      aiInteractionsToggleEnabled && (
-                        <div className="ai-toggle-wrapper">
-                          <CWToggle
-                            className="ai-toggle"
-                            icon="binoculars"
-                            iconColor="#757575"
-                            checked={effectiveWebSearchEnabled}
-                            onChange={() =>
-                              effectiveSetWebSearchEnabled(
-                                !effectiveWebSearchEnabled,
-                              )
-                            }
-                          />
-                          <CWText type="caption" className="toggle-label">
-                            Web search
-                          </CWText>
-                        </div>
-                      )}
+                    {isAIEnabled && (
+                      <div className="ai-toggle-wrapper">
+                        <CWToggle
+                          className="ai-toggle"
+                          icon="binoculars"
+                          iconColor="#757575"
+                          checked={effectiveWebSearchEnabled}
+                          onChange={() =>
+                            effectiveSetWebSearchEnabled(
+                              !effectiveWebSearchEnabled,
+                            )
+                          }
+                        />
+                        <CWText type="caption" className="toggle-label">
+                          Web search
+                        </CWText>
+                      </div>
+                    )}
 
-                    {aiCommentsFeatureEnabled &&
-                      aiInteractionsToggleEnabled && (
-                        <CWThreadAction
-                          action="ai-reply"
-                          label="Draft thread with AI"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleGenerateAIThread().catch(console.error);
+                    {isAIEnabled && (
+                      <CWThreadAction
+                        action="ai-reply"
+                        label="Draft thread with AI"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleGenerateAIThread().catch(console.error);
+                        }}
+                      />
+                    )}
+
+                    {isAIEnabled && (
+                      <div className="ai-toggle-wrapper">
+                        <CWToggle
+                          className="ai-toggle"
+                          icon="sparkle"
+                          iconColor="#757575"
+                          checked={aiCommentsToggleEnabled}
+                          onChange={() => {
+                            setAICommentsToggleEnabled(
+                              !aiCommentsToggleEnabled,
+                            );
                           }}
                         />
-                      )}
-
-                    {aiCommentsFeatureEnabled &&
-                      aiInteractionsToggleEnabled && (
-                        <div className="ai-toggle-wrapper">
-                          <CWToggle
-                            className="ai-toggle"
-                            icon="sparkle"
-                            iconColor="#757575"
-                            checked={aiCommentsToggleEnabled}
-                            onChange={() => {
-                              setAICommentsToggleEnabled(
-                                !aiCommentsToggleEnabled,
-                              );
-                            }}
-                          />
-                          <CWText type="caption" className="toggle-label">
-                            AI initial comment
-                          </CWText>
-                        </div>
-                      )}
+                        <CWText type="caption" className="toggle-label">
+                          AI initial comment
+                        </CWText>
+                      </div>
+                    )}
 
                     <CWButton
                       label="Create"
