@@ -1,6 +1,8 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { Op } from 'sequelize';
 import { config } from '../../config';
+import { models } from '../../database';
 
 export function GetPublicEnvVar(): Query<typeof schemas.GetPublicEnvVar> {
   return {
@@ -8,6 +10,16 @@ export function GetPublicEnvVar(): Query<typeof schemas.GetPublicEnvVar> {
     auth: [],
     secure: false,
     body: async () => {
+      // TODO: cache the result of this query since redirects change very rarely
+      const communities = await models.Community.findAll({
+        attributes: ['id', 'redirect'],
+        where: {
+          redirect: {
+            [Op.ne]: null,
+          },
+        },
+      });
+
       return {
         APP_ENV: config.APP_ENV,
         HEROKU_APP_NAME: config.HEROKU.HEROKU_APP_NAME,
@@ -28,6 +40,19 @@ export function GetPublicEnvVar(): Query<typeof schemas.GetPublicEnvVar> {
           config.CLOUDFLARE.TURNSTILE.CREATE_COMMENT?.SITE_KEY,
         CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY:
           config.CLOUDFLARE.TURNSTILE.CREATE_COMMUNITY?.SITE_KEY,
+        TEST_EVM_ETH_RPC: config.TEST_EVM.ETH_RPC,
+        TEST_EVM_PROVIDER_URL: config.TEST_EVM.PROVIDER_URL,
+        ALCHEMY_PUBLIC_APP_KEY: config.ALCHEMY.APP_KEYS.PUBLIC,
+        // FARCASTER_NGROK_DOMAIN should only be setup on local development
+        FARCASTER_NGROK_DOMAIN: config.CONTESTS.FARCASTER_NGROK_DOMAIN,
+        CONTEST_DURATION_IN_SEC: config.CONTESTS.CONTEST_DURATION_IN_SEC,
+        COMMUNITY_REDIRECTS: communities.reduce(
+          (acc, community) => {
+            acc[community.redirect!] = community.id;
+            return acc;
+          },
+          {} as Record<string, string>,
+        ),
       };
     },
   };

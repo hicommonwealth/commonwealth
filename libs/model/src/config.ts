@@ -89,6 +89,7 @@ const {
   KNOCK_IN_APP_FEED_ID,
   UNLEASH_FRONTEND_API_TOKEN,
   MIXPANEL_TOKEN,
+  CONTEST_DURATION_IN_SEC,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -147,7 +148,7 @@ export const config = configure(
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
         : 5,
-      FARCASTER_NGROK_DOMAIN: FARCASTER_NGROK_DOMAIN,
+      FARCASTER_NGROK_DOMAIN,
       NEYNAR_API_KEY: NEYNAR_API_KEY,
       NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
@@ -158,6 +159,9 @@ export const config = configure(
       FARCASTER_MANIFEST_SIGNATURE: FARCASTER_MANIFEST_SIGNATURE,
       FARCASTER_MANIFEST_DOMAIN: FARCASTER_MANIFEST_DOMAIN,
       DISABLE_CONTEST_ENDING_VOTE: DISABLE_CONTEST_ENDING_VOTE === 'true',
+      CONTEST_DURATION_IN_SEC: CONTEST_DURATION_IN_SEC
+        ? parseInt(CONTEST_DURATION_IN_SEC, 10)
+        : undefined,
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -457,6 +461,7 @@ export const config = configure(
           'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
         ),
       DISABLE_CONTEST_ENDING_VOTE: z.boolean().optional(),
+      CONTEST_DURATION_IN_SEC: z.number().optional(),
     }),
     AUTH: z
       .object({

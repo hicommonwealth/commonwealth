@@ -23,6 +23,7 @@ export default defineConfig(({ mode }) => {
 
   // WARN: only used locally never in remote (Heroku) apps
   const featureFlags = {
+    'process.version': JSON.stringify(''), // necessary to avoid readable-stream error
     'process.env.FLAG_MOBILE_DOWNLOAD': JSON.stringify(
       env.FLAG_MOBILE_DOWNLOAD,
     ),
@@ -57,27 +58,6 @@ export default defineConfig(({ mode }) => {
       env.FLAG_NEW_PROFILE_PAGE,
     ),
     'process.env.FLAG_PRIVATE_TOPICS': JSON.stringify(env.FLAG_PRIVATE_TOPICS),
-  };
-
-  const config = {
-    'process.version': JSON.stringify(''), // necessary to avoid readable-stream error
-    // FARCASTER_NGROK_DOMAIN should only be setup on local development
-    'process.env.FARCASTER_NGROK_DOMAIN': JSON.stringify(
-      env.FARCASTER_NGROK_DOMAIN,
-    ),
-    'process.env.CONTEST_DURATION_IN_SEC': JSON.stringify(
-      env.CONTEST_DURATION_IN_SEC,
-    ),
-    'process.env.ETH_RPC': JSON.stringify(env.ETH_RPC),
-    'process.env.ALCHEMY_PUBLIC_APP_KEY':
-      (env.ETH_RPC || '').trim() === 'e2e-test' &&
-      (env.NODE_ENV || '').trim() === 'test'
-        ? JSON.stringify(env.ALCHEMY_PUBLIC_APP_KEY)
-        : undefined,
-    'process.env.TEST_EVM_PROVIDER_URL': JSON.stringify(
-      env.PROVIDER_URL || 'http://127.0.0.1:8545',
-    ),
-    'process.env.TEST_EVM_ETH_RPC': JSON.stringify(env.ETH_RPC || 'prod'),
   };
 
   return {
@@ -217,10 +197,7 @@ export default defineConfig(({ mode }) => {
     },
     // Vite built env var are disabled in all remote apps (only enabled in local/CI environments)
     define: !['local', 'CI'].includes((env.APP_ENV ?? '')!.trim())
-      ? { ...config }
-      : {
-          ...config,
-          ...featureFlags,
-        },
+      ? {}
+      : featureFlags,
   };
 });

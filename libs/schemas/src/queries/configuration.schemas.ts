@@ -20,5 +20,11 @@ export const GetPublicEnvVar = {
     CF_TURNSTILE_CREATE_THREAD_SITE_KEY: z.string().optional(),
     CF_TURNSTILE_CREATE_COMMENT_SITE_KEY: z.string().optional(),
     CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY: z.string().optional(),
+    TEST_EVM_ETH_RPC: z.string().optional(),
+    TEST_EVM_PROVIDER_URL: z.string().optional(),
+    ALCHEMY_PUBLIC_APP_KEY: z.string(),
+    FARCASTER_NGROK_DOMAIN: z.string().nullish(),
+    CONTEST_DURATION_IN_SEC: z.number().optional(),
+    COMMUNITY_REDIRECTS: z.record(z.string(), z.string()),
   }),
 };

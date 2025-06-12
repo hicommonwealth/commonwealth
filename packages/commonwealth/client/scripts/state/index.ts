@@ -7,7 +7,11 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { EventEmitter } from 'events';
 import type IChainAdapter from 'models/IChainAdapter';
 import { queryClient, QueryKeys } from 'state/api/config';
-import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
+import {
+  Configuration,
+  fetchCustomDomainQuery,
+  fetchPublicEnvVar,
+} from 'state/api/configuration';
 import { errorStore } from 'state/ui/error';
 import SuiAccount from '../controllers/chain/sui/account';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
@@ -69,6 +73,7 @@ export async function initAppState(
   try {
     await fetchNodes();
     await fetchCustomDomainQuery();
+    await fetchPublicEnvVar();
 
     // set evmTestEnv in configuration cache
     queryClient.setQueryData([QueryKeys.CONFIGURATION], {
