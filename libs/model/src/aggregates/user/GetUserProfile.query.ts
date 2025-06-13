@@ -62,7 +62,6 @@ comments AS (
     c.deleted_at IS NULL
   ORDER BY
     c.created_at DESC
-  LIMIT 10 -- just last 10 comments for performance
 ) 
 SELECT
   u.id AS "userId",
@@ -140,7 +139,7 @@ SELECT
           )
         )
       )
-  	), '[]'::json)
+  	ORDER BY t.created_at DESC), '[]'::json)
     FROM
       "Threads" t
       JOIN open_gates og ON t.topic_id = og.topic_id
@@ -150,9 +149,6 @@ SELECT
       JOIN "Topics" g ON t.topic_id = g.id
     WHERE
       t.deleted_at IS NULL 
-    ORDER BY
-      t.created_at DESC
-    LIMIT 10 -- just last 10 threads for performance
   ) AS threads
 , (
   SELECT json_agg(
