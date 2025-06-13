@@ -7,6 +7,7 @@ import useTokenBalanceQuery from './getTokenBalance';
 import useGetTokenByCommunityId from './getTokenByCommunityId';
 import useTokenMetadataQuery from './getTokenMetadata';
 import useTokensMetadataQuery from './getTokensMetadata';
+import { useGetTokenStatsQuery } from './getTokenStats';
 
 export {
   useCreateTokenMutation,
@@ -15,6 +16,7 @@ export {
   useGetERC20BalanceQuery,
   useGetLaunchpadTradesQuery,
   useGetTokenByCommunityId,
+  useGetTokenStatsQuery,
   useTokenBalanceQuery,
   useTokenMetadataQuery,
   useTokensMetadataQuery,

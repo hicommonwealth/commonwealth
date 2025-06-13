@@ -89,3 +89,10 @@ export const GetTokenInfoAlchemy = {
       .array(),
   }),
 };
+export const GetTokenStats = {
+  input: z.object({ token_address: z.string() }),
+  output: z.object({
+    holder_count: z.number(),
+    volume_24h: z.number(),
+  }),
+};
