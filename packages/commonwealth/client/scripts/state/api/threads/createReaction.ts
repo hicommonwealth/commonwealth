@@ -61,7 +61,7 @@ const useCreateThreadReactionMutation = ({
   const utils = trpc.useUtils();
 
   return trpc.thread.createThreadReaction.useMutation({
-    onSuccess: async (newReaction) => {
+    onSuccess: (newReaction) => {
       resetXPCacheForUser(utils);
 
       const reaction: any = {
