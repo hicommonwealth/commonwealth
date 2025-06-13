@@ -15,6 +15,7 @@ import {
   TagType,
 } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { FullUser } from 'views/components/user/fullUser';
 import { QuestAction } from '../../../CreateQuest/QuestForm/QuestActionSubForm';
 import './XPEarningsTable.scss';
 import { getTagConfigForRewardType } from './helpers';
@@ -37,6 +38,12 @@ const columns: CWTableColumnInfo[] = [
     header: 'Reward Type',
     numeric: false,
     sortable: true,
+  },
+  {
+    key: 'referredBy',
+    header: 'Referred By',
+    numeric: false,
+    sortable: false,
   },
   {
     key: 'auraAmount',
@@ -96,6 +103,25 @@ export const XPEarningsTable = () => {
           />
         );
       })(),
+    },
+    referredBy: {
+      customElement:
+        user.id === log.creator_user_id ? (
+          <FullUser
+            profile={{
+              address: '',
+              avatarUrl: log?.user_profile?.avatar_url || '',
+              lastActive: '',
+              name: log?.user_profile?.name || '',
+              userId: log.user_id || 0,
+            }}
+            userAddress=""
+            userCommunityId="common"
+            shouldLinkProfile
+          />
+        ) : (
+          <></>
+        ),
     },
     auraAmount:
       user.id === log.creator_user_id ? log.creator_xp_points : log.xp_points,
