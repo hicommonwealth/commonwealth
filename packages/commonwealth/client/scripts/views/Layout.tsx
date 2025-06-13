@@ -72,9 +72,8 @@ const LayoutComponent = ({
   // If community id was updated ex: `${PRODUCTION_DOMAIN}/{community-id}/**/*`
   // redirect to new community id ex: `${PRODUCTION_DOMAIN}/{new-community-id}/**/*`
   useNecessaryEffect(() => {
-    // @ts-expect-error <StrictNullChecks/>
     const redirectTo =
-      configurationData?.COMMUNITY_REDIRECTS?.[providedCommunityScope];
+      configurationData?.COMMUNITY_REDIRECTS?.[providedCommunityScope || ''];
     // @ts-expect-error <StrictNullChecks/>
     if (redirectTo && redirectTo !== providedCommunityScope.toLowerCase()) {
       // @ts-expect-error <StrictNullChecks/>

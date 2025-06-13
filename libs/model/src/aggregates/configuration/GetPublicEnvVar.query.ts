@@ -43,8 +43,10 @@ export function GetPublicEnvVar(): Query<typeof schemas.GetPublicEnvVar> {
         TEST_EVM_ETH_RPC: config.TEST_EVM.ETH_RPC,
         TEST_EVM_PROVIDER_URL: config.TEST_EVM.PROVIDER_URL,
         ALCHEMY_PUBLIC_APP_KEY: config.ALCHEMY.APP_KEYS.PUBLIC,
-        // FARCASTER_NGROK_DOMAIN should only be setup on local development
-        FARCASTER_NGROK_DOMAIN: config.CONTESTS.FARCASTER_NGROK_DOMAIN,
+        FARCASTER_NGROK_DOMAIN:
+          config.APP_ENV === 'local'
+            ? config.CONTESTS.FARCASTER_NGROK_DOMAIN
+            : undefined,
         CONTEST_DURATION_IN_SEC: config.CONTESTS.CONTEST_DURATION_IN_SEC,
         COMMUNITY_REDIRECTS: communities.reduce(
           (acc, community) => {

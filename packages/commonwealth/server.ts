@@ -35,7 +35,7 @@ blobStorage({
   adapter: R2BlobStorage(),
   isDefault: false,
 });
-(config.ANALYTICS.MIXPANEL_DEV_TOKEN || config.ANALYTICS.MIXPANEL_PROD_TOKEN) &&
+config.ANALYTICS.MIXPANEL_TOKEN &&
   analytics({
     adapter: MixpanelAnalytics(),
   });

@@ -88,7 +88,6 @@ const {
   KNOCK_PUBLIC_API_KEY,
   KNOCK_IN_APP_FEED_ID,
   UNLEASH_FRONTEND_API_TOKEN,
-  MIXPANEL_TOKEN,
   CONTEST_DURATION_IN_SEC,
 } = process.env;
 
@@ -247,9 +246,6 @@ export const config = configure(
       FLAG_USE_RUNWARE: FLAG_USE_RUNWARE === 'true' || false,
       RUNWARE_API_KEY: RUNWARE_API_KEY,
     },
-    ANALYTICS: {
-      MIXPANEL_TOKEN: MIXPANEL_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
-    },
     CLOUDFLARE: {
       TURNSTILE: {
         ...(CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY &&
@@ -303,8 +299,11 @@ export const config = configure(
       MCP_DEMO_CLIENT_KEY: MCP_DEMO_CLIENT_KEY,
     },
     NOTIFICATIONS: {
-      KNOCK_PUBLIC_API_KEY,
-      KNOCK_IN_APP_FEED_ID,
+      KNOCK_PUBLIC_API_KEY:
+        KNOCK_PUBLIC_API_KEY ||
+        'pk_test_Hd4ZpzlVcz9bqepJQoo9BvZHokgEqvj4T79fPdKqpYM',
+      KNOCK_IN_APP_FEED_ID:
+        KNOCK_IN_APP_FEED_ID || 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb',
     },
     UNLEASH: {
       FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
@@ -365,27 +364,9 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && data),
           'EVM_CHAINS_WHITELIST cannot be set in production.',
         ),
-      LAUNCHPAD_CHAIN_ID: z
-        .number()
-        .optional()
-        .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'LAUNCHPAD_CHAIN_ID must be set in production',
-        ),
-      LAUNCHPAD_CONNECTOR_WEIGHT: z
-        .number()
-        .optional()
-        .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'LAUNCHPAD_CONNECTOR_WEIGHT must be set in production',
-        ),
-      LAUNCHPAD_INITIAL_PRICE: z
-        .number()
-        .optional()
-        .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'LAUNCHPAD_INITIAL_PRICE must be set in production',
-        ),
+      LAUNCHPAD_CHAIN_ID: z.number(),
+      LAUNCHPAD_CONNECTOR_WEIGHT: z.number(),
+      LAUNCHPAD_INITIAL_PRICE: z.number(),
     }),
     TBC: z.object({
       TTL_SECS: z.number().int(),
@@ -636,8 +617,8 @@ export const config = configure(
     }),
     NOTIFICATIONS: z
       .object({
-        KNOCK_PUBLIC_API_KEY: z.string().optional(),
-        KNOCK_IN_APP_FEED_ID: z.string().optional(),
+        KNOCK_PUBLIC_API_KEY: z.string(),
+        KNOCK_IN_APP_FEED_ID: z.string(),
       })
       .refine(
         (data) =>
@@ -653,9 +634,6 @@ export const config = configure(
         .refine(
           (data) => !(!['local', 'CI'].includes(target.APP_ENV) && !data),
         ),
-    }),
-    ANALYTICS: z.object({
-      MIXPANEL_TOKEN: z.string(),
     }),
   }),
 );

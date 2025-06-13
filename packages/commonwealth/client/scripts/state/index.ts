@@ -1,3 +1,4 @@
+import { GetPublicEnvVar } from '@hicommonwealth/schemas';
 import { updateActiveUser } from 'controllers/app/login';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
@@ -11,6 +12,7 @@ import {
   fetchPublicEnvVar,
 } from 'state/api/configuration';
 import { errorStore } from 'state/ui/error';
+import { z } from 'zod';
 import SuiAccount from '../controllers/chain/sui/account';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
 import { fetchNodes } from './api/nodes';
@@ -67,13 +69,13 @@ const app: IApp = {
 // On logout: called to reset everything
 export async function initAppState(
   updateSelectedCommunity = true,
-): Promise<void> {
+): Promise<z.infer<(typeof GetPublicEnvVar)['output']>> {
   try {
-    const [status] = await Promise.all([
+    const [status, publicEnvVars] = await Promise.all([
       fetchStatus(),
+      fetchPublicEnvVar(),
       fetchNodes(),
       fetchCustomDomainQuery(),
-      fetchPublicEnvVar(),
     ]);
 
     updateActiveUser(status);
@@ -90,6 +92,7 @@ export async function initAppState(
         });
       }
     }
+    return publicEnvVars;
   } catch (err) {
     errorStore
       .getState()

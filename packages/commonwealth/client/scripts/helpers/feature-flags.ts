@@ -3,10 +3,7 @@
 //
 // See knowledge_base/Feature-Flags.md for more info.
 
-import {
-  UNLEASH_FRONTEND_API_TOKEN,
-  UNLEASH_FRONTEND_SERVER_URL,
-} from '@hicommonwealth/shared';
+import { UNLEASH_FRONTEND_SERVER_URL } from '@hicommonwealth/shared';
 import { InMemoryProvider } from '@openfeature/web-sdk';
 import { UnleashClient } from 'unleash-proxy-client';
 import { UnleashProvider } from '../../../shared/UnleashProvider';
@@ -50,14 +47,20 @@ const featureFlags = {
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;
 
-const unleashConfig = {
-  url: UNLEASH_FRONTEND_SERVER_URL,
-  clientKey: UNLEASH_FRONTEND_API_TOKEN,
-  refreshInterval: 120,
-  appName: process.env.HEROKU_APP_NAME,
-};
+export const initializeFeatureFlags = (
+  unleashApiToken: string,
+  appName: string,
+) => {
+  const unleashConfig = {
+    url: UNLEASH_FRONTEND_SERVER_URL,
+    clientKey: unleashApiToken,
+    refreshInterval: 120,
+    appName,
+  };
 
-export const openFeatureProvider = UNLEASH_FRONTEND_API_TOKEN
-  ? // @ts-expect-error StrictNullChecks
-    new UnleashProvider(new UnleashClient(unleashConfig))
-  : new InMemoryProvider(featureFlags);
+  const provider = unleashApiToken
+    ? new UnleashProvider(new UnleashClient(unleashConfig))
+    : new InMemoryProvider(featureFlags);
+
+  return provider;
+};

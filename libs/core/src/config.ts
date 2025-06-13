@@ -83,6 +83,7 @@ const {
   TEST_WITHOUT_LOGS,
   HEROKU_APP_NAME,
   HEROKU_API_TOKEN,
+  MIXPANEL_TOKEN,
 } = process.env;
 
 const DEFAULTS = {
@@ -119,6 +120,9 @@ export const config = configure(
         _ROLLBAR_SERVER_TOKEN || DEFAULTS.ROLLBAR_SERVER_TOKEN,
       ROLLBAR_ENV: _ROLLBAR_ENV || DEFAULTS.ROLLBAR_ENV,
       TEST_WITHOUT_LOGS: TEST_WITHOUT_LOGS === 'true',
+    },
+    ANALYTICS: {
+      MIXPANEL_TOKEN: MIXPANEL_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
     },
   },
   z.object({
@@ -198,5 +202,8 @@ export const config = configure(
           return false;
         return true;
       }, 'ROLLBAR_SERVER_TOKEN and ROLLBAR_ENV may only be set in production to a non-default value.'),
+    ANALYTICS: z.object({
+      MIXPANEL_TOKEN: z.string(),
+    }),
   }),
 );
