@@ -21,8 +21,6 @@ const KYOFinanceSwapFields = ({
         key={`metadata-minTimestamp-${defaultValues?.action}`}
         name="metadata-minTimestamp"
         label="Min Timestamp"
-        // minDate={new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000)} // TODO: 11963 - malik - do we need this?
-        // maxDate={new Date(new Date().getTime() + 5 * 24 * 60 * 60 * 1000)} // TODO: 11963 - malik - do we need this?
         containerClassName="span-3"
         fullWidth
         {...(defaultValues?.metadata?.minTimestamp && {
