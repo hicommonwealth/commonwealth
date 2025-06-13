@@ -1,5 +1,5 @@
 import {
-  QuestActionMeta,
+  QuestActionView,
   QuestParticipationLimit,
   QuestParticipationPeriod,
   XpLogView,
@@ -9,7 +9,7 @@ import { trpc } from 'utils/trpcClient';
 import { z } from 'zod';
 import { QuestAction as QuestActionType } from '../views/pages/CreateQuest/QuestForm/QuestActionSubForm/types';
 
-export type QuestAction = z.infer<typeof QuestActionMeta>;
+export type QuestAction = z.infer<typeof QuestActionView>;
 export type XPLog = z.infer<typeof XpLogView>;
 
 export const doesActionRequireRewardShare = (action: QuestActionType) => {
@@ -39,7 +39,8 @@ export const doesActionAllowContentId = (action: QuestActionType) => {
     action === 'DiscordServerJoined' ||
     action === 'MembershipsRefreshed' ||
     action === 'LaunchpadTokenTraded' ||
-    action === 'CommunityGoalReached'
+    action === 'CommunityGoalReached' ||
+    action === 'SSOLinked'
   );
 };
 
@@ -97,6 +98,10 @@ export const doesActionRequireAmountMultipler = (action: QuestActionType) => {
 
 export const doesActionRequireGoalConfig = (action: QuestActionType) => {
   return action === 'CommunityGoalReached';
+};
+
+export const doesActionAllowSSOType = (action: QuestActionType) => {
+  return action === 'SSOLinked';
 };
 
 export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {

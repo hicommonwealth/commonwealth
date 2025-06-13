@@ -50,4 +50,7 @@ export const communityProfileValidationSchema = z.object({
   communityBanner: z.string({
     invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
   }),
+  aiFeaturesEnabled: z.boolean({
+    invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
+  }),
 });

@@ -1,4 +1,4 @@
-import { Projection } from '@hicommonwealth/core';
+import { logger, Projection } from '@hicommonwealth/core';
 import { getEvmAddress, getTransaction } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import {
@@ -10,9 +10,12 @@ import {
   UserTierMap,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
-import { Op, Transaction } from 'sequelize';
+import { Op, Sequelize, Transaction } from 'sequelize';
 import { z } from 'zod';
+import { config } from '../../config';
 import { models, sequelize } from '../../database';
+
+const log = logger(import.meta);
 
 async function getUserByAddressId(address_id: number) {
   const addr = await models.Address.findOne({
@@ -34,16 +37,22 @@ async function getUserByAddressId(address_id: number) {
 
 async function getUserByAddress(address: string) {
   const addr = await models.Address.findOne({
-    where: { address: { [Op.iLike]: address }, user_id: { [Op.not]: null } },
+    where: {
+      [Op.and]: [
+        Sequelize.where(
+          Sequelize.fn('LOWER', Sequelize.col('address')),
+          Sequelize.fn('LOWER', address),
+        ),
+        { user_id: { [Op.not]: null } },
+      ],
+    },
     attributes: ['user_id'],
     include: [
       {
         model: models.User,
         attributes: ['id'],
         required: true,
-        where: {
-          tier: { [Op.ne]: UserTierMap.BannedUser },
-        },
+        where: { tier: { [Op.ne]: UserTierMap.BannedUser } },
       },
     ],
   });
@@ -522,6 +531,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       },
       LaunchpadTokenRecordCreated: async ({ id, payload }) => {
         const user_id = await getUserByAddress(payload.creator_address);
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenRecordCreated', { id, payload, user_id });
         if (!user_id) return;
 
         const created_at = payload.created_at;
@@ -529,6 +540,13 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           { created_at },
           'LaunchpadTokenRecordCreated',
         );
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenRecordCreated', {
+            id,
+            payload,
+            user_id,
+            action_metas,
+          });
         await recordXpsForQuest({
           event_id: id,
           user_id,
@@ -538,11 +556,15 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       },
       LaunchpadTokenTraded: async ({ id, payload }) => {
         const user_id = await getUserByAddress(payload.trader_address);
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenTraded', { id, payload, user_id });
         if (!user_id) return;
 
         const token = await models.LaunchpadToken.findOne({
           where: { token_address: payload.token_address.toLowerCase() },
         });
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenTraded', { id, payload, user_id, token });
         if (!token) return;
 
         const community = await models.Community.findOne({
@@ -557,7 +579,15 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
 
         // payload eth_amount is in wei, a little misleading
         const eth_amount = Number(payload.eth_amount) / 1e18;
-        //console.log({ payload, action_metas, eth_amount });
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenTraded', {
+            id,
+            payload,
+            user_id,
+            created_at,
+            action_metas,
+            eth_amount,
+          });
         await recordXpsForQuest({
           event_id: id,
           user_id,

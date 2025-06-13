@@ -1,4 +1,5 @@
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import { PRODUCTION_DOMAIN, WalletSsoSource } from '@hicommonwealth/shared';
+import { capitalize } from 'lodash';
 import React from 'react';
 import { fetchCachedNodes } from 'state/api/nodes';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
@@ -29,6 +30,7 @@ const ContentIdInput = ({
       chainId: `Select community chain`,
       groupId: `https://${PRODUCTION_DOMAIN}/common/members?tab=groups&groupId=1234`,
       tokenThresholdAmount: '0.00001',
+      sso: 'Select SSO provider',
     },
     labels: {
       threadId: 'Thread Link (optional)',
@@ -39,6 +41,7 @@ const ContentIdInput = ({
       discordServerId: 'Discord Server Id',
       groupId: 'Group Link',
       tokenThresholdAmount: 'Min ETH Trade Amount (optional)',
+      sso: 'SSO Provider',
     },
     instructionalMessages: {
       threadId: '',
@@ -50,6 +53,7 @@ const ContentIdInput = ({
       groupId: '',
       tokenThresholdAmount:
         'Aura is awarded after this amount of token is traded',
+      sso: '',
     },
   };
 
@@ -115,6 +119,14 @@ const ContentIdInput = ({
       };
     }
 
+    if (config?.with_optional_sso_type) {
+      return {
+        label: inputConfig.labels.sso,
+        placeholder: inputConfig.placeholders.sso,
+        instructionalMessages: inputConfig.instructionalMessages.sso,
+      };
+    }
+
     if (config?.with_optional_token_trade_threshold) {
       return {
         label: inputConfig.labels.tokenThresholdAmount,
@@ -165,6 +177,38 @@ const ContentIdInput = ({
       })}
       customError={errors?.contentIdentifier}
     />;
+  }
+
+  const ssoOptions = Object.values(WalletSsoSource)
+    .filter((x) => x !== WalletSsoSource.Unknown)
+    .map((v) => ({
+      label: capitalize(v),
+      value: v,
+    }));
+  console.log('defaultValues => ', defaultValues);
+
+  if (config?.with_optional_sso_type) {
+    return (
+      <CWSelectList
+        isClearable={true}
+        key={`contentIdentifier-${defaultValues?.action}`}
+        name="contentIdentifier"
+        label={inputConfig.labels.sso}
+        placeholder={inputConfig.placeholders.sso}
+        containerClassname="span-3"
+        options={ssoOptions}
+        onChange={(v) => {
+          onChange?.({ contentIdentifier: `${v?.value || ''}` });
+        }}
+        {...(defaultValues?.contentIdentifier && {
+          value: {
+            value: defaultValues?.contentIdentifier,
+            label: `${ssoOptions.find((x) => x.value === defaultValues?.contentIdentifier)?.label}`,
+          },
+        })}
+        customError={errors?.contentIdentifier}
+      />
+    );
   }
 
   return (

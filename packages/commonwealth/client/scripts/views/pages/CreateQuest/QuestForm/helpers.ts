@@ -24,7 +24,8 @@ export type ContentIdType =
   | 'discord_server_id'
   | 'chain'
   | 'threshold'
-  | 'goal';
+  | 'goal'
+  | 'sso';
 
 export const inferContentIdTypeFromContentId = (
   action: QuestAction,
@@ -66,6 +67,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.Group;
     case 'threshold':
       return QuestActionContentIdScope.TokenTradeThreshold;
+    case 'sso':
+      return QuestActionContentIdScope.Sso;
     default:
       return QuestActionContentIdScope.Thread;
   }
@@ -85,6 +88,9 @@ export const buildContentIdFromIdentifier = (
     return `${idType}:${identifier}`;
   }
   if (idType === 'goal') {
+    return `${idType}:${identifier}`;
+  }
+  if (idType === 'sso') {
     return `${idType}:${identifier}`;
   }
 
@@ -161,6 +167,9 @@ export const buildRedirectURLFromContentId = (
   if (idType === 'goal') {
     return `${idOrURL}`;
   }
+  if (idType === 'sso') {
+    return `${idOrURL}`;
+  }
 
   return '';
 };
@@ -177,6 +186,7 @@ export const doesConfigAllowContentIdField = (
     // config?.requires_goal_config || // hidden, will be set programatically
     config?.with_optional_chain_id ||
     config?.requires_group_id ||
-    config?.with_optional_token_trade_threshold
+    config?.with_optional_token_trade_threshold ||
+    config?.with_optional_sso_type
   );
 };

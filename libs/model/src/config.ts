@@ -82,6 +82,7 @@ const {
   MCP_DEMO_CLIENT_SERVER_URL,
   MCP_DEMO_CLIENT_KEY,
   EVM_CHAINS_WHITELIST,
+  LOG_XP_LAUNCHPAD,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -279,6 +280,7 @@ export const config = configure(
       MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
       MCP_DEMO_CLIENT_KEY: MCP_DEMO_CLIENT_KEY,
     },
+    LOG_XP_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
   },
   z.object({
     SENDGRID: z.object({
@@ -332,7 +334,7 @@ export const config = configure(
         .string()
         .optional()
         .refine(
-          () => target.APP_ENV !== 'production',
+          (data) => !(target.APP_ENV === 'production' && data),
           'EVM_CHAINS_WHITELIST cannot be set in production.',
         ),
     }),
@@ -593,5 +595,6 @@ export const config = configure(
       MCP_DEMO_CLIENT_SERVER_URL: z.string().optional(),
       MCP_DEMO_CLIENT_KEY: z.string().optional(),
     }),
+    LOG_XP_LAUNCHPAD: z.boolean().default(false),
   }),
 );
