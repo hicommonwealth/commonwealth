@@ -1,0 +1,73 @@
+name: Destroy Review App
+
+on:
+  pull_request:
+    types: [closed]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Pull Request Number'
+        required: true
+        type: number
+
+env:
+  APP_ENV: CI
+
+jobs:
+  delete_review_app:
+    name: Delete Review App
+    if: |
+      (github.event.pull_request && github.event.action == 'closed') ||
+      (github.event.issue.pull_request && github.event.comment.body == '/destroy') ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          node: [ 22 ]
+    steps:
+      - name: Set PR Number
+        id: set_pr_number
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+          else
+            echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
+
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install Neonctl
+        run: npm install -g neonctl
+
+      - name: Check if Review DB Branch Exists
+        id: check_neon_branch
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+        run: |
+          if neonctl branches list --project-id=${{ secrets.NEON_PROJECT_ID }} | grep -q "preview/pr-${{ steps.set_pr_number.outputs.pr_number }}"; then
+            echo "branch_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "branch_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Delete Review DB Branch
+        if: steps.check_neon_branch.outputs.branch_exists == 'true'
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+        run: neonctl branches delete preview/pr-${{ steps.set_pr_number.outputs.pr_number }} --project-id=${{ secrets.NEON_PROJECT_ID }}
+
+      - name: Delete environment
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: pnpm -F railway delete-env --env=pr-${{ steps.set_pr_number.outputs.pr_number }}
+
