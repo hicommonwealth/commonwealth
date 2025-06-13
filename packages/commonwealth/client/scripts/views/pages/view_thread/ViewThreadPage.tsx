@@ -264,6 +264,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     StreamingReplyInstance[]
   >([]);
 
+  // Track chat mode state from comment filters
+  const [isChatMode, setIsChatMode] = useState(false);
+
+  const handleChatModeChange = useCallback((chatMode: boolean) => {
+    setIsChatMode(chatMode);
+  }, []);
+
   const handleGenerateAIComment = useCallback(
     async (mainThreadId: number): Promise<void> => {
       if (
@@ -1118,6 +1125,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 streamingInstances={streamingInstances}
                 setStreamingInstances={setStreamingInstances}
                 permissions={permissions}
+                onChatModeChange={handleChatModeChange}
               />
             </>
           }
@@ -1125,6 +1133,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           sidebarComponents={sidebarComponent as unknown as SidebarComponents}
           proposalDetailSidebar={proposalDetailSidebar as SidebarComponents}
           showActionIcon={true}
+          isChatMode={isChatMode}
         />
         <WithDefaultStickyComment>
           {thread &&

@@ -86,6 +86,7 @@ type ContentPageProps = {
   shareUrl?: string;
   proposalDetailSidebar?: SidebarComponents;
   showActionIcon?: boolean;
+  isChatMode?: boolean;
 };
 
 export const CWContentPage = ({
@@ -129,6 +130,7 @@ export const CWContentPage = ({
   shareUrl,
   proposalDetailSidebar,
   showActionIcon = false,
+  isChatMode,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -218,54 +220,60 @@ export const CWContentPage = ({
   );
 
   const mainBody = (
-    <div className="main-body-container">
-      <div className="header">
-        {typeof title === 'string' ? (
-          <h1 className="title">
-            <ThreadContestTagContainer
-              associatedContests={thread?.associatedContests}
-            />
-            {truncate(title)}
-          </h1>
-        ) : (
-          title
-        )}
-        {!isEditing ? authorAndPublishInfoRow : <></>}
-      </div>
-      {subHeader}
-      {isEditing ? authorAndPublishInfoRow : <></>}
-      {body &&
-        body(
-          <ThreadOptions
-            upvoteBtnVisible={!thread?.readOnly}
-            upvoteDrawerBtnBelow={true}
-            commentBtnVisible={!thread?.readOnly}
-            onCommentClick={onCommentClick}
-            // @ts-expect-error <StrictNullChecks/>
-            thread={thread}
-            totalComments={thread?.numberOfComments}
-            onLockToggle={onLockToggle}
-            onSpamToggle={onSpamToggle}
-            onDelete={onDelete}
-            onPinToggle={onPinToggle}
-            onCollaboratorsEdit={onCollaboratorsEdit}
-            onEditCancel={onEditCancel}
-            onEditConfirm={onEditConfirm}
-            onEditStart={onEditStart}
-            canUpdateThread={canUpdateThread}
-            hasPendingEdits={hasPendingEdits}
-            onProposalStageChange={onProposalStageChange}
-            onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-            setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
-            shareEndpoint={`${window.location.origin}${window.location.pathname}`}
-            editingDisabled={editingDisabled}
-            actionGroups={actionGroups}
-            bypassGating={bypassGating}
-          />,
-        )}
+    <div className={`main-body-container ${isChatMode ? 'chat-mode' : ''}`}>
+      <div className={`thread-content ${isChatMode ? 'chat-mode-thread' : ''}`}>
+        <div className="header">
+          {typeof title === 'string' ? (
+            <h1 className="title">
+              <ThreadContestTagContainer
+                associatedContests={thread?.associatedContests}
+              />
+              {truncate(title)}
+            </h1>
+          ) : (
+            title
+          )}
+          {!isEditing ? authorAndPublishInfoRow : <></>}
+        </div>
+        {subHeader}
+        {isEditing ? authorAndPublishInfoRow : <></>}
+        {body &&
+          body(
+            <ThreadOptions
+              upvoteBtnVisible={!thread?.readOnly}
+              upvoteDrawerBtnBelow={true}
+              commentBtnVisible={!thread?.readOnly}
+              onCommentClick={onCommentClick}
+              // @ts-expect-error <StrictNullChecks/>
+              thread={thread}
+              totalComments={thread?.numberOfComments}
+              onLockToggle={onLockToggle}
+              onSpamToggle={onSpamToggle}
+              onDelete={onDelete}
+              onPinToggle={onPinToggle}
+              onCollaboratorsEdit={onCollaboratorsEdit}
+              onEditCancel={onEditCancel}
+              onEditConfirm={onEditConfirm}
+              onEditStart={onEditStart}
+              canUpdateThread={canUpdateThread}
+              hasPendingEdits={hasPendingEdits}
+              onProposalStageChange={onProposalStageChange}
+              onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+              setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
+              shareEndpoint={`${window.location.origin}${window.location.pathname}`}
+              editingDisabled={editingDisabled}
+              actionGroups={actionGroups}
+              bypassGating={bypassGating}
+            />,
+          )}
 
-      {subBody}
-      {comments}
+        {subBody}
+      </div>
+      <div
+        className={`comments-section ${isChatMode ? 'chat-mode-comments' : ''}`}
+      >
+        {comments}
+      </div>
     </div>
   );
 
