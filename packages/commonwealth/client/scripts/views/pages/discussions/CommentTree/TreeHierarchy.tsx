@@ -583,7 +583,6 @@ export const TreeHierarchy = ({
               commentFilters.sortType === 'oldest' &&
               !parentCommentId && {
                 followOutput: !isLoadingOlderMessages, // Don't follow output when loading older messages
-                alignToBottom: true,
                 reversed: true,
               })}
             itemContent={(index, comment) => renderCommentItem(comment, index)}
