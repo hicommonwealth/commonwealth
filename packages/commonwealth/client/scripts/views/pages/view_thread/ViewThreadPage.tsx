@@ -128,9 +128,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [voterProfiles, setVoterProfiles] = useState<
     Record<string, VoterProfileData>
   >({});
-  const [uniqueVoterAddresses, setUniqueVoterAddresses] = useState<string[]>(
-    [],
-  );
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
@@ -389,8 +386,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [thread?.versionHistory]);
 
-  // FIXME it's here ... this is the problem.
-  // it must be triggering useEffect loops.
+  // FIXME it's here ... this is the problem.  I think what's happening is that
+  // it will cause useFetchProfilesByAddressesQuery to fire...
 
   // Effect to gather unique voter addresses from all polls
   // useEffect(() => {
@@ -401,6 +398,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   //     setUniqueVoterAddresses(Array.from(new Set(allAddresses)));
   //   }
   // }, [pollsData]);
+
+  const getUniqueVoterAddresses = useCallback(() => {
+    if (pollsData && pollsData.length > 0) {
+      const allAddresses = pollsData.flatMap((poll) =>
+        (poll.votes || []).map((vote) => vote.address),
+      );
+      return Array.from(new Set(allAddresses));
+    }
+
+    return [];
+  }, [pollsData]);
+
+  const uniqueVoterAddresses = useMemo(() => {
+    return getUniqueVoterAddresses();
+  }, [getUniqueVoterAddresses]);
 
   const { data: fetchedProfiles, isLoading: isLoadingProfiles } =
     useFetchProfilesByAddressesQuery({
