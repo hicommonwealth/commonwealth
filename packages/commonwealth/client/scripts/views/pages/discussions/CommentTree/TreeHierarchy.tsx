@@ -89,12 +89,6 @@ export const TreeHierarchy = ({
   // Derive chat mode from sort type - no separate state needed
   const isChatMode = commentFilters.sortType === 'oldest';
 
-  console.log(
-    `[TreeHierarchy] Render. Parent: ${parentCommentId ?? 'ROOT'}. Filter: ${
-      commentFilters.sortType
-    }`,
-  );
-
   const virtuosoRef = useRef<any>(null);
   const previousChatModeRef = useRef(isChatMode);
   const isLoadingOlderMessagesRef = useRef(false);
@@ -119,24 +113,6 @@ export const TreeHierarchy = ({
     apiEnabled: !!communityId && !!thread.id,
   });
 
-  useEffect(() => {
-    if (paginatedComments) {
-      console.log(
-        `[TreeHierarchy] Data for Parent: ${
-          parentCommentId ?? 'ROOT'
-        }. Pages: ${paginatedComments.pages.length}`,
-        paginatedComments.pages.map((p) => ({
-          page: p.page,
-          totalPages: p.totalPages,
-          results: p.results.map((r: any) => ({
-            id: r.id,
-            body: r.body.substring(0, 30),
-          })),
-        })),
-      );
-    }
-  }, [paginatedComments, parentCommentId]);
-
   const allComments = useMemo(() => {
     if (!paginatedComments?.pages) return [];
 
@@ -153,18 +129,6 @@ export const TreeHierarchy = ({
     isChatMode,
     parentCommentId,
   ]) as ExtendedCommentViewParams[];
-
-  useEffect(() => {
-    console.log(
-      `[TreeHierarchy] Processed comments for Parent: ${
-        parentCommentId ?? 'ROOT'
-      }. Count: ${allComments.length}`,
-      allComments.map((c) => ({
-        id: c.id,
-        body: c.body.substring(0, 30),
-      })),
-    );
-  }, [allComments, parentCommentId]);
 
   const handleGenerateAIReply = useCallback(
     (
@@ -291,34 +255,6 @@ export const TreeHierarchy = ({
     },
     [selectedModels, setStreamingInstances],
   );
-
-  // Debug pagination in chat mode
-  useEffect(() => {
-    if (isChatMode && paginatedComments && !parentCommentId) {
-      const lastPage =
-        paginatedComments.pages[paginatedComments.pages.length - 1];
-      console.log('Chat Mode Pagination Debug:', {
-        hasNextPage,
-        totalPages: lastPage?.totalPages,
-        currentPage: lastPage?.page,
-        pagesCount: paginatedComments.pages.length,
-        isLoadingComments,
-        allCommentsLength: allComments.length,
-        allPagesInfo: paginatedComments.pages.map((p) => ({
-          page: p.page,
-          totalPages: p.totalPages,
-          resultsCount: p.results.length,
-        })),
-      });
-    }
-  }, [
-    isChatMode,
-    paginatedComments,
-    allComments.length,
-    hasNextPage,
-    isLoadingComments,
-    parentCommentId,
-  ]);
 
   if (isInitialCommentsLoading) {
     return <CWCircleMultiplySpinner />;
@@ -588,9 +524,11 @@ export const TreeHierarchy = ({
             itemContent={(index, comment) => renderCommentItem(comment, index)}
             overscan={50}
             components={{
+              // eslint-disable-next-line react/no-multi-comp
               EmptyPlaceholder: () => <></>,
               ...(isChatMode && !parentCommentId
                 ? {
+                    // eslint-disable-next-line react/no-multi-comp
                     Header: () => {
                       // More robust check for whether there are more pages to load
                       const lastPage =
@@ -641,6 +579,7 @@ export const TreeHierarchy = ({
                     },
                   }
                 : {
+                    // eslint-disable-next-line react/no-multi-comp
                     Footer: () =>
                       hasNextPage ? (
                         <CWButton
