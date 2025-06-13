@@ -13,6 +13,7 @@ export default (sequelize: Sequelize.Sequelize) =>
       id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
       action_meta_id: { type: Sequelize.INTEGER, allowNull: false },
       user_id: { type: Sequelize.INTEGER, allowNull: false },
+      event_id: { type: Sequelize.INTEGER, allowNull: true },
       event_created_at: { type: Sequelize.DATE, allowNull: false },
       name: { type: Sequelize.STRING, allowNull: true },
       xp_points: { type: Sequelize.INTEGER, allowNull: false },

@@ -13,6 +13,7 @@ export const XpLog = z.object({
   id: PG_INT.optional(),
   action_meta_id: z.number(),
   user_id: PG_INT,
+  event_id: PG_INT.nullish(),
   event_created_at: z.coerce.date(),
   name: XpLogName.nullish(),
   xp_points: PG_INT,
