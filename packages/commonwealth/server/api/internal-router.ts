@@ -4,6 +4,7 @@ import { Router } from 'express';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
+import * as configuration from './configuration';
 import * as contest from './contest';
 import * as discordBot from './discordBot';
 import * as email from './emails';
@@ -40,6 +41,7 @@ const api = {
   quest: quest.trpcRouter,
   tag: tag.trpcRouter,
   search: search.trpcRouter,
+  configuration: configuration.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {

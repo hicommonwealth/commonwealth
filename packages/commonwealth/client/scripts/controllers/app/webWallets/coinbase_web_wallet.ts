@@ -11,7 +11,7 @@ import { getChainHex } from '@hicommonwealth/evm-protocols';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
-import { fetchCachedConfiguration } from 'state/api/configuration';
+import { fetchCachedPublicEnvVar } from 'state/api/configuration';
 import { userStore } from 'state/ui/user';
 import { Web3BaseProvider } from 'web3';
 import { hexToNumber } from 'web3-utils';
@@ -122,9 +122,9 @@ class CoinbaseWebWalletController implements IWebWallet<string> {
       });
       const chainIdHex = getChainHex(parseInt(chainId, 10));
       try {
-        const config = fetchCachedConfiguration();
+        const config = fetchCachedPublicEnvVar();
 
-        if (config?.evmTestEnv !== 'test') {
+        if (config?.TEST_EVM_ETH_RPC !== 'test') {
           await this._web3.givenProvider.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: chainIdHex }],

@@ -1,10 +1,12 @@
 import AddressInfo from 'models/AddressInfo';
 import NodeInfo from 'models/NodeInfo';
 import { useEffect, useState } from 'react';
+import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
 import { fetchNodes } from 'state/api/nodes';
 
 const useCreateTokenCommunity = () => {
-  const LAUNCHPAD_CHAIN_ID = parseInt(process.env.LAUNCHPAD_CHAIN_ID || '8453');
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
+  const LAUNCHPAD_CHAIN_ID = configurationData!.LAUNCHPAD_CHAIN_ID;
 
   const [baseNode, setBaseNode] = useState<NodeInfo | undefined>();
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>();

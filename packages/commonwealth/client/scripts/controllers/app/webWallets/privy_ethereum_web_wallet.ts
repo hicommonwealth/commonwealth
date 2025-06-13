@@ -9,7 +9,7 @@ import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
-import { fetchCachedConfiguration } from 'state/api/configuration';
+import { fetchCachedPublicEnvVar } from 'state/api/configuration';
 import { userStore } from 'state/ui/user';
 import { Web3BaseProvider } from 'web3';
 
@@ -116,8 +116,10 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
         });
       }
 
+      const config = fetchCachedPublicEnvVar();
+
       this._web3 =
-        process.env.ETH_RPC !== 'e2e-test'
+        config?.TEST_EVM_ETH_RPC !== 'e2e-test'
           ? {
               givenProvider: ethereum,
             }
@@ -143,9 +145,9 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
       });
       const chainIdHex = `0x${parseInt(chainId, 10).toString(16)}`;
       try {
-        const config = fetchCachedConfiguration();
+        const config = fetchCachedPublicEnvVar();
 
-        if (config?.evmTestEnv !== 'test') {
+        if (config?.TEST_EVM_ETH_RPC !== 'test') {
           await this._web3.givenProvider.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: chainIdHex }],

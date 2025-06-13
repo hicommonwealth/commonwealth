@@ -2,6 +2,7 @@ import { TurnstileWidgetNames, UserTierMap } from '@hicommonwealth/shared';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import React, { useCallback, useState } from 'react';
 import Turnstile, { useTurnstile as useReactTurnstile } from 'react-turnstile';
+import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
 import { useDarkMode } from 'state/ui/darkMode/darkMode';
 import useUserStore from 'state/ui/user';
 
@@ -45,12 +46,14 @@ export const useTurnstile = (
   const { isDarkMode } = useDarkMode();
   const user = useUserStore();
 
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
+
   const siteKey =
     action === 'create-thread'
-      ? process.env.CF_TURNSTILE_CREATE_THREAD_SITE_KEY
+      ? configurationData!.CF_TURNSTILE_CREATE_THREAD_SITE_KEY
       : action === 'create-comment'
-        ? process.env.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY
-        : process.env.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY;
+        ? configurationData!.CF_TURNSTILE_CREATE_COMMENT_SITE_KEY
+        : configurationData!.CF_TURNSTILE_CREATE_COMMUNITY_SITE_KEY;
 
   // Determine if Turnstile should be enabled based on site key and user tier
   const isTurnstileEnabled =

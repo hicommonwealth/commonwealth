@@ -9,7 +9,10 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import type { NavigateOptions, To } from 'react-router-dom';
 import app from 'state';
-import { fetchCachedCustomDomain } from 'state/api/configuration';
+import {
+  fetchCachedCustomDomain,
+  fetchCachedPublicEnvVar,
+} from 'state/api/configuration';
 import { useCreateDiscordBotConfigMutation } from 'state/api/discord';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import useUserStore, { userStore } from 'state/ui/user';
@@ -49,6 +52,7 @@ const getCreateContentMenuItems = (
     userStore.getState() && !!app.chain?.meta?.snapshot_spaces?.length;
 
   const { isCustomDomain } = fetchCachedCustomDomain() || {};
+  const { DISCORD_CLIENT_ID } = fetchCachedPublicEnvVar() || {};
 
   const showOnChainProposalItem =
     app.chain?.base === ChainBase.CosmosSDK &&
@@ -128,7 +132,7 @@ const getCreateContentMenuItems = (
               .then(() => {
                 window.open(
                   `https://discord.com/oauth2/authorize?client_id=${
-                    process.env.DISCORD_CLIENT_ID
+                    DISCORD_CLIENT_ID
                   }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
                     `${
                       !isCustomDomain

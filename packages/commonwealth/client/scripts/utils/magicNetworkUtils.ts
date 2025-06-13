@@ -1,5 +1,6 @@
 import { Magic } from 'magic-sdk';
 import NodeInfo from 'models/NodeInfo';
+import { fetchCachedPublicEnvVar } from 'state/api/configuration';
 import { fetchCachedNodes } from 'state/api/nodes';
 import { userStore } from 'state/ui/user';
 
@@ -13,8 +14,10 @@ export const getMagicInstanceForChain = (
   chainId: number,
   rpcUrl: string,
 ): Magic | null => {
+  const { MAGIC_PUBLISHABLE_KEY } = fetchCachedPublicEnvVar() || {};
+
   try {
-    if (!process.env.MAGIC_PUBLISHABLE_KEY) {
+    if (!MAGIC_PUBLISHABLE_KEY) {
       return null;
     }
 
@@ -24,7 +27,7 @@ export const getMagicInstanceForChain = (
     }
 
     // Create new instance for this chain
-    const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
+    const magic = new Magic(MAGIC_PUBLISHABLE_KEY, {
       network: {
         rpcUrl,
         chainId,

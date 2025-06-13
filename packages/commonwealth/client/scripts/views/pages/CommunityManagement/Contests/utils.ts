@@ -3,6 +3,7 @@ import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
 import { OpenFeature } from '@openfeature/web-sdk';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import moment from 'moment';
+import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
 import { saveToClipboard } from 'utils/clipboard';
 import { Contest } from './ContestsList';
 
@@ -20,8 +21,11 @@ export const CONTEST_FAQ_URL =
   'https://docs.common.xyz/commonwealth/for-admins-and-mods/enabling-and-running-contests';
 
 export const copyFarcasterContestFrameUrl = async (contestAddress: string) => {
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
+
   // FARCASTER_NGROK_DOMAIN should only be setup on local development
-  const origin = process.env.FARCASTER_NGROK_DOMAIN || window.location.origin;
+  const origin =
+    configurationData!.FARCASTER_NGROK_DOMAIN || window.location.origin;
   const farcasterUrl = buildFarcasterContestFrameUrl(contestAddress);
 
   try {

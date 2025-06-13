@@ -1,9 +1,8 @@
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { PrivyProvider } from '@privy-io/react-auth';
 import React, { memo } from 'react';
+import { useFetchPublicEnvVarQuery } from 'state/api/configuration';
 import { useDarkMode } from 'state/ui/darkMode/darkMode';
-
-const PRIVY_APP_ID = process.env.PRIVY_APP_ID;
 
 type DefaultPrivyProvider = {
   children: React.ReactNode;
@@ -13,11 +12,13 @@ export const LoadPrivy = memo(function LoadPrivy(props: DefaultPrivyProvider) {
   const { children } = props;
   const darkMode = useDarkMode();
 
-  if (!PRIVY_APP_ID) return <div>Privy not configured in .env</div>;
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
+
+  if (!configurationData?.PRIVY_APP_ID) return <div>Privy not configured</div>;
 
   return (
     <PrivyProvider
-      appId={PRIVY_APP_ID}
+      appId={configurationData.PRIVY_APP_ID}
       config={{
         loginMethods: [
           'google',

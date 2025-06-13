@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 
 import { useFlag } from 'client/scripts/hooks/useFlag';
-import { useFetchConfigurationQuery } from 'state/api/configuration';
+import { useFetchPublicEnvVarQuery } from 'state/api/configuration';
 import {
   CWImageInput,
   ImageBehavior,
@@ -66,10 +66,11 @@ const CommunityInformationForm = ({
     updateAndValidateSocialLinkAtIndex,
   } = useSocialLinks();
 
-  const { data: configurationData } = useFetchConfigurationQuery();
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
 
   const communityId = slugifyPreserveDashes(communityName.toLowerCase());
-  const isCommunityNameTaken = !!configurationData?.redirects?.[communityId];
+  const isCommunityNameTaken =
+    !!configurationData?.COMMUNITY_REDIRECTS?.[communityId];
 
   const validation = withChainsConfig
     ? baseCommunityInformationFormValidationSchema.merge(

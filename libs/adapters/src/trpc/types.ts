@@ -34,6 +34,7 @@ export enum Tag {
   Bot = 'Bot',
   Tag = 'Tag',
   Search = 'Search',
+  Configuration = 'Configuration',
 }
 
 /**

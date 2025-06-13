@@ -3,6 +3,7 @@ export * as Bot from './aggregates/bot';
 export * as ChainEvents from './aggregates/chain-events';
 export * as Comment from './aggregates/comment';
 export * as Community from './aggregates/community';
+export * as Configuration from './aggregates/configuration';
 export * as Contest from './aggregates/contest';
 export * as DiscordBot from './aggregates/discordBot';
 export * as Email from './aggregates/emails';
