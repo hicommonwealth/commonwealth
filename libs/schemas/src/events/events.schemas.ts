@@ -68,7 +68,7 @@ export const events = {
     community_id: z.string(),
     address: z.string(),
     user_id: z.number(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
     referrer_address: z.string().nullish(),
   }),
 
@@ -78,7 +78,7 @@ export const events = {
     user_id: z.number(),
     old_user_id: z.number(),
     old_user_email: z.string().nullish(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   ThreadCreated: Thread.omit({
@@ -118,14 +118,14 @@ export const events = {
     community_id: z.string(),
     group_id: z.number(),
     creator_user_id: z.number(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   RoleUpdated: z.object({
     community_id: z.string(),
     address: z.string(),
     role: z.enum(Roles),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   UserMentioned: z.object({
@@ -143,14 +143,14 @@ export const events = {
     user_id: z.number(),
     referrer_address: z.string().optional(),
     social_links: z.array(z.string()).optional(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   CommunityUpdated: z.object({
     community_id: z.string(),
     user_id: z.number(),
     social_links: z.array(z.string().nullish()).optional(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   CommunityJoined: z.object({
@@ -158,7 +158,7 @@ export const events = {
     user_id: z.number(),
     oauth_provider: z.string().nullish(),
     referrer_address: z.string().nullish(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   SnapshotProposalCreated: z.object({
@@ -356,7 +356,7 @@ export const events = {
     user_id: z.number(),
     address: z.string(),
     referred_by_address: z.string().nullish(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   QuestStarted: z.object({
@@ -411,7 +411,7 @@ export const events = {
   LaunchpadTokenRecordCreated: z.object({
     name: z.string(),
     symbol: z.string(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
     eth_chain_id: z.number(),
     creator_address: EVM_ADDRESS_STRICT,
     token_address: EVM_ADDRESS_STRICT,
@@ -465,7 +465,7 @@ export const events = {
     wallet_id: z.nativeEnum(WalletId),
     community_id: z.string(),
     balance: z.string(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   SSOLinked: z.object({
@@ -473,14 +473,14 @@ export const events = {
     new_user: z.boolean(),
     oauth_provider: z.nativeEnum(WalletSsoSource),
     community_id: z.string(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   XpChainEventCreated: z.object({
     eth_chain_id: z.number(),
     quest_action_meta_ids: z.array(z.number()),
     transaction_hash: z.string(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   // TokenStaking - TODO: review mapping rules with @timolegros
@@ -566,14 +566,14 @@ export const events = {
     deployer_address: z.string(),
     community_id: z.string(),
     referral: NamespaceReferral.optional(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   CommunityGoalReached: z.object({
     community_goal_meta_id: PG_INT,
     goal_type: z.enum(CommunityGoalTypes),
     community_id: z.string(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   TweetEngagementCapReached: z.object({
@@ -587,7 +587,7 @@ export const events = {
   CommunityTagsUpdated: z.object({
     community_id: z.string(),
     tag_ids: z.array(z.number()),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   MembershipsRefreshed: z.object({
@@ -601,13 +601,13 @@ export const events = {
         rejected: z.boolean().optional(),
       })
       .array(),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 
   CommunityDirectoryTagsUpdated: z.object({
     community_id: z.string(),
     tag_names: z.array(z.string()),
     selected_community_ids: z.array(z.string()),
-    created_at: z.date(),
+    created_at: z.coerce.date(),
   }),
 } as const;
