@@ -27,6 +27,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
       // Chat mode: reverse pagination for 'oldest' order
       const isChatMode = order_by === 'oldest';
       let offset, actualOrderBy, actualPage;
+      let actualLimit = limit;
 
       if (isChatMode) {
         // For chat mode, we need to calculate reverse pagination
@@ -60,8 +61,15 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         // We calculate offset from the end of all comments
         offset = Math.max(0, totalCount - cursor * limit);
 
+        // Adjust limit for the last page to avoid overlapping results
+        // Calculate how many comments we've already fetched in previous pages
+        const commentsFetchedInPreviousPages = (cursor - 1) * limit;
+        const remainingCommentsToFetch =
+          totalCount - commentsFetchedInPreviousPages;
+        actualLimit = Math.min(limit, remainingCommentsToFetch);
+
         console.log(
-          `Chat Mode Debug - totalCount: ${totalCount}, cursor: ${cursor}, limit: ${limit}, offset: ${offset}`,
+          `Chat Mode Debug - totalCount: ${totalCount}, cursor: ${cursor}, limit: ${limit}, actualLimit: ${actualLimit}, offset: ${offset}, commentsFetchedInPreviousPages: ${commentsFetchedInPreviousPages}, remainingCommentsToFetch: ${remainingCommentsToFetch}`,
         );
 
         actualPage = Math.floor(offset / limit) + 1;
@@ -177,7 +185,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
           thread_id,
           comment_id,
           ...(parent_id && { parent_id: `${parent_id}` }),
-          limit,
+          limit: isChatMode ? actualLimit : limit,
           offset,
         },
         type: QueryTypes.SELECT,
@@ -201,18 +209,33 @@ export function GetComments(): Query<typeof schemas.GetComments> {
       // The reverse pagination logic handles which "page" of chronological comments to return
       const finalResults = sanitizedComments;
 
-      const paginatedResponse = schemas.buildPaginatedResponse(
-        finalResults,
-        totalCount,
-        {
-          ...payload,
-          offset,
-        },
-      );
+      // Build pagination response with correct page calculation for chat mode
+      let paginatedResponse;
+      if (isChatMode) {
+        // In chat mode, cursor IS the page number, so use it directly
+        paginatedResponse = {
+          results: finalResults,
+          limit,
+          page: cursor, // Use cursor directly as page number
+          totalPages:
+            Math.floor(totalCount / limit) + (totalCount % limit === 0 ? 0 : 1),
+          totalResults: totalCount,
+        };
+      } else {
+        // Normal mode: let buildPaginatedResponse calculate from offset
+        paginatedResponse = schemas.buildPaginatedResponse(
+          finalResults,
+          totalCount,
+          {
+            ...payload,
+            offset,
+          },
+        );
+      }
 
       if (isChatMode) {
         console.log(
-          `Chat Mode Response - page: ${paginatedResponse.page}, totalPages: ${paginatedResponse.totalPages}, results: ${finalResults.length}`,
+          `Chat Mode Response - cursor: ${cursor}, page: ${paginatedResponse.page}, totalPages: ${paginatedResponse.totalPages}, results: ${finalResults.length}, offset: ${offset}`,
         );
       }
 

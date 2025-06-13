@@ -1,7 +1,13 @@
 import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
@@ -85,6 +91,9 @@ export const TreeHierarchy = ({
 
   const virtuosoRef = useRef<any>(null);
   const previousChatModeRef = useRef(isChatMode);
+  const isLoadingOlderMessagesRef = useRef(false);
+  const previousCommentsLengthRef = useRef(0);
+  const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
 
   const {
     data: paginatedComments,
@@ -104,9 +113,22 @@ export const TreeHierarchy = ({
     apiEnabled: !!communityId && !!thread.id,
   });
 
-  const allComments = (paginatedComments?.pages || []).flatMap(
-    (page) => page.results,
-  ) as ExtendedCommentViewParams[];
+  const allComments = useMemo(() => {
+    if (!paginatedComments?.pages) return [];
+
+    const pages = paginatedComments.pages;
+    if (isChatMode && !parentCommentId) {
+      // For chat mode, reverse the pages array so older messages (newer pages) appear first
+      return [...pages].reverse().flatMap((page) => page.results);
+    }
+
+    // For normal mode and replies, use standard order
+    return pages.flatMap((page) => page.results);
+  }, [
+    paginatedComments?.pages,
+    isChatMode,
+    parentCommentId,
+  ]) as ExtendedCommentViewParams[];
 
   const handleGenerateAIReply = useCallback(
     (
@@ -175,6 +197,7 @@ export const TreeHierarchy = ({
   const commentRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Auto-scroll to bottom when entering chat mode or when new comments are added in chat mode
+  // But NOT when loading older messages
   useEffect(() => {
     if (
       isChatMode &&
@@ -184,8 +207,11 @@ export const TreeHierarchy = ({
       const shouldAutoScroll =
         // When first entering chat mode
         (!previousChatModeRef.current && isChatMode) ||
-        // When new comments are added (allComments length increased)
-        (isChatMode && previousChatModeRef.current);
+        // When new comments are added (but not when loading older messages)
+        (isChatMode &&
+          previousChatModeRef.current &&
+          allComments.length > previousCommentsLengthRef.current &&
+          !isLoadingOlderMessagesRef.current);
 
       if (shouldAutoScroll && virtuosoRef.current && allComments.length > 0) {
         // Small delay to ensure comments are rendered
@@ -204,6 +230,7 @@ export const TreeHierarchy = ({
     }
 
     previousChatModeRef.current = isChatMode;
+    previousCommentsLengthRef.current = allComments.length;
   }, [
     isChatMode,
     allComments.length,
@@ -228,6 +255,34 @@ export const TreeHierarchy = ({
     },
     [selectedModels, setStreamingInstances],
   );
+
+  // Debug pagination in chat mode
+  useEffect(() => {
+    if (isChatMode && paginatedComments && !parentCommentId) {
+      const lastPage =
+        paginatedComments.pages[paginatedComments.pages.length - 1];
+      console.log('Chat Mode Pagination Debug:', {
+        hasNextPage,
+        totalPages: lastPage?.totalPages,
+        currentPage: lastPage?.page,
+        pagesCount: paginatedComments.pages.length,
+        isLoadingComments,
+        allCommentsLength: allComments.length,
+        allPagesInfo: paginatedComments.pages.map((p) => ({
+          page: p.page,
+          totalPages: p.totalPages,
+          resultsCount: p.results.length,
+        })),
+      });
+    }
+  }, [
+    isChatMode,
+    paginatedComments,
+    allComments.length,
+    hasNextPage,
+    isLoadingComments,
+    parentCommentId,
+  ]);
 
   if (isInitialCommentsLoading) {
     return <CWCircleMultiplySpinner />;
@@ -327,7 +382,7 @@ export const TreeHierarchy = ({
             })}
           {...(isChatMode &&
             commentFilters.sortType === 'oldest' && {
-              followOutput: true,
+              followOutput: !isLoadingOlderMessages, // Don't follow output when loading older messages
               alignToBottom: true,
               reversed: true,
             })}
@@ -509,22 +564,52 @@ export const TreeHierarchy = ({
             EmptyPlaceholder: () => <></>,
             ...(isChatMode
               ? {
-                  Header: () =>
-                    hasNextPage ? (
+                  Header: () => {
+                    // More robust check for whether there are more pages to load
+                    const lastPage =
+                      paginatedComments?.pages?.[
+                        paginatedComments.pages.length - 1
+                      ];
+                    const canLoadMore =
+                      hasNextPage &&
+                      lastPage &&
+                      lastPage.page < lastPage.totalPages &&
+                      !isLoadingComments &&
+                      !isLoadingOlderMessages &&
+                      allComments.length > 0; // Only show if we have comments to display
+
+                    return canLoadMore ? (
                       <div className="chat-load-older-container">
                         <CWButton
                           containerClassName="m-auto"
                           label="Load older messages"
-                          disabled={isLoadingComments}
-                          onClick={() => {
-                            !isLoadingComments &&
-                              fetchMoreComments().catch(console.error);
+                          disabled={isLoadingComments || isLoadingOlderMessages}
+                          onClick={async () => {
+                            if (!isLoadingComments && canLoadMore) {
+                              setIsLoadingOlderMessages(true);
+                              isLoadingOlderMessagesRef.current = true;
+                              try {
+                                await fetchMoreComments();
+                              } catch (error) {
+                                console.error(
+                                  'Failed to load older messages:',
+                                  error,
+                                );
+                              } finally {
+                                // Reset the flag after a delay to allow for rendering
+                                setTimeout(() => {
+                                  setIsLoadingOlderMessages(false);
+                                  isLoadingOlderMessagesRef.current = false;
+                                }, 500);
+                              }
+                            }
                           }}
                         />
                       </div>
                     ) : (
                       <></>
-                    ),
+                    );
+                  },
                 }
               : {
                   Footer: () =>
