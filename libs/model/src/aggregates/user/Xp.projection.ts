@@ -12,6 +12,7 @@ import {
 } from '@hicommonwealth/shared';
 import { Op, Sequelize, Transaction } from 'sequelize';
 import { z } from 'zod/v4';
+import { config } from '../../config';
 import { models, sequelize } from '../../database';
 
 const log = logger(import.meta);

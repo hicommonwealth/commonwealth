@@ -21,15 +21,19 @@ export const query = async <
   validate = true,
 ): Promise<z.infer<Output>> => {
   try {
-    const context: Context<Input, _Context> = {
-      actor,
-      payload: validate
-        ? (Object.fromEntries(
-            Object.entries(input.parse(payload)).filter(
+    const validated = validate ? input.parse(payload) : payload;
+    const stripped = (
+      typeof validated === 'object'
+        ? Object.fromEntries(
+            Object.entries(validated as object).filter(
               ([, v]) => v !== undefined,
             ),
-          ) as z.infer<Input>)
-        : payload,
+          )
+        : payload
+    ) as z.infer<Input>;
+    const context: Context<Input, _Context> = {
+      actor,
+      payload: stripped,
     };
     for (const fn of auth) {
       await fn(context);

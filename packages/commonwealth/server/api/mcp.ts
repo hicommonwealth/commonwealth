@@ -11,7 +11,7 @@ import {
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 import { IncomingMessage } from 'http';
-import { toJSONSchema, z } from 'zod/v4';
+import { toJSONSchema, z, ZodType } from 'zod/v4';
 import {
   api as externalApi,
   trpcRouter as externalTrpcRouter,

@@ -1,5 +1,5 @@
-import { Events } from '@hicommonwealth/schemas';
-import { ZodError, ZodType, ZodUndefined, z } from 'zod/v4';
+import { Events, events } from '@hicommonwealth/schemas';
+import { z, ZodError, ZodType, ZodUndefined } from 'zod/v4';
 import {
   InvalidInput,
   type EventContext,
@@ -30,13 +30,12 @@ export const handleEvent = async <
       `Unhandled event: ${name} not found in ${Object.keys(body)}`,
     );
   try {
+    const validated = validate ? inputs[name]!.parse(payload) : payload;
     return (
       (await body[name]({
         id,
         name,
-        payload: validate
-          ? (inputs[name]!.parse(payload) as z.infer<Input>)
-          : payload,
+        payload: validated as z.infer<(typeof events)[Name]>,
       })) || {}
     );
   } catch (error) {
