@@ -41,6 +41,20 @@ export const FiltersDrawer = ({
     });
   };
 
+  const onLaunchpadTokenFilterChange = () => {
+    onFiltersChange({
+      ...filters,
+      withLaunchpadToken: !filters.withLaunchpadToken,
+    });
+  };
+
+  const onPinnedTokenFilterChange = () => {
+    onFiltersChange({
+      ...filters,
+      withPinnedToken: !filters.withPinnedToken,
+    });
+  };
+
   const onTagOptionChange = (tagId: number) => {
     onFiltersChange({
       ...filters,
@@ -128,12 +142,34 @@ export const FiltersDrawer = ({
           <div className="filter-content">
             <div className="stake-filter">
               <CWText type="h5" fontWeight="semiBold">
-                Stake
+                Has Member Stake
               </CWText>
               <CWToggle
                 size="small"
                 checked={filters.withStakeEnabled}
                 onChange={() => onStakeFilterChange()}
+              />
+            </div>
+
+            <div className="stake-filter">
+              <CWText type="h5" fontWeight="semiBold">
+                Has Launchpad Token
+              </CWText>
+              <CWToggle
+                size="small"
+                checked={filters.withLaunchpadToken}
+                onChange={() => onLaunchpadTokenFilterChange()}
+              />
+            </div>
+
+            <div className="stake-filter">
+              <CWText type="h5" fontWeight="semiBold">
+                Has External Token
+              </CWText>
+              <CWToggle
+                size="small"
+                checked={filters.withPinnedToken}
+                onChange={() => onPinnedTokenFilterChange()}
               />
             </div>
 

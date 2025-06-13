@@ -22,6 +22,7 @@ export const GetAllContests = {
     contest_id: z.number().int().optional(),
     running: z.boolean().optional().describe('Only active contests'),
     with_chain_node: z.string().optional(),
+    search: z.string().optional().describe('Search contests by name'),
   }),
   output: z.array(ContestResults),
 };

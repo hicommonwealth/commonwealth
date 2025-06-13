@@ -12,7 +12,13 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { comment_limit = 3, limit = 10, cursor = 1 } = payload;
+      const {
+        comment_limit = 3,
+        limit = 10,
+        cursor = 1,
+        community_id,
+        search,
+      } = payload;
 
       const rankedThreadIds = await cache().sliceSortedSet(
         CacheNamespaces.GlobalThreadRanks,
@@ -21,6 +27,14 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
         cursor * limit - 1,
         { order: 'ASC' },
       );
+
+      const whereConditions = [
+        filterGates(),
+        community_id ? 'AND T.community_id = :community_id' : '',
+        search ? 'AND T.title ILIKE :search' : '',
+      ]
+        .filter(Boolean)
+        .join(' ');
 
       // TODO: if we run out of ranked threads should we return something else
       if (!rankedThreadIds.length)
@@ -42,7 +56,7 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
             ${joinGates()}
           WHERE
             T.id IN (:threadIds)
-            ${filterGates()}
+            ${whereConditions}
         )
         ${baseActivityQuery}
         ORDER BY ARRAY_POSITION(ARRAY[:threadIds], T.id);
@@ -55,6 +69,8 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
         replacements: {
           comment_limit,
           threadIds: rankedThreadIds.map((t) => parseInt(t)),
+          ...(community_id && { community_id }),
+          ...(search && { search: `%${search}%` }),
         },
       });
 

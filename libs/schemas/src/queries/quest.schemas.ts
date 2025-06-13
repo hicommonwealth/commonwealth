@@ -42,6 +42,7 @@ export const GetQuest = {
 
 export const GetQuests = {
   input: PaginationParamsSchema.extend({
+    search: z.string().optional(),
     community_id: z.string().optional(),
     start_after: z.coerce.date().optional(),
     start_before: z.coerce.date().optional(),

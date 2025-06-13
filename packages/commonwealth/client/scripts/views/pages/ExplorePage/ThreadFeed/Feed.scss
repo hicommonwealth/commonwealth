@@ -1,0 +1,45 @@
+.Feed {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+
+  .filters {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+
+    &.hasAppliedFilter {
+      margin-bottom: 8px;
+    }
+  }
+
+  .no-feed-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 16px;
+    color: var(--text-secondary);
+  }
+}
+
+.FiltersDrawer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+
+  .filter-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+}

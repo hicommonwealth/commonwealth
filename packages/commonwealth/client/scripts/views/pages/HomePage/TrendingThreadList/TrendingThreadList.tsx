@@ -17,6 +17,7 @@ import {
 } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import useGetActiveThreadsQuery from 'client/scripts/state/api/threads/getActiveThreads';
 import useUserStore from 'client/scripts/state/ui/user';
+import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
 import { VirtuosoGrid } from 'react-virtuoso';
 import { EmptyThreadCard } from 'views/components/EmptyThreadCard/EmptyThreadCard';
 import { PageNotFound } from '../../404';
@@ -31,6 +32,9 @@ type TrendingThreadListProps = {
   customScrollParent?: HTMLElement;
   communityIdFilter?: string;
   hideHeader?: boolean;
+  searchText?: string;
+  onClearSearch?: () => void;
+  hideSearchTag?: boolean;
 };
 
 type FeedThreadProps = {
@@ -115,6 +119,9 @@ const TrendingThreadList = ({
   customScrollParent,
   communityIdFilter,
   hideHeader,
+  searchText,
+  hideSearchTag,
+  onClearSearch,
 }: TrendingThreadListProps) => {
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
@@ -125,7 +132,7 @@ const TrendingThreadList = ({
     data: feed,
     isLoading: feedIsLoading,
     isError: feedIsError,
-  } = query({ limit: 10 });
+  } = query({ limit: 10, search: searchText?.trim() });
 
   const {
     data: communityThreads,
@@ -186,6 +193,13 @@ const TrendingThreadList = ({
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
           </div>
         </div>
+      )}
+      {!hideSearchTag && searchText?.trim() && (
+        <CWTag
+          label={`Search: ${searchText?.trim()}`}
+          type="filter"
+          onCloseClick={onClearSearch}
+        />
       )}
       {isLoading ? (
         <div className="content">

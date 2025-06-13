@@ -21,6 +21,8 @@ export const ActivityComment = z.object({
 export const GlobalFeed = {
   input: PaginationParamsSchema.extend({
     comment_limit: z.number().int().min(0).max(10).optional().default(3),
+    community_id: z.string().optional(),
+    search: z.string().optional(),
   }),
   output: PaginatedResultSchema.extend({
     results: z.array(ThreadView),
