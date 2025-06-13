@@ -9,6 +9,7 @@ import {
   getDecodedString,
   renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
+import { useMutualConnections } from 'client/scripts/state/api/user';
 import { useFlag } from 'hooks/useFlag';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
@@ -30,6 +31,15 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const user = useUserStore();
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
   const referralsEnabled = useFlag('referrals');
+
+  const { data: mutualConnections } = useMutualConnections(
+    {
+      user_id_1: user.id,
+      user_id_2: profile.userId,
+      limit: 5,
+    },
+    { enabled: !isOwner && user.isLoggedIn },
+  );
 
   if (!profile) return;
   const { bio, name } = profile;
@@ -111,6 +121,35 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
             </div>
           </div>
         </div>
+        {!isOwner && mutualConnections?.mutual_communities?.length > 0 && (
+          <div className="mutual-connections">
+            <div className="mutual-icons">
+              {mutualConnections.mutual_communities
+                .slice(0, 5)
+                .map(
+                  (
+                    community: { id: string | number; icon_url?: string },
+                    idx: number,
+                  ) =>
+                    community.icon_url ? (
+                      <img
+                        key={community.id}
+                        src={community.icon_url}
+                        alt=""
+                        className="mutual-community-icon"
+                        style={{ zIndex: 10 - idx }}
+                      />
+                    ) : null,
+                )}
+            </div>
+            <CWText type="b1" style={{ marginLeft: 24 }}>
+              {mutualConnections.mutual_communities.length > 50
+                ? '50+'
+                : mutualConnections.mutual_communities.length}{' '}
+              mutual communities
+            </CWText>
+          </div>
+        )}
       </div>
     </div>
   );

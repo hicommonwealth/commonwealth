@@ -121,4 +121,30 @@
       }
     }
   }
+
+  .mutual-connections {
+    display: flex;
+    align-items: center;
+    margin: 16px 0;
+
+    .mutual-icons {
+      display: flex;
+      align-items: center;
+
+      .mutual-community-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-left: -10px;
+        border: 2px solid $white;
+        box-shadow: 0 0 0 1px $neutral-100;
+        background: $white;
+
+        &:first-child {
+          margin-left: 0;
+        }
+      }
+    }
+  }
 }
