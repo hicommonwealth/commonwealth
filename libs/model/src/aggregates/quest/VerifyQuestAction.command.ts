@@ -192,6 +192,7 @@ export function VerifyQuestAction(): Command<typeof schemas.VerifyQuestAction> {
       if (!actionCompleted) throw new InvalidState('Quest incomplete');
 
       const event = {
+        id: 0,
         name: questActionMeta.event_name,
         payload: {
           verified_at: verifiedAt,
@@ -202,7 +203,7 @@ export function VerifyQuestAction(): Command<typeof schemas.VerifyQuestAction> {
 
       const xpProjection = Xp();
       const res = await handleEvent(xpProjection, event, true);
-      return res && Array.isArray(res) && res.length > 0;
+      return !!res && Array.isArray(res) && res.length > 0;
     },
   };
 }

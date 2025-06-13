@@ -755,27 +755,33 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
             }),
         );
       },
-      KyoFinanceSwapQuestVerified: async ({ payload }) => {
+      KyoFinanceSwapQuestVerified: async ({ id, payload }) => {
         const action_meta = await models.QuestActionMeta.findOne({
           where: {
             id: payload.quest_action_meta_id,
           },
         });
         if (!action_meta) return;
-        return await recordXpsForQuest(payload.user_id, payload.verified_at, [
-          action_meta,
-        ]);
+        return await recordXpsForQuest({
+          event_id: id,
+          user_id: payload.user_id,
+          event_created_at: payload.verified_at,
+          action_metas: [action_meta],
+        });
       },
-      KyoFinanceLpQuestVerified: async ({ payload }) => {
+      KyoFinanceLpQuestVerified: async ({ id, payload }) => {
         const action_meta = await models.QuestActionMeta.findOne({
           where: {
             id: payload.quest_action_meta_id,
           },
         });
         if (!action_meta) return;
-        return await recordXpsForQuest(payload.user_id, payload.verified_at, [
-          action_meta,
-        ]);
+        return await recordXpsForQuest({
+          event_id: id,
+          user_id: payload.user_id,
+          event_created_at: payload.verified_at,
+          action_metas: [action_meta],
+        });
       },
     },
   };
