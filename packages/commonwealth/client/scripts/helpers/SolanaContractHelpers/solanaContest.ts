@@ -57,9 +57,14 @@ export async function initializeContest(
   // Set authority to wallet public key if not provided
   const authority = params.authority || wallet.publicKey;
 
-  // Validate winner shares add up to 100% (10000 basis points)
-  if (winnerShares.reduce((a, b) => a + b, 0) !== 10000) {
-    throw new Error('Winner shares must add up to 10000 (100%)');
+  // Validate winner shares add up to 100% (10000 basis points) with some tolerance for rounding errors
+  const totalShares = winnerShares.reduce((a, b) => a + b, 0);
+
+  if (Math.abs(totalShares - 10000) > 10) {
+    // Allow small margin for rounding errors
+    throw new Error(
+      `Winner shares must add up to 10000 (100%). Current total: ${totalShares}. Shares: ${JSON.stringify(winnerShares)}`,
+    );
   }
 
   // Validate protocol fee percentage is within range
@@ -301,9 +306,6 @@ export async function addContentToContest(
 
   // Fetch contest account to get the current content count
   const contestAccount = await program.account.contest.fetch(contestPda);
-
-  // Log the contest account for debugging (will be removed after debugging)
-  console.log('Contest account data:', JSON.stringify(contestAccount, null, 2));
 
   // Check if the required properties exist and use them with proper casing
   // Use optional chaining to prevent errors if properties don't exist
@@ -771,7 +773,6 @@ export async function getContestScore(
     isContestEnded: contestAccount.contestEnded,
     winners: [],
   };
-  console.log('totalPrize (from vault):', vaultBalance);
 
   // Check if there are any winner IDs (regardless of contest status)
   if (contestAccount.winnerIds && contestAccount.winnerIds.length > 0) {
@@ -781,8 +782,7 @@ export async function getContestScore(
 
     // Calculate the prize pool (after protocol fee is taken out)
     const prizePool = result.totalPrize - result.protocolFee;
-    console.log('Prize pool:', prizePool);
-    console.log('winnerIDs', contestAccount.winnerIds[0].toNumber());
+
     // Fetch content info for each winner
     const winnerPromises = contestAccount.winnerIds.map(
       async (contentId, index) => {

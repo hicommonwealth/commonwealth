@@ -64,6 +64,10 @@ class PhantomWebWalletController implements IWebWallet<string> {
       throw new Error('Phantom wallet not enabled! Call enable() first.');
     }
 
+    if (!this.accounts || this.accounts.length === 0) {
+      throw new Error('No accounts found in Phantom wallet!');
+    }
+
     return {
       publicKey: new PublicKey(this.accounts[0]),
       signTransaction: async (tx: any) => {
@@ -85,19 +89,22 @@ class PhantomWebWalletController implements IWebWallet<string> {
     connection: Connection,
     opts: { commitment?: string; preflightCommitment?: string } = {},
   ) {
-    // Get the anchor wallet interface
-    const wallet = this.getAnchorWallet();
+    try {
+      // Get the anchor wallet interface
+      const wallet = this.getAnchorWallet();
 
-    // Create and return the provider
-    return new AnchorProvider(connection, wallet, {
-      commitment: opts.commitment || 'confirmed',
-      preflightCommitment: opts.preflightCommitment || 'confirmed',
-    });
+      // Create and return the provider
+      return new AnchorProvider(connection, wallet, {
+        commitment: opts.commitment || 'confirmed',
+        preflightCommitment: opts.preflightCommitment || 'confirmed',
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   // ACTIONS
   public async enable() {
-    console.log('Attempting to enable Phantom');
     this._enabling = true;
     if (!this.available) {
       this._enabling = false;

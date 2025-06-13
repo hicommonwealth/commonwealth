@@ -101,10 +101,15 @@ const AdminContestsPage = () => {
       x.community?.id === community?.id,
   );
 
+  const isEthereumBased = app?.chain?.base === 'ethereum';
+  const isSolanaBased = app?.chain?.base === 'solana';
+  const isContestEligibleChain = isEthereumBased || isSolanaBased;
+
   const showBanner =
     hasAtLeastOneWeightedVotingTopic &&
     isContestAvailable &&
     ethChainId &&
+    isEthereumBased &&
     community?.namespace;
 
   const gotToContestTypeSelection = () => {
@@ -136,6 +141,7 @@ const AdminContestsPage = () => {
           <CWText type="h2">Contests</CWText>
 
           {contestView === ContestView.List &&
+            isContestEligibleChain &&
             isContestAvailable &&
             !hasNoContests && (
               <CWButton
@@ -213,7 +219,7 @@ const AdminContestsPage = () => {
                 img={commonUrl}
                 title="Launch on Common"
                 subtitle={
-                  !community?.namespace
+                  !community?.namespace && !isSolanaBased
                     ? `You need a namespace for your community to run Common contests. Set one up first.`
                     : !hasAtLeastOneWeightedVotingTopic
                       ? `You have a namespace, but no topics with weighted voting. You can still run a 
@@ -221,12 +227,15 @@ const AdminContestsPage = () => {
                       : `Setting up a contest just takes a few minutes and can be a huge boost to your community.`
                 }
                 button={{
-                  label: community?.namespace
-                    ? 'Launch Common contest'
-                    : 'Create a namespace',
-                  handler: community?.namespace
-                    ? goToLaunchCommonContest
-                    : () => setContestView(ContestView.NamespaceEnablemenement),
+                  label:
+                    community?.namespace || isSolanaBased
+                      ? 'Launch Common contest'
+                      : 'Create a namespace',
+                  handler:
+                    community?.namespace || isSolanaBased
+                      ? goToLaunchCommonContest
+                      : () =>
+                          setContestView(ContestView.NamespaceEnablemenement),
                 }}
               />
             ) : (
@@ -246,18 +255,20 @@ Setting up a contest just takes a few minutes and can be a huge boost to your co
               img={farcasterUrl}
               title="Launch on Farcaster"
               subtitle={
-                community?.namespace
+                community?.namespace || isSolanaBased
                   ? `Share your contest on Farcaster`
                   : `You need a namespace for your community to run Farcaster contests.
 Set one up first.`
               }
               button={{
-                label: community?.namespace
-                  ? 'Launch Farcaster contest'
-                  : 'Create a namespace',
-                handler: community?.namespace
-                  ? goToLaunchFarcasterContest
-                  : () => setContestView(ContestView.NamespaceEnablemenement),
+                label:
+                  community?.namespace || isSolanaBased
+                    ? 'Launch Farcaster contest'
+                    : 'Create a namespace',
+                handler:
+                  community?.namespace || isSolanaBased
+                    ? goToLaunchFarcasterContest
+                    : () => setContestView(ContestView.NamespaceEnablemenement),
               }}
             />
           </div>

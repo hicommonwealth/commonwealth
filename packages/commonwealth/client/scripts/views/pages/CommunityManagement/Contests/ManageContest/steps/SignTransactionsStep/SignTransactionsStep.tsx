@@ -1,7 +1,8 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { WalletId, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import useGetJudgeStatusQuery from 'client/scripts/state/api/contests/getJudgeStatus';
+import WebWalletController from 'controllers/app/web_wallets';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useFlag } from 'hooks/useFlag';
@@ -17,10 +18,12 @@ import {
   useDeployRecurringContestOnchainMutation,
   useDeploySingleERC20ContestOnchainMutation,
   useDeploySingleJudgedContestOnchainMutation,
+  useDeploySolanaContestOnchainMutation,
   useNominateJudgesMutation,
 } from 'state/api/contests';
 import { DeploySingleERC20ContestOnchainProps } from 'state/api/contests/deploySingleERC20ContestOnchain';
 import { DeploySingleJudgedContestOnchainProps } from 'state/api/contests/deploySingleJudgedContestOnchain';
+import { DeploySolanaContestOnchainProps } from 'state/api/contests/deploySolanaContestOnchain';
 import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -52,7 +55,6 @@ const ONE_HOUR_IN_SECONDS = 60 * 60;
 
 const CUSTOM_CONTEST_DURATION_IN_SECONDS =
   Number(process.env.CONTEST_DURATION_IN_SEC) || ONE_HOUR_IN_SECONDS;
-console.log({ CUSTOM_CONTEST_DURATION_IN_SECONDS });
 
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
@@ -84,6 +86,8 @@ const SignTransactionsStep = ({
     useDeploySingleERC20ContestOnchainMutation();
   const { mutateAsync: deploySingleJudgedContestOnchainMutation } =
     useDeploySingleJudgedContestOnchainMutation();
+  const { mutateAsync: deploySolanaContestOnchainMutation } =
+    useDeploySolanaContestOnchainMutation();
   const { mutateAsync: configureNominationsMutation } =
     useConfigureNominationsMutation();
 
@@ -117,6 +121,8 @@ const SignTransactionsStep = ({
   const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
   const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
   const walletAddress = user.activeAccount?.address || '';
+  const chainBase = app?.chain?.base || '';
+  const isSolanaChain = chainBase === 'solana';
 
   const judgeIdToUse = useMemo(() => {
     if (judgedContest && community?.pending_namespace_judge_token_id) {
@@ -128,6 +134,31 @@ const SignTransactionsStep = ({
     community?.pending_namespace_judge_token_id,
     judgeStatus?.current_judge_id,
   ]);
+
+  // For Solana communities, make sure we have a valid fundingTokenAddress
+  const defaultSolanaPrizeMintAddress =
+    'Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr'; // USDC on Solana
+
+  const getExchangeToken = () => {
+    if (isSolanaChain) {
+      // For Solana, we need a valid token address
+      if (isDirectDepositSelected) {
+        return (
+          contestFormData?.fundingTokenAddress || defaultSolanaPrizeMintAddress
+        );
+      } else {
+        // If no stake token, use default Solana token
+        return stakeData?.stake?.stake_token || defaultSolanaPrizeMintAddress;
+      }
+    } else {
+      // For Ethereum, use the original logic
+      return isDirectDepositSelected
+        ? contestFormData?.fundingTokenAddress || ZERO_ADDRESS
+        : stakeData?.stake?.stake_token;
+    }
+  };
+
+  const exchangeToken = getExchangeToken();
 
   const signTransaction = async () => {
     const contestLength = devContest
@@ -142,9 +173,7 @@ const SignTransactionsStep = ({
       ? CUSTOM_CONTEST_DURATION_IN_SECONDS
       : contestFormData?.contestDuration;
     const prizeShare = contestFormData?.prizePercentage;
-    const exchangeToken = isDirectDepositSelected
-      ? contestFormData?.fundingTokenAddress || ZERO_ADDRESS
-      : stakeData?.stake?.stake_token;
+
     const winnerShares = contestFormData?.payoutStructure;
     const voteToken = contestFormData?.isFarcasterContest
       ? exchangeToken
@@ -188,6 +217,28 @@ const SignTransactionsStep = ({
       walletAddress: walletAddress || '',
     };
 
+    // Ensure we have a valid prize mint address - use either exchangeToken or the default USDC address
+    const prizeMintToUse =
+      exchangeToken && exchangeToken !== ZERO_ADDRESS
+        ? exchangeToken
+        : defaultSolanaPrizeMintAddress;
+
+    const solanaContest = {
+      connectionUrl: chainRpc,
+      prizeMint: prizeMintToUse, // Guaranteed to be a valid address now
+      protocolFeeDestination: walletAddress, // Use admin wallet as fee destination for now
+      contestLengthSeconds: contestLength,
+      // Convert percentages (0-100) to basis points (0-10000) for Solana contract
+      winnerShares:
+        winnerShares && winnerShares.length > 0
+          ? winnerShares.map((share) => share * 100) // Convert from percentages to basis points
+          : [10000],
+      protocolFeePercentage: 1000, // 10% fee in basis points
+      authority: walletAddress,
+      // Adding a random seed to ensure uniqueness
+      seed: Math.floor(Math.random() * 256),
+    } as DeploySolanaContestOnchainProps;
+
     let contestAddress: string;
 
     try {
@@ -196,7 +247,99 @@ const SignTransactionsStep = ({
         state: 'loading',
       }));
 
-      if (isContestRecurring) {
+      // For Solana communities, always use the Solana contest deployment
+      if (isSolanaChain) {
+        // Convert the winner shares for validation
+        const convertedWinnerShares =
+          winnerShares && winnerShares.length > 0
+            ? winnerShares.map((share) => share * 100)
+            : [10000];
+
+        // Calculate the total shares in basis points (should be 10000)
+        const totalBasisPoints = convertedWinnerShares.reduce(
+          (a, b) => a + b,
+          0,
+        );
+
+        // Update solanaContest with the converted shares
+        solanaContest.winnerShares = convertedWinnerShares;
+
+        // Get phantom wallet and ensure it's available
+        const webWalletController = WebWalletController.Instance;
+        const phantomWallet = webWalletController.getByName(WalletId.Phantom);
+
+        if (!phantomWallet) {
+          throw new Error(
+            'Phantom wallet not found. Please install the Phantom wallet extension.',
+          );
+        }
+
+        if (!phantomWallet.available) {
+          throw new Error(
+            'Phantom wallet is not available in this browser. Please install the Phantom extension.',
+          );
+        }
+
+        if (!phantomWallet.enabled) {
+          await phantomWallet.enable();
+        }
+
+        if (!phantomWallet.accounts || phantomWallet.accounts.length === 0) {
+          throw new Error(
+            'No accounts found in Phantom wallet. Please connect your wallet first.',
+          );
+        }
+
+        // Triple-check prizeMint is set correctly
+        if (
+          !solanaContest.prizeMint ||
+          solanaContest.prizeMint === ZERO_ADDRESS
+        ) {
+          solanaContest.prizeMint = defaultSolanaPrizeMintAddress;
+        }
+
+        if (!solanaContest.protocolFeeDestination) {
+          solanaContest.protocolFeeDestination = walletAddress;
+        }
+
+        // Validate total basis points before deploying
+        if (Math.abs(totalBasisPoints - 10000) > 5) {
+          // Allow small rounding errors
+          throw new Error(
+            `Winner shares must add up to 10000 basis points (100%). Current total: ${totalBasisPoints}`,
+          );
+        }
+
+        try {
+          const result =
+            await deploySolanaContestOnchainMutation(solanaContest);
+          contestAddress = result.contestPda;
+        } catch (error) {
+          // Extract detailed error message if available
+          let errorMessage = error.message || 'Unknown error occurred';
+
+          // Check if this is a Solana-specific error with logs
+          if (error.logs) {
+            errorMessage = `Solana program error: ${errorMessage}\nCheck console for detailed logs.`;
+          }
+
+          // Check specific error conditions and provide more helpful messages
+          if (errorMessage.includes('Prize mint address is required')) {
+            errorMessage =
+              'Prize token address is missing. Please select a valid token or use the default USDC token.';
+          } else if (
+            errorMessage.includes('Prize mint cannot be the zero address')
+          ) {
+            errorMessage =
+              'Invalid token address provided. Please select a valid Solana token.';
+          } else if (errorMessage.includes('Phantom wallet')) {
+            errorMessage =
+              'Please install and connect Phantom wallet to deploy Solana contests.';
+          }
+
+          throw new Error(`Failed to deploy Solana contest: ${errorMessage}`);
+        }
+      } else if (isContestRecurring) {
         contestAddress = await deployRecurringContestOnchainMutation(recurring);
       } else if (judgedContest) {
         contestAddress =
@@ -233,7 +376,6 @@ const SignTransactionsStep = ({
         isPWA: isAddedToHomeScreen,
       });
     } catch (error) {
-      console.log('error', error);
       setLaunchContestData((prevState) => ({
         ...prevState,
         state: 'not-started',
@@ -265,7 +407,6 @@ const SignTransactionsStep = ({
         state: 'completed',
       }));
     } catch (error) {
-      console.log('Error configuring nominations', error);
       setConfigureNominationsData((prevState) => ({
         ...prevState,
         state: 'not-started',
@@ -299,7 +440,6 @@ const SignTransactionsStep = ({
         state: 'completed',
       }));
     } catch (error) {
-      console.log('Error nominating self as judge', error);
       setNominateSelfData((prevState) => ({
         ...prevState,
         state: 'not-started',
@@ -320,9 +460,11 @@ const SignTransactionsStep = ({
         <CWText type="h2">Sign transactions to launch contest</CWText>
         <CWText type="b1" className="description">
           You must sign this transaction to deploy the contest.{' '}
-          {isContestRecurring
-            ? 'It routes the fees generated from stake to the contest address and launchs the contest contract onchain.'
-            : 'It launchs the contest contract onchain.'}
+          {isSolanaChain
+            ? 'This will initialize a Solana contest on-chain.'
+            : isContestRecurring
+              ? 'It routes the fees generated from stake to the contest address and launchs the contest contract onchain.'
+              : 'It launchs the contest contract onchain.'}
         </CWText>
 
         <CWText fontWeight="medium" type="b1" className="description">
@@ -340,6 +482,7 @@ const SignTransactionsStep = ({
             isDirectDepositSelected,
             launchContestData,
             signTransaction,
+            isSolanaChain,
           })}
         />
 

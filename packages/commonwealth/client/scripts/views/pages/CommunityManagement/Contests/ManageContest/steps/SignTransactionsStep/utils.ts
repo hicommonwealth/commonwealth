@@ -21,6 +21,7 @@ interface GetActionStepsProps {
     errorText: string;
   };
   signTransaction: () => Promise<void>;
+  isSolanaChain?: boolean;
 }
 
 export const getActionSteps = ({
@@ -32,60 +33,79 @@ export const getActionSteps = ({
   isDirectDepositSelected,
   launchContestData,
   signTransaction,
+  isSolanaChain = false,
 }: GetActionStepsProps): ActionStepsProps['steps'] => {
-  const judgeTokenStep = isJudgedContest
-    ? [
-        {
-          label: 'Register and mint judge tokens',
-          description:
-            'This transaction registers and mints judge tokens for the contest.',
-          state: configureNominationsData.state,
-          errorText: configureNominationsData.errorText,
-          actionButton: {
-            label:
-              configureNominationsData.state === 'completed'
-                ? 'Signed'
-                : 'Sign',
-            disabled:
-              configureNominationsData.state === 'loading' ||
-              configureNominationsData.state === 'completed',
-            onClick: configureNominations,
+  const judgeTokenStep =
+    isJudgedContest && !isSolanaChain
+      ? [
+          {
+            label: 'Register and mint judge tokens',
+            description:
+              'This transaction registers and mints judge tokens for the contest.',
+            state: configureNominationsData.state,
+            errorText: configureNominationsData.errorText,
+            actionButton: {
+              label:
+                configureNominationsData.state === 'completed'
+                  ? 'Signed'
+                  : 'Sign',
+              disabled:
+                configureNominationsData.state === 'loading' ||
+                configureNominationsData.state === 'completed',
+              onClick: configureNominations,
+            },
           },
-        },
-        {
-          label: 'Nominate self as a judge',
-          description: `This transaction nominates yourself as a judge for the contest, 
+          {
+            label: 'Nominate self as a judge',
+            description: `This transaction nominates yourself as a judge for the contest, 
           allowing you to participate in the judging process.`,
-          state: nominateSelfData.state,
-          errorText: nominateSelfData.errorText,
-          actionButton: {
-            label: nominateSelfData.state === 'completed' ? 'Signed' : 'Sign',
-            disabled:
-              nominateSelfData.state === 'loading' ||
-              nominateSelfData.state === 'completed' ||
-              configureNominationsData.state !== 'completed',
-            onClick: nominateSelf,
+            state: nominateSelfData.state,
+            errorText: nominateSelfData.errorText,
+            actionButton: {
+              label: nominateSelfData.state === 'completed' ? 'Signed' : 'Sign',
+              disabled:
+                nominateSelfData.state === 'loading' ||
+                nominateSelfData.state === 'completed' ||
+                configureNominationsData.state !== 'completed',
+              onClick: nominateSelf,
+            },
           },
-        },
-      ]
-    : [];
+        ]
+      : [];
 
-  const isLaunchStepDisabled = isJudgedContest
-    ? launchContestData.state === 'loading' ||
-      launchContestData.state === 'completed' ||
-      nominateSelfData.state !== 'completed'
-    : launchContestData.state === 'loading' ||
-      launchContestData.state === 'completed';
+  const isLaunchStepDisabled =
+    isJudgedContest && !isSolanaChain
+      ? launchContestData.state === 'loading' ||
+        launchContestData.state === 'completed' ||
+        nominateSelfData.state !== 'completed'
+      : launchContestData.state === 'loading' ||
+        launchContestData.state === 'completed';
+
+  const getLaunchLabel = () => {
+    if (isSolanaChain) {
+      return 'Launch Solana contest';
+    } else if (isDirectDepositSelected) {
+      return 'Launch contest';
+    } else {
+      return 'Launch contest & re-route fees';
+    }
+  };
+
+  const getLaunchDescription = () => {
+    if (isSolanaChain) {
+      return 'This transaction launches a Solana contest.';
+    } else if (isDirectDepositSelected) {
+      return 'This transaction launches a contest.';
+    } else {
+      return 'This transaction launches a contest and re-routes fees to the community.';
+    }
+  };
 
   return [
     ...judgeTokenStep,
     {
-      label: isDirectDepositSelected
-        ? 'Launch contest'
-        : 'Launch contest & re-route fees',
-      description: isDirectDepositSelected
-        ? 'This transaction launches a contest.'
-        : 'This transaction launches a contest and re-routes fees to the community.',
+      label: getLaunchLabel(),
+      description: getLaunchDescription(),
       state: launchContestData.state,
       errorText: launchContestData.errorText,
       actionButton: {
