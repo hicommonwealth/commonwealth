@@ -89,6 +89,12 @@ export const TreeHierarchy = ({
   // Derive chat mode from sort type - no separate state needed
   const isChatMode = commentFilters.sortType === 'oldest';
 
+  console.log(
+    `[TreeHierarchy] Render. Parent: ${parentCommentId ?? 'ROOT'}. Filter: ${
+      commentFilters.sortType
+    }`,
+  );
+
   const virtuosoRef = useRef<any>(null);
   const previousChatModeRef = useRef(isChatMode);
   const isLoadingOlderMessagesRef = useRef(false);
@@ -113,6 +119,24 @@ export const TreeHierarchy = ({
     apiEnabled: !!communityId && !!thread.id,
   });
 
+  useEffect(() => {
+    if (paginatedComments) {
+      console.log(
+        `[TreeHierarchy] Data for Parent: ${
+          parentCommentId ?? 'ROOT'
+        }. Pages: ${paginatedComments.pages.length}`,
+        paginatedComments.pages.map((p) => ({
+          page: p.page,
+          totalPages: p.totalPages,
+          results: p.results.map((r: any) => ({
+            id: r.id,
+            body: r.body.substring(0, 30),
+          })),
+        })),
+      );
+    }
+  }, [paginatedComments, parentCommentId]);
+
   const allComments = useMemo(() => {
     if (!paginatedComments?.pages) return [];
 
@@ -129,6 +153,18 @@ export const TreeHierarchy = ({
     isChatMode,
     parentCommentId,
   ]) as ExtendedCommentViewParams[];
+
+  useEffect(() => {
+    console.log(
+      `[TreeHierarchy] Processed comments for Parent: ${
+        parentCommentId ?? 'ROOT'
+      }. Count: ${allComments.length}`,
+      allComments.map((c) => ({
+        id: c.id,
+        body: c.body.substring(0, 30),
+      })),
+    );
+  }, [allComments, parentCommentId]);
 
   const handleGenerateAIReply = useCallback(
     (
@@ -363,6 +399,164 @@ export const TreeHierarchy = ({
     return <></>;
   if (allComments.length === 0 && parentCommentId) return <></>;
 
+  const renderCommentItem = (
+    comment: ExtendedCommentViewParams,
+    index: number,
+  ) => {
+    const isCommentAuthor = comment.address === user.activeAccount?.address;
+
+    return (
+      <div
+        key={comment.id + '' + comment.marked_as_spam_at}
+        ref={(el) => {
+          commentRefs.current[index] = el;
+        }}
+      >
+        <div className={`Comment comment-${comment.id}`}>
+          <CommentCard
+            key={`${comment.id}-${comment.body}`}
+            isThreadArchived={isThreadArchived}
+            canReply={canReply}
+            maxReplyLimitReached={comment.comment_level >= MAX_COMMENT_DEPTH}
+            replyBtnVisible={isReplyButtonVisible}
+            {...(comment.reply_count > 0 && {
+              repliesCount: comment.reply_count,
+            })}
+            canReact={canReact}
+            canEdit={!isThreadLocked && (isCommentAuthor || isAdminOrMod)}
+            editDraft={commentEdits?.[comment.id]?.editDraft || ''}
+            onEditStart={() => onEditStart(comment)}
+            onEditCancel={(hasContentChanged: boolean) =>
+              onEditCancel(comment, hasContentChanged)
+            }
+            onEditConfirm={(newDelta) => onEditConfirm(comment, newDelta)}
+            isSavingEdit={commentEdits?.[comment.id]?.isSavingEdit || false}
+            isEditing={commentEdits?.[comment.id]?.isEditing || false}
+            canDelete={!isThreadLocked && (isCommentAuthor || isAdminOrMod)}
+            onReply={() => {
+              onCommentReplyStart(comment.id, index);
+            }}
+            onAIReply={() => {
+              return handleGenerateAIReply(comment.id, true);
+            }}
+            onDelete={() => onDelete(comment)}
+            isSpam={!!comment.marked_as_spam_at}
+            onSpamToggle={() => onSpamToggle(comment)}
+            canToggleSpam={!isThreadLocked && (isCommentAuthor || isAdminOrMod)}
+            comment={comment}
+            shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
+            weightType={thread.topic?.weighted_voting}
+            tokenNumDecimals={thread.topic?.token_decimals || undefined}
+            threadContext={thread.body}
+            permissions={permissions}
+          />
+        </div>
+        {comment.reply_count > 0 && (
+          <TreeHierarchy
+            commentFilters={commentFilters}
+            isThreadArchived={!!thread.archivedAt}
+            isThreadLocked={isThreadLocked}
+            isReplyButtonVisible={isReplyButtonVisible}
+            onDelete={onDelete}
+            onEditStart={onEditStart}
+            onEditConfirm={onEditConfirm}
+            onEditCancel={onEditCancel}
+            onSpamToggle={onSpamToggle}
+            pageRef={pageRef}
+            isReplyingToCommentId={isReplyingToCommentId}
+            onCommentReplyStart={onCommentReplyStart}
+            onCommentReplyEnd={onCommentReplyEnd}
+            commentEdits={commentEdits}
+            canComment={canComment}
+            thread={thread}
+            canReact={canReact}
+            canReply={canReply}
+            parentCommentId={comment.id}
+            streamingInstances={streamingInstances}
+            setStreamingInstances={setStreamingInstances}
+            permissions={permissions}
+          />
+        )}
+        {streamingInstances
+          .filter((instance) => instance.targetCommentId === comment.id)
+          .map((instance) => (
+            <div
+              className="replies-container"
+              key={`streaming-${comment.id}-${instance.modelId}`}
+            >
+              <CommentCard
+                permissions={permissions}
+                isThreadArchived={isThreadArchived}
+                maxReplyLimitReached={true}
+                replyBtnVisible={false}
+                comment={{
+                  ...comment,
+                  id: comment.id,
+                  body: '',
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString(),
+                  address: user.activeAccount?.address || '',
+                  comment_level: comment.comment_level + 1,
+                  thread_id: comment.thread_id,
+                  marked_as_spam_at: null,
+                  reaction_count: 0,
+                  reply_count: 0,
+                  user_id: user.id,
+                  // Use fallbacks for profile_name
+                  profile_name: user.activeAccount?.address || 'AI Assistant',
+                }}
+                isStreamingAIReply={true}
+                streamingModelId={instance.modelId}
+                modelName={instance.modelName}
+                parentCommentText={comment.body}
+                threadContext={thread.body}
+                onStreamingComplete={() => {
+                  setStreamingInstances((prev) =>
+                    prev.filter(
+                      (si) =>
+                        !(
+                          si.targetCommentId === comment.id &&
+                          si.modelId === instance.modelId
+                        ),
+                    ),
+                  );
+                }}
+                canReply={false}
+                canReact={false}
+                canEdit={false}
+                canDelete={false}
+                canToggleSpam={false}
+                shareURL=""
+                tokenNumDecimals={thread.topic?.token_decimals || undefined}
+              />
+            </div>
+          ))}
+        {isReplyingToCommentId === comment.id && (
+          <WithActiveStickyComment>
+            <CreateComment
+              handleIsReplying={onCommentReplyEnd}
+              parentCommentId={isReplyingToCommentId}
+              rootThread={thread}
+              canComment={canComment}
+              isReplying={!!isReplyingToCommentId}
+              replyingToAuthor={comment.profile_name}
+              parentCommentText={comment.body}
+              onCancel={() => {
+                onEditCancel(comment, false);
+              }}
+              onCommentCreated={(newCommentId: number, hasAI: boolean) => {
+                if (hasAI) {
+                  triggerStreamingForNewComment(newCommentId, true);
+                }
+              }}
+              tooltipText={permissions.CREATE_COMMENT.tooltip}
+            />
+          </WithActiveStickyComment>
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
       <div
@@ -371,264 +565,101 @@ export const TreeHierarchy = ({
           'chat-mode': isChatMode && !parentCommentId,
         })}
       >
-        <Virtuoso
-          ref={virtuosoRef}
-          className="comments-list"
-          style={{ height: '100%', width: '100%' }}
-          data={isInitialCommentsLoading ? [] : allComments}
-          {...(pageRef.current &&
-            !isChatMode && {
-              customScrollParent: pageRef.current,
-            })}
-          {...(isChatMode &&
-            commentFilters.sortType === 'oldest' && {
-              followOutput: !isLoadingOlderMessages, // Don't follow output when loading older messages
-              alignToBottom: true,
-              reversed: true,
-            })}
-          itemContent={(index, comment) => {
-            const isCommentAuthor =
-              comment.address === user.activeAccount?.address;
+        {parentCommentId ? (
+          // For replies, render directly without Virtuoso to avoid nesting issues
+          <div>{allComments.map(renderCommentItem)}</div>
+        ) : (
+          // For root comments, use Virtuoso for performance
+          <Virtuoso
+            ref={virtuosoRef}
+            className="comments-list"
+            style={{ height: '100%', width: '100%' }}
+            data={isInitialCommentsLoading ? [] : allComments}
+            {...(pageRef.current &&
+              !isChatMode && {
+                customScrollParent: pageRef.current,
+              })}
+            {...(isChatMode &&
+              commentFilters.sortType === 'oldest' &&
+              !parentCommentId && {
+                followOutput: !isLoadingOlderMessages, // Don't follow output when loading older messages
+                alignToBottom: true,
+                reversed: true,
+              })}
+            itemContent={(index, comment) => renderCommentItem(comment, index)}
+            overscan={50}
+            components={{
+              EmptyPlaceholder: () => <></>,
+              ...(isChatMode && !parentCommentId
+                ? {
+                    Header: () => {
+                      // More robust check for whether there are more pages to load
+                      const lastPage =
+                        paginatedComments?.pages?.[
+                          paginatedComments.pages.length - 1
+                        ];
+                      const canLoadMore =
+                        hasNextPage &&
+                        lastPage &&
+                        lastPage.page < lastPage.totalPages &&
+                        !isLoadingComments &&
+                        !isLoadingOlderMessages &&
+                        allComments.length > 0; // Only show if we have comments to display
 
-            return (
-              <div
-                key={comment.id + '' + comment.marked_as_spam_at}
-                ref={(el) => {
-                  commentRefs.current[index] = el;
-                }}
-              >
-                <div className={`Comment comment-${comment.id}`}>
-                  <CommentCard
-                    key={`${comment.id}-${comment.body}`}
-                    isThreadArchived={isThreadArchived}
-                    canReply={canReply}
-                    maxReplyLimitReached={
-                      comment.comment_level >= MAX_COMMENT_DEPTH
-                    }
-                    replyBtnVisible={isReplyButtonVisible}
-                    {...(comment.reply_count > 0 && {
-                      repliesCount: comment.reply_count,
-                    })}
-                    canReact={canReact}
-                    canEdit={
-                      !isThreadLocked && (isCommentAuthor || isAdminOrMod)
-                    }
-                    editDraft={commentEdits?.[comment.id]?.editDraft || ''}
-                    onEditStart={() => onEditStart(comment)}
-                    onEditCancel={(hasContentChanged: boolean) =>
-                      onEditCancel(comment, hasContentChanged)
-                    }
-                    onEditConfirm={(newDelta) =>
-                      onEditConfirm(comment, newDelta)
-                    }
-                    isSavingEdit={
-                      commentEdits?.[comment.id]?.isSavingEdit || false
-                    }
-                    isEditing={commentEdits?.[comment.id]?.isEditing || false}
-                    canDelete={
-                      !isThreadLocked && (isCommentAuthor || isAdminOrMod)
-                    }
-                    onReply={() => {
-                      onCommentReplyStart(comment.id, index);
-                    }}
-                    onAIReply={() => {
-                      return handleGenerateAIReply(comment.id, true);
-                    }}
-                    onDelete={() => onDelete(comment)}
-                    isSpam={!!comment.marked_as_spam_at}
-                    onSpamToggle={() => onSpamToggle(comment)}
-                    canToggleSpam={
-                      !isThreadLocked && (isCommentAuthor || isAdminOrMod)
-                    }
-                    comment={comment}
-                    shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
-                    weightType={thread.topic?.weighted_voting}
-                    tokenNumDecimals={thread.topic?.token_decimals || undefined}
-                    threadContext={thread.body}
-                    permissions={permissions}
-                  />
-                </div>
-                {comment.reply_count > 0 && (
-                  <TreeHierarchy
-                    commentFilters={commentFilters}
-                    isThreadArchived={!!thread.archivedAt}
-                    isThreadLocked={isThreadLocked}
-                    isReplyButtonVisible={isReplyButtonVisible}
-                    onDelete={onDelete}
-                    onEditStart={onEditStart}
-                    onEditConfirm={onEditConfirm}
-                    onEditCancel={onEditCancel}
-                    onSpamToggle={onSpamToggle}
-                    pageRef={pageRef}
-                    isReplyingToCommentId={isReplyingToCommentId}
-                    onCommentReplyStart={onCommentReplyStart}
-                    onCommentReplyEnd={onCommentReplyEnd}
-                    commentEdits={commentEdits}
-                    canComment={canComment}
-                    thread={thread}
-                    canReact={canReact}
-                    canReply={canReply}
-                    parentCommentId={comment.id}
-                    streamingInstances={streamingInstances}
-                    setStreamingInstances={setStreamingInstances}
-                    permissions={permissions}
-                  />
-                )}
-                {streamingInstances
-                  .filter((instance) => instance.targetCommentId === comment.id)
-                  .map((instance) => (
-                    <div
-                      className="replies-container"
-                      key={`streaming-${comment.id}-${instance.modelId}`}
-                    >
-                      <CommentCard
-                        permissions={permissions}
-                        isThreadArchived={isThreadArchived}
-                        maxReplyLimitReached={true}
-                        replyBtnVisible={false}
-                        comment={{
-                          ...comment,
-                          id: comment.id,
-                          body: '',
-                          created_at: new Date().toISOString(),
-                          updated_at: new Date().toISOString(),
-                          address: user.activeAccount?.address || '',
-                          comment_level: comment.comment_level + 1,
-                          thread_id: comment.thread_id,
-                          marked_as_spam_at: null,
-                          reaction_count: 0,
-                          reply_count: 0,
-                          user_id: user.id,
-                          // Use fallbacks for profile_name
-                          profile_name:
-                            user.activeAccount?.address || 'AI Assistant',
-                        }}
-                        isStreamingAIReply={true}
-                        streamingModelId={instance.modelId}
-                        modelName={instance.modelName}
-                        parentCommentText={comment.body}
-                        threadContext={thread.body}
-                        onStreamingComplete={() => {
-                          setStreamingInstances((prev) =>
-                            prev.filter(
-                              (si) =>
-                                !(
-                                  si.targetCommentId === comment.id &&
-                                  si.modelId === instance.modelId
-                                ),
-                            ),
-                          );
-                        }}
-                        canReply={false}
-                        canReact={false}
-                        canEdit={false}
-                        canDelete={false}
-                        canToggleSpam={false}
-                        shareURL=""
-                        tokenNumDecimals={
-                          thread.topic?.token_decimals || undefined
-                        }
-                      />
-                    </div>
-                  ))}
-                {isReplyingToCommentId === comment.id && (
-                  <WithActiveStickyComment>
-                    <CreateComment
-                      handleIsReplying={onCommentReplyEnd}
-                      parentCommentId={isReplyingToCommentId}
-                      rootThread={thread}
-                      canComment={canComment}
-                      isReplying={!!isReplyingToCommentId}
-                      replyingToAuthor={comment.profile_name}
-                      parentCommentText={comment.body}
-                      onCancel={() => {
-                        onEditCancel(comment, false);
-                      }}
-                      onCommentCreated={(
-                        newCommentId: number,
-                        hasAI: boolean,
-                      ) => {
-                        if (hasAI) {
-                          triggerStreamingForNewComment(newCommentId, true);
-                        }
-                      }}
-                      tooltipText={permissions.CREATE_COMMENT.tooltip}
-                    />
-                  </WithActiveStickyComment>
-                )}
-              </div>
-            );
-          }}
-          overscan={50}
-          components={{
-            EmptyPlaceholder: () => <></>,
-            ...(isChatMode
-              ? {
-                  Header: () => {
-                    // More robust check for whether there are more pages to load
-                    const lastPage =
-                      paginatedComments?.pages?.[
-                        paginatedComments.pages.length - 1
-                      ];
-                    const canLoadMore =
-                      hasNextPage &&
-                      lastPage &&
-                      lastPage.page < lastPage.totalPages &&
-                      !isLoadingComments &&
-                      !isLoadingOlderMessages &&
-                      allComments.length > 0; // Only show if we have comments to display
-
-                    return canLoadMore ? (
-                      <div className="chat-load-older-container">
+                      return canLoadMore ? (
+                        <div className="chat-load-older-container">
+                          <CWButton
+                            containerClassName="m-auto"
+                            label="Load older messages"
+                            disabled={
+                              isLoadingComments || isLoadingOlderMessages
+                            }
+                            onClick={async () => {
+                              if (!isLoadingComments && canLoadMore) {
+                                setIsLoadingOlderMessages(true);
+                                isLoadingOlderMessagesRef.current = true;
+                                try {
+                                  await fetchMoreComments();
+                                } catch (error) {
+                                  console.error(
+                                    'Failed to load older messages:',
+                                    error,
+                                  );
+                                } finally {
+                                  // Reset the flag after a delay to allow for rendering
+                                  setTimeout(() => {
+                                    setIsLoadingOlderMessages(false);
+                                    isLoadingOlderMessagesRef.current = false;
+                                  }, 500);
+                                }
+                              }
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <></>
+                      );
+                    },
+                  }
+                : {
+                    Footer: () =>
+                      hasNextPage ? (
                         <CWButton
                           containerClassName="m-auto"
-                          label="Load older messages"
-                          disabled={isLoadingComments || isLoadingOlderMessages}
-                          onClick={async () => {
-                            if (!isLoadingComments && canLoadMore) {
-                              setIsLoadingOlderMessages(true);
-                              isLoadingOlderMessagesRef.current = true;
-                              try {
-                                await fetchMoreComments();
-                              } catch (error) {
-                                console.error(
-                                  'Failed to load older messages:',
-                                  error,
-                                );
-                              } finally {
-                                // Reset the flag after a delay to allow for rendering
-                                setTimeout(() => {
-                                  setIsLoadingOlderMessages(false);
-                                  isLoadingOlderMessagesRef.current = false;
-                                }, 500);
-                              }
-                            }
+                          label="Load more"
+                          disabled={isLoadingComments}
+                          onClick={() => {
+                            !isLoadingComments &&
+                              fetchMoreComments().catch(console.error);
                           }}
                         />
-                      </div>
-                    ) : (
-                      <></>
-                    );
-                  },
-                }
-              : {
-                  Footer: () =>
-                    hasNextPage ? (
-                      <CWButton
-                        containerClassName="m-auto"
-                        label="Load more"
-                        disabled={isLoadingComments}
-                        onClick={() => {
-                          !isLoadingComments &&
-                            fetchMoreComments().catch(console.error);
-                        }}
-                      />
-                    ) : (
-                      <></>
-                    ),
-                }),
-          }}
-        />
+                      ) : (
+                        <></>
+                      ),
+                  }),
+            }}
+          />
+        )}
       </div>
     </>
   );
