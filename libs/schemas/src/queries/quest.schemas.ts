@@ -1,29 +1,57 @@
 import { z } from 'zod';
 import { AuthContext } from '../context';
+import { ChainEventXpSource } from '../entities/chain-event-xp-source.schemas';
+import { CommunityGoalMeta } from '../entities/community.schemas';
 import {
-  ChainEventXpSource,
-  CommunityGoalMeta,
+  GeneralQuestAction,
+  KyoFinanceLpQuestAction,
+  KyoFinanceSwapQuestAction,
   Quest,
-  QuestActionMeta,
   QuestTweet,
-} from '../entities';
+} from '../entities/quest.schemas';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
-export const QuestActionView = QuestActionMeta.extend({
-  QuestTweet: QuestTweet.extend({
-    created_at: z.coerce.date().or(z.string()).optional(),
-    updated_at: z.coerce.date().or(z.string()).optional(),
-  }).nullish(),
-  ChainEventXpSource: ChainEventXpSource.extend({
-    created_at: z.coerce.date().or(z.string()).optional(),
-    updated_at: z.coerce.date().or(z.string()).optional(),
-  }).nullish(),
-  CommunityGoalMeta: CommunityGoalMeta.extend({
-    created_at: z.coerce.date().or(z.string()).optional(),
-  }).nullish(),
+// Define the extended versions of the shared schemas
+const QuestTweetView = QuestTweet.extend({
   created_at: z.coerce.date().or(z.string()).optional(),
   updated_at: z.coerce.date().or(z.string()).optional(),
 });
+
+const ChainEventXpSourceView = ChainEventXpSource.extend({
+  created_at: z.coerce.date().or(z.string()).optional(),
+  updated_at: z.coerce.date().or(z.string()).optional(),
+});
+
+const CommunityGoalMetaView = CommunityGoalMeta.extend({
+  created_at: z.coerce.date().or(z.string()).optional(),
+});
+
+// Helper to extend any quest action variant for the view
+function extendQuestActionForView<T extends z.ZodRawShape>(
+  base: z.ZodObject<T>,
+) {
+  return base.extend({
+    QuestTweet: QuestTweetView.nullish(),
+    ChainEventXpSource: ChainEventXpSourceView.nullish(),
+    CommunityGoalMeta: CommunityGoalMetaView.nullish(),
+    created_at: z.coerce.date().or(z.string()).optional(),
+    updated_at: z.coerce.date().or(z.string()).optional(),
+  });
+}
+
+const KyoFinanceSwapQuestActionView = extendQuestActionForView(
+  KyoFinanceSwapQuestAction,
+);
+const KyoFinanceLpQuestActionView = extendQuestActionForView(
+  KyoFinanceLpQuestAction,
+);
+const GeneralQuestActionView = extendQuestActionForView(GeneralQuestAction);
+
+export const QuestActionView = z.discriminatedUnion('event_name', [
+  KyoFinanceSwapQuestActionView,
+  KyoFinanceLpQuestActionView,
+  GeneralQuestActionView,
+]);
 
 export const QuestView = Quest.omit({ scheduled_job_id: true }).extend({
   id: z.number(),

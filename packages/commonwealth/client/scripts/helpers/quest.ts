@@ -118,6 +118,8 @@ export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
     'MembershipsRefreshed',
     'LaunchpadTokenRecordCreated',
     'CommunityGoalReached',
+    'KyoFinanceSwapQuestVerified',
+    'KyoFinanceLpQuestVerified',
   ];
   const channelQuest: QuestActionType[] = [
     'TweetEngagement',
@@ -125,6 +127,18 @@ export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
   ];
 
   return [...commonQuests, ...channelQuest].includes(action);
+};
+
+export const doesActionRequireKYOFinanceSwapMetadata = (
+  action: QuestActionType,
+) => {
+  return action === 'KyoFinanceSwapQuestVerified';
+};
+
+export const doesActionRequireKYOFinanceLpMetadata = (
+  action: QuestActionType,
+) => {
+  return action === 'KyoFinanceLpQuestVerified';
 };
 
 const convertTimeRemainingToLabel = ({

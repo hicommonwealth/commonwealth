@@ -1,6 +1,8 @@
 import {
   EVM_ADDRESS_STRICT,
   EVM_EVENT_SIGNATURE_STRICT,
+  KyoFinanceLpQuestRequestParams,
+  KyoFinanceSwapQuestRequestParams,
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
@@ -26,6 +28,8 @@ import {
   doesActionRequireDiscordServerId,
   doesActionRequireGoalConfig,
   doesActionRequireGroupId,
+  doesActionRequireKYOFinanceLpMetadata,
+  doesActionRequireKYOFinanceSwapMetadata,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
@@ -75,6 +79,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'LaunchpadTokenRecordCreated',
       'LaunchpadTokenTraded',
       'CommunityGoalReached',
+      'KyoFinanceSwapQuestVerified',
+      'KyoFinanceLpQuestVerified',
     ] as QuestAction[],
     channel: ['TweetEngagement', 'XpChainEventCreated'] as QuestAction[],
   };
@@ -140,6 +146,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   participationPeriod: subForm.participationPeriod,
                   participationTimesPerPeriod:
                     subForm.participationTimesPerPeriod,
+                  metadata: subForm.metadata || null,
                 },
                 errors: {},
                 config: {
@@ -174,6 +181,10 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   with_optional_token_trade_threshold:
                     allowsContentId &&
                     doesActionAllowTokenTradeThreshold(chosenAction),
+                  requires_kyo_finance_swap_metadata:
+                    doesActionRequireKYOFinanceSwapMetadata(chosenAction),
+                  requires_kyo_finance_lp_metadata:
+                    doesActionRequireKYOFinanceLpMetadata(chosenAction),
                   with_optional_sso_type:
                     allowsContentId && doesActionAllowSSOType(chosenAction),
                 },
@@ -212,7 +223,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         isUserReferred: false, // we assume user is not referred to calculate the max lower/upper limit,
         questActions: [...questActionSubForms].map(({ values }) => ({
           creator_reward_weight: parseInt(`${values.creatorRewardAmount || 0}`),
-          event_name: values.action as QuestAction,
+          event_name: values.action as QuestAction as any, // TODO: 11963 - tim - fix type in API
           quest_id: Math.random(),
           reward_amount: parseInt(`${values.rewardAmount || 0}`),
           participation_times_per_period: parseInt(
@@ -292,9 +303,39 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         }
         return 'thread';
       })();
+      const metadata = (() => {
+        if (!subForm.values?.metadata?.chainId) return null;
+
+        switch (subForm.values.action) {
+          case 'KyoFinanceLpQuestVerified': {
+            return {
+              chainId: subForm.values.metadata.chainId,
+              poolAddresses: subForm.values.metadata.poolAddresses
+                ?.split(',')
+                .map((x) => x.trim()),
+              minUSDValues: subForm.values.metadata.minUSDValues
+                ?.split(',')
+                .map((x) => x.trim()),
+            } as z.infer<typeof KyoFinanceLpQuestRequestParams>;
+          }
+          case 'KyoFinanceSwapQuestVerified': {
+            return {
+              chainId: subForm.values.metadata.chainId,
+              inputToken: subForm.values.metadata.inputToken || '',
+              outputToken: subForm.values.metadata.outputToken || '',
+              minOutputAmount: subForm.values.metadata.minOutputAmount || '',
+              minTimestamp: subForm.values.metadata.outputToken || '',
+              minVolumeUSD: subForm.values.metadata.minVolumeUSD || '',
+            } as z.infer<typeof KyoFinanceSwapQuestRequestParams>;
+          }
+          default: {
+            return null;
+          }
+        }
+      })();
 
       return {
-        event_name: subForm.values.action as QuestAction,
+        event_name: subForm.values.action as QuestAction as any, // TODO: 11963 - tim - fix type in API
         reward_amount: parseInt(`${subForm.values.rewardAmount || 0}`, 10),
         ...(subForm.values.creatorRewardAmount && {
           creator_reward_weight: calculateRemainingPercentageChangeFractional(
@@ -349,6 +390,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         amount_multiplier: subForm.config?.requires_amount_multipler
           ? parseInt(`${subForm.values.amountMultipler || 0}`)
           : 0,
+        metadata,
       };
     });
   };

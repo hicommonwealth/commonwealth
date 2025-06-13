@@ -20,6 +20,8 @@ export const actionCopies = {
     ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
     ['CommunityGoalReached']: 'Complete the community goal',
     ['RecurringContestManagerDeployed']: 'Create a Recurring Contest',
+    ['KyoFinanceSwapQuestVerified']: 'Complete a token swap on Kyo Finance',
+    ['KyoFinanceLpQuestVerified']: 'Provide liquidity to a Kyo Finance pool',
   },
   pre_reqs: {
     ['SignUpFlowCompleted']: () => '',
@@ -41,6 +43,10 @@ export const actionCopies = {
     ['LaunchpadTokenTraded']: () => '',
     ['CommunityGoalReached']: () => '',
     ['RecurringContestManagerDeployed']: '',
+    ['KyoFinanceSwapQuestVerified']: (displayFor: 'user' | 'admin' = 'user') =>
+      `Requires a wallet connected to Soneium chain on ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
+    ['KyoFinanceLpQuestVerified']: (displayFor: 'user' | 'admin' = 'user') =>
+      `Requires a wallet connected to Soneium chain on ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
   },
   explainer: {
     ['SignUpFlowCompleted']: () => '',
@@ -161,6 +167,59 @@ export const actionCopies = {
           </li>
         </ul>
       </div>
+    ), // eslint-disable-next-line react/no-multi-comp
+    ['KyoFinanceSwapQuestVerified']: (
+      chainId?: number,
+      minOutputAmount?: string,
+      minVolumeUSD?: string,
+    ) => (
+      <div>
+        <ul>
+          <li>
+            ● Must be completed on{' '}
+            {chainId === 1868 ? 'Soneium Mainnet' : 'Soneium Testnet'}.
+          </li>
+          {minOutputAmount && (
+            <li>● Minimum output amount: {minOutputAmount} tokens.</li>
+          )}
+          {minVolumeUSD && <li>● Minimum swap volume: ${minVolumeUSD} USD.</li>}
+          <li>● Aura is awarded once the swap is verified on-chain.</li>
+        </ul>
+      </div>
+    ),
+    // eslint-disable-next-line react/no-multi-comp
+    ['KyoFinanceLpQuestVerified']: (
+      chainId?: number,
+      poolAddresses?: string[],
+      minUSDValues?: string[],
+    ) => (
+      <div>
+        <ul>
+          <li>
+            ● Must be completed on{' '}
+            {chainId === 1868 ? 'Soneium Mainnet' : 'Soneium Testnet'}.
+          </li>
+          {/* eslint-disable-next-line react/destructuring-assignment */}
+          {poolAddresses &&
+            minUSDValues &&
+            // eslint-disable-next-line react/destructuring-assignment
+            poolAddresses.length > 0 &&
+            minUSDValues.length > 0 && (
+              <li>
+                {/* eslint-disable-next-line react/destructuring-assignment */}●
+                Minimum liquidity required:{' '}
+                {/* eslint-disable-next-line react/destructuring-assignment */}
+                {poolAddresses
+                  .map((a, i) => `${a} = ${minUSDValues[i]} USD`)
+                  .join(', ')}
+                .
+              </li>
+            )}
+          <li>
+            ● Aura is awarded once the liquidity provision is verified on-chain.
+          </li>
+        </ul>
+      </div>
     ),
     // eslint-disable-next-line react/no-multi-comp
     ['RecurringContestManagerDeployed']: () => (
@@ -192,5 +251,7 @@ export const actionCopies = {
     ['LaunchpadTokenTraded']: '',
     ['CommunityGoalReached']: '',
     ['RecurringContestManagerDeployed']: '',
+    ['KyoFinanceSwapQuestVerified']: '',
+    ['KyoFinanceLpQuestVerified']: '',
   },
 };

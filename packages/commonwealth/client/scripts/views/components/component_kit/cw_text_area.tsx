@@ -24,6 +24,7 @@ type TextAreaFormValidationProps = {
   name?: string;
   hookToForm?: boolean;
   charCount?: number;
+  customError?: string;
 };
 
 type TextAreaProps = BaseTextInputProps &
@@ -179,7 +180,8 @@ export const CWTextArea = (props: TextAreaProps) => {
           }
           validationStatus={
             validationProps.validationStatus ||
-            (formFieldErrorMessage || customError ? 'failure' : undefined)
+            (formFieldErrorMessage || customError ? 'failure' : undefined) ||
+            'failure'
           }
         />
       )}

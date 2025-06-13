@@ -12,6 +12,7 @@ import {
 import { ContestWorker, models } from '@hicommonwealth/model';
 import { Client } from 'pg';
 import { config } from 'server/config';
+import { ZodSchema, ZodUndefined } from 'zod';
 import { setupListener } from './pgListener';
 import { rascalConsumerMap } from './rascalConsumerMap';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
@@ -43,7 +44,10 @@ export async function bootstrapBindings(options?: {
   }
 
   for (const item of rascalConsumerMap) {
-    let consumer: () => EventsHandlerMetadata<EventSchemas>;
+    let consumer: () => EventsHandlerMetadata<
+      EventSchemas,
+      ZodSchema | ZodUndefined
+    >;
     let worker: string | undefined;
     let retryStrategy: RetryStrategyFn | undefined;
     let hooks: ConsumerHooks | undefined;
