@@ -78,7 +78,7 @@ const QuestDetails = ({ id }: { id: number }) => {
     useDeleteQuestMutation();
   const { mutateAsync: cancelQuest, isPending: isCancelingQuest } =
     useCancelQuestMutation();
-  const { mutateAsync: verifyQuestAction, isLoading: isVerifyingQuestAction } =
+  const { mutateAsync: verifyQuestAction, isPending: isVerifyingQuestAction } =
     useVerifyQuestActionMutation();
 
   const isPendingAction =
