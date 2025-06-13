@@ -48,6 +48,14 @@ export function mustBeProtocolChainId(
   }
 }
 
+// Purpose of this function is to get around the satisfies in the
+// factoryContract type in order to check existence of fields
+export function toContractObject<T extends factoryContractsType[ValidChains]>(
+  obj: T,
+): Required<factoryContractsType[ValidChains]> {
+  return obj as Required<factoryContractsType[ValidChains]>;
+}
+
 export const STAKE_ID = 2;
 export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;

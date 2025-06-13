@@ -105,6 +105,7 @@ export const ExtendedCommunity = Community.extend({
     }),
   ),
   communityBanner: z.string().nullish(),
+  communityTreasuryAddress: z.string().nullish(),
 });
 
 export const CommunityGoalMeta = z.object({
