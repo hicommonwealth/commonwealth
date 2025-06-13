@@ -234,7 +234,7 @@ export const events = {
     server_id: z.string(),
     user_id: z.number().nullish(),
     discord_username: z.string(),
-    joined_date: z.date(),
+    joined_date: z.coerce.date(),
   }),
 
   // on-chain contest manager events
@@ -271,8 +271,8 @@ export const events = {
   // Contest Events
   ContestStarted: ContestManagerEvent.extend({
     contest_id: z.number().int().gte(0),
-    start_time: z.date().describe('Contest start time'),
-    end_time: z.date().describe('Contest end time'),
+    start_time: z.coerce.date().describe('Contest start time'),
+    end_time: z.coerce.date().describe('Contest end time'),
     is_one_off: z.boolean().describe('Is this a one-off contest'),
   }).describe('When a contest instance gets started'),
 
@@ -364,8 +364,8 @@ export const events = {
     name: z.string().max(255),
     description: z.string().max(1000),
     image_url: z.string(),
-    start_date: z.date(),
-    end_date: z.date(),
+    start_date: z.coerce.date(),
+    end_date: z.coerce.date(),
     community_id: z.string().nullish(),
   }),
 
