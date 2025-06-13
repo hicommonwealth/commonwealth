@@ -158,6 +158,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             namespace_verified: false,
             environment: config.APP_ENV,
             profile_count: 1,
+            ai_features_enabled: true,
           },
           { transaction },
         );

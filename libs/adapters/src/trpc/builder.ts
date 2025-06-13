@@ -3,7 +3,7 @@ import { TRPCError, initTRPC } from '@trpc/server';
 import type { Request } from 'express';
 import passport from 'passport';
 import type { OpenApiMeta } from 'trpc-swagger';
-import { ZodSchema, z } from 'zod';
+import { ZodType, z } from 'zod';
 import { config } from '../config';
 import type { BuildProcOptions, Context, Metadata } from './types';
 
@@ -11,20 +11,21 @@ const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
 export const router = trpc.router;
 export const procedure = trpc.procedure;
 
-const isSecure = <Input extends ZodSchema, Output extends ZodSchema>(
+const isSecure = <Input extends ZodType, Output extends ZodType>(
   md: Metadata<Input, Output>,
   forceSecure?: boolean,
 ) => {
   const firstAuth = md.auth?.at(0);
   const optional =
-    typeof firstAuth === 'function' && firstAuth.name === 'authOptional';
+    typeof firstAuth === 'function' &&
+    firstAuth.name.startsWith('authOptional');
   return {
     secure: forceSecure || md.secure !== false || !!firstAuth,
     optional,
   };
 };
 
-const authenticate = async <Input extends ZodSchema>(
+const authenticate = async <Input extends ZodType>(
   req: Request,
   rawInput: z.infer<Input>,
   authStrategy: AuthStrategies<Input> = { type: 'jwt' },
@@ -69,7 +70,7 @@ const authenticate = async <Input extends ZodSchema>(
 /**
  * tRPC procedure factory with authentication, traffic stats, and analytics middleware
  */
-export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
+export const buildproc = <Input extends ZodType, Output extends ZodType>({
   method,
   name,
   md,

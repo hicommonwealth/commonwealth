@@ -7,8 +7,10 @@ export type AIModelOption = {
   label: string;
 };
 
-interface LocalAISettingsStore {
+interface UserAiSettingsStore {
+  // AI interactions toggle in Edit profile page - personal preference
   aiInteractionsToggleEnabled: boolean;
+  // AI reply toggle in thread / comment creation page - personal preference
   aiCommentsToggleEnabled: boolean;
   setAIInteractionsToggleEnabled: (enabled: boolean) => void;
   setAICommentsToggleEnabled: (enabled: boolean) => void;
@@ -16,7 +18,7 @@ interface LocalAISettingsStore {
   setSelectedModels: (models: AIModelOption[]) => void;
 }
 
-const localAISettingsStore = createStore<LocalAISettingsStore>()(
+const userAiSettingsStore = createStore<UserAiSettingsStore>()(
   persist(
     (set) => ({
       aiInteractionsToggleEnabled: true,
@@ -42,5 +44,5 @@ const localAISettingsStore = createStore<LocalAISettingsStore>()(
   ),
 );
 
-export const useLocalAISettingsStore =
-  createBoundedUseStore(localAISettingsStore);
+export const useUserAiSettingsStore =
+  createBoundedUseStore(userAiSettingsStore);

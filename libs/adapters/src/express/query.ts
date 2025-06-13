@@ -1,7 +1,7 @@
 import type { Metadata, User } from '@hicommonwealth/core';
 import * as core from '@hicommonwealth/core';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { ZodSchema, z } from 'zod';
+import { ZodType, z } from 'zod';
 
 /**
  * Adapts queries to express handlers
@@ -9,18 +9,10 @@ import { ZodSchema, z } from 'zod';
  * @returns express query handler
  */
 export const query =
-  <
-    Input extends ZodSchema,
-    Output extends ZodSchema,
-    Context extends ZodSchema,
-  >(
+  <Input extends ZodType, Output extends ZodType, Context extends ZodType>(
     md: Metadata<Input, Output, Context>,
   ): RequestHandler =>
-  async (
-    req: Request,
-    res: Response<z.infer<Output> | undefined>,
-    next: NextFunction,
-  ) => {
+  async (req: Request, res: Response<z.infer<Output>>, next: NextFunction) => {
     try {
       const results = await core.query(md, {
         actor: { user: req.user as User, address: req.body.address },

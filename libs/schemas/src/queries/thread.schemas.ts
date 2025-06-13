@@ -1,6 +1,6 @@
 import { LinkSource } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
-import { AuthContext } from '../context';
+import { AuthContext, ThreadContext } from '../context';
 import {
   Address,
   Comment,
@@ -128,18 +128,19 @@ export const CommentVersionHistoryView = CommentVersionHistory.extend({
   timestamp: z.date().or(z.string()),
 });
 
-export const CommentView = Comment.extend({
+export const CommentView = Comment.omit({
+  Thread: true,
+  search: true,
+}).extend({
   id: PG_INT,
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
   deleted_at: z.date().or(z.string()).nullish(),
   marked_as_spam_at: z.date().or(z.string()).nullish(),
   Address: AddressView.nullish(),
-  Thread: z.undefined(),
   community_id: z.string(),
   last_active: z.date().or(z.string()).nullish(),
   Reaction: ReactionView.nullish(),
-  search: z.undefined(),
   // this is returned by GetThreads
   address: z.string(),
   profile_name: z.string().optional(),
@@ -179,7 +180,7 @@ export const ThreadView = Thread.extend({
   ContestActions: z.array(ContestActionView).optional(),
   Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
-  search: z.union([z.string(), z.record(z.any())]).nullish(),
+  search: z.union([z.string(), z.record(z.string(), z.any())]).nullish(),
   total_num_thread_results: z
     .number()
     .nullish()
@@ -276,10 +277,19 @@ export const GetThreads = {
 
 export const GetThreadsByIds = {
   input: z.object({
-    community_id: z.string().optional(),
+    community_id: z.string(),
     thread_ids: z.string(),
   }),
   output: z.array(ThreadView),
+  context: AuthContext,
+};
+
+export const GetThreadById = {
+  input: z.object({
+    thread_id: PG_INT,
+  }),
+  output: ThreadView,
+  context: ThreadContext,
 };
 
 export const GetThreadCount = {

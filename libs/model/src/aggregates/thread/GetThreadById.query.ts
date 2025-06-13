@@ -1,39 +1,48 @@
-import { InvalidInput, Query } from '@hicommonwealth/core';
+import { InvalidState, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Op } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../../database';
-import { authOptional } from '../../middleware';
+import { authOptionalForThread, UnauthorizedView } from '../../middleware';
+import { filterGates, joinGates, withGates } from '../../utils/gating';
 
-export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
+export function GetThreadById(): Query<typeof schemas.GetThreadById> {
   return {
-    ...schemas.GetThreadsByIds,
-    auth: [authOptional],
+    ...schemas.GetThreadById,
+    auth: [authOptionalForThread],
     secure: true,
-    body: async ({ payload }) => {
-      const { community_id, thread_ids } = payload;
-      if (thread_ids === '') return [];
+    body: async ({ actor, payload, context }) => {
+      const { thread_id } = payload;
+      const address_id = context?.address?.id;
 
-      let parsedThreadIds: number[];
-
-      try {
-        parsedThreadIds = z
-          .string()
-          .transform((ids) =>
-            ids.split(',').map((id) => parseInt(id.trim(), 10)),
-          )
-          .parse(thread_ids);
-      } catch (e) {
-        throw new InvalidInput('Invalid thread_ids format');
-      }
-
-      // TODO: add gating filters if needed, just used in thread linking atm
-      const threads = await models.Thread.findAll({
-        where: {
-          ...(community_id && { community_id }),
-          id: { [Op.in]: parsedThreadIds },
+      // find open gates in thread's community
+      const [open_thread] = await sequelize.query<{
+        id: number;
+      }>(
+        `
+        ${withGates(address_id)}
+        SELECT T.id
+        FROM
+          "Threads" T
+          ${joinGates(address_id)}
+        WHERE
+          T.id = :thread_id
+          ${filterGates(address_id)}
+        `,
+        {
+          type: QueryTypes.SELECT,
+          replacements: {
+            address_id,
+            community_id: context?.community_id,
+            thread_id,
+          },
         },
+      );
+      if (!open_thread) throw new UnauthorizedView(actor);
 
+      // TODO: refactor using plain sql and add gating filters
+      const thread = await models.Thread.findOne({
+        where: { id: thread_id },
         include: [
           {
             model: models.Address,
@@ -85,9 +94,7 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
           },
           {
             model: models.ContestAction,
-            where: {
-              action: 'upvoted',
-            },
+            where: { action: 'upvoted' },
             required: false,
             attributes: ['content_id', 'thread_id'],
             include: [
@@ -121,15 +128,15 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
               },
             ],
           },
-          {
-            model: models.ThreadVersionHistory,
-          },
+          { model: models.ThreadVersionHistory },
         ],
       });
 
-      return threads!.map(
-        (t) => t.toJSON() as z.infer<typeof schemas.ThreadView>,
-      );
+      if (!thread) {
+        throw new InvalidState('Thread not found');
+      }
+
+      return thread!.toJSON() as z.infer<typeof schemas.ThreadView>;
     },
   };
 }
