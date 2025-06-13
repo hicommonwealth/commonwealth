@@ -48,7 +48,17 @@ const HomePage = () => {
           <IdeaLaunchpad />
           {mobileDownloadEnabled && <IOSBanner />}
         </div>
-        <TrendingTokensList />
+        <TrendingTokensList heading="Trending" variant="trending" limit={10} />
+        <TrendingTokensList
+          heading="Recently Launched"
+          variant="recent"
+          limit={10}
+        />
+        <TrendingTokensList
+          heading="Graduated"
+          variant="graduated"
+          limit={10}
+        />
         <TrendingCommunitiesPreview />
         <ActiveContestList />
         <XpQuestList />
