@@ -219,6 +219,7 @@ describe('Contests projection lifecycle', () => {
     } as unknown as any);
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'RecurringContestManagerDeployed',
       payload: {
         namespace,
@@ -231,6 +232,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestStarted',
       payload: {
         contest_address: recurring,
@@ -242,6 +244,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'OneOffContestManagerDeployed',
       payload: {
         namespace,
@@ -265,6 +268,7 @@ describe('Contests projection lifecycle', () => {
     ).to.exist;
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestStarted',
       payload: {
         contest_id: 0,
@@ -276,6 +280,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentAdded',
       payload: {
         contest_address: oneoff,
@@ -286,6 +291,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentAdded',
       payload: {
         contest_address: recurring,
@@ -297,6 +303,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentUpvoted',
       payload: {
         contest_address: recurring,
@@ -308,6 +315,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentUpvoted',
       payload: {
         contest_address: recurring,
@@ -319,6 +327,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentUpvoted',
       payload: {
         contest_address: oneoff,
