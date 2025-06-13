@@ -1,5 +1,6 @@
-import { logger, User } from '@hicommonwealth/core';
-import { config } from '@hicommonwealth/model';
+import { logger } from '@hicommonwealth/core';
+import { config, models } from '@hicommonwealth/model';
+import { User } from '@hicommonwealth/schemas';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
@@ -12,6 +13,7 @@ import {
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 import { IncomingMessage } from 'http';
+import { Op } from 'sequelize';
 import { z, ZodSchema } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import {
@@ -28,6 +30,64 @@ type CommonMCPTool<T extends z.ZodSchema = z.ZodSchema> = {
   inputSchema: T;
   fn: (token: string | null, input: z.infer<T>) => Promise<unknown>;
 };
+
+async function checkBypass(req: Request) {
+  const address = req.headers['address'] as string;
+  const apiKey = req.headers['x-api-key'] as string;
+
+  const shouldBypass =
+    config.MCP.MCP_KEY_BYPASS?.length && apiKey === config.MCP.MCP_KEY_BYPASS;
+
+  console.log('shouldBypass', {
+    shouldBypass,
+    address,
+    apiKey,
+    config: config.MCP.MCP_KEY_BYPASS,
+    headers: req.headers,
+  });
+
+  // If the bypass key doesn't match, we should use normal API key auth
+  if (!shouldBypass) {
+    return false;
+  }
+
+  // If bypass key matches but no address provided, we can't proceed
+  if (!address) {
+    throw new Error('Address header required for MCP bypass');
+  }
+
+  // Look up the address and set the user
+  const addr = await models.Address.findOne({
+    attributes: ['user_id'],
+    where: {
+      address: address,
+      verified: { [Op.ne]: null },
+    },
+    include: [
+      {
+        model: models.User,
+        required: true,
+        include: [
+          {
+            model: models.ApiKey,
+            required: true,
+          },
+        ],
+      },
+    ],
+  });
+
+  if (!addr?.User?.id) {
+    throw new Error(`No verified user found for address: ${address}`);
+  }
+
+  req.address = addr;
+  const user = addr.User;
+  // Remove ApiKey from user object like the middleware does
+  delete user.ApiKey;
+  req.user = models.User.build(user as z.infer<typeof User>);
+  return true;
+}
 
 // map external trpc router procedures to MCP tools
 export const buildMCPTools = (): Array<CommonMCPTool> => {
@@ -54,14 +114,12 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
             'x-api-key': apiKey,
           },
           path: `/${key}`,
-        } as unknown as Request & { user: User };
+        } as unknown as Request;
 
         const res = {} as Response;
 
         // execute api key middleware
-        const shouldBypass =
-          config.MCP.MCP_KEY_BYPASS &&
-          req.headers['authorization'] === config.MCP.MCP_KEY_BYPASS;
+        const shouldBypass = await checkBypass(req);
         if (!shouldBypass) {
           let err: Error | null = null;
           await apiKeyAuthMiddleware(req, res, (error?: unknown) => {
@@ -74,12 +132,17 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
           }
         }
 
+        // Ensure user is set after authentication
+        if (!req.user) {
+          throw new Error('User not authenticated');
+        }
+
         // trigger trcp procedure pipeline
         const trpcCaller = externalTrpcRouter.createCaller({
           req,
           res,
           actor: {
-            user: req.user,
+            user: req.user as any,
             address: req.headers['address'] as string,
           },
         });
