@@ -3,7 +3,7 @@ import { PinnedTokenWithPrices } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { GetTokenMetadataResponse } from 'state/api/tokens/getTokenMetadata';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { TradingMode } from '../types';
 
 export type UniswapToken = {

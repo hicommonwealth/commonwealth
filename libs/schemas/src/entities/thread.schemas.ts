@@ -1,5 +1,5 @@
 import { LinkSource } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 import { Reaction } from './reaction.schemas';
 import { Topic } from './topic.schemas';

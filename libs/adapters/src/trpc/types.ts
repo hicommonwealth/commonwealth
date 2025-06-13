@@ -1,6 +1,6 @@
 import type { Actor, AuthStrategies } from '@hicommonwealth/core';
 import type { Request, Response } from 'express';
-import { ZodType, z } from 'zod';
+import { ZodType, z } from 'zod/v4';
 
 /**
  * tRPC request context

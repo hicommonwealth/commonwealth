@@ -3,7 +3,7 @@ import { Address, Topic } from '@hicommonwealth/schemas';
 import { CommunityTierMap } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { GetNewContent } from '../../src/aggregates/user';
 import { seed } from '../../src/tester';
 

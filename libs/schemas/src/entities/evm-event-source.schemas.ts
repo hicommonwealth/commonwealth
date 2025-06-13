@@ -1,6 +1,6 @@
 import { ChildContractNames } from '@hicommonwealth/evm-protocols';
 import { EVM_ADDRESS } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const EvmEventSource = z.object({
   eth_chain_id: z.number(),

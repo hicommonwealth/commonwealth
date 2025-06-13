@@ -11,7 +11,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Model, ValidationError, type ModelStatic } from 'sequelize';
 import { afterAll, describe, test } from 'vitest';
-import z from 'zod';
+import z from 'zod/v4';
 import { models } from '../../src/database';
 import { SeedOptions, seed } from '../../src/tester';
 
@@ -30,7 +30,7 @@ async function testSeed<T extends schemas.Aggregates>(
   // perform schema validation on created entity (throws)
   const schema = schemas[name];
   const model: ModelStatic<Model> = models[name];
-  const data: ReturnType<typeof schema.parse> = schema.parse(record);
+  const data = schema.parse(record) as z.infer<(typeof schemas)[T]>;
 
   // attempt to find entity that was created
   const existingEntity = await model.findOne({

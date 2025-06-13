@@ -1,4 +1,4 @@
-import { z, ZodError, ZodType } from 'zod';
+import { z, ZodError, ZodType } from 'zod/v4';
 import { InvalidInput, type Context, type Metadata } from './types';
 
 /**
@@ -21,15 +21,19 @@ export const query = async <
   validate = true,
 ): Promise<z.infer<Output>> => {
   try {
-    const context: Context<Input, _Context> = {
-      actor,
-      payload: validate
+    const validated = validate ? input.parse(payload) : payload;
+    const stripped = (
+      typeof validated === 'object'
         ? Object.fromEntries(
-            Object.entries(input.parse(payload)).filter(
+            Object.entries(validated as object).filter(
               ([, v]) => v !== undefined,
             ),
           )
-        : payload,
+        : payload
+    ) as z.infer<Input>;
+    const context: Context<Input, _Context> = {
+      actor,
+      payload: stripped,
     };
     for (const fn of auth) {
       await fn(context);

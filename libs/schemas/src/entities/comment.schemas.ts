@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { PG_INT } from '../utils';
 import { Reaction } from './reaction.schemas';
 import { Thread } from './thread.schemas';

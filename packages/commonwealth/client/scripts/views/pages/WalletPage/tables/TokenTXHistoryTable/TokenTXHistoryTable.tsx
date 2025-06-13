@@ -4,7 +4,7 @@ import React from 'react';
 import { TransactionsTab } from 'views/components/Profile/ProfileActivity/TransactionsTab';
 import './TokenTXHistoryTable.scss';
 
-type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._type;
+type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._output;
 
 type TokenTXHistoryTableProps = {
   trades?: GetLaunchpadTradesOutput;

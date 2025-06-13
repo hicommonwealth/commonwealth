@@ -1,6 +1,6 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { TradingMode } from '../types';
 
 export const TokenWithCommunity = TokenView.extend({

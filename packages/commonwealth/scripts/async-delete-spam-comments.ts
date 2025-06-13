@@ -2,7 +2,7 @@ import { CommentAttributes, models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 
 import { parseArgs } from 'node:util';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const argSchema = z.object({
   communityId: z.string().min(1),

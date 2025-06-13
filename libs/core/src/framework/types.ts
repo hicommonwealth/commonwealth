@@ -1,5 +1,5 @@
 import { Events, events } from '@hicommonwealth/schemas';
-import z, { ZodType, ZodUndefined } from 'zod';
+import z, { ZodType, ZodUndefined } from 'zod/v4';
 
 /**
  * Error names as constants
@@ -139,7 +139,7 @@ export type BodyHandler<
 
 /**
  * Middleware handler
- * @param context execution context
+ * @param context command execution context
  * @throws {@link InvalidActor} when unauthorized
  */
 export type AuthHandler<Input extends ZodType, _Context extends ZodType> = (

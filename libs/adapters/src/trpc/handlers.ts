@@ -14,7 +14,7 @@ import {
 } from '@hicommonwealth/core';
 import { Events } from '@hicommonwealth/schemas';
 import { TRPCError } from '@trpc/server';
-import { ZodType, ZodUndefined, z } from 'zod';
+import { ZodType, ZodUndefined, z } from 'zod/v4';
 import { buildproc, procedure } from './builder';
 import { Tag, type OutputMiddleware } from './types';
 
@@ -68,13 +68,14 @@ export const command = <
     md,
     tag,
     outMiddlewares,
+    // @ts-expect-error TODO: fix this
   }).mutation(async ({ ctx, input }) => {
     try {
       return await coreCommand(
         md,
         {
           actor: ctx.actor,
-          payload: input!,
+          payload: input! as z.infer<Input>,
         },
         false,
       );
@@ -117,7 +118,7 @@ export const query = <
     try {
       const cacheTTL =
         typeof options?.ttlSecs === 'function'
-          ? options.ttlSecs(input)
+          ? options.ttlSecs(input as z.infer<Input>)
           : options?.ttlSecs;
 
       const cacheKey = cacheTTL
@@ -145,7 +146,7 @@ export const query = <
         md,
         {
           actor: ctx.actor,
-          payload: input!,
+          payload: input! as z.infer<Input>,
         },
         false,
       );

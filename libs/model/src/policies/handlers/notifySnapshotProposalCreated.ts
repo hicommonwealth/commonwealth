@@ -6,7 +6,7 @@ import {
 } from '@hicommonwealth/core';
 import { SnapshotEventType } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
-import z from 'zod';
+import z from 'zod/v4';
 import { models } from '../../database';
 import { getSnapshotUrl } from '../utils/utils';
 

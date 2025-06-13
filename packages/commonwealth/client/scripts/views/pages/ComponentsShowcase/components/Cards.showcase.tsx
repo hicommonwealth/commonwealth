@@ -5,7 +5,7 @@ import { CWContentPageCard } from 'views/components/component_kit/CWContentPageC
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const CardsShowcase = () => {
   const sampleCommunityId = 'dydx';

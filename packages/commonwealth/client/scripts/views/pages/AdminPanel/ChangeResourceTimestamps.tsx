@@ -3,7 +3,6 @@ import {
   notifySuccess,
 } from 'client/scripts/controllers/app/notifications';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
-import { z } from 'node_modules/zod';
 import React from 'react';
 import { useUpdateResourceTimestamps } from 'state/api/superAdmin';
 import CWDateTimeInput from 'views/components/component_kit/CWDateTimeInput';
@@ -12,42 +11,31 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { z } from 'zod/v4';
 import './AdminPanel.scss';
 
 const validationSchema = z
   .object({
     resource_id: z
-      .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+      .string()
       .nonempty({ message: VALIDATION_MESSAGES.INVALID_INPUT })
-      .or(z.number({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })),
-    resource_name: z.object(
-      {
-        value: z.enum(['Quests']),
-        label: z.string(),
-      },
-      {
-        invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-        required_error: VALIDATION_MESSAGES.NO_INPUT,
-      },
-    ),
-    date_field_name: z.object(
-      {
-        value: z.enum([
-          'start_date',
-          'end_date',
-          'created_at',
-          'updated_at',
-          'deleted_at',
-        ]),
-        label: z.string(),
-      },
-      {
-        invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-        required_error: VALIDATION_MESSAGES.NO_INPUT,
-      },
-    ), // add more date fields as required
+      .or(z.number()),
+    resource_name: z.object({
+      value: z.enum(['Quests']),
+      label: z.string(),
+    }),
+    date_field_name: z.object({
+      value: z.enum([
+        'start_date',
+        'end_date',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+      ]),
+      label: z.string(),
+    }), // add more date fields as required
     date_field_value: z
-      .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+      .string()
       .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   })
   .refine(

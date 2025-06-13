@@ -5,7 +5,7 @@ import type EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import type { IApp } from 'state';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import IChainAdapter from '../../../models/IChainAdapter';
 
 // TODO: hook up underlyung functionality of this boilerplate

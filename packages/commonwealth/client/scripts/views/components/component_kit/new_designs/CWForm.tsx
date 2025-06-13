@@ -6,7 +6,7 @@ import React, {
   useImperativeHandle,
 } from 'react';
 import { FormProvider, UseFormReturn, useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 type FormProps = {
   id?: string;
@@ -15,7 +15,7 @@ type FormProps = {
   children?: any | ((formMethods: UseFormReturn) => ReactNode);
   className?: string;
   initialValues?: Object;
-  validationSchema: z.Schema<any, any>;
+  validationSchema: z.ZodType;
   onWatch?: (values: any) => void;
 };
 
@@ -40,7 +40,7 @@ const CWForm = forwardRef<UseFormReturn, FormProps>(
     ref,
   ) => {
     const formMethods: UseFormReturn = useForm({
-      resolver: zodResolver(validationSchema),
+      resolver: zodResolver(validationSchema as any),
       defaultValues: initialValues,
       mode: 'all',
     });

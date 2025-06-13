@@ -5,7 +5,7 @@ import { trpc } from 'utils/trpcClient'; // Assuming trpcClient location
 // IMPORTANT: Verify and update 'trpc.token.getLaunchpadTrades' if your actual procedure path is different.
 export const useGetLaunchpadTradesQuery = (
   // Input type from the Zod schema
-  input: typeof schemas.GetLaunchpadTrades.input._type,
+  input: GetLaunchpadTradesInput,
   // Options like `enabled`, `staleTime`, etc., passed to react-query
   options?: Parameters<
     typeof trpc.launchpadToken.getLaunchpadTrades.useQuery
@@ -17,6 +17,6 @@ export const useGetLaunchpadTradesQuery = (
 
 // Export the inferred input/output types for convenience elsewhere
 export type GetLaunchpadTradesInput =
-  typeof schemas.GetLaunchpadTrades.input._type;
+  typeof schemas.GetLaunchpadTrades.input._input;
 // Note: The output type was already defined and imported from 'types/api' in other files.
 // We might need to reconcile this later if 'types/api' is not the canonical source.

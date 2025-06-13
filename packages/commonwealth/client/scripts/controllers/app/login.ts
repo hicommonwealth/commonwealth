@@ -33,7 +33,7 @@ import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/g
 import { SERVER_URL } from 'state/api/config';
 import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
 import { userStore } from 'state/ui/user';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import { fetchCachedCustomDomain } from '../../state/api/configuration/index';

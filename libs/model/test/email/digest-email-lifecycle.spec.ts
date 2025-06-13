@@ -4,7 +4,7 @@ import { Community, User } from '@hicommonwealth/schemas';
 
 import { CommunityTierMap } from '@hicommonwealth/shared';
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { GetDigestEmailDataQuery } from '../../src/aggregates/emails';
 import { seed } from '../../src/tester';
 import { generateThreads } from './util';

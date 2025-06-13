@@ -19,7 +19,7 @@ import {
   test,
   vi,
 } from 'vitest';
-import z from 'zod';
+import z from 'zod/v4';
 import { models, tester } from '../../src';
 import { notifySnapshotProposalCreated } from '../../src/policies/handlers/notifySnapshotProposalCreated';
 import { getSnapshotUrl } from '../../src/policies/utils/utils';

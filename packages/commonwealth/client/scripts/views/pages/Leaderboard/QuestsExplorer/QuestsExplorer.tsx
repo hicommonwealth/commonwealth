@@ -7,7 +7,7 @@ import { useFetchQuestsQuery } from 'state/api/quest';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import TotalQuestXPTag from '../../QuestDetails/TotalQuestXPTag';
 import ExploreCard from '../common/ExploreCard';
 import './QuestsExplorer.scss';

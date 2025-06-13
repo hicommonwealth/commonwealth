@@ -5,7 +5,7 @@ import { useCreateCommunityAlertMutation } from 'state/api/trpc/subscription/use
 import { useDeleteCommunityAlertMutation } from 'state/api/trpc/subscription/useDeleteCommunityAlertMutation';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWToggle } from 'views/components/component_kit/cw_toggle';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 type CommunityEntryProps = Readonly<{
   id: string;

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { CommentContext, ThreadContext } from '../context';
 import { Comment, Reaction } from '../entities';
 import { DiscordMetaSchema, PG_INT } from '../utils';
