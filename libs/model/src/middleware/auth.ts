@@ -442,6 +442,23 @@ export function authVerified() {
 }
 
 /**
+ * Optionally validates if actor's address is authorized/verified, not tied to any specific community
+ */
+export async function authOptionalVerified(
+  ctx: Context<typeof VerifiedContextInput, typeof VerifiedContext>,
+) {
+  try {
+    if (!ctx.actor.user || !ctx.actor.address) return;
+    const { address } = await findVerifiedAddress(ctx.actor);
+    (ctx as { context: VerifiedContext }).context = { address };
+  } catch (err) {
+    // ignore InvalidActor errors
+    if (err instanceof InvalidActor) return;
+    throw err;
+  }
+}
+
+/**
  * Creates an authorization context for the actor when authenticated,
  * but anonymous access is allowed.
  * This is mainly used when querying communities with gating conditions.

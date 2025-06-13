@@ -55,6 +55,7 @@ export const GetUserProfile = {
     userId: PG_INT.optional(),
   }),
   output: UserProfileView as ZodType<UserProfileView>,
+  context: VerifiedContext,
 };
 
 export const GetUser = {
