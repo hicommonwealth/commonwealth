@@ -126,7 +126,7 @@ describe('User lifecycle', () => {
       const watermark = new Date();
 
       // act on community, triggering quest rewards
-      await command(CreateThread(), {
+      const thread = await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
@@ -145,7 +145,7 @@ describe('User lifecycle', () => {
           body: 'Comment body 1.1',
         },
       });
-      await command(CreateComment(), {
+      const comment2 = await command(CreateComment(), {
         actor: admin,
         payload: {
           thread_id,
@@ -198,6 +198,10 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[0].created_at,
+          scope: {
+            thread_id: thread!.id,
+            topic_id,
+          },
         },
         {
           id: 2,
@@ -210,6 +214,11 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[1].created_at,
+          scope: {
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 3,
@@ -222,6 +231,11 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[2].created_at,
+          scope: {
+            thread_id,
+            topic_id,
+            comment_id: comment2!.id,
+          },
         },
         {
           id: 4,
@@ -234,6 +248,11 @@ describe('User lifecycle', () => {
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
           created_at: logs[3].created_at,
+          scope: {
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
       ]);
 
@@ -302,7 +321,7 @@ describe('User lifecycle', () => {
       const watermark = new Date();
 
       // act on community, triggering quest rewards
-      await command(CreateThread(), {
+      const thread = await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
@@ -488,6 +507,10 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: last[0].created_at,
+          scope: {
+            thread_id: thread!.id,
+            topic_id,
+          },
         },
         {
           id: 6,
@@ -500,6 +523,11 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: last[1].created_at,
+          scope: {
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 7,
@@ -512,6 +540,11 @@ describe('User lifecycle', () => {
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
           created_at: last[2].created_at,
+          scope: {
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 8,
@@ -524,6 +557,9 @@ describe('User lifecycle', () => {
           creator_user_id: member.user.id,
           creator_xp_points: 10,
           created_at: last[3].created_at,
+          scope: {
+            community_id,
+          },
         },
         {
           id: 9,
@@ -536,6 +572,7 @@ describe('User lifecycle', () => {
           creator_user_id: member.user.id,
           creator_xp_points: 4,
           created_at: last[4].created_at,
+          scope: null,
         },
       ]);
 

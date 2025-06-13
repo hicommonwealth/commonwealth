@@ -51,6 +51,32 @@ export const QuestActionNames = [
   ...ChannelBatchActions,
 ];
 
+export const QuestActionScope = z.object({
+  chain_id: z.number().optional(),
+  community_id: z.string().optional(),
+  namespace: z.string().optional(),
+  contest_address: z.string().optional(),
+  launchpad_token_address: z.string().optional(),
+  topic_id: z.number().optional(),
+  thread_id: z.number().optional(),
+  comment_id: z.number().optional(),
+  group_id: z.number().optional(),
+  wallet: z.string().optional(),
+  sso: z.string().optional(),
+  amount: z
+    .number()
+    .optional()
+    .describe(
+      'Overrides reward_amount if present, used with trades x multiplier',
+    ),
+  goal_id: z.number().optional().describe('Community goal'),
+  threshold: z
+    .number()
+    .optional()
+    .describe('Rewards when over configured meta value'),
+  discord_server_id: z.string().optional().describe('Discord server id'),
+});
+
 export enum QuestParticipationLimit {
   OncePerQuest = 'once_per_quest',
   OncePerPeriod = 'once_per_period',
