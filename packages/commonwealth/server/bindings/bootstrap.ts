@@ -92,6 +92,7 @@ export function bootstrapContestRolloverLoop() {
   const loop = async () => {
     try {
       await handleEvent(ContestWorker(), {
+        id: 0,
         name: 'ContestRolloverTimerTicked',
         payload: {},
       });

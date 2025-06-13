@@ -1,3 +1,4 @@
+import { ChainBase } from '@hicommonwealth/shared';
 import {
   SnapshotProposal,
   SnapshotSpace,
@@ -29,16 +30,19 @@ import { JSONDisplay } from '../view_proposal/JSONDisplay';
 import ProposalVotesDrawer from './ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from './useCosmosProposal';
 import { useSnapshotProposal } from './useSnapshotProposal';
+
 type ViewProposalPageProps = {
   id: string;
   scope: string;
   identifier: string;
   type?: string;
 };
+
 export enum CodeEditorType {
   Code,
   Preview,
 }
+
 const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [title, setTitle] = useState('');
@@ -62,7 +66,7 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
     proposal,
     title: proposalTitle,
     description,
-    isLoading,
+    isLoading: isCosmosLoading,
     error: cosmosError,
     threads: cosmosThreads,
   } = useCosmosProposal({ proposalId, enabled: queryType === 'cosmos' });
@@ -136,14 +140,17 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
     }
   }, [snapshotProposal, proposal, queryType]);
 
-  if (isLoading || isSnapshotLoading) {
+  const isCosmosChain = app.chain.base === ChainBase.CosmosSDK;
+  if ((isCosmosChain && isCosmosLoading) || isSnapshotLoading) {
     return <LoadingIndicator message="Loading..." />;
   }
 
   if (
-    (queryType === 'cosmos' && (cosmosError || !(proposal && isLoading))) ||
-    (queryType !== 'cosmos' &&
-      (snapshotProposalError || !(snapshotProposal && isSnapshotLoading)))
+    isCosmosChain &&
+    ((queryType === 'cosmos' &&
+      (cosmosError || !(proposal && isCosmosLoading))) ||
+      (queryType !== 'cosmos' &&
+        (snapshotProposalError || !(snapshotProposal && isSnapshotLoading))))
   ) {
     return (
       <PageNotFound

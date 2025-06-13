@@ -18,6 +18,7 @@ import {
   doesActionAllowCommentId,
   doesActionAllowContentId,
   doesActionAllowRepetition,
+  doesActionAllowSSOType,
   doesActionAllowThreadId,
   doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
@@ -184,6 +185,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     doesActionRequireKYOFinanceSwapMetadata(chosenAction),
                   requires_kyo_finance_lp_metadata:
                     doesActionRequireKYOFinanceLpMetadata(chosenAction),
+                  with_optional_sso_type:
+                    allowsContentId && doesActionAllowSSOType(chosenAction),
                 },
               };
             }),
@@ -290,6 +293,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (scope === QuestActionContentIdScope.Chain) return 'chain';
         if (scope === QuestActionContentIdScope.Group) return 'group';
         if (scope === QuestActionContentIdScope.Goal) return 'goal';
+        if (scope === QuestActionContentIdScope.Sso) return 'sso';
         if (scope === QuestActionContentIdScope.TokenTradeThreshold) {
           return 'threshold';
         }

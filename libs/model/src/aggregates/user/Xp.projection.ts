@@ -1,4 +1,4 @@
-import { Projection } from '@hicommonwealth/core';
+import { logger, Projection } from '@hicommonwealth/core';
 import { getEvmAddress, getTransaction } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import {
@@ -10,10 +10,13 @@ import {
   UserTierMap,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
-import { Op, Transaction } from 'sequelize';
+import { Op, Sequelize, Transaction } from 'sequelize';
 import { z } from 'zod';
+import { config } from '../../config';
 import { models, sequelize } from '../../database';
 import { XpLogInstance } from '../../models/xp_log';
+
+const log = logger(import.meta);
 
 async function getUserByAddressId(address_id: number) {
   const addr = await models.Address.findOne({
@@ -35,16 +38,22 @@ async function getUserByAddressId(address_id: number) {
 
 async function getUserByAddress(address: string) {
   const addr = await models.Address.findOne({
-    where: { address: { [Op.iLike]: address }, user_id: { [Op.not]: null } },
+    where: {
+      [Op.and]: [
+        Sequelize.where(
+          Sequelize.fn('LOWER', Sequelize.col('address')),
+          Sequelize.fn('LOWER', address),
+        ),
+        { user_id: { [Op.not]: null } },
+      ],
+    },
     attributes: ['user_id'],
     include: [
       {
         model: models.User,
         attributes: ['id'],
         required: true,
-        where: {
-          tier: { [Op.ne]: UserTierMap.BannedUser },
-        },
+        where: { tier: { [Op.ne]: UserTierMap.BannedUser } },
       },
     ],
   });
@@ -128,14 +137,22 @@ async function accumulatePoints(
   );
 }
 
-async function recordXpsForQuest(
-  user_id: number,
-  event_created_at: Date,
-  action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>,
+async function recordXpsForQuest({
+  event_id,
+  user_id,
+  event_created_at,
+  action_metas,
+  shared_with,
+  scope,
+}: {
+  event_id: number;
+  user_id: number;
+  event_created_at: Date;
+  action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>;
   shared_with?: {
     creator_address?: string | null;
     referrer_address?: string | null;
-  },
+  };
   scope?: {
     chain_id?: number;
     topic_id?: number;
@@ -148,8 +165,8 @@ async function recordXpsForQuest(
     goal_id?: number; // community goals
     threshold?: number; // rewards when threshold over configured meta value
     discord_server_id?: string;
-  },
-) {
+  };
+}) {
   const shared_with_address =
     shared_with?.creator_address || shared_with?.referrer_address;
   const xpLogs: XpLogInstance[] = [];
@@ -228,6 +245,7 @@ async function recordXpsForQuest(
           event_created_at,
         },
         defaults: {
+          event_id,
           user_id,
           action_meta_id: action_meta.id,
           event_created_at,
@@ -262,7 +280,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
     inputs: schemas.QuestEvents,
     output,
     body: {
-      SignUpFlowCompleted: async ({ payload }) => {
+      SignUpFlowCompleted: async ({ id, payload }) => {
         const referee_address = await models.User.findOne({
           where: {
             id: payload.user_id,
@@ -273,14 +291,17 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           payload,
           'SignUpFlowCompleted',
         );
-        await recordXpsForQuest(
-          payload.user_id,
-          payload.created_at!,
+        await recordXpsForQuest({
+          event_id: id,
+          user_id: payload.user_id,
+          event_created_at: payload.created_at!,
           action_metas,
-          { referrer_address: referee_address?.referred_by_address },
-        );
+          shared_with: {
+            referrer_address: referee_address?.referred_by_address,
+          },
+        });
       },
-      CommunityCreated: async ({ payload }) => {
+      CommunityCreated: async ({ id, payload }) => {
         const community = await models.Community.findOne({
           where: { id: payload.community_id },
         });
@@ -290,16 +311,17 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           'CommunityCreated',
         );
         if (action_metas.length > 0) {
-          await recordXpsForQuest(
-            payload.user_id,
-            payload.created_at!,
+          await recordXpsForQuest({
+            event_id: id,
+            user_id: payload.user_id,
+            event_created_at: payload.created_at!,
             action_metas,
-            { referrer_address: payload.referrer_address },
-            { chain_id: community.chain_node_id || undefined },
-          );
+            shared_with: { referrer_address: payload.referrer_address },
+            scope: { chain_id: community.chain_node_id || undefined },
+          });
         }
       },
-      CommunityJoined: async ({ payload }) => {
+      CommunityJoined: async ({ id, payload }) => {
         const action_metas = await getQuestActionMetas(
           payload,
           'CommunityJoined',
@@ -311,33 +333,34 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           },
         });
         if (action_metas.length > 0) {
-          await recordXpsForQuest(
-            payload.user_id,
-            payload.created_at!,
+          await recordXpsForQuest({
+            event_id: id,
+            user_id: payload.user_id,
+            event_created_at: payload.created_at!,
             action_metas,
-            { referrer_address: user?.referred_by_address },
-          );
+            shared_with: { referrer_address: user?.referred_by_address },
+          });
         }
       },
-      ThreadCreated: async ({ payload }) => {
+      ThreadCreated: async ({ id, payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
         if (!user_id) return;
         const action_metas = await getQuestActionMetas(
           payload,
           'ThreadCreated',
         );
-        await recordXpsForQuest(
+        await recordXpsForQuest({
+          event_id: id,
           user_id,
-          payload.created_at!,
+          event_created_at: payload.created_at!,
           action_metas,
-          undefined,
-          {
+          scope: {
             topic_id: payload.topic_id,
             thread_id: payload.id!,
           },
-        );
+        });
       },
-      ThreadUpvoted: async ({ payload }) => {
+      ThreadUpvoted: async ({ id, payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
         if (!user_id) return;
         const thread = await models.Thread.findOne({
@@ -356,15 +379,16 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           payload,
           'ThreadUpvoted',
         );
-        await recordXpsForQuest(
+        await recordXpsForQuest({
+          event_id: id,
           user_id,
-          payload.created_at!,
+          event_created_at: payload.created_at!,
           action_metas,
-          { creator_address: thread!.Address!.address },
-          { topic_id: thread.topic_id, thread_id: thread.id! },
-        );
+          shared_with: { creator_address: thread!.Address!.address },
+          scope: { topic_id: thread.topic_id, thread_id: thread.id! },
+        });
       },
-      CommentCreated: async ({ payload }) => {
+      CommentCreated: async ({ id, payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
         if (!user_id) return;
         const thread = await models.Thread.findOne({
@@ -375,18 +399,18 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           payload,
           'CommentCreated',
         );
-        await recordXpsForQuest(
+        await recordXpsForQuest({
+          event_id: id,
           user_id,
-          payload.created_at!,
+          event_created_at: payload.created_at!,
           action_metas,
-          undefined,
-          {
+          scope: {
             topic_id: thread.topic_id,
             thread_id: thread.id!,
           },
-        );
+        });
       },
-      CommentUpvoted: async ({ payload }) => {
+      CommentUpvoted: async ({ id, payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
         if (!user_id) return;
         const comment = await models.Comment.findOne({
@@ -413,17 +437,18 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           },
           'CommentUpvoted',
         );
-        await recordXpsForQuest(
+        await recordXpsForQuest({
+          event_id: id,
           user_id,
-          payload.created_at!,
+          event_created_at: payload.created_at!,
           action_metas,
-          { creator_address: comment!.Address!.address },
-          {
+          shared_with: { creator_address: comment!.Address!.address },
+          scope: {
             topic_id: comment.Thread!.topic_id,
             thread_id: comment.Thread!.id!,
             comment_id: comment.id,
           },
-        );
+        });
       },
       UserMentioned: async () => {
         // const user_id = await getUserId(payload);
@@ -433,7 +458,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
         // );
         // await recordXps(user_id, payload.created_at!, action_metas);
       },
-      RecurringContestManagerDeployed: async ({ payload }) => {
+      RecurringContestManagerDeployed: async ({ id, payload }) => {
         const contest = await models.ContestManager.findOne({
           where: { contest_address: payload.contest_address },
           attributes: ['community_id', 'creator_address'],
@@ -449,9 +474,14 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           },
           'RecurringContestManagerDeployed',
         );
-        await recordXpsForQuest(user_id, payload.created_at!, action_metas);
+        await recordXpsForQuest({
+          event_id: id,
+          user_id,
+          event_created_at: payload.created_at!,
+          action_metas,
+        });
       },
-      OneOffContestManagerDeployed: async ({ payload }) => {
+      OneOffContestManagerDeployed: async ({ id, payload }) => {
         const contest = await models.ContestManager.findOne({
           where: { contest_address: payload.contest_address },
           attributes: ['community_id', 'creator_address'],
@@ -467,9 +497,14 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           },
           'OneOffContestManagerDeployed',
         );
-        await recordXpsForQuest(user_id, payload.created_at!, action_metas);
+        await recordXpsForQuest({
+          event_id: id,
+          user_id,
+          event_created_at: payload.created_at!,
+          action_metas,
+        });
       },
-      ContestEnded: async ({ payload }) => {
+      ContestEnded: async ({ id, payload }) => {
         const contest = await models.ContestManager.findOne({
           where: { contest_address: payload.contest_address },
           attributes: ['community_id', 'creator_address'],
@@ -493,16 +528,18 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           },
           'ContestEnded',
         );
-        await recordXpsForQuest(
+        await recordXpsForQuest({
+          event_id: id,
           user_id,
-          payload.created_at!,
+          event_created_at: payload.created_at!,
           action_metas,
-          undefined,
-          { amount: total_prize },
-        );
+          scope: { amount: total_prize },
+        });
       },
-      LaunchpadTokenRecordCreated: async ({ payload }) => {
+      LaunchpadTokenRecordCreated: async ({ id, payload }) => {
         const user_id = await getUserByAddress(payload.creator_address);
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenRecordCreated', { id, payload, user_id });
         if (!user_id) return;
 
         const created_at = payload.created_at;
@@ -510,15 +547,31 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           { created_at },
           'LaunchpadTokenRecordCreated',
         );
-        await recordXpsForQuest(user_id, created_at, action_metas);
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenRecordCreated', {
+            id,
+            payload,
+            user_id,
+            action_metas,
+          });
+        await recordXpsForQuest({
+          event_id: id,
+          user_id,
+          event_created_at: created_at,
+          action_metas,
+        });
       },
-      LaunchpadTokenTraded: async ({ payload }) => {
+      LaunchpadTokenTraded: async ({ id, payload }) => {
         const user_id = await getUserByAddress(payload.trader_address);
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenTraded', { id, payload, user_id });
         if (!user_id) return;
 
         const token = await models.LaunchpadToken.findOne({
           where: { token_address: payload.token_address.toLowerCase() },
         });
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenTraded', { id, payload, user_id, token });
         if (!token) return;
 
         const community = await models.Community.findOne({
@@ -533,39 +586,53 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
 
         // payload eth_amount is in wei, a little misleading
         const eth_amount = Number(payload.eth_amount) / 1e18;
-        //console.log({ payload, action_metas, eth_amount });
-        await recordXpsForQuest(user_id, created_at, action_metas, undefined, {
-          amount: eth_amount,
-          threshold: eth_amount,
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenTraded', {
+            id,
+            payload,
+            user_id,
+            created_at,
+            action_metas,
+            eth_amount,
+          });
+        await recordXpsForQuest({
+          event_id: id,
+          user_id,
+          event_created_at: created_at,
+          action_metas,
+          scope: {
+            amount: eth_amount,
+            threshold: eth_amount,
+          },
         });
       },
-      WalletLinked: async ({ payload }) => {
+      WalletLinked: async ({ id, payload }) => {
         const action_metas = await getQuestActionMetas(payload, 'WalletLinked');
         // TODO: use action meta attributes to determine denomination and conversion to XP,
         // at the moment we assume ETH (wei) denomination
         const threshold = Number(payload.balance);
-        await recordXpsForQuest(
-          payload.user_id,
-          payload.created_at,
+        await recordXpsForQuest({
+          event_id: id,
+          user_id: payload.user_id,
+          event_created_at: payload.created_at,
           action_metas,
-          undefined,
-          {
+          scope: {
             wallet: payload.wallet_id,
             threshold,
           },
-        );
+        });
       },
-      SSOLinked: async ({ payload }) => {
+      SSOLinked: async ({ id, payload }) => {
         const action_metas = await getQuestActionMetas(payload, 'SSOLinked');
-        await recordXpsForQuest(
-          payload.user_id,
-          payload.created_at,
+        await recordXpsForQuest({
+          event_id: id,
+          user_id: payload.user_id,
+          event_created_at: payload.created_at,
           action_metas,
-          undefined,
-          { sso: payload.oauth_provider },
-        );
+          scope: { sso: payload.oauth_provider },
+        });
       },
-      NamespaceLinked: async ({ payload }) => {
+      NamespaceLinked: async ({ id, payload }) => {
         const address = await models.Address.findOne({
           where: { address: payload.deployer_address },
           attributes: ['user_id'],
@@ -575,13 +642,14 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           payload,
           'NamespaceLinked',
         );
-        await recordXpsForQuest(
-          address.user_id!,
-          payload.created_at,
+        await recordXpsForQuest({
+          event_id: id,
+          user_id: address.user_id!,
+          event_created_at: payload.created_at,
           action_metas,
-        );
+        });
       },
-      CommunityGoalReached: async ({ payload }) => {
+      CommunityGoalReached: async ({ id, payload }) => {
         // find the admin of the community (TODO: project on community creation, using proxy in the meantime)
         const address = await models.Address.findOne({
           where: { community_id: payload.community_id, role: 'admin' },
@@ -592,15 +660,15 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           payload,
           'CommunityGoalReached',
         );
-        await recordXpsForQuest(
-          address.user_id!,
-          payload.created_at,
+        await recordXpsForQuest({
+          event_id: id,
+          user_id: address.user_id!,
+          event_created_at: payload.created_at,
           action_metas,
-          undefined,
-          { goal_id: payload.community_goal_meta_id },
-        );
+          scope: { goal_id: payload.community_goal_meta_id },
+        });
       },
-      TwitterCommonMentioned: async ({ payload }) => {
+      TwitterCommonMentioned: async ({ id, payload }) => {
         const address = await models.Address.findOne({
           where: {
             oauth_provider: WalletSsoSource.Twitter,
@@ -612,28 +680,29 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           payload,
           'TwitterCommonMentioned',
         );
-        await recordXpsForQuest(
-          address.user_id!,
-          payload.created_at,
+        await recordXpsForQuest({
+          event_id: id,
+          user_id: address.user_id!,
+          event_created_at: payload.created_at,
           action_metas,
-        );
+        });
       },
-      DiscordServerJoined: async ({ payload }) => {
+      DiscordServerJoined: async ({ id, payload }) => {
         if (payload.user_id) {
           const action_metas = await getQuestActionMetas(
             { created_at: payload.joined_date },
             'DiscordServerJoined',
           );
-          await recordXpsForQuest(
-            payload.user_id,
-            payload.joined_date,
+          await recordXpsForQuest({
+            event_id: id,
+            user_id: payload.user_id,
+            event_created_at: payload.joined_date,
             action_metas,
-            undefined,
-            { discord_server_id: payload.server_id },
-          );
+            scope: { discord_server_id: payload.server_id },
+          });
         }
       },
-      XpChainEventCreated: async ({ payload }) => {
+      XpChainEventCreated: async ({ id, payload }) => {
         const chainNode = await models.ChainNode.scope(
           'withPrivateData',
         ).findOne({
@@ -660,9 +729,14 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           );
 
         if (action_metas.length === 0) return;
-        await recordXpsForQuest(user_id, payload.created_at, action_metas);
+        await recordXpsForQuest({
+          event_id: id,
+          user_id,
+          event_created_at: payload.created_at,
+          action_metas,
+        });
       },
-      MembershipsRefreshed: async ({ payload }) => {
+      MembershipsRefreshed: async ({ id, payload }) => {
         const action_metas = await getQuestActionMetas(
           payload,
           'MembershipsRefreshed',
@@ -671,13 +745,13 @@ export function Xp(): Projection<typeof schemas.QuestEvents, typeof output> {
           payload.membership
             .filter((m) => !m.rejected)
             .map(async ({ user_id, group_id }) => {
-              await recordXpsForQuest(
+              await recordXpsForQuest({
+                event_id: id,
                 user_id,
-                payload.created_at,
+                event_created_at: payload.created_at,
                 action_metas,
-                undefined,
-                { group_id },
-              );
+                scope: { group_id },
+              });
             }),
         );
       },

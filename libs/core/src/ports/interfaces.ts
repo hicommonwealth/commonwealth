@@ -1,4 +1,4 @@
-import { Events } from '@hicommonwealth/schemas';
+import { Events, OutboxEvents } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
 import { z, ZodSchema, ZodUndefined } from 'zod';
 import {
@@ -469,7 +469,9 @@ export type RoutingKey =
   | Concat<EventNamesType, RoutingKeyTagsType>;
 
 export interface Broker extends Disposable {
-  publish<Name extends Events>(event: EventContext<Name>): Promise<boolean>;
+  publish<Name extends OutboxEvents>(
+    event: EventContext<Name>,
+  ): Promise<boolean>;
 
   subscribe<Inputs extends EventSchemas>(
     consumer: () => EventsHandlerMetadata<Inputs, ZodSchema>,
@@ -776,4 +778,9 @@ export interface NotificationsProvider extends Disposable {
     token: string,
     channelType: 'FCM' | 'APNS',
   ): Promise<boolean>;
+
+  signUserToken(
+    userId: number,
+    expiresInSeconds: number,
+  ): Promise<string | undefined>;
 }

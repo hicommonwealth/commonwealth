@@ -58,7 +58,19 @@ export const actionCopies = {
     ['CommentCreated']: () => '',
     ['CommentUpvoted']: () => '',
     ['WalletLinked']: () => '',
-    ['SSOLinked']: () => '',
+    ['SSOLinked']: (ssoType?: string) =>
+      ssoType ? (
+        <div>
+          <ul>
+            <li>
+              ● Link <span className="capitalize">{ssoType}</span> SSO to your
+              account.
+            </li>
+          </ul>
+        </div>
+      ) : (
+        ''
+      ),
     ['TweetEngagement']: (likes: number, retweets: number, replies: number) => (
       <div>
         <ul>

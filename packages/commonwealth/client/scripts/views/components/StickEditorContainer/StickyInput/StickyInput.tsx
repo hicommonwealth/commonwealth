@@ -2,7 +2,6 @@ import { CompletionModel, ContentType } from '@hicommonwealth/shared';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { notifyError } from 'controllers/app/notifications';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
 import { Thread } from 'models/Thread';
 import type { Topic } from 'models/Topic';
 import React, {
@@ -19,7 +18,7 @@ import {
   generateThreadPrompt,
 } from 'state/api/ai/prompts';
 import useSidebarStore from 'state/ui/sidebar';
-import { useLocalAISettingsStore } from 'state/ui/user';
+import { useAIFeatureEnabled, useUserAiSettingsStore } from 'state/ui/user';
 import { AIModelSelector } from 'views/components/AIModelSelector';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -61,6 +60,7 @@ interface StickyInputProps extends CommentEditorProps {
   topic?: Topic;
   parentType: ContentType;
   thread?: Thread;
+  communityId?: string;
 }
 
 const StickyInput = (props: StickyInputProps) => {
@@ -78,16 +78,19 @@ const StickyInput = (props: StickyInputProps) => {
   const { isWindowExtraSmall: isMobile } = useBrowserWindow({});
   const { menuVisible } = useSidebarStore();
   const { mode, setIsExpanded, isExpanded } = useContext(StickCommentContext);
+  const { isAIEnabled } = useAIFeatureEnabled();
   const {
     aiCommentsToggleEnabled,
-    aiInteractionsToggleEnabled,
     setAICommentsToggleEnabled,
     selectedModels,
     setSelectedModels,
-  } = useLocalAISettingsStore();
+  } = useUserAiSettingsStore();
+
+  const effectiveAiCommentsToggleEnabled =
+    isAIEnabled && aiCommentsToggleEnabled;
+
   const stickyCommentReset = useActiveStickCommentReset();
   const { generateCompletion } = useAiCompletion();
-  const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   const aiModelPopover = usePopover();
 
@@ -95,6 +98,8 @@ const StickyInput = (props: StickyInputProps) => {
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
+  const [justClosedMentionDropdown, setJustClosedMentionDropdown] =
+    useState(false);
 
   const placeholderText = useDynamicPlaceholder({
     mode,
@@ -151,7 +156,7 @@ const StickyInput = (props: StickyInputProps) => {
   }, [setOpenModalOnExpand, setIsExpanded]);
 
   const handleGenerateAIContent = useCallback(async () => {
-    if (!aiCommentsFeatureEnabled || !aiInteractionsToggleEnabled) return;
+    if (!effectiveAiCommentsToggleEnabled) return;
 
     setIsGenerating(true);
     bodyAccumulatedRef.current = '';
@@ -167,6 +172,8 @@ const StickyInput = (props: StickyInputProps) => {
           stream: true,
           systemPrompt,
           useWebSearch: webSearchEnabled,
+          includeContextualMentions: true,
+          communityId: props.communityId,
           onError: (error) => {
             console.error('Error generating AI thread:', error);
             notifyError('Failed to generate AI thread content');
@@ -196,6 +203,8 @@ const StickyInput = (props: StickyInputProps) => {
           stream: true,
           systemPrompt,
           useWebSearch: webSearchEnabled,
+          includeContextualMentions: true,
+          communityId: props.communityId,
           onError: (error) => {
             console.error('Error generating AI comment:', error);
           },
@@ -211,8 +220,7 @@ const StickyInput = (props: StickyInputProps) => {
       setIsGenerating(false);
     }
   }, [
-    aiCommentsFeatureEnabled,
-    aiInteractionsToggleEnabled,
+    effectiveAiCommentsToggleEnabled,
     generateCompletion,
     mode,
     originalThread,
@@ -220,6 +228,7 @@ const StickyInput = (props: StickyInputProps) => {
     setContentDelta,
     webSearchEnabled,
     selectedModels,
+    props.communityId,
   ]);
 
   const getActionPillLabel = () => {
@@ -256,12 +265,12 @@ const StickyInput = (props: StickyInputProps) => {
         resetTurnstile();
       }
 
-      if (aiCommentsToggleEnabled) {
+      if (effectiveAiCommentsToggleEnabled) {
         handleAiReply(commentId);
       }
 
       try {
-        await listenForComment(commentId, aiCommentsToggleEnabled);
+        await listenForComment(commentId, !!effectiveAiCommentsToggleEnabled);
       } catch (error) {
         console.warn('StickyInput - Failed to jump to comment:', error);
       }
@@ -276,7 +285,7 @@ const StickyInput = (props: StickyInputProps) => {
     }
   }, [
     handleSubmitComment,
-    aiCommentsToggleEnabled,
+    effectiveAiCommentsToggleEnabled,
     handleAiReply,
     turnstileToken,
     setContentDelta,
@@ -286,12 +295,18 @@ const StickyInput = (props: StickyInputProps) => {
   ]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (justClosedMentionDropdown && event.key === 'Enter') {
+      setJustClosedMentionDropdown(false);
+      return;
+    }
+
     if (
       event.key === 'Enter' &&
       !event.shiftKey &&
       !isExpanded &&
       contentDelta?.ops?.length > 0 &&
-      (!isTurnstileEnabled || turnstileToken)
+      (!isTurnstileEnabled || turnstileToken) &&
+      !justClosedMentionDropdown
     ) {
       event.preventDefault();
       void customHandleSubmitComment();
@@ -341,7 +356,7 @@ const StickyInput = (props: StickyInputProps) => {
 
     const buttonGroup = (
       <div className="button-group">
-        {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+        {isAIEnabled && (
           <CWTooltip
             content={`${webSearchEnabled ? 'Disable' : 'Enable'} Web Search`}
             placement="top"
@@ -357,7 +372,7 @@ const StickyInput = (props: StickyInputProps) => {
             )}
           />
         )}
-        {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+        {isAIEnabled && (
           <ClickAwayListener onClickAway={() => aiModelPopover.dispose()}>
             <div className="popover-container">
               <CWTooltip
@@ -495,6 +510,7 @@ const StickyInput = (props: StickyInputProps) => {
 
     const inputContent = (
       <div
+        // eslint-disable-next-line max-len
         className={`StickyInput ${isExpanded ? 'expanded' : 'not-expanded'} ${isMobile ? 'mobile' : 'desktop'} ${mode === 'thread' ? 'thread-mode' : ''}`}
         ref={containerRef}
         style={isMobile && menuVisible ? { zIndex: -1 } : undefined}
@@ -524,6 +540,7 @@ const StickyInput = (props: StickyInputProps) => {
                 setContentDelta={setContentDelta}
                 webSearchEnabled={webSearchEnabled}
                 setWebSearchEnabled={setWebSearchEnabled}
+                communityId={props.communityId}
               />
             ) : (
               <CommentEditor
@@ -531,7 +548,8 @@ const StickyInput = (props: StickyInputProps) => {
                 shouldFocus={true}
                 onCancel={handleCancel}
                 aiCommentsToggleEnabled={
-                  aiCommentsToggleEnabled && selectedModels.length > 0
+                  !!effectiveAiCommentsToggleEnabled &&
+                  selectedModels.length > 0
                 }
                 handleSubmitComment={customHandleSubmitComment}
                 onAiReply={handleAiReply}
@@ -541,6 +559,7 @@ const StickyInput = (props: StickyInputProps) => {
                 setContentDelta={setContentDelta}
                 webSearchEnabled={webSearchEnabled}
                 setWebSearchEnabled={setWebSearchEnabled}
+                communityId={props.communityId}
               />
             )}
           </div>
@@ -548,7 +567,7 @@ const StickyInput = (props: StickyInputProps) => {
           <>
             <div className="action-tags-container">
               <div className="tags-row">
-                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                {effectiveAiCommentsToggleEnabled && (
                   <CWTag
                     key="draft"
                     type="pill"
@@ -571,6 +590,7 @@ const StickyInput = (props: StickyInputProps) => {
                   setContentDelta={props.setContentDelta}
                   isDisabled={!canComment}
                   onKeyDown={handleKeyDown}
+                  justClosed={setJustClosedMentionDropdown}
                   placeholder={placeholderText}
                 />
               </div>

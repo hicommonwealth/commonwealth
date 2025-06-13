@@ -52,7 +52,9 @@ const App = () => {
                   </PrivyMobileAuthenticator>
                 )}
                 <ToastContainer />
-                {import.meta.env.DEV && <ReactQueryDevtools />}
+                {import.meta.env.DEV && (
+                  <ReactQueryDevtools buttonPosition="bottom-left" />
+                )}
               </OpenFeatureProvider>
             </FarcasterFrameProvider>
           </trpc.Provider>

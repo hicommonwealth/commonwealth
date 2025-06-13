@@ -96,6 +96,7 @@ collaborator_data AS ( -- get the thread collaborators and their profiles
     T.id as thread_id,
     CASE WHEN max(A.id) IS NOT NULL THEN
         json_agg(json_strip_nulls(json_build_object(
+          'id', editor_profiles.id,
           'address', A.address,
           'community_id', A.community_id,
           'User', json_build_object(

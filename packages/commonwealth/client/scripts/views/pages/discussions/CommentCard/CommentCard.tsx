@@ -13,7 +13,6 @@ import {
 } from '@hicommonwealth/shared';
 import { useAiCompletion } from 'client/scripts/state/api/ai';
 import clsx from 'clsx';
-import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
@@ -21,8 +20,7 @@ import { useCreateCommentMutation } from 'state/api/comments';
 import { buildCreateCommentInput } from 'state/api/comments/createComment';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
-import useUserStore from 'state/ui/user';
-import { useLocalAISettingsStore } from 'state/ui/user/localAISettings';
+import useUserStore, { useAIFeatureEnabled } from 'state/ui/user';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import ShareButton from 'views/components/ShareButton';
@@ -159,13 +157,13 @@ export const CommentCard = ({
     enabled: !!comment?.community_id,
   });
 
-  const aiCommentsFeatureEnabled = useFlag('aiComments');
+  const { isAIEnabled } = useAIFeatureEnabled();
+
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: comment.thread_id,
     communityId: comment.community_id,
     existingNumberOfComments: 0,
   });
-  const { aiInteractionsToggleEnabled } = useLocalAISettingsStore();
   const [commentText, setCommentText] = useState(comment.body);
   const commentBody = React.useMemo(() => {
     const rawContent = editDraft || commentText || comment.body;
@@ -547,25 +545,24 @@ Community Description: ${communityDescription}`;
                         void onReply?.();
                       }}
                     />
-                    {aiCommentsFeatureEnabled &&
-                      aiInteractionsToggleEnabled && (
-                        <CWThreadAction
-                          action="ai-reply"
-                          label="AI Reply"
-                          disabled={maxReplyLimitReached || !canReply}
-                          tooltipText={
-                            permissions.CREATE_COMMENT.tooltip ||
-                            (canReply && maxReplyLimitReached
-                              ? 'Further replies not allowed'
-                              : '')
-                          }
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            void onAIReply?.(comment.body);
-                          }}
-                        />
-                      )}
+                    {isAIEnabled && (
+                      <CWThreadAction
+                        action="ai-reply"
+                        label="AI Reply"
+                        disabled={maxReplyLimitReached || !canReply}
+                        tooltipText={
+                          permissions.CREATE_COMMENT.tooltip ||
+                          (canReply && maxReplyLimitReached
+                            ? 'Further replies not allowed'
+                            : '')
+                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          void onAIReply?.(comment.body);
+                        }}
+                      />
+                    )}
                   </>
                 )}
 

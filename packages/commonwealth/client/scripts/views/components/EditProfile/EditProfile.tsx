@@ -8,7 +8,7 @@ import NewProfile from 'models/NewProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import useUserStore, { useUserAiSettingsStore } from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import ManageApiKey from 'views/components/EditProfile/ManageAPIKeys';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -66,7 +66,7 @@ const EditProfile = () => {
   });
 
   const { aiInteractionsToggleEnabled, setAIInteractionsToggleEnabled } =
-    useLocalAISettingsStore();
+    useUserAiSettingsStore();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
@@ -75,7 +75,7 @@ const EditProfile = () => {
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
-  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+  const { mutateAsync: updateUser, isPending: isUpdatingProfile } =
     useUpdateUserMutation({
       addressesWithChainsToUpdate: addresses?.map((a) => ({
         address: a.address,

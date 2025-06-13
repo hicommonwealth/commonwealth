@@ -1,13 +1,11 @@
 import { config as EnvConfig } from '@hicommonwealth/adapters';
-import { Consumer, logger } from '@hicommonwealth/core';
+import { Consumer } from '@hicommonwealth/core';
 import {
   BindingConfig,
   BrokerConfig,
   ConnectionConfig,
   QueueConfig,
 } from 'rascal';
-
-const log = logger(import.meta);
 
 export enum RascalExchanges {
   DeadLetter = 'DeadLetterExchange',

@@ -1,6 +1,6 @@
 import { ChainBase, Roles, WalletId } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
-import { VerifiedContext } from '../context';
+import { AuthContext, VerifiedContext } from '../context';
 import { ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { USER_TIER, UserProfile } from '../entities/user.schemas';
@@ -80,7 +80,7 @@ export const UserStatusAddressView = z.object({
 export const UserStatusCommunityView = z.object({
   id: z.string(),
   name: z.string(),
-  icon_url: z.string(),
+  icon_url: z.string().nullish(),
   redirect: z.string().nullish(),
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
@@ -88,11 +88,15 @@ export const UserStatusCommunityView = z.object({
 });
 
 export const GetStatus = {
-  input: z.object({}),
-  output: UserView.omit({ profile: true }).extend({
-    addresses: z.array(UserStatusAddressView),
-    communities: z.array(UserStatusCommunityView),
-  }),
+  input: z.void(),
+  output: UserView.omit({ profile: true })
+    .extend({
+      addresses: z.array(UserStatusAddressView),
+      communities: z.array(UserStatusCommunityView),
+      jwt: z.string(),
+      knockJwtToken: z.string().optional(),
+    })
+    .optional(),
 };
 
 export const SearchUserProfilesView = z.object({
@@ -247,4 +251,23 @@ export const GetAddressStatus = {
     belongs_to_user: z.boolean(),
   }),
   context: VerifiedContext,
+};
+
+export const GetMutualConnections = {
+  input: z.object({
+    user_id_1: PG_INT,
+    user_id_2: PG_INT,
+    limit: z.number().int().min(1).max(100).optional().default(10),
+  }),
+  output: z.object({
+    mutual_communities: z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        base: z.nativeEnum(ChainBase),
+        icon_url: z.string().nullish(),
+      }),
+    ),
+  }),
+  context: AuthContext,
 };
