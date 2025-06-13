@@ -60,6 +60,8 @@ comments AS (
   WHERE
     t.deleted_at IS NULL AND 
     c.deleted_at IS NULL
+  ORDER BY
+    c.created_at DESC
   LIMIT 10 -- just last 10 comments for performance
 ) 
 SELECT
@@ -148,6 +150,8 @@ SELECT
       JOIN "Topics" g ON t.topic_id = g.id
     WHERE
       t.deleted_at IS NULL 
+    ORDER BY
+      t.created_at DESC
     LIMIT 10 -- just last 10 threads for performance
   ) AS threads
 , (
