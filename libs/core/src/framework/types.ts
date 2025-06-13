@@ -120,6 +120,7 @@ export type Context<Input extends ZodType, _Context extends ZodType> = {
  * - `payload`: validated event payload
  */
 export type EventContext<Name extends Events> = {
+  readonly id: number;
   readonly name: Name;
   readonly payload: z.infer<(typeof events)[Name]>;
 };

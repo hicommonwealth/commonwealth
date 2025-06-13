@@ -55,6 +55,7 @@
     "node-fetch": "2",
     "node-object-hash": "^3.0.0",
     "openai": "^5.1.0",
+    "passport-magic": "^1.0.0",
     "pg": "^8.11.3",
     "quill-delta-to-markdown": "^0.6.0",
     "sequelize": "^6.32.1",

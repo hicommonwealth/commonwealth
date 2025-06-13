@@ -35,6 +35,7 @@ export async function drainOutbox<E extends Events>(
         `>>> ${event_name} >>> ${factory.name} >>> ${JSON.stringify(event_payload)}`,
       );
       await handleEvent(handler, {
+        id: 0,
         name: event_name,
         payload: event_payload,
       });

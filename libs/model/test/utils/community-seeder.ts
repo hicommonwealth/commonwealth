@@ -24,9 +24,11 @@ export type CommunitySeedOptions = {
     permissions: GatedActionEnum[];
   }[];
   custom_stages?: string[];
+  namespace?: string;
   namespace_address?: string;
   stakes?: z.infer<typeof schemas.CommunityStake>[];
   weighted_voting?: schemas.TopicWeightedVoting;
+  override_addresses?: Array<string>;
 };
 
 /**
@@ -44,9 +46,11 @@ export async function seedCommunity({
   ss58_prefix = undefined,
   groups = [],
   custom_stages,
+  namespace,
   namespace_address,
   stakes,
   weighted_voting,
+  override_addresses,
 }: CommunitySeedOptions) {
   const actors = {} as Record<(typeof roles)[number], Actor>;
   const addresses = {} as Record<
@@ -79,7 +83,7 @@ export async function seedCommunity({
     profile_count: 1,
     Addresses: roles.map((role, index) => {
       return {
-        address: signerInfo[index].address,
+        address: override_addresses?.[index] || signerInfo[index].address,
         user_id: users[role].id,
         role: role === 'admin' ? 'admin' : 'member',
         is_banned: role === 'banned',
@@ -95,12 +99,13 @@ export async function seedCommunity({
     base: chain_base,
     bech32_prefix,
     ss58_prefix,
+    namespace,
     namespace_address,
     active: true,
     profile_count: 1,
     Addresses: roles.map((role, index) => {
       return {
-        address: signerInfo[index].address,
+        address: override_addresses?.[index] || signerInfo[index].address,
         user_id: users[role].id,
         role: role === 'admin' ? 'admin' : 'member',
         is_banned: role === 'banned',

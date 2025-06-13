@@ -93,6 +93,7 @@ describe('userMentioned Event Handler', () => {
 
   test('should not throw if relevant community is not found', async () => {
     const res = await notifyUserMentioned({
+      id: 0,
       name: 'UserMentioned',
       payload: {
         communityId: 'nonexistent',

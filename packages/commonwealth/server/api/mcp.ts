@@ -11,7 +11,7 @@ import {
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 import { IncomingMessage } from 'http';
-import { toJSONSchema, z, ZodSchema } from 'zod/v4';
+import { toJSONSchema, z } from 'zod/v4';
 import {
   api as externalApi,
   trpcRouter as externalTrpcRouter,
@@ -20,7 +20,7 @@ import { apiKeyAuthMiddleware } from './external-router-middleware';
 
 const log = logger(import.meta);
 
-type CommonMCPTool<T extends z.ZodSchema = z.ZodSchema> = {
+type CommonMCPTool<T extends z.ZodType = z.ZodType> = {
   name: string;
   description: string;
   inputSchema: T;
@@ -34,7 +34,7 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
   >;
   const tools = procedures.map((key) => {
     const procedure = externalApi[key];
-    const inputSchema = procedure._def.inputs[0] as ZodSchema;
+    const inputSchema = procedure._def.inputs[0] as ZodType;
     if (!inputSchema) {
       throw new Error(`No input schema for ${key}`);
     }

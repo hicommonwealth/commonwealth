@@ -53,9 +53,9 @@ const trpcerror = (error: unknown): TRPCError => {
  * @returns tRPC mutation procedure
  */
 export const command = <
-  Input extends ZodType<any>,
-  Output extends ZodType<any>,
-  Context extends ZodType<any>,
+  Input extends ZodType,
+  Output extends ZodType,
+  Context extends ZodType,
 >(
   factory: () => Metadata<Input, Output, Context>,
   tag: Tag,
@@ -194,7 +194,11 @@ export const event = <
     .mutation(async ({ input }) => {
       try {
         const [[name, payload]] = Object.entries(input as object);
-        return await handleEvent(md, { name: name as Events, payload }, false);
+        return await handleEvent(
+          md,
+          { id: 0, name: name as Events, payload },
+          false,
+        );
       } catch (error) {
         throw trpcerror(error);
       }

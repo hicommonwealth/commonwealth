@@ -146,7 +146,14 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'SSOLinked': {
-        setAuthModalConfig({ type: AuthModalType.SignIn, options: ['sso'] });
+        const specificAuthOption = buildRedirectURLFromContentId(
+          action.content_id || '',
+        ) as AuthOptions;
+        setAuthModalConfig({
+          type: AuthModalType.SignIn,
+          options: ['sso'],
+          ...(specificAuthOption && { specificAuthOption }),
+        });
         break;
       }
       case 'CommunityCreated': {

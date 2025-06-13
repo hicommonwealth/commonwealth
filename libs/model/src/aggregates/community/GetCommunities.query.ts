@@ -102,7 +102,8 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   "Community"."updated_at",
                   "Community"."redirect",
                   "Community"."snapshot_spaces",
-                  "Community"."include_in_digest_email"
+                  "Community"."include_in_digest_email",
+                  COALESCE("Community"."ai_features_enabled", false) AS "ai_features_enabled"
                   ${iQ(threadFilter, `, COALESCE(tc.thread_count, 0) as last_30_day_thread_count`)}
           FROM    "Communities" AS "Community"
           ${iQ(threadFilter, 'LEFT JOIN thread_counts tc ON tc.community_id = "Community".id')}

@@ -252,3 +252,22 @@ export const GetAddressStatus = {
   }),
   context: VerifiedContext,
 };
+
+export const GetMutualConnections = {
+  input: z.object({
+    user_id_1: PG_INT,
+    user_id_2: PG_INT,
+    limit: z.number().int().min(1).max(100).optional().default(10),
+  }),
+  output: z.object({
+    mutual_communities: z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        base: z.nativeEnum(ChainBase),
+        icon_url: z.string().nullish(),
+      }),
+    ),
+  }),
+  context: AuthContext,
+};

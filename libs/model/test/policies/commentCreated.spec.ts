@@ -134,6 +134,7 @@ describe('CommentCreated Event Handler', () => {
 
   test('should not throw if a valid author is not found', async () => {
     const res = await notifyCommentCreated({
+      id: 0,
       name: 'CommentCreated',
       payload: { address_id: -999999 } as z.infer<
         typeof schemas.events.CommentCreated
@@ -144,6 +145,7 @@ describe('CommentCreated Event Handler', () => {
 
   test('should not throw if a valid community is not found', async () => {
     const res = await notifyCommentCreated({
+      id: 0,
       name: 'CommentCreated',
       payload: {
         // @ts-expect-error StrictNullChecks
@@ -160,6 +162,7 @@ describe('CommentCreated Event Handler', () => {
     });
 
     const res = await notifyCommentCreated({
+      id: 0,
       name: 'CommentCreated',
       payload: {
         // @ts-expect-error StrictNullChecks

@@ -39,7 +39,8 @@ export const doesActionAllowContentId = (action: QuestActionType) => {
     action === 'DiscordServerJoined' ||
     action === 'MembershipsRefreshed' ||
     action === 'LaunchpadTokenTraded' ||
-    action === 'CommunityGoalReached'
+    action === 'CommunityGoalReached' ||
+    action === 'SSOLinked'
   );
 };
 
@@ -97,6 +98,10 @@ export const doesActionRequireAmountMultipler = (action: QuestActionType) => {
 
 export const doesActionRequireGoalConfig = (action: QuestActionType) => {
   return action === 'CommunityGoalReached';
+};
+
+export const doesActionAllowSSOType = (action: QuestActionType) => {
+  return action === 'SSOLinked';
 };
 
 export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
