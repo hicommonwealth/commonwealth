@@ -324,7 +324,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
               inputToken: subForm.values.metadata.inputToken || '',
               outputToken: subForm.values.metadata.outputToken || '',
               minOutputAmount: subForm.values.metadata.minOutputAmount || '',
-              minTimestamp: subForm.values.metadata.outputToken || '',
+              minTimestamp: subForm.values.metadata.minTimestamp || '',
               minVolumeUSD: subForm.values.metadata.minVolumeUSD || '',
             } as z.infer<typeof KyoFinanceSwapQuestRequestParams>;
           }
