@@ -116,6 +116,7 @@ export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
     'SSOLinked',
     'DiscordServerJoined',
     'MembershipsRefreshed',
+    'ContestEnded',
     'LaunchpadTokenRecordCreated',
     'CommunityGoalReached',
   ];
