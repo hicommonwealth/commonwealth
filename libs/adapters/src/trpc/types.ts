@@ -1,6 +1,6 @@
 import type { Actor, AuthStrategies } from '@hicommonwealth/core';
 import type { Request, Response } from 'express';
-import { ZodSchema, z } from 'zod';
+import { ZodType, z } from 'zod';
 
 /**
  * tRPC request context
@@ -43,10 +43,7 @@ export enum Tag {
  * - Applied in the order it is defined in the array.
  * - Use `fireAndForget` wrapper for I/O operations like committing to a canvas, tracking analytics, etc.
  */
-export type OutputMiddleware<
-  Input extends ZodSchema,
-  Output extends ZodSchema,
-> = (
+export type OutputMiddleware<Input extends ZodType, Output extends ZodType> = (
   input: z.infer<Input>,
   output: z.infer<Output>,
   ctx: Context,
@@ -55,7 +52,7 @@ export type OutputMiddleware<
 /**
  * Overrides for the default metadata for tRPC to work
  */
-export type Metadata<Input extends ZodSchema, Output extends ZodSchema> = {
+export type Metadata<Input extends ZodType, Output extends ZodType> = {
   readonly input: Input;
   readonly output: Output;
   auth: unknown[];
@@ -63,10 +60,7 @@ export type Metadata<Input extends ZodSchema, Output extends ZodSchema> = {
   authStrategy?: AuthStrategies<Input>;
 };
 
-export type BuildProcOptions<
-  Input extends ZodSchema,
-  Output extends ZodSchema,
-> = {
+export type BuildProcOptions<Input extends ZodType, Output extends ZodType> = {
   method: 'GET' | 'POST';
   name: string;
   md: Metadata<Input, Output>;
@@ -80,7 +74,7 @@ export type BuildProcOptions<
  * 1. A declarative tuple with [event name, optional output mapper]
  * 2. A "general" async mapper that derives the tuple of [event name, data] from input/output
  */
-export type Track<Input extends ZodSchema, Output extends ZodSchema> =
+export type Track<Input extends ZodType, Output extends ZodType> =
   | [string, mapper?: (output: z.infer<Output>) => Record<string, unknown>]
   | ((
       input: z.infer<Input>,

@@ -85,6 +85,7 @@ const {
   MCP_DEMO_CLIENT_SERVER_URL,
   MCP_DEMO_CLIENT_KEY,
   EVM_CHAINS_WHITELIST,
+  LOG_XP_LAUNCHPAD,
   KNOCK_PUBLIC_API_KEY,
   KNOCK_IN_APP_FEED_ID,
   UNLEASH_FRONTEND_API_TOKEN,
@@ -298,6 +299,7 @@ export const config = configure(
       MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
       MCP_DEMO_CLIENT_KEY: MCP_DEMO_CLIENT_KEY,
     },
+    LOG_XP_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
     NOTIFICATIONS: {
       KNOCK_PUBLIC_API_KEY:
         KNOCK_PUBLIC_API_KEY ||
@@ -615,6 +617,7 @@ export const config = configure(
       MCP_DEMO_CLIENT_SERVER_URL: z.string().optional(),
       MCP_DEMO_CLIENT_KEY: z.string().optional(),
     }),
+    LOG_XP_LAUNCHPAD: z.boolean().default(false),
     NOTIFICATIONS: z
       .object({
         KNOCK_PUBLIC_API_KEY: z.string(),

@@ -14,7 +14,7 @@ import {
 } from '@hicommonwealth/core';
 import { Events } from '@hicommonwealth/schemas';
 import { TRPCError } from '@trpc/server';
-import { ZodSchema, ZodUndefined, z } from 'zod';
+import { ZodType, ZodUndefined, z } from 'zod';
 import { buildproc, procedure } from './builder';
 import { Tag, type OutputMiddleware } from './types';
 
@@ -53,9 +53,9 @@ const trpcerror = (error: unknown): TRPCError => {
  * @returns tRPC mutation procedure
  */
 export const command = <
-  Input extends ZodSchema,
-  Output extends ZodSchema,
-  Context extends ZodSchema,
+  Input extends ZodType,
+  Output extends ZodType,
+  Context extends ZodType,
 >(
   factory: () => Metadata<Input, Output, Context>,
   tag: Tag,
@@ -93,9 +93,9 @@ export const command = <
  * @returns tRPC query procedure
  */
 export const query = <
-  Input extends ZodSchema,
-  Output extends ZodSchema,
-  Context extends ZodSchema,
+  Input extends ZodType,
+  Output extends ZodType,
+  Context extends ZodType,
 >(
   factory: () => Metadata<Input, Output, Context>,
   tag: Tag,
@@ -175,7 +175,7 @@ export const query = <
 // TODO: add security options (API key, IP range, internal, etc)
 export const event = <
   Input extends EventSchemas,
-  Output extends ZodSchema | ZodUndefined = ZodUndefined,
+  Output extends ZodType | ZodUndefined = ZodUndefined,
 >(
   factory: () => EventsHandlerMetadata<Input, Output>,
   tag: Tag.Integration,

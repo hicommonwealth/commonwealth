@@ -13,10 +13,9 @@ import type { ModelInstance } from './types';
 export type EmailNotificationInterval = 'weekly' | 'never';
 
 export type UserAttributes = z.infer<typeof User> & {
-  // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
-  selectedCommunity?: CommunityAttributes | CommunityAttributes['id'];
-  Addresses?: AddressAttributes[] | AddressAttributes['id'][];
-  Communities?: CommunityAttributes[] | CommunityAttributes['id'][];
+  selectedCommunity?: CommunityAttributes;
+  Addresses?: AddressAttributes[];
+  Communities?: CommunityAttributes[];
   SubscriptionPreferences?: SubscriptionPreferenceAttributes;
   threadSubscriptions?: ThreadSubscriptionAttributes[];
   commentSubscriptions?: CommentSubscriptionAttributes[];
