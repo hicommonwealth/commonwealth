@@ -922,8 +922,8 @@ importers:
         specifier: ^12.4.0
         version: 12.4.0
       '@magic-ext/farcaster':
-        specifier: ^0.16.0
-        version: 0.16.0
+        specifier: ^1.1.0
+        version: 1.1.0
       '@magic-ext/oauth':
         specifier: ^22.17.0
         version: 22.17.0
@@ -5095,8 +5095,8 @@ packages:
   '@magic-ext/cosmos@12.4.0':
     resolution: {integrity: sha512-WfLlUzkKVfqO9vv+h8fA7z/KAcBL6tbLjSPHZCr8WbBUL/Me86Pmx8g8Zftb19oaGmYM+XkPVli7h20zBRE2oA==}
 
-  '@magic-ext/farcaster@0.16.0':
-    resolution: {integrity: sha512-+1u6r4sh1Mys2fxqbqU/8uBYeD2RQmjJY/6iwKHTih20gPotH++VoD6Jhl89I9UW8KogwTQ620asu8XZbXOLbw==}
+  '@magic-ext/farcaster@1.1.0':
+    resolution: {integrity: sha512-T/koq2fT21B0jjcFBKSBsjCYrCydZavX+YbLyrhRppsaKGMANBBkjLLrGSLDAunl0s8ZEnaYOtCaey++4h/U7A==}
 
   '@magic-ext/oauth2@9.16.0':
     resolution: {integrity: sha512-+ixOFjjLZtbk7GgRdzfGKpREGZUyqpIjXDftUjNOlgbaroBBjqrVj4scnzz06VQwCuiWotZ4ZU1vSFz/NszotQ==}
@@ -27363,7 +27363,7 @@ snapshots:
 
   '@magic-ext/cosmos@12.4.0': {}
 
-  '@magic-ext/farcaster@0.16.0': {}
+  '@magic-ext/farcaster@1.1.0': {}
 
   '@magic-ext/oauth2@9.16.0':
     dependencies:
@@ -30997,7 +30997,7 @@ snapshots:
       chalk: 4.1.2
       execa: 5.1.1
       metro: 0.80.12(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      metro-config: 0.80.12(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      metro-config: 0.80.12(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       metro-core: 0.80.12
       node-fetch: 2.7.0(encoding@0.1.13)
       querystring: 0.2.1
@@ -42513,6 +42513,21 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  metro-config@0.80.12(bufferutil@4.0.8)(utf-8-validate@5.0.10):
+    dependencies:
+      connect: 3.7.0
+      cosmiconfig: 5.2.1
+      flow-enums-runtime: 0.0.6
+      jest-validate: 29.7.0
+      metro: 0.80.12(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      metro-cache: 0.80.12
+      metro-core: 0.80.12
+      metro-runtime: 0.80.12
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
   metro-config@0.80.12(bufferutil@4.0.8)(utf-8-validate@6.0.3):
     dependencies:
       connect: 3.7.0
@@ -42817,7 +42832,7 @@ snapshots:
       metro-babel-transformer: 0.80.12
       metro-cache: 0.80.12
       metro-cache-key: 0.80.12
-      metro-config: 0.80.12(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      metro-config: 0.80.12(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       metro-core: 0.80.12
       metro-file-map: 0.80.12
       metro-resolver: 0.80.12
