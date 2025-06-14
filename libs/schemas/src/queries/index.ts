@@ -3,6 +3,7 @@ export * from './community.schemas';
 export * from './contests.schemas';
 export * from './discord.schemas';
 export * from './eventStream.schemas';
+export * from './mcp-server.schemas';
 export * from './pagination';
 export * from './poll.schemas';
 export * from './quest.schemas';

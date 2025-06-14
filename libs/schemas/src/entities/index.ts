@@ -9,6 +9,7 @@ export * from './group-permission.schemas';
 export * from './group.schemas';
 export * from './launchpad-token.schemas';
 export * from './launchpad.schemas';
+export * from './mcp.schemas';
 export * from './notification.schemas';
 export * from './pinned-token.schemas';
 export * from './poll.schemas';

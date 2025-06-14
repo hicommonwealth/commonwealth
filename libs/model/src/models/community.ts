@@ -6,6 +6,7 @@ import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
 import type { CommunityAlertAttributes } from './community_alerts';
 import type { CommunityTagsAttributes } from './community_tags';
+import type { MCPServerCommunityAttributes } from './mcp_server_community';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
 import type { TopicInstance } from './topic';
@@ -25,6 +26,7 @@ export type CommunityAttributes = z.infer<typeof Community> & {
   profile_count?: number;
   count_updated?: boolean;
   communityAlerts?: CommunityAlertAttributes[];
+  MCPServerCommunities?: MCPServerCommunityAttributes[];
 };
 
 export type CommunityInstance = ModelInstance<CommunityAttributes> & {

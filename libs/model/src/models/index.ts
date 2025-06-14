@@ -64,6 +64,8 @@ export * from './evmEventSource';
 export * from './group';
 export * from './lastProcessedEvmBlock';
 export * from './launchpad_trade';
+export * from './mcp_server';
+export * from './mcp_server_community';
 export * from './membership';
 export * from './outbox';
 export * from './poll';

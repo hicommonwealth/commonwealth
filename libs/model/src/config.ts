@@ -80,8 +80,8 @@ const {
   DISABLE_TIER_RATE_LIMITS,
   TIER_SOCIAL_VERIFIED_MIN_ETH,
   MCP_DEMO_CLIENT_SERVER_URL,
-  MCP_DEMO_CLIENT_KEY,
   EVM_CHAINS_WHITELIST,
+  MCP_KEY_BYPASS,
   LOG_XP_LAUNCHPAD,
 } = process.env;
 
@@ -278,7 +278,7 @@ export const config = configure(
     },
     MCP: {
       MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
-      MCP_DEMO_CLIENT_KEY: MCP_DEMO_CLIENT_KEY,
+      MCP_KEY_BYPASS: MCP_KEY_BYPASS,
     },
     LOG_XP_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
   },
@@ -593,7 +593,7 @@ export const config = configure(
     }),
     MCP: z.object({
       MCP_DEMO_CLIENT_SERVER_URL: z.string().optional(),
-      MCP_DEMO_CLIENT_KEY: z.string().optional(),
+      MCP_KEY_BYPASS: z.string().optional(),
     }),
     LOG_XP_LAUNCHPAD: z.boolean().default(false),
   }),

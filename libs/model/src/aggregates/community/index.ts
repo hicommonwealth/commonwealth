@@ -34,6 +34,7 @@ export * from './RefreshCustomDomain.query';
 export * from './SearchCommunities.query';
 export * from './SelectCommunity.command';
 export * from './SetAddressWallet.command';
+export * from './SetCommunityMCPServers.command';
 export * from './SetCommunityStake.command';
 export * from './SetReachedGoal.command';
 export * from './ToggleArchiveTopic.command';
