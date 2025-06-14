@@ -39,14 +39,6 @@ async function checkBypass(req: Request) {
     config.MCP.MCP_KEY_BYPASS?.length &&
     `${address}:${apiKey}` === config.MCP.MCP_KEY_BYPASS;
 
-  console.log('shouldBypass', {
-    shouldBypass,
-    address,
-    apiKey,
-    config: config.MCP.MCP_KEY_BYPASS,
-    headers: req.headers,
-  });
-
   // If the bypass key doesn't match, we should use normal API key auth
   if (!shouldBypass) {
     return false;
@@ -70,7 +62,6 @@ async function checkBypass(req: Request) {
       },
     ],
   });
-  console.log('addr', addr?.get({ plain: true }));
   if (!addr?.User?.id) {
     throw new Error(`No verified user found for address: ${address}`);
   }
