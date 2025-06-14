@@ -20,6 +20,7 @@ If no specific server is mentioned, you can provide general assistance based on 
 
 Always use the appropriate MCP tools when available to provide accurate, up-to-date information about Commonwealth communities, threads, users, and other relevant data.`;
 
+// build reusable MCP client options
 export function buildMCPClientOptions(
   userInput: string,
   allServers: CommonMCPServerWithHeaders[],
