@@ -1,4 +1,4 @@
-import { z, ZodError, ZodSchema } from 'zod';
+import { z, ZodError, ZodType } from 'zod';
 import { InvalidInput, type Context, type Metadata } from './types';
 
 /**
@@ -12,9 +12,9 @@ import { InvalidInput, type Context, type Metadata } from './types';
  * @throws {@link InvalidInput} when user invokes query with invalid payload or attributes, or rethrows internal errors
  */
 export const query = async <
-  Input extends ZodSchema,
-  Output extends ZodSchema,
-  _Context extends ZodSchema,
+  Input extends ZodType,
+  Output extends ZodType,
+  _Context extends ZodType,
 >(
   { input, auth, body }: Metadata<Input, Output, _Context>,
   { actor, payload }: Context<Input, _Context>,

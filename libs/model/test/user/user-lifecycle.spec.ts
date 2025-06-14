@@ -190,6 +190,7 @@ describe('User lifecycle', () => {
         {
           id: 1,
           name: null,
+          event_id: 0,
           event_created_at: logs[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
@@ -201,6 +202,7 @@ describe('User lifecycle', () => {
         {
           id: 2,
           name: null,
+          event_id: 0,
           event_created_at: logs[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -212,6 +214,7 @@ describe('User lifecycle', () => {
         {
           id: 3,
           name: null,
+          event_id: 0,
           event_created_at: logs[2].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -223,6 +226,7 @@ describe('User lifecycle', () => {
         {
           id: 4,
           name: null,
+          event_id: 0,
           event_created_at: logs[3].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
@@ -475,6 +479,7 @@ describe('User lifecycle', () => {
       expect(last.map((l) => l.toJSON())).to.deep.equal([
         {
           id: 5,
+          event_id: 0,
           event_created_at: last[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
@@ -486,6 +491,7 @@ describe('User lifecycle', () => {
         },
         {
           id: 6,
+          event_id: 0,
           event_created_at: last[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -497,6 +503,7 @@ describe('User lifecycle', () => {
         },
         {
           id: 7,
+          event_id: 0,
           event_created_at: last[2].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
@@ -508,6 +515,7 @@ describe('User lifecycle', () => {
         },
         {
           id: 8,
+          event_id: 0,
           event_created_at: last[3].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 10,
@@ -519,6 +527,7 @@ describe('User lifecycle', () => {
         },
         {
           id: 9,
+          event_id: 0,
           event_created_at: last[4].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 16,

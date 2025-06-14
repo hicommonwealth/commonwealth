@@ -32,7 +32,11 @@ export function createRmqConfig({
   map: Array<Consumer>;
 }) {
   let vhost: string;
-  if (rabbitMqUri.includes('localhost') || rabbitMqUri.includes('127.0.0.1')) {
+  if (
+    rabbitMqUri.includes('localhost') ||
+    rabbitMqUri.includes('127.0.0.1') ||
+    rabbitMqUri.includes('railway')
+  ) {
     vhost = '/';
   } else {
     const count = (rabbitMqUri.match(/\//g) || []).length;

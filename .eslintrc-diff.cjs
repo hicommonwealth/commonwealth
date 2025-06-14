@@ -45,6 +45,7 @@ module.exports = {
       './libs/schemas/tsconfig.json',
       './libs/shared/tsconfig.json',
       './libs/sitemaps/tsconfig.json',
+      './libs/railway/tsconfig.json',
       './packages/tsconfig.json',
       './packages/commonwealth/tsconfig.json',
       './packages/load-testing/tsconfig.json',

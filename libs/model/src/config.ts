@@ -82,6 +82,7 @@ const {
   MCP_DEMO_CLIENT_SERVER_URL,
   EVM_CHAINS_WHITELIST,
   MCP_KEY_BYPASS,
+  LOG_XP_LAUNCHPAD,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -279,6 +280,7 @@ export const config = configure(
       MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
       MCP_KEY_BYPASS: MCP_KEY_BYPASS,
     },
+    LOG_XP_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
   },
   z.object({
     SENDGRID: z.object({
@@ -593,5 +595,6 @@ export const config = configure(
       MCP_DEMO_CLIENT_SERVER_URL: z.string().optional(),
       MCP_KEY_BYPASS: z.string().optional(),
     }),
+    LOG_XP_LAUNCHPAD: z.boolean().default(false),
   }),
 );

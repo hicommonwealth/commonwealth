@@ -1,6 +1,6 @@
 import { ChainBase, Roles, WalletId } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
-import { VerifiedContext } from '../context';
+import { AuthContext, VerifiedContext } from '../context';
 import { ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { USER_TIER, UserProfile } from '../entities/user.schemas';
@@ -147,8 +147,8 @@ export const GetUserAddresses = {
 };
 
 export const ReferralView = z.object({
-  referrer_address: EVM_ADDRESS,
-  referee_address: EVM_ADDRESS,
+  referrer_address: z.string().max(255),
+  referee_address: z.string().max(255),
   referee_user_id: PG_INT,
   referee_profile: UserProfile,
   // when referee creates a community
@@ -251,4 +251,23 @@ export const GetAddressStatus = {
     belongs_to_user: z.boolean(),
   }),
   context: VerifiedContext,
+};
+
+export const GetMutualConnections = {
+  input: z.object({
+    user_id_1: PG_INT,
+    user_id_2: PG_INT,
+    limit: z.number().int().min(1).max(100).optional().default(10),
+  }),
+  output: z.object({
+    mutual_communities: z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        base: z.nativeEnum(ChainBase),
+        icon_url: z.string().nullish(),
+      }),
+    ),
+  }),
+  context: AuthContext,
 };
