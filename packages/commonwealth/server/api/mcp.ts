@@ -36,7 +36,8 @@ async function checkBypass(req: Request) {
   const apiKey = req.headers['x-api-key'] as string;
 
   const shouldBypass =
-    config.MCP.MCP_KEY_BYPASS?.length && apiKey === config.MCP.MCP_KEY_BYPASS;
+    config.MCP.MCP_KEY_BYPASS?.length &&
+    `${address}:${apiKey}` === config.MCP.MCP_KEY_BYPASS;
 
   console.log('shouldBypass', {
     shouldBypass,
@@ -58,7 +59,6 @@ async function checkBypass(req: Request) {
 
   // Look up the address and set the user
   const addr = await models.Address.findOne({
-    attributes: ['user_id'],
     where: {
       address: address,
       verified: { [Op.ne]: null },
@@ -67,16 +67,10 @@ async function checkBypass(req: Request) {
       {
         model: models.User,
         required: true,
-        include: [
-          {
-            model: models.ApiKey,
-            required: true,
-          },
-        ],
       },
     ],
   });
-
+  console.log('addr', addr?.get({ plain: true }));
   if (!addr?.User?.id) {
     throw new Error(`No verified user found for address: ${address}`);
   }
