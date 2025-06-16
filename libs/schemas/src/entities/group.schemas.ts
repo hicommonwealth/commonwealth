@@ -110,12 +110,14 @@ export const MembershipRejectReason = z
   .object({
     message: z.string(),
     requirement: z.object({
-      data: z.any(),
+      data: z.any().optional(),
       rule: z.string(),
     }),
   })
   .array()
   .optional();
+
+export type MembershipRejectReason = z.infer<typeof MembershipRejectReason>;
 
 export const Membership = z.object({
   group_id: z.number(),

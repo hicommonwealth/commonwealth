@@ -29,7 +29,7 @@ import {
   Role,
 } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
-import { ZodSchema, z } from 'zod';
+import { ZodType, z } from 'zod';
 import { models } from '../database';
 import { AddressInstance } from '../models';
 import { BannedActor, NonMember, RejectedMember } from './errors';
@@ -332,7 +332,17 @@ GROUP BY
  * Generic authorization guard used by all middleware once the authorization context is loaded
  */
 async function mustBeAuthorized(
-  { actor, context }: Context<ZodSchema, ZodSchema>,
+  {
+    actor,
+    context,
+  }:
+    | Context<typeof AuthContextInput, typeof AuthContext>
+    | Context<typeof ThreadContextInput, typeof ThreadContext>
+    | Context<typeof CommentContextInput, typeof CommentContext>
+    | Context<typeof TopicContextInput, typeof TopicContext>
+    | Context<typeof ReactionContextInput, typeof ReactionContext>
+    | Context<typeof PollContextInput, typeof PollContext>
+    | Context<typeof VerifiedContextInput, typeof VerifiedContext>,
   check: {
     permissions?: {
       topic_id: number;
@@ -347,17 +357,17 @@ async function mustBeAuthorized(
   if (actor.is_system_actor) return;
 
   // Admins (and super admins) are always allowed to act on any entity
-  if (actor.user.isAdmin || context.address.role === 'admin') return;
+  if (actor.user.isAdmin || context!.address.role === 'admin') return;
 
   // Banned actors are always rejected (if not admin or system actors)
-  if (context.address.is_banned) throw new BannedActor(actor);
+  if (context!.address.is_banned) throw new BannedActor(actor);
 
   // Author is always allowed to act on their own entity, unless banned
-  if (context.is_author) return;
+  if ('is_author' in context! && context!.is_author) return;
 
   if (
     check.roles?.includes('moderator') &&
-    context.address.role === 'moderator'
+    context?.address.role === 'moderator'
   )
     return;
 
@@ -365,18 +375,18 @@ async function mustBeAuthorized(
   if (check.permissions)
     return await checkGatedActions(
       actor,
-      context.address!.id!,
+      context!.address!.id!,
       check.permissions.action,
       check.permissions.topic_id,
     );
 
   // Allows when actor is a collaborator in the thread
-  if (check.collaborators) {
+  if ('is_collaborator' in context! && check.collaborators) {
     const found = check.collaborators?.find(
       ({ address }) => address === actor.address,
     );
-    context.is_collaborator = !!found;
-    if (context.is_collaborator) return;
+    context!.is_collaborator = !!found;
+    if (context!.is_collaborator) return;
     throw new InvalidActor(actor, 'Not authorized collaborator');
   }
 
@@ -413,7 +423,7 @@ export const systemActor = ({
   is_system_actor: true,
 });
 
-export async function isSuperAdmin(ctx: Context<ZodSchema, ZodSchema>) {
+export async function isSuperAdmin(ctx: Context<ZodType, ZodType>) {
   if (!ctx.actor.user.isAdmin)
     await Promise.reject(new InvalidActor(ctx.actor, 'Must be a super admin'));
 }
