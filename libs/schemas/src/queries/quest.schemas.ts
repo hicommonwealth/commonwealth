@@ -1,14 +1,37 @@
 import { z } from 'zod';
 import { AuthContext } from '../context';
-import { Quest } from '../entities';
+import {
+  ChainEventXpSource,
+  CommunityGoalMeta,
+  Quest,
+  QuestActionMeta,
+  QuestTweet,
+} from '../entities';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
+
+export const QuestActionView = QuestActionMeta.extend({
+  QuestTweet: QuestTweet.extend({
+    created_at: z.coerce.date().or(z.string()).optional(),
+    updated_at: z.coerce.date().or(z.string()).optional(),
+  }).nullish(),
+  ChainEventXpSource: ChainEventXpSource.extend({
+    created_at: z.coerce.date().or(z.string()).optional(),
+    updated_at: z.coerce.date().or(z.string()).optional(),
+  }).nullish(),
+  CommunityGoalMeta: CommunityGoalMeta.extend({
+    created_at: z.coerce.date().or(z.string()).optional(),
+  }).nullish(),
+  created_at: z.coerce.date().or(z.string()).optional(),
+  updated_at: z.coerce.date().or(z.string()).optional(),
+});
 
 export const QuestView = Quest.omit({ scheduled_job_id: true }).extend({
   id: z.number(),
   start_date: z.coerce.date().or(z.string()),
   end_date: z.coerce.date().or(z.string()),
-  created_at: z.coerce.date().or(z.string()),
+  created_at: z.coerce.date().or(z.string()).optional(),
   updated_at: z.coerce.date().or(z.string()).optional(),
+  action_metas: z.array(QuestActionView).optional(),
 });
 
 export const GetQuest = {

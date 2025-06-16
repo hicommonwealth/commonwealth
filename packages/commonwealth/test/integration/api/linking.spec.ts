@@ -6,7 +6,7 @@ import type {
   Signature,
 } from '@canvas-js/interfaces';
 import { dispose, query } from '@hicommonwealth/core';
-import { Thread, ThreadAttributes } from '@hicommonwealth/model';
+import { Thread, ThreadAttributes, models } from '@hicommonwealth/model';
 import { LinkSource } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -57,11 +57,8 @@ describe('Linking Tests', () => {
   beforeAll(async () => {
     server = await testServer();
 
-    const topic = await server.models.Topic.findOne({
-      where: {
-        community_id: chain,
-        group_ids: [],
-      },
+    const topic = await models.Topic.findOne({
+      where: { community_id: chain },
     });
     // @ts-expect-error StrictNullChecks
     topicId = topic.id;

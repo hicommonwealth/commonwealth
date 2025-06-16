@@ -23,7 +23,6 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
             },
             { model: models.CommunityStake },
           ],
-          attributes: ['chain_node_id', 'namespace', 'namespace_address'],
         })
       )?.toJSON();
       mustExist('Community', community);

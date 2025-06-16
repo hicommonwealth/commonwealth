@@ -13,16 +13,38 @@
     align-items: center;
     gap: 8px;
 
-    .avatar-placeholder {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 1px solid $black;
+    .token-details-avatar {
+      .avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid $black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: $primary-100;
+        font-size: 24px;
+      }
+    }
+
+    .token-details-info {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: $primary-100;
-      font-size: 24px;
+      flex-direction: column;
+      gap: 2px;
+
+      .token-details-row {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+      }
+
+      .token-address {
+        color: $neutral-500;
+      }
+
+      .chain-info {
+        color: $neutral-500;
+      }
     }
 
     .Text.ticker {

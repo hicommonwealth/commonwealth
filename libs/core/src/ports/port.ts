@@ -219,6 +219,9 @@ export const stats = port(function statsFactory(statsAdapter?: Stats) {
       histogram: (key, value, tags) => {
         log.trace('stats.histogram', { key, value, tags });
       },
+      distribution: (key, value, sampleRate, tags) => {
+        log.trace('stats.distribution', { key, value, sampleRate, tags });
+      },
       set: () => {},
       increment: (key, tags) => {
         log.trace('stats.increment', { key, tags });
@@ -355,6 +358,7 @@ export const notificationsProvider = port(function notificationsProviderFactory(
         Promise.resolve({ id: options.user_id }),
       registerClientRegistrationToken: () => Promise.resolve(false),
       unregisterClientRegistrationToken: () => Promise.resolve(false),
+      signUserToken: () => Promise.resolve(undefined),
     }
   );
 });

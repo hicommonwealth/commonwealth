@@ -6,13 +6,16 @@ import {
 } from 'helpers/quest';
 import React from 'react';
 import { fetchCachedNodes } from 'state/api/nodes';
+import { useGetGoalMetasQuery } from 'state/api/superAdmin';
 import useUserStore from 'state/ui/user';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWCircleRingSpinner from 'views/components/component_kit/new_designs/CWCircleRingSpinner';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { buildRedirectURLFromContentId } from '../../CreateQuest/QuestForm/helpers';
 import { actionCopies } from './helpers';
 import './QuestActionCard.scss';
 import QuestActionXpShares from './QuestActionXPShares';
@@ -46,6 +49,15 @@ const QuestActionCard = ({
   questEndDate,
 }: QuestActionCardProps) => {
   const user = useUserStore();
+
+  const { data: goalMetas } = useGetGoalMetasQuery({
+    apiEnabled: questAction.event_name === 'CommunityGoalReached',
+  });
+  const foundGoalsMetaMeta = goalMetas?.find(
+    (m) =>
+      m.id ===
+      parseInt((questAction?.content_id || '')?.split(':').at(-1) || ''),
+  );
 
   // Function to determine the button label based on quest action type
   const getButtonLabel = () => {
@@ -115,6 +127,8 @@ const QuestActionCard = ({
               'CommunityCreated',
               'LaunchpadTokenTraded',
               'XpChainEventCreated',
+              'CommunityGoalReached',
+              'SSOLinked',
             ].includes(questAction.event_name) && (
               <>
                 {questAction.event_name === 'CommunityCreated' &&
@@ -163,6 +177,25 @@ const QuestActionCard = ({
                       questAction?.ChainEventXpSource?.contract_address || '',
                       questAction?.ChainEventXpSource?.ChainNode
                         ?.eth_chain_id || '',
+                    )}
+                  </CWText>
+                )}
+                {questAction.event_name === 'CommunityGoalReached' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      foundGoalsMetaMeta?.type || (
+                        <CWCircleRingSpinner size="small" />
+                      ),
+                      foundGoalsMetaMeta?.target || <></>,
+                    )}
+                  </CWText>
+                )}
+                {questAction.event_name === 'SSOLinked' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      buildRedirectURLFromContentId(
+                        questAction.content_id || '',
+                      ),
                     )}
                   </CWText>
                 )}

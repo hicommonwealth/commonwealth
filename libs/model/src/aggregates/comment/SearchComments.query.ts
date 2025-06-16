@@ -2,107 +2,79 @@ import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
+import { z } from 'zod';
 import { models } from '../../database';
+import { authOptional } from '../../middleware';
+import { filterGates, joinGates, withGates } from '../../utils/gating';
 
 export function SearchComments(): Query<typeof schemas.SearchComments> {
   return {
     ...schemas.SearchComments,
-    auth: [],
-    body: async ({ payload }) => {
+    auth: [authOptional],
+    secure: true,
+    body: async ({ payload, context }) => {
       const { community_id, search, limit, cursor, order_by, order_direction } =
         payload;
-      // sort by rank by default
-      let sortOptions: schemas.PaginationSqlOptions = {
-        limit: Math.min(limit, 100) || 10,
-        page: cursor || 1,
-        orderDirection: order_direction,
+      const address_id = context?.address?.id;
+
+      const replacements = {
+        address_id,
+        community_id:
+          community_id && community_id !== ALL_COMMUNITIES
+            ? community_id
+            : undefined,
+        search,
+        limit,
+        offset: limit * (cursor - 1),
       };
-      switch (order_by) {
-        case 'created_at':
-          sortOptions = {
-            ...sortOptions,
-            orderBy: `"Comments".${order_by}`,
-          };
-          break;
-        default:
-          sortOptions = {
-            ...sortOptions,
-            orderBy: `rank`,
-            orderBySecondary: `"Comments".created_at`,
-            orderDirectionSecondary: 'DESC',
-          };
-      }
 
-      const { sql: paginationSort, bind: paginationBind } =
-        schemas.buildPaginationSql(sortOptions);
-
-      const bind: {
-        searchTerm?: string;
-        community?: string;
-        limit?: number;
-      } = {
-        searchTerm: search,
-        ...paginationBind,
-      };
-      if (community_id && community_id !== ALL_COMMUNITIES) {
-        bind.community = community_id;
-      }
-
-      const communityWhere = bind.community
-        ? '"Threads".community_id = $community AND'
-        : '';
-
-      const sqlBaseQuery = `
-    SELECT
-      "Comments".id,
-      "Threads".title,
-      "Comments".body,
-      "Comments".thread_id,
-      'comment' as type,
-      "Addresses".id as address_id,
-      "Addresses".address,
-      "Addresses".community_id as address_community_id,
-      "Comments".created_at,
-      "Threads".community_id as community_id,
-      ts_rank_cd("Comments".search, query) as rank
-    FROM "Comments"
-      JOIN "Threads" ON "Comments".thread_id = "Threads".id
-      JOIN "Addresses" ON "Comments".address_id = "Addresses".id,
-      websearch_to_tsquery('english', $searchTerm) as query
-    WHERE
-      ${communityWhere}
-      "Comments".deleted_at IS NULL AND
-      "Comments".marked_as_spam_at IS NULL AND
-      query @@ "Comments".search
-    ${paginationSort}
+      const sql = `
+${withGates(address_id)}
+SELECT
+  'comment' as type,
+  C.id,
+  C.created_at,
+  C.body,
+  C.thread_id,
+  A.id as address_id,
+  A.address,
+  A.community_id as address_community_id,
+  T.title,
+  T.community_id,
+  COUNT(*) OVER()::INTEGER AS total_count,
+  ts_rank_cd(C.search, tsquery) as rank
+FROM
+  "Comments" C
+  JOIN "Addresses" A ON C.address_id = A.id
+  JOIN "Threads" T ON C.thread_id = T.id
+  ${joinGates(address_id)}
+  , websearch_to_tsquery('english', :search) as tsquery
+WHERE
+  C.deleted_at IS NULL
+  AND C.marked_as_spam_at IS NULL
+  ${replacements.community_id ? 'AND T.community_id = :community_id' : ''}
+  ${filterGates(address_id)}
+  AND tsquery @@ C.search
+ORDER BY
+  ${order_by === 'created_at' ? `C.created_at ${order_direction || 'DESC'}` : `rank, C.created_at DESC`}
+LIMIT :limit OFFSET :offset
   `;
 
-      const sqlCountQuery = `
-    SELECT
-      COUNT (*) as count
-    FROM "Comments"
-      JOIN "Threads" ON "Comments".thread_id = "Threads".id
-      JOIN "Addresses" ON "Comments".address_id = "Addresses".id,
-      websearch_to_tsquery('english', $searchTerm) as query
-    WHERE
-      ${communityWhere}
-      "Comments".deleted_at IS NULL AND
-      "Comments".marked_as_spam_at IS NULL AND
-      query @@ "Comments".search
-  `;
+      const comments = await models.sequelize.query<
+        z.infer<typeof schemas.CommentSearchView> & { total_count: number }
+      >(sql, {
+        type: QueryTypes.SELECT,
+        replacements,
+      });
 
-      const [results, [{ count }]]: [any[], any[]] = await Promise.all([
-        models.sequelize.query(sqlBaseQuery, {
-          bind,
-          type: QueryTypes.SELECT,
-        }),
-        models.sequelize.query(sqlCountQuery, {
-          bind,
-          type: QueryTypes.SELECT,
-        }),
-      ]);
-
-      return schemas.buildPaginatedResponse(results, parseInt(count, 10), bind);
+      return schemas.buildPaginatedResponse(
+        comments,
+        comments?.at(0)?.total_count || 0,
+        {
+          cursor,
+          limit,
+        },
+      );
     },
   };
 }

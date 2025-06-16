@@ -63,6 +63,10 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_PARTNERSHIP_WALLET': JSON.stringify(
       env.FLAG_PARTNERSHIP_WALLET,
     ),
+    'process.env.FLAG_NEW_PROFILE_PAGE': JSON.stringify(
+      env.FLAG_NEW_PROFILE_PAGE,
+    ),
+    'process.env.FLAG_PRIVATE_TOPICS': JSON.stringify(env.FLAG_PRIVATE_TOPICS),
   };
 
   const config = {
@@ -121,6 +125,10 @@ export default defineConfig(({ mode }) => {
       JSON.stringify('416700000'),
     'process.env.ENABLED_TRPC_BATCHING':
       JSON.stringify(env.ENABLED_TRPC_BATCHING) || JSON.stringify('true'),
+    'process.env.TEST_EVM_PROVIDER_URL': JSON.stringify(
+      env.PROVIDER_URL || 'http://127.0.0.1:8545',
+    ),
+    'process.env.TEST_EVM_ETH_RPC': JSON.stringify(env.ETH_RPC || 'prod'),
   };
 
   return {
@@ -194,6 +202,11 @@ export default defineConfig(({ mode }) => {
       host: 'localhost',
       proxy: {
         '/api': {
+          target: env.BACKEND_PROXY_URL || 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
+        },
+        '/mcp': {
           target: env.BACKEND_PROXY_URL || 'http://localhost:3000',
           changeOrigin: true,
           secure: false,

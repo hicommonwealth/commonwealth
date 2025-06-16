@@ -12,20 +12,22 @@ import { RefreshCommunityMemberships } from './RefreshCommunityMemberships.comma
  * Builds a map of topic permissions indexed by group id
  */
 export function buildTopicPermissionsMap(groups: GroupAttributes[]) {
-  const permissions = groups.map((g) => g.GroupPermissions || []).flat();
+  const permissions = groups.map((g) => g.GroupGatedActions || []).flat();
   const map = new Map<number, z.infer<typeof schemas.TopicPermissionsView>[]>();
   permissions.forEach((p) => {
     const entry = map.get(p.group_id);
     if (entry)
       entry.push({
         id: p.topic_id,
-        permissions: p.allowed_actions,
+        is_private: p.is_private,
+        permissions: p.gated_actions,
       });
     else
       map.set(p.group_id, [
         {
           id: p.topic_id,
-          permissions: p.allowed_actions,
+          is_private: p.is_private,
+          permissions: p.gated_actions,
         },
       ]);
   });
@@ -51,8 +53,13 @@ export function GetMemberships(): Query<typeof schemas.GetMemberships> {
           attributes: ['id'],
           include: [
             {
-              model: models.GroupPermission,
-              attributes: ['group_id', 'topic_id', 'allowed_actions'],
+              model: models.GroupGatedAction,
+              attributes: [
+                'group_id',
+                'topic_id',
+                'is_private',
+                'gated_actions',
+              ],
               where: topic_id ? { topic_id } : undefined,
             },
           ],

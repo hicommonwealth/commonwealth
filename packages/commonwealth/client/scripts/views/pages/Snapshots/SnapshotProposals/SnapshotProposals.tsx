@@ -14,6 +14,8 @@ import { SnapshotProposalCard } from './SnapshotProposalCard';
 
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { useGetSnapshotProposalsQuery } from 'state/api/snapshots';
+import { PageNotFound } from '../../404';
+import { isValidSnapshotName } from '../../CommunityManagement/Integrations/Snapshots/validation';
 import './SnapshotProposals.scss';
 
 type SnapshotProposalsProps = {
@@ -22,6 +24,7 @@ type SnapshotProposalsProps = {
 };
 
 const SnapshotProposals = ({ snapshotId }: SnapshotProposalsProps) => {
+  const isValidSnapshot = isValidSnapshotName(snapshotId);
   const [activeTab, setActiveTab] = useState<number>(1);
 
   const { data: snapshotProposals, isLoading: isSnapshotProposalsLoading } =
@@ -45,6 +48,10 @@ const SnapshotProposals = ({ snapshotId }: SnapshotProposalsProps) => {
     activeTab === 1 ? getActiveProposals() : getEndedProposals();
 
   useManageDocumentTitle('Snapshots');
+
+  if (!isValidSnapshot) {
+    return <PageNotFound />;
+  }
 
   return (
     <CWPageLayout>

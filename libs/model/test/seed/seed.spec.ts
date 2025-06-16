@@ -125,7 +125,6 @@ describe('Seed functions', () => {
             verification_token_expires: undefined,
             verified: new Date(),
             role: 'admin',
-            is_user_default: false,
           },
         ],
       });
@@ -152,7 +151,6 @@ describe('Seed functions', () => {
             verification_token_expires: undefined,
             verified: new Date(),
             role: 'admin',
-            is_user_default: false,
           },
         ],
         groups: [

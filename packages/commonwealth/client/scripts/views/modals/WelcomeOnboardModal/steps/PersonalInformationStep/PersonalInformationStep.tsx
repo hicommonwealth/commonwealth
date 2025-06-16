@@ -37,7 +37,7 @@ const PersonalInformationStep = ({
   onComplete,
 }: PersonalInformationStepProps) => {
   const formMethodsRef = useRef<CWFormRef>();
-  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+  const { mutateAsync: updateUser, isPending: isUpdatingProfile } =
     useUpdateUserMutation();
   const [isEmailChangeDisabled, setIsEmailChangeDisabled] = useState(false);
   const [isUserNameChangeDisabled, setIsUserNameChangeDisabled] =
@@ -155,7 +155,7 @@ const PersonalInformationStep = ({
     }
     // enable/disable promotional emails flag for user
     await updateEmailSettings({
-      promotionalEmailsEnabled: values.enableProductUpdates,
+      enable_promotional_emails: values.enableProductUpdates,
     });
 
     // refetch profile data

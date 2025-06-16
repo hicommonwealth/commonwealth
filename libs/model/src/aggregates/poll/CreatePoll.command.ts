@@ -17,11 +17,9 @@ export function CreatePoll(): Command<typeof schemas.CreatePoll> {
         actor,
         context,
       );
-      const { prompt, options, custom_duration } = payload;
+      const { prompt, options, duration } = payload;
 
-      const ends_at = custom_duration
-        ? dayjs().add(custom_duration, 'days').toDate()
-        : null;
+      const ends_at = duration ? dayjs().add(duration, 'days').toDate() : null;
 
       const community = await models.Community.findByPk(community_id);
       mustExist('Community', community);
@@ -38,7 +36,7 @@ export function CreatePoll(): Command<typeof schemas.CreatePoll> {
             community_id,
             thread_id: thread.id!,
             prompt,
-            options: JSON.stringify(options),
+            options,
             ends_at,
           },
           { transaction },

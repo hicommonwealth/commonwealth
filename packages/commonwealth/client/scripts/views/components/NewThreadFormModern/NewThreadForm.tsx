@@ -1,7 +1,11 @@
-import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import {
+  canUserPerformGatedAction,
+  GatedActionEnum,
+} from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { weightedVotingValueToLabel } from 'helpers';
-import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
+import { detectURL } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import React, { useEffect, useRef, useState } from 'react';
@@ -31,7 +35,6 @@ import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProp
 import { useSnapshotProposal } from '../../pages/NewProposalViewPage/useSnapshotProposal';
 import { LinkedProposalsCard } from '../../pages/view_thread/linked_proposals_card';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
-import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
 import ContestThreadBanner from './ContestThreadBanner';
 
@@ -41,12 +44,11 @@ import {
 } from 'client/scripts/helpers/snapshot_utils';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
-import Poll from 'client/scripts/models/Poll';
+import { ExtendedPoll, LocalPoll } from 'utils/polls';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { SnapshotPollCardContainer } from '../../pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard';
 import { ThreadPollCard } from '../../pages/view_thread/ThreadPollCard';
 import { ThreadPollEditorCard } from '../../pages/view_thread/ThreadPollEditorCard';
-import { ExtendedPoll } from '../NewThreadFormLegacy/NewThreadForm';
 import DetailCard from '../proposals/DetailCard';
 import TimeLineCard from '../proposals/TimeLineCard';
 import VotingResultView from '../proposals/VotingResultView';
@@ -73,7 +75,7 @@ export const NewThreadForm = () => {
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
 
-  const [pollsData, setPollData] = useState<ExtendedPoll[]>();
+  const [pollsData, setPollData] = useState<LocalPoll[]>();
 
   const markdownEditorMethodsRef = useRef<MarkdownEditorMethods | null>(null);
 
@@ -135,7 +137,7 @@ export const NewThreadForm = () => {
     includeTopics: true,
     enabled: !!communityId,
   });
-  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
+  const { actionGroups, bypassGating, memberships } = useTopicGating({
     communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
@@ -164,17 +166,17 @@ export const NewThreadForm = () => {
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
-  const gatedGroupNames = groups
-    .filter((group) =>
-      group.topics.find((topic) => topic.id === threadTopic?.id),
-    )
-    .map((group) => group.name);
-
   // eslint-disable-next-line @typescript-eslint/require-await
   const handleNewThreadCreation = async () => {
     const body = markdownEditorMethodsRef.current!.getMarkdown();
 
-    if (isRestrictedMembership) {
+    if (
+      canUserPerformGatedAction(
+        actionGroups,
+        GatedActionEnum.CREATE_THREAD,
+        bypassGating,
+      )
+    ) {
       notifyError('Topic is gated!');
       return;
     }
@@ -232,16 +234,10 @@ export const NewThreadForm = () => {
   };
 
   const showBanner = !user.activeAccount && isBannerVisible;
-  const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!user.activeAccount,
-    isThreadTopicGated: isRestrictedMembership,
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_THREAD,
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
+
+  const permissions = Permissions.getCreateThreadPermission({
+    actionGroups,
+    bypassGating,
   });
 
   const contestThreadBannerVisible =
@@ -366,16 +362,13 @@ export const NewThreadForm = () => {
             label: 'Polls',
             item: (
               <div className="cards-column">
-                {[
-                  ...new Map(
-                    pollsData?.map((poll) => [poll?.id, poll]),
-                  ).values(),
-                ].map((poll: Poll) => {
+                {(pollsData || []).map((poll) => {
                   return (
                     <ThreadPollCard
-                      poll={poll}
-                      key={poll.id}
-                      isTopicMembershipRestricted={isRestrictedMembership}
+                      poll={poll as unknown as ExtendedPoll}
+                      key={(poll as unknown as ExtendedPoll).id}
+                      actionGroups={actionGroups}
+                      bypassGating={bypassGating}
                       showDeleteButton={true}
                       isCreateThreadPage={true}
                       setLocalPoll={setPollData}
@@ -553,16 +546,8 @@ export const NewThreadForm = () => {
                     (markdownEditorMethodsRef.current = methods)
                   }
                   onChange={(markdown) => setEditorText(markdown)}
-                  disabled={
-                    isRestrictedMembership ||
-                    !!disabledActionsTooltipText ||
-                    !user.activeAccount
-                  }
-                  tooltip={
-                    typeof disabledActionsTooltipText === 'function'
-                      ? disabledActionsTooltipText?.('submit')
-                      : disabledActionsTooltipText
-                  }
+                  disabled={!permissions.allowed}
+                  tooltip={permissions.tooltip}
                   placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
                   SubmitButton={() => (
                     <MarkdownSubmitButton
@@ -570,7 +555,11 @@ export const NewThreadForm = () => {
                       disabled={
                         isDisabled ||
                         !user.activeAccount ||
-                        !!disabledActionsTooltipText ||
+                        !canUserPerformGatedAction(
+                          actionGroups,
+                          GatedActionEnum.CREATE_THREAD,
+                          bypassGating,
+                        ) ||
                         walletBalanceError ||
                         contestTopicError
                       }
@@ -598,28 +587,16 @@ export const NewThreadForm = () => {
                   />
                 )}
 
-                {isRestrictedMembership && canShowGatingBanner && (
+                {canShowGatingBanner && (
                   <div>
                     <CWGatedTopicBanner
-                      groupNames={gatedGroupNames}
+                      actions={[GatedActionEnum.CREATE_THREAD]}
+                      actionGroups={actionGroups}
+                      bypassGating={bypassGating}
                       onClose={() => setCanShowGatingBanner(false)}
                     />
                   </div>
                 )}
-
-                {canShowTopicPermissionBanner &&
-                  foundTopicPermissions &&
-                  !isAdmin &&
-                  !foundTopicPermissions?.permissions?.includes(
-                    PermissionEnum.CREATE_THREAD,
-                  ) && (
-                    <CWGatedTopicPermissionLevelBanner
-                      topicPermissions={
-                        foundTopicPermissions?.permissions as PermissionEnum[]
-                      }
-                      onClose={() => setCanShowTopicPermissionBanner(false)}
-                    />
-                  )}
               </div>
             </div>
             <>

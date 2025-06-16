@@ -47,7 +47,6 @@ describe.skip('Check Contests', () => {
           id: topicId,
           name: 'hello',
           community_id: communityId,
-          group_ids: [],
         },
       ],
       contest_managers: [
@@ -159,6 +158,7 @@ describe.skip('Check Contests', () => {
     );
 
     await handleEvent(ContestWorker(), {
+      id: 0,
       name: 'ContestRolloverTimerTicked',
       payload: {},
     });
@@ -180,6 +180,7 @@ describe.skip('Check Contests', () => {
     );
 
     await handleEvent(ContestWorker(), {
+      id: 0,
       name: 'ContestRolloverTimerTicked',
       payload: {},
     });

@@ -12,7 +12,7 @@ import {
   decodeLog,
   getEvmAddress,
 } from '@hicommonwealth/evm-protocols';
-import { Events } from '@hicommonwealth/schemas';
+import { OutboxEvents } from '@hicommonwealth/schemas';
 import { EvmEvent, EvmMapper } from './types';
 
 const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
@@ -345,7 +345,7 @@ const judgeNominatedMapper: EvmMapper<'JudgeNominated'> = (event: EvmEvent) => {
 };
 
 // TODO: type should match EventRegistry event signatures
-export const chainEventMappers: Record<string, EvmMapper<Events>> = {
+export const chainEventMappers: Record<string, EvmMapper<OutboxEvents>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]:
     namespaceDeployedMapper,
 

@@ -1,21 +1,16 @@
 import { Command } from '@hicommonwealth/core';
-import { events } from '@hicommonwealth/schemas';
+import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { chainNodeMustExist } from '../../policies/utils/utils';
-import { handleCapReached } from './utils'; // TODO: place in utils
+import { handleCapReached } from './utils';
 
-const schema = {
-  input: events.LaunchpadTokenTraded,
-  output: z.object({
-    community_id: z.string().optional(),
-  }),
-};
-
-export function ProjectLaunchpadTrade(): Command<typeof schema> {
+export function ProjectLaunchpadTrade(): Command<
+  typeof schemas.ProjectLaunchpadTrade
+> {
   return {
-    ...schema,
+    ...schemas.ProjectLaunchpadTrade,
     auth: [],
     body: async ({ payload }) => {
       const {
@@ -30,7 +25,8 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
         floating_supply,
       } = payload;
 
-      const output: z.infer<(typeof schema)['output']> = {};
+      const output: z.infer<(typeof schemas.ProjectLaunchpadTrade)['output']> =
+        {};
 
       const token_address = token_address_unformatted.toLowerCase();
       const chainNode = await chainNodeMustExist(eth_chain_id);
@@ -86,9 +82,9 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
                   address: trader_address,
                   user_id: address.user_id,
                   role: 'member',
-                  is_user_default: false,
                   ghost_address: false,
                   is_banned: false,
+                  verification_token: address.verification_token,
                 },
                 transaction,
               });

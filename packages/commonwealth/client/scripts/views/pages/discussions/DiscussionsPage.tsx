@@ -8,9 +8,7 @@ import React, {
   useState,
 } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import useFetchThreadsQuery, {
-  useDateCursor,
-} from 'state/api/threads/fetchThreads';
+import useGetThreadsQuery from 'state/api/threads/getThreads';
 import {
   ThreadFeaturedFilterTypes,
   ThreadTimelineFilterTypes,
@@ -22,14 +20,19 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import {
+  canUserPerformGatedAction,
   ContentType,
-  ZERO_ADDRESS,
   formatDecimalToWei,
+  GatedActionEnum,
   generateTopicIdentifiersFromUrl,
   generateUrlPartForTopicIdentifiers,
   sanitizeTopicName,
+  ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
+import Thread from 'client/scripts/models/Thread';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
+import { useFetchNodesQuery } from 'client/scripts/state/api/nodes';
+import { useDateCursor } from 'client/scripts/state/api/threads/dateCursor';
 import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError } from 'controllers/app/notifications';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
@@ -50,6 +53,7 @@ import { StickCommentProvider } from 'views/components/StickEditorContainer/cont
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import TokenBanner from 'views/components/TokenBanner';
+import { CWGatedTopicBanner } from 'views/components/component_kit/CWGatedTopicBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   createDeltaFromText,
@@ -69,12 +73,6 @@ import './DiscussionsPage.scss';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 import { RenderThreadCard } from './RenderThreadCard';
 
-export type DiscussionsPageProps = {
-  tabs?: { value: string; label: string };
-  selectedView?: string;
-  topicName?: string;
-  updateSelectedView?: (tabValue: string) => void;
-};
 export type ListContainerProps = React.HTMLProps<HTMLDivElement> & {
   children: React.ReactNode;
   style?: React.CSSProperties;
@@ -93,6 +91,7 @@ const DiscussionsPage = () => {
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
+  const [canShowGatingBanner, setCanShowGatingBanner] = useState(true);
   const [includeArchivedThreads, setIncludeArchivedThreads] =
     useState<boolean>(false);
   const [searchParams] = useSearchParams();
@@ -131,14 +130,20 @@ const DiscussionsPage = () => {
     ({ name }) =>
       sanitizeTopicName(name) === topicIdentifiersFromURL?.topicName,
   );
+
+  const { data: chainNodes } = useFetchNodesQuery();
   const topicId = topicObj?.id;
+  const chainNode = chainNodes?.find(
+    (node) => node.ethChainId === topicObj?.eth_chain_id,
+  );
 
   const user = useUserStore();
 
-  const { memberships, topicPermissions } = useTopicGating({
+  const { actionGroups, bypassGating } = useTopicGating({
     communityId: communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
+    topicId,
   });
 
   const { data: domain } = useFetchCustomDomainQuery();
@@ -173,46 +178,57 @@ const DiscussionsPage = () => {
       topicObj?.eth_chain_id || app?.chain.meta?.ChainNode?.eth_chain_id || 0,
   });
 
-  const { fetchNextPage, data, isInitialLoading, hasNextPage, threadCount } =
-    useFetchThreadsQuery({
-      communityId: communityId,
-      queryType: 'bulk',
-      page: 1,
-      limit: 20,
-      topicId,
-      stage: stageName ?? undefined,
-      includePinnedThreads: true,
-      ...(featuredFilter && {
-        orderBy: featuredFilter,
-      }),
-      ...(dateCursor.fromDate && {
-        toDate: dateCursor.toDate,
-        fromDate: dateCursor.fromDate,
-      }),
-      includeArchivedThreads: isOnArchivePage || includeArchivedThreads,
-      // @ts-expect-error <StrictNullChecks/>
-      contestAddress,
-      // @ts-expect-error <StrictNullChecks/>
-      contestStatus,
-      apiEnabled:
-        !!communityId &&
-        (selectedView === 'all' || selectedView === 'cardview'),
-    });
-
-  const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
-
-  // Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
-  // Checks both for mobile device and inner window size for desktop responsiveness
-  const filteredThreads = threads.filter((t) => {
-    if (!includeSpamThreads && t.markedAsSpamAt) return null;
-
-    if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt)
-      return null;
-
-    if (isOnArchivePage && !t.archivedAt) return null;
-
-    return t;
+  const {
+    data,
+    hasNextPage,
+    fetchNextPage,
+    isLoading: isInitialLoading,
+  } = useGetThreadsQuery({
+    community_id: communityId,
+    cursor: 1,
+    limit: 20,
+    topic_id: topicId,
+    stage: stageName ?? undefined,
+    ...(featuredFilter && {
+      order_by: featuredFilter,
+    }),
+    ...(dateCursor.fromDate && {
+      to_date: dateCursor.toDate,
+      from_date: dateCursor.fromDate,
+    }),
+    archived: isOnArchivePage || includeArchivedThreads,
+    contestAddress: contestAddress || undefined,
+    enabled:
+      !!communityId && (selectedView === 'all' || selectedView === 'cardview'),
   });
+  const [filteredThreads, setFilteredThreads] = useState<Thread[]>([]);
+
+  useEffect(() => {
+    if (isInitialLoading || !data) return;
+    const threads = sortPinned(
+      sortByFeaturedFilter(
+        data.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [],
+        featuredFilter,
+      ),
+    );
+    // Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
+    // Checks both for mobile device and inner window size for desktop responsiveness
+    const filtered = threads.filter((t) => {
+      if (!includeSpamThreads && t.markedAsSpamAt) return null;
+      if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt)
+        return null;
+      if (isOnArchivePage && !t.archivedAt) return null;
+      return t;
+    });
+    setFilteredThreads(filtered);
+  }, [
+    data,
+    featuredFilter,
+    includeSpamThreads,
+    includeArchivedThreads,
+    isOnArchivePage,
+    isInitialLoading,
+  ]);
 
   //checks for malformed url in topics and redirects if the topic does not exist
   useEffect(() => {
@@ -356,7 +372,7 @@ const DiscussionsPage = () => {
       return newThread.id ?? -1;
     } catch (err) {
       console.error('Error creating thread:', err);
-      notifyError('Failed to create thread');
+      notifyError(err.message);
       return -1;
     } finally {
       setIsSubmitting(false);
@@ -381,6 +397,9 @@ const DiscussionsPage = () => {
             name={tokenMetadata?.name}
             ticker={topicObj?.token_symbol}
             avatarUrl={tokenMetadata?.logo}
+            tokenAddress={topicObj?.token_address || ''}
+            chainName={chainNode?.name}
+            chainEthId={topicObj?.eth_chain_id || 0}
             voteWeight={voteWeight}
             popover={{
               title: tokenMetadata?.name,
@@ -406,6 +425,15 @@ const DiscussionsPage = () => {
           />
         )}
 
+        {canShowGatingBanner && (
+          <CWGatedTopicBanner
+            actions={Object.values(GatedActionEnum)}
+            actionGroups={actionGroups}
+            bypassGating={bypassGating}
+            onClose={() => setCanShowGatingBanner(false)}
+          />
+        )}
+
         <HeaderWithFilters
           topic={topicIdentifiersFromURL?.topicName || ''}
           stage={stageName}
@@ -414,9 +442,7 @@ const DiscussionsPage = () => {
           totalThreadCount={
             isOnArchivePage
               ? filteredThreads.length || 0
-              : threads
-                ? threadCount || 0
-                : 0
+              : data?.pages[0]?.totalResults || 0
           }
           isIncludingSpamThreads={includeSpamThreads}
           onIncludeSpamThreads={setIncludeSpamThreads}
@@ -439,8 +465,8 @@ const DiscussionsPage = () => {
                 <RenderThreadCard
                   thread={thread}
                   communityId={communityId}
-                  memberships={memberships}
-                  topicPermissions={topicPermissions}
+                  actionGroups={actionGroups}
+                  bypassGating={bypassGating}
                   contestsData={contestsData}
                 />
               )}
@@ -505,8 +531,8 @@ const DiscussionsPage = () => {
                 hideTrendingTag={true}
                 hideSpamTag={true}
                 communityId={communityId}
-                memberships={memberships}
-                topicPermissions={topicPermissions}
+                actionGroups={actionGroups}
+                bypassGating={bypassGating}
                 contestsData={contestsData}
               />
             )}
@@ -521,7 +547,11 @@ const DiscussionsPage = () => {
           {user.isLoggedIn && user.activeAccount && (
             <StickyInput
               parentType={ContentType.Thread}
-              canComment={true}
+              canComment={canUserPerformGatedAction(
+                actionGroups,
+                GatedActionEnum.CREATE_COMMENT,
+                bypassGating,
+              )}
               handleSubmitComment={handleSubmitThread}
               errorMsg=""
               contentDelta={threadContentDelta}
@@ -532,6 +562,7 @@ const DiscussionsPage = () => {
               editorValue={getTextFromDelta(threadContentDelta)}
               tooltipText=""
               topic={topicObj}
+              communityId={communityId}
             />
           )}
         </WithDefaultStickyComment>

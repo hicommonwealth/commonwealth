@@ -45,6 +45,7 @@ module.exports = {
       './libs/schemas/tsconfig.json',
       './libs/shared/tsconfig.json',
       './libs/sitemaps/tsconfig.json',
+      './libs/railway/tsconfig.json',
       './packages/tsconfig.json',
       './packages/commonwealth/tsconfig.json',
       './packages/load-testing/tsconfig.json',
@@ -124,8 +125,6 @@ module.exports = {
       },
     ],
     '@tanstack/query/exhaustive-deps': 'error',
-    '@tanstack/query/prefer-query-object-syntax': 'error',
-    '@tanstack/query/no-deprecated-options': 1,
     'react/destructuring-assignment': [1, 'always'],
     'react/function-component-definition': [
       1,

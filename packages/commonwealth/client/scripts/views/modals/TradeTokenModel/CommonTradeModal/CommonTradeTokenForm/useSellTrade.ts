@@ -24,10 +24,10 @@ const useSellTrade = ({
     useState<string>(`0`); // can be fractional
   const tokenSellAmountDecimals = parseFloat(tokenSellAmountString) || 0;
 
-  const { mutateAsync: createTokenTrade, isLoading: isCreatingTokenTrade } =
+  const { mutateAsync: createTokenTrade, isPending: isCreatingTokenTrade } =
     useCreateTokenTradeMutation();
 
-  const { mutateAsync: sellToken, isLoading: isSellingToken } =
+  const { mutateAsync: sellToken, isPending: isSellingToken } =
     useSellTokenMutation();
 
   const isSelectedAddressTokenBalanceQueryEnabled = !!(
@@ -57,7 +57,7 @@ const useSellTrade = ({
     data: unitTokenToEthSellExchangeRate = 0,
     isLoading: isLoadingUnitTokenToEthSellExchangeRate,
   } = useTokenEthExchangeRateQuery({
-    chainRpc: chainNode.url,
+    chainRpc: chainNode?.url || '',
     ethChainId,
     mode: 'sell',
     tokenAmount: 1 * 1e18, // convert to wei - get exchange rate of 1 unit token to eth
@@ -108,7 +108,6 @@ const useSellTrade = ({
 
   const handleTokenSell = async () => {
     try {
-      // this condition wouldn't be called, but adding to avoid typescript issues
       if (
         !chainNode?.url ||
         !ethChainId ||

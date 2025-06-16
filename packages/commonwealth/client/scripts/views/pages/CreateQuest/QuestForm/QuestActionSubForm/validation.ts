@@ -4,6 +4,7 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
+import { WalletSsoSource } from '@hicommonwealth/shared';
 import {
   linkValidationSchema,
   numberDecimalValidationSchema,
@@ -39,9 +40,11 @@ export const buildQuestSubFormValidationSchema = (
     config?.with_optional_thread_id ||
     config?.with_optional_topic_id ||
     config?.with_optional_chain_id ||
-    config?.with_optional_token_trade_threshold;
+    config?.with_optional_token_trade_threshold ||
+    config?.with_optional_sso_type;
   const requiresTwitterEngagement = config?.requires_twitter_tweet_link;
   const requiresDiscordServerId = config?.requires_discord_server_id;
+  const requiresGoalConfig = config?.requires_goal_config;
   const requiresChainEvent = config?.requires_chain_event;
   const requiresGroupId = config?.requires_group_id;
   const requiresStartLink = config?.requires_start_link;
@@ -51,17 +54,20 @@ export const buildQuestSubFormValidationSchema = (
   const allowsChainIdAsContentId = config?.with_optional_chain_id;
   const allowsTokenThresholdAmountAsContentId =
     config?.with_optional_token_trade_threshold;
+  const requiresSsoSource = config?.with_optional_sso_type;
 
   const needsExtension =
     requiresCreatorPoints ||
     allowsOptionalContentId ||
     requiresTwitterEngagement ||
     requiresDiscordServerId ||
+    requiresGoalConfig ||
     requiresGroupId ||
     requiresStartLink ||
     allowsChainIdAsContentId ||
     allowsTokenThresholdAmountAsContentId ||
-    requiresChainEvent;
+    requiresChainEvent ||
+    requiresSsoSource;
 
   if (!needsExtension) return questSubFormValidationSchema;
 
@@ -75,6 +81,10 @@ export const buildQuestSubFormValidationSchema = (
     } else if (allowsTokenThresholdAmountAsContentId) {
       baseSchema = baseSchema.extend({
         contentIdentifier: numberDecimalValidationSchema.optional,
+      }) as unknown as typeof baseSchema;
+    } else if (requiresSsoSource) {
+      baseSchema = baseSchema.extend({
+        contentIdentifier: z.nativeEnum(WalletSsoSource).optional(),
       }) as unknown as typeof baseSchema;
     } else {
       baseSchema = baseSchema.extend({
@@ -206,7 +216,7 @@ export const buildQuestSubFormValidationSchema = (
         },
       ) as unknown as typeof baseSchema;
   }
-  if (requiresDiscordServerId) {
+  if (requiresDiscordServerId || requiresGoalConfig) {
     baseSchema = baseSchema.extend({
       contentIdentifier: stringHasNumbersOnlyValidationSchema,
     }) as unknown as typeof baseSchema;

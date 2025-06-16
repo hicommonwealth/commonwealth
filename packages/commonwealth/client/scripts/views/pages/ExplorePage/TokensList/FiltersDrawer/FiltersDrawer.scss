@@ -1,6 +1,13 @@
 @import '../../../../../styles/shared.scss';
 
 .FiltersDrawer {
+  .filter-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 4px !important;
+  }
+
   .Drawer.filter-drawer {
     @include extraSmall {
       top: 48px !important;
@@ -22,7 +29,7 @@
       }
     }
 
-    .stake-filter {
+    .graduated-filter {
       display: flex;
       justify-content: space-between;
       align-items: center;

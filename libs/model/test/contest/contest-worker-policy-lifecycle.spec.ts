@@ -53,7 +53,6 @@ describe('Contest Worker Policy Lifecycle', () => {
           id: topicId,
           name: 'hello',
           community_id: communityId,
-          group_ids: [],
         },
       ],
       contest_managers: [
@@ -199,6 +198,7 @@ describe('Contest Worker Policy Lifecycle', () => {
     expect(voteContentStub).toHaveBeenCalled();
 
     await handleEvent(ContestWorker(), {
+      id: 0,
       name: 'ContestRolloverTimerTicked',
       payload: {},
     });
@@ -228,6 +228,7 @@ describe('Contest Worker Policy Lifecycle', () => {
     );
 
     await handleEvent(ContestWorker(), {
+      id: 0,
       name: 'ContestRolloverTimerTicked',
       payload: {},
     });
