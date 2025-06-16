@@ -1,14 +1,11 @@
 import { config as EnvConfig } from '@hicommonwealth/adapters';
-import { Consumer, logger, outboxEvents } from '@hicommonwealth/core';
-import { Events } from '@hicommonwealth/schemas';
+import { Consumer } from '@hicommonwealth/core';
 import {
   BindingConfig,
   BrokerConfig,
   ConnectionConfig,
   QueueConfig,
 } from 'rascal';
-
-const log = logger(import.meta);
 
 export enum RascalExchanges {
   DeadLetter = 'DeadLetterExchange',
@@ -36,7 +33,11 @@ export function createRmqConfig({
 }) {
   let vhost: string;
   let connection = <ConnectionConfig>rabbitMqUri;
-  if (rabbitMqUri.includes('localhost') || rabbitMqUri.includes('127.0.0.1')) {
+  if (
+    rabbitMqUri.includes('localhost') ||
+    rabbitMqUri.includes('127.0.0.1') ||
+    rabbitMqUri.includes('railway')
+  ) {
     vhost = '/';
   } else {
     const count = (rabbitMqUri.match(/\//g) || []).length;
@@ -116,7 +117,6 @@ export function createRmqConfig({
     },
   };
 
-  const ignoredEvents = new Set<string>();
   for (const item of map) {
     let consumer,
       overrides: Record<string, string | null | undefined> | undefined;
@@ -149,13 +149,6 @@ export function createRmqConfig({
       destinationType: 'queue',
       bindingKeys: Object.keys(consumer().inputs).reduce(
         (acc: string[], val) => {
-          // if consumer handler does not have an associated event
-          // from the Outbox exclude it automatically
-          if (!outboxEvents.includes(<Events>val)) {
-            ignoredEvents.add(val);
-            return acc;
-          }
-
           if (!overrides) acc.push(val);
           else if (overrides[val] !== null) {
             acc.push(overrides[val] || val);
@@ -175,11 +168,5 @@ export function createRmqConfig({
     };
   }
 
-  if (ignoredEvents.size > 0)
-    log.warn(
-      `The following events are ignored because they are not part of the Outbox: ${Array.from(
-        ignoredEvents,
-      ).join(', ')}`,
-    );
   return config;
 }

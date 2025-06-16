@@ -73,9 +73,9 @@ const QuestDetails = ({ id }: { id: number }) => {
     specificAuthOption: undefined,
   });
 
-  const { mutateAsync: deleteQuest, isLoading: isDeletingQuest } =
+  const { mutateAsync: deleteQuest, isPending: isDeletingQuest } =
     useDeleteQuestMutation();
-  const { mutateAsync: cancelQuest, isLoading: isCancelingQuest } =
+  const { mutateAsync: cancelQuest, isPending: isCancelingQuest } =
     useCancelQuestMutation();
 
   const isPendingAction = isDeletingQuest || isCancelingQuest;
@@ -146,7 +146,14 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'SSOLinked': {
-        setAuthModalConfig({ type: AuthModalType.SignIn, options: ['sso'] });
+        const specificAuthOption = buildRedirectURLFromContentId(
+          action.content_id || '',
+        ) as AuthOptions;
+        setAuthModalConfig({
+          type: AuthModalType.SignIn,
+          options: ['sso'],
+          ...(specificAuthOption && { specificAuthOption }),
+        });
         break;
       }
       case 'CommunityCreated': {

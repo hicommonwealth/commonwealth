@@ -126,7 +126,7 @@ describe('User lifecycle', () => {
       const watermark = new Date();
 
       // act on community, triggering quest rewards
-      await command(CreateThread(), {
+      const thread = await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
@@ -145,7 +145,7 @@ describe('User lifecycle', () => {
           body: 'Comment body 1.1',
         },
       });
-      await command(CreateComment(), {
+      const comment2 = await command(CreateComment(), {
         actor: admin,
         payload: {
           thread_id,
@@ -190,6 +190,7 @@ describe('User lifecycle', () => {
         {
           id: 1,
           name: null,
+          event_id: 0,
           event_created_at: logs[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
@@ -197,10 +198,15 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[0].created_at,
+          scope: {
+            thread_id: thread!.id,
+            topic_id,
+          },
         },
         {
           id: 2,
           name: null,
+          event_id: 0,
           event_created_at: logs[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -208,10 +214,16 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[1].created_at,
+          scope: {
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 3,
           name: null,
+          event_id: 0,
           event_created_at: logs[2].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -219,10 +231,16 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[2].created_at,
+          scope: {
+            thread_id,
+            topic_id,
+            comment_id: comment2!.id,
+          },
         },
         {
           id: 4,
           name: null,
+          event_id: 0,
           event_created_at: logs[3].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
@@ -230,6 +248,11 @@ describe('User lifecycle', () => {
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
           created_at: logs[3].created_at,
+          scope: {
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
       ]);
 
@@ -298,7 +321,7 @@ describe('User lifecycle', () => {
       const watermark = new Date();
 
       // act on community, triggering quest rewards
-      await command(CreateThread(), {
+      const thread = await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
@@ -475,6 +498,7 @@ describe('User lifecycle', () => {
       expect(last.map((l) => l.toJSON())).to.deep.equal([
         {
           id: 5,
+          event_id: 0,
           event_created_at: last[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
@@ -483,9 +507,14 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: last[0].created_at,
+          scope: {
+            thread_id: thread!.id,
+            topic_id,
+          },
         },
         {
           id: 6,
+          event_id: 0,
           event_created_at: last[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -494,9 +523,15 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: last[1].created_at,
+          scope: {
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 7,
+          event_id: 0,
           event_created_at: last[2].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
@@ -505,9 +540,15 @@ describe('User lifecycle', () => {
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
           created_at: last[2].created_at,
+          scope: {
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 8,
+          event_id: 0,
           event_created_at: last[3].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 10,
@@ -516,9 +557,13 @@ describe('User lifecycle', () => {
           creator_user_id: member.user.id,
           creator_xp_points: 10,
           created_at: last[3].created_at,
+          scope: {
+            community_id,
+          },
         },
         {
           id: 9,
+          event_id: 0,
           event_created_at: last[4].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 16,
@@ -527,6 +572,7 @@ describe('User lifecycle', () => {
           creator_user_id: member.user.id,
           creator_xp_points: 4,
           created_at: last[4].created_at,
+          scope: null,
         },
       ]);
 

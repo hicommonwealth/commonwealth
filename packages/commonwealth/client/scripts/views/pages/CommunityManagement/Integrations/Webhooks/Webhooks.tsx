@@ -42,7 +42,7 @@ const Webhooks = () => {
 
   const webhooks = links as (Link & { metadata: z.infer<typeof Webhook> })[];
 
-  const { mutateAsync: createWebhook, isLoading: isCreatingWebhook } =
+  const { mutateAsync: createWebhook, isPending: isCreatingWebhook } =
     useCreateWebhookMutation();
 
   const { data: existingWebhooks, isLoading: isLoadingWebhooks } =
@@ -50,10 +50,10 @@ const Webhooks = () => {
       communityId: communityId,
     });
 
-  const { mutateAsync: deleteWebhook, isLoading: isDeletingWebhook } =
+  const { mutateAsync: deleteWebhook, isPending: isDeletingWebhook } =
     useDeleteWebhookMutation();
 
-  const { mutateAsync: editWebhook, isLoading: isEditingWebhook } =
+  const { mutateAsync: editWebhook, isPending: isEditingWebhook } =
     useEditWebhookMutation();
 
   useNecessaryEffect(() => {

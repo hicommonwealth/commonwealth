@@ -55,7 +55,7 @@ const TagUsageDialog = ({
           <CWText>No communities are using this tag.</CWText>
         )}
 
-        {!isLoading && !error && data?.communities.length > 0 && (
+        {!isLoading && !error && (data?.communities.length || 0) > 0 && (
           <div className="communities-list">
             <div className="list-header">
               <CWText type="caption" fontWeight="medium">
@@ -65,7 +65,7 @@ const TagUsageDialog = ({
                 Community ID
               </CWText>
             </div>
-            {data.communities.map((community) => (
+            {data?.communities?.map((community) => (
               <div key={community.id} className="community-item">
                 <CWText>
                   <span

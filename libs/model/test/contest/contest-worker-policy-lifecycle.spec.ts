@@ -198,6 +198,7 @@ describe('Contest Worker Policy Lifecycle', () => {
     expect(voteContentStub).toHaveBeenCalled();
 
     await handleEvent(ContestWorker(), {
+      id: 0,
       name: 'ContestRolloverTimerTicked',
       payload: {},
     });
@@ -227,6 +228,7 @@ describe('Contest Worker Policy Lifecycle', () => {
     );
 
     await handleEvent(ContestWorker(), {
+      id: 0,
       name: 'ContestRolloverTimerTicked',
       payload: {},
     });

@@ -140,7 +140,8 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                   'telegram', T.telegram,
                   'weighted_voting', T.weighted_voting,
                   'token_decimals', T.token_decimals,
-                  'vote_weight_multiplier', T.vote_weight_multiplier
+                  'vote_weight_multiplier', T.vote_weight_multiplier,
+                  'token_symbol', T.token_symbol
                 ) as topic,
                 json_build_object(
                   'id', A.id,
@@ -160,6 +161,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
               TT.id as thread_id,
               CASE WHEN max(A.id) IS NOT NULL THEN
                 json_agg(json_strip_nulls(json_build_object(
+                  'id', editor_profiles.id,
                   'address', A.address,
                   'community_id', A.community_id,
                   'User', json_build_object(
@@ -179,6 +181,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
             FROM top_threads TT LEFT JOIN "Collaborations" AS C ON TT.id = C.thread_id
             LEFT JOIN "Addresses" A ON C.address_id = A.id
             LEFT JOIN "Users" editor_profiles ON A.user_id = editor_profiles.id
+            WHERE A.user_id IS NOT NULL
             GROUP BY TT.id
           ), reaction_data AS ( -- get the thread reactions and the address/profile of the user who reacted
             SELECT
