@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { PG_INT } from '../utils';
-import { QuestActionMeta } from './quest.schemas';
+import { QuestActionMeta, QuestActionScope } from './quest.schemas';
 import { User } from './user.schemas';
 
 export const XpLogName = z.enum([
@@ -20,6 +20,7 @@ export const XpLog = z.object({
   creator_user_id: PG_INT.nullish(),
   creator_xp_points: PG_INT.nullish(),
   created_at: z.coerce.date(),
+  scope: QuestActionScope.nullish(),
 
   // associations
   user: User.optional(),
