@@ -48,9 +48,16 @@ const featureFlags = {
 export type AvailableFeatureFlag = keyof typeof featureFlags;
 
 export const initializeFeatureFlags = (
-  unleashApiToken: string,
-  appName: string,
+  unleashApiToken?: string,
+  appName?: string,
 ) => {
+  if (!unleashApiToken || !appName) {
+    console.warn(
+      'No unleashApiToken or appName provided, using in-memory provider',
+    );
+    return new InMemoryProvider(featureFlags);
+  }
+
   const unleashConfig = {
     url: UNLEASH_FRONTEND_SERVER_URL,
     clientKey: unleashApiToken,
@@ -58,9 +65,5 @@ export const initializeFeatureFlags = (
     appName,
   };
 
-  const provider = unleashApiToken
-    ? new UnleashProvider(new UnleashClient(unleashConfig))
-    : new InMemoryProvider(featureFlags);
-
-  return provider;
+  return new UnleashProvider(new UnleashClient(unleashConfig));
 };

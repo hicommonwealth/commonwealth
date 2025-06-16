@@ -12,7 +12,9 @@ export const fetchCachedPublicEnvVar = () => {
   );
 };
 
-export const fetchPublicEnvVar = async () => {
+export const fetchPublicEnvVar = async (): Promise<
+  z.infer<(typeof GetPublicEnvVar)['output']>
+> => {
   const queryKey = getQueryKey(trpc.configuration.getPublicEnvVar);
   const cache =
     queryClient.getQueryData<z.infer<(typeof GetPublicEnvVar)['output']>>(
@@ -27,8 +29,13 @@ export const fetchPublicEnvVar = async () => {
     `${BASE_API_PATH}/configuration.getPublicEnvVar`,
   );
 
-  data && queryClient.setQueryData(queryKey, data);
-  return data;
+  if (!data.result.data) {
+    // TODO: this should never happen but how should we handle it if it does?
+    throw new Error('No public env var returned from the API');
+  }
+
+  queryClient.setQueryData(queryKey, data.result.data);
+  return data.result.data as z.infer<(typeof GetPublicEnvVar)['output']>;
 };
 
 const useFetchPublicEnvVarQuery = () => {

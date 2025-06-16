@@ -16,13 +16,11 @@ const useInitApp = () => {
     initAppState()
       .then((envVars) => {
         // Initialize feature flags if we have the required token
-        if (envVars?.UNLEASH_FRONTEND_API_TOKEN) {
-          const provider = initializeFeatureFlags(
-            envVars.UNLEASH_FRONTEND_API_TOKEN,
-            envVars.HEROKU_APP_NAME || 'commonwealthapp',
-          );
-          OpenFeature.setProvider(provider);
-        }
+        const provider = initializeFeatureFlags(
+          envVars.UNLEASH_FRONTEND_API_TOKEN,
+          envVars.HEROKU_APP_NAME,
+        );
+        OpenFeature.setProvider(provider);
       })
       .catch((err) => console.log('App initialization failed', err))
       .finally(() => setIsLoading(false));
