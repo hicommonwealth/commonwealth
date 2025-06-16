@@ -1,4 +1,4 @@
-import { logger } from '@hicommonwealth/core';
+import { Actor, logger } from '@hicommonwealth/core';
 import { config, models } from '@hicommonwealth/model';
 import { User } from '@hicommonwealth/schemas';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -127,7 +127,7 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
           req,
           res,
           actor: {
-            user: req.user as any,
+            user: req.user as Actor['user'],
             address: req.headers['address'] as string,
           },
         });
