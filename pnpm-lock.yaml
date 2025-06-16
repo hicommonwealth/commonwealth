@@ -953,8 +953,8 @@ importers:
         specifier: ^12.4.0
         version: 12.4.0
       '@magic-ext/farcaster':
-        specifier: ^0.16.0
-        version: 0.16.0
+        specifier: ^1.1.0
+        version: 1.1.0
       '@magic-ext/oauth':
         specifier: ^22.17.0
         version: 22.17.0
@@ -5483,8 +5483,8 @@ packages:
   '@magic-ext/cosmos@12.4.0':
     resolution: {integrity: sha512-WfLlUzkKVfqO9vv+h8fA7z/KAcBL6tbLjSPHZCr8WbBUL/Me86Pmx8g8Zftb19oaGmYM+XkPVli7h20zBRE2oA==}
 
-  '@magic-ext/farcaster@0.16.0':
-    resolution: {integrity: sha512-+1u6r4sh1Mys2fxqbqU/8uBYeD2RQmjJY/6iwKHTih20gPotH++VoD6Jhl89I9UW8KogwTQ620asu8XZbXOLbw==}
+  '@magic-ext/farcaster@1.1.0':
+    resolution: {integrity: sha512-T/koq2fT21B0jjcFBKSBsjCYrCydZavX+YbLyrhRppsaKGMANBBkjLLrGSLDAunl0s8ZEnaYOtCaey++4h/U7A==}
 
   '@magic-ext/oauth2@9.16.0':
     resolution: {integrity: sha512-+ixOFjjLZtbk7GgRdzfGKpREGZUyqpIjXDftUjNOlgbaroBBjqrVj4scnzz06VQwCuiWotZ4ZU1vSFz/NszotQ==}
@@ -28892,7 +28892,7 @@ snapshots:
 
   '@magic-ext/cosmos@12.4.0': {}
 
-  '@magic-ext/farcaster@0.16.0': {}
+  '@magic-ext/farcaster@1.1.0': {}
 
   '@magic-ext/oauth2@9.16.0':
     dependencies:
