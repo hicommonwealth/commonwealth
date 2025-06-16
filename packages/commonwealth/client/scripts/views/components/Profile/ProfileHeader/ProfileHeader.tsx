@@ -11,6 +11,7 @@ import {
 } from '@hicommonwealth/shared';
 import { useMutualConnections } from 'client/scripts/state/api/user';
 import { useFlag } from 'hooks/useFlag';
+import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
@@ -40,6 +41,14 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
     },
     { enabled: !isOwner && user.isLoggedIn },
   );
+
+  const { data: viewedProfile } = useFetchProfileByIdQuery({
+    userId: profile.userId,
+    apiCallEnabled: !!profile.userId,
+  });
+
+  const karma =
+    (viewedProfile?.xp_points ?? 0) + (viewedProfile?.xp_referrer_points ?? 0);
 
   if (!profile) return;
   const { bio, name } = profile;
@@ -109,22 +118,19 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
           <div className="stats-container">
             <div className="stat-item">
               <CWText type="b1" className="stat-value">
-                {(user?.xpPoints ?? 0) + (user?.xpReferrerPoints ?? 0)}
+                {karma}
               </CWText>
               <CWText type="caption">Karma earned across Common</CWText>
             </div>
           </div>
         </div>
-        {!isOwner && mutualConnections?.mutual_communities?.length > 0 && (
-          <div className="mutual-connections">
-            <div className="mutual-icons">
-              {mutualConnections.mutual_communities
-                .slice(0, 5)
-                .map(
-                  (
-                    community: { id: string | number; icon_url?: string },
-                    idx: number,
-                  ) =>
+        {!isOwner &&
+          (mutualConnections?.mutual_communities?.length ?? 0) > 0 && (
+            <div className="mutual-connections">
+              <div className="mutual-icons">
+                {(mutualConnections?.mutual_communities ?? [])
+                  .slice(0, 5)
+                  .map((community, idx) =>
                     community.icon_url ? (
                       <img
                         key={community.id}
@@ -134,16 +140,16 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
                         style={{ zIndex: 10 - idx }}
                       />
                     ) : null,
-                )}
+                  )}
+              </div>
+              <CWText type="b1" style={{ marginLeft: 24 }}>
+                {(mutualConnections?.mutual_communities?.length ?? 0) > 50
+                  ? '50+'
+                  : (mutualConnections?.mutual_communities?.length ?? 0)}{' '}
+                mutual communities
+              </CWText>
             </div>
-            <CWText type="b1" style={{ marginLeft: 24 }}>
-              {mutualConnections.mutual_communities.length > 50
-                ? '50+'
-                : mutualConnections.mutual_communities.length}{' '}
-              mutual communities
-            </CWText>
-          </div>
-        )}
+          )}
       </div>
     </div>
   );
