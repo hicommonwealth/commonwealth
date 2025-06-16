@@ -213,15 +213,23 @@ export const TreeHierarchy = ({
           allComments.length > previousCommentsLengthRef.current &&
           !isLoadingOlderMessagesRef.current);
 
-      if (shouldAutoScroll && virtuosoRef.current && allComments.length > 0) {
+      if (shouldAutoScroll && allComments.length > 0) {
         // Small delay to ensure comments are rendered
         setTimeout(() => {
           try {
-            virtuosoRef.current?.scrollToIndex({
-              index: allComments.length - 1,
-              behavior: 'smooth',
-              align: 'end',
-            });
+            const lastComment = allComments[allComments.length - 1];
+            if (lastComment) {
+              const element = document.querySelector(
+                `.comment-${lastComment.id}`,
+              );
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              } else {
+                console.warn(
+                  `Could not find element for comment ${lastComment.id} to scroll to.`,
+                );
+              }
+            }
           } catch (error) {
             console.warn('Auto-scroll failed:', error);
           }
@@ -236,6 +244,7 @@ export const TreeHierarchy = ({
     allComments.length,
     commentFilters.sortType,
     parentCommentId,
+    allComments,
   ]);
 
   const triggerStreamingForNewComment = useCallback(
@@ -511,10 +520,9 @@ export const TreeHierarchy = ({
             className="comments-list"
             style={{ height: '100%', width: '100%' }}
             data={isInitialCommentsLoading ? [] : allComments}
-            {...(pageRef.current &&
-              !isChatMode && {
-                customScrollParent: pageRef.current,
-              })}
+            {...(pageRef.current && {
+              customScrollParent: pageRef.current,
+            })}
             {...(isChatMode &&
               commentFilters.sortType === 'oldest' &&
               !parentCommentId && {

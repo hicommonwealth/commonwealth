@@ -20,15 +20,4 @@
       background-color: $neutral-50;
     }
   }
-
-  // Chat mode layout - inherit height from parent container
-  &.chat-mode {
-    height: 100%;
-    min-height: 0;
-
-    .comments-list {
-      height: 100%;
-      min-height: 0;
-    }
-  }
 }

@@ -221,54 +221,52 @@ export const CWContentPage = ({
 
   const mainBody = (
     <div className={`main-body-container ${isChatMode ? 'chat-mode' : ''}`}>
-      <div className={`thread-content ${isChatMode ? 'chat-mode-thread' : ''}`}>
-        <div className="header">
-          {typeof title === 'string' ? (
-            <h1 className="title">
-              <ThreadContestTagContainer
-                associatedContests={thread?.associatedContests}
-              />
-              {truncate(title)}
-            </h1>
-          ) : (
-            title
-          )}
-          {!isEditing ? authorAndPublishInfoRow : <></>}
-        </div>
-        {subHeader}
-        {isEditing ? authorAndPublishInfoRow : <></>}
-        {body &&
-          body(
-            <ThreadOptions
-              upvoteBtnVisible={!thread?.readOnly}
-              upvoteDrawerBtnBelow={true}
-              commentBtnVisible={!thread?.readOnly}
-              onCommentClick={onCommentClick}
-              // @ts-expect-error <StrictNullChecks/>
-              thread={thread}
-              totalComments={thread?.numberOfComments}
-              onLockToggle={onLockToggle}
-              onSpamToggle={onSpamToggle}
-              onDelete={onDelete}
-              onPinToggle={onPinToggle}
-              onCollaboratorsEdit={onCollaboratorsEdit}
-              onEditCancel={onEditCancel}
-              onEditConfirm={onEditConfirm}
-              onEditStart={onEditStart}
-              canUpdateThread={canUpdateThread}
-              hasPendingEdits={hasPendingEdits}
-              onProposalStageChange={onProposalStageChange}
-              onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-              setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
-              shareEndpoint={`${window.location.origin}${window.location.pathname}`}
-              editingDisabled={editingDisabled}
-              actionGroups={actionGroups}
-              bypassGating={bypassGating}
-            />,
-          )}
-
-        {subBody}
+      <div className="header">
+        {typeof title === 'string' ? (
+          <h1 className="title">
+            <ThreadContestTagContainer
+              associatedContests={thread?.associatedContests}
+            />
+            {truncate(title)}
+          </h1>
+        ) : (
+          title
+        )}
+        {!isEditing ? authorAndPublishInfoRow : <></>}
       </div>
+      {subHeader}
+      {isEditing ? authorAndPublishInfoRow : <></>}
+      {body &&
+        body(
+          <ThreadOptions
+            upvoteBtnVisible={!thread?.readOnly}
+            upvoteDrawerBtnBelow={true}
+            commentBtnVisible={!thread?.readOnly}
+            onCommentClick={onCommentClick}
+            // @ts-expect-error <StrictNullChecks/>
+            thread={thread}
+            totalComments={thread?.numberOfComments}
+            onLockToggle={onLockToggle}
+            onSpamToggle={onSpamToggle}
+            onDelete={onDelete}
+            onPinToggle={onPinToggle}
+            onCollaboratorsEdit={onCollaboratorsEdit}
+            onEditCancel={onEditCancel}
+            onEditConfirm={onEditConfirm}
+            onEditStart={onEditStart}
+            canUpdateThread={canUpdateThread}
+            hasPendingEdits={hasPendingEdits}
+            onProposalStageChange={onProposalStageChange}
+            onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+            setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
+            shareEndpoint={`${window.location.origin}${window.location.pathname}`}
+            editingDisabled={editingDisabled}
+            actionGroups={actionGroups}
+            bypassGating={bypassGating}
+          />,
+        )}
+
+      {subBody}
       <div
         className={`comments-section ${isChatMode ? 'chat-mode-comments' : ''}`}
       >
