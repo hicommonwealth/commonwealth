@@ -27,7 +27,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
       // Chat mode: reverse pagination for 'oldest' order, but only for top-level comments
       // Replies should always use normal pagination regardless of order_by
       const isChatMode = order_by === 'oldest' && !parent_id;
-      let offset, actualOrderBy, actualPage;
+      let offset, actualOrderBy;
       let actualLimit = limit;
 
       if (isChatMode) {
@@ -56,10 +56,6 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         });
 
         const totalCount = parseInt(countResult?.total_count || '0');
-
-        // For chat mode: cursor=1 should show the most recent LIMIT comments
-        // cursor=2 should show the next older LIMIT comments, etc.
-        // We calculate offset from the end of all comments
         offset = Math.max(0, totalCount - cursor * limit);
 
         // Adjust limit for the last page to avoid overlapping results
@@ -68,13 +64,8 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         const remainingCommentsToFetch =
           totalCount - commentsFetchedInPreviousPages;
         actualLimit = Math.min(limit, remainingCommentsToFetch);
-
-        console.log(
-          `Chat Mode Debug - totalCount: ${totalCount}, cursor: ${cursor}, limit: ${limit}, actualLimit: ${actualLimit}, offset: ${offset}, commentsFetchedInPreviousPages: ${commentsFetchedInPreviousPages}, remainingCommentsToFetch: ${remainingCommentsToFetch}, parent_id: ${parent_id}`,
-        );
-
-        actualPage = Math.floor(offset / limit) + 1;
-        actualOrderBy = 'C."created_at" ASC'; // Always ASC for chat mode to get proper chronological order
+        // Always ASC for chat mode to get proper chronological order
+        actualOrderBy = 'C."created_at" ASC';
       } else {
         // Normal pagination for non-chat modes (including replies in chat mode)
         offset = (cursor - 1) * limit;
@@ -87,7 +78,6 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         actualOrderBy = parent_id
           ? 'C."created_at" ASC'
           : orderByQueries[order_by || 'newest'];
-        actualPage = cursor;
       }
 
       const sql = `
@@ -234,12 +224,6 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             ...payload,
             offset,
           },
-        );
-      }
-
-      if (isChatMode) {
-        console.log(
-          `Chat Mode Response - cursor: ${cursor}, page: ${paginatedResponse.page}, totalPages: ${paginatedResponse.totalPages}, results: ${finalResults.length}, offset: ${offset}, parent_id: ${parent_id}`,
         );
       }
 

@@ -256,7 +256,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     StreamingReplyInstance[]
   >([]);
 
-  // Track chat mode state from comment filters
   const [isChatMode, setIsChatMode] = useState(false);
 
   const handleChatModeChange = useCallback((chatMode: boolean) => {

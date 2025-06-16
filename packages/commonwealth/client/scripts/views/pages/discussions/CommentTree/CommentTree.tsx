@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { trpc } from 'utils/trpcClient';
 import { CommentFilters } from './CommentFilters';
@@ -79,17 +79,20 @@ export const CommentTree = ({
     }
   }, [thread?.id, thread?.numberOfComments]);
 
-  const handleFiltersChange = async (newFilters: typeof commentFilters) => {
-    // Check if sort type is changing (which affects pagination and ordering)
-    if (newFilters.sortType !== commentFilters.sortType) {
-      await utils.comment.getComments.reset({
-        thread_id: thread.id,
-      });
-    }
+  const handleFiltersChange = useCallback(
+    async (newFilters: typeof commentFilters) => {
+      // Check if sort type is changing (which affects pagination and ordering)
+      if (newFilters.sortType !== commentFilters.sortType) {
+        await utils.comment.getComments.reset({
+          thread_id: thread.id,
+        });
+      }
 
-    onFiltersChange(newFilters);
-    onChatModeChange?.(newFilters.sortType === 'oldest');
-  };
+      onFiltersChange(newFilters);
+      onChatModeChange?.(newFilters.sortType === 'oldest');
+    },
+    [commentFilters, onFiltersChange, onChatModeChange, utils, thread.id],
+  );
 
   return (
     <>

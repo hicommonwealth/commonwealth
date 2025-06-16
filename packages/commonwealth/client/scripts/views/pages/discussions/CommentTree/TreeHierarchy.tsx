@@ -86,10 +86,7 @@ export const TreeHierarchy = ({
   const communityId = app.activeChainId() || '';
   const { selectedModels } = useLocalAISettingsStore();
 
-  // Derive chat mode from sort type - no separate state needed
   const isChatMode = commentFilters.sortType === 'oldest';
-
-  const virtuosoRef = useRef<any>(null);
   const previousChatModeRef = useRef(isChatMode);
   const isLoadingOlderMessagesRef = useRef(false);
   const previousCommentsLengthRef = useRef(0);
@@ -516,7 +513,6 @@ export const TreeHierarchy = ({
         ) : (
           // For root comments, use Virtuoso for performance
           <Virtuoso
-            ref={virtuosoRef}
             className="comments-list"
             style={{ height: '100%', width: '100%' }}
             data={isInitialCommentsLoading ? [] : allComments}
@@ -526,7 +522,7 @@ export const TreeHierarchy = ({
             {...(isChatMode &&
               commentFilters.sortType === 'oldest' &&
               !parentCommentId && {
-                followOutput: !isLoadingOlderMessages, // Don't follow output when loading older messages
+                followOutput: !isLoadingOlderMessages,
                 reversed: true,
               })}
             itemContent={(index, comment) => renderCommentItem(comment, index)}
@@ -538,7 +534,6 @@ export const TreeHierarchy = ({
                 ? {
                     // eslint-disable-next-line react/no-multi-comp
                     Header: () => {
-                      // More robust check for whether there are more pages to load
                       const lastPage =
                         paginatedComments?.pages?.[
                           paginatedComments.pages.length - 1
