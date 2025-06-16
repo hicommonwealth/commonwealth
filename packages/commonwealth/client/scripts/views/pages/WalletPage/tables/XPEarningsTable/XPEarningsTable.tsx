@@ -1,5 +1,6 @@
+import { QuestEvents, XpLogView } from '@hicommonwealth/schemas';
+import { splitCamelOrPascalCase } from 'client/scripts/helpers/string';
 import { APIOrderDirection } from 'helpers/constants';
-import { splitCamelOrPascalCase } from 'helpers/string';
 import moment from 'moment';
 import React from 'react';
 import { useGetXPs } from 'state/api/user';
@@ -16,7 +17,7 @@ import {
 } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { FullUser } from 'views/components/user/fullUser';
-import { QuestAction } from '../../../CreateQuest/QuestForm/QuestActionSubForm';
+import z from 'zod';
 import './XPEarningsTable.scss';
 import { getTagConfigForRewardType } from './helpers';
 
@@ -59,6 +60,59 @@ const columns: CWTableColumnInfo[] = [
   },
 ];
 
+function buildActionLink(log: z.infer<typeof XpLogView>) {
+  const title = splitCamelOrPascalCase(log.event_name);
+  if (log.scope) {
+    switch (log.event_name as keyof typeof QuestEvents) {
+      case 'CommunityCreated':
+      case 'CommunityJoined':
+      case 'CommunityGoalReached':
+      case 'NamespaceLinked':
+      case 'MembershipsRefreshed':
+        return log.scope.community_id ? (
+          <a
+            href={`/${log.scope.community_id}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {title}
+          </a>
+        ) : (
+          title
+        );
+      case 'ThreadCreated':
+      case 'ThreadUpvoted':
+        return log.scope.community_id && log.scope.thread_id ? (
+          <a
+            href={`/${log.scope.community_id}/discussions/${log.scope.thread_id}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {title}
+          </a>
+        ) : (
+          title
+        );
+      case 'CommentCreated':
+      case 'CommentUpvoted':
+        return log.scope.community_id &&
+          log.scope.thread_id &&
+          log.scope.comment_id ? (
+          <a
+            href={`/${log.scope.community_id}/discussions/${log.scope.thread_id}?focusComments=true`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {title}
+          </a>
+        ) : (
+          title
+        );
+    }
+  }
+  return title;
+}
+
 export const XPEarningsTable = () => {
   const tableState = useCWTableState({
     columns,
@@ -73,7 +127,7 @@ export const XPEarningsTable = () => {
   });
 
   const tableData = xpLogs.map((log) => ({
-    action: splitCamelOrPascalCase(log.event_name),
+    action: buildActionLink(log),
     earnTime: {
       customElement: withTooltip(
         <CWTag
@@ -87,14 +141,7 @@ export const XPEarningsTable = () => {
     },
     rewardType: {
       customElement: (() => {
-        const config = getTagConfigForRewardType({
-          action: log.event_name as QuestAction,
-          auth_user_id: user.id,
-          log: {
-            creator_id: log.creator_user_id,
-            user_id: log.user_id,
-          },
-        });
+        const config = getTagConfigForRewardType(log);
         return (
           <CWTag
             classNames="rewardType"
@@ -106,7 +153,7 @@ export const XPEarningsTable = () => {
     },
     completedBy: {
       customElement:
-        user.id === log.creator_user_id ? (
+        log.is_creator && log.user_id !== user.id ? (
           <FullUser
             profile={{
               address: '',
@@ -124,7 +171,8 @@ export const XPEarningsTable = () => {
         ),
     },
     auraAmount:
-      user.id === log.creator_user_id ? log.creator_xp_points : log.xp_points,
+      (user.id === log.user_id ? log.xp_points : 0) +
+      (user.id === log.creator_user_id ? log.creator_xp_points || 0 : 0),
     questLink: {
       customElement: (
         <a
