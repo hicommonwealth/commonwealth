@@ -30,7 +30,7 @@ export const Outbox = z.union(
       created_at: z.coerce.date().optional(),
       updated_at: z.coerce.date().optional(),
     }),
-  ) as unknown as readonly [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]],
+  ) as unknown as readonly [z.ZodType, z.ZodType, ...z.ZodType[]],
 );
 
 export { events };

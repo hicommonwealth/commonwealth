@@ -15,6 +15,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleRingSpinner from 'views/components/component_kit/new_designs/CWCircleRingSpinner';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { buildRedirectURLFromContentId } from '../../CreateQuest/QuestForm/helpers';
 import { actionCopies } from './helpers';
 import './QuestActionCard.scss';
 import QuestActionXpShares from './QuestActionXPShares';
@@ -127,6 +128,7 @@ const QuestActionCard = ({
               'LaunchpadTokenTraded',
               'XpChainEventCreated',
               'CommunityGoalReached',
+              'SSOLinked',
             ].includes(questAction.event_name) && (
               <>
                 {questAction.event_name === 'CommunityCreated' &&
@@ -185,6 +187,15 @@ const QuestActionCard = ({
                         <CWCircleRingSpinner size="small" />
                       ),
                       foundGoalsMetaMeta?.target || <></>,
+                    )}
+                  </CWText>
+                )}
+                {questAction.event_name === 'SSOLinked' && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      buildRedirectURLFromContentId(
+                        questAction.content_id || '',
+                      ),
                     )}
                   </CWText>
                 )}

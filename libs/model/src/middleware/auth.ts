@@ -29,7 +29,7 @@ import {
   Role,
 } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
-import { ZodSchema, z } from 'zod';
+import { ZodType, z } from 'zod';
 import { models } from '../database';
 import { AddressInstance } from '../models';
 import { BannedActor, NonMember, RejectedMember } from './errors';
@@ -423,7 +423,7 @@ export const systemActor = ({
   is_system_actor: true,
 });
 
-export async function isSuperAdmin(ctx: Context<ZodSchema, ZodSchema>) {
+export async function isSuperAdmin(ctx: Context<ZodType, ZodType>) {
   if (!ctx.actor.user.isAdmin)
     await Promise.reject(new InvalidActor(ctx.actor, 'Must be a super admin'));
 }
@@ -439,6 +439,23 @@ export function authVerified() {
     const { address } = await findVerifiedAddress(ctx.actor);
     (ctx as { context: VerifiedContext }).context = { address };
   };
+}
+
+/**
+ * Optionally validates if actor's address is authorized/verified, not tied to any specific community
+ */
+export async function authOptionalVerified(
+  ctx: Context<typeof VerifiedContextInput, typeof VerifiedContext>,
+) {
+  try {
+    if (!ctx.actor.user || !ctx.actor.address) return;
+    const { address } = await findVerifiedAddress(ctx.actor);
+    (ctx as { context: VerifiedContext }).context = { address };
+  } catch (err) {
+    // ignore InvalidActor errors
+    if (err instanceof InvalidActor) return;
+    throw err;
+  }
 }
 
 /**
