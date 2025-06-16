@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { MCPServer } from '../entities';
 
 export const GetAllMCPServers = {
-  input: z.object({}),
+  input: z.void(),
   output: z.array(MCPServer),
-  context: z.object({}),
 };
