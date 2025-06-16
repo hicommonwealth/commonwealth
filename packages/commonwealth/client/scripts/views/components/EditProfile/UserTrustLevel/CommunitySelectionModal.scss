@@ -1,4 +1,5 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .CommunitySectionModal {
   display: flex;
@@ -7,7 +8,7 @@
   padding: 16px 0;
 
   .description {
-    color: $neutral-500;
+    color: colors.$neutral-500;
     text-align: center;
   }
 

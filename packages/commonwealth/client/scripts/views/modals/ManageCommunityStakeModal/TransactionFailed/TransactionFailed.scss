@@ -1,4 +1,5 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/media_queries';
 
 .TransactionFailed {
   .CWModalBody {
@@ -7,7 +8,7 @@
     align-items: center;
     margin-bottom: 8px;
 
-    @include heightSmallInclusive {
+    @include media_queries.heightSmallInclusive {
       min-height: unset;
     }
   }

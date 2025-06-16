@@ -1,4 +1,7 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .NewThreadForm {
   flex-direction: row;
@@ -22,7 +25,7 @@
       padding-bottom: 24px;
     }
 
-    @include mediumSmallInclusive {
+    @include media_queries.mediumSmallInclusive {
       width: 100%;
     }
 
@@ -49,7 +52,7 @@
       justify-content: space-between;
       width: 100%;
 
-      @include smallInclusive {
+      @include media_queries.smallInclusive {
         flex-direction: column;
       }
 
@@ -72,8 +75,8 @@
         width: 100%;
 
         .set-display-name-callout {
-          background-color: $purple-50;
-          border-radius: $border-radius-corners;
+          background-color: colors.$purple-50;
+          border-radius: border_radius.$border-radius-corners;
           display: flex;
           flex-direction: column;
           gap: 8px;
@@ -83,9 +86,9 @@
         }
 
         .draft-text.Text {
-          background-color: $rorange-50;
-          border-radius: $border-radius-rounded-corners;
-          color: $rorange-500;
+          background-color: colors.$rorange-50;
+          border-radius: border_radius.$border-radius-rounded-corners;
+          color: colors.$rorange-500;
           margin-bottom: 16px;
           padding: 4px 16px;
           width: fit-content;
@@ -96,7 +99,7 @@
           flex-wrap: wrap;
           gap: 8px;
 
-          @include mediumInclusive {
+          @include media_queries.mediumInclusive {
             .Button {
               flex: 1;
             }
@@ -125,10 +128,10 @@
           }
 
           .toggle-label {
-            color: $neutral-500;
+            color: colors.$neutral-500;
           }
 
-          @include smallInclusive {
+          @include media_queries.smallInclusive {
             flex-wrap: wrap;
 
             .ai-toggle-wrapper {
@@ -153,7 +156,7 @@
       flex-direction: column;
 
       .drafts-list-title-text.Text {
-        border-bottom: 2px solid $primary-500;
+        border-bottom: 2px solid colors.$primary-500;
         margin: 0 0 8px 16px;
         width: fit-content;
       }
@@ -165,7 +168,7 @@
         overflow-y: auto;
         width: 200px;
 
-        @include visibleScrollbar(light);
+        @include shared.visibleScrollbar(light);
 
         .draft-item {
           cursor: pointer;
@@ -175,7 +178,7 @@
           padding: 8px 16px;
 
           &:hover {
-            background-color: $neutral-50;
+            background-color: colors.$neutral-50;
           }
 
           .draft-title {
@@ -185,7 +188,7 @@
           }
 
           .draft-delete-text {
-            color: $rorange-500;
+            color: colors.$rorange-500;
           }
         }
       }

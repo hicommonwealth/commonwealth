@@ -1,24 +1,27 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/elevation';
 
 @mixin bareAvatar {
   position: relative;
   display: inline-block;
   margin-right: 8px;
-  background: $white;
-  border-radius: $border-radius-round;
+  background: colors.$white;
+  border-radius: border_radius.$border-radius-round;
   overflow: hidden;
 
   .avatar-image {
-    background: $neutral-200;
+    background: colors.$neutral-200;
     background-size: cover;
   }
 }
 
 @mixin circledAvatar {
-  border-radius: $border-radius-round;
+  border-radius: border_radius.$border-radius-round;
   overflow: hidden;
   margin: 0;
-  background: $white;
+  background: colors.$white;
   box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.1);
 
   svg {
@@ -28,15 +31,15 @@
   .avatar-image {
     width: 100% !important;
     height: 100% !important;
-    background: $neutral-200;
+    background: colors.$neutral-200;
     background-size: cover;
   }
 }
 
 @mixin roleIcon {
-  background: $primary-600;
-  border-radius: $border-radius-round;
-  color: $white;
+  background: colors.$primary-600;
+  border-radius: border_radius.$border-radius-round;
+  color: colors.$white;
   display: inline-block;
   font-size: 12px;
   font-weight: 500;
@@ -47,19 +50,19 @@
   height: 14px;
 
   &.green {
-    background: $green-500;
+    background: colors.$green-500;
   }
 
   &.red {
-    background: $rorange-500;
+    background: colors.$rorange-500;
   }
 
   &.gray {
-    background: $primary-400;
+    background: colors.$primary-400;
   }
 
   &.long {
-    border-radius: $border-radius-corners;
+    border-radius: border_radius.$border-radius-corners;
     font-size: 15px;
     font-weight: 400;
     height: 24px;
@@ -92,7 +95,7 @@
   }
 
   a.user-display-name {
-    color: $neutral-800;
+    color: colors.$neutral-800;
     cursor: inherit;
     text-decoration: initial;
     display: flex;
@@ -110,9 +113,9 @@
     font-size: 12px;
     font-weight: 500;
     margin-left: 10px;
-    color: $neutral-800;
-    background: $neutral-200;
-    border-radius: $border-radius-corners-wider;
+    color: colors.$neutral-800;
+    background: colors.$neutral-200;
+    border-radius: border_radius.$border-radius-corners-wider;
     text-decoration: none !important;
     display: flex;
     padding: 4px 8px;
@@ -146,9 +149,9 @@
 }
 
 .UserPopover {
-  background-color: $white;
-  border-radius: $border-radius-corners;
-  box-shadow: $elevation-3;
+  background-color: colors.$white;
+  border-radius: border_radius.$border-radius-corners;
+  box-shadow: elevation.$elevation-3;
   padding: 8px;
   text-align: center !important;
   display: flex;
@@ -176,7 +179,7 @@
 
     a {
       text-decoration: none !important;
-      color: $neutral-800 !important;
+      color: colors.$neutral-800 !important;
     }
 
     a:hover {
@@ -186,7 +189,7 @@
 
   .user-address,
   .user-chain {
-    color: $neutral-500 !important;
+    color: colors.$neutral-500 !important;
   }
   .address-container {
     display: 'flex';

@@ -1,8 +1,9 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .ReferenceImageItem {
   align-items: center;
-  background-color: $neutral-200; // Lighter background for empty state
+  background-color: colors.$neutral-200; // Lighter background for empty state
   border-radius: 50%; // Perfect circle
   cursor: pointer;
   display: flex;
@@ -14,7 +15,7 @@
 
   // Add a dashed border for the empty state
   &:not(:has(img)) {
-    border: 1px dashed $neutral-400;
+    border: 1px dashed colors.$neutral-400;
   }
 
   &:hover {
@@ -22,7 +23,7 @@
   }
 
   .icon-button-container {
-    background-color: $white;
+    background-color: colors.$white;
     border-radius: 50%;
     position: absolute;
     right: -4px;
@@ -36,26 +37,26 @@
 
     // Styles for the X button
     &.with-image {
-      background-color: $neutral-100;
+      background-color: colors.$neutral-100;
 
       .IconButton {
-        color: $neutral-600;
+        color: colors.$neutral-600;
 
         &:hover {
-          color: $neutral-800;
+          color: colors.$neutral-800;
         }
       }
     }
 
     // Styles for the + button
     &.empty {
-      background-color: $primary-500;
+      background-color: colors.$primary-500;
 
       .IconButton {
-        color: $white;
+        color: colors.$white;
 
         &:hover {
-          color: $white;
+          color: colors.$white;
         }
       }
     }

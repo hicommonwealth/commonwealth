@@ -1,4 +1,6 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
+@use '../../../../../../styles/mixins/media_queries';
 
 .InformationalCTAStep {
   display: flex;
@@ -7,22 +9,22 @@
   width: 100%;
 
   .description {
-    color: $neutral-600;
+    color: colors.$neutral-600;
   }
 
   .cta-link-container {
     margin-top: 12px;
-    color: $neutral-700 !important;
+    color: colors.$neutral-700 !important;
 
     a {
-      color: $primary-600;
+      color: colors.$primary-600;
       text-decoration: none;
 
       &:focus,
       &:active,
       &:hover,
       &:visited {
-        color: $primary-600;
+        color: colors.$primary-600;
         outline: none;
         text-decoration: none;
       }
@@ -38,7 +40,7 @@
     margin-bottom: 24px;
     gap: 10px;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       justify-content: flex-end;
     }
   }
