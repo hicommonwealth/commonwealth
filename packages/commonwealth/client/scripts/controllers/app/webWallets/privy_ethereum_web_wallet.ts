@@ -145,8 +145,6 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
       });
       const chainIdHex = `0x${parseInt(chainId, 10).toString(16)}`;
       try {
-        const config = fetchCachedPublicEnvVar();
-
         if (config?.TEST_EVM_ETH_RPC !== 'test') {
           await this._web3.givenProvider.request({
             method: 'wallet_switchEthereumChain',

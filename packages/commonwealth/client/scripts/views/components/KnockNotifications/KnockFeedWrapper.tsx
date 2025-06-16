@@ -28,10 +28,16 @@ export const KnockFeedWrapper = memo(function KnockFeedWrapper({
 }: KnockFeedWrapperProps) {
   const user = useUserStore();
   const { data: publicEnvVars } = useFetchPublicEnvVarQuery();
+  const knockApiKey = publicEnvVars?.KNOCK_PUBLIC_API_KEY;
 
   useEffect(() => {
     const initializeKnock = async () => {
-      const knockClient = getKnockClient(publicEnvVars!.KNOCK_PUBLIC_API_KEY);
+      if (!knockApiKey) {
+        console.warn('No knockApiKey found, skipping Knock initialization');
+        return;
+      }
+
+      const knockClient = getKnockClient(knockApiKey);
       if (!user.id || !user.isLoggedIn || !user.knockJWT) {
         knockClient.teardown();
         return;
@@ -57,14 +63,8 @@ export const KnockFeedWrapper = memo(function KnockFeedWrapper({
       console.error('Error during Knock initialization:', error);
     });
 
-    return () => getKnockClient(publicEnvVars!.KNOCK_PUBLIC_API_KEY).teardown();
-  }, [
-    user.id,
-    user.email,
-    user.isLoggedIn,
-    user.knockJWT,
-    publicEnvVars!.KNOCK_PUBLIC_API_KEY,
-  ]);
+    return () => getKnockClient(knockApiKey).teardown();
+  }, [user.id, user.email, user.isLoggedIn, user.knockJWT, knockApiKey]);
 
   if (!user.id || !user.isLoggedIn || !user.knockJWT) {
     // Render children directly if user is not logged in or authenticated
