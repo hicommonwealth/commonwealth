@@ -142,9 +142,8 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                 `
                           AND EXISTS (
                             SELECT 1
-                            FROM   "LaunchpadTokens" AS "LaunchpadTokens"
-                            WHERE  ( "LaunchpadTokens"."namespace" = "Community"."namespace" )
-                            LIMIT  1
+                            FROM "LaunchpadTokens" AS "LaunchpadTokens"
+                            WHERE "LaunchpadTokens"."namespace" = "Community"."namespace"
                           )
                         `,
               )}
@@ -154,8 +153,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                           AND EXISTS (
                             SELECT 1
                             FROM   "PinnedTokens" AS "PinnedTokens"
-                            WHERE  ( "PinnedTokens"."community_id" = "Community"."id" )
-                            LIMIT  1
+                            WHERE  "PinnedTokens"."community_id" = "Community"."id"
                           )
                         `,
               )}
