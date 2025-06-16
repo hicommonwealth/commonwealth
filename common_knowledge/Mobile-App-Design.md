@@ -90,3 +90,66 @@ Also, you MUST use the 'expo' package manager to install new packages.
 To install you must run 'expo install' not 'npm install'.  This is because
 expo maintains a list of package compatibilities and will upgrade secondary 
 packages when necessary.  
+
+# Questions
+
+# What’s the recommended way to set up the mobile app for local development?
+
+The commonwealth-mobile2 repo has a file called BUILD_NOTES.md which gives an 
+overview.
+
+I've been trying to keep it up to date.
+
+The general Expo documentation also works. 
+
+
+# How do we deploy the mobile app to the staging environment?
+
+I documented that above but basically:
+
+- push to frack
+- use the gesture to change the config, select 'frack'
+
+# What’s the process for deploying the app to production (stores, versioning, approvals)?
+
+Ilya has this already setup.
+
+It's also documented in BUILD_NOTES.md
+
+Basically 'build' then 'submit' with eas.
+
+# What’s the CI/CD pipeline like for the mobile app?
+
+Ilya already has it setup.
+
+Once it's in the mobile app stores you have to manually deploy by logging 
+into the app stores and then promoting from test flight to prod.
+
+# What tools and steps are involved?
+
+Just 'eas' AKA expo application services. It builds everything for you.
+
+# Are there any environment variables specific to the mobile app that I should be aware of?
+
+They're all documented in config.ts
+
+# Are there any logic branches, features, or files that are mobile-only? How is platform-specific logic structured in the codebase?
+
+In the webapp, everything that uses the react-native mobile bridge is platform specific.
+
+Anything that access window.ReactNativeWebView ... 
+
+# Are we using Expo Updates, CodePush or any other over the air update mechanism?
+
+No. No OTA. Just app store specific build and release.
+
+# How is navigation handled across screens (e.g. React Navigation, custom routing)? Are there any hidden "gotcha's" when dealing with routing?
+
+We're using Expo navigation. We only have one route.  The main app route. 
+
+I've seen no major issue.
+
+# Are we using webview only or have any native components in place?
+
+Webview only but we have native components just setup for auth.  These components
+are used during authentication.
