@@ -199,6 +199,7 @@ describe('User lifecycle', () => {
           creator_xp_points: null,
           created_at: logs[0].created_at,
           scope: {
+            community_id,
             thread_id: thread!.id,
             topic_id,
           },
@@ -215,6 +216,7 @@ describe('User lifecycle', () => {
           creator_xp_points: null,
           created_at: logs[1].created_at,
           scope: {
+            community_id,
             thread_id,
             topic_id,
             comment_id: comment!.id,
@@ -232,6 +234,7 @@ describe('User lifecycle', () => {
           creator_xp_points: null,
           created_at: logs[2].created_at,
           scope: {
+            community_id,
             thread_id,
             topic_id,
             comment_id: comment2!.id,
@@ -249,6 +252,7 @@ describe('User lifecycle', () => {
           creator_xp_points: 2,
           created_at: logs[3].created_at,
           scope: {
+            community_id,
             thread_id,
             topic_id,
             comment_id: comment!.id,
@@ -508,6 +512,7 @@ describe('User lifecycle', () => {
           creator_xp_points: null,
           created_at: last[0].created_at,
           scope: {
+            community_id,
             thread_id: thread!.id,
             topic_id,
           },
@@ -524,6 +529,7 @@ describe('User lifecycle', () => {
           creator_xp_points: null,
           created_at: last[1].created_at,
           scope: {
+            community_id,
             thread_id,
             topic_id,
             comment_id: comment!.id,
@@ -541,6 +547,7 @@ describe('User lifecycle', () => {
           creator_xp_points: 2,
           created_at: last[2].created_at,
           scope: {
+            community_id,
             thread_id,
             topic_id,
             comment_id: comment!.id,
@@ -608,7 +615,7 @@ describe('User lifecycle', () => {
       // 4 events after first CommentUpvoted
       const xps3 = await query(GetXps(), {
         actor: admin,
-        payload: { from: xps2!.at(-1)!.created_at },
+        payload: { from: new Date(xps2!.at(-1)!.created_at) },
       });
       expect(xps3!.length).to.equal(5);
 
