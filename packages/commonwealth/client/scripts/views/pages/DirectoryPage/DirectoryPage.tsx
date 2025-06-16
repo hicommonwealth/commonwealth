@@ -57,7 +57,7 @@ const DirectoryPage = () => {
   const communitySearchDebounced = useDebounce<string>(communitySearch, 500);
 
   const { data: nodes } = useFetchNodesQuery();
-  const { data: tagsForFilter } = useFetchTagsQuery();
+  const { data: tagsForFilter } = useFetchTagsQuery({ enabled: true });
   const navigate = useCommonNavigate();
 
   const [filteredTagsList, setFilteredTagsList] = useState<

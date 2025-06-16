@@ -1,4 +1,5 @@
 import { dispose } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import Chance from 'chance';
@@ -15,7 +16,7 @@ describe('createComment Integration Tests', () => {
   let server: TestServer;
 
   const getThreadCommentCount = async (threadId) => {
-    const thread = await server.models.Thread.findOne({
+    const thread = await models.Thread.findOne({
       where: { id: threadId },
     });
     // @ts-expect-error StrictNullChecks
@@ -41,7 +42,7 @@ describe('createComment Integration Tests', () => {
   const getUniqueCommentText = async () => {
     const time = new Date().getMilliseconds();
     const body = `${chance.name()} at ${time}`;
-    const comment = await server.models.Comment.findOne({
+    const comment = await models.Comment.findOne({
       where: { body },
     });
     chai.assert.isNull(comment);
@@ -123,7 +124,7 @@ describe('createComment Integration Tests', () => {
       jwtTokenUser1,
     );
     chai.assert.equal(response.status, 200);
-    const comment = await server.models.Comment.findOne({
+    const comment = await models.Comment.findOne({
       where: { body },
     });
     chai.assert.isNotNull(comment);
@@ -142,7 +143,7 @@ describe('createComment Integration Tests', () => {
       jwtTokenUser1,
     );
 
-    let comment = await server.models.Comment.findOne({
+    let comment = await models.Comment.findOne({
       where: { body },
     });
     let afterCommentCount = await getThreadCommentCount(
@@ -154,7 +155,7 @@ describe('createComment Integration Tests', () => {
     chai.assert.equal(response.status, 200);
 
     const deleteResponse = await deleteComment(comment!.id, jwtTokenUser1);
-    comment = await server.models.Comment.findOne({
+    comment = await models.Comment.findOne({
       where: { body },
     });
     afterCommentCount = await getThreadCommentCount(

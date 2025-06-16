@@ -1,5 +1,5 @@
 import { pluralize } from 'helpers';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 export const actionCopies = {
   title: {
@@ -15,10 +15,14 @@ export const actionCopies = {
     ['TweetEngagement']: 'Engage on Tweet',
     ['DiscordServerJoined']: 'Join Discord Community',
     ['MembershipsRefreshed']: 'Join a Group',
-    ['LaunchpadTokenCreated']: 'Launch a Token on Common',
+    ['XpChainEventCreated']: 'Engage on Blockchain',
+    ['LaunchpadTokenRecordCreated']: 'Launch a Token on Common',
+    ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
+    ['CommunityGoalReached']: 'Complete the community goal',
+    ['RecurringContestManagerDeployed']: 'Create a Recurring Contest',
   },
   pre_reqs: {
-    ['SignUpFlowCompleted']: '',
+    ['SignUpFlowCompleted']: () => '',
     ['CommunityCreated']: () => '',
     ['CommunityJoined']: () => '',
     ['ThreadCreated']: () => '',
@@ -31,11 +35,15 @@ export const actionCopies = {
       `Requires Twitter/X profile linked to ${displayFor === 'admin' ? "user's" : 'your'} Common profile.`,
     ['DiscordServerJoined']: (displayFor: 'user' | 'admin' = 'user') =>
       `Requires Discord SSO sign-in/linked-to ${displayFor === 'admin' ? 'user' : 'your'} account.`,
-    ['MembershipsRefreshed']: '',
-    ['LaunchpadTokenCreated']: '',
+    ['MembershipsRefreshed']: () => '',
+    ['XpChainEventCreated']: () => '',
+    ['LaunchpadTokenRecordCreated']: () => '',
+    ['LaunchpadTokenTraded']: () => '',
+    ['CommunityGoalReached']: () => '',
+    ['RecurringContestManagerDeployed']: '',
   },
   explainer: {
-    ['SignUpFlowCompleted']: '',
+    ['SignUpFlowCompleted']: () => '',
     ['CommunityCreated']: (chainName?: string) =>
       chainName ? `● Must be created on the ${chainName} chain.` : '',
     ['CommunityJoined']: () => '',
@@ -44,7 +52,19 @@ export const actionCopies = {
     ['CommentCreated']: () => '',
     ['CommentUpvoted']: () => '',
     ['WalletLinked']: () => '',
-    ['SSOLinked']: () => '',
+    ['SSOLinked']: (ssoType?: string) =>
+      ssoType ? (
+        <div>
+          <ul>
+            <li>
+              ● Link <span className="capitalize">{ssoType}</span> SSO to your
+              account.
+            </li>
+          </ul>
+        </div>
+      ) : (
+        ''
+      ),
     ['TweetEngagement']: (likes: number, retweets: number, replies: number) => (
       <div>
         <ul>
@@ -82,9 +102,76 @@ export const actionCopies = {
         </ul>
       </div>
     ),
-    ['DiscordServerJoined']: '',
-    ['MembershipsRefreshed']: '',
-    ['LaunchpadTokenCreated']: '',
+    ['DiscordServerJoined']: () => '',
+    ['MembershipsRefreshed']: () => '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['XpChainEventCreated']: (
+      contractAddress: string,
+      ethChainId: number | string,
+    ) => (
+      <div>
+        <ul>
+          <li>
+            ● Any user address who&apos;s transaction emits the event on the
+            ethereum chain: {ethChainId} and contract: {contractAddress}, will
+            receive Aura.
+          </li>
+          <li>
+            ● Aura goes to the initiator of the transaction, and not the
+            receiver/target of it.
+          </li>
+        </ul>
+      </div>
+    ),
+    ['LaunchpadTokenRecordCreated']: () => '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['LaunchpadTokenTraded']: (
+      amountMultipler: string | number,
+      ethAmount?: string | number,
+    ) => (
+      <div>
+        <ul>
+          <li>
+            ● This action rewards aura based on your trade volume ex: You trade
+            1 ETH tokens worth, you get 1 Aura.
+          </li>
+          <li>
+            ● This action has an aura multipler of {amountMultipler}x. You trade
+            1 ETH tokens worth, you get {amountMultipler} Aura.
+          </li>
+          {ethAmount && (
+            <li>
+              ● Aura is only awarded after a miminum {ethAmount} ETH worth of
+              launchpad token is traded.
+            </li>
+          )}
+          <li>
+            ● No Aura is awarded if your trade amount multiplied by the aura
+            multiplier does not equal at least 1 Aura.
+          </li>
+        </ul>
+      </div>
+    ),
+    // eslint-disable-next-line react/no-multi-comp
+    ['CommunityGoalReached']: (type: ReactNode, target: ReactNode) => (
+      <div>
+        <ul>
+          <li>
+            ● Reach {target} {type} before quest ends.
+          </li>
+        </ul>
+      </div>
+    ),
+    // eslint-disable-next-line react/no-multi-comp
+    ['RecurringContestManagerDeployed']: () => (
+      <div>
+        <ul>
+          <li>● Contest must be funded with a prize pool</li>
+          <li>● Aura is awarded when the contest is successfully deployed</li>
+          <li>● Only the contest creator receives Aura for this action</li>
+        </ul>
+      </div>
+    ),
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -100,6 +187,10 @@ export const actionCopies = {
     ['TweetEngagement']: '',
     ['DiscordServerJoined']: '',
     ['MembershipsRefreshed']: '',
-    ['LaunchpadTokenCreated']: '',
+    ['XpChainEventCreated']: '',
+    ['LaunchpadTokenRecordCreated']: '',
+    ['LaunchpadTokenTraded']: '',
+    ['CommunityGoalReached']: '',
+    ['RecurringContestManagerDeployed']: '',
   },
 };

@@ -1,9 +1,6 @@
-import {
-  MembershipRejectReason,
-  PermissionEnum,
-} from '@hicommonwealth/schemas';
+import { MembershipRejectReason } from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { trpc } from 'client/scripts/utils/trpcClient';
-import { z } from 'node_modules/zod';
 
 const GET_MEMBERSHIPS_STALE_TIME = 5 * 60 * 1_000; // 5 min
 
@@ -16,9 +13,9 @@ interface GetMembershipsProps {
 
 export interface Memberships {
   groupId: number;
-  topics: { id: number; permissions: PermissionEnum[] }[];
+  topics: { id: number; permissions: GatedActionEnum[] }[];
   isAllowed: boolean;
-  rejectReason?: z.infer<typeof MembershipRejectReason>;
+  rejectReason?: MembershipRejectReason;
 }
 
 export const useGetMembershipsQuery = ({
@@ -35,7 +32,7 @@ export const useGetMembershipsQuery = ({
     },
     {
       enabled,
-      cacheTime: GET_MEMBERSHIPS_STALE_TIME,
+      gcTime: GET_MEMBERSHIPS_STALE_TIME,
       staleTime: GET_MEMBERSHIPS_STALE_TIME,
     },
   );

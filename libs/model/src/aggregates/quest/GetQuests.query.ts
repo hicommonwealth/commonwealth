@@ -11,6 +11,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
     secure: false,
     body: async ({ payload }) => {
       const {
+        search = '',
         community_id,
         cursor,
         limit,
@@ -27,6 +28,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
       const order = order_by || 'created_at';
       const offset = limit! * (cursor! - 1);
       const replacements = {
+        search: search ? `%${search.toLowerCase()}%` : '',
         direction,
         community_id,
         order,
@@ -44,6 +46,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         start_before ? `Q.start_date <= :start_before` : '',
         end_after ? `Q.end_date > :end_after` : '',
         end_before ? `Q.end_date <= :end_before` : '',
+        search ? 'LOWER(Q.name) LIKE :search' : '',
       ].filter(Boolean);
 
       const sql = `
@@ -67,17 +70,31 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
                 'reward_amount', QAS.reward_amount,
                 'instructions_link', QAS.instructions_link,
                 'creator_reward_weight', QAS.creator_reward_weight,
+                'amount_multiplier', QAS.amount_multiplier,
+                'content_id', QAS.content_id,
                 'participation_limit', QAS.participation_limit,
                 'participation_period', QAS.participation_period,
                 'participation_times_per_period', QAS.participation_times_per_period,
                 'created_at', QAS.created_at,
-                'updated_at', QAS.updated_at
+                'updated_at', QAS.updated_at,
+                'CommunityGoalMeta', 
+                  CASE 
+                    WHEN CGM.id IS NOT NULL THEN json_build_object(
+                      'id', CGM.id,
+                      'name', CGM.name,
+                      'description', CGM.description,
+                      'type', CGM.type,
+                      'target', CGM.target
+                    )
+                    ELSE NULL
+                  END
             )))
           ELSE '[]'::json
           END AS "action_metas"
         FROM 
           "Quests" as Q
-        LEFT JOIN "QuestActionMetas" QAS on QAS.quest_id = Q.id
+          LEFT JOIN "QuestActionMetas" QAS on QAS.quest_id = Q.id
+          LEFT JOIN "CommunityGoalMetas" CGM on QAS.community_goal_meta_id = CGM.id
         ${filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : ''}
         GROUP BY Q.id
         ORDER BY Q.${order} ${direction}

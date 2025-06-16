@@ -5,7 +5,6 @@ import { ChainBase, TwitterBotName } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
-  SENDGRID_API_KEY,
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
@@ -33,6 +32,7 @@ const {
   TWITTER_WORKER_POLL_INTERVAL,
   TWITTER_ENABLED_BOTS,
   EVM_CE_ETH_CHAIN_ID_OVERRIDE,
+  RAILWAY_PUBLIC_DOMAIN,
 } = process.env;
 
 const DEFAULTS = {
@@ -72,9 +72,6 @@ export const config = configure(
         DEFAULTS.MAGIC_SUPPORTED_BASES,
       MAGIC_DEFAULT_CHAIN:
         (MAGIC_DEFAULT_CHAIN as ChainBase) ?? DEFAULTS.MAGIC_DEFAULT_CHAIN,
-    },
-    SENDGRID: {
-      API_KEY: SENDGRID_API_KEY,
     },
     TELEGRAM: {
       BOT_TOKEN:
@@ -147,6 +144,9 @@ export const config = configure(
         ? parseInt(CACHE_GET_COMMUNITIES_JOIN_COMMUNITY, 10)
         : DEFAULTS.CACHE_GET_COMMUNITIES_JOIN_COMMUNITY,
     },
+    RAILWAY: {
+      RAILWAY_PUBLIC_DOMAIN,
+    },
   },
   z.object({
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
@@ -166,15 +166,6 @@ export const config = configure(
         ),
       MAGIC_SUPPORTED_BASES: z.array(z.nativeEnum(ChainBase)),
       MAGIC_DEFAULT_CHAIN: z.nativeEnum(ChainBase),
-    }),
-    SENDGRID: z.object({
-      API_KEY: z
-        .string()
-        .optional()
-        .refine(
-          (data) => !(model_config.APP_ENV === 'production' && !data),
-          'SENDGRID_API_KEY is required in production',
-        ),
     }),
     TELEGRAM: z.object({
       BOT_TOKEN: z
@@ -250,6 +241,9 @@ export const config = configure(
       POLL_INTERVAL_MS: z.number().int().positive(),
       LOG_TRACE: z.boolean(),
       ETH_CHAIN_ID_OVERRIDE: z.array(z.number()).optional(),
+    }),
+    RAILWAY: z.object({
+      RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
     }),
   }),
 );

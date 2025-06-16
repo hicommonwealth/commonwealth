@@ -16,11 +16,6 @@ import { AuthModal } from 'views/modals/AuthModal';
 import TradeTokenModal, { TradingMode } from 'views/modals/TradeTokenModel';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { z } from 'zod';
-import {
-  CommunityFilters,
-  CommunitySortOptions,
-  communitySortOptionsLabelToKeysMap,
-} from '../../Communities/FiltersDrawer';
 import TrendingToken from '../TrendingToken/TrendingToken';
 import './TrendingTokenList.scss';
 
@@ -28,13 +23,7 @@ const TokenWithCommunity = TokenView.extend({
   community_id: z.string(),
 });
 
-type TokensListProps = {
-  filters?: CommunityFilters;
-};
-
-const TrendingTokensList = ({
-  filters = { withCommunitySortBy: CommunitySortOptions.MarketCap },
-}: TokensListProps) => {
+const TrendingTokensList = () => {
   const user = useUserStore();
   const navigate = useNavigate();
   const launchpadEnabled = useFlag('launchpad');
@@ -58,21 +47,6 @@ const TrendingTokensList = ({
     cursor: 1,
     limit: 3,
     with_stats: true,
-    order_by: (() => {
-      if (
-        filters.withCommunitySortBy &&
-        [CommunitySortOptions.MarketCap, CommunitySortOptions.Price].includes(
-          filters.withCommunitySortBy,
-        )
-      ) {
-        return communitySortOptionsLabelToKeysMap[
-          filters.withCommunitySortBy
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ] as any;
-      }
-
-      return undefined;
-    })(),
     enabled: launchpadEnabled,
   });
   const tokens = (tokensList?.pages || [])

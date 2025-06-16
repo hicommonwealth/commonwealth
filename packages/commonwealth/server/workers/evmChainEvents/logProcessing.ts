@@ -11,6 +11,8 @@ import { EventPairs } from '@hicommonwealth/schemas';
 import { createPublicClient, getAddress, http } from 'viem';
 import { config } from '../../config';
 
+const ALCHEMY_BLOCK_LIMIT = 9_000;
+
 const logger = _logger(import.meta);
 
 /**
@@ -36,36 +38,47 @@ export async function getLogs({
   blockDetails: Record<number, EvmBlockDetails>;
 }> {
   let startBlock = startingBlockNum;
-  if (startBlock > endingBlockNum) {
+  let endBlock = endingBlockNum;
+  if (startBlock > endBlock) {
     logger.error(
       'Starting block number is greater than the latest/current block number!',
       undefined,
       {
         startBlock,
-        endingBlockNum,
+        endBlock,
       },
     );
-    return { logs: [], lastBlockNum: endingBlockNum, blockDetails: {} };
+    return { logs: [], lastBlockNum: endBlock, blockDetails: {} };
   }
 
   if (contractAddresses.length === 0) {
     logger.error(`No contracts given`);
-    return { logs: [], lastBlockNum: endingBlockNum, blockDetails: {} };
+    return { logs: [], lastBlockNum: endBlock, blockDetails: {} };
   }
 
-  // limit the number of blocks to fetch to avoid rate limiting on some public EVM nodes like Celo
-  // maxBlockRange = -1 indicates there is no block range limit
-  if (maxBlockRange !== -1 && endingBlockNum - startBlock > maxBlockRange) {
-    startBlock = endingBlockNum - maxBlockRange;
+  // Limit the number of blocks to fetch to avoid rate limiting on some public EVM nodes like Celo
+  // maxBlockRange = -1 indicates there is no rate limiting (though chunking
+  // may still be required - see the next condition)
+  if (maxBlockRange !== -1 && endBlock - startBlock > maxBlockRange) {
+    startBlock = endBlock - maxBlockRange;
     logger.error(
       'Block span too large. The number of fetch blocked is reduced to 500.',
       undefined,
       {
         contractAddresses,
         startBlock,
-        endingBlockNum,
+        endBlock,
       },
     );
+  } else if (
+    maxBlockRange === -1 &&
+    endBlock - startBlock > ALCHEMY_BLOCK_LIMIT
+  ) {
+    // For Alchemy nodes where we won't get rate limited we just need to go through
+    // all the blocks but in chunks of 9k (max is 10k).
+    // This is different from the case above which increases the startBlock (skipping blocks)
+    endBlock = startBlock + ALCHEMY_BLOCK_LIMIT;
+    logger.trace(`Reduced block range to 9k: ${startBlock} to ${endBlock}`);
   }
 
   const client = createPublicClient({
@@ -74,7 +87,7 @@ export async function getLogs({
   const logs: Log[] = (await client.getLogs({
     address: <`0x${string}`[]>contractAddresses,
     fromBlock: BigInt(startBlock),
-    toBlock: BigInt(endingBlockNum),
+    toBlock: BigInt(endBlock),
   })) as Log[];
 
   const blockNumbers = [...new Set(logs.map((l) => l.blockNumber))];
@@ -98,7 +111,7 @@ export async function getLogs({
 
   return {
     logs,
-    lastBlockNum: endingBlockNum,
+    lastBlockNum: endBlock,
     blockDetails: blockDetails.reduce((map, details) => {
       map[String(details.number)] = details;
       return map;

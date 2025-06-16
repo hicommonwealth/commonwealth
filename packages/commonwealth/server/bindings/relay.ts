@@ -1,5 +1,6 @@
-import { Broker, Outbox, logger, stats } from '@hicommonwealth/core';
+import { Broker, logger, stats } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { Outbox } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../config';
@@ -28,6 +29,7 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
     for (const event of events) {
       try {
         const res = await broker.publish({
+          id: event.event_id,
           name: event.event_name,
           payload: event.event_payload,
         });

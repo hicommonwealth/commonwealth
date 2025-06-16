@@ -45,14 +45,14 @@ export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
             ({ username }) => `Hey @${username}. ${prettyError}`,
           );
         }
-        return;
+        return '';
       }
       mustExist('Parsed Contest Metadata', contestMetadata);
 
       const botNamespace = config.BOT.CONTEST_BOT_NAMESPACE;
 
       if (!botNamespace || botNamespace === '') {
-        new InvalidState('bot not enabled on given chain');
+        throw new InvalidState('bot not enabled on given chain');
       }
 
       const community = await models.Community.findOne({
@@ -86,7 +86,7 @@ export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
           );
         }
         log.warn(`token validation failed: ${(err as Error).message}`);
-        return;
+        return '';
       }
 
       mustBeProtocolChainId(community.ChainNode!.eth_chain_id!);

@@ -1,10 +1,9 @@
 import { AddressRole } from '@hicommonwealth/shared';
-import axios from 'axios';
 import { useUpdateRoleMutation } from 'client/scripts/state/api/communities';
+import { useGetRolesQuery } from 'client/scripts/state/api/communities/getRoles';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
-import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { User } from 'views/components/user/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
@@ -28,6 +27,11 @@ export const ManageRoles = ({
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const { mutateAsync: updateRole } = useUpdateRoleMutation();
+  const { data: adminsAndModerators } = useGetRolesQuery({
+    community_id: app.activeChainId()!,
+    roles: ['moderator', 'admin'],
+    apiEnabled: false,
+  });
 
   const removeRole = async (role: AddressRole) => {
     const result = await updateRole({
@@ -48,20 +52,13 @@ export const ManageRoles = ({
       ({ address }) => address === role.address,
     );
 
-    const res = await axios.get(`${SERVER_URL}/roles`, {
-      params: {
-        chain_id: app.activeChainId(),
-        permissions: ['moderator', 'admin'],
-      },
-    });
-    const returnedAddrs = res.data.result;
-
-    const userAdminsAndMods = returnedAddrs.filter((addr) => {
-      const belongsToUser = !!user.addresses.filter(
-        (addr_) => addr_.address === addr.address,
-      ).length;
-      return belongsToUser;
-    });
+    const userAdminsAndMods =
+      adminsAndModerators?.filter((addr) => {
+        const belongsToUser = !!user.addresses.filter(
+          (addr_) => addr_.address === addr.address,
+        ).length;
+        return belongsToUser;
+      }) || [];
 
     const onlyModsRemaining = () => {
       const modCount = userAdminsAndMods.filter(

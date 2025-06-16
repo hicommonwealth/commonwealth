@@ -3,12 +3,13 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../../database';
+import { authOptional } from '../../middleware';
 
 export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
   return {
     ...schemas.GetThreadsByIds,
-    auth: [],
-    secure: false,
+    auth: [authOptional],
+    secure: true,
     body: async ({ payload }) => {
       const { community_id, thread_ids } = payload;
       if (thread_ids === '') return [];
@@ -26,6 +27,7 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
         throw new InvalidInput('Invalid thread_ids format');
       }
 
+      // TODO: add gating filters if needed, just used in thread linking atm
       const threads = await models.Thread.findAll({
         where: {
           ...(community_id && { community_id }),

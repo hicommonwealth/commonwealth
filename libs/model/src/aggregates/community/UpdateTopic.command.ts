@@ -28,7 +28,6 @@ export function UpdateTopic(): Command<typeof schemas.UpdateTopic> {
         name,
         description,
         telegram,
-        group_ids,
         featured_in_sidebar,
         featured_in_new_post,
         allow_tokenized_threads,
@@ -54,9 +53,6 @@ export function UpdateTopic(): Command<typeof schemas.UpdateTopic> {
       }
       if (typeof telegram !== 'undefined') {
         topic.telegram = telegram || '';
-      }
-      if (Array.isArray(group_ids)) {
-        topic.group_ids = group_ids;
       }
       if (typeof featured_in_sidebar !== 'undefined') {
         topic.featured_in_sidebar = featured_in_sidebar || false;

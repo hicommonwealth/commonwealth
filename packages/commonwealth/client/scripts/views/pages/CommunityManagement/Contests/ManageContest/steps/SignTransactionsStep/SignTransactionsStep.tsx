@@ -1,9 +1,11 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
+import useGetJudgeStatusQuery from 'client/scripts/state/api/contests/getJudgeStatus';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useFlag } from 'hooks/useFlag';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelContestEvents,
@@ -15,6 +17,7 @@ import {
   useDeployRecurringContestOnchainMutation,
   useDeploySingleERC20ContestOnchainMutation,
   useDeploySingleJudgedContestOnchainMutation,
+  useNominateJudgesMutation,
 } from 'state/api/contests';
 import { DeploySingleERC20ContestOnchainProps } from 'state/api/contests/deploySingleERC20ContestOnchain';
 import { DeploySingleJudgedContestOnchainProps } from 'state/api/contests/deploySingleJudgedContestOnchain';
@@ -68,6 +71,11 @@ const SignTransactionsStep = ({
     errorText: '',
   });
 
+  const [nominateSelfData, setNominateSelfData] = useState({
+    state: 'not-started' as ActionStepProps['state'],
+    errorText: '',
+  });
+
   const { stakeData } = useCommunityStake();
 
   const { mutateAsync: deployRecurringContestOnchainMutation } =
@@ -79,8 +87,18 @@ const SignTransactionsStep = ({
   const { mutateAsync: configureNominationsMutation } =
     useConfigureNominationsMutation();
 
+  const { mutateAsync: nominateJudges } = useNominateJudgesMutation();
+
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
+  const { data: judgeStatus } = useGetJudgeStatusQuery(app.activeChainId());
+
   const user = useUserStore();
+
+  const communityId = app.activeChainId() || '';
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -100,22 +118,33 @@ const SignTransactionsStep = ({
   const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
   const walletAddress = user.activeAccount?.address || '';
 
+  const judgeIdToUse = useMemo(() => {
+    if (judgedContest && community?.pending_namespace_judge_token_id) {
+      return community.pending_namespace_judge_token_id;
+    }
+    return (judgeStatus?.current_judge_id || 100) + 1;
+  }, [
+    judgedContest,
+    community?.pending_namespace_judge_token_id,
+    judgeStatus?.current_judge_id,
+  ]);
+
   const signTransaction = async () => {
     const contestLength = devContest
       ? CUSTOM_CONTEST_DURATION_IN_SECONDS
       : contestFormData?.contestDuration || 0;
 
-    const stakeId = stakeData?.stake_id;
+    const stakeId = stakeData?.stake?.stake_id || 0;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
-    const weight = stakeData?.vote_weight;
+    const weight = stakeData?.stake?.vote_weight || 0;
     const contestInterval = devContest
       ? CUSTOM_CONTEST_DURATION_IN_SECONDS
       : contestFormData?.contestDuration;
     const prizeShare = contestFormData?.prizePercentage;
     const exchangeToken = isDirectDepositSelected
       ? contestFormData?.fundingTokenAddress || ZERO_ADDRESS
-      : stakeData?.stake_token;
+      : stakeData?.stake?.stake_token;
     const winnerShares = contestFormData?.payoutStructure;
     const voteToken = contestFormData?.isFarcasterContest
       ? exchangeToken
@@ -142,7 +171,7 @@ const SignTransactionsStep = ({
       voterShare,
       walletAddress,
       exchangeToken,
-      judgeId: 1,
+      judgeId: judgeIdToUse,
     } as DeploySingleJudgedContestOnchainProps;
 
     const recurring = {
@@ -194,6 +223,7 @@ const SignTransactionsStep = ({
         is_farcaster_contest: contestFormData.isFarcasterContest,
         decimals: fundingTokenDecimals,
         vote_weight_multiplier: contestFormData.voteWeightMultiplier,
+        namespace_judge_token_id: judgedContest ? judgeIdToUse : null,
       });
 
       onSetLaunchContestStep('ContestLive');
@@ -227,8 +257,7 @@ const SignTransactionsStep = ({
         maxNominations: 5,
         ethChainId,
         chainRpc,
-        // TODO: get from backend in https://github.com/hicommonwealth/commonwealth/issues/10993
-        judgeId: 101,
+        judgeId: judgeIdToUse,
       });
 
       setConfigureNominationsData((prevState) => ({
@@ -241,6 +270,40 @@ const SignTransactionsStep = ({
         ...prevState,
         state: 'not-started',
         errorText: 'Failed to configure nominations. Please try again.',
+      }));
+    }
+  };
+
+  const nominateSelf = async () => {
+    try {
+      setNominateSelfData((prevState) => ({
+        ...prevState,
+        state: 'loading',
+      }));
+
+      if (!walletAddress) {
+        throw new Error('Wallet Address Not Found');
+      }
+
+      await nominateJudges({
+        namespace: namespaceName,
+        judges: [walletAddress],
+        judgeId: judgeIdToUse,
+        walletAddress,
+        ethChainId,
+        chainRpc,
+      });
+
+      setNominateSelfData((prevState) => ({
+        ...prevState,
+        state: 'completed',
+      }));
+    } catch (error) {
+      console.log('Error nominating self as judge', error);
+      setNominateSelfData((prevState) => ({
+        ...prevState,
+        state: 'not-started',
+        errorText: 'Failed to nominate self as judge. Please try again.',
       }));
     }
   };
@@ -272,6 +335,8 @@ const SignTransactionsStep = ({
             isJudgedContest: judgedContest,
             configureNominationsData,
             configureNominations,
+            nominateSelfData,
+            nominateSelf,
             isDirectDepositSelected,
             launchContestData,
             signTransaction,

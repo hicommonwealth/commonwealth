@@ -1,8 +1,13 @@
+import * as services from '../../src/services';
+
+vi.spyOn(services.tokenBalanceCache, 'getBalances').mockResolvedValue({});
+
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type { Session, SessionSigner } from '@canvas-js/interfaces';
 import { type Actor, command, dispose } from '@hicommonwealth/core';
 import { getVerifiedUserInfo } from '@hicommonwealth/model';
 import {
+  bech32ToHex,
   CANVAS_TOPIC,
   ChainBase,
   CommunityTierMap,
@@ -561,12 +566,15 @@ describe('SignIn Lifecycle', async () => {
 
         // create a second community and have ref.actor join it
         const [community2] = await tester.seed('Community', {
-          tier: CommunityTierMap.CommunityVerified,
+          tier: CommunityTierMap.ChainVerified,
           chain_node_id: ref.chain_node_id,
           base: seed.chain_base,
           active: true,
           profile_count: 0,
           topics: [],
+          ...('bech32_prefix' in seed
+            ? { bech32_prefix: seed.bech32_prefix }
+            : {}),
         });
         await tester.seed('Address', {
           community_id: community2!.id,
@@ -574,7 +582,11 @@ describe('SignIn Lifecycle', async () => {
           user_id: ref.actor.user.id!,
           role: 'member',
           wallet_id: wallet,
-          hex: 'hex',
+          ...(wallet === WalletId.Keplr
+            ? {
+                hex: bech32ToHex(ref.address),
+              }
+            : {}),
           ...(privyUser && provider === 'google_oauth'
             ? {
                 oauth_provider: 'google',
@@ -680,7 +692,7 @@ describe('SignIn Lifecycle', async () => {
 
         // create a second community and have 2nd user join it
         const [community2] = await tester.seed('Community', {
-          tier: CommunityTierMap.CommunityVerified,
+          tier: CommunityTierMap.ChainVerified,
           chain_node_id: ref.chain_node_id,
           base: seed.chain_base,
           active: true,

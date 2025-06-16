@@ -86,7 +86,7 @@ const CommunityTypeStep = ({
   const [
     baseOption,
     solanaOption,
-    sonieumOption,
+    soneiumOption,
     skaleOption,
     ...advancedOptions
   ] = communityTypeOptions;
@@ -142,15 +142,15 @@ const CommunityTypeStep = ({
         />
 
         <CWCommunitySelector
-          key={sonieumOption.type}
-          img={sonieumOption.img}
-          title={sonieumOption.title}
-          description={sonieumOption.description}
-          isRecommended={sonieumOption.isRecommended}
+          key={soneiumOption.type}
+          img={soneiumOption.img}
+          title={soneiumOption.title}
+          description={soneiumOption.description}
+          isRecommended={soneiumOption.isRecommended}
           onClick={() =>
             handleCommunitySelection({
-              type: sonieumOption.type,
-              chainBase: sonieumOption.chainBase,
+              type: soneiumOption.type,
+              chainBase: soneiumOption.chainBase,
             })
           }
         />

@@ -5,9 +5,10 @@ import MinimumProfile from 'models/MinimumProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import { useFetchNodesQuery } from 'state/api/nodes';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles/index';
 import TopicGatingHelpMessage from '../../Groups/TopicGatingHelpMessage/index';
-import { chainTypes, requirementTypes } from '../../common/constants';
+import { getChainTypes, requirementTypes } from '../../common/constants';
 import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
 import GroupCard from './GroupCard';
 import './GroupsSection.scss';
@@ -37,6 +38,8 @@ const GroupsSection = ({
     profileChainIds: [communityId],
     apiCallEnabled: profileAddresses?.length > 0,
   });
+
+  const { data: chainNodes } = useFetchNodesQuery();
 
   const profileMap = new Map<string, MinimumProfile>(
     profiles?.map((p) => [p.address, p]),
@@ -78,7 +81,7 @@ const GroupsSection = ({
                     (x) => x.value === r?.data?.source?.source_type,
                   )?.label,
                   requirementChain:
-                    chainTypes
+                    getChainTypes(chainNodes || [])
                       ?.find(
                         (x) =>
                           `${x.value}` ===
@@ -86,6 +89,7 @@ const GroupsSection = ({
                             r?.data?.source?.evm_chain_id ||
                             r?.data?.source?.cosmos_chain_id ||
                             r?.data?.source?.solana_network ||
+                            r?.data?.source?.sui_network ||
                             ''
                           }`,
                       )
@@ -112,6 +116,7 @@ const GroupsSection = ({
               topics={(group?.topics || []).map((x) => ({
                 id: x.id,
                 name: x.name,
+                is_private: x.is_private,
                 permissions: x.permissions,
               }))}
               canEdit={canManageGroups}

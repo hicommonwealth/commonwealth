@@ -15,18 +15,17 @@ import './WVMethodSelection.scss';
 
 interface WVMethodSelectionProps {
   onStepChange: (step: CreateTopicStep) => void;
-  hasNamespace: boolean;
 }
 
 enum WVMethod {
   ERC20 = 'ERC20',
+  SPL = 'SPL',
+  SuiNative = 'SuiNative',
+  SuiToken = 'SuiToken',
   Stake = 'Stake',
 }
 
-const WVMethodSelection = ({
-  onStepChange,
-  hasNamespace,
-}: WVMethodSelectionProps) => {
+const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
   const [selectedWVMethod, setSelectedWVMethod] = useState<WVMethod | null>(
     null,
   );
@@ -36,17 +35,33 @@ const WVMethodSelection = ({
       return onStepChange(CreateTopicStep.WVStake);
     }
 
-    onStepChange(
-      hasNamespace
-        ? CreateTopicStep.WVERC20Details
-        : CreateTopicStep.WVNamespaceEnablement,
-    );
+    // Handle non-EVM token methods
+    if (selectedWVMethod === WVMethod.SPL) {
+      return onStepChange(CreateTopicStep.WVSPLDetails);
+    }
+
+    if (selectedWVMethod === WVMethod.SuiNative) {
+      return onStepChange(CreateTopicStep.WVSuiNativeDetails);
+    }
+
+    if (selectedWVMethod === WVMethod.SuiToken) {
+      return onStepChange(CreateTopicStep.WVSuiTokenDetails);
+    }
+
+    onStepChange(CreateTopicStep.WVERC20Details);
   };
 
   const canEnableStake = chainIdsWithStakeEnabled.includes(
     // @ts-expect-error StrictNullChecks
     app?.chain?.meta?.ChainNode?.eth_chain_id,
   );
+
+  const chainNodeBalanceType = app?.chain?.meta?.ChainNode?.balance_type;
+
+  // Determine chain types
+  const isEVMChain = chainNodeBalanceType === 'ethereum';
+  const isSolanaChain = chainNodeBalanceType === 'solana';
+  const isSuiChain = chainNodeBalanceType === 'sui';
 
   return (
     <div className="WVMethodSelection">
@@ -61,49 +76,109 @@ const WVMethodSelection = ({
         <CWText type="h4">Choose weight voting method</CWText>
 
         <CWRadioPanelGroup>
-          <CWRadioPanel
-            value={WVMethod.ERC20}
-            onSelect={setSelectedWVMethod}
-            label="Connect ERC20/ETH"
-            description="ERC20 Token or Native ETH"
-            popover={{
-              title: 'ERC20',
-              body: (
-                <CWText type="b2">
-                  Use any ERC 20 token that is on the same chain as your
-                  community. ERC20s can be used for weighted voting and running
-                  contests
-                </CWText>
-              ),
-            }}
-            isSelected={selectedWVMethod === WVMethod.ERC20}
-          />
+          {(isEVMChain || !chainNodeBalanceType) && (
+            <CWRadioPanel
+              value={WVMethod.ERC20}
+              onSelect={setSelectedWVMethod}
+              label="Connect ERC20/ETH"
+              description="ERC20 Token or Native ETH"
+              popover={{
+                title: 'ERC20',
+                body: (
+                  <CWText type="b2">
+                    Use any ERC 20 token that is on the same chain as your
+                    community. ERC20s can be used for weighted voting and
+                    running contests
+                  </CWText>
+                ),
+              }}
+              isSelected={selectedWVMethod === WVMethod.ERC20}
+            />
+          )}
 
-          <CWRadioPanel
-            value={WVMethod.Stake}
-            onSelect={setSelectedWVMethod}
-            label="Use Community stake"
-            description="Use non-transferable tokens"
-            popover={
-              canEnableStake
-                ? {
-                    title: 'Stake',
-                    body: (
-                      <CWText type="b2">
-                        Community Stake lets you buy a stake in your community
-                        using a fungible non transferable token. This token can
-                        be used for weighted voting and running contests
-                      </CWText>
-                    ),
-                  }
-                : {
-                    title: 'Disabled',
-                    body: 'Stake is not supported on your network',
-                  }
-            }
-            isSelected={selectedWVMethod === WVMethod.Stake}
-            disabled={!canEnableStake}
-          />
+          {isSolanaChain && (
+            <CWRadioPanel
+              value={WVMethod.SPL}
+              onSelect={setSelectedWVMethod}
+              label="Connect SPL Token"
+              description="Solana Program Library Token"
+              popover={{
+                title: 'SPL',
+                body: (
+                  <CWText type="b2">
+                    Use any SPL token from the Solana blockchain. SPL tokens can
+                    be used for weighted voting and running contests
+                  </CWText>
+                ),
+              }}
+              isSelected={selectedWVMethod === WVMethod.SPL}
+            />
+          )}
+
+          {isSuiChain && (
+            <>
+              <CWRadioPanel
+                value={WVMethod.SuiNative}
+                onSelect={setSelectedWVMethod}
+                label="Connect Sui Native"
+                description="Sui Native Object"
+                popover={{
+                  title: 'Sui Native',
+                  body: (
+                    <CWText type="b2">
+                      Use Sui Native objects for weighted voting and running
+                      contests
+                    </CWText>
+                  ),
+                }}
+                isSelected={selectedWVMethod === WVMethod.SuiNative}
+              />
+
+              <CWRadioPanel
+                value={WVMethod.SuiToken}
+                onSelect={setSelectedWVMethod}
+                label="Connect Sui Token"
+                description="Sui Coin Type"
+                popover={{
+                  title: 'Sui Token',
+                  body: (
+                    <CWText type="b2">
+                      Use Sui tokens for weighted voting and running contests
+                    </CWText>
+                  ),
+                }}
+                isSelected={selectedWVMethod === WVMethod.SuiToken}
+              />
+            </>
+          )}
+
+          {(isEVMChain || !chainNodeBalanceType) && (
+            <CWRadioPanel
+              value={WVMethod.Stake}
+              onSelect={setSelectedWVMethod}
+              label="Use Community stake"
+              description="Use non-transferable tokens"
+              popover={
+                canEnableStake
+                  ? {
+                      title: 'Stake',
+                      body: (
+                        <CWText type="b2">
+                          Community Stake lets you buy a stake in your community
+                          using a fungible non transferable token. This token
+                          can be used for weighted voting and running contests
+                        </CWText>
+                      ),
+                    }
+                  : {
+                      title: 'Disabled',
+                      body: 'Stake is not supported on your network',
+                    }
+              }
+              isSelected={selectedWVMethod === WVMethod.Stake}
+              disabled={!canEnableStake}
+            />
+          )}
         </CWRadioPanelGroup>
 
         <CWDivider />

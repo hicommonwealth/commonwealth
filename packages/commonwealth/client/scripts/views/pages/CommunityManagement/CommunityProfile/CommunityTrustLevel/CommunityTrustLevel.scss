@@ -1,0 +1,108 @@
+@import '../../../../../styles/shared.scss';
+
+.CommunityTrustLevel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.level-box {
+  border-radius: 8px;
+  display: flex;
+  padding: 16px;
+  border: 1.5px solid transparent;
+  justify-content: start;
+  gap: 16px;
+
+  &.clickable {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+  }
+
+  .tier-icon {
+    display: flex;
+    align-items: start;
+    justify-content: center;
+  }
+
+  .level-box-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &.level-green {
+    border-color: $green-200;
+  }
+
+  &.level-yellow {
+    border-color: $yellow-200;
+  }
+
+  &.level-gray {
+    border-color: $neutral-200;
+  }
+
+  &.disabled {
+    border-color: $neutral-200;
+    opacity: 0.5;
+  }
+
+  .level-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+    gap: 8px;
+  }
+
+  .description-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .level-description {
+    font-size: 14px;
+    color: $neutral-500;
+    flex: 1;
+  }
+
+  .level-arrow {
+    display: flex;
+    align-items: center;
+  }
+
+  .level-item-content {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .level-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &.locked {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .level-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid $neutral-200;
+      gap: 8px;
+    }
+  }
+}

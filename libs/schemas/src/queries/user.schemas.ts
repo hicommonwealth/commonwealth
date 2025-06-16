@@ -1,5 +1,6 @@
-import { ChainBase, Roles } from '@hicommonwealth/shared';
+import { ChainBase, Roles, WalletId } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
+import { AuthContext, VerifiedContext } from '../context';
 import { ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { USER_TIER, UserProfile } from '../entities/user.schemas';
@@ -11,6 +12,7 @@ import {
   CommentView,
   CommentViewType,
   ThreadView,
+  UserView,
 } from './thread.schemas';
 
 export const UserProfileAddressView = AddressView.extend({
@@ -53,11 +55,49 @@ export const GetUserProfile = {
     userId: PG_INT.optional(),
   }),
   output: UserProfileView as ZodType<UserProfileView>,
+  context: VerifiedContext,
 };
 
 export const GetUser = {
   input: z.object({}),
   output: z.union([User, z.object({})]),
+};
+
+export const UserStatusAddressView = z.object({
+  id: PG_INT,
+  address: z.string(),
+  role: z.enum(['member', 'moderator', 'admin']),
+  wallet_id: z.nativeEnum(WalletId),
+  oauth_provider: z.string().nullish(),
+  ghost_address: z.boolean().nullish(),
+  last_active: z.coerce.date().or(z.string()).nullish(),
+  Community: z.object({
+    id: z.string(),
+    base: z.nativeEnum(ChainBase),
+    ss58_prefix: PG_INT.nullish(),
+  }),
+});
+
+export const UserStatusCommunityView = z.object({
+  id: z.string(),
+  name: z.string(),
+  icon_url: z.string().nullish(),
+  redirect: z.string().nullish(),
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  starred_at: z.date().or(z.string()).nullish(),
+});
+
+export const GetStatus = {
+  input: z.void(),
+  output: UserView.omit({ profile: true })
+    .extend({
+      addresses: z.array(UserStatusAddressView),
+      communities: z.array(UserStatusCommunityView),
+      jwt: z.string(),
+      knockJwtToken: z.string().optional(),
+    })
+    .optional(),
 };
 
 export const SearchUserProfilesView = z.object({
@@ -108,8 +148,8 @@ export const GetUserAddresses = {
 };
 
 export const ReferralView = z.object({
-  referrer_address: EVM_ADDRESS,
-  referee_address: EVM_ADDRESS,
+  referrer_address: z.string().max(255),
+  referee_address: z.string().max(255),
   referee_user_id: PG_INT,
   referee_profile: UserProfile,
   // when referee creates a community
@@ -188,6 +228,7 @@ export const XpRankedUser = z.object({
 export const GetXpsRanked = {
   input: z.object({
     top: z.number(),
+    search: z.string().optional(),
     quest_id: z
       .number()
       .optional()
@@ -201,3 +242,34 @@ export const RandomResourceIdsView = z.object({
   thread_id: z.number(),
   comment_id: z.number(),
 });
+
+export const GetAddressStatus = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({
+    exists: z.boolean(),
+    belongs_to_user: z.boolean(),
+  }),
+  context: VerifiedContext,
+};
+
+export const GetMutualConnections = {
+  input: z.object({
+    user_id_1: PG_INT,
+    user_id_2: PG_INT,
+    limit: z.number().int().min(1).max(100).optional().default(10),
+  }),
+  output: z.object({
+    mutual_communities: z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        base: z.nativeEnum(ChainBase),
+        icon_url: z.string().nullish(),
+      }),
+    ),
+  }),
+  context: AuthContext,
+};

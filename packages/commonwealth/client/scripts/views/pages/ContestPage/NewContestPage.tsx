@@ -15,6 +15,7 @@ import { MobileTabType } from './ContestPage';
 import useTokenData from './hooks/useTokenData';
 import type { EntriesTabProps } from './tabs/Entries';
 import EntriesTab from './tabs/Entries';
+import JudgesTab from './tabs/Judges';
 import PriceChartTab from './tabs/PriceChart';
 import TokenSwapTab from './tabs/TokenSwap';
 import { getCurrentContestIndex, getSortedContests } from './utils';
@@ -73,6 +74,9 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
     isFarcasterContest: !!contest?.is_farcaster_contest,
   };
 
+  const isJudgedContest = !!contest?.namespace_judge_token_id;
+  const judgeAddresses = contest?.namespace_judges || [];
+
   return (
     <CWPageLayout>
       <div className="NewContestPage">
@@ -87,6 +91,7 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
               topics={contest?.topics}
               decimals={contest?.decimals}
               ticker={contest?.ticker}
+              prizePercentage={contest?.prize_percentage || undefined}
               finishDate={end_time ? moment(end_time).toISOString() : ''}
               isCancelled={!!contest?.cancelled}
               isRecurring={!contest?.funding_token_address}
@@ -138,6 +143,14 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
             isActive={selectedMobileTab === MobileTabType.Entries}
             onClick={() => setSelectedMobileTab(MobileTabType.Entries)}
           />
+          {isJudgedContest && (
+            <CWMobileTab
+              label={MobileTabType.Judges}
+              icon="gavel"
+              isActive={selectedMobileTab === MobileTabType.Judges}
+              onClick={() => setSelectedMobileTab(MobileTabType.Judges)}
+            />
+          )}
           {chain && address && (
             <CWMobileTab
               label={MobileTabType.PriceChart}
@@ -149,7 +162,7 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
           {address && (
             <CWMobileTab
               label={MobileTabType.TokenSwap}
-              icon="arrowClockwise"
+              icon="arrowsClockwise"
               isActive={selectedMobileTab === MobileTabType.TokenSwap}
               onClick={() => setSelectedMobileTab(MobileTabType.TokenSwap)}
             />
@@ -160,6 +173,12 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
           {selectedMobileTab === MobileTabType.Entries && (
             <EntriesTab {...entriesTabProps} />
           )}
+          {selectedMobileTab === MobileTabType.Judges && isJudgedContest && (
+            <JudgesTab
+              contestAddress={contestAddress}
+              judges={judgeAddresses}
+            />
+          )}
           {selectedMobileTab === MobileTabType.PriceChart && <PriceChartTab />}
           {selectedMobileTab === MobileTabType.TokenSwap && <TokenSwapTab />}
         </div>
@@ -169,10 +188,16 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
             <div className="thread-list-container">
               <EntriesTab {...entriesTabProps} />
             </div>
-            {address ? (
+            {address || isJudgedContest ? (
               <div>
                 <TokenSwapTab />
                 <PriceChartTab />
+                {isJudgedContest && (
+                  <JudgesTab
+                    contestAddress={contestAddress}
+                    judges={judgeAddresses}
+                  />
+                )}
               </div>
             ) : null}
           </CWGrid>

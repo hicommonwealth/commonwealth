@@ -53,7 +53,7 @@ describe('userMentioned Event Handler', () => {
     [user] = await tester.seed('User', {});
     [author] = await tester.seed('User', {});
     [community] = await tester.seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: chainNode?.id,
       lifetime_thread_count: 0,
       profile_count: 2,
@@ -93,6 +93,7 @@ describe('userMentioned Event Handler', () => {
 
   test('should not throw if relevant community is not found', async () => {
     const res = await notifyUserMentioned({
+      id: 0,
       name: 'UserMentioned',
       payload: {
         communityId: 'nonexistent',

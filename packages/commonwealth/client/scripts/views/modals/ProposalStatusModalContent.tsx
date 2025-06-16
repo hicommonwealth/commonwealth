@@ -1,7 +1,7 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
-import React from 'react';
+import React, { useRef } from 'react';
 import app from 'state';
 import { parseCustomStages, threadStageToLabel } from '../../helpers';
 import { ThreadStage } from '../../models/types';
@@ -51,6 +51,7 @@ export const ProposalStatusModalContent = ({
   tempCosmosProposals,
   setTempCosmosProposals,
 }: ProposalStatusModalContentProps) => {
+  const modalContainerRef = useRef<HTMLDivElement | null>(null);
   const { custom_stages } = app.chain.meta;
   const stages = parseCustomStages(custom_stages);
   const showSnapshot = !!app.chain.meta?.snapshot_spaces?.length;
@@ -90,7 +91,7 @@ export const ProposalStatusModalContent = ({
   };
 
   return (
-    <div className="UpdateProposalStatusModal">
+    <div className="UpdateProposalStatusModal" ref={modalContainerRef}>
       <CWModalHeader
         label="Update proposal status"
         onModalClose={onModalClose}
@@ -99,7 +100,7 @@ export const ProposalStatusModalContent = ({
         {showSnapshot ? (
           <>
             <SelectList
-              defaultValue={
+              value={
                 tempStage
                   ? { value: tempStage, label: threadStageToLabel(tempStage) }
                   : null
@@ -111,6 +112,7 @@ export const ProposalStatusModalContent = ({
                 label: threadStageToLabel(stage),
               }))}
               className="StageSelector"
+              menuPortalTarget={modalContainerRef.current}
               // @ts-expect-error <StrictNullChecks/>
               onChange={(option) => setTempStage(option.value)}
             />

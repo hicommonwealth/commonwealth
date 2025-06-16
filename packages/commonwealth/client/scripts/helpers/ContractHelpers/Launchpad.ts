@@ -67,6 +67,7 @@ class LaunchpadBondingCurve extends ContractBase {
       this.tokenCommunityManager,
       initialBuyValue,
       maxFeePerGas!,
+      chainId,
     );
     return txReceipt;
   }

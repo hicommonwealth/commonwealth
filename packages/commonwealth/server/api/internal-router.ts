@@ -13,8 +13,10 @@ import * as launchpadToken from './launchpadToken';
 import * as loadTest from './load-test';
 import * as poll from './poll';
 import * as quest from './quest';
+import * as search from './search';
 import * as subscription from './subscription';
 import * as superAdmin from './super-admin';
+import * as tag from './tag';
 import * as thread from './thread';
 import * as user from './user';
 import * as wallet from './wallet';
@@ -36,6 +38,8 @@ const api = {
   launchpadToken: launchpadToken.trpcRouter,
   poll: poll.trpcRouter,
   quest: quest.trpcRouter,
+  tag: tag.trpcRouter,
+  search: search.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {

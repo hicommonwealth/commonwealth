@@ -10,6 +10,14 @@ export function GetAllContests(): Query<typeof schemas.GetAllContests> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
+      const whereConditions = [
+        payload.community_id ? 'cm.community_id = :community_id' : '',
+        payload.contest_address ? 'cm.contest_address = :contest_address' : '',
+        payload.search ? 'cm.name ILIKE :search' : '',
+      ]
+        .filter(Boolean)
+        .join(' and ');
+
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ContestResults>
       >(
@@ -31,6 +39,8 @@ select
   cm.topic_id,
   cm.is_farcaster_contest,
   cm.vote_weight_multiplier,
+  cm.namespace_judge_token_id,
+  cm.namespace_judges,
   coalesce((
     select jsonb_agg(json_build_object('id', t.id, 'name', t.name) order by t.name)
     from "ContestManagers" cm2
@@ -71,9 +81,8 @@ from
     ${payload.contest_id ? `where c.contest_id = ${payload.contest_id}` : ''}
 	  group by c.contest_address
   ) as c on cm.contest_address = c.contest_address
-  where cm.deleted_at is null ${payload.community_id || payload.contest_address ? 'and' : ''}
-  ${payload.community_id ? 'cm.community_id = :community_id' : ''}
-  ${payload.community_id && payload.contest_address ? 'and cm.contest_address = :contest_address' : ''}
+  where cm.deleted_at is null ${whereConditions.length > 0 ? ' and ' : ''}
+  ${whereConditions}
 group by
   cm.community_id,
   cm.contest_address,
@@ -88,6 +97,8 @@ group by
   cm.prize_percentage,
   cm.payout_structure,
   cm.cancelled,
+  cm.namespace_judge_token_id,
+  cm.namespace_judges,
   c.contests
 order by
   cm.name;
@@ -98,6 +109,7 @@ order by
           replacements: {
             community_id: payload.community_id,
             contest_address: payload.contest_address,
+            ...(payload.search && { search: `%${payload.search}%` }),
           },
         },
       );

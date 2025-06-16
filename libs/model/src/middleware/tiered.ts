@@ -9,9 +9,9 @@ import {
   USER_TIERS,
   UserTierMap,
 } from '@hicommonwealth/shared';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { Op } from 'sequelize';
-import { ZodSchema } from 'zod';
+import { ZodType } from 'zod';
 import { config } from '../config';
 import { models } from '../database';
 
@@ -51,7 +51,7 @@ export function tiered({
   ai?: { images?: boolean; text?: boolean };
   minTier?: UserTierMap;
 }) {
-  return async function ({ actor }: Context<ZodSchema, ZodSchema>) {
+  return async function ({ actor }: Context<ZodType, ZodType>) {
     if (!actor.user.id) throw new InvalidActor(actor, 'Must be a user');
 
     const user = await models.User.findOne({
@@ -66,12 +66,14 @@ export function tiered({
       ],
     });
     if (!user?.id) throw new InvalidActor(actor, 'Unverified user');
+    if (user.tier === UserTierMap.BannedUser)
+      throw new InvalidActor(actor, 'Banned user');
 
     // upgrade tier after a week
     let tier = user.tier;
     if (
       tier === UserTierMap.NewlyVerifiedWallet &&
-      moment().diff(moment(user.created_at), 'weeks') >= 1
+      dayjs().diff(dayjs(user.created_at), 'weeks') >= 1
     )
       tier = UserTierMap.VerifiedWallet;
 

@@ -1,4 +1,5 @@
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import { PRODUCTION_DOMAIN, WalletSsoSource } from '@hicommonwealth/shared';
+import { capitalize } from 'lodash';
 import React from 'react';
 import { fetchCachedNodes } from 'state/api/nodes';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
@@ -28,6 +29,8 @@ const ContentIdInput = ({
       discordServerId: `0xxxxxxxxxxxxxxxx0`,
       chainId: `Select community chain`,
       groupId: `https://${PRODUCTION_DOMAIN}/common/members?tab=groups&groupId=1234`,
+      tokenThresholdAmount: '0.00001',
+      sso: 'Select SSO provider',
     },
     labels: {
       threadId: 'Thread Link (optional)',
@@ -37,6 +40,20 @@ const ContentIdInput = ({
       chainId: 'Chain Id (optional)',
       discordServerId: 'Discord Server Id',
       groupId: 'Group Link',
+      tokenThresholdAmount: 'Min ETH Trade Amount (optional)',
+      sso: 'SSO Provider',
+    },
+    instructionalMessages: {
+      threadId: '',
+      commentId: '',
+      topicId: '',
+      twitterTweetUrl: '',
+      chainId: '',
+      discordServerId: '',
+      groupId: '',
+      tokenThresholdAmount:
+        'Aura is awarded after this amount of token is traded',
+      sso: '',
     },
   };
 
@@ -46,12 +63,14 @@ const ContentIdInput = ({
         return {
           label: inputConfig.labels.threadId,
           placeholder: inputConfig.placeholders.sampleThreadLink,
+          instructionalMessages: inputConfig.instructionalMessages.threadId,
         };
       }
       if (config?.with_optional_comment_id) {
         return {
           label: inputConfig.labels.commentId,
           placeholder: inputConfig.placeholders.sampleCommentLink,
+          instructionalMessages: inputConfig.instructionalMessages.commentId,
         };
       }
     }
@@ -62,6 +81,7 @@ const ContentIdInput = ({
       return {
         label: inputConfig.labels.topicId,
         placeholder: inputConfig.placeholders.sampleTopicLink,
+        instructionalMessages: inputConfig.instructionalMessages.topicId,
       };
     }
 
@@ -69,6 +89,8 @@ const ContentIdInput = ({
       return {
         label: inputConfig.labels.twitterTweetUrl,
         placeholder: inputConfig.placeholders.twitterTweetUrl,
+        instructionalMessages:
+          inputConfig.instructionalMessages.twitterTweetUrl,
       };
     }
 
@@ -76,6 +98,8 @@ const ContentIdInput = ({
       return {
         label: inputConfig.labels.discordServerId,
         placeholder: inputConfig.placeholders.discordServerId,
+        instructionalMessages:
+          inputConfig.instructionalMessages.discordServerId,
       };
     }
 
@@ -83,6 +107,7 @@ const ContentIdInput = ({
       return {
         label: inputConfig.labels.chainId,
         placeholder: inputConfig.placeholders.chainId,
+        instructionalMessages: inputConfig.instructionalMessages.chainId,
       };
     }
 
@@ -90,10 +115,32 @@ const ContentIdInput = ({
       return {
         label: inputConfig.labels.groupId,
         placeholder: inputConfig.placeholders.groupId,
+        instructionalMessages: inputConfig.instructionalMessages.groupId,
       };
     }
 
-    return { label: 'Content Id', placeholder: 'Content Id' };
+    if (config?.with_optional_sso_type) {
+      return {
+        label: inputConfig.labels.sso,
+        placeholder: inputConfig.placeholders.sso,
+        instructionalMessages: inputConfig.instructionalMessages.sso,
+      };
+    }
+
+    if (config?.with_optional_token_trade_threshold) {
+      return {
+        label: inputConfig.labels.tokenThresholdAmount,
+        placeholder: inputConfig.placeholders.tokenThresholdAmount,
+        instructionalMessages:
+          inputConfig.instructionalMessages.tokenThresholdAmount,
+      };
+    }
+
+    return {
+      label: 'Content Id',
+      placeholder: 'Content Id',
+      instructionalMessages: '',
+    };
   };
 
   const communityChainNodeSelectInputOptions = fetchCachedNodes()
@@ -132,6 +179,38 @@ const ContentIdInput = ({
     />;
   }
 
+  const ssoOptions = Object.values(WalletSsoSource)
+    .filter((x) => x !== WalletSsoSource.Unknown)
+    .map((v) => ({
+      label: capitalize(v),
+      value: v,
+    }));
+  console.log('defaultValues => ', defaultValues);
+
+  if (config?.with_optional_sso_type) {
+    return (
+      <CWSelectList
+        isClearable={true}
+        key={`contentIdentifier-${defaultValues?.action}`}
+        name="contentIdentifier"
+        label={inputConfig.labels.sso}
+        placeholder={inputConfig.placeholders.sso}
+        containerClassname="span-3"
+        options={ssoOptions}
+        onChange={(v) => {
+          onChange?.({ contentIdentifier: `${v?.value || ''}` });
+        }}
+        {...(defaultValues?.contentIdentifier && {
+          value: {
+            value: defaultValues?.contentIdentifier,
+            label: `${ssoOptions.find((x) => x.value === defaultValues?.contentIdentifier)?.label}`,
+          },
+        })}
+        customError={errors?.contentIdentifier}
+      />
+    );
+  }
+
   return (
     <CWTextInput
       key={`contentIdentifier-${defaultValues?.action}-${defaultValues?.contentIdScope}`}
@@ -147,6 +226,7 @@ const ContentIdInput = ({
         onChange?.({ contentIdentifier: e?.target?.value?.trim() })
       }
       customError={errors?.contentIdentifier}
+      instructionalMessage={getContentIdInputConfig().instructionalMessages}
     />
   );
 };

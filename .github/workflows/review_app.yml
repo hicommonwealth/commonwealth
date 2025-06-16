@@ -1,0 +1,209 @@
+name: Review App Railway
+
+on:
+  issue_comment:
+    types: [ created ]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Pull Request Number'
+        required: true
+        type: number
+      commit_sha:
+        description: 'Override commit SHA for Docker builds (optional)'
+        required: false
+        type: string
+
+env:
+  RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  APP_ENV: CI
+
+jobs:
+  build:
+    name: Build Docker Containers
+    if: |
+      (github.event.issue.pull_request && github.event.comment.body == '/deploy') ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ 22 ]
+    steps:
+      - name: Set PR Number
+        id: set_pr_number
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+          else
+            echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+          fi
+      - name: Set Effective SHA
+        id: set_effective_sha
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.commit_sha }}" ]; then
+            echo "sha=${{ github.event.inputs.commit_sha }}" >> $GITHUB_OUTPUT
+          else
+            echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if commonwealth base image exists
+        id: check_base_image
+        run: |
+          set +e
+          output=$(docker manifest inspect ghcr.io/hicommonwealth/commonwealth-ephemeral:${{ steps.set_effective_sha.outputs.sha }} 2>&1)
+          status=$?
+          echo "Manifest inspect output for commonwealth base:"
+          echo "$output"
+          echo "Exit code: $status"
+          if [ $status -eq 0 ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+          exit 0
+
+      - uses: actions/checkout@v4
+        if: steps.check_base_image.outputs.exists == 'false'
+        with:
+          fetch-depth: 0
+          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
+
+      - uses: ./.github/actions/setup
+        if: steps.check_base_image.outputs.exists == 'false'
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Set up Docker Buildx
+        if: steps.check_base_image.outputs.exists == 'false'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Copy .env for build
+        if: steps.check_base_image.outputs.exists == 'false'
+        run: |
+          ENV_PATH=./packages/commonwealth/deploy/environments/.env.public.review-apps
+          if [ ! -f "$ENV_PATH" ]; then
+            echo "Error: $ENV_PATH not found"
+            exit 1
+          fi
+          cp "$ENV_PATH" .env
+
+      - name: Build and Push commonwealth base image
+        if: steps.check_base_image.outputs.exists == 'false'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.commonwealth_ephemeral
+          push: true
+          tags: ghcr.io/hicommonwealth/commonwealth-ephemeral:${{ steps.set_effective_sha.outputs.sha }}
+          cache-from: type=registry,ref=ghcr.io/hicommonwealth/commonwealth-ephemeral:buildcache
+          cache-to: type=registry,ref=ghcr.io/hicommonwealth/commonwealth-ephemeral:buildcache,mode=max
+
+  deploy:
+    name: Deploy to Railway
+    needs: build
+    if: |
+      (github.event.issue.pull_request && github.event.comment.body == '/deploy') ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ 22 ]
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    steps:
+      - name: Set PR Number
+        id: set_pr_number
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+          else
+            echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+          fi
+      - name: Set Effective SHA
+        id: set_effective_sha
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.commit_sha }}" ]; then
+            echo "sha=${{ github.event.inputs.commit_sha }}" >> $GITHUB_OUTPUT
+          else
+            echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: refs/pull/${{ steps.set_pr_number.outputs.pr_number }}/head
+
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Create Neon Branch
+        id: create_neon_branch
+        uses: neondatabase/create-branch-action@v5
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          parent: 'Review App Parent'
+          branch_name: preview/pr-${{ steps.set_pr_number.outputs.pr_number }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+          username: 'neondb_owner'
+          database: 'commonwealth'
+          suspend_timeout: 300 # scale to 0 compute after 5 minutes
+          ssl: require # DO NOT CHANGE THIS - we must use SSL since we are branching off prod
+
+      - name: Migrate DB
+        id: migrate_db
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+        run: pnpm migrate-db
+
+      - name: Create Railway environment and deploy
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_PARENT_ENV_ID: ${{ secrets.RAILWAY_PARENT_ENV_ID }}
+        run: |
+          pnpm -F railway deploy-review-app \
+            --env=pr-${{ steps.set_pr_number.outputs.pr_number }} \
+            --commit=${{ steps.set_effective_sha.outputs.sha }} \
+            --db-url=${{ steps.create_neon_branch.outputs.db_url }}
+
+      - name: Comment on PR with Deployment URL
+        if: |
+          (github.event.issue.pull_request && github.event.comment.body == '/deploy') ||
+          github.event_name == 'workflow_dispatch'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            if (process.env.DEPLOYMENT_URL) {
+              const message = `🚀 Review app deployed!\n\nYou can access the review app at: [${process.env.DEPLOYMENT_URL}](${process.env.DEPLOYMENT_URL})`;
+              
+              github.rest.issues.createComment({
+                issue_number: ${{ steps.set_pr_number.outputs.pr_number }},
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: message
+              });
+            } else {
+              console.log('No deployment URL found to comment on PR');
+            }
+
+      # TODO: check if this posts a new comment for each commit to an open PR if this updates the comment
+      # TODO: if this creates a new comment for each commit, we need to update if so it only posts a
+      # new comment when a migration changes in one of the commits since last execution
+      #   - name: Post Schema Diff Comment to PR
+      #     uses: neondatabase/schema-diff-action@v1
+      #     if: |
+      #       contains(join(github.event.issue.pull_request.changed_files.*.filename, '\n'), 'packages/commonwealth/server/migrations/')
+      #     with:
+      #       project_id: ${{ secrets.NEON_PROJECT_ID }}
+      #       compare_branch: production # TODO: need to ensure this doesn't cause undue stress on main DB (maybe use a read replica?)
+      #       api_key: ${{ secrets.NEON_API_KEY }}

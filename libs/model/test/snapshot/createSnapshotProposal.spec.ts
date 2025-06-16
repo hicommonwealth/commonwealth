@@ -20,7 +20,7 @@ describe('Snapshot Listener API', { timeout: 5_000 }, () => {
     );
 
     await tester.seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: chainNode?.id,
       lifetime_thread_count: 0,
       profile_count: 0,
