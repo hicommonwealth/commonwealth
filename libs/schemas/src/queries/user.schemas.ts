@@ -147,8 +147,8 @@ export const GetUserAddresses = {
 };
 
 export const ReferralView = z.object({
-  referrer_address: EVM_ADDRESS,
-  referee_address: EVM_ADDRESS,
+  referrer_address: z.string().max(255),
+  referee_address: z.string().max(255),
   referee_user_id: PG_INT,
   referee_profile: UserProfile,
   // when referee creates a community
