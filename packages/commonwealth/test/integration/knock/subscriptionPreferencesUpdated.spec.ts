@@ -114,6 +114,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -155,6 +156,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -209,6 +211,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -248,6 +251,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -288,6 +292,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,

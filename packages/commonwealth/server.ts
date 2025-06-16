@@ -98,19 +98,28 @@ const start = async () => {
         );
       }
 
-      // bootstrap bindings when in dev mode and DEV_MODULITH is true
-      if (config.NODE_ENV === 'development' && config.DEV_MODULITH) {
+      // bootstrap bindings when DEV_MODULITH is true and not in prod
+      // Enables: consumer, knock, message-relayer, graphile worker
+      // Does not enable: twitter poller, Discord listener, evm CE
+      if (config.DEV_MODULITH && config.APP_ENV !== 'production') {
         const {
           bootstrapBindings,
           bootstrapRelayer,
           bootstrapContestRolloverLoop,
         } = await import('./server/bindings/bootstrap');
+        const { startGraphileWorker } = await import(
+          './server/workers/graphileWorker/graphileWorker'
+        );
+
         await bootstrapBindings();
         await bootstrapRelayer();
         bootstrapContestRolloverLoop();
+        await startGraphileWorker();
       }
     })
-    .catch((e) => log.error(e.message, e));
+    .catch((e) => {
+      log.error(`Failed to initialize modulith mode: ${e.message}`, e);
+    });
 };
 void start();
 

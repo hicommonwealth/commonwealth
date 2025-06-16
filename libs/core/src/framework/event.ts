@@ -22,7 +22,7 @@ export const handleEvent = async <
   Output extends ZodType | ZodUndefined = ZodUndefined,
 >(
   { inputs, body }: EventsHandlerMetadata<Input, Output>,
-  { name, payload }: EventContext<Name>,
+  { id, name, payload }: EventContext<Name>,
   validate = true,
 ): Promise<Partial<z.infer<Output>>> => {
   if (!body[name])
@@ -32,6 +32,7 @@ export const handleEvent = async <
   try {
     return (
       (await body[name]({
+        id,
         name,
         payload: validate ? inputs[name]!.parse(payload) : payload,
       })) || {}
