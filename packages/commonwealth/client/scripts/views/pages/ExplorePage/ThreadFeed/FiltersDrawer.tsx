@@ -27,6 +27,13 @@ const FiltersDrawer = ({
 }: FiltersDrawerProps) => {
   const user = useUserStore();
   const userCommunities = user.communities || [];
+  const options = userCommunities.map((community) => ({
+    label: community.name,
+    value: community.id,
+  }));
+  const currentOption = options.find(
+    (o) => o.value === filters.in_community_id,
+  );
 
   const handleCommunityChange = (value: string) => {
     onFiltersChange({
@@ -44,12 +51,13 @@ const FiltersDrawer = ({
           <div className="filter-section">
             <CWText type="h5">Community</CWText>
             <CWSelectList
-              options={userCommunities.map((community) => ({
-                label: community.name,
-                value: community.id,
-              }))}
-              value={filters.in_community_id}
-              onChange={handleCommunityChange}
+              options={options}
+              {...(currentOption && {
+                value: currentOption,
+              })}
+              onChange={(newValue) =>
+                handleCommunityChange(newValue?.value || '')
+              }
             />
           </div>
           <div className="filter-actions">
