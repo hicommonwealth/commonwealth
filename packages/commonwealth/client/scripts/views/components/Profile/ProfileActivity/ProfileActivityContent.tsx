@@ -1,9 +1,8 @@
-import React from 'react';
-
-import './../Profile.scss';
-
 import Thread from 'models/Thread';
+import React from 'react';
 import { CWText } from '../../component_kit/cw_text';
+import './../Profile.scss';
+import CommunityTab from './CommunityTab';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivityRow from './ProfileActivityRow';
 import { ProfileThread } from './ProfileThread/ProfileThread';
@@ -21,14 +20,12 @@ type ProfileActivityContentProps = {
   option: ProfileActivityType;
   threads: Thread[];
   comments: CommentWithAssociatedThread[];
-  mapProfileThread: (thread: Thread) => Thread;
 };
 
 const ProfileActivityContent = ({
   option,
   comments,
   threads,
-  mapProfileThread,
 }: ProfileActivityContentProps) => {
   if (option === ProfileActivityType.Threads) {
     if (threads.length === 0) {
@@ -48,10 +45,7 @@ const ProfileActivityContent = ({
         {threads
           .sort((a, b) => +b.createdAt - +a.createdAt)
           .map((thread, i) => (
-            <ProfileThread
-              thread={mapProfileThread(thread) as Thread}
-              key={i}
-            />
+            <ProfileThread thread={thread} key={i} />
           ))}
       </>
     );
@@ -59,6 +53,10 @@ const ProfileActivityContent = ({
 
   if (option === ProfileActivityType.MyTokens) {
     return <TransactionsTab transactionsType="tokens" />;
+  }
+
+  if (option === ProfileActivityType.Communities) {
+    return <CommunityTab />;
   }
 
   const allActivities: Array<CommentWithAssociatedThread | Thread> = [

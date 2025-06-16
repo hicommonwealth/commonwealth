@@ -6,7 +6,7 @@ import {
   uploadIfLarge,
 } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
+import { GatedActionEnum, MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import { models } from '../../database';
 import {
   authThread,
@@ -35,7 +35,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
     ...schemas.CreateComment,
     auth: [
       authThread({
-        action: schemas.PermissionEnum.CREATE_COMMENT,
+        action: GatedActionEnum.CREATE_COMMENT,
       }),
       verifyCommentSignature,
       tiered({ creates: true }),
@@ -106,6 +106,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               comment_level: parent ? parent.comment_level + 1 : 0,
               reply_count: 0,
               marked_as_spam_at,
+              user_tier_at_creation: user.tier,
             },
             {
               transaction,
@@ -142,20 +143,22 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
             { transaction },
           );
 
-          await emitEvent(
-            models.Outbox,
-            [
-              {
-                event_name: 'CommentCreated',
-                event_payload: {
-                  ...comment.toJSON(),
-                  community_id: thread.community_id,
-                  users_mentioned: mentions.map((u) => parseInt(u.userId)),
+          if (!marked_as_spam_at) {
+            await emitEvent(
+              models.Outbox,
+              [
+                {
+                  event_name: 'CommentCreated',
+                  event_payload: {
+                    ...comment.toJSON(),
+                    community_id: thread.community_id,
+                    users_mentioned: mentions.map((u) => parseInt(u.userId)),
+                  },
                 },
-              },
-            ],
-            transaction,
-          );
+              ],
+              transaction,
+            );
+          }
 
           mentions.length &&
             (await emitMentions(transaction, {

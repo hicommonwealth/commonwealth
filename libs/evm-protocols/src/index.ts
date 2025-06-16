@@ -10,3 +10,4 @@ export * from './common-protocol/contractHelpers/tokens';
 export * from './common-protocol/utils';
 export * from './event-registry/eventRegistry';
 export * from './event-registry/eventSignatures';
+export * from './utils';

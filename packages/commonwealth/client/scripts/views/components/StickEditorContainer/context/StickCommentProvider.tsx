@@ -3,6 +3,7 @@ import React, {
   createContext,
   memo,
   useContext,
+  useMemo,
   useState,
 } from 'react';
 import { ActivatorContext } from './ActivatorContext';
@@ -47,26 +48,32 @@ export const StickCommentProvider = memo(function StickCommentProvider({
   const [activeElement, setActiveElement] = useState<ReactNode | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const stickCommentValue = useMemo(
+    () => ({
+      mode,
+      isExpanded,
+      setIsExpanded,
+      defaultElement,
+      setDefaultElement,
+      activeElement,
+      setActiveElement,
+    }),
+    [mode, isExpanded, defaultElement, activeElement],
+  );
+
+  const activatorValue = useMemo(
+    () => ({
+      defaultElement,
+      setDefaultElement,
+      activeElement,
+      setActiveElement,
+    }),
+    [defaultElement, activeElement],
+  );
+
   return (
-    <StickCommentContext.Provider
-      value={{
-        mode,
-        isExpanded,
-        setIsExpanded,
-        defaultElement,
-        setDefaultElement,
-        activeElement,
-        setActiveElement,
-      }}
-    >
-      <ActivatorContext.Provider
-        value={{
-          defaultElement,
-          setDefaultElement,
-          activeElement,
-          setActiveElement,
-        }}
-      >
+    <StickCommentContext.Provider value={stickCommentValue}>
+      <ActivatorContext.Provider value={activatorValue}>
         {children}
       </ActivatorContext.Provider>
     </StickCommentContext.Provider>

@@ -1,0 +1,34 @@
+# By default any code not covered by the below owners
+* @Rotorsoft @dillchen @timolegros
+
+# Code owner changes must be reviewed by Dillon
+/.github/CODEOWNERS @dillchen
+
+# Changes to CI or code/deployment processes must be reviewed by the Platform team
+.github @timolegros @kurtassad @Rotorsoft @rbennettcw
+.husky @timolegros @kurtassad @Rotorsoft @rbennettcw
+/scripts/ @timolegros @kurtassad @Rotorsoft @rbennettcw
+
+# Libs
+/libs/ @timolegros @Rotorsoft @kurtassad @rbennettcw
+/libs/sitemaps/ @burtonator
+/libs/evm-testing/ @timolegros
+/libs/evm-protocols/ @timolegros
+
+# Packages
+/packages/commonwealth/ @timolegros @Rotorsoft @kurtassad @rbennettcw
+/packages/commonwealth/client @mzparacha @masvelio @burtonator
+/packages/commonwealth/load-testing/ @timolegros
+
+# WARNING: this disables code owners so it MUST be paired with code review limits to prevent approvals of PRs by GitHub
+# users that do NOT have explicit read or higher access to the repository. See the followings docs for info:
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/managing-pull-request-reviews-in-your-repository
+/libs/shared/
+/packages/commonwealth/package.json
+/packages/commonwealth/shared/
+/common_knowledge/
+/packages/commonwealth/.gitignore
+/packages/commonwealth/.eslintignore
+**/test/
+
+

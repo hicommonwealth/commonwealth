@@ -220,5 +220,15 @@ export function KnockProvider(): NotificationsProvider {
         return false;
       }
     },
+
+    async signUserToken(
+      userId: number,
+      expiresInSeconds: number,
+    ): Promise<string> {
+      return await Knock.signUserToken(`${userId}`, {
+        signingKey: config.NOTIFICATIONS.KNOCK_SIGNING_KEY,
+        expiresInSeconds,
+      });
+    },
   };
 }

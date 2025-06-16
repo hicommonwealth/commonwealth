@@ -37,6 +37,7 @@ export const CreateContestManagerMetadata = {
     topic_id: z.number().optional(),
     is_farcaster_contest: z.boolean().optional(),
     vote_weight_multiplier: z.number().optional().nullish(),
+    namespace_judge_token_id: PG_INT.optional().nullish(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),
@@ -52,6 +53,7 @@ export const UpdateContestManagerMetadata = {
     description: z.string().optional(),
     image_url: z.string().optional(),
     topic_id: PG_INT.optional(),
+    namespace_judge_token_id: PG_INT.optional(),
   }),
   output: z.object({
     contest_managers: z.array(
@@ -217,6 +219,19 @@ export const DeleteContestManagerMetadata = {
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),
+  }),
+  context: AuthContext,
+};
+
+export const ConfigureNominationsMetadata = {
+  input: z.object({
+    community_id: z.string(),
+    judge_token_id: PG_INT,
+  }),
+  output: z.object({
+    community_id: z.string(),
+    judge_token_id: PG_INT,
+    success: z.boolean(),
   }),
   context: AuthContext,
 };

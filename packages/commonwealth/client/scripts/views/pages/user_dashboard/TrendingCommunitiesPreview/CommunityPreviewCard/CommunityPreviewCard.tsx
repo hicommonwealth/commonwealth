@@ -108,6 +108,7 @@ const CommunityPreviewCard = ({
                 )}
                 {trustLevelEnabled &&
                   community?.tier &&
+                  community.tier !== CommunityTierMap.Unverified &&
                   (() => {
                     const tier = community.tier as CommunityTierMap;
                     return (

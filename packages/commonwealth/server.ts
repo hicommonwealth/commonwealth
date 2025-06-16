@@ -35,7 +35,7 @@ blobStorage({
   adapter: R2BlobStorage(),
   isDefault: false,
 });
-(config.ANALYTICS.MIXPANEL_DEV_TOKEN || config.ANALYTICS.MIXPANEL_PROD_TOKEN) &&
+config.ANALYTICS.MIXPANEL_TOKEN &&
   analytics({
     adapter: MixpanelAnalytics(),
   });
@@ -68,12 +68,12 @@ const app = express();
  * - Once we fully decouple the models, we can remove the import from `main.ts` that's causing this issue
  */
 const start = async () => {
-  const { models } = await import('@hicommonwealth/model');
-  config.APP_ENV === 'local' && console.log(config);
-
+  // importing here to avoid conflicts with notifications provider port
   const { main } = await import('./main');
 
-  await main(app, models, {
+  config.APP_ENV === 'local' && console.log(config);
+
+  await main(app, {
     port: config.PORT,
     withLoggingMiddleware: true,
     withPrerender:
@@ -98,19 +98,28 @@ const start = async () => {
         );
       }
 
-      // bootstrap bindings when in dev mode and DEV_MODULITH is true
-      if (config.NODE_ENV === 'development' && config.DEV_MODULITH) {
+      // bootstrap bindings when DEV_MODULITH is true and not in prod
+      // Enables: consumer, knock, message-relayer, graphile worker
+      // Does not enable: twitter poller, Discord listener, evm CE
+      if (config.DEV_MODULITH && config.APP_ENV !== 'production') {
         const {
           bootstrapBindings,
           bootstrapRelayer,
           bootstrapContestRolloverLoop,
         } = await import('./server/bindings/bootstrap');
+        const { startGraphileWorker } = await import(
+          './server/workers/graphileWorker/graphileWorker'
+        );
+
         await bootstrapBindings();
         await bootstrapRelayer();
         bootstrapContestRolloverLoop();
+        await startGraphileWorker();
       }
     })
-    .catch((e) => log.error(e.message, e));
+    .catch((e) => {
+      log.error(`Failed to initialize modulith mode: ${e.message}`, e);
+    });
 };
 void start();
 

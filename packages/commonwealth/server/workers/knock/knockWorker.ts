@@ -1,31 +1,22 @@
 import {
   HotShotsStats,
   KnockProvider,
-  RabbitMQAdapter,
   ServiceKey,
-  buildRetryStrategy,
-  createRmqConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
-  Broker,
-  broker,
   dispose,
   logger,
   notificationsProvider,
   stats,
 } from '@hicommonwealth/core';
-import { NotificationsPolicy } from '@hicommonwealth/model';
+import { bootstrapBindings } from 'server/bindings/bootstrap';
 import { fileURLToPath } from 'url';
-import { rascalConsumerMap } from '../../bindings/rascalConsumerMap';
 import { config } from '../../config';
-import { NotificationsSettingsPolicy } from './NotificationsSettings.policy';
 
 const log = logger(import.meta);
 
-stats({
-  adapter: HotShotsStats(),
-});
+stats({ adapter: HotShotsStats() });
 
 let isServiceHealthy = false;
 
@@ -42,25 +33,6 @@ startHealthCheckLoop({
 
 async function startKnockWorker() {
   log.info('Starting Knock Worker');
-  let brokerInstance: Broker;
-  try {
-    const rmqAdapter = new RabbitMQAdapter(
-      createRmqConfig({
-        rabbitMqUri: config.BROKER.RABBITMQ_URI,
-        map: rascalConsumerMap,
-      }),
-    );
-    await rmqAdapter.init();
-    broker({
-      adapter: rmqAdapter,
-    });
-    brokerInstance = rmqAdapter;
-  } catch (e) {
-    log.error(
-      'Rascal consumer setup failed. Please check the Rascal configuration',
-    );
-    throw e;
-  }
 
   // init Knock as notifications provider - this is necessary since the policies do not define the provider
   if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)
@@ -69,47 +41,7 @@ async function startKnockWorker() {
     });
   else notificationsProvider();
 
-  const sub = await brokerInstance.subscribe(
-    NotificationsPolicy,
-    // This disables retry strategies on any handler error/failure
-    // This is because we cannot guarantee whether a Knock workflow trigger
-    // call was successful or not. It is better to 'miss' notifications then
-    // to double send a notification
-    buildRetryStrategy((err, topic, content, ackOrNackFn, log_) => {
-      log_.error(err.message, err, {
-        topic,
-        message: content,
-      });
-      ackOrNackFn({ strategy: 'ack' });
-      return true;
-    }),
-  );
-
-  if (!sub) {
-    log.fatal(
-      'Failed to subscribe to notifications. Requires restart!',
-      undefined,
-      {
-        topic: NotificationsPolicy.name,
-      },
-    );
-    await dispose()('ERROR', true);
-  }
-
-  const settingsSub = await brokerInstance.subscribe(
-    NotificationsSettingsPolicy,
-  );
-
-  if (!settingsSub) {
-    log.fatal(
-      'Failed to subscribe to notifications. Requires restart!',
-      undefined,
-      {
-        topic: NotificationsSettingsPolicy.name,
-      },
-    );
-    await dispose()('ERROR', true);
-  }
+  await bootstrapBindings({ worker: 'knock' });
 
   isServiceHealthy = true;
   log.info('Knock Worker started');

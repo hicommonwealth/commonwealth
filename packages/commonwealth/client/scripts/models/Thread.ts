@@ -229,8 +229,6 @@ export class Thread implements IUniqueId {
   constructor(
     t: ThreadView & {
       // TODO: fix other type variants
-      numberOfComments?: number;
-      number_of_comments?: number;
       reactionIds?: number[];
       addressesReacted?: z.infer<typeof schemas.Address>[];
       reactedProfileName?: string[];
@@ -240,17 +238,13 @@ export class Thread implements IUniqueId {
       reactionTimestamps?: string[];
       reactionWeights?: number[];
       userId?: number;
-      user_id?: number;
-      user_tier?: number;
-      avatar_url?: string | null;
-      address_last_active?: string;
       associatedReactions?: ReactionView[];
       associatedContests?: ContestView[] | null;
       recentComments?: CommentView[];
       ContestActions?: ContestActionView[];
     },
   ) {
-    this.author = t.Address?.address ?? '';
+    this.author = t.Address?.address || t.profile_name || '';
     this.title = getDecodedString(t.title!);
     this.body = getDecodedString(t.body!);
     this.id = t.id!;
@@ -260,7 +254,7 @@ export class Thread implements IUniqueId {
     this.topic = t.topic ? ({ ...t.topic } as unknown as Topic) : undefined;
     this.kind = t.kind as ThreadKind;
     this.stage = t.stage! as ThreadStage;
-    this.authorCommunity = t.Address?.community_id ?? '';
+    this.authorCommunity = t.community_id;
     this.pinned = t.pinned!;
     this.url = t.url!;
     this.communityId = t.community_id;
@@ -298,8 +292,7 @@ export class Thread implements IUniqueId {
       : undefined;
     this.archivedAt = t.archived_at ? moment(t.archived_at) : null;
     this.lockedAt = t.locked_at ? moment(t.locked_at) : undefined;
-    this.numberOfComments =
-      t.numberOfComments ?? t.number_of_comments ?? t.comment_count ?? 0;
+    this.numberOfComments = t.comment_count ?? 0;
     this.canvasSignedData = t.canvas_signed_data ?? undefined;
     this.canvasMsgId = t.canvas_msg_id ?? undefined;
     this.links = t.links || [];
@@ -377,7 +370,7 @@ export class Thread implements IUniqueId {
         userId: t.userId ?? t.user_id ?? 0,
         name: t.profile_name ?? '',
         address: t.Address?.address ?? '',
-        lastActive: t.address_last_active ?? '',
+        lastActive: t.address_last_active?.toString() ?? '',
         avatarUrl: t.avatar_url ?? '',
         tier: t.user_tier ?? UserTierMap.IncompleteUser,
       };

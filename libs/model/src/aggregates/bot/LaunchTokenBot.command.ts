@@ -4,6 +4,7 @@ import {
   InvalidState,
   ServerError,
   command,
+  logger,
   type Command,
 } from '@hicommonwealth/core';
 import {
@@ -21,6 +22,8 @@ import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { CreateCommunity } from '../community';
 
+const log = logger(import.meta);
+
 export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
   return {
     ...schemas.LaunchToken,
@@ -33,8 +36,8 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
         throw new AppError('eth_chain_id is not supported');
       }
 
-      if (!config.WEB3.CONTEST_BOT_PRIVATE_KEY)
-        throw new ServerError('Contest bot private key not set!');
+      if (!config.WEB3.LAUNCHPAD_PRIVATE_KEY)
+        throw new ServerError('Launchpad private key not set!');
 
       const communityId = _.kebabCase(name.toLowerCase());
       const existingCommunity = await models.Community.findOne({
@@ -45,16 +48,18 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
         throw new AppError('Token already exists, choose another name');
       }
 
-      const chainNode = await models.ChainNode.findOne({
-        where: { eth_chain_id },
-        attributes: ['id', 'eth_chain_id', 'url', 'private_url'],
-      });
+      const chainNode = await models.ChainNode.scope('withPrivateData').findOne(
+        {
+          where: { eth_chain_id },
+          attributes: ['id', 'eth_chain_id', 'url', 'private_url'],
+        },
+      );
 
       mustExist('Chain Node', chainNode);
 
       const web3 = cp.createPrivateEvmClient({
         rpc: chainNode.private_url!,
-        privateKey: config.WEB3.CONTEST_BOT_PRIVATE_KEY,
+        privateKey: config.WEB3.LAUNCHPAD_PRIVATE_KEY,
       });
       const launchpadContract = new web3.eth.Contract(
         LaunchpadAbi,
@@ -91,6 +96,13 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
           tokenAddress: tokenData.parsedArgs.tokenAddress,
         });
       } catch (e) {
+        log.error(
+          `Failed to get erc20 token properties for token ${tokenData.parsedArgs.tokenAddress}`,
+          e instanceof Error ? e : undefined,
+          {
+            e,
+          },
+        );
         throw new Error(
           `Failed to get erc20 token properties for token ${tokenData.parsedArgs.tokenAddress}`,
         );

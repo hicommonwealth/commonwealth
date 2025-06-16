@@ -24,6 +24,10 @@ export default (
       tableName: 'Memberships',
       underscored: true,
       timestamps: false,
-      indexes: [{ fields: ['address_id'] }, { fields: ['group_id'] }],
+      indexes: [
+        { fields: ['address_id'] },
+        { fields: ['group_id'] },
+        { fields: ['group_id', 'address_id'], where: { reject_reason: null } },
+      ],
     },
   );

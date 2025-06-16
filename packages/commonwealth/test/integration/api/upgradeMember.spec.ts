@@ -1,4 +1,5 @@
 import { dispose } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
@@ -72,7 +73,7 @@ describe('upgradeMember Integration Tests', () => {
   });
 
   test('should upgrade member and return a success response', async () => {
-    await server.models.Address.update(
+    await models.Address.update(
       { role: 'admin' },
       { where: { id: server.e2eTestEntities.testAddresses[0].id } },
     );
@@ -89,7 +90,7 @@ describe('upgradeMember Integration Tests', () => {
       });
     expect(response.status).toBe(200);
 
-    const addr = await server.models.Address.findOne({
+    const addr = await models.Address.findOne({
       where: { id: server.e2eTestEntities.testAddresses[1].id },
     });
     expect(addr!.role).toBe('admin');

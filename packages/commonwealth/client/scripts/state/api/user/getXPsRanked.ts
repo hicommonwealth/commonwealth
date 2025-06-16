@@ -12,17 +12,19 @@ type UseGetXPsRankedProps = z.infer<typeof GetXpsRanked.input> & {
 const useGetXPsRanked = ({
   top = 100,
   quest_id,
+  search,
   enabled = true,
 }: UseGetXPsRankedProps) => {
   return trpc.user.getXpsRanked.useQuery(
     {
       top,
       quest_id,
+      search,
     },
     {
       enabled,
       staleTime: FETCH_XP_RANKED_STALE_TIME,
-      cacheTime: FETCH_XP_RANKED_CACHE_TIME,
+      gcTime: FETCH_XP_RANKED_CACHE_TIME,
     },
   );
 };

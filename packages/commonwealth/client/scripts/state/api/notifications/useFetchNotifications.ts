@@ -4,13 +4,16 @@ import {
   useNotificationStore,
 } from '@knocklabs/react';
 import { useEffect } from 'react';
-
-const KNOCK_IN_APP_FEED_ID =
-  process.env.KNOCK_IN_APP_FEED_ID || 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb';
+import useFetchPublicEnvVarQuery from '../configuration/fetchPublicEnvVar';
 
 const useFetchNotifications = () => {
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
+
   const knockClient = useKnockClient();
-  const feedClient = useNotifications(knockClient, KNOCK_IN_APP_FEED_ID);
+  const feedClient = useNotifications(
+    knockClient,
+    configurationData!.KNOCK_IN_APP_FEED_ID,
+  );
 
   const { items } = useNotificationStore(feedClient);
 

@@ -1,6 +1,7 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import BigNumber from 'bignumber.js';
 import { weiToTokens } from 'helpers';
+import { fetchCachedPublicEnvVar } from 'state/api/configuration';
 import { z } from 'zod';
 
 export const calculateTokenPricing = (
@@ -8,11 +9,11 @@ export const calculateTokenPricing = (
   ethToUsdRate: number,
   ethPerToken: number,
 ) => {
-  const currentRate = ethPerToken * ethToUsdRate || 0;
+  const { LAUNCHPAD_INITIAL_PRICE } = fetchCachedPublicEnvVar() || {};
+  const currentRate =
+    (ethPerToken || token?.latest_price || 0) * ethToUsdRate || 0;
   const price24HrAgo =
-    (token?.old_price ||
-      parseInt(process.env.LAUNCHPAD_INITIAL_PRICE || '416700000') / 1e18) *
-    ethToUsdRate;
+    (token?.old_price || LAUNCHPAD_INITIAL_PRICE! / 1e18) * ethToUsdRate;
   const priceChange = (currentRate - price24HrAgo) / price24HrAgo;
   const pricePercentage24HourChange = parseFloat(
     (
@@ -36,7 +37,7 @@ export const calculateTokenPricing = (
     marketCapCurrent === 0;
   if (marketCapIsMissing && ethToUsdRate) {
     const initialPriceEtherStr = weiToTokens(
-      process.env.LAUNCHPAD_INITIAL_PRICE || '0',
+      LAUNCHPAD_INITIAL_PRICE!.toString(),
       18,
     );
     const initialPriceEther = new BigNumber(initialPriceEtherStr);

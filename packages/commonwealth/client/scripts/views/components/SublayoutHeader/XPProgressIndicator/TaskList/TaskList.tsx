@@ -1,7 +1,9 @@
+import { QuestAction } from 'client/scripts/helpers/quest';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import React from 'react';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import TotalQuestXPTag from 'views/pages/QuestDetails/TotalQuestXPTag';
 import WeeklyProgressGoal from '../WeeklyProgressGoal';
 import useXPProgress from '../useXPProgress';
 import Quests from './Quests';
@@ -45,7 +47,14 @@ const TaskList = ({ className }: TaskListProps) => {
               imageURL: quest.image_url,
               title: quest.name,
               isCompleted: quest.isCompleted,
-              xpPoints: { gained: quest.gainedXP, total: quest.totalUserXP },
+              xpPointsElement: (
+                <TotalQuestXPTag
+                  questId={quest.id}
+                  questStartDate={new Date(quest.start_date)}
+                  questEndDate={new Date(quest.end_date)}
+                  questActions={(quest.action_metas as QuestAction[]) || []}
+                />
+              ),
             }))}
           />
           <Quests
@@ -59,7 +68,15 @@ const TaskList = ({ className }: TaskListProps) => {
               imageURL: quest.image_url,
               title: quest.name,
               isCompleted: quest.isCompleted,
-              xpPoints: { gained: quest.gainedXP, total: quest.totalUserXP },
+              xpPointsElement: (
+                <TotalQuestXPTag
+                  questId={quest.id}
+                  questStartDate={new Date(quest.start_date)}
+                  questEndDate={new Date(quest.end_date)}
+                  questActions={(quest.action_metas as QuestAction[]) || []}
+                  hideGainedXp
+                />
+              ),
             }))}
           />
         </>

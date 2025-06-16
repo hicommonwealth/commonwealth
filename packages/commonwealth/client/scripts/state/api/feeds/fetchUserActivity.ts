@@ -4,25 +4,34 @@ const USER_ACTIVITY_STALE_TIME = 60 * 1_000; // 1 minute
 const USER_ACTIVITY_CACHE_TIME = 5 * 60 * 1_000; // 5 minutes
 const GLOBAL_ACTIVITY_STALE_TIME = 5 * 60 * 1_000; // 5 minutes (backend caches for 5 minutes as well)
 
-export const useFetchGlobalActivityQuery = ({ limit }) => {
+export const useFetchGlobalActivityQuery = ({
+  limit,
+  community_id,
+  search,
+}: {
+  limit: number;
+  community_id?: string;
+  search?: string;
+}) => {
   return trpc.feed.getGlobalActivity.useInfiniteQuery(
     {
       limit,
+      community_id,
+      search,
     },
     {
       staleTime: GLOBAL_ACTIVITY_STALE_TIME,
-      cacheTime: USER_ACTIVITY_CACHE_TIME,
+      gcTime: USER_ACTIVITY_CACHE_TIME,
       initialCursor: 1,
       getNextPageParam: (lastPage) => {
-        const nextPageNum = lastPage.page + 1;
-        if (nextPageNum <= lastPage.totalPages) return nextPageNum;
-        return undefined;
+        if (lastPage.results.length === 0) return undefined;
+        return lastPage.page + 1;
       },
     },
   );
 };
 
-export const useFetchUserActivityQuery = ({ limit }) => {
+export const useFetchUserActivityQuery = ({ limit }: { limit: number }) => {
   return trpc.feed.getUserActivity.useInfiniteQuery(
     {
       limit,
@@ -30,7 +39,7 @@ export const useFetchUserActivityQuery = ({ limit }) => {
     },
     {
       staleTime: USER_ACTIVITY_STALE_TIME,
-      cacheTime: USER_ACTIVITY_CACHE_TIME,
+      gcTime: USER_ACTIVITY_CACHE_TIME,
       initialCursor: 1,
       getNextPageParam: (lastPage) => {
         const nextPageNum = lastPage.page + 1;

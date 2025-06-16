@@ -53,14 +53,17 @@ const CommunityInformationStep = ({
 
   const {
     mutateAsync: createCommunityMutation,
-    isLoading: createCommunityLoading,
+    isPending: createCommunityLoading,
   } = useCreateCommunityMutation();
 
   const handleSubmit = async (
     values: CommunityInformationFormSubmitValues & { communityId: string },
   ) => {
+    // Simplified logic: Find the chain node by comparing stringified values.
+    // This works for Sui chains (e.g., "sui-123") and other chains (e.g., "1", "osmosis")
+    // because values.chain.value from the form now directly matches chain.value in sortedChains.
     const selectedChainNode = sortedChains.find(
-      (chain) => String(chain.value) === values?.chain?.value,
+      (chain) => String(chain.value) === String(values?.chain?.value),
     );
 
     if (isTurnstileEnabled && !turnstileToken) {
@@ -117,7 +120,17 @@ const CommunityInformationStep = ({
   };
 
   const handleWatchForm = (values: CommunityInformationFormSubmitValues) => {
-    values?.chain?.value && handleSelectedChainId(values.chain.value);
+    // Extract the chain ID value, handling the Sui special case
+    if (values?.chain?.value) {
+      if (values.chain.value.toString().startsWith('sui-')) {
+        // For Sui chains, pass the node ID directly
+        const chainNodeId = values.chain.value.split('-')[1];
+        handleSelectedChainId(chainNodeId);
+      } else {
+        // For regular chains, pass the value as before
+        handleSelectedChainId(values.chain.value);
+      }
+    }
   };
 
   return (

@@ -1,25 +1,30 @@
 @import '../../../../styles/shared';
 
+.xp-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px !important;
+  height: auto !important;
+
+  .quest-filter {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    min-width: 300px;
+
+    .CWSelectList {
+      width: 100%;
+    }
+  }
+}
+
 .XPTable {
   @include table-cell;
 
   @include smallInclusive {
     max-height: 300px;
     overflow: scroll;
-  }
-
-  .filters {
-    margin-bottom: 16px;
-
-    .quest-filter {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-
-      .CWSelectList {
-        width: 100%;
-      }
-    }
   }
 
   .table-header {

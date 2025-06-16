@@ -4,65 +4,299 @@
 .StickyInput {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  border-radius: 8px;
   background-color: $white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  border: 1px solid $neutral-200;
   padding: 12px;
-  gap: 4px;
+  width: 100%;
+  max-width: 100%;
+  gap: 8px;
+  min-width: 280px;
+  position: relative;
 
-  .thread-tags-container {
-    width: 100%;
+  @include extraSmall {
+    .input-row {
+      gap: 6px;
 
-    .tags-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 4px 0;
-      scrollbar-width: thin;
+      .action-button,
+      .send-button,
+      .image-button,
+      .expand-button,
+      .ai-toggle-button {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
 
-      &::-webkit-scrollbar {
-        height: 4px;
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background-color: $neutral-300;
-        border-radius: 4px;
+        svg {
+          transform: scale(0.8);
+        }
       }
     }
   }
 
-  .action-tags-container {
-    .tags-row {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 12px;
-      overflow-x: auto;
-      padding: 4px 0;
-      scrollbar-width: thin;
+  // Action buttons container
+  .button-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
 
-      &::-webkit-scrollbar {
-        height: 4px;
-      }
+  .action-button,
+  .send-button,
+  .image-button,
+  .expand-button,
+  .ai-toggle-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $primary-500;
+    color: $white;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    aspect-ratio: 1/1;
+    padding: 0;
 
-      &::-webkit-scrollbar-thumb {
-        background-color: $neutral-300;
-        border-radius: 4px;
+    &:hover {
+      background-color: $primary-600;
+    }
+
+    &:disabled {
+      background-color: $primary-200;
+      cursor: not-allowed;
+    }
+
+    &.active {
+      background-color: $primary-500;
+
+      &:hover {
+        background-color: $primary-600;
       }
     }
 
-    .Tag.action-pill {
-      background-color: $neutral-100 !important;
-      color: $neutral-800 !important;
-      border: none !important;
+    &.inactive {
+      background-color: $white;
+      border: 1px solid $neutral-200;
 
       &:hover {
-        background-color: $neutral-200 !important;
+        background-color: $neutral-50;
       }
 
-      .Text {
-        color: $neutral-800 !important;
+      svg {
+        color: $neutral-500;
+      }
+    }
+
+    svg {
+      color: $white;
+    }
+  }
+
+  .web-search-toggle-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $primary-500;
+    color: $white;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    aspect-ratio: 1/1;
+    padding: 0;
+
+    &:hover {
+      background-color: $primary-600;
+    }
+
+    &:disabled {
+      background-color: $primary-200;
+      cursor: not-allowed;
+    }
+
+    &.active {
+      background-color: $primary-500;
+
+      &:hover {
+        background-color: $primary-600;
+      }
+    }
+
+    &.inactive {
+      background-color: $white;
+      border: 1px solid $neutral-200;
+
+      &:hover {
+        background-color: $neutral-50;
+      }
+
+      svg {
+        color: $neutral-500;
+      }
+    }
+
+    svg {
+      color: $white;
+    }
+  }
+
+  .ai-toggle-button {
+    position: relative;
+
+    .model-count-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background-color: $primary-700;
+      color: $white;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      border: 1px solid $white;
+      line-height: 1;
+    }
+  }
+
+  // Mobile specific styles
+  &.mobile {
+    border-radius: 12px 12px 0 0;
+    border-bottom: none;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-width: 100%;
+    padding: 12px;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+
+    &.not-expanded {
+      .CWEditor {
+        .ql-container {
+          min-height: unset !important;
+          max-height: 152px !important;
+          overflow: unset !important;
+
+          .ql-editor {
+            max-height: 72px !important;
+          }
+        }
+      }
+    }
+
+    &.expanded {
+      height: 100%;
+      padding: 0;
+      border-radius: 0;
+      display: flex;
+      flex-direction: column;
+
+      .CWEditor {
+        .ql-container {
+          .ql-editor {
+            max-height: 412px !important;
+          }
+        }
+      }
+    }
+
+    &.not-expanded.thread-mode {
+      .CWEditor {
+        .ql-container {
+          max-height: unset !important;
+        }
+      }
+    }
+
+    .MobileStickyInputFocused {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      background-color: $white;
+      z-index: 1100;
+      padding: 16px;
+
+      .mobile-editor-container {
+        padding: 16px;
+        display: unset !important;
+        flex: unset !important;
+        height: unset !important;
+
+        .header-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+      }
+    }
+  }
+
+  // Desktop specific styles
+  &.desktop {
+    border-radius: 12px;
+    width: 100%;
+    margin: 0 auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+
+    &.expanded {
+      padding: 0;
+    }
+
+    &.not-expanded {
+      .CWEditor {
+        .ql-container {
+          overflow: unset !important;
+
+          .ql-editor {
+            overflow: auto !important;
+            max-height: 72px !important;
+          }
+        }
+      }
+    }
+  }
+
+  // Common components styled regardless of mobile/desktop
+  .action-tags-container {
+    .tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 4px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .action-pill {
+      background-color: $neutral-50;
+      color: $neutral-800;
+      font-size: 13px;
+      cursor: pointer;
+
+      &.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
       }
     }
   }
@@ -70,277 +304,97 @@
   .input-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 10px;
     width: 100%;
 
     .text-input-container {
-      flex: 1;
       position: relative;
-      min-width: 0;
+      flex-grow: 1;
+      min-width: 240px;
+      flex-basis: 240px;
 
-      .mention-dropdown {
-        position: absolute;
-        top: calc(100% + 5px);
-        left: 0;
-        width: 280px;
-        max-height: 300px;
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        padding: 8px 0;
-
-        &.mention-dropdown-above {
-          bottom: calc(100% + 5px);
-          top: auto;
+      .CWEditor {
+        .CWTabsRow,
+        .CustomQuillToolbar,
+        .CustomQuillFooter {
+          display: none;
         }
 
-        .mention-items {
-          overflow-y: auto;
-          max-height: 300px;
+        .QuillEditorWrapper {
+          min-height: unset !important;
 
-          .mention-item {
-            padding: 8px 16px;
-            cursor: pointer;
-            font-size: 14px;
-            color: $neutral-800;
-            display: flex;
-            align-items: center;
-
-            &:hover {
-              background-color: $neutral-100;
-            }
-
-            &.selected {
-              background-color: rgba($primary-100, 0.7);
-              font-weight: 500;
-            }
-
-            &.thread {
-              &::before {
-                content: '';
-                display: inline-block;
-                width: 8px;
-                height: 8px;
-                min-width: 8px;
-                flex-shrink: 0;
-                border-radius: 50%;
-                background-color: $primary-500;
-                margin-right: 8px;
-              }
-            }
-
-            &.model {
-              &::before {
-                content: '';
-                display: inline-block;
-                width: 8px;
-                height: 8px;
-                min-width: 8px;
-                flex-shrink: 0;
-                border-radius: 50%;
-                background-color: $neutral-500;
-                margin-right: 8px;
-              }
-            }
-
-            .mention-item-text {
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              max-width: 250px;
-              display: block;
-            }
+          &.isFocused {
+            border-radius: 6px;
           }
 
-          .mention-empty {
-            padding: 12px 16px;
-            color: $neutral-500;
-            font-size: 14px;
-            text-align: center;
-          }
-        }
-      }
-    }
+          .ql-container {
+            min-height: unset !important;
+            max-height: 76px !important;
+            font-family: $font-family-neue-haas-unica;
 
-    .model-selector {
-      display: flex;
-      align-items: center;
-      position: relative;
+            .ql-editor {
+              min-height: unset !important;
+              padding: 8px !important;
+              font-size: 14px !important;
 
-      .model-selector-button {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        padding: 6px;
-        min-width: 32px;
-        min-height: 32px;
-        border: none;
-        border-radius: 12px;
-        background-color: $primary-500;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-        white-space: nowrap;
-        max-width: 200px;
-
-        &:has(.model-name) {
-          padding: 6px 8px;
-        }
-
-        &:hover {
-          background-color: $primary-700;
-        }
-
-        .model-name {
-          font-size: 14px;
-          font-weight: 500;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .model-count {
-          font-size: 14px;
-          font-weight: 500;
-          flex-shrink: 0;
-        }
-
-        .Icon {
-          color: white;
-          flex-shrink: 0;
-        }
-      }
-
-      .model-selector-dropdown {
-        position: absolute;
-        right: 0;
-        left: auto;
-        width: 200px;
-        max-height: 300px;
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        padding: 8px 0;
-
-        &.mention-dropdown-above {
-          bottom: calc(100% + 5px);
-          top: auto;
-        }
-
-        .mention-items {
-          overflow-y: auto;
-          max-height: 300px;
-
-          .mention-item {
-            padding: 8px 16px;
-            cursor: pointer;
-            font-size: 14px;
-            color: $neutral-800;
-            display: flex;
-            align-items: center;
-
-            &:hover {
-              background-color: $neutral-100;
-            }
-
-            &.selected {
-              background-color: rgba($primary-100, 0.7);
-              font-weight: 500;
-            }
-
-            &.model {
-              &::before {
-                content: '';
-                display: inline-block;
-                width: 8px;
-                height: 8px;
-                min-width: 8px;
-                flex-shrink: 0;
-                border-radius: 50%;
-                background-color: $neutral-500;
-                margin-right: 8px;
+              &.ql-blank::before {
+                left: 8px !important;
               }
-            }
-
-            .mention-item-text {
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              max-width: 180px;
-              display: block;
             }
           }
         }
-      }
-    }
-
-    .send-button {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 6px;
-      min-width: 32px;
-      min-height: 32px;
-      border: none;
-      border-radius: 12px;
-      background-color: $primary-500;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-
-      &:hover {
-        background-color: $primary-700;
-      }
-
-      .Icon {
-        color: white;
       }
     }
   }
 
-  @include mediumSmall {
-    padding: 8px;
+  .turnstile-container {
+    padding: 8px 16px 0;
+  }
 
-    .input-row {
-      .text-input-container {
-        .mention-dropdown {
-          width: 240px;
-        }
-      }
+  .cancel-reply-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    background-color: $neutral-100;
+    width: fit-content;
+    padding: 2px 4px;
+    border-radius: 6px;
+  }
+}
 
-      .model-selector {
-        .model-selector-button {
-          padding: 6px 8px;
-          max-width: 160px;
-        }
-      }
+/* Desktop container styles */
+.DesktopStickyInput {
+  position: sticky;
+  bottom: 0;
+  padding: 12px 0 12px 0;
+  margin-top: 12px;
+  z-index: 70;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 
-      .send-button {
-        padding: 6px 10px;
-      }
+/* Expanded view styles - common for both desktop and mobile */
+.DesktopStickyInputExpanded {
+  padding: 0 !important;
+
+  .PageLayout {
+    padding: 0 !important;
+    .layout-container {
+      padding: 0 !important;
     }
   }
 
-  @include extraSmall {
-    .input-row {
-      .text-input-container {
-        .mention-dropdown {
-          width: 100%;
-        }
-      }
-
-      .model-selector {
-        .model-selector-button {
-          max-width: 140px;
-        }
-      }
-    }
+  .NewThreadForm,
+  .CommentEditor {
+    width: 100%;
+    background: $white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    margin: 0;
+    padding: 16px;
   }
 }

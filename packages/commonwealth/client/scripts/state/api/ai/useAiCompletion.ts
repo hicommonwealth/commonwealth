@@ -1,11 +1,16 @@
 import { CompletionOptions } from '@hicommonwealth/shared';
+import { notifyInfo } from 'client/scripts/controllers/app/notifications';
 import { useCallback, useState } from 'react';
 import { userStore } from 'state/ui/user';
+import { trpc } from 'utils/trpcClient';
+import { useMentionExtractor } from '../../../hooks/useMentionExtractor';
 
 interface AiCompletionOptions extends Partial<CompletionOptions> {
   onChunk?: (chunk: string) => void;
   onComplete?: (fullText: string) => void;
   onError?: (error: Error) => void;
+  includeContextualMentions?: boolean;
+  communityId?: string;
 }
 
 interface CompletionError {
@@ -17,37 +22,126 @@ interface CompletionError {
 
 /**
  * Hook for streaming AI completions from the server
- * Supports both OpenAI and OpenRouter
+ * Supports both OpenAI and OpenRouter with contextual mention integration
  */
 export const useAiCompletion = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [completion, setCompletion] = useState<string>('');
 
+  const { extractMentionsFromText, validateMentionLimits } =
+    useMentionExtractor();
+
+  const utils = trpc.useUtils();
+
+  const fetchContextForMentions = useCallback(
+    async (
+      userPrompt: string,
+      communityId?: string,
+    ): Promise<string | null> => {
+      try {
+        const mentions = extractMentionsFromText(userPrompt);
+
+        if (mentions.length === 0) {
+          return null;
+        }
+
+        const { validMentions, hasExceededLimit } =
+          validateMentionLimits(mentions);
+
+        if (hasExceededLimit) {
+          console.warn('Some mentions were ignored due to limits');
+          notifyInfo('Some mentions were ignored due to limits');
+        }
+
+        if (validMentions.length === 0) {
+          return null;
+        }
+
+        const mentionsForContext = validMentions.map((mention) => ({
+          id: mention.id,
+          type: mention.type,
+          name: mention.name,
+        }));
+
+        const contextData = await utils.search.aggregateContext.fetch({
+          mentions: JSON.stringify(mentionsForContext),
+          communityId,
+          contextDataDays: 30,
+        });
+
+        return contextData.formattedContext;
+      } catch (contextError) {
+        console.error('Error fetching context for mentions:', contextError);
+        return null;
+      }
+    },
+    [extractMentionsFromText, validateMentionLimits, utils],
+  );
+
   const generateCompletion = useCallback(
-    async (prompt: string, options?: AiCompletionOptions) => {
+    async (userPrompt: string, options?: AiCompletionOptions) => {
       setIsLoading(true);
       setError(null);
       setCompletion('');
 
       let accumulatedText = '';
-      const streamMode = options?.stream !== false; // Default to true
+      const streamMode = options?.stream !== false;
 
       try {
+        let contextualData: string | null = null;
+        if (options?.includeContextualMentions !== false) {
+          contextualData = await fetchContextForMentions(
+            userPrompt,
+            options?.communityId,
+          );
+        }
+
+        let enhancedSystemPrompt = options?.systemPrompt;
+        if (contextualData) {
+          const contextSection = `
+
+CONTEXTUAL INFORMATION:
+The user has mentioned the following entities in their message. 
+Use this context to provide more informed and relevant responses:
+
+${contextualData}
+
+---
+
+`;
+          enhancedSystemPrompt = contextSection + (enhancedSystemPrompt || '');
+        }
+
+        const requestBody: Partial<CompletionOptions> & {
+          jwt?: string | null;
+          prompt: string;
+        } = {
+          prompt: userPrompt,
+          model: options?.model || 'gpt-4o',
+          maxTokens: options?.maxTokens,
+          stream: streamMode,
+          useOpenRouter: options?.useOpenRouter,
+          jwt: userStore.getState().jwt,
+          ...(typeof options?.useWebSearch === 'boolean'
+            ? { useWebSearch: options.useWebSearch }
+            : {}),
+        };
+
+        if (typeof options?.temperature === 'number') {
+          requestBody.temperature = options.temperature;
+        }
+
+        if (enhancedSystemPrompt) {
+          requestBody.systemPrompt = enhancedSystemPrompt;
+        }
+
         const response = await fetch('/api/aicompletion', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            prompt,
-            model: options?.model || 'gpt-4o',
-            temperature: options?.temperature,
-            maxTokens: options?.maxTokens,
-            stream: streamMode,
-            useOpenRouter: options?.useOpenRouter,
-            jwt: userStore.getState().jwt,
-          }),
+          body: JSON.stringify(requestBody),
         });
 
         if (!response.ok) {
@@ -129,7 +223,7 @@ export const useAiCompletion = () => {
 
       return accumulatedText;
     },
-    [],
+    [fetchContextForMentions],
   );
 
   return {

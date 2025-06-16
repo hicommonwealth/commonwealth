@@ -1,8 +1,9 @@
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useState } from 'react';
 import { getSnapshotProposalQuery } from 'state/api/snapshots';
-import { PageLoading } from './loading';
+import { LoadingIndicator } from '../components/LoadingIndicator/LoadingIndicator';
+import { PageNotFound } from './404';
 
 type SnapshotProposalLinkRedirectProps = {
   identifier: string;
@@ -13,6 +14,7 @@ const SnapshotProposalLinkRedirect = ({
   identifier,
 }: SnapshotProposalLinkRedirectProps) => {
   const navigate = useCommonNavigate();
+  const [notFound, setNotFound] = useState(false);
 
   useNecessaryEffect(() => {
     const fetchSnapshotData = async () => {
@@ -33,15 +35,18 @@ const SnapshotProposalLinkRedirect = ({
         // 3. redirect
         navigate(`/proposal/${newLink.identifier}`, { replace: true });
       } catch (e) {
-        // TODO: show error page
-        throw new Error('could not find entity');
+        setNotFound(true);
       }
     };
 
     fetchSnapshotData();
   }, [navigate]);
 
-  return <PageLoading />;
+  if (notFound) {
+    return <PageNotFound />;
+  }
+
+  return <LoadingIndicator />;
 };
 
 export default SnapshotProposalLinkRedirect;

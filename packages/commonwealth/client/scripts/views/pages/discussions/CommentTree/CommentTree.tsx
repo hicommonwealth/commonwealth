@@ -15,11 +15,11 @@ export const CommentTree = ({
   canReact = true,
   canReply = true,
   canComment,
-  disabledActionsTooltipText,
   onThreadCreated,
   aiCommentsToggleEnabled,
-  streamingReplyIds,
-  setStreamingReplyIds,
+  streamingInstances,
+  setStreamingInstances,
+  permissions,
 }: CommentsTreeProps) => {
   const user = useUserStore();
   const [hasTriggeredAIComment, setHasTriggeredAIComment] = useState(false);
@@ -50,7 +50,7 @@ export const CommentTree = ({
       onThreadCreated &&
       (!thread.numberOfComments || thread.numberOfComments === 0) &&
       !hasTriggeredAIComment &&
-      streamingReplyIds.length === 0;
+      streamingInstances.length === 0;
 
     if (shouldGenerateAIComment) {
       setHasTriggeredAIComment(true);
@@ -65,7 +65,7 @@ export const CommentTree = ({
     onThreadCreated,
     user.activeAccount,
     hasTriggeredAIComment,
-    streamingReplyIds,
+    streamingInstances,
     thread,
   ]);
 
@@ -103,7 +103,7 @@ export const CommentTree = ({
         onCommentReplyEnd={handleIsReplying}
         commentEdits={edits}
         canComment={canComment}
-        disabledActionsTooltipText={disabledActionsTooltipText}
+        permissions={permissions}
         canReact={
           !thread.archivedAt && (!!user.activeAccount || isAdmin) && canReact
         }
@@ -114,8 +114,8 @@ export const CommentTree = ({
           canReply
         }
         commentFilters={commentFilters}
-        streamingReplyIds={streamingReplyIds}
-        setStreamingReplyIds={setStreamingReplyIds}
+        streamingInstances={streamingInstances}
+        setStreamingInstances={setStreamingInstances}
       />
     </>
   );

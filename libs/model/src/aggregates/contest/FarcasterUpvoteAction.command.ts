@@ -24,7 +24,7 @@ export function FarcasterUpvoteAction(): Command<
         log.warn(
           'Farcaster verified address not found for upvote action- upvote will be ignored.',
         );
-        return;
+        return { message: '' };
       }
       const { parent_hash, hash } = payload.cast;
       const contentUrlWithoutFid = buildFarcasterContentUrl(parent_hash!, hash);
@@ -44,6 +44,11 @@ export function FarcasterUpvoteAction(): Command<
             required: true,
             include: [
               {
+                model: models.Contest,
+                as: 'contests',
+                required: true,
+              },
+              {
                 model: models.Community,
                 required: true,
                 include: [
@@ -58,6 +63,12 @@ export function FarcasterUpvoteAction(): Command<
         ],
       });
       mustExist(`Contest Action (${contentUrlWithoutFid})`, addAction);
+      if (new Date() > addAction.ContestManager!.contests![0]!.end_time) {
+        return {
+          type: 'message',
+          message: `Contest has ended`,
+        };
+      }
 
       // ensure that the fid did not vote on this content before
       const voteAction = await models.ContestAction.findOne({

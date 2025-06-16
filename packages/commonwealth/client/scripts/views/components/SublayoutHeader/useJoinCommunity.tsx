@@ -195,9 +195,7 @@ const useJoinCommunity = () => {
           activeChainId: activeCommunityId,
         });
 
-        await toggleCommunityStar({
-          community: activeCommunityId || '',
-        });
+        await toggleCommunityStar({ community_id: activeCommunityId || '' });
       } catch (err) {
         console.error(err);
       }
