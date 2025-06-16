@@ -38,13 +38,6 @@ export function createRmqConfig({
   let connection = <ConnectionConfig>rabbitMqUri;
   if (rabbitMqUri.includes('localhost') || rabbitMqUri.includes('127.0.0.1')) {
     vhost = '/';
-    // necessary until rascal upgrades amqp version >= 0.10.6
-    connection = {
-      url: rabbitMqUri,
-      options: {
-        frameMax: 131072,
-      },
-    };
   } else {
     const count = (rabbitMqUri.match(/\//g) || []).length;
     if (count == 3) {
@@ -56,6 +49,16 @@ export function createRmqConfig({
         "Can't create Rascal RabbitMQ Config with an invalid URI!",
       );
     }
+  }
+
+  if (EnvConfig.APP_ENV === 'local') {
+    // necessary until rascal upgrades amqp version >= 0.10.6
+    connection = {
+      url: rabbitMqUri,
+      options: {
+        frameMax: 131072,
+      },
+    };
   }
 
   const queueConfig = {
