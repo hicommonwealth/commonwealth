@@ -11,6 +11,7 @@ type RankedUser = z.infer<typeof schemas.XpRankedUser>;
  * Returns the top users with the most XP points.
  * @param top The number of top users to return.
  * @param quest_id The quest ID to filter the users by.
+ * @param search The search term to filter users by name.
  */
 export function GetXpsRanked(): Query<typeof schemas.GetXpsRanked> {
   return {
@@ -18,7 +19,12 @@ export function GetXpsRanked(): Query<typeof schemas.GetXpsRanked> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { top, quest_id } = payload;
+      const { top, quest_id, search = '' } = payload;
+      const searchCondition = search
+        ? `AND LOWER(u.profile->>'name') LIKE LOWER(:search)`
+        : '';
+      const searchParam = search ? `%${search}%` : '';
+
       const query = quest_id
         ? `
 with
@@ -81,14 +87,14 @@ select
  	profile->>'avatar_url' as avatar_url
 from
 	"Users" U
-where
-	tier != ${UserTierMap.BannedUser}
-order by
-	xp_points desc
+where tier != ${UserTierMap.BannedUser} ${searchCondition}
+order by xp_points desc
 limit :top;
 `;
       return await models.sequelize.query<RankedUser>(query, {
-        replacements: quest_id ? { quest_id, top } : { top },
+        replacements: quest_id
+          ? { quest_id, top, search: searchParam }
+          : { top, search: searchParam },
         type: QueryTypes.SELECT,
         raw: true,
       });

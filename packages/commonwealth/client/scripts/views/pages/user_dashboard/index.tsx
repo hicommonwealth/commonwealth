@@ -24,7 +24,7 @@ import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
-import { Feed } from '../../components/feed';
+import { ThreadFeed } from '../ExplorePage/ThreadFeed/ThreadFeed';
 import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
 import './index.scss';
 
@@ -135,13 +135,13 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
               </CWTabsRow>
             </div>
             {containerReady && activePage === DashboardViews.Global ? (
-              <Feed
+              <ThreadFeed
                 query={useFetchGlobalActivityQuery}
                 // @ts-expect-error <StrictNullChecks/>
                 customScrollParent={containerRef.current}
               />
             ) : (
-              <Feed
+              <ThreadFeed
                 query={useFetchUserActivityQuery}
                 // @ts-expect-error <StrictNullChecks/>
                 customScrollParent={containerRef.current}

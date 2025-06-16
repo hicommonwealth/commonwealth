@@ -1,5 +1,4 @@
 import { OpenFeatureProvider } from '@openfeature/react-sdk';
-import { OpenFeature } from '@openfeature/web-sdk';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import useInitApp from 'hooks/useInitApp';
@@ -17,15 +16,13 @@ import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
 import { ReactNativeLogForwarder } from 'views/components/ReactNativeBridge/ReactNativeLogForwarder';
 import { ReactNativeScrollToTopListener } from 'views/components/ReactNativeBridge/ReactNativeScrollToTopListener';
 import { Splash } from './Splash';
-import { openFeatureProvider } from './helpers/feature-flags';
 import { trpc, trpcClient } from './utils/trpcClient';
 import FarcasterFrameProvider from './views/components/FarcasterProvider';
 import OnBoardingWrapperForMobile from './views/pages/OnBoarding/OnBoardingWrapperForMobile';
 
-OpenFeature.setProvider(openFeatureProvider);
-
 const App = () => {
   const { isLoading } = useInitApp();
+
   return (
     <StrictMode>
       <HelmetProvider>
@@ -52,7 +49,9 @@ const App = () => {
                   </PrivyMobileAuthenticator>
                 )}
                 <ToastContainer />
-                {import.meta.env.DEV && <ReactQueryDevtools />}
+                {import.meta.env.DEV && (
+                  <ReactQueryDevtools buttonPosition="bottom-left" />
+                )}
               </OpenFeatureProvider>
             </FarcasterFrameProvider>
           </trpc.Provider>

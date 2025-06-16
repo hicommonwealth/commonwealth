@@ -11,17 +11,20 @@ import {
 } from 'client/scripts/helpers/snapshot_utils';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
-import { notifyError } from 'controllers/app/notifications';
+import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   getEthChainIdOrBech32Prefix,
   SessionKeyError,
 } from 'controllers/server/sessions';
 import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL } from 'helpers/threads';
+import useAppStatus from 'hooks/useAppStatus';
 import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
+import { AnyProposal, ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, {
   forwardRef,
@@ -39,7 +42,6 @@ import {
 } from 'state/api/ai/prompts';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
-import { useFetchGroupsQuery } from 'state/api/groups';
 import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import {
   useAddThreadLinksMutation,
@@ -49,7 +51,7 @@ import {
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import useUserStore, { useUserAiSettingsStore } from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import CustomTopicOption from 'views/components/NewThreadFormLegacy/CustomTopicOption';
@@ -61,17 +63,21 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { useTurnstile } from 'views/components/useTurnstile';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import useAppStatus from '../../../hooks/useAppStatus';
-import { AnyProposal, ThreadKind, ThreadStage } from '../../../models/types';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 
 import { DeltaStatic } from 'quill';
+// eslint-disable-next-line max-len
+import useCreateThreadTokenMutation from 'client/scripts/state/api/threads/createThreadToken';
+import {
+  useGetTokenByCommunityId,
+  useGetTokenizedThreadsAllowedQuery,
+} from 'client/scripts/state/api/tokens';
+import { useAIFeatureEnabled } from 'state/ui/user';
 import { ExtendedPoll, LocalPoll, parseCustomDuration } from 'utils/polls';
 // eslint-disable-next-line max-len
-import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
@@ -103,6 +109,7 @@ import {
 } from '../react_quill_editor/utils';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
+import { TokenWidget } from './ToketWidget';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
@@ -152,6 +159,7 @@ export const NewThreadForm = forwardRef<
     const [linkedProposals, setLinkedProposals] =
       useState<ProposalState | null>();
     const [pollsData, setPollData] = useState<LocalPoll[]>();
+    const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
     // --- State for Image Modal Context ---
     const [imageModalContext, setImageModalContext] = useState<{
@@ -160,6 +168,7 @@ export const NewThreadForm = forwardRef<
     } | null>(null);
 
     const { mutateAsync: createPoll } = useCreateThreadPollMutation();
+    const { mutateAsync: createThreadToken } = useCreateThreadTokenMutation();
 
     const user = useUserStore();
     const { data: userProfile } = useFetchProfileByIdQuery({
@@ -167,12 +176,9 @@ export const NewThreadForm = forwardRef<
       apiCallEnabled: !!user.id,
     });
 
-    const {
-      aiInteractionsToggleEnabled,
-      aiCommentsToggleEnabled,
-      setAICommentsToggleEnabled,
-    } = useLocalAISettingsStore();
-    const aiCommentsFeatureEnabled = useFlag('aiComments');
+    const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
+      useUserAiSettingsStore();
+    const { isAIEnabled } = useAIFeatureEnabled();
 
     useAppStatus();
 
@@ -223,7 +229,6 @@ export const NewThreadForm = forwardRef<
       clearDraft,
       canShowGatingBanner,
       setCanShowGatingBanner,
-      canShowTopicPermissionBanner,
       setCanShowTopicPermissionBanner,
     } = useNewThreadForm(selectedCommunityId, topicsForSelector, {
       contentDelta,
@@ -262,12 +267,7 @@ export const NewThreadForm = forwardRef<
     const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
     const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
 
-    const { data: groups = [] } = useFetchGroupsQuery({
-      communityId: selectedCommunityId,
-      includeTopics: true,
-      enabled: !!selectedCommunityId,
-    });
-    const { memberships, actionGroups, bypassGating } = useTopicGating({
+    const { actionGroups, bypassGating } = useTopicGating({
       communityId: selectedCommunityId,
       userAddress: userSelectedAddress || '',
       apiEnabled: !!userSelectedAddress && !!selectedCommunityId,
@@ -340,6 +340,18 @@ export const NewThreadForm = forwardRef<
     const effectiveSetWebSearchEnabled =
       setWebSearchEnabled || setLocalWebSearchEnabled;
 
+    const { data: tokenizedThreadsAllowed } =
+      useGetTokenizedThreadsAllowedQuery({
+        community_id: selectedCommunityId,
+        topic_id: threadTopic?.id || 0,
+      });
+
+    const { data: communityToken } = useGetTokenByCommunityId({
+      community_id: selectedCommunityId,
+      with_stats: true,
+      enabled: !!selectedCommunityId,
+    });
+
     const handleNewThreadCreation = useCallback(async () => {
       if (!community || !userSelectedAddress || !selectedCommunityId) {
         notifyError('Invalid form state!');
@@ -368,17 +380,17 @@ export const NewThreadForm = forwardRef<
       }
 
       // In AI mode, provide default values so the backend validation is not broken.
-      const effectiveTitle = aiInteractionsToggleEnabled
+      const effectiveTitle = isAIEnabled
         ? threadTitle.trim() || DEFAULT_THREAD_TITLE
         : threadTitle;
 
-      const effectiveBody = aiInteractionsToggleEnabled
+      const effectiveBody = isAIEnabled
         ? getTextFromDelta(threadContentDelta).trim()
           ? serializeDelta(threadContentDelta)
           : DEFAULT_THREAD_BODY
         : serializeDelta(threadContentDelta);
 
-      if (!aiInteractionsToggleEnabled) {
+      if (!isAIEnabled) {
         const deltaString = JSON.stringify(threadContentDelta);
         checkNewThreadErrors(
           { threadKind, threadUrl, threadTitle, threadTopic },
@@ -415,6 +427,36 @@ export const NewThreadForm = forwardRef<
         });
 
         const thread = await createThread(input);
+
+        if (tokenizedThreadsAllowed?.tokenized_threads_enabled) {
+          if (!communityToken?.token_address) {
+            notifyError('Community token not found');
+            return;
+          }
+
+          if (!community?.ChainNode?.id) {
+            notifyError('chainId not found');
+            return;
+          }
+
+          await createThreadToken({
+            name: community.id,
+            symbol: communityToken.symbol,
+            threadId: thread.id!,
+            ethChainId: app?.chain?.meta?.ChainNode?.eth_chain_id || 0,
+            initPurchaseAmount: 1e18,
+            chainId: community.ChainNode?.id,
+            walletAddress: userSelectedAddress,
+            authorAddress: userSelectedAddress,
+            communityTreasuryAddress:
+              app.chain?.meta?.communityTreasuryAddress || '',
+            chainRpc: community.ChainNode?.url || '',
+            paymentTokenAddress: communityToken.token_address,
+          });
+
+          notifySuccess('Thread token created successfully');
+        }
+
         if (thread && linkedProposals) {
           addThreadLinks({
             thread_id: thread.id!,
@@ -488,31 +530,37 @@ export const NewThreadForm = forwardRef<
       }
     }, [
       community,
-      createThread,
-      isInsideCommunity,
-      isDiscussion,
-      threadUrl,
-      threadTopic,
-      threadKind,
-      threadContentDelta,
-      threadTitle,
-      setIsSaving,
-      setThreadContentDelta,
-      clearDraft,
-      navigate,
-      selectedCommunityId,
       userSelectedAddress,
-      hasTopics,
-      checkForSessionKeyRevalidationErrors,
-      user,
-      aiInteractionsToggleEnabled,
+      selectedCommunityId,
       isTurnstileEnabled,
       turnstileToken,
-      resetTurnstile,
-      addThreadLinks,
+      actionGroups,
+      bypassGating,
+      isDiscussion,
+      threadUrl,
+      threadTitle,
+      threadContentDelta,
+      setIsSaving,
+      threadKind,
+      threadTopic,
+      hasTopics,
+      createThread,
+      tokenizedThreadsAllowed?.tokenized_threads_enabled,
       linkedProposals,
-      createPoll,
       pollsData,
+      setThreadContentDelta,
+      clearDraft,
+      isInsideCommunity,
+      navigate,
+      checkForSessionKeyRevalidationErrors,
+      user,
+      resetTurnstile,
+      communityToken?.token_address,
+      communityToken?.symbol,
+      createThreadToken,
+      addThreadLinks,
+      createPoll,
+      isAIEnabled,
     ]);
 
     const handleCancel = (e: React.MouseEvent | undefined) => {
@@ -771,6 +819,16 @@ export const NewThreadForm = forwardRef<
     );
 
     const sidebarComponent = [
+      tokenizedThreadsEnabled
+        ? {
+            label: 'Links',
+            item: (
+              <div className="cards-colum">
+                <TokenWidget />
+              </div>
+            ),
+          }
+        : {},
       {
         label: 'Links',
         item: (
@@ -1041,6 +1099,23 @@ export const NewThreadForm = forwardRef<
                     />
                   )}
 
+                  {tokenizedThreadsAllowed && tokenizedThreadsEnabled && (
+                    <div className="tokenized-status">
+                      <CWText
+                        type="caption"
+                        className={
+                          tokenizedThreadsAllowed.tokenized_threads_enabled
+                            ? 'tokenized-enabled'
+                            : 'tokenized-disabled'
+                        }
+                      >
+                        {tokenizedThreadsAllowed.tokenized_threads_enabled
+                          ? 'This topic allows tokenized threads'
+                          : 'This topic does not allow tokenized threads'}
+                      </CWText>
+                    </div>
+                  )}
+
                   {!!contestTopicAffordanceVisible && (
                     <ContestTopicBanner
                       contests={threadTopic?.active_contest_managers?.map(
@@ -1110,57 +1185,54 @@ export const NewThreadForm = forwardRef<
                       containerClassName="no-pad cancel-button"
                     />
 
-                    {aiCommentsFeatureEnabled &&
-                      aiInteractionsToggleEnabled && (
-                        <div className="ai-toggle-wrapper">
-                          <CWToggle
-                            className="ai-toggle"
-                            icon="binoculars"
-                            iconColor="#757575"
-                            checked={effectiveWebSearchEnabled}
-                            onChange={() =>
-                              effectiveSetWebSearchEnabled(
-                                !effectiveWebSearchEnabled,
-                              )
-                            }
-                          />
-                          <CWText type="caption" className="toggle-label">
-                            Web search
-                          </CWText>
-                        </div>
-                      )}
+                    {isAIEnabled && (
+                      <div className="ai-toggle-wrapper">
+                        <CWToggle
+                          className="ai-toggle"
+                          icon="binoculars"
+                          iconColor="#757575"
+                          checked={effectiveWebSearchEnabled}
+                          onChange={() =>
+                            effectiveSetWebSearchEnabled(
+                              !effectiveWebSearchEnabled,
+                            )
+                          }
+                        />
+                        <CWText type="caption" className="toggle-label">
+                          Web search
+                        </CWText>
+                      </div>
+                    )}
 
-                    {aiCommentsFeatureEnabled &&
-                      aiInteractionsToggleEnabled && (
-                        <CWThreadAction
-                          action="ai-reply"
-                          label="Draft thread with AI"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleGenerateAIThread().catch(console.error);
+                    {isAIEnabled && (
+                      <CWThreadAction
+                        action="ai-reply"
+                        label="Draft thread with AI"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleGenerateAIThread().catch(console.error);
+                        }}
+                      />
+                    )}
+
+                    {isAIEnabled && (
+                      <div className="ai-toggle-wrapper">
+                        <CWToggle
+                          className="ai-toggle"
+                          icon="sparkle"
+                          iconColor="#757575"
+                          checked={aiCommentsToggleEnabled}
+                          onChange={() => {
+                            setAICommentsToggleEnabled(
+                              !aiCommentsToggleEnabled,
+                            );
                           }}
                         />
-                      )}
-
-                    {aiCommentsFeatureEnabled &&
-                      aiInteractionsToggleEnabled && (
-                        <div className="ai-toggle-wrapper">
-                          <CWToggle
-                            className="ai-toggle"
-                            icon="sparkle"
-                            iconColor="#757575"
-                            checked={aiCommentsToggleEnabled}
-                            onChange={() => {
-                              setAICommentsToggleEnabled(
-                                !aiCommentsToggleEnabled,
-                              );
-                            }}
-                          />
-                          <CWText type="caption" className="toggle-label">
-                            AI initial comment
-                          </CWText>
-                        </div>
-                      )}
+                        <CWText type="caption" className="toggle-label">
+                          AI initial comment
+                        </CWText>
+                      </div>
+                    )}
 
                     <CWButton
                       label="Create"

@@ -16,6 +16,8 @@ export type CommunityFilters = {
   withCommunityEcosystem?: ChainBase;
   withEcosystemChainId?: string | number;
   withStakeEnabled?: boolean;
+  withLaunchpadToken?: boolean;
+  withPinnedToken?: boolean;
   withTagsIds?: number[];
   withCommunityType?: CommunityType;
   withCommunitySortBy?: CommunitySortOptions;
