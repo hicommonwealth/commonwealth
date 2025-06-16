@@ -593,7 +593,13 @@ export const config = configure(
     }),
     MCP: z.object({
       MCP_DEMO_CLIENT_SERVER_URL: z.string().optional(),
-      MCP_KEY_BYPASS: z.string().optional(),
+      MCP_KEY_BYPASS: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && data),
+          'MCP_KEY_BYPASS cannot be set in production',
+        ),
     }),
     LOG_XP_LAUNCHPAD: z.boolean().default(false),
   }),
