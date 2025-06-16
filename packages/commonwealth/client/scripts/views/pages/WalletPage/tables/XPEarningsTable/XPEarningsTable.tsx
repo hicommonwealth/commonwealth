@@ -40,8 +40,8 @@ const columns: CWTableColumnInfo[] = [
     sortable: true,
   },
   {
-    key: 'referredBy',
-    header: 'Referred By',
+    key: 'completedBy',
+    header: 'Completed By',
     numeric: false,
     sortable: false,
   },
@@ -104,7 +104,7 @@ export const XPEarningsTable = () => {
         );
       })(),
     },
-    referredBy: {
+    completedBy: {
       customElement:
         user.id === log.creator_user_id ? (
           <FullUser
