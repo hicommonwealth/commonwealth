@@ -18,9 +18,6 @@ globs: '**/*'
 ### Deployment Environments
 
 - For Heroku deployments, set environment variables in the Heroku dashboard for each environment
-- For Docker deployments, use the `/environments` directory where public env vars should be committed
-- Environment variable files in `/environments` follow the naming convention `.env.public.{environment-name}`
-- Different environments (production, beta, demo, frick, frack) have their own configurations
 
 ### Vite Configuration
 
@@ -154,4 +151,4 @@ const featureFlags = {
 - Implement A/B testing using feature flags when appropriate
 - Clean up unused feature flags regularly
 - Document the purpose and expected lifecycle of each feature flag
-- Use feature flags for temporary workarounds, but plan for permanent solutions 
+- Use feature flags for temporary workarounds, but plan for permanent solutions
