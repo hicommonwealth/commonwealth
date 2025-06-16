@@ -279,9 +279,13 @@ export const buildAssociations = (db: DB) => {
   db.MCPServerCommunity.withManyToMany(
     {
       model: db.MCPServer,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
     {
       model: db.Community,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
   );
 };

@@ -28,6 +28,12 @@ export default (sequelize: Sequelize.Sequelize): MCPServerModelStatic =>
       updatedAt: 'updated_at',
       tableName: 'MCPServers',
       underscored: true,
-      indexes: [{ fields: ['name'], unique: true }],
+      indexes: [
+        {
+          fields: ['name'],
+          unique: true,
+          name: 'MCPServers_name_unique',
+        },
+      ],
     },
   );
