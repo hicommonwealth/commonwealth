@@ -11,6 +11,7 @@ import {
 } from 'client/scripts/helpers/snapshot_utils';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
+import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   getEthChainIdOrBech32Prefix,
@@ -18,8 +19,12 @@ import {
 } from 'controllers/server/sessions';
 import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL } from 'helpers/threads';
+import useAppStatus from 'hooks/useAppStatus';
+import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
+import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
+import { AnyProposal, ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, {
   forwardRef,
@@ -58,8 +63,6 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { useTurnstile } from 'views/components/useTurnstile';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import useAppStatus from '../../../hooks/useAppStatus';
-import { AnyProposal, ThreadKind, ThreadStage } from '../../../models/types';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -535,7 +538,6 @@ export const NewThreadForm = forwardRef<
       bypassGating,
       isDiscussion,
       threadUrl,
-      aiInteractionsToggleEnabled,
       threadTitle,
       threadContentDelta,
       setIsSaving,
@@ -550,25 +552,14 @@ export const NewThreadForm = forwardRef<
       clearDraft,
       isInsideCommunity,
       navigate,
-      selectedCommunityId,
-      userSelectedAddress,
-      hasTopics,
       checkForSessionKeyRevalidationErrors,
       user,
-      isTurnstileEnabled,
-      turnstileToken,
       resetTurnstile,
-      communityToken?.token_address,
-      communityToken?.symbol,
+      communityToken.token_address,
+      communityToken.symbol,
       createThreadToken,
       addThreadLinks,
-      linkedProposals,
-      actionGroups,
-      bypassGating,
       createPoll,
-      resetTurnstile,
-      checkForSessionKeyRevalidationErrors,
-      user,
       isAIEnabled,
     ]);
 
