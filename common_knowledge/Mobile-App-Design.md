@@ -36,15 +36,7 @@ functions/callbacks you can use which also support throwing Errors.
 
 # Privy
 
-Auth is handled by Privy which provides a bridge between react-native and our 
-webapp.
-
-Privy, inside react-native, performs auth on the react-native side, then, once 
-that's done, it uses the RPC system to bridge function calls from the webview
-into Privy running inside react-native.
-
-The mains ones are signMessage, which handles auth, the other one is eth_call
-which is handled in PrivyWalletController in the webapp.
+See Privy-Auth-Design.md
 
 # Knock
 
