@@ -68,7 +68,6 @@ export const command = <
     md,
     tag,
     outMiddlewares,
-    // @ts-expect-error TODO: fix this
   }).mutation(async ({ ctx, input }) => {
     try {
       return await coreCommand(

@@ -1,8 +1,10 @@
 #!/bin/bash
-for file in $(git diff master --name-only -- 'libs/**/*.ts'); do
+
+branch="rotorsoft/12486-type-fixes-zodv4" 
+for file in $(git diff "$branch" --name-only -- 'libs/**/*.ts'); do
   if [[ -f "$file" ]]; then
     # Normalize content (replace zod/v4 → zod)
-    git show master:"$file" 2>/dev/null | sed 's|zod/v4|zod|g' > /tmp/old.ts
+    git show "$branch:$file" 2>/dev/null | sed 's|zod/v4|zod|g' > /tmp/old.ts
     sed 's|zod/v4|zod|g' "$file" > /tmp/new.ts
 
     # Show diff if meaningful change remains
