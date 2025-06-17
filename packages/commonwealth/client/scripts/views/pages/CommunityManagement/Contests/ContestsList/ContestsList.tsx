@@ -1,5 +1,6 @@
 import moment from 'moment';
 import React, { useState } from 'react';
+import app from 'state';
 
 import { Skeleton } from 'views/components/Skeleton';
 
@@ -106,7 +107,14 @@ const ContestsList = ({
                 finishDate={end_time ? moment(end_time).toISOString() : ''}
                 isCancelled={contest.cancelled}
                 onFund={() => setFundDrawerContest(contest)}
-                isRecurring={(contest.interval || 0) > 0}
+                isRecurring={
+                  contest.community_id &&
+                  app?.chain?.id === contest.community_id
+                    ? app?.chain?.base === 'solana'
+                      ? false // Solana contests are never recurring
+                      : (contest.interval || 0) > 0
+                    : (contest.interval || 0) > 0
+                }
                 payoutStructure={contest.payout_structure}
                 prizePercentage={contest.prize_percentage}
                 isFarcaster={contest.is_farcaster_contest}
@@ -134,7 +142,14 @@ const ContestsList = ({
                 }
                 isCancelled={contest.cancelled}
                 onFund={() => setFundDrawerContest(contest)}
-                isRecurring={(contest.interval || 0) > 0}
+                isRecurring={
+                  contest.community_id &&
+                  app?.chain?.id === contest.community_id
+                    ? app?.chain?.base === 'solana'
+                      ? false // Solana contests are never recurring
+                      : (contest.interval || 0) > 0
+                    : (contest.interval || 0) > 0
+                }
                 payoutStructure={contest.payout_structure}
                 prizePercentage={contest.prize_percentage}
                 isFarcaster={contest.is_farcaster_contest}
@@ -152,7 +167,11 @@ const ContestsList = ({
         contestAddress={fundDrawerContest?.contest_address || ''}
         fundingTokenAddress={fundDrawerContest?.funding_token_address}
         fundingTokenTicker={fundDrawerContest?.ticker || 'ETH'}
-        isRecurring={(fundDrawerContest?.interval || 0) > 0}
+        isRecurring={
+          app?.chain?.base === 'solana'
+            ? false // Solana contests are never recurring
+            : (fundDrawerContest?.interval || 0) > 0
+        }
       />
     </>
   );

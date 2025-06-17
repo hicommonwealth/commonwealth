@@ -110,19 +110,20 @@ const SignTransactionsStep = ({
     onAction: true,
   });
 
-  const isContestRecurring =
-    contestFormData.contestRecurring === ContestRecurringType.Yes;
-  const isDirectDepositSelected =
-    contestFormData.feeType === ContestFeeType.DirectDeposit;
-  const devContest = useFlag('contestDev');
-  const judgedContest = isJudgedContest(contestFormData?.contestTopic);
-
   const namespaceName = app?.chain?.meta?.namespace || '';
   const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
   const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
   const walletAddress = user.activeAccount?.address || '';
   const chainBase = app?.chain?.base || '';
   const isSolanaChain = chainBase === 'solana';
+
+  const isContestRecurring =
+    !isSolanaChain &&
+    contestFormData.contestRecurring === ContestRecurringType.Yes;
+  const isDirectDepositSelected =
+    contestFormData.feeType === ContestFeeType.DirectDeposit;
+  const devContest = useFlag('contestDev');
+  const judgedContest = isJudgedContest(contestFormData?.contestTopic);
 
   const judgeIdToUse = useMemo(() => {
     if (judgedContest && community?.pending_namespace_judge_token_id) {
@@ -141,8 +142,15 @@ const SignTransactionsStep = ({
 
   const getExchangeToken = () => {
     if (isSolanaChain) {
+      // For Solana, first try to use the token address from the selected topic
+      const topicTokenAddress = contestFormData?.contestTopic?.tokenAddress;
+
       // For Solana, we need a valid token address
-      if (isDirectDepositSelected) {
+      if (topicTokenAddress) {
+        // If we have a token address from the topic, use that first
+        return topicTokenAddress;
+      } else if (isDirectDepositSelected) {
+        // Otherwise fallback to funding token address if direct deposit
         return (
           contestFormData?.fundingTokenAddress || defaultSolanaPrizeMintAddress
         );
@@ -217,15 +225,17 @@ const SignTransactionsStep = ({
       walletAddress: walletAddress || '',
     };
 
-    // Ensure we have a valid prize mint address - use either exchangeToken or the default USDC address
+    // Ensure we have a valid prize mint address - prioritize token from topic if available
+    const topicTokenAddress = contestFormData?.contestTopic?.tokenAddress;
     const prizeMintToUse =
-      exchangeToken && exchangeToken !== ZERO_ADDRESS
+      topicTokenAddress ||
+      (exchangeToken && exchangeToken !== ZERO_ADDRESS
         ? exchangeToken
-        : defaultSolanaPrizeMintAddress;
+        : defaultSolanaPrizeMintAddress);
 
     const solanaContest = {
       connectionUrl: chainRpc,
-      prizeMint: prizeMintToUse, // Guaranteed to be a valid address now
+      prizeMint: prizeMintToUse, // Prioritize topic token address
       protocolFeeDestination: walletAddress, // Use admin wallet as fee destination for now
       contestLengthSeconds: contestLength,
       // Convert percentages (0-100) to basis points (0-10000) for Solana contract
@@ -267,40 +277,6 @@ const SignTransactionsStep = ({
         // Get phantom wallet and ensure it's available
         const webWalletController = WebWalletController.Instance;
         const phantomWallet = webWalletController.getByName(WalletId.Phantom);
-
-        if (!phantomWallet) {
-          throw new Error(
-            'Phantom wallet not found. Please install the Phantom wallet extension.',
-          );
-        }
-
-        if (!phantomWallet.available) {
-          throw new Error(
-            'Phantom wallet is not available in this browser. Please install the Phantom extension.',
-          );
-        }
-
-        if (!phantomWallet.enabled) {
-          await phantomWallet.enable();
-        }
-
-        if (!phantomWallet.accounts || phantomWallet.accounts.length === 0) {
-          throw new Error(
-            'No accounts found in Phantom wallet. Please connect your wallet first.',
-          );
-        }
-
-        // Triple-check prizeMint is set correctly
-        if (
-          !solanaContest.prizeMint ||
-          solanaContest.prizeMint === ZERO_ADDRESS
-        ) {
-          solanaContest.prizeMint = defaultSolanaPrizeMintAddress;
-        }
-
-        if (!solanaContest.protocolFeeDestination) {
-          solanaContest.protocolFeeDestination = walletAddress;
-        }
 
         // Validate total basis points before deploying
         if (Math.abs(totalBasisPoints - 10000) > 5) {
@@ -348,25 +324,31 @@ const SignTransactionsStep = ({
         contestAddress =
           await deploySingleERC20ContestOnchainMutation(singleERC20);
       }
-
       await createContestMutation({
         contest_address: contestAddress,
         name: contestFormData?.contestName,
         description: contestFormData?.contestDescription,
         community_id: app.activeChainId() || '',
         image_url: contestFormData?.contestImage,
-        funding_token_address: exchangeToken,
+        // For Solana contests, ensure we use the token address from the contest topic if available
+        funding_token_address:
+          isSolanaChain && contestFormData?.contestTopic?.tokenAddress
+            ? contestFormData.contestTopic.tokenAddress
+            : exchangeToken,
         prize_percentage: isContestRecurring
           ? contestFormData?.prizePercentage
           : 0,
         payout_structure: contestFormData?.payoutStructure,
-        interval: isContestRecurring ? contestInterval! : 0,
+        interval: isSolanaChain ? 0 : isContestRecurring ? contestInterval! : 0,
         topic_id: contestFormData?.contestTopic?.value as number,
-        ticker: fundingTokenTicker,
+        ticker: isSolanaChain
+          ? contestFormData?.contestTopic?.tokenSymbol || fundingTokenTicker // Prioritize token symbol from topic for Solana
+          : fundingTokenTicker,
         is_farcaster_contest: contestFormData.isFarcasterContest,
         decimals: fundingTokenDecimals,
         vote_weight_multiplier: contestFormData.voteWeightMultiplier,
-        namespace_judge_token_id: judgedContest ? judgeIdToUse : null,
+        namespace_judge_token_id:
+          judgedContest && !isSolanaChain ? judgeIdToUse : null,
       });
 
       onSetLaunchContestStep('ContestLive');
@@ -461,10 +443,10 @@ const SignTransactionsStep = ({
         <CWText type="b1" className="description">
           You must sign this transaction to deploy the contest.{' '}
           {isSolanaChain
-            ? 'This will initialize a Solana contest on-chain.'
+            ? 'This will initialize a single Solana contest on-chain.'
             : isContestRecurring
-              ? 'It routes the fees generated from stake to the contest address and launchs the contest contract onchain.'
-              : 'It launchs the contest contract onchain.'}
+              ? 'It routes the fees generated from stake to the contest address and launches the contest contract onchain.'
+              : 'It launches the contest contract onchain.'}
         </CWText>
 
         <CWText fontWeight="medium" type="b1" className="description">

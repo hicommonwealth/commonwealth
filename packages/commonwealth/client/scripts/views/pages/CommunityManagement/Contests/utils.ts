@@ -3,6 +3,7 @@ import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
 import { OpenFeature } from '@openfeature/web-sdk';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import moment from 'moment';
+import app from 'state';
 import { saveToClipboard } from 'utils/clipboard';
 import { Contest } from './ContestsList';
 
@@ -38,6 +39,10 @@ export const isJudgedContest = (
     weightedVoting?: TopicWeightedVoting | null;
   } | null,
 ): boolean => {
+  // No judged contests for Solana chains
+  const isSolanaChain = app?.chain?.base === 'solana';
+  if (isSolanaChain) return false;
+
   const judgeContestEnabled = client.getBooleanValue('judgeContest', false);
   return (
     !!judgeContestEnabled && !!contestTopic && !contestTopic.weightedVoting

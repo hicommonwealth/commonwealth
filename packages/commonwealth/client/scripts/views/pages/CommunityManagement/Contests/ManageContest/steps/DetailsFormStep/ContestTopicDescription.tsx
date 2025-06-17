@@ -5,6 +5,7 @@ import CWPopover, {
   usePopover,
 } from 'client/scripts/views/components/component_kit/new_designs/CWPopover/CWPopover';
 import React from 'react';
+import app from 'state';
 import { getChainName } from './utils';
 
 interface ContestTopicDescriptionProps {
@@ -47,7 +48,9 @@ const ContestTopicDescription = ({
   const getPopover = (
     weightedVoting: TopicWeightedVoting | null | undefined,
   ) => {
-    if (!weightedVoting) {
+    const isSolanaChain = app?.chain?.base === 'solana';
+
+    if (!weightedVoting && !isSolanaChain) {
       return (
         <span>
           <CWIconButton
@@ -124,6 +127,18 @@ Judges are nominated after the contest is launched.`}
   }
 
   // This is for judged contests (non-weighted topics)
+  const isSolanaChain = app?.chain?.base === 'solana';
+
+  if (isSolanaChain) {
+    // For Solana chains, we show ERC20-like voting description instead of judged contest
+    return (
+      <CWText className="contest-topic-description">
+        Community members will vote with <b>{tokenName}</b> on <b>Solana.</b>{' '}
+        {getPopover(TopicWeightedVoting.ERC20)}
+      </CWText>
+    );
+  }
+
   return (
     <CWText className="contest-topic-description judged-description">
       Only nominated judges will be able to vote on this contest.

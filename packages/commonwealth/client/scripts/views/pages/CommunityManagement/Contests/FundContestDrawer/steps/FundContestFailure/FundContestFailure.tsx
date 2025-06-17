@@ -10,18 +10,20 @@ import './FundContestFailure.scss';
 
 interface FundContestFailureProps {
   onSetFundContestDrawerStep: (step: FundContestStep) => void;
+  errorMessage?: string;
 }
 
 const FundContestFailure = ({
   onSetFundContestDrawerStep,
+  errorMessage,
 }: FundContestFailureProps) => {
   return (
     <div className="FundContestFailure">
-      <img src={contestFundFailure} alt="success" className="img" />
+      <img src={contestFundFailure} alt="failure" className="img" />
       <CWText type="h4">Something went wrong</CWText>
       <CWText type="b1" className="description">
-        We were unable to complete your transaction because of a network error.
-        Please try again.
+        {errorMessage ||
+          'We were unable to complete your transaction because of a network error. Please try again.'}
       </CWText>
       <CWButton
         label="Try again"

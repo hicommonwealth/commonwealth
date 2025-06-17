@@ -1,9 +1,11 @@
 import React from 'react';
 
+import app from 'state';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { buildEtherscanLink } from 'views/modals/ManageCommunityStakeModal/utils';
+import { buildSolanaExplorerLink } from '../../../../../../../helpers/SolanaContractHelpers';
 
 import CopyAddressInput from '../../../CopyAddressInput';
 
@@ -14,14 +16,19 @@ interface FundContestSuccessProps {
   onClose: () => void;
   address: string;
   txHash: string;
+  isSolanaChain?: boolean;
 }
 
 const FundContestSuccess = ({
   onClose,
   address,
   txHash,
+  isSolanaChain = false,
 }: FundContestSuccessProps) => {
-  const etherscanLink = buildEtherscanLink(txHash);
+  // Build the appropriate blockchain explorer link based on chain type
+  const txLink = isSolanaChain
+    ? buildSolanaExplorerLink(txHash, app?.chain?.meta?.ChainNode?.url || '')
+    : buildEtherscanLink(txHash);
 
   return (
     <div className="FundContestSuccess">
@@ -41,7 +48,7 @@ const FundContestSuccess = ({
           <CWButton label="Close" onClick={onClose} buttonType="secondary" />
           <CWButton
             label="View transactions"
-            onClick={() => window.open(etherscanLink, '_blank')}
+            onClick={() => window.open(txLink, '_blank')}
           />
         </div>
       </div>

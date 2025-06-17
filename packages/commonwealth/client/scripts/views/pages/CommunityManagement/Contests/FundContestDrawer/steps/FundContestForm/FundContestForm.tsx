@@ -40,6 +40,7 @@ interface FundContestFormProps {
   newContestBalanceInUsd: string;
   handleTransferFunds: () => void;
   fundingTokenTicker: string;
+  isSolanaChain?: boolean;
 }
 
 const FundContestForm = ({
@@ -58,6 +59,7 @@ const FundContestForm = ({
   newContestBalanceInUsd,
   handleTransferFunds,
   fundingTokenTicker,
+  isSolanaChain = false,
 }: FundContestFormProps) => {
   const tokenAmountValue = tokenAmount ? Number(tokenAmount) : '';
 
@@ -71,25 +73,35 @@ const FundContestForm = ({
           funds at any time using the contract address.
         </CWText>
 
-        <CWSelectList
-          label="From address"
-          placeholder="Select address"
-          isClearable={false}
-          isSearchable={false}
-          value={selectedAddress}
-          defaultValue={addressOptions[0]}
-          options={addressOptions}
-          onChange={onSetSelectedAddress}
-        />
+        {!isSolanaChain && (
+          <>
+            <CWSelectList
+              label="From address"
+              placeholder="Select address"
+              isClearable={false}
+              isSearchable={false}
+              value={selectedAddress}
+              defaultValue={addressOptions[0]}
+              options={addressOptions}
+              onChange={onSetSelectedAddress}
+            />
 
-        <div className="current-balance-row">
-          <CWText type="caption" fontWeight="medium">
-            Current Balance
+            <div className="current-balance-row">
+              <CWText type="caption" fontWeight="medium">
+                Current Balance
+              </CWText>
+              <CWText type="caption" fontWeight="medium">
+                {displayAmount(userTokenBalance)} {fundingTokenTicker}
+              </CWText>
+            </div>
+          </>
+        )}
+
+        {isSolanaChain && (
+          <CWText type="b1" className="description">
+            Funding this contest will use your connected Phantom wallet.
           </CWText>
-          <CWText type="caption" fontWeight="medium">
-            {displayAmount(userTokenBalance)} {fundingTokenTicker}
-          </CWText>
-        </div>
+        )}
 
         <div className="to-address-row">
           <MessageRow label="To address" />
@@ -153,7 +165,9 @@ const FundContestForm = ({
             buttonType="secondary"
             buttonAlt="green"
             onClick={handleTransferFunds}
-            disabled={!!amountError || !selectedAddress?.value}
+            disabled={
+              !!amountError || (!isSolanaChain && !selectedAddress?.value)
+            }
           />
         </div>
       </div>

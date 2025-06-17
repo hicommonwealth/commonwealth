@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 
+import { ChainBase } from '@hicommonwealth/shared';
 import app from 'state';
 import { useFundContestOnchainMutation } from 'state/api/contests';
+import useFundSolanaContestOnchainMutation from 'state/api/contests/fundSolanaContestOnchain';
 import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
@@ -39,9 +41,11 @@ const FundContestDrawer = ({
   const [fundContestDrawerStep, setFundContestDrawerStep] =
     useState<FundContestStep>('Form');
   const [txHash, setTxHash] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
   const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
+  const isSolanaChain = app?.chain?.meta?.base === ChainBase.Solana;
 
   const { addressOptions, selectedAddress, setSelectedAddress } =
     useUserAddressesForFundForm();
@@ -64,7 +68,9 @@ const FundContestDrawer = ({
     isRecurring,
   });
 
-  const { mutateAsync: fundContest } = useFundContestOnchainMutation();
+  const { mutateAsync: fundEvmContest } = useFundContestOnchainMutation();
+  const { mutateAsync: fundSolanaContest } =
+    useFundSolanaContestOnchainMutation();
 
   const handleChangeTokenAmount = (e) => {
     setTokenAmount(e.target.value);
@@ -72,22 +78,59 @@ const FundContestDrawer = ({
 
   const handleTransferFunds = () => {
     setFundContestDrawerStep('Loading');
+    setErrorMessage('');
 
-    fundContest({
-      contestAddress,
-      ethChainId,
-      chainRpc,
-      amount: Number(tokenAmount),
-      walletAddress: selectedAddress.value,
-    })
-      .then((tx) => {
-        setFundContestDrawerStep('Success');
-        setTxHash(tx.transactionHash as string);
-      })
-      .catch((err) => {
-        console.log('Failed to fund contest', err);
+    if (isSolanaChain) {
+      // Check for Phantom wallet in window object
+      const phantomWallet = window.solana;
+
+      if (!phantomWallet) {
+        console.error('Phantom wallet not found');
+        setErrorMessage(
+          'Phantom wallet not found. Please install the Phantom wallet extension and refresh the page.',
+        );
         setFundContestDrawerStep('Failure');
-      });
+        return;
+      }
+
+      fundSolanaContest({
+        contestAddress,
+        chainRpc,
+        amount: Number(tokenAmount),
+        phantomWallet,
+      })
+        .then((tx) => {
+          setFundContestDrawerStep('Success');
+          setTxHash(tx.transactionHash);
+        })
+        .catch((err) => {
+          console.error('Failed to fund Solana contest', err);
+          setErrorMessage(
+            err.message || 'Failed to fund Solana contest. Please try again.',
+          );
+          setFundContestDrawerStep('Failure');
+        });
+    } else {
+      // EVM chain funding
+      fundEvmContest({
+        contestAddress,
+        ethChainId,
+        chainRpc,
+        amount: Number(tokenAmount),
+        walletAddress: selectedAddress.value,
+      })
+        .then((tx) => {
+          setFundContestDrawerStep('Success');
+          setTxHash(tx.transactionHash as string);
+        })
+        .catch((err) => {
+          console.error('Failed to fund contest', err);
+          setErrorMessage(
+            err.message || 'Failed to fund contest. Please try again.',
+          );
+          setFundContestDrawerStep('Failure');
+        });
+    }
   };
 
   const handleClose = () => {
@@ -95,6 +138,7 @@ const FundContestDrawer = ({
     setFundContestDrawerStep('Form');
     setTokenAmount(INITIAL_AMOUNT);
     setTxHash('');
+    setErrorMessage('');
   };
 
   const getCurrentStep = () => {
@@ -119,6 +163,7 @@ const FundContestDrawer = ({
             newContestBalanceInUsd={newContestBalanceInUsd}
             contestAddress={contestAddress}
             fundingTokenTicker={fundingTokenTicker}
+            isSolanaChain={isSolanaChain}
           />
         );
 
@@ -129,6 +174,7 @@ const FundContestDrawer = ({
         return (
           <FundContestFailure
             onSetFundContestDrawerStep={setFundContestDrawerStep}
+            errorMessage={errorMessage}
           />
         );
 
@@ -138,6 +184,7 @@ const FundContestDrawer = ({
             onClose={handleClose}
             address={contestAddress}
             txHash={txHash}
+            isSolanaChain={isSolanaChain}
           />
         );
     }
