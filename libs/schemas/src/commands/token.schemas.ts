@@ -32,3 +32,8 @@ export const ProjectLaunchpadTrade = {
     community_id: z.string().optional(),
   }),
 };
+
+export const CommunityNamespaceCreated = {
+  input: events.CommunityNamespaceCreated,
+  output: z.object({}),
+};
