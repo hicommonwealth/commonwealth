@@ -9,7 +9,7 @@ import { EventEmitter } from 'events';
 import type IChainAdapter from 'models/IChainAdapter';
 import {
   fetchCustomDomainQuery,
-  fetchPublicEnvVar,
+  fetchPublicEnvVarQuery,
 } from 'state/api/configuration';
 import { errorStore } from 'state/ui/error';
 import { z } from 'zod';
@@ -73,7 +73,7 @@ export async function initAppState(
   try {
     const [status, publicEnvVars] = await Promise.all([
       fetchStatus(),
-      fetchPublicEnvVar(),
+      fetchPublicEnvVarQuery(),
       fetchNodes(),
       fetchCustomDomainQuery(),
     ]);
