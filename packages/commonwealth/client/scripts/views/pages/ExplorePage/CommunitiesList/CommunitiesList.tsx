@@ -1,5 +1,5 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import { ChainNetwork, CommunityType } from '@hicommonwealth/shared';
+import { ChainBase, ChainNetwork, CommunityType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
 import React, {
@@ -20,6 +20,13 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import TradeTokenModal, {
+  TradingConfig,
+  TradingMode,
+} from 'views/modals/TradeTokenModel';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
+import { ExternalToken } from 'views/modals/TradeTokenModel/UniswapTradeModal/types';
+import useCommunityToken from 'hooks/useCommunityToken';
 import { z } from 'zod';
 import '../ExplorePage.scss';
 import { getCommunityCountsString } from '../helpers';
@@ -222,6 +229,63 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
     });
   };
 
+  const CommunityCardWithToken = ({
+    community,
+    canBuyStake,
+    historicalPriceMap,
+  }: {
+    community: ExtendedCommunityType;
+    canBuyStake: boolean;
+    historicalPriceMap: Map<string, string | undefined>;
+  }) => {
+    const { communityToken, isPinnedToken } = useCommunityToken(community.id);
+    const [tokenModalConfig, setTokenModalConfig] = useState<{
+      isOpen: boolean;
+      tradeConfig?: TradingConfig;
+    }>({ isOpen: false, tradeConfig: undefined });
+
+    const handleTokenBtnClick = () => {
+      if (!communityToken) return;
+      setTokenModalConfig({
+        isOpen: true,
+        tradeConfig: {
+          mode: isPinnedToken ? TradingMode.Swap : TradingMode.Buy,
+          token: communityToken as LaunchpadToken | ExternalToken,
+          addressType: ChainBase.Ethereum,
+        } as TradingConfig,
+      });
+    };
+
+    return (
+      <>
+        <CWRelatedCommunityCard
+          community={community}
+          memberCount={community.profile_count || 0}
+          threadCount={community.lifetime_thread_count || 0}
+          canBuyStake={canBuyStake}
+          onStakeBtnClick={() => setSelectedCommunityId(community?.id || '')}
+          ethUsdRate={ethUsdRate.toString()}
+          {...(historicalPriceMap &&
+            community.id && {
+              historicalPrice: historicalPriceMap?.get(community.id),
+            })}
+          onlyShowIfStakeEnabled={!!filters.withStakeEnabled}
+          hasToken={!!communityToken}
+          canTradeToken={user.isLoggedIn}
+          onTokenBtnClick={handleTokenBtnClick}
+        />
+        {tokenModalConfig.tradeConfig && (
+          <TradeTokenModal
+            isOpen={tokenModalConfig.isOpen}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            tradeConfig={tokenModalConfig.tradeConfig as any}
+            onModalClose={() => setTokenModalConfig({ isOpen: false })}
+          />
+        )}
+      </>
+    );
+  };
+
   const isLoadingCommunities =
     isInitialCommunitiesLoading || isLoading || isLoadingTags;
 
@@ -370,20 +434,10 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
 
               return (
                 <Fragment key={community.id}>
-                  <CWRelatedCommunityCard
+                  <CommunityCardWithToken
                     community={community}
-                    memberCount={community.profile_count || 0}
-                    threadCount={community.lifetime_thread_count || 0}
                     canBuyStake={canBuyStake}
-                    onStakeBtnClick={() =>
-                      setSelectedCommunityId(community?.id || '')
-                    }
-                    ethUsdRate={ethUsdRate.toString()}
-                    {...(historicalPriceMap &&
-                      community.id && {
-                        historicalPrice: historicalPriceMap?.get(community.id),
-                      })}
-                    onlyShowIfStakeEnabled={!!filters.withStakeEnabled}
+                    historicalPriceMap={historicalPriceMap}
                   />
                   {listIndex === communitiesList.length - 1 &&
                     sliceIndex === slicedCommunities.length - 1 && (
