@@ -24,4 +24,14 @@ export type ContestFormData = ContestFormValidationSubmitValues & {
   prizePercentage: number;
   payoutStructure: number[];
   contestDuration?: number;
+  topicsData?: {
+    id?: number;
+    token_symbol?: string | null;
+    eth_chain_id?: number | null;
+    vote_weight_multiplier?: number | null;
+    community_id: string;
+    token_address?: string | null;
+    name?: string;
+    weighted_voting?: any;
+  }[];
 };

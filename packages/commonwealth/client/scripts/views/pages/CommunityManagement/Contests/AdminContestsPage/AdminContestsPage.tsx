@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { ChainBase } from '@hicommonwealth/shared';
 import commonUrl from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
 import shape2Url from 'assets/img/shapes/shape2.svg';
@@ -101,8 +102,8 @@ const AdminContestsPage = () => {
       x.community?.id === community?.id,
   );
 
-  const isEthereumBased = app?.chain?.base === 'ethereum';
-  const isSolanaBased = app?.chain?.base === 'solana';
+  const isEthereumBased = app?.chain?.base === ChainBase.Ethereum;
+  const isSolanaBased = app?.chain?.base === ChainBase.Solana;
   const isContestEligibleChain = isEthereumBased || isSolanaBased;
 
   const showBanner =

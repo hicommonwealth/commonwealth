@@ -230,6 +230,7 @@ const DetailsFormStep = ({
       contestDuration,
       isFarcasterContest,
       voteWeightMultiplier,
+      topicsData, // Include topics data to make it available in next steps
     };
 
     if (editMode) {

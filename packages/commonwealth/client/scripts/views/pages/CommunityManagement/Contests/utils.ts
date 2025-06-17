@@ -1,5 +1,8 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
+import {
+  buildFarcasterContestFrameUrl,
+  ChainBase,
+} from '@hicommonwealth/shared';
 import { OpenFeature } from '@openfeature/web-sdk';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import moment from 'moment';
@@ -40,7 +43,7 @@ export const isJudgedContest = (
   } | null,
 ): boolean => {
   // No judged contests for Solana chains
-  const isSolanaChain = app?.chain?.base === 'solana';
+  const isSolanaChain = app?.chain?.base === ChainBase.Solana;
   if (isSolanaChain) return false;
 
   const judgeContestEnabled = client.getBooleanValue('judgeContest', false);

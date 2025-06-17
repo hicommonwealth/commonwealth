@@ -1,3 +1,4 @@
+import { ChainBase } from '@hicommonwealth/shared';
 import moment from 'moment';
 import React, { useState } from 'react';
 import app from 'state';
@@ -110,7 +111,7 @@ const ContestsList = ({
                 isRecurring={
                   contest.community_id &&
                   app?.chain?.id === contest.community_id
-                    ? app?.chain?.base === 'solana'
+                    ? app?.chain?.base === ChainBase.Solana
                       ? false // Solana contests are never recurring
                       : (contest.interval || 0) > 0
                     : (contest.interval || 0) > 0
@@ -145,7 +146,7 @@ const ContestsList = ({
                 isRecurring={
                   contest.community_id &&
                   app?.chain?.id === contest.community_id
-                    ? app?.chain?.base === 'solana'
+                    ? app?.chain?.base === ChainBase.Solana
                       ? false // Solana contests are never recurring
                       : (contest.interval || 0) > 0
                     : (contest.interval || 0) > 0
@@ -168,7 +169,7 @@ const ContestsList = ({
         fundingTokenAddress={fundDrawerContest?.funding_token_address}
         fundingTokenTicker={fundDrawerContest?.ticker || 'ETH'}
         isRecurring={
-          app?.chain?.base === 'solana'
+          app?.chain?.base === ChainBase.Solana
             ? false // Solana contests are never recurring
             : (fundDrawerContest?.interval || 0) > 0
         }

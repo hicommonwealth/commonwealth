@@ -1,8 +1,7 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { WalletId, ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { ChainBase, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import useGetJudgeStatusQuery from 'client/scripts/state/api/contests/getJudgeStatus';
-import WebWalletController from 'controllers/app/web_wallets';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useFlag } from 'hooks/useFlag';
@@ -24,6 +23,7 @@ import {
 import { DeploySingleERC20ContestOnchainProps } from 'state/api/contests/deploySingleERC20ContestOnchain';
 import { DeploySingleJudgedContestOnchainProps } from 'state/api/contests/deploySingleJudgedContestOnchain';
 import { DeploySolanaContestOnchainProps } from 'state/api/contests/deploySolanaContestOnchain';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -104,6 +104,17 @@ const SignTransactionsStep = ({
     enabled: !!communityId,
   });
 
+  // Fetch topics data if not already in contestFormData
+  const { data: topicsData } = useFetchTopicsQuery({
+    communityId,
+    apiEnabled:
+      !!communityId &&
+      (!contestFormData.topicsData || contestFormData.topicsData.length === 0),
+  });
+
+  // Combine topicsData from the form (if it exists) or from the API fetch
+  const combinedTopicsData = contestFormData.topicsData || topicsData || [];
+
   const { isAddedToHomeScreen } = useAppStatus();
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
@@ -115,7 +126,7 @@ const SignTransactionsStep = ({
   const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
   const walletAddress = user.activeAccount?.address || '';
   const chainBase = app?.chain?.base || '';
-  const isSolanaChain = chainBase === 'solana';
+  const isSolanaChain = chainBase === ChainBase.Solana;
 
   const isContestRecurring =
     !isSolanaChain &&
@@ -136,10 +147,6 @@ const SignTransactionsStep = ({
     judgeStatus?.current_judge_id,
   ]);
 
-  // For Solana communities, make sure we have a valid fundingTokenAddress
-  const defaultSolanaPrizeMintAddress =
-    'Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr'; // USDC on Solana
-
   const getExchangeToken = () => {
     if (isSolanaChain) {
       // For Solana, first try to use the token address from the selected topic
@@ -151,12 +158,10 @@ const SignTransactionsStep = ({
         return topicTokenAddress;
       } else if (isDirectDepositSelected) {
         // Otherwise fallback to funding token address if direct deposit
-        return (
-          contestFormData?.fundingTokenAddress || defaultSolanaPrizeMintAddress
-        );
+        return contestFormData?.fundingTokenAddress;
       } else {
         // If no stake token, use default Solana token
-        return stakeData?.stake?.stake_token || defaultSolanaPrizeMintAddress;
+        return stakeData?.stake?.stake_token;
       }
     } else {
       // For Ethereum, use the original logic
@@ -227,11 +232,7 @@ const SignTransactionsStep = ({
 
     // Ensure we have a valid prize mint address - prioritize token from topic if available
     const topicTokenAddress = contestFormData?.contestTopic?.tokenAddress;
-    const prizeMintToUse =
-      topicTokenAddress ||
-      (exchangeToken && exchangeToken !== ZERO_ADDRESS
-        ? exchangeToken
-        : defaultSolanaPrizeMintAddress);
+    const prizeMintToUse = topicTokenAddress || exchangeToken;
 
     const solanaContest = {
       connectionUrl: chainRpc,
@@ -275,16 +276,6 @@ const SignTransactionsStep = ({
         solanaContest.winnerShares = convertedWinnerShares;
 
         // Get phantom wallet and ensure it's available
-        const webWalletController = WebWalletController.Instance;
-        const phantomWallet = webWalletController.getByName(WalletId.Phantom);
-
-        // Validate total basis points before deploying
-        if (Math.abs(totalBasisPoints - 10000) > 5) {
-          // Allow small rounding errors
-          throw new Error(
-            `Winner shares must add up to 10000 basis points (100%). Current total: ${totalBasisPoints}`,
-          );
-        }
 
         try {
           const result =
@@ -299,20 +290,6 @@ const SignTransactionsStep = ({
             errorMessage = `Solana program error: ${errorMessage}\nCheck console for detailed logs.`;
           }
 
-          // Check specific error conditions and provide more helpful messages
-          if (errorMessage.includes('Prize mint address is required')) {
-            errorMessage =
-              'Prize token address is missing. Please select a valid token or use the default USDC token.';
-          } else if (
-            errorMessage.includes('Prize mint cannot be the zero address')
-          ) {
-            errorMessage =
-              'Invalid token address provided. Please select a valid Solana token.';
-          } else if (errorMessage.includes('Phantom wallet')) {
-            errorMessage =
-              'Please install and connect Phantom wallet to deploy Solana contests.';
-          }
-
           throw new Error(`Failed to deploy Solana contest: ${errorMessage}`);
         }
       } else if (isContestRecurring) {
@@ -324,6 +301,15 @@ const SignTransactionsStep = ({
         contestAddress =
           await deploySingleERC20ContestOnchainMutation(singleERC20);
       }
+      // Get token symbol from the topic for Solana contests
+      const topicId = contestFormData?.contestTopic?.value as number;
+      const selectedTopic = combinedTopicsData.find((t) => t.id === topicId);
+      // Use token_symbol from the selected topic for Solana chains
+      const tokenSymbol =
+        isSolanaChain && selectedTopic?.token_symbol
+          ? selectedTopic.token_symbol
+          : fundingTokenTicker;
+
       await createContestMutation({
         contest_address: contestAddress,
         name: contestFormData?.contestName,
@@ -340,12 +326,10 @@ const SignTransactionsStep = ({
           : 0,
         payout_structure: contestFormData?.payoutStructure,
         interval: isSolanaChain ? 0 : isContestRecurring ? contestInterval! : 0,
-        topic_id: contestFormData?.contestTopic?.value as number,
-        ticker: isSolanaChain
-          ? contestFormData?.contestTopic?.tokenSymbol || fundingTokenTicker // Prioritize token symbol from topic for Solana
-          : fundingTokenTicker,
+        topic_id: topicId,
+        ticker: tokenSymbol,
         is_farcaster_contest: contestFormData.isFarcasterContest,
-        decimals: fundingTokenDecimals,
+        decimals: isSolanaChain ? 9 : fundingTokenDecimals,
         vote_weight_multiplier: contestFormData.voteWeightMultiplier,
         namespace_judge_token_id:
           judgedContest && !isSolanaChain ? judgeIdToUse : null,
