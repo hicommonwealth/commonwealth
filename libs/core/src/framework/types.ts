@@ -139,7 +139,7 @@ export type BodyHandler<
 
 /**
  * Middleware handler
- * @param context command execution context
+ * @param context execution context
  * @throws {@link InvalidActor} when unauthorized
  */
 export type AuthHandler<Input extends ZodType, _Context extends ZodType> = (

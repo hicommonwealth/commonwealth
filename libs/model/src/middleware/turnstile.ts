@@ -5,7 +5,7 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { TurnstileWidgetNames, UserTierMap } from '@hicommonwealth/shared';
-import { ZodObject, ZodString, ZodType } from 'zod/v4';
+import { ZodType } from 'zod/v4';
 import { config } from '../config';
 import { models } from '../database';
 
@@ -52,10 +52,7 @@ export function turnstile({
   widgetName: TurnstileWidgetNames;
   bypassMinTier?: number;
 }) {
-  return async function ({
-    actor,
-    payload,
-  }: Context<ZodObject<{ turnstile_token: ZodString }>, ZodType>) {
+  return async function ({ actor, payload }: Context<ZodType, ZodType>) {
     const turnstileSiteKey = TurnstileSecretMap[widgetName];
     if (config.APP_ENV === 'production' && !turnstileSiteKey)
       throw new Error('Turnstile site key not found');
