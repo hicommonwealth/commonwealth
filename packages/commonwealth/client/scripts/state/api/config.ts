@@ -1,5 +1,5 @@
+import { SNAPSHOT_HUB_URL } from '@hicommonwealth/shared';
 import { QueryClient } from '@tanstack/react-query';
-import process from 'process';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,10 +45,8 @@ export const ExternalEndpoints = {
       `https://coins.llama.fi/prices/current/base:${tokenContractAddress}`,
   },
   snapshotHub: {
-    url: process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org',
-    graphql: process.env.SNAPSHOT_HUB_URL
-      ? process.env.SNAPSHOT_HUB_URL + '/graphql'
-      : 'https://hub.snapshot.org/graphql',
+    url: SNAPSHOT_HUB_URL,
+    graphql: SNAPSHOT_HUB_URL + '/graphql',
   },
 };
 

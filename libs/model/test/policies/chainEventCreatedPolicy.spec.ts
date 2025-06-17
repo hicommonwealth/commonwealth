@@ -21,6 +21,7 @@ const blockTimestamp = 1712247912;
 
 async function processValidStakeTransaction() {
   const context: EventContext<'CommunityStakeTrade'> = {
+    id: 0,
     name: 'CommunityStakeTrade',
     payload: {
       rawLog: {
