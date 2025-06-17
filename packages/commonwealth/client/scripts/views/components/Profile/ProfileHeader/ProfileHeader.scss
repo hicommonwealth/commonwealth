@@ -93,4 +93,58 @@
       }
     }
   }
+
+  .user-stats {
+    border-top: 1px solid $neutral-200;
+
+    .stats-container {
+      display: flex;
+      width: 100%;
+      justify-content: space-around;
+      margin-top: 16px;
+
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+
+        .stat-value {
+          color: $neutral-800;
+          font-weight: 600;
+        }
+
+        .stat-label {
+          color: $neutral-500;
+          margin-top: 4px;
+        }
+      }
+    }
+  }
+
+  .mutual-connections {
+    display: flex;
+    align-items: center;
+    margin: 16px 0;
+
+    .mutual-icons {
+      display: flex;
+      align-items: center;
+
+      .mutual-community-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-left: -10px;
+        border: 2px solid $white;
+        box-shadow: 0 0 0 1px $neutral-100;
+        background: $white;
+
+        &:first-child {
+          margin-left: 0;
+        }
+      }
+    }
+  }
 }
