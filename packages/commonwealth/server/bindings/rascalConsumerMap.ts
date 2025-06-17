@@ -82,6 +82,7 @@ const _NotificationsPolicy = {
   },
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   ChainEventPolicy,
   DiscordBotPolicy,

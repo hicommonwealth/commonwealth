@@ -32,6 +32,7 @@ export function createRmqConfig({
   map,
 }: {
   rabbitMqUri: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   map: Array<Consumer<EventsHandlerMetadata<any>>>;
 }) {
   let vhost: string;
