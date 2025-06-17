@@ -95,7 +95,7 @@
   }
 
   .user-stats {
-    border-top: 1px solid var(--neutral-200);
+    border-top: 1px solid $neutral-200;
 
     .stats-container {
       display: flex;
@@ -110,12 +110,12 @@
         text-align: center;
 
         .stat-value {
-          color: var(--neutral-800);
+          color: $neutral-800;
           font-weight: 600;
         }
 
         .stat-label {
-          color: var(--neutral-500);
+          color: $neutral-500;
           margin-top: 4px;
         }
       }

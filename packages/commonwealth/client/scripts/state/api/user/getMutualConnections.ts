@@ -6,7 +6,7 @@ interface GetMutualConnectionsInput {
   limit?: number;
 }
 
-export const useMutualConnections = (
+export const useMutualConnectionsQuery = (
   input: GetMutualConnectionsInput,
   options?: { enabled?: boolean },
 ) => {

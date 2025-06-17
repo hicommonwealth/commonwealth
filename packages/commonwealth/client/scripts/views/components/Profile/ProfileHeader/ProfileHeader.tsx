@@ -9,7 +9,7 @@ import {
   getDecodedString,
   renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
-import { useMutualConnections } from 'client/scripts/state/api/user';
+import { useMutualConnectionsQuery } from 'client/scripts/state/api/user';
 import { useFlag } from 'hooks/useFlag';
 import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import { useInviteLinkModal } from 'state/ui/modals';
@@ -33,7 +33,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
   const referralsEnabled = useFlag('referrals');
 
-  const { data: mutualConnections } = useMutualConnections(
+  const { data: mutualConnections } = useMutualConnectionsQuery(
     {
       user_id_1: user.id,
       user_id_2: profile.userId,
