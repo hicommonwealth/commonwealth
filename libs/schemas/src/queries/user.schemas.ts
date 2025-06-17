@@ -255,6 +255,13 @@ export const GetAddressStatus = {
   context: VerifiedContext,
 };
 
+export const MutualCommunityView = z.object({
+  id: z.string(),
+  name: z.string(),
+  base: z.nativeEnum(ChainBase),
+  icon_url: z.string().nullish(),
+});
+
 export const GetMutualConnections = {
   input: z.object({
     user_id_1: PG_INT,
@@ -262,14 +269,7 @@ export const GetMutualConnections = {
     limit: z.number().int().min(1).max(100).optional().default(10),
   }),
   output: z.object({
-    mutual_communities: z.array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        base: z.nativeEnum(ChainBase),
-        icon_url: z.string().nullish(),
-      }),
-    ),
+    mutual_communities: z.array(MutualCommunityView),
   }),
   context: AuthContext,
 };
