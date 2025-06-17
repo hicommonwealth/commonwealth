@@ -20,7 +20,7 @@ import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
+import { getCommunityByIdQuery } from 'state/api/communities/getCommuityById';
 import { SERVER_URL } from 'state/api/config';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import { darkModeStore, useDarkMode } from 'state/ui/darkMode/darkMode';
@@ -158,7 +158,7 @@ const useUserMenuItems = ({
         // making a fresh query to get chain and community info for this address
         // as all the necessary fields don't exist on user.address, these should come
         // from api in the user address response, and the extra api call here removed
-        const community = await EXCEPTION_CASE_VANILLA_getCommunityById(
+        const community = await getCommunityByIdQuery(
           account.community.id,
           true,
         );
