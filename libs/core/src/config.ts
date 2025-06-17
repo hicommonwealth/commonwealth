@@ -1,3 +1,4 @@
+import { Environments } from '@hicommonwealth/schemas';
 import { createHash } from 'crypto';
 import * as dotenv from 'dotenv';
 import _ from 'lodash';
@@ -9,7 +10,6 @@ dotenv.config({ path: '../../.env' });
 const APP_ENV_PASSWORD_HASH =
   '7f5c0fe24e27b24fcab364f319e488fffe99104b8f82bec64b6bc82c3a729090';
 
-const Environments = ['development', 'test', 'staging', 'production'] as const;
 const AppEnvironments = [
   'local',
   'CI',
@@ -71,6 +71,7 @@ const {
   APP_ENV,
   APP_ENV_PASSWORD,
   MAGIC_API_KEY,
+  MAGIC_PUBLISHABLE_KEY,
   MAGIC_CLIENT_ID,
   NODE_ENV,
   IS_CI,
@@ -82,6 +83,7 @@ const {
   TEST_WITHOUT_LOGS,
   HEROKU_APP_NAME,
   HEROKU_API_TOKEN,
+  MIXPANEL_TOKEN,
 } = process.env;
 
 const DEFAULTS = {
@@ -100,6 +102,7 @@ export const config = configure(
     APP_ENV: APP_ENV as AppEnvironment,
     APP_ENV_PASSWORD: APP_ENV_PASSWORD,
     MAGIC_API_KEY,
+    MAGIC_PUBLISHABLE_KEY: MAGIC_PUBLISHABLE_KEY || 'pk_live_EF89AABAFB87D6F4',
     MAGIC_CLIENT_ID,
     NODE_ENV: (NODE_ENV || DEFAULTS.NODE_ENV) as Environment,
     IS_CI: IS_CI === 'true',
@@ -117,6 +120,9 @@ export const config = configure(
         _ROLLBAR_SERVER_TOKEN || DEFAULTS.ROLLBAR_SERVER_TOKEN,
       ROLLBAR_ENV: _ROLLBAR_ENV || DEFAULTS.ROLLBAR_ENV,
       TEST_WITHOUT_LOGS: TEST_WITHOUT_LOGS === 'true',
+    },
+    ANALYTICS: {
+      MIXPANEL_TOKEN: MIXPANEL_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
     },
   },
   z.object({
@@ -156,6 +162,7 @@ export const config = configure(
         (data) => !(APP_ENV === 'production' && !data),
         'MAGIC_API_KEY is required in production',
       ),
+    MAGIC_PUBLISHABLE_KEY: z.string(),
     MAGIC_CLIENT_ID: z
       .string()
       .optional()
@@ -195,5 +202,8 @@ export const config = configure(
           return false;
         return true;
       }, 'ROLLBAR_SERVER_TOKEN and ROLLBAR_ENV may only be set in production to a non-default value.'),
+    ANALYTICS: z.object({
+      MIXPANEL_TOKEN: z.string(),
+    }),
   }),
 );

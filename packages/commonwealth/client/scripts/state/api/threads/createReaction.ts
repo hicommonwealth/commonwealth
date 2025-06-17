@@ -9,7 +9,6 @@ import { trpc } from 'utils/trpcClient';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
-import { updateThreadInAllCaches } from './helpers/cache';
 
 interface IUseCreateThreadReactionMutation {
   threadId: number;
@@ -73,22 +72,22 @@ const useCreateThreadReactionMutation = ({
         voting_weight: newReaction.calculated_voting_weight || 0,
         calculated_voting_weight: newReaction.calculated_voting_weight || 0,
       };
-      updateThreadInAllCaches(
-        communityId,
-        threadId,
-        { associatedReactions: [reaction] },
-        'combineAndRemoveDups',
-      );
 
-      const addition = (
-        BigInt(currentReactionWeightsSum) +
-        BigInt(reaction.voting_weight || '0')
-      ).toString();
+      utils.thread.getThreadById.setData({ thread_id: threadId }, (oldData) => {
+        if (!oldData) return oldData;
 
-      updateThreadInAllCaches(communityId, threadId, {
-        reactionCount: currentReactionCount + 1,
-        // I think it is broken here
-        reactionWeightsSum: addition,
+        const newReactionCount = (oldData.reaction_count || 0) + 1;
+        const newReactionWeightsSum = (
+          BigInt(oldData.reaction_weights_sum || '0') +
+          BigInt(reaction.voting_weight || '0')
+        ).toString();
+
+        return {
+          ...oldData,
+          reaction_count: newReactionCount,
+          reaction_weights_sum: newReactionWeightsSum,
+          reactions: [...(oldData.reactions || []), reaction],
+        };
       });
 
       const userId = user.addresses?.[0]?.profile?.userId;

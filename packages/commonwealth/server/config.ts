@@ -32,6 +32,7 @@ const {
   TWITTER_WORKER_POLL_INTERVAL,
   TWITTER_ENABLED_BOTS,
   EVM_CE_ETH_CHAIN_ID_OVERRIDE,
+  RAILWAY_PUBLIC_DOMAIN,
 } = process.env;
 
 const DEFAULTS = {
@@ -143,6 +144,9 @@ export const config = configure(
         ? parseInt(CACHE_GET_COMMUNITIES_JOIN_COMMUNITY, 10)
         : DEFAULTS.CACHE_GET_COMMUNITIES_JOIN_COMMUNITY,
     },
+    RAILWAY: {
+      RAILWAY_PUBLIC_DOMAIN,
+    },
   },
   z.object({
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
@@ -237,6 +241,9 @@ export const config = configure(
       POLL_INTERVAL_MS: z.number().int().positive(),
       LOG_TRACE: z.boolean(),
       ETH_CHAIN_ID_OVERRIDE: z.array(z.number()).optional(),
+    }),
+    RAILWAY: z.object({
+      RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
     }),
   }),
 );

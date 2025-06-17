@@ -1,4 +1,4 @@
-import { Query } from '@hicommonwealth/core';
+import { InvalidState, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod/v4';
@@ -131,6 +131,10 @@ export function GetThreadById(): Query<typeof schemas.GetThreadById> {
           { model: models.ThreadVersionHistory },
         ],
       });
+
+      if (!thread) {
+        throw new InvalidState('Thread not found');
+      }
 
       return thread!.toJSON() as z.infer<typeof schemas.ThreadView>;
     },

@@ -1,7 +1,7 @@
 @import '../../../styles/shared';
 
 .NewThreadForm {
-  flex-direction: row;
+  flex-direction: row !important;
   width: 100%;
   display: flex;
   gap: 56px;
@@ -231,6 +231,33 @@
 
   .turnstile-container {
     display: flex;
-    justify-content: right;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    max-width: 300px;
+    width: 248px;
+
+    .left-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+}
+
+.tokenized-status {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: $neutral-50;
+
+  .tokenized-enabled {
+    color: $green-500;
+  }
+
+  .tokenized-disabled {
+    color: $neutral-500;
   }
 }

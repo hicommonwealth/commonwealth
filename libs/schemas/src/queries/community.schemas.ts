@@ -26,6 +26,7 @@ import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const GetCommunities = {
   input: PaginationParamsSchema.extend({
+    search: z.string().optional(),
     // eslint-disable-next-line max-len
     relevance_by: z
       .enum(['tag_ids', 'membership'])
@@ -55,6 +56,8 @@ export const GetCommunities = {
     include_node_info: z.boolean().optional(),
     stake_enabled: z.boolean().optional(),
     has_groups: z.boolean().optional(),
+    has_launchpad_token: z.boolean().optional(),
+    has_pinned_token: z.boolean().optional(),
     include_last_30_day_thread_count: z.boolean().optional(),
     order_by: z
       .enum([

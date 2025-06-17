@@ -4,6 +4,7 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import NodeInfo from 'models/NodeInfo';
 import { useEffect, useMemo, useState } from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
 import { fetchNodes } from 'state/api/nodes';
 import useUserStore from 'state/ui/user';
 import { z } from 'zod/v4';
@@ -23,6 +24,7 @@ const useCommonTradeTokenForm = ({
     tradeConfig.mode || TradingMode.Buy,
   );
   const user = useUserStore();
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
   const userAddresses = useMemo(() => {
     // get all the addresses of the user that matches chain base
     const tempUserAddresses = user.addresses
@@ -43,9 +45,7 @@ const useCommonTradeTokenForm = ({
       .then((nodes) =>
         setBaseNode(
           nodes.find(
-            (n) =>
-              n.ethChainId ===
-              parseInt(process.env.LAUNCHPAD_CHAIN_ID || '8453'),
+            (n) => n.ethChainId === configurationData!.LAUNCHPAD_CHAIN_ID,
           ) as NodeInfo,
         ),
       )

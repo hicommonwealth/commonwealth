@@ -12,12 +12,14 @@ type UseGetXPsRankedProps = z.infer<typeof GetXpsRanked.input> & {
 const useGetXPsRanked = ({
   top = 100,
   quest_id,
+  search,
   enabled = true,
 }: UseGetXPsRankedProps) => {
   return trpc.user.getXpsRanked.useQuery(
     {
       top,
       quest_id,
+      search,
     },
     {
       enabled,

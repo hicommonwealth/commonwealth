@@ -55,6 +55,7 @@ export const GetUserProfile = {
     userId: PG_INT.optional(),
   }),
   output: UserProfileView as ZodType<UserProfileView>,
+  context: VerifiedContext,
 };
 
 export const GetUser = {
@@ -147,8 +148,8 @@ export const GetUserAddresses = {
 };
 
 export const ReferralView = z.object({
-  referrer_address: EVM_ADDRESS,
-  referee_address: EVM_ADDRESS,
+  referrer_address: z.string().max(255),
+  referee_address: z.string().max(255),
   referee_user_id: PG_INT,
   referee_profile: UserProfile,
   // when referee creates a community
@@ -227,6 +228,7 @@ export const XpRankedUser = z.object({
 export const GetXpsRanked = {
   input: z.object({
     top: z.number(),
+    search: z.string().optional(),
     quest_id: z
       .number()
       .optional()

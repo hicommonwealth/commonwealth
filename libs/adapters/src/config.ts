@@ -9,8 +9,6 @@ const DEFAULTS = {
 };
 
 const {
-  MIXPANEL_PROD_TOKEN,
-  MIXPANEL_DEV_TOKEN,
   DISABLE_CACHE,
   CLOUDAMQP_URL,
   REDIS_URL, // local + staging
@@ -62,10 +60,6 @@ export const config = configure(
         ),
       },
       SEND_EMAILS: SEND_EMAILS === 'true',
-    },
-    ANALYTICS: {
-      MIXPANEL_PROD_TOKEN,
-      MIXPANEL_DEV_TOKEN,
     },
     PUSH_NOTIFICATIONS: {
       KNOCK_FCM_CHANNEL_ID,
@@ -246,13 +240,6 @@ export const config = configure(
         )
         .optional()
         .describe('The public firebase config for FCM'),
-    }),
-    ANALYTICS: z.object({
-      MIXPANEL_PROD_TOKEN: z
-        .string()
-        .optional()
-        .refine((data) => !(target.APP_ENV === 'production' && !data)),
-      MIXPANEL_DEV_TOKEN: z.string().optional(),
     }),
     LOAD_TESTING: z
       .object({
