@@ -375,6 +375,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         });
       },
       CommentCreated: async ({ id, payload }) => {
+        throw Error('mocked error');
         const user_id = await getUserByAddressId(payload.address_id);
         if (!user_id) return;
         const thread = await models.Thread.findOne({

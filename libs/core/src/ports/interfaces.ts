@@ -445,15 +445,18 @@ export type ConsumerHooks = {
   afterHandleEvent: (topic: string, content: any, context: any) => void;
 };
 
-export type Consumer =
-  | {
-      consumer: () => EventsHandlerMetadata<EventSchemas>;
-      worker?: string;
-      retryStrategy?: RetryStrategyFn;
-      hooks?: ConsumerHooks;
-      overrides: Record<string, string | null | undefined>;
-    }
-  | (() => EventsHandlerMetadata<EventSchemas>);
+export type Consumer<T> =
+  T extends EventsHandlerMetadata<infer E>
+    ?
+        | {
+            consumer: () => T;
+            worker?: string;
+            retryStrategy?: RetryStrategyFn;
+            hooks?: ConsumerHooks;
+            overrides?: { [K in keyof E]?: string | null };
+          }
+        | (() => T)
+    : never;
 
 type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
 

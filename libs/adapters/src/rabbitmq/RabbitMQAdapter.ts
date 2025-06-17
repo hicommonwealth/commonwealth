@@ -93,9 +93,7 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async init(): Promise<void> {
-    this._log.info(
-      `Rascal connecting to RabbitMQ: ${this._rawVhost.connection}`,
-    );
+    this._log.info('Rascal connecting to RabbitMQ', this._rawVhost.connection);
 
     this.broker = await Rascal.BrokerAsPromised.create(
       Rascal.withDefaultConfig(this._rabbitMQConfig),
@@ -121,6 +119,29 @@ export class RabbitMQAdapter implements Broker {
       this._log.info(
         `Vhost: ${vhost} was unblocked using connection: ${connectionUrl}.`,
       );
+    });
+
+    // subscribe DLQ handler
+    const dlq_handler = await this.broker.subscribe('dlq_handler');
+    dlq_handler.on('message', (message, content, ackOrNack) => {
+      try {
+        this._log.info('[DLQ] Failed Event:', {
+          death: message.properties.headers['x-death'],
+          content,
+        });
+        // TODO: make a regular policy?
+        // and persist to a dlq model containing:
+        // - event id
+        // - event name
+        // - event payload
+        // - consumer name
+        // - error details (retries, reasons)
+        // - dlq timestamp
+        // ackOrNack(); // TODO: Ack after persisting to db
+      } catch (err) {
+        this._log.error('[DLQ] Failed to process DLQ message:', err as Error);
+        ackOrNack(err as Error); // Will retry or re-DLQ
+      }
     });
 
     this._initialized = true;
