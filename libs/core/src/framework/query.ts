@@ -25,9 +25,7 @@ export const query = async <
     const stripped = (
       typeof validated === 'object'
         ? Object.fromEntries(
-            Object.entries(input.parse(payload)).filter(
-              ([, v]) => v !== undefined,
-            ),
+            Object.entries(validated).filter(([, v]) => v !== undefined),
           )
         : payload
     ) as z.infer<Input>;

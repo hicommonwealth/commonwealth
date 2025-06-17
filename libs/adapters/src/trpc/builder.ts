@@ -100,7 +100,7 @@ export const buildproc = <Input extends ZodType, Output extends ZodType>({
       if (result.ok && outMiddlewares?.length) {
         const input = (await getRawInput()) as z.infer<Input>;
         for (const omw of outMiddlewares) {
-          await omw(input, result.data, ctx);
+          await omw(input, result.data as z.infer<Output>, ctx);
         }
       }
       return result;
