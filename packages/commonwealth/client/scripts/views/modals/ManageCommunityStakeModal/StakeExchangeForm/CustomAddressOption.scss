@@ -1,4 +1,5 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
 
 .CustomAddressOptionElement {
   display: flex;
@@ -6,7 +7,7 @@
   font-weight: 500;
 
   .check-icon {
-    fill: $green-600;
+    fill: colors.$green-600;
     margin-right: 8px;
   }
 }

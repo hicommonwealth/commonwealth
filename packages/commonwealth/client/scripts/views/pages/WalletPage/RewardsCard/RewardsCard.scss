@@ -1,4 +1,5 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .RewardsCard {
   &.Card {
@@ -15,19 +16,19 @@
     .see-all-text {
       cursor: pointer;
       margin-left: auto;
-      color: $primary-500;
+      color: colors.$primary-500;
       white-space: nowrap;
 
       &.disabled {
         cursor: default;
-        color: $neutral-400;
+        color: colors.$neutral-400;
         opacity: 0.7;
       }
     }
   }
 
   .rewards-card-description {
-    color: $neutral-600;
+    color: colors.$neutral-600;
   }
 
   .rewards-card-body {

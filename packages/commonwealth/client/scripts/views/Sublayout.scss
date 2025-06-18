@@ -1,4 +1,5 @@
-@import '../styles/shared.scss';
+@use '../styles/shared.scss';
+@use '../styles/mixins/media_queries';
 
 .Sublayout {
   display: flex;
@@ -17,7 +18,7 @@
       flex-direction: column;
       transition: margin-left 0.2s ease-in-out;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         margin-top: 48px;
       }
 
@@ -26,26 +27,31 @@
       }
 
       &.menu-visible {
-        margin-left: calc(#{$quick-switcher-width} + #{$sidebar-width} + 1px);
+        margin-left: calc(
+          #{shared.$quick-switcher-width} + #{shared.$sidebar-width} + 1px
+        );
 
         transition: margin-left 0.2s ease-in-out;
 
-        width: calc(100% - (#{$quick-switcher-width} + 1px));
+        width: calc(100% - (#{shared.$quick-switcher-width} + 1px));
 
-        @include isWindowSmallToMediumInclusive {
+        @include media_queries.isWindowSmallToMediumInclusive {
           margin-left: 100vw;
         }
       }
 
       &.quick-switcher-visible {
-        margin-left: calc(#{$sidebar-width} + #{$quick-switcher-width} + 1px);
+        margin-left: calc(
+          #{shared.$sidebar-width} + #{shared.$quick-switcher-width} + 1px
+        );
         width: calc(
-          100% - (#{$sidebar-width} + #{$quick-switcher-width} + 1px)
+          100% -
+            (#{shared.$sidebar-width} + #{shared.$quick-switcher-width} + 1px)
         );
 
         transition: margin-left 0.2s ease-in-out;
 
-        @include isWindowSmallToMediumInclusive {
+        @include media_queries.isWindowSmallToMediumInclusive {
           margin-left: 100vw;
         }
       }
@@ -55,21 +61,21 @@
         margin-left: 0;
         transition: margin-left 0.2s ease-in-out;
 
-        @include smallInclusive {
+        @include media_queries.smallInclusive {
           margin-left: 0;
         }
 
         .Banner {
-          padding-left: calc(#{$sidebar-width} + 20px);
+          padding-left: calc(#{shared.$sidebar-width} + 20px);
           margin-left: calc(
-            -#{$sidebar-width} + 1px
+            -#{shared.$sidebar-width} + 1px
           ); // give it a negative margin equal to the parent's margin
         }
 
         .MessageBanner {
-          padding-left: calc(#{$sidebar-width} + 20px);
+          padding-left: calc(#{shared.$sidebar-width} + 20px);
           margin-left: calc(
-            -#{$sidebar-width} + 1px
+            -#{shared.$sidebar-width} + 1px
           ); // give it a negative margin equal to the parent's margin
         }
       }

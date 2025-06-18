@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .JoinCommunityStep {
   display: flex;
@@ -7,10 +9,10 @@
   gap: 16px;
 
   .h4 {
-    color: $neutral-600;
+    color: colors.$neutral-600;
 
     .b1 {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 
@@ -21,18 +23,18 @@
     width: 100%;
     max-height: 270px;
     overflow-y: scroll;
-    @include extraSmall {
+    /* Hide scrollbar for Firefox */
+    scrollbar-width: none;
+    /* Hide scrollbar for Internet Explorer and Edge */
+    -ms-overflow-style: none;
+
+    @include media_queries.extraSmall {
       max-height: 60vh;
     }
+
     &::-webkit-scrollbar {
       display: none;
     }
-
-    /* Hide scrollbar for Firefox */
-    scrollbar-width: none;
-
-    /* Hide scrollbar for Internet Explorer and Edge */
-    -ms-overflow-style: none;
   }
 
   .footer-container {
@@ -43,14 +45,14 @@
     flex-direction: column;
     margin-top: 30px;
     .primary {
-      background-color: $primary-600 !important;
+      background-color: colors.$primary-600 !important;
     }
-    @include extraSmall {
+    @include media_queries.extraSmall {
       position: absolute;
       bottom: 40px;
       margin-top: 0px;
     }
-    @include heightSmallInclusive {
+    @include media_queries.heightSmallInclusive {
       bottom: 10px;
       margin-top: 0px;
     }

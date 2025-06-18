@@ -1,8 +1,10 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .ViewUpvotesDrawer {
   .Drawer.upvote-drawer {
-    @include extraSmall {
+    @include media_queries.extraSmall {
       top: 48px !important;
 
       .content-container {
@@ -11,7 +13,7 @@
     }
 
     .empty-upvotes-container {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
 
     .drawer-actions {
@@ -22,7 +24,7 @@
       align-items: center;
       padding: 16px 56px 12px 25px;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         gap: 4px;
         padding: 16px 16px 12px 16px;
       }
@@ -31,7 +33,7 @@
     .content-container {
       padding: 20px 56px;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         padding: 0 16px;
       }
 
@@ -61,7 +63,7 @@
           flex-basis: 30%;
 
           .Text.caption {
-            color: $neutral-400;
+            color: colors.$neutral-400;
           }
         }
       }

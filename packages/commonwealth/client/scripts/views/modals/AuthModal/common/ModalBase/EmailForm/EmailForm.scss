@@ -1,4 +1,5 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/media_queries';
 
 .EmailForm {
   display: flex;
@@ -20,7 +21,7 @@
     .btn-border {
       margin: 0 !important;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         width: 100% !important;
 
         button {

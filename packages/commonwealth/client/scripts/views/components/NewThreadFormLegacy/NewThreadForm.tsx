@@ -11,15 +11,20 @@ import {
 } from 'client/scripts/helpers/snapshot_utils';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
-import { notifyError } from 'controllers/app/notifications';
+import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   getEthChainIdOrBech32Prefix,
   SessionKeyError,
 } from 'controllers/server/sessions';
 import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL } from 'helpers/threads';
+import useAppStatus from 'hooks/useAppStatus';
+import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
+import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
+import { AnyProposal, ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, {
   forwardRef,
@@ -58,16 +63,18 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { useTurnstile } from 'views/components/useTurnstile';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import useAppStatus from '../../../hooks/useAppStatus';
-import { AnyProposal, ThreadKind, ThreadStage } from '../../../models/types';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 
-import useTopicGating from 'client/scripts/hooks/useTopicGating';
-import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import { DeltaStatic } from 'quill';
+// eslint-disable-next-line max-len
+import useCreateThreadTokenMutation from 'client/scripts/state/api/threads/createThreadToken';
+import {
+  useGetTokenByCommunityId,
+  useGetTokenizedThreadsAllowedQuery,
+} from 'client/scripts/state/api/tokens';
 import { useAIFeatureEnabled } from 'state/ui/user';
 import { ExtendedPoll, LocalPoll, parseCustomDuration } from 'utils/polls';
 // eslint-disable-next-line max-len
@@ -102,6 +109,7 @@ import {
 } from '../react_quill_editor/utils';
 import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
+import { TokenWidget } from './ToketWidget';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
@@ -151,6 +159,7 @@ export const NewThreadForm = forwardRef<
     const [linkedProposals, setLinkedProposals] =
       useState<ProposalState | null>();
     const [pollsData, setPollData] = useState<LocalPoll[]>();
+    const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
     // --- State for Image Modal Context ---
     const [imageModalContext, setImageModalContext] = useState<{
@@ -159,6 +168,7 @@ export const NewThreadForm = forwardRef<
     } | null>(null);
 
     const { mutateAsync: createPoll } = useCreateThreadPollMutation();
+    const { mutateAsync: createThreadToken } = useCreateThreadTokenMutation();
 
     const user = useUserStore();
     const { data: userProfile } = useFetchProfileByIdQuery({
@@ -330,6 +340,18 @@ export const NewThreadForm = forwardRef<
     const effectiveSetWebSearchEnabled =
       setWebSearchEnabled || setLocalWebSearchEnabled;
 
+    const { data: tokenizedThreadsAllowed } =
+      useGetTokenizedThreadsAllowedQuery({
+        community_id: selectedCommunityId,
+        topic_id: threadTopic?.id || 0,
+      });
+
+    const { data: communityToken } = useGetTokenByCommunityId({
+      community_id: selectedCommunityId,
+      with_stats: true,
+      enabled: !!selectedCommunityId,
+    });
+
     const handleNewThreadCreation = useCallback(async () => {
       if (!community || !userSelectedAddress || !selectedCommunityId) {
         notifyError('Invalid form state!');
@@ -405,6 +427,36 @@ export const NewThreadForm = forwardRef<
         });
 
         const thread = await createThread(input);
+
+        if (tokenizedThreadsAllowed?.tokenized_threads_enabled) {
+          if (!communityToken?.token_address) {
+            notifyError('Community token not found');
+            return;
+          }
+
+          if (!community?.ChainNode?.id) {
+            notifyError('chainId not found');
+            return;
+          }
+
+          await createThreadToken({
+            name: community.id,
+            symbol: communityToken.symbol,
+            threadId: thread.id!,
+            ethChainId: app?.chain?.meta?.ChainNode?.eth_chain_id || 0,
+            initPurchaseAmount: 1e18,
+            chainId: community.ChainNode?.id,
+            walletAddress: userSelectedAddress,
+            authorAddress: userSelectedAddress,
+            communityTreasuryAddress:
+              app.chain?.meta?.communityTreasuryAddress || '',
+            chainRpc: community.ChainNode?.url || '',
+            paymentTokenAddress: communityToken.token_address,
+          });
+
+          notifySuccess('Thread token created successfully');
+        }
+
         if (thread && linkedProposals) {
           addThreadLinks({
             thread_id: thread.id!,
@@ -478,32 +530,36 @@ export const NewThreadForm = forwardRef<
       }
     }, [
       community,
-      createThread,
-      isInsideCommunity,
-      isDiscussion,
-      threadUrl,
-      threadTopic,
-      threadKind,
-      threadContentDelta,
-      threadTitle,
-      setIsSaving,
-      setThreadContentDelta,
-      clearDraft,
-      navigate,
-      selectedCommunityId,
       userSelectedAddress,
-      hasTopics,
-      checkForSessionKeyRevalidationErrors,
-      user,
+      selectedCommunityId,
       isTurnstileEnabled,
       turnstileToken,
-      resetTurnstile,
-      addThreadLinks,
-      linkedProposals,
       actionGroups,
       bypassGating,
-      createPoll,
+      isDiscussion,
+      threadUrl,
+      threadTitle,
+      threadContentDelta,
+      setIsSaving,
+      threadKind,
+      threadTopic,
+      hasTopics,
+      createThread,
+      tokenizedThreadsAllowed?.tokenized_threads_enabled,
+      linkedProposals,
       pollsData,
+      setThreadContentDelta,
+      clearDraft,
+      isInsideCommunity,
+      navigate,
+      checkForSessionKeyRevalidationErrors,
+      user,
+      resetTurnstile,
+      communityToken?.token_address,
+      communityToken?.symbol,
+      createThreadToken,
+      addThreadLinks,
+      createPoll,
       isAIEnabled,
     ]);
 
@@ -763,6 +819,16 @@ export const NewThreadForm = forwardRef<
     );
 
     const sidebarComponent = [
+      tokenizedThreadsEnabled
+        ? {
+            label: 'Links',
+            item: (
+              <div className="cards-colum">
+                <TokenWidget />
+              </div>
+            ),
+          }
+        : {},
       {
         label: 'Links',
         item: (
@@ -1031,6 +1097,23 @@ export const NewThreadForm = forwardRef<
                         }
                       }}
                     />
+                  )}
+
+                  {tokenizedThreadsAllowed && tokenizedThreadsEnabled && (
+                    <div className="tokenized-status">
+                      <CWText
+                        type="caption"
+                        className={
+                          tokenizedThreadsAllowed.tokenized_threads_enabled
+                            ? 'tokenized-enabled'
+                            : 'tokenized-disabled'
+                        }
+                      >
+                        {tokenizedThreadsAllowed.tokenized_threads_enabled
+                          ? 'This topic allows tokenized threads'
+                          : 'This topic does not allow tokenized threads'}
+                      </CWText>
+                    </div>
                   )}
 
                   {!!contestTopicAffordanceVisible && (

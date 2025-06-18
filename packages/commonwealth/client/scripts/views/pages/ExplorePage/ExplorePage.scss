@@ -1,4 +1,6 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .BreadcrumbsComponent {
   z-index: 0 !important;
@@ -28,7 +30,7 @@
     position: sticky;
     top: 0;
     z-index: 1;
-    background-color: $white;
+    background-color: colors.$white;
 
     .btn-border {
       margin: 0 !important;
@@ -55,7 +57,7 @@
         gap: 8px;
 
         .communities-count {
-          color: $neutral-500;
+          color: colors.$neutral-500;
           height: fit-content;
           margin-right: 12px;
         }
@@ -69,10 +71,10 @@
     .explore-tabs-row {
       margin: 8px 0 16px;
       width: 100%;
-      border-bottom: 1px solid $neutral-200;
+      border-bottom: 1px solid colors.$neutral-200;
       overflow-x: auto;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         padding-bottom: 4px;
       }
     }
@@ -86,24 +88,24 @@
     padding: 4px 0;
 
     .coming-soon-badge {
-      background-color: $primary-100;
-      color: $primary-700;
+      background-color: colors.$primary-100;
+      color: colors.$primary-700;
       border-radius: 4px;
       padding: 4px 8px;
 
       .Text {
-        color: $primary-700;
+        color: colors.$primary-700;
       }
     }
   }
 
   .placeholder-content {
-    background-color: $neutral-50;
+    background-color: colors.$neutral-50;
     border-radius: 8px;
     padding: 32px;
     text-align: center;
     margin: 24px 0;
-    color: $neutral-600;
+    color: colors.$neutral-600;
   }
 
   // Common styles for tab content
@@ -126,7 +128,7 @@
         text-align: center;
         padding: 32px;
         font-size: 16px;
-        color: $neutral-600;
+        color: colors.$neutral-600;
       }
     }
   }
@@ -142,7 +144,7 @@
         width: 100%;
         max-width: 100%;
 
-        @include extraSmall {
+        @include media_queries.extraSmall {
           font-size: 14px;
         }
       }
@@ -162,11 +164,11 @@
           justify-content: center;
           padding-top: 24px;
 
-          @include mediumSmall {
+          @include media_queries.mediumSmall {
             grid-template-columns: 1fr 1fr;
           }
 
-          @include extraSmall {
+          @include media_queries.extraSmall {
             grid-template-columns: 1fr;
           }
         }
@@ -191,13 +193,13 @@
       text-align: center;
 
       a {
-        color: $primary-500;
+        color: colors.$primary-500;
         text-decoration: none;
 
         &:hover,
         &:active,
         &:focus {
-          color: $primary-500;
+          color: colors.$primary-500;
           text-decoration: underline;
         }
       }
@@ -229,17 +231,17 @@
       cursor: pointer;
 
       .link {
-        color: $primary-500;
+        color: colors.$primary-500;
 
         &:hover,
         &:active,
         &:visited {
-          color: $primary-600;
+          color: colors.$primary-600;
         }
       }
 
       .blue-icon {
-        color: $primary-500;
+        color: colors.$primary-500;
       }
     }
   }

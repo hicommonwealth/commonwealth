@@ -1,4 +1,6 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
+@use '../../../../../../styles/mixins/media_queries';
 
 .GroupCard {
   display: flex;
@@ -7,8 +9,8 @@
   align-items: flex-start;
   gap: 24px;
   border-radius: 6px;
-  background: $white;
-  border: 1px solid $neutral-200;
+  background: colors.$white;
+  border: 1px solid colors.$neutral-200;
 
   .group-name-row {
     display: flex;
@@ -30,7 +32,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        color: $neutral-500;
+        color: colors.$neutral-500;
         cursor: pointer;
         outline: none;
         border: none;
@@ -38,12 +40,12 @@
         gap: 4px;
 
         .Icon {
-          color: $neutral-500;
+          color: colors.$neutral-500;
           font-size: 18px;
         }
 
         .caption {
-          color: $neutral-500;
+          color: colors.$neutral-500;
         }
       }
     }
@@ -62,7 +64,7 @@
 
     .header-row {
       font-weight: bold;
-      border-bottom: 1px solid $neutral-200;
+      border-bottom: 1px solid colors.$neutral-200;
       padding-bottom: 4px;
       margin-bottom: 4px;
       .topic-name-header {
@@ -105,7 +107,7 @@
       margin-bottom: 0;
     }
 
-    @include isWindowSmallToMediumInclusive {
+    @include media_queries.isWindowSmallToMediumInclusive {
       .row,
       .topic-row {
         flex-direction: column;

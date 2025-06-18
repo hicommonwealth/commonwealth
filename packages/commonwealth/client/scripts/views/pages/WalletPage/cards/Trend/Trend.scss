@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
 
 .Trend {
   display: flex;
@@ -10,9 +11,9 @@
   }
 
   &.trend-up {
-    color: $green-500;
+    color: colors.$green-500;
     .percentage {
-      color: $green-500;
+      color: colors.$green-500;
     }
     .trend-icon {
       display: block;
@@ -21,9 +22,9 @@
   }
 
   &.trend-down {
-    color: $rorange-500;
+    color: colors.$rorange-500;
     .percentage {
-      color: $rorange-500;
+      color: colors.$rorange-500;
     }
 
     .trend-icon {
@@ -33,7 +34,7 @@
   }
 
   .from-last-month {
-    color: $neutral-500;
+    color: colors.$neutral-500;
     margin-left: 4px;
   }
 }

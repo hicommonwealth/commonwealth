@@ -1,4 +1,6 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 @mixin searchRowStyles {
   align-items: center;
@@ -8,7 +10,7 @@
   padding: 8px 16px;
 
   &:hover {
-    background-color: $neutral-50;
+    background-color: colors.$neutral-50;
   }
 }
 
@@ -20,7 +22,7 @@
   padding: 8px 16px;
 
   &:hover {
-    background-color: $neutral-50;
+    background-color: colors.$neutral-50;
   }
 }
 
@@ -36,12 +38,12 @@
     flex-direction: column;
     gap: 16px;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       width: 100%;
     }
 
     .search-results-caption.Text {
-      color: $neutral-500;
+      color: colors.$neutral-500;
 
       .search-all-communities {
         margin-left: 8px;
@@ -73,7 +75,7 @@
           width: calc(100% - 32px);
 
           .thread-header.Text {
-            color: $neutral-500;
+            color: colors.$neutral-500;
           }
 
           .search-results-thread-title {
@@ -87,12 +89,12 @@
 
             .User {
               align-items: center;
-              color: $neutral-500;
+              color: colors.$neutral-500;
               display: flex;
             }
 
             .created-at.Text {
-              color: $neutral-500;
+              color: colors.$neutral-500;
             }
           }
         }
