@@ -3,7 +3,8 @@
 @use '../../../../styles/mixins/media_queries';
 
 .QuestList {
-  margin: 16px 0;
+  margin: 0;
+  margin-bottom: 16px;
   width: 100%;
 
   .list {
