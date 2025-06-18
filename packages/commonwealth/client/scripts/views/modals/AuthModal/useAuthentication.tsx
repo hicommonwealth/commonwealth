@@ -9,7 +9,7 @@ import {
 } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { useFlag } from 'client/scripts/hooks/useFlag';
-import { BASE_API_PATH } from 'client/scripts/utils/trpcClient';
+import { BASE_API_PATH, trpc } from 'client/scripts/utils/trpcClient';
 import {
   completeClientLogin,
   setActiveAccount,
@@ -41,7 +41,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
-import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
+import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { EIP1193Provider } from 'viem';
@@ -93,6 +93,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
     useState(false);
   const privyEnabled = useFlag('privy');
+  const utils = trpc.useUtils();
 
   const { isAddedToHomeScreen } = useAppStatus();
   const { setState: setSMSDialogState } = usePrivySMSDialogStore();
@@ -178,7 +179,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         ),
       );
     }
-  }, []);
+  }, [configurationData]);
 
   const handleSuccess = async (
     authAddress?: string | null | undefined,
@@ -509,11 +510,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      const userAddresses =
-        await DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
-          [account!.profile!.chain],
-          [account!.profile!.address],
-        );
+
+      const userAddresses = await fetchProfilesByAddress(
+        [account!.profile!.chain],
+        [account!.profile!.address],
+      );
+
       const currentUserAddress = userAddresses?.[0];
       if (!currentUserAddress) {
         console.log('No profile yet.');
@@ -524,7 +526,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           currentUserAddress.address,
           currentUserAddress.avatarUrl ?? '',
           account?.profile?.chain,
-          new Date(currentUserAddress.lastActive),
+          new Date(currentUserAddress.lastActive ?? ''),
           0,
         );
       }
