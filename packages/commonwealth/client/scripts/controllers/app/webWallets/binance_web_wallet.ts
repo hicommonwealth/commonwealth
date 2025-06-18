@@ -13,7 +13,7 @@ import { getChainHex } from '@hicommonwealth/evm-protocols';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
-import { fetchCachedConfiguration } from 'state/api/configuration';
+import { fetchCachedPublicEnvVar } from 'state/api/configuration';
 import { userStore } from 'state/ui/user';
 import { Web3BaseProvider } from 'web3';
 
@@ -32,7 +32,7 @@ class BinanceWebWalletController implements IWebWallet<string> {
   public readonly chain = ChainBase.Ethereum;
 
   public get available() {
-    return !!window.BinanceChain;
+    return !!window?.ethereum?.isBinance;
   }
 
   public get provider() {
@@ -81,7 +81,7 @@ class BinanceWebWalletController implements IWebWallet<string> {
         signMessage: (message) =>
           this._web3.givenProvider.request({
             method: 'personal_sign',
-            params: [this.accounts[0], message],
+            params: [message, this.accounts[0]],
           }),
         getAddress: () => this.accounts[0],
       },
@@ -101,7 +101,7 @@ class BinanceWebWalletController implements IWebWallet<string> {
       const Web3 = (await import('web3')).default;
 
       // Binance Chain wallet interface
-      let ethereum = window.BinanceChain;
+      let ethereum = window.ethereum;
 
       this._web3 = {
         givenProvider: ethereum,
@@ -114,9 +114,9 @@ class BinanceWebWalletController implements IWebWallet<string> {
 
       const chainIdHex = getChainHex(parseInt(chainId, 10));
       try {
-        const config = fetchCachedConfiguration();
+        const config = fetchCachedPublicEnvVar();
 
-        if (config?.evmTestEnv !== 'test') {
+        if (config?.TEST_EVM_ETH_RPC !== 'test') {
           await this._web3.givenProvider.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: chainIdHex }],
