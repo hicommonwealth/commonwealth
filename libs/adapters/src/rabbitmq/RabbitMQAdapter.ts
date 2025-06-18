@@ -304,27 +304,25 @@ export class RabbitMQAdapter implements Broker {
     }
 
     const dlq_handler = await this.broker!.subscribe('dlq_handler');
-    dlq_handler.on('message', async (message, content, ackOrNack) => {
-      try {
-        const death = message.properties.headers['x-death'];
-        if (death && death.length > 0) {
-          const d = death.at(0)!;
-          await handler({
-            consumer: d.queue,
-            event_id: +content.id,
-            event_name: content.name,
-            reason: d.reason,
-            timestamp: d.time.value,
+    dlq_handler.on('message', (message, content, ackOrNack) => {
+      const death = message.properties.headers['x-death'];
+      if (death && death.length > 0) {
+        const d = death.at(0)!;
+        handler({
+          consumer: d.queue,
+          event_id: +content.id,
+          event_name: content.name,
+          reason: d.reason,
+          timestamp: d.time.value,
+        })
+          .then(() => ackOrNack())
+          .catch((e) => {
+            this._log.error('[DLQ Handler] Failed to handle DLQ message:', e);
+            ackOrNack(e);
           });
-        }
-        ackOrNack();
-      } catch (err) {
-        this._log.error(
-          '[DLQ Handler] Failed to handle DLQ message:',
-          err as Error,
-        );
-        ackOrNack(err as Error); // Will retry or re-DLQ
       }
+      // ack when x-death is not present?
+      ackOrNack(new Error('No x-death header present'));
     });
     return true;
   }
