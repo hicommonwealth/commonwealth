@@ -1,34 +1,11 @@
-import {
-  doesActionRequireRewardShare,
-  doesActionRewardShareForCreator,
-  doesActionRewardShareForReferrer,
-} from 'helpers/quest';
-import { QuestAction } from '../../../CreateQuest/QuestForm/QuestActionSubForm';
+import { XpLogView } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 
-export const getTagConfigForRewardType = ({
-  action,
-  auth_user_id,
-  log,
-}: {
-  action: QuestAction;
-  auth_user_id: number;
-  log: { user_id: number; creator_id };
-}) => {
-  if (doesActionRequireRewardShare(action)) {
-    if (
-      doesActionRewardShareForCreator(action) &&
-      auth_user_id === log.creator_id
-    ) {
-      return { type: 'proposal', copy: `Creator Bonus` };
-    }
-
-    if (
-      doesActionRewardShareForReferrer(action) &&
-      auth_user_id === log.creator_id
-    ) {
-      return { type: 'trending', copy: `Referrer Bonus` };
-    }
+export const getTagConfigForRewardType = (log: z.infer<typeof XpLogView>) => {
+  if (log.is_creator && log.user_id !== log.creator_user_id) {
+    return log.is_referral
+      ? { type: 'trending', copy: `Referrer Bonus` }
+      : { type: 'proposal', copy: `Creator Bonus` };
   }
-
   return { type: 'new', copy: `Task Completion` };
 };

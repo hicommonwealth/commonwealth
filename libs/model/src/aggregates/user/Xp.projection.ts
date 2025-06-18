@@ -152,19 +152,7 @@ async function recordXpsForQuest({
     creator_address?: string | null;
     referrer_address?: string | null;
   };
-  scope?: {
-    chain_id?: number;
-    topic_id?: number;
-    thread_id?: number;
-    comment_id?: number;
-    group_id?: number;
-    wallet?: string;
-    sso?: string;
-    amount?: number; // overrides reward_amount if present, used with trades x multiplier
-    goal_id?: number; // community goals
-    threshold?: number; // rewards when threshold over configured meta value
-    discord_server_id?: string;
-  };
+  scope?: z.infer<typeof schemas.QuestActionScope>;
 }) {
   const shared_with_address =
     shared_with?.creator_address || shared_with?.referrer_address;
@@ -251,6 +239,7 @@ async function recordXpsForQuest({
           creator_user_id: shared_with_user_id,
           creator_xp_points: shared_xp_points,
           created_at: new Date(),
+          scope,
         },
         transaction,
       });
@@ -310,7 +299,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             event_created_at: payload.created_at!,
             action_metas,
             shared_with: { referrer_address: payload.referrer_address },
-            scope: { chain_id: community.chain_node_id || undefined },
+            scope: {
+              chain_id: community.chain_node_id || undefined,
+              community_id: community.id,
+            },
           });
         }
       },
@@ -332,6 +324,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             event_created_at: payload.created_at!,
             action_metas,
             shared_with: { referrer_address: user?.referred_by_address },
+            scope: { community_id: payload.community_id },
           });
         }
       },
@@ -348,6 +341,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           event_created_at: payload.created_at!,
           action_metas,
           scope: {
+            community_id: payload.community_id,
             topic_id: payload.topic_id,
             thread_id: payload.id!,
           },
@@ -378,7 +372,11 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           event_created_at: payload.created_at!,
           action_metas,
           shared_with: { creator_address: thread!.Address!.address },
-          scope: { topic_id: thread.topic_id, thread_id: thread.id! },
+          scope: {
+            community_id: thread.community_id,
+            topic_id: thread.topic_id,
+            thread_id: thread.id!,
+          },
         });
       },
       CommentCreated: async ({ id, payload }) => {
@@ -398,8 +396,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           event_created_at: payload.created_at!,
           action_metas,
           scope: {
+            community_id: thread.community_id,
             topic_id: thread.topic_id,
             thread_id: thread.id!,
+            comment_id: payload.id!,
           },
         });
       },
@@ -437,6 +437,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           action_metas,
           shared_with: { creator_address: comment!.Address!.address },
           scope: {
+            community_id: comment.Thread!.community_id,
             topic_id: comment.Thread!.topic_id,
             thread_id: comment.Thread!.id!,
             comment_id: comment.id,
@@ -472,6 +473,11 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           user_id,
           event_created_at: payload.created_at!,
           action_metas,
+          scope: {
+            community_id: contest.community_id,
+            namespace: payload.namespace,
+            contest_address: payload.contest_address,
+          },
         });
       },
       OneOffContestManagerDeployed: async ({ id, payload }) => {
@@ -495,6 +501,11 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           user_id,
           event_created_at: payload.created_at!,
           action_metas,
+          scope: {
+            community_id: contest.community_id,
+            namespace: payload.namespace,
+            contest_address: payload.contest_address,
+          },
         });
       },
       ContestEnded: async ({ id, payload }) => {
@@ -526,7 +537,11 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           user_id,
           event_created_at: payload.created_at!,
           action_metas,
-          scope: { amount: total_prize },
+          scope: {
+            community_id: contest.community_id,
+            contest_address: payload.contest_address,
+            amount: total_prize,
+          },
         });
       },
       LaunchpadTokenRecordCreated: async ({ id, payload }) => {
@@ -552,6 +567,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           user_id,
           event_created_at: created_at,
           action_metas,
+          scope: {
+            namespace: payload.namespace,
+            launchpad_token_address: payload.token_address,
+          },
         });
       },
       LaunchpadTokenTraded: async ({ id, payload }) => {
@@ -594,6 +613,9 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           event_created_at: created_at,
           action_metas,
           scope: {
+            community_id: community?.id,
+            namespace: token.namespace,
+            launchpad_token_address: payload.token_address,
             amount: eth_amount,
             threshold: eth_amount,
           },
@@ -640,6 +662,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           user_id: address.user_id!,
           event_created_at: payload.created_at,
           action_metas,
+          scope: {
+            community_id: payload.community_id,
+            namespace: payload.namespace_address,
+          },
         });
       },
       CommunityGoalReached: async ({ id, payload }) => {
@@ -658,7 +684,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           user_id: address.user_id!,
           event_created_at: payload.created_at,
           action_metas,
-          scope: { goal_id: payload.community_goal_meta_id },
+          scope: {
+            community_id: payload.community_id,
+            goal_id: payload.community_goal_meta_id,
+          },
         });
       },
       TwitterCommonMentioned: async ({ id, payload }) => {
@@ -743,7 +772,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
                 user_id,
                 event_created_at: payload.created_at,
                 action_metas,
-                scope: { group_id },
+                scope: { community_id: payload.community_id, group_id },
               });
             }),
         );

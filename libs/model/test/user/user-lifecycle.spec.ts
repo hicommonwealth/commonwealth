@@ -126,7 +126,7 @@ describe('User lifecycle', () => {
       const watermark = new Date();
 
       // act on community, triggering quest rewards
-      await command(CreateThread(), {
+      const thread = await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
@@ -145,7 +145,7 @@ describe('User lifecycle', () => {
           body: 'Comment body 1.1',
         },
       });
-      await command(CreateComment(), {
+      const comment2 = await command(CreateComment(), {
         actor: admin,
         payload: {
           thread_id,
@@ -198,6 +198,11 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[0].created_at,
+          scope: {
+            community_id,
+            thread_id: thread!.id,
+            topic_id,
+          },
         },
         {
           id: 2,
@@ -210,6 +215,12 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[1].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 3,
@@ -222,6 +233,12 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[2].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment2!.id,
+          },
         },
         {
           id: 4,
@@ -234,6 +251,12 @@ describe('User lifecycle', () => {
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
           created_at: logs[3].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
       ]);
 
@@ -302,7 +325,7 @@ describe('User lifecycle', () => {
       const watermark = new Date();
 
       // act on community, triggering quest rewards
-      await command(CreateThread(), {
+      const thread = await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
@@ -488,6 +511,11 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: last[0].created_at,
+          scope: {
+            community_id,
+            thread_id: thread!.id,
+            topic_id,
+          },
         },
         {
           id: 6,
@@ -500,6 +528,12 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: last[1].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 7,
@@ -512,6 +546,12 @@ describe('User lifecycle', () => {
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
           created_at: last[2].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 8,
@@ -524,6 +564,9 @@ describe('User lifecycle', () => {
           creator_user_id: member.user.id,
           creator_xp_points: 10,
           created_at: last[3].created_at,
+          scope: {
+            community_id,
+          },
         },
         {
           id: 9,
@@ -536,6 +579,7 @@ describe('User lifecycle', () => {
           creator_user_id: member.user.id,
           creator_xp_points: 4,
           created_at: last[4].created_at,
+          scope: null,
         },
       ]);
 
@@ -571,7 +615,7 @@ describe('User lifecycle', () => {
       // 4 events after first CommentUpvoted
       const xps3 = await query(GetXps(), {
         actor: admin,
-        payload: { from: xps2!.at(-1)!.created_at },
+        payload: { from: new Date(xps2!.at(-1)!.created_at) },
       });
       expect(xps3!.length).to.equal(5);
 
@@ -941,11 +985,32 @@ describe('User lifecycle', () => {
     });
 
     it('should query ranked by xp points', async () => {
+      // dump xp logs to debug xp ranking
+      const logs = await query(GetXps(), {
+        actor: admin,
+        payload: {},
+      });
+      const table = logs
+        ?.map((x) => ({
+          quest: x.quest_id,
+          user: x.user_profile?.name,
+          event: x.event_name,
+          xp: x.xp_points,
+          creator: x.creator_profile?.name,
+          creator_xp: x.creator_xp_points,
+        }))
+        .sort((a, b) => b.xp - a.xp);
+      console.table(table);
+
       const xps1 = await query(GetXpsRanked(), {
         actor: admin,
         payload: { top: 10 },
       });
       expect(xps1!.length).to.equal(4);
+      // member has 25+18+18+13+12+11+10+10+10+10+10=147 xp points + 4+10 creator points = 161 total
+      // admin has 11+10+10+5+5+5 xp points + 2+2 creator points = 50 total
+      // new_user has 16+11+10 xp points = 37 total
+      // superadmin has 11 xp points
       expect(xps1?.map((x) => x.xp_points)).to.deep.eq([161, 50, 37, 11]);
 
       const xps2 = await query(GetXpsRanked(), {
@@ -953,7 +1018,9 @@ describe('User lifecycle', () => {
         payload: { top: 10, quest_id: -1 },
       });
       expect(xps2!.length).to.equal(2);
-      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([20, 10]);
+      // new_user has 16 for SignUpFlowCompleted
+      // member has 10 for WalletLinked and 4 for SignUpFlowCompleted as referrer
+      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([16, 14]);
     });
   });
 });

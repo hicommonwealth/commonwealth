@@ -26,14 +26,6 @@ heroku container:login
 
 heroku git:remote --app ${app_name}
 
-env_path=./packages/commonwealth/deploy/environments/.env.public.${app_name}
-if [ ! -f ${env_path} ]; then
-  echo "Error: ${env_path} not found"
-  exit 1
-fi
-
-cp ${env_path} .env
-
 # Needed for commonwealth_base
 docker build -f Dockerfile.datadog -t datadog-base .
 

@@ -4,6 +4,10 @@
 .ExploreContestList {
   margin: 16px 0;
 
+  .filters {
+    height: 40px;
+  }
+
   .content {
     display: grid;
     grid-gap: 28px;
