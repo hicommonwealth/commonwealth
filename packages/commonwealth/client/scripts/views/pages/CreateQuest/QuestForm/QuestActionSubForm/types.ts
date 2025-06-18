@@ -1,13 +1,16 @@
 import {
   ChannelBatchActions,
+  KyoFinanceChainIds,
   QuestActionNames,
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 
 export type QuestAction =
   | (typeof QuestActionNames)[number]
   | (typeof ChannelBatchActions)[number];
+
 export enum QuestActionContentIdScope {
   Topic = 'topic',
   Thread = 'thread',
@@ -19,6 +22,8 @@ export enum QuestActionContentIdScope {
   TokenTradeThreshold = 'threshold',
   Goal = 'goal',
 }
+
+export type KyoFinanceChainIdsType = z.infer<typeof KyoFinanceChainIds>;
 
 export type QuestActionSubFormErrors = {
   action?: string;
@@ -44,6 +49,20 @@ export type QuestActionSubFormErrors = {
   // specific to community goal quests
   goalType?: string;
   goalTarget?: string;
+  // specific to kyo finance actions
+  metadata?: {
+    // for all kyo finance actions
+    chainId: string;
+    // for swap kyo finance actions
+    outputToken?: string;
+    inputToken?: string;
+    minOutputAmount?: string;
+    minTimestamp?: string;
+    minVolumeUSD?: string;
+    // for lp kyo finance actions
+    poolAddresses?: string;
+    minUSDValues?: string;
+  };
 };
 
 export type QuestActionSubFormFields = {
@@ -75,6 +94,20 @@ export type QuestActionSubFormFields = {
   // specific to community goal quests
   goalType?: string;
   goalTarget?: string | number;
+  // specific to kyo finance actions
+  metadata?: {
+    // for all kyo finance actions
+    chainId: KyoFinanceChainIdsType;
+    // for swap kyo finance actions
+    outputToken?: string;
+    inputToken?: string;
+    minOutputAmount?: string;
+    minTimestamp?: string;
+    minVolumeUSD?: string;
+    // for lp kyo finance actions
+    poolAddresses?: string;
+    minUSDValues?: string;
+  } | null;
 };
 
 export type QuestActionSubFormConfig = {
@@ -93,6 +126,8 @@ export type QuestActionSubFormConfig = {
   requires_start_link: boolean;
   requires_amount_multipler: boolean;
   with_optional_token_trade_threshold: boolean;
+  requires_kyo_finance_swap_metadata: boolean;
+  requires_kyo_finance_lp_metadata: boolean;
   with_optional_sso_type?: boolean;
 };
 

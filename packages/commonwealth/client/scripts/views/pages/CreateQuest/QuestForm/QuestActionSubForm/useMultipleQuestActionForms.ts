@@ -14,6 +14,8 @@ import {
   doesActionRequireDiscordServerId,
   doesActionRequireGoalConfig,
   doesActionRequireGroupId,
+  doesActionRequireKYOFinanceLpMetadata,
+  doesActionRequireKYOFinanceSwapMetadata,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
@@ -92,7 +94,7 @@ const useQuestActionMultiFormsState = ({
     refs?: QuestActionSubFormInternalRefs,
     config?: QuestActionSubFormConfig,
   ) => {
-    let errors: QuestActionSubFormErrors = {};
+    const errors: QuestActionSubFormErrors = {};
 
     // validate via zod
     try {
@@ -100,11 +102,16 @@ const useQuestActionMultiFormsState = ({
       schema.parse(values);
     } catch (e) {
       const zodError = e as ZodError;
-      zodError.errors.map((error) => {
-        errors = {
-          ...errors,
-          [error.path[0] as keyof QuestActionSubFormErrors]: error.message,
-        };
+      zodError.errors.forEach((error) => {
+        // correctly displays nested paths
+        let current = errors;
+        for (let i = 0; i < error.path.length - 1; i++) {
+          const key = error.path[i];
+          current[key] = current[key] || {};
+          current = current[key];
+        }
+        const lastKey = error.path[error.path.length - 1];
+        current[lastKey] = error.message;
       });
     }
 
@@ -168,6 +175,12 @@ const useQuestActionMultiFormsState = ({
         allowsContentId && doesActionAllowTokenTradeThreshold(chosenAction);
       const isActionRepeatable = doesActionAllowRepetition(chosenAction);
       const requiresStartLink = doesActionRequireStartLink(chosenAction);
+      const requiresKYOFinanceSwapMetadata =
+        doesActionRequireKYOFinanceSwapMetadata(chosenAction);
+      const requiresKYOFinanceLpMetadata =
+        doesActionRequireKYOFinanceLpMetadata(chosenAction);
+      const requiresKYOFinanceMetadata =
+        requiresKYOFinanceSwapMetadata || requiresKYOFinanceLpMetadata;
 
       // update config based on chosen action
       updatedSubForms[index].config = {
@@ -191,6 +204,8 @@ const useQuestActionMultiFormsState = ({
         requires_amount_multipler:
           doesActionRequireAmountMultipler(chosenAction),
         with_optional_token_trade_threshold: allowsTokenTradeThreshold,
+        requires_kyo_finance_swap_metadata: requiresKYOFinanceSwapMetadata,
+        requires_kyo_finance_lp_metadata: requiresKYOFinanceLpMetadata,
         with_optional_sso_type:
           allowsContentId && doesActionAllowSSOType(chosenAction),
       };
@@ -216,6 +231,20 @@ const useQuestActionMultiFormsState = ({
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
           contentIdentifier: undefined,
+        };
+      }
+
+      // set fixed metadata for non kyo finance actions
+      if (!requiresKYOFinanceMetadata) {
+        updatedSubForms[index].values.metadata = null;
+      }
+
+      // reset errors/values if action doesn't require kyo finance metadata
+      if (!requiresKYOFinanceMetadata) {
+        updatedSubForms[index].values.metadata = null;
+        updatedSubForms[index].errors = {
+          ...updatedSubForms[index].errors,
+          metadata: undefined,
         };
       }
 
