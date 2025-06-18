@@ -157,12 +157,6 @@ export const ThreadFeed = ({
   const allThreads =
     feed?.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [];
 
-  // if () {
-  //   return (
-
-  //   );
-  // }
-
   const openModal = (thread: Thread) => {
     setSelectedThread(thread);
     setIsThreadModalOpen(true);
@@ -185,7 +179,7 @@ export const ThreadFeed = ({
   );
 
   return (
-    <div className="Feed">
+    <>
       {!hideFilters && (
         <div className="filters">
           <CWButton
@@ -216,43 +210,44 @@ export const ThreadFeed = ({
           />
         </div>
       )}
-
-      {!allThreads?.length ? (
-        <div className="no-feed-message">No threads found!</div>
-      ) : (
-        <Virtuoso
-          overscan={50}
-          customScrollParent={customScrollParent}
-          totalCount={allThreads?.length || DEFAULT_COUNT}
-          data={allThreads || []}
-          style={{ height: '100%' }}
-          itemContent={(i, thread) => (
-            <FeedThread
-              key={i}
-              thread={thread}
-              onClick={() => openModal(thread)}
-            />
-          )}
-          endReached={() => {
-            hasNextPage && fetchNextPage().catch(console.error);
-          }}
-        />
-      )}
-      {selectedThread && (
-        <CWModal
-          size="large"
-          content={
-            <ThreadPreviewModal
-              isThreadModalOpen={isThreadModalOpen}
-              onClose={() => setIsThreadModalOpen(false)}
-              images={extractImages(selectedThread?.body)}
-              thread={selectedThread}
-            />
-          }
-          onClose={closeModal}
-          open={isThreadModalOpen}
-        />
-      )}
-    </div>
+      <div className="Feed">
+        {!allThreads?.length ? (
+          <div className="no-feed-message">No threads found!</div>
+        ) : (
+          <Virtuoso
+            overscan={50}
+            customScrollParent={customScrollParent}
+            totalCount={allThreads?.length || DEFAULT_COUNT}
+            data={allThreads || []}
+            style={{ height: '100%' }}
+            itemContent={(i, thread) => (
+              <FeedThread
+                key={i}
+                thread={thread}
+                onClick={() => openModal(thread)}
+              />
+            )}
+            endReached={() => {
+              hasNextPage && fetchNextPage().catch(console.error);
+            }}
+          />
+        )}
+        {selectedThread && (
+          <CWModal
+            size="large"
+            content={
+              <ThreadPreviewModal
+                isThreadModalOpen={isThreadModalOpen}
+                onClose={() => setIsThreadModalOpen(false)}
+                images={extractImages(selectedThread?.body)}
+                thread={selectedThread}
+              />
+            }
+            onClose={closeModal}
+            open={isThreadModalOpen}
+          />
+        )}
+      </div>
+    </>
   );
 };
