@@ -1,7 +1,7 @@
 import * as anchor from '@coral-xyz/anchor';
 import { BorshCoder, Event } from '@coral-xyz/anchor';
-import { findIdlByProgramId } from '@hicommonwealth/evm-protocols';
 import { EventPairs, Events } from '@hicommonwealth/schemas';
+import { findIdlByProgramId } from './solanaIdlLoader';
 import { SolanaEvent, SolanaMapper } from './types';
 
 /**

@@ -5,9 +5,11 @@
  * 3. Finding IDLs by program ID
  */
 import { Idl } from '@coral-xyz/anchor';
+import { logger } from '@hicommonwealth/core';
 import { existsSync, readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 
+const log = logger(import.meta);
 /**
  * Define supported Solana networks
  */
@@ -62,7 +64,7 @@ export function loadIdls(network: SolanaNetworks): IdlWithAddress[] {
 
     // Check if directory exists
     if (!existsSync(dirPath)) {
-      console.warn(`IDL directory not found: ${dirPath}`);
+      log.warn(`IDL directory not found: ${dirPath}`);
       return [];
     }
 
@@ -98,10 +100,10 @@ export function loadIdls(network: SolanaNetworks): IdlWithAddress[] {
 
     // Cache the loaded IDLs
     idlCache[network] = idls;
-    console.log(`Loaded ${idls.length} IDLs for network ${network}`);
+    log.info(`Loaded ${idls.length} IDLs for network ${network}`);
     return idls;
-  } catch (error) {
-    console.error(`Error loading IDLs for network ${network}:`, error);
+  } catch (error: any) {
+    log.error(`Error loading IDLs for network ${network}: ${error.message}`);
     return [];
   }
 }

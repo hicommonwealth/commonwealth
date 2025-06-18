@@ -1,9 +1,10 @@
 import { logger, stats } from '@hicommonwealth/core';
 import {
+  emitEvent,
   getAllProgramIds,
+  models,
   SolanaNetworks,
-} from '@hicommonwealth/evm-protocols';
-import { emitEvent, models } from '@hicommonwealth/model';
+} from '@hicommonwealth/model';
 import { EventPairs } from '@hicommonwealth/schemas';
 import { Connection } from '@solana/web3.js';
 import { config } from '../../config';
@@ -41,7 +42,7 @@ export async function processChainNode(
       return;
     }
 
-    const lastProcessedSlot = await models.LastProcessedSolanaSlot.findOne({
+    const lastProcessedSlot = await models.LastProcessedEvmBlock.findOne({
       where: {
         chain_node_id: chainNode.id!,
       },
@@ -54,12 +55,12 @@ export async function processChainNode(
     if (!lastProcessedSlot) {
       // If no slot is recorded, start 100 slots back
       startSlot = Math.max(1, currentSlot - 100);
-    } else if (lastProcessedSlot.slot_number === currentSlot - 1) {
+    } else if (lastProcessedSlot.block_number === currentSlot - 1) {
       // Last processed slot is the current slot - 1, nothing to do
       return;
-    } else if (lastProcessedSlot.slot_number + 1 <= currentSlot - 1) {
+    } else if (lastProcessedSlot.block_number + 1 <= currentSlot - 1) {
       // Process from the next slot after the last processed slot
-      startSlot = lastProcessedSlot.slot_number + 1;
+      startSlot = lastProcessedSlot.block_number + 1;
     } else {
       // Something went wrong with slot numbers, nothing to do
       return;
@@ -91,10 +92,10 @@ export async function processChainNode(
 
         // Update the last processed slot
         if (lastSlot > 0) {
-          await models.LastProcessedSolanaSlot.upsert(
+          await models.LastProcessedEvmBlock.upsert(
             {
               chain_node_id: chainNode.id!,
-              slot_number: lastSlot,
+              block_number: lastSlot,
             },
             { transaction },
           );

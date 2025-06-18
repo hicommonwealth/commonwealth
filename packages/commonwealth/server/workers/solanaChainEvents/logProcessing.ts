@@ -1,12 +1,10 @@
 import { logger as _logger, stats } from '@hicommonwealth/core';
 import {
   getAllProgramIds,
-  SolanaNetworks,
-} from '@hicommonwealth/evm-protocols';
-import {
   processSolanaEvents as mapSolanaEvents,
   SolanaEvent,
   SolanaLogInfo,
+  SolanaNetworks,
   SolanaSlotDetails,
   SolanaTransactionInfo,
 } from '@hicommonwealth/model';

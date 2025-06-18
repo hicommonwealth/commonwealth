@@ -91,6 +91,7 @@
     "@canvas-js/gossiplog": "^0.13.14",
     "@canvas-js/interfaces": "^0.13.14",
     "@canvas-js/signatures": "^0.13.14",
+    "@coral-xyz/anchor": "^0.31.1",
     "@cosmjs/amino": "^0.31.3",
     "@cosmjs/cosmwasm-stargate": "^0.31.3",
     "@cosmjs/crypto": "0.31.3",
