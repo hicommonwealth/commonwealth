@@ -23,17 +23,6 @@ export type SolanaLogInfo = {
   data?: string;
 };
 
-type SolanaEventMeta = (
-  | {
-      events_migrated: true;
-      quest_action_meta_ids?: number[];
-    }
-  | {
-      events_migrated: false;
-      created_at_slot: number;
-    }
-) & { event_name?: Events };
-
 export type SolanaEvent = {
   eventSource: {
     chainId: string; // Solana uses string chain IDs (mainnet, devnet, testnet)
@@ -42,7 +31,7 @@ export type SolanaEvent = {
   transaction: SolanaTransactionInfo;
   slot: SolanaSlotDetails;
   log: SolanaLogInfo;
-  meta: SolanaEventMeta;
+  event_name?: string; // Name of the event
 };
 
 export type SolanaMapper<E extends Events> = (

@@ -38,7 +38,7 @@ export function decodeAnchorEvent(event: SolanaEvent): Event | null {
       const eventLog = event.log.logs.find(
         (log) =>
           log.includes('Program log: ') &&
-          (log.includes(event.meta.event_name || '') ||
+          (log.includes(event.event_name || '') ||
             log.includes('Program log: data:')),
       );
 
@@ -49,7 +49,7 @@ export function decodeAnchorEvent(event: SolanaEvent): Event | null {
         } else {
           // Try to find the inner instruction that contains our event
           const innerIxIndex = event.log.logs.findIndex((log) =>
-            log.includes(`Program log: ${event.meta.event_name || ''}`),
+            log.includes(`Program log: ${event.event_name || ''}`),
           );
           if (innerIxIndex >= 0 && event.log.data) {
             // If we find a matching event, try to decode using the raw data

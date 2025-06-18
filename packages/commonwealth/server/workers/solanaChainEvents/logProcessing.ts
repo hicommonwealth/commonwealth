@@ -319,11 +319,6 @@ async function extractEvents(
               transaction: transactionInfo,
               slot: slotDetails,
               log: logInfo,
-              meta: {
-                events_migrated: false,
-                created_at_slot: slot,
-                event_name: undefined,
-              },
             });
 
             logger.debug(
