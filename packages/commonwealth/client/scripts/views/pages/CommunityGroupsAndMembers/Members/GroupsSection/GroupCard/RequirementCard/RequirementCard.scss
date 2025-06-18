@@ -1,11 +1,13 @@
-@import '../../../../../../../styles/shared';
+@use '../../../../../../../styles/shared';
+@use '../../../../../../../styles/mixins/colors.module';
+@use '../../../../../../../styles/mixins/media_queries';
 
 .RequirementCard {
   display: flex;
   flex-direction: column;
   padding: 16px;
-  background-color: $neutral-25;
-  border: 1px solid $neutral-200;
+  background-color: colors.$neutral-25;
+  border: 1px solid colors.$neutral-200;
   border-radius: 6px;
   gap: 16px;
   width: 100%;
@@ -32,7 +34,7 @@
   .cols-4 {
     grid-template-columns: 1fr 2fr 1fr 1fr;
 
-    @include mediumSmallInclusive {
+    @include media_queries.mediumSmallInclusive {
       grid-template-columns: initial;
       grid-template-rows: 1fr 1fr 1fr 1fr;
     }
@@ -41,7 +43,7 @@
   .cols-3 {
     grid-template-columns: 3fr 1fr 1fr;
 
-    @include mediumSmallInclusive {
+    @include media_queries.mediumSmallInclusive {
       grid-template-columns: initial;
       grid-template-rows: 1fr 1fr 1fr;
     }

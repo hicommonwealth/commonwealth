@@ -1,4 +1,6 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/media_queries';
+@use '../../../../styles/mixins/table';
 
 .xp-filters {
   display: flex;
@@ -20,9 +22,9 @@
 }
 
 .XPTable {
-  @include table-cell;
+  @include table.table-cell;
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     max-height: 300px;
     overflow: scroll;
   }

@@ -1,13 +1,15 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .DesktopHeader {
   align-items: center;
-  border-bottom: 1px solid $neutral-200;
+  border-bottom: 1px solid colors.$neutral-200;
   display: flex;
   gap: 8px;
-  height: $global-header-height;
+  height: shared.$global-header-height;
   justify-content: space-between;
-  min-height: $global-header-height;
+  min-height: shared.$global-header-height;
   padding: 0 12px;
 
   body.token-launch-drawer-open & {
@@ -31,7 +33,7 @@
     display: flex;
     gap: 4px;
     .SearchBar {
-      @include extraSmall {
+      @include media_queries.extraSmall {
         display: none;
       }
     }
@@ -52,7 +54,7 @@
 
       &.isLoggedIn {
         padding-right: 20px;
-        border-right: 1px solid $neutral-100;
+        border-right: 1px solid colors.$neutral-100;
         margin-right: 14px;
       }
 
@@ -69,7 +71,7 @@
         justify-content: center;
 
         svg {
-          fill: $neutral-500;
+          fill: colors.$neutral-500;
           filter: grayscale(100%);
         }
 
@@ -81,13 +83,13 @@
           gap: 4px;
 
           .Text {
-            color: $neutral-500;
+            color: colors.$neutral-500;
           }
 
           .earnings {
             margin-inline: 4px;
-            font-family: $font-family-roboto;
-            color: $neutral-500;
+            font-family: shared.$font-family-roboto;
+            color: colors.$neutral-500;
             white-space: nowrap;
           }
         }
@@ -105,14 +107,14 @@
       }
 
       svg {
-        fill: $neutral-500;
+        fill: colors.$neutral-500;
       }
 
       & div {
         display: flex;
       }
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         display: none;
       }
     }
@@ -120,7 +122,7 @@
     .UserDropdownTriggerButton {
       margin-right: 10px;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         margin-right: 2px;
       }
     }

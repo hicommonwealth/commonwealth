@@ -1,4 +1,6 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
+@use '../../../../../../styles/mixins/media_queries';
 
 .SuccessStep {
   margin: 40px auto 0;
@@ -20,13 +22,13 @@
     gap: 12px;
 
     .description {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
 
     .cta-btn {
       min-width: 328px;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         min-width: auto;
         width: 100%;
       }

@@ -1,7 +1,9 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
 
 .CWIconButton {
-  border-radius: $border-radius-corners-wider;
+  border-radius: border_radius.$border-radius-corners-wider;
   line-height: 0;
   padding: 4px;
   border: none;
@@ -9,16 +11,16 @@
   width: fit-content;
 
   svg {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 
   &:hover:not(.disabled) {
-    background-color: $neutral-100;
+    background-color: colors.$neutral-100;
     cursor: pointer;
   }
 
   &:active {
-    background-color: $neutral-50;
+    background-color: colors.$neutral-50;
   }
 
   &:focus {
@@ -29,7 +31,7 @@
     cursor: not-allowed;
 
     svg {
-      color: $neutral-400;
+      color: colors.$neutral-400;
     }
   }
 

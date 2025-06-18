@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/media_queries';
 
 .PageLayout {
   width: 100%;
@@ -10,7 +11,7 @@
     z-index: 1;
   }
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     padding-inline: 16px;
     padding-top: 0; // because of the breadcrumbs being in static position on mobile
   }
@@ -23,7 +24,7 @@
       z-index: 1;
     }
 
-    @include mediumSmall {
+    @include media_queries.mediumSmall {
       max-width: 792px;
     }
   }

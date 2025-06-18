@@ -1,4 +1,5 @@
-@import './../../../../styles/shared.scss';
+@use './../../../../styles/shared.scss';
+@use './../../../../styles/mixins/colors.module';
 
 .TokenWidget {
   margin: 16px 0;
@@ -7,7 +8,7 @@
     overflow-y: scroll;
     padding-left: 8px;
     width: 370px;
-    border: 2px solid $primary-300;
+    border: 2px solid colors.$primary-300;
     border-radius: 12px;
     padding: 12px;
     overflow: hidden;
@@ -15,14 +16,14 @@
 
   .notice-box {
     margin-top: 16px;
-    border: 2px solid $primary-300;
+    border: 2px solid colors.$primary-300;
     border-radius: 12px;
     padding: 12px;
     width: 370px;
-    background-color: rgba($primary-300, 0.05);
+    background-color: rgba(colors.$primary-300, 0.05);
 
     .Text {
-      color: $primary-500;
+      color: colors.$primary-500;
 
       .blue-icon {
         margin-right: 8px;
