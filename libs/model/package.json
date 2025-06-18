@@ -24,7 +24,6 @@
     "@anatine/zod-mock": "^3.13.3",
     "@canvas-js/chain-ethereum": "^0.13.14",
     "@canvas-js/interfaces": "^0.12.1",
-    "@canvas-js/signatures": "^0.12.1",
     "@cosmjs/cosmwasm-stargate": "^0.31.3",
     "@cosmjs/encoding": "0.32.3",
     "@cosmjs/stargate": "^0.31.3",

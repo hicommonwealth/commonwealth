@@ -90,7 +90,6 @@
     "@types/readline-sync": "^1.4.8",
     "@types/underscore": "^1.9.4",
     "@types/uuid": "^9.0.7",
-    "@types/yargs": "^17.0.24",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
     "@vitejs/plugin-react-swc": "^3.7.0",
