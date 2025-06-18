@@ -9,19 +9,15 @@
   text-align: center;
 }
 
-.filters {
+.community-filters {
   display: flex;
   flex-direction: row;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
   height: 0;
-  margin-top: -16px;
-
-  &.hasAppliedFilter {
-    margin-top: initial;
-    height: auto;
-  }
+  margin-top: initial;
+  height: auto;
 
   .Tag {
     .Text {

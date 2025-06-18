@@ -2,11 +2,8 @@
 @use '../../../../styles/mixins/media_queries';
 
 .ExploreContestList {
-  margin: 16px 0;
-
-  .filters {
-    height: 40px;
-  }
+  margin: 0;
+  margin-bottom: 16px;
 
   .content {
     display: grid;

@@ -181,7 +181,7 @@ export const ThreadFeed = ({
   return (
     <>
       {!hideFilters && (
-        <div className="filters">
+        <div className="thread-filters">
           <CWButton
             label="Filters"
             iconRight="funnelSimple"
