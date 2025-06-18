@@ -37,6 +37,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   useCreateQuestMutation,
+  useDeleteQuestMutation,
   useUpdateQuestMutation,
 } from 'state/api/quests';
 import {
@@ -197,10 +198,12 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
 
   const { mutateAsync: createQuest } = useCreateQuestMutation();
   const { mutateAsync: updateQuest } = useUpdateQuestMutation();
+  const { mutateAsync: deleteQuest } = useDeleteQuestMutation();
   const { mutateAsync: createGoalMeta } = useCreateGoalMetaMutation();
   const { data: goalMetas = [] } = useGetGoalMetasQuery({
     apiEnabled: true,
   });
+  const createQuestIdRef = useRef<number>();
 
   const navigate = useCommonNavigate();
 
@@ -370,6 +373,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     });
 
     if (quest && quest.id) {
+      createQuestIdRef.current = quest.id;
       await updateQuest({
         quest_id: quest.id,
         action_metas: buildActionMetasPayload(),
@@ -635,6 +639,14 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           return;
         }
         notifyError(`Failed to ${mode} quest!`);
+
+        // delete the invalid created quest
+        if (createQuestIdRef.current) {
+          await deleteQuest({
+            quest_id: createQuestIdRef.current,
+          }).catch(console.error);
+          createQuestIdRef.current = undefined;
+        }
       }
     };
     const questStartHoursDiffFromNow = moment(values.start_date).diff(
