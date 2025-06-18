@@ -1,0 +1,28 @@
+// Font families
+$font-family-neue-haas-unica: NeueHaasUnica, 'Segoe UI', sans-serif,
+  'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+
+$font-family-silka: Silka, sans-serif;
+$font-family-monospace: 'DM Mono', monospace;
+$font-family-roboto: 'Roboto', sans-serif;
+$font-family-MDNichrome: 'MDNichrome';
+$font-family-MDNichromeRegular: 'MDNichromeRegular';
+
+$fonts: NeueHaasUnica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
+  'Segoe UI Emoji', 'Segoe UI Symbol';
+
+$monospace-fonts:
+  SF Mono,
+  Menlo,
+  Monaco,
+  'Lucida Sans Typewriter',
+  'Courier New',
+  Courier,
+  monospace;
+
+// Layout variables
+$sidebar-width: 238px;
+$quick-switcher-width: 56px;
+$global-header-height: 56px;
+$global-sidebar-header-height: 49px;
+$sidebar-community-header-height: 56px;

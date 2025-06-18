@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/media_queries';
 
 .FiltersDrawer {
   .filter-content {
@@ -9,7 +10,7 @@
   }
 
   .Drawer.filter-drawer {
-    @include extraSmall {
+    @include media_queries.extraSmall {
       top: 48px !important;
 
       .content-container {
@@ -20,7 +21,7 @@
     .content-container {
       padding: 20px 32px;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         padding: 0 16px;
       }
 

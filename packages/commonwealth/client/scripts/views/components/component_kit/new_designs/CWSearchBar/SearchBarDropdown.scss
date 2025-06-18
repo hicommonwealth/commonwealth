@@ -1,5 +1,7 @@
-@import '../../../../../styles/shared';
-@import './CWSearchBar.scss';
+@use '../../../../../styles/shared';
+@use 'CWSearchBar.scss';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .SearchBarDropdown {
   position: absolute;
@@ -14,12 +16,12 @@
   overflow: auto;
   outline: 0;
   z-index: 999;
-  background-color: $white;
-  border: 1px solid $neutral-200;
-  color: $neutral-900;
-  box-shadow: 0 4px 30px $neutral-200;
+  background-color: colors.$white;
+  border: 1px solid colors.$neutral-200;
+  color: colors.$neutral-900;
+  box-shadow: 0 4px 30px colors.$neutral-200;
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     box-shadow: none;
     border: none;
     max-height: calc(100dvh - 56px);
@@ -42,7 +44,7 @@
         margin-bottom: 8px;
 
         .section-header-text.Text {
-          color: $neutral-500;
+          color: colors.$neutral-500;
         }
       }
     }

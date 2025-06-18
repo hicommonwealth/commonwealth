@@ -1,4 +1,7 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
+
 .OptionalWalletModal {
   display: flex;
   gap: 1rem;
@@ -11,7 +14,7 @@
     margin: auto;
     width: 227px;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       width: 175px;
     }
   }
@@ -36,11 +39,11 @@
       .primary {
         padding-left: 2rem;
         padding-right: 2rem;
-        border: 1px solid $primary-600;
+        border: 1px solid colors.$primary-600;
         background-color: transparent !important;
 
         .button-text {
-          color: $primary-600 !important;
+          color: colors.$primary-600 !important;
         }
       }
     }
@@ -56,8 +59,8 @@
       .primary {
         padding-left: 2rem;
         padding-right: 2rem;
-        border: 1px solid $primary-600;
-        background-color: $primary-600;
+        border: 1px solid colors.$primary-600;
+        background-color: colors.$primary-600;
         .button-text {
           color: white !important;
         }

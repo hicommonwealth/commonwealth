@@ -1,4 +1,6 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
 
 .CWImageInput {
   display: flex;
@@ -16,9 +18,9 @@
     height: 100%;
     width: 100%;
     padding: 16px;
-    background-color: $neutral-25;
-    border: 1px solid $neutral-200;
-    border-radius: $border-radius-corners;
+    background-color: colors.$neutral-25;
+    border: 1px solid colors.$neutral-200;
+    border-radius: border_radius.$border-radius-corners;
     position: relative;
     cursor: pointer;
     min-height: 175px;
@@ -35,16 +37,16 @@
       cursor: not-allowed;
 
       .Text {
-        color: $neutral-400;
+        color: colors.$neutral-400;
       }
 
       .Icon {
-        color: $neutral-300;
+        color: colors.$neutral-300;
       }
     }
 
     &.hovered {
-      border: 1px solid $primary-500;
+      border: 1px solid colors.$primary-500;
     }
 
     .file-input {
@@ -65,7 +67,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      border-radius: $border-radius-corners;
+      border-radius: border_radius.$border-radius-corners;
     }
 
     .img-repeat {
@@ -75,14 +77,14 @@
       position: absolute;
       top: 0;
       left: 0;
-      border-radius: $border-radius-corners;
+      border-radius: border_radius.$border-radius-corners;
       background-repeat: repeat;
       background-position: 0px 0px;
       background-size: 150px 100px;
     }
 
     .gray {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
 
     .btn-focus-styles {
@@ -126,7 +128,7 @@
       top: 0;
       background: rgba(255, 255, 255, 0.5);
       backdrop-filter: blur(5px);
-      border-radius: $border-radius-corners;
+      border-radius: border_radius.$border-radius-corners;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -161,7 +163,7 @@
 
     &.formError {
       margin-bottom: 24px;
-      border-color: $rorange-500;
+      border-color: colors.$rorange-500;
     }
 
     .form-validation-error {
@@ -180,7 +182,7 @@
     margin-top: 8px;
 
     .cover-image-title {
-      color: $neutral-700 !important;
+      color: colors.$neutral-700 !important;
       padding-bottom: 8px;
     }
   }

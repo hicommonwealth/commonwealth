@@ -1,4 +1,6 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
+@use '../../../../../../styles/mixins/media_queries';
 
 @mixin topicRowStyles {
   align-items: center;
@@ -6,7 +8,7 @@
   display: flex;
   justify-content: space-between;
   padding: 8px;
-  background-color: $white;
+  background-color: colors.$white;
 }
 
 .ManageTopicsSection {
@@ -37,7 +39,7 @@
       flex-direction: column;
       gap: 8px;
 
-      @include visibleScrollbar(light);
+      @include shared.visibleScrollbar(light);
 
       .header {
         display: flex;
@@ -50,7 +52,7 @@
         @include topicRowStyles;
 
         &:hover {
-          background-color: $neutral-50;
+          background-color: colors.$neutral-50;
         }
 
         .CWIconButton {
@@ -66,7 +68,7 @@
     gap: 24px;
   }
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     .actions {
       flex-direction: column;
       align-items: center;

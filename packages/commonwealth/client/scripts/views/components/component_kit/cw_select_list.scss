@@ -1,5 +1,6 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/inputs';
 
 .SelectList {
-  @include inputStyles;
+  @include inputs.inputStyles;
 }

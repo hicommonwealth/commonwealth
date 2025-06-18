@@ -1,4 +1,6 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 @mixin rowTopTextStyles {
   display: inline-block;
@@ -8,12 +10,12 @@
   }
 
   span {
-    color: $neutral-500;
+    color: colors.$neutral-500;
     margin-right: 4px;
   }
 
   a {
-    color: $neutral-800;
+    color: colors.$neutral-800;
     font-weight: 600;
     margin-right: 4px;
 
@@ -24,18 +26,18 @@
 }
 
 @mixin userDashboardRowStyles {
-  border-bottom: 1px solid $neutral-100;
+  border-bottom: 1px solid colors.$neutral-100;
   display: flex;
   gap: 16px;
   padding: 16px;
   width: 768px;
 
-  @include mediumSmallInclusive {
+  @include media_queries.mediumSmallInclusive {
     width: 100%;
   }
 
   &:hover {
-    background: $neutral-50;
+    background: colors.$neutral-50;
   }
 }
 
@@ -47,7 +49,7 @@
   color: unset !important;
   text-decoration: none;
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     padding: 16px 0 16px 0;
     overflow: auto;
   }

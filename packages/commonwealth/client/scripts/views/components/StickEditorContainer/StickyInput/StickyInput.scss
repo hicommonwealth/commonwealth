@@ -1,13 +1,14 @@
-@import '../../../../styles/shared.scss';
-@import '../../../../styles/mixins/colors.module.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module.scss';
+@use '../../../../styles/mixins/media_queries';
 
 .StickyInput {
   display: flex;
   flex-direction: column;
-  background-color: $white;
+  background-color: colors.$white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  border: 1px solid $neutral-200;
+  border: 1px solid colors.$neutral-200;
   padding: 12px;
   width: 100%;
   max-width: 100%;
@@ -15,7 +16,7 @@
   min-width: 280px;
   position: relative;
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     .input-row {
       gap: 6px;
 
@@ -51,8 +52,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: $primary-500;
-    color: $white;
+    background-color: colors.$primary-500;
+    color: colors.$white;
     border: none;
     border-radius: 50%;
     width: 38px;
@@ -65,37 +66,37 @@
     padding: 0;
 
     &:hover {
-      background-color: $primary-600;
+      background-color: colors.$primary-600;
     }
 
     &:disabled {
-      background-color: $primary-200;
+      background-color: colors.$primary-200;
       cursor: not-allowed;
     }
 
     &.active {
-      background-color: $primary-500;
+      background-color: colors.$primary-500;
 
       &:hover {
-        background-color: $primary-600;
+        background-color: colors.$primary-600;
       }
     }
 
     &.inactive {
-      background-color: $white;
-      border: 1px solid $neutral-200;
+      background-color: colors.$white;
+      border: 1px solid colors.$neutral-200;
 
       &:hover {
-        background-color: $neutral-50;
+        background-color: colors.$neutral-50;
       }
 
       svg {
-        color: $neutral-500;
+        color: colors.$neutral-500;
       }
     }
 
     svg {
-      color: $white;
+      color: colors.$white;
     }
   }
 
@@ -103,8 +104,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: $primary-500;
-    color: $white;
+    background-color: colors.$primary-500;
+    color: colors.$white;
     border: none;
     border-radius: 50%;
     width: 38px;
@@ -117,37 +118,37 @@
     padding: 0;
 
     &:hover {
-      background-color: $primary-600;
+      background-color: colors.$primary-600;
     }
 
     &:disabled {
-      background-color: $primary-200;
+      background-color: colors.$primary-200;
       cursor: not-allowed;
     }
 
     &.active {
-      background-color: $primary-500;
+      background-color: colors.$primary-500;
 
       &:hover {
-        background-color: $primary-600;
+        background-color: colors.$primary-600;
       }
     }
 
     &.inactive {
-      background-color: $white;
-      border: 1px solid $neutral-200;
+      background-color: colors.$white;
+      border: 1px solid colors.$neutral-200;
 
       &:hover {
-        background-color: $neutral-50;
+        background-color: colors.$neutral-50;
       }
 
       svg {
-        color: $neutral-500;
+        color: colors.$neutral-500;
       }
     }
 
     svg {
-      color: $white;
+      color: colors.$white;
     }
   }
 
@@ -158,8 +159,8 @@
       position: absolute;
       top: -4px;
       right: -4px;
-      background-color: $primary-700;
-      color: $white;
+      background-color: colors.$primary-700;
+      color: colors.$white;
       border-radius: 50%;
       width: 16px;
       height: 16px;
@@ -168,7 +169,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      border: 1px solid $white;
+      border: 1px solid colors.$white;
       line-height: 1;
     }
   }
@@ -231,7 +232,7 @@
       bottom: 0;
       display: flex;
       flex-direction: column;
-      background-color: $white;
+      background-color: colors.$white;
       z-index: 1100;
       padding: 16px;
 
@@ -289,8 +290,8 @@
     }
 
     .action-pill {
-      background-color: $neutral-50;
-      color: $neutral-800;
+      background-color: colors.$neutral-50;
+      color: colors.$neutral-800;
       font-size: 13px;
       cursor: pointer;
 
@@ -331,7 +332,7 @@
           .ql-container {
             min-height: unset !important;
             max-height: 76px !important;
-            font-family: $font-family-neue-haas-unica;
+            font-family: shared.$font-family-neue-haas-unica;
 
             .ql-editor {
               min-height: unset !important;
@@ -357,7 +358,7 @@
     align-items: center;
     gap: 4px;
     cursor: pointer;
-    background-color: $neutral-100;
+    background-color: colors.$neutral-100;
     width: fit-content;
     padding: 2px 4px;
     border-radius: 6px;
@@ -390,7 +391,7 @@
   .NewThreadForm,
   .CommentEditor {
     width: 100%;
-    background: $white;
+    background: colors.$white;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);

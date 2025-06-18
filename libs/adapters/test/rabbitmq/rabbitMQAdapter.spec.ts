@@ -73,6 +73,7 @@ describe('RabbitMQ', () => {
   describe('Before initialization', () => {
     test('Should fail to publish messages if not initialized', async () => {
       const res = await rmqAdapter.publish({
+        id: 0,
         name: eventName,
         payload: {
           id: 'testing',
@@ -102,6 +103,7 @@ describe('RabbitMQ', () => {
 
     test('should publish a valid event and return true', async () => {
       const res = await rmqAdapter.publish({
+        id: 0,
         name: eventName,
         payload: {
           id: idInput,
@@ -140,6 +142,7 @@ describe('RabbitMQ', () => {
         const subRes = await rmqAdapter.subscribe(Snapshot);
         expect(subRes).to.be.true;
         const pubRes = await rmqAdapter.publish({
+          id: 0,
           name: eventName,
           payload: {
             id: idInput,
@@ -172,6 +175,7 @@ describe('RabbitMQ', () => {
         );
         expect(subRes).to.be.true;
         const pubRes1 = await rmqAdapter.publish({
+          id: 0,
           name: eventName,
           payload: {
             id: 1,
@@ -182,6 +186,7 @@ describe('RabbitMQ', () => {
         expect(retryExecuted).to.be.true;
         expect(shouldNotExecute).to.be.true;
         const pubRes = await rmqAdapter.publish({
+          id: 0,
           name: eventName,
           payload: {
             id: '1',

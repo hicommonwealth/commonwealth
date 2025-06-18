@@ -1,12 +1,14 @@
-@import '../../../../../styles/shared';
-@import './CWSearchBar.scss';
+@use '../../../../../styles/shared';
+@use 'CWSearchBar.scss';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/text';
 
 .SearchBarThreadPreviewRow {
   display: flex;
   flex-direction: column;
   gap: 4px;
 
-  @include everyRowStyles;
+  @include CWSearchBar.everyRowStyles;
 
   .header-row {
     align-items: center;
@@ -22,14 +24,14 @@
       }
 
       .username {
-        @include caption;
+        @include text.caption;
 
         font-weight: 500;
       }
     }
 
     .last-updated-text.Text {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 
@@ -40,7 +42,7 @@
   }
 
   .excerpt-text.Text {
-    color: $neutral-600;
+    color: colors.$neutral-600;
   }
 }
 

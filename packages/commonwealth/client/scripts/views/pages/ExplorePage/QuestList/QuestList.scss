@@ -1,4 +1,6 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .QuestList {
   margin: 16px 0;
@@ -12,15 +14,15 @@
     margin: 16px 0;
     grid-template-columns: 1fr 1fr 1fr 1fr !important;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       grid-template-columns: 1fr !important;
     }
 
-    @include small {
+    @include media_queries.small {
       grid-template-columns: 1fr 1fr !important;
     }
 
-    @include mediumSmall {
+    @include media_queries.mediumSmall {
       grid-template-columns: 1fr 1fr 1fr !important;
     }
   }
@@ -46,7 +48,7 @@
     }
   }
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     gap: 12px;
   }
 
@@ -55,7 +57,7 @@
   }
 
   .tag-filter {
-    border: 1px solid $black !important;
+    border: 1px solid colors.$black !important;
     min-width: 180px;
     max-width: 180px;
   }

@@ -5,6 +5,8 @@ import useGetERC20BalanceQuery from './getERC20Balance';
 import { useGetLaunchpadTradesQuery } from './getLaunchpadTrades';
 import useTokenBalanceQuery from './getTokenBalance';
 import useGetTokenByCommunityId from './getTokenByCommunityId';
+import useGetTokenByThreadId from './getTokenByThreadId';
+import useGetTokenizedThreadsAllowedQuery from './getTokenizedThreadsAllowed';
 import useTokenMetadataQuery from './getTokenMetadata';
 import useTokensMetadataQuery from './getTokensMetadata';
 import { useGetTokenStatsQuery } from './getTokenStats';
@@ -17,6 +19,8 @@ export {
   useGetLaunchpadTradesQuery,
   useGetTokenByCommunityId,
   useGetTokenStatsQuery,
+  useGetTokenByThreadId,
+  useGetTokenizedThreadsAllowedQuery,
   useTokenBalanceQuery,
   useTokenMetadataQuery,
   useTokensMetadataQuery,

@@ -18,6 +18,7 @@ export const actionCopies = {
     ['XpChainEventCreated']: 'Engage on Blockchain',
     ['LaunchpadTokenRecordCreated']: 'Launch a Token on Common',
     ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
+    ['ContestEnded']: 'Engage on a Contest till completion',
     ['CommunityGoalReached']: 'Complete the community goal',
     ['RecurringContestManagerDeployed']: 'Create a Recurring Contest',
   },
@@ -39,6 +40,7 @@ export const actionCopies = {
     ['XpChainEventCreated']: () => '',
     ['LaunchpadTokenRecordCreated']: () => '',
     ['LaunchpadTokenTraded']: () => '',
+    ['ContestEnded']: '',
     ['CommunityGoalReached']: () => '',
     ['RecurringContestManagerDeployed']: '',
   },
@@ -52,7 +54,19 @@ export const actionCopies = {
     ['CommentCreated']: () => '',
     ['CommentUpvoted']: () => '',
     ['WalletLinked']: () => '',
-    ['SSOLinked']: () => '',
+    ['SSOLinked']: (ssoType?: string) =>
+      ssoType ? (
+        <div>
+          <ul>
+            <li>
+              ● Link <span className="capitalize">{ssoType}</span> SSO to your
+              account.
+            </li>
+          </ul>
+        </div>
+      ) : (
+        ''
+      ),
     ['TweetEngagement']: (likes: number, retweets: number, replies: number) => (
       <div>
         <ul>
@@ -160,6 +174,16 @@ export const actionCopies = {
         </ul>
       </div>
     ),
+    // eslint-disable-next-line react/no-multi-comp
+    ['ContestEnded']: () => (
+      <div>
+        <ul>
+          <li>● Contest must be funded with a prize pool</li>
+          <li>● Aura is awarded when the contest is successfully deployed</li>
+          <li>● Only the contest creator receives Aura for this action</li>
+        </ul>
+      </div>
+    ),
   },
   shares: {
     ['SignUpFlowCompleted']: '',
@@ -178,6 +202,7 @@ export const actionCopies = {
     ['XpChainEventCreated']: '',
     ['LaunchpadTokenRecordCreated']: '',
     ['LaunchpadTokenTraded']: '',
+    ['ContestEnded']: '',
     ['CommunityGoalReached']: '',
     ['RecurringContestManagerDeployed']: '',
   },
