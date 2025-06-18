@@ -254,13 +254,13 @@
   margin-bottom: 8px;
   padding: 8px 12px;
   border-radius: 4px;
-  background-color: $neutral-50;
+  background-color: colors.$neutral-50;
 
   .tokenized-enabled {
-    color: $green-500;
+    color: colors.$green-500;
   }
 
   .tokenized-disabled {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 }
