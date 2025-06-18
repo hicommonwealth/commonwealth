@@ -97,7 +97,7 @@
   }
 
   .user-stats {
-    border-top: 1px solid $neutral-200;
+    border-top: 1px solid colors.$neutral-200;
 
     .stats-container {
       display: flex;
@@ -112,12 +112,12 @@
         text-align: center;
 
         .stat-value {
-          color: $neutral-800;
+          color: colors.$neutral-800;
           font-weight: 600;
         }
 
         .stat-label {
-          color: $neutral-500;
+          color: colors.$neutral-500;
           margin-top: 4px;
         }
       }
@@ -139,9 +139,9 @@
         border-radius: 50%;
         object-fit: cover;
         margin-left: -10px;
-        border: 2px solid $white;
-        box-shadow: 0 0 0 1px $neutral-100;
-        background: $white;
+        border: 2px solid colors.$white;
+        box-shadow: 0 0 0 1px colors.$neutral-100;
+        background: colors.$white;
 
         &:first-child {
           margin-left: 0;
