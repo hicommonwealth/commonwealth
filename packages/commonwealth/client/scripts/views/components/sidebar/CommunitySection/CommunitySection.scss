@@ -1,16 +1,18 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .community-menu {
-  background-color: $neutral-25;
+  background-color: colors.$neutral-25;
   display: flex;
   flex-direction: column;
   height: auto;
-  min-width: $sidebar-width;
+  min-width: shared.$sidebar-width;
   overflow-y: auto;
-  width: $sidebar-width;
+  width: shared.$sidebar-width;
 
-  @include isWindowSmallToMediumInclusive {
-    width: calc(100vw - $quick-switcher-width);
+  @include media_queries.isWindowSmallToMediumInclusive {
+    width: calc(100vw - shared.$quick-switcher-width);
   }
 
   .home-button {
@@ -20,11 +22,11 @@
     cursor: pointer;
 
     &:hover {
-      background-color: $primary-50;
+      background-color: colors.$primary-50;
     }
 
     &.active {
-      background-color: $primary-100;
+      background-color: colors.$primary-100;
     }
 
     svg {

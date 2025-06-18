@@ -1,4 +1,5 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/media_queries';
 
 $growl-outside-bottom-padding: 16px;
 $growl-outside-left-padding: 16px;
@@ -9,7 +10,9 @@ $growl-outside-right-padding: 32px; // accounts for scrollbar width
   display: flex;
   position: fixed;
   max-width: 400px;
-  @include smallInclusive {
+  z-index: 1001;
+
+  @include media_queries.smallInclusive {
     max-width: 320px;
     max-height: 100%;
   }
@@ -33,6 +36,4 @@ $growl-outside-right-padding: 32px; // accounts for scrollbar width
     padding: 0;
     width: 300px;
   }
-
-  z-index: 1001;
 }

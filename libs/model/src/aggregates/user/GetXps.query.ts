@@ -81,7 +81,14 @@ export function GetXps(): Query<typeof schemas.GetXps> {
             quest_id: quest_action_meta!.quest_id,
             quest_action_meta_id: quest_action_meta!.id!,
             event_name: quest_action_meta!.event_name,
+            reward_amount: quest_action_meta!.reward_amount,
             creator_profile: creator?.profile,
+            is_creator: user_or_creator_id === rest.creator_user_id,
+            is_referral: [
+              'SignUpFlowCompleted',
+              'CommunityCreated',
+              'CommunityJoined',
+            ].includes(quest_action_meta!.event_name),
           };
         })
         .filter((x) => x.quest_id);

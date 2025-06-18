@@ -1,11 +1,12 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .VoteListing {
   display: flex;
   flex-direction: column;
 
   .no-votes.Text {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 
   .vote {

@@ -1,4 +1,5 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .spinner-container {
   margin: auto;
@@ -31,6 +32,6 @@
   }
 
   .no-proposals-text.Text {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 }

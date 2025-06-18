@@ -1,4 +1,5 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
 
 .container {
   display: flex;
@@ -13,19 +14,19 @@
     width: 16px;
     height: 16px;
     cursor: pointer;
-    accent-color: $neutral-400;
+    accent-color: colors.$neutral-400;
     z-index: 1;
 
     &:hover {
-      accent-color: $primary-600;
+      accent-color: colors.$primary-600;
     }
 
     &:checked {
-      accent-color: $primary-500;
+      accent-color: colors.$primary-500;
     }
 
     &:checked:hover {
-      accent-color: $primary-600;
+      accent-color: colors.$primary-600;
     }
   }
 

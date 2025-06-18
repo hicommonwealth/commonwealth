@@ -1,4 +1,6 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .communities-count {
   padding: 12px 0;
@@ -27,7 +29,7 @@
     }
   }
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     gap: 12px;
   }
 
@@ -36,7 +38,7 @@
   }
 
   .tag-filter {
-    border: 1px solid $black !important;
+    border: 1px solid colors.$black !important;
     min-width: 180px;
     max-width: 180px;
   }

@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/table';
 
 .MembersSection {
   display: flex;
@@ -10,7 +12,7 @@
 
   table {
     width: 100%;
-    @include table-cell;
+    @include table.table-cell;
 
     .table-cell {
       display: flex;
@@ -20,7 +22,7 @@
 
     .Button.secondary {
       .Text.button-text {
-        color: $rorange-400;
+        color: colors.$rorange-400;
       }
     }
   }
@@ -30,7 +32,7 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 4px;
-    background-color: $neutral-200;
+    background-color: colors.$neutral-200;
     border-radius: 5px;
     padding: 2px 8px 2px 8px;
   }

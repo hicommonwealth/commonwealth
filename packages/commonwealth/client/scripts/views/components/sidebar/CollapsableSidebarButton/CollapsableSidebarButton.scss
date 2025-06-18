@@ -1,8 +1,9 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .CollapsableSidebarButton {
   svg {
-    fill: $neutral-500;
+    fill: colors.$neutral-500;
   }
 
   &.onMobile {

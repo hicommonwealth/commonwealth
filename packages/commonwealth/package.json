@@ -142,7 +142,7 @@
     "@openfeature/react-sdk": "^0.1.1-experimental",
     "@openfeature/server-sdk": "^1.11.0",
     "@osmonauts/lcd": "^0.10.0",
-    "@phosphor-icons/react": "^2.0.8",
+    "@phosphor-icons/react": "^2.1.10",
     "@polkadot/extension-dapp": "0.40.3",
     "@polkadot/extension-inject": "0.47.4",
     "@polkadot/util": "12.6.2",

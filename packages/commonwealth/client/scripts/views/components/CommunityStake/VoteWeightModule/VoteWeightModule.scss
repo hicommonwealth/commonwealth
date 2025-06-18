@@ -1,8 +1,9 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
 
 .VoteWeightModule {
   padding: 16px 24px;
-  border-bottom: 1px solid $neutral-200;
+  border-bottom: 1px solid colors.$neutral-200;
 
   .content {
     display: flex;
@@ -14,12 +15,12 @@
       justify-content: space-between;
 
       .Text {
-        color: $neutral-400;
+        color: colors.$neutral-400;
       }
     }
 
     .vote-weight {
-      color: $neutral-800;
+      color: colors.$neutral-800;
     }
 
     .info-and-actions {
@@ -29,13 +30,13 @@
 
       .info {
         .stake-num {
-          color: $neutral-800;
+          color: colors.$neutral-800;
         }
 
         .stake-value {
           display: flex;
           align-items: center;
-          color: $neutral-400;
+          color: colors.$neutral-400;
         }
 
         .denominationIcon {

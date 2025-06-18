@@ -1,4 +1,6 @@
-@import '../../../../../../styles/shared.scss';
+@use '../../../../../../styles/shared.scss';
+@use '../../../../../../styles/mixins/colors.module';
+@use '../../../../../../styles/mixins/media_queries';
 
 .JoinCommunityCard {
   display: flex;
@@ -7,10 +9,10 @@
   padding: 16px;
   gap: 16px;
   border-radius: 6px;
-  border: 1px solid $neutral-200;
+  border: 1px solid colors.$neutral-200;
   width: 100%;
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     padding: 8px 16px;
     gap: 8px;
   }
@@ -30,18 +32,18 @@
       align-items: center;
       gap: 8px;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         gap: 4px;
       }
 
       .b2 {
-        color: $neutral-500;
+        color: colors.$neutral-500;
       }
 
       .dot {
         height: fit-content;
         line-height: 5px;
-        color: $neutral-500;
+        color: colors.$neutral-500;
       }
     }
   }
@@ -49,7 +51,7 @@
   .join-btn {
     margin-left: auto;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       margin-top: -8px;
       margin-left: 32px;
       margin-right: auto;

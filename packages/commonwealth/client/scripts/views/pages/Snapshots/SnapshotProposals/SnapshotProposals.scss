@@ -1,4 +1,5 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .SnapshotProposals {
   display: flex;
@@ -20,6 +21,6 @@
   }
 
   .no-proposals-text.Text {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 }

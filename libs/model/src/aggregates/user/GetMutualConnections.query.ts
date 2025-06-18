@@ -18,7 +18,9 @@ export function GetMutualConnections(): Query<
         limit,
       } = payload;
 
-      const mutualCommunities = await models.sequelize.query(
+      const mutual_communities = await models.sequelize.query<
+        z.infer<typeof schemas.MutualCommunityView>
+      >(
         `SELECT c.id, c.name, c.base, c.icon_url
          FROM "Communities" c
          WHERE c.id IN (
@@ -37,12 +39,8 @@ export function GetMutualConnections(): Query<
         },
       );
 
-      type MutualConnectionsType = z.infer<
-        typeof schemas.GetMutualConnections.output
-      >;
       return {
-        mutual_communities:
-          mutualCommunities as unknown as MutualConnectionsType['mutual_communities'],
+        mutual_communities,
       };
     },
   };

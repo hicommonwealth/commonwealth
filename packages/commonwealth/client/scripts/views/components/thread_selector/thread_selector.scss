@@ -1,8 +1,10 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
 
 .ThreadSelector {
-  border-radius: $border-radius-corners;
-  border: 1px solid $neutral-100;
+  border-radius: border_radius.$border-radius-corners;
+  border: 1px solid colors.$neutral-100;
 
   .QueryList {
     height: 200px;
@@ -22,7 +24,7 @@
       cursor: pointer;
 
       &:hover {
-        background-color: $neutral-100;
+        background-color: colors.$neutral-100;
       }
 
       .selected {
@@ -32,7 +34,7 @@
         align-items: center;
 
         svg {
-          fill: $black;
+          fill: colors.$black;
           width: 18px;
         }
       }

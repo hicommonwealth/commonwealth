@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .ProfileActivityRow {
   display: flex;
@@ -10,23 +12,23 @@
   flex-direction: column;
   border-bottom: 1px solid #dddddd;
   padding: 16px 60px 16px 60px;
-  @include extraSmall {
+  @include media_queries.extraSmall {
     padding: 10px 30px 0px 30px;
   }
   .AuthorAndPublishInfo {
     flex-wrap: nowrap;
     .community-user-info a {
-      color: $black;
+      color: colors.$black;
     }
   }
 
   &:hover {
-    background: $neutral-50;
+    background: colors.$neutral-50;
     text-decoration: none;
     color: unset;
   }
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     min-height: 150px;
     max-height: 250px;
     padding-bottom: 10px;
@@ -36,7 +38,7 @@
     justify-content: space-between;
     align-items: center;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       margin-bottom: 2px;
       flex-wrap: wrap;
     }
@@ -44,8 +46,8 @@
     .created_at {
       margin-bottom: 10px;
       min-width: fit-content;
-      color: $neutral-500;
-      @include extraSmall {
+      color: colors.$neutral-500;
+      @include media_queries.extraSmall {
         margin-bottom: 0px;
         font-size: 12px !important;
       }
@@ -57,25 +59,25 @@
       margin-bottom: 5px;
       max-width: 90%;
 
-      @include isWindowSmallToMediumInclusive {
+      @include media_queries.isWindowSmallToMediumInclusive {
         max-width: 85% !important;
       }
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         margin-bottom: 0px;
         max-width: 100%;
       }
       .address.Text {
-        color: $neutral-900;
+        color: colors.$neutral-900;
       }
       .Text {
         font-size: 18px;
         font-weight: 400;
         line-height: 18px;
-        color: $neutral-700;
+        color: colors.$neutral-700;
         word-spacing: 0.1cap;
 
-        @include extraSmall {
+        @include media_queries.extraSmall {
           font-size: 14px !important;
           line-height: 14px !important;
           word-spacing: 0cap !important;
@@ -87,7 +89,7 @@
         font-weight: 500;
         line-height: 20px;
         align-self: flex-start;
-        color: $neutral-800 !important;
+        color: colors.$neutral-800 !important;
       }
 
       span {
@@ -125,7 +127,7 @@
 
     .date {
       .Text {
-        color: $neutral-500;
+        color: colors.$neutral-500;
       }
     }
 
@@ -134,7 +136,7 @@
       display: flex;
       font-weight: 600;
       align-items: center;
-      color: $neutral-500;
+      color: colors.$neutral-500;
       padding-bottom: 8px;
       justify-content: center;
     }
@@ -143,12 +145,12 @@
   .gray-text {
     width: 100%;
     font-size: 18px;
-    color: $neutral-600;
+    color: colors.$neutral-600;
   }
 
   .link a {
     cursor: pointer;
-    color: $neutral-800;
+    color: colors.$neutral-800;
   }
 
   .title {
@@ -158,16 +160,16 @@
     font-weight: 400;
     line-height: 18px;
     .gray_text {
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
-    @include extraSmall {
+    @include media_queries.extraSmall {
       font-size: 13px !important;
       line-height: 13px !important;
       word-spacing: 0cap !important;
     }
 
     a {
-      color: $neutral-800 !important;
+      color: colors.$neutral-800 !important;
     }
 
     span {
@@ -184,17 +186,17 @@
     justify-content: space-between;
     height: fit-content;
     max-height: 80px;
-    @include extraSmall {
+    @include media_queries.extraSmall {
       overflow: hidden;
     }
     .MarkdownFormattedText {
-      @include extraSmall {
+      @include media_queries.extraSmall {
         padding-top: 0px !important;
       }
 
       div {
         overflow: hidden;
-        @include extraSmall {
+        @include media_queries.extraSmall {
           display: flex;
           overflow: hidden;
         }
@@ -202,7 +204,7 @@
 
       width: 90%;
       height: 100%;
-      @include extraSmall {
+      @include media_queries.extraSmall {
         height: auto;
         width: auto;
       }
@@ -214,19 +216,19 @@
         font-weight: 400;
         font-size: 21px !important;
         line-height: 21px !important;
-        font-family: $font-family-neue-haas-unica;
+        font-family: shared.$font-family-neue-haas-unica;
 
-        @include extraSmall {
+        @include media_queries.extraSmall {
           font-size: 14px !important;
           line-height: 20px !important;
         }
       }
 
       p {
-        color: $neutral-700;
+        color: colors.$neutral-700;
       }
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         font-size: 14px !important;
         line-height: 14px !important;
       }

@@ -1,4 +1,7 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/elevation';
 
 .MuiModal-root {
   position: fixed;
@@ -25,9 +28,9 @@
 $modal-padding: 16px;
 
 .CWModal {
-  background: $white;
-  border-radius: $border-radius-corners;
-  box-shadow: $elevation-3;
+  background: colors.$white;
+  border-radius: border_radius.$border-radius-corners;
+  box-shadow: elevation.$elevation-3;
   min-height: 168px;
   max-height: 84vh;
   max-width: 100vw;

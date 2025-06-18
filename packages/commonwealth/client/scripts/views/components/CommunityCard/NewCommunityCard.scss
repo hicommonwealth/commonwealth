@@ -1,10 +1,11 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/media_queries';
 
 .new-community-card.Card {
   height: 336px;
   width: 240px;
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     height: 220px;
     width: 136px;
   }
@@ -20,8 +21,8 @@
       margin-bottom: 48px;
       text-align: center;
 
-      @include smallInclusive {
-        font-family: $font-family-silka;
+      @include media_queries.smallInclusive {
+        font-family: shared.$font-family-silka;
         font-size: 18px;
         line-height: 24px;
         margin-bottom: 8px;
@@ -33,8 +34,8 @@
       margin-bottom: 48px;
       text-align: center;
 
-      @include smallInclusive {
-        font-family: $font-family-neue-haas-unica;
+      @include media_queries.smallInclusive {
+        font-family: shared.$font-family-neue-haas-unica;
         font-size: 12px;
         letter-spacing: 0.02em;
         line-height: 16px;
@@ -42,9 +43,9 @@
       }
     }
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       a.learn-more {
-        font-family: $font-family-neue-haas-unica;
+        font-family: shared.$font-family-neue-haas-unica;
         font-size: 12px;
         letter-spacing: 0.02em;
         line-height: 16px;
