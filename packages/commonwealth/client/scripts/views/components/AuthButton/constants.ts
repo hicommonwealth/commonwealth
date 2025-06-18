@@ -107,8 +107,8 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'Binance Wallet',
     description: {
-      text: 'Ethereum Communities',
-      hasBackground: false,
+      text: '+10 Aura w/ Binance Signup',
+      hasBackground: true,
     },
   },
   polkadot: {
