@@ -1,4 +1,5 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
 
 .CommunityInfo {
   padding: 0;
@@ -29,11 +30,11 @@
     flex-direction: column;
 
     .symbol {
-      color: $neutral-800 !important;
+      color: colors.$neutral-800 !important;
     }
 
     .name {
-      color: $neutral-500 !important;
+      color: colors.$neutral-500 !important;
     }
   }
 }

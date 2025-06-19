@@ -93,7 +93,7 @@ export const AddressView = Address.extend({
   last_active: z.date().or(z.string()).nullish(),
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
-  User: UserView.optional().nullish() as ZodType<UserView | null | undefined>,
+  User: UserView.nullish() as ZodType<UserView | null | undefined>,
 }).omit({
   oauth_email: true,
   oauth_provider: true,

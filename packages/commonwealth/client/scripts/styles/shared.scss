@@ -1,48 +1,17 @@
-@import 'mixins/buttons';
-@import 'mixins/media_queries';
-@import 'mixins/breakpoints.module';
-@import 'mixins/elevation';
-@import 'mixins/colors.module';
-@import 'mixins/border_radius';
-@import 'mixins/choice';
-@import 'mixins/inputs';
-@import 'mixins/icons';
-@import 'mixins/text';
-@import 'mixins/table';
-@import 'utils';
+@use 'mixins/buttons';
+@use 'mixins/media_queries';
+@use 'mixins/breakpoints.module';
+@use 'mixins/elevation';
+@use 'mixins/colors.module';
+@use 'mixins/border_radius';
+@use 'mixins/choice';
+@use 'mixins/inputs';
+@use 'mixins/icons';
+@use 'mixins/text';
+@use 'mixins/table';
+@use 'utils';
 
-// layout & global nav parameters
-
-$sidebar-width: 238px;
-$quick-switcher-width: 56px;
-$global-header-height: 56px;
-$global-sidebar-header-height: 49px;
-$sidebar-community-header-height: 56px;
-
-// base fonts
-
-$fonts: NeueHaasUnica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
-  'Segoe UI Emoji', 'Segoe UI Symbol';
-
-$monospace-fonts:
-  SF Mono,
-  Menlo,
-  Monaco,
-  'Lucida Sans Typewriter',
-  'Courier New',
-  Courier,
-  monospace;
-
-$font-family-silka: Silka, sans-serif;
-
-$font-family-neue-haas-unica: NeueHaasUnica, 'Segoe UI', sans-serif,
-  'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-
-$font-family-monospace: 'DM Mono', monospace;
-$font-family-roboto: 'Roboto', sans-serif;
-
-$font-family-MDNichrome: 'MDNichrome';
-$font-family-MDNichromeRegular: 'MDNichromeRegular';
+@forward 'variables';
 
 @mixin visibleScrollbar($theme) {
   &::-webkit-scrollbar {
@@ -56,23 +25,23 @@ $font-family-MDNichromeRegular: 'MDNichromeRegular';
 
   @if $theme ==light {
     &::-webkit-scrollbar-track {
-      background: $neutral-50;
-      border-radius: $border-radius-corners;
+      background: colors.$neutral-50;
+      border-radius: border_radius.$border-radius-corners;
     }
 
     &::-webkit-scrollbar-thumb {
-      border-radius: $border-radius-corners;
-      background-color: $neutral-200;
+      border-radius: border_radius.$border-radius-corners;
+      background-color: colors.$neutral-200;
     }
   } @else if $theme ==dark {
     &::-webkit-scrollbar-track {
-      background: $neutral-700;
-      border-radius: $border-radius-corners;
+      background: colors.$neutral-700;
+      border-radius: border_radius.$border-radius-corners;
     }
 
     &::-webkit-scrollbar-thumb {
-      border-radius: $border-radius-corners;
-      background-color: $neutral-500;
+      border-radius: border_radius.$border-radius-corners;
+      background-color: colors.$neutral-500;
     }
   }
 }
@@ -80,15 +49,15 @@ $font-family-MDNichromeRegular: 'MDNichromeRegular';
 @mixin contentPadding {
   padding: 56px;
 
-  @include medium {
+  @include media_queries.medium {
     padding: 40px;
   }
 
-  @include mediumSmall {
+  @include media_queries.mediumSmall {
     padding: 32px;
   }
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     padding: 16px;
   }
 }

@@ -3,6 +3,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { MutableRefObject } from 'react';
 import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
 import CWSectionHeader from 'views/components/component_kit/new_designs/CWSectionHeader';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import TrendingThreadList from '../../HomePage/TrendingThreadList/TrendingThreadList';
 import XPTable from '../../Leaderboard/XPTable/XPTable';
 import { TrendingCommunitiesPreview } from '../../user_dashboard/TrendingCommunitiesPreview';
@@ -13,15 +14,29 @@ import './AllTabContent.scss';
 
 interface AllTabContentProps {
   containerRef: MutableRefObject<HTMLElement | undefined>;
+  searchText?: string;
+  onClearSearch?: () => void;
 }
 
-const AllTabContent: React.FC<AllTabContentProps> = ({ containerRef }) => {
+const AllTabContent: React.FC<AllTabContentProps> = ({
+  containerRef,
+  searchText,
+  onClearSearch,
+}) => {
   const launchpadEnabled = useFlag('launchpad');
   const questsEnabled = useFlag('xp');
   const navigate = useCommonNavigate();
 
   return (
-    <>
+    <div className="AllTabContent">
+      {searchText?.trim() && (
+        <CWTag
+          label={`Search: ${searchText?.trim()}`}
+          type="filter"
+          onCloseClick={onClearSearch}
+        />
+      )}
+
       {launchpadEnabled && (
         <div className="section-container">
           <CWSectionHeader
@@ -29,13 +44,24 @@ const AllTabContent: React.FC<AllTabContentProps> = ({ containerRef }) => {
             seeAllText="See all tokens"
             onSeeAllClick={() => navigate('/explore?tab=tokens')}
           />
-          <TokensList hideHeader />
+          <TokensList
+            hideHeader
+            hideFilters
+            hideSeeMore
+            hideSearchTag
+            searchText={searchText}
+            onClearSearch={onClearSearch}
+          />
         </div>
       )}
 
       {/* Communities section */}
       <div className="section-container">
-        <TrendingCommunitiesPreview />
+        <TrendingCommunitiesPreview
+          hideSearchTag
+          searchText={searchText}
+          onClearSearch={onClearSearch}
+        />
       </div>
 
       {/* Quests section */}
@@ -47,7 +73,14 @@ const AllTabContent: React.FC<AllTabContentProps> = ({ containerRef }) => {
             onSeeAllClick={() => navigate('/explore?tab=quests')}
           />
           <div className="horizontal-scroll-container">
-            <QuestList hideHeader hideFilters hideSeeMore />
+            <QuestList
+              hideHeader
+              hideFilters
+              hideSeeMore
+              hideSearchTag
+              searchText={searchText}
+              onClearSearch={onClearSearch}
+            />
           </div>
         </div>
       )}
@@ -60,7 +93,13 @@ const AllTabContent: React.FC<AllTabContentProps> = ({ containerRef }) => {
           onSeeAllClick={() => navigate('/explore?tab=contests')}
         />
         <div className="horizontal-scroll-container">
-          <ExploreContestList hideHeader />
+          <ExploreContestList
+            hideHeader
+            hideFilters
+            hideSearchTag
+            searchText={searchText}
+            onClearSearch={onClearSearch}
+          />
         </div>
       </div>
 
@@ -75,6 +114,9 @@ const AllTabContent: React.FC<AllTabContentProps> = ({ containerRef }) => {
           query={useFetchGlobalActivityQuery}
           customScrollParent={containerRef.current}
           hideHeader
+          hideSearchTag
+          searchText={searchText}
+          onClearSearch={onClearSearch}
         />
       </div>
 
@@ -86,10 +128,14 @@ const AllTabContent: React.FC<AllTabContentProps> = ({ containerRef }) => {
           onSeeAllClick={() => navigate('/explore?tab=users')}
         />
         <div className="users-xp-table">
-          <XPTable />
+          <XPTable
+            hideFilters
+            searchText={searchText}
+            onClearSearch={onClearSearch}
+          />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

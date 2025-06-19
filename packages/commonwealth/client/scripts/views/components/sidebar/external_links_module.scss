@@ -1,4 +1,5 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .ExternalLinksModule {
   display: flex;
@@ -11,37 +12,37 @@
   gap: 16px;
 
   .telegram-link {
-    color: $primary-500;
+    color: colors.$primary-500;
     cursor: pointer;
   }
 
   .tiktok-link {
-    color: $neutral-800;
+    color: colors.$neutral-800;
     cursor: pointer;
   }
 
   .twitter-link {
-    color: $neutral-800;
+    color: colors.$neutral-800;
     cursor: pointer;
   }
 
   .element-link {
-    color: $green-500;
+    color: colors.$green-500;
     cursor: pointer;
   }
 
   .discord-link {
-    color: $purple-300;
+    color: colors.$purple-300;
     cursor: pointer;
   }
 
   .website-link {
-    color: $neutral-800;
+    color: colors.$neutral-800;
     cursor: pointer;
   }
 
   .github-link {
-    color: $neutral-800;
+    color: colors.$neutral-800;
     cursor: pointer;
   }
 }

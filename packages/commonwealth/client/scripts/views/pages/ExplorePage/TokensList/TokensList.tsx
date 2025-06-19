@@ -33,9 +33,21 @@ const TokenWithCommunity = TokenView.extend({
 
 type TokensListProps = {
   hideHeader?: boolean;
+  hideFilters?: boolean;
+  hideSeeMore?: boolean;
+  searchText?: string;
+  onClearSearch?: () => void;
+  hideSearchTag?: boolean;
 };
 
-const TokensList = ({ hideHeader }: TokensListProps) => {
+const TokensList = ({
+  hideHeader,
+  hideFilters,
+  hideSeeMore,
+  searchText,
+  onClearSearch,
+  hideSearchTag,
+}: TokensListProps) => {
   const navigate = useCommonNavigate();
   const launchpadEnabled = useFlag('launchpad');
 
@@ -60,6 +72,7 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
     hasNextPage,
     fetchNextPage,
   } = useFetchTokensQuery({
+    search: searchText?.trim(),
     cursor: 1,
     limit: 8,
     with_stats: true,
@@ -122,47 +135,49 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
   return (
     <div className="TokensList">
       {!hideHeader && <CWText type="h2">Tokens</CWText>}
-      <div
-        className={clsx('filters', {
-          hasAppliedFilter:
-            Object.values(filters).filter(Boolean).length === 1
-              ? !filters.withTokenSortOrder
-              : Object.values(filters).filter(Boolean).length > 0,
-        })}
-      >
-        <CWButton
-          label="Filters"
-          iconRight="funnelSimple"
-          buttonType="secondary"
-          onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
-        />
-        {filters.withTokenSortBy && (
-          <CWTag
-            label={`${filters.withTokenSortBy}${
-              filters.withTokenSortOrder &&
-              filters.withTokenSortBy !== TokenSortOptions.MostRecent
-                ? ` : ${filters.withTokenSortOrder}`
-                : ''
-            }
+      {!hideFilters && (
+        <div className={clsx('filters', 'hasAppliedFilter')}>
+          <CWButton
+            label="Filters"
+            iconRight="funnelSimple"
+            buttonType="secondary"
+            onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
+          />
+          {!hideSearchTag && searchText?.trim() && (
+            <CWTag
+              label={`Search: ${searchText?.trim()}`}
+              type="filter"
+              onCloseClick={onClearSearch}
+            />
+          )}
+          {filters.withTokenSortBy && (
+            <CWTag
+              label={`${filters.withTokenSortBy}${
+                filters.withTokenSortOrder &&
+                filters.withTokenSortBy !== TokenSortOptions.MostRecent
+                  ? ` : ${filters.withTokenSortOrder}`
+                  : ''
+              }
                         `}
-            type="filter"
-            onCloseClick={removeCommunitySortByFilter}
+              type="filter"
+              onCloseClick={removeCommunitySortByFilter}
+            />
+          )}
+          {filters.isGraduated && (
+            <CWTag
+              label="Graduated"
+              type="filter"
+              onCloseClick={removeIsGraduatedFilter}
+            />
+          )}
+          <FiltersDrawer
+            isOpen={isFilterDrawerOpen}
+            onClose={() => setIsFilterDrawerOpen(false)}
+            filters={filters}
+            onFiltersChange={(newFilters) => setFilters(newFilters)}
           />
-        )}
-        {filters.isGraduated && (
-          <CWTag
-            label="Graduated"
-            type="filter"
-            onCloseClick={removeIsGraduatedFilter}
-          />
-        )}
-        <FiltersDrawer
-          isOpen={isFilterDrawerOpen}
-          onClose={() => setIsFilterDrawerOpen(false)}
-          filters={filters}
-          onFiltersChange={(newFilters) => setFilters(newFilters)}
-        />
-      </div>
+        </div>
+      )}
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
@@ -207,12 +222,14 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
           <CWCircleMultiplySpinner />
         </div>
       ) : hasNextPage && tokens.length > 0 ? (
-        <CWButton
-          label="See more"
-          buttonType="tertiary"
-          containerClassName="ml-auto"
-          onClick={handleFetchMoreTokens}
-        />
+        !hideSeeMore && (
+          <CWButton
+            label="See more"
+            buttonType="tertiary"
+            containerClassName="ml-auto"
+            onClick={handleFetchMoreTokens}
+          />
+        )
       ) : (
         <></>
       )}

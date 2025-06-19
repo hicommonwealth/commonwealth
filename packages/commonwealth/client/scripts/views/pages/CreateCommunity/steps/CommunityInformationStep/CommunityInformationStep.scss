@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 $form-width: 596px;
 
@@ -20,11 +22,11 @@ $form-width: 596px;
     width: 100%;
 
     .description {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     flex-direction: column;
     gap: 16px;
 

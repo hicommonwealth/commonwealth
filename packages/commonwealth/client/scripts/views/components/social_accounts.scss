@@ -1,4 +1,5 @@
-@import '../../styles/shared.scss';
+@use '../../styles/shared.scss';
+@use '../../styles/mixins/colors.module';
 
 .SocialAccounts {
   display: flex;
@@ -7,13 +8,13 @@
   flex-wrap: wrap;
 
   .social-icon {
-    fill: $neutral-500;
+    fill: colors.$neutral-500;
     transition: fill 0.2s ease-in-out;
     margin: 0 8px 8px 8px;
     cursor: pointer;
 
     &:hover {
-      fill: $neutral-700;
+      fill: colors.$neutral-700;
     }
   }
 }

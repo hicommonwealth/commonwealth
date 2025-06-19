@@ -1,10 +1,12 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .ExploreCommunitiesSidebar {
   display: flex;
   flex-direction: column;
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     width: 100%;
   }
 
@@ -16,11 +18,11 @@
     width: 100%;
 
     &:hover {
-      background-color: $neutral-100;
+      background-color: colors.$neutral-100;
     }
 
     &.isSelected {
-      background-color: $purple-100;
+      background-color: colors.$purple-100;
     }
 
     .roles-and-star {
@@ -29,14 +31,14 @@
       gap: 8px;
 
       .star-filled::after {
-        color: $yellow-400;
+        color: colors.$yellow-400;
         content: '\2605';
         display: block;
         font-size: 18px;
       }
 
       .star-empty::after {
-        color: $yellow-400;
+        color: colors.$yellow-400;
         content: '\2606';
         display: block;
         font-size: 18px;

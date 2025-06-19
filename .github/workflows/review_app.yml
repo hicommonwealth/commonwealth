@@ -84,16 +84,6 @@ jobs:
         if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/setup-buildx-action@v3
 
-      - name: Copy .env for build
-        if: steps.check_base_image.outputs.exists == 'false'
-        run: |
-          ENV_PATH=./packages/commonwealth/deploy/environments/.env.public.review-apps
-          if [ ! -f "$ENV_PATH" ]; then
-            echo "Error: $ENV_PATH not found"
-            exit 1
-          fi
-          cp "$ENV_PATH" .env
-
       - name: Build and Push commonwealth base image
         if: steps.check_base_image.outputs.exists == 'false'
         uses: docker/build-push-action@v5
