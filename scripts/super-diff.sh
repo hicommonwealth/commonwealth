@@ -1,6 +1,6 @@
 #!/bin/bash
 
-branch="rotorsoft/12486-type-fixes-zodv4" 
+branch="master" 
 for file in $(git diff "$branch" --name-only -- 'libs/**/*.ts'); do
   if [[ -f "$file" ]]; then
     # Normalize content (replace zod/v4 → zod)
