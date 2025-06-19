@@ -46,6 +46,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
 
   const signMessageProvider = useCallback(
     async (message: string): Promise<string> => {
+      console.log('FIXME: waiting for sign message');
       return await signMessage(message);
     },
     [signMessage],
@@ -57,6 +58,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
         if (!window.PRIVY_MOBILE_ENABLED) {
           // only attempt to authenticate when running in the mobile app and
           // privy is enabled.
+          console.log('FIXME2 privy not enabled');
           return false;
         }
 
@@ -67,9 +69,14 @@ export const PrivyMobileAuthenticator = (props: Props) => {
 
         console.log('Getting privy mobile auth status... ');
 
+        console.log('FIXME3 waiting for auth status...');
+
         const privyMobileAuthStatus = await getPrivyMobileAuthStatus({});
 
+        console.log('FIXME3 waiting for auth status...done');
+
         if (!privyMobileAuthStatus.enabled) {
+          console.log('FIXME4 not enabled...');
           return false;
         }
 
@@ -77,11 +84,13 @@ export const PrivyMobileAuthenticator = (props: Props) => {
           !privyMobileAuthStatus.authenticated ||
           !privyMobileAuthStatus.userAuth
         ) {
+          console.log('FIXME5');
           return false;
         }
 
         if (authenticatingRef.current) {
           console.log('Already authenticating...');
+          console.log('FIXME6');
           return false;
         }
 
@@ -93,7 +102,11 @@ export const PrivyMobileAuthenticator = (props: Props) => {
           signMessageProvider,
         );
 
+        console.log('FIXME7');
+
         await webWallet.enable();
+
+        console.log('FIXME8');
 
         const session = await getSessionFromWallet(webWallet, {
           newSession: true,
@@ -123,6 +136,8 @@ export const PrivyMobileAuthenticator = (props: Props) => {
 
         console.log('Attempting to signIn...');
 
+        console.log('FIXME9');
+
         await signIn(session, signInOpts);
 
         console.log('Authenticated successfully.');
@@ -135,6 +150,8 @@ export const PrivyMobileAuthenticator = (props: Props) => {
        */
       async function login(): Promise<boolean> {
         try {
+          console.log('FIXME10');
+
           return await doLogin();
         } catch (err) {
           console.error('Could not perform authentication: ' + err.stack, err);
@@ -144,6 +161,8 @@ export const PrivyMobileAuthenticator = (props: Props) => {
           return false;
         }
       }
+
+      console.log('FIXME11');
 
       const authenticated = await login();
 
@@ -172,7 +191,12 @@ export const PrivyMobileAuthenticator = (props: Props) => {
   ]);
 
   if (!user.isLoggedIn && window.PRIVY_MOBILE_ENABLED) {
-    return <LoadingIndicatorScreen />;
+    return (
+      <>
+        <div>FIXME waiting for privy </div>
+        <LoadingIndicatorScreen />
+      </>
+    );
   }
 
   return children;
