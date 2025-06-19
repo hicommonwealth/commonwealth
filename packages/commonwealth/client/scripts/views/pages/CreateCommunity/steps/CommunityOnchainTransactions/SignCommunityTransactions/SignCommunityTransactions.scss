@@ -1,4 +1,6 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
+@use '../../../../../../styles/mixins/media_queries';
 
 .SignCommunityTransactions {
   display: flex;
@@ -7,7 +9,7 @@
     &.mobile {
       display: none;
 
-      @include smallInclusive {
+      @include media_queries.smallInclusive {
         display: block;
       }
     }
@@ -15,7 +17,7 @@
     &.desktop {
       max-width: 244px;
 
-      @include smallInclusive {
+      @include media_queries.smallInclusive {
         display: none;
       }
     }
@@ -30,12 +32,12 @@
     max-width: 596px;
     margin-right: 110px;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       margin-right: unset;
     }
 
     .description {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
 
     .form {
@@ -49,7 +51,7 @@
 
       a {
         margin-left: 4px;
-        color: $primary-600;
+        color: colors.$primary-600;
       }
     }
 
@@ -67,7 +69,7 @@
     margin-top: 32px;
   }
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     .FeatureHint {
       &.desktop {
         display: none;

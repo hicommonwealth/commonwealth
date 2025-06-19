@@ -21,6 +21,7 @@
     "lint-all": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint './packages/**/*.{ts,tsx}'",
     "lint-branch": "./scripts/lint-branch.sh",
     "lint-branch-warnings": "FAIL_WARNINGS=1 ./scripts/lint-branch.sh",
+    "lint-diff": "chmod u+x scripts/lint-diff-branch.sh && ./scripts/lint-diff-branch.sh",
     "load-db": "pnpm -F commonwealth load-db",
     "migrate-db": "pnpm -F commonwealth migrate-db",
     "prepare": "husky install",
@@ -57,7 +58,7 @@
     "@playwright/test": "^1.43.1",
     "@polkadot/util": "12.6.2",
     "@polkadot/util-crypto": "12.6.2",
-    "@tanstack/eslint-plugin-query": "^4.29.4",
+    "@tanstack/eslint-plugin-query": "^5.78.0",
     "@tharsis/address-converter": "^0.1.8",
     "@types/amqplib": "^0.8.2",
     "@types/bn.js": "^4.11.6",
@@ -134,7 +135,7 @@
     "tsconfig-paths": "^4.2.0",
     "tslint": "^5.13.0",
     "typescript": "^5.8.2",
-    "vite": "^5.4.11",
+    "vite": "^6.3.5",
     "vite-bundle-visualizer": "^1.2.1",
     "vite-plugin-html": "^3.2.2",
     "vite-plugin-node-polyfills": "^0.22.0",
@@ -147,5 +148,10 @@
   },
   "engines": {
     "node": "22.x"
+  },
+  "pnpm": {
+    "overrides": {
+      "ws": "^8.13.0"
+    }
   }
 }

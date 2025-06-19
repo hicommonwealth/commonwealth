@@ -4,9 +4,15 @@ import {
   doesActionAllowCommentId,
   doesActionAllowContentId,
   doesActionAllowRepetition,
+  doesActionAllowSSOType,
   doesActionAllowThreadId,
+  doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
+  doesActionRequireAmountMultipler,
+  doesActionRequireBasicRewardAmount,
+  doesActionRequireChainEvent,
   doesActionRequireDiscordServerId,
+  doesActionRequireGoalConfig,
   doesActionRequireGroupId,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
@@ -143,6 +149,8 @@ const useQuestActionMultiFormsState = ({
 
     const chosenAction = updatedSubForms[index].values.action as QuestAction;
     if (chosenAction) {
+      const requiresBasicPoints =
+        doesActionRequireBasicRewardAmount(chosenAction);
       const requiresCreatorPoints = doesActionRequireRewardShare(chosenAction);
       const allowsContentId = doesActionAllowContentId(chosenAction);
       const allowsTopicId =
@@ -153,12 +161,17 @@ const useQuestActionMultiFormsState = ({
         allowsContentId && doesActionRequireTwitterTweetURL(chosenAction);
       const requiresDiscordServerId =
         doesActionRequireDiscordServerId(chosenAction);
-      const requiresGroupId = doesActionRequireGroupId(chosenAction);
+      const requiresGoalConfig = doesActionRequireGoalConfig(chosenAction);
+      const requiresGroupId =
+        allowsContentId && doesActionRequireGroupId(chosenAction);
+      const allowsTokenTradeThreshold =
+        allowsContentId && doesActionAllowTokenTradeThreshold(chosenAction);
       const isActionRepeatable = doesActionAllowRepetition(chosenAction);
       const requiresStartLink = doesActionRequireStartLink(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
+        requires_basic_points: requiresBasicPoints,
         requires_creator_points: requiresCreatorPoints,
         is_action_repeatable: isActionRepeatable,
         with_optional_topic_id: allowsTopicId,
@@ -168,11 +181,18 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionAllowThreadId(chosenAction),
         requires_twitter_tweet_link:
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
+        requires_chain_event: doesActionRequireChainEvent(chosenAction),
         requires_discord_server_id: requiresDiscordServerId,
+        requires_goal_config: requiresGoalConfig,
         with_optional_chain_id:
           allowsContentId && doesActionAllowChainId(chosenAction),
         requires_group_id: requiresGroupId,
         requires_start_link: requiresStartLink,
+        requires_amount_multipler:
+          doesActionRequireAmountMultipler(chosenAction),
+        with_optional_token_trade_threshold: allowsTokenTradeThreshold,
+        with_optional_sso_type:
+          allowsContentId && doesActionAllowSSOType(chosenAction),
       };
 
       // set fixed action repitition per certain actions
@@ -221,6 +241,21 @@ const useQuestActionMultiFormsState = ({
             QuestActionContentIdScope.Group;
           break;
         }
+        case 'SSOLinked': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.Sso;
+          break;
+        }
+        case 'LaunchpadTokenTraded': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.TokenTradeThreshold;
+          break;
+        }
+        case 'CommunityGoalReached': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.Goal;
+          break;
+        }
         default: {
           break;
         }
@@ -244,11 +279,20 @@ const useQuestActionMultiFormsState = ({
             QuestActionContentIdScope.DiscordServer &&
             !requiresDiscordServerId) ||
           (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.Goal &&
+            !requiresGoalConfig) ||
+          (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.Chain &&
             !allowsChainId) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.Group &&
-            !requiresGroupId)
+            !requiresGroupId) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.TokenTradeThreshold &&
+            !allowsTokenTradeThreshold) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.Sso &&
+            !updatedSubForms[index].config?.with_optional_sso_type)
         ) {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.Thread;

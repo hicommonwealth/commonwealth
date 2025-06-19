@@ -1,9 +1,10 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .ManageCommunityStakeModal {
   .CWModalHeader {
     .warning-icon {
-      fill: $yellow-500;
+      fill: colors.$yellow-500;
     }
   }
 }

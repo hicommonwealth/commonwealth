@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import AddressInfo from 'models/AddressInfo';
 import app from 'state';
 import { useDebounce } from 'usehooks-ts';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
@@ -28,40 +27,25 @@ export const ThreadSelector = ({
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const communityId = app.activeChainId() || '';
-  const sharedQueryOptions = {
-    communityId,
-    searchTerm: debouncedSearchTerm,
-    limit: 5,
-    orderBy: APIOrderBy.Rank,
-    orderDirection: APIOrderDirection.Desc,
-    threadTitleOnly: true,
-  };
   const queryEnabled = debouncedSearchTerm?.trim().length > 0 && !!communityId;
 
   const { data: threadsData, isLoading } = useSearchThreadsQuery({
-    ...sharedQueryOptions,
+    community_id: communityId,
+    search_term: debouncedSearchTerm,
+    cursor: 1,
+    limit: 5,
+    order_by: APIOrderBy.Rank,
+    order_direction: APIOrderDirection.Desc,
+    thread_title_only: true,
+    include_count: true,
     enabled: queryEnabled,
   });
 
   const searchResults = useMemo(() => {
-    const threads = threadsData?.pages?.[0]?.results || [];
-    return threads.map(
-      (t) =>
-        // @ts-expect-error <StrictNullChecks/>
-        new Thread({
-          id: t.id,
-          title: t.title,
-          community_id: t.community_id,
-          Address: new AddressInfo({
-            userId: t.address_user_id,
-            id: t.address_id,
-            address: t.address,
-            community: {
-              id: t.address_community_id,
-              // we don't get other community properties from api + they aren't needed here
-            },
-          }),
-        } as ConstructorParameters<typeof Thread>[0]),
+    // TODO: replace Thread with ThreadView
+    return (
+      threadsData?.pages.flatMap((p) => p.results.map((t) => new Thread(t))) ||
+      []
     );
   }, [threadsData]);
 

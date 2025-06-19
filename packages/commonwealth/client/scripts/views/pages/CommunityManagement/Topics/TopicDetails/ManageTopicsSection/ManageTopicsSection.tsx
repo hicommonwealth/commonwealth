@@ -3,10 +3,11 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import type { Topic } from 'models/Topic';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import {
-  useFetchTopicsQuery,
+  updateFeaturedTopicsOrderPayload,
   useUpdateFeaturedTopicsOrderMutation,
-} from 'state/api/topics';
+} from 'state/api/topics/updateFeaturedTopicsOrder';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
@@ -108,7 +109,9 @@ export const ManageTopicsSection = () => {
 
   const handleSave = async () => {
     try {
-      await updateFeaturedTopicsOrder({ featuredTopics: featuredTopics });
+      await updateFeaturedTopicsOrder(
+        updateFeaturedTopicsOrderPayload({ featuredTopics }),
+      );
       notifySuccess('Topic order updated!');
     } catch (err) {
       notifyError('Failed to update topic order');

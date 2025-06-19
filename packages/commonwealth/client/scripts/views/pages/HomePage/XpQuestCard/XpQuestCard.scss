@@ -1,31 +1,33 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
 
 .QuestCard {
-  border-radius: $border-radius-corners;
+  border-radius: border_radius.$border-radius-corners;
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  background-color: $white;
+  background-color: colors.$white;
   width: 335px;
   min-height: 360px;
-  border: 1px solid $neutral-300;
+  border: 1px solid colors.$neutral-300;
   cursor: pointer;
 
   .text-dark {
-    color: $neutral-600;
+    color: colors.$neutral-600;
     width: fit-content;
     cursor: initial;
   }
 
   .text-light {
-    color: $neutral-500;
+    color: colors.$neutral-500;
     width: fit-content;
     cursor: initial;
   }
 
   .image {
-    border-radius: $border-radius-corners;
+    border-radius: border_radius.$border-radius-corners;
     width: 100%;
     min-width: 100%;
     max-width: 100%;
@@ -74,7 +76,7 @@
     }
 
     .time-label {
-      color: $yellow-600 !important;
+      color: colors.$yellow-600 !important;
     }
 
     .xp-row {

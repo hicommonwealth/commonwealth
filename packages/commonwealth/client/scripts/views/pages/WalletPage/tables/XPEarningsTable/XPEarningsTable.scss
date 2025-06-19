@@ -1,0 +1,28 @@
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+
+.XPEarningsTable {
+  .Table {
+    .data-container {
+      .rewardType {
+        &.proposal {
+          border: 1px solid colors.$primary-500;
+        }
+      }
+
+      .questLink {
+        cursor: pointer;
+        color: colors.$primary-500;
+        text-decoration: none;
+
+        &:focus,
+        &:active,
+        &:hover,
+        &:visited {
+          outline: none;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}

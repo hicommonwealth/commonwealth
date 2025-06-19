@@ -24,6 +24,8 @@ export type Contest = {
   payout_structure?: number[];
   prize_percentage?: number;
   ticker?: string;
+  namespace_judges?: string[];
+  namespace_judge_token_id?: number;
   contests?: {
     contest_id?: number;
     score?: {
@@ -104,8 +106,9 @@ const ContestsList = ({
                 finishDate={end_time ? moment(end_time).toISOString() : ''}
                 isCancelled={contest.cancelled}
                 onFund={() => setFundDrawerContest(contest)}
-                isRecurring={!contest.funding_token_address}
+                isRecurring={(contest.interval || 0) > 0}
                 payoutStructure={contest.payout_structure}
+                prizePercentage={contest.prize_percentage}
                 isFarcaster={contest.is_farcaster_contest}
                 score={score || []}
                 community={community}
@@ -131,8 +134,9 @@ const ContestsList = ({
                 }
                 isCancelled={contest.cancelled}
                 onFund={() => setFundDrawerContest(contest)}
-                isRecurring={!contest.funding_token_address}
+                isRecurring={(contest.interval || 0) > 0}
                 payoutStructure={contest.payout_structure}
+                prizePercentage={contest.prize_percentage}
                 isFarcaster={contest.is_farcaster_contest}
                 score={sc?.score || []}
                 community={community}
@@ -148,6 +152,7 @@ const ContestsList = ({
         contestAddress={fundDrawerContest?.contest_address || ''}
         fundingTokenAddress={fundDrawerContest?.funding_token_address}
         fundingTokenTicker={fundDrawerContest?.ticker || 'ETH'}
+        isRecurring={(fundDrawerContest?.interval || 0) > 0}
       />
     </>
   );

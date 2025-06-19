@@ -1,0 +1,167 @@
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
+
+.TopHolders {
+  .heading-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .see-all-link {
+      cursor: pointer;
+      color: colors.$primary-500;
+      text-decoration: none;
+
+      &:focus,
+      &:active,
+      &:hover,
+      &:visited {
+        outline: none;
+        text-decoration: none;
+      }
+    }
+
+    .link-right {
+      display: flex;
+      gap: 4px;
+    }
+  }
+
+  .holders-table {
+    min-width: 300px;
+    width: 100%;
+    background-color: colors.$white;
+    border-radius: 6px;
+    border: 1px solid colors.$neutral-100;
+    overflow: hidden;
+    overflow-x: auto;
+
+    .Table {
+      width: 100%;
+
+      table {
+        min-width: 100%;
+
+        th {
+          &:nth-child(1) {
+            min-width: 250px;
+            width: 50%;
+          }
+
+          &:nth-child(2) {
+            min-width: 120px;
+            width: 25%;
+            text-align: right;
+          }
+
+          &:nth-child(3) {
+            min-width: 100px;
+            width: 25%;
+            text-align: right;
+          }
+        }
+
+        td {
+          white-space: nowrap;
+          padding: 8px 16px;
+
+          // Username column
+          &:nth-child(1) {
+            width: 50%;
+            min-width: 250px;
+            white-space: normal;
+
+            .top-holder-user {
+              .user-avatar {
+                margin-right: 6px;
+              }
+
+              .user-display-name {
+                display: inline-flex;
+                align-items: center;
+                max-width: calc(100% - 30px);
+                overflow: hidden;
+
+                .username {
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  flex-shrink: 1;
+                }
+
+                .role-tag {
+                  margin-left: 6px;
+                  flex-shrink: 0;
+                }
+              }
+            }
+          }
+
+          // Tokens column
+          &:nth-child(2) {
+            width: 25%;
+            min-width: 120px;
+            text-align: right;
+
+            .tokens-cell {
+              display: flex;
+              justify-content: flex-end;
+
+              .FormattedDisplayNumber {
+                display: inline-block;
+              }
+            }
+          }
+
+          // Percentage column
+          &:nth-child(3) {
+            width: 25%;
+            min-width: 100px;
+            text-align: right;
+
+            .percent-cell {
+              display: flex;
+              justify-content: flex-end;
+              font-weight: 500;
+            }
+          }
+        }
+      }
+    }
+
+    @include media_queries.extraSmall {
+      .Table {
+        table {
+          th,
+          td {
+            padding: 8px;
+          }
+
+          th {
+            &:nth-child(1) {
+              min-width: 180px;
+            }
+
+            &:nth-child(2),
+            &:nth-child(3) {
+              min-width: 80px;
+            }
+          }
+
+          td {
+            &:nth-child(1) {
+              min-width: 180px;
+            }
+
+            &:nth-child(2),
+            &:nth-child(3) {
+              min-width: 80px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

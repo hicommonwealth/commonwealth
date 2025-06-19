@@ -1,11 +1,13 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .CommunityManagementLayout {
   display: grid;
   grid-template-columns: 3fr 1fr;
   gap: 69px;
 
-  @include mediumSmallInclusive {
+  @include media_queries.mediumSmallInclusive {
     grid-template-columns: 1fr;
   }
 
@@ -18,7 +20,7 @@
 
     .header {
       .b1 {
-        color: $neutral-500 !important;
+        color: colors.$neutral-500 !important;
       }
     }
 
@@ -32,7 +34,7 @@
     .feature-hint-mobile {
       display: none;
 
-      @include mediumSmallInclusive {
+      @include media_queries.mediumSmallInclusive {
         display: initial;
       }
     }
@@ -41,7 +43,7 @@
   .right-section {
     margin-top: 64px;
 
-    @include mediumSmallInclusive {
+    @include media_queries.mediumSmallInclusive {
       display: none;
     }
   }

@@ -1,7 +1,9 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
 
 .SidebarSectionGroup {
-  border-bottom-color: $neutral-50;
+  border-bottom-color: colors.$neutral-50;
   border-bottom-width: 1px;
   cursor: pointer;
   display: flex;
@@ -10,13 +12,13 @@
 
   .section-group-title-container {
     align-items: center;
-    color: $neutral-800;
+    color: colors.$neutral-800;
     display: flex;
     justify-content: left;
     padding: 8px;
 
     &:hover {
-      background-color: $primary-50;
+      background-color: colors.$primary-50;
     }
 
     .Icon {
@@ -39,7 +41,7 @@
     height: 100%;
 
     .title-text {
-      color: $neutral-600;
+      color: colors.$neutral-600;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -53,12 +55,12 @@
       margin-right: 8px;
 
       svg {
-        fill: $neutral-500;
+        fill: colors.$neutral-500;
       }
     }
 
     &.background {
-      background-color: $primary-100;
+      background-color: colors.$primary-100;
     }
 
     &.no-background {
@@ -67,7 +69,7 @@
 
     &.active,
     &:hover {
-      background-color: $primary-50;
+      background-color: colors.$primary-50;
     }
 
     .section-title-text-active {
@@ -106,11 +108,11 @@
   }
 
   &.active {
-    background-color: $primary-100;
+    background-color: colors.$primary-100;
   }
 
   &:hover {
-    background-color: $primary-50;
+    background-color: colors.$primary-50;
   }
 }
 
@@ -127,9 +129,9 @@
 
   .unread-icon {
     align-items: center;
-    background-color: $rorange-500;
-    border-radius: $border-radius-round;
-    color: $white;
+    background-color: colors.$rorange-500;
+    border-radius: border_radius.$border-radius-round;
+    color: colors.$white;
     display: flex;
     height: 16px;
     justify-content: center;

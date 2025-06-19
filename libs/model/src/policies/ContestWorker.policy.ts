@@ -6,7 +6,7 @@ import {
   ServerError,
 } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { QueryTypes } from 'sequelize';
 import { config, Contest, models } from '..';
 import { GetActiveContestManagers } from '../aggregates/contest';
@@ -67,10 +67,21 @@ export function ContestWorker(): Policy<typeof inputs> {
           eth_chain_id: number;
           private_url: string;
           contest_address: string;
+          namespace_judge_token_id: number | null;
+          namespace_judges: string[] | null;
           content_id: number;
+          creator_address: string;
         }>(
           `
-              SELECT cn.private_url, cn.url, cn.eth_chain_id, cm.contest_address, added.content_id
+              SELECT
+                cn.private_url,
+                cn.url,
+                cn.eth_chain_id,
+                cm.contest_address,
+                cm.namespace_judge_token_id,
+                cm.namespace_judges,
+                added.content_id,
+                cm.creator_address
               FROM "Communities" c
                        JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
                        JOIN "ContestManagers" cm ON cm.community_id = c.id
@@ -123,16 +134,45 @@ export function ContestWorker(): Policy<typeof inputs> {
         );
 
         const contestManagers = activeContestManagersWithoutVote.map(
-          ({ contest_address, content_id, eth_chain_id }) => ({
+          ({
+            contest_address,
+            content_id,
+            eth_chain_id,
+            namespace_judge_token_id,
+            namespace_judges,
+            creator_address,
+          }) => ({
             url: chainNodeUrl,
             contest_address,
             content_id,
             eth_chain_id,
+            namespace_judge_token_id,
+            namespace_judges,
+            creator_address,
           }),
         );
 
+        const allowedContestManagers = contestManagers.filter(
+          (contestManager) => {
+            // if judged contest, only allow judge
+            if (contestManager.namespace_judge_token_id) {
+              const isJudge = (contestManager.namespace_judges || [])
+                .map((addr) => addr.toLowerCase())
+                .includes(payload.address!.toLowerCase());
+              if (!isJudge) {
+                log.warn(
+                  `ThreadUpvoted: ${payload.address} is not a judge for contest ${contestManager.contest_address}– vote skipped`,
+                );
+              }
+              return isJudge;
+            }
+            // if not judged contest, allow all to vote
+            return true;
+          },
+        );
+
         await createOnchainContestVote({
-          contestManagers,
+          contestManagers: allowedContestManagers,
           content_url,
           author_address: payload.address!,
         });
@@ -167,10 +207,7 @@ const checkContests = async () => {
       const firstContent = contestManager.actions.find(
         (action) => action.action === 'added',
       );
-      const timeLeft = moment(contestManager.end_time).diff(
-        moment(),
-        'minutes',
-      );
+      const timeLeft = dayjs(contestManager.end_time).diff(dayjs(), 'minutes');
       const isEnding =
         !contestManager.ending && !!firstContent && timeLeft < 60;
       return isEnding;

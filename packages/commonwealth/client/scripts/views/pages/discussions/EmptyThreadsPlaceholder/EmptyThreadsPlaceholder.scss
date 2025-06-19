@@ -1,4 +1,6 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .EmptyThreadsSkeletonContainer {
   display: flex;
@@ -6,20 +8,20 @@
   width: 100%;
   padding: 40px;
 
-  @include medium {
+  @include media_queries.medium {
     padding: 40px;
   }
 
-  @include mediumSmall {
+  @include media_queries.mediumSmall {
     padding: 32px;
   }
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     padding: 24px;
   }
 }
 
 .EmptyThreadsPlaceholderText {
-  color: $neutral-500;
+  color: colors.$neutral-500;
   margin-left: 40px;
 }

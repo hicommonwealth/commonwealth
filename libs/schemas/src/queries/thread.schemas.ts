@@ -1,18 +1,22 @@
+import { LinkSource } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
+import { AuthContext, ThreadContext } from '../context';
 import {
   Address,
   Comment,
   CommentVersionHistory,
   ContestManager,
+  Link,
   ProfileTags,
   Thread,
   ThreadVersionHistory,
+  USER_TIER,
   UserProfile,
 } from '../entities';
 import { ContestAction } from '../projections';
 import { PG_INT, paginationSchema } from '../utils';
 import { TopicView } from './community.schemas';
-import { PaginatedResultSchema } from './pagination';
+import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const ContestManagerView = ContestManager.pick({
   name: true,
@@ -50,7 +54,7 @@ export const ContestActionView = ContestAction.pick({
   Contest: ContestView,
 });
 
-export const ProfileTagsView = ProfileTags.extend({
+export const ProfileTagsView = ProfileTags.omit({ Tag: true }).extend({
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
 });
@@ -77,6 +81,8 @@ export const UserView = z.object({
   ProfileTags: z.array(ProfileTagsView).optional(),
   unsubscribe_uuid: z.string().uuid().nullish().optional(),
   tier: z.number().nullish().optional(),
+  referred_by_address: z.string().nullish(),
+  xp_referrer_points: PG_INT.default(0).nullish(),
 });
 type UserView = z.infer<typeof UserView>;
 
@@ -87,7 +93,7 @@ export const AddressView = Address.extend({
   last_active: z.date().or(z.string()).nullish(),
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
-  User: UserView.optional().nullish() as ZodType<UserView | null | undefined>,
+  User: UserView.nullish() as ZodType<UserView | null | undefined>,
 }).omit({
   oauth_email: true,
   oauth_provider: true,
@@ -122,18 +128,19 @@ export const CommentVersionHistoryView = CommentVersionHistory.extend({
   timestamp: z.date().or(z.string()),
 });
 
-export const CommentView = Comment.extend({
+export const CommentView = Comment.omit({
+  Thread: true,
+  search: true,
+}).extend({
   id: PG_INT,
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
   deleted_at: z.date().or(z.string()).nullish(),
   marked_as_spam_at: z.date().or(z.string()).nullish(),
   Address: AddressView.nullish(),
-  Thread: z.undefined(),
   community_id: z.string(),
   last_active: z.date().or(z.string()).nullish(),
   Reaction: ReactionView.nullish(),
-  search: z.undefined(),
   // this is returned by GetThreads
   address: z.string(),
   profile_name: z.string().optional(),
@@ -173,11 +180,15 @@ export const ThreadView = Thread.extend({
   ContestActions: z.array(ContestActionView).optional(),
   Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
-  search: z.union([z.string(), z.record(z.any())]).nullish(),
+  search: z.union([z.string(), z.record(z.string(), z.any())]).nullish(),
   total_num_thread_results: z
     .number()
     .nullish()
     .describe('total number of thread results for the query'),
+  user_id: PG_INT.nullish(),
+  user_tier: USER_TIER.nullish(),
+  avatar_url: z.string().nullish(),
+  address_last_active: z.date().or(z.string()).nullish(),
 });
 
 export const OrderByQueriesKeys = z.enum([
@@ -199,7 +210,6 @@ export const BulkThreadView = ThreadView.extend({
     address: z.string(),
     community_id: z.string(),
   }),
-  numberOfComments: PG_INT,
   reactionIds: z.string().array(),
   reactionTimestamps: z.coerce.date().array(),
   reactionWeights: PG_INT.array(),
@@ -246,10 +256,8 @@ export const GetThreadsOrderBy = z.enum([
 ]);
 
 export const GetThreads = {
-  input: z.object({
+  input: PaginationParamsSchema.extend({
     community_id: z.string(),
-    page: z.number().optional(),
-    limit: z.number().optional(),
     stage: z.string().optional(),
     topic_id: PG_INT.optional(),
     includePinnedThreads: z.boolean().optional(),
@@ -261,45 +269,27 @@ export const GetThreads = {
     status: GetThreadsStatus.optional(),
     withXRecentComments: z.number().optional(),
   }),
-  output: z.object({
-    page: z.number(),
-    limit: z.number(),
-    threads: z.array(ThreadView),
-    threadCount: z.number().optional(),
+  output: PaginatedResultSchema.extend({
+    results: z.array(ThreadView),
   }),
+  context: AuthContext,
 };
-
-export const DEPRECATED_GetThreads = z.object({
-  community_id: z.string(),
-  bulk: z.coerce.boolean().default(false),
-  thread_ids: z.coerce.number().int().array().optional(),
-  active: z.string().optional(),
-  search: z.string().optional(),
-  count: z.coerce.boolean().optional().default(false),
-  include_count: z.coerce.boolean().default(false),
-});
-
-export const DEPRECATED_GetBulkThreads = z.object({
-  topic_id: z.coerce.number().int().optional(),
-  includePinnedThreads: z.coerce.boolean().optional(),
-  limit: z.coerce.number().int().optional(),
-  page: z.coerce.number().int().optional(),
-  archived: z.coerce.boolean().optional(),
-  stage: z.string().optional(),
-  orderBy: z.string().optional(),
-  from_date: z.string().optional(),
-  to_date: z.string().optional(),
-  contestAddress: z.string().optional(),
-  status: z.string().optional(),
-  withXRecentComments: z.coerce.number().optional(),
-});
 
 export const GetThreadsByIds = {
   input: z.object({
-    community_id: z.string().optional(),
+    community_id: z.string(),
     thread_ids: z.string(),
   }),
   output: z.array(ThreadView),
+  context: AuthContext,
+};
+
+export const GetThreadById = {
+  input: z.object({
+    thread_id: PG_INT,
+  }),
+  output: ThreadView,
+  context: ThreadContext,
 };
 
 export const GetThreadCount = {
@@ -316,22 +306,40 @@ export const GetActiveThreads = {
     withXRecentComments: z.coerce.number().optional(),
   }),
   output: z.array(ThreadView),
+  context: AuthContext,
 };
 
 export const SearchThreads = {
-  input: z.object({
-    communityId: z.string(),
-    searchTerm: z.string(),
-    threadTitleOnly: z.coerce.boolean().default(false),
-    limit: z.coerce.number().optional(),
-    page: z.coerce.number().optional(),
-    orderBy: z
+  input: PaginationParamsSchema.extend({
+    community_id: z.string(),
+    search_term: z.string(),
+    thread_title_only: z.coerce.boolean().default(false),
+    include_count: z.coerce.boolean().default(false),
+    order_by: z
       .enum(['last_active', 'rank', 'created_at', 'profile_name'])
       .optional(),
-    orderDirection: z.enum(['ASC', 'DESC']).optional(),
-    includeCount: z.coerce.boolean().default(false),
   }),
   output: PaginatedResultSchema.extend({
     results: z.array(ThreadView),
+  }),
+  context: AuthContext,
+};
+
+export const GetLinks = {
+  input: z.object({
+    thread_id: PG_INT.optional(),
+    link_source: z.nativeEnum(LinkSource).optional(),
+    link_identifier: z.string().optional(),
+  }),
+  output: z.object({
+    links: z.array(Link).optional(),
+    threads: z
+      .array(
+        z.object({
+          id: PG_INT,
+          title: z.string(),
+        }),
+      )
+      .optional(),
   }),
 };

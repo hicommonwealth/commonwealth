@@ -1,6 +1,7 @@
 import { useCreateApiKeyMutation } from './createApiKey';
 import { useDeleteApiKeyMutation } from './deleteApiKey';
 import { useGetApiKeyQuery } from './getApiKey';
+import { useMutualConnectionsQuery } from './getMutualConnections';
 import useGetNewContent from './getNewContent';
 import useGetUserReferralFeesQuery from './getUserReferralFees';
 import useGetUserReferralsQuery from './getUserReferrals';
@@ -18,6 +19,7 @@ export {
   useGetUserReferralFeesQuery,
   useGetUserReferralsQuery,
   useGetXPs,
+  useMutualConnectionsQuery,
   useSignIn,
   useUpdateUserEmailMutation,
   useUpdateUserEmailSettingsMutation,

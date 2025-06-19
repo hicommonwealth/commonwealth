@@ -1,4 +1,5 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/media_queries';
 
 .TrendingCommunitiesPreview {
   display: flex;
@@ -10,7 +11,7 @@
   margin: 24px 0;
   width: 100%;
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     padding-bottom: 0;
     gap: 16px;
   }
@@ -28,7 +29,7 @@
       display: none; /* Chrome, Safari and Opera */
     }
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       z-index: inherit;
     }
 

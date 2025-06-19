@@ -1,0 +1,22 @@
+@use '../../../../../styles/shared';
+
+.QuestSummaryCard {
+  .xp-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    margin-bottom: 10px;
+
+    .Text {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}

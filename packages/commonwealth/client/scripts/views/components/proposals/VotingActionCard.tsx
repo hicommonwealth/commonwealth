@@ -7,7 +7,7 @@ import VotingResultView, { VoteOption } from './VotingResultView';
 interface VotingOption {
   label: string;
   value: string;
-  voteCount: number | string;
+  voteCount: number | string | bigint;
 }
 
 interface VotingActionCardProps {

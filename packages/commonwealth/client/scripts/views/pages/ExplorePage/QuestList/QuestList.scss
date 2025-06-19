@@ -1,0 +1,85 @@
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
+
+.QuestList {
+  margin: 0;
+  margin-bottom: 16px;
+  width: 100%;
+
+  .list {
+    max-width: 100%;
+    overflow-x: hidden;
+    display: grid;
+    gap: 16px;
+    margin: 16px 0;
+    grid-template-columns: 1fr 1fr 1fr 1fr !important;
+
+    @include media_queries.extraSmall {
+      grid-template-columns: 1fr !important;
+    }
+
+    @include media_queries.small {
+      grid-template-columns: 1fr 1fr !important;
+    }
+
+    @include media_queries.mediumSmall {
+      grid-template-columns: 1fr 1fr 1fr !important;
+    }
+  }
+}
+
+.filters {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  height: 0;
+  margin-top: -16px;
+
+  &.hasAppliedFilter {
+    margin-top: initial;
+    height: auto;
+  }
+
+  .Tag {
+    .Text {
+      text-transform: capitalize;
+    }
+  }
+
+  @include media_queries.extraSmall {
+    gap: 12px;
+  }
+
+  .Divider {
+    height: 40px;
+  }
+
+  .tag-filter {
+    border: 1px solid colors.$black !important;
+    min-width: 180px;
+    max-width: 180px;
+  }
+}
+
+// Special style for when this component is inside a horizontal-scroll-container
+.horizontal-scroll-container .QuestList {
+  .empty-placeholder {
+    margin-left: 180px;
+  }
+
+  .list {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    grid-template-columns: unset !important;
+    overflow-x: visible; // Let the parent handle scrolling
+
+    & > div {
+      flex: 0 0 auto;
+      min-width: 300px;
+      max-width: 350px;
+    }
+  }
+}

@@ -65,6 +65,7 @@ describe('Contests projection lifecycle', () => {
   const getTokenAttributes = vi.spyOn(evm, 'getTokenAttributes');
   const getContestScore = vi.spyOn(evm, 'getContestScore');
   const getContestStatus = vi.spyOn(evm, 'getContestStatus');
+  const getTransaction = vi.spyOn(evm, 'getTransaction');
 
   beforeAll(async () => {
     try {
@@ -93,7 +94,7 @@ describe('Contests projection lifecycle', () => {
             },
           ],
           CommunityStakes: [],
-          topics: [{ id: topic_id, name: 'test-topic' }],
+          topics: [{ id: topic_id, name: 'General' }],
           groups: [],
           contest_managers: [
             {
@@ -207,22 +208,31 @@ describe('Contests projection lifecycle', () => {
       endTime: 100,
       contestInterval: 50,
       lastContentId: '1',
-      // prizeShare: 10,
-      // voterShare: 20,
-      // contestToken: '0x000',
+      prizeShare: 10,
+      voterShare: 20,
+      contestToken: recurring,
     });
+    getTransaction.mockResolvedValue({
+      tx: {
+        from: '0x0000000000000000000000000000000000000123',
+      },
+    } as unknown as any);
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'RecurringContestManagerDeployed',
       payload: {
         namespace,
         contest_address: recurring,
         interval: 10,
         block_number: 1,
+        eth_chain_id: 1,
+        transaction_hash: '0x0000000000000000000000000000000000000000',
       },
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestStarted',
       payload: {
         contest_address: recurring,
@@ -234,19 +244,34 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'OneOffContestManagerDeployed',
       payload: {
         namespace,
         contest_address: oneoff,
-        length: 1,
+        length: 100,
         block_number: 1,
+        eth_chain_id: 1,
+        transaction_hash: '0x0000000000000000000000000000000000000000',
       },
     });
 
+    const contest = await models.Contest.findOne({
+      where: {
+        contest_address: oneoff,
+        contest_id: 0,
+      },
+    });
+    expect(
+      contest,
+      'OneOffContestManagerDeployed should have created a Contest',
+    ).to.exist;
+
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestStarted',
       payload: {
-        contest_id: 1,
+        contest_id: 0,
         contest_address: oneoff,
         start_time,
         end_time,
@@ -255,6 +280,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentAdded',
       payload: {
         contest_address: oneoff,
@@ -265,6 +291,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentAdded',
       payload: {
         contest_address: recurring,
@@ -276,6 +303,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentUpvoted',
       payload: {
         contest_address: recurring,
@@ -287,6 +315,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentUpvoted',
       payload: {
         contest_address: recurring,
@@ -298,6 +327,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentUpvoted',
       payload: {
         contest_address: oneoff,
@@ -344,9 +374,11 @@ describe('Contests projection lifecycle', () => {
         cancelled,
         created_at,
         topic_id: topic_id,
-        topics: [{ id: topic_id, name: 'test-topic' }],
+        topics: [{ id: topic_id, name: 'General' }],
         is_farcaster_contest: true,
         vote_weight_multiplier: null,
+        namespace_judge_token_id: null,
+        namespace_judges: null,
         contests: [
           {
             contest_id,

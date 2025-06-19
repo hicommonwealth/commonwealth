@@ -1,0 +1,18 @@
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+
+.CommunitySectionModal {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px 0;
+
+  .description {
+    color: colors.$neutral-500;
+    text-align: center;
+  }
+
+  .create-community-button {
+    align-self: flex-end;
+  }
+}

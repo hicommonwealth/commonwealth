@@ -1,4 +1,6 @@
-@import '../../../../../../../styles/shared';
+@use '../../../../../../../styles/shared';
+@use '../../../../../../../styles/mixins/colors.module';
+@use '../../../../../../../styles/mixins/media_queries';
 
 .CommunityManagementLayout {
   .contest-description,
@@ -16,14 +18,14 @@
     .Divider {
       margin-block: 64px;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         margin-block: 40px;
       }
     }
 
     .contest-section {
       .Text.b1 {
-        color: $neutral-500;
+        color: colors.$neutral-500;
       }
 
       & > .Text.b1 {
@@ -45,7 +47,7 @@
 
       .SelectList {
         .create-new-topic-btn {
-          color: $primary-500;
+          color: colors.$primary-500;
           width: 100%;
           display: flex;
           justify-content: center;
@@ -95,7 +97,7 @@
       max-width: 596px;
 
       .description {
-        color: $neutral-500;
+        color: colors.$neutral-500;
         margin-top: -8px;
       }
 
@@ -143,14 +145,14 @@
         gap: 16px;
         flex-wrap: wrap;
 
-        @include extraSmall {
+        @include media_queries.extraSmall {
           gap: unset;
         }
 
         .Button {
           padding-inline: 36px;
 
-          @include extraSmall {
+          @include media_queries.extraSmall {
             padding-inline: 10px;
           }
         }
@@ -185,19 +187,19 @@
             .NumberSelector {
               gap: 16px;
 
-              @include extraSmall {
+              @include media_queries.extraSmall {
                 gap: 8px;
               }
 
               .input-and-icon-container {
                 width: 110px;
 
-                @include extraSmall {
+                @include media_queries.extraSmall {
                   width: 110px;
                 }
 
                 input {
-                  font-family: $font-family-silka;
+                  font-family: shared.$font-family-silka;
                   font-size: 29px;
                   font-weight: 700;
                   height: 48px;
@@ -220,11 +222,11 @@
           justify-content: end;
 
           .Text.h4 {
-            color: $neutral-500;
+            color: colors.$neutral-500;
           }
 
           .total-percentage {
-            font-family: $font-family-silka;
+            font-family: shared.$font-family-silka;
             font-size: 29px;
             font-weight: 700;
             margin-left: 4px;

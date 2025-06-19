@@ -1,15 +1,17 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/elevation';
 
 .RelatedCommunityCard {
   padding: 16px;
   display: flex;
   border-radius: 6px;
-  border: 1px solid $neutral-100;
-  background: $white;
+  border: 1px solid colors.$neutral-100;
+  background: colors.$white;
   cursor: pointer;
 
   &:hover {
-    box-shadow: $elevation-2;
+    box-shadow: elevation.$elevation-2;
   }
 
   .content-container {
@@ -43,7 +45,7 @@
             gap: 8px;
 
             .Text {
-              color: $neutral-900;
+              color: colors.$neutral-900;
               letter-spacing: -0.18px;
               word-break: break-word;
             }
@@ -51,7 +53,7 @@
 
           .stake-info {
             .stake-value {
-              color: $neutral-900;
+              color: colors.$neutral-900;
             }
 
             .stake-change {
@@ -59,23 +61,23 @@
 
               .percentage {
                 &.positive {
-                  color: $green-600;
+                  color: colors.$green-600;
                 }
 
                 &.negative {
-                  color: $rorange-600;
+                  color: colors.$rorange-600;
                 }
               }
 
               .hours {
-                color: $neutral-500;
+                color: colors.$neutral-500;
               }
             }
           }
         }
 
         .description {
-          color: $neutral-800;
+          color: colors.$neutral-800;
           word-break: break-word;
         }
       }
@@ -94,7 +96,7 @@
 
         .count,
         .text {
-          color: $neutral-500;
+          color: colors.$neutral-500;
         }
 
         .Icon {
@@ -104,7 +106,7 @@
       }
 
       .divider {
-        color: $neutral-500;
+        color: colors.$neutral-500;
         height: 16px;
         width: 5px;
         display: flex;

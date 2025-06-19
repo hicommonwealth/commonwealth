@@ -105,6 +105,53 @@ export const makeGroupDataBaseAPIPayload = (
       return;
     }
 
+    // for sui base
+    if (x.requirementType === TOKENS.SUI_TOKEN) {
+      // @ts-expect-error StrictNullChecks
+      payload.requirements.push({
+        rule: 'threshold',
+        data: {
+          threshold: convertRequirementAmountFromTokensToWei(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            x.requirementType as any,
+            // @ts-expect-error StrictNullChecks
+            x.requirementAmount,
+          ),
+          source: {
+            source_type: x.requirementType,
+            sui_network: x.requirementChain,
+            ...(x.requirementContractAddress && {
+              object_id: x.requirementContractAddress.trim(),
+            }),
+          },
+        },
+      });
+      return;
+    }
+
+    // for sui token with custom coinType
+    if (x.requirementType === TOKENS.SUI_TOKEN_TYPE) {
+      // @ts-expect-error StrictNullChecks
+      payload.requirements.push({
+        rule: 'threshold',
+        data: {
+          threshold: convertRequirementAmountFromTokensToWei(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            x.requirementType as any,
+            // @ts-expect-error StrictNullChecks
+            x.requirementAmount,
+          ),
+          source: {
+            source_type: x.requirementType,
+            sui_network: x.requirementChain,
+            // @ts-expect-error StrictNullChecks
+            coin_type: x.requirementCoinType.trim(),
+          },
+        },
+      });
+      return;
+    }
+
     // for cosmos base
     if (
       x.requirementType === TOKENS.COSMOS_TOKEN ||

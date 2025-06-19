@@ -1,10 +1,37 @@
-import { CommunityTierMap } from '@hicommonwealth/shared';
+import {
+  BalanceType,
+  CommunityGoalTypes,
+  CommunityTierMap,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import { z } from 'zod';
+import { Community, CommunityGoalMeta } from '../entities';
+
+export const CreateChainNode = {
+  input: z.object({
+    url: z.string().url(),
+    name: z.string(),
+    balance_type: z.literal(BalanceType.Ethereum),
+    eth_chain_id: z.number(),
+  }),
+  output: z.object({
+    node_id: z.number(),
+  }),
+};
+
+export const UpdateCommunityId = {
+  input: z.object({
+    community_id: z.string(),
+    new_community_id: z.string(),
+    redirect: z.boolean().optional(),
+  }),
+  output: Community,
+};
 
 export const TriggerNotificationsWorkflow = {
   input: z.object({
     workflow_key: z.string(),
-    data: z.record(z.any()),
+    data: z.record(z.string(), z.any()),
   }),
   output: z.object({
     numFailed: z
@@ -22,6 +49,16 @@ export const SetCommunityTier = {
   input: z.object({
     community_id: z.string(),
     tier: z.nativeEnum(CommunityTierMap),
+  }),
+  output: z.object({
+    success: z.boolean(),
+  }),
+};
+
+export const SetUserTier = {
+  input: z.object({
+    user_id: z.number(),
+    tier: z.nativeEnum(UserTierMap),
   }),
   output: z.object({
     success: z.boolean(),
@@ -98,3 +135,21 @@ export const UpdateResourceTimestamps = {
 };
 
 export type Type1 = z.infer<typeof TriggerNotificationsWorkflow.input>;
+
+export const UpdateSiteAdmin = {
+  input: z.object({
+    address: z.string(),
+    is_admin: z.boolean(),
+  }),
+  output: z.boolean(),
+};
+
+export const CreateCommunityGoalMeta = {
+  input: z.object({
+    name: z.string(),
+    description: z.string(),
+    type: z.enum(CommunityGoalTypes),
+    target: z.number(),
+  }),
+  output: CommunityGoalMeta,
+};

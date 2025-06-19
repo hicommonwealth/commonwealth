@@ -1,4 +1,6 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/text';
 
 @mixin mainBodyStyles {
   .main-body-container {
@@ -9,7 +11,7 @@
     width: 100%;
 
     .title {
-      font-family: $font-family-silka;
+      font-family: shared.$font-family-silka;
       font-size: 24px;
       line-height: 36px;
       font-weight: 600;
@@ -36,15 +38,25 @@
           }
 
           .username {
-            @include caption;
+            @include text.caption;
 
             font-weight: 500;
           }
         }
 
         .header-text.Text {
-          color: $neutral-500;
+          color: colors.$neutral-500;
         }
+      }
+    }
+
+    .mobile-action-card-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      .actions {
+        width: 100%;
+        max-width: 100%;
       }
     }
 

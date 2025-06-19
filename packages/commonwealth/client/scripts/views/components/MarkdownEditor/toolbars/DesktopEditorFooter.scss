@@ -1,14 +1,15 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .DesktopEditorFooter {
-  color: $neutral-500;
+  color: colors.$neutral-500;
 
   display: flex;
   padding: 6px;
 
   user-select: none;
 
-  background-color: $neutral-50;
+  background-color: colors.$neutral-50;
 
   .Item {
     display: flex;
@@ -23,7 +24,7 @@
 
   .SubmitButtonItem {
     margin-left: auto;
-    background-color: $neutral-200;
+    background-color: colors.$neutral-200;
 
     button {
       border: none;
