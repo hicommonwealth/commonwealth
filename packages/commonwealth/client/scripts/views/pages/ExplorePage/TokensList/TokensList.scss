@@ -1,7 +1,9 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/media_queries';
 
 .TokensList {
-  margin: 16px 0;
+  margin: 0;
+  margin-bottom: 16px;
   width: 100%;
 
   .list {
@@ -12,15 +14,15 @@
     margin: 16px 0;
     grid-template-columns: 1fr 1fr 1fr 1fr !important;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       grid-template-columns: 1fr !important;
     }
 
-    @include small {
+    @include media_queries.small {
       grid-template-columns: 1fr 1fr !important;
     }
 
-    @include mediumSmall {
+    @include media_queries.mediumSmall {
       grid-template-columns: 1fr 1fr 1fr !important;
     }
   }

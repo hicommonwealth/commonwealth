@@ -227,14 +227,7 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
 
   return (
     <>
-      <div
-        className={clsx('filters', {
-          hasAppliedFilter:
-            Object.values(filters).filter(Boolean).length === 1
-              ? !filters.withCommunitySortOrder
-              : Object.values(filters).filter(Boolean).length > 0,
-        })}
-      >
+      <div className="community-filters">
         <CWButton
           label="Filters"
           iconRight="funnelSimple"

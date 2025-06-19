@@ -1,8 +1,11 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/icons';
 
 .CommunityAvatar {
   align-items: center;
-  border-radius: $border-radius-round;
+  border-radius: border_radius.$border-radius-round;
   display: flex;
   flex-shrink: 0;
   justify-content: center;
@@ -18,38 +21,38 @@
   }
 
   &.small {
-    height: $small-icon;
-    width: $small-icon;
+    height: icons.$small-icon;
+    width: icons.$small-icon;
   }
 
   &.regular {
-    height: $regular-icon;
-    width: $regular-icon;
+    height: icons.$regular-icon;
+    width: icons.$regular-icon;
   }
 
   &.medium {
-    height: $medium-icon;
-    width: $medium-icon;
+    height: icons.$medium-icon;
+    width: icons.$medium-icon;
   }
 
   &.large {
-    height: $large-icon;
-    width: $large-icon;
+    height: icons.$large-icon;
+    width: icons.$large-icon;
   }
 
   &.xl {
-    height: $xl-icon;
-    width: $xl-icon;
+    height: icons.$xl-icon;
+    width: icons.$xl-icon;
   }
 
   &.xxl {
-    height: $xxl-icon;
-    width: $xxl-icon;
+    height: icons.$xxl-icon;
+    width: icons.$xxl-icon;
   }
 
   .no-image {
     align-items: center;
-    background: $neutral-800;
+    background: colors.$neutral-800;
     display: flex;
     height: 100%;
     justify-content: center;
@@ -62,7 +65,7 @@
     }
 
     .avatar-no-image-letter.Text {
-      color: $white;
+      color: colors.$white;
     }
   }
 }

@@ -16,12 +16,17 @@ export const doesActionRequireRewardShare = (action: QuestActionType) => {
   return (
     action === 'CommunityCreated' ||
     action === 'CommunityJoined' ||
-    action === 'CommentUpvoted'
+    action === 'CommentUpvoted' ||
+    action === 'SignUpFlowCompleted'
   );
 };
 
 export const doesActionRewardShareForReferrer = (action: QuestActionType) => {
-  return action === 'CommunityCreated' || action === 'CommunityJoined';
+  return (
+    action === 'CommunityCreated' ||
+    action === 'CommunityJoined' ||
+    action === 'SignUpFlowCompleted'
+  );
 };
 
 export const doesActionRewardShareForCreator = (action: QuestActionType) => {
@@ -116,6 +121,7 @@ export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
     'SSOLinked',
     'DiscordServerJoined',
     'MembershipsRefreshed',
+    'ContestEnded',
     'LaunchpadTokenRecordCreated',
     'CommunityGoalReached',
   ];

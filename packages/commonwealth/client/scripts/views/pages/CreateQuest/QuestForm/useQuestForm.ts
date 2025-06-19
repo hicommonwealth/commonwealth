@@ -74,6 +74,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'RecurringContestManagerDeployed',
       'LaunchpadTokenRecordCreated',
       'LaunchpadTokenTraded',
+      'ContestEnded',
       'CommunityGoalReached',
     ] as QuestAction[],
     channel: ['TweetEngagement', 'XpChainEventCreated'] as QuestAction[],

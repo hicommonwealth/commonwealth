@@ -1,6 +1,7 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .HeadingButtonActive {
   font-weight: bold;
-  background-color: $neutral-100;
+  background-color: colors.$neutral-100;
 }

@@ -1,11 +1,12 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
 
 .ProfileCard {
   width: 100%;
   height: 160px;
   border-radius: 16px;
   text-align: center;
-  background: $white;
+  background: colors.$white;
   padding: 16px;
 
   .background-cover {
@@ -27,7 +28,7 @@
   .profile-content {
     position: relative;
     padding: 10px;
-    background: $white;
+    background: colors.$white;
 
     .user-info {
       text-decoration: none;
@@ -40,7 +41,7 @@
       width: 65px;
       height: 65px;
       border-radius: 50%;
-      border: 4px solid $white;
+      border: 4px solid colors.$white;
       position: absolute;
       top: -40px;
       left: 50%;
@@ -58,7 +59,7 @@
       white-space: pre-wrap;
 
       &:hover {
-        color: $neutral-600;
+        color: colors.$neutral-600;
       }
 
       .TrustLevelRole {

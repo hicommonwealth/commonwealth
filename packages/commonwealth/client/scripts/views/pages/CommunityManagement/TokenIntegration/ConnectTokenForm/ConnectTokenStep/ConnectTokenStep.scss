@@ -1,4 +1,6 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
+@use '../../../../../../styles/mixins/media_queries';
 
 .ConnectTokenStep {
   display: flex;
@@ -23,7 +25,7 @@
   }
 
   .description {
-    color: $neutral-600;
+    color: colors.$neutral-600;
   }
 
   .action-buttons {
@@ -35,7 +37,7 @@
     margin-bottom: 24px;
     gap: 10px;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       justify-content: flex-end;
     }
   }

@@ -1,9 +1,11 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .CardsSliderPageLayout {
   padding-top: 20px;
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     padding-top: 0;
   }
 
@@ -14,9 +16,9 @@
     flex-direction: column;
     padding: 12px;
     border-radius: 10px;
-    background-color: $primary-50;
+    background-color: colors.$primary-50;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       padding-top: 16px;
       padding: 8px;
     }
@@ -27,7 +29,7 @@
       align-items: center;
       gap: 32px;
       width: 100%;
-      @include extraSmall {
+      @include media_queries.extraSmall {
         gap: 4px;
         align-items: baseline;
       }

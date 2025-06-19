@@ -60,7 +60,7 @@ const ExploreContestList = ({
     <div className="ExploreContestList">
       {!hideHeader && <CWText type="h2">Contests</CWText>}
       {!hideFilters && searchText?.trim() && (
-        <div className="filters">
+        <div className="contest-filters">
           <CWTag
             label={`Search: ${searchText?.trim()}`}
             type="filter"

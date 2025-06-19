@@ -1,4 +1,7 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .QuestDetails {
   display: flex;
@@ -15,7 +18,7 @@
       grid-template-columns: 200px 8fr;
       gap: 16px;
 
-      @include smallInclusive {
+      @include media_queries.smallInclusive {
         grid-template-columns: 1fr;
       }
 
@@ -31,7 +34,7 @@
         }
 
         .b1 {
-          color: $neutral-700;
+          color: colors.$neutral-700;
         }
 
         .progress {
@@ -48,22 +51,22 @@
           .progress-bar {
             height: 10px;
             width: 100%;
-            border: 1px solid $neutral-100;
+            border: 1px solid colors.$neutral-100;
 
             &.isEnded {
               &::-webkit-progress-value {
-                background-color: $neutral-400 !important;
+                background-color: colors.$neutral-400 !important;
               }
             }
 
             &::-webkit-progress-bar {
-              background-color: $neutral-200;
-              border-radius: $border-radius-corners;
+              background-color: colors.$neutral-200;
+              border-radius: border_radius.$border-radius-corners;
             }
 
             &::-webkit-progress-value {
-              background-color: $primary-400;
-              border-radius: $border-radius-corners;
+              background-color: colors.$primary-400;
+              border-radius: border_radius.$border-radius-corners;
             }
           }
         }
@@ -92,7 +95,7 @@
       border-radius: 6px;
       width: 100%;
       gap: 8px;
-      background-color: $white;
+      background-color: colors.$white;
 
       .header {
         padding: 16px 0px;
@@ -101,7 +104,7 @@
         align-items: center;
 
         .b1 {
-          color: $black;
+          color: colors.$black;
           letter-spacing: 1px;
         }
       }
@@ -126,15 +129,15 @@
       grid-template-columns: 1fr 1fr 1fr;
       gap: 16px;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         grid-template-columns: 1fr !important;
       }
 
-      @include small {
+      @include media_queries.small {
         grid-template-columns: 1fr !important;
       }
 
-      @include mediumSmall {
+      @include media_queries.mediumSmall {
         grid-template-columns: 1fr 1fr !important;
       }
     }

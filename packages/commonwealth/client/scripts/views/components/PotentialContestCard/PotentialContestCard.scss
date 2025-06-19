@@ -1,14 +1,16 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba($yellow-400, 0.4);
+    box-shadow: 0 0 0 0 rgba(colors.$yellow-400, 0.4);
   }
   70% {
-    box-shadow: 0 0 0 6px rgba($yellow-400, 0);
+    box-shadow: 0 0 0 6px rgba(colors.$yellow-400, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba($yellow-400, 0);
+    box-shadow: 0 0 0 0 rgba(colors.$yellow-400, 0);
   }
 }
 
@@ -30,7 +32,7 @@
 
   &.PotentialContestCard--Skeleton {
     .Skeleton {
-      border-radius: $border-radius-md;
+      border-radius: border_radius.$border-radius-md;
     }
   }
 
@@ -48,7 +50,7 @@
       align-items: center;
 
       .header-trophy-icon {
-        color: $yellow-500;
+        color: colors.$yellow-500;
       }
     }
 
@@ -65,40 +67,40 @@
         justify-content: space-between;
         gap: 8px;
         padding: 8px 8px 4px;
-        border-radius: $border-radius-md;
+        border-radius: border_radius.$border-radius-md;
         border: 1px solid transparent;
 
         .label {
-          color: $neutral-600;
-          font-family: $font-family-silka;
+          color: colors.$neutral-600;
+          font-family: shared.$font-family-silka;
           font-weight: 600;
         }
 
         .bold {
-          font-family: $font-family-monospace;
+          font-family: shared.$font-family-monospace;
         }
       }
 
       .prize-row-1 {
-        background-color: $yellow-300;
-        border-color: $yellow-400;
+        background-color: colors.$yellow-300;
+        border-color: colors.$yellow-400;
         animation: pulse 2s infinite;
       }
 
       .prize-row-2 {
-        background-color: $neutral-200;
-        border-color: $neutral-300;
+        background-color: colors.$neutral-200;
+        border-color: colors.$neutral-300;
       }
 
       .prize-row-3 {
-        background-color: $rorange-200;
-        border-color: $rorange-300;
+        background-color: colors.$rorange-200;
+        border-color: colors.$rorange-300;
       }
     }
 
     .prize-explanation,
     .progress-explanation {
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
 
     .divider {

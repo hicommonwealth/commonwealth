@@ -1,4 +1,6 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .communities-count {
   padding: 12px 0;
@@ -7,19 +9,15 @@
   text-align: center;
 }
 
-.filters {
+.community-filters {
   display: flex;
   flex-direction: row;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
   height: 0;
-  margin-top: -16px;
-
-  &.hasAppliedFilter {
-    margin-top: initial;
-    height: auto;
-  }
+  margin-top: initial;
+  height: auto;
 
   .Tag {
     .Text {
@@ -27,7 +25,7 @@
     }
   }
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     gap: 12px;
   }
 
@@ -36,7 +34,7 @@
   }
 
   .tag-filter {
-    border: 1px solid $black !important;
+    border: 1px solid colors.$black !important;
     min-width: 180px;
     max-width: 180px;
   }

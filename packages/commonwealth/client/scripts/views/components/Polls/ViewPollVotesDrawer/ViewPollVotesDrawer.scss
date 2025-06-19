@@ -1,4 +1,6 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/text';
 
 .ViewPollVotesDrawer {
   .poll-votes-drawer {
@@ -14,24 +16,24 @@
       display: flex;
       justify-content: flex-end; // Align button to the right
       padding-bottom: 16px;
-      border-bottom: 1px solid $neutral-200; // Separator line
+      border-bottom: 1px solid colors.$neutral-200; // Separator line
       margin-bottom: 16px;
 
       .csv-download-button {
         // Basic button styling, can be replaced with CWButton later
         padding: 8px 16px;
-        background-color: $primary-500;
-        color: $white;
+        background-color: colors.$primary-500;
+        color: colors.$white;
         border: none;
         border-radius: 4px;
         cursor: pointer;
 
         &:hover {
-          background-color: $primary-600;
+          background-color: colors.$primary-600;
         }
 
         &:disabled {
-          background-color: $neutral-300;
+          background-color: colors.$neutral-300;
           cursor: not-allowed;
         }
       }
@@ -42,7 +44,7 @@
     }
 
     .percentage-breakdown-section {
-      background-color: $neutral-100; // Light background for emphasis
+      background-color: colors.$neutral-100; // Light background for emphasis
       padding: 16px;
       border-radius: 8px;
       display: flex;
@@ -54,7 +56,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 8px 0;
-        border-bottom: 1px solid $neutral-200;
+        border-bottom: 1px solid colors.$neutral-200;
 
         &:last-child {
           border-bottom: none;
@@ -67,11 +69,11 @@
         }
         .option-percentage {
           font-weight: bold;
-          color: $primary-500; // Highlight percentage
+          color: colors.$primary-500; // Highlight percentage
         }
         .option-weight-details {
-          color: $neutral-600;
-          @include caption;
+          color: colors.$neutral-600;
+          @include text.caption;
           text-align: right;
           flex-basis: 30%;
         }
@@ -82,7 +84,7 @@
       display: flex;
       justify-content: space-around;
       padding: 16px 0;
-      border-top: 1px solid $neutral-200;
+      border-top: 1px solid colors.$neutral-200;
       margin-top: 16px;
 
       .total-votes-count,
@@ -93,7 +95,7 @@
         gap: 4px;
 
         .CWText[type='caption'] {
-          color: $neutral-500;
+          color: colors.$neutral-500;
         }
         .CWText[type='b2'] {
           font-weight: bold;
@@ -104,13 +106,13 @@
     .empty-votes-container {
       text-align: center;
       padding: 40px 0;
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
 
     .loading-text {
       text-align: center;
       padding: 40px 0;
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
   }
 }

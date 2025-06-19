@@ -1,4 +1,6 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .CommunityMembersPage {
   width: 100%;
@@ -16,7 +18,7 @@
     &.cols-3 {
       grid-template-columns: 9fr 3fr;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         grid-template-columns: initial;
         grid-template-rows: 1fr 1fr;
       }
@@ -25,7 +27,7 @@
     &.cols-4 {
       grid-template-columns: 7fr 3fr 2fr;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         grid-template-columns: initial;
         grid-template-rows: 1fr 1fr 1fr;
       }
@@ -44,7 +46,7 @@
     .search-icon {
       position: relative;
       left: 16px !important;
-      color: $neutral-400;
+      color: colors.$neutral-400;
     }
 
     .select-dropdown-container {
@@ -62,7 +64,7 @@
         margin-right: 16px;
         width: fit-content;
 
-        @include extraSmall {
+        @include media_queries.extraSmall {
           margin-left: 0;
         }
       }

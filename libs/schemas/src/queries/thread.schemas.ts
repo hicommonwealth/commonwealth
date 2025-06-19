@@ -1,5 +1,5 @@
 import { LinkSource } from '@hicommonwealth/shared';
-import { z } from 'zod/v4';
+import { z, ZodType } from 'zod/v4';
 import { AuthContext, ThreadContext } from '../context';
 import {
   Address,
@@ -14,7 +14,7 @@ import {
   UserProfile,
 } from '../entities';
 import { ContestAction } from '../projections';
-import { PG_INT, paginationSchema } from '../utils';
+import { paginationSchema, PG_INT } from '../utils';
 import { TopicView } from './community.schemas';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
@@ -92,7 +92,7 @@ export const AddressView = Address.extend({
   last_active: z.date().or(z.string()).nullish(),
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
-  User: UserView.nullish(),
+  User: UserView.nullish() as ZodType<UserView | null | undefined>,
 }).omit({
   oauth_email: true,
   oauth_provider: true,

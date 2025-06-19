@@ -1,15 +1,16 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
 
 .AdminActions {
   .danger {
-    color: $rorange-600 !important;
+    color: colors.$rorange-600 !important;
 
     .Icon {
-      color: $rorange-600 !important;
+      color: colors.$rorange-600 !important;
     }
 
     .Text {
-      color: $rorange-600 !important;
+      color: colors.$rorange-600 !important;
     }
   }
 }

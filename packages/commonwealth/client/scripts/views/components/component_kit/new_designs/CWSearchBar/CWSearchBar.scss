@@ -1,11 +1,14 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
+@use '../../../../../styles/mixins/text';
 
 @mixin everyRowStyles {
   cursor: pointer;
   padding: 8px;
 
   &:hover {
-    background-color: $neutral-100;
+    background-color: colors.$neutral-100;
     border-radius: 6px;
   }
 }
@@ -18,10 +21,10 @@
   padding: 8px 16px;
   gap: 8px;
   height: 40px;
-  background-color: $white;
-  border: 1px solid $neutral-200;
+  background-color: colors.$white;
+  border: 1px solid colors.$neutral-200;
   border-radius: 6px;
-  color: $neutral-800;
+  color: colors.$neutral-800;
 
   &.small {
     height: 34px;
@@ -33,24 +36,24 @@
     }
   }
 
-  @include mediumSmallMid {
+  @include media_queries.mediumSmallMid {
     width: 100%;
   }
 
   &:hover {
-    border: 1px solid $primary-600;
+    border: 1px solid colors.$primary-600;
   }
 
   &:focus-within {
     outline: none;
-    border-color: $primary-500;
+    border-color: colors.$primary-500;
     box-shadow:
       0 2px 2px -1px rgba(0, 0, 0, 0.12),
-      0px 0px 0px 3px $primary-100;
+      0px 0px 0px 3px colors.$primary-100;
   }
 
   &:focus-within:hover {
-    border-color: $primary-500;
+    border-color: colors.$primary-500;
   }
 
   &.container {
@@ -63,7 +66,7 @@
       border: none;
     }
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       // on mobile, dropdown should be relative to header container
       // so the result list is full width of the device
       position: static;
@@ -71,20 +74,20 @@
   }
 
   &.disabled {
-    background-color: $neutral-50;
-    border-color: $neutral-200;
+    background-color: colors.$neutral-50;
+    border-color: colors.$neutral-200;
     box-shadow: none;
-    color: $neutral-500;
+    color: colors.$neutral-500;
 
     &:hover {
-      border-color: $neutral-200;
+      border-color: colors.$neutral-200;
     }
   }
 
   input {
     width: 100%;
     border: none;
-    @include b2;
+    @include text.b2;
 
     &:focus {
       outline: none;
@@ -92,20 +95,20 @@
     }
 
     &.disabled {
-      background-color: $neutral-50;
+      background-color: colors.$neutral-50;
     }
 
     ::placeholder {
-      color: $neutral-800;
+      color: colors.$neutral-800;
     }
   }
 
   .magnifyingGlass {
-    color: $neutral-400;
+    color: colors.$neutral-400;
 
     &:hover {
       cursor: pointer;
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
   }
 

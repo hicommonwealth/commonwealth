@@ -136,14 +136,7 @@ const TokensList = ({
     <div className="TokensList">
       {!hideHeader && <CWText type="h2">Tokens</CWText>}
       {!hideFilters && (
-        <div
-          className={clsx('filters', {
-            hasAppliedFilter:
-              Object.values(filters).filter(Boolean).length === 1
-                ? !filters.withTokenSortOrder
-                : Object.values(filters).filter(Boolean).length > 0,
-          })}
-        >
+        <div className={clsx('filters', 'hasAppliedFilter')}>
           <CWButton
             label="Filters"
             iconRight="funnelSimple"

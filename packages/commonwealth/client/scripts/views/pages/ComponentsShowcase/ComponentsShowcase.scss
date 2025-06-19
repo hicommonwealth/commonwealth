@@ -1,21 +1,23 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .ComponentsShowcase {
   display: flex;
-  height: calc(100vh - #{$global-header-height} - 88px);
+  height: calc(100vh - #{shared.$global-header-height} - 88px);
 
   .page-sidebar {
     width: 224px;
     padding-right: 24px;
     overflow-y: auto;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       display: none;
     }
 
     .list-header {
       text-transform: uppercase;
-      color: $neutral-400;
+      color: colors.$neutral-400;
       padding: 6px 12px;
     }
 
@@ -101,7 +103,7 @@
 
   .Colors {
     .ColorCard {
-      @include extraSmall {
+      @include media_queries.extraSmall {
         width: 48%;
       }
 
@@ -148,7 +150,7 @@
       justify-content: center;
       align-items: center;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         width: 100%;
       }
     }
