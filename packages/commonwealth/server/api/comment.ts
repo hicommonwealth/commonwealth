@@ -28,12 +28,12 @@ export const trpcRouter = trpc.router({
         },
       ) => {
         if (
-          !(await shouldRankThread({
+          !shouldRankThread({
             community_id,
             user_tier_at_creation,
             marked_as_spam_at,
             body,
-          }))
+          })
         )
           return;
         await incrementThreadRank(config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT, {
@@ -85,12 +85,12 @@ export const trpcRouter = trpc.router({
       ) => {
         if (!user_tier_at_creation) return;
         if (
-          !(await shouldRankThread({
+          !shouldRankThread({
             community_id,
             user_tier_at_creation,
             marked_as_spam_at,
             body,
-          }))
+          })
         )
           return;
         await decrementThreadRank(config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT, {
@@ -124,12 +124,12 @@ export const trpcRouter = trpc.router({
           });
         } else if (spam === false && marked_as_spam_at === null) {
           if (
-            !(await shouldRankThread({
+            !shouldRankThread({
               community_id,
               user_tier_at_creation,
               marked_as_spam_at,
               body,
-            }))
+            })
           )
             return;
           await incrementThreadRank(config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT, {

@@ -470,7 +470,7 @@ export async function decrementThreadRank(
  *
  * WARNING: These rules MUST be replicated in the ReRankThreads.command.ts DB query.
  */
-export async function shouldRankThread({
+export function shouldRankThread({
   community_id,
   body,
   user_tier_at_creation,

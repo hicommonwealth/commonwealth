@@ -36,13 +36,13 @@ export const trpcRouter = trpc.router({
         },
       ) => {
         if (
-          !(await shouldRankThread({
+          !shouldRankThread({
             community_id,
             body,
             user_tier_at_creation,
             community_tier,
             marked_as_spam_at,
-          }))
+          })
         )
           return;
         await createThreadRank(
@@ -100,13 +100,13 @@ export const trpcRouter = trpc.router({
           });
           if (!community) return;
           if (
-            !(await shouldRankThread({
+            !shouldRankThread({
               community_id,
               body,
               user_tier_at_creation,
               community_tier: community.tier,
               marked_as_spam_at,
-            }))
+            })
           )
             return;
           await createThreadRank(
@@ -133,10 +133,10 @@ export const trpcRouter = trpc.router({
       trpc.fireAndForget(
         async (_, { community_id, thread_id, user_tier_at_creation }) => {
           if (
-            !(await shouldRankThread({
+            !shouldRankThread({
               user_tier_at_creation,
               community_id,
-            }))
+            })
           )
             return;
           await incrementThreadRank(config.HEURISTIC_WEIGHTS.LIKE_WEIGHT, {
@@ -179,10 +179,10 @@ export const trpcRouter = trpc.router({
         });
         if (thread) {
           if (
-            !(await shouldRankThread({
+            !shouldRankThread({
               user_tier_at_creation,
               community_id: thread.community_id,
-            }))
+            })
           )
             return;
           await decrementThreadRank(config.HEURISTIC_WEIGHTS.LIKE_WEIGHT, {

@@ -151,11 +151,11 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
         } = {};
         const globalRankUpdates: { value: string; score: number }[] = [];
         for (const { thread_id, community_rank, global_rank } of ranks[0]) {
-          const community_id = communityIds[String(thread_id)];
-          if (!communityRankUpdates[community_id]) {
-            communityRankUpdates[community_id] = [];
+          const commmunityId = communityIds[String(thread_id)];
+          if (!communityRankUpdates[commmunityId]) {
+            communityRankUpdates[commmunityId] = [];
           }
-          communityRankUpdates[community_id].push({
+          communityRankUpdates[commmunityId].push({
             value: String(thread_id),
             score: Number(community_rank),
           });

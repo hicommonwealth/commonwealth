@@ -20,7 +20,7 @@ const RerankThreads = () => {
       enabled: !!debouncedCommunityId,
     });
 
-  const { mutateAsync: rerankThreads, isLoading } = useRerankThreadsMutation();
+  const { mutateAsync: rerankThreads, isPending } = useRerankThreadsMutation();
 
   const communityNotFound =
     !isLoadingCommunity &&
@@ -30,7 +30,9 @@ const RerankThreads = () => {
   const openConfirmationModal = () => {
     openConfirmation({
       title: 'Rerank Threads',
-      description: `Are you sure you want to rerank threads${communityId ? ` for community ${communityId}` : ' for all communities'}?`,
+      description: `Are you sure you want to rerank threads${
+        communityId ? ` for community ${communityId}` : ' for all communities'
+      }?`,
       buttons: [
         {
           label: 'Rerank',
@@ -80,7 +82,7 @@ const RerankThreads = () => {
           disabled={
             (!!debouncedCommunityId &&
               (isLoadingCommunity || communityNotFound)) ||
-            isLoading
+            isPending
           }
           onClick={openConfirmationModal}
         />
