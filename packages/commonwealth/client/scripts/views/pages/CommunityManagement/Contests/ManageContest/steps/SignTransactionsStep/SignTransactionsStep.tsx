@@ -159,10 +159,6 @@ const SignTransactionsStep = ({
       } else if (isDirectDepositSelected) {
         // Otherwise fallback to funding token address if direct deposit
         return contestFormData?.fundingTokenAddress;
-      } else {
-        // If no stake token, use default Solana token
-        return stakeData?.stake?.stake_token;
-      }
     } else {
       // For Ethereum, use the original logic
       return isDirectDepositSelected
@@ -260,37 +256,8 @@ const SignTransactionsStep = ({
 
       // For Solana communities, always use the Solana contest deployment
       if (isSolanaChain) {
-        // Convert the winner shares for validation
-        const convertedWinnerShares =
-          winnerShares && winnerShares.length > 0
-            ? winnerShares.map((share) => share * 100)
-            : [10000];
-
-        // Calculate the total shares in basis points (should be 10000)
-        const totalBasisPoints = convertedWinnerShares.reduce(
-          (a, b) => a + b,
-          0,
-        );
-
-        // Update solanaContest with the converted shares
-        solanaContest.winnerShares = convertedWinnerShares;
-
-        // Get phantom wallet and ensure it's available
-
-        try {
-          const result =
             await deploySolanaContestOnchainMutation(solanaContest);
-          contestAddress = result.contestPda;
-        } catch (error) {
-          // Extract detailed error message if available
-          let errorMessage = error.message || 'Unknown error occurred';
-
-          // Check if this is a Solana-specific error with logs
-          if (error.logs) {
-            errorMessage = `Solana program error: ${errorMessage}\nCheck console for detailed logs.`;
-          }
-
-          throw new Error(`Failed to deploy Solana contest: ${errorMessage}`);
+          contestAddress = result.contestPda;;
         }
       } else if (isContestRecurring) {
         contestAddress = await deployRecurringContestOnchainMutation(recurring);
@@ -304,11 +271,6 @@ const SignTransactionsStep = ({
       // Get token symbol from the topic for Solana contests
       const topicId = contestFormData?.contestTopic?.value as number;
       const selectedTopic = combinedTopicsData.find((t) => t.id === topicId);
-      // Use token_symbol from the selected topic for Solana chains
-      const tokenSymbol =
-        isSolanaChain && selectedTopic?.token_symbol
-          ? selectedTopic.token_symbol
-          : fundingTokenTicker;
 
       await createContestMutation({
         contest_address: contestAddress,
@@ -327,7 +289,9 @@ const SignTransactionsStep = ({
         payout_structure: contestFormData?.payoutStructure,
         interval: isSolanaChain ? 0 : isContestRecurring ? contestInterval! : 0,
         topic_id: topicId,
-        ticker: tokenSymbol,
+        ticker: isSolanaChain && selectedTopic?.token_symbol
+          ? selectedTopic.token_symbol
+          : fundingTokenTicker,
         is_farcaster_contest: contestFormData.isFarcasterContest,
         decimals: isSolanaChain ? 9 : fundingTokenDecimals,
         vote_weight_multiplier: contestFormData.voteWeightMultiplier,

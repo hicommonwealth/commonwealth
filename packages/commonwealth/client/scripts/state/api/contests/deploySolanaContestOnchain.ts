@@ -81,17 +81,6 @@ const deploySolanaContestOnchain = async ({
       );
     }
 
-    // Create the provider using the wallet interface directly instead of helper
-    const anchorWallet = {
-      publicKey: new PublicKey(phantomWallet.accounts[0]),
-      signTransaction: async (tx: any) => {
-        return await window.solana.signTransaction(tx);
-      },
-      signAllTransactions: async (txs: any[]) => {
-        return await window.solana.signAllTransactions(txs);
-      },
-    };
-
     // Ensure prizeMint is a PublicKey
     const prizeMintKey =
       typeof prizeMint === 'string'

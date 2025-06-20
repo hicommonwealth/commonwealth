@@ -138,9 +138,11 @@ const FundContestForm = ({
             />
           )}
 
-          <CWText type="b2" fontWeight="medium">
-            {displayAmount(tokenAmountInUsd)} USD
-          </CWText>
+          {!isSolanaChain && (
+            <CWText type="b2" fontWeight="medium">
+              {displayAmount(tokenAmountInUsd)} USD
+            </CWText>
+          )}
         </div>
 
         <div className="summary-balance-row">
@@ -150,9 +152,11 @@ const FundContestForm = ({
               {displayAmount(newContestTokenBalance)} {fundingTokenTicker}
             </CWText>
           </div>
-          <CWText type="caption" fontWeight="medium">
-            {displayAmount(newContestBalanceInUsd)} USD
-          </CWText>
+          {!isSolanaChain && (
+            <CWText type="caption" fontWeight="medium">
+              {displayAmount(newContestBalanceInUsd)} USD
+            </CWText>
+          )}
         </div>
       </div>
 

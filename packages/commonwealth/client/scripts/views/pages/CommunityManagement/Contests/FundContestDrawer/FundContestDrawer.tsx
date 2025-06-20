@@ -82,22 +82,11 @@ const FundContestDrawer = ({
 
     if (isSolanaChain) {
       // Check for Phantom wallet in window object
-      const phantomWallet = window.solana;
-
-      if (!phantomWallet) {
-        console.error('Phantom wallet not found');
-        setErrorMessage(
-          'Phantom wallet not found. Please install the Phantom wallet extension and refresh the page.',
-        );
-        setFundContestDrawerStep('Failure');
-        return;
-      }
 
       fundSolanaContest({
         contestAddress,
         chainRpc,
         amount: Number(tokenAmount),
-        phantomWallet,
       })
         .then((tx) => {
           setFundContestDrawerStep('Success');
