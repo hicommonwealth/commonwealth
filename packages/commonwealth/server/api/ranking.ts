@@ -471,16 +471,21 @@ export async function decrementThreadRank(
  * WARNING: These rules MUST be replicated in the ReRankThreads.command.ts DB query.
  */
 export async function shouldRankThread({
+  community_id,
   body,
   user_tier_at_creation,
   community_tier,
   marked_as_spam_at,
 }: {
+  community_id?: string;
   body?: string;
   user_tier_at_creation?: UserTierMap | null;
   community_tier?: CommunityTierMap;
   marked_as_spam_at?: Date | null;
 }) {
+  // Common skews rankings since there is a lot of spam and it gets a lot of views/reactions/comments
+  if (community_id && community_id === 'common') return false;
+
   if (body && body.length < 32) return false;
   if (community_tier && community_tier < CommunityTierMap.ManuallyVerified)
     return false;

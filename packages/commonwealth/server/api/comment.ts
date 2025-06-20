@@ -19,12 +19,20 @@ export const trpcRouter = trpc.router({
     trpc.fireAndForget(
       async (
         _,
-        { community_id, thread_id, user_tier_at_creation, marked_as_spam_at },
+        {
+          community_id,
+          thread_id,
+          user_tier_at_creation,
+          marked_as_spam_at,
+          body,
+        },
       ) => {
         if (
           !(await shouldRankThread({
+            community_id,
             user_tier_at_creation,
             marked_as_spam_at,
+            body,
           }))
         )
           return;
@@ -65,8 +73,26 @@ export const trpcRouter = trpc.router({
   getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment),
   deleteComment: trpc.command(Comment.DeleteComment, trpc.Tag.Comment, [
     trpc.fireAndForget(
-      async (_, { thread_id, community_id, user_tier_at_creation }) => {
+      async (
+        _,
+        {
+          thread_id,
+          community_id,
+          user_tier_at_creation,
+          marked_as_spam_at,
+          body,
+        },
+      ) => {
         if (!user_tier_at_creation) return;
+        if (
+          !(await shouldRankThread({
+            community_id,
+            user_tier_at_creation,
+            marked_as_spam_at,
+            body,
+          }))
+        )
+          return;
         await decrementThreadRank(config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT, {
           thread_id,
           community_id,
@@ -85,6 +111,7 @@ export const trpcRouter = trpc.router({
           user_tier_at_creation,
           marked_as_spam_at,
           spam_toggled,
+          body,
         },
       ) => {
         if (!user_tier_at_creation || !spam_toggled) return;
@@ -98,8 +125,10 @@ export const trpcRouter = trpc.router({
         } else if (spam === false && marked_as_spam_at === null) {
           if (
             !(await shouldRankThread({
+              community_id,
               user_tier_at_creation,
               marked_as_spam_at,
+              body,
             }))
           )
             return;

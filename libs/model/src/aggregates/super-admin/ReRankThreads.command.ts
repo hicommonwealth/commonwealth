@@ -78,13 +78,15 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
                                   LEFT JOIN "Comments" C ON C.thread_id = T.id
                                   LEFT JOIN "Reactions" R ON R.thread_id = T.id
                                   JOIN "Communities" CO ON CO.id = T.community_id
-                           WHERE T.created_at > NOW() - INTERVAL '4 weeks'
+                           WHERE T.created_at > NOW() - INTERVAL '7 weeks'
                              AND T.marked_as_spam_at IS NULL
                              AND T.deleted_at IS NULL
                              AND T.user_tier_at_creation IS NOT NULL
                              AND C.marked_as_spam_at IS NULL
                              AND CO.tier >= ${CommunityTierMap.ManuallyVerified}
                              AND LENGTH(T.body) >= 32
+                             AND LENGTH(C.body) >= 32
+                             AND CO.id != 'common'
                              ${community_id ? 'AND T.community_id = :community_id' : ''}
                            GROUP BY T.id, T.user_tier_at_creation, T.view_count, T.created_at, CO.tier, T.community_id),
                  base_ranks AS (SELECT id,

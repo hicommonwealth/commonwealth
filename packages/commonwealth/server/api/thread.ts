@@ -32,18 +32,27 @@ export const trpcRouter = trpc.router({
           community_id,
           community_tier,
           marked_as_spam_at,
+          body,
         },
       ) => {
-        if (!marked_as_spam_at) {
-          await createThreadRank(
-            {
-              id: id!,
-              created_at: created_at!,
-              user_tier_at_creation: user_tier_at_creation!,
-            },
-            { id: community_id, tier: community_tier },
-          );
-        }
+        if (
+          !(await shouldRankThread({
+            community_id,
+            body,
+            user_tier_at_creation,
+            community_tier,
+            marked_as_spam_at,
+          }))
+        )
+          return;
+        await createThreadRank(
+          {
+            id: id!,
+            created_at: created_at!,
+            user_tier_at_creation: user_tier_at_creation!,
+          },
+          { id: community_id, tier: community_tier },
+        );
       },
     ),
     trpc.trackAnalytics([
@@ -92,6 +101,7 @@ export const trpcRouter = trpc.router({
           if (!community) return;
           if (
             !(await shouldRankThread({
+              community_id,
               body,
               user_tier_at_creation,
               community_tier: community.tier,
@@ -122,6 +132,13 @@ export const trpcRouter = trpc.router({
       }),
       trpc.fireAndForget(
         async (_, { community_id, thread_id, user_tier_at_creation }) => {
+          if (
+            !(await shouldRankThread({
+              user_tier_at_creation,
+              community_id,
+            }))
+          )
+            return;
           await incrementThreadRank(config.HEURISTIC_WEIGHTS.LIKE_WEIGHT, {
             community_id,
             thread_id,
@@ -161,6 +178,13 @@ export const trpcRouter = trpc.router({
           where: { id: thread_id },
         });
         if (thread) {
+          if (
+            !(await shouldRankThread({
+              user_tier_at_creation,
+              community_id: thread.community_id,
+            }))
+          )
+            return;
           await decrementThreadRank(config.HEURISTIC_WEIGHTS.LIKE_WEIGHT, {
             thread_id,
             community_id: thread.community_id,
