@@ -104,6 +104,7 @@ export enum WalletId {
   Farcaster = 'farcaster',
   OKX = 'okx',
   SuiWallet = 'sui-wallet',
+  Binance = 'binance',
 }
 
 // Passed directly to Magic login.
