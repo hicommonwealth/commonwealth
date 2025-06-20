@@ -2,7 +2,7 @@ import { models } from '@hicommonwealth/model';
 import { GenericContainer } from 'testcontainers';
 import Web3 from 'web3';
 
-export const imageUrl = 'public.ecr.aws/f8g0x5p7/commonwealth-anvil:72bdcb7';
+export const imageUrl = 'public.ecr.aws/f8g0x5p7/commonwealth-anvil:af964a9';
 
 let port;
 
@@ -28,6 +28,10 @@ export async function setupAnvil() {
   try {
     const container = await new GenericContainer(imageUrl)
       .withExposedPorts(8545)
+      .withEnvironment({
+        FORK_URL: process.env.FORK_URL as string,
+        PORT: '8545',
+      })
       .start();
 
     port = container.getMappedPort(8545);
@@ -54,9 +58,16 @@ export async function setupAnvil() {
       )
     `);
 
+    const web3 = new Web3(
+      new Web3.providers.HttpProvider(
+        `http://127.0.0.1:${container!.getMappedPort(8545)}`,
+      ),
+    );
+
+    const lastBlock = await web3.eth.getBlockNumber();
     await models.sequelize.query(`
         INSERT INTO "LastProcessedEvmBlocks" (chain_node_id, block_number)
-        VALUES (1, 18);
+        VALUES (1, ${lastBlock});
     `);
 
     return container;
