@@ -33,6 +33,7 @@ export type CommentsTreeProps = {
   permissions: ReturnType<
     typeof Permissions.getMultipleActionsPermission<typeof actionPermissions>
   >;
+  onChatModeChange?: (isChatMode: boolean) => void;
 };
 
 export type UseCommentsTreeProps = Pick<
