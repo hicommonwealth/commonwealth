@@ -1,5 +1,5 @@
 import { MAX_SCHEMA_INT, MIN_SCHEMA_INT } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const Wallets = z.object({
   id: z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT).optional(),

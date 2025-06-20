@@ -2,7 +2,7 @@ import { TokenView } from '@hicommonwealth/schemas';
 import BigNumber from 'bignumber.js';
 import { weiToTokens } from 'helpers';
 import { fetchCachedPublicEnvVar } from 'state/api/configuration';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const calculateTokenPricing = (
   token: z.infer<typeof TokenView> | undefined,

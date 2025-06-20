@@ -1,6 +1,6 @@
 import { PollView } from '@hicommonwealth/schemas';
 import moment from 'moment';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const getPollTimestamp = (
   poll: z.infer<typeof PollView> & { custom_duration?: string },

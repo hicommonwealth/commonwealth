@@ -1,4 +1,4 @@
-import { z, ZodError, ZodType } from 'zod';
+import { z, ZodError, ZodType } from 'zod/v4';
 import { InvalidInput, type Context, type Metadata } from './types';
 
 /**

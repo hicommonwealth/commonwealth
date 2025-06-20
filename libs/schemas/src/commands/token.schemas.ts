@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { AuthContext } from '../context';
 import { events } from '../events';
 import { LaunchpadTradeView, TokenView } from '../queries';

@@ -1,11 +1,9 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import * as protocols from '@hicommonwealth/evm-protocols';
-import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import Chance from 'chance';
 import dayjs from 'dayjs';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
-import z from 'zod';
 import { config, emitEvent, equalEvmAddresses } from '../../src';
 import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
 import { CreateLaunchpadTrade, CreateToken } from '../../src/aggregates/token';
@@ -156,11 +154,15 @@ describe('Launchpad Lifecycle', () => {
           is_buy: true,
           token_address: results!.token_address as `0x${string}`,
           trader_address: results!.trader_address as `0x${string}`,
+          // @ts-ignore - this is a mock
           community_token_amount: results!.community_token_amount,
+          // @ts-ignore - this is a mock
           floating_supply: results!.floating_supply,
+          // @ts-ignore - this is a mock
           eth_amount: AMOUNT1,
+          // @ts-ignore - this is a mock
           block_timestamp: Math.floor(new Date().getTime() / 1000),
-        } as unknown as z.infer<schemas.OutboxSchemas['LaunchpadTokenTraded']>,
+        },
       },
     ]);
 

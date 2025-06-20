@@ -3,7 +3,7 @@ import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { alchemyGetTokenPrices } from '@hicommonwealth/shared';
 import { Includeable } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 import { PinTokenErrors } from './PinToken.command';
 

@@ -114,8 +114,9 @@ export function useOAS(
     swaggerUi.setup(undefined, { swaggerUrl: '../openapi.json' }),
   );
 
-  const oasHandler = toOpenApiExpress(trpcRouter);
-  router.use((req, res, next) => {
-    oasHandler(req, res).catch(next);
-  });
+  // TODO: support zod/v4 missing
+  // const oasHandler = toOpenApiExpress(trpcRouter);
+  // router.use((req, res, next) => {
+  //   oasHandler(req, res).catch(next);
+  // });
 }

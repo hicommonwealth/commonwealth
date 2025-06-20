@@ -5,7 +5,7 @@ import { notifyError } from 'client/scripts/controllers/app/notifications';
 import Account from 'client/scripts/models/Account';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { useCallback, useMemo, useRef } from 'react';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export function useSignIn() {
   const utils = trpc.useUtils();

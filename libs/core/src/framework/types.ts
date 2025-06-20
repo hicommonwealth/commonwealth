@@ -1,5 +1,5 @@
 import { Events, events } from '@hicommonwealth/schemas';
-import z, { ZodType, ZodUndefined } from 'zod';
+import z, { ZodType, ZodUndefined } from 'zod/v4';
 
 /**
  * Error names as constants

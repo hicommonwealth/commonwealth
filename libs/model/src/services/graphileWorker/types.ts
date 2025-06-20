@@ -1,6 +1,6 @@
 import { events } from '@hicommonwealth/schemas';
 import { CronItem, JobHelpers, PromiseOrDirect } from 'graphile-worker';
-import { z, ZodType, ZodUndefined } from 'zod';
+import { z, ZodType, ZodUndefined } from 'zod/v4';
 
 export enum GraphileTaskNames {
   ArchiveOutbox = 'ArchiveOutbox',

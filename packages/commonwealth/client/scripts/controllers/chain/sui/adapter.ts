@@ -1,7 +1,7 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import type { IApp } from 'state';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import IChainAdapter from '../../../models/IChainAdapter';
 import type SuiAccount from './account';
 import SuiAccounts from './accounts';

@@ -5,7 +5,7 @@ import app from 'state';
 import { useCreateCommunityAlertMutation } from 'state/api/trpc/subscription/useCreateCommunityAlertMutation';
 import { useDeleteCommunityAlertMutation } from 'state/api/trpc/subscription/useDeleteCommunityAlertMutation';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { useUserStore } from '../../state/ui/user/user';
 
 export const SubscriptionButton = ({

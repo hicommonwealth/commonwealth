@@ -6,7 +6,7 @@ import {
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { AuthContext } from '../context';
 import {
   Community,

@@ -1,6 +1,6 @@
 import { config, logger, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import { ZodUndefined } from 'zod';
+import { ZodUndefined } from 'zod/v4';
 import { models } from '../database';
 import { mustExist } from '../middleware';
 

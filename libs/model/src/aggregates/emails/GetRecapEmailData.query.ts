@@ -14,7 +14,7 @@ import {
   notificationsProvider,
 } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import z from 'zod';
+import z from 'zod/v4';
 import { config, generateUnsubscribeLink, models } from '../../index';
 
 const log = logger(import.meta);

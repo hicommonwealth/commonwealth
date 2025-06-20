@@ -1,6 +1,6 @@
 import { PollContext, ThreadContext } from '@hicommonwealth/schemas';
 import { DEFAULT_POLL_DURATION } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { Poll, Vote } from '../entities/poll.schemas';
 import { PG_INT } from '../utils';
 

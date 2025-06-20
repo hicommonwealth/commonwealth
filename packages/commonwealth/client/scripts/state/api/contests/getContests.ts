@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { GetAllContests } from '@hicommonwealth/schemas';
 import { trpc } from 'utils/trpcClient';

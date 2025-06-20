@@ -2,7 +2,7 @@ import { Environments } from '@hicommonwealth/schemas';
 import { createHash } from 'crypto';
 import * as dotenv from 'dotenv';
 import _ from 'lodash';
-import { ZodType, z } from 'zod';
+import { ZodType, z } from 'zod/v4';
 import { LogLevel, LogLevels } from './ports/enums';
 
 dotenv.config({ path: '../../.env' });
