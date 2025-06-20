@@ -359,9 +359,9 @@ async function updatePostgresRank(threadId: number, rankIncrease: number) {
     `,
     {
       type: QueryTypes.UPDATE,
-      replacements: { rankIncrease: Math.round(rankIncrease), threadId },
+      replacements: { rankIncrease, threadId },
     },
-  )) as unknown as [{ community_rank: number; global_rank: number }[], number];
+  )) as unknown as [{ community_rank: string; global_rank: string }[], number];
   return rank[0];
 }
 
@@ -374,17 +374,22 @@ export async function createThreadRank(
   community: { id: string; tier: CommunityTierMap },
 ) {
   const communityRank =
-    Math.floor((thread.created_at?.getTime() || Date.now()) / 1000) *
-      config.HEURISTIC_WEIGHTS.CREATED_DATE_WEIGHT +
-    thread.user_tier_at_creation *
-      config.HEURISTIC_WEIGHTS.CREATOR_USER_TIER_WEIGHT;
-  const globalRank =
-    Math.round(communityRank) +
-    config.HEURISTIC_WEIGHTS.COMMUNITY_TIER_WEIGHT * community.tier;
+    Math.round(
+      Math.floor((thread.created_at?.getTime() || Date.now()) / 1000 / 60) *
+        config.HEURISTIC_WEIGHTS.CREATED_DATE_WEIGHT,
+    ) +
+    Math.round(
+      thread.user_tier_at_creation *
+        config.HEURISTIC_WEIGHTS.CREATOR_USER_TIER_WEIGHT,
+    );
+  const globalRank = Math.round(
+    communityRank +
+      config.HEURISTIC_WEIGHTS.COMMUNITY_TIER_WEIGHT * community.tier,
+  );
 
   await models.ThreadRank.create({
     thread_id: thread.id!,
-    community_rank: BigInt(Math.round(communityRank)),
+    community_rank: BigInt(communityRank),
     global_rank: BigInt(globalRank),
   });
   await incrementCachedRank(
@@ -423,7 +428,7 @@ export async function incrementThreadRank(
   updateWeight: number,
   { community_id, thread_id, user_tier_at_creation }: ThreadRankUpdateParams,
 ) {
-  const rankIncrease = user_tier_at_creation * updateWeight;
+  const rankIncrease = Math.round(user_tier_at_creation * updateWeight);
   const rank = await updatePostgresRank(thread_id, rankIncrease);
   if (rank.length === 0) {
     log.trace(`No thread rank found for thread ${thread_id}`);
@@ -441,7 +446,7 @@ export async function decrementThreadRank(
   weight: number,
   { community_id, thread_id, user_tier_at_creation }: ThreadRankUpdateParams,
 ) {
-  const rankDecrease = user_tier_at_creation * weight;
+  const rankDecrease = Math.round(user_tier_at_creation * weight);
   const rank = await updatePostgresRank(thread_id, -rankDecrease);
   if (rank.length === 0) {
     log.trace(`No thread rank found for thread ${thread_id}`);
@@ -457,4 +462,38 @@ export async function decrementThreadRank(
     Number(rank[0].community_rank),
     Number(rank[0].global_rank),
   );
+}
+
+/**
+ * This function is used to determine if a thread should be ranked.
+ * It filters out spam, low quality, and predicted low engagement threads.
+ *
+ * WARNING: These rules MUST be replicated in the ReRankThreads.command.ts DB query.
+ */
+export function shouldRankThread({
+  community_id,
+  body,
+  user_tier_at_creation,
+  community_tier,
+  marked_as_spam_at,
+}: {
+  community_id?: string;
+  body?: string;
+  user_tier_at_creation?: UserTierMap | null;
+  community_tier?: CommunityTierMap;
+  marked_as_spam_at?: Date | null;
+}) {
+  // Common skews rankings since there is a lot of spam and it gets a lot of views/reactions/comments
+  if (community_id && community_id === 'common') return false;
+
+  if (body && body.length < 32) return false;
+  if (community_tier && community_tier < CommunityTierMap.ManuallyVerified)
+    return false;
+  if (
+    user_tier_at_creation &&
+    user_tier_at_creation < UserTierMap.NewlyVerifiedWallet
+  )
+    return false;
+  if (marked_as_spam_at) return false;
+  return true;
 }

@@ -1,3 +1,4 @@
+import useRerankThreadsMutation from 'state/api/superAdmin/rerankThreads';
 import { useCreateGoalMetaMutation } from './createGoalMeta';
 import useEnableDigestEmail from './enableDigestEmail';
 import useGetGoalMetasQuery from './getGoalMetas';
@@ -8,6 +9,7 @@ export {
   useCreateGoalMetaMutation,
   useEnableDigestEmail,
   useGetGoalMetasQuery,
+  useRerankThreadsMutation,
   useTriggerNotificationsWorkflowMutation,
   useUpdateResourceTimestamps,
 };

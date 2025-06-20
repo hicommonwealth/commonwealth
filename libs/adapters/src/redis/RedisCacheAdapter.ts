@@ -361,21 +361,15 @@ export class RedisCache implements Cache {
    * Get all the key-value pairs of a specific namespace.
    * @param namespace The name of the namespace to retrieve keys from
    * @param maxResults The maximum number of keys to retrieve from the given namespace
+   * @param withData
    */
   public async getNamespaceKeys(
     namespace: CacheNamespaces,
-    maxResults = 1000,
   ): Promise<{ [key: string]: string } | boolean> {
-    const keys = [];
     const data = {} as any;
     if (!this.isReady()) return false;
     try {
-      for await (const key of this._client.scanIterator({
-        MATCH: `${namespace}*`,
-        COUNT: maxResults,
-      })) {
-        keys.push(key);
-      }
+      const keys = await this.scanNamespaceKeys(namespace);
       for (const key of keys) {
         const keyType = await this._client.type(key);
         if (keyType === 'string') {
@@ -394,6 +388,29 @@ export class RedisCache implements Cache {
     }
   }
 
+  private async scanNamespaceKeys(
+    namespace: CacheNamespaces,
+    resultsPerIteration = 100,
+  ): Promise<string[]> {
+    const keys: string[] = [];
+    if (!this.isReady()) return [];
+    try {
+      for await (const key of this._client.scanIterator({
+        MATCH: `${namespace}*`,
+        COUNT: resultsPerIteration,
+      })) {
+        keys.push(key);
+      }
+    } catch (e) {
+      this._log.error(
+        'An error occurred while scanning namespace keys',
+        e as Error,
+      );
+      return [];
+    }
+    return keys;
+  }
+
   /**
    * delete redis key by namespace and key
    * @returns boolean
@@ -404,17 +421,17 @@ export class RedisCache implements Cache {
     if (!this.isReady()) return false;
     try {
       let count = 0;
-      const data = await this.getNamespaceKeys(namespace);
-      if (data) {
-        for (const key of Object.keys(data)) {
-          try {
-            const resp = await this._client.del(key);
-            count += resp ?? 0;
-            this._log.trace(`deleted key ${key} ${resp} ${count}`);
-          } catch (err) {
-            this._log.trace(`error deleting key ${key}`);
-            this._log.trace((err as Error).message);
-          }
+      for await (const key of this._client.scanIterator({
+        MATCH: `${namespace}*`,
+        COUNT: 100,
+      })) {
+        try {
+          const resp = await this._client.del(key);
+          count += resp ?? 0;
+          this._log.trace(`deleted key ${key} ${resp} ${count}`);
+        } catch (err) {
+          this._log.trace(`error deleting key ${key}`);
+          this._log.trace((err as Error).message);
         }
       }
       return count;
