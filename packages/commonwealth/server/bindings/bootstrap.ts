@@ -34,6 +34,16 @@ export async function bootstrapBindings(options?: {
     if (!options?.skipRmqAdapter) {
       broker({ adapter: rmqAdapter });
     }
+
+    await rmqAdapter.subscribeDlqHandler(
+      async ({ consumer, event_id, ...dlq }) => {
+        await models.Dlq.findOrCreate({
+          where: { consumer, event_id },
+          defaults: { consumer, event_id, ...dlq },
+        });
+      },
+    );
+
     brokerInstance = rmqAdapter;
   } catch (e) {
     log.error(

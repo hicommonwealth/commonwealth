@@ -1,5 +1,5 @@
 import { config as EnvConfig } from '@hicommonwealth/adapters';
-import { Consumer } from '@hicommonwealth/core';
+import { Consumer, EventsHandlerMetadata } from '@hicommonwealth/core';
 import {
   BindingConfig,
   BrokerConfig,
@@ -10,6 +10,10 @@ import {
 export enum RascalExchanges {
   DeadLetter = 'DeadLetterExchange',
   MessageRelayer = 'MessageRelayerExchange',
+}
+
+export enum RascalQueues {
+  DeadLetter = 'DeadLetterQueue',
 }
 
 /**
@@ -28,8 +32,8 @@ export function createRmqConfig({
   map,
 }: {
   rabbitMqUri: string;
-  // TODO: @Roger - add types so that override keys are a partial record of consumer input type
-  map: Array<Consumer>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  map: Array<Consumer<EventsHandlerMetadata<any>>>;
 }) {
   let vhost: string;
   let connection = <ConnectionConfig>rabbitMqUri;
@@ -76,7 +80,6 @@ export function createRmqConfig({
     },
   };
 
-  const deadLetterQueue = 'DeadLetterQueue';
   const config: BrokerConfig = {
     vhosts: {
       [vhost]: {
@@ -91,14 +94,14 @@ export function createRmqConfig({
           },
         },
         queues: {
-          [deadLetterQueue]: {
+          [RascalQueues.DeadLetter]: {
             ...queueConfig,
           },
         },
         bindings: {
           DeadLetterBinding: {
             source: RascalExchanges.DeadLetter,
-            destination: deadLetterQueue,
+            destination: RascalQueues.DeadLetter,
             destinationType: 'queue',
             bindingKey: deadLetterRoutingKey,
           },
@@ -112,7 +115,13 @@ export function createRmqConfig({
             },
           },
         },
-        subscriptions: {},
+        subscriptions: {
+          dlq_handler: {
+            queue: RascalQueues.DeadLetter,
+            contentType: 'application/json',
+            prefetch: 10,
+          },
+        },
       },
     },
   };
@@ -147,16 +156,11 @@ export function createRmqConfig({
       source: RascalExchanges.MessageRelayer,
       destination: queue,
       destinationType: 'queue',
-      bindingKeys: Object.keys(consumer().inputs).reduce(
-        (acc: string[], val) => {
-          if (!overrides) acc.push(val);
-          else if (overrides[val] !== null) {
-            acc.push(overrides[val] || val);
-          }
-          return acc;
-        },
-        [],
-      ),
+      bindingKeys: Object.keys(consumer().inputs).reduce((acc, key) => {
+        if (!overrides) acc.push(key);
+        else if (overrides[key] !== null) acc.push(overrides[key] || key);
+        return acc;
+      }, [] as string[]),
     };
     config.vhosts![vhost].subscriptions![consumerName] = {
       queue,
