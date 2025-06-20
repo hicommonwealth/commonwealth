@@ -3,7 +3,7 @@ import { TRPCError, initTRPC } from '@trpc/server';
 import type { Request } from 'express';
 import passport from 'passport';
 import type { OpenApiMeta } from 'trpc-swagger';
-import { ZodSchema, z } from 'zod';
+import { ZodType, z } from 'zod';
 import { config } from '../config';
 import type { BuildProcOptions, Context, Metadata } from './types';
 
@@ -11,7 +11,7 @@ const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
 export const router = trpc.router;
 export const procedure = trpc.procedure;
 
-const isSecure = <Input extends ZodSchema, Output extends ZodSchema>(
+const isSecure = <Input extends ZodType, Output extends ZodType>(
   md: Metadata<Input, Output>,
   forceSecure?: boolean,
 ) => {
@@ -25,7 +25,7 @@ const isSecure = <Input extends ZodSchema, Output extends ZodSchema>(
   };
 };
 
-const authenticate = async <Input extends ZodSchema>(
+const authenticate = async <Input extends ZodType>(
   req: Request,
   rawInput: z.infer<Input>,
   authStrategy: AuthStrategies<Input> = { type: 'jwt' },
@@ -70,7 +70,7 @@ const authenticate = async <Input extends ZodSchema>(
 /**
  * tRPC procedure factory with authentication, traffic stats, and analytics middleware
  */
-export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
+export const buildproc = <Input extends ZodType, Output extends ZodType>({
   method,
   name,
   md,
@@ -82,7 +82,7 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
   return trpc.procedure
     .use(async ({ ctx, next, getRawInput }) => {
       if (secure) {
-        const input = await getRawInput();
+        const input = (await getRawInput()) as z.infer<Input>;
         await authenticate(ctx.req, input, md.authStrategy, optional);
       }
       return next({
@@ -98,9 +98,9 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
     .use(async ({ ctx, next, getRawInput }) => {
       const result = await next();
       if (result.ok && outMiddlewares?.length) {
-        const input = await getRawInput();
+        const input = (await getRawInput()) as z.infer<Input>;
         for (const omw of outMiddlewares) {
-          await omw(input, result.data, ctx);
+          await omw(input, result.data as z.infer<Output>, ctx);
         }
       }
       return result;
@@ -108,7 +108,7 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
     .meta({
       openapi: {
         method,
-        description: md.input._def.description, // zod property description
+        description: md.input.description, // zod property description
         path: `/${name}`,
         tags: [tag],
         headers: [

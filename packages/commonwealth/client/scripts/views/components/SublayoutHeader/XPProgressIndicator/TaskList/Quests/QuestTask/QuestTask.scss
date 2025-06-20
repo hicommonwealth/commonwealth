@@ -1,4 +1,5 @@
-@import '../../../../../../../styles/shared';
+@use '../../../../../../../styles/shared';
+@use '../../../../../../../styles/mixins/colors.module';
 
 .QuestTask {
   all: unset;
@@ -10,7 +11,7 @@
   border-radius: 8px;
 
   &:hover {
-    background-color: $neutral-100;
+    background-color: colors.$neutral-100;
   }
 
   &:focus,
@@ -47,7 +48,7 @@
       align-items: center;
 
       .Icon {
-        fill: $green-600;
+        fill: colors.$green-600;
       }
     }
 
@@ -58,7 +59,7 @@
       flex-wrap: wrap;
 
       .timeline-label {
-        color: $primary-300 !important;
+        color: colors.$primary-300 !important;
       }
     }
   }

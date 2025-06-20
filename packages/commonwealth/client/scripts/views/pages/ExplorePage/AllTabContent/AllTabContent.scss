@@ -1,4 +1,6 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .section-container {
   margin-bottom: 32px;
@@ -19,17 +21,17 @@
       cursor: pointer;
 
       .link {
-        color: $primary-500;
+        color: colors.$primary-500;
 
         &:hover,
         &:active,
         &:visited {
-          color: $primary-600;
+          color: colors.$primary-600;
         }
       }
 
       .blue-icon {
-        color: $primary-500;
+        color: colors.$primary-500;
       }
     }
   }
@@ -57,7 +59,7 @@
     }
   }
 
-  .users-xp-table {
+  > .users-xp-table {
     margin-top: 16px;
     width: 100%;
     overflow-x: auto;
@@ -66,7 +68,7 @@
       width: 100%;
       max-width: 100%;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         font-size: 14px;
       }
     }

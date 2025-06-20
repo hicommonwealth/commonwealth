@@ -1,4 +1,6 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .GovernanceHeader {
   width: 100%;
@@ -20,9 +22,9 @@
         gap: 8px;
 
         .address {
-          background-color: $neutral-200;
+          background-color: colors.$neutral-200;
           border-radius: 6px;
-          color: $neutral-600;
+          color: colors.$neutral-600;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -49,7 +51,7 @@
     }
   }
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     .header {
       > *:not(:first-child) {
         display: none;

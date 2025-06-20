@@ -1,4 +1,5 @@
-@import '../../../../../../styles/shared.scss';
+@use '../../../../../../styles/shared.scss';
+@use '../../../../../../styles/mixins/colors.module';
 
 .MyTokens {
   .Table {
@@ -16,16 +17,16 @@
         text-transform: capitalize;
 
         .b1 {
-          color: $neutral-700 !important;
+          color: colors.$neutral-700 !important;
         }
         .caption {
-          color: $neutral-600 !important;
+          color: colors.$neutral-600 !important;
         }
       }
 
       .etherscanLink {
         cursor: pointer;
-        color: $neutral-500;
+        color: colors.$neutral-500;
         text-decoration: none;
 
         &:focus,

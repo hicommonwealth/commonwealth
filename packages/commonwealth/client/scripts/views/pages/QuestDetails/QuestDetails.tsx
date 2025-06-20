@@ -146,7 +146,14 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'SSOLinked': {
-        setAuthModalConfig({ type: AuthModalType.SignIn, options: ['sso'] });
+        const specificAuthOption = buildRedirectURLFromContentId(
+          action.content_id || '',
+        ) as AuthOptions;
+        setAuthModalConfig({
+          type: AuthModalType.SignIn,
+          options: ['sso'],
+          ...(specificAuthOption && { specificAuthOption }),
+        });
         break;
       }
       case 'CommunityCreated': {
@@ -329,6 +336,19 @@ const QuestDetails = ({ id }: { id: number }) => {
           );
         } else {
           // If no community context, navigate to community selection for contest creation
+          navigate('/explore?tab=communities', {}, null);
+        }
+        break;
+      }
+      case 'ContestEnded': {
+        if (quest.community_id) {
+          navigate(
+            `/${quest.community_id}/contests`,
+            {},
+            quest.community_id || null,
+          );
+        } else {
+          // If no community context, navigate to community selection for contest view
           navigate('/explore?tab=communities', {}, null);
         }
         break;

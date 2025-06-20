@@ -1,3 +1,4 @@
+import { GetPublicEnvVar } from '@hicommonwealth/schemas';
 import { updateActiveUser } from 'controllers/app/login';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
@@ -6,9 +7,12 @@ import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { EventEmitter } from 'events';
 import type IChainAdapter from 'models/IChainAdapter';
-import { queryClient, QueryKeys } from 'state/api/config';
-import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
+import {
+  fetchCustomDomainQuery,
+  fetchPublicEnvVar,
+} from 'state/api/configuration';
 import { errorStore } from 'state/ui/error';
+import { z } from 'zod';
 import SuiAccount from '../controllers/chain/sui/account';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
 import { fetchNodes } from './api/nodes';
@@ -65,40 +69,17 @@ const app: IApp = {
 // On logout: called to reset everything
 export async function initAppState(
   updateSelectedCommunity = true,
-): Promise<void> {
+): Promise<z.infer<(typeof GetPublicEnvVar)['output']>> {
   try {
-    await fetchNodes();
-    await fetchCustomDomainQuery();
+    const [status, publicEnvVars] = await Promise.all([
+      fetchStatus(),
+      fetchPublicEnvVar(),
+      fetchNodes(),
+      fetchCustomDomainQuery(),
+    ]);
 
-    // set evmTestEnv in configuration cache
-    queryClient.setQueryData([QueryKeys.CONFIGURATION], {
-      evmTestEnv: {
-        ETH_RPC: process.env.TEST_EVM_ETH_RPC,
-        PROVIDER_URL: process.env.TEST_EVM_PROVIDER_URL,
-      },
-    });
-
-    const status = await fetchStatus();
     updateActiveUser(status);
     if (status) {
-      // store community redirect's map in configuration cache
-      const communityWithRedirects =
-        status.communities?.filter((c) => c.redirect) || [];
-      if (communityWithRedirects.length > 0) {
-        communityWithRedirects.map(({ id, redirect }) => {
-          const cachedConfig = queryClient.getQueryData<Configuration>([
-            QueryKeys.CONFIGURATION,
-          ]);
-          queryClient.setQueryData([QueryKeys.CONFIGURATION], {
-            ...cachedConfig,
-            redirects: {
-              ...cachedConfig?.redirects,
-              [redirect!]: id,
-            },
-          });
-        });
-      }
-
       // update the selectedCommunity, unless we explicitly want to avoid
       // changing the current state (e.g. when logging in through link_new_address_modal)
       if (updateSelectedCommunity && status?.selected_community_id) {
@@ -111,6 +92,7 @@ export async function initAppState(
         });
       }
     }
+    return publicEnvVars;
   } catch (err) {
     errorStore
       .getState()

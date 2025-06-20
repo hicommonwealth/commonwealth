@@ -1,4 +1,5 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .ImageActionModal.CWResponsiveDialog .CWModal .CWModalBody {
   overflow-y: auto;
@@ -17,7 +18,7 @@
   }
 
   .reference-images-container {
-    border-bottom: 1px solid $neutral-200;
+    border-bottom: 1px solid colors.$neutral-200;
     width: 100%;
     display: block !important;
   }
@@ -43,20 +44,20 @@
   .empty-reference-uploader {
     width: 60px;
     height: 60px;
-    background-color: $neutral-100;
+    background-color: colors.$neutral-100;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border: 1px dashed $neutral-400;
+    border: 1px dashed colors.$neutral-400;
 
     &:hover {
-      background-color: $neutral-200;
+      background-color: colors.$neutral-200;
     }
 
     .plus-icon {
-      color: $neutral-500;
+      color: colors.$neutral-500;
       font-size: 24px;
     }
   }
@@ -66,7 +67,7 @@
   }
 
   .reference-text-container {
-    border-bottom: 1px solid $neutral-200;
+    border-bottom: 1px solid colors.$neutral-200;
   }
 
   .reference-text-list {
@@ -77,12 +78,12 @@
   }
 
   .reference-text-list .Tag.pill {
-    background-color: $neutral-100 !important;
-    border: 1px solid $neutral-300 !important;
+    background-color: colors.$neutral-100 !important;
+    border: 1px solid colors.$neutral-300 !important;
     padding: 4px 8px !important;
 
     .Text {
-      color: $neutral-700 !important;
+      color: colors.$neutral-700 !important;
     }
 
     .close-container {
@@ -90,27 +91,27 @@
       margin-left: 6px;
 
       svg {
-        color: $neutral-500 !important;
+        color: colors.$neutral-500 !important;
       }
 
       &:hover {
         svg {
-          background-color: $neutral-200 !important;
-          color: $neutral-700 !important;
+          background-color: colors.$neutral-200 !important;
+          color: colors.$neutral-700 !important;
         }
       }
     }
 
     &:hover {
-      background-color: $neutral-200 !important;
-      border-color: $neutral-400 !important;
+      background-color: colors.$neutral-200 !important;
+      border-color: colors.$neutral-400 !important;
 
       .Text {
-        color: $neutral-800 !important;
+        color: colors.$neutral-800 !important;
       }
 
       .close-container svg {
-        color: $neutral-700 !important;
+        color: colors.$neutral-700 !important;
       }
     }
   }

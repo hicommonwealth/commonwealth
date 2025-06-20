@@ -1,4 +1,5 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
 
 .NotificationSettings {
   max-width: 650px;
@@ -24,16 +25,16 @@
   }
 
   .text-muted {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 
   .page-subheader-text {
-    color: $neutral-500;
+    color: colors.$neutral-500;
     margin-bottom: 8px;
   }
 
   .SubscriptionEntry {
-    border-bottom: 1px solid $neutral-300;
+    border-bottom: 1px solid colors.$neutral-300;
     margin-bottom: 16px;
     padding-left: 8px;
     padding-right: 8px;
@@ -45,13 +46,13 @@
     margin-top: 8px;
     margin-bottom: 16px;
     font-size: 14px;
-    color: $neutral-500;
+    color: colors.$neutral-500;
     gap: 8px;
   }
 
   .User a.user-display-name,
   .SubscriptionHeader * {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 
   .SubscriptionFooter {

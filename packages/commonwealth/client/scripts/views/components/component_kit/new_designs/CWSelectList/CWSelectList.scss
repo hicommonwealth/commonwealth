@@ -1,4 +1,7 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/inputs';
 
 .CWSelectList {
   &.disabled {
@@ -6,14 +9,14 @@
   }
 
   .SelectList {
-    @include inputStyles;
+    @include inputs.inputStyles;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 14px;
     line-height: 20px;
-    border: 1px solid $neutral-200 !important;
-    border-radius: $border-radius-corners-wider;
+    border: 1px solid colors.$neutral-200 !important;
+    border-radius: border_radius.$border-radius-corners-wider;
     min-height: 40px;
     max-height: 40px;
     padding: 10px 16px;
@@ -50,7 +53,7 @@
           margin-right: 8px !important;
           margin-top: 2px !important;
           margin-bottom: 2px !important;
-          background-color: $neutral-100;
+          background-color: colors.$neutral-100;
 
           .cwsl__multi-value__label {
             font-size: 14px;
@@ -61,12 +64,12 @@
           .cwsl__multi-value__remove {
             padding: 0;
             cursor: pointer;
-            color: $neutral-500;
+            color: colors.$neutral-500;
             font-size: 16px !important;
 
             &:hover {
               background-color: inherit;
-              color: $neutral-600;
+              color: colors.$neutral-600;
             }
 
             svg {
@@ -106,9 +109,9 @@
       left: 0;
       margin-top: 8px;
       border-radius: 6px;
-      border: 1px solid $neutral-200;
+      border: 1px solid colors.$neutral-200;
       width: 100%;
-      background-color: $white;
+      background-color: colors.$white;
       box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 
       .cwsl__menu-list {
@@ -144,7 +147,7 @@
           &:focus,
           &:focus-visible,
           &:focus-within {
-            background-color: $neutral-100;
+            background-color: colors.$neutral-100;
           }
 
           &:active {
@@ -152,22 +155,22 @@
           }
 
           &[class*='__option--is-selected'] {
-            background-color: $neutral-50;
-            color: $neutral-800;
+            background-color: colors.$neutral-50;
+            color: colors.$neutral-800;
 
             .text-container {
-              background-color: $neutral-50;
-              color: $neutral-800;
+              background-color: colors.$neutral-50;
+              color: colors.$neutral-800;
             }
           }
 
           &[class*='__option--is-focused'] {
-            background-color: $neutral-100;
-            color: $neutral-800;
+            background-color: colors.$neutral-100;
+            color: colors.$neutral-800;
 
             .text-container {
-              background-color: $neutral-100;
-              color: $neutral-800;
+              background-color: colors.$neutral-100;
+              color: colors.$neutral-800;
             }
           }
         }
