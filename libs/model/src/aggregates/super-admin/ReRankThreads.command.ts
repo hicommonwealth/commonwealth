@@ -5,6 +5,7 @@ import {
   InvalidInput,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { config } from '../../config';
 import { models } from '../../database';
@@ -77,18 +78,21 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
                                   LEFT JOIN "Comments" C ON C.thread_id = T.id
                                   LEFT JOIN "Reactions" R ON R.thread_id = T.id
                                   JOIN "Communities" CO ON CO.id = T.community_id
-                           WHERE T.created_at > T.created_at - INTERVAL '1 week'
+                           WHERE T.created_at > NOW() - INTERVAL '4 weeks'
                              AND T.marked_as_spam_at IS NULL
                              AND T.deleted_at IS NULL
-                            
+                             AND T.user_tier_at_creation IS NOT NULL
+                             AND C.marked_as_spam_at IS NULL
+                             AND CO.tier >= ${CommunityTierMap.ManuallyVerified}
+                             AND LENGTH(T.body) >= 32
                              ${community_id ? 'AND T.community_id = :community_id' : ''}
                            GROUP BY T.id, T.user_tier_at_creation, T.view_count, T.created_at, CO.tier, T.community_id),
                  base_ranks AS (SELECT id,
                                        view_count * :viewCountWeight +
-                                       COALESCE(user_tier_at_creation, 3) * :creatorTierWeight +
-                                       EXTRACT(EPOCH FROM created_at) / 60 * :createdDateWeight +
-                                       COALESCE(comment_total, 0) * :commentWeight +
-                                       COALESCE(reaction_total, 0) * :reactionWeight AS base_rank,
+                                       user_tier_at_creation * :creatorTierWeight +
+                                       EXTRACT(EPOCH FROM created_at)::INTEGER / 60 * :createdDateWeight +
+                                       comment_total * :commentWeight +
+                                       reaction_total * :reactionWeight AS base_rank,
                                        community_tier,
                                        community_id
                                 FROM ranks)

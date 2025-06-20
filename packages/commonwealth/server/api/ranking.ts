@@ -463,3 +463,32 @@ export async function decrementThreadRank(
     Number(rank[0].global_rank),
   );
 }
+
+/**
+ * This function is used to determine if a thread should be ranked.
+ * It filters out spam, low quality, and predicted low engagement threads.
+ *
+ * WARNING: These rules MUST be replicated in the ReRankThreads.command.ts DB query.
+ */
+export async function shouldRankThread({
+  body,
+  user_tier_at_creation,
+  community_tier,
+  marked_as_spam_at,
+}: {
+  body?: string;
+  user_tier_at_creation?: UserTierMap | null;
+  community_tier?: CommunityTierMap;
+  marked_as_spam_at?: Date | null;
+}) {
+  if (body && body.length < 32) return false;
+  if (community_tier && community_tier < CommunityTierMap.ManuallyVerified)
+    return false;
+  if (
+    user_tier_at_creation &&
+    user_tier_at_creation < UserTierMap.NewlyVerifiedWallet
+  )
+    return false;
+  if (marked_as_spam_at) return false;
+  return true;
+}

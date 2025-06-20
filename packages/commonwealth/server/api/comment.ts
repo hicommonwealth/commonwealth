@@ -2,7 +2,11 @@ import { trpc } from '@hicommonwealth/adapters';
 import { Comment, middleware } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { config } from '../config';
-import { decrementThreadRank, incrementThreadRank } from './ranking';
+import {
+  decrementThreadRank,
+  incrementThreadRank,
+  shouldRankThread,
+} from './ranking';
 
 export const trpcRouter = trpc.router({
   createComment: trpc.command(Comment.CreateComment, trpc.Tag.Comment, [
@@ -13,7 +17,17 @@ export const trpcRouter = trpc.router({
       await middleware.incrementUserCount(ctx.actor.user.id!, 'creates');
     }),
     trpc.fireAndForget(
-      async (_, { community_id, thread_id, user_tier_at_creation }) => {
+      async (
+        _,
+        { community_id, thread_id, user_tier_at_creation, marked_as_spam_at },
+      ) => {
+        if (
+          !(await shouldRankThread({
+            user_tier_at_creation,
+            marked_as_spam_at,
+          }))
+        )
+          return;
         await incrementThreadRank(config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT, {
           community_id,
           thread_id,
@@ -82,6 +96,13 @@ export const trpcRouter = trpc.router({
             user_tier_at_creation: user_tier_at_creation,
           });
         } else if (spam === false && marked_as_spam_at === null) {
+          if (
+            !(await shouldRankThread({
+              user_tier_at_creation,
+              marked_as_spam_at,
+            }))
+          )
+            return;
           await incrementThreadRank(config.HEURISTIC_WEIGHTS.COMMENT_WEIGHT, {
             community_id,
             thread_id,

@@ -8,6 +8,7 @@ import {
   createThreadRank,
   decrementThreadRank,
   incrementThreadRank,
+  shouldRankThread,
   updateRankOnThreadIneligibility,
 } from './ranking';
 
@@ -71,6 +72,7 @@ export const trpcRouter = trpc.router({
           created_at,
           user_tier_at_creation,
           spam_toggled,
+          body,
         },
       ) => {
         if (!user_tier_at_creation || !spam_toggled) return;
@@ -88,6 +90,15 @@ export const trpcRouter = trpc.router({
             },
           });
           if (!community) return;
+          if (
+            !(await shouldRankThread({
+              body,
+              user_tier_at_creation,
+              community_tier: community.tier,
+              marked_as_spam_at,
+            }))
+          )
+            return;
           await createThreadRank(
             { id: id!, created_at: created_at!, user_tier_at_creation },
             {
