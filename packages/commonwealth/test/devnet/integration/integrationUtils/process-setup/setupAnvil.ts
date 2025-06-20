@@ -6,24 +6,6 @@ export const imageUrl = 'public.ecr.aws/f8g0x5p7/commonwealth-anvil:af964a9';
 
 let port;
 
-export async function mineBlocks(blocks: number) {
-  const provider = new Web3.providers.HttpProvider(`http://localhost:${port}`);
-
-  // mine blocks
-  const res = await provider.request({
-    jsonrpc: '2.0',
-    id: 1,
-    method: 'anvil_mine',
-    params: [blocks],
-  });
-
-  if (res.error) {
-    throw new Error((res.error as { code: number; message: string }).message);
-  }
-
-  return true;
-}
-
 export async function setupAnvil() {
   try {
     const container = await new GenericContainer(imageUrl)
