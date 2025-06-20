@@ -60,4 +60,10 @@
     margin: 0 !important;
     margin-top: auto;
   }
+
+  .token-stats {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 4px;
+  }
 }
