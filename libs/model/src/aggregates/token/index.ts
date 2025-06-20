@@ -1,3 +1,4 @@
+export * from './CommunityNamespaceCreated.command';
 export * from './CreateLaunchpadTrade.command';
 export * from './CreateToken.command';
 export * from './GetAllowTokenizedThread.query';

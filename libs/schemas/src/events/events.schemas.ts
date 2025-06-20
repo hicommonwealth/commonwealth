@@ -459,6 +459,13 @@ export const events = {
     }),
   }),
 
+  CommunityNamespaceCreated: z.object({
+    name: z.string(),
+    token: z.string(),
+    namespaceAddress: z.string(),
+    governanceAddress: z.string(),
+  }),
+
   WalletLinked: z.object({
     user_id: z.number(),
     new_user: z.boolean(),
