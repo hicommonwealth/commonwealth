@@ -468,13 +468,14 @@ export type RoutingKey =
   | EventNamesType
   | Concat<EventNamesType, RoutingKeyTagsType>;
 
-export type DlqEventHandler = (dql: {
+export type DLQEvent = {
   consumer: string;
   event_id: number;
   event_name: string;
   reason: string;
   timestamp: number;
-}) => Promise<void>;
+};
+export type DlqEventHandler = (dlq: DLQEvent) => Promise<void>;
 
 export interface Broker extends Disposable {
   publish<Name extends OutboxEvents>(

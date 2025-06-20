@@ -35,11 +35,14 @@ export async function bootstrapBindings(options?: {
       broker({ adapter: rmqAdapter });
     }
 
-    // TODO: implement a handler that persists to db
-    await rmqAdapter.subscribeDlqHandler((dlq) => {
-      log.info('DLQ EVENT', dlq);
-      return Promise.resolve();
-    });
+    await rmqAdapter.subscribeDlqHandler(
+      async ({ consumer, event_id, ...dlq }) => {
+        await models.Dlq.findOrCreate({
+          where: { consumer, event_id },
+          defaults: { consumer, event_id, ...dlq },
+        });
+      },
+    );
 
     brokerInstance = rmqAdapter;
   } catch (e) {

@@ -310,10 +310,10 @@ export class RabbitMQAdapter implements Broker {
         const d = death.at(0)!;
         handler({
           consumer: d.queue,
-          event_id: +content.id,
-          event_name: content.name,
-          reason: d.reason,
-          timestamp: d.time.value,
+          event_id: +content.id || 0,
+          event_name: content.name || '',
+          reason: d.reason || '',
+          timestamp: d.time.value || 0,
         })
           .then(() => ackOrNack())
           .catch((e) => {
@@ -322,7 +322,7 @@ export class RabbitMQAdapter implements Broker {
           });
       }
       // ack when x-death is not present?
-      ackOrNack(new Error('No x-death header present'));
+      else ackOrNack(new Error('No x-death header present'));
     });
     return true;
   }
