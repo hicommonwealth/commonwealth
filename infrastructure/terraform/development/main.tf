@@ -28,7 +28,7 @@ provider "digitalocean" {
 resource "digitalocean_kubernetes_cluster" "main" {
   name    = var.ENV_NAME
   region  = "nyc1"
-  version = "1.32.2-do.3"
+  version = "latest"
 
   node_pool {
     name       = "worker-pool"
