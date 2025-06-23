@@ -19,7 +19,7 @@ const useGetTokenByThreadId = ({
       with_stats,
     },
     {
-      cacheTime: FETCH_TOKEN_STALE_TIME,
+      staleTime: FETCH_TOKEN_STALE_TIME,
       enabled,
     },
   );
