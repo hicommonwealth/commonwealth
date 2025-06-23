@@ -80,13 +80,15 @@ export const CommentTree = ({
   }, [thread?.id, thread?.numberOfComments]);
 
   const handleFiltersChange = useCallback(
-    async (newFilters: typeof commentFilters) => {
-      // Check if sort type is changing (which affects pagination and ordering)
-      if (newFilters.sortType !== commentFilters.sortType) {
-        await utils.comment.getComments.reset({
-          thread_id: thread.id,
-        });
-      }
+    (newFilters: typeof commentFilters) => {
+      void (async () => {
+        // Check if sort type is changing (which affects pagination and ordering)
+        if (newFilters.sortType !== commentFilters.sortType) {
+          await utils.comment.getComments.reset({
+            thread_id: thread.id,
+          });
+        }
+      })();
 
       onFiltersChange(newFilters);
       onChatModeChange?.(newFilters.sortType === 'oldest');
