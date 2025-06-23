@@ -1,0 +1,29 @@
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/media_queries';
+
+.TokensList {
+  margin: 0;
+  margin-bottom: 16px;
+  width: 100%;
+
+  .list {
+    max-width: 100%;
+    overflow-x: hidden;
+    display: grid;
+    gap: 16px;
+    margin: 16px 0;
+    grid-template-columns: 1fr 1fr 1fr 1fr !important;
+
+    @include media_queries.extraSmall {
+      grid-template-columns: 1fr !important;
+    }
+
+    @include media_queries.small {
+      grid-template-columns: 1fr 1fr !important;
+    }
+
+    @include media_queries.mediumSmall {
+      grid-template-columns: 1fr 1fr 1fr !important;
+    }
+  }
+}

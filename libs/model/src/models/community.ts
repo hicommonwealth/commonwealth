@@ -6,6 +6,7 @@ import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
 import type { CommunityAlertAttributes } from './community_alerts';
 import type { CommunityTagsAttributes } from './community_tags';
+import type { MCPServerCommunityAttributes } from './mcp_server_community';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
 import type { TopicInstance } from './topic';
@@ -25,6 +26,7 @@ export type CommunityAttributes = z.infer<typeof Community> & {
   profile_count?: number;
   count_updated?: boolean;
   communityAlerts?: CommunityAlertAttributes[];
+  MCPServerCommunities?: MCPServerCommunityAttributes[];
 };
 
 export type CommunityInstance = ModelInstance<CommunityAttributes> & {
@@ -129,12 +131,26 @@ export default (
         defaultValue: 0,
       },
       namespace: { type: Sequelize.STRING, allowNull: true, unique: true },
+      namespace_verified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       namespace_address: {
         type: Sequelize.STRING,
         allowNull: true,
       },
       namespace_creator_address: {
         type: Sequelize.STRING,
+        allowNull: true,
+      },
+      namespace_verification_configured: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      namespace_nominations: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: true,
       },
       created_at: { type: Sequelize.DATE, allowNull: true },
@@ -153,6 +169,15 @@ export default (
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      ai_features_enabled: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
+      environment: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       allow_tokenized_threads: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
@@ -160,6 +185,10 @@ export default (
       },
       thread_purchase_token: {
         type: Sequelize.STRING,
+        allowNull: true,
+      },
+      pending_namespace_judge_token_id: {
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
     },

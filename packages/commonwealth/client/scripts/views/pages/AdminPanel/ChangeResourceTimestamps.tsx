@@ -85,13 +85,14 @@ const validationSchema = z
   );
 
 const ChangeResourceTimestamps = () => {
-  const { mutateAsync: updateResourceTimestamps, isLoading } =
+  const { mutateAsync: updateResourceTimestamps, isPending } =
     useUpdateResourceTimestamps();
 
   const resourceNames = ['Quests'].map((x) => ({
     label: x,
     value: x,
   }));
+
   const dateFieldNames = [
     'created_at',
     'updated_at',
@@ -175,7 +176,7 @@ const ChangeResourceTimestamps = () => {
         <CWButton
           label="Submit"
           type="submit"
-          disabled={isLoading}
+          disabled={isPending}
           buttonWidth="wide"
         />
       </CWForm>

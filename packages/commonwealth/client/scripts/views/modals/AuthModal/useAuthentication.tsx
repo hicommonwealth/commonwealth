@@ -8,6 +8,8 @@ import {
   verifySession,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { useFlag } from 'client/scripts/hooks/useFlag';
+import { BASE_API_PATH } from 'client/scripts/utils/trpcClient';
 import {
   completeClientLogin,
   setActiveAccount,
@@ -35,14 +37,19 @@ import {
 } from 'helpers/localStorage';
 import _ from 'lodash';
 import { Magic } from 'magic-sdk';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
-import { SERVER_URL } from 'state/api/config';
+import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { EIP1193Provider } from 'viem';
+import usePrivyEmailDialogStore from 'views/components/Privy/stores/usePrivyEmailDialogStore';
+import usePrivySMSDialogStore from 'views/components/Privy/stores/usePrivySMSDialogStore';
+import { usePrivyAuthWithEmail } from 'views/components/Privy/usePrivyAuthWithEmail';
+import { usePrivyAuthWithOAuth } from 'views/components/Privy/usePrivyAuthWithOAuth';
+import { usePrivyAuthWithPhone } from 'views/components/Privy/usePrivyAuthWithPhone';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
@@ -69,8 +76,6 @@ type UseAuthenticationProps = {
   isUserFromWebView?: boolean;
 };
 
-const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Wallet = IWebWallet<any>;
 
@@ -87,10 +92,16 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
   const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
     useState(false);
+  const privyEnabled = useFlag('privy');
 
   const { isAddedToHomeScreen } = useAppStatus();
+  const { setState: setSMSDialogState } = usePrivySMSDialogStore();
+  const { setState: setEmailDialogState } = usePrivyEmailDialogStore();
 
   const user = useUserStore();
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
+
+  const magic = new Magic(configurationData!.MAGIC_PUBLISHABLE_KEY);
 
   const isWalletConnectEnabled = _.some(
     wallets,
@@ -109,14 +120,38 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const { mutateAsync: updateUser } = useUpdateUserMutation();
   const { signIn } = useSignIn();
 
+  const handlePrivySuccess = useCallback(() => {
+    const landingURL = new URL(
+      '/dashboard/for-you',
+      window.location.href,
+    ).toString();
+    document.location.href = landingURL;
+  }, []);
+
+  const handlePrivyError = useCallback((err: Error) => {
+    console.log('privy error: ', err);
+    setIsMagicLoading(false);
+  }, []);
+
+  const privyCallbacks = useMemo(() => {
+    return {
+      onSuccess: handlePrivySuccess,
+      onError: handlePrivyError,
+    };
+  }, [handlePrivyError, handlePrivySuccess]);
+
+  const privyAuthWithOAuth = usePrivyAuthWithOAuth(privyCallbacks);
+  const privyAuthWithPhone = usePrivyAuthWithPhone(privyCallbacks);
+  const privyAuthWithEmail = usePrivyAuthWithEmail(privyCallbacks);
+
   const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
 
   useEffect(() => {
-    if (process.env.ETH_RPC === 'e2e-test') {
+    if (configurationData!.TEST_EVM_ETH_RPC === 'e2e-test') {
       import('../../../helpers/mockMetaMaskUtil')
         .then((f) => {
           window['ethereum'] = new f.MockMetaMaskProvider(
-            `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_PUBLIC_APP_KEY}`,
+            `https://eth-mainnet.g.alchemy.com/v2/${configurationData!.ALCHEMY_PUBLIC_APP_KEY}`,
             '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
           ) as unknown as EIP1193Provider;
         })
@@ -133,6 +168,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         ChainBase.Ethereum,
         ChainBase.Substrate,
         ChainBase.Solana,
+        ChainBase.Sui,
       ];
       setWallets(
         _.flatten(
@@ -167,7 +203,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   // Handles Magic Link Login
-  const onSMSLogin = async (phoneNumber = '') => {
+  const onSMSLoginMagic = async (phoneNumber = '') => {
     const tempSMSToUse = phoneNumber || SMS;
     setSMS(tempSMSToUse);
 
@@ -200,7 +236,26 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
-  const onEmailLogin = async (emailToUse = '') => {
+  const onSMSLoginPrivy = async (phoneNumber) => {
+    setIsMagicLoading(true);
+    const tempSMSToUse = phoneNumber || SMS;
+    setSMS(tempSMSToUse);
+    // this will bring the SMS dialog up so that the user can enter the code we
+    // are about to send
+    setSMSDialogState({
+      active: true,
+      onCancel: () => {
+        setSMS(undefined);
+        setIsMagicLoading(false);
+      },
+      onError: privyCallbacks.onError,
+    });
+    await privyAuthWithPhone.sendCode({ phoneNumber: tempSMSToUse });
+  };
+
+  const onSMSLogin = privyEnabled ? onSMSLoginPrivy : onSMSLoginMagic;
+
+  const onEmailLoginMagic = async (emailToUse = '') => {
     const tempEmailToUse = emailToUse || email;
     setEmail(tempEmailToUse);
 
@@ -233,8 +288,43 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
+  const onEmailLoginPrivy = async (emailToUse = '') => {
+    const tempEmailToUse = emailToUse || email;
+    setEmail(tempEmailToUse);
+
+    setIsMagicLoading(true);
+
+    if (!tempEmailToUse) {
+      notifyError('Please enter a valid email address.');
+      setIsMagicLoading(false);
+      return;
+    }
+
+    try {
+      setEmailDialogState({
+        active: true,
+        onCancel: () => {
+          setEmail(undefined);
+          setIsMagicLoading(false);
+        },
+        onError: privyCallbacks.onError,
+      });
+      await privyAuthWithEmail.sendCode({ email: tempEmailToUse });
+
+      // TODO: I need to handle these now...
+      // setIsMagicLoading(false);
+      // TODO: trackLoginEvent('email', true);
+    } catch (e) {
+      notifyError(`Error authenticating with email`);
+      console.error(`Error authenticating with email: ${e}`);
+      setIsMagicLoading(false);
+    }
+  };
+
+  const onEmailLogin = privyEnabled ? onEmailLoginPrivy : onEmailLoginMagic;
+
   // New callback for handling social login
-  const onSocialLogin = async (provider: WalletSsoSource) => {
+  const onSocialLoginMagic = async (provider: WalletSsoSource) => {
     setIsMagicLoading(true);
 
     try {
@@ -257,6 +347,15 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setIsMagicLoading(false);
     }
   };
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  const onSocialLoginPrivy = async (provider: WalletSsoSource) => {
+    setIsMagicLoading(true);
+    console.log('onSocialLoginPrivy: ' + provider);
+    privyAuthWithOAuth.onInitOAuth(provider);
+  };
+
+  const onSocialLogin = privyEnabled ? onSocialLoginPrivy : onSocialLoginMagic;
 
   // Performs Login on the client
   const onLogInWithAccount = async (
@@ -563,27 +662,28 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     if (user.isLoggedIn) {
       try {
-        const res = await axios.post(`${SERVER_URL}/getAddressStatus`, {
-          address:
-            wallet.chain === ChainBase.Substrate
-              ? addressSwapper({
-                  address: address,
-                  currentPrefix: parseInt(
-                    `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
-                    10,
-                  ),
-                })
-              : address,
-          community_id: app.activeChainId() ?? wallet.chain,
-          jwt: user.jwt,
-        });
+        const cid = app.activeChainId() ?? wallet.chain;
+        const adr =
+          wallet.chain === ChainBase.Substrate
+            ? addressSwapper({
+                address,
+                currentPrefix: parseInt(
+                  `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
+                  10,
+                ),
+              })
+            : address;
+        const { data } = await axios.get(
+          `${BASE_API_PATH}/user.getAddressStatus?community_id=${cid}&address=${adr}`,
+          { headers: { address: user.activeAccount?.address, jwt: user.jwt } },
+        );
 
-        if (res.data.result.exists && res.data.result.belongsToUser) {
+        if (data.exists && data.belongs_to_user) {
           notifyInfo('This address is already linked to your current account.');
           return;
         }
 
-        if (res.data.result.exists) {
+        if (data.exists) {
           openConfirmation({
             title: 'Wallet Transfer Confirmation',
             description: `

@@ -1,8 +1,9 @@
+import { generateUrlPartForTopicIdentifiers } from '@hicommonwealth/shared';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useGetTopicByIdQuery } from 'state/api/topics';
-import { PageLoading } from './loading';
+import { LoadingIndicator } from '../components/LoadingIndicator/LoadingIndicator';
 
 const ThreadRedirect = ({ id }: { id: number }) => {
   const navigate = useCommonNavigate();
@@ -37,7 +38,7 @@ const ThreadRedirect = ({ id }: { id: number }) => {
 
       // redirect to thread list view for the provided topic
       navigate(
-        `/discussions/${topic.name}${window.location.search}`,
+        `/discussions/${generateUrlPartForTopicIdentifiers(topic.id, topic.name)}${window.location.search}`,
         { replace: true },
         topic?.community_id,
       );
@@ -45,7 +46,7 @@ const ThreadRedirect = ({ id }: { id: number }) => {
     shouldRun: !!(topic || error),
   });
 
-  return <PageLoading />;
+  return <LoadingIndicator />;
 };
 
 export default ThreadRedirect;

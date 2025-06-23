@@ -11,4 +11,6 @@ export const trpcRouter = trpc.router({
     Token.GetTokenizedThreadsAllowed,
     trpc.Tag.Token,
   ),
+  getTokenInfoAlchemy: trpc.query(Token.GetTokenInfoAlchemy, trpc.Tag.Token),
+  getTokenStats: trpc.query(Token.GetTokenStats, trpc.Tag.Token),
 });

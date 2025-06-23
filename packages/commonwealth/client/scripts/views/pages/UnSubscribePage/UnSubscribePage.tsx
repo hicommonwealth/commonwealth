@@ -1,12 +1,17 @@
-import { splitAndDecodeURL } from '@hicommonwealth/shared';
-import { useCommonNavigate } from 'client/scripts/navigation/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useUnSubscribeEmailMutation } from 'state/api/trpc/subscription/useUnSubscribeEmailMutation';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
 import UnSubscribeModal from '../../modals/UnSubscribeModal/UnSubscribeModal';
+import { PageNotFound } from '../404';
 
-const UnSubscribePage = () => {
+type UnSubscribePageProps = {
+  userId: string;
+};
+
+const UnSubscribePage = ({ userId }: UnSubscribePageProps) => {
+  const _userId = parseInt(`${userId || 0}`);
   const { mutateAsync: unSubscribeEmail } = useUnSubscribeEmailMutation();
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -15,12 +20,11 @@ const UnSubscribePage = () => {
     setModalOpen(false);
     navigate('/dashboard');
   };
-  const id = splitAndDecodeURL(window.location.pathname);
 
   const handleUnsubscribe = async () => {
-    if (id) {
+    if (_userId) {
       await unSubscribeEmail({
-        user_uuid: id,
+        user_uuid: String(_userId),
         email_notifications_enabled: false,
       }).catch(console.error);
       navigate('/dashboard');
@@ -34,10 +38,14 @@ const UnSubscribePage = () => {
   };
 
   useEffect(() => {
-    if (id) {
+    if (_userId) {
       setModalOpen(true);
     }
-  }, [id]);
+  }, [_userId]);
+
+  if (!_userId) {
+    return <PageNotFound />;
+  }
 
   return (
     <CWPageLayout>

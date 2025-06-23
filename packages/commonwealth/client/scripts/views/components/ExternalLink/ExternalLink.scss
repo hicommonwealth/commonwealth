@@ -1,24 +1,26 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
 
 .ExternalLink {
   cursor: pointer;
   display: flex;
   max-width: 200px;
   align-items: center;
-  background: $neutral-100;
-  border-radius: $border-radius-rounded-corners;
-  color: $neutral-500;
+  background: colors.$neutral-100;
+  border-radius: border_radius.$border-radius-rounded-corners;
+  color: colors.$neutral-500;
   font-weight: 600;
   overflow: hidden;
   padding: 8px 16px;
 
   &:hover {
-    background: $neutral-200;
+    background: colors.$neutral-200;
   }
 
   a:link,
   a:visited {
-    color: $purple-300;
+    color: colors.$purple-300;
     display: inline-block;
     overflow: hidden;
     text-decoration: none;
@@ -27,7 +29,7 @@
   }
 
   svg {
-    color: $purple-300;
+    color: colors.$purple-300;
     margin-left: 8px;
   }
 }

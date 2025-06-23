@@ -1,22 +1,24 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .ContentPageCard.Card {
-  border-color: $neutral-200;
+  border-color: colors.$neutral-200;
   overflow: hidden;
   padding: 0;
   width: 248px;
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     width: 100%;
   }
   &.isCollapsed {
     min-height: 40px;
-    height: 40px;
+    height: fit-content;
     overflow: hidden;
   }
 
   .header-container {
-    background-color: $neutral-50;
-    border-bottom: 1px solid $neutral-200;
+    background-color: colors.$neutral-50;
+    border-bottom: 1px solid colors.$neutral-200;
     min-height: 40px;
     padding: 8px 16px;
     width: 100%;

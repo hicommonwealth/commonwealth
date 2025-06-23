@@ -37,6 +37,7 @@ const tokenEthExchangeRate = async ({
 export const getTokenEthExchangeRateQueryKey = (
   params: TokenEthExchangeRateProps,
 ) => [
+  'TOKEN_ETH_EXCHANGE_RATE',
   params.ethChainId,
   params.chainRpc,
   params.tokenAddress,
@@ -69,7 +70,7 @@ const useTokenEthExchangeRateQuery = ({
         mode,
       }),
     staleTime: TOKEN_ETH_EXCHANGE_TIME,
-    cacheTime: TOKEN_ETH_EXCHANGE_TIME,
+    gcTime: TOKEN_ETH_EXCHANGE_TIME,
     enabled,
   });
 };

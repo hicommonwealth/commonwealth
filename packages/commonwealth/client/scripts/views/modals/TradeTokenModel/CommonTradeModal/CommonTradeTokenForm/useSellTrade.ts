@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'; // Import BigNumber for precision
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useState } from 'react';
 import {
@@ -23,10 +24,10 @@ const useSellTrade = ({
     useState<string>(`0`); // can be fractional
   const tokenSellAmountDecimals = parseFloat(tokenSellAmountString) || 0;
 
-  const { mutateAsync: createTokenTrade, isLoading: isCreatingTokenTrade } =
+  const { mutateAsync: createTokenTrade, isPending: isCreatingTokenTrade } =
     useCreateTokenTradeMutation();
 
-  const { mutateAsync: sellToken, isLoading: isSellingToken } =
+  const { mutateAsync: sellToken, isPending: isSellingToken } =
     useSellTokenMutation();
 
   const isSelectedAddressTokenBalanceQueryEnabled = !!(
@@ -56,7 +57,7 @@ const useSellTrade = ({
     data: unitTokenToEthSellExchangeRate = 0,
     isLoading: isLoadingUnitTokenToEthSellExchangeRate,
   } = useTokenEthExchangeRateQuery({
-    chainRpc: chainNode.url,
+    chainRpc: chainNode?.url || '',
     ethChainId,
     mode: 'sell',
     tokenAmount: 1 * 1e18, // convert to wei - get exchange rate of 1 unit token to eth
@@ -75,8 +76,22 @@ const useSellTrade = ({
     if (typeof change == 'number') {
       // not handling number type preset amounts atm
     } else if (typeof change == 'string') {
+      const balance = new BigNumber(selectedAddressTokenBalance || '0');
+      if (balance.isZero()) {
+        setTokenSellAmountString('0'); // Cannot sell if balance is zero
+        return;
+      }
+
       if (change === 'Max') {
-        setTokenSellAmountString(selectedAddressTokenBalance);
+        setTokenSellAmountString(balance.toString());
+      } else if (change.endsWith('%')) {
+        const percentage = parseFloat(change.replace('%', ''));
+        if (!isNaN(percentage) && percentage > 0 && percentage <= 100) {
+          const amountToSell = balance.multipliedBy(percentage / 100);
+          // Avoid scientific notation and format nicely if possible, adjust decimals as needed for display?
+          // For now, use toString() which might include many decimals.
+          setTokenSellAmountString(amountToSell.toString());
+        }
       }
     } else {
       const value = change.target.value;
@@ -93,7 +108,6 @@ const useSellTrade = ({
 
   const handleTokenSell = async () => {
     try {
-      // this condition wouldn't be called, but adding to avoid typescript issues
       if (
         !chainNode?.url ||
         !ethChainId ||

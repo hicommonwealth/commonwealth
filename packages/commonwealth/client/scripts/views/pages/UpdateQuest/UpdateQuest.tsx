@@ -8,7 +8,9 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { fetchCachedNodes } from 'state/api/nodes';
 import { useGetQuestByIdQuery } from 'state/api/quest';
+import { useGetGoalMetasQuery } from 'state/api/superAdmin';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -19,7 +21,7 @@ import { PageNotFound } from '../404';
 import QuestForm from '../CreateQuest/QuestForm';
 import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
 import {
-  buildURLFromContentId,
+  buildRedirectURLFromContentId,
   inferContentIdTypeFromContentId,
 } from '../CreateQuest/QuestForm/helpers';
 import { QuestTypes } from '../CreateQuest/QuestForm/types';
@@ -43,6 +45,29 @@ const UpdateQuest = ({ id }: { id: number }) => {
       id: quest?.community_id || '',
       enabled: !!quest?.community_id,
     });
+
+  // Note: Ideally API should return this, but calculating these values per model issues
+  const communityGoalActionIndex = quest?.action_metas?.findIndex(
+    (m) => m.event_name === 'CommunityGoalReached',
+  );
+  const hasIndex =
+    communityGoalActionIndex !== undefined && communityGoalActionIndex >= 0;
+  const shouldFetchGoalsMeta = !!(quest && hasIndex);
+  const { data: goalMetas, isLoading: isFetchingGoalsMeta } =
+    useGetGoalMetasQuery({
+      apiEnabled: shouldFetchGoalsMeta,
+    });
+  const foundGoalsMetaMeta = hasIndex
+    ? goalMetas?.find(
+        (m) =>
+          m.id ===
+          parseInt(
+            (quest?.action_metas?.[communityGoalActionIndex]?.content_id || '')
+              ?.split(':')
+              .at(-1) || '',
+          ),
+      )
+    : null;
 
   useRunOnceOnCondition({
     callback: () => {
@@ -77,8 +102,13 @@ const UpdateQuest = ({ id }: { id: number }) => {
   if (!xpEnabled || !user.isLoggedIn || !Permissions.isSiteAdmin())
     return <PageNotFound />;
 
-  if (isLoadingQuest || (quest?.community_id && isLoadingCommunity))
+  if (
+    isLoadingQuest ||
+    (quest?.community_id && isLoadingCommunity) ||
+    (shouldFetchGoalsMeta && isFetchingGoalsMeta)
+  ) {
     return <CWCircleMultiplySpinner />;
+  }
 
   if (!quest || (quest?.community_id && !community)) return <PageNotFound />;
 
@@ -132,16 +162,40 @@ const UpdateQuest = ({ id }: { id: number }) => {
                 action: action.event_name as QuestAction,
                 // pass creator xp value (not fractional percentage)
                 creatorRewardAmount: `${Math.round(action.creator_reward_weight * action.reward_amount)}`,
-                rewardAmount: `${action.reward_amount}`,
+                rewardAmount: `${action.reward_amount || 0}`,
                 instructionsLink: action.instructions_link || '',
+                amountMultipler: `${action.amount_multiplier || 0}`,
                 contentIdScope: inferContentIdTypeFromContentId(
                   action.event_name as QuestAction,
                   action.content_id || undefined,
                 ),
-                contentLink: buildURLFromContentId(action.content_id || ''),
+                startLink: action.start_link || '',
+                contentIdentifier: buildRedirectURLFromContentId(
+                  action.content_id || '',
+                ),
                 noOfLikes: `${action.QuestTweet?.like_cap || 0}`,
                 noOfRetweets: `${action.QuestTweet?.retweet_cap || 0}`,
                 noOfReplies: `${action.QuestTweet?.replies_cap || 0}`,
+                contractAddress: `${action.ChainEventXpSource?.contract_address || ''}`,
+                goalTarget:
+                  (action.event_name as QuestAction) === 'CommunityGoalReached'
+                    ? foundGoalsMetaMeta?.target
+                    : '',
+                goalType:
+                  (action.event_name as QuestAction) === 'CommunityGoalReached'
+                    ? foundGoalsMetaMeta?.type
+                    : '',
+                ethChainId: action.ChainEventXpSource?.chain_node_id
+                  ? `${
+                      fetchCachedNodes()?.find(
+                        (x) =>
+                          x.id === action.ChainEventXpSource?.chain_node_id,
+                      )?.ethChainId || ''
+                    }`
+                  : ``,
+                // important to use readable signature instead of event signature here
+                eventSignature: `${action.ChainEventXpSource?.readable_signature || ''}`,
+                transactionHash: `${action.ChainEventXpSource?.transaction_hash || ''}`,
               })),
             }}
           />

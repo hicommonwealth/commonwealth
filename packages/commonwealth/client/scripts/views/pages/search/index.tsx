@@ -16,13 +16,13 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { PageLoading } from 'views/pages/loading';
+import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import {
   APIOrderBy,
   APIOrderDirection,
 } from '../../../../scripts/helpers/constants';
-import { useSearchChainsQuery } from '../../../../scripts/state/api/chains';
 import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
+import { useSearchCommunitiesQuery } from '../../../../scripts/state/api/communities';
 import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
 import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
 import { useCommonNavigate } from '../../../navigation/helpers';
@@ -115,14 +115,10 @@ const SearchPage = () => {
     // @ts-expect-error <StrictNullChecks/>
     SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
 
-  const sharedQueryOptions = {
-    communityId: community,
-    searchTerm: queryParams.q || '',
-    limit: 20,
-    orderBy,
-    orderDirection,
-    includeCount: true,
-  };
+  const search_term = queryParams.q || '';
+  const community_id = community;
+  const order_by = orderBy;
+  const order_direction = orderDirection;
 
   const {
     data: threadsData,
@@ -130,10 +126,15 @@ const SearchPage = () => {
     fetchNextPage: threadsFetchNextPage,
     isLoading: threadsIsLoading,
   } = useSearchThreadsQuery({
-    ...sharedQueryOptions,
-    enabled:
-      activeTab === SearchScope.Threads &&
-      sharedQueryOptions?.searchTerm?.length > 3,
+    community_id,
+    search_term,
+    cursor: 1,
+    limit: 20,
+    order_by,
+    order_direction,
+    thread_title_only: true,
+    include_count: true,
+    enabled: activeTab === SearchScope.Threads && search_term?.length > 3,
   });
 
   const {
@@ -142,10 +143,13 @@ const SearchPage = () => {
     fetchNextPage: commentsFetchNextPage,
     isLoading: commentsIsLoading,
   } = useSearchCommentsQuery({
-    ...sharedQueryOptions,
-    enabled:
-      activeTab === SearchScope.Replies &&
-      sharedQueryOptions?.searchTerm?.length > 3,
+    community_id,
+    search: search_term,
+    cursor: 1,
+    limit: 20,
+    order_by,
+    order_direction,
+    enabled: activeTab === SearchScope.Replies && search_term.length > 3,
   });
 
   const {
@@ -153,11 +157,13 @@ const SearchPage = () => {
     error: communityError,
     fetchNextPage: chainsFetchNextPage,
     isLoading: communityIsLoading,
-  } = useSearchChainsQuery({
-    ...sharedQueryOptions,
-    enabled:
-      activeTab === SearchScope.Communities &&
-      sharedQueryOptions?.searchTerm?.length > 0,
+  } = useSearchCommunitiesQuery({
+    search: search_term,
+    cursor: 1,
+    limit: 20,
+    order_by: 'tier',
+    order_direction: 'DESC',
+    enabled: activeTab === SearchScope.Communities && search_term.length > 0,
   });
 
   const {
@@ -166,10 +172,12 @@ const SearchPage = () => {
     fetchNextPage: profilesFetchNextPage,
     isLoading: profilesIsLoading,
   } = useSearchProfilesQuery({
-    ...sharedQueryOptions,
-    enabled:
-      activeTab === SearchScope.Members &&
-      sharedQueryOptions?.searchTerm?.length > 0,
+    communityId: community,
+    searchTerm: search_term,
+    limit: 20,
+    orderBy,
+    orderDirection,
+    enabled: activeTab === SearchScope.Members && search_term.length > 0,
   });
 
   const results = useMemo(() => {
@@ -234,7 +242,7 @@ const SearchPage = () => {
     const err =
       threadsError || commentsError || communityError || profilesError;
     if (err) {
-      notifyError((err as Error).message);
+      notifyError(err.message);
     }
   }, [communityError, commentsError, profilesError, threadsError]);
 
@@ -303,13 +311,13 @@ const SearchPage = () => {
             </CWTabsRow>
           </div>
           <>
-            {sharedQueryOptions?.searchTerm?.length === 0 && (
+            {search_term.length === 0 && (
               <ErrorPage message="No search term provided!" />
             )}
-            {sharedQueryOptions?.searchTerm?.length > 0 && (
+            {search_term.length > 0 && (
               <>
                 {isLoading ? (
-                  <PageLoading />
+                  <LoadingIndicator />
                 ) : (
                   <>
                     <CWText className="search-results-caption">

@@ -5,6 +5,7 @@ import {
   ChainBase,
   ChainType,
   CommunityGoalTypes,
+  GatedActionEnum,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
   Roles,
@@ -12,8 +13,8 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { AuthContext, TopicContext, VerifiedContext } from '../context';
+import { MCPServer } from '../entities';
 import { Community } from '../entities/community.schemas';
-import { PermissionEnum } from '../entities/group-permission.schemas';
 import { Group, Requirement } from '../entities/group.schemas';
 import { PinnedToken } from '../entities/pinned-token.schemas';
 import { StakeTransaction } from '../entities/stake.schemas';
@@ -151,8 +152,18 @@ export const UpdateCommunity = {
       featuredTopics: z.array(z.string()).optional(),
       snapshot: Snapshot.or(z.array(Snapshot)).optional(),
       transactionHash: z.string().optional(),
+      launchpad_weighted_voting: z.boolean().optional(),
     }),
   output: Community,
+  context: AuthContext,
+};
+
+export const SetCommunityMCPServers = {
+  input: z.object({
+    community_id: z.string(),
+    mcp_server_ids: z.array(z.number()),
+  }),
+  output: z.array(MCPServer),
   context: AuthContext,
 };
 
@@ -166,6 +177,15 @@ export const GenerateStakeholderGroups = {
       created: z.boolean(),
     })
     .partial(),
+};
+
+export const UpdateTopicsOrder = {
+  input: z.object({
+    community_id: z.string(),
+    ordered_ids: z.array(PG_INT),
+  }),
+  output: z.array(Topic),
+  context: AuthContext,
 };
 
 export const CreateTopic = {
@@ -206,7 +226,6 @@ export const UpdateTopic = {
       Topic.pick({
         name: true,
         description: true,
-        group_ids: true,
         telegram: true,
         featured_in_sidebar: true,
         featured_in_new_post: true,
@@ -218,6 +237,15 @@ export const UpdateTopic = {
     topic: Topic.partial(),
     user_id: z.number(),
   }),
+  context: TopicContext,
+};
+
+export const UpdateTopicChannel = {
+  input: z.object({
+    topic_id: z.number(),
+    channel_id: z.string().optional(),
+  }),
+  output: Topic,
   context: TopicContext,
 };
 
@@ -251,7 +279,8 @@ export const CreateGroup = {
       .array(
         z.object({
           id: PG_INT,
-          permissions: z.array(z.nativeEnum(PermissionEnum)),
+          is_private: z.boolean().optional(),
+          permissions: z.array(z.nativeEnum(GatedActionEnum)),
         }),
       )
       .optional(),
@@ -288,7 +317,8 @@ export const UpdateGroup = {
       .array(
         z.object({
           id: PG_INT,
-          permissions: z.array(z.nativeEnum(PermissionEnum)),
+          is_private: z.boolean().optional(),
+          permissions: z.array(z.nativeEnum(GatedActionEnum)),
         }),
       )
       .optional(),
@@ -359,6 +389,7 @@ export const RefreshCommunityMemberships = {
     community_id: z.string(),
     address: z.string().optional(),
     group_id: PG_INT.optional(),
+    refresh_all: z.boolean().optional(),
   }),
   output: z.object({
     community_id: z.string(),
@@ -436,5 +467,29 @@ export const UpdateCommunityTags = {
     community_id: z.string(),
     tags: z.array(Tags),
   }),
+  context: AuthContext,
+};
+
+export const UpdateBanner = {
+  input: z.object({
+    community_id: z.string(),
+    banner_text: z.string(),
+  }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const ToggleCommunityStar = {
+  input: z.object({ community_id: z.string() }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const SetAddressWallet = {
+  input: z.object({
+    community_id: z.string(),
+    wallet_id: z.nativeEnum(WalletId),
+  }),
+  output: z.boolean(),
   context: AuthContext,
 };

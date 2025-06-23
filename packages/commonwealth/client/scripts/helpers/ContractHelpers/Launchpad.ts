@@ -3,6 +3,7 @@ import {
   LPBondingCurveAbi,
 } from '@commonxyz/common-protocol-abis';
 import { commonProtocol as cp, erc20Abi } from '@hicommonwealth/evm-protocols';
+import { fetchCachedPublicEnvVar } from 'client/scripts/state/api/configuration';
 import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
 import ContractBase from './ContractBase';
@@ -12,6 +13,8 @@ class LaunchpadBondingCurve extends ContractBase {
   launchpadFactoryAddress: string;
   launchpadFactory: Contract<typeof LaunchpadAbi>;
   tokenCommunityManager: string;
+  LAUNCHPAD_INITIAL_PRICE: number;
+  LAUNCHPAD_CONNECTOR_WEIGHT: number;
 
   constructor(
     bondingCurveAddress: string,
@@ -24,13 +27,21 @@ class LaunchpadBondingCurve extends ContractBase {
     this.tokenAddress = tokenAddress;
     this.launchpadFactoryAddress = launchpadFactoryAddress;
     this.tokenCommunityManager = tokenCommunityManager;
+
+    const { LAUNCHPAD_INITIAL_PRICE, LAUNCHPAD_CONNECTOR_WEIGHT } =
+      fetchCachedPublicEnvVar() || {};
+
+    this.LAUNCHPAD_INITIAL_PRICE = LAUNCHPAD_INITIAL_PRICE!;
+    this.LAUNCHPAD_CONNECTOR_WEIGHT = LAUNCHPAD_CONNECTOR_WEIGHT!;
   }
 
   async initialize(
     withWallet?: boolean,
     chainId?: string | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any,
   ): Promise<void> {
-    await super.initialize(withWallet, chainId);
+    await super.initialize(withWallet, chainId, providerInstance);
     this.launchpadFactory = new this.web3.eth.Contract(
       LaunchpadAbi,
       this.launchpadFactoryAddress,
@@ -42,12 +53,13 @@ class LaunchpadBondingCurve extends ContractBase {
     symbol: string,
     walletAddress: string,
     chainId: string,
-    connectorWeight: number = 830000,
   ) {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }
-    const initialBuyValue = 4.4400042e14;
+    const initialBuyValue = 4.44e14 + this.LAUNCHPAD_INITIAL_PRICE;
+    const connectorWeight = this.LAUNCHPAD_CONNECTOR_WEIGHT;
+    const maxFeePerGas = await this.estimateGas();
     const txReceipt = await cp.launchToken(
       this.launchpadFactory,
       name,
@@ -60,38 +72,88 @@ class LaunchpadBondingCurve extends ContractBase {
       connectorWeight,
       this.tokenCommunityManager,
       initialBuyValue,
+      maxFeePerGas!,
+      chainId,
     );
     return txReceipt;
   }
 
-  async buyToken(amountEth: number, walletAddress: string, chainId: string) {
-    if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true, chainId);
-    }
+  async buyToken(
+    amountEth: number,
 
+    walletAddress: string,
+
+    chainId: string,
+    imgUrl?: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any,
+  ) {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true, chainId, providerInstance);
+    }
+    const maxFeePerGas = await this.estimateGas();
     const txReceipt = await cp.buyToken(
       this.contract,
       this.tokenAddress,
       walletAddress,
       amountEth,
+      maxFeePerGas!,
     );
+
+    // Add token to user's wallet after successful purchase
+    try {
+      const tokenContract = new this.web3.eth.Contract(
+        erc20Abi as unknown as AbiItem[],
+        this.tokenAddress,
+      );
+
+      // Get token details for wallet_watchAsset
+      const tokenSymbol = await tokenContract.methods.symbol().call();
+
+      // @ts-expect-error StrictNullChecks
+      await this.web3.currentProvider.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: this.tokenAddress,
+            symbol: tokenSymbol,
+            decimals: 18,
+            image: imgUrl,
+          },
+        },
+      });
+    } catch (error) {
+      console.log('Failed to add token to wallet:', error);
+      // Continue as this is an enhancement, not a critical functionality
+    }
+
     return txReceipt;
   }
 
-  async sellToken(amountSell: number, walletAddress: string, chainId: string) {
+  async sellToken(
+    amountSell: number,
+    walletAddress: string,
+    chainId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any,
+  ) {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true, chainId);
+      await this.initialize(true, chainId, providerInstance);
     }
+
     const tokenContract = new this.web3.eth.Contract(
       erc20Abi as unknown as AbiItem[],
       this.tokenAddress,
     );
+    const maxFeePerGas = await this.estimateGas();
     const txReceipt = await cp.sellToken(
       this.contract,
       this.tokenAddress,
       amountSell,
       walletAddress,
       tokenContract,
+      maxFeePerGas!,
     );
     return txReceipt;
   }
@@ -110,8 +172,8 @@ class LaunchpadBondingCurve extends ContractBase {
   }
 
   async getAmountOut(amountIn: number, buy: boolean, chainId: string) {
-    if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true, chainId);
+    if (!this.initialized) {
+      await this.initialize(false, chainId);
     }
 
     const amountOut = await cp.getPrice(

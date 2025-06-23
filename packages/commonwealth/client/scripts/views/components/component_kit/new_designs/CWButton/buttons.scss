@@ -1,3 +1,6 @@
+@use '../../../../../styles/mixins/buttons';
+@use '../../../../../styles/mixins/colors.module';
+
 @mixin iconAndTextColors($icon-color, $text-color) {
   .Icon.button-icon {
     color: $icon-color;
@@ -12,5 +15,5 @@
   box-shadow: none;
   pointer-events: none;
 
-  @include iconAndText($neutral-300);
+  @include buttons.iconAndText(colors.$neutral-300);
 }

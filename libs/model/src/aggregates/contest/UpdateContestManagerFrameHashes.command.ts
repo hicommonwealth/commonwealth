@@ -1,4 +1,4 @@
-import { Command } from '@hicommonwealth/core';
+import { Command, logger } from '@hicommonwealth/core';
 import { config, models } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
@@ -6,6 +6,12 @@ import { Mutex } from 'async-mutex';
 import _ from 'lodash';
 import { Op } from 'sequelize';
 import { mustExist } from '../../middleware/guards';
+
+const log = logger(import.meta);
+
+const Errors = {
+  ContestEnded: 'Contest has ended',
+};
 
 const neynarMutex = new Mutex();
 
@@ -27,8 +33,19 @@ export function UpdateContestManagerFrameHashes(): Command<
               [Op.not]: true,
             },
           },
+          include: [
+            {
+              model: models.Contest,
+              as: 'contests',
+              required: true,
+            },
+          ],
         });
         mustExist('Contest Manager', contestManager);
+        if (new Date() > contestManager.contests![0]!.end_time) {
+          log.warn(`${Errors.ContestEnded}: ${contestManager.contest_address}`);
+          return {};
+        }
 
         // find webhook by ID
         const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
@@ -86,6 +103,8 @@ export function UpdateContestManagerFrameHashes(): Command<
           await contestManager.save();
         }
       });
+
+      return {};
     },
   };
 }

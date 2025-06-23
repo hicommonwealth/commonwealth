@@ -85,6 +85,30 @@ export const numberValidationSchema = {
     ),
 };
 
+export const numberDecimalValidationSchema = {
+  required: z
+    .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+    .refine(
+      (value) => {
+        const intVal = parseFloat(value);
+        return !isNaN(intVal) && intVal.toString() === value.trim();
+      },
+      { message: VALIDATION_MESSAGES.INVALID_INPUT },
+    ),
+  optional: z
+    .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+    .optional()
+    .refine(
+      (value) => {
+        if (!value || value.toString().trim() === '') return true;
+        const intVal = parseFloat(value);
+        return !isNaN(intVal) && intVal.toString() === value.trim();
+      },
+      { message: VALIDATION_MESSAGES.INVALID_INPUT },
+    ),
+};
+
 // non decimal number
 export const numberNonDecimalValidationSchema = {
   required: numberValidationSchema.required.refine(
@@ -110,4 +134,12 @@ export const numberNonDecimalGTZeroValidationSchema =
       return intVal > 0;
     },
     { message: VALIDATION_MESSAGES.MUST_BE_GREATER(0) },
+  );
+
+export const stringHasNumbersOnlyValidationSchema = z
+  .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+  .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+  .refine(
+    (value) => /^\d+$/.test(`${value}`), // checks for digits only
+    { message: VALIDATION_MESSAGES.INVALID_INPUT },
   );

@@ -26,7 +26,7 @@ describe('allow_tokenized_threads lifecycle', () => {
     });
     await seed('Community', {
       id: community_id,
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       allow_tokenized_threads: false,
       profile_count: 0,
     });

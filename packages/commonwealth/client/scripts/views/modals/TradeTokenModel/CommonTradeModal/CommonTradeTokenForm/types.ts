@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { CommonTradingConfig } from '../types';
 import useCommonTradeTokenFormProps from './useCommonTradeTokenForm';
 
-export type TokenPresetAmounts = number | 'Max';
+export type TokenPresetAmounts = number | 'Max' | string;
 
 export type UseCommonTradeTokenFormProps = {
   tradeConfig: CommonTradingConfig & {
@@ -20,7 +20,7 @@ export type UseCommonTradeTokenFormProps = {
 
 export type UseBuyTradeProps = UseCommonTradeTokenFormProps & {
   enabled: boolean;
-  chainNode: NodeInfo;
+  chainNode: NodeInfo | undefined;
   tokenCommunity?: z.infer<typeof ExtendedCommunity>;
   selectedAddress?: string;
   commonFeePercentage: number;

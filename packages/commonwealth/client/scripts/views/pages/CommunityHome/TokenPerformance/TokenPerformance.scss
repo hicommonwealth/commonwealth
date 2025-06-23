@@ -1,4 +1,6 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .TokenPerformance {
   margin: 16px 0;
@@ -11,7 +13,7 @@
 
     .see-all-link {
       cursor: pointer;
-      color: $primary-500;
+      color: colors.$primary-500;
       text-decoration: none;
 
       &:focus,
@@ -34,5 +36,37 @@
     gap: 16px;
     align-items: flex-start;
     flex-wrap: wrap;
+
+    &.no-chart {
+      justify-content: space-between;
+
+      > div {
+        flex: 1;
+        min-width: 300px;
+      }
+
+      .TopHolders {
+        max-width: 50%;
+      }
+
+      @include media_queries.mediumSmallInclusive {
+        flex-direction: column;
+
+        > div {
+          min-width: 100%;
+          width: 100%;
+        }
+
+        .TopHolders {
+          max-width: 100%;
+          margin-top: 16px;
+        }
+      }
+    }
+
+    .GeckoChart {
+      flex: 1;
+      min-width: 300px;
+    }
   }
 }

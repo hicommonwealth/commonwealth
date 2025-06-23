@@ -1,12 +1,21 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import {
+  doesActionAllowChainId,
   doesActionAllowCommentId,
   doesActionAllowContentId,
   doesActionAllowRepetition,
+  doesActionAllowSSOType,
   doesActionAllowThreadId,
+  doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
-  doesActionRequireDiscordServerURL,
+  doesActionRequireAmountMultipler,
+  doesActionRequireBasicRewardAmount,
+  doesActionRequireChainEvent,
+  doesActionRequireDiscordServerId,
+  doesActionRequireGoalConfig,
+  doesActionRequireGroupId,
   doesActionRequireRewardShare,
+  doesActionRequireStartLink,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -140,18 +149,29 @@ const useQuestActionMultiFormsState = ({
 
     const chosenAction = updatedSubForms[index].values.action as QuestAction;
     if (chosenAction) {
+      const requiresBasicPoints =
+        doesActionRequireBasicRewardAmount(chosenAction);
       const requiresCreatorPoints = doesActionRequireRewardShare(chosenAction);
       const allowsContentId = doesActionAllowContentId(chosenAction);
       const allowsTopicId =
         allowsContentId && doesActionAllowTopicId(chosenAction);
+      const allowsChainId =
+        allowsContentId && doesActionAllowChainId(chosenAction);
       const allowsTwitterTweetUrl =
         allowsContentId && doesActionRequireTwitterTweetURL(chosenAction);
-      const requiresDiscordServerURL =
-        doesActionRequireDiscordServerURL(chosenAction);
+      const requiresDiscordServerId =
+        doesActionRequireDiscordServerId(chosenAction);
+      const requiresGoalConfig = doesActionRequireGoalConfig(chosenAction);
+      const requiresGroupId =
+        allowsContentId && doesActionRequireGroupId(chosenAction);
+      const allowsTokenTradeThreshold =
+        allowsContentId && doesActionAllowTokenTradeThreshold(chosenAction);
       const isActionRepeatable = doesActionAllowRepetition(chosenAction);
+      const requiresStartLink = doesActionRequireStartLink(chosenAction);
 
       // update config based on chosen action
       updatedSubForms[index].config = {
+        requires_basic_points: requiresBasicPoints,
         requires_creator_points: requiresCreatorPoints,
         is_action_repeatable: isActionRepeatable,
         with_optional_topic_id: allowsTopicId,
@@ -161,7 +181,18 @@ const useQuestActionMultiFormsState = ({
           allowsContentId && doesActionAllowThreadId(chosenAction),
         requires_twitter_tweet_link:
           allowsContentId && doesActionRequireTwitterTweetURL(chosenAction),
-        requires_discord_server_url: requiresDiscordServerURL,
+        requires_chain_event: doesActionRequireChainEvent(chosenAction),
+        requires_discord_server_id: requiresDiscordServerId,
+        requires_goal_config: requiresGoalConfig,
+        with_optional_chain_id:
+          allowsContentId && doesActionAllowChainId(chosenAction),
+        requires_group_id: requiresGroupId,
+        requires_start_link: requiresStartLink,
+        requires_amount_multipler:
+          doesActionRequireAmountMultipler(chosenAction),
+        with_optional_token_trade_threshold: allowsTokenTradeThreshold,
+        with_optional_sso_type:
+          allowsContentId && doesActionAllowSSOType(chosenAction),
       };
 
       // set fixed action repitition per certain actions
@@ -179,12 +210,12 @@ const useQuestActionMultiFormsState = ({
         };
       }
 
-      // reset errors/values if action doesn't require content link
+      // reset errors/values if action doesn't require content identifier
       if (!allowsContentId) {
-        updatedSubForms[index].values.contentLink = undefined;
+        updatedSubForms[index].values.contentIdentifier = undefined;
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
-          contentLink: undefined,
+          contentIdentifier: undefined,
         };
       }
 
@@ -195,9 +226,34 @@ const useQuestActionMultiFormsState = ({
             QuestActionContentIdScope.TwitterTweet;
           break;
         }
-        case 'CommonDiscordServerJoined': {
+        case 'DiscordServerJoined': {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.DiscordServer;
+          break;
+        }
+        case 'CommunityCreated': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.Chain;
+          break;
+        }
+        case 'MembershipsRefreshed': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.Group;
+          break;
+        }
+        case 'SSOLinked': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.Sso;
+          break;
+        }
+        case 'LaunchpadTokenTraded': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.TokenTradeThreshold;
+          break;
+        }
+        case 'CommunityGoalReached': {
+          updatedSubForms[index].values.contentIdScope =
+            QuestActionContentIdScope.Goal;
           break;
         }
         default: {
@@ -205,7 +261,7 @@ const useQuestActionMultiFormsState = ({
         }
       }
 
-      // set/reset default values/config if action allows content link
+      // set/reset default values/config if action allows content identifier
       if (allowsContentId) {
         updatedSubForms[index].values.contentIdScope =
           updateBody.contentIdScope ||
@@ -221,7 +277,22 @@ const useQuestActionMultiFormsState = ({
             !allowsTwitterTweetUrl) ||
           (updatedSubForms[index].values.contentIdScope ===
             QuestActionContentIdScope.DiscordServer &&
-            !requiresDiscordServerURL)
+            !requiresDiscordServerId) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.Goal &&
+            !requiresGoalConfig) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.Chain &&
+            !allowsChainId) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.Group &&
+            !requiresGroupId) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.TokenTradeThreshold &&
+            !allowsTokenTradeThreshold) ||
+          (updatedSubForms[index].values.contentIdScope ===
+            QuestActionContentIdScope.Sso &&
+            !updatedSubForms[index].config?.with_optional_sso_type)
         ) {
           updatedSubForms[index].values.contentIdScope =
             QuestActionContentIdScope.Thread;
@@ -230,7 +301,7 @@ const useQuestActionMultiFormsState = ({
         updatedSubForms[index].errors = {
           ...updatedSubForms[index].errors,
           contentIdScope: undefined,
-          contentLink: undefined,
+          contentIdentifier: undefined,
         };
       }
     }

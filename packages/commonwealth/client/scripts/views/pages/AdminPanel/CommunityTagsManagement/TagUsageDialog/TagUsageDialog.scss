@@ -1,0 +1,66 @@
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
+
+.TagUsageDialog {
+  .tag-usage-container {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    min-width: 300px;
+
+    .dialog-title {
+      margin-bottom: 16px;
+    }
+
+    .loading-container,
+    .error-container {
+      display: flex;
+      justify-content: center;
+      padding: 24px 0;
+    }
+
+    .loading-spinner {
+      color: colors.$primary-500;
+      font-weight: 500;
+    }
+
+    .communities-list {
+      display: flex;
+      flex-direction: column;
+      max-height: 50vh;
+      overflow-y: auto;
+      margin-top: 16px;
+
+      .list-header {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid colors.$neutral-200;
+        margin-bottom: 8px;
+      }
+
+      .community-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid colors.$neutral-100;
+
+        .community-link {
+          color: colors.$primary-500;
+          text-decoration: none;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+
+        .community-id {
+          color: colors.$neutral-500;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}

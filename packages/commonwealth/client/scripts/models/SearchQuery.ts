@@ -1,6 +1,7 @@
 export enum SearchScope {
   'Members' = 'Members',
   'Communities' = 'Communities',
+  'Topics' = 'Topics',
   'Proposals' = 'Proposals',
   'Threads' = 'Threads',
   'Replies' = 'Replies',
@@ -12,6 +13,7 @@ export const VALID_SEARCH_SCOPES: SearchScope[] = [
   SearchScope.Replies,
   SearchScope.Communities,
   SearchScope.Members,
+  SearchScope.Topics,
   SearchScope.Proposals,
   SearchScope.All,
 ];

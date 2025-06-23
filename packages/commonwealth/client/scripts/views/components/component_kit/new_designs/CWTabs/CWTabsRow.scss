@@ -1,15 +1,17 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
 
 .CWTabsRow {
   display: inline-flex;
-  border-bottom: 1px solid $neutral-200;
+  border-bottom: 1px solid colors.$neutral-200;
   margin-bottom: 8px;
 
   &.boxed {
-    background-color: $neutral-100;
+    background-color: colors.$neutral-100;
     border: none;
-    border-top-right-radius: $border-radius-corners-wider;
-    border-top-left-radius: $border-radius-corners-wider;
+    border-top-right-radius: border_radius.$border-radius-corners-wider;
+    border-top-left-radius: border_radius.$border-radius-corners-wider;
   }
 }
 

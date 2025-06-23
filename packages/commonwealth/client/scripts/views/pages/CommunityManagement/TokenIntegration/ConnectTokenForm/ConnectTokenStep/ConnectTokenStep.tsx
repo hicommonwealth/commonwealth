@@ -47,10 +47,10 @@ const ConnectTokenStep = ({
     nodeEthChainId: baseNode.ethChainId || 0,
   });
 
-  const { mutateAsync: pinToken, isLoading: isPinningToken } =
+  const { mutateAsync: pinToken, isPending: isPinningToken } =
     usePinTokenToCommunityMutation();
 
-  const { mutateAsync: unpinToken, isLoading: isUnpinningToken } =
+  const { mutateAsync: unpinToken, isPending: isUnpinningToken } =
     useUnpinTokenFromCommunityMutation({
       resetCacheOnSuccess: false,
     });
@@ -140,6 +140,9 @@ const ConnectTokenStep = ({
           hookToForm
           fullWidth
           placeholder="Please enter primary token address"
+          tokenAddress={tokenValue}
+          chainName={baseNode.name}
+          chainEthId={baseNode.ethChainId}
         />
       </div>
       <CWDivider />

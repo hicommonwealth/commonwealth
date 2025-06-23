@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .CommunityPreviewCard.Card {
   display: flex;
@@ -11,7 +13,7 @@
   position: relative;
   flex-wrap: wrap;
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     min-height: 100px;
     max-width: 200px;
     min-width: 200px;
@@ -35,7 +37,7 @@
     display: flex;
     justify-content: center;
     align-content: center;
-    border: 1px solid $neutral-700;
+    border: 1px solid colors.$neutral-700;
     flex-direction: column;
 
     .explore-label {
@@ -48,7 +50,7 @@
   }
 
   .card-subtext {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 
   .thread-counts {
@@ -57,7 +59,7 @@
     display: flex;
     gap: 2px;
     align-items: center;
-    color: $neutral-500;
+    color: colors.$neutral-500;
 
     .Tag.new {
       margin-left: 6px !important;
@@ -67,13 +69,23 @@
   .community-name {
     display: flex;
     flex-direction: column;
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .Icon {
+      margin-left: 2px;
+    }
   }
 
   .join-community {
     position: absolute;
     right: 0;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       position: relative;
     }
   }

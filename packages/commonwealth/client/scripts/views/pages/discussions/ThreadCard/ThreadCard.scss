@@ -1,4 +1,8 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
+@use '../../../../styles/mixins/text';
 
 .ThreadCard {
   cursor: pointer;
@@ -13,7 +17,7 @@
   overflow: hidden;
   min-width: 100%;
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     padding: 12px;
   }
 
@@ -24,17 +28,17 @@
   }
 
   &.isPinned {
-    background: $neutral-50;
+    background: colors.$neutral-50;
 
     &:hover {
-      background: $neutral-50;
+      background: colors.$neutral-50;
       text-decoration: none;
       color: unset;
     }
   }
 
   &:hover {
-    background: $neutral-50;
+    background: colors.$neutral-50;
     text-decoration: none;
     color: unset;
   }
@@ -65,12 +69,12 @@
         display: flex;
         gap: 8px;
 
-        @include flame;
+        @include shared.flame;
 
-        @include smallInclusive {
+        @include media_queries.smallInclusive {
           gap: 4px;
 
-          @include flame($size: small);
+          @include shared.flame($size: small);
         }
       }
     }
@@ -81,18 +85,18 @@
       gap: 8px;
 
       .content-body {
-        @include multiline-text-ellipsis($max-lines: 2);
+        @include text.multiline-text-ellipsis($max-lines: 2);
         word-break: break-word;
         font-size: 16px !important;
         overflow: hidden;
         white-space: pre-wrap;
 
-        @include extraSmall {
+        @include media_queries.extraSmall {
           overflow: hidden !important;
         }
 
         .MarkdownFormattedText {
-          @include caption;
+          @include text.caption;
           overflow: hidden;
           --line-height: 20px;
 
@@ -100,7 +104,7 @@
             overflow: hidden;
           }
 
-          @include extraSmall {
+          @include media_queries.extraSmall {
             p {
               line-height: calc(var(--line-height) - 2) !important;
             }
@@ -146,7 +150,7 @@
 
         .show-more-btn {
           padding-top: 4px;
-          color: $primary-500 !important;
+          color: colors.$primary-500 !important;
 
           &:hover {
             text-decoration: underline;
@@ -166,7 +170,7 @@
         flex-wrap: wrap;
         gap: 8px;
 
-        @include extraSmall {
+        @include media_queries.extraSmall {
           padding-right: 0;
         }
 
@@ -210,10 +214,10 @@
         gap: 4px;
         cursor: pointer;
         padding: 4px;
-        border-radius: $border-radius-corners-wider;
+        border-radius: border_radius.$border-radius-corners-wider;
 
         &:hover {
-          background-color: $neutral-200;
+          background-color: colors.$neutral-200;
         }
       }
 
@@ -231,9 +235,9 @@
   gap: 4px;
   margin: 8px 0 8px 72px;
   padding-left: 8px;
-  border-left: 1px solid $neutral-200 !important;
+  border-left: 1px solid colors.$neutral-200 !important;
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     margin-left: 32px;
   }
 
@@ -251,7 +255,7 @@
     border-radius: 6px;
 
     &:hover {
-      background: $neutral-50;
+      background: colors.$neutral-50;
       text-decoration: none;
       color: unset;
       cursor: pointer;
@@ -280,14 +284,14 @@
   border-radius: 6px;
   width: 33% !important;
   display: flex !important;
-  border: 1px solid $neutral-100 !important;
+  border: 1px solid colors.$neutral-100 !important;
   align-items: flex-start !important;
 
-  @include mediumToLarge {
+  @include media_queries.mediumToLarge {
     width: 49% !important;
   }
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     width: 100% !important;
     max-height: 280px !important;
     min-height: 200px !important;

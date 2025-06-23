@@ -1,9 +1,11 @@
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
+import { SignIn } from 'views/components/SignIn/SignIn';
 import { withLayout } from 'views/Layout';
 import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
 import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
+import ExportPrivateKeyFromMagic from '../views/components/ExportPrivateKeyFromMagic';
 
 const QuillPage = lazy(() => import('views/pages/QuillPage'));
 const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
@@ -13,7 +15,7 @@ const MarkdownHitHighlighterPage = lazy(
 );
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
-const CommunitiesPage = lazy(() => import('views/pages/Communities'));
+const ExplorePage = lazy(() => import('views/pages/ExplorePage'));
 const SearchPage = lazy(() => import('views/pages/search'));
 const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
@@ -49,7 +51,6 @@ const NotificationSettings = lazy(
 );
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
-const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 
 const DiscussionsPage = lazy(
@@ -60,6 +61,9 @@ const ViewThreadPage = lazy(
 );
 const TopicRedirectPage = lazy(() => import('views/pages/topic_redirect'));
 const ThreadRedirectPage = lazy(() => import('views/pages/thread_redirect'));
+const GroupRedirectPage = lazy(
+  () => import('views/pages/Redirects/GroupRedirect'),
+);
 const CommentRedirectPage = lazy(() => import('views/pages/comment_redirect'));
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
@@ -129,7 +133,7 @@ const CommunityNotFoundPage = lazy(
 );
 
 const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
-const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+const WalletPage = lazy(() => import('views/pages/WalletPage'));
 const CommunityHomePage = lazy(
   () => import('../views/pages/CommunityHome/CommunityHomePage'),
 );
@@ -146,6 +150,18 @@ const CommonDomainRoutes = () => [
     key="mobile-app-redirect"
     path="/_internal/mobile-app-redirect"
     element={<MobileAppRedirect />}
+  />,
+
+  <Route
+    key="ExportPrivateKeyFromMagic"
+    path="/export-magic"
+    element={<ExportPrivateKeyFromMagic />}
+  />,
+
+  <Route
+    key="sign-in"
+    path="/sign-in"
+    element={withLayout(SignIn, { type: 'common' })}
   />,
 
   <Route
@@ -252,14 +268,14 @@ const CommonDomainRoutes = () => [
   <Route
     key="/explore"
     path="/explore"
-    element={withLayout(CommunitiesPage, {
+    element={withLayout(ExplorePage, {
       type: 'common',
     })}
   />,
   <Route
-    key="/rewards"
-    path="/rewards"
-    element={withLayout(RewardsPage, { type: 'common' })}
+    key="/wallet"
+    path="/wallet"
+    element={withLayout(WalletPage, { type: 'common' })}
   />,
   <Route
     key="/search"
@@ -356,9 +372,13 @@ const CommonDomainRoutes = () => [
   <Route
     key="/:scope/proposal/:type/:identifier"
     path="/:scope/proposal/:type/:identifier"
-    element={withLayout(ViewProposalPage, {
-      scoped: true,
-    })}
+    element={
+      <Navigate
+        to={(parameters) =>
+          `/${parameters.scope}/proposal-details/${parameters.identifier}?type=cosmos`
+        }
+      />
+    }
   />,
 
   <Route
@@ -451,6 +471,13 @@ const CommonDomainRoutes = () => [
     key="/discussion/:identifier"
     path="/discussion/:identifier"
     element={withLayout(ThreadRedirectPage, {
+      scoped: false,
+    })}
+  />,
+  <Route
+    key="/group/:id"
+    path="/group/:id"
+    element={withLayout(GroupRedirectPage, {
       scoped: false,
     })}
   />,
@@ -768,6 +795,7 @@ const CommonDomainRoutes = () => [
     path="/:scope/home"
     element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
   />,
+  <Route key="/rewards" path="/rewards" element={<Navigate to="/wallet" />} />,
   // LEGACY REDIRECTS END
 
   // Community not found page - This should be at the end

@@ -3,7 +3,7 @@ import { TRPCError, initTRPC } from '@trpc/server';
 import type { Request } from 'express';
 import passport from 'passport';
 import type { OpenApiMeta } from 'trpc-swagger';
-import { ZodSchema, z } from 'zod';
+import { ZodType, z } from 'zod';
 import { config } from '../config';
 import type { BuildProcOptions, Context, Metadata } from './types';
 
@@ -11,14 +11,25 @@ const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
 export const router = trpc.router;
 export const procedure = trpc.procedure;
 
-const isSecure = <Input extends ZodSchema, Output extends ZodSchema>(
+const isSecure = <Input extends ZodType, Output extends ZodType>(
   md: Metadata<Input, Output>,
-) => md.secure !== false || (md.auth ?? []).length > 0;
+  forceSecure?: boolean,
+) => {
+  const firstAuth = md.auth?.at(0);
+  const optional =
+    typeof firstAuth === 'function' &&
+    firstAuth.name.startsWith('authOptional');
+  return {
+    secure: forceSecure || md.secure !== false || !!firstAuth,
+    optional,
+  };
+};
 
-const authenticate = async <Input extends ZodSchema>(
+const authenticate = async <Input extends ZodType>(
   req: Request,
   rawInput: z.infer<Input>,
   authStrategy: AuthStrategies<Input> = { type: 'jwt' },
+  optional: boolean,
 ) => {
   // Bypass when user is already authenticated via JWT or token
   // Authentication overridden at router level e.g. external-router.ts
@@ -47,7 +58,7 @@ const authenticate = async <Input extends ZodSchema>(
     } else {
       await passport.authenticate(authStrategy.type, { session: false });
     }
-    if (!req.user) throw new Error('Not authenticated');
+    if (!req.user && !optional) throw new Error('Not authenticated');
   } catch (error) {
     throw new TRPCError({
       message: error instanceof Error ? error.message : (error as string),
@@ -59,7 +70,7 @@ const authenticate = async <Input extends ZodSchema>(
 /**
  * tRPC procedure factory with authentication, traffic stats, and analytics middleware
  */
-export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
+export const buildproc = <Input extends ZodType, Output extends ZodType>({
   method,
   name,
   md,
@@ -67,10 +78,13 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
   outMiddlewares,
   forceSecure,
 }: BuildProcOptions<Input, Output>) => {
-  const secure = forceSecure ?? isSecure(md);
+  const { secure, optional } = isSecure(md, forceSecure);
   return trpc.procedure
-    .use(async ({ ctx, rawInput, next }) => {
-      if (secure) await authenticate(ctx.req, rawInput, md.authStrategy);
+    .use(async ({ ctx, next, getRawInput }) => {
+      if (secure) {
+        const input = (await getRawInput()) as z.infer<Input>;
+        await authenticate(ctx.req, input, md.authStrategy, optional);
+      }
       return next({
         ctx: {
           ...ctx,
@@ -81,11 +95,12 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
         },
       });
     })
-    .use(async ({ ctx, rawInput, next }) => {
+    .use(async ({ ctx, next, getRawInput }) => {
       const result = await next();
       if (result.ok && outMiddlewares?.length) {
+        const input = (await getRawInput()) as z.infer<Input>;
         for (const omw of outMiddlewares) {
-          await omw(rawInput, result.data, ctx);
+          await omw(input, result.data as z.infer<Output>, ctx);
         }
       }
       return result;
@@ -93,6 +108,7 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
     .meta({
       openapi: {
         method,
+        description: md.input.description, // zod property description
         path: `/${name}`,
         tags: [tag],
         headers: [

@@ -17,14 +17,11 @@
     "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "echo No tests for @hicommonwealth/schemas",
-    "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
-    "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
+    "test": "echo No tests for @hicommonwealth/schemas"
   },
   "dependencies": {
-    "@hicommonwealth/shared": "workspace:*",
     "@hicommonwealth/evm-protocols": "workspace:*",
-    "moment": "^2.23.0",
-    "zod": "^3.22.4"
+    "@hicommonwealth/shared": "workspace:*",
+    "zod": "^3.25.46"
   }
 }

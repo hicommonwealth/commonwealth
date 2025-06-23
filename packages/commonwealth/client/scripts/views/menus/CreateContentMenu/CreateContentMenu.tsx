@@ -7,10 +7,12 @@ import { useFlag } from 'hooks/useFlag';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import { isMobile } from 'react-device-detect';
 import type { NavigateOptions, To } from 'react-router-dom';
 import app from 'state';
-import { fetchCachedCustomDomain } from 'state/api/configuration';
+import {
+  fetchCachedCustomDomain,
+  fetchCachedPublicEnvVar,
+} from 'state/api/configuration';
 import { useCreateDiscordBotConfigMutation } from 'state/api/discord';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import useUserStore, { userStore } from 'state/ui/user';
@@ -26,19 +28,13 @@ import {
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWSidebarMenu } from '../../components/component_kit/cw_sidebar_menu';
 import { getClasses } from '../../components/component_kit/helpers';
+import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
 import TokenLaunchButton from '../../components/sidebar/TokenLaunchButton';
 import './CreateContentMenu.scss';
 
 const resetSidebarState = () => {
-  //Bouncer pattern -- I have found isMobile does not always detect screen
-  //size when responsively resizing so added a redundancy with window.innerWidth
-  if (!isMobile || window.innerWidth > 425) return;
-
-  if (sidebarStore.getState().userToggledVisibility !== 'open') {
-    sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
-  } else {
-    sidebarStore.getState().setMenu({ name: 'default', isVisible: true });
-  }
+  // Always set the menu back to default, effectively closing the CreateContentMenu
+  sidebarStore.getState().setMenu({ name: 'default' });
 };
 
 const getCreateContentMenuItems = (
@@ -56,6 +52,7 @@ const getCreateContentMenuItems = (
     userStore.getState() && !!app.chain?.meta?.snapshot_spaces?.length;
 
   const { isCustomDomain } = fetchCachedCustomDomain() || {};
+  const { DISCORD_CLIENT_ID } = fetchCachedPublicEnvVar() || {};
 
   const showOnChainProposalItem =
     app.chain?.base === ChainBase.CosmosSDK &&
@@ -94,25 +91,26 @@ const getCreateContentMenuItems = (
       : [];
 
   const getUniversalCreateItems = (): PopoverMenuItem[] => [
-    {
-      label: 'Create community',
-      isButton: true,
-      iconLeft: 'peopleNew',
-      iconLeftWeight: 'bold',
-      onClick: (e) => {
-        e?.preventDefault();
-        resetSidebarState();
-        navigate('/createCommunity', {}, null);
-      },
-    },
     ...(launchpadEnabled
       ? [
           {
             type: 'element',
-            element: <TokenLaunchButton key={2} buttonHeight="sm" />,
+            element: (
+              <div onClick={resetSidebarState} key="token-launch-wrapper">
+                <TokenLaunchButton key={2} buttonHeight="sm" />
+              </div>
+            ),
           } as PopoverMenuItem,
         ]
       : []),
+    {
+      type: 'element',
+      element: (
+        <div onClick={resetSidebarState} key="create-community-wrapper">
+          <CreateCommunityButton withIcon buttonHeight="sm" />
+        </div>
+      ),
+    } as PopoverMenuItem,
   ];
 
   const getDiscordBotConnectionItems = (): PopoverMenuItem[] => {
@@ -125,6 +123,7 @@ const getCreateContentMenuItems = (
           label: 'Connect Discord',
           iconLeft: 'discord',
           onClick: () => {
+            resetSidebarState();
             const verificationToken = uuidv4();
             createDiscordBotConfig!({
               verification_token: verificationToken,
@@ -133,7 +132,7 @@ const getCreateContentMenuItems = (
               .then(() => {
                 window.open(
                   `https://discord.com/oauth2/authorize?client_id=${
-                    process.env.DISCORD_CLIENT_ID
+                    DISCORD_CLIENT_ID
                   }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
                     `${
                       !isCustomDomain

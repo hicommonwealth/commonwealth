@@ -1,8 +1,26 @@
-@import '../../../../../../styles/shared.scss';
+@use '../../../../../../styles/shared.scss';
+@use '../../../../../../styles/mixins/colors.module';
 
 .AddressBalance {
   display: flex;
   align-items: center;
   justify-self: flex-end;
   gap: 1px;
+}
+
+.address-balance-container {
+  display: flex;
+  align-items: center;
+  white-space: nowrap; // Prevent wrapping
+  gap: 4px; // Add a small gap between icon, value, and symbol
+
+  .AddressBalance {
+    // Existing styles for the FormattedDisplayNumber component if any
+    // Add any specific alignment/spacing if needed
+  }
+
+  .na-value {
+    // Styles for the N/A text if needed
+    color: colors.$neutral-400; // Example style
+  }
 }

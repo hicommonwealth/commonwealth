@@ -1,9 +1,20 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .ManageAPIKeys {
   .flex-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    .api-key-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .tier-message {
+        color: colors.$rorange-500;
+      }
+    }
   }
 }

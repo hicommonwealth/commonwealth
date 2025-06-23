@@ -4,13 +4,10 @@ import React from 'react';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
 
-import { ActivityThread, PermissionEnum } from '@hicommonwealth/schemas';
 import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
-import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
 import useTopicGating from 'client/scripts/hooks/useTopicGating';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
-import { ThreadKind, ThreadStage } from 'client/scripts/models/types';
 import app from 'client/scripts/state';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { useFetchCustomDomainQuery } from 'client/scripts/state/api/configuration';
@@ -18,11 +15,11 @@ import {
   useFetchGlobalActivityQuery,
   useFetchUserActivityQuery,
 } from 'client/scripts/state/api/feeds/fetchUserActivity';
-import { useFetchThreadsQuery } from 'client/scripts/state/api/threads';
+import useGetActiveThreadsQuery from 'client/scripts/state/api/threads/getActiveThreads';
 import useUserStore from 'client/scripts/state/ui/user';
+import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
 import { VirtuosoGrid } from 'react-virtuoso';
-import Permissions from 'utils/Permissions';
-import { z } from 'zod';
+import { EmptyThreadCard } from 'views/components/EmptyThreadCard/EmptyThreadCard';
 import { PageNotFound } from '../../404';
 import { ThreadCard } from '../../discussions/ThreadCard';
 import './TrendingThreadList.scss';
@@ -35,6 +32,9 @@ type TrendingThreadListProps = {
   customScrollParent?: HTMLElement;
   communityIdFilter?: string;
   hideHeader?: boolean;
+  searchText?: string;
+  onClearSearch?: () => void;
+  hideSearchTag?: boolean;
 };
 
 type FeedThreadProps = {
@@ -63,50 +63,29 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
     (a) => a?.community?.id === thread?.communityId,
   );
 
-  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
+  const { actionGroups, bypassGating } = useTopicGating({
     communityId: thread.communityId,
     userAddress: account?.address || '',
     apiEnabled: !!account?.address && !!thread.communityId,
     topicId: thread?.topic?.id || 0,
   });
 
-  const isAdmin =
-    Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin({
-      id: community?.id || '',
-      adminsAndMods: community?.adminsAndMods || [],
-    });
-
-  const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: isRestrictedMembership,
-  });
-
-  const disabledCommentActionTooltipText = getThreadActionTooltipText({
-    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT, // on this page we only show comment option
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
-  });
-
   // edge case for deleted communities with orphaned posts
   if (!community) {
     return (
-      <ThreadCard thread={thread} layoutType="community-first" showSkeleton />
+      <ThreadCard
+        thread={thread}
+        layoutType="community-first"
+        showSkeleton
+        actionGroups={actionGroups}
+        bypassGating={bypassGating}
+      />
     );
   }
 
   return (
     <ThreadCard
       thread={thread}
-      canReact={!disabledActionsTooltipText}
-      canComment={!disabledCommentActionTooltipText}
       canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
       onStageTagClick={() => {
         navigate(
@@ -117,11 +96,6 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       }}
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledActionsTooltipText={
-        disabledCommentActionTooltipText
-          ? disabledCommentActionTooltipText
-          : disabledActionsTooltipText
-      }
       customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer
@@ -133,85 +107,11 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       hideTrendingTag
       showOnlyThreadActionIcons
       communityHomeLayout
+      actionGroups={actionGroups}
+      bypassGating={bypassGating}
     />
   );
 };
-
-// TODO: Reconcile client state with query schemas
-function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
-  return new Thread({
-    Address: {
-      id: 0,
-      address: thread.user_address,
-      community_id: thread.community_id,
-      ghost_address: false,
-      is_user_default: false,
-      is_banned: false,
-      role: 'member',
-    },
-    title: thread.title,
-    id: thread.id,
-    created_at: thread.created_at ?? '',
-    updated_at: thread.updated_at ?? thread.created_at ?? '',
-    topic: {
-      community_id: thread.community_id,
-      id: thread.topic.id,
-      name: thread.topic.name,
-      description: thread.topic.description,
-      created_at: '',
-      featured_in_sidebar: false,
-      featured_in_new_post: false,
-      group_ids: [],
-      active_contest_managers: [],
-      total_threads: 0,
-      // If we expect to do tokenized stuff on the community homepage, modify this
-      allow_tokenized_threads: false,
-    },
-    kind: thread.kind as ThreadKind,
-    stage: thread.stage as ThreadStage,
-    ThreadVersionHistories: [],
-    community_id: thread.community_id,
-    read_only: thread.read_only,
-    body: thread.body,
-    content_url: thread.content_url || null,
-    locked_at: thread.locked_at ?? '',
-    archived_at: thread.archived_at ?? '',
-    has_poll: thread.has_poll ?? false,
-    marked_as_spam_at: thread.marked_as_spam_at ?? '',
-    discord_meta: thread.discord_meta!,
-    profile_name: thread.profile_name ?? '',
-    avatar_url: thread.profile_avatar ?? '',
-    user_id: thread.user_id,
-    user_tier: thread.user_tier,
-    userId: thread.user_id,
-    last_edited: thread.updated_at ?? '',
-    last_commented_on: '',
-    reaction_weights_sum: '0',
-    address_last_active: '',
-    address_id: 0,
-    search: '',
-    ContestActions: [],
-    numberOfComments: thread.number_of_comments,
-    recentComments:
-      thread.recent_comments?.map((c) => ({
-        id: c.id,
-        address: c.address,
-        user_id: c.user_id ?? 0,
-        created_at: c.created_at,
-        updated_at: c.updated_at,
-        profile_avatar: c.profile_avatar ?? '',
-        profile_name: c.profile_name ?? '',
-        body: c.body,
-        content_url: c.content_url || null,
-        thread_id: 0,
-        address_id: 0,
-        reaction_count: 0,
-        comment_level: 0,
-        reply_count: 0,
-        community_id: thread.community_id,
-      })) ?? [],
-  });
-}
 
 // eslint-disable-next-line react/no-multi-comp
 const TrendingThreadList = ({
@@ -219,25 +119,28 @@ const TrendingThreadList = ({
   customScrollParent,
   communityIdFilter,
   hideHeader,
+  searchText,
+  hideSearchTag,
+  onClearSearch,
 }: TrendingThreadListProps) => {
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
 
+  // TODO: we don't need to be fetching global activity feed when using this
+  //  component from inside a community...
   const {
     data: feed,
     isLoading: feedIsLoading,
     isError: feedIsError,
-  } = query({ limit: 3 });
+  } = query({ limit: 10, search: searchText?.trim() });
 
   const {
     data: communityThreads,
-    loading: communitythreadsLoading,
+    isLoading: communitythreadsLoading,
     isError: threadsError,
-  } = useFetchThreadsQuery({
-    queryType: 'active',
-    communityId,
-    limit: 3,
-    apiEnabled: !!communityId,
+  } = useGetActiveThreadsQuery({
+    community_id: communityId,
+    enabled: !!communityId,
   });
 
   const isLoading = communityIdFilter ? communitythreadsLoading : feedIsLoading;
@@ -252,14 +155,14 @@ const TrendingThreadList = ({
 
   if (communityIdFilter) {
     allThreads = Array.isArray(communityThreads)
-      ? communityThreads
-          .filter((thread) => !thread.marked_as_spam_at)
-          .slice(0, 3)
+      ? communityThreads.filter((thread) => !thread.markedAsSpamAt).slice(0, 3)
       : [];
   } else if (feed?.pages) {
     allThreads = feed.pages
-      .flatMap((page) => page.results || [])
-      .filter((thread) => !thread.marked_as_spam_at);
+      .flatMap((p) => p.results)
+      .filter((t) => !t.marked_as_spam_at)
+      .map((t) => new Thread(t))
+      .slice(0, 3);
   }
   const redirectPath = communityId ? '/discussions' : '/explore?tab=threads';
 
@@ -275,11 +178,7 @@ const TrendingThreadList = ({
             </div>
           </div>
         )}
-        <>
-          <CWText type="h2" className="empty-thread">
-            No threads found
-          </CWText>
-        </>
+        <EmptyThreadCard />
       </div>
     );
   }
@@ -295,38 +194,34 @@ const TrendingThreadList = ({
           </div>
         </div>
       )}
-      <>
-        {!isLoading && !feed && (
-          <CWText type="h2" className="empty-thread">
-            No threads found
-          </CWText>
-        )}
-        {isLoading ? (
-          <div className="content">
-            <>
-              <Skeleton height="300px" />
-              <Skeleton height="300px" />
-            </>
-          </div>
-        ) : (
-          <div className="content">
-            <VirtuosoGrid
-              overscan={50}
-              customScrollParent={customScrollParent}
-              totalCount={allThreads?.length || DEFAULT_COUNT}
-              data={allThreads || []}
-              style={{ width: '100%', height: '100%' }}
-              itemContent={(i, thread) => (
-                <FeedThread
-                  key={i}
-                  thread={communityIdFilter ? thread : mapThread(thread)}
-                  onClick={() => {}}
-                />
-              )}
-            />
-          </div>
-        )}
-      </>
+      {!hideSearchTag && searchText?.trim() && (
+        <CWTag
+          label={`Search: ${searchText?.trim()}`}
+          type="filter"
+          onCloseClick={onClearSearch}
+        />
+      )}
+      {isLoading ? (
+        <div className="content">
+          <>
+            <Skeleton height="300px" />
+            <Skeleton height="300px" />
+          </>
+        </div>
+      ) : (
+        <div className="content">
+          <VirtuosoGrid
+            overscan={50}
+            customScrollParent={customScrollParent}
+            totalCount={allThreads?.length || DEFAULT_COUNT}
+            data={allThreads || []}
+            style={{ width: '100%', height: '100%' }}
+            itemContent={(i, thread) => (
+              <FeedThread key={i} thread={thread} onClick={() => {}} />
+            )}
+          />
+        </div>
+      )}
     </div>
   );
 };

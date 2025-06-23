@@ -1,4 +1,6 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .ContestCard {
   max-width: 600px;
@@ -6,7 +8,7 @@
   padding: 0;
   position: relative;
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     min-width: 350px;
   }
 
@@ -41,7 +43,7 @@
       max-height: 275px;
       object-fit: cover;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         min-height: 195px;
       }
     }
@@ -56,6 +58,9 @@
     position: relative;
 
     .header-row {
+      width: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
       display: flex;
       justify-content: start;
       align-items: center;
@@ -66,6 +71,9 @@
         display: flex;
         align-items: self-start;
         gap: 8px;
+        overflow: hidden;
+        min-width: 0;
+        flex: 1;
 
         & > .Text {
           line-height: 1.2;
@@ -74,7 +82,7 @@
 
       .contest-icon-container {
         position: absolute;
-        background: $white;
+        background: colors.$white;
         border-radius: 50%;
         right: 20px;
         top: -30px;
@@ -95,7 +103,7 @@
         margin-left: auto;
       }
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         flex-direction: column;
         align-items: start;
         gap: 8px;
@@ -107,13 +115,13 @@
     }
 
     .topics {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
 
     .prizes-header {
       font-size: 18px;
       margin-block: 8px;
-      font-family: $font-family-silka;
+      font-family: shared.$font-family-silka;
       font-weight: 600;
     }
 
@@ -127,36 +135,36 @@
         display: flex;
         justify-content: space-between;
         gap: 8px;
-        background-color: $neutral-50;
-        border: 1px solid $neutral-100;
+        background-color: colors.$neutral-50;
+        border: 1px solid colors.$neutral-100;
         padding: 8px 8px 4px;
         border-radius: 6px;
 
         .label {
-          color: $neutral-600;
-          font-family: $font-family-silka;
+          color: colors.$neutral-600;
+          font-family: shared.$font-family-silka;
           font-weight: 600;
         }
 
         .bold {
           word-break: break-word;
-          font-family: $font-family-monospace;
+          font-family: shared.$font-family-monospace;
         }
       }
 
       .prize-row:nth-child(1) {
-        background-color: $yellow-300;
-        border: 1px solid $yellow-400;
+        background-color: colors.$yellow-300;
+        border: 1px solid colors.$yellow-400;
       }
 
       .prize-row:nth-child(2) {
-        background-color: $neutral-200;
-        border: 1px solid $neutral-300;
+        background-color: colors.$neutral-200;
+        border: 1px solid colors.$neutral-300;
       }
 
       .prize-row:nth-child(3) {
-        background-color: $rorange-200;
-        border: 1px solid $rorange-300;
+        background-color: colors.$rorange-200;
+        border: 1px solid colors.$rorange-300;
       }
     }
 
@@ -165,7 +173,7 @@
       gap: 16px;
       margin-top: auto;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         justify-content: space-between;
         margin-top: 12px;
 
@@ -189,18 +197,18 @@
       align-items: center;
       gap: 7px;
       padding-block: 8px;
-      border: 1px solid $neutral-200;
+      border: 1px solid colors.$neutral-200;
       border-radius: 6px;
       margin-top: 8px;
 
       &:not(:disabled):hover {
         cursor: pointer;
-        background-color: $neutral-25;
+        background-color: colors.$neutral-25;
       }
 
       &:not(:disabled):active {
         cursor: pointer;
-        background-color: $neutral-50;
+        background-color: colors.$neutral-50;
       }
 
       &:focus {
@@ -232,7 +240,7 @@
       display: flex;
       justify-content: flex-end;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         flex-direction: column;
 
         .cta-btn,

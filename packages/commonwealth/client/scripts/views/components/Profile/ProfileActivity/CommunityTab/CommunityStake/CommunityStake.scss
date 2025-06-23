@@ -1,0 +1,7 @@
+@use '../../../../../../styles/mixins/colors.module';
+
+.CommunityStake {
+  .green-500 {
+    color: colors.$green-500;
+  }
+}

@@ -1,21 +1,23 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/icons';
 
 .Icon {
-  @include baseIconStyles;
+  @include icons.baseIconStyles;
 
   &.disabled {
-    color: $neutral-200;
+    color: colors.$neutral-200;
     pointer-events: none;
   }
 }
 
 .CustomIcon {
-  @include baseIconStyles;
+  @include icons.baseIconStyles;
 
   fill: unset; // they will be brand assets should we shouldn't alter their colors
 }
 
 .blue-icon {
-  color: $primary-500;
-  fill: $primary-500;
+  color: colors.$primary-500;
+  fill: colors.$primary-500;
 }

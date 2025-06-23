@@ -5,7 +5,11 @@ import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { Session } from '@canvas-js/interfaces';
 
 import { getEvmAddress } from '@hicommonwealth/evm-protocols';
-import { ExtendedCommunity, MagicLogin } from '@hicommonwealth/schemas';
+import {
+  ExtendedCommunity,
+  GetStatus,
+  MagicLogin,
+} from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
   ChainBase,
@@ -23,30 +27,19 @@ import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
 import { Magic } from 'magic-sdk';
+import moment from 'moment';
 import app, { initAppState } from 'state';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import { SERVER_URL } from 'state/api/config';
-import {
-  onUpdateEmailError,
-  onUpdateEmailSuccess,
-  updateEmail,
-} from 'state/api/user/updateEmail';
 import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
 import { userStore } from 'state/ui/user';
 import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
-import { fetchCachedCustomDomain } from '../../state/api/configuration/index';
-
-// need to instantiate it early because the farcaster sdk has an async constructor which will cause a race condition
-// if instantiated right before the login is called;
-export const defaultMagic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!, {
-  extensions: [
-    new FarcasterExtension(),
-    new OAuthExtension(),
-    new OAuthExtensionV2(),
-  ],
-});
+import {
+  fetchCachedCustomDomain,
+  fetchCachedPublicEnvVar,
+} from '../../state/api/configuration/index';
 
 function storeActiveAccount(account: Account) {
   const user = userStore.getState();
@@ -56,20 +49,7 @@ function storeActiveAccount(account: Account) {
 }
 
 export async function setActiveAccount(account: Account): Promise<void> {
-  const community = app.activeChainId();
   try {
-    const response = await axios.post(`${SERVER_URL}/setDefaultRole`, {
-      address: account.address,
-      author_community_id: account.community.id,
-      community_id: community,
-      jwt: userStore.getState().jwt,
-      auth: true,
-    });
-
-    if (response.data.status !== 'Success') {
-      throw Error(`Unsuccessful status: ${response.status}`);
-    }
-
     storeActiveAccount(account);
   } catch (err) {
     // Failed to set the user's active address to this account.
@@ -97,6 +77,7 @@ export async function completeClientLogin(account: Account) {
         address: account.address,
         community: account.community,
         walletId: account.walletId,
+        walletSsoSource: account.walletSsoSource,
       });
       user.addresses.push(addressInfo);
     }
@@ -186,10 +167,10 @@ export async function updateActiveAddresses(chainId: string) {
 }
 
 // called from the server, which returns public keys
-export function updateActiveUser(data) {
+export function updateActiveUser(data?: z.infer<(typeof GetStatus)['output']>) {
   const user = userStore.getState();
 
-  if (!data || data.loggedIn === false) {
+  if (!data) {
     user.setData({
       id: 0,
       email: '',
@@ -210,27 +191,32 @@ export function updateActiveUser(data) {
       xpReferrerPoints: 0,
     });
   } else {
-    const addresses = data.addresses.map(
-      (a) =>
-        new AddressInfo({
-          userId: user.id,
-          id: a.id,
-          address: a.address,
-          community: {
-            id: a.community_id,
-            base: a.Community.base,
-            ss58Prefix: a.Community.ss58_prefix,
-          },
-          walletId: a.wallet_id,
-          ghostAddress: a.ghost_address,
-          lastActive: a.last_active,
-        }),
-    );
+    const addresses = data.addresses.map((a) => {
+      // Map the oauth_provider string to WalletSsoSource enum
+      const ssoSource = a.oauth_provider
+        ? (a.oauth_provider as WalletSsoSource)
+        : undefined;
+
+      return new AddressInfo({
+        userId: user.id,
+        id: a.id,
+        address: a.address,
+        community: {
+          id: a.Community.id,
+          base: a.Community.base,
+          ss58Prefix: a.Community.ss58_prefix || undefined,
+        },
+        walletId: a.wallet_id,
+        ghostAddress: a.ghost_address || undefined,
+        lastActive: a.last_active ? moment(a.last_active) : undefined,
+        walletSsoSource: ssoSource,
+      });
+    });
 
     user.setData({
       id: data.id || 0,
       email: data.email || '',
-      emailNotificationInterval: data.emailInterval || '',
+      emailNotificationInterval: data.emailNotificationInterval || '',
       knockJWT: data.knockJwtToken || '',
       addresses,
       jwt: data.jwt || null,
@@ -243,32 +229,37 @@ export function updateActiveUser(data) {
         id: c.id || '',
         iconUrl: c.icon_url || '',
         name: c.name || '',
-        isStarred: c.is_starred || false,
+        isStarred: !!c.starred_at,
       })),
       isLoggedIn: true,
-      referredByAddress: data?.referred_by_address,
-      xpPoints: data?.xp_points,
-      xpReferrerPoints: data?.xp_referrer_points,
-      tier: data?.tier,
+      xpPoints: data.xp_points || undefined,
+      referredByAddress: data.referred_by_address || undefined,
+      xpReferrerPoints: data.xp_referrer_points || undefined,
+      tier: data.tier || undefined,
     });
   }
 }
 
 async function constructMagic(isCosmos: boolean, chain?: string) {
-  if (!isCosmos) {
-    return defaultMagic;
-  }
-
   if (isCosmos && !chain) {
     throw new Error('Must be in a community to sign in with Cosmos magic link');
   }
 
-  if (process.env.MAGIC_PUBLISHABLE_KEY === undefined) {
+  const { MAGIC_PUBLISHABLE_KEY } = fetchCachedPublicEnvVar() || {};
+
+  if (!MAGIC_PUBLISHABLE_KEY) {
     throw new Error('Missing magic key');
   }
 
-  return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
-    extensions: [
+  let extensions: (
+    | OAuthExtension
+    | OAuthExtensionV2
+    | FarcasterExtension
+    | CosmosExtension
+  )[] = [];
+
+  if (isCosmos) {
+    extensions = [
       new OAuthExtension(),
       new OAuthExtensionV2(),
       new CosmosExtension({
@@ -276,7 +267,17 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
         // so we can't use app.chain.meta?.node?.url
         rpcUrl: `${document.location.origin}${SERVER_URL}/magicCosmosProxy/${chain}`,
       }),
-    ],
+    ];
+  } else {
+    extensions = [
+      new FarcasterExtension(),
+      new OAuthExtension(),
+      new OAuthExtensionV2(),
+    ];
+  }
+
+  return new Magic(MAGIC_PUBLISHABLE_KEY, {
+    extensions,
   });
 }
 
@@ -562,15 +563,7 @@ export async function handleSocialLoginCallback({
       chainInfo && (await updateActiveAddresses(chainInfo.id || ''));
     }
 
-    const { Profiles: profiles, email: ssoEmail } = response.data.result;
-
-    // if email is not set, set the SSO email as the default email
-    // only if its a standalone account (no account linking)
-    if (!userStore.getState().email && ssoEmail && profiles?.length === 1) {
-      await updateEmail({ email: ssoEmail })
-        .then(onUpdateEmailSuccess)
-        .catch(() => onUpdateEmailError(false));
-    }
+    const { Profiles: profiles } = response.data.result;
 
     // if account is newly created and user has not completed onboarding flow
     // then open the welcome modal.

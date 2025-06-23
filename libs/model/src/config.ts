@@ -8,6 +8,7 @@ import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
+  SENDGRID_API_KEY,
   DATABASE_URL,
   DATABASE_LOG_TRACE,
   DEFAULT_COMMONWEALTH_LOGO,
@@ -15,6 +16,10 @@ const {
   DISCORD_TOKEN,
   NO_SSL,
   PRIVATE_KEY,
+  LAUNCHPAD_PRIVATE_KEY,
+  LAUNCHPAD_CHAIN_ID,
+  LAUNCHPAD_CONNECTOR_WEIGHT,
+  LAUNCHPAD_INITIAL_PRICE,
   TBC_BALANCE_TTL_SECONDS,
   BLACKLISTED_EVENTS,
   MAX_USER_POSTS_PER_CONTEST,
@@ -69,6 +74,22 @@ const {
   CF_TURNSTILE_CREATE_THREAD_SECRET_KEY,
   CF_TURNSTILE_CREATE_COMMENT_SITE_KEY,
   CF_TURNSTILE_CREATE_COMMENT_SECRET_KEY,
+  VIEW_COUNT_WEIGHT,
+  COMMENT_WEIGHT,
+  LIKE_WEIGHT,
+  CREATED_DATE_WEIGHT,
+  CREATOR_USER_TIER_WEIGHT,
+  COMMUNITY_TIER_WEIGHT,
+  DISABLE_TIER_RATE_LIMITS,
+  TIER_SOCIAL_VERIFIED_MIN_ETH,
+  MCP_DEMO_CLIENT_SERVER_URL,
+  EVM_CHAINS_WHITELIST,
+  MCP_KEY_BYPASS,
+  LOG_XP_LAUNCHPAD,
+  KNOCK_PUBLIC_API_KEY,
+  KNOCK_IN_APP_FEED_ID,
+  UNLEASH_FRONTEND_API_TOKEN,
+  CONTEST_DURATION_IN_SEC,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -82,11 +103,15 @@ const DEFAULTS = {
   MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
   TWITTER_LOG_LEVEL: 'info' as const,
+  TIER_SOCIAL_VERIFIED_MIN_ETH: '0.006',
 };
 
 export const config = configure(
   [target],
   {
+    SENDGRID: {
+      API_KEY: SENDGRID_API_KEY,
+    },
     DB: {
       URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
       NAME,
@@ -95,7 +120,18 @@ export const config = configure(
     },
     WEB3: {
       PRIVATE_KEY: PRIVATE_KEY || '',
+      LAUNCHPAD_PRIVATE_KEY: LAUNCHPAD_PRIVATE_KEY || '',
       CONTEST_BOT_PRIVATE_KEY: CONTEST_BOT_PRIVATE_KEY || '',
+      EVM_CHAINS_WHITELIST: EVM_CHAINS_WHITELIST || '',
+      LAUNCHPAD_CHAIN_ID: LAUNCHPAD_CHAIN_ID
+        ? parseInt(LAUNCHPAD_CHAIN_ID)
+        : 8543,
+      LAUNCHPAD_CONNECTOR_WEIGHT: LAUNCHPAD_CONNECTOR_WEIGHT
+        ? parseInt(LAUNCHPAD_CONNECTOR_WEIGHT)
+        : 830000,
+      LAUNCHPAD_INITIAL_PRICE: LAUNCHPAD_INITIAL_PRICE
+        ? parseInt(LAUNCHPAD_INITIAL_PRICE)
+        : 416700000,
     },
     TBC: {
       TTL_SECS: TBC_BALANCE_TTL_SECONDS
@@ -112,7 +148,7 @@ export const config = configure(
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
         : 5,
-      FARCASTER_NGROK_DOMAIN: FARCASTER_NGROK_DOMAIN,
+      FARCASTER_NGROK_DOMAIN,
       NEYNAR_API_KEY: NEYNAR_API_KEY,
       NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
@@ -123,6 +159,9 @@ export const config = configure(
       FARCASTER_MANIFEST_SIGNATURE: FARCASTER_MANIFEST_SIGNATURE,
       FARCASTER_MANIFEST_DOMAIN: FARCASTER_MANIFEST_DOMAIN,
       DISABLE_CONTEST_ENDING_VOTE: DISABLE_CONTEST_ENDING_VOTE === 'true',
+      CONTEST_DURATION_IN_SEC: CONTEST_DURATION_IN_SEC
+        ? parseInt(CONTEST_DURATION_IN_SEC, 10)
+        : undefined,
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -176,7 +215,7 @@ export const config = configure(
       10,
     ),
     DISCORD: {
-      CLIENT_ID: DISCORD_CLIENT_ID,
+      CLIENT_ID: DISCORD_CLIENT_ID || '1027997517964644453',
       BOT_TOKEN: DISCORD_TOKEN,
     },
     OPENAI: {
@@ -233,8 +272,55 @@ export const config = configure(
           }),
       },
     },
+    HEURISTIC_WEIGHTS: {
+      VIEW_COUNT_WEIGHT: VIEW_COUNT_WEIGHT ? parseFloat(VIEW_COUNT_WEIGHT) : 1,
+      COMMENT_WEIGHT: COMMENT_WEIGHT ? parseFloat(COMMENT_WEIGHT) : 1,
+      LIKE_WEIGHT: LIKE_WEIGHT ? parseFloat(LIKE_WEIGHT) : 1,
+      CREATED_DATE_WEIGHT: CREATED_DATE_WEIGHT
+        ? parseFloat(CREATED_DATE_WEIGHT)
+        : 1,
+      CREATOR_USER_TIER_WEIGHT: CREATOR_USER_TIER_WEIGHT
+        ? parseFloat(CREATOR_USER_TIER_WEIGHT)
+        : 1,
+      COMMUNITY_TIER_WEIGHT: COMMUNITY_TIER_WEIGHT
+        ? parseFloat(COMMUNITY_TIER_WEIGHT)
+        : 1,
+    },
+    DISABLE_TIER_RATE_LIMITS:
+      !DISABLE_TIER_RATE_LIMITS && target.APP_ENV === 'local'
+        ? true
+        : DISABLE_TIER_RATE_LIMITS === 'true',
+    TIER: {
+      SOCIAL_VERIFIED_MIN_ETH: parseFloat(
+        TIER_SOCIAL_VERIFIED_MIN_ETH || DEFAULTS.TIER_SOCIAL_VERIFIED_MIN_ETH,
+      ),
+    },
+    MCP: {
+      MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
+      MCP_KEY_BYPASS: MCP_KEY_BYPASS,
+    },
+    LOG_XP_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
+    NOTIFICATIONS: {
+      KNOCK_PUBLIC_API_KEY:
+        KNOCK_PUBLIC_API_KEY ||
+        'pk_test_Hd4ZpzlVcz9bqepJQoo9BvZHokgEqvj4T79fPdKqpYM',
+      KNOCK_IN_APP_FEED_ID:
+        KNOCK_IN_APP_FEED_ID || 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb',
+    },
+    UNLEASH: {
+      FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
+    },
   },
   z.object({
+    SENDGRID: z.object({
+      API_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'SENDGRID_API_KEY is required in production',
+        ),
+    }),
     DB: z.object({
       URI: z
         .string()
@@ -259,6 +345,13 @@ export const config = configure(
             !(target.APP_ENV === 'production' && data === DEFAULTS.PRIVATE_KEY),
           'PRIVATE_KEY must be set to a non-default value in production.',
         ),
+      LAUNCHPAD_PRIVATE_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'LAUNCHPAD_PRIVATE_KEY must be set to a non-default value in production.',
+        ),
       CONTEST_BOT_PRIVATE_KEY: z
         .string()
         .optional()
@@ -266,6 +359,16 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && !data),
           'CONTEST_BOT_PRIVATE_KEY must be set to a non-default value in production.',
         ),
+      EVM_CHAINS_WHITELIST: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && data),
+          'EVM_CHAINS_WHITELIST cannot be set in production.',
+        ),
+      LAUNCHPAD_CHAIN_ID: z.number(),
+      LAUNCHPAD_CONNECTOR_WEIGHT: z.number(),
+      LAUNCHPAD_INITIAL_PRICE: z.number(),
     }),
     TBC: z.object({
       TTL_SECS: z.number().int(),
@@ -341,6 +444,7 @@ export const config = configure(
           'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
         ),
       DISABLE_CONTEST_ENDING_VOTE: z.boolean().optional(),
+      CONTEST_DURATION_IN_SEC: z.number().optional(),
     }),
     AUTH: z
       .object({
@@ -397,18 +501,7 @@ export const config = configure(
     MEMBERSHIP_REFRESH_BATCH_SIZE: z.number().int().positive(),
     MEMBERSHIP_REFRESH_TTL_SECONDS: z.number().int().positive(),
     DISCORD: z.object({
-      CLIENT_ID: z
-        .string()
-        .optional()
-        .refine(
-          (data) =>
-            !(
-              ['production', 'frick', 'beta', 'demo'].includes(
-                target.APP_ENV,
-              ) && !data
-            ),
-          'DISCORD_CLIENT_ID is required in production, frick, beta (QA), and demo',
-        ),
+      CLIENT_ID: z.string(),
       BOT_TOKEN: z
         .string()
         .optional()
@@ -502,6 +595,54 @@ export const config = configure(
             'Turnstile create comment widget keys are required in production',
           ),
       }),
+    }),
+    HEURISTIC_WEIGHTS: z.object({
+      VIEW_COUNT_WEIGHT: z.number(),
+      COMMENT_WEIGHT: z.number(),
+      LIKE_WEIGHT: z.number(),
+      CREATED_DATE_WEIGHT: z.number(),
+      CREATOR_USER_TIER_WEIGHT: z.number(),
+      COMMUNITY_TIER_WEIGHT: z.number(),
+    }),
+    DISABLE_TIER_RATE_LIMITS: z
+      .boolean()
+      .refine(
+        (data) => !(target.APP_ENV === 'production' && data),
+        'Tier rate limits cannot be disabled in production',
+      ),
+    TIER: z.object({
+      SOCIAL_VERIFIED_MIN_ETH: z.number(),
+    }),
+    MCP: z.object({
+      MCP_DEMO_CLIENT_SERVER_URL: z.string().optional(),
+      MCP_KEY_BYPASS: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && data),
+          'MCP_KEY_BYPASS cannot be set in production',
+        ),
+    }),
+    LOG_XP_LAUNCHPAD: z.boolean().default(false),
+    NOTIFICATIONS: z
+      .object({
+        KNOCK_PUBLIC_API_KEY: z.string(),
+        KNOCK_IN_APP_FEED_ID: z.string(),
+      })
+      .refine(
+        (data) =>
+          !(
+            (!data.KNOCK_PUBLIC_API_KEY || !data.KNOCK_IN_APP_FEED_ID) &&
+            target.APP_ENV === 'production'
+          ),
+      ),
+    UNLEASH: z.object({
+      FRONTEND_API_TOKEN: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(!['local', 'CI'].includes(target.APP_ENV) && !data),
+        ),
     }),
   }),
 );

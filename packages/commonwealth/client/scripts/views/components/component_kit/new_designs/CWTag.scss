@@ -1,8 +1,10 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
 
 .Tag {
-  font-family: $font-family-neue-haas-unica;
-  border-radius: $border-radius-corners-wider;
+  font-family: shared.$font-family-neue-haas-unica;
+  border-radius: border_radius.$border-radius-corners-wider;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,36 +20,36 @@
 
   &.disabled,
   &.spam {
-    background-color: $neutral-300 !important;
+    background-color: colors.$neutral-300 !important;
 
     .Text,
     .Icon {
-      color: $white !important;
+      color: colors.$white !important;
     }
   }
 
   &.new {
-    background-color: $yellow-50;
-    border: 1px solid $yellow-600;
+    background-color: colors.$yellow-50;
+    border: 1px solid colors.$yellow-600;
 
     .Text {
-      color: $yellow-600;
+      color: colors.$yellow-600;
     }
 
     .Icon {
-      stroke: $yellow-600;
+      stroke: colors.$yellow-600;
       padding: 0;
       fill: none;
     }
   }
 
   &.trending {
-    background-color: $green-50;
-    border: 1px solid $green-600;
+    background-color: colors.$green-50;
+    border: 1px solid colors.$green-600;
 
     .Text,
     .Icon {
-      color: $green-600;
+      color: colors.$green-600;
     }
 
     svg {
@@ -56,170 +58,170 @@
   }
 
   &.pill {
-    background-color: $primary-100;
+    background-color: colors.$primary-100;
     padding: 2px 8px;
     height: 28px;
     border-radius: 14px;
     cursor: pointer;
 
     .Text {
-      color: $primary-600;
+      color: colors.$primary-600;
       font-weight: 500;
     }
 
     .close-container {
-      background-color: $primary-100;
+      background-color: colors.$primary-100;
       display: flex;
       margin-left: 6px;
 
       svg {
         width: 14px;
         height: 14px;
-        color: $primary-600;
+        color: colors.$primary-600;
       }
 
       &:hover {
         > svg {
-          background-color: $primary-200;
+          background-color: colors.$primary-200;
         }
       }
     }
 
     .pill-close-icon {
-      color: $primary-600 !important;
+      color: colors.$primary-600 !important;
       width: 14px !important;
       height: 14px !important;
     }
 
     &:hover {
-      background-color: $primary-200;
+      background-color: colors.$primary-200;
 
       .close-container {
-        background-color: $primary-200;
+        background-color: colors.$primary-200;
       }
     }
   }
 
   &.poll {
-    background-color: $purple-50;
+    background-color: colors.$purple-50;
 
     .Text,
     .Icon {
-      color: $purple-600;
+      color: colors.$purple-600;
     }
   }
 
   &.active {
-    background-color: $pink-100;
+    background-color: colors.$pink-100;
 
     .Text,
     .Icon {
-      color: $pink-700;
+      color: colors.$pink-700;
     }
   }
 
   &.poll,
   &.active {
     padding: 4px 12px;
-    border-radius: $border-radius-tags;
+    border-radius: border_radius.$border-radius-tags;
   }
 
   &.passed {
-    background-color: $green-300;
+    background-color: colors.$green-300;
 
     .Text,
     .Icon {
-      color: $green-700;
+      color: colors.$green-700;
     }
   }
 
   &.failed {
-    background-color: $rorange-300;
+    background-color: colors.$rorange-300;
 
     .Text,
     .Icon {
-      color: $rorange-700;
+      color: colors.$rorange-700;
     }
   }
 
   &.proposal {
-    background-color: $primary-100;
+    background-color: colors.$primary-100;
 
     .Text,
     .Icon {
-      color: $primary-600;
+      color: colors.$primary-600;
     }
   }
 
   &.referendum {
-    background-color: $neutral-100;
-    border-radius: $border-radius-corners;
+    background-color: colors.$neutral-100;
+    border-radius: border_radius.$border-radius-corners;
 
     .Text,
     .Icon {
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
   }
 
   &.stage {
-    background-color: $green-600;
+    background-color: colors.$green-600;
 
     .Text,
     .Icon {
-      color: $white;
+      color: colors.$white;
     }
 
     &.phase-1 {
-      background-color: $rorange-600;
+      background-color: colors.$rorange-600;
     }
 
     &.phase-2 {
-      background-color: $rorange-400;
+      background-color: colors.$rorange-400;
     }
 
     &.phase-3 {
-      background-color: $yellow-500;
+      background-color: colors.$yellow-500;
     }
 
     &.phase-4 {
-      background-color: $green-600;
+      background-color: colors.$green-600;
     }
 
     &.phase-5 {
-      background-color: $green-500;
+      background-color: colors.$green-500;
     }
 
     &.phase-6 {
-      background-color: $primary-600;
+      background-color: colors.$primary-600;
     }
 
     &.phase-7 {
-      background-color: $primary-400;
+      background-color: colors.$primary-400;
     }
 
     &.phase-8 {
-      background-color: $purple-600;
+      background-color: colors.$purple-600;
     }
 
     &.phase-9 {
-      background-color: $purple-400;
+      background-color: colors.$purple-400;
     }
   }
 
   &.input,
   &.group {
-    background-color: $neutral-100;
+    background-color: colors.$neutral-100;
     padding: 2px 8px;
     gap: 8px;
 
     .close-container {
-      background-color: $neutral-100;
+      background-color: colors.$neutral-100;
       display: flex;
       margin-left: 8px;
 
       &:hover {
         > svg {
-          background-color: $neutral-200;
+          background-color: colors.$neutral-200;
         }
       }
     }
@@ -227,27 +229,27 @@
     .Text {
       font-size: 14px;
       line-height: 20px;
-      color: $neutral-800;
+      color: colors.$neutral-800;
     }
 
     &:hover {
-      background-color: $neutral-200;
+      background-color: colors.$neutral-200;
 
       .close-container {
-        background-color: $neutral-200;
+        background-color: colors.$neutral-200;
 
         > svg {
-          background-color: $neutral-200;
+          background-color: colors.$neutral-200;
         }
       }
 
       .Text {
-        color: $neutral-900;
+        color: colors.$neutral-900;
       }
     }
 
     &.container:hover {
-      background-color: $neutral-200;
+      background-color: colors.$neutral-200;
     }
   }
 
@@ -255,16 +257,16 @@
     .Text {
       font-size: 12px;
       line-height: 16px;
-      color: $neutral-700;
+      color: colors.$neutral-700;
     }
   }
 
   &.contest {
-    background-color: $neutral-900;
-    color: $white;
+    background-color: colors.$neutral-900;
+    color: colors.$white;
 
     .Text {
-      color: $white;
+      color: colors.$white;
     }
 
     .Icon {
@@ -272,36 +274,36 @@
     }
 
     &.prize-1 {
-      background-color: $yellow-500;
-      color: $neutral-900;
+      background-color: colors.$yellow-500;
+      color: colors.$neutral-900;
 
       .Text {
-        color: $neutral-900;
+        color: colors.$neutral-900;
       }
     }
 
     &.prize-2 {
-      background-color: $neutral-100;
-      color: $neutral-900;
+      background-color: colors.$neutral-100;
+      color: colors.$neutral-900;
 
       .Text {
-        color: $neutral-900;
+        color: colors.$neutral-900;
       }
     }
 
     &.prize-3 {
-      background-color: $yellow-600;
+      background-color: colors.$yellow-600;
     }
   }
 
   &.address,
   &.login {
-    background-color: $neutral-200;
+    background-color: colors.$neutral-200;
     gap: 8px;
 
     .Text,
     .Icon {
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
 
     .Icon {
@@ -311,11 +313,11 @@
     }
 
     &:hover {
-      background-color: $neutral-300;
+      background-color: colors.$neutral-300;
 
       .Text,
       .Icon {
-        color: $neutral-800;
+        color: colors.$neutral-800;
       }
     }
   }
@@ -328,7 +330,7 @@
   &.action {
     display: grid;
     align-items: center;
-    color: $neutral-500;
+    color: colors.$neutral-500;
     max-width: 20px;
     max-height: 20px;
     width: fit-content;
@@ -337,19 +339,18 @@
 
     &:hover {
       cursor: pointer;
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
-
     &.pill-close-icon {
-      color: $primary-600 !important;
+      color: colors.$primary-600 !important;
     }
   }
 
   &.filter {
     padding: 12px 16px;
     height: auto;
-    background-color: $white;
-    border: 1px solid $black;
+    background-color: colors.$white;
+    border: 1px solid colors.$black;
 
     .Text {
       font-size: 14px !important;
@@ -362,20 +363,20 @@
     .Text,
     .Icon,
     svg {
-      color: $black !important;
+      color: colors.$black !important;
     }
   }
 
   &.amount {
     height: auto;
-    background-color: $neutral-200;
+    background-color: colors.$neutral-200;
     padding: 8px 12px;
     border-radius: 40px;
     cursor: pointer;
 
     .Text {
       font-size: 16px;
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 }

@@ -1,0 +1,33 @@
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/media_queries';
+
+.FiltersDrawer {
+  .Drawer.filter-drawer {
+    @include media_queries.extraSmall {
+      top: 48px !important;
+
+      .content-container {
+        padding: 0 16px;
+      }
+    }
+
+    .content-container {
+      padding: 20px 32px;
+
+      @include media_queries.extraSmall {
+        padding: 0 16px;
+      }
+
+      div.h3 {
+        margin-bottom: 16px;
+      }
+
+      .filter-content {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 24px;
+      }
+    }
+  }
+}

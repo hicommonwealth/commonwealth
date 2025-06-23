@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 
 import { useFlag } from 'client/scripts/hooks/useFlag';
-import { useFetchConfigurationQuery } from 'state/api/configuration';
+import { useFetchPublicEnvVarQuery } from 'state/api/configuration';
 import {
   CWImageInput,
   ImageBehavior,
@@ -24,6 +24,7 @@ import {
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
   SKALE_ID,
+  SONEIUM_ID,
   alphabeticallyStakeWiseSortedChains as sortedChains,
 } from './constants';
 import {
@@ -65,10 +66,11 @@ const CommunityInformationForm = ({
     updateAndValidateSocialLinkAtIndex,
   } = useSocialLinks();
 
-  const { data: configurationData } = useFetchConfigurationQuery();
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
 
   const communityId = slugifyPreserveDashes(communityName.toLowerCase());
-  const isCommunityNameTaken = !!configurationData?.redirects?.[communityId];
+  const isCommunityNameTaken =
+    !!configurationData?.COMMUNITY_REDIRECTS?.[communityId];
 
   const validation = withChainsConfig
     ? baseCommunityInformationFormValidationSchema.merge(
@@ -94,6 +96,12 @@ const CommunityInformationForm = ({
     if (withChainsConfig?.community?.type === CommunityType.Solana) {
       return sortedChains
         .filter((chainType) => chainType.chainBase === CommunityType.Solana)
+        .map(mappedChainValue);
+    }
+
+    if (withChainsConfig?.community?.type === CommunityType.Sui) {
+      return sortedChains
+        .filter((chainType) => chainType.chainBase === CommunityType.Sui)
         .map(mappedChainValue);
     }
 
@@ -126,6 +134,8 @@ const CommunityInformationForm = ({
               return options?.find((o) => o.value === BLAST_ID);
             case CommunityType.Skale:
               return options?.find((o) => o.value === SKALE_ID);
+            case CommunityType.Soneium:
+              return options?.find((o) => o.value === SONEIUM_ID);
             case CommunityType.Polygon:
             case CommunityType.Solana:
               return options?.[0];

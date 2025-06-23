@@ -61,6 +61,7 @@ function SpyNotificationsProvider(stubs?: {
     unregisterClientRegistrationToken:
       stubs?.unregisterClientRegistrationToken ||
       vi.fn(() => Promise.resolve(true)),
+    signUserToken: vi.fn(() => Promise.resolve(undefined)),
   };
 }
 
@@ -113,6 +114,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -154,6 +156,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -208,6 +211,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -247,6 +251,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -287,6 +292,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
