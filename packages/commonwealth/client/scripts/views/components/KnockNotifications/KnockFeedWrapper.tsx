@@ -63,7 +63,11 @@ export const KnockFeedWrapper = memo(function KnockFeedWrapper({
       console.error('Error during Knock initialization:', error);
     });
 
-    return () => getKnockClient(knockApiKey).teardown();
+    return () => {
+      if (knockApiKey) {
+        getKnockClient(knockApiKey).teardown();
+      }
+    };
   }, [user.id, user.email, user.isLoggedIn, user.knockJWT, knockApiKey]);
 
   if (!user.id || !user.isLoggedIn || !user.knockJWT) {
