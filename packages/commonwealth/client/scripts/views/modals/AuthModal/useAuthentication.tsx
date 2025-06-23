@@ -639,7 +639,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setIsNewlyCreated(newlyCreated);
       if (isMobile) {
         setSignerAccount(signingAccount);
-        setIsMobileWalletVerificationStep(true);
+        if (window?.ethereum?.isBinance) {
+          // for binance wallet we don't need to show the verification modal/step
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          setIsMobileWalletVerificationStep(true);
+        }
       } else {
         await onAccountVerified(signingAccount, newlyCreated, false, wallet);
       }
