@@ -1,4 +1,5 @@
-@import '../../styles/shared.scss';
+@use '../../styles/shared.scss';
+@use '../../styles/mixins/media_queries';
 
 .ProposalsPage {
   flex: 1;
@@ -6,7 +7,7 @@
   .header {
     padding-bottom: 32px;
 
-    @include small {
+    @include media_queries.small {
       padding-bottom: 14px;
     }
   }

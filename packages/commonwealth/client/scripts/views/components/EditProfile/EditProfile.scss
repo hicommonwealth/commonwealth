@@ -1,4 +1,5 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
 
 .EditProfile {
   &.full-height {
@@ -55,11 +56,11 @@
     padding-bottom: 16px;
 
     .h4 {
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
 
     .h5 {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 

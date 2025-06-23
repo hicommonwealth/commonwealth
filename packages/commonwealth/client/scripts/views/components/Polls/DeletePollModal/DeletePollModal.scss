@@ -1,9 +1,10 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/media_queries';
 
 .DeletePollModal {
   width: 100%;
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     width: 100%;
   }
 }

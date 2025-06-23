@@ -1,4 +1,5 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
 
 .PricePercentageChange {
   width: fit-content;
@@ -6,10 +7,10 @@
   align-items: center;
 
   &.negative {
-    color: $rorange-500;
+    color: colors.$rorange-500;
   }
 
   &.positive {
-    color: $green-500;
+    color: colors.$green-500;
   }
 }

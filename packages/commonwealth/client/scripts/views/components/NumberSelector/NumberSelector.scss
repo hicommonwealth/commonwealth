@@ -1,11 +1,13 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .NumberSelector {
   display: flex;
   gap: 25px;
   align-items: center;
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     gap: 0;
   }
 
@@ -20,7 +22,7 @@
         text-align: center;
         width: 5ch;
         transition: width 0.2s ease-in-out;
-        border: 1px solid $neutral-200;
+        border: 1px solid colors.$neutral-200;
 
         &.expanded {
           width: 8ch;

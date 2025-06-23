@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
 
 .ProposalCard.Card {
   display: flex;
@@ -19,7 +21,7 @@
     }
 
     .proposal-amount-text.Text {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 
@@ -31,17 +33,17 @@
     display: inline-block;
 
     &.pass {
-      color: $green-600;
+      color: colors.$green-600;
     }
 
     &.fail {
-      color: $rorange-600;
+      color: colors.$rorange-600;
     }
   }
 
   .proposal-thread-link-text.Text {
-    background: $neutral-100;
-    border-radius: $border-radius-corners;
+    background: colors.$neutral-100;
+    border-radius: border_radius.$border-radius-corners;
     padding: 8px;
   }
 }

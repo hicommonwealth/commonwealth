@@ -1,10 +1,13 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/text';
 
 .CWEditor {
   .editor-and-tabs-container {
     position: relative;
-    border: 1px solid $neutral-200;
-    border-radius: $border-radius-corners-wider;
+    border: 1px solid colors.$neutral-200;
+    border-radius: border_radius.$border-radius-corners-wider;
 
     .CWTabsRow.boxed {
       width: 100%;
@@ -19,8 +22,8 @@
     .CustomQuillToolbar {
       display: flex;
       border: none !important;
-      background-color: $white;
-      border-bottom: 1px solid $neutral-200 !important;
+      background-color: colors.$white;
+      border-bottom: 1px solid colors.$neutral-200 !important;
 
       .formatting-buttons-container {
         width: 100%;
@@ -44,13 +47,13 @@
 
           &:hover {
             svg {
-              fill: $neutral-600;
+              fill: colors.$neutral-600;
             }
           }
 
           svg {
             height: unset !important;
-            fill: $neutral-500;
+            fill: colors.$neutral-500;
           }
         }
       }
@@ -60,7 +63,7 @@
       position: sticky;
       border-bottom-left-radius: 6px;
       border-bottom-right-radius: 6px;
-      background-color: $neutral-50;
+      background-color: colors.$neutral-50;
       padding: 6px 12px;
       display: flex;
       justify-content: space-between;
@@ -72,7 +75,7 @@
 
       #img-upload-trigger {
         cursor: pointer;
-        color: $neutral-500;
+        color: colors.$neutral-500;
         display: flex;
         align-items: center;
 
@@ -81,7 +84,7 @@
         }
 
         .Text {
-          color: $neutral-500;
+          color: colors.$neutral-500;
           line-height: 22px;
         }
       }
@@ -115,7 +118,7 @@
       border: 1px solid transparent;
 
       &.isFocused {
-        border: 1px solid $primary-500;
+        border: 1px solid colors.$primary-500;
         box-shadow: 0 0 0 3px rgba(204, 227, 255, 1);
       }
 
@@ -124,7 +127,7 @@
         user-select: none;
 
         .QuillEditor {
-          background: $neutral-50;
+          background: colors.$neutral-50;
         }
       }
 
@@ -135,7 +138,7 @@
 
       .markdownEnabled {
         .ql-container {
-          font-family: $font-family-monospace;
+          font-family: shared.$font-family-monospace;
         }
       }
 
@@ -165,7 +168,7 @@
 
       .ondragover {
         background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23338fff' stroke-width='4' stroke-dasharray='4%2c 4' stroke-dashoffset='0' stroke-linecap='butt'/%3e%3c/svg%3e");
-        caret-color: $primary-500;
+        caret-color: colors.$primary-500;
       }
 
       .LoadingIndicator {
@@ -222,9 +225,9 @@
       left: 50%;
       transform: translate(-50%, calc(-50% + 20px));
       border-radius: 4px;
-      background-color: $neutral-900;
+      background-color: colors.$neutral-900;
       padding: 4px 8px;
-      color: $white;
+      color: colors.$white;
       text-align: center;
 
       span {
@@ -235,10 +238,10 @@
     }
 
     .ql-mention-list-container {
-      background: $white;
-      border-top: 1px solid $neutral-200;
-      border-left: 1px solid $neutral-200;
-      border-right: 1px solid $neutral-200;
+      background: colors.$white;
+      border-top: 1px solid colors.$neutral-200;
+      border-left: 1px solid colors.$neutral-200;
+      border-right: 1px solid colors.$neutral-200;
       box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
       border-radius: 4px;
       z-index: 2;
@@ -254,12 +257,12 @@
 
         li.ql-mention-list-item {
           padding: 8px;
-          border-bottom: 1px solid $neutral-200;
+          border-bottom: 1px solid colors.$neutral-200;
           margin: 0;
           display: flex;
           align-items: center;
           justify-content: center;
-          @include multiline-text-ellipsis(2);
+          @include text.multiline-text-ellipsis(2);
 
           .mention-entity-indicator {
             margin-right: 8px;
@@ -283,7 +286,7 @@
         }
 
         > .selected {
-          background: $neutral-100;
+          background: colors.$neutral-100;
           cursor: pointer;
         }
 
@@ -293,19 +296,19 @@
           .ql-mention-name {
             font-size: 16px;
             margin-right: 16px;
-            @include multiline-text-ellipsis(2);
+            @include text.multiline-text-ellipsis(2);
           }
 
           .ql-mention-addr,
           .ql-mention-desc {
             float: right;
-            color: $neutral-500;
+            color: colors.$neutral-500;
             font-size: 14px;
           }
 
           .ql-mention-la {
             display: block;
-            color: $neutral-500;
+            color: colors.$neutral-500;
             font-size: 14px;
             white-space: nowrap;
             margin-bottom: 2px;
@@ -321,7 +324,7 @@
           border-radius: 9999px;
 
           &.missing {
-            background-color: $neutral-300;
+            background-color: colors.$neutral-300;
           }
         }
       }
@@ -332,7 +335,7 @@
     }
 
     &.error {
-      border-color: $rorange-500;
+      border-color: colors.$rorange-500;
     }
   }
 

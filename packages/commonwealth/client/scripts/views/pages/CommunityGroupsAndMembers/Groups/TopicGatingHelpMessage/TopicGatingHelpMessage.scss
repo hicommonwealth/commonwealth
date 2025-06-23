@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
 
 .TopicGatingHelpMessage {
   display: flex;
@@ -7,5 +8,5 @@
   padding: 16px;
   gap: 8px;
   width: 100%;
-  border: 1px solid $neutral-600;
+  border: 1px solid colors.$neutral-600;
 }

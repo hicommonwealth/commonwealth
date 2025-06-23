@@ -1,7 +1,9 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .QuestActionSubForm {
-  background-color: $neutral-50;
+  background-color: colors.$neutral-50;
   padding: 16px;
   border-radius: 6px;
   gap: 24px;
@@ -30,7 +32,7 @@
   .span-1,
   .span-2,
   .span-3 {
-    @include mediumSmallInclusive {
+    @include media_queries.mediumSmallInclusive {
       grid-column: span 6;
     }
   }
@@ -53,15 +55,15 @@
     width: 100%;
 
     .caption .Text {
-      color: $neutral-600 !important;
+      color: colors.$neutral-600 !important;
     }
 
     .b1 {
-      color: $neutral-600 !important;
+      color: colors.$neutral-600 !important;
     }
 
     .radio-btn .Text {
-      color: $neutral-800 !important;
+      color: colors.$neutral-800 !important;
     }
 
     .mt-8 {

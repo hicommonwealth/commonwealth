@@ -1,9 +1,10 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
 
 .CWIdentificationTag {
   display: flex;
   align-items: center;
-  background-color: $neutral-200;
+  background-color: colors.$neutral-200;
   padding: 2px 8px;
   border-radius: 6px;
   cursor: default;
@@ -17,7 +18,7 @@
   }
 
   .label {
-    color: $neutral-600;
+    color: colors.$neutral-600;
     overflow: hidden;
     display: inline-block;
     text-overflow: ellipsis;

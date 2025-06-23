@@ -1,4 +1,6 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .TokenPerformance {
   margin: 16px 0;
@@ -11,7 +13,7 @@
 
     .see-all-link {
       cursor: pointer;
-      color: $primary-500;
+      color: colors.$primary-500;
       text-decoration: none;
 
       &:focus,
@@ -47,7 +49,7 @@
         max-width: 50%;
       }
 
-      @include mediumSmallInclusive {
+      @include media_queries.mediumSmallInclusive {
         flex-direction: column;
 
         > div {

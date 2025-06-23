@@ -74,7 +74,7 @@ export const command = <
         md,
         {
           actor: ctx.actor,
-          payload: input!,
+          payload: input! as z.infer<Input>,
         },
         false,
       );
@@ -117,7 +117,7 @@ export const query = <
     try {
       const cacheTTL =
         typeof options?.ttlSecs === 'function'
-          ? options.ttlSecs(input)
+          ? options.ttlSecs(input as z.infer<Input>)
           : options?.ttlSecs;
 
       const cacheKey = cacheTTL
@@ -145,7 +145,7 @@ export const query = <
         md,
         {
           actor: ctx.actor,
-          payload: input!,
+          payload: input! as z.infer<Input>,
         },
         false,
       );

@@ -1,11 +1,12 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
 
 .AddressItemRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  border: 1px solid $neutral-300;
+  border: 1px solid colors.$neutral-300;
   border-radius: 6px;
 
   .address-info {

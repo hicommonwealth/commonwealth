@@ -1,4 +1,6 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
+@use '../../../../../../styles/mixins/media_queries';
 
 .EVMWalletsSubModal {
   .CWModal {
@@ -11,7 +13,7 @@
     }
   }
   &.forMobile {
-    background-color: $white !important;
+    background-color: colors.$white !important;
   }
   .container {
     border-radius: 24px;
@@ -22,9 +24,9 @@
     padding: 24px 12px;
     gap: 24px;
     &.forMobile {
-      background-color: $white !important;
+      background-color: colors.$white !important;
     }
-    @include extraSmall {
+    @include media_queries.extraSmall {
       min-width: auto;
     }
 
@@ -55,7 +57,7 @@
 
       .wallet-connect-reset-btn {
         margin-left: auto;
-        color: $neutral-400;
+        color: colors.$neutral-400;
         outline: none;
         border: none;
         background-color: transparent;
@@ -83,11 +85,11 @@
         .primary {
           padding-left: 2rem;
           padding-right: 2rem;
-          border: 1px solid $primary-600;
+          border: 1px solid colors.$primary-600;
           background-color: transparent !important;
 
           .button-text {
-            color: $primary-600 !important;
+            color: colors.$primary-600 !important;
           }
         }
       }
@@ -103,8 +105,8 @@
         .primary {
           padding-left: 2rem;
           padding-right: 2rem;
-          border: 1px solid $primary-600;
-          background-color: $primary-600;
+          border: 1px solid colors.$primary-600;
+          background-color: colors.$primary-600;
           .button-text {
             color: white !important;
           }
@@ -118,7 +120,7 @@
       a:visited,
       a:active,
       a:hover {
-        color: $primary-600;
+        color: colors.$primary-600;
       }
     }
   }
@@ -126,22 +128,22 @@
 
 @media (prefers-color-scheme: dark) {
   .EVMWalletsSubModal {
-    background-color: $black !important;
+    background-color: colors.$black !important;
 
     .container {
-      background-color: $gray-900 !important;
+      background-color: colors.$gray-900 !important;
     }
 
     .wallet-connect-reset-btn {
-      color: $neutral-600 !important;
+      color: colors.$neutral-600 !important;
     }
 
     .header {
       .Text {
-        color: $white !important;
+        color: colors.$white !important;
       }
       .Icon {
-        color: $white !important;
+        color: colors.$white !important;
       }
     }
   }
@@ -149,22 +151,22 @@
 
 @media (prefers-color-scheme: light) {
   .EVMWalletsSubModal {
-    background-color: $pink-25 !important;
+    background-color: colors.$pink-25 !important;
 
     .container {
-      background-color: $pink-100 !important;
+      background-color: colors.$pink-100 !important;
     }
 
     .wallet-connect-reset-btn {
-      color: $neutral-400 !important;
+      color: colors.$neutral-400 !important;
     }
 
     .header {
       .Text {
-        color: $black !important;
+        color: colors.$black !important;
       }
       .Icon {
-        color: $black !important;
+        color: colors.$black !important;
       }
     }
   }

@@ -1,4 +1,5 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .ProposalSubheader {
   display: flex;
@@ -7,11 +8,11 @@
 
   .onchain-status-text.Text {
     &.pass {
-      color: $green-600;
+      color: colors.$green-600;
     }
 
     &.fail {
-      color: $rorange-600;
+      color: colors.$rorange-600;
     }
   }
 
