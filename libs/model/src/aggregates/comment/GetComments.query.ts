@@ -22,15 +22,13 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         cursor,
         order_by,
         include_spam_comments,
+        is_chat_mode,
       } = payload;
 
-      // Chat mode: reverse pagination for 'oldest' order, but only for top-level comments
-      // Replies should always use normal pagination regardless of order_by
-      const isChatMode = order_by === 'oldest' && !parent_id;
       let offset, actualOrderBy;
       let actualLimit = limit;
 
-      if (isChatMode) {
+      if (is_chat_mode) {
         // For chat mode, we need to calculate reverse pagination
         // First, get total count to determine the actual page mapping
         const countSql = `
@@ -179,7 +177,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
           thread_id,
           comment_id,
           ...(parent_id && { parent_id: `${parent_id}` }),
-          limit: isChatMode ? actualLimit : limit,
+          limit: is_chat_mode ? actualLimit : limit,
           offset,
         },
         type: QueryTypes.SELECT,
@@ -205,7 +203,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
 
       // Build pagination response with correct page calculation for chat mode
       let paginatedResponse;
-      if (isChatMode) {
+      if (is_chat_mode) {
         // In chat mode, cursor IS the page number, so use it directly
         paginatedResponse = {
           results: finalResults,
