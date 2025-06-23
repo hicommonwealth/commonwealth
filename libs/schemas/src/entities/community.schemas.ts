@@ -14,6 +14,7 @@ import { PG_INT } from '../utils';
 import { ChainNode } from './chain.schemas';
 import { ContestManager } from './contest-manager.schemas';
 import { Group } from './group.schemas';
+import { MCPServerCommunity } from './mcp.schemas';
 import { CommunityStake } from './stake.schemas';
 import { CommunityTags } from './tag.schemas';
 import { Topic } from './topic.schemas';
@@ -95,6 +96,7 @@ export const Community = z.object({
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),
+  MCPServerCommunities: z.array(MCPServerCommunity).optional(),
 });
 
 export const ExtendedCommunity = Community.extend({
@@ -105,6 +107,7 @@ export const ExtendedCommunity = Community.extend({
     }),
   ),
   communityBanner: z.string().nullish(),
+  communityTreasuryAddress: z.string().nullish(),
 });
 
 export const CommunityGoalMeta = z.object({

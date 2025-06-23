@@ -1,7 +1,7 @@
-@import '../../../../../../styles/mixins/colors.module';
+@use '../../../../../../styles/mixins/colors.module';
 
 .CommunityStake {
   .green-500 {
-    color: $green-500;
+    color: colors.$green-500;
   }
 }

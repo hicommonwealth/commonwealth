@@ -1,4 +1,5 @@
-@import '../styles/shared.scss';
+@use '../styles/shared.scss';
+@use '../styles/mixins/colors.module';
 
 .Layout {
   height: 100%;
@@ -15,7 +16,7 @@
 
   .loading-error {
     align-items: center;
-    color: $neutral-800;
+    color: colors.$neutral-800;
     display: flex;
     flex-direction: column;
     justify-content: center;

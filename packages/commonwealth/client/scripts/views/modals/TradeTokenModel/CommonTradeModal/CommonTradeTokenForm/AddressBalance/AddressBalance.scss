@@ -1,4 +1,5 @@
-@import '../../../../../../styles/shared.scss';
+@use '../../../../../../styles/shared.scss';
+@use '../../../../../../styles/mixins/colors.module';
 
 .AddressBalance {
   display: flex;
@@ -20,6 +21,6 @@
 
   .na-value {
     // Styles for the N/A text if needed
-    color: $neutral-400; // Example style
+    color: colors.$neutral-400; // Example style
   }
 }

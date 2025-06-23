@@ -1,4 +1,5 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .UserTrustLevel {
   display: flex;
@@ -37,21 +38,21 @@
   }
 
   &.level-1 {
-    border-color: $green-200;
+    border-color: colors.$green-200;
   }
 
   &.level-2 {
-    border-color: $yellow-200;
+    border-color: colors.$yellow-200;
   }
 
   &.level-3,
   &.level-4,
   &.level-5 {
-    border-color: $neutral-200;
+    border-color: colors.$neutral-200;
   }
 
   &.disabled {
-    border-color: $neutral-200;
+    border-color: colors.$neutral-200;
     opacity: 0.5;
   }
 
@@ -72,7 +73,7 @@
 
   .level-description {
     font-size: 14px;
-    color: $neutral-500;
+    color: colors.$neutral-500;
     flex: 1;
   }
 
@@ -104,7 +105,7 @@
       justify-content: space-between;
       padding: 8px 12px;
       border-radius: 8px;
-      border: 1px solid $neutral-200;
+      border: 1px solid colors.$neutral-200;
       cursor: pointer;
       transition: all 0.2s ease-in-out;
 

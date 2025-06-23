@@ -1,22 +1,23 @@
-@import '../../../../../styles/shared';
-@import './CWSearchBar.scss';
+@use '../../../../../styles/shared';
+@use 'CWSearchBar.scss';
+@use '../../../../../styles/mixins/colors.module';
 
 .SearchBarCommentPreviewRow {
   display: flex;
   flex-direction: column;
   gap: 4px;
 
-  @include everyRowStyles;
+  @include CWSearchBar.everyRowStyles;
 
   .Text {
     display: inline;
   }
 
   .last-updated-text.Text {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 
   .excerpt-text.Text {
-    color: $neutral-600;
+    color: colors.$neutral-600;
   }
 }

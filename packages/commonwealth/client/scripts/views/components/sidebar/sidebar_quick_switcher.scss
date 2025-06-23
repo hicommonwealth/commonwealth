@@ -1,35 +1,37 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
 
 .SidebarQuickSwitcher {
-  background: $neutral-50;
-  border-right: 1px solid $neutral-200;
+  background: colors.$neutral-50;
+  border-right: 1px solid colors.$neutral-200;
   display: flex;
   flex-direction: column;
   align-items: center;
   height: 100%;
   overflow: hidden;
-  width: $quick-switcher-width;
+  width: shared.$quick-switcher-width;
 
   &:not(.isInsideCommunity) {
     padding-top: 32px;
   }
 
   .CommunityAvatar {
-    border-radius: $border-radius-corners-wider;
+    border-radius: border_radius.$border-radius-corners-wider;
 
     .community-image {
       width: 100%;
       height: 100%;
-      border-radius: $border-radius-corners-wider;
+      border-radius: border_radius.$border-radius-corners-wider;
 
       &.isSelected {
-        border-radius: $border-radius-round;
+        border-radius: border_radius.$border-radius-round;
       }
     }
 
     &.isSelected {
-      border-radius: $border-radius-round;
-      border: 2px solid $primary-600;
+      border-radius: border_radius.$border-radius-round;
+      border: 2px solid colors.$primary-600;
       padding: 2px;
     }
   }

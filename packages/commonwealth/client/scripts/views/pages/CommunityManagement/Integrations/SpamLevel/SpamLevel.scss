@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
 
 .SpamLevel {
   display: flex;
@@ -13,12 +14,12 @@
     align-items: center;
 
     .h4 {
-      color: $neutral-900 !important;
+      color: colors.$neutral-900 !important;
     }
   }
 
   .b1 {
-    color: $neutral-500 !important;
+    color: colors.$neutral-500 !important;
     padding-bottom: 12px;
   }
 

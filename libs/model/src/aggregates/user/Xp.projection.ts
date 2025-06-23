@@ -341,6 +341,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           event_created_at: payload.created_at!,
           action_metas,
           scope: {
+            community_id: payload.community_id,
             topic_id: payload.topic_id,
             thread_id: payload.id!,
           },
@@ -371,7 +372,11 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           event_created_at: payload.created_at!,
           action_metas,
           shared_with: { creator_address: thread!.Address!.address },
-          scope: { topic_id: thread.topic_id, thread_id: thread.id! },
+          scope: {
+            community_id: thread.community_id,
+            topic_id: thread.topic_id,
+            thread_id: thread.id!,
+          },
         });
       },
       CommentCreated: async ({ id, payload }) => {
@@ -391,6 +396,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           event_created_at: payload.created_at!,
           action_metas,
           scope: {
+            community_id: thread.community_id,
             topic_id: thread.topic_id,
             thread_id: thread.id!,
             comment_id: payload.id!,
@@ -431,6 +437,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           action_metas,
           shared_with: { creator_address: comment!.Address!.address },
           scope: {
+            community_id: comment.Thread!.community_id,
             topic_id: comment.Thread!.topic_id,
             thread_id: comment.Thread!.id!,
             comment_id: comment.id,

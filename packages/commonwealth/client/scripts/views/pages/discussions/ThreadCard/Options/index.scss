@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
 
 .Options {
   align-items: center;
@@ -15,15 +17,15 @@
     gap: 4px;
     cursor: pointer;
     padding: 4px 8px;
-    border-radius: $border-radius-corners-wider;
-    color: $neutral-600;
+    border-radius: border_radius.$border-radius-corners-wider;
+    color: colors.$neutral-600;
 
     &:hover {
-      background-color: $neutral-200;
+      background-color: colors.$neutral-200;
     }
 
     .Text {
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
   }
 

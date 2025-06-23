@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .TransactionsTab {
   display: flex;
@@ -20,7 +22,7 @@
     align-items: center;
     gap: 24px;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       flex-direction: column;
       align-items: flex-end;
       gap: 16px;
@@ -29,7 +31,7 @@
     .TextInput {
       max-width: 700px;
 
-      @include smallInclusive {
+      @include media_queries.smallInclusive {
         max-width: 100%;
       }
 
@@ -40,7 +42,7 @@
           position: relative;
           top: 14px !important;
           left: 14px !important;
-          color: $neutral-400;
+          color: colors.$neutral-400;
         }
       }
 
@@ -56,7 +58,7 @@
       margin-left: auto;
       gap: 16px;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         flex-direction: column;
         justify-content: flex-start;
         align-items: start;
