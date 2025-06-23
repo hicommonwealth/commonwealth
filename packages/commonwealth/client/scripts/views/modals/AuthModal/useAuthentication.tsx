@@ -760,7 +760,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       isNewlyCreated,
       false,
       selectedWallet,
-    );
+    ).catch(console.error);
     setIsMobileWalletVerificationStep(false);
     props?.onModalClose?.();
   };
