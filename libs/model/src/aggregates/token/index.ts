@@ -5,4 +5,5 @@ export * from './GetLaunchpadTrades.query';
 export * from './GetToken.query';
 export * from './GetTokenInfoAlchemy.query';
 export * from './GetTokens.query';
+export * from './GetTokenStats.query';
 export * from './ProjectLaunchpadTrade.command';

@@ -26,6 +26,8 @@ import Group from './group';
 import GroupGatedAction from './groupGatedAction';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LaunchpadTrade from './launchpad_trade';
+import MCPServer from './mcp_server';
+import MCPServerCommunity from './mcp_server_community';
 import Membership from './membership';
 import Outbox from './outbox';
 import PinnedToken from './pinned_token';
@@ -81,6 +83,8 @@ export const Factories = {
   GroupGatedAction,
   LastProcessedEvmBlock,
   LaunchpadTrade,
+  MCPServer,
+  MCPServerCommunity,
   Membership,
   Outbox,
   PinnedToken,
