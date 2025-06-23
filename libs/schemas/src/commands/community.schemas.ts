@@ -13,6 +13,7 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod/v4';
 import { AuthContext, TopicContext, VerifiedContext } from '../context';
+import { MCPServer } from '../entities';
 import { Community } from '../entities/community.schemas';
 import { Group, Requirement } from '../entities/group.schemas';
 import { PinnedToken } from '../entities/pinned-token.schemas';
@@ -154,6 +155,15 @@ export const UpdateCommunity = {
       launchpad_weighted_voting: z.boolean().optional(),
     }),
   output: Community,
+  context: AuthContext,
+};
+
+export const SetCommunityMCPServers = {
+  input: z.object({
+    community_id: z.string(),
+    mcp_server_ids: z.array(z.number()),
+  }),
+  output: z.array(MCPServer),
   context: AuthContext,
 };
 
