@@ -1,10 +1,14 @@
 Two step setup:
 
-# Setup infra + argocd
+# Setup infra
 1. Run `terraform init` to install providers (Only needs to be run once)
 2. Run terraform script with `terraform apply` (This requires vars ENV_NAME and DIGITALOCEAN_TOKEN)
 3. Connect to digital ocean cluster `doctl auth init` and `doctl kubernetes cluster kubeconfig save "$ENV_NAME"`
-4. Run `./olmBootstrap.sh`
+
+# Bootstrap
+We will use OLM to bootstrap argoCD as well as manage the lifecycle of various components that need complex initializations
+1. Install operator-sdk. On Mac: `brew install operator-sdk`
+2. Run `operator-sdk olm install`
 
 # Setup vault
 1. Run the vault manifests `kubectl apply -n argocd vault.yaml`
