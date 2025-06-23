@@ -7,6 +7,7 @@ import { trpc } from 'utils/trpcClient';
 import { CWText } from 'views/components/component_kit/cw_text';
 import ContestCard from 'views/components/ContestCard';
 import { PotentialContestCard } from 'views/components/PotentialContestCard/PotentialContestCard';
+import ExploreContestsCard from 'views/components/ExploreContestsCard';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import { Skeleton } from 'views/components/Skeleton';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
@@ -42,12 +43,10 @@ const ActiveContestList = ({
   isCommunityHomePage = false,
 }: ActiveContestListProps) => {
   const {
-    contestsData: { active: activeContests, suggested: suggestedContest },
+    contestsData: { active: activeContests },
     isContestDataLoading,
-    isSuggestedMode,
   } = useCommunityContests({
     fetchAll: true,
-    isCommunityHomePage,
   });
 
   const { communityToken, isLoadingToken, isPinnedToken, isLoadingPricing } =
@@ -68,11 +67,7 @@ const ActiveContestList = ({
   const shouldRenderPotentialCard =
     showPotentialCardCase1 || showPotentialCardCase2;
 
-  const activeContestsLimited = isCommunityHomePage
-    ? activeContests.length > 0
-      ? activeContests.slice(0, 3)
-      : suggestedContest.slice(0, 3) || []
-    : activeContests.slice(0, 3);
+  const activeContestsLimited = activeContests.slice(0, 3);
 
   const communityIds = [
     ...new Set(activeContestsLimited.map((contest) => contest.community_id)),
@@ -109,9 +104,6 @@ const ActiveContestList = ({
           </div>
         </Link>
       </div>
-      {isSuggestedMode && !shouldRenderPotentialCard && (
-        <CWText type="h5">Suggested</CWText>
-      )}
       <>
         {shouldRenderPotentialCard && <PotentialContestCard />}
         {!isLoading &&
@@ -122,6 +114,10 @@ const ActiveContestList = ({
               No active contests found
             </CWText>
           )}
+        {!isLoading &&
+          !shouldRenderPotentialCard &&
+          isCommunityHomePage &&
+          !hasActiveContests && <ExploreContestsCard />}
         {isLoading ? (
           <div className="content">
             <>
