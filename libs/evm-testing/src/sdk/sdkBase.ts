@@ -5,8 +5,8 @@ export abstract class SdkBase {
   protected readonly web3: Web3;
   private accounts: string[] | undefined;
 
-  constructor() {
-    this.web3 = getProvider();
+  constructor(web3?: Web3) {
+    this.web3 = web3 ?? getProvider();
   }
 
   public async getAccounts() {

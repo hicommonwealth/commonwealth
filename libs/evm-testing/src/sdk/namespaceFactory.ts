@@ -1,5 +1,5 @@
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { AbiFragment, Contract } from 'web3';
+import Web3, { AbiFragment, Contract } from 'web3';
 import { namespace_factory } from '../utils/contracts';
 import { SdkBase } from './sdkBase';
 
@@ -8,10 +8,12 @@ const TOPIC_LOG =
 
 export class NamespaceFactory extends SdkBase {
   public address: string = cp.factoryContracts[84532].factory;
-  public contract: Contract<AbiFragment[]> = namespace_factory(
-    this.address,
-    this.web3,
-  );
+  public contract: Contract<AbiFragment[]>;
+
+  constructor(web3?: Web3) {
+    super(web3);
+    this.contract = namespace_factory(this.address, this.web3);
+  }
 
   /**
    * Deploys a new namespace. Note current wallet will be admin of namespace

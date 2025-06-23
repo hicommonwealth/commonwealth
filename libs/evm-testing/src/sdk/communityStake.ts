@@ -1,16 +1,19 @@
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { AbiFragment, Contract } from 'web3';
+import Web3, { AbiFragment, Contract } from 'web3';
 import { community_stake } from '../utils/contracts';
 import { NamespaceFactory } from './namespaceFactory';
 import { SdkBase } from './sdkBase';
 
 export class CommunityStake extends SdkBase {
   public address: string = cp.factoryContracts[84532].communityStake;
-  public contract: Contract<AbiFragment[]> = community_stake(
-    this.address,
-    this.web3,
-  );
-  public namespaceFactory: NamespaceFactory = new NamespaceFactory();
+  public contract: Contract<AbiFragment[]>;
+  public namespaceFactory: NamespaceFactory;
+
+  constructor(web3?: Web3) {
+    super(web3);
+    this.contract = community_stake(this.address, this.web3);
+    this.namespaceFactory = new NamespaceFactory(this.web3);
+  }
 
   /**
    * Buy Community Stake, recalculates total buy as CS does not allow slippage
