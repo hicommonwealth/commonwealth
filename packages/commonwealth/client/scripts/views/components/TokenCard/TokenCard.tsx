@@ -47,10 +47,9 @@ const TokenCard = ({
   const { name, symbol, icon_url } = token;
 
   const { pricing } = useTokenPricing({ token }) as { pricing: TokenPricing };
-  const { data: stats } = useGetTokenStatsQuery(
-    { token_address: token.token_address },
-    { staleTime: 30_000, refetchInterval: 30_000 },
-  ) as { data: TokenStats | undefined };
+  const { data: stats } = useGetTokenStatsQuery({
+    token_address: token.token_address,
+  }) as { data: TokenStats | undefined };
 
   const currencySymbol = currencyNameToSymbolMap[currency];
 
