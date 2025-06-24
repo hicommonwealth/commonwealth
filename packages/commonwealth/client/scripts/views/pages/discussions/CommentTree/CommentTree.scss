@@ -11,4 +11,13 @@
     padding-left: 24px;
     margin-left: 28px;
   }
+
+  .comments-list {
+    .chat-load-older-container {
+      padding: 16px;
+      text-align: center;
+      border-bottom: 1px solid colors.$neutral-200;
+      background-color: colors.$neutral-50;
+    }
+  }
 }
