@@ -623,6 +623,12 @@ describe('Thread lifecycle', () => {
   describe('comments', () => {
     test('should create a thread comment as member of group with permissions', async () => {
       let body = chance.paragraph({ sentences: 50 });
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: thread.id!,
+        },
+      });
+      const initialCommentCount = threadInstance!.comment_count;
       const firstComment = await command(CreateComment(), {
         actor: actors.member,
         payload: {
@@ -631,6 +637,8 @@ describe('Thread lifecycle', () => {
           body,
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.comment_count).to.equal(initialCommentCount! + 1);
       expect(firstComment).to.include({
         thread_id: thread!.id,
         body: body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
@@ -661,6 +669,8 @@ describe('Thread lifecycle', () => {
         community_id: thread!.community_id,
       });
       expect(_comment?.content_url).toBeFalsy();
+      await threadInstance!.reload();
+      expect(threadInstance!.comment_count).to.equal(initialCommentCount! + 2);
     });
 
     test('should throw error when thread not found', async () => {
@@ -766,6 +776,12 @@ describe('Thread lifecycle', () => {
 
     test('should update comment', async () => {
       let body = chance.paragraph({ sentences: 50 });
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: thread.id!,
+        },
+      });
+      const initialCommentCount = threadInstance!.comment_count;
       let updated = await command(UpdateComment(), {
         actor: actors.member,
         payload: {
@@ -773,6 +789,8 @@ describe('Thread lifecycle', () => {
           body,
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.comment_count).to.equal(initialCommentCount!);
       expect(updated).to.include({
         thread_id: thread!.id,
         body: body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
@@ -824,6 +842,12 @@ describe('Thread lifecycle', () => {
 
     test('should delete a comment as author', async () => {
       const body = 'to be deleted';
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: thread.id!,
+        },
+      });
+      const initialCommentCount = threadInstance!.comment_count;
       const tbd = await command(CreateComment(), {
         actor: actors.member,
         payload: {
@@ -831,6 +855,8 @@ describe('Thread lifecycle', () => {
           body,
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.comment_count).to.equal(initialCommentCount! + 1);
       expect(tbd).to.include({
         thread_id: thread!.id,
         body,
@@ -841,6 +867,11 @@ describe('Thread lifecycle', () => {
         payload: { comment_id: tbd!.id! },
       });
       expect(deleted).to.include({ comment_id: tbd!.id! });
+
+      // This is fails because we paranoidly delete the comment and comment count is used to correctly
+      // render the comment tree. See DeleteComment.command.ts for more details.
+      // await threadInstance!.reload();
+      // expect(threadInstance!.comment_count).to.equal(initialCommentCount!);
     });
 
     test('should delete a comment as admin', async () => {
