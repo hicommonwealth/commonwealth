@@ -9,7 +9,7 @@ import {
 } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { useFlag } from 'client/scripts/hooks/useFlag';
-import { BASE_API_PATH, trpc } from 'client/scripts/utils/trpcClient';
+import { BASE_API_PATH } from 'client/scripts/utils/trpcClient';
 import {
   completeClientLogin,
   setActiveAccount,
@@ -93,7 +93,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
     useState(false);
   const privyEnabled = useFlag('privy');
-  const utils = trpc.useUtils();
 
   const { isAddedToHomeScreen } = useAppStatus();
   const { setState: setSMSDialogState } = usePrivySMSDialogStore();
