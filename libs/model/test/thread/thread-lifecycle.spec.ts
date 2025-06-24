@@ -1095,6 +1095,12 @@ describe('Thread lifecycle', () => {
       getNamespaceBalanceSpy.mockResolvedValue({
         [actors.admin.address!]: '50',
       });
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: read_only!.id!,
+        },
+      });
+      const initialReactionCount = threadInstance!.reaction_count;
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.admin,
         payload: {
@@ -1103,12 +1109,17 @@ describe('Thread lifecycle', () => {
           reaction: 'like',
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.reaction_count).to.equal(
+        initialReactionCount! + 1,
+      );
       const expectedWeight = 50 * vote_weight;
       expect(`${reaction?.calculated_voting_weight}`).to.eq(
         `${expectedWeight}`,
       );
-      const t = await models.Thread.findByPk(thread!.id);
-      expect(`${t!.reaction_weights_sum}`).to.eq(`${expectedWeight}`);
+      expect(`${threadInstance!.reaction_weights_sum}`).to.eq(
+        `${expectedWeight}`,
+      );
     });
 
     // test('should handle ERC20 topic weight vote', async () => {
@@ -1150,6 +1161,13 @@ describe('Thread lifecycle', () => {
     // });
 
     test('should delete a reaction', async () => {
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: read_only!.id!,
+        },
+      });
+      const initialReactionCount = threadInstance!.reaction_count;
+      // tries to create a duplicate reaction on the same thread
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.admin,
         payload: {
@@ -1158,6 +1176,8 @@ describe('Thread lifecycle', () => {
           reaction: 'like',
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.reaction_count).to.equal(initialReactionCount);
       const deleted = await command(DeleteReaction(), {
         actor: actors.admin,
         payload: {
@@ -1165,6 +1185,10 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.reaction_count).to.equal(
+        initialReactionCount! - 1,
+      );
       const tempReaction = { ...reaction } as Partial<typeof reaction>;
       if (tempReaction) {
         if (tempReaction.community_id) delete tempReaction.community_id;
@@ -1214,6 +1238,12 @@ describe('Thread lifecycle', () => {
       getNamespaceBalanceSpy.mockResolvedValue({
         [actors.admin.address!]: '50',
       });
+      const commentInstance = await models.Comment.findOne({
+        where: {
+          id: comment!.id!,
+        },
+      });
+      const initialReactionCount = commentInstance!.reaction_count;
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.admin,
         payload: {
@@ -1226,8 +1256,13 @@ describe('Thread lifecycle', () => {
       expect(`${reaction?.calculated_voting_weight}`).to.eq(
         `${expectedWeight}`,
       );
-      const c = await models.Comment.findByPk(comment!.id);
-      expect(`${c!.reaction_weights_sum}`).to.eq(`${expectedWeight * 2}`); // *2 to account for first member reaction
+      await commentInstance!.reload();
+      expect(commentInstance!.reaction_count).to.equal(
+        initialReactionCount! + 1,
+      );
+      expect(`${commentInstance!.reaction_weights_sum}`).to.eq(
+        `${expectedWeight * 2}`,
+      ); // *2 to account for first member reaction
     });
 
     test('should throw error when comment not found', async () => {
@@ -1276,6 +1311,14 @@ describe('Thread lifecycle', () => {
       getNamespaceBalanceSpy.mockResolvedValue({
         [actors.member.address!]: '50',
       });
+      const commentInstance = await models.Comment.findOne({
+        where: {
+          id: comment!.id!,
+        },
+      });
+      const initialReactionCount = commentInstance!.reaction_count;
+
+      // tries to create a duplicate reaction on the same comment
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.member,
         payload: {
@@ -1284,6 +1327,8 @@ describe('Thread lifecycle', () => {
           reaction: 'like',
         },
       });
+      await commentInstance!.reload();
+      expect(commentInstance!.reaction_count).to.equal(initialReactionCount);
       const deleted = await command(DeleteReaction(), {
         actor: actors.member,
         payload: {
@@ -1291,6 +1336,10 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
+      await commentInstance!.reload();
+      expect(commentInstance!.reaction_count).to.equal(
+        initialReactionCount! - 1,
+      );
       const tempReaction: Partial<typeof reaction> = { ...reaction };
       if (tempReaction) {
         if (tempReaction.community_id) delete tempReaction.community_id;
