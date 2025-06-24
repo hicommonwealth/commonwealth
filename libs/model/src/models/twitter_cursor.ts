@@ -1,6 +1,6 @@
 import { TwitterCursor } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { ModelInstance } from './types';
 
 export type TwitterCursorAttributes = z.infer<typeof TwitterCursor>;

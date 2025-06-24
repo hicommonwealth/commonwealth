@@ -9,7 +9,7 @@ import { useFetchQuestsQuery } from 'state/api/quest';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import TotalQuestXPTag from '../../QuestDetails/TotalQuestXPTag';
 import XpQuestCard from '../XpQuestCard/XpQuestCard';
 import './XpQuestList.scss';

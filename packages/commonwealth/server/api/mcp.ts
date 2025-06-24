@@ -14,8 +14,7 @@ import cors from 'cors';
 import express, { Request, Response } from 'express';
 import { IncomingMessage } from 'http';
 import { Op } from 'sequelize';
-import { z, ZodType } from 'zod';
-import { zodToJsonSchema } from 'zod-to-json-schema';
+import { toJSONSchema, z, ZodType } from 'zod/v4';
 import {
   api as externalApi,
   trpcRouter as externalTrpcRouter,
@@ -87,7 +86,7 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
     }
     return {
       name: key,
-      description: inputSchema._def.description || '',
+      description: inputSchema.description || '',
       inputSchema,
       fn: async (token: string | null, input: z.infer<typeof inputSchema>) => {
         const [address, apiKey] = token?.split(':') || [];
@@ -167,7 +166,7 @@ const createMCPServer = (tools: CommonMCPTool[]): Server => {
       tools: tools.map((tool) => ({
         name: tool.name,
         description: tool.description,
-        inputSchema: zodToJsonSchema(tool.inputSchema),
+        inputSchema: toJSONSchema(tool.inputSchema),
       })),
     };
   });

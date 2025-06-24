@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { EVM_ADDRESS, PG_ETH, PG_INT } from '../utils';
 
 export const LaunchpadTrade = z.object({

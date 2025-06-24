@@ -1,6 +1,6 @@
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { AuthContext, VerifiedContext } from '../context';
 import { Address, User } from '../entities';
 

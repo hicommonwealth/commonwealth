@@ -1,6 +1,6 @@
 import { SearchComments } from '@hicommonwealth/schemas';
 import { trpc } from 'utils/trpcClient';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const SEARCH_COMMENTS_STALE_TIME = 60 * 1_000; // 60 s
 

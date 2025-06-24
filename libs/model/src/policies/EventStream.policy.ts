@@ -19,7 +19,7 @@ import {
   buildContestLeaderboardUrl,
   getBaseUrl,
 } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { buildThreadContentUrl } from '../utils';

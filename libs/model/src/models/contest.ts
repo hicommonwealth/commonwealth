@@ -1,6 +1,6 @@
 import { Contest } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import type { ModelInstance } from './types';
 
 type Contest = ModelInstance<z.infer<typeof Contest>>;

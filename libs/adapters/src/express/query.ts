@@ -1,7 +1,7 @@
 import type { Metadata, User } from '@hicommonwealth/core';
 import * as core from '@hicommonwealth/core';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { ZodType, z } from 'zod';
+import { ZodType, z } from 'zod/v4';
 
 /**
  * Adapts queries to express handlers

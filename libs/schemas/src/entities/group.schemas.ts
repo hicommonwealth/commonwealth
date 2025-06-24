@@ -1,5 +1,5 @@
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { PG_INT } from '../utils';
 import { GroupGatedAction } from './group-permission.schemas';
 import { Address } from './user.schemas';

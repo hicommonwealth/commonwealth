@@ -3,7 +3,7 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { ZodBoolean } from 'zod';
+import { ZodBoolean } from 'zod/v4';
 import { models } from '../../database';
 
 export const notifyAddressOwnershipTransferred: EventHandler<

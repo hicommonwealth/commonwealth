@@ -1,6 +1,6 @@
 import { GroupGatedAction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { GroupAttributes } from './group';
 import { TopicAttributes } from './topic';
 import type { ModelInstance } from './types';

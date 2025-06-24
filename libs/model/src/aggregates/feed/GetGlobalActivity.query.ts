@@ -1,7 +1,7 @@
 import { cache, CacheNamespaces, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 import { filterGates, joinGates, withGates } from '../../utils/gating';
 import { baseActivityQuery } from '../../utils/getUserActivityFeed';

@@ -14,7 +14,7 @@ import {
 } from '@hicommonwealth/core';
 import { Events } from '@hicommonwealth/schemas';
 import { TRPCError } from '@trpc/server';
-import { ZodType, ZodUndefined, z } from 'zod';
+import { ZodType, ZodUndefined, z } from 'zod/v4';
 import { buildproc, procedure } from './builder';
 import { Tag, type OutputMiddleware } from './types';
 

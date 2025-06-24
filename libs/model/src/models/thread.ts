@@ -6,7 +6,7 @@ import {
   getDecodedString,
 } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { emitEvent, getThreadContestManagers } from '../utils/utils';
 import { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';

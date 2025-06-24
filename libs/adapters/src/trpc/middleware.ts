@@ -1,6 +1,6 @@
 import { analytics, logger } from '@hicommonwealth/core';
 import type { Request } from 'express';
-import { ZodType, z } from 'zod';
+import { ZodType, z } from 'zod/v4';
 import { config } from '../config';
 import type { Context, OutputMiddleware, Track } from './types';
 

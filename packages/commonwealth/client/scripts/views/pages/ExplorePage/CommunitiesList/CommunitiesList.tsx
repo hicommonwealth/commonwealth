@@ -20,7 +20,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import '../ExplorePage.scss';
 import { getCommunityCountsString } from '../helpers';
 import './CommunitiesList.scss';

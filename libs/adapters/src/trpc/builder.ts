@@ -3,7 +3,7 @@ import { TRPCError, initTRPC } from '@trpc/server';
 import type { Request } from 'express';
 import passport from 'passport';
 import type { OpenApiMeta } from 'trpc-swagger';
-import { ZodType, z } from 'zod';
+import { ZodType, z } from 'zod/v4';
 import { config } from '../config';
 import type { BuildProcOptions, Context, Metadata } from './types';
 

@@ -5,7 +5,7 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { TurnstileWidgetNames, UserTierMap } from '@hicommonwealth/shared';
-import { ZodType } from 'zod';
+import { ZodType } from 'zod/v4';
 import { config } from '../config';
 import { models } from '../database';
 

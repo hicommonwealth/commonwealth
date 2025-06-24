@@ -1,5 +1,5 @@
 import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { PG_INT } from '../utils';
 
 export enum TopicWeightedVoting {

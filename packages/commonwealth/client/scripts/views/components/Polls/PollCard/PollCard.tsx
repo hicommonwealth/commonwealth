@@ -16,7 +16,7 @@ import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { downloadCSV } from '../../../pages/AdminPanel/utils';
 import {
   ViewPollVotesDrawer,

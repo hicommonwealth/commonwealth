@@ -5,7 +5,7 @@ import {
   awardTweetEngagementXpTask,
 } from '@hicommonwealth/model';
 import { Task } from 'graphile-worker';
-import { ZodType, ZodUndefined, z } from 'zod';
+import { ZodType, ZodUndefined, z } from 'zod/v4';
 import { archiveOutboxTask } from './tasks/archiveOutbox';
 import { cleanChainEventXpSourcesTask } from './tasks/cleanChainEventXpSources';
 import { cleanSubscriptionsTask } from './tasks/cleanSubscriptions';
@@ -18,7 +18,7 @@ export function taskFactory<Input extends ZodType | ZodUndefined>({
   fn,
 }: GraphileTask<Input>) {
   const task: Task = async (payload, helpers) => {
-    const parsedPayload: z.infer<Input> = input.parse(payload);
+    const parsedPayload = input.parse(payload) as z.infer<typeof input>;
     await fn(parsedPayload, helpers);
   };
   return task;

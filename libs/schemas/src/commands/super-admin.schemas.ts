@@ -4,7 +4,7 @@ import {
   CommunityTierMap,
   UserTierMap,
 } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { Community, CommunityGoalMeta } from '../entities';
 
 export const CreateChainNode = {

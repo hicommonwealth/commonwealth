@@ -33,7 +33,7 @@ import {
   UserTierMap,
 } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import {
   CreateComment,
   CreateCommentErrors,

@@ -2,7 +2,7 @@ import { Policy, command } from '@hicommonwealth/core';
 import { CommunityGoalReached, events } from '@hicommonwealth/schemas';
 import { CommunityGoalType } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { SetReachedGoal } from '../aggregates/community';
 import { models } from '../database';
 import { systemActor } from '../middleware';

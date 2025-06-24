@@ -573,8 +573,8 @@ importers:
   libs/model:
     dependencies:
       '@anatine/zod-mock':
-        specifier: ^3.13.3
-        version: 3.13.4(@faker-js/faker@8.4.1)(zod@3.25.51)
+        specifier: ^3.14.0
+        version: 3.14.0(@faker-js/faker@8.4.1)(zod@3.25.51)
       '@canvas-js/chain-ethereum':
         specifier: ^0.13.14
         version: 0.13.14(bufferutil@4.0.8)(utf-8-validate@6.0.3)
@@ -917,8 +917,8 @@ importers:
         specifier: workspace:*
         version: link:../../libs/sitemaps
       '@hookform/resolvers':
-        specifier: ^3.3.1
-        version: 3.3.4(react-hook-form@7.51.4(react@18.3.1))
+        specifier: ^5.0.1
+        version: 5.1.1(react-hook-form@7.51.4(react@18.3.1))
       '@ipld/dag-json':
         specifier: ^10.2.0
         version: 10.2.0
@@ -1594,10 +1594,10 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@anatine/zod-mock@3.13.4':
-    resolution: {integrity: sha512-yO/KeuyYsEDCTcQ+7CiRuY3dnafMHIZUMok6Ci7aERRCTQ+/XmsiPk/RnMx5wlLmWBTmX9kw+PavbMsjM+sAJA==}
+  '@anatine/zod-mock@3.14.0':
+    resolution: {integrity: sha512-pTYyn9dlszUl5gMGWtE7DBRvx1EcqpBJ1iJ73rlJYCZr9lgIEdZ6PCZQqoXIdlC8DYIwuT1M3/N8arkJa7A10Q==}
     peerDependencies:
-      '@faker-js/faker': ^7.0.0 || ^8.0.0
+      '@faker-js/faker': ^7.0.0 || ^8.0.0 || ^9.0.0
       zod: ^3.21.4
 
   '@apidevtools/json-schema-ref-parser@9.0.9':
@@ -5257,10 +5257,10 @@ packages:
     peerDependencies:
       react: '>= 16 || ^19.0.0-rc'
 
-  '@hookform/resolvers@3.3.4':
-    resolution: {integrity: sha512-o5cgpGOuJYrd+iMKvkttOclgwRW86EsWJZZRC23prf0uU2i48Htq4PuT73AVb9ionFyZrwYEITuOFGF+BydEtQ==}
+  '@hookform/resolvers@5.1.1':
+    resolution: {integrity: sha512-J/NVING3LMAEvexJkyTLjruSm7aOFx7QX21pzkiJfMoNG0wl5aFEjLTl7ay7IQb9EWY6AkrBy7tHL2Alijpdcg==}
     peerDependencies:
-      react-hook-form: ^7.0.0
+      react-hook-form: ^7.55.0
 
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
@@ -9438,6 +9438,9 @@ packages:
 
   '@stablelib/x25519@1.0.3':
     resolution: {integrity: sha512-KnTbKmUhPhHavzobclVJQG5kuivH+qDLpe84iRqX3CLrKp881cF160JvXJ+hjn1aMyCwYOKeIZefIH/P5cJoRw==}
+
+  '@standard-schema/utils@0.3.0':
+    resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
 
   '@starknet-io/types-js@0.7.10':
     resolution: {integrity: sha512-1VtCqX4AHWJlRRSYGSn+4X1mqolI1Tdq62IwzoU2vUuEE72S1OlEeGhpvd6XsdqXcfHmVzYfj8k1XtKBQqwo9w==}
@@ -22357,7 +22360,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@anatine/zod-mock@3.13.4(@faker-js/faker@8.4.1)(zod@3.25.51)':
+  '@anatine/zod-mock@3.14.0(@faker-js/faker@8.4.1)(zod@3.25.51)':
     dependencies:
       '@faker-js/faker': 8.4.1
       randexp: 0.5.3
@@ -29077,8 +29080,9 @@ snapshots:
     dependencies:
       react: 18.3.1
 
-  '@hookform/resolvers@3.3.4(react-hook-form@7.51.4(react@18.3.1))':
+  '@hookform/resolvers@5.1.1(react-hook-form@7.51.4(react@18.3.1))':
     dependencies:
+      '@standard-schema/utils': 0.3.0
       react-hook-form: 7.51.4(react@18.3.1)
 
   '@humanwhocodes/config-array@0.11.14':
@@ -36136,6 +36140,8 @@ snapshots:
       '@stablelib/keyagreement': 1.0.1
       '@stablelib/random': 1.0.2
       '@stablelib/wipe': 1.0.1
+
+  '@standard-schema/utils@0.3.0': {}
 
   '@starknet-io/types-js@0.7.10': {}
 

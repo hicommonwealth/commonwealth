@@ -1,4 +1,4 @@
-import z from 'zod';
+import z from 'zod/v4';
 import { AuthContext } from '../context';
 import { PG_INT, zBoolean } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
