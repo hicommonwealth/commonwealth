@@ -1,4 +1,6 @@
-import { logger, User } from '@hicommonwealth/core';
+import { Actor, logger } from '@hicommonwealth/core';
+import { config, models } from '@hicommonwealth/model';
+import { User } from '@hicommonwealth/schemas';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
@@ -11,7 +13,8 @@ import {
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 import { IncomingMessage } from 'http';
-import { z, ZodSchema } from 'zod';
+import { Op } from 'sequelize';
+import { z, ZodType } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import {
   api as externalApi,
@@ -21,12 +24,55 @@ import { apiKeyAuthMiddleware } from './external-router-middleware';
 
 const log = logger(import.meta);
 
-type CommonMCPTool<T extends z.ZodSchema = z.ZodSchema> = {
+type CommonMCPTool<T extends z.ZodType = z.ZodType> = {
   name: string;
   description: string;
   inputSchema: T;
   fn: (token: string | null, input: z.infer<T>) => Promise<unknown>;
 };
+
+async function checkBypass(req: Request) {
+  const address = req.headers['address'] as string;
+  const apiKey = req.headers['x-api-key'] as string;
+
+  const shouldBypass =
+    config.MCP.MCP_KEY_BYPASS?.length &&
+    `${address}:${apiKey}` === config.MCP.MCP_KEY_BYPASS;
+
+  // If the bypass key doesn't match, we should use normal API key auth
+  if (!shouldBypass) {
+    return false;
+  }
+
+  // If bypass key matches but no address provided, we can't proceed
+  if (!address) {
+    throw new Error('Address header required for MCP bypass');
+  }
+
+  // Look up the address and set the user
+  const addr = await models.Address.findOne({
+    where: {
+      address: address,
+      verified: { [Op.ne]: null },
+    },
+    include: [
+      {
+        model: models.User,
+        required: true,
+      },
+    ],
+  });
+  if (!addr?.User?.id) {
+    throw new Error(`No verified user found for address: ${address}`);
+  }
+
+  req.address = addr;
+  const user = addr.User;
+  // Remove ApiKey from user object like the middleware does
+  delete user.ApiKey;
+  req.user = models.User.build(user as z.infer<typeof User>);
+  return true;
+}
 
 // map external trpc router procedures to MCP tools
 export const buildMCPTools = (): Array<CommonMCPTool> => {
@@ -35,7 +81,7 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
   >;
   const tools = procedures.map((key) => {
     const procedure = externalApi[key];
-    const inputSchema = procedure._def.inputs[0] as ZodSchema;
+    const inputSchema = procedure._def.inputs[0] as ZodType;
     if (!inputSchema) {
       throw new Error(`No input schema for ${key}`);
     }
@@ -53,19 +99,27 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
             'x-api-key': apiKey,
           },
           path: `/${key}`,
-        } as unknown as Request & { user: User };
+        } as unknown as Request;
 
         const res = {} as Response;
 
         // execute api key middleware
-        let err: Error | null = null;
-        await apiKeyAuthMiddleware(req, res, (error?: unknown) => {
-          if (error) {
-            err = error as Error;
+        const shouldBypass = await checkBypass(req);
+        if (!shouldBypass) {
+          let err: Error | null = null;
+          await apiKeyAuthMiddleware(req, res, (error?: unknown) => {
+            if (error) {
+              err = error as Error;
+            }
+          });
+          if (err) {
+            throw err;
           }
-        });
-        if (err) {
-          throw err;
+        }
+
+        // Ensure user is set after authentication
+        if (!req.user) {
+          throw new Error('User not authenticated');
         }
 
         // trigger trcp procedure pipeline
@@ -73,7 +127,7 @@ export const buildMCPTools = (): Array<CommonMCPTool> => {
           req,
           res,
           actor: {
-            user: req.user,
+            user: req.user as Actor['user'],
             address: req.headers['address'] as string,
           },
         });

@@ -2,7 +2,6 @@ import { CompletionModel, ContentType } from '@hicommonwealth/shared';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { notifyError } from 'controllers/app/notifications';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
 import { Thread } from 'models/Thread';
 import type { Topic } from 'models/Topic';
 import React, {
@@ -19,7 +18,7 @@ import {
   generateThreadPrompt,
 } from 'state/api/ai/prompts';
 import useSidebarStore from 'state/ui/sidebar';
-import { useLocalAISettingsStore } from 'state/ui/user';
+import { useAIFeatureEnabled, useUserAiSettingsStore } from 'state/ui/user';
 import { AIModelSelector } from 'views/components/AIModelSelector';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import CommentEditor from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -79,16 +78,19 @@ const StickyInput = (props: StickyInputProps) => {
   const { isWindowExtraSmall: isMobile } = useBrowserWindow({});
   const { menuVisible } = useSidebarStore();
   const { mode, setIsExpanded, isExpanded } = useContext(StickCommentContext);
+  const { isAIEnabled } = useAIFeatureEnabled();
   const {
     aiCommentsToggleEnabled,
-    aiInteractionsToggleEnabled,
     setAICommentsToggleEnabled,
     selectedModels,
     setSelectedModels,
-  } = useLocalAISettingsStore();
+  } = useUserAiSettingsStore();
+
+  const effectiveAiCommentsToggleEnabled =
+    isAIEnabled && aiCommentsToggleEnabled;
+
   const stickyCommentReset = useActiveStickCommentReset();
   const { generateCompletion } = useAiCompletion();
-  const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   const aiModelPopover = usePopover();
 
@@ -154,7 +156,7 @@ const StickyInput = (props: StickyInputProps) => {
   }, [setOpenModalOnExpand, setIsExpanded]);
 
   const handleGenerateAIContent = useCallback(async () => {
-    if (!aiCommentsFeatureEnabled || !aiInteractionsToggleEnabled) return;
+    if (!effectiveAiCommentsToggleEnabled) return;
 
     setIsGenerating(true);
     bodyAccumulatedRef.current = '';
@@ -218,8 +220,7 @@ const StickyInput = (props: StickyInputProps) => {
       setIsGenerating(false);
     }
   }, [
-    aiCommentsFeatureEnabled,
-    aiInteractionsToggleEnabled,
+    effectiveAiCommentsToggleEnabled,
     generateCompletion,
     mode,
     originalThread,
@@ -264,12 +265,12 @@ const StickyInput = (props: StickyInputProps) => {
         resetTurnstile();
       }
 
-      if (aiCommentsToggleEnabled) {
+      if (effectiveAiCommentsToggleEnabled) {
         handleAiReply(commentId);
       }
 
       try {
-        await listenForComment(commentId, aiCommentsToggleEnabled);
+        await listenForComment(commentId, !!effectiveAiCommentsToggleEnabled);
       } catch (error) {
         console.warn('StickyInput - Failed to jump to comment:', error);
       }
@@ -284,7 +285,7 @@ const StickyInput = (props: StickyInputProps) => {
     }
   }, [
     handleSubmitComment,
-    aiCommentsToggleEnabled,
+    effectiveAiCommentsToggleEnabled,
     handleAiReply,
     turnstileToken,
     setContentDelta,
@@ -355,7 +356,7 @@ const StickyInput = (props: StickyInputProps) => {
 
     const buttonGroup = (
       <div className="button-group">
-        {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+        {isAIEnabled && (
           <CWTooltip
             content={`${webSearchEnabled ? 'Disable' : 'Enable'} Web Search`}
             placement="top"
@@ -371,7 +372,7 @@ const StickyInput = (props: StickyInputProps) => {
             )}
           />
         )}
-        {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+        {isAIEnabled && (
           <ClickAwayListener onClickAway={() => aiModelPopover.dispose()}>
             <div className="popover-container">
               <CWTooltip
@@ -509,6 +510,7 @@ const StickyInput = (props: StickyInputProps) => {
 
     const inputContent = (
       <div
+        // eslint-disable-next-line max-len
         className={`StickyInput ${isExpanded ? 'expanded' : 'not-expanded'} ${isMobile ? 'mobile' : 'desktop'} ${mode === 'thread' ? 'thread-mode' : ''}`}
         ref={containerRef}
         style={isMobile && menuVisible ? { zIndex: -1 } : undefined}
@@ -546,7 +548,8 @@ const StickyInput = (props: StickyInputProps) => {
                 shouldFocus={true}
                 onCancel={handleCancel}
                 aiCommentsToggleEnabled={
-                  aiCommentsToggleEnabled && selectedModels.length > 0
+                  !!effectiveAiCommentsToggleEnabled &&
+                  selectedModels.length > 0
                 }
                 handleSubmitComment={customHandleSubmitComment}
                 onAiReply={handleAiReply}
@@ -564,7 +567,7 @@ const StickyInput = (props: StickyInputProps) => {
           <>
             <div className="action-tags-container">
               <div className="tags-row">
-                {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+                {effectiveAiCommentsToggleEnabled && (
                   <CWTag
                     key="draft"
                     type="pill"

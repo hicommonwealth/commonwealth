@@ -32,7 +32,12 @@ export function createRmqConfig({
   map: Array<Consumer>;
 }) {
   let vhost: string;
-  if (rabbitMqUri.includes('localhost') || rabbitMqUri.includes('127.0.0.1')) {
+  let connection = <ConnectionConfig>rabbitMqUri;
+  if (
+    rabbitMqUri.includes('localhost') ||
+    rabbitMqUri.includes('127.0.0.1') ||
+    rabbitMqUri.includes('railway')
+  ) {
     vhost = '/';
   } else {
     const count = (rabbitMqUri.match(/\//g) || []).length;
@@ -45,6 +50,16 @@ export function createRmqConfig({
         "Can't create Rascal RabbitMQ Config with an invalid URI!",
       );
     }
+  }
+
+  if (EnvConfig.APP_ENV === 'local') {
+    // necessary until rascal upgrades amqp version >= 0.10.6
+    connection = {
+      url: rabbitMqUri,
+      options: {
+        frameMax: 131072,
+      },
+    };
   }
 
   const queueConfig = {
@@ -65,7 +80,7 @@ export function createRmqConfig({
   const config: BrokerConfig = {
     vhosts: {
       [vhost]: {
-        connection: <ConnectionConfig>rabbitMqUri,
+        connection,
         exchanges: {
           [RascalExchanges.DeadLetter]: {
             ...exchangeConfig,

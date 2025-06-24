@@ -1,15 +1,16 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .BlobContainer {
   display: flex;
   justify-content: center;
   gap: 12px;
   flex-direction: column;
-  background: $neutral-200;
+  background: colors.$neutral-200;
   border-radius: 5px;
 
   .labelText {
-    color: $neutral-600;
+    color: colors.$neutral-600;
     padding: 15px 15px 0px;
   }
   .title-and-button {
@@ -20,7 +21,7 @@
   }
 
   .Blob {
-    background: $neutral-200;
+    background: colors.$neutral-200;
     border-radius: 5px;
     display: flex;
     padding: 8px;

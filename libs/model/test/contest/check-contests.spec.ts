@@ -158,6 +158,7 @@ describe.skip('Check Contests', () => {
     );
 
     await handleEvent(ContestWorker(), {
+      id: 0,
       name: 'ContestRolloverTimerTicked',
       payload: {},
     });
@@ -179,6 +180,7 @@ describe.skip('Check Contests', () => {
     );
 
     await handleEvent(ContestWorker(), {
+      id: 0,
       name: 'ContestRolloverTimerTicked',
       payload: {},
     });

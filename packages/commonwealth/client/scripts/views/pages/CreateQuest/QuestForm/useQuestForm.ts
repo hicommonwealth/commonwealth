@@ -16,6 +16,7 @@ import {
   doesActionAllowCommentId,
   doesActionAllowContentId,
   doesActionAllowRepetition,
+  doesActionAllowSSOType,
   doesActionAllowThreadId,
   doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
@@ -73,6 +74,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'RecurringContestManagerDeployed',
       'LaunchpadTokenRecordCreated',
       'LaunchpadTokenTraded',
+      'ContestEnded',
       'CommunityGoalReached',
     ] as QuestAction[],
     channel: ['TweetEngagement', 'XpChainEventCreated'] as QuestAction[],
@@ -173,6 +175,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   with_optional_token_trade_threshold:
                     allowsContentId &&
                     doesActionAllowTokenTradeThreshold(chosenAction),
+                  with_optional_sso_type:
+                    allowsContentId && doesActionAllowSSOType(chosenAction),
                 },
               };
             }),
@@ -279,6 +283,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (scope === QuestActionContentIdScope.Chain) return 'chain';
         if (scope === QuestActionContentIdScope.Group) return 'group';
         if (scope === QuestActionContentIdScope.Goal) return 'goal';
+        if (scope === QuestActionContentIdScope.Sso) return 'sso';
         if (scope === QuestActionContentIdScope.TokenTradeThreshold) {
           return 'threshold';
         }

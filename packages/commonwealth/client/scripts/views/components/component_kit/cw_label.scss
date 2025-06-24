@@ -1,6 +1,7 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .Label.Text {
-  color: $neutral-500;
+  color: colors.$neutral-500;
   margin-bottom: 4px;
 }

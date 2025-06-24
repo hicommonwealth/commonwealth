@@ -1,4 +1,7 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .CommentEditor {
   display: flex;
@@ -26,7 +29,7 @@
       .user-link-text {
         &.disabled {
           .user-display-name {
-            color: $neutral-400 !important;
+            color: colors.$neutral-400 !important;
           }
         }
       }
@@ -34,8 +37,8 @@
   }
 
   .callout-text.Text {
-    background-color: $neutral-200;
-    border-radius: $border-radius-corners;
+    background-color: colors.$neutral-200;
+    border-radius: border_radius.$border-radius-corners;
     padding: 16px;
 
     a {
@@ -73,7 +76,7 @@
         align-items: center;
       }
 
-      @include smallInclusive {
+      @include media_queries.smallInclusive {
         flex-wrap: wrap;
 
         .ai-toggle-wrapper {
@@ -93,7 +96,7 @@
   }
 
   .token-req-text.Text {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 
   .ai-toggle-wrapper {

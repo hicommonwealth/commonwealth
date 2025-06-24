@@ -1,5 +1,6 @@
-@import '../../../styles/shared.scss';
-@import './user_dashboard_row.scss';
+@use '../../../styles/shared.scss';
+@use 'user_dashboard_row.scss';
+@use '../../../styles/mixins/colors.module';
 
 .UserDashboardRowTop {
   display: flex;
@@ -20,7 +21,7 @@
     .dot {
       width: 24px;
       height: 16px;
-      color: $neutral-500;
+      color: colors.$neutral-500;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -29,7 +30,7 @@
     }
 
     .gray-text {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 
@@ -52,7 +53,7 @@
   }
 
   .comment-preview {
-    color: $neutral-600;
+    color: colors.$neutral-600;
     flex-wrap: wrap;
   }
 }

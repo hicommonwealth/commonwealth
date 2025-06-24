@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .TopHolders {
   .heading-container {
@@ -9,7 +11,7 @@
 
     .see-all-link {
       cursor: pointer;
-      color: $primary-500;
+      color: colors.$primary-500;
       text-decoration: none;
 
       &:focus,
@@ -30,9 +32,9 @@
   .holders-table {
     min-width: 300px;
     width: 100%;
-    background-color: $white;
+    background-color: colors.$white;
     border-radius: 6px;
-    border: 1px solid $neutral-100;
+    border: 1px solid colors.$neutral-100;
     overflow: hidden;
     overflow-x: auto;
 
@@ -129,7 +131,7 @@
       }
     }
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       .Table {
         table {
           th,

@@ -1,5 +1,5 @@
-import { Events } from '@hicommonwealth/schemas';
-import { ZodError, ZodSchema, ZodUndefined, z } from 'zod';
+import { events, Events } from '@hicommonwealth/schemas';
+import { z, ZodError, ZodType, ZodUndefined } from 'zod';
 import {
   InvalidInput,
   type EventContext,
@@ -19,10 +19,10 @@ import {
 export const handleEvent = async <
   Name extends Events,
   Input extends EventSchemas,
-  Output extends ZodSchema | ZodUndefined = ZodUndefined,
+  Output extends ZodType | ZodUndefined = ZodUndefined,
 >(
   { inputs, body }: EventsHandlerMetadata<Input, Output>,
-  { name, payload }: EventContext<Name>,
+  { id, name, payload }: EventContext<Name>,
   validate = true,
 ): Promise<Partial<z.infer<Output>>> => {
   if (!body[name])
@@ -30,10 +30,12 @@ export const handleEvent = async <
       `Unhandled event: ${name} not found in ${Object.keys(body)}`,
     );
   try {
+    const validated = validate ? inputs[name]!.parse(payload) : payload;
     return (
       (await body[name]({
+        id,
         name,
-        payload: validate ? inputs[name]!.parse(payload) : payload,
+        payload: validated as z.infer<(typeof events)[Name]>,
       })) || {}
     );
   } catch (error) {

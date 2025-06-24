@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/media_queries';
 
 .AdminContestsPage {
   .admin-header-row {
@@ -7,7 +8,7 @@
     max-width: 600px;
     margin-bottom: 24px;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       align-items: center;
     }
   }

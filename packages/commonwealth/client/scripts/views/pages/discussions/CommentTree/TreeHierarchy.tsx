@@ -1,4 +1,8 @@
 import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
+import {
+  AIModelOption,
+  useUserAiSettingsStore,
+} from 'client/scripts/state/ui/user/userAiSettings';
 import clsx from 'clsx';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, {
@@ -12,10 +16,6 @@ import { Virtuoso } from 'react-virtuoso';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
-import {
-  AIModelOption,
-  useLocalAISettingsStore,
-} from 'state/ui/user/localAISettings';
 import { CreateComment } from 'views/components/Comments/CreateComment';
 import { WithActiveStickyComment } from 'views/components/StickEditorContainer/context/WithActiveStickyComment';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -84,7 +84,7 @@ export const TreeHierarchy = ({
 }: TreeHierarchyProps) => {
   const user = useUserStore();
   const communityId = app.activeChainId() || '';
-  const { selectedModels } = useLocalAISettingsStore();
+  const { selectedModels } = useUserAiSettingsStore();
 
   const isChatMode = commentFilters.sortType === 'oldest';
   const previousChatModeRef = useRef(isChatMode);

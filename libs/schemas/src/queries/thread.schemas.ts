@@ -93,7 +93,7 @@ export const AddressView = Address.extend({
   last_active: z.date().or(z.string()).nullish(),
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
-  User: UserView.optional().nullish() as ZodType<UserView | null | undefined>,
+  User: UserView.nullish() as ZodType<UserView | null | undefined>,
 }).omit({
   oauth_email: true,
   oauth_provider: true,
@@ -128,18 +128,19 @@ export const CommentVersionHistoryView = CommentVersionHistory.extend({
   timestamp: z.date().or(z.string()),
 });
 
-export const CommentView = Comment.extend({
+export const CommentView = Comment.omit({
+  Thread: true,
+  search: true,
+}).extend({
   id: PG_INT,
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
   deleted_at: z.date().or(z.string()).nullish(),
   marked_as_spam_at: z.date().or(z.string()).nullish(),
   Address: AddressView.nullish(),
-  Thread: z.undefined(),
   community_id: z.string(),
   last_active: z.date().or(z.string()).nullish(),
   Reaction: ReactionView.nullish(),
-  search: z.undefined(),
   // this is returned by GetThreads
   address: z.string(),
   profile_name: z.string().optional(),
@@ -179,7 +180,7 @@ export const ThreadView = Thread.extend({
   ContestActions: z.array(ContestActionView).optional(),
   Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
-  search: z.union([z.string(), z.record(z.any())]).nullish(),
+  search: z.union([z.string(), z.record(z.string(), z.any())]).nullish(),
   total_num_thread_results: z
     .number()
     .nullish()
