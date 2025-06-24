@@ -1,4 +1,4 @@
-import { GetPublicEnvVar } from '@hicommonwealth/schemas';
+import { ExtendedCommunity, GetPublicEnvVar } from '@hicommonwealth/schemas';
 import { updateActiveUser } from 'controllers/app/login';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
@@ -9,12 +9,12 @@ import { EventEmitter } from 'events';
 import type IChainAdapter from 'models/IChainAdapter';
 import {
   fetchCustomDomainQuery,
-  fetchPublicEnvVar,
+  fetchPublicEnvVarQuery,
 } from 'state/api/configuration';
 import { errorStore } from 'state/ui/error';
 import { z } from 'zod';
 import SuiAccount from '../controllers/chain/sui/account';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
+import { getCommunityByIdQuery } from './api/communities/getCommuityById';
 import { fetchNodes } from './api/nodes';
 import { fetchStatus } from './api/user/fetchStatus';
 import { userStore } from './ui/user';
@@ -73,7 +73,7 @@ export async function initAppState(
   try {
     const [status, publicEnvVars] = await Promise.all([
       fetchStatus(),
-      fetchPublicEnvVar(),
+      fetchPublicEnvVarQuery(),
       fetchNodes(),
       fetchCustomDomainQuery(),
     ]);
@@ -85,10 +85,10 @@ export async function initAppState(
       if (updateSelectedCommunity && status?.selected_community_id) {
         userStore.getState().setData({
           // TODO: api should be updated to get relevant data
-          activeCommunity: await EXCEPTION_CASE_VANILLA_getCommunityById(
+          activeCommunity: (await getCommunityByIdQuery(
             status.selected_community_id,
             true,
-          ),
+          )) as unknown as z.infer<typeof ExtendedCommunity>,
         });
       }
     }
