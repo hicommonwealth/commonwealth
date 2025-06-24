@@ -1,6 +1,7 @@
 import {
   Broker,
   CustomRetryStrategyError,
+  DlqEventHandler,
   EventContext,
   EventSchemas,
   EventsHandlerMetadata,
@@ -93,9 +94,7 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async init(): Promise<void> {
-    this._log.info(
-      `Rascal connecting to RabbitMQ: ${this._rawVhost.connection}`,
-    );
+    this._log.info('Rascal connecting to RabbitMQ', this._rawVhost.connection);
 
     this.broker = await Rascal.BrokerAsPromised.create(
       Rascal.withDefaultConfig(this._rabbitMQConfig),
@@ -296,6 +295,36 @@ export class RabbitMQAdapter implements Broker {
     }
 
     return false;
+  }
+
+  public async subscribeDlqHandler(handler: DlqEventHandler): Promise<boolean> {
+    if (!this.initialized) {
+      this._log.fatal('Adapter not initialized', undefined);
+      return false;
+    }
+
+    const dlq_handler = await this.broker!.subscribe('dlq_handler');
+    dlq_handler.on('message', (message, content, ackOrNack) => {
+      const death = message.properties.headers['x-death'];
+      if (death && death.length > 0) {
+        const d = death.at(0)!;
+        handler({
+          consumer: d.queue,
+          event_id: +content.id || 0,
+          event_name: content.name || '',
+          reason: d.reason || '',
+          timestamp: d.time.value || 0,
+        })
+          .then(() => ackOrNack())
+          .catch((e) => {
+            this._log.error('[DLQ Handler] Failed to handle DLQ message:', e);
+            ackOrNack(e);
+          });
+      }
+      // ack when x-death is not present?
+      else ackOrNack(new Error('No x-death header present'));
+    });
+    return true;
   }
 
   public getRoutingKey<Name extends Events>(
