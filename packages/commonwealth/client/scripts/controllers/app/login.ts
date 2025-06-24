@@ -29,7 +29,7 @@ import { isSameAccount } from 'helpers';
 import { Magic } from 'magic-sdk';
 import moment from 'moment';
 import app, { initAppState } from 'state';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
+import { getCommunityByIdQuery } from 'state/api/communities/getCommuityById';
 import { SERVER_URL } from 'state/api/config';
 import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
 import { userStore } from 'state/ui/user';
@@ -416,11 +416,10 @@ export async function handleSocialLoginCallback({
   // a page without a chain, in which case we default to an eth login
   let desiredChain = app.chain?.meta;
   if (!desiredChain && chain) {
-    const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
-      chain || '',
-      true,
-    );
-    desiredChain = communityInfo as z.infer<typeof ExtendedCommunity>;
+    const communityInfo = await getCommunityByIdQuery(chain || '', true);
+    desiredChain = communityInfo as unknown as z.infer<
+      typeof ExtendedCommunity
+    >;
   }
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
@@ -553,11 +552,10 @@ export async function handleSocialLoginCallback({
       let chainInfo = userStore.getState().activeCommunity;
 
       if (!chainInfo && chain) {
-        const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
-          chain || '',
-          true,
-        );
-        chainInfo = communityInfo as z.infer<typeof ExtendedCommunity>;
+        const communityInfo = await getCommunityByIdQuery(chain || '', true);
+        chainInfo = communityInfo as unknown as z.infer<
+          typeof ExtendedCommunity
+        >;
       }
 
       chainInfo && (await updateActiveAddresses(chainInfo.id || ''));
