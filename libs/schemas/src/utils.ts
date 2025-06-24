@@ -70,3 +70,10 @@ export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
     });
   }
 }
+
+export const Environments = [
+  'development',
+  'test',
+  'staging',
+  'production',
+] as const;

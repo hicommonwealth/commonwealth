@@ -40,7 +40,8 @@ import { Magic } from 'magic-sdk';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
-import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
+import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
+import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { EIP1193Provider } from 'viem';
@@ -75,8 +76,6 @@ type UseAuthenticationProps = {
   isUserFromWebView?: boolean;
 };
 
-const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Wallet = IWebWallet<any>;
 
@@ -100,6 +99,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const { setState: setEmailDialogState } = usePrivyEmailDialogStore();
 
   const user = useUserStore();
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
+
+  const magic = new Magic(configurationData!.MAGIC_PUBLISHABLE_KEY);
 
   const isWalletConnectEnabled = _.some(
     wallets,
@@ -145,11 +147,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
 
   useEffect(() => {
-    if (process.env.ETH_RPC === 'e2e-test') {
+    if (configurationData!.TEST_EVM_ETH_RPC === 'e2e-test') {
       import('../../../helpers/mockMetaMaskUtil')
         .then((f) => {
           window['ethereum'] = new f.MockMetaMaskProvider(
-            `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_PUBLIC_APP_KEY}`,
+            `https://eth-mainnet.g.alchemy.com/v2/${configurationData!.ALCHEMY_PUBLIC_APP_KEY}`,
             '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
           ) as unknown as EIP1193Provider;
         })
@@ -176,7 +178,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         ),
       );
     }
-  }, []);
+  }, [configurationData]);
 
   const handleSuccess = async (
     authAddress?: string | null | undefined,
@@ -507,11 +509,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      const userAddresses =
-        await DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
-          [account!.profile!.chain],
-          [account!.profile!.address],
-        );
+
+      const userAddresses = await fetchProfilesByAddress(
+        [account!.profile!.chain],
+        [account!.profile!.address],
+      );
+
       const currentUserAddress = userAddresses?.[0];
       if (!currentUserAddress) {
         console.log('No profile yet.');
@@ -522,7 +525,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           currentUserAddress.address,
           currentUserAddress.avatarUrl ?? '',
           account?.profile?.chain,
-          new Date(currentUserAddress.lastActive),
+          new Date(currentUserAddress.lastActive ?? ''),
           0,
         );
       }

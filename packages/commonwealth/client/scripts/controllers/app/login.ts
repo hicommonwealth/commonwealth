@@ -29,24 +29,17 @@ import { isSameAccount } from 'helpers';
 import { Magic } from 'magic-sdk';
 import moment from 'moment';
 import app, { initAppState } from 'state';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
+import { getCommunityByIdQuery } from 'state/api/communities/getCommuityById';
 import { SERVER_URL } from 'state/api/config';
 import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
 import { userStore } from 'state/ui/user';
 import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
-import { fetchCachedCustomDomain } from '../../state/api/configuration/index';
-
-// need to instantiate it early because the farcaster sdk has an async constructor which will cause a race condition
-// if instantiated right before the login is called;
-export const defaultMagic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!, {
-  extensions: [
-    new FarcasterExtension(),
-    new OAuthExtension(),
-    new OAuthExtensionV2(),
-  ],
-});
+import {
+  fetchCachedCustomDomain,
+  fetchCachedPublicEnvVar,
+} from '../../state/api/configuration/index';
 
 function storeActiveAccount(account: Account) {
   const user = userStore.getState();
@@ -248,20 +241,25 @@ export function updateActiveUser(data?: z.infer<(typeof GetStatus)['output']>) {
 }
 
 async function constructMagic(isCosmos: boolean, chain?: string) {
-  if (!isCosmos) {
-    return defaultMagic;
-  }
-
   if (isCosmos && !chain) {
     throw new Error('Must be in a community to sign in with Cosmos magic link');
   }
 
-  if (process.env.MAGIC_PUBLISHABLE_KEY === undefined) {
+  const { MAGIC_PUBLISHABLE_KEY } = fetchCachedPublicEnvVar() || {};
+
+  if (!MAGIC_PUBLISHABLE_KEY) {
     throw new Error('Missing magic key');
   }
 
-  return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
-    extensions: [
+  let extensions: (
+    | OAuthExtension
+    | OAuthExtensionV2
+    | FarcasterExtension
+    | CosmosExtension
+  )[] = [];
+
+  if (isCosmos) {
+    extensions = [
       new OAuthExtension(),
       new OAuthExtensionV2(),
       new CosmosExtension({
@@ -269,7 +267,17 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
         // so we can't use app.chain.meta?.node?.url
         rpcUrl: `${document.location.origin}${SERVER_URL}/magicCosmosProxy/${chain}`,
       }),
-    ],
+    ];
+  } else {
+    extensions = [
+      new FarcasterExtension(),
+      new OAuthExtension(),
+      new OAuthExtensionV2(),
+    ];
+  }
+
+  return new Magic(MAGIC_PUBLISHABLE_KEY, {
+    extensions,
   });
 }
 
@@ -408,11 +416,10 @@ export async function handleSocialLoginCallback({
   // a page without a chain, in which case we default to an eth login
   let desiredChain = app.chain?.meta;
   if (!desiredChain && chain) {
-    const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
-      chain || '',
-      true,
-    );
-    desiredChain = communityInfo as z.infer<typeof ExtendedCommunity>;
+    const communityInfo = await getCommunityByIdQuery(chain || '', true);
+    desiredChain = communityInfo as unknown as z.infer<
+      typeof ExtendedCommunity
+    >;
   }
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
@@ -545,11 +552,10 @@ export async function handleSocialLoginCallback({
       let chainInfo = userStore.getState().activeCommunity;
 
       if (!chainInfo && chain) {
-        const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
-          chain || '',
-          true,
-        );
-        chainInfo = communityInfo as z.infer<typeof ExtendedCommunity>;
+        const communityInfo = await getCommunityByIdQuery(chain || '', true);
+        chainInfo = communityInfo as unknown as z.infer<
+          typeof ExtendedCommunity
+        >;
       }
 
       chainInfo && (await updateActiveAddresses(chainInfo.id || ''));

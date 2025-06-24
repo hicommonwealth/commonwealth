@@ -31,8 +31,6 @@ import setupServer from './server/scripts/setupServer';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const parseJson = json({ limit: '1mb' });
-
 /**
  * Bootstraps express app
  */
@@ -89,18 +87,41 @@ export async function main(
       }
     });
 
-    // redirect to https:// unless we are using a test domain or using 192.168.1.range (local network range)
-    app.use(
-      redirectToHTTPS(
-        [
-          /localhost:(\d{4})/,
-          /127.0.0.1:(\d{4})/,
-          /192.168.1.(\d{1,3}):(\d{4})/,
-        ],
-        [],
-        301,
-      ),
-    );
+    // Disable https redirects on non-prod Railway apps
+    if (
+      config.RAILWAY.RAILWAY_PUBLIC_DOMAIN &&
+      config.APP_ENV !== 'production'
+    ) {
+      log.warn('HTTP -> HTTPS redirects disabled');
+    } else {
+      // redirect to https:// unless we are using a test domain or using 192.168.1.range (local network range)
+      app.use(
+        redirectToHTTPS(
+          [
+            /localhost:(\d{4})/,
+            /127.0.0.1:(\d{4})/,
+            /192.168.1.(\d{1,3}):(\d{4})/,
+          ],
+          [],
+          301,
+        ),
+      );
+    }
+
+    app.use((req, res, next) => {
+      const contentLength = parseInt(req.headers['content-length'] || '0', 10);
+      if (contentLength > 1024 * 1024) {
+        return res.status(413).json({ error: 'Request entity too large' });
+      }
+      next();
+    });
+
+    app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
+    const parseJson = json({ limit: '1mb' });
+    app.use((req, res, next) => {
+      if (req.path.startsWith(`${api.integration.PATH}/chainevent/`)) next();
+      else parseJson(req, res, next);
+    });
 
     // dynamic compression settings used
     app.use(compression());
@@ -177,12 +198,6 @@ export async function main(
         }),
       );
 
-    app.use((req, res, next) => {
-      if (req.path.startsWith(`${api.integration.PATH}/chainevent/`)) next();
-      else parseJson(req, res, next);
-    });
-
-    app.use(urlencoded({ limit: '1mb', extended: false }) as RequestHandler);
     app.use(cookieParser());
     app.use(sessionParser);
     app.use(passport.initialize());

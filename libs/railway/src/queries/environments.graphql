@@ -1,0 +1,39 @@
+query environments($projectId: String!) {
+  environments(projectId: $projectId) {
+    edges {
+      node {
+        id
+        name
+      }
+    }
+  }
+}
+
+mutation environmentCreate($input: EnvironmentCreateInput!) {
+  environmentCreate(input: $input) {
+    id
+    name
+    projectId
+  }
+}
+
+query environment($id: String!) {
+  environment(id: $id) {
+    serviceInstances {
+      edges {
+        node {
+          serviceId
+          serviceName
+        }
+      }
+    }
+  }
+}
+
+mutation variableCollectionUpsert($input: VariableCollectionUpsertInput!) {
+  variableCollectionUpsert(input: $input)
+}
+
+mutation environmentDelete($id: String!) {
+  environmentDelete(id: $id)
+}

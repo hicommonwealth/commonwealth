@@ -55,6 +55,7 @@ export const GetUserProfile = {
     userId: PG_INT.optional(),
   }),
   output: UserProfileView as ZodType<UserProfileView>,
+  context: VerifiedContext,
 };
 
 export const GetUser = {
@@ -227,6 +228,7 @@ export const XpRankedUser = z.object({
 export const GetXpsRanked = {
   input: z.object({
     top: z.number(),
+    search: z.string().optional(),
     quest_id: z
       .number()
       .optional()
