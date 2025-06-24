@@ -7,7 +7,7 @@ module.exports = {
       'Communities',
       'namespace_governance_address',
       {
-        type: Sequelize.TEXT,
+        type: Sequelize.STRING,
         allowNull: true,
       },
     );
