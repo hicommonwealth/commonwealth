@@ -4,14 +4,14 @@ import useFetchCustomDomainQuery, {
 } from './fetchCustomDomain';
 import useFetchPublicEnvVarQuery, {
   fetchCachedPublicEnvVar,
-  fetchPublicEnvVar,
+  fetchPublicEnvVarQuery,
 } from './fetchPublicEnvVar';
 
 export {
   fetchCachedCustomDomain,
   fetchCachedPublicEnvVar,
   fetchCustomDomainQuery,
-  fetchPublicEnvVar,
+  fetchPublicEnvVarQuery,
   useFetchCustomDomainQuery,
   useFetchPublicEnvVarQuery,
 };
