@@ -6,6 +6,7 @@ import {
   LPBondingCurveAbi,
   NamespaceFactoryAbi,
   ReferralFeeManagerAbi,
+  TokenCommunityManagerAbi,
 } from '@commonxyz/common-protocol-abis';
 import {
   EvmEventSignatures,
@@ -344,6 +345,28 @@ const judgeNominatedMapper: EvmMapper<'JudgeNominated'> = (event: EvmEvent) => {
   };
 };
 
+const communityNamespaceCreatedMapper: EvmMapper<
+  'CommunityNamespaceCreated'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: TokenCommunityManagerAbi,
+    eventName: 'CommunityNamespaceCreated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+
+  const { name, token, namespaceAddress, governanceAddress } = decoded.args;
+  return {
+    event_name: 'CommunityNamespaceCreated',
+    event_payload: {
+      name,
+      token,
+      namespaceAddress,
+      governanceAddress,
+    },
+  };
+};
+
 // TODO: type should match EventRegistry event signatures
 export const chainEventMappers: Record<string, EvmMapper<OutboxEvents>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]:
@@ -383,6 +406,10 @@ export const chainEventMappers: Record<string, EvmMapper<OutboxEvents>> = {
     recurringContestVoteMapper,
   [EvmEventSignatures.Contests.SingleContestVoterVoted]:
     singleContestVoteMapper,
+
+  // TokenCommunityManager
+  [EvmEventSignatures.TokenCommunityManager.CommunityNamespaceCreated]:
+    communityNamespaceCreatedMapper,
 
   // User defined events (no hardcoded event signatures)
   XpChainEventCreated: xpChainEventCreatedMapper,
