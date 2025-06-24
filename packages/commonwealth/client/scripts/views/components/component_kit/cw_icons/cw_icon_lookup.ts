@@ -371,6 +371,8 @@ export const customIconLookup = {
   solflare: CustomIcons.CWSolflare,
   sui: CustomIcons.CWSui,
   'sui-wallet': CustomIcons.CWSui,
+  suiet: CustomIcons.CWSuiet,
+  bitget: CustomIcons.CWBitget,
   terrastation: CustomIcons.CWTerraStation2,
   unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,
