@@ -417,7 +417,9 @@ export async function handleSocialLoginCallback({
   let desiredChain = app.chain?.meta;
   if (!desiredChain && chain) {
     const communityInfo = await getCommunityByIdQuery(chain || '', true);
-    desiredChain = communityInfo as z.infer<typeof ExtendedCommunity>;
+    desiredChain = communityInfo as unknown as z.infer<
+      typeof ExtendedCommunity
+    >;
   }
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
@@ -551,7 +553,9 @@ export async function handleSocialLoginCallback({
 
       if (!chainInfo && chain) {
         const communityInfo = await getCommunityByIdQuery(chain || '', true);
-        chainInfo = communityInfo as z.infer<typeof ExtendedCommunity>;
+        chainInfo = communityInfo as unknown as z.infer<
+          typeof ExtendedCommunity
+        >;
       }
 
       chainInfo && (await updateActiveAddresses(chainInfo.id || ''));

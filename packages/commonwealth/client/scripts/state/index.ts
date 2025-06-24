@@ -88,7 +88,7 @@ export async function initAppState(
           activeCommunity: (await getCommunityByIdQuery(
             status.selected_community_id,
             true,
-          )) as z.infer<typeof ExtendedCommunity>,
+          )) as unknown as z.infer<typeof ExtendedCommunity>,
         });
       }
     }

@@ -83,9 +83,9 @@ export const UserStatusCommunityView = z.object({
   name: z.string(),
   icon_url: z.string().nullish(),
   redirect: z.string().nullish(),
-  created_at: z.date().or(z.string()).nullish(),
-  updated_at: z.date().or(z.string()).nullish(),
-  starred_at: z.date().or(z.string()).nullish(),
+  created_at: z.coerce.date().nullish(),
+  updated_at: z.coerce.date().nullish(),
+  starred_at: z.coerce.date().nullish(),
 });
 
 export const GetStatus = {
