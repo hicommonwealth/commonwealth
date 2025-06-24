@@ -107,7 +107,9 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
         true,
       );
 
-      this._chainInfo = communityInfo as z.infer<typeof ExtendedCommunity>;
+      this._chainInfo = communityInfo as unknown as z.infer<
+        typeof ExtendedCommunity
+      >;
     }
 
     const chainId = this._chainInfo?.ChainNode?.eth_chain_id || 1;
