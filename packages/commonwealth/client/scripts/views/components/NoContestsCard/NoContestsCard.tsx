@@ -1,14 +1,14 @@
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { useCommonNavigate } from 'navigation/helpers';
-import './ExploreContestsCard.scss';
+import './NoContestsCard.scss';
 
-const ExploreContestsCard = () => {
+const NoContestsCard = () => {
   const navigate = useCommonNavigate();
   return (
-    <CWCard className="ExploreContestsCard" fullWidth>
+    <CWCard className="NoContestsCard" fullWidth>
       <CWText type="h4" className="title">
         No contests in this community
       </CWText>
@@ -24,4 +24,4 @@ const ExploreContestsCard = () => {
   );
 };
 
-export default ExploreContestsCard;
+export default NoContestsCard;

@@ -7,12 +7,12 @@ import { trpc } from 'utils/trpcClient';
 import { CWText } from 'views/components/component_kit/cw_text';
 import ContestCard from 'views/components/ContestCard';
 import { PotentialContestCard } from 'views/components/PotentialContestCard/PotentialContestCard';
-import ExploreContestsCard from 'views/components/ExploreContestsCard';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import { Skeleton } from 'views/components/Skeleton';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 
+import NoContestsCard from 'client/scripts/views/components/NoContestsCard';
 import './ActiveContestList.scss';
 
 interface ActiveContestListProps {
@@ -43,10 +43,11 @@ const ActiveContestList = ({
   isCommunityHomePage = false,
 }: ActiveContestListProps) => {
   const {
-    contestsData: { active: activeContests },
+    contestsData: { active: activeContests = [] },
     isContestDataLoading,
   } = useCommunityContests({
     fetchAll: true,
+    isCommunityHomePage,
   });
 
   const { communityToken, isLoadingToken, isPinnedToken, isLoadingPricing } =
@@ -117,7 +118,7 @@ const ActiveContestList = ({
         {!isLoading &&
           !shouldRenderPotentialCard &&
           isCommunityHomePage &&
-          !hasActiveContests && <ExploreContestsCard />}
+          !hasActiveContests && <NoContestsCard />}
         {isLoading ? (
           <div className="content">
             <>

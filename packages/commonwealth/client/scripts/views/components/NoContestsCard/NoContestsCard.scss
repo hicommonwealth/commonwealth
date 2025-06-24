@@ -1,6 +1,6 @@
-@use '../../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/colors.module.scss';
 
-.ExploreContestsCard {
+.NoContestsCard {
   display: flex;
   flex-direction: column;
   align-items: center;
