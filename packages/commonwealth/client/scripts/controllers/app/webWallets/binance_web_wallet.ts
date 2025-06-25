@@ -101,7 +101,7 @@ class BinanceWebWalletController implements IWebWallet<string> {
       const Web3 = (await import('web3')).default;
 
       // Binance Chain wallet interface
-      let ethereum = window.ethereum;
+      const ethereum = window.ethereum;
 
       this._web3 = {
         givenProvider: ethereum,
@@ -178,6 +178,7 @@ class BinanceWebWalletController implements IWebWallet<string> {
     } catch (error) {
       let errorMsg = `Failed to enable Binance Wallet: ${error.message}`;
       if (error.code === 4902) {
+        // eslint-disable-next-line max-len
         errorMsg = `Failed to enable Binance Wallet: Please add chain ID ${app?.chain?.meta?.ChainNode?.eth_chain_id || 0}`;
       }
       console.error(errorMsg);
