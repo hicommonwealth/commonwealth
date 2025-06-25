@@ -105,6 +105,7 @@ export enum WalletId {
   OKX = 'okx',
   SuiWallet = 'sui-wallet',
   SuietWallet = 'suiet',
+  Suiet = 'suiet-wallet',
   OkxWallet = 'okx-wallet',
   bitgetWallet = 'bitget',
 }
