@@ -14,6 +14,7 @@ import { filterGates, joinGates, withGates } from './gating';
 
 type GetUserActivityFeedParams = z.infer<typeof schemas.ActivityFeed.input> & {
   user_id?: number;
+  is_admin: boolean;
 };
 
 export const baseActivityQuery = `
@@ -96,13 +97,14 @@ export const baseActivityQuery = `
 
 export async function getUserActivityFeed({
   user_id = 0,
+  is_admin,
   comment_limit,
   limit,
   cursor,
 }: GetUserActivityFeedParams) {
   const offset = (cursor - 1) * limit;
   const query = `
-${withGates()},
+${withGates({ admin_or_moderator: is_admin })},
 user_communities AS (
     SELECT DISTINCT community_id 
     FROM "Addresses" 
@@ -117,14 +119,14 @@ top_threads AS (
     "Threads" T
     ${user_id ? 'JOIN user_communities UC ON UC.community_id = T.community_id' : ''}
     JOIN "Communities" C ON C.id = T.community_id
-    ${joinGates()}
+    ${joinGates({ admin_or_moderator: is_admin })}
   WHERE
     T.deleted_at IS NULL 
     AND T.marked_as_spam_at IS NULL 
     AND C.active IS TRUE 
     AND C.tier != ${CommunityTierMap.SpamCommunity}
     AND C.id NOT IN ('ethereum', 'cosmos', 'polkadot')
-    ${filterGates()}
+    ${filterGates({ admin_or_moderator: is_admin })}
   ORDER BY
     T.activity_rank_date DESC NULLS LAST
   LIMIT :limit OFFSET :offset 

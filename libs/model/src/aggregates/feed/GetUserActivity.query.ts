@@ -11,6 +11,7 @@ export function GetUserActivity(): Query<typeof schemas.ActivityFeed> {
       const { comment_limit = 3, limit = 10, cursor = 1 } = payload;
       return await getUserActivityFeed({
         user_id: actor.user.id,
+        is_admin: actor.user.isAdmin || false,
         comment_limit,
         limit,
         cursor,
