@@ -445,15 +445,18 @@ export type ConsumerHooks = {
   afterHandleEvent: (topic: string, content: any, context: any) => void;
 };
 
-export type Consumer =
-  | {
-      consumer: () => EventsHandlerMetadata<EventSchemas>;
-      worker?: string;
-      retryStrategy?: RetryStrategyFn;
-      hooks?: ConsumerHooks;
-      overrides: Record<string, string | null | undefined>;
-    }
-  | (() => EventsHandlerMetadata<EventSchemas>);
+export type Consumer<T> =
+  T extends EventsHandlerMetadata<infer E>
+    ?
+        | {
+            consumer: () => T;
+            worker?: string;
+            retryStrategy?: RetryStrategyFn;
+            hooks?: ConsumerHooks;
+            overrides?: { [K in keyof E]?: string | null };
+          }
+        | (() => T)
+    : never;
 
 type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
 
@@ -465,6 +468,15 @@ export type RoutingKey =
   | EventNamesType
   | Concat<EventNamesType, RoutingKeyTagsType>;
 
+export type DLQEvent = {
+  consumer: string;
+  event_id: number;
+  event_name: string;
+  reason: string;
+  timestamp: number;
+};
+export type DlqEventHandler = (dlq: DLQEvent) => Promise<void>;
+
 export interface Broker extends Disposable {
   publish<Name extends OutboxEvents>(
     event: EventContext<Name>,
@@ -475,6 +487,8 @@ export interface Broker extends Disposable {
     retryStrategy?: RetryStrategyFn,
     hooks?: ConsumerHooks,
   ): Promise<boolean>;
+
+  subscribeDlqHandler(handler: DlqEventHandler): Promise<boolean>;
 
   getRoutingKey<Name extends Events>(event: EventContext<Name>): RoutingKey;
 }
