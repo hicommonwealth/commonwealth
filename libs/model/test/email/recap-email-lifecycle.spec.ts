@@ -216,6 +216,6 @@ describe('Recap email lifecycle', () => {
           user_id: String(recipientUser!.id),
         },
       }),
-    ).to.eventually.be.rejectedWith(ProviderError);
+    ).rejects.toThrow(ProviderError);
   });
 });
