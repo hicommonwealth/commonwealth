@@ -160,15 +160,6 @@ importers:
       '@vitest/coverage-istanbul':
         specifier: ^1.6.0
         version: 1.6.0(vitest@1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.42.0))
-      chai:
-        specifier: ^4.3.6
-        version: 4.4.1
-      chai-as-promised:
-        specifier: ^7.1.1
-        version: 7.1.1(chai@4.4.1)
-      chai-http:
-        specifier: ^4.3.0
-        version: 4.4.0
       chance:
         specifier: ^1.1.11
         version: 1.1.11
@@ -9659,9 +9650,6 @@ packages:
   '@types/stylis@4.2.5':
     resolution: {integrity: sha512-1Xve+NMN7FWjY14vLoY5tL3BVEQ/n42YLwaqJIPYhotZ9uBHt87VceMwWQpzmdEt2TNXIorIFG+YeCUUW7RInw==}
 
-  '@types/superagent@4.1.13':
-    resolution: {integrity: sha512-YIGelp3ZyMiH0/A09PMAORO0EBGlF5xIKfDpK74wdYvWUs2o96b5CItJcWPdH409b7SAXIIG6p8NdU/4U2Maww==}
-
   '@types/superagent@8.1.9':
     resolution: {integrity: sha512-pTVjI73witn+9ILmoJdajHGW2jkSaOzhiFYF1Rd3EQ94kymLqB9PjD9ISg7WaALC7+dCHT0FGe9T2LktLq/3GQ==}
 
@@ -11461,15 +11449,6 @@ packages:
   centra@2.7.0:
     resolution: {integrity: sha512-PbFMgMSrmgx6uxCdm57RUos9Tc3fclMvhLSATYN39XsDV29B89zZ3KA89jmY0vwSGazyU+uerqwa6t+KaodPcg==}
 
-  chai-as-promised@7.1.1:
-    resolution: {integrity: sha512-azL6xMoi+uxu6z4rhWQ1jbdUhOMhis2PvscD/xjLqNMkv3BPPp2JyyuTHOrf9BOosGpNQ11v6BKv/g57RXbiaA==}
-    peerDependencies:
-      chai: '>= 2.1.2 < 5'
-
-  chai-http@4.4.0:
-    resolution: {integrity: sha512-uswN3rZpawlRaa5NiDUHcDZ3v2dw5QgLyAwnQ2tnVNuP7CwIsOFuYJ0xR1WiR7ymD4roBnJIzOUep7w9jQMFJA==}
-    engines: {node: '>=10'}
-
   chai@4.4.1:
     resolution: {integrity: sha512-13sOfMv2+DWduEU+/xbun3LScLoqN17nBeTLUsmDfKdoiC1fr0n9PU4guu4AhRcOVFk/sW8LyZWHuhWtQZiF+g==}
     engines: {node: '>=4'}
@@ -11519,10 +11498,6 @@ packages:
 
   charenc@0.0.2:
     resolution: {integrity: sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==}
-
-  charset@1.0.1:
-    resolution: {integrity: sha512-6dVyOOYjpfFcL1Y4qChrAoQLRHvj2ziyhcm0QJlhOcAhykL/k1kTUPbeo+87MNRTRdk2OIIsIXbuF3x2wi5EXg==}
-    engines: {node: '>=4.0.0'}
 
   check-error@1.0.3:
     resolution: {integrity: sha512-iKEoDYaRmd1mxM90a2OEfWhjsjPpYPuQ+lMYsoxB126+t8fw7ySEO48nmDg5COTjxDI65/Y2OWpeEHk3ZOe8zg==}
@@ -13621,10 +13596,6 @@ packages:
     resolution: {integrity: sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==}
     engines: {node: '>=12.20.0'}
 
-  formidable@2.1.2:
-    resolution: {integrity: sha512-CM3GuJ57US06mlpQ47YcunuUZ9jpm8Vx+P2CGt2j7HpgkKZO/DJYQ0Bobim8G6PFQmK5lOqOOdUXboU+h73A4g==}
-    deprecated: 'ACTION REQUIRED: SWITCH TO v3 - v1 and v2 are VULNERABLE! v1 is DEPRECATED FOR OVER 2 YEARS! Use formidable@latest or try formidable-mini for fresh projects'
-
   formidable@3.5.4:
     resolution: {integrity: sha512-YikH+7CUTOtP44ZTnUhR7Ic2UASBPOqmaRkRKxRbywPTe5VxF7RRCck4af9wutiZ/QKM5nME9Bie2fFaPz5Gug==}
     engines: {node: '>=14.0.0'}
@@ -14180,10 +14151,6 @@ packages:
     resolution: {integrity: sha512-Ox1pJVrDCyGHMG9CFg1tmrRUMRPRsAWYc/PinY0XzJU4K7y7vjNoLKIQ7BR5UJMCxNN8EM1MNDmHWA/B3aZUuw==}
     engines: {node: '>=6'}
 
-  hexoid@1.0.0:
-    resolution: {integrity: sha512-QFLV0taWQOZtvIRIAdBChesmogZrtuXvVWsFHZTk2SU+anspqZ2vMnoLg7IE1+Uk16N19APic1BuF8bC8c2m5g==}
-    engines: {node: '>=8'}
-
   hey-listen@1.0.8:
     resolution: {integrity: sha512-COpmrF2NOg4TBWUJ5UVyaCU2A88wEMkUPK4hNqyCkqHbxT92BbvfjoSozkAIIm6XhicGlJHhFdullInrdhwU8Q==}
 
@@ -14676,10 +14643,6 @@ packages:
   is-interactive@2.0.0:
     resolution: {integrity: sha512-qP1vozQRI+BMOPcjFzrjXuQvdak2pHNUMZoeG2eRbiSqyvbEf/wQtEOTOX1guk6E3t36RkaqiSt8A/6YElNxLQ==}
     engines: {node: '>=12'}
-
-  is-ip@2.0.0:
-    resolution: {integrity: sha512-9MTn0dteHETtyUx8pxqMwg5hMBi3pvlyglJ+b79KOCca0po23337LbVV2Hl4xmMvfw++ljnO0/+5G6G+0Szh6g==}
-    engines: {node: '>=4'}
 
   is-ipfs@8.0.4:
     resolution: {integrity: sha512-upkO6a8WgBSZMMmuPzmF2NQLWXtiJtHxdEfEiMWrOzCKoZ+XEiM0XlK4fFMfo/PyiRmPMJ4PsNrXyvJeqMrJXA==}
@@ -19580,11 +19543,6 @@ packages:
     resolution: {integrity: sha512-O+PCv11lgTNJUzy49teNAWLjBZfc+A1enOwTpLlH6/rsvKcTwcdTT8m9azGkVqM7HBl5jpyZ7KTPhHweokBcdg==}
     engines: {node: '>=14.18.0'}
 
-  superagent@8.1.2:
-    resolution: {integrity: sha512-6WTxW1EB6yCxV5VFOIPQruWGHqc3yI7hEmZK6h+pyk69Lk/Ut7rLUY6W/ONF2MjBuGjvmMiIpsrVJ2vjrHlslA==}
-    engines: {node: '>=6.4.0 <13 || >=14'}
-    deprecated: Please upgrade to v9.0.0+ as we have fixed a public vulnerability with formidable dependency. Note that v9.0.0+ requires Node.js v14.18.0+. See https://github.com/ladjs/superagent/pull/1800 for insight. This project is supported and maintained by the team at Forward Email @ https://forwardemail.net
-
   superstruct@0.14.2:
     resolution: {integrity: sha512-nPewA6m9mR3d6k7WkZ8N8zpTWfenFH3q9pA2PkuiZxINr9DKB2+40wEQf0ixn8VaGuJ78AB6iWOtStI+/4FKZQ==}
 
@@ -22276,7 +22234,7 @@ snapshots:
       '@babel/traverse': 7.25.6
       '@babel/types': 7.25.2
       convert-source-map: 2.0.0
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.1
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -24530,7 +24488,7 @@ snapshots:
       '@babel/parser': 7.25.3
       '@babel/template': 7.25.0
       '@babel/types': 7.25.2
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.1
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -24542,7 +24500,7 @@ snapshots:
       '@babel/parser': 7.25.6
       '@babel/template': 7.25.0
       '@babel/types': 7.25.6
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.1
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -35417,11 +35375,6 @@ snapshots:
 
   '@types/stylis@4.2.5': {}
 
-  '@types/superagent@4.1.13':
-    dependencies:
-      '@types/cookiejar': 2.1.5
-      '@types/node': 20.12.10
-
   '@types/superagent@8.1.9':
     dependencies:
       '@types/cookiejar': 2.1.5
@@ -35528,7 +35481,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.33.1(typescript@5.8.2)
       '@typescript-eslint/types': 8.33.1
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.1
       typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
@@ -35568,7 +35521,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 8.3.0(typescript@5.8.2)
       '@typescript-eslint/utils': 8.3.0(eslint@8.57.0)(typescript@5.8.2)
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.1
       ts-api-utils: 1.3.0(typescript@5.8.2)
     optionalDependencies:
       typescript: 5.8.2
@@ -35601,7 +35554,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.3.0
       '@typescript-eslint/visitor-keys': 8.3.0
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.1
       fast-glob: 3.3.2
       is-glob: 4.0.3
       minimatch: 9.0.4
@@ -35618,7 +35571,7 @@ snapshots:
       '@typescript-eslint/tsconfig-utils': 8.33.1(typescript@5.8.2)
       '@typescript-eslint/types': 8.33.1
       '@typescript-eslint/visitor-keys': 8.33.1
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.1
       fast-glob: 3.3.2
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -39270,24 +39223,6 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  chai-as-promised@7.1.1(chai@4.4.1):
-    dependencies:
-      chai: 4.4.1
-      check-error: 1.0.3
-
-  chai-http@4.4.0:
-    dependencies:
-      '@types/chai': 4.3.16
-      '@types/superagent': 4.1.13
-      charset: 1.0.1
-      cookiejar: 2.1.4
-      is-ip: 2.0.0
-      methods: 1.1.2
-      qs: 6.12.1
-      superagent: 8.1.2
-    transitivePeerDependencies:
-      - supports-color
-
   chai@4.4.1:
     dependencies:
       assertion-error: 1.1.0
@@ -39360,8 +39295,6 @@ snapshots:
   chardet@0.7.0: {}
 
   charenc@0.0.2: {}
-
-  charset@1.0.1: {}
 
   check-error@1.0.3:
     dependencies:
@@ -40220,6 +40153,10 @@ snapshots:
       ms: 2.1.2
 
   debug@4.3.7:
+    dependencies:
+      ms: 2.1.3
+
+  debug@4.4.1:
     dependencies:
       ms: 2.1.3
 
@@ -42362,13 +42299,6 @@ snapshots:
     dependencies:
       fetch-blob: 3.2.0
 
-  formidable@2.1.2:
-    dependencies:
-      dezalgo: 1.0.4
-      hexoid: 1.0.0
-      once: 1.4.0
-      qs: 6.14.0
-
   formidable@3.5.4:
     dependencies:
       '@paralleldrive/cuid2': 2.2.2
@@ -43039,8 +42969,6 @@ snapshots:
 
   hex-rgb@4.3.0: {}
 
-  hexoid@1.0.0: {}
-
   hey-listen@1.0.8: {}
 
   highlight-words-core@1.2.2: {}
@@ -43126,7 +43054,7 @@ snapshots:
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
 
@@ -43178,7 +43106,7 @@ snapshots:
   https-proxy-agent@7.0.6:
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
 
@@ -43544,10 +43472,6 @@ snapshots:
   is-interactive@1.0.0: {}
 
   is-interactive@2.0.0: {}
-
-  is-ip@2.0.0:
-    dependencies:
-      ip-regex: 2.1.0
 
   is-ipfs@8.0.4:
     dependencies:
@@ -50163,21 +50087,6 @@ snapshots:
       methods: 1.1.2
       mime: 2.6.0
       qs: 6.14.0
-    transitivePeerDependencies:
-      - supports-color
-
-  superagent@8.1.2:
-    dependencies:
-      component-emitter: 1.3.1
-      cookiejar: 2.1.4
-      debug: 4.3.5
-      fast-safe-stringify: 2.1.1
-      form-data: 4.0.0
-      formidable: 2.1.2
-      methods: 1.1.2
-      mime: 2.6.0
-      qs: 6.12.1
-      semver: 7.6.3
     transitivePeerDependencies:
       - supports-color
 
