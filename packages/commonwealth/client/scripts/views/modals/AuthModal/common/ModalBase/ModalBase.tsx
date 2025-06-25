@@ -177,6 +177,21 @@ const ModalBase = ({
   const solanaWallets = filterWalletNames(ChainBase.Solana);
   const substrateWallets = filterWalletNames(ChainBase.Substrate);
   const suiWallets = filterWalletNames(ChainBase.Sui);
+  const getEVMWallets = () => {
+    const configEvmWallets: string[] = [];
+    if (partnershipWalletEnabled) {
+      if (isOkxWalletAvailable) {
+        configEvmWallets.push('okx');
+      }
+      if (isBinanceWalletAvailable) {
+        configEvmWallets.push('binance');
+      }
+    }
+    if (hasWalletConnect) {
+      configEvmWallets.push('walletconnect');
+    }
+    return configEvmWallets;
+  };
   const getWalletNames = () => {
     // Wallet Display Logic:
     // 1. When `showWalletsFor` is present, show wallets for that specific chain only.
@@ -192,17 +207,7 @@ const ModalBase = ({
     if (showWalletsForSpecificChains) {
       switch (showWalletsForSpecificChains) {
         case ChainBase.Ethereum: {
-          const configEvmWallets: string[] = [];
-          if (isOkxWalletAvailable && partnershipWalletEnabled) {
-            configEvmWallets.push('okx');
-          }
-          if (isBinanceWalletAvailable) {
-            configEvmWallets.push('binance');
-          }
-          if (hasWalletConnect) {
-            configEvmWallets.push('walletconnect');
-          }
-          return configEvmWallets;
+          return getEVMWallets();
         }
         case ChainBase.CosmosSDK:
           return cosmosWallets;
@@ -218,16 +223,7 @@ const ModalBase = ({
     }
 
     if (!app?.chain?.base) {
-      const configEvmWallets: string[] = [];
-      if (isOkxWalletAvailable && partnershipWalletEnabled) {
-        configEvmWallets.push('okx');
-      }
-      if (isBinanceWalletAvailable) {
-        configEvmWallets.push('binance');
-      }
-      if (hasWalletConnect) {
-        configEvmWallets.push('walletconnect');
-      }
+      const configEvmWallets = getEVMWallets();
       return [
         ...configEvmWallets,
         ...cosmosWallets,
