@@ -121,13 +121,13 @@ describe('Stake lifecycle', () => {
     expect(results?.results?.at(0)?.id).to.eq(id_with_stake);
   });
 
-  test('should fail set when community namespace not configured', () => {
-    expect(
+  test('should fail set when community namespace not configured', async () => {
+    await expect(
       command(SetCommunityStake(), {
         actor,
         payload: { ...payload, community_id: id_with_stake },
       }),
-    ).to.eventually.be.rejected;
+    ).rejects.toThrow();
   });
 
   test('should set and get community stake', async () => {
@@ -160,27 +160,26 @@ describe('Stake lifecycle', () => {
   });
 
   test('should fail set when community not found', async () => {
-    expect(
+    await expect(
       command(SetCommunityStake(), {
         actor,
         payload: { ...payload, community_id: 'does-not-exist' },
       }),
-    ).to.eventually.be.rejectedWith(InvalidActor);
+    ).rejects.toThrow(InvalidActor);
   });
 
-  // NOTE 8/8/24: This test seems like a duplicate of
-  // "should fail set when community namespace not configured"
-  // but with stricter requirements for the rejection state.
-  test.skip('should fail set when community stake has been configured', () => {
-    expect(
-      command(SetCommunityStake(), {
+  test('should fail set when community stake has been configured', async () => {
+    try {
+      await command(SetCommunityStake(), {
         actor,
         payload: { ...payload, community_id: id_with_stake },
-      }),
-    ).to.eventually.be.rejectedWith(
-      InvalidState,
-      `Stake 1 already configured in community ${id_with_stake}`,
-    );
+      });
+      throw new Error('Expected to throw');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      expect(err).toBeInstanceOf(InvalidState);
+      expect(err.message).toBe(`Community stake already configured`);
+    }
   });
 
   test('should get empty result when community stake not configured', async () => {

@@ -164,6 +164,6 @@ describe('snapshotProposalCreated Event Handler', () => {
           id: proposalId,
         } as z.infer<typeof schemas.events.SnapshotProposalCreated>,
       }),
-    ).to.eventually.be.rejectedWith(ProviderError);
+    ).rejects.toThrow(ProviderError);
   });
 });

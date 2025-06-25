@@ -165,7 +165,7 @@ describe('Seed functions', () => {
     test('Should not mock data', async () => {
       expect(shouldExit).to.be.false;
       shouldExit = true;
-      expect(
+      await expect(
         seed(
           'Community',
           {
@@ -174,7 +174,7 @@ describe('Seed functions', () => {
           },
           { mock: false },
         ),
-      ).to.eventually.be.rejectedWith(ValidationError);
+      ).rejects.toThrow(ValidationError);
       shouldExit = false;
     });
   });

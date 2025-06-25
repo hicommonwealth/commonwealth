@@ -165,6 +165,6 @@ describe('userMentioned Event Handler', () => {
           thread,
         },
       }),
-    ).to.eventually.be.rejectedWith(ProviderError);
+    ).rejects.toThrow(ProviderError);
   });
 });
