@@ -3,15 +3,16 @@ import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
+import { authOptionalVerified } from '../../middleware';
 import { filterGates, joinGates, withGates } from '../../utils/gating';
 import { baseActivityQuery } from '../../utils/getUserActivityFeed';
 
 export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
   return {
     ...schemas.GlobalFeed,
-    auth: [],
-    secure: false,
-    body: async ({ payload }) => {
+    auth: [authOptionalVerified],
+    secure: true,
+    body: async ({ actor, payload }) => {
       const {
         comment_limit = 3,
         limit = 10,
@@ -28,8 +29,12 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
         { order: 'ASC' },
       );
 
+      const gating = {
+        admin_or_moderator: actor.user.isAdmin || false,
+      };
+
       const whereConditions = [
-        filterGates(),
+        filterGates(gating),
         community_id ? 'AND T.community_id = :community_id' : '',
         search ? 'AND T.title ILIKE :search' : '',
       ]
@@ -45,7 +50,7 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
 
       // TODO: add deleted_at, marked_as_spam_at and default community filters?
       const query = `
-        ${withGates()},
+        ${withGates(gating)},
         top_threads AS (
           SELECT
             T.*,
@@ -53,7 +58,7 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
           FROM
             "Threads" T
             JOIN "Communities" C ON C.id = T.community_id
-            ${joinGates()}
+            ${joinGates(gating)}
           WHERE
             T.id IN (:threadIds)
             ${whereConditions}

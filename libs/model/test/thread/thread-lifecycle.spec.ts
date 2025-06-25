@@ -932,6 +932,7 @@ describe('Thread lifecycle', () => {
           include_reactions: true,
           include_spam_comments: true,
           order_by: 'oldest',
+          is_chat_mode: true,
         },
       });
       expect(response!.results.length).to.equal(5);
@@ -966,6 +967,7 @@ describe('Thread lifecycle', () => {
           include_reactions: true,
           include_spam_comments: true,
           order_by: 'oldest',
+          is_chat_mode: true,
         },
       });
       const second = response2!.results.at(0)!;
@@ -982,6 +984,7 @@ describe('Thread lifecycle', () => {
           include_reactions: false,
           include_spam_comments: true,
           order_by: 'oldest',
+          is_chat_mode: true,
         },
       });
       expect(response!.results.length).to.equal(5);
@@ -1005,6 +1008,7 @@ describe('Thread lifecycle', () => {
           include_reactions: false,
           include_spam_comments: true,
           order_by: 'newest',
+          is_chat_mode: false,
         },
       });
       const second = response2!.results.at(0)!;

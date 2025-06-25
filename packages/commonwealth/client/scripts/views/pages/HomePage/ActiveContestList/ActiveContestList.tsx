@@ -12,6 +12,7 @@ import { Skeleton } from 'views/components/Skeleton';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 
+import NoContestsCard from 'client/scripts/views/components/NoContestsCard';
 import './ActiveContestList.scss';
 
 interface ActiveContestListProps {
@@ -42,9 +43,8 @@ const ActiveContestList = ({
   isCommunityHomePage = false,
 }: ActiveContestListProps) => {
   const {
-    contestsData: { active: activeContests, suggested: suggestedContest },
+    contestsData: { active: activeContests = [] },
     isContestDataLoading,
-    isSuggestedMode,
   } = useCommunityContests({
     fetchAll: true,
     isCommunityHomePage,
@@ -68,11 +68,7 @@ const ActiveContestList = ({
   const shouldRenderPotentialCard =
     showPotentialCardCase1 || showPotentialCardCase2;
 
-  const activeContestsLimited = isCommunityHomePage
-    ? activeContests.length > 0
-      ? activeContests.slice(0, 3)
-      : suggestedContest.slice(0, 3) || []
-    : activeContests.slice(0, 3);
+  const activeContestsLimited = activeContests.slice(0, 3);
 
   const communityIds = [
     ...new Set(activeContestsLimited.map((contest) => contest.community_id)),
@@ -109,9 +105,6 @@ const ActiveContestList = ({
           </div>
         </Link>
       </div>
-      {isSuggestedMode && !shouldRenderPotentialCard && (
-        <CWText type="h5">Suggested</CWText>
-      )}
       <>
         {shouldRenderPotentialCard && <PotentialContestCard />}
         {!isLoading &&
@@ -122,6 +115,10 @@ const ActiveContestList = ({
               No active contests found
             </CWText>
           )}
+        {!isLoading &&
+          !shouldRenderPotentialCard &&
+          isCommunityHomePage &&
+          !hasActiveContests && <NoContestsCard />}
         {isLoading ? (
           <div className="content">
             <>
