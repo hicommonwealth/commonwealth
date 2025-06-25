@@ -168,7 +168,7 @@ SELECT
       t.deleted_at IS NULL 
   ) AS threads
 , (
-  SELECT json_agg(
+  SELECT COALESCE(json_agg(
     jsonb_build_object(
       'id', c.id,
       'thread_id', c.thread_id,
@@ -192,12 +192,12 @@ SELECT
         'community_id', c.community_id
       )
     )
-  )
+  ), '[]'::json)
   FROM comments c
 ) as comments
 , (
 	SELECT
-	  json_agg(jsonb_build_object(
+	 COALESCE(json_agg(jsonb_build_object(  
 	    'id', t.id,
 	    'address_id', a.id,
 	    'community_id', a.community_id,
@@ -228,7 +228,7 @@ SELECT
 	        'tier', u.tier            
 	      )
 	    )
-	  ))
+	  )), '[]'::json)
 	FROM
 	  comments c
 	  JOIN "Threads" t ON c.thread_id = t.id
