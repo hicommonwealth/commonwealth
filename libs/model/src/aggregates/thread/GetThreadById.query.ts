@@ -15,19 +15,26 @@ export function GetThreadById(): Query<typeof schemas.GetThreadById> {
       const { thread_id } = payload;
       const address_id = context?.address?.id;
 
+      const gating = {
+        address_id,
+        admin_or_moderator:
+          actor.user.isAdmin ||
+          ['admin', 'moderator'].includes(context?.address?.role || ''),
+      };
+
       // find open gates in thread's community
       const [open_thread] = await sequelize.query<{
         id: number;
       }>(
         `
-        ${withGates(address_id)}
+        ${withGates(gating)}
         SELECT T.id
         FROM
           "Threads" T
-          ${joinGates(address_id)}
+          ${joinGates(gating)}
         WHERE
           T.id = :thread_id
-          ${filterGates(address_id)}
+          ${filterGates(gating)}
         `,
         {
           type: QueryTypes.SELECT,
