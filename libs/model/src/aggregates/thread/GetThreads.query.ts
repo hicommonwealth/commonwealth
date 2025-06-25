@@ -11,7 +11,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
     ...schemas.GetThreads,
     auth: [authOptional],
     secure: true,
-    body: async ({ context, payload }) => {
+    body: async ({ actor, context, payload }) => {
       const {
         community_id,
         stage,
@@ -70,8 +70,15 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         all: '',
       };
 
+      const gating = {
+        address_id,
+        admin_or_moderator:
+          actor.user.isAdmin ||
+          ['admin', 'moderator'].includes(context?.address?.role || ''),
+      };
+
       const sql = `
-            ${withGates(address_id)},
+            ${withGates(gating)},
             contest_ids as (
               SELECT DISTINCT(CA.thread_id)
               FROM "Contests" CON
@@ -115,12 +122,12 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 (COUNT(id) OVER())::INTEGER AS total_num_thread_results
               FROM
                 "Threads" T
-                ${joinGates(address_id)}
+                ${joinGates(gating)}
               WHERE
                 community_id = :community_id
                 AND deleted_at IS NULL
                 AND archived_at IS ${archived ? 'NOT' : ''} NULL
-                ${filterGates(address_id)}
+                ${filterGates(gating)}
                 ${topic_id ? ' AND T.topic_id = :topic_id' : ''}
                 ${stage ? ' AND stage = :stage' : ''}
                 ${from_date ? ' AND T.created_at > :from_date' : ''}
