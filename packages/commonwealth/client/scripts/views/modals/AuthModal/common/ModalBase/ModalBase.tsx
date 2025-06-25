@@ -177,7 +177,7 @@ const ModalBase = ({
   const solanaWallets = filterWalletNames(ChainBase.Solana);
   const substrateWallets = filterWalletNames(ChainBase.Substrate);
   const suiWallets = filterWalletNames(ChainBase.Sui);
-  const getEVMWallets = () => {
+  const getEVMWalletsForMainModal = () => {
     const configEvmWallets: string[] = [];
     if (partnershipWalletEnabled) {
       if (isOkxWalletAvailable) {
@@ -190,6 +190,21 @@ const ModalBase = ({
     if (hasWalletConnect) {
       configEvmWallets.push('walletconnect');
     }
+    return configEvmWallets;
+  };
+  const getEVMWalletsForEVMSubModal = () => {
+    const configEvmWallets: string[] = [
+      // to ensure it always comes first
+      ...(evmWallets.includes('walletconnect') ? ['walletconnect'] : []),
+      ...evmWallets.filter((x) => {
+        if (!partnershipWalletEnabled) {
+          if (x === 'okx' || x === 'binance') return false;
+        }
+
+        return x !== 'walletconnect';
+      }),
+    ];
+
     return configEvmWallets;
   };
   const getWalletNames = () => {
@@ -207,7 +222,7 @@ const ModalBase = ({
     if (showWalletsForSpecificChains) {
       switch (showWalletsForSpecificChains) {
         case ChainBase.Ethereum: {
-          return getEVMWallets();
+          return getEVMWalletsForMainModal();
         }
         case ChainBase.CosmosSDK:
           return cosmosWallets;
@@ -223,7 +238,7 @@ const ModalBase = ({
     }
 
     if (!app?.chain?.base) {
-      const configEvmWallets = getEVMWallets();
+      const configEvmWallets = getEVMWalletsForMainModal();
       return [
         ...configEvmWallets,
         ...cosmosWallets,
@@ -476,10 +491,7 @@ const ModalBase = ({
       </section>
       <EVMWalletsSubModal
         availableWallets={
-          [
-            ...(evmWallets.includes('walletconnect') ? ['walletconnect'] : []),
-            ...evmWallets.filter((x) => x !== 'walletconnect'),
-          ].filter((wallet) =>
+          getEVMWalletsForEVMSubModal().filter((wallet) =>
             showAuthOptionFor ? wallet === showAuthOptionFor : true,
           ) as EVMWallets[]
         }
