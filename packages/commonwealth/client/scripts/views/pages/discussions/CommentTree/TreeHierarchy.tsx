@@ -347,6 +347,9 @@ export const TreeHierarchy = ({
       return (
         <CWButton
           containerClassName="m-auto"
+          buttonType="secondary"
+          buttonHeight="sm"
+          buttonWidth="narrow"
           label="Load replies"
           disabled={isLoadingComments || isInitialCommentsLoading}
           onClick={() => setLoadButtonClicked(true)}
