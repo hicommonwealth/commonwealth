@@ -55,7 +55,10 @@ export type TreeHierarchyProps = Pick<
   CommentsTreeProps,
   'pageRef' | 'thread' | 'permissions'
 > & {
-  parentCommentId?: number;
+  parentComment?: {
+    id: number;
+    level: number;
+  };
   isThreadLocked: boolean;
   isThreadArchived: boolean;
   isReplyingToCommentId?: number;
