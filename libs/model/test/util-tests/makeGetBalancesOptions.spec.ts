@@ -5,7 +5,6 @@ import {
   makeGetBalancesOptions,
 } from '@hicommonwealth/model';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import {} from 'chai';
 import { describe, expect, test } from 'vitest';
 
 describe('makeGetBalancesOptions', () => {

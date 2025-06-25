@@ -5,7 +5,7 @@ import {
   numUnrelayedEvents,
   resetNumUnrelayedEvents,
 } from 'server/bindings/relayForever';
-import { afterEach, describe, test } from 'vitest';
+import { afterEach, describe, expect, test } from 'vitest';
 import { startMessageRelayer } from '../../../server/workers/messageRelayer/messageRelayer';
 import { testOutboxEvents } from './util';
 

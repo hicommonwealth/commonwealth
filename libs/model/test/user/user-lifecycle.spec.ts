@@ -19,6 +19,8 @@ import {
 import {
   CreateGroup,
   RefreshCommunityMemberships,
+  UpdateRole,
+  UpdateRoleErrors,
 } from '../../src/aggregates/community';
 import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
 import { CreateThread } from '../../src/aggregates/thread';
@@ -1021,6 +1023,71 @@ describe('User lifecycle', () => {
       // new_user has 16 for SignUpFlowCompleted
       // member has 10 for WalletLinked and 4 for SignUpFlowCompleted as referrer
       expect(xps2?.map((x) => x.xp_points)).to.deep.eq([16, 14]);
+    });
+  });
+
+  describe('roles', () => {
+    it('should fail to update to unknown role', async () => {
+      expect(
+        command(UpdateRole(), {
+          actor: superadmin,
+          payload: {
+            community_id,
+            address: member.address!,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            role: 'unknown' as any,
+          },
+        }),
+      ).rejects.toThrowError();
+    });
+
+    it('should update a member to a moderator', async () => {
+      const updated = await command(UpdateRole(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          address: member.address!,
+          role: 'moderator',
+        },
+      });
+      expect(updated?.role).to.equal('moderator');
+    });
+
+    it('should update a moderator to a member', async () => {
+      const updated = await command(UpdateRole(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          address: member.address!,
+          role: 'member',
+        },
+      });
+      expect(updated?.role).to.equal('member');
+    });
+
+    it('should fail to update an admin to a member if there is no other admin', async () => {
+      await expect(
+        command(UpdateRole(), {
+          actor: admin,
+          payload: {
+            community_id,
+            address: admin.address!,
+            role: 'member',
+          },
+        }),
+      ).rejects.toThrowError(UpdateRoleErrors.MustHaveAdmin);
+    });
+
+    it('should update a member to an admin', async () => {
+      const updated = await command(UpdateRole(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          address: admin.address!,
+          role: 'admin',
+        },
+      });
+      expect(updated?.role).to.equal('admin');
     });
   });
 });
