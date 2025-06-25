@@ -63,8 +63,6 @@
     "@types/amqplib": "^0.8.2",
     "@types/bn.js": "^4.11.6",
     "@types/bs58": "^4.0.1",
-    "@types/chai": "^4.2.11",
-    "@types/chai-as-promised": "^7.1.8",
     "@types/chance": "^1.1.6",
     "@types/compression": "^1.7.5",
     "@types/cookie-parser": "^1.4.6",
