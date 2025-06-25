@@ -8,8 +8,6 @@ import {
   query,
 } from '@hicommonwealth/core';
 import { CommunityTierMap } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import {
   GetCommunities,
@@ -18,8 +16,6 @@ import {
 } from '../../src/aggregates/community';
 import { commonProtocol } from '../../src/services';
 import { seed } from '../../src/tester';
-
-chai.use(chaiAsPromised);
 
 describe('Stake lifecycle', () => {
   let id_with_stake: string;

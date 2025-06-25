@@ -10,8 +10,6 @@ import {
   CommunityTierMap,
   safeTruncateBody,
 } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   Mock,
   afterAll,
@@ -31,8 +29,6 @@ import {
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
 } from '../utils/mockedNotificationProvider';
-
-chai.use(chaiAsPromised);
 
 describe('userMentioned Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;

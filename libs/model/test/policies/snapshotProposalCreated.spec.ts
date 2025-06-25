@@ -6,8 +6,6 @@ import {
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { CommunityTierMap, SnapshotEventType } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   Mock,
   afterAll,
@@ -28,8 +26,6 @@ import {
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
 } from '../utils/mockedNotificationProvider';
-
-chai.use(chaiAsPromised);
 
 const space = 'dydxgov.eth';
 const proposalId = '0x1';

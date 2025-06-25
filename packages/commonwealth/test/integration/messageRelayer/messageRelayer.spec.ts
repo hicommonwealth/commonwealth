@@ -1,7 +1,6 @@
 import { disposeAdapter } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { delay } from '@hicommonwealth/shared';
-import { expect } from 'chai';
 import {
   numUnrelayedEvents,
   resetNumUnrelayedEvents,

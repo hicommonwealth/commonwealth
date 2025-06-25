@@ -7,8 +7,6 @@ import {
 } from '@hicommonwealth/core';
 import { Comment, Community, Thread, User } from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   afterAll,
   afterEach,
@@ -31,8 +29,6 @@ import {
   generateGovernanceData,
   generateProtocolData,
 } from './util';
-
-chai.use(chaiAsPromised);
 
 describe('Recap email lifecycle', () => {
   let community: z.infer<typeof Community> | undefined;

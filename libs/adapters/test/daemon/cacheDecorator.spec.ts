@@ -5,8 +5,6 @@ import {
   dispose,
   disposeAdapter,
 } from '@hicommonwealth/core';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   Mocked,
   afterAll,
@@ -19,7 +17,6 @@ import {
 } from 'vitest';
 import { CacheDecorator } from '../../src/redis';
 import { CacheKeyDuration } from '../../src/utils';
-chai.use(chaiAsPromised);
 
 describe('CacheDecorator', () => {
   let cacheDecorator: CacheDecorator;
