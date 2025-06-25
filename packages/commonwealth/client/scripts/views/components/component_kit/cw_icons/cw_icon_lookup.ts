@@ -373,6 +373,7 @@ export const customIconLookup = {
   'sui-wallet': CustomIcons.CWSui,
   suiet: CustomIcons.CWSuiet,
   bitget: CustomIcons.CWBitget,
+  'okx-wallet': CustomIcons.CWOKX,
   terrastation: CustomIcons.CWTerraStation2,
   unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,

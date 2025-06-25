@@ -1271,7 +1271,7 @@ export const CWSuiet = (props: CustomIconProps) => {
           gradientUnits="userSpaceOnUse"
           gradientTransform="translate(-9.65777e-07 7.40741) rotate(44.2296) scale(73.6278 73.7446)"
         >
-          <stop stop-color="#0058DD" />
+          <stop stopColor="#0058DD" />
           <stop offset="1" stopColor="#67C8FF" />
         </radialGradient>
       </defs>
