@@ -455,7 +455,7 @@ describe('CacheDecorator', () => {
           duration,
           CacheNamespaces.Function_Response,
         );
-        await expect(wrapFn()).to.be.rejectedWith('test-error');
+        await expect(wrapFn()).rejects.toThrow('test-error');
 
         // expect(result).to.equal('test-result');
         expect(mockCache.getKey).toHaveBeenCalledOnce();
