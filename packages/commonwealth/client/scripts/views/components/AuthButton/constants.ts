@@ -89,7 +89,7 @@ export const AUTH_TYPES: AuthTypesList = {
       hasBackground: false,
     },
   },
-  'suiet-wallet': {
+  suiet: {
     icon: {
       name: 'suiet',
       isCustom: true,
@@ -111,7 +111,7 @@ export const AUTH_TYPES: AuthTypesList = {
       hasBackground: false,
     },
   },
-  'bitget-wallet': {
+  bitget: {
     icon: {
       name: 'bitget',
       isCustom: true,
