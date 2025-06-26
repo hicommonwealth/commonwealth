@@ -746,12 +746,22 @@ describe('Community lifecycle', () => {
           directory_page_enabled: true,
           directory_page_chain_node_id: ethNode.id,
           type: ChainType.Offchain,
+          name: `${new Date().getTime()}`,
+          description: `${new Date().getTime()}`,
+          social_links: ['http://discord.gg', 'https://t.me/'],
         },
       });
 
       assert.equal(updated?.directory_page_enabled, true);
       assert.equal(updated?.directory_page_chain_node_id, ethNode.id);
       assert.equal(updated?.type, 'offchain');
+      assert.equal(updated?.default_symbol, 'EDG');
+      // don't allow updating base
+      assert.equal(updated?.base, 'ethereum');
+      assert.equal(updated?.icon_url, 'assets/img/protocols/edg.png');
+      assert.equal(updated?.active, true);
+      expect(updated?.social_links).toContain('http://discord.gg');
+      expect(updated?.social_links).toContain('https://t.me/');
     });
 
     test('ensure update community does not override allow_tokenized_threads', async () => {

@@ -623,6 +623,12 @@ describe('Thread lifecycle', () => {
   describe('comments', () => {
     test('should create a thread comment as member of group with permissions', async () => {
       let body = chance.paragraph({ sentences: 50 });
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: thread.id!,
+        },
+      });
+      const initialCommentCount = threadInstance!.comment_count;
       const firstComment = await command(CreateComment(), {
         actor: actors.member,
         payload: {
@@ -631,6 +637,8 @@ describe('Thread lifecycle', () => {
           body,
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.comment_count).to.equal(initialCommentCount! + 1);
       expect(firstComment).to.include({
         thread_id: thread!.id,
         body: body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
@@ -661,6 +669,8 @@ describe('Thread lifecycle', () => {
         community_id: thread!.community_id,
       });
       expect(_comment?.content_url).toBeFalsy();
+      await threadInstance!.reload();
+      expect(threadInstance!.comment_count).to.equal(initialCommentCount! + 2);
     });
 
     test('should throw error when thread not found', async () => {
@@ -766,6 +776,12 @@ describe('Thread lifecycle', () => {
 
     test('should update comment', async () => {
       let body = chance.paragraph({ sentences: 50 });
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: thread.id!,
+        },
+      });
+      const initialCommentCount = threadInstance!.comment_count;
       let updated = await command(UpdateComment(), {
         actor: actors.member,
         payload: {
@@ -773,6 +789,8 @@ describe('Thread lifecycle', () => {
           body,
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.comment_count).to.equal(initialCommentCount!);
       expect(updated).to.include({
         thread_id: thread!.id,
         body: body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
@@ -824,6 +842,12 @@ describe('Thread lifecycle', () => {
 
     test('should delete a comment as author', async () => {
       const body = 'to be deleted';
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: thread.id!,
+        },
+      });
+      const initialCommentCount = threadInstance!.comment_count;
       const tbd = await command(CreateComment(), {
         actor: actors.member,
         payload: {
@@ -831,6 +855,8 @@ describe('Thread lifecycle', () => {
           body,
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.comment_count).to.equal(initialCommentCount! + 1);
       expect(tbd).to.include({
         thread_id: thread!.id,
         body,
@@ -841,6 +867,11 @@ describe('Thread lifecycle', () => {
         payload: { comment_id: tbd!.id! },
       });
       expect(deleted).to.include({ comment_id: tbd!.id! });
+
+      // This is fails because we paranoidly delete the comment and comment count is used to correctly
+      // render the comment tree. See DeleteComment.command.ts for more details.
+      // await threadInstance!.reload();
+      // expect(threadInstance!.comment_count).to.equal(initialCommentCount!);
     });
 
     test('should delete a comment as admin', async () => {
@@ -1068,6 +1099,12 @@ describe('Thread lifecycle', () => {
       getNamespaceBalanceSpy.mockResolvedValue({
         [actors.admin.address!]: '50',
       });
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: read_only!.id!,
+        },
+      });
+      const initialReactionCount = threadInstance!.reaction_count;
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.admin,
         payload: {
@@ -1076,12 +1113,17 @@ describe('Thread lifecycle', () => {
           reaction: 'like',
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.reaction_count).to.equal(
+        initialReactionCount! + 1,
+      );
       const expectedWeight = 50 * vote_weight;
       expect(`${reaction?.calculated_voting_weight}`).to.eq(
         `${expectedWeight}`,
       );
-      const t = await models.Thread.findByPk(thread!.id);
-      expect(`${t!.reaction_weights_sum}`).to.eq(`${expectedWeight}`);
+      expect(`${threadInstance!.reaction_weights_sum}`).to.eq(
+        `${expectedWeight}`,
+      );
     });
 
     // test('should handle ERC20 topic weight vote', async () => {
@@ -1123,6 +1165,13 @@ describe('Thread lifecycle', () => {
     // });
 
     test('should delete a reaction', async () => {
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: read_only!.id!,
+        },
+      });
+      const initialReactionCount = threadInstance!.reaction_count;
+      // tries to create a duplicate reaction on the same thread
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.admin,
         payload: {
@@ -1131,6 +1180,8 @@ describe('Thread lifecycle', () => {
           reaction: 'like',
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.reaction_count).to.equal(initialReactionCount);
       const deleted = await command(DeleteReaction(), {
         actor: actors.admin,
         payload: {
@@ -1138,6 +1189,10 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.reaction_count).to.equal(
+        initialReactionCount! - 1,
+      );
       const tempReaction = { ...reaction } as Partial<typeof reaction>;
       if (tempReaction) {
         if (tempReaction.community_id) delete tempReaction.community_id;
@@ -1187,6 +1242,12 @@ describe('Thread lifecycle', () => {
       getNamespaceBalanceSpy.mockResolvedValue({
         [actors.admin.address!]: '50',
       });
+      const commentInstance = await models.Comment.findOne({
+        where: {
+          id: comment!.id!,
+        },
+      });
+      const initialReactionCount = commentInstance!.reaction_count;
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.admin,
         payload: {
@@ -1199,8 +1260,13 @@ describe('Thread lifecycle', () => {
       expect(`${reaction?.calculated_voting_weight}`).to.eq(
         `${expectedWeight}`,
       );
-      const c = await models.Comment.findByPk(comment!.id);
-      expect(`${c!.reaction_weights_sum}`).to.eq(`${expectedWeight * 2}`); // *2 to account for first member reaction
+      await commentInstance!.reload();
+      expect(commentInstance!.reaction_count).to.equal(
+        initialReactionCount! + 1,
+      );
+      expect(`${commentInstance!.reaction_weights_sum}`).to.eq(
+        `${expectedWeight * 2}`,
+      ); // *2 to account for first member reaction
     });
 
     test('should throw error when comment not found', async () => {
@@ -1249,6 +1315,14 @@ describe('Thread lifecycle', () => {
       getNamespaceBalanceSpy.mockResolvedValue({
         [actors.member.address!]: '50',
       });
+      const commentInstance = await models.Comment.findOne({
+        where: {
+          id: comment!.id!,
+        },
+      });
+      const initialReactionCount = commentInstance!.reaction_count;
+
+      // tries to create a duplicate reaction on the same comment
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.member,
         payload: {
@@ -1257,6 +1331,8 @@ describe('Thread lifecycle', () => {
           reaction: 'like',
         },
       });
+      await commentInstance!.reload();
+      expect(commentInstance!.reaction_count).to.equal(initialReactionCount);
       const deleted = await command(DeleteReaction(), {
         actor: actors.member,
         payload: {
@@ -1264,6 +1340,10 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
+      await commentInstance!.reload();
+      expect(commentInstance!.reaction_count).to.equal(
+        initialReactionCount! - 1,
+      );
       const tempReaction: Partial<typeof reaction> = { ...reaction };
       if (tempReaction) {
         if (tempReaction.community_id) delete tempReaction.community_id;
