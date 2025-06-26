@@ -84,7 +84,7 @@ export const PrivyMobileAuthenticator = (props: Props) => {
           !privyMobileAuthStatus.authenticated ||
           !privyMobileAuthStatus.userAuth
         ) {
-          console.log('FIXME5');
+          console.log('Aborting auth. Not authenticated or no userAuth.');
           return false;
         }
 
