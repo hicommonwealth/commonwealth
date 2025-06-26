@@ -3,7 +3,11 @@ import {
   addContentBatch,
   voteContentBatch,
 } from '@hicommonwealth/evm-protocols';
-import { config, models } from '@hicommonwealth/model';
+import {
+  config,
+  commonProtocol as modelCommonProtocol,
+  models,
+} from '@hicommonwealth/model';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   ChainBase,
@@ -70,9 +74,11 @@ describe(
       communityStake = new CommunityStake(web3);
 
       // Use the ChainNode created by setupCommonwealthE2E (setupAnvil)
-      const chainNode = await models.ChainNode.findOne({
-        where: { eth_chain_id: 31337 },
-      });
+      const chainNode = await models.ChainNode.scope('withPrivateData').findOne(
+        {
+          where: { eth_chain_id: 31337 },
+        },
+      );
       if (!chainNode) {
         throw new Error(
           'Anvil ChainNode not found - setupCommonwealthE2E may have failed',
@@ -263,6 +269,26 @@ describe(
       // Configure community stakes for testing
       await namespaceFactory.configureCommunityStakes(namespaceName, 2);
 
+      // Wait until stake configuration is confirmed on the contract
+      await vi.waitFor(
+        async () => {
+          const community = await models.Community.findOne({
+            where: { id: communityId },
+            include: [{ model: models.ChainNode.scope('withPrivateData') }],
+          });
+          if (!community) throw new Error('Community not found');
+          console.log('HELLO');
+          await modelCommonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
+            community.toJSON(),
+            2,
+          );
+        },
+        {
+          timeout: TIMEOUT,
+          interval: INTERVAL,
+        },
+      );
+
       await command(Community.SetCommunityStake(), {
         actor: {
           user: { id: userId, email: user.email!, isAdmin: true },
@@ -349,14 +375,19 @@ describe(
         },
       });
 
-      // Create active contest
-      await models.Contest.create({
-        contest_address: contestAddress,
-        contest_id: contestId,
-        start_time: new Date(),
-        end_time: new Date(Date.now() + 3600000), // 1 hour from now
-        score: [],
-      });
+      // Wait for contest instance to be created
+      await vi.waitFor(
+        async () => {
+          const contest = await models.Contest.findOne({
+            where: { contest_address: contestAddress },
+          });
+          expect(contest).toBeTruthy();
+        },
+        {
+          timeout: TIMEOUT,
+          interval: INTERVAL,
+        },
+      );
 
       // Buy some stake for voting weight
       await communityStake.buyStake(namespaceName, 2, 5); // Buy 5 units of stake
