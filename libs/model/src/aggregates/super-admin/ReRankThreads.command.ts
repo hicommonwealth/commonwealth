@@ -165,12 +165,12 @@ export function RerankThreads(): Command<typeof schemas.RerankThreads> {
           });
         }
 
-        for (const community_id in communityRankUpdates) {
-          if (communityRankUpdates[community_id].length > 0) {
+        for (const communityId in communityRankUpdates) {
+          if (communityRankUpdates[communityId].length > 0) {
             await cache().addToSortedSet(
               CacheNamespaces.CommunityThreadRanks,
-              community_id,
-              communityRankUpdates[community_id],
+              communityId,
+              communityRankUpdates[communityId],
             );
           }
         }
