@@ -1,4 +1,4 @@
-import { dispose } from '@hicommonwealth/core';
+import { dispose, User } from '@hicommonwealth/core';
 import {
   addContentBatch,
   voteContentBatch,
@@ -47,7 +47,7 @@ describe(
     const userAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
     const threadId = 2001;
     const threadTitle = 'Test Weighted Voting Thread';
-    let topicId: number;
+    let user: User;
     let contestAddress: string;
     let contestId = 0;
     let chainNodeId: number;
@@ -84,13 +84,14 @@ describe(
       chainNodeId = chainNode.id!;
 
       // Create test user with unique ID to avoid conflicts
-      const user = await models.User.create({
+      const u = await models.User.create({
         id: userId,
         email: `test-${userId}@example.com`,
         isAdmin: true,
         profile: {},
         tier: UserTierMap.ManuallyVerified,
       });
+      user = u as unknown as User;
 
       // Create a dummy/base community directly via models (required for user to have an address)
       const baseCommunityId = 'base-ethereum-community';
@@ -314,6 +315,20 @@ describe(
         },
       );
 
+      // Buy some stake for voting weight
+      await communityStake.buyStake(namespaceName, 2, stakeAmount); // Buy 5 units of stake
+
+      console.log(
+        'Community setup complete - simulated UI 3-transaction flow!',
+      );
+    }, TIMEOUT);
+
+    afterAll(async () => {
+      vi.restoreAllMocks();
+      await dispose()();
+    });
+
+    test('should handle staked contest with weighted voting', async () => {
       // Create weighted voting topic using command
       const topicResult = await command(Community.CreateTopic(), {
         actor: {
@@ -331,7 +346,7 @@ describe(
           vote_weight_multiplier: 3,
         },
       });
-      topicId = topicResult!.topic.id!;
+      const stakeTopicId = topicResult!.topic.id!;
 
       // Deploy contest
       const contestResult = await namespaceFactory.newSingleContest(
@@ -361,7 +376,7 @@ describe(
           prize_percentage: 100,
           payout_structure: [70, 20, 10],
           interval: 0,
-          topic_id: topicId,
+          topic_id: stakeTopicId,
           ticker: 'ETH',
           decimals: 18,
           is_farcaster_contest: false,
@@ -383,20 +398,6 @@ describe(
         },
       );
 
-      // Buy some stake for voting weight
-      await communityStake.buyStake(namespaceName, 2, stakeAmount); // Buy 5 units of stake
-
-      console.log(
-        'Community setup complete - simulated UI 3-transaction flow!',
-      );
-    }, TIMEOUT);
-
-    afterAll(async () => {
-      vi.restoreAllMocks();
-      await dispose()();
-    });
-
-    test('should create weighted voting contest with correct vote weight calculation', async () => {
       // Create a thread using the CreateThread command
       const threadResult = await command(Thread.CreateThread(), {
         actor: {
@@ -409,7 +410,7 @@ describe(
         },
         payload: {
           community_id: communityId,
-          topic_id: topicId,
+          topic_id: stakeTopicId,
           title: threadTitle,
           body: 'This is a test thread for weighted voting',
           kind: 'discussion' as const,
