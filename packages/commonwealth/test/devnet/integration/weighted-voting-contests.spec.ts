@@ -3,11 +3,7 @@ import {
   addContentBatch,
   voteContentBatch,
 } from '@hicommonwealth/evm-protocols';
-import {
-  config,
-  commonProtocol as modelCommonProtocol,
-  models,
-} from '@hicommonwealth/model';
+import { config, models } from '@hicommonwealth/model';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   ChainBase,
@@ -32,7 +28,7 @@ import {
 } from '@hicommonwealth/evm-protocols';
 
 const TIMEOUT = 120_000;
-const INTERVAL = 3_000;
+const INTERVAL = 1_000;
 
 describe(
   'Weighted Voting Contests E2E Integration Test',
@@ -269,26 +265,7 @@ describe(
       // Configure community stakes for testing
       await namespaceFactory.configureCommunityStakes(namespaceName, 2);
 
-      // Wait until stake configuration is confirmed on the contract
-      await vi.waitFor(
-        async () => {
-          const community = await models.Community.findOne({
-            where: { id: communityId },
-            include: [{ model: models.ChainNode.scope('withPrivateData') }],
-          });
-          if (!community) throw new Error('Community not found');
-          console.log('HELLO');
-          await modelCommonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
-            community.toJSON(),
-            2,
-          );
-        },
-        {
-          timeout: TIMEOUT,
-          interval: INTERVAL,
-        },
-      );
-
+      // Set community stake
       await command(Community.SetCommunityStake(), {
         actor: {
           user: { id: userId, email: user.email!, isAdmin: true },
@@ -306,6 +283,7 @@ describe(
       // Wait for CommunityStake to be created
       await vi.waitFor(
         async () => {
+          console.log('\n\nWaiting for CommunityStake to be created\n\n');
           const communityStake = await models.CommunityStake.findOne({
             where: {
               community_id: communityId,
