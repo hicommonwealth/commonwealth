@@ -11,19 +11,11 @@ export function GetActiveThreads(): Query<typeof schemas.GetActiveThreads> {
     ...schemas.GetActiveThreads,
     auth: [authOptional],
     secure: true,
-    body: async ({ actor, context, payload }) => {
+    body: async ({ actor, payload }) => {
       const { community_id, threads_per_topic, withXRecentComments } = payload;
-      const address_id = context?.address?.id;
-
-      const gating = {
-        address_id,
-        admin_or_moderator:
-          actor.user.isAdmin ||
-          ['admin', 'moderator'].includes(context?.address?.role || ''),
-      };
 
       const sql = `
-${withGates(gating)},
+${withGates(actor)},
 TH AS (
 	SELECT
 		T.id,
@@ -57,12 +49,12 @@ TH AS (
       PARTITION BY T.topic_id ORDER BY T.created_at DESC,	T.last_commented_on DESC) AS topic_rank
 	FROM
 		"Threads" T
-    ${joinGates(gating)}
+    ${joinGates(actor)}
 	WHERE
 		community_id = :community_id
 		AND deleted_at IS NULL
 		AND archived_at IS NULL
-		${filterGates(gating)}
+		${filterGates(actor)}
 ),
 T AS ( -- select top by topic and get the thread authors and their profiles
 SELECT
@@ -175,7 +167,7 @@ SELECT
         {
           replacements: {
             community_id,
-            address_id,
+            address_id: actor.address_id,
             threads_per_topic: threads_per_topic || 3,
             withXRecentComments,
           },

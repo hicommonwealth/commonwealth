@@ -59,6 +59,9 @@ export type User = {
 export type Actor = {
   readonly user: Readonly<User>;
   readonly address?: string;
+  readonly address_id?: number;
+  readonly community_id?: string;
+  readonly role?: string;
   readonly is_system_actor?: boolean;
 };
 

@@ -159,6 +159,9 @@ async function findVerifiedAddress(
   });
 
   if (address) {
+    (actor as { address_id: number }).address_id = address.id!;
+    (actor as { community_id: string }).community_id = address.community_id;
+    (actor as { role: string }).role = address.role;
     // fire and forget address activity tracking
     address.last_active = new Date();
     void address.save();
@@ -217,6 +220,9 @@ async function findAddress(
   });
 
   if (address) {
+    (actor as { address_id: number }).address_id = address.id!;
+    (actor as { community_id: string }).community_id = address.community_id;
+    (actor as { role: string }).role = address.role;
     // fire and forget address activity tracking
     address.last_active = new Date();
     void address.save();

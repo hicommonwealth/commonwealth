@@ -1,3 +1,4 @@
+import { Actor } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { CommunityTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
@@ -13,8 +14,7 @@ import { filterGates, joinGates, withGates } from './gating';
  */
 
 type GetUserActivityFeedParams = z.infer<typeof schemas.ActivityFeed.input> & {
-  user_id?: number;
-  is_admin: boolean;
+  actor: Actor;
 };
 
 export const baseActivityQuery = `
@@ -96,15 +96,14 @@ export const baseActivityQuery = `
 `;
 
 export async function getUserActivityFeed({
-  user_id = 0,
-  is_admin,
+  actor,
   comment_limit,
   limit,
   cursor,
 }: GetUserActivityFeedParams) {
   const offset = (cursor - 1) * limit;
   const query = `
-${withGates({ admin_or_moderator: is_admin })},
+${withGates(actor)},
 user_communities AS (
     SELECT DISTINCT community_id 
     FROM "Addresses" 
@@ -117,16 +116,16 @@ top_threads AS (
     C.icon_url
   FROM
     "Threads" T
-    ${user_id ? 'JOIN user_communities UC ON UC.community_id = T.community_id' : ''}
+    ${actor.user?.id ? 'JOIN user_communities UC ON UC.community_id = T.community_id' : ''}
     JOIN "Communities" C ON C.id = T.community_id
-    ${joinGates({ admin_or_moderator: is_admin })}
+    ${joinGates(actor)}
   WHERE
     T.deleted_at IS NULL 
     AND T.marked_as_spam_at IS NULL 
     AND C.active IS TRUE 
     AND C.tier != ${CommunityTierMap.SpamCommunity}
     AND C.id NOT IN ('ethereum', 'cosmos', 'polkadot')
-    ${filterGates({ admin_or_moderator: is_admin })}
+    ${filterGates(actor)}
   ORDER BY
     T.activity_rank_date DESC NULLS LAST
   LIMIT :limit OFFSET :offset 
@@ -140,7 +139,12 @@ ORDER BY T.activity_rank_date DESC NULLS LAST
   >(query, {
     type: QueryTypes.SELECT,
     raw: true,
-    replacements: { user_id, limit, comment_limit, offset },
+    replacements: {
+      user_id: actor.user?.id || 0,
+      limit,
+      comment_limit,
+      offset,
+    },
   });
 
   return schemas.buildPaginatedResponse(threads, +(threads.at(0)?.total ?? 0), {

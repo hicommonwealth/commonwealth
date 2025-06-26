@@ -29,12 +29,8 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
         { order: 'ASC' },
       );
 
-      const gating = {
-        admin_or_moderator: actor.user.isAdmin || false,
-      };
-
       const whereConditions = [
-        filterGates(gating),
+        filterGates(actor),
         community_id ? 'AND T.community_id = :community_id' : '',
         search ? 'AND T.title ILIKE :search' : '',
       ]
@@ -50,7 +46,7 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
 
       // TODO: add deleted_at, marked_as_spam_at and default community filters?
       const query = `
-        ${withGates(gating)},
+        ${withGates(actor)},
         top_threads AS (
           SELECT
             T.*,
@@ -58,7 +54,7 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
           FROM
             "Threads" T
             JOIN "Communities" C ON C.id = T.community_id
-            ${joinGates(gating)}
+            ${joinGates(actor)}
           WHERE
             T.id IN (:threadIds)
             ${whereConditions}
@@ -74,6 +70,8 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
         replacements: {
           comment_limit,
           threadIds: rankedThreadIds.map((t) => parseInt(t)),
+          ...(actor.address_id && { address_id: actor.address_id }),
+          ...(actor.community_id && { community_id: actor.community_id }),
           ...(community_id && { community_id }),
           ...(search && { search: `%${search}%` }),
         },

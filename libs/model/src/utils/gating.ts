@@ -1,18 +1,23 @@
+import { Actor } from '@hicommonwealth/core';
+import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
+
+const bypassGates = (actor: Actor) =>
+  actor.user?.isAdmin || ['admin', 'moderator'].includes(actor.role || '');
+
+const gateCommunity = (actor: Actor) =>
+  actor.address_id &&
+  actor.community_id &&
+  actor.community_id !== ALL_COMMUNITIES;
+
 /*
  * When viewing actor is authenticated (address_id and community_id are defined)
  * - Gets all community topics, public or private where the viewer is a member
  * ...otherwise, gets all private topics to be excluded
  */
-export function withGates({
-  address_id,
-  admin_or_moderator,
-}: {
-  address_id?: number;
-  admin_or_moderator: boolean;
-}) {
-  return admin_or_moderator
+export function withGates(actor: Actor) {
+  return bypassGates(actor)
     ? 'WITH Dummy AS (SELECT 1 as topic_id)'
-    : address_id
+    : gateCommunity(actor)
       ? `
 WITH OpenGates AS (
   SELECT T.id as topic_id
@@ -42,30 +47,16 @@ WITH PrivateGates AS (
 `;
 }
 
-export function joinGates({
-  address_id,
-  admin_or_moderator,
-}: {
-  address_id?: number;
-  admin_or_moderator: boolean;
-}) {
-  return admin_or_moderator
+export function joinGates(actor: Actor) {
+  return bypassGates(actor)
     ? ''
-    : address_id
+    : gateCommunity(actor)
       ? 'JOIN OpenGates ON T.topic_id = OpenGates.topic_id'
       : 'LEFT JOIN PrivateGates ON T.topic_id = PrivateGates.topic_id';
 }
 
-export function filterGates({
-  address_id,
-  admin_or_moderator,
-}: {
-  address_id?: number;
-  admin_or_moderator: boolean;
-}) {
-  return admin_or_moderator
+export function filterGates(actor: Actor) {
+  return bypassGates(actor) || gateCommunity(actor)
     ? ''
-    : address_id
-      ? ''
-      : 'AND PrivateGates.topic_id IS NULL';
+    : 'AND PrivateGates.topic_id IS NULL';
 }
