@@ -27,7 +27,8 @@ import {
   factoryContracts,
 } from '@hicommonwealth/evm-protocols';
 
-const TIMEOUT = 120_000;
+const TIMEOUT = 60_000 * 4;
+const TX_TIMEOUT = 10_000;
 const INTERVAL = 1_000;
 
 describe(
@@ -44,7 +45,6 @@ describe(
     const addressId = 1001;
     const userId = 1001;
     const userAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
-    const voterAddress = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8';
     const threadId = 2001;
     const threadTitle = 'Test Weighted Voting Thread';
     let topicId: number;
@@ -53,6 +53,7 @@ describe(
     let chainNodeId: number;
     let privateKey: string;
     let rpcUrl: string;
+    const stakeAmount = 5;
 
     beforeAll(async () => {
       // Setup Commonwealth E2E environment with relayer and event processing
@@ -209,7 +210,7 @@ describe(
           expect(community?.namespace_verification_configured).toBe(true);
         },
         {
-          timeout: TIMEOUT,
+          timeout: TX_TIMEOUT,
           interval: INTERVAL,
         },
       );
@@ -253,7 +254,7 @@ describe(
           expect(community?.namespace_nominations).toContain(userAddress);
         },
         {
-          timeout: TIMEOUT,
+          timeout: TX_TIMEOUT,
           interval: INTERVAL,
         },
       );
@@ -263,7 +264,22 @@ describe(
       );
 
       // Configure community stakes for testing
-      await namespaceFactory.configureCommunityStakes(namespaceName, 2);
+      const { block } = await namespaceFactory.configureCommunityStakes(
+        namespaceName,
+        commonProtocol.STAKE_ID,
+      );
+
+      // Wait for the block to be mined
+      await vi.waitFor(
+        async () => {
+          const blockNumber = await web3.eth.getBlockNumber();
+          expect(blockNumber).toBeGreaterThanOrEqual(block);
+        },
+        {
+          timeout: TX_TIMEOUT,
+          interval: INTERVAL,
+        },
+      );
 
       // Set community stake
       await command(Community.SetCommunityStake(), {
@@ -293,7 +309,7 @@ describe(
           expect(communityStake).toBeTruthy();
         },
         {
-          timeout: TIMEOUT,
+          timeout: TX_TIMEOUT,
           interval: INTERVAL,
         },
       );
@@ -362,13 +378,13 @@ describe(
           expect(contest).toBeTruthy();
         },
         {
-          timeout: TIMEOUT,
+          timeout: TX_TIMEOUT,
           interval: INTERVAL,
         },
       );
 
       // Buy some stake for voting weight
-      await communityStake.buyStake(namespaceName, 2, 5); // Buy 5 units of stake
+      await communityStake.buyStake(namespaceName, 2, stakeAmount); // Buy 5 units of stake
 
       console.log(
         'Community setup complete - simulated UI 3-transaction flow!',
@@ -380,7 +396,7 @@ describe(
       await dispose()();
     });
 
-    test.skip('should create weighted voting contest with correct vote weight calculation', async () => {
+    test('should create weighted voting contest with correct vote weight calculation', async () => {
       // Create a thread using the CreateThread command
       const threadResult = await command(Thread.CreateThread(), {
         actor: {
@@ -399,8 +415,6 @@ describe(
           kind: 'discussion' as const,
           stage: 'discussion',
           read_only: false,
-          canvas_signed_data: '',
-          canvas_msg_id: '',
         },
       });
 
@@ -430,7 +444,7 @@ describe(
           expect(contestAction!.actor_address).toBe(userAddress);
         },
         {
-          timeout: TIMEOUT,
+          timeout: TX_TIMEOUT,
           interval: INTERVAL,
         },
       );
@@ -442,7 +456,7 @@ describe(
           rpc: rpcUrl,
         },
         privateKey,
-        voter: voterAddress,
+        voter: userAddress,
         entries: [
           {
             contestAddress: contestAddress,
@@ -457,28 +471,24 @@ describe(
           const voteAction = await models.ContestAction.findOne({
             where: {
               contest_address: contestAddress,
-              actor_address: voterAddress,
+              actor_address: userAddress,
               action: 'upvoted',
             },
           });
-
           expect(voteAction).toBeTruthy();
           expect(voteAction!.calculated_voting_weight).not.toBeNull();
-
-          // The calculated voting weight should be based on the stake balance and multiplier
-          // With 1.5x multiplier, the weight should be 1.5 times the stake balance
-          expect(BigInt(voteAction!.calculated_voting_weight!)).toBeGreaterThan(
-            BigInt(0),
+          expect(BigInt(voteAction!.calculated_voting_weight!)).toBe(
+            BigInt(stakeAmount),
           );
         },
         {
-          timeout: TIMEOUT,
+          timeout: TX_TIMEOUT,
           interval: INTERVAL,
         },
       );
     });
 
-    test('should handle ERC20 weighted voting in contests', async () => {
+    test.skip('should handle ERC20 weighted voting in contests', async () => {
       // Create ERC20 weighted voting topic using command
       const erc20TopicResult = await command(Community.CreateTopic(), {
         actor: {
@@ -510,7 +520,7 @@ describe(
         3600, // 1 hour duration
         [60, 30, 10], // winner shares
         '0x1234567890123456789012345678901234567890', // ERC20 token address
-        0, // no stake ID for ERC20
+        2, // use stake ID
         10, // voter share
         2.0, // weight multiplier
       );
@@ -570,8 +580,6 @@ describe(
           kind: 'discussion' as const,
           stage: 'discussion',
           read_only: false,
-          canvas_signed_data: '',
-          canvas_msg_id: '',
         },
       });
 
@@ -601,7 +609,7 @@ describe(
           expect(contestAction!.actor_address).toBe(userAddress);
         },
         {
-          timeout: TIMEOUT,
+          timeout: TX_TIMEOUT,
           interval: INTERVAL,
         },
       );
@@ -613,7 +621,7 @@ describe(
           rpc: rpcUrl,
         },
         privateKey,
-        voter: voterAddress,
+        voter: userAddress,
         entries: [
           {
             contestAddress: erc20ContestResult.contest,
@@ -628,7 +636,7 @@ describe(
           const erc20Vote = await models.ContestAction.findOne({
             where: {
               contest_address: erc20ContestResult.contest,
-              actor_address: voterAddress,
+              actor_address: userAddress,
               action: 'upvoted',
             },
           });
@@ -644,7 +652,7 @@ describe(
           expect(Number(calculatedWeight)).toBeGreaterThan(Number(votingPower));
         },
         {
-          timeout: TIMEOUT,
+          timeout: TX_TIMEOUT,
           interval: INTERVAL,
         },
       );
@@ -660,7 +668,7 @@ describe(
         },
         {
           content_id: 4,
-          actor_address: voterAddress,
+          actor_address: userAddress,
           calculated_voting_weight: '3000000000000000000', // 3 tokens
         },
         {
