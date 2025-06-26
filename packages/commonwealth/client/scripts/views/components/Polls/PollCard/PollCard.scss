@@ -30,6 +30,17 @@
     .poll-title-text.Text {
       width: 100%;
     }
+
+    .poll-end-timestamp.Text {
+      color: colors.$neutral-500;
+    }
+
+    .poll-title-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+    }
   }
 
   .poll-voting-section {

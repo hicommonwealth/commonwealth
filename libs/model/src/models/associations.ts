@@ -275,4 +275,17 @@ export const buildAssociations = (db: DB) => {
   db.LaunchpadToken.withMany(db.LaunchpadTrade, {
     foreignKey: 'token_address',
   });
+
+  db.MCPServerCommunity.withManyToMany(
+    {
+      model: db.MCPServer,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+    {
+      model: db.Community,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  );
 };

@@ -12,7 +12,7 @@ export function SearchThreads(): Query<typeof schemas.SearchThreads> {
     ...schemas.SearchThreads,
     auth: [authOptional],
     secure: true,
-    body: async ({ context, payload }) => {
+    body: async ({ actor, context, payload }) => {
       const {
         community_id,
         search_term,
@@ -36,8 +36,15 @@ export function SearchThreads(): Query<typeof schemas.SearchThreads> {
         offset: limit * (cursor - 1),
       };
 
+      const gating = {
+        address_id,
+        admin_or_moderator:
+          actor.user.isAdmin ||
+          ['admin', 'moderator'].includes(context?.address?.role || ''),
+      };
+
       const sql = `
-${withGates(address_id)}
+${withGates(gating)}
 SELECT 
   'thread' as type,
   T.community_id,
@@ -63,19 +70,18 @@ FROM
     "Threads" T
     JOIN "Addresses" A ON T.address_id = A.id
     JOIN "Users" U ON A.user_id = U.id
-    ${joinGates(address_id)}
+    ${joinGates(gating)}
     , websearch_to_tsquery('english', :search_term) as tsquery
 WHERE
   T.deleted_at IS NULL
   AND T.marked_as_spam_at IS NULL
   ${replacements.community_id ? 'AND T.community_id = :community_id' : ''} 
-  ${filterGates(address_id)}
+  ${filterGates(gating)}
   AND (T.title ILIKE '%' || :search_term || '%' ${!thread_title_only ? 'OR tsquery @@ T.search' : ''})
 ORDER BY
   ${order_by === 'created_at' ? `T.${order_by} ${order_direction || 'DESC'}` : `rank, T.created_at DESC`}
 LIMIT :limit OFFSET :offset
 `;
-
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ThreadView> & { total_count: number }
       >(sql, {

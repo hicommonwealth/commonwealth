@@ -1,12 +1,8 @@
 import { command, dispose } from '@hicommonwealth/core';
-import { use as chaiUse, expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import { afterAll, beforeAll, describe, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { CreateApiKey } from '../../../../../libs/model/src/aggregates/user';
 import { seed } from '../../../../../libs/model/src/tester';
 import { buildMCPTools } from '../../../server/api/mcp';
-
-chaiUse(chaiAsPromised);
 
 describe('buildMCPTools', () => {
   const address = '0x1234567890123456789012345678901234567890';
@@ -46,7 +42,7 @@ describe('buildMCPTools', () => {
     });
 
     apiKey = result?.api_key || null;
-    expect(apiKey).to.exist;
+    expect(apiKey).toBeTruthy();
   });
 
   afterAll(async () => {
@@ -55,20 +51,20 @@ describe('buildMCPTools', () => {
 
   it('should return an array of MCP tools and be able to call them', async () => {
     const tools = buildMCPTools();
-    expect(Array.isArray(tools)).to.be.true;
-    expect(tools.length).to.be.greaterThan(0);
+    expect(Array.isArray(tools)).toBe(true);
+    expect(tools.length).toBeGreaterThan(0);
     const getCommunityTool = tools.find((tool) => tool.name === 'getCommunity');
-    expect(getCommunityTool).to.exist;
-    expect(getCommunityTool!.inputSchema).to.exist;
-    expect(getCommunityTool!.fn).to.exist;
+    expect(getCommunityTool).toBeTruthy();
+    expect(getCommunityTool!.inputSchema).toBeTruthy();
+    expect(getCommunityTool!.fn).toBeTruthy();
     const combinedToken = `${address}:${apiKey!}`;
     const community = (await getCommunityTool!.fn(combinedToken, {
       id: 'ethereum',
     })) as any;
-    expect(community).to.exist;
-    expect(community!.id).to.equal('ethereum');
-    expect(community!.name).to.equal('Ethereum');
-    expect(community!.description).to.equal('Ethereum is the best');
+    expect(community).toBeTruthy();
+    expect(community!.id).toBe('ethereum');
+    expect(community!.name).toBe('Ethereum');
+    expect(community!.description).toBe('Ethereum is the best');
   });
 
   it('should return an error if the api key is invalid', async () => {
@@ -79,6 +75,6 @@ describe('buildMCPTools', () => {
       getCommunityTool!.fn(invalidCombinedKey, {
         id: 'ethereum',
       }),
-    ).to.eventually.be.rejectedWith('Unauthorized');
+    ).rejects.toThrow('Unauthorized');
   });
 });

@@ -1,8 +1,6 @@
 import { models } from '@hicommonwealth/model';
 import { expect, test } from '@playwright/test';
-import chai from 'chai';
 import sleep from 'sleep-promise';
-const chaiExpect = chai.expect;
 
 test.describe.configure({ mode: 'parallel' });
 
@@ -33,9 +31,8 @@ test.describe('Community proposals page', () => {
     await waitForCompletedProposals({ page });
     const inactiveCardsCollection = await page.$$('.CardsCollection');
     const inactiveCardsContainer = await inactiveCardsCollection?.[1];
-    const inactiveCardsSpinner = await inactiveCardsContainer?.$(
-      '.LoadingSpinner',
-    );
+    const inactiveCardsSpinner =
+      await inactiveCardsContainer?.$('.LoadingSpinner');
     await inactiveCardsSpinner?.waitForElementState('hidden');
     const inactiveCards = await inactiveCardsContainer?.$('.cards');
 
@@ -323,14 +320,8 @@ test.describe('Community proposals page', () => {
         include: [models.ChainNode],
       });
 
-      // @ts-expect-error StrictNullChecks
-      chaiExpect(communityBeforeUpgrade.ChainNode.cosmos_gov_version).to.equal(
-        null,
-      );
-      // @ts-expect-error StrictNullChecks
-      chaiExpect(communityBeforeUpgrade.ChainNode.alt_wallet_url).to.equal(
-        null,
-      );
+      expect(communityBeforeUpgrade?.ChainNode?.cosmos_gov_version).toBe(null);
+      expect(communityBeforeUpgrade?.ChainNode?.alt_wallet_url).toBe(null);
 
       await page.goto(proposalsPageUrl);
       await inactiveProposalCardsTest({ page }, 0);
@@ -340,8 +331,7 @@ test.describe('Community proposals page', () => {
         where: { id: chain },
         include: [models.ChainNode],
       });
-      // @ts-expect-error StrictNullChecks
-      chaiExpect(communityAfterFailure.ChainNode.cosmos_gov_version).to.equal(
+      expect(communityAfterFailure?.ChainNode?.cosmos_gov_version).toBe(
         'v1beta1-attempt-failed',
       );
     });
@@ -356,10 +346,7 @@ test.describe('Community proposals page', () => {
         include: [models.ChainNode],
       });
 
-      // @ts-expect-error StrictNullChecks
-      chaiExpect(communityAfterRefresh.ChainNode.cosmos_gov_version).to.equal(
-        'v1',
-      );
+      expect(communityAfterRefresh?.ChainNode?.cosmos_gov_version).toBe('v1');
     });
     test('Inactive proposal page loads from Proposal Card click', async ({
       page,

@@ -3,9 +3,17 @@
  * - Gets all community topics, public or private where the viewer is a member
  * ...otherwise, gets all private topics to be excluded
  */
-export function withGates(address_id?: number) {
-  return address_id
-    ? `
+export function withGates({
+  address_id,
+  admin_or_moderator,
+}: {
+  address_id?: number;
+  admin_or_moderator: boolean;
+}) {
+  return admin_or_moderator
+    ? 'WITH Dummy AS (SELECT 1 as topic_id)'
+    : address_id
+      ? `
 WITH OpenGates AS (
   SELECT T.id as topic_id
   FROM
@@ -25,7 +33,7 @@ WITH OpenGates AS (
     )
 )
 `
-    : `
+      : `
 WITH PrivateGates AS (
   SELECT DISTINCT topic_id
   FROM "GroupGatedActions"
@@ -34,12 +42,30 @@ WITH PrivateGates AS (
 `;
 }
 
-export function joinGates(address_id?: number) {
-  return address_id
-    ? 'JOIN OpenGates ON T.topic_id = OpenGates.topic_id'
-    : 'LEFT JOIN PrivateGates ON T.topic_id = PrivateGates.topic_id';
+export function joinGates({
+  address_id,
+  admin_or_moderator,
+}: {
+  address_id?: number;
+  admin_or_moderator: boolean;
+}) {
+  return admin_or_moderator
+    ? ''
+    : address_id
+      ? 'JOIN OpenGates ON T.topic_id = OpenGates.topic_id'
+      : 'LEFT JOIN PrivateGates ON T.topic_id = PrivateGates.topic_id';
 }
 
-export function filterGates(address_id?: number) {
-  return address_id ? '' : 'AND PrivateGates.topic_id IS NULL';
+export function filterGates({
+  address_id,
+  admin_or_moderator,
+}: {
+  address_id?: number;
+  admin_or_moderator: boolean;
+}) {
+  return admin_or_moderator
+    ? ''
+    : address_id
+      ? ''
+      : 'AND PrivateGates.topic_id IS NULL';
 }

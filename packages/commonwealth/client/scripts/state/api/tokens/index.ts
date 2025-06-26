@@ -9,6 +9,7 @@ import useGetTokenByThreadId from './getTokenByThreadId';
 import useGetTokenizedThreadsAllowedQuery from './getTokenizedThreadsAllowed';
 import useTokenMetadataQuery from './getTokenMetadata';
 import useTokensMetadataQuery from './getTokensMetadata';
+import { useGetTokenStatsQuery } from './getTokenStats';
 
 export {
   useCreateTokenMutation,
@@ -19,6 +20,7 @@ export {
   useGetTokenByCommunityId,
   useGetTokenByThreadId,
   useGetTokenizedThreadsAllowedQuery,
+  useGetTokenStatsQuery,
   useTokenBalanceQuery,
   useTokenMetadataQuery,
   useTokensMetadataQuery,

@@ -45,6 +45,7 @@ export type PollCardProps = PollOptionProps &
     tokenDecimals?: number;
     topicWeight?: TopicWeightedVoting | null;
     isLoadingVotes?: boolean;
+    endTimestamp?: string;
   };
 
 export const PollCard = ({
@@ -57,6 +58,7 @@ export const PollCard = ({
   pollEnded,
   proposalTitle = 'Poll',
   timeRemaining,
+  endTimestamp,
   tokenSymbol,
   tooltipErrorMessage,
   votedFor,
@@ -138,9 +140,16 @@ export const PollCard = ({
   return (
     <CWCard className="PollCard">
       <div className="poll-title-section">
-        <CWText type="b2" className="poll-title-text">
-          {proposalTitle}
-        </CWText>
+        <div className="poll-title-wrapper">
+          <CWText type="b2" className="poll-title-text">
+            {proposalTitle}
+          </CWText>
+          {endTimestamp && (
+            <CWText type="caption" className="poll-end-timestamp">
+              {`Ends ${endTimestamp}`}
+            </CWText>
+          )}
+        </div>
         <CWModal
           size="small"
           content={

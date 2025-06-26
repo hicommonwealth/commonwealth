@@ -59,6 +59,10 @@ export const EvmEventSignatures = {
     JudgeNominated:
       '0xd3381a18ee091ebc453476f9f0f9167642972862d5946a730a557ef658113ac1',
   },
+  TokenCommunityManager: {
+    CommunityNamespaceCreated:
+      '0xa16d784cb6c784b621c7877ce80495765ed32ca0b3dba2ef467116a435f125fd',
+  },
 } as const;
 
 type Values<T> = T[keyof T];
