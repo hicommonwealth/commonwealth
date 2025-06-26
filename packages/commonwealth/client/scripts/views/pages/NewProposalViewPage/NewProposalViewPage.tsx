@@ -147,10 +147,22 @@ const NewProposalViewPage = ({ identifier, scope }: ViewProposalPageProps) => {
 
   if (
     isCosmosChain &&
-    ((queryType === 'cosmos' &&
-      (cosmosError || !(proposal && isCosmosLoading))) ||
-      (queryType !== 'cosmos' &&
-        (snapshotProposalError || !(snapshotProposal && isSnapshotLoading))))
+    queryType === 'cosmos' &&
+    !isCosmosLoading &&
+    (cosmosError || !proposal)
+  ) {
+    return (
+      <PageNotFound
+        message={"We couldn't find what you searched for. Try searching again."}
+      />
+    );
+  }
+
+  if (
+    isCosmosChain &&
+    queryType !== 'cosmos' &&
+    !isSnapshotLoading &&
+    (snapshotProposalError || !snapshotProposal)
   ) {
     return (
       <PageNotFound
