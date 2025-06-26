@@ -63,7 +63,7 @@ The Commonwealth monorepo is a modular, event-driven platform for decentralized 
 
 ### 4.1 Databases
 
-- PostgreSQL for persistent storage. See [Database-ERD.md](common_knowledge/Database-ERD.md) for schema.
+- PostgreSQL for persistent storage. See [Database-ERD.md](Database-ERD.md) for schema.
 
 ### 4.2 Caching
 
@@ -83,11 +83,11 @@ The Commonwealth monorepo is a modular, event-driven platform for decentralized 
 
 ### 5.1 Environment Variables
 
-- Managed via `.env` files and documented in [Environment-Variables.md](common_knowledge/Environment-Variables.md).
+- Managed via `.env` files and documented in [Environment-Variables.md](Environment-Variables.md).
 
 ### 5.2 App Initialization Flow
 
-- See [App-Initialization-Flow.md](common_knowledge/App-Initialization-Flow.md) for details on bootstrapping and dependency wiring.
+- See [App-Initialization-Flow.md](App-Initialization-Flow.md) for details on bootstrapping and dependency wiring.
 
 ---
 
@@ -103,7 +103,7 @@ The Commonwealth monorepo is a modular, event-driven platform for decentralized 
 
 ### 6.3 Idempotency & Retry Strategies
 
-- Policies for handling duplicate or failed events. See [RabbitMQ.md](common_knowledge/RabbitMQ.md).
+- Policies for handling duplicate or failed events. See [RabbitMQ.md](RabbitMQ.md).
 
 ---
 
@@ -487,7 +487,7 @@ graph TD
 
 ### 10.5 Database ERD
 
-- See [Database-ERD.md](common_knowledge/Database-ERD.md)
+- See [Database-ERD.md](Database-ERD.md)
 
 ---
 
@@ -497,9 +497,9 @@ graph TD
 
 ## 12. References
 
-- [App-Initialization-Flow.md](common_knowledge/App-Initialization-Flow.md)
-- [RabbitMQ.md](common_knowledge/RabbitMQ.md)
-- [Environment-Variables.md](common_knowledge/Environment-Variables.md)
-- [Database-ERD.md](common_knowledge/Database-ERD.md)
-- [Deployment.md](common_knowledge/Deployment.md)
-- [State-Management.md](common_knowledge/State-Management.md)
+- [App-Initialization-Flow.md](App-Initialization-Flow.md)
+- [RabbitMQ.md](RabbitMQ.md)
+- [Environment-Variables.md](Environment-Variables.md)
+- [Database-ERD.md](Database-ERD.md)
+- [Deployment.md](Deployment.md)
+- [State-Management.md](State-Management.md)
