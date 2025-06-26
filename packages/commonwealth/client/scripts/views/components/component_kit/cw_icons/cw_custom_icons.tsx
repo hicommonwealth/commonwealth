@@ -1231,3 +1231,36 @@ export const CWSui = (props: CustomIconProps) => {
     </svg>
   );
 };
+
+export const CWBinance = (props: CustomIconProps) => {
+  const { componentType, iconSize, ...otherProps } = props;
+  return (
+    <svg
+      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+      {...otherProps}
+    >
+      <rect width="32" height="32" rx="16" fill="#F3BA2F" />
+      <path
+        d="M16.002 7.478L18.882 10.36L13.772 15.468L10.892 12.588L16.002 7.478Z"
+        fill="white"
+      />
+      <path
+        d="M18.232 13.71L21.112 16.59L13.772 23.93L10.892 21.05L18.232 13.71Z"
+        fill="white"
+      />
+      <path
+        d="M9.482 14L12.362 16.88L9.482 19.76L6.602 16.88L9.482 14Z"
+        fill="white"
+      />
+      <path
+        d="M22.522 14L25.402 16.88L18.062 24.22L15.182 21.34L22.522 14Z"
+        fill="white"
+      />
+    </svg>
+  );
+};
