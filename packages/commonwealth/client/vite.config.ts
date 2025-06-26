@@ -129,7 +129,6 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 8080,
       host: 'localhost',
-      allowedHosts: ['tim.affinity.fun'],
       proxy: {
         '/api': {
           target: env.BACKEND_PROXY_URL || 'http://localhost:3000',
