@@ -26,6 +26,10 @@ export function usePrivySignOn() {
     async (props: UsePrivySignOnProps) => {
       const { wallet, ssoOAuthToken, ssoProvider, onSuccess } = props;
 
+      console.log(
+        'Authenticating with privy user: ' + JSON.stringify(privyUser, null, 2),
+      );
+
       if (ssoProvider === 'email' && !privyUser?.email) {
         // trying to login via email but the privyUser is wrong.
         console.log('Skipping attempt at email auth... ');
@@ -73,6 +77,6 @@ export function usePrivySignOn() {
 
       onSuccess(wallet.address, newlyCreated);
     },
-    [identityTokenRef, signIn, signMessage],
+    [identityTokenRef, privyUser, signIn, signMessage],
   );
 }
