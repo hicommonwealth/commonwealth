@@ -1,23 +1,11 @@
 import { Actor } from '@hicommonwealth/core';
-import * as schemas from '@hicommonwealth/schemas';
 import { CommunityTierMap } from '@hicommonwealth/shared';
-import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
-import { models } from '../database';
-import { filterGates, joinGates, withGates } from './gating';
 
 /**
- * Gets last updated threads and their recent comments
- * @param user_id by user id communities, 0 for global
- * @param limit thread limit
- * @param comment_limit comment limit
+ * Base query for global and user activity feeds
+ * - Based on the gated top_threads CTE from the builder functions
  */
-
-type GetUserActivityFeedParams = z.infer<typeof schemas.ActivityFeed.input> & {
-  actor: Actor;
-};
-
-export const baseActivityQuery = `
+const baseActivityQuery = `
   SELECT
     T.community_id,
     T.icon_url as community_icon,
@@ -95,20 +83,109 @@ export const baseActivityQuery = `
       JOIN "Topics" Tp ON Tp.id = T.topic_id
 `;
 
-export async function getUserActivityFeed({
-  actor,
-  comment_limit,
-  limit,
-  cursor,
-}: GetUserActivityFeedParams) {
-  const offset = (cursor - 1) * limit;
-  const query = `
-${withGates(actor)},
-user_communities AS (
-    SELECT DISTINCT community_id 
-    FROM "Addresses" 
-    WHERE user_id = :user_id
+/**
+ * Gates topics according to the actor's group memberships
+ */
+function buildOpenGates(actor: Actor) {
+  return `
+user_addresses AS (
+  SELECT a.id FROM "Addresses" a WHERE a.user_id = ${actor.user.id}
 ),
+open_gates AS (
+  SELECT T.id as topic_id
+  FROM
+    user_addresses ua
+    JOIN "Addresses" a ON ua.id = a.id
+    JOIN "Topics" T ON a.community_id = T.community_id
+  	LEFT JOIN "GroupGatedActions" G ON T.id = G.topic_id
+  	LEFT JOIN "Memberships" M ON G.group_id = M.group_id
+      AND M.address_id IN (SELECT id FROM user_addresses)
+      AND M.reject_reason IS NULL
+  GROUP BY
+    T.id
+  HAVING
+    BOOL_AND(
+      COALESCE(G.is_private, FALSE) = FALSE
+      OR M.address_id IS NOT NULL
+      OR ${actor.user?.isAdmin ? 'TRUE' : 'FALSE'}
+    )
+)
+`;
+}
+
+/**
+ * Global activity feed query builder
+ * - Can be scoped to a specific community or search term
+ */
+export function buildGlobalActivityQuery(
+  actor: Actor,
+  community_id?: string,
+  search?: string,
+) {
+  const query = `
+WITH ranked_threads AS (
+  SELECT
+    T.*,
+    C.icon_url,
+    count(*) OVER () AS total
+  FROM
+    "Threads" T
+    JOIN "Communities" C ON C.id = T.community_id 
+  WHERE
+    T.id IN (:threadIds)
+    ${community_id ? 'AND T.community_id = :community_id' : ''}
+    ${search ? 'AND T.title ILIKE :search' : ''}
+),
+${
+  actor.address_id
+    ? // authenticated users are gated by group memberships
+      `
+${buildOpenGates(actor)},
+top_threads AS (
+  SELECT  
+    T.*
+  FROM
+    ranked_threads T
+    JOIN open_gates og ON T.topic_id = og.topic_id
+)
+`
+    : // otherwise only public threads are returned
+      `
+private_gates AS (
+  SELECT DISTINCT ga.topic_id
+  FROM
+    "GroupGatedActions" ga
+    JOIN ranked_threads T ON ga.topic_id = T.topic_id
+  WHERE
+    ga.is_private = TRUE
+),
+top_threads AS (
+  SELECT
+    T.*
+  FROM
+    ranked_threads T
+    LEFT JOIN private_gates pg ON T.topic_id = pg.topic_id
+  WHERE
+    pg.topic_id IS NULL
+)
+`
+}
+${baseActivityQuery}
+ORDER BY ARRAY_POSITION(ARRAY[:threadIds], T.id);
+`;
+
+  return query;
+}
+
+/**
+ * User activity feed query builder
+ */
+export function buildUserActivityQuery(actor: Actor) {
+  const query = `
+WITH user_communities AS (
+  SELECT DISTINCT community_id FROM "Addresses" WHERE user_id = ${actor.user?.id}
+),
+${buildOpenGates(actor)},
 top_threads AS (
   SELECT
     T.*,
@@ -116,16 +193,15 @@ top_threads AS (
     C.icon_url
   FROM
     "Threads" T
-    ${actor.user?.id ? 'JOIN user_communities UC ON UC.community_id = T.community_id' : ''}
+    JOIN open_gates og ON T.topic_id = og.topic_id
+    JOIN user_communities UC ON UC.community_id = T.community_id
     JOIN "Communities" C ON C.id = T.community_id
-    ${joinGates(actor)}
   WHERE
     T.deleted_at IS NULL 
     AND T.marked_as_spam_at IS NULL 
     AND C.active IS TRUE 
     AND C.tier != ${CommunityTierMap.SpamCommunity}
     AND C.id NOT IN ('ethereum', 'cosmos', 'polkadot')
-    ${filterGates(actor)}
   ORDER BY
     T.activity_rank_date DESC NULLS LAST
   LIMIT :limit OFFSET :offset 
@@ -134,21 +210,5 @@ ${baseActivityQuery}
 ORDER BY T.activity_rank_date DESC NULLS LAST
 `;
 
-  const threads = await models.sequelize.query<
-    z.infer<typeof schemas.ThreadView> & { total?: number }
-  >(query, {
-    type: QueryTypes.SELECT,
-    raw: true,
-    replacements: {
-      user_id: actor.user?.id || 0,
-      limit,
-      comment_limit,
-      offset,
-    },
-  });
-
-  return schemas.buildPaginatedResponse(threads, +(threads.at(0)?.total ?? 0), {
-    limit,
-    offset,
-  });
+  return query;
 }

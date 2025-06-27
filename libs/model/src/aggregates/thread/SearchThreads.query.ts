@@ -12,7 +12,7 @@ export function SearchThreads(): Query<typeof schemas.SearchThreads> {
     ...schemas.SearchThreads,
     auth: [authOptional],
     secure: true,
-    body: async ({ actor, context, payload }) => {
+    body: async ({ actor, payload }) => {
       const {
         community_id,
         search_term,
@@ -74,6 +74,8 @@ ORDER BY
   ${order_by === 'created_at' ? `T.${order_by} ${order_direction || 'DESC'}` : `rank, T.created_at DESC`}
 LIMIT :limit OFFSET :offset
 `;
+
+      console.log('Search threads query', sql);
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ThreadView> & { total_count: number }
       >(sql, {
