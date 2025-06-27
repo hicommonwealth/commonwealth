@@ -117,9 +117,12 @@ export async function signInPrivy({
 
     if (!payload.privy.ssoProvider) throw new Error('Missing OAuth provider');
 
+    console.log('payload.privy.ssoProvider', payload.privy.ssoProvider);
     const walletSsoSource = mapPrivyTypeToWalletSso(payload.privy.ssoProvider);
     if (requiresAuthToken(walletSsoSource) && !payload.privy.ssoOAuthToken)
       throw new Error('Missing OAuth token');
+
+    console.log('walletSsoSource', walletSsoSource);
     verifiedSsoInfo = await getVerifiedUserInfo({
       privyUser: fullPrivyUser,
       walletSsoSource,

@@ -14,11 +14,34 @@ export const LoadPrivy = memo(function LoadPrivy(props: DefaultPrivyProvider) {
 
   const configurationData = fetchCachedPublicEnvVar();
 
+  console.log(
+    '[DEBUG] LoadPrivy - PRIVY_APP_ID configured:',
+    !!configurationData?.PRIVY_APP_ID,
+  );
+
   if (!configurationData?.PRIVY_APP_ID) return <div>Privy not configured</div>;
 
   return (
     <PrivyProvider
       appId={configurationData.PRIVY_APP_ID}
+      onSuccess={(
+        user,
+        isNewUser,
+        wasAlreadyAuthenticated,
+        loginMethod,
+        linkedAccount,
+      ) => {
+        console.log('[DEBUG] PrivyProvider - Authentication success');
+        console.log('[DEBUG] PrivyProvider - user:', user);
+        console.log('[DEBUG] PrivyProvider - isNewUser:', isNewUser);
+        console.log(
+          '[DEBUG] PrivyProvider - wasAlreadyAuthenticated:',
+          wasAlreadyAuthenticated,
+        );
+        console.log('[DEBUG] PrivyProvider - loginMethod:', loginMethod);
+        console.log('[DEBUG] PrivyProvider - linkedAccount:', linkedAccount);
+        console.log('[DEBUG] PrivyProvider - user.wallet:', user.wallet);
+      }}
       config={{
         loginMethods: [
           'google',

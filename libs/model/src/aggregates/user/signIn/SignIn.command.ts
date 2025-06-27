@@ -101,6 +101,8 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         signedInUser: user,
         ethChainId: ethChainId ?? undefined,
       };
+
+      console.log('wallet_id signInPrivy', wallet_id);
       const res =
         wallet_id === WalletId.Privy
           ? await signInPrivy(args)
