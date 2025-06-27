@@ -28,11 +28,13 @@ export function usePrivySignOn() {
 
       if (ssoProvider === 'email' && !privyUser?.email) {
         // trying to login via email but the privyUser is wrong.
+        console.log('Skipping attempt at email auth... ');
         return;
       }
 
       if (ssoProvider === 'phone' && !privyUser?.phone) {
         // trying to login via phone but the privyUser is wrong.
+        console.log('Skipping attempt at phone auth... ');
         return;
       }
 
