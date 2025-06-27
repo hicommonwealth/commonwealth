@@ -12,13 +12,12 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
     ...schemas.SearchComments,
     auth: [authOptional],
     secure: true,
-    body: async ({ actor, payload, context }) => {
+    body: async ({ actor, payload }) => {
       const { community_id, search, limit, cursor, order_by, order_direction } =
         payload;
-      const address_id = context?.address?.id;
 
       const replacements = {
-        address_id,
+        address_id: actor.address_id,
         community_id:
           community_id && community_id !== ALL_COMMUNITIES
             ? community_id
@@ -28,15 +27,8 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
         offset: limit * (cursor - 1),
       };
 
-      const gating = {
-        address_id,
-        admin_or_moderator:
-          actor.user.isAdmin ||
-          ['admin', 'moderator'].includes(context?.address?.role || ''),
-      };
-
       const sql = `
-${withGates(gating)}
+${withGates(actor)}
 SELECT
   'comment' as type,
   C.id,
@@ -54,13 +46,13 @@ FROM
   "Comments" C
   JOIN "Addresses" A ON C.address_id = A.id
   JOIN "Threads" T ON C.thread_id = T.id
-  ${joinGates(gating)}
+  ${joinGates(actor)}
   , websearch_to_tsquery('english', :search) as tsquery
 WHERE
   C.deleted_at IS NULL
   AND C.marked_as_spam_at IS NULL
   ${replacements.community_id ? 'AND T.community_id = :community_id' : ''}
-  ${filterGates(gating)}
+  ${filterGates(actor)}
   AND tsquery @@ C.search
 ORDER BY
   ${order_by === 'created_at' ? `C.created_at ${order_direction || 'DESC'}` : `rank, C.created_at DESC`}
