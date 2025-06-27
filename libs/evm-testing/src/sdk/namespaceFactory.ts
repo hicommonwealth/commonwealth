@@ -127,6 +127,37 @@ export class NamespaceFactory extends SdkBase {
     };
   }
 
+  async newERC20Contest(
+    namespaceName: string,
+    contestInterval: number,
+    winnerShares: number[],
+    voteToken: string,
+    voterShare: number,
+    exchangeToken: string,
+    accountIndex?: number,
+  ): Promise<{ block: number; contest: string }> {
+    const account = (await this.getAccounts())[accountIndex ?? 0];
+    const txReceipt = await this.contract.methods
+      .newSingleERC20Contest(
+        namespaceName,
+        contestInterval,
+        winnerShares,
+        voteToken,
+        voterShare,
+        exchangeToken,
+      )
+      .send({ from: account });
+    const eventLog = txReceipt.logs.find((log) => log.topics![0] == TOPIC_LOG);
+    const newContestAddress = this.web3.eth.abi.decodeParameters(
+      ['address', 'address', 'uint256', 'bool'],
+      eventLog!.data!.toString(),
+    )['0'] as string;
+    return {
+      block: Number(txReceipt['blockNumber']),
+      contest: newContestAddress,
+    };
+  }
+
   /**
    * Gets the contract address for a namespace with the given name
    * @param name Namespace name
