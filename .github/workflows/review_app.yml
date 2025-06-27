@@ -186,6 +186,21 @@ jobs:
               console.log('No deployment URL found to comment on PR');
             }
 
+      - name: Comment on PR if Deployment Fails
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const message = `❌ Review app deployment failed!\n\nYou can view the failed workflow run for details: [View Run](${runUrl})`;
+            github.rest.issues.createComment({
+              issue_number: ${{ steps.set_pr_number.outputs.pr_number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });
+
       # TODO: check if this posts a new comment for each commit to an open PR if this updates the comment
       # TODO: if this creates a new comment for each commit, we need to update if so it only posts a
       # new comment when a migration changes in one of the commits since last execution
