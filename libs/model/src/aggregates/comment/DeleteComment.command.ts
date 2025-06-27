@@ -51,6 +51,8 @@ export function DeleteComment(): Command<typeof schemas.DeleteComment> {
         comment_id: comment.id!,
         thread_id: comment.thread_id,
         community_id,
+        body: comment.body,
+        marked_as_spam_at: comment.marked_as_spam_at,
         user_tier_at_creation: comment.user_tier_at_creation,
         canvas_signed_data: comment.canvas_signed_data,
         canvas_msg_id: comment.canvas_msg_id,
