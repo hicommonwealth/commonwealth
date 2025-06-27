@@ -4,11 +4,15 @@ import {
   useOAuthTokens,
   usePrivy,
 } from '@privy-io/react-auth';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toSignInProvider } from 'views/components/Privy/helpers';
+import {
+  getPrivyActiveProvider,
+  setPrivyActiveProvider,
+} from 'views/components/Privy/privyActiveAuthStrategy';
 import { PrivyCallbacks } from 'views/components/Privy/PrivyCallbacks';
 import { usePrivyAuthEffect } from 'views/components/Privy/usePrivyAuthEffect';
-import { OAuthProvider } from './types';
+import { OAuthProvider, PrivySignInSSOProvider } from './types';
 
 /**
  * Use privy auth with OAuth providers. Like google.
@@ -22,7 +26,6 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
   const privyAuthEffect = usePrivyAuthEffect(props);
   const { authenticated, logout } = usePrivy();
   const { loading, initOAuth } = useLoginWithOAuth();
-  const providerRef = useRef<OAuthProvider | undefined>(undefined);
 
   useOAuthTokens({
     onOAuthTokenGrant: (params) => {
@@ -35,11 +38,13 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
       return;
     }
 
-    if (!providerRef.current) {
-      console.warn('No provider.');
+    const activeProvider = getPrivyActiveProvider();
+    if (activeProvider === null || !isOauthProvider(activeProvider)) {
+      console.warn('No provider or wrong provider: ' + activeProvider);
       return;
     }
-    const ssoProvider = toSignInProvider(providerRef.current);
+    const ssoProvider = toSignInProvider(activeProvider);
+    console.log('FIXME trying to do auth with ' + ssoProvider);
     privyAuthEffect(ssoProvider, oAuthAccessToken);
   }, [oAuthAccessToken, privyAuthEffect]);
 
@@ -47,7 +52,7 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
     (provider: OAuthProvider | WalletSsoSource) => {
       async function doAsync() {
         if (isOauthProvider(provider)) {
-          providerRef.current = provider;
+          setPrivyActiveProvider(toSignInProvider(provider));
           await initOAuth({ provider });
         } else {
           throw new Error('Not supported: ' + provider);
@@ -68,7 +73,7 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
 }
 
 function isOauthProvider(
-  value: WalletSsoSource | OAuthProvider,
+  value: WalletSsoSource | OAuthProvider | PrivySignInSSOProvider,
 ): value is OAuthProvider {
   switch (value) {
     case 'google':
@@ -76,6 +81,11 @@ function isOauthProvider(
     case 'discord':
     case 'twitter':
     case 'apple':
+    case 'apple_oauth':
+    case 'discord_oauth':
+    case 'github_oauth':
+    case 'google_oauth':
+    case 'twitter_oauth':
       return true;
     default:
       return false;
