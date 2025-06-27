@@ -1,5 +1,5 @@
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
-import { ConnectedWallet } from '@privy-io/react-auth';
+import { ConnectedWallet, usePrivy } from '@privy-io/react-auth';
 import { PrivyEthereumWebWalletController } from 'controllers/app/webWallets/privy_ethereum_web_wallet';
 import { getSessionFromWallet } from 'controllers/server/sessions';
 import { useCallback } from 'react';
@@ -20,10 +20,21 @@ export function usePrivySignOn() {
   const { signIn } = useSignIn();
   const signMessage = useSignMessageMemo();
   const identityTokenRef = useIdentityTokenRef();
+  const { user: privyUser } = usePrivy();
 
   return useCallback(
     async (props: UsePrivySignOnProps) => {
       const { wallet, ssoOAuthToken, ssoProvider, onSuccess } = props;
+
+      if (ssoProvider === 'email' && !privyUser?.email) {
+        // trying to login via email but the privyUser is wrong.
+        return;
+      }
+
+      if (ssoProvider === 'phone' && !privyUser?.phone) {
+        // trying to login via phone but the privyUser is wrong.
+        return;
+      }
 
       const ethereumProvider = async () => {
         return await wallet.getEthereumProvider();
