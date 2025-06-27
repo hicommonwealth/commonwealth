@@ -1,11 +1,8 @@
 import { dispose, User } from '@hicommonwealth/core';
-import {
-  addContentBatch,
-  voteContentBatch,
-} from '@hicommonwealth/evm-protocols';
-import { config, models } from '@hicommonwealth/model';
+import { models, tokenBalanceCache } from '@hicommonwealth/model';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
+  BalanceSourceType,
   ChainBase,
   ChainType,
   CommunityTierMap,
@@ -45,7 +42,6 @@ describe(
     const namespaceName = 'TestWeightedNamespace';
     const addressId = 1001;
     const userId = 1001;
-    const userAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
     const threadId = 2001;
     const threadTitle = 'Test Weighted Voting Thread';
     let user: User;
@@ -56,13 +52,17 @@ describe(
     let rpcUrl: string;
     const stakeAmount = 5;
 
+    let userAddress = '';
+    const mintAmount = 10 ** 6;
+
     beforeAll(async () => {
       // Setup Commonwealth E2E environment with relayer and event processing
       const setupResult = await setupCommonwealthE2E();
 
       web3 = setupResult.web3;
       anvilAccounts = setupResult.anvilAccounts;
-      privateKey = config.WEB3.PRIVATE_KEY;
+      privateKey = anvilAccounts[0].privateKey;
+      userAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address;
 
       // Set rpcUrl based on the anvil container
       const anvilPort = setupResult.anvilContainer!.getMappedPort(8545);
@@ -83,6 +83,8 @@ describe(
         );
       }
       chainNodeId = chainNode.id!;
+
+      // TODO: deploy ERC20 for funding token
 
       // Create test user with unique ID to avoid conflicts
       const u = await models.User.create({
@@ -420,18 +422,6 @@ describe(
         },
       });
 
-      // Make actual web3 contract call to add content to contest
-      await addContentBatch({
-        chain: {
-          eth_chain_id: 31337,
-          rpc: rpcUrl,
-        },
-        privateKey,
-        contest: [contestAddress],
-        creator: userAddress,
-        url: `/${communityId}/discussion/${threadResult!.id}`,
-      });
-
       // Wait for automatic processing of ContestContentAdded event
       await vi.waitFor(
         async () => {
@@ -451,20 +441,16 @@ describe(
         },
       );
 
-      // Make actual web3 contract call to vote on contest content
-      await voteContentBatch({
-        chain: {
-          eth_chain_id: 31337,
-          rpc: rpcUrl,
+      // Make upvote on thread
+      await command(Thread.CreateThreadReaction(), {
+        actor: {
+          user: { id: userId, email: user.email!, isAdmin: true },
+          address: userAddress,
         },
-        privateKey,
-        voter: userAddress,
-        entries: [
-          {
-            contestAddress: contestAddress,
-            contentId: '1', // First content ID
-          },
-        ],
+        payload: {
+          thread_id: threadResult!.id!,
+          reaction: 'like',
+        },
       });
 
       // Wait for automatic processing of ContestContentUpvoted event
@@ -524,6 +510,8 @@ describe(
       );
       const erc20ContestAddress = erc20ContestResult.contest;
 
+      const voteWeightMultiplier = 12;
+
       // Create contest manager using command
       await command(Contest.CreateContestManagerMetadata(), {
         actor: {
@@ -544,7 +532,7 @@ describe(
           ticker: 'TEST',
           decimals: 18,
           is_farcaster_contest: false,
-          vote_weight_multiplier: 2,
+          vote_weight_multiplier: voteWeightMultiplier,
         },
       });
 
@@ -583,18 +571,6 @@ describe(
         },
       });
 
-      // Make actual web3 contract call to add content to contest
-      await addContentBatch({
-        chain: {
-          eth_chain_id: 31337,
-          rpc: rpcUrl,
-        },
-        privateKey,
-        contest: [erc20ContestAddress],
-        creator: userAddress,
-        url: `/${communityId}/discussion/${erc20ThreadResult!.id}`,
-      });
-
       // Wait for automatic processing of ContestContentAdded event
       await vi.waitFor(
         async () => {
@@ -614,20 +590,29 @@ describe(
         },
       );
 
-      // Make actual web3 contract call to vote on contest content
-      await voteContentBatch({
-        chain: {
-          eth_chain_id: 31337,
-          rpc: rpcUrl,
+      // Get token balance of user via tokenBalanceCache
+      const tokenBalances = await tokenBalanceCache.getBalances({
+        balanceSourceType: BalanceSourceType.ERC20,
+        addresses: [userAddress],
+        sourceOptions: {
+          evmChainId: 31337, // Use the Anvil chain ID
+          contractAddress: CMN_TOKEN_ADDRESS,
         },
-        privateKey,
-        voter: userAddress,
-        entries: [
-          {
-            contestAddress: erc20ContestAddress,
-            contentId: '1', // First content ID
-          },
-        ],
+        cacheRefresh: true,
+      });
+      const tokenBalance = tokenBalances[userAddress] || '0';
+      console.log('Token balance:', tokenBalance);
+
+      // Make upvote on thread
+      await command(Thread.CreateThreadReaction(), {
+        actor: {
+          user: { id: userId, email: user.email!, isAdmin: true },
+          address: userAddress,
+        },
+        payload: {
+          thread_id: erc20ThreadResult!.id!,
+          reaction: 'like',
+        },
       });
 
       // Wait for automatic processing of ContestContentUpvoted event
@@ -642,9 +627,12 @@ describe(
           });
           expect(voteAction).toBeTruthy();
           expect(voteAction!.calculated_voting_weight).not.toBeNull();
-          // For ERC20 voting, we expect the calculated weight to reflect the token balance and multiplier
-          expect(BigInt(voteAction!.calculated_voting_weight!)).toBeGreaterThan(
-            BigInt(0),
+          // For ERC20 voting, we expect the calculated weight to reflect
+          // the token balance and multiplier
+          const expectedWeight =
+            BigInt(tokenBalance) * BigInt(voteWeightMultiplier);
+          expect(BigInt(voteAction!.calculated_voting_weight!)).toEqual(
+            expectedWeight,
           );
         },
         {
