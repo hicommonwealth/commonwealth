@@ -5,7 +5,7 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authOptionalVerified } from '../../middleware';
-import { buildOpenGates } from '../../utils/gating';
+import { buildGatedOutput } from '../../utils/gating';
 
 export function SearchThreads(): Query<typeof schemas.SearchThreads> {
   return {
@@ -36,7 +36,7 @@ export function SearchThreads(): Query<typeof schemas.SearchThreads> {
       };
 
       const sql = `
-WITH threads AS (
+WITH output_with_topics AS (
 SELECT 
   'thread' as type,
   T.community_id,
@@ -69,45 +69,12 @@ WHERE
   ${replacements.community_id ? 'AND T.community_id = :community_id' : ''} 
   AND (T.title ILIKE '%' || :search_term || '%' ${!thread_title_only ? 'OR tsquery @@ T.search' : ''})
 ),
-${
-  actor.address_id
-    ? // authenticated users are gated by group memberships
-      `
-${buildOpenGates(actor)},
-gated_threads AS (
-  SELECT  
-    T.*
-  FROM
-    threads T
-    JOIN open_gates og ON T.topic_id = og.topic_id
-)
-`
-    : // otherwise only public threads are returned
-      `
-private_gates AS (
-  SELECT DISTINCT ga.topic_id
-  FROM
-    "GroupGatedActions" ga
-    JOIN threads T ON ga.topic_id = T.topic_id
-  WHERE
-    ga.is_private = TRUE
-),
-gated_threads AS (
-  SELECT
-    T.*
-  FROM
-    threads T
-    LEFT JOIN private_gates pg ON T.topic_id = pg.topic_id
-  WHERE
-    pg.topic_id IS NULL
-)
-`
-}  
+${buildGatedOutput(actor)}  
 SELECT
   T.*,
   COUNT(*) OVER()::INTEGER AS total_count
 FROM
-  gated_threads T
+  gated_output T
 ORDER BY
   ${order_by === 'created_at' ? `T.${order_by} ${order_direction || 'DESC'}` : `rank, T.created_at DESC`}
 LIMIT :limit OFFSET :offset

@@ -1,10 +1,10 @@
 import { Actor } from '@hicommonwealth/core';
 import { CommunityTierMap } from '@hicommonwealth/shared';
-import { buildOpenGates } from './gating';
+import { buildGatedOutput, buildOpenGates } from './gating';
 
 /**
  * Base query for global and user activity feeds
- * - Based on the gated top_threads CTE from the builder functions
+ * - Based on `gated_output` CTE from the builder functions
  */
 const baseActivityQuery = `
   SELECT
@@ -78,7 +78,7 @@ const baseActivityQuery = `
             AND C.deleted_at IS NULL
         ) C WHERE C.rn <= :comment_limit), '[]') as comments
   FROM
-    top_threads T
+    gated_output T
       JOIN "Addresses" A ON A.id = T.address_id AND A.community_id = T.community_id
       JOIN "Users" U ON U.id = A.user_id
       JOIN "Topics" Tp ON Tp.id = T.topic_id
@@ -94,7 +94,7 @@ export function buildGlobalActivityQuery(
   search?: string,
 ) {
   const query = `
-WITH ranked_threads AS (
+WITH output_with_topics AS (
   SELECT
     T.*,
     C.icon_url,
@@ -107,40 +107,7 @@ WITH ranked_threads AS (
     ${community_id ? 'AND T.community_id = :community_id' : ''}
     ${search ? 'AND T.title ILIKE :search' : ''}
 ),
-${
-  actor.address_id
-    ? // authenticated users are gated by group memberships
-      `
-${buildOpenGates(actor)},
-top_threads AS (
-  SELECT  
-    T.*
-  FROM
-    ranked_threads T
-    JOIN open_gates og ON T.topic_id = og.topic_id
-)
-`
-    : // otherwise only public threads are returned
-      `
-private_gates AS (
-  SELECT DISTINCT ga.topic_id
-  FROM
-    "GroupGatedActions" ga
-    JOIN ranked_threads T ON ga.topic_id = T.topic_id
-  WHERE
-    ga.is_private = TRUE
-),
-top_threads AS (
-  SELECT
-    T.*
-  FROM
-    ranked_threads T
-    LEFT JOIN private_gates pg ON T.topic_id = pg.topic_id
-  WHERE
-    pg.topic_id IS NULL
-)
-`
-}
+${buildGatedOutput(actor)}
 ${baseActivityQuery}
 ORDER BY ARRAY_POSITION(ARRAY[:threadIds], T.id);
 `;
@@ -157,7 +124,7 @@ WITH user_communities AS (
   SELECT DISTINCT community_id FROM "Addresses" WHERE user_id = ${actor.user?.id}
 ),
 ${buildOpenGates(actor)},
-top_threads AS (
+gated_output AS (
   SELECT
     T.*,
     count(*) OVER() AS total,

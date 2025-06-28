@@ -90,3 +90,44 @@ open_gates AS (
 )
 `;
 }
+
+/**
+ * Gated output builder
+ * - Expects `output_with_topics` CTE
+ * - Filters according to the actor's group memberships
+ * - Builds `gated_output` CTE
+ */
+export function buildGatedOutput(actor: Actor) {
+  // authenticated users are gated by group memberships
+  if (actor.address_id)
+    return `
+  ${buildOpenGates(actor)},
+  gated_output AS (
+    SELECT  
+      output_with_topics.*
+    FROM
+      output_with_topics
+      JOIN open_gates og ON og.topic_id = output_with_topics.topic_id
+  )
+  `;
+
+  // otherwise only public ouput is returned
+  return `
+  private_gates AS (
+    SELECT DISTINCT ga.topic_id
+    FROM
+      "GroupGatedActions" ga
+      JOIN output_with_topics ON ga.topic_id = output_with_topics.topic_id
+    WHERE
+      ga.is_private = TRUE
+  ),
+  gated_output AS (
+    SELECT
+      output_with_topics.*
+    FROM
+      output_with_topics
+      LEFT JOIN private_gates pg ON output_with_topics.topic_id = pg.topic_id
+    WHERE
+      pg.topic_id IS NULL
+  )`;
+}

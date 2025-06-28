@@ -5,7 +5,7 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authOptionalVerified } from '../../middleware';
-import { buildOpenGates } from '../../utils/gating';
+import { buildGatedOutput } from '../../utils/gating';
 
 export function SearchComments(): Query<typeof schemas.SearchComments> {
   return {
@@ -28,7 +28,7 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
       };
 
       const sql = `
-WITH comments AS (
+WITH output_with_topics AS (
 SELECT
   'comment' as type,
   C.id,
@@ -53,45 +53,12 @@ WHERE
   ${replacements.community_id ? 'AND T.community_id = :community_id' : ''}
   AND tsquery @@ C.search
 ),
-${
-  actor.address_id
-    ? // authenticated users are gated by group memberships
-      `
-${buildOpenGates(actor)},
-gated_comments AS (
-  SELECT  
-    C.*
-  FROM
-    comments C
-    JOIN open_gates og ON C.topic_id = og.topic_id
-)
-`
-    : // otherwise only public threads are returned
-      `
-private_gates AS (
-  SELECT DISTINCT ga.topic_id
-  FROM
-    "GroupGatedActions" ga
-    JOIN comments C ON ga.topic_id = C.topic_id
-  WHERE
-    ga.is_private = TRUE
-),
-gated_comments AS (
-  SELECT
-    C.*
-  FROM
-    comments C
-    LEFT JOIN private_gates pg ON C.topic_id = pg.topic_id
-  WHERE
-    pg.topic_id IS NULL
-)
-`
-}
+${buildGatedOutput(actor)} 
 SELECT
   C.*,
   COUNT(*) OVER()::INTEGER AS total_count
 FROM
-  gated_comments C
+  gated_output C
 ORDER BY
   ${order_by === 'created_at' ? `C.created_at ${order_direction || 'DESC'}` : `rank, C.created_at DESC`}
 LIMIT :limit OFFSET :offset
