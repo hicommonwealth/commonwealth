@@ -26,7 +26,6 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         status,
         withXRecentComments = 0,
       } = payload;
-      const address_id = context?.address?.id;
 
       if (stage && status)
         throw new InvalidInput('Cannot provide both stage and status');
@@ -46,7 +45,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         from_date,
         to_date: to_date || new Date().toISOString(),
         community_id,
-        address_id,
+        address_id: actor.address_id,
         stage,
         topic_id,
         contestAddress,
@@ -70,15 +69,8 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         all: '',
       };
 
-      const gating = {
-        address_id,
-        admin_or_moderator:
-          actor.user.isAdmin ||
-          ['admin', 'moderator'].includes(context?.address?.role || ''),
-      };
-
       const sql = `
-            ${withGates(gating)},
+            ${withGates(actor)},
             contest_ids as (
               SELECT DISTINCT(CA.thread_id)
               FROM "Contests" CON
@@ -122,12 +114,12 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 (COUNT(id) OVER())::INTEGER AS total_num_thread_results
               FROM
                 "Threads" T
-                ${joinGates(gating)}
+                ${joinGates(actor)}
               WHERE
                 community_id = :community_id
                 AND deleted_at IS NULL
                 AND archived_at IS ${archived ? 'NOT' : ''} NULL
-                ${filterGates(gating)}
+                ${filterGates(actor)}
                 ${topic_id ? ' AND T.topic_id = :topic_id' : ''}
                 ${stage ? ' AND stage = :stage' : ''}
                 ${from_date ? ' AND T.created_at > :from_date' : ''}
