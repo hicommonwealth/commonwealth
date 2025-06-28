@@ -4,15 +4,15 @@ import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
-import { authOptional } from '../../middleware';
-import { filterGates, joinGates, withGates } from '../../utils/gating';
+import { authOptionalVerified } from '../../middleware';
+import { buildGatedOutput } from '../../utils/gating';
 
 export function SearchThreads(): Query<typeof schemas.SearchThreads> {
   return {
     ...schemas.SearchThreads,
-    auth: [authOptional],
+    auth: [authOptionalVerified],
     secure: true,
-    body: async ({ actor, context, payload }) => {
+    body: async ({ actor, payload }) => {
       const {
         community_id,
         search_term,
@@ -36,10 +36,11 @@ export function SearchThreads(): Query<typeof schemas.SearchThreads> {
       };
 
       const sql = `
-${withGates(actor)}
+WITH output_with_topics AS (
 SELECT 
   'thread' as type,
   T.community_id,
+  T.topic_id,
   T.id,
   T.title,
   ${thread_title_only ? `''` : `T.body`} as body,
@@ -56,24 +57,29 @@ SELECT
   U.tier as user_tier,
   U.profile->>'avatar_url' as avatar_url,
   U.profile->>'name' as profile_name,
-  COUNT(*) OVER()::INTEGER AS total_count, 
   ts_rank_cd(T.search, tsquery) as rank
 FROM 
     "Threads" T
     JOIN "Addresses" A ON T.address_id = A.id
     JOIN "Users" U ON A.user_id = U.id
-    ${joinGates(actor)}
     , websearch_to_tsquery('english', :search_term) as tsquery
 WHERE
   T.deleted_at IS NULL
   AND T.marked_as_spam_at IS NULL
   ${replacements.community_id ? 'AND T.community_id = :community_id' : ''} 
-  ${filterGates(actor)}
   AND (T.title ILIKE '%' || :search_term || '%' ${!thread_title_only ? 'OR tsquery @@ T.search' : ''})
+),
+${buildGatedOutput(actor)}  
+SELECT
+  T.*,
+  COUNT(*) OVER()::INTEGER AS total_count
+FROM
+  gated_output T
 ORDER BY
   ${order_by === 'created_at' ? `T.${order_by} ${order_direction || 'DESC'}` : `rank, T.created_at DESC`}
 LIMIT :limit OFFSET :offset
 `;
+
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ThreadView> & { total_count: number }
       >(sql, {
