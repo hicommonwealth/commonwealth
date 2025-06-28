@@ -47,6 +47,8 @@ export function usePrivySignOn() {
         newSession: true,
       });
 
+      console.log('ssoProvider in usePrivySignOn', ssoProvider);
+
       const { newlyCreated } = await signIn(session, {
         address: wallet.address,
         community_id: ChainBase.Ethereum,
