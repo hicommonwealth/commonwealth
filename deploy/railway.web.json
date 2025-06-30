@@ -5,7 +5,7 @@
     "dockerfilePath": "Dockerfile.railway"
   },
   "deploy": {
-    "preDeployCommand": "./build/scripts/pre-deploy.sh",
+    "preDeployCommand": "chmod u+x build/scripts/pre-deploy.sh && ./build/scripts/pre-deploy.sh",
     "startCommand": "node --import=extensionless/register --enable-source-maps ./build/server.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3,
