@@ -6,16 +6,4 @@
   flex-direction: column;
   gap: 16px;
   align-items: flex-start;
-
-  .header {
-    .h4 {
-      color: colors.$neutral-900 !important;
-      margin-bottom: 8px;
-    }
-
-    p {
-      color: colors.$neutral-500 !important;
-      margin: 0;
-    }
-  }
 }

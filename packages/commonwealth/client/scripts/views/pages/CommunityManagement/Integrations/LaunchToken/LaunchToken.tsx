@@ -2,53 +2,44 @@ import { ChainBase } from '@hicommonwealth/shared';
 import React, { useState } from 'react';
 import app from 'state';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import QuickTokenLaunchForm from 'views/pages/LaunchToken/QuickTokenLaunchForm';
+import TokenLaunchDrawer from 'views/pages/ExplorePage/IdeaLaunchpad/TokenLaunchDrawer';
 import './LaunchToken.scss';
 
 const LaunchToken = () => {
   const isEthereum = app.chain.meta.base === ChainBase.Ethereum;
 
-  const [isLaunchTokenModalOpen, setLaunchTokenModalOpen] = useState(false);
+  const [isTokenLaunchDrawerOpen, setIsTokenLaunchDrawerOpen] = useState(false);
 
   const communityId = app.activeChainId();
   const { data: community } = useGetCommunityByIdQuery({
     id: communityId || '',
     enabled: !!communityId,
   });
+
   const communityDescription = community?.description || '';
 
-  if (!isEthereum) {
-    return null;
-  }
+  if (!isEthereum) return null;
 
   return (
     <div className="LaunchToken">
       <div className="header">
-        <h4>Launch Token</h4>
-        <p>Create and launch a token for your community</p>
+        <CWText type="h4">Launch Token</CWText>
+        <CWText type="b1">Launch a token for your community</CWText>
       </div>
 
       <CWButton
         label="Launch Token"
         iconLeft="rocketLaunch"
         buttonType="primary"
-        onClick={() => setLaunchTokenModalOpen(true)}
+        onClick={() => setIsTokenLaunchDrawerOpen(true)}
       />
 
-      {/* Modal with QuickTokenLaunchForm */}
-      <CWModal
-        open={isLaunchTokenModalOpen}
-        onClose={() => setLaunchTokenModalOpen(false)}
-        content={
-          <QuickTokenLaunchForm
-            onCancel={() => setLaunchTokenModalOpen(false)}
-            onCommunityCreated={() => setLaunchTokenModalOpen(false)}
-            initialIdeaPrompt={communityDescription}
-          />
-        }
-        size="large"
+      <TokenLaunchDrawer
+        isOpen={isTokenLaunchDrawerOpen}
+        onClose={() => setIsTokenLaunchDrawerOpen(false)}
+        initialIdeaPrompt={communityDescription}
       />
     </div>
   );
