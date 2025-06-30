@@ -22,6 +22,7 @@ export async function setupAnvil() {
       INSERT INTO "ChainNodes" (
           id,
           url,
+          private_url,
           eth_chain_id,
           alt_wallet_url,
           balance_type,
@@ -30,6 +31,7 @@ export async function setupAnvil() {
           updated_at
       ) VALUES (
         1,
+        'http://localhost:${port}',
         'http://localhost:${port}',
         31337,
         'http://localhost:${port}',
