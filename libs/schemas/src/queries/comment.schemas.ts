@@ -1,5 +1,5 @@
 import z from 'zod';
-import { AuthContext } from '../context';
+import { VerifiedContext } from '../context';
 import { PG_INT, zBoolean } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 import { CommentView, ReactionView } from './thread.schemas';
@@ -27,7 +27,7 @@ export const SearchComments = {
   output: PaginatedResultSchema.extend({
     results: z.array(CommentSearchView),
   }),
-  context: AuthContext,
+  context: VerifiedContext,
 };
 
 export const CommentsView = CommentView.extend({
