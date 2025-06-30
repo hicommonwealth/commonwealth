@@ -602,7 +602,7 @@ export const deployNamespace = async (
   });
 
   const namespaceCheck = await getNamespace(chain, name);
-  if (namespaceCheck === ZERO_ADDRESS) {
+  if (namespaceCheck !== ZERO_ADDRESS) {
     throw new Error('Namespace already reserved');
   }
 
