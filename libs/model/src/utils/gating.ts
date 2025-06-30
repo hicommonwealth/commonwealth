@@ -111,23 +111,21 @@ export function buildGatedOutput(actor: Actor) {
   )
   `;
 
-  // otherwise only public ouput is returned
+  // otherwise only return public ouput -> no private gated actions associated to the topic
   return `
-  private_gates AS (
-    SELECT DISTINCT ga.topic_id
-    FROM
-      "GroupGatedActions" ga
-      JOIN output_with_topics ON ga.topic_id = output_with_topics.topic_id
-    WHERE
-      ga.is_private = TRUE
-  ),
   gated_output AS (
     SELECT
       output_with_topics.*
     FROM
       output_with_topics
-      LEFT JOIN private_gates pg ON output_with_topics.topic_id = pg.topic_id
     WHERE
-      pg.topic_id IS NULL
+      NOT EXISTS (
+        SELECT 1
+        FROM
+          "GroupGatedActions" ga
+        WHERE
+          ga.topic_id = output_with_topics.topic_id
+          AND ga.is_private = TRUE
+      )
   )`;
 }
