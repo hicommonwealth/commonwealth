@@ -6,7 +6,7 @@ Two step setup:
 3. Connect to digital ocean cluster `doctl auth init` and `doctl kubernetes cluster kubeconfig save development`
 
 # Bootstrap Argocd
-1. Run `kubectl create namespace argocd && helm install my-argo-cd argo/argo-cd --version 8.1.2 --namespace argocd` (requires installing helm locally)
+1. Run `kubectl create namespace argocd && helm install argocd argo/argo-cd --version 8.1.2 --namespace argocd` (requires installing helm locally)
 
 # Setup cloudflare-tunnel
 Run `kubectl apply -f cloudflare.yaml`

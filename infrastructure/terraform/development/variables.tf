@@ -18,3 +18,6 @@ variable "CLOUDFLARE_ACCOUNT_ID" {
 variable "DOMAIN_NAME" {
   type = string
 }
+variable "CLOUDFLARE_ZONE_ID" {
+  type = string
+}

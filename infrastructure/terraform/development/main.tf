@@ -88,26 +88,34 @@ resource "kubernetes_secret" "tunnel_token_secret" {
 variable "subdomain_services" {
   type = map(string)
   default = {
-    argocd  = "http://httpbin-service"
+    argocd = "https://argocd-server.argocd.svc.cluster.local:443"
   }
 }
 
-resource "cloudflare_tunnel_hostname" "routes" {
-  for_each  = var.subdomain_services
-
-  account_id = var.CLOUDFLARE_ACCOUNT_ID
+resource "cloudflare_zero_trust_tunnel_cloudflared_config" "cmn_config" {
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.cmn_tunnel.id
+  account_id = var.CLOUDFLARE_ACCOUNT_ID
 
-  hostname = "${each.key}.${var.DOMAIN_NAME}"
-  service  = each.value
+  config = {
+    ingress = concat(
+      [for name, svc in var.subdomain_services : {
+        hostname = "${name}.${var.DOMAIN_NAME}"
+        service  = svc
+      }],
+      [
+        { service = "http_status:404" }
+      ]
+    )
+  }
 }
 
-resource "cloudflare_record" "dns" {
+resource "cloudflare_dns_record" "dns" {
   for_each = var.subdomain_services
 
   zone_id = var.CLOUDFLARE_ZONE_ID
   name    = each.key
+  content   = "${cloudflare_zero_trust_tunnel_cloudflared.cmn_tunnel.id}.cfargotunnel.com"
   type    = "CNAME"
-  value   = "${cloudflare_zero_trust_tunnel_cloudflared.cmn_tunnel.id}.cfargotunnel.com"
+  ttl     = 1
   proxied = true
 }
