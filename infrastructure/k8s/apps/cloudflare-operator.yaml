@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cloudflare-operator
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cloudflare-operator-system
+  project: default
+  source:
+    repoURL: https://github.com/adyanth/cloudflare-operator.git
+    targetRevision: v0.13.1
+    path: config/default
+    kustomize:
+      patches:
+        - target:
+            kind: Deployment
+            name: cloudflare-operator-controller-manager
+          patch: |-
+            - op: remove
+              path: /spec/template/spec/containers/0/resources/requests/cpu
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

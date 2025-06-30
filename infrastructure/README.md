@@ -9,7 +9,12 @@ Two step setup:
 1. Run `kubectl create namespace argocd && helm install argocd argo/argo-cd --version 8.1.2 --namespace argocd` (requires installing helm locally)
 
 # Setup cloudflare-tunnel
-Run `kubectl apply -f cloudflare.yaml`
+1. Run `kubectl apply -f cert-manager.yaml`
+2. Run `kubectl apply -f cloudflare-operator.yaml`
+2. TODO: Fix with vault `kubectl create secret generic cloudflare-secrets \
+  --namespace cloudflare-operator-system \
+  --from-literal CLOUDFLARE_API_TOKEN=<api-token> `
+
 
 # Setting up Istio
 1. Run `kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \

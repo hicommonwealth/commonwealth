@@ -1,23 +1,27 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cloudflare-tunnel
+  name: cert-manager
   namespace: argocd
 spec:
   destination:
-    namespace: cloudflare
+    namespace: cert-manager
     server: https://kubernetes.default.svc
   source:
-    path: charts/cloudflare-tunnel-remote
-    repoURL: https://github.com/cloudflare/helm-charts.git
-    targetRevision: main
+    path: ''
+    repoURL: https://charts.jetstack.io
+    targetRevision: v1.18.0
+    chart: cert-manager
     helm:
+      values: ''
       parameters:
-        - name: fullnameOverride
-          value: cloudflare-tunnel
+        - name: crds.enabled
+          value: 'true'
   sources: []
   project: default
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

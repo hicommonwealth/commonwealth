@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ingress-nginx
+  namespace: argocd
+spec:
+  destination:
+    namespace: ingress-nginx
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://kubernetes.github.io/ingress-nginx
+    targetRevision: 4.12.3
+    chart: ingress-nginx
+    helm:
+      releaseName: ingress-nginx
+      parameters:
+        - name: defaultBackend.enabled
+          value: 'true'
+      values: |-
+        controller:
+          config:
+            enable-real-ip: "true"
+            forwarded-for-header: "CF-Connecting-IP"
+            use-forwarded-headers: "true"
+            proxy-real-ip-cidr: "10.244.0.0/16"
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
