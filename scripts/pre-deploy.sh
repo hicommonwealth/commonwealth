@@ -11,7 +11,7 @@ echo ""
 # Apply migration to DB
 echo "Migrating DB..."
 echo ""
-npx sequelize-cli db:migrate --config build/server/sequelize.json
+npx sequelize-cli db:migrate --config server/sequelize.json
 echo ""
 
 # Purge the Cloudflare Cache
