@@ -10,7 +10,9 @@ const DEFAULTS = {
 
 const {
   DISABLE_CACHE,
+  // TODO: remove when finalizing transition off Heroku
   CLOUDAMQP_URL,
+  RABBITMQ_URI,
   REDIS_URL, // local + staging
   REDIS_TLS_URL, // staging + production
   KNOCK_AUTH_TOKEN,
@@ -42,7 +44,7 @@ export const config = configure(
       DISABLE_CACHE: DISABLE_CACHE === 'true',
     },
     BROKER: {
-      RABBITMQ_URI: CLOUDAMQP_URL ?? DEFAULTS.RABBITMQ_URI,
+      RABBITMQ_URI: (RABBITMQ_URI || CLOUDAMQP_URL) ?? DEFAULTS.RABBITMQ_URI,
       DISABLE_LOCAL_QUEUE_PURGE: DISABLE_LOCAL_QUEUE_PURGE === 'true',
     },
     NOTIFICATIONS: {

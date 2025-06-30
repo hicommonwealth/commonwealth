@@ -60,3 +60,72 @@ export function filterGates(actor: Actor) {
     ? ''
     : 'AND PrivateGates.topic_id IS NULL';
 }
+
+/**
+ * Gates topics according to the actor's group memberships
+ */
+export function buildOpenGates(actor: Actor) {
+  return `
+user_addresses AS (
+  SELECT a.id FROM "Addresses" a WHERE a.user_id = ${actor.user.id}
+),
+open_gates AS (
+  SELECT T.id as topic_id
+  FROM
+    user_addresses ua
+    JOIN "Addresses" a ON ua.id = a.id
+    JOIN "Topics" T ON a.community_id = T.community_id
+  	LEFT JOIN "GroupGatedActions" G ON T.id = G.topic_id
+  	LEFT JOIN "Memberships" M ON G.group_id = M.group_id
+      AND M.address_id IN (SELECT id FROM user_addresses)
+      AND M.reject_reason IS NULL
+  GROUP BY
+    T.id
+  HAVING
+    BOOL_AND(
+      COALESCE(G.is_private, FALSE) = FALSE
+      OR M.address_id IS NOT NULL
+      OR ${actor.user?.isAdmin ? 'TRUE' : 'FALSE'}
+    )
+)
+`;
+}
+
+/**
+ * Gated output builder
+ * - Expects `output_with_topics` CTE
+ * - Filters according to the actor's group memberships
+ * - Builds `gated_output` CTE
+ */
+export function buildGatedOutput(actor: Actor) {
+  // authenticated users are gated by group memberships
+  if (actor.address_id)
+    return `
+  ${buildOpenGates(actor)},
+  gated_output AS (
+    SELECT  
+      output_with_topics.*
+    FROM
+      output_with_topics
+      JOIN open_gates og ON og.topic_id = output_with_topics.topic_id
+  )
+  `;
+
+  // otherwise only return public ouput -> no private gated actions associated to the topic
+  return `
+  gated_output AS (
+    SELECT
+      output_with_topics.*
+    FROM
+      output_with_topics
+    WHERE
+      NOT EXISTS (
+        SELECT 1
+        FROM
+          "GroupGatedActions" ga
+        WHERE
+          ga.topic_id = output_with_topics.topic_id
+          AND ga.is_private = TRUE
+      )
+  )`;
+}
