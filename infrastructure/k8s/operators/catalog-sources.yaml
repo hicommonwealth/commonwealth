@@ -1,0 +1,10 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: olm-catalog
+  namespace: olm
+spec:
+  displayName: OLM Core Operators
+  publisher: Operator Framework
+  sourceType: grpc
+  image: quay.io/operator-framework/olm:latest

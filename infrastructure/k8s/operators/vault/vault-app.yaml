@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault-operator
+  namespace: argocd
+spec:
+  destination:
+    name: ''
+    namespace: vault-operator
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: deploy/charts/vault-operator
+    repoURL: 'https://github.com/bank-vaults/vault-operator.git'
+    targetRevision: main
+    helm:
+      values: ''
+      valueFiles:
+        - values.yaml
+      parameters:
+        - name: service.type
+          value: LoadBalancer
+  sources: []
+  project: default
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
