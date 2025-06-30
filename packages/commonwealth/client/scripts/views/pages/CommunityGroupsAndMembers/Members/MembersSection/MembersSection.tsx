@@ -1,17 +1,22 @@
 import { Role, WalletId } from '@hicommonwealth/shared';
-import { formatAddressShort } from 'client/scripts/helpers';
-import app from 'client/scripts/state';
-import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
-import { getChainIcon } from 'client/scripts/utils/chainUtils';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
+import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
+import { formatAddressShort } from 'helpers';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { Avatar } from 'views/components/Avatar';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import {
+  CustomAddressOption,
+  CustomAddressOptionElement,
+} from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { getFallbackImage } from '../helper';
 import { ManageOnchainModal } from './ManageOnchainModal';
 import './MembersSection.scss';
@@ -31,6 +36,7 @@ export type Member = {
   lastActive?: string;
   address?: string;
   addresses?: AddressInfo[];
+  uniqueAddresses?: string[];
 };
 
 export type MemberWithGroups = Omit<Member, 'groups'> & {
@@ -84,6 +90,10 @@ const MembersSection = ({
     AddressInfo[] | undefined
   >(undefined);
 
+  const [userSelectedAddresses, setUserSelectedAddresses] = useState<
+    Record<number, string>
+  >({});
+
   const handleManageOnchainClick = (Addresses: AddressInfo[] | undefined) => {
     setSelectedUserAddresses(Addresses);
     setIsRoleModalOpen(true);
@@ -102,6 +112,30 @@ const MembersSection = ({
     }));
   };
   const filteredMember = removeDuplicateAddresses(filteredMembers);
+  console.log('selectedAccounts => ', selectedAccounts);
+
+  useRunOnceOnCondition({
+    callback: () => {
+      console.log('comes here => ', selectedAccounts);
+      if (!selectedAccounts || !filteredMember) return;
+      const newSelected: Record<number, string> = {};
+      filteredMember.forEach((member) => {
+        const found = (member.uniqueAddresses || []).find((addr) =>
+          selectedAccounts.includes(addr),
+        );
+        if (found) {
+          newSelected[member.userId] = found;
+        }
+      });
+      console.log('newSelected => ', newSelected);
+      setUserSelectedAddresses(newSelected);
+    },
+    shouldRun:
+      Array.isArray(selectedAccounts) &&
+      selectedAccounts.length > 0 &&
+      filteredMember.length > 0 &&
+      Object.keys(userSelectedAddresses).length === 0,
+  });
 
   return (
     <div className="MembersSection">
@@ -113,13 +147,26 @@ const MembersSection = ({
           name: {
             sortValue: member.name + (member.role || ''),
             customElement: (
-              <div className="table-cell">
+              <div className="table-cell row">
                 {handleCheckboxChange && (
                   <CWCheckbox
-                    // @ts-expect-error <StrictNullChecks/>
-                    checked={selectedAccounts.includes(member.address)}
-                    // @ts-expect-error <StrictNullChecks/>
-                    onChange={() => handleCheckboxChange(member.address)}
+                    checked={(selectedAccounts || [])?.includes(
+                      userSelectedAddresses[member.userId] || '',
+                    )}
+                    onChange={() => {
+                      let selectedAddress =
+                        userSelectedAddresses[member.userId] || '';
+                      if (!selectedAddress) {
+                        selectedAddress =
+                          member?.uniqueAddresses?.[0] || member.address || '';
+                        setUserSelectedAddresses((prev) => ({
+                          ...prev,
+                          [member.userId]: selectedAddress,
+                        }));
+                      }
+                      console.log('selectedAddress => ', selectedAddress);
+                      handleCheckboxChange(selectedAddress);
+                    }}
                   />
                 )}
                 <Link to={`/profile/id/${member.userId}`} className="user-info">
@@ -160,22 +207,80 @@ const MembersSection = ({
               <div className="table-cell text-right">{member.stakeBalance}</div>
             ),
           },
-          addresses: {
+          address: {
             sortValue: member.address?.length || 0,
             customElement: (
               <div className="table-cell">
-                {member.addresses?.map((address, index) => {
-                  return (
-                    <div key={index} className="address-item">
-                      <CWTag
-                        type="address"
-                        label={formatAddressShort(address.address)}
-                        iconName={getChainIcon(address, community?.base)}
-                        classNames="address-tag"
+                {member?.uniqueAddresses?.length === 1 ? (
+                  formatAddressShort(member.address || '', 5, 6)
+                ) : (
+                  <CWSelectList
+                    components={{
+                      Option: (originalProps) =>
+                        CustomAddressOption({
+                          originalProps,
+                          selectedAddressValue:
+                            userSelectedAddresses[member.userId] || '',
+                        }),
+                    }}
+                    formatOptionLabel={(option) => (
+                      <CustomAddressOptionElement
+                        value={option.value}
+                        label={option.label}
+                        selectedAddressValue={
+                          userSelectedAddresses[member.userId] || ''
+                        }
                       />
-                    </div>
-                  );
-                })}
+                    )}
+                    placeholder="Select address"
+                    isClearable={false}
+                    isSearchable={false}
+                    options={(member.uniqueAddresses || [])?.map(
+                      convertAddressToDropdownOption,
+                    )}
+                    {...(userSelectedAddresses[member.userId]
+                      ? {
+                          value: convertAddressToDropdownOption(
+                            userSelectedAddresses[member.userId],
+                          ),
+                        }
+                      : {})}
+                    onChange={(option) => {
+                      if (option?.value) {
+                        // if the older value wasnt this
+                        // and an other address of this user exists
+                        const foundOtherAddressSelected =
+                          selectedAccounts?.find(
+                            (address) =>
+                              address ===
+                              (userSelectedAddresses[member.userId] || ''),
+                          );
+                        const isSameAsOldAddress =
+                          (userSelectedAddresses[member.userId] || '') ===
+                          option.value;
+                        const shouldUpdateCheckbox =
+                          foundOtherAddressSelected &&
+                          !isSameAsOldAddress &&
+                          foundOtherAddressSelected !== option.value;
+                        if (shouldUpdateCheckbox) {
+                          foundOtherAddressSelected &&
+                            handleCheckboxChange?.(foundOtherAddressSelected); // to remove this option
+                          handleCheckboxChange?.(option.value);
+                        }
+                        setUserSelectedAddresses((prev) => ({
+                          ...prev,
+                          [member.userId]: option.value,
+                        }));
+                      } else {
+                        setUserSelectedAddresses((prev) => {
+                          const updated = { ...prev };
+                          delete updated[member.userId];
+                          return updated;
+                        });
+                      }
+                    }}
+                  />
+                )}
               </div>
             ),
           },
@@ -198,8 +303,7 @@ const MembersSection = ({
                 },
               }
             : {}),
-          // @ts-expect-error <StrictNullChecks/>
-          ...extraColumns(member),
+          ...(extraColumns ? extraColumns(member) : () => ({})),
         }))}
         onScrollEnd={onLoadMoreMembers}
         isLoadingMoreRows={isLoadingMoreMembers}
