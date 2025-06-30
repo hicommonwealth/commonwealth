@@ -9,14 +9,14 @@ terraform {
       source  = "digitalocean/digitalocean"
       version = "2.54.0"
     }
-    # kubernetes = {
-    #   source  = "hashicorp/kubernetes"
-    #   version = ">= 2.37.1"
-    # }
-    # helm = {
-    #   source  = "hashicorp/helm"
-    #   version = ">= 2.17.0"
-    # }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "5.6.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.37.1"
+    }
   }
 }
 
@@ -25,10 +25,15 @@ provider "digitalocean" {
   token = var.DIGITALOCEAN_TOKEN
 }
 
+# Cloudflare to set up tunnel
+provider "cloudflare" {
+  api_token = var.CLOUDFLARE_API_TOKEN
+}
+
 resource "digitalocean_kubernetes_cluster" "main" {
   name    = var.ENV_NAME
   region  = "nyc1"
-  version = "latest"
+  version = "1.33.1-do.0"
 
   node_pool {
     name       = "worker-pool"
@@ -48,44 +53,26 @@ provider "kubernetes" {
   )
 }
 
-# Import helm for ArgoCD bootstrapping
-# provider "helm" {
-#   kubernetes {
-#     host  = digitalocean_kubernetes_cluster.main.endpoint
-#     token = digitalocean_kubernetes_cluster.main.kube_config[0].token
-#     cluster_ca_certificate = base64decode(
-#       digitalocean_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate
-#     )
-#   }
-# }
-#
-# resource "helm_release" "argocd" {
-#   depends_on = [digitalocean_kubernetes_cluster.main]
-#   name       = "argocd"
-#   repository = "https://argoproj.github.io/argo-helm"
-#   chart      = "argo-cd"
-#   version    = "8.0.14"
-#
-#   namespace = "argocd"
-#
-#   create_namespace = true
-#
-#   set {
-#     name  = "server.service.type"
-#     value = "LoadBalancer"
-#   }
-#
-#   set {
-#     name  = "server.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
-#     value = "nlb"
-#   }
-# }
-#
-# data "kubernetes_service" "argocd_server" {
-#   depends_on = [helm_release.argocd]
-#
-#   metadata {
-#     name      = "argocd-server"
-#     namespace = "argocd"
-#   }
-# }
+# Create cloudflare tunnel
+resource "cloudflare_zero_trust_tunnel_cloudflared" "cmn_tunnel" {
+  account_id = var.CLOUDFLARE_ACCOUNT_ID
+  name = "commonwealth-${var.ENV_NAME}"
+}
+
+data "cloudflare_zero_trust_tunnel_cloudflared_token" "tunnel_token" {
+  account_id   = var.CLOUDFLARE_ACCOUNT_ID
+  tunnel_id   = cloudflare_zero_trust_tunnel_cloudflared.cmn_tunnel.id
+}
+
+resource "kubernetes_secret" "tunnel_token_secret" {
+  metadata {
+    name      = "tunnel-token"
+    namespace = "cloudflare"
+  }
+
+  data = {
+    token = data.cloudflare_zero_trust_tunnel_cloudflared_token.tunnel_token.token
+  }
+
+  type = "Opaque"
+}

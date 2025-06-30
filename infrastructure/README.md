@@ -3,17 +3,16 @@ Two step setup:
 # Setup infra
 1. Run `terraform init` to install providers (Only needs to be run once)
 2. Run terraform script with `terraform apply` (This requires vars ENV_NAME and DIGITALOCEAN_TOKEN)
-3. Connect to digital ocean cluster `doctl auth init` and `doctl kubernetes cluster kubeconfig save "$ENV_NAME"`
+3. Connect to digital ocean cluster `doctl auth init` and `doctl kubernetes cluster kubeconfig save development`
 
-# Bootstrap OLM
-1. Run `kubectl apply -f namespaces.yaml` to create the required namespace
-2. Run `helm install my-argo-cd argo/argo-cd --version 8.1.2` (requires installing helm locally)
+# Bootstrap Argocd
+1. Run `kubectl create namespace argocd && helm install my-argo-cd argo/argo-cd --version 8.1.2 --namespace argocd` (requires installing helm locally)
 
-# Bootstrap OLM
-1. `curl -L -s https://github.com/operator-framework/operator-controller/releases/download/v1.3.0/install.sh | bash -s`
-2. Run `kubectl apply -f namespaces.yaml`
-Refer to Here `https://github.com/operator-framework/operator-controller/tree/main/docs/tutorials`
-if you need to add/update/remove extensions
+# Setting up Istio
+1. Run `kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
+  kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml` 
+Note, this is not necessary on DO since it comes pre-installed with these CRDs
+2. 
 
 # Set up Argocd
 1. `kubectl apply -f argocd-olm.yaml -n argocd`
