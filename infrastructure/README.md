@@ -8,6 +8,9 @@ Two step setup:
 # Bootstrap Argocd
 1. Run `kubectl create namespace argocd && helm install my-argo-cd argo/argo-cd --version 8.1.2 --namespace argocd` (requires installing helm locally)
 
+# Setup cloudflare-tunnel
+Run `kubectl apply -f cloudflare.yaml`
+
 # Setting up Istio
 1. Run `kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml` 

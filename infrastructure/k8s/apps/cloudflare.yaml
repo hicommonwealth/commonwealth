@@ -27,8 +27,8 @@ spec:
             - name: TUNNEL_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: tunnel-token
-                  key: token
+                  name: cloudflare-tunnel
+                  key: tunnelToken
           command:
             # Configures tunnel run parameters
             - cloudflared

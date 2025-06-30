@@ -64,15 +64,22 @@ data "cloudflare_zero_trust_tunnel_cloudflared_token" "tunnel_token" {
   tunnel_id   = cloudflare_zero_trust_tunnel_cloudflared.cmn_tunnel.id
 }
 
+resource "kubernetes_namespace" "cloudflare" {
+  metadata {
+    name = "cloudflare"
+  }
+}
+
 resource "kubernetes_secret" "tunnel_token_secret" {
   metadata {
-    name      = "tunnel-token"
+    name      = "cloudflare-tunnel"
     namespace = "cloudflare"
   }
 
   data = {
-    token = data.cloudflare_zero_trust_tunnel_cloudflared_token.tunnel_token.token
+    tunnelToken = data.cloudflare_zero_trust_tunnel_cloudflared_token.tunnel_token.token
   }
 
   type = "Opaque"
+  depends_on = [kubernetes_namespace.cloudflare]
 }
