@@ -4,8 +4,7 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authOptionalVerified } from '../../middleware';
-import { filterGates, joinGates, withGates } from '../../utils/gating';
-import { baseActivityQuery } from '../../utils/getUserActivityFeed';
+import { buildGlobalActivityQuery } from '../../utils/getBaseActivityFeed';
 
 export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
   return {
@@ -29,14 +28,6 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
         { order: 'ASC' },
       );
 
-      const whereConditions = [
-        filterGates(actor),
-        community_id ? 'AND T.community_id = :community_id' : '',
-        search ? 'AND T.title ILIKE :search' : '',
-      ]
-        .filter(Boolean)
-        .join(' ');
-
       // TODO: if we run out of ranked threads should we return something else
       if (!rankedThreadIds.length)
         return schemas.buildPaginatedResponse([], 0, {
@@ -44,25 +35,7 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
           cursor,
         });
 
-      // TODO: add deleted_at, marked_as_spam_at and default community filters?
-      const query = `
-        ${withGates(actor)},
-        top_threads AS (
-          SELECT
-            T.*,
-            count(*) OVER () AS total, C.icon_url
-          FROM
-            "Threads" T
-            JOIN "Communities" C ON C.id = T.community_id
-            ${joinGates(actor)}
-          WHERE
-            T.id IN (:threadIds)
-            ${whereConditions}
-        )
-        ${baseActivityQuery}
-        ORDER BY ARRAY_POSITION(ARRAY[:threadIds], T.id);
-      `;
-
+      const query = buildGlobalActivityQuery(actor, community_id, search);
       const threads = await models.sequelize.query<
         z.infer<typeof schemas.ThreadView>
       >(query, {

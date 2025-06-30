@@ -39,6 +39,7 @@ export const ActivityFeed = {
   output: PaginatedResultSchema.extend({
     results: z.array(ThreadView),
   }),
+  context: VerifiedContext,
 };
 
 export const ChainFeedRecord = z.object({
