@@ -64,7 +64,18 @@ export const TokenTradeWidget = ({
     return <TokenTradeWidgetSkeleton />;
   }
 
-  if (!communityToken) return;
+  if (!communityToken) {
+    return (
+      <section className="TokenTradeWidget">
+        <div className="pad-8">
+          <CWText type="b2" fontWeight="semiBold">
+            Community token not yet attached to community. This should resolve
+            automatically in a few minutes.
+          </CWText>
+        </div>
+      </section>
+    );
+  }
 
   const tokenAddress =
     (communityToken as LaunchpadToken)?.token_address ||
