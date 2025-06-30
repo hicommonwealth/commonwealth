@@ -112,11 +112,9 @@ const MembersSection = ({
     }));
   };
   const filteredMember = removeDuplicateAddresses(filteredMembers);
-  console.log('selectedAccounts => ', selectedAccounts);
 
   useRunOnceOnCondition({
     callback: () => {
-      console.log('comes here => ', selectedAccounts);
       if (!selectedAccounts || !filteredMember) return;
       const newSelected: Record<number, string> = {};
       filteredMember.forEach((member) => {
@@ -127,7 +125,6 @@ const MembersSection = ({
           newSelected[member.userId] = found;
         }
       });
-      console.log('newSelected => ', newSelected);
       setUserSelectedAddresses(newSelected);
     },
     shouldRun:
