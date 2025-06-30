@@ -83,3 +83,31 @@ resource "kubernetes_secret" "tunnel_token_secret" {
   type = "Opaque"
   depends_on = [kubernetes_namespace.cloudflare]
 }
+
+# Cloudflare-tunnel routes
+variable "subdomain_services" {
+  type = map(string)
+  default = {
+    argocd  = "http://httpbin-service"
+  }
+}
+
+resource "cloudflare_tunnel_hostname" "routes" {
+  for_each  = var.subdomain_services
+
+  account_id = var.CLOUDFLARE_ACCOUNT_ID
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.cmn_tunnel.id
+
+  hostname = "${each.key}.${var.DOMAIN_NAME}"
+  service  = each.value
+}
+
+resource "cloudflare_record" "dns" {
+  for_each = var.subdomain_services
+
+  zone_id = var.CLOUDFLARE_ZONE_ID
+  name    = each.key
+  type    = "CNAME"
+  value   = "${cloudflare_zero_trust_tunnel_cloudflared.cmn_tunnel.id}.cfargotunnel.com"
+  proxied = true
+}
