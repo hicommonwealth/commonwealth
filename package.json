@@ -36,7 +36,8 @@
     "stylelint": "stylelint packages/commonwealth/client/styles/*",
     "test-api": "pnpm -F commonwealth test-api",
     "merge-coverage": "chmod u+x scripts/mergeCoverageReports.sh && ./scripts/mergeCoverageReports.sh",
-    "generate-load-tests": "chmod u+x scripts/generate-load-tests.sh && ./scripts/generate-load-tests.sh"
+    "generate-load-tests": "chmod u+x scripts/generate-load-tests.sh && ./scripts/generate-load-tests.sh",
+    "pre-deploy": "chmod u+x build/scripts/pre-deploy.sh && bash -x ./build/scripts/pre-deploy.sh"
   },
   "resolutions": {
     "js-sha3": "^0.8.0",
