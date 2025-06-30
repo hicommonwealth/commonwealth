@@ -1,8 +1,8 @@
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 import { GroupGatedAction } from './group-permission.schemas';
-import { Address } from './user.schemas';
+import { Address, USER_TIER } from './user.schemas';
 
 const ContractSource = z.object({
   source_type: z.enum([
@@ -56,7 +56,8 @@ const CosmosContractSource = z.object({
   cosmos_chain_id: z.string(),
   contract_address: z.string(),
 });
-const ThresholdData = z.object({
+
+export const ThresholdData = z.object({
   threshold: z.string().regex(/^[0-9]+$/),
   source: z.union([
     ContractSource,
@@ -69,8 +70,13 @@ const ThresholdData = z.object({
   ]),
 });
 
-const AllowlistData = z.object({
+export const AllowlistData = z.object({
   allow: z.array(z.string().regex(/^0x[a-fA-F0-9]{40}$/)),
+});
+
+export const TrustLevelData = z.object({
+  minimum_trust_level: USER_TIER,
+  sso_required: z.array(z.nativeEnum(WalletSsoSource)).optional(),
 });
 
 export const Requirement = z.union([
@@ -81,6 +87,10 @@ export const Requirement = z.union([
   z.object({
     rule: z.literal('allow'),
     data: AllowlistData,
+  }),
+  z.object({
+    rule: z.literal('trust-level'),
+    data: TrustLevelData,
   }),
 ]);
 
