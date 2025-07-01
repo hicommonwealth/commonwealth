@@ -30,8 +30,8 @@ module "vpc" {
   public_subnets  = ["10.0.10.0/24", "10.0.11.0/24"]
   private_subnets = ["10.0.20.0/24", "10.0.21.0/24"]
 
-  enable_nat_gateway = false
-  single_nat_gateway = false
+  enable_nat_gateway = true
+  single_nat_gateway = true
 
   tags = {
     Terraform   = "true"
@@ -46,21 +46,23 @@ module "eks" {
   cluster_name    = "commonwealth-${var.ENV_NAME}"
   cluster_version = "1.33"
 
-  cluster_endpoint_public_access = true
+  cluster_endpoint_public_access  = true
+  cluster_endpoint_private_access = true
 
   enable_cluster_creator_admin_permissions = true
 
-  vpc_id          = module.vpc.vpc_id
-  subnet_ids      = module.vpc.private_subnets
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
 
   eks_managed_node_groups = {
-    default = {
-      desired_size = 2
-      max_size     = 2
-      min_size     = 2
-
-      instance_types = ["t3.nano"]
+    arm-nodes = {
+      ami_type       = "BOTTLEROCKET_ARM_64"
+      instance_types = ["t4g.nano"]
       capacity_type  = "ON_DEMAND"
+
+      desired_size = 2
+      min_size     = 1
+      max_size     = 2
     }
   }
 
