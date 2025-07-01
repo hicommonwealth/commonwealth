@@ -5,50 +5,67 @@ terraform {
     region = "us-east-1"
   }
   required_providers {
-    digitalocean = {
-      source  = "digitalocean/digitalocean"
-      version = "2.54.0"
-    }
-    cloudflare = {
-      source  = "cloudflare/cloudflare"
-      version = "5.6.0"
-    }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = ">= 2.37.1"
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.95.0" # Can't be 6.x.x due to eks provider
     }
   }
 }
 
-# Digital Ocean K8 Setup
-provider "digitalocean" {
-  token = var.DIGITALOCEAN_TOKEN
+provider "aws" {
+  region = var.AWS_REGION
 }
 
-# Cloudflare to set up tunnel
-provider "cloudflare" {
-  api_token = var.CLOUDFLARE_API_TOKEN
-}
+data "aws_availability_zones" "available" {}
 
-resource "digitalocean_kubernetes_cluster" "main" {
-  name    = var.ENV_NAME
-  region  = "nyc1"
-  version = "1.33.1-do.0"
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.21.0" # Can also upgrade when eks upgrade supports v6
 
-  node_pool {
-    name       = "worker-pool"
-    size       = "s-1vcpu-2gb"
-    node_count = 1
-    max_nodes = 1
-    min_nodes = 1
-    auto_scale = false
+  name = "eks-vpc-${var.ENV_NAME}"
+  cidr = "10.0.0.0/16"
+
+  # Required to have at least 2 AZs for subnets
+  azs             = slice(data.aws_availability_zones.available.names, 0, 2)
+  public_subnets  = ["10.0.10.0/24", "10.0.11.0/24"]
+  private_subnets = ["10.0.20.0/24", "10.0.21.0/24"]
+
+  enable_nat_gateway = false
+  single_nat_gateway = false
+
+  tags = {
+    Terraform   = "true"
+    Environment = "dev"
   }
 }
 
-provider "kubernetes" {
-  host  = digitalocean_kubernetes_cluster.main.endpoint
-  token = digitalocean_kubernetes_cluster.main.kube_config[0].token
-  cluster_ca_certificate = base64decode(
-    digitalocean_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate
-  )
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "20.37.1"
+
+  cluster_name    = "commonwealth-${var.ENV_NAME}"
+  cluster_version = "1.33"
+
+  cluster_endpoint_public_access = true
+
+  enable_cluster_creator_admin_permissions = true
+
+  vpc_id          = module.vpc.vpc_id
+  subnet_ids      = module.vpc.private_subnets
+
+  eks_managed_node_groups = {
+    default = {
+      desired_size = 2
+      max_size     = 2
+      min_size     = 2
+
+      instance_types = ["t3.nano"]
+      capacity_type  = "ON_DEMAND"
+    }
+  }
+
+  tags = {
+    Environment = var.ENV_NAME
+    Terraform   = "true"
+  }
 }

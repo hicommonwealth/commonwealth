@@ -1,23 +1,9 @@
-variable "DIGITALOCEAN_TOKEN" {
+variable "ENV_NAME" {
   type = string
   default = "development"
 }
 
-variable "ENV_NAME" {
+variable "AWS_REGION" {
   type = string
-}
-
-variable "CLOUDFLARE_API_TOKEN" {
-  type = string
-}
-
-variable "CLOUDFLARE_ACCOUNT_ID" {
-  type = string
-}
-
-variable "DOMAIN_NAME" {
-  type = string
-}
-variable "CLOUDFLARE_ZONE_ID" {
-  type = string
+  default = "us-east-1"
 }
