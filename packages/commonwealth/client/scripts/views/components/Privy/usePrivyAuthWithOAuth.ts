@@ -1,7 +1,11 @@
 import { WalletSsoSource } from '@hicommonwealth/shared';
-import { useLoginWithOAuth, usePrivy } from '@privy-io/react-auth';
+import {
+  useLoginWithOAuth,
+  useOAuthTokens,
+  usePrivy,
+} from '@privy-io/react-auth';
 import { useUserStore } from 'client/scripts/state/ui/user/user';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toSignInProvider } from 'views/components/Privy/helpers';
 import { PrivyCallbacks } from 'views/components/Privy/PrivyCallbacks';
 import { OAuthProvider } from './types';
@@ -10,6 +14,8 @@ import { usePrivySignOn } from './usePrivySignOn';
 
 const WALLET_WAIT_TIMEOUT = 5000;
 const WALLET_POLL_INTERVAL = 100;
+const OAUTH_TOKEN_WAIT_TIMEOUT = 5000;
+const OAUTH_TOKEN_POLL_INTERVAL = 100;
 
 /**
  * Use privy auth with OAuth providers. Like google.
@@ -22,8 +28,11 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
   const userStore = useUserStore();
   const privySignOn = usePrivySignOn();
 
+  const [oAuthTokens, setOAuthTokens] = useState<Record<string, string>>({});
+
   const privyRef = useRef(privy);
   const walletRef = useRef(wallet);
+  const oAuthTokensRef = useRef(oAuthTokens);
 
   useEffect(() => {
     privyRef.current = privy;
@@ -32,6 +41,19 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
   useEffect(() => {
     walletRef.current = wallet;
   }, [wallet]);
+
+  useEffect(() => {
+    oAuthTokensRef.current = oAuthTokens;
+  }, [oAuthTokens]);
+
+  useOAuthTokens({
+    onOAuthTokenGrant: ({ oAuthTokens: tokens, user }) => {
+      setOAuthTokens((prev) => ({
+        ...prev,
+        [tokens.provider]: tokens.accessToken,
+      }));
+    },
+  });
 
   const waitForWallet = useCallback(async (): Promise<boolean> => {
     if (walletRef.current) return true;
@@ -45,17 +67,39 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
     return !!walletRef.current;
   }, []);
 
+  const waitForOAuthToken = useCallback(
+    async (provider: string): Promise<string | null> => {
+      if (oAuthTokensRef.current[provider])
+        return oAuthTokensRef.current[provider];
+
+      let waitTime = 0;
+      while (
+        !oAuthTokensRef.current[provider] &&
+        waitTime < OAUTH_TOKEN_WAIT_TIMEOUT
+      ) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, OAUTH_TOKEN_POLL_INTERVAL),
+        );
+        waitTime += OAUTH_TOKEN_POLL_INTERVAL;
+      }
+
+      return oAuthTokensRef.current[provider] || null;
+    },
+    [],
+  );
+
   const handleOAuthComplete = useCallback(
     async (params: any) => {
       if (userStore.isLoggedIn) return;
 
-      const accessToken = await privy.getAccessToken();
-      if (!accessToken) {
-        console.warn('No access token.');
+      const ssoProvider = toSignInProvider(params.loginMethod as OAuthProvider);
+
+      // Wait for provider-specific OAuth token to be available
+      const oAuthToken = await waitForOAuthToken(params.loginMethod);
+      if (!oAuthToken) {
+        props.onError(new Error('OAuth token not available'));
         return;
       }
-
-      const ssoProvider = toSignInProvider(params.loginMethod as OAuthProvider);
 
       const walletAvailable = await waitForWallet();
       if (!walletAvailable) {
@@ -73,11 +117,17 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
         wallet: currentWallet,
         onSuccess: props.onSuccess,
         onError: props.onError,
-        ssoOAuthToken: accessToken,
+        ssoOAuthToken: oAuthToken,
         ssoProvider,
       });
     },
-    [privy, userStore.isLoggedIn, privySignOn, props, waitForWallet],
+    [
+      userStore.isLoggedIn,
+      privySignOn,
+      props,
+      waitForWallet,
+      waitForOAuthToken,
+    ],
   );
 
   const { loading, initOAuth } = useLoginWithOAuth({
@@ -91,6 +141,9 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
       async function doAsync() {
         if (isOauthProvider(provider)) {
           providerRef.current = provider;
+
+          window.history.pushState(null, '', '/sign-in');
+
           await initOAuth({ provider });
         } else {
           throw new Error('Not supported: ' + provider);

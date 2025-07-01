@@ -39,6 +39,7 @@ import _ from 'lodash';
 import { Magic } from 'magic-sdk';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import app, { initAppState } from 'state';
 import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
 import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
@@ -97,6 +98,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
   const { setState: setSMSDialogState } = usePrivySMSDialogStore();
   const { setState: setEmailDialogState } = usePrivyEmailDialogStore();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
 
   const user = useUserStore();
   const { data: configurationData } = useFetchPublicEnvVarQuery();
@@ -179,6 +182,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       );
     }
   }, [configurationData]);
+
+  useEffect(() => {
+    const actualUrl = new URL(window.location.href);
+    const hasPrivyOAuthState = actualUrl.searchParams.has('privy_oauth_state');
+    setIsMagicLoading(hasPrivyOAuthState);
+  }, [searchParams, location]);
 
   const handleSuccess = async (
     authAddress?: string | null | undefined,
