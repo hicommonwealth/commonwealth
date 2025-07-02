@@ -6,16 +6,16 @@ import {
 } from '@privy-io/react-auth';
 import { useUserStore } from 'client/scripts/state/ui/user/user';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { toSignInProvider } from 'views/components/Privy/helpers';
+import {
+  isOauthProvider,
+  toSignInProvider,
+  waitForOAuthToken,
+  waitForWallet,
+} from 'views/components/Privy/helpers';
 import { PrivyCallbacks } from 'views/components/Privy/PrivyCallbacks';
 import { OAuthProvider } from './types';
 import { useConnectedWallet } from './useConnectedWallet';
 import { usePrivySignOn } from './usePrivySignOn';
-
-const WALLET_WAIT_TIMEOUT = 5000;
-const WALLET_POLL_INTERVAL = 100;
-const OAUTH_TOKEN_WAIT_TIMEOUT = 5000;
-const OAUTH_TOKEN_POLL_INTERVAL = 100;
 
 /**
  * Use privy auth with OAuth providers. Like google.
@@ -30,6 +30,7 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
 
   const [oAuthTokens, setOAuthTokens] = useState<Record<string, string>>({});
 
+  // Refs and effects for privy, wallet and oAuthTokens used to avoid stale closures
   const privyRef = useRef(privy);
   const walletRef = useRef(wallet);
   const oAuthTokensRef = useRef(oAuthTokens);
@@ -55,53 +56,23 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
     },
   });
 
-  const waitForWallet = useCallback(async (): Promise<boolean> => {
-    if (walletRef.current) return true;
-
-    let waitTime = 0;
-    while (!walletRef.current && waitTime < WALLET_WAIT_TIMEOUT) {
-      await new Promise((resolve) => setTimeout(resolve, WALLET_POLL_INTERVAL));
-      waitTime += WALLET_POLL_INTERVAL;
-    }
-
-    return !!walletRef.current;
-  }, []);
-
-  const waitForOAuthToken = useCallback(
-    async (provider: string): Promise<string | null> => {
-      if (oAuthTokensRef.current[provider])
-        return oAuthTokensRef.current[provider];
-
-      let waitTime = 0;
-      while (
-        !oAuthTokensRef.current[provider] &&
-        waitTime < OAUTH_TOKEN_WAIT_TIMEOUT
-      ) {
-        await new Promise((resolve) =>
-          setTimeout(resolve, OAUTH_TOKEN_POLL_INTERVAL),
-        );
-        waitTime += OAUTH_TOKEN_POLL_INTERVAL;
-      }
-
-      return oAuthTokensRef.current[provider] || null;
-    },
-    [],
-  );
-
   const handleOAuthComplete = useCallback(
     async (params: any) => {
       if (userStore.isLoggedIn) return;
 
       const ssoProvider = toSignInProvider(params.loginMethod as OAuthProvider);
 
-      // Wait for provider-specific OAuth token to be available
-      const oAuthToken = await waitForOAuthToken(params.loginMethod);
+      const oAuthToken = await waitForOAuthToken(
+        params.loginMethod,
+        oAuthTokensRef,
+      );
+
       if (!oAuthToken) {
         props.onError(new Error('OAuth token not available'));
         return;
       }
 
-      const walletAvailable = await waitForWallet();
+      const walletAvailable = await waitForWallet(walletRef);
       if (!walletAvailable) {
         props.onError(new Error('Wallet not available'));
         return;
@@ -121,13 +92,7 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
         ssoProvider,
       });
     },
-    [
-      userStore.isLoggedIn,
-      privySignOn,
-      props,
-      waitForWallet,
-      waitForOAuthToken,
-    ],
+    [userStore.isLoggedIn, privySignOn, props, walletRef, oAuthTokensRef],
   );
 
   const { loading, initOAuth } = useLoginWithOAuth({
@@ -166,19 +131,4 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
       loading,
     };
   }, [privy.authenticated, privy.logout, onInitOAuth, loading]);
-}
-
-function isOauthProvider(
-  value: WalletSsoSource | OAuthProvider,
-): value is OAuthProvider {
-  switch (value) {
-    case 'google':
-    case 'github':
-    case 'discord':
-    case 'twitter':
-    case 'apple':
-      return true;
-    default:
-      return false;
-  }
 }
