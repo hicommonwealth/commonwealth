@@ -7,7 +7,7 @@ import {
   addressSwapper,
   verifySession,
 } from '@hicommonwealth/shared';
-import { useLoginWithSms } from '@privy-io/react-auth';
+import { useLoginWithEmail, useLoginWithSms } from '@privy-io/react-auth';
 import axios from 'axios';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { BASE_API_PATH } from 'client/scripts/utils/trpcClient';
@@ -47,7 +47,9 @@ import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddres
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { EIP1193Provider } from 'viem';
-import usePrivyEmailDialogStore from 'views/components/Privy/stores/usePrivyEmailDialogStore';
+import usePrivyEmailDialogStore, {
+  emailDialogStore,
+} from 'views/components/Privy/stores/usePrivyEmailDialogStore';
 import { smsDialogStore } from 'views/components/Privy/stores/usePrivySMSDialogStore';
 import type { PrivySignInSSOProvider } from 'views/components/Privy/types';
 import { useConnectedWallet } from 'views/components/Privy/useConnectedWallet';
@@ -202,9 +204,57 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     ],
   );
 
-  const { sendCode, loginWithCode } = useLoginWithSms({
-    onComplete: handleSMSLoginComplete,
-  });
+  const handleEmailLoginComplete = useCallback(
+    async (params: any) => {
+      if (user.isLoggedIn) return;
+
+      console.log('Email login onComplete: ', params);
+
+      // Wait for wallet to be available
+      const walletAvailable = await waitForWallet(connectedWalletRef);
+      if (!walletAvailable) {
+        handlePrivyError(new Error('Wallet not available'));
+        return;
+      }
+
+      const currentWallet = connectedWalletRef.current;
+      if (!currentWallet) {
+        console.warn('No connected wallet available');
+        handlePrivyError(new Error('No connected wallet available'));
+        return;
+      }
+
+      try {
+        await privySignOn({
+          wallet: currentWallet,
+          onSuccess: handlePrivySuccess,
+          onError: handlePrivyError,
+          ssoOAuthToken: undefined, // Not needed for email
+          ssoProvider: 'email' as PrivySignInSSOProvider, // Email provider
+        });
+      } catch (error) {
+        console.error('Email sign-on error:', error);
+        handlePrivyError(error as Error);
+      }
+    },
+    [
+      user.isLoggedIn,
+      connectedWalletRef,
+      privySignOn,
+      handlePrivySuccess,
+      handlePrivyError,
+    ],
+  );
+
+  const { sendCode: sendSMSCode, loginWithCode: loginWithSMSCode } =
+    useLoginWithSms({
+      onComplete: handleSMSLoginComplete,
+    });
+
+  const { sendCode: sendEmailCode, loginWithCode: loginWithEmailCode } =
+    useLoginWithEmail({
+      onComplete: handleEmailLoginComplete,
+    });
 
   const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
 
@@ -310,17 +360,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     setSMS(tempSMSToUse);
 
     try {
-      await sendCode({ phoneNumber: tempSMSToUse });
+      await sendSMSCode({ phoneNumber: tempSMSToUse });
 
-      // Use the awaitable dialog instead of native prompt
       const { awaitUserInput } = smsDialogStore.getState();
       const code = await awaitUserInput('Enter the code we sent to your phone');
 
-      console.log('code received: ', code);
+      await loginWithSMSCode({ code });
 
-      await loginWithCode({ code });
-
-      // Success - completion will be handled by onComplete callback
       setIsMagicLoading(false);
     } catch (error) {
       // Handle both cancellation and actual errors
@@ -383,22 +429,16 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
 
     try {
-      setEmailDialogState({
-        active: true,
-        onCancel: () => {
-          setEmail(undefined);
-          setIsMagicLoading(false);
-        },
-        onError: privyCallbacks.onError,
-      });
-      // await privyAuthWithEmail.sendCode({ email: tempEmailToUse });
-
-      // TODO: I need to handle these now...
-      // setIsMagicLoading(false);
-      // TODO: trackLoginEvent('email', true);
+      await sendEmailCode({ email: tempEmailToUse });
+      const { awaitUserInput } = emailDialogStore.getState();
+      const code = await awaitUserInput();
+      console.log('code received: ', code);
+      await loginWithEmailCode({ code });
+      setIsMagicLoading(false);
     } catch (e) {
       notifyError(`Error authenticating with email`);
       console.error(`Error authenticating with email: ${e}`);
+      setEmail(undefined);
       setIsMagicLoading(false);
     }
   };
