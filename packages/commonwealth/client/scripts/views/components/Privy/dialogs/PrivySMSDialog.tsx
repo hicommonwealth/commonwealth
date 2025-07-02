@@ -21,9 +21,7 @@ export const PrivySMSDialog = () => {
         onCancel: undefined,
         onError: () => {},
         resolver: undefined,
-        rejector: undefined,
       });
-      return;
     },
     [setSMSDialogStore, resolver],
   );
@@ -35,7 +33,6 @@ export const PrivySMSDialog = () => {
       onCancel: undefined,
       onError: () => {},
       resolver: undefined,
-      rejector: undefined,
     });
   }, [onCancel, setSMSDialogStore]);
 

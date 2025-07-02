@@ -1,4 +1,3 @@
-import { useLoginWithEmail } from '@privy-io/react-auth';
 import React, { useCallback } from 'react';
 import { CodeDialog } from 'views/components/Privy/dialogs/CodeDialog';
 import usePrivyEmailDialogStore from 'views/components/Privy/stores/usePrivyEmailDialogStore';
@@ -13,7 +12,6 @@ export const PrivyEmailDialog = () => {
     onCancel,
     resolver,
   } = usePrivyEmailDialogStore();
-  const { loginWithCode } = useLoginWithEmail();
 
   const handleLoginWithCode = useCallback(
     (code: string) => {
@@ -23,12 +21,9 @@ export const PrivyEmailDialog = () => {
         onCancel: undefined,
         onError: () => {},
         resolver: undefined,
-        rejector: undefined,
       });
-
-      loginWithCode({ code });
     },
-    [setEmailDialogStore, loginWithCode, resolver],
+    [setEmailDialogStore, resolver],
   );
 
   const handleCancel = useCallback(() => {
@@ -38,7 +33,6 @@ export const PrivyEmailDialog = () => {
       onCancel: undefined,
       onError: () => {},
       resolver: undefined,
-      rejector: undefined,
     });
   }, [onCancel, setEmailDialogStore]);
 

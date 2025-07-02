@@ -1,4 +1,5 @@
 import { WalletSsoSource } from '@hicommonwealth/shared';
+import { ConnectedWallet } from '@privy-io/react-auth';
 import {
   OAuthProvider,
   PrivySignInSSOProvider,
@@ -72,7 +73,7 @@ export function isOauthProvider(
 }
 
 export async function waitForWallet(
-  walletRef: React.RefObject<any>,
+  walletRef: React.RefObject<ConnectedWallet | undefined>,
 ): Promise<boolean> {
   const result = await waitForCondition(() => walletRef.current);
   return !!result;

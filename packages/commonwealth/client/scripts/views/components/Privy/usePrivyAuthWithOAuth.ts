@@ -48,7 +48,7 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
   }, [oAuthTokens]);
 
   useOAuthTokens({
-    onOAuthTokenGrant: ({ oAuthTokens: tokens, user }) => {
+    onOAuthTokenGrant: ({ oAuthTokens: tokens }) => {
       setOAuthTokens((prev) => ({
         ...prev,
         [tokens.provider]: tokens.accessToken,
@@ -57,7 +57,7 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
   });
 
   const handleOAuthComplete = useCallback(
-    async (params: any) => {
+    async (params) => {
       if (userStore.isLoggedIn) return;
 
       const ssoProvider = toSignInProvider(params.loginMethod as OAuthProvider);
@@ -96,7 +96,9 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
   );
 
   const { loading, initOAuth } = useLoginWithOAuth({
-    onComplete: handleOAuthComplete,
+    onComplete: (params) => {
+      handleOAuthComplete(params).catch(onError);
+    },
   });
 
   const providerRef = useRef<OAuthProvider | undefined>(undefined);

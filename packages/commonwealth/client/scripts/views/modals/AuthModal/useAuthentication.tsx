@@ -158,102 +158,94 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   }, [handlePrivyError, handlePrivySuccess]);
 
   const privyAuthWithOAuth = usePrivyAuthWithOAuth(privyCallbacks);
-  // redundant - could be used native hook  sendCode from sms
-  // const privyAuthWithEmail = usePrivyAuthWithEmail(privyCallbacks);
 
   // Handle SMS login completion (similar to OAuth pattern)
-  const handleSMSLoginComplete = useCallback(
-    async (params: any) => {
-      if (user.isLoggedIn) return;
+  const handleSMSLoginComplete = useCallback(async () => {
+    if (user.isLoggedIn) return;
 
-      console.log('SMS login onComplete: ', params);
+    // Wait for wallet to be available
+    const walletAvailable = await waitForWallet(connectedWalletRef);
+    if (!walletAvailable) {
+      handlePrivyError(new Error('Wallet not available'));
+      return;
+    }
 
-      // Wait for wallet to be available
-      const walletAvailable = await waitForWallet(connectedWalletRef);
-      if (!walletAvailable) {
-        handlePrivyError(new Error('Wallet not available'));
-        return;
-      }
+    const currentWallet = connectedWalletRef.current;
+    if (!currentWallet) {
+      console.warn('No connected wallet available');
+      handlePrivyError(new Error('No connected wallet available'));
+      return;
+    }
 
-      const currentWallet = connectedWalletRef.current;
-      if (!currentWallet) {
-        console.warn('No connected wallet available');
-        handlePrivyError(new Error('No connected wallet available'));
-        return;
-      }
+    try {
+      await privySignOn({
+        wallet: currentWallet,
+        onSuccess: handlePrivySuccess,
+        onError: handlePrivyError,
+        ssoOAuthToken: undefined, // Not needed for SMS
+        ssoProvider: 'phone' as PrivySignInSSOProvider, // SMS provider
+      });
+    } catch (error) {
+      console.error('SMS sign-on error:', error);
+      handlePrivyError(error as Error);
+    }
+  }, [
+    user.isLoggedIn,
+    connectedWalletRef,
+    privySignOn,
+    handlePrivySuccess,
+    handlePrivyError,
+  ]);
 
-      try {
-        await privySignOn({
-          wallet: currentWallet,
-          onSuccess: handlePrivySuccess,
-          onError: handlePrivyError,
-          ssoOAuthToken: undefined, // Not needed for SMS
-          ssoProvider: 'phone' as PrivySignInSSOProvider, // SMS provider
-        });
-      } catch (error) {
-        console.error('SMS sign-on error:', error);
-        handlePrivyError(error as Error);
-      }
-    },
-    [
-      user.isLoggedIn,
-      connectedWalletRef,
-      privySignOn,
-      handlePrivySuccess,
-      handlePrivyError,
-    ],
-  );
+  const handleEmailLoginComplete = useCallback(async () => {
+    if (user.isLoggedIn) return;
 
-  const handleEmailLoginComplete = useCallback(
-    async (params: any) => {
-      if (user.isLoggedIn) return;
+    // Wait for wallet to be available
+    const walletAvailable = await waitForWallet(connectedWalletRef);
+    if (!walletAvailable) {
+      handlePrivyError(new Error('Wallet not available'));
+      return;
+    }
 
-      console.log('Email login onComplete: ', params);
+    const currentWallet = connectedWalletRef.current;
+    if (!currentWallet) {
+      console.warn('No connected wallet available');
+      handlePrivyError(new Error('No connected wallet available'));
+      return;
+    }
 
-      // Wait for wallet to be available
-      const walletAvailable = await waitForWallet(connectedWalletRef);
-      if (!walletAvailable) {
-        handlePrivyError(new Error('Wallet not available'));
-        return;
-      }
-
-      const currentWallet = connectedWalletRef.current;
-      if (!currentWallet) {
-        console.warn('No connected wallet available');
-        handlePrivyError(new Error('No connected wallet available'));
-        return;
-      }
-
-      try {
-        await privySignOn({
-          wallet: currentWallet,
-          onSuccess: handlePrivySuccess,
-          onError: handlePrivyError,
-          ssoOAuthToken: undefined, // Not needed for email
-          ssoProvider: 'email' as PrivySignInSSOProvider, // Email provider
-        });
-      } catch (error) {
-        console.error('Email sign-on error:', error);
-        handlePrivyError(error as Error);
-      }
-    },
-    [
-      user.isLoggedIn,
-      connectedWalletRef,
-      privySignOn,
-      handlePrivySuccess,
-      handlePrivyError,
-    ],
-  );
+    try {
+      await privySignOn({
+        wallet: currentWallet,
+        onSuccess: handlePrivySuccess,
+        onError: handlePrivyError,
+        ssoOAuthToken: undefined, // Not needed for email
+        ssoProvider: 'email' as PrivySignInSSOProvider, // Email provider
+      });
+    } catch (error) {
+      console.error('Email sign-on error:', error);
+      handlePrivyError(error as Error);
+    }
+  }, [
+    user.isLoggedIn,
+    connectedWalletRef,
+    privySignOn,
+    handlePrivySuccess,
+    handlePrivyError,
+  ]);
 
   const { sendCode: sendSMSCode, loginWithCode: loginWithSMSCode } =
     useLoginWithSms({
-      onComplete: handleSMSLoginComplete,
+      onComplete: () => {
+        handleSMSLoginComplete().catch(console.error);
+      },
     });
 
   const { sendCode: sendEmailCode, loginWithCode: loginWithEmailCode } =
     useLoginWithEmail({
-      onComplete: handleEmailLoginComplete,
+      onComplete: () => {
+        handleEmailLoginComplete().catch(console.error);
+      },
     });
 
   const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
@@ -432,7 +424,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       await sendEmailCode({ email: tempEmailToUse });
       const { awaitUserInput } = emailDialogStore.getState();
       const code = await awaitUserInput();
-      console.log('code received: ', code);
       await loginWithEmailCode({ code });
       setIsMagicLoading(false);
     } catch (e) {

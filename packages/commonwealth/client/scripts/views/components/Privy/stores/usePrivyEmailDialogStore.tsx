@@ -11,7 +11,6 @@ type InternalState = {
   onCancel: OnCancel | undefined;
   onError: OnError;
   resolver?: (value: string) => void;
-  rejector?: (reason?: any) => void;
 };
 
 type EmailDialogStore = InternalState & {
@@ -25,21 +24,17 @@ export const emailDialogStore = createStore<EmailDialogStore>()(
     onCancel: undefined,
     onError: () => {},
     resolver: undefined,
-    rejector: undefined,
     setState: (newState: InternalState) => set(newState),
     awaitUserInput: () => {
       return new Promise<string>((resolve, reject) => {
         set({
           active: true,
           resolver: resolve,
-          rejector: reject,
           onCancel: () => {
             reject(new Error('User cancelled'));
             set({
               active: false,
               resolver: undefined,
-              rejector: undefined,
-              onCancel: undefined,
               onError: () => {},
             });
           },
@@ -48,7 +43,6 @@ export const emailDialogStore = createStore<EmailDialogStore>()(
             set({
               active: false,
               resolver: undefined,
-              rejector: undefined,
               onCancel: undefined,
               onError: () => {},
             });
