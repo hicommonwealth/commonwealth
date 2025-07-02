@@ -13,7 +13,7 @@ describe('Governance Lifecycle tests', () => {
     async () => {
       const { chain, anvilAccounts } = await setupCommonwealthE2E();
 
-      const namespaceName = 'tesadfzcbvcmpasdfzc';
+      const namespaceName = 'tesadfzcbvcmpasdfzcz';
       const namespaceAddress = await cp.deployNamespace(
         namespaceName,
         anvilAccounts[0].address,
@@ -29,7 +29,7 @@ describe('Governance Lifecycle tests', () => {
         id: namespaceName,
         name: namespaceName,
         namespace: namespaceName,
-        namespaceAddress: namespaceAddress,
+        namespace_address: namespaceAddress,
         tier: CommunityTierMap.PremiumVerification,
         spam_tier_level: DisabledCommunitySpamTier,
         environment: 'development',
