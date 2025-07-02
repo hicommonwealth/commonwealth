@@ -1,4 +1,3 @@
-import { useLoginWithSms } from '@privy-io/react-auth';
 import React, { useCallback } from 'react';
 import usePrivySMSDialogStore from 'views/components/Privy/stores/usePrivySMSDialogStore';
 import { CodeDialog } from './CodeDialog';
@@ -11,24 +10,22 @@ export const PrivySMSDialog = () => {
     active,
     setState: setSMSDialogStore,
     onCancel,
-    onError,
+    resolver,
   } = usePrivySMSDialogStore();
-  const { loginWithCode } = useLoginWithSms();
 
   const handleLoginWithCode = useCallback(
     (code: string) => {
-      async function doAsync() {
-        setSMSDialogStore({
-          active: false,
-          onCancel: undefined,
-          onError: () => {},
-        });
-
-        await loginWithCode({ code });
-      }
-      doAsync().catch((err) => onError(err));
+      resolver?.(code);
+      setSMSDialogStore({
+        active: false,
+        onCancel: undefined,
+        onError: () => {},
+        resolver: undefined,
+        rejector: undefined,
+      });
+      return;
     },
-    [onError, setSMSDialogStore, loginWithCode],
+    [setSMSDialogStore, resolver],
   );
 
   const handleCancel = useCallback(() => {
@@ -37,6 +34,8 @@ export const PrivySMSDialog = () => {
       active: false,
       onCancel: undefined,
       onError: () => {},
+      resolver: undefined,
+      rejector: undefined,
     });
   }, [onCancel, setSMSDialogStore]);
 
