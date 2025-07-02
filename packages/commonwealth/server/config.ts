@@ -1,5 +1,11 @@
 import { config as adapters_config } from '@hicommonwealth/adapters';
-import { configure, config as target } from '@hicommonwealth/core';
+import {
+  configure,
+  DeployedEnvironments,
+  requiredInEnvironmentServices,
+  config as target,
+  WebServices,
+} from '@hicommonwealth/core';
 import { config as model_config } from '@hicommonwealth/model';
 import { ChainBase, TwitterBotName } from '@hicommonwealth/shared';
 import { z } from 'zod';
@@ -23,7 +29,6 @@ const {
   LIBP2P_PRIVATE_KEY,
   DISPATCHER_APP_ID,
   DISPATCHER_APP_PRIVATE_KEY,
-  DEV_MODULITH,
   ENABLE_CLIENT_PUBLISHING,
   EVM_CE_LOG_TRACE,
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_IN,
@@ -118,7 +123,6 @@ export const config = configure(
         : undefined,
       DISPATCHER_APP_PRIVATE_KEY,
     },
-    DEV_MODULITH: DEV_MODULITH === 'true',
     ENABLE_CLIENT_PUBLISHING: ENABLE_CLIENT_PUBLISHING === 'true',
     TWITTER: {
       WORKER_POLL_INTERVAL: (() => {
@@ -154,16 +158,14 @@ export const config = configure(
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
     ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: z.number().int().positive(),
     AUTH: z.object({
-      SESSION_SECRET: z
-        .string()
-        .refine(
-          (data) =>
-            !(
-              model_config.APP_ENV === 'production' &&
-              data === DEFAULTS.SESSION_SECRET
-            ),
-          'SESSION_SECRET must be a non-default value in production',
-        ),
+      SESSION_SECRET: z.string().refine(
+        requiredInEnvironmentServices({
+          config: model_config,
+          requiredAppEnvs: ['production'],
+          requiredServices: WebServices,
+          defaultCheck: DEFAULTS.SESSION_SECRET,
+        }),
+      ),
       MAGIC_SUPPORTED_BASES: z.array(z.nativeEnum(ChainBase)),
       MAGIC_DEFAULT_CHAIN: z.nativeEnum(ChainBase),
     }),
@@ -172,8 +174,11 @@ export const config = configure(
         .string()
         .optional()
         .refine(
-          (data) => !(model_config.APP_ENV === 'production' && !data),
-          'TELEGRAM_BOT_TOKEN is required in production',
+          requiredInEnvironmentServices({
+            config: model_config,
+            requiredAppEnvs: ['production'],
+            requiredServices: WebServices,
+          }),
         ),
     }),
     CLOUDFLARE: z.object({
@@ -181,15 +186,21 @@ export const config = configure(
         .string()
         .optional()
         .refine(
-          (data) => !(['production'].includes(model_config.APP_ENV) && !data),
-          'CF_ZONE_ID is required in production',
+          requiredInEnvironmentServices({
+            config: model_config,
+            requiredAppEnvs: ['production'],
+            requiredServices: WebServices,
+          }),
         ),
       API_KEY: z
         .string()
         .optional()
         .refine(
-          (data) => !(['production'].includes(model_config.APP_ENV) && !data),
-          'CF_API_KEY is required in production',
+          requiredInEnvironmentServices({
+            config: model_config,
+            requiredAppEnvs: ['production'],
+            requiredServices: WebServices,
+          }),
         ),
     }),
     WORKERS: z.object({
@@ -201,37 +212,53 @@ export const config = configure(
       .string()
       .optional()
       .refine(
-        (data) => !(!['local', 'CI'].includes(model_config.APP_ENV) && !data),
-        'SNAPSHOT_WEBHOOK_SECRET is required in public environments',
+        requiredInEnvironmentServices({
+          config: model_config,
+          requiredAppEnvs: DeployedEnvironments,
+          requiredServices: WebServices,
+        }),
       ),
     GITHUB: z.object({
       DISPATCHER_APP_ID: z
         .number()
         .optional()
-        .refine((data) => !(model_config.APP_ENV === 'production' && !data))
+        .refine(
+          requiredInEnvironmentServices({
+            config: model_config,
+            requiredAppEnvs: ['production'],
+            requiredServices: WebServices,
+          }),
+        )
         .describe('The ID of the Common Workflow Dispatcher GitHub app'),
       DISPATCHER_APP_PRIVATE_KEY: z
         .string()
         .optional()
-        .refine((data) => !(model_config.APP_ENV === 'production' && !data))
+        .refine(
+          requiredInEnvironmentServices({
+            config: model_config,
+            requiredAppEnvs: ['production'],
+            requiredServices: WebServices,
+          }),
+        )
         .describe(
           'The private key of the Common Workflow Dispatcher GitHub app',
         ),
     }),
-    DEV_MODULITH: z.boolean(),
     ENABLE_CLIENT_PUBLISHING: z.boolean(),
     TWITTER: z
       .object({
         WORKER_POLL_INTERVAL: z.number().int().gte(0),
         ENABLED_BOTS: z.array(z.nativeEnum(TwitterBotName)),
       })
-      .refine(
-        (data) =>
-          !(
-            data.ENABLED_BOTS.length > 0 &&
-            !model_config.TWITTER.APP_BEARER_TOKEN
-          ),
-      ),
+      .refine((data) => {
+        if (data.ENABLED_BOTS.length === 0) return true;
+        const fn = requiredInEnvironmentServices({
+          config: model_config,
+          requiredAppEnvs: ['production'],
+          requiredServices: WebServices,
+        });
+        return fn(model_config.TWITTER.APP_BEARER_TOKEN);
+      }),
     CACHE_TTL: z.object({
       GET_COMMUNITIES_TRENDING_SIGNED_IN: z.number(),
       GET_COMMUNITIES_TRENDING_SIGNED_OUT: z.number(),
