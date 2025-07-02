@@ -1,6 +1,5 @@
-import { expect } from 'chai';
 import { sidebarStore } from 'state/ui/sidebar';
-import { beforeEach, describe, test } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 
 describe('sidebar store', () => {
   const initialStore = sidebarStore.getState();

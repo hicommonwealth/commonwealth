@@ -1,4 +1,7 @@
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import {
+  commonProtocol as cp,
+  ValidChains,
+} from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { bootstrapBindings } from '../../../../server/bindings/bootstrap';
 // eslint-disable-next-line max-len
@@ -37,10 +40,15 @@ export async function setupCommonwealthE2E() {
     bootstrapBindings({ skipRmqAdapter: true }),
   ]);
 
-  const web3 = setupWeb3(anvilContainer!.getMappedPort(8545));
+  const web3 = setupWeb3(anvilContainer!.getMappedPort(8546));
+
+  const chain = await models.ChainNode.scope('withPrivateData').findOne({
+    where: { eth_chain_id: ValidChains.Anvil },
+  });
 
   return {
     web3,
+    chain,
     anvilAccounts,
     anvilContainer,
     rabbitMQContainer,

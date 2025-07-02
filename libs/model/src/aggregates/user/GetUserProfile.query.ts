@@ -42,6 +42,7 @@ open_gates AS (
     BOOL_AND(
       COALESCE(G.is_private, FALSE) = FALSE
       OR M.address_id IS NOT NULL
+      OR ${actor.user.isAdmin ? 'TRUE' : 'FALSE'}
     )
 ),
 comments AS (
@@ -56,10 +57,11 @@ comments AS (
     JOIN user_addresses ua ON ua.id = c.address_id
     JOIN "Addresses" a ON c.address_id = a.id
     JOIN "Threads" t ON c.thread_id = t.id
-    JOIN open_gates og ON t.topic_id = og.topic_id
+    LEFT JOIN open_gates og ON t.topic_id = og.topic_id
   WHERE
-    t.deleted_at IS NULL AND 
-    c.deleted_at IS NULL
+    t.deleted_at IS NULL
+    AND c.deleted_at IS NULL
+    AND (og.topic_id IS NOT NULL OR a.user_id = :actor_id)
   ORDER BY
     c.created_at DESC
 ) 
@@ -159,13 +161,14 @@ SELECT
   	ORDER BY t.created_at DESC), '[]'::json)
     FROM
       "Threads" t
-      JOIN open_gates og ON t.topic_id = og.topic_id
       JOIN user_addresses ua ON ua.id = t.address_id
       JOIN "Addresses" a ON ua.id = a.id
       JOIN "Users" u ON a.user_id = u.id
       JOIN "Topics" g ON t.topic_id = g.id
+      LEFT JOIN open_gates og ON t.topic_id = og.topic_id
     WHERE
       t.deleted_at IS NULL 
+      AND (og.topic_id IS NOT NULL OR a.user_id = :actor_id)
   ) AS threads
 , (
   SELECT COALESCE(json_agg(
@@ -232,7 +235,6 @@ SELECT
 	FROM
 	  comments c
 	  JOIN "Threads" t ON c.thread_id = t.id
-    JOIN open_gates og ON t.topic_id = og.topic_id
 	  JOIN "Addresses" a ON c.address_id = a.id
 	  JOIN "Users" u ON a.user_id = u.id
 	  JOIN "Topics" g ON t.topic_id = g.id

@@ -6,13 +6,9 @@ import {
   type DB,
 } from '@hicommonwealth/model';
 import { UserTierMap } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { cleanSubscriptions } from '../../server/workers/graphileWorker/tasks/cleanSubscriptions';
-
-chai.use(chaiHttp);
 
 describe('DatabaseCleaner Tests', async () => {
   let models: DB;
