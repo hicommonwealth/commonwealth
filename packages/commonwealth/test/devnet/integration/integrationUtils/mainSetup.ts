@@ -40,7 +40,7 @@ export async function setupCommonwealthE2E() {
     bootstrapBindings({ skipRmqAdapter: true }),
   ]);
 
-  const web3 = setupWeb3(anvilContainer!.getMappedPort(8545));
+  const web3 = setupWeb3(anvilContainer!.getMappedPort(8546));
 
   const chain = await models.ChainNode.scope('withPrivateData').findOne({
     where: { eth_chain_id: ValidChains.Anvil },
