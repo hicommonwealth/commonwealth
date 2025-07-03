@@ -409,6 +409,15 @@ const DiscussionsPage = () => {
           <Breadcrumbs />
           <UserTrainingSlider />
           <AdminOnboardingSlider />
+
+          {canShowGatingBanner && (
+            <CWGatedTopicBanner
+              actions={Object.values(GatedActionEnum)}
+              actionGroups={actionGroups}
+              bypassGating={bypassGating}
+              onClose={() => setCanShowGatingBanner(false)}
+            />
+          )}
           <CWBanner type="info" body="This topic is private." />
         </CWPageLayout>
       </StickCommentProvider>
