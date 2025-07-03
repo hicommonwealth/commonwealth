@@ -1,6 +1,8 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
-import { middleware, models, Reaction, Thread } from '@hicommonwealth/model';
+import { Reaction, Thread } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import * as middleware from '@hicommonwealth/model/middleware';
 import { CountAggregatorKeys, LinkSource } from '@hicommonwealth/shared';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { config } from '../config';

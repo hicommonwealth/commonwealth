@@ -8,10 +8,11 @@ import {
 import { events } from '@hicommonwealth/schemas';
 import dayjs from 'dayjs';
 import { QueryTypes } from 'sequelize';
-import { config, Contest, models } from '..';
 import { GetActiveContestManagers } from '../aggregates/contest';
 import { SetContestEnded } from '../aggregates/contest/SetContestEnded.command';
 import { SetContestEnding } from '../aggregates/contest/SetContestEnding.command';
+import { config } from '../config';
+import { models } from '../database';
 import { systemActor } from '../middleware';
 import { buildThreadContentUrl, getChainNodeUrl } from '../utils';
 import {
@@ -37,7 +38,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           payload.id!,
         );
 
-        const contestManagers = await Contest.GetActiveContestManagers().body({
+        const contestManagers = await GetActiveContestManagers().body({
           actor: {} as Actor,
           payload: {
             community_id: payload.community_id!,
