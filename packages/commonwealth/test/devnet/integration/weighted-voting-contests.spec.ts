@@ -213,7 +213,6 @@ describe(
     let contestId = 0;
     let chainNodeId: number;
     let privateKey: string;
-    let rpcUrl: string;
     const stakeAmount = 5;
 
     let userAddress = '';
@@ -233,19 +232,11 @@ describe(
       privateKey = anvilAccounts[0].privateKey;
       userAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address;
 
-      // Set rpcUrl based on the anvil container
-      const anvilPort = setupResult.anvilContainer!.getMappedPort(8545);
-      rpcUrl = `http://localhost:${anvilPort}`;
-
       namespaceFactory = new NamespaceFactory(web3);
       communityStake = new CommunityStake(web3);
 
       // Use the ChainNode created by setupCommonwealthE2E (setupAnvil)
-      const chainNode = await models.ChainNode.scope('withPrivateData').findOne(
-        {
-          where: { eth_chain_id: 31337 },
-        },
-      );
+      const chainNode = setupResult.chain;
       if (!chainNode) {
         throw new Error(
           'Anvil ChainNode not found - setupCommonwealthE2E may have failed',
@@ -255,13 +246,7 @@ describe(
 
       console.log('deploying ERC20 for voting token');
       // Deploy ERC20 for voting token
-      const testToken = await deployERC20Token(
-        web3,
-        'Test Token',
-        'TT',
-        18,
-        10 ** 6,
-      );
+      testToken = await deployERC20Token(web3, 'Test Token', 'TT', 18, 10 ** 6);
 
       console.log('creating test user');
       // Create test user with unique ID to avoid conflicts
@@ -349,9 +334,20 @@ describe(
       console.log('Transaction 1: Deploying namespace...');
       await namespaceFactory.deployNamespace(namespaceName);
 
-      console.log('getting namespace address');
-      const namespaceAddress =
-        await namespaceFactory.getNamespaceAddress(namespaceName);
+      let namespaceAddress: string | null = null;
+
+      // wait for namespace to be deployed
+      await vi.waitFor(
+        async () => {
+          namespaceAddress =
+            await namespaceFactory.getNamespaceAddress(namespaceName);
+          expect(namespaceAddress).toBeTruthy();
+        },
+        {
+          timeout: TX_TIMEOUT,
+          interval: INTERVAL,
+        },
+      );
 
       console.log('updating community with namespace address');
       await models.Community.update(
@@ -524,11 +520,7 @@ describe(
       await dispose()();
     });
 
-    test('test', async () => {
-      console.log('test');
-    });
-
-    test.skip('should handle staked contest with weighted voting', async () => {
+    test('should handle staked contest with weighted voting', async () => {
       console.log('creating topic');
       // Create weighted voting topic using command
       const topicResult = await command(Community.CreateTopic(), {
@@ -690,7 +682,7 @@ describe(
       );
     });
 
-    test.skip('should handle ERC20 weighted voting in contests', async () => {
+    test('should handle ERC20 weighted voting in contests', async () => {
       // Create ERC20 weighted voting topic using command
       const erc20TopicResult = await command(Community.CreateTopic(), {
         actor: {
@@ -854,71 +846,6 @@ describe(
           interval: INTERVAL,
         },
       );
-    });
-
-    test.skip('should correctly calculate contest scores with weighted voting', async () => {
-      // Create multiple contest actions with different weights
-      const contentActions = [
-        {
-          content_id: 3,
-          actor_address: userAddress,
-          calculated_voting_weight: '1500000000000000000', // 1.5 tokens
-        },
-        {
-          content_id: 4,
-          actor_address: userAddress,
-          calculated_voting_weight: '3000000000000000000', // 3 tokens
-        },
-        {
-          content_id: 5,
-          actor_address: '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
-          calculated_voting_weight: '750000000000000000', // 0.75 tokens
-        },
-      ];
-
-      // Add contest actions for score calculation
-      for (const action of contentActions) {
-        await models.ContestAction.create({
-          contest_address: contestAddress,
-          contest_id: contestId,
-          content_id: action.content_id,
-          action: 'upvoted',
-          actor_address: action.actor_address,
-          thread_id: threadId,
-          content_url: `/${communityId}/discussion/${threadId}`,
-          voting_power: action.calculated_voting_weight,
-          calculated_voting_weight: action.calculated_voting_weight,
-          created_at: new Date(),
-        });
-      }
-
-      // Get contest actions and verify weights
-      const contestActions = await models.ContestAction.findAll({
-        where: {
-          contest_address: contestAddress,
-          action: 'upvoted',
-        },
-        order: [['calculated_voting_weight', 'DESC']],
-      });
-
-      expect(contestActions.length).toBeGreaterThan(0);
-
-      // Verify actions are ordered by weight (highest first)
-      let previousWeight = BigInt('999999999999999999999999999999999999999');
-      for (const action of contestActions) {
-        const currentWeight = BigInt(action.calculated_voting_weight || '0');
-        expect(Number(currentWeight)).toBeLessThanOrEqual(
-          Number(previousWeight),
-        );
-        previousWeight = currentWeight;
-      }
-
-      // Verify total weighted votes
-      const totalWeight = contestActions.reduce(
-        (sum, action) => sum + BigInt(action.calculated_voting_weight || '0'),
-        BigInt(0),
-      );
-      expect(Number(totalWeight)).toBeGreaterThan(0);
     });
   },
   TIMEOUT,
