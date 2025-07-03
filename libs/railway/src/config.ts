@@ -1,4 +1,9 @@
-import { configure, config as target } from '@hicommonwealth/core';
+import {
+  configure,
+  requiredInEnvironmentServices,
+  config as target,
+  WebServices,
+} from '@hicommonwealth/core';
 import { z } from 'zod';
 
 const { RAILWAY_TOKEN, RAILWAY_PROJECT_ID, RAILWAY_PARENT_ENV_ID } =
@@ -31,8 +36,12 @@ export const config = configure(
             .string()
             .optional()
             .refine(
-              (data) => !(target.IS_CI && !data),
-              'Railway environment parent id must be set in CI for review app deployments to work',
+              requiredInEnvironmentServices({
+                config: target,
+                requiredAppEnvs: ['CI'],
+                // TODO: should be Railway services
+                requiredServices: WebServices,
+              }),
             )
             .describe(
               'The environment id to fork from when deploying a new review app',
@@ -41,8 +50,11 @@ export const config = configure(
       })
       .optional()
       .refine(
-        (data) => !(target.IS_CI && !data),
-        'Railway configuration is required in CI',
+        requiredInEnvironmentServices({
+          config: target,
+          requiredAppEnvs: ['CI'],
+          requiredServices: WebServices,
+        }),
       ),
   }),
 );

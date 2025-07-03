@@ -1,30 +1,38 @@
-import pino, { DestinationStream } from 'pino';
+import pino, { DestinationStream, MultiStreamRes } from 'pino';
 import { ZodError } from 'zod';
 import { config } from '../config';
 import { LogLevel } from '../ports/enums';
 import { GetLogger, LogContext, LoggerIds } from './interfaces';
 import { rollbar } from './rollbar';
 
-let transport: DestinationStream;
+let transport: DestinationStream | MultiStreamRes;
 
 const formatFilename = (name: string) => {
   const t = name.split('/');
   return t[t.length - 1];
 };
 
-if (config.NODE_ENV !== 'production') {
-  transport = pino.transport({
-    target: 'pino-pretty',
-    options: {
-      destination: 1, // STDOUT
-      ignore: 'pid,hostname',
-      errorLikeObjectKeys: ['e', 'err', 'error'],
-      sync: config.NODE_ENV === 'test',
-      colorizeObjects: false,
-      singleLine: true,
-    },
-  });
-}
+// if (config.NODE_ENV !== 'production') {
+//   transport = pino.transport({
+//     target: 'pino-pretty',
+//     options: {
+//       destination: 1, // STDOUT
+//       ignore: 'pid,hostname',
+//       errorLikeObjectKeys: ['e', 'err', 'error'],
+//       sync: config.NODE_ENV === 'test',
+//       colorizeObjects: false,
+//       singleLine: true,
+//     },
+//   });
+// } else {
+transport = pino.multistream(
+  [
+    { level: 'info', stream: process.stdout },
+    { level: 'error', stream: process.stderr },
+  ],
+  { dedupe: true },
+);
+// }
 
 export const getPinoLogger: GetLogger = (
   ids: LoggerIds,
