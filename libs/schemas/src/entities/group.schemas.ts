@@ -116,7 +116,7 @@ export const Group = z.object({
   updated_at: z.coerce.date().optional(),
 });
 
-export const MembershipRejectReasonSchema = z
+export const MembershipRejectReason = z
   .object({
     message: z.string(),
     requirement: z.object({
@@ -128,14 +128,12 @@ export const MembershipRejectReasonSchema = z
   .optional()
   .nullable();
 
-export type MembershipRejectReason = z.infer<
-  typeof MembershipRejectReasonSchema
->;
+export type MembershipRejectReason = z.infer<typeof MembershipRejectReason>;
 
 export const Membership = z.object({
   group_id: z.number(),
   address_id: z.number(),
-  reject_reason: MembershipRejectReasonSchema,
+  reject_reason: MembershipRejectReason,
   last_checked: z.coerce.date(),
 
   // associations

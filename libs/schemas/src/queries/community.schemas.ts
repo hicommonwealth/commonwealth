@@ -16,7 +16,7 @@ import {
   ExtendedCommunity,
   Group,
   Membership,
-  MembershipRejectReasonSchema,
+  MembershipRejectReason,
   PinnedTokenWithPrices,
   Topic,
 } from '../entities';
@@ -114,7 +114,7 @@ export const MembershipView = z.object({
   groupId: z.number(),
   topics: TopicPermissionsView.array(),
   isAllowed: z.boolean(),
-  rejectReason: MembershipRejectReasonSchema,
+  rejectReason: MembershipRejectReason,
 });
 
 export const GetMemberships = {
@@ -342,7 +342,7 @@ export const GroupView = Group.omit({ GroupGatedActions: true }).extend({
   memberships: z.array(
     Membership.omit({ address: true, group: true }).extend({
       last_checked: z.coerce.date().or(z.string()),
-      reject_reason: MembershipRejectReasonSchema,
+      reject_reason: MembershipRejectReason,
       address: z.string().nullable(),
     }),
   ),
