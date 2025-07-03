@@ -1,12 +1,9 @@
 import {
   OptionsWithBalances,
+  Requirement,
   validateGroupMembership,
 } from '@hicommonwealth/model';
-import {
-  BalanceSourceType,
-  Requirement,
-  WalletSsoSource,
-} from '@hicommonwealth/shared';
+import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
 import { describe, expect, test } from 'vitest';
 
 type MockRequirementOptions = {
