@@ -89,7 +89,7 @@ export function requiredInEnvironmentServices<T>({
   defaultCheck,
   mustBeUndefined,
 }: {
-  config: { APP_ENV: AppEnvironment; SERVICE: Service; DEV_MODULITH: boolean };
+  config: { APP_ENV: AppEnvironment; SERVICE?: Service; DEV_MODULITH: boolean };
   requiredAppEnvs: AppEnvironment[] | 'all';
   requiredServices:
     | ['web', 'web-modulith', ...Service[]]
@@ -124,8 +124,8 @@ export function requiredInEnvironmentServices<T>({
     if (requiredAppEnvs === 'all') return false;
     if (!requiredAppEnvs.includes(appEnv)) return true;
 
-    // don't check services in CI
-    if (appEnv === 'CI') return true;
+    // don't check services in CI or if service is undefined (local/CI/tests/scripts)
+    if (appEnv === 'CI' || service === undefined) return true;
 
     if (requiredServices === 'all') return false;
     return !requiredServices.includes(service as Exclude<Service, 'web'>);
@@ -245,7 +245,20 @@ export const config = configure(
           requiredServices: 'all',
         }),
       ),
-    SERVICE: z.enum(Services),
+    SERVICE: z
+      .enum(Services)
+      .optional()
+      .refine(
+        requiredInEnvironmentServices({
+          config: {
+            APP_ENV: APP_ENV as AppEnvironment,
+            SERVICE: SERVICE as Service,
+            DEV_MODULITH: DEV_MODULITH === 'true',
+          },
+          requiredAppEnvs: DeployedEnvironments,
+          requiredServices: 'all',
+        }),
+      ),
     NODE_ENV: z.enum(Environments),
     DEV_MODULITH: z.boolean(),
     IS_CI: z.boolean(),
