@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 import { CacheDecorator, RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
-import { tester, type E2E_TestEntities } from '@hicommonwealth/model';
+import * as tester from '@hicommonwealth/model/tester';
 import express from 'express';
 import 'express-async-errors'; // handle exceptions thrown in express routes
 import { main } from './main';
@@ -23,7 +23,7 @@ export type TestServer = {
   app: express.Express;
   cacheDecorator: CacheDecorator;
   seeder: ModelSeeder;
-  e2eTestEntities: E2E_TestEntities;
+  e2eTestEntities: tester.E2E_TestEntities;
   baseUrl: string;
 };
 

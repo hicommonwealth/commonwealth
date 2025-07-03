@@ -1,5 +1,6 @@
 import { command } from '@hicommonwealth/core';
-import { SuperAdmin, UserInstance } from '@hicommonwealth/model';
+import { SuperAdmin } from '@hicommonwealth/model';
+import { UserInstance } from '@hicommonwealth/model/models';
 import { BalanceType, UserTierMap } from '@hicommonwealth/shared';
 import { describe, expect, test } from 'vitest';
 import { buildUser } from '../../unit/unitHelpers';

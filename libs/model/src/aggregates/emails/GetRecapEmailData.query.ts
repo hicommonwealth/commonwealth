@@ -15,7 +15,9 @@ import {
 } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
-import { config, generateUnsubscribeLink, models } from '../../index';
+import { config } from '../../config';
+import { models } from '../../database';
+import { generateUnsubscribeLink } from '../../utils';
 
 const log = logger(import.meta);
 type AdditionalMetaData<Key extends keyof typeof EnrichedNotificationNames> = {

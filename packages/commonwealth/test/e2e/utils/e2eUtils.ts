@@ -1,8 +1,9 @@
 // Note, this login will not work for the homepage
-import { models, tester, type E2E_TestEntities } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import * as tester from '@hicommonwealth/model/tester';
 import { expect } from '@playwright/test';
 
-export type E2E_Seeder = E2E_TestEntities & {
+export type E2E_Seeder = tester.E2E_TestEntities & {
   testAddress: string;
   addAlchemyKey: () => Promise<void>;
   removeUser: () => Promise<void>;

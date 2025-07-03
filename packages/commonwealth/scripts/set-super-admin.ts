@@ -1,5 +1,6 @@
 import { dispose } from '@hicommonwealth/core';
-import { models, UserAttributes } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { UserAttributes } from '@hicommonwealth/model/models';
 import { WhereOptions } from 'sequelize';
 
 async function main() {

@@ -1,12 +1,12 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
-import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import {
   CreateStakeTransaction,
   GetTransactions,
 } from '../../src/aggregates/community';
+import { seed } from '../../src/tester';
 
 describe('Transactions history', () => {
   const actor: Actor = { user: { email: '' } };

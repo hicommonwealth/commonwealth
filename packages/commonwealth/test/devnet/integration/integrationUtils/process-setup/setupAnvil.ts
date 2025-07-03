@@ -1,4 +1,4 @@
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { GenericContainer } from 'testcontainers';
 import Web3 from 'web3';
 

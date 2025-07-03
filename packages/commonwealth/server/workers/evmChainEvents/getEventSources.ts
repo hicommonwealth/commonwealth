@@ -9,8 +9,8 @@ import {
   EvmEventSource,
   EvmSources,
   buildChainNodeUrl,
-  models,
 } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { getAddress } from 'viem';
 import { config } from '../../config';
 

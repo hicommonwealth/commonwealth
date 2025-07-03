@@ -11,11 +11,11 @@ import type {
 } from '@canvas-js/interfaces';
 import { Action, Session } from '@canvas-js/interfaces';
 import { createEvmSigner } from '@hicommonwealth/evm-protocols';
+import { models } from '@hicommonwealth/model/db';
 import {
   CommunityAttributes,
   ThreadAttributes,
-  models,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/models';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,

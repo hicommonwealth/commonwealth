@@ -1,5 +1,6 @@
 import { stats } from '@hicommonwealth/core';
-import { magicLogin, models } from '@hicommonwealth/model';
+import { magicLogin } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { MagicLogin } from '@hicommonwealth/schemas';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { Magic } from '@magic-sdk/admin';

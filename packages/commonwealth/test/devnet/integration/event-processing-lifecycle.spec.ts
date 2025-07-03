@@ -3,7 +3,7 @@ import {
   LPBondingCurveAbi,
 } from '@commonxyz/common-protocol-abis';
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { describe, expect, test, vi } from 'vitest';
 import { setupCommonwealthE2E } from './integrationUtils/mainSetup';
 

@@ -1,5 +1,5 @@
 import { dispose, logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { safeTruncateBody } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 

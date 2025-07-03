@@ -3,9 +3,9 @@ import { dispose } from '@hicommonwealth/core';
 import {
   ThreadAttributes,
   getThreadSearchVector,
-  tester,
   type DB,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/models';
+import * as tester from '@hicommonwealth/model/tester';
 import { Optional } from 'sequelize';
 import { NullishPropertiesOf } from 'sequelize/lib/utils';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';

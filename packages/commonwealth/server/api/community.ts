@@ -2,11 +2,11 @@ import { trpc } from '@hicommonwealth/adapters';
 import { command } from '@hicommonwealth/core';
 import {
   Community,
-  middleware,
-  models,
   refreshMemberships,
   refreshProfileCount,
 } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import * as middleware from '@hicommonwealth/model/middleware';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityInteractionEvent,

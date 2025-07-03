@@ -1,4 +1,5 @@
-import { EvmContractSources, models } from '@hicommonwealth/model';
+import { EvmContractSources } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { EventPairs } from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
 

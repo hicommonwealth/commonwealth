@@ -11,12 +11,9 @@ import {
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
-import {
-  CommunityAttributes,
-  tester,
-  tokenBalanceCache,
-  type DB,
-} from '@hicommonwealth/model';
+import { tokenBalanceCache } from '@hicommonwealth/model';
+import { CommunityAttributes, DB } from '@hicommonwealth/model/models';
+import * as tester from '@hicommonwealth/model/tester';
 import {
   BalanceSourceType,
   BalanceType,

@@ -4,8 +4,8 @@ import {
   CommonMCPServerWithHeaders,
   buildMCPClientOptions,
   config,
-  models,
 } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import OpenAI from 'openai';
 import { exit } from 'process';
 import * as readline from 'readline';

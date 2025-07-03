@@ -7,11 +7,9 @@ import {
   EvmEventSignatures,
   commonProtocol,
 } from '@hicommonwealth/evm-protocols';
-import {
-  EvmEventSourceInstance,
-  createTestRpc,
-  models,
-} from '@hicommonwealth/model';
+import { createTestRpc } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { EvmEventSourceInstance } from '@hicommonwealth/model/models';
 import { AbiType } from '@hicommonwealth/shared';
 
 export async function createContestEventSources(

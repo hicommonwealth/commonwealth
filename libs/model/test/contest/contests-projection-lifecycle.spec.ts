@@ -7,7 +7,6 @@ import {
   query,
 } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
-import { createEventRegistryChainNodes, models } from '@hicommonwealth/model';
 import { ContestResults } from '@hicommonwealth/schemas';
 import { CONTEST_FEE_PERCENT, delay } from '@hicommonwealth/shared';
 import {
@@ -22,7 +21,9 @@ import {
 import { z } from 'zod';
 import { Contests } from '../../src/aggregates/contest/Contests.projection';
 import { GetAllContests } from '../../src/aggregates/contest/GetAllContests.query';
+import { models } from '../../src/database';
 import { seed } from '../../src/tester';
+import { createEventRegistryChainNodes } from '../../src/utils';
 
 const { commonProtocol } = evm;
 

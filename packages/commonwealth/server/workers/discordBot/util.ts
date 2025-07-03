@@ -1,4 +1,4 @@
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { Message, OmitPartialGroupDMChannel, PartialMessage } from 'discord.js';
 
 export function getImageUrls(

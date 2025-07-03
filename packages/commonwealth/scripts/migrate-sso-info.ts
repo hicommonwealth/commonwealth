@@ -1,5 +1,6 @@
 import { dispose, logger } from '@hicommonwealth/core';
-import { AddressInstance, models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { AddressInstance } from '@hicommonwealth/model/models';
 import { WalletSsoSource } from '@hicommonwealth/shared';
 import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import csvParser from 'csv-parser';

@@ -1,4 +1,4 @@
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { expect, test } from '@playwright/test';
 import sleep from 'sleep-promise';
 

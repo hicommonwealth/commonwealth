@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { config, models } from '..';
+import { config } from '../config';
+import { models } from '../database';
 
 /**
  * Generates an unsubscribe link for a user and updates the database.

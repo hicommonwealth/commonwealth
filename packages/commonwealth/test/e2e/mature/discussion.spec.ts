@@ -1,5 +1,5 @@
 import { config } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { expect, test } from '@playwright/test';
 import _ from 'lodash';
 import { e2eSeeder, login, type E2E_Seeder } from '../utils/e2eUtils';

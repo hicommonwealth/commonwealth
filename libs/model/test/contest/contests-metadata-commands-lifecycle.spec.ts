@@ -2,7 +2,8 @@ import { Actor, command, dispose } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import z from 'zod';
-import { Contest, TopicAttributes } from '../../src/index';
+import * as Contest from '../../src/aggregates/contest';
+import { TopicAttributes } from '../../src/models';
 import { seed } from '../../src/tester';
 
 describe('Contests metadata commands lifecycle', () => {

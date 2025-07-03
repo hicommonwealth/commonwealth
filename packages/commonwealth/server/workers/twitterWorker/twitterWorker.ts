@@ -8,11 +8,11 @@ import {
   emitEvent,
   getMentions,
   getTweets,
-  models,
   pgMultiRowUpdate,
   TwitterBotConfig,
   TwitterBotConfigs,
 } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { EventPair } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { fileURLToPath } from 'url';

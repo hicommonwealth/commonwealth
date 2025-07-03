@@ -1,5 +1,6 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { Comment, middleware } from '@hicommonwealth/model';
+import { Comment } from '@hicommonwealth/model';
+import * as middleware from '@hicommonwealth/model/middleware';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { config } from '../config';
 import {

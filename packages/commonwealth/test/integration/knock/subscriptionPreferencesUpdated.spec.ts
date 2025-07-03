@@ -8,7 +8,6 @@ import {
   RepeatFrequency,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   afterAll,
@@ -23,6 +22,8 @@ import {
 } from 'vitest';
 import z from 'zod';
 // eslint-disable-next-line max-len
+import { models } from '@hicommonwealth/model/db';
+import * as tester from '@hicommonwealth/model/tester';
 import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/subscriptionPreferencesUpdated';
 
 function SpyNotificationsProvider(stubs?: {

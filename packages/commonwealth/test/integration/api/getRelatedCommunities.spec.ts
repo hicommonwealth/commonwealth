@@ -1,5 +1,7 @@
 import { dispose, query } from '@hicommonwealth/core';
-import { Community, tester, type DB } from '@hicommonwealth/model';
+import { Community } from '@hicommonwealth/model';
+import { DB } from '@hicommonwealth/model/models';
+import * as tester from '@hicommonwealth/model/tester';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
 describe('GetRelatedCommunities Tests', async () => {

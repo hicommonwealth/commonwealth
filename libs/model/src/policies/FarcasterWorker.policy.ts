@@ -1,9 +1,9 @@
 import { command, logger, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
-import { models } from '..';
 import { CreateBotContest } from '../aggregates/bot/CreateBotContest.command';
 import { UpdateContestManagerFrameHashes } from '../aggregates/contest/UpdateContestManagerFrameHashes.command';
+import { models } from '../database';
 import { systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { buildFarcasterContentUrl, getChainNodeUrl } from '../utils';

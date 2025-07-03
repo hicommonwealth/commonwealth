@@ -1,4 +1,5 @@
-import { CommentAttributes, models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { CommentAttributes } from '@hicommonwealth/model/models';
 import { QueryTypes } from 'sequelize';
 
 import { parseArgs } from 'node:util';

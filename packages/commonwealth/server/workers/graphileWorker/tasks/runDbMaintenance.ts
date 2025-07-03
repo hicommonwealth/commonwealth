@@ -1,4 +1,5 @@
-import { TaskPayloads, models } from '@hicommonwealth/model';
+import { TaskPayloads } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 
 const runDbMaintenance = async () => {
   await models.sequelize.query(`

@@ -1,5 +1,5 @@
 import { logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type { Request, Response } from 'express';

@@ -22,7 +22,6 @@ import {
   inMemoryBlobStorage,
   query,
 } from '@hicommonwealth/core';
-import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
@@ -55,7 +54,9 @@ import {
 } from '../../src/aggregates/thread';
 import { models } from '../../src/database';
 import { BannedActor, NonMember, RejectedMember } from '../../src/middleware';
+import { AddressAttributes } from '../../src/models';
 import { seed, seedRecord } from '../../src/tester';
+import { R2_ADAPTER_KEY } from '../../src/utils';
 import { getCommentDepth } from '../../src/utils/getCommentDepth';
 import { getSignersInfo, signCreateThread } from '../utils/canvas-signers';
 

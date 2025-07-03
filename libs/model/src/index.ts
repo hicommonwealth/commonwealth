@@ -24,20 +24,10 @@ export * as User from './aggregates/user';
 export * as Wallet from './aggregates/wallet';
 export * as Webhook from './aggregates/webhook';
 
-// Core Services
-export * from './services';
-
 // Policies
 export * from './policies';
 
-// Test Service
-export * as tester from './tester';
-export type { E2E_TestEntities } from './tester';
-
-export * as middleware from './middleware';
-
-// Internals - Should not be exported once we finish the migrations to models
+// Core Services
 export * from './config';
-export * from './database';
-export * from './models';
+export * from './services';
 export * from './utils';

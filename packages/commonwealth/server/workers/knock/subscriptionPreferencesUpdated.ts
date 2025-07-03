@@ -5,7 +5,8 @@ import {
   RepeatFrequency,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models, SubscriptionPreferenceInstance } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { SubscriptionPreferenceInstance } from '@hicommonwealth/model/models';
 import { events } from '@hicommonwealth/schemas';
 import { DaysOfWeek } from '@knocklabs/node';
 import z from 'zod';

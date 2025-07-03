@@ -4,9 +4,10 @@ import {
   GetDigestEmailData,
   Query,
 } from '@hicommonwealth/core';
-import { generateUnsubscribeLink, models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
+import { models } from '../../database';
+import { generateUnsubscribeLink } from '../../utils';
 
 export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
   return {

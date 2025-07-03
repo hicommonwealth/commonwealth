@@ -1,4 +1,4 @@
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { delay } from '@hicommonwealth/shared';
 import { Client } from 'pg';
 import { setupListener } from 'server/bindings/pgListener';

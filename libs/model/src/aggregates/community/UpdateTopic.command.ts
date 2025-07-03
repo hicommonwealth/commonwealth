@@ -1,6 +1,6 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { models } from '../../index';
+import { models } from '../../database';
 import { authTopic } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
 import { decodeContent, sanitizeQuillText } from '../../utils';

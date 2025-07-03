@@ -1,5 +1,6 @@
 import { dispose } from '@hicommonwealth/core';
-import { ThreadAttributes, models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { ThreadAttributes } from '@hicommonwealth/model/models';
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';

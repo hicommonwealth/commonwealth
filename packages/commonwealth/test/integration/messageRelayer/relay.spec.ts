@@ -1,5 +1,5 @@
 import { Broker, successfulInMemoryBroker } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { relay } from 'server/bindings/relay';
 import { afterEach, describe, expect, test } from 'vitest';
 import { testOutboxEvents } from './util';

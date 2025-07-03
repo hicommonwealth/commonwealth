@@ -9,8 +9,35 @@
   ],
   "exports": {
     ".": {
-      "default": "./build/index.js",
-      "devmode": "./src/index.ts"
+      "import": {
+        "types": "./build/index.d.js",
+        "default": "./build/index.js",
+        "devmode": "./src/index.ts"
+      }
+    },
+    "./db": {
+      "import": {
+        "types": "./build/database.d.js",
+        "default": "./build/database.js"
+      }
+    },
+    "./models": {
+      "import": {
+        "types": "./build/models/index.d.js",
+        "default": "./build/models/index.js"
+      }
+    },
+    "./middleware": {
+      "import": {
+        "types": "./build/middleware/index.d.js",
+        "default": "./build/middleware/index.js"
+      }
+    },
+    "./tester": {
+      "import": {
+        "types": "./build/tester/index.d.js",
+        "default": "./build/tester/index.js"
+      }
     }
   },
   "scripts": {
