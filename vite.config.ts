@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 import * as dotenv from 'dotenv';
 import path from 'path';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 dotenv.config();
 
