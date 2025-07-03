@@ -1,5 +1,5 @@
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { AbiFragment, Contract } from 'web3';
+import Web3, { AbiFragment, Contract } from 'web3';
 import { namespace_factory } from '../utils/contracts';
 import { SdkBase } from './sdkBase';
 
@@ -8,10 +8,12 @@ const TOPIC_LOG =
 
 export class NamespaceFactory extends SdkBase {
   public address: string = cp.factoryContracts[84532].factory;
-  public contract: Contract<AbiFragment[]> = namespace_factory(
-    this.address,
-    this.web3,
-  );
+  public contract: Contract<AbiFragment[]>;
+
+  constructor(web3?: Web3) {
+    super(web3);
+    this.contract = namespace_factory(this.address, this.web3);
+  }
 
   /**
    * Deploys a new namespace. Note current wallet will be admin of namespace
@@ -123,6 +125,87 @@ export class NamespaceFactory extends SdkBase {
       block: Number(txReceipt['blockNumber']),
       contest: newContestAddress,
     };
+  }
+
+  async newERC20Contest(
+    namespaceName: string,
+    contestInterval: number,
+    winnerShares: number[],
+    voteToken: string,
+    voterShare: number,
+    exchangeToken: string,
+    accountIndex?: number,
+  ): Promise<{ block: number; contest: string }> {
+    const account = (await this.getAccounts())[accountIndex ?? 0];
+    const txReceipt = await this.contract.methods
+      .newSingleERC20Contest(
+        namespaceName,
+        contestInterval,
+        winnerShares,
+        voteToken,
+        voterShare,
+        exchangeToken,
+      )
+      .send({ from: account });
+    const eventLog = txReceipt.logs.find((log) => log.topics![0] == TOPIC_LOG);
+    const newContestAddress = this.web3.eth.abi.decodeParameters(
+      ['address', 'address', 'uint256', 'bool'],
+      eventLog!.data!.toString(),
+    )['0'] as string;
+    return {
+      block: Number(txReceipt['blockNumber']),
+      contest: newContestAddress,
+    };
+  }
+
+  async newSingleJudgedContest(
+    namespaceName: string,
+    contestInterval: number,
+    winnerShares: number[],
+    voterShare: number,
+    exchangeToken: string,
+    judgeId: number,
+    accountIndex?: number,
+  ): Promise<{ block: number; contest: string }> {
+    const account = (await this.getAccounts())[accountIndex ?? 0];
+    const txReceipt = await this.contract.methods
+      .newSingleJudgedContest(
+        namespaceName,
+        contestInterval,
+        winnerShares,
+        voterShare,
+        exchangeToken,
+        judgeId,
+      )
+      .send({ from: account });
+    const eventLog = txReceipt.logs.find((log) => log.topics![0] == TOPIC_LOG);
+    const newContestAddress = this.web3.eth.abi.decodeParameters(
+      ['address', 'address', 'uint256', 'bool'],
+      eventLog!.data!.toString(),
+    )['0'] as string;
+    return {
+      block: Number(txReceipt['blockNumber']),
+      contest: newContestAddress,
+    };
+  }
+
+  async configureNominations(
+    namespaceName: string,
+    creatorOnly: boolean,
+    maxNominations: number,
+    judgeId: number,
+    accountIndex?: number,
+  ): Promise<{ block: number }> {
+    const account = (await this.getAccounts())[accountIndex ?? 0];
+    const txReceipt = await this.contract.methods
+      .configureNominationStrategy(
+        namespaceName,
+        maxNominations,
+        !creatorOnly,
+        judgeId,
+      )
+      .send({ from: account });
+    return { block: Number(txReceipt['blockNumber']) };
   }
 
   /**

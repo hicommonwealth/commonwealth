@@ -1,4 +1,5 @@
 import {
+  CommunityNominationsAbi,
   CommunityStakeAbi,
   NamespaceFactoryAbi,
 } from '@commonxyz/common-protocol-abis';
@@ -35,6 +36,13 @@ export const namespace_factory = (address: string, provider: Web3) => {
 export const community_stake = (address: string, provider: Web3) => {
   return new provider.eth.Contract(
     CommunityStakeAbi as unknown as AbiItem[],
+    address,
+  );
+};
+
+export const community_nominations = (address: string, provider: Web3) => {
+  return new provider.eth.Contract(
+    CommunityNominationsAbi as unknown as AbiItem[],
     address,
   );
 };
