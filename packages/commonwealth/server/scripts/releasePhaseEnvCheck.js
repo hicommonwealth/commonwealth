@@ -11,7 +11,7 @@ if (import.meta.url.endsWith(process.argv[1])) {
       dispose()('EXIT', true);
     })
     .catch((err) => {
-      log.fatal('Environment variables not properly configured!', err);
+      log.error('Environment variables not properly configured!', err);
       dispose()('ERROR', true);
     });
 }

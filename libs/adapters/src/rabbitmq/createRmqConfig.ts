@@ -56,12 +56,12 @@ export function createRmqConfig({
     }
   }
 
-  if (EnvConfig.APP_ENV === 'local') {
+  if (EnvConfig.BROKER.RABBITMQ_FRAME_SIZE) {
     // necessary until rascal upgrades amqp version >= 0.10.6
     connection = {
       url: rabbitMqUri,
       options: {
-        frameMax: 131072,
+        frameMax: EnvConfig.BROKER.RABBITMQ_FRAME_SIZE,
       },
     };
   }

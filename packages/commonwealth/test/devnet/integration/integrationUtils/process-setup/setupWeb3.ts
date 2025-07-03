@@ -2,54 +2,54 @@ import Web3 from 'web3';
 
 export const anvilAccounts: { address: string; privateKey: string }[] = [
   {
-    address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    address: '0xeae51cd2055b8e6F381b0A1688FE84E459A63bB6',
     privateKey:
-      '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
+      '0xee381817fb43be969236690d1a6e6a3d8d21ffca7feaabc634e38bc9eb11dafb',
   },
   {
-    address: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
+    address: '0x99f544eA102c90924249F9169a9275B70469E13e',
     privateKey:
-      '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d',
+      '0x7faaff01df3c99f28f738e12e0e78c4d03dc04eba5c52495c007f3c158b05f5d',
   },
   {
-    address: '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
+    address: '0x5c60a7D9265FF034F52221dBAA7dE78dBa1f6c31',
     privateKey:
-      '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a',
+      '0xb3428f59a49e1d2b12a868a138319893abe7487c0c5eed8ee7d443e8174f90da',
   },
   {
-    address: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
+    address: '0x6Ec51543EC61460924a2FD71c78CE4941bC118c8',
     privateKey:
-      '0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6',
+      '0x1a0e63ecc28b4595bb0856450193003626967d25b7130ac2c1453db84917ca22',
   },
   {
-    address: '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',
+    address: '0x52acC856D7AF34AEbc6865d901b2F3Cd09469c89',
     privateKey:
-      '0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a',
+      '0x15db9a3840976214c8f48e5a5b724f93479b8b651af3efa8eec929178a7e258c',
   },
   {
-    address: '0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc',
+    address: '0xf65E463072363b61Ea978206253Ff23d5ac509eF',
     privateKey:
-      '0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba',
+      '0xd0f01e25afb76cfb2add3c52a420e38d4e7d5dd9cfe2c3870a1aa296120447f6',
   },
   {
-    address: '0x976EA74026E726554dB657fA54763abd0C3a0aa9',
+    address: '0x73dB3832ce7bc307Eb6858Cdb6CD8b4D6873A079',
     privateKey:
-      '0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e',
+      '0x2ff8b9e791eb613331a219337a79431b53889fdd6d4a9402ca65bf0427624da5',
   },
   {
-    address: '0x14dC79964da2C08b23698B3D3cc7Ca32193d9955',
+    address: '0x38f955d10d829c1CF78dC216325D86Eb1cF03230',
     privateKey:
-      '0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356',
+      '0x642438559a31203963a86f9b18dbf263fcc2b53a242442c6b067bac9003bd3a9',
   },
   {
-    address: '0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f',
+    address: '0xf21C91c73F13e36feDbb58f87A052Ef3A578bccf',
     privateKey:
-      '0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97',
+      '0x5fcd94d22981f9c89c255f67814b617babd8d4591f94717f349f071e3b0f5a5c',
   },
   {
-    address: '0xa0Ee7A142d267C1f36714E4a8F75612F20a79720',
+    address: '0x636aD2Ca468CA9012a360a9e87F9F0c34F779B88',
     privateKey:
-      '0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6',
+      '0xb7770d1ef75d29c51387506488b3257085bbc7f579df0d438d7348bf790c3fc4',
   },
 ];
 

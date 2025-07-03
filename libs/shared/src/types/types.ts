@@ -1,4 +1,4 @@
-import { ThresholdData } from './protocol';
+import { ThresholdData, WalletSsoSource } from './protocol';
 
 export const Roles = ['admin', 'moderator', 'member'] as const;
 export type Role = (typeof Roles)[number];
@@ -32,6 +32,7 @@ export type AllowlistData = {
   allow: string[];
 };
 
+// TODO: this should be coming from schemas
 export type Requirement =
   | {
       rule: 'threshold';
@@ -40,6 +41,13 @@ export type Requirement =
   | {
       rule: 'allow';
       data: AllowlistData;
+    }
+  | {
+      rule: 'trust-level';
+      data: {
+        sso_required?: WalletSsoSource[];
+        minimum_trust_level: number;
+      };
     };
 
 export enum ContentType {
