@@ -28,6 +28,10 @@ export default defineConfig({
         __dirname,
         './libs/evm-protocols/src/index.ts',
       ),
+      '@hicommonwealth/evm-testing': path.resolve(
+        __dirname,
+        './libs/evm-testing/src/index.ts',
+      ),
       '@hicommonwealth/model/tester': path.resolve(
         __dirname,
         './libs/model/src/tester/index.ts',
