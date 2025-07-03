@@ -40,6 +40,7 @@ const {
   R2_ACCESS_KEY_ID,
   R2_SECRET_ACCESS_KEY,
   R2_ACCOUNT_ID,
+  RABBITMQ_FRAME_SIZE,
 } = process.env;
 
 export const config = configure(
@@ -54,6 +55,9 @@ export const config = configure(
     BROKER: {
       RABBITMQ_URI: (RABBITMQ_URI || CLOUDAMQP_URL) ?? DEFAULTS.RABBITMQ_URI,
       DISABLE_LOCAL_QUEUE_PURGE: DISABLE_LOCAL_QUEUE_PURGE === 'true',
+      RABBITMQ_FRAME_SIZE: RABBITMQ_FRAME_SIZE
+        ? parseInt(RABBITMQ_FRAME_SIZE)
+        : undefined,
     },
     NOTIFICATIONS: {
       FLAG_KNOCK_INTEGRATION_ENABLED:
@@ -116,6 +120,7 @@ export const config = configure(
         .describe(
           'Disable purging all messages in queues when a consumer starts up',
         ),
+      RABBITMQ_FRAME_SIZE: z.number().optional(),
     }),
     NOTIFICATIONS: z
       .object({
