@@ -264,9 +264,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Build
-        run: pnpm -r build
-
       - name: Run unit tests
         run: pnpm -r test -- --allowOnly=false
 
@@ -322,9 +319,6 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
-
-      - name: Build
-        run: pnpm -r build
 
       - name: Run EVM Devnet tests
         run: pnpm -F commonwealth test-devnet:evm --allowOnly=false
