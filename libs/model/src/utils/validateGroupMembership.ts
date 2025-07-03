@@ -11,10 +11,10 @@ import { toBigInt } from 'web3-utils';
 import { z } from 'zod';
 import type { OptionsWithBalances } from '../services';
 
-type Requirement = z.infer<typeof Requirement>;
 type AllowlistData = z.infer<typeof AllowlistData>;
 type ThresholdData = z.infer<typeof ThresholdData>;
 type TrustLevelData = z.infer<typeof TrustLevelData>;
+export type Requirement = z.infer<typeof Requirement>;
 export type Membership = z.infer<typeof Membership> & { balance?: bigint };
 export type UserInfo = {
   address_id: number;
