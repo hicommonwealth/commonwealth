@@ -1,5 +1,5 @@
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { bootstrapBindings } from '../../../../server/bindings/bootstrap';
 // eslint-disable-next-line max-len
 import { up as outboxTriggerMigration } from '../../../../server/migrations/20240319234133-create-outbox-channel-trigger.js';

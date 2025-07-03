@@ -1,6 +1,6 @@
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
 import { dispose } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import * as tester from '@hicommonwealth/model/tester';
 import { CosmosApiType } from 'controllers/chain/cosmos/chain';
 import {
   getRPCClient,

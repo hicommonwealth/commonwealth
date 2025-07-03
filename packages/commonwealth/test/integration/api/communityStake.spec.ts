@@ -1,10 +1,7 @@
 import { command, dispose, query } from '@hicommonwealth/core';
-import {
-  commonProtocol,
-  Community,
-  models,
-  type UserInstance,
-} from '@hicommonwealth/model';
+import { commonProtocol, Community } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { UserInstance } from '@hicommonwealth/model/models';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';

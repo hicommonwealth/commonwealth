@@ -6,7 +6,8 @@ import type {
   Signature,
 } from '@canvas-js/interfaces';
 import { command, dispose, query } from '@hicommonwealth/core';
-import { Poll, models } from '@hicommonwealth/model';
+import { Poll } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';

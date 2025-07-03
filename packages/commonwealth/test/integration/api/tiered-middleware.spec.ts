@@ -1,5 +1,5 @@
 import { Actor, dispose } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import * as tester from '@hicommonwealth/model/tester';
 import {
   ChainBase,
   CommunityTierMap,

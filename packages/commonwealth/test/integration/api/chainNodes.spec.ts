@@ -1,10 +1,7 @@
 import { command, dispose } from '@hicommonwealth/core';
-import {
-  SuperAdmin,
-  tester,
-  type DB,
-  type UserInstance,
-} from '@hicommonwealth/model';
+import { SuperAdmin } from '@hicommonwealth/model';
+import { DB, UserInstance } from '@hicommonwealth/model/models';
+import * as tester from '@hicommonwealth/model/tester';
 import { BalanceType, UserTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { buildUser } from '../../unit/unitHelpers';
