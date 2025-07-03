@@ -22,6 +22,7 @@ const useTopicGating = ({
     {
       communityId,
       includeTopics: true,
+      includeMembers: true,
       enabled: !!communityId,
     },
   );
