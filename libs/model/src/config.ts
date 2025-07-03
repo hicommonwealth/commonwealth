@@ -690,7 +690,7 @@ export const config = configure(
       KNOCK_IN_APP_FEED_ID: z.string().refine(
         requiredInEnvironmentServices({
           config: target,
-          requiredAppEnvs: ProdLikeEnvironments,
+          requiredAppEnvs: ['production'],
           requiredServices: [...WebServices, 'knock', 'consumer'],
           defaultCheck: DEFAULTS.KNOCK_IN_APP_FEED_ID,
         }),

@@ -49,7 +49,6 @@ const Services = [
   'knock',
   'evm-ce',
   'web-modulith',
-  // TODO: add modulith web service and update all requiredInEnvironmentServices uses to include it as needed
 ] as const;
 export const WebServices = ['web', 'web-modulith'] as const satisfies Service[];
 type Service = (typeof Services)[number];
@@ -124,6 +123,10 @@ export function requiredInEnvironmentServices<T>({
     if (!requiredAppEnvs.length || !requiredServices.length) return true;
     if (requiredAppEnvs === 'all') return false;
     if (!requiredAppEnvs.includes(appEnv)) return true;
+
+    // don't check services in CI
+    if (appEnv === 'CI') return true;
+
     if (requiredServices === 'all') return false;
     return !requiredServices.includes(service as Exclude<Service, 'web'>);
   };
@@ -285,9 +288,12 @@ export const config = configure(
             SERVICE: SERVICE as Service,
             DEV_MODULITH: DEV_MODULITH === 'true',
           },
-          requiredAppEnvs: ['production', 'beta', 'frick', 'demo'],
+          requiredAppEnvs: ['production'],
           requiredServices: WebServices,
         }),
+      )
+      .describe(
+        'Magic client ID used to interactive with Magic API (update custom domains)',
       ),
     HEROKU: z.object({
       HEROKU_APP_NAME: z.string().optional(),
