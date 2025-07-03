@@ -158,6 +158,56 @@ export class NamespaceFactory extends SdkBase {
     };
   }
 
+  async newSingleJudgedContest(
+    namespaceName: string,
+    contestInterval: number,
+    winnerShares: number[],
+    voterShare: number,
+    exchangeToken: string,
+    judgeId: number,
+    accountIndex?: number,
+  ): Promise<{ block: number; contest: string }> {
+    const account = (await this.getAccounts())[accountIndex ?? 0];
+    const txReceipt = await this.contract.methods
+      .newSingleJudgedContest(
+        namespaceName,
+        contestInterval,
+        winnerShares,
+        voterShare,
+        exchangeToken,
+        judgeId,
+      )
+      .send({ from: account });
+    const eventLog = txReceipt.logs.find((log) => log.topics![0] == TOPIC_LOG);
+    const newContestAddress = this.web3.eth.abi.decodeParameters(
+      ['address', 'address', 'uint256', 'bool'],
+      eventLog!.data!.toString(),
+    )['0'] as string;
+    return {
+      block: Number(txReceipt['blockNumber']),
+      contest: newContestAddress,
+    };
+  }
+
+  async configureNominations(
+    namespaceName: string,
+    creatorOnly: boolean,
+    maxNominations: number,
+    judgeId: number,
+    accountIndex?: number,
+  ): Promise<{ block: number }> {
+    const account = (await this.getAccounts())[accountIndex ?? 0];
+    const txReceipt = await this.contract.methods
+      .configureNominationStrategy(
+        namespaceName,
+        maxNominations,
+        !creatorOnly,
+        judgeId,
+      )
+      .send({ from: account });
+    return { block: Number(txReceipt['blockNumber']) };
+  }
+
   /**
    * Gets the contract address for a namespace with the given name
    * @param name Namespace name
