@@ -1,11 +1,11 @@
-import pino, { DestinationStream } from 'pino';
+import pino, { DestinationStream, MultiStreamRes } from 'pino';
 import { ZodError } from 'zod';
 import { config } from '../config';
 import { LogLevel } from '../ports/enums';
 import { GetLogger, LogContext, LoggerIds } from './interfaces';
 import { rollbar } from './rollbar';
 
-let transport: DestinationStream;
+let transport: DestinationStream | MultiStreamRes;
 
 const formatFilename = (name: string) => {
   const t = name.split('/');
@@ -24,6 +24,11 @@ if (config.NODE_ENV !== 'production') {
       singleLine: true,
     },
   });
+} else {
+  transport = pino.multistream([
+    { level: 'info', stream: process.stdout },
+    { level: 'error', stream: process.stderr },
+  ]);
 }
 
 export const getPinoLogger: GetLogger = (

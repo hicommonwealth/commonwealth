@@ -7,11 +7,11 @@ if (import.meta.url.endsWith(process.argv[1])) {
     .then(() => {
       // TODO: Add checks for unused env var
       // TODO: Add warning for manually set client FLAGs when APP_ENV !== 'local'/'CI'
-      log.info('Environment variables are properly configured');
+      log.fatal('Environment variables are properly configured --- TESTING');
       dispose()('EXIT', true);
     })
     .catch((err) => {
-      log.error('Environment variables not properly configured!', err);
+      log.fatal('Environment variables not properly configured!', err);
       dispose()('ERROR', true);
     });
 }
