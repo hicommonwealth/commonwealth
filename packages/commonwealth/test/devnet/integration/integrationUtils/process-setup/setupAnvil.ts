@@ -2,26 +2,45 @@ import { models } from '@hicommonwealth/model/db';
 import { GenericContainer } from 'testcontainers';
 import Web3 from 'web3';
 
-export const imageUrl = 'public.ecr.aws/f8g0x5p7/commonwealth-anvil:af964a9';
+export const imageUrl = 'ghcr.io/foundry-rs/foundry:v1.2.3';
 
 let port;
 
 export async function setupAnvil() {
+  if (!process.env.FORK_URL) {
+    throw new Error('Fork URL is missing for anvil tests');
+  }
+  const mnemonic =
+    'quantum manual lottery rocket sing shed rigid nose walnut mercy warrior bullet nuclear bargain hunt';
+
   try {
     const container = await new GenericContainer(imageUrl)
-      .withExposedPorts(8545)
-      .withEnvironment({
-        FORK_URL: process.env.FORK_URL as string,
-        PORT: '8545',
-      })
+      .withExposedPorts(8546)
+      .withEntrypoint([
+        'anvil',
+        '--block-time',
+        '1',
+        '--chain-id',
+        '31337',
+        '--host',
+        '0.0.0.0',
+        '--port',
+        '8546',
+        '--fork-url',
+        process.env.FORK_URL,
+        '--steps-tracing',
+        '-m',
+        mnemonic,
+      ])
       .start();
 
-    port = container.getMappedPort(8545);
+    port = container.getMappedPort(8546);
 
     await models.sequelize.query(`
       INSERT INTO "ChainNodes" (
           id,
           url,
+          private_url,
           eth_chain_id,
           alt_wallet_url,
           balance_type,
@@ -30,6 +49,7 @@ export async function setupAnvil() {
           updated_at
       ) VALUES (
         1,
+        'http://localhost:${port}',
         'http://localhost:${port}',
         31337,
         'http://localhost:${port}',
@@ -42,7 +62,7 @@ export async function setupAnvil() {
 
     const web3 = new Web3(
       new Web3.providers.HttpProvider(
-        `http://127.0.0.1:${container!.getMappedPort(8545)}`,
+        `http://127.0.0.1:${container!.getMappedPort(8546)}`,
       ),
     );
 
