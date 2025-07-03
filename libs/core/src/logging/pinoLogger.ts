@@ -12,24 +12,27 @@ const formatFilename = (name: string) => {
   return t[t.length - 1];
 };
 
-if (config.NODE_ENV !== 'production') {
-  transport = pino.transport({
-    target: 'pino-pretty',
-    options: {
-      destination: 1, // STDOUT
-      ignore: 'pid,hostname',
-      errorLikeObjectKeys: ['e', 'err', 'error'],
-      sync: config.NODE_ENV === 'test',
-      colorizeObjects: false,
-      singleLine: true,
-    },
-  });
-} else {
-  transport = pino.multistream([
+// if (config.NODE_ENV !== 'production') {
+//   transport = pino.transport({
+//     target: 'pino-pretty',
+//     options: {
+//       destination: 1, // STDOUT
+//       ignore: 'pid,hostname',
+//       errorLikeObjectKeys: ['e', 'err', 'error'],
+//       sync: config.NODE_ENV === 'test',
+//       colorizeObjects: false,
+//       singleLine: true,
+//     },
+//   });
+// } else {
+transport = pino.multistream(
+  [
     { level: 'info', stream: process.stdout },
     { level: 'error', stream: process.stderr },
-  ]);
-}
+  ],
+  { dedupe: true },
+);
+// }
 
 export const getPinoLogger: GetLogger = (
   ids: LoggerIds,
