@@ -5,6 +5,7 @@
     "dockerfilePath": "Dockerfile.railway"
   },
   "deploy": {
+    "preDeployCommand": "node --import=extensionless/register --enable-source-maps ./build/server/scripts/releasePhaseEnvCheck.js",
     "startCommand": "node --import=extensionless/register --enable-source-maps ./build/server/workers/messageRelayer/messageRelayer.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3,
