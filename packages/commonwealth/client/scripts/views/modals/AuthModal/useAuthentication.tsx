@@ -140,6 +140,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     };
   }, [handlePrivyError, handlePrivySuccess]);
 
+  // Initialize all auth hooks but with strict isolation
   const privyAuthWithOAuth = usePrivyAuthWithOAuth(privyCallbacks);
   const privyAuthWithPhone = usePrivyAuthWithPhone(privyCallbacks);
   const privyAuthWithEmail = usePrivyAuthWithEmail(privyCallbacks);
