@@ -115,14 +115,17 @@ describe('Tiered middleware', () => {
     server = await testServer();
 
     const [member1_user] = await tester.seed('User', {
+      profile: { name: 'Member 1' },
       tier: UserTierMap.IncompleteUser,
       created_at: new Date(),
     });
     const [member2_user] = await tester.seed('User', {
+      profile: { name: 'Member 2' },
       tier: UserTierMap.IncompleteUser,
       created_at: moment().subtract(2, 'weeks'),
     });
     const [member3_user] = await tester.seed('User', {
+      profile: { name: 'Member 3' },
       created_at: new Date(),
       tier: UserTierMap.SocialVerified,
     });
@@ -138,13 +141,13 @@ describe('Tiered middleware', () => {
       topics: [{}],
       Addresses: [
         {
-          role: 'admin',
+          role: 'member',
           user_id: member1_user!.id,
           verified: new Date(),
           address: '0x0000000000000000000000000000000000000111',
         },
         {
-          role: 'admin',
+          role: 'member',
           user_id: member2_user!.id,
           verified: new Date(),
           address: '0x0000000000000000000000000000000000000222',
