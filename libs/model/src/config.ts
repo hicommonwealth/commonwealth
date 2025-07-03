@@ -610,7 +610,7 @@ export const config = configure(
           .refine(
             requiredInEnvironmentServices({
               config: target,
-              requiredAppEnvs: ProductionEnvironments,
+              requiredAppEnvs: ['production'], // can't enable in QA because we can only whitelist 10 domains
               requiredServices: [...WebServices],
             }),
           ),
@@ -623,7 +623,7 @@ export const config = configure(
           .refine(
             requiredInEnvironmentServices({
               config: target,
-              requiredAppEnvs: ProductionEnvironments,
+              requiredAppEnvs: ['production'], // can't enable in QA because we can only whitelist 10 domains
               requiredServices: [...WebServices],
             }),
           ),
@@ -636,7 +636,7 @@ export const config = configure(
           .refine(
             requiredInEnvironmentServices({
               config: target,
-              requiredAppEnvs: ProductionEnvironments,
+              requiredAppEnvs: ['production'], // can't enable in QA because we can only whitelist 10 domains
               requiredServices: [...WebServices],
             }),
           ),
