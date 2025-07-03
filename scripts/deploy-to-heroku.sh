@@ -51,10 +51,17 @@ deploy_heroku_app() {
   process_types=$(echo $process_types | xargs)
 
   # We get "Lost connection with release dyno." sometimes. So if we do, retry 5 times
-  for i in {1..5}; do
+  for i in {1..10}; do
     output=$(heroku container:release ${process_types} -a ${app_name} 2>&1) && break
-    echo "$output" | grep -q "Lost connection with release dyno" && { echo "$output"; exit 1; }
-    sleep 5
+
+    echo "$output"
+
+    # If it passes, break out of loop
+    if simulate_heroku_release; then
+      break
+    fi
+
+    sleep 2
   done
 }
 
