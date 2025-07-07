@@ -1,11 +1,13 @@
 /// <reference types="vitest" />
 import * as dotenv from 'dotenv';
 import path from 'path';
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 dotenv.config();
 
 export default defineConfig({
+  plugins: [tsconfigPaths()],
   resolve: {
     alias: {
       '@hicommonwealth/shared': path.resolve(
