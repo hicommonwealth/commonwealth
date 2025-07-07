@@ -5,11 +5,7 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import {
-  BalanceSourceType,
-  WalletSsoSource,
-  type Requirement,
-} from '@hicommonwealth/shared';
+import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
 import { config } from '../../config';
@@ -26,6 +22,7 @@ import {
   makeGetBalancesOptions,
   validateGroupMembership,
   type Membership,
+  type Requirement,
   type UserInfo,
 } from '../../utils';
 
