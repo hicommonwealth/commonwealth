@@ -1,13 +1,29 @@
-import { MembershipRejectReason } from '@hicommonwealth/schemas';
 import {
   AllowlistData,
-  BalanceSourceType,
+  Membership,
+  MembershipRejectReason,
   Requirement,
   ThresholdData,
-} from '@hicommonwealth/shared';
+  TrustLevelData,
+} from '@hicommonwealth/schemas';
+import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
 import { toBigInt } from 'web3-utils';
 import { z } from 'zod';
 import type { OptionsWithBalances } from '../services';
+
+type AllowlistData = z.infer<typeof AllowlistData>;
+type ThresholdData = z.infer<typeof ThresholdData>;
+type TrustLevelData = z.infer<typeof TrustLevelData>;
+export type Requirement = z.infer<typeof Requirement>;
+export type Membership = z.infer<typeof Membership> & { balance?: bigint };
+export type UserInfo = {
+  address_id: number;
+  address: string;
+  user_id: number;
+  user_tier: number;
+  wallet_sso?: WalletSsoSource;
+  memberships?: Membership[];
+};
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
@@ -25,7 +41,7 @@ export type ValidateGroupMembershipResponse = {
  * @returns ValidateGroupMembershipResponse validity and messages on requirements that failed
  */
 export function validateGroupMembership(
-  userAddress: string,
+  user: UserInfo,
   requirements: Requirement[],
   balances: OptionsWithBalances[],
   numRequiredRequirements: number = 0,
@@ -35,23 +51,38 @@ export function validateGroupMembership(
     messages: [],
   };
   let allowListOverride = false;
+  let trustLevelOverride = false;
   let numRequirementsMet = 0;
 
   requirements.forEach((requirement) => {
     let checkResult: { result: boolean; message: string; balance?: bigint };
     switch (requirement.rule) {
       case 'threshold': {
-        checkResult = _thresholdCheck(userAddress, requirement.data, balances);
+        checkResult = _thresholdCheck(
+          user.address,
+          requirement.data as ThresholdData,
+          balances,
+        );
         response.balance = checkResult.balance;
         break;
       }
       case 'allow': {
         checkResult = _allowlistCheck(
-          userAddress,
+          user.address,
           requirement.data as AllowlistData,
         );
         if (checkResult.result) {
           allowListOverride = true;
+        }
+        break;
+      }
+      case 'trust-level': {
+        checkResult = _trustLevelCheck(
+          user,
+          requirement.data as TrustLevelData,
+        );
+        if (checkResult.result) {
+          trustLevelOverride = true;
         }
         break;
       }
@@ -75,8 +106,8 @@ export function validateGroupMembership(
     }
   });
 
-  if (allowListOverride) {
-    // allow if address is whitelisted
+  if (allowListOverride || trustLevelOverride) {
+    // allow if address is whitelisted or trust level is met
     return { isValid: true, messages: undefined };
   }
 
@@ -107,7 +138,10 @@ function _thresholdCheck(
       case 'spl': {
         balanceSourceType = BalanceSourceType.SPL;
         contractAddress = thresholdData.source.contract_address;
-        chainId = thresholdData.source.solana_network.toString();
+        chainId =
+          'solana_network' in thresholdData.source
+            ? thresholdData.source.solana_network.toString()
+            : thresholdData.source.evm_chain_id.toString();
         break;
       }
       case 'metaplex': {
@@ -260,4 +294,32 @@ function _allowlistCheck(
       message: `Error: ${error instanceof Error ? error.message : error}`,
     };
   }
+}
+
+function _trustLevelCheck(
+  user: UserInfo,
+  trustLevelData: TrustLevelData,
+): { result: boolean; message: string } {
+  if (trustLevelData.sso_required) {
+    if (
+      !user.wallet_sso ||
+      !trustLevelData.sso_required.includes(user.wallet_sso)
+    ) {
+      return {
+        result: false,
+        message: 'User sso requirement not met',
+      };
+    }
+  }
+
+  if (user.user_tier < trustLevelData.minimum_trust_level)
+    return {
+      result: false,
+      message: 'User trust level requirement not met',
+    };
+
+  return {
+    result: true,
+    message: 'pass',
+  };
 }

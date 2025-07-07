@@ -24,6 +24,7 @@ export type TestServer = {
   cacheDecorator: CacheDecorator;
   seeder: ModelSeeder;
   e2eTestEntities: E2E_TestEntities;
+  baseUrl: string;
 };
 
 /**
@@ -40,8 +41,9 @@ export const testServer = async (): Promise<TestServer> => {
   const seeder = modelSeeder(app);
   const e2eTestEntities = await tester.e2eTestEntities();
 
+  const port = 8081;
   const { server, cacheDecorator } = await main(app, {
-    port: 8081,
+    port,
     withLoggingMiddleware: !config.LOGGING.TEST_WITHOUT_LOGS,
   });
 
@@ -55,5 +57,6 @@ export const testServer = async (): Promise<TestServer> => {
     cacheDecorator,
     seeder,
     e2eTestEntities,
+    baseUrl: `http://localhost:${port}`,
   };
 };

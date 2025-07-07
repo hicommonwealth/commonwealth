@@ -3,18 +3,15 @@
 /* eslint-disable no-unused-expressions */
 import { CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
 import { delay } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
 import express, { RequestHandler, json } from 'express';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { CacheDecorator, RedisCache, XCACHE_VALUES } from '../../src/redis';
 import {
   CACHE_ENDPOINTS,
   setupCacheTestEndpoints,
 } from './setupCacheEndpoints';
 
-chai.use(chaiHttp);
-const expect = chai.expect;
 const app = express();
 app.use(json() as RequestHandler);
 
@@ -24,19 +21,19 @@ const content_type = {
 };
 
 function verifyNoCacheResponse(
-  res: ChaiHttp.Response,
+  res: request.Response,
   status = 200,
   cacheHeader = XCACHE_VALUES.MISS,
 ) {
-  expect(res.body).to.not.be.null;
-  expect(res).to.have.status(status);
-  expect(res).to.not.have.header('X-Cache', XCACHE_VALUES.HIT);
-  expect(res).to.have.header('X-Cache', cacheHeader);
+  expect(res.body).not.toBeNull();
+  expect(res.status).toBe(status);
+  expect(res.headers['x-cache']).not.toBe(XCACHE_VALUES.HIT);
+  expect(res.headers['x-cache']).toBe(cacheHeader);
 }
 
 async function makeGetRequest(endpoint: string, headers = {}) {
   headers = { ...headers, Accept: 'application/json' };
-  return chai.request(app).get(endpoint).set(headers);
+  return request(app).get(endpoint).set(headers);
 }
 
 async function makePostRequest(
@@ -45,7 +42,7 @@ async function makePostRequest(
   headers = {},
 ) {
   headers = { ...headers, Accept: 'application/json' };
-  return chai.request(app).post(endpoint).set(headers).send(body);
+  return request(app).post(endpoint).set(headers).send(body);
 }
 
 describe('Cache Decorator', () => {
@@ -54,17 +51,16 @@ describe('Cache Decorator', () => {
 
   async function verifyCacheResponse(
     key: string,
-    res: ChaiHttp.Response,
-    resEarlier: ChaiHttp.Response,
+    res: request.Response,
+    resEarlier: request.Response,
   ) {
-    expect(res).to.have.status(200);
-    expect(res).to.have.header('X-Cache', XCACHE_VALUES.HIT);
+    expect(res.status).toBe(200);
+    expect(res.headers['x-cache']).toBe(XCACHE_VALUES.HIT);
     const valFromRedis = await cacheDecorator.checkCache(key);
-    expect(valFromRedis).to.not.be.null;
+    expect(valFromRedis).not.toBeNull();
     if (key === CACHE_ENDPOINTS.JSON) {
-      // to avoid unhandled exceptions when response is not json
-      expect(JSON.parse(valFromRedis!)).to.be.deep.equal(res.body);
-      expect(JSON.parse(valFromRedis!)).to.be.deep.equal(resEarlier.body);
+      expect(JSON.parse(valFromRedis!)).toEqual(res.body);
+      expect(JSON.parse(valFromRedis!)).toEqual(resEarlier.body);
     }
   }
 
@@ -86,16 +82,14 @@ describe('Cache Decorator', () => {
     `verify cache route ${CACHE_ENDPOINTS.TEXT} route and expire`,
     { timeout: 5_000 },
     async () => {
-      // make request to /cachedummy/text twice, verify no cache first time & cache second time
       const res = await makeGetRequest(CACHE_ENDPOINTS.TEXT);
       verifyNoCacheResponse(res);
-      expect(res).to.have.header('content-type', content_type.html);
+      expect(res.headers['content-type']).toBe(content_type.html);
 
       const res2 = await makeGetRequest(CACHE_ENDPOINTS.TEXT);
-      verifyCacheResponse(CACHE_ENDPOINTS.TEXT, res2, res);
-      expect(res2).to.have.header('content-type', content_type.html);
+      await verifyCacheResponse(CACHE_ENDPOINTS.TEXT, res2, res);
+      expect(res2.headers['content-type']).toBe(content_type.html);
 
-      // wait for cache to expire
       await delay(3000);
       const res3 = await makeGetRequest(CACHE_ENDPOINTS.TEXT);
       verifyNoCacheResponse(res3);
@@ -103,27 +97,25 @@ describe('Cache Decorator', () => {
   );
 
   test(`verify cache control skip ${CACHE_ENDPOINTS.JSON} route and expire`, async () => {
-    // make request to /cachedummy/json twice, verify skip cache first time & miss second time & hit third time
     const res = await makeGetRequest(CACHE_ENDPOINTS.JSON, {
       'Cache-Control': 'no-cache',
     });
     verifyNoCacheResponse(res, 200, XCACHE_VALUES.SKIP);
-    expect(res).to.have.header('content-type', content_type.json);
+    expect(res.headers['content-type']).toBe(content_type.json);
 
     const res2 = await makeGetRequest(CACHE_ENDPOINTS.JSON);
     verifyNoCacheResponse(res2, 200);
-    expect(res2).to.have.header('content-type', content_type.json);
-    expect(res2.body).to.be.deep.equal(res.body);
+    expect(res2.headers['content-type']).toBe(content_type.json);
+    expect(res2.body).toEqual(res.body);
 
     const res3 = await makeGetRequest(CACHE_ENDPOINTS.JSON);
-    verifyCacheResponse(CACHE_ENDPOINTS.JSON, res3, res2);
-    expect(res3).to.have.header('content-type', content_type.json);
-    expect(res3.body).to.be.deep.equal(res.body);
-    expect(res3.body).to.be.deep.equal(res2.body);
+    await verifyCacheResponse(CACHE_ENDPOINTS.JSON, res3, res2);
+    expect(res3.headers['content-type']).toBe(content_type.json);
+    expect(res3.body).toEqual(res.body);
+    expect(res3.body).toEqual(res2.body);
   });
 
   test(`verify no key or duration ${CACHE_ENDPOINTS.CUSTOM_KEY_DURATION} route and expire`, async () => {
-    // make request to /cachedummy/customkeyduration twice, verify no cache both first time & second time
     const res = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {
       duration: 3,
     });
@@ -139,25 +131,22 @@ describe('Cache Decorator', () => {
     `verify key ${CACHE_ENDPOINTS.CUSTOM_KEY_DURATION} route and expire`,
     { timeout: 5000 },
     async () => {
-      // make request to /cachedummy/customkeyduration twice, verify no cache both first time
-      // & cache second time for passed duration & expire after duration
       const res = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {
         key: 'test',
         duration: 3,
       });
       verifyNoCacheResponse(res, 200);
-      expect(res).to.have.header('content-type', content_type.json);
-      expect(res.body).to.be.deep.equal({ key: 'test', duration: 3 });
+      expect(res.headers['content-type']).toBe(content_type.json);
+      expect(res.body).toEqual({ key: 'test', duration: 3 });
 
       const res2 = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {
         key: 'test',
         duration: 3,
       });
-      verifyCacheResponse('test', res2, res);
-      expect(res2).to.have.header('content-type', content_type.json);
-      expect(res2.body).to.be.deep.equal({ key: 'test', duration: 3 });
+      await verifyCacheResponse('test', res2, res);
+      expect(res2.headers['content-type']).toBe(content_type.json);
+      expect(res2.body).toEqual({ key: 'test', duration: 3 });
 
-      // wait for cache to expire
       await delay(3000);
       const res3 = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {
         key: 'test',
@@ -168,7 +157,6 @@ describe('Cache Decorator', () => {
   );
 
   test(`dont cache broken route ${CACHE_ENDPOINTS.BROKEN_5XX} route`, async () => {
-    // make request to /cachedummy/broken5xx twice, verify no cache both first time & second time
     let res = await makeGetRequest(CACHE_ENDPOINTS.BROKEN_5XX);
     verifyNoCacheResponse(res, 500);
     res = await makeGetRequest(CACHE_ENDPOINTS.BROKEN_5XX);

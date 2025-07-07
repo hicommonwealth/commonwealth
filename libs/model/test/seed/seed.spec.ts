@@ -7,15 +7,11 @@ import {
   ChainType,
   CommunityTierMap,
 } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import { Model, ValidationError, type ModelStatic } from 'sequelize';
-import { afterAll, describe, test } from 'vitest';
+import { afterAll, describe, expect, test } from 'vitest';
 import z from 'zod';
 import { models } from '../../src/database';
 import { SeedOptions, seed } from '../../src/tester';
-
-chai.use(chaiAsPromised);
 
 // testSeed creates an entity using the `seed` function
 // then attempts to find the entity and validate it
@@ -169,7 +165,7 @@ describe('Seed functions', () => {
     test('Should not mock data', async () => {
       expect(shouldExit).to.be.false;
       shouldExit = true;
-      expect(
+      await expect(
         seed(
           'Community',
           {
@@ -178,7 +174,7 @@ describe('Seed functions', () => {
           },
           { mock: false },
         ),
-      ).to.eventually.be.rejectedWith(ValidationError);
+      ).rejects.toThrow(ValidationError);
       shouldExit = false;
     });
   });

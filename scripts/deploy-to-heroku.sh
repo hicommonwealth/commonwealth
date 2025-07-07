@@ -49,7 +49,20 @@ deploy_heroku_app() {
   done
 
   process_types=$(echo $process_types | xargs)
-  heroku container:release ${process_types} -a ${app_name}
+
+  # We get "Lost connection with release dyno." sometimes. So if we do, retry 5 times
+  for i in {1..10}; do
+    output=$(heroku container:release ${process_types} -a ${app_name} 2>&1) && break
+
+    echo "$output"
+
+    # If it passes, break out of loop
+    if simulate_heroku_release; then
+      break
+    fi
+
+    sleep 2
+  done
 }
 
 docker build . --target commonwealth -t commonwealth -f Dockerfile.commonwealth_base

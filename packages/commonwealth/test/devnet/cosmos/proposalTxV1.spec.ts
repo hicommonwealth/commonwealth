@@ -1,6 +1,4 @@
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
-import chai from 'chai';
-
 import { longify } from '@cosmjs/stargate/build/queryclient';
 import {
   ProposalStatus as ProposalStatusV1,
@@ -21,7 +19,7 @@ import {
   encodeTextProposal,
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import Long from 'long';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { LCD } from '../../../shared/chain/types/cosmos';
 import {
   deposit,
@@ -29,8 +27,6 @@ import {
   setupTestSigner,
   waitOneBlock,
 } from './utils/helpers';
-
-const { expect, assert } = chai;
 
 const idV1 = 'csdk-v1-local'; // V1 CI devnet
 const rpcUrl = `http://localhost:8080/cosmosAPI/${idV1}`;
@@ -90,9 +86,9 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     const msg = encodeMsgSubmitProposal(signer, deposit, content);
     const resp = await sendTx(rpcUrl, msg, isAmino);
 
-    expect(resp.transactionHash).to.not.be.undefined;
-    expect(resp.rawLog).to.not.be.undefined;
-    expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
+    expect(resp.transactionHash).not.toBeUndefined();
+    expect(resp.rawLog).not.toBeUndefined();
+    expect(isDeliverTxSuccess(resp)).toBe(true);
     // @ts-expect-error StrictNullChecks
     const rawLog = JSON.parse(resp.rawLog);
     const submitProposalEvent = rawLog[0]?.events?.find(
@@ -105,7 +101,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     const onChainProposal = await waitForOnchainProposal(proposalId);
     const messageType = onChainProposal.messages[0]?.content['@type'];
 
-    expect(messageType).to.eql(expectedProposalType);
+    expect(messageType).toEqual(expectedProposalType);
   };
 
   const voteTest = async (
@@ -114,16 +110,16 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
   ): Promise<void> => {
     await waitOneBlock(rpcUrl);
     const activeProposals = await getActiveVotingProposals();
-    assert.isAtLeast(activeProposals.length, 1);
+    expect(activeProposals.length).toBeGreaterThanOrEqual(1);
     const latestProposal = activeProposals[activeProposals.length - 1];
     const msg = encodeMsgVote(signer, latestProposal.id, voteOption);
 
     const resp = await sendTx(rpcUrl, msg, isAmino);
 
-    expect(resp.transactionHash).to.not.be.undefined;
-    expect(resp.rawLog).to.not.be.undefined;
-    expect(resp.rawLog).to.not.include('failed to execute message');
-    expect(resp.rawLog).to.include(voteOptionToJSON(voteOption));
+    expect(resp.transactionHash).not.toBeUndefined();
+    expect(resp.rawLog).not.toBeUndefined();
+    expect(resp.rawLog).not.toContain('failed to execute message');
+    expect(resp.rawLog).toContain(voteOptionToJSON(voteOption));
   };
 
   describe('Direct Signer', () => {
@@ -197,15 +193,14 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     describe('getActiveProposals', () => {
       test('should fetch active proposals', async () => {
         const proposals = await getActiveProposalsV1(lcd);
-        expect(proposals.length).to.be.greaterThan(0);
+        expect(proposals.length).toBeGreaterThan(0);
 
         proposals.forEach((proposal) => {
-          expect(proposal.state.completed).to.eq(false);
-          expect(proposal.state.status).to.be.oneOf([
-            'VotingPeriod',
-            'DepositPeriod',
-          ]);
-          expect(proposal.state.tally).to.not.be.null;
+          expect(proposal.state.completed).toBe(false);
+          expect(['VotingPeriod', 'DepositPeriod']).toContain(
+            proposal.state.status,
+          );
+          expect(proposal.state.tally).not.toBeNull();
         });
       });
     });
@@ -215,12 +210,10 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
         const proposals = await getCompletedProposalsV1(lcd);
 
         proposals.forEach((proposal) => {
-          expect(proposal.state.completed).to.eq(true);
-          expect(proposal.state.status).to.be.oneOf([
-            'Passed',
-            'Rejected',
-            'Failed',
-          ]);
+          expect(proposal.state.completed).toBe(true);
+          expect(['Passed', 'Rejected', 'Failed']).toContain(
+            proposal.state.status,
+          );
         });
       });
     });

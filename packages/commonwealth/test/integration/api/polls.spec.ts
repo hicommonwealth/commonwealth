@@ -7,15 +7,10 @@ import type {
 } from '@canvas-js/interfaces';
 import { command, dispose, query } from '@hicommonwealth/core';
 import { Poll, models } from '@hicommonwealth/model';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
-
-chai.use(chaiHttp);
-const { expect } = chai;
 
 describe('Polls', () => {
   const chain = 'ethereum';
