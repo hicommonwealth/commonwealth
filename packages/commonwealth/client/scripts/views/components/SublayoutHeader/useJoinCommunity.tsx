@@ -267,6 +267,10 @@ const useJoinCommunity = () => {
       <AuthModal
         onClose={() => setIsAuthModalOpen(false)}
         isOpen={isAuthModalOpen}
+        {...(activeCommunityId === 'dydx' && {
+          showAuthOptionFor: 'x',
+          showAuthOptionTypesFor: ['sso'],
+        })}
       />
     </>
   );

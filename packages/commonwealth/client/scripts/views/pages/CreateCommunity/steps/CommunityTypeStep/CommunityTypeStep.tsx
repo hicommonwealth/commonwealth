@@ -16,6 +16,7 @@ import { useBrowserAnalyticsTrack } from '../../../../../hooks/useBrowserAnalyti
 import { communityTypeOptions } from './helpers';
 
 import { ChainBase } from '@hicommonwealth/shared';
+import app from 'state';
 import useUserStore from 'state/ui/user';
 import { AuthModal } from 'views/modals/AuthModal';
 import useAppStatus from '../../../../../hooks/useAppStatus';
@@ -194,6 +195,10 @@ const CommunityTypeStep = ({
           communityTypeOptions.find((c) => c.type === selectedCommunity.type)
             ?.chainBase as Exclude<ChainBase, ChainBase.NEAR>
         }
+        {...(app.activeChainId() === 'dydx' && {
+          showAuthOptionFor: 'x',
+          showAuthOptionTypesFor: ['sso'],
+        })}
       />
     </div>
   );

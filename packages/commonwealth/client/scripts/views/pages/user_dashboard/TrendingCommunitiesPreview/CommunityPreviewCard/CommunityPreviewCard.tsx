@@ -14,6 +14,7 @@ import { AuthModal } from 'client/scripts/views/modals/AuthModal';
 import clsx from 'clsx';
 import React from 'react';
 import { smartTrim } from 'shared/utils';
+import app from 'state';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWCard } from '../../../../components/component_kit/cw_card';
@@ -182,6 +183,10 @@ const CommunityPreviewCard = ({
           setIsAuthModalOpen(false);
         }}
         showWalletsFor={ChainBase.Ethereum}
+        {...(app.activeChainId() === 'dydx' && {
+          showAuthOptionFor: 'x',
+          showAuthOptionTypesFor: ['sso'],
+        })}
       />
     </>
   );

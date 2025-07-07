@@ -202,6 +202,10 @@ export const ReactionButton = ({
       <AuthModal
         onClose={() => setIsAuthModalOpen(false)}
         isOpen={isAuthModalOpen}
+        {...(app.activeChainId() === 'dydx' && {
+          showAuthOptionFor: 'x',
+          showAuthOptionTypesFor: ['sso'],
+        })}
       />
     </>
   );
