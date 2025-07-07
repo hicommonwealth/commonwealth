@@ -5,7 +5,6 @@ const GROUPS_STALE_TIME = 5000; // 5 seconds
 
 type FetchGroupsProps = {
   includeTopics?: boolean;
-  includeMembers?: boolean;
 } & (
   | {
       communityId: string;
@@ -20,7 +19,6 @@ type FetchGroupsProps = {
 const useFetchGroupsQuery = ({
   communityId,
   groupId,
-  includeMembers,
   includeTopics,
   enabled = true,
 }: FetchGroupsProps & { enabled?: boolean }) => {
@@ -29,7 +27,6 @@ const useFetchGroupsQuery = ({
       community_id: communityId,
       group_id: groupId ? +groupId : undefined,
       include_topics: includeTopics,
-      include_members: includeMembers,
     },
     {
       staleTime: GROUPS_STALE_TIME,

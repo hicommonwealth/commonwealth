@@ -143,12 +143,13 @@ const DiscussionsPage = () => {
 
   const user = useUserStore();
 
-  const { bypassGating, actionGroups, groups } = useTopicGating({
-    communityId: communityId,
-    userAddress: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address && !!communityId,
-    topicId,
-  });
+  const { bypassGating, actionGroups, isPrivateTopic, isAllowedMember } =
+    useTopicGating({
+      communityId: communityId,
+      userAddress: user.activeAccount?.address || '',
+      apiEnabled: !!user.activeAccount?.address && !!communityId,
+      topicId,
+    });
 
   const { data: domain } = useFetchCustomDomainQuery();
 
@@ -382,19 +383,6 @@ const DiscussionsPage = () => {
       setIsSubmitting(false);
     }
   };
-
-  const isPrivateTopic = groups
-    .flatMap((g) => g.topics)
-    .some((t) => t.id === topicId && t.is_private);
-
-  const isAllowedMember = groups.some(
-    (g) =>
-      g.topics.some((t) => t.id === topicId) &&
-      g.members?.some(
-        (m) =>
-          m.address === user.activeAccount?.address && m.reject_reason === null,
-      ),
-  );
 
   if (privateTopicsEnabled && isPrivateTopic && !isAllowedMember) {
     return (

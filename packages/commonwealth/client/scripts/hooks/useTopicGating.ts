@@ -22,7 +22,6 @@ const useTopicGating = ({
     {
       communityId,
       includeTopics: true,
-      includeMembers: true,
       enabled: !!communityId,
     },
   );
@@ -58,6 +57,22 @@ const useTopicGating = ({
 
   // stores group ids of groups that have gated actions for current topic
   const topicGroupSet = new Set<number>([]);
+
+  let isPrivateTopic = false;
+  let isAllowedMember = false;
+
+  for (const group of groups) {
+    for (const topic of group.topics) {
+      if (topic.id === topicId) {
+        if (topic.is_private) {
+          isPrivateTopic = true;
+        }
+        if (membershipMap.get(group.id)) {
+          isAllowedMember = true;
+        }
+      }
+    }
+  }
 
   // stores groups (by action) that:
   //  - are relevant to the current topic
@@ -98,6 +113,8 @@ const useTopicGating = ({
     // boolean indicating whether gating should be bypassed
     bypassGating: isAdmin,
     actionGroups,
+    isPrivateTopic,
+    isAllowedMember,
   };
 };
 
