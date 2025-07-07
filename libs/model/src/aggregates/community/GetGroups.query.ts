@@ -53,13 +53,7 @@ export function GetGroups(): Query<typeof schemas.GetGroups> {
         });
         members.forEach((m) => {
           const group = output.get(m.group_id);
-          if (group) {
-            const plain = m.get ? m.get({ plain: true }) : m;
-            group.memberships.push({
-              ...plain,
-              address: plain.address?.address || null,
-            });
-          }
+          group && group.memberships.concat(m);
         });
       }
 

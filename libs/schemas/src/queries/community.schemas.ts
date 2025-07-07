@@ -342,8 +342,6 @@ export const GroupView = Group.omit({ GroupGatedActions: true }).extend({
   memberships: z.array(
     Membership.omit({ address: true, group: true }).extend({
       last_checked: z.coerce.date().or(z.string()),
-      reject_reason: MembershipRejectReason,
-      address: z.string().nullable(),
     }),
   ),
   topics: z.array(

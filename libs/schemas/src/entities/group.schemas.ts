@@ -125,8 +125,7 @@ export const MembershipRejectReason = z
     }),
   })
   .array()
-  .optional()
-  .nullable();
+  .optional();
 
 export type MembershipRejectReason = z.infer<typeof MembershipRejectReason>;
 
