@@ -1,5 +1,5 @@
 import { commonProtocol, veBridgeAbi } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { describe, expect, it, vi } from 'vitest';
 import { setupCommonwealthE2E } from './integrationUtils/mainSetup';
 

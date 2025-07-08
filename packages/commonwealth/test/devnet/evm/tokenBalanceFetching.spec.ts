@@ -6,12 +6,9 @@ import {
   ERC721,
   getAnvil,
 } from '@hicommonwealth/evm-testing';
-import {
-  tester,
-  tokenBalanceCache,
-  type Balances,
-  type DB,
-} from '@hicommonwealth/model';
+import { tokenBalanceCache, type Balances } from '@hicommonwealth/model';
+import { DB } from '@hicommonwealth/model/models';
+import * as tester from '@hicommonwealth/model/tester';
 import {
   BalanceSourceType,
   BalanceType,

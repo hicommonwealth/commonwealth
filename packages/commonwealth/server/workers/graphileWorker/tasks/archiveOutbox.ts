@@ -66,7 +66,7 @@ async function uploadToS3(filePath: string): Promise<boolean> {
 }
 
 async function getTablesToBackup(): Promise<string[]> {
-  const { models } = await import('@hicommonwealth/model');
+  const { models } = await import('@hicommonwealth/model/db');
 
   const result = await models.sequelize.query<{
     table_name: string;

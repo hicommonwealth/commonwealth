@@ -3,9 +3,9 @@ import { cache, CacheNamespaces, dispose } from '@hicommonwealth/core';
 import {
   CommunityInstance,
   type DB,
-  tester,
   ThreadInstance,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/models';
+import * as tester from '@hicommonwealth/model/tester';
 import { CountAggregatorKeys } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { countAggregator } from '../../server/workers/graphileWorker/tasks/countAggregator';
