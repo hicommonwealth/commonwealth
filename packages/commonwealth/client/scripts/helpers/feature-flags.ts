@@ -43,7 +43,7 @@ const featureFlags = {
   partnershipWallet: buildFlag(process.env.FLAG_PARTNERSHIP_WALLET),
   newProfilePage: buildFlag(process.env.FLAG_NEW_PROFILE_PAGE),
   privateTopics: buildFlag(process.env.FLAG_PRIVATE_TOPICS),
-  crecimentoHackathon: buildFlag(process.env.FLAG_CRECIMENTO_HACKATHON),
+  crecimientoHackathon: buildFlag(process.env.FLAG_CRECIMIENTO_HACKATHON),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

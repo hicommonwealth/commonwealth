@@ -27,7 +27,7 @@ import {
   CWModalBody,
   CWModalFooter,
 } from '../../../../components/component_kit/new_designs/CWModal';
-import { TemporaryCrecimentoModalBase } from '../../TemporaryCrecimentoModalBase';
+import { TemporaryCrecimientoModalBase } from '../../TemporaryCrecimientoModalBase';
 import { AuthModalType, ModalBaseProps, ModalBaseTabs } from '../../types';
 import useAuthentication from '../../useAuthentication';
 import { EVMWalletsSubModal } from './EVMWalletsSubModal';
@@ -111,7 +111,7 @@ const ModalBase = ({
   const copy = MODAL_COPY[layoutType];
 
   const partnershipWalletEnabled = useFlag('partnershipWallet');
-  const crecimentoHackathonEnabled = useFlag('crecimentoHackathon');
+  const crecimientoHackathonEnabled = useFlag('crecimientoHackathon');
 
   const { farcasterContext, signInToFarcasterFrame } = useFarcasterStore();
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
@@ -130,10 +130,10 @@ const ModalBase = ({
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
     useState(false);
   const [isAuthenticatingWithSMS, setIsAuthenticatingWithSMS] = useState(false);
-  const [showCrecimentoHackathonModal, setShowCrecimentoHackathonModal] =
+  const [showcrecimientoHackathonModal, setShowCrecimientoHackathonModal] =
     useState(
-      crecimentoHackathonEnabled &&
-        app?.chain?.id?.toLowerCase() === 'crecimento',
+      crecimientoHackathonEnabled &&
+        app?.chain?.id?.toLowerCase() === 'crecimiento',
     );
 
   const handleClose = async () => {
@@ -400,10 +400,10 @@ const ModalBase = ({
         )}
 
         <CWModalBody className={clsx('content', bodyClassName)}>
-          {showCrecimentoHackathonModal ? (
-            <TemporaryCrecimentoModalBase
+          {showcrecimientoHackathonModal ? (
+            <TemporaryCrecimientoModalBase
               onOtherMethodsSignIn={() =>
-                setShowCrecimentoHackathonModal(false)
+                setShowCrecimientoHackathonModal(false)
               }
               onTwitterSignIn={() => onAuthMethodSelect('x')}
             />

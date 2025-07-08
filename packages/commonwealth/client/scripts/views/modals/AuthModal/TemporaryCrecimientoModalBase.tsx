@@ -1,6 +1,6 @@
 // IMPORTANT:
-// - this component is to be deleted after the "Crecimento Hackathon" event
-// - this should be the only component having "Crecimento Hackathon" event specific changes (for easy removal later on)
+// - this component is to be deleted after the "Crecimiento Hackathon" event
+// - this should be the only component having "Crecimiento Hackathon" event specific changes (for easy removal later on)
 // https://github.com/hicommonwealth/commonwealth/milestone/133
 
 import { useFlag } from 'hooks/useFlag';
@@ -9,17 +9,17 @@ import AuthButton from '../../components/AuthButton';
 import '../../components/AuthButton/AuthButton.scss';
 import { CWText } from '../../components/component_kit/cw_text';
 
-type TemporaryCrecimentoModalBaseProps = {
+type TemporaryCrecimientoModalBaseProps = {
   onTwitterSignIn: () => void;
   onOtherMethodsSignIn: () => void;
 };
 
-const TemporaryCrecimentoModalBase = ({
+const TemporaryCrecimientoModalBase = ({
   onOtherMethodsSignIn,
   onTwitterSignIn,
-}: TemporaryCrecimentoModalBaseProps) => {
-  const crecimentoHackathonEnabled = useFlag('crecimentoHackathon');
-  if (!crecimentoHackathonEnabled) return <></>;
+}: TemporaryCrecimientoModalBaseProps) => {
+  const crecimientoHackathonEnabled = useFlag('crecimientoHackathon');
+  if (!crecimientoHackathonEnabled) return <></>;
 
   return (
     <>
@@ -39,4 +39,4 @@ const TemporaryCrecimentoModalBase = ({
   );
 };
 
-export { TemporaryCrecimentoModalBase };
+export { TemporaryCrecimientoModalBase };
