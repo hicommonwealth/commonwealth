@@ -1,10 +1,7 @@
-import {
-  OptionsWithBalances,
-  Requirement,
-  validateGroupMembership,
-} from '@hicommonwealth/model';
 import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
 import { describe, expect, test } from 'vitest';
+import { Requirement, validateGroupMembership } from '../../src';
+import type { OptionsWithBalances } from '../../src/services/tokenBalanceCache/types';
 
 type MockRequirementOptions = {
   threshold: string;

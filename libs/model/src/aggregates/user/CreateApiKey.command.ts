@@ -1,10 +1,10 @@
 import { type Command } from '@hicommonwealth/core';
-import { getSaltedApiKeyHash } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { randomBytes } from 'crypto';
 import { models } from '../../database';
 import { authVerified, tiered } from '../../middleware';
+import { getSaltedApiKeyHash } from '../../utils';
 
 export function CreateApiKey(): Command<typeof schemas.CreateApiKey> {
   return {

@@ -50,6 +50,18 @@ export default defineConfig({
         __dirname,
         './libs/model/src/database.ts',
       ),
+      '@hicommonwealth/model/services': path.resolve(
+        __dirname,
+        './libs/model/src/services/index.ts',
+      ),
+      '@hicommonwealth/model/tbc': path.resolve(
+        __dirname,
+        './libs/model/src/services/tokenBalanceCache/index.ts',
+      ),
+      '@hicommonwealth/model/protocol': path.resolve(
+        __dirname,
+        './libs/model/src/services/commonProtocol/index.ts',
+      ),
       '@hicommonwealth/model': path.resolve(
         __dirname,
         './libs/model/src/index.ts',

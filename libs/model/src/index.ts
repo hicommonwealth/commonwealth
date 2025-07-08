@@ -27,7 +27,8 @@ export * as Webhook from './aggregates/webhook';
 // Policies
 export * from './policies';
 
-// Core Services
+// Config
 export * from './config';
-export * from './services';
+
+// TODO: export as namespace
 export * from './utils';
