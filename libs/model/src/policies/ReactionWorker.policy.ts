@@ -110,6 +110,35 @@ async function* paginateComments(
   }
 }
 
+// Process a single reaction and return its calculated weight
+async function processSingleReaction(
+  reaction: any,
+  topicId: number,
+): Promise<bigint> {
+  try {
+    const calculatedWeight = await getVotingWeight(
+      topicId,
+      reaction.Address!.address,
+    );
+
+    await reaction.update({
+      calculated_voting_weight: calculatedWeight?.toString() || '0',
+    });
+
+    return BigInt(calculatedWeight?.toString() || '0');
+  } catch (error) {
+    log.warn(
+      `Failed to recalculate voting weight for reaction ${reaction.id}: ${error}`,
+    );
+
+    await reaction.update({
+      calculated_voting_weight: '0',
+    });
+
+    return BigInt(0);
+  }
+}
+
 export function ReactionWorker(): Policy<typeof inputs> {
   return {
     inputs,
@@ -151,29 +180,12 @@ export function ReactionWorker(): Policy<typeof inputs> {
             thread.id!,
             'thread',
           )) {
-            try {
-              const calculatedWeight = await getVotingWeight(
-                topic_id,
-                reaction.Address!.address,
-              );
-
-              await reaction.update({
-                calculated_voting_weight: calculatedWeight?.toString() || '0',
-              });
-
-              totalReactionWeight += BigInt(
-                calculatedWeight?.toString() || '0',
-              );
-              reactionsProcessed++;
-            } catch (error) {
-              log.warn(
-                `Failed to recalculate voting weight for reaction ${reaction.id}: ${error}`,
-              );
-
-              await reaction.update({
-                calculated_voting_weight: '0',
-              });
-            }
+            const reactionWeight = await processSingleReaction(
+              reaction,
+              topic_id,
+            );
+            totalReactionWeight += reactionWeight;
+            reactionsProcessed++;
           }
 
           await thread.update({
@@ -190,29 +202,12 @@ export function ReactionWorker(): Policy<typeof inputs> {
             comment.id!,
             'comment',
           )) {
-            try {
-              const calculatedWeight = await getVotingWeight(
-                topic_id,
-                reaction.Address!.address,
-              );
-
-              await reaction.update({
-                calculated_voting_weight: calculatedWeight?.toString() || '0',
-              });
-
-              totalReactionWeight += BigInt(
-                calculatedWeight?.toString() || '0',
-              );
-              reactionsProcessed++;
-            } catch (error) {
-              log.warn(
-                `Failed to recalculate voting weight for reaction ${reaction.id}: ${error}`,
-              );
-
-              await reaction.update({
-                calculated_voting_weight: '0',
-              });
-            }
+            const reactionWeight = await processSingleReaction(
+              reaction,
+              topic_id,
+            );
+            totalReactionWeight += reactionWeight;
+            reactionsProcessed++;
           }
 
           await comment.update({
