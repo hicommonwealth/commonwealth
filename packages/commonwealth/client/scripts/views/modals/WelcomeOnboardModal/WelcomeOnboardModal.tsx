@@ -6,7 +6,10 @@ import { useFlag } from 'hooks/useFlag';
 import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import {
+  CWModal,
+  CWModalHeader,
+} from '../../components/component_kit/new_designs/CWModal';
 import './WelcomeOnboardModal.scss';
 import { InviteModal } from './steps/InviteModal';
 import { JoinCommunityStep } from './steps/JoinCommunityStep';
@@ -142,6 +145,12 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
       content={
         <>
           <section className="content">
+            {[
+              WelcomeOnboardModalSteps.PersonalInformation,
+              WelcomeOnboardModalSteps.TermsOfServices,
+            ].includes(activeStep) && (
+              <CWModalHeader onModalClose={handleClose} />
+            )}
             <img src={commonLogo} className="logo" />
             <CWText type="h2" className="modal-heading">
               {getCurrentStep()?.title}
