@@ -33,6 +33,7 @@ export const validateCommunityStakeConfig = async (
     !chainNode.private_url ||
     !Object.values(commonProtocol.ValidChains).includes(chainNode.eth_chain_id)
   ) {
+    console.error(JSON.stringify(chainNode, null, 2));
     throw new AppError(`Community Stakes not available on ${chainNode.name}`);
   }
 
