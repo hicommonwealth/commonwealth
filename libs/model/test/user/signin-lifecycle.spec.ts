@@ -346,7 +346,7 @@ describe('SignIn Lifecycle', async () => {
         expect(addr!.verified).to.be.not.null;
 
         expect(addr!.was_signed_in).to.be.false;
-        expect(addr!.first_community).to.be.true;
+        expect(addr!.is_welcome_onboard_flow_complete).to.be.true;
         expect(addr!.user_created).to.be.true;
         expect(addr!.address_created).to.be.true;
         expect(addr!.User).to.not.be.null;
@@ -397,7 +397,7 @@ describe('SignIn Lifecycle', async () => {
         expect(addr!.User).to.be.not.null;
         expect(addr!.User!.id).to.equal(ref.actor.user.id!);
         expect(addr!.was_signed_in).to.be.true;
-        expect(addr!.first_community).to.be.false;
+        expect(addr!.is_welcome_onboard_flow_complete).to.be.false;
         expect(addr!.user_created).to.be.false;
         expect(addr!.address_created).to.be.false;
 
@@ -455,7 +455,7 @@ describe('SignIn Lifecycle', async () => {
         expect(addr!.User).to.be.not.null;
         expect(addr!.User!.id).to.equal(ref.actor.user.id!);
         expect(addr!.was_signed_in).to.be.true;
-        expect(addr!.first_community).to.be.false;
+        expect(addr!.is_welcome_onboard_flow_complete).to.be.false;
         expect(addr!.user_created).to.be.false;
         expect(addr!.address_created).to.be.true;
       },
