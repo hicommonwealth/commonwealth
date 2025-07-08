@@ -3,8 +3,7 @@ Two step setup:
 # Setup infra
 1. Run `terraform init` to install providers (Only needs to be run once)
 2. Run terraform script with `terraform apply` (This requires vars ENV_NAME and DIGITALOCEAN_TOKEN)
-3. Connect to digital ocean cluster `doctl auth init` and `doctl kubernetes cluster kubeconfig save development`
-3. Connect to digital ocean cluster `aws eks update-kubeconfig --name your-cluster-name --region your-region`
+3. Connect aws cluster `aws eks update-kubeconfig --name your-cluster-name --region your-region`
 
 # Bootstrap Argocd
 1. Run `kubectl create namespace argocd && helm install argocd argo/argo-cd --version 8.1.2 --namespace argocd` (requires installing helm locally)

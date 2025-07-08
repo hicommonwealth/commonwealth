@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: ingress-nginx
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: ingress-nginx
@@ -22,7 +24,7 @@ spec:
             enable-real-ip: "true"
             forwarded-for-header: "CF-Connecting-IP"
             use-forwarded-headers: "true"
-            proxy-real-ip-cidr: "10.244.0.0/16"
+            proxy-real-ip-cidr: "10.0.0.0/16"
   sources: []
   project: default
   syncPolicy:

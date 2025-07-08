@@ -30,12 +30,30 @@ module "vpc" {
   public_subnets  = ["10.0.10.0/24", "10.0.11.0/24"]
   private_subnets = ["10.0.20.0/24", "10.0.21.0/24"]
 
-  enable_nat_gateway = true
-  single_nat_gateway = true
+  # Disable managed nats since we are using fck-nat
+  enable_nat_gateway = false
+  single_nat_gateway = false
 
   tags = {
     Terraform   = "true"
     Environment = "dev"
+  }
+}
+
+# TODO: In production for multi-AZ we need 1 fck-nat per each AZ. This means we should for-each over it to create
+# them on each public subnet, and route corresponding private-subnet traffic through it.
+module "fck-nat" {
+  source = "RaJiska/fck-nat/aws"
+
+  name       = "fck-nat-${var.ENV_NAME}"
+  vpc_id     = module.vpc.vpc_id
+  subnet_id  = module.vpc.public_subnets[0]
+
+  ha_mode = true
+  update_route_tables = true
+  route_tables_ids = {
+    for idx, subnet in module.vpc.private_subnets :
+    "private-rt-${idx}" => module.vpc.private_route_table_ids[idx]
   }
 }
 
@@ -57,10 +75,10 @@ module "eks" {
   eks_managed_node_groups = {
     arm-nodes = {
       ami_type       = "BOTTLEROCKET_ARM_64"
-      instance_types = ["t4g.nano"]
-      capacity_type  = "ON_DEMAND"
+      instance_types = ["t4g.large", "t4g.medium"]
+      capacity_type  = "SPOT"
 
-      desired_size = 2
+      desired_size = 1
       min_size     = 1
       max_size     = 2
     }
