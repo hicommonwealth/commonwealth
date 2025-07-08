@@ -1,4 +1,4 @@
-import { Requirement } from '@hicommonwealth/shared';
+import { Requirement } from '@hicommonwealth/model';
 import Ajv from 'ajv';
 import requirementsSchema from './requirementsSchema_v1';
 

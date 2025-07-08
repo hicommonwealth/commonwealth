@@ -1,4 +1,5 @@
-import { BalanceSourceType, Requirement } from '@hicommonwealth/shared';
+import { Requirement } from '@hicommonwealth/model';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import validateRequirements from 'server/util/requirementsModule/validateRequirements';
 import { describe, expect, test } from 'vitest';
 
