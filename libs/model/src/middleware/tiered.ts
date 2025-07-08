@@ -78,7 +78,7 @@ export function tiered({
       tier = UserTierMap.VerifiedWallet;
 
     // WARNING: If router is not authenticated before this middleware this will incorrectly bump user tier
-    if (tier === UserTierMap.IncompleteUser && config.NODE_ENV !== 'test')
+    if (tier === UserTierMap.IncompleteUser)
       tier = UserTierMap.NewlyVerifiedWallet;
     if (tier > user.tier)
       await models.User.update({ tier }, { where: { id: user.id } });
