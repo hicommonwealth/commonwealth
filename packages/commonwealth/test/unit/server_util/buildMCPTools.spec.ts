@@ -1,7 +1,7 @@
 import { command, dispose } from '@hicommonwealth/core';
+import { User } from '@hicommonwealth/model';
+import { seed } from '@hicommonwealth/model/tester';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { CreateApiKey } from '../../../../../libs/model/src/aggregates/user';
-import { seed } from '../../../../../libs/model/src/tester';
 import { buildMCPTools } from '../../../server/api/mcp';
 
 describe('buildMCPTools', () => {
@@ -30,7 +30,7 @@ describe('buildMCPTools', () => {
       ],
     });
 
-    const result = await command(CreateApiKey(), {
+    const result = await command(User.CreateApiKey(), {
       actor: {
         address,
         user: {
