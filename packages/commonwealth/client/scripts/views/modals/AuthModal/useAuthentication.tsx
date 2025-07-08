@@ -536,7 +536,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     newelyCreated?: boolean,
   ) => {
     try {
-      if (username && account?.profile) {
+      if (username !== DEFAULT_NAME && account?.profile) {
         await updateUser({
           id: account.profile.userId,
           profile: {
