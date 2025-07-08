@@ -152,6 +152,8 @@ const GroupForm = ({
     apiEnabled: !!communityId,
   });
 
+  console.log('topics :', topics);
+
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId,
     enabled: !!communityId,
