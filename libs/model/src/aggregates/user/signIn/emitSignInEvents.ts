@@ -1,11 +1,11 @@
 import { logger } from '@hicommonwealth/core';
 import { EventPair } from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { getBalances } from 'model/src/services/tokenBalanceCache';
 import { Op, Transaction } from 'sequelize';
 import { models } from '../../../database';
 import { AddressAttributes } from '../../../models/address';
 import { UserAttributes } from '../../../models/user';
+import { getBalances } from '../../../services/tokenBalanceCache';
 import { emitEvent } from '../../../utils/utils';
 
 const log = logger(import.meta);
