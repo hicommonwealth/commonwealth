@@ -62,7 +62,6 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
-import { darkModeStore } from '../../../state/ui/darkMode/darkMode';
 import { openConfirmation } from '../confirmation_modal';
 
 type UseAuthenticationProps = {
@@ -377,10 +376,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     } else {
       // log in as the new user
       await initAppState(false);
-      const darkMode = darkModeStore.getState();
-      if (!darkMode.isDarkMode) {
-        darkMode.setDarkMode(true);
-      }
       if (app.chain) {
         await updateActiveAddresses(app.activeChainId() || '');
       }
