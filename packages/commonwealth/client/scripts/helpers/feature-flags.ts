@@ -43,6 +43,7 @@ const featureFlags = {
   partnershipWallet: buildFlag(process.env.FLAG_PARTNERSHIP_WALLET),
   newProfilePage: buildFlag(process.env.FLAG_NEW_PROFILE_PAGE),
   privateTopics: buildFlag(process.env.FLAG_PRIVATE_TOPICS),
+  newGroupForm: buildFlag(process.env.FLAG_NEW_GROUP_FORM),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;
