@@ -1,6 +1,7 @@
 import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { Op } from 'sequelize';
 import { models } from '../../database';
 import { authVerified } from '../../middleware/auth';
 import { mustExist } from '../../middleware/guards';
@@ -104,6 +105,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
               }
               const existingUsername = await models.User.findOne({
                 where: {
+                  id: { [Op.ne]: id },
                   profile: {
                     name: updates?.profile?.name,
                   },
