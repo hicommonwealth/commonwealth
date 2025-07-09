@@ -5,7 +5,7 @@ import {
   sendUserOpHelper,
 } from '@hicommonwealth/evm-protocols';
 import { config } from '../../config';
-import { equalEvmAddresses } from '../../utils';
+import { equalEvmAddresses } from '../../utils/utils';
 
 const message =
   'I approve commonwealth to create a smart wallet on behalf of this account';

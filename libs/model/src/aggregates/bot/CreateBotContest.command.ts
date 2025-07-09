@@ -21,7 +21,7 @@ import {
   ParseBotCommandError,
 } from '../../services/openai/parseBotCommand';
 import type { TokenAttributes } from '../../services/tokenBalanceCache/types';
-import { publishCast } from '../../utils';
+import { publishCast } from '../../utils/utils';
 
 const log = logger(import.meta);
 

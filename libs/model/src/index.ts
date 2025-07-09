@@ -30,5 +30,32 @@ export * from './policies';
 // Config
 export * from './config';
 
-// TODO: export as namespace
-export * from './utils';
+// Exported utils (might be leaks)
+export {
+  refreshMemberships,
+  refreshProfileCount,
+} from './utils/denormalizedCountUtils';
+export {
+  buildFarcasterContentUrl,
+  parseFarcasterContentUrl,
+} from './utils/farcasterUtils';
+export { generateImage } from './utils/generateImage';
+export { magicLogin } from './utils/magic';
+export {
+  findMentionDiff,
+  parseUserMentions,
+  uniqueMentions,
+} from './utils/parseUserMentions';
+export { pgMultiRowUpdate } from './utils/pgMultiRowUpdate';
+export {
+  createEventRegistryChainNodes,
+  createTestRpc,
+} from './utils/testChainNodeUtils';
+export {
+  R2_ADAPTER_KEY,
+  buildChainNodeUrl,
+  emitEvent,
+  equalEvmAddresses,
+  getSaltedApiKeyHash,
+  uploadIfLarge,
+} from './utils/utils';

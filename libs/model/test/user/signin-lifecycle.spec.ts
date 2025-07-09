@@ -5,7 +5,6 @@ vi.spyOn(tokenBalanceCache, 'getBalances').mockResolvedValue({});
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type { Session, SessionSigner } from '@canvas-js/interfaces';
 import { type Actor, command, dispose } from '@hicommonwealth/core';
-import { getVerifiedUserInfo } from '@hicommonwealth/model';
 import {
   bech32ToHex,
   CANVAS_TOPIC,
@@ -146,27 +145,28 @@ async function createPrivyUser(
   } as User;
 }
 
-const getVerifiedUserInfoMockFn: typeof getVerifiedUserInfo = ({
-  privyUser,
-  walletSsoSource,
-}: {
-  privyUser?: User;
-  walletSsoSource: string;
-  token?: string;
-}) => {
-  if (!privyUser) throw new Error('Only Privy supported in the Mock');
+const getVerifiedUserInfoMockFn: typeof ssoVerificationUtils.getVerifiedUserInfo =
+  ({
+    privyUser,
+    walletSsoSource,
+  }: {
+    privyUser?: User;
+    walletSsoSource: string;
+    token?: string;
+  }) => {
+    if (!privyUser) throw new Error('Only Privy supported in the Mock');
 
-  switch (walletSsoSource) {
-    case 'google':
-      return Promise.resolve({
-        provider: WalletSsoSource.Google,
-        email: privyUser.google?.email,
-        emailVerified: true,
-      });
-    default:
-      throw new Error(`Unsupported SSO provider: ${walletSsoSource}`);
-  }
-};
+    switch (walletSsoSource) {
+      case 'google':
+        return Promise.resolve({
+          provider: WalletSsoSource.Google,
+          email: privyUser.google?.email,
+          emailVerified: true,
+        });
+      default:
+        throw new Error(`Unsupported SSO provider: ${walletSsoSource}`);
+    }
+  };
 
 describe('SignIn Lifecycle', async () => {
   const [evmSigner, , cosmosSigner, substrateSigner, solanaSigner] =

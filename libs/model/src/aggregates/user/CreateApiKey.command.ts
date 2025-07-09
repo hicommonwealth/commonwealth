@@ -4,7 +4,7 @@ import { UserTierMap } from '@hicommonwealth/shared';
 import { randomBytes } from 'crypto';
 import { models } from '../../database';
 import { authVerified, tiered } from '../../middleware';
-import { getSaltedApiKeyHash } from '../../utils';
+import { getSaltedApiKeyHash } from '../../utils/utils';
 
 export function CreateApiKey(): Command<typeof schemas.CreateApiKey> {
   return {
