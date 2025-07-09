@@ -88,6 +88,7 @@ export function GetStatus(): Query<typeof schemas.GetStatus> {
         referred_by_address: user.referred_by_address,
         xp_points: user.xp_points,
         xp_referrer_points: user.xp_referrer_points,
+        notify_user_name_change: user.notify_user_name_change,
         addresses: (addresses || []).map((a) => a.toJSON()) as Array<
           z.infer<typeof schemas.UserStatusAddressView>
         >,

@@ -99,6 +99,11 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
         type: Sequelize.STRING,
         allowNull: true,
       },
+      notify_user_name_change: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
     },
     {
       timestamps: true,

@@ -47,9 +47,15 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
         user.promotional_emails_enabled ??
         false;
 
+      const notify_user_name_change =
+        payload.notify_user_name_change ??
+        user.notify_user_name_change ??
+        false;
+
       const user_delta = getDelta(user, {
         is_welcome_onboard_flow_complete,
         promotional_emails_enabled,
+        notify_user_name_change,
         profile: {
           email,
           slug,
