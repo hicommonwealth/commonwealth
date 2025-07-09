@@ -37,7 +37,7 @@ export async function setupCommonwealthE2E() {
 
   await Promise.all([
     setupEvmCe(),
-    bootstrapBindings({ skipRmqAdapter: true }),
+    bootstrapBindings({ skipRmqAdapter: true, worker: 'commonwealth' }),
   ]);
 
   const web3 = setupWeb3(anvilContainer!.getMappedPort(8546));

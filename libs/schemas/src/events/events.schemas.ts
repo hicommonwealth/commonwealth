@@ -621,6 +621,5 @@ export const events = {
   RefreshWeightedVotesRequested: z.object({
     topic_id: PG_INT,
     community_id: z.string(),
-    actor_user_id: PG_INT,
   }),
 } as const;

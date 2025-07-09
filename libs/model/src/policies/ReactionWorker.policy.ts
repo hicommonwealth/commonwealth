@@ -1,4 +1,4 @@
-import { Actor, InvalidActor, logger, Policy } from '@hicommonwealth/core';
+import { logger, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { models } from '..';
 import { mustExist } from '../middleware';
@@ -121,6 +121,11 @@ async function processSingleReaction(
       reaction.Address!.address,
     );
 
+    console.log('processed reaction', {
+      reactionId: reaction.id,
+      calculatedWeight,
+    });
+
     await reaction.update({
       calculated_voting_weight: calculatedWeight?.toString() || '0',
     });
@@ -144,26 +149,12 @@ export function ReactionWorker(): Policy<typeof inputs> {
     inputs,
     body: {
       RefreshWeightedVotesRequested: async ({ payload }) => {
-        const { topic_id, community_id, actor_user_id } = payload;
+        const { topic_id, community_id } = payload;
 
         const topic = await models.Topic.findOne({
           where: { id: topic_id, community_id },
         });
         mustExist('Topic', topic);
-
-        const actorAddress = await models.Address.findOne({
-          where: {
-            user_id: actor_user_id,
-            community_id,
-            role: 'admin',
-          },
-        });
-        if (!actorAddress) {
-          throw new InvalidActor(
-            { user: { id: actor_user_id } } as Actor,
-            'Must be community admin to refresh weighted votes',
-          );
-        }
 
         log.info(
           `Starting weighted votes refresh for topic ${topic_id} in community ${community_id}`,

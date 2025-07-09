@@ -26,7 +26,6 @@ export function RefreshWeightedVotes(): Command<
           event_payload: {
             topic_id,
             community_id,
-            actor_user_id: actor.user.id!,
           },
         },
       ]);
