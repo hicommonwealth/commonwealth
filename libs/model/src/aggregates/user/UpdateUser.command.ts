@@ -1,4 +1,4 @@
-import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { models } from '../../database';
@@ -101,6 +101,16 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
               };
               if (updates.profile.bio === '') {
                 updates.profile.bio = null;
+              }
+              const existingUsername = await models.User.findOne({
+                where: {
+                  profile: {
+                    name: updates?.profile?.name,
+                  },
+                },
+              });
+              if (existingUsername) {
+                throw new InvalidState('Username already exists');
               }
               const [, rows] = await models.User.update(updates, {
                 where: { id: user.id },
