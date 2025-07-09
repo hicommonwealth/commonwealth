@@ -107,7 +107,13 @@ const LayoutComponent = ({
         hideWarning: true,
       });
     }
-  }, [user.notifyUserNameChange, updateUser, user, data]);
+  }, [
+    user.notifyUserNameChange,
+    updateUser,
+    user,
+    data,
+    confirmationModalOpen,
+  ]);
 
   // If community id was updated ex: `${PRODUCTION_DOMAIN}/{community-id}/**/*`
   // redirect to new community id ex: `${PRODUCTION_DOMAIN}/{new-community-id}/**/*`
