@@ -2,6 +2,9 @@ import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { deinitChainOrCommunity, loadCommunityChainInfo } from 'helpers/chain';
 import withRouter, { useCommonNavigate } from 'navigation/helpers';
 import React, { ReactNode, Suspense, useEffect, useState } from 'react';
+import {
+  notifyError,
+} from 'controllers/app/notifications';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
@@ -82,12 +85,20 @@ const LayoutComponent = ({
   useEffect(() => {
     if (user.notifyUserNameChange && data && !confirmationModalOpen) {
       setConfirmationModalOpen(true);
-      const handleAcknowledge = async () => {
-        await updateUser({
-          id: user.id,
-          profile: data.profile,
-          notify_user_name_change: false,
-        });
+      const handleAcknowledge = () => {
+        (async () => {
+          try {
+            await updateUser({
+              id: user.id,
+              profile: data.profile,
+              notify_user_name_change: false,
+            });
+            user.setData({ notifyUserNameChange: false });
+          } catch (err) {
+            notifyError('Failed to update profile');
+          }
+        })();
+      };
         user.setData({ notifyUserNameChange: false });
       };
 
