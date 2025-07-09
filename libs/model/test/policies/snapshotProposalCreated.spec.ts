@@ -6,8 +6,6 @@ import {
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { CommunityTierMap, SnapshotEventType } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   Mock,
   afterAll,
@@ -20,16 +18,15 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { models, tester } from '../../src';
+import { models } from '../../src/database';
 import { notifySnapshotProposalCreated } from '../../src/policies/handlers/notifySnapshotProposalCreated';
 import { getSnapshotUrl } from '../../src/policies/utils/utils';
+import * as tester from '../../src/tester';
 import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
 } from '../utils/mockedNotificationProvider';
-
-chai.use(chaiAsPromised);
 
 const space = 'dydxgov.eth';
 const proposalId = '0x1';
@@ -168,6 +165,6 @@ describe('snapshotProposalCreated Event Handler', () => {
           id: proposalId,
         } as z.infer<typeof schemas.events.SnapshotProposalCreated>,
       }),
-    ).to.eventually.be.rejectedWith(ProviderError);
+    ).rejects.toThrow(ProviderError);
   });
 });

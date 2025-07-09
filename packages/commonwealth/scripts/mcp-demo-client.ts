@@ -1,118 +1,126 @@
-import { config } from '@hicommonwealth/model';
-import { delay } from '@hicommonwealth/shared';
+// run with `pnpm run start-mcp-demo-client`
+
+import {
+  CommonMCPServerWithHeaders,
+  buildMCPClientOptions,
+  config,
+} from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import OpenAI from 'openai';
 import { exit } from 'process';
 import * as readline from 'readline';
 
-// run with `pnpm run start-mcp-demo-client`
-
-const help = `
+const demoHelp = `
 MCP_DEMO_CLIENT_SERVER_URL must be set to the (ngrok) URL of the MCP server, just the domain.
-MCP_DEMO_CLIENT_KEY must be set to the key of the MCP server in format <address>:<api-key>.
+MCP_KEY_BYPASS must be set to the key of the MCP server in format <address>:<api-key>.
 
 Example:
 MCP_DEMO_CLIENT_SERVER_URL=my-mcp-server.ngrok.io
-MCP_DEMO_CLIENT_KEY=0x1234567890:myApiKey
+MCP_KEY_BYPASS=0x1234567890:myApiKey
 `;
 
-const { MCP_DEMO_CLIENT_SERVER_URL, MCP_DEMO_CLIENT_KEY } = config.MCP;
-if (!MCP_DEMO_CLIENT_SERVER_URL || !MCP_DEMO_CLIENT_KEY) {
-  console.log(help);
-  exit(1);
-}
+let rl: readline.Interface | undefined;
 
-const serverUrl = `https://${MCP_DEMO_CLIENT_SERVER_URL}/mcp`;
-
-const client = new OpenAI({
-  apiKey: config.OPENAI.API_KEY,
-});
-
-// Create readline interface for user input
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-// Conversation history - using OpenAI's Responses API format
-let previousResponseId: string | undefined = undefined;
-
-// Function to get user input
 function getUserInput(prompt: string): Promise<string> {
+  if (!rl) {
+    rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+  }
   return new Promise((resolve) => {
-    rl.question(prompt, (answer) => {
+    rl!.question(prompt, (answer) => {
       resolve(answer);
     });
   });
 }
 
-// Main chat loop
+const { MCP_DEMO_CLIENT_SERVER_URL, MCP_KEY_BYPASS } = config.MCP;
+
+const client = new OpenAI({
+  apiKey: config.OPENAI.API_KEY,
+});
+
+export async function getAllServers(): Promise<CommonMCPServerWithHeaders[]> {
+  const dbServers = (await models.MCPServer.findAll()).filter(
+    (server) => server.id !== 1, // exclude common prod server
+  );
+  const allServers: CommonMCPServerWithHeaders[] = [
+    {
+      id: 0,
+      name: 'Common MCP Server',
+      description: 'Common MCP Server',
+      source: 'common',
+      server_url: `https://${MCP_DEMO_CLIENT_SERVER_URL}/mcp`,
+      handle: 'common',
+      headers: {
+        Authorization: `Bearer ${MCP_KEY_BYPASS}`,
+      },
+    },
+    ...dbServers,
+  ];
+  return allServers;
+}
+
 async function startChatBot() {
-  // wait for warning message to be printed
-  await delay(1000);
+  if (!config.MCP.MCP_DEMO_CLIENT_SERVER_URL || !config.MCP.MCP_KEY_BYPASS) {
+    throw new Error(demoHelp);
+  }
 
   console.clear();
-
-  console.log('🤖 Commonwealth AI Chatbot started! Type "exit" to quit.\n');
   console.log(
-    'Ask me anything about Commonwealth communities, threads, or users!\n',
+    '\n👋 Ask me anything about Common communities, threads, or users!',
   );
+
+  const allServers = await getAllServers();
+  console.log(`\nAvailable servers:`);
+  allServers.forEach((server) => {
+    console.log(
+      `⭐️ @${server.handle} (${server.name}) => ${server.server_url}\n`,
+    );
+  });
+
+  let previousResponseId: string | null = null;
 
   while (true) {
     try {
-      // Get user input
-      const userInput = await getUserInput('You: ');
+      const userInput = await getUserInput('➡️  You: ');
 
-      // Check for exit condition
       if (userInput.toLowerCase().trim() === 'exit') {
         console.log('👋 Goodbye!');
         break;
       }
 
-      console.log('🤔 Thinking...\n');
+      const options = buildMCPClientOptions(
+        userInput,
+        allServers,
+        previousResponseId,
+      );
+      const resp = await client.responses.create(options);
 
-      // Make request to OpenAI Responses API with MCP tools
-      const resp = await client.responses.create({
-        model: 'gpt-4.1',
-        tools: [
-          {
-            type: 'mcp',
-            server_label: 'commonwealth',
-            server_url: serverUrl,
-            require_approval: 'never',
-            headers: {
-              Authorization: `Bearer ${MCP_DEMO_CLIENT_KEY}`,
-            },
-          },
-        ],
-        input: userInput,
-        previous_response_id: previousResponseId,
-      });
+      process.stdout.write('✅ Assistant: ');
 
-      // Update the previous response ID for next iteration
-      previousResponseId = resp.id;
+      for await (const event of resp) {
+        if (event.type === 'response.output_text.delta') {
+          const deltaText = event.delta || '';
+          process.stdout.write(deltaText);
+        } else if (event.type === 'response.completed') {
+          previousResponseId = event.response?.id || null;
+        }
+      }
 
-      // Display the response
-      console.log(`🤖 Assistant: ${resp.output_text || resp.output}\n`);
+      console.log('');
     } catch (error: unknown) {
       const err = error as Error;
       console.error('❌ Error:', err.message);
-      console.log('Please try again.\n');
-
-      // If there's an authentication or server error, show more details
-      if (err.message.includes('401')) {
-        console.log('Check your OpenAI API key and MCP server credentials.\n');
-      } else if (err.message.includes('404')) {
-        console.log("Check your MCP server URL and ensure it's accessible.\n");
-      }
     }
   }
 
-  rl.close();
+  rl?.close();
 }
 
-// Start the chatbot
 startChatBot().catch((error) => {
   console.error('Fatal error:', error);
-  rl.close();
+  rl?.close();
   exit(1);
 });

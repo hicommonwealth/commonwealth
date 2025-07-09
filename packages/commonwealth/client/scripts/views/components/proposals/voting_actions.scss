@@ -1,7 +1,8 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .poll-container {
-  background: $neutral-50;
+  background: colors.$neutral-50;
   gap: 16px;
   border-radius: 6px;
   padding: 16px;
@@ -9,7 +10,7 @@
   flex-direction: column;
 
   .poll-box {
-    background-color: $neutral-200;
+    background-color: colors.$neutral-200;
     padding: 15px;
     border-radius: 8px;
   }

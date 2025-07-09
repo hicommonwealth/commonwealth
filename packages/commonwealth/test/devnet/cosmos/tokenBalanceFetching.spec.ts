@@ -11,12 +11,9 @@ import {
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
-import {
-  CommunityAttributes,
-  tester,
-  tokenBalanceCache,
-  type DB,
-} from '@hicommonwealth/model';
+import { tokenBalanceCache } from '@hicommonwealth/model';
+import { CommunityAttributes, DB } from '@hicommonwealth/model/models';
+import * as tester from '@hicommonwealth/model/tester';
 import {
   BalanceSourceType,
   BalanceType,
@@ -27,11 +24,7 @@ import {
   delay,
 } from '@hicommonwealth/shared';
 import BN from 'bn.js';
-import { use as chaiUse, expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import { afterAll, beforeAll, describe, test } from 'vitest';
-
-chaiUse(chaiAsPromised);
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
 // same mnemonic as defined in cosmos-chain-testing bootstrap files
 const addressOneMnemonic =

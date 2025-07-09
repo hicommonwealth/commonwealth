@@ -1,4 +1,6 @@
-@import '../../../../../../styles/shared.scss';
+@use '../../../../../../styles/shared.scss';
+@use '../../../../../../styles/mixins/colors.module';
+@use '../../../../../../styles/mixins/media_queries';
 
 .TokenInformationFormStep {
   display: flex;
@@ -7,7 +9,7 @@
   width: 100%;
   max-width: 596px;
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     gap: 16px;
   }
 
@@ -17,14 +19,14 @@
     grid-template-columns: 1fr 1fr;
     gap: 16px;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       grid-template-columns: 1fr;
     }
   }
 
   .optional-label {
-    font-family: $font-family-silka;
-    color: $neutral-500;
+    font-family: shared.$font-family-silka;
+    color: colors.$neutral-500;
     margin-left: 6px;
     margin-top: auto;
   }
@@ -38,7 +40,7 @@
     margin-bottom: 24px;
     gap: 10px;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       justify-content: flex-end;
     }
   }

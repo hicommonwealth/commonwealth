@@ -1,5 +1,5 @@
 import { broker, logger, stats } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import _ from 'underscore';
 import { config } from '../config';
 import { relay } from './relay';

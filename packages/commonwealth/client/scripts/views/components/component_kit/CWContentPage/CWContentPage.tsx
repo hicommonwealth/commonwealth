@@ -86,6 +86,7 @@ type ContentPageProps = {
   shareUrl?: string;
   proposalDetailSidebar?: SidebarComponents;
   showActionIcon?: boolean;
+  isChatMode?: boolean;
 };
 
 export const CWContentPage = ({
@@ -129,6 +130,7 @@ export const CWContentPage = ({
   shareUrl,
   proposalDetailSidebar,
   showActionIcon = false,
+  isChatMode,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -218,7 +220,7 @@ export const CWContentPage = ({
   );
 
   const mainBody = (
-    <div className="main-body-container">
+    <div className={`main-body-container ${isChatMode ? 'chat-mode' : ''}`}>
       <div className="header">
         {typeof title === 'string' ? (
           <h1 className="title">
@@ -265,7 +267,11 @@ export const CWContentPage = ({
         )}
 
       {subBody}
-      {comments}
+      <div
+        className={`comments-section ${isChatMode ? 'chat-mode-comments' : ''}`}
+      >
+        {comments}
+      </div>
     </div>
   );
 

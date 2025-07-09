@@ -1,5 +1,5 @@
 import { dispose } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { Client, GatewayIntentBits } from 'discord.js';
 import { Op } from 'sequelize';
 import { config } from '../server/config';

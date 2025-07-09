@@ -3,8 +3,7 @@ import { Slip10RawIndex } from '@cosmjs/crypto';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { dispose } from '@hicommonwealth/core';
 import { createEvmSigner } from '@hicommonwealth/evm-protocols';
-import { tester } from '@hicommonwealth/model';
-import chai from 'chai';
+import * as tester from '@hicommonwealth/model/tester';
 import { CosmosToken } from 'client/scripts/controllers/chain/cosmos/types';
 import { CosmosApiType } from 'controllers/chain/cosmos/chain';
 import {
@@ -23,11 +22,9 @@ import {
   VoteOption,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import Long from 'long';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import EthSigner from './utils/eth-signer';
 import { waitOneBlock } from './utils/helpers';
-
-const { expect, assert } = chai;
 
 // evmos1yc36qsnpgnnwnhjp5v524lk3cadlq4480u47x2
 const mnemonic =
@@ -124,7 +121,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
     await waitOneBlock(rpcUrl);
     const activeProposals = await getActiveVotingProposals();
 
-    assert.isAtLeast(activeProposals.length, 1);
+    expect(activeProposals.length).toBeGreaterThanOrEqual(1);
     const proposal = activeProposals[activeProposals.length - 1];
 
     const msg = encodeMsgVote(
@@ -134,10 +131,10 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
     );
     const resp = await sendTx(lcdUrl, msg);
 
-    expect(resp.transactionHash).to.not.be.undefined;
-    expect(resp.rawLog).to.not.be.undefined;
+    expect(resp.transactionHash).not.toBeUndefined();
+    expect(resp.rawLog).not.toBeUndefined();
     const voteValue = parseVoteValue(resp.rawLog);
-    expect(voteValue).to.eql(expectedVoteString);
+    expect(voteValue).toEqual(expectedVoteString);
   };
 
   test('creates a proposal', async () => {
@@ -149,12 +146,12 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
 
     const resp = await sendTx(lcdUrl, msg);
 
-    expect(resp.transactionHash).to.not.be.undefined;
-    expect(resp.rawLog).to.not.be.undefined;
+    expect(resp.transactionHash).not.toBeUndefined();
+    expect(resp.rawLog).not.toBeUndefined();
 
     await waitOneBlock(rpcUrl);
     const activeProposals = await getActiveVotingProposals();
-    expect(activeProposals.length).to.be.greaterThan(0);
+    expect(activeProposals.length).toBeGreaterThan(0);
   });
 
   test('votes NO on an active proposal', async () => {
@@ -195,15 +192,14 @@ describe('Ethermint Governance v1beta1 util Tests', () => {
       const rpc = await getRPCClient(tmClient);
 
       const proposals = await getActiveProposalsV1Beta1(rpc);
-      expect(proposals.length).to.be.greaterThan(0);
+      expect(proposals.length).toBeGreaterThan(0);
 
       proposals.forEach((proposal) => {
-        expect(proposal.state.completed).to.eq(false);
-        expect(proposal.state.status).to.be.oneOf([
-          'VotingPeriod',
-          'DepositPeriod',
-        ]);
-        expect(proposal.state.tally).to.not.be.null;
+        expect(proposal.state.completed).toBe(false);
+        expect(['VotingPeriod', 'DepositPeriod']).toContain(
+          proposal.state.status,
+        );
+        expect(proposal.state.tally).not.toBeNull();
       });
     });
   });

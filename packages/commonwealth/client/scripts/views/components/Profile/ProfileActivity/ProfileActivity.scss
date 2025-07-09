@@ -1,11 +1,13 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .ProfileActivity {
-  border: 1px solid $neutral-200;
+  border: 1px solid colors.$neutral-200;
   border-radius: 16px;
   height: fit-content;
   flex: 2;
-  background-color: $white;
+  background-color: colors.$white;
 
   max-width: 100%;
   overflow: hidden;
@@ -14,7 +16,7 @@
     display: flex;
     padding: 24px;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       padding: 24px 24px 0 24px;
     }
 
@@ -32,8 +34,8 @@
           height: 24px;
           width: 24px;
           border-radius: 50%;
-          background: $neutral-50;
-          color: $neutral-500;
+          background: colors.$neutral-50;
+          color: colors.$neutral-500;
           font-size: 12px;
           margin-left: 8px;
         }
@@ -85,7 +87,7 @@
       border-bottom: none;
     }
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       padding: 0 24px 24px 24px;
     }
   }

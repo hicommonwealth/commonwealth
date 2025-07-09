@@ -28,7 +28,7 @@ import {
   uniqueMentions,
   uploadIfLarge,
 } from '../../utils';
-import { GetActiveContestManagers } from '../contest';
+import { GetActiveContestManagers } from '../contest/GetActiveContestManagers.query';
 
 export const CreateThreadErrors = {
   InsufficientTokenBalance: 'Insufficient token balance',

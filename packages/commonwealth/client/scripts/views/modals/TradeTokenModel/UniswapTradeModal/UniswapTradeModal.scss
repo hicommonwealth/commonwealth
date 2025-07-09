@@ -1,4 +1,5 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
 
 /* Global styles for the network indicator when used outside the modal */
 .swap-network-indicator {
@@ -87,17 +88,17 @@
       }
 
       button[color='interactive'] {
-        color: $white !important;
+        color: colors.$white !important;
 
         svg {
-          stroke: $white !important;
+          stroke: colors.$white !important;
         }
       }
 
       button[color='accent'],
       button[color='accentSoft'] {
         div {
-          color: $white !important;
+          color: colors.$white !important;
         }
       }
 

@@ -82,7 +82,7 @@ export const buildproc = <Input extends ZodType, Output extends ZodType>({
   return trpc.procedure
     .use(async ({ ctx, next, getRawInput }) => {
       if (secure) {
-        const input = await getRawInput();
+        const input = (await getRawInput()) as z.infer<Input>;
         await authenticate(ctx.req, input, md.authStrategy, optional);
       }
       return next({
@@ -98,9 +98,9 @@ export const buildproc = <Input extends ZodType, Output extends ZodType>({
     .use(async ({ ctx, next, getRawInput }) => {
       const result = await next();
       if (result.ok && outMiddlewares?.length) {
-        const input = await getRawInput();
+        const input = (await getRawInput()) as z.infer<Input>;
         for (const omw of outMiddlewares) {
-          await omw(input, result.data, ctx);
+          await omw(input, result.data as z.infer<Output>, ctx);
         }
       }
       return result;
@@ -108,7 +108,7 @@ export const buildproc = <Input extends ZodType, Output extends ZodType>({
     .meta({
       openapi: {
         method,
-        description: md.input._def.description, // zod property description
+        description: md.input.description, // zod property description
         path: `/${name}`,
         tags: [tag],
         headers: [

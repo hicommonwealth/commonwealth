@@ -8,6 +8,54 @@ dotenv.config();
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
+  resolve: {
+    alias: {
+      '@hicommonwealth/shared': path.resolve(
+        __dirname,
+        './libs/shared/src/index.ts',
+      ),
+      '@hicommonwealth/schemas': path.resolve(
+        __dirname,
+        './libs/schemas/src/index.ts',
+      ),
+      '@hicommonwealth/adapters': path.resolve(
+        __dirname,
+        './libs/adapters/src/index.ts',
+      ),
+      '@hicommonwealth/core': path.resolve(
+        __dirname,
+        './libs/core/src/index.ts',
+      ),
+      '@hicommonwealth/evm-protocols': path.resolve(
+        __dirname,
+        './libs/evm-protocols/src/index.ts',
+      ),
+      '@hicommonwealth/evm-testing': path.resolve(
+        __dirname,
+        './libs/evm-testing/src/index.ts',
+      ),
+      '@hicommonwealth/model/tester': path.resolve(
+        __dirname,
+        './libs/model/src/tester/index.ts',
+      ),
+      '@hicommonwealth/model/middleware': path.resolve(
+        __dirname,
+        './libs/model/src/middleware/index.ts',
+      ),
+      '@hicommonwealth/model/models': path.resolve(
+        __dirname,
+        './libs/model/src/models/index.ts',
+      ),
+      '@hicommonwealth/model/db': path.resolve(
+        __dirname,
+        './libs/model/src/database.ts',
+      ),
+      '@hicommonwealth/model': path.resolve(
+        __dirname,
+        './libs/model/src/index.ts',
+      ),
+    },
+  },
   test: {
     // Enables parallel lifecycle tests
     setupFiles: [path.resolve(__dirname, './libs/model/src/vitest.setup.ts')],

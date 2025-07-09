@@ -215,7 +215,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      # TODO: use devmode instead to avoid building
       - name: Build
         run: pnpm -r build
 

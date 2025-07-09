@@ -1,25 +1,27 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
 
 .QuestCard {
-  border-radius: $border-radius-corners;
+  border-radius: border_radius.$border-radius-corners;
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  background-color: $white;
+  background-color: colors.$white;
   width: 100%;
   min-height: 360px;
-  border: 1px solid $neutral-300;
+  border: 1px solid colors.$neutral-300;
   cursor: pointer;
 
   .text-dark {
-    color: $neutral-600;
+    color: colors.$neutral-600;
     width: fit-content;
     cursor: initial;
   }
 
   .text-light {
-    color: $neutral-500;
+    color: colors.$neutral-500;
     width: fit-content;
     cursor: initial;
   }
@@ -37,7 +39,7 @@
   }
 
   .image {
-    border-radius: $border-radius-corners;
+    border-radius: border_radius.$border-radius-corners;
     width: 100%;
     min-width: 100%;
     max-width: 100%;
@@ -69,28 +71,28 @@
       .progress-bar {
         height: 10px;
         width: 100%;
-        border: 1px solid $neutral-100;
+        border: 1px solid colors.$neutral-100;
 
         &.isEnded {
           &::-webkit-progress-value {
-            background-color: $neutral-400 !important;
+            background-color: colors.$neutral-400 !important;
           }
         }
 
         &::-webkit-progress-bar {
-          background-color: $neutral-200;
-          border-radius: $border-radius-corners;
+          background-color: colors.$neutral-200;
+          border-radius: border_radius.$border-radius-corners;
         }
 
         &::-webkit-progress-value {
-          background-color: $primary-400;
-          border-radius: $border-radius-corners;
+          background-color: colors.$primary-400;
+          border-radius: border_radius.$border-radius-corners;
         }
       }
     }
 
     .time-label {
-      color: $yellow-600 !important;
+      color: colors.$yellow-600 !important;
     }
 
     .xp-row {
@@ -108,7 +110,7 @@
       .Text,
       .Button {
         font-weight: normal !important;
-        color: $neutral-500 !important;
+        color: colors.$neutral-500 !important;
       }
 
       &:focus-within {

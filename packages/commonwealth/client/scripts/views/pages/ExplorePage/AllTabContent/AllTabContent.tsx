@@ -36,6 +36,7 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
           onCloseClick={onClearSearch}
         />
       )}
+
       {launchpadEnabled && (
         <div className="section-container">
           <CWSectionHeader

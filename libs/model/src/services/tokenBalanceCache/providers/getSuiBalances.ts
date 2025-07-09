@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { SuiClient } from '@mysten/sui.js/client';
+import { SuiClient } from '@mysten/sui/client';
 import { models } from '../../../database';
 import {
   Balances,

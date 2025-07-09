@@ -182,12 +182,21 @@ export const GetUserReferralFees = {
   output: z.array(ReferralFeesView),
 };
 
-export const XpLogView = XpLog.extend({
+export const XpLogView = XpLog.omit({
+  user: true,
+  creator: true,
+  quest_action_meta: true,
+}).extend({
   user_profile: UserProfile,
   quest_id: z.number(),
   quest_action_meta_id: z.number(),
   event_name: z.string(),
+  reward_amount: z.number(),
   creator_profile: UserProfile.nullish(),
+  is_creator: z.boolean().describe('Actor is the creator or referrer'),
+  is_referral: z.boolean().describe('Is a referral event'),
+  created_at: z.date().or(z.string()),
+  event_created_at: z.date().or(z.string()),
 });
 
 export const GetXps = {
@@ -255,6 +264,13 @@ export const GetAddressStatus = {
   context: VerifiedContext,
 };
 
+export const MutualCommunityView = z.object({
+  id: z.string(),
+  name: z.string(),
+  base: z.nativeEnum(ChainBase),
+  icon_url: z.string().nullish(),
+});
+
 export const GetMutualConnections = {
   input: z.object({
     user_id_1: PG_INT,
@@ -262,14 +278,7 @@ export const GetMutualConnections = {
     limit: z.number().int().min(1).max(100).optional().default(10),
   }),
   output: z.object({
-    mutual_communities: z.array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        base: z.nativeEnum(ChainBase),
-        icon_url: z.string().nullish(),
-      }),
-    ),
+    mutual_communities: z.array(MutualCommunityView),
   }),
   context: AuthContext,
 };

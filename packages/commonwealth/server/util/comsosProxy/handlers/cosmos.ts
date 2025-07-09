@@ -1,5 +1,6 @@
 import { logger } from '@hicommonwealth/core';
-import { ChainNodeInstance, models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { ChainNodeInstance } from '@hicommonwealth/model/models';
 import { NodeHealth, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type { Request, Response } from 'express';

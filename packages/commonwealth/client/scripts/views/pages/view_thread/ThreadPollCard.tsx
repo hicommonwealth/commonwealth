@@ -11,7 +11,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import Permissions from '../../../utils/Permissions';
 import { PollCard } from '../../components/Polls';
-import { getPollTimestamp } from './helpers';
+import { getPollTimestamp, getPollEndDateString } from './helpers';
 import './poll_cards.scss';
 
 type ThreadPollCardProps = {
@@ -172,6 +172,7 @@ export const ThreadPollCard = ({
           poll,
           !!poll.ends_at && moment(poll.ends_at).isBefore(moment().utc()),
         )}
+        endTimestamp={getPollEndDateString(poll)}
         totalVoteCount={pollVotes.length}
         totalVoteWeight={totalVoteWeight}
         voteInformation={voteInformation}

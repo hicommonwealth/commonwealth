@@ -51,7 +51,7 @@ const TermsOfServicesStep = ({ onComplete }: TermsOfServicesStepProps) => {
               />
             </div>
 
-            <div className="footerContainer">
+            <div className="terms-footer">
               <CWButton
                 label="Next"
                 buttonWidth="full"

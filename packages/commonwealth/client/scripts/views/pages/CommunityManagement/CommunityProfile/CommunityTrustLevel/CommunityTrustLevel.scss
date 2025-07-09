@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
 
 .CommunityTrustLevel {
   display: flex;
@@ -37,19 +38,19 @@
   }
 
   &.level-green {
-    border-color: $green-200;
+    border-color: colors.$green-200;
   }
 
   &.level-yellow {
-    border-color: $yellow-200;
+    border-color: colors.$yellow-200;
   }
 
   &.level-gray {
-    border-color: $neutral-200;
+    border-color: colors.$neutral-200;
   }
 
   &.disabled {
-    border-color: $neutral-200;
+    border-color: colors.$neutral-200;
     opacity: 0.5;
   }
 
@@ -70,7 +71,7 @@
 
   .level-description {
     font-size: 14px;
-    color: $neutral-500;
+    color: colors.$neutral-500;
     flex: 1;
   }
 
@@ -101,7 +102,7 @@
       align-items: center;
       padding: 8px 12px;
       border-radius: 8px;
-      border: 1px solid $neutral-200;
+      border: 1px solid colors.$neutral-200;
       gap: 8px;
     }
   }

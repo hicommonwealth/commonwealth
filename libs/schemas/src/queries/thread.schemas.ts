@@ -1,6 +1,6 @@
 import { LinkSource } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
-import { AuthContext, ThreadContext } from '../context';
+import { AuthContext, ThreadContext, VerifiedContext } from '../context';
 import {
   Address,
   Comment,
@@ -93,7 +93,7 @@ export const AddressView = Address.extend({
   last_active: z.date().or(z.string()).nullish(),
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
-  User: UserView.optional().nullish() as ZodType<UserView | null | undefined>,
+  User: UserView.nullish() as ZodType<UserView | null | undefined>,
 }).omit({
   oauth_email: true,
   oauth_provider: true,
@@ -322,7 +322,7 @@ export const SearchThreads = {
   output: PaginatedResultSchema.extend({
     results: z.array(ThreadView),
   }),
-  context: AuthContext,
+  context: VerifiedContext,
 };
 
 export const GetLinks = {

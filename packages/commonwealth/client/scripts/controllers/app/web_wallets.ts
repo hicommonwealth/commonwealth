@@ -6,6 +6,8 @@ import { userStore } from 'state/ui/user';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 import BackpackWebWalletController from './webWallets/backpack_web_wallet';
+import BinanceWebWalletController from './webWallets/binance_web_wallet';
+import BitgetWebWalletController from './webWallets/bitget_web_wallet';
 import CoinbaseWebWalletController from './webWallets/coinbase_web_wallet';
 import CosmosEvmMetamaskWalletController from './webWallets/cosmos_evm_metamask_web_wallet';
 import KeplrEthereumWalletController from './webWallets/keplr_ethereum_web_wallet';
@@ -13,10 +15,12 @@ import KeplrWebWalletController from './webWallets/keplr_web_wallet';
 import LeapWebWalletController from './webWallets/leap_web_wallet';
 import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
 import OkxWebWalletController from './webWallets/okx_web_wallet';
+import OkxSuiWebWalletController from './webWallets/okxSui_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
 import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
 import SolflareWebWalletController from './webWallets/solflare_web_wallet';
 import SuiWebWalletController from './webWallets/sui_web_wallet';
+import SuietWebWalletController from './webWallets/suiet_web_wallet';
 import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
 import TerraWalletConnectWebWalletController from './webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';
@@ -136,6 +140,10 @@ export default class WebWalletController {
       new BackpackWebWalletController(),
       new SolflareWebWalletController(),
       new SuiWebWalletController(),
+      new BinanceWebWalletController(),
+      new SuietWebWalletController(),
+      new OkxSuiWebWalletController(),
+      new BitgetWebWalletController(),
     ];
   }
 }

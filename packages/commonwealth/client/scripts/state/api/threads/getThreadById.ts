@@ -10,6 +10,12 @@ const useGetThreadByIdQuery = (thread_id: number, enabled = true) => {
       staleTime: THREAD_STALE_TIME,
       select: (data) => new Thread(data),
       enabled,
+      retry: (failureCount, error) => {
+        // Avoid retrying if unauthorized
+        if (error?.data?.code === 'UNAUTHORIZED') return false;
+        // Optional: limit retries to 2 times for other errors
+        return failureCount < 2;
+      },
     },
   );
 };

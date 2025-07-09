@@ -1,4 +1,5 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
 
 .EmptyThreadCard {
   display: flex;
@@ -20,16 +21,16 @@
     gap: 16px;
 
     .icon {
-      color: $neutral-600;
+      color: colors.$neutral-600;
       margin-bottom: 8px;
     }
 
     .title {
-      color: $neutral-900;
+      color: colors.$neutral-900;
     }
 
     .subtitle {
-      color: $neutral-700;
+      color: colors.$neutral-700;
       max-width: 300px;
     }
 

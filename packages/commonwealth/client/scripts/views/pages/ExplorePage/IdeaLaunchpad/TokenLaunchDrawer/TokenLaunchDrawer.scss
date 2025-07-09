@@ -1,14 +1,16 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module' as colors;
+@use '../../../../../styles/mixins/media_queries';
 
 .TokenLaunchDrawer {
   position: relative;
   z-index: 1000;
 
   .Drawer.filter-drawer {
-    background: $white;
+    background: colors.$white;
     z-index: 1001;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       padding-bottom: 0px !important;
     }
 
@@ -17,12 +19,12 @@
       margin-left: -36px;
       z-index: 1002;
 
-      @include mediumSmallMid {
+      @include media_queries.mediumSmallMid {
         margin-left: -26px;
       }
     }
 
-    @include mediumSmall {
+    @include media_queries.mediumSmall {
       > .QuickTokenLaunchForm {
         padding: 0 16px;
       }
@@ -33,18 +35,17 @@
       height: 100%;
       overflow-y: scroll;
       padding-bottom: 60px !important;
-
-      @include mediumSmallMid {
-        padding: 20px 32px;
-        padding-bottom: 60px !important;
-      }
-
       background: linear-gradient(
         90deg,
         rgba(255, 31, 0, 0.3) 0%,
         rgba(255, 128, 215, 0.3) 50%,
         rgba(0, 121, 204, 0.3) 100%
       );
+
+      @include media_queries.mediumSmallMid {
+        padding: 20px 32px;
+        padding-bottom: 60px !important;
+      }
     }
   }
 }

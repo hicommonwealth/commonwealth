@@ -3,15 +3,15 @@ import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
-import { filterGates, joinGates, withGates } from '../../utils/gating';
-import { baseActivityQuery } from '../../utils/getUserActivityFeed';
+import { authOptionalVerified } from '../../middleware';
+import { buildGlobalActivityQuery } from '../../utils/getBaseActivityFeed';
 
 export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
   return {
     ...schemas.GlobalFeed,
-    auth: [],
-    secure: false,
-    body: async ({ payload }) => {
+    auth: [authOptionalVerified],
+    secure: true,
+    body: async ({ actor, payload }) => {
       const {
         comment_limit = 3,
         limit = 10,
@@ -28,14 +28,6 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
         { order: 'ASC' },
       );
 
-      const whereConditions = [
-        filterGates(),
-        community_id ? 'AND T.community_id = :community_id' : '',
-        search ? 'AND T.title ILIKE :search' : '',
-      ]
-        .filter(Boolean)
-        .join(' ');
-
       // TODO: if we run out of ranked threads should we return something else
       if (!rankedThreadIds.length)
         return schemas.buildPaginatedResponse([], 0, {
@@ -43,25 +35,7 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
           cursor,
         });
 
-      // TODO: add deleted_at, marked_as_spam_at and default community filters?
-      const query = `
-        ${withGates()},
-        top_threads AS (
-          SELECT
-            T.*,
-            count(*) OVER () AS total, C.icon_url
-          FROM
-            "Threads" T
-            JOIN "Communities" C ON C.id = T.community_id
-            ${joinGates()}
-          WHERE
-            T.id IN (:threadIds)
-            ${whereConditions}
-        )
-        ${baseActivityQuery}
-        ORDER BY ARRAY_POSITION(ARRAY[:threadIds], T.id);
-      `;
-
+      const query = buildGlobalActivityQuery(actor, community_id, search);
       const threads = await models.sequelize.query<
         z.infer<typeof schemas.ThreadView>
       >(query, {
@@ -69,6 +43,8 @@ export function GetGlobalActivity(): Query<typeof schemas.GlobalFeed> {
         replacements: {
           comment_limit,
           threadIds: rankedThreadIds.map((t) => parseInt(t)),
+          ...(actor.address_id && { address_id: actor.address_id }),
+          ...(actor.community_id && { community_id: actor.community_id }),
           ...(community_id && { community_id }),
           ...(search && { search: `%${search}%` }),
         },

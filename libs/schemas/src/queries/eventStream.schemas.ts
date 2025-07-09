@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { VerifiedContext } from '../context';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 import { ThreadView } from './thread.schemas';
@@ -27,6 +28,7 @@ export const GlobalFeed = {
   output: PaginatedResultSchema.extend({
     results: z.array(ThreadView),
   }),
+  context: VerifiedContext,
 };
 
 export const ActivityFeed = {
@@ -37,6 +39,7 @@ export const ActivityFeed = {
   output: PaginatedResultSchema.extend({
     results: z.array(ThreadView),
   }),
+  context: VerifiedContext,
 };
 
 export const ChainFeedRecord = z.object({
