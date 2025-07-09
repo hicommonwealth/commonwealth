@@ -28,15 +28,17 @@ describe('Native ETH weighted voting lifecycle', () => {
   let _chain: ChainNodeAttributes;
   let _user1: UserAttributes;
   let _user2: UserAttributes;
+  let _user3: UserAttributes;
+  let _user4: UserAttributes;
   let _community: CommunityAttributes;
   let _topic: TopicAttributes;
-  let _memberActor: {
+  let _memberActors: {
     user: {
       id: number;
       email: string;
     };
     address: string;
-  };
+  }[];
   let _adminActor: {
     user: {
       id: number;
@@ -52,24 +54,46 @@ describe('Native ETH weighted voting lifecycle', () => {
     _chain = chain!;
 
     _user1 = await models.User.create({
-      email: 'test@example.com',
+      email: 'admin@example.com',
       emailVerified: true,
       tier: UserTierMap.ManuallyVerified,
       profile: {
-        name: 'Test User',
-        bio: 'Test bio',
-        avatar_url: 'test.jpg',
+        name: 'Admin User',
+        bio: 'Admin bio',
+        avatar_url: 'admin.jpg',
       },
     });
 
     _user2 = await models.User.create({
-      email: 'test2@example.com',
+      email: 'member1@example.com',
       emailVerified: true,
       tier: UserTierMap.ManuallyVerified,
       profile: {
-        name: 'Test User 2',
-        bio: 'Test bio',
-        avatar_url: 'test.jpg',
+        name: 'Member User 1',
+        bio: 'Member bio',
+        avatar_url: 'member1.jpg',
+      },
+    });
+
+    _user3 = await models.User.create({
+      email: 'member2@example.com',
+      emailVerified: true,
+      tier: UserTierMap.ManuallyVerified,
+      profile: {
+        name: 'Member User 2',
+        bio: 'Member bio',
+        avatar_url: 'member2.jpg',
+      },
+    });
+
+    _user4 = await models.User.create({
+      email: 'member3@example.com',
+      emailVerified: true,
+      tier: UserTierMap.ManuallyVerified,
+      profile: {
+        name: 'Member User 3',
+        bio: 'Member bio',
+        avatar_url: 'member3.jpg',
       },
     });
 
@@ -79,7 +103,7 @@ describe('Native ETH weighted voting lifecycle', () => {
       description: 'Community for native ETH weighted voting test',
       chain_node_id: chain!.id,
       environment: 'test',
-      profile_count: 1,
+      profile_count: 4,
       active: true,
       Addresses: [
         {
@@ -97,6 +121,26 @@ describe('Native ETH weighted voting lifecycle', () => {
           role: 'member',
           address: anvilAccounts[1].address,
           hex: anvilAccounts[1].address,
+          ghost_address: false,
+          is_banned: false,
+          verification_token: '123456',
+          verified: new Date(),
+        },
+        {
+          user_id: _user3.id,
+          role: 'member',
+          address: anvilAccounts[2].address,
+          hex: anvilAccounts[2].address,
+          ghost_address: false,
+          is_banned: false,
+          verification_token: '123456',
+          verified: new Date(),
+        },
+        {
+          user_id: _user4.id,
+          role: 'member',
+          address: anvilAccounts[3].address,
+          hex: anvilAccounts[3].address,
           ghost_address: false,
           is_banned: false,
           verification_token: '123456',
@@ -129,24 +173,43 @@ describe('Native ETH weighted voting lifecycle', () => {
       },
       address: community!.Addresses![0].address!,
     };
-    _memberActor = {
-      user: {
-        id: _user2.id!,
-        email: _user2.email!,
+
+    _memberActors = [
+      {
+        user: {
+          id: _user2.id!,
+          email: _user2.email!,
+        },
+        address: community!.Addresses![1].address!,
       },
-      address: community!.Addresses![1].address!,
-    };
+      {
+        user: {
+          id: _user3.id!,
+          email: _user3.email!,
+        },
+        address: community!.Addresses![2].address!,
+      },
+      {
+        user: {
+          id: _user4.id!,
+          email: _user4.email!,
+        },
+        address: community!.Addresses![3].address!,
+      },
+    ];
   });
 
   test(
     'should recalculate vote weights for threads and comments after ETH balance changes',
     async () => {
-      // Get initial ETH balance
-      const initialBalance = await _web3.eth.getBalance(
-        _anvilAccounts[1].address,
+      // Get initial ETH balances for all member accounts
+      const initialBalances = await Promise.all(
+        _memberActors.map((_, index) =>
+          _web3.eth.getBalance(_anvilAccounts[index + 1].address),
+        ),
       );
 
-      // Create a thread using command
+      // Create a thread using command (using first member)
       const thread = await command(Thread.CreateThread(), {
         payload: {
           body: 'Test thread for native ETH voting',
@@ -157,59 +220,92 @@ describe('Native ETH weighted voting lifecycle', () => {
           stage: '',
           read_only: false,
         },
-        actor: _memberActor,
+        actor: _memberActors[0],
       });
 
-      // Create a comment on the thread
+      // Create a comment on the thread (using first member)
       const comment = await command(Comment.CreateComment(), {
         payload: {
           thread_id: thread.id!,
           body: 'Test comment for native ETH voting',
         },
-        actor: _memberActor,
+        actor: _memberActors[0],
       });
 
-      // Create a thread reaction
-      const threadReaction = await command(Thread.CreateThreadReaction(), {
-        payload: {
-          thread_id: thread.id!,
-          thread_msg_id: thread.canvas_msg_id,
-          reaction: 'like',
-        },
-        actor: _memberActor,
-      });
-
-      // Create a comment reaction
-      const commentReaction = await command(Comment.CreateCommentReaction(), {
-        payload: {
-          comment_id: comment.id!,
-          reaction: 'like',
-        },
-        actor: _memberActor,
-      });
-
-      // Thread reaction vote weight should match the initial balance
-      const expectedInitialWeight = calculateVoteWeight(
-        initialBalance.toString(),
-        voteWeightMultiplier,
-      )!;
-      expect(threadReaction.calculated_voting_weight).toBe(
-        expectedInitialWeight.toString(),
+      // Create thread reactions from all 3 members
+      const threadReactions = await Promise.all(
+        _memberActors.map((actor) =>
+          command(Thread.CreateThreadReaction(), {
+            payload: {
+              thread_id: thread.id!,
+              thread_msg_id: thread.canvas_msg_id,
+              reaction: 'like',
+            },
+            actor,
+          }),
+        ),
       );
 
-      // Comment reaction vote weight should match the initial balance
-      const expectedInitialCommentWeight = calculateVoteWeight(
-        initialBalance.toString(),
-        voteWeightMultiplier,
-      )!;
-      expect(commentReaction.calculated_voting_weight).toBe(
-        expectedInitialCommentWeight.toString(),
+      // Create comment reactions from all 3 members
+      const commentReactions = await Promise.all(
+        _memberActors.map((actor) =>
+          command(Comment.CreateCommentReaction(), {
+            payload: {
+              comment_id: comment.id!,
+              reaction: 'like',
+            },
+            actor,
+          }),
+        ),
       );
 
-      // Transfer some ETH to another address to reduce balance
+      // Calculate expected initial weights for all members
+      const expectedInitialWeights = initialBalances.map(
+        (balance) =>
+          calculateVoteWeight(balance.toString(), voteWeightMultiplier)!,
+      );
+
+      // Verify initial vote weights match the initial balances
+      threadReactions.forEach((reaction, index) => {
+        expect(reaction.calculated_voting_weight).toBe(
+          expectedInitialWeights[index].toString(),
+        );
+      });
+
+      commentReactions.forEach((reaction, index) => {
+        expect(reaction.calculated_voting_weight).toBe(
+          expectedInitialWeights[index].toString(),
+        );
+      });
+
+      // Verify initial sum of all weights
+      const initialThreadWeightSum = threadReactions.reduce(
+        (sum, reaction) => sum + BigInt(reaction.calculated_voting_weight!),
+        BigInt(0),
+      );
+      const initialCommentWeightSum = commentReactions.reduce(
+        (sum, reaction) => sum + BigInt(reaction.calculated_voting_weight!),
+        BigInt(0),
+      );
+
+      await vi.waitFor(
+        async () => {
+          const updatedThread = await models.Thread.findByPk(thread.id);
+          const updatedComment = await models.Comment.findByPk(comment.id);
+          expect(updatedThread!.reaction_weights_sum).toBe(
+            initialThreadWeightSum.toString(),
+          );
+          expect(updatedComment!.reaction_weights_sum).toBe(
+            initialCommentWeightSum.toString(),
+          );
+        },
+        { timeout: 10_000, interval: 1000 },
+      );
+
+      // Transfer some ETH from first member to reduce their balance
       const transferAmount = _web3.utils.toWei('1', 'ether');
       const transaction = await _web3.eth.sendTransaction({
-        from: _memberActor.address,
+        from: _memberActors[0].address,
         to: ZERO_ADDRESS,
         value: transferAmount,
         gas: 21000,
@@ -229,13 +325,13 @@ describe('Native ETH weighted voting lifecycle', () => {
         { timeout: 10_000, interval: 1000 },
       );
 
-      // Check new balance
-      const newBalance = await _web3.eth.getBalance(_memberActor.address);
+      // Check new balance for first member
+      const newBalance = await _web3.eth.getBalance(_memberActors[0].address);
 
-      // Verify balance decreased
-      expect(BigInt(newBalance)).toBeLessThan(BigInt(initialBalance));
+      // Verify balance decreased for first member
+      expect(BigInt(newBalance)).toBeLessThan(BigInt(initialBalances[0]));
 
-      // Calculate expected new vote weight based on new balance
+      // Calculate expected new vote weight based on new balance for first member
       const expectedNewWeight = calculateVoteWeight(
         newBalance.toString(),
         voteWeightMultiplier,
@@ -250,14 +346,38 @@ describe('Native ETH weighted voting lifecycle', () => {
         actor: _adminActor,
       });
 
-      // Verify that the vote weight was recalculated to exactly match the new balance
+      // Verify that the vote weights were recalculated correctly
       await vi.waitFor(
         async () => {
-          const updatedReaction = await models.Reaction.findByPk(
-            threadReaction.id,
+          const updatedThreadReactions = await Promise.all(
+            threadReactions.map((reaction) =>
+              models.Reaction.findByPk(reaction.id),
+            ),
           );
-          const updatedWeight = updatedReaction!.calculated_voting_weight;
-          expect(updatedWeight).toBe(expectedNewWeight.toString());
+
+          const updatedCommentReactions = await Promise.all(
+            commentReactions.map((reaction) =>
+              models.Reaction.findByPk(reaction.id),
+            ),
+          );
+
+          // First member's weight should be updated to reflect new balance
+          expect(updatedThreadReactions[0]!.calculated_voting_weight).toBe(
+            expectedNewWeight.toString(),
+          );
+          expect(updatedCommentReactions[0]!.calculated_voting_weight).toBe(
+            expectedNewWeight.toString(),
+          );
+
+          // Other members' weights should remain the same
+          for (let i = 1; i < _memberActors.length; i++) {
+            expect(updatedThreadReactions[i]!.calculated_voting_weight).toBe(
+              expectedInitialWeights[i].toString(),
+            );
+            expect(updatedCommentReactions[i]!.calculated_voting_weight).toBe(
+              expectedInitialWeights[i].toString(),
+            );
+          }
         },
         {
           timeout: 10_000,
@@ -265,15 +385,25 @@ describe('Native ETH weighted voting lifecycle', () => {
         },
       );
 
-      // Verify the thread weight sum matches the updated reaction weight exactly
-      const updatedThread = await models.Thread.findByPk(thread.id);
-      const threadWeightSum = updatedThread!.reaction_weights_sum;
-      expect(threadWeightSum).toBe(expectedNewWeight.toString());
+      // Calculate expected weight sums
+      const expectedThreadWeightSum = (
+        BigInt(expectedNewWeight) +
+        BigInt(expectedInitialWeights[1]) +
+        BigInt(expectedInitialWeights[2])
+      ).toString();
+      console.log('expectedThreadWeightSum', expectedThreadWeightSum);
 
-      // Verify the comment weight sum matches the updated reaction weight exactly
+      const expectedCommentWeightSum = expectedThreadWeightSum;
+
+      // Verify the thread weight sum matches the sum of all updated reaction weights
+      const updatedThread = await models.Thread.findByPk(thread.id);
+      expect(updatedThread!.reaction_weights_sum).toBe(expectedThreadWeightSum);
+
+      // Verify the comment weight sum matches the sum of all updated reaction weights
       const updatedComment = await models.Comment.findByPk(comment.id);
-      const commentWeightSum = updatedComment!.reaction_weights_sum;
-      expect(commentWeightSum).toBe(expectedNewWeight.toString());
+      expect(updatedComment!.reaction_weights_sum).toBe(
+        expectedCommentWeightSum,
+      );
     },
     { timeout: 120_000 },
   );
