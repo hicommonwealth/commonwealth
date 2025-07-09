@@ -30,4 +30,19 @@ export * from './policies';
 // Core Services
 export * from './config';
 export * from './services';
-export * from './utils';
+
+// Exported utils (might be leaks)
+export {
+  refreshMemberships,
+  refreshProfileCount,
+} from './utils/denormalizedCountUtils';
+export { generateImage } from './utils/generateImage';
+export { magicLogin } from './utils/magic';
+export { pgMultiRowUpdate } from './utils/pgMultiRowUpdate';
+export {
+  R2_ADAPTER_KEY,
+  buildChainNodeUrl,
+  emitEvent,
+  getSaltedApiKeyHash,
+  uploadIfLarge,
+} from './utils/utils';
