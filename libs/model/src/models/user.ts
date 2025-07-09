@@ -102,7 +102,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       notify_user_name_change: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {
