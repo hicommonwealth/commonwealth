@@ -1,5 +1,4 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { GatedActionEnum } from '@hicommonwealth/shared';
 import Chance from 'chance';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -13,6 +12,7 @@ import {
   GetThreads,
   SearchThreads,
 } from '../../src/aggregates/thread';
+import { models } from '../../src/database';
 import { NonMember, RejectedMember } from '../../src/middleware/errors';
 import { seedCommunity } from '../utils/community-seeder';
 

@@ -7,6 +7,7 @@ import {
   DisabledCommunitySpamTier,
   UserTierMap,
 } from '@hicommonwealth/shared';
+import { models } from '../database';
 import type {
   AddressInstance,
   ChainNodeAttributes,
@@ -17,8 +18,7 @@ import type {
   ThreadInstance,
   TopicAttributes,
   UserInstance,
-} from '../../src';
-import { models } from '../database';
+} from '../models';
 import { getCommentSearchVector, getThreadSearchVector } from '../models';
 
 export type E2E_TestEntities = {

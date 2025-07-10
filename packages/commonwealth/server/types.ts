@@ -2,7 +2,7 @@ import type {
   AddressInstance,
   CommunityInstance,
   UserInstance,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/models';
 import type { Response } from 'express';
 import type { ValidationError } from 'express-validator';
 

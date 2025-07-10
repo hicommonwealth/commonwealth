@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
+import { DB } from '@hicommonwealth/model/models';
 import { Op, Transaction } from 'sequelize';
 
 export const updateTags = async (

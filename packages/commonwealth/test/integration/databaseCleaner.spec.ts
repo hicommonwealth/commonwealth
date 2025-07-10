@@ -2,9 +2,9 @@ import { dispose } from '@hicommonwealth/core';
 import {
   getCommentSearchVector,
   getThreadSearchVector,
-  tester,
   type DB,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/models';
+import * as tester from '@hicommonwealth/model/tester';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { Sequelize } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';

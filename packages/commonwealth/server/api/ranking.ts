@@ -1,6 +1,6 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { CommunityTierMap, UserTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { config } from '../config';
