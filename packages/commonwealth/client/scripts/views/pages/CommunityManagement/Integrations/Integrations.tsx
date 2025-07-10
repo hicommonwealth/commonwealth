@@ -7,6 +7,7 @@ import CustomTOS from './CustomTOS';
 import CustomURL from './CustomURL';
 import Directory from './Directory';
 import Discord from './Discord';
+import MCP from './MCP';
 import './Integrations.scss';
 import OnchainVerification from './OnchainVerification';
 import Snapshots from './Snapshots';
@@ -41,6 +42,7 @@ const Integrations = () => {
         <Stake />
         {isEthereum && <Snapshots />}
         <Tokenization />
+        <MCP />
         <Discord />
         <Webhooks />
         <CustomTOS />
