@@ -20,9 +20,8 @@
       position: sticky;
       top: 0;
       display: flex;
-      gap: 8px;
-      align-items: center;
-      padding: 16px 56px 12px 25px;
+      flex-direction: column;
+      gap: 16px;
 
       @include media_queries.extraSmall {
         gap: 4px;
@@ -41,36 +40,40 @@
         margin-bottom: 16px;
       }
 
-      .upvoted-content {
+      .tab-content {
+        min-height: 300px;
         padding: 16px 0;
-        margin-bottom: 24px;
 
-        .upvoted-content-body {
-          padding: 16px 0 0 18px;
-        }
-      }
-
-      .upvote-totals {
-        display: flex;
-        justify-content: space-evenly;
-
-        .upvotes,
-        .weight {
-          padding: 14px 16px;
+        .upvotes-tab,
+        .holders-tab,
+        .trade-activity-tab {
           display: flex;
-          gap: 10px;
-          justify-content: flex-start;
-          flex-basis: 30%;
+          flex-direction: column;
+          gap: 16px;
+        }
 
-          .Text.caption {
-            color: colors.$neutral-400;
+        .upvote-totals {
+          display: flex;
+          justify-content: space-between;
+          padding: 16px;
+          background-color: var(--bg-light);
+          border-radius: 8px;
+          margin-top: 16px;
+
+          .upvotes,
+          .weight {
+            padding: 14px 16px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+            flex-basis: 30%;
+
+            .Text.caption {
+              color: colors.$neutral-400;
+            }
           }
         }
       }
-    }
-
-    .user-display-name {
-      font-weight: 500;
     }
   }
 }

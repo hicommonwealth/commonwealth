@@ -44,6 +44,7 @@ export const ViewThreadUpvotesDrawer = ({
       tokenDecimals={thread?.topic?.token_decimals}
       topicWeight={thread?.topic?.weighted_voting}
       publishDate={thread.createdAt}
+      launchpadTokenAddress={thread?.launchpadTokenAddress || undefined}
     />
   );
 };
