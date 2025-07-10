@@ -675,16 +675,19 @@ const GroupForm = ({
                   options={topicOptions}
                   /* eslint-disable react/prop-types */
                   components={{
+                    // eslint-disable-next-line react/prop-types
                     Option: ({ data, ...props }) => (
                       <components.Option {...props} data={data}>
                         {data.label}
                       </components.Option>
                     ),
+                    // eslint-disable-next-line react/prop-types
                     SingleValue: ({ data, ...props }) => (
                       <components.SingleValue {...props} data={data}>
                         {data.label}
                       </components.SingleValue>
                     ),
+                    // eslint-disable-next-line react/prop-types
                     MultiValueLabel: ({ data, ...props }) => (
                       <components.MultiValueLabel {...props} data={data}>
                         {data.label}
