@@ -38,6 +38,7 @@ const {
   TWITTER_ENABLED_BOTS,
   EVM_CE_ETH_CHAIN_ID_OVERRIDE,
   RAILWAY_PUBLIC_DOMAIN,
+  RAILWAY_GIT_COMMIT_SHA,
 } = process.env;
 
 const DEFAULTS = {
@@ -150,6 +151,7 @@ export const config = configure(
     },
     RAILWAY: {
       RAILWAY_PUBLIC_DOMAIN,
+      RAILWAY_GIT_COMMIT_SHA,
     },
   },
   z.object({
@@ -271,6 +273,7 @@ export const config = configure(
     }),
     RAILWAY: z.object({
       RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
+      RAILWAY_GIT_COMMIT_SHA: z.string().optional(),
     }),
   }),
 );
