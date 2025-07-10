@@ -50,9 +50,9 @@ export const SignIn = {
       .describe(
         'True when address is newly created, equivalent to joining a community',
       ),
-    first_community: z
+    is_welcome_onboard_flow_complete: z
       .boolean()
-      .describe('True when address joins the first community'),
+      .describe("True when user hasn't completed the welcome onboard flow"),
   }),
   context: AuthContext,
 };

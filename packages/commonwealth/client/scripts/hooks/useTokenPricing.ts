@@ -10,6 +10,7 @@ import {
 import { fetchCachedNodes } from 'state/api/nodes';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { z } from 'zod';
+import useUserStore from '../state/ui/user';
 
 export const useTokenPricing = ({ token }: { token: LaunchpadToken }) => {
   const { data: tokenCommunity } = useGetCommunityByIdQuery({
@@ -18,6 +19,7 @@ export const useTokenPricing = ({ token }: { token: LaunchpadToken }) => {
     includeNodeInfo: true,
   });
 
+  const user = useUserStore();
   const nodes = fetchCachedNodes();
   const communityNode = nodes?.find(
     (n) => n.id === tokenCommunity?.chain_node_id,
@@ -36,7 +38,8 @@ export const useTokenPricing = ({ token }: { token: LaunchpadToken }) => {
   const enabled =
     uniswapPricingEnabled &&
     !!communityNode?.ethChainId &&
-    !!token?.token_address;
+    !!token?.token_address &&
+    user?.isLoggedIn;
 
   // Get MCAP/pricing from uniswap only when token liquidity transferred to uniswap
   const { data: uniswapResponse } = useGetTokenInfoAlchemy({
