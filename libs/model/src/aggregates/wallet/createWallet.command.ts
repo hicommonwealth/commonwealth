@@ -1,7 +1,7 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
-import { commonProtocol } from '../../services';
+import { aaWallet } from '../../services/commonProtocol';
 
 export function CreateWallet(): Command<typeof schemas.CreateWallet> {
   return {
@@ -22,10 +22,8 @@ export function CreateWallet(): Command<typeof schemas.CreateWallet> {
         };
       }
       const { address, signedMessage } = payload;
-      commonProtocol.aaWallet.verifySignature(address, signedMessage);
-      const newAccount = await commonProtocol.aaWallet.newSmartAccount([
-        address,
-      ]);
+      aaWallet.verifySignature(address, signedMessage);
+      const newAccount = await aaWallet.newSmartAccount([address]);
 
       await models.Wallets.create({
         user_id: actor.user.id!,

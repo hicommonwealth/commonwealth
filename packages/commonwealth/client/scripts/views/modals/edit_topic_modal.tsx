@@ -126,8 +126,9 @@ export const EditTopicModal = ({
       });
       if (noRedirect) {
         onModalClose();
-        notifySuccess('Topic updated!');
+        notifySuccess('Settings saved.');
       } else {
+        notifySuccess('Settings saved.');
         navigate(`/discussions/${encodeURI(name.toString().trim())}`);
       }
     } catch (err) {

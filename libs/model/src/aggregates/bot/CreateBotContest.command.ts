@@ -10,17 +10,18 @@ import {
   getTokenAttributes,
   mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
-import { config, publishCast } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
+import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
-import { TokenAttributes } from '../../services';
 import {
   ContestMetadataResponse,
   parseBotCommand,
   ParseBotCommandError,
 } from '../../services/openai/parseBotCommand';
+import type { TokenAttributes } from '../../services/tokenBalanceCache/types';
+import { publishCast } from '../../utils/utils';
 
 const log = logger(import.meta);
 

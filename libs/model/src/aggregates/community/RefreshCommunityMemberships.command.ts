@@ -12,11 +12,11 @@ import { config } from '../../config';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import type { GroupAttributes } from '../../models';
-import {
-  tokenBalanceCache,
-  type Balances,
-  type OptionsWithBalances,
-} from '../../services';
+import { getBalances } from '../../services/tokenBalanceCache';
+import type {
+  Balances,
+  OptionsWithBalances,
+} from '../../services/tokenBalanceCache/types';
 import {
   emitEvent,
   makeGetBalancesOptions,
@@ -259,7 +259,7 @@ export function RefreshCommunityMemberships(): Command<
           getBalancesOptions.map(async (options) => {
             let result: Balances = {};
             try {
-              result = await tokenBalanceCache.getBalances({
+              result = await getBalances({
                 ...options,
                 cacheRefresh: refresh_all || false,
               });

@@ -18,6 +18,7 @@ export const actionCopies = {
     ['XpChainEventCreated']: 'Engage on Blockchain',
     ['LaunchpadTokenRecordCreated']: 'Launch a Token on Common',
     ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
+    ['LaunchpadTokenGraduated']: 'Graduate a Launchpad Token',
     ['ContestEnded']: 'Engage on a Contest till completion',
     ['CommunityGoalReached']: 'Complete the community goal',
     ['RecurringContestManagerDeployed']: 'Create a Recurring Contest',
@@ -40,6 +41,7 @@ export const actionCopies = {
     ['XpChainEventCreated']: () => '',
     ['LaunchpadTokenRecordCreated']: () => '',
     ['LaunchpadTokenTraded']: () => '',
+    ['LaunchpadTokenGraduated']: () => '',
     ['ContestEnded']: '',
     ['CommunityGoalReached']: () => '',
     ['RecurringContestManagerDeployed']: '',
@@ -126,6 +128,7 @@ export const actionCopies = {
       </div>
     ),
     ['LaunchpadTokenRecordCreated']: () => '',
+    ['LaunchpadTokenGraduated']: () => '',
     // eslint-disable-next-line react/no-multi-comp
     ['LaunchpadTokenTraded']: (
       amountMultipler: string | number,
@@ -201,6 +204,7 @@ export const actionCopies = {
     ['MembershipsRefreshed']: '',
     ['XpChainEventCreated']: '',
     ['LaunchpadTokenRecordCreated']: '',
+    ['LaunchpadTokenGraduated']: '',
     ['LaunchpadTokenTraded']: '',
     ['ContestEnded']: '',
     ['CommunityGoalReached']: '',

@@ -1,4 +1,7 @@
-import { CustomCronItem, GraphileTaskNames } from '@hicommonwealth/model';
+import {
+  type CustomCronItem,
+  GraphileTaskNames,
+} from '@hicommonwealth/model/services';
 
 function buildCustomCronItem({
   task,

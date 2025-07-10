@@ -3,7 +3,7 @@ import {
   GraphileTaskNames,
   TaskPayloads,
   awardTweetEngagementXpTask,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/services';
 import { Task } from 'graphile-worker';
 import { ZodType, ZodUndefined, z } from 'zod';
 import { archiveOutboxTask } from './tasks/archiveOutbox';

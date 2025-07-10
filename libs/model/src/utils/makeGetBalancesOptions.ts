@@ -19,7 +19,7 @@ import type {
   GetSPLBalancesOptions,
   GetSuiNativeBalanceOptions,
   GetSuiTokenBalanceOptions,
-} from '../services';
+} from '../services/tokenBalanceCache/types';
 
 export function makeGetBalancesOptions(
   groups: GroupAttributes[],

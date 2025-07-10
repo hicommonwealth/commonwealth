@@ -6,11 +6,12 @@ import Chance from 'chance';
 import dayjs from 'dayjs';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import z from 'zod';
-import { config, emitEvent, equalEvmAddresses } from '../../src';
 import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
 import { CreateLaunchpadTrade, CreateToken } from '../../src/aggregates/token';
 import { GetXps, Xp } from '../../src/aggregates/user';
+import { config } from '../../src/config';
 import { models } from '../../src/database';
+import { emitEvent, equalEvmAddresses } from '../../src/utils/utils';
 import { drainOutbox, seedCommunity } from '../utils';
 
 const chance = new Chance();

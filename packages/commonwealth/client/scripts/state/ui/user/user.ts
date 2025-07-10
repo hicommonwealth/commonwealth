@@ -40,6 +40,7 @@ type CommonProps = {
   xpReferrerPoints: number;
   referredByAddress?: string;
   tier: number;
+  notifyUserNameChange: boolean;
 };
 
 export type UserStoreProps = CommonProps & {
@@ -71,6 +72,7 @@ export const userStore = createStore<UserStoreProps>()(
     xpReferrerPoints: 0,
     referredByAddress: undefined,
     tier: 0,
+    notifyUserNameChange: false,
     // when logged-in, set the auth-user values
     setData: (data) => {
       if (Object.keys(data).length > 0) {

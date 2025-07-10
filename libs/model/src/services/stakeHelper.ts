@@ -6,10 +6,11 @@ import {
   NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
-import { GetBalancesOptions, tokenBalanceCache } from '.';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { contractHelpers } from '../services/commonProtocol';
+import { getBalances } from './tokenBalanceCache';
+import type { GetBalancesOptions } from './tokenBalanceCache/types';
 
 /**
  * Calculates voting weight of address based on the topic in wei
@@ -187,7 +188,7 @@ export async function getWeightedNumTokens(
 
   balanceOptions.cacheRefresh = true;
 
-  const balances = await tokenBalanceCache.getBalances(balanceOptions);
+  const balances = await getBalances(balanceOptions);
 
   const tokenBalance = balances[address];
 
@@ -215,7 +216,7 @@ export async function getWeightedSPLTokens(
     cacheRefresh: true,
   };
 
-  const balances = await tokenBalanceCache.getBalances(balanceOptions);
+  const balances = await getBalances(balanceOptions);
   const tokenBalance = balances[address];
 
   if (BigInt(tokenBalance || 0) <= BigInt(0)) {
@@ -247,7 +248,7 @@ export async function getWeightedSuiNativeTokens(
     cacheRefresh: true,
   };
 
-  const balances = await tokenBalanceCache.getBalances(balanceOptions);
+  const balances = await getBalances(balanceOptions);
   const tokenBalance = balances[address];
 
   if (BigInt(tokenBalance || 0) <= BigInt(0)) {
@@ -281,7 +282,7 @@ export async function getWeightedSuiTokens(
     cacheRefresh: true,
   };
 
-  const balances = await tokenBalanceCache.getBalances(balanceOptions);
+  const balances = await getBalances(balanceOptions);
   const tokenBalance = balances[address];
 
   if (BigInt(tokenBalance || 0) <= BigInt(0)) {

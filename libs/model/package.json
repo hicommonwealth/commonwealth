@@ -33,6 +33,24 @@
         "default": "./build/middleware/index.js"
       }
     },
+    "./services": {
+      "import": {
+        "types": "./build/services/index.d.js",
+        "default": "./build/services/index.js"
+      }
+    },
+    "./tbc": {
+      "import": {
+        "types": "./build/services/tokenBalanceCache/index.d.js",
+        "default": "./build/services/tokenBalanceCache/index.js"
+      }
+    },
+    "./protocol": {
+      "import": {
+        "types": "./build/services/commonProtocol/index.d.js",
+        "default": "./build/services/commonProtocol/index.js"
+      }
+    },
     "./tester": {
       "import": {
         "types": "./build/tester/index.d.js",

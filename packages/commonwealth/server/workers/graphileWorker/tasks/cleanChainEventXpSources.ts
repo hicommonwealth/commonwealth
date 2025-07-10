@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
-import { TaskPayloads } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
+import { TaskPayloads } from '@hicommonwealth/model/services';
 import { QueryTypes } from 'sequelize';
 
 const log = logger(import.meta);

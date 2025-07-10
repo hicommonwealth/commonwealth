@@ -50,10 +50,12 @@ import { saveToClipboard } from 'utils/clipboard';
 import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 // eslint-disable-next-line max-len
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import TokenBanner from 'views/components/TokenBanner';
 import { CWGatedTopicBanner } from 'views/components/component_kit/CWGatedTopicBanner';
+import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   createDeltaFromText,
@@ -85,6 +87,8 @@ const VIEWS = [
 ];
 
 const DiscussionsPage = () => {
+  const privateTopicsEnabled = useFlag('privateTopics');
+
   const [selectedView, setSelectedView] = useState<string>();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -139,12 +143,13 @@ const DiscussionsPage = () => {
 
   const user = useUserStore();
 
-  const { actionGroups, bypassGating } = useTopicGating({
-    communityId: communityId,
-    userAddress: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address && !!communityId,
-    topicId,
-  });
+  const { bypassGating, actionGroups, isPrivateTopic, isAllowedMember } =
+    useTopicGating({
+      communityId: communityId,
+      userAddress: user.activeAccount?.address || '',
+      apiEnabled: !!user.activeAccount?.address && !!communityId,
+      topicId,
+    });
 
   const { data: domain } = useFetchCustomDomainQuery();
 
@@ -378,6 +383,34 @@ const DiscussionsPage = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (privateTopicsEnabled && isPrivateTopic && !isAllowedMember) {
+    return (
+      <StickCommentProvider mode="thread">
+        <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">
+          <DiscussionsFeedDiscovery
+            orderBy={featuredFilter}
+            community={communityId}
+            includePinnedThreads={true}
+          />
+
+          <Breadcrumbs />
+          <UserTrainingSlider />
+          <AdminOnboardingSlider />
+
+          {canShowGatingBanner && (
+            <CWGatedTopicBanner
+              actions={Object.values(GatedActionEnum)}
+              actionGroups={actionGroups}
+              bypassGating={bypassGating}
+              onClose={() => setCanShowGatingBanner(false)}
+            />
+          )}
+          <CWBanner type="info" body="This topic is private." />
+        </CWPageLayout>
+      </StickCommentProvider>
+    );
+  }
 
   return (
     <StickCommentProvider mode="thread">

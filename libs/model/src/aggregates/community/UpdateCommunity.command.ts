@@ -9,7 +9,8 @@ import { z } from 'zod';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
-import { checkSnapshotObjectExists, commonProtocol } from '../../services';
+import { checkSnapshotObjectExists } from '../../services';
+import { newNamespaceValidator } from '../../services/commonProtocol';
 import { emitEvent } from '../../utils/utils';
 
 export const UpdateCommunityErrors = {
@@ -98,7 +99,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
 
         community.namespace = namespace;
         community.namespace_address =
-          await commonProtocol.newNamespaceValidator.validateNamespace(
+          await newNamespaceValidator.validateNamespace(
             namespace!,
             transactionHash,
             actor.address!,

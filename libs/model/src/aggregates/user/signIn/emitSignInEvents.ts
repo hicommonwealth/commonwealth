@@ -5,7 +5,7 @@ import { Op, Transaction } from 'sequelize';
 import { models } from '../../../database';
 import { AddressAttributes } from '../../../models/address';
 import { UserAttributes } from '../../../models/user';
-import { tokenBalanceCache } from '../../../services';
+import { getBalances } from '../../../services/tokenBalanceCache';
 import { emitEvent } from '../../../utils/utils';
 
 const log = logger(import.meta);
@@ -56,7 +56,7 @@ export async function emitSignInEvents({
     if (!existingWallet) {
       // getBalances try-catch logs and returns empty balances on failures
       const balances = ethChainId
-        ? await tokenBalanceCache.getBalances({
+        ? await getBalances({
             addresses: [address],
             balanceSourceType: BalanceSourceType.ETHNative,
             sourceOptions: { evmChainId: ethChainId },

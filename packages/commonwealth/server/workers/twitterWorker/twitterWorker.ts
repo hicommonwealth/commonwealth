@@ -4,15 +4,14 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { composeSequelizeLogger, logger, stats } from '@hicommonwealth/core';
+import { emitEvent, pgMultiRowUpdate } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import {
-  emitEvent,
   getMentions,
   getTweets,
-  pgMultiRowUpdate,
-  TwitterBotConfig,
+  type TwitterBotConfig,
   TwitterBotConfigs,
-} from '@hicommonwealth/model';
-import { models } from '@hicommonwealth/model/db';
+} from '@hicommonwealth/model/services';
 import { EventPair } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { fileURLToPath } from 'url';

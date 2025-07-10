@@ -231,7 +231,11 @@ const EditProfile = () => {
           }
         })
         .catch((err) => {
-          notifyError(err?.response?.data?.error || 'Something went wrong.');
+          notifyError(
+            err?.response?.data?.error ||
+              err.message ||
+              'Something went wrong.',
+          );
         });
     };
 

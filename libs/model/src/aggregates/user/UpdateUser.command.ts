@@ -1,6 +1,7 @@
-import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { Op } from 'sequelize';
 import { models } from '../../database';
 import { authVerified } from '../../middleware/auth';
 import { mustExist } from '../../middleware/guards';
@@ -47,9 +48,15 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
         user.promotional_emails_enabled ??
         false;
 
+      const notify_user_name_change =
+        payload.notify_user_name_change ??
+        user.notify_user_name_change ??
+        false;
+
       const user_delta = getDelta(user, {
         is_welcome_onboard_flow_complete,
         promotional_emails_enabled,
+        notify_user_name_change,
         profile: {
           email,
           slug,
@@ -95,6 +102,17 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
               };
               if (updates.profile.bio === '') {
                 updates.profile.bio = null;
+              }
+              const existingUsername = await models.User.findOne({
+                where: {
+                  id: { [Op.ne]: id },
+                  profile: {
+                    name: updates?.profile?.name,
+                  },
+                },
+              });
+              if (existingUsername) {
+                throw new InvalidState('Username already exists');
               }
               const [, rows] = await models.User.update(updates, {
                 where: { id: user.id },

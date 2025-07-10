@@ -96,6 +96,7 @@ export const GetStatus = {
       communities: z.array(UserStatusCommunityView),
       jwt: z.string(),
       knockJwtToken: z.string().optional(),
+      notify_user_name_change: z.boolean().default(false),
     })
     .optional(),
 };

@@ -35,6 +35,7 @@ export const QuestEvents = {
   ContestEnded: events.ContestEnded,
   LaunchpadTokenRecordCreated: events.LaunchpadTokenRecordCreated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
+  LaunchpadTokenGraduated: events.LaunchpadTokenGraduated,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
   NamespaceLinked: events.NamespaceLinked,

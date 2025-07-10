@@ -1,5 +1,6 @@
-import { Requirement } from '@hicommonwealth/model';
+import { Requirement } from '@hicommonwealth/schemas';
 import Ajv from 'ajv';
+import { z } from 'zod';
 import requirementsSchema from './requirementsSchema_v1';
 
 const Errors = {
@@ -14,7 +15,7 @@ const ajv = new Ajv();
  * @returns Error if invalid, otherwise null
  */
 export default function validateRequirements(
-  requirements: Requirement[],
+  requirements: z.infer<typeof Requirement>[],
 ): Error | null {
   const validate = ajv.compile(requirementsSchema);
   const isValid = validate(requirements);
