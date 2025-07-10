@@ -673,23 +673,25 @@ const GroupForm = ({
                   label="Topics"
                   placeholder="Type in topic name"
                   options={topicOptions}
+                  /* eslint-disable react/prop-types */
                   components={{
-                    Option: (props) => (
-                      <components.Option {...props}>
-                        {props.data.label}
+                    Option: ({ data, ...props }) => (
+                      <components.Option {...props} data={data}>
+                        {data.label}
                       </components.Option>
                     ),
-                    SingleValue: (props) => (
-                      <components.SingleValue {...props}>
-                        {props.data.label}
+                    SingleValue: ({ data, ...props }) => (
+                      <components.SingleValue {...props} data={data}>
+                        {data.label}
                       </components.SingleValue>
                     ),
-                    MultiValueLabel: (props) => (
-                      <components.MultiValueLabel {...props}>
-                        {props.data.label}
+                    MultiValueLabel: ({ data, ...props }) => (
+                      <components.MultiValueLabel {...props} data={data}>
+                        {data.label}
                       </components.MultiValueLabel>
                     ),
                   }}
+                  /* eslint-enable react/prop-types */
                 />
               </section>
 
