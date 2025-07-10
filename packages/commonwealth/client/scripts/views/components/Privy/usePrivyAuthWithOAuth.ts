@@ -97,7 +97,7 @@ export function usePrivyAuthWithOAuth(props: PrivyCallbacks) {
 
   const { loading, initOAuth } = useLoginWithOAuth({
     onComplete: (params) => {
-      handleOAuthComplete(params).catch(onError);
+      void handleOAuthComplete(params).catch(onError);
     },
   });
 
