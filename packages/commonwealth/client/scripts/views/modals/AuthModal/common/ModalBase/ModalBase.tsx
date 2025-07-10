@@ -405,9 +405,9 @@ const ModalBase = ({
               onOtherMethodsSignIn={() =>
                 setShowCrecimientoHackathonModal(false)
               }
-              onTwitterSignIn={() =>
-                onAuthMethodSelect('x').catch(console.error)
-              }
+              onTwitterSignIn={() => {
+                onAuthMethodSelect('x').catch(console.error);
+              }}
             />
           ) : (
             (showAuthOptionTypesFor || [])?.length > 0 && (
