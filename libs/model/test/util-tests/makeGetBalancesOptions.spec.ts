@@ -1,7 +1,7 @@
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { describe, expect, test } from 'vitest';
 import { AddressAttributes, GroupAttributes } from '../../src/models';
-import { GetBalancesOptions } from '../../src/services';
+import type { GetBalancesOptions } from '../../src/services/tokenBalanceCache/types';
 import { makeGetBalancesOptions } from '../../src/utils';
 
 describe('makeGetBalancesOptions', () => {

@@ -11,8 +11,8 @@ import {
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
-import { tokenBalanceCache } from '@hicommonwealth/model';
 import { CommunityAttributes, DB } from '@hicommonwealth/model/models';
+import { getBalances, getTendermintClient } from '@hicommonwealth/model/tbc';
 import * as tester from '@hicommonwealth/model/tester';
 import {
   BalanceSourceType,
@@ -144,7 +144,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
 
   describe('Cosmos Native', function () {
     test('should return a single balance', async () => {
-      const balance = await tokenBalanceCache.getBalances({
+      const balance = await getBalances({
         balanceSourceType: BalanceSourceType.CosmosNative,
         addresses: [addressOne],
         sourceOptions: {
@@ -159,7 +159,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
     });
 
     test('should not throw if a single address fails', async () => {
-      const balance = await tokenBalanceCache.getBalances({
+      const balance = await getBalances({
         balanceSourceType: BalanceSourceType.CosmosNative,
         addresses: [addressOne, discobotAddress],
         sourceOptions: {
@@ -173,7 +173,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
     });
 
     test('should only return a single result per address', async () => {
-      const balances = await tokenBalanceCache.getBalances({
+      const balances = await getBalances({
         balanceSourceType: BalanceSourceType.CosmosNative,
         addresses: [addressOne, addressOne],
         sourceOptions: {
@@ -187,7 +187,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
     });
 
     test('should return many balances', async () => {
-      const balances = await tokenBalanceCache.getBalances({
+      const balances = await getBalances({
         balanceSourceType: BalanceSourceType.CosmosNative,
         addresses: [addressOne, addressTwo],
         sourceOptions: {
@@ -205,7 +205,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
       const bulkAddresses = await generateCosmosAddresses(20);
       bulkAddresses.splice(4, 0, addressOne);
       bulkAddresses.splice(5, 0, addressTwo);
-      const balances = await tokenBalanceCache.getBalances({
+      const balances = await getBalances({
         balanceSourceType: BalanceSourceType.CosmosNative,
         addresses: bulkAddresses,
         sourceOptions: {
@@ -248,7 +248,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
           const { amount } = await api.bank.balance(addressOne, denom!);
           const originalAddressOneBalance = amount;
 
-          const balance = await tokenBalanceCache.getBalances(
+          const balance = await getBalances(
             {
               balanceSourceType: BalanceSourceType.CosmosNative,
               addresses: [addressOne],
@@ -275,7 +275,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
             gas: '200000',
           });
 
-          const balanceTwo = await tokenBalanceCache.getBalances(
+          const balanceTwo = await getBalances(
             {
               balanceSourceType: BalanceSourceType.CosmosNative,
               addresses: [addressOne],
@@ -289,7 +289,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
           expect(balanceTwo[addressOne]).to.equal(originalAddressOneBalance);
           await delay(20000);
 
-          const balanceThree = await tokenBalanceCache.getBalances(
+          const balanceThree = await getBalances(
             {
               balanceSourceType: BalanceSourceType.CosmosNative,
               addresses: [addressOne],
@@ -318,7 +318,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
       'stars183uw93940vj49tmpzez09c03w6qn6cgmy03v9srh8n2ntmt9lh3qzn2lac'; // slime world
 
     test('should return a single cw721 balance', async () => {
-      const balance = await tokenBalanceCache.getBalances({
+      const balance = await getBalances({
         balanceSourceType: BalanceSourceType.CW721,
         addresses: [addressWithNft],
         sourceOptions: {
@@ -333,7 +333,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
     });
 
     test('should return many cw721 balances', async () => {
-      const balances = await tokenBalanceCache.getBalances({
+      const balances = await getBalances({
         balanceSourceType: BalanceSourceType.CW721,
         addresses: [addressWithNft, addressWithoutNft],
         sourceOptions: {
@@ -349,7 +349,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
     });
 
     test('should not throw if a single address fails', async () => {
-      const balance = await tokenBalanceCache.getBalances({
+      const balance = await getBalances({
         balanceSourceType: BalanceSourceType.CW721,
         addresses: [discobotAddress],
         sourceOptions: {
@@ -363,7 +363,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
     });
 
     test('should not throw if a single address out of many fails', async () => {
-      const balance = await tokenBalanceCache.getBalances({
+      const balance = await getBalances({
         balanceSourceType: BalanceSourceType.CW721,
         addresses: [addressWithNft, discobotAddress],
         sourceOptions: {
@@ -381,7 +381,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
       const bulkAddresses = await generateCosmosAddresses(20);
       bulkAddresses.splice(4, 0, addressWithNft);
       bulkAddresses.splice(5, 0, addressWithoutNft);
-      const balances = await tokenBalanceCache.getBalances({
+      const balances = await getBalances({
         balanceSourceType: BalanceSourceType.CW721,
         addresses: bulkAddresses,
         sourceOptions: {
@@ -412,7 +412,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
               cosmos_chain_id: stargazeChainId,
             },
           });
-          const tmClient = await tokenBalanceCache.getTendermintClient({
+          const tmClient = await getTendermintClient({
             chainNode: chainNode!,
           });
           const api = QueryClient.withExtensions(tmClient, setupWasmExtension);
@@ -430,7 +430,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
           );
           const expectedAddressOneBalance = response.tokens.length.toString();
 
-          const balance = await tokenBalanceCache.getBalances(
+          const balance = await getBalances(
             {
               balanceSourceType: BalanceSourceType.CW721,
               addresses: [addressWithNft],
@@ -448,7 +448,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
 
           await delay(20000);
 
-          const balanceAfterTTL = await tokenBalanceCache.getBalances(
+          const balanceAfterTTL = await getBalances(
             {
               balanceSourceType: BalanceSourceType.CW721,
               addresses: [addressWithNft],
@@ -478,7 +478,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
     const contractAddress = contractAddressWYND;
 
     test('should return a single cw20 balance', async () => {
-      const balance = await tokenBalanceCache.getBalances({
+      const balance = await getBalances({
         balanceSourceType: BalanceSourceType.CW20,
         addresses: [addressWithToken],
         sourceOptions: {
@@ -493,7 +493,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
     });
 
     test('should return many cw20 balances', async () => {
-      const balances = await tokenBalanceCache.getBalances({
+      const balances = await getBalances({
         balanceSourceType: BalanceSourceType.CW20,
         addresses: [addressWithToken, addressWithoutToken],
         sourceOptions: {
@@ -509,7 +509,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
     });
 
     test('should not throw if a single address fails', async () => {
-      const balance = await tokenBalanceCache.getBalances({
+      const balance = await getBalances({
         balanceSourceType: BalanceSourceType.CW20,
         addresses: [discobotAddress],
         sourceOptions: {
@@ -523,7 +523,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
     });
 
     test('should not throw if a single address out of many fails', async () => {
-      const balance = await tokenBalanceCache.getBalances({
+      const balance = await getBalances({
         balanceSourceType: BalanceSourceType.CW20,
         addresses: [addressWithToken, discobotAddress],
         sourceOptions: {
@@ -541,7 +541,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
       const bulkAddresses = await generateCosmosAddresses(20);
       bulkAddresses.splice(4, 0, addressWithToken);
       bulkAddresses.splice(5, 0, addressWithoutToken);
-      const balances = await tokenBalanceCache.getBalances({
+      const balances = await getBalances({
         balanceSourceType: BalanceSourceType.CW20,
         addresses: bulkAddresses,
         sourceOptions: {
@@ -572,7 +572,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
               cosmos_chain_id: junoChainId,
             },
           });
-          const tmClient = await tokenBalanceCache.getTendermintClient({
+          const tmClient = await getTendermintClient({
             chainNode: chainNode!,
           });
           const api = QueryClient.withExtensions(tmClient, setupWasmExtension);
@@ -588,7 +588,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
           );
           const expectedAddressOneBalance = response.balance.toString();
 
-          const balance = await tokenBalanceCache.getBalances(
+          const balance = await getBalances(
             {
               balanceSourceType: BalanceSourceType.CW20,
               addresses: [addressWithToken],
@@ -606,7 +606,7 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
 
           await delay(20000);
 
-          const balanceAfterTTL = await tokenBalanceCache.getBalances(
+          const balanceAfterTTL = await getBalances(
             {
               balanceSourceType: BalanceSourceType.CW20,
               addresses: [addressWithToken],

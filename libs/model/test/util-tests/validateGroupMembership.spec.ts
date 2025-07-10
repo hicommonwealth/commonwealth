@@ -1,6 +1,6 @@
 import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
 import { describe, expect, test } from 'vitest';
-import { OptionsWithBalances } from '../../src/services';
+import type { OptionsWithBalances } from '../../src/services/tokenBalanceCache/types';
 import { Requirement, validateGroupMembership } from '../../src/utils';
 
 type MockRequirementOptions = {

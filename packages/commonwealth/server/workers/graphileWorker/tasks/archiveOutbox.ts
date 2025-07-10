@@ -1,5 +1,6 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
-import { TaskPayloads, config } from '@hicommonwealth/model';
+import { config } from '@hicommonwealth/model';
+import { TaskPayloads } from '@hicommonwealth/model/services';
 import { execSync } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
 import { QueryTypes } from 'sequelize';

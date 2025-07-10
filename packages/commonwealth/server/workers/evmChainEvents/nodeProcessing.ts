@@ -1,6 +1,7 @@
 import { logger, stats } from '@hicommonwealth/core';
-import { EvmChainSource, emitEvent } from '@hicommonwealth/model';
+import { emitEvent } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
+import type { EvmChainSource } from '@hicommonwealth/model/services';
 import { EventPairs } from '@hicommonwealth/schemas';
 import { serializeBigIntObj } from '@hicommonwealth/shared';
 import { createPublicClient, http } from 'viem';
