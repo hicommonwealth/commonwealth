@@ -74,6 +74,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'RecurringContestManagerDeployed',
       'LaunchpadTokenRecordCreated',
       'LaunchpadTokenTraded',
+      'LaunchpadTokenGraduated',
       'ContestEnded',
       'CommunityGoalReached',
     ] as QuestAction[],
