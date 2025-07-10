@@ -1,8 +1,8 @@
 import { InvalidState, logger, type Command } from '@hicommonwealth/core';
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { alchemyGetTokenPrices } from '@hicommonwealth/shared';
+import { config } from '../../config';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
