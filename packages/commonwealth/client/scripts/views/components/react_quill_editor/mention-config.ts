@@ -16,6 +16,7 @@ export enum MentionEntityType {
   THREAD = 'thread',
   COMMUNITY = 'community',
   PROPOSAL = 'proposal',
+  MCP_SERVER = 'mcp_server',
 }
 
 export const MENTION_DENOTATION_CHARS = {
@@ -23,6 +24,7 @@ export const MENTION_DENOTATION_CHARS = {
   '#': MentionEntityType.TOPIC,
   '!': MentionEntityType.THREAD,
   '~': MentionEntityType.COMMUNITY,
+  '/': 'mcp',
 } as const;
 
 export const ENTITY_TYPE_INDICATORS = {
@@ -84,6 +86,12 @@ export const DENOTATION_SEARCH_CONFIG = {
     communityScoped: false,
     description: 'Search all communities',
   },
+  '/': {
+    scopes: [],
+    communityScoped: false,
+    description: 'Search MCP servers',
+    isMcpServer: true,
+  },
 } as const;
 
 // Type alias for search results from SearchEntities query
@@ -110,6 +118,8 @@ export const formatEntityDisplayName = (
       return result.name || 'Unknown Community';
     case MentionEntityType.PROPOSAL:
       return result.name || 'Unknown Proposal';
+    case MentionEntityType.MCP_SERVER:
+      return result.name || 'Unknown Server';
     default:
       return 'Unknown Entity';
   }

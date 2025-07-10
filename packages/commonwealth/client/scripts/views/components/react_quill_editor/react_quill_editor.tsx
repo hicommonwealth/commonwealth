@@ -18,6 +18,8 @@ import { useImageUploader } from './use_image_uploader';
 import { useMarkdownShortcuts } from './use_markdown_shortcuts';
 import { useMention } from './use_mention';
 import { RTFtoMD, SerializableDeltaStatic, getTextFromDelta } from './utils';
+import { MCPServer } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 
 import { useQuillPasteText } from './useQuillPasteText';
 
@@ -57,6 +59,8 @@ type ReactQuillEditorProps = {
   fromManageTopic?: boolean;
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
   justClosed?: (isOpen: boolean) => void;
+  mcpServers?: Array<z.infer<typeof MCPServer>>;
+  onMcpServerSelect?: (server: z.infer<typeof MCPServer>) => void;
 } & ReactQuillEditorFormValidationProps;
 
 const TABS = [
@@ -81,6 +85,8 @@ const ReactQuillEditor = ({
   fromManageTopic = false,
   onKeyDown,
   justClosed,
+  mcpServers = [],
+  onMcpServerSelect,
 }: ReactQuillEditorProps) => {
   const toolbarId = useMemo(() => {
     return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
@@ -130,6 +136,8 @@ const ReactQuillEditor = ({
     editorRef,
     lastSelectionRef,
     justClosed,
+    mcpServers,
+    onMcpServerSelect,
   });
 
   // handle image upload for drag and drop

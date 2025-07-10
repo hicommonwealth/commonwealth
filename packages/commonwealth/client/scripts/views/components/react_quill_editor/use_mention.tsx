@@ -8,6 +8,8 @@ import { UserTierMap } from '@hicommonwealth/shared';
 import app from 'client/scripts/state';
 import _ from 'lodash';
 import { trpc } from 'utils/trpcClient';
+import { MCPServer } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 import {
   DENOTATION_SEARCH_CONFIG,
   ENTITY_TYPE_INDICATORS,
@@ -28,12 +30,16 @@ type UseMentionProps = {
   editorRef: MutableRefObject<ReactQuill>;
   lastSelectionRef: MutableRefObject<RangeStatic | null>;
   justClosed?: (isOpen: boolean) => void;
+  mcpServers?: Array<z.infer<typeof MCPServer>>;
+  onMcpServerSelect?: (server: z.infer<typeof MCPServer>) => void;
 };
 
 export const useMention = ({
   editorRef,
   lastSelectionRef,
   justClosed,
+  mcpServers = [],
+  onMcpServerSelect,
 }: UseMentionProps) => {
   const utils = trpc.useUtils();
 
@@ -78,6 +84,23 @@ export const useMention = ({
       const entityId = getEntityId(entityType, item);
       const entityName = formatEntityDisplayName(entityType, item);
 
+      if (entityType === 'mcp_server') {
+        const server = mcpServers.find((s) => `${s.id}` === `${item.id}`);
+        onMcpServerSelect?.(
+          server || {
+            id: Number(item.id),
+            name: item.name,
+            description: '',
+            handle: (item as any).handle,
+            server_url: (item as any).server_url,
+          },
+        );
+        const delta = new Delta().retain(beforeText.length).delete(mentionLength);
+        editor.updateContents(delta);
+        editor.setSelection(beforeText.length, 0);
+        return;
+      }
+
       const mentionText = MENTION_LINK_FORMATS[entityType](
         entityName,
         entityId,
@@ -98,7 +121,7 @@ export const useMention = ({
         0,
       );
     },
-    [editorRef, lastSelectionRef],
+    [editorRef, lastSelectionRef, mcpServers, onMcpServerSelect],
   );
 
   const createEntityMentionItem = useCallback(
@@ -360,9 +383,38 @@ export const useMention = ({
     };
   };
 
+  const createMcpServerMentionItem = (server: z.infer<typeof MCPServer>) => {
+    const node = document.createElement('div');
+    node.className = 'mention-item';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.innerText = server.name;
+    nameSpan.className = 'ql-mention-name';
+
+    const descSpan = document.createElement('span');
+    descSpan.innerText = server.description;
+    descSpan.className = 'ql-mention-desc';
+
+    const textWrap = document.createElement('div');
+    textWrap.className = 'ql-mention-text-wrap';
+    textWrap.appendChild(nameSpan);
+    textWrap.appendChild(descSpan);
+    node.appendChild(textWrap);
+
+    return {
+      link: '#',
+      name: server.name,
+      component: node.outerHTML,
+      type: 'mcp_server',
+      id: server.id,
+      server_url: server.server_url,
+      handle: server.handle,
+    } as unknown as QuillMention;
+  };
+
   const mention = useMemo(() => {
     return {
-      allowedChars: /^[A-Za-z0-9\sÅÄÖåäö\-_.]*$/,
+      allowedChars: /^[A-Za-z0-9\sÅÄÖåäö\-_.\/]*$/,
       mentionDenotationChars: Object.keys(MENTION_DENOTATION_CHARS),
       dataAttributes: [
         'name',
@@ -370,6 +422,8 @@ export const useMention = ({
         'component',
         'type',
         'id',
+        'server_url',
+        'handle',
         'user_id',
         'topic_id',
         'thread_id',
@@ -407,7 +461,7 @@ export const useMention = ({
             if (searchTerm.length < MENTION_CONFIG.MIN_SEARCH_LENGTH) {
               const node = document.createElement('div');
               node.className = 'mention-empty-state';
-              node.innerText = `Type at least ${MENTION_CONFIG.MIN_SEARCH_LENGTH} characters to 
+              node.innerText = `Type at least ${MENTION_CONFIG.MIN_SEARCH_LENGTH} characters to
               ${mentionSearchConfig.description.toLowerCase()}`;
               renderList(
                 [
@@ -419,6 +473,34 @@ export const useMention = ({
                 ],
                 searchTerm,
               );
+              return;
+            }
+
+            if (mentionSearchConfig.isMcpServer) {
+              const results = mcpServers.filter((s) =>
+                `${s.name} ${s.handle}`.toLowerCase().includes(searchTerm.toLowerCase()),
+              );
+              if (results.length === 0) {
+                const node = document.createElement('div');
+                node.className = 'mention-empty-state';
+                node.innerText = `No results found for "${searchTerm}".`;
+                renderList(
+                  [
+                    {
+                      link: '#',
+                      name: '',
+                      component: node.outerHTML,
+                    },
+                  ],
+                  searchTerm,
+                );
+                return;
+              }
+
+              const formattedMatches = results
+                .slice(0, MENTION_CONFIG.MAX_SEARCH_RESULTS)
+                .map((server) => createMcpServerMentionItem(server));
+              renderList(formattedMatches, searchTerm);
               return;
             }
 
@@ -473,7 +555,7 @@ export const useMention = ({
       ),
       isolateChar: true,
     };
-  }, [selectMention, createEntityMentionItem, justClosed]);
+  }, [selectMention, createEntityMentionItem, justClosed, mcpServers, onMcpServerSelect]);
 
   return { mention };
 };
