@@ -1,6 +1,5 @@
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { MagnifyingGlass } from '@phosphor-icons/react';
-import { formatAddressShort } from 'helpers';
 import { APIOrderDirection } from 'helpers/constants';
 import useTopicGating from 'hooks/useTopicGating';
 import React, { useMemo, useState } from 'react';
@@ -155,6 +154,9 @@ const Allowlist = ({
           }),
         stakeBalance: p.addresses[0].stake_balance,
         address: p.addresses[0].address,
+        uniqueAddresses: Array.from(
+          new Set((p?.addresses || [])?.map((a) => a?.address)),
+        ),
       })) as Member[]) || []
     );
   }, [groups, members?.results]);
@@ -167,20 +169,6 @@ const Allowlist = ({
     } else {
       setAllowedAddresses((prevItems) => [...prevItems, address]);
     }
-  };
-
-  const extraColumns = (member: Member) => {
-    return {
-      address: {
-        sortValue: member.address,
-        customElement: (
-          <div className="table-cell">
-            {/*@ts-expect-error StrictNullChecks*/}
-            {formatAddressShort(member.address, 5, 6)}
-          </div>
-        ),
-      },
-    };
   };
 
   return (
@@ -245,7 +233,6 @@ const Allowlist = ({
             filteredMembers={formattedMembers}
             isLoadingMoreMembers={isLoadingMembers}
             tableState={tableState}
-            extraColumns={extraColumns}
             selectedAccounts={allowedAddresses}
             handleCheckboxChange={handleCheckboxChange}
           />
