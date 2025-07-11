@@ -10,6 +10,7 @@ type UseGetCommunityByIdProps = {
   id: string;
   includeNodeInfo?: boolean;
   includeGroups?: boolean;
+  includeMcpServers?: boolean;
   enabled?: boolean;
 };
 
@@ -87,11 +88,13 @@ export const invalidateAllQueriesForCommunity = async (communityId: string) => {
 export const getCommunityByIdQuery = async (
   communityId: string,
   includeNodeInfo = false,
+  includeMcpServers = false,
 ) => {
   return await trpcQueryUtils.community.getCommunity.fetch(
     {
       id: communityId,
       include_node_info: includeNodeInfo,
+      include_mcp_servers: includeMcpServers,
     },
     {
       staleTime: COMMUNITIY_STALE_TIME,
@@ -103,6 +106,7 @@ const useGetCommunityByIdQuery = ({
   id,
   includeNodeInfo = false,
   includeGroups = false,
+  includeMcpServers = false,
   enabled,
 }: UseGetCommunityByIdProps) => {
   return trpc.community.getCommunity.useQuery(
@@ -110,6 +114,7 @@ const useGetCommunityByIdQuery = ({
       id,
       include_node_info: includeNodeInfo,
       include_groups: includeGroups,
+      include_mcp_servers: includeMcpServers,
     },
     {
       staleTime: COMMUNITIY_STALE_TIME,
