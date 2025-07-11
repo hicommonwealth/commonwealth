@@ -31,6 +31,7 @@ export * from './LinkNamespace.command';
 export * from './PinToken.command';
 export * from './RefreshCommunityMemberships.command';
 export * from './RefreshCustomDomain.query';
+export * from './RefreshWeightedVotes.command';
 export * from './SearchCommunities.query';
 export * from './SelectCommunity.command';
 export * from './SetAddressWallet.command';

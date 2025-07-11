@@ -3,7 +3,10 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import type { Topic } from 'models/Topic';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import { useFetchTopicsQuery } from 'state/api/topics';
+import {
+  useFetchTopicsQuery,
+  useRefreshWeightedVotesMutation,
+} from 'state/api/topics';
 import {
   updateFeaturedTopicsOrderPayload,
   useUpdateFeaturedTopicsOrderMutation,
@@ -17,6 +20,11 @@ import DraggableTopicsList from 'views/modals/order_topics_modal/draggable_topic
 import './ManageTopicsSection.scss';
 
 export const ManageTopicsSection = () => {
+  const hasWeightedVoting = (topic: Topic): boolean => {
+    console.log('topic', topic);
+    return !!topic.weighted_voting;
+  };
+
   const getFeaturedTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
       .filter((topic) => topic.featured_in_sidebar && !topic.archived_at)
@@ -86,6 +94,9 @@ export const ManageTopicsSection = () => {
   const { mutateAsync: updateFeaturedTopicsOrder } =
     useUpdateFeaturedTopicsOrderMutation();
 
+  const { mutateAsync: refreshWeightedVotes, isPending: isRefreshingVotes } =
+    useRefreshWeightedVotesMutation();
+
   const [featuredTopics, setFeaturedTopics] = useState<Topic[]>(() =>
     // @ts-expect-error <StrictNullChecks/>
     getFeaturedTopics(rawTopics),
@@ -107,6 +118,11 @@ export const ManageTopicsSection = () => {
   // @ts-expect-error <StrictNullChecks/>
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
 
+  // Track which topic is being recalculated
+  const [recalculatingTopicId, setRecalculatingTopicId] = useState<
+    number | null
+  >(null);
+
   const handleSave = async () => {
     try {
       await updateFeaturedTopicsOrder(
@@ -120,6 +136,22 @@ export const ManageTopicsSection = () => {
 
   const handleReversion = () => {
     setFeaturedTopics(initialFeaturedTopics);
+  };
+
+  const handleRecalculateVotes = async (topic: Topic) => {
+    if (!topic.id) return;
+
+    setRecalculatingTopicId(topic.id);
+    try {
+      await refreshWeightedVotes({
+        topic_id: topic.id,
+        community_id: communityId,
+      });
+    } catch (err) {
+      console.error('Failed to recalculate votes:', err);
+    } finally {
+      setRecalculatingTopicId(null);
+    }
   };
 
   useEffect(() => {
@@ -167,14 +199,32 @@ export const ManageTopicsSection = () => {
                 <div key={index} className="topic-row">
                   <CWText>
                     {regTopic.name}
-                    <CWIconButton
-                      iconName="pencil"
-                      buttonSize="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTopicSelectedToEdit(regTopic);
-                      }}
-                    />
+                    <div className="topic-actions">
+                      <CWIconButton
+                        iconName="pencil"
+                        buttonSize="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setTopicSelectedToEdit(regTopic);
+                        }}
+                      />
+                      {hasWeightedVoting(regTopic) && (
+                        <CWButton
+                          label="Recalculate Votes"
+                          buttonType="secondary"
+                          buttonHeight="sm"
+                          buttonWidth="narrow"
+                          disabled={
+                            recalculatingTopicId === regTopic.id ||
+                            isRefreshingVotes
+                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRecalculateVotes(regTopic);
+                          }}
+                        />
+                      )}
+                    </div>
                   </CWText>
                 </div>
               ))
@@ -198,14 +248,32 @@ export const ManageTopicsSection = () => {
                 <div key={index} className="topic-row">
                   <CWText>
                     {regTopic.name}
-                    <CWIconButton
-                      iconName="pencil"
-                      buttonSize="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTopicSelectedToEdit(regTopic);
-                      }}
-                    />
+                    <div className="topic-actions">
+                      <CWIconButton
+                        iconName="pencil"
+                        buttonSize="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setTopicSelectedToEdit(regTopic);
+                        }}
+                      />
+                      {hasWeightedVoting(regTopic) && (
+                        <CWButton
+                          label="Recalculate Votes"
+                          buttonType="secondary"
+                          buttonHeight="sm"
+                          buttonWidth="narrow"
+                          disabled={
+                            recalculatingTopicId === regTopic.id ||
+                            isRefreshingVotes
+                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRecalculateVotes(regTopic);
+                          }}
+                        />
+                      )}
+                    </div>
                   </CWText>
                 </div>
               ))
