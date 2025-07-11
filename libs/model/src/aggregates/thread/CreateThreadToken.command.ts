@@ -1,7 +1,15 @@
+import { TokenLaunchpadAbi } from '@commonxyz/common-protocol-abis';
 import { type Command } from '@hicommonwealth/core';
 import * as protocols from '@hicommonwealth/evm-protocols';
-import { getTransaction, withRetries } from '@hicommonwealth/evm-protocols';
+import { withRetries } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
+import {
+  createPublicClient,
+  decodeEventLog,
+  getEventSelector,
+  Hash,
+  http,
+} from 'viem';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authRoles, mustExist } from '../../middleware';
@@ -19,12 +27,45 @@ export function CreateToken(): Command<typeof schemas.CreateThreadToken> {
       });
       mustExist('ChainNode', chainNode);
 
-      const tx = await withRetries(async () => {
-        const { tx: innerTx } = await getTransaction({
-          rpc: chainNode.private_url! || chainNode.url!,
-          txHash: transaction_hash,
-        });
-        return innerTx;
+      const rpc = chainNode.private_url! || chainNode.url!;
+      const client = createPublicClient({
+        transport: http(rpc),
+      });
+
+      const receipt = await withRetries(() =>
+        client.getTransactionReceipt({
+          hash: transaction_hash as Hash,
+        }),
+      );
+
+      const NEW_TOKEN_CREATED_TOPIC0 = getEventSelector({
+        type: 'event',
+        name: 'NewTokenCreated',
+        inputs: TokenLaunchpadAbi.find(
+          (x) => x.type === 'event' && x.name === 'NewTokenCreated',
+        )!.inputs,
+      });
+
+      for (const log of receipt.logs) {
+        try {
+          const decoded = decodeEventLog({
+            abi: TokenLaunchpadAbi,
+            data: log.data,
+            topics: log.topics,
+          });
+
+          if (decoded.eventName === 'NewTokenCreated') {
+            decodedLogs.push(decoded.args);
+          }
+        } catch {
+          // skip logs that don't match any event in the ABI
+        }
+      }
+
+      const decoded = decodeEventLog({
+        abi: TokenLaunchpadAbi,
+        data: log.data,
+        topics: log.topics,
       });
 
       return models.sequelize.transaction(async (transaction) => {
