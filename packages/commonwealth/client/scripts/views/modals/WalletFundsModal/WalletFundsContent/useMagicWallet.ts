@@ -1,10 +1,9 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { Magic } from 'magic-sdk';
-import { useEffect, useState } from 'react';
-import { fetchCachedNodes } from 'state/api/nodes';
+import { useEffect, useMemo, useState } from 'react';
+import { useFetchNodesQuery } from 'state/api/nodes';
 import { getMagicForChain } from 'utils/magicNetworkUtils';
 import Web3 from 'web3';
-import { fetchUserAddress } from './utils';
 
 const DEFAULT_CHAIN_ID = commonProtocol.ValidChains.Base;
 
@@ -27,15 +26,20 @@ const useMagicWallet = ({
   const [userAddress, setUserAddress] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const { data: nodes } = useFetchNodesQuery();
+  const chainNode = useMemo(
+    () => nodes?.find((n) => n.ethChainId === chainId),
+    [nodes, chainId],
+  );
+
   useEffect(() => {
     const initMagic = async () => {
       setIsLoading(true);
       try {
-        const nodes = fetchCachedNodes();
-        const chainNode = nodes?.find((n) => n.ethChainId === chainId);
         const effectiveChainId = chainNode?.ethChainId || chainId;
 
-        const magicInstance = getMagicForChain(effectiveChainId);
+        const magicInstance = getMagicForChain(effectiveChainId, chainNode);
+
         setMagic(magicInstance);
 
         if (magicInstance) {
@@ -43,8 +47,15 @@ const useMagicWallet = ({
           setWeb3(web3Instance);
 
           // Get user address
-          const address = await fetchUserAddress(web3Instance);
-          setUserAddress(address);
+          try {
+            const metadata = await magicInstance.user.getMetadata();
+            if (metadata.publicAddress) {
+              setUserAddress(metadata.publicAddress);
+            }
+          } catch {
+            // Not logged in
+            console.log('User not logged in to Magic');
+          }
         }
       } catch (error) {
         console.error('Error initializing Magic wallet:', error);

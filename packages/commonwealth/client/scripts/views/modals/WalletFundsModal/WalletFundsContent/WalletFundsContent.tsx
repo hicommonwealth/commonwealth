@@ -1,5 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import React, { useState } from 'react';
+import React from 'react';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useGetEthereumBalanceQuery } from 'state/api/tokens';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -7,7 +7,6 @@ import {
   CWModalBody,
   CWModalFooter,
 } from 'views/components/component_kit/new_designs/CWModal';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { FundWalletItem } from './FundWalletItem';
 import useMagicWallet from './useMagicWallet';
 import { formatUsdBalance, handleRefreshBalance } from './utils';
@@ -23,8 +22,6 @@ interface WalletFundsContentProps {
 const WalletFundsContent = ({
   chainId = BASE_MAINNET_CHAIN_ID,
 }: WalletFundsContentProps = {}) => {
-  const [amount, setAmount] = useState('0.05');
-
   const {
     magic,
     userAddress,
@@ -45,24 +42,23 @@ const WalletFundsContent = ({
     tokenSymbol: 'ETH',
   });
 
-  const handleInputChange = (value: string): void => {
-    const cleanValue = value.replace(/^0+(?=\d)/, '');
-    if (value === '' || value === '0') {
-      setAmount('0');
-    } else {
-      setAmount(cleanValue);
-    }
-  };
-
   const handleShowWalletAddress = async (): Promise<void> => {
     if (magic) {
-      await magic.wallet.showAddress();
+      try {
+        await magic.wallet.showAddress();
+      } catch (error) {
+        console.error('Error showing wallet address:', error);
+      }
     }
   };
 
   const handleShowOnRamp = async (): Promise<void> => {
     if (magic) {
-      await magic.wallet.showOnRamp();
+      try {
+        await magic.wallet.showOnRamp();
+      } catch (error) {
+        console.error('Error showing on-ramp:', error);
+      }
     }
   };
 
@@ -76,19 +72,6 @@ const WalletFundsContent = ({
   return (
     <div className="WalletFundsContent">
       <CWModalBody>
-        <div className="amount-input-container">
-          <CWTextInput
-            type="number"
-            value={amount}
-            onInput={(e) => handleInputChange(e.target.value)}
-            min={0}
-            step={0.001}
-          />
-          <CWText type="b1" fontWeight="bold" className="amount-text">
-            ETH
-          </CWText>
-        </div>
-
         <CWText className="usd-value">
           {isLoading ? 'Loading...' : formattedBalanceUsd}
         </CWText>
