@@ -1,11 +1,13 @@
 import { dispose, handleEvent } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
-import { ContestWorker, emitEvent, models } from '@hicommonwealth/model';
 import { CommunityTierMap } from '@hicommonwealth/shared';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { Contests } from '../../src/aggregates/contest';
+import { models } from '../../src/database';
+import { ContestWorker } from '../../src/policies';
 import { seed } from '../../src/tester';
+import { emitEvent } from '../../src/utils';
 import { drainOutbox } from '../utils';
 
 describe.skip('Check Contests', () => {
@@ -29,7 +31,7 @@ describe.skip('Check Contests', () => {
       //{ mock: true, log: true },
     );
     await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       id: communityId,
       chain_node_id: chainNode!.id,
       lifetime_thread_count: 0,
@@ -47,7 +49,6 @@ describe.skip('Check Contests', () => {
           id: topicId,
           name: 'hello',
           community_id: communityId,
-          group_ids: [],
         },
       ],
       contest_managers: [
@@ -159,6 +160,7 @@ describe.skip('Check Contests', () => {
     );
 
     await handleEvent(ContestWorker(), {
+      id: 0,
       name: 'ContestRolloverTimerTicked',
       payload: {},
     });
@@ -180,6 +182,7 @@ describe.skip('Check Contests', () => {
     );
 
     await handleEvent(ContestWorker(), {
+      id: 0,
       name: 'ContestRolloverTimerTicked',
       payload: {},
     });

@@ -5,8 +5,6 @@ import {
   dispose,
   disposeAdapter,
 } from '@hicommonwealth/core';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   Mocked,
   afterAll,
@@ -19,7 +17,6 @@ import {
 } from 'vitest';
 import { CacheDecorator } from '../../src/redis';
 import { CacheKeyDuration } from '../../src/utils';
-chai.use(chaiAsPromised);
 
 describe('CacheDecorator', () => {
   let cacheDecorator: CacheDecorator;
@@ -66,6 +63,8 @@ describe('CacheDecorator', () => {
       addToSortedSet: vi.fn(),
       sortedSetPopMin: vi.fn(),
       delSortedSetItemsByValue: vi.fn(),
+      lpushAndTrim: vi.fn(),
+      getList: vi.fn(),
     };
     cache({
       key: 'mocked.cache.key',
@@ -456,7 +455,7 @@ describe('CacheDecorator', () => {
           duration,
           CacheNamespaces.Function_Response,
         );
-        await expect(wrapFn()).to.be.rejectedWith('test-error');
+        await expect(wrapFn()).rejects.toThrow('test-error');
 
         // expect(result).to.equal('test-result');
         expect(mockCache.getKey).toHaveBeenCalledOnce();

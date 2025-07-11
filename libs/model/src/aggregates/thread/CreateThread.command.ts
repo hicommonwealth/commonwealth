@@ -6,7 +6,7 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import { BalanceSourceType, GatedActionEnum } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
@@ -20,7 +20,7 @@ import {
   verifyThreadSignature,
 } from '../../middleware';
 import { getThreadSearchVector } from '../../models/thread';
-import { tokenBalanceCache } from '../../services';
+import { getBalances } from '../../services/tokenBalanceCache';
 import {
   decodeContent,
   emitMentions,
@@ -28,7 +28,7 @@ import {
   uniqueMentions,
   uploadIfLarge,
 } from '../../utils';
-import { GetActiveContestManagers } from '../contest';
+import { GetActiveContestManagers } from '../contest/GetActiveContestManagers.query';
 
 export const CreateThreadErrors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -36,7 +36,6 @@ export const CreateThreadErrors = {
   ParseMentionsFailed: 'Failed to parse mentions',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only discussion and link posts supported',
-  FailedCreateThread: 'Failed to create thread',
   DiscussionMissingTitle: 'Discussion posts must include a title',
   NoBody: 'Thread body cannot be blank',
   PostLimitReached: 'Post limit reached',
@@ -52,7 +51,7 @@ async function checkAddressBalance(
   activeContestManagers: z.infer<typeof getActiveContestManagersQuery.output>,
   address: string,
 ) {
-  const balances = await tokenBalanceCache.getBalances({
+  const balances = await getBalances({
     balanceSourceType: BalanceSourceType.ETHNative,
     addresses: [address],
     sourceOptions: {
@@ -90,7 +89,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
   return {
     ...schemas.CreateThread,
     auth: [
-      authTopic({ action: schemas.PermissionEnum.CREATE_THREAD }),
+      authTopic({ action: GatedActionEnum.CREATE_THREAD }),
       verifyThreadSignature,
       tiered({ creates: true }),
       turnstile({ widgetName: 'create-thread' }),

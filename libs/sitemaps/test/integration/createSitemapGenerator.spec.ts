@@ -1,7 +1,6 @@
 import { dispose, inMemoryBlobUrl, inMemoryBlobs } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
-import { expect } from 'chai';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import * as tester from '@hicommonwealth/model/tester';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import {
   createDatabasePaginatorDefault,
   createSitemapGenerator,

@@ -3,9 +3,11 @@ import {
   EvmEventSignatures,
   commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
-import { config, equalEvmAddresses, models } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { Hmac, createHmac } from 'crypto';
+import { config } from '../../config';
+import { models } from '../../database';
+import { equalEvmAddresses } from '../../utils';
 
 // TODO: how do we handle chain re-orgs
 //  Alchemy re-emits logs with `removed: true` -> modify event handlers to rollback changes if `removed: true`.
@@ -148,6 +150,8 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
       // if (events.length > 0) {
       //   await emitEvent(models.Outbox, events);
       // }
+
+      return {};
     },
   };
 }

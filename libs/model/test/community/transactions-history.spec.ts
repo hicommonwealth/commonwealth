@@ -1,16 +1,12 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import { seed } from 'model/src/tester';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import {
   CreateStakeTransaction,
   GetTransactions,
 } from '../../src/aggregates/community';
-
-chai.use(chaiAsPromised);
+import { seed } from '../../src/tester';
 
 describe('Transactions history', () => {
   const actor: Actor = { user: { email: '' } };
@@ -30,7 +26,7 @@ describe('Transactions history', () => {
       isAdmin: true,
     });
     const [community] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       namespace: 'qaa',
       chain_node_id: node?.id,
       lifetime_thread_count: 0,

@@ -7,7 +7,10 @@ import {
   addressSwapper,
   verifySession,
 } from '@hicommonwealth/shared';
+import { useLoginWithEmail, useLoginWithSms } from '@privy-io/react-auth';
 import axios from 'axios';
+import { useFlag } from 'client/scripts/hooks/useFlag';
+import { BASE_API_PATH } from 'client/scripts/utils/trpcClient';
 import {
   completeClientLogin,
   setActiveAccount,
@@ -35,14 +38,23 @@ import {
 } from 'helpers/localStorage';
 import _ from 'lodash';
 import { Magic } from 'magic-sdk';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import app, { initAppState } from 'state';
-import { SERVER_URL } from 'state/api/config';
-import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
+import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
+import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { EIP1193Provider } from 'viem';
+import usePrivyEmailDialogStore, {
+  emailDialogStore,
+} from 'views/components/Privy/stores/usePrivyEmailDialogStore';
+import { smsDialogStore } from 'views/components/Privy/stores/usePrivySMSDialogStore';
+import type { PrivySignInSSOProvider } from 'views/components/Privy/types';
+import { useConnectedWallet } from 'views/components/Privy/useConnectedWallet';
+import { usePrivyAuthWithOAuth } from 'views/components/Privy/usePrivyAuthWithOAuth';
+import { usePrivySignOn } from 'views/components/Privy/usePrivySignOn';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
@@ -56,6 +68,7 @@ import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrac
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 import { darkModeStore } from '../../../state/ui/darkMode/darkMode';
+import { waitForWallet } from '../../components/Privy/helpers';
 import { openConfirmation } from '../confirmation_modal';
 
 type UseAuthenticationProps = {
@@ -68,8 +81,6 @@ type UseAuthenticationProps = {
   withSessionKeyLoginFlow?: boolean;
   isUserFromWebView?: boolean;
 };
-
-const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Wallet = IWebWallet<any>;
@@ -87,10 +98,27 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const [isNewlyCreated, setIsNewlyCreated] = useState<boolean>(false);
   const [isMobileWalletVerificationStep, setIsMobileWalletVerificationStep] =
     useState(false);
+  const privyEnabled = useFlag('privy');
 
   const { isAddedToHomeScreen } = useAppStatus();
+  const { setState: setEmailDialogState } = usePrivyEmailDialogStore();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
 
   const user = useUserStore();
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
+
+  // Privy hooks for SMS authentication
+  const connectedWallet = useConnectedWallet();
+  const privySignOn = usePrivySignOn();
+  const connectedWalletRef = useRef(connectedWallet);
+
+  // Update wallet ref when wallet changes
+  useEffect(() => {
+    connectedWalletRef.current = connectedWallet;
+  }, [connectedWallet]);
+
+  const magic = new Magic(configurationData!.MAGIC_PUBLISHABLE_KEY);
 
   const isWalletConnectEnabled = _.some(
     wallets,
@@ -109,14 +137,125 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const { mutateAsync: updateUser } = useUpdateUserMutation();
   const { signIn } = useSignIn();
 
+  const handlePrivySuccess = useCallback(() => {
+    const landingURL = new URL(
+      '/dashboard/for-you',
+      window.location.href,
+    ).toString();
+    document.location.href = landingURL;
+  }, []);
+
+  const handlePrivyError = useCallback((err: Error) => {
+    console.log('privy error: ', err);
+    setIsMagicLoading(false);
+  }, []);
+
+  const privyCallbacks = useMemo(() => {
+    return {
+      onSuccess: handlePrivySuccess,
+      onError: handlePrivyError,
+    };
+  }, [handlePrivyError, handlePrivySuccess]);
+
+  const privyAuthWithOAuth = usePrivyAuthWithOAuth(privyCallbacks);
+
+  // Handle SMS login completion (similar to OAuth pattern)
+  const handleSMSLoginComplete = useCallback(async () => {
+    if (user.isLoggedIn) return;
+
+    // Wait for wallet to be available
+    const walletAvailable = await waitForWallet(connectedWalletRef);
+    if (!walletAvailable) {
+      handlePrivyError(new Error('Wallet not available'));
+      return;
+    }
+
+    const currentWallet = connectedWalletRef.current;
+    if (!currentWallet) {
+      console.warn('No connected wallet available');
+      handlePrivyError(new Error('No connected wallet available'));
+      return;
+    }
+
+    try {
+      await privySignOn({
+        wallet: currentWallet,
+        onSuccess: handlePrivySuccess,
+        onError: handlePrivyError,
+        ssoOAuthToken: undefined, // Not needed for SMS
+        ssoProvider: 'phone' as PrivySignInSSOProvider, // SMS provider
+      });
+    } catch (error) {
+      console.error('SMS sign-on error:', error);
+      handlePrivyError(error as Error);
+    }
+  }, [
+    user.isLoggedIn,
+    connectedWalletRef,
+    privySignOn,
+    handlePrivySuccess,
+    handlePrivyError,
+  ]);
+
+  const handleEmailLoginComplete = useCallback(async () => {
+    if (user.isLoggedIn) return;
+
+    // Wait for wallet to be available
+    const walletAvailable = await waitForWallet(connectedWalletRef);
+    if (!walletAvailable) {
+      handlePrivyError(new Error('Wallet not available'));
+      return;
+    }
+
+    const currentWallet = connectedWalletRef.current;
+    if (!currentWallet) {
+      console.warn('No connected wallet available');
+      handlePrivyError(new Error('No connected wallet available'));
+      return;
+    }
+
+    try {
+      await privySignOn({
+        wallet: currentWallet,
+        onSuccess: handlePrivySuccess,
+        onError: handlePrivyError,
+        ssoOAuthToken: undefined, // Not needed for email
+        ssoProvider: 'email' as PrivySignInSSOProvider, // Email provider
+      });
+    } catch (error) {
+      console.error('Email sign-on error:', error);
+      handlePrivyError(error as Error);
+    }
+  }, [
+    user.isLoggedIn,
+    connectedWalletRef,
+    privySignOn,
+    handlePrivySuccess,
+    handlePrivyError,
+  ]);
+
+  const { sendCode: sendSMSCode, loginWithCode: loginWithSMSCode } =
+    useLoginWithSms({
+      onComplete: () => {
+        handleSMSLoginComplete().catch(console.error);
+      },
+    });
+
+  const { sendCode: sendEmailCode, loginWithCode: loginWithEmailCode } =
+    useLoginWithEmail({
+      onComplete: () => {
+        handleEmailLoginComplete().catch(console.error);
+      },
+    });
+
   const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
 
   useEffect(() => {
-    if (process.env.ETH_RPC === 'e2e-test') {
+    if (configurationData!.TEST_EVM_ETH_RPC === 'e2e-test') {
       import('../../../helpers/mockMetaMaskUtil')
         .then((f) => {
           window['ethereum'] = new f.MockMetaMaskProvider(
-            `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_PUBLIC_APP_KEY}`,
+            `https://eth-mainnet.g.alchemy.com/v2/${configurationData!.ALCHEMY_PUBLIC_APP_KEY}`,
             '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
           ) as unknown as EIP1193Provider;
         })
@@ -133,6 +272,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         ChainBase.Ethereum,
         ChainBase.Substrate,
         ChainBase.Solana,
+        ChainBase.Sui,
       ];
       setWallets(
         _.flatten(
@@ -142,7 +282,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         ),
       );
     }
-  }, []);
+  }, [configurationData]);
+
+  useEffect(() => {
+    const actualUrl = new URL(window.location.href);
+    const hasPrivyOAuthState = actualUrl.searchParams.has('privy_oauth_state');
+    setIsMagicLoading(hasPrivyOAuthState);
+  }, [searchParams, location]);
 
   const handleSuccess = async (
     authAddress?: string | null | undefined,
@@ -167,7 +313,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   // Handles Magic Link Login
-  const onSMSLogin = async (phoneNumber = '') => {
+  const onSMSLoginMagic = async (phoneNumber = '') => {
     const tempSMSToUse = phoneNumber || SMS;
     setSMS(tempSMSToUse);
 
@@ -200,7 +346,36 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
-  const onEmailLogin = async (emailToUse = '') => {
+  const onSMSLoginPrivy = async (phoneNumber) => {
+    setIsMagicLoading(true);
+    const tempSMSToUse = phoneNumber || SMS;
+    setSMS(tempSMSToUse);
+
+    try {
+      await sendSMSCode({ phoneNumber: tempSMSToUse });
+
+      const { awaitUserInput } = smsDialogStore.getState();
+      const code = await awaitUserInput('Enter the code we sent to your phone');
+
+      await loginWithSMSCode({ code });
+
+      setIsMagicLoading(false);
+    } catch (error) {
+      // Handle both cancellation and actual errors
+      if (error.message === 'User cancelled') {
+        console.log('User cancelled SMS verification');
+      } else {
+        console.error('SMS login error:', error);
+        notifyError('Error during SMS verification. Please try again.');
+      }
+      setSMS(undefined);
+      setIsMagicLoading(false);
+    }
+  };
+
+  const onSMSLogin = privyEnabled ? onSMSLoginPrivy : onSMSLoginMagic;
+
+  const onEmailLoginMagic = async (emailToUse = '') => {
     const tempEmailToUse = emailToUse || email;
     setEmail(tempEmailToUse);
 
@@ -233,8 +408,36 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
+  const onEmailLoginPrivy = async (emailToUse = '') => {
+    const tempEmailToUse = emailToUse || email;
+    setEmail(tempEmailToUse);
+
+    setIsMagicLoading(true);
+
+    if (!tempEmailToUse) {
+      notifyError('Please enter a valid email address.');
+      setIsMagicLoading(false);
+      return;
+    }
+
+    try {
+      await sendEmailCode({ email: tempEmailToUse });
+      const { awaitUserInput } = emailDialogStore.getState();
+      const code = await awaitUserInput();
+      await loginWithEmailCode({ code });
+      setIsMagicLoading(false);
+    } catch (e) {
+      notifyError(`Error authenticating with email`);
+      console.error(`Error authenticating with email: ${e}`);
+      setEmail(undefined);
+      setIsMagicLoading(false);
+    }
+  };
+
+  const onEmailLogin = privyEnabled ? onEmailLoginPrivy : onEmailLoginMagic;
+
   // New callback for handling social login
-  const onSocialLogin = async (provider: WalletSsoSource) => {
+  const onSocialLoginMagic = async (provider: WalletSsoSource) => {
     setIsMagicLoading(true);
 
     try {
@@ -257,6 +460,15 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setIsMagicLoading(false);
     }
   };
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  const onSocialLoginPrivy = async (provider: WalletSsoSource) => {
+    setIsMagicLoading(true);
+    console.log('onSocialLoginPrivy: ' + provider);
+    privyAuthWithOAuth.onInitOAuth(provider);
+  };
+
+  const onSocialLogin = privyEnabled ? onSocialLoginPrivy : onSocialLoginMagic;
 
   // Performs Login on the client
   const onLogInWithAccount = async (
@@ -410,11 +622,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      const userAddresses =
-        await DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
-          [account!.profile!.chain],
-          [account!.profile!.address],
-        );
+
+      const userAddresses = await fetchProfilesByAddress(
+        [account!.profile!.chain],
+        [account!.profile!.address],
+      );
+
       const currentUserAddress = userAddresses?.[0];
       if (!currentUserAddress) {
         console.log('No profile yet.');
@@ -425,7 +638,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           currentUserAddress.address,
           currentUserAddress.avatarUrl ?? '',
           account?.profile?.chain,
-          new Date(currentUserAddress.lastActive),
+          new Date(currentUserAddress.lastActive ?? ''),
           0,
         );
       }
@@ -540,7 +753,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       setIsNewlyCreated(newlyCreated);
       if (isMobile) {
         setSignerAccount(signingAccount);
-        setIsMobileWalletVerificationStep(true);
+        if (window?.ethereum?.isBinance) {
+          // for binance wallet we don't need to show the verification modal/step
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          setIsMobileWalletVerificationStep(true);
+        }
       } else {
         await onAccountVerified(signingAccount, newlyCreated, false, wallet);
       }
@@ -563,27 +783,28 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     if (user.isLoggedIn) {
       try {
-        const res = await axios.post(`${SERVER_URL}/getAddressStatus`, {
-          address:
-            wallet.chain === ChainBase.Substrate
-              ? addressSwapper({
-                  address: address,
-                  currentPrefix: parseInt(
-                    `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
-                    10,
-                  ),
-                })
-              : address,
-          community_id: app.activeChainId() ?? wallet.chain,
-          jwt: user.jwt,
-        });
+        const cid = app.activeChainId() ?? wallet.chain;
+        const adr =
+          wallet.chain === ChainBase.Substrate
+            ? addressSwapper({
+                address,
+                currentPrefix: parseInt(
+                  `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
+                  10,
+                ),
+              })
+            : address;
+        const { data } = await axios.get(
+          `${BASE_API_PATH}/user.getAddressStatus?community_id=${cid}&address=${adr}`,
+          { headers: { address: user.activeAccount?.address, jwt: user.jwt } },
+        );
 
-        if (res.data.result.exists && res.data.result.belongsToUser) {
+        if (data.exists && data.belongs_to_user) {
           notifyInfo('This address is already linked to your current account.');
           return;
         }
 
-        if (res.data.result.exists) {
+        if (data.exists) {
           openConfirmation({
             title: 'Wallet Transfer Confirmation',
             description: `
@@ -660,7 +881,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       isNewlyCreated,
       false,
       selectedWallet,
-    );
+    ).catch(console.error);
     setIsMobileWalletVerificationStep(false);
     props?.onModalClose?.();
   };

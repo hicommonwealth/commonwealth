@@ -1,5 +1,4 @@
 import {
-  LinkSource,
   MAX_COMMUNITY_IMAGE_SIZE_KB,
   MAX_SCHEMA_ETH,
   MAX_SCHEMA_INT,
@@ -32,15 +31,9 @@ export const DiscordMetaSchema = z.object({
   message_id: z.string(),
 });
 
-export const linksSchema = {
-  source: z.nativeEnum(LinkSource),
-  identifier: z.string(),
-  title: z.string().nullable().optional(),
-};
-
 export const PG_INT = z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT);
 
-export const PG_ETH = z.bigint().min(MIN_SCHEMA_ETH).max(MAX_SCHEMA_ETH);
+export const PG_ETH = z.coerce.bigint().min(MIN_SCHEMA_ETH).max(MAX_SCHEMA_ETH);
 
 export const zBoolean = z.preprocess((v) => v && v !== 'false', z.boolean());
 
@@ -77,3 +70,10 @@ export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
     });
   }
 }
+
+export const Environments = [
+  'development',
+  'test',
+  'staging',
+  'production',
+] as const;

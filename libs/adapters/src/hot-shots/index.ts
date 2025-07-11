@@ -22,6 +22,8 @@ export const HotShotsStats = (): Stats => {
       }),
     histogram: (key, value, tags) =>
       client && client.histogram(key, value, tags),
+    distribution: (key, value, sampleRate, tags) =>
+      client && client.distribution(key, value, sampleRate, tags),
     set: (key, value) => client && client.set(key, value),
     increment: (key, tags) => client && client.increment(key, tags),
     incrementBy: (key, value, tags) =>

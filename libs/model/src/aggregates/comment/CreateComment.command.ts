@@ -1,12 +1,6 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
-import {
-  CommentInstance,
-  decodeContent,
-  getCommentSearchVector,
-  uploadIfLarge,
-} from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
+import { GatedActionEnum, MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import { models } from '../../database';
 import {
   authThread,
@@ -16,11 +10,14 @@ import {
 } from '../../middleware';
 import { verifyCommentSignature } from '../../middleware/canvas';
 import { mustBeAuthorizedThread, mustExist } from '../../middleware/guards';
+import { CommentInstance, getCommentSearchVector } from '../../models';
 import {
+  decodeContent,
   emitEvent,
   emitMentions,
   parseUserMentions,
   uniqueMentions,
+  uploadIfLarge,
 } from '../../utils';
 import { getCommentDepth } from '../../utils/getCommentDepth';
 
@@ -35,7 +32,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
     ...schemas.CreateComment,
     auth: [
       authThread({
-        action: schemas.PermissionEnum.CREATE_COMMENT,
+        action: GatedActionEnum.CREATE_COMMENT,
       }),
       verifyCommentSignature,
       tiered({ creates: true }),

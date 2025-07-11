@@ -1,13 +1,16 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, logger } from '@hicommonwealth/core';
-import { middleware, models, Reaction, Thread } from '@hicommonwealth/model';
-import { CountAggregatorKeys } from '@hicommonwealth/shared';
+import { Reaction, Thread } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import * as middleware from '@hicommonwealth/model/middleware';
+import { CountAggregatorKeys, LinkSource } from '@hicommonwealth/shared';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { config } from '../config';
 import {
   createThreadRank,
   decrementThreadRank,
   incrementThreadRank,
+  shouldRankThread,
   updateRankOnThreadIneligibility,
 } from './ranking';
 
@@ -31,18 +34,27 @@ export const trpcRouter = trpc.router({
           community_id,
           community_tier,
           marked_as_spam_at,
+          body,
         },
       ) => {
-        if (!marked_as_spam_at) {
-          await createThreadRank(
-            {
-              id: id!,
-              created_at: created_at!,
-              user_tier_at_creation: user_tier_at_creation!,
-            },
-            { id: community_id, tier: community_tier },
-          );
-        }
+        if (
+          !shouldRankThread({
+            community_id,
+            body,
+            user_tier_at_creation,
+            community_tier,
+            marked_as_spam_at,
+          })
+        )
+          return;
+        await createThreadRank(
+          {
+            id: id!,
+            created_at: created_at!,
+            user_tier_at_creation: user_tier_at_creation!,
+          },
+          { id: community_id, tier: community_tier },
+        );
       },
     ),
     trpc.trackAnalytics([
@@ -71,6 +83,7 @@ export const trpcRouter = trpc.router({
           created_at,
           user_tier_at_creation,
           spam_toggled,
+          body,
         },
       ) => {
         if (!user_tier_at_creation || !spam_toggled) return;
@@ -88,6 +101,16 @@ export const trpcRouter = trpc.router({
             },
           });
           if (!community) return;
+          if (
+            !shouldRankThread({
+              community_id,
+              body,
+              user_tier_at_creation,
+              community_tier: community.tier,
+              marked_as_spam_at,
+            })
+          )
+            return;
           await createThreadRank(
             { id: id!, created_at: created_at!, user_tier_at_creation },
             {
@@ -111,6 +134,13 @@ export const trpcRouter = trpc.router({
       }),
       trpc.fireAndForget(
         async (_, { community_id, thread_id, user_tier_at_creation }) => {
+          if (
+            !shouldRankThread({
+              user_tier_at_creation,
+              community_id,
+            })
+          )
+            return;
           await incrementThreadRank(config.HEURISTIC_WEIGHTS.LIKE_WEIGHT, {
             community_id,
             thread_id,
@@ -150,6 +180,13 @@ export const trpcRouter = trpc.router({
           where: { id: thread_id },
         });
         if (thread) {
+          if (
+            !shouldRankThread({
+              user_tier_at_creation,
+              community_id: thread.community_id,
+            })
+          )
+            return;
           await decrementThreadRank(config.HEURISTIC_WEIGHTS.LIKE_WEIGHT, {
             thread_id,
             community_id: thread.community_id,
@@ -159,7 +196,47 @@ export const trpcRouter = trpc.router({
       }
     }),
   ]),
+  addLinks: trpc.command(Thread.AddLinks, trpc.Tag.Thread, [
+    trpc.trackAnalytics((_, { community_id, new_links }) => {
+      if (new_links.length > 0) {
+        const source = new_links.at(-1)!.source;
+        const event =
+          source === LinkSource.Snapshot || source === LinkSource.Proposal
+            ? MixpanelCommunityInteractionEvent.LINKED_PROPOSAL
+            : source === LinkSource.Thread
+              ? MixpanelCommunityInteractionEvent.LINKED_THREAD
+              : source === LinkSource.Web
+                ? MixpanelCommunityInteractionEvent.LINKED_URL
+                : source === LinkSource.Template
+                  ? MixpanelCommunityInteractionEvent.LINKED_TEMPLATE
+                  : undefined;
+        if (event)
+          return Promise.resolve([
+            event,
+            { event, community: community_id, proposalType: source },
+          ]);
+      }
+      return Promise.resolve(undefined);
+    }),
+  ]),
+  deleteLinks: trpc.command(Thread.DeleteLinks, trpc.Tag.Thread),
+  getLinks: trpc.query(Thread.GetLinks, trpc.Tag.Thread),
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread),
+  getThreadById: trpc.query(
+    Thread.GetThreadById,
+    trpc.Tag.Thread,
+    { ttlSecs: 10 },
+    [
+      trpc.fireAndForget(async (input) => {
+        log.trace('incrementing thread view count', { id: input.thread_id });
+        await cache().incrementHashKey(
+          CacheNamespaces.CountAggregator,
+          CountAggregatorKeys.ThreadViewCount,
+          input.thread_id.toString(),
+        );
+      }),
+    ],
+  ),
   getThreadsByIds: trpc.query(
     Thread.GetThreadsByIds,
     trpc.Tag.Thread,
@@ -181,4 +258,8 @@ export const trpcRouter = trpc.router({
       }),
     ],
   ),
+  searchThreads: trpc.query(Thread.SearchThreads, trpc.Tag.Thread),
+  getActiveThreads: trpc.query(Thread.GetActiveThreads, trpc.Tag.Thread, {
+    ttlSecs: 60,
+  }),
 });

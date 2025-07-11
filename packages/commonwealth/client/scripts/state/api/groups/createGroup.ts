@@ -1,4 +1,3 @@
-import { ApiEndpoints, queryClient } from 'state/api/config';
 import { trpc } from 'utils/trpcClient';
 import { GroupFormTopicSubmitValues } from 'views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/index.types';
 
@@ -40,11 +39,10 @@ export const buildCreateGroupInput = ({
 };
 
 const useCreateGroupMutation = ({ communityId }: { communityId: string }) => {
+  const utils = trpc.useUtils();
   return trpc.community.createGroup.useMutation({
     onSuccess: async () => {
-      const key = [ApiEndpoints.FETCH_GROUPS, communityId];
-      queryClient.cancelQueries(key);
-      queryClient.refetchQueries(key);
+      await utils.community.getGroups.invalidate({ community_id: communityId });
     },
   });
 };

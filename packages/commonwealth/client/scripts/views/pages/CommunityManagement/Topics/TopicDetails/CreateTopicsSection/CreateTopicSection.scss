@@ -1,4 +1,6 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
+@use '../../../../../../styles/mixins/media_queries';
 
 .CreateTopicSection {
   form {
@@ -26,7 +28,7 @@
 
         .checkbox-label-caption {
           margin-top: 8px;
-          color: $neutral-700;
+          color: colors.$neutral-700;
         }
       }
 
@@ -38,7 +40,7 @@
 
         &.enabled {
           padding: 12px;
-          background-color: $neutral-50;
+          background-color: colors.$neutral-50;
 
           .QuillEditor {
             background-color: white;
@@ -54,7 +56,7 @@
     }
   }
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     .form {
       .actions {
         align-items: center;

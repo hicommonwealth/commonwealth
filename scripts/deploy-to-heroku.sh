@@ -26,14 +26,6 @@ heroku container:login
 
 heroku git:remote --app ${app_name}
 
-env_path=./packages/commonwealth/deploy/environments/.env.public.${app_name}
-if [ ! -f ${env_path} ]; then
-  echo "Error: ${env_path} not found"
-  exit 1
-fi
-
-cp ${env_path} .env
-
 # Needed for commonwealth_base
 docker build -f Dockerfile.datadog -t datadog-base .
 
@@ -57,7 +49,20 @@ deploy_heroku_app() {
   done
 
   process_types=$(echo $process_types | xargs)
-  heroku container:release ${process_types} -a ${app_name}
+
+  # We get "Lost connection with release dyno." sometimes. So if we do, retry 5 times
+  for i in {1..10}; do
+    output=$(heroku container:release ${process_types} -a ${app_name} 2>&1) && break
+
+    echo "$output"
+
+    # If it passes, break out of loop
+    if simulate_heroku_release; then
+      break
+    fi
+
+    sleep 2
+  done
 }
 
 docker build . --target commonwealth -t commonwealth -f Dockerfile.commonwealth_base

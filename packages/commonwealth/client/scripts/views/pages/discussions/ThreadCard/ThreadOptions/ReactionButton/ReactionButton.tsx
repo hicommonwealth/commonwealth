@@ -60,7 +60,7 @@ export const ReactionButton = ({
   const popoverProps = usePopover();
 
   const communityId = app.activeChainId() || '';
-  const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
+  const { mutateAsync: createThreadReaction, isPending: isAddingReaction } =
     useCreateThreadReactionMutation({
       communityId,
       threadId: thread.id,
@@ -68,7 +68,7 @@ export const ReactionButton = ({
       currentReactionCount: thread.reactionCount || 0,
       currentReactionWeightsSum: `${thread?.reactionWeightsSum || 0}`,
     });
-  const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
+  const { mutateAsync: deleteThreadReaction, isPending: isDeletingReaction } =
     useDeleteThreadReactionMutation({
       communityId,
       address: user.activeAccount?.address || '',
@@ -126,8 +126,14 @@ export const ReactionButton = ({
         }
         if ((e.message as string)?.includes('Insufficient token balance')) {
           notifyError(
-            'You must have the requisite tokens to upvote in this topic',
+            `You must have ${thread.topic?.token_symbol || 'the required'} tokens to upvote in this topic`,
           );
+        } else if (e.message.includes('Must be judge')) {
+          notifyError(
+            'You must be a judge contest to upvote. Ask community admin for nomination',
+          );
+        } else if (e.message.includes('Insufficient balance')) {
+          notifyError('You must have the requisite tokens to upvote');
         } else {
           notifyError('Failed to upvote');
         }

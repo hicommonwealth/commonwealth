@@ -2,9 +2,10 @@ import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import NodeInfo from 'models/NodeInfo';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import { fetchCachedNodes } from 'state/api/nodes';
+import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
+import { fetchNodes } from 'state/api/nodes';
 import useUserStore from 'state/ui/user';
 import { z } from 'zod';
 import { TradingMode } from '../../types';
@@ -23,6 +24,7 @@ const useCommonTradeTokenForm = ({
     tradeConfig.mode || TradingMode.Buy,
   );
   const user = useUserStore();
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
   const userAddresses = useMemo(() => {
     // get all the addresses of the user that matches chain base
     const tempUserAddresses = user.addresses
@@ -37,10 +39,18 @@ const useCommonTradeTokenForm = ({
   const [selectedAddress, setSelectedAddress] = useState<string>();
 
   // base chain node info
-  const nodes = fetchCachedNodes();
-  const baseNode = nodes?.find(
-    (n) => n.ethChainId === parseInt(process.env.LAUNCHPAD_CHAIN_ID || '8453'),
-  ) as NodeInfo;
+  const [baseNode, setBaseNode] = useState<NodeInfo | undefined>();
+  useEffect(() => {
+    fetchNodes()
+      .then((nodes) =>
+        setBaseNode(
+          nodes.find(
+            (n) => n.ethChainId === configurationData!.LAUNCHPAD_CHAIN_ID,
+          ) as NodeInfo,
+        ),
+      )
+      .catch(console.error);
+  }, []);
 
   const { data: tokenCommunity, isLoading: isLoadingTokenCommunity } =
     useGetCommunityByIdQuery({

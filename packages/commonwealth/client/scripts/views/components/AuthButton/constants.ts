@@ -78,6 +78,50 @@ export const AUTH_TYPES: AuthTypesList = {
       hasBackground: false,
     },
   },
+  'sui-wallet': {
+    icon: {
+      name: 'sui',
+      isCustom: true,
+    },
+    label: 'Sui Wallet',
+    description: {
+      text: 'Sui Communities',
+      hasBackground: false,
+    },
+  },
+  suiet: {
+    icon: {
+      name: 'suiet',
+      isCustom: true,
+    },
+    label: 'Suiet Wallet',
+    description: {
+      text: 'Sui Communities',
+      hasBackground: false,
+    },
+  },
+  'okx-wallet': {
+    icon: {
+      name: 'okx',
+      isCustom: true,
+    },
+    label: 'OKX Wallet',
+    description: {
+      text: 'Sui Communities',
+      hasBackground: false,
+    },
+  },
+  bitget: {
+    icon: {
+      name: 'bitget',
+      isCustom: true,
+    },
+    label: 'Bitget Wallet',
+    description: {
+      text: 'Sui Communities',
+      hasBackground: false,
+    },
+  },
   okx: {
     icon: {
       name: 'okx',
@@ -86,6 +130,17 @@ export const AUTH_TYPES: AuthTypesList = {
     label: 'OKX Wallet',
     description: {
       text: '+10 Aura w/ OKX Signup',
+      hasBackground: true,
+    },
+  },
+  binance: {
+    icon: {
+      name: 'binance',
+      isCustom: true,
+    },
+    label: 'Binance Wallet',
+    description: {
+      text: '+10 Aura w/ Binance Signup',
       hasBackground: true,
     },
   },

@@ -1,0 +1,137 @@
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
+
+.QuestCard {
+  border-radius: border_radius.$border-radius-corners;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background-color: colors.$white;
+  width: 100%;
+  min-height: 360px;
+  border: 1px solid colors.$neutral-300;
+  cursor: pointer;
+
+  .text-dark {
+    color: colors.$neutral-600;
+    width: fit-content;
+    cursor: initial;
+  }
+
+  .text-light {
+    color: colors.$neutral-500;
+    width: fit-content;
+    cursor: initial;
+  }
+
+  .max-h-24 {
+    max-height: 24px;
+    overflow: hidden;
+  }
+
+  .quest-scope {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .image {
+    border-radius: border_radius.$border-radius-corners;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 160px;
+    max-height: 160px;
+    object-fit: cover;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 0px;
+
+    .basic-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      width: 100%;
+    }
+
+    .progress {
+      cursor: default;
+
+      .progress-label {
+        margin-left: auto;
+        width: fit-content;
+      }
+      .progress-bar {
+        height: 10px;
+        width: 100%;
+        border: 1px solid colors.$neutral-100;
+
+        &.isEnded {
+          &::-webkit-progress-value {
+            background-color: colors.$neutral-400 !important;
+          }
+        }
+
+        &::-webkit-progress-bar {
+          background-color: colors.$neutral-200;
+          border-radius: border_radius.$border-radius-corners;
+        }
+
+        &::-webkit-progress-value {
+          background-color: colors.$primary-400;
+          border-radius: border_radius.$border-radius-corners;
+        }
+      }
+    }
+
+    .time-label {
+      color: colors.$yellow-600 !important;
+    }
+
+    .xp-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .leaderboard-btn {
+      border-width: 0 !important;
+      border-color: transparent !important;
+      padding: 0 !important;
+      margin: 0 !important;
+
+      .Text,
+      .Button {
+        font-weight: normal !important;
+        color: colors.$neutral-500 !important;
+      }
+
+      &:focus-within {
+        border-width: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+    }
+
+    .action-btn {
+      button {
+        text-transform: capitalize;
+      }
+
+      &:focus-within {
+        border-width: 1px !important;
+        padding: 0 !important;
+      }
+
+      margin: 0 !important;
+      margin-top: auto;
+    }
+  }
+}

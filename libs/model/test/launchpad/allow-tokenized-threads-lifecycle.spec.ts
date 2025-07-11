@@ -1,7 +1,6 @@
 import { command, dispose, query } from '@hicommonwealth/core';
 import { CommunityTierMap } from '@hicommonwealth/shared';
-import { expect } from 'chai';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { UpdateCommunity, UpdateTopic } from '../../src/aggregates/community';
 import { GetTokenizedThreadsAllowed } from '../../src/aggregates/token';
 import { seed } from '../../src/tester';
@@ -26,7 +25,7 @@ describe('allow_tokenized_threads lifecycle', () => {
     });
     await seed('Community', {
       id: community_id,
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       allow_tokenized_threads: false,
       profile_count: 0,
     });
@@ -60,7 +59,7 @@ describe('allow_tokenized_threads lifecycle', () => {
   }
 
   test('Should return false if both community and topic are false', async () => {
-    expect(await GetTokenizedThreadsAllowedResult()).to.eq(false);
+    expect(await GetTokenizedThreadsAllowedResult()).toBe(false);
   });
 
   test('Should return true if both community is true regardless of topic', async () => {
@@ -72,7 +71,7 @@ describe('allow_tokenized_threads lifecycle', () => {
       },
     });
 
-    expect(await GetTokenizedThreadsAllowedResult()).to.eq(true);
+    expect(await GetTokenizedThreadsAllowedResult()).toBe(true);
 
     await command(UpdateTopic(), {
       actor,
@@ -83,7 +82,7 @@ describe('allow_tokenized_threads lifecycle', () => {
       },
     });
 
-    expect(await GetTokenizedThreadsAllowedResult()).to.eq(true);
+    expect(await GetTokenizedThreadsAllowedResult()).toBe(true);
 
     await command(UpdateCommunity(), {
       actor,
@@ -93,6 +92,6 @@ describe('allow_tokenized_threads lifecycle', () => {
       },
     });
 
-    expect(await GetTokenizedThreadsAllowedResult()).to.eq(true);
+    expect(await GetTokenizedThreadsAllowedResult()).toBe(true);
   });
 });

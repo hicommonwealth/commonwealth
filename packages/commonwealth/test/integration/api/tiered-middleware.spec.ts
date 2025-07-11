@@ -1,21 +1,19 @@
 import { Actor, dispose } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import * as tester from '@hicommonwealth/model/tester';
 import {
   ChainBase,
   CommunityTierMap,
   UserTierMap,
 } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
 import Chance from 'chance';
 import jsonwebtoken from 'jsonwebtoken';
 import moment from 'moment';
+import fetch from 'node-fetch';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { testServer, TestServer } from '../../../server-test';
 import { config } from '../../../server/config';
 
 const chance = Chance();
-chai.use(chaiHttp);
 
 describe('Tiered middleware', () => {
   let server: TestServer;
@@ -29,11 +27,14 @@ describe('Tiered middleware', () => {
   let jwt3: string = '';
 
   const CreateThread = async (actor: Actor, jwt: string) => {
-    return await chai
-      .request(server.app)
-      .post(`/api/v1/CreateThread`)
-      .set('address', actor.address!)
-      .send({
+    const url = `${server.baseUrl}/api/v1/CreateThread`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        address: actor.address!,
+      },
+      body: JSON.stringify({
         jwt,
         community_id,
         topic_id,
@@ -42,7 +43,9 @@ describe('Tiered middleware', () => {
         kind: 'discussion',
         stage: '',
         read_only: false,
-      });
+      }),
+    });
+    return await res.text();
   };
 
   const CreateThreadReaction = async (
@@ -50,15 +53,20 @@ describe('Tiered middleware', () => {
     jwt: string,
     thread_id: number,
   ) => {
-    return await chai
-      .request(server.app)
-      .post(`/api/v1/CreateThreadReaction`)
-      .set('address', actor.address!)
-      .send({
+    const url = `${server.baseUrl}/api/v1/CreateThreadReaction`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        address: actor.address!,
+      },
+      body: JSON.stringify({
         jwt,
         thread_id,
         reaction: 'like',
-      });
+      }),
+    });
+    return await res.text();
   };
 
   const CreateComment = async (
@@ -66,15 +74,20 @@ describe('Tiered middleware', () => {
     jwt: string,
     thread_id: number,
   ) => {
-    return await chai
-      .request(server.app)
-      .post(`/api/v1/CreateComment`)
-      .set('address', actor.address!)
-      .send({
+    const url = `${server.baseUrl}/api/v1/CreateComment`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        address: actor.address!,
+      },
+      body: JSON.stringify({
         jwt,
         thread_id,
         body: chance.name(),
-      });
+      }),
+    });
+    return await res.text();
   };
 
   const CreateCommentReaction = async (
@@ -82,29 +95,37 @@ describe('Tiered middleware', () => {
     jwt: string,
     comment_id: number,
   ) => {
-    return await chai
-      .request(server.app)
-      .post(`/api/v1/CreateCommentReaction`)
-      .set('address', actor.address!)
-      .send({
+    const url = `${server.baseUrl}/api/v1/CreateCommentReaction`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        address: actor.address!,
+      },
+      body: JSON.stringify({
         jwt,
         comment_id,
         reaction: 'like',
-      });
+      }),
+    });
+    return await res.text();
   };
 
   beforeAll(async () => {
     server = await testServer();
 
     const [member1_user] = await tester.seed('User', {
+      profile: { name: 'Member 1' },
       tier: UserTierMap.IncompleteUser,
       created_at: new Date(),
     });
     const [member2_user] = await tester.seed('User', {
+      profile: { name: 'Member 2' },
       tier: UserTierMap.IncompleteUser,
       created_at: moment().subtract(2, 'weeks'),
     });
     const [member3_user] = await tester.seed('User', {
+      profile: { name: 'Member 3' },
       created_at: new Date(),
       tier: UserTierMap.SocialVerified,
     });
@@ -120,13 +141,13 @@ describe('Tiered middleware', () => {
       topics: [{}],
       Addresses: [
         {
-          role: 'admin',
+          role: 'member',
           user_id: member1_user!.id,
           verified: new Date(),
           address: '0x0000000000000000000000000000000000000111',
         },
         {
-          role: 'admin',
+          role: 'member',
           user_id: member2_user!.id,
           verified: new Date(),
           address: '0x0000000000000000000000000000000000000222',
@@ -191,24 +212,28 @@ describe('Tiered middleware', () => {
 
   it('should throw after exceeding tier 1 creation limits', async () => {
     await CreateThread(member1, jwt1);
-    const response = await CreateThread(member1, jwt1);
-    expect(response.text).to.equal(
+    const responseText = await CreateThread(member1, jwt1);
+    expect(responseText).toEqual(
       '{"message":"Exceeded content creation limit","code":"UNAUTHORIZED"}',
     );
   });
 
   it('should throw after exceeding tier 2 creation limits', async () => {
-    const response = await CreateThread(member2, jwt2);
-    await CreateComment(member2, jwt2, response.body.id);
-    const response2 = await CreateThread(member2, jwt2);
-    expect(response2.text).to.equal(
+    const responseText = await CreateThread(member2, jwt2);
+    const commentText = await CreateComment(
+      member2,
+      jwt2,
+      JSON.parse(responseText).id,
+    );
+    const response2Text = await CreateThread(member2, jwt2);
+    expect(response2Text).toEqual(
       '{"message":"Exceeded content creation limit","code":"UNAUTHORIZED"}',
     );
   });
 
   it('should throw after exceeding tier 1 reaction limits', async () => {
-    const response = await CreateThread(member3, jwt3);
-    const thread_id = response.body.id;
+    const responseText = await CreateThread(member3, jwt3);
+    const thread_id = JSON.parse(responseText).id;
     const responses = await Promise.all(
       [1, 2, 3, 4, 5].map(() => CreateComment(member3, jwt3, thread_id)),
     );
@@ -216,15 +241,15 @@ describe('Tiered middleware', () => {
     // have member 1 (tier 1) react on content
     await CreateThreadReaction(member1, jwt1, thread_id);
     for (let i = 0; i < 4; i++) {
-      await CreateCommentReaction(member1, jwt1, responses[i].body.id);
+      await CreateCommentReaction(member1, jwt1, JSON.parse(responses[i]).id);
     }
 
-    const response2 = await CreateCommentReaction(
+    const response2Text = await CreateCommentReaction(
       member1,
       jwt1,
-      responses[4].body.id,
+      JSON.parse(responses[4]).id,
     );
-    expect(response2.text).to.equal(
+    expect(response2Text).toEqual(
       '{"message":"Exceeded upvote limit","code":"UNAUTHORIZED"}',
     );
   });

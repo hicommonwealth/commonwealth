@@ -1,4 +1,4 @@
-import { Events } from '@hicommonwealth/schemas';
+import { Events, OutboxEvents } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
 import { z } from 'zod';
 import {
@@ -53,6 +53,13 @@ export type AdapterFactory<T extends Disposable> = (adapter?: T) => T;
 export interface Stats extends Disposable {
   histogram(key: string, value: number, tags?: Record<string, string>): void;
 
+  distribution(
+    key: string,
+    value: number,
+    sampleRate?: number,
+    tags?: Record<string, string>,
+  ): void;
+
   // counters
   set(key: string, value: number): void;
 
@@ -90,6 +97,7 @@ export enum CacheNamespaces {
   External_Api_Usage_Counter = 'api_key_counter',
   CommunityThreadRanks = 'community_thread_ranks',
   GlobalThreadRanks = 'global_thread_ranks',
+  TokenTopHolders = 'token_top_holders',
 }
 
 /**
@@ -159,6 +167,20 @@ export interface Cache extends Disposable {
     key: string,
     ttlInSeconds: number,
   ): Promise<boolean>;
+
+  lpushAndTrim(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+    maxLength: number,
+  ): Promise<number | false>;
+
+  getList(
+    namespace: CacheNamespaces,
+    key: string,
+    start?: number,
+    stop?: number,
+  ): Promise<string[]>;
 
   // Hash methods
   /**
@@ -416,6 +438,26 @@ export class CustomRetryStrategyError extends Error {
   }
 }
 
+export type ConsumerHooks = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  beforeHandleEvent: (topic: string, content: any, context: any) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  afterHandleEvent: (topic: string, content: any, context: any) => void;
+};
+
+export type Consumer<T> =
+  T extends EventsHandlerMetadata<infer E>
+    ?
+        | {
+            consumer: () => T;
+            worker?: string;
+            retryStrategy?: RetryStrategyFn;
+            hooks?: ConsumerHooks;
+            overrides?: { [K in keyof E]?: string | null };
+          }
+        | (() => T)
+    : never;
+
 type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
 
 type EventNamesType = `${Events}`;
@@ -426,19 +468,27 @@ export type RoutingKey =
   | EventNamesType
   | Concat<EventNamesType, RoutingKeyTagsType>;
 
+export type DLQEvent = {
+  consumer: string;
+  event_id: number;
+  event_name: string;
+  reason: string;
+  timestamp: number;
+};
+export type DlqEventHandler = (dlq: DLQEvent) => Promise<void>;
+
 export interface Broker extends Disposable {
-  publish<Name extends Events>(event: EventContext<Name>): Promise<boolean>;
+  publish<Name extends OutboxEvents>(
+    event: EventContext<Name>,
+  ): Promise<boolean>;
 
   subscribe<Inputs extends EventSchemas>(
     consumer: () => EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
-    hooks?: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      beforeHandleEvent: (topic: string, content: any, context: any) => void;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      afterHandleEvent: (topic: string, content: any, context: any) => void;
-    },
+    hooks?: ConsumerHooks,
   ): Promise<boolean>;
+
+  subscribeDlqHandler(handler: DlqEventHandler): Promise<boolean>;
 
   getRoutingKey<Name extends Events>(event: EventContext<Name>): RoutingKey;
 }
@@ -739,4 +789,9 @@ export interface NotificationsProvider extends Disposable {
     token: string,
     channelType: 'FCM' | 'APNS',
   ): Promise<boolean>;
+
+  signUserToken(
+    userId: number,
+    expiresInSeconds: number,
+  ): Promise<string | undefined>;
 }

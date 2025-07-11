@@ -1,6 +1,7 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { AppError, cache, CacheNamespaces, logger } from '@hicommonwealth/core';
-import { getSaltedApiKeyHash, models } from '@hicommonwealth/model';
+import { getSaltedApiKeyHash } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { User } from '@hicommonwealth/schemas';
 import { NextFunction, Request, Response } from 'express';
 import { rateLimit } from 'express-rate-limit';
@@ -182,14 +183,12 @@ export function addRateLimiterMiddleware() {
   // count all authenticated, non-rate-limited requests for analytics
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   router.use(async (req: Request, _, next: NextFunction) => {
-    // This theoretically will never happen since the key is validated during auth
-    if (!req.user || !req.user.id) throw new AppError('Unauthorized', 401);
-
-    await redis.incrementKey(
-      CacheNamespaces.External_Api_Usage_Counter,
-      String(req.user.id),
-      1,
-    );
+    if (req.user?.id)
+      await redis.incrementKey(
+        CacheNamespaces.External_Api_Usage_Counter,
+        String(req.user.id),
+        1,
+      );
     next();
   });
 }

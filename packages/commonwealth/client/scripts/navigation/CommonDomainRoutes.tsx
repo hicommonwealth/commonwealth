@@ -1,9 +1,11 @@
 import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
+import { SignIn } from 'views/components/SignIn/SignIn';
 import { withLayout } from 'views/Layout';
 import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
 import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
+import ExportPrivateKeyFromMagic from '../views/components/ExportPrivateKeyFromMagic';
 
 const QuillPage = lazy(() => import('views/pages/QuillPage'));
 const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
@@ -13,7 +15,7 @@ const MarkdownHitHighlighterPage = lazy(
 );
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
-const CommunitiesPage = lazy(() => import('views/pages/Communities'));
+const ExplorePage = lazy(() => import('views/pages/ExplorePage'));
 const SearchPage = lazy(() => import('views/pages/search'));
 const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
@@ -151,6 +153,18 @@ const CommonDomainRoutes = () => [
   />,
 
   <Route
+    key="ExportPrivateKeyFromMagic"
+    path="/export-magic"
+    element={<ExportPrivateKeyFromMagic />}
+  />,
+
+  <Route
+    key="sign-in"
+    path="/sign-in"
+    element={withLayout(SignIn, { type: 'common' })}
+  />,
+
+  <Route
     key="/_internal/quill"
     path="/_internal/quill"
     element={<QuillPage />}
@@ -254,7 +268,7 @@ const CommonDomainRoutes = () => [
   <Route
     key="/explore"
     path="/explore"
-    element={withLayout(CommunitiesPage, {
+    element={withLayout(ExplorePage, {
       type: 'common',
     })}
   />,

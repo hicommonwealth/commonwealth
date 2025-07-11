@@ -8,11 +8,12 @@ import {
   query,
 } from '@hicommonwealth/core';
 import { ChainEventPolicy, emitEvent } from '@hicommonwealth/model';
-import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   ChainBase,
   ChainType,
   CommunityTierMap,
+  GatedActionEnum,
   UserTierMap,
 } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
@@ -26,11 +27,13 @@ import {
   DeleteGroup,
   DeleteGroupErrors,
   GetCommunities,
+  GetCommunity,
   GetMembers,
   GetTopics,
   JoinCommunity,
   JoinCommunityErrors,
   MAX_GROUPS_PER_COMMUNITY,
+  SetCommunityMCPServers,
   ToggleArchiveTopic,
   UpdateCommunity,
   UpdateCommunityErrors,
@@ -42,6 +45,7 @@ import { systemActor } from '../../src/middleware';
 import type {
   ChainNodeAttributes,
   CommunityAttributes,
+  MCPServerAttributes,
   TopicAttributes,
 } from '../../src/models';
 import { seed } from '../../src/tester';
@@ -51,7 +55,7 @@ const chance = Chance();
 
 function buildCreateGroupPayload(
   community_id: string,
-  topics: { id: number; permissions: PermissionEnum[] }[] = [],
+  topics: { id: number; permissions: GatedActionEnum[] }[] = [],
 ) {
   return {
     community_id,
@@ -83,6 +87,7 @@ describe('Community lifecycle', () => {
     cosmosActor: Actor,
     substrateActor: Actor;
   const custom_domain = 'custom';
+  let mcpServer: MCPServerAttributes;
 
   beforeAll(async () => {
     const [_ethNode] = await seed('ChainNode', { eth_chain_id: 1 });
@@ -130,7 +135,7 @@ describe('Community lifecycle', () => {
     });
 
     const [ethBase] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: _ethNode!.id!,
       base: ChainBase.Ethereum,
       active: true,
@@ -159,7 +164,7 @@ describe('Community lifecycle', () => {
     });
 
     const [cosmosBase] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: _cosmosNode!.id!,
       base: ChainBase.CosmosSDK,
       active: true,
@@ -187,7 +192,7 @@ describe('Community lifecycle', () => {
     });
 
     const [substrateBase] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: _substrateNode!.id!,
       base: ChainBase.Substrate,
       active: true,
@@ -260,6 +265,16 @@ describe('Community lifecycle', () => {
       },
       address: substrateBase?.Addresses?.at(1)?.address,
     };
+
+    const [server] = await seed('MCPServer', {
+      id: 1,
+      name: 'mcp-server',
+      description: 'A test MCP server',
+      handle: 'mcp',
+      source: 'test',
+      server_url: 'https://mcp.example.com',
+    });
+    mcpServer = server!;
   });
 
   afterAll(async () => {
@@ -336,12 +351,37 @@ describe('Community lifecycle', () => {
         user_id: superAdminActor.user.id,
         address: superAdminActor.address!,
         community_id: community.id,
-        is_user_default: true,
         role: 'admin',
         last_active: new Date(),
         ghost_address: false,
         is_banned: false,
         verification_token: '123',
+      });
+    });
+  });
+
+  describe('mcp servers', () => {
+    test('should set mcp servers', async () => {
+      const result = await command(SetCommunityMCPServers(), {
+        actor: superAdminActor,
+        payload: {
+          community_id: community.id,
+          mcp_server_ids: [mcpServer.id!],
+        },
+      });
+      expect(result).to.have.length(1);
+      expect(result?.[0]).to.toMatchObject(mcpServer);
+
+      const communityResult = await query(GetCommunity(), {
+        actor: superAdminActor,
+        payload: { id: community.id, include_mcp_servers: true },
+      });
+      expect(communityResult?.MCPServerCommunities).to.have.length(1);
+      expect(communityResult?.MCPServerCommunities?.[0]).to.toMatchObject({
+        mcp_server_id: mcpServer.id,
+        community_id: community.id,
+        created_at: expect.any(Date),
+        updated_at: expect.any(Date),
       });
     });
   });
@@ -394,28 +434,28 @@ describe('Community lifecycle', () => {
             {
               id: 1,
               permissions: [
-                PermissionEnum.CREATE_COMMENT,
-                PermissionEnum.CREATE_THREAD,
-                PermissionEnum.CREATE_COMMENT_REACTION,
-                PermissionEnum.CREATE_THREAD_REACTION,
+                GatedActionEnum.CREATE_COMMENT,
+                GatedActionEnum.CREATE_THREAD,
+                GatedActionEnum.CREATE_COMMENT_REACTION,
+                GatedActionEnum.CREATE_THREAD_REACTION,
               ],
             },
             {
               id: 2,
               permissions: [
-                PermissionEnum.CREATE_COMMENT,
-                PermissionEnum.CREATE_THREAD,
-                PermissionEnum.CREATE_COMMENT_REACTION,
-                PermissionEnum.CREATE_THREAD_REACTION,
+                GatedActionEnum.CREATE_COMMENT,
+                GatedActionEnum.CREATE_THREAD,
+                GatedActionEnum.CREATE_COMMENT_REACTION,
+                GatedActionEnum.CREATE_THREAD_REACTION,
               ],
             },
             {
               id: 3,
               permissions: [
-                PermissionEnum.CREATE_COMMENT,
-                PermissionEnum.CREATE_THREAD,
-                PermissionEnum.CREATE_COMMENT_REACTION,
-                PermissionEnum.CREATE_THREAD_REACTION,
+                GatedActionEnum.CREATE_COMMENT,
+                GatedActionEnum.CREATE_THREAD,
+                GatedActionEnum.CREATE_COMMENT_REACTION,
+                GatedActionEnum.CREATE_THREAD_REACTION,
               ],
             },
           ]),
@@ -706,12 +746,22 @@ describe('Community lifecycle', () => {
           directory_page_enabled: true,
           directory_page_chain_node_id: ethNode.id,
           type: ChainType.Offchain,
+          name: `${new Date().getTime()}`,
+          description: `${new Date().getTime()}`,
+          social_links: ['http://discord.gg', 'https://t.me/'],
         },
       });
 
       assert.equal(updated?.directory_page_enabled, true);
       assert.equal(updated?.directory_page_chain_node_id, ethNode.id);
       assert.equal(updated?.type, 'offchain');
+      assert.equal(updated?.default_symbol, 'EDG');
+      // don't allow updating base
+      assert.equal(updated?.base, 'ethereum');
+      assert.equal(updated?.icon_url, 'assets/img/protocols/edg.png');
+      assert.equal(updated?.active, true);
+      expect(updated?.social_links).toContain('http://discord.gg');
+      expect(updated?.social_links).toContain('https://t.me/');
     });
 
     test('ensure update community does not override allow_tokenized_threads', async () => {
@@ -844,7 +894,12 @@ describe('Community lifecycle', () => {
       expect(address?.address).toBe(ethActor.address);
       const members = await query(GetMembers(), {
         actor: superAdminActor,
-        payload: { community_id: community.id, limit: 10, cursor: 1 },
+        payload: {
+          community_id: community.id,
+          limit: 10,
+          cursor: 1,
+          searchByNameAndAddress: false,
+        },
       });
       expect(members?.results.length).toBe(3);
     });

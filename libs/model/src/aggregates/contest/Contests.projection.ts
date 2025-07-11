@@ -2,6 +2,7 @@ import { InvalidState, Projection, logger } from '@hicommonwealth/core';
 import {
   ChildContractNames,
   EvmEventSignatures,
+  commonProtocol,
   commonProtocol as cp,
   getContestScore,
   getContestStatus,
@@ -9,8 +10,9 @@ import {
   getTransaction,
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
-import { events } from '@hicommonwealth/schemas';
+import { TopicWeightedVoting, events } from '@hicommonwealth/schemas';
 import {
+  BalanceSourceType,
   LP_CONTEST_MANAGER_ADDRESS_ANVIL,
   LP_CONTEST_MANAGER_ADDRESS_BASE_MAINNET,
   LP_CONTEST_MANAGER_ADDRESS_BASE_SEPOLIA,
@@ -25,6 +27,7 @@ import { z } from 'zod';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { EvmEventSourceAttributes } from '../../models';
+import { contractHelpers } from '../../services/commonProtocol';
 import { DEFAULT_CONTEST_BOT_PARAMS } from '../../services/openai/parseBotCommand';
 import { getWeightedNumTokens } from '../../services/stakeHelper';
 import {
@@ -128,7 +131,7 @@ async function createInitialContest(
       );
     }
 
-    const [contestManager] = await models.ContestManager.update(
+    const [, [contestManager]] = await models.ContestManager.update(
       {
         interval,
         ticker,
@@ -148,6 +151,42 @@ async function createInitialContest(
       },
       { transaction },
     );
+
+    // if judged contest, create group for contest
+    if (contestManager.namespace_judge_token_id) {
+      const groupName = `Contest [${contestManager.name}] Judge`;
+      await models.Group.findOrCreate({
+        where: {
+          community_id: community.id,
+          metadata: { name: groupName },
+          is_system_managed: true,
+        },
+        defaults: {
+          community_id: community.id,
+          metadata: {
+            name: groupName,
+            description: 'Users who are judges for this contest',
+            required_requirements: 1,
+          },
+          requirements: [
+            {
+              rule: 'threshold',
+              data: {
+                threshold: '0', // must have more than 0 tokens
+                source: {
+                  source_type: BalanceSourceType.ERC1155,
+                  evm_chain_id: community.ChainNode!.eth_chain_id!,
+                  contract_address: community.namespace_address!,
+                  token_id: contestManager.namespace_judge_token_id.toString(),
+                },
+              },
+            },
+          ],
+          is_system_managed: true,
+        },
+        transaction,
+      });
+    }
 
     const childContractName = isOneOff
       ? ChildContractNames.SingleContest
@@ -453,6 +492,9 @@ export function Contests(): Projection<typeof inputs> {
                     {
                       model: models.ChainNode.scope('withPrivateData'),
                     },
+                    {
+                      model: models.CommunityStake,
+                    },
                   ],
                 },
               ],
@@ -466,23 +508,44 @@ export function Contests(): Projection<typeof inputs> {
           return;
         }
 
-        let calculated_voting_weight: string | undefined;
+        let calculated_voting_weight: bigint | null = null;
 
         if (
           BigInt(payload.voting_power || 0) > BigInt(0) &&
           add_action?.ContestManager?.vote_weight_multiplier
         ) {
-          const { eth_chain_id } =
-            add_action!.ContestManager!.Community!.ChainNode!;
-          const { funding_token_address, vote_weight_multiplier } =
-            add_action!.ContestManager!;
-          const numTokens = await getWeightedNumTokens(
-            payload.voter_address,
-            funding_token_address!,
-            eth_chain_id!,
-            vote_weight_multiplier!,
-          );
-          calculated_voting_weight = numTokens.toString();
+          const topic = await models.Topic.findOne({
+            where: { id: add_action.ContestManager.topic_id! },
+          });
+          if (topic?.weighted_voting === TopicWeightedVoting.Stake) {
+            // handle stake
+            const stake =
+              add_action!.ContestManager!.Community!.CommunityStakes?.at(0);
+            mustExist('Community Stake', stake);
+            const stakeBalances = await contractHelpers.getNamespaceBalance(
+              add_action!.ContestManager.Community!.namespace_address!,
+              stake!.stake_id,
+              add_action!.ContestManager!.Community!.ChainNode!.eth_chain_id!,
+              [payload.voter_address],
+            );
+            const stakeBalance = stakeBalances[payload.voter_address];
+            if (BigInt(stakeBalance) === BigInt(0)) {
+              log.warn(`Stake balance is 0 for voter ${payload.voter_address}`);
+              return;
+            }
+            calculated_voting_weight = commonProtocol.calculateVoteWeight(
+              stakeBalance,
+              stake!.vote_weight,
+            );
+          } else {
+            // handle ETH/erc20
+            calculated_voting_weight = await getWeightedNumTokens(
+              payload.voter_address,
+              add_action!.ContestManager!.funding_token_address!,
+              add_action!.ContestManager!.Community!.ChainNode!.eth_chain_id!,
+              add_action!.ContestManager!.vote_weight_multiplier!,
+            );
+          }
         }
 
         await models.ContestAction.upsert({
@@ -493,7 +556,8 @@ export function Contests(): Projection<typeof inputs> {
           thread_id: add_action!.thread_id,
           content_url: add_action!.content_url,
           created_at: new Date(),
-          calculated_voting_weight,
+          calculated_voting_weight:
+            calculated_voting_weight?.toString() || null,
         });
 
         // eslint-disable-next-line @typescript-eslint/no-misused-promises

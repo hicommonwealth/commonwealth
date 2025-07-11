@@ -1,10 +1,5 @@
 import { expect as pwexpect } from '@playwright/test';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
 import { login } from '../../utils/e2eUtils';
-
-chai.use(chaiHttp);
-const { expect } = chai;
 
 export const discussionTests = (test) => {
   return () => {
@@ -15,8 +10,7 @@ export const discussionTests = (test) => {
 
       // Assert Thread header exists on discussions page
       const headerExists = (await page.$('div.HeaderWithFilters')) !== null;
-
-      expect(headerExists).to.be.true;
+      pwexpect(headerExists).toBe(true);
 
       // Assert Threads are loaded into page
       await page.waitForSelector('div[data-test-id]');
@@ -27,7 +21,7 @@ export const discussionTests = (test) => {
           'div[data-test-id] > div',
           (divs) => divs.length,
         );
-        expect(numberOfThreads).to.be.gte(0);
+        pwexpect(numberOfThreads).toBeGreaterThanOrEqual(0);
       }).toPass();
 
       const firstThread = await page.$(
@@ -37,9 +31,8 @@ export const discussionTests = (test) => {
       // navigate to first link
       await firstThread.click();
 
-      expect(page.url())
-        .to.include('discussion')
-        .and.not.include('discussions');
+      pwexpect(page.url()).toContain('discussion');
+      pwexpect(page.url()).not.toContain('discussions');
     });
 
     test('Check navigation to first profile', async ({ page }) => {
@@ -52,7 +45,7 @@ export const discussionTests = (test) => {
       // navigate to first link
       await userProfileLinks.first().click();
 
-      expect(page.url()).to.include('/profile/id/');
+      pwexpect(page.url()).toContain('/profile/id/');
     });
 
     test.skip('Check User can Like/Dislike post', async ({ page }) => {

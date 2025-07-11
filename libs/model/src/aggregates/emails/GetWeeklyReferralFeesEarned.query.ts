@@ -4,7 +4,8 @@ import {
   Query,
 } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import { generateUnsubscribeLink, models } from '../../index';
+import { models } from '../../database';
+import { generateUnsubscribeLink } from '../../utils';
 
 export function GetWeeklyReferralFeesEarnedQuery(): Query<
   typeof GetWeeklyReferralFeesEarned

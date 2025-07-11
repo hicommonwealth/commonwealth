@@ -49,6 +49,11 @@ export function GetDiscordChannels(): Query<typeof schemas.GetDiscordChannels> {
             }),
         };
       }
+
+      return {
+        channels: [],
+        forumChannels: [],
+      };
     },
   };
 }

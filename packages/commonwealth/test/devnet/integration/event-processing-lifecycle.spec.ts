@@ -3,7 +3,7 @@ import {
   LPBondingCurveAbi,
 } from '@commonxyz/common-protocol-abis';
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { describe, expect, test, vi } from 'vitest';
 import { setupCommonwealthE2E } from './integrationUtils/mainSetup';
 
@@ -11,7 +11,7 @@ describe('End to end event tests', () => {
   test(
     'Token trade happy path',
     async () => {
-      const { web3, mineBlocks, anvilAccounts, contractAddresses } =
+      const { web3, anvilAccounts, contractAddresses } =
         await setupCommonwealthE2E();
 
       const launchpadFactory = new web3.eth.Contract(
@@ -30,8 +30,6 @@ describe('End to end event tests', () => {
         830000,
         contractAddresses.tokenCommunityManager,
       );
-
-      await mineBlocks(1);
 
       let token = await models.LaunchpadToken.findOne({
         where: { name: 'testToken' },
@@ -60,8 +58,6 @@ describe('End to end event tests', () => {
         anvilAccounts[0].address,
         100,
       );
-
-      await mineBlocks(1);
 
       await vi.waitFor(
         async () => {

@@ -1,18 +1,35 @@
-import { MembershipRejectReason } from '@hicommonwealth/schemas';
 import {
   AllowlistData,
-  BalanceSourceType,
+  Membership,
+  MembershipRejectReason,
   Requirement,
   ThresholdData,
-} from '@hicommonwealth/shared';
+  TrustLevelData,
+} from '@hicommonwealth/schemas';
+import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
 import { toBigInt } from 'web3-utils';
 import { z } from 'zod';
-import type { OptionsWithBalances } from '../services';
+import type { OptionsWithBalances } from '../services/tokenBalanceCache/types';
+
+type AllowlistData = z.infer<typeof AllowlistData>;
+type ThresholdData = z.infer<typeof ThresholdData>;
+type TrustLevelData = z.infer<typeof TrustLevelData>;
+export type Requirement = z.infer<typeof Requirement>;
+export type Membership = z.infer<typeof Membership> & { balance?: bigint };
+export type UserInfo = {
+  address_id: number;
+  address: string;
+  user_id: number;
+  user_tier: number;
+  wallet_sso?: WalletSsoSource;
+  memberships?: Membership[];
+};
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
   messages?: z.infer<typeof MembershipRejectReason>;
   numRequirementsMet?: number;
+  balance?: bigint;
 };
 
 /**
@@ -24,7 +41,7 @@ export type ValidateGroupMembershipResponse = {
  * @returns ValidateGroupMembershipResponse validity and messages on requirements that failed
  */
 export function validateGroupMembership(
-  userAddress: string,
+  user: UserInfo,
   requirements: Requirement[],
   balances: OptionsWithBalances[],
   numRequiredRequirements: number = 0,
@@ -34,22 +51,38 @@ export function validateGroupMembership(
     messages: [],
   };
   let allowListOverride = false;
+  let trustLevelOverride = false;
   let numRequirementsMet = 0;
 
   requirements.forEach((requirement) => {
-    let checkResult: { result: boolean; message: string };
+    let checkResult: { result: boolean; message: string; balance?: bigint };
     switch (requirement.rule) {
       case 'threshold': {
-        checkResult = _thresholdCheck(userAddress, requirement.data, balances);
+        checkResult = _thresholdCheck(
+          user.address,
+          requirement.data as ThresholdData,
+          balances,
+        );
+        response.balance = checkResult.balance;
         break;
       }
       case 'allow': {
         checkResult = _allowlistCheck(
-          userAddress,
+          user.address,
           requirement.data as AllowlistData,
         );
         if (checkResult.result) {
           allowListOverride = true;
+        }
+        break;
+      }
+      case 'trust-level': {
+        checkResult = _trustLevelCheck(
+          user,
+          requirement.data as TrustLevelData,
+        );
+        if (checkResult.result) {
+          trustLevelOverride = true;
         }
         break;
       }
@@ -73,8 +106,8 @@ export function validateGroupMembership(
     }
   });
 
-  if (allowListOverride) {
-    // allow if address is whitelisted
+  if (allowListOverride || trustLevelOverride) {
+    // allow if address is whitelisted or trust level is met
     return { isValid: true, messages: undefined };
   }
 
@@ -93,23 +126,40 @@ function _thresholdCheck(
   userAddress: string,
   thresholdData: ThresholdData,
   balances: OptionsWithBalances[],
-): { result: boolean; message: string } {
+): { result: boolean; message: string; balance?: bigint } {
   try {
     let balanceSourceType: BalanceSourceType;
     let contractAddress: string;
     let chainId: string;
     let tokenId: string;
+    let objectId: string;
+
     switch (thresholdData.source.source_type) {
       case 'spl': {
         balanceSourceType = BalanceSourceType.SPL;
         contractAddress = thresholdData.source.contract_address;
-        chainId = thresholdData.source.solana_network.toString();
+        chainId =
+          'solana_network' in thresholdData.source
+            ? thresholdData.source.solana_network.toString()
+            : thresholdData.source.evm_chain_id.toString();
         break;
       }
       case 'metaplex': {
         balanceSourceType = BalanceSourceType.SOLNFT;
         contractAddress = thresholdData.source.contract_address;
         chainId = thresholdData.source.solana_network.toString();
+        break;
+      }
+      case 'sui_native': {
+        balanceSourceType = BalanceSourceType.SuiNative;
+        chainId = thresholdData.source.sui_network.toString();
+        objectId = thresholdData.source.object_id!;
+        break;
+      }
+      case 'sui_token': {
+        balanceSourceType = BalanceSourceType.SuiToken;
+        chainId = thresholdData.source.sui_network.toString();
+        contractAddress = thresholdData.source.coin_type;
         break;
       }
       case 'erc20': {
@@ -159,7 +209,7 @@ function _thresholdCheck(
         break;
     }
 
-    const balance = balances
+    const _balance = balances
       .filter((b) => b.options.balanceSourceType === balanceSourceType)
       .find((b) => {
         switch (b.options.balanceSourceType) {
@@ -188,21 +238,37 @@ function _thresholdCheck(
           case BalanceSourceType.SOLNFT:
           case BalanceSourceType.SPL:
             return b.options.mintAddress == contractAddress;
+          case BalanceSourceType.SuiNative:
+            if (objectId) {
+              return (
+                b.options.sourceOptions.suiNetwork === chainId &&
+                b.options.sourceOptions.objectId === objectId
+              );
+            }
+            return b.options.sourceOptions.suiNetwork === chainId;
+          case BalanceSourceType.SuiToken:
+            return (
+              b.options.sourceOptions.suiNetwork === chainId &&
+              b.options.sourceOptions.coinType === contractAddress
+            );
           default:
             return null;
         }
       })?.balances[userAddress];
 
-    if (typeof balance !== 'string') {
+    if (typeof _balance !== 'string') {
       throw new Error(`Failed to get balance for address`);
     }
 
-    const result = toBigInt(balance) > toBigInt(thresholdData.threshold);
+    const balance = BigInt(_balance);
+    const result = balance > toBigInt(thresholdData.threshold);
+
     return {
       result,
       message: !result
-        ? `User Balance of ${balance} below threshold ${thresholdData.threshold}`
+        ? `User Balance of ${_balance} below threshold ${thresholdData.threshold}`
         : 'pass',
+      balance,
     };
   } catch (error) {
     return {
@@ -228,4 +294,32 @@ function _allowlistCheck(
       message: `Error: ${error instanceof Error ? error.message : error}`,
     };
   }
+}
+
+function _trustLevelCheck(
+  user: UserInfo,
+  trustLevelData: TrustLevelData,
+): { result: boolean; message: string } {
+  if (trustLevelData.sso_required) {
+    if (
+      !user.wallet_sso ||
+      !trustLevelData.sso_required.includes(user.wallet_sso)
+    ) {
+      return {
+        result: false,
+        message: 'User sso requirement not met',
+      };
+    }
+  }
+
+  if (user.user_tier < trustLevelData.minimum_trust_level)
+    return {
+      result: false,
+      message: 'User trust level requirement not met',
+    };
+
+  return {
+    result: true,
+    message: 'pass',
+  };
 }

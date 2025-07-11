@@ -2,6 +2,7 @@ import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import clsx from 'clsx';
+import { APIOrderDirection } from 'helpers/constants';
 import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
@@ -15,11 +16,6 @@ import { AuthModal } from 'views/modals/AuthModal';
 import TradeTokenModal, { TradingMode } from 'views/modals/TradeTokenModel';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { z } from 'zod';
-import {
-  CommunityFilters,
-  CommunitySortOptions,
-  communitySortOptionsLabelToKeysMap,
-} from '../../Communities/FiltersDrawer';
 import TrendingToken from '../TrendingToken/TrendingToken';
 import './TrendingTokenList.scss';
 
@@ -27,13 +23,17 @@ const TokenWithCommunity = TokenView.extend({
   community_id: z.string(),
 });
 
-type TokensListProps = {
-  filters?: CommunityFilters;
+type TrendingTokensListProps = {
+  variant?: 'trending' | 'recent' | 'marketcap' | 'graduated';
+  heading?: string;
+  limit?: number;
 };
 
 const TrendingTokensList = ({
-  filters = { withCommunitySortBy: CommunitySortOptions.MarketCap },
-}: TokensListProps) => {
+  variant = 'trending',
+  heading = 'Tokens',
+  limit = 3,
+}: TrendingTokensListProps) => {
   const user = useUserStore();
   const navigate = useCommonNavigate();
   const launchpadEnabled = useFlag('launchpad');
@@ -54,28 +54,21 @@ const TrendingTokensList = ({
 
   const { data: tokensList, isInitialLoading } = useFetchTokensQuery({
     cursor: 1,
-    limit: 3,
+    limit,
     with_stats: true,
     order_by: (() => {
-      if (
-        filters.withCommunitySortBy &&
-        [CommunitySortOptions.MarketCap, CommunitySortOptions.Price].includes(
-          filters.withCommunitySortBy,
-        )
-      ) {
-        return communitySortOptionsLabelToKeysMap[
-          filters.withCommunitySortBy
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ] as any;
-      }
-
-      return undefined;
+      if (variant === 'recent') return 'created_at';
+      if (variant === 'marketcap' || variant === 'graduated')
+        return 'market_cap';
+      return 'price';
     })(),
+    order_direction: APIOrderDirection.Desc,
+    is_graduated: variant === 'graduated',
     enabled: launchpadEnabled,
   });
   const tokens = (tokensList?.pages || [])
     .flatMap((page) => page.results)
-    .slice(0, 3);
+    .slice(0, limit);
 
   const openAuthModalOrTriggerCallback = () => {
     if (user.isLoggedIn) {
@@ -104,7 +97,7 @@ const TrendingTokensList = ({
   return (
     <div className="TokensList">
       <div className="heading-container">
-        <CWText type="h2">Tokens</CWText>
+        <CWText type="h2">{heading}</CWText>
         <Link to="/explore?tab=tokens">
           <div className="link-right">
             <CWText className="link">Tokens</CWText>

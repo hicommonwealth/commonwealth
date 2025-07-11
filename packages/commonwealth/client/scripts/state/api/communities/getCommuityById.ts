@@ -1,6 +1,6 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import axios from 'axios';
-import { BASE_API_PATH, trpc } from 'utils/trpcClient';
+import { getQueryKey } from '@trpc/react-query';
+import { trpc, trpcQueryUtils } from 'utils/trpcClient';
 import { z } from 'zod';
 import { queryClient } from '../config';
 
@@ -37,7 +37,7 @@ export const updateCommunityThreadCount = (
   const count = type === 'increment' ? 1 : -1;
 
   queryKeys.map((key) => {
-    const queryKey = trpc.community.getCommunity.getQueryKey(key);
+    const queryKey = getQueryKey(trpc.community.getCommunity, key);
 
     // update react query cache
     const rqData =
@@ -75,7 +75,7 @@ export const invalidateAllQueriesForCommunity = async (communityId: string) => {
     await Promise.all(
       queryKeys.map(async (key) => {
         const params = {
-          queryKey: trpc.community.getCommunity.getQueryKey(key),
+          queryKey: getQueryKey(trpc.community.getCommunity, key),
         };
         await queryClient.cancelQueries(params);
         await queryClient.invalidateQueries(params);
@@ -84,39 +84,19 @@ export const invalidateAllQueriesForCommunity = async (communityId: string) => {
   }
 };
 
-export const EXCEPTION_CASE_VANILLA_getCommunityById = async (
+export const getCommunityByIdQuery = async (
   communityId: string,
   includeNodeInfo = false,
-): Promise<z.infer<typeof ExtendedCommunity> | undefined> => {
-  // make trpc query key for this request
-  const queryKey = trpc.community.getCommunity.getQueryKey({
-    id: communityId,
-    include_node_info: includeNodeInfo,
-  });
-
-  // if community already exists in cache, return that
-  const cachedCommunity = queryClient.getQueryData<
-    z.infer<typeof ExtendedCommunity> | undefined
-  >(queryKey);
-  if (cachedCommunity) {
-    return cachedCommunity;
-  }
-
-  // HACK: with @trpc/react-query v10.x, we can't directly call an endpoint outside of 'react-context'
-  // with this way the api can be used in non-react files. This should be cleaned up when we migrate
-  // to @trpc/react-query v11.x
-  const response = await axios.get(
-    // eslint-disable-next-line max-len
-    `${BASE_API_PATH}/community.getCommunity?batch=1&input=%7B%220%22%3A%7B%22id%22%3A%22${communityId}%22%2C%22include_node_info%22%3A${includeNodeInfo}%7D%7D`,
+) => {
+  return await trpcQueryUtils.community.getCommunity.fetch(
+    {
+      id: communityId,
+      include_node_info: includeNodeInfo,
+    },
+    {
+      staleTime: COMMUNITIY_STALE_TIME,
+    },
   );
-  const fetchedCommunity = response?.data[0]?.result?.data as z.infer<
-    typeof ExtendedCommunity
-  >;
-
-  // add response in cache
-  queryClient.setQueryData(queryKey, fetchedCommunity);
-
-  return fetchedCommunity;
 };
 
 const useGetCommunityByIdQuery = ({

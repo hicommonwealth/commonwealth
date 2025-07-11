@@ -10,6 +10,7 @@ class TokenLaunchpad extends ContractBase {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private paymentTokenContract: any;
   launchpadFactoryAddress: string;
+  paymentTokenAddress: string;
   launchpadFactory: Contract<typeof TokenLaunchpadAbi>;
 
   constructor(
@@ -19,14 +20,25 @@ class TokenLaunchpad extends ContractBase {
     rpc: string,
   ) {
     super(bondingCurveAddress, TokenBondingCurveAbi, rpc);
+    this.launchpadFactoryAddress = launchpadFactoryAddress;
+    this.paymentTokenAddress = paymentTokenAddress;
+    this.launchpadFactoryAddress = launchpadFactoryAddress;
+  }
+
+  async initialize(
+    withWallet?: boolean,
+    chainId?: string | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any,
+  ): Promise<void> {
+    await super.initialize(withWallet, chainId, providerInstance);
     this.launchpadFactory = new this.web3.eth.Contract(
       TokenLaunchpadAbi,
-      launchpadFactoryAddress,
+      this.launchpadFactoryAddress,
     );
-    this.launchpadFactoryAddress = launchpadFactoryAddress;
     this.paymentTokenContract = new this.web3.eth.Contract(
       erc20Abi,
-      paymentTokenAddress,
+      this.paymentTokenAddress,
     );
   }
 
@@ -52,12 +64,13 @@ class TokenLaunchpad extends ContractBase {
         symbol,
         [8250, 1550, 100, 100],
         [authorAddress, communityTreasuryAddress],
-        this.web3.utils.toWei('1e9', 'ether'), // Default 1B tokens
+        this.web3.utils.toWei('1000000000', 'ether'), // Default 1B tokens
         walletAddress,
         830000,
         threadId,
         exchangeToken,
         initPurchaseAmount,
+        this.contract.options.address as string,
         this.paymentTokenContract,
       );
     } catch (error) {

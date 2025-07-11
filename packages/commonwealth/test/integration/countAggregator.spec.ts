@@ -3,16 +3,12 @@ import { cache, CacheNamespaces, dispose } from '@hicommonwealth/core';
 import {
   CommunityInstance,
   type DB,
-  tester,
   ThreadInstance,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/models';
+import * as tester from '@hicommonwealth/model/tester';
 import { CountAggregatorKeys } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { countAggregator } from '../../server/workers/graphileWorker/tasks/countAggregator';
-
-chai.use(chaiHttp);
 
 async function clearCountAggregatorCache() {
   await cache().deleteKey(
@@ -73,8 +69,8 @@ describe('Count Aggregator Tests', () => {
   describe('Tests the count aggregator', () => {
     test('it shouldnt do anything when redis is empty', async () => {
       await countAggregator();
-      expect(thread.view_count).to.equal(0);
-      expect(thread.reaction_count).to.equal(0);
+      expect(thread.view_count).toBe(0);
+      expect(thread.reaction_count).toBe(0);
     });
 
     test('it updates counts when redis updates', async () => {
@@ -110,30 +106,30 @@ describe('Count Aggregator Tests', () => {
       await community.reload();
       await createReaction(models);
 
-      expect(community.lifetime_thread_count).to.equal(originalThreadCount + 1);
-      expect(community.profile_count).to.equal(originalProfileCount + 1);
+      expect(community.lifetime_thread_count).toBe(originalThreadCount + 1);
+      expect(community.profile_count).toBe(originalProfileCount + 1);
 
       await thread.reload();
-      expect(thread!.view_count).to.equal(15);
-      expect(thread!.reaction_count).to.equal(1);
+      expect(thread!.view_count).toBe(15);
+      expect(thread!.reaction_count).toBe(1);
 
       const profileChangedSet = await cache().getSet(
         CacheNamespaces.CountAggregator,
         CountAggregatorKeys.CommunityProfileCount,
       );
-      expect(profileChangedSet.length).to.equal(0);
+      expect(profileChangedSet.length).toBe(0);
 
       const threadChangedSet = await cache().getSet(
         CacheNamespaces.CountAggregator,
         CountAggregatorKeys.CommunityThreadCount,
       );
-      expect(threadChangedSet.length).to.equal(0);
+      expect(threadChangedSet.length).toBe(0);
 
       const viewCountsHash = await cache().getHash(
         CacheNamespaces.CountAggregator,
         CountAggregatorKeys.ThreadViewCount,
       );
-      expect(Object.keys(viewCountsHash).length).to.equal(0);
+      expect(Object.keys(viewCountsHash).length).toBe(0);
     });
   });
 });

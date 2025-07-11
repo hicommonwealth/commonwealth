@@ -69,7 +69,9 @@ const useGetUserStakeBalanceQuery = ({
       }),
     staleTime: GET_USER_STAKE_BALANCE_STALE_TIME,
     enabled: apiEnabled,
-    keepPreviousData,
+    placeholderData: keepPreviousData
+      ? (previousData) => previousData
+      : undefined,
   });
 };
 

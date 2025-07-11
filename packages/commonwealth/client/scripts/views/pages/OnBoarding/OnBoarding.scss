@@ -1,11 +1,13 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+
 .OnBoarding {
   display: flex;
   height: 100vh;
   width: 100vw;
   justify-content: center;
   overflow: hidden;
-  background-color: $white;
+  background-color: colors.$white;
 
   .swiper-container {
     width: 100%;
@@ -75,7 +77,7 @@
             text-align: start;
             font-size: 43px;
             line-height: 43px;
-            font-family: $font-family-MDNichromeRegular;
+            font-family: shared.$font-family-MDNichromeRegular;
             width: 91%;
           }
           .onboarding-title {
@@ -83,7 +85,7 @@
               font-size: 43px;
               font-weight: 700;
               margin-right: 2px;
-              font-family: $font-family-MDNichrome;
+              font-family: shared.$font-family-MDNichrome;
             }
           }
         }
@@ -101,10 +103,10 @@
     border: 0px;
     height: 48px !important;
     .primary {
-      background-color: $primary-600 !important;
-      font-family: $font-family-MDNichromeRegular;
+      background-color: colors.$primary-600 !important;
+      font-family: shared.$font-family-MDNichromeRegular;
       .btn-border .Button.primary:hover .Text.button-text {
-        font-family: $font-family-MDNichromeRegular !important;
+        font-family: shared.$font-family-MDNichromeRegular !important;
       }
     }
   }

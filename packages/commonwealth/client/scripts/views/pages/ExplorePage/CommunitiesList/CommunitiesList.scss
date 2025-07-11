@@ -1,0 +1,41 @@
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
+
+.communities-count {
+  padding: 12px 0;
+  padding-bottom: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.community-filters {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  height: 0;
+  margin-top: initial;
+  height: auto;
+
+  .Tag {
+    .Text {
+      text-transform: capitalize;
+    }
+  }
+
+  @include media_queries.extraSmall {
+    gap: 12px;
+  }
+
+  .Divider {
+    height: 40px;
+  }
+
+  .tag-filter {
+    border: 1px solid colors.$black !important;
+    min-width: 180px;
+    max-width: 180px;
+  }
+}

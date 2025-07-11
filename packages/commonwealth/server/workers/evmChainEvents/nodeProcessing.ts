@@ -1,5 +1,7 @@
 import { logger, stats } from '@hicommonwealth/core';
-import { EvmChainSource, emitEvent, models } from '@hicommonwealth/model';
+import { emitEvent } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import type { EvmChainSource } from '@hicommonwealth/model/services';
 import { EventPairs } from '@hicommonwealth/schemas';
 import { serializeBigIntObj } from '@hicommonwealth/shared';
 import { createPublicClient, http } from 'viem';
@@ -56,7 +58,7 @@ export async function processChainNode(
       startBlockNum = currentBlock - 10;
     } else if (lastProcessedBlock.block_number === currentBlock - 1) {
       // last processed block number is the same as the most recent block
-      // that EVM CE will process (-1 to avoid chain the majority of re-orgs)
+      // that EVM CE will process (-1 to avoid the majority of chain re-orgs)
       return;
     } else if (lastProcessedBlock.block_number + 1 <= currentBlock - 1) {
       // the next block evm ce is ready to process is less than or equal to
@@ -153,9 +155,29 @@ export async function scheduleNodeProcessing(
   }
 
   const ethChainIds = Object.keys(evmSources);
+
+  const whitelistedChains = config.WEB3.EVM_CHAINS_WHITELIST
+    ? config.WEB3.EVM_CHAINS_WHITELIST.split(',')
+    : null;
+
+  if (whitelistedChains?.length) {
+    const blacklistedChains = ethChainIds.filter((ethChainId) => {
+      return !whitelistedChains.includes(ethChainId);
+    });
+    log.warn(
+      // eslint-disable-next-line max-len
+      `Ignoring chain events for chains ${blacklistedChains.join(', ')} because it is not in EVM_CHAINS_WHITELIST whitelist. Remove the env var to allow all.`,
+    );
+  }
+
+  const filteredEthChainIds = ethChainIds.filter((ethChainId) => {
+    if (!whitelistedChains) return true;
+    return whitelistedChains.includes(ethChainId);
+  });
+
   const betweenInterval = interval / numEvmSources;
 
-  ethChainIds.forEach((ethChainId, index) => {
+  filteredEthChainIds.forEach((ethChainId, index) => {
     const delay = index * betweenInterval;
 
     setTimeout(async () => {

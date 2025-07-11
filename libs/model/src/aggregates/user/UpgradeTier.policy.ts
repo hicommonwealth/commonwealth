@@ -1,6 +1,5 @@
 import { config, logger, Policy } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { tokenBalanceCache } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
@@ -9,11 +8,12 @@ import {
   UserTierMap,
 } from '@hicommonwealth/shared';
 import { Op, QueryTypes, Transaction } from 'sequelize';
-import { models, sequelize } from '../../database';
+import { models } from '../../database';
 import {
   USDC_BASE_MAINNET_ADDRESS,
   USDC_BASE_SEPOLIA_ADDRESS,
 } from '../../services/openai/parseBotCommand';
+import { getBalances } from '../../services/tokenBalanceCache';
 import { findActiveContestManager } from '../../utils/findActiveContestManager';
 import { getChainNodeUrl } from '../../utils/utils';
 
@@ -64,7 +64,7 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
         if (nominatedAddress.User.tier >= UserTierMap.ChainVerified) return;
 
         // if user has sufficient balance of community nomination token, upgrade to ChainVerified tier
-        const balances = await tokenBalanceCache.getBalances({
+        const balances = await getBalances({
           addresses: [nominatedAddress.address],
           balanceSourceType: BalanceSourceType.ERC1155,
           sourceOptions: {
@@ -77,17 +77,10 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
         const balance = parseInt(balances[nominatedAddress.address] ?? '0');
         if (balance < NAMESPACE_MIN_NOMINATION_BALANCE) return;
 
-        await sequelize.transaction(async (transaction) => {
-          await upgradeUserTier(
-            nominatedAddress!.User!.id!,
-            UserTierMap.ChainVerified,
-            transaction,
-          );
-          await models.Community.update(
-            { namespace_verified: true },
-            { where: { id: community.id }, transaction },
-          );
-        });
+        await upgradeUserTier(
+          nominatedAddress!.User!.id!,
+          UserTierMap.ChainVerified,
+        );
       },
       LaunchpadTokenTraded: async ({ payload }) => {
         const { token_address } = payload;

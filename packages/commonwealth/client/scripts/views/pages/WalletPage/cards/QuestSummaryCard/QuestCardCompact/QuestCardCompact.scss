@@ -1,11 +1,12 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
 
 .QuestCardCompact {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   width: 100%;
-  border: 1px solid $neutral-200;
+  border: 1px solid colors.$neutral-200;
   border-radius: 6px;
   padding: 12px 16px;
   gap: 8px;
@@ -27,7 +28,7 @@
       }
 
       .caption {
-        color: $neutral-600;
+        color: colors.$neutral-600;
 
         .community-link,
         .community-link:focus,
@@ -35,7 +36,7 @@
         .community-link:active,
         .community-link:focus-visible,
         .community-link:focus-within {
-          color: $primary-500;
+          color: colors.$primary-500;
         }
       }
 
@@ -55,7 +56,7 @@
     .count-down {
       .Text,
       svg {
-        color: $rorange-300;
+        color: colors.$rorange-300;
       }
     }
   }
@@ -64,7 +65,7 @@
     .count-down {
       .Text,
       svg {
-        color: $neutral-500;
+        color: colors.$neutral-500;
       }
     }
   }

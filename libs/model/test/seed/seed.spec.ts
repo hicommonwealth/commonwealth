@@ -7,15 +7,11 @@ import {
   ChainType,
   CommunityTierMap,
 } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import { Model, ValidationError, type ModelStatic } from 'sequelize';
-import { afterAll, describe, test } from 'vitest';
+import { afterAll, describe, expect, test } from 'vitest';
 import z from 'zod';
 import { models } from '../../src/database';
 import { SeedOptions, seed } from '../../src/tester';
-
-chai.use(chaiAsPromised);
 
 // testSeed creates an entity using the `seed` function
 // then attempts to find the entity and validate it
@@ -105,7 +101,7 @@ describe('Seed functions', () => {
       const user = await testSeed('User', { selected_community_id: null });
       await testSeed('Community', {
         id: 'ethereum',
-        tier: CommunityTierMap.CommunityVerified,
+        tier: CommunityTierMap.ChainVerified,
         network: ChainNetwork.Ethereum,
         default_symbol: 'ETH',
         name: 'Ethereum',
@@ -125,14 +121,13 @@ describe('Seed functions', () => {
             verification_token_expires: undefined,
             verified: new Date(),
             role: 'admin',
-            is_user_default: false,
           },
         ],
       });
 
       await testSeed('Community', {
         id: 'superEth',
-        tier: CommunityTierMap.CommunityVerified,
+        tier: CommunityTierMap.ChainVerified,
         network: ChainNetwork.Ethereum,
         default_symbol: 'SETH',
         name: 'Super Eth',
@@ -152,7 +147,6 @@ describe('Seed functions', () => {
             verification_token_expires: undefined,
             verified: new Date(),
             role: 'admin',
-            is_user_default: false,
           },
         ],
         groups: [
@@ -171,7 +165,7 @@ describe('Seed functions', () => {
     test('Should not mock data', async () => {
       expect(shouldExit).to.be.false;
       shouldExit = true;
-      expect(
+      await expect(
         seed(
           'Community',
           {
@@ -180,7 +174,7 @@ describe('Seed functions', () => {
           },
           { mock: false },
         ),
-      ).to.eventually.be.rejectedWith(ValidationError);
+      ).rejects.toThrow(ValidationError);
       shouldExit = false;
     });
   });

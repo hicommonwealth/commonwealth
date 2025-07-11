@@ -1,6 +1,11 @@
 import { generateMock } from '@anatine/zod-mock';
 import { DeepPartial } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import {
+  CommunityTierMap,
+  DisabledCommunitySpamTier,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import { randomInt } from 'crypto';
 import { Model, type ModelStatic } from 'sequelize';
 import z, {
@@ -97,6 +102,15 @@ async function _seed(
 ) {
   const schema = schemas[model.name as schemas.Entities];
   if (schema && options.mock && schema instanceof ZodObject) {
+    if (model.name === 'User' && !('tier' in values)) {
+      values['tier'] = UserTierMap.ManuallyVerified;
+    }
+    if (model.name === 'Community') {
+      if (!('tier' in values))
+        values['tier'] = CommunityTierMap.ManuallyVerified;
+      if (!('spam_tier_level' in values))
+        values['spam_tier_level'] = DisabledCommunitySpamTier;
+    }
     const mocked = generateMock(schema, {});
     // force undefined associations
     const undefs = {} as State;

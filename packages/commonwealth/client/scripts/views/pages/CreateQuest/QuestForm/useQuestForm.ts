@@ -4,7 +4,10 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import { getDefaultContestImage } from '@hicommonwealth/shared';
+import {
+  CommunityGoalType,
+  getDefaultContestImage,
+} from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
 import {
@@ -13,6 +16,7 @@ import {
   doesActionAllowCommentId,
   doesActionAllowContentId,
   doesActionAllowRepetition,
+  doesActionAllowSSOType,
   doesActionAllowThreadId,
   doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
@@ -20,6 +24,7 @@ import {
   doesActionRequireBasicRewardAmount,
   doesActionRequireChainEvent,
   doesActionRequireDiscordServerId,
+  doesActionRequireGoalConfig,
   doesActionRequireGroupId,
   doesActionRequireRewardShare,
   doesActionRequireStartLink,
@@ -32,8 +37,13 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   useCreateQuestMutation,
+  useDeleteQuestMutation,
   useUpdateQuestMutation,
 } from 'state/api/quests';
+import {
+  useCreateGoalMetaMutation,
+  useGetGoalMetasQuery,
+} from 'state/api/superAdmin';
 import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
@@ -62,8 +72,12 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
       'SSOLinked',
       'DiscordServerJoined',
       'MembershipsRefreshed',
-      'LaunchpadTokenCreated',
+      'RecurringContestManagerDeployed',
+      'LaunchpadTokenRecordCreated',
       'LaunchpadTokenTraded',
+      'LaunchpadTokenGraduated',
+      'ContestEnded',
+      'CommunityGoalReached',
     ] as QuestAction[],
     channel: ['TweetEngagement', 'XpChainEventCreated'] as QuestAction[],
   };
@@ -121,6 +135,10 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                     eventSignature: subForm.eventSignature,
                     transactionHash: subForm.transactionHash,
                   }),
+                  ...(doesActionRequireGoalConfig(chosenAction) && {
+                    goalTarget: subForm.goalTarget,
+                    goalType: subForm.goalType,
+                  }),
                   participationLimit: subForm.participationLimit,
                   participationPeriod: subForm.participationPeriod,
                   participationTimesPerPeriod:
@@ -145,6 +163,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   requires_discord_server_id:
                     allowsContentId &&
                     doesActionRequireDiscordServerId(chosenAction),
+                  requires_goal_config:
+                    doesActionRequireGoalConfig(chosenAction),
                   requires_chain_event:
                     doesActionRequireChainEvent(chosenAction),
                   with_optional_chain_id:
@@ -157,6 +177,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
                   with_optional_token_trade_threshold:
                     allowsContentId &&
                     doesActionAllowTokenTradeThreshold(chosenAction),
+                  with_optional_sso_type:
+                    allowsContentId && doesActionAllowSSOType(chosenAction),
                 },
               };
             }),
@@ -178,6 +200,12 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
 
   const { mutateAsync: createQuest } = useCreateQuestMutation();
   const { mutateAsync: updateQuest } = useUpdateQuestMutation();
+  const { mutateAsync: deleteQuest } = useDeleteQuestMutation();
+  const { mutateAsync: createGoalMeta } = useCreateGoalMetaMutation();
+  const { data: goalMetas = [] } = useGetGoalMetasQuery({
+    apiEnabled: true,
+  });
+  const createQuestIdRef = useRef<number>();
 
   const navigate = useCommonNavigate();
 
@@ -258,6 +286,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         if (scope === QuestActionContentIdScope.Topic) return 'topic';
         if (scope === QuestActionContentIdScope.Chain) return 'chain';
         if (scope === QuestActionContentIdScope.Group) return 'group';
+        if (scope === QuestActionContentIdScope.Goal) return 'goal';
+        if (scope === QuestActionContentIdScope.Sso) return 'sso';
         if (scope === QuestActionContentIdScope.TokenTradeThreshold) {
           return 'threshold';
         }
@@ -279,7 +309,8 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
         }),
         ...(subForm.values.contentIdentifier &&
           subForm.config &&
-          doesConfigAllowContentIdField(subForm.config) && {
+          (doesConfigAllowContentIdField(subForm.config) ||
+            subForm.config.requires_goal_config) && {
             content_id: buildContentIdFromIdentifier(
               subForm.values.contentIdentifier,
               contentIdScope,
@@ -344,6 +375,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     });
 
     if (quest && quest.id) {
+      createQuestIdRef.current = quest.id;
       await updateQuest({
         quest_id: quest.id,
         action_metas: buildActionMetasPayload(),
@@ -375,16 +407,75 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     });
   };
 
-  const handleSubmit = (
+  const handleGoalMetaAssignment = async () => {
+    const foundCommunityGoalReachedActionIndex = questActionSubForms.findIndex(
+      (f) => f.values.action === 'CommunityGoalReached',
+    );
+    if (foundCommunityGoalReachedActionIndex < 0) return true;
+    const { goalTarget, goalType } =
+      questActionSubForms[foundCommunityGoalReachedActionIndex]?.values || {};
+    if (goalTarget && goalType) {
+      // find existing goal meta, use its id if present
+      const foundMeta = goalMetas.find(
+        (m) => m.type === goalType && m.target === parseInt(`${goalTarget}`),
+      );
+      if (foundMeta) {
+        // TODO: fix - api throws unique constraint error if goal id is repeated
+        console.log('foundMeta => ', foundMeta);
+        // updateSubFormByIndex(
+        //   {
+        //     contentIdentifier: `${foundMeta.id || ''}`,
+        //   },
+        //   foundCommunityGoalReachedActionIndex,
+        // );
+        // return true;
+      }
+
+      try {
+        // create goal meta
+        const name = [String(goalType), String(goalTarget)]
+          .sort((a, b) => b.localeCompare(a))
+          .join('-'); // creating manually, ensure dups aren't created
+        const goal = await createGoalMeta({
+          name,
+          description: name,
+          target: parseInt(`${goalTarget}`),
+          type: goalType as CommunityGoalType,
+        });
+        updateSubFormByIndex(
+          {
+            contentIdentifier: `${goal.id || ''}`,
+          },
+          foundCommunityGoalReachedActionIndex,
+        );
+        await new Promise((r) => setTimeout(r, 500));
+        return true;
+      } catch (error) {
+        const subFormErrors = validateSubForms();
+        if (subFormErrors) {
+          return false;
+        }
+        notifyError(
+          `Failed to create goal config for 'Community Goal Reached' action`,
+        );
+        return false;
+      }
+    }
+  };
+
+  const handleSubmit = async (
     values: z.infer<ReturnType<typeof buildDynamicQuestFormValidationSchema>>,
   ) => {
+    const isAssigned = await handleGoalMetaAssignment().catch(() => false);
+    if (!isAssigned) return;
+
     const subFormErrors = validateSubForms();
 
     if (subFormErrors || (mode === 'update' ? !questId : false)) {
       return;
     }
 
-    const handleAsync = async () => {
+    const handleMutation = async () => {
       try {
         if (mode === 'create') {
           await handleCreateQuest(values);
@@ -529,7 +620,35 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
           setQuestActionSubForms([...tempForm]);
           return;
         }
+        if (error.includes('tweet url is already part of a quest')) {
+          const tempForm = [...questActionSubForms];
+          const foundSubForm = tempForm.find(
+            (form) => form.values?.action === 'TweetEngagement',
+          );
+          if (foundSubForm) {
+            foundSubForm.errors = {
+              ...(foundSubForm.errors || {}),
+              contentIdentifier: `This tweet is already part of another quest.`,
+            };
+          }
+          setQuestActionSubForms([...tempForm]);
+          return;
+        }
+        if (error.includes('community id is required when setting goals')) {
+          notifyError(
+            `Community scope is required for setting a community goal`,
+          );
+          return;
+        }
         notifyError(`Failed to ${mode} quest!`);
+
+        // delete the invalid created quest
+        if (createQuestIdRef.current) {
+          await deleteQuest({
+            quest_id: createQuestIdRef.current,
+          }).catch(console.error);
+          createQuestIdRef.current = undefined;
+        }
       }
     };
     const questStartHoursDiffFromNow = moment(values.start_date).diff(
@@ -539,10 +658,10 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
     // request confirmation from user if quest is being created <=6 hours in advance
     if (questStartHoursDiffFromNow <= 6) {
       handleQuestMutateConfirmation(questStartHoursDiffFromNow)
-        .then(() => handleAsync().catch(console.error))
+        .then(() => handleMutation().catch(console.error))
         .catch(console.error);
     } else {
-      handleAsync().catch(console.error);
+      handleMutation().catch(console.error);
     }
   };
 

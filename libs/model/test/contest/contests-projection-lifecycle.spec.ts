@@ -7,11 +7,8 @@ import {
   query,
 } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
-import { createEventRegistryChainNodes, models } from '@hicommonwealth/model';
 import { ContestResults } from '@hicommonwealth/schemas';
 import { CONTEST_FEE_PERCENT, delay } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   afterAll,
   afterEach,
@@ -24,9 +21,9 @@ import {
 import { z } from 'zod';
 import { Contests } from '../../src/aggregates/contest/Contests.projection';
 import { GetAllContests } from '../../src/aggregates/contest/GetAllContests.query';
+import { models } from '../../src/database';
 import { seed } from '../../src/tester';
-
-chai.use(chaiAsPromised);
+import { createEventRegistryChainNodes } from '../../src/utils';
 
 const { commonProtocol } = evm;
 
@@ -219,6 +216,7 @@ describe('Contests projection lifecycle', () => {
     } as unknown as any);
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'RecurringContestManagerDeployed',
       payload: {
         namespace,
@@ -231,6 +229,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestStarted',
       payload: {
         contest_address: recurring,
@@ -242,6 +241,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'OneOffContestManagerDeployed',
       payload: {
         namespace,
@@ -265,6 +265,7 @@ describe('Contests projection lifecycle', () => {
     ).to.exist;
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestStarted',
       payload: {
         contest_id: 0,
@@ -276,6 +277,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentAdded',
       payload: {
         contest_address: oneoff,
@@ -286,6 +288,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentAdded',
       payload: {
         contest_address: recurring,
@@ -297,6 +300,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentUpvoted',
       payload: {
         contest_address: recurring,
@@ -308,6 +312,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentUpvoted',
       payload: {
         contest_address: recurring,
@@ -319,6 +324,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentUpvoted',
       payload: {
         contest_address: oneoff,
@@ -369,6 +375,7 @@ describe('Contests projection lifecycle', () => {
         is_farcaster_contest: true,
         vote_weight_multiplier: null,
         namespace_judge_token_id: null,
+        namespace_judges: null,
         contests: [
           {
             contest_id,

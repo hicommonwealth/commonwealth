@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
 
 .MagicWalletCreationStep {
   display: flex;
@@ -8,14 +9,14 @@
   align-items: center;
 
   .h4 {
-    color: $neutral-600;
+    color: colors.$neutral-600;
 
     .b1 {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
   .primary {
-    background-color: $primary-600 !important;
+    background-color: colors.$primary-600 !important;
   }
 
   .button-container {

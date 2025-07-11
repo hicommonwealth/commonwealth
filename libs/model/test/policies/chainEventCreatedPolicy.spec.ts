@@ -1,12 +1,13 @@
 import { EventContext, dispose } from '@hicommonwealth/core';
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { createTestRpc, models, tester } from '@hicommonwealth/model';
 import { Community } from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
-import { expect } from 'chai';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
+import { models } from '../../src/database';
 import { handleCommunityStakeTrades } from '../../src/policies/handlers/handleCommunityStakeTrades';
+import * as tester from '../../src/tester';
+import { createTestRpc } from '../../src/utils';
 
 // These are all values for a real txn on the Ethereum Sepolia Testnet
 const transactionHash =
@@ -21,6 +22,7 @@ const blockTimestamp = 1712247912;
 
 async function processValidStakeTransaction() {
   const context: EventContext<'CommunityStakeTrade'> = {
+    id: 0,
     name: 'CommunityStakeTrade',
     payload: {
       rawLog: {
@@ -85,7 +87,7 @@ describe('ChainEventCreated Policy', () => {
     });
 
     [community] = await tester.seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: chainNode?.id,
       namespace_address: namespaceAddress,
       lifetime_thread_count: 0,
@@ -118,8 +120,8 @@ describe('ChainEventCreated Policy', () => {
   test("should save stake transactions that don't exist", async () => {
     await processValidStakeTransaction();
     const txns = await models.StakeTransaction.findAll();
-    expect(txns.length).to.equal(1);
-    expect(txns[0].toJSON()).to.deep.equal({
+    expect(txns.length).toBe(1);
+    expect(txns[0].toJSON()).toEqual({
       transaction_hash: transactionHash,
       community_id: community!.id,
       stake_id: stakeId,
@@ -144,12 +146,12 @@ describe('ChainEventCreated Policy', () => {
     });
 
     const initialCount = await models.StakeTransaction.count();
-    expect(initialCount).to.equal(1);
+    expect(initialCount).toBe(1);
 
     await processValidStakeTransaction();
 
     const postCount = await models.StakeTransaction.count();
-    expect(postCount).to.equal(1);
+    expect(postCount).toBe(1);
   });
 
   test('should save judge nominations', async () => {

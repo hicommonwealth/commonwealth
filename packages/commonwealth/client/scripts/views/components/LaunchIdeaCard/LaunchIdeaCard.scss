@@ -1,4 +1,6 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .LaunchIdeaCard {
   position: relative;
@@ -46,7 +48,7 @@
       gap: 12px;
     }
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       .LaunchIdeaCard {
         .gradiant-container {
           .buttons {
@@ -71,12 +73,12 @@
     }
 
     .cta-elements {
-      @include mediumSmallMid {
+      @include media_queries.mediumSmallMid {
         flex-direction: column;
       }
 
       .randomize-cta-text {
-        color: $neutral-700;
+        color: colors.$neutral-700;
       }
 
       .TokenLaunchButton {

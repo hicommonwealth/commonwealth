@@ -19,12 +19,15 @@ import Contest from './contest';
 import ContestAction from './contest_action';
 import ContestManager from './contest_manager';
 import DiscordBotConfig from './discord_bot_config';
+import Dlq from './dlq';
 import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';
 import Group from './group';
-import GroupPermission from './groupPermission';
+import GroupGatedAction from './groupGatedAction';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LaunchpadTrade from './launchpad_trade';
+import MCPServer from './mcp_server';
+import MCPServerCommunity from './mcp_server_community';
 import Membership from './membership';
 import Outbox from './outbox';
 import PinnedToken from './pinned_token';
@@ -73,12 +76,15 @@ export const Factories = {
   ContestManager,
   ChainEventXpSource,
   DiscordBotConfig,
+  Dlq,
   EmailUpdateToken,
   EvmEventSource,
   Group,
-  GroupPermission,
+  GroupGatedAction,
   LastProcessedEvmBlock,
   LaunchpadTrade,
+  MCPServer,
+  MCPServerCommunity,
   Membership,
   Outbox,
   PinnedToken,

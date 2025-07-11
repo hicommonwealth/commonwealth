@@ -1,5 +1,7 @@
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useState } from 'react';
+import React from 'react';
+import app from 'state';
+import { useGetTopHoldersQuery } from 'state/api/communities/getTopHolders';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
@@ -8,75 +10,15 @@ import FormattedDisplayNumber from 'views/components/FormattedDisplayNumber/Form
 import { FullUser } from 'views/components/user/fullUser';
 import './TopHolders.scss';
 
-// Mock data for top holders
-const mockTopHolders = [
-  {
-    address: '0x421',
-    userId: 1,
-    communityId: 'ethereum',
-    name: 'Username',
-    tokens: 21312312,
-    percentage: 21,
-    role: 'Member',
-    tier: 3,
-  },
-  {
-    address: '0x421',
-    userId: 2,
-    communityId: 'ethereum',
-    name: 'Username',
-    tokens: 1231231,
-    percentage: 3.5,
-    role: 'Member',
-    tier: 3,
-  },
-  {
-    address: '0x421',
-    userId: 3,
-    communityId: 'ethereum',
-    name: 'Username',
-    tokens: 12321321,
-    percentage: 3.5,
-    role: 'Member',
-    tier: 3,
-  },
-  {
-    address: '0x421',
-    userId: 4,
-    communityId: 'ethereum',
-    name: 'Username',
-    tokens: 12321321,
-    percentage: 3.5,
-    role: 'Member',
-    tier: 3,
-  },
-  {
-    address: '0x421',
-    userId: 5,
-    communityId: 'ethereum',
-    name: 'Username',
-    tokens: 12321321,
-    percentage: 3.5,
-    role: 'Member',
-    tier: 3,
-  },
-  {
-    address: '0x421',
-    userId: 6,
-    communityId: 'ethereum',
-    name: 'Username',
-    tokens: 12321321,
-    percentage: 3.5,
-    role: 'Member',
-    tier: 3,
-  },
-];
-
-const TopHolders = () => {
+const TopHolders = ({ supply }: { supply: number }) => {
   const navigate = useCommonNavigate();
+  const communityId = app.activeChainId() || '';
 
-  // Hardcode isWindowSmallInclusive to false for now to prevent resize issues
-  const isWindowSmallInclusive = false;
+  const { data: topHolders, isLoading } = useGetTopHoldersQuery({
+    community_id: communityId,
+    limit: 10,
+    shouldPolling: true,
+  });
 
   const columnInfo: CWTableColumnInfo[] = [
     {
@@ -100,28 +42,26 @@ const TopHolders = () => {
     },
   ];
 
-  // Use a memoized date for all rows to reduce re-renders
-  const lastActiveDate = useState(() => new Date().toISOString())[0];
-
-  // Transform mock data to the format expected by CWTable
-  const rowData = mockTopHolders.map((holder) => {
+  const rowData = topHolders?.results.map((holder) => {
+    const name = holder.name || '';
+    const percentage = (holder.tokens * 100) / supply;
     return {
       user: {
         customElement: (
           <FullUser
             userAddress={holder.address}
-            userCommunityId={holder.communityId}
+            userCommunityId={communityId}
             profile={{
               address: holder.address,
-              name: holder.name,
-              userId: holder.userId,
+              name: name.length > 8 ? name.substring(0, 8) + '...' : name,
+              userId: holder.user_id,
               tier: holder.tier,
-              lastActive: lastActiveDate,
-              avatarUrl: '',
+              lastActive: new Date().toISOString(),
+              avatarUrl: holder.avatar_url || '',
             }}
             shouldShowPopover
             shouldShowRole
-            shouldShowAddressWithDisplayName={!isWindowSmallInclusive}
+            shouldShowAddressWithDisplayName={true}
             className="top-holder-user"
             avatarSize={24}
           />
@@ -143,8 +83,10 @@ const TopHolders = () => {
         sortValue: holder.tokens,
       },
       percentDisplay: {
-        customElement: <div className="percent-cell">{holder.percentage}%</div>,
-        sortValue: holder.percentage,
+        customElement: (
+          <div className="percent-cell">{percentage.toFixed(2)}%</div>
+        ),
+        sortValue: percentage,
       },
     };
   });
@@ -164,7 +106,11 @@ const TopHolders = () => {
         </div>
       </div>
       <div className="holders-table">
-        <CWTable columnInfo={columnInfo} rowData={rowData} />
+        {isLoading ? (
+          <CWText>Loading...</CWText>
+        ) : (
+          <CWTable columnInfo={columnInfo} rowData={rowData!} />
+        )}
       </div>
     </div>
   );

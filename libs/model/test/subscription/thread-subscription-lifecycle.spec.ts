@@ -1,8 +1,7 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
-import { expect } from 'chai';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import z from 'zod';
 import {
   CreateThreadSubscription,
@@ -28,7 +27,7 @@ describe('Thread subscription lifecycle', () => {
       balance_type: BalanceType.Ethereum,
     });
     const [community] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: node!.id!,
       lifetime_thread_count: 0,
       profile_count: 1,

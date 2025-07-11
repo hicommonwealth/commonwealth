@@ -1,8 +1,7 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
-import { expect } from 'chai';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import z from 'zod';
 import {
   CreateCommentSubscription,
@@ -29,7 +28,7 @@ describe('Comment subscription lifecycle', () => {
       balance_type: BalanceType.Ethereum,
     });
     const [community] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: node!.id!,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -85,7 +84,7 @@ describe('Comment subscription lifecycle', () => {
       payload,
       actor,
     });
-    expect(res).to.deep.contains({
+    expect(res).toMatchObject({
       user_id: actor.user.id,
       comment_id: commentOne!.id,
     });
@@ -103,7 +102,7 @@ describe('Comment subscription lifecycle', () => {
       payload: {},
     });
 
-    expect(res!.length).to.equal(2);
+    expect(res!.length).toBe(2);
     expect(res![0].id === commentSubOne.id);
     expect(res![1].id === commentSubTwo.id);
   });
@@ -113,7 +112,7 @@ describe('Comment subscription lifecycle', () => {
       actor,
       payload: {},
     });
-    expect(res).to.deep.equal([]);
+    expect(res).toEqual([]);
   });
 
   test('should delete a comment subscriptions', async () => {
@@ -131,6 +130,6 @@ describe('Comment subscription lifecycle', () => {
       payload,
       actor,
     });
-    expect(res).to.equal(2);
+    expect(res).toBe(2);
   });
 });

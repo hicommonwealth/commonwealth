@@ -14,6 +14,7 @@ import { PG_INT } from '../utils';
 import { ChainNode } from './chain.schemas';
 import { ContestManager } from './contest-manager.schemas';
 import { Group } from './group.schemas';
+import { MCPServerCommunity } from './mcp.schemas';
 import { CommunityStake } from './stake.schemas';
 import { CommunityTags } from './tag.schemas';
 import { Topic } from './topic.schemas';
@@ -52,6 +53,7 @@ export const Community = z.object({
   has_homepage: z.enum(['true', 'false']).default('false').nullish(),
   terms: z.string().trim().or(z.literal('')).or(z.string().url()).nullish(),
   admin_only_polling: z.boolean().nullish(),
+  ai_features_enabled: z.boolean(),
   bech32_prefix: z.string().nullish(),
   hide_projects: z.boolean().nullish(),
   token_name: z.string().nullish(),
@@ -67,6 +69,7 @@ export const Community = z.object({
   namespace_verification_configured: z.boolean().optional(),
   namespace_nominations: z.array(z.string()).nullish(),
   namespace_verified: z.boolean().optional(),
+  namespace_governance_address: z.string().nullish(),
   redirect: z.string().nullish(),
   snapshot_spaces: z.array(z.string().max(255)).default([]),
   include_in_digest_email: z.boolean().nullish(),
@@ -76,6 +79,7 @@ export const Community = z.object({
   allow_tokenized_threads: z.boolean().optional(),
   thread_purchase_token: z.string().nullish(),
   environment: z.string().optional(),
+  pending_namespace_judge_token_id: PG_INT.nullish(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),
@@ -93,6 +97,7 @@ export const Community = z.object({
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),
+  MCPServerCommunities: z.array(MCPServerCommunity).optional(),
 });
 
 export const ExtendedCommunity = Community.extend({

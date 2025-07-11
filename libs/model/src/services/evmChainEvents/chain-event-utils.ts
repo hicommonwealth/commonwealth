@@ -6,13 +6,14 @@ import {
   LPBondingCurveAbi,
   NamespaceFactoryAbi,
   ReferralFeeManagerAbi,
+  TokenCommunityManagerAbi,
 } from '@commonxyz/common-protocol-abis';
 import {
   EvmEventSignatures,
   decodeLog,
   getEvmAddress,
 } from '@hicommonwealth/evm-protocols';
-import { Events } from '@hicommonwealth/schemas';
+import { OutboxEvents } from '@hicommonwealth/schemas';
 import { EvmEvent, EvmMapper } from './types';
 
 const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
@@ -142,23 +143,22 @@ const contestManagerDeployedMapper: EvmMapper<
     transaction_hash: event.rawLog.transactionHash,
     eth_chain_id: event.eventSource.ethChainId,
   };
-  if (decoded.args.oneOff) {
-    return {
-      event_name: 'OneOffContestManagerDeployed',
-      event_payload: {
-        ...event_payload,
-        length: Number(interval),
-      },
-    };
-  }
 
-  return {
-    event_name: 'RecurringContestManagerDeployed',
-    event_payload: {
-      ...event_payload,
-      interval: Number(interval),
-    },
-  };
+  return decoded.args.oneOff
+    ? {
+        event_name: 'OneOffContestManagerDeployed',
+        event_payload: {
+          ...event_payload,
+          length: Number(interval),
+        },
+      }
+    : {
+        event_name: 'RecurringContestManagerDeployed',
+        event_payload: {
+          ...event_payload,
+          interval: Number(interval),
+        },
+      };
 };
 
 const recurringContestStartedMapper: EvmMapper<'ContestStarted'> = (
@@ -276,8 +276,8 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
   event: EvmEvent,
 ) => {
   if (
-    !('quest_action_meta_id' in event.meta) ||
-    !event.meta.quest_action_meta_id
+    !('quest_action_meta_ids' in event.meta) ||
+    !event.meta.quest_action_meta_ids
   ) {
     throw new Error('Custom XP chain event is missing quest action meta id');
   }
@@ -286,7 +286,7 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
     event_name: 'XpChainEventCreated',
     event_payload: {
       eth_chain_id: event.eventSource.ethChainId,
-      quest_action_meta_id: event.meta.quest_action_meta_id,
+      quest_action_meta_ids: event.meta.quest_action_meta_ids,
       transaction_hash: event.rawLog.transactionHash,
       created_at: new Date(Number(event.block.timestamp) * 1_000),
     },
@@ -345,8 +345,30 @@ const judgeNominatedMapper: EvmMapper<'JudgeNominated'> = (event: EvmEvent) => {
   };
 };
 
+const communityNamespaceCreatedMapper: EvmMapper<
+  'CommunityNamespaceCreated'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: TokenCommunityManagerAbi,
+    eventName: 'CommunityNamespaceCreated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+
+  const { name, token, namespaceAddress, governanceAddress } = decoded.args;
+  return {
+    event_name: 'CommunityNamespaceCreated',
+    event_payload: {
+      name,
+      token,
+      namespaceAddress,
+      governanceAddress,
+    },
+  };
+};
+
 // TODO: type should match EventRegistry event signatures
-export const chainEventMappers: Record<string, EvmMapper<Events>> = {
+export const chainEventMappers: Record<string, EvmMapper<OutboxEvents>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]:
     namespaceDeployedMapper,
 
@@ -384,6 +406,10 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
     recurringContestVoteMapper,
   [EvmEventSignatures.Contests.SingleContestVoterVoted]:
     singleContestVoteMapper,
+
+  // TokenCommunityManager
+  [EvmEventSignatures.TokenCommunityManager.CommunityNamespaceCreated]:
+    communityNamespaceCreatedMapper,
 
   // User defined events (no hardcoded event signatures)
   XpChainEventCreated: xpChainEventCreatedMapper,

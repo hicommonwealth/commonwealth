@@ -361,23 +361,24 @@ export class RedisCache implements Cache {
    * Get all the key-value pairs of a specific namespace.
    * @param namespace The name of the namespace to retrieve keys from
    * @param maxResults The maximum number of keys to retrieve from the given namespace
+   * @param withData
    */
   public async getNamespaceKeys(
     namespace: CacheNamespaces,
-    maxResults = 1000,
   ): Promise<{ [key: string]: string } | boolean> {
-    const keys = [];
     const data = {} as any;
     if (!this.isReady()) return false;
     try {
-      for await (const key of this._client.scanIterator({
-        MATCH: `${namespace}*`,
-        COUNT: maxResults,
-      })) {
-        keys.push(key);
-      }
+      const keys = await this.scanNamespaceKeys(namespace);
       for (const key of keys) {
-        data[key] = await this._client.get(key);
+        const keyType = await this._client.type(key);
+        if (keyType === 'string') {
+          data[key] = await this._client.get(key);
+        } else {
+          this._log.warn(
+            `Skipping key with non-string type: ${key} (type: ${keyType})`,
+          );
+        }
       }
       return data;
     } catch (e) {
@@ -385,6 +386,29 @@ export class RedisCache implements Cache {
       this._log.error(msg, e as Error);
       return false;
     }
+  }
+
+  private async scanNamespaceKeys(
+    namespace: CacheNamespaces,
+    resultsPerIteration = 100,
+  ): Promise<string[]> {
+    const keys: string[] = [];
+    if (!this.isReady()) return [];
+    try {
+      for await (const key of this._client.scanIterator({
+        MATCH: `${namespace}*`,
+        COUNT: resultsPerIteration,
+      })) {
+        keys.push(key);
+      }
+    } catch (e) {
+      this._log.error(
+        'An error occurred while scanning namespace keys',
+        e as Error,
+      );
+      return [];
+    }
+    return keys;
   }
 
   /**
@@ -397,17 +421,17 @@ export class RedisCache implements Cache {
     if (!this.isReady()) return false;
     try {
       let count = 0;
-      const data = await this.getNamespaceKeys(namespace);
-      if (data) {
-        for (const key of Object.keys(data)) {
-          try {
-            const resp = await this._client.del(key);
-            count += resp ?? 0;
-            this._log.trace(`deleted key ${key} ${resp} ${count}`);
-          } catch (err) {
-            this._log.trace(`error deleting key ${key}`);
-            this._log.trace((err as Error).message);
-          }
+      for await (const key of this._client.scanIterator({
+        MATCH: `${namespace}*`,
+        COUNT: 100,
+      })) {
+        try {
+          const resp = await this._client.del(key);
+          count += resp ?? 0;
+          this._log.trace(`deleted key ${key} ${resp} ${count}`);
+        } catch (err) {
+          this._log.trace(`error deleting key ${key}`);
+          this._log.trace((err as Error).message);
         }
       }
       return count;
@@ -654,5 +678,62 @@ export class RedisCache implements Cache {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async sendCommand(args: string[]): Promise<any> {
     return await this._client.sendCommand(args);
+  }
+
+  /**
+   * Push a value to the beginning of a list and trim it to a specific size in a single transaction.
+   * This is an atomic operation that adds an item to a list and ensures the list doesn't exceed the specified max length.
+   *
+   * @param namespace The namespace of the key
+   * @param key The key of the list
+   * @param value The value to push to the list
+   * @param maxLength The maximum length to maintain for the list
+   * @returns The new length of the list after the push operation, or false if an error occurred
+   */
+  public async lpushAndTrim(
+    namespace: CacheNamespaces,
+    key: string,
+    value: string,
+    maxLength: number,
+  ): Promise<number | false> {
+    if (!this.isReady()) return false;
+    try {
+      const finalKey = RedisCache.getNamespaceKey(namespace, key);
+      const multi = this._client.multi();
+      multi.lPush(finalKey, value);
+      multi.lTrim(finalKey, 0, maxLength - 1);
+      const [newLength] = (await multi.exec()) as [number, unknown];
+      return newLength;
+    } catch (e) {
+      const msg = `An error occurred during lpushAndTrim for key: ${key}`;
+      this._log.error(msg, e as Error);
+      return false;
+    }
+  }
+
+  /**
+   * Retrieve a range of elements from a list stored at the specified key.
+   *
+   * @param namespace The namespace of the key
+   * @param key The key of the list
+   * @param start The starting index (0-based, inclusive)
+   * @param stop The ending index (0-based, inclusive)
+   * @returns Array of elements in the specified range, or an empty array if the key doesn't exist or an error occurred
+   */
+  public async getList(
+    namespace: CacheNamespaces,
+    key: string,
+    start: number = 0,
+    stop: number = -1,
+  ): Promise<string[]> {
+    if (!this.isReady()) return [];
+    try {
+      const finalKey = RedisCache.getNamespaceKey(namespace, key);
+      return await this._client.lRange(finalKey, start, stop);
+    } catch (e) {
+      const msg = `An error occurred while getting list range for key: ${key}`;
+      this._log.error(msg, e as Error);
+      return [];
+    }
   }
 }

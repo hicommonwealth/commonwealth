@@ -1,15 +1,18 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .PersonalInformationStep {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
   gap: 16px;
 
   .h4 {
-    color: $neutral-600;
+    color: colors.$neutral-600;
     .b1 {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 
@@ -34,20 +37,16 @@
       }
     }
   }
-  .footerContainer {
-    bottom: 40px;
+  .personal-info-footer {
     align-self: center;
     display: flex;
     flex-direction: column;
-    width: 90vw;
-    max-width: 400px;
-    @include extraSmall {
-      position: absolute;
-    }
+    margin-top: auto;
+
     .primary {
       padding-left: 2rem;
       padding-right: 2rem;
-      background-color: $primary-600 !important;
+      background-color: colors.$primary-600 !important;
     }
     .footer {
       display: block;
@@ -56,7 +55,7 @@
       a:visited,
       a:active,
       a:hover {
-        color: $primary-600;
+        color: colors.$primary-600;
       }
     }
     .button-container {

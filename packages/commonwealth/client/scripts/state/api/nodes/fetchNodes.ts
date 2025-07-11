@@ -1,40 +1,42 @@
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import NodeInfo from 'models/NodeInfo';
-import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
+import { getQueryKey } from '@trpc/react-query';
+import NodeInfo, { ChainNode } from 'models/NodeInfo';
+import { trpc, trpcQueryUtils } from 'utils/trpcClient';
+import { queryClient } from '../config';
 
-const NODES_STALE_TIME = 3 * 60 * 1_000; // 3 min
+const NODES_STALE_TIME = Infinity;
 const NODES_CACHE_TIME = Infinity;
-
-const fetchNodes = async (): Promise<NodeInfo[]> => {
-  const response = await axios.get(`${SERVER_URL}/${ApiEndpoints.FETCH_NODES}`);
-
-  return response.data.result.map(NodeInfo.fromJSON);
-};
-
-// this is specifically used where you want to get nodes synchronously (only directly from cache)
-export const fetchCachedNodes = () => {
-  return queryClient.getQueryData<NodeInfo[]>([ApiEndpoints.FETCH_NODES]);
-};
-
-// this is similar to hook below, but for non-react files, where the hooks cannot be used
-export const fetchNodesQuery = async () => {
-  return await queryClient.fetchQuery({
-    queryKey: [ApiEndpoints.FETCH_NODES],
-    queryFn: fetchNodes,
-    staleTime: NODES_STALE_TIME,
-    cacheTime: NODES_CACHE_TIME,
-  });
-};
 
 // this is a default query that should be used to get list of nodes
 const useFetchNodesQuery = () => {
-  return useQuery({
-    queryKey: [ApiEndpoints.FETCH_NODES],
-    queryFn: fetchNodes,
+  return trpc.superAdmin.getChainNodes.useQuery(undefined, {
     staleTime: NODES_STALE_TIME,
-    cacheTime: NODES_CACHE_TIME,
+    gcTime: NODES_CACHE_TIME,
+    select: (data) => data.map((node) => new NodeInfo(node as ChainNode)),
   });
+};
+
+// use this to fetch cached nodes synchronously
+export const fetchCachedNodes = (): NodeInfo[] | undefined => {
+  const queryKey = getQueryKey(trpc.superAdmin.getChainNodes);
+  return queryClient.getQueryData<NodeInfo[]>(queryKey);
+};
+
+// use this to fetch nodes in non-react components
+export const fetchNodes = async (): Promise<NodeInfo[]> => {
+  const queryKey = getQueryKey(trpc.superAdmin.getChainNodes);
+  const cache = queryClient.getQueryData<NodeInfo[]>(queryKey);
+  if (cache) return cache;
+
+  const data = await trpcQueryUtils.superAdmin.getChainNodes.fetch(undefined, {
+    staleTime: NODES_STALE_TIME,
+    gcTime: NODES_CACHE_TIME,
+  });
+
+  const nodes = data.map((node: ChainNode) => new NodeInfo(node));
+
+  // add response in cache
+  nodes && queryClient.setQueryData(queryKey, nodes);
+  return nodes;
 };
 
 export default useFetchNodesQuery;

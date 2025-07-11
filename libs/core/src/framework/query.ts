@@ -1,4 +1,4 @@
-import { z, ZodError, ZodSchema } from 'zod';
+import { z, ZodError, ZodType } from 'zod';
 import { InvalidInput, type Context, type Metadata } from './types';
 
 /**
@@ -12,24 +12,26 @@ import { InvalidInput, type Context, type Metadata } from './types';
  * @throws {@link InvalidInput} when user invokes query with invalid payload or attributes, or rethrows internal errors
  */
 export const query = async <
-  Input extends ZodSchema,
-  Output extends ZodSchema,
-  _Context extends ZodSchema,
+  Input extends ZodType,
+  Output extends ZodType,
+  _Context extends ZodType,
 >(
   { input, auth, body }: Metadata<Input, Output, _Context>,
   { actor, payload }: Context<Input, _Context>,
   validate = true,
-): Promise<z.infer<Output> | undefined> => {
+): Promise<z.infer<Output>> => {
   try {
+    const validated = validate ? input.parse(payload) : payload;
+    const stripped = (
+      typeof validated === 'object'
+        ? Object.fromEntries(
+            Object.entries(validated).filter(([, v]) => v !== undefined),
+          )
+        : payload
+    ) as z.infer<Input>;
     const context: Context<Input, _Context> = {
       actor,
-      payload: validate
-        ? Object.fromEntries(
-            Object.entries(input.parse(payload)).filter(
-              ([, v]) => v !== undefined,
-            ),
-          )
-        : payload,
+      payload: stripped,
     };
     for (const fn of auth) {
       await fn(context);

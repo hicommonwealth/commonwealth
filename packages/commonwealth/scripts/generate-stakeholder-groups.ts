@@ -1,5 +1,6 @@
 import { command, dispose, logger } from '@hicommonwealth/core';
-import { Community, models } from '@hicommonwealth/model';
+import { Community } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { Op } from 'sequelize';
 
 const log = logger(import.meta);

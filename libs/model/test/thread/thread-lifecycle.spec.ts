@@ -22,11 +22,11 @@ import {
   inMemoryBlobStorage,
   query,
 } from '@hicommonwealth/core';
-import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   CommunityTierMap,
+  GatedActionEnum,
   MAX_COMMENT_DEPTH,
   MAX_TRUNCATED_CONTENT_LENGTH,
   UserTierMap,
@@ -39,6 +39,7 @@ import {
   CreateCommentReaction,
   DeleteComment,
   GetComments,
+  SearchComments,
   UpdateComment,
 } from '../../src/aggregates/comment';
 import { DeleteReaction } from '../../src/aggregates/reaction';
@@ -53,7 +54,9 @@ import {
 } from '../../src/aggregates/thread';
 import { models } from '../../src/database';
 import { BannedActor, NonMember, RejectedMember } from '../../src/middleware';
+import { AddressAttributes } from '../../src/models';
 import { seed, seedRecord } from '../../src/tester';
+import { R2_ADAPTER_KEY } from '../../src/utils';
 import { getCommentDepth } from '../../src/utils/getCommentDepth';
 import { getSignersInfo, signCreateThread } from '../utils/canvas-signers';
 
@@ -106,7 +109,7 @@ describe('Thread lifecycle', () => {
           : UserTierMap.ManuallyVerified,
     }));
     const [_community] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       spam_tier_level: UserTierMap.NewlyVerifiedWallet,
       chain_node_id: node!.id!,
       namespace_address: '0x123',
@@ -128,18 +131,11 @@ describe('Thread lifecycle', () => {
       ],
       topics: [
         {
-          name: 'topic with permissions',
-          group_ids: [threadGroupId, commentGroupId],
+          name: 'topic with gating',
           weighted_voting: TopicWeightedVoting.Stake,
         },
-        {
-          name: 'topic without thread permissions',
-          group_ids: [emptyGroupId],
-        },
-        {
-          name: 'topic without groups',
-          group_ids: [],
-        },
+        { name: 'topic without gating' },
+        { name: 'topic without groups' },
       ],
       CommunityStakes: [
         {
@@ -151,24 +147,25 @@ describe('Thread lifecycle', () => {
       ],
       custom_stages: ['one', 'two'],
     });
-    await seed('GroupPermission', {
+    await seed('GroupGatedAction', {
       group_id: threadGroupId,
-      topic_id: _community?.topics?.[0]?.id || 0,
-      allowed_actions: [
-        schemas.PermissionEnum.CREATE_THREAD,
-        schemas.PermissionEnum.CREATE_THREAD_REACTION,
-        schemas.PermissionEnum.CREATE_COMMENT_REACTION,
+      topic_id: _community!.topics![0]!.id,
+      gated_actions: [
+        GatedActionEnum.CREATE_THREAD,
+        GatedActionEnum.CREATE_THREAD_REACTION,
+        GatedActionEnum.CREATE_COMMENT_REACTION,
+        GatedActionEnum.UPDATE_POLL,
       ],
     });
-    await seed('GroupPermission', {
+    await seed('GroupGatedAction', {
       group_id: commentGroupId,
-      topic_id: _community?.topics?.[0]?.id || 0,
-      allowed_actions: [schemas.PermissionEnum.CREATE_COMMENT],
+      topic_id: _community!.topics![0]!.id,
+      gated_actions: [GatedActionEnum.CREATE_COMMENT],
     });
-    await seed('GroupPermission', {
+    await seed('GroupGatedAction', {
       group_id: emptyGroupId,
-      topic_id: _community?.topics?.[1]?.id || 0,
-      allowed_actions: [],
+      topic_id: _community!.topics![1]!.id,
+      gated_actions: [],
     });
 
     community = _community!;
@@ -338,7 +335,7 @@ describe('Thread lifecycle', () => {
           actor: actors.nonmember,
           payload: await signCreateThread(actors.nonmember.address!, {
             ...payload,
-            topic_id: community!.topics!.at(1)!.id!,
+            topic_id: community!.topics!.at(0)!.id!,
           }),
         }),
       ).rejects.toThrowError(NonMember);
@@ -627,6 +624,12 @@ describe('Thread lifecycle', () => {
   describe('comments', () => {
     test('should create a thread comment as member of group with permissions', async () => {
       let body = chance.paragraph({ sentences: 50 });
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: thread.id!,
+        },
+      });
+      const initialCommentCount = threadInstance!.comment_count;
       const firstComment = await command(CreateComment(), {
         actor: actors.member,
         payload: {
@@ -635,6 +638,8 @@ describe('Thread lifecycle', () => {
           body,
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.comment_count).to.equal(initialCommentCount! + 1);
       expect(firstComment).to.include({
         thread_id: thread!.id,
         body: body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
@@ -665,6 +670,8 @@ describe('Thread lifecycle', () => {
         community_id: thread!.community_id,
       });
       expect(_comment?.content_url).toBeFalsy();
+      await threadInstance!.reload();
+      expect(threadInstance!.comment_count).to.equal(initialCommentCount! + 2);
     });
 
     test('should throw error when thread not found', async () => {
@@ -770,6 +777,12 @@ describe('Thread lifecycle', () => {
 
     test('should update comment', async () => {
       let body = chance.paragraph({ sentences: 50 });
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: thread.id!,
+        },
+      });
+      const initialCommentCount = threadInstance!.comment_count;
       let updated = await command(UpdateComment(), {
         actor: actors.member,
         payload: {
@@ -777,6 +790,8 @@ describe('Thread lifecycle', () => {
           body,
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.comment_count).to.equal(initialCommentCount!);
       expect(updated).to.include({
         thread_id: thread!.id,
         body: body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
@@ -828,6 +843,12 @@ describe('Thread lifecycle', () => {
 
     test('should delete a comment as author', async () => {
       const body = 'to be deleted';
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: thread.id!,
+        },
+      });
+      const initialCommentCount = threadInstance!.comment_count;
       const tbd = await command(CreateComment(), {
         actor: actors.member,
         payload: {
@@ -835,6 +856,8 @@ describe('Thread lifecycle', () => {
           body,
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.comment_count).to.equal(initialCommentCount! + 1);
       expect(tbd).to.include({
         thread_id: thread!.id,
         body,
@@ -845,6 +868,11 @@ describe('Thread lifecycle', () => {
         payload: { comment_id: tbd!.id! },
       });
       expect(deleted).to.include({ comment_id: tbd!.id! });
+
+      // This is fails because we paranoidly delete the comment and comment count is used to correctly
+      // render the comment tree. See DeleteComment.command.ts for more details.
+      // await threadInstance!.reload();
+      // expect(threadInstance!.comment_count).to.equal(initialCommentCount!);
     });
 
     test('should delete a comment as admin', async () => {
@@ -905,6 +933,7 @@ describe('Thread lifecycle', () => {
           include_reactions: true,
           include_spam_comments: true,
           order_by: 'oldest',
+          is_chat_mode: true,
         },
       });
       expect(response!.results.length).to.equal(5);
@@ -939,6 +968,7 @@ describe('Thread lifecycle', () => {
           include_reactions: true,
           include_spam_comments: true,
           order_by: 'oldest',
+          is_chat_mode: true,
         },
       });
       const second = response2!.results.at(0)!;
@@ -955,6 +985,7 @@ describe('Thread lifecycle', () => {
           include_reactions: false,
           include_spam_comments: true,
           order_by: 'oldest',
+          is_chat_mode: true,
         },
       });
       expect(response!.results.length).to.equal(5);
@@ -978,6 +1009,7 @@ describe('Thread lifecycle', () => {
           include_reactions: false,
           include_spam_comments: true,
           order_by: 'newest',
+          is_chat_mode: false,
         },
       });
       const second = response2!.results.at(0)!;
@@ -1068,6 +1100,12 @@ describe('Thread lifecycle', () => {
       getNamespaceBalanceSpy.mockResolvedValue({
         [actors.admin.address!]: '50',
       });
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: read_only!.id!,
+        },
+      });
+      const initialReactionCount = threadInstance!.reaction_count;
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.admin,
         payload: {
@@ -1076,12 +1114,17 @@ describe('Thread lifecycle', () => {
           reaction: 'like',
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.reaction_count).to.equal(
+        initialReactionCount! + 1,
+      );
       const expectedWeight = 50 * vote_weight;
       expect(`${reaction?.calculated_voting_weight}`).to.eq(
         `${expectedWeight}`,
       );
-      const t = await models.Thread.findByPk(thread!.id);
-      expect(`${t!.reaction_weights_sum}`).to.eq(`${expectedWeight}`);
+      expect(`${threadInstance!.reaction_weights_sum}`).to.eq(
+        `${expectedWeight}`,
+      );
     });
 
     // test('should handle ERC20 topic weight vote', async () => {
@@ -1123,6 +1166,13 @@ describe('Thread lifecycle', () => {
     // });
 
     test('should delete a reaction', async () => {
+      const threadInstance = await models.Thread.findOne({
+        where: {
+          id: read_only!.id!,
+        },
+      });
+      const initialReactionCount = threadInstance!.reaction_count;
+      // tries to create a duplicate reaction on the same thread
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.admin,
         payload: {
@@ -1131,6 +1181,8 @@ describe('Thread lifecycle', () => {
           reaction: 'like',
         },
       });
+      await threadInstance!.reload();
+      expect(threadInstance!.reaction_count).to.equal(initialReactionCount);
       const deleted = await command(DeleteReaction(), {
         actor: actors.admin,
         payload: {
@@ -1138,7 +1190,11 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      const tempReaction = { ...reaction };
+      await threadInstance!.reload();
+      expect(threadInstance!.reaction_count).to.equal(
+        initialReactionCount! - 1,
+      );
+      const tempReaction = { ...reaction } as Partial<typeof reaction>;
       if (tempReaction) {
         if (tempReaction.community_id) delete tempReaction.community_id;
         if (tempReaction.Address) delete tempReaction.Address;
@@ -1187,6 +1243,12 @@ describe('Thread lifecycle', () => {
       getNamespaceBalanceSpy.mockResolvedValue({
         [actors.admin.address!]: '50',
       });
+      const commentInstance = await models.Comment.findOne({
+        where: {
+          id: comment!.id!,
+        },
+      });
+      const initialReactionCount = commentInstance!.reaction_count;
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.admin,
         payload: {
@@ -1199,8 +1261,13 @@ describe('Thread lifecycle', () => {
       expect(`${reaction?.calculated_voting_weight}`).to.eq(
         `${expectedWeight}`,
       );
-      const c = await models.Comment.findByPk(comment!.id);
-      expect(`${c!.reaction_weights_sum}`).to.eq(`${expectedWeight * 2}`); // *2 to account for first member reaction
+      await commentInstance!.reload();
+      expect(commentInstance!.reaction_count).to.equal(
+        initialReactionCount! + 1,
+      );
+      expect(`${commentInstance!.reaction_weights_sum}`).to.eq(
+        `${expectedWeight * 2}`,
+      ); // *2 to account for first member reaction
     });
 
     test('should throw error when comment not found', async () => {
@@ -1249,6 +1316,14 @@ describe('Thread lifecycle', () => {
       getNamespaceBalanceSpy.mockResolvedValue({
         [actors.member.address!]: '50',
       });
+      const commentInstance = await models.Comment.findOne({
+        where: {
+          id: comment!.id!,
+        },
+      });
+      const initialReactionCount = commentInstance!.reaction_count;
+
+      // tries to create a duplicate reaction on the same comment
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.member,
         payload: {
@@ -1257,6 +1332,8 @@ describe('Thread lifecycle', () => {
           reaction: 'like',
         },
       });
+      await commentInstance!.reload();
+      expect(commentInstance!.reaction_count).to.equal(initialReactionCount);
       const deleted = await command(DeleteReaction(), {
         actor: actors.member,
         payload: {
@@ -1264,7 +1341,11 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      const tempReaction = { ...reaction };
+      await commentInstance!.reload();
+      expect(commentInstance!.reaction_count).to.equal(
+        initialReactionCount! - 1,
+      );
+      const tempReaction: Partial<typeof reaction> = { ...reaction };
       if (tempReaction) {
         if (tempReaction.community_id) delete tempReaction.community_id;
         if (tempReaction.Address) delete tempReaction.Address;
@@ -1305,12 +1386,31 @@ describe('Thread lifecycle', () => {
         actor: actors.member,
         payload: {
           community_id: thread.community_id,
-          limit: 100,
+          limit: 50,
+          cursor: 1,
         },
       });
 
-      // console.log(response);
-      expect(response!.threads.length).to.equal(7);
+      expect(response!.results.length).to.equal(7);
+    });
+
+    test('should search comments', async () => {
+      const comments = await query(SearchComments(), {
+        actor: actors.member,
+        payload: {
+          community_id: thread.community_id,
+          search: 'hello',
+          limit: 5,
+          cursor: 1,
+          order_by: 'created_at',
+          order_direction: 'DESC',
+        },
+      });
+      expect(comments!.results).to.have.length(1);
+      expect(comments!.limit).to.equal(5);
+      expect(comments!.page).to.equal(1);
+      expect(comments!.totalPages).to.equal(1);
+      expect(comments!.totalResults).to.equal(1);
     });
   });
 });

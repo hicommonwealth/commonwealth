@@ -35,6 +35,7 @@ export const ProfileTags = z.object({
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 
+  // associations
   Tag: Tags.nullish(),
 });
 
@@ -65,6 +66,7 @@ export const User = z.object({
   xp_points: PG_INT.default(0).nullish(),
   xp_referrer_points: PG_INT.default(0).nullish(),
   privy_id: z.string().max(255).nullish(),
+  notify_user_name_change: z.boolean().default(false).nullish(),
 
   ProfileTags: z.array(ProfileTags).optional(),
   ApiKey: ApiKey.optional(),
@@ -85,7 +87,6 @@ export const Address = z.object({
   ghost_address: z.boolean().default(false),
   wallet_id: z.nativeEnum(WalletId).nullish(),
   block_info: z.string().max(255).nullish(),
-  is_user_default: z.boolean().default(false),
   role: z.enum(Roles).default('member'),
   is_banned: z.boolean().default(false),
   hex: z.string().max(64).nullish(),

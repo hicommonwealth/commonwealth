@@ -2,6 +2,8 @@ import { logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
+  bumpCommunityTier,
+  CommunityTierMap,
   NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
 } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
@@ -109,8 +111,11 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
         log.warn(
           `Community not found for namespace ${namespace_address}, skipping link`,
         );
-        return;
+        return false;
       }
+
+      if (!log_removed)
+        bumpCommunityTier(CommunityTierMap.ChainVerified, community);
 
       community.namespace_creator_address = deployer_address;
 
@@ -187,7 +192,7 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
                 {
                   rule: 'threshold',
                   data: {
-                    threshold: '4', // must have 5 or more tokens
+                    threshold: '0',
                     source: {
                       source_type: BalanceSourceType.ERC1155,
                       evm_chain_id: community.ChainNode!.eth_chain_id!,

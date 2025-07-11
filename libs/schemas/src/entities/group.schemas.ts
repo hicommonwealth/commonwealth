@@ -1,8 +1,8 @@
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
-import { GroupPermission } from './group-permission.schemas';
-import { Address } from './user.schemas';
+import { GroupGatedAction } from './group-permission.schemas';
+import { Address, USER_TIER } from './user.schemas';
 
 const ContractSource = z.object({
   source_type: z.enum([
@@ -25,6 +25,21 @@ const SolanaSource = z.object({
   contract_address: z.string().regex(/^[a-zA-Z0-9]{32,44}$/),
 });
 
+const SuiSource = z.object({
+  source_type: z.enum([BalanceSourceType.SuiNative]),
+  sui_network: z.string(),
+  object_id: z
+    .string()
+    .regex(/^0x[a-zA-F0-9]+$/)
+    .nullish(),
+});
+
+const SuiTokenSource = z.object({
+  source_type: z.enum([BalanceSourceType.SuiToken]),
+  sui_network: z.string(),
+  coin_type: z.string(),
+});
+
 const NativeSource = z.object({
   source_type: z.enum([BalanceSourceType.ETHNative]),
   evm_chain_id: PG_INT,
@@ -41,7 +56,8 @@ const CosmosContractSource = z.object({
   cosmos_chain_id: z.string(),
   contract_address: z.string(),
 });
-const ThresholdData = z.object({
+
+export const ThresholdData = z.object({
   threshold: z.string().regex(/^[0-9]+$/),
   source: z.union([
     ContractSource,
@@ -49,11 +65,18 @@ const ThresholdData = z.object({
     CosmosSource,
     CosmosContractSource,
     SolanaSource,
+    SuiSource,
+    SuiTokenSource,
   ]),
 });
 
-const AllowlistData = z.object({
+export const AllowlistData = z.object({
   allow: z.array(z.string().regex(/^0x[a-fA-F0-9]{40}$/)),
+});
+
+export const TrustLevelData = z.object({
+  minimum_trust_level: USER_TIER,
+  sso_required: z.array(z.nativeEnum(WalletSsoSource)).optional(),
 });
 
 export const Requirement = z.union([
@@ -65,6 +88,10 @@ export const Requirement = z.union([
     rule: z.literal('allow'),
     data: AllowlistData,
   }),
+  z.object({
+    rule: z.literal('trust-level'),
+    data: TrustLevelData,
+  }),
 ]);
 
 export const GroupMetadata = z.object({
@@ -72,6 +99,7 @@ export const GroupMetadata = z.object({
   description: z.string(),
   required_requirements: PG_INT.nullish(),
   membership_ttl: z.number().nullish(), // NOT USED
+  groupImageUrl: z.string().nullish(),
 });
 
 export const Group = z.object({
@@ -82,7 +110,7 @@ export const Group = z.object({
   is_system_managed: z.boolean().optional(),
 
   // associations
-  GroupPermissions: z.array(GroupPermission).optional(),
+  GroupGatedActions: z.array(GroupGatedAction).optional(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
@@ -92,12 +120,14 @@ export const MembershipRejectReason = z
   .object({
     message: z.string(),
     requirement: z.object({
-      data: z.any(),
+      data: z.any().optional(),
       rule: z.string(),
     }),
   })
   .array()
   .optional();
+
+export type MembershipRejectReason = z.infer<typeof MembershipRejectReason>;
 
 export const Membership = z.object({
   group_id: z.number(),

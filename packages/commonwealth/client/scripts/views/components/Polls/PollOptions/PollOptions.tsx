@@ -6,7 +6,7 @@ import './PollOptions.scss';
 export type VoteInformation = {
   label: string;
   value: string;
-  voteCount: number;
+  voteCount: bigint;
 };
 
 export type PollOptionProps = {

@@ -1,0 +1,28 @@
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
+
+.AIModelSelector {
+  padding: 12px 16px;
+  background-color: colors.$white;
+  border: 1px solid colors.$neutral-200;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-width: 300px;
+  max-width: 400px;
+
+  &__title {
+    font-size: 12px;
+    font-weight: 600;
+    color: colors.$neutral-500;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+
+  &__maxReachedMessage {
+    font-size: 12px;
+    color: colors.$neutral-500;
+    margin-top: 10px;
+    margin-bottom: 0;
+    text-align: left;
+  }
+}

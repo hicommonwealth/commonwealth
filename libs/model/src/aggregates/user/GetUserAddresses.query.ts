@@ -8,7 +8,7 @@ export function GetUserAddresses(): Query<typeof schemas.GetUserAddresses> {
   return {
     ...schemas.GetUserAddresses,
     auth: [],
-    secure: true,
+    secure: false,
     body: async ({ actor, payload }) => {
       const { communities, addresses } = payload;
 

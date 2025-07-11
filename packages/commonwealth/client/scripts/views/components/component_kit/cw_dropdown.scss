@@ -1,12 +1,15 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/elevation';
 
 .dropdown-wrapper {
   position: relative;
 
   .dropdown-options-display {
-    background-color: $white;
-    border-radius: $border-radius-corners;
-    box-shadow: $elevation-3;
+    background-color: colors.$white;
+    border-radius: border_radius.$border-radius-corners;
+    box-shadow: elevation.$elevation-3;
     margin-top: 5px;
     overflow: hidden;
     position: absolute;
@@ -22,23 +25,23 @@
       user-select: none;
 
       .dropdown-item-text.Text {
-        color: $neutral-600;
+        color: colors.$neutral-600;
       }
 
       &:hover {
-        background-color: $neutral-50;
+        background-color: colors.$neutral-50;
       }
 
       &:active {
-        background-color: $neutral-100;
+        background-color: colors.$neutral-100;
       }
 
       &.disabled {
-        background-color: $neutral-50;
+        background-color: colors.$neutral-50;
         pointer-events: none;
 
         .dropdown-item-text.Text {
-          color: $neutral-500;
+          color: colors.$neutral-500;
         }
       }
     }

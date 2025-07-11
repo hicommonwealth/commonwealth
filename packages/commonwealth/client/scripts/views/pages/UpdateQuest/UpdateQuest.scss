@@ -1,4 +1,5 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
 
 .UpdateQuest {
   display: flex;
@@ -7,12 +8,12 @@
 
   .header {
     .h2 {
-      color: $neutral-800 !important;
+      color: colors.$neutral-800 !important;
     }
 
     .b1 {
       margin-top: 4px;
-      color: $neutral-600 !important;
+      color: colors.$neutral-600 !important;
     }
   }
 }

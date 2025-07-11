@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
 
 .TokenTradeWidget {
   display: flex;
@@ -11,10 +12,10 @@
     flex-direction: row;
     gap: 8px;
     align-items: center;
-    color: $neutral-500 !important;
+    color: colors.$neutral-500 !important;
 
     .Text {
-      color: $neutral-500 !important;
+      color: colors.$neutral-500 !important;
       letter-spacing: 0.5Øpx;
     }
   }
@@ -29,7 +30,7 @@
       width: 50px;
       border-radius: 50%;
       cursor: pointer;
-      border: 1px solid $neutral-100;
+      border: 1px solid colors.$neutral-100;
     }
 
     .token-address {
@@ -38,7 +39,7 @@
       align-items: center;
       gap: 2px;
       .Text {
-        color: $neutral-800;
+        color: colors.$neutral-800;
       }
     }
   }

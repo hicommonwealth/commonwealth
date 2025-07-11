@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import {
   ChainBase,
   CommunityTierMap,
+  GatedActionEnum,
   UserTierMap,
   WalletId,
 } from '@hicommonwealth/shared';
@@ -20,12 +21,14 @@ export type CommunitySeedOptions = {
   ss58_prefix?: number;
   groups?: {
     id: number;
-    permissions: schemas.PermissionEnum[];
+    permissions: GatedActionEnum[];
   }[];
   custom_stages?: string[];
+  namespace?: string;
   namespace_address?: string;
   stakes?: z.infer<typeof schemas.CommunityStake>[];
   weighted_voting?: schemas.TopicWeightedVoting;
+  override_addresses?: Array<string>;
 };
 
 /**
@@ -43,9 +46,11 @@ export async function seedCommunity({
   ss58_prefix = undefined,
   groups = [],
   custom_stages,
+  namespace,
   namespace_address,
   stakes,
   weighted_voting,
+  override_addresses,
 }: CommunitySeedOptions) {
   const actors = {} as Record<(typeof roles)[number], Actor>;
   const addresses = {} as Record<
@@ -78,7 +83,7 @@ export async function seedCommunity({
     profile_count: 1,
     Addresses: roles.map((role, index) => {
       return {
-        address: signerInfo[index].address,
+        address: override_addresses?.[index] || signerInfo[index].address,
         user_id: users[role].id,
         role: role === 'admin' ? 'admin' : 'member',
         is_banned: role === 'banned',
@@ -89,17 +94,18 @@ export async function seedCommunity({
   });
 
   const [community] = await seed('Community', {
-    tier: CommunityTierMap.CommunityVerified,
+    tier: CommunityTierMap.ChainVerified,
     chain_node_id: node!.id!,
     base: chain_base,
     bech32_prefix,
     ss58_prefix,
+    namespace,
     namespace_address,
     active: true,
     profile_count: 1,
     Addresses: roles.map((role, index) => {
       return {
-        address: signerInfo[index].address,
+        address: override_addresses?.[index] || signerInfo[index].address,
         user_id: users[role].id,
         role: role === 'admin' ? 'admin' : 'member',
         is_banned: role === 'banned',
@@ -108,22 +114,17 @@ export async function seedCommunity({
       };
     }),
     groups: groups.map(({ id }) => ({ id })),
-    topics: [
-      {
-        group_ids: groups.map(({ id }) => id),
-        weighted_voting,
-      },
-    ],
+    topics: [{ weighted_voting }],
     CommunityStakes: stakes ?? [],
     custom_stages,
   });
 
   await Promise.all(
     groups.map((g) =>
-      seed('GroupPermission', {
+      seed('GroupGatedAction', {
         group_id: g.id,
         topic_id: community?.topics?.[0]?.id || 0,
-        allowed_actions: g.permissions,
+        gated_actions: g.permissions,
       }),
     ),
   );

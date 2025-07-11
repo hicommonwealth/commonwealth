@@ -1,6 +1,5 @@
 import { config, dispose } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { emitEvent, tokenBalanceCache } from '@hicommonwealth/model';
 import { Community, EventPair, User } from '@hicommonwealth/schemas';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
@@ -11,7 +10,9 @@ import {
 } from '../../src/aggregates/user/UpgradeTier.policy';
 import { models } from '../../src/database';
 import { USDC_BASE_MAINNET_ADDRESS } from '../../src/services/openai/parseBotCommand';
+import * as tokenBalanceCache from '../../src/services/tokenBalanceCache';
 import { seed } from '../../src/tester';
+import { emitEvent } from '../../src/utils/utils';
 import { drainOutbox } from '../utils';
 
 // TODO: use bigint helper util
@@ -149,8 +150,6 @@ describe('Upgrade Tiers lifecycle', () => {
 
       const userAfter = await models.User.findByPk(user.id);
       expect(userAfter!.tier).toBe(UserTierMap.ChainVerified);
-      const communityAfter = await models.Community.findByPk(community.id);
-      expect(communityAfter!.namespace_verified).toBe(true);
     });
 
     test('should upgrade user to ChainVerified tier when contest is funded and there is contest activity', async () => {

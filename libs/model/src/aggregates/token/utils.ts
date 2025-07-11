@@ -9,9 +9,11 @@ import {
   mustBeProtocolChainId,
   transferLaunchpadLiquidityToUniswap,
 } from '@hicommonwealth/evm-protocols';
-import { config, models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
+import { config } from '../../config';
+import { models } from '../../database';
 import { mustExist } from '../../middleware';
+import { emitEvent } from '../../utils';
 
 const log = logger(import.meta);
 
@@ -95,6 +97,9 @@ export async function handleCapReached(
         privateKey: config.WEB3.LAUNCHPAD_PRIVATE_KEY!,
       });
 
+      token.liquidity_transferred = true;
+      log.debug(`Liquidity transferred to ${token_address}`);
+
       if (notifyUsers.length > 0) {
         await provider.triggerWorkflow({
           key: WorkflowKeys.LaunchpadCapReached,
@@ -105,11 +110,24 @@ export async function handleCapReached(
           },
         });
       }
-
-      token.liquidity_transferred = true;
-      log.debug(`Liquidity transferred to ${token_address}`);
     }
 
-    await token.save();
+    await models.sequelize.transaction(async (transaction) => {
+      if (token.liquidity_transferred) {
+        await emitEvent(
+          models.Outbox,
+          [
+            {
+              event_name: 'LaunchpadTokenGraduated',
+              event_payload: {
+                token: token.toJSON(),
+              },
+            },
+          ],
+          transaction,
+        );
+      }
+      await token.save({ transaction });
+    });
   }
 }

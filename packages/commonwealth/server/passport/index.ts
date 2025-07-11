@@ -1,16 +1,21 @@
 import { stats } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import { magicLogin } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { MagicLogin } from '@hicommonwealth/schemas';
+import { UserTierMap } from '@hicommonwealth/shared';
+import { Magic } from '@magic-sdk/admin';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
+import { Strategy as MagicStrategy } from 'passport-magic';
+import { Op } from 'sequelize';
 import { config } from '../config';
 import '../types';
-import { initMagicAuth } from './magic';
 // import { initTokenAuth } from './tokenAuth';
 
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 
-function initDefaultUserAuth(models: DB) {
+function initDefaultUserAuth() {
   passport.use(
     new JWTStrategy(
       {
@@ -24,7 +29,12 @@ function initDefaultUserAuth(models: DB) {
       async (jwtPayload, done) => {
         try {
           models.User.scope('withPrivateData')
-            .findOne({ where: { id: jwtPayload.id } })
+            .findOne({
+              where: {
+                id: jwtPayload.id,
+                tier: { [Op.ne]: UserTierMap.BannedUser },
+              },
+            })
             .then((user) => {
               if (user) {
                 // note the return removed with passport JWT - add this return for passport local
@@ -41,9 +51,29 @@ function initDefaultUserAuth(models: DB) {
   );
 }
 
-export function setupPassport(models: DB) {
-  initDefaultUserAuth(models);
-  initMagicAuth(models);
+function initMagicAuth() {
+  // allow magic login if configured with key
+  if (config.MAGIC_API_KEY) {
+    // TODO: verify we are in a community that supports magic login
+    const magic = new Magic(config.MAGIC_API_KEY);
+    passport.use(
+      new MagicStrategy({ passReqToCallback: true }, (req, user, cb) => {
+        try {
+          const body = MagicLogin.parse(req.body);
+          magicLogin(magic, body, user)
+            .then((signed) => cb(null, signed))
+            .catch((e) => cb(e, user));
+        } catch (e) {
+          return cb(e, user);
+        }
+      }),
+    );
+  }
+}
+
+export function setupPassport() {
+  initDefaultUserAuth();
+  initMagicAuth();
   // initTokenAuth();
 
   passport.serializeUser<any>((user, done) => {
@@ -55,15 +85,24 @@ export function setupPassport(models: DB) {
   });
 
   passport.deserializeUser((userId, done) => {
-    models.User.scope('withPrivateData')
-      // @ts-expect-error StrictNullChecks
-      .findOne({ where: { id: userId } })
-      .then((user) => {
-        done(null, user);
-      })
-      .catch((err) => {
-        done(err, null);
-      });
+    if (!userId || (typeof userId !== 'string' && typeof userId !== 'number')) {
+      done(new Error('Invalid user'), false);
+    } else {
+      models.User.scope('withPrivateData')
+        .findOne({
+          where: { id: userId, tier: { [Op.ne]: UserTierMap.BannedUser } },
+        })
+        .then((user) => {
+          if (!user) {
+            done(new Error('Invalid user'), false);
+          } else {
+            done(null, user);
+          }
+        })
+        .catch((err) => {
+          done(err, null);
+        });
+    }
   });
 }
 

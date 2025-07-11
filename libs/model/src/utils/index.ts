@@ -5,6 +5,7 @@ export * from './farcasterUtils';
 export * from './generateImage';
 export * from './generateUnsubscribeLink';
 export * from './getDelta';
+export * from './magic';
 export * from './makeGetBalancesOptions';
 export * from './oauth/getVerifiedUserInfo';
 export * from './oauth/types';

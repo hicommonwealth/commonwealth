@@ -1,8 +1,9 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
 
 .CWModalHeader {
   width: 100%;
-  background: $white;
+  background: colors.$white;
   border-radius: 6px 6px 0 0;
   padding: 24px 24px 16px 24px;
 
@@ -27,18 +28,18 @@
     }
 
     .close-icon {
-      color: $neutral-500;
+      color: colors.$neutral-500;
       flex-shrink: 0;
 
       &:hover {
         cursor: pointer;
-        color: $neutral-800;
+        color: colors.$neutral-800;
       }
     }
 
     .danger-icon,
     .warning-icon {
-      color: $rorange-600;
+      color: colors.$rorange-600;
       flex-shrink: 0;
       margin-right: 8px;
       line-height: 28px;
@@ -46,19 +47,19 @@
     }
 
     .danger-icon {
-      color: $rorange-600;
+      color: colors.$rorange-600;
     }
 
     .warning-icon {
       flex-shrink: 0;
-      color: $yellow-500;
+      color: colors.$yellow-500;
       margin-right: 8px;
       margin-top: 2px;
     }
   }
 
   .Subtitle {
-    color: $neutral-800;
+    color: colors.$neutral-800;
     font-style: normal;
     line-height: 16px;
     margin-top: 8px;

@@ -7,8 +7,6 @@ import {
 } from '@hicommonwealth/core';
 import { Comment, Community, Thread, User } from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   afterAll,
   afterEach,
@@ -31,8 +29,6 @@ import {
   generateGovernanceData,
   generateProtocolData,
 } from './util';
-
-chai.use(chaiAsPromised);
 
 describe('Recap email lifecycle', () => {
   let community: z.infer<typeof Community> | undefined;
@@ -58,7 +54,7 @@ describe('Recap email lifecycle', () => {
       balance_type: BalanceType.Ethereum,
     });
     [community] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -220,6 +216,6 @@ describe('Recap email lifecycle', () => {
           user_id: String(recipientUser!.id),
         },
       }),
-    ).to.eventually.be.rejectedWith(ProviderError);
+    ).rejects.toThrow(ProviderError);
   });
 });
