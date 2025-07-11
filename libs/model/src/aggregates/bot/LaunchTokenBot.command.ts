@@ -12,12 +12,11 @@ import {
   getErc20TokenInfo,
   getLaunchpadTokenCreatedTransaction,
 } from '@hicommonwealth/evm-protocols';
-import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import _ from 'lodash';
 import { z } from 'zod';
+import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { CreateCommunity } from '../community';
@@ -155,7 +154,7 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
         community_url: `${config.SERVER_URL}/${communityId}`,
         ...token!.toJSON(),
       };
-      return response as unknown as z.infer<typeof TokenView> & {
+      return response as unknown as z.infer<typeof schemas.TokenView> & {
         community_url: string;
       };
     },
