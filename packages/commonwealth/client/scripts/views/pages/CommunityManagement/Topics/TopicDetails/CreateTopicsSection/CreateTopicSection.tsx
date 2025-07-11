@@ -3,12 +3,14 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
+import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import {
@@ -24,12 +26,14 @@ import { topicCreationValidationSchema } from './validation';
 interface CreateTopicSectionProps {
   onStepChange: (step: CreateTopicStep) => void;
   onSetTopicFormData: (data: Partial<TopicForm>) => void;
+  onGroupsSelected?: (groups: number[]) => void;
   topicFormData: TopicForm | null;
 }
 
 export const CreateTopicSection = ({
   onStepChange,
   onSetTopicFormData,
+  onGroupsSelected,
   topicFormData,
 }: CreateTopicSectionProps) => {
   const communityId = app.activeChainId() || '';
@@ -58,6 +62,15 @@ export const CreateTopicSection = ({
     createDeltaFromText(topicFormData?.newPostTemplate || ''),
   );
   const [characterCount, setCharacterCount] = useState(0);
+
+  // Private topic state (local only, not part of TopicForm)
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
+
+  const { data: groups } = useFetchGroupsQuery({
+    communityId: communityId,
+    enabled: !!communityId,
+  });
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
@@ -127,8 +140,14 @@ export const CreateTopicSection = ({
           ? JSON.stringify(newPostTemplate)
           : '',
     });
+    if (onGroupsSelected) onGroupsSelected(selectedGroups);
     onStepChange(CreateTopicStep.WVConsent);
   };
+
+  // Also call onGroupsSelected when groups change
+  useEffect(() => {
+    if (onGroupsSelected) onGroupsSelected(selectedGroups);
+  }, [selectedGroups]);
 
   return (
     <div className="CreateTopicSection">
@@ -218,6 +237,24 @@ export const CreateTopicSection = ({
               />
             )}
           </div>
+          <CWCheckbox
+            label="Private topic"
+            checked={isPrivate}
+            onChange={() => setIsPrivate(!isPrivate)}
+          />
+          {isPrivate && (
+            <CWSelectList
+              isMulti
+              label="Allowed groups"
+              options={groups?.map((g) => ({ label: g.name, value: g.id }))}
+              value={groups
+                ?.filter((g) => selectedGroups.includes(g.id))
+                .map((g) => ({ label: g.name, value: g.id }))}
+              onChange={(selected) =>
+                setSelectedGroups(selected.map((opt) => opt.value))
+              }
+            />
+          )}
         </div>
         <div className="actions">
           <MessageRow
