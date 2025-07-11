@@ -42,7 +42,7 @@ open_gates AS (
     BOOL_AND(
       COALESCE(G.is_private, FALSE) = FALSE
       OR M.address_id IS NOT NULL
-      OR ${actor.user.isAdmin ? 'TRUE' : 'FALSE'}
+      OR ${actor?.user?.isAdmin ? 'TRUE' : 'FALSE'}
     )
 ),
 comments AS (
