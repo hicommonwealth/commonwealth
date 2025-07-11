@@ -1,5 +1,6 @@
 import { type Command } from '@hicommonwealth/core';
 import * as protocols from '@hicommonwealth/evm-protocols';
+import { getTransaction, withRetries } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { models } from '../../database';
@@ -18,20 +19,12 @@ export function CreateToken(): Command<typeof schemas.CreateThreadToken> {
       });
       mustExist('ChainNode', chainNode);
 
-      const {
-        name,
-        symbol,
-        token_address,
-        creator_address,
-        created_at,
-        total_supply,
-        launchpad_liquidity,
-        curve_id,
-        reserve_ration,
-        initial_purchase_eth_amount,
-      } = await protocols.getLaunchpadTokenDetails({
-        rpc: chainNode.private_url! || chainNode.url!,
-        transactionHash: transaction_hash,
+      const tx = await withRetries(async () => {
+        const { tx: innerTx } = await getTransaction({
+          rpc: chainNode.private_url! || chainNode.url!,
+          txHash: transaction_hash,
+        });
+        return innerTx;
       });
 
       return models.sequelize.transaction(async (transaction) => {
