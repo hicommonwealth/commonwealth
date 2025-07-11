@@ -38,6 +38,7 @@
     "emit-webhook": "tsx server/scripts/emitWebhook.ts",
     "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",
     "generate-oas": "pnpm ts-exec server/scripts/generate-external-api-oas.ts",
+    "generate-event-signatures": "pnpm ts-exec server/scripts/generate-event-signature.ts TokenLaunchpadAbi",
     "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
     "list-neynar-webhooks": "tsx ./scripts/list-neynar-webhooks.ts",
     "list-event-sigs": "tsx ./scripts/list-event-sigs.ts",
