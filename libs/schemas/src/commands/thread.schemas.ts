@@ -1,6 +1,17 @@
 import { z } from 'zod';
-import { ReactionContext, ThreadContext, TopicContext } from '../context';
-import { COMMUNITY_TIER, Link, Reaction, Thread } from '../entities';
+import {
+  AuthContext,
+  ReactionContext,
+  ThreadContext,
+  TopicContext,
+} from '../context';
+import {
+  COMMUNITY_TIER,
+  Link,
+  Reaction,
+  Thread,
+  ThreadToken,
+} from '../entities';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 
 export const CanvasThread = z.object({
@@ -117,4 +128,14 @@ export const DeleteLinks = {
   }),
   output: Thread,
   context: ThreadContext,
+};
+
+export const CreateThreadToken = {
+  input: z.object({
+    community_id: z.string(),
+    eth_chain_id: z.number(),
+    transaction_hash: z.string().length(66),
+  }),
+  output: ThreadToken,
+  context: AuthContext,
 };

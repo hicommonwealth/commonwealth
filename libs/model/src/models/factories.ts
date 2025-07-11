@@ -46,6 +46,8 @@ import Tags from './tags';
 import Thread from './thread';
 import ThreadRank from './thread_rank';
 import ThreadSubscription from './thread_subscriptions';
+import ThreadToken from './thread_token';
+import ThreadTokenTrade from './thread_token_trade';
 import ThreadVersionHistory from './thread_version_history';
 import LaunchpadToken from './token';
 import Topic from './topic';
@@ -113,6 +115,8 @@ export const Factories = {
   Wallets,
   LaunchpadToken,
   XpLog,
+  ThreadToken,
+  ThreadTokenTrade,
 };
 
 export type DB = {
