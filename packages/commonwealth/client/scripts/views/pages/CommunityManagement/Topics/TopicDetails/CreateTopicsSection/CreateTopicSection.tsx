@@ -63,7 +63,6 @@ export const CreateTopicSection = ({
   );
   const [characterCount, setCharacterCount] = useState(0);
 
-  // Private topic state (local only, not part of TopicForm)
   const [isPrivate, setIsPrivate] = useState(false);
   const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
 
@@ -144,7 +143,6 @@ export const CreateTopicSection = ({
     onStepChange(CreateTopicStep.WVConsent);
   };
 
-  // Also call onGroupsSelected when groups change
   useEffect(() => {
     if (onGroupsSelected) onGroupsSelected(selectedGroups);
   }, [selectedGroups]);
