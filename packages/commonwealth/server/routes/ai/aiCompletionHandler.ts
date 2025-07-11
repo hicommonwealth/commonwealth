@@ -30,6 +30,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       stream = true,
       useOpenRouter = false,
       useWebSearch = false,
+      mcpServerUrl,
     } = req.body as RequestBody;
 
     let finalUserPrompt: string;
@@ -127,6 +128,75 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     };
 
     const openai = new OpenAI(openAIConfig);
+
+    // If a specific MCP server URL is provided, use the new Responses API
+    if (mcpServerUrl) {
+      if (stream) {
+        res.setHeader('Content-Type', 'text/plain');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('X-Accel-Buffering', 'no');
+
+        try {
+          const responseStream = await openai.responses.create({
+            model: modelId,
+            instructions: finalSystemPrompt,
+            input: finalUserPrompt,
+            tools: [
+              {
+                type: 'mcp',
+                server_url: mcpServerUrl,
+                require_approval: 'never',
+              },
+            ],
+            stream: true,
+          });
+
+          for await (const event of responseStream) {
+            if (event.type === 'response.output_text.delta') {
+              const deltaText = (event as { delta?: string }).delta || '';
+              if (deltaText) {
+                res.write(deltaText);
+                if (res.flush) res.flush();
+              }
+            }
+          }
+
+          return res.end();
+        } catch (err) {
+          const error = err as Error & { status?: number };
+          return res.status(error.status || 500).json({
+            error: error.message || 'Streaming failed',
+            status: error.status || 500,
+          });
+        }
+      }
+
+      // Non-streaming fallback
+      try {
+        const completion = await openai.responses.create({
+          model: modelId,
+          instructions: finalSystemPrompt,
+          input: finalUserPrompt,
+          tools: [
+            {
+              type: 'mcp',
+              server_url: mcpServerUrl,
+              require_approval: 'never',
+            },
+          ],
+          stream: false,
+        });
+
+        const text = (completion as any)?.response?.output_text || '';
+        return res.json({ completion: text });
+      } catch (err) {
+        const error = err as Error & { status?: number };
+        return res.status(error.status || 500).json({
+          error: error.message || 'Completion failed',
+          status: error.status || 500,
+        });
+      }
+    }
 
     if (stream) {
       // Set proper headers for streaming
