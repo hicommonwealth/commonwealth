@@ -20,9 +20,11 @@ import { CreateTopicStep, getCreateTopicSteps } from './utils';
 import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
 import { useCreateTopicMutation } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import Permissions from 'client/scripts/utils/Permissions';
 import { PageNotFound } from '../../404';
 import './Topics.scss';
@@ -93,9 +95,17 @@ export const Topics = () => {
   const [createTopicStep, setCreateTopicStep] = useState(
     CreateTopicStep.TopicDetails,
   );
+  const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
 
   const navigate = useCommonNavigate();
   const { mutateAsync: createTopic } = useCreateTopicMutation();
+  const { mutateAsync: editGroup } = useEditGroupMutation({
+    communityId: app.activeChainId() || '',
+  });
+  const { data: groups = [] } = useFetchGroupsQuery({
+    communityId: app.activeChainId() || '',
+    enabled: !!app.activeChainId(),
+  });
 
   const { data: community } = useGetCommunityByIdQuery({
     id: app.activeChainId() || '',
@@ -112,6 +122,10 @@ export const Topics = () => {
 
   const handleSetTopicFormData = (data: Partial<TopicForm>) => {
     setTopicFormData((prevState) => ({ ...prevState, ...data }));
+  };
+
+  const handleGroupsSelected = (groups: number[]) => {
+    setSelectedGroups(groups);
   };
 
   if (
@@ -133,7 +147,7 @@ export const Topics = () => {
     }
 
     try {
-      await createTopic({
+      const result = await createTopic({
         name: topicFormData.name,
         description: topicFormData.description,
         featured_in_sidebar: topicFormData.featuredInSidebar || false,
@@ -185,6 +199,29 @@ export const Topics = () => {
           : {}),
       });
 
+      const newTopicId = result.topic?.id;
+
+      console.log('test newTopicId', newTopicId);
+      console.log('test selectedGroups', selectedGroups);
+
+      for (const groupId of selectedGroups) {
+        const group = groups.find((g) => g.id === groupId);
+        if (!group) continue;
+        const updatedTopics = [
+          ...(group.topics || []),
+          { id: newTopicId, is_private: true, name: topicFormData.name },
+        ];
+        await editGroup({
+          community_id: app.activeChainId() || '',
+          group_id: groupId,
+          topics: updatedTopics.map((t) => ({
+            id: t.id,
+            is_private: true,
+            permissions: Object.values(GatedActionEnum),
+          })),
+        });
+      }
+
       navigate(`/discussions/${encodeURI(topicFormData.name.trim())}`);
     } catch (err) {
       notifyError('Failed to create topic');
@@ -203,6 +240,7 @@ export const Topics = () => {
           <TopicDetails
             onStepChange={setCreateTopicStep}
             onSetTopicFormData={handleSetTopicFormData}
+            onGroupsSelected={handleGroupsSelected}
             topicFormData={topicFormData}
           />
         );
