@@ -38,17 +38,14 @@ export const createThreadToken = async ({
     commonProtocol.factoryContracts[ethChainId],
   );
 
-  if (
-    !factoryContracts.postTokenLaunchpad ||
-    !factoryContracts.postTokenBondingCurve
-  ) {
+  if (!factoryContracts.TokenLaunchpad || !factoryContracts.TokenBondingCurve) {
     throw new Error(
       `Factory configuration is missing for chain ID ${ethChainId}. Please check your commonProtocol configuration.`,
     );
   }
 
-  const factoryAddress = factoryContracts.postTokenLaunchpad;
-  const bondingCurve = factoryContracts.postTokenBondingCurve;
+  const factoryAddress = factoryContracts.TokenLaunchpad;
+  const bondingCurve = factoryContracts.TokenBondingCurve;
 
   const launchpad = new TokenLaunchpad(
     factoryAddress,

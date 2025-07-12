@@ -157,13 +157,14 @@ const tokenStakingSource: ContractSource = {
  */
 export const EventRegistry = {
   [ValidChains.Base]: {
-    [factoryContracts[ValidChains.Base].factory]: namespaceFactorySource,
-    [factoryContracts[ValidChains.Base].communityStake]: communityStakesSource,
-    [factoryContracts[ValidChains.Base].launchpad]: launchpadSource,
-    [factoryContracts[ValidChains.Base].lpBondingCurve]: lpBondingCurveSource,
-    [factoryContracts[ValidChains.Base].tokenCommunityManager]:
+    [factoryContracts[ValidChains.Base].NamespaceFactory]:
+      namespaceFactorySource,
+    [factoryContracts[ValidChains.Base].CommunityStake]: communityStakesSource,
+    [factoryContracts[ValidChains.Base].Launchpad]: launchpadSource,
+    [factoryContracts[ValidChains.Base].LPBondingCurve]: lpBondingCurveSource,
+    [factoryContracts[ValidChains.Base].TokenCommunityManager]:
       tokenCommunityManagerSource,
-    [factoryContracts[ValidChains.Base].referralFeeManager]:
+    [factoryContracts[ValidChains.Base].ReferralFeeManager]:
       referralFeeManagerSource,
   },
   [ValidChains.SepoliaBase]: {

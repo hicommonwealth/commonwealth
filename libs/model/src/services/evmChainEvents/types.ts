@@ -56,6 +56,8 @@ export type EvmEventSource = {
   eth_chain_id: number;
   contract_address: string;
   event_signature: string;
+  contract_name: string;
+  event_name: string;
   meta: EvmEventMeta;
 };
 
