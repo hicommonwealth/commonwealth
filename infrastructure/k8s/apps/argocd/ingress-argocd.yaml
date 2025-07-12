@@ -1,11 +1,11 @@
-# Note deployment was run manually via helm to bootstrap,
-# so this only contains the service to connect it to ingress
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: argocd
   namespace: argocd
   annotations:
+    kubernetes.io/ingress.class: 'nginx'
+    cert-manager.io/cluster-issuer: 'letsencrypt-dns'
     nginx.ingress.kubernetes.io/backend-protocol: 'HTTPS'
 spec:
   ingressClassName: nginx
