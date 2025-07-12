@@ -1,0 +1,12 @@
+apiVersion: networking.cfargotunnel.com/v1alpha2
+kind: ClusterTunnel
+metadata:
+  name: cloudflare-tunnel
+spec:
+  newTunnel:
+    name: my-k8s-tunnel
+  cloudflare:
+    email: dillon@commonwealth.im
+    domain: unique.rocks
+    secret: cloudflare-secrets
+    accountId: e8e1aeb981240c9adb23c5160f3e4850

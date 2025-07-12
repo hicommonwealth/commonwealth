@@ -25,6 +25,10 @@ spec:
             forwarded-for-header: "CF-Connecting-IP"
             use-forwarded-headers: "true"
             proxy-real-ip-cidr: "10.0.0.0/16"
+        defaultBackend:
+          image:
+            repository: registry.k8s.io/defaultbackend-arm64
+            tag: "1.4"
   sources: []
   project: default
   syncPolicy:

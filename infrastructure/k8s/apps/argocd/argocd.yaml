@@ -1,0 +1,26 @@
+# Note deployment was run manually via helm to bootstrap,
+# so this only contains the service to connect it to ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd
+  namespace: argocd
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: 'HTTPS'
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - argocd.unique.rocks
+      secretName: wildcard-cert-dns-tls
+  rules:
+    - host: argocd.unique.rocks
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 443

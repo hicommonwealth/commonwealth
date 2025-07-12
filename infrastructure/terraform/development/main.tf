@@ -19,15 +19,15 @@ provider "aws" {
 data "aws_availability_zones" "available" {}
 
 module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
+  source = "terraform-aws-modules/vpc/aws"
   version = "5.21.0" # Can also upgrade when eks upgrade supports v6
 
   name = "eks-vpc-${var.ENV_NAME}"
   cidr = "10.0.0.0/16"
 
   # Required to have at least 2 AZs for subnets
-  azs             = slice(data.aws_availability_zones.available.names, 0, 2)
-  public_subnets  = ["10.0.10.0/24", "10.0.11.0/24"]
+  azs = slice(data.aws_availability_zones.available.names, 0, 2)
+  public_subnets = ["10.0.10.0/24", "10.0.11.0/24"]
   private_subnets = ["10.0.20.0/24", "10.0.21.0/24"]
 
   # Disable managed nats since we are using fck-nat
@@ -45,13 +45,13 @@ module "vpc" {
 module "fck-nat" {
   source = "RaJiska/fck-nat/aws"
 
-  name       = "fck-nat-${var.ENV_NAME}"
-  vpc_id     = module.vpc.vpc_id
-  subnet_id  = module.vpc.public_subnets[0]
+  name      = "fck-nat-${var.ENV_NAME}"
+  vpc_id    = module.vpc.vpc_id
+  subnet_id = module.vpc.public_subnets[0]
 
-  ha_mode = true
+  ha_mode             = true
   update_route_tables = true
-  route_tables_ids = {
+  route_tables_ids    = {
     for idx, subnet in module.vpc.private_subnets :
     "private-rt-${idx}" => module.vpc.private_route_table_ids[idx]
   }
@@ -72,11 +72,25 @@ module "eks" {
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
+  cluster_addons = {
+    # Enables ip prefix delegation which increases the maximum pod limit per node
+    vpc-cni = {
+      most_recent    = true
+      before_compute = true
+      configuration_values = jsonencode({
+        env = {
+          ENABLE_PREFIX_DELEGATION = "true"
+          WARM_PREFIX_TARGET       = "1"
+        }
+      })
+    }
+  }
+
   eks_managed_node_groups = {
     arm-nodes = {
-      ami_type       = "BOTTLEROCKET_ARM_64"
+      ami_type      = "BOTTLEROCKET_ARM_64"
       instance_types = ["t4g.large", "t4g.medium"]
-      capacity_type  = "SPOT"
+      capacity_type = "SPOT"
 
       desired_size = 1
       min_size     = 1

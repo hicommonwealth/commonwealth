@@ -1,0 +1,13 @@
+apiVersion: networking.cfargotunnel.com/v1alpha1
+kind: TunnelBinding
+metadata:
+  name: ingress-nginx
+subjects:
+  - name: wildcard
+    spec:
+      fqdn: '*.unique.rocks'
+      target: https://ingress-nginx-controller.ingress-nginx.svc.cluster.local:443
+
+tunnelRef:
+  kind: ClusterTunnel
+  name: my-k8s-tunnel
