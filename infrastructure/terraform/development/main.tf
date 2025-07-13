@@ -208,6 +208,33 @@ resource "aws_iam_role" "irsa_role_iam" {
   })
 }
 
+resource "aws_iam_role_policy" "vault_s3_access" {
+  name = "vault-s3-access"
+  role = aws_iam_role.irsa_role_iam.name
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowVaultToListBucket",
+        Effect = "Allow",
+        Action = "s3:ListBucket",
+        Resource = "arn:aws:s3:::bank-vaults-development"
+      },
+      {
+        Sid    = "AllowVaultToUseObjectsInBucket",
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        Resource = "arn:aws:s3:::bank-vaults-${var.ENV_NAME}/*"
+      }
+    ]
+  })
+}
+
 data "aws_caller_identity" "current" {}
 
 module "vault_kms" {
