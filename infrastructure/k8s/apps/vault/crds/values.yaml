@@ -1,0 +1,4 @@
+irsaRoleArn: 'arn:aws:iam::775434881122:role/vault-server-role-development'
+kmsKeyArn: 'arn:aws:kms:us-east-1:775434881122:key/2af407d3-75f9-499d-906e-a5a77748fa6c'
+awsRegion: 'us-east-1'
+tlsSecretName: 'vault-tls'

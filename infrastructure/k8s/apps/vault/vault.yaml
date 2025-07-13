@@ -14,11 +14,6 @@ spec:
     targetRevision: main
     helm:
       values: ''
-      valueFiles:
-        - values.yaml
-      parameters:
-        - name: service.type
-          value: LoadBalancer
   sources: []
   project: default
   syncPolicy:

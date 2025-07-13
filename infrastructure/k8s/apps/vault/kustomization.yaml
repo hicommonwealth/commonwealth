@@ -1,0 +1,19 @@
+resources:
+  - rbac-vault.yaml
+
+vars:
+  - name: ACCOUNT_ID
+    objref:
+      kind: ConfigMap
+      name: vault-vars
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.ACCOUNT_ID
+
+  - name: ENVIRONMENT
+    objref:
+      kind: ConfigMap
+      name: vault-vars
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.ENVIRONMENT

@@ -1,0 +1,106 @@
+apiVersion: 'vault.banzaicloud.com/v1alpha1'
+kind: 'Vault'
+metadata:
+  name: 'vault'
+spec:
+  size: 3
+  image: hashicorp/vault:1.14.8
+  bankVaultsImage: ghcr.io/bank-vaults/bank-vaults:latest
+  serviceAccount: vault
+
+  volumeClaimTemplates:
+    - metadata:
+        name: vault-raft
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        volumeMode: Filesystem
+        resources:
+          requests:
+            storage: 1Gi
+
+  volumeMounts:
+    - name: vault-raft
+      mountPath: /vault/file
+
+  caNamespaces:
+    - '*'
+
+  unsealConfig:
+    options:
+      preFlightChecks: true
+      storeRootToken: true
+      secretShares: 5
+      secretThreshold: 3
+    aws:
+      kmsKeyId: arn:aws:kms:REGION:ACCOUNT_ID:key/YOUR_KEY_ID
+      region: us-east-1
+
+  config:
+    storage:
+      raft:
+        path: /vault/file
+    listener:
+      tcp:
+        address: '0.0.0.0:8200'
+        tls_cert_file: /vault/tls/server.crt
+        tls_key_file: /vault/tls/server.key
+    api_addr: https://vault.default:8200
+    cluster_addr: 'https://${.Env.POD_NAME}:8201'
+    ui: true
+
+  externalConfig:
+    policies:
+      - name: allow_secrets
+        rules: |
+          path "secret/*" {
+            capabilities = ["create", "read", "update", "delete", "list"]
+          }
+          path "database/*" {
+            capabilities = ["create", "read", "update", "delete", "list"]
+          }
+    auth:
+      - type: kubernetes
+        roles:
+          - name: default
+            bound_service_account_names: ['default', 'vault']
+            bound_service_account_namespaces: ['*']
+            policies: ['allow_secrets']
+            ttl: 1h
+
+    secrets:
+      - path: secret
+        type: kv
+        description: General secrets.
+        options:
+          version: 2
+      - type: database
+        description: mysql
+        configuration:
+          config:
+            - name: mysql
+              plugin_name: mysql-database-plugin
+              max_open_connections: 5
+              connection_url: '{{username}}:{{password}}@tcp(mysql:3306)/'
+              allowed_roles: ['*']
+              username: root
+              password: '${ awskms (env `ENCRYPTED_DB_CREDS`) }'
+          roles:
+            - name: app
+              db_name: mysql
+              creation_statements: "CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}'; GRANT ALL ON `app\_%`.* TO '{{name}}'@'%';"
+              default_ttl: 2m
+              max_ttl: 10m
+
+  envsConfig:
+    - name: ENCRYPTED_DB_CREDS
+      valueFrom:
+        secretKeyRef:
+          name: my-app-secrets
+          key: ENCRYPTED_DB_CREDS
+    - name: AWS_REGION
+      value: 'us-east-1'
+
+  secretInitsConfig:
+    - name: VAULT_LOG_LEVEL
+      value: debug
