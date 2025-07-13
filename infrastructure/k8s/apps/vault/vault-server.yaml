@@ -9,12 +9,12 @@ spec:
   source:
     repoURL: https://github.com/hicommonwealth/commonwealth
     targetRevision: ka.review-apps
-    path: charts/vault # <-- path to your custom Vault Helm chart
+    path: infrastructure/charts/vault-server
 
     helm:
       releaseName: vault
       valueFiles:
-        - values.yaml # optional if you have one in the same path
+        - values.yaml
 
   destination:
     server: https://kubernetes.default.svc
