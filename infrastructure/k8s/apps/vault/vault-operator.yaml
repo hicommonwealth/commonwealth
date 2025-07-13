@@ -13,7 +13,9 @@ spec:
     repoURL: 'https://github.com/bank-vaults/vault-operator.git'
     targetRevision: main
     helm:
-      values: ''
+      parameters:
+        - name: watchNamespace
+          value: vault
   sources: []
   project: default
   syncPolicy:

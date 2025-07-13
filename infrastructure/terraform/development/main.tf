@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     bucket = "terraform-common-dev"
     key = "commonwealth-pr-environments/default/terraform.tfstate" # This will be overridden by the workflow
-    region = var.AWS_REGION
+    region = "us-east-1"
   }
   required_providers {
     aws = {
@@ -102,6 +102,10 @@ module "eks" {
       desired_size = 1
       min_size     = 1
       max_size     = 2
+
+      iam_role_additional_policies = {
+        EBS_CSI = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+      }
     }
   }
 
@@ -214,7 +218,7 @@ resource "local_file" "vault_outputs" {
   filename = "${path.module}/.env"
   content  = <<EOF
 irsaRoleArn=${aws_iam_role.irsa_role_iam.arn}
-kmsKeyArn=${module.vault_kms.key_arn}
+kmsKeyId=${module.vault_kms.key_id}
 awsRegion=${var.AWS_REGION}
 EOF
 }

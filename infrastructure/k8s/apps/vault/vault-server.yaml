@@ -1,28 +1,61 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
+apiVersion: vault.banzaicloud.com/v1alpha1
+kind: Vault
 metadata:
-  name: vault-server
-  namespace: argocd
+  name: vault
+  namespace: vault
 spec:
-  project: default
+  size: 3
 
-  source:
-    repoURL: https://github.com/hicommonwealth/commonwealth
-    targetRevision: ka.review-apps
-    path: infrastructure/charts/vault-server
+  image: hashicorp/vault:1.14.8
+  bankVaultsImage: ghcr.io/bank-vaults/bank-vaults:latest
+  serviceAccount: vault
 
-    helm:
-      releaseName: vault
-      valueFiles:
-        - values.yaml
+  existingTlsSecretName: vault-tls
 
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: vault
+  volumeClaimTemplates:
+    - metadata:
+        name: vault-raft
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: gp2
+        volumeMode: Filesystem
+        resources:
+          requests:
+            storage: 1Gi
 
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+  volumeMounts:
+    - name: vault-raft
+      mountPath: /vault/file
+
+  caNamespaces:
+    - '*'
+
+  unsealConfig:
+    options:
+      preFlightChecks: true
+      storeRootToken: true
+      secretShares: 5
+      secretThreshold: 3
+    aws:
+      kmsKeyId: "2af407d3-75f9-499d-906e-a5a77748fa6c"
+      s3Bucket: "bank-vaults"
+      s3Prefix: "vault-operator/"
+      kmsRegion: "us-east-1"
+
+  config:
+    storage:
+      raft:
+        path: /vault/file
+    listener:
+      tcp:
+        address: '0.0.0.0:8200'
+        tls_cert_file: /vault/tls/server.crt
+        tls_key_file: /vault/tls/server.key
+    api_addr: https://vault.vault:8200
+    cluster_addr: 'https://${.Env.POD_NAME}:8201'
+    ui: true
+
+  externalConfig:
+    tls:
+      disable: false

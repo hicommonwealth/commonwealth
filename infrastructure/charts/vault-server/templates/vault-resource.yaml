@@ -36,8 +36,8 @@ spec:
       secretShares: 5
       secretThreshold: 3
     aws:
-      kmsKeyId: {{ .Values.kmsKeyArn }}
-      region: {{ .Values.awsRegion }}
+      kmsKeyId: "{{ .Values.kmsKeyId }}"
+      kmsRegion: "{{ .Values.kmsRegion }}"
 
     config:
       storage:

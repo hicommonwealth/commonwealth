@@ -1,7 +1,8 @@
 apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
+kind: Issuer
 metadata:
   name: vault-selfsigned
+  namespace: vault
 spec:
   selfSigned: {}
 
@@ -10,17 +11,18 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: vault-tls
-  namespace: default
+  namespace: vault
 spec:
-  secretName: vault-tls
-  commonName: vault.default.svc
+  commonName: vault
+  usages:
+    - server auth
   dnsNames:
-    - vault.default.svc
-    - vault.default
     - vault
+    - vault.default
+    - vault.default.svc
+    - vault.default.svc.cluster.local
+  ipAddresses:
+    - 127.0.0.1
+  secretName: vault-tls
   issuerRef:
     name: vault-selfsigned
-    kind: ClusterIssuer
-  privateKey:
-    algorithm: RSA
-    size: 2048
