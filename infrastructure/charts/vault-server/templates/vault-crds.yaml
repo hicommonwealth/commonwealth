@@ -3,7 +3,7 @@ kind: ServiceAccount
 metadata:
   name: vault
   annotations:
-    eks.amazonaws.com/role-arn: '{{ Values.irsaRoleArn }}'
+    eks.amazonaws.com/role-arn: '{{ .Values.irsaRoleArn }}'
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1

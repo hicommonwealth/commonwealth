@@ -9,7 +9,7 @@ spec:
   bankVaultsImage: ghcr.io/bank-vaults/bank-vaults:latest
   serviceAccount: vault
 
-  existingTlsSecretName: { { Values.tlsSecretName } }
+  existingTlsSecretName: { { .Values.tlsSecretName } }
 
   volumeClaimTemplates:
     - metadata:
@@ -36,8 +36,8 @@ spec:
       secretShares: 5
       secretThreshold: 3
     aws:
-      kmsKeyId: { { Values.kmsKeyArn } }
-      region: { { Values.awsRegion } }
+      kmsKeyId: { { .Values.kmsKeyArn } }
+      region: { { .Values.awsRegion } }
 
     config:
       storage:
