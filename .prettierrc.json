@@ -1,5 +1,13 @@
 {
   "singleQuote": true,
   "trailingComma": "all",
-  "plugins": ["prettier-plugin-organize-imports"]
+  "plugins": ["prettier-plugin-organize-imports"],
+  "overrides": [
+    {
+      "files": "*.yaml",
+      "options": {
+        "parser": "json"
+      }
+    }
+  ]
 }
