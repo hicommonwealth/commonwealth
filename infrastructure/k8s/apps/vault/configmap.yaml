@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: vault-vars
-  namespace: default
-data:
-  AWS_ACCOUNT_ID: '775434881122'
-  ENV_NAME: 'development'

@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault-server
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/hicommonwealth/commonwealth
+    targetRevision: ka.review-apps
+    path: charts/vault # <-- path to your custom Vault Helm chart
+
+    helm:
+      releaseName: vault
+      valueFiles:
+        - values.yaml # optional if you have one in the same path
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: vault
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
