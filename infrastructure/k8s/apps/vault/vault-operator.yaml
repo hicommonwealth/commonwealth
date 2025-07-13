@@ -12,10 +12,6 @@ spec:
     path: deploy/charts/vault-operator
     repoURL: 'https://github.com/bank-vaults/vault-operator.git'
     targetRevision: main
-    helm:
-      parameters:
-        - name: watchNamespace
-          value: vault
   sources: []
   project: default
   syncPolicy:

@@ -2,7 +2,6 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: vault-selfsigned
-  namespace: vault
 spec:
   selfSigned: {}
 
@@ -11,7 +10,6 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: vault-tls
-  namespace: vault
 spec:
   commonName: vault
   usages:
