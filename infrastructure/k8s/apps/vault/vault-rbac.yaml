@@ -2,13 +2,15 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: vault
+  namespace: vault
   annotations:
     eks.amazonaws.com/role-arn: 'arn:aws:iam::775434881122:role/vault-server-role-development'
 ---
-kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
 metadata:
   name: vault
+  namespace: vault
 rules:
   - apiGroups: ['']
     resources: ['secrets']
@@ -16,11 +18,15 @@ rules:
   - apiGroups: ['']
     resources: ['pods']
     verbs: ['get', 'update', 'patch']
+  - apiGroups: ['vault.banzaicloud.com']
+    resources: ['vaults']
+    verbs: ['get', 'list', 'watch']
 ---
-kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
 metadata:
   name: vault
+  namespace: vault
 roleRef:
   kind: Role
   name: vault
@@ -28,6 +34,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: vault
+    namespace: vault
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -40,4 +47,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: vault
-    namespace: default
+    namespace: vault

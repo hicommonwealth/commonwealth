@@ -162,6 +162,26 @@ module "ebs_csi_controller_role" {
 }
 
 ## KMS for vault
+module "vault_unseal_s3" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "~> 4.11.0"
+
+  bucket = "bank-vaults-${var.ENV_NAME}"
+  acl    = "private"
+
+  control_object_ownership = true
+  object_ownership         = "ObjectWriter"
+
+  versioning = {
+    enabled = true
+  }
+
+  tags = {
+    Name        = "vault-unseal-${var.ENV_NAME}"
+    Environment = var.ENV_NAME
+  }
+}
+
 locals {
   oidc_provider_sub = "${module.eks.oidc_provider}:sub"
 }

@@ -39,9 +39,10 @@ spec:
       secretThreshold: 3
     aws:
       kmsKeyId: "2af407d3-75f9-499d-906e-a5a77748fa6c"
-      s3Bucket: "bank-vaults"
+      s3Bucket: "bank-vaults-development"
       s3Prefix: "vault-operator/"
       kmsRegion: "us-east-1"
+      kmsEncryptionContext: "Service=Vault"
 
   config:
     storage:
@@ -57,5 +58,26 @@ spec:
     ui: true
 
   externalConfig:
-    tls:
-      disable: false
+    policies:
+      - name: allow_secrets
+        rules: path "secret/*" {
+          capabilities = ["create", "read", "update", "delete", "list"]
+          }
+    auth:
+      - type: kubernetes
+        roles:
+          # Allow every pod in the vault namespace to use the secret kv store
+          - name: vault
+            bound_service_account_names: ["vault", "vault-secrets-webhook"]
+            bound_service_account_namespaces: ["vault", "vswh"]
+            policies: allow_secrets
+            ttl: 1h
+
+    secrets:
+      configuration:
+        config:
+          - name: urls
+            issuing_certificates: https://vault.vault:8200/v1/pki/ca
+            crl_distribution_points: https://vault.vault:8200/v1/pki/crl
+          - name: internal
+            common_name: vault.vault
