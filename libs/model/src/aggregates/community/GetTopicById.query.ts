@@ -1,12 +1,10 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 
-export type TopicWithGatingGroups = z.infer<typeof schemas.Topic> & {
-  gatingGroups?: Array<{ id: number; name: string | null }>;
-};
+type TopicWithGatingGroups = z.infer<(typeof schemas.GetTopicById)['output']>;
 
 export function GetTopicById(): Query<typeof schemas.GetTopicById> {
   return {
