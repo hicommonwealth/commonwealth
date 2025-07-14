@@ -18,12 +18,17 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { openConfirmation } from './confirmation_modal';
 
-import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
+import {
+  DISALLOWED_TOPIC_NAMES_REGEX,
+  GatedActionEnum,
+} from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
+import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWSelectList } from '../components/component_kit/new_designs/CWSelectList';
 import { ReactQuillEditor } from '../components/react_quill_editor';
 import './edit_topic_modal.scss';
 
@@ -68,6 +73,19 @@ export const EditTopicModal = ({
   const [name, setName] = useState<string>(nameProp);
   const [characterCount, setCharacterCount] = useState(0);
   const [descErrorMsg, setDescErrorMsg] = useState<string | null>(null);
+
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
+  const communityId = app.activeChainId() || '';
+
+  const { data: groups } = useFetchGroupsQuery({
+    communityId: communityId,
+    enabled: !!communityId,
+  });
+
+  const { mutateAsync: editGroup } = useEditGroupMutation({
+    communityId: app.activeChainId() || '',
+  });
 
   const getCharacterCount = (delta) => {
     if (!delta || !delta.ops) {
@@ -124,6 +142,26 @@ export const EditTopicModal = ({
             ? JSON.stringify(newPostTemplate)
             : '',
       });
+
+      const updatedTopicId = id;
+      for (const groupId of selectedGroups) {
+        const group = groups?.find((g) => g.id === groupId);
+        if (!group) continue;
+        const updatedTopics = [
+          ...(group.topics || []),
+          { id: updatedTopicId, is_private: true, name },
+        ];
+        await editGroup({
+          community_id: app.activeChainId() || '',
+          group_id: groupId,
+          topics: updatedTopics.map((t) => ({
+            id: t.id,
+            is_private: true,
+            permissions: Object.values(GatedActionEnum),
+          })),
+        });
+      }
+
       if (noRedirect) {
         onModalClose();
         notifySuccess('Settings saved.');
@@ -260,6 +298,25 @@ export const EditTopicModal = ({
           value=""
           disabled={!!topic.archived_at}
         />
+        <CWCheckbox
+          label="Private topic"
+          checked={isPrivate}
+          onChange={() => setIsPrivate(!isPrivate)}
+          disabled={!!topic.archived_at}
+        />
+        {isPrivate && (
+          <CWSelectList
+            isMulti
+            label="Allowed groups"
+            options={groups?.map((g) => ({ label: g.name, value: g.id }))}
+            value={groups
+              ?.filter((g) => selectedGroups.includes(g.id))
+              .map((g) => ({ label: g.name, value: g.id }))}
+            onChange={(selected) =>
+              setSelectedGroups(selected.map((opt) => opt.value))
+            }
+          />
+        )}
         <div
           className={clsx(
             'new-topic-template-section',
