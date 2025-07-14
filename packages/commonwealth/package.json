@@ -125,6 +125,7 @@
     "@magic-sdk/admin": "^2.4.1",
     "@metamask/eth-sig-util": "^4.0.0",
     "@modelcontextprotocol/sdk": "^1.12.1",
+    "@moonpay/moonpay-react": "^1.10.2",
     "@mui/base": "5.0.0-beta.5",
     "@mysten/sui": "^1.28.2",
     "@mysten/wallet-standard": "^0.14.7",

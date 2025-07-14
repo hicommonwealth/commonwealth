@@ -11,6 +11,7 @@ import { queryClient } from 'state/api/config';
 import { DefaultPrivyProvider } from 'views/components/DefaultPrivyProvider/DefaultPrivyProvider';
 import { DisableMavaOnMobile } from 'views/components/DisableMavaOnMobile';
 import ForceMobileAuth from 'views/components/ForceMobileAuth';
+import MoonPayProvider from 'views/components/MoonPayProvider';
 import { PrivyMobileAuthenticator } from 'views/components/PrivyMobile/PrivyMobileAuthenticator';
 import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
 import { ReactNativeLogForwarder } from 'views/components/ReactNativeBridge/ReactNativeLogForwarder';
@@ -38,13 +39,15 @@ const App = () => {
                 ) : (
                   <PrivyMobileAuthenticator>
                     <DefaultPrivyProvider>
-                      <ForceMobileAuth>
-                        <OnBoardingWrapperForMobile>
-                          <ReactNativeBridgeUser />
-                          <ReactNativeScrollToTopListener />
-                          <RouterProvider router={router()} />
-                        </OnBoardingWrapperForMobile>
-                      </ForceMobileAuth>
+                      <MoonPayProvider>
+                        <ForceMobileAuth>
+                          <OnBoardingWrapperForMobile>
+                            <ReactNativeBridgeUser />
+                            <ReactNativeScrollToTopListener />
+                            <RouterProvider router={router()} />
+                          </OnBoardingWrapperForMobile>
+                        </ForceMobileAuth>
+                      </MoonPayProvider>
                     </DefaultPrivyProvider>
                   </PrivyMobileAuthenticator>
                 )}

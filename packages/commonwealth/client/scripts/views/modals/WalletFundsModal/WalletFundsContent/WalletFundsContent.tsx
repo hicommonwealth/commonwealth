@@ -1,5 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import React from 'react';
+import { MoonPayBuyWidget } from '@moonpay/moonpay-react';
+import React, { useState } from 'react';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useGetEthereumBalanceQuery } from 'state/api/tokens';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -27,6 +28,8 @@ const WalletFundsContent = ({
     userAddress,
     isLoading: isMagicLoading,
   } = useMagicWallet({ chainId });
+
+  const [isMoonpayVisible, setIsMoonpayVisible] = useState(false);
 
   const {
     data: userBalance = '0',
@@ -62,6 +65,15 @@ const WalletFundsContent = ({
     }
   };
 
+  const handleShowMoonpay = () => {
+    setIsMoonpayVisible(true);
+  };
+
+  const handleCloseMoonpay = async () => {
+    setIsMoonpayVisible(false);
+    handleRefreshBalance(refetch);
+  };
+
   const ethToUsdRate = parseFloat(
     ethToCurrencyRateData?.data?.data?.amount || '0',
   );
@@ -90,6 +102,11 @@ const WalletFundsContent = ({
             onClick={handleShowOnRamp}
           />
           <FundWalletItem
+            icon="moonpay"
+            title="Moonpay"
+            onClick={handleShowMoonpay}
+          />
+          <FundWalletItem
             icon="barcode"
             title="View wallet information"
             onClick={handleShowWalletAddress}
@@ -99,6 +116,21 @@ const WalletFundsContent = ({
       <CWModalFooter>
         <></>
       </CWModalFooter>
+      <MoonPayBuyWidget
+        variant="overlay"
+        visible={isMoonpayVisible}
+        walletAddress={userAddress}
+        onClose={handleCloseMoonpay}
+        // TODO: This needs to be implemented with a backend endpoint to sign the URL
+        // onUrlSignatureRequested={async (url) => {
+        //   const response = await fetch(`/api/moonpay/sign-url`, {
+        //     method: 'POST',
+        //     body: JSON.stringify({ url }),
+        //   });
+        //   const { signature } = await response.json();
+        //   return signature;
+        // }}
+      />
     </div>
   );
 };

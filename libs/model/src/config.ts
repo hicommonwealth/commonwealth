@@ -90,6 +90,7 @@ const {
   KNOCK_IN_APP_FEED_ID,
   UNLEASH_FRONTEND_API_TOKEN,
   CONTEST_DURATION_IN_SEC,
+  MOONPAY_PUBLISHABLE_KEY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -309,6 +310,9 @@ export const config = configure(
     },
     UNLEASH: {
       FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
+    },
+    MOONPAY: {
+      PUBLISHABLE_KEY: MOONPAY_PUBLISHABLE_KEY || '',
     },
   },
   z.object({
@@ -643,6 +647,9 @@ export const config = configure(
         .refine(
           (data) => !(!['local', 'CI'].includes(target.APP_ENV) && !data),
         ),
+    }),
+    MOONPAY: z.object({
+      PUBLISHABLE_KEY: z.string().optional(),
     }),
   }),
 );
