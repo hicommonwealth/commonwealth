@@ -102,7 +102,7 @@ export const Topics = () => {
   const { mutateAsync: editGroup } = useEditGroupMutation({
     communityId: app.activeChainId() || '',
   });
-  const { data: groups = [] } = useFetchGroupsQuery({
+  const { data: groupList = [] } = useFetchGroupsQuery({
     communityId: app.activeChainId() || '',
     enabled: !!app.activeChainId(),
   });
@@ -205,7 +205,7 @@ export const Topics = () => {
       console.log('test selectedGroups', selectedGroups);
 
       for (const groupId of selectedGroups) {
-        const group = groups.find((g) => g.id === groupId);
+        const group = groupList.find((g) => g.id === groupId);
         if (!group) continue;
         const updatedTopics = [
           ...(group.topics || []),
