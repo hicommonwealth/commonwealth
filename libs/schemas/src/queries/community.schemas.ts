@@ -251,9 +251,18 @@ export const GetTopics = {
 export const GetTopicById = {
   input: z.object({
     topic_id: z.number(),
+    includeGatingGroups: z.boolean().optional(),
   }),
-  // TODO: fix type
-  output: z.any(),
+  output: Topic.extend({
+    gatingGroups: z
+      .array(
+        z.object({
+          id: z.number(),
+          name: z.string().nullable(),
+        }),
+      )
+      .optional(),
+  }).optional(),
 };
 
 export const GetPinnedTokens = {
