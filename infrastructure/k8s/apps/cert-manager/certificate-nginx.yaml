@@ -5,7 +5,7 @@ metadata:
 spec:
   acme:
     email: kurtis@common.xyz
-    server: https://acme-v02.api.letsencrypt.org/directory
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-dns-key
     solvers:

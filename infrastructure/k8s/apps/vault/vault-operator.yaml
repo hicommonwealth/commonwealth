@@ -5,7 +5,6 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    name: ''
     namespace: vault-operator
     server: 'https://kubernetes.default.svc'
   source:

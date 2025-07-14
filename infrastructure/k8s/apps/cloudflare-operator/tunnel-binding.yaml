@@ -6,7 +6,7 @@ subjects:
   - name: wildcard
     spec:
       fqdn: '*.unique.rocks'
-      target: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      target: https://ingress-nginx-controller.ingress-nginx.svc.cluster.local:443
 tunnelRef:
   kind: ClusterTunnel
   name: cloudflare-tunnel

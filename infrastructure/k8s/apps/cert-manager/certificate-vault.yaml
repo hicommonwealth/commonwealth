@@ -19,6 +19,10 @@ spec:
     - vault.default
     - vault.default.svc
     - vault.default.svc.cluster.local
+    - vault-0
+    - vault-0.default
+    - vault-0.default.svc
+    - vault-0.default.svc.cluster.local
   ipAddresses:
     - 127.0.0.1
   secretName: vault-tls

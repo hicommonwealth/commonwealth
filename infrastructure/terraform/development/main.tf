@@ -12,6 +12,17 @@ terraform {
   }
 }
 
+import {
+ to = cloudflare_registrar_domain.example_registrar_domain
+}
+resource "cloudflare_registrar_domain" "example_registrar_domain" {
+  account_id = "023e105f4ecef8ad9ca31a8372d0c353"
+  domain_name = "cloudflare.com"
+  auto_renew = true
+  locked = false
+  privacy = true
+}
+
 provider "aws" {
   region = var.AWS_REGION
 }
@@ -99,7 +110,7 @@ module "eks" {
       instance_types = ["t4g.large", "t4g.medium"]
       capacity_type = "SPOT"
 
-      desired_size = 1
+      desired_size = 2
       min_size     = 1
       max_size     = 2
 
