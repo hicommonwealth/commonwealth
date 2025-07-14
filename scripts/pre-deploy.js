@@ -8,6 +8,7 @@ for (const VAR of REQUIRED_VARS) {
 
 const RAILWAY_GIT_COMMIT_SHA = process.env.RAILWAY_GIT_COMMIT_SHA;
 const RAILWAY_RELEASER_API = process.env.RAILWAY_RELEASER_API;
+const RAILWAY_RELEASER_PORT = process.env.RAILWAY_RELEASER_PORT;
 
 // Check if release trigger is enabled (first argument)
 const TRIGGER_RELEASE =
@@ -17,11 +18,14 @@ const TRIGGER_RELEASE =
   if (TRIGGER_RELEASE) {
     console.log(`Triggering release for commit: ${RAILWAY_GIT_COMMIT_SHA}`);
     try {
-      const response = await fetch(`http://${RAILWAY_RELEASER_API}/queue`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ commitSha: RAILWAY_GIT_COMMIT_SHA }),
-      });
+      const response = await fetch(
+        `http://${RAILWAY_RELEASER_API}:${RAILWAY_RELEASER_PORT}/queue`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ commitSha: RAILWAY_GIT_COMMIT_SHA }),
+        },
+      );
 
       if (response.status === 200) {
         console.log('Release queued successfully');
@@ -47,7 +51,7 @@ const TRIGGER_RELEASE =
     let STATUS;
     try {
       const res = await fetch(
-        `http://${RAILWAY_RELEASER_API}/release?commit-sha=${RAILWAY_GIT_COMMIT_SHA}`,
+        `http://${RAILWAY_RELEASER_API}:${RAILWAY_RELEASER_PORT}/release?commit-sha=${RAILWAY_GIT_COMMIT_SHA}`,
       );
 
       if (res.status === 400) {
