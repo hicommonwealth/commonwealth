@@ -145,7 +145,7 @@ export const CreateTopicSection = ({
 
   useEffect(() => {
     if (onGroupsSelected) onGroupsSelected(selectedGroups);
-  }, [selectedGroups, onGroupsSelected]);
+  }, [selectedGroups]);
 
   return (
     <div className="CreateTopicSection">
