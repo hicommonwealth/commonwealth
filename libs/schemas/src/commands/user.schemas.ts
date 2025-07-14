@@ -1,4 +1,4 @@
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { AuthContext, VerifiedContext } from '../context';
@@ -104,11 +104,9 @@ export const DeleteApiKey = {
 export const DistributeSkale = {
   input: z.object({
     address: z.string(),
-    eth_chain_id: z
-      .number()
-      .refine((data) => data === cp.ValidChains.SKALE_TEST, {
-        message: `eth_chain_id must be a Skale chain Id`,
-      }),
+    eth_chain_id: z.number().refine((data) => data === ValidChains.SKALE_TEST, {
+      message: `eth_chain_id must be a Skale chain Id`,
+    }),
   }),
   output: z.undefined(),
 };

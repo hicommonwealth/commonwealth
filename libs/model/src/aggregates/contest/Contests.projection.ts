@@ -2,12 +2,14 @@ import { InvalidState, Projection, logger } from '@hicommonwealth/core';
 import {
   ChildContractNames,
   EvmEventSignatures,
-  commonProtocol,
-  commonProtocol as cp,
+  calculateVoteWeight,
+  factoryContracts,
   getContestScore,
   getContestStatus,
   getTokenAttributes,
   getTransaction,
+  isValidChain,
+  mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
 import { TopicWeightedVoting, events } from '@hicommonwealth/schemas';
 import {
@@ -72,7 +74,7 @@ async function createInitialContest(
   }
 
   const ethChainId = community!.ChainNode!.eth_chain_id!;
-  if (!cp.isValidChain(ethChainId)) {
+  if (!isValidChain(ethChainId)) {
     log.error(
       `Unsupported eth chain id: ${ethChainId} for namespace: ${namespace}`,
     );
@@ -210,7 +212,7 @@ async function createInitialContest(
           contract_address: contest_address,
           event_signature: eventSignature,
           contract_name: childContractName,
-          parent_contract_address: cp.factoryContracts[ethChainId].factory,
+          parent_contract_address: factoryContracts[ethChainId].factory,
           created_at_block: blockNumber,
         };
       },
@@ -270,7 +272,7 @@ export async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
-    cp.mustBeProtocolChainId(details.eth_chain_id);
+    mustBeProtocolChainId(details.eth_chain_id);
 
     const { scores, contestBalance } = await getContestScore(
       { eth_chain_id: details.eth_chain_id, rpc: details.url },
@@ -533,7 +535,7 @@ export function Contests(): Projection<typeof inputs> {
               log.warn(`Stake balance is 0 for voter ${payload.voter_address}`);
               return;
             }
-            calculated_voting_weight = commonProtocol.calculateVoteWeight(
+            calculated_voting_weight = calculateVoteWeight(
               stakeBalance,
               stake!.vote_weight,
             );
