@@ -17,7 +17,7 @@ const TRIGGER_RELEASE =
   if (TRIGGER_RELEASE) {
     console.log(`Triggering release for commit: ${RAILWAY_GIT_COMMIT_SHA}`);
     try {
-      const response = await fetch(`${RAILWAY_RELEASER_API}/queue`, {
+      const response = await fetch(`http://${RAILWAY_RELEASER_API}/queue`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ commitSha: RAILWAY_GIT_COMMIT_SHA }),
@@ -47,7 +47,7 @@ const TRIGGER_RELEASE =
     let STATUS;
     try {
       const res = await fetch(
-        `${RAILWAY_RELEASER_API}/release?commit-sha=${RAILWAY_GIT_COMMIT_SHA}`,
+        `http://${RAILWAY_RELEASER_API}/release?commit-sha=${RAILWAY_GIT_COMMIT_SHA}`,
       );
 
       if (res.status === 400) {
