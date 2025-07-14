@@ -28,7 +28,7 @@ async function purgeCache(zoneId?: string, apiKey?: string) {
   }
 }
 
-purgeCache(process.env.CLOUDFLARE_ZONE_ID, process.env.CLOUDFLARE_API_KEY)
+purgeCache(process.env.CF_ZONE_ID, process.env.CF_API_KEY)
   .then(() => console.info('finished cloudflare purge script'))
   .catch((e) => {
     console.error('cloudflare purge script failed:', e);
