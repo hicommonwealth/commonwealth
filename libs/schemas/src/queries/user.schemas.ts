@@ -265,6 +265,16 @@ export const GetAddressStatus = {
   context: VerifiedContext,
 };
 
+export const GetMoonpaySignature = {
+  input: z.object({
+    url: z.string().url(),
+  }),
+  output: z.object({
+    signature: z.string(),
+  }),
+  context: VerifiedContext,
+};
+
 export const MutualCommunityView = z.object({
   id: z.string(),
   name: z.string(),

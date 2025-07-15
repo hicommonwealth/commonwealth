@@ -4,6 +4,7 @@ export * from './DistributeSkale.command';
 export * from './FinishUpdateEmail.command';
 export * from './GetAddressStatus.query';
 export * from './GetApiKey.query';
+export * from './GetMoonpaySignature.query';
 export * from './GetMutualConnections.query';
 export * from './GetNewContent.query';
 export * from './GetStatus.query';

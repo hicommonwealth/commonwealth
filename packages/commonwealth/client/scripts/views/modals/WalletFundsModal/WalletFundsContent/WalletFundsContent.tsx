@@ -3,6 +3,7 @@ import { MoonPayBuyWidget } from '@moonpay/moonpay-react';
 import React, { useState } from 'react';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useGetEthereumBalanceQuery } from 'state/api/tokens';
+import { trpc } from 'utils/trpcClient';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
   CWModalBody,
@@ -30,6 +31,7 @@ const WalletFundsContent = ({
   } = useMagicWallet({ chainId });
 
   const [isMoonpayVisible, setIsMoonpayVisible] = useState(false);
+  const utils = trpc.useUtils();
 
   const {
     data: userBalance = '0',
@@ -72,6 +74,17 @@ const WalletFundsContent = ({
   const handleCloseMoonpay = async () => {
     setIsMoonpayVisible(false);
     handleRefreshBalance(refetch);
+  };
+
+  const onUrlSignatureRequested = async (url: string): Promise<string> => {
+    try {
+      const result = await utils.user.getMoonpaySignature.fetch({ url });
+      console.log('result', result);
+      return result.signature;
+    } catch (error) {
+      console.error('Failed to get MoonPay signature:', error);
+      throw new Error('Failed to get signature');
+    }
   };
 
   const ethToUsdRate = parseFloat(
@@ -121,15 +134,7 @@ const WalletFundsContent = ({
         visible={isMoonpayVisible}
         walletAddress={userAddress}
         onClose={handleCloseMoonpay}
-        // TODO: This needs to be implemented with a backend endpoint to sign the URL
-        // onUrlSignatureRequested={async (url) => {
-        //   const response = await fetch(`/api/moonpay/sign-url`, {
-        //     method: 'POST',
-        //     body: JSON.stringify({ url }),
-        //   });
-        //   const { signature } = await response.json();
-        //   return signature;
-        // }}
+        onUrlSignatureRequested={onUrlSignatureRequested}
       />
     </div>
   );
