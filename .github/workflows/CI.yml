@@ -66,6 +66,12 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Apply minimal schema to test DB
+        env:
+          PGPASSWORD: edgeware
+        run: |
+          psql -h localhost -U commonwealth -d common_test -f ./libs/model/assets/minimal_schema.sql
+
       - uses: ./.github/actions/e2e
 
       - name: Build server

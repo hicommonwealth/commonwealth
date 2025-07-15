@@ -67,7 +67,8 @@
     "migrate-db": "npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
     "migrate:status": "npx sequelize-cli db:migrate:status",
-    "migration:generate": "npx sequelize-cli migration:generate --name"
+    "migration:generate": "npx sequelize-cli migration:generate --name",
+    "dump:minimal-schema": "tsx scripts/dump-minimal-schema.ts"
   },
   "dependencies": {
     "@anatine/zod-mock": "^3.13.3",
