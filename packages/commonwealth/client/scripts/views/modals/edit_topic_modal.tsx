@@ -26,6 +26,7 @@ import clsx from 'clsx';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
+import useGetTopicByIdQuery from 'state/api/topics/getTopicById';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWSelectList } from '../components/component_kit/new_designs/CWSelectList';
@@ -82,6 +83,19 @@ export const EditTopicModal = ({
     communityId: communityId,
     enabled: !!communityId,
   });
+
+  const { data: topicData } = useGetTopicByIdQuery({
+    topicId: id ?? 0,
+    includeGatingGroups: true,
+    apiEnabled: !!id,
+  });
+
+  useEffect(() => {
+    if (topicData?.gatingGroups) {
+      setSelectedGroups(topicData.gatingGroups.map((g) => g.id));
+      setIsPrivate(topicData.gatingGroups.some((g) => g.is_private));
+    }
+  }, [topicData]);
 
   const { mutateAsync: editGroup } = useEditGroupMutation({
     communityId: app.activeChainId() || '',
