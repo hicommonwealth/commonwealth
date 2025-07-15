@@ -1,5 +1,5 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import app from 'state';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
@@ -116,9 +116,9 @@ export const Topics = () => {
     setTopicFormData((prevState) => ({ ...prevState, ...data }));
   };
 
-  const handleGroupsSelected = (groups: number[]) => {
+  const handleGroupsSelected = useCallback((groups: number[]) => {
     setSelectedGroups(groups);
-  };
+  }, []);
 
   const updateGroupTopicsBulk = useGroupTopicUpdater();
 
