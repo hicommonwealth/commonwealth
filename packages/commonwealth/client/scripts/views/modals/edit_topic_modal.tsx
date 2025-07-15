@@ -159,7 +159,7 @@ export const EditTopicModal = ({
       const updatedTopicId = id;
       const prevGroupIds = topicData?.gatingGroups?.map((g) => g.id) || [];
       const groupsToRemove = prevGroupIds.filter(
-        (id) => !selectedGroups.includes(id),
+        (groupId) => !selectedGroups.includes(groupId),
       );
 
       if (typeof updatedTopicId === 'number') {
