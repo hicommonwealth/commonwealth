@@ -11,8 +11,9 @@ import { buildDb, syncDb, type DB } from '../models';
  * Verifies the existence of a database,
  * creating a fresh instance if it doesn't exist.
  * @param name db name
+ * @param applyDump apply minimal dump when testing model
  */
-const verify_db = async (name: string): Promise<void> => {
+const verify_db = async (name: string, applyDump = false): Promise<void> => {
   let pg: Sequelize | undefined = undefined;
   try {
     pg = new Sequelize({
@@ -32,22 +33,23 @@ const verify_db = async (name: string): Promise<void> => {
       await pg.query(`CREATE DATABASE ${name};`);
       console.log('Created new test db:', name);
 
-      // apply minimal dump
-      const schemaPath = join(__dirname, '../../assets/minimal_schema.sql');
-      if (existsSync(schemaPath)) {
-        execSync(
-          `psql -h localhost -U commonwealth -d ${name} -f "${schemaPath}"`,
-          {
-            stdio: 'inherit',
-            env: {
-              ...process.env,
-              PGPASSWORD: 'edgeware',
+      if (applyDump) {
+        const schemaPath = join(__dirname, '../../assets/minimal_schema.sql');
+        if (existsSync(schemaPath)) {
+          execSync(
+            `psql -h localhost -U commonwealth -d ${name} -f "${schemaPath}"`,
+            {
+              stdio: 'inherit',
+              env: {
+                ...process.env,
+                PGPASSWORD: 'edgeware',
+              },
             },
-          },
-        );
-        console.log(`Loaded minimal schema into ${name}`);
-      } else {
-        console.warn('Minimal schema file not found:', schemaPath);
+          );
+          console.log(`Loaded minimal schema into ${name}`);
+        } else {
+          console.warn('Minimal schema file not found:', schemaPath);
+        }
       }
     }
   } catch (error) {
@@ -122,7 +124,7 @@ const truncate_db = async (db?: DB) => {
 export const create_db_from_migrations = async (
   name: string,
 ): Promise<Sequelize> => {
-  await verify_db(name);
+  await verify_db(name, true);
   try {
     const sequelize = new Sequelize({
       dialect: 'postgres',
