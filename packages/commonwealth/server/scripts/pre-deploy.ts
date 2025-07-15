@@ -48,11 +48,11 @@ if (!RAILWAY_GIT_COMMIT_SHA || !RELEASER_URL || !RELEASER_API_KEY) {
   while (true) {
     let STATUS: string | undefined;
     try {
-      const url = `${RELEASER_URL}/release?commit-sha=${RAILWAY_GIT_COMMIT_SHA}`;
+      const releaseUrl = `${RELEASER_URL}/release?commitSha=${RAILWAY_GIT_COMMIT_SHA}`;
       console.log(
-        `Checking release status for ${RAILWAY_GIT_COMMIT_SHA} at ${url}`,
+        `Checking release status for ${RAILWAY_GIT_COMMIT_SHA} at ${releaseUrl}`,
       );
-      const res: Response = await fetch(url, {
+      const res: Response = await fetch(releaseUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -66,6 +66,9 @@ if (!RAILWAY_GIT_COMMIT_SHA || !RELEASER_URL || !RELEASER_API_KEY) {
         process.exit(1);
       } else if (res.status === 200) {
         const data: { release_status: string } = await res.json();
+        if (!data.release_status) {
+          console.warn('Release not found!');
+        }
         STATUS = data.release_status;
       } else {
         console.error(
