@@ -21,7 +21,6 @@ import './ManageTopicsSection.scss';
 
 export const ManageTopicsSection = () => {
   const hasWeightedVoting = (topic: Topic): boolean => {
-    console.log('topic', topic);
     return !!topic.weighted_voting;
   };
 
