@@ -12,7 +12,7 @@ module.exports = {
             allowNull: false,
             defaultValue: false,
           },
-          { transaction: t }
+          { transaction: t },
         ),
         queryInterface.addColumn(
           'Addresses',
@@ -22,7 +22,7 @@ module.exports = {
             allowNull: false,
             defaultValue: false,
           },
-          { transaction: t }
+          { transaction: t },
         ),
       ]);
     });

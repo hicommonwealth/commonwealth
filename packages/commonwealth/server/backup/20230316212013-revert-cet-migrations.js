@@ -9,7 +9,7 @@ module.exports = {
           // id = chain-event_name (event_name is value of string enum)
           id: { type: Sequelize.STRING, primaryKey: true },
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Subscriptions',
@@ -19,7 +19,7 @@ module.exports = {
           allowNull: true,
           references: { model: 'ChainEventTypes', key: 'id' },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -30,7 +30,7 @@ module.exports = {
           allowNull: true,
           references: { model: 'ChainEntityMeta', key: 'id' },
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

@@ -9,7 +9,7 @@ module.exports = {
         {
           offchain_community_id: 'infinity',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // DELETE Offchain Reactions
@@ -18,7 +18,7 @@ module.exports = {
         {
           community: 'nft-co',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Fix OffchainCommunity Model id to "infinity" from "nft-co"
@@ -31,7 +31,7 @@ module.exports = {
           // WHERE
           id: 'nft-co',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Fix Roles Offchain_community_id to be "infinity" for "nft-co"
@@ -44,7 +44,7 @@ module.exports = {
           // WHERE
           offchain_community_id: 'nft-co',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Fix Offchain Threads
@@ -57,7 +57,7 @@ module.exports = {
           // WHERE
           community: 'nft-co',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Fix Offchain Topics
@@ -70,7 +70,7 @@ module.exports = {
           // WHERE
           community_id: 'nft-co',
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -89,7 +89,7 @@ module.exports = {
           // WHERE
           id: 'infinity',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Fix Roles Offchain_community_id to be "infinity" for "nft-co"
@@ -102,7 +102,7 @@ module.exports = {
           // WHERE
           offchain_community_id: 'infinity',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Fix Offchain Threads
@@ -115,7 +115,7 @@ module.exports = {
           // WHERE
           community: 'infinity',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Fix Offchain Topics
@@ -128,7 +128,7 @@ module.exports = {
           // WHERE
           community_id: 'infinity',
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

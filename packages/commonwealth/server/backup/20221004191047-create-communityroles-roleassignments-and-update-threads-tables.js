@@ -49,7 +49,7 @@ module.exports = {
             { fields: ['address_id'] },
           ],
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -79,7 +79,7 @@ module.exports = {
             defaultValue: false,
           },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Migrate CommunityRoles for Current Chains
@@ -102,7 +102,7 @@ module.exports = {
                 updated_at: new Date(),
               },
             ],
-            { transaction: t }
+            { transaction: t },
           );
           await queryInterface.bulkInsert(
             'CommunityRoles',
@@ -114,7 +114,7 @@ module.exports = {
                 updated_at: new Date(),
               },
             ],
-            { transaction: t }
+            { transaction: t },
           );
           await queryInterface.bulkInsert(
             'CommunityRoles',
@@ -126,9 +126,9 @@ module.exports = {
                 updated_at: new Date(),
               },
             ],
-            { transaction: t }
+            { transaction: t },
           );
-        })
+        }),
       );
 
       // I think we need to do it half and half
@@ -143,7 +143,7 @@ module.exports = {
         role_query,
         {
           transaction: t,
-        }
+        },
       );
       await Promise.all(
         rolesWithCommunityRoles[0].map(async (r) => {
@@ -159,9 +159,9 @@ module.exports = {
                 is_user_default: r.is_user_default,
               },
             ],
-            { transaction: t }
+            { transaction: t },
           );
-        })
+        }),
       );
     });
   },

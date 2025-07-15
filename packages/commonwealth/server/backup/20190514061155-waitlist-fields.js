@@ -10,7 +10,7 @@ module.exports = {
           type: Sequelize.BOOLEAN,
           defaultValue: false,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Users',
@@ -19,7 +19,7 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

@@ -14,7 +14,7 @@ module.exports = {
                 WHERE CE1.id = 715
                   AND CE2.id = 403;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       await queryInterface.sequelize.query(
         `
@@ -22,7 +22,7 @@ module.exports = {
                 SET entity_id = 715
                 WHERE entity_id = 403;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       await queryInterface.sequelize.query(
         `
@@ -30,7 +30,7 @@ module.exports = {
                 FROM "ChainEntities"
                 WHERE id = 403;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       // delete entity 692 (replaced by 717)
@@ -44,7 +44,7 @@ module.exports = {
                 WHERE CE1.id = 717
                   AND CE2.id = 692;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       await queryInterface.sequelize.query(
         `
@@ -52,7 +52,7 @@ module.exports = {
                 SET entity_id = 717
                 WHERE entity_id = 692;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       await queryInterface.sequelize.query(
         `
@@ -60,7 +60,7 @@ module.exports = {
                 FROM "ChainEntities"
                 WHERE id = 692;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       // delete entity 693 (replaced by 718)
@@ -74,7 +74,7 @@ module.exports = {
                 WHERE CE1.id = 718
                   AND CE2.id = 693;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       await queryInterface.sequelize.query(
         `
@@ -82,7 +82,7 @@ module.exports = {
                 SET entity_id = 718
                 WHERE entity_id = 693;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       await queryInterface.sequelize.query(
         `
@@ -90,7 +90,7 @@ module.exports = {
                 FROM "ChainEntities"
                 WHERE id = 693;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       // delete entity 694 (replaced by 719)
@@ -104,7 +104,7 @@ module.exports = {
                 WHERE CE1.id = 719
                   AND CE2.id = 694;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       await queryInterface.sequelize.query(
         `
@@ -112,7 +112,7 @@ module.exports = {
                 SET entity_id = 719
                 WHERE entity_id = 694;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       await queryInterface.sequelize.query(
         `
@@ -120,7 +120,7 @@ module.exports = {
                 FROM "ChainEntities"
                 WHERE id = 694;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       // delete entity 109 (replaced by 110)
@@ -131,7 +131,7 @@ module.exports = {
                 FROM "ChainEvents"
                 WHERE id = 19066;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       // update the remaining chain-events
       await queryInterface.sequelize.query(
@@ -140,7 +140,7 @@ module.exports = {
                 SET entity_id = 110
                 WHERE entity_id = 109;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       await queryInterface.sequelize.query(
         `
@@ -148,7 +148,7 @@ module.exports = {
                 FROM "ChainEntities"
                 WHERE id = 109;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       // deletes entity 506 (replaced by 732)
@@ -158,7 +158,7 @@ module.exports = {
                 FROM "ChainEvents"
                 WHERE id = 543427;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       await queryInterface.sequelize.query(
         `
@@ -166,7 +166,7 @@ module.exports = {
                 FROM "ChainEntities"
                 WHERE id = 506;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
     });
   },

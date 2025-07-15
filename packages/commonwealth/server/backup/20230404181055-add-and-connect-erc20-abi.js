@@ -310,7 +310,7 @@ module.exports = {
           type: Sequelize.STRING,
           unique: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // add a contractabi
@@ -324,14 +324,14 @@ module.exports = {
             updated_at: new Date(),
           },
         ],
-        { transaction: t, returning: true }
+        { transaction: t, returning: true },
       );
 
       const erc20abiId = abis[0].id;
 
       await queryInterface.sequelize.query(
         `Update "Contracts" SET abi_id = '${erc20abiId}' WHERE type = 'erc20';`,
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -344,7 +344,7 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
     await queryInterface.sequelize.query(
-      `Update "Contracts" SET abi_id = NULL WHERE type = 'erc20';`
+      `Update "Contracts" SET abi_id = NULL WHERE type = 'erc20';`,
     );
   },
 };

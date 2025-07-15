@@ -10,20 +10,16 @@ module.exports = {
         {
           type: Sequelize.ARRAY(Sequelize.INTEGER),
           allowNull: false,
-          defaultValue: []
+          defaultValue: [],
         },
-        { transaction: t }
-      )
-    })
+        { transaction: t },
+      );
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.removeColumn(
-        'Topics',
-        'group_ids',
-        { transaction }
-      )
-    })
-  }
+      await queryInterface.removeColumn('Topics', 'group_ids', { transaction });
+    });
+  },
 };

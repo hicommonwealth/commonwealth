@@ -12,7 +12,7 @@ module.exports = {
           SELECT id FROM "Threads"
         );
       `,
-        { transaction: t }
+        { transaction: t },
       );
 
       if (ids.length > 0) {
@@ -21,7 +21,7 @@ module.exports = {
         // Assert that the comment count is not more than 10 so that we don't end up deleting too many comments
         if (commentIds.length > 10) {
           throw new Error(
-            'More than 10 comments found with invalid thread_id, fail-safe hit'
+            'More than 10 comments found with invalid thread_id, fail-safe hit',
           );
         }
 
@@ -34,7 +34,7 @@ module.exports = {
         // Assert that the reaction count is not more than 10 so that we don't end up deleting too many reactions
         if (reactionsToDelete.length > 10) {
           throw new Error(
-            'More than 10 reactions found to delete, fail-safe hit'
+            'More than 10 reactions found to delete, fail-safe hit',
           );
         }
 
@@ -43,7 +43,7 @@ module.exports = {
           {
             id: reactionsToDelete.map((r) => r.id),
           },
-          { transaction: t }
+          { transaction: t },
         );
 
         await queryInterface.bulkDelete(
@@ -51,7 +51,7 @@ module.exports = {
           {
             id: commentIds,
           },
-          { transaction: t }
+          { transaction: t },
         );
       }
 
@@ -66,7 +66,7 @@ module.exports = {
             key: 'id',
           },
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

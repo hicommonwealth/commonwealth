@@ -16,7 +16,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -28,7 +28,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
 
       // FRAX UPDATE
@@ -44,7 +44,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -56,7 +56,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
     });
   },
@@ -76,7 +76,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -88,7 +88,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
 
       // FRAX UPDATE
@@ -104,7 +104,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -116,7 +116,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
     });
   },

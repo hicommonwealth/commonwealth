@@ -24,7 +24,7 @@ module.exports = {
         {
           type: queryInterface.sequelize.QueryTypes.SELECT,
           transaction,
-        }
+        },
       );
 
       // 2. Produce mapping of addresses to duplicate users
@@ -53,7 +53,7 @@ module.exports = {
 
         // once mergeSet is maximal, remove all intersecting elements + reinsert the final set
         userMergeSets = userMergeSets.filter(
-          (set) => !hasIntersection(set, mergeSet)
+          (set) => !hasIntersection(set, mergeSet),
         );
         userMergeSets.push(mergeSet);
       }
@@ -87,7 +87,7 @@ module.exports = {
           {
             type: queryInterface.sequelize.QueryTypes.SELECT,
             transaction,
-          }
+          },
         );
 
         // 5. Produce object to transform addresses / profiles
@@ -103,7 +103,7 @@ module.exports = {
         const userToKeepMap = [];
         for (const userSet of userMergeSets) {
           const userSetData = [...userSet].map((user_id) =>
-            usersToBeMerged.find((u) => u.user_id === user_id)
+            usersToBeMerged.find((u) => u.user_id === user_id),
           );
           const userTransformData = {
             keptUser: null,
@@ -152,7 +152,7 @@ module.exports = {
               SET profile_name = '${keptProfileName}'
               WHERE id = ${keptProfile}
             `,
-              { transaction }
+              { transaction },
             );
           }
         }
@@ -166,7 +166,7 @@ module.exports = {
             SET user_id = ${keptUser}, profile_id = ${keptProfile}
             WHERE user_id IN (${mergedUsers.join(',')});
           `,
-            { transaction }
+            { transaction },
           );
         }
         console.log('Migration complete.');

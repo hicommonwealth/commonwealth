@@ -7,7 +7,7 @@ module.exports = {
         `
                 DROP TABLE IF EXISTS entities_creation_events;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       await queryInterface.addConstraint('ChainEntities', {

@@ -18,7 +18,7 @@ module.exports = {
             decimals: 18,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -31,7 +31,7 @@ module.exports = {
             eth_chain_id: 421611,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -41,12 +41,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'ideamarket-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: 'ideamarket-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

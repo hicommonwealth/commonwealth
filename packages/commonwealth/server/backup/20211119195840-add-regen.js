@@ -19,7 +19,7 @@ module.exports = {
             bech32_prefix: 'regen',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -30,7 +30,7 @@ module.exports = {
             url: 'http://public-rpc.regen.vitwit.com:26657/',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -39,12 +39,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'regen-network' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['regen-network'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

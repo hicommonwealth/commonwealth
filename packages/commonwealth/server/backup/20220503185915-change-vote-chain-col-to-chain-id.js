@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      { transaction: t }
+      { transaction: t },
     );
     await queryInterface.renameColumn('OffchainVotes', 'chain_id', 'chain');
     return new Promise((resolve) => resolve());

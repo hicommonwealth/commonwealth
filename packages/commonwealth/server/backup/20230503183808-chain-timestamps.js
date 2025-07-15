@@ -11,7 +11,7 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.addColumn(
@@ -21,7 +21,7 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
 
       const updateQuery = `

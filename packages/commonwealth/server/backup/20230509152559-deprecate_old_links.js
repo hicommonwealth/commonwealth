@@ -47,7 +47,7 @@ module.exports = {
             type: Sequelize.DATE,
           },
         },
-        { transaction }
+        { transaction },
       );
 
       // Add thread_id column back to ChainEntityMeta table
@@ -58,7 +58,7 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
 
       // Add snapshotProposal column back to Threads table
@@ -70,7 +70,7 @@ module.exports = {
           allowNull: false,
           defaultValue: false,
         },
-        { transaction }
+        { transaction },
       );
     });
   },

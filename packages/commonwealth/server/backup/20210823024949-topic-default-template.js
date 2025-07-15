@@ -10,7 +10,7 @@ module.exports = {
           type: Sequelize.TEXT,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -20,7 +20,7 @@ module.exports = {
       await queryInterface.removeColumn(
         'OffchainTopics',
         'default_offchain_template',
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

@@ -43,7 +43,7 @@ module.exports = {
             permission: 'member',
             created_at: new Date(),
             updated_at: new Date(),
-          })
+          }),
         );
       };
 
@@ -52,14 +52,14 @@ module.exports = {
           ? queryInterface.bulkInsert(
               'Roles',
               update(addressChainAssociations[0]),
-              { transaction: t }
+              { transaction: t },
             )
           : null,
         addressPublicCommunityAssociations[0].length > 0
           ? queryInterface.bulkInsert(
               'Roles',
               update(addressPublicCommunityAssociations[0]),
-              { transaction: t }
+              { transaction: t },
             )
           : null,
       ]);
@@ -137,7 +137,7 @@ module.exports = {
             active: true,
             created_at: new Date(),
             updated_at: new Date(),
-          })
+          }),
         );
       };
 
@@ -145,17 +145,17 @@ module.exports = {
         queryInterface.bulkInsert(
           'Memberships',
           update(userChainAssociations[0]),
-          { transaction: t }
+          { transaction: t },
         ),
         queryInterface.bulkInsert(
           'Memberships',
           update(userPublicCommunityAssociations[0]),
-          { transaction: t }
+          { transaction: t },
         ),
         queryInterface.bulkInsert(
           'Memberships',
           update(userPrivateCommunityAssociations[0]),
-          { transaction: t }
+          { transaction: t },
         ),
       ]);
     });

@@ -10,7 +10,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Chains',
@@ -19,7 +19,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

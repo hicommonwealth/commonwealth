@@ -9,7 +9,7 @@ module.exports = {
                 CREATE table "ChainEntityMeta" as (SELECT id, title, chain, author, thread_id
                                                    from "ChainEntities");
             `,
-        { transaction: t }
+        { transaction: t },
       );
 
       // rename exising column id => ce_id and add UNIQUE + NOT NULL constraints
@@ -26,7 +26,7 @@ module.exports = {
                 ALTER TABLE "ChainEntityMeta"
                     ALTER COLUMN ce_id SET NOT NULL;
             `,
-        { transaction: t }
+        { transaction: t },
       );
       // create the new id serial primary key column
       await queryInterface.sequelize.query(
@@ -34,7 +34,7 @@ module.exports = {
                 ALTER TABLE "ChainEntityMeta"
                     ADD COLUMN id SERIAL PRIMARY KEY;
             `,
-        { transaction: t }
+        { transaction: t },
       );
 
       // set id column as an auto-increment primary key
@@ -57,7 +57,7 @@ module.exports = {
                     ADD CONSTRAINT "ChainEntityMeta_thread_id_fkey"
                         FOREIGN KEY (thread_id) REFERENCES "Threads";
             `,
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `
@@ -65,7 +65,7 @@ module.exports = {
                     ADD CONSTRAINT "ChainEntityMeta_chain_fkey"
                         FOREIGN KEY (chain) REFERENCES "Chains";
             `,
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.dropTable('ChainEntities', {
@@ -77,7 +77,7 @@ module.exports = {
       await queryInterface.removeConstraint(
         'Notifications',
         'Notifications_chain_event_id_fkey1',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.dropTable('ChainEvents', { transaction: t });
 
@@ -89,7 +89,7 @@ module.exports = {
                     DROP COLUMN event_name,
                     DROP COLUMN event_network
             `,
-        { transaction: t }
+        { transaction: t },
       );
 
       // make the ChainNodes url unique

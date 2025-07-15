@@ -13,7 +13,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'ChainEntityMeta',
@@ -23,7 +23,7 @@ module.exports = {
           allowNull: true,
           references: { model: 'Chains', key: 'id' },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Add required commonwealth nodes / chains
@@ -39,7 +39,7 @@ module.exports = {
             name: 'Ethereum (Goerli)',
           },
         ],
-        { transaction: t, returning: true }
+        { transaction: t, returning: true },
       );
 
       // create dummy CWP chain
@@ -58,7 +58,7 @@ module.exports = {
             chain_node_id: ethChainNode[0].id,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       const contract = await queryInterface.bulkInsert(
@@ -72,7 +72,7 @@ module.exports = {
             updated_at: new Date(),
           },
         ],
-        { transaction: t, returning: true }
+        { transaction: t, returning: true },
       );
 
       await queryInterface.bulkInsert(
@@ -85,7 +85,7 @@ module.exports = {
             updated_at: new Date(),
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -95,7 +95,7 @@ module.exports = {
           type: Sequelize.BOOLEAN,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -123,28 +123,28 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkDelete(
         'CommunityContracts',
         { chain_id: 'common-protocol' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Contracts',
         { address: '0x6f2b3594E54BAAcCB5A7AE93185e1A4fa82Ba67a' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: 'common-protocol' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { eth_chain_id: 5 },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeColumn('ChainEntityMeta', 'type_id', {
         transaction: t,

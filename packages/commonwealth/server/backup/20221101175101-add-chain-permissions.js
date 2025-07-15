@@ -17,7 +17,7 @@ module.exports = {
           allowNull: false,
           defaultValue: 0,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Chains',
@@ -27,7 +27,7 @@ module.exports = {
           allowNull: false,
           defaultValue: 0,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

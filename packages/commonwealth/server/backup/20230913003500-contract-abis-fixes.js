@@ -10,7 +10,7 @@ module.exports = {
       await queryInterface.removeConstraint(
         'ContractAbis',
         'ContractAbis_abi_key',
-        { transaction }
+        { transaction },
       );
       await queryInterface.addColumn(
         'ContractAbis',
@@ -19,7 +19,7 @@ module.exports = {
           type: Sequelize.TEXT,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
       console.log('New abi_hash column setup');
 
@@ -31,7 +31,7 @@ module.exports = {
           transaction,
           type: queryInterface.sequelize.QueryTypes.SELECT,
           raw: true,
-        }
+        },
       );
 
       if (abis.length > 0) {
@@ -62,7 +62,7 @@ module.exports = {
               transaction,
               type: queryInterface.sequelize.QueryTypes.UPDATE,
               replacements: [JSON.stringify(dataToHash), hash, abi.id],
-            }
+            },
           );
           console.log('Updated abi hash for abi id', abi.id);
         }
@@ -80,7 +80,7 @@ module.exports = {
         `
         ALTER TABLE "ContractAbis" ALTER COLUMN abi_hash SET NOT NULL;
       `,
-        { transaction }
+        { transaction },
       );
 
       console.log('Adding abi array constraint');
@@ -88,7 +88,7 @@ module.exports = {
         `
         ALTER TABLE "ContractAbis" ADD CONSTRAINT chk_contract_abi_array CHECK (jsonb_typeof(abi) = 'array');
       `,
-        { transaction }
+        { transaction },
       );
     });
   },

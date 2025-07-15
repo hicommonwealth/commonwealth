@@ -39,7 +39,7 @@ module.exports = {
             allowNull: true,
           },
         },
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.addColumn(
@@ -53,7 +53,7 @@ module.exports = {
             key: 'id',
           },
         },
-        { transaction }
+        { transaction },
       );
     });
   },

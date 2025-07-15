@@ -18,7 +18,7 @@ module.exports = {
           { fields: ['origin', 'blocknum'] },
           { fields: ['origin', 'timestamp'] },
         ],
-      }
+      },
     );
   },
 

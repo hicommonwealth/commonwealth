@@ -7,7 +7,7 @@ module.exports = {
         `
         ALTER TABLE "ChainNodes" ADD CONSTRAINT "Chain_nodes_unique_eth_chain_id" UNIQUE (eth_chain_id);
         `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
     });
   },
@@ -16,7 +16,7 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `ALTER TABLE "ChainNodes" DROP CONSTRAINT "Chain_nodes_unique_eth_chain_id";`,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
     });
   },

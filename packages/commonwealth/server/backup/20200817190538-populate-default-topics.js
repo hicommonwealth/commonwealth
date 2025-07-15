@@ -3,10 +3,10 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const communityIds = await queryInterface.sequelize.query(
-      'SELECT id FROM "OffchainCommunities"'
+      'SELECT id FROM "OffchainCommunities"',
     );
     const chainIds = await queryInterface.sequelize.query(
-      'SELECT id FROM "Chains"'
+      'SELECT id FROM "Chains"',
     );
 
     return queryInterface.sequelize.transaction(async (t) => {
@@ -18,7 +18,7 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date(),
         })),
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkInsert(
         'OffchainTopics',
@@ -28,14 +28,14 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date(),
         })),
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.query(
-      'DELETE FROM "OffchainTopics" WHERE name=\'General\''
+      'DELETE FROM "OffchainTopics" WHERE name=\'General\'',
     );
   },
 };

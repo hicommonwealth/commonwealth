@@ -20,7 +20,7 @@ async function getChainNodes(queryInterface, transaction) {
         WHERE "ChainNodes".name = 'Ethereum (Mainnet)'
         LIMIT 1;
       `,
-    { transaction, raw: true, type: QueryTypes.SELECT }
+    { transaction, raw: true, type: QueryTypes.SELECT },
   );
 
   const mumbaiResult = await queryInterface.sequelize.query(
@@ -30,7 +30,7 @@ async function getChainNodes(queryInterface, transaction) {
         WHERE "ChainNodes".name = 'Polygon (Mumbai)'
         LIMIT 1;
       `,
-    { transaction, raw: true, type: QueryTypes.SELECT }
+    { transaction, raw: true, type: QueryTypes.SELECT },
   );
 
   const celoResult = await queryInterface.sequelize.query(
@@ -40,7 +40,7 @@ async function getChainNodes(queryInterface, transaction) {
         WHERE "ChainNodes".name = 'Celo'
         LIMIT 1;
       `,
-    { transaction, raw: true, type: QueryTypes.SELECT }
+    { transaction, raw: true, type: QueryTypes.SELECT },
   );
 
   console.log('Existing ChainNodes fetched');
@@ -58,7 +58,7 @@ async function findOrCreateAbi(queryInterface, transaction, rawAbi, nickname) {
       transaction,
       type: QueryTypes.SELECT,
       replacements: [hashInstance.hash(rawAbi)],
-    }
+    },
   );
 
   if (abi.length > 0) {
@@ -86,7 +86,7 @@ async function findOrCreateAbi(queryInterface, transaction, rawAbi, nickname) {
         nickname,
         hashInstance.hash(rawAbi),
       ],
-    }
+    },
   );
 
   return result[0][0].id;
@@ -109,7 +109,7 @@ module.exports = {
           CONSTRAINT unique_event_source UNIQUE(chain_node_id, contract_address, event_signature)
         );
       `,
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.createTable(
@@ -122,13 +122,13 @@ module.exports = {
           },
           block_number: { type: Sequelize.INTEGER, allowNull: false },
         },
-        { transaction }
+        { transaction },
       );
       console.log('New tables created');
 
       const [ethereumResult, mumbaiResult, celoResult] = await getChainNodes(
         queryInterface,
-        transaction
+        transaction,
       );
 
       console.log('Finding or creating ABIs');
@@ -136,37 +136,37 @@ module.exports = {
         queryInterface,
         transaction,
         rawAaveAbi,
-        'AaveGovernanceV2'
+        'AaveGovernanceV2',
       );
       const dydxAbiId = await findOrCreateAbi(
         queryInterface,
         transaction,
         rawDydxAbi,
-        'DydxGovernor'
+        'DydxGovernor',
       );
       const tribeAbiId = await findOrCreateAbi(
         queryInterface,
         transaction,
         rawTribeAbi,
-        'FeiDAO'
+        'FeiDAO',
       );
       const autonomiesAbiId = await findOrCreateAbi(
         queryInterface,
         transaction,
         rawAutonomiesAbi,
-        'NVMGovernance'
+        'NVMGovernance',
       );
       const impactMarketAbiId = await findOrCreateAbi(
         queryInterface,
         transaction,
         rawImpactMarketAbi,
-        'PACTDelegator'
+        'PACTDelegator',
       );
       const moolaMarketAbiId = await findOrCreateAbi(
         queryInterface,
         transaction,
         rawMoolaMarketAbi,
-        'MoolaGovernorBravoDelegator'
+        'MoolaGovernorBravoDelegator',
       );
       console.log('ABI processing complete');
 
@@ -208,7 +208,7 @@ module.exports = {
                 [tribeAddress, ethereumId],
               ],
             ],
-          }
+          },
         );
         console.log('Ethereum ABIs uploaded');
 
@@ -320,7 +320,7 @@ module.exports = {
             transaction,
             type: QueryTypes.UPDATE,
             replacements: [autonomiesAbiId, autonomiesAddress, mumbaiId],
-          }
+          },
         );
 
         eventSourceRecords = [
@@ -387,7 +387,7 @@ module.exports = {
                 [moolaMarketAddress, celoId],
               ],
             ],
-          }
+          },
         );
         console.log('Uploaded Celo ABIs');
 
@@ -482,7 +482,7 @@ module.exports = {
             'MoolaGovernorBravoDelegator',
           ],
         },
-        { transaction }
+        { transaction },
       );
     });
   },

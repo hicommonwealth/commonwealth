@@ -5,7 +5,7 @@ module.exports = {
     await queryInterface.renameColumn(
       'Users',
       'selected_node_id',
-      'selectedNodeId'
+      'selectedNodeId',
     );
   },
 
@@ -13,7 +13,7 @@ module.exports = {
     await queryInterface.renameColumn(
       'Users',
       'selectedNodeId',
-      'selected_node_id'
+      'selected_node_id',
     );
   },
 };

@@ -12,7 +12,7 @@ module.exports = {
           },
           category_name: { type: Sequelize.STRING, allowNull: true },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       const categoryTypes = [
@@ -23,7 +23,7 @@ module.exports = {
       await queryInterface.bulkInsert(
         'ChainCategoryTypes',
         [...categoryTypes],
-        { transaction: t }
+        { transaction: t },
       );
 
       // creates a new table called ChainCategories
@@ -46,7 +46,7 @@ module.exports = {
             references: { model: 'ChainCategoryTypes', key: 'id' },
           },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       const chainCategories = [];
@@ -64,15 +64,15 @@ module.exports = {
       const defi = ['clover', 'injective'];
 
       daos.forEach((c) =>
-        chainCategories.push({ chain_id: c, category_type_id: 2 })
+        chainCategories.push({ chain_id: c, category_type_id: 2 }),
       );
       defi.forEach((c) =>
-        chainCategories.push({ chain_id: c, category_type_id: 1 })
+        chainCategories.push({ chain_id: c, category_type_id: 1 }),
       );
       return queryInterface.bulkInsert(
         'ChainCategories',
         [...chainCategories],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

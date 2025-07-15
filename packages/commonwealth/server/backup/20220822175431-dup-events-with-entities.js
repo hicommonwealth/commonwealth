@@ -25,7 +25,7 @@ module.exports = {
                 WHERE ce_ids.row + ce_ids.reverse_row > 2 AND
                       real_entity != 1;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       await queryInterface.sequelize.query(
@@ -35,7 +35,7 @@ module.exports = {
                 FROM "ChainEvents"
                 WHERE entity_id IN (SELECT * FROM "chain_entities_to_delete");
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       await queryInterface.sequelize.query(
@@ -47,7 +47,7 @@ module.exports = {
                 FROM "NotificationsRead"
                 WHERE notification_id IN (SELECT * FROM notifications_to_delete);
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       await queryInterface.sequelize.query(
@@ -56,7 +56,7 @@ module.exports = {
                 FROM "Notifications"
                 WHERE chain_event_id IN (SELECT * FROM "chain_events_to_delete");
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       await queryInterface.sequelize.query(
@@ -65,7 +65,7 @@ module.exports = {
                 FROM "ChainEvents"
                 WHERE id IN (SELECT * FROM chain_events_to_delete);
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       await queryInterface.sequelize.query(
@@ -74,21 +74,21 @@ module.exports = {
                 FROM "ChainEntities"
                 WHERE id IN (SELECT * FROM chain_entities_to_delete);
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       await queryInterface.sequelize.query(
         `
                 DROP TABLE chain_events_to_delete;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       await queryInterface.sequelize.query(
         `
                 DROP TABLE chain_entities_to_delete;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
     });
   },

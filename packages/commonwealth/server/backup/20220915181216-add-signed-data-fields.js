@@ -7,57 +7,57 @@ module.exports = {
         'Threads',
         'canvas_action',
         { type: Sequelize.JSONB },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Threads',
         'canvas_session',
         { type: Sequelize.JSONB },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Threads',
         'canvas_hash',
         { type: Sequelize.STRING },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
         'Comments',
         'canvas_action',
         { type: Sequelize.JSONB },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Comments',
         'canvas_session',
         { type: Sequelize.JSONB },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Comments',
         'canvas_hash',
         { type: Sequelize.STRING },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
         'Reactions',
         'canvas_action',
         { type: Sequelize.JSONB },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Reactions',
         'canvas_session',
         { type: Sequelize.JSONB },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Reactions',
         'canvas_hash',
         { type: Sequelize.STRING },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

@@ -42,7 +42,7 @@ module.exports = {
             'entity-event',
           ],
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

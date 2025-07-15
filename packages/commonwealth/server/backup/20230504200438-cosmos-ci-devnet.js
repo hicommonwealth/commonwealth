@@ -36,7 +36,7 @@ module.exports = {
             NOW()
         );
         `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
     });
   },
@@ -49,7 +49,7 @@ module.exports = {
         DELETE FROM "Chains" WHERE id = 'csdk-v1';
         DELETE FROM "ChainNodes" WHERE name = 'cosmos sdk v0.46.11';
       `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
     });
   },

@@ -1,7 +1,7 @@
 module.exports = {
   up: async (queryInterface) => {
     return queryInterface.sequelize.query(
-      `UPDATE "Topics" SET name=LTRIM(RTRIM(name));`
+      `UPDATE "Topics" SET name=LTRIM(RTRIM(name));`,
     );
   },
 

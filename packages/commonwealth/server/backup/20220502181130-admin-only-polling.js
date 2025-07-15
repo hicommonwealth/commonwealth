@@ -10,7 +10,7 @@ module.exports = {
           type: Sequelize.BOOLEAN,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

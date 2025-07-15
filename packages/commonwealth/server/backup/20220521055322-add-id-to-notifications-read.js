@@ -8,7 +8,7 @@ module.exports = {
       ALTER TABLE "NotificationsRead"
         ADD COLUMN IF NOT EXISTS id integer;
     `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
 
       await queryInterface.sequelize.query(
@@ -31,7 +31,7 @@ module.exports = {
         END;
         $$;
     `,
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.sequelize.query(
@@ -39,7 +39,7 @@ module.exports = {
         ALTER TABLE "NotificationsRead"
         ALTER COLUMN id SET NOT NULL;
       `,
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

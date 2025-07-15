@@ -6,13 +6,13 @@ module.exports = {
       type: Sequelize.BOOLEAN,
     });
     await queryInterface.sequelize.query(
-      `UPDATE \"Users\" SET "tempEmailVerified"=true WHERE "emailVerified" IS NOT NULL`
+      `UPDATE \"Users\" SET "tempEmailVerified"=true WHERE "emailVerified" IS NOT NULL`,
     );
     await queryInterface.removeColumn('Users', 'emailVerified');
     await queryInterface.renameColumn(
       'Users',
       'tempEmailVerified',
-      'emailVerified'
+      'emailVerified',
     );
   },
 

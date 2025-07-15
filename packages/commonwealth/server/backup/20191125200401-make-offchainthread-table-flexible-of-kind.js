@@ -10,7 +10,7 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.changeColumn(
         'OffchainThreads',
@@ -19,7 +19,7 @@ module.exports = {
           type: Sequelize.TEXT,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -33,7 +33,7 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: false,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.changeColumn(
         'OffchainThreads',
@@ -42,7 +42,7 @@ module.exports = {
           type: Sequelize.TEXT,
           allowNull: false,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

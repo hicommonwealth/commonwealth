@@ -14,11 +14,11 @@ module.exports = {
           allowNull: false,
           defaultValue: [],
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `UPDATE "Chains" SET snapshot = array[snapshot_old] WHERE snapshot_old IS NOT NULL;`,
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeColumn('Chains', 'snapshot_old', {
         transaction: t,
@@ -38,11 +38,11 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `UPDATE "Chains" SET snapshot = snapshot_old[1] WHERE cardinality(snapshot_old) > 0;`,
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeColumn('Chains', 'snapshot_old', {
         transaction: t,

@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (transaction) => {
       const chains = await queryInterface.sequelize.query(
         `SELECT c.id FROM "Chains" c WHERE c.id NOT IN (SELECT DISTINCT(chain_id) FROM "Topics");`,
-        { transaction }
+        { transaction },
       );
       const topics = chains[0].map((c) => {
         return {

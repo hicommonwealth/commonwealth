@@ -10,7 +10,7 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.addColumn(
@@ -20,20 +20,20 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
-    })
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.removeColumn('Threads', 'marked_as_spam_at', {
-        transaction
+        transaction,
       });
 
       await queryInterface.removeColumn('Comments', 'marked_as_spam_at', {
-        transaction
+        transaction,
       });
-    })
-  }
+    });
+  },
 };

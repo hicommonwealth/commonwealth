@@ -8,7 +8,7 @@ module.exports = {
       SET url = 'https://rpc-juno.ecostake.com'
       WHERE url = 'https://rpc-juno.itastakers.com';
       `,
-      { raw: true }
+      { raw: true },
     );
   },
 
@@ -19,7 +19,7 @@ module.exports = {
       SET url = 'https://rpc-juno.itastakers.com'
       WHERE url = 'https://rpc-juno.ecostake.com';
       `,
-      { raw: true }
+      { raw: true },
     );
   },
 };

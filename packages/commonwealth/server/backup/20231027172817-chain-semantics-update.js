@@ -10,7 +10,7 @@ module.exports = {
         `
         ALTER INDEX "Chains_pkey" RENAME TO "Communities_pkey";
       `,
-        { transaction }
+        { transaction },
       );
     });
   },
@@ -24,8 +24,8 @@ module.exports = {
         `
         ALTER INDEX "Communities_pkey" RENAME TO "Chains_pkey";
       `,
-        { transaction }
+        { transaction },
       );
     });
-  }
+  },
 };

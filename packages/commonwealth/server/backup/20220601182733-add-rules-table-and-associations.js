@@ -30,7 +30,7 @@ module.exports = {
             allowNull: true,
           },
         },
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.addColumn(
@@ -44,7 +44,7 @@ module.exports = {
             key: 'id',
           },
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.addColumn(
         'ChatChannels',
@@ -57,7 +57,7 @@ module.exports = {
             key: 'id',
           },
         },
-        { transaction }
+        { transaction },
       );
     });
   },

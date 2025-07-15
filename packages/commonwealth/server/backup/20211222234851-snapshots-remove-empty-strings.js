@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `UPDATE "Chains" SET snapshot = '{}' WHERE length(snapshot[1])=0;`,
-        { transaction: t }
+        { transaction: t },
       );
     });
     /**

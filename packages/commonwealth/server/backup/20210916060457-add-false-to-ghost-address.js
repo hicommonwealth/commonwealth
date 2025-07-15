@@ -7,7 +7,7 @@ module.exports = {
         'Addresses',
         { ghost_address: false },
         { ghost_address: null },
-        { transaction: t }
+        { transaction: t },
       );
     });
     /**
@@ -24,7 +24,7 @@ module.exports = {
         'Addresses',
         { ghost_address: null },
         { ghost_address: false },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

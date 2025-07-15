@@ -6,12 +6,12 @@ async function replaceImageWithCdn(
   queryInterface,
   tableName,
   fieldName,
-  transaction
+  transaction,
 ) {
   await queryInterface.sequelize.query(
     `UPDATE "${tableName}" SET "${fieldName}" = 
      regexp_replace(${fieldName}, '.*commonwealth-uploads.s3.us-east-2.amazonaws.com/(.*)', 'https://assets.commonwealth.im/\\1')`,
-    { transaction }
+    { transaction },
   );
 }
 
@@ -19,12 +19,12 @@ async function replaceImageWithCdnRollToken(
   queryInterface,
   tableName,
   fieldName,
-  transaction
+  transaction,
 ) {
   await queryInterface.sequelize.query(
     `UPDATE "${tableName}" SET "${fieldName}" = 
      regexp_replace(${fieldName}, '.*roll-token.s3.amazonaws.com/(.*)', 'https://assets.commonwealth.im/\\1')`,
-    { transaction }
+    { transaction },
   );
 }
 
@@ -32,12 +32,12 @@ async function reverseReplaceImageWithCdn(
   queryInterface,
   tableName,
   fieldName,
-  transaction
+  transaction,
 ) {
   await queryInterface.sequelize.query(
     `UPDATE "${tableName}" SET "${fieldName}" = 
      regexp_replace(${fieldName}, 'https://assets.commonwealth.im/(.*)', 'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/\\1')`,
-    { transaction }
+    { transaction },
   );
 }
 

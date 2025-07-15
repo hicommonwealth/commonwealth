@@ -4,14 +4,14 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.renameTable(
       'OffchainThreadCategories',
-      'OffchainTags'
+      'OffchainTags',
     );
   },
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.renameTable(
       'OffchainTags',
-      'OffchainThreadCategories'
+      'OffchainThreadCategories',
     );
   },
 };

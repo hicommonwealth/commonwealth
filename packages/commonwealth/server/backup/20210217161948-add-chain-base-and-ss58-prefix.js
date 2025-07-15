@@ -7,13 +7,13 @@ module.exports = {
         'Chains',
         'base',
         { type: Sequelize.STRING, allowNull: false, defaultValue: '' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Chains',
         'ss58_prefix',
         { type: Sequelize.INTEGER, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
 
       // populate columns for all extant chains
@@ -21,85 +21,85 @@ module.exports = {
         'Chains',
         { base: 'ethereum' },
         { id: 'ethereum' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { base: 'substrate', ss58_prefix: 7 },
         { id: 'edgeware-testnet' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { base: 'substrate', ss58_prefix: 36 },
         { id: 'centrifuge' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { base: 'substrate', ss58_prefix: 16 },
         { id: 'kulupu' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { base: 'substrate', ss58_prefix: 2 },
         { id: 'kusama' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { base: 'substrate', ss58_prefix: 5 },
         { id: 'plasm' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { base: 'ethereum' },
         { id: 'metacartel' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { base: 'substrate', ss58_prefix: 30 },
         { id: 'phala' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { base: 'substrate', ss58_prefix: 0 },
         { id: 'polkadot' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { base: 'near' },
         { id: 'near' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { base: 'cosmos' },
         { id: 'straightedge' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { base: 'substrate', ss58_prefix: 7 },
         { id: 'edgeware' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { base: 'substrate', ss58_prefix: 18 },
         { id: 'darwinia' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
         { base: 'substrate', ss58_prefix: 20 },
         { id: 'stafi' },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

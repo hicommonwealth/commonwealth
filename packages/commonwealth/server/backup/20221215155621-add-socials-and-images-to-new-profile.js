@@ -12,7 +12,7 @@ module.exports = {
             type: Sequelize.ARRAY(Sequelize.STRING),
             allowNull: true,
           },
-          { transaction: t }
+          { transaction: t },
         );
       }
       if (!tableDefinition.background_image) {
@@ -23,7 +23,7 @@ module.exports = {
             type: Sequelize.JSONB,
             allowNull: true,
           },
-          { transaction: t }
+          { transaction: t },
         );
       }
     });

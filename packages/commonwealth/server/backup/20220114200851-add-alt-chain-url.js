@@ -30,14 +30,14 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
 
       // populate the column for existing nodes
       for (const [id, url] of ALT_WALLET_URLS) {
         await queryInterface.sequelize.query(
           `UPDATE "ChainNodes" SET alt_wallet_url='${url}' WHERE eth_chain_id=${id}`,
-          { transaction: t }
+          { transaction: t },
         );
       }
     });

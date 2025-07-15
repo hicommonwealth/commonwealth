@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.renameColumn(
       'OffchainThreads',
       'author_id',
-      'address_id'
+      'address_id',
     );
   },
 
@@ -13,7 +13,7 @@ module.exports = {
     return queryInterface.renameColumn(
       'OffchainThreads',
       'address_id',
-      'author_id'
+      'author_id',
     );
   },
 };

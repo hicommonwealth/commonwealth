@@ -11,7 +11,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'OffchainProfiles',
@@ -20,7 +20,7 @@ module.exports = {
           type: Sequelize.JSONB,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

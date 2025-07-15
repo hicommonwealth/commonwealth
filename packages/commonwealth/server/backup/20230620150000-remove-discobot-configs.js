@@ -10,7 +10,7 @@ module.exports = {
      */
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.sequelize.query(
-        `UPDATE "Chains" SET discord_config_id = NULL`
+        `UPDATE "Chains" SET discord_config_id = NULL`,
       );
 
       await queryInterface.bulkDelete('DiscordBotConfig', null, {

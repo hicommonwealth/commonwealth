@@ -8,7 +8,7 @@ module.exports = {
       SET eth_chain_id = 7332
       WHERE name = 'Horizen EON';
       `,
-      { raw: true }
+      { raw: true },
     );
   },
 
@@ -19,7 +19,7 @@ module.exports = {
       SET eth_chain_id = NULL
       WHERE name = 'Horizen EON';
       `,
-      { raw: true }
+      { raw: true },
     );
   },
 };

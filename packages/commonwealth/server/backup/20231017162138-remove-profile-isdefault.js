@@ -15,7 +15,7 @@ module.exports = {
         'Profiles',
         'is_default',
         { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

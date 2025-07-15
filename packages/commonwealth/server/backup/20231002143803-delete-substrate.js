@@ -6,7 +6,7 @@ module.exports = {
 
     if (!ceUrl) {
       console.warn(
-        'CE_DATABASE_URL env var not set. Substrate proposal links not updated.'
+        'CE_DATABASE_URL env var not set. Substrate proposal links not updated.',
       );
       return;
     }
@@ -18,7 +18,7 @@ module.exports = {
         USING "Chains" C
          WHERE S.chain_id = C.id AND S.category_id = 'chain-event' AND C.base = 'substrate';
       `,
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.sequelize.query(
@@ -27,7 +27,7 @@ module.exports = {
         USING "Chains" C
         WHERE N.chain_id = C.id AND N.category_id = 'chain-event' AND C.base = 'substrate';
       `,
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.sequelize.query(
@@ -50,7 +50,7 @@ module.exports = {
                 Extracted.link_index
         FROM Extracted;
       `,
-        { transaction }
+        { transaction },
       );
 
       const namespaces = await queryInterface.sequelize.query(
@@ -60,7 +60,7 @@ module.exports = {
                  JOIN pg_namespace n ON n.oid = e.extnamespace
         WHERE extname = 'dblink';
       `,
-        { transaction, raw: true, type: 'SELECT' }
+        { transaction, raw: true, type: 'SELECT' },
       );
 
       if (namespaces.length === 0) {
@@ -79,7 +79,7 @@ module.exports = {
         FROM chain_entities ce
                  JOIN extracted_identifiers ei ON ce.entity_id::text = ei.link_identifier;
       `,
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.sequelize.query(
@@ -109,21 +109,21 @@ module.exports = {
         $$
         LANGUAGE plpgsql;
       `,
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.sequelize.query(
         `
         DROP TABLE extracted_identifiers;
       `,
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.sequelize.query(
         `
         DROP TABLE merged_entity_link;
       `,
-        { transaction }
+        { transaction },
       );
     });
   },

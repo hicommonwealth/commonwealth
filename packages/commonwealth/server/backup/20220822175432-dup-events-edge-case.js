@@ -24,7 +24,7 @@ module.exports = {
                 WHERE dups.row + reverseRow > 2
                   AND entity_id IS NULL;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       await queryInterface.sequelize.query(
@@ -36,7 +36,7 @@ module.exports = {
                 FROM "NotificationsRead"
                 WHERE notification_id IN (SELECT * FROM notiifcations_to_delete);
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       await queryInterface.sequelize.query(
@@ -45,7 +45,7 @@ module.exports = {
                 FROM "Notifications"
                 WHERE chain_event_id IN (SELECT id FROM temp_ce);
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       await queryInterface.sequelize.query(
@@ -54,14 +54,14 @@ module.exports = {
                 FROM "ChainEvents"
                 WHERE id IN (SELECT id FROM temp_ce);
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       await queryInterface.sequelize.query(
         `
                 DROP TABLE temp_ce;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
     });
   },

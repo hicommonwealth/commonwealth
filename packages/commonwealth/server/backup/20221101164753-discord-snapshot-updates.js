@@ -35,7 +35,7 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -46,7 +46,7 @@ module.exports = {
           references: { model: 'DiscordBotConfig', key: 'id' },
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -56,7 +56,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -106,7 +106,7 @@ module.exports = {
         {
           timestamps: true,
           indexes: [{ fields: ['id'] }],
-        }
+        },
       );
 
       await queryInterface.createTable(
@@ -120,7 +120,7 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -136,13 +136,13 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.sequelize.query(
         `INSERT INTO "SnapshotSpaces" (snapshot_space, created_at, updated_at) 
       SELECT DISTINCT UNNEST(snapshot), NOW(), NOW() FROM "Chains";`,
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.sequelize.query(
@@ -151,7 +151,7 @@ module.exports = {
           FROM (SELECT DISTINCT id, UNNEST(snapshot) as snaps FROM "Chains") c
             INNER JOIN "SnapshotSpaces" s
               ON c.snaps = s.snapshot_space;`,
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.removeColumn('Chains', 'snapshot', {
@@ -168,7 +168,7 @@ module.exports = {
             updated_at: new Date(),
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -198,7 +198,7 @@ module.exports = {
           type: Sequelize.ARRAY(Sequelize.STRING),
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.sequelize.query(
@@ -209,7 +209,7 @@ module.exports = {
                 INNER JOIN "SnapshotSpaces" ss ON css.snapshot_space_id = ss.snapshot_space
                 GROUP BY css.chain_id  ) sn
           WHERE "Chains".id = sn.chain_id;`,
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.dropTable('CommunitySnapshotSpaces', {
@@ -221,7 +221,7 @@ module.exports = {
         {
           name: 'snapshot-proposal',
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.dropTable('DiscordBotConfig', { transaction: t });
     });

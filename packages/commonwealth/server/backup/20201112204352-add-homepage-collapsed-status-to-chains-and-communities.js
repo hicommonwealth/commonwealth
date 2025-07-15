@@ -15,7 +15,7 @@ module.exports = {
           type: Sequelize.BOOLEAN,
           defaultValue: false,
           allowNull: false,
-        }
+        },
       );
     });
   },
@@ -25,7 +25,7 @@ module.exports = {
       await queryInterface.removeColumn('Chains', 'collapsed_on_homepage');
       await queryInterface.removeColumn(
         'OffchainCommunities',
-        'collapsed_on_homepage'
+        'collapsed_on_homepage',
       );
     });
   },

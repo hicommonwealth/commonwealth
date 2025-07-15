@@ -4,7 +4,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     let reactions = await queryInterface.sequelize.query(
-      `SELECT (id, object_id) FROM "OffchainReactions"`
+      `SELECT (id, object_id) FROM "OffchainReactions"`,
     );
     reactions = reactions[0].map((rxn) => {
       const [id, object_id] = rxn.row.slice(1, rxn.row.length - 1).split(',');
@@ -38,15 +38,15 @@ module.exports = {
         const rxnId = rxn[0];
         const objId = rxn[1];
         const thread = await queryInterface.sequelize.query(
-          `SELECT id FROM "OffchainThreads" WHERE id=${Number(objId)}`
+          `SELECT id FROM "OffchainThreads" WHERE id=${Number(objId)}`,
         );
         if (thread[0][0] && thread[0][0].id) {
           const query = `UPDATE "OffchainReactions" SET thread_id=${objId} WHERE id=${Number(
-            rxnId
+            rxnId,
           )}`;
           await queryInterface.sequelize.query(query);
         }
-      })
+      }),
     );
   },
 
@@ -64,7 +64,7 @@ module.exports = {
     });
 
     let reactions = await queryInterface.sequelize.query(
-      `SELECT (id, thread_id) FROM "OffchainReactions"`
+      `SELECT (id, thread_id) FROM "OffchainReactions"`,
     );
     reactions = reactions[0].map((rxn) => {
       const [id, thread_id] = rxn.row.slice(1, rxn.row.length - 1).split(',');
@@ -85,15 +85,15 @@ module.exports = {
         const rxnId = rxn[0];
         const threadId = rxn[1];
         const thread = await queryInterface.sequelize.query(
-          `SELECT id FROM "OffchainThreads" WHERE id=${Number(threadId)}`
+          `SELECT id FROM "OffchainThreads" WHERE id=${Number(threadId)}`,
         );
         if (thread[0][0] && thread[0][0].id) {
           const query = `UPDATE "OffchainReactions" SET object_id='discussion_${threadId}' WHERE id=${Number(
-            rxnId
+            rxnId,
           )}`;
           await queryInterface.sequelize.query(query);
         }
-      })
+      }),
     );
     await queryInterface.removeColumn('OffchainReactions', 'thread_id', {
       type: Sequelize.INTEGER,

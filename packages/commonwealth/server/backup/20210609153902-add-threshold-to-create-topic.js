@@ -11,7 +11,7 @@ module.exports = {
           allowNull: true,
           defaultValue: '0',
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -26,7 +26,7 @@ module.exports = {
           allowNull: true,
           defaultValue: '0',
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

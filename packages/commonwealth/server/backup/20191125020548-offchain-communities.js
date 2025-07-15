@@ -43,7 +43,7 @@ module.exports = {
             { fields: ['creator_id'] },
           ],
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // 2.
@@ -54,7 +54,7 @@ module.exports = {
           type: Sequelize.STRING,
           references: { model: 'OffchainCommunities', key: 'id' },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -64,7 +64,7 @@ module.exports = {
           type: Sequelize.STRING,
           references: { model: 'OffchainCommunities', key: 'id' },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -74,14 +74,14 @@ module.exports = {
           type: Sequelize.STRING,
           references: { model: 'OffchainCommunities', key: 'id' },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // 3. Add the default offchain communities
       await queryInterface.bulkInsert(
         'OffchainCommunities',
         newOffchainCommunitiesRecord,
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

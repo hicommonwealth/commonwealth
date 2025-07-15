@@ -5,7 +5,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     let comments = await queryInterface.sequelize.query(
-      `SELECT (id, parent_id, parent_type) FROM "OffchainComments"`
+      `SELECT (id, parent_id, parent_type) FROM "OffchainComments"`,
     );
     comments = comments[0].map((comment) => {
       const [id, parent_id, parent_type] = comment.row
@@ -45,9 +45,9 @@ module.exports = {
           : `SET root_id='${root_id}', parent_id=NULL `;
         const queryConditional = `WHERE id='${comment_id}'`;
         await queryInterface.sequelize.query(
-          queryTable + queryValues + queryConditional
+          queryTable + queryValues + queryConditional,
         );
-      })
+      }),
     );
     await queryInterface.removeColumn('OffchainComments', 'parent_type', {
       type: Sequelize.STRING,
@@ -61,7 +61,7 @@ module.exports = {
       defaultValue: 'proposal',
     });
     let comments = await queryInterface.sequelize.query(
-      `SELECT (id, parent_id, root_id) FROM "OffchainComments"`
+      `SELECT (id, parent_id, root_id) FROM "OffchainComments"`,
     );
     comments = comments[0].map((comment) => {
       const [id, parent_id, root_id] = comment.row
@@ -78,9 +78,9 @@ module.exports = {
         const queryValues = `SET parent_id='${parent_id}', root_id=NULL, parent_type='${parent_type}' `;
         const queryConditional = `WHERE id='${comment.id}'`;
         await queryInterface.sequelize.query(
-          queryTable + queryValues + queryConditional
+          queryTable + queryValues + queryConditional,
         );
-      })
+      }),
     );
   },
 };

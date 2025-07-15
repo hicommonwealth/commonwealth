@@ -711,16 +711,16 @@ module.exports = {
           type: Sequelize.JSONB,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // initialize existing specs
       for (const [key, spec] of Object.entries(specs)) {
         await queryInterface.sequelize.query(
           `UPDATE "Chains" SET substrate_spec = '${JSON.stringify(
-            spec
+            spec,
           )}' WHERE id = '${key}'`,
-          { transaction: t }
+          { transaction: t },
         );
       }
     });

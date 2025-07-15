@@ -19,7 +19,7 @@ module.exports = {
           { fields: ['chain_id'] },
           { fields: ['offchain_community_id'] },
         ],
-      }
+      },
     );
   },
 

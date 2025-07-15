@@ -8,7 +8,7 @@ module.exports = {
       SET alt_wallet_url = 'https://regen.stakesystems.io'
       WHERE name = 'Regen Network';
       `,
-      { raw: true }
+      { raw: true },
     );
   },
 
@@ -19,7 +19,7 @@ module.exports = {
       SET alt_wallet_url = NULL
       WHERE name = 'Regen Network';
       `,
-      { raw: true }
+      { raw: true },
     );
   },
 };

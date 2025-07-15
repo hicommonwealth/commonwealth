@@ -12,7 +12,7 @@ module.exports = {
             updated_at: new Date(),
           },
         ],
-        { returning: true, transaction }
+        { returning: true, transaction },
       );
 
       const userId = user[0].id;
@@ -27,7 +27,7 @@ module.exports = {
             updated_at: new Date(),
           },
         ],
-        { transaction }
+        { transaction },
       );
     });
   },
@@ -36,7 +36,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (transaction) => {
       const profiles = await queryInterface.sequelize.query(
         `SELECT * FROM "Profiles" WHERE profile_name = 'Discord Bot'`,
-        { transaction }
+        { transaction },
       );
       const profile = profiles[0][0];
 
@@ -47,13 +47,13 @@ module.exports = {
         await queryInterface.bulkDelete(
           'Profiles',
           { id: profileId },
-          { transaction }
+          { transaction },
         );
 
         await queryInterface.bulkDelete(
           'Users',
           { id: userId },
-          { transaction }
+          { transaction },
         );
       }
     });

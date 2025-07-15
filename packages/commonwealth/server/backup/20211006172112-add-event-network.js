@@ -9,7 +9,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // update all types
@@ -18,7 +18,7 @@ module.exports = {
         {
           type: queryInterface.sequelize.QueryTypes.UPDATE,
           transaction: t,
-        }
+        },
       );
 
       for (const n of ['compound', 'aave', 'erc20', 'moloch']) {
@@ -28,7 +28,7 @@ module.exports = {
             replacements: { n },
             type: queryInterface.sequelize.QueryTypes.UPDATE,
             transaction: t,
-          }
+          },
         );
       }
     });

@@ -13,7 +13,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
     });
   },
@@ -29,7 +29,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
     });
   },

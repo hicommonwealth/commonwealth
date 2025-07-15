@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.addColumn(
       'Addresses',
       'ghost_address',
-      Sequelize.BOOLEAN
+      Sequelize.BOOLEAN,
     );
   },
 

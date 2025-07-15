@@ -5,16 +5,16 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       const subscriptions = await queryInterface.sequelize.query(
         `SELECT * FROM "Subscriptions";`,
-        { transaction: t }
+        { transaction: t },
       );
       const threads = await queryInterface.sequelize.query(
         `SELECT * FROM "OffchainThreads" WHERE deleted_at IS NULL;`,
-        { transaction: t }
+        { transaction: t },
       );
       const threadIds = threads[0].map((t) => t.id);
       const comments = await queryInterface.sequelize.query(
         `SELECT * FROM "OffchainComments" WHERE deleted_at IS NULL;`,
-        { transaction: t }
+        { transaction: t },
       );
       const commentIds = comments[0].map((c) => c.id);
       await Promise.all(
@@ -28,7 +28,7 @@ module.exports = {
               else {
                 queryInterface.sequelize.query(
                   `DELETE FROM "Notifications" WHERE subscription_id=${s.id}; DELETE FROM "Subscriptions" WHERE id=${s.id};`,
-                  { transaction: t }
+                  { transaction: t },
                 );
               }
             } else if (s.offchain_comment_id) {
@@ -36,7 +36,7 @@ module.exports = {
               else {
                 queryInterface.sequelize.query(
                   `DELETE FROM "Notifications" WHERE subscription_id=${s.id}; DELETE FROM "Subscriptions" WHERE id=${s.id};`,
-                  { transaction: t }
+                  { transaction: t },
                 );
               }
             } else if (
@@ -47,13 +47,13 @@ module.exports = {
             ) {
               queryInterface.sequelize.query(
                 `DELETE FROM "Notifications" WHERE subscription_id=${s.id}; DELETE FROM "Subscriptions" WHERE id=${s.id};`,
-                { transaction: t }
+                { transaction: t },
               );
             }
           } else {
             return;
           }
-        })
+        }),
       );
     });
   },

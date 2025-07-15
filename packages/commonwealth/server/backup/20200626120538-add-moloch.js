@@ -28,7 +28,7 @@ module.exports = {
             address: '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       const buildObject = (event_name, chain) => ({
@@ -37,7 +37,7 @@ module.exports = {
         event_name,
       });
       const molochObjs = Object.values(MolochEventKinds).map((s) =>
-        buildObject(s, 'moloch')
+        buildObject(s, 'moloch'),
       );
 
       // TODO: somehow switch this on for testing purposes?
@@ -54,14 +54,14 @@ module.exports = {
         {
           chain: 'moloch',
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         {
           chain: 'moloch',
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

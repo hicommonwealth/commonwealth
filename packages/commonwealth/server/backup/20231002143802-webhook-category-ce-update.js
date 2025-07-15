@@ -26,7 +26,7 @@ module.exports = {
             WHERE n.id = w.id
         );
       `,
-        { transaction }
+        { transaction },
       );
     });
   },

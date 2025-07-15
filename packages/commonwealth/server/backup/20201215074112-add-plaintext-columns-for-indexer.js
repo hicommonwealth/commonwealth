@@ -9,7 +9,7 @@ module.exports = {
         { type: Sequelize.TEXT, allowNull: true },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.addColumn(
         'OffchainComments',
@@ -17,7 +17,7 @@ module.exports = {
         { type: Sequelize.TEXT, allowNull: true },
         {
           transaction: t,
-        }
+        },
       );
     });
   },

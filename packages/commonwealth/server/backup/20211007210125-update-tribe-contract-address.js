@@ -9,7 +9,7 @@ module.exports = {
       },
       {
         chain: 'tribe',
-      }
+      },
     );
   },
 
@@ -21,7 +21,7 @@ module.exports = {
       },
       {
         chain: 'tribe',
-      }
+      },
     );
   },
 };

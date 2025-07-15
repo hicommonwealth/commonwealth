@@ -61,7 +61,7 @@ module.exports = {
         UPDATE "ChainNodes" SET cosmos_chain_id = 'umee' WHERE name = 'Umee';
         UPDATE "ChainNodes" SET cosmos_chain_id = 'vidulum' WHERE name = 'Vidulum (Mainnet)';
         `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
     });
   },
@@ -73,7 +73,7 @@ module.exports = {
         ALTER TABLE "ChainNodes"
         DROP COLUMN cosmos_chain_id;
       `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
     });
   },

@@ -6,11 +6,11 @@ module.exports = {
       // delete notifications attached to deleted subscriptions
       await queryInterface.sequelize.query(
         'DELETE FROM "Notifications" WHERE id in (SELECT "Notifications".id FROM "Notifications" JOIN "Subscriptions" ON "Notifications".subscription_id="Subscriptions".id WHERE "Subscriptions".deleted_at IS NOT NULL);',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         'DELETE FROM "Subscriptions" WHERE deleted_at IS NOT NULL',
-        { transaction: t }
+        { transaction: t },
       );
       return queryInterface.removeColumn('Subscriptions', 'deleted_at', {
         transaction: t,

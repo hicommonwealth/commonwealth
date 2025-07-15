@@ -12,20 +12,20 @@ module.exports = {
         'author_community_id',
         {
           transaction,
-        }
+        },
       );
       await queryInterface.sequelize.query(
         `
         ALTER INDEX "OffchainVotes_pkey" RENAME TO "Votes_pkey";
       `,
-        { transaction }
+        { transaction },
       );
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "Votes"
         RENAME CONSTRAINT "OffchainVotes_poll_id_fkey" TO "Votes_poll_id_fkey";
       `,
-        { transaction }
+        { transaction },
       );
     });
   },
@@ -41,20 +41,20 @@ module.exports = {
         'chain_id',
         {
           transaction,
-        }
+        },
       );
       await queryInterface.sequelize.query(
         `
         ALTER INDEX "Votes_pkey" RENAME TO "OffchainVotes_pkey";
       `,
-        { transaction }
+        { transaction },
       );
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "Votes"
         RENAME CONSTRAINT "Votes_poll_id_fkey" TO "OffchainVotes_poll_id_fkey";
       `,
-        { transaction }
+        { transaction },
       );
     });
   },

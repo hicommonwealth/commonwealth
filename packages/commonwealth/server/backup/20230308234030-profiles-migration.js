@@ -19,7 +19,7 @@ module.exports = {
         {
           type: queryInterface.sequelize.QueryTypes.SELECT,
           transaction: t,
-        }
+        },
       );
 
       let newProfilesAndUsersCreated = 0;
@@ -45,7 +45,7 @@ module.exports = {
                 `UPDATE "Profiles" SET avatar_url=${
                   parsedData.avatarUrl ? `'${parsedData.avatarUrl}'` : 'NULL'
                 } WHERE id=${profile.profile_id}`,
-                { transaction: t }
+                { transaction: t },
               );
               break;
             }
@@ -60,7 +60,7 @@ module.exports = {
               console.log(
                 'Error parsing JSON',
                 e,
-                profile.address_offchain_pairs[0]
+                profile.address_offchain_pairs[0],
               );
               continue;
             }
@@ -75,7 +75,7 @@ module.exports = {
                     ? `'${parsedData.name.replace(/'/g, '')}'`
                     : 'NULL'
                 } WHERE id=${profile.profile_id}`,
-                { transaction: t }
+                { transaction: t },
               );
             }
           } else if (profile.address_offchain_pairs.length > 1) {
@@ -132,7 +132,7 @@ module.exports = {
                 }, profile_name=${
                   name ? `'${name.replace(/'/g, '')}'` : 'NULL'
                 } WHERE id=${profile.profile_id}`,
-                { transaction: t }
+                { transaction: t },
               );
             } else {
               let addressMapping = {};
@@ -161,7 +161,7 @@ module.exports = {
                         ? `'${parsedData.name.replace(/'/g, '')}'`
                         : 'NULL'
                     } WHERE id=${profile.profile_id}`,
-                    { transaction: t }
+                    { transaction: t },
                   );
 
                   addressMapping[address] = {
@@ -200,14 +200,14 @@ module.exports = {
                             ? `'${parsedData.name.replace(/'/g, '')}'`
                             : 'NULL'
                         } WHERE id=${existingAddressProfileId}`,
-                        { transaction: t }
+                        { transaction: t },
                       );
                     }
 
                     // update address with new user id and new profile id
                     await queryInterface.sequelize.query(
                       `UPDATE "Addresses" SET user_id=${existingAddressUserId}, profile_id=${existingAddressProfileId} WHERE id=${addressId}`,
-                      { transaction: t }
+                      { transaction: t },
                     );
                     newProfilesSkippedForAddressDuplication += 1;
                     continue;
@@ -219,7 +219,7 @@ module.exports = {
                     {
                       type: queryInterface.sequelize.QueryTypes.INSERT,
                       transaction: t,
-                    }
+                    },
                   );
 
                   // Create new profile
@@ -238,13 +238,13 @@ module.exports = {
                     {
                       type: queryInterface.sequelize.QueryTypes.INSERT,
                       transaction: t,
-                    }
+                    },
                   );
 
                   // update address with new user id and new profile id
                   await queryInterface.sequelize.query(
                     `UPDATE "Addresses" SET user_id=${newUser[0][0].id}, profile_id=${newProfile[0][0].id} WHERE id=${addressId}`,
-                    { transaction: t }
+                    { transaction: t },
                   );
 
                   // Add to map to keep track of address duplicates
@@ -264,12 +264,12 @@ module.exports = {
       }
 
       console.log(
-        `Created ${newProfilesAndUsersCreated} new profiles and users`
+        `Created ${newProfilesAndUsersCreated} new profiles and users`,
       );
       console.log(
         'Skipped creating',
         newProfilesSkippedForAddressDuplication,
-        'new profiles due to duplicate addresses'
+        'new profiles due to duplicate addresses',
       );
     });
   },

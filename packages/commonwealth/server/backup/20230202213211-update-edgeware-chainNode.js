@@ -7,7 +7,7 @@ module.exports = {
       {
         url: 'wss://edgeware.jelliedowl.net/',
       },
-      { id: 45 }
+      { id: 45 },
     );
   },
 
@@ -17,7 +17,7 @@ module.exports = {
       {
         url: 'wss://edgeware-rpc.dwellir.com',
       },
-      { id: 45 }
+      { id: 45 },
     );
   },
 };

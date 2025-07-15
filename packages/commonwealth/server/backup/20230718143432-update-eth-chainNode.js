@@ -25,7 +25,7 @@ module.exports = {
         {
           url: oldChainNodeEth,
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -35,7 +35,7 @@ module.exports = {
         {
           url: oldChainNodeBnb,
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -45,7 +45,7 @@ module.exports = {
         {
           url: oldFantomNode,
         },
-        { transaction }
+        { transaction },
       );
     });
   },
@@ -62,7 +62,7 @@ module.exports = {
         {
           url: newChainNodeEth,
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -72,7 +72,7 @@ module.exports = {
         {
           url: newChainNodeBnb,
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -82,7 +82,7 @@ module.exports = {
         {
           url: newFantomNode,
         },
-        { transaction }
+        { transaction },
       );
     });
   },

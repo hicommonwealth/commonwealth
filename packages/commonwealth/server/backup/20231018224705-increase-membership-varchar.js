@@ -11,5 +11,5 @@ module.exports = {
     await queryInterface.sequelize.query(`
       ALTER TABLE "Memberships" ALTER COLUMN "reject_reason" TYPE VARCHAR(255);
     `);
-  }
+  },
 };

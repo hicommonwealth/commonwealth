@@ -32,12 +32,12 @@ module.exports = {
         'Collaborations',
         'offchain_thread_id',
         'thread_id',
-        { transaction }
+        { transaction },
       );
       await queryInterface.addIndex(
         'Subscriptions',
         { fields: ['offchain_thread_id'] },
-        { transaction }
+        { transaction },
       );
     });
   },
@@ -73,12 +73,12 @@ module.exports = {
         'Collaborations',
         'thread_id',
         'offchain_thread_id',
-        { transaction }
+        { transaction },
       );
       await queryInterface.removeIndex(
         'Subscriptions',
         { fields: ['offchain_thread_id'] },
-        { transaction }
+        { transaction },
       );
     });
   },

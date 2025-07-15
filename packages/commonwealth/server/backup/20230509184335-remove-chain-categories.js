@@ -9,7 +9,7 @@ module.exports = {
         {
           type: Sequelize.JSONB,
         },
-        { transaction }
+        { transaction },
       );
 
       // Update the "category_names" column with the concatenated category names for each chain
@@ -46,7 +46,7 @@ module.exports = {
             allowNull: false,
           },
         },
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.createTable(
@@ -74,7 +74,7 @@ module.exports = {
             },
           },
         },
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.removeColumn('Chains', 'category', {

@@ -10,14 +10,14 @@ module.exports = {
         `
         ALTER INDEX IF EXISTS "addresses_public_key_chain" RENAME TO "Addresses_address_community_id";
       `,
-        { transaction }
+        { transaction },
       );
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "Addresses"
         RENAME CONSTRAINT "Addresses_chain_fkey" TO "Addresses_community_id_fkey";
       `,
-        { transaction }
+        { transaction },
       );
     });
   },
@@ -31,14 +31,14 @@ module.exports = {
         `
         ALTER INDEX IF EXISTS "Addresses_address_community_id" RENAME TO "addresses_public_key_chain";
       `,
-        { transaction }
+        { transaction },
       );
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "Addresses"
         RENAME CONSTRAINT "Addresses_community_id_fkey" TO "Addresses_chain_fkey";
       `,
-        { transaction }
+        { transaction },
       );
     });
   },

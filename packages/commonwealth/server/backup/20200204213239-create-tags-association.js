@@ -22,7 +22,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'OffchainTags',
@@ -31,7 +31,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -46,7 +46,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeColumn(
         'OffchainTags',
@@ -55,7 +55,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: false,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

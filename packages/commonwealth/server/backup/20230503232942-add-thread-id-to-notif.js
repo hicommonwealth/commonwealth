@@ -11,7 +11,7 @@ module.exports = {
         WHERE notification_data::jsonb ? 'thread_id' AND
                 (notification_data::jsonb ->> 'thread_id') NOT IN (SELECT id::text FROM "Threads");
       `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
 
       await queryInterface.sequelize.query(
@@ -19,7 +19,7 @@ module.exports = {
           DELETE FROM "NotificationsRead"
           WHERE notification_id IN (SELECT id FROM notif_to_delete);
       `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
 
       await queryInterface.sequelize.query(
@@ -27,14 +27,14 @@ module.exports = {
         DELETE FROM "Notifications"
         WHERE id IN (SELECT id FROM notif_to_delete);
       `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
 
       await queryInterface.sequelize.query(
         `
         DROP TABLE notif_to_delete;
       `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -44,7 +44,7 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.sequelize.query(
@@ -53,7 +53,7 @@ module.exports = {
         SET thread_id = (notification_data::jsonb->>'thread_id')::INTEGER
         WHERE notification_data::jsonb->>'thread_id' IS NOT NULL;
       `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
 
       await queryInterface.addIndex('Notifications', ['thread_id'], {

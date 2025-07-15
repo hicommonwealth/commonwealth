@@ -17,7 +17,7 @@ module.exports = {
                         SELECT FROM "ChainEvents" WHERE entity_id = "ChainEntities".id
                     );
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       await queryInterface.sequelize.query(
         `
@@ -25,7 +25,7 @@ module.exports = {
                 FROM "ChainEntities"
                 WHERE id IN (SELECT id FROM delete_no_event_entities);
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       // create a table of comments that reference deleted entities and need to be deleted themselves
@@ -48,7 +48,7 @@ module.exports = {
                              END
                      WHERE C.root_id not like 'discussion%');
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       // delete reactions that reference to be deleted comments
       await queryInterface.sequelize.query(
@@ -57,7 +57,7 @@ module.exports = {
                 FROM "Reactions"
                 WHERE comment_id IN (SELECT * FROM comments_to_delete);
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       // delete comments
       await queryInterface.sequelize.query(
@@ -66,7 +66,7 @@ module.exports = {
                 FROM "Comments"
                 WHERE id IN (SELECT * FROM comments_to_delete);
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       // delete reactions that reference deleted entities and need to be deleted themselves
@@ -92,7 +92,7 @@ module.exports = {
                 FROM "Reactions"
                 WHERE "Reactions".id IN (SELECT id FROM temp);
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
 
       // clean-up
@@ -100,13 +100,13 @@ module.exports = {
         `
                 DROP TABLE delete_no_event_entities;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
       await queryInterface.sequelize.query(
         `
                 DROP TABlE comments_to_delete;
             `,
-        { transaction: t, logging: console.log }
+        { transaction: t, logging: console.log },
       );
     });
   },

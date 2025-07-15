@@ -6,12 +6,12 @@ module.exports = {
       await queryInterface.renameTable(
         'StatsEvents',
         'EdgewareLockdropEvents',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.renameTable(
         'StatsBalances',
         'EdgewareLockdropBalances',
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -34,7 +34,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
 
       await queryInterface.createTable(
@@ -57,7 +57,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
 
       await queryInterface.createTable(
@@ -80,7 +80,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
     });
   },
@@ -90,12 +90,12 @@ module.exports = {
       await queryInterface.renameTable(
         'EdgewareLockdropEvents',
         'StatsEvents',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.renameTable(
         'EdgewareLockdropBalances',
         'StatsBalances',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.dropTable('SupernovaLockdropBTCLocks', {
         transaction: t,

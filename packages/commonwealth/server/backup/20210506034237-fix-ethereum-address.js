@@ -5,10 +5,10 @@ const Web3 = require('web3');
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const addresses = await queryInterface.sequelize.query(
-      'SELECT id, address, chain FROM "Addresses";'
+      'SELECT id, address, chain FROM "Addresses";',
     );
     const chains = await queryInterface.sequelize.query(
-      'SELECT id, network, base FROM "Chains";'
+      'SELECT id, network, base FROM "Chains";',
     );
     const promises = [];
     const removeAddressIds = [];
@@ -20,7 +20,7 @@ module.exports = {
         if (!Web3.utils.checkAddressChecksum(address)) {
           const checksumAddress = Web3.utils.toChecksumAddress(address);
           const duplicated = await queryInterface.sequelize.query(
-            `SELECT id FROM "Addresses" WHERE address='${checksumAddress}' AND chain='${chain}';`
+            `SELECT id FROM "Addresses" WHERE address='${checksumAddress}' AND chain='${chain}';`,
           );
           if (duplicated[0] && duplicated[0].length) {
             removeAddressIds.push(id);
@@ -31,8 +31,8 @@ module.exports = {
                 {
                   replacements: { id, address: checksumAddress },
                   type: queryInterface.sequelize.QueryTypes.UPDATE,
-                }
-              )
+                },
+              ),
             );
           }
         }
@@ -42,44 +42,44 @@ module.exports = {
     if (removeAddressIds.length) {
       const payload = removeAddressIds.join(', ');
       await queryInterface.sequelize.query(
-        `DELETE FROM "OffchainProfiles" WHERE address_id IN (${payload});`
+        `DELETE FROM "OffchainProfiles" WHERE address_id IN (${payload});`,
       );
       await queryInterface.sequelize.query(
-        `DELETE FROM "Roles" WHERE address_id IN (${payload});`
+        `DELETE FROM "Roles" WHERE address_id IN (${payload});`,
       );
       await queryInterface.sequelize.query(
-        `DELETE FROM "Collaborations" WHERE address_id IN (${payload});`
+        `DELETE FROM "Collaborations" WHERE address_id IN (${payload});`,
       );
 
       const threads = await queryInterface.sequelize.query(
-        `SELECT id FROM "OffchainThreads" WHERE address_id IN (${payload});`
+        `SELECT id FROM "OffchainThreads" WHERE address_id IN (${payload});`,
       );
       const comments = await queryInterface.sequelize.query(
-        `SELECT id FROM "OffchainComments" WHERE address_id IN (${payload});`
+        `SELECT id FROM "OffchainComments" WHERE address_id IN (${payload});`,
       );
 
       if (threads[0] && threads[0].length) {
         const threadIds = threads[0].map((_) => _.id).join(', ');
         await queryInterface.sequelize.query(
-          `DELETE FROM "OffchainReactions" WHERE thread_id IN (${threadIds});`
+          `DELETE FROM "OffchainReactions" WHERE thread_id IN (${threadIds});`,
         );
         await queryInterface.sequelize.query(
-          `DELETE FROM "OffchainThreads" WHERE id IN (${threadIds});`
+          `DELETE FROM "OffchainThreads" WHERE id IN (${threadIds});`,
         );
       }
 
       if (comments[0] && comments[0].length) {
         const commentIds = comments[0].map((_) => _.id).join(', ');
         await queryInterface.sequelize.query(
-          `DELETE FROM "OffchainReactions" WHERE comment_id IN (${commentIds});`
+          `DELETE FROM "OffchainReactions" WHERE comment_id IN (${commentIds});`,
         );
         await queryInterface.sequelize.query(
-          `DELETE FROM "OffchainComments" WHERE id IN (${commentIds});`
+          `DELETE FROM "OffchainComments" WHERE id IN (${commentIds});`,
         );
       }
 
       await queryInterface.sequelize.query(
-        `DELETE FROM "Addresses" WHERE id IN (${payload});`
+        `DELETE FROM "Addresses" WHERE id IN (${payload});`,
       );
     }
 
@@ -90,10 +90,10 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     const addresses = await queryInterface.sequelize.query(
-      'SELECT id, address, chain FROM "Addresses";'
+      'SELECT id, address, chain FROM "Addresses";',
     );
     const chains = await queryInterface.sequelize.query(
-      'SELECT id, network, base FROM "Chains";'
+      'SELECT id, network, base FROM "Chains";',
     );
     const promises = [];
 
@@ -107,8 +107,8 @@ module.exports = {
             {
               replacements: { id, address: address.toLowerCase() },
               type: queryInterface.sequelize.QueryTypes.UPDATE,
-            }
-          )
+            },
+          ),
         );
       }
     }

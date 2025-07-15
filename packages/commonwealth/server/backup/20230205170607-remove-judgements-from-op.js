@@ -19,7 +19,7 @@ module.exports = {
           type: Sequelize.JSONB,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

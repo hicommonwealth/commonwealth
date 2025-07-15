@@ -10,7 +10,7 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     const toDelete = await queryInterface.sequelize.query(
-      `SELECT id FROM "Addresses" WHERE keytype IS NOT NULL`
+      `SELECT id FROM "Addresses" WHERE keytype IS NOT NULL`,
     );
     const ids = toDelete ? toDelete[0].map(({ id }) => id) : [];
     return queryInterface.sequelize
@@ -18,12 +18,12 @@ module.exports = {
         await queryInterface.bulkDelete(
           'OffchainProfiles',
           { address_id: ids },
-          { transaction: t }
+          { transaction: t },
         );
         await queryInterface.bulkDelete(
           'Addresses',
           { id: ids },
-          { transaction: t }
+          { transaction: t },
         );
       })
       .then(() => {

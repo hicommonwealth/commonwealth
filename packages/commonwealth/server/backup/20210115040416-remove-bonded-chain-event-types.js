@@ -7,42 +7,42 @@ module.exports = {
       await queryInterface.bulkDelete(
         'Subscriptions',
         { object_id: 'kulupu-bonded' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Subscriptions',
         { object_id: 'kulupu-unbonded' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Subscriptions',
         { object_id: 'kusama-bonded' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Subscriptions',
         { object_id: 'kusama-unbonded' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Subscriptions',
         { object_id: 'polkadot-bonded' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Subscriptions',
         { object_id: 'polkadot-unbonded' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Subscriptions',
         { object_id: 'edgeware-bonded' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Subscriptions',
         { object_id: 'edgeware-unbonded' },
-        { transaction: t }
+        { transaction: t },
       );
 
       console.log('Adding index to chain events');
@@ -56,7 +56,7 @@ module.exports = {
 DELETE FROM "ChainEvents" WHERE "ChainEvents".chain_event_type_id IN
 ('edgeware-unbonded', 'edgeware-bonded', 'polkadot-unbonded',
  'polkadot-bonded', 'kusama-unbonded', 'kusama-bonded');`,
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

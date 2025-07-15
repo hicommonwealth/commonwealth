@@ -10,7 +10,7 @@ module.exports = {
           type: Sequelize.STRING(48),
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
     });
   },

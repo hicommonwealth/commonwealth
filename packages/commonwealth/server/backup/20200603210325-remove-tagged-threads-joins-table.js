@@ -19,7 +19,7 @@ module.exports = {
       updated_at: { type: Sequelize.DATE, allowNull: false },
     });
     const [threads] = await queryInterface.sequelize.query(
-      'SELECT * FROM "OffchainThreads";'
+      'SELECT * FROM "OffchainThreads";',
     );
     await Promise.all(
       threads.map(async (thread) => {
@@ -28,7 +28,7 @@ module.exports = {
           const query = `INSERT INTO "TaggedThreads" (tag_id, thread_id, created_at, updated_at) VALUES (${tag_id}, ${id}, NOW(), NOW())`;
           await queryInterface.sequelize.query(query);
         }
-      })
+      }),
     );
   },
 };

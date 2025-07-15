@@ -6,7 +6,7 @@ module.exports = {
         INSERT INTO "NotificationCategories"
         VALUES ('new-chat-mention', 'someone mentions a user in chat', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
       `,
-        { transaction: t, raw: true, type: 'RAW' }
+        { transaction: t, raw: true, type: 'RAW' },
       );
 
       await queryInterface.sequelize.query(
@@ -19,7 +19,7 @@ module.exports = {
                 CURRENT_TIMESTAMP 
         FROM "Users";
       `,
-        { transaction: t, raw: true, type: 'RAW' }
+        { transaction: t, raw: true, type: 'RAW' },
       );
     });
   },
@@ -32,7 +32,7 @@ module.exports = {
         FROM "Subscriptions"
         WHERE category_id = 'new-chat-mention';
       `,
-        { transaction: t, raw: true, type: 'RAW' }
+        { transaction: t, raw: true, type: 'RAW' },
       );
 
       await queryInterface.sequelize.query(
@@ -41,7 +41,7 @@ module.exports = {
         FROM "NotificationCategories"
         WHERE name = 'new-chat-mention';
     `,
-        { transaction: t, raw: true, type: 'RAW' }
+        { transaction: t, raw: true, type: 'RAW' },
       );
     });
   },

@@ -11,13 +11,13 @@ module.exports = {
             type: Sequelize.STRING,
             allowNull: true,
           },
-          { transaction: t }
+          { transaction: t },
         ),
         queryInterface.changeColumn(
           'InviteLinks',
           'community_id',
           { type: Sequelize.STRING, allowNull: true },
-          { transaction: t }
+          { transaction: t },
         ),
       ]);
     });

@@ -11,7 +11,7 @@ module.exports = {
           allowNull: false,
           defaultValue: 1,
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.addColumn(
         'ChainNodes',
@@ -20,7 +20,7 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -30,7 +30,7 @@ module.exports = {
         {
           url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -40,7 +40,7 @@ module.exports = {
         {
           url: 'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
         },
-        { transaction }
+        { transaction },
       );
     });
   },

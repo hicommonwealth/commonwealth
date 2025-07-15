@@ -8,19 +8,19 @@ module.exports = {
         'ChainNodes',
         'chain_base',
         { type: Sequelize.STRING, allowNull: false, defaultValue: '' },
-        { transaction: t }
+        { transaction: t },
       );
 
       const chainz = await queryInterface.sequelize.query(
         `SELECT c.id as cid, c.base, cn.* FROM "Chains" c LEFT JOIN "ChainNodes" cn ON cn.id = c.chain_node_id;`,
-        { transaction: t }
+        { transaction: t },
       );
 
       await Promise.all(
         chainz[0].map(async (c) => {
           const quer = `UPDATE "ChainNodes" SET chain_base='${c.base}' WHERE id=${c.id};`;
           await queryInterface.sequelize.query(quer, { transaction: t });
-        })
+        }),
       );
 
       // Create ContractAbis Table
@@ -41,7 +41,7 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Create Contracts Table
@@ -71,7 +71,7 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Create CommunityContracts Table
@@ -96,7 +96,7 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Migrate Current Chains to Contracts + CommunityContracts
@@ -128,12 +128,12 @@ module.exports = {
                 updated_at: new Date(),
               },
             ],
-            { transaction: t }
+            { transaction: t },
           );
 
           const contract = await queryInterface.sequelize.query(
             `SELECT * FROM "Contracts" WHERE address='${c.address}';`,
-            { transaction: t }
+            { transaction: t },
           );
           if (!contract[0][0]) return;
           await queryInterface.bulkInsert(
@@ -146,9 +146,9 @@ module.exports = {
                 updated_at: new Date(),
               },
             ],
-            { transaction: t }
+            { transaction: t },
           );
-        })
+        }),
       );
 
       // Migrate sputnik Contracts
@@ -177,12 +177,12 @@ module.exports = {
                 updated_at: new Date(),
               },
             ],
-            { transaction: t }
+            { transaction: t },
           );
 
           const contract = await queryInterface.sequelize.query(
             `SELECT * FROM "Contracts" WHERE chain_node_id='19';`, // filter by NEAR's chain_node_id
-            { transaction: t }
+            { transaction: t },
           );
           if (!contract[0][0]) return;
           await queryInterface.bulkInsert(
@@ -195,9 +195,9 @@ module.exports = {
                 updated_at: new Date(),
               },
             ],
-            { transaction: t }
+            { transaction: t },
           );
-        })
+        }),
       );
 
       // Update Columns on Chains Table
@@ -208,7 +208,7 @@ module.exports = {
         'Chains',
         'default_symbol',
         { type: Sequelize.STRING, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeColumn('Chains', 'decimals', {
         transaction: t,
@@ -227,7 +227,7 @@ module.exports = {
       await queryInterface.addIndex(
         'Contracts',
         { fields: ['address'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
 
@@ -243,7 +243,7 @@ module.exports = {
         'Chains',
         'default_symbol',
         { type: Sequelize.STRING, allowNull: false },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.renameColumn('Chains', 'default_symbol', 'symbol', {
         transaction: t,
@@ -252,19 +252,19 @@ module.exports = {
         'Chains',
         'decimals',
         { type: Sequelize.INTEGER, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Chains',
         'address',
         { type: Sequelize.STRING, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
 
       const contracts = await queryInterface.sequelize.query(
         `SELECT c.decimals, c.address, cc.chain_id FROM "Contracts" c
         LEFT JOIN "CommunityContracts" cc ON c.id = cc.contract_id;`,
-        { transaction: t }
+        { transaction: t },
       );
 
       await Promise.all(
@@ -272,9 +272,9 @@ module.exports = {
           // Add contract stuff back on Chains model
           await queryInterface.sequelize.query(
             `UPDATE "Chains" c SET decimals=${c.decimals}, address='${c.address}' WHERE c.id = '${c.chain_id}';`,
-            { transaction: t }
+            { transaction: t },
           );
-        })
+        }),
       );
 
       // DELETE column
@@ -300,7 +300,7 @@ module.exports = {
           description: { type: Sequelize.TEXT, allowNull: false },
           color: { type: Sequelize.STRING, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -318,7 +318,7 @@ module.exports = {
           color: { type: Sequelize.STRING, allowNull: false },
           category_id: { type: Sequelize.INTEGER, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

@@ -7,7 +7,7 @@ module.exports = {
         'Chains',
         { type: 'dao' },
         { id: 'compound' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkUpdate(
         'Chains',
@@ -16,7 +16,7 @@ module.exports = {
           type: 'token',
           base: 'ethereum',
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -25,21 +25,21 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       const tokens = await queryInterface.sequelize.query(
         "SELECT id FROM \"Chains\" WHERE type = 'token' AND base = 'ethereum';",
-        { transaction: t }
+        { transaction: t },
       );
       for (const { id } of tokens[0]) {
         await queryInterface.bulkUpdate(
           'Chains',
           { network: id },
           { id },
-          { transaction: t }
+          { transaction: t },
         );
       }
       await queryInterface.bulkUpdate(
         'Chains',
         { type: 'token' },
         { id: 'compound' },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

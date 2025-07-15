@@ -11,7 +11,7 @@ module.exports = {
   down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn(
       'Chains',
-      'discord_bot_webhooks_enabled'
+      'discord_bot_webhooks_enabled',
     );
   },
 };

@@ -32,7 +32,7 @@ module.exports = {
 
       await SubstrateChains.forEach(async (c) => {
         const bountyObjs = Object.values(BountyEventKinds).map((s) =>
-          buildObject(s, c)
+          buildObject(s, c),
         );
         await queryInterface.bulkInsert('ChainEventTypes', [...bountyObjs], {
           transaction: t,
@@ -50,7 +50,7 @@ module.exports = {
             [Op.like]: '%treasury-bounty%',
           },
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

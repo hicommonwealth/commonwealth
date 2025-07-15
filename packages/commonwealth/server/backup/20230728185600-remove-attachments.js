@@ -45,7 +45,7 @@ module.exports = {
             allowNull: false,
           },
         },
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.addColumn(
@@ -56,7 +56,7 @@ module.exports = {
           allowNull: true,
           references: { model: 'Attachments', key: 'id' },
         },
-        { transaction }
+        { transaction },
       );
     });
   },

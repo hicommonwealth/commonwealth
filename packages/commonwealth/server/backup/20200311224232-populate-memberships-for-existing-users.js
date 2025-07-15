@@ -58,7 +58,7 @@ UNION ALL
             active: true,
             created_at: new Date(),
             updated_at: new Date(),
-          })
+          }),
         );
       };
 
@@ -67,21 +67,21 @@ UNION ALL
           ? queryInterface.bulkInsert(
               'Memberships',
               update(userChainAssociations[0]),
-              { transaction: t }
+              { transaction: t },
             )
           : null,
         userPublicCommunityAssociations[0].length > 0
           ? queryInterface.bulkInsert(
               'Memberships',
               update(userPublicCommunityAssociations[0]),
-              { transaction: t }
+              { transaction: t },
             )
           : null,
         userPrivateCommunityAssociations[0].length > 0
           ? queryInterface.bulkInsert(
               'Memberships',
               update(userPrivateCommunityAssociations[0]),
-              { transaction: t }
+              { transaction: t },
             )
           : null,
       ]);

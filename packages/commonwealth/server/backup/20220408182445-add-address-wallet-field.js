@@ -11,7 +11,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
 
       // populate column for all but default eth addresses
@@ -27,7 +27,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction,
-        }
+        },
       );
       await queryInterface.sequelize.query(
         `
@@ -40,7 +40,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction,
-        }
+        },
       );
       await queryInterface.sequelize.query(
         `
@@ -53,7 +53,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction,
-        }
+        },
       );
       await queryInterface.sequelize.query(
         `
@@ -66,7 +66,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction,
-        }
+        },
       );
 
       // update by network
@@ -81,7 +81,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction,
-        }
+        },
       );
       await queryInterface.sequelize.query(
         `
@@ -96,7 +96,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction,
-        }
+        },
       );
       await queryInterface.sequelize.query(
         `
@@ -109,7 +109,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction,
-        }
+        },
       );
 
       // update for magic specifically
@@ -117,7 +117,7 @@ module.exports = {
         'Addresses',
         { wallet_id: 'magic' },
         { is_magic: true },
-        { transaction }
+        { transaction },
       );
 
       // drop is_magic field (use magic wallet instead)
@@ -137,7 +137,7 @@ module.exports = {
           allowNull: false,
           defaultValue: false,
         },
-        { transaction }
+        { transaction },
       );
 
       // repopulate is_magic based on wallet_id === 'magic'
@@ -145,7 +145,7 @@ module.exports = {
         'Addresses',
         { is_magic: true },
         { wallet_id: 'magic' },
-        { transaction }
+        { transaction },
       );
 
       await queryInterface.removeColumn('Addresses', 'wallet_id', {

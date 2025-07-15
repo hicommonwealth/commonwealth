@@ -19,7 +19,7 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // add indexes
@@ -47,7 +47,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction: t,
-        }
+        },
       );
 
       // remove user data columns
@@ -67,13 +67,13 @@ module.exports = {
         'Users',
         'magicIssuer',
         { type: Sequelize.STRING, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Users',
         'lastMagicLoginAt',
         { type: Sequelize.INTEGER, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
 
       // migrate data from SsoTokens
@@ -90,7 +90,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction: t,
-        }
+        },
       );
 
       // drop SsoTokens table

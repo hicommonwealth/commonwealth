@@ -11,7 +11,7 @@ module.exports = {
         SET chain_id = object_id
         WHERE category_id = 'new-thread-creation' AND chain_id IS NULL;
       `,
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.removeColumn('Subscriptions', 'object_id', {
@@ -41,7 +41,7 @@ module.exports = {
                                                                    ((thread_id IS NOT NULL AND comment_id IS NULL) OR
                                                                     (thread_id IS NULL AND comment_id IS NOT NULL)))) NOT VALID;
       `,
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -57,7 +57,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.sequelize.query(
@@ -69,7 +69,7 @@ module.exports = {
         DROP CONSTRAINT IF EXISTS "chk_thread_id_comment_id_on_new_comment_creation",
         DROP CONSTRAINT IF EXISTS "chk_thread_id_comment_id_on_new_reaction";
     `,
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

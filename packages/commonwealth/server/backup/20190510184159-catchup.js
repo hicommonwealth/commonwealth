@@ -12,7 +12,7 @@ module.exports = {
             allowNull: false,
             defaultValue: 'MIGRATED',
           },
-          { transaction: t }
+          { transaction: t },
         ),
         queryInterface.addColumn(
           'Addresses',
@@ -21,7 +21,7 @@ module.exports = {
             type: Sequelize.DATE,
             allowNull: true,
           },
-          { transaction: t }
+          { transaction: t },
         ),
         queryInterface.addColumn(
           'Addresses',
@@ -30,7 +30,7 @@ module.exports = {
             type: Sequelize.DATE,
             allowNull: true,
           },
-          { transaction: t }
+          { transaction: t },
         ),
 
         queryInterface.addColumn(
@@ -40,7 +40,7 @@ module.exports = {
             type: Sequelize.INTEGER,
             allowNull: false,
           },
-          { transaction: t }
+          { transaction: t },
         ),
 
         queryInterface.createTable(
@@ -58,7 +58,7 @@ module.exports = {
             updated_at: { type: Sequelize.DATE, allowNull: false },
             deleted_at: Sequelize.DATE,
           },
-          { transaction: t }
+          { transaction: t },
         ),
 
         queryInterface.createTable(
@@ -83,7 +83,7 @@ module.exports = {
             updated_at: { type: Sequelize.DATE, allowNull: false },
             deleted_at: Sequelize.DATE,
           },
-          { transaction: t }
+          { transaction: t },
         ),
       ]).then(() => {
         queryInterface.changeColumn('Addresses', 'verification_token', {

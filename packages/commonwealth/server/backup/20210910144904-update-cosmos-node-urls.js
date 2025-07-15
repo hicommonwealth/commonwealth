@@ -13,7 +13,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'Chains',
@@ -25,7 +25,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -37,7 +37,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -49,7 +49,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
     });
   },
@@ -65,7 +65,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'Chains',
@@ -77,7 +77,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -89,7 +89,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -101,7 +101,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
     });
   },

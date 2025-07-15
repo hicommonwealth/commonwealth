@@ -23,5 +23,5 @@ module.exports = {
         jsonb_build_object('root_id', 'discussion_'::text || (notification_data::jsonb->>'thread_id')::text)
         WHERE notification_data::jsonb ? 'thread_id';
     `);
-  }
+  },
 };

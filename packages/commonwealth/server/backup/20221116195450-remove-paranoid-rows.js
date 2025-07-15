@@ -12,7 +12,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `DELETE FROM "RoleAssignments" WHERE deleted_at IS NOT NULL;`,
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeColumn('RoleAssignments', 'deleted_at', {
         transaction: t,
@@ -34,7 +34,7 @@ module.exports = {
         { type: Sequelize.DATE },
         {
           transaction: t,
-        }
+        },
       );
     });
   },

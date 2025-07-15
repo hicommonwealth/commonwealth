@@ -29,14 +29,14 @@ module.exports = {
             { fields: ['id'], unique: true },
             { fields: ['creator_id'] },
           ],
-        }
+        },
       )
       .then(() => {
         return Promise.all([
           queryInterface.addColumn(
             'OffchainCommunities',
             'isAuthenticatedForum',
-            { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false }
+            { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
           ),
           queryInterface.addColumn('OffchainCommunities', 'privacyEnabled', {
             type: Sequelize.BOOLEAN,
@@ -57,7 +57,7 @@ module.exports = {
       return Promise.all([
         queryInterface.removeColumn(
           'OffchainCommunities',
-          'isAuthenticatedForum'
+          'isAuthenticatedForum',
         ),
         queryInterface.removeColumn('OffchainCommunities', 'privacyEnabled'),
         queryInterface.removeColumn('OffchainCommunities', 'invitesEnabled'),

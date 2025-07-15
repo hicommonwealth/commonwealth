@@ -6,34 +6,34 @@ module.exports = {
       const duplicateChainRolesQuery = await queryInterface.sequelize.query(
         'SELECT address_id, chain_id, COUNT(*), ARRAY_AGG(DISTINCT "Roles".permission), ARRAY_AGG(id) as ids ' +
           'FROM "Roles" WHERE offchain_community_id IS NULL ' +
-          'GROUP BY address_id, chain_id HAVING COUNT(*) > 1'
+          'GROUP BY address_id, chain_id HAVING COUNT(*) > 1',
       );
       const duplicateCommunityRolesQuery = await queryInterface.sequelize.query(
         'SELECT address_id, offchain_community_id, COUNT(*), ARRAY_AGG(DISTINCT "Roles".permission), ARRAY_AGG(id) as ids ' +
           'FROM "Roles" WHERE chain_id IS NULL ' +
-          'GROUP BY address_id, offchain_community_id HAVING COUNT(*) > 1'
+          'GROUP BY address_id, offchain_community_id HAVING COUNT(*) > 1',
       );
 
       const chainRoleIdsToDelete = duplicateChainRolesQuery[0].reduce(
         (acc, fields) => acc.concat(fields.ids),
-        []
+        [],
       );
       const communityRoleIdsToDelete = duplicateCommunityRolesQuery[0].reduce(
         (acc, fields) => acc.concat(fields.ids),
-        []
+        [],
       );
       if (chainRoleIdsToDelete.length > 0) {
         await queryInterface.bulkDelete(
           'Roles',
           { id: chainRoleIdsToDelete },
-          { transaction: t }
+          { transaction: t },
         );
       }
       if (communityRoleIdsToDelete.length > 0) {
         await queryInterface.bulkDelete(
           'Roles',
           { id: communityRoleIdsToDelete },
-          { transaction: t }
+          { transaction: t },
         );
       }
 
@@ -42,8 +42,8 @@ module.exports = {
           fields.array_agg.indexOf('admin') !== -1
             ? 'admin'
             : fields.array_agg.indexOf('moderator') !== -1
-            ? 'moderator'
-            : 'member';
+              ? 'moderator'
+              : 'member';
         delete fields.ids;
         delete fields.count;
         delete fields.array_agg;
@@ -70,7 +70,7 @@ module.exports = {
 
     await queryInterface.removeIndex(
       'Roles',
-      'roles_address_id_chain_id_offchain_community_id'
+      'roles_address_id_chain_id_offchain_community_id',
     );
     await queryInterface.addIndex('Roles', {
       fields: ['address_id', 'chain_id'],
@@ -86,7 +86,7 @@ module.exports = {
     await queryInterface.removeIndex('Roles', 'roles_address_id_chain_id');
     await queryInterface.removeIndex(
       'Roles',
-      'roles_address_id_offchain_community_id'
+      'roles_address_id_offchain_community_id',
     );
     await queryInterface.addIndex('Roles', {
       fields: ['address_id', 'chain_id', 'offchain_community_id'],

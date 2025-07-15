@@ -15,7 +15,7 @@ module.exports = {
         type = 'chain', bech32_prefix = 'kyve', network = 'kyve'
         WHERE id = 'kyve';
       `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
     });
   },
@@ -34,7 +34,7 @@ module.exports = {
         type = 'offchain', bech32_prefix = 'osmo', network = 'osmosis'
         WHERE id = 'kyve';
       `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
     });
   },

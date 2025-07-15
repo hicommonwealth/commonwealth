@@ -19,20 +19,20 @@ module.exports = {
             created_at: { type: Sequelize.DATE, allowNull: false },
             updated_at: { type: Sequelize.DATE, allowNull: false },
           },
-          { transaction: t }
+          { transaction: t },
         );
 
         await queryInterface.addColumn(
           'OffchainThreads',
           'offchain_voting_ends_at',
           { type: Sequelize.DATE, allowNull: true },
-          { transaction: t }
+          { transaction: t },
         );
         await queryInterface.addColumn(
           'OffchainThreads',
           'offchain_voting_votes',
           { type: Sequelize.INTEGER, allowNull: true },
-          { transaction: t }
+          { transaction: t },
         );
       })
       .then(async () => {
@@ -40,22 +40,22 @@ module.exports = {
           await queryInterface.addIndex(
             'OffchainThreads',
             { fields: ['chain', 'offchain_voting_ends_at'] },
-            { transaction: t }
+            { transaction: t },
           );
           await queryInterface.addIndex(
             'OffchainThreads',
             { fields: ['chain', 'offchain_voting_votes'] },
-            { transaction: t }
+            { transaction: t },
           );
           await queryInterface.addIndex(
             'OffchainThreads',
             { fields: ['community', 'offchain_voting_ends_at'] },
-            { transaction: t }
+            { transaction: t },
           );
           await queryInterface.addIndex(
             'OffchainThreads',
             { fields: ['community', 'offchain_voting_votes'] },
-            { transaction: t }
+            { transaction: t },
           );
         });
       });
@@ -66,33 +66,33 @@ module.exports = {
       await queryInterface.removeIndex(
         'OffchainThreads',
         'offchain_threads_chain_offchain_voting_ends_at',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeIndex(
         'OffchainThreads',
         'offchain_threads_community_offchain_voting_ends_at',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeIndex(
         'OffchainThreads',
         'offchain_threads_chain_offchain_voting_votes',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeIndex(
         'OffchainThreads',
         'offchain_threads_community_offchain_voting_votes',
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.removeColumn(
         'OffchainThreads',
         'offchain_voting_ends_at',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeColumn(
         'OffchainThreads',
         'offchain_voting_votes',
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.dropTable('OffchainVotes', { transaction: t });

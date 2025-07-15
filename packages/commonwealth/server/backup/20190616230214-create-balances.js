@@ -14,7 +14,7 @@ module.exports = {
         timestamps: false,
         underscored: true,
         indexes: [{ fields: ['address'] }],
-      }
+      },
     );
   },
   down: (queryInterface, Sequelize) => {

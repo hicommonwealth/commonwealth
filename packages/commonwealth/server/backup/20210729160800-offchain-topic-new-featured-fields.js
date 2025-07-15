@@ -11,7 +11,7 @@ module.exports = {
           allowNull: false,
           defaultValue: false,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'OffchainTopics',
@@ -21,7 +21,7 @@ module.exports = {
           allowNull: false,
           defaultValue: false,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -31,12 +31,12 @@ module.exports = {
       await queryInterface.removeColumn(
         'OffchainTopics',
         'featured_in_sidebar',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeColumn(
         'OffchainTopics',
         'featured_in_new_post',
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

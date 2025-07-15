@@ -12,14 +12,14 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
       const threadLastCommentedOn = {};
       const allComments = await queryInterface.sequelize.query(
         `SELECT root_id, created_at FROM "OffchainComments"`,
         {
           transaction: t,
-        }
+        },
       );
       allComments[0].forEach((comment) => {
         const discussionId = comment.root_id.split('_')[1];
@@ -39,9 +39,9 @@ module.exports = {
           ).toFixed(0);
           await queryInterface.sequelize.query(
             `UPDATE "OffchainThreads" SET last_commented_on=TO_TIMESTAMP(${unixTimestamp}) WHERE id=${threadId}`,
-            { transaction: t }
+            { transaction: t },
           );
-        })
+        }),
       );
     });
   },

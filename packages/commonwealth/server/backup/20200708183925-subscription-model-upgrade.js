@@ -9,48 +9,48 @@ module.exports = {
         'Subscriptions',
         'chain_id',
         { type: Sequelize.STRING, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Subscriptions',
         'community_id',
         { type: Sequelize.STRING, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Subscriptions',
         'offchain_thread_id',
         { type: Sequelize.INTEGER, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Subscriptions',
         'offchain_comment_id',
         { type: Sequelize.INTEGER, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Subscriptions',
         'chain_event_type_id',
         { type: Sequelize.STRING, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Subscriptions',
         'chain_entity_id',
         { type: Sequelize.STRING, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
 
       // for each subscription, create relevant associations
       const chains = await queryInterface.sequelize.query(
         `SELECT * FROM "Chains"`,
-        { transaction: t }
+        { transaction: t },
       );
       const chainIds = chains[0].map((c) => c.id);
       const subscriptions = await queryInterface.sequelize.query(
         `SELECT * FROM "Subscriptions";`,
-        { transaction: t }
+        { transaction: t },
       );
       await Promise.all(
         subscriptions[0].map(async (s) => {
@@ -74,15 +74,15 @@ module.exports = {
               if (entity === 'discussion') {
                 // associate OffchainThread
                 query = `UPDATE "Subscriptions" SET offchain_thread_id=${Number(
-                  p_object_id
+                  p_object_id,
                 )} WHERE id=${id};`;
                 // await queryInterface.sequelize.query(query);
                 // associate chain or community
                 const thread = await queryInterface.sequelize.query(
                   `SELECT * FROM "OffchainThreads" WHERE id=${Number(
-                    p_object_id
+                    p_object_id,
                   )};`,
-                  { transaction: t }
+                  { transaction: t },
                 );
                 if (thread[0].length === 0) break;
                 if (thread[0][0].chain) {
@@ -94,14 +94,14 @@ module.exports = {
               } else if (entity === 'comment') {
                 // query associate OffchainComment
                 query = `UPDATE "Subscriptions" SET offchain_comment_id=${Number(
-                  p_object_id
+                  p_object_id,
                 )} WHERE id=${id};`;
                 // // associate chain or community
                 const comment = await queryInterface.sequelize.query(
                   `SELECT * FROM "OffchainComments" WHERE id=${Number(
-                    p_object_id
+                    p_object_id,
                   )};`,
-                  { transaction: t }
+                  { transaction: t },
                 );
                 if (comment[0].length === 0) break;
                 if (comment[0][0].chain) {
@@ -120,14 +120,14 @@ module.exports = {
               if (entity === 'discussion') {
                 // associate offchain_thread
                 query = `UPDATE "Subscriptions" SET offchain_thread_id=${Number(
-                  p_object_id
+                  p_object_id,
                 )} WHERE id=${id};`;
                 // associate chain or community
                 const thread = await queryInterface.sequelize.query(
                   `SELECT * FROM "OffchainThreads" WHERE id=${Number(
-                    p_object_id
+                    p_object_id,
                   )};`,
-                  { transaction: t }
+                  { transaction: t },
                 );
                 if (thread[0].length === 0) break;
                 if (thread[0][0].chain) {
@@ -139,14 +139,14 @@ module.exports = {
               } else if (entity === 'comment') {
                 // associate offchain_comment
                 query = `UPDATE "Subscriptions" SET offchain_comment_id=${Number(
-                  p_object_id
+                  p_object_id,
                 )} WHERE id=${id};`;
                 // associate chain or community
                 const comment = await queryInterface.sequelize.query(
                   `SELECT * FROM "OffchainComments" WHERE id=${Number(
-                    p_object_id
+                    p_object_id,
                   )};`,
-                  { transaction: t }
+                  { transaction: t },
                 );
                 if (comment[0].length === 0) break;
                 if (comment[0][0].chain) {
@@ -168,7 +168,7 @@ module.exports = {
               // all cases should be detailed above.
               break;
           }
-        })
+        }),
       ); // end of loop
     });
   },

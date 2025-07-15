@@ -11,7 +11,7 @@ module.exports = {
                              AND tablename = 'entities_creation_events'
                        );
         `,
-      { raw: true }
+      { raw: true },
     );
     if (!temp[0].exists) return;
 
@@ -26,7 +26,7 @@ module.exports = {
                   AND ECE.type = 'collective-proposal'
                   AND SPLIT_PART(C.root_id, '_', 1) = 'councilmotion';
             `,
-        { transaction: t }
+        { transaction: t },
       );
       // updates reactions root_id's (proposal_ids) for the collective proposal entities
       await queryInterface.sequelize.query(
@@ -38,7 +38,7 @@ module.exports = {
                   AND ECE.type = 'collective-proposal'
                   AND SPLIT_PART(R.proposal_id, '_', 1) = 'councilmotion';
             `,
-        { transaction: t }
+        { transaction: t },
       );
 
       // update all collective-proposal entities to use proposalIndex instead of proposalHash
@@ -50,7 +50,7 @@ module.exports = {
                 WHERE CE.type = 'collective-proposal'
                   AND CE.id = ECE.entity_id;
             `,
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

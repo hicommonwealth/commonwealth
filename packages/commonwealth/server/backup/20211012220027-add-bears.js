@@ -18,7 +18,7 @@ module.exports = {
             active: true,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -30,7 +30,7 @@ module.exports = {
             address: '0x4923017F3B7fAC4e096b46e401c0662F0B7E393f',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -40,12 +40,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'buzzed-bear-hideout' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: ['buzzed-bear-hideout'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

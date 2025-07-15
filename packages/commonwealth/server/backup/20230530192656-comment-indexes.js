@@ -11,7 +11,7 @@ module.exports = {
         DROP INDEX IF EXISTS "offchain_comments_root_id";
 
         `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
     });
   },

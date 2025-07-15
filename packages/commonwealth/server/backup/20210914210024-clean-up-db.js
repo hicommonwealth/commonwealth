@@ -6,7 +6,7 @@ module.exports = {
       // Query all addresses (not deleted) into Array
       const addresses = await queryInterface.sequelize.query(
         'SELECT id FROM "Addresses";',
-        { transaction }
+        { transaction },
       );
 
       let addressIds = addresses[0].map((_) => _.id).join(', ');
@@ -18,7 +18,7 @@ module.exports = {
 
       await queryInterface.sequelize.query(
         `DELETE FROM "OffchainReactions" WHERE address_id NOT IN (${addressIds});`,
-        { transaction, logging: console.log }
+        { transaction, logging: console.log },
       );
     });
   },

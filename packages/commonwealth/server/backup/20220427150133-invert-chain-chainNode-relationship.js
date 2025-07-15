@@ -13,7 +13,7 @@ module.exports = {
             key: 'id',
           },
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.sequelize.query(
         `
@@ -27,7 +27,7 @@ module.exports = {
           type: 'RAW',
           transaction,
           logging: console.log,
-        }
+        },
       );
       await queryInterface.removeColumn('Users', 'selectedNodeId', {
         transaction,
@@ -41,7 +41,7 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.addColumn(
         'Chains',
@@ -50,7 +50,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.addColumn(
         'Chains',
@@ -59,7 +59,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.addColumn(
         'Chains',
@@ -68,7 +68,7 @@ module.exports = {
           type: Sequelize.BOOLEAN,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
 
       // clone id / addresses / verbose / token_name over to associated Chain
@@ -88,7 +88,7 @@ module.exports = {
           type: 'RAW',
           transaction,
           logging: console.log,
-        }
+        },
       );
 
       // set up cleaned and deduped ChainNodes values
@@ -119,7 +119,7 @@ module.exports = {
           type: 'RAW',
           transaction,
           logging: console.log,
-        }
+        },
       );
 
       // map new ChainNodeID to Chains
@@ -136,7 +136,7 @@ module.exports = {
           type: 'RAW',
           transaction,
           logging: console.log,
-        }
+        },
       );
 
       /*
@@ -182,7 +182,7 @@ module.exports = {
           type: 'RAW',
           transaction,
           logging: console.log,
-        }
+        },
       );
 
       // insert new ChainNodes values
@@ -197,7 +197,7 @@ module.exports = {
           type: 'RAW',
           transaction,
           logging: console.log,
-        }
+        },
       );
 
       /*
@@ -222,7 +222,7 @@ module.exports = {
           type: 'RAW',
           transaction,
           logging: console.log,
-        }
+        },
       );
 
       // set the foreign key relationship now, to avoid errors during loading
@@ -234,7 +234,7 @@ module.exports = {
           allowNull: true,
           references: { model: 'ChainNodes', key: 'id' },
         },
-        { transaction }
+        { transaction },
       );
     });
   },
@@ -250,7 +250,7 @@ module.exports = {
           allowNull: true,
           references: { model: 'Chains', key: 'id' },
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.addColumn(
         'ChainNodes',
@@ -259,7 +259,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.addColumn(
         'ChainNodes',
@@ -268,7 +268,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
       await queryInterface.addColumn(
         'ChainNodes',
@@ -277,7 +277,7 @@ module.exports = {
           type: Sequelize.BOOLEAN,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
 
       // TODO: create duplicates of chain nodes for each chain, and populate 'chain' column

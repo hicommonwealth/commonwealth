@@ -13,19 +13,19 @@ module.exports = {
         'OffchainThreads',
         'tag_id',
         'topic_id',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.renameColumn(
         'Chains',
         'featured_tags',
         'featured_topics',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.renameColumn(
         'OffchainCommunities',
         'featured_tags',
         'featured_topics',
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -42,19 +42,19 @@ module.exports = {
         'OffchainThreads',
         'topic_id',
         'tag_id',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.renameColumn(
         'Chains',
         'featured_topics',
         'featured_tags',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.renameColumn(
         'OffchainCommunities',
         'featured_topics',
         'featured_tags',
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

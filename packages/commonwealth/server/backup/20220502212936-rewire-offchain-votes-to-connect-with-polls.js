@@ -12,7 +12,7 @@ module.exports = {
             as: 'poll',
           },
         },
-        { transaction: t }
+        { transaction: t },
       );
       const getThreadsQuery = `SELECT * FROM "OffchainThreads" WHERE has_poll = TRUE`;
       const threads = await queryInterface.sequelize.query(getThreadsQuery, {
@@ -26,7 +26,7 @@ module.exports = {
           {
             replacements: [id],
           },
-          { transaction: t }
+          { transaction: t },
         );
         const poll_id = res[0][0]?.id;
         if (id && poll_id) {
@@ -36,7 +36,7 @@ module.exports = {
             {
               replacements: [poll_id, id],
             },
-            { transaction: t }
+            { transaction: t },
           );
         }
       });

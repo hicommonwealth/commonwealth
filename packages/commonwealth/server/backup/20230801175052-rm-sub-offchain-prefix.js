@@ -7,19 +7,19 @@ module.exports = {
         'Subscriptions',
         'offchain_thread_id',
         'thread_id',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.renameColumn(
         'Subscriptions',
         'offchain_comment_id',
         'comment_id',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `
         ALTER INDEX IF EXISTS "subscriptions_offchain_thread_id" RENAME TO "subscriptions_thread_id";
       `,
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -30,19 +30,19 @@ module.exports = {
         'Subscriptions',
         'thread_id',
         'offchain_thread_id',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.renameColumn(
         'Subscriptions',
         'comment_id',
         'offchain_comment_id',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `
         ALTER INDEX IF EXISTS "subscriptions_thread_id" RENAME TO "subscriptions_offchain_thread_id";
       `,
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

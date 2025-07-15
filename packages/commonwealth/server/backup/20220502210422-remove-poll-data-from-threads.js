@@ -3,20 +3,20 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.removeColumn(
         'OffchainThreads',
-        'offchain_voting_ends_at'
+        'offchain_voting_ends_at',
       );
       await queryInterface.removeColumn(
         'OffchainThreads',
-        'offchain_voting_votes'
+        'offchain_voting_votes',
       );
       await queryInterface.removeColumn(
         'OffchainThreads',
-        'offchain_voting_options'
+        'offchain_voting_options',
       );
       await queryInterface.renameColumn(
         'OffchainThreads',
         'offchain_voting_enabled',
-        'has_poll'
+        'has_poll',
       );
     });
   },
@@ -28,20 +28,20 @@ module.exports = {
           'OffchainThreads',
           'offchain_voting_ends_at',
           { type: Sequelize.DATE, allowNull: true },
-          { transaction: t }
+          { transaction: t },
         );
         await queryInterface.addColumn(
           'OffchainThreads',
           'offchain_voting_votes',
           { type: Sequelize.INTEGER, allowNull: true },
-          { transaction: t }
+          { transaction: t },
         );
       })
       .then(async () => {
         queryInterface.renameColumn(
           'OffchainThreads',
           'has_poll',
-          'offchain_voting_enabled'
+          'offchain_voting_enabled',
         );
       })
       .then(async () => {
@@ -49,12 +49,12 @@ module.exports = {
           await queryInterface.addIndex(
             'OffchainThreads',
             { fields: ['chain', 'offchain_voting_ends_at'] },
-            { transaction: t }
+            { transaction: t },
           );
           await queryInterface.addIndex(
             'OffchainThreads',
             { fields: ['chain', 'offchain_voting_votes'] },
-            { transaction: t }
+            { transaction: t },
           );
         });
       });

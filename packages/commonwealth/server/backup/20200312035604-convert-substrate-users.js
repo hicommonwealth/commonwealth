@@ -43,14 +43,14 @@ module.exports = {
       .then(async (addresses) => {
         const counts = _.countBy(addresses, (a) => a.address);
         const duplicateAddrs = Object.entries(counts).filter(
-          ([addr, count]) => count > 1
+          ([addr, count]) => count > 1,
         );
         console.log(
           'skipping addresses with conflicting encodings:',
-          duplicateAddrs
+          duplicateAddrs,
         );
         const migratingAddrs = addresses.filter(
-          (a) => duplicateAddrs.indexOf(a.address) === -1
+          (a) => duplicateAddrs.indexOf(a.address) === -1,
         );
 
         for (const r of migratingAddrs) {
@@ -59,7 +59,7 @@ module.exports = {
               `UPDATE "Addresses" SET address = ? WHERE id = ?`,
               {
                 replacements: [r.address, r.id],
-              }
+              },
             );
           } catch (e) {
             console.error('Failed to migrate:', r.id, r.address);
@@ -92,14 +92,14 @@ module.exports = {
       .then(async (addresses) => {
         const counts = _.countBy(addresses, (a) => a.address);
         const duplicateAddrs = Object.entries(counts).filter(
-          ([addr, count]) => count > 1
+          ([addr, count]) => count > 1,
         );
         console.log(
           'skipping addresses with conflicting encodings:',
-          duplicateAddrs
+          duplicateAddrs,
         );
         const migratingAddrs = addresses.filter(
-          (a) => duplicateAddrs.indexOf(a.address) === -1
+          (a) => duplicateAddrs.indexOf(a.address) === -1,
         );
 
         for (const r of migratingAddrs) {
@@ -108,7 +108,7 @@ module.exports = {
               `UPDATE "Addresses" SET address = ? WHERE id = ?`,
               {
                 replacements: [r.address, r.id],
-              }
+              },
             );
           } catch (e) {
             console.error('Failed to migrate:', r.id, r.address);

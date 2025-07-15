@@ -36,7 +36,7 @@ module.exports = {
             references: { model: 'NotificationCategories', key: 'name' },
           },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // create a new table called NotificationsRead --- creating this table with queryInterface.createTable() does
@@ -55,7 +55,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction: t,
-        }
+        },
       );
 
       // copies all UNIQUE (notifications that have the same notification_data AND chain_event_id notifications from OldNotifications to Notifications
@@ -78,7 +78,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction: t,
-        }
+        },
       );
 
       // populates NotificationsRead table by getting notification_id, subscription_id and is_read using joins of
@@ -107,7 +107,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction: t,
-        }
+        },
       );
 
       // populate category_ids
@@ -128,7 +128,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction: t,
-        }
+        },
       );
 
       // populate chain_id's
@@ -160,7 +160,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction: t,
-        }
+        },
       );
 
       // deletes notifications that did not define chain_id or chain and whose chain_id was derived from an off-chain
@@ -170,7 +170,7 @@ module.exports = {
         {
           chain_id: { [Sequelize.Op.eq]: null },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // since we inserted rows with custom id (overrides sequence but does not increment it) we set the sequence
@@ -183,7 +183,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction: t,
-        }
+        },
       );
 
       // add the not null constraint for chain_id and category_id on Notifications table
@@ -200,7 +200,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction: t,
-        }
+        },
       );
       // Cannot regenerate the original notification id's once the OldNotifications table is dropped
       // best to leave the old notification's table until smooth transition is confirmed (delete manually later)

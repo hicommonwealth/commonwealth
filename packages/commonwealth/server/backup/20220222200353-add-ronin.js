@@ -7,53 +7,53 @@ module.exports = {
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain },
-        { transaction: t }
+        { transaction: t },
       );
 
       const toDelete = await queryInterface.sequelize.query(
         `SELECT id FROM "Addresses" WHERE chain = 'axie-infinity'`,
-        { transaction: t }
+        { transaction: t },
       );
       const ids = toDelete ? toDelete[0].map(({ id }) => id) : [];
       await queryInterface.bulkDelete(
         'OffchainProfiles',
         { address_id: ids },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Notifications',
         { chain_id: chain },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainCategories',
         { chain_id: chain },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: [chain] },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkInsert(
         'Chains',
@@ -69,7 +69,7 @@ module.exports = {
             description: 'TODO',
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -82,7 +82,7 @@ module.exports = {
             eth_chain_id: 2020, // ??
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -92,48 +92,48 @@ module.exports = {
       await queryInterface.bulkDelete(
         'OffchainReactions',
         { chain },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainThreads',
         { chain },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'OffchainComments',
         { chain },
-        { transaction: t }
+        { transaction: t },
       );
 
       const toDelete = await queryInterface.sequelize.query(
         `SELECT id FROM "Addresses" WHERE chain = 'axie-infinity'`,
-        { transaction: t }
+        { transaction: t },
       );
       const ids = toDelete ? toDelete[0].map(({ id }) => id) : [];
       await queryInterface.bulkDelete(
         'OffchainProfiles',
         { address_id: ids },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Addresses',
         { chain },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Notifications',
         { chain_id: chain },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: chain },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

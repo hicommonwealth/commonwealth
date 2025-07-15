@@ -5,7 +5,7 @@ module.exports = {
     await queryInterface.renameColumn(
       'OffchainComments',
       'object_id',
-      'parent_id'
+      'parent_id',
     );
     await queryInterface.addColumn('OffchainComments', 'root_id', {
       type: Sequelize.STRING,
@@ -21,7 +21,7 @@ module.exports = {
     await queryInterface.renameColumn(
       'OffchainComments',
       'parent_id',
-      'object_id'
+      'object_id',
     );
     await queryInterface.removeColumn('OffchainComments', 'root_id', {
       type: Sequelize.STRING,

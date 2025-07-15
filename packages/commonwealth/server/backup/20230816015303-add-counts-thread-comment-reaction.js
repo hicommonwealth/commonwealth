@@ -12,7 +12,7 @@ module.exports = {
         ALTER TABLE "Threads" ADD COLUMN IF NOT EXISTS max_notif_id integer NOT NULL DEFAULT 0;
         ALTER TABLE "Comments" ADD COLUMN IF NOT EXISTS reaction_count integer NOT NULL DEFAULT 0;
         `,
-        { raw: true, transaction: t, logging: console.log }
+        { raw: true, transaction: t, logging: console.log },
       );
       console.timeEnd('Add columns');
 
@@ -31,7 +31,7 @@ module.exports = {
         FROM reactionCntByComment rc
         where rc.comment_id="Comments".id
         `,
-        { raw: true, transaction: t, logging: console.log }
+        { raw: true, transaction: t, logging: console.log },
       );
       console.timeEnd('Add comment reaction count');
 
@@ -50,7 +50,7 @@ module.exports = {
         FROM reactionCntByThread rc
         where rc.thread_id="Threads".id
         `,
-        { raw: true, transaction: t, logging: console.log }
+        { raw: true, transaction: t, logging: console.log },
       );
       console.timeEnd('Add thread reaction count');
 
@@ -70,7 +70,7 @@ module.exports = {
         FROM commentCntByThread cc
         where cc.thread_id="Threads".id
         `,
-        { raw: true, transaction: t, logging: console.log }
+        { raw: true, transaction: t, logging: console.log },
       );
       console.timeEnd('Add thread comment count');
 
@@ -91,7 +91,7 @@ module.exports = {
         where mn.thread_id="Threads".id
         
         `,
-        { raw: true, transaction: t, logging: console.log }
+        { raw: true, transaction: t, logging: console.log },
       );
       console.timeEnd('Add thread max notification id');
     });
@@ -106,7 +106,7 @@ module.exports = {
         ALTER TABLE "Threads" DROP COLUMN IF EXISTS max_notif_id;
         ALTER TABLE "Comments" DROP COLUMN IF EXISTS reaction_count;
         `,
-        { raw: true, transaction: t, logging: console.log }
+        { raw: true, transaction: t, logging: console.log },
       );
     });
   },

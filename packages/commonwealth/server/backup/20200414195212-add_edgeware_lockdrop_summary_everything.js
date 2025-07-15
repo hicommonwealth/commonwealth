@@ -13,7 +13,7 @@ module.exports = {
       },
       {
         underscored: true,
-      }
+      },
     );
   },
 

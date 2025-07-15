@@ -13,7 +13,7 @@ module.exports = {
       const [threads, metadata] = await queryInterface.sequelize.query(
         `SELECT t.id as id, t.snapshot_proposal as snapshot_proposal, sp.space as space, sp.title as title
         FROM "Threads" t
-        LEFT JOIN "SnapshotProposals" sp ON t.snapshot_proposal = sp.id`
+        LEFT JOIN "SnapshotProposals" sp ON t.snapshot_proposal = sp.id`,
       );
 
       const linkedThreadsPromises = threads.map((thread) =>
@@ -24,8 +24,8 @@ module.exports = {
           {
             replacements: [thread.id],
             type: Sequelize.QueryTypes.SELECT,
-          }
-        )
+          },
+        ),
       );
 
       const chainEntitiesPromises = threads.map((thread) =>
@@ -34,8 +34,8 @@ module.exports = {
           {
             replacements: [thread.id],
             type: Sequelize.QueryTypes.SELECT,
-          }
-        )
+          },
+        ),
       );
 
       const linkedThreads = await Promise.all(linkedThreadsPromises);
@@ -84,7 +84,7 @@ module.exports = {
               replacements: [JSON.stringify(links), thread.id],
               type: Sequelize.QueryTypes.UPDATE,
               transaction,
-            }
+            },
           );
         }
       });

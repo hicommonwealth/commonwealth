@@ -11,7 +11,7 @@ module.exports = {
             type: Sequelize.STRING,
             allowNull: true,
           },
-          { transaction: t }
+          { transaction: t },
         ),
         queryInterface.addColumn(
           'ChainEntities',
@@ -20,7 +20,7 @@ module.exports = {
             type: Sequelize.STRING,
             allowNull: true,
           },
-          { transaction: t }
+          { transaction: t },
         ),
       ]);
     });

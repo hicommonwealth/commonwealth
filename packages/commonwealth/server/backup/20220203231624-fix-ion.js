@@ -14,7 +14,7 @@ module.exports = {
         {
           id: 'ion',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkUpdate(
@@ -26,7 +26,7 @@ module.exports = {
         {
           chain: 'ion',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkDelete(
@@ -34,7 +34,7 @@ module.exports = {
         {
           chain_id: 'ion',
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -51,7 +51,7 @@ module.exports = {
         {
           id: 'ion',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkUpdate(
@@ -64,7 +64,7 @@ module.exports = {
         {
           chain: 'ion',
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

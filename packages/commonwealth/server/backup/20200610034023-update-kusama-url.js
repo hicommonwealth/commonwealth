@@ -10,7 +10,7 @@ module.exports = {
         },
         {
           url: 'wss://mainnet2.edgewa.re',
-        }
+        },
       );
     });
   },
@@ -24,7 +24,7 @@ module.exports = {
         },
         {
           url: 'ws://mainnet2.edgewa.re:9944',
-        }
+        },
       );
     });
   },

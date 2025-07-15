@@ -13,7 +13,7 @@ module.exports = {
         },
         {
           transaction: t,
-        }
+        },
       );
 
       await queryInterface.bulkDelete(
@@ -21,7 +21,7 @@ module.exports = {
         {
           id: 1285,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

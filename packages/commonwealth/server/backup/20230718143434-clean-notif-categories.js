@@ -11,7 +11,7 @@ module.exports = {
             WHERE category_id = 'new-chat-mention'
         );
       `,
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.sequelize.query(
@@ -20,7 +20,7 @@ module.exports = {
             USING subs_ids_to_delete ND
         WHERE NR.subscription_id = ND.id;
       `,
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.sequelize.query(
@@ -29,7 +29,7 @@ module.exports = {
             USING subs_ids_to_delete ND
         WHERE S.id = ND.id;
       `,
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkDelete(
@@ -37,7 +37,7 @@ module.exports = {
         {
           category_id: 'new-chat-mention',
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkDelete(
@@ -52,7 +52,7 @@ module.exports = {
             ],
           },
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

@@ -88,7 +88,7 @@ module.exports = {
         'SELECT id, body FROM "OffchainThreads";',
         {
           transaction: t,
-        }
+        },
       );
       console.log(threads[0].length);
       await Promise.all(
@@ -97,7 +97,7 @@ module.exports = {
           const plaintext = (() => {
             try {
               return renderQuillDeltaToText(
-                JSON.parse(decodeURIComponent(thread.body))
+                JSON.parse(decodeURIComponent(thread.body)),
               );
             } catch (e) {
               return decodeURIComponent(thread.body);
@@ -110,9 +110,9 @@ module.exports = {
               replacements: { id, plaintext },
               type: queryInterface.sequelize.QueryTypes.UPDATE,
             },
-            { transaction: t }
+            { transaction: t },
           );
-        })
+        }),
       );
 
       console.log('Populating OffchainComments plaintext');
@@ -120,7 +120,7 @@ module.exports = {
         'SELECT id, text FROM "OffchainComments";',
         {
           transaction: t,
-        }
+        },
       );
       console.log(comments[0].length);
       await Promise.all(
@@ -129,7 +129,7 @@ module.exports = {
           const plaintext = (() => {
             try {
               return renderQuillDeltaToText(
-                JSON.parse(decodeURIComponent(comment.text))
+                JSON.parse(decodeURIComponent(comment.text)),
               );
             } catch (e) {
               return decodeURIComponent(comment.text);
@@ -142,9 +142,9 @@ module.exports = {
               replacements: { id, plaintext },
               type: queryInterface.sequelize.QueryTypes.UPDATE,
             },
-            { transaction: t }
+            { transaction: t },
           );
-        })
+        }),
       );
     });
   },

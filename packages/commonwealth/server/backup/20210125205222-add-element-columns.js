@@ -7,19 +7,19 @@ module.exports = {
         'OffchainCommunities',
         'element',
         { type: Sequelize.STRING, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Chains',
         'element',
         { type: Sequelize.STRING, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.renameColumn(
         'OffchainCommunities',
         'chat',
         'discord',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.renameColumn('Chains', 'chat', 'discord', {
         transaction: t,
@@ -39,7 +39,7 @@ module.exports = {
         'OffchainCommunities',
         'discord',
         'chat',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.renameColumn('Chains', 'discord', 'chat', {
         transaction: t,

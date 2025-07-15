@@ -54,7 +54,7 @@ module.exports = {
         event_name,
       });
       const kusamaObjs = Object.values(SubstrateEventKinds).map((s) =>
-        buildObject(s, 'kusama')
+        buildObject(s, 'kusama'),
       );
 
       // TODO: somehow switch this on for testing purposes?
@@ -71,7 +71,7 @@ module.exports = {
         {
           chain: 'kusama',
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

@@ -10,7 +10,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'ChainNodes',
@@ -19,7 +19,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'ChainNodes',
@@ -28,34 +28,34 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // populate balance_types
       // first, set everything to cosmos
       await queryInterface.sequelize.query(
         `UPDATE "ChainNodes" SET balance_type='cosmos';`,
-        { transaction: t }
+        { transaction: t },
       );
       // set solana nodes
       await queryInterface.sequelize.query(
         `UPDATE "ChainNodes" SET balance_type='solana' WHERE url = 'devnet' OR url = 'mainnet-beta' OR url = 'testnet';`,
-        { transaction: t }
+        { transaction: t },
       );
       // set eth nodes
       await queryInterface.sequelize.query(
         `UPDATE "ChainNodes" SET balance_type='ethereum' WHERE eth_chain_id IS NOT NULL;`,
-        { transaction: t }
+        { transaction: t },
       );
       // special case for axie
       await queryInterface.sequelize.query(
         `UPDATE "ChainNodes" SET balance_type='terra' WHERE id = (SELECT chain_node_id FROM "Chains" WHERE "Chains".id = 'axie-infinity');`,
-        { transaction: t }
+        { transaction: t },
       );
       // special case for terra
       await queryInterface.sequelize.query(
         `UPDATE "ChainNodes" SET balance_type='terra' WHERE id = (SELECT chain_node_id FROM "Chains" WHERE "Chains".id = 'terra');`,
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

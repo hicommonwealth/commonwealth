@@ -9,7 +9,7 @@ module.exports = {
           alt_wallet_url = 'https://rest.cosmos.directory/osmosis'
       WHERE url = 'https://rpc.osmosis.zone:443';
       `,
-      { raw: true }
+      { raw: true },
     );
   },
 
@@ -21,7 +21,7 @@ module.exports = {
           alt_wallet_url = 'https://lcd-osmosis.blockapsis.com'
       WHERE url = 'https://rpc.cosmos.directory/osmosis';
       `,
-      { raw: true }
+      { raw: true },
     );
-  }
+  },
 };

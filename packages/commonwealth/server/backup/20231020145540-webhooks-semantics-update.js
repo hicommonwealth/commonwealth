@@ -9,7 +9,7 @@ module.exports = {
         'community_id',
         {
           transaction,
-        }
+        },
       );
       // remove webhooks that aren't associated with any community
       await queryInterface.sequelize.query(
@@ -21,7 +21,7 @@ module.exports = {
             WHERE C.id = W.community_id
         );
       `,
-        { transaction }
+        { transaction },
       );
       await queryInterface.addConstraint('Webhooks', {
         type: 'FOREIGN KEY',
@@ -41,7 +41,7 @@ module.exports = {
       await queryInterface.removeConstraint(
         'Posts',
         'Webhooks_community_id_fkey',
-        { transaction }
+        { transaction },
       );
       await queryInterface.renameColumn(
         'Webhooks',
@@ -49,7 +49,7 @@ module.exports = {
         'chain_id',
         {
           transaction,
-        }
+        },
       );
     });
   },

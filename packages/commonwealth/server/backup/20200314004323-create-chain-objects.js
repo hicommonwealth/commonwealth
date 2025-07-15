@@ -18,7 +18,7 @@ module.exports = {
           updated_at: { type: Sequelize.DATE, allowNull: false },
           deleted_at: Sequelize.DATE,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -46,7 +46,7 @@ module.exports = {
           updated_at: { type: Sequelize.DATE, allowNull: false },
           deleted_at: Sequelize.DATE,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -65,7 +65,7 @@ module.exports = {
           updated_at: { type: Sequelize.DATE, allowNull: false },
           deleted_at: Sequelize.DATE,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
 
@@ -73,34 +73,34 @@ module.exports = {
       await queryInterface.addIndex(
         'ChainObjectVersions',
         { fields: ['id'] },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addIndex(
         'ChainObjectVersions',
         { fields: ['chain'] },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addIndex(
         'ChainObjectQueries',
         { fields: ['id'] },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addIndex(
         'ChainObjectQueries',
         { fields: ['object_type', 'query_type'] },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addIndex(
         'ChainObjects',
         { fields: ['id'] },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addIndex(
         'ChainObjects',
         { fields: ['object_type', 'object_id'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
 

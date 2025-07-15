@@ -4,7 +4,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const notifications = await queryInterface.sequelize.query(
-      `SELECT * FROM "Notifications";`
+      `SELECT * FROM "Notifications";`,
     );
     await Promise.all(
       notifications[0].map(async (notif) => {
@@ -19,7 +19,7 @@ module.exports = {
           const root = data.object_id || data.root_id;
           if (!root) {
             console.error(
-              `Comment without object_id or root_id: ${data.comment_id}`
+              `Comment without object_id or root_id: ${data.comment_id}`,
             );
             return;
           }
@@ -37,16 +37,16 @@ module.exports = {
         // Escape JSON single quotemarks by doubling
         data = JSON.stringify(data).replace(/'/g, `''`);
         const query = `UPDATE "Notifications" SET notification_data='${data}' WHERE id=${Number(
-          notif.id
+          notif.id,
         )};`;
         await queryInterface.sequelize.query(query);
-      })
+      }),
     );
   },
 
   down: async (queryInterface, Sequelize) => {
     const notifications = await queryInterface.sequelize.query(
-      `SELECT * FROM "Notifications";`
+      `SELECT * FROM "Notifications";`,
     );
     await Promise.all(
       notifications[0].map(async (notif) => {
@@ -67,10 +67,10 @@ module.exports = {
         delete data.root_type;
         data = JSON.stringify(data).replace(/'/g, `''`);
         const query = `UPDATE "Notifications" SET notification_data = '${data}' WHERE id=${Number(
-          notif.id
+          notif.id,
         )};`;
         await queryInterface.sequelize.query(query);
-      })
+      }),
     );
   },
 };

@@ -76,7 +76,7 @@ module.exports = {
         SET alt_wallet_url = 'https://rest.cosmos.directory/evmos'
         WHERE name = 'Evmos';
         `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
     });
   },
@@ -100,7 +100,7 @@ module.exports = {
         SET alt_wallet_url = ''
         WHERE alt_wallet_url = 'https://rest.cosmos.directory/evmos';
       `,
-        { raw: true, transaction: t }
+        { raw: true, transaction: t },
       );
     });
   },

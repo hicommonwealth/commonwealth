@@ -14,7 +14,7 @@ module.exports = {
         {
           transaction: t,
           isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE,
-        }
+        },
       );
       await queryInterface.addColumn(
         'Addresses',
@@ -27,7 +27,7 @@ module.exports = {
         {
           transaction: t,
           isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE,
-        }
+        },
       );
 
       // Add roles to Addresses from Roles table
@@ -40,7 +40,7 @@ module.exports = {
           type: queryInterface.sequelize.QueryTypes.SELECT,
           transaction: t,
           isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE,
-        }
+        },
       );
 
       const roles = roleInfo.filter((r) => r.name !== 'member');
@@ -57,7 +57,7 @@ module.exports = {
             ${ids
               .map(
                 (id, index) =>
-                  `WHEN id = ${id} THEN '${permissions[index]}'::"enum_Addresses_role"`
+                  `WHEN id = ${id} THEN '${permissions[index]}'::"enum_Addresses_role"`,
               )
               .join(' ')}
         END
@@ -66,7 +66,7 @@ module.exports = {
           {
             transaction: t,
             isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE,
-          }
+          },
         );
 
         const isUserDefault = roleInfo.filter((r) => r.is_user_default);
@@ -82,7 +82,7 @@ module.exports = {
           {
             transaction: t,
             isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE,
-          }
+          },
         );
       }
     });

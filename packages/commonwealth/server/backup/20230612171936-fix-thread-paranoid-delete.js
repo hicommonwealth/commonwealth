@@ -11,7 +11,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Making "address_id" nullable in "Threads"
@@ -22,17 +22,17 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Dropping old foreign key constraint and Adding new one with "ON UPDATE CASCADE ON DELETE SET NULL"
       await queryInterface.sequelize.query(
         `ALTER TABLE "Threads" DROP CONSTRAINT "OffchainThreads_author_id_fkey"`,
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `ALTER TABLE "Threads" ADD CONSTRAINT "OffchainThreads_author_id_fkey" FOREIGN KEY ("address_id") REFERENCES "Addresses"(id) ON UPDATE CASCADE ON DELETE SET NULL`,
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -42,7 +42,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Making "address_id" nullable in "Threads"
@@ -53,21 +53,21 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Dropping old foreign key constraint and Adding new one with "ON UPDATE CASCADE ON DELETE SET NULL"
       await queryInterface.sequelize.query(
         `ALTER TABLE "Comments" DROP CONSTRAINT "Comments_address_id_fkey"`,
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `ALTER TABLE "Comments" DROP CONSTRAINT "Comments_chain_fkey"`,
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `ALTER TABLE "Comments" ADD CONSTRAINT "Comments_address_id_fkey" FOREIGN KEY ("address_id") REFERENCES "Addresses"(id) ON UPDATE CASCADE ON DELETE SET NULL`,
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -77,11 +77,11 @@ module.exports = {
       // Reverting to old foreign key constraint
       await queryInterface.sequelize.query(
         `ALTER TABLE "Threads" DROP CONSTRAINT "OffchainThreads_author_id_fkey"`,
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `ALTER TABLE "Threads" ADD CONSTRAINT "OffchainThreads_author_id_fkey" FOREIGN KEY ("address_id") REFERENCES "Addresses"(id)`,
-        { transaction: t }
+        { transaction: t },
       );
 
       // Reverting "address_id" to not nullable
@@ -92,7 +92,7 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: false,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Removing "created_by" column from "Threads"
@@ -102,15 +102,15 @@ module.exports = {
 
       await queryInterface.sequelize.query(
         `ALTER TABLE "Comments" DROP CONSTRAINT "Comments_address_id_fkey"`,
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `ALTER TABLE "Comments" ADD CONSTRAINT "Comments_address_id_fkey" FOREIGN KEY ("address_id") REFERENCES "Addresses"(id)`,
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `ALTER TABLE "Comments" ADD CONSTRAINT "Comments_chain_fkey" FOREIGN KEY ("chain") REFERENCES "Chains"(id)`,
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.changeColumn(
@@ -120,7 +120,7 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: false,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // Removing "created_by" column from "Threads"

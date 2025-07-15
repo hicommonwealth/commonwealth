@@ -23,7 +23,7 @@ module.exports = {
           { fields: ['address_id'] },
           { fields: ['offchain_community_id'] },
         ],
-      }
+      },
     );
   },
 

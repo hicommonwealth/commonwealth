@@ -6,12 +6,12 @@ module.exports = {
       await queryInterface.renameColumn(
         'Chains',
         'additionalStages',
-        'customStages'
+        'customStages',
       );
       await queryInterface.renameColumn(
         'OffchainCommunities',
         'additionalStages',
-        'customStages'
+        'customStages',
       );
     });
   },
@@ -21,12 +21,12 @@ module.exports = {
       await queryInterface.renameColumn(
         'Chains',
         'customStages',
-        'additionalStages'
+        'additionalStages',
       );
       await queryInterface.renameColumn(
         'OffchainCommunities',
         'customStages',
-        'additionalStages'
+        'additionalStages',
       );
     });
   },

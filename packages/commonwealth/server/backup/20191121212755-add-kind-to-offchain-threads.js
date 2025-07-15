@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.addColumn(
       'OffchainThreads',
       'kind',
-      Sequelize.STRING
+      Sequelize.STRING,
     );
   },
 
@@ -13,7 +13,7 @@ module.exports = {
     return queryInterface.removeColumn(
       'OffchainThreads',
       'kind',
-      Sequelize.STRING
+      Sequelize.STRING,
     );
   },
 };

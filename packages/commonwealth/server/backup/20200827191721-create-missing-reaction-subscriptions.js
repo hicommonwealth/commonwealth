@@ -6,13 +6,13 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       const users = await queryInterface.sequelize.query(
         `SELECT * FROM "Users";`,
-        { transaction: t }
+        { transaction: t },
       );
       await Promise.all(
         users[0].map(async (user) => {
           const resSubs = await queryInterface.sequelize.query(
             `SELECT * FROM "Subscriptions" WHERE subscriber_id=${user.id} AND category_id IN ('new-comment-creation', 'new-reaction');`,
-            { transaction: t }
+            { transaction: t },
           );
           const subscriptions = resSubs[0];
 
@@ -20,7 +20,7 @@ module.exports = {
           while (subscriptions.length) {
             const subscription1 = subscriptions.splice(0, 1)[0];
             const subscription2 = subscriptions.findIndex(
-              (s) => s.object_id === subscription1.object_id
+              (s) => s.object_id === subscription1.object_id,
             );
             if (subscription2 === -1) {
               orphanedCommentSubscriptions.push(subscription1);
@@ -42,11 +42,11 @@ module.exports = {
                 }, ${s.offchain_thread_id || 'NULL'}, ${
                   s.offchain_comment_id || 'NULL'
                 }, NOW(), NOW());`,
-                { transaction: t }
+                { transaction: t },
               );
-            })
+            }),
           );
-        })
+        }),
       );
     });
   },

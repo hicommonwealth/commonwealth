@@ -27,7 +27,7 @@ module.exports = {
       {
         underscored: true,
         indexes: [{ fields: ['address_id'] }],
-      }
+      },
     );
   },
 

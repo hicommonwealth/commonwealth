@@ -8,7 +8,7 @@ module.exports = {
         'chain_event_type_id',
         {
           transaction: t,
-        }
+        },
       );
       await queryInterface.removeColumn('Subscriptions', 'chain_entity_id', {
         transaction: t,
@@ -24,7 +24,7 @@ module.exports = {
         {
           id: { type: Sequelize.STRING, primaryKey: true },
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Subscriptions',
@@ -34,7 +34,7 @@ module.exports = {
           allowNull: true,
           references: { model: 'ChainEventTypes', key: 'id' },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -45,7 +45,7 @@ module.exports = {
           allowNull: true,
           references: { model: 'ChainEntityMeta', key: 'id' },
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

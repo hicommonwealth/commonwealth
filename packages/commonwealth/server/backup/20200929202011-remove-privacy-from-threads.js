@@ -21,7 +21,7 @@ module.exports = {
         'OffchainThreads',
         'private',
         { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.createTable(
         'read_only_roles_threads',
@@ -31,7 +31,7 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.createTable(
         'private_threads_roles',
@@ -41,7 +41,7 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

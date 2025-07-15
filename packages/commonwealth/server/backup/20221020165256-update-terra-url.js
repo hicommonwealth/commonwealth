@@ -10,7 +10,7 @@ module.exports = {
       {
         raw: true,
         type: 'RAW',
-      }
+      },
     );
   },
 
@@ -23,7 +23,7 @@ module.exports = {
       {
         raw: true,
         type: 'RAW',
-      }
+      },
     );
   },
 };

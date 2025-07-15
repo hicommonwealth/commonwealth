@@ -7,19 +7,19 @@ module.exports = {
         'Users',
         'magicIssuer',
         { type: Sequelize.STRING, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Users',
         'lastMagicLoginAt',
         { type: Sequelize.INTEGER, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'Addresses',
         'is_magic',
         { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
-        { transaction: t }
+        { transaction: t },
       );
 
       // change default community chains to ethereum
@@ -27,7 +27,7 @@ module.exports = {
         'OffchainCommunities',
         { default_chain: 'ethereum' },
         { default_chain: 'edgeware' },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -47,7 +47,7 @@ module.exports = {
         'OffchainCommunities',
         { default_chain: 'edgeware' },
         { default_chain: 'ethereum' },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

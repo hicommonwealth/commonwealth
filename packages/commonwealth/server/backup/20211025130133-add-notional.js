@@ -19,7 +19,7 @@ module.exports = {
             has_chain_events_listener: true,
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.bulkInsert(
@@ -32,7 +32,7 @@ module.exports = {
             token_name: 'note', // for alpha/bravo
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -42,12 +42,12 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { chain: 'notional' },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.bulkDelete(
         'Chains',
         { id: 'notional' },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

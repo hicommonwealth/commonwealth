@@ -38,7 +38,7 @@ module.exports = {
           underscored: true,
           indexes: [{ fields: ['address'] }],
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -61,7 +61,7 @@ module.exports = {
           underscored: true,
           indexes: [{ fields: ['address'] }],
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -84,7 +84,7 @@ module.exports = {
           underscored: true,
           indexes: [{ fields: ['address'] }],
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

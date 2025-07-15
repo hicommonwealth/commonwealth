@@ -10,16 +10,16 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
-    })
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.removeColumn('Threads', 'archived_at', {
-        transaction
+        transaction,
       });
-    })
-  }
+    });
+  },
 };

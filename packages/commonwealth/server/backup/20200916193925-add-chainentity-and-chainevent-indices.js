@@ -26,7 +26,7 @@ module.exports = {
       return queryInterface.removeIndex(
         'ChainEntities',
         ['chain', 'completed'],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

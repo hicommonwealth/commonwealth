@@ -10,7 +10,7 @@ module.exports = {
         },
         {
           url: 'wss://mainnet1.edgewa.re',
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -19,7 +19,7 @@ module.exports = {
         },
         {
           url: 'wss://mainnet2.edgewa.re',
-        }
+        },
       );
     });
   },
@@ -33,7 +33,7 @@ module.exports = {
         },
         {
           url: 'ws://mainnet1.edgewa.re:9944',
-        }
+        },
       );
       await queryInterface.bulkUpdate(
         'ChainNodes',
@@ -42,7 +42,7 @@ module.exports = {
         },
         {
           url: 'ws://mainnet2.edgewa.re:9944',
-        }
+        },
       );
     });
   },

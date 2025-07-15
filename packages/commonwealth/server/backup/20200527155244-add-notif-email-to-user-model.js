@@ -4,7 +4,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     try {
       await queryInterface.sequelize.query(
-        'DROP TYPE "enum_Users_emailNotificationInterval";'
+        'DROP TYPE "enum_Users_emailNotificationInterval";',
       );
     } catch (e) {
       console.log('Dropped preexisting enum_Users_emailNotificationInterval');
@@ -21,7 +21,7 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn('Users', 'emailNotificationInterval');
     await queryInterface.sequelize.query(
-      'DROP TYPE "enum_Users_emailNotificationInterval";'
+      'DROP TYPE "enum_Users_emailNotificationInterval";',
     );
   },
 };

@@ -14,7 +14,7 @@ module.exports = {
         'NotificationsRead_subscription_id_fkey',
         {
           transaction: t,
-        }
+        },
       );
 
       await queryInterface.removeConstraint(
@@ -22,7 +22,7 @@ module.exports = {
         'NotificationsRead_notification_id_fkey',
         {
           transaction: t,
-        }
+        },
       );
     });
   },
@@ -32,7 +32,7 @@ module.exports = {
       await queryInterface.removeIndex(
         'Subscriptions',
         'subscriptions_subscriber_id',
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addConstraint('NotificationsRead', {

@@ -6,17 +6,17 @@ module.exports = {
       await queryInterface.addIndex(
         'ChainEntities',
         { fields: ['thread_id'] },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addIndex(
         'OffchainThreads',
         { fields: ['chain'] },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addIndex(
         'OffchainThreads',
         { fields: ['community'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -26,17 +26,17 @@ module.exports = {
       await queryInterface.removeIndex(
         'ChainEntities',
         'chain_entities_thread_id',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeIndex(
         'OffchainThreads',
         'offchain_threads_chain',
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeIndex(
         'OffchainThreads',
         'offchain_threads_community',
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

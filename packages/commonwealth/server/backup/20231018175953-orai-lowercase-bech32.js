@@ -13,7 +13,7 @@ module.exports = {
       ALTER TABLE "Chains"
       ADD CONSTRAINT "check_lowercase_bech32_prefix" CHECK (bech32_prefix = LOWER(bech32_prefix));
       `,
-      { raw: true }
+      { raw: true },
     );
   },
 
@@ -29,7 +29,7 @@ module.exports = {
       UPDATE "Chains" SET bech32_prefix = 'ODIN' WHERE bech32_prefix = 'odin';
       UPDATE "Chains" SET bech32_prefix = 'DYM' WHERE bech32_prefix = 'dym';
       `,
-      { raw: true }
+      { raw: true },
     );
   },
 };

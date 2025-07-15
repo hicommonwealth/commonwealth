@@ -6,7 +6,7 @@ module.exports = {
       // FIRST: if an address does not have a user_id, remove its profile_id
       await queryInterface.sequelize.query(
         `UPDATE "Addresses" SET profile_id = NULL WHERE user_id IS NULL;`,
-        { transaction }
+        { transaction },
       );
       // THEN, fix addresses by replacing their profile_id with the profile associated with their user_id
       // This is safe because we have a mandatory 1-to-1 User <> Profile mapping, (verify this beforehand:
@@ -20,7 +20,7 @@ module.exports = {
           ON a.user_id = p.user_id
           WHERE a.user_id IS NOT NULL AND a.profile_id != p.id;
         `,
-        { transaction }
+        { transaction },
       );
       if (addresses.length > 0) {
         const [, metadata] = await queryInterface.sequelize.query(
@@ -32,7 +32,7 @@ module.exports = {
             AND a.user_id = p.user_id
             AND a.id IN (${addresses.map((a) => a.id).join(',')});
         `,
-          { transaction }
+          { transaction },
         );
         console.log(`Update ${metadata.rowCount} Addresses to new profile_id.`);
       }

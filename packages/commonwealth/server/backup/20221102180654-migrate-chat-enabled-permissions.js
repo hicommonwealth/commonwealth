@@ -17,7 +17,7 @@ module.exports = {
       await queryInterface.sequelize.query(
         `UPDATE "Chains" SET "default_deny_permissions" = "default_deny_permissions" | ${view_chat_channels_permission} 
       WHERE "chat_enabled" = false;`,
-        { transaction: t }
+        { transaction: t },
       );
 
       // remove the chat_enabled column
@@ -50,14 +50,14 @@ module.exports = {
       await queryInterface.sequelize.query(
         `UPDATE "Chains" SET "chat_enabled" = false 
         WHERE "default_deny_permissions" & ${view_chat_channels_permission} = ${view_chat_channels_permission};`,
-        { transaction: t }
+        { transaction: t },
       );
 
       // remove the view_chat_channels bit from default_deny_permissions
       await queryInterface.sequelize.query(
         `UPDATE "Chains" 
         SET "default_deny_permissions" = "default_deny_permissions" & ~${view_chat_channels_permission};`,
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

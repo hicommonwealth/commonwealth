@@ -17,7 +17,7 @@ module.exports = {
                    CURRENT_TIMESTAMP                          as updated_at
             FROM "Chains";
         `,
-      { raw: true, type: 'RAW' }
+      { raw: true, type: 'RAW' },
     );
   },
 
@@ -28,7 +28,7 @@ module.exports = {
             FROM "ChatChannels"
             WHERE name = 'General';
         `,
-      { raw: true, type: 'RAW' }
+      { raw: true, type: 'RAW' },
     );
   },
 };

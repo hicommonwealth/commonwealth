@@ -25,7 +25,7 @@ module.exports = {
           underscored: true,
           indexes: [{ fields: ['chain_id'] }],
           transaction,
-        }
+        },
       );
     });
   },

@@ -5,7 +5,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const addresses = await queryInterface.sequelize.query(
-      `SELECT * FROM "OffchainProfiles" JOIN "Addresses" ON "address_id"="id"`
+      `SELECT * FROM "OffchainProfiles" JOIN "Addresses" ON "address_id"="id"`,
     );
     await queryInterface.addColumn('Addresses', 'name', {
       type: Sequelize.STRING,
@@ -17,7 +17,7 @@ module.exports = {
         const { name } = JSON.parse(data);
         const query = `UPDATE "Addresses" SET name='${name}' WHERE id='${id}'`;
         await queryInterface.sequelize.query(query);
-      })
+      }),
     );
   },
 

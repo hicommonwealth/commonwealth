@@ -37,7 +37,7 @@ module.exports = {
           underscored: true,
           paranoid: false,
           indexes: [{ fields: ['id'] }, { fields: ['chain', 'event_name'] }],
-        }
+        },
       );
 
       await queryInterface.addColumn(
@@ -51,7 +51,7 @@ module.exports = {
             key: 'id',
           },
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

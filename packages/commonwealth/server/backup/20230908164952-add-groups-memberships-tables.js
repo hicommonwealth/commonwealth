@@ -6,7 +6,11 @@ module.exports = {
       await queryInterface.createTable(
         'Groups',
         {
-          id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+          id: {
+            type: Sequelize.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+          },
           chain_id: {
             type: Sequelize.STRING,
             allowNull: false,
@@ -18,7 +22,7 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.createTable(
         'Memberships',
@@ -36,32 +40,32 @@ module.exports = {
           reject_reason: { type: Sequelize.STRING, allowNull: true },
           last_checked: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
-    })
+    });
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addIndex(
         'Groups',
         { fields: ['chain_id'] },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addIndex(
         'Memberships',
         { fields: ['group_id'] },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addIndex(
         'Memberships',
         { fields: ['address_id'] },
-        { transaction: t }
+        { transaction: t },
       );
-    })
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.dropTable('Memberships', { transaction: t })
-      await queryInterface.dropTable('Groups', { transaction: t })
-    })
-  }
+      await queryInterface.dropTable('Memberships', { transaction: t });
+      await queryInterface.dropTable('Groups', { transaction: t });
+    });
+  },
 };

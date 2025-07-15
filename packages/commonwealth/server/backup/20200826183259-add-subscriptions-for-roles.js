@@ -6,7 +6,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       const users = await queryInterface.sequelize.query(
         `SELECT * FROM "Users";`,
-        { transaction: t }
+        { transaction: t },
       );
 
       await Promise.all(
@@ -15,7 +15,7 @@ module.exports = {
           // Get all addresses for User
           const resAddresses = await queryInterface.sequelize.query(
             `SELECT * FROM "Addresses" WHERE user_id=${id};`,
-            { transaction: t }
+            { transaction: t },
           );
           const addresses = resAddresses[0];
           const addressIds = addresses.map((a) => a.id);
@@ -23,13 +23,13 @@ module.exports = {
           if (addressIds.length === 0) return;
           const addressRoles = await queryInterface.sequelize.query(
             `SELECT * FROM "Roles" WHERE address_id IN (${[...addressIds]});`,
-            { transaction: t }
+            { transaction: t },
           );
           const userRoles = addressRoles[0];
 
           // Get all user subscriptions
           const subscriptions = await queryInterface.sequelize.query(
-            `SELECT * FROM "Subscriptions" WHERE subscriber_id=${id};`
+            `SELECT * FROM "Subscriptions" WHERE subscriber_id=${id};`,
           );
           const existingSubscriptions = [];
           // Add subscriptions object_id to existingSubscriptions where not included already
@@ -65,9 +65,9 @@ module.exports = {
             communityIds.map(async (communityId) => {
               await queryInterface.sequelize.query(
                 `INSERT INTO "Subscriptions" (subscriber_id, category_id, object_id, chain_id, community_id, created_at, updated_at) VALUES (${id}, 'new-thread-creation', '${communityId}', NULL, '${communityId}', NOW(), NOW());`,
-                { transaction: t }
+                { transaction: t },
               );
-            })
+            }),
           );
 
           // For each chain where a user has a role but no subscription, add one.
@@ -75,11 +75,11 @@ module.exports = {
             chainIds.map(async (chainId) => {
               await queryInterface.sequelize.query(
                 `INSERT INTO "Subscriptions" (subscriber_id, category_id, object_id, chain_id, community_id, created_at, updated_at) VALUES (${id}, 'new-thread-creation', '${chainId}', '${chainId}', NULL, NOW(), NOW());`,
-                { transaction: t }
+                { transaction: t },
               );
-            })
+            }),
           );
-        })
+        }),
       );
     });
   },

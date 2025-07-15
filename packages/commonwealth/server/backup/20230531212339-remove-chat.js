@@ -29,7 +29,7 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // creates a composite unique constraint on name and community. This ensures that a community cannot have any chat
@@ -52,8 +52,8 @@ module.exports = {
             updated_at TIMESTAMP NOT NULL
         );
       `,
-        { type: 'RAW', raw: true, transaction: t }
+        { type: 'RAW', raw: true, transaction: t },
       );
     });
-  }
+  },
 };

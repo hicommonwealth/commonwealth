@@ -27,7 +27,7 @@ module.exports = {
             defaultValue: false,
           },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       // adds new column to map Addresses to the new Profiles object
@@ -35,7 +35,7 @@ module.exports = {
         'Addresses',
         'profile_id',
         { type: Sequelize.INTEGER, allowNull: true },
-        { transaction: t }
+        { transaction: t },
       );
 
       // creates a new Profile object for each User
@@ -52,7 +52,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction: t,
-        }
+        },
       );
 
       // creates a new Profile object for each User
@@ -66,7 +66,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction: t,
-        }
+        },
       );
     });
   },

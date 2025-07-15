@@ -13,7 +13,7 @@ module.exports = {
             updated_at: new Date(),
           },
         ],
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -25,7 +25,7 @@ module.exports = {
         {
           name: 'new-reaction',
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

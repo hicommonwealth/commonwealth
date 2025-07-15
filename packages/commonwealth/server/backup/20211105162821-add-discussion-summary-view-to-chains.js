@@ -10,7 +10,7 @@ module.exports = {
           type: Sequelize.BOOLEAN,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addColumn(
         'OffchainCommunities',
@@ -19,7 +19,7 @@ module.exports = {
           type: Sequelize.BOOLEAN,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -33,7 +33,7 @@ module.exports = {
           type: Sequelize.BOOLEAN,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.removeColumn(
         'OffchainCommunities',
@@ -42,7 +42,7 @@ module.exports = {
           type: Sequelize.BOOLEAN,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

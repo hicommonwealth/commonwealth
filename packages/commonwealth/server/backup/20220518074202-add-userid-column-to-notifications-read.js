@@ -10,7 +10,7 @@ module.exports = {
           type: Sequelize.INTEGER,
           references: { model: 'Users', key: 'id' },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.sequelize.query(
@@ -22,21 +22,21 @@ module.exports = {
         ) as B
         WHERE NR.subscription_id = B.id;
       `,
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.sequelize.query(
         `
         CREATE INDEX "NotificationsRead_user_index" ON "NotificationsRead"(user_id);
       `,
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "NotificationsRead" ALTER COLUMN user_id SET NOT NULL;
       `,
-        { transaction: t }
+        { transaction: t },
       );
     });
   },

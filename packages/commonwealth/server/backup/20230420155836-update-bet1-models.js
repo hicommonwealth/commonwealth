@@ -10,7 +10,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -20,7 +20,7 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -30,7 +30,7 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -40,7 +40,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -50,7 +50,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -61,7 +61,7 @@ module.exports = {
           allowNull: true,
           references: { model: 'Chains', key: 'id' },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -71,7 +71,7 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -81,7 +81,7 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: true,
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
   },
@@ -91,19 +91,19 @@ module.exports = {
       await queryInterface.removeColumn(
         'CommunityContractTemplateMetadata',
         'enabled_by',
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.removeColumn(
         'CommunityContractTemplateMetadata',
         'created_at',
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.removeColumn(
         'CommunityContractTemplateMetadata',
         'updated_at',
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.removeColumn('Template', 'created_at', {

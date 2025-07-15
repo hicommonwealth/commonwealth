@@ -21,7 +21,7 @@ module.exports = {
           { fields: ['chain', 'community', 'object_id'] },
           { fields: ['view_count'] },
         ],
-      }
+      },
     );
   },
 

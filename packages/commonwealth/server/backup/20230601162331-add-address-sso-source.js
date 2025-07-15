@@ -11,7 +11,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction }
+        { transaction },
       );
 
       // Magic linked wallets from before SSO are email-based
@@ -24,7 +24,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction,
-        }
+        },
       );
 
       // Magic linked wallets since then should be manually handled
@@ -37,7 +37,7 @@ module.exports = {
           raw: true,
           type: 'RAW',
           transaction,
-        }
+        },
       );
     });
   },

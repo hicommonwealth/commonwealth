@@ -16,7 +16,7 @@ module.exports = {
       },
       {
         underscored: true,
-      }
+      },
     );
 
     await queryInterface.bulkInsert('NotificationCategories', [
@@ -66,7 +66,7 @@ module.exports = {
           { fields: ['subscriber_id'] },
           { fields: ['category_id', 'object_id', 'is_active'] },
         ],
-      }
+      },
     );
 
     // initialize notifications
@@ -91,7 +91,7 @@ module.exports = {
       {
         underscored: true,
         indexes: [{ fields: ['subscription_id'] }],
-      }
+      },
     );
   },
 

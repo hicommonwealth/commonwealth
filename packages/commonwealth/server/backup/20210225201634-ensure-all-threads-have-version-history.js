@@ -14,7 +14,7 @@ module.exports = {
         try {
           const escapedStr = JSON.stringify(firstVersionObj).replace(
             /'/g,
-            "''"
+            "''",
           );
           return `UPDATE "OffchainThreads" SET version_history=ARRAY['${escapedStr}'] WHERE id='${thread.id}'`;
         } catch (e) {
@@ -28,7 +28,7 @@ module.exports = {
         if (insertQuery) {
           return queryInterface.sequelize.query(insertQuery);
         }
-      })
+      }),
     );
   },
 
