@@ -1,5 +1,7 @@
 import { delay } from '@hicommonwealth/shared';
-import path from 'path';
+import { execSync } from 'child_process';
+import { existsSync } from 'fs';
+import path, { join } from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { config } from '../config';
@@ -29,6 +31,24 @@ const verify_db = async (name: string): Promise<void> => {
     if (!+count) {
       await pg.query(`CREATE DATABASE ${name};`);
       console.log('Created new test db:', name);
+
+      // apply minimal dump
+      const schemaPath = join(__dirname, '../../assets/minimal_schema.sql');
+      if (existsSync(schemaPath)) {
+        execSync(
+          `psql -h localhost -U commonwealth -d ${name} -f "${schemaPath}"`,
+          {
+            stdio: 'inherit',
+            env: {
+              ...process.env,
+              PGPASSWORD: 'edgeware',
+            },
+          },
+        );
+        console.log(`Loaded minimal schema into ${name}`);
+      } else {
+        console.warn('Minimal schema file not found:', schemaPath);
+      }
     }
   } catch (error) {
     console.error(`<<<Error verifying ${name}>>>`, error);
@@ -48,7 +68,7 @@ const migrate_db = async (sequelize: Sequelize) => {
   const umzug = new Umzug({
     // TODO: move sequelize config and migrations to libs/model
     migrations: {
-      glob: path.resolve('../../packages/commonwealth/server/migrations/*.js'),
+      glob: path.resolve('../../migrations/*.js'),
       // migration resolver since we use v2 migration interface
       resolve: ({ name, path, context }) => {
         return {
