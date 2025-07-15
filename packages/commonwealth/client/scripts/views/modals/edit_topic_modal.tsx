@@ -18,10 +18,8 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { openConfirmation } from './confirmation_modal';
 
-import {
-  DISALLOWED_TOPIC_NAMES_REGEX,
-  GatedActionEnum,
-} from '@hicommonwealth/shared';
+import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
@@ -41,18 +39,13 @@ type EditTopicModalProps = {
   noRedirect?: boolean;
 };
 
-interface GroupTopic {
-  id: number;
-  is_private: boolean;
-  name?: string;
-  permissions?: GatedActionEnum[];
-}
-
 export const EditTopicModal = ({
   topic,
   onModalClose,
   noRedirect,
 }: EditTopicModalProps) => {
+  const privateTopicsEnabled = useFlag('privateTopics');
+
   const {
     description: descriptionProp,
     featured_in_sidebar: featuredInSidebarProp,
@@ -329,7 +322,7 @@ export const EditTopicModal = ({
           onChange={() => setIsPrivate(!isPrivate)}
           disabled={!!topic.archived_at}
         />
-        {isPrivate && (
+        {privateTopicsEnabled && isPrivate && (
           <CWSelectList
             isMulti
             label="Allowed groups"
