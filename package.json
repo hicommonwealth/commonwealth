@@ -23,7 +23,7 @@
     "lint-branch-warnings": "FAIL_WARNINGS=1 ./scripts/lint-branch.sh",
     "lint-diff": "chmod u+x scripts/lint-diff-branch.sh && ./scripts/lint-diff-branch.sh",
     "load-db": "pnpm -F commonwealth load-db",
-    "migrate-db": "pnpm -F commonwealth migrate-db",
+    "migrate-db": "pnpm -F model migrate-db",
     "prepare": "husky install",
     "psql": "pnpm -F commonwealth psql",
     "reset-db": "pnpm -F commonwealth reset-db",
