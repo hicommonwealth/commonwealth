@@ -259,6 +259,7 @@ export const GetTopicById = {
         z.object({
           id: z.number(),
           name: z.string().nullable(),
+          is_private: z.boolean(),
         }),
       )
       .optional(),
