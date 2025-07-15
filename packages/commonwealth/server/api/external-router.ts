@@ -4,6 +4,7 @@ import {
   Community,
   Contest,
   Feed,
+  Poll,
   Thread,
   Token,
   User,
@@ -24,6 +25,7 @@ import {
   apiKeyAuthMiddleware,
 } from './external-router-middleware';
 import * as launchpad from './launchpadToken';
+import * as poll from './poll';
 import * as thread from './thread';
 import * as user from './user';
 
@@ -69,6 +71,13 @@ const {
 const { createToken, createTrade, getLaunchpadTrades, getTokenInfoAlchemy } =
   launchpad.trpcRouter;
 const { launchTokenBot } = bot.trpcRouter;
+const {
+  createPoll,
+  deletePoll,
+  createPollVote,
+  getPolls,
+  getPollVotes,
+} = poll.trpcRouter;
 
 const api = {
   getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
@@ -141,6 +150,11 @@ const api = {
   getTokenInfoAlchemy,
   getLaunchpadTrades,
   launchTokenBot,
+  createPoll,
+  deletePoll,
+  createPollVote,
+  getPolls,
+  getPollVotes,
 };
 
 const PATH = '/api/v1';
