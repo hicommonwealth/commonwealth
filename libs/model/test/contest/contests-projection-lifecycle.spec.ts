@@ -25,8 +25,6 @@ import { models } from '../../src/database';
 import { seed } from '../../src/tester';
 import { createEventRegistryChainNodes } from '../../src/utils';
 
-const { commonProtocol } = evm;
-
 describe('Contests projection lifecycle', () => {
   const actor: Actor = { user: { email: '' } };
   const namespace = 'test-namespace';
@@ -55,8 +53,8 @@ describe('Contests projection lifecycle', () => {
   const community_id = 'community-with-contests';
   const thread_id = 1;
   const thread_title = 'thread-in-contest';
-  const ticker = commonProtocol.Denominations.ETH;
-  const decimals = commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH];
+  const ticker = evm.Denominations.ETH;
+  const decimals = evm.WeiDecimals[evm.Denominations.ETH];
   const topic_id = 100;
 
   const getTokenAttributes = vi.spyOn(evm, 'getTokenAttributes');
