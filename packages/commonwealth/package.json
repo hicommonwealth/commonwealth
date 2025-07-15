@@ -45,7 +45,7 @@
     "migrate-db": "npx sequelize db:migrate",
     "migrate-db-down": "npx sequelize db:migrate:undo",
     "migrate-db-to-neon": "chmod u+x scripts/migrate-db-to-neon.sh && ./scripts/migrate-db-to-neon.sh",
-    "pre-deploy": "node ./build/scripts/pre-deploy.js",
+    "pre-deploy": "node --import=extensionless/register --enable-source-maps ./build/server/scripts/pre-deploy.js",
     "preview": "concurrently -p '{name}' -c red,green 'PORT=3000 pnpm run start' 'vite preview -c ./client/vite.config.ts'",
     "psql": "chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh",
     "publish-rmq-msg": "tsx ./scripts/publishRmqMessageScript.ts",
