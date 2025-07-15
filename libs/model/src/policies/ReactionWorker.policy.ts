@@ -208,6 +208,11 @@ export function ReactionWorker(): Policy<typeof inputs> {
           commentsProcessed++;
         }
 
+        // Set the finish timestamp
+        await topic.update({
+          recalculated_votes_finish: new Date(),
+        });
+
         log.info(
           `Completed weighted votes refresh for topic ${topic_id}: ` +
             `${threadsProcessed} threads, ${commentsProcessed} comments, ${reactionsProcessed} reactions processed`,

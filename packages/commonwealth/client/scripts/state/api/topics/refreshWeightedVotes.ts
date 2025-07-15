@@ -13,7 +13,7 @@ const useRefreshWeightedVotesMutation = () => {
         community_id: response.community_id,
       });
 
-      notifySuccess('Vote weights recalculated successfully');
+      notifySuccess('Vote weights recalculation completed successfully');
     },
     onError: (error) => {
       console.error('Failed to refresh weighted votes:', error);

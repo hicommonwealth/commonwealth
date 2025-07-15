@@ -48,6 +48,8 @@ interface TopicRowProps {
   onRecalculateVotes?: (topic: Topic) => void;
   recalculatingTopicId?: number | null;
   isRefreshingVotes?: boolean;
+  isRecalculationDisabled?: (topic: Topic) => boolean;
+  getLastRefreshText?: (topic: Topic) => string | null;
 }
 
 // eslint-disable-next-line react/no-multi-comp
@@ -60,7 +62,14 @@ const TopicRow = ({
   onRecalculateVotes,
   recalculatingTopicId,
   isRefreshingVotes,
+  isRecalculationDisabled,
+  getLastRefreshText,
 }: TopicRowProps) => {
+  const isDisabled = isRecalculationDisabled
+    ? isRecalculationDisabled(item)
+    : false;
+  const lastRefreshText = getLastRefreshText ? getLastRefreshText(item) : null;
+
   return (
     <div
       {...provided.draggableProps}
@@ -87,17 +96,28 @@ const TopicRow = ({
           {hasWeightedVoting &&
             onRecalculateVotes &&
             hasWeightedVoting(item) && (
-              <CWButton
-                label="Recalculate Votes"
-                buttonType="secondary"
-                buttonHeight="sm"
-                buttonWidth="narrow"
-                disabled={recalculatingTopicId === item.id || isRefreshingVotes}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRecalculateVotes(item);
-                }}
-              />
+              <div className="recalculate-votes-section">
+                <CWButton
+                  label="Recalculate Votes"
+                  buttonType="secondary"
+                  buttonHeight="sm"
+                  buttonWidth="narrow"
+                  disabled={
+                    recalculatingTopicId === item.id ||
+                    isRefreshingVotes ||
+                    isDisabled
+                  }
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRecalculateVotes(item);
+                  }}
+                />
+                {lastRefreshText && (
+                  <CWText type="caption" className="last-refresh-text">
+                    {lastRefreshText}
+                  </CWText>
+                )}
+              </div>
             )}
         </div>
       </CWText>
@@ -115,6 +135,8 @@ interface DraggableTopicsListProps {
   onRecalculateVotes?: (topic: Topic) => void;
   recalculatingTopicId?: number | null;
   isRefreshingVotes?: boolean;
+  isRecalculationDisabled?: (topic: Topic) => boolean;
+  getLastRefreshText?: (topic: Topic) => string | null;
 }
 
 // eslint-disable-next-line react/no-multi-comp
@@ -126,6 +148,8 @@ const DraggableTopicsList = ({
   onRecalculateVotes,
   recalculatingTopicId,
   isRefreshingVotes,
+  isRecalculationDisabled,
+  getLastRefreshText,
 }: DraggableTopicsListProps) => {
   const onDragEnd = (result) => {
     if (!result.destination) {
@@ -155,6 +179,8 @@ const DraggableTopicsList = ({
             onRecalculateVotes={onRecalculateVotes}
             recalculatingTopicId={recalculatingTopicId}
             isRefreshingVotes={isRefreshingVotes}
+            isRecalculationDisabled={isRecalculationDisabled}
+            getLastRefreshText={getLastRefreshText}
           />
         )}
       >
@@ -183,6 +209,8 @@ const DraggableTopicsList = ({
                         onRecalculateVotes={onRecalculateVotes}
                         recalculatingTopicId={recalculatingTopicId}
                         isRefreshingVotes={isRefreshingVotes}
+                        isRecalculationDisabled={isRecalculationDisabled}
+                        getLastRefreshText={getLastRefreshText}
                       />
                     )}
                   </Draggable>

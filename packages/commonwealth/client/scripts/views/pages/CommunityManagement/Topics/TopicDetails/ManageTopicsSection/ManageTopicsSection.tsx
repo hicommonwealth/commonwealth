@@ -25,6 +25,60 @@ export const ManageTopicsSection = () => {
     return !!topic.weighted_voting;
   };
 
+  const isRecalculationDisabled = (topic: Topic): boolean => {
+    const now = new Date();
+    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+
+    // Check if a recalculation is currently in progress
+    if (topic.recalculated_votes_start && !topic.recalculated_votes_finish) {
+      return true;
+    }
+
+    // Check if the last recalculation was less than 5 minutes ago
+    if (
+      topic.recalculated_votes_start &&
+      new Date(topic.recalculated_votes_start) > fiveMinutesAgo
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const getLastRefreshText = (topic: Topic): string | null => {
+    if (!topic.recalculated_votes_finish) {
+      return null;
+    }
+
+    const finishTime = new Date(topic.recalculated_votes_finish);
+    const now = new Date();
+    const diffInMinutes = Math.floor(
+      (now.getTime() - finishTime.getTime()) / (1000 * 60),
+    );
+
+    if (diffInMinutes < 1) {
+      return 'Last refreshed less than a minute ago';
+    } else if (diffInMinutes === 1) {
+      return 'Last refreshed 1 minute ago';
+    } else if (diffInMinutes < 60) {
+      return `Last refreshed ${diffInMinutes} minutes ago`;
+    } else {
+      const diffInHours = Math.floor(diffInMinutes / 60);
+      if (diffInHours === 1) {
+        return 'Last refreshed 1 hour ago';
+      } else if (diffInHours < 24) {
+        return `Last refreshed ${diffInHours} hours ago`;
+      } else {
+        const diffInDays = Math.floor(diffInHours / 24);
+        if (diffInDays === 1) {
+          return 'Last refreshed 1 day ago';
+        } else {
+          return `Last refreshed ${diffInDays} days ago`;
+        }
+      }
+    }
+  };
+
   const getFeaturedTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
       .filter((topic) => topic.featured_in_sidebar && !topic.archived_at)
@@ -183,6 +237,8 @@ export const ManageTopicsSection = () => {
               onRecalculateVotes={handleRecalculateVotes}
               recalculatingTopicId={recalculatingTopicId}
               isRefreshingVotes={isRefreshingVotes}
+              isRecalculationDisabled={isRecalculationDisabled}
+              getLastRefreshText={getLastRefreshText}
             />
           ) : (
             <CWText>No Topics to Reorder</CWText>
@@ -213,20 +269,31 @@ export const ManageTopicsSection = () => {
                         }}
                       />
                       {hasWeightedVoting(regTopic) && (
-                        <CWButton
-                          label="Recalculate Votes"
-                          buttonType="secondary"
-                          buttonHeight="sm"
-                          buttonWidth="narrow"
-                          disabled={
-                            recalculatingTopicId === regTopic.id ||
-                            isRefreshingVotes
-                          }
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRecalculateVotes(regTopic);
-                          }}
-                        />
+                        <div className="recalculate-votes-section">
+                          <CWButton
+                            label="Recalculate Votes"
+                            buttonType="secondary"
+                            buttonHeight="sm"
+                            buttonWidth="narrow"
+                            disabled={
+                              recalculatingTopicId === regTopic.id ||
+                              isRefreshingVotes ||
+                              isRecalculationDisabled(regTopic)
+                            }
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRecalculateVotes(regTopic);
+                            }}
+                          />
+                          {getLastRefreshText(regTopic) && (
+                            <CWText
+                              type="caption"
+                              className="last-refresh-text"
+                            >
+                              {getLastRefreshText(regTopic)}
+                            </CWText>
+                          )}
+                        </div>
                       )}
                     </div>
                   </CWText>
@@ -262,20 +329,31 @@ export const ManageTopicsSection = () => {
                         }}
                       />
                       {hasWeightedVoting(regTopic) && (
-                        <CWButton
-                          label="Recalculate Votes"
-                          buttonType="secondary"
-                          buttonHeight="sm"
-                          buttonWidth="narrow"
-                          disabled={
-                            recalculatingTopicId === regTopic.id ||
-                            isRefreshingVotes
-                          }
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRecalculateVotes(regTopic);
-                          }}
-                        />
+                        <div className="recalculate-votes-section">
+                          <CWButton
+                            label="Recalculate Votes"
+                            buttonType="secondary"
+                            buttonHeight="sm"
+                            buttonWidth="narrow"
+                            disabled={
+                              recalculatingTopicId === regTopic.id ||
+                              isRefreshingVotes ||
+                              isRecalculationDisabled(regTopic)
+                            }
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRecalculateVotes(regTopic);
+                            }}
+                          />
+                          {getLastRefreshText(regTopic) && (
+                            <CWText
+                              type="caption"
+                              className="last-refresh-text"
+                            >
+                              {getLastRefreshText(regTopic)}
+                            </CWText>
+                          )}
+                        </div>
                       )}
                     </div>
                   </CWText>
