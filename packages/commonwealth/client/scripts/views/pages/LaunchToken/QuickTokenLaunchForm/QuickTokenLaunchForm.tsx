@@ -140,7 +140,6 @@ export const QuickTokenLaunchForm = ({
   const ethFee = estimatedPrice
     ? fromWei(estimatedPrice.toString(), 'ether')
     : null;
-  console.log('estimatedPrice => ', estimatedPrice);
 
   const { mutateAsync: createToken } = useCreateTokenMutation();
 
@@ -507,7 +506,7 @@ export const QuickTokenLaunchForm = ({
               />
               <CWBanner
                 type="info"
-                body={`aunching your token on BASE requires a small amount of BASE ETH to cover gas fees.
+                body={`Launching your token on BASE requires a small amount of BASE ETH to cover gas fees.
                       ${ethFee ? `Estimated fee: ${ethFee} BASE ETH.` : ''}`}
               />
               <div className="cta-elements">
