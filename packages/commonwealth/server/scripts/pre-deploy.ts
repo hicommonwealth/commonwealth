@@ -27,11 +27,20 @@ if (!RAILWAY_GIT_COMMIT_SHA || !RELEASER_URL || !RELEASER_API_KEY) {
       },
       body: JSON.stringify({ commitSha: RAILWAY_GIT_COMMIT_SHA }),
     });
+    const json = await response.json();
 
     if (response.status === 200) {
-      console.log('Release queued successfully');
+      console.log(json);
     } else if (response.status === 202) {
-      console.log('Release is already queued');
+      if (['failed', 'timeout'].includes(json.release.release_status)) {
+        console.error(`Release already failed. Exiting...`, json.release);
+        process.exit(1);
+      } else if (json.release.release_status === 'success') {
+        console.log('Release already executed successfully.', json.release);
+        process.exit(0);
+      } else {
+        console.log(json);
+      }
     } else {
       console.error(`Failed to queue release. Status: ${response.status}`);
       process.exit(1);
