@@ -236,11 +236,11 @@ let db: DB | undefined = undefined;
  * Creates a clean model if it doesn't exist
  * @returns synchronized and truncated sequelize db instance
  */
-export async function bootstrap_testing(): Promise<DB> {
+export async function bootstrap_testing(applyDump = false): Promise<DB> {
   if (!db) {
     const db_name = config.DB.NAME;
     try {
-      await verify_db(db_name);
+      await verify_db(db_name, applyDump);
       db = buildDb(
         new Sequelize({
           dialect: 'postgres',
