@@ -21,6 +21,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
+import { fetchGroupById } from 'state/api/groups/fetchGroupById';
 import { useCreateTopicMutation } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 
@@ -205,20 +206,37 @@ export const Topics = () => {
       console.log('test selectedGroups', selectedGroups);
 
       for (const groupId of selectedGroups) {
-        const group = groupList.find((g) => g.id === groupId);
-        if (!group) continue;
-        const updatedTopics = [
-          ...(group.topics || []),
+        const latestGroups = await fetchGroupById(groupId);
+        const latestGroup = latestGroups?.[0];
+        const existingTopics = (latestGroup?.topics || [])
+          .filter((t) => typeof t.id === 'number')
+          .map((t) => ({
+            id: t.id as number,
+            is_private: t.is_private,
+            name: t.name,
+            permissions: t.permissions,
+          }));
+        const mergedTopics = [
+          ...existingTopics.filter((t) => t.id !== newTopicId),
           { id: newTopicId, is_private: true, name: topicFormData.name },
         ];
         await editGroup({
           community_id: app.activeChainId() || '',
           group_id: groupId,
-          topics: updatedTopics.map((t) => ({
-            id: t.id,
-            is_private: true,
-            permissions: Object.values(GatedActionEnum),
-          })),
+          topics: mergedTopics
+            .filter((t) => typeof t.id === 'number')
+            .map((t) => {
+              const hasPermissions = Array.isArray(
+                (t as { permissions?: GatedActionEnum[] }).permissions,
+              );
+              return {
+                id: t.id as number,
+                is_private: t.is_private,
+                permissions: hasPermissions
+                  ? (t as { permissions: GatedActionEnum[] }).permissions
+                  : Object.values(GatedActionEnum),
+              };
+            }),
         });
       }
 
