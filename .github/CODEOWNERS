@@ -11,13 +11,13 @@
 
 # Libs
 /libs/ @timolegros @Rotorsoft @kurtassad @rbennettcw
-/libs/sitemaps/ @burtonator
+/libs/sitemaps/ @kurtassad
 /libs/evm-testing/ @timolegros
 /libs/evm-protocols/ @timolegros
 
 # Packages
 /packages/commonwealth/ @timolegros @Rotorsoft @kurtassad @rbennettcw
-/packages/commonwealth/client @mzparacha @masvelio @burtonator
+/packages/commonwealth/client @mzparacha @masvelio
 /packages/commonwealth/load-testing/ @timolegros
 
 # WARNING: this disables code owners so it MUST be paired with code review limits to prevent approvals of PRs by GitHub

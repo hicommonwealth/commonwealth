@@ -1,5 +1,6 @@
 import { dispose, logger } from '@hicommonwealth/core';
-import { UserInstance, models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { UserInstance } from '@hicommonwealth/model/models';
 
 const log = logger(import.meta);
 

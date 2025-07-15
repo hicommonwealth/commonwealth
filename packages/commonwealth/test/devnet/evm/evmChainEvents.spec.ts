@@ -13,14 +13,15 @@ import {
   mineBlocks,
 } from '@hicommonwealth/evm-testing';
 import {
-  ChainNodeInstance,
-  EvmChainSource,
-  LastProcessedEvmBlockInstance,
-  Log,
   createEventRegistryChainNodes,
   equalEvmAddresses,
-  models,
 } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import {
+  ChainNodeInstance,
+  LastProcessedEvmBlockInstance,
+} from '@hicommonwealth/model/models';
+import { EvmChainSource, Log } from '@hicommonwealth/model/services';
 import { EventPair, events as eventSchemas } from '@hicommonwealth/schemas';
 import { Anvil } from '@viem/anvil';
 import { Op } from 'sequelize';

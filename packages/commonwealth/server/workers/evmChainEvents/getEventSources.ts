@@ -4,13 +4,13 @@ import {
   EventRegistry,
   commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
-import {
+import { buildChainNodeUrl } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import type {
   EvmContractSources,
   EvmEventSource,
   EvmSources,
-  buildChainNodeUrl,
-  models,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/services';
 import { getAddress } from 'viem';
 import { config } from '../../config';
 

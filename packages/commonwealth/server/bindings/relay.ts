@@ -1,5 +1,5 @@
 import { Broker, logger, stats } from '@hicommonwealth/core';
-import type { DB } from '@hicommonwealth/model';
+import type { DB } from '@hicommonwealth/model/models';
 import { Outbox } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';

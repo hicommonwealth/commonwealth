@@ -14,7 +14,7 @@ import {
   GetCommunityStake,
   SetCommunityStake,
 } from '../../src/aggregates/community';
-import { commonProtocol } from '../../src/services';
+import { communityStakeConfigValidator } from '../../src/services/commonProtocol';
 import { seed } from '../../src/tester';
 
 describe('Stake lifecycle', () => {
@@ -98,7 +98,7 @@ describe('Stake lifecycle', () => {
     };
 
     vi.spyOn(
-      commonProtocol.communityStakeConfigValidator,
+      communityStakeConfigValidator,
       'validateCommunityStakeConfig',
     ).mockImplementation((c) => {
       if (!c.namespace) throw new AppError('No namespace');

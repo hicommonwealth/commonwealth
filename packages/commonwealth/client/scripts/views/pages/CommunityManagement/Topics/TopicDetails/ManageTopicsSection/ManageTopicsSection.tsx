@@ -128,7 +128,7 @@ export const ManageTopicsSection = () => {
       await updateFeaturedTopicsOrder(
         updateFeaturedTopicsOrderPayload({ featuredTopics }),
       );
-      notifySuccess('Topic order updated!');
+      notifySuccess('Settings saved.');
     } catch (err) {
       notifyError('Failed to update topic order');
     }

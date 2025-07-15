@@ -1,10 +1,8 @@
 import { command, dispose, query } from '@hicommonwealth/core';
-import {
-  commonProtocol,
-  Community,
-  models,
-  type UserInstance,
-} from '@hicommonwealth/model';
+import { Community } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { UserInstance } from '@hicommonwealth/model/models';
+import { communityStakeConfigValidator } from '@hicommonwealth/model/protocol';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
@@ -105,7 +103,7 @@ describe('POST communityStakes Tests', () => {
       },
     });
     expect(community).not.toBeNull();
-    await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
+    await communityStakeConfigValidator.validateCommunityStakeConfig(
       community!,
       2,
     );

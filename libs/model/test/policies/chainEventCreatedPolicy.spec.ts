@@ -1,11 +1,13 @@
 import { EventContext, dispose } from '@hicommonwealth/core';
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { createTestRpc, models, tester } from '@hicommonwealth/model';
 import { Community } from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
+import { models } from '../../src/database';
 import { handleCommunityStakeTrades } from '../../src/policies/handlers/handleCommunityStakeTrades';
+import * as tester from '../../src/tester';
+import { createTestRpc } from '../../src/utils';
 
 // These are all values for a real txn on the Ethereum Sepolia Testnet
 const transactionHash =

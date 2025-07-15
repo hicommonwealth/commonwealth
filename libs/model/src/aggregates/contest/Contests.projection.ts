@@ -9,7 +9,6 @@ import {
   getTokenAttributes,
   getTransaction,
 } from '@hicommonwealth/evm-protocols';
-import { config } from '@hicommonwealth/model';
 import { TopicWeightedVoting, events } from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
@@ -24,6 +23,7 @@ import {
 import { QueryTypes } from 'sequelize';
 import { privateKeyToAccount } from 'viem/accounts';
 import { z } from 'zod';
+import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { EvmEventSourceAttributes } from '../../models';

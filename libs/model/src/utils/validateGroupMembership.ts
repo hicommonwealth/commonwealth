@@ -9,7 +9,7 @@ import {
 import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
 import { toBigInt } from 'web3-utils';
 import { z } from 'zod';
-import type { OptionsWithBalances } from '../services';
+import type { OptionsWithBalances } from '../services/tokenBalanceCache/types';
 
 type AllowlistData = z.infer<typeof AllowlistData>;
 type ThresholdData = z.infer<typeof ThresholdData>;

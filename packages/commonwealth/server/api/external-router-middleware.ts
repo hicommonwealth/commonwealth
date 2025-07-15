@@ -1,6 +1,7 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { AppError, cache, CacheNamespaces, logger } from '@hicommonwealth/core';
-import { getSaltedApiKeyHash, models } from '@hicommonwealth/model';
+import { getSaltedApiKeyHash } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { User } from '@hicommonwealth/schemas';
 import { NextFunction, Request, Response } from 'express';
 import { rateLimit } from 'express-rate-limit';

@@ -6,7 +6,9 @@ import type {
   Signature,
 } from '@canvas-js/interfaces';
 import { dispose, query } from '@hicommonwealth/core';
-import { Thread, ThreadAttributes, models } from '@hicommonwealth/model';
+import { Thread } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { ThreadAttributes } from '@hicommonwealth/model/models';
 import { LinkSource } from '@hicommonwealth/shared';
 import jwt from 'jsonwebtoken';
 import { config } from 'server/config';

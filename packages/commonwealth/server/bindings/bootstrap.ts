@@ -9,7 +9,8 @@ import {
   handleEvent,
   logger,
 } from '@hicommonwealth/core';
-import { ContestWorker, models } from '@hicommonwealth/model';
+import { ContestWorker } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { Client } from 'pg';
 import { config } from 'server/config';
 import { setupListener } from './pgListener';

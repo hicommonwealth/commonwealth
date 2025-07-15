@@ -3,7 +3,7 @@ import {
   checkCommunityStakeWhitelist,
   commonProtocol,
 } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
+import { models } from '../../database';
 import { CommunityAttributes } from '../../models/community';
 
 export const validateCommunityStakeConfig = async (
