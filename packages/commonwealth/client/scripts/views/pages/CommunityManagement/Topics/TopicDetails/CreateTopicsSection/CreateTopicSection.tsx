@@ -1,3 +1,4 @@
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { DeltaStatic } from 'quill';
@@ -36,6 +37,8 @@ export const CreateTopicSection = ({
   onGroupsSelected,
   topicFormData,
 }: CreateTopicSectionProps) => {
+  const privateTopicsEnabled = useFlag('privateTopics');
+
   const communityId = app.activeChainId() || '';
   const { data: topics } = useFetchTopicsQuery({
     communityId: communityId,
@@ -235,12 +238,14 @@ export const CreateTopicSection = ({
               />
             )}
           </div>
-          <CWCheckbox
-            label="Private topic"
-            checked={isPrivate}
-            onChange={() => setIsPrivate(!isPrivate)}
-          />
-          {isPrivate && (
+          {privateTopicsEnabled && (
+            <CWCheckbox
+              label="Private topic"
+              checked={isPrivate}
+              onChange={() => setIsPrivate(!isPrivate)}
+            />
+          )}
+          {privateTopicsEnabled && isPrivate && (
             <CWSelectList
               isMulti
               label="Allowed groups"
