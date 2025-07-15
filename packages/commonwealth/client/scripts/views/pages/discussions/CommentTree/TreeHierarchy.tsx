@@ -45,6 +45,7 @@ export interface TreeHierarchyProps
       | StreamingReplyInstance[]
       | ((prevInstances: StreamingReplyInstance[]) => StreamingReplyInstance[]),
   ) => void;
+  autoLoadNestedParentLevelReplies?: Boolean;
 }
 
 type ExtendedCommentViewParams = CommentViewParams & {
@@ -81,6 +82,7 @@ export const TreeHierarchy = ({
   streamingInstances,
   setStreamingInstances,
   permissions,
+  autoLoadNestedParentLevelReplies,
 }: TreeHierarchyProps) => {
   const user = useUserStore();
   const communityId = app.activeChainId() || '';
@@ -91,7 +93,13 @@ export const TreeHierarchy = ({
   const isLoadingOlderMessagesRef = useRef(false);
   const previousCommentsLengthRef = useRef(0);
   const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
-  const [loadButtonClicked, setLoadButtonClicked] = useState(false);
+  const [loadButtonClicked, setLoadButtonClicked] = useState(
+    autoLoadNestedParentLevelReplies || false,
+  );
+  const [
+    _autoLoadNestedParentLevelReplies,
+    setAutoLoadNestedParentLevelReplies,
+  ] = useState(false);
   // do not load all children beyond 2nd level, allow 2nd level to be expanded, level starts from 0
   const shouldLoadWithBtnClick = parentComment && parentComment?.level >= 1;
 
@@ -145,6 +153,8 @@ export const TreeHierarchy = ({
         );
         return Promise.resolve();
       }
+
+      setAutoLoadNestedParentLevelReplies(true); // show the replies afterwards
 
       // If useDefaultModelOnly is true, only use the first selected model
       const modelsToUse = useDefaultModelOnly
@@ -442,6 +452,7 @@ export const TreeHierarchy = ({
             streamingInstances={streamingInstances}
             setStreamingInstances={setStreamingInstances}
             permissions={permissions}
+            autoLoadNestedParentLevelReplies={_autoLoadNestedParentLevelReplies}
           />
         )}
         {streamingInstances
