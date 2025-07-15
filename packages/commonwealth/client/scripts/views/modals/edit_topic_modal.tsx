@@ -316,12 +316,14 @@ export const EditTopicModal = ({
           value=""
           disabled={!!topic.archived_at}
         />
-        <CWCheckbox
-          label="Private topic"
-          checked={isPrivate}
-          onChange={() => setIsPrivate(!isPrivate)}
-          disabled={!!topic.archived_at}
-        />
+        {privateTopicsEnabled && (
+          <CWCheckbox
+            label="Private topic"
+            checked={isPrivate}
+            onChange={() => setIsPrivate(!isPrivate)}
+            disabled={!!topic.archived_at}
+          />
+        )}
         {privateTopicsEnabled && isPrivate && (
           <CWSelectList
             isMulti
