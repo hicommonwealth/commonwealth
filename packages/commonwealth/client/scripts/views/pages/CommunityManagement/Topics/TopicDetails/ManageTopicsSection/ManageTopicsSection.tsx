@@ -179,6 +179,10 @@ export const ManageTopicsSection = () => {
               topics={featuredTopics}
               setTopics={setFeaturedTopics}
               onEdit={setTopicSelectedToEdit}
+              hasWeightedVoting={hasWeightedVoting}
+              onRecalculateVotes={handleRecalculateVotes}
+              recalculatingTopicId={recalculatingTopicId}
+              isRefreshingVotes={isRefreshingVotes}
             />
           ) : (
             <CWText>No Topics to Reorder</CWText>

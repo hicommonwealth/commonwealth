@@ -5,6 +5,7 @@ import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import { Virtuoso } from 'react-virtuoso';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import type { Topic } from '../../../models/Topic';
 import CWIconButton from '../../components/component_kit/new_designs/CWIconButton';
 
@@ -43,10 +44,23 @@ interface TopicRowProps {
   item: Topic;
   isDragging: boolean;
   onEdit?: React.Dispatch<React.SetStateAction<Topic>>;
+  hasWeightedVoting?: (topic: Topic) => boolean;
+  onRecalculateVotes?: (topic: Topic) => void;
+  recalculatingTopicId?: number | null;
+  isRefreshingVotes?: boolean;
 }
 
 // eslint-disable-next-line react/no-multi-comp
-const TopicRow = ({ provided, item, isDragging, onEdit }: TopicRowProps) => {
+const TopicRow = ({
+  provided,
+  item,
+  isDragging,
+  onEdit,
+  hasWeightedVoting,
+  onRecalculateVotes,
+  recalculatingTopicId,
+  isRefreshingVotes,
+}: TopicRowProps) => {
   return (
     <div
       {...provided.draggableProps}
@@ -59,16 +73,33 @@ const TopicRow = ({ provided, item, isDragging, onEdit }: TopicRowProps) => {
     >
       <CWText>
         {item.name}
-        {onEdit && (
-          <CWIconButton
-            iconName="pencil"
-            buttonSize="sm"
-            onClick={async (e) => {
-              e.stopPropagation();
-              onEdit(item);
-            }}
-          />
-        )}
+        <div className="topic-actions">
+          {onEdit && (
+            <CWIconButton
+              iconName="pencil"
+              buttonSize="sm"
+              onClick={async (e) => {
+                e.stopPropagation();
+                onEdit(item);
+              }}
+            />
+          )}
+          {hasWeightedVoting &&
+            onRecalculateVotes &&
+            hasWeightedVoting(item) && (
+              <CWButton
+                label="Recalculate Votes"
+                buttonType="secondary"
+                buttonHeight="sm"
+                buttonWidth="narrow"
+                disabled={recalculatingTopicId === item.id || isRefreshingVotes}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRecalculateVotes(item);
+                }}
+              />
+            )}
+        </div>
       </CWText>
 
       <CWIcon iconName="hamburger" />
@@ -80,6 +111,10 @@ interface DraggableTopicsListProps {
   topics: Topic[];
   setTopics: React.Dispatch<React.SetStateAction<Topic[]>>;
   onEdit?: React.Dispatch<React.SetStateAction<Topic>>;
+  hasWeightedVoting?: (topic: Topic) => boolean;
+  onRecalculateVotes?: (topic: Topic) => void;
+  recalculatingTopicId?: number | null;
+  isRefreshingVotes?: boolean;
 }
 
 // eslint-disable-next-line react/no-multi-comp
@@ -87,6 +122,10 @@ const DraggableTopicsList = ({
   topics,
   setTopics,
   onEdit,
+  hasWeightedVoting,
+  onRecalculateVotes,
+  recalculatingTopicId,
+  isRefreshingVotes,
 }: DraggableTopicsListProps) => {
   const onDragEnd = (result) => {
     if (!result.destination) {
@@ -112,6 +151,10 @@ const DraggableTopicsList = ({
             provided={provided}
             isDragging={snapshot.isDragging}
             item={topics[rubric.source.index]}
+            hasWeightedVoting={hasWeightedVoting}
+            onRecalculateVotes={onRecalculateVotes}
+            recalculatingTopicId={recalculatingTopicId}
+            isRefreshingVotes={isRefreshingVotes}
           />
         )}
       >
@@ -136,6 +179,10 @@ const DraggableTopicsList = ({
                         item={item}
                         isDragging={false}
                         onEdit={onEdit}
+                        hasWeightedVoting={hasWeightedVoting}
+                        onRecalculateVotes={onRecalculateVotes}
+                        recalculatingTopicId={recalculatingTopicId}
+                        isRefreshingVotes={isRefreshingVotes}
                       />
                     )}
                   </Draggable>

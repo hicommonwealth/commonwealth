@@ -85,7 +85,6 @@ const _NotificationsPolicy = {
 
 const _ReactionWorker = {
   consumer: ReactionWorker,
-  worker: 'commonwealth',
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

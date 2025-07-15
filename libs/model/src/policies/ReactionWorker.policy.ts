@@ -1,6 +1,6 @@
 import { logger, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import { models } from '..';
+import { models } from '../database';
 import { mustExist } from '../middleware';
 import { getVotingWeight } from '../services/stakeHelper';
 
