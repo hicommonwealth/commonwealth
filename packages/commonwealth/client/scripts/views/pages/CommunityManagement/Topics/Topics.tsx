@@ -20,8 +20,7 @@ import { CreateTopicStep, getCreateTopicSteps } from './utils';
 import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import { useEditGroupMutation } from 'state/api/groups';
-import { updateGroupTopicsBulk } from 'state/api/groups/useGroupTopicUpdater';
+import { useGroupTopicUpdater } from 'state/api/groups/useGroupTopicUpdater';
 import { useCreateTopicMutation } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 
@@ -99,9 +98,6 @@ export const Topics = () => {
 
   const navigate = useCommonNavigate();
   const { mutateAsync: createTopic } = useCreateTopicMutation();
-  const { mutateAsync: editGroup } = useEditGroupMutation({
-    communityId: app.activeChainId() || '',
-  });
 
   const { data: community } = useGetCommunityByIdQuery({
     id: app.activeChainId() || '',
@@ -123,6 +119,8 @@ export const Topics = () => {
   const handleGroupsSelected = (groups: number[]) => {
     setSelectedGroups(groups);
   };
+
+  const updateGroupTopicsBulk = useGroupTopicUpdater();
 
   if (
     !user.isLoggedIn ||
@@ -202,7 +200,6 @@ export const Topics = () => {
           groupIds: [groupId],
           topicId: newTopicId as number,
           name: topicFormData.name,
-          editGroup,
         });
       }
 

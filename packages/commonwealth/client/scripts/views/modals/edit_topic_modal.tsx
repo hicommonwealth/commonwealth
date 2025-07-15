@@ -23,9 +23,8 @@ import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
-import { useEditGroupMutation } from 'state/api/groups';
 import useFetchGroupsQuery from 'state/api/groups/fetchGroups';
-import { updateGroupTopicsBulk } from 'state/api/groups/useGroupTopicUpdater';
+import { useGroupTopicUpdater } from 'state/api/groups/useGroupTopicUpdater';
 import useGetTopicByIdQuery from 'state/api/topics/getTopicById';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWText } from '../components/component_kit/cw_text';
@@ -99,9 +98,7 @@ export const EditTopicModal = ({
     }
   }, [topicData]);
 
-  const { mutateAsync: editGroup } = useEditGroupMutation({
-    communityId: app.activeChainId() || '',
-  });
+  const updateGroupTopicsBulk = useGroupTopicUpdater();
 
   const getCharacterCount = (delta) => {
     if (!delta || !delta.ops) {
@@ -169,14 +166,12 @@ export const EditTopicModal = ({
         await updateGroupTopicsBulk({
           groupIds: groupsToRemove,
           topicId: updatedTopicId,
-          editGroup,
           remove: true,
         });
         await updateGroupTopicsBulk({
           groupIds: selectedGroups,
           topicId: updatedTopicId,
           name,
-          editGroup,
         });
       }
 
