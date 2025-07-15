@@ -20,7 +20,7 @@ import { CreateTopicStep, getCreateTopicSteps } from './utils';
 import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
+import { useEditGroupMutation } from 'state/api/groups';
 import { updateGroupTopicsBulk } from 'state/api/groups/useGroupTopicUpdater';
 import { useCreateTopicMutation } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
@@ -101,10 +101,6 @@ export const Topics = () => {
   const { mutateAsync: createTopic } = useCreateTopicMutation();
   const { mutateAsync: editGroup } = useEditGroupMutation({
     communityId: app.activeChainId() || '',
-  });
-  const { data: groupList = [] } = useFetchGroupsQuery({
-    communityId: app.activeChainId() || '',
-    enabled: !!app.activeChainId(),
   });
 
   const { data: community } = useGetCommunityByIdQuery({
@@ -200,9 +196,6 @@ export const Topics = () => {
       });
 
       const newTopicId = result.topic?.id;
-
-      console.log('test newTopicId', newTopicId);
-      console.log('test selectedGroups', selectedGroups);
 
       for (const groupId of selectedGroups) {
         await updateGroupTopicsBulk({
