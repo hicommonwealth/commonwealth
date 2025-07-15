@@ -39,6 +39,8 @@ const {
   EVM_CE_ETH_CHAIN_ID_OVERRIDE,
   RAILWAY_PUBLIC_DOMAIN,
   RAILWAY_GIT_COMMIT_SHA,
+  RELEASER_URL,
+  RELEASER_API_KEY,
 } = process.env;
 
 const DEFAULTS = {
@@ -152,6 +154,8 @@ export const config = configure(
     RAILWAY: {
       RAILWAY_PUBLIC_DOMAIN,
       RAILWAY_GIT_COMMIT_SHA,
+      RELEASER_URL,
+      RELEASER_API_KEY,
     },
   },
   z.object({
@@ -274,6 +278,22 @@ export const config = configure(
     RAILWAY: z.object({
       RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
       RAILWAY_GIT_COMMIT_SHA: z.string().optional(),
+      RELEASER_URL: z.string().optional(),
+      // Enable once migrated to Railway
+      // .refine(
+      //   requiredInEnvironmentServices({
+      //     config: model_config,
+      //     requiredAppEnvs: ['production', 'frick', 'frack', 'beta', 'demo'],
+      //     requiredServices: 'all',
+      //   }),)
+      RELEASER_API_KEY: z.string().optional(),
+      // Enable once migrated to Railway
+      // .refine(
+      //   requiredInEnvironmentServices({
+      //     config: model_config,
+      //     requiredAppEnvs: ['production', 'frick', 'frack', 'beta', 'demo'],
+      //     requiredServices: 'all',
+      //   }),)
     }),
   }),
 );
