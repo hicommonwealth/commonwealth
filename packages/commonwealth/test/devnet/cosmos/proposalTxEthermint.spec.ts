@@ -3,7 +3,7 @@ import { Slip10RawIndex } from '@cosmjs/crypto';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { dispose } from '@hicommonwealth/core';
 import { createEvmSigner } from '@hicommonwealth/evm-protocols';
-import { tester } from '@hicommonwealth/model';
+import * as tester from '@hicommonwealth/model/tester';
 import { CosmosToken } from 'client/scripts/controllers/chain/cosmos/types';
 import { CosmosApiType } from 'controllers/chain/cosmos/chain';
 import {

@@ -1,5 +1,5 @@
 import { dispose, inMemoryBlobUrl, inMemoryBlobs } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import * as tester from '@hicommonwealth/model/tester';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import {
   createDatabasePaginatorDefault,

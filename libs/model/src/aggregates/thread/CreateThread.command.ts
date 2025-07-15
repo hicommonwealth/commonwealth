@@ -20,7 +20,7 @@ import {
   verifyThreadSignature,
 } from '../../middleware';
 import { getThreadSearchVector } from '../../models/thread';
-import { tokenBalanceCache } from '../../services';
+import { getBalances } from '../../services/tokenBalanceCache';
 import {
   decodeContent,
   emitMentions,
@@ -28,7 +28,7 @@ import {
   uniqueMentions,
   uploadIfLarge,
 } from '../../utils';
-import { GetActiveContestManagers } from '../contest';
+import { GetActiveContestManagers } from '../contest/GetActiveContestManagers.query';
 
 export const CreateThreadErrors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -51,7 +51,7 @@ async function checkAddressBalance(
   activeContestManagers: z.infer<typeof getActiveContestManagersQuery.output>,
   address: string,
 ) {
-  const balances = await tokenBalanceCache.getBalances({
+  const balances = await getBalances({
     balanceSourceType: BalanceSourceType.ETHNative,
     addresses: [address],
     sourceOptions: {

@@ -9,9 +9,11 @@ import {
   mustBeProtocolChainId,
   transferLaunchpadLiquidityToUniswap,
 } from '@hicommonwealth/evm-protocols';
-import { config, emitEvent, models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
+import { config } from '../../config';
+import { models } from '../../database';
 import { mustExist } from '../../middleware';
+import { emitEvent } from '../../utils';
 
 const log = logger(import.meta);
 

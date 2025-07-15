@@ -1,6 +1,7 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, command, dispose, logger, query } from '@hicommonwealth/core';
-import { Community, models } from '@hicommonwealth/model';
+import { Community } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { config } from '../server/config';
 
 const log = logger(import.meta);

@@ -1,5 +1,6 @@
 import { logger } from '@hicommonwealth/core';
-import { emitEvent, models } from '@hicommonwealth/model';
+import { emitEvent } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import {
   Client,
   Message,
