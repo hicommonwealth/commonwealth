@@ -69,6 +69,7 @@ export const Community = z.object({
   namespace_verification_configured: z.boolean().optional(),
   namespace_nominations: z.array(z.string()).nullish(),
   namespace_verified: z.boolean().optional(),
+  namespace_governance_address: z.string().nullish(),
   redirect: z.string().nullish(),
   snapshot_spaces: z.array(z.string().max(255)).default([]),
   include_in_digest_email: z.boolean().nullish(),
@@ -107,7 +108,6 @@ export const ExtendedCommunity = Community.extend({
     }),
   ),
   communityBanner: z.string().nullish(),
-  communityTreasuryAddress: z.string().nullish(),
 });
 
 export const CommunityGoalMeta = z.object({

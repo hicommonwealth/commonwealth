@@ -1,6 +1,5 @@
 import { config, logger, Policy } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { tokenBalanceCache } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
@@ -14,6 +13,7 @@ import {
   USDC_BASE_MAINNET_ADDRESS,
   USDC_BASE_SEPOLIA_ADDRESS,
 } from '../../services/openai/parseBotCommand';
+import { getBalances } from '../../services/tokenBalanceCache';
 import { findActiveContestManager } from '../../utils/findActiveContestManager';
 import { getChainNodeUrl } from '../../utils/utils';
 
@@ -64,7 +64,7 @@ export function UpgradeTierPolicy(): Policy<typeof inputs> {
         if (nominatedAddress.User.tier >= UserTierMap.ChainVerified) return;
 
         // if user has sufficient balance of community nomination token, upgrade to ChainVerified tier
-        const balances = await tokenBalanceCache.getBalances({
+        const balances = await getBalances({
           addresses: [nominatedAddress.address],
           balanceSourceType: BalanceSourceType.ERC1155,
           sourceOptions: {

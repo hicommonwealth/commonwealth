@@ -1,6 +1,6 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger, stats } from '@hicommonwealth/core';
-import { sequelize } from '@hicommonwealth/model';
+import { sequelize } from '@hicommonwealth/model/db';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';

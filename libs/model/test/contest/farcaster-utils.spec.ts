@@ -1,9 +1,8 @@
+import { describe, expect, test } from 'vitest';
 import {
   buildFarcasterContentUrl,
   parseFarcasterContentUrl,
-} from '@hicommonwealth/model';
-import { expect } from 'chai';
-import { describe, test } from 'vitest';
+} from '../../src/utils/farcasterUtils';
 
 describe('farcaster utils', () => {
   describe('buildFarcasterContentUrl', () => {

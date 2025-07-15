@@ -1,10 +1,4 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
-import {
-  CommentInstance,
-  decodeContent,
-  getCommentSearchVector,
-  uploadIfLarge,
-} from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { GatedActionEnum, MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import { models } from '../../database';
@@ -16,11 +10,14 @@ import {
 } from '../../middleware';
 import { verifyCommentSignature } from '../../middleware/canvas';
 import { mustBeAuthorizedThread, mustExist } from '../../middleware/guards';
+import { CommentInstance, getCommentSearchVector } from '../../models';
 import {
+  decodeContent,
   emitEvent,
   emitMentions,
   parseUserMentions,
   uniqueMentions,
+  uploadIfLarge,
 } from '../../utils';
 import { getCommentDepth } from '../../utils/getCommentDepth';
 

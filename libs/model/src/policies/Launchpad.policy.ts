@@ -2,7 +2,11 @@ import { Policy, command, logger } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { RefreshCommunityMemberships } from '../aggregates/community';
-import { CreateToken, ProjectLaunchpadTrade } from '../aggregates/token';
+import {
+  CreateToken,
+  LinkGovernanceAddress,
+  ProjectLaunchpadTrade,
+} from '../aggregates/token';
 import { models } from '../database';
 import { systemActor } from '../middleware';
 
@@ -11,6 +15,7 @@ const log = logger(import.meta);
 const inputs = {
   LaunchpadTokenCreated: events.LaunchpadTokenCreated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
+  CommunityNamespaceCreated: events.CommunityNamespaceCreated,
 };
 
 async function findTokenHolderGroups(
@@ -54,6 +59,17 @@ export function LaunchpadPolicy(): Policy<typeof inputs> {
             community_id: '', // community id is not known yet, but system actor has rights
             eth_chain_id: payload.eth_chain_id,
             transaction_hash: payload.transaction_hash,
+          },
+        });
+      },
+      CommunityNamespaceCreated: async ({ payload }) => {
+        await command(LinkGovernanceAddress(), {
+          actor: systemActor({}),
+          payload: {
+            name: payload.name,
+            token: payload.token,
+            namespaceAddress: payload.namespaceAddress,
+            governanceAddress: payload.governanceAddress,
           },
         });
       },

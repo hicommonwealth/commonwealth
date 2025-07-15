@@ -1,10 +1,7 @@
 import { cache, CacheNamespaces, dispose, logger } from '@hicommonwealth/core';
-import {
-  GraphileTask,
-  models,
-  pgMultiRowUpdate,
-  TaskPayloads,
-} from '@hicommonwealth/model';
+import { pgMultiRowUpdate } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { GraphileTask, TaskPayloads } from '@hicommonwealth/model/services';
 import { CountAggregatorKeys } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { batchedIncrementCachedRank } from '../../../api/ranking';
@@ -175,8 +172,9 @@ async function processViewCounts() {
   for (const [threadId, count] of <[string, string][]>(
     Object.entries(threadIdHash)
   )) {
-    const threadRankIncrease =
-      config.HEURISTIC_WEIGHTS.VIEW_COUNT_WEIGHT * parseInt(count);
+    const threadRankIncrease = Math.round(
+      config.HEURISTIC_WEIGHTS.VIEW_COUNT_WEIGHT * parseInt(count),
+    );
     if (threadRankIncrease > 0) {
       communityRankUpdates.push({
         newValue: `community_rank + ${threadRankIncrease}`,

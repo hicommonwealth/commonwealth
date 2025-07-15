@@ -128,7 +128,9 @@ const lpBondingCurveSource: ContractSource = {
 
 const tokenCommunityManagerSource: ContractSource = {
   abi: TokenCommunityManagerAbi,
-  eventSignatures: [],
+  eventSignatures: [
+    EvmEventSignatures.TokenCommunityManager.CommunityNamespaceCreated,
+  ],
 } satisfies ContractSource;
 
 const referralFeeManagerSource: ContractSource = {

@@ -3,10 +3,8 @@
 /* eslint-disable no-unused-expressions */
 import { CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
 import { delay } from '@hicommonwealth/shared';
-import chai from 'chai';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { RedisCache } from '../../src';
-const expect = chai.expect;
 
 async function addRandomKeys(test_namespace: CacheNamespaces) {
   const random = Math.random();

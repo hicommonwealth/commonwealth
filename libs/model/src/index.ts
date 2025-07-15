@@ -24,20 +24,38 @@ export * as User from './aggregates/user';
 export * as Wallet from './aggregates/wallet';
 export * as Webhook from './aggregates/webhook';
 
-// Core Services
-export * from './services';
-
 // Policies
 export * from './policies';
 
-// Test Service
-export * as tester from './tester';
-export type { E2E_TestEntities } from './tester';
-
-export * as middleware from './middleware';
-
-// Internals - Should not be exported once we finish the migrations to models
+// Config
 export * from './config';
-export * from './database';
-export * from './models';
-export * from './utils';
+
+// Exported utils (might be leaks)
+export {
+  refreshMemberships,
+  refreshProfileCount,
+} from './utils/denormalizedCountUtils';
+export {
+  buildFarcasterContentUrl,
+  parseFarcasterContentUrl,
+} from './utils/farcasterUtils';
+export { generateImage } from './utils/generateImage';
+export { magicLogin } from './utils/magic';
+export {
+  findMentionDiff,
+  parseUserMentions,
+  uniqueMentions,
+} from './utils/parseUserMentions';
+export { pgMultiRowUpdate } from './utils/pgMultiRowUpdate';
+export {
+  createEventRegistryChainNodes,
+  createTestRpc,
+} from './utils/testChainNodeUtils';
+export {
+  R2_ADAPTER_KEY,
+  buildChainNodeUrl,
+  emitEvent,
+  equalEvmAddresses,
+  getSaltedApiKeyHash,
+  uploadIfLarge,
+} from './utils/utils';

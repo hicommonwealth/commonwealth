@@ -7,11 +7,8 @@ import {
   query,
 } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
-import { createEventRegistryChainNodes, models } from '@hicommonwealth/model';
 import { ContestResults } from '@hicommonwealth/schemas';
 import { CONTEST_FEE_PERCENT, delay } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   afterAll,
   afterEach,
@@ -24,9 +21,9 @@ import {
 import { z } from 'zod';
 import { Contests } from '../../src/aggregates/contest/Contests.projection';
 import { GetAllContests } from '../../src/aggregates/contest/GetAllContests.query';
+import { models } from '../../src/database';
 import { seed } from '../../src/tester';
-
-chai.use(chaiAsPromised);
+import { createEventRegistryChainNodes } from '../../src/utils';
 
 const { commonProtocol } = evm;
 

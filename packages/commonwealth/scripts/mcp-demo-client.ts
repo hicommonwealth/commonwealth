@@ -1,11 +1,11 @@
 // run with `pnpm run start-mcp-demo-client`
 
+import { config } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import {
-  CommonMCPServerWithHeaders,
   buildMCPClientOptions,
-  config,
-  models,
-} from '@hicommonwealth/model';
+  type CommonMCPServerWithHeaders,
+} from '@hicommonwealth/model/services';
 import OpenAI from 'openai';
 import { exit } from 'process';
 import * as readline from 'readline';
