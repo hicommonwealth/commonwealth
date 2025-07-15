@@ -1,25 +1,21 @@
-import { TokenLaunchpadAbi } from '@commonxyz/common-protocol-abis';
-import { type Command } from '@hicommonwealth/core';
+import {
+  TokenBondingCurveAbi,
+  TokenLaunchpadAbi,
+} from '@commonxyz/common-protocol-abis';
+import { type Command, InvalidState } from '@hicommonwealth/core';
 import * as protocols from '@hicommonwealth/evm-protocols';
 import { withRetries } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import {
-  createPublicClient,
-  decodeEventLog,
-  getEventSelector,
-  Hash,
-  http,
-} from 'viem';
-import { z } from 'zod';
+import { createPublicClient, Hash, http, parseEventLogs } from 'viem';
 import { models } from '../../database';
 import { authRoles, mustExist } from '../../middleware';
 
-export function CreateToken(): Command<typeof schemas.CreateThreadToken> {
+export function CreateThreadToken(): Command<typeof schemas.CreateThreadToken> {
   return {
     ...schemas.CreateThreadToken,
     auth: [authRoles('admin')],
     body: async ({ payload }) => {
-      const { community_id, eth_chain_id, transaction_hash } = payload;
+      const { eth_chain_id, transaction_hash } = payload;
 
       const chainNode = await models.ChainNode.findOne({
         where: { eth_chain_id },
@@ -38,56 +34,61 @@ export function CreateToken(): Command<typeof schemas.CreateThreadToken> {
         }),
       );
 
-      const NEW_TOKEN_CREATED_TOPIC0 = getEventSelector({
-        type: 'event',
-        name: 'NewTokenCreated',
-        inputs: TokenLaunchpadAbi.find(
-          (x) => x.type === 'event' && x.name === 'NewTokenCreated',
-        )!.inputs,
+      const parsedLogs = parseEventLogs({
+        abi: TokenBondingCurveAbi,
+        eventName: 'TokenRegistered',
+        logs: receipt.logs,
       });
 
-      for (const log of receipt.logs) {
-        try {
-          const decoded = decodeEventLog({
-            abi: TokenLaunchpadAbi,
-            data: log.data,
-            topics: log.topics,
-          });
-
-          if (decoded.eventName === 'NewTokenCreated') {
-            decodedLogs.push(decoded.args);
-          }
-        } catch {
-          // skip logs that don't match any event in the ABI
-        }
+      if (parsedLogs.length === 0) {
+        throw new InvalidState(
+          'TokenRegistered event could not be processed from txReceipt',
+        );
       }
 
-      const decoded = decodeEventLog({
+      const {
+        token: tokenAddress,
+        totalSupply,
+        launchpadLiquidity,
+      } = parsedLogs[0].args;
+
+      const tokenCreatedParsedLogs = parseEventLogs({
         abi: TokenLaunchpadAbi,
-        data: log.data,
-        topics: log.topics,
+        eventName: 'NewTokenCreated',
+        logs: receipt.logs,
       });
 
-      return models.sequelize.transaction(async (transaction) => {
-        const [token, created] = await models.ThreadToken.findOrCreate({
-          where: { token_address: token_address.toLowerCase() },
+      if (tokenCreatedParsedLogs.length === 0) {
+        throw new InvalidState(
+          'NewTokenCreated event could not be processed from txReceipt',
+        );
+      }
+
+      const { name, symbol, threadId } = tokenCreatedParsedLogs[0].args;
+
+      const block = await client.getBlock({ blockHash: receipt.blockHash });
+      const date = new Date(Number(block.timestamp) * 1000);
+
+      return await models.sequelize.transaction(async (transaction) => {
+        const [token] = await models.ThreadToken.findOrCreate({
+          where: { token_address: tokenAddress.toLowerCase() },
           defaults: {
-            token_address: token_address.toLowerCase(),
+            token_address: tokenAddress.toLowerCase(),
             name,
             symbol,
-            initial_supply: Number(BigInt(total_supply) / BigInt(1e18)),
+            initial_supply: Number(BigInt(totalSupply) / BigInt(1e18)),
             liquidity_transferred: false,
-            launchpad_liquidity: BigInt(launchpad_liquidity).toString(),
+            launchpad_liquidity: BigInt(launchpadLiquidity).toString(),
             eth_market_cap_target: protocols.getTargetMarketCap(),
-            creator_address,
+            creator_address: receipt.from,
+            thread_id: threadId.toString(),
+            created_at: date,
+            updated_at: date,
           },
           transaction,
         });
 
-        return {
-          ...token!.toJSON(),
-          community_id,
-        } as unknown as z.infer<(typeof schemas.CreateThreadToken)['output']>;
+        return token!.toJSON();
       });
     },
   };

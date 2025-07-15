@@ -5,7 +5,13 @@ import { toEventSelector } from 'viem';
 
 const log = logger(import.meta);
 
-function generateEventSignatureBlock(contractName: string, abi: Abi): string {
+// This file is intended to be run with the name of an ABI. It will print out
+// all the event names mapped to signatures which you will add/replace in
+// the eventSignatures.ts file
+
+// Example Usage: `pnpm generate-event-signature TokenLaunchpadAbi`
+function generateEventSignatureBlock(abiKey: string, abi: Abi): string {
+  const contractName = abiKey.replace(/Abi$/, ''); // Strip "Abi" from the end
   const events = abi.filter(
     (entry): entry is AbiEvent => entry.type === 'event',
   );

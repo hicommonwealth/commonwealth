@@ -14,7 +14,7 @@ class TokenLaunchpad extends ContractBase {
   launchpadFactory: Contract<typeof TokenLaunchpadAbi>;
 
   constructor(
-    launchpadFactoryAddress: string, // use chainConfig.postTokenLaunchpad
+    launchpadFactoryAddress: string, // use chainConfig.tokenLaunchpad
     bondingCurveAddress: string, // use chainConfig.postTokenBondingCurve
     paymentTokenAddress: string, // communities payment token
     rpc: string,

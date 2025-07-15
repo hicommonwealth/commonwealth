@@ -63,6 +63,22 @@ export const EvmEventSignatures = {
     CommunityNamespaceCreated:
       '0xa16d784cb6c784b621c7877ce80495765ed32ca0b3dba2ef467116a435f125fd',
   },
+  // Corresponds to contract with the Thread token logic
+  TokenLaunchpad: {
+    LaunchpadCreated:
+      '0x6c609cd15c5d8c38ee4d6addf46ca8d289008474fcf5d0430da7d14992425476',
+    NewTokenCreated:
+      '0xe9b435d3cbcb61a420f93ec8bfb90cf0ce4daae815fbd54eafde865ca841267f',
+    TokenRegistered:
+      '0xd7ca5dc2f8c6bb37c3a4de2a81499b25f8ca8bbb3082010244fe747077d0f6cc',
+  },
+  TokenBondingCurve: {
+    LiquidityTransferred:
+      '0xff752bd3e34b90ae8e7db783e56e8d8bc8c16878c4bda3a8c42abf2b01bdfb21',
+    TokenRegistered:
+      '0xc2fe88a1a3c1957424571593960b97f158a519d0aa4cef9e13a247c64f1f4c35',
+    Trade: '0x9adcf0ad0cda63c4d50f26a48925cf6405df27d422a39c456b5f03f661c82982',
+  },
 } as const;
 
 type Values<T> = T[keyof T];

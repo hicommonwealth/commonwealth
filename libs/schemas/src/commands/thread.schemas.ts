@@ -11,6 +11,7 @@ import {
   Reaction,
   Thread,
   ThreadToken,
+  ThreadTokenTrade,
 } from '../entities';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 
@@ -137,5 +138,19 @@ export const CreateThreadToken = {
     transaction_hash: z.string().length(66),
   }),
   output: ThreadToken,
+  context: AuthContext,
+};
+
+export const ThreadTokenTradeView = ThreadTokenTrade.extend({
+  community_token_amount: z.string(),
+  floating_supply: z.string(),
+});
+
+export const CreateThreadTokenTrade = {
+  input: z.object({
+    eth_chain_id: z.number(),
+    transaction_hash: z.string().length(66),
+  }),
+  output: ThreadTokenTradeView,
   context: AuthContext,
 };

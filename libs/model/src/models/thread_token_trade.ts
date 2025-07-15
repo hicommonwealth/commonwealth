@@ -1,9 +1,9 @@
-import { ThreadTokenTrade } from '@hicommonwealth/schemas';
+import { LaunchpadTrade } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance } from './types';
 
-export type ThreadTokenTradeAttributes = z.infer<typeof ThreadTokenTrade>;
+export type ThreadTokenTradeAttributes = z.infer<typeof LaunchpadTrade>;
 
 export type ThreadTokenTradeInstance =
   ModelInstance<ThreadTokenTradeAttributes>;

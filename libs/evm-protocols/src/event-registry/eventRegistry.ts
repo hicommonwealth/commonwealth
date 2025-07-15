@@ -7,7 +7,9 @@ import {
   LaunchpadAbi,
   NamespaceFactoryAbi,
   ReferralFeeManagerAbi,
+  TokenBondingCurveAbi,
   TokenCommunityManagerAbi,
+  TokenLaunchpadAbi,
 } from '@commonxyz/common-protocol-abis';
 import { veBridgeAbi } from '../abis/veBridgeAbi';
 import { ValidChains, factoryContracts } from '../common-protocol';
@@ -45,6 +47,16 @@ type ContractAddresses = {
     | (key extends keyof typeof factoryContracts
         ? 'veBridge' extends keyof (typeof factoryContracts)[key]
           ? (typeof factoryContracts)[key]['veBridge']
+          : never
+        : never)
+    | (key extends keyof typeof factoryContracts
+        ? 'tokenLaunchpad' extends keyof (typeof factoryContracts)[key]
+          ? (typeof factoryContracts)[key]['tokenLaunchpad']
+          : never
+        : never)
+    | (key extends keyof typeof factoryContracts
+        ? 'tokenBondingCurve' extends keyof (typeof factoryContracts)[key]
+          ? (typeof factoryContracts)[key]['tokenBondingCurve']
           : never
         : never);
 };
@@ -151,6 +163,24 @@ const tokenStakingSource: ContractSource = {
   ],
 };
 
+const tokenLaunchpadSource: ContractSource = {
+  abi: TokenLaunchpadAbi,
+  eventSignatures: [
+    EvmEventSignatures.TokenLaunchpad.LaunchpadCreated,
+    EvmEventSignatures.TokenLaunchpad.NewTokenCreated,
+    EvmEventSignatures.TokenLaunchpad.TokenRegistered,
+  ],
+};
+
+const tokenBondingCurveSource: ContractSource = {
+  abi: TokenBondingCurveAbi,
+  eventSignatures: [
+    EvmEventSignatures.TokenBondingCurve.LiquidityTransferred,
+    EvmEventSignatures.TokenBondingCurve.TokenRegistered,
+    EvmEventSignatures.TokenBondingCurve.Trade,
+  ],
+};
+
 /**
  * Note that this object does not contain details for contracts deployed by users
  * at runtime. Those contracts remain in the EvmEventSources table.
@@ -180,6 +210,10 @@ export const EventRegistry = {
     [factoryContracts[ValidChains.SepoliaBase].referralFeeManager]:
       referralFeeManagerSource,
     [factoryContracts[ValidChains.SepoliaBase].veBridge]: tokenStakingSource,
+    [factoryContracts[ValidChains.SepoliaBase].tokenLaunchpad]:
+      tokenLaunchpadSource,
+    [factoryContracts[ValidChains.SepoliaBase].tokenBondingCurve]:
+      tokenBondingCurveSource,
   },
   [ValidChains.Sepolia]: {
     [factoryContracts[ValidChains.Sepolia].factory]: namespaceFactorySource,
@@ -230,5 +264,8 @@ export const EventRegistry = {
     [factoryContracts[ValidChains.Anvil].referralFeeManager]:
       referralFeeManagerSource,
     [factoryContracts[ValidChains.Anvil].veBridge]: tokenStakingSource,
+    [factoryContracts[ValidChains.Anvil].tokenLaunchpad]: tokenLaunchpadSource,
+    [factoryContracts[ValidChains.Anvil].tokenBondingCurve]:
+      tokenBondingCurveSource,
   },
 } as const satisfies EventRegistryType;

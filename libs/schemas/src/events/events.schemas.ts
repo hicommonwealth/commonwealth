@@ -1,3 +1,4 @@
+import { ThreadToken } from '@hicommonwealth/schemas';
 import {
   CommunityGoalTypes,
   Roles,
@@ -425,6 +426,10 @@ export const events = {
 
   LaunchpadTokenGraduated: z.object({
     token: LaunchpadToken,
+  }),
+
+  ThreadTokenGraduated: z.object({
+    token: ThreadToken,
   }),
 
   LaunchpadTokenTraded: z.object({
