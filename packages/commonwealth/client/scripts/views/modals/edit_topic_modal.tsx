@@ -25,9 +25,11 @@ import {
 import clsx from 'clsx';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
-import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
+import { useEditGroupMutation } from 'state/api/groups';
+import useFetchGroupsQuery from 'state/api/groups/fetchGroups';
 import useGetTopicByIdQuery from 'state/api/topics/getTopicById';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import { fetchGroupById } from '../../state/api/groups/fetchGroupById';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWSelectList } from '../components/component_kit/new_designs/CWSelectList';
 import { ReactQuillEditor } from '../components/react_quill_editor';
@@ -38,6 +40,13 @@ type EditTopicModalProps = {
   topic: Topic;
   noRedirect?: boolean;
 };
+
+interface GroupTopic {
+  id: number;
+  is_private: boolean;
+  name?: string;
+  permissions?: GatedActionEnum[];
+}
 
 export const EditTopicModal = ({
   topic,
@@ -139,6 +148,24 @@ export const EditTopicModal = ({
     }
   }, [featuredInNewPost, newPostTemplate]);
 
+  const GroupTopics = (
+    topics: GroupTopic[],
+    updatedTopicId: number,
+    newTopic?: GroupTopic,
+  ) => {
+    let result = topics.filter((t) => t.id !== updatedTopicId);
+    if (newTopic) {
+      result = [...result, newTopic];
+    }
+    return result.map((t) => ({
+      id: t.id,
+      is_private: t.is_private,
+      permissions: Array.isArray(t.permissions)
+        ? t.permissions
+        : Object.values(GatedActionEnum),
+    }));
+  };
+
   const handleSaveChanges = async () => {
     setIsSaving(true);
 
@@ -158,22 +185,51 @@ export const EditTopicModal = ({
       });
 
       const updatedTopicId = id;
-      for (const groupId of selectedGroups) {
-        const group = groups?.find((g) => g.id === groupId);
-        if (!group) continue;
-        const updatedTopics = [
-          ...(group.topics || []),
-          { id: updatedTopicId, is_private: true, name },
-        ];
-        await editGroup({
-          community_id: app.activeChainId() || '',
-          group_id: groupId,
-          topics: updatedTopics.map((t) => ({
-            id: t.id,
-            is_private: true,
-            permissions: Object.values(GatedActionEnum),
-          })),
-        });
+      const prevGroupIds = topicData?.gatingGroups?.map((g) => g.id) || [];
+      const groupsToRemove = prevGroupIds.filter(
+        (id) => !selectedGroups.includes(id),
+      );
+
+      if (typeof updatedTopicId === 'number') {
+        for (const groupId of groupsToRemove) {
+          const latestGroups = await fetchGroupById(groupId);
+          const latestGroup = latestGroups?.[0];
+          const existingTopics = (latestGroup?.topics || [])
+            .filter((t) => typeof t.id === 'number')
+            .map((t) => ({
+              id: t.id as number,
+              is_private: t.is_private,
+              name: t.name,
+              permissions: t.permissions,
+            }));
+          await editGroup({
+            community_id: app.activeChainId() || '',
+            group_id: groupId,
+            topics: GroupTopics(existingTopics, updatedTopicId),
+          });
+        }
+
+        for (const groupId of selectedGroups) {
+          const latestGroups = await fetchGroupById(groupId);
+          const latestGroup = latestGroups?.[0];
+          const existingTopics = (latestGroup?.topics || [])
+            .filter((t) => typeof t.id === 'number')
+            .map((t) => ({
+              id: t.id as number,
+              is_private: t.is_private,
+              name: t.name,
+              permissions: t.permissions,
+            }));
+          await editGroup({
+            community_id: app.activeChainId() || '',
+            group_id: groupId,
+            topics: GroupTopics(existingTopics, updatedTopicId, {
+              id: updatedTopicId,
+              is_private: true,
+              name,
+            }),
+          });
+        }
       }
 
       if (noRedirect) {
