@@ -1,19 +1,27 @@
 /* eslint-disable n/no-process-exit, no-fallthrough */
 import fetch, { Response } from 'node-fetch';
-import { config } from '../config';
-
-const RAILWAY_GIT_COMMIT_SHA: string = config.RAILWAY.RAILWAY_GIT_COMMIT_SHA!;
-const RELEASER_URL: string = config.RAILWAY.RELEASER_URL!;
-const RELEASER_API_KEY: string = config.RAILWAY.RELEASER_API_KEY!;
-
-if (!RAILWAY_GIT_COMMIT_SHA || !RELEASER_URL || !RELEASER_API_KEY) {
-  console.error(
-    `Error: RAILWAY_GIT_COMMIT_SHA, RELEASER_URL, RELEASER_API_KEY is not set.`,
-  );
-  process.exit(1);
-}
 
 (async () => {
+  let config;
+  try {
+    config = await import('../config');
+    console.log('Environment variables are properly configured');
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+
+  const RAILWAY_GIT_COMMIT_SHA: string = config.RAILWAY.RAILWAY_GIT_COMMIT_SHA!;
+  const RELEASER_URL: string = config.RAILWAY.RELEASER_URL!;
+  const RELEASER_API_KEY: string = config.RAILWAY.RELEASER_API_KEY!;
+
+  if (!RAILWAY_GIT_COMMIT_SHA || !RELEASER_URL || !RELEASER_API_KEY) {
+    console.error(
+      `Error: RAILWAY_GIT_COMMIT_SHA, RELEASER_URL, RELEASER_API_KEY is not set.`,
+    );
+    process.exit(1);
+  }
+
   const url = `${RELEASER_URL}/queue`;
   console.log(
     `Triggering release for commit: ${RAILWAY_GIT_COMMIT_SHA} at ${url}`,
