@@ -11,9 +11,8 @@ import { buildDb, syncDb, type DB } from '../models';
  * Verifies the existence of a database,
  * creating a fresh instance if it doesn't exist.
  * @param name db name
- * @param applyDump apply minimal dump when testing model
  */
-const verify_db = async (name: string, applyDump = false): Promise<void> => {
+const verify_db = async (name: string): Promise<void> => {
   let pg: Sequelize | undefined = undefined;
   try {
     pg = new Sequelize({
@@ -32,25 +31,6 @@ const verify_db = async (name: string, applyDump = false): Promise<void> => {
     if (!+count) {
       await pg.query(`CREATE DATABASE ${name};`);
       console.log('Created new test db:', name);
-
-      if (applyDump) {
-        const schemaPath = join(__dirname, '../../assets/minimal_schema.sql');
-        if (existsSync(schemaPath)) {
-          execSync(
-            `psql -h localhost -U commonwealth -d ${name} -f "${schemaPath}"`,
-            {
-              stdio: 'inherit',
-              env: {
-                ...process.env,
-                PGPASSWORD: 'edgeware',
-              },
-            },
-          );
-          console.log(`Loaded minimal schema into ${name}`);
-        } else {
-          console.warn('Minimal schema file not found:', schemaPath);
-        }
-      }
     }
   } catch (error) {
     console.error(`<<<Error verifying ${name}>>>`, error);
@@ -67,6 +47,24 @@ const verify_db = async (name: string, applyDump = false): Promise<void> => {
  * @param sequelize sequelize instance
  */
 const migrate_db = async (sequelize: Sequelize) => {
+  // initialize minimal schema - baseline before migrations
+  const schemaPath = join(__dirname, '../../assets/minimal_schema.sql');
+  if (existsSync(schemaPath)) {
+    execSync(
+      `psql -h localhost -U commonwealth -d ${name} -f "${schemaPath}"`,
+      {
+        stdio: 'inherit',
+        env: {
+          ...process.env,
+          PGPASSWORD: 'edgeware',
+        },
+      },
+    );
+    console.log(`Loaded minimal schema into ${name}`);
+  } else {
+    console.warn('Minimal schema file not found:', schemaPath);
+  }
+
   const umzug = new Umzug({
     // TODO: move sequelize config and migrations to libs/model
     migrations: {
@@ -124,7 +122,7 @@ const truncate_db = async (db?: DB) => {
 export const create_db_from_migrations = async (
   name: string,
 ): Promise<Sequelize> => {
-  await verify_db(name, true);
+  await verify_db(name);
   try {
     const sequelize = new Sequelize({
       dialect: 'postgres',
