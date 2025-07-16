@@ -5,7 +5,7 @@
     "dockerfilePath": "Dockerfile.railway"
   },
   "deploy": {
-    "preDeployCommand": "node --import=extensionless/register --enable-source-maps ./build/server/scripts/releasePhaseEnvCheck.js",
+    "preDeployCommand": "npm run pre-deploy",
     "startCommand": "node --import=extensionless/register --enable-source-maps ./build/server/workers/discordBot/discordListener.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3,
