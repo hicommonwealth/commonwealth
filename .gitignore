@@ -23,4 +23,5 @@ redis-data
 external-production-openapi.json
 external-openapi.json
 .eslintcache
+.envrc
 tracing

@@ -621,6 +621,32 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           },
         });
       },
+      LaunchpadTokenGraduated: async ({ id, payload }) => {
+        const user_id =
+          payload.token.creator_address &&
+          (await getUserByAddress(payload.token.creator_address));
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenGraduated', { id, payload, user_id });
+        if (!user_id) return;
+
+        const created_at = payload.token.updated_at
+          ? new Date(payload.token.updated_at)
+          : new Date();
+        const action_metas = await getQuestActionMetas(
+          { created_at },
+          'LaunchpadTokenGraduated',
+        );
+        await recordXpsForQuest({
+          event_id: id,
+          user_id,
+          event_created_at: created_at,
+          action_metas,
+          scope: {
+            namespace: payload.token.namespace,
+            launchpad_token_address: payload.token.token_address,
+          },
+        });
+      },
       WalletLinked: async ({ id, payload }) => {
         const action_metas = await getQuestActionMetas(payload, 'WalletLinked');
         // TODO: use action meta attributes to determine denomination and conversion to XP,

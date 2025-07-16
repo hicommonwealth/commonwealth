@@ -5,27 +5,24 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import {
-  BalanceSourceType,
-  WalletSsoSource,
-  type Requirement,
-} from '@hicommonwealth/shared';
+import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
 import { config } from '../../config';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import type { GroupAttributes } from '../../models';
-import {
-  tokenBalanceCache,
-  type Balances,
-  type OptionsWithBalances,
-} from '../../services';
+import { getBalances } from '../../services/tokenBalanceCache';
+import type {
+  Balances,
+  OptionsWithBalances,
+} from '../../services/tokenBalanceCache/types';
 import {
   emitEvent,
   makeGetBalancesOptions,
   validateGroupMembership,
   type Membership,
+  type Requirement,
   type UserInfo,
 } from '../../utils';
 
@@ -262,7 +259,7 @@ export function RefreshCommunityMemberships(): Command<
           getBalancesOptions.map(async (options) => {
             let result: Balances = {};
             try {
-              result = await tokenBalanceCache.getBalances({
+              result = await getBalances({
                 ...options,
                 cacheRefresh: refresh_all || false,
               });

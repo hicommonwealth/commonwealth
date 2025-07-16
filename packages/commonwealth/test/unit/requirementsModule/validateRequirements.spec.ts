@@ -1,6 +1,10 @@
-import { BalanceSourceType, Requirement } from '@hicommonwealth/shared';
+import { Requirement } from '@hicommonwealth/schemas';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import validateRequirements from 'server/util/requirementsModule/validateRequirements';
 import { describe, expect, test } from 'vitest';
+import { z } from 'zod';
+
+type Requirement = z.infer<typeof Requirement>;
 
 describe('validateRequirements', () => {
   test('should pass as valid for ERC20 ContractSource', () => {

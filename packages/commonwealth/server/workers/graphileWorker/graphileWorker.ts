@@ -10,7 +10,7 @@ import {
   logger,
   stats,
 } from '@hicommonwealth/core';
-import { GraphileTaskNames, preset } from '@hicommonwealth/model';
+import { GraphileTaskNames, preset } from '@hicommonwealth/model/services';
 import { Task, parseCronItems, run } from 'graphile-worker';
 import { config } from '../../config';
 import { cronItems } from './cronJobs';

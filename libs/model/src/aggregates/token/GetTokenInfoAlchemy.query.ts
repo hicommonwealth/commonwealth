@@ -1,6 +1,7 @@
 import { logger, type Query } from '@hicommonwealth/core';
-import { config, models } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { config } from '../../config';
+import { models } from '../../database';
 
 const errorObject = {
   network: '',

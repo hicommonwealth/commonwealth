@@ -1,11 +1,10 @@
-import * as services from '../../src/services';
+import * as tokenBalanceCache from '../../src/services/tokenBalanceCache';
 
-vi.spyOn(services.tokenBalanceCache, 'getBalances').mockResolvedValue({});
+vi.spyOn(tokenBalanceCache, 'getBalances').mockResolvedValue({});
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type { Session, SessionSigner } from '@canvas-js/interfaces';
 import { type Actor, command, dispose } from '@hicommonwealth/core';
-import { getVerifiedUserInfo } from '@hicommonwealth/model';
 import {
   bech32ToHex,
   CANVAS_TOPIC,
@@ -146,27 +145,28 @@ async function createPrivyUser(
   } as User;
 }
 
-const getVerifiedUserInfoMockFn: typeof getVerifiedUserInfo = ({
-  privyUser,
-  walletSsoSource,
-}: {
-  privyUser?: User;
-  walletSsoSource: string;
-  token?: string;
-}) => {
-  if (!privyUser) throw new Error('Only Privy supported in the Mock');
+const getVerifiedUserInfoMockFn: typeof ssoVerificationUtils.getVerifiedUserInfo =
+  ({
+    privyUser,
+    walletSsoSource,
+  }: {
+    privyUser?: User;
+    walletSsoSource: string;
+    token?: string;
+  }) => {
+    if (!privyUser) throw new Error('Only Privy supported in the Mock');
 
-  switch (walletSsoSource) {
-    case 'google':
-      return Promise.resolve({
-        provider: WalletSsoSource.Google,
-        email: privyUser.google?.email,
-        emailVerified: true,
-      });
-    default:
-      throw new Error(`Unsupported SSO provider: ${walletSsoSource}`);
-  }
-};
+    switch (walletSsoSource) {
+      case 'google':
+        return Promise.resolve({
+          provider: WalletSsoSource.Google,
+          email: privyUser.google?.email,
+          emailVerified: true,
+        });
+      default:
+        throw new Error(`Unsupported SSO provider: ${walletSsoSource}`);
+    }
+  };
 
 describe('SignIn Lifecycle', async () => {
   const [evmSigner, , cosmosSigner, substrateSigner, solanaSigner] =
@@ -346,7 +346,7 @@ describe('SignIn Lifecycle', async () => {
         expect(addr!.verified).to.be.not.null;
 
         expect(addr!.was_signed_in).to.be.false;
-        expect(addr!.first_community).to.be.true;
+        expect(addr!.is_welcome_onboard_flow_complete).to.be.false;
         expect(addr!.user_created).to.be.true;
         expect(addr!.address_created).to.be.true;
         expect(addr!.User).to.not.be.null;
@@ -397,7 +397,7 @@ describe('SignIn Lifecycle', async () => {
         expect(addr!.User).to.be.not.null;
         expect(addr!.User!.id).to.equal(ref.actor.user.id!);
         expect(addr!.was_signed_in).to.be.true;
-        expect(addr!.first_community).to.be.false;
+        expect(addr!.is_welcome_onboard_flow_complete).to.be.false;
         expect(addr!.user_created).to.be.false;
         expect(addr!.address_created).to.be.false;
 
@@ -455,7 +455,7 @@ describe('SignIn Lifecycle', async () => {
         expect(addr!.User).to.be.not.null;
         expect(addr!.User!.id).to.equal(ref.actor.user.id!);
         expect(addr!.was_signed_in).to.be.true;
-        expect(addr!.first_community).to.be.false;
+        expect(addr!.is_welcome_onboard_flow_complete).to.be.false;
         expect(addr!.user_created).to.be.false;
         expect(addr!.address_created).to.be.true;
       },

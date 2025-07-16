@@ -1,9 +1,4 @@
 import { Actor, InvalidState, type Command } from '@hicommonwealth/core';
-import {
-  Contest,
-  GetBalancesOptions,
-  tokenBalanceCache,
-} from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType, GatedActionEnum } from '@hicommonwealth/shared';
 import { models } from '../../database';
@@ -11,6 +6,11 @@ import { authThread, mustExist, tiered } from '../../middleware';
 import { verifyReactionSignature } from '../../middleware/canvas';
 import { mustBeAuthorizedThread } from '../../middleware/guards';
 import { getVotingWeight } from '../../services/stakeHelper';
+import {
+  getBalances,
+  type GetBalancesOptions,
+} from '../../services/tokenBalanceCache';
+import { GetActiveContestManagers } from '../contest';
 
 export const CreateThreadReactionErrors = {
   ThreadArchived: 'Thread is archived',
@@ -37,7 +37,7 @@ export function CreateThreadReaction(): Command<
         throw new InvalidState(CreateThreadReactionErrors.ThreadArchived);
 
       // check if thread is part of contest
-      const contestManagers = await Contest.GetActiveContestManagers().body({
+      const contestManagers = await GetActiveContestManagers().body({
         actor: {} as Actor,
         payload: {
           community_id: thread.community_id!,
@@ -69,7 +69,7 @@ export function CreateThreadReaction(): Command<
             },
           };
           balanceOptions.cacheRefresh = true;
-          const balances = await tokenBalanceCache.getBalances(balanceOptions);
+          const balances = await getBalances(balanceOptions);
           const balance = balances[address.address];
           if (balance && BigInt(balance) > BigInt(0)) {
             numSufficientBalances++;

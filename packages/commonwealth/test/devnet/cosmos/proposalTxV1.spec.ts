@@ -6,7 +6,7 @@ import {
   voteOptionToJSON,
 } from '@hicommonwealth/chains';
 import { dispose } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import * as tester from '@hicommonwealth/model/tester';
 import { getLCDClient } from 'controllers/chain/cosmos/chain.utils';
 import {
   getActiveProposalsV1,

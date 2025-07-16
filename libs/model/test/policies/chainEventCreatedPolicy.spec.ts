@@ -1,11 +1,13 @@
 import { EventContext, dispose } from '@hicommonwealth/core';
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { createTestRpc, models, tester } from '@hicommonwealth/model';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { Community } from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
+import { models } from '../../src/database';
 import { handleCommunityStakeTrades } from '../../src/policies/handlers/handleCommunityStakeTrades';
+import * as tester from '../../src/tester';
+import { createTestRpc } from '../../src/utils';
 
 // These are all values for a real txn on the Ethereum Sepolia Testnet
 const transactionHash =
@@ -47,7 +49,7 @@ async function processValidStakeTransaction() {
         exchangeToken: '0x0000000000000000000000000000000000000000',
       },
       eventSource: {
-        ethChainId: cp.ValidChains.Sepolia,
+        ethChainId: ValidChains.Sepolia,
       },
       block: {
         number: 5628559n,
@@ -71,10 +73,10 @@ describe('ChainEventCreated Policy', () => {
     const [chainNode] = await tester.seed(
       'ChainNode',
       {
-        url: createTestRpc(cp.ValidChains.Sepolia),
-        private_url: createTestRpc(cp.ValidChains.Sepolia, 'private'),
+        url: createTestRpc(ValidChains.Sepolia),
+        private_url: createTestRpc(ValidChains.Sepolia, 'private'),
         name: 'Sepolia Testnet',
-        eth_chain_id: cp.ValidChains.Sepolia,
+        eth_chain_id: ValidChains.Sepolia,
         balance_type: BalanceType.Ethereum,
       },
       { mock: false },

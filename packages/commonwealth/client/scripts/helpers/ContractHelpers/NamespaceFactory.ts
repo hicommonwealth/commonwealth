@@ -3,7 +3,7 @@ import {
   INamespaceResHookAbi,
   NamespaceFactoryAbi,
 } from '@commonxyz/common-protocol-abis';
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
 import ContractBase from './ContractBase';
@@ -111,7 +111,7 @@ class NamespaceFactory extends ContractBase {
           type: '0x2',
           maxFeePerGas: maxFeePerGasEst?.toString(),
           maxPriorityFeePerGas:
-            this.chainId && parseInt(this.chainId) === cp.ValidChains.SKALE_TEST
+            this.chainId && parseInt(this.chainId) === ValidChains.SKALE_TEST
               ? BigInt(0.00012 * 1e9)
               : this.web3.utils.toWei('0.001', 'gwei'),
         });
@@ -199,7 +199,7 @@ class NamespaceFactory extends ContractBase {
           type: '0x2',
           maxFeePerGas: maxFeePerGasEst?.toString(),
           maxPriorityFeePerGas:
-            this.chainId && parseInt(this.chainId) === cp.ValidChains.SKALE_TEST
+            this.chainId && parseInt(this.chainId) === ValidChains.SKALE_TEST
               ? BigInt(0.00012 * 1e9)
               : this.web3.utils.toWei('0.001', 'gwei'),
         });
@@ -261,8 +261,7 @@ class NamespaceFactory extends ContractBase {
             type: '0x2',
             maxFeePerGas: maxFeePerGasEst?.toString(),
             maxPriorityFeePerGas:
-              this.chainId &&
-              parseInt(this.chainId) === cp.ValidChains.SKALE_TEST
+              this.chainId && parseInt(this.chainId) === ValidChains.SKALE_TEST
                 ? BigInt(0.00012 * 1e9)
                 : this.web3.utils.toWei('0.001', 'gwei'),
           });

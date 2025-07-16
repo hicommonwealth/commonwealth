@@ -1,5 +1,5 @@
 import { disposeAdapter } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { delay } from '@hicommonwealth/shared';
 import {
   numUnrelayedEvents,

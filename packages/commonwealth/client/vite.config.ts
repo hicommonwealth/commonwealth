@@ -58,6 +58,9 @@ export default defineConfig(({ mode }) => {
       env.FLAG_NEW_PROFILE_PAGE,
     ),
     'process.env.FLAG_PRIVATE_TOPICS': JSON.stringify(env.FLAG_PRIVATE_TOPICS),
+    'process.env.FLAG_CRECIMIENTO_HACKATHON': JSON.stringify(
+      env.FLAG_CRECIMIENTO_HACKATHON,
+    ),
   };
 
   return {
