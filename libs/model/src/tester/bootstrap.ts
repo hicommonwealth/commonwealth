@@ -48,6 +48,7 @@ const verify_db = async (name: string): Promise<void> => {
  */
 const migrate_db = async (sequelize: Sequelize) => {
   // initialize minimal schema - baseline before migrations
+  const name = sequelize.getDatabaseName();
   const schemaPath = join(__dirname, '../../assets/minimal_schema.sql');
   if (existsSync(schemaPath)) {
     execSync(
