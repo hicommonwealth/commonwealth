@@ -14,4 +14,4 @@ echo ""
 # Purge the Cloudflare Cache
 echo "Purging Cloudflare Cache..."
 echo ""
-npx -y tsx@^4.7.2 /server/scripts/purgeCloudflareCache.ts
+npx -y tsx@^4.7.2 server/scripts/purgeCloudflareCache.ts

@@ -21,8 +21,11 @@ async function purgeCache(zoneId?: string, apiKey?: string) {
     });
 
     const responseData = await response.json();
-    console.info('Cache purge request successful:');
-    console.info(responseData);
+    if (response.status < 400 || responseData.success === false) {
+      console.error('Cache purge request failed', responseData);
+    } else {
+      console.info('Cache purge request successful:', responseData);
+    }
   } catch (error) {
     console.error('Error purging cache:', error.message);
   }
