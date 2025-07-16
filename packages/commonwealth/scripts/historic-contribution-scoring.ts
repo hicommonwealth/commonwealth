@@ -366,6 +366,7 @@ async function getHistoricalTokenAllocations(
 ): Promise<Array<HistoricalAllocation>> {
   const res = await models.sequelize.query<HistoricalAllocation>(
     `
+    CREATE TABLE historical_allocations AS
     WITH users AS (SELECT U.id as user_id, U.created_at
                    FROM "Users" U),
          addresses AS (SELECT U.user_id as user_id, A.id as address_id, A.address
@@ -455,6 +456,7 @@ async function getAuraTokenAllocations(
 ): Promise<Array<AuraAllocation>> {
   const res = await models.sequelize.query<AuraAllocation>(
     `
+    CREATE TABLE aura_allocations AS
       WITH xp_sum AS (
           SELECT SUM(xp_points) + SUM(creator_xp_points) as total_xp_awarded
           FROM "XpLogs"
@@ -554,12 +556,18 @@ async function main() {
 
     console.log(`\n`);
 
-    const scores = await getHistoricalTokenAllocations(config);
-    const auraScores = await getAuraTokenAllocations(config);
+    console.log('Dropping tables if they exist');
+    await models.sequelize.query(`DROP TABLE IF EXISTS historical_allocations`);
+    await models.sequelize.query(`DROP TABLE IF EXISTS aura_allocations`);
 
-    // Write both CSV files
-    writeScoresToCSV(scores, config.historicalOutputPath);
-    writeScoresToCSV(auraScores, config.auraOutputPath);
+    console.log('Generating historical token allocations...');
+    await getHistoricalTokenAllocations(config);
+    console.log('Generating aura token allocations...');
+    await getAuraTokenAllocations(config);
+
+    // // Write both CSV files
+    // writeScoresToCSV(scores, config.historicalOutputPath);
+    // writeScoresToCSV(auraScores, config.auraOutputPath);
     process.exit(0);
   } catch (error) {
     console.error('Error:', error instanceof Error ? error.message : error);
