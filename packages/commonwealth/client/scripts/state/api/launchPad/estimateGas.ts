@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 
@@ -11,10 +11,10 @@ interface EstimateGasProps {
 
 const estimateGas = async ({ ethChainId, chainRpc }: EstimateGasProps) => {
   const launchPad = new LaunchpadBondingCurve(
-    commonProtocol.factoryContracts[ethChainId].lpBondingCurve,
-    commonProtocol.factoryContracts[ethChainId].launchpad,
+    factoryContracts[ethChainId].lpBondingCurve,
+    factoryContracts[ethChainId].launchpad,
     '',
-    commonProtocol.factoryContracts[ethChainId].tokenCommunityManager,
+    factoryContracts[ethChainId].tokenCommunityManager,
     chainRpc,
   );
 
