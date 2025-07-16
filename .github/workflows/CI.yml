@@ -79,7 +79,6 @@ jobs:
 
       - name: Run serial e2e tests
         run: |
-          pnpm -F commonwealth bootstrap-test-db &&
           (cd packages/commonwealth && node --import=extensionless/register --enable-source-maps ./build/server.js) &
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
       - name: Archive code coverage results
