@@ -1,11 +1,11 @@
-import pino, { DestinationStream, MultiStreamRes } from 'pino';
+import pino, { DestinationStream } from 'pino';
 import { ZodError } from 'zod';
 import { config } from '../config';
 import { LogLevel } from '../ports/enums';
 import { GetLogger, LogContext, LoggerIds } from './interfaces';
 import { rollbar } from './rollbar';
 
-let transport: DestinationStream | MultiStreamRes;
+let transport: DestinationStream;
 
 const formatFilename = (name: string) => {
   const t = name.split('/');
@@ -24,14 +24,6 @@ if (config.NODE_ENV !== 'production') {
       singleLine: true,
     },
   });
-} else {
-  transport = pino.multistream(
-    [
-      { level: 'info', stream: process.stdout },
-      { level: 'error', stream: process.stderr },
-    ],
-    { dedupe: true },
-  );
 }
 
 export const getPinoLogger: GetLogger = (
@@ -91,7 +83,10 @@ export const getPinoLogger: GetLogger = (
       else rollbar.error(msg, error ?? '');
     },
     fatal(msg: string, error?: Error, context?: LogContext) {
-      logger.fatal({ ...context, err: error || undefined }, msg);
+      // Railway doesn't currently normalize fatal logs as errors so must log as errors for now
+      if (config.NODE_ENV === 'production')
+        logger.error({ ...context, err: error || undefined }, msg);
+      else logger.fatal({ ...context, err: error || undefined }, msg);
 
       if (context) rollbar.critical(msg, error ?? '', context);
       else rollbar.critical(msg, error ?? '');
