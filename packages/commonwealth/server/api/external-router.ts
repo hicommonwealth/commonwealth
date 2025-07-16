@@ -75,8 +75,6 @@ const {
   createPoll,
   deletePoll,
   createPollVote,
-  getPolls,
-  getPollVotes,
 } = poll.trpcRouter;
 
 const api = {
@@ -153,8 +151,8 @@ const api = {
   createPoll,
   deletePoll,
   createPollVote,
-  getPolls,
-  getPollVotes,
+  getPolls: trpc.query(Poll.GetPolls, trpc.Tag.Poll, { forceSecure: true }),
+  getPollVotes: trpc.query(Poll.GetPollVotes, trpc.Tag.Poll, { forceSecure: true }),
 };
 
 const PATH = '/api/v1';
