@@ -287,9 +287,11 @@ export const config = configure(
         : 1,
     },
     DISABLE_TIER_RATE_LIMITS:
-      !DISABLE_TIER_RATE_LIMITS && target.APP_ENV === 'local'
-        ? true
-        : DISABLE_TIER_RATE_LIMITS === 'true',
+      target.NODE_ENV === 'test'
+        ? false
+        : !DISABLE_TIER_RATE_LIMITS && target.APP_ENV === 'local'
+          ? true
+          : DISABLE_TIER_RATE_LIMITS === 'true',
     TIER: {
       SOCIAL_VERIFIED_MIN_ETH: parseFloat(
         TIER_SOCIAL_VERIFIED_MIN_ETH || DEFAULTS.TIER_SOCIAL_VERIFIED_MIN_ETH,
