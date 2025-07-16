@@ -1,4 +1,4 @@
-/* eslint-disable n/no-process-exit, no-fallthrough */
+/* eslint-disable n/no-process-exit, no-fallthrough, no-warning-comments */
 import { dispose } from '@hicommonwealth/core';
 import fetch, { Response } from 'node-fetch';
 
