@@ -1,10 +1,11 @@
 /* eslint-disable n/no-process-exit, no-fallthrough */
+import { dispose } from '@hicommonwealth/core';
 import fetch, { Response } from 'node-fetch';
 
-(async () => {
-  let config;
+async function main() {
+  let config: typeof import('../config').config;
   try {
-    config = await import('../config');
+    ({ config } = await import('../config'));
     console.log('Environment variables are properly configured');
   } catch (error) {
     console.error(error);
@@ -125,4 +126,17 @@ import fetch, { Response } from 'node-fetch';
 
     await new Promise((r) => setTimeout(r, 10000));
   }
-})();
+}
+
+if (import.meta.url.endsWith(process.argv[1])) {
+  main()
+    .then(() => {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('EXIT', true);
+    })
+    .catch((err) => {
+      console.error(err);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('ERROR', true);
+    });
+}
