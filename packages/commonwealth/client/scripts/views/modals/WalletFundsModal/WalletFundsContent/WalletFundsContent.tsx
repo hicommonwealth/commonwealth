@@ -2,6 +2,7 @@ import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { MoonPayBuyWidget } from '@moonpay/moonpay-react';
 import React, { useState } from 'react';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
+import { useFetchPublicEnvVarQuery } from 'state/api/configuration';
 import { useGetEthereumBalanceQuery } from 'state/api/tokens';
 import { trpc } from 'utils/trpcClient';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -12,8 +13,12 @@ import {
 import { FundWalletItem } from './FundWalletItem';
 import useMagicWallet from './useMagicWallet';
 import { formatUsdBalance, handleRefreshBalance } from './utils';
-
 import './WalletFundsContent.scss';
+
+// Type guard to check for ReactNativeWebView property
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const isReactNativeWebView = (): boolean =>
+  !!(window as any).ReactNativeWebView;
 
 const BASE_MAINNET_CHAIN_ID = commonProtocol.ValidChains.Base;
 
@@ -29,6 +34,8 @@ const WalletFundsContent = ({
     userAddress,
     isLoading: isMagicLoading,
   } = useMagicWallet({ chainId });
+
+  const { data: configurationData } = useFetchPublicEnvVarQuery();
 
   const [isMoonpayVisible, setIsMoonpayVisible] = useState(false);
   const utils = trpc.useUtils();
@@ -67,8 +74,22 @@ const WalletFundsContent = ({
     }
   };
 
-  const handleShowMoonpay = () => {
-    setIsMoonpayVisible(true);
+  const handleShowMoonpay = async () => {
+    // If we're in a react native webview, post a message to the host app
+    if (isReactNativeWebView() && userAddress) {
+      const moonpayUrl = `https://buy-sandbox.moonpay.com?apiKey=${
+        configurationData?.MOONPAY_PUBLISHABLE_KEY
+      }&walletAddress=${userAddress}&currencyCode=eth`;
+
+      const signedUrl = await onUrlSignatureRequested(moonpayUrl);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).ReactNativeWebView.postMessage(
+        JSON.stringify({ type: 'MOONPAY_OPEN', url: signedUrl }),
+      );
+    } else {
+      setIsMoonpayVisible(true);
+    }
   };
 
   const handleCloseMoonpay = async () => {
@@ -135,6 +156,7 @@ const WalletFundsContent = ({
         walletAddress={userAddress}
         onClose={handleCloseMoonpay}
         onUrlSignatureRequested={onUrlSignatureRequested}
+        currencyCode="eth"
       />
     </div>
   );
