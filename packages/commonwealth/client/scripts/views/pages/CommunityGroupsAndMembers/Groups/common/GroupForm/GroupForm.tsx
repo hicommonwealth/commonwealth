@@ -8,10 +8,17 @@ import { weightedVotingValueToLabel } from 'helpers';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  MultiValueProps,
+  OptionProps,
+  SingleValueProps,
+  components,
+} from 'react-select';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -46,6 +53,12 @@ import {
   groupValidationSchema,
   requirementSubFormValidationSchema,
 } from './validations';
+
+type TopicOption = {
+  label: React.ReactNode;
+  value: string | number;
+  helpText?: string;
+};
 
 type CWRequirementsRadioButtonProps = {
   maxRequirements: number;
@@ -154,6 +167,7 @@ const GroupForm = ({
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId,
+    includeTopics: true,
     enabled: !!communityId,
   });
 
@@ -181,6 +195,37 @@ const GroupForm = ({
   ] = useState<TopicPermissionToggleGroupSubFormsState[]>([]);
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
+
+  const topicPrivacyMap = new Map<number, boolean>();
+  groups.forEach((group) => {
+    (group.topics || []).forEach((topic) => {
+      topicPrivacyMap.set(topic.id, topic.is_private);
+    });
+  });
+
+  const currentGroup = groups.find((g) => g.name === initialValues.groupName);
+  const privateTopicIds = new Set(
+    (currentGroup?.topics || []).filter((t) => t.is_private).map((t) => t.id),
+  );
+
+  const topicOptions = sortedTopics
+    .filter((topic) => topic.id !== undefined)
+    .map((topic) => ({
+      label: (
+        <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+          {topic.name}
+          {privateTopicIds.has(topic.id) && (
+            <CWIcon
+              iconName="lockedNew"
+              iconSize="small"
+              style={{ marginLeft: 6 }}
+            />
+          )}
+        </span>
+      ),
+      value: topic.id as number,
+      helpText: weightedVotingValueToLabel(topic.weighted_voting!),
+    }));
 
   const handleImageProcessingChange = useCallback(
     ({ isGenerating, isUploading }) => {
@@ -459,11 +504,11 @@ const GroupForm = ({
               ? REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
               : REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS
             : '',
-          topics:
-            initialValues?.topics?.map((t) => ({
-              label: t.label,
-              value: t.value,
-            })) || '',
+          topics: (initialValues?.topics || [])
+            .map((t) =>
+              topicOptions.find((opt) => opt.value === Number(t.value)),
+            )
+            .filter(Boolean),
         }}
         validationSchema={groupValidationSchema}
         onSubmit={handleSubmit}
@@ -640,13 +685,33 @@ const GroupForm = ({
                   isClearable={false}
                   label="Topics"
                   placeholder="Type in topic name"
-                  options={sortedTopics.map((topic) => ({
-                    label: topic.name,
-                    value: topic.id,
-                    helpText: weightedVotingValueToLabel(
-                      topic.weighted_voting!,
+                  options={topicOptions}
+                  components={{
+                    Option: ({
+                      data,
+                      ...props
+                    }: OptionProps<TopicOption, true>) => (
+                      <components.Option {...props} data={data}>
+                        {data.label}
+                      </components.Option>
                     ),
-                  }))}
+                    SingleValue: ({
+                      data,
+                      ...props
+                    }: SingleValueProps<TopicOption, true>) => (
+                      <components.SingleValue {...props} data={data}>
+                        {data.label}
+                      </components.SingleValue>
+                    ),
+                    MultiValueLabel: ({
+                      data,
+                      ...props
+                    }: MultiValueProps<TopicOption, true>) => (
+                      <components.MultiValueLabel {...props} data={data}>
+                        {data.label}
+                      </components.MultiValueLabel>
+                    ),
+                  }}
                 />
               </section>
 
