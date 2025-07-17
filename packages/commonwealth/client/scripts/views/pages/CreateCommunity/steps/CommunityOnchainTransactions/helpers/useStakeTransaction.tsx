@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { STAKE_ID } from '@hicommonwealth/evm-protocols';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useState } from 'react';
@@ -60,14 +60,14 @@ const useStakeTransaction = ({
 
       await namespaceFactory.configureCommunityStakes(
         namespace,
-        commonProtocol.STAKE_ID,
+        STAKE_ID,
         userAddress,
         chainId,
       );
 
       await updateCommunityStake({
         community_id: communityId,
-        stake_id: commonProtocol.STAKE_ID,
+        stake_id: STAKE_ID,
       });
 
       setTransactionData({

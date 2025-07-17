@@ -1,5 +1,8 @@
 import { config, logger, Policy } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import {
+  EvmProtocolChain,
+  getContestScore,
+} from '@hicommonwealth/evm-protocols';
 import { events } from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
@@ -222,12 +225,12 @@ const onContestActivity = async ({
     private_url: contestManager!.Community!.ChainNode!.private_url,
   });
 
-  const chain: commonProtocol.EvmProtocolChain = {
+  const chain: EvmProtocolChain = {
     eth_chain_id: contestManager.Community!.ChainNode!.eth_chain_id!,
     rpc,
   };
 
-  const { contestBalance } = await commonProtocol.getContestScore(
+  const { contestBalance } = await getContestScore(
     chain,
     contest_address,
     contestManager.prize_percentage!,
