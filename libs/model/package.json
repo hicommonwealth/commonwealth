@@ -68,7 +68,11 @@
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
     "migrate:status": "npx sequelize-cli db:migrate:status",
     "migration:generate": "npx sequelize-cli migration:generate --name",
-    "dump:minimal-schema": "tsx scripts/dump-minimal-schema.ts"
+    "dump:minimal-schema": "tsx scripts/dump-minimal-schema.ts",
+    "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
+    "db-all": "chmod u+x scripts/db-all.sh && ./scripts/db-all.sh",
+    "dump-db": "chmod u+x scripts/dump-db.sh && ./scripts/dump-db.sh",
+    "reset-db": "chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh"
   },
   "dependencies": {
     "@anatine/zod-mock": "^3.13.3",

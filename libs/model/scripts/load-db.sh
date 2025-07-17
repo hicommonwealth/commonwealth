@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 
 # this path is relative to the location from which the script is called i.e. /commonwealth root rather than the path
 # from which the script exists i.e. commonwealth/scripts/
@@ -19,4 +20,4 @@ if [ "$1" ]; then
 fi
 
 psql -h localhost -d commonwealth -U commonwealth -f "$DUMP_NAME";
-pnpm cancel-all-local-contests
+pnpm -F commonwealth cancel-all-local-contests

@@ -25,3 +25,4 @@ external-openapi.json
 .eslintcache
 .envrc
 tracing
+latest.dump
