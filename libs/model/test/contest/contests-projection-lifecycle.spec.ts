@@ -7,7 +7,6 @@ import {
   query,
 } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
-import { createEventRegistryChainNodes, models } from '@hicommonwealth/model';
 import { ContestResults } from '@hicommonwealth/schemas';
 import { CONTEST_FEE_PERCENT, delay } from '@hicommonwealth/shared';
 import {
@@ -22,9 +21,9 @@ import {
 import { z } from 'zod';
 import { Contests } from '../../src/aggregates/contest/Contests.projection';
 import { GetAllContests } from '../../src/aggregates/contest/GetAllContests.query';
+import { models } from '../../src/database';
 import { seed } from '../../src/tester';
-
-const { commonProtocol } = evm;
+import { createEventRegistryChainNodes } from '../../src/utils';
 
 describe('Contests projection lifecycle', () => {
   const actor: Actor = { user: { email: '' } };
@@ -54,8 +53,8 @@ describe('Contests projection lifecycle', () => {
   const community_id = 'community-with-contests';
   const thread_id = 1;
   const thread_title = 'thread-in-contest';
-  const ticker = commonProtocol.Denominations.ETH;
-  const decimals = commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH];
+  const ticker = evm.Denominations.ETH;
+  const decimals = evm.WeiDecimals[evm.Denominations.ETH];
   const topic_id = 100;
 
   const getTokenAttributes = vi.spyOn(evm, 'getTokenAttributes');

@@ -17,12 +17,13 @@ import {
   express as expressAdapter,
 } from '@hicommonwealth/adapters';
 import { AppError, query } from '@hicommonwealth/core';
-import { Community, generateTokenIdea, User } from '@hicommonwealth/model';
+import { Community, User } from '@hicommonwealth/model';
 import { get_atom_feed_router } from 'server/api/get-atom-feed-router';
 import generateImageHandler from '../routes/generateImage';
 import getUploadSignature from '../routes/getUploadSignature';
 import logout from '../routes/logout';
 
+import { generateTokenIdea } from '@hicommonwealth/model/services';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { config } from '../config';
 import { aiCompletionHandler } from '../routes/ai';

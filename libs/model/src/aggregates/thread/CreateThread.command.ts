@@ -20,7 +20,7 @@ import {
   verifyThreadSignature,
 } from '../../middleware';
 import { getThreadSearchVector } from '../../models/thread';
-import { tokenBalanceCache } from '../../services';
+import { getBalances } from '../../services/tokenBalanceCache';
 import {
   decodeContent,
   emitMentions,
@@ -28,7 +28,7 @@ import {
   uniqueMentions,
   uploadIfLarge,
 } from '../../utils';
-import { GetActiveContestManagers } from '../contest';
+import { GetActiveContestManagers } from '../contest/GetActiveContestManagers.query';
 
 export const CreateThreadErrors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -51,7 +51,7 @@ async function checkAddressBalance(
   activeContestManagers: z.infer<typeof getActiveContestManagersQuery.output>,
   address: string,
 ) {
-  const balances = await tokenBalanceCache.getBalances({
+  const balances = await getBalances({
     balanceSourceType: BalanceSourceType.ETHNative,
     addresses: [address],
     sourceOptions: {
@@ -141,7 +141,10 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       const body = decodeContent(payload.body);
       const mentions = uniqueMentions(parseUserMentions(body));
 
-      const { contentUrl } = await uploadIfLarge('threads', body);
+      const { truncatedBody, contentUrl } = await uploadIfLarge(
+        'threads',
+        body,
+      );
 
       // == mutation transaction boundary ==
       const new_thread_id = await models.sequelize.transaction(
@@ -153,7 +156,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
               address_id: address.id!,
               topic_id,
               kind,
-              body,
+              body: truncatedBody || body,
               view_count: 0,
               comment_count: 0,
               reaction_count: 0,
@@ -172,7 +175,7 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
           await models.ThreadVersionHistory.create(
             {
               thread_id: thread.id!,
-              body,
+              body: truncatedBody || body,
               address: address.address,
               timestamp: thread.created_at!,
               content_url: contentUrl,

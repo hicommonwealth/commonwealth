@@ -7,6 +7,7 @@ import {
   addressSwapper,
   verifySession,
 } from '@hicommonwealth/shared';
+import { useLoginWithEmail, useLoginWithSms } from '@privy-io/react-auth';
 import axios from 'axios';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { BASE_API_PATH } from 'client/scripts/utils/trpcClient';
@@ -37,19 +38,23 @@ import {
 } from 'helpers/localStorage';
 import _ from 'lodash';
 import { Magic } from 'magic-sdk';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import app, { initAppState } from 'state';
 import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
 import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { EIP1193Provider } from 'viem';
-import usePrivyEmailDialogStore from 'views/components/Privy/stores/usePrivyEmailDialogStore';
-import usePrivySMSDialogStore from 'views/components/Privy/stores/usePrivySMSDialogStore';
-import { usePrivyAuthWithEmail } from 'views/components/Privy/usePrivyAuthWithEmail';
+import usePrivyEmailDialogStore, {
+  emailDialogStore,
+} from 'views/components/Privy/stores/usePrivyEmailDialogStore';
+import { smsDialogStore } from 'views/components/Privy/stores/usePrivySMSDialogStore';
+import type { PrivySignInSSOProvider } from 'views/components/Privy/types';
+import { useConnectedWallet } from 'views/components/Privy/useConnectedWallet';
 import { usePrivyAuthWithOAuth } from 'views/components/Privy/usePrivyAuthWithOAuth';
-import { usePrivyAuthWithPhone } from 'views/components/Privy/usePrivyAuthWithPhone';
+import { usePrivySignOn } from 'views/components/Privy/usePrivySignOn';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
@@ -62,7 +67,7 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
-import { darkModeStore } from '../../../state/ui/darkMode/darkMode';
+import { waitForWallet } from '../../components/Privy/helpers';
 import { openConfirmation } from '../confirmation_modal';
 
 type UseAuthenticationProps = {
@@ -95,11 +100,22 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const privyEnabled = useFlag('privy');
 
   const { isAddedToHomeScreen } = useAppStatus();
-  const { setState: setSMSDialogState } = usePrivySMSDialogStore();
   const { setState: setEmailDialogState } = usePrivyEmailDialogStore();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
 
   const user = useUserStore();
   const { data: configurationData } = useFetchPublicEnvVarQuery();
+
+  // Privy hooks for SMS authentication
+  const connectedWallet = useConnectedWallet();
+  const privySignOn = usePrivySignOn();
+  const connectedWalletRef = useRef(connectedWallet);
+
+  // Update wallet ref when wallet changes
+  useEffect(() => {
+    connectedWalletRef.current = connectedWallet;
+  }, [connectedWallet]);
 
   const magic = new Magic(configurationData!.MAGIC_PUBLISHABLE_KEY);
 
@@ -141,8 +157,95 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   }, [handlePrivyError, handlePrivySuccess]);
 
   const privyAuthWithOAuth = usePrivyAuthWithOAuth(privyCallbacks);
-  const privyAuthWithPhone = usePrivyAuthWithPhone(privyCallbacks);
-  const privyAuthWithEmail = usePrivyAuthWithEmail(privyCallbacks);
+
+  // Handle SMS login completion (similar to OAuth pattern)
+  const handleSMSLoginComplete = useCallback(async () => {
+    if (user.isLoggedIn) return;
+
+    // Wait for wallet to be available
+    const walletAvailable = await waitForWallet(connectedWalletRef);
+    if (!walletAvailable) {
+      handlePrivyError(new Error('Wallet not available'));
+      return;
+    }
+
+    const currentWallet = connectedWalletRef.current;
+    if (!currentWallet) {
+      console.warn('No connected wallet available');
+      handlePrivyError(new Error('No connected wallet available'));
+      return;
+    }
+
+    try {
+      await privySignOn({
+        wallet: currentWallet,
+        onSuccess: handlePrivySuccess,
+        onError: handlePrivyError,
+        ssoOAuthToken: undefined, // Not needed for SMS
+        ssoProvider: 'phone' as PrivySignInSSOProvider, // SMS provider
+      });
+    } catch (error) {
+      console.error('SMS sign-on error:', error);
+      handlePrivyError(error as Error);
+    }
+  }, [
+    user.isLoggedIn,
+    connectedWalletRef,
+    privySignOn,
+    handlePrivySuccess,
+    handlePrivyError,
+  ]);
+
+  const handleEmailLoginComplete = useCallback(async () => {
+    if (user.isLoggedIn) return;
+
+    // Wait for wallet to be available
+    const walletAvailable = await waitForWallet(connectedWalletRef);
+    if (!walletAvailable) {
+      handlePrivyError(new Error('Wallet not available'));
+      return;
+    }
+
+    const currentWallet = connectedWalletRef.current;
+    if (!currentWallet) {
+      console.warn('No connected wallet available');
+      handlePrivyError(new Error('No connected wallet available'));
+      return;
+    }
+
+    try {
+      await privySignOn({
+        wallet: currentWallet,
+        onSuccess: handlePrivySuccess,
+        onError: handlePrivyError,
+        ssoOAuthToken: undefined, // Not needed for email
+        ssoProvider: 'email' as PrivySignInSSOProvider, // Email provider
+      });
+    } catch (error) {
+      console.error('Email sign-on error:', error);
+      handlePrivyError(error as Error);
+    }
+  }, [
+    user.isLoggedIn,
+    connectedWalletRef,
+    privySignOn,
+    handlePrivySuccess,
+    handlePrivyError,
+  ]);
+
+  const { sendCode: sendSMSCode, loginWithCode: loginWithSMSCode } =
+    useLoginWithSms({
+      onComplete: () => {
+        handleSMSLoginComplete().catch(console.error);
+      },
+    });
+
+  const { sendCode: sendEmailCode, loginWithCode: loginWithEmailCode } =
+    useLoginWithEmail({
+      onComplete: () => {
+        handleEmailLoginComplete().catch(console.error);
+      },
+    });
 
   const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
 
@@ -179,6 +282,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       );
     }
   }, [configurationData]);
+
+  useEffect(() => {
+    const actualUrl = new URL(window.location.href);
+    const hasPrivyOAuthState = actualUrl.searchParams.has('privy_oauth_state');
+    setIsMagicLoading(hasPrivyOAuthState);
+  }, [searchParams, location]);
 
   const handleSuccess = async (
     authAddress?: string | null | undefined,
@@ -240,17 +349,27 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     setIsMagicLoading(true);
     const tempSMSToUse = phoneNumber || SMS;
     setSMS(tempSMSToUse);
-    // this will bring the SMS dialog up so that the user can enter the code we
-    // are about to send
-    setSMSDialogState({
-      active: true,
-      onCancel: () => {
-        setSMS(undefined);
-        setIsMagicLoading(false);
-      },
-      onError: privyCallbacks.onError,
-    });
-    await privyAuthWithPhone.sendCode({ phoneNumber: tempSMSToUse });
+
+    try {
+      await sendSMSCode({ phoneNumber: tempSMSToUse });
+
+      const { awaitUserInput } = smsDialogStore.getState();
+      const code = await awaitUserInput('Enter the code we sent to your phone');
+
+      await loginWithSMSCode({ code });
+
+      setIsMagicLoading(false);
+    } catch (error) {
+      // Handle both cancellation and actual errors
+      if (error.message === 'User cancelled') {
+        console.log('User cancelled SMS verification');
+      } else {
+        console.error('SMS login error:', error);
+        notifyError('Error during SMS verification. Please try again.');
+      }
+      setSMS(undefined);
+      setIsMagicLoading(false);
+    }
   };
 
   const onSMSLogin = privyEnabled ? onSMSLoginPrivy : onSMSLoginMagic;
@@ -301,22 +420,15 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
 
     try {
-      setEmailDialogState({
-        active: true,
-        onCancel: () => {
-          setEmail(undefined);
-          setIsMagicLoading(false);
-        },
-        onError: privyCallbacks.onError,
-      });
-      await privyAuthWithEmail.sendCode({ email: tempEmailToUse });
-
-      // TODO: I need to handle these now...
-      // setIsMagicLoading(false);
-      // TODO: trackLoginEvent('email', true);
+      await sendEmailCode({ email: tempEmailToUse });
+      const { awaitUserInput } = emailDialogStore.getState();
+      const code = await awaitUserInput();
+      await loginWithEmailCode({ code });
+      setIsMagicLoading(false);
     } catch (e) {
       notifyError(`Error authenticating with email`);
       console.error(`Error authenticating with email: ${e}`);
+      setEmail(undefined);
       setIsMagicLoading(false);
     }
   };
@@ -377,10 +489,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     } else {
       // log in as the new user
       await initAppState(false);
-      const darkMode = darkModeStore.getState();
-      if (!darkMode.isDarkMode) {
-        darkMode.setDarkMode(true);
-      }
       if (app.chain) {
         await updateActiveAddresses(app.activeChainId() || '');
       }
@@ -541,7 +649,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     newelyCreated?: boolean,
   ) => {
     try {
-      if (username && account?.profile) {
+      if (username !== DEFAULT_NAME && account?.profile) {
         await updateUser({
           id: account.profile.userId,
           profile: {

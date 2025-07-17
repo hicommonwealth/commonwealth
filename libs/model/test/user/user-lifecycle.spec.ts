@@ -32,7 +32,7 @@ import {
   Xp,
 } from '../../src/aggregates/user';
 import { models } from '../../src/database';
-import * as services from '../../src/services';
+import * as tokenBalanceCache from '../../src/services/tokenBalanceCache';
 import { seed } from '../../src/tester';
 import * as utils from '../../src/utils';
 import { drainOutbox } from '../utils';
@@ -402,7 +402,7 @@ describe('User lifecycle', () => {
         },
       ]);
 
-      vi.spyOn(services.tokenBalanceCache, 'getBalances').mockResolvedValue({
+      vi.spyOn(tokenBalanceCache, 'getBalances').mockResolvedValue({
         [member.address!]: '100',
       });
 
@@ -955,7 +955,7 @@ describe('User lifecycle', () => {
       const address = await signer.getWalletAddress();
 
       // make sure address has a balance above threshold
-      vi.spyOn(services.tokenBalanceCache, 'getBalances').mockResolvedValue({
+      vi.spyOn(tokenBalanceCache, 'getBalances').mockResolvedValue({
         [address]: '100',
       });
 

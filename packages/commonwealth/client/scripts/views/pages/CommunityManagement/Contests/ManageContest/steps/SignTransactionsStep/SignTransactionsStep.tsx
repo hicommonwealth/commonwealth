@@ -1,4 +1,7 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import {
+  CONTEST_FEE_SHARE,
+  CONTEST_VOTER_SHARE,
+} from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import useGetJudgeStatusQuery from 'client/scripts/state/api/contests/getJudgeStatus';
@@ -136,8 +139,8 @@ const SignTransactionsStep = ({
       : contestFormData?.contestDuration || 0;
 
     const stakeId = stakeData?.stake?.stake_id || 0;
-    const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
-    const feeShare = commonProtocol.CONTEST_FEE_SHARE;
+    const voterShare = CONTEST_VOTER_SHARE;
+    const feeShare = CONTEST_FEE_SHARE;
     const weight = stakeData?.stake?.vote_weight || 0;
     const contestInterval = devContest
       ? contestDurationInSeconds

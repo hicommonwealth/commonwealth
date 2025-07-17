@@ -1,10 +1,4 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
-import {
-  CommentInstance,
-  decodeContent,
-  getCommentSearchVector,
-  uploadIfLarge,
-} from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { GatedActionEnum, MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import { models } from '../../database';
@@ -16,11 +10,14 @@ import {
 } from '../../middleware';
 import { verifyCommentSignature } from '../../middleware/canvas';
 import { mustBeAuthorizedThread, mustExist } from '../../middleware/guards';
+import { CommentInstance, getCommentSearchVector } from '../../models';
 import {
+  decodeContent,
   emitEvent,
   emitMentions,
   parseUserMentions,
   uniqueMentions,
+  uploadIfLarge,
 } from '../../utils';
 import { getCommentDepth } from '../../utils/getCommentDepth';
 
@@ -83,7 +80,10 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
       const body = decodeContent(payload.body);
       const mentions = uniqueMentions(parseUserMentions(body));
 
-      const { contentUrl } = await uploadIfLarge('comments', body);
+      const { truncatedBody, contentUrl } = await uploadIfLarge(
+        'comments',
+        body,
+      );
 
       // == mutation transaction boundary ==
       const new_comment_id = await models.sequelize.transaction(
@@ -93,7 +93,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               ...rest,
               thread_id,
               parent_id,
-              body,
+              body: truncatedBody || body,
               address_id: address.id!,
               reaction_count: 0,
               reaction_weights_sum: '0',
@@ -120,7 +120,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
           await models.CommentVersionHistory.create(
             {
               comment_id: comment.id!,
-              body: comment.body,
+              body: truncatedBody || comment.body,
               timestamp: comment.created_at!,
               content_url: contentUrl,
             },

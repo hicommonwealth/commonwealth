@@ -9,8 +9,53 @@
   ],
   "exports": {
     ".": {
-      "default": "./build/index.js",
-      "devmode": "./src/index.ts"
+      "import": {
+        "types": "./build/index.d.js",
+        "default": "./build/index.js",
+        "devmode": "./src/index.ts"
+      }
+    },
+    "./db": {
+      "import": {
+        "types": "./build/database.d.js",
+        "default": "./build/database.js"
+      }
+    },
+    "./models": {
+      "import": {
+        "types": "./build/models/index.d.js",
+        "default": "./build/models/index.js"
+      }
+    },
+    "./middleware": {
+      "import": {
+        "types": "./build/middleware/index.d.js",
+        "default": "./build/middleware/index.js"
+      }
+    },
+    "./services": {
+      "import": {
+        "types": "./build/services/index.d.js",
+        "default": "./build/services/index.js"
+      }
+    },
+    "./tbc": {
+      "import": {
+        "types": "./build/services/tokenBalanceCache/index.d.js",
+        "default": "./build/services/tokenBalanceCache/index.js"
+      }
+    },
+    "./protocol": {
+      "import": {
+        "types": "./build/services/commonProtocol/index.d.js",
+        "default": "./build/services/commonProtocol/index.js"
+      }
+    },
+    "./tester": {
+      "import": {
+        "types": "./build/tester/index.d.js",
+        "default": "./build/tester/index.js"
+      }
     }
   },
   "scripts": {

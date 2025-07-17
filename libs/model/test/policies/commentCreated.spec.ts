@@ -18,9 +18,10 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { models, tester } from '../../src';
+import { models } from '../../src/database';
 import { notifyCommentCreated } from '../../src/policies/handlers/notifyCommentCreated';
 import { getCommentUrl, getProfileUrl } from '../../src/policies/utils/utils';
+import * as tester from '../../src/tester';
 import {
   ProviderError,
   SpyNotificationsProvider,

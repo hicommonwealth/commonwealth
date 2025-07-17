@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 
@@ -20,10 +20,10 @@ const tokenEthExchangeRate = async ({
   mode,
 }: TokenEthExchangeRateProps) => {
   const launchPad = new LaunchpadBondingCurve(
-    commonProtocol.factoryContracts[ethChainId].lpBondingCurve,
-    commonProtocol.factoryContracts[ethChainId].launchpad,
+    factoryContracts[ethChainId].lpBondingCurve,
+    factoryContracts[ethChainId].launchpad,
     tokenAddress,
-    commonProtocol.factoryContracts[ethChainId].tokenCommunityManager,
+    factoryContracts[ethChainId].tokenCommunityManager,
     chainRpc,
   );
 

@@ -3,7 +3,7 @@ import { fetchAllDigitalAssetByOwner } from '@metaplex-foundation/mpl-token-meta
 import { isSome, publicKey } from '@metaplex-foundation/umi';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import { Connection } from '@solana/web3.js';
-import { ChainNodeInstance } from 'model/src/models/chain_node';
+import type { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances, GetSPLBalancesOptions } from '../types';
 import { failingChainNodeError } from '../util';
 
