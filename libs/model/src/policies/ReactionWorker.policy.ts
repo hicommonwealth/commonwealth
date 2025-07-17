@@ -2,6 +2,7 @@ import { logger, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { mustExist } from '../middleware';
+import { ReactionInstance } from '../models/reaction';
 import { getVotingWeight } from '../services/stakeHelper';
 
 const log = logger(import.meta);
@@ -112,7 +113,7 @@ async function* paginateComments(
 
 // Process a single reaction and return its calculated weight
 async function processSingleReaction(
-  reaction: any,
+  reaction: ReactionInstance,
   topicId: number,
 ): Promise<bigint> {
   try {

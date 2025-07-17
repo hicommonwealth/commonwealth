@@ -281,7 +281,7 @@ export const ManageTopicsSection = () => {
                             }
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleRecalculateVotes(regTopic);
+                              void handleRecalculateVotes(regTopic);
                             }}
                           />
                           {getLastRefreshText(regTopic) && (
@@ -341,7 +341,7 @@ export const ManageTopicsSection = () => {
                             }
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleRecalculateVotes(regTopic);
+                              void handleRecalculateVotes(regTopic);
                             }}
                           />
                           {getLastRefreshText(regTopic) && (

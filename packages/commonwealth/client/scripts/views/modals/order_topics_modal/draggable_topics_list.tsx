@@ -87,7 +87,7 @@ const TopicRow = ({
             <CWIconButton
               iconName="pencil"
               buttonSize="sm"
-              onClick={async (e) => {
+              onClick={(e) => {
                 e.stopPropagation();
                 onEdit(item);
               }}
