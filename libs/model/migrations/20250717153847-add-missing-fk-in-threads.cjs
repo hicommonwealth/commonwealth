@@ -1,7 +1,7 @@
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
-module.exports = {
+export default {
   async up(queryInterface) {
     // move orphaned threads from 'govgen' to 'atomone' community
     await queryInterface.sequelize.query(
