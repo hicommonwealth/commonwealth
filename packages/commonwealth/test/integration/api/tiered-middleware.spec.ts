@@ -15,9 +15,6 @@ import { testServer, TestServer } from '../../../server-test';
 
 const chance = Chance();
 
-// @ts-expect-error - disable tier rate limits when testing tiered middleware
-config.DISABLE_TIER_RATE_LIMITS = false;
-
 describe('Tiered middleware', () => {
   let server: TestServer;
   let community_id: string;
