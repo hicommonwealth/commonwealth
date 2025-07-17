@@ -24,9 +24,9 @@ FROM base AS commonwealth
 ENV NODE_ENV=production
 
 COPY --from=build /prod/commonwealth /prod/commonwealth
-COPY --from=build /user/src/app/libs/model/.sequelizerc /prod/commonwealth/.sequelizerc
-COPY --from=build /user/src/app/libs/model/sequelize.json /prod/commonwealth/sequelize.json
-COPY --from=build /user/src/app/libs/model/migrations /prod/commonwealth/migrations
+COPY --from=build /usr/src/app/libs/model/.sequelizerc /prod/commonwealth/.sequelizerc
+COPY --from=build /usr/src/app/libs/model/sequelize.json /prod/commonwealth/sequelize.json
+COPY --from=build /usr/src/app/libs/model/migrations /prod/commonwealth/migrations
 
 WORKDIR /prod/commonwealth
 
