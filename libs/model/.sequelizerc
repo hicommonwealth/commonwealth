@@ -1,7 +1,7 @@
-const path = require('path')
+const path = require('path');
 
 module.exports = {
   config: path.resolve(__dirname, 'sequelize.json'),
   'migrations-path': path.resolve(__dirname, 'migrations'),
-  'models-path': path.resolve(__dirname, 'src', 'src/models')
-}
+  'models-path': path.resolve(__dirname, 'src', 'models'),
+};

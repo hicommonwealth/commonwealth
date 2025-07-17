@@ -14,7 +14,7 @@
     "clean": "chmod u+x scripts/clean-modules.sh && ./scripts/clean-modules.sh",
     "db-all": "pnpm -F model db-all",
     "dependency-graph": "npx depcruise packages/commonwealth/server.ts -T archi | dot -T svg > dependency-graph.svg",
-    "dump-db": "pnpm -F commonwealth dump-db",
+    "dump-db": "pnpm -F model dump-db",
     "format": "prettier --write .",
     "format-check": "prettier --check .",
     "heroku-postbuild": "chmod u+x scripts/heroku-build.sh && ./scripts/heroku-build.sh",
