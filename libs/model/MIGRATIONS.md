@@ -1,17 +1,17 @@
-## Migrations
+# Migrations
 
 When adding or changing models in the database, we write migrations so
 that the production database gets updated smoothly when code using
 the new models goes live.
 
 The main reference for how to run migrations is here:
-https://sequelize.org/master/manual/migrations.html
+<https://sequelize.org/master/manual/migrations.html>
 
-### Writing and running migrations
+## Writing and running migrations
 
 Migrations use the queryInterface object to perform operations on tables. The
 queryInterface documentation covers how to use most of those functions:
-https://sequelize.org/master/class/lib/query-interface.js~QueryInterface.html
+<https://sequelize.org/master/class/lib/query-interface.js~QueryInterface.html>
 
 Here are some example migrations:
 

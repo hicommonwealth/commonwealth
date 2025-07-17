@@ -24,10 +24,6 @@ const generateSchemas = async () => {
       // Can't define index in model since it uses NULLS NOT DISTINCT
       // See 20250409215621-add-unique-name-xp-log.js for more info
       XpLogs: ['UNIQUE(action_meta_id,event_created_at,name,user_id)'],
-      // not sure why this is not in the db
-      Threads: [
-        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE SET NULL',
-      ],
     },
   });
 
