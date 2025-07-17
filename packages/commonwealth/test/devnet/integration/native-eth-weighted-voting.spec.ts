@@ -343,6 +343,9 @@ describe('Native ETH weighted voting lifecycle', () => {
         actor: _adminActor,
       });
 
+      const topic = await models.Topic.findByPk(_topic.id);
+      expect(topic!.recalculated_votes_start).toBeDefined();
+
       // Verify that the vote weights were recalculated correctly
       await vi.waitFor(
         async () => {
@@ -375,6 +378,9 @@ describe('Native ETH weighted voting lifecycle', () => {
               expectedInitialWeights[i].toString(),
             );
           }
+
+          const topic = await models.Topic.findByPk(_topic.id);
+          expect(topic!.recalculated_votes_finish).toBeDefined();
         },
         {
           timeout: 10_000,
