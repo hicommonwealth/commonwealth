@@ -1,4 +1,5 @@
-import { UserAttributes, models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { UserAttributes } from '@hicommonwealth/model/models';
 import type {
   TypedRequestBody,
   TypedRequestQuery,

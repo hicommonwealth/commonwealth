@@ -83,7 +83,10 @@ export const getPinoLogger: GetLogger = (
       else rollbar.error(msg, error ?? '');
     },
     fatal(msg: string, error?: Error, context?: LogContext) {
-      logger.fatal({ ...context, err: error || undefined }, msg);
+      // Railway doesn't currently normalize fatal logs as errors so must log as errors for now
+      if (config.NODE_ENV === 'production')
+        logger.error({ ...context, err: error || undefined }, msg);
+      else logger.fatal({ ...context, err: error || undefined }, msg);
 
       if (context) rollbar.critical(msg, error ?? '', context);
       else rollbar.critical(msg, error ?? '');

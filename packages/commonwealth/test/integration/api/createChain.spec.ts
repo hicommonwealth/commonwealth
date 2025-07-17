@@ -1,8 +1,8 @@
 import { command } from '@hicommonwealth/core';
-import { SuperAdmin, UserInstance } from '@hicommonwealth/model';
+import { SuperAdmin } from '@hicommonwealth/model';
+import { UserInstance } from '@hicommonwealth/model/models';
 import { BalanceType, UserTierMap } from '@hicommonwealth/shared';
-import { assert } from 'chai';
-import { describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { buildUser } from '../../unit/unitHelpers';
 
 describe('create chain tests', () => {
@@ -30,7 +30,7 @@ describe('create chain tests', () => {
       return;
     }
 
-    assert.fail(0, 1, 'Exception not thrown');
+    expect(false, 'Exception not thrown').toBe(true);
   });
 
   test('fails when eth_chain_id is not a number', async () => {
@@ -57,6 +57,6 @@ describe('create chain tests', () => {
       return;
     }
 
-    assert.fail(0, 1, 'Exception not thrown');
+    expect(false, 'Exception not thrown').toBe(true);
   });
 });

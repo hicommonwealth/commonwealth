@@ -1,7 +1,6 @@
 import { dispose } from '@hicommonwealth/core';
-import { expect } from 'chai';
 import { Sequelize } from 'sequelize';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { models } from '../../src/database';
 import { Factories } from '../../src/models/factories';
 import {
@@ -25,6 +24,10 @@ const generateSchemas = async () => {
       // Can't define index in model since it uses NULLS NOT DISTINCT
       // See 20250409215621-add-unique-name-xp-log.js for more info
       XpLogs: ['UNIQUE(action_meta_id,event_created_at,name,user_id)'],
+      // not sure why this is not in the db
+      Threads: [
+        'FOREIGN KEY Communities(community_id) UPDATE CASCADE DELETE SET NULL',
+      ],
     },
   });
 

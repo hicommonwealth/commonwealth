@@ -1,5 +1,6 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
-import { TaskPayloads, config } from '@hicommonwealth/model';
+import { config } from '@hicommonwealth/model';
+import { TaskPayloads } from '@hicommonwealth/model/services';
 import { execSync } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
 import { QueryTypes } from 'sequelize';
@@ -66,7 +67,7 @@ async function uploadToS3(filePath: string): Promise<boolean> {
 }
 
 async function getTablesToBackup(): Promise<string[]> {
-  const { models } = await import('@hicommonwealth/model');
+  const { models } = await import('@hicommonwealth/model/db');
 
   const result = await models.sequelize.query<{
     table_name: string;

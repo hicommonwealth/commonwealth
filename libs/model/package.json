@@ -9,8 +9,53 @@
   ],
   "exports": {
     ".": {
-      "default": "./build/index.js",
-      "devmode": "./src/index.ts"
+      "import": {
+        "types": "./build/index.d.js",
+        "default": "./build/index.js",
+        "devmode": "./src/index.ts"
+      }
+    },
+    "./db": {
+      "import": {
+        "types": "./build/database.d.js",
+        "default": "./build/database.js"
+      }
+    },
+    "./models": {
+      "import": {
+        "types": "./build/models/index.d.js",
+        "default": "./build/models/index.js"
+      }
+    },
+    "./middleware": {
+      "import": {
+        "types": "./build/middleware/index.d.js",
+        "default": "./build/middleware/index.js"
+      }
+    },
+    "./services": {
+      "import": {
+        "types": "./build/services/index.d.js",
+        "default": "./build/services/index.js"
+      }
+    },
+    "./tbc": {
+      "import": {
+        "types": "./build/services/tokenBalanceCache/index.d.js",
+        "default": "./build/services/tokenBalanceCache/index.js"
+      }
+    },
+    "./protocol": {
+      "import": {
+        "types": "./build/services/commonProtocol/index.d.js",
+        "default": "./build/services/commonProtocol/index.js"
+      }
+    },
+    "./tester": {
+      "import": {
+        "types": "./build/tester/index.d.js",
+        "default": "./build/tester/index.js"
+      }
     }
   },
   "scripts": {
@@ -18,13 +63,17 @@
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
     "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test",
-    "test-select": "NODE_ENV=test vitest --config ../../vite.config.ts run"
+    "test-select": "NODE_ENV=test vitest --config ../../vite.config.ts run",
+    "migrate-db": "npx sequelize-cli db:migrate",
+    "migrate:undo": "npx sequelize-cli db:migrate:undo",
+    "migrate:status": "npx sequelize-cli db:migrate:status",
+    "migration:generate": "npx sequelize-cli migration:generate --name",
+    "dump:minimal-schema": "tsx scripts/dump-minimal-schema.ts"
   },
   "dependencies": {
     "@anatine/zod-mock": "^3.13.3",
     "@canvas-js/chain-ethereum": "^0.13.14",
     "@canvas-js/interfaces": "^0.12.1",
-    "@canvas-js/signatures": "^0.12.1",
     "@cosmjs/cosmwasm-stargate": "^0.31.3",
     "@cosmjs/encoding": "0.32.3",
     "@cosmjs/stargate": "^0.31.3",
@@ -36,8 +85,10 @@
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
     "@magic-sdk/admin": "^2.4.1",
-    "@metaplex-foundation/js": "^0.20.1",
-    "@mysten/sui.js": "^0.54.1",
+    "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
+    "@metaplex-foundation/umi": "^1.2.0",
+    "@metaplex-foundation/umi-bundle-defaults": "^1.2.0",
+    "@mysten/sui": "^1.28.2",
     "@neynar/nodejs-sdk": "^1.55.0",
     "@privy-io/server-auth": "^1.19.0",
     "@sendgrid/mail": "^6.5.0",
@@ -54,7 +105,7 @@
     "lodash": "^4.17.21",
     "node-fetch": "2",
     "node-object-hash": "^3.0.0",
-    "openai": "^5.1.0",
+    "openai": "^5.7.0",
     "passport-magic": "^1.0.0",
     "pg": "^8.11.3",
     "quill-delta-to-markdown": "^0.6.0",
@@ -67,6 +118,7 @@
     "zod": "^3.25.46"
   },
   "devDependencies": {
+    "sequelize-cli": "^6.6.3",
     "tsx": "^4.7.2"
   }
 }

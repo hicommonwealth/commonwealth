@@ -1,6 +1,7 @@
 import { R2BlobStorage } from '@hicommonwealth/adapters';
 import { blobStorage, dispose, logger } from '@hicommonwealth/core';
-import { R2_ADAPTER_KEY, models, uploadIfLarge } from '@hicommonwealth/model';
+import { R2_ADAPTER_KEY, uploadIfLarge } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { QueryTypes } from 'sequelize';
 
 const log = logger(import.meta);

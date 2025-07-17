@@ -5,43 +5,43 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceSourceType, type Requirement } from '@hicommonwealth/shared';
+import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
-import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
-import type { AddressAttributes, GroupAttributes } from '../../models';
-import {
-  tokenBalanceCache,
-  type Balances,
-  type OptionsWithBalances,
-} from '../../services';
+import type { GroupAttributes } from '../../models';
+import { getBalances } from '../../services/tokenBalanceCache';
+import type {
+  Balances,
+  OptionsWithBalances,
+} from '../../services/tokenBalanceCache/types';
 import {
   emitEvent,
   makeGetBalancesOptions,
   validateGroupMembership,
+  type Membership,
+  type Requirement,
+  type UserInfo,
 } from '../../utils';
 
 const log = logger(import.meta);
 
-type Membership = z.infer<typeof schemas.Membership> & { balance?: bigint };
-
 function computeMembership(
-  address: AddressAttributes,
+  user: UserInfo,
   group: GroupAttributes,
   balances: OptionsWithBalances[],
 ): Membership {
   const { isValid, messages, balance } = validateGroupMembership(
-    address.address,
+    user,
     group.requirements as Requirement[],
     balances,
     group.metadata.required_requirements!,
   );
   return {
     group_id: group.id!,
-    address_id: address.id!,
+    address_id: user.address_id,
     reject_reason: isValid ? undefined : (messages ?? undefined),
     last_checked: new Date(),
     balance,
@@ -52,7 +52,7 @@ function computeMembership(
 async function processMemberships(
   community_id: string,
   groups: GroupAttributes[],
-  addresses: AddressAttributes[],
+  users: UserInfo[],
   balances: OptionsWithBalances[],
   force_refresh = false,
 ): Promise<[number, number, number]> {
@@ -80,8 +80,8 @@ async function processMemberships(
         ? group.id
         : tokenHolderGroupId;
 
-    for (const address of addresses) {
-      const memberships = address.Memberships ?? [];
+    for (const user of users) {
+      const memberships = user.memberships ?? [];
       const found = memberships.find(({ group_id }) => group_id === group.id);
       if (found) {
         const expiresAt = dayjs(found.last_checked).add(
@@ -89,26 +89,26 @@ async function processMemberships(
           'seconds',
         );
         if (dayjs().isAfter(expiresAt) || force_refresh) {
-          const updated = computeMembership(address, group, balances);
+          const updated = computeMembership(user, group, balances);
           toUpdate.push(updated);
           // make sure we only emit actual changes to membership, not just refreshed dates
           if (!!updated.reject_reason !== !!found.reject_reason)
             toEmit.push({
               group_id: updated.group_id,
               address_id: updated.address_id,
-              user_id: address.user_id!,
+              user_id: user.user_id,
               created: false,
               rejected: !!updated.reject_reason,
             });
         }
       } else {
         // membership does not exist, create
-        const created = computeMembership(address, group, balances);
+        const created = computeMembership(user, group, balances);
         toCreate.push(created);
         toEmit.push({
           group_id: created.group_id,
           address_id: created.address_id,
-          user_id: address.user_id!,
+          user_id: user.user_id,
           created: true,
           rejected: !!created.reject_reason,
         });
@@ -176,7 +176,7 @@ async function processMemberships(
 async function paginateAddresses(
   community_id: string,
   minAddressId: number,
-  callback: (addresses: AddressAttributes[]) => Promise<void>,
+  callback: (users: UserInfo[]) => Promise<void>,
 ): Promise<void> {
   const addresses = await models.Address.findAll({
     where: {
@@ -186,11 +186,10 @@ async function paginateAddresses(
       id: { [Op.gt]: minAddressId },
     },
     attributes: ['id', 'address', 'user_id'],
-    include: {
-      model: models.Membership,
-      as: 'Memberships',
-      required: false,
-    },
+    include: [
+      { model: models.User, as: 'User', required: true },
+      { model: models.Membership, as: 'Memberships', required: false },
+    ],
     order: [['id', 'ASC']],
     limit: config.MEMBERSHIP_REFRESH_BATCH_SIZE,
   });
@@ -199,7 +198,15 @@ async function paginateAddresses(
     return;
   }
 
-  await callback(addresses);
+  const users = addresses.map((a) => ({
+    address_id: a.id!,
+    address: a.address,
+    user_id: a.user_id!,
+    user_tier: a.User!.tier,
+    wallet_sso: a.oauth_provider as WalletSsoSource,
+    memberships: a.Memberships,
+  }));
+  await callback(users);
 
   if (addresses.length < config.MEMBERSHIP_REFRESH_BATCH_SIZE) return;
 
@@ -241,21 +248,18 @@ export function RefreshCommunityMemberships(): Command<
             where: { community_id, verified: { [Op.ne]: null } },
           });
 
-      const refresh = async (
-        addresses: AddressAttributes[],
-        force_refresh = false,
-      ) => {
+      const refresh = async (users: UserInfo[], force_refresh = false) => {
         const pageStartedAt = Date.now();
 
         const getBalancesOptions = makeGetBalancesOptions(
           groups,
-          addresses.map((a) => a.address),
+          users.map((u) => u.address),
         );
         const balances = await Promise.all(
           getBalancesOptions.map(async (options) => {
             let result: Balances = {};
             try {
-              result = await tokenBalanceCache.getBalances({
+              result = await getBalances({
                 ...options,
                 cacheRefresh: refresh_all || false,
               });
@@ -272,7 +276,7 @@ export function RefreshCommunityMemberships(): Command<
         const [created, updated, emitted] = await processMemberships(
           community_id,
           groups,
-          addresses,
+          users,
           balances,
           force_refresh,
         );
@@ -280,7 +284,7 @@ export function RefreshCommunityMemberships(): Command<
         totalCreated += created;
         totalUpdated += updated;
         totalEmitted += emitted;
-        totalProcessed += addresses.length;
+        totalProcessed += users.length;
 
         log.info(`Refreshed "${community_id}" memberships (${(Date.now() - pageStartedAt) / 1000}s)
   addresses=${totalProcessed}/${totalAddresses}, created=${created}, updated=${updated}, emitted=${emitted}`);
@@ -290,13 +294,22 @@ export function RefreshCommunityMemberships(): Command<
         const addr = await models.Address.findOne({
           where: { community_id, address, user_id: { [Op.ne]: null } },
           attributes: ['id', 'address', 'user_id'],
-          include: {
-            model: models.Membership,
-            as: 'Memberships',
-            required: false,
-          },
+          include: [
+            { model: models.User, as: 'User', required: true },
+            { model: models.Membership, as: 'Memberships', required: false },
+          ],
         });
-        addr && (await refresh([addr], true)); // force refresh even if the membership is not expired
+        if (addr) {
+          const user: UserInfo = {
+            address_id: addr.id!,
+            address: addr.address,
+            user_id: addr.user_id!,
+            user_tier: addr.User!.tier,
+            wallet_sso: addr.oauth_provider as WalletSsoSource,
+            memberships: addr.Memberships,
+          };
+          await refresh([user], true); // force refresh even if the membership is not expired
+        }
       } else await paginateAddresses(community_id, 0, refresh);
 
       log.info(

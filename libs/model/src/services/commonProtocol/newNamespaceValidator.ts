@@ -6,8 +6,8 @@ import {
   getTransactionReceipt,
   mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
 import { BalanceSourceType } from '@hicommonwealth/shared';
+import { models } from '../../database';
 import { CommunityAttributes } from '../../models';
 import { equalEvmAddresses } from '../../utils';
 import { getBalances } from '../tokenBalanceCache';

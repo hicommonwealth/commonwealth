@@ -1,6 +1,5 @@
-import { getDelta } from '@hicommonwealth/model';
-import { expect } from 'chai';
-import { describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
+import { getDelta } from '../../src/utils';
 
 describe('getDelta', () => {
   test('should get delta', () => {

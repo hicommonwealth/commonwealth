@@ -2,8 +2,8 @@ import {
   LaunchpadAbi,
   LPBondingCurveAbi,
 } from '@commonxyz/common-protocol-abis';
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
+import { buyToken, launchToken } from '@hicommonwealth/evm-protocols';
+import { models } from '@hicommonwealth/model/db';
 import { describe, expect, test, vi } from 'vitest';
 import { setupCommonwealthE2E } from './integrationUtils/mainSetup';
 
@@ -19,7 +19,7 @@ describe('End to end event tests', () => {
         contractAddresses.launchpad,
       );
 
-      await cp.launchToken(
+      await launchToken(
         launchpadFactory,
         'testToken',
         'test',
@@ -52,7 +52,7 @@ describe('End to end event tests', () => {
         contractAddresses.lpBondingCurve,
       );
 
-      await cp.buyToken(
+      await buyToken(
         lpBondingCurveFactory,
         token!.token_address,
         anvilAccounts[0].address,

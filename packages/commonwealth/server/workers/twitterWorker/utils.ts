@@ -1,8 +1,8 @@
 import {
-  TwitterBotConfig,
+  type TwitterBotConfig,
   TwitterBotConfigs,
-  twitterMentions,
-} from '@hicommonwealth/model';
+  type twitterMentions,
+} from '@hicommonwealth/model/services';
 import { Tweet } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 

@@ -1,5 +1,6 @@
 import { Actor, logger } from '@hicommonwealth/core';
-import { config, models } from '@hicommonwealth/model';
+import { config } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { User } from '@hicommonwealth/schemas';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';

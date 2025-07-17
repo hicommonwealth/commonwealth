@@ -24,9 +24,9 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { tester } from '../../src';
 import { models } from '../../src/database';
 import { notifyCommunityStakeTrades } from '../../src/policies/handlers/notifyCommunityStakeTrades';
+import * as tester from '../../src/tester';
 import {
   ProviderError,
   SpyNotificationsProvider,

@@ -1,6 +1,6 @@
 import { LinkSource } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
-import { AuthContext, ThreadContext } from '../context';
+import { AuthContext, ThreadContext, VerifiedContext } from '../context';
 import {
   Address,
   Comment,
@@ -322,7 +322,7 @@ export const SearchThreads = {
   output: PaginatedResultSchema.extend({
     results: z.array(ThreadView),
   }),
-  context: AuthContext,
+  context: VerifiedContext,
 };
 
 export const GetLinks = {
