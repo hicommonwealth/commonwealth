@@ -1,23 +1,20 @@
 import { command } from '@hicommonwealth/core';
 import { calculateVoteWeight } from '@hicommonwealth/evm-protocols';
+import { Comment, Community, Thread } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import {
   ChainNodeAttributes,
-  Comment,
-  Community,
   CommunityAttributes,
-  Thread,
   TopicAttributes,
   UserAttributes,
-  models,
-  tester,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/models';
+import { seed } from '@hicommonwealth/model/tester';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { UserTierMap, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { beforeAll, describe, expect, test, vi } from 'vitest';
 import Web3 from 'web3';
 import { setupCommonwealthE2E } from './integrationUtils/mainSetup';
 
-const { seed } = tester;
 const { RefreshWeightedVotes } = Community;
 
 describe('Native ETH weighted voting lifecycle', () => {
