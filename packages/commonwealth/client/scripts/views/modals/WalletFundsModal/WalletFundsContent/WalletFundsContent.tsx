@@ -80,6 +80,10 @@ const WalletFundsContent = ({
     ethToCurrencyRateData?.data?.data?.amount || '0',
   );
 
+  console.log('isMagicLoading', isMagicLoading);
+  console.log('isBalanceLoading', isBalanceLoading);
+  console.log('userBalance', userBalance);
+
   const formattedBalanceUsd = formatUsdBalance(userBalance, ethToUsdRate);
   const isLoading = isMagicLoading || isBalanceLoading;
 
