@@ -20,6 +20,7 @@ import { openConfirmation } from './confirmation_modal';
 
 import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import clsx from 'clsx';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
@@ -51,6 +52,8 @@ export const EditTopicModal = ({
     id,
     name: nameProp,
   } = topic;
+
+  const utils = trpc.useUtils();
 
   const navigate = useCommonNavigate();
   const { mutateAsync: editTopic } = useEditTopicMutation();
@@ -172,6 +175,9 @@ export const EditTopicModal = ({
           groupIds: selectedGroups,
           topicId: updatedTopicId,
           name,
+        });
+        await utils.community.getTopicById.invalidate({
+          topic_id: updatedTopicId,
         });
       }
 
