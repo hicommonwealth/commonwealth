@@ -220,4 +220,8 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   getRoles: trpc.query(Community.GetRoles, trpc.Tag.Community),
+  refreshWeightedVotes: trpc.command(
+    Community.RefreshWeightedVotes,
+    trpc.Tag.Community,
+  ),
 });
