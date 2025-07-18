@@ -25,7 +25,7 @@ spec:
   vaultConfigurerLabels:
     example.com/log-format: "string"
 
-  image: openbao/openbao:latest
+  image: hashicorp/vault:1.14.8
   bankVaultsImage: ghcr.io/bank-vaults/bank-vaults:latest
   serviceAccount: vault
 
