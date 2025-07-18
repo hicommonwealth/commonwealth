@@ -62,6 +62,8 @@ export interface CompletionOptions {
   stream?: boolean;
   useOpenRouter?: boolean;
   useWebSearch?: boolean;
+  /** Optional MCP server URL to direct the completion request */
+  mcpServerUrl?: string;
 }
 
 export interface CompletionResponse {
