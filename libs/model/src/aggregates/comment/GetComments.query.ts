@@ -154,14 +154,23 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             ${!include_spam_comments ? 'AND C."marked_as_spam_at" IS NULL' : ''}
         GROUP BY
             C.id,
+            C.body,
             C.created_at,
             C.updated_at,
             C.deleted_at,
             C.marked_as_spam_at,
+            C.reaction_count,
+            C.parent_id,
+            C.thread_id,
+            C.content_url,
+            C.comment_level,
+            C.reply_count,
+            C.address_id,
             CA.address,
             CA.last_active,
             CA.community_id,
             CU.id,
+            CU.tier,
             CU.profile->>'name',
             CU.profile->>'avatar_url'
         ORDER BY
