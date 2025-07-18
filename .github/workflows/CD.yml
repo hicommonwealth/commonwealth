@@ -3,11 +3,8 @@ name: Build Docker Image
 on:
   push:
     branches:
-      - frick
       - frack
-      - beta
       - production
-      - master
 
   workflow_run:
     workflows:
@@ -22,24 +19,11 @@ jobs:
       - name: Set Heroku app name based on branch
         id: set-heroku-app-name
         run: |
-          if [ "${{ github.event_name }}" == "workflow_run" ]; then
-            BRANCH_NAME="beta" 
-          else
-            BRANCH_NAME=${GITHUB_REF##*/}
-          fi
+          BRANCH_NAME=${GITHUB_REF##*/}
           
           case $BRANCH_NAME in
-            frick)
-              APP_NAME="commonwealth-frick"
-              ;;
             frack)
               APP_NAME="commonwealth-frack"
-              ;;
-            beta)
-              APP_NAME="commonwealth-beta"
-              ;;
-            master)
-              APP_NAME="commonwealth-demo"
               ;;
             production)
               APP_NAME="commonwealthapp"
