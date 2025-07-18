@@ -1,0 +1,35 @@
+.WalletFundsContent {
+  .CWModalBody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+
+    .usd-value {
+      font-size: 32px;
+      font-weight: 500;
+      text-align: center;
+      margin-block: 16px;
+    }
+
+    .refresh-link {
+      color: #0064c8;
+      font-size: 14px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 16px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .fund-options {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+  }
+}

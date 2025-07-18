@@ -1,6 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { PinnedTokenWithPrices } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
+import NodeInfo from 'models/NodeInfo';
 import { GetTokenMetadataResponse } from 'state/api/tokens/getTokenMetadata';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { z } from 'zod';
@@ -35,6 +36,7 @@ export type UseUniswapTradeModalProps = {
   rpcUrl?: string | null;
   blockExplorerUrl?: string | null;
   tradeConfig: UniswapTradingConfig;
+  node?: NodeInfo;
 };
 
 export type UniswapWidgetConfig = {

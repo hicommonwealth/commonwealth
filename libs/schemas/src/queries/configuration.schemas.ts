@@ -26,5 +26,6 @@ export const GetPublicEnvVar = {
     FARCASTER_NGROK_DOMAIN: z.string().nullish(),
     CONTEST_DURATION_IN_SEC: z.number().optional(),
     COMMUNITY_REDIRECTS: z.record(z.string(), z.string()),
+    MOONPAY_PUBLISHABLE_KEY: z.string().optional(),
   }),
 };

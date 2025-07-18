@@ -89,7 +89,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
         return hasMagic
           ? {
               index: 5,
-              title: 'Magic Wallet Creation',
+              title: 'Add funds to your wallet',
               component: (
                 <MagicWalletCreationStep
                   onComplete={() =>
