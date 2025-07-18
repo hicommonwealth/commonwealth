@@ -170,7 +170,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             CA.last_active,
             CA.community_id,
             CU.id,
-            CU.tier AS "user_tier",
+            CU.tier,
             CU.profile->>'name',
             CU.profile->>'avatar_url'
         ORDER BY
