@@ -69,7 +69,7 @@ const migrate_db = async (sequelize: Sequelize) => {
   const umzug = new Umzug({
     // TODO: move sequelize config and migrations to libs/model
     migrations: {
-      glob: path.resolve('./migrations/*.cjs'),
+      glob: path.resolve('./migrations/*.js'),
       // migration resolver since we use v2 migration interface
       resolve: ({ name, path, context }) => {
         return {
