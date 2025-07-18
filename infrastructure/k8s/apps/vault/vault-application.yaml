@@ -11,7 +11,7 @@ spec:
     path: infrastructure/charts/vault-application
   destination:
     server: https://kubernetes.default.svc
-    namespace: vault
+    namespace: default
   syncPolicy:
     automated:
       prune: true
