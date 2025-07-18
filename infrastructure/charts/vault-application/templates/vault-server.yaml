@@ -2,8 +2,6 @@ apiVersion: vault.banzaicloud.com/v1alpha1
 kind: Vault
 metadata:
   name: vault
-  annotations:
-    argocd.argoproj.io/tracking-id: vault-operator:apps/Deployment:vault-operator/vault-operator
   labels:
     app.kubernetes.io/name: vault
     vault_cr: vault
@@ -11,7 +9,7 @@ spec:
   size: 3
 
   annotations:
-    iam.amazonaws.com/role: 'arn:aws:iam::775434881122:role/vault-server-role-development'
+    iam.amazonaws.com/role: '{{ .Values.irsaRoleArn }}'
     common/annotation: "true"
 
   vaultAnnotations:
@@ -19,7 +17,6 @@ spec:
 
   vaultConfigurerAnnotations:
     type/instance: "vaultconfigurer"
-#    iam.amazonaws.com/role: 'arn:aws:iam::775434881122:role/vault-server-role-development'
 
 
   vaultLabels:
@@ -82,21 +79,19 @@ spec:
       storeRootToken: true
       secretShares: 5
       secretThreshold: 3
-#    kubernetes:
-#      secretNamespace: default
     aws:
-      kmsKeyId: "2af407d3-75f9-499d-906e-a5a77748fa6c"
+      kmsKeyId: "{{ .Values.kmsKeyId }}"
       s3Bucket: "bank-vaults-development"
       s3Prefix: "vault-operator/"
-      s3Region: "us-east-1"
-      kmsRegion: "us-east-1"
+      s3Region: "{{ .Values.kmsRegion }}"
+      kmsRegion: "{{ .Values.kmsRegion }}"
       kmsEncryptionContext: "Service=Vault"
 
   config:
     seal:
       awskms:
-        region: us-east-1
-        kms_key_id: 2af407d3-75f9-499d-906e-a5a77748fa6c
+        region: {{ .Values.kmsRegion }}
+        kms_key_id: {{ .Values.kmsKeyId }}
     serviceRegistrationEnabled: true
     disable_mlock: true
     storage:
@@ -136,7 +131,3 @@ spec:
         description: General secrets.
         options:
           version: 2
-
-  vaultEnvsConfig:
-    - name: VAULT_LOG_LEVEL
-      value: trace
