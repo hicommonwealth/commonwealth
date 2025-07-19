@@ -1,12 +1,11 @@
 import { logger, stats } from '@hicommonwealth/core';
 import { emitEvent } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
-import type { EvmChainSource } from '@hicommonwealth/model/services';
 import { EventPairs } from '@hicommonwealth/schemas';
 import { serializeBigIntObj } from '@hicommonwealth/shared';
 import { createPublicClient, http } from 'viem';
 import { config } from '../../config';
-import { getEventSources } from './getEventSources';
+import { EvmChainSource, getEventSources } from './getEventSources';
 import { getEvents, migrateEvents } from './logProcessing';
 import { updateMigratedEvmEventSources } from './utils';
 

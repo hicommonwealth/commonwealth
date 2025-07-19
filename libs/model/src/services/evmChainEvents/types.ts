@@ -58,17 +58,3 @@ export type EvmEventSource = {
   event_signature: string;
   meta: EvmEventMeta;
 };
-
-export type EvmContractSources = {
-  [contractAddress: string]: Array<EvmEventSource>;
-};
-
-export type EvmChainSource = {
-  rpc: string;
-  maxBlockRange: number;
-  contracts: EvmContractSources;
-};
-
-export type EvmSources = {
-  [ethChainId: string]: EvmChainSource;
-};
