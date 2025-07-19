@@ -1,7 +1,7 @@
 import { dispose } from '@hicommonwealth/core';
 import {
-  EventRegistry,
   EvmEventSignatures,
+  factoryContracts,
   getFactoryContract,
   ValidChains,
 } from '@hicommonwealth/evm-protocols';
@@ -29,9 +29,9 @@ describe('getEventSources', () => {
 
   test('should get Event-Registry and EvmEventSources', async () => {
     const result = await getEventSources();
-    expect(Object.keys(result)).deep.equal(Object.keys(EventRegistry));
+    expect(Object.keys(result)).deep.equal(Object.keys(factoryContracts));
     let flag = false;
-    for (const ethChainId in EventRegistry) {
+    for (const ethChainId in factoryContracts) {
       expect(result[ethChainId]).haveOwnProperty('rpc');
       expect(result[ethChainId]).to.haveOwnProperty('contracts');
       expect(
