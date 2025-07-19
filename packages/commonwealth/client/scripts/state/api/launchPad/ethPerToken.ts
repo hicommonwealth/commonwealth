@@ -1,5 +1,5 @@
 import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
-import { getFactoryContract getAmountIn } from '@hicommonwealth/evm-protocols';
+import { getAmountIn, getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
 import Web3 from 'web3';
 

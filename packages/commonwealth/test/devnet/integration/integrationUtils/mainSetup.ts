@@ -1,4 +1,4 @@
-import { getFactoryContract ValidChains } from '@hicommonwealth/evm-protocols';
+import { getFactoryContract, ValidChains } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model/db';
 import { bootstrapBindings } from '../../../../server/bindings/bootstrap';
 // eslint-disable-next-line max-len
@@ -36,6 +36,6 @@ export async function setupCommonwealthE2E() {
     anvilAccounts,
     anvilContainer,
     rabbitMQContainer,
-    contractAddresses: factoryContracts[31337],
+    contractAddresses: getFactoryContract(ValidChains.Anvil),
   };
 }

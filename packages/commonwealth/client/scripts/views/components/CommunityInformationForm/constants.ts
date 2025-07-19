@@ -1,4 +1,4 @@
-import { getFactoryContract ValidChains } from '@hicommonwealth/evm-protocols';
+import { factoryContracts, ValidChains } from '@hicommonwealth/evm-protocols';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import NodeInfo from 'models/NodeInfo';
 import { fetchCachedNodes } from 'state/api/nodes';

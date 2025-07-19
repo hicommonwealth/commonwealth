@@ -2,7 +2,7 @@ import { dispose } from '@hicommonwealth/core';
 import {
   EventRegistry,
   EvmEventSignatures,
-  getFactoryContract
+  getFactoryContract,
   ValidChains,
 } from '@hicommonwealth/evm-protocols';
 import { createEventRegistryChainNodes } from '@hicommonwealth/model';
@@ -36,7 +36,9 @@ describe('getEventSources', () => {
       expect(result[ethChainId]).to.haveOwnProperty('contracts');
       expect(
         Array.isArray(
-          result[ethChainId].contracts[getFactoryContract(ethChainId).NamespaceFactory],
+          result[ethChainId].contracts[
+            getFactoryContract(parseInt(ethChainId)).NamespaceFactory
+          ],
         ),
       ).to.be.true;
 

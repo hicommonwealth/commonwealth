@@ -129,7 +129,7 @@ export async function getEventSources(): Promise<EvmSources> {
     )) {
       const parentContractAddress = getAddress(source.parent_contract_address);
       const contractAddress = getAddress(source.contract_address);
-      const childContracts: ContractSource['childContracts'] =
+      const childContracts =
         EventRegistry[ethChainId][parentContractAddress]?.childContracts;
       if (!childContracts) {
         log.error(`Child contracts not found in Event Registry!`, undefined, {

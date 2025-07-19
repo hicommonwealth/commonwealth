@@ -3,8 +3,8 @@ import {
   ChildContractNames,
   EvmEventSignatures,
   ValidChains,
-  getFactoryContract
   getBlockNumber,
+  getFactoryContract,
 } from '@hicommonwealth/evm-protocols';
 import {
   CommunityStake,
@@ -61,13 +61,15 @@ const namespaceDeployedLog = {
   logIndex: 4,
   removed: false,
 };
-const namespaceFactoryAddress =
-  getFactoryContract(ValidChains.SepoliaBase).NamespaceFactory;
+const namespaceFactoryAddress = getFactoryContract(
+  ValidChains.SepoliaBase,
+).NamespaceFactory;
 const namespaceFactory = new NamespaceFactory();
 const namespaceName = `cetest${new Date().getTime()}`;
 
-const communityStakeAddress =
-  getFactoryContract(ValidChains.SepoliaBase).CommunityStake;
+const communityStakeAddress = getFactoryContract(
+  ValidChains.SepoliaBase,
+).CommunityStake;
 const communityStake = new CommunityStake();
 
 describe('EVM Chain Events Devnet Tests', () => {
@@ -206,7 +208,8 @@ describe('EVM Chain Events Devnet Tests', () => {
         [
           namespaceDeployedLog,
           {
-            address: getFactoryContract(ValidChains.SepoliaBase).NamespaceFactory,
+            address: getFactoryContract(ValidChains.SepoliaBase)
+              .NamespaceFactory,
             topics: ['0xfake_topic'],
           } as Log,
         ],
