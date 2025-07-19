@@ -622,4 +622,9 @@ export const events = {
     selected_community_ids: z.array(z.string()),
     created_at: z.coerce.date(),
   }),
+
+  RefreshWeightedVotesRequested: z.object({
+    topic_id: PG_INT,
+    community_id: z.string(),
+  }),
 } as const;

@@ -4,7 +4,7 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import {
-  commonProtocol as cp,
+  factoryContracts,
   getLaunchpadToken,
   mustBeProtocolChainId,
   transferLaunchpadLiquidityToUniswap,
@@ -81,7 +81,7 @@ export async function handleCapReached(
   const remainingLiquidity =
     BigInt(token.launchpad_liquidity) - floating_supply;
 
-  const contracts = cp.factoryContracts[eth_chain_id];
+  const contracts = factoryContracts[eth_chain_id];
   if (
     !token.liquidity_transferred &&
     remainingLiquidity < transferLiquidityThreshold

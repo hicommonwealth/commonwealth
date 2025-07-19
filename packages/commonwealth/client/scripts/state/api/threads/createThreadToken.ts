@@ -1,5 +1,5 @@
 import {
-  commonProtocol,
+  factoryContracts,
   mustBeProtocolChainId,
   toContractObject,
 } from '@hicommonwealth/evm-protocols';
@@ -34,18 +34,19 @@ export const createThreadToken = async ({
   chainRpc,
 }: CreateThreadTokenProps) => {
   mustBeProtocolChainId(ethChainId);
-  const factoryContracts = toContractObject(
-    commonProtocol.factoryContracts[ethChainId],
-  );
+  const _factoryContracts = toContractObject(factoryContracts[ethChainId]);
 
-  if (!factoryContracts.tokenLaunchpad || !factoryContracts.tokenBondingCurve) {
+  if (
+    !_factoryContracts.tokenLaunchpad ||
+    !_factoryContracts.tokenBondingCurve
+  ) {
     throw new Error(
       `Factory configuration is missing for chain ID ${ethChainId}. Please check your commonProtocol configuration.`,
     );
   }
 
-  const factoryAddress = factoryContracts.tokenLaunchpad;
-  const bondingCurve = factoryContracts.tokenBondingCurve;
+  const factoryAddress = _factoryContracts.tokenLaunchpad;
+  const bondingCurve = _factoryContracts.tokenBondingCurve;
 
   const launchpad = new TokenLaunchpad(
     factoryAddress,
