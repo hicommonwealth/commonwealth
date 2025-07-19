@@ -16,7 +16,7 @@ describe('End to end event tests', () => {
 
       const launchpadFactory = new web3.eth.Contract(
         LaunchpadAbi,
-        contractAddresses.launchpad,
+        contractAddresses.Launchpad,
       );
 
       await launchToken(
@@ -28,7 +28,7 @@ describe('End to end event tests', () => {
         web3.utils.toWei(1e9, 'ether'),
         anvilAccounts[0].address,
         830000,
-        contractAddresses.tokenCommunityManager,
+        contractAddresses.TokenCommunityManager,
       );
 
       let token = await models.LaunchpadToken.findOne({
@@ -49,7 +49,7 @@ describe('End to end event tests', () => {
 
       const lpBondingCurveFactory = new web3.eth.Contract(
         LPBondingCurveAbi,
-        contractAddresses.lpBondingCurve,
+        contractAddresses.LPBondingCurve,
       );
 
       await buyToken(

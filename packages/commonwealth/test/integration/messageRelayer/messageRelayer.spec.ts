@@ -69,7 +69,7 @@ describe('messageRelayer', { timeout: 20_000 }, () => {
       },
     });
     await pgClient.end();
-    expect(events.length).to.equal(3);
+    expect(events.length).to.equal(6);
     expect(numUnrelayedEvents).to.equal(0);
   });
 });

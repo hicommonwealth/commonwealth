@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import { factoryContracts, ValidChains } from '@hicommonwealth/evm-protocols';
+import { getFactoryContract, ValidChains } from '@hicommonwealth/evm-protocols';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { Balances, getBalances } from '../tokenBalanceCache';
 
@@ -17,7 +17,7 @@ export const getNamespaceBalance = async (
   chain: ValidChains,
   addresses: string[],
 ): Promise<Balances> => {
-  const factoryData = factoryContracts[chain];
+  const factoryData = getFactoryContract(chain);
   if (!namespaceAddress) {
     throw new AppError('No namespace provided!');
   }
