@@ -182,15 +182,15 @@ export function cwProtocolSources(): AbiGen {
         contractEntries,
       )) {
         const abiName = `${contractName}Abi`;
-        const abi = (abis as any)[abiName];
+        const abi = (abis as unknown as Abi)[abiName];
 
         if (!abi) {
           throw new Error(`Missing ABI for contract: ${contractName}`);
         }
 
         contractAddressToEvents[contractAddress as `0x${string}`] = abi
-          .filter((item: any) => item.type === 'event')
-          .map((item: any) => ({
+          .filter((item) => item.type === 'event')
+          .map((item) => ({
             eth_chain_id: chainId,
             contract_address: contractAddress,
             event_signature: toEventHash(item),
