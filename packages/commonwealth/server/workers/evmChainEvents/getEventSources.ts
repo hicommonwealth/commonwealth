@@ -3,6 +3,7 @@ import { logger } from '@hicommonwealth/core';
 import { factoryContracts, isValidChain } from '@hicommonwealth/evm-protocols';
 import { buildChainNodeUrl } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
+import { EvmEventSourceInstance } from '@hicommonwealth/model/src/models';
 import { Events } from '@hicommonwealth/schemas';
 import { Abi, getAbiItem, getAddress, toEventHash } from 'viem';
 import { config } from '../../config';
@@ -242,9 +243,10 @@ export async function getEventSources(): Promise<EvmSources> {
       autogennedSources[ethChainId] ?? {};
 
     const dbContractSources: EvmContractSources = {};
-    for (const source of dbEvmSources.filter(
+    for (const eventSource of dbEvmSources.filter(
       (e) => e.eth_chain_id === ethChainId,
     )) {
+      const source = eventSource as EvmEventSourceInstance;
       const parentContractAddress = getAddress(source.parent_contract_address);
       const contractAddress = getAddress(source.contract_address);
       const allHaveChildContracts = registryContractSources[
