@@ -60,7 +60,7 @@ describe('messageRelayer', { timeout: 20_000 }, () => {
       },
     });
     expect(numUnrelayedEvents).to.equal(0);
-    expect(events.length).to.equal(3);
+    expect(events.length).to.equal(6);
     await models.Outbox.bulkCreate(testOutboxEvents);
     await delay(1000);
     events = await models.Outbox.findAll({
