@@ -1,5 +1,5 @@
 import * as Abis from '@commonxyz/common-protocol-abis';
-import { dispose, logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/core';
 import type { Abi, AbiEvent } from 'viem';
 import { toEventSelector } from 'viem';
 
@@ -25,7 +25,7 @@ function generateEventSignatureBlock(abiKey: string, abi: Abi): string {
   return lines.join('\n');
 }
 
-async function main() {
+function main() {
   const contractName = process.argv[2];
 
   if (!contractName) {
@@ -45,14 +45,5 @@ async function main() {
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
-  main()
-    .then(() => {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      dispose()('EXIT', true);
-    })
-    .catch((err) => {
-      console.error(err);
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      dispose()('ERROR', true);
-    });
+  main();
 }
