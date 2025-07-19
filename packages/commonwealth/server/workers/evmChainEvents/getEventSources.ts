@@ -3,7 +3,7 @@ import { logger } from '@hicommonwealth/core';
 import { factoryContracts, isValidChain } from '@hicommonwealth/evm-protocols';
 import { buildChainNodeUrl } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
-import { Events } from '@hicommonwealth/schemas';
+import { ChildContractNames, Events } from '@hicommonwealth/schemas';
 import { Abi, getAbiItem, getAddress, toEventHash } from 'viem';
 import { config } from '../../config';
 
@@ -14,10 +14,6 @@ const log = logger(import.meta);
 export type EvmContractSources = {
   [contractAddress: string]: Array<EvmEventSource>;
 };
-export enum ChildContractNames {
-  SingleContest = 'SingleContest',
-  RecurringContest = 'RecurringContest',
-}
 export type EvmChainSource = {
   rpc: string;
   maxBlockRange: number;

@@ -240,12 +240,25 @@ export async function getLaunchpadTokenCreatedTransaction({
     logs: txReceipt.logs,
   });
 
+  const {
+    token: tokenAddress,
+    curveId,
+    totalSupply,
+    launchpadLiquidity,
+    reserveRatio,
+    initialPurchaseEthAmount,
+  } = tokenEvents[0].args;
   return {
     txReceipt,
     block,
     parsedArgs: {
       namespace,
-      ...tokenEvents[0].args,
+      tokenAddress,
+      curveId,
+      totalSupply,
+      launchpadLiquidity,
+      reserveRatio,
+      initialPurchaseEthAmount,
     },
   };
 }
@@ -255,7 +268,7 @@ type LaunchpadTokenOnChainData = {
   poolLiquidity: bigint;
   curveId: bigint;
   scalar: bigint;
-  reserveRation: bigint;
+  reserveRatio: bigint;
   LPhook: string;
   funded: boolean;
 };
@@ -368,7 +381,7 @@ export async function getLaunchpadTokenDetails({
     curve_id: tokenData.parsedArgs.curveId.toString(),
     total_supply: tokenData.parsedArgs.totalSupply.toString(),
     launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity.toString(),
-    reserve_ration: tokenData.parsedArgs.reserveRation.toString(),
+    reserve_ration: tokenData.parsedArgs.reserveRatio.toString(),
     initial_purchase_eth_amount:
       tokenData.parsedArgs.initialPurchaseEthAmount.toString(),
   };

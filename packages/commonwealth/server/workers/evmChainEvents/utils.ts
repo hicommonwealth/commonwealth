@@ -1,7 +1,7 @@
 import { models } from '@hicommonwealth/model/db';
-import type { EvmContractSources } from '@hicommonwealth/model/services';
 import { EventPairs } from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
+import { EvmContractSources } from './getEventSources';
 
 export async function updateMigratedEvmEventSources(
   ethChainId: number,

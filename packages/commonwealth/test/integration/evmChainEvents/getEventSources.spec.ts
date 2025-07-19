@@ -1,11 +1,13 @@
+import * as abis from '@commonxyz/common-protocol-abis';
+import { ContestGovernorSingleAbi } from '@commonxyz/common-protocol-abis';
 import { dispose } from '@hicommonwealth/core';
 import {
-  EvmEventSignatures,
   factoryContracts,
   getFactoryContract,
   ValidChains,
 } from '@hicommonwealth/evm-protocols';
 import { createEventRegistryChainNodes } from '@hicommonwealth/model';
+import { getAbiItem, toEventHash } from 'viem';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
 import { createContestEventSources } from '../../util/util';
@@ -49,7 +51,12 @@ describe('getEventSources', () => {
           {
             eth_chain_id: parseInt(ethChainId),
             contract_address: singleContestAddress,
-            event_signature: EvmEventSignatures.Contests.SingleContestStarted,
+            event_signature: toEventHash(
+              getAbiItem({
+                abi: ContestGovernorSingleAbi,
+                name: 'NewSingleContestStarted',
+              })!,
+            ),
             meta: {
               events_migrated: true,
             },
@@ -61,8 +68,12 @@ describe('getEventSources', () => {
           {
             eth_chain_id: parseInt(ethChainId),
             contract_address: recurringContestAddress,
-            event_signature:
-              EvmEventSignatures.Contests.RecurringContestStarted,
+            event_signature: toEventHash(
+              getAbiItem({
+                abi: abis.ContestGovernorAbi,
+                name: 'NewRecurringContestStarted',
+              })!,
+            ),
             meta: {
               events_migrated: true,
             },

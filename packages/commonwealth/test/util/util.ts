@@ -1,17 +1,16 @@
+import * as abis from '@commonxyz/common-protocol-abis';
 import {
   CommunityStakeAbi,
+  ContestGovernorSingleAbi,
   NamespaceFactoryAbi,
 } from '@commonxyz/common-protocol-abis';
-import {
-  ChildContractNames,
-  EvmEventSignatures,
-  getFactoryContract,
-  ValidChains,
-} from '@hicommonwealth/evm-protocols';
+import { getFactoryContract, ValidChains } from '@hicommonwealth/evm-protocols';
 import { createTestRpc } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import { EvmEventSourceInstance } from '@hicommonwealth/model/models';
+import { ChildContractNames } from '@hicommonwealth/schemas';
 import { AbiType } from '@hicommonwealth/shared';
+import { getAbiItem, toEventHash } from 'viem';
 
 export async function createContestEventSources(
   ethChainId: ValidChains,
@@ -24,7 +23,12 @@ export async function createContestEventSources(
     {
       eth_chain_id: ethChainId,
       contract_address: singleContestContractAddress,
-      event_signature: EvmEventSignatures.Contests.SingleContestStarted,
+      event_signature: toEventHash(
+        getAbiItem({
+          abi: ContestGovernorSingleAbi,
+          name: 'NewSingleContestStarted',
+        })!,
+      ),
       contract_name: ChildContractNames.SingleContest,
       parent_contract_address: getFactoryContract(ValidChains.SepoliaBase)
         .NamespaceFactory,
@@ -34,7 +38,12 @@ export async function createContestEventSources(
     {
       eth_chain_id: ethChainId,
       contract_address: recurringContestContractAddress,
-      event_signature: EvmEventSignatures.Contests.RecurringContestStarted,
+      event_signature: toEventHash(
+        getAbiItem({
+          abi: abis.ContestGovernorAbi,
+          name: 'NewRecurringContestStarted',
+        })!,
+      ),
       contract_name: ChildContractNames.RecurringContest,
       parent_contract_address: getFactoryContract(ValidChains.SepoliaBase)
         .NamespaceFactory,
@@ -59,7 +68,12 @@ export const singleEventSource = {
         sources: [
           {
             eth_chain_id: ValidChains.SepoliaBase,
-            event_signature: EvmEventSignatures.CommunityStake.Trade,
+            event_signature: toEventHash(
+              getAbiItem({
+                abi: CommunityStakeAbi,
+                name: 'Trade',
+              })!,
+            ),
             contract_address: getFactoryContract(
               ValidChains.SepoliaBase,
             ).CommunityStake.toLowerCase(),
@@ -73,8 +87,12 @@ export const singleEventSource = {
         sources: [
           {
             eth_chain_id: ValidChains.SepoliaBase,
-            event_signature:
-              EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+            event_signature: toEventHash(
+              getAbiItem({
+                abi: NamespaceFactoryAbi,
+                name: 'DeployedNamespace',
+              })!,
+            ),
             contract_address: getFactoryContract(
               ValidChains.SepoliaBase,
             ).NamespaceFactory.toLowerCase(),
@@ -96,7 +114,12 @@ export const multipleEventSource = {
         sources: [
           {
             eth_chain_id: ValidChains.Base,
-            event_signature: EvmEventSignatures.CommunityStake.Trade,
+            event_signature: toEventHash(
+              getAbiItem({
+                abi: CommunityStakeAbi,
+                name: 'Trade',
+              })!,
+            ),
             contract_address: getFactoryContract(
               ValidChains.Base,
             ).CommunityStake.toLowerCase(),
@@ -108,8 +131,12 @@ export const multipleEventSource = {
         sources: [
           {
             eth_chain_id: ValidChains.Base,
-            event_signature:
-              EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+            event_signature: toEventHash(
+              getAbiItem({
+                abi: NamespaceFactoryAbi,
+                name: 'DeployedNamespace',
+              })!,
+            ),
             contract_address: getFactoryContract(
               ValidChains.Base,
             ).NamespaceFactory.toLowerCase(),

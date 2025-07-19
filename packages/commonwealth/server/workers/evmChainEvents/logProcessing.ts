@@ -1,8 +1,6 @@
 import { logger as _logger, stats } from '@hicommonwealth/core';
 import {
   type EvmBlockDetails,
-  type EvmChainSource,
-  type EvmContractSources,
   type EvmEvent,
   type Log,
   chainEventMappers,
@@ -10,6 +8,7 @@ import {
 import { EventPairs } from '@hicommonwealth/schemas';
 import { createPublicClient, getAddress, http } from 'viem';
 import { config } from '../../config';
+import { EvmChainSource, EvmContractSources } from './getEventSources';
 
 const ALCHEMY_BLOCK_LIMIT = 9_000;
 
