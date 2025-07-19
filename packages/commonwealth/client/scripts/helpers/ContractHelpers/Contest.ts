@@ -1,7 +1,7 @@
 import { ContestGovernorAbi } from '@commonxyz/common-protocol-abis';
 import {
-  commonProtocol,
   erc20Abi,
+  getTotalContestBalance,
   mustBeProtocolChainId,
   ValidChains,
   ViemChains,
@@ -297,7 +297,7 @@ class Contest extends ContractBase {
       await this.initialize(false);
     }
     this.reInitContract();
-    const contestBalance = await commonProtocol.getTotalContestBalance(
+    const contestBalance = await getTotalContestBalance(
       this.contractAddress,
       createPublicClient({
         chain: ViemChains[this.ethChainId],

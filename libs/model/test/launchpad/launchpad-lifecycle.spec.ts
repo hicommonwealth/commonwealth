@@ -37,7 +37,7 @@ describe('Launchpad Lifecycle', () => {
         url: `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`,
         private_url: `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`,
         name: 'Base Sepolia Testnet',
-        eth_chain_id: protocols.commonProtocol.ValidChains.SepoliaBase,
+        eth_chain_id: protocols.ValidChains.SepoliaBase,
         balance_type: BalanceType.Ethereum,
       },
       namespace: 'DogeMoonLanding',
@@ -129,14 +129,14 @@ describe('Launchpad Lifecycle', () => {
   test('Get a launchpad trade txn and project it', async () => {
     const payload = {
       transaction_hash: TRADE_TOKEN_TXN_HASH,
-      eth_chain_id: protocols.commonProtocol.ValidChains.SepoliaBase,
+      eth_chain_id: protocols.ValidChains.SepoliaBase,
     };
     const results = await command(CreateLaunchpadTrade(), {
       actor,
       payload,
     });
     expect(results).to.deep.equal({
-      eth_chain_id: protocols.commonProtocol.ValidChains.SepoliaBase,
+      eth_chain_id: protocols.ValidChains.SepoliaBase,
       transaction_hash: TRADE_TOKEN_TXN_HASH,
       token_address: TOKEN_ADDRESS.toLowerCase(),
       trader_address: TRADER_ADDRESS,

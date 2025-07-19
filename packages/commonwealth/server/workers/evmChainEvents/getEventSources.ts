@@ -2,9 +2,9 @@ import * as abis from '@commonxyz/common-protocol-abis';
 import { logger } from '@hicommonwealth/core';
 import {
   ContractSource,
-  commonProtocol as cp,
   EventRegistry,
   factoryContracts,
+  isValidChain,
 } from '@hicommonwealth/evm-protocols';
 import { buildChainNodeUrl } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
@@ -73,6 +73,7 @@ export async function getXpSources(
       meta: {
         events_migrated: true,
         quest_action_meta_ids: [source.quest_action_meta_id],
+        event_name: 'XpChainEventCreated',
       },
     });
   }
@@ -150,7 +151,7 @@ export async function getEventSources(): Promise<EvmSources> {
 
   for (const chainNode of chainNodes) {
     const ethChainId = chainNode.eth_chain_id!;
-    if (!cp.isValidChain(ethChainId))
+    if (!isValidChain(ethChainId))
       throw new Error(`Invalid eth chain id ${ethChainId}`);
 
     const registryContractSources: EvmContractSources =
