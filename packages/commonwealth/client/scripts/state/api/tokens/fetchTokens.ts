@@ -17,7 +17,7 @@ const useFetchTokensQuery = ({
   enabled = true,
   is_graduated,
 }: UseFetchTokensProps) => {
-  return trpc.launchpadToken.getTokens.useInfiniteQuery(
+  return trpc.LaunchpadToken.getTokens.useInfiniteQuery(
     {
       limit,
       order_by,

@@ -5,7 +5,7 @@ import { queryClient } from '../config';
 const useCreateTokenMutation = () => {
   const user = useUserStore();
 
-  return trpc.launchpadToken.createToken.useMutation({
+  return trpc.LaunchpadToken.createToken.useMutation({
     onSuccess: () => {
       user.setData({ addressSelectorSelectedAddress: undefined });
 

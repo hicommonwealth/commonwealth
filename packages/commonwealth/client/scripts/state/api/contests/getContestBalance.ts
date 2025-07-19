@@ -1,4 +1,3 @@
-import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
 import Contest from 'helpers/ContractHelpers/Contest';
 import { ContractMethods } from 'state/api/config';
@@ -15,7 +14,7 @@ const getContestBalance = async ({
 }: UseGetContestBalanceProps) => {
   const contest = new Contest(
     contestAddress,
-    factoryContracts[ethChainId].factory,
+    getFactoryContract(ethChainId).NamespaceFactory,
     chainRpc,
     ethChainId,
   );

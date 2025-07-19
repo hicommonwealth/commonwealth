@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import Contest from 'helpers/ContractHelpers/Contest';
 
 export interface DeploySingleERC20ContestOnchainProps {
@@ -28,7 +27,7 @@ const deploySingleERC20ContestOnchain = async ({
 }: DeploySingleERC20ContestOnchainProps) => {
   const contest = new Contest(
     '',
-    factoryContracts[ethChainId].factory,
+    getFactoryContract(ethChainId).NamespaceFactory,
     chainRpc,
     ethChainId,
   );

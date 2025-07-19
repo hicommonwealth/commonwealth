@@ -3,10 +3,10 @@ import { trpc } from 'utils/trpcClient';
 const useCreateTokenTradeMutation = () => {
   const utils = trpc.useUtils();
 
-  return trpc.launchpadToken.createTrade.useMutation({
+  return trpc.LaunchpadToken.createTrade.useMutation({
     onSuccess: async () => {
-      await utils.launchpadToken.getTokens.invalidate();
-      await utils.launchpadToken.getToken.invalidate();
+      await utils.LaunchpadToken.getTokens.invalidate();
+      await utils.LaunchpadToken.getToken.invalidate();
     },
   });
 };

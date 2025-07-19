@@ -22,14 +22,14 @@ export const mintAdminToken = async ({
   if (
     !factoryContracts ||
     !factoryContracts[ethChainId] ||
-    !factoryContracts[ethChainId].factory
+    !getFactoryContract(ethChainId).NamespaceFactory
   ) {
     throw new Error(
       `Factory configuration is missing for chain ID ${ethChainId}. Please check your commonProtocol configuration.`,
     );
   }
 
-  const factoryAddress = factoryContracts[ethChainId].factory;
+  const factoryAddress = getFactoryContract(ethChainId).NamespaceFactory;
   const namespaceFactory = new NamespaceFactory(factoryAddress, chainRpc);
 
   return await namespaceFactory.mintNamespaceTokens(
