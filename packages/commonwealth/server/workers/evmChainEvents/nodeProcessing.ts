@@ -164,7 +164,7 @@ export async function scheduleNodeProcessing(
     const blacklistedChains = ethChainIds.filter((ethChainId) => {
       return !whitelistedChains.includes(ethChainId);
     });
-    log.warn(
+    log.trace(
       // eslint-disable-next-line max-len
       `Ignoring chain events for chains ${blacklistedChains.join(', ')} because it is not in EVM_CHAINS_WHITELIST whitelist. Remove the env var to allow all.`,
     );

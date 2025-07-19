@@ -109,7 +109,8 @@ export const EventRegistry = {
     [getFactoryContract(ValidChains.Base).LPBondingCurve]: lpBondingCurveSource,
     [getFactoryContract(ValidChains.Base).TokenCommunityManager]:
       tokenCommunityManagerSource,
-    [getFactoryContract(ValidChains.Base).FeeManager]: referralFeeManagerSource,
+    [getFactoryContract(ValidChains.Base).ReferralFeeManager]:
+      referralFeeManagerSource,
   },
   [ValidChains.SepoliaBase]: {
     [getFactoryContract(ValidChains.SepoliaBase).NamespaceFactory]:
@@ -123,7 +124,7 @@ export const EventRegistry = {
       lpBondingCurveSource,
     [getFactoryContract(ValidChains.SepoliaBase).TokenCommunityManager]:
       tokenCommunityManagerSource,
-    [getFactoryContract(ValidChains.SepoliaBase).FeeManager]:
+    [getFactoryContract(ValidChains.SepoliaBase).ReferralFeeManager]:
       referralFeeManagerSource,
   },
   [ValidChains.Sepolia]: {
@@ -185,7 +186,7 @@ export const EventRegistry = {
       lpBondingCurveSource,
     [getFactoryContract(ValidChains.Anvil).TokenCommunityManager]:
       tokenCommunityManagerSource,
-    [getFactoryContract(ValidChains.Anvil).FeeManager]:
+    [getFactoryContract(ValidChains.Anvil).ReferralFeeManager]:
       referralFeeManagerSource,
   },
 };
