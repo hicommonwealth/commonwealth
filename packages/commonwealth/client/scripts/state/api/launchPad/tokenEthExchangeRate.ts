@@ -1,3 +1,4 @@
+import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 

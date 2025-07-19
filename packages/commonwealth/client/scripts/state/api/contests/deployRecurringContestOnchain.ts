@@ -1,3 +1,4 @@
+import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
 
 import Contest from 'helpers/ContractHelpers/Contest';

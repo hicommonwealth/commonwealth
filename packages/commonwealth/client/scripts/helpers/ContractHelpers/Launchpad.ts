@@ -32,8 +32,8 @@ class LaunchpadBondingCurve extends ContractBase {
   ) {
     super(bondingCurveAddress, LPBondingCurveAbi, rpc);
     this.tokenAddress = tokenAddress;
-    this.LaunchpadFactoryAddress = launchpadFactoryAddress;
-    this.TokenCommunityManager = tokenCommunityManager;
+    this.launchpadFactoryAddress = launchpadFactoryAddress;
+    this.tokenCommunityManager = tokenCommunityManager;
 
     const { LAUNCHPAD_INITIAL_PRICE, LAUNCHPAD_CONNECTOR_WEIGHT } =
       fetchCachedPublicEnvVar() || {};
@@ -49,9 +49,9 @@ class LaunchpadBondingCurve extends ContractBase {
     providerInstance?: any,
   ): Promise<void> {
     await super.initialize(withWallet, chainId, providerInstance);
-    this.LaunchpadFactory = new this.web3.eth.Contract(
+    this.launchpadFactory = new this.web3.eth.Contract(
       LaunchpadAbi,
-      this.LaunchpadFactoryAddress,
+      this.launchpadFactoryAddress,
     );
   }
 
@@ -68,7 +68,7 @@ class LaunchpadBondingCurve extends ContractBase {
     const connectorWeight = this.LAUNCHPAD_CONNECTOR_WEIGHT;
     const maxFeePerGas = await this.estimateGas();
     const txReceipt = await launchToken(
-      this.LaunchpadFactory,
+      this.launchpadFactory,
       name,
       symbol,
       [], // 9181 parameters
@@ -77,7 +77,7 @@ class LaunchpadBondingCurve extends ContractBase {
       this.web3.utils.toWei(1e9, 'ether'), // Default 1B tokens
       walletAddress,
       connectorWeight,
-      this.TokenCommunityManager,
+      this.tokenCommunityManager,
       initialBuyValue,
       maxFeePerGas!,
       chainId,

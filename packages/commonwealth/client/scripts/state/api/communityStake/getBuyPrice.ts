@@ -1,6 +1,7 @@
+import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
+import { lazyLoadCommunityStakes } from 'helpers/ContractHelpers/LazyCommunityStakes';
 import { ContractMethods } from 'state/api/config';
-import { lazyLoadCommunityStakes } from '../../../helpers/ContractHelpers/LazyCommunityStakes';
 
 const GET_BUY_PRICE_STALE_TIME = 2 * 1_000; // 2 sec
 

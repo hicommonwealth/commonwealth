@@ -1,4 +1,7 @@
-import { factoryContracts } from '@hicommonwealth/evm-protocols';
+import {
+  factoryContracts,
+  getFactoryContract,
+} from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
 import NamespaceFactory from 'client/scripts/helpers/ContractHelpers/NamespaceFactory';
 

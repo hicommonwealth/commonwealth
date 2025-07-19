@@ -1,3 +1,4 @@
+import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 import { useEffect, useMemo, useState } from 'react';
