@@ -13,6 +13,7 @@ import {
   events,
   LaunchpadToken,
   Thread,
+  ThreadToken,
 } from '@hicommonwealth/schemas';
 import {
   buildCommunityUrl,
@@ -62,6 +63,10 @@ const EventStreamSchemas = {
   LaunchpadTokenGraduated: {
     input: events.LaunchpadTokenGraduated,
     output: LaunchpadToken,
+  },
+  ThreadTokenGraduated: {
+    input: events.ThreadTokenGraduated,
+    output: ThreadToken,
   },
 } as const;
 
