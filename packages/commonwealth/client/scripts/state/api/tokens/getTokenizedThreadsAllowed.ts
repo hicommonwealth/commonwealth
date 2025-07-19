@@ -13,7 +13,7 @@ type UseGetTokenizedThreadsAllowedQuery = z.infer<
 const useGetTokenizedThreadsAllowedQuery = (
   params: UseGetTokenizedThreadsAllowedQuery,
 ) => {
-  return trpc.launchpadToken.geTokenizedThreadsAllowed.useQuery(
+  return trpc.LaunchpadToken.geTokenizedThreadsAllowed.useQuery(
     {
       community_id: params.community_id,
       topic_id: params.topic_id,

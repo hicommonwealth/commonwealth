@@ -1,5 +1,5 @@
 import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
-import { factoryContracts, getAmountIn } from '@hicommonwealth/evm-protocols';
+import { getFactoryContract getAmountIn } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
 import Web3 from 'web3';
 
@@ -16,7 +16,7 @@ const ethPerToken = async ({
   tokenAddress,
   chainRpc,
 }: EthPerTokenProps) => {
-  const contractAddress = factoryContracts[ethChainId].lpBondingCurve;
+  const contractAddress = getFactoryContract(ethChainId).LPBondingCurve;
 
   const web3 = new Web3(chainRpc);
   const contract = new web3.eth.Contract(LPBondingCurveAbi, contractAddress);

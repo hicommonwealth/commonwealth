@@ -1,4 +1,3 @@
-import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
 import { ContractMethods, queryClient } from 'state/api/config';
 import { setActiveAccountOnTransactionSuccess } from 'views/modals/ManageCommunityStakeModal/utils';
@@ -23,8 +22,8 @@ const sellStake = async ({
 }: SellStakeProps) => {
   const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
-    factoryContracts[ethChainId].communityStake,
-    factoryContracts[ethChainId].factory,
+    getFactoryContract(ethChainId).CommunityStake,
+    getFactoryContract(ethChainId).NamespaceFactory,
     chainRpc,
   );
 

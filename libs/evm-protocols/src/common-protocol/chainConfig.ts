@@ -1,3 +1,5 @@
+import * as abis from '@commonxyz/common-protocol-abis';
+
 // Chains with deployed namespace factories. As new chains are enabled, add here.
 
 export enum ValidChains {
@@ -49,38 +51,24 @@ export function mustBeProtocolChainId(
   }
 }
 
-// Purpose of this function is to get around the satisfies in the
-// factoryContract type in order to check existence of fields
-export function toContractObject<T extends factoryContractsType[ValidChains]>(
-  obj: T,
-): Required<factoryContractsType[ValidChains]> {
-  return obj as Required<factoryContractsType[ValidChains]>;
-}
-
 export const STAKE_ID = 2;
 export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
 export const NOMINATION_FEE = 0.00005;
 
-type factoryContractsType = {
-  [key in ValidChains]: {
-    NamespaceFactory: string;
-    CommunityStake: string;
-    Launchpad?: string;
-    LPBondingCurve?: string;
-    TokenCommunityManager?: string;
-    ReferralFeeManager?: string;
-    // veBridge?: string; TODO: Add back once we add the contract for it
-    CommunityNominations?: string;
-    TokenLaunchpad?: string;
-    TokenBondingCurve?: string;
+type AbiContractName = {
+  [K in keyof typeof abis]: K extends `${infer Base}Abi` ? Base : never;
+}[keyof typeof abis];
+
+export type FactoryContractsType = {
+  [chain in ValidChains]: {
     chainId: number;
-  };
+  } & Partial<Record<AbiContractName, `0x${string}`>>;
 };
 
 // Requires a live contract for each enum chain. Add address of factory here on new deploy.
 // WARNING: UPDATE THE EvmEventSources.parent_contract_address IN THE DB IF THE FACTORY ADDRESS IS UPDATED
-export const factoryContracts = {
+export const factoryContracts: FactoryContractsType = {
   [ValidChains.Sepolia]: {
     NamespaceFactory: '0xEAB6373E6a722EeC8A65Fd38b014d8B81d5Bc1d4',
     CommunityStake: '0xf6C1B02257f0Ac4Af5a1FADd2dA8E37EC5f9E5fd',
@@ -156,4 +144,35 @@ export const factoryContracts = {
     TokenBondingCurve: '0x112eAB263b0eEe88b6996Ff4A03D9629dad8a2b8',
     chainId: 31337,
   },
-} as const satisfies factoryContractsType;
+};
+
+const chainIdToValidChain: Record<number, keyof FactoryContractsType> =
+  Object.entries(factoryContracts).reduce(
+    (acc, [key, val]) => {
+      acc[val.chainId] = key as unknown as keyof FactoryContractsType;
+      return acc;
+    },
+    {} as Record<number, keyof FactoryContractsType>,
+  );
+
+// Type safe and runtime safe contract getter. Will throw an error if you
+// Try to get a contract from a chain that does not have the contract deployed
+export function getFactoryContract(ethChainId: number) {
+  const chainKey = chainIdToValidChain[ethChainId];
+  if (!chainKey) {
+    throw new Error(`No contracts configured for chainId ${ethChainId}`);
+  }
+
+  const contracts = factoryContracts[chainKey];
+
+  return new Proxy(contracts, {
+    get(target, prop: string) {
+      if (!(prop in target)) {
+        throw new Error(
+          `Contract "${prop}" not found on chain ${chainKey} (chainId ${ethChainId})`,
+        );
+      }
+      return target[prop as keyof typeof target];
+    },
+  }) as Required<FactoryContractsType[keyof FactoryContractsType]>;
+}

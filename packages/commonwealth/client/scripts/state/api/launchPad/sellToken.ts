@@ -1,4 +1,3 @@
-import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 import { userStore } from 'state/ui/user';
@@ -40,10 +39,10 @@ const sellToken = async ({
   }
 
   const launchPad = new LaunchpadBondingCurve(
-    factoryContracts[ethChainId].lpBondingCurve,
-    factoryContracts[ethChainId].launchpad,
+    getFactoryContract(ethChainId).LPBondingCurve,
+    getFactoryContract(ethChainId).Launchpad,
     tokenAddress,
-    factoryContracts[ethChainId].tokenCommunityManager,
+    getFactoryContract(ethChainId).TokenCommunityManager,
     chainRpc,
   );
 

@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import Contest from 'helpers/ContractHelpers/Contest';
 
 export interface DeploySingleJudgedContestOnchainProps {
@@ -28,7 +27,7 @@ const deploySingleJudgedContestOnchain = async ({
 }: DeploySingleJudgedContestOnchainProps) => {
   const contest = new Contest(
     '',
-    factoryContracts[ethChainId].factory,
+    getFactoryContract(ethChainId).NamespaceFactory,
     chainRpc,
     ethChainId,
   );

@@ -13,7 +13,7 @@ const useGetTokenByCommunityId = ({
   with_stats = true,
   enabled,
 }: UseGetTokenByCommunityIdProps) => {
-  return trpc.launchpadToken.getToken.useQuery(
+  return trpc.LaunchpadToken.getToken.useQuery(
     {
       community_id,
       with_stats,

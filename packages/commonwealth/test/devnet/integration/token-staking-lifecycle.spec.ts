@@ -24,7 +24,7 @@ describe.skip('Token staking lifecycle', () => {
     //   web3.utils.toWei(1e9, 'ether'),
     //   anvilAccounts[0].address,
     //   830000,
-    //   contractAddresses.tokenCommunityManager,
+    //   contractAddresses.TokenCommunityManager,
     // );
 
     let token = await models.LaunchpadToken.findOne({
