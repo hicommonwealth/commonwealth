@@ -242,7 +242,7 @@ export async function getEventSources(): Promise<EvmSources> {
       autogennedSources[ethChainId] ?? {};
 
     const dbContractSources: EvmContractSources = {};
-    for (const eventSource of dbEvmSources.filter(
+    for (const source of dbEvmSources.filter(
       (e) => e.eth_chain_id === ethChainId,
     )) {
       const parentContractAddress = getAddress(source.parent_contract_address);
