@@ -1,6 +1,9 @@
 // Approve ERC20 token transfer if allowance is insufficient
 import { TokenBondingCurveAbi } from '@commonxyz/common-protocol-abis';
-import { createPrivateEvmClient } from '@hicommonwealth/evm-protocols';
+import {
+  createPrivateEvmClient,
+  getAmountIn,
+} from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
 
 export const approveTokenTransfer = async (
@@ -164,9 +167,13 @@ export async function transferPostLiquidityToUniswap({
       BigInt(web3.utils.toNumber(maxPriorityFeePerGas));
   }
 
+  const amountIn = await getAmountIn(contract, tokenAddress, 1e18, 830000);
+
   return await transferPostLiquidity(
     contract,
     tokenAddress,
+    amountIn.toString(),
+    '0',
     web3.eth.defaultAccount!,
     maxFeePerGas,
   );
