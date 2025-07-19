@@ -1,5 +1,8 @@
-import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
-import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
+import {
+  LPBondingCurveAbi,
+  NamespaceFactoryAbi,
+} from '@commonxyz/common-protocol-abis';
+import { createPublicClient, http, parseEventLogs } from 'viem';
 import { Web3 } from 'web3';
 import { createPrivateEvmClient, getTransaction, withRetries } from '../utils';
 import { getErc20TokenInfo } from './tokens';
@@ -200,77 +203,49 @@ export async function getLaunchpadTokenCreatedTransaction({
   transactionHash,
 }: {
   rpc: string;
-  transactionHash: string;
+  transactionHash: `0x${string}`;
 }) {
-  const web3 = new Web3(rpc);
+  const client = createPublicClient({
+    transport: http(rpc),
+  });
 
-  const txReceipt = await web3.eth.getTransactionReceipt(transactionHash);
+  const txReceipt = await client.getTransactionReceipt({
+    hash: transactionHash,
+  });
   if (!txReceipt) {
     return;
   }
 
-  const block = await web3.eth.getBlock(txReceipt.blockHash.toString());
+  const block = await client.getBlock({ blockHash: txReceipt.blockHash! });
 
-  const deployedNamespaceLog = txReceipt.logs.find((l) => {
-    if (l.topics && l.topics.length > 0) {
-      return (
-        l.topics[0].toString() ===
-        EvmEventSignatures.NamespaceFactory.NamespaceDeployed
-      );
-    }
-    return false;
+  const namespaceEvents = parseEventLogs({
+    abi: NamespaceFactoryAbi,
+    eventName: 'DeployedNamespace',
+    logs: txReceipt.logs,
   });
-  if (!deployedNamespaceLog) {
+
+  if (namespaceEvents.length === 0) {
     return;
   }
-  const {
-    0: namespace,
-    // 1: feeManager,
-    // 2: signature,
-    // 3: namespaceDeployer,
-    // 3: nameSpaceAddress,
-  } = web3.eth.abi.decodeParameters(
-    ['string', 'address', 'bytes', 'address', 'address'],
-    deployedNamespaceLog.data!.toString(),
-  );
 
-  const tokenRegisteredLog = txReceipt.logs.find((l) => {
-    if (l.topics && l.topics.length > 0) {
-      return (
-        l.topics[0].toString() === EvmEventSignatures.Launchpad.TokenRegistered
-      );
-    }
-    return false;
-  });
-  if (!tokenRegisteredLog) {
+  const { nameSpaceAddress: namespace } = namespaceEvents[0].args;
+
+  if (!namespace) {
     return;
   }
-  const {
-    0: curveId,
-    1: totalSupply,
-    2: launchpadLiquidity,
-    3: reserveRatio,
-    4: initialPurchaseEthAmount,
-  } = web3.eth.abi.decodeParameters(
-    ['uint256', 'uint256', 'uint256', 'uint256', 'uint256'],
-    tokenRegisteredLog.data!.toString(),
-  );
-  const tokenAddress = web3.eth.abi.decodeParameter(
-    'address',
-    tokenRegisteredLog.topics![1].toString(),
-  );
+
+  const tokenEvents = parseEventLogs({
+    abi: LPBondingCurveAbi,
+    eventName: 'TokenRegistered',
+    logs: txReceipt.logs,
+  });
 
   return {
     txReceipt,
     block,
     parsedArgs: {
-      namespace: namespace as string,
-      tokenAddress: tokenAddress as string,
-      curveId: curveId as bigint,
-      totalSupply: totalSupply as bigint,
-      launchpadLiquidity: launchpadLiquidity as bigint,
-      reserveRation: reserveRatio as bigint,
-      initialPurchaseEthAmount: initialPurchaseEthAmount as bigint,
+      namespace,
+      ...tokenEvents[0].args,
     },
   };
 }
@@ -343,7 +318,7 @@ export async function getLaunchpadTokenDetails({
   transactionHash,
 }: {
   rpc: string;
-  transactionHash: string;
+  transactionHash: `0x${string}`;
 }): Promise<{
   name: string;
   symbol: string;

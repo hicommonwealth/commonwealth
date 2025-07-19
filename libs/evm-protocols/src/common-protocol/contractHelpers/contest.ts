@@ -5,17 +5,14 @@ import {
   INamespaceAbi,
   NamespaceFactoryAbi,
 } from '@commonxyz/common-protocol-abis';
-import {
-  decodeLog,
-  EvmEventSignatures,
-  getFactoryContract,
-} from '@hicommonwealth/evm-protocols';
+import { decodeLog, getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import {
   Chain,
   getContract,
   HttpTransport,
+  parseEventLogs,
   PublicClient,
   TransactionReceipt,
 } from 'viem';
@@ -324,19 +321,17 @@ export const addContent = async (
     throw new Error('Failed to push content to chain: ' + e);
   }
 
-  const contentAddedEvent = txReceipt.logs.find(
-    (l) => l.topics[0] === EvmEventSignatures.Contests.ContentAdded,
-  );
-
-  if (!contentAddedEvent) {
-    throw new Error('Content not added on-chain');
-  }
+  const eventLog = parseEventLogs({
+    abi: ContestGovernorAbi,
+    eventName: 'ContentAdded',
+    logs: txReceipt.logs,
+  });
 
   const { args } = decodeLog({
     abi: ContestGovernorAbi,
     eventName: 'ContentAdded',
-    data: contentAddedEvent.data,
-    topics: contentAddedEvent.topics,
+    data: eventLog[0].data,
+    topics: eventLog[0].topics,
   });
 
   return {
@@ -571,18 +566,19 @@ export const deployERC20Contest = async ({
       hash: await client.writeContract(request),
     });
 
-    const eventLog = txReceipt.logs.find(
-      (log) =>
-        log.topics[0] ==
-        EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
-    );
-    if (!eventLog || !eventLog.data) throw new Error('Contest not deployed');
+    const eventLog = parseEventLogs({
+      abi: ContestGovernorAbi,
+      eventName: 'ContentAdded',
+      logs: txReceipt.logs,
+    });
+
+    if (!eventLog || !eventLog[0].data) throw new Error('Contest not deployed');
 
     const { args } = decodeLog({
       abi: NamespaceFactoryAbi,
       eventName: 'NewContest',
-      data: eventLog.data,
-      topics: eventLog.topics,
+      data: eventLog[0].data,
+      topics: eventLog[0].topics,
     });
 
     return args.contest;
