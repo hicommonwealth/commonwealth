@@ -8,11 +8,11 @@ export const useGetLaunchpadTradesQuery = (
   input: typeof schemas.GetLaunchpadTrades.input._type,
   // Options like `enabled`, `staleTime`, etc., passed to react-query
   options?: Parameters<
-    typeof trpc.LaunchpadToken.getLaunchpadTrades.useQuery
+    typeof trpc.launchpadToken.getLaunchpadTrades.useQuery
   >[1],
 ) => {
   // Call the TRPC hook
-  return trpc.LaunchpadToken.getLaunchpadTrades.useQuery(input, options);
+  return trpc.launchpadToken.getLaunchpadTrades.useQuery(input, options);
 };
 
 // Export the inferred input/output types for convenience elsewhere

@@ -13,7 +13,7 @@ const useGetTokenByThreadId = ({
   with_stats = true,
   enabled,
 }: UseGetTokenByThreadIdProps) => {
-  return trpc.LaunchpadToken.getToken.useQuery(
+  return trpc.launchpadToken.getToken.useQuery(
     {
       thread_id,
       with_stats,

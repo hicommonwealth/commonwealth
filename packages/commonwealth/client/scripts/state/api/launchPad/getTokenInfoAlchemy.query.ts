@@ -13,7 +13,7 @@ const useGetTokenInfoAlchemy = ({
   token_address,
   enabled = true,
 }: UseGetTokenInfoAlchemy) => {
-  return trpc.LaunchpadToken.getTokenInfoAlchemy.useQuery(
+  return trpc.launchpadToken.getTokenInfoAlchemy.useQuery(
     {
       eth_chain_id: eth_chain_id!,
       token_address,

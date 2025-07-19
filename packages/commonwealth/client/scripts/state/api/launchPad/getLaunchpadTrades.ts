@@ -9,7 +9,7 @@ type UseGetLaunchpadTradesProps = {
 const useGetLaunchpadTradesQuery = ({
   trader_addresses,
 }: UseGetLaunchpadTradesProps) => {
-  return trpc.LaunchpadToken.getLaunchpadTrades.useQuery(
+  return trpc.launchpadToken.getLaunchpadTrades.useQuery(
     {
       trader_addresses: trader_addresses.join(','),
     },

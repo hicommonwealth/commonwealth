@@ -321,7 +321,7 @@ export class Thread implements IUniqueId {
     );
     this.contentUrl = t.content_url;
     this.isLinkingToken = t.is_linking_token;
-    this.LaunchpadTokenAddress = t.launchpad_token_address;
+    this.launchpadTokenAddress = t.launchpad_token_address;
 
     this.recentComments = (t.recentComments ?? t.Comments ?? []).map(
       (rc) =>
