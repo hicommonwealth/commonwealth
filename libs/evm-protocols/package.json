@@ -15,8 +15,8 @@
   },
   "scripts": {
     "build": "tsc -b ./tsconfig.build.json",
-    "generate-event-schema": "tsx ./src/generateZodSchema.ts",
-    "verify-event-schema": "tsx ./src/verifySchemaUpToDate.ts",
+    "generate-event-schema": "tsx src/generate/generateZodSchema.ts",
+    "verify-event-schema": "tsx src/generate/verifySchemaUpToDate.ts",
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
     "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run ./test/**/*.spec.ts"

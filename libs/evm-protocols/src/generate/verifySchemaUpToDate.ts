@@ -1,4 +1,4 @@
-import pkg from '../../../package.json';
+import pkg from '../../../../package.json';
 import { commonProtocolVersion } from './commonProtocolEventSchema';
 const currentVersion = pkg.dependencies['@commonxyz/common-protocol-abis'];
 
