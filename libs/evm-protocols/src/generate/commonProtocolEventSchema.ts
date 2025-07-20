@@ -2,21 +2,26 @@
 
 import { z } from 'zod';
 
+import {
+  EVM_ADDRESS_STRICT,
+  EVM_EVENT_SIGNATURE_STRICT_REGEX,
+} from '@hicommonwealth/schemas';
+
 export const commonProtocolVersion = '1.4.11';
 
 export const ChainEventBase = z.object({
-  ethChainId: z.number(),
+  eth_chain_id: z.number(),
   block_number: z.string(),
   block_timestamp: z.number(),
-  contract_address: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-  transaction_hash: z.string().regex(/^0x[0-9a-fA-F]{64}$/),
+  contract_address: EVM_ADDRESS_STRICT,
+  transaction_hash: EVM_EVENT_SIGNATURE_STRICT_REGEX,
 });
 
 export const commonProtocolEventSchema = {
   'CommunityNominations.FactoryUpdated': ChainEventBase.extend({
     parsedArgs: z.object({
-      oldFactory: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      newFactory: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      oldFactory: EVM_ADDRESS_STRICT,
+      newFactory: EVM_ADDRESS_STRICT,
     }),
   }),
   'CommunityNominations.FeeAmountUpdated': ChainEventBase.extend({
@@ -27,31 +32,31 @@ export const commonProtocolEventSchema = {
   }),
   'CommunityNominations.FeeDestinationUpdated': ChainEventBase.extend({
     parsedArgs: z.object({
-      oldDestination: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      newDestination: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      oldDestination: EVM_ADDRESS_STRICT,
+      newDestination: EVM_ADDRESS_STRICT,
     }),
   }),
   'CommunityNominations.FeeTransferred': ChainEventBase.extend({
     parsedArgs: z.object({
-      recipient: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      recipient: EVM_ADDRESS_STRICT,
       amount: z.bigint(),
     }),
   }),
   'CommunityNominations.JudgeNominated': ChainEventBase.extend({
     parsedArgs: z.object({
       namespace: z.string(),
-      judge: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      judge: EVM_ADDRESS_STRICT,
       judgeId: z.bigint(),
-      nominator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      nominator: EVM_ADDRESS_STRICT,
       currentNominations: z.bigint(),
     }),
   }),
   'CommunityNominations.JudgeUnnominated': ChainEventBase.extend({
     parsedArgs: z.object({
       namespace: z.string(),
-      judge: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      judge: EVM_ADDRESS_STRICT,
       judgeId: z.bigint(),
-      nominator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      nominator: EVM_ADDRESS_STRICT,
       currentNominations: z.bigint(),
     }),
   }),
@@ -66,7 +71,7 @@ export const commonProtocolEventSchema = {
   'CommunityNominations.NominatorNominated': ChainEventBase.extend({
     parsedArgs: z.object({
       namespace: z.string(),
-      nominator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      nominator: EVM_ADDRESS_STRICT,
     }),
   }),
   'CommunityNominations.NominatorSettled': ChainEventBase.extend({
@@ -77,38 +82,38 @@ export const commonProtocolEventSchema = {
   'CommunityNominations.NominatorUnnominated': ChainEventBase.extend({
     parsedArgs: z.object({
       namespace: z.string(),
-      nominator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      nominator: EVM_ADDRESS_STRICT,
     }),
   }),
   'CommunityNominations.OwnershipTransferred': ChainEventBase.extend({
     parsedArgs: z.object({
-      previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      previousOwner: EVM_ADDRESS_STRICT,
+      newOwner: EVM_ADDRESS_STRICT,
     }),
   }),
   'CommunityStake.OwnershipTransferred': ChainEventBase.extend({
     parsedArgs: z.object({
-      previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      previousOwner: EVM_ADDRESS_STRICT,
+      newOwner: EVM_ADDRESS_STRICT,
     }),
   }),
   'CommunityStake.Trade': ChainEventBase.extend({
     parsedArgs: z.object({
-      trader: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      namespace: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      trader: EVM_ADDRESS_STRICT,
+      namespace: EVM_ADDRESS_STRICT,
       isBuy: z.boolean(),
       communityTokenAmount: z.bigint(),
       ethAmount: z.bigint(),
       protocolEthAmount: z.bigint(),
       nameSpaceEthAmount: z.bigint(),
       supply: z.bigint(),
-      exchangeToken: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      exchangeToken: EVM_ADDRESS_STRICT,
     }),
   }),
   'ContestGovernor.ContentAdded': ChainEventBase.extend({
     parsedArgs: z.object({
       contentId: z.bigint(),
-      creator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      creator: EVM_ADDRESS_STRICT,
       url: z.string(),
     }),
   }),
@@ -126,14 +131,14 @@ export const commonProtocolEventSchema = {
   }),
   'ContestGovernor.TransferFailed': ChainEventBase.extend({
     parsedArgs: z.object({
-      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      to: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      token: EVM_ADDRESS_STRICT,
+      to: EVM_ADDRESS_STRICT,
       amount: z.bigint(),
     }),
   }),
   'ContestGovernor.VoterVoted': ChainEventBase.extend({
     parsedArgs: z.object({
-      voter: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      voter: EVM_ADDRESS_STRICT,
       contentId: z.bigint(),
       contestId: z.bigint(),
       votingPower: z.bigint(),
@@ -142,7 +147,7 @@ export const commonProtocolEventSchema = {
   'ContestGovernorSingle.ContentAdded': ChainEventBase.extend({
     parsedArgs: z.object({
       contentId: z.bigint(),
-      creator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      creator: EVM_ADDRESS_STRICT,
       url: z.string(),
     }),
   }),
@@ -154,81 +159,81 @@ export const commonProtocolEventSchema = {
   }),
   'ContestGovernorSingle.OwnershipTransferred': ChainEventBase.extend({
     parsedArgs: z.object({
-      previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      previousOwner: EVM_ADDRESS_STRICT,
+      newOwner: EVM_ADDRESS_STRICT,
     }),
   }),
   'ContestGovernorSingle.TokenSwept': ChainEventBase.extend({
     parsedArgs: z.object({
-      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      token: EVM_ADDRESS_STRICT,
       amount: z.bigint(),
     }),
   }),
   'ContestGovernorSingle.TransferFailed': ChainEventBase.extend({
     parsedArgs: z.object({
-      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      to: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      token: EVM_ADDRESS_STRICT,
+      to: EVM_ADDRESS_STRICT,
       amount: z.bigint(),
     }),
   }),
   'ContestGovernorSingle.VoterVoted': ChainEventBase.extend({
     parsedArgs: z.object({
-      voter: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      voter: EVM_ADDRESS_STRICT,
       contentId: z.bigint(),
       votingPower: z.bigint(),
     }),
   }),
   'FeeManager.BeneficiaryAdded': ChainEventBase.extend({
     parsedArgs: z.object({
-      beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      beneficiary: EVM_ADDRESS_STRICT,
       weight: z.bigint(),
     }),
   }),
   'FeeManager.BeneficiaryRemoved': ChainEventBase.extend({
     parsedArgs: z.object({
-      beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      beneficiary: EVM_ADDRESS_STRICT,
     }),
   }),
   'FeeManager.BeneficiaryUpdated': ChainEventBase.extend({
     parsedArgs: z.object({
-      beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      beneficiary: EVM_ADDRESS_STRICT,
       weight: z.bigint(),
     }),
   }),
   'FeeManager.ERC20_FeeDistributed': ChainEventBase.extend({
     parsedArgs: z.object({
-      beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      beneficiary: EVM_ADDRESS_STRICT,
       amount: z.bigint(),
-      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      token: EVM_ADDRESS_STRICT,
     }),
   }),
   'FeeManager.ETH_FeeDistributed': ChainEventBase.extend({
     parsedArgs: z.object({
-      beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      beneficiary: EVM_ADDRESS_STRICT,
       amount: z.bigint(),
     }),
   }),
   'INamespace.ApprovalForAll': ChainEventBase.extend({
     parsedArgs: z.object({
-      account: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      operator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      account: EVM_ADDRESS_STRICT,
+      operator: EVM_ADDRESS_STRICT,
       approved: z.boolean(),
     }),
   }),
   'INamespace.TransferBatch': ChainEventBase.extend({
     parsedArgs: z.object({
-      operator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      from: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      to: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      operator: EVM_ADDRESS_STRICT,
+      from: EVM_ADDRESS_STRICT,
+      to: EVM_ADDRESS_STRICT,
       ids: z.bigint(),
       values: z.bigint(),
     }),
   }),
   'INamespace.TransferSingle': ChainEventBase.extend({
     parsedArgs: z.object({
-      operator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      from: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      to: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      operator: EVM_ADDRESS_STRICT,
+      from: EVM_ADDRESS_STRICT,
+      to: EVM_ADDRESS_STRICT,
       id: z.bigint(),
       value: z.bigint(),
     }),
@@ -241,15 +246,15 @@ export const commonProtocolEventSchema = {
   }),
   'LPBondingCurve.LiquidityTransferred': ChainEventBase.extend({
     parsedArgs: z.object({
-      tokenAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      LPHook: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      tokenAddress: EVM_ADDRESS_STRICT,
+      LPHook: EVM_ADDRESS_STRICT,
       tokensTransferred: z.bigint(),
       liquidityTransferred: z.bigint(),
     }),
   }),
   'LPBondingCurve.TokenRegistered': ChainEventBase.extend({
     parsedArgs: z.object({
-      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      token: EVM_ADDRESS_STRICT,
       curveId: z.bigint(),
       totalSupply: z.bigint(),
       launchpadLiquidity: z.bigint(),
@@ -259,8 +264,8 @@ export const commonProtocolEventSchema = {
   }),
   'LPBondingCurve.Trade': ChainEventBase.extend({
     parsedArgs: z.object({
-      trader: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      tokenAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      trader: EVM_ADDRESS_STRICT,
+      tokenAddress: EVM_ADDRESS_STRICT,
       isBuy: z.boolean(),
       tokenAmount: z.bigint(),
       ethAmount: z.bigint(),
@@ -270,12 +275,12 @@ export const commonProtocolEventSchema = {
   }),
   'Launchpad.LaunchpadCreated': ChainEventBase.extend({
     parsedArgs: z.object({
-      launchpad: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      launchpad: EVM_ADDRESS_STRICT,
     }),
   }),
   'Launchpad.NewTokenCreated': ChainEventBase.extend({
     parsedArgs: z.object({
-      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      token: EVM_ADDRESS_STRICT,
       totalSupply: z.bigint(),
       name: z.string(),
       symbol: z.string(),
@@ -283,7 +288,7 @@ export const commonProtocolEventSchema = {
   }),
   'Launchpad.TokenRegistered': ChainEventBase.extend({
     parsedArgs: z.object({
-      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      token: EVM_ADDRESS_STRICT,
       curveId: z.bigint(),
     }),
   }),
@@ -297,21 +302,21 @@ export const commonProtocolEventSchema = {
   'NamespaceFactory.DeployedNamespace': ChainEventBase.extend({
     parsedArgs: z.object({
       name: z.string(),
-      _feeManager: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      _feeManager: EVM_ADDRESS_STRICT,
       _signature: z.string(),
-      _namespaceDeployer: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      nameSpaceAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      _namespaceDeployer: EVM_ADDRESS_STRICT,
+      nameSpaceAddress: EVM_ADDRESS_STRICT,
     }),
   }),
   'NamespaceFactory.DeployedNamespaceWithReferral': ChainEventBase.extend({
     parsedArgs: z.object({
       name: z.string(),
-      feeManager: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      referrer: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      referralFeeManager: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      feeManager: EVM_ADDRESS_STRICT,
+      referrer: EVM_ADDRESS_STRICT,
+      referralFeeManager: EVM_ADDRESS_STRICT,
       signature: z.string(),
-      namespaceDeployer: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      nameSpaceAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      namespaceDeployer: EVM_ADDRESS_STRICT,
+      nameSpaceAddress: EVM_ADDRESS_STRICT,
     }),
   }),
   'NamespaceFactory.Initialized': ChainEventBase.extend({
@@ -321,26 +326,26 @@ export const commonProtocolEventSchema = {
   }),
   'NamespaceFactory.NewContest': ChainEventBase.extend({
     parsedArgs: z.object({
-      contest: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      namespace: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      contest: EVM_ADDRESS_STRICT,
+      namespace: EVM_ADDRESS_STRICT,
       interval: z.bigint(),
       oneOff: z.boolean(),
     }),
   }),
   'NamespaceFactory.OwnershipTransferred': ChainEventBase.extend({
     parsedArgs: z.object({
-      previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      previousOwner: EVM_ADDRESS_STRICT,
+      newOwner: EVM_ADDRESS_STRICT,
     }),
   }),
   'ReferralFeeManager.FeeDistributorAdded': ChainEventBase.extend({
     parsedArgs: z.object({
-      newDistributor: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      newDistributor: EVM_ADDRESS_STRICT,
     }),
   }),
   'ReferralFeeManager.FeeDistributorRemoved': ChainEventBase.extend({
     parsedArgs: z.object({
-      removedDistributor: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      removedDistributor: EVM_ADDRESS_STRICT,
     }),
   }),
   'ReferralFeeManager.FeeSplitUpdated': ChainEventBase.extend({
@@ -350,28 +355,28 @@ export const commonProtocolEventSchema = {
   }),
   'ReferralFeeManager.FeesDistributed': ChainEventBase.extend({
     parsedArgs: z.object({
-      namespace: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      namespace: EVM_ADDRESS_STRICT,
+      token: EVM_ADDRESS_STRICT,
       amount: z.bigint(),
-      recipient: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      recipient: EVM_ADDRESS_STRICT,
       recipientAmount: z.bigint(),
     }),
   }),
   'ReferralFeeManager.OwnershipTransferred': ChainEventBase.extend({
     parsedArgs: z.object({
-      previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      previousOwner: EVM_ADDRESS_STRICT,
+      newOwner: EVM_ADDRESS_STRICT,
     }),
   }),
   'ReferralFeeManager.ProtocolFeeDestinationUpdated': ChainEventBase.extend({
     parsedArgs: z.object({
-      newDestination: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      newDestination: EVM_ADDRESS_STRICT,
     }),
   }),
   'ReferralFeeManager.ReferralSet': ChainEventBase.extend({
     parsedArgs: z.object({
-      namespace: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      referral: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      namespace: EVM_ADDRESS_STRICT,
+      referral: EVM_ADDRESS_STRICT,
     }),
   }),
   'ReferralFeeManager.RoleAdminChanged': ChainEventBase.extend({
@@ -384,28 +389,28 @@ export const commonProtocolEventSchema = {
   'ReferralFeeManager.RoleGranted': ChainEventBase.extend({
     parsedArgs: z.object({
       role: z.string(),
-      account: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      sender: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      account: EVM_ADDRESS_STRICT,
+      sender: EVM_ADDRESS_STRICT,
     }),
   }),
   'ReferralFeeManager.RoleRevoked': ChainEventBase.extend({
     parsedArgs: z.object({
       role: z.string(),
-      account: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      sender: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      account: EVM_ADDRESS_STRICT,
+      sender: EVM_ADDRESS_STRICT,
     }),
   }),
   'TokenBondingCurve.LiquidityTransferred': ChainEventBase.extend({
     parsedArgs: z.object({
-      tokenAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      LPHook: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      tokenAddress: EVM_ADDRESS_STRICT,
+      LPHook: EVM_ADDRESS_STRICT,
       tokensTransferred: z.bigint(),
       liquidityTransferred: z.bigint(),
     }),
   }),
   'TokenBondingCurve.TokenRegistered': ChainEventBase.extend({
     parsedArgs: z.object({
-      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      token: EVM_ADDRESS_STRICT,
       curveId: z.bigint(),
       totalSupply: z.bigint(),
       launchpadLiquidity: z.bigint(),
@@ -415,8 +420,8 @@ export const commonProtocolEventSchema = {
   }),
   'TokenBondingCurve.Trade': ChainEventBase.extend({
     parsedArgs: z.object({
-      trader: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      tokenAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      trader: EVM_ADDRESS_STRICT,
+      tokenAddress: EVM_ADDRESS_STRICT,
       isBuy: z.boolean(),
       tokenAmount: z.bigint(),
       ethAmount: z.bigint(),
@@ -427,19 +432,19 @@ export const commonProtocolEventSchema = {
   'TokenCommunityManager.CommunityNamespaceCreated': ChainEventBase.extend({
     parsedArgs: z.object({
       name: z.string(),
-      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      namespaceAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-      governanceAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      token: EVM_ADDRESS_STRICT,
+      namespaceAddress: EVM_ADDRESS_STRICT,
+      governanceAddress: EVM_ADDRESS_STRICT,
     }),
   }),
   'TokenLaunchpad.LaunchpadCreated': ChainEventBase.extend({
     parsedArgs: z.object({
-      launchpad: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      launchpad: EVM_ADDRESS_STRICT,
     }),
   }),
   'TokenLaunchpad.NewTokenCreated': ChainEventBase.extend({
     parsedArgs: z.object({
-      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      token: EVM_ADDRESS_STRICT,
       totalSupply: z.bigint(),
       name: z.string(),
       symbol: z.string(),
@@ -448,11 +453,18 @@ export const commonProtocolEventSchema = {
   }),
   'TokenLaunchpad.TokenRegistered': ChainEventBase.extend({
     parsedArgs: z.object({
-      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      token: EVM_ADDRESS_STRICT,
       curveId: z.bigint(),
     }),
   }),
 } as const;
 
-export type CommonProtocolEventSchemaKey =
-  keyof typeof commonProtocolEventSchema;
+type CommonProtocolEventSchema = typeof commonProtocolEventSchema;
+type InferEventPayload<T extends keyof CommonProtocolEventSchema> = z.infer<
+  CommonProtocolEventSchema[T]
+>;
+export type CommonProtocolEventHandlerType = {
+  [K in keyof CommonProtocolEventSchema]?: (
+    payload: InferEventPayload<K>,
+  ) => void;
+};

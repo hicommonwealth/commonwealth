@@ -1,5 +1,5 @@
-import { Policy, command, logger } from '@hicommonwealth/core';
-import { events } from '@hicommonwealth/schemas';
+import { command, logger } from '@hicommonwealth/core';
+import { CommonProtocolEventHandlerType } from '@hicommonwealth/evm-protocols';
 import { QueryTypes } from 'sequelize';
 import { RefreshCommunityMemberships } from '../aggregates/community';
 import {
@@ -11,12 +11,6 @@ import { models } from '../database';
 import { systemActor } from '../middleware';
 
 const log = logger(import.meta);
-
-const inputs = {
-  LaunchpadTokenCreated: events.LaunchpadTokenCreated,
-  LaunchpadTokenTraded: events.LaunchpadTokenTraded,
-  CommunityNamespaceCreated: events.CommunityNamespaceCreated,
-};
 
 async function findTokenHolderGroups(
   community_id: string,
@@ -48,58 +42,75 @@ async function findTokenHolderGroups(
   });
 }
 
-export function LaunchpadPolicy(): Policy<typeof inputs> {
-  return {
-    inputs,
-    body: {
-      LaunchpadTokenCreated: async ({ payload }) => {
-        await command(CreateToken(), {
-          actor: systemActor({}),
-          payload: {
-            community_id: '', // community id is not known yet, but system actor has rights
-            eth_chain_id: payload.eth_chain_id,
-            transaction_hash: payload.transaction_hash,
-          },
-        });
+export const LaunchpadPolicy: CommonProtocolEventHandlerType = {
+  'Launchpad.NewTokenCreated': async (payload) => {
+    await command(CreateToken(), {
+      actor: systemActor({}),
+      payload: {
+        community_id: '', // community id is not known yet, but system actor has rights
+        eth_chain_id: payload.eth_chain_id,
+        transaction_hash: payload.transaction_hash,
       },
-      CommunityNamespaceCreated: async ({ payload }) => {
-        await command(LinkGovernanceAddress(), {
-          actor: systemActor({}),
-          payload: {
-            name: payload.name,
-            token: payload.token,
-            namespaceAddress: payload.namespaceAddress,
-            governanceAddress: payload.governanceAddress,
-          },
-        });
+    });
+  },
+  'TokenCommunityManager.CommunityNamespaceCreated': async (payload) => {
+    await command(LinkGovernanceAddress(), {
+      actor: systemActor({}),
+      payload: {
+        name: payload.parsedArgs.name,
+        token: payload.parsedArgs.token,
+        namespaceAddress: payload.parsedArgs.namespaceAddress,
+        governanceAddress: payload.parsedArgs.governanceAddress,
       },
-      LaunchpadTokenTraded: async ({ payload }) => {
-        const output = await command(ProjectLaunchpadTrade(), {
-          actor: systemActor({}),
-          payload,
-        });
+    });
+  },
+  // LaunchpadTokenTraded: z.object({
+  //   block_timestamp: z.coerce.bigint(),
+  //   transaction_hash: z.string(),
+  //   trader_address: EVM_ADDRESS_STRICT,
+  //   token_address: EVM_ADDRESS_STRICT,
+  //   is_buy: z.boolean(),
+  //   eth_chain_id: z.number(),
+  //   eth_amount: z.coerce.bigint(),
+  //   community_token_amount: z.coerce.bigint(),
+  //   floating_supply: z.coerce.bigint(),
+  // }),
 
-        // when token associated with a community, refresh token holder memberships
-        if (output?.community_id) {
-          const group_ids = await findTokenHolderGroups(
-            output.community_id,
-            payload.token_address,
-          );
-          if (group_ids.length)
-            await command(RefreshCommunityMemberships(), {
-              actor: systemActor({}),
-              payload: {
-                community_id: output.community_id,
-                group_id: group_ids[0].id,
-                refresh_all: true,
-              },
-            }).catch((err) => {
-              log.error(
-                `Failed to refresh token holder memberships for community ${output.community_id}: ${err}`,
-              );
-            });
-        }
+  'LPBondingCurve.Trade': async (payload) => {
+    const output = await command(ProjectLaunchpadTrade(), {
+      actor: systemActor({}),
+      payload: {
+        block_timestamp: BigInt(payload.block_timestamp),
+        transaction_hash: payload.transaction_hash,
+        trader_address: payload.parsedArgs.trader,
+        token_address: payload.parsedArgs.tokenAddress,
+        is_buy: payload.parsedArgs.isBuy,
+        eth_chain_id: payload.eth_chain_id,
+        eth_amount: payload.parsedArgs.ethAmount,
+        community_token_amount: payload.parsedArgs.tokenAmount,
+        floating_supply: payload.parsedArgs.floatingSupply,
       },
-    },
-  };
-}
+    });
+
+    // when token associated with a community, refresh token holder memberships
+    if (output?.community_id) {
+      const group_ids = await findTokenHolderGroups(
+        output.community_id,
+        payload.parsedArgs.tokenAddress,
+      );
+      if (group_ids.length)
+        await command(RefreshCommunityMemberships(), {
+          actor: systemActor({}),
+          payload: {
+            community_id: output.community_id,
+            group_id: group_ids[0].id,
+            refresh_all: true,
+          },
+        }).catch((err) => {
+          log.error(
+            `Failed to refresh token holder memberships for community ${output.community_id}: ${err}`,
+          );
+        });
+    }
+  },
+};

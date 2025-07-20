@@ -8,7 +8,7 @@ export function solidityToZodStr(type: string): string {
     return 'z.bigint()'; // maps all integer types
   }
   if (type === 'address') {
-    return 'z.string().regex(/^0x[0-9a-fA-F]{40}$/)';
+    return 'EVM_ADDRESS_STRICT';
   }
   if (type === 'string') {
     return 'z.string()';
@@ -42,14 +42,18 @@ function generateZodMap() {
     ``,
   );
   lines.push(`import { z } from 'zod';`, ``);
+  lines.push(
+    `import { EVM_ADDRESS_STRICT, EVM_EVENT_SIGNATURE_STRICT_REGEX } from '@hicommonwealth/schemas';`,
+    ``,
+  );
   lines.push(`export const commonProtocolVersion = '${version}';`, ``);
   lines.push(
     `export const ChainEventBase = z.object({
-    ethChainId: z.number(),
+    eth_chain_id: z.number(),
     block_number: z.string(),
     block_timestamp: z.number(),
-    contract_address: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    transaction_hash: z.string().regex(/^0x[0-9a-fA-F]{64}$/)
+    contract_address: EVM_ADDRESS_STRICT,
+    transaction_hash: EVM_EVENT_SIGNATURE_STRICT_REGEX
 });`,
     ``,
   );
@@ -81,7 +85,12 @@ function generateZodMap() {
 
   lines.push(`} as const;`, '');
   lines.push(
-    `export type CommonProtocolEventSchemaKey = keyof typeof commonProtocolEventSchema;`,
+    `
+type CommonProtocolEventSchema = typeof commonProtocolEventSchema;
+type InferEventPayload<T extends keyof CommonProtocolEventSchema> =  z.infer<CommonProtocolEventSchema[T]>;
+export type CommonProtocolEventHandlerType = {
+  [K in keyof CommonProtocolEventSchema]?: (payload: InferEventPayload<K>) => void;
+};`,
   );
   const output = lines.join('\n');
   const outPath = path.resolve(
