@@ -44,13 +44,13 @@ function generateZodMap() {
   lines.push(`import { z } from 'zod';`, ``);
   lines.push(`export const commonProtocolVersion = '${version}';`, ``);
   lines.push(
-    `const ChainEventBase = z.object({
+    `export const ChainEventBase = z.object({
     ethChainId: z.number(),
     block_number: z.string(),
-    block_timestamp: z.string(),
+    block_timestamp: z.number(),
     contract_address: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
     transaction_hash: z.string().regex(/^0x[0-9a-fA-F]{64}$/)
-  });`,
+});`,
     ``,
   );
 
@@ -72,7 +72,7 @@ function generateZodMap() {
         .join(',\n');
 
       lines.push(`  ${JSON.stringify(key)}: ChainEventBase.extend({`);
-      lines.push(`    args: z.object({`);
+      lines.push(`    parsedArgs: z.object({`);
       lines.push(props);
       lines.push(`    })`);
       lines.push(`  }),`);

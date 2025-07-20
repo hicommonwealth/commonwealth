@@ -1,4 +1,5 @@
 import { logger as _logger, stats } from '@hicommonwealth/core';
+import { ChainEventBase } from '@hicommonwealth/evm-protocols';
 import {
   createPublicClient,
   decodeEventLog,
@@ -6,6 +7,7 @@ import {
   http,
   Log,
 } from 'viem';
+import { z } from 'zod';
 import { config } from '../../config';
 import {
   EvmChainSource,
@@ -35,9 +37,8 @@ export async function getLogs({
   startingBlockNum: number;
   endingBlockNum: number;
 }): Promise<{
-  logs: Log[];
+  logs: (Log & { blockTimestamp: string })[];
   lastBlockNum: number;
-  blockDetails;
 }> {
   let startBlock = startingBlockNum;
   let endBlock = endingBlockNum;
@@ -50,12 +51,12 @@ export async function getLogs({
         endBlock,
       },
     );
-    return { logs: [], lastBlockNum: endBlock, blockDetails: {} };
+    return { logs: [], lastBlockNum: endBlock };
   }
 
   if (contractAddresses.length === 0) {
     logger.error(`No contracts given`);
-    return { logs: [], lastBlockNum: endBlock, blockDetails: {} };
+    return { logs: [], lastBlockNum: endBlock };
   }
 
   // Limit the number of blocks to fetch to avoid rate limiting on some public EVM nodes like Celo
@@ -92,32 +93,9 @@ export async function getLogs({
     toBlock: BigInt(endBlock),
   })) as Log[];
 
-  const blockNumbers = [...new Set(logs.map((l) => l.blockNumber))];
-  const blockDetails = await Promise.all(
-    blockNumbers.map(async (blockNumber) => {
-      const block = await client.getBlock({
-        blockNumber: blockNumber!,
-      });
-      return {
-        number: block.number,
-        hash: block.hash,
-        logsBloom: block.logsBloom,
-        parentHash: block.parentHash,
-        miner: block.miner,
-        nonce: block.nonce ? block.nonce.toString() : undefined,
-        timestamp: block.timestamp,
-        gasLimit: block.gasLimit,
-      };
-    }),
-  );
-
   return {
     logs,
     lastBlockNum: endBlock,
-    blockDetails: blockDetails.reduce((map, details) => {
-      map[String(details.number)] = details;
-      return map;
-    }, {}),
   };
 }
 
@@ -131,8 +109,11 @@ export type EvmEventPayload = {
   meta: EvmEventMeta;
 };
 
-export async function parseLogs(sources: EvmContractSources, logs: Log[]) {
-  const events = [];
+export async function parseLogs(
+  sources: EvmContractSources,
+  logs: (Log & { blockTimestamp: string })[],
+) {
+  const events: z.infer<typeof ChainEventBase> = [];
 
   for (const log of logs) {
     const address = getAddress(log.address);
@@ -159,11 +140,11 @@ export async function parseLogs(sources: EvmContractSources, logs: Log[]) {
     });
 
     events.push({
-      args: decoded.args,
+      parsedArgs: decoded.args,
       eth_chain_id: evmEventSources.eth_chain_id,
       event_name: `${evmEventSources.contract_name}.${decoded.eventName}`,
       block_number: log.blockNumber,
-      block_timestamp: log.blockTimestamp,
+      block_timestamp: parseInt(log.blockTimestamp, 16),
       contract_address: log.address,
       transaction_hash: log.transactionHash,
     });
@@ -180,7 +161,7 @@ export async function getEvents(
   startingBlockNum: number,
   endingBlockNum: number,
 ): Promise<{ events; lastBlockNum: number }> {
-  const { logs, lastBlockNum, blockDetails } = await getLogs({
+  const { logs, lastBlockNum } = await getLogs({
     rpc: evmSource.rpc,
     maxBlockRange: evmSource.maxBlockRange,
     contractAddresses: Object.keys(evmSource.contracts),
