@@ -4,321 +4,453 @@ import { z } from 'zod';
 
 export const commonProtocolVersion = '1.4.11';
 
+const ChainEventBase = z.object({
+  ethChainId: z.number(),
+  block_number: z.string(),
+  block_timestamp: z.string(),
+  contract_address: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  transaction_hash: z.string().regex(/^0x[0-9a-fA-F]{64}$/),
+});
+
 export const commonProtocolEventSchema = {
-  'CommunityNominations.FactoryUpdated': z.object({
-    oldFactory: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    newFactory: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'CommunityNominations.FactoryUpdated': ChainEventBase.extend({
+    args: z.object({
+      oldFactory: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      newFactory: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'CommunityNominations.FeeAmountUpdated': z.object({
-    oldAmount: z.bigint(),
-    newAmount: z.bigint(),
+  'CommunityNominations.FeeAmountUpdated': ChainEventBase.extend({
+    args: z.object({
+      oldAmount: z.bigint(),
+      newAmount: z.bigint(),
+    }),
   }),
-  'CommunityNominations.FeeDestinationUpdated': z.object({
-    oldDestination: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    newDestination: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'CommunityNominations.FeeDestinationUpdated': ChainEventBase.extend({
+    args: z.object({
+      oldDestination: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      newDestination: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'CommunityNominations.FeeTransferred': z.object({
-    recipient: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    amount: z.bigint(),
+  'CommunityNominations.FeeTransferred': ChainEventBase.extend({
+    args: z.object({
+      recipient: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      amount: z.bigint(),
+    }),
   }),
-  'CommunityNominations.JudgeNominated': z.object({
-    namespace: z.string(),
-    judge: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    judgeId: z.bigint(),
-    nominator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    currentNominations: z.bigint(),
+  'CommunityNominations.JudgeNominated': ChainEventBase.extend({
+    args: z.object({
+      namespace: z.string(),
+      judge: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      judgeId: z.bigint(),
+      nominator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      currentNominations: z.bigint(),
+    }),
   }),
-  'CommunityNominations.JudgeUnnominated': z.object({
-    namespace: z.string(),
-    judge: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    judgeId: z.bigint(),
-    nominator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    currentNominations: z.bigint(),
+  'CommunityNominations.JudgeUnnominated': ChainEventBase.extend({
+    args: z.object({
+      namespace: z.string(),
+      judge: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      judgeId: z.bigint(),
+      nominator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      currentNominations: z.bigint(),
+    }),
   }),
-  'CommunityNominations.NominationsConfigured': z.object({
-    namespace: z.string(),
-    judgeId: z.bigint(),
-    referralModeEnabled: z.boolean(),
-    maxNominations: z.bigint(),
+  'CommunityNominations.NominationsConfigured': ChainEventBase.extend({
+    args: z.object({
+      namespace: z.string(),
+      judgeId: z.bigint(),
+      referralModeEnabled: z.boolean(),
+      maxNominations: z.bigint(),
+    }),
   }),
-  'CommunityNominations.NominatorNominated': z.object({
-    namespace: z.string(),
-    nominator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'CommunityNominations.NominatorNominated': ChainEventBase.extend({
+    args: z.object({
+      namespace: z.string(),
+      nominator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'CommunityNominations.NominatorSettled': z.object({
-    namespace: z.string(),
+  'CommunityNominations.NominatorSettled': ChainEventBase.extend({
+    args: z.object({
+      namespace: z.string(),
+    }),
   }),
-  'CommunityNominations.NominatorUnnominated': z.object({
-    namespace: z.string(),
-    nominator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'CommunityNominations.NominatorUnnominated': ChainEventBase.extend({
+    args: z.object({
+      namespace: z.string(),
+      nominator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'CommunityNominations.OwnershipTransferred': z.object({
-    previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'CommunityNominations.OwnershipTransferred': ChainEventBase.extend({
+    args: z.object({
+      previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'CommunityStake.OwnershipTransferred': z.object({
-    previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'CommunityStake.OwnershipTransferred': ChainEventBase.extend({
+    args: z.object({
+      previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'CommunityStake.Trade': z.object({
-    trader: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    namespace: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    isBuy: z.boolean(),
-    communityTokenAmount: z.bigint(),
-    ethAmount: z.bigint(),
-    protocolEthAmount: z.bigint(),
-    nameSpaceEthAmount: z.bigint(),
-    supply: z.bigint(),
-    exchangeToken: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'CommunityStake.Trade': ChainEventBase.extend({
+    args: z.object({
+      trader: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      namespace: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      isBuy: z.boolean(),
+      communityTokenAmount: z.bigint(),
+      ethAmount: z.bigint(),
+      protocolEthAmount: z.bigint(),
+      nameSpaceEthAmount: z.bigint(),
+      supply: z.bigint(),
+      exchangeToken: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'ContestGovernor.ContentAdded': z.object({
-    contentId: z.bigint(),
-    creator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    url: z.string(),
+  'ContestGovernor.ContentAdded': ChainEventBase.extend({
+    args: z.object({
+      contentId: z.bigint(),
+      creator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      url: z.string(),
+    }),
   }),
-  'ContestGovernor.NewRecurringContestStarted': z.object({
-    contestId: z.bigint(),
-    startTime: z.bigint(),
-    endTime: z.bigint(),
+  'ContestGovernor.NewRecurringContestStarted': ChainEventBase.extend({
+    args: z.object({
+      contestId: z.bigint(),
+      startTime: z.bigint(),
+      endTime: z.bigint(),
+    }),
   }),
-  'ContestGovernor.PrizeShareUpdated': z.object({
-    newPrizeShare: z.bigint(),
+  'ContestGovernor.PrizeShareUpdated': ChainEventBase.extend({
+    args: z.object({
+      newPrizeShare: z.bigint(),
+    }),
   }),
-  'ContestGovernor.TransferFailed': z.object({
-    token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    to: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    amount: z.bigint(),
+  'ContestGovernor.TransferFailed': ChainEventBase.extend({
+    args: z.object({
+      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      to: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      amount: z.bigint(),
+    }),
   }),
-  'ContestGovernor.VoterVoted': z.object({
-    voter: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    contentId: z.bigint(),
-    contestId: z.bigint(),
-    votingPower: z.bigint(),
+  'ContestGovernor.VoterVoted': ChainEventBase.extend({
+    args: z.object({
+      voter: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      contentId: z.bigint(),
+      contestId: z.bigint(),
+      votingPower: z.bigint(),
+    }),
   }),
-  'ContestGovernorSingle.ContentAdded': z.object({
-    contentId: z.bigint(),
-    creator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    url: z.string(),
+  'ContestGovernorSingle.ContentAdded': ChainEventBase.extend({
+    args: z.object({
+      contentId: z.bigint(),
+      creator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      url: z.string(),
+    }),
   }),
-  'ContestGovernorSingle.NewSingleContestStarted': z.object({
-    startTime: z.bigint(),
-    endTime: z.bigint(),
+  'ContestGovernorSingle.NewSingleContestStarted': ChainEventBase.extend({
+    args: z.object({
+      startTime: z.bigint(),
+      endTime: z.bigint(),
+    }),
   }),
-  'ContestGovernorSingle.OwnershipTransferred': z.object({
-    previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'ContestGovernorSingle.OwnershipTransferred': ChainEventBase.extend({
+    args: z.object({
+      previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'ContestGovernorSingle.TokenSwept': z.object({
-    token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    amount: z.bigint(),
+  'ContestGovernorSingle.TokenSwept': ChainEventBase.extend({
+    args: z.object({
+      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      amount: z.bigint(),
+    }),
   }),
-  'ContestGovernorSingle.TransferFailed': z.object({
-    token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    to: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    amount: z.bigint(),
+  'ContestGovernorSingle.TransferFailed': ChainEventBase.extend({
+    args: z.object({
+      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      to: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      amount: z.bigint(),
+    }),
   }),
-  'ContestGovernorSingle.VoterVoted': z.object({
-    voter: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    contentId: z.bigint(),
-    votingPower: z.bigint(),
+  'ContestGovernorSingle.VoterVoted': ChainEventBase.extend({
+    args: z.object({
+      voter: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      contentId: z.bigint(),
+      votingPower: z.bigint(),
+    }),
   }),
-  'FeeManager.BeneficiaryAdded': z.object({
-    beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    weight: z.bigint(),
+  'FeeManager.BeneficiaryAdded': ChainEventBase.extend({
+    args: z.object({
+      beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      weight: z.bigint(),
+    }),
   }),
-  'FeeManager.BeneficiaryRemoved': z.object({
-    beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'FeeManager.BeneficiaryRemoved': ChainEventBase.extend({
+    args: z.object({
+      beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'FeeManager.BeneficiaryUpdated': z.object({
-    beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    weight: z.bigint(),
+  'FeeManager.BeneficiaryUpdated': ChainEventBase.extend({
+    args: z.object({
+      beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      weight: z.bigint(),
+    }),
   }),
-  'FeeManager.ERC20_FeeDistributed': z.object({
-    beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    amount: z.bigint(),
-    token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'FeeManager.ERC20_FeeDistributed': ChainEventBase.extend({
+    args: z.object({
+      beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      amount: z.bigint(),
+      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'FeeManager.ETH_FeeDistributed': z.object({
-    beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    amount: z.bigint(),
+  'FeeManager.ETH_FeeDistributed': ChainEventBase.extend({
+    args: z.object({
+      beneficiary: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      amount: z.bigint(),
+    }),
   }),
-  'INamespace.ApprovalForAll': z.object({
-    account: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    operator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    approved: z.boolean(),
+  'INamespace.ApprovalForAll': ChainEventBase.extend({
+    args: z.object({
+      account: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      operator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      approved: z.boolean(),
+    }),
   }),
-  'INamespace.TransferBatch': z.object({
-    operator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    from: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    to: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    ids: z.bigint(),
-    values: z.bigint(),
+  'INamespace.TransferBatch': ChainEventBase.extend({
+    args: z.object({
+      operator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      from: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      to: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      ids: z.bigint(),
+      values: z.bigint(),
+    }),
   }),
-  'INamespace.TransferSingle': z.object({
-    operator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    from: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    to: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    id: z.bigint(),
-    value: z.bigint(),
+  'INamespace.TransferSingle': ChainEventBase.extend({
+    args: z.object({
+      operator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      from: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      to: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      id: z.bigint(),
+      value: z.bigint(),
+    }),
   }),
-  'INamespace.URI': z.object({
-    value: z.string(),
-    id: z.bigint(),
+  'INamespace.URI': ChainEventBase.extend({
+    args: z.object({
+      value: z.string(),
+      id: z.bigint(),
+    }),
   }),
-  'LPBondingCurve.LiquidityTransferred': z.object({
-    tokenAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    LPHook: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    tokensTransferred: z.bigint(),
-    liquidityTransferred: z.bigint(),
+  'LPBondingCurve.LiquidityTransferred': ChainEventBase.extend({
+    args: z.object({
+      tokenAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      LPHook: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      tokensTransferred: z.bigint(),
+      liquidityTransferred: z.bigint(),
+    }),
   }),
-  'LPBondingCurve.TokenRegistered': z.object({
-    token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    curveId: z.bigint(),
-    totalSupply: z.bigint(),
-    launchpadLiquidity: z.bigint(),
-    reserveRatio: z.bigint(),
-    initialPurchaseEthAmount: z.bigint(),
+  'LPBondingCurve.TokenRegistered': ChainEventBase.extend({
+    args: z.object({
+      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      curveId: z.bigint(),
+      totalSupply: z.bigint(),
+      launchpadLiquidity: z.bigint(),
+      reserveRatio: z.bigint(),
+      initialPurchaseEthAmount: z.bigint(),
+    }),
   }),
-  'LPBondingCurve.Trade': z.object({
-    trader: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    tokenAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    isBuy: z.boolean(),
-    tokenAmount: z.bigint(),
-    ethAmount: z.bigint(),
-    protocolEthAmount: z.bigint(),
-    floatingSupply: z.bigint(),
+  'LPBondingCurve.Trade': ChainEventBase.extend({
+    args: z.object({
+      trader: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      tokenAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      isBuy: z.boolean(),
+      tokenAmount: z.bigint(),
+      ethAmount: z.bigint(),
+      protocolEthAmount: z.bigint(),
+      floatingSupply: z.bigint(),
+    }),
   }),
-  'Launchpad.LaunchpadCreated': z.object({
-    launchpad: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'Launchpad.LaunchpadCreated': ChainEventBase.extend({
+    args: z.object({
+      launchpad: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'Launchpad.NewTokenCreated': z.object({
-    token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    totalSupply: z.bigint(),
-    name: z.string(),
-    symbol: z.string(),
+  'Launchpad.NewTokenCreated': ChainEventBase.extend({
+    args: z.object({
+      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      totalSupply: z.bigint(),
+      name: z.string(),
+      symbol: z.string(),
+    }),
   }),
-  'Launchpad.TokenRegistered': z.object({
-    token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    curveId: z.bigint(),
+  'Launchpad.TokenRegistered': ChainEventBase.extend({
+    args: z.object({
+      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      curveId: z.bigint(),
+    }),
   }),
-  'NamespaceFactory.ConfiguredCommunityStakeId': z.object({
-    name: z.string(),
-    tokenName: z.string(),
-    id: z.bigint(),
+  'NamespaceFactory.ConfiguredCommunityStakeId': ChainEventBase.extend({
+    args: z.object({
+      name: z.string(),
+      tokenName: z.string(),
+      id: z.bigint(),
+    }),
   }),
-  'NamespaceFactory.DeployedNamespace': z.object({
-    name: z.string(),
-    _feeManager: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    _signature: z.string(),
-    _namespaceDeployer: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    nameSpaceAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'NamespaceFactory.DeployedNamespace': ChainEventBase.extend({
+    args: z.object({
+      name: z.string(),
+      _feeManager: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      _signature: z.string(),
+      _namespaceDeployer: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      nameSpaceAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'NamespaceFactory.DeployedNamespaceWithReferral': z.object({
-    name: z.string(),
-    feeManager: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    referrer: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    referralFeeManager: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    signature: z.string(),
-    namespaceDeployer: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    nameSpaceAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'NamespaceFactory.DeployedNamespaceWithReferral': ChainEventBase.extend({
+    args: z.object({
+      name: z.string(),
+      feeManager: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      referrer: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      referralFeeManager: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      signature: z.string(),
+      namespaceDeployer: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      nameSpaceAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'NamespaceFactory.Initialized': z.object({
-    version: z.bigint(),
+  'NamespaceFactory.Initialized': ChainEventBase.extend({
+    args: z.object({
+      version: z.bigint(),
+    }),
   }),
-  'NamespaceFactory.NewContest': z.object({
-    contest: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    namespace: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    interval: z.bigint(),
-    oneOff: z.boolean(),
+  'NamespaceFactory.NewContest': ChainEventBase.extend({
+    args: z.object({
+      contest: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      namespace: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      interval: z.bigint(),
+      oneOff: z.boolean(),
+    }),
   }),
-  'NamespaceFactory.OwnershipTransferred': z.object({
-    previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'NamespaceFactory.OwnershipTransferred': ChainEventBase.extend({
+    args: z.object({
+      previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'ReferralFeeManager.FeeDistributorAdded': z.object({
-    newDistributor: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'ReferralFeeManager.FeeDistributorAdded': ChainEventBase.extend({
+    args: z.object({
+      newDistributor: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'ReferralFeeManager.FeeDistributorRemoved': z.object({
-    removedDistributor: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'ReferralFeeManager.FeeDistributorRemoved': ChainEventBase.extend({
+    args: z.object({
+      removedDistributor: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'ReferralFeeManager.FeeSplitUpdated': z.object({
-    newSplitPercentage: z.bigint(),
+  'ReferralFeeManager.FeeSplitUpdated': ChainEventBase.extend({
+    args: z.object({
+      newSplitPercentage: z.bigint(),
+    }),
   }),
-  'ReferralFeeManager.FeesDistributed': z.object({
-    namespace: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    amount: z.bigint(),
-    recipient: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    recipientAmount: z.bigint(),
+  'ReferralFeeManager.FeesDistributed': ChainEventBase.extend({
+    args: z.object({
+      namespace: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      amount: z.bigint(),
+      recipient: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      recipientAmount: z.bigint(),
+    }),
   }),
-  'ReferralFeeManager.OwnershipTransferred': z.object({
-    previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'ReferralFeeManager.OwnershipTransferred': ChainEventBase.extend({
+    args: z.object({
+      previousOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      newOwner: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'ReferralFeeManager.ProtocolFeeDestinationUpdated': z.object({
-    newDestination: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'ReferralFeeManager.ProtocolFeeDestinationUpdated': ChainEventBase.extend({
+    args: z.object({
+      newDestination: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'ReferralFeeManager.ReferralSet': z.object({
-    namespace: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    referral: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'ReferralFeeManager.ReferralSet': ChainEventBase.extend({
+    args: z.object({
+      namespace: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      referral: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'ReferralFeeManager.RoleAdminChanged': z.object({
-    role: z.string(),
-    previousAdminRole: z.string(),
-    newAdminRole: z.string(),
+  'ReferralFeeManager.RoleAdminChanged': ChainEventBase.extend({
+    args: z.object({
+      role: z.string(),
+      previousAdminRole: z.string(),
+      newAdminRole: z.string(),
+    }),
   }),
-  'ReferralFeeManager.RoleGranted': z.object({
-    role: z.string(),
-    account: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    sender: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'ReferralFeeManager.RoleGranted': ChainEventBase.extend({
+    args: z.object({
+      role: z.string(),
+      account: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      sender: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'ReferralFeeManager.RoleRevoked': z.object({
-    role: z.string(),
-    account: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    sender: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'ReferralFeeManager.RoleRevoked': ChainEventBase.extend({
+    args: z.object({
+      role: z.string(),
+      account: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      sender: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'TokenBondingCurve.LiquidityTransferred': z.object({
-    tokenAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    LPHook: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    tokensTransferred: z.bigint(),
-    liquidityTransferred: z.bigint(),
+  'TokenBondingCurve.LiquidityTransferred': ChainEventBase.extend({
+    args: z.object({
+      tokenAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      LPHook: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      tokensTransferred: z.bigint(),
+      liquidityTransferred: z.bigint(),
+    }),
   }),
-  'TokenBondingCurve.TokenRegistered': z.object({
-    token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    curveId: z.bigint(),
-    totalSupply: z.bigint(),
-    launchpadLiquidity: z.bigint(),
-    reserveRatio: z.bigint(),
-    initialPurchaseEthAmount: z.bigint(),
+  'TokenBondingCurve.TokenRegistered': ChainEventBase.extend({
+    args: z.object({
+      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      curveId: z.bigint(),
+      totalSupply: z.bigint(),
+      launchpadLiquidity: z.bigint(),
+      reserveRatio: z.bigint(),
+      initialPurchaseEthAmount: z.bigint(),
+    }),
   }),
-  'TokenBondingCurve.Trade': z.object({
-    trader: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    tokenAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    isBuy: z.boolean(),
-    tokenAmount: z.bigint(),
-    ethAmount: z.bigint(),
-    protocolEthAmount: z.bigint(),
-    floatingSupply: z.bigint(),
+  'TokenBondingCurve.Trade': ChainEventBase.extend({
+    args: z.object({
+      trader: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      tokenAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      isBuy: z.boolean(),
+      tokenAmount: z.bigint(),
+      ethAmount: z.bigint(),
+      protocolEthAmount: z.bigint(),
+      floatingSupply: z.bigint(),
+    }),
   }),
-  'TokenCommunityManager.CommunityNamespaceCreated': z.object({
-    name: z.string(),
-    token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    namespaceAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    governanceAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'TokenCommunityManager.CommunityNamespaceCreated': ChainEventBase.extend({
+    args: z.object({
+      name: z.string(),
+      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      namespaceAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      governanceAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'TokenLaunchpad.LaunchpadCreated': z.object({
-    launchpad: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  'TokenLaunchpad.LaunchpadCreated': ChainEventBase.extend({
+    args: z.object({
+      launchpad: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+    }),
   }),
-  'TokenLaunchpad.NewTokenCreated': z.object({
-    token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    totalSupply: z.bigint(),
-    name: z.string(),
-    symbol: z.string(),
-    threadId: z.bigint(),
+  'TokenLaunchpad.NewTokenCreated': ChainEventBase.extend({
+    args: z.object({
+      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      totalSupply: z.bigint(),
+      name: z.string(),
+      symbol: z.string(),
+      threadId: z.bigint(),
+    }),
   }),
-  'TokenLaunchpad.TokenRegistered': z.object({
-    token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
-    curveId: z.bigint(),
+  'TokenLaunchpad.TokenRegistered': ChainEventBase.extend({
+    args: z.object({
+      token: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+      curveId: z.bigint(),
+    }),
   }),
 } as const;
 

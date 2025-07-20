@@ -26,6 +26,17 @@ export const EventMetadata = z.object({
   // causation: z.object({}).describe("Event causation")
 });
 
+function extendWithChainEventBase(z: ZodObject) {
+  return z.object({
+    args: z,
+    ethChainId: z.number(),
+    block_number: z.string(),
+    block_timestamp: z.string(),
+    contract_address: z.string(),
+    transaction_hash: z.string(),
+  });
+}
+
 const ChainEventBase = z.object({
   eventSource: z.object({
     ethChainId: z.number(),

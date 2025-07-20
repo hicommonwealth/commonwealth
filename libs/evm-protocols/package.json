@@ -15,6 +15,8 @@
   },
   "scripts": {
     "build": "tsc -b ./tsconfig.build.json",
+    "generate-event-schema": "tsx ./src/generateZodSchema.ts",
+    "verify-event-schema": "tsx ./src/verifySchemaUpToDate.ts",
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
     "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run ./test/**/*.spec.ts"
@@ -31,5 +33,8 @@
     "web3-utils": "^4.2.2",
     "web3-validator": "2.0.5",
     "zod": "^3.25.46"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.2"
   }
 }

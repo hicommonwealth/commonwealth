@@ -494,6 +494,10 @@ importers:
       zod:
         specifier: ^3.25.46
         version: 3.25.64
+    devDependencies:
+      tsx:
+        specifier: ^4.7.2
+        version: 4.9.3
 
   libs/evm-testing:
     dependencies:
