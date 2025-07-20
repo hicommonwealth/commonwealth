@@ -1,3 +1,4 @@
+import { commonProtocolEventSchema } from '@hicommonwealth/evm-protocols';
 import { events, Events } from '@hicommonwealth/schemas';
 import { z, ZodError, ZodType, ZodUndefined } from 'zod';
 import {
@@ -21,10 +22,17 @@ export const handleEvent = async <
   Input extends EventSchemas,
   Output extends ZodType | ZodUndefined = ZodUndefined,
 >(
-  { inputs, body }: EventsHandlerMetadata<Input, Output>,
+  handler: EventsHandlerMetadata<Input, Output>,
   { id, name, payload }: EventContext<Name>,
   validate = true,
 ): Promise<Partial<z.infer<Output>>> => {
+  // Override for common protocol because the inputs are a lookup to the
+  // commonProtocolEventSchema
+  let { inputs, body } = handler;
+  if (!inputs && !body) {
+    inputs = commonProtocolEventSchema;
+    body = handler;
+  }
   if (!body[name])
     throw new InvalidInput(
       `Unhandled event: ${name} not found in ${Object.keys(body)}`,

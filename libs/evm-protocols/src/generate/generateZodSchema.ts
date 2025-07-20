@@ -5,7 +5,7 @@ import pkg from '../../../../package.json';
 
 export function solidityToZodStr(type: string): string {
   if (type.startsWith('uint') || type.startsWith('int')) {
-    return 'z.bigint()'; // maps all integer types
+    return 'z.coerce.bigint()'; // maps all integer types
   }
   if (type === 'address') {
     return 'EVM_ADDRESS_STRICT';
@@ -43,8 +43,15 @@ function generateZodMap() {
   );
   lines.push(`import { z } from 'zod';`, ``);
   lines.push(
-    `import { EVM_ADDRESS_STRICT, EVM_EVENT_SIGNATURE_STRICT_REGEX } from '@hicommonwealth/schemas';`,
-    ``,
+    'const EVM_ADDRESS_STRICT_REGEX = /^0x[0-9a-fA-F]{40}$/;',
+    'const EVM_EVENT_SIGNATURE_STRICT_REGEX = /^0x[0-9a-fA-F]{64}$/;',
+    'export const EVM_ADDRESS_STRICT = z.custom<`0x${string}`>((val) =>',
+    '  EVM_ADDRESS_STRICT_REGEX.test(val as string),',
+    ');',
+    'export const EVM_EVENT_SIGNATURE_STRICT = z.custom<`0x${string}`>((val) =>',
+    '  EVM_EVENT_SIGNATURE_STRICT_REGEX.test(val as string),',
+    ');',
+    '',
   );
   lines.push(`export const commonProtocolVersion = '${version}';`, ``);
   lines.push(
@@ -53,7 +60,7 @@ function generateZodMap() {
     block_number: z.string(),
     block_timestamp: z.number(),
     contract_address: EVM_ADDRESS_STRICT,
-    transaction_hash: EVM_EVENT_SIGNATURE_STRICT_REGEX
+    transaction_hash: EVM_EVENT_SIGNATURE_STRICT
 });`,
     ``,
   );
@@ -87,9 +94,13 @@ function generateZodMap() {
   lines.push(
     `
 type CommonProtocolEventSchema = typeof commonProtocolEventSchema;
-type InferEventPayload<T extends keyof CommonProtocolEventSchema> =  z.infer<CommonProtocolEventSchema[T]>;
+type InferEventPayload<T extends keyof CommonProtocolEventSchema> = z.infer<CommonProtocolEventSchema[T]>;
 export type CommonProtocolEventHandlerType = {
-  [K in keyof CommonProtocolEventSchema]?: (payload: InferEventPayload<K>) => void;
+  [K in keyof CommonProtocolEventSchema]?: (args: {
+    id: string;
+    name: K;
+    payload: InferEventPayload<K>;
+  }) => void | Promise<void>;
 };`,
   );
   const output = lines.join('\n');

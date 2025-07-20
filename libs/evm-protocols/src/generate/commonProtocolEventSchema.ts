@@ -2,10 +2,14 @@
 
 import { z } from 'zod';
 
-import {
-  EVM_ADDRESS_STRICT,
-  EVM_EVENT_SIGNATURE_STRICT_REGEX,
-} from '@hicommonwealth/schemas';
+const EVM_ADDRESS_STRICT_REGEX = /^0x[0-9a-fA-F]{40}$/;
+const EVM_EVENT_SIGNATURE_STRICT_REGEX = /^0x[0-9a-fA-F]{64}$/;
+export const EVM_ADDRESS_STRICT = z.custom<`0x${string}`>((val) =>
+  EVM_ADDRESS_STRICT_REGEX.test(val as string),
+);
+export const EVM_EVENT_SIGNATURE_STRICT = z.custom<`0x${string}`>((val) =>
+  EVM_EVENT_SIGNATURE_STRICT_REGEX.test(val as string),
+);
 
 export const commonProtocolVersion = '1.4.11';
 
@@ -14,7 +18,7 @@ export const ChainEventBase = z.object({
   block_number: z.string(),
   block_timestamp: z.number(),
   contract_address: EVM_ADDRESS_STRICT,
-  transaction_hash: EVM_EVENT_SIGNATURE_STRICT_REGEX,
+  transaction_hash: EVM_EVENT_SIGNATURE_STRICT,
 });
 
 export const commonProtocolEventSchema = {
@@ -26,8 +30,8 @@ export const commonProtocolEventSchema = {
   }),
   'CommunityNominations.FeeAmountUpdated': ChainEventBase.extend({
     parsedArgs: z.object({
-      oldAmount: z.bigint(),
-      newAmount: z.bigint(),
+      oldAmount: z.coerce.bigint(),
+      newAmount: z.coerce.bigint(),
     }),
   }),
   'CommunityNominations.FeeDestinationUpdated': ChainEventBase.extend({
@@ -39,33 +43,33 @@ export const commonProtocolEventSchema = {
   'CommunityNominations.FeeTransferred': ChainEventBase.extend({
     parsedArgs: z.object({
       recipient: EVM_ADDRESS_STRICT,
-      amount: z.bigint(),
+      amount: z.coerce.bigint(),
     }),
   }),
   'CommunityNominations.JudgeNominated': ChainEventBase.extend({
     parsedArgs: z.object({
       namespace: z.string(),
       judge: EVM_ADDRESS_STRICT,
-      judgeId: z.bigint(),
+      judgeId: z.coerce.bigint(),
       nominator: EVM_ADDRESS_STRICT,
-      currentNominations: z.bigint(),
+      currentNominations: z.coerce.bigint(),
     }),
   }),
   'CommunityNominations.JudgeUnnominated': ChainEventBase.extend({
     parsedArgs: z.object({
       namespace: z.string(),
       judge: EVM_ADDRESS_STRICT,
-      judgeId: z.bigint(),
+      judgeId: z.coerce.bigint(),
       nominator: EVM_ADDRESS_STRICT,
-      currentNominations: z.bigint(),
+      currentNominations: z.coerce.bigint(),
     }),
   }),
   'CommunityNominations.NominationsConfigured': ChainEventBase.extend({
     parsedArgs: z.object({
       namespace: z.string(),
-      judgeId: z.bigint(),
+      judgeId: z.coerce.bigint(),
       referralModeEnabled: z.boolean(),
-      maxNominations: z.bigint(),
+      maxNominations: z.coerce.bigint(),
     }),
   }),
   'CommunityNominations.NominatorNominated': ChainEventBase.extend({
@@ -102,59 +106,59 @@ export const commonProtocolEventSchema = {
       trader: EVM_ADDRESS_STRICT,
       namespace: EVM_ADDRESS_STRICT,
       isBuy: z.boolean(),
-      communityTokenAmount: z.bigint(),
-      ethAmount: z.bigint(),
-      protocolEthAmount: z.bigint(),
-      nameSpaceEthAmount: z.bigint(),
-      supply: z.bigint(),
+      communityTokenAmount: z.coerce.bigint(),
+      ethAmount: z.coerce.bigint(),
+      protocolEthAmount: z.coerce.bigint(),
+      nameSpaceEthAmount: z.coerce.bigint(),
+      supply: z.coerce.bigint(),
       exchangeToken: EVM_ADDRESS_STRICT,
     }),
   }),
   'ContestGovernor.ContentAdded': ChainEventBase.extend({
     parsedArgs: z.object({
-      contentId: z.bigint(),
+      contentId: z.coerce.bigint(),
       creator: EVM_ADDRESS_STRICT,
       url: z.string(),
     }),
   }),
   'ContestGovernor.NewRecurringContestStarted': ChainEventBase.extend({
     parsedArgs: z.object({
-      contestId: z.bigint(),
-      startTime: z.bigint(),
-      endTime: z.bigint(),
+      contestId: z.coerce.bigint(),
+      startTime: z.coerce.bigint(),
+      endTime: z.coerce.bigint(),
     }),
   }),
   'ContestGovernor.PrizeShareUpdated': ChainEventBase.extend({
     parsedArgs: z.object({
-      newPrizeShare: z.bigint(),
+      newPrizeShare: z.coerce.bigint(),
     }),
   }),
   'ContestGovernor.TransferFailed': ChainEventBase.extend({
     parsedArgs: z.object({
       token: EVM_ADDRESS_STRICT,
       to: EVM_ADDRESS_STRICT,
-      amount: z.bigint(),
+      amount: z.coerce.bigint(),
     }),
   }),
   'ContestGovernor.VoterVoted': ChainEventBase.extend({
     parsedArgs: z.object({
       voter: EVM_ADDRESS_STRICT,
-      contentId: z.bigint(),
-      contestId: z.bigint(),
-      votingPower: z.bigint(),
+      contentId: z.coerce.bigint(),
+      contestId: z.coerce.bigint(),
+      votingPower: z.coerce.bigint(),
     }),
   }),
   'ContestGovernorSingle.ContentAdded': ChainEventBase.extend({
     parsedArgs: z.object({
-      contentId: z.bigint(),
+      contentId: z.coerce.bigint(),
       creator: EVM_ADDRESS_STRICT,
       url: z.string(),
     }),
   }),
   'ContestGovernorSingle.NewSingleContestStarted': ChainEventBase.extend({
     parsedArgs: z.object({
-      startTime: z.bigint(),
-      endTime: z.bigint(),
+      startTime: z.coerce.bigint(),
+      endTime: z.coerce.bigint(),
     }),
   }),
   'ContestGovernorSingle.OwnershipTransferred': ChainEventBase.extend({
@@ -166,27 +170,27 @@ export const commonProtocolEventSchema = {
   'ContestGovernorSingle.TokenSwept': ChainEventBase.extend({
     parsedArgs: z.object({
       token: EVM_ADDRESS_STRICT,
-      amount: z.bigint(),
+      amount: z.coerce.bigint(),
     }),
   }),
   'ContestGovernorSingle.TransferFailed': ChainEventBase.extend({
     parsedArgs: z.object({
       token: EVM_ADDRESS_STRICT,
       to: EVM_ADDRESS_STRICT,
-      amount: z.bigint(),
+      amount: z.coerce.bigint(),
     }),
   }),
   'ContestGovernorSingle.VoterVoted': ChainEventBase.extend({
     parsedArgs: z.object({
       voter: EVM_ADDRESS_STRICT,
-      contentId: z.bigint(),
-      votingPower: z.bigint(),
+      contentId: z.coerce.bigint(),
+      votingPower: z.coerce.bigint(),
     }),
   }),
   'FeeManager.BeneficiaryAdded': ChainEventBase.extend({
     parsedArgs: z.object({
       beneficiary: EVM_ADDRESS_STRICT,
-      weight: z.bigint(),
+      weight: z.coerce.bigint(),
     }),
   }),
   'FeeManager.BeneficiaryRemoved': ChainEventBase.extend({
@@ -197,20 +201,20 @@ export const commonProtocolEventSchema = {
   'FeeManager.BeneficiaryUpdated': ChainEventBase.extend({
     parsedArgs: z.object({
       beneficiary: EVM_ADDRESS_STRICT,
-      weight: z.bigint(),
+      weight: z.coerce.bigint(),
     }),
   }),
   'FeeManager.ERC20_FeeDistributed': ChainEventBase.extend({
     parsedArgs: z.object({
       beneficiary: EVM_ADDRESS_STRICT,
-      amount: z.bigint(),
+      amount: z.coerce.bigint(),
       token: EVM_ADDRESS_STRICT,
     }),
   }),
   'FeeManager.ETH_FeeDistributed': ChainEventBase.extend({
     parsedArgs: z.object({
       beneficiary: EVM_ADDRESS_STRICT,
-      amount: z.bigint(),
+      amount: z.coerce.bigint(),
     }),
   }),
   'INamespace.ApprovalForAll': ChainEventBase.extend({
@@ -225,8 +229,8 @@ export const commonProtocolEventSchema = {
       operator: EVM_ADDRESS_STRICT,
       from: EVM_ADDRESS_STRICT,
       to: EVM_ADDRESS_STRICT,
-      ids: z.bigint(),
-      values: z.bigint(),
+      ids: z.coerce.bigint(),
+      values: z.coerce.bigint(),
     }),
   }),
   'INamespace.TransferSingle': ChainEventBase.extend({
@@ -234,32 +238,32 @@ export const commonProtocolEventSchema = {
       operator: EVM_ADDRESS_STRICT,
       from: EVM_ADDRESS_STRICT,
       to: EVM_ADDRESS_STRICT,
-      id: z.bigint(),
-      value: z.bigint(),
+      id: z.coerce.bigint(),
+      value: z.coerce.bigint(),
     }),
   }),
   'INamespace.URI': ChainEventBase.extend({
     parsedArgs: z.object({
       value: z.string(),
-      id: z.bigint(),
+      id: z.coerce.bigint(),
     }),
   }),
   'LPBondingCurve.LiquidityTransferred': ChainEventBase.extend({
     parsedArgs: z.object({
       tokenAddress: EVM_ADDRESS_STRICT,
       LPHook: EVM_ADDRESS_STRICT,
-      tokensTransferred: z.bigint(),
-      liquidityTransferred: z.bigint(),
+      tokensTransferred: z.coerce.bigint(),
+      liquidityTransferred: z.coerce.bigint(),
     }),
   }),
   'LPBondingCurve.TokenRegistered': ChainEventBase.extend({
     parsedArgs: z.object({
       token: EVM_ADDRESS_STRICT,
-      curveId: z.bigint(),
-      totalSupply: z.bigint(),
-      launchpadLiquidity: z.bigint(),
-      reserveRatio: z.bigint(),
-      initialPurchaseEthAmount: z.bigint(),
+      curveId: z.coerce.bigint(),
+      totalSupply: z.coerce.bigint(),
+      launchpadLiquidity: z.coerce.bigint(),
+      reserveRatio: z.coerce.bigint(),
+      initialPurchaseEthAmount: z.coerce.bigint(),
     }),
   }),
   'LPBondingCurve.Trade': ChainEventBase.extend({
@@ -267,10 +271,10 @@ export const commonProtocolEventSchema = {
       trader: EVM_ADDRESS_STRICT,
       tokenAddress: EVM_ADDRESS_STRICT,
       isBuy: z.boolean(),
-      tokenAmount: z.bigint(),
-      ethAmount: z.bigint(),
-      protocolEthAmount: z.bigint(),
-      floatingSupply: z.bigint(),
+      tokenAmount: z.coerce.bigint(),
+      ethAmount: z.coerce.bigint(),
+      protocolEthAmount: z.coerce.bigint(),
+      floatingSupply: z.coerce.bigint(),
     }),
   }),
   'Launchpad.LaunchpadCreated': ChainEventBase.extend({
@@ -281,7 +285,7 @@ export const commonProtocolEventSchema = {
   'Launchpad.NewTokenCreated': ChainEventBase.extend({
     parsedArgs: z.object({
       token: EVM_ADDRESS_STRICT,
-      totalSupply: z.bigint(),
+      totalSupply: z.coerce.bigint(),
       name: z.string(),
       symbol: z.string(),
     }),
@@ -289,14 +293,14 @@ export const commonProtocolEventSchema = {
   'Launchpad.TokenRegistered': ChainEventBase.extend({
     parsedArgs: z.object({
       token: EVM_ADDRESS_STRICT,
-      curveId: z.bigint(),
+      curveId: z.coerce.bigint(),
     }),
   }),
   'NamespaceFactory.ConfiguredCommunityStakeId': ChainEventBase.extend({
     parsedArgs: z.object({
       name: z.string(),
       tokenName: z.string(),
-      id: z.bigint(),
+      id: z.coerce.bigint(),
     }),
   }),
   'NamespaceFactory.DeployedNamespace': ChainEventBase.extend({
@@ -321,14 +325,14 @@ export const commonProtocolEventSchema = {
   }),
   'NamespaceFactory.Initialized': ChainEventBase.extend({
     parsedArgs: z.object({
-      version: z.bigint(),
+      version: z.coerce.bigint(),
     }),
   }),
   'NamespaceFactory.NewContest': ChainEventBase.extend({
     parsedArgs: z.object({
       contest: EVM_ADDRESS_STRICT,
       namespace: EVM_ADDRESS_STRICT,
-      interval: z.bigint(),
+      interval: z.coerce.bigint(),
       oneOff: z.boolean(),
     }),
   }),
@@ -350,16 +354,16 @@ export const commonProtocolEventSchema = {
   }),
   'ReferralFeeManager.FeeSplitUpdated': ChainEventBase.extend({
     parsedArgs: z.object({
-      newSplitPercentage: z.bigint(),
+      newSplitPercentage: z.coerce.bigint(),
     }),
   }),
   'ReferralFeeManager.FeesDistributed': ChainEventBase.extend({
     parsedArgs: z.object({
       namespace: EVM_ADDRESS_STRICT,
       token: EVM_ADDRESS_STRICT,
-      amount: z.bigint(),
+      amount: z.coerce.bigint(),
       recipient: EVM_ADDRESS_STRICT,
-      recipientAmount: z.bigint(),
+      recipientAmount: z.coerce.bigint(),
     }),
   }),
   'ReferralFeeManager.OwnershipTransferred': ChainEventBase.extend({
@@ -404,18 +408,18 @@ export const commonProtocolEventSchema = {
     parsedArgs: z.object({
       tokenAddress: EVM_ADDRESS_STRICT,
       LPHook: EVM_ADDRESS_STRICT,
-      tokensTransferred: z.bigint(),
-      liquidityTransferred: z.bigint(),
+      tokensTransferred: z.coerce.bigint(),
+      liquidityTransferred: z.coerce.bigint(),
     }),
   }),
   'TokenBondingCurve.TokenRegistered': ChainEventBase.extend({
     parsedArgs: z.object({
       token: EVM_ADDRESS_STRICT,
-      curveId: z.bigint(),
-      totalSupply: z.bigint(),
-      launchpadLiquidity: z.bigint(),
-      reserveRatio: z.bigint(),
-      initialPurchaseEthAmount: z.bigint(),
+      curveId: z.coerce.bigint(),
+      totalSupply: z.coerce.bigint(),
+      launchpadLiquidity: z.coerce.bigint(),
+      reserveRatio: z.coerce.bigint(),
+      initialPurchaseEthAmount: z.coerce.bigint(),
     }),
   }),
   'TokenBondingCurve.Trade': ChainEventBase.extend({
@@ -423,10 +427,10 @@ export const commonProtocolEventSchema = {
       trader: EVM_ADDRESS_STRICT,
       tokenAddress: EVM_ADDRESS_STRICT,
       isBuy: z.boolean(),
-      tokenAmount: z.bigint(),
-      ethAmount: z.bigint(),
-      protocolEthAmount: z.bigint(),
-      floatingSupply: z.bigint(),
+      tokenAmount: z.coerce.bigint(),
+      ethAmount: z.coerce.bigint(),
+      protocolEthAmount: z.coerce.bigint(),
+      floatingSupply: z.coerce.bigint(),
     }),
   }),
   'TokenCommunityManager.CommunityNamespaceCreated': ChainEventBase.extend({
@@ -445,16 +449,16 @@ export const commonProtocolEventSchema = {
   'TokenLaunchpad.NewTokenCreated': ChainEventBase.extend({
     parsedArgs: z.object({
       token: EVM_ADDRESS_STRICT,
-      totalSupply: z.bigint(),
+      totalSupply: z.coerce.bigint(),
       name: z.string(),
       symbol: z.string(),
-      threadId: z.bigint(),
+      threadId: z.coerce.bigint(),
     }),
   }),
   'TokenLaunchpad.TokenRegistered': ChainEventBase.extend({
     parsedArgs: z.object({
       token: EVM_ADDRESS_STRICT,
-      curveId: z.bigint(),
+      curveId: z.coerce.bigint(),
     }),
   }),
 } as const;
@@ -464,7 +468,9 @@ type InferEventPayload<T extends keyof CommonProtocolEventSchema> = z.infer<
   CommonProtocolEventSchema[T]
 >;
 export type CommonProtocolEventHandlerType = {
-  [K in keyof CommonProtocolEventSchema]?: (
-    payload: InferEventPayload<K>,
-  ) => void;
+  [K in keyof CommonProtocolEventSchema]?: (args: {
+    id: string;
+    name: K;
+    payload: InferEventPayload<K>;
+  }) => void | Promise<void>;
 };
