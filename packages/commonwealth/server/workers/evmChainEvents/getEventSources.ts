@@ -11,9 +11,40 @@ const DEFAULT_MAX_BLOCK_RANGE = 500;
 
 const log = logger(import.meta);
 
-export type EvmContractSources = {
-  [contractAddress: string]: Array<EvmEventSource>;
+export type EvmEventMeta = (
+  | {
+      events_migrated: true;
+      quest_action_meta_ids?: number[];
+    }
+  | {
+      events_migrated: false;
+      created_at_block: number;
+    }
+) & { event_name?: Events };
+
+export type EventSource = {
+  event_signature: `0x${string}`;
+  event_name: string;
+  meta: EvmEventMeta;
 };
+
+export type EvmContractInfo = {
+  event_sources: EventSource[];
+  eth_chain_id: number;
+  contract_address: string;
+  contract_name: string;
+  child_contracts?: ChildContracts;
+  abi: Abi;
+};
+
+export type EvmContractSources = {
+  [contractAddress: string]: EvmContractInfo;
+};
+
+type AbiGen = {
+  [chainId: number]: EvmContractSources;
+};
+
 export type EvmChainSource = {
   rpc: string;
   maxBlockRange: number;
@@ -21,12 +52,8 @@ export type EvmChainSource = {
 };
 
 export type EvmEventSource = {
-  eth_chain_id: number;
-  contract_address: string;
   event_signature: string;
-  contract_name: string;
   event_name: string;
-  child_contracts?: ChildContracts;
   meta: EvmEventMeta;
 };
 
@@ -65,11 +92,11 @@ export async function getXpSources(
     const chainSource = evmSources[source.ChainNode!.eth_chain_id!];
     const contractAddress = getAddress(source.contract_address);
     if (!chainSource.contracts[contractAddress]) {
-      chainSource.contracts[contractAddress] = [];
+      chainSource.contracts[contractAddress] = { event_sources: [] };
     } else {
-      const existingSource = chainSource.contracts[contractAddress].find(
-        (s) => s.event_signature === source.event_signature,
-      );
+      const existingSource = chainSource.contracts[contractAddress][
+        'event_sources'
+      ].find((s) => s.event_signature === source.event_signature);
       if (existingSource && 'quest_action_meta_ids' in existingSource.meta) {
         existingSource.meta.quest_action_meta_ids?.push(
           source.quest_action_meta_id,
@@ -78,7 +105,7 @@ export async function getXpSources(
       }
     }
 
-    chainSource.contracts[contractAddress].push({
+    chainSource.contracts[contractAddress]['event_sources'].push({
       eth_chain_id: source.ChainNode!.eth_chain_id!,
       contract_address: contractAddress,
       event_signature: source.event_signature,
@@ -96,21 +123,6 @@ export async function getXpSources(
 }
 
 let logWarning = true;
-
-export type EvmEventMeta = (
-  | {
-      events_migrated: true;
-      quest_action_meta_ids?: number[];
-    }
-  | {
-      events_migrated: false;
-      created_at_block: number;
-    }
-) & { event_name?: Events };
-
-type AbiGen = {
-  [chainId: number]: EvmContractSources;
-};
 
 export type ChildContracts = {
   [K in keyof typeof abis]?: {
@@ -172,34 +184,35 @@ export function cwProtocolSources(): AbiGen {
     Object.entries(factoryContracts).map(([_, contracts]) => {
       const { chainId, ...contractEntries } = contracts;
 
-      const contractAddressToEvents = {};
+      const contractAddressToEvents: Record<string, EvmContractInfo> = {};
 
       for (const [contractName, contractAddress] of Object.entries(
         contractEntries,
       )) {
         const abiName = `${contractName}Abi`;
-        const abi = (abis as unknown as Abi)[abiName];
+        const abi = (abis as any)[abiName] as Abi;
 
-        if (!abi) {
-          throw new Error(`Missing ABI for contract: ${contractName}`);
-        }
+        if (!abi) throw new Error(`Missing ABI for contract: ${contractName}`);
 
-        contractAddressToEvents[contractAddress as `0x${string}`] = abi
+        const event_sources = abi
           .filter((item) => item.type === 'event')
           .map((item) => ({
-            eth_chain_id: chainId,
-            contract_address: contractAddress,
             event_signature: toEventHash(item),
-            contract_name: contractName,
-            child_contracts: childContracts[abiName],
-            event_name: item.name,
-            meta: {
-              events_migrated: true,
-            },
+            event_name: item.name!,
+            meta: { events_migrated: true },
           }));
+
+        contractAddressToEvents[contractAddress as `0x${string}`] = {
+          contract_address: contractAddress as `0x${string}`,
+          contract_name: contractName,
+          eth_chain_id: chainId,
+          abi,
+          child_contracts: childContracts[abiName],
+          event_sources: event_sources as unknown as EventSource[],
+        };
       }
 
-      return [chainId, contractAddressToEvents];
+      return [chainId, contractAddressToEvents] as const;
     }),
   );
 }
@@ -243,19 +256,14 @@ export async function getEventSources(): Promise<EvmSources> {
     )) {
       const parentContractAddress = getAddress(source.parent_contract_address);
       const contractAddress = getAddress(source.contract_address);
-      const allHaveChildContracts = registryContractSources[
-        parentContractAddress
-      ]?.every((s) => !!s.child_contracts);
-      if (!allHaveChildContracts) {
+      const childContract =
+        registryContractSources[parentContractAddress].child_contracts;
+      if (!childContract) {
         log.error(`Child contracts not found in Event Registry!`, undefined, {
           eth_chain_id: ethChainId,
           parent_contract_address: parentContractAddress,
         });
         continue;
-      }
-
-      if (!dbContractSources[contractAddress]) {
-        dbContractSources[contractAddress] = [];
       }
 
       const sharedSource = {
@@ -283,7 +291,7 @@ export async function getEventSources(): Promise<EvmSources> {
         };
       }
 
-      dbContractSources[contractAddress].push(buildSource);
+      dbContractSources[contractAddress]['event_sources'].push(buildSource);
     }
 
     evmSources[ethChainId] = {

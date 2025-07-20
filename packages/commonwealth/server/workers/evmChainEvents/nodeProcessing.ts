@@ -1,12 +1,11 @@
 import { logger, stats } from '@hicommonwealth/core';
 import { emitEvent } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
-import { EventPairs } from '@hicommonwealth/schemas';
 import { serializeBigIntObj } from '@hicommonwealth/shared';
 import { createPublicClient, http } from 'viem';
 import { config } from '../../config';
 import { EvmChainSource, getEventSources } from './getEventSources';
-import { getEvents, migrateEvents } from './logProcessing';
+import { EvmEventPayload, getEvents, migrateEvents } from './logProcessing';
 import { updateMigratedEvmEventSources } from './utils';
 
 const log = logger(import.meta);
@@ -69,7 +68,7 @@ export async function processChainNode(
       return;
     }
 
-    const allEvents: Array<EventPairs> = [];
+    const allEvents: EvmEventPayload[] = [];
     const migratedData = await migrateEvents(evmSource, startBlockNum - 1);
     if ('events' in migratedData && migratedData.events?.length > 0)
       allEvents.push(...migratedData.events);
@@ -116,9 +115,15 @@ export async function processChainNode(
             ),
           )}`,
         );
+
+        const sanitized_events = allEvents.map((e) => serializeBigIntObj(e));
+
         await emitEvent(
           models.Outbox,
-          allEvents.map((e) => serializeBigIntObj(e)) as Array<EventPairs>,
+          sanitized_events.map((e) => ({
+            event_name: e.event_name,
+            event_payload: e,
+          })),
           transaction,
         );
         await updateMigratedEvmEventSources(

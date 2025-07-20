@@ -1,3 +1,4 @@
+import { schemaMap } from '@hicommonwealth/evm-protocols';
 import { describe, expect, it } from 'vitest';
 import { calculateVoteWeight } from '../../src/common-protocol';
 
@@ -45,6 +46,11 @@ describe('commonProtocol', () => {
         const result = calculateVoteWeight('1000', 0.5);
         expect(result!).eq(BigInt('500'));
       }
+    });
+  });
+  describe('testEventSchema', () => {
+    it('Should contain certain schemas', () => {
+      expect(schemaMap['Launchpad.NewTokenCreated']).exists();
     });
   });
 });

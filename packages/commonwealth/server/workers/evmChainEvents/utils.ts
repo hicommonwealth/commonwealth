@@ -1,13 +1,13 @@
 import { models } from '@hicommonwealth/model/db';
-import { EventPairs } from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
 import { EvmContractSources } from './getEventSources';
+import { EvmEventPayload } from './logProcessing';
 
 export async function updateMigratedEvmEventSources(
   ethChainId: number,
   migratedData:
     | {
-        events: Array<EventPairs>;
+        events: EvmEventPayload[];
         lastBlockNum: number;
         contracts: EvmContractSources;
       }

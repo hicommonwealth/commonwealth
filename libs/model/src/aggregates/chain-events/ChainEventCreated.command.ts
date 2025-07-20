@@ -1,9 +1,5 @@
 import { type Command } from '@hicommonwealth/core';
-import {
-  EvmEventSignatures,
-  getFactoryContract,
-  ValidChains,
-} from '@hicommonwealth/evm-protocols';
+import { getFactoryContract, ValidChains } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { createHmac, Hmac } from 'crypto';
 import { config } from '../../config';
