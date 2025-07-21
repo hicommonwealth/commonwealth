@@ -6,6 +6,7 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { Community, CommunityGoalMeta } from '../entities';
+import { PG_INT } from '../utils';
 
 export const CreateChainNode = {
   input: z.object({
@@ -152,4 +153,16 @@ export const CreateCommunityGoalMeta = {
     target: z.number(),
   }),
   output: CommunityGoalMeta,
+};
+
+export const AwardXp = {
+  input: z.object({
+    user_id: PG_INT.min(1, 'User is required'),
+    xp_amount: z.number().min(1).max(10_000),
+    reason: z
+      .string()
+      .min(1)
+      .refine((val) => val.trim().length > 0, 'Reason is required'),
+  }),
+  output: z.boolean(),
 };
