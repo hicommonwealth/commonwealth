@@ -49,7 +49,7 @@ const AwardXpTask = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
-    (async () => {
+    void (async () => {
       try {
         // Convert xp_amount to number for validation/submission
         const toValidate = {
