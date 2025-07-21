@@ -438,7 +438,8 @@ async function getHistoricalTokenAllocations(
         )
     SELECT *,
           (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) * 100 as percent_allocation,
-          (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) * ${(config.supplyPercent / 2) * totalSupply}::NUMERIC as token_allocation
+          (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) * ${(config.supplyPercent / 2) * totalSupply}::NUMERIC as token_allocation,
+          NULL as claim_address
     FROM final_scores
     ORDER BY ${config.historicalOrder} NULLS LAST;
   `,
@@ -480,7 +481,8 @@ async function getAuraTokenAllocations(
             (SELECT total_xp_awarded FROM xp_sum) as xp_total_sum,
             COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0) as total_xp,
             (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC / (SELECT total_xp_awarded FROM xp_sum) * 100 as percent_allocation,
-            (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC / (SELECT total_xp_awarded FROM xp_sum) * ${(config.supplyPercent / 2) * totalSupply}::NUMERIC as token_allocation
+            (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC / (SELECT total_xp_awarded FROM xp_sum) * ${(config.supplyPercent / 2) * totalSupply}::NUMERIC as token_allocation,
+            NULL as claim_address
       FROM "Users" U
               LEFT JOIN user_xp UX ON UX.user_id = U.id
               LEFT JOIN creator_xp CX ON CX.creator_user_id = U.id
@@ -494,6 +496,38 @@ async function getAuraTokenAllocations(
       type: QueryTypes.SELECT,
     },
   );
+}
+
+async function setClaimableAddresses(
+  tableName: 'aura_allocations' | 'historical_allocations',
+) {
+  await models.sequelize.query(`
+    WITH MaxLastActive AS (
+      SELECT
+        A.user_id,
+        MAX(A.last_active) as max_last_active
+      FROM "Addresses" A
+             JOIN "Communities" C ON C.id = A.community_id
+      WHERE C.network = 'ethereum'
+        AND C.base = 'ethereum'
+        AND A.address LIKE '0x%'
+        AND LENGTH(A.address) = 42
+      GROUP BY A.user_id
+    ),
+         MaxAddresses AS (
+           SELECT
+             A.address,
+             A.user_id
+           FROM "Addresses" A
+                  JOIN MaxLastActive MLA ON A.user_id = MLA.user_id
+           WHERE A.last_active = MLA.max_last_active
+         )
+    UPDATE ${tableName} AA
+    SET claim_address = (
+      SELECT MA.address FROM MaxAddresses MA WHERE
+        MA.user_id = AA.user_id
+    );
+  `);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -563,6 +597,9 @@ async function main() {
     await getHistoricalTokenAllocations(config);
     console.log('Generating aura token allocations...');
     await getAuraTokenAllocations(config);
+
+    await setClaimableAddresses('aura_allocations');
+    await setClaimableAddresses('historical_allocations');
 
     // // Write both CSV files
     // writeScoresToCSV(scores, config.historicalOutputPath);
