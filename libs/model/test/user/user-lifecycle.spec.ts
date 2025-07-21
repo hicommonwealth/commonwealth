@@ -1039,6 +1039,19 @@ describe('User lifecycle', () => {
       expect(manualLog?.scope?.award_reason).to.equal(reason);
     });
 
+    it("should fail to award manual xp to a user if they've already awarded today", async () => {
+      expect(
+        command(AwardXp(), {
+          actor: superadmin,
+          payload: {
+            user_id: member.user.id!,
+            xp_amount: 42,
+            reason: 'Manual XP for test',
+          },
+        }),
+      ).rejects.toThrowError('User already has manual XP awards logged today');
+    });
+
     it('should query ranked by xp points', async () => {
       // dump xp logs to debug xp ranking
       const logs = await query(GetXps(), {
