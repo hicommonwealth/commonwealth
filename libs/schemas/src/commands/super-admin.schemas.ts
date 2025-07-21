@@ -158,7 +158,7 @@ export const CreateCommunityGoalMeta = {
 export const AwardXp = {
   input: z.object({
     user_id: PG_INT.min(1, 'User is required'),
-    xp_amount: z.number().min(1).max(10_000),
+    xp_amount: z.coerce.number().min(1).max(10_000),
     reason: z
       .string()
       .min(1)
