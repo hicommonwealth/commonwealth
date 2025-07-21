@@ -19,6 +19,7 @@ import * as subscription from './subscription';
 import * as superAdmin from './super-admin';
 import * as tag from './tag';
 import * as thread from './thread';
+import * as tokenAllocation from './tokenAllocation';
 import * as user from './user';
 import * as wallet from './wallet';
 import * as webhook from './webhook';
@@ -42,6 +43,7 @@ const api = {
   tag: tag.trpcRouter,
   search: search.trpcRouter,
   configuration: configuration.trpcRouter,
+  tokenAllocation: tokenAllocation.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
