@@ -1,3 +1,5 @@
+/* eslint-disable no-case-declarations, n/no-process-exit, max-len */
+
 import { models } from '@hicommonwealth/model/db';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -364,7 +366,7 @@ type AuraAllocation = {
 async function getHistoricalTokenAllocations(
   config: ScoringConfig,
 ): Promise<Array<HistoricalAllocation>> {
-  const res = await models.sequelize.query<HistoricalAllocation>(
+  return await models.sequelize.query<HistoricalAllocation>(
     `
     CREATE TABLE historical_allocations AS
     WITH users AS (SELECT U.id as user_id, U.created_at
@@ -447,14 +449,12 @@ async function getHistoricalTokenAllocations(
       type: QueryTypes.SELECT,
     },
   );
-
-  return res;
 }
 
 async function getAuraTokenAllocations(
   config: ScoringConfig,
 ): Promise<Array<AuraAllocation>> {
-  const res = await models.sequelize.query<AuraAllocation>(
+  return await models.sequelize.query<AuraAllocation>(
     `
     CREATE TABLE aura_allocations AS
       WITH xp_sum AS (
@@ -494,10 +494,9 @@ async function getAuraTokenAllocations(
       type: QueryTypes.SELECT,
     },
   );
-
-  return res;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function writeScoresToCSV<T extends Record<string, any>>(
   scores: Array<T>,
   outputPath: string,
