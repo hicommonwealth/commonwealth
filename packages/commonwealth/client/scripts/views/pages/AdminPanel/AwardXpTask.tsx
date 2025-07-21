@@ -46,7 +46,7 @@ const AwardXpTask = () => {
     }
   };
 
-  const handleErrors = (_errors: any) => {
+  const handleErrors = () => {
     setErrorMsg('Please fix form errors');
   };
 
