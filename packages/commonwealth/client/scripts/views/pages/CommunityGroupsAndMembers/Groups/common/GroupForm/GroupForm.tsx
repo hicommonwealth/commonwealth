@@ -55,7 +55,7 @@ import {
 } from './validations';
 
 type TopicOption = {
-  label: React.ReactNode;
+  label: string;
   value: string | number;
   helpText?: string;
 };
@@ -211,18 +211,7 @@ const GroupForm = ({
   const topicOptions = sortedTopics
     .filter((topic) => topic.id !== undefined)
     .map((topic) => ({
-      label: (
-        <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-          {topic.name}
-          {privateTopicIds.has(topic.id) && (
-            <CWIcon
-              iconName="lockedNew"
-              iconSize="small"
-              style={{ marginLeft: 6 }}
-            />
-          )}
-        </span>
-      ),
+      label: topic.name,
       value: topic.id as number,
       helpText: weightedVotingValueToLabel(topic.weighted_voting!),
     }));
@@ -693,6 +682,13 @@ const GroupForm = ({
                     }: OptionProps<TopicOption, true>) => (
                       <components.Option {...props} data={data}>
                         {data.label}
+                        {privateTopicIds.has(data.value) && (
+                          <CWIcon
+                            iconName="lockedNew"
+                            iconSize="small"
+                            style={{ marginLeft: 6 }}
+                          />
+                        )}
                       </components.Option>
                     ),
                     SingleValue: ({
@@ -701,6 +697,13 @@ const GroupForm = ({
                     }: SingleValueProps<TopicOption, true>) => (
                       <components.SingleValue {...props} data={data}>
                         {data.label}
+                        {privateTopicIds.has(data.value) && (
+                          <CWIcon
+                            iconName="lockedNew"
+                            iconSize="small"
+                            style={{ marginLeft: 6 }}
+                          />
+                        )}
                       </components.SingleValue>
                     ),
                     MultiValueLabel: ({
@@ -709,6 +712,13 @@ const GroupForm = ({
                     }: MultiValueProps<TopicOption, true>) => (
                       <components.MultiValueLabel {...props} data={data}>
                         {data.label}
+                        {privateTopicIds.has(data.value) && (
+                          <CWIcon
+                            iconName="lockedNew"
+                            iconSize="small"
+                            style={{ marginLeft: 6 }}
+                          />
+                        )}
                       </components.MultiValueLabel>
                     ),
                   }}
