@@ -15,16 +15,9 @@ export default {
           "created_at",
           "updated_at"
         )
-        VALUES (
-          -100, 
-          -2,
-          'XpAwarded',
-          0,
-          'once_per_period',
-          'daily',
-          now(),
-          now()
-        );`,
+        SELECT -100, -2, 'XpAwarded', 0, 'once_per_period', 'daily', now(), now()
+        WHERE EXISTS (SELECT 1 FROM "Quests" WHERE "id" = -2);
+        `,
         { transaction },
       );
     });

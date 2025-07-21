@@ -7,7 +7,9 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWUserPicker from 'views/components/component_kit/new_designs/CWUserPicker/CWUserPicker';
+import CWUserPicker, {
+  CWUserPickerOption,
+} from 'views/components/component_kit/new_designs/CWUserPicker/CWUserPicker';
 import { z } from 'zod';
 import './AdminPanel.scss';
 
@@ -28,12 +30,12 @@ const AwardXpTask = () => {
   const { mutateAsync, isPending } = useAwardXpMutation();
 
   const communityId = app.activeChainId() || '';
-  const handleUserSelect = (user) => {
+  const handleUserSelect = (user: CWUserPickerOption | null) => {
     setForm((f) => ({ ...f, user_id: user ? Number(user.value) : 0 }));
     setTouched((t) => ({ ...t, user_id: true }));
   };
 
-  const handleChange = (field: keyof typeof initialState, value: any) => {
+  const handleChange = (field: keyof typeof initialState, value: unknown) => {
     setForm((f) => ({ ...f, [field]: value }));
     setTouched((t) => ({ ...t, [field]: true }));
   };
@@ -43,31 +45,34 @@ const AwardXpTask = () => {
     setTouched({});
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Refactor handleSubmit to not be async directly
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
-    try {
-      // Convert xp_amount to number for validation/submission
-      const toValidate = {
-        ...form,
-        xp_amount: form.xp_amount === '' ? 0 : Number(form.xp_amount),
-      };
-      schema.parse(toValidate);
-      await mutateAsync(toValidate);
-      notifySuccess('XP awarded successfully');
-      handleCancel();
-    } catch (err: any) {
-      if (err instanceof z.ZodError) {
-        setErrorMsg('Please fix form errors');
-        notifyError('Please fix form errors');
-      } else if (err?.message) {
-        setErrorMsg(err.message);
-        notifyError(err.message);
-      } else {
-        setErrorMsg('Failed to award XP');
-        notifyError('Failed to award XP');
+    (async () => {
+      try {
+        // Convert xp_amount to number for validation/submission
+        const toValidate = {
+          ...form,
+          xp_amount: form.xp_amount === '' ? 0 : Number(form.xp_amount),
+        };
+        schema.parse(toValidate);
+        await mutateAsync(toValidate);
+        notifySuccess('XP awarded successfully');
+        handleCancel();
+      } catch (err: unknown) {
+        if (err instanceof z.ZodError) {
+          setErrorMsg('Please fix form errors');
+          notifyError('Please fix form errors');
+        } else if (err instanceof Error) {
+          setErrorMsg(err.message);
+          notifyError(err.message);
+        } else {
+          setErrorMsg('Failed to award XP');
+          notifyError('Failed to award XP');
+        }
       }
-    }
+    })();
   };
 
   const toValidate = {
