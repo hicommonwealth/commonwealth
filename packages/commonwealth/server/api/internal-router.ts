@@ -12,6 +12,7 @@ import * as feed from './feed';
 import * as integrations from './integrations';
 import * as launchpadToken from './launchpadToken';
 import * as loadTest from './load-test';
+import * as mcp from './mcp';
 import * as poll from './poll';
 import * as quest from './quest';
 import * as search from './search';
@@ -42,6 +43,7 @@ const api = {
   tag: tag.trpcRouter,
   search: search.trpcRouter,
   configuration: configuration.trpcRouter,
+  mcp: mcp.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {

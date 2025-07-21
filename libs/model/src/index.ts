@@ -9,6 +9,7 @@ export * as DiscordBot from './aggregates/discordBot';
 export * as Email from './aggregates/emails';
 export * as Feed from './aggregates/feed';
 export * as LoadTest from './aggregates/load-testing';
+export * as MCP from './aggregates/mcp';
 export * as MCPServer from './aggregates/mcp-server';
 export * as Poll from './aggregates/poll';
 export * as Quest from './aggregates/quest';

@@ -95,6 +95,10 @@ const {
   KNOCK_IN_APP_FEED_ID,
   UNLEASH_FRONTEND_API_TOKEN,
   CONTEST_DURATION_IN_SEC,
+  KLAVIS_API_KEY,
+  GOOGLE_SHEETS_CLIENT_ID,
+  GOOGLE_SHEETS_CLIENT_SECRET,
+  GOOGLE_SHEETS_CALLBACK_URL,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -317,6 +321,14 @@ export const config = configure(
     },
     UNLEASH: {
       FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
+    },
+    KLAVIS: {
+      API_KEY: KLAVIS_API_KEY,
+      GOOGLE_SHEETS: {
+        CLIENT_ID: GOOGLE_SHEETS_CLIENT_ID,
+        CLIENT_SECRET: GOOGLE_SHEETS_CLIENT_SECRET,
+        CALLBACK_URL: GOOGLE_SHEETS_CALLBACK_URL,
+      },
     },
   },
   z.object({
@@ -709,6 +721,14 @@ export const config = configure(
             requiredServices: [...WebServices],
           }),
         ),
+    }),
+    KLAVIS: z.object({
+      API_KEY: z.string().optional(),
+      GOOGLE_SHEETS: z.object({
+        CLIENT_ID: z.string().optional(),
+        CLIENT_SECRET: z.string().optional(),
+        CALLBACK_URL: z.string().optional(),
+      }),
     }),
   }),
 );

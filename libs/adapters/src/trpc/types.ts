@@ -35,6 +35,7 @@ export enum Tag {
   Tag = 'Tag',
   Search = 'Search',
   Configuration = 'Configuration',
+  MCP = 'MCP',
 }
 
 /**
