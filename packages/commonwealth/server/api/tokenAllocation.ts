@@ -6,4 +6,8 @@ export const trpcRouter = trpc.router({
     TokenAllocation.UpdateClaimAddress,
     trpc.Tag.TokenAllocation,
   ),
+  getClaimAddress: trpc.query(
+    TokenAllocation.GetClaimAddress,
+    trpc.Tag.TokenAllocation,
+  ),
 });

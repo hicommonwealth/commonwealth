@@ -1,4 +1,9 @@
-import { type Command, InvalidState, logger } from '@hicommonwealth/core';
+import {
+  type Command,
+  InvalidActor,
+  InvalidState,
+  logger,
+} from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
@@ -11,7 +16,8 @@ export function UpdateClaimAddress(): Command<
   return {
     ...schemas.UpdateClaimableAddress,
     auth: [],
-    body: async ({ payload }) => {
+    secure: true,
+    body: async ({ payload, actor }) => {
       const { address_id } = payload;
 
       const [address] = await models.sequelize.query<{
@@ -37,6 +43,10 @@ export function UpdateClaimAddress(): Command<
         },
       );
 
+      if (address.user_id !== actor.user.id) {
+        throw new InvalidActor(actor, 'Cannot update claim address');
+      }
+
       if (!address) {
         throw new InvalidState('Address not found!');
       } else if (!address.community_id) {
@@ -47,14 +57,17 @@ export function UpdateClaimAddress(): Command<
         await models.sequelize.query(
           `
           INSERT INTO "ClaimAddresses"
-          VALUES (:user_id, :address)
-          ON CONFLICT DO UPDATE SET address = EXCLUDED.address;
+          VALUES (:user_id, :address, NOW(), NOW())
+          ON CONFLICT DO UPDATE 
+          SET address = EXCLUDED.address, updated_at = NOW();
         `,
           {
             type: QueryTypes.UPSERT,
             replacements: {
               user_id: address.user_id,
               address: address.address,
+              created_at: new Date(),
+              updated_at: new Date(),
             },
           },
         );

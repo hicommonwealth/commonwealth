@@ -518,8 +518,8 @@ async function setClaimableAddresses() {
            WHERE A.last_active = MLA.max_last_active
          )
 
-    INSERT INTO "ClaimAddresses" (user_id, address)
-    SELECT * FROM max_addresses;
+    INSERT INTO "ClaimAddresses" (user_id, address, created_at, updated_at)
+    SELECT *, NOW() as created_at, NOW() as updated_at FROM max_addresses;
   `);
 }
 

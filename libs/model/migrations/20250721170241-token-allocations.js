@@ -82,20 +82,36 @@ module.exports = {
 
       // Separate table without fkey to Addresses so users/addresses can
       // be deleted independently
-      await queryInterface.createTable('ClaimAddresses', {
-        user_id: {
-          type: Sequelize.INTEGER,
-          primaryKey: true,
+      await queryInterface.createTable(
+        'ClaimAddresses',
+        {
+          user_id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+          },
+          address: {
+            type: Sequelize.STRING,
+            allowNull: false,
+          },
+          created_at: {
+            type: Sequelize.DATE,
+            allowNull: false,
+          },
+          updated_at: {
+            type: Sequelize.DATE,
+            allowNull: false,
+          },
         },
-        address: {
-          type: Sequelize.STRING,
-          allowNull: false,
-        },
-      });
+        { transaction },
+      );
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.removeColumn('Addresses', 'is_airdrop_claim_address');
+    await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.dropTable('ClaimAddresses');
+      await queryInterface.dropTable('AuraAllocations');
+      await queryInterface.dropTable('HistoricalAllocations');
+    });
   },
 };
