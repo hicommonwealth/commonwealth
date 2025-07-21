@@ -368,7 +368,7 @@ async function getHistoricalTokenAllocations(
 ): Promise<Array<HistoricalAllocation>> {
   return await models.sequelize.query<HistoricalAllocation>(
     `
-    CREATE TABLE historical_allocations AS
+    CREATE TABLE "HistoricalAllocations" AS
     WITH users AS (SELECT U.id as user_id, U.created_at
                    FROM "Users" U),
          addresses AS (SELECT U.user_id as user_id, A.id as address_id, A.address
@@ -438,8 +438,7 @@ async function getHistoricalTokenAllocations(
         )
     SELECT *,
           (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) * 100 as percent_allocation,
-          (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) * ${(config.supplyPercent / 2) * totalSupply}::NUMERIC as token_allocation,
-          NULL as claim_address
+          (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) * ${(config.supplyPercent / 2) * totalSupply}::NUMERIC as token_allocation
     FROM final_scores
     ORDER BY ${config.historicalOrder} NULLS LAST;
   `,
@@ -478,11 +477,9 @@ async function getAuraTokenAllocations(
           GROUP BY creator_user_id
       ) SELECT
             U.id as user_id,
-            (SELECT total_xp_awarded FROM xp_sum) as xp_total_sum,
             COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0) as total_xp,
             (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC / (SELECT total_xp_awarded FROM xp_sum) * 100 as percent_allocation,
-            (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC / (SELECT total_xp_awarded FROM xp_sum) * ${(config.supplyPercent / 2) * totalSupply}::NUMERIC as token_allocation,
-            NULL as claim_address
+            (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC / (SELECT total_xp_awarded FROM xp_sum) * ${(config.supplyPercent / 2) * totalSupply}::NUMERIC as token_allocation
       FROM "Users" U
               LEFT JOIN user_xp UX ON UX.user_id = U.id
               LEFT JOIN creator_xp CX ON CX.creator_user_id = U.id
@@ -498,11 +495,9 @@ async function getAuraTokenAllocations(
   );
 }
 
-async function setClaimableAddresses(
-  tableName: 'aura_allocations' | 'historical_allocations',
-) {
+async function setClaimableAddresses() {
   await models.sequelize.query(`
-    WITH MaxLastActive AS (
+    WITH max_last_active AS (
       SELECT
         A.user_id,
         MAX(A.last_active) as max_last_active
@@ -514,19 +509,17 @@ async function setClaimableAddresses(
         AND LENGTH(A.address) = 42
       GROUP BY A.user_id
     ),
-         MaxAddresses AS (
+         max_addresses AS (
            SELECT
              A.address,
              A.user_id
            FROM "Addresses" A
-                  JOIN MaxLastActive MLA ON A.user_id = MLA.user_id
+                  JOIN max_last_active MLA ON A.user_id = MLA.user_id
            WHERE A.last_active = MLA.max_last_active
          )
-    UPDATE ${tableName} AA
-    SET claim_address = (
-      SELECT MA.address FROM MaxAddresses MA WHERE
-        MA.user_id = AA.user_id
-    );
+
+    INSERT INTO "ClaimAddresses" (user_id, address)
+    SELECT * FROM max_addresses;
   `);
 }
 
@@ -589,17 +582,18 @@ async function main() {
 
     console.log(`\n`);
 
-    console.log('Dropping tables if they exist');
-    await models.sequelize.query(`DROP TABLE IF EXISTS historical_allocations`);
-    await models.sequelize.query(`DROP TABLE IF EXISTS aura_allocations`);
+    console.log('Truncating tables if they exist');
+    await models.sequelize.query(`TRUNCATE "HistoricalAllocations";`);
+    await models.sequelize.query(`TRUNCATE "AuraAllocations"`);
 
     console.log('Generating historical token allocations...');
     await getHistoricalTokenAllocations(config);
     console.log('Generating aura token allocations...');
     await getAuraTokenAllocations(config);
 
-    await setClaimableAddresses('aura_allocations');
-    await setClaimableAddresses('historical_allocations');
+    console.log('Setting claim addresses...');
+    await setClaimableAddresses();
+    console.log('Claim addresses set');
 
     // // Write both CSV files
     // writeScoresToCSV(scores, config.historicalOutputPath);

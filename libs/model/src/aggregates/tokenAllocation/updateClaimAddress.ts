@@ -44,38 +44,20 @@ export function UpdateClaimAddress(): Command<
       }
 
       try {
-        await models.sequelize.transaction(async (transaction) => {
-          await models.sequelize.query(
-            `
-              UPDATE aura_allocations
-              SET claim_address = :address
-              WHERE user_id = :user_id;
-            `,
-            {
-              type: QueryTypes.UPDATE,
-              replacements: {
-                address: address.address,
-                user_id: address.user_id,
-              },
-              transaction,
+        await models.sequelize.query(
+          `
+          INSERT INTO "ClaimAddresses"
+          VALUES (:user_id, :address)
+          ON CONFLICT DO UPDATE SET address = EXCLUDED.address;
+        `,
+          {
+            type: QueryTypes.UPSERT,
+            replacements: {
+              user_id: address.user_id,
+              address: address.address,
             },
-          );
-          await models.sequelize.query(
-            `
-              UPDATE historical_allocations
-              SET claim_address = :address
-              WHERE user_id = :user_id;
-            `,
-            {
-              type: QueryTypes.UPDATE,
-              replacements: {
-                address: address.address,
-                user_id: address.user_id,
-              },
-              transaction,
-            },
-          );
-        });
+          },
+        );
       } catch (error) {
         log.error('Failed to update claim_address', error as Error);
         throw new Error('Failed to update claim_address');
