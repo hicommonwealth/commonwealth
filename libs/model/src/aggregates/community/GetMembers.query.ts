@@ -210,7 +210,17 @@ function membersSqlWithSearch(
           ? 'WHERE COALESCE(U.referral_count, 0) + COALESCE(U.referral_eth_earnings, 0) > 0'
           : ''
       }
-      GROUP BY U.id, T.total
+      GROUP BY 
+        U.id, 
+        U.tier, 
+        U.profile->>'name', 
+        U.profile->>'avatar_url', 
+        U.created_at,
+        U.referral_count,
+        U.referral_eth_earnings,
+        U.xp_points,
+        U.xp_referrer_points,
+        T.total
       ORDER BY ${buildOrderBy(by, direction)}
       LIMIT ${limit} OFFSET ${offset};
      `;

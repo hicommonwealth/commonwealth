@@ -493,3 +493,15 @@ export const SetAddressWallet = {
   output: z.boolean(),
   context: AuthContext,
 };
+
+export const RefreshWeightedVotes = {
+  input: z.object({
+    topic_id: PG_INT,
+    community_id: z.string(),
+  }),
+  output: z.object({
+    topic_id: PG_INT,
+    community_id: z.string(),
+  }),
+  context: TopicContext,
+};
