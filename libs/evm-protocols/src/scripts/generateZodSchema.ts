@@ -106,7 +106,7 @@ export type CommonProtocolEventHandlerType = {
   const output = lines.join('\n');
   const outPath = path.resolve(
     path.dirname(import.meta.url.slice(7)),
-    './commonProtocolEventSchema.ts',
+    '../commonProtocolEventSchema.ts',
   );
   fs.writeFileSync(outPath, output);
   console.log('✅ Generated commonProtocolEventSchema.ts');
