@@ -6,6 +6,7 @@ export type FormSubmitValues = {
   communityName: string;
   communityDescription: string;
   communityProfileImageURL: string;
+  updateTokenImage?: boolean;
   defaultPage: DefaultPage;
   hasStagesEnabled?: boolean;
   customStages?: string;
