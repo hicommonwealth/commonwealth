@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: commonwealth-server{{ .Values.commonwealthServerSuffix }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    kubernetes.io/ingress.class: 'nginx'
+    nginx.ingress.kubernetes.io/backend-protocol: 'HTTPS'
+spec:
+  ingressClassName: nginx
+
+  rules:
+    - host: {{ .Values.hostUrl }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: commonwealth-server{{ .Values.commonwealthServerSuffix }}
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - {{ .Values.hostUrl }}
+      secretName: wildcard-cert-dns-tls

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: commonwealth-server{{ .Values.commonwealthServerSuffix }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: commonwealth-server{{ .Values.commonwealthServerSuffix }}
+  annotations:
+    reloader.stakater.com/match: "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: commonwealth-server{{ .Values.commonwealthServerSuffix }}
+  template:
+    metadata:
+      labels:
+        app: commonwealth-server{{ .Values.commonwealthServerSuffix }}
+    spec:
+      containers:
+        - name: commonwealth-server{{ .Values.commonwealthServerSuffix }}
+          image: {{ .Values.cwServerImage }}
+          volumeMounts:
+            - name: env-volume
+              mountPath: /app/.env #TODO: Filepath inside the container. Fix
+              subPath: .env
+          ports:
+            - containerPort: 8080
+      volumes:
+        - name: env-volume
+          secret:
+            secretName: commonwealth-server-env{{ .Values.commonwealthSecretsNameSuffix }}

@@ -1,5 +1,3 @@
-Two step setup:
-
 # Setup infra
 1. `terraform init` to install providers (Only needs to be run once)
 2. `terraform apply` (This requires vars ENV_NAME and DIGITALOCEAN_TOKEN)
@@ -34,3 +32,21 @@ In this scenario you would need to manually delete the load balancer for full cl
 
 # Apply Ingress to argocd
 1. `kubectl apply -f argocd/ingress-argocd.yaml`
+
+# Setup vault
+1. `kubectl apply -f vault/vault-application.yaml`
+2. `kubectl apply -f vault/vault-operator.yaml`
+
+# Get root token and setup initial secrets
+1. `export VAULT_ADDR=https://vault.<domain_name>`
+2. `./vault/setup/decode_root_token <key-id>`
+3. `Ensure base secrets are in .env in the vault/setup/ folder`
+4. `./vault/setup/push_env_to_vault`
+
+# Setup external-secrets-operator
+1. `kubectl apply -f external-secrets-operator.yaml`
+2. `kubectl create secret generic vault-token \
+  --from-literal=token='<vault-token>' \
+  -n external-secrets`
+3. `kubectl apply -f cluster-secrets-store.yaml`
+4. `kubectl apply -f reloader.yaml`

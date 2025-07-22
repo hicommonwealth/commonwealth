@@ -1,0 +1,6 @@
+cwServerImage: 'arn:aws:iam::775434881122:role/vault-server-role-development'
+hostUrl: 'commonwealth.unique.rocks'
+commonwealthServerSuffix: ''
+commonwealthSecretsNameSuffix: ''
+commonwealthSecretsPath: 'secret/baseenv'
+namespace: 'commonwealth'
