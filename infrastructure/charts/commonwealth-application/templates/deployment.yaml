@@ -26,6 +26,10 @@ spec:
               subPath: .env
           ports:
             - containerPort: 8080
+        - name: redis
+          image: redis:7.2-alpine
+          ports:
+            - containerPort: 6379
       volumes:
         - name: env-volume
           secret:
