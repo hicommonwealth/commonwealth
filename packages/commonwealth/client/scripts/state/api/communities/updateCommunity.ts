@@ -123,12 +123,15 @@ const useUpdateCommunityMutation = ({
   reInitAppOnSuccess,
 }: UseUpdateCommunityMutationProps) => {
   const user = useUserStore();
+  const utils = trpc.useUtils();
 
   return trpc.community.updateCommunity.useMutation({
     onSuccess: async () => {
       // since this is the main chain/community object affecting
       // some other features, better to re-fetch on update.
       await invalidateAllQueriesForCommunity(communityId);
+
+      await utils.launchpadToken.invalidate().catch(console.error);
 
       user.setData({ addressSelectorSelectedAddress: undefined });
 
