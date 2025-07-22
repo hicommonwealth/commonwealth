@@ -1,6 +1,7 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import axios from 'axios';
+import { KlavisClient } from 'klavis';
 import { config } from '../../config';
 
 export function CreateKlavisMCPInstance(): Command<
@@ -23,28 +24,26 @@ export function CreateKlavisMCPInstance(): Command<
       }
 
       try {
-        const response = await axios.post(
-          'https://api.klavis.ai/mcp-server/instance/create',
-          {
-            serverName: serverType,
-            userId: actor.user.id.toString(),
-            platformName: 'Common',
-            connectionType: 'StreamableHttp',
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${config.KLAVIS.API_KEY}`,
-              'Content-Type': 'application/json',
-            },
-          },
-        );
+        const klavis = new KlavisClient({
+          apiKey: config.KLAVIS.API_KEY,
+        });
 
-        const { serverUrl, instanceId, oauthUrl } = response.data;
+        const instance = await klavis.mcpServer.createServerInstance({
+          serverName: serverType,
+          userId: actor.user.id.toString(),
+          platformName: 'Common',
+        });
+
+        const { oauthUrl } = await klavis.mcpServer.getOAuthUrl({
+          serverName: serverType,
+          instanceId: instance.instanceId,
+          redirectUrl: `${config.KLAVIS.REDIRECT_URL}/api/integration/klavis/oauth-callback?instanceId=${instance.instanceId}`,
+        });
 
         return {
-          serverUrl,
-          instanceId,
-          oauthUrl,
+          serverUrl: instance.serverUrl,
+          instanceId: instance.instanceId,
+          oauthUrl: oauthUrl,
         };
       } catch (error) {
         console.error('Failed to create Klavis MCP instance:', error);

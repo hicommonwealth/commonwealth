@@ -77,6 +77,13 @@ function build() {
     express.command(Snapshot.CreateSnapshotProposal()),
   );
 
+  // klavis oauth callback
+  router.get('/klavis/oauth-callback', (req, res) => {
+    const { instanceId } = req.query;
+    console.log('INSTANCE ID: ', instanceId);
+    res.redirect(config.KLAVIS.REDIRECT_URL!);
+  });
+
   return router;
 }
 
