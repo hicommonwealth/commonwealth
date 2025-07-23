@@ -20,4 +20,7 @@ if [ "$1" ]; then
 fi
 
 psql -h localhost -d commonwealth -U commonwealth -f "$DUMP_NAME";
-pnpm -F commonwealth cancel-all-local-contests
+
+# remove production noise
+pnpm cancel-active-contests
+
