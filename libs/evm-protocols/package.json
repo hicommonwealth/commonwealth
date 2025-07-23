@@ -16,6 +16,7 @@
   "scripts": {
     "build": "tsc -b ./tsconfig.build.json",
     "generate-event-schema": "tsx src/scripts/generateZodSchema.ts",
+    "generate-event-signatures": "tsx src/scripts/generateEventSignatures.ts",
     "verify-event-schema": "tsx src/scripts/verifySchemaUpToDate.ts",
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",

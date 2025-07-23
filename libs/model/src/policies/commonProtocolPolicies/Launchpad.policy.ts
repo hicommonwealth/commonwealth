@@ -40,7 +40,7 @@ async function findTokenHolderGroups(
   });
 }
 
-export function LaunchpadPolicy(): CommonProtocolEventHandlerType {
+export default function LaunchpadPolicy(): CommonProtocolEventHandlerType {
   return {
     'Launchpad.NewTokenCreated': async ({ payload }) => {
       await command(CreateToken(), {

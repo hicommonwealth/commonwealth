@@ -1,5 +1,6 @@
 export * from './ChainEventCreated.policy';
-export * from './commonProtocolPolicies/Launchpad.policy';
+export * from './commonProtocolPolicies/extractPolicyKeys';
+export { default as LaunchpadPolicy } from './commonProtocolPolicies/Launchpad.policy';
 export * from './CommunityGoals.policy';
 export * from './ContestWorker.policy';
 export * from './CreateUnverifiedUser.policy';

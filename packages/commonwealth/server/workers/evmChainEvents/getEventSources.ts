@@ -1,7 +1,7 @@
 import * as abis from '@commonxyz/common-protocol-abis';
 import { logger } from '@hicommonwealth/core';
 import { factoryContracts, isValidChain } from '@hicommonwealth/evm-protocols';
-import { buildChainNodeUrl } from '@hicommonwealth/model';
+import { buildChainNodeUrl, extractPolicyKeys } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import { ChildContractNames, Events } from '@hicommonwealth/schemas';
 import { Abi, getAbiItem, getAddress, toEventHash } from 'viem';
@@ -241,6 +241,8 @@ export async function getEventSources(): Promise<EvmSources> {
 
   const dbEvmSources = await models.EvmEventSource.findAll();
   const autogennedSources = cwProtocolSources();
+
+  const temp = extractPolicyKeys();
 
   for (const chainNode of chainNodes) {
     const ethChainId = chainNode.eth_chain_id!;
