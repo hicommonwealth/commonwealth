@@ -1,41 +1,32 @@
 /*
-
-  Cancels all contests locally
-
+  Cancels all active contests locally
 */
-
 import { config, logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model/db';
 import { exit } from 'process';
 import { Op } from 'sequelize';
+import { models } from '../src/database';
 
 const log = logger(import.meta);
 
-async function cancelAllLocalContests() {
+async function cancelActiveContests() {
   const { host } = models.sequelize.config;
   if (config.APP_ENV !== 'local' || host !== 'localhost') {
     throw new Error('script can only be run on localhost DB');
   }
   const activeContests = await models.ContestManager.update(
-    {
-      cancelled: true,
-    },
+    { cancelled: true },
     {
       where: {
-        cancelled: {
-          [Op.not]: true,
-        },
-        ended: {
-          [Op.not]: true,
-        },
+        cancelled: { [Op.not]: true },
+        ended: { [Op.not]: true },
       },
     },
   );
-  log.debug(`cancelled ${activeContests.length} active contests`);
+  log.debug(`Cancelled ${activeContests.length} active contests`);
   exit(0);
 }
 
-cancelAllLocalContests().catch((err) => {
+cancelActiveContests().catch((err) => {
   console.error(err);
   exit(1);
 });
