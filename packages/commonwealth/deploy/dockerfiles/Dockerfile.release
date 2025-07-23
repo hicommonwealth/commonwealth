@@ -1,5 +1,21 @@
 FROM commonwealth
+
 RUN apt-get update && apt-get install -y curl # Needed for heroku
+
+# Install pgroll binary with architecture detection
+ARG OS=linux
+RUN ARCH=$(case $(uname -m) in \
+        x86_64) echo "amd64" ;; \
+        aarch64|arm64) echo "arm64" ;; \
+        *) echo "amd64" ;; \
+    esac) && \
+    # Validate OS argument
+    case ${OS} in \
+        linux|macos) echo "Installing pgroll for ${OS}_${ARCH}" ;; \
+        *) echo "Error: OS must be either 'linux' or 'macos'" && exit 1 ;; \
+    esac && \
+    curl -L "https://github.com/xataio/pgroll/releases/download/v0.14.1/pgroll_0.14.1_${OS}_${ARCH}.tar.gz" | tar -xz -C /usr/local/bin/
+
 CMD SERVICE=web node --import=extensionless/register --enable-source-maps build/server/scripts/releasePhaseEnvCheck.js && \
   npx sequelize-cli db:migrate --config sequelize.json && \
   SERVICE=web node --import=extensionless/register --enable-source-maps build/server/scripts/purgeCloudflareCache.js

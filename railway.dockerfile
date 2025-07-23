@@ -19,6 +19,21 @@ RUN pnpm deploy -F commonwealth --prod /prod/commonwealth
 RUN mv /usr/src/app/packages/commonwealth/build /prod/commonwealth/build
 
 FROM base AS commonwealth
+
+# Install pgroll binary with architecture detection
+ARG OS=linux
+RUN ARCH=$(case $(uname -m) in \
+        x86_64) echo "amd64" ;; \
+        aarch64|arm64) echo "arm64" ;; \
+        *) echo "amd64" ;; \
+    esac) && \
+    # Validate OS argument
+    case ${OS} in \
+        linux|macos) echo "Installing pgroll for ${OS}_${ARCH}" ;; \
+        *) echo "Error: OS must be either 'linux' or 'macos'" && exit 1 ;; \
+    esac && \
+    curl -L "https://github.com/xataio/pgroll/releases/download/v0.14.1/pgroll_0.14.1_${OS}_${ARCH}.tar.gz" | tar -xz -C /usr/local/bin/
+
 ENV NODE_ENV=production
 COPY --from=build /prod/commonwealth /prod/commonwealth
 WORKDIR /prod/commonwealth
