@@ -4,8 +4,6 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      // TODO: check DOUBLE precision vs NUMERIC
-
       await queryInterface.createTable(
         'HistoricalAllocations',
         {
@@ -18,7 +16,7 @@ module.exports = {
             allowNull: false,
           },
           thread_score: {
-            type: Sequelize.DOUBLE,
+            type: Sequelize.DECIMAL,
             allowNull: false,
           },
           num_comments: {
@@ -26,7 +24,7 @@ module.exports = {
             allowNull: false,
           },
           comment_score: {
-            type: Sequelize.DOUBLE,
+            type: Sequelize.DECIMAL,
             allowNull: false,
           },
           num_reactions: {
@@ -34,23 +32,23 @@ module.exports = {
             allowNull: false,
           },
           reactions_score: {
-            type: Sequelize.DOUBLE,
+            type: Sequelize.DECIMAL,
             allowNull: false,
           },
           unadjusted_score: {
-            type: Sequelize.DOUBLE,
+            type: Sequelize.DECIMAL,
             allowNull: false,
           },
           adjusted_score: {
-            type: Sequelize.DOUBLE,
+            type: Sequelize.DECIMAL,
             allowNull: false,
           },
           percent_score: {
-            type: Sequelize.DOUBLE,
+            type: Sequelize.DECIMAL,
             allowNull: false,
           },
           token_allocation: {
-            type: Sequelize.DOUBLE,
+            type: Sequelize.DECIMAL,
             allowNull: false,
           },
         },
@@ -69,11 +67,11 @@ module.exports = {
             allowNull: false,
           },
           percent_allocation: {
-            type: Sequelize.DOUBLE,
+            type: Sequelize.DECIMAL,
             allowNull: false,
           },
           token_allocation: {
-            type: Sequelize.DOUBLE,
+            type: Sequelize.DECIMAL,
             allowNull: false,
           },
         },
