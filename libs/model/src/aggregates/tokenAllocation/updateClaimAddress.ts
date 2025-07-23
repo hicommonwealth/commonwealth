@@ -66,8 +66,6 @@ export function UpdateClaimAddress(): Command<
             replacements: {
               user_id: address.user_id,
               address: address.address,
-              created_at: new Date(),
-              updated_at: new Date(),
             },
           },
         );
