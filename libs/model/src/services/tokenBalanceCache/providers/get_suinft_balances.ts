@@ -47,6 +47,7 @@ export async function __get_suinft_balances(
 
             // Method 3: Check content for collection metadata
             if (obj.data.content && typeof obj.data.content === 'object') {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const content = obj.data.content as any;
 
               // Look for collection field in the content

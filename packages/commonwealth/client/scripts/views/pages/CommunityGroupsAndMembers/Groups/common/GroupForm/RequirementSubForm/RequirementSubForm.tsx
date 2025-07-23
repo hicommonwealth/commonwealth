@@ -188,6 +188,7 @@ const RequirementSubForm = ({
                 })}
                 onInput={(e) => {
                   onChange({
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     requirementContractAddress: (e.target as any).value,
                   });
                 }}
@@ -295,6 +296,7 @@ const RequirementSubForm = ({
               })}
               onInput={(e) => {
                 onChange({
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   requirementContractAddress: (e.target as any).value,
                 });
               }}
