@@ -22,5 +22,5 @@ fi
 psql -h localhost -d commonwealth -U commonwealth -f "$DUMP_NAME";
 
 # remove production noise
-tsx ./scripts/cancel-active-contests.ts
+pnpm cancel-active-contests
 
