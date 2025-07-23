@@ -1,6 +1,5 @@
 import { dispose } from '@hicommonwealth/core';
 import {
-  ChildContractNames,
   EvmEventSignatures,
   ValidChains,
   getBlockNumber,
@@ -484,7 +483,7 @@ describe('EVM Chain Events Devnet Tests', () => {
         created_at_block: namespaceDeployedBlock,
         events_migrated: false,
         // Unrelated to NamespaceFactory tests here but required for type
-        contract_name: ChildContractNames.SingleContest,
+        contract_name: 'Contests.SingleContestStarted',
         parent_contract_address: '',
       });
 
@@ -496,7 +495,7 @@ describe('EVM Chain Events Devnet Tests', () => {
         created_at_block: namespaceDeployedBlock,
         events_migrated: false,
         // Unrelated to NamespaceFactory tests here but required for type
-        contract_name: ChildContractNames.SingleContest,
+        contract_name: 'Contests.SingleContestStarted',
         parent_contract_address: '',
       });
 
@@ -634,7 +633,7 @@ describe('EVM Chain Events Devnet Tests', () => {
           created_at_block: namespaceDeployedBlock,
           events_migrated: false,
           // Unrelated to NamespaceFactory tests here but required for type
-          contract_name: ChildContractNames.SingleContest,
+          contract_name: 'Contests.SingleContestStarted',
           parent_contract_address: '',
         });
 
@@ -646,7 +645,7 @@ describe('EVM Chain Events Devnet Tests', () => {
           created_at_block: namespaceDeployedBlock,
           events_migrated: false,
           // Unrelated to NamespaceFactory tests here but required for type
-          contract_name: ChildContractNames.SingleContest,
+          contract_name: 'Contests.SingleContestStarted',
           parent_contract_address: '',
         });
 

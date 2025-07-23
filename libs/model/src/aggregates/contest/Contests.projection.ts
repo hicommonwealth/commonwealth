@@ -190,8 +190,8 @@ async function createInitialContest(
     }
 
     const childContractName = isOneOff
-      ? ChildContractNames.SingleContest
-      : ChildContractNames.RecurringContest;
+      ? 'Contests.SingleContestStarted'
+      : 'ContestGovernor.NewRecurringContestStarted';
 
     const sigs = isOneOff
       ? [

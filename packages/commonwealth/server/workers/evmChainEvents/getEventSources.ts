@@ -135,7 +135,7 @@ export type ChildContracts = {
 
 const childContracts: ChildContracts = {
   NamespaceFactoryAbi: {
-    [ChildContractNames.RecurringContest]: {
+    ['ContestGovernor.NewRecurringContestStarted']: {
       abi: abis.ContestGovernorAbi,
       eventSignatures: [
         toEventHash(
@@ -152,7 +152,7 @@ const childContracts: ChildContracts = {
         ),
       ],
     },
-    [ChildContractNames.SingleContest]: {
+    ['Contests.SingleContestStarted']: {
       abi: abis.ContestGovernorSingleAbi,
       eventSignatures: [
         toEventHash(
