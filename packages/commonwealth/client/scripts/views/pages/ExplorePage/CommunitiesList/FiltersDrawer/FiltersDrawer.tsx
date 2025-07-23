@@ -8,6 +8,7 @@ import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 
+import CWAccordion from 'client/scripts/views/components/CWAccordion';
 import { CommonFiltersDrawer } from 'client/scripts/views/components/CommonFiltersDrawer/CommonFiltersDrawer';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import './FiltersDrawer.scss';
@@ -110,12 +111,12 @@ export const FiltersDrawer = ({
       ...filters,
       withCommunitySortOrder: (sortOption === CommunitySortOptions.MostRecent
         ? Object.entries(sortOrderLabelsToDirectionsMap).find(
-            ([_, v]) => v === sortOrderLabelsToDirectionsMap.Descending,
-          )?.[0]
+          ([_, v]) => v === sortOrderLabelsToDirectionsMap.Descending,
+        )?.[0]
         : filters.withCommunitySortOrder ||
-          Object.entries(sortOrderLabelsToDirectionsMap).find(
-            ([_, v]) => v === sortOrderLabelsToDirectionsMap.Descending,
-          )?.[0]) as CommunitySortDirections,
+        Object.entries(sortOrderLabelsToDirectionsMap).find(
+          ([_, v]) => v === sortOrderLabelsToDirectionsMap.Descending,
+        )?.[0]) as CommunitySortDirections,
       withCommunitySortBy:
         filters.withCommunitySortBy === sortOption ? undefined : sortOption,
     });
@@ -188,69 +189,95 @@ export const FiltersDrawer = ({
               !hasAppliedFilters
             }
           />
+          <CWAccordion
+            header="Community Type"
+            content={
+              <div className="options-list">
+                {communityTypes.map((type) => (
+                  <CWRadioButton
+                    key={type}
+                    groupName="community-type"
+                    value={type}
+                    label={type}
+                    checked={filters.withCommunityType === type}
+                    onChange={() => onCommunityTypeChange(type)}
+                  />
+                ))}
+              </div>
+            }
+          />
+        </>
+      )}
+      <CWAccordion
+        header="Community Preferences"
+        content={
           <div className="options-list">
-            {communityTypes.map((type) => (
-              <CWRadioButton
-                key={type}
-                groupName="community-type"
-                value={type}
-                label={type}
-                checked={filters.withCommunityType === type}
-                onChange={() => onCommunityTypeChange(type)}
+            {(tags || []).map((t) => (
+              <CWCheckbox
+                key={t.id}
+                label={t.name}
+                checked={(filters.withTagsIds || []).includes(t.id!)}
+                onChange={() => onTagOptionChange(t.id!)}
               />
             ))}
           </div>
-        </>
-      )}
-      <div className="options-list">
-        {(tags || []).map((t) => (
-          <CWCheckbox
-            key={t.id}
-            label={t.name}
-            checked={(filters.withTagsIds || []).includes(t.id!)}
-            onChange={() => onTagOptionChange(t.id!)}
-          />
-        ))}
-      </div>
-      <div className="options-list">
-        {Object.keys(communityBases).map((base) => (
-          <CWRadioButton
-            key={base}
-            groupName="community-ecosystem"
-            value={base}
-            label={base}
-            checked={filters.withCommunityEcosystem === communityBases[base]}
-            onChange={(e) =>
-              e.target.checked &&
-              onCommunityEcosystemOptionChange(communityBases[base])
-            }
-          />
-        ))}
-        {launchpadEnabled &&
-          Object.keys(communityChains).map((chain) => (
-            <CWRadioButton
-              key={chain}
-              groupName="community-ecosystem"
-              value={chain}
-              label={chain}
-              checked={filters.withEcosystemChainId === communityChains[chain]}
-              onChange={(e) =>
-                e.target.checked &&
-                onCommunityEcosystemChainIdChange(communityChains[chain])
-              }
-            />
-          ))}
-      </div>
-      <div className="options-list">
-        {communityNetworks.map((network: ChainNetwork) => (
-          <CWCheckbox
-            key={network}
-            label={network}
-            checked={filters.withNetwork === network}
-            onChange={() => onChainNetworkFilterChange(network)}
-          />
-        ))}
-      </div>
+        }
+      />
+
+      <CWAccordion
+        header="Community Ecosystem"
+        content={
+          <div className="options-list">
+            {Object.keys(communityBases).map((base) => (
+              <CWRadioButton
+                key={base}
+                groupName="community-ecosystem"
+                value={base}
+                label={base}
+                checked={
+                  filters.withCommunityEcosystem === communityBases[base]
+                }
+                onChange={(e) =>
+                  e.target.checked &&
+                  onCommunityEcosystemOptionChange(communityBases[base])
+                }
+              />
+            ))}
+            {launchpadEnabled &&
+              Object.keys(communityChains).map((chain) => (
+                <CWRadioButton
+                  key={chain}
+                  groupName="community-ecosystem"
+                  value={chain}
+                  label={chain}
+                  checked={
+                    filters.withEcosystemChainId === communityChains[chain]
+                  }
+                  onChange={(e) =>
+                    e.target.checked &&
+                    onCommunityEcosystemChainIdChange(communityChains[chain])
+                  }
+                />
+              ))}
+          </div>
+        }
+      />
+
+      <CWAccordion
+        header="Community Network"
+        content={
+          <div className="options-list">
+            {communityNetworks.map((network: ChainNetwork) => (
+              <CWCheckbox
+                key={network}
+                label={network}
+                checked={filters.withNetwork === network}
+                onChange={() => onChainNetworkFilterChange(network)}
+              />
+            ))}
+          </div>
+        }
+      />
     </CommonFiltersDrawer>
   );
 };
