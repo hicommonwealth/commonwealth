@@ -1,3 +1,4 @@
+export * from './AwardXp.command';
 export * from './CreateChainNode.command';
 export * from './CreateCommunityGoalMeta.command';
 export * from './EnableDigestEmail';
