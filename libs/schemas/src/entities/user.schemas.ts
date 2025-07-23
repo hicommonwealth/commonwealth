@@ -95,7 +95,6 @@ export const Address = z.object({
   oauth_email_verified: z.boolean().nullish(),
   oauth_username: z.string().max(255).nullish(),
   oauth_phone_number: z.string().max(255).nullish(),
-  is_airdrop_claim_address: z.boolean().nullish(),
 
   User: User.optional().nullish(),
 

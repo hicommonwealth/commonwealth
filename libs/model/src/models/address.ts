@@ -82,7 +82,6 @@ export default (
       oauth_email_verified: { type: Sequelize.BOOLEAN, allowNull: true },
       oauth_username: { type: Sequelize.STRING, allowNull: true },
       oauth_phone_number: { type: Sequelize.STRING, allowNull: true },
-      is_airdrop_claim_address: { type: Sequelize.BOOLEAN, allowNull: true },
     },
     {
       timestamps: true,
