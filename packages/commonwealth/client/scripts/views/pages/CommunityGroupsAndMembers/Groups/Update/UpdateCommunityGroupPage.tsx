@@ -120,6 +120,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
               requirementContractAddress:
                 requirement.data.source.contract_address ||
                 requirement.data.source.object_id ||
+                requirement.data.source.collection_id ||
                 '',
               requirementCoinType: requirement.data.source.coin_type || '',
               // API doesn't return this, api internally uses the "more than" option, so we set it here explicitly

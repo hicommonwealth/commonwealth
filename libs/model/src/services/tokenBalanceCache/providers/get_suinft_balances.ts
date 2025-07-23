@@ -19,13 +19,85 @@ export async function __get_suinft_balances(
         let cursor: string | null | undefined = null;
         let count = 0;
         do {
+          // Get all owned objects for the address without filtering by struct type
+          // This allows us to implement custom collection detection logic
           const res = await client.getOwnedObjects({
             owner: address,
             cursor,
-            filter: { StructType: options.sourceOptions.collectionId },
-            options: { showType: true },
+            options: {
+              showType: true,
+              showContent: true,
+              showDisplay: true,
+            },
           });
-          count += res.data.length;
+
+          // Custom filtering logic for NFT collections
+          const validNFTs = res.data.filter((obj) => {
+            if (!obj.data) return false;
+
+            // Method 1: Check if the object type matches the collection ID exactly
+            if (obj.data.type === options.sourceOptions.collectionId) {
+              return true;
+            }
+
+            // Method 2: Check if the object type contains the collection ID as part of the struct
+            if (obj.data.type?.includes(options.sourceOptions.collectionId)) {
+              return true;
+            }
+
+            // Method 3: Check content for collection metadata
+            if (obj.data.content && typeof obj.data.content === 'object') {
+              const content = obj.data.content as any;
+
+              // Look for collection field in the content
+              if (
+                content.fields?.collection ===
+                options.sourceOptions.collectionId
+              ) {
+                return true;
+              }
+
+              // Look for collection_id field
+              if (
+                content.fields?.collection_id ===
+                options.sourceOptions.collectionId
+              ) {
+                return true;
+              }
+
+              // Look for collection in dataType moveObject
+              if (content.dataType === 'moveObject' && content.fields) {
+                // Check various common collection field names
+                const collectionFields = [
+                  'collection',
+                  'collection_id',
+                  'collection_name',
+                  'creator',
+                ];
+                for (const field of collectionFields) {
+                  if (
+                    content.fields[field] === options.sourceOptions.collectionId
+                  ) {
+                    return true;
+                  }
+                }
+              }
+            }
+
+            // Method 4: Check display metadata
+            if (obj.data.display?.data) {
+              const displayData = obj.data.display.data;
+              if (
+                displayData.collection === options.sourceOptions.collectionId
+              ) {
+                return true;
+              }
+            }
+
+            return false;
+          });
+
+          count += validNFTs.length;
           cursor = res.hasNextPage ? res.nextCursor : null;
         } while (cursor);
         balances[address] = count.toString();
