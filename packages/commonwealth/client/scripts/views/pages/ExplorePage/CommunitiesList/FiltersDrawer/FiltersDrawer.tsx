@@ -2,14 +2,14 @@ import { ChainBase, ChainNetwork, CommunityType } from '@hicommonwealth/shared';
 import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import { useFetchTagsQuery } from 'state/api/tags';
-import CWAccordion from 'views/components/CWAccordion';
+import { SortByFilter } from 'views/components/SortByFilter';
+import { SortOrderFilter } from 'views/components/SortOrderFilter';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWDrawer, {
-  CWDrawerTopBar,
-} from 'views/components/component_kit/new_designs/CWDrawer';
-import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+
+import { CommonFiltersDrawer } from 'client/scripts/views/components/CommonFiltersDrawer';
+import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import './FiltersDrawer.scss';
 import {
   communityBases,
@@ -24,6 +24,13 @@ import {
   CommunitySortOptions,
   FiltersDrawerProps,
 } from './types';
+
+const sortByOptions = Object.entries(communitySortOptionsLabelToKeysMap).map(
+  ([label, value]) => ({ label, value }),
+);
+const sortOrderOptions = Object.entries(sortOrderLabelsToDirectionsMap).map(
+  ([label, value]) => ({ label, value }),
+);
 
 export const FiltersDrawer = ({
   isOpen,
@@ -128,202 +135,122 @@ export const FiltersDrawer = ({
       : Object.values(filters).filter(Boolean).length > 0;
 
   return (
-    <div className="FiltersDrawer">
-      <CWDrawer
-        overlayOpacity={0}
-        className="filter-drawer"
-        open={isOpen}
-        onClose={() => onClose()}
-      >
-        <CWDrawerTopBar onClose={() => onClose()} />
-
-        <div className="content-container">
-          <CWText type="h3">Community Filters</CWText>
-          <div className="filter-content">
-            <div className="stake-filter">
-              <CWText type="h5" fontWeight="semiBold">
-                Has Member Stake
-              </CWText>
-              <CWToggle
-                size="small"
-                checked={filters.withStakeEnabled}
-                onChange={() => onStakeFilterChange()}
+    <CommonFiltersDrawer
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Community Filters"
+    >
+      <div className="stake-filter">
+        <CWText type="h5" fontWeight="semiBold">
+          Has Member Stake
+        </CWText>
+        <CWToggle
+          size="small"
+          checked={filters.withStakeEnabled}
+          onChange={onStakeFilterChange}
+        />
+      </div>
+      <div className="stake-filter">
+        <CWText type="h5" fontWeight="semiBold">
+          Has Launchpad Token
+        </CWText>
+        <CWToggle
+          size="small"
+          checked={filters.withLaunchpadToken}
+          onChange={onLaunchpadTokenFilterChange}
+        />
+      </div>
+      <div className="stake-filter">
+        <CWText type="h5" fontWeight="semiBold">
+          Has External Token
+        </CWText>
+        <CWToggle
+          size="small"
+          checked={filters.withPinnedToken}
+          onChange={onPinnedTokenFilterChange}
+        />
+      </div>
+      {launchpadEnabled && (
+        <>
+          <SortByFilter
+            options={sortByOptions}
+            selected={filters.withCommunitySortBy}
+            onChange={onCommunitySortOptionChange}
+            groupName="community-sort-option"
+          />
+          <SortOrderFilter
+            options={sortOrderOptions}
+            selected={filters.withCommunitySortOrder}
+            onChange={onCommunityOrderChange}
+            groupName="community-sort-direction"
+            disabled={
+              filters.withCommunitySortBy === CommunitySortOptions.MostRecent ||
+              !hasAppliedFilters
+            }
+          />
+          <div className="options-list">
+            {communityTypes.map((type) => (
+              <CWRadioButton
+                key={type}
+                groupName="community-type"
+                value={type}
+                label={type}
+                checked={filters.withCommunityType === type}
+                onChange={() => onCommunityTypeChange(type)}
               />
-            </div>
-
-            <div className="stake-filter">
-              <CWText type="h5" fontWeight="semiBold">
-                Has Launchpad Token
-              </CWText>
-              <CWToggle
-                size="small"
-                checked={filters.withLaunchpadToken}
-                onChange={() => onLaunchpadTokenFilterChange()}
-              />
-            </div>
-
-            <div className="stake-filter">
-              <CWText type="h5" fontWeight="semiBold">
-                Has External Token
-              </CWText>
-              <CWToggle
-                size="small"
-                checked={filters.withPinnedToken}
-                onChange={() => onPinnedTokenFilterChange()}
-              />
-            </div>
-
-            {launchpadEnabled && (
-              <>
-                <CWAccordion
-                  header="Sort By"
-                  content={
-                    <div className="options-list">
-                      {Object.entries(communitySortOptionsLabelToKeysMap).map(
-                        ([sortOption]) => (
-                          <CWRadioButton
-                            key={sortOption}
-                            groupName="community-sort-option"
-                            value={sortOption}
-                            label={sortOption}
-                            checked={filters.withCommunitySortBy === sortOption}
-                            onChange={() =>
-                              onCommunitySortOptionChange(
-                                sortOption as CommunitySortOptions,
-                              )
-                            }
-                          />
-                        ),
-                      )}
-                    </div>
-                  }
-                />
-
-                <CWAccordion
-                  header="Sort Order"
-                  content={
-                    <div className="options-list">
-                      {Object.entries(sortOrderLabelsToDirectionsMap).map(
-                        ([order]) => (
-                          <CWRadioButton
-                            key={order}
-                            groupName="community-sort-direction"
-                            value={order}
-                            label={order}
-                            checked={filters.withCommunitySortOrder === order}
-                            onChange={() =>
-                              onCommunityOrderChange(
-                                order as CommunitySortDirections,
-                              )
-                            }
-                            disabled={
-                              filters.withCommunitySortBy ===
-                                CommunitySortOptions.MostRecent ||
-                              !hasAppliedFilters
-                            }
-                          />
-                        ),
-                      )}
-                    </div>
-                  }
-                />
-
-                <CWAccordion
-                  header="Community Type"
-                  content={
-                    <div className="options-list">
-                      {communityTypes.map((type) => (
-                        <CWRadioButton
-                          key={type}
-                          groupName="community-type"
-                          value={type}
-                          label={type}
-                          checked={filters.withCommunityType === type}
-                          onChange={() => onCommunityTypeChange(type)}
-                        />
-                      ))}
-                    </div>
-                  }
-                />
-              </>
-            )}
-
-            <CWAccordion
-              header="Community Preferences"
-              content={
-                <div className="options-list">
-                  {(tags || []).map((t) => (
-                    <CWCheckbox
-                      key={t.id}
-                      label={t.name}
-                      checked={(filters.withTagsIds || []).includes(t.id!)}
-                      onChange={() => onTagOptionChange(t.id!)}
-                    />
-                  ))}
-                </div>
-              }
-            />
-
-            <CWAccordion
-              header="Community Ecosystem"
-              content={
-                <div className="options-list">
-                  {Object.keys(communityBases).map((base) => (
-                    <CWRadioButton
-                      key={base}
-                      groupName="community-ecosystem"
-                      value={base}
-                      label={base}
-                      checked={
-                        filters.withCommunityEcosystem === communityBases[base]
-                      }
-                      onChange={(e) =>
-                        e.target.checked &&
-                        onCommunityEcosystemOptionChange(communityBases[base])
-                      }
-                    />
-                  ))}
-                  {launchpadEnabled &&
-                    Object.keys(communityChains).map((chain) => (
-                      <CWRadioButton
-                        key={chain}
-                        groupName="community-ecosystem"
-                        value={chain}
-                        label={chain}
-                        checked={
-                          filters.withEcosystemChainId ===
-                          communityChains[chain]
-                        }
-                        onChange={(e) =>
-                          e.target.checked &&
-                          onCommunityEcosystemChainIdChange(
-                            communityChains[chain],
-                          )
-                        }
-                      />
-                    ))}
-                </div>
-              }
-            />
-
-            <CWAccordion
-              header="Community Network"
-              content={
-                <div className="options-list">
-                  {communityNetworks.map((network: ChainNetwork) => (
-                    <CWCheckbox
-                      key={network}
-                      label={network}
-                      checked={filters.withNetwork === network}
-                      onChange={() => onChainNetworkFilterChange(network)}
-                    />
-                  ))}
-                </div>
-              }
-            />
+            ))}
           </div>
-        </div>
-      </CWDrawer>
-    </div>
+        </>
+      )}
+      <div className="options-list">
+        {(tags || []).map((t) => (
+          <CWCheckbox
+            key={t.id}
+            label={t.name}
+            checked={(filters.withTagsIds || []).includes(t.id!)}
+            onChange={() => onTagOptionChange(t.id!)}
+          />
+        ))}
+      </div>
+      <div className="options-list">
+        {Object.keys(communityBases).map((base) => (
+          <CWRadioButton
+            key={base}
+            groupName="community-ecosystem"
+            value={base}
+            label={base}
+            checked={filters.withCommunityEcosystem === communityBases[base]}
+            onChange={(e) =>
+              e.target.checked &&
+              onCommunityEcosystemOptionChange(communityBases[base])
+            }
+          />
+        ))}
+        {launchpadEnabled &&
+          Object.keys(communityChains).map((chain) => (
+            <CWRadioButton
+              key={chain}
+              groupName="community-ecosystem"
+              value={chain}
+              label={chain}
+              checked={filters.withEcosystemChainId === communityChains[chain]}
+              onChange={(e) =>
+                e.target.checked &&
+                onCommunityEcosystemChainIdChange(communityChains[chain])
+              }
+            />
+          ))}
+      </div>
+      <div className="options-list">
+        {communityNetworks.map((network: ChainNetwork) => (
+          <CWCheckbox
+            key={network}
+            label={network}
+            checked={filters.withNetwork === network}
+            onChange={() => onChainNetworkFilterChange(network)}
+          />
+        ))}
+      </div>
+    </CommonFiltersDrawer>
   );
 };

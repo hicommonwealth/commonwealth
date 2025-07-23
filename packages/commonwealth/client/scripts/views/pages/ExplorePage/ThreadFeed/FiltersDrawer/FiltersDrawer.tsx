@@ -1,9 +1,7 @@
 import React from 'react';
 import useUserStore from 'state/ui/user';
+import { CommonFiltersDrawer } from 'views/components/CommonFiltersDrawer';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWDrawer, {
-  CWDrawerTopBar,
-} from 'views/components/component_kit/new_designs/CWDrawer';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import './FiltersDrawer.scss';
 
@@ -33,42 +31,32 @@ export const FiltersDrawer = ({
   const selected = communities.find((x) => x.value === filters.in_community_id);
 
   return (
-    <div className="FiltersDrawer">
-      <CWDrawer
-        overlayOpacity={0}
-        className="filter-drawer"
-        open={isOpen}
-        onClose={onClose}
-      >
-        <CWDrawerTopBar onClose={onClose} />
-
-        <div className="content-container">
-          <CWText type="h3">Thread Filters</CWText>
-          <div className="filter-content">
-            {user.id ? (
-              <CWSelectList
-                label="Community"
-                placeholder="Select a community"
-                options={communities}
-                {...(selected && {
-                  selected,
-                })}
-                onChange={(newValue) =>
-                  newValue &&
-                  onFiltersChange({
-                    ...filters,
-                    in_community_id: newValue.value,
-                  })
-                }
-              />
-            ) : (
-              <div className="login-message">
-                <CWText>Login to filter by community</CWText>
-              </div>
-            )}
-          </div>
+    <CommonFiltersDrawer
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Thread Filters"
+    >
+      {user.id ? (
+        <CWSelectList
+          label="Community"
+          placeholder="Select a community"
+          options={communities}
+          {...(selected && {
+            selected,
+          })}
+          onChange={(newValue) =>
+            newValue &&
+            onFiltersChange({
+              ...filters,
+              in_community_id: newValue.value,
+            })
+          }
+        />
+      ) : (
+        <div className="login-message">
+          <CWText>Login to filter by community</CWText>
         </div>
-      </CWDrawer>
-    </div>
+      )}
+    </CommonFiltersDrawer>
   );
 };

@@ -1,22 +1,27 @@
 import { useFlag } from 'hooks/useFlag';
 import React from 'react';
-import CWAccordion from 'views/components/CWAccordion';
+import { CommonFiltersDrawer } from 'views/components/CommonFiltersDrawer';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWDrawer, {
-  CWDrawerTopBar,
-} from 'views/components/component_kit/new_designs/CWDrawer';
-import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
-import './FiltersDrawer.scss';
+import { SortByFilter } from 'views/components/SortByFilter';
+import { SortOrderFilter } from 'views/components/SortOrderFilter';
 import {
   sortOrderLabelsToDirectionsMap,
   tokenSortOptionsLabelToKeysMap,
 } from './constants';
+import './FiltersDrawer.scss';
 import {
   FiltersDrawerProps,
   TokenSortDirections,
   TokenSortOptions,
 } from './types';
+
+const sortByOptions = Object.entries(tokenSortOptionsLabelToKeysMap).map(
+  ([label, value]) => ({ label, value }),
+);
+const sortOrderOptions = Object.entries(sortOrderLabelsToDirectionsMap).map(
+  ([label, value]) => ({ label, value }),
+);
 
 export const FiltersDrawer = ({
   isOpen,
@@ -63,88 +68,41 @@ export const FiltersDrawer = ({
       : Object.values(filters).filter(Boolean).length > 0;
 
   return (
-    <div className="FiltersDrawer">
-      <CWDrawer
-        overlayOpacity={0}
-        className="filter-drawer"
-        open={isOpen}
-        onClose={() => onClose()}
-      >
-        <CWDrawerTopBar onClose={() => onClose()} />
-
-        <div className="content-container">
-          <CWText type="h3">Token Filters</CWText>
-          <div className="filter-content">
-            <div className="graduated-filter">
-              <CWText type="h5" fontWeight="semiBold">
-                Graduated
-              </CWText>
-              <CWToggle
-                size="small"
-                checked={filters.isGraduated}
-                onChange={() => onIsGraduatedChange(!filters.isGraduated)}
-              />
-            </div>
-
-            {launchpadEnabled && (
-              <>
-                <CWAccordion
-                  header="Sort By"
-                  content={
-                    <div className="options-list">
-                      {Object.entries(tokenSortOptionsLabelToKeysMap).map(
-                        ([sortOption]) => (
-                          <CWRadioButton
-                            key={sortOption}
-                            groupName="token-sort-option"
-                            value={sortOption}
-                            label={sortOption}
-                            checked={filters.withTokenSortBy === sortOption}
-                            onChange={() =>
-                              onTokenSortOptionChange(
-                                sortOption as TokenSortOptions,
-                              )
-                            }
-                          />
-                        ),
-                      )}
-                    </div>
-                  }
-                />
-
-                <CWAccordion
-                  header="Sort Order"
-                  content={
-                    <div className="options-list">
-                      {Object.entries(sortOrderLabelsToDirectionsMap).map(
-                        ([order]) => (
-                          <CWRadioButton
-                            key={order}
-                            groupName="token-sort-direction"
-                            value={order}
-                            label={order}
-                            checked={filters.withTokenSortOrder === order}
-                            onChange={() =>
-                              onCommunityOrderChange(
-                                order as TokenSortDirections,
-                              )
-                            }
-                            disabled={
-                              filters.withTokenSortBy ===
-                                TokenSortOptions.MostRecent ||
-                              !hasAppliedFilters
-                            }
-                          />
-                        ),
-                      )}
-                    </div>
-                  }
-                />
-              </>
-            )}
-          </div>
-        </div>
-      </CWDrawer>
-    </div>
+    <CommonFiltersDrawer
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Token Filters"
+    >
+      <div className="graduated-filter">
+        <CWText type="h5" fontWeight="semiBold">
+          Graduated
+        </CWText>
+        <CWToggle
+          size="small"
+          checked={filters.isGraduated}
+          onChange={() => onIsGraduatedChange(!filters.isGraduated)}
+        />
+      </div>
+      {launchpadEnabled && (
+        <>
+          <SortByFilter
+            options={sortByOptions}
+            selected={filters.withTokenSortBy}
+            onChange={onTokenSortOptionChange}
+            groupName="token-sort-option"
+          />
+          <SortOrderFilter
+            options={sortOrderOptions}
+            selected={filters.withTokenSortOrder}
+            onChange={onCommunityOrderChange}
+            groupName="token-sort-direction"
+            disabled={
+              filters.withTokenSortBy === TokenSortOptions.MostRecent ||
+              !hasAppliedFilters
+            }
+          />
+        </>
+      )}
+    </CommonFiltersDrawer>
   );
 };
