@@ -1,5 +1,6 @@
-/* eslint-disable no-case-declarations, n/no-process-exit, max-len */
+/* eslint-disable no-warning-comments, no-case-declarations, n/no-process-exit, max-len */
 
+import { dispose } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model/db';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -379,80 +380,86 @@ async function getHistoricalTokenAllocations(
 ): Promise<Array<HistoricalAllocation>> {
   return await models.sequelize.query<HistoricalAllocation>(
     `
-    INSERT INTO "HistoricalAllocations"
-    WITH users AS (SELECT U.id as user_id, U.created_at
-                   FROM "Users" U),
-         addresses AS (SELECT U.user_id as user_id, A.id as address_id, A.address
-                       FROM users U
-                              JOIN "Addresses" A on U.user_id = A.user_id),
-         threads AS (SELECT T.id as thread_id, T.created_at as thread_created_at, A.user_id as user_id
-                     FROM "Threads" T
-                            JOIN addresses A ON T.address_id = A.address_id
-                     WHERE T.created_at < :historicalEndDate ${
-                       config.noVietnamese
-                         ? `AND NOT (T.body ~ '[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]')`
-                         : ''
-                     } ${config.minLength ? `AND LENGTH(T.body) >= ${config.minLength}` : ''}),
-         comments AS (SELECT C.id as comment_id, C.created_at as comment_created_at, A.user_id as user_id
-                      FROM "Comments" C
-                             JOIN addresses A ON C.address_id = A.address_id
-                      WHERE C.created_at < :historicalEndDate ${
-                        config.noVietnamese
-                          ? `AND NOT (C.body ~ '[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]')`
-                          : ''
-                      } ${config.minLength ? `AND LENGTH(C.body) >= ${config.minLength}` : ''}),
-         reactions AS (SELECT R.id                           as reaction_id,
-                              R.created_at                   as reaction_created_at,
-                              COALESCE(T.user_id, C.user_id) as user_id
-                       FROM "Reactions" R
-                              LEFT JOIN threads T ON T.thread_id = R.thread_id
-                              LEFT JOIN comments C ON C.comment_id = R.comment_id
-                       WHERE R.created_at < :historicalEndDate
-                         AND (T.user_id IS NOT NULL OR C.user_id IS NOT NULL)),
-         thread_scores AS (SELECT T.user_id,
-                                  SUM(exp(
-                                        (ln(2) / 365) *
-                                        EXTRACT(EPOCH FROM (:historicalEndDate::timestamptz - T.thread_created_at)) / 86400
-                                      ) * ${config.threadWeight}) as score,
-                                  COUNT(*)   as num_threads
-                           FROM threads T
-                           GROUP BY T.user_id),
-         comment_scores AS (SELECT C.user_id,
-                                   SUM(exp(
-                                         (ln(2) / 365) *
-                                         EXTRACT(EPOCH FROM (:historicalEndDate::timestamptz - C.comment_created_at)) / 86400
-                                       ) * ${config.commentWeight}) as score,
-                                   COUNT(*)   as num_comments
-                            FROM comments C
-                            GROUP BY C.user_id),
-         reaction_scores AS (SELECT R.user_id,
+      INSERT INTO "HistoricalAllocations"
+      WITH users AS (SELECT U.id as user_id, U.created_at
+                     FROM "Users" U),
+           addresses AS (SELECT U.user_id as user_id, A.id as address_id, A.address
+                         FROM users U
+                                JOIN "Addresses" A on U.user_id = A.user_id),
+           threads AS (SELECT T.id as thread_id, T.created_at as thread_created_at, A.user_id as user_id
+                       FROM "Threads" T
+                              JOIN addresses A ON T.address_id = A.address_id
+                       WHERE T.created_at < :historicalEndDate ${
+                         config.noVietnamese
+                           ? `AND NOT (T.body ~ '[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]')`
+                           : ''
+                       } ${config.minLength ? `AND LENGTH(T.body) >= ${config.minLength}` : ''}),
+           comments AS (SELECT C.id as comment_id, C.created_at as comment_created_at, A.user_id as user_id
+                        FROM "Comments" C
+                               JOIN addresses A ON C.address_id = A.address_id
+                        WHERE C.created_at < :historicalEndDate ${
+                          config.noVietnamese
+                            ? `AND NOT (C.body ~ '[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]')`
+                            : ''
+                        } ${config.minLength ? `AND LENGTH(C.body) >= ${config.minLength}` : ''}),
+           reactions AS (SELECT R.id                           as reaction_id,
+                                R.created_at                   as reaction_created_at,
+                                COALESCE(T.user_id, C.user_id) as user_id
+                         FROM "Reactions" R
+                                LEFT JOIN threads T ON T.thread_id = R.thread_id
+                                LEFT JOIN comments C ON C.comment_id = R.comment_id
+                         WHERE R.created_at < :historicalEndDate
+                           AND (T.user_id IS NOT NULL OR C.user_id IS NOT NULL)),
+           thread_scores AS (SELECT T.user_id,
                                     SUM(exp(
                                           (ln(2) / 365) *
-                                          EXTRACT(EPOCH FROM (:historicalEndDate::timestamptz - R.reaction_created_at)) / 86400
-                                        ) * ${config.reactionWeight}) as score,
-                                    COUNT(*)   as num_reactions
-                             FROM reactions R
-                             GROUP BY R.user_id),
-        final_scores as (SELECT U.user_id                                                                   as user_id,
-          COALESCE(TS.num_threads, 0)                                                 as num_threads,
-          COALESCE(TS.score, 0)                                                       as thread_score,
-          COALESCE(CS.num_comments, 0)                                                as num_comments,
-          COALESCE(CS.score, 0)                                                       as comment_score,
-          COALESCE(RS.num_reactions, 0)                                               as num_reactions,
-          COALESCE(RS.score, 0)                                                       as reaction_score,
-          COALESCE(TS.score, 0) + COALESCE(CS.score, 0) + COALESCE(RS.score, 0)       as unadjusted_score,
-          sqrt((COALESCE(TS.score, 0) + COALESCE(CS.score, 0) + COALESCE(RS.score, 0))::NUMERIC) as adjusted_score
-          FROM users U
-          LEFT JOIN thread_scores TS ON TS.user_id = U.user_id
-          LEFT JOIN comment_scores CS ON CS.user_id = U.user_id
-          LEFT JOIN reaction_scores RS ON RS.user_id = U.user_id
-        )
-    SELECT *,
-          (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) * 100 as percent_allocation,
-          (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) * ${(config.supplyPercent / 2) * totalSupply}::NUMERIC as token_allocation
-    FROM final_scores
-    ORDER BY ${config.historicalOrder} NULLS LAST;
-  `,
+                                          EXTRACT(EPOCH FROM (:historicalEndDate::timestamptz - T.thread_created_at)) /
+                                          86400
+                                        ) * ${config.threadWeight}) as score,
+                                    COUNT(*)                        as num_threads
+                             FROM threads T
+                             GROUP BY T.user_id),
+           comment_scores AS (SELECT C.user_id,
+                                     SUM(exp(
+                                           (ln(2) / 365) *
+                                           EXTRACT(EPOCH FROM
+                                                   (:historicalEndDate::timestamptz - C.comment_created_at)) / 86400
+                                         ) * ${config.commentWeight}) as score,
+                                     COUNT(*)                         as num_comments
+                              FROM comments C
+                              GROUP BY C.user_id),
+           reaction_scores AS (SELECT R.user_id,
+                                      SUM(exp(
+                                            (ln(2) / 365) *
+                                            EXTRACT(EPOCH FROM
+                                                    (:historicalEndDate::timestamptz - R.reaction_created_at)) / 86400
+                                          ) * ${config.reactionWeight}) as score,
+                                      COUNT(*)                          as num_reactions
+                               FROM reactions R
+                               GROUP BY R.user_id),
+           final_scores as (SELECT U.user_id                              as user_id,
+                                   COALESCE(TS.num_threads, 0)            as num_threads,
+                                   COALESCE(TS.score, 0)                  as thread_score,
+                                   COALESCE(CS.num_comments, 0)           as num_comments,
+                                   COALESCE(CS.score, 0)                  as comment_score,
+                                   COALESCE(RS.num_reactions, 0)          as num_reactions,
+                                   COALESCE(RS.score, 0)                  as reaction_score,
+                                   COALESCE(TS.score, 0) + COALESCE(CS.score, 0) +
+                                   COALESCE(RS.score, 0)                  as unadjusted_score,
+                                   sqrt((COALESCE(TS.score, 0) + COALESCE(CS.score, 0) +
+                                         COALESCE(RS.score, 0))::NUMERIC) as adjusted_score
+                            FROM users U
+                                   LEFT JOIN thread_scores TS ON TS.user_id = U.user_id
+                                   LEFT JOIN comment_scores CS ON CS.user_id = U.user_id
+                                   LEFT JOIN reaction_scores RS ON RS.user_id = U.user_id)
+      SELECT *,
+             (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) *
+             100                                                  as percent_allocation,
+             (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) *
+             ${(config.supplyPercent / 2) * totalSupply}::NUMERIC as token_allocation
+      FROM final_scores
+      ORDER BY ${config.historicalOrder} NULLS LAST;
+    `,
     {
       replacements: {
         historicalEndDate: config.historicalEndDate,
@@ -468,29 +475,30 @@ async function getAuraTokenAllocations(
   return await models.sequelize.query<AuraAllocation>(
     `
       INSERT INTO "AuraAllocations"
-      WITH xp_sum AS (
-        SELECT SUM(xp_points) + SUM(creator_xp_points) as total_xp_awarded
-        FROM "XpLogs"
-        WHERE :historicalEndDate < created_at AND created_at < :auraEndDate
-      ), user_xp AS (
-        SELECT
-          user_id,
-          SUM(xp_points) as xp_points
-        FROM "XpLogs"
-        WHERE :historicalEndDate < created_at AND created_at < :auraEndDate
-        GROUP BY user_id
-      ), creator_xp AS (
-        SELECT
-          creator_user_id,
-          SUM(creator_xp_points) as creator_xp_points
-        FROM "XpLogs"
-        WHERE :historicalEndDate < created_at AND created_at < :auraEndDate
-        GROUP BY creator_user_id
-      ) SELECT
-          U.id as user_id,
-          COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0) as total_xp,
-          (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC / (SELECT total_xp_awarded FROM xp_sum) * 100 as percent_allocation,
-          (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC / (SELECT total_xp_awarded FROM xp_sum) * ${(config.supplyPercent / 2) * totalSupply}::NUMERIC as token_allocation
+      WITH xp_sum AS (SELECT SUM(xp_points) + SUM(creator_xp_points) as total_xp_awarded
+                      FROM "XpLogs"
+                      WHERE :historicalEndDate < created_at
+                        AND created_at < :auraEndDate),
+           user_xp AS (SELECT user_id,
+                              SUM(xp_points) as xp_points
+                       FROM "XpLogs"
+                       WHERE :historicalEndDate < created_at
+                         AND created_at < :auraEndDate
+                       GROUP BY user_id),
+           creator_xp AS (SELECT creator_user_id,
+                                 SUM(creator_xp_points) as creator_xp_points
+                          FROM "XpLogs"
+                          WHERE :historicalEndDate < created_at
+                            AND created_at < :auraEndDate
+                          GROUP BY creator_user_id)
+      SELECT U.id                                                          as user_id,
+             COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0) as total_xp,
+             (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC /
+             (SELECT total_xp_awarded FROM xp_sum) *
+             100                                                           as percent_allocation,
+             (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC /
+             (SELECT total_xp_awarded FROM xp_sum) *
+             ${(config.supplyPercent / 2) * totalSupply}::NUMERIC          as token_allocation
       FROM "Users" U
              LEFT JOIN user_xp UX ON UX.user_id = U.id
              LEFT JOIN creator_xp CX ON CX.creator_user_id = U.id
@@ -508,34 +516,30 @@ async function getAuraTokenAllocations(
 
 async function setClaimableAddresses() {
   await models.sequelize.query(`
-    WITH max_last_active AS (
-      SELECT
-        A.user_id,
-        MAX(A.last_active) as max_last_active
-      FROM "Addresses" A
-             JOIN "Communities" C ON C.id = A.community_id
-      WHERE C.network = 'ethereum'
-        AND C.base = 'ethereum'
-        AND A.address LIKE '0x%'
-        AND LENGTH(A.address) = 42
-      GROUP BY A.user_id
-    ),
-         max_addresses AS (
-           SELECT
-             A.address,
-             A.user_id
-           FROM "Addresses" A
-                  JOIN max_last_active MLA ON A.user_id = MLA.user_id
-           WHERE A.last_active = MLA.max_last_active
-         )
+    WITH max_last_active AS (SELECT A.user_id,
+                                    MAX(A.last_active) as max_last_active
+                             FROM "Addresses" A
+                                    JOIN "Communities" C ON C.id = A.community_id
+                             WHERE C.network = 'ethereum'
+                               AND C.base = 'ethereum'
+                               AND A.address LIKE '0x%'
+                               AND LENGTH(A.address) = 42
+                             GROUP BY A.user_id),
+         max_addresses AS (SELECT A.address,
+                                  A.user_id
+                           FROM "Addresses" A
+                                  JOIN max_last_active MLA ON A.user_id = MLA.user_id
+                           WHERE A.last_active = MLA.max_last_active)
 
-    INSERT INTO "ClaimAddresses" (user_id, address, created_at, updated_at)
-    SELECT user_id, address, NOW() as created_at, NOW() as updated_at FROM max_addresses;
+    INSERT
+    INTO "ClaimAddresses" (user_id, address, created_at, updated_at)
+    SELECT user_id, address, NOW() as created_at, NOW() as updated_at
+    FROM max_addresses;
   `);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function writeScoresToCSV<T extends Record<string, any>>(
+function writeScoresToCSV<T extends Record<string, unknown>>(
   scores: Array<T>,
   outputPath: string,
 ) {
@@ -620,4 +624,13 @@ async function main() {
   }
 }
 
-main();
+main()
+  .then(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    dispose()('EXIT', true);
+  })
+  .catch((err) => {
+    console.error(err);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    dispose()('ERROR', true);
+  });
