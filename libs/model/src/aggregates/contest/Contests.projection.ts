@@ -1,9 +1,6 @@
-import {
-  ContestGovernorAbi,
-  ContestGovernorSingleAbi,
-} from '@commonxyz/common-protocol-abis';
 import { InvalidState, Projection, logger } from '@hicommonwealth/core';
 import {
+  EvmEventSignatures,
   calculateVoteWeight,
   getContestScore,
   getContestStatus,
@@ -13,11 +10,7 @@ import {
   isValidChain,
   mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
-import {
-  ChildContractNames,
-  TopicWeightedVoting,
-  events,
-} from '@hicommonwealth/schemas';
+import { TopicWeightedVoting, events } from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
   LP_CONTEST_MANAGER_ADDRESS_ANVIL,
@@ -29,7 +22,6 @@ import {
   getDefaultContestImage,
 } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
-import { getAbiItem, toEventHash } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { z } from 'zod';
 import { config } from '../../config';
@@ -203,44 +195,14 @@ async function createInitialContest(
 
     const sigs = isOneOff
       ? [
-          toEventHash(
-            getAbiItem({
-              abi: ContestGovernorSingleAbi,
-              name: 'ContentAdded',
-            })!,
-          ),
-          toEventHash(
-            getAbiItem({
-              abi: ContestGovernorSingleAbi,
-              name: 'NewSingleContestStarted',
-            })!,
-          ),
-          toEventHash(
-            getAbiItem({
-              abi: ContestGovernorSingleAbi,
-              name: 'VoterVoted',
-            })!,
-          ),
+          EvmEventSignatures['ContestGovernorSingle.ContentAdded'],
+          EvmEventSignatures['ContestGovernorSingle.NewSingleContestStarted'],
+          EvmEventSignatures['ContestGovernorSingle.VoterVoted'],
         ]
       : [
-          toEventHash(
-            getAbiItem({
-              abi: ContestGovernorAbi,
-              name: 'ContentAdded',
-            })!,
-          ),
-          toEventHash(
-            getAbiItem({
-              abi: ContestGovernorAbi,
-              name: 'NewRecurringContestStarted',
-            })!,
-          ),
-          toEventHash(
-            getAbiItem({
-              abi: ContestGovernorAbi,
-              name: 'VoterVoted',
-            })!,
-          ),
+          EvmEventSignatures['ContestGovernor.ContentAdded'],
+          EvmEventSignatures['ContestGovernor.NewRecurringContestStarted'],
+          EvmEventSignatures['ContestGovernor.VoterVoted'],
         ];
     const sourcesToCreate: EvmEventSourceAttributes[] = sigs.map(
       (eventSignature) => {

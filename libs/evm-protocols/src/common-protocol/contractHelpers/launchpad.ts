@@ -1,8 +1,5 @@
-import {
-  LPBondingCurveAbi,
-  NamespaceFactoryAbi,
-} from '@commonxyz/common-protocol-abis';
-import { createPublicClient, http, parseEventLogs } from 'viem';
+import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
+import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
 import { createPrivateEvmClient, getTransaction, withRetries } from '../utils';
 import { getErc20TokenInfo } from './tokens';
@@ -203,62 +200,78 @@ export async function getLaunchpadTokenCreatedTransaction({
   transactionHash,
 }: {
   rpc: string;
-  transactionHash: `0x${string}`;
+  transactionHash: string;
 }) {
-  const client = createPublicClient({
-    transport: http(rpc),
-  });
+  const web3 = new Web3(rpc);
 
-  const txReceipt = await client.getTransactionReceipt({
-    hash: transactionHash,
-  });
+  const txReceipt = await web3.eth.getTransactionReceipt(transactionHash);
   if (!txReceipt) {
     return;
   }
 
-  const block = await client.getBlock({ blockHash: txReceipt.blockHash! });
+  const block = await web3.eth.getBlock(txReceipt.blockHash.toString());
 
-  const namespaceEvents = parseEventLogs({
-    abi: NamespaceFactoryAbi,
-    eventName: 'DeployedNamespace',
-    logs: txReceipt.logs,
+  const deployedNamespaceLog = txReceipt.logs.find((l) => {
+    if (l.topics && l.topics.length > 0) {
+      return (
+        l.topics[0].toString() ===
+        EvmEventSignatures['NamespaceFactory.NamespaceDeployed']
+      );
+    }
+    return false;
   });
-
-  if (namespaceEvents.length === 0) {
+  if (!deployedNamespaceLog) {
     return;
   }
-
-  const { nameSpaceAddress: namespace } = namespaceEvents[0].args;
-
-  if (!namespace) {
-    return;
-  }
-
-  const tokenEvents = parseEventLogs({
-    abi: LPBondingCurveAbi,
-    eventName: 'TokenRegistered',
-    logs: txReceipt.logs,
-  });
-
   const {
-    token: tokenAddress,
-    curveId,
-    totalSupply,
-    launchpadLiquidity,
-    reserveRatio,
-    initialPurchaseEthAmount,
-  } = tokenEvents[0].args;
+    0: namespace,
+    // 1: feeManager,
+    // 2: signature,
+    // 3: namespaceDeployer,
+    // 3: nameSpaceAddress,
+  } = web3.eth.abi.decodeParameters(
+    ['string', 'address', 'bytes', 'address', 'address'],
+    deployedNamespaceLog.data!.toString(),
+  );
+
+  const tokenRegisteredLog = txReceipt.logs.find((l) => {
+    if (l.topics && l.topics.length > 0) {
+      return (
+        l.topics[0].toString() ===
+        EvmEventSignatures['Launchpad.TokenRegistered']
+      );
+    }
+    return false;
+  });
+  if (!tokenRegisteredLog) {
+    return;
+  }
+  const {
+    0: curveId,
+    1: totalSupply,
+    2: launchpadLiquidity,
+    3: reserveRatio,
+    4: initialPurchaseEthAmount,
+  } = web3.eth.abi.decodeParameters(
+    ['uint256', 'uint256', 'uint256', 'uint256', 'uint256'],
+    tokenRegisteredLog.data!.toString(),
+  );
+  const tokenAddress = web3.eth.abi.decodeParameter(
+    'address',
+    tokenRegisteredLog.topics![1].toString(),
+  );
+
   return {
     txReceipt,
     block,
     parsedArgs: {
-      namespace,
-      tokenAddress,
-      curveId,
-      totalSupply,
-      launchpadLiquidity,
-      reserveRatio,
-      initialPurchaseEthAmount,
+      namespace: namespace as string,
+      tokenAddress: tokenAddress as string,
+      curveId: curveId as bigint,
+      totalSupply: totalSupply as bigint,
+      launchpadLiquidity: launchpadLiquidity as bigint,
+      reserveRation: reserveRatio as bigint,
+      initialPurchaseEthAmount: initialPurchaseEthAmount as bigint,
     },
   };
 }
@@ -268,7 +281,7 @@ type LaunchpadTokenOnChainData = {
   poolLiquidity: bigint;
   curveId: bigint;
   scalar: bigint;
-  reserveRatio: bigint;
+  reserveRation: bigint;
   LPhook: string;
   funded: boolean;
 };
@@ -331,7 +344,7 @@ export async function getLaunchpadTokenDetails({
   transactionHash,
 }: {
   rpc: string;
-  transactionHash: `0x${string}`;
+  transactionHash: string;
 }): Promise<{
   name: string;
   symbol: string;
@@ -381,7 +394,7 @@ export async function getLaunchpadTokenDetails({
     curve_id: tokenData.parsedArgs.curveId.toString(),
     total_supply: tokenData.parsedArgs.totalSupply.toString(),
     launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity.toString(),
-    reserve_ration: tokenData.parsedArgs.reserveRatio.toString(),
+    reserve_ration: tokenData.parsedArgs.reserveRation.toString(),
     initial_purchase_eth_amount:
       tokenData.parsedArgs.initialPurchaseEthAmount.toString(),
   };
