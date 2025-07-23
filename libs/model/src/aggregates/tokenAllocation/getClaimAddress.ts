@@ -11,7 +11,7 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
     body: async ({ actor }) => {
       const claimAddress = await models.sequelize.query<{
         user_id: number;
-        address: string;
+        address: `0x${string}`;
       }>(
         `
           SELECT user_id, address
@@ -40,8 +40,12 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
         },
       });
 
-      if (address) return address;
-      else return claimAddress;
+      if (address)
+        return {
+          address: address.address as `0x${string}`,
+          user_id: address.user_id!,
+        };
+      else return claimAddress[0];
     },
   };
 }
