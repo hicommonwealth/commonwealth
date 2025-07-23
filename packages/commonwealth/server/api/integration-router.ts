@@ -1,6 +1,13 @@
 import { express } from '@hicommonwealth/adapters';
-import { AppError } from '@hicommonwealth/core';
-import { ChainEvents, Contest, Snapshot, config } from '@hicommonwealth/model';
+import { AppError, command } from '@hicommonwealth/core';
+import {
+  ChainEvents,
+  Contest,
+  MCP,
+  Snapshot,
+  config,
+} from '@hicommonwealth/model';
+import { systemActor } from '@hicommonwealth/model/middleware';
 import { Router, raw } from 'express';
 import farcasterRouter from 'server/farcaster/router';
 import { validateFarcasterAction } from 'server/middleware/validateFarcasterAction';
@@ -78,10 +85,18 @@ function build() {
   );
 
   // klavis oauth callback
-  router.get('/klavis/oauth-callback', (req, res) => {
-    const { instanceId } = req.query;
-    console.log('INSTANCE ID: ', instanceId);
-    res.redirect(config.KLAVIS.REDIRECT_URL!);
+  router.get('/klavis/oauth-callback', async (req, res) => {
+    const { instanceId, original_url } = req.query;
+    if (typeof instanceId !== 'string' || !instanceId.length) {
+      throw new AppError('Instance ID is required', 500);
+    }
+    await command(MCP.KlavisOAuthCallback(), {
+      actor: systemActor({}),
+      payload: {
+        instanceId: instanceId as string,
+      },
+    });
+    res.redirect(original_url as string);
   });
 
   return router;

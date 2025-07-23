@@ -19,6 +19,27 @@ export default (sequelize: Sequelize.Sequelize): MCPServerModelStatic =>
       handle: { type: Sequelize.STRING, allowNull: false },
       server_url: { type: Sequelize.STRING, allowNull: false },
       source: { type: Sequelize.STRING, allowNull: false },
+      source_identifier: { type: Sequelize.STRING, allowNull: false },
+      private_community_id: { type: Sequelize.STRING, allowNull: true },
+      tools: {
+        type: Sequelize.JSON,
+        allowNull: false,
+        defaultValue: [],
+      },
+      auth_required: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      auth_completed: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      auth_user_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
     },
@@ -30,9 +51,9 @@ export default (sequelize: Sequelize.Sequelize): MCPServerModelStatic =>
       underscored: true,
       indexes: [
         {
-          fields: ['name'],
+          fields: ['source', 'source_identifier'],
           unique: true,
-          name: 'MCPServers_name_unique',
+          name: 'MCPServers_source_source_identifier_unique',
         },
       ],
     },

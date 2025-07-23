@@ -96,9 +96,6 @@ const {
   UNLEASH_FRONTEND_API_TOKEN,
   CONTEST_DURATION_IN_SEC,
   KLAVIS_API_KEY,
-  GOOGLE_SHEETS_CLIENT_ID,
-  GOOGLE_SHEETS_CLIENT_SECRET,
-  KLAVIS_REDIRECT_URL,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -324,11 +321,6 @@ export const config = configure(
     },
     KLAVIS: {
       API_KEY: KLAVIS_API_KEY,
-      REDIRECT_URL: KLAVIS_REDIRECT_URL,
-      GOOGLE_SHEETS: {
-        CLIENT_ID: GOOGLE_SHEETS_CLIENT_ID,
-        CLIENT_SECRET: GOOGLE_SHEETS_CLIENT_SECRET,
-      },
     },
   },
   z.object({
@@ -724,11 +716,6 @@ export const config = configure(
     }),
     KLAVIS: z.object({
       API_KEY: z.string().optional(),
-      REDIRECT_URL: z.string().optional(),
-      GOOGLE_SHEETS: z.object({
-        CLIENT_ID: z.string().optional(),
-        CLIENT_SECRET: z.string().optional(),
-      }),
     }),
   }),
 );

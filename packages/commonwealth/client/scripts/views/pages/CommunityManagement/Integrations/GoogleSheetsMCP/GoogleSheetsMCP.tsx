@@ -1,5 +1,6 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
+import app from 'state';
 import { trpc } from 'utils/trpcClient';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -7,6 +8,13 @@ import './GoogleSheetsMCP.scss';
 
 const GoogleSheetsMCP = () => {
   const [isConnecting, setIsConnecting] = useState(false);
+  const communityId = app.activeChainId() || '';
+
+  const { data: mcpServers = [], isLoading } =
+    trpc.mcp.getPrivateCommunityMCPServers.useQuery(
+      { community_id: communityId },
+      { enabled: !!communityId },
+    );
 
   const createKlavisMCPInstanceMutation =
     trpc.mcp.createKlavisMCPInstance.useMutation({
@@ -26,13 +34,25 @@ const GoogleSheetsMCP = () => {
     setIsConnecting(true);
     try {
       await createKlavisMCPInstanceMutation.mutateAsync({
+        community_id: communityId,
         serverType: 'Google Sheets' as const,
+        original_url: window.location.href,
       });
     } catch (error) {
       // Error is handled by onError callback
       console.error('Connection error:', error);
     }
   };
+
+  // Check if there are any connected Google Sheets MCP servers
+  const googleSheetServer = mcpServers.find(
+    (server) => server.name === 'Google Sheets' && server.auth_completed,
+  );
+  const connectionStatus = isLoading
+    ? 'Loading...'
+    : googleSheetServer
+      ? 'Connected'
+      : 'Not connected';
 
   return (
     <section className="GoogleSheetsMCP">
@@ -46,18 +66,16 @@ const GoogleSheetsMCP = () => {
       </div>
 
       <div className="connection-section">
-        <CWText type="caption">Status: Not connected</CWText>
+        <CWText type="caption">Status: {connectionStatus}</CWText>
 
         <CWButton
           buttonType="primary"
           label="Connect Google Sheets MCP"
-          disabled={isConnecting}
+          disabled={isConnecting || !!googleSheetServer}
           onClick={handleConnect}
         />
 
-        {isConnecting && (
-          <CWText type="caption">Creating MCP instance...</CWText>
-        )}
+        {isConnecting && <CWText type="caption">Redirecting to auth...</CWText>}
       </div>
     </section>
   );

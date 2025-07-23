@@ -1,24 +1,25 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { getBaseUrl } from '@hicommonwealth/shared';
 import axios from 'axios';
 import { KlavisClient } from 'klavis';
 import { config } from '../../config';
+import { models } from '../../database';
+import { authRoles, mustExist } from '../../middleware';
 
 export function CreateKlavisMCPInstance(): Command<
   typeof schemas.CreateKlavisMCPInstance
 > {
   return {
     ...schemas.CreateKlavisMCPInstance,
-    auth: [],
+    auth: [authRoles('admin')],
     body: async ({ actor, payload }) => {
-      const { serverType } = payload;
+      const { community_id, serverType, original_url } = payload;
 
-      // Ensure user is authenticated
       if (!actor.user?.id) {
         throw new Error('User must be authenticated');
       }
 
-      // Ensure API key is configured
       if (!config.KLAVIS.API_KEY) {
         throw new Error('KLAVIS_API_KEY not configured');
       }
@@ -31,14 +32,37 @@ export function CreateKlavisMCPInstance(): Command<
         const instance = await klavis.mcpServer.createServerInstance({
           serverName: serverType,
           userId: actor.user.id.toString(),
-          platformName: 'Common',
+          platformName: `common_${config.APP_ENV}`,
         });
+        mustExist('Instance', instance);
+
+        const baseUrl = getBaseUrl(config.APP_ENV);
 
         const { oauthUrl } = await klavis.mcpServer.getOAuthUrl({
           serverName: serverType,
           instanceId: instance.instanceId,
-          redirectUrl: `${config.KLAVIS.REDIRECT_URL}/api/integration/klavis/oauth-callback?instanceId=${instance.instanceId}`,
+          redirectUrl: `${baseUrl}/api/integration/klavis/oauth-callback?instanceId=${instance.instanceId}&original_url=${original_url}`,
         });
+
+        switch (serverType) {
+          case 'Google Sheets':
+            await models.MCPServer.create({
+              name: serverType,
+              description: serverType,
+              handle: 'google_sheets',
+              source: 'klavis',
+              source_identifier: instance.instanceId,
+              server_url: instance.serverUrl,
+              tools: [],
+              private_community_id: community_id,
+              auth_required: true,
+              auth_completed: false,
+              auth_user_id: actor.user.id,
+            });
+            break;
+          default:
+            throw new Error(`Unsupported server type: ${serverType}`);
+        }
 
         return {
           serverUrl: instance.serverUrl,
