@@ -1,6 +1,6 @@
+import { CommonFiltersDrawer } from 'client/scripts/views/components/CommonFiltersDrawer/CommonFiltersDrawer';
 import moment from 'moment';
 import React from 'react';
-import { CommonFiltersDrawer } from 'views/components/CommonFiltersDrawer';
 import CWDateTimeInput from 'views/components/component_kit/CWDateTimeInput';
 import './FiltersDrawer.scss';
 import { FiltersDrawerProps } from './types';

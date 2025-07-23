@@ -1,10 +1,10 @@
 import { useFlag } from 'hooks/useFlag';
 import React from 'react';
-import { CommonFiltersDrawer } from 'views/components/CommonFiltersDrawer';
+import { CommonFiltersDrawer } from 'views/components/CommonFiltersDrawer/CommonFiltersDrawer';
+import { SortByFilter } from 'views/components/CommonFiltersDrawer/SortByFilter';
+import { SortOrderFilter } from 'views/components/CommonFiltersDrawer/SortOrderFilter';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
-import { SortByFilter } from 'views/components/SortByFilter';
-import { SortOrderFilter } from 'views/components/SortOrderFilter';
 import {
   sortOrderLabelsToDirectionsMap,
   tokenSortOptionsLabelToKeysMap,

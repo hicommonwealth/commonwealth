@@ -1,6 +1,6 @@
 import React from 'react';
 import useUserStore from 'state/ui/user';
-import { CommonFiltersDrawer } from 'views/components/CommonFiltersDrawer';
+import { CommonFiltersDrawer } from 'views/components/CommonFiltersDrawer/CommonFiltersDrawer';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import './FiltersDrawer.scss';

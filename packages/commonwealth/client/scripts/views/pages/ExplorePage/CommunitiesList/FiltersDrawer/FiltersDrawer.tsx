@@ -1,14 +1,14 @@
 import { ChainBase, ChainNetwork, CommunityType } from '@hicommonwealth/shared';
+import { SortByFilter } from 'client/scripts/views/components/CommonFiltersDrawer/SortByFilter';
+import { SortOrderFilter } from 'client/scripts/views/components/CommonFiltersDrawer/SortOrderFilter';
 import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import { useFetchTagsQuery } from 'state/api/tags';
-import { SortByFilter } from 'views/components/SortByFilter';
-import { SortOrderFilter } from 'views/components/SortOrderFilter';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 
-import { CommonFiltersDrawer } from 'client/scripts/views/components/CommonFiltersDrawer';
+import { CommonFiltersDrawer } from 'client/scripts/views/components/CommonFiltersDrawer/CommonFiltersDrawer';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import './FiltersDrawer.scss';
 import {
