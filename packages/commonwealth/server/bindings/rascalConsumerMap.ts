@@ -89,6 +89,7 @@ const _ReactionWorker = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
+  LaunchpadPolicy,
   ChainEventPolicy,
   DiscordBotPolicy,
   Contest.Contests,
@@ -99,7 +100,6 @@ export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   CreateUnverifiedUser,
   TwitterEngagementPolicy,
   CommunityGoalsPolicy,
-  LaunchpadPolicy,
   _ContestWorker,
   _FarcasterWorker,
   _Xp,

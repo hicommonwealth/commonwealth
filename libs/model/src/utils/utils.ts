@@ -1,6 +1,5 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
 import { isEvmAddress } from '@hicommonwealth/evm-protocols';
-import { EventPairs } from '@hicommonwealth/schemas';
 import {
   getThreadUrl,
   safeTruncateBody,
@@ -43,10 +42,10 @@ export function hashAbi(abi: AbiType): string {
  */
 export async function emitEvent(
   outbox: ModelStatic<Model<OutboxAttributes>>,
-  values: Array<EventPairs>,
+  values,
   transaction?: Transaction | null,
 ) {
-  const records: Array<EventPairs> = [];
+  const records = [];
   for (const event of values) {
     if (!config.OUTBOX.BLACKLISTED_EVENTS.includes(event.event_name)) {
       records.push(event);
@@ -64,7 +63,11 @@ export async function emitEvent(
   }
 
   if (records.length > 0) {
-    await outbox.bulkCreate(values, { transaction });
+    try {
+      await outbox.bulkCreate(values, { transaction });
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
 

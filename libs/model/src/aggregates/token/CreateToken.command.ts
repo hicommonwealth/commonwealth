@@ -40,7 +40,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
         initial_purchase_eth_amount,
       } = await protocols.getLaunchpadTokenDetails({
         rpc: chainNode.private_url! || chainNode.url!,
-        transactionHash: transaction_hash,
+        transactionHash: transaction_hash as `0x${string}`,
       });
 
       return models.sequelize.transaction(async (transaction) => {

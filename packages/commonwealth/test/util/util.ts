@@ -3,7 +3,6 @@ import {
   NamespaceFactoryAbi,
 } from '@commonxyz/common-protocol-abis';
 import {
-  ChildContractNames,
   EvmEventSignatures,
   getFactoryContract,
   ValidChains,
@@ -24,8 +23,8 @@ export async function createContestEventSources(
     {
       eth_chain_id: ethChainId,
       contract_address: singleContestContractAddress,
-      event_signature: EvmEventSignatures.Contests.SingleContestStarted,
-      contract_name: ChildContractNames.SingleContest,
+      event_signature: EvmEventSignatures['Contests.SingleContestStarted'],
+      contract_name: 'Contests.SingleContestStarted',
       parent_contract_address: getFactoryContract(ValidChains.SepoliaBase)
         .NamespaceFactory,
       created_at_block: 1,
@@ -34,8 +33,9 @@ export async function createContestEventSources(
     {
       eth_chain_id: ethChainId,
       contract_address: recurringContestContractAddress,
-      event_signature: EvmEventSignatures.Contests.RecurringContestStarted,
-      contract_name: ChildContractNames.RecurringContest,
+      event_signature:
+        EvmEventSignatures['ContestGovernor.NewRecurringContestStarted'],
+      contract_name: 'ContestGovernor.NewRecurringContestStarted',
       parent_contract_address: getFactoryContract(ValidChains.SepoliaBase)
         .NamespaceFactory,
       created_at_block: 1,
@@ -59,7 +59,7 @@ export const singleEventSource = {
         sources: [
           {
             eth_chain_id: ValidChains.SepoliaBase,
-            event_signature: EvmEventSignatures.CommunityStake.Trade,
+            event_signature: EvmEventSignatures['CommunityStake.Trade'],
             contract_address: getFactoryContract(
               ValidChains.SepoliaBase,
             ).CommunityStake.toLowerCase(),
@@ -74,7 +74,7 @@ export const singleEventSource = {
           {
             eth_chain_id: ValidChains.SepoliaBase,
             event_signature:
-              EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+              EvmEventSignatures['NamespaceFactory.NamespaceDeployed'],
             contract_address: getFactoryContract(
               ValidChains.SepoliaBase,
             ).NamespaceFactory.toLowerCase(),
@@ -96,7 +96,7 @@ export const multipleEventSource = {
         sources: [
           {
             eth_chain_id: ValidChains.Base,
-            event_signature: EvmEventSignatures.CommunityStake.Trade,
+            event_signature: EvmEventSignatures['CommunityStake.Trade'],
             contract_address: getFactoryContract(
               ValidChains.Base,
             ).CommunityStake.toLowerCase(),
@@ -109,7 +109,7 @@ export const multipleEventSource = {
           {
             eth_chain_id: ValidChains.Base,
             event_signature:
-              EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+              EvmEventSignatures['NamespaceFactory.NamespaceDeployed'],
             contract_address: getFactoryContract(
               ValidChains.Base,
             ).NamespaceFactory.toLowerCase(),

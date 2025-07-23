@@ -36,7 +36,6 @@
     "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",
     "generate-oas": "pnpm ts-exec server/scripts/generate-external-api-oas.ts",
     "list-neynar-webhooks": "tsx ./scripts/list-neynar-webhooks.ts",
-    "list-event-sigs": "tsx ./scripts/list-event-sigs.ts",
     "lint-diff-canary": "cp test/canary/eslint_canary.ts.disabled test/canary/eslint_canary.ts && (NODE_OPTIONS='--max-old-space-size=16384' eslint --cache -c ../../.eslintrc-diff.cjs test/canary/eslint_canary.ts | tail +2; true) > test/canary/eslint_canary.log ; diff -w -u test/canary/eslint_canary.log test/canary/eslint_canary.snap",
     "migrate-db-to-neon": "chmod u+x scripts/migrate-db-to-neon.sh && ./scripts/migrate-db-to-neon.sh",
     "pre-deploy": "node --import=extensionless/register --enable-source-maps ./build/server/scripts/pre-deploy.js",

@@ -6,18 +6,18 @@ import {
   NamespaceFactoryAbi,
 } from '@commonxyz/common-protocol-abis';
 import {
-  decodeLog,
   EvmEventSignatures,
-  getFactoryContract,
+  decodeLog,
+  factoryContracts,
 } from '@hicommonwealth/evm-protocols';
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import {
   Chain,
-  getContract,
   HttpTransport,
   PublicClient,
   TransactionReceipt,
+  getContract,
 } from 'viem';
 import {
   EvmProtocolChain,
@@ -325,7 +325,7 @@ export const addContent = async (
   }
 
   const contentAddedEvent = txReceipt.logs.find(
-    (l) => l.topics[0] === EvmEventSignatures.Contests.ContentAdded,
+    (l) => l.topics[0] === EvmEventSignatures['ContestGovernor.ContentAdded'],,
   );
 
   if (!contentAddedEvent) {
@@ -554,7 +554,7 @@ export const deployERC20Contest = async ({
     });
 
     const { request } = await client.simulateContract({
-      address: getFactoryContract(chain.eth_chain_id).NamespaceFactory,
+      address: factoryContracts[chain.eth_chain_id].factory,
       abi: NamespaceFactoryAbi,
       functionName: 'newSingleERC20Contest',
       args: [
@@ -574,7 +574,7 @@ export const deployERC20Contest = async ({
     const eventLog = txReceipt.logs.find(
       (log) =>
         log.topics[0] ==
-        EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
+        EvmEventSignatures['NamespaceFactory.ContestManagerDeployed'],
     );
     if (!eventLog || !eventLog.data) throw new Error('Contest not deployed');
 
@@ -607,7 +607,7 @@ export const deployNamespace = async (
   }
 
   const { request } = await client.simulateContract({
-    address: getFactoryContract(chain.eth_chain_id).NamespaceFactory,
+    address: factoryContracts[chain.eth_chain_id].factory,
     abi: NamespaceFactoryAbi,
     functionName: 'deployNamespace',
     ...(await client.estimateFeesPerGas()),

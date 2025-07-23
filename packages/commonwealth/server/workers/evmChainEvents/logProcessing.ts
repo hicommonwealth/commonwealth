@@ -1,15 +1,19 @@
 import { logger as _logger, stats } from '@hicommonwealth/core';
+import { ChainEventBase } from '@hicommonwealth/evm-protocols';
 import {
-  type EvmBlockDetails,
-  type EvmChainSource,
-  type EvmContractSources,
-  type EvmEvent,
-  type Log,
-  chainEventMappers,
-} from '@hicommonwealth/model/services';
-import { EventPairs } from '@hicommonwealth/schemas';
-import { createPublicClient, getAddress, http } from 'viem';
+  createPublicClient,
+  decodeEventLog,
+  getAddress,
+  http,
+  Log,
+} from 'viem';
+import { z } from 'zod';
 import { config } from '../../config';
+import {
+  EvmChainSource,
+  EvmContractSources,
+  EvmEventMeta,
+} from './getEventSources';
 
 const ALCHEMY_BLOCK_LIMIT = 9_000;
 
@@ -33,9 +37,8 @@ export async function getLogs({
   startingBlockNum: number;
   endingBlockNum: number;
 }): Promise<{
-  logs: Log[];
+  logs: (Log & { blockTimestamp: string })[];
   lastBlockNum: number;
-  blockDetails: Record<number, EvmBlockDetails>;
 }> {
   let startBlock = startingBlockNum;
   let endBlock = endingBlockNum;
@@ -48,12 +51,12 @@ export async function getLogs({
         endBlock,
       },
     );
-    return { logs: [], lastBlockNum: endBlock, blockDetails: {} };
+    return { logs: [], lastBlockNum: endBlock };
   }
 
   if (contractAddresses.length === 0) {
     logger.error(`No contracts given`);
-    return { logs: [], lastBlockNum: endBlock, blockDetails: {} };
+    return { logs: [], lastBlockNum: endBlock };
   }
 
   // Limit the number of blocks to fetch to avoid rate limiting on some public EVM nodes like Celo
@@ -90,41 +93,27 @@ export async function getLogs({
     toBlock: BigInt(endBlock),
   })) as Log[];
 
-  const blockNumbers = [...new Set(logs.map((l) => l.blockNumber))];
-  const blockDetails = await Promise.all(
-    blockNumbers.map(async (blockNumber) => {
-      const block = await client.getBlock({
-        blockNumber: blockNumber,
-      });
-      return {
-        number: block.number,
-        hash: block.hash,
-        logsBloom: block.logsBloom,
-        parentHash: block.parentHash,
-        miner: block.miner,
-        nonce: block.nonce ? block.nonce.toString() : undefined,
-        timestamp: block.timestamp,
-        gasLimit: block.gasLimit,
-      };
-    }),
-  );
-
   return {
     logs,
     lastBlockNum: endBlock,
-    blockDetails: blockDetails.reduce((map, details) => {
-      map[String(details.number)] = details;
-      return map;
-    }, {}),
   };
 }
 
+export type EvmEventPayload = {
+  event_name: string;
+  args: unknown;
+  eth_chain_id: number;
+  event_signature: string;
+  raw_log: Log;
+  block: unknown;
+  meta: EvmEventMeta;
+};
+
 export async function parseLogs(
   sources: EvmContractSources,
-  logs: Log[],
-  blockDetails: Record<number, EvmBlockDetails>,
-): Promise<Array<EventPairs>> {
-  const events: Array<EventPairs> = [];
+  logs: (Log & { blockTimestamp: string })[],
+) {
+  const events: z.infer<typeof ChainEventBase> = [];
 
   for (const log of logs) {
     const address = getAddress(log.address);
@@ -138,38 +127,27 @@ export async function parseLogs(
       continue;
     }
 
-    const evmEventSource = evmEventSources.find(
+    const evmEventSource = evmEventSources.event_sources.find(
       (s) => s.event_signature === log.topics[0],
     );
     if (!evmEventSource) continue;
 
-    const eventMapper = evmEventSource.meta.event_name
-      ? chainEventMappers[evmEventSource.meta.event_name]
-      : chainEventMappers[evmEventSource.event_signature];
-    if (!eventMapper) {
-      logger.error('Missing event mapper', undefined, {
-        eventSignature: evmEventSource.event_signature,
-        contractAddress: address,
-      });
-      continue;
-    }
+    const decoded = decodeEventLog({
+      abi: evmEventSources.abi,
+      eventName: evmEventSource.event_name,
+      topics: log.topics,
+      data: log.data,
+    });
 
-    const evmEvent: EvmEvent = {
-      eventSource: {
-        ethChainId: evmEventSource.eth_chain_id,
-        eventSignature: evmEventSource.event_signature,
-      },
-      rawLog: log,
-      block: blockDetails[String(log.blockNumber)],
-      meta: evmEventSource.meta,
-    };
-    try {
-      events.push(eventMapper(evmEvent) as EventPairs);
-    } catch (e) {
-      const msg = `Failed to map log from contract ${address} with signature ${log.topics[0]}`;
-      logger.error(msg, e, evmEvent);
-      continue;
-    }
+    events.push({
+      parsedArgs: decoded.args,
+      eth_chain_id: evmEventSources.eth_chain_id,
+      event_name: `${evmEventSources.contract_name}.${decoded.eventName}`,
+      block_number: log.blockNumber,
+      block_timestamp: parseInt(log.blockTimestamp, 16),
+      contract_address: log.address,
+      transaction_hash: log.transactionHash,
+    });
     stats().increment('ce.evm.event', {
       contractAddress: address,
     });
@@ -182,8 +160,8 @@ export async function getEvents(
   evmSource: EvmChainSource,
   startingBlockNum: number,
   endingBlockNum: number,
-): Promise<{ events: Array<EventPairs>; lastBlockNum: number }> {
-  const { logs, lastBlockNum, blockDetails } = await getLogs({
+): Promise<{ events; lastBlockNum: number }> {
+  const { logs, lastBlockNum } = await getLogs({
     rpc: evmSource.rpc,
     maxBlockRange: evmSource.maxBlockRange,
     contractAddresses: Object.keys(evmSource.contracts),
@@ -191,7 +169,7 @@ export async function getEvents(
     endingBlockNum,
   });
 
-  const events = await parseLogs(evmSource.contracts, logs, blockDetails);
+  const events = await parseLogs(evmSource.contracts, logs);
   return {
     events,
     lastBlockNum,
@@ -210,19 +188,19 @@ export async function migrateEvents(
   endingBlockNum: number,
 ): Promise<
   | {
-      events: Array<EventPairs>;
+      events;
       lastBlockNum: number;
       contracts: EvmContractSources;
     }
   | { contracts: EvmContractSources }
 > {
   let oldestBlock: number | undefined;
-  const contracts: EvmContractSources = {};
+  const contracts = {};
   for (const [contractAddress, evmEventSource] of Object.entries(
     evmSource.contracts,
   )) {
-    for (const source of evmEventSource) {
-      if (source.meta.events_migrated === false) {
+    for (const source of evmEventSource.event_sources) {
+      if (!source.meta.events_migrated) {
         if (!contracts[contractAddress]) {
           contracts[contractAddress] = [];
         }
