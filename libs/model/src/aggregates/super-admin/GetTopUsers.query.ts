@@ -29,7 +29,7 @@ export function GetTopUsers(): Query<typeof schemas.GetTopUsers> {
       LEFT JOIN "Threads" AS t ON a.id = t.address_id
       LEFT JOIN "Comments" AS c ON a.id = c.address_id
     WHERE u."isAdmin" = FALSE
-    GROUP BY u.id
+    GROUP BY u.profile->>'name', u.id
     ORDER BY total_activity DESC
     LIMIT 150
   )

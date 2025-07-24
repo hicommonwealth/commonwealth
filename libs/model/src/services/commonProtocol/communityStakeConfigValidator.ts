@@ -1,7 +1,7 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   checkCommunityStakeWhitelist,
-  commonProtocol,
+  ValidChains,
 } from '@hicommonwealth/evm-protocols';
 import { models } from '../../database';
 import { CommunityAttributes } from '../../models/community';
@@ -31,7 +31,7 @@ export const validateCommunityStakeConfig = async (
   if (
     !chainNode.eth_chain_id ||
     !chainNode.private_url ||
-    !Object.values(commonProtocol.ValidChains).includes(chainNode.eth_chain_id)
+    !Object.values(ValidChains).includes(chainNode.eth_chain_id)
   ) {
     throw new AppError(`Community Stakes not available on ${chainNode.name}`);
   }

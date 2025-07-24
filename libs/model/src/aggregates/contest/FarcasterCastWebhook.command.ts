@@ -1,8 +1,8 @@
 import { logger, type Command } from '@hicommonwealth/core';
-import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { z } from 'zod';
+import { config } from '../../config';
 import { models } from '../../database';
 import { emitEvent, publishCast } from '../../utils';
 

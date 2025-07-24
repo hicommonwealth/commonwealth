@@ -1,10 +1,11 @@
 import { type Command } from '@hicommonwealth/core';
 import {
   EvmEventSignatures,
-  commonProtocol as cp,
+  factoryContracts,
+  ValidChains,
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import { Hmac, createHmac } from 'crypto';
+import { createHmac, Hmac } from 'crypto';
 import { config } from '../../config';
 import { models } from '../../database';
 import { equalEvmAddresses } from '../../utils';
@@ -98,14 +99,14 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
           anyAddressEqual(
             [
               // Namespace/Contest factory contract events
-              cp.factoryContracts[cp.ValidChains.Base].factory,
-              cp.factoryContracts[cp.ValidChains.SepoliaBase].factory,
-              cp.factoryContracts[cp.ValidChains.Sepolia].factory,
+              factoryContracts[ValidChains.Base].factory,
+              factoryContracts[ValidChains.SepoliaBase].factory,
+              factoryContracts[ValidChains.Sepolia].factory,
 
               // CommunityStake contract events
-              cp.factoryContracts[cp.ValidChains.Base].communityStake,
-              cp.factoryContracts[cp.ValidChains.SepoliaBase].communityStake,
-              cp.factoryContracts[cp.ValidChains.Sepolia].communityStake,
+              factoryContracts[ValidChains.Base].communityStake,
+              factoryContracts[ValidChains.SepoliaBase].communityStake,
+              factoryContracts[ValidChains.Sepolia].communityStake,
             ],
             contractAddress,
           )

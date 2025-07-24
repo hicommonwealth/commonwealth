@@ -1,6 +1,6 @@
+import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
 
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import CommunityNominations from 'helpers/ContractHelpers/CommunityNominations';
 
 export interface NominateJudgesProps {
@@ -20,8 +20,7 @@ const nominateJudges = async ({
   ethChainId,
   chainRpc,
 }: NominateJudgesProps) => {
-  const contractAddress =
-    commonProtocol.factoryContracts[ethChainId]?.communityNomination;
+  const contractAddress = factoryContracts[ethChainId]?.communityNomination;
 
   if (!contractAddress) {
     throw new Error(`Contract address not found for chain ID ${ethChainId}`);

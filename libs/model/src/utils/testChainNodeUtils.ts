@@ -1,41 +1,41 @@
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { BalanceType } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { ChainNodeInstance } from '../models';
 import { buildChainNodeUrl } from './utils';
 
 export function createTestRpc(
-  ethChainId: cp.ValidChains,
+  ethChainId: ValidChains,
   scope: 'private' | 'public' = 'public',
 ): string {
   switch (ethChainId) {
-    case cp.ValidChains.Arbitrum:
+    case ValidChains.Arbitrum:
       return buildChainNodeUrl('https://arb-mainnet.g.alchemy.com/v2/', scope);
-    case cp.ValidChains.Mainnet:
+    case ValidChains.Mainnet:
       return buildChainNodeUrl('https://eth-mainnet.g.alchemy.com/v2/', scope);
-    case cp.ValidChains.Optimism:
+    case ValidChains.Optimism:
       return buildChainNodeUrl('https://opt-mainnet.g.alchemy.com/v2/', scope);
-    case cp.ValidChains.Linea:
+    case ValidChains.Linea:
       return buildChainNodeUrl(
         'https://linea-mainnet.g.alchemy.com/v2/',
         scope,
       );
-    case cp.ValidChains.Blast:
+    case ValidChains.Blast:
       return buildChainNodeUrl(
         'https://blast-mainnet.g.alchemy.com/v2/',
         scope,
       );
-    case cp.ValidChains.Sepolia:
+    case ValidChains.Sepolia:
       return buildChainNodeUrl('https://eth-sepolia.g.alchemy.com/v2/', scope);
-    case cp.ValidChains.SepoliaBase:
+    case ValidChains.SepoliaBase:
       return buildChainNodeUrl('https://base-sepolia.g.alchemy.com/v2/', scope);
-    case cp.ValidChains.Base:
+    case ValidChains.Base:
       return buildChainNodeUrl('https://base-mainnet.g.alchemy.com/v2/', scope);
-    case cp.ValidChains.BSC:
+    case ValidChains.BSC:
       return buildChainNodeUrl('https://bnb-mainnet.g.alchemy.com/v2/', scope);
-    case cp.ValidChains.SKALE_TEST:
+    case ValidChains.SKALE_TEST:
       return 'https://testnet.skalenodes.com/v1/giant-half-dual-testnet';
-    case cp.ValidChains.Anvil:
+    case ValidChains.Anvil:
       return 'http://localhost:5502';
     default:
       throw new Error(`Eth chain id ${ethChainId} not supported`);
@@ -44,7 +44,7 @@ export function createTestRpc(
 
 export async function createEventRegistryChainNodes() {
   const promises: Array<Promise<[ChainNodeInstance, boolean]>> = [];
-  for (const ethChainId of Object.values(cp.ValidChains)) {
+  for (const ethChainId of Object.values(ValidChains)) {
     if (typeof ethChainId === 'number') {
       promises.push(
         models.ChainNode.findOrCreate({

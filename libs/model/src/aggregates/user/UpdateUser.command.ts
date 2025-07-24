@@ -103,17 +103,24 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
               if (updates.profile.bio === '') {
                 updates.profile.bio = null;
               }
-              const existingUsername = await models.User.findOne({
-                where: {
-                  id: { [Op.ne]: id },
-                  profile: {
-                    name: updates?.profile?.name,
+
+              if (
+                updates?.profile?.name &&
+                updates?.profile?.name !== 'Anonymous'
+              ) {
+                const existingUsername = await models.User.findOne({
+                  where: {
+                    id: { [Op.ne]: id },
+                    profile: {
+                      name: updates?.profile?.name,
+                    },
                   },
-                },
-              });
-              if (existingUsername) {
-                throw new InvalidState('Username already exists');
+                });
+                if (existingUsername) {
+                  throw new InvalidState('Username already exists');
+                }
               }
+
               const [, rows] = await models.User.update(updates, {
                 where: { id: user.id },
                 returning: true,

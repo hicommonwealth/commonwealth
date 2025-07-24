@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
 import app from 'state';
 import { trpc } from 'utils/trpcClient';
@@ -24,7 +24,7 @@ const configureNominations = async ({
   ethChainId,
   chainRpc,
 }: ConfigureNominationsProps) => {
-  const factoryAddress = commonProtocol.factoryContracts[ethChainId]?.factory;
+  const factoryAddress = factoryContracts[ethChainId]?.factory;
   const namespaceFactory = new NamespaceFactory(factoryAddress, chainRpc);
 
   const txReceipt = await namespaceFactory.configureNominations(

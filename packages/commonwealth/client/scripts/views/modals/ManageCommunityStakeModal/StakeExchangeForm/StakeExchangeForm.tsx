@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { calculateVoteWeight, STAKE_ID } from '@hicommonwealth/evm-protocols';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
@@ -117,7 +117,7 @@ const StakeExchangeForm = ({
   const { mutateAsync: sellStake } = useSellStakeMutation();
   const { linkSpecificAddressToSpecificCommunity } = useJoinCommunity();
 
-  const expectedVoteWeight = commonProtocol.calculateVoteWeight(
+  const expectedVoteWeight = calculateVoteWeight(
     numberOfStakeToExchange ? String(numberOfStakeToExchange) : '0',
     stakeData?.stake?.vote_weight,
   );
@@ -144,7 +144,7 @@ const StakeExchangeForm = ({
 
       const txReceipt = await buyStake({
         amount: numberOfStakeToExchange,
-        stakeId: commonProtocol.STAKE_ID,
+        stakeId: STAKE_ID,
         namespace: stakeData!.stake!.Community!.namespace!,
         chainRpc,
         walletAddress: selectedAddress?.value,
@@ -200,7 +200,7 @@ const StakeExchangeForm = ({
 
       const txReceipt = await sellStake({
         amount: numberOfStakeToExchange,
-        stakeId: commonProtocol.STAKE_ID,
+        stakeId: STAKE_ID,
         namespace: stakeData!.stake!.Community!.namespace!,
         chainRpc,
         walletAddress: selectedAddress?.value,

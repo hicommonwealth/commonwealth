@@ -12,7 +12,10 @@ import useCreateCommunityMutation, {
   buildCreateCommunityInput,
 } from 'state/api/communities/createCommunity';
 import { generateImage } from 'state/api/general/generateImage';
-import { useLaunchTokenMutation } from 'state/api/launchPad';
+import {
+  useEstimateGasQuery,
+  useLaunchTokenMutation,
+} from 'state/api/launchPad';
 import { useCreateTokenMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import PageCounter from 'views/components/PageCounter';
@@ -24,6 +27,7 @@ import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import TokenLaunchButton from 'views/components/sidebar/TokenLaunchButton';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { fromWei } from 'web3-utils';
 import useCreateTokenCommunity from '../useCreateTokenCommunity';
 import './QuickTokenLaunchForm.scss';
 import SuccessStep from './steps/SuccessStep';
@@ -128,6 +132,14 @@ export const QuickTokenLaunchForm = ({
   } = useCreateTokenCommunity();
 
   const { mutateAsync: launchToken } = useLaunchTokenMutation();
+  const { data: estimatedPrice } = useEstimateGasQuery({
+    chainRpc: baseNode?.url || '',
+    ethChainId: baseNode?.ethChainId || 0,
+    apiEnabled: !!(baseNode?.url && baseNode?.ethChainId),
+  });
+  const ethFee = estimatedPrice
+    ? fromWei(estimatedPrice.toString(), 'ether')
+    : null;
 
   const { mutateAsync: createToken } = useCreateTokenMutation();
 
@@ -490,7 +502,12 @@ export const QuickTokenLaunchForm = ({
               <CWBanner
                 type="info"
                 body={`Launching token will create a complimentary community.
-                        You can edit your community post launch.`}
+                      You can edit your community post launch.`}
+              />
+              <CWBanner
+                type="info"
+                body={`Launching your token on BASE requires a small amount of BASE ETH to cover gas fees.
+                      ${ethFee ? `Estimated fee: ${ethFee} BASE ETH.` : ''}`}
               />
               <div className="cta-elements">
                 {/* allows to switch b/w generated ideas */}

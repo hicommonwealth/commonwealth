@@ -56,6 +56,8 @@ export default (
         allowNull: false,
         defaultValue: false,
       },
+      recalculated_votes_start: { type: Sequelize.DATE, allowNull: true },
+      recalculated_votes_finish: { type: Sequelize.DATE, allowNull: true },
     },
     {
       timestamps: true,

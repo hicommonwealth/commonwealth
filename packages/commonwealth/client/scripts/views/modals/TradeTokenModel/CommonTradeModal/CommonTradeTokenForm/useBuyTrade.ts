@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 import { useEffect, useMemo, useState } from 'react';
@@ -71,10 +71,10 @@ const useBuyTrade = ({
       enabled
     ) {
       return new LaunchpadBondingCurve(
-        commonProtocol.factoryContracts[ethChainId].lpBondingCurve,
-        commonProtocol.factoryContracts[ethChainId].launchpad,
+        factoryContracts[ethChainId].lpBondingCurve,
+        factoryContracts[ethChainId].launchpad,
         tradeConfig.token.token_address,
-        commonProtocol.factoryContracts[ethChainId].tokenCommunityManager,
+        factoryContracts[ethChainId].tokenCommunityManager,
         chainNode.url,
       );
     }

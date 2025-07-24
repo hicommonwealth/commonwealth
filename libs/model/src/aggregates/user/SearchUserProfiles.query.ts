@@ -62,7 +62,7 @@ export function SearchUserProfiles(): Query<typeof schemas.SearchUserProfiles> {
               WHERE U.tier > ${UserTierMap.BannedUser} 
               ${communityFilter}
               ${nameFilter}
-          GROUP BY U.id
+          GROUP BY U.id, U.profile ->> 'name', U.profile ->> 'avatar_url', U.created_at
           ORDER BY ${order_col} ${direction}
           LIMIT :limit OFFSET :offset
       `;

@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { Denominations } from '@hicommonwealth/evm-protocols';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { ChainNodeInstance } from '../../models/chain_node';
 
@@ -134,6 +134,6 @@ export type GetTendermintClientOptions = {
 };
 
 export type TokenAttributes = {
-  ticker: string | commonProtocol.Denominations;
+  ticker: string | Denominations;
   decimals: number;
 };

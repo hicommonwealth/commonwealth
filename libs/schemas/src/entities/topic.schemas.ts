@@ -67,4 +67,6 @@ export const Topic = z.object({
   updated_at: z.coerce.date().optional(),
   deleted_at: z.coerce.date().nullish(),
   archived_at: z.coerce.date().nullish(),
+  recalculated_votes_start: z.coerce.date().nullish(),
+  recalculated_votes_finish: z.coerce.date().nullish(),
 });

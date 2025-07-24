@@ -17,6 +17,7 @@ import {
   LaunchpadPolicy,
   NominationsWorker,
   NotificationsPolicy,
+  ReactionWorker,
   TwitterEngagementPolicy,
   User,
 } from '@hicommonwealth/model';
@@ -82,6 +83,10 @@ const _NotificationsPolicy = {
   },
 };
 
+const _ReactionWorker = {
+  consumer: ReactionWorker,
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   ChainEventPolicy,
@@ -100,4 +105,5 @@ export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   _Xp,
   _NotificationsSettingsPolicy,
   _NotificationsPolicy,
+  _ReactionWorker,
 ];

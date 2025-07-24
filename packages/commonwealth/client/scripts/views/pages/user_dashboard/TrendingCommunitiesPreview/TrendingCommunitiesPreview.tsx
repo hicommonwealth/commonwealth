@@ -12,18 +12,12 @@ import { CommunityPreviewCard } from './CommunityPreviewCard';
 import './TrendingCommunitiesPreview.scss';
 
 type TrendingCommunitiesPreviewProps = {
-  hideHeader?: boolean;
-  hideFilters?: boolean;
-  hideSeeMore?: boolean;
   searchText?: string;
   onClearSearch?: () => void;
   hideSearchTag?: boolean;
 };
 
 export const TrendingCommunitiesPreview = ({
-  hideHeader,
-  hideFilters,
-  hideSeeMore,
   searchText,
   onClearSearch,
   hideSearchTag,
@@ -31,7 +25,7 @@ export const TrendingCommunitiesPreview = ({
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
-  const { data: newContent } = useGetNewContent({ enabled: user.isLoggedIn });
+  const { data: newContent } = useGetNewContent({ enabled: !!user.isLoggedIn });
   const { data: paginatedTrendingCommunities } = useFetchCommunitiesQuery({
     cursor: 1,
     limit: 3,

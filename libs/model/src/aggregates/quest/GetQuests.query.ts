@@ -96,7 +96,16 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
           LEFT JOIN "QuestActionMetas" QAS on QAS.quest_id = Q.id
           LEFT JOIN "CommunityGoalMetas" CGM on QAS.community_goal_meta_id = CGM.id
         ${filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : ''}
-        GROUP BY Q.id
+          GROUP BY Q.id, 
+          Q.name,
+          Q.description, 
+          Q.image_url, 
+          Q.community_id, 
+          Q.start_date, 
+          Q.end_date, 
+          Q.updated_at, 
+          Q.created_at,
+          Q.quest_type
         ORDER BY Q.${order} ${direction}
         LIMIT :limit OFFSET :offset
       `;

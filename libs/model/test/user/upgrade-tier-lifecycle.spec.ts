@@ -1,5 +1,5 @@
 import { config, dispose } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import * as commonProtocol from '@hicommonwealth/evm-protocols';
 import { Community, EventPair, User } from '@hicommonwealth/schemas';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';

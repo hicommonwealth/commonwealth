@@ -2,7 +2,8 @@ import { dispose } from '@hicommonwealth/core';
 import {
   EventRegistry,
   EvmEventSignatures,
-  commonProtocol as cp,
+  factoryContracts,
+  ValidChains,
 } from '@hicommonwealth/evm-protocols';
 import { createEventRegistryChainNodes } from '@hicommonwealth/model';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
@@ -16,7 +17,7 @@ describe('getEventSources', () => {
   beforeAll(async () => {
     await createEventRegistryChainNodes();
     await createContestEventSources(
-      cp.ValidChains.SepoliaBase,
+      ValidChains.SepoliaBase,
       singleContestAddress,
       recurringContestAddress,
     );
@@ -35,11 +36,11 @@ describe('getEventSources', () => {
       expect(result[ethChainId]).to.haveOwnProperty('contracts');
       expect(
         Array.isArray(
-          result[ethChainId].contracts[cp.factoryContracts[ethChainId].factory],
+          result[ethChainId].contracts[factoryContracts[ethChainId].factory],
         ),
       ).to.be.true;
 
-      if (ethChainId === String(cp.ValidChains.SepoliaBase)) {
+      if (ethChainId === String(ValidChains.SepoliaBase)) {
         expect(
           result[ethChainId].contracts[singleContestAddress],
         ).to.deep.equal([

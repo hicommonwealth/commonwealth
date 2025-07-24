@@ -1,4 +1,5 @@
 import useBuyTokenMutation from './buyToken';
+import useEstimateGasQuery from './estimateGas';
 import useEthPerTokenQuery from './ethPerToken';
 import useGetLaunchpadTradesQuery from './getLaunchpadTrades';
 import useGetTokenInfoAlchemy from './getTokenInfoAlchemy.query';
@@ -8,6 +9,7 @@ import useTokenEthExchangeRateQuery from './tokenEthExchangeRate';
 
 export {
   useBuyTokenMutation,
+  useEstimateGasQuery,
   useEthPerTokenQuery,
   useGetLaunchpadTradesQuery,
   useGetTokenInfoAlchemy,

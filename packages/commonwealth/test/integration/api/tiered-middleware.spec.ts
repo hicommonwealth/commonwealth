@@ -1,4 +1,5 @@
 import { Actor, dispose } from '@hicommonwealth/core';
+import { config } from '@hicommonwealth/model';
 import * as tester from '@hicommonwealth/model/tester';
 import {
   ChainBase,
@@ -11,7 +12,6 @@ import moment from 'moment';
 import fetch from 'node-fetch';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { testServer, TestServer } from '../../../server-test';
-import { config } from '../../../server/config';
 
 const chance = Chance();
 
@@ -116,12 +116,12 @@ describe('Tiered middleware', () => {
 
     const [member1_user] = await tester.seed('User', {
       profile: { name: 'Member 1' },
-      tier: UserTierMap.IncompleteUser,
+      tier: UserTierMap.NewlyVerifiedWallet,
       created_at: new Date(),
     });
     const [member2_user] = await tester.seed('User', {
       profile: { name: 'Member 2' },
-      tier: UserTierMap.IncompleteUser,
+      tier: UserTierMap.NewlyVerifiedWallet,
       created_at: moment().subtract(2, 'weeks'),
     });
     const [member3_user] = await tester.seed('User', {
@@ -220,11 +220,7 @@ describe('Tiered middleware', () => {
 
   it('should throw after exceeding tier 2 creation limits', async () => {
     const responseText = await CreateThread(member2, jwt2);
-    const commentText = await CreateComment(
-      member2,
-      jwt2,
-      JSON.parse(responseText).id,
-    );
+    await CreateComment(member2, jwt2, JSON.parse(responseText).id);
     const response2Text = await CreateThread(member2, jwt2);
     expect(response2Text).toEqual(
       '{"message":"Exceeded content creation limit","code":"UNAUTHORIZED"}',

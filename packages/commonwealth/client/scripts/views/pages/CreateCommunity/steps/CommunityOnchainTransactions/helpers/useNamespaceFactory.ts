@@ -1,10 +1,9 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
 import { useFetchNodesQuery } from 'state/api/nodes';
 
 const useNamespaceFactory = (ethChainId: number) => {
-  const chainFactoryAddress =
-    commonProtocol.factoryContracts[ethChainId]?.factory;
+  const chainFactoryAddress = factoryContracts[ethChainId]?.factory;
 
   const { data: nodes } = useFetchNodesQuery();
 

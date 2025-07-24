@@ -105,6 +105,9 @@ async function _seed(
     if (model.name === 'User' && !('tier' in values)) {
       values['tier'] = UserTierMap.ManuallyVerified;
     }
+    if (model.name === 'Address' && !('is_banned' in values)) {
+      values['is_banned'] = false;
+    }
     if (model.name === 'Community') {
       if (!('tier' in values))
         values['tier'] = CommunityTierMap.ManuallyVerified;

@@ -1,4 +1,4 @@
-import { commonProtocol, veBridgeAbi } from '@hicommonwealth/evm-protocols';
+import { lockTokens, veBridgeAbi } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model/db';
 import { describe, expect, it, vi } from 'vitest';
 import { setupCommonwealthE2E } from './integrationUtils/mainSetup';
@@ -13,13 +13,7 @@ describe.skip('Token staking lifecycle', () => {
       contractAddresses.veBridge,
     );
 
-    await commonProtocol.lockTokens(
-      contract,
-      anvilAccounts[0].address,
-      '10',
-      '1000',
-      false,
-    );
+    await lockTokens(contract, anvilAccounts[0].address, '10', '1000', false);
 
     // await cp.launchToken(
     //   launchpadFactory,

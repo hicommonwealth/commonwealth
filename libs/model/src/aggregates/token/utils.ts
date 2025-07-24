@@ -4,7 +4,7 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import {
-  commonProtocol as cp,
+  factoryContracts,
   getLaunchpadToken,
   mustBeProtocolChainId,
   transferLaunchpadLiquidityToUniswap,
@@ -73,7 +73,7 @@ export async function handleCapReached(
     !token.liquidity_transferred &&
     remainingLiquidity < transferLiquidityThreshold
   ) {
-    const contracts = cp.factoryContracts[eth_chain_id];
+    const contracts = factoryContracts[eth_chain_id];
     const lpBondingCurveAddress = (contracts as { lpBondingCurve: string })
       .lpBondingCurve;
 

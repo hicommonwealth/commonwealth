@@ -1,5 +1,5 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import app from 'state';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
@@ -20,6 +20,7 @@ import { CreateTopicStep, getCreateTopicSteps } from './utils';
 import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { useGroupTopicUpdater } from 'state/api/groups/useGroupTopicUpdater';
 import { useCreateTopicMutation } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 
@@ -93,6 +94,7 @@ export const Topics = () => {
   const [createTopicStep, setCreateTopicStep] = useState(
     CreateTopicStep.TopicDetails,
   );
+  const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
 
   const navigate = useCommonNavigate();
   const { mutateAsync: createTopic } = useCreateTopicMutation();
@@ -114,6 +116,12 @@ export const Topics = () => {
     setTopicFormData((prevState) => ({ ...prevState, ...data }));
   };
 
+  const handleGroupsSelected = useCallback((groups: number[]) => {
+    setSelectedGroups(groups);
+  }, []);
+
+  const updateGroupTopicsBulk = useGroupTopicUpdater();
+
   if (
     !user.isLoggedIn ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
@@ -133,7 +141,7 @@ export const Topics = () => {
     }
 
     try {
-      await createTopic({
+      const result = await createTopic({
         name: topicFormData.name,
         description: topicFormData.description,
         featured_in_sidebar: topicFormData.featuredInSidebar || false,
@@ -185,6 +193,16 @@ export const Topics = () => {
           : {}),
       });
 
+      const newTopicId = result.topic?.id;
+
+      for (const groupId of selectedGroups) {
+        await updateGroupTopicsBulk({
+          groupIds: [groupId],
+          topicId: newTopicId as number,
+          name: topicFormData.name,
+        });
+      }
+
       navigate(`/discussions/${encodeURI(topicFormData.name.trim())}`);
     } catch (err) {
       notifyError('Failed to create topic');
@@ -203,6 +221,7 @@ export const Topics = () => {
           <TopicDetails
             onStepChange={setCreateTopicStep}
             onSetTopicFormData={handleSetTopicFormData}
+            onGroupsSelected={handleGroupsSelected}
             topicFormData={topicFormData}
           />
         );

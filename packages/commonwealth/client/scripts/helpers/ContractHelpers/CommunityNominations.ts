@@ -1,5 +1,5 @@
 import { CommunityNominationsAbi } from '@commonxyz/common-protocol-abis';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { NOMINATION_FEE } from '@hicommonwealth/evm-protocols';
 import { TransactionReceipt } from 'web3';
 import ContractBase from './ContractBase';
 
@@ -30,10 +30,7 @@ class communityNominations extends ContractBase {
       txReceipt = await this.contract.methods
         .nominateJudges(namespace, judges, judgeId)
         .send({
-          value: this.web3.utils.toWei(
-            commonProtocol.NOMINATION_FEE * judges.length,
-            'ether',
-          ),
+          value: this.web3.utils.toWei(NOMINATION_FEE * judges.length, 'ether'),
           from: walletAddress,
           type: '0x2',
           maxFeePerGas: maxFeePerGasEst?.toString(),
@@ -60,7 +57,7 @@ class communityNominations extends ContractBase {
       txReceipt = await this.contract.methods
         .nominateNominator(namespace, verfiedAddress)
         .send({
-          value: this.web3.utils.toWei(commonProtocol.NOMINATION_FEE, 'ether'),
+          value: this.web3.utils.toWei(NOMINATION_FEE, 'ether'),
           from: this.wallet.accounts[0],
           type: '0x2',
           maxFeePerGas: maxFeePerGasEst?.toString(),

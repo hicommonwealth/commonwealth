@@ -1,8 +1,13 @@
 import {
   configure,
+  DeployedEnvironments,
   LogLevel,
   LogLevels,
+  ProdLikeEnvironments,
+  ProductionEnvironments,
+  requiredInEnvironmentServices,
   config as target,
+  WebServices,
 } from '@hicommonwealth/core';
 import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import { z } from 'zod';
@@ -104,6 +109,8 @@ const DEFAULTS = {
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
   TWITTER_LOG_LEVEL: 'info' as const,
   TIER_SOCIAL_VERIFIED_MIN_ETH: '0.006',
+  KNOCK_PUBLIC_API_KEY: 'pk_test_Hd4ZpzlVcz9bqepJQoo9BvZHokgEqvj4T79fPdKqpYM',
+  KNOCK_IN_APP_FEED_ID: 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb',
 };
 
 export const config = configure(
@@ -287,9 +294,11 @@ export const config = configure(
         : 1,
     },
     DISABLE_TIER_RATE_LIMITS:
-      !DISABLE_TIER_RATE_LIMITS && target.APP_ENV === 'local'
-        ? true
-        : DISABLE_TIER_RATE_LIMITS === 'true',
+      target.NODE_ENV === 'test'
+        ? false
+        : !DISABLE_TIER_RATE_LIMITS && target.APP_ENV === 'local'
+          ? true
+          : DISABLE_TIER_RATE_LIMITS === 'true',
     TIER: {
       SOCIAL_VERIFIED_MIN_ETH: parseFloat(
         TIER_SOCIAL_VERIFIED_MIN_ETH || DEFAULTS.TIER_SOCIAL_VERIFIED_MIN_ETH,
@@ -302,10 +311,9 @@ export const config = configure(
     LOG_XP_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
     NOTIFICATIONS: {
       KNOCK_PUBLIC_API_KEY:
-        KNOCK_PUBLIC_API_KEY ||
-        'pk_test_Hd4ZpzlVcz9bqepJQoo9BvZHokgEqvj4T79fPdKqpYM',
+        KNOCK_PUBLIC_API_KEY || DEFAULTS.KNOCK_PUBLIC_API_KEY,
       KNOCK_IN_APP_FEED_ID:
-        KNOCK_IN_APP_FEED_ID || 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb',
+        KNOCK_IN_APP_FEED_ID || DEFAULTS.KNOCK_IN_APP_FEED_ID,
     },
     UNLEASH: {
       FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
@@ -317,47 +325,54 @@ export const config = configure(
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'SENDGRID_API_KEY is required in production',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ['production'],
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
     }),
     DB: z.object({
-      URI: z
-        .string()
-        .refine(
-          (data) =>
-            !(
-              target.APP_ENV !== 'local' &&
-              target.APP_ENV !== 'CI' &&
-              data === DEFAULTS.DATABASE_URL
-            ),
-          'DATABASE_URL must be set to a non-default value in Heroku apps.',
-        ),
+      URI: z.string().refine(
+        requiredInEnvironmentServices({
+          config: target,
+          requiredAppEnvs: DeployedEnvironments,
+          requiredServices: 'all',
+          defaultCheck: DEFAULTS.DATABASE_URL,
+        }),
+      ),
       NAME: z.string(),
       NO_SSL: z.boolean(),
       TRACE: z.boolean(),
     }),
     WEB3: z.object({
-      PRIVATE_KEY: z
-        .string()
-        .refine(
-          (data) =>
-            !(target.APP_ENV === 'production' && data === DEFAULTS.PRIVATE_KEY),
-          'PRIVATE_KEY must be set to a non-default value in production.',
-        ),
+      PRIVATE_KEY: z.string().refine(
+        requiredInEnvironmentServices({
+          config: target,
+          requiredAppEnvs: ProductionEnvironments,
+          requiredServices: [...WebServices, 'consumer', 'graphile'],
+          defaultCheck: DEFAULTS.PRIVATE_KEY,
+        }),
+      ),
       LAUNCHPAD_PRIVATE_KEY: z
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'LAUNCHPAD_PRIVATE_KEY must be set to a non-default value in production.',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ProductionEnvironments,
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
       CONTEST_BOT_PRIVATE_KEY: z
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'CONTEST_BOT_PRIVATE_KEY must be set to a non-default value in production.',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ProductionEnvironments,
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
       EVM_CHAINS_WHITELIST: z
         .string()
@@ -384,87 +399,107 @@ export const config = configure(
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'NEYNAR_BOT_UUID must be set to a non-default value in production.',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ProductionEnvironments,
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
       NEYNAR_API_KEY: z
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'NEYNAR_API_KEY must be set to a non-default value in production.',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ProductionEnvironments,
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: z
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'NEYNAR_CAST_CREATED_WEBHOOK_SECRET must be set to a non-default value in production.',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ProductionEnvironments,
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
       NEYNAR_CAST_WEBHOOK_ID: z
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'NEYNAR_CAST_WEBHOOK_ID must be set to a non-default value in production.',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ProductionEnvironments,
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
       FARCASTER_ACTION_URL: z
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'FARCASTER_ACTION_URL must be set to a non-default value in production.',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ProductionEnvironments,
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
       FARCASTER_MANIFEST_HEADER: z
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ProductionEnvironments,
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
       FARCASTER_MANIFEST_PAYLOAD: z
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'FARCASTER_MANIFEST_PAYLOAD must be set to a non-default value in production.',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ProductionEnvironments,
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
       FARCASTER_MANIFEST_SIGNATURE: z
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'FARCASTER_MANIFEST_SIGNATURE must be set to a non-default value in production.',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ProductionEnvironments,
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
       FARCASTER_MANIFEST_DOMAIN: z
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ProductionEnvironments,
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
       DISABLE_CONTEST_ENDING_VOTE: z.boolean().optional(),
       CONTEST_DURATION_IN_SEC: z.number().optional(),
     }),
-    AUTH: z
-      .object({
-        JWT_SECRET: z.string(),
-        SESSION_EXPIRY_MILLIS: z.number().int(),
-        ADDRESS_TOKEN_EXPIRES_IN: z.number().int(),
-      })
-      .refine(
-        (data) => {
-          if (!['local', 'CI'].includes(target.APP_ENV)) {
-            return !!JWT_SECRET && data.JWT_SECRET !== DEFAULTS.JWT_SECRET;
-          }
-          return true;
-        },
-        {
-          message:
-            'JWT_SECRET must be set to a non-default value in production environments',
-          path: ['JWT_SECRET'],
-        },
+    AUTH: z.object({
+      JWT_SECRET: z.string().refine(
+        requiredInEnvironmentServices({
+          config: target,
+          requiredAppEnvs: DeployedEnvironments,
+          requiredServices: [...WebServices],
+          defaultCheck: DEFAULTS.JWT_SECRET,
+        }),
       ),
+      SESSION_EXPIRY_MILLIS: z.number().int(),
+      ADDRESS_TOKEN_EXPIRES_IN: z.number().int(),
+    }),
     ALCHEMY: z.object({
       BASE_WEBHOOK_SIGNING_KEY: z.string().optional(),
       BASE_SEPOLIA_WEBHOOK_SIGNING_KEY: z.string().optional(),
@@ -506,13 +541,11 @@ export const config = configure(
         .string()
         .optional()
         .refine(
-          (data) =>
-            !(
-              ['production', 'frick', 'frack', 'beta', 'demo'].includes(
-                target.APP_ENV,
-              ) && !data
-            ),
-          'DISCORD_TOKEN is required in production, frick, frack, beta (QA), and demo',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: DeployedEnvironments,
+            requiredServices: [...WebServices, 'discord-listener'],
+          }),
         ),
     }),
     OPENAI: z.object({
@@ -526,8 +559,11 @@ export const config = configure(
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'CONTEST_BOT_NAMESPACE must be set to a non-default value in production.',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ProductionEnvironments,
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
     }),
     TWITTER: z.object({
@@ -543,8 +579,11 @@ export const config = configure(
         .string()
         .optional()
         .refine(
-          (data) => !(target.APP_ENV === 'production' && !data),
-          'SKALE_PRIVATE_KEY must be set to a non-default value in production.',
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: ProductionEnvironments,
+            requiredServices: [...WebServices, 'consumer'],
+          }),
         ),
     }),
     PRIVY: z
@@ -571,8 +610,11 @@ export const config = configure(
           })
           .optional()
           .refine(
-            (data) => !(['production'].includes(target.APP_ENV) && !data),
-            'Turnstile create community widget keys are required in production',
+            requiredInEnvironmentServices({
+              config: target,
+              requiredAppEnvs: ['production'], // can't enable in QA because we can only whitelist 10 domains
+              requiredServices: [...WebServices],
+            }),
           ),
         CREATE_THREAD: z
           .object({
@@ -581,8 +623,11 @@ export const config = configure(
           })
           .optional()
           .refine(
-            (data) => !(['production'].includes(target.APP_ENV) && !data),
-            'Turnstile create thread widget keys are required in production',
+            requiredInEnvironmentServices({
+              config: target,
+              requiredAppEnvs: ['production'], // can't enable in QA because we can only whitelist 10 domains
+              requiredServices: [...WebServices],
+            }),
           ),
         CREATE_COMMENT: z
           .object({
@@ -591,8 +636,11 @@ export const config = configure(
           })
           .optional()
           .refine(
-            (data) => !(['production'].includes(target.APP_ENV) && !data),
-            'Turnstile create comment widget keys are required in production',
+            requiredInEnvironmentServices({
+              config: target,
+              requiredAppEnvs: ['production'], // can't enable in QA because we can only whitelist 10 domains
+              requiredServices: [...WebServices],
+            }),
           ),
       }),
     }),
@@ -609,6 +657,14 @@ export const config = configure(
       .refine(
         (data) => !(target.APP_ENV === 'production' && data),
         'Tier rate limits cannot be disabled in production',
+      )
+      .refine(
+        requiredInEnvironmentServices({
+          config: target,
+          requiredAppEnvs: ProductionEnvironments,
+          requiredServices: [...WebServices],
+          defaultCheck: true,
+        }),
       ),
     TIER: z.object({
       SOCIAL_VERIFIED_MIN_ETH: z.number(),
@@ -624,24 +680,34 @@ export const config = configure(
         ),
     }),
     LOG_XP_LAUNCHPAD: z.boolean().default(false),
-    NOTIFICATIONS: z
-      .object({
-        KNOCK_PUBLIC_API_KEY: z.string(),
-        KNOCK_IN_APP_FEED_ID: z.string(),
-      })
-      .refine(
-        (data) =>
-          !(
-            (!data.KNOCK_PUBLIC_API_KEY || !data.KNOCK_IN_APP_FEED_ID) &&
-            target.APP_ENV === 'production'
-          ),
+    NOTIFICATIONS: z.object({
+      KNOCK_PUBLIC_API_KEY: z.string().refine(
+        requiredInEnvironmentServices({
+          config: target,
+          requiredAppEnvs: ProdLikeEnvironments,
+          requiredServices: [...WebServices, 'knock', 'consumer'],
+          defaultCheck: DEFAULTS.KNOCK_PUBLIC_API_KEY,
+        }),
       ),
+      KNOCK_IN_APP_FEED_ID: z.string().refine(
+        requiredInEnvironmentServices({
+          config: target,
+          requiredAppEnvs: ['production'],
+          requiredServices: [...WebServices, 'knock', 'consumer'],
+          defaultCheck: DEFAULTS.KNOCK_IN_APP_FEED_ID,
+        }),
+      ),
+    }),
     UNLEASH: z.object({
       FRONTEND_API_TOKEN: z
         .string()
         .optional()
         .refine(
-          (data) => !(!['local', 'CI'].includes(target.APP_ENV) && !data),
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: DeployedEnvironments,
+            requiredServices: [...WebServices],
+          }),
         ),
     }),
   }),
