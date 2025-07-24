@@ -71,7 +71,6 @@ async function startChatBot() {
   );
 
   const allServers = await getAllServers();
-  console.log(JSON.stringify(allServers, null, 2));
   console.log(`\nAvailable servers:`);
   allServers.forEach((server) => {
     console.log(
