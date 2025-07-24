@@ -156,12 +156,6 @@ const MembersSection = ({
             ),
           },
           stakeBalance: {
-            sortValue: parseInt(member.stakeBalance || '0', 10),
-            customElement: (
-              <div className="table-cell text-right">{member.stakeBalance}</div>
-            ),
-          },
-          votingPower: {
             sortValue: Array.isArray(member.addresses)
               ? member.addresses.reduce(
                   (sum, addr) => sum + (Number(addr.stake_balance) || 0),

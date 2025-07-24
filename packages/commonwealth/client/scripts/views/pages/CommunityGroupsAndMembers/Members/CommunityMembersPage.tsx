@@ -135,11 +135,11 @@ const CommunityMembersPage = () => {
       hidden: !isStakedCommunity,
     },
     {
-      key: 'votingPower',
-      header: 'Voting Power',
+      key: 'groups',
+      header: 'Groups',
       hasCustomSortValue: true,
-      numeric: true,
-      sortable: true,
+      numeric: false,
+      sortable: false,
     },
     {
       key: 'lastActive',
@@ -147,13 +147,6 @@ const CommunityMembersPage = () => {
       hasCustomSortValue: true,
       numeric: false,
       sortable: true,
-    },
-    {
-      key: 'groups',
-      header: 'Groups',
-      hasCustomSortValue: true,
-      numeric: false,
-      sortable: false,
     },
     {
       key: 'actions',
