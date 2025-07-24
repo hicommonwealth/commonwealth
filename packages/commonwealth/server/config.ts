@@ -11,6 +11,7 @@ import { ChainBase, TwitterBotName } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
+  DISABLE_SITEMAP,
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
@@ -62,6 +63,7 @@ const DEFAULTS = {
 export const config = configure(
   [model_config, adapters_config],
   {
+    DISABLE_SITEMAP: DISABLE_SITEMAP === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     PRERENDER_TOKEN,
     GENERATE_IMAGE_RATE_LIMIT: parseInt(
@@ -159,6 +161,7 @@ export const config = configure(
     },
   },
   z.object({
+    DISABLE_SITEMAP: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
