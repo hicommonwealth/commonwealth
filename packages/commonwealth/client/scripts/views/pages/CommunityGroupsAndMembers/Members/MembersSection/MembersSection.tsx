@@ -5,6 +5,7 @@ import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { getChainIcon } from 'client/scripts/utils/chainUtils';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
+import moment from 'moment';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar } from 'views/components/Avatar';
@@ -158,6 +159,32 @@ const MembersSection = ({
             sortValue: parseInt(member.stakeBalance || '0', 10),
             customElement: (
               <div className="table-cell text-right">{member.stakeBalance}</div>
+            ),
+          },
+          votingPower: {
+            sortValue: Array.isArray(member.addresses)
+              ? member.addresses.reduce(
+                  (sum, addr) => sum + (Number(addr.stake_balance) || 0),
+                  0,
+                )
+              : 0,
+            customElement: (
+              <div className="table-cell text-right">
+                {Array.isArray(member.addresses)
+                  ? member.addresses.reduce(
+                      (sum, addr) => sum + (Number(addr.stake_balance) || 0),
+                      0,
+                    )
+                  : 0}
+              </div>
+            ),
+          },
+          lastActive: {
+            sortValue: member.lastActive ? moment(member.lastActive).unix() : 0,
+            customElement: (
+              <div className="table-cell">
+                {member.lastActive ? moment(member.lastActive).fromNow() : ''}
+              </div>
             ),
           },
           addresses: {
