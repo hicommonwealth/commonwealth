@@ -4,6 +4,8 @@
 # Code owner changes must be reviewed by Dillon
 /.github/CODEOWNERS @dillchen
 
+/deploy @Rotorsoft @timolegros @kurtassad @rbennettcw
+
 # Changes to CI or code/deployment processes must be reviewed by the Platform team
 .github @timolegros @kurtassad @Rotorsoft @rbennettcw
 .husky @timolegros @kurtassad @Rotorsoft @rbennettcw
