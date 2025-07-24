@@ -1,5 +1,5 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import {
@@ -18,7 +18,7 @@ describe('Transactions history', () => {
       url: 'https://ethereum-sepolia.publicnode.com',
       private_url: 'https://ethereum-sepolia.publicnode.com',
       name: 'Sepolia Testnet',
-      eth_chain_id: commonProtocol.ValidChains.Sepolia,
+      eth_chain_id: ValidChains.Sepolia,
       balance_type: BalanceType.Ethereum,
     });
 
