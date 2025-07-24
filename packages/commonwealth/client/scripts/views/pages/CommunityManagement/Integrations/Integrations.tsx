@@ -21,6 +21,7 @@ const Integrations = () => {
   const isEthereum = app.chain.meta.base === ChainBase.Ethereum;
 
   const isJudgementEnabled = useFlag('judgeContest');
+  const mcpGoogleSheetsEnabled = useFlag('mcpGoogleSheets');
 
   return (
     <CommunityManagementLayout
@@ -43,7 +44,7 @@ const Integrations = () => {
         {isEthereum && <Snapshots />}
         <Tokenization />
         <Discord />
-        <GoogleSheetsMCP />
+        {mcpGoogleSheetsEnabled && <GoogleSheetsMCP />}
         <Webhooks />
         <CustomTOS />
         <CustomURL />
