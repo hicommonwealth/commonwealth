@@ -10,8 +10,6 @@ import {
   CommunityTierMap,
   safeTruncateBody,
 } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   Mock,
   afterAll,
@@ -23,16 +21,14 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { tester } from '../../src';
 import { notifyUserMentioned } from '../../src/policies/handlers/notifyUserMentioned';
 import { getProfileUrl, getThreadUrl } from '../../src/policies/utils/utils';
+import * as tester from '../../src/tester';
 import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
 } from '../utils/mockedNotificationProvider';
-
-chai.use(chaiAsPromised);
 
 describe('userMentioned Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
@@ -93,6 +89,7 @@ describe('userMentioned Event Handler', () => {
 
   test('should not throw if relevant community is not found', async () => {
     const res = await notifyUserMentioned({
+      id: 0,
       name: 'UserMentioned',
       payload: {
         communityId: 'nonexistent',
@@ -168,6 +165,6 @@ describe('userMentioned Event Handler', () => {
           thread,
         },
       }),
-    ).to.eventually.be.rejectedWith(ProviderError);
+    ).rejects.toThrow(ProviderError);
   });
 });

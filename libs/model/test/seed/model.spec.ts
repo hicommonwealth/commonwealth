@@ -1,7 +1,6 @@
 import { dispose } from '@hicommonwealth/core';
-import { expect } from 'chai';
 import { Sequelize } from 'sequelize';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { models } from '../../src/database';
 import { Factories } from '../../src/models/factories';
 import {
@@ -17,6 +16,7 @@ const generateSchemas = async () => {
   const model_schema = await get_info_schema(models.sequelize, {
     ignore_columns: {
       GroupGatedActions: ['gated_actions'],
+      Votes: ['user_id'],
     },
     ignore_constraints: {
       // Removed in migration
@@ -33,6 +33,7 @@ const generateSchemas = async () => {
       Comments: ['root_id'],
       Topics: ['default_offchain_template_backup'],
       GroupGatedActions: ['gated_actions'],
+      Votes: ['user_id'],
     },
     ignore_constraints: {
       // Can't define index in model since it uses NULLS NOT DISTINCT

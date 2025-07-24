@@ -19,6 +19,8 @@ import {
 import {
   CreateGroup,
   RefreshCommunityMemberships,
+  UpdateRole,
+  UpdateRoleErrors,
 } from '../../src/aggregates/community';
 import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
 import { CreateThread } from '../../src/aggregates/thread';
@@ -30,7 +32,7 @@ import {
   Xp,
 } from '../../src/aggregates/user';
 import { models } from '../../src/database';
-import * as services from '../../src/services';
+import * as tokenBalanceCache from '../../src/services/tokenBalanceCache';
 import { seed } from '../../src/tester';
 import * as utils from '../../src/utils';
 import { drainOutbox } from '../utils';
@@ -126,7 +128,7 @@ describe('User lifecycle', () => {
       const watermark = new Date();
 
       // act on community, triggering quest rewards
-      await command(CreateThread(), {
+      const thread = await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
@@ -145,7 +147,7 @@ describe('User lifecycle', () => {
           body: 'Comment body 1.1',
         },
       });
-      await command(CreateComment(), {
+      const comment2 = await command(CreateComment(), {
         actor: admin,
         payload: {
           thread_id,
@@ -190,6 +192,7 @@ describe('User lifecycle', () => {
         {
           id: 1,
           name: null,
+          event_id: 0,
           event_created_at: logs[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
@@ -197,10 +200,16 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[0].created_at,
+          scope: {
+            community_id,
+            thread_id: thread!.id,
+            topic_id,
+          },
         },
         {
           id: 2,
           name: null,
+          event_id: 0,
           event_created_at: logs[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -208,10 +217,17 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[1].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 3,
           name: null,
+          event_id: 0,
           event_created_at: logs[2].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -219,10 +235,17 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[2].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment2!.id,
+          },
         },
         {
           id: 4,
           name: null,
+          event_id: 0,
           event_created_at: logs[3].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
@@ -230,6 +253,12 @@ describe('User lifecycle', () => {
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
           created_at: logs[3].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
       ]);
 
@@ -298,7 +327,7 @@ describe('User lifecycle', () => {
       const watermark = new Date();
 
       // act on community, triggering quest rewards
-      await command(CreateThread(), {
+      const thread = await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
@@ -373,7 +402,7 @@ describe('User lifecycle', () => {
         },
       ]);
 
-      vi.spyOn(services.tokenBalanceCache, 'getBalances').mockResolvedValue({
+      vi.spyOn(tokenBalanceCache, 'getBalances').mockResolvedValue({
         [member.address!]: '100',
       });
 
@@ -475,6 +504,7 @@ describe('User lifecycle', () => {
       expect(last.map((l) => l.toJSON())).to.deep.equal([
         {
           id: 5,
+          event_id: 0,
           event_created_at: last[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
@@ -483,9 +513,15 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: last[0].created_at,
+          scope: {
+            community_id,
+            thread_id: thread!.id,
+            topic_id,
+          },
         },
         {
           id: 6,
+          event_id: 0,
           event_created_at: last[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -494,9 +530,16 @@ describe('User lifecycle', () => {
           creator_user_id: null,
           creator_xp_points: null,
           created_at: last[1].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 7,
+          event_id: 0,
           event_created_at: last[2].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
@@ -505,9 +548,16 @@ describe('User lifecycle', () => {
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
           created_at: last[2].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 8,
+          event_id: 0,
           event_created_at: last[3].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 10,
@@ -516,9 +566,13 @@ describe('User lifecycle', () => {
           creator_user_id: member.user.id,
           creator_xp_points: 10,
           created_at: last[3].created_at,
+          scope: {
+            community_id,
+          },
         },
         {
           id: 9,
+          event_id: 0,
           event_created_at: last[4].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 16,
@@ -527,6 +581,7 @@ describe('User lifecycle', () => {
           creator_user_id: member.user.id,
           creator_xp_points: 4,
           created_at: last[4].created_at,
+          scope: null,
         },
       ]);
 
@@ -562,7 +617,7 @@ describe('User lifecycle', () => {
       // 4 events after first CommentUpvoted
       const xps3 = await query(GetXps(), {
         actor: admin,
-        payload: { from: xps2!.at(-1)!.created_at },
+        payload: { from: new Date(xps2!.at(-1)!.created_at) },
       });
       expect(xps3!.length).to.equal(5);
 
@@ -900,7 +955,7 @@ describe('User lifecycle', () => {
       const address = await signer.getWalletAddress();
 
       // make sure address has a balance above threshold
-      vi.spyOn(services.tokenBalanceCache, 'getBalances').mockResolvedValue({
+      vi.spyOn(tokenBalanceCache, 'getBalances').mockResolvedValue({
         [address]: '100',
       });
 
@@ -932,11 +987,32 @@ describe('User lifecycle', () => {
     });
 
     it('should query ranked by xp points', async () => {
+      // dump xp logs to debug xp ranking
+      const logs = await query(GetXps(), {
+        actor: admin,
+        payload: {},
+      });
+      const table = logs
+        ?.map((x) => ({
+          quest: x.quest_id,
+          user: x.user_profile?.name,
+          event: x.event_name,
+          xp: x.xp_points,
+          creator: x.creator_profile?.name,
+          creator_xp: x.creator_xp_points,
+        }))
+        .sort((a, b) => b.xp - a.xp);
+      console.table(table);
+
       const xps1 = await query(GetXpsRanked(), {
         actor: admin,
         payload: { top: 10 },
       });
       expect(xps1!.length).to.equal(4);
+      // member has 25+18+18+13+12+11+10+10+10+10+10=147 xp points + 4+10 creator points = 161 total
+      // admin has 11+10+10+5+5+5 xp points + 2+2 creator points = 50 total
+      // new_user has 16+11+10 xp points = 37 total
+      // superadmin has 11 xp points
       expect(xps1?.map((x) => x.xp_points)).to.deep.eq([161, 50, 37, 11]);
 
       const xps2 = await query(GetXpsRanked(), {
@@ -944,7 +1020,74 @@ describe('User lifecycle', () => {
         payload: { top: 10, quest_id: -1 },
       });
       expect(xps2!.length).to.equal(2);
-      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([20, 10]);
+      // new_user has 16 for SignUpFlowCompleted
+      // member has 10 for WalletLinked and 4 for SignUpFlowCompleted as referrer
+      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([16, 14]);
+    });
+  });
+
+  describe('roles', () => {
+    it('should fail to update to unknown role', async () => {
+      expect(
+        command(UpdateRole(), {
+          actor: superadmin,
+          payload: {
+            community_id,
+            address: member.address!,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            role: 'unknown' as any,
+          },
+        }),
+      ).rejects.toThrowError();
+    });
+
+    it('should update a member to a moderator', async () => {
+      const updated = await command(UpdateRole(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          address: member.address!,
+          role: 'moderator',
+        },
+      });
+      expect(updated?.role).to.equal('moderator');
+    });
+
+    it('should update a moderator to a member', async () => {
+      const updated = await command(UpdateRole(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          address: member.address!,
+          role: 'member',
+        },
+      });
+      expect(updated?.role).to.equal('member');
+    });
+
+    it('should fail to update an admin to a member if there is no other admin', async () => {
+      await expect(
+        command(UpdateRole(), {
+          actor: admin,
+          payload: {
+            community_id,
+            address: admin.address!,
+            role: 'member',
+          },
+        }),
+      ).rejects.toThrowError(UpdateRoleErrors.MustHaveAdmin);
+    });
+
+    it('should update a member to an admin', async () => {
+      const updated = await command(UpdateRole(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          address: admin.address!,
+          role: 'admin',
+        },
+      });
+      expect(updated?.role).to.equal('admin');
     });
   });
 });

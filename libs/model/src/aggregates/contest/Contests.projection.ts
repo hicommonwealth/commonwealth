@@ -2,14 +2,16 @@ import { InvalidState, Projection, logger } from '@hicommonwealth/core';
 import {
   ChildContractNames,
   EvmEventSignatures,
-  commonProtocol as cp,
+  calculateVoteWeight,
+  factoryContracts,
   getContestScore,
   getContestStatus,
   getTokenAttributes,
   getTransaction,
+  isValidChain,
+  mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
-import { config } from '@hicommonwealth/model';
-import { events } from '@hicommonwealth/schemas';
+import { TopicWeightedVoting, events } from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
   LP_CONTEST_MANAGER_ADDRESS_ANVIL,
@@ -23,9 +25,11 @@ import {
 import { QueryTypes } from 'sequelize';
 import { privateKeyToAccount } from 'viem/accounts';
 import { z } from 'zod';
+import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { EvmEventSourceAttributes } from '../../models';
+import { contractHelpers } from '../../services/commonProtocol';
 import { DEFAULT_CONTEST_BOT_PARAMS } from '../../services/openai/parseBotCommand';
 import { getWeightedNumTokens } from '../../services/stakeHelper';
 import {
@@ -70,7 +74,7 @@ async function createInitialContest(
   }
 
   const ethChainId = community!.ChainNode!.eth_chain_id!;
-  if (!cp.isValidChain(ethChainId)) {
+  if (!isValidChain(ethChainId)) {
     log.error(
       `Unsupported eth chain id: ${ethChainId} for namespace: ${namespace}`,
     );
@@ -208,7 +212,7 @@ async function createInitialContest(
           contract_address: contest_address,
           event_signature: eventSignature,
           contract_name: childContractName,
-          parent_contract_address: cp.factoryContracts[ethChainId].factory,
+          parent_contract_address: factoryContracts[ethChainId].factory,
           created_at_block: blockNumber,
         };
       },
@@ -268,7 +272,7 @@ export async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
-    cp.mustBeProtocolChainId(details.eth_chain_id);
+    mustBeProtocolChainId(details.eth_chain_id);
 
     const { scores, contestBalance } = await getContestScore(
       { eth_chain_id: details.eth_chain_id, rpc: details.url },
@@ -490,6 +494,9 @@ export function Contests(): Projection<typeof inputs> {
                     {
                       model: models.ChainNode.scope('withPrivateData'),
                     },
+                    {
+                      model: models.CommunityStake,
+                    },
                   ],
                 },
               ],
@@ -503,23 +510,44 @@ export function Contests(): Projection<typeof inputs> {
           return;
         }
 
-        let calculated_voting_weight: string | undefined;
+        let calculated_voting_weight: bigint | null = null;
 
         if (
           BigInt(payload.voting_power || 0) > BigInt(0) &&
           add_action?.ContestManager?.vote_weight_multiplier
         ) {
-          const { eth_chain_id } =
-            add_action!.ContestManager!.Community!.ChainNode!;
-          const { funding_token_address, vote_weight_multiplier } =
-            add_action!.ContestManager!;
-          const numTokens = await getWeightedNumTokens(
-            payload.voter_address,
-            funding_token_address!,
-            eth_chain_id!,
-            vote_weight_multiplier!,
-          );
-          calculated_voting_weight = numTokens.toString();
+          const topic = await models.Topic.findOne({
+            where: { id: add_action.ContestManager.topic_id! },
+          });
+          if (topic?.weighted_voting === TopicWeightedVoting.Stake) {
+            // handle stake
+            const stake =
+              add_action!.ContestManager!.Community!.CommunityStakes?.at(0);
+            mustExist('Community Stake', stake);
+            const stakeBalances = await contractHelpers.getNamespaceBalance(
+              add_action!.ContestManager.Community!.namespace_address!,
+              stake!.stake_id,
+              add_action!.ContestManager!.Community!.ChainNode!.eth_chain_id!,
+              [payload.voter_address],
+            );
+            const stakeBalance = stakeBalances[payload.voter_address];
+            if (BigInt(stakeBalance) === BigInt(0)) {
+              log.warn(`Stake balance is 0 for voter ${payload.voter_address}`);
+              return;
+            }
+            calculated_voting_weight = calculateVoteWeight(
+              stakeBalance,
+              stake!.vote_weight,
+            );
+          } else {
+            // handle ETH/erc20
+            calculated_voting_weight = await getWeightedNumTokens(
+              payload.voter_address,
+              add_action!.ContestManager!.funding_token_address!,
+              add_action!.ContestManager!.Community!.ChainNode!.eth_chain_id!,
+              add_action!.ContestManager!.vote_weight_multiplier!,
+            );
+          }
         }
 
         await models.ContestAction.upsert({
@@ -530,7 +558,8 @@ export function Contests(): Projection<typeof inputs> {
           thread_id: add_action!.thread_id,
           content_url: add_action!.content_url,
           created_at: new Date(),
-          calculated_voting_weight,
+          calculated_voting_weight:
+            calculated_voting_weight?.toString() || null,
         });
 
         // eslint-disable-next-line @typescript-eslint/no-misused-promises

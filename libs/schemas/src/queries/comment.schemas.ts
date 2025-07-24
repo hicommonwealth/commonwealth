@@ -1,4 +1,5 @@
 import z from 'zod';
+import { VerifiedContext } from '../context';
 import { PG_INT, zBoolean } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 import { CommentView, ReactionView } from './thread.schemas';
@@ -26,6 +27,7 @@ export const SearchComments = {
   output: PaginatedResultSchema.extend({
     results: z.array(CommentSearchView),
   }),
+  context: VerifiedContext,
 };
 
 export const CommentsView = CommentView.extend({
@@ -40,6 +42,7 @@ export const GetComments = {
     parent_id: PG_INT.optional(),
     include_reactions: zBoolean.default(false),
     include_spam_comments: zBoolean.optional().default(false),
+    is_chat_mode: zBoolean.optional().default(false),
     order_by: GetCommentsOrderBy.optional().default('newest'),
   }).omit({
     order_direction: true,

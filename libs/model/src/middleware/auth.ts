@@ -11,7 +11,7 @@ import {
   AuthContextInput,
   CommentContext,
   CommentContextInput,
-  Group,
+  MembershipRejectReason,
   PollContext,
   PollContextInput,
   ReactionContext,
@@ -23,9 +23,13 @@ import {
   VerifiedContext,
   VerifiedContextInput,
 } from '@hicommonwealth/schemas';
-import { GroupGatedActionKey, Role } from '@hicommonwealth/shared';
+import {
+  ALL_COMMUNITIES,
+  GroupGatedActionKey,
+  Role,
+} from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
-import { ZodSchema, z } from 'zod';
+import { ZodType, z } from 'zod';
 import { models } from '../database';
 import { AddressInstance } from '../models';
 import { BannedActor, NonMember, RejectedMember } from './errors';
@@ -155,6 +159,9 @@ async function findVerifiedAddress(
   });
 
   if (address) {
+    (actor as { address_id: number }).address_id = address.id!;
+    (actor as { community_id: string }).community_id = address.community_id;
+    (actor as { role: string }).role = address.role;
     // fire and forget address activity tracking
     address.last_active = new Date();
     void address.save();
@@ -213,6 +220,9 @@ async function findAddress(
   });
 
   if (address) {
+    (actor as { address_id: number }).address_id = address.id!;
+    (actor as { community_id: string }).community_id = address.community_id;
+    (actor as { role: string }).role = address.role;
     // fire and forget address activity tracking
     address.last_active = new Date();
     void address.save();
@@ -250,68 +260,95 @@ async function checkGatedActions(
   action: GroupGatedActionKey,
   topic_id: number,
 ): Promise<void> {
-  if (!topic_id)
-    throw new InvalidInput('Must provide a valid topic id to authorize');
-
-  const topic = await models.Topic.findOne({ where: { id: topic_id } });
-  if (!topic) throw new InvalidInput('Topic not found');
-
-  // Get the groups and gated actions
-  // TODO: we can probably cache this
-  const groups = await models.sequelize.query<
-    z.infer<typeof Group> & {
-      gated_actions?: GroupGatedActionKey[];
-    }
-  >(
+  const [topic] = await models.sequelize.query<{
+    topic_name: string;
+    gates: Array<{
+      group_id: number;
+      group_name: string;
+      actions: GroupGatedActionKey[];
+      is_private: boolean;
+      membership: {
+        is_member: boolean;
+        reject_reason: z.infer<typeof MembershipRejectReason> | null;
+      } | null;
+    }>;
+  }>(
     `
-      SELECT g.*, gp.topic_id, gp.gated_actions
-      FROM "Groups" as g
-             JOIN "GroupGatedActions" gp ON g.id = gp.group_id
-      WHERE g.community_id = :community_id
-        AND gp.topic_id = :topic_id
-        AND :action = ANY(gp.gated_actions)
-    `,
+SELECT
+  T.name AS topic_name,
+  JSONB_AGG(
+    JSONB_BUILD_OBJECT(
+      'group_id', G.id,
+      'group_name', G.metadata->>'name',
+      'actions', GA.gated_actions,
+      'is_private', GA.is_private,
+      'membership', (
+        SELECT JSONB_BUILD_OBJECT(
+          'is_member', (M.reject_reason IS NULL),
+          'reject_reason', M.reject_reason
+        )
+        FROM "Memberships" M
+        WHERE M.group_id = G.id AND M.address_id = :address_id
+      )
+    )
+  ) AS gates
+FROM
+  "Topics" T
+  JOIN "GroupGatedActions" GA ON GA.topic_id = T.id
+  JOIN "Groups" G ON GA.group_id = G.id
+WHERE
+  T.id = :topic_id
+  AND (:action = ANY(GA.gated_actions) OR GA.is_private = TRUE)
+GROUP BY
+  T.name;
+`,
     {
       type: QueryTypes.SELECT,
       raw: true,
-      replacements: {
-        community_id: topic.community_id,
-        topic_id: topic.id,
-        action,
-      },
+      replacements: { address_id, topic_id, action },
     },
   );
 
-  // if the action is not gated by any group then allow
-  if (!groups.length) return;
+  // action not gated and public topic... allow it
+  if (!topic) return;
 
-  // if action is gated by 1 or more groups search for membership in those groups
-  const memberships = await models.Membership.findAll({
-    where: {
-      address_id,
-      group_id: { [Op.in]: groups.map((g) => g.id!) },
-    },
-  });
-  // if not a member in any group then this is not a member
-  if (!memberships.length) throw new NonMember(actor, topic.name, action);
+  const closed_gates = topic.gates.filter(
+    ({ actions, is_private, membership }) =>
+      actions.includes(action) || (is_private && actions.length === 0)
+        ? (membership?.is_member || false) === false
+        : false,
+  );
 
-  // if all memberships are rejected, return reject reasons
-  const rejects = memberships.filter((m) => m.reject_reason);
-  if (rejects.length === memberships.length)
-    throw new RejectedMember(
-      actor,
-      rejects.flatMap((reject) =>
-        reject.reject_reason!.map((reason) => reason.message),
-      ),
-    );
-  // a membership in one of the groups was found so the user has required permissions
+  // throw when at least one gate is closed (AND gates)
+  if (closed_gates.length > 0) {
+    const rejects = topic.gates
+      .filter(({ membership }) => !!membership?.reject_reason)
+      .map(({ membership }) =>
+        membership!.reject_reason!.map(({ message }) => message).join('; '),
+      );
+    if (rejects.length)
+      throw new RejectedMember(actor, topic.topic_name, action, rejects);
+    else throw new NonMember(actor, topic.topic_name, action);
+  }
+
+  // all gates are open!
 }
 
 /**
  * Generic authorization guard used by all middleware once the authorization context is loaded
  */
 async function mustBeAuthorized(
-  { actor, context }: Context<ZodSchema, ZodSchema>,
+  {
+    actor,
+    context,
+  }:
+    | Context<typeof AuthContextInput, typeof AuthContext>
+    | Context<typeof ThreadContextInput, typeof ThreadContext>
+    | Context<typeof CommentContextInput, typeof CommentContext>
+    | Context<typeof TopicContextInput, typeof TopicContext>
+    | Context<typeof ReactionContextInput, typeof ReactionContext>
+    | Context<typeof PollContextInput, typeof PollContext>
+    | Context<typeof VerifiedContextInput, typeof VerifiedContext>,
   check: {
     permissions?: {
       topic_id: number;
@@ -326,17 +363,17 @@ async function mustBeAuthorized(
   if (actor.is_system_actor) return;
 
   // Admins (and super admins) are always allowed to act on any entity
-  if (actor.user.isAdmin || context.address.role === 'admin') return;
+  if (actor.user.isAdmin || context!.address.role === 'admin') return;
 
   // Banned actors are always rejected (if not admin or system actors)
-  if (context.address.is_banned) throw new BannedActor(actor);
+  if (context!.address.is_banned) throw new BannedActor(actor);
 
   // Author is always allowed to act on their own entity, unless banned
-  if (context.is_author) return;
+  if ('is_author' in context! && context!.is_author) return;
 
   if (
     check.roles?.includes('moderator') &&
-    context.address.role === 'moderator'
+    context?.address.role === 'moderator'
   )
     return;
 
@@ -344,18 +381,18 @@ async function mustBeAuthorized(
   if (check.permissions)
     return await checkGatedActions(
       actor,
-      context.address!.id!,
+      context!.address!.id!,
       check.permissions.action,
       check.permissions.topic_id,
     );
 
   // Allows when actor is a collaborator in the thread
-  if (check.collaborators) {
+  if ('is_collaborator' in context! && check.collaborators) {
     const found = check.collaborators?.find(
       ({ address }) => address === actor.address,
     );
-    context.is_collaborator = !!found;
-    if (context.is_collaborator) return;
+    context!.is_collaborator = !!found;
+    if (context!.is_collaborator) return;
     throw new InvalidActor(actor, 'Not authorized collaborator');
   }
 
@@ -392,7 +429,7 @@ export const systemActor = ({
   is_system_actor: true,
 });
 
-export async function isSuperAdmin(ctx: Context<ZodSchema, ZodSchema>) {
+export async function isSuperAdmin(ctx: Context<ZodType, ZodType>) {
   if (!ctx.actor.user.isAdmin)
     await Promise.reject(new InvalidActor(ctx.actor, 'Must be a super admin'));
 }
@@ -408,6 +445,85 @@ export function authVerified() {
     const { address } = await findVerifiedAddress(ctx.actor);
     (ctx as { context: VerifiedContext }).context = { address };
   };
+}
+
+/**
+ * Optionally validates if actor's address is authorized/verified, not tied to any specific community
+ */
+export async function authOptionalVerified(
+  ctx: Context<typeof VerifiedContextInput, typeof VerifiedContext>,
+) {
+  try {
+    if (!ctx.actor.user || !ctx.actor.address) return;
+    const { address } = await findVerifiedAddress(ctx.actor);
+    (ctx as { context: VerifiedContext }).context = { address };
+  } catch (err) {
+    // ignore InvalidActor errors
+    if (err instanceof InvalidActor) return;
+    throw err;
+  }
+}
+
+/**
+ * Creates an authorization context for the actor when authenticated,
+ * but anonymous access is allowed.
+ * This is mainly used when querying communities with gating conditions.
+ */
+export async function authOptional(
+  ctx: Context<typeof AuthContextInput, typeof AuthContext>,
+) {
+  if (!ctx.actor.user || !ctx.actor.address || !ctx.payload.community_id)
+    return;
+  if (ctx.payload.community_id === ALL_COMMUNITIES) return;
+
+  try {
+    const { address, is_author } = await findAddress(
+      ctx.actor,
+      ctx.payload.community_id,
+      ['admin', 'moderator', 'member'],
+    );
+
+    (ctx as { context: AuthContext }).context = {
+      address,
+      is_author,
+      community_id: ctx.payload.community_id,
+    };
+  } catch (err) {
+    // ignore InvalidActor errors
+    if (err instanceof InvalidActor) return;
+    throw err;
+  }
+}
+
+/**
+ * Creates an authorization context for the actor when authenticated,
+ * but anonymous access is allowed.
+ * This is mainly used when querying threads with gating conditions.
+ */
+export async function authOptionalForThread(
+  ctx: Context<typeof ThreadContextInput, typeof ThreadContext>,
+) {
+  if (!ctx.actor.user || !ctx.actor.address || !ctx.payload.thread_id) return;
+
+  try {
+    const auth = await findThread(ctx.actor, ctx.payload.thread_id, false);
+    const { address, is_author } = await findAddress(
+      ctx.actor,
+      auth.community_id,
+      ['admin', 'moderator', 'member'],
+      auth.author_address_id,
+    );
+
+    (ctx as { context: AuthContext }).context = {
+      address,
+      is_author,
+      community_id: auth.community_id,
+    };
+  } catch (err) {
+    // ignore InvalidActor errors
+    if (err instanceof InvalidActor) return;
+    throw err;
+  }
 }
 
 /**

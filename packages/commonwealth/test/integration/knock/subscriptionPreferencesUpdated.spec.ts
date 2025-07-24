@@ -8,10 +8,7 @@ import {
   RepeatFrequency,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   afterAll,
   afterEach,
@@ -25,9 +22,9 @@ import {
 } from 'vitest';
 import z from 'zod';
 // eslint-disable-next-line max-len
+import { models } from '@hicommonwealth/model/db';
+import * as tester from '@hicommonwealth/model/tester';
 import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/subscriptionPreferencesUpdated';
-
-chai.use(chaiAsPromised);
 
 function SpyNotificationsProvider(stubs?: {
   triggerWorkflowStub?: Mock<
@@ -61,6 +58,7 @@ function SpyNotificationsProvider(stubs?: {
     unregisterClientRegistrationToken:
       stubs?.unregisterClientRegistrationToken ||
       vi.fn(() => Promise.resolve(true)),
+    signUserToken: vi.fn(() => Promise.resolve(undefined)),
   };
 }
 
@@ -113,6 +111,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -154,6 +153,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -208,6 +208,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -247,6 +248,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -287,6 +289,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,

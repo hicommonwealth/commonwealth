@@ -14,42 +14,6 @@ const TopicPermissionToggleGroupSubForm = ({
 }: TopicPermissionFormToggleGroupSubFormProps) => {
   const topics = PermissionFormData.map((item) => item.topic);
 
-  const handlePermissionChange = (
-    topic: Topic,
-    gatedAction: GatedActionEnum,
-  ) => {
-    const updatedData = PermissionFormData.map((item) => {
-      if (item.topic === topic) {
-        const updatedPermissions = item.permission.filter(
-          (perm) => perm !== gatedAction,
-        );
-
-        if (!item.permission.some((perm) => perm === gatedAction)) {
-          updatedPermissions.push(gatedAction);
-        }
-
-        return { ...item, permission: updatedPermissions };
-      }
-      return item;
-    });
-
-    onChange(updatedData);
-  };
-
-  const toggleAllPermissionsForAction = (
-    gatedAction: GatedActionEnum,
-    toggleValue: boolean,
-  ) => {
-    const updatedData = PermissionFormData.map((item) => {
-      const updatedPermissions = toggleValue
-        ? [...new Set([...item.permission, gatedAction])]
-        : item.permission.filter((perm) => perm !== gatedAction);
-      return { ...item, permission: updatedPermissions };
-    });
-
-    onChange(updatedData);
-  };
-
   const toggle = (selectedTopics: Topic[], gatedAction: GatedActionEnum) => {
     const value = selectedTopics.every((topic) =>
       PermissionFormData.find(
@@ -57,6 +21,29 @@ const TopicPermissionToggleGroupSubForm = ({
       )?.permission.includes(gatedAction),
     );
     return !value;
+  };
+
+  const handlePermissionChange = (
+    gatedAction: GatedActionEnum,
+    topic?: Topic,
+  ) => {
+    if (topic) {
+      const data = PermissionFormData.find((p) => p.topic.id === topic.id);
+      if (data) {
+        const enable = !data.permission.some((p) => p === gatedAction);
+        data.permission = enable
+          ? [...new Set([...data.permission, gatedAction])]
+          : data.permission.filter((perm) => perm !== gatedAction);
+      }
+    } else {
+      const enable = toggle(topics, gatedAction);
+      PermissionFormData.forEach((item) => {
+        item.permission = enable
+          ? [...new Set([...item.permission, gatedAction])]
+          : item.permission.filter((perm) => perm !== gatedAction);
+      });
+    }
+    onChange(PermissionFormData.map((item) => ({ ...item })));
   };
 
   return (
@@ -86,7 +73,7 @@ const TopicPermissionToggleGroupSubForm = ({
                   checked={PermissionFormData.find(
                     (item) => item.topic === topic,
                   )?.permission.includes(gatedAction)}
-                  onChange={() => handlePermissionChange(topic, gatedAction)}
+                  onChange={() => handlePermissionChange(gatedAction, topic)}
                 />
               </div>
             ),
@@ -105,12 +92,7 @@ const TopicPermissionToggleGroupSubForm = ({
                     (item) => item.topic === topic,
                   )?.permission.includes(gatedAction),
                 )}
-                onChange={() =>
-                  toggleAllPermissionsForAction(
-                    gatedAction,
-                    toggle(topics, gatedAction),
-                  )
-                }
+                onChange={() => handlePermissionChange(gatedAction)}
               />
             </div>
           ),

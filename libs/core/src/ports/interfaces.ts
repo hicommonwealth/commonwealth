@@ -1,4 +1,4 @@
-import { Events } from '@hicommonwealth/schemas';
+import { Events, OutboxEvents } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
 import { z } from 'zod';
 import {
@@ -52,6 +52,13 @@ export type AdapterFactory<T extends Disposable> = (adapter?: T) => T;
  */
 export interface Stats extends Disposable {
   histogram(key: string, value: number, tags?: Record<string, string>): void;
+
+  distribution(
+    key: string,
+    value: number,
+    sampleRate?: number,
+    tags?: Record<string, string>,
+  ): void;
 
   // counters
   set(key: string, value: number): void;
@@ -438,15 +445,18 @@ export type ConsumerHooks = {
   afterHandleEvent: (topic: string, content: any, context: any) => void;
 };
 
-export type Consumer =
-  | {
-      consumer: () => EventsHandlerMetadata<EventSchemas>;
-      worker?: string;
-      retryStrategy?: RetryStrategyFn;
-      hooks?: ConsumerHooks;
-      overrides: Record<string, string | null | undefined>;
-    }
-  | (() => EventsHandlerMetadata<EventSchemas>);
+export type Consumer<T> =
+  T extends EventsHandlerMetadata<infer E>
+    ?
+        | {
+            consumer: () => T;
+            worker?: string;
+            retryStrategy?: RetryStrategyFn;
+            hooks?: ConsumerHooks;
+            overrides?: { [K in keyof E]?: string | null };
+          }
+        | (() => T)
+    : never;
 
 type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
 
@@ -458,14 +468,27 @@ export type RoutingKey =
   | EventNamesType
   | Concat<EventNamesType, RoutingKeyTagsType>;
 
+export type DLQEvent = {
+  consumer: string;
+  event_id: number;
+  event_name: string;
+  reason: string;
+  timestamp: number;
+};
+export type DlqEventHandler = (dlq: DLQEvent) => Promise<void>;
+
 export interface Broker extends Disposable {
-  publish<Name extends Events>(event: EventContext<Name>): Promise<boolean>;
+  publish<Name extends OutboxEvents>(
+    event: EventContext<Name>,
+  ): Promise<boolean>;
 
   subscribe<Inputs extends EventSchemas>(
     consumer: () => EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
     hooks?: ConsumerHooks,
   ): Promise<boolean>;
+
+  subscribeDlqHandler(handler: DlqEventHandler): Promise<boolean>;
 
   getRoutingKey<Name extends Events>(event: EventContext<Name>): RoutingKey;
 }
@@ -766,4 +789,9 @@ export interface NotificationsProvider extends Disposable {
     token: string,
     channelType: 'FCM' | 'APNS',
   ): Promise<boolean>;
+
+  signUserToken(
+    userId: number,
+    expiresInSeconds: number,
+  ): Promise<string | undefined>;
 }

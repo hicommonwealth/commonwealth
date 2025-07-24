@@ -12,7 +12,10 @@ import useCreateCommunityMutation, {
   buildCreateCommunityInput,
 } from 'state/api/communities/createCommunity';
 import { generateImage } from 'state/api/general/generateImage';
-import { useLaunchTokenMutation } from 'state/api/launchPad';
+import {
+  useEstimateGasQuery,
+  useLaunchTokenMutation,
+} from 'state/api/launchPad';
 import { useCreateTokenMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import PageCounter from 'views/components/PageCounter';
@@ -24,6 +27,7 @@ import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import TokenLaunchButton from 'views/components/sidebar/TokenLaunchButton';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { fromWei } from 'web3-utils';
 import useCreateTokenCommunity from '../useCreateTokenCommunity';
 import './QuickTokenLaunchForm.scss';
 import SuccessStep from './steps/SuccessStep';
@@ -42,6 +46,42 @@ type QuickTokenLaunchFormProps = {
 
 const MAX_IDEAS_LIMIT = 5;
 
+const RATE_LIMIT_MESSAGE =
+  'You are being rate limited. Please wait and try again.';
+
+interface RateLimitErrorType {
+  data?: {
+    httpStatus?: number;
+    message?: string;
+  };
+  status?: number;
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
+const isRateLimitError = (err: RateLimitErrorType) => {
+  const status = err?.data?.httpStatus || err?.status || err?.response?.status;
+  if (status === 429) return true;
+
+  if (status === 401) {
+    const msg =
+      err?.data?.message || err?.message || err?.response?.data?.message || '';
+    const lowerMsg = String(msg).toLowerCase();
+    return (
+      lowerMsg.includes('image') &&
+      lowerMsg.includes('prompt') &&
+      lowerMsg.includes('overload')
+    );
+  }
+
+  return false;
+};
+
 export const QuickTokenLaunchForm = ({
   onCancel,
   onCommunityCreated,
@@ -50,6 +90,7 @@ export const QuickTokenLaunchForm = ({
   isSmallScreen = false,
 }: QuickTokenLaunchFormProps) => {
   const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+  const [transactionHash, setTransactionHash] = useState('');
 
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const {
@@ -91,6 +132,14 @@ export const QuickTokenLaunchForm = ({
   } = useCreateTokenCommunity();
 
   const { mutateAsync: launchToken } = useLaunchTokenMutation();
+  const { data: estimatedPrice } = useEstimateGasQuery({
+    chainRpc: baseNode?.url || '',
+    ethChainId: baseNode?.ethChainId || 0,
+    apiEnabled: !!(baseNode?.url && baseNode?.ethChainId),
+  });
+  const ethFee = estimatedPrice
+    ? fromWei(estimatedPrice.toString(), 'ether')
+    : null;
 
   const { mutateAsync: createToken } = useCreateTokenMutation();
 
@@ -212,6 +261,9 @@ export const QuickTokenLaunchForm = ({
             try {
               response = await createCommunityMutation(communityPayload);
             } catch (e) {
+              if (isRateLimitError(e)) {
+                throw e;
+              }
               const errorMsg = e?.message?.toLowerCase() || '';
               if (
                 errorMsg.includes('name') &&
@@ -220,6 +272,8 @@ export const QuickTokenLaunchForm = ({
               ) {
                 // this is not a unique community name error, abort token creation
                 response = 'invalid_state';
+              } else {
+                throw e;
               }
             }
             if (response === 'invalid_state') {
@@ -263,6 +317,8 @@ export const QuickTokenLaunchForm = ({
           addressSelectorSelectedAddress: selectedAddress.address,
         });
 
+        setTransactionHash(txReceipt.transactionHash);
+
         const token = await createToken({
           community_id: communityId,
           eth_chain_id: baseNode.ethChainId!,
@@ -296,7 +352,9 @@ export const QuickTokenLaunchForm = ({
       } catch (e) {
         console.error(`Error creating token: `, e, e.name);
 
-        if (e?.name === 'TransactionBlockTimeoutError') {
+        if (isRateLimitError(e)) {
+          notifyError(RATE_LIMIT_MESSAGE);
+        } else if (e?.name === 'TransactionBlockTimeoutError') {
           notifyError('Transaction not timely signed. Please try again!');
         } else if (
           e?.message
@@ -444,7 +502,12 @@ export const QuickTokenLaunchForm = ({
               <CWBanner
                 type="info"
                 body={`Launching token will create a complimentary community.
-                        You can edit your community post launch.`}
+                      You can edit your community post launch.`}
+              />
+              <CWBanner
+                type="info"
+                body={`Launching your token on BASE requires a small amount of BASE ETH to cover gas fees.
+                      ${ethFee ? `Estimated fee: ${ethFee} BASE ETH.` : ''}`}
               />
               <div className="cta-elements">
                 {/* allows to switch b/w generated ideas */}
@@ -517,6 +580,17 @@ export const QuickTokenLaunchForm = ({
             </>
           )}
         />
+      )}
+
+      {!!transactionHash && (
+        <>
+          <CWText type="b1" className="debugTxHash debugTxHashGap">
+            Transaction hash is
+          </CWText>
+          <CWText type="b1" className="debugTxHash">
+            {transactionHash}
+          </CWText>
+        </>
       )}
     </div>
   );

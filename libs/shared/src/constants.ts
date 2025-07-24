@@ -61,3 +61,11 @@ export const LP_CONTEST_MANAGER_ADDRESS_BASE_MAINNET =
   '0xa5f64ac36aaa2bcee1642e691bfb8bd6c6b5921c';
 export const LP_CONTEST_MANAGER_ADDRESS_ANVIL =
   '0x15d34aaf54267db7d7c367839aaf71a00a2c6a65';
+
+export const DEFAULT_POLL_DURATION = 5; // days
+
+export const UNLEASH_FRONTEND_SERVER_URL =
+  'https://flag.commonwealth.im/api/frontend';
+
+export const SNAPSHOT_HUB_URL = 'https://hub.snapshot.org';
+export const COSMOS_REGISTRY_API = 'https://cosmoschains.thesilverfox.pro';

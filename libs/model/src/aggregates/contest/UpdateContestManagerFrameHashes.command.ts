@@ -1,10 +1,11 @@
 import { Command, logger } from '@hicommonwealth/core';
-import { config, models } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { Mutex } from 'async-mutex';
 import _ from 'lodash';
 import { Op } from 'sequelize';
+import { config } from '../../config';
+import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 
 const log = logger(import.meta);
@@ -44,7 +45,7 @@ export function UpdateContestManagerFrameHashes(): Command<
         mustExist('Contest Manager', contestManager);
         if (new Date() > contestManager.contests![0]!.end_time) {
           log.warn(`${Errors.ContestEnded}: ${contestManager.contest_address}`);
-          return;
+          return {};
         }
 
         // find webhook by ID
@@ -103,6 +104,8 @@ export function UpdateContestManagerFrameHashes(): Command<
           await contestManager.save();
         }
       });
+
+      return {};
     },
   };
 }

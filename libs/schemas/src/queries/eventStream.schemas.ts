@@ -1,6 +1,8 @@
 import { z } from 'zod';
+import { VerifiedContext } from '../context';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
+import { ThreadView } from './thread.schemas';
 
 export const ActivityComment = z.object({
   id: z.number(),
@@ -17,59 +19,16 @@ export const ActivityComment = z.object({
   discord_meta: DiscordMetaSchema.nullish(),
 });
 
-export const ActivityThread = z.object({
-  community_id: z.string(),
-  community_icon: z.string().nullish(),
-  id: z.number(),
-  user_id: z.number(),
-  user_tier: z.number(),
-  user_address: z.string(),
-  profile_name: z.string().nullish(),
-  profile_avatar: z.string().nullish(),
-  body: z.string(),
-  content_url: z.string().nullish(),
-  title: z.string(),
-  kind: z.string(),
-  stage: z.string(),
-  number_of_comments: z.number(),
-  created_at: z.string().nullish(),
-  updated_at: z.string().nullish(),
-  deleted_at: z.string().nullish(),
-  locked_at: z.string().nullish(),
-  archived_at: z.string().nullish(),
-  marked_as_spam_at: z.string().nullish(),
-  read_only: z.boolean(),
-  has_poll: z.boolean().nullish(),
-  is_linking_token: z.boolean().optional(),
-  launchpad_token_address: z.string().nullish(),
-  discord_meta: DiscordMetaSchema.nullish(),
-  topic: z.object({
-    id: z.number(),
-    name: z.string(),
-    description: z.string(),
-  }),
-  recent_comments: z.array(ActivityComment).nullish(),
-});
-
 export const GlobalFeed = {
-  input: z.object({
-    limit: z.coerce.number().int().min(1).max(50).optional().default(10),
-    cursor: z.coerce
-      .number()
-      .int()
-      .min(1)
-      .optional()
-      .default(1)
-      .describe(
-        'required for tRPC useInfiniteQuery hook, equivalent to page number',
-      ),
+  input: PaginationParamsSchema.extend({
     comment_limit: z.number().int().min(0).max(10).optional().default(3),
+    community_id: z.string().optional(),
+    search: z.string().optional(),
   }),
-  output: z.object({
-    results: z.array(ActivityThread),
-    limit: z.number(),
-    page: z.number(),
+  output: PaginatedResultSchema.extend({
+    results: z.array(ThreadView),
   }),
+  context: VerifiedContext,
 };
 
 export const ActivityFeed = {
@@ -78,12 +37,11 @@ export const ActivityFeed = {
     comment_limit: z.number().optional(),
   }),
   output: PaginatedResultSchema.extend({
-    results: z.array(ActivityThread),
+    results: z.array(ThreadView),
   }),
+  context: VerifiedContext,
 };
-export const ActivityThreadWrapper = z.object({
-  thread: ActivityThread,
-});
+
 export const ChainFeedRecord = z.object({
   community_id: z.string(),
   network: z.string(),

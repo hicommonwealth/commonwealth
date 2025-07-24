@@ -1,7 +1,4 @@
-import {
-  TopicWeightedVoting,
-  Vote as VoteSchema,
-} from '@hicommonwealth/schemas';
+import { TopicWeightedVoting, VoteView } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import React, { useState } from 'react';
 import {
@@ -28,8 +25,6 @@ import {
 
 import './PollCard.scss';
 
-type ActualVoteAttributes = z.infer<typeof VoteSchema>;
-
 interface VoterProfileData {
   name: string;
   avatarUrl?: string;
@@ -45,11 +40,12 @@ export type PollCardProps = PollOptionProps &
     showDeleteButton?: boolean;
     onDeleteClick?: () => void;
     communityId: string;
-    individualVotesData?: ActualVoteAttributes[];
+    individualVotesData?: z.infer<typeof VoteView>[];
     voterProfiles?: Record<string, VoterProfileData>;
     tokenDecimals?: number;
     topicWeight?: TopicWeightedVoting | null;
     isLoadingVotes?: boolean;
+    endTimestamp?: string;
   };
 
 export const PollCard = ({
@@ -62,6 +58,7 @@ export const PollCard = ({
   pollEnded,
   proposalTitle = 'Poll',
   timeRemaining,
+  endTimestamp,
   tokenSymbol,
   tooltipErrorMessage,
   votedFor,
@@ -143,9 +140,16 @@ export const PollCard = ({
   return (
     <CWCard className="PollCard">
       <div className="poll-title-section">
-        <CWText type="b2" className="poll-title-text">
-          {proposalTitle}
-        </CWText>
+        <div className="poll-title-wrapper">
+          <CWText type="b2" className="poll-title-text">
+            {proposalTitle}
+          </CWText>
+          {endTimestamp && (
+            <CWText type="caption" className="poll-end-timestamp">
+              {`Ends ${endTimestamp}`}
+            </CWText>
+          )}
+        </div>
         <CWModal
           size="small"
           content={

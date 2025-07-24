@@ -48,6 +48,8 @@ interface CommunitiesListProps {
     | undefined;
   ethUsdRate: number;
   setSelectedCommunityId: (id: string) => void;
+  searchText?: string;
+  onClearSearch?: () => void;
 }
 
 const CommunitiesList: React.FC<CommunitiesListProps> = ({
@@ -56,6 +58,8 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
   historicalPrices,
   ethUsdRate,
   setSelectedCommunityId,
+  searchText,
+  onClearSearch,
 }) => {
   const launchpadEnabled = useFlag('launchpad');
   const user = useUserStore();
@@ -68,6 +72,8 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
   const [filters, setFilters] = useState<CommunityFilters>({
     withCommunityEcosystem: undefined,
     withStakeEnabled: undefined,
+    withLaunchpadToken: undefined,
+    withPinnedToken: undefined,
     withTagsIds: undefined,
     withCommunitySortBy: CommunitySortOptions.MemberCount,
     withCommunitySortOrder: CommunitySortDirections.Descending,
@@ -76,6 +82,7 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
     withNetwork: undefined,
   });
 
+  // TODO: 11814 - add param to api to search communities
   const {
     data: communities,
     fetchNextPage: fetchMoreCommunitiesOriginal,
@@ -83,6 +90,7 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
     isInitialLoading: isInitialCommunitiesLoading,
   } = useFetchCommunitiesQuery({
     limit: 50,
+    search: searchText?.trim(),
     include_node_info: true,
     order_by: (() => {
       if (
@@ -119,6 +127,8 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
       ? ChainNetwork[filters.withNetwork]
       : undefined,
     stake_enabled: filters.withStakeEnabled,
+    has_launchpad_token: filters.withLaunchpadToken,
+    has_pinned_token: filters.withPinnedToken,
     cursor: 1,
     tag_ids: filters.withTagsIds,
     community_type: filters.withCommunityType
@@ -150,6 +160,20 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
     setFilters({
       ...filters,
       withStakeEnabled: false,
+    });
+  };
+
+  const removeLaunchpadTokenFilter = () => {
+    setFilters({
+      ...filters,
+      withLaunchpadToken: false,
+    });
+  };
+
+  const removePinnedTokenFilter = () => {
+    setFilters({
+      ...filters,
+      withPinnedToken: false,
     });
   };
 
@@ -203,20 +227,20 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
 
   return (
     <>
-      <div
-        className={clsx('filters', {
-          hasAppliedFilter:
-            Object.values(filters).filter(Boolean).length === 1
-              ? !filters.withCommunitySortOrder
-              : Object.values(filters).filter(Boolean).length > 0,
-        })}
-      >
+      <div className="community-filters">
         <CWButton
           label="Filters"
           iconRight="funnelSimple"
           buttonType="secondary"
           onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
         />
+        {searchText?.trim() && (
+          <CWTag
+            label={`Search: ${searchText?.trim()}`}
+            type="filter"
+            onCloseClick={onClearSearch}
+          />
+        )}
         {filters.withCommunitySortBy && (
           <CWTag
             label={`${filters.withCommunitySortBy}${
@@ -263,7 +287,25 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
           />
         )}
         {filters.withStakeEnabled && (
-          <CWTag label="Stake" type="filter" onCloseClick={removeStakeFilter} />
+          <CWTag
+            label="With: Stake"
+            type="filter"
+            onCloseClick={removeStakeFilter}
+          />
+        )}
+        {filters.withLaunchpadToken && (
+          <CWTag
+            label="With: Launchpad Token"
+            type="filter"
+            onCloseClick={removeLaunchpadTokenFilter}
+          />
+        )}
+        {filters.withPinnedToken && (
+          <CWTag
+            label="With: External Token"
+            type="filter"
+            onCloseClick={removePinnedTokenFilter}
+          />
         )}
         {filters.withTagsIds &&
           filters.withTagsIds.map((id) => (

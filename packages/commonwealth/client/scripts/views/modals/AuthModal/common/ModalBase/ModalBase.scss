@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .ModalBase {
   display: flex;
@@ -7,7 +9,7 @@
   gap: 16px;
   padding-top: 48px;
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     padding-top: 32px;
     height: 90vh;
   }
@@ -25,7 +27,11 @@
     margin: auto;
     width: 227px;
 
-    @include extraSmall {
+    &.mobileApp {
+      margin-top: 12px !important;
+    }
+
+    @include media_queries.extraSmall {
       width: 175px;
     }
   }
@@ -37,17 +43,25 @@
 
   .description {
     text-align: center;
-    color: $neutral-600;
+    color: colors.$neutral-600;
     margin-top: -12px;
     padding: 0px 12px;
   }
 
   .content {
     padding: 0 48px;
-    @include extraSmall {
+
+    @include media_queries.extraSmall {
       padding: 0 32px;
       height: 70vh;
       max-height: 70vh;
+    }
+
+    &.mobileApp {
+      align-items: center !important;
+      justify-content: center !important;
+      height: fit-content !important;
+      margin-bottom: auto !important;
     }
   }
 
@@ -70,7 +84,8 @@
     gap: 12px;
     width: 100%;
     max-height: 430px;
-    @include extraSmall {
+
+    @include media_queries.extraSmall {
       padding: 0 0px;
       max-height: 100vh;
     }
@@ -79,14 +94,13 @@
 
 .footer {
   padding-bottom: 48px;
-
-  @include extraSmall {
-    padding-bottom: 32px;
-  }
-
   display: flex;
   flex-direction: column;
   justify-content: center;
+
+  @include media_queries.extraSmall {
+    padding-bottom: 32px;
+  }
 
   .Text {
     display: initial;
@@ -97,7 +111,7 @@
   a:active,
   a:hover,
   button {
-    color: $primary-600;
+    color: colors.$primary-600;
   }
 
   button {

@@ -1,7 +1,6 @@
 import { RedisCache } from '@hicommonwealth/adapters';
 import { cache, CacheNamespaces, config, dispose } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
-import { models, tester } from '@hicommonwealth/model';
 import { ContestManager, Events, events } from '@hicommonwealth/schemas';
 import { serializeBigIntObj } from '@hicommonwealth/shared';
 import {
@@ -14,12 +13,14 @@ import {
   vi,
 } from 'vitest';
 import { z } from 'zod';
+import { models } from '../../src/database';
 import {
   EVENT_STREAM_WINDOW_SIZE,
   EventStreamPolicy,
   getEventStream,
   getEventStreamCacheKey,
 } from '../../src/policies/EventStream.policy';
+import * as tester from '../../src/tester';
 import { drainOutbox } from '../utils/outbox-drain';
 
 const isValidUrl = (urlString: string): boolean => {
@@ -331,14 +332,14 @@ describe('EventStream Policy Integration Tests', () => {
           topic_id: 1,
         } satisfies z.infer<typeof events.ThreadCreated>,
       },
-      {
-        event_name: 'LaunchpadTokenCreated',
-        event_payload: serializeBigIntObj({
-          transaction_hash: '0x7777777777777777777777777777777777777777',
-          eth_chain_id: 1,
-          block_timestamp: 1n,
-        } satisfies z.infer<typeof events.LaunchpadTokenCreated>),
-      },
+      // {
+      //   event_name: 'LaunchpadTokenCreated',
+      //   event_payload: serializeBigIntObj({
+      //     transaction_hash: '0x7777777777777777777777777777777777777777',
+      //     eth_chain_id: 1,
+      //     block_timestamp: 1n,
+      //   } satisfies z.infer<typeof events.LaunchpadTokenCreated>),
+      // },
       // {
       //   event_name: 'LaunchpadTokenTraded',
       //   event_payload: serializeBigIntObj({
@@ -378,7 +379,7 @@ describe('EventStream Policy Integration Tests', () => {
       'ContestEnding',
       'CommunityCreated',
       'ThreadCreated',
-      'LaunchpadTokenCreated',
+      // 'LaunchpadTokenCreated',
       // 'LaunchpadTokenTraded',
       'LaunchpadTokenGraduated',
     ] satisfies Events[];

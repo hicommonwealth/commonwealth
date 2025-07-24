@@ -61,17 +61,23 @@ export function UpdateGroup(): Command<typeof schemas.UpdateGroup> {
                   .join(', ')}]::"enum_GroupGatedActions_gated_actions"[]`;
                 await models.sequelize.query(
                   `
-                  INSERT INTO "GroupGatedActions" (group_id, topic_id, gated_actions, created_at, updated_at)
-                  VALUES (:group_id, :topic_id, ${gatedActions}, NOW(), NOW())
-                  ON CONFLICT(group_id, topic_id) DO UPDATE
-                    SET gated_actions = EXCLUDED.gated_actions,
-                        updated_at      = NOW();
-                `,
+                    INSERT INTO "GroupGatedActions" (
+                      group_id, topic_id, is_private,gated_actions, created_at, updated_at
+                    )
+                    VALUES (
+                      :group_id, :topic_id, :is_private, ${gatedActions}, NOW(), NOW()
+                    )
+                    ON CONFLICT(group_id, topic_id) DO UPDATE
+                      SET gated_actions = EXCLUDED.gated_actions,
+                          is_private = EXCLUDED.is_private,
+                          updated_at = NOW();
+                  `,
                   {
                     transaction,
                     replacements: {
                       group_id,
                       topic_id: t.id,
+                      is_private: !!t.is_private,
                     },
                   },
                 );
@@ -79,6 +85,27 @@ export function UpdateGroup(): Command<typeof schemas.UpdateGroup> {
             }),
           );
         }
+
+        // delete all entries for this group with empty permissions array or if the topic_id is not in the payload
+        const topicIds = (payload.topics || []).map((t) => t.id);
+        await models.sequelize.query(
+          `
+          DELETE FROM "GroupGatedActions"
+          WHERE group_id = :group_id 
+           ${
+             topicIds.length > 0
+               ? `AND (coalesce(array_length(gated_actions, 1), 0) = 0 OR topic_id NOT IN (:topic_ids))`
+               : ''
+           };
+          `,
+          {
+            transaction,
+            replacements: {
+              group_id,
+              topic_ids: topicIds,
+            },
+          },
+        );
 
         return group.toJSON();
       });

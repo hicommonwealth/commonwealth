@@ -3,7 +3,6 @@ import {
   deployNamespace,
   mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
-import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   ChainBase,
@@ -13,6 +12,7 @@ import {
   DefaultPage,
   DisabledCommunitySpamTier,
 } from '@hicommonwealth/shared';
+import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 
@@ -81,6 +81,7 @@ export function CreateBotNamespace(): Command<
         snapshot_spaces: [],
         stages_enabled: true,
         namespace_verified: false,
+        ai_features_enabled: true,
       });
       return {
         community,

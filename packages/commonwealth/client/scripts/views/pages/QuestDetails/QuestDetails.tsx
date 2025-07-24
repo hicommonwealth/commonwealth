@@ -73,9 +73,9 @@ const QuestDetails = ({ id }: { id: number }) => {
     specificAuthOption: undefined,
   });
 
-  const { mutateAsync: deleteQuest, isLoading: isDeletingQuest } =
+  const { mutateAsync: deleteQuest, isPending: isDeletingQuest } =
     useDeleteQuestMutation();
-  const { mutateAsync: cancelQuest, isLoading: isCancelingQuest } =
+  const { mutateAsync: cancelQuest, isPending: isCancelingQuest } =
     useCancelQuestMutation();
 
   const isPendingAction = isDeletingQuest || isCancelingQuest;
@@ -146,7 +146,14 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case 'SSOLinked': {
-        setAuthModalConfig({ type: AuthModalType.SignIn, options: ['sso'] });
+        const specificAuthOption = buildRedirectURLFromContentId(
+          action.content_id || '',
+        ) as AuthOptions;
+        setAuthModalConfig({
+          type: AuthModalType.SignIn,
+          options: ['sso'],
+          ...(specificAuthOption && { specificAuthOption }),
+        });
         break;
       }
       case 'CommunityCreated': {
@@ -310,6 +317,44 @@ const QuestDetails = ({ id }: { id: number }) => {
           return;
         }
         navigate(`/explore?tab=tokens`);
+        break;
+      }
+      case 'LaunchpadTokenGraduated': {
+        navigate(`/explore?tab=tokens`);
+        break;
+      }
+      case 'CommunityGoalReached': {
+        if (quest.community_id) {
+          navigate(`/${quest.community_id}/discussions`, {}, null);
+          return;
+        }
+        navigate(`/explore?tab=communities`);
+        break;
+      }
+      case 'RecurringContestManagerDeployed': {
+        if (quest.community_id) {
+          navigate(
+            `/${quest.community_id}/contests/launch`,
+            {},
+            quest.community_id || null,
+          );
+        } else {
+          // If no community context, navigate to community selection for contest creation
+          navigate('/explore?tab=communities', {}, null);
+        }
+        break;
+      }
+      case 'ContestEnded': {
+        if (quest.community_id) {
+          navigate(
+            `/${quest.community_id}/contests`,
+            {},
+            quest.community_id || null,
+          );
+        } else {
+          // If no community context, navigate to community selection for contest view
+          navigate('/explore?tab=communities', {}, null);
+        }
         break;
       }
       default:

@@ -42,7 +42,6 @@ const {
   joinCommunity,
   banAddress,
   updateRole,
-  setDefaultRole,
 } = community.trpcRouter;
 const {
   createThread,
@@ -61,8 +60,12 @@ const {
   toggleCommentSpam,
 } = comment.trpcRouter;
 const { getNewContent } = user.trpcRouter;
-const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
-  contest.trpcRouter;
+const {
+  createContestMetadata,
+  updateContestMetadata,
+  cancelContestMetadata,
+  deleteContestMetadata,
+} = contest.trpcRouter;
 const { createToken, createTrade, getLaunchpadTrades, getTokenInfoAlchemy } =
   launchpad.trpcRouter;
 const { launchTokenBot } = bot.trpcRouter;
@@ -109,6 +112,7 @@ const api = {
   createContestMetadata,
   updateContestMetadata,
   cancelContestMetadata,
+  deleteContestMetadata,
   createCommunity,
   updateCommunity,
   createTopic,
@@ -131,7 +135,6 @@ const api = {
   joinCommunity,
   banAddress,
   updateRole,
-  setDefaultRole,
   toggleCommentSpam,
   createToken,
   createTrade,
@@ -182,4 +185,4 @@ const oasOptions: trpc.OasOptions = {
 const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, oasOptions);
 
-export { oasOptions, PATH, router, trpcRouter };
+export { api, oasOptions, PATH, router, trpcRouter };

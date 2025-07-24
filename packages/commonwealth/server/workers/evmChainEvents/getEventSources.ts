@@ -2,15 +2,16 @@ import { logger } from '@hicommonwealth/core';
 import {
   ContractSource,
   EventRegistry,
-  commonProtocol as cp,
+  isValidChain,
 } from '@hicommonwealth/evm-protocols';
-import {
+import { buildChainNodeUrl } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import type {
   EvmContractSources,
   EvmEventSource,
   EvmSources,
-  buildChainNodeUrl,
-  models,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/services';
+import { getAddress } from 'viem';
 import { config } from '../../config';
 
 const DEFAULT_MAX_BLOCK_RANGE = 500;
@@ -46,12 +47,13 @@ export async function getXpSources(
     }
 
     const chainSource = evmSources[source.ChainNode!.eth_chain_id!];
-    if (!chainSource.contracts[source.contract_address]) {
-      chainSource.contracts[source.contract_address] = [];
+    const contractAddress = getAddress(source.contract_address);
+    if (!chainSource.contracts[contractAddress]) {
+      chainSource.contracts[contractAddress] = [];
     } else {
-      const existingSource = chainSource.contracts[
-        source.contract_address
-      ].find((s) => s.event_signature === source.event_signature);
+      const existingSource = chainSource.contracts[contractAddress].find(
+        (s) => s.event_signature === source.event_signature,
+      );
       if (existingSource && 'quest_action_meta_ids' in existingSource.meta) {
         existingSource.meta.quest_action_meta_ids?.push(
           source.quest_action_meta_id,
@@ -60,9 +62,9 @@ export async function getXpSources(
       }
     }
 
-    chainSource.contracts[source.contract_address].push({
+    chainSource.contracts[contractAddress].push({
       eth_chain_id: source.ChainNode!.eth_chain_id!,
-      contract_address: source.contract_address,
+      contract_address: contractAddress,
       event_signature: source.event_signature,
       meta: {
         events_migrated: true,
@@ -83,7 +85,8 @@ export async function getEventSources(): Promise<EvmSources> {
   let ethChainIds: string[] | number[] = Object.keys(EventRegistry);
   if (
     Array.isArray(config.EVM_CE.ETH_CHAIN_ID_OVERRIDE) &&
-    config.EVM_CE.ETH_CHAIN_ID_OVERRIDE.length > 0
+    config.EVM_CE.ETH_CHAIN_ID_OVERRIDE.length > 0 &&
+    config.NODE_ENV !== 'test'
   ) {
     ethChainIds = config.EVM_CE.ETH_CHAIN_ID_OVERRIDE;
     if (logWarning) {
@@ -101,7 +104,7 @@ export async function getEventSources(): Promise<EvmSources> {
 
   for (const chainNode of chainNodes) {
     const ethChainId = chainNode.eth_chain_id!;
-    if (!cp.isValidChain(ethChainId))
+    if (!isValidChain(ethChainId))
       throw new Error(`Invalid eth chain id ${ethChainId}`);
 
     const entries = Object.entries<ContractSource>(EventRegistry[ethChainId]);
@@ -124,24 +127,25 @@ export async function getEventSources(): Promise<EvmSources> {
     for (const source of dbEvmSources.filter(
       (e) => e.eth_chain_id === ethChainId,
     )) {
+      const parentContractAddress = getAddress(source.parent_contract_address);
+      const contractAddress = getAddress(source.contract_address);
       const childContracts: ContractSource['childContracts'] =
-        EventRegistry[ethChainId][source.parent_contract_address]
-          ?.childContracts;
+        EventRegistry[ethChainId][parentContractAddress]?.childContracts;
       if (!childContracts) {
         log.error(`Child contracts not found in Event Registry!`, undefined, {
           eth_chain_id: ethChainId,
-          parent_contract_address: source.parent_contract_address,
+          parent_contract_address: parentContractAddress,
         });
         continue;
       }
 
-      if (!dbContractSources[source.contract_address]) {
-        dbContractSources[source.contract_address] = [];
+      if (!dbContractSources[contractAddress]) {
+        dbContractSources[contractAddress] = [];
       }
 
       const sharedSource = {
         eth_chain_id: source.eth_chain_id,
-        contract_address: source.contract_address,
+        contract_address: contractAddress,
         event_signature: source.event_signature,
       };
       let buildSource: EvmEventSource;
@@ -162,7 +166,7 @@ export async function getEventSources(): Promise<EvmSources> {
         };
       }
 
-      dbContractSources[source.contract_address].push(buildSource);
+      dbContractSources[contractAddress].push(buildSource);
     }
 
     evmSources[ethChainId] = {

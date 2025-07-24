@@ -1,6 +1,5 @@
 import { config as EnvConfig } from '@hicommonwealth/adapters';
-import { Consumer, logger, outboxEvents } from '@hicommonwealth/core';
-import { Events } from '@hicommonwealth/schemas';
+import { Consumer, EventsHandlerMetadata } from '@hicommonwealth/core';
 import {
   BindingConfig,
   BrokerConfig,
@@ -8,11 +7,13 @@ import {
   QueueConfig,
 } from 'rascal';
 
-const log = logger(import.meta);
-
 export enum RascalExchanges {
   DeadLetter = 'DeadLetterExchange',
   MessageRelayer = 'MessageRelayerExchange',
+}
+
+export enum RascalQueues {
+  DeadLetter = 'DeadLetterQueue',
 }
 
 /**
@@ -31,11 +32,16 @@ export function createRmqConfig({
   map,
 }: {
   rabbitMqUri: string;
-  // TODO: @Roger - add types so that override keys are a partial record of consumer input type
-  map: Array<Consumer>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  map: Array<Consumer<EventsHandlerMetadata<any>>>;
 }) {
   let vhost: string;
-  if (rabbitMqUri.includes('localhost') || rabbitMqUri.includes('127.0.0.1')) {
+  let connection = <ConnectionConfig>rabbitMqUri;
+  if (
+    rabbitMqUri.includes('localhost') ||
+    rabbitMqUri.includes('127.0.0.1') ||
+    rabbitMqUri.includes('railway')
+  ) {
     vhost = '/';
   } else {
     const count = (rabbitMqUri.match(/\//g) || []).length;
@@ -48,6 +54,16 @@ export function createRmqConfig({
         "Can't create Rascal RabbitMQ Config with an invalid URI!",
       );
     }
+  }
+
+  if (EnvConfig.BROKER.RABBITMQ_FRAME_SIZE) {
+    // necessary until rascal upgrades amqp version >= 0.10.6
+    connection = {
+      url: rabbitMqUri,
+      options: {
+        frameMax: EnvConfig.BROKER.RABBITMQ_FRAME_SIZE,
+      },
+    };
   }
 
   const queueConfig = {
@@ -64,11 +80,10 @@ export function createRmqConfig({
     },
   };
 
-  const deadLetterQueue = 'DeadLetterQueue';
   const config: BrokerConfig = {
     vhosts: {
       [vhost]: {
-        connection: <ConnectionConfig>rabbitMqUri,
+        connection,
         exchanges: {
           [RascalExchanges.DeadLetter]: {
             ...exchangeConfig,
@@ -79,14 +94,14 @@ export function createRmqConfig({
           },
         },
         queues: {
-          [deadLetterQueue]: {
+          [RascalQueues.DeadLetter]: {
             ...queueConfig,
           },
         },
         bindings: {
           DeadLetterBinding: {
             source: RascalExchanges.DeadLetter,
-            destination: deadLetterQueue,
+            destination: RascalQueues.DeadLetter,
             destinationType: 'queue',
             bindingKey: deadLetterRoutingKey,
           },
@@ -100,12 +115,17 @@ export function createRmqConfig({
             },
           },
         },
-        subscriptions: {},
+        subscriptions: {
+          dlq_handler: {
+            queue: RascalQueues.DeadLetter,
+            contentType: 'application/json',
+            prefetch: 10,
+          },
+        },
       },
     },
   };
 
-  const ignoredEvents = new Set<string>();
   for (const item of map) {
     let consumer,
       overrides: Record<string, string | null | undefined> | undefined;
@@ -136,23 +156,11 @@ export function createRmqConfig({
       source: RascalExchanges.MessageRelayer,
       destination: queue,
       destinationType: 'queue',
-      bindingKeys: Object.keys(consumer().inputs).reduce(
-        (acc: string[], val) => {
-          // if consumer handler does not have an associated event
-          // from the Outbox exclude it automatically
-          if (!outboxEvents.includes(<Events>val)) {
-            ignoredEvents.add(val);
-            return acc;
-          }
-
-          if (!overrides) acc.push(val);
-          else if (overrides[val] !== null) {
-            acc.push(overrides[val] || val);
-          }
-          return acc;
-        },
-        [],
-      ),
+      bindingKeys: Object.keys(consumer().inputs).reduce((acc, key) => {
+        if (!overrides) acc.push(key);
+        else if (overrides[key] !== null) acc.push(overrides[key] || key);
+        return acc;
+      }, [] as string[]),
     };
     config.vhosts![vhost].subscriptions![consumerName] = {
       queue,
@@ -164,11 +172,5 @@ export function createRmqConfig({
     };
   }
 
-  if (ignoredEvents.size > 0)
-    log.warn(
-      `The following events are ignored because they are not part of the Outbox: ${Array.from(
-        ignoredEvents,
-      ).join(', ')}`,
-    );
   return config;
 }

@@ -48,6 +48,14 @@ export function mustBeProtocolChainId(
   }
 }
 
+// Purpose of this function is to get around the satisfies in the
+// factoryContract type in order to check existence of fields
+export function toContractObject<T extends factoryContractsType[ValidChains]>(
+  obj: T,
+): Required<factoryContractsType[ValidChains]> {
+  return obj as Required<factoryContractsType[ValidChains]>;
+}
+
 export const STAKE_ID = 2;
 export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
@@ -80,9 +88,9 @@ export const factoryContracts = {
   [ValidChains.SepoliaBase]: {
     factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
     communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
-    launchpad: '0x0d3b664431feb91e630dbab864917da60e1915b8',
+    launchpad: '0x0d3b664431FEB91E630DBAB864917DA60e1915b8',
     lpBondingCurve: '0x40F620b5191fF99d0290F27194383c6979011a68',
-    tokenCommunityManager: '0x5620cfb48748c1be2dfb919eee7414b491ccba20',
+    tokenCommunityManager: '0x5620CfB48748c1bE2DFB919Eee7414B491CCba20',
     referralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
     veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
     communityNomination: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
@@ -98,9 +106,9 @@ export const factoryContracts = {
   [ValidChains.Base]: {
     factory: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
     communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
-    launchpad: '0x0c1786961cfdac88edeb5728e52f73a0dbbe7813',
+    launchpad: '0x0c1786961CfDac88EdEb5728E52F73A0DbBe7813',
     lpBondingCurve: '0x4bF195932E20Dc8459419Bc93a84B713bED20f38',
-    tokenCommunityManager: '0x84a0cfb53a77202777fdbc845e7a5bb214311e88',
+    tokenCommunityManager: '0x84A0CFb53a77202777fdbc845e7A5bb214311e88',
     referralFeeManager: '0x9d3BE262bed6F3A0AAb4E97c0232071EF730632f',
     chainId: 8453,
   },
@@ -137,12 +145,14 @@ export const factoryContracts = {
   [ValidChains.Anvil]: {
     factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
     communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
-    launchpad: '0x0d3b664431feb91e630dbab864917da60e1915b8',
+    launchpad: '0x0d3b664431FEB91E630DBAB864917DA60e1915b8',
     lpBondingCurve: '0x40F620b5191fF99d0290F27194383c6979011a68',
-    tokenCommunityManager: '0x5620cfb48748c1be2dfb919eee7414b491ccba20',
+    tokenCommunityManager: '0x5620CfB48748c1bE2DFB919Eee7414B491CCba20',
     referralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
     veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
-    communityNomination: '0xD7beDeb28c9AB4A3bcB835Bc341AaB110cb27d5b',
+    communityNomination: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
+    postTokenLaunchpad: '0x26B3f37507c38a84C5eFAB888D422170102cCF10',
+    postTokenBondingCurve: '0x112eAB263b0eEe88b6996Ff4A03D9629dad8a2b8',
     chainId: 31337,
   },
 } as const satisfies factoryContractsType;

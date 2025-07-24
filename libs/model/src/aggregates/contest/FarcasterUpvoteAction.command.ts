@@ -4,7 +4,10 @@ import { BalanceSourceType, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { models } from '../../database';
 import { mustExist, mustNotExist } from '../../middleware/guards';
-import { GetBalancesOptions, tokenBalanceCache } from '../../services';
+import {
+  getBalances,
+  type GetBalancesOptions,
+} from '../../services/tokenBalanceCache';
 import { buildFarcasterContentUrl, emitEvent } from '../../utils';
 
 const log = logger(import.meta);
@@ -24,7 +27,7 @@ export function FarcasterUpvoteAction(): Command<
         log.warn(
           'Farcaster verified address not found for upvote action- upvote will be ignored.',
         );
-        return;
+        return { message: '' };
       }
       const { parent_hash, hash } = payload.cast;
       const contentUrlWithoutFid = buildFarcasterContentUrl(parent_hash!, hash);
@@ -109,7 +112,7 @@ export function FarcasterUpvoteAction(): Command<
               cacheRefresh: true,
             };
 
-      const balances = await tokenBalanceCache.getBalances(balanceOptions);
+      const balances = await getBalances(balanceOptions);
       const tokenBalance = balances[verified_address];
 
       if (BigInt(tokenBalance || 0) <= BigInt(0)) {

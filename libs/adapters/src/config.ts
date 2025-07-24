@@ -1,4 +1,13 @@
-import { configure, logger, config as target } from '@hicommonwealth/core';
+import {
+  configure,
+  DeployedEnvironments,
+  isAllDefined,
+  logger,
+  ProdLikeEnvironments,
+  requiredInEnvironmentServices,
+  config as target,
+  WebServices,
+} from '@hicommonwealth/core';
 import { z } from 'zod';
 
 const log = logger(import.meta);
@@ -9,10 +18,9 @@ const DEFAULTS = {
 };
 
 const {
-  MIXPANEL_PROD_TOKEN,
-  MIXPANEL_DEV_TOKEN,
   DISABLE_CACHE,
-  CLOUDAMQP_URL,
+  CLOUDAMQP_URL, // TODO: remove when finalizing transition off Heroku
+  RABBITMQ_URI,
   REDIS_URL, // local + staging
   REDIS_TLS_URL, // staging + production
   KNOCK_AUTH_TOKEN,
@@ -32,6 +40,7 @@ const {
   R2_ACCESS_KEY_ID,
   R2_SECRET_ACCESS_KEY,
   R2_ACCOUNT_ID,
+  RABBITMQ_FRAME_SIZE,
 } = process.env;
 
 export const config = configure(
@@ -44,8 +53,11 @@ export const config = configure(
       DISABLE_CACHE: DISABLE_CACHE === 'true',
     },
     BROKER: {
-      RABBITMQ_URI: CLOUDAMQP_URL ?? DEFAULTS.RABBITMQ_URI,
+      RABBITMQ_URI: (RABBITMQ_URI || CLOUDAMQP_URL) ?? DEFAULTS.RABBITMQ_URI,
       DISABLE_LOCAL_QUEUE_PURGE: DISABLE_LOCAL_QUEUE_PURGE === 'true',
+      RABBITMQ_FRAME_SIZE: RABBITMQ_FRAME_SIZE
+        ? parseInt(RABBITMQ_FRAME_SIZE)
+        : undefined,
     },
     NOTIFICATIONS: {
       FLAG_KNOCK_INTEGRATION_ENABLED:
@@ -62,10 +74,6 @@ export const config = configure(
         ),
       },
       SEND_EMAILS: SEND_EMAILS === 'true',
-    },
-    ANALYTICS: {
-      MIXPANEL_PROD_TOKEN,
-      MIXPANEL_DEV_TOKEN,
     },
     PUSH_NOTIFICATIONS: {
       KNOCK_FCM_CHANNEL_ID,
@@ -89,26 +97,30 @@ export const config = configure(
       REDIS_URL: z
         .string()
         .optional()
-        .refine((data) => {
-          return !(
-            ['production', 'beta', 'demo', 'frick'].includes(target.APP_ENV) &&
-            !data
-          );
-        }, 'REDIS_URL is required in production, beta (QA), demo, and frick Heroku apps'),
+        .refine(
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: DeployedEnvironments,
+            requiredServices: [...WebServices, 'consumer', 'graphile'],
+          }),
+        ),
       DISABLE_CACHE: z.boolean(),
     }),
     BROKER: z.object({
-      RABBITMQ_URI: z.string().refine((data) => {
-        return !(
-          ['production', 'beta', 'demo', 'frick'].includes(target.APP_ENV) &&
-          data === DEFAULTS.RABBITMQ_URI
-        );
-      }, 'RABBITMQ_URI is require in production, beta (QA), demo, and frick Heroku apps'),
+      RABBITMQ_URI: z.string().refine(
+        requiredInEnvironmentServices({
+          config: target,
+          requiredAppEnvs: DeployedEnvironments,
+          requiredServices: ['consumer', 'message-relayer', 'knock'],
+          defaultCheck: DEFAULTS.RABBITMQ_URI,
+        }),
+      ),
       DISABLE_LOCAL_QUEUE_PURGE: z
         .boolean()
         .describe(
           'Disable purging all messages in queues when a consumer starts up',
         ),
+      RABBITMQ_FRAME_SIZE: z.number().optional(),
     }),
     NOTIFICATIONS: z
       .object({
@@ -188,32 +200,25 @@ export const config = configure(
             return true;
           }),
       })
-      .refine(
-        (data) => {
-          if (data.FLAG_KNOCK_INTEGRATION_ENABLED) {
-            return (
-              data.KNOCK_AUTH_TOKEN &&
-              data.KNOCK_SECRET_KEY &&
-              data.KNOCK_SIGNING_KEY &&
-              data.KNOCK_IN_APP_FEED_ID &&
-              data.KNOCK_PUBLIC_API_KEY
-            );
-          }
-          return true;
-        },
-        {
-          message:
-            'KNOCK_AUTH_TOKEN, KNOCK_SECRET_KEY, KNOCK_PUBLIC_API_KEY, KNOCK_IN_APP_FEED_ID, and KNOCK_SIGNING_KEY ' +
-            'are required when FLAG_KNOCK_INTEGRATION_ENABLED is true',
-          path: [
-            'KNOCK_AUTH_TOKEN',
-            'KNOCK_SECRET_KEY',
-            'KNOCK_SIGNING_KEY',
-            'KNOCK_PUBLIC_API_KEY',
-            'KNOCK_IN_APP_FEED_ID',
-          ],
-        },
-      ),
+      .refine((data) => {
+        const fn = requiredInEnvironmentServices({
+          config: target,
+          requiredAppEnvs: ProdLikeEnvironments,
+          requiredServices: [...WebServices, 'consumer', 'knock'],
+        });
+        if (data.FLAG_KNOCK_INTEGRATION_ENABLED) {
+          return fn(
+            isAllDefined(
+              data.KNOCK_AUTH_TOKEN,
+              data.KNOCK_SECRET_KEY,
+              data.KNOCK_SIGNING_KEY,
+              data.KNOCK_IN_APP_FEED_ID,
+              data.KNOCK_PUBLIC_API_KEY,
+            ),
+          );
+        }
+        return true;
+      }),
     PUSH_NOTIFICATIONS: z.object({
       KNOCK_FCM_CHANNEL_ID: z
         .string()
@@ -231,10 +236,11 @@ export const config = configure(
         .describe('The Firebase VAPID key.'),
       KNOCK_PUSH_NOTIFICATIONS_PUBLIC_FIREBASE_CONFIG: z
         .string()
+        .optional()
         .refine(
           (data) => {
             try {
-              JSON.parse(data);
+              JSON.parse(data ?? '{}');
               return true;
             } catch {
               return false;
@@ -244,36 +250,28 @@ export const config = configure(
             message: 'Invalid JSON string',
           },
         )
-        .optional()
         .describe('The public firebase config for FCM'),
     }),
-    ANALYTICS: z.object({
-      MIXPANEL_PROD_TOKEN: z
+    LOAD_TESTING: z.object({
+      AUTH_TOKEN: z
         .string()
         .optional()
-        .refine((data) => !(target.APP_ENV === 'production' && !data)),
-      MIXPANEL_DEV_TOKEN: z.string().optional(),
+        .refine(
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: DeployedEnvironments,
+            requiredServices: [...WebServices],
+          }),
+        )
+        .refine(
+          requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: DeployedEnvironments,
+            requiredServices: [...WebServices],
+            defaultCheck: DEFAULTS.LOAD_TESTING_AUTH_TOKEN,
+          }),
+        ),
     }),
-    LOAD_TESTING: z
-      .object({
-        AUTH_TOKEN: z.string().optional(),
-      })
-      .refine(
-        (data) => {
-          if (!['local', 'CI'].includes(target.APP_ENV)) {
-            return (
-              !!LOAD_TESTING_AUTH_TOKEN &&
-              data.AUTH_TOKEN !== DEFAULTS.LOAD_TESTING_AUTH_TOKEN
-            );
-          }
-          return true;
-        },
-        {
-          message:
-            'LOAD_TESTING_AUTH_TOKEN must be set in all publicly accessible Common API instances.',
-          path: ['AUTH_TOKEN'],
-        },
-      ),
     CLOUDFLARE: z.object({
       R2: z
         .object({
@@ -282,12 +280,18 @@ export const config = configure(
           SECRET_ACCESS_KEY: z.string().optional(),
         })
         .refine((data) => {
-          if (target.APP_ENV === 'CI' || target.NODE_ENV === 'test')
-            return true;
-          else
-            return (
-              data.ACCOUNT_ID && data.ACCESS_KEY_ID && data.SECRET_ACCESS_KEY
-            );
+          const fn = requiredInEnvironmentServices({
+            config: target,
+            requiredAppEnvs: DeployedEnvironments,
+            requiredServices: [...WebServices],
+          });
+          return fn(
+            isAllDefined(
+              data.ACCOUNT_ID,
+              data.ACCESS_KEY_ID,
+              data.SECRET_ACCESS_KEY,
+            ),
+          );
         }),
     }),
   }),

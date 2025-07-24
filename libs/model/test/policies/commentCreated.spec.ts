@@ -6,8 +6,6 @@ import {
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   Mock,
   afterAll,
@@ -20,16 +18,15 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { models, tester } from '../../src';
+import { models } from '../../src/database';
 import { notifyCommentCreated } from '../../src/policies/handlers/notifyCommentCreated';
 import { getCommentUrl, getProfileUrl } from '../../src/policies/utils/utils';
+import * as tester from '../../src/tester';
 import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
 } from '../utils/mockedNotificationProvider';
-
-chai.use(chaiAsPromised);
 
 describe('CommentCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined,
@@ -134,6 +131,7 @@ describe('CommentCreated Event Handler', () => {
 
   test('should not throw if a valid author is not found', async () => {
     const res = await notifyCommentCreated({
+      id: 0,
       name: 'CommentCreated',
       payload: { address_id: -999999 } as z.infer<
         typeof schemas.events.CommentCreated
@@ -144,6 +142,7 @@ describe('CommentCreated Event Handler', () => {
 
   test('should not throw if a valid community is not found', async () => {
     const res = await notifyCommentCreated({
+      id: 0,
       name: 'CommentCreated',
       payload: {
         // @ts-expect-error StrictNullChecks
@@ -160,6 +159,7 @@ describe('CommentCreated Event Handler', () => {
     });
 
     const res = await notifyCommentCreated({
+      id: 0,
       name: 'CommentCreated',
       payload: {
         // @ts-expect-error StrictNullChecks
@@ -291,7 +291,7 @@ describe('CommentCreated Event Handler', () => {
         // @ts-expect-error StrictNullChecks
         payload: { ...rootComment, community_id: community.id },
       }),
-    ).to.eventually.be.rejectedWith(ProviderError);
+    ).rejects.toThrow(ProviderError);
   });
 
   test('should not trigger workflow for mentioned users', async () => {

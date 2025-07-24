@@ -22,6 +22,7 @@ export const GetAllContests = {
     contest_id: z.number().int().optional(),
     running: z.boolean().optional().describe('Only active contests'),
     with_chain_node: z.string().optional(),
+    search: z.string().optional().describe('Search contests by name'),
   }),
   output: z.array(ContestResults),
 };
@@ -63,6 +64,9 @@ export const GetActiveContestManagers = {
         'demo',
         'production',
       ]),
+      namespace_judge_token_id: z.number().nullish(),
+      namespace_judges: z.array(z.string()).nullish(),
+      funding_token_address: z.string().nullish(),
     }),
   ),
 };

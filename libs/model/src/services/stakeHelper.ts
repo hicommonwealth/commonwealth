@@ -1,15 +1,16 @@
 import { InvalidState } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { calculateVoteWeight } from '@hicommonwealth/evm-protocols';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
   NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
-import { GetBalancesOptions, tokenBalanceCache } from '.';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { contractHelpers } from '../services/commonProtocol';
+import { getBalances } from './tokenBalanceCache';
+import type { GetBalancesOptions } from './tokenBalanceCache/types';
 
 /**
  * Calculates voting weight of address based on the topic in wei
@@ -69,7 +70,7 @@ export async function getVotingWeight(
       throw new InvalidState('Must have stake to vote');
     }
 
-    return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
+    return calculateVoteWeight(stakeBalance, stake.vote_weight);
   } else if (topic.weighted_voting === TopicWeightedVoting.ERC20) {
     // if topic chain node is missing, fallback on community chain node
     const chainNode = topic.ChainNode || community.ChainNode!;
@@ -86,6 +87,7 @@ export async function getVotingWeight(
     if (numTokens === BigInt(0)) {
       throw new InvalidState('Insufficient token balance');
     }
+    return numTokens;
   } else if (topic.weighted_voting === TopicWeightedVoting.SPL) {
     // SPL Token support
     mustExist('Topic Token Address', topic.token_address);
@@ -153,7 +155,7 @@ export async function getVotingWeight(
       throw new InvalidState('Must have community nomination token to vote');
     }
 
-    return commonProtocol.calculateVoteWeight(tokenBalance, 1);
+    return calculateVoteWeight(tokenBalance, 1);
   }
 
   // no weighted voting
@@ -186,17 +188,14 @@ export async function getWeightedNumTokens(
 
   balanceOptions.cacheRefresh = true;
 
-  const balances = await tokenBalanceCache.getBalances(balanceOptions);
+  const balances = await getBalances(balanceOptions);
 
   const tokenBalance = balances[address];
 
   if (BigInt(tokenBalance || 0) <= BigInt(0)) {
     throw new InvalidState('Insufficient token balance');
   }
-  const result = commonProtocol.calculateVoteWeight(
-    tokenBalance,
-    voteWeightMultiplier,
-  );
+  const result = calculateVoteWeight(tokenBalance, voteWeightMultiplier);
   return result || BigInt(0);
 }
 
@@ -214,16 +213,13 @@ export async function getWeightedSPLTokens(
     cacheRefresh: true,
   };
 
-  const balances = await tokenBalanceCache.getBalances(balanceOptions);
+  const balances = await getBalances(balanceOptions);
   const tokenBalance = balances[address];
 
   if (BigInt(tokenBalance || 0) <= BigInt(0)) {
     throw new InvalidState('Insufficient SPL token balance');
   }
-  const result = commonProtocol.calculateVoteWeight(
-    tokenBalance,
-    voteWeightMultiplier,
-  );
+  const result = calculateVoteWeight(tokenBalance, voteWeightMultiplier);
   return result || BigInt(0);
 }
 
@@ -246,16 +242,13 @@ export async function getWeightedSuiNativeTokens(
     cacheRefresh: true,
   };
 
-  const balances = await tokenBalanceCache.getBalances(balanceOptions);
+  const balances = await getBalances(balanceOptions);
   const tokenBalance = balances[address];
 
   if (BigInt(tokenBalance || 0) <= BigInt(0)) {
     throw new InvalidState('Insufficient Sui Native token balance');
   }
-  const result = commonProtocol.calculateVoteWeight(
-    tokenBalance,
-    voteWeightMultiplier,
-  );
+  const result = calculateVoteWeight(tokenBalance, voteWeightMultiplier);
   return result || BigInt(0);
 }
 
@@ -280,15 +273,12 @@ export async function getWeightedSuiTokens(
     cacheRefresh: true,
   };
 
-  const balances = await tokenBalanceCache.getBalances(balanceOptions);
+  const balances = await getBalances(balanceOptions);
   const tokenBalance = balances[address];
 
   if (BigInt(tokenBalance || 0) <= BigInt(0)) {
     throw new InvalidState('Insufficient Sui token balance');
   }
-  const result = commonProtocol.calculateVoteWeight(
-    tokenBalance,
-    voteWeightMultiplier,
-  );
+  const result = calculateVoteWeight(tokenBalance, voteWeightMultiplier);
   return result || BigInt(0);
 }

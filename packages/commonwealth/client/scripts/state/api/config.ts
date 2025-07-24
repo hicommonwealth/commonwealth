@@ -1,5 +1,5 @@
+import { SNAPSHOT_HUB_URL } from '@hicommonwealth/shared';
 import { QueryClient } from '@tanstack/react-query';
-import process from 'process';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -12,12 +12,9 @@ export const queryClient = new QueryClient({
 export const ApiEndpoints = {
   // endpoint builder functions like getEndpoint(id) => /endpoint/:id should have camel cased keys
   // stand alone endpoints should be have upper snake case keys so we can easily tell them apart in code
-  FETCH_THREADS: '/threads',
   FETCH_DOMAIN: '/domain',
   FETCH_PROPOSALS: '/proposals',
   FETCH_PROPOSAL_VOTES: '/proposalVotes',
-  UPDATE_USER_EMAIL: '/updateEmail',
-  searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
   GENERATE_IMAGE: '/generateImage',
   GENERATE_TOKEN_IDEA: '/generateTokenIdea',
@@ -48,10 +45,8 @@ export const ExternalEndpoints = {
       `https://coins.llama.fi/prices/current/base:${tokenContractAddress}`,
   },
   snapshotHub: {
-    url: process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org',
-    graphql: process.env.SNAPSHOT_HUB_URL
-      ? process.env.SNAPSHOT_HUB_URL + '/graphql'
-      : 'https://hub.snapshot.org/graphql',
+    url: SNAPSHOT_HUB_URL,
+    graphql: SNAPSHOT_HUB_URL + '/graphql',
   },
 };
 

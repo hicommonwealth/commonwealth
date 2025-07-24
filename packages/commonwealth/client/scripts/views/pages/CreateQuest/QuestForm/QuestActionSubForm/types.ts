@@ -15,7 +15,9 @@ export enum QuestActionContentIdScope {
   DiscordServer = 'discord_server',
   Chain = 'chain',
   Group = 'group',
+  Sso = 'sso',
   TokenTradeThreshold = 'threshold',
+  Goal = 'goal',
 }
 
 export type QuestActionSubFormErrors = {
@@ -39,6 +41,9 @@ export type QuestActionSubFormErrors = {
   ethChainId?: string;
   eventSignature?: string;
   transactionHash?: string;
+  // specific to community goal quests
+  goalType?: string;
+  goalTarget?: string;
 };
 
 export type QuestActionSubFormFields = {
@@ -67,6 +72,9 @@ export type QuestActionSubFormFields = {
   ethChainId?: string | number;
   eventSignature?: string;
   transactionHash?: string;
+  // specific to community goal quests
+  goalType?: string;
+  goalTarget?: string | number;
 };
 
 export type QuestActionSubFormConfig = {
@@ -78,12 +86,14 @@ export type QuestActionSubFormConfig = {
   with_optional_comment_id: boolean;
   requires_twitter_tweet_link: boolean;
   requires_discord_server_id: boolean;
+  requires_goal_config: boolean;
   requires_chain_event: boolean;
   with_optional_chain_id: boolean;
   requires_group_id: boolean;
   requires_start_link: boolean;
   requires_amount_multipler: boolean;
   with_optional_token_trade_threshold: boolean;
+  with_optional_sso_type?: boolean;
 };
 
 export type QuestActionSubFormInternalRefs = {

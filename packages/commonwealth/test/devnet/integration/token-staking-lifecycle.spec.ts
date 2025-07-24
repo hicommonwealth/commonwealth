@@ -1,11 +1,11 @@
-import { commonProtocol, veBridgeAbi } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
+import { lockTokens, veBridgeAbi } from '@hicommonwealth/evm-protocols';
+import { models } from '@hicommonwealth/model/db';
 import { describe, expect, it, vi } from 'vitest';
 import { setupCommonwealthE2E } from './integrationUtils/mainSetup';
 
 describe.skip('Token staking lifecycle', () => {
   it('should lock tokens', async () => {
-    const { web3, mineBlocks, anvilAccounts, contractAddresses } =
+    const { web3, anvilAccounts, contractAddresses } =
       await setupCommonwealthE2E();
 
     const contract = new web3.eth.Contract(
@@ -13,13 +13,7 @@ describe.skip('Token staking lifecycle', () => {
       contractAddresses.veBridge,
     );
 
-    await commonProtocol.lockTokens(
-      contract,
-      anvilAccounts[0].address,
-      '10',
-      '1000',
-      false,
-    );
+    await lockTokens(contract, anvilAccounts[0].address, '10', '1000', false);
 
     // await cp.launchToken(
     //   launchpadFactory,
@@ -32,8 +26,6 @@ describe.skip('Token staking lifecycle', () => {
     //   830000,
     //   contractAddresses.tokenCommunityManager,
     // );
-
-    await mineBlocks(1);
 
     let token = await models.LaunchpadToken.findOne({
       where: { name: 'testToken' },

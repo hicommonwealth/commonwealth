@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
 
 .CommunityProfileForm {
   width: 100%;
@@ -8,11 +9,11 @@
 
   .header {
     .h4 {
-      color: $neutral-900 !important;
+      color: colors.$neutral-900 !important;
     }
 
     .b1 {
-      color: $neutral-500 !important;
+      color: colors.$neutral-500 !important;
     }
   }
 
@@ -31,11 +32,11 @@
     gap: 24px;
 
     .lock-icon {
-      fill: $neutral-600 !important;
+      fill: colors.$neutral-600 !important;
       cursor: pointer;
 
       &.disabled {
-        fill: $neutral-400 !important;
+        fill: colors.$neutral-400 !important;
         cursor: not-allowed !important;
         pointer-events: all;
       }
@@ -92,5 +93,18 @@
     align-items: center;
     gap: 24px;
     flex-wrap: wrap;
+  }
+
+  .ai-features-section {
+    .controls {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: 16px;
+
+      .Toggle {
+        min-width: 44px;
+      }
+    }
   }
 }

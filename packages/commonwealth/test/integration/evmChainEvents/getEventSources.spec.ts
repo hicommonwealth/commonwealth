@@ -2,21 +2,22 @@ import { dispose } from '@hicommonwealth/core';
 import {
   EventRegistry,
   EvmEventSignatures,
-  commonProtocol as cp,
+  factoryContracts,
+  ValidChains,
 } from '@hicommonwealth/evm-protocols';
 import { createEventRegistryChainNodes } from '@hicommonwealth/model';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
 import { createContestEventSources } from '../../util/util';
 
-const singleContestAddress = '0x123';
-const recurringContestAddress = '0x321';
+const singleContestAddress = '0x44aAFC7eCF5bb9053D5Ad750690339d3BF901952';
+const recurringContestAddress = '0x5f0Fae9F9b6aE59C36129D6907f4DE4b6F7Ec2B2';
 
 describe('getEventSources', () => {
   beforeAll(async () => {
     await createEventRegistryChainNodes();
     await createContestEventSources(
-      cp.ValidChains.SepoliaBase,
+      ValidChains.SepoliaBase,
       singleContestAddress,
       recurringContestAddress,
     );
@@ -35,11 +36,11 @@ describe('getEventSources', () => {
       expect(result[ethChainId]).to.haveOwnProperty('contracts');
       expect(
         Array.isArray(
-          result[ethChainId].contracts[cp.factoryContracts[ethChainId].factory],
+          result[ethChainId].contracts[factoryContracts[ethChainId].factory],
         ),
       ).to.be.true;
 
-      if (ethChainId === String(cp.ValidChains.SepoliaBase)) {
+      if (ethChainId === String(ValidChains.SepoliaBase)) {
         expect(
           result[ethChainId].contracts[singleContestAddress],
         ).to.deep.equal([

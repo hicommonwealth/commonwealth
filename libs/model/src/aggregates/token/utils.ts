@@ -4,14 +4,16 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import {
-  commonProtocol as cp,
+  factoryContracts,
   getLaunchpadToken,
   mustBeProtocolChainId,
   transferLaunchpadLiquidityToUniswap,
 } from '@hicommonwealth/evm-protocols';
-import { config, emitEvent, models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
+import { config } from '../../config';
+import { models } from '../../database';
 import { mustExist } from '../../middleware';
+import { emitEvent } from '../../utils';
 
 const log = logger(import.meta);
 
@@ -71,7 +73,7 @@ export async function handleCapReached(
     !token.liquidity_transferred &&
     remainingLiquidity < transferLiquidityThreshold
   ) {
-    const contracts = cp.factoryContracts[eth_chain_id];
+    const contracts = factoryContracts[eth_chain_id];
     const lpBondingCurveAddress = (contracts as { lpBondingCurve: string })
       .lpBondingCurve;
 

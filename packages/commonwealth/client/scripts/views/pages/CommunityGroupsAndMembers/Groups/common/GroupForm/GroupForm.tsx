@@ -7,11 +7,18 @@ import {
 import { weightedVotingValueToLabel } from 'helpers';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  MultiValueProps,
+  OptionProps,
+  SingleValueProps,
+  components,
+} from 'react-select';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -46,6 +53,12 @@ import {
   groupValidationSchema,
   requirementSubFormValidationSchema,
 } from './validations';
+
+type TopicOption = {
+  label: string;
+  value: string | number;
+  helpText?: string;
+};
 
 type CWRequirementsRadioButtonProps = {
   maxRequirements: number;
@@ -154,6 +167,7 @@ const GroupForm = ({
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId,
+    includeTopics: true,
     enabled: !!communityId,
   });
 
@@ -181,6 +195,33 @@ const GroupForm = ({
   ] = useState<TopicPermissionToggleGroupSubFormsState[]>([]);
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
+
+  const topicPrivacyMap = new Map<number, boolean>();
+  groups.forEach((group) => {
+    (group.topics || []).forEach((topic) => {
+      topicPrivacyMap.set(topic.id, topic.is_private);
+    });
+  });
+
+  const currentGroup = groups.find((g) => g.name === initialValues.groupName);
+  const privateTopicIds = new Set(
+    (currentGroup?.topics || []).filter((t) => t.is_private).map((t) => t.id),
+  );
+
+  const topicOptions = sortedTopics
+    .filter((topic) => topic.id !== undefined)
+    .map((topic) => ({
+      label: topic.name,
+      value: topic.id as number,
+      helpText: weightedVotingValueToLabel(topic.weighted_voting!),
+    }));
+
+  const handleImageProcessingChange = useCallback(
+    ({ isGenerating, isUploading }) => {
+      setIsProcessingProfileImage(isGenerating || isUploading);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (initialValues.requirements) {
@@ -218,15 +259,18 @@ const GroupForm = ({
 
     if (initialValues.topics) {
       const updatedInitialValues: TopicPermissionToggleGroupSubFormsState[] =
-        initialValues.topics.map(({ label, value, permission }) => ({
-          topic: {
-            id: Number(value),
-            name: label,
-          },
-          permission: (Array.isArray(permission)
-            ? permission.filter(isGatedAction)
-            : []) as Permission[],
-        }));
+        initialValues.topics.map(
+          ({ label, value, is_private, permission }) => ({
+            topic: {
+              id: Number(value),
+              is_private,
+              name: label,
+            },
+            permission: (Array.isArray(permission)
+              ? permission.filter(isGatedAction)
+              : []) as Permission[],
+          }),
+        );
       setTopicPermissionsToggleGroupSubForms(updatedInitialValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -405,6 +449,7 @@ const GroupForm = ({
       ...values,
       topics: topicPermissionsToggleGroupSubForms.map((t) => ({
         id: t.topic.id,
+        is_private: t.topic.is_private,
         permissions: t.permission,
       })),
       requirementsToFulfill,
@@ -420,6 +465,7 @@ const GroupForm = ({
         values.topics.map((topic) => ({
           topic: {
             id: Number(topic.value),
+            is_private: false,
             name: topic.label,
           },
           permission: [],
@@ -447,11 +493,11 @@ const GroupForm = ({
               ? REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
               : REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS
             : '',
-          topics:
-            initialValues?.topics?.map((t) => ({
-              label: t.label,
-              value: t.value,
-            })) || '',
+          topics: (initialValues?.topics || [])
+            .map((t) =>
+              topicOptions.find((opt) => opt.value === Number(t.value)),
+            )
+            .filter(Boolean),
         }}
         validationSchema={groupValidationSchema}
         onSubmit={handleSubmit}
@@ -501,9 +547,7 @@ const GroupForm = ({
 
               <CWImageInput
                 label="Group Image (Accepts JPG and PNG files)"
-                onImageProcessingChange={({ isGenerating, isUploading }) => {
-                  setIsProcessingProfileImage(isGenerating || isUploading);
-                }}
+                onImageProcessingChange={handleImageProcessingChange}
                 name="groupImageUrl"
                 hookToForm
                 imageBehavior={ImageBehavior.Circle}
@@ -630,13 +674,54 @@ const GroupForm = ({
                   isClearable={false}
                   label="Topics"
                   placeholder="Type in topic name"
-                  options={sortedTopics.map((topic) => ({
-                    label: topic.name,
-                    value: topic.id,
-                    helpText: weightedVotingValueToLabel(
-                      topic.weighted_voting!,
+                  options={topicOptions}
+                  components={{
+                    Option: ({
+                      data,
+                      ...props
+                    }: OptionProps<TopicOption, true>) => (
+                      <components.Option {...props} data={data}>
+                        {data.label}
+                        {privateTopicIds.has(data.value) && (
+                          <CWIcon
+                            iconName="lockedNew"
+                            iconSize="small"
+                            style={{ marginLeft: 6 }}
+                          />
+                        )}
+                      </components.Option>
                     ),
-                  }))}
+                    SingleValue: ({
+                      data,
+                      ...props
+                    }: SingleValueProps<TopicOption, true>) => (
+                      <components.SingleValue {...props} data={data}>
+                        {data.label}
+                        {privateTopicIds.has(data.value) && (
+                          <CWIcon
+                            iconName="lockedNew"
+                            iconSize="small"
+                            style={{ marginLeft: 6 }}
+                          />
+                        )}
+                      </components.SingleValue>
+                    ),
+                    MultiValueLabel: ({
+                      data,
+                      ...props
+                    }: MultiValueProps<TopicOption, true>) => (
+                      <components.MultiValueLabel {...props} data={data}>
+                        {data.label}
+                        {privateTopicIds.has(data.value) && (
+                          <CWIcon
+                            iconName="lockedNew"
+                            iconSize="small"
+                            style={{ marginLeft: 6 }}
+                          />
+                        )}
+                      </components.MultiValueLabel>
+                    ),
+                  }}
                 />
               </section>
 

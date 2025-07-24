@@ -3,7 +3,7 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useGetTopicByIdQuery } from 'state/api/topics';
-import { PageLoading } from './loading';
+import { LoadingIndicator } from '../components/LoadingIndicator/LoadingIndicator';
 
 const ThreadRedirect = ({ id }: { id: number }) => {
   const navigate = useCommonNavigate();
@@ -27,7 +27,9 @@ const ThreadRedirect = ({ id }: { id: number }) => {
       if (newThread) {
         const newParams = new URLSearchParams(window.location.search);
         newParams.delete('newThread');
-        newParams.append('topic', topic.id);
+        if (topic.id !== undefined) {
+          newParams.append('topic', String(topic.id));
+        }
         navigate(
           `/new/discussion?${newParams.toString()}`,
           { replace: true },
@@ -46,7 +48,7 @@ const ThreadRedirect = ({ id }: { id: number }) => {
     shouldRun: !!(topic || error),
   });
 
-  return <PageLoading />;
+  return <LoadingIndicator />;
 };
 
 export default ThreadRedirect;

@@ -1,7 +1,7 @@
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import { filterLinks } from 'helpers/threads';
 
-import { ProposalType } from '@hicommonwealth/shared';
+import { ChainBase, ProposalType } from '@hicommonwealth/shared';
 import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -81,7 +81,7 @@ export const LinkedProposalsCard = ({
           }`,
         );
       } else {
-        loadMultipleSpacesData(app.chain.meta?.snapshot_spaces || [])
+        loadMultipleSpacesData(app.chain?.meta?.snapshot_spaces || [])
           .then((data) => {
             for (const { space: _space, proposals } of data) {
               const matchingSnapshot = proposals.find(
@@ -122,6 +122,13 @@ export const LinkedProposalsCard = ({
   const showSnapshot =
     (initialSnapshotLinks.length > 0 && snapshotProposalsLoaded) ||
     linkedProposals?.source === 'snapshot';
+
+  if (
+    app.chain?.meta.base !== ChainBase.Ethereum &&
+    app.chain?.meta.base !== ChainBase.CosmosSDK
+  ) {
+    return <></>;
+  }
 
   return (
     <>

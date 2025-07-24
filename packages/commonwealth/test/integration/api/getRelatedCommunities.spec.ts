@@ -1,7 +1,8 @@
 import { dispose, query } from '@hicommonwealth/core';
-import { Community, tester, type DB } from '@hicommonwealth/model';
-import { assert } from 'chai';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { Community } from '@hicommonwealth/model';
+import { DB } from '@hicommonwealth/model/models';
+import * as tester from '@hicommonwealth/model/tester';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
 describe('GetRelatedCommunities Tests', async () => {
   let models: DB;
@@ -19,7 +20,7 @@ describe('GetRelatedCommunities Tests', async () => {
       actor: { user: { id: 1, email: '' } },
       payload: { chain_node_id: -100 },
     });
-    assert.equal(response?.length, 0);
+    expect(response?.length).toBe(0);
   });
 
   test('Correctly returns results if base matches some chainNode.name', async () => {
@@ -27,29 +28,28 @@ describe('GetRelatedCommunities Tests', async () => {
       actor: { user: { id: 1, email: '' } },
       payload: { chain_node_id: 2 },
     });
-    assert.equal(response!.length, 3);
+    expect(response!.length).toBe(3);
 
     const ethereumCommunity = response!.find((r) => r.community === 'Ethereum');
-    assert.equal(ethereumCommunity!.profile_count, 2);
-    assert.equal(ethereumCommunity!.lifetime_thread_count, 0);
-    assert.equal(ethereumCommunity!.icon_url, 'assets/img/protocols/eth.png');
-    assert.equal(ethereumCommunity!.description, null);
+    expect(ethereumCommunity!.profile_count).toBe(2);
+    expect(ethereumCommunity!.lifetime_thread_count).toBe(0);
+    expect(ethereumCommunity!.icon_url).toBe('assets/img/protocols/eth.png');
+    expect(ethereumCommunity!.description).toBe(null);
 
     const sushiCommunity = response!.find((r) => r.community === 'Sushi');
-    assert.equal(sushiCommunity!.profile_count, 0);
-    assert.equal(sushiCommunity!.lifetime_thread_count, 0);
-    assert.equal(sushiCommunity!.icon_url, 'assets/img/protocols/eth.png');
-    assert.equal(sushiCommunity!.description, 'sushi community description');
+    expect(sushiCommunity!.profile_count).toBe(0);
+    expect(sushiCommunity!.lifetime_thread_count).toBe(0);
+    expect(sushiCommunity!.icon_url).toBe('assets/img/protocols/eth.png');
+    expect(sushiCommunity!.description).toBe('sushi community description');
 
     const yearnFinanceCommunity = response!.find(
       (r) => r.community === 'yearn.finance',
     );
-    assert.equal(yearnFinanceCommunity!.profile_count, 0);
-    assert.equal(yearnFinanceCommunity!.lifetime_thread_count, 0);
-    assert.equal(
-      yearnFinanceCommunity!.icon_url,
+    expect(yearnFinanceCommunity!.profile_count).toBe(0);
+    expect(yearnFinanceCommunity!.lifetime_thread_count).toBe(0);
+    expect(yearnFinanceCommunity!.icon_url).toBe(
       'assets/img/protocols/eth.png',
     );
-    assert.equal(yearnFinanceCommunity!.description, null);
+    expect(yearnFinanceCommunity!.description).toBe(null);
   });
 });

@@ -1,4 +1,7 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
+
 .NotificationModal {
   display: flex;
   width: 100%;
@@ -11,13 +14,13 @@
     width: 227px;
     margin-top: 20px;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       width: 175px;
     }
   }
   .header {
     margin-top: 20px;
-    color: $neutral-500 !important;
+    color: colors.$neutral-500 !important;
   }
 
   .notificationButton {
@@ -29,20 +32,20 @@
     width: 100%;
     outline: none !important;
     cursor: pointer;
-    border: 2px solid $neutral-200; // Default gray border
+    border: 2px solid colors.$neutral-200; // Default gray border
     transition:
       border 0.3s ease,
       box-shadow 0.3s ease; // Smooth animation for border and shadow
 
     // Hover state
     &:hover {
-      border: 2px solid $neutral-400; // Lighter gray on hover
+      border: 2px solid colors.$neutral-400; // Lighter gray on hover
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); // Optional shadow
     }
 
     // Active state
     &:active {
-      border: 2px solid $neutral-600; // Darker border on click
+      border: 2px solid colors.$neutral-600; // Darker border on click
     }
 
     // Animation when notifications are enabled
@@ -85,7 +88,7 @@
           font-size: 17px;
           font-weight: 600;
           margin-right: auto;
-          color: $neutral-700;
+          color: colors.$neutral-700;
         }
 
         .description {
@@ -93,7 +96,7 @@
           margin: 0;
           font-size: 14px;
           font-weight: 400;
-          color: $neutral-400;
+          color: colors.$neutral-400;
           background-color: transparent;
         }
       }
@@ -104,24 +107,27 @@
     bottom: 40px;
     align-self: center;
     display: flex;
+    padding: 12px;
     flex-direction: column;
-    @include extraSmall {
+    @include media_queries.extraSmall {
       position: absolute;
     }
     .footer {
       display: block;
+      padding: 12px;
 
       a,
       a:visited,
       a:active,
       a:hover {
-        color: $primary-600;
+        color: colors.$primary-600;
       }
     }
     .buttons_container {
       display: flex;
       gap: 1rem;
       width: 100%;
+      padding: 12px;
       position: relative;
       align-items: center;
       justify-content: space-between;
@@ -137,11 +143,11 @@
         .primary {
           padding-left: 2rem;
           padding-right: 2rem;
-          border: 1px solid $primary-600;
+          border: 1px solid colors.$primary-600;
           background-color: transparent !important;
 
           .button-text {
-            color: $primary-600 !important;
+            color: colors.$primary-600 !important;
           }
         }
       }
@@ -157,8 +163,8 @@
         .primary {
           padding-left: 2rem;
           padding-right: 2rem;
-          border: 1px solid $primary-600;
-          background-color: $primary-600;
+          border: 1px solid colors.$primary-600;
+          background-color: colors.$primary-600;
           .button-text {
             color: white !important;
           }
@@ -169,7 +175,7 @@
   // Keyframes for the animation
   @keyframes borderHighlight {
     0% {
-      border: 2px solid $neutral-200; // Start with gray
+      border: 2px solid colors.$neutral-200; // Start with gray
       box-shadow: 0 0 4px rgba(0, 128, 0, 0.3);
     }
     50% {
@@ -185,7 +191,7 @@
   // Keyframes for the animation
   @keyframes borderHighlight {
     0% {
-      border: 2px solid $neutral-200; // Start with gray
+      border: 2px solid colors.$neutral-200; // Start with gray
       box-shadow: 0 0 4px rgba(0, 128, 0, 0.3);
     }
     50% {

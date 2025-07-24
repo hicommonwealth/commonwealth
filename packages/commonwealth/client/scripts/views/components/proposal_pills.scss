@@ -1,31 +1,33 @@
-@import '../../styles/shared.scss';
+@use '../../styles/shared.scss';
+@use '../../styles/mixins/border_radius';
+@use '../../styles/mixins/colors.module';
 
 .ActiveProposalPill {
   align-items: center;
-  background-color: $neutral-50;
-  border-radius: $border-radius-rounded-corners;
-  color: $neutral-600;
+  background-color: colors.$neutral-50;
+  border-radius: border_radius.$border-radius-rounded-corners;
+  color: colors.$neutral-600;
   display: flex;
   padding: 4px 8px;
   width: fit-content;
 
   .active-text.Text {
-    background-color: $green-500;
-    border-radius: $border-radius-rounded-corners;
-    color: $green-700;
+    background-color: colors.$green-500;
+    border-radius: border_radius.$border-radius-rounded-corners;
+    color: colors.$green-700;
     margin-left: 8px;
     padding: 4px 8px;
   }
 }
 
 .ClosedProposalPill {
-  background-color: $neutral-500;
-  border-radius: $border-radius-rounded-corners;
+  background-color: colors.$neutral-500;
+  border-radius: border_radius.$border-radius-rounded-corners;
   padding: 4px 16px;
   text-transform: capitalize;
   width: fit-content;
 
   .closed-text.Text {
-    color: $white;
+    color: colors.$white;
   }
 }

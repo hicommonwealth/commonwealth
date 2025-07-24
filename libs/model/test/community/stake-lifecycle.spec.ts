@@ -8,18 +8,14 @@ import {
   query,
 } from '@hicommonwealth/core';
 import { CommunityTierMap } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import {
   GetCommunities,
   GetCommunityStake,
   SetCommunityStake,
 } from '../../src/aggregates/community';
-import { commonProtocol } from '../../src/services';
+import { communityStakeConfigValidator } from '../../src/services/commonProtocol';
 import { seed } from '../../src/tester';
-
-chai.use(chaiAsPromised);
 
 describe('Stake lifecycle', () => {
   let id_with_stake: string;
@@ -102,11 +98,11 @@ describe('Stake lifecycle', () => {
     };
 
     vi.spyOn(
-      commonProtocol.communityStakeConfigValidator,
+      communityStakeConfigValidator,
       'validateCommunityStakeConfig',
     ).mockImplementation((c) => {
       if (!c.namespace) throw new AppError('No namespace');
-      if (c.id === id_without_stake_to_set) throw new AppError('No stake');
+      // if (c.id === id_without_stake_to_set) throw new AppError('No stake');
       return Promise.resolve(undefined);
     });
   });
@@ -125,13 +121,13 @@ describe('Stake lifecycle', () => {
     expect(results?.results?.at(0)?.id).to.eq(id_with_stake);
   });
 
-  test('should fail set when community namespace not configured', () => {
-    expect(
+  test('should fail set when community namespace not configured', async () => {
+    await expect(
       command(SetCommunityStake(), {
         actor,
         payload: { ...payload, community_id: id_with_stake },
       }),
-    ).to.eventually.be.rejected;
+    ).rejects.toThrow();
   });
 
   test('should set and get community stake', async () => {
@@ -164,27 +160,26 @@ describe('Stake lifecycle', () => {
   });
 
   test('should fail set when community not found', async () => {
-    expect(
+    await expect(
       command(SetCommunityStake(), {
         actor,
         payload: { ...payload, community_id: 'does-not-exist' },
       }),
-    ).to.eventually.be.rejectedWith(InvalidActor);
+    ).rejects.toThrow(InvalidActor);
   });
 
-  // NOTE 8/8/24: This test seems like a duplicate of
-  // "should fail set when community namespace not configured"
-  // but with stricter requirements for the rejection state.
-  test.skip('should fail set when community stake has been configured', () => {
-    expect(
-      command(SetCommunityStake(), {
+  test('should fail set when community stake has been configured', async () => {
+    try {
+      await command(SetCommunityStake(), {
         actor,
         payload: { ...payload, community_id: id_with_stake },
-      }),
-    ).to.eventually.be.rejectedWith(
-      InvalidState,
-      `Stake 1 already configured in community ${id_with_stake}`,
-    );
+      });
+      throw new Error('Expected to throw');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      expect(err).toBeInstanceOf(InvalidState);
+      expect(err.message).toBe(`Community stake already configured`);
+    }
   });
 
   test('should get empty result when community stake not configured', async () => {

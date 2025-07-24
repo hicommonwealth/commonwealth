@@ -5,22 +5,23 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import {
-  commonProtocol as cp,
   deployERC20Contest,
   getTokenAttributes,
   mustBeProtocolChainId,
+  ValidChains,
 } from '@hicommonwealth/evm-protocols';
-import { config, publishCast } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
+import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
-import { TokenAttributes } from '../../services';
 import {
   ContestMetadataResponse,
   parseBotCommand,
   ParseBotCommandError,
 } from '../../services/openai/parseBotCommand';
+import type { TokenAttributes } from '../../services/tokenBalanceCache/types';
+import { publishCast } from '../../utils/utils';
 
 const log = logger(import.meta);
 
@@ -45,14 +46,14 @@ export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
             ({ username }) => `Hey @${username}. ${prettyError}`,
           );
         }
-        return;
+        return '';
       }
       mustExist('Parsed Contest Metadata', contestMetadata);
 
       const botNamespace = config.BOT.CONTEST_BOT_NAMESPACE;
 
       if (!botNamespace || botNamespace === '') {
-        new InvalidState('bot not enabled on given chain');
+        throw new InvalidState('bot not enabled on given chain');
       }
 
       const community = await models.Community.findOne({
@@ -86,14 +87,14 @@ export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
           );
         }
         log.warn(`token validation failed: ${(err as Error).message}`);
-        return;
+        return '';
       }
 
       mustBeProtocolChainId(community.ChainNode!.eth_chain_id!);
 
       // use short duration for testnet contests
       const contestDurationSecs =
-        community.ChainNode!.eth_chain_id === cp.ValidChains.SepoliaBase
+        community.ChainNode!.eth_chain_id === ValidChains.SepoliaBase
           ? 60 * 60
           : 60 * 60 * 24 * 7;
 

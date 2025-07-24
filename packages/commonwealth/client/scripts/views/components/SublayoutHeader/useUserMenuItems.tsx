@@ -20,7 +20,7 @@ import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
+import { getCommunityByIdQuery } from 'state/api/communities/getCommuityById';
 import { SERVER_URL } from 'state/api/config';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import { darkModeStore, useDarkMode } from 'state/ui/darkMode/darkMode';
@@ -33,6 +33,7 @@ import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import { usePrivyMobileLogout } from 'views/components/PrivyMobile/usePrivyMobileLogout';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { MobileTabType } from '../../pages/WalletPage/types';
 import { mobileTabParam } from '../../pages/WalletPage/utils';
@@ -79,6 +80,7 @@ const useUserMenuItems = ({
   const privyEnabled = useFlag('privy');
 
   const { authenticated, logout } = usePrivy();
+  const privyMobileLogout = usePrivyMobileLogout();
 
   const userData = useUserStore();
   const hasMagic = userData.hasMagicWallet;
@@ -116,6 +118,11 @@ const useUserMenuItems = ({
       if (privyEnabled && authenticated) {
         await logout();
       }
+
+      // when in the mobile, app, logout there too. It's safe to call this
+      // when not in the mobile app.
+      privyMobileLogout({}).catch(console.error);
+
       notifySuccess('Signed out');
       darkModeStore.getState().setDarkMode(false);
       setLocalStorageItem(LocalStorageKeys.HasSeenNotifications, 'true');
@@ -124,7 +131,7 @@ const useUserMenuItems = ({
       notifyError('Something went wrong during logging out.');
       window.location.reload();
     }
-  }, [authenticated, logout, privyEnabled]);
+  }, [authenticated, logout, privyEnabled, privyMobileLogout]);
 
   useEffect(() => {
     // if a user is in a stake enabled community without membership, set first user address as active that
@@ -151,7 +158,7 @@ const useUserMenuItems = ({
         // making a fresh query to get chain and community info for this address
         // as all the necessary fields don't exist on user.address, these should come
         // from api in the user address response, and the extra api call here removed
-        const community = await EXCEPTION_CASE_VANILLA_getCommunityById(
+        const community = await getCommunityByIdQuery(
           account.community.id,
           true,
         );

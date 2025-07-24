@@ -5,6 +5,7 @@ import {
   CommentSearchView,
   SearchCommunityView,
   SearchUserProfilesView,
+  ThreadView,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
@@ -14,10 +15,9 @@ import { useSearchCommentsQuery } from '../state/api/comments';
 import { useSearchCommunitiesQuery } from '../state/api/communities';
 import { useSearchProfilesQuery } from '../state/api/profiles';
 import { useSearchThreadsQuery } from '../state/api/threads';
-import { SearchThreadsResponse } from '../state/api/threads/searchThreads';
 
 export type SearchResults = {
-  [SearchScope.Threads]: SearchThreadsResponse['results'];
+  [SearchScope.Threads]: z.infer<typeof ThreadView>[];
   [SearchScope.Replies]: z.infer<typeof CommentSearchView>[];
   [SearchScope.Communities]: z.infer<typeof SearchCommunityView>[];
   [SearchScope.Members]: z.infer<typeof SearchUserProfilesView>[];
@@ -49,7 +49,16 @@ const useSearchResults = (
   const queryEnabled = debouncedSearchTerm.length > 0 && !!communityId;
 
   const { data: threadsData } = useSearchThreadsQuery({
-    ...sharedQueryOptions,
+    ...{
+      community_id: sharedQueryOptions.communityId,
+      search_term: sharedQueryOptions.searchTerm,
+      cursor: 1,
+      limit: sharedQueryOptions.limit,
+      order_by: sharedQueryOptions.orderBy,
+      order_direction: sharedQueryOptions.orderDirection,
+      thread_title_only: false,
+      include_count: false,
+    },
     enabled: queryEnabled && filters.includes('threads'),
   });
 
@@ -70,8 +79,8 @@ const useSearchResults = (
       search: sharedQueryOptions.searchTerm,
       cursor: 1,
       limit: sharedQueryOptions.limit,
-      order_by: sharedQueryOptions.orderBy,
-      order_direction: sharedQueryOptions.orderDirection,
+      order_by: 'tier',
+      order_direction: APIOrderDirection.Desc,
     },
     enabled: queryEnabled && filters.includes('communities'),
   });

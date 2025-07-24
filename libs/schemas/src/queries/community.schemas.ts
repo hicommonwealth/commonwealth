@@ -26,6 +26,7 @@ import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const GetCommunities = {
   input: PaginationParamsSchema.extend({
+    search: z.string().optional(),
     // eslint-disable-next-line max-len
     relevance_by: z
       .enum(['tag_ids', 'membership'])
@@ -55,6 +56,8 @@ export const GetCommunities = {
     include_node_info: z.boolean().optional(),
     stake_enabled: z.boolean().optional(),
     has_groups: z.boolean().optional(),
+    has_launchpad_token: z.boolean().optional(),
+    has_pinned_token: z.boolean().optional(),
     include_last_30_day_thread_count: z.boolean().optional(),
     order_by: z
       .enum([
@@ -96,12 +99,14 @@ export const GetCommunity = {
     id: z.string(),
     include_node_info: z.boolean().optional(),
     include_groups: z.boolean().optional(),
+    include_mcp_servers: z.boolean().optional(),
   }),
   output: z.union([ExtendedCommunity, z.undefined()]),
 };
 
 export const TopicPermissionsView = z.object({
   id: z.number(),
+  is_private: z.boolean(),
   permissions: z.array(z.nativeEnum(GatedActionEnum)),
 });
 
@@ -159,6 +164,8 @@ export const GetCommunityMembers = {
     order_by: z
       .enum(['last_active', 'name', 'referrals', 'earnings'])
       .optional(),
+    /** If true, search will match both profile name and address. */
+    searchByNameAndAddress: z.boolean().optional().default(false),
   }),
   output: PaginatedResultSchema.extend({
     results: CommunityMember.array(),
@@ -204,11 +211,12 @@ export const GetStakeHistoricalPrice = {
     .array(),
 };
 
-export const ConstestManagerView = ContestManager.extend({
+export const ConstestManagerView = ContestManager.omit({
+  contests: true,
+  topics: true,
+}).extend({
   created_at: z.string(),
   deleted_at: z.string().nullish(),
-  topics: z.undefined(),
-  contests: z.undefined(),
   content: z.array(
     projections.ContestAction.extend({
       cast_deleted_at: z.string().nullish(),
@@ -222,13 +230,15 @@ export const TopicView = Topic.extend({
   updated_at: z.date().or(z.string()).nullish(),
   deleted_at: z.date().or(z.string()).nullish(),
   archived_at: z.date().or(z.string()).nullish(),
-  contest_topics: z.undefined(),
+  recalculated_votes_start: z.date().or(z.string()).nullish(),
+  recalculated_votes_finish: z.date().or(z.string()).nullish(),
   total_threads: z.number().default(0),
   active_contest_managers: z.array(ConstestManagerView).optional(),
   allow_tokenized_threads: z.boolean().optional(),
   chain_node_id: z.number().nullish().optional(),
   chain_node_url: z.string().nullish().optional(),
   eth_chain_id: z.number().nullish().optional(),
+  token_symbol: z.string().nullish().optional(),
 });
 
 export const GetTopics = {
@@ -243,9 +253,19 @@ export const GetTopics = {
 export const GetTopicById = {
   input: z.object({
     topic_id: z.number(),
+    includeGatingGroups: z.boolean().optional(),
   }),
-  // TODO: fix type
-  output: z.any(),
+  output: Topic.extend({
+    gatingGroups: z
+      .array(
+        z.object({
+          id: z.number(),
+          name: z.string().nullable(),
+          is_private: z.boolean(),
+        }),
+      )
+      .optional(),
+  }).optional(),
 };
 
 export const GetPinnedTokens = {
@@ -338,6 +358,7 @@ export const GroupView = Group.omit({ GroupGatedActions: true }).extend({
   ),
   topics: z.array(
     TopicView.omit({ total_threads: true }).extend({
+      is_private: z.boolean(),
       permissions: z.array(z.nativeEnum(GatedActionEnum)),
     }),
   ),
@@ -426,4 +447,20 @@ export const GetRoles = {
     }),
   ),
   context: AuthContext,
+};
+
+export const GetNamespaceMetadata = {
+  input: z.object({
+    namespace: z.string(),
+    stake_id: z.string().regex(/^[0-9a-f]{64}$/),
+  }),
+  output: z.object({
+    name: z.string(),
+    image: z.string().nullish(),
+  }),
+};
+
+export const GetByDomain = {
+  input: z.object({ custom_domain: z.string() }),
+  output: z.object({ community_id: z.string().optional() }),
 };

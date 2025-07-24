@@ -9,7 +9,7 @@ import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import { setActiveAccount } from 'controllers/app/login';
 import app from 'state';
-import { fetchCachedConfiguration } from 'state/api/configuration';
+import { fetchCachedPublicEnvVar } from 'state/api/configuration';
 import { userStore } from 'state/ui/user';
 import { Web3BaseProvider } from 'web3';
 
@@ -98,7 +98,6 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
   public async enable(forceChainId?: string) {
     // TODO: use https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods to switch active
     // chain according to currently active node, if one exists
-    console.log('Attempting to enable Metamask');
     this._enabling = true;
     try {
       // default to ETH
@@ -117,8 +116,10 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
         });
       }
 
+      const config = fetchCachedPublicEnvVar();
+
       this._web3 =
-        process.env.ETH_RPC !== 'e2e-test'
+        config?.TEST_EVM_ETH_RPC !== 'e2e-test'
           ? {
               givenProvider: ethereum,
             }
@@ -144,9 +145,7 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
       });
       const chainIdHex = `0x${parseInt(chainId, 10).toString(16)}`;
       try {
-        const config = fetchCachedConfiguration();
-
-        if (config?.evmTestEnv !== 'test') {
+        if (config?.TEST_EVM_ETH_RPC !== 'test') {
           await this._web3.givenProvider.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: chainIdHex }],
@@ -188,6 +187,7 @@ export class PrivyEthereumWebWalletController implements IWebWallet<string> {
           throw switchError;
         }
       }
+
       // fetch active accounts
       this._accounts = (
         await this._web3.givenProvider.request({

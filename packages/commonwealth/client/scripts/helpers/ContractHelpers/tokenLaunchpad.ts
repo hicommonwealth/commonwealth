@@ -2,7 +2,14 @@ import {
   TokenBondingCurveAbi,
   TokenLaunchpadAbi,
 } from '@commonxyz/common-protocol-abis';
-import { commonProtocol as cp, erc20Abi } from '@hicommonwealth/evm-protocols';
+import {
+  buyPostToken,
+  erc20Abi,
+  getPostPrice,
+  launchPostToken,
+  sellPostToken,
+  transferPostLiquidity,
+} from '@hicommonwealth/evm-protocols';
 import { Contract } from 'web3';
 import ContractBase from './ContractBase';
 
@@ -10,6 +17,7 @@ class TokenLaunchpad extends ContractBase {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private paymentTokenContract: any;
   launchpadFactoryAddress: string;
+  paymentTokenAddress: string;
   launchpadFactory: Contract<typeof TokenLaunchpadAbi>;
 
   constructor(
@@ -19,14 +27,25 @@ class TokenLaunchpad extends ContractBase {
     rpc: string,
   ) {
     super(bondingCurveAddress, TokenBondingCurveAbi, rpc);
+    this.launchpadFactoryAddress = launchpadFactoryAddress;
+    this.paymentTokenAddress = paymentTokenAddress;
+    this.launchpadFactoryAddress = launchpadFactoryAddress;
+  }
+
+  async initialize(
+    withWallet?: boolean,
+    chainId?: string | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any,
+  ): Promise<void> {
+    await super.initialize(withWallet, chainId, providerInstance);
     this.launchpadFactory = new this.web3.eth.Contract(
       TokenLaunchpadAbi,
-      launchpadFactoryAddress,
+      this.launchpadFactoryAddress,
     );
-    this.launchpadFactoryAddress = launchpadFactoryAddress;
     this.paymentTokenContract = new this.web3.eth.Contract(
       erc20Abi,
-      paymentTokenAddress,
+      this.paymentTokenAddress,
     );
   }
 
@@ -46,18 +65,19 @@ class TokenLaunchpad extends ContractBase {
         await this.initialize(true, chainId);
       }
 
-      return await cp.launchPostToken(
+      return await launchPostToken(
         this.launchpadFactory,
         name,
         symbol,
         [8250, 1550, 100, 100],
         [authorAddress, communityTreasuryAddress],
-        this.web3.utils.toWei('1e9', 'ether'), // Default 1B tokens
+        this.web3.utils.toWei('1000000000', 'ether'), // Default 1B tokens
         walletAddress,
         830000,
         threadId,
         exchangeToken,
         initPurchaseAmount,
+        this.contract.options.address as string,
         this.paymentTokenContract,
       );
     } catch (error) {
@@ -77,7 +97,7 @@ class TokenLaunchpad extends ContractBase {
       if (!this.initialized || !this.walletEnabled) {
         await this.initialize(true);
       }
-      return await cp.buyPostToken(
+      return await buyPostToken(
         this.contract,
         postTokenAddress,
         recipient,
@@ -102,7 +122,7 @@ class TokenLaunchpad extends ContractBase {
       if (!this.initialized || !this.walletEnabled) {
         await this.initialize(true);
       }
-      return await cp.sellPostToken(
+      return await sellPostToken(
         this.contract,
         postTokenAddress,
         amount,
@@ -126,7 +146,7 @@ class TokenLaunchpad extends ContractBase {
       if (!this.initialized || !this.walletEnabled) {
         await this.initialize(true);
       }
-      return await cp.transferPostLiquidity(
+      return await transferPostLiquidity(
         this.contract,
         tokenAddress,
         amountIn,
@@ -149,7 +169,7 @@ class TokenLaunchpad extends ContractBase {
       await this.initialize(true, chainId);
     }
 
-    const amountOut = await cp.getPostPrice(
+    const amountOut = await getPostPrice(
       this.contract,
       postTokenAddress,
       amountIn,

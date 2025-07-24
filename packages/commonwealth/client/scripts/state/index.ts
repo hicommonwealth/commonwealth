@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { ExtendedCommunity, GetPublicEnvVar } from '@hicommonwealth/schemas';
 import { updateActiveUser } from 'controllers/app/login';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
@@ -7,12 +7,16 @@ import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { EventEmitter } from 'events';
 import type IChainAdapter from 'models/IChainAdapter';
-import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
-import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
+import {
+  fetchCustomDomainQuery,
+  fetchPublicEnvVarQuery,
+} from 'state/api/configuration';
 import { errorStore } from 'state/ui/error';
+import { z } from 'zod';
 import SuiAccount from '../controllers/chain/sui/account';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
+import { getCommunityByIdQuery } from './api/communities/getCommuityById';
 import { fetchNodes } from './api/nodes';
+import { fetchStatus } from './api/user/fetchStatus';
 import { userStore } from './ui/user';
 
 export enum ApiStatus {
@@ -61,59 +65,34 @@ const app: IApp = {
   isModuleReady: false,
 };
 
-// On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
+// On login: called to initialize the logged-in state, available chains, and other metadata
 // On logout: called to reset everything
 export async function initAppState(
   updateSelectedCommunity = true,
-): Promise<void> {
+): Promise<z.infer<(typeof GetPublicEnvVar)['output']>> {
   try {
-    const [{ data: statusRes }] = await Promise.all([
-      axios.get(`${SERVER_URL}/status`),
+    const [status, publicEnvVars] = await Promise.all([
+      fetchStatus(),
+      fetchPublicEnvVarQuery(),
+      fetchNodes(),
+      fetchCustomDomainQuery(),
     ]);
 
-    await fetchNodes();
-    await fetchCustomDomainQuery();
-
-    queryClient.setQueryData([QueryKeys.CONFIGURATION], {
-      evmTestEnv: statusRes.result.evmTestEnv,
-    });
-
-    // store community redirect's map in configuration cache
-    const communityWithRedirects =
-      statusRes.result?.communityWithRedirects || [];
-    if (communityWithRedirects.length > 0) {
-      communityWithRedirects.map(({ id, redirect }) => {
-        const cachedConfig = queryClient.getQueryData<Configuration>([
-          QueryKeys.CONFIGURATION,
-        ]);
-
-        queryClient.setQueryData([QueryKeys.CONFIGURATION], {
-          ...cachedConfig,
-          redirects: {
-            ...cachedConfig?.redirects,
-            [redirect]: id,
-          },
+    updateActiveUser(status);
+    if (status) {
+      // update the selectedCommunity, unless we explicitly want to avoid
+      // changing the current state (e.g. when logging in through link_new_address_modal)
+      if (updateSelectedCommunity && status?.selected_community_id) {
+        userStore.getState().setData({
+          // TODO: api should be updated to get relevant data
+          activeCommunity: (await getCommunityByIdQuery(
+            status.selected_community_id,
+            true,
+          )) as unknown as z.infer<typeof ExtendedCommunity>,
         });
-      });
+      }
     }
-
-    // it is either user object or undefined
-    const userResponse = statusRes.result.user;
-
-    // update the login status
-    updateActiveUser(userResponse);
-
-    // update the selectedCommunity, unless we explicitly want to avoid
-    // changing the current state (e.g. when logging in through link_new_address_modal)
-    if (updateSelectedCommunity && userResponse?.selectedCommunity) {
-      userStore.getState().setData({
-        // TODO: api should be updated to get relevant data
-        activeCommunity: await EXCEPTION_CASE_VANILLA_getCommunityById(
-          userResponse?.selectedCommunity.id,
-          true,
-        ),
-      });
-    }
+    return publicEnvVars;
   } catch (err) {
     errorStore
       .getState()

@@ -23,7 +23,12 @@ export function GetGroups(): Query<typeof schemas.GetGroups> {
           include: [
             {
               model: models.GroupGatedAction,
-              attributes: ['group_id', 'topic_id', 'gated_actions'],
+              attributes: [
+                'group_id',
+                'topic_id',
+                'is_private',
+                'gated_actions',
+              ],
             },
           ],
         })
@@ -74,8 +79,10 @@ export function GetGroups(): Query<typeof schemas.GetGroups> {
             perm.forEach((p) => {
               const topic = topics_map.get(p.id);
               topic &&
+                p.permissions.length > 0 &&
                 g.topics.push({
                   ...topic!,
+                  is_private: p.is_private,
                   permissions: p.permissions,
                 });
             });

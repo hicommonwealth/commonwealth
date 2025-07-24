@@ -1,18 +1,12 @@
 import { command, dispose, query } from '@hicommonwealth/core';
-import {
-  commonProtocol,
-  Community,
-  type UserInstance,
-} from '@hicommonwealth/model';
+import { Community } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { UserInstance } from '@hicommonwealth/model/models';
+import { communityStakeConfigValidator } from '@hicommonwealth/model/protocol';
 import { UserTierMap } from '@hicommonwealth/shared';
-import chai, { assert } from 'chai';
-import chaiHttp from 'chai-http';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { buildUser } from '../../unit/unitHelpers';
-
-chai.use(chaiHttp);
-chai.should();
 
 const baseRequest = {
   community_id: 'common-protocol',
@@ -43,7 +37,6 @@ describe('POST communityStakes Tests', () => {
 
   test('Should create and update community stake', async () => {
     buildUser({
-      models: server.models,
       userAttributes: {
         email: '',
         id: 1,
@@ -67,12 +60,11 @@ describe('POST communityStakes Tests', () => {
     });
     const createResponse = community!.CommunityStakes?.[0];
 
-    assert.equal(createResponse!.community_id, expectedCreateResp.community_id);
-    assert.equal(createResponse!.stake_id, expectedCreateResp.stake_id);
-    assert.equal(createResponse!.stake_token, expectedCreateResp.stake_token);
-    assert.equal(createResponse!.vote_weight, expectedCreateResp.vote_weight);
-    assert.equal(
-      createResponse!.stake_enabled,
+    expect(createResponse!.community_id).toBe(expectedCreateResp.community_id);
+    expect(createResponse!.stake_id).toBe(expectedCreateResp.stake_id);
+    expect(createResponse!.stake_token).toBe(expectedCreateResp.stake_token);
+    expect(createResponse!.vote_weight).toBe(expectedCreateResp.vote_weight);
+    expect(createResponse!.stake_enabled).toBe(
       expectedCreateResp.stake_enabled,
     );
 
@@ -87,7 +79,7 @@ describe('POST communityStakes Tests', () => {
       error = e;
     }
 
-    assert.equal(error.message, 'Community stake already configured');
+    expect(error.message).toBe('Community stake already configured');
 
     const found = await query(Community.GetCommunityStake(), {
       actor,
@@ -97,21 +89,21 @@ describe('POST communityStakes Tests', () => {
       },
     });
 
-    assert.equal(found!.stake!.community_id, expectedCreateResp.community_id);
-    assert.equal(found!.stake!.stake_id, expectedCreateResp.stake_id);
-    assert.equal(found!.stake!.stake_token, expectedCreateResp.stake_token);
-    assert.equal(found!.stake!.vote_weight, expectedCreateResp.vote_weight);
-    assert.equal(found!.stake!.stake_enabled, expectedCreateResp.stake_enabled);
+    expect(found!.stake!.community_id).toBe(expectedCreateResp.community_id);
+    expect(found!.stake!.stake_id).toBe(expectedCreateResp.stake_id);
+    expect(found!.stake!.stake_token).toBe(expectedCreateResp.stake_token);
+    expect(found!.stake!.vote_weight).toBe(expectedCreateResp.vote_weight);
+    expect(found!.stake!.stake_enabled).toBe(expectedCreateResp.stake_enabled);
   });
 
   test('The integration with protocol works', async () => {
-    const community = await server.models.Community.findOne({
+    const community = await models.Community.findOne({
       where: {
         id: 'common-protocol',
       },
     });
-    assert.isNotNull(community);
-    await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
+    expect(community).not.toBeNull();
+    await communityStakeConfigValidator.validateCommunityStakeConfig(
       community!,
       2,
     );

@@ -1,12 +1,11 @@
 import { disposeAdapter } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { delay } from '@hicommonwealth/shared';
-import { expect } from 'chai';
 import {
   numUnrelayedEvents,
   resetNumUnrelayedEvents,
 } from 'server/bindings/relayForever';
-import { afterEach, describe, test } from 'vitest';
+import { afterEach, describe, expect, test } from 'vitest';
 import { startMessageRelayer } from '../../../server/workers/messageRelayer/messageRelayer';
 import { testOutboxEvents } from './util';
 

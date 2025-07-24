@@ -1,4 +1,6 @@
-@import '../../styles/shared.scss';
+@use '../../styles/shared.scss';
+@use '../../styles/mixins/border_radius';
+@use '../../styles/mixins/colors.module';
 
 .StatsPage {
   flex: 1;
@@ -8,7 +10,7 @@
   }
 
   .stat-row {
-    border: 1px solid $neutral-100;
+    border: 1px solid colors.$neutral-100;
     border-top: none;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
@@ -25,22 +27,22 @@
   }
 
   .dark {
-    background-color: $neutral-50;
-    color: $neutral-500;
+    background-color: colors.$neutral-50;
+    color: colors.$neutral-500;
   }
 
   .bottom {
-    border-bottom-right-radius: $border-radius-corners;
-    border-bottom-left-radius: $border-radius-corners;
+    border-bottom-right-radius: border_radius.$border-radius-corners;
+    border-bottom-left-radius: border_radius.$border-radius-corners;
   }
 
   .top {
-    border-top: 1px solid $neutral-100;
-    border-top-right-radius: $border-radius-corners;
-    border-top-left-radius: $border-radius-corners;
+    border-top: 1px solid colors.$neutral-100;
+    border-top-right-radius: border_radius.$border-radius-corners;
+    border-top-left-radius: border_radius.$border-radius-corners;
 
     .Text {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 }

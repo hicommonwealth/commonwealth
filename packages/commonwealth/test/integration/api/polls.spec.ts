@@ -7,15 +7,11 @@ import type {
 } from '@canvas-js/interfaces';
 import { command, dispose, query } from '@hicommonwealth/core';
 import { Poll } from '@hicommonwealth/model';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
+import { models } from '@hicommonwealth/model/db';
 import jwt from 'jsonwebtoken';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
-
-chai.use(chaiHttp);
-const { expect } = chai;
 
 describe('Polls', () => {
   const chain = 'ethereum';
@@ -38,7 +34,7 @@ describe('Polls', () => {
   beforeAll(async () => {
     server = await testServer();
 
-    const topic = await server.models.Topic.findOne({
+    const topic = await models.Topic.findOne({
       where: { community_id: chain },
     });
     // @ts-expect-error StrictNullChecks
@@ -98,15 +94,14 @@ describe('Polls', () => {
       },
       payload: {
         thread_id: thread!.id!,
+        duration: null,
         ...data,
       },
     });
     expect(res).to.not.be.undefined;
     expect(res?.id).to.not.be.undefined;
-    expect(res).to.contain({
-      prompt: data.prompt,
-      options: JSON.stringify(data.options),
-    });
+    expect(res?.prompt).to.equal(data.prompt);
+    expect(res?.options).to.deep.equal(data.options);
 
     threadId = thread!.id!;
     pollId = res!.id!;

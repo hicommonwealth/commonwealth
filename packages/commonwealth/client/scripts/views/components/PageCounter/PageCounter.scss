@@ -1,4 +1,5 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/media_queries';
 
 .PageCounter {
   display: flex;
@@ -10,12 +11,12 @@
     min-width: 40px;
     text-align: center;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       min-width: 30px;
     }
   }
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     gap: 4px;
   }
 }

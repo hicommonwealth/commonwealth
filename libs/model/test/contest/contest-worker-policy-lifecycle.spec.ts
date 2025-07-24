@@ -4,12 +4,13 @@ import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { CommunityTierMap } from '@hicommonwealth/shared';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
-import { emitEvent, models } from '../../src';
 import { GetTopics } from '../../src/aggregates/community';
 import { Contests } from '../../src/aggregates/contest';
+import { models } from '../../src/database';
 import { systemActor } from '../../src/middleware';
 import { ContestWorker } from '../../src/policies';
 import { seed } from '../../src/tester';
+import { emitEvent } from '../../src/utils';
 import { drainOutbox } from '../utils/outbox-drain';
 
 describe('Contest Worker Policy Lifecycle', () => {
@@ -198,6 +199,7 @@ describe('Contest Worker Policy Lifecycle', () => {
     expect(voteContentStub).toHaveBeenCalled();
 
     await handleEvent(ContestWorker(), {
+      id: 0,
       name: 'ContestRolloverTimerTicked',
       payload: {},
     });
@@ -227,6 +229,7 @@ describe('Contest Worker Policy Lifecycle', () => {
     );
 
     await handleEvent(ContestWorker(), {
+      id: 0,
       name: 'ContestRolloverTimerTicked',
       payload: {},
     });

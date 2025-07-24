@@ -6,16 +6,14 @@ import type {
   Signature,
 } from '@canvas-js/interfaces';
 import { dispose, query } from '@hicommonwealth/core';
-import { Thread, ThreadAttributes } from '@hicommonwealth/model';
+import { Thread } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { ThreadAttributes } from '@hicommonwealth/model/models';
 import { LinkSource } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { config } from 'server/config';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
-
-chai.use(chaiHttp);
 
 describe('Linking Tests', () => {
   let server: TestServer;
@@ -57,7 +55,7 @@ describe('Linking Tests', () => {
   beforeAll(async () => {
     server = await testServer();
 
-    const topic = await server.models.Topic.findOne({
+    const topic = await models.Topic.findOne({
       where: { community_id: chain },
     });
     // @ts-expect-error StrictNullChecks

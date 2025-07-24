@@ -9,7 +9,8 @@ import {
   handleEvent,
   logger,
 } from '@hicommonwealth/core';
-import { ContestWorker, models } from '@hicommonwealth/model';
+import { ContestWorker } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { Client } from 'pg';
 import { config } from 'server/config';
 import { setupListener } from './pgListener';
@@ -34,6 +35,16 @@ export async function bootstrapBindings(options?: {
     if (!options?.skipRmqAdapter) {
       broker({ adapter: rmqAdapter });
     }
+
+    await rmqAdapter.subscribeDlqHandler(
+      async ({ consumer, event_id, ...dlq }) => {
+        await models.Dlq.findOrCreate({
+          where: { consumer, event_id },
+          defaults: { consumer, event_id, ...dlq },
+        });
+      },
+    );
+
     brokerInstance = rmqAdapter;
   } catch (e) {
     log.error(
@@ -88,6 +99,7 @@ export function bootstrapContestRolloverLoop() {
   const loop = async () => {
     try {
       await handleEvent(ContestWorker(), {
+        id: 0,
         name: 'ContestRolloverTimerTicked',
         payload: {},
       });

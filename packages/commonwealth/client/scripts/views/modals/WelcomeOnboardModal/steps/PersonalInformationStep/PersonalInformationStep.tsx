@@ -37,7 +37,7 @@ const PersonalInformationStep = ({
   onComplete,
 }: PersonalInformationStepProps) => {
   const formMethodsRef = useRef<CWFormRef>();
-  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+  const { mutateAsync: updateUser, isPending: isUpdatingProfile } =
     useUpdateUserMutation();
   const [isEmailChangeDisabled, setIsEmailChangeDisabled] = useState(false);
   const [isUserNameChangeDisabled, setIsUserNameChangeDisabled] =
@@ -238,7 +238,7 @@ const PersonalInformationStep = ({
             />
           </div>
 
-          <div className="footerContainer">
+          <div className="personal-info-footer">
             <CWButton
               label="Next"
               buttonWidth="full"

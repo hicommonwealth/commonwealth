@@ -6,9 +6,9 @@ import { useFlag } from 'hooks/useFlag';
 import AddressInfo from 'models/AddressInfo';
 import NewProfile from 'models/NewProfile';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import useUserStore, { useUserAiSettingsStore } from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import ManageApiKey from 'views/components/EditProfile/ManageAPIKeys';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -66,7 +66,7 @@ const EditProfile = () => {
   });
 
   const { aiInteractionsToggleEnabled, setAIInteractionsToggleEnabled } =
-    useLocalAISettingsStore();
+    useUserAiSettingsStore();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
@@ -75,7 +75,7 @@ const EditProfile = () => {
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
-  const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
+  const { mutateAsync: updateUser, isPending: isUpdatingProfile } =
     useUpdateUserMutation({
       addressesWithChainsToUpdate: addresses?.map((a) => ({
         address: a.address,
@@ -91,6 +91,13 @@ const EditProfile = () => {
   } = useFetchProfileByIdQuery({
     apiCallEnabled: user.isLoggedIn,
   });
+
+  const handleImageProcessingChange = useCallback(
+    ({ isGenerating, isUploading }) => {
+      setIsUploadingCoverImage(isGenerating || isUploading);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (isLoadingProfile) return;
@@ -224,7 +231,11 @@ const EditProfile = () => {
           }
         })
         .catch((err) => {
-          notifyError(err?.response?.data?.error || 'Something went wrong.');
+          notifyError(
+            err?.response?.data?.error ||
+              err.message ||
+              'Something went wrong.',
+          );
         });
     };
 
@@ -375,9 +386,7 @@ const EditProfile = () => {
                 hookToForm
                 withAIImageGeneration
                 imageBehavior={imageBehavior}
-                onImageProcessingChange={({ isGenerating, isUploading }) =>
-                  setIsUploadingCoverImage(isGenerating || isUploading)
-                }
+                onImageProcessingChange={handleImageProcessingChange}
                 onImageUploaded={console.log}
                 onImageBehaviorChange={setImageBehavior}
                 allowedImageBehaviours={['Fill', 'Tiled']}

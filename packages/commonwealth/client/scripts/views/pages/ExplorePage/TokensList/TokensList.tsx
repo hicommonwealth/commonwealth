@@ -21,6 +21,7 @@ import TokenCard from '../../../components/TokenCard';
 import FiltersDrawer, {
   TokenFilters,
   TokenSortDirections,
+  TokenSortDirectionsToEnumMap,
   TokenSortOptions,
   tokenSortOptionsLabelToKeysMap,
 } from './FiltersDrawer';
@@ -32,9 +33,21 @@ const TokenWithCommunity = TokenView.extend({
 
 type TokensListProps = {
   hideHeader?: boolean;
+  hideFilters?: boolean;
+  hideSeeMore?: boolean;
+  searchText?: string;
+  onClearSearch?: () => void;
+  hideSearchTag?: boolean;
 };
 
-const TokensList = ({ hideHeader }: TokensListProps) => {
+const TokensList = ({
+  hideHeader,
+  hideFilters,
+  hideSeeMore,
+  searchText,
+  onClearSearch,
+  hideSearchTag,
+}: TokensListProps) => {
   const navigate = useCommonNavigate();
   const launchpadEnabled = useFlag('launchpad');
 
@@ -59,16 +72,12 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
     hasNextPage,
     fetchNextPage,
   } = useFetchTokensQuery({
+    search: searchText?.trim(),
     cursor: 1,
     limit: 8,
     with_stats: true,
     order_by: (() => {
-      if (
-        filters?.withTokenSortBy &&
-        [TokenSortOptions.MarketCap, TokenSortOptions.Price].includes(
-          filters?.withTokenSortBy,
-        )
-      ) {
+      if (filters?.withTokenSortBy) {
         return tokenSortOptionsLabelToKeysMap[
           filters?.withTokenSortBy
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,6 +86,11 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
 
       return undefined;
     })(),
+    order_direction:
+      TokenSortDirectionsToEnumMap[
+        filters.withTokenSortOrder || TokenSortDirections.Descending
+      ],
+    is_graduated: filters.isGraduated,
     enabled: launchpadEnabled,
   });
   const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
@@ -92,6 +106,13 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
       ...filters,
       withTokenSortBy: undefined,
       withTokenSortOrder: undefined,
+    });
+  };
+
+  const removeIsGraduatedFilter = () => {
+    setFilters({
+      ...filters,
+      isGraduated: false,
     });
   };
 
@@ -114,40 +135,49 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
   return (
     <div className="TokensList">
       {!hideHeader && <CWText type="h2">Tokens</CWText>}
-      <div
-        className={clsx('filters', {
-          hasAppliedFilter:
-            Object.values(filters).filter(Boolean).length === 1
-              ? !filters.withTokenSortOrder
-              : Object.values(filters).filter(Boolean).length > 0,
-        })}
-      >
-        <CWButton
-          label="Filters"
-          iconRight="funnelSimple"
-          buttonType="secondary"
-          onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
-        />
-        {filters.withTokenSortBy && (
-          <CWTag
-            label={`${filters.withTokenSortBy}${
-              filters.withTokenSortOrder &&
-              filters.withTokenSortBy !== TokenSortOptions.MostRecent
-                ? ` : ${filters.withTokenSortOrder}`
-                : ''
-            }
-                        `}
-            type="filter"
-            onCloseClick={removeCommunitySortByFilter}
+      {!hideFilters && (
+        <div className={clsx('filters', 'hasAppliedFilter')}>
+          <CWButton
+            label="Filters"
+            iconRight="funnelSimple"
+            buttonType="secondary"
+            onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
           />
-        )}
-        <FiltersDrawer
-          isOpen={isFilterDrawerOpen}
-          onClose={() => setIsFilterDrawerOpen(false)}
-          filters={filters}
-          onFiltersChange={(newFilters) => setFilters(newFilters)}
-        />
-      </div>
+          {!hideSearchTag && searchText?.trim() && (
+            <CWTag
+              label={`Search: ${searchText?.trim()}`}
+              type="filter"
+              onCloseClick={onClearSearch}
+            />
+          )}
+          {filters.withTokenSortBy && (
+            <CWTag
+              label={`${filters.withTokenSortBy}${
+                filters.withTokenSortOrder &&
+                filters.withTokenSortBy !== TokenSortOptions.MostRecent
+                  ? ` : ${filters.withTokenSortOrder}`
+                  : ''
+              }
+                        `}
+              type="filter"
+              onCloseClick={removeCommunitySortByFilter}
+            />
+          )}
+          {filters.isGraduated && (
+            <CWTag
+              label="Graduated"
+              type="filter"
+              onCloseClick={removeIsGraduatedFilter}
+            />
+          )}
+          <FiltersDrawer
+            isOpen={isFilterDrawerOpen}
+            onClose={() => setIsFilterDrawerOpen(false)}
+            filters={filters}
+            onFiltersChange={(newFilters) => setFilters(newFilters)}
+          />
+        </div>
+      )}
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
@@ -192,12 +222,14 @@ const TokensList = ({ hideHeader }: TokensListProps) => {
           <CWCircleMultiplySpinner />
         </div>
       ) : hasNextPage && tokens.length > 0 ? (
-        <CWButton
-          label="See more"
-          buttonType="tertiary"
-          containerClassName="ml-auto"
-          onClick={handleFetchMoreTokens}
-        />
+        !hideSeeMore && (
+          <CWButton
+            label="See more"
+            buttonType="tertiary"
+            containerClassName="ml-auto"
+            onClick={handleFetchMoreTokens}
+          />
+        )
       ) : (
         <></>
       )}

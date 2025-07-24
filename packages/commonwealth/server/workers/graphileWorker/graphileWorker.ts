@@ -10,7 +10,7 @@ import {
   logger,
   stats,
 } from '@hicommonwealth/core';
-import { GraphileTaskNames, preset } from '@hicommonwealth/model';
+import { GraphileTaskNames, preset } from '@hicommonwealth/model/services';
 import { Task, parseCronItems, run } from 'graphile-worker';
 import { config } from '../../config';
 import { cronItems } from './cronJobs';
@@ -18,22 +18,26 @@ import { graphileTasks, taskFactory } from './tasks';
 
 const log = logger(import.meta);
 
-blobStorage({
-  adapter: S3BlobStorage(),
-});
-stats({
-  adapter: HotShotsStats(),
-});
+export async function startGraphileWorker(initAdapters: boolean = false) {
+  if (initAdapters) {
+    if (!config.CACHE.REDIS_URL) {
+      log.warn(
+        'REDIS_URL not set. Some Graphile jobs (e.g. CountAggregator) may fail unexpectedly.',
+      );
+    } else {
+      cache({
+        adapter: new RedisCache(config.CACHE.REDIS_URL),
+      });
+    }
 
-if (!config.CACHE.REDIS_URL) {
-  throw new Error('REDIS_URL is not set');
-}
+    blobStorage({
+      adapter: S3BlobStorage(),
+    });
+    stats({
+      adapter: HotShotsStats(),
+    });
+  }
 
-cache({
-  adapter: new RedisCache(config.CACHE.REDIS_URL),
-});
-
-async function startGraphileWorker() {
   for (const cronJob of cronItems) {
     if (!graphileTasks[cronJob.task])
       throw new Error(`Cron job task not found: ${cronJob.task}`);
@@ -54,8 +58,8 @@ async function startGraphileWorker() {
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
-  startGraphileWorker().catch((err) => {
-    log.fatal('A fatal error occurred with the Knock Worker', err);
+  startGraphileWorker(true).catch((err) => {
+    log.fatal('A fatal error occurred with the Graphile Worker', err);
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('ERROR', true);
   });

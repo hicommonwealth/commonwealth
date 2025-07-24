@@ -36,15 +36,8 @@ module.exports = {
   parserOptions: {
     project: [
       './tsconfig.json',
-      './libs/tsconfig.json',
-      './libs/evm-protocols/tsconfig.json',
-      './libs/core/tsconfig.json',
-      './libs/adapters/tsconfig.json',
-      './libs/evm-testing/tsconfig.json',
-      './libs/model/tsconfig.json',
-      './libs/schemas/tsconfig.json',
-      './libs/shared/tsconfig.json',
-      './libs/sitemaps/tsconfig.json',
+      './tsconfig.vite.json',
+      './libs/**/tsconfig.json',
       './packages/tsconfig.json',
       './packages/commonwealth/tsconfig.json',
       './packages/load-testing/tsconfig.json',
@@ -124,8 +117,6 @@ module.exports = {
       },
     ],
     '@tanstack/query/exhaustive-deps': 'error',
-    '@tanstack/query/prefer-query-object-syntax': 'error',
-    '@tanstack/query/no-deprecated-options': 1,
     'react/destructuring-assignment': [1, 'always'],
     'react/function-component-definition': [
       1,

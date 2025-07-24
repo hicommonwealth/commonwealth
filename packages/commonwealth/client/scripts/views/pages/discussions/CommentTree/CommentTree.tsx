@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
+import { trpc } from 'utils/trpcClient';
 import { CommentFilters } from './CommentFilters';
 import './CommentTree.scss';
 import { TreeHierarchy } from './TreeHierarchy';
@@ -17,12 +18,14 @@ export const CommentTree = ({
   canComment,
   onThreadCreated,
   aiCommentsToggleEnabled,
-  streamingReplyIds,
-  setStreamingReplyIds,
+  streamingInstances,
+  setStreamingInstances,
   permissions,
+  onChatModeChange,
 }: CommentsTreeProps) => {
   const user = useUserStore();
   const [hasTriggeredAIComment, setHasTriggeredAIComment] = useState(false);
+  const utils = trpc.useUtils();
 
   const {
     commentFilters,
@@ -50,7 +53,7 @@ export const CommentTree = ({
       onThreadCreated &&
       (!thread.numberOfComments || thread.numberOfComments === 0) &&
       !hasTriggeredAIComment &&
-      streamingReplyIds.length === 0;
+      streamingInstances.length === 0;
 
     if (shouldGenerateAIComment) {
       setHasTriggeredAIComment(true);
@@ -65,7 +68,7 @@ export const CommentTree = ({
     onThreadCreated,
     user.activeAccount,
     hasTriggeredAIComment,
-    streamingReplyIds,
+    streamingInstances,
     thread,
   ]);
 
@@ -76,13 +79,30 @@ export const CommentTree = ({
     }
   }, [thread?.id, thread?.numberOfComments]);
 
+  const handleFiltersChange = useCallback(
+    (newFilters: typeof commentFilters) => {
+      void (async () => {
+        // Check if sort type is changing (which affects pagination and ordering)
+        if (newFilters.sortType !== commentFilters.sortType) {
+          await utils.comment.getComments.reset({
+            thread_id: thread.id,
+          });
+        }
+      })();
+
+      onFiltersChange(newFilters);
+      onChatModeChange?.(newFilters.sortType === 'oldest');
+    },
+    [commentFilters, onFiltersChange, onChatModeChange, utils, thread.id],
+  );
+
   return (
     <>
       {thread?.numberOfComments > 0 && (
         <CommentFilters
           commentsRef={commentsRef}
           filters={commentFilters}
-          onFiltersChange={onFiltersChange}
+          onFiltersChange={handleFiltersChange}
         />
       )}
       <TreeHierarchy
@@ -114,8 +134,8 @@ export const CommentTree = ({
           canReply
         }
         commentFilters={commentFilters}
-        streamingReplyIds={streamingReplyIds}
-        setStreamingReplyIds={setStreamingReplyIds}
+        streamingInstances={streamingInstances}
+        setStreamingInstances={setStreamingInstances}
       />
     </>
   );

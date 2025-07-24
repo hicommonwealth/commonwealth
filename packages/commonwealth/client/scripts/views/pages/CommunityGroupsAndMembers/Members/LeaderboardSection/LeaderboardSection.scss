@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/table';
 
 .LeaderboardSection {
   display: flex;
@@ -20,7 +22,7 @@
   .search-icon {
     position: relative;
     left: 16px !important;
-    color: $neutral-400;
+    color: colors.$neutral-400;
   }
 
   .empty-state {
@@ -41,7 +43,7 @@
 
   table {
     width: 100%;
-    @include table-cell;
+    @include table.table-cell;
   }
 
   .table-cell {

@@ -1,11 +1,11 @@
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import { AbiFragment, Contract } from 'web3';
 import { community_stake } from '../utils/contracts';
 import { NamespaceFactory } from './namespaceFactory';
 import { SdkBase } from './sdkBase';
 
 export class CommunityStake extends SdkBase {
-  public address: string = cp.factoryContracts[84532].communityStake;
+  public address: string = factoryContracts[84532].communityStake;
   public contract: Contract<AbiFragment[]> = community_stake(
     this.address,
     this.web3,

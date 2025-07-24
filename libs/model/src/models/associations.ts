@@ -4,7 +4,10 @@ import type { DB } from './factories';
  * Associates models with type safety
  */
 export const buildAssociations = (db: DB) => {
-  db.User.withMany(db.Address)
+  db.User.withMany(db.Address, {
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  })
     .withMany(db.ProfileTags)
     .withMany(db.SubscriptionPreference, {
       asMany: 'SubscriptionPreferences',
@@ -45,6 +48,12 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });
+
+  db.CommunityGoalMeta.withMany(db.QuestActionMeta, {
+    foreignKey: 'community_goal_meta_id',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  });
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -87,7 +96,9 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Address)
+    .withMany(db.Address, {
+      onUpdate: 'CASCADE',
+    })
     .withMany(db.Thread, {
       asOne: 'Community',
       onUpdate: 'CASCADE',
@@ -269,4 +280,17 @@ export const buildAssociations = (db: DB) => {
   db.LaunchpadToken.withMany(db.LaunchpadTrade, {
     foreignKey: 'token_address',
   });
+
+  db.MCPServerCommunity.withManyToMany(
+    {
+      model: db.MCPServer,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+    {
+      model: db.Community,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  );
 };

@@ -74,6 +74,7 @@ const buildFilters = (memberships: string, addresses: string[]): Filters => {
 const buildFilteredQuery = (
   search: string,
   { joins: groupsJoin, filters: addressFilter }: Filters,
+  searchByNameAndAddress: boolean = false,
 ) => {
   return search
     ? `
@@ -85,7 +86,14 @@ const buildFilteredQuery = (
       ${groupsJoin}
     WHERE
       A.community_id = :community_id
-      AND U.profile->>'name' ILIKE :search
+      AND ${
+        searchByNameAndAddress
+          ? `(
+        U.profile->>'name' ILIKE :search
+        OR A.address ILIKE :search
+      )`
+          : `U.profile->>'name' ILIKE :search`
+      }
       ${addressFilter}
     `
     : `
@@ -202,7 +210,17 @@ function membersSqlWithSearch(
           ? 'WHERE COALESCE(U.referral_count, 0) + COALESCE(U.referral_eth_earnings, 0) > 0'
           : ''
       }
-      GROUP BY U.id, T.total
+      GROUP BY 
+        U.id, 
+        U.tier, 
+        U.profile->>'name', 
+        U.profile->>'avatar_url', 
+        U.created_at,
+        U.referral_count,
+        U.referral_eth_earnings,
+        U.xp_points,
+        U.xp_referrer_points,
+        T.total
       ORDER BY ${buildOrderBy(by, direction)}
       LIMIT ${limit} OFFSET ${offset};
      `;
@@ -223,6 +241,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         limit,
         order_by,
         order_direction,
+        searchByNameAndAddress = false,
       } = payload;
 
       const offset = limit * (cursor - 1);
@@ -243,6 +262,7 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
               buildFilteredQuery(
                 search ?? '',
                 buildFilters(memberships ?? '', addresses),
+                searchByNameAndAddress,
               ),
               by,
               direction,

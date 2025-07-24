@@ -7,6 +7,9 @@ const useGetJudgeStatusQuery = (communityId: string | null | undefined) => {
     },
     {
       enabled: !!communityId,
+      staleTime: 0,
+      gcTime: 0,
+      refetchOnMount: 'always',
     },
   );
 };

@@ -111,7 +111,7 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
         log.warn(
           `Community not found for namespace ${namespace_address}, skipping link`,
         );
-        return;
+        return false;
       }
 
       if (!log_removed)
@@ -192,7 +192,7 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
                 {
                   rule: 'threshold',
                   data: {
-                    threshold: '4', // must have 5 or more tokens
+                    threshold: '0',
                     source: {
                       source_type: BalanceSourceType.ERC1155,
                       evm_chain_id: community.ChainNode!.eth_chain_id!,

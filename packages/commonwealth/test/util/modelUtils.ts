@@ -11,11 +11,11 @@ import type {
 } from '@canvas-js/interfaces';
 import { Action, Session } from '@canvas-js/interfaces';
 import { createEvmSigner } from '@hicommonwealth/evm-protocols';
-import type {
+import { models } from '@hicommonwealth/model/db';
+import {
   CommunityAttributes,
-  DB,
   ThreadAttributes,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/models';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
@@ -29,8 +29,8 @@ import {
   type Link,
   type Role,
 } from '@hicommonwealth/shared';
-import chai from 'chai';
 import type { Application } from 'express';
+import request from 'supertest';
 import { z } from 'zod';
 
 function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
@@ -234,10 +234,9 @@ export type ModelSeeder = {
   setSiteAdmin: (args: SetSiteAdminArgs) => Promise<boolean>;
 };
 
-export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
+export const modelSeeder = (app: Application): ModelSeeder => ({
   getTopicId: async ({ chain }: { chain: string }) => {
-    const res = await chai.request
-      .agent(app)
+    const res = await request(app)
       .get('/api/topics')
       .set('Accept', 'application/json')
       .query({
@@ -269,8 +268,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       await sessionSigner.newSession(CANVAS_TOPIC);
     const walletAddress = sessionSigner.getAddressFromDid(session.did);
 
-    const res = await chai.request
-      .agent(app)
+    const res = await request(app)
       .post('/api/internal/SignIn')
       .set('Accept', 'application/json')
       .set('address', walletAddress)
@@ -303,8 +301,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   updateProfile: async ({ chain, address, data, jwt, skipChainFetch }) => {
-    const res = await chai.request
-      .agent(app)
+    const res = await request(app)
       .post('/api/updateProfile')
       .set('Accept', 'application/json')
       .send({ address, chain, data, jwt, skipChainFetch });
@@ -352,8 +349,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       action,
     });
 
-    const res = await chai.request
-      .agent(app)
+    const res = await request(app)
       .post('/api/v1/CreateThread')
       .set('Accept', 'application/json')
       .set('address', address)
@@ -375,8 +371,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   createLink: async (args: createDeleteLinkArgs) => {
-    const res = await chai.request
-      .agent(app)
+    const res = await request(app)
       .post('/api/v1/addLinks')
       .set('Accept', 'application/json')
       .set('address', args.address)
@@ -385,8 +380,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   deleteLink: async (args: createDeleteLinkArgs) => {
-    const res = await chai.request
-      .agent(app)
+    const res = await request(app)
       .post('/api/v1/deleteLinks')
       .set('Accept', 'application/json')
       .set('address', args.address)
@@ -427,8 +421,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       action,
     });
 
-    const res = await chai.request
-      .agent(app)
+    const res = await request(app)
       .post(`/api/v1/CreateComment`)
       .set('Accept', 'application/json')
       .set('address', address)
@@ -448,8 +441,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
   editComment: async (args: EditCommentArgs) => {
     const { jwt, text, comment_id, chain, community, address } = args;
-    const res = await chai.request
-      .agent(app)
+    const res = await request(app)
       .patch(`/api/v1/UpdateComment`)
       .set('Accept', 'application/json')
       .set('address', address!.split(':')[2])
@@ -494,8 +486,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       action,
     });
 
-    const res = await chai.request
-      .agent(app)
+    const res = await request(app)
       .post(`/api/v1/CreateCommentReaction`)
       .set('Accept', 'application/json')
       .set('address', address)
@@ -541,8 +532,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       action,
     });
 
-    const res = await chai.request
-      .agent(app)
+    const res = await request(app)
       .post(`/api/v1/CreateThreadReaction`)
       .set('Accept', 'application/json')
       .set('address', address)
@@ -570,8 +560,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       chain,
       community,
     } = args;
-    const res = await chai.request
-      .agent(app)
+    const res = await request(app)
       .post(`/api/topics/${id}`)
       .set('Accept', 'application/json')
       .send({
@@ -588,8 +577,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   createWebhook: async ({ chain, webhookUrl, jwt }) => {
-    const res = await chai.request
-      .agent(app)
+    const res = await request(app)
       .post('/api/createWebhook')
       .set('Accept', 'application/json')
       .send({ chain, webhookUrl, auth: true, jwt });
@@ -608,8 +596,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   createSubscription: async (args: SubscriptionArgs) => {
-    const res = await chai
-      .request(app)
+    const res = await request(app)
       .post('/api/createSubscription')
       .set('Accept', 'application/json')
       .send({ ...args });
@@ -618,8 +605,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   },
 
   createCommunity: async (args, jwt: string) => {
-    const res = await chai
-      .request(app)
+    const res = await request(app)
       .post(`/api/v1/CreateCommunity`)
       .set('Accept', 'application/json')
       .set('address', args.address)
@@ -633,8 +619,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
   joinCommunity: async (args: JoinCommunityArgs) => {
     const { jwt, address, chain } = args;
     try {
-      await chai.request
-        .agent(app)
+      await request(app)
         .post('/api/v1/JoinCommunity')
         .set('Accept', 'application/json')
         .set('address', address)
@@ -645,19 +630,6 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         });
     } catch (e) {
       console.error('Failed to link an existing address to a chain');
-      console.error(e);
-      return false;
-    }
-
-    try {
-      await chai.request
-        .agent(app)
-        .post('/api/v1/SetDefaultRole')
-        .set('Accept', 'application/json')
-        .set('address', address)
-        .send({ community_id: chain, jwt });
-    } catch (e) {
-      console.error('Failed to set default role');
       console.error(e);
       return false;
     }

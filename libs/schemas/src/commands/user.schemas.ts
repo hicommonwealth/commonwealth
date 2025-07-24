@@ -1,4 +1,4 @@
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { AuthContext, VerifiedContext } from '../context';
@@ -50,9 +50,9 @@ export const SignIn = {
       .describe(
         'True when address is newly created, equivalent to joining a community',
       ),
-    first_community: z
+    is_welcome_onboard_flow_complete: z
       .boolean()
-      .describe('True when address joins the first community'),
+      .describe("True when user hasn't completed the welcome onboard flow"),
   }),
   context: AuthContext,
 };
@@ -104,11 +104,9 @@ export const DeleteApiKey = {
 export const DistributeSkale = {
   input: z.object({
     address: z.string(),
-    eth_chain_id: z
-      .number()
-      .refine((data) => data === cp.ValidChains.SKALE_TEST, {
-        message: `eth_chain_id must be a Skale chain Id`,
-      }),
+    eth_chain_id: z.number().refine((data) => data === ValidChains.SKALE_TEST, {
+      message: `eth_chain_id must be a Skale chain Id`,
+    }),
   }),
   output: z.undefined(),
 };
@@ -123,14 +121,19 @@ export const UpdateSettings = {
   context: VerifiedContext,
 };
 
-export const GetAddressStatus = {
+export const UpdateEmail = {
   input: z.object({
-    community_id: z.string(),
-    address: z.string(),
+    email: z.string().email(),
   }),
-  output: z.object({
-    exists: z.boolean(),
-    belongs_to_user: z.boolean(),
+  output: User.extend({ email: z.string() }),
+  context: VerifiedContext,
+};
+
+export const FinishUpdateEmail = {
+  input: z.object({
+    email: z.string().email(),
+    token: z.string(),
   }),
+  output: z.object({ redirect_path: z.string() }),
   context: VerifiedContext,
 };

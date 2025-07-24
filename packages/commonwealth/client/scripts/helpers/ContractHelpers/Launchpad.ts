@@ -2,7 +2,15 @@ import {
   LaunchpadAbi,
   LPBondingCurveAbi,
 } from '@commonxyz/common-protocol-abis';
-import { commonProtocol as cp, erc20Abi } from '@hicommonwealth/evm-protocols';
+import {
+  buyToken,
+  erc20Abi,
+  getPrice,
+  launchToken,
+  sellToken,
+  transferLiquidity,
+} from '@hicommonwealth/evm-protocols';
+import { fetchCachedPublicEnvVar } from 'client/scripts/state/api/configuration';
 import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
 import ContractBase from './ContractBase';
@@ -12,6 +20,8 @@ class LaunchpadBondingCurve extends ContractBase {
   launchpadFactoryAddress: string;
   launchpadFactory: Contract<typeof LaunchpadAbi>;
   tokenCommunityManager: string;
+  LAUNCHPAD_INITIAL_PRICE: number;
+  LAUNCHPAD_CONNECTOR_WEIGHT: number;
 
   constructor(
     bondingCurveAddress: string,
@@ -24,6 +34,12 @@ class LaunchpadBondingCurve extends ContractBase {
     this.tokenAddress = tokenAddress;
     this.launchpadFactoryAddress = launchpadFactoryAddress;
     this.tokenCommunityManager = tokenCommunityManager;
+
+    const { LAUNCHPAD_INITIAL_PRICE, LAUNCHPAD_CONNECTOR_WEIGHT } =
+      fetchCachedPublicEnvVar() || {};
+
+    this.LAUNCHPAD_INITIAL_PRICE = LAUNCHPAD_INITIAL_PRICE!;
+    this.LAUNCHPAD_CONNECTOR_WEIGHT = LAUNCHPAD_CONNECTOR_WEIGHT!;
   }
 
   async initialize(
@@ -48,13 +64,10 @@ class LaunchpadBondingCurve extends ContractBase {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }
-    const initialBuyValue =
-      4.44e14 + parseInt(process.env.LAUNCHPAD_INITIAL_PRICE || '416700000');
-    const connectorWeight = parseInt(
-      process.env.LAUNCHPAD_CONNECTOR_WEIGHT || '830000',
-    );
+    const initialBuyValue = 4.44e14 + this.LAUNCHPAD_INITIAL_PRICE;
+    const connectorWeight = this.LAUNCHPAD_CONNECTOR_WEIGHT;
     const maxFeePerGas = await this.estimateGas();
-    const txReceipt = await cp.launchToken(
+    const txReceipt = await launchToken(
       this.launchpadFactory,
       name,
       symbol,
@@ -86,7 +99,7 @@ class LaunchpadBondingCurve extends ContractBase {
       await this.initialize(true, chainId, providerInstance);
     }
     const maxFeePerGas = await this.estimateGas();
-    const txReceipt = await cp.buyToken(
+    const txReceipt = await buyToken(
       this.contract,
       this.tokenAddress,
       walletAddress,
@@ -141,7 +154,7 @@ class LaunchpadBondingCurve extends ContractBase {
       this.tokenAddress,
     );
     const maxFeePerGas = await this.estimateGas();
-    const txReceipt = await cp.sellToken(
+    const txReceipt = await sellToken(
       this.contract,
       this.tokenAddress,
       amountSell,
@@ -157,7 +170,7 @@ class LaunchpadBondingCurve extends ContractBase {
       await this.initialize(true);
     }
 
-    const txReceipt = await cp.transferLiquidity(
+    const txReceipt = await transferLiquidity(
       this.contract,
       this.tokenAddress,
       walletAddress,
@@ -170,7 +183,7 @@ class LaunchpadBondingCurve extends ContractBase {
       await this.initialize(false, chainId);
     }
 
-    const amountOut = await cp.getPrice(
+    const amountOut = await getPrice(
       this.contract,
       this.tokenAddress,
       amountIn,

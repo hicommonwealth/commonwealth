@@ -22,12 +22,22 @@ type QuestListProps = {
   minQuests?: number;
   questsForCommunityId?: string;
   hideHeader?: boolean;
+  hideFilters?: boolean;
+  hideSeeMore?: boolean;
+  searchText?: string;
+  onClearSearch?: () => void;
+  hideSearchTag?: boolean;
 };
 
 const QuestList = ({
   minQuests = 8,
   questsForCommunityId,
   hideHeader,
+  hideFilters = false,
+  hideSeeMore = false,
+  searchText,
+  onClearSearch,
+  hideSearchTag,
 }: QuestListProps) => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
@@ -47,6 +57,7 @@ const QuestList = ({
     hasNextPage,
     fetchNextPage,
   } = useFetchQuestsQuery({
+    search: searchText?.trim(),
     ...(questsForCommunityId && {
       community_id: questsForCommunityId,
     }),
@@ -87,35 +98,44 @@ const QuestList = ({
   return (
     <div className="QuestList">
       {!hideHeader && <CWText type="h2">Quests</CWText>}
-      <div
-        className={clsx('filters', {
-          hasAppliedFilter: Object.values(filters).filter(Boolean).length > 0,
-        })}
-      >
-        <CWButton
-          label="Filters"
-          iconRight="funnelSimple"
-          buttonType="secondary"
-          onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
-        />
-        <CWTag
-          label={`Ending After: ${moment(filters.endingAfter).utc().local().format('Do MMMM, YYYY h:mm A')}`}
-          type="filter"
-        />
-        <CWTag
-          label={`Starting Before: ${moment(filters.startingBefore).utc().local().format('Do MMMM, YYYY h:mm A')}`}
-          type="filter"
-          onCloseClick={() =>
-            setFilters((f) => ({ ...f, startingBefore: undefined }))
-          }
-        />
-        <FiltersDrawer
-          isOpen={isFilterDrawerOpen}
-          onClose={() => setIsFilterDrawerOpen(false)}
-          filters={filters}
-          onFiltersChange={(newFilters) => setFilters(newFilters)}
-        />
-      </div>
+      {!hideFilters && (
+        <div
+          className={clsx('filters', {
+            hasAppliedFilter: Object.values(filters).filter(Boolean).length > 0,
+          })}
+        >
+          <CWButton
+            label="Filters"
+            iconRight="funnelSimple"
+            buttonType="secondary"
+            onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
+          />
+          {!hideSearchTag && searchText?.trim() && (
+            <CWTag
+              label={`Search: ${searchText?.trim()}`}
+              type="filter"
+              onCloseClick={onClearSearch}
+            />
+          )}
+          <CWTag
+            label={`Ending After: ${moment(filters.endingAfter).utc().local().format('Do MMMM, YYYY h:mm A')}`}
+            type="filter"
+          />
+          <CWTag
+            label={`Starting Before: ${moment(filters.startingBefore).utc().local().format('Do MMMM, YYYY h:mm A')}`}
+            type="filter"
+            onCloseClick={() =>
+              setFilters((f) => ({ ...f, startingBefore: undefined }))
+            }
+          />
+          <FiltersDrawer
+            isOpen={isFilterDrawerOpen}
+            onClose={() => setIsFilterDrawerOpen(false)}
+            filters={filters}
+            onFiltersChange={(newFilters) => setFilters(newFilters)}
+          />
+        </div>
+      )}
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : quests.length === 0 ? (
@@ -180,12 +200,18 @@ const QuestList = ({
           <CWCircleMultiplySpinner />
         </div>
       ) : hasNextPage && quests.length > 0 ? (
-        <CWButton
-          label="See more"
-          buttonType="tertiary"
-          containerClassName="ml-auto"
-          onClick={handleFetchMoreQuests}
-        />
+        <>
+          {hideSeeMore ? (
+            <></>
+          ) : (
+            <CWButton
+              label="See more"
+              buttonType="tertiary"
+              containerClassName="ml-auto"
+              onClick={handleFetchMoreQuests}
+            />
+          )}
+        </>
       ) : (
         <></>
       )}

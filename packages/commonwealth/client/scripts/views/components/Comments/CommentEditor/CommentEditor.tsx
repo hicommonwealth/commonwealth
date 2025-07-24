@@ -2,7 +2,6 @@ import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import { isCommandClick } from 'helpers';
-import { useFlag } from 'hooks/useFlag';
 import Account from 'models/Account';
 import Thread from 'models/Thread';
 import type { DeltaStatic } from 'quill';
@@ -10,7 +9,7 @@ import React, { forwardRef, useCallback, useEffect, useState } from 'react';
 import { useAiCompletion } from 'state/api/ai';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
-import { useLocalAISettingsStore } from 'state/ui/user';
+import { useAIFeatureEnabled, useUserAiSettingsStore } from 'state/ui/user';
 import { useTurnstile } from 'views/components/useTurnstile';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
@@ -31,6 +30,7 @@ export type CommentEditorProps = {
   parentType: ContentType;
   canComment: boolean;
   handleSubmitComment: (turnstileToken?: string | null) => Promise<number>;
+  handleIsReplying?: (isReplying: boolean) => void;
   errorMsg: string;
   contentDelta: DeltaStatic;
   setContentDelta: React.Dispatch<React.SetStateAction<DeltaStatic>>;
@@ -50,6 +50,9 @@ export type CommentEditorProps = {
   parentCommentText?: string;
   triggerImageModalOpen?: boolean;
   placeholder?: string;
+  webSearchEnabled?: boolean;
+  setWebSearchEnabled?: (enabled: boolean) => void;
+  communityId?: string;
 };
 
 // eslint-disable-next-line react/display-name
@@ -75,20 +78,27 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
       parentCommentText,
       triggerImageModalOpen,
       placeholder,
+      webSearchEnabled,
+      setWebSearchEnabled,
+      communityId,
     },
     _ref,
   ) => {
-    const aiCommentsFeatureEnabled = useFlag('aiComments');
-    const {
-      aiCommentsToggleEnabled,
-      aiInteractionsToggleEnabled,
-      setAICommentsToggleEnabled,
-    } = useLocalAISettingsStore();
+    const { isAIEnabled } = useAIFeatureEnabled();
+    const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
+      useUserAiSettingsStore();
 
     const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
 
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [localWebSearchEnabled, setLocalWebSearchEnabled] = useState(false);
+    const effectiveWebSearchEnabled =
+      typeof webSearchEnabled === 'boolean'
+        ? webSearchEnabled
+        : localWebSearchEnabled;
+    const effectiveSetWebSearchEnabled =
+      setWebSearchEnabled || setLocalWebSearchEnabled;
 
     const { generateCompletion } = useAiCompletion();
 
@@ -131,6 +141,8 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
         model: 'gpt-4o-mini',
         stream: true,
         systemPrompt,
+        includeContextualMentions: true,
+        communityId: communityId || thread?.communityId,
         onError: (error) => {
           console.error('Error generating AI comment:', error);
           notifyError('Failed to generate AI comment');
@@ -320,7 +332,7 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
                 label="Add or Generate Image"
                 onClick={handleOpenImageModal}
               />
-              {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+              {isAIEnabled && (
                 <CWThreadAction
                   action="ai-reply"
                   label={`Draft AI ${!isReplying ? 'Comment' : 'Reply'}`}
@@ -330,7 +342,7 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
               )}
             </div>
 
-            {aiCommentsFeatureEnabled && aiInteractionsToggleEnabled && (
+            {isAIEnabled && (
               <div className="ai-toggle-wrapper">
                 <CWTooltip
                   content={`${aiCommentsToggleEnabled ? 'Disable' : 'Enable'} AI auto reply`}
@@ -350,6 +362,32 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
                 <CWText type="caption" className="toggle-label">
                   AI auto reply
                 </CWText>
+              </div>
+            )}
+            {isAIEnabled && (
+              <div className="ai-toggle-wrapper">
+                <CWTooltip
+                  content={`${effectiveWebSearchEnabled ? 'Disable' : 'Enable'} Web Search`}
+                  placement="top"
+                  renderTrigger={() => (
+                    <div className="ai-toggle-wrapper">
+                      <CWToggle
+                        className="ai-toggle"
+                        icon="binoculars"
+                        iconColor="#757575"
+                        checked={effectiveWebSearchEnabled}
+                        onChange={() =>
+                          effectiveSetWebSearchEnabled(
+                            !effectiveWebSearchEnabled,
+                          )
+                        }
+                      />
+                      <CWText type="caption" className="toggle-label">
+                        Web search
+                      </CWText>
+                    </div>
+                  )}
+                />
               </div>
             )}
             <CWButton

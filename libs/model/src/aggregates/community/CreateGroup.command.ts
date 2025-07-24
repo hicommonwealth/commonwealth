@@ -61,6 +61,7 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
               const groupGatedActions = (payload.topics || []).map((t) => ({
                 group_id: group.id!,
                 topic_id: t.id,
+                is_private: !!t.is_private,
                 gated_actions: sequelize.literal(
                   `ARRAY[${t.permissions
                     .map((p) => `'${p}'`)

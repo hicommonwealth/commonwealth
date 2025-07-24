@@ -2,11 +2,11 @@ import { trpc } from '@hicommonwealth/adapters';
 import { command } from '@hicommonwealth/core';
 import {
   Community,
-  middleware,
-  models,
   refreshMemberships,
   refreshProfileCount,
 } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import * as middleware from '@hicommonwealth/model/middleware';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityInteractionEvent,
@@ -211,7 +211,6 @@ export const trpcRouter = trpc.router({
     { ttlSecs: 60 * 60 },
   ),
   updateBanner: trpc.command(Community.UpdateBanner, trpc.Tag.Community),
-  setDefaultRole: trpc.command(Community.SetDefaultRole, trpc.Tag.Community),
   toggleCommunityStar: trpc.command(
     Community.ToggleCommunityStar,
     trpc.Tag.Community,
@@ -221,4 +220,8 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   getRoles: trpc.query(Community.GetRoles, trpc.Tag.Community),
+  refreshWeightedVotes: trpc.command(
+    Community.RefreshWeightedVotes,
+    trpc.Tag.Community,
+  ),
 });

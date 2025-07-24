@@ -5,6 +5,7 @@ import {
   doesActionAllowTokenTradeThreshold,
   doesActionAllowTopicId,
   doesActionRequireDiscordServerId,
+  doesActionRequireGoalConfig,
   doesActionRequireGroupId,
   doesActionRequireTwitterTweetURL,
 } from 'helpers/quest';
@@ -22,7 +23,9 @@ export type ContentIdType =
   | 'tweet_url'
   | 'discord_server_id'
   | 'chain'
-  | 'threshold';
+  | 'threshold'
+  | 'goal'
+  | 'sso';
 
 export const inferContentIdTypeFromContentId = (
   action: QuestAction,
@@ -35,6 +38,8 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.TwitterTweet;
     if (doesActionRequireDiscordServerId(action as QuestAction))
       return QuestActionContentIdScope.DiscordServer;
+    if (doesActionRequireGoalConfig(action as QuestAction))
+      return QuestActionContentIdScope.Goal;
     if (doesActionAllowThreadId(action as QuestAction))
       return QuestActionContentIdScope.Thread;
     if (doesActionAllowChainId(action as QuestAction))
@@ -54,12 +59,16 @@ export const inferContentIdTypeFromContentId = (
       return QuestActionContentIdScope.TwitterTweet;
     case 'discord_server_id':
       return QuestActionContentIdScope.DiscordServer;
+    case 'goal':
+      return QuestActionContentIdScope.Goal;
     case 'chain':
       return QuestActionContentIdScope.Chain;
     case 'group':
       return QuestActionContentIdScope.Group;
     case 'threshold':
       return QuestActionContentIdScope.TokenTradeThreshold;
+    case 'sso':
+      return QuestActionContentIdScope.Sso;
     default:
       return QuestActionContentIdScope.Thread;
   }
@@ -76,6 +85,12 @@ export const buildContentIdFromIdentifier = (
     return `${idType}:${identifier}`;
   }
   if (idType === 'threshold') {
+    return `${idType}:${identifier}`;
+  }
+  if (idType === 'goal') {
+    return `${idType}:${identifier}`;
+  }
+  if (idType === 'sso') {
     return `${idType}:${identifier}`;
   }
 
@@ -149,6 +164,12 @@ export const buildRedirectURLFromContentId = (
   if (idType === 'threshold') {
     return `${idOrURL}`;
   }
+  if (idType === 'goal') {
+    return `${idOrURL}`;
+  }
+  if (idType === 'sso') {
+    return `${idOrURL}`;
+  }
 
   return '';
 };
@@ -162,8 +183,10 @@ export const doesConfigAllowContentIdField = (
     config?.with_optional_topic_id ||
     config?.requires_twitter_tweet_link ||
     config?.requires_discord_server_id ||
+    // config?.requires_goal_config || // hidden, will be set programatically
     config?.with_optional_chain_id ||
     config?.requires_group_id ||
-    config?.with_optional_token_trade_threshold
+    config?.with_optional_token_trade_threshold ||
+    config?.with_optional_sso_type
   );
 };

@@ -1,3 +1,4 @@
+import { Environments } from '@hicommonwealth/schemas';
 import { createHash } from 'crypto';
 import * as dotenv from 'dotenv';
 import _ from 'lodash';
@@ -9,7 +10,6 @@ dotenv.config({ path: '../../.env' });
 const APP_ENV_PASSWORD_HASH =
   '7f5c0fe24e27b24fcab364f319e488fffe99104b8f82bec64b6bc82c3a729090';
 
-const Environments = ['development', 'test', 'staging', 'production'] as const;
 const AppEnvironments = [
   'local',
   'CI',
@@ -21,6 +21,37 @@ const AppEnvironments = [
 ] as const;
 type Environment = (typeof Environments)[number];
 type AppEnvironment = (typeof AppEnvironments)[number];
+export const DeployedEnvironments = [
+  'production',
+  'beta',
+  'frick',
+  'demo',
+  'frack',
+] as const satisfies AppEnvironment[];
+export const ProdLikeEnvironments = [
+  'production',
+  'beta',
+  'frick',
+  'demo',
+] as const satisfies AppEnvironment[];
+export const ProductionEnvironments = [
+  'production',
+  'beta',
+  'demo',
+] as const satisfies AppEnvironment[];
+const Services = [
+  'web',
+  'consumer',
+  'message-relayer',
+  'graphile',
+  'discord-listener',
+  'twitter',
+  'knock',
+  'evm-ce',
+  'web-modulith',
+] as const;
+export const WebServices = ['web', 'web-modulith'] as const satisfies Service[];
+type Service = (typeof Services)[number];
 
 type UnionToIntersection<U> = (
   U extends unknown ? (k: U) => void : never
@@ -40,6 +71,65 @@ function customMerge(objValue: unknown, srcValue: unknown, key: unknown) {
   }
   // Otherwise, use the source value.
   return srcValue;
+}
+
+export function isAllDefined(...args: unknown[]): true | undefined {
+  const res = args.every(
+    (arg) => arg !== undefined && arg !== null && arg !== '',
+  );
+  if (!res) return undefined;
+  return true;
+}
+
+export function requiredInEnvironmentServices<T>({
+  // TODO: disAllowedEnvs and disAllowedServices
+  config,
+  requiredAppEnvs,
+  requiredServices,
+  defaultCheck,
+  mustBeUndefined,
+}: {
+  config: { APP_ENV: AppEnvironment; SERVICE?: Service; DEV_MODULITH: boolean };
+  requiredAppEnvs: AppEnvironment[] | 'all';
+  requiredServices:
+    | ['web', 'web-modulith', ...Service[]]
+    | Exclude<Service, 'web'>[]
+    | 'all';
+} & (
+  | {
+      mustBeUndefined?: boolean;
+      defaultCheck?: never;
+    }
+  | { mustBeUndefined?: never; defaultCheck?: T }
+)) {
+  const { APP_ENV: appEnv, SERVICE, DEV_MODULITH } = config;
+  // DEV_MODULITH overrides SERVICE - needed when using modulith on Railway
+  // This works on the client because there is a single .env (all env var loaded for every service)
+  // This works for Railway because there is a separate set of env vars for each service
+  const service = DEV_MODULITH && SERVICE === 'web' ? 'web-modulith' : SERVICE;
+
+  return (data: T | undefined) => {
+    // Ensures data is not set to default value in specified environments/services
+    if (defaultCheck) {
+      if (defaultCheck !== data) return true;
+    }
+    // Ensures data is undefined in specified environments/services
+    else if (mustBeUndefined) {
+      if (data === undefined) return true;
+    }
+    // Ensures data is not undefined in specified environments/services
+    else if (data !== undefined) return true;
+
+    if (!requiredAppEnvs.length || !requiredServices.length) return true;
+    if (requiredAppEnvs === 'all') return false;
+    if (!requiredAppEnvs.includes(appEnv)) return true;
+
+    // don't check services in CI or if service is undefined (local/CI/tests/scripts)
+    if (appEnv === 'CI' || service === undefined) return true;
+
+    if (requiredServices === 'all') return false;
+    return !requiredServices.includes(service as Exclude<Service, 'web'>);
+  };
 }
 
 /**
@@ -70,7 +160,9 @@ export const configure = <
 const {
   APP_ENV,
   APP_ENV_PASSWORD,
+  SERVICE,
   MAGIC_API_KEY,
+  MAGIC_PUBLISHABLE_KEY,
   MAGIC_CLIENT_ID,
   NODE_ENV,
   IS_CI,
@@ -82,6 +174,8 @@ const {
   TEST_WITHOUT_LOGS,
   HEROKU_APP_NAME,
   HEROKU_API_TOKEN,
+  MIXPANEL_TOKEN,
+  DEV_MODULITH,
 } = process.env;
 
 const DEFAULTS = {
@@ -99,9 +193,12 @@ export const config = configure(
   {
     APP_ENV: APP_ENV as AppEnvironment,
     APP_ENV_PASSWORD: APP_ENV_PASSWORD,
+    SERVICE: SERVICE as Service,
     MAGIC_API_KEY,
+    MAGIC_PUBLISHABLE_KEY: MAGIC_PUBLISHABLE_KEY || 'pk_live_EF89AABAFB87D6F4',
     MAGIC_CLIENT_ID,
     NODE_ENV: (NODE_ENV || DEFAULTS.NODE_ENV) as Environment,
+    DEV_MODULITH: DEV_MODULITH === 'true',
     IS_CI: IS_CI === 'true',
     SERVER_URL: SERVER_URL ?? DEFAULTS.SERVER_URL,
     PORT: _PORT ? parseInt(_PORT, 10) : DEFAULTS.PORT,
@@ -117,6 +214,9 @@ export const config = configure(
         _ROLLBAR_SERVER_TOKEN || DEFAULTS.ROLLBAR_SERVER_TOKEN,
       ROLLBAR_ENV: _ROLLBAR_ENV || DEFAULTS.ROLLBAR_ENV,
       TEST_WITHOUT_LOGS: TEST_WITHOUT_LOGS === 'true',
+    },
+    ANALYTICS: {
+      MIXPANEL_TOKEN: MIXPANEL_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
     },
   },
   z.object({
@@ -134,34 +234,79 @@ export const config = configure(
     APP_ENV_PASSWORD: z
       .string()
       .optional()
-      .refine(() => !(APP_ENV === 'production' && !APP_ENV_PASSWORD)),
-    NODE_ENV: z.enum(Environments),
-    IS_CI: z.boolean(),
-    SERVER_URL: z
-      .string()
       .refine(
-        (data) =>
-          !(
-            APP_ENV !== 'local' &&
-            APP_ENV !== 'CI' &&
-            data === DEFAULTS.SERVER_URL
-          ),
-        'SERVER_URL cannot be set to a default value in non-local or CI environments (i.e. Heroku apps).',
+        requiredInEnvironmentServices({
+          config: {
+            APP_ENV: APP_ENV as AppEnvironment,
+            SERVICE: SERVICE as Service,
+            DEV_MODULITH: DEV_MODULITH === 'true',
+          },
+          requiredAppEnvs: ['production'],
+          requiredServices: 'all',
+        }),
       ),
+    SERVICE: z
+      .enum(Services)
+      .optional()
+      .refine(
+        requiredInEnvironmentServices({
+          config: {
+            APP_ENV: APP_ENV as AppEnvironment,
+            SERVICE: SERVICE as Service,
+            DEV_MODULITH: DEV_MODULITH === 'true',
+          },
+          requiredAppEnvs: DeployedEnvironments,
+          requiredServices: 'all',
+        }),
+      ),
+    NODE_ENV: z.enum(Environments),
+    DEV_MODULITH: z.boolean(),
+    IS_CI: z.boolean(),
+    SERVER_URL: z.string().refine(
+      requiredInEnvironmentServices({
+        config: {
+          APP_ENV: APP_ENV as AppEnvironment,
+          SERVICE: SERVICE as Service,
+          DEV_MODULITH: DEV_MODULITH === 'true',
+        },
+
+        requiredAppEnvs: ['frick', 'frack', 'beta', 'demo', 'production'],
+        requiredServices: 'all',
+        defaultCheck: DEFAULTS.SERVER_URL,
+      }),
+    ),
     PORT: z.number().int().min(1000).max(65535),
     MAGIC_API_KEY: z
       .string()
       .optional()
       .refine(
-        (data) => !(APP_ENV === 'production' && !data),
-        'MAGIC_API_KEY is required in production',
+        requiredInEnvironmentServices({
+          config: {
+            APP_ENV: APP_ENV as AppEnvironment,
+            SERVICE: SERVICE as Service,
+            DEV_MODULITH: DEV_MODULITH === 'true',
+          },
+          requiredAppEnvs: ['production', 'beta', 'frick', 'demo'],
+          requiredServices: WebServices,
+        }),
       ),
+    MAGIC_PUBLISHABLE_KEY: z.string(),
     MAGIC_CLIENT_ID: z
       .string()
       .optional()
       .refine(
-        (data) => !(APP_ENV === 'production' && !data),
-        'MAGIC_CLIENT_ID is required in production',
+        requiredInEnvironmentServices({
+          config: {
+            APP_ENV: APP_ENV as AppEnvironment,
+            SERVICE: SERVICE as Service,
+            DEV_MODULITH: DEV_MODULITH === 'true',
+          },
+          requiredAppEnvs: ['production'],
+          requiredServices: WebServices,
+        }),
+      )
+      .describe(
+        'Magic client ID used to interactive with Magic API (update custom domains)',
       ),
     HEROKU: z.object({
       HEROKU_APP_NAME: z.string().optional(),
@@ -171,7 +316,10 @@ export const config = configure(
       .object({
         LOG_LEVEL: z
           .enum(LogLevels)
-          .refine((data) => !(APP_ENV === 'production' && data !== 'info')),
+          .refine(
+            (data) => !(APP_ENV === 'production' && data !== 'info'),
+            'LOG_LEVEL must be info in production.',
+          ),
         ROLLBAR_SERVER_TOKEN: z.string(),
         ROLLBAR_ENV: z.string(),
         TEST_WITHOUT_LOGS: z.boolean(),
@@ -195,5 +343,8 @@ export const config = configure(
           return false;
         return true;
       }, 'ROLLBAR_SERVER_TOKEN and ROLLBAR_ENV may only be set in production to a non-default value.'),
+    ANALYTICS: z.object({
+      MIXPANEL_TOKEN: z.string(),
+    }),
   }),
 );

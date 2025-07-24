@@ -24,9 +24,9 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { tester } from '../../src';
 import { models } from '../../src/database';
 import { notifyCommunityStakeTrades } from '../../src/policies/handlers/notifyCommunityStakeTrades';
+import * as tester from '../../src/tester';
 import {
   ProviderError,
   SpyNotificationsProvider,
@@ -83,6 +83,7 @@ describe('chainEventCreated Event Handler', () => {
   describe('Community Stakes', () => {
     test('should not throw if the community is invalid', async () => {
       await notifyCommunityStakeTrades({
+        id: 0,
         name: 'CommunityStakeTrade',
         payload: {
           eventSource: {
@@ -103,6 +104,7 @@ describe('chainEventCreated Event Handler', () => {
       });
 
       await notifyCommunityStakeTrades({
+        id: 0,
         name: 'CommunityStakeTrade',
         payload: {
           eventSource: {
@@ -130,6 +132,7 @@ describe('chainEventCreated Event Handler', () => {
       });
 
       await notifyCommunityStakeTrades({
+        id: 0,
         name: 'CommunityStakeTrade',
         payload: {
           eventSource: {
@@ -170,6 +173,7 @@ describe('chainEventCreated Event Handler', () => {
 
       await expect(
         notifyCommunityStakeTrades({
+          id: 0,
           name: 'CommunityStakeTrade',
           payload: {
             eventSource: {

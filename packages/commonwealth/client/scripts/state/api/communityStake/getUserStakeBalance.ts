@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
 import { ContractMethods } from 'state/api/config';
 import { lazyLoadCommunityStakes } from '../../../helpers/ContractHelpers/LazyCommunityStakes';
@@ -19,8 +19,8 @@ const getUserStakeBalance = async ({
 }: GetUserStakeBalanceProps) => {
   const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
-    commonProtocol.factoryContracts[ethChainId].communityStake,
-    commonProtocol.factoryContracts[ethChainId].factory,
+    factoryContracts[ethChainId].communityStake,
+    factoryContracts[ethChainId].factory,
     chainRpc,
   );
 
@@ -69,7 +69,9 @@ const useGetUserStakeBalanceQuery = ({
       }),
     staleTime: GET_USER_STAKE_BALANCE_STALE_TIME,
     enabled: apiEnabled,
-    keepPreviousData,
+    placeholderData: keepPreviousData
+      ? (previousData) => previousData
+      : undefined,
   });
 };
 

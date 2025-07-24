@@ -23,12 +23,14 @@ interface TopicDetailsProps {
   onStepChange: (step: CreateTopicStep) => void;
   onSetTopicFormData: (data: Partial<TopicForm>) => void;
   topicFormData: TopicForm | null;
+  onGroupsSelected?: (groups: number[]) => void;
 }
 
 const TopicDetails = ({
   onStepChange,
   onSetTopicFormData,
   topicFormData,
+  onGroupsSelected,
 }: TopicDetailsProps) => {
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
   const isCreateTopicTab = selectedTab === TABS[0].value;
@@ -57,6 +59,7 @@ const TopicDetails = ({
             <CreateTopicSection
               onStepChange={onStepChange}
               onSetTopicFormData={onSetTopicFormData}
+              onGroupsSelected={onGroupsSelected}
               topicFormData={topicFormData}
             />
           ) : (

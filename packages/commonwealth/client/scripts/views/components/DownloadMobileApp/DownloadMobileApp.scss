@@ -1,4 +1,5 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
 
 .DownloadMobileAppButton {
   margin-top: auto;
@@ -8,9 +9,9 @@
   }
 
   button {
-    background-color: $primary-500 !important;
+    background-color: colors.$primary-500 !important;
   }
   button * {
-    color: $white !important;
+    color: colors.$white !important;
   }
 }

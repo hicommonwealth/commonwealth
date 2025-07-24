@@ -13,6 +13,7 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { AuthContext, TopicContext, VerifiedContext } from '../context';
+import { MCPServer } from '../entities';
 import { Community } from '../entities/community.schemas';
 import { Group, Requirement } from '../entities/group.schemas';
 import { PinnedToken } from '../entities/pinned-token.schemas';
@@ -157,6 +158,15 @@ export const UpdateCommunity = {
   context: AuthContext,
 };
 
+export const SetCommunityMCPServers = {
+  input: z.object({
+    community_id: z.string(),
+    mcp_server_ids: z.array(z.number()),
+  }),
+  output: z.array(MCPServer),
+  context: AuthContext,
+};
+
 export const GenerateStakeholderGroups = {
   input: z.object({
     id: z.string(),
@@ -269,6 +279,7 @@ export const CreateGroup = {
       .array(
         z.object({
           id: PG_INT,
+          is_private: z.boolean().optional(),
           permissions: z.array(z.nativeEnum(GatedActionEnum)),
         }),
       )
@@ -306,6 +317,7 @@ export const UpdateGroup = {
       .array(
         z.object({
           id: PG_INT,
+          is_private: z.boolean().optional(),
           permissions: z.array(z.nativeEnum(GatedActionEnum)),
         }),
       )
@@ -467,12 +479,6 @@ export const UpdateBanner = {
   context: AuthContext,
 };
 
-export const SetDefaultRole = {
-  input: z.object({ community_id: z.string() }),
-  output: z.boolean(),
-  context: AuthContext,
-};
-
 export const ToggleCommunityStar = {
   input: z.object({ community_id: z.string() }),
   output: z.boolean(),
@@ -486,4 +492,16 @@ export const SetAddressWallet = {
   }),
   output: z.boolean(),
   context: AuthContext,
+};
+
+export const RefreshWeightedVotes = {
+  input: z.object({
+    topic_id: PG_INT,
+    community_id: z.string(),
+  }),
+  output: z.object({
+    topic_id: PG_INT,
+    community_id: z.string(),
+  }),
+  context: TopicContext,
 };
