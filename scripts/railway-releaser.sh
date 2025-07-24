@@ -8,7 +8,10 @@ cd libs/model
 echo "Migrating DB..."
 echo ""
 
-npx -y --package=sequelize@^6.32.1 --package=sequelize-cli@^6.2.0 --package=pg@^8.11.3 sequelize-cli db:migrate --config sequelize.json
+# TODO: add DATABASE_URL validation
+# TODO: init, baseline, validate in CI
+
+pgroll --postgres-url "$DATABASE_URL" migrate /migrations
 echo ""
 
 # Purge the Cloudflare Cache
