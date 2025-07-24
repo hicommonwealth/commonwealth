@@ -7,7 +7,7 @@ export const MCPServer = z.object({
   description: z.string(),
   handle: z.string(),
   source: z.string(),
-  source_identifier: z.string(), // required in DB but not in API
+  source_identifier: z.string().optional(), // required in DB but not in API
   server_url: z.string().optional(), // required in DB but not in API
   private_community_id: z.string().nullable().optional(),
   tools: z

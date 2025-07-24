@@ -29,6 +29,17 @@ export function CreateKlavisMCPInstance(): Command<
           apiKey: config.KLAVIS.API_KEY,
         });
 
+        // find existing mcp server with same name and private_community_id
+        const existingServer = await models.MCPServer.findOne({
+          where: {
+            name: serverType,
+            private_community_id: community_id,
+          },
+        });
+        if (existingServer) {
+          throw new Error('MCP server already exists');
+        }
+
         const instance = await klavis.mcpServer.createServerInstance({
           serverName: serverType,
           userId: actor.user.id.toString(),
