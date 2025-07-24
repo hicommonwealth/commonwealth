@@ -694,7 +694,6 @@ export const config = configure(
           config: target,
           requiredAppEnvs: ['production'],
           requiredServices: [...WebServices, 'knock', 'consumer'],
-          defaultCheck: DEFAULTS.KNOCK_IN_APP_FEED_ID,
         }),
       ),
     }),

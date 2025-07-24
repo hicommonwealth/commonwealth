@@ -622,4 +622,12 @@ export const events = {
     topic_id: PG_INT,
     community_id: z.string(),
   }),
+
+  XpAwarded: z.object({
+    by_user_id: PG_INT,
+    user_id: PG_INT,
+    xp_amount: z.number(),
+    reason: z.string(),
+    created_at: z.coerce.date(),
+  }),
 } as const;

@@ -21,7 +21,7 @@ ORG_ID="${NEON_ORG_ID}"
 app=${1:-local}
 
 if [ "$app" == "local" ]; then
-  psql -h localhost -d postgres -U commonwealth -c 'DROP DATABASE commonwealth WITH (FORCE);'; npx sequelize db:create
+  psql -h localhost -d postgres -U commonwealth -c 'DROP DATABASE IF EXISTS commonwealth WITH (FORCE);'; npx sequelize db:create
 elif [ "$app" == "frick" ] || [ "$app" == "frack" ] || [ "$app" == "beta" ] || [ "$app" == "demo" ]; then
   if [[ -z "${PROJECT_ID}" ]]; then
       echo "Error: NEON_PROJECT_ID is not set"

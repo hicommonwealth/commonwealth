@@ -16,6 +16,10 @@
       flex-direction: row;
       gap: 15px;
       align-items: center;
+      > * {
+        flex: 1;
+        min-width: 0;
+      }
 
       .Downloading {
         display: flex;
