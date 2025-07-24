@@ -85,18 +85,22 @@ function build() {
   );
 
   // klavis oauth callback
-  router.get('/klavis/oauth-callback', async (req, res) => {
-    const { instanceId, original_url } = req.query;
-    if (typeof instanceId !== 'string' || !instanceId.length) {
-      throw new AppError('Instance ID is required', 500);
+  router.get('/klavis/oauth-callback', async (req, res, next) => {
+    try {
+      const { instanceId, original_url } = req.query;
+      if (typeof instanceId !== 'string' || !instanceId.length) {
+        throw new AppError('Instance ID is required', 500);
+      }
+      await command(MCP.KlavisOAuthCallback(), {
+        actor: systemActor({}),
+        payload: {
+          instanceId: instanceId as string,
+        },
+      });
+      res.redirect(original_url as string);
+    } catch (error) {
+      next(error);
     }
-    await command(MCP.KlavisOAuthCallback(), {
-      actor: systemActor({}),
-      payload: {
-        instanceId: instanceId as string,
-      },
-    });
-    res.redirect(original_url as string);
   });
 
   return router;

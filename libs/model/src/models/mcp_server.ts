@@ -20,7 +20,16 @@ export default (sequelize: Sequelize.Sequelize): MCPServerModelStatic =>
       server_url: { type: Sequelize.STRING, allowNull: false },
       source: { type: Sequelize.STRING, allowNull: false },
       source_identifier: { type: Sequelize.STRING, allowNull: false },
-      private_community_id: { type: Sequelize.STRING, allowNull: true },
+      private_community_id: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        references: {
+          model: 'Communities',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'NO ACTION',
+      },
       tools: {
         type: Sequelize.JSON,
         allowNull: false,

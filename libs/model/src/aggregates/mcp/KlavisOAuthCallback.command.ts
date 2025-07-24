@@ -21,21 +21,13 @@ export function KlavisOAuthCallback(): Command<
       const instance = await klavis.mcpServer.getServerInstance(instanceId);
       mustExist('Server name', instance);
 
-      const instanceAuthMetadata =
-        await klavis.mcpServer.getInstanceAuthMetadata(instanceId);
-
-      console.log('INSTANCE: ', JSON.stringify(instance, null, 2));
-      console.log(
-        'INSTANCE AUTH METADATA: ',
-        JSON.stringify(instanceAuthMetadata, null, 2),
-      );
-
       const userId = parseInt(instance.externalUserId ?? '0');
       if (!userId) {
         throw new Error('No user ID found for klavis instance');
       }
 
       const tools = await klavis.mcpServer.getTools(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         instance.serverName as unknown as any,
       );
       if (!tools.tools?.length) {
