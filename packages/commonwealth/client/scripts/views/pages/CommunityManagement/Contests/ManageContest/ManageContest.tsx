@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { Denominations, WeiDecimals } from '@hicommonwealth/evm-protocols';
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
@@ -59,10 +59,8 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
     return <PageNotFound />;
   }
 
-  const fundingTokenTicker =
-    tokenMetadata?.symbol || commonProtocol.Denominations.ETH;
-  const fundingTokenDecimals =
-    tokenMetadata?.decimals || commonProtocol.WeiDecimals.ETH;
+  const fundingTokenTicker = tokenMetadata?.symbol || Denominations.ETH;
+  const fundingTokenDecimals = tokenMetadata?.decimals || WeiDecimals.ETH;
 
   const getCurrentStep = () => {
     switch (launchContestStep) {

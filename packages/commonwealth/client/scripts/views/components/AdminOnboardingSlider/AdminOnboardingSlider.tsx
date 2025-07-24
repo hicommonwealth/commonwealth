@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { ChainBase } from '@hicommonwealth/shared';
 import shape1Url from 'assets/img/shapes/shape1.svg';
 import shape3Url from 'assets/img/shapes/shape3.svg';
@@ -112,10 +112,9 @@ export const AdminOnboardingSlider = () => {
   const isCommunitySupported =
     community?.base === ChainBase.Ethereum &&
     community?.ChainNode?.eth_chain_id &&
-    [
-      commonProtocol.ValidChains.Base,
-      commonProtocol.ValidChains.SepoliaBase,
-    ].includes(community?.ChainNode?.eth_chain_id);
+    [ValidChains.Base, ValidChains.SepoliaBase].includes(
+      community?.ChainNode?.eth_chain_id,
+    );
   const isContestActionCompleted =
     isCommunitySupported && contestsData.all?.length > 0;
 
