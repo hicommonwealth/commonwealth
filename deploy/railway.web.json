@@ -15,6 +15,31 @@
         "cpu": 1,
         "memoryBytes": 1000000000
       }
+    },
+    "healthcheckPath": "/api/health"
+  },
+  "environments": {
+    "production": {
+      "deploy": {
+        "restartPolicyType": "ALWAYS",
+        "restartPolicyMaxRetries": null,
+        "multiRegionConfig": {
+          "us-east4-eqdc4a": {
+            "numReplicas": 1
+          },
+          "europe-west4-drams3a": {
+            "numReplicas": 1
+          }
+        },
+        "limitOverride": {
+          "containers": {
+            "cpu": 2,
+            "memoryBytes": 5000000000
+          }
+        },
+        "overlapSeconds": 30,
+        "drainingSeconds": 30
+      }
     }
   }
 }
