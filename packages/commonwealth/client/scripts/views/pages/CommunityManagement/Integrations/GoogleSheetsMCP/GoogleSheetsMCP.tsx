@@ -16,6 +16,8 @@ const GoogleSheetsMCP = () => {
       { enabled: !!communityId },
     );
 
+  console.log('mcpServers', mcpServers);
+
   const createKlavisMCPInstanceMutation =
     trpc.mcp.createKlavisMCPInstance.useMutation({
       onSuccess: (data) => {

@@ -42,7 +42,9 @@ const client = new OpenAI({
 });
 
 async function getAllServers(): Promise<CommonMCPServerWithHeaders[]> {
-  const dbServers = (await models.MCPServer.findAll()).map((server) => ({
+  const dbServers = (
+    await models.MCPServer.scope('withPrivateData').findAll()
+  ).map((server) => ({
     ...server.toJSON(),
     server_url:
       server.id === 1

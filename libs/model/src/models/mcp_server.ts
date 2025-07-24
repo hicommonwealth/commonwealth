@@ -49,6 +49,14 @@ export default (sequelize: Sequelize.Sequelize): MCPServerModelStatic =>
       updatedAt: 'updated_at',
       tableName: 'MCPServers',
       underscored: true,
+      defaultScope: {
+        attributes: {
+          exclude: ['source_identifier', 'server_url'],
+        },
+      },
+      scopes: {
+        withPrivateData: {},
+      },
       indexes: [
         {
           fields: ['source', 'source_identifier'],
