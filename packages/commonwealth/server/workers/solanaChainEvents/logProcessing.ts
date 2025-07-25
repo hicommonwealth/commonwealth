@@ -50,7 +50,7 @@ async function getTransactionSignatures(
           `Fetching signatures for program ${programId} between slots ${startSlot} and ${endSlot}`,
         );
 
-        let allProgramSignatures: ConfirmedSignatureInfo[] = [];
+        const allProgramSignatures: ConfirmedSignatureInfo[] = [];
         let lastSignature: string | undefined = undefined;
         let fetchMore = true;
         const batchLimit = 1000; // Maximum number of signatures per request
@@ -58,6 +58,7 @@ async function getTransactionSignatures(
         // Use pagination to fetch all signatures within the slot range
         while (fetchMore) {
           // Get batch of signatures using proper slot range filtering
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const options: any = {
             limit: batchLimit,
             minContextSlot: startSlot,
@@ -190,6 +191,7 @@ async function getTransactionDetails(
   programIdsInTransaction: string[];
   slot?: number;
   blockTime?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   transaction: any;
 }> {
   try {

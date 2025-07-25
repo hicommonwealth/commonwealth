@@ -14,6 +14,7 @@ const log = logger(import.meta);
  */
 export async function startSolanaPolling(
   interval: number,
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
 ): Promise<NodeJS.Timeout> {
   log.info(`Starting Solana poller`);
   if (interval > 300_000) {
@@ -25,7 +26,9 @@ export async function startSolanaPolling(
   log.info(
     `All Solana chains will be polled for events every ${interval / 1000} seconds`,
   );
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   await scheduleSolanaNodeProcessing(processChainNode);
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   return setInterval(scheduleSolanaNodeProcessing, interval, processChainNode);
 }
 

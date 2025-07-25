@@ -102,6 +102,7 @@ export function loadIdls(network: SolanaNetworks): IdlWithAddress[] {
     idlCache[network] = idls;
     log.info(`Loaded ${idls.length} IDLs for network ${network}`);
     return idls;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     log.error(`Error loading IDLs for network ${network}: ${error.message}`);
     return [];
