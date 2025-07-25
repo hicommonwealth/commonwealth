@@ -7,7 +7,7 @@ import {
   SolanaNetworks,
   SolanaSlotDetails,
   SolanaTransactionInfo,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/services';
 import { EventPairs } from '@hicommonwealth/schemas';
 import { ConfirmedSignatureInfo, Connection, PublicKey } from '@solana/web3.js';
 

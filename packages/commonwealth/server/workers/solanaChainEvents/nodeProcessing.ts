@@ -1,10 +1,10 @@
 import { logger, stats } from '@hicommonwealth/core';
+import { emitEvent } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import {
-  emitEvent,
   getAllProgramIds,
-  models,
   SolanaNetworks,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/services';
 import { EventPairs } from '@hicommonwealth/schemas';
 import { Connection } from '@solana/web3.js';
 import { config } from '../../config';

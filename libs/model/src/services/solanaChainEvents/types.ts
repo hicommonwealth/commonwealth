@@ -1,5 +1,5 @@
 import { Event } from '@coral-xyz/anchor';
-import { EventPair, Events } from '@hicommonwealth/schemas';
+import { EventPair, OutboxEvents } from '@hicommonwealth/schemas';
 
 export type SolanaSlotDetails = {
   slot: number;
@@ -34,6 +34,6 @@ export type SolanaEvent = {
   event_name?: string; // Name of the event
 };
 
-export type SolanaMapper<E extends Events> = (
+export type SolanaMapper<E extends OutboxEvents> = (
   solanaEvent: Event,
 ) => EventPair<E>;

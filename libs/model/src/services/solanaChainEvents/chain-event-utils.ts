@@ -1,6 +1,6 @@
 import * as anchor from '@coral-xyz/anchor';
 import { BorshCoder, Event } from '@coral-xyz/anchor';
-import { EventPairs, Events } from '@hicommonwealth/schemas';
+import { EventPairs, OutboxEvents } from '@hicommonwealth/schemas';
 import { findIdlByProgramId } from './solanaIdlLoader';
 import { SolanaEvent, SolanaMapper } from './types';
 
@@ -162,7 +162,7 @@ const singleContestVoteMapper: SolanaMapper<'ContestContentUpvoted'> = (
 /**
  * Maps event types to their respective mapper functions for Solana events.
  */
-export const solanaEventMappers: Record<string, SolanaMapper<Events>> = {
+export const solanaEventMappers: Record<string, SolanaMapper<OutboxEvents>> = {
   NewContest: singleContestStartedMapper,
   ContentAdded: contestContentAddedMapper,
   VoterVoted: singleContestVoteMapper,
