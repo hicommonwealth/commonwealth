@@ -10,6 +10,7 @@ import { archiveOutboxTask } from './tasks/archiveOutbox';
 import { cleanChainEventXpSourcesTask } from './tasks/cleanChainEventXpSources';
 import { cleanSubscriptionsTask } from './tasks/cleanSubscriptions';
 import { countAggregatorTask } from './tasks/countAggregator';
+import { magnaSyncTask } from './tasks/magnaSync';
 import { runDbMaintenanceTask } from './tasks/runDbMaintenance';
 import { sitemapTask } from './tasks/sitemap-runner';
 
@@ -34,4 +35,5 @@ export const graphileTasks: {
   [GraphileTaskNames.RunDbMaintenance]: runDbMaintenanceTask,
   [GraphileTaskNames.AwardTwitterQuestXp]: awardTweetEngagementXpTask,
   [GraphileTaskNames.CountAggregator]: countAggregatorTask,
+  [GraphileTaskNames.MagnaSync]: magnaSyncTask,
 } as const;
