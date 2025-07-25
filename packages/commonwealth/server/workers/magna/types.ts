@@ -38,7 +38,7 @@ export interface MagnaAllocation {
     | 'COMPLETED'
     | 'UP_TO_DATE';
   stakeholder: MagnaStakeholder;
-  customAttributes: any[];
+  customAttributes: unknown[];
   category: MagnaCategory;
   unlockStartAt: string;
   vestingStartAt: string;
