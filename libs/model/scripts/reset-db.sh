@@ -25,7 +25,7 @@ if [[ "$app" != "local" ]]; then
   BRANCH_NAME="$app"
 elif [[ "$DATABASE_URL" == *"neon.tech"* ]]; then
   BRANCH_NAME="dev-$(git config user.name)"
-elif [[ "$DATABASE_URL" == *"127.0.0.1"* ]]; then
+elif [[ "$DATABASE_URL" == *"127.0.0.1"* || "$DATABASE_URL" == *"localhost"* ]]; then
   BRANCH_NAME="local"
 else
   BRANCH_NAME="local"

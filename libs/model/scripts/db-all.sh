@@ -12,7 +12,7 @@ dumpName=${1:-latest.dump}
 
 pnpm reset-db
 
-if [[ -z "$DATABASE_URL" || "$DATABASE_URL" == *"127.0.0.1"* ]]; then
+if [[ -z "$DATABASE_URL" || "$DATABASE_URL" == *"127.0.0.1"* || "$DATABASE_URL" == *"localhost"* ]]; then
   pnpm load-db $dumpName
 else
   echo "DATABASE_URL is not local, skipping pnpm load-db $dumpName"
