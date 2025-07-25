@@ -142,6 +142,13 @@ const CommunityMembersPage = () => {
       sortable: false,
     },
     {
+      key: 'lastActive',
+      header: 'Last Active',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: true,
+    },
+    {
       key: 'actions',
       header: 'Permissions',
       numeric: false,
