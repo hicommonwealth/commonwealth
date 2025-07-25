@@ -27,6 +27,7 @@ export type Aggregates = Extract<
   | 'Group'
   | 'MCPServer'
   | 'MCPServerCommunity'
+  | 'ThreadToken'
 >;
 
 export * from './commands';
