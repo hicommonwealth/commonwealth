@@ -12,6 +12,8 @@ export const SPL_SPECIFICATION = 'spl';
 
 export const SOL_NFT_SPECIFICATION = 'metaplex';
 
+export const SUI_NFT_SPECIFICATION = 'sui_nft';
+
 export const ERC_SPECIFICATIONS = {
   ERC_20: 'erc20',
   ERC_721: 'erc721',
@@ -46,6 +48,7 @@ export const requirementTypes = [
   { value: TOKENS.EVM_TOKEN, label: 'EVM base tokens' },
   { value: TOKENS.SUI_TOKEN, label: 'Sui native token' },
   { value: TOKENS.SUI_TOKEN_TYPE, label: 'Sui custom token' },
+  { value: SUI_NFT_SPECIFICATION, label: 'Sui NFT' },
   { value: SPL_SPECIFICATION, label: 'Solana SPL Token' },
   { value: SOL_NFT_SPECIFICATION, label: 'Solana NFT' },
 ];

@@ -5,6 +5,7 @@ import {
   ERC_SPECIFICATIONS,
   SOL_NFT_SPECIFICATION,
   SPL_SPECIFICATION,
+  SUI_NFT_SPECIFICATION,
   TOKENS,
 } from '../../../common/constants';
 import { convertRequirementAmountFromTokensToWei } from '../../../common/helpers';
@@ -146,6 +147,29 @@ export const makeGroupDataBaseAPIPayload = (
             sui_network: x.requirementChain,
             // @ts-expect-error StrictNullChecks
             coin_type: x.requirementCoinType.trim(),
+          },
+        },
+      });
+      return;
+    }
+
+    // for sui nft
+    if (x.requirementType === SUI_NFT_SPECIFICATION) {
+      // @ts-expect-error StrictNullChecks
+      payload.requirements.push({
+        rule: 'threshold',
+        data: {
+          threshold: convertRequirementAmountFromTokensToWei(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            x.requirementType as any,
+            // @ts-expect-error StrictNullChecks
+            x.requirementAmount,
+          ),
+          source: {
+            source_type: x.requirementType,
+            sui_network: x.requirementChain,
+            // @ts-expect-error StrictNullChecks
+            collection_id: x.requirementContractAddress.trim(),
           },
         },
       });

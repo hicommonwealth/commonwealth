@@ -40,6 +40,13 @@ const SuiTokenSource = z.object({
   coin_type: z.string(),
 });
 
+const SuiNFTSource = z.object({
+  source_type: z.enum([BalanceSourceType.SuiNFT]),
+  sui_network: z.string(),
+  collection_id: z.string(),
+  token_standard: z.string().optional(),
+});
+
 const NativeSource = z.object({
   source_type: z.enum([BalanceSourceType.ETHNative]),
   evm_chain_id: PG_INT,
@@ -67,6 +74,7 @@ export const ThresholdData = z.object({
     SolanaSource,
     SuiSource,
     SuiTokenSource,
+    SuiNFTSource,
   ]),
 });
 
