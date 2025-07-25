@@ -34,6 +34,8 @@ const CWCommunityInput = (props: CWCommunityInputProps) => {
   const { data: communityResults } = useSearchCommunitiesQuery({
     search: debouncedSearchTerm.trim(), // we want to display the common community as a default
     limit: debouncedSearchTerm === DEFAULT_COMMUNITY_SEARCH ? 1 : 50,
+    order_direction:
+      debouncedSearchTerm === DEFAULT_COMMUNITY_SEARCH ? 'DESC' : 'ASC',
     cursor: 1,
     enabled: debouncedSearchTerm.trim().length > 0,
   });
