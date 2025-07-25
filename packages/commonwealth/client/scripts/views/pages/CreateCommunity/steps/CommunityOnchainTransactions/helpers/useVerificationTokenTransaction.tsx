@@ -41,7 +41,7 @@ const useVerificationTokenTransaction = ({
     (node) => node.ethChainId === parseInt(chainId),
   )?.url;
 
-  const contractAddress = factoryContracts?.[chainId]?.communityNomination;
+  const contractAddress = factoryContracts?.[chainId]?.CommunityNominations;
 
   const action = async () => {
     if (

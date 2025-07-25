@@ -53,14 +53,18 @@ export async function processChainNode(
     });
     const currentBlock = Number(await client.getBlockNumber());
 
+    // EVM CE will process (-1 to avoid the majority of chain re-orgs). Disabled
+    // For tests as we don't want to need to mine an extra block
+    const checkAgainstBlock = config.WEB3.REORG_SAFETY_DISABLED
+      ? currentBlock
+      : currentBlock - 1;
     let startBlockNum: number;
     if (!lastProcessedBlock) {
       startBlockNum = currentBlock - 10;
-    } else if (lastProcessedBlock.block_number === currentBlock - 1) {
+    } else if (lastProcessedBlock.block_number === checkAgainstBlock) {
       // last processed block number is the same as the most recent block
-      // that EVM CE will process (-1 to avoid the majority of chain re-orgs)
       return;
-    } else if (lastProcessedBlock.block_number + 1 <= currentBlock - 1) {
+    } else if (lastProcessedBlock.block_number + 1 <= checkAgainstBlock) {
       // the next block evm ce is ready to process is less than or equal to
       // the most recent block that EVM CE will process
       startBlockNum = lastProcessedBlock.block_number + 1;
@@ -164,7 +168,7 @@ export async function scheduleNodeProcessing(
     const blacklistedChains = ethChainIds.filter((ethChainId) => {
       return !whitelistedChains.includes(ethChainId);
     });
-    log.warn(
+    log.trace(
       // eslint-disable-next-line max-len
       `Ignoring chain events for chains ${blacklistedChains.join(', ')} because it is not in EVM_CHAINS_WHITELIST whitelist. Remove the env var to allow all.`,
     );
