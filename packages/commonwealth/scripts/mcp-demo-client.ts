@@ -41,25 +41,23 @@ const client = new OpenAI({
   apiKey: config.OPENAI.API_KEY,
 });
 
-export async function getAllServers(): Promise<CommonMCPServerWithHeaders[]> {
-  const dbServers = (await models.MCPServer.findAll()).filter(
-    (server) => server.id !== 1, // exclude common prod server
-  );
-  const allServers: CommonMCPServerWithHeaders[] = [
-    {
-      id: 0,
-      name: 'Common MCP Server',
-      description: 'Common MCP Server',
-      source: 'common',
-      server_url: `https://${MCP_DEMO_CLIENT_SERVER_URL}/mcp`,
-      handle: 'common',
-      headers: {
-        Authorization: `Bearer ${MCP_KEY_BYPASS}`,
-      },
-    },
-    ...dbServers,
-  ];
-  return allServers;
+async function getAllServers(): Promise<CommonMCPServerWithHeaders[]> {
+  const dbServers = (
+    await models.MCPServer.scope('withPrivateData').findAll()
+  ).map((server) => ({
+    ...server.toJSON(),
+    server_url:
+      server.id === 1
+        ? `https://${MCP_DEMO_CLIENT_SERVER_URL}/mcp`
+        : server.server_url,
+    headers:
+      server.id === 1
+        ? {
+            Authorization: `Bearer ${MCP_KEY_BYPASS}`,
+          }
+        : undefined,
+  }));
+  return dbServers;
 }
 
 async function startChatBot() {
