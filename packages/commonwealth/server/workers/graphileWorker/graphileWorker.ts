@@ -10,7 +10,11 @@ import {
   logger,
   stats,
 } from '@hicommonwealth/core';
-import { GraphileTaskNames, preset } from '@hicommonwealth/model/services';
+import {
+  CustomCronItem,
+  GraphileTaskNames,
+  preset,
+} from '@hicommonwealth/model/services';
 import { Task, parseCronItems, run } from 'graphile-worker';
 import { config } from '../../config';
 import { cronItems } from './cronJobs';
@@ -39,12 +43,14 @@ export async function startGraphileWorker(initAdapters: boolean = false) {
   }
 
   for (const cronJob of cronItems) {
-    if (!graphileTasks[cronJob.task])
+    if (cronJob && !graphileTasks[cronJob.task])
       throw new Error(`Cron job task not found: ${cronJob.task}`);
   }
 
   await run({
-    parsedCronItems: parseCronItems(cronItems.filter(Boolean)),
+    parsedCronItems: parseCronItems(
+      cronItems.filter((x): x is CustomCronItem => x !== undefined),
+    ),
     preset,
     taskList: Object.entries(graphileTasks).reduce(
       (acc, [taskName, task]) => ({
