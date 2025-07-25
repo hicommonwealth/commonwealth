@@ -659,13 +659,13 @@ importers:
         version: 1.0.0(encoding@0.1.13)
       pg:
         specifier: ^8.11.3
-        version: 8.11.5
+        version: 8.13.0
       quill-delta-to-markdown:
         specifier: ^0.6.0
         version: 0.6.0
       sequelize:
         specifier: ^6.32.1
-        version: 6.37.3(pg@8.11.5)
+        version: 6.37.3(pg@8.13.0)
       umzug:
         specifier: ^3.7.0
         version: 3.8.0(@types/node@24.0.3)
@@ -9595,6 +9595,9 @@ packages:
 
   '@types/pg@8.11.6':
     resolution: {integrity: sha512-/2WmmBXHLsfRqzfHW7BNZ8SbYzE8OSk7i3WjFYvfgRHj7S1xj+16Je5fUKv3lVdVzk/zn9TXOqf+avFCFIE0yQ==}
+
+  '@types/pg@8.15.4':
+    resolution: {integrity: sha512-I6UNVBAoYbvuWkkU3oosC8yxqH21f4/Jc4DK71JLG3dT2mdlGe1z+ep/LQGXaKaOgcvUrsQoPRqfgtMcvZiJhg==}
 
   '@types/phoenix@1.6.6':
     resolution: {integrity: sha512-PIzZZlEppgrpoT2QgbnDU+MMzuR6BbCjllj0bM70lWoejMeNJAxCchxnv7J3XFkI8MpygtRpzXrIlmWUBclP5A==}
@@ -35180,6 +35183,12 @@ snapshots:
       pg-protocol: 1.6.1
       pg-types: 4.0.2
 
+  '@types/pg@8.15.4':
+    dependencies:
+      '@types/node': 20.17.6
+      pg-protocol: 1.7.0
+      pg-types: 2.2.0
+
   '@types/phoenix@1.6.6': {}
 
   '@types/prop-types@15.7.12': {}
@@ -42555,7 +42564,7 @@ snapshots:
     dependencies:
       '@graphile/logger': 0.2.0
       '@types/debug': 4.1.12
-      '@types/pg': 8.11.10
+      '@types/pg': 8.15.4
       cosmiconfig: 8.3.6(typescript@5.8.2)
       graphile-config: 0.0.1-beta.14
       json5: 2.2.3
@@ -49046,6 +49055,29 @@ snapshots:
       wkx: 0.5.0
     optionalDependencies:
       pg: 8.11.5
+    transitivePeerDependencies:
+      - supports-color
+
+  sequelize@6.37.3(pg@8.13.0):
+    dependencies:
+      '@types/debug': 4.1.12
+      '@types/validator': 13.11.9
+      debug: 4.4.1(supports-color@8.1.1)
+      dottie: 2.0.6
+      inflection: 1.13.4
+      lodash: 4.17.21
+      moment: 2.30.1
+      moment-timezone: 0.5.45
+      pg-connection-string: 2.7.0
+      retry-as-promised: 7.0.4
+      semver: 7.7.2
+      sequelize-pool: 7.1.0
+      toposort-class: 1.0.1
+      uuid: 8.3.2
+      validator: 13.11.0
+      wkx: 0.5.0
+    optionalDependencies:
+      pg: 8.13.0
     transitivePeerDependencies:
       - supports-color
 

@@ -120,7 +120,10 @@ export const config = configure(
       API_KEY: SENDGRID_API_KEY,
     },
     DB: {
-      URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
+      URI:
+        target.NODE_ENV === 'test' || !DATABASE_URL
+          ? DEFAULTS.DATABASE_URL
+          : DATABASE_URL,
       NAME,
       NO_SSL: NO_SSL === 'true',
       TRACE: DATABASE_LOG_TRACE === 'true',
