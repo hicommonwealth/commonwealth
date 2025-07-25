@@ -33,6 +33,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         description,
         default_symbol,
         icon_url,
+        update_token_image,
         active,
         type,
         stages_enabled,
@@ -64,6 +65,8 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         ],
       });
       mustExist('Community', community); // if authorized as admin, community is always found
+
+      console.log('update_token_image => ', update_token_image);
 
       // Handle single string case and undefined case
       if (snapshot !== undefined) {
@@ -162,6 +165,25 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
 
       await models.sequelize.transaction(async (transaction) => {
         await community.save({ transaction });
+
+        // Update LaunchpadToken image if requested
+        if (update_token_image) {
+          const foundNamespace = namespace || community.namespace;
+          if (foundNamespace) {
+            const launchpadToken = await models.LaunchpadToken.findOne({
+              where: { namespace: foundNamespace },
+              transaction,
+            });
+            if (launchpadToken) {
+              // Prefer payload icon_url, else use community.icon_url
+              const newIconUrl = icon_url || community.icon_url;
+              if (newIconUrl && launchpadToken.icon_url !== newIconUrl) {
+                launchpadToken.icon_url = newIconUrl;
+                await launchpadToken.save({ transaction });
+              }
+            }
+          }
+        }
 
         if (weightedVotingProps) {
           // update general topic to use weighted voting

@@ -26,6 +26,7 @@ interface UpdateCommunityProps {
   customStages?: string[];
   customDomain?: string;
   iconUrl?: string;
+  updateTokenImage?: boolean;
   defaultOverview?: boolean;
   chainNodeId?: string;
   type?: ChainType;
@@ -54,6 +55,7 @@ export const buildUpdateCommunityInput = ({
   customStages,
   customDomain,
   iconUrl,
+  updateTokenImage,
   defaultOverview,
   chainNodeId,
   type,
@@ -93,6 +95,7 @@ export const buildUpdateCommunityInput = ({
       custom_domain: customDomain,
     }),
     ...(typeof iconUrl !== 'undefined' && { icon_url: iconUrl }),
+    update_token_image: updateTokenImage || false,
     ...(typeof defaultOverview !== 'undefined' && {
       default_summary_view: defaultOverview,
     }),
@@ -120,12 +123,15 @@ const useUpdateCommunityMutation = ({
   reInitAppOnSuccess,
 }: UseUpdateCommunityMutationProps) => {
   const user = useUserStore();
+  const utils = trpc.useUtils();
 
   return trpc.community.updateCommunity.useMutation({
     onSuccess: async () => {
       // since this is the main chain/community object affecting
       // some other features, better to re-fetch on update.
       await invalidateAllQueriesForCommunity(communityId);
+
+      await utils.launchpadToken.invalidate().catch(console.error);
 
       user.setData({ addressSelectorSelectedAddress: undefined });
 
