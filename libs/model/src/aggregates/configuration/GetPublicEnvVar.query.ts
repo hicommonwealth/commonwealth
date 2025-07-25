@@ -55,6 +55,7 @@ export function GetPublicEnvVar(): Query<typeof schemas.GetPublicEnvVar> {
           },
           {} as Record<string, string>,
         ),
+        MOONPAY_PUBLISHABLE_KEY: config.MOONPAY.PUBLISHABLE_KEY,
       };
     },
   };
