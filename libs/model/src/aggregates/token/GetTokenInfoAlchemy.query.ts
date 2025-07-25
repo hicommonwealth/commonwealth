@@ -63,8 +63,11 @@ export function GetTokenInfoAlchemy(): Query<
       const json = await response.json();
 
       if (json?.error) {
+        if (json?.error?.message?.includes('Token not found')) {
+          return errorObject; // don't want to spam rollbar with errors
+        }
         log.error(
-          json.error.message ||
+          `GetTokenInfoAlchemy: ${json.error.message}` ||
             'Unknown error from alchemy in GetTokenInfoAlchemy query',
         );
         return errorObject;
