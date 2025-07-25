@@ -41,6 +41,8 @@ const {
   RAILWAY_GIT_COMMIT_SHA,
   RELEASER_URL,
   RELEASER_API_KEY,
+  MAGNA_API_KEY,
+  MAGNA_API_URL,
 } = process.env;
 
 const DEFAULTS = {
@@ -156,6 +158,10 @@ export const config = configure(
       RAILWAY_GIT_COMMIT_SHA,
       RELEASER_URL,
       RELEASER_API_KEY,
+    },
+    MAGNA: {
+      API_KEY: MAGNA_API_KEY,
+      API_URL: MAGNA_API_URL,
     },
   },
   z.object({
@@ -294,6 +300,10 @@ export const config = configure(
       //     requiredAppEnvs: ['production', 'frick', 'frack', 'beta', 'demo'],
       //     requiredServices: 'all',
       //   }),)
+    }),
+    MAGNA: z.object({
+      API_KEY: z.string().optional(),
+      API_URL: z.string().optional(),
     }),
   }),
 );

@@ -44,7 +44,7 @@ export async function startGraphileWorker(initAdapters: boolean = false) {
   }
 
   await run({
-    parsedCronItems: parseCronItems(cronItems),
+    parsedCronItems: parseCronItems(cronItems.filter(Boolean)),
     preset,
     taskList: Object.entries(graphileTasks).reduce(
       (acc, [taskName, task]) => ({
