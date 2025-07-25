@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { MoonPayBuyWidget } from '@moonpay/moonpay-react';
 import React, { useState } from 'react';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
@@ -15,7 +15,7 @@ import useMagicWallet from './useMagicWallet';
 import { formatUsdBalance, handleRefreshBalance } from './utils';
 import './WalletFundsContent.scss';
 
-const BASE_MAINNET_CHAIN_ID = commonProtocol.ValidChains.Base;
+const BASE_MAINNET_CHAIN_ID = ValidChains.Base;
 
 interface WalletFundsContentProps {
   chainId?: number;

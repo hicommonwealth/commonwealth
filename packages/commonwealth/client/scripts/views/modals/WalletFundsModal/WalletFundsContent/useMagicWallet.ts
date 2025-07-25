@@ -1,11 +1,11 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { Magic } from 'magic-sdk';
 import { useEffect, useMemo, useState } from 'react';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { getMagicForChain } from 'utils/magicNetworkUtils';
 import Web3 from 'web3';
 
-const DEFAULT_CHAIN_ID = commonProtocol.ValidChains.Base;
+const DEFAULT_CHAIN_ID = ValidChains.Base;
 
 interface UseMagicWalletProps {
   chainId?: number;
