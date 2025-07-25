@@ -94,6 +94,9 @@ const CommunityStakeIntegration = lazy(
 const CommunityTokenIntegration = lazy(
   () => import('views/pages/CommunityManagement/TokenIntegration'),
 );
+const MCPIntegration = lazy(
+  () => import('views/pages/CommunityManagement/MCPIntegration'),
+);
 const CommunityOnchainVerificationIntegration = lazy(
   () =>
     import('views/pages/CommunityManagement/OnchainVerificationIntegration'),
@@ -572,6 +575,13 @@ const CommonDomainRoutes = () => [
     key="/:scope/manage/integrations/token"
     path="/:scope/manage/integrations/token"
     element={withLayout(CommunityTokenIntegration, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/manage/integrations/mcp"
+    path="/:scope/manage/integrations/mcp"
+    element={withLayout(MCPIntegration, {
       scoped: true,
     })}
   />,
