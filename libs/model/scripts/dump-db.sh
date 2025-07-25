@@ -11,37 +11,11 @@ load-env-var '../../.env';
 dumpType=${1:-partial}
 dumpName=${2:-latest.dump}
 
-if [[ -z "${BRANCH_NAME}" ]]; then
-
-else
-  BRANCH_NAME="${BRANCH_NAME}"
-fi
-
 DATABASE_NAME="commonwealth"
-PROJECT_ID="${NEON_PROJECT_ID}"
-ORG_ID="${NEON_ORG_ID}"
-
-if [[ -z "${PROJECT_ID}" ]]; then
-    echo "Error: NEON_PROJECT_ID is not set"
-    exit 1
-fi
-
-if [[ -z "${ORG_ID}" ]]; then
-    echo "Error: NEON_ORG_ID is not set"
-    exit 1
-fi
-
-neon() {
-   if [ -n "$PROJECT_ID" ]; then
-       neonctl "$@" --org-id "$ORG_ID" --project-id "$PROJECT_ID"
-   else
-       neonctl "$@" --org-id "$ORG_ID"
-   fi
-}
 
 echo "Creating temporary branch off production..."
 TMP_BRANCH="dump-branch-$(date +%s)"
-neon branches create --name "$TMP_BRANCH" --parent-branch-name "$BRANCH_NAME"
+neon branches create --name "$TMP_BRANCH" --parent
 trap 'echo "Cleaning up branch $TMP_BRANCH..."; neon branches delete "$TMP_BRANCH" --force' EXIT
 
 echo "Fetching database URI for branch $TMP_BRANCH..."
