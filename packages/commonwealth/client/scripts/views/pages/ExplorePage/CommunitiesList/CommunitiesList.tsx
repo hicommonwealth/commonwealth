@@ -156,69 +156,42 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
     return twoCommunitiesPerEntry;
   }, [communities?.pages]);
 
-  const removeStakeFilter = () => {
-    setFilters({
-      ...filters,
-      withStakeEnabled: false,
-    });
-  };
-
-  const removeLaunchpadTokenFilter = () => {
-    setFilters({
-      ...filters,
-      withLaunchpadToken: false,
-    });
-  };
-
-  const removePinnedTokenFilter = () => {
-    setFilters({
-      ...filters,
-      withPinnedToken: false,
-    });
-  };
-
-  const removeTagFilter = (tagId: number) => {
-    setFilters({
-      ...filters,
-      withTagsIds: [...(filters.withTagsIds || [])].filter(
-        (id) => tagId !== id,
-      ),
-    });
-  };
-
-  const removeCommunityEcosystemFilter = () => {
-    setFilters({
-      ...filters,
-      withCommunityEcosystem: undefined,
-    });
-  };
-
-  const removeEcosystemChainIdFilter = () => {
-    setFilters({
-      ...filters,
-      withEcosystemChainId: undefined,
-    });
-  };
-
-  const removeChainNetworkFilter = () => {
-    setFilters({
-      ...filters,
-      withNetwork: undefined,
-    });
-  };
-
-  const removeCommunityTypeFilter = () => {
-    setFilters({
-      ...filters,
-      withCommunityType: undefined,
-    });
-  };
-
-  const removeCommunitySortByFilter = () => {
-    setFilters({
-      ...filters,
-      withCommunitySortBy: undefined,
-      withCommunitySortOrder: undefined,
+  const removeFilter = <K extends keyof CommunityFilters>(
+    key: K,
+    value?: CommunityFilters[K] | number,
+  ) => {
+    setFilters((prev) => {
+      if (
+        key === 'withTagsIds' &&
+        Array.isArray(prev.withTagsIds) &&
+        typeof value === 'number'
+      ) {
+        return {
+          ...prev,
+          withTagsIds: prev.withTagsIds.filter((id) => id !== value),
+        };
+      }
+      if (
+        key === 'withStakeEnabled' ||
+        key === 'withLaunchpadToken' ||
+        key === 'withPinnedToken'
+      ) {
+        return {
+          ...prev,
+          [key]: false,
+        };
+      }
+      if (key === 'withCommunitySortBy') {
+        return {
+          ...prev,
+          withCommunitySortBy: undefined,
+          withCommunitySortOrder: undefined,
+        };
+      }
+      return {
+        ...prev,
+        [key]: undefined,
+      };
     });
   };
 
@@ -251,28 +224,28 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
             }
                   `}
             type="filter"
-            onCloseClick={removeCommunitySortByFilter}
+            onCloseClick={() => removeFilter('withCommunitySortBy')}
           />
         )}
         {filters.withCommunityType && (
           <CWTag
             label={filters.withCommunityType}
             type="filter"
-            onCloseClick={removeCommunityTypeFilter}
+            onCloseClick={() => removeFilter('withCommunityType')}
           />
         )}
         {filters.withNetwork && (
           <CWTag
             label={filters.withNetwork}
             type="filter"
-            onCloseClick={removeChainNetworkFilter}
+            onCloseClick={() => removeFilter('withNetwork')}
           />
         )}
         {filters.withCommunityEcosystem && (
           <CWTag
             label={filters.withCommunityEcosystem}
             type="filter"
-            onCloseClick={removeCommunityEcosystemFilter}
+            onCloseClick={() => removeFilter('withCommunityEcosystem')}
           />
         )}
         {filters.withEcosystemChainId && (
@@ -283,28 +256,28 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
               )?.[0] as string
             }
             type="filter"
-            onCloseClick={removeEcosystemChainIdFilter}
+            onCloseClick={() => removeFilter('withEcosystemChainId')}
           />
         )}
         {filters.withStakeEnabled && (
           <CWTag
             label="With: Stake"
             type="filter"
-            onCloseClick={removeStakeFilter}
+            onCloseClick={() => removeFilter('withStakeEnabled')}
           />
         )}
         {filters.withLaunchpadToken && (
           <CWTag
             label="With: Launchpad Token"
             type="filter"
-            onCloseClick={removeLaunchpadTokenFilter}
+            onCloseClick={() => removeFilter('withLaunchpadToken')}
           />
         )}
         {filters.withPinnedToken && (
           <CWTag
             label="With: External Token"
             type="filter"
-            onCloseClick={removePinnedTokenFilter}
+            onCloseClick={() => removeFilter('withPinnedToken')}
           />
         )}
         {filters.withTagsIds &&
@@ -313,7 +286,7 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
               key={id}
               type="filter"
               label={(tags || []).find((t) => t.id === id)?.name || ''}
-              onCloseClick={() => removeTagFilter(id)}
+              onCloseClick={() => removeFilter('withTagsIds', id)}
             />
           ))}
         <FiltersDrawer
