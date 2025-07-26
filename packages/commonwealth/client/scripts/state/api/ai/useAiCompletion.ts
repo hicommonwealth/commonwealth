@@ -11,6 +11,7 @@ interface AiCompletionOptions extends Partial<CompletionOptions> {
   onError?: (error: Error) => void;
   includeContextualMentions?: boolean;
   communityId?: string;
+  mcpServerUrl?: string;
 }
 
 interface CompletionError {
@@ -125,6 +126,9 @@ ${contextualData}
           jwt: userStore.getState().jwt,
           ...(typeof options?.useWebSearch === 'boolean'
             ? { useWebSearch: options.useWebSearch }
+            : {}),
+          ...(options?.mcpServerUrl
+            ? { mcpServerUrl: options.mcpServerUrl }
             : {}),
         };
 
