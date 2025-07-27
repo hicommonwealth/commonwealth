@@ -66,8 +66,6 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
       });
       mustExist('Community', community); // if authorized as admin, community is always found
 
-      console.log('update_token_image => ', update_token_image);
-
       // Handle single string case and undefined case
       if (snapshot !== undefined) {
         const snapshots = typeof snapshot === 'string' ? [snapshot] : snapshot;
