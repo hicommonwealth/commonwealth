@@ -22,11 +22,13 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         start_before,
         start_after,
         include_system_quests,
+        include_active_only,
       } = payload;
 
       const direction = order_direction || 'DESC';
       const order = order_by || 'created_at';
       const offset = limit! * (cursor! - 1);
+      const now = new Date();
       const replacements = {
         search: search ? `%${search.toLowerCase()}%` : '',
         direction,
@@ -38,6 +40,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         start_after: start_after ? new Date(start_after) : null,
         start_before: start_before ? new Date(start_before) : null,
         end_after: end_after ? new Date(end_after) : null,
+        now: include_active_only ? now : undefined,
       };
       const filterConditions = [
         include_system_quests ? '' : 'Q.id > 0',
@@ -47,6 +50,9 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         end_after ? `Q.end_date > :end_after` : '',
         end_before ? `Q.end_date <= :end_before` : '',
         search ? 'LOWER(Q.name) LIKE :search' : '',
+        include_active_only
+          ? 'Q.start_date <= :now AND Q.end_date >= :now'
+          : '',
       ].filter(Boolean);
 
       const sql = `

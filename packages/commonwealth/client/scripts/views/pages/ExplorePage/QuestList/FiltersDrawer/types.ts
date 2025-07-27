@@ -1,6 +1,7 @@
 export type QuestFilters = {
   endingAfter: Date;
   startingBefore?: Date;
+  activeOnly?: boolean;
 };
 
 export type FiltersDrawerProps = {

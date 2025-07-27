@@ -2,6 +2,7 @@ import moment from 'moment';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWDateTimeInput from 'views/components/component_kit/CWDateTimeInput';
+import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
@@ -27,6 +28,22 @@ export const FiltersDrawer = ({
         <div className="content-container">
           <CWText type="h3">Quest Filters</CWText>
           <div className="filter-content">
+            <div className="active-filter">
+              <CWText type="h5" fontWeight="semiBold">
+                Show Active Only
+              </CWText>
+              <CWToggle
+                size="small"
+                checked={filters.activeOnly}
+                onChange={() =>
+                  onFiltersChange({
+                    ...filters,
+                    activeOnly: !filters.activeOnly,
+                  })
+                }
+              />
+            </div>
+
             <CWDateTimeInput
               label="Ending After"
               selected={moment(filters.endingAfter).utc().local().toDate()}

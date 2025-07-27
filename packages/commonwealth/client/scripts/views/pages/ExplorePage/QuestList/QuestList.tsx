@@ -46,6 +46,7 @@ const QuestList = ({
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const [filters, setFilters] = useState<QuestFilters>({
+    activeOnly: true,
     endingAfter: moment().startOf('week').toDate(),
     startingBefore: moment().endOf('year').toDate(),
   });
@@ -67,6 +68,7 @@ const QuestList = ({
     start_before: filters.startingBefore,
     // dont show system quests in quest lists for communities
     include_system_quests: questsForCommunityId ? false : true,
+    include_active_only: filters.activeOnly || false,
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
@@ -115,6 +117,15 @@ const QuestList = ({
               label={`Search: ${searchText?.trim()}`}
               type="filter"
               onCloseClick={onClearSearch}
+            />
+          )}
+          {filters.activeOnly && (
+            <CWTag
+              label="Active Quests"
+              type="filter"
+              onCloseClick={() =>
+                setFilters((f) => ({ ...f, activeOnly: false }))
+              }
             />
           )}
           <CWTag
