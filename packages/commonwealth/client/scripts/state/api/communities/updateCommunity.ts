@@ -95,7 +95,7 @@ export const buildUpdateCommunityInput = ({
       custom_domain: customDomain,
     }),
     ...(typeof iconUrl !== 'undefined' && { icon_url: iconUrl }),
-    update_token_image: updateTokenImage || false,
+    launchpad_token_image: updateTokenImage || false,
     ...(typeof defaultOverview !== 'undefined' && {
       default_summary_view: defaultOverview,
     }),
