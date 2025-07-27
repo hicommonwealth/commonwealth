@@ -26,7 +26,7 @@ interface UpdateCommunityProps {
   customStages?: string[];
   customDomain?: string;
   iconUrl?: string;
-  updateTokenImage?: boolean;
+  launchpadTokenImage?: string;
   defaultOverview?: boolean;
   chainNodeId?: string;
   type?: ChainType;
@@ -55,7 +55,7 @@ export const buildUpdateCommunityInput = ({
   customStages,
   customDomain,
   iconUrl,
-  updateTokenImage,
+  launchpadTokenImage,
   defaultOverview,
   chainNodeId,
   type,
@@ -95,7 +95,9 @@ export const buildUpdateCommunityInput = ({
       custom_domain: customDomain,
     }),
     ...(typeof iconUrl !== 'undefined' && { icon_url: iconUrl }),
-    launchpad_token_image: updateTokenImage || false,
+    ...(typeof launchpadTokenImage !== 'undefined' && {
+      launchpad_token_image: launchpadTokenImage,
+    }),
     ...(typeof defaultOverview !== 'undefined' && {
       default_summary_view: defaultOverview,
     }),

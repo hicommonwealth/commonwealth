@@ -177,7 +177,9 @@ const CommunityProfileForm = () => {
             ? JSON.parse(values.customStages)
             : [],
           iconUrl: values.communityProfileImageURL,
-          updateTokenImage: values.updateTokenImage,
+          launchpadTokenImage: values.updateTokenImage
+            ? values.communityProfileImageURL || community.icon_url || ''
+            : undefined,
           defaultPage: values.defaultPage,
           aiFeaturesEnabled: values.aiFeaturesEnabled,
         }),
