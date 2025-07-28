@@ -1,0 +1,32 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "deploy/dockerfiles/nginx/nginx.dockerfile",
+    "watchPatterns": ["deploy/dockerfiles/nginx/**"]
+  },
+  "deploy": {
+    "restartPolicyType": "ALWAYS",
+    "region": "us-east4-eqdc4a",
+    "limitOverride": {
+      "containers": {
+        "cpu": 2,
+        "memoryBytes": 2000000000
+      }
+    },
+    "overlapSeconds": 60,
+    "drainingSeconds": 30
+  },
+  "environments": {
+    "production": {
+      "deploy": {
+        "limitOverride": {
+          "containers": {
+            "cpu": 3,
+            "memoryBytes": 3000000000
+          }
+        }
+      }
+    }
+  }
+}
