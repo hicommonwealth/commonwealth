@@ -23,6 +23,6 @@ else
 fi
 
 # Fetch and log the new branch database connection string
-DB_URL=$(neon connection-string --branch-name "$BRANCH_NAME" --database-name commonwealth)
+DB_URL=$(neon connection-string "$BRANCH_NAME" --database-name commonwealth)
 echo "NOTE: You must add the following in your .env file:"
 echo "DATABASE_URL=$DB_URL"
