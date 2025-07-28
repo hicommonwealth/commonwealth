@@ -1,0 +1,26 @@
+.GoogleSheetsMCP {
+  border: 1px solid #e1e8ed;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  background: white;
+
+  .header {
+    margin-bottom: 24px;
+
+    .cw-text:first-child {
+      margin-bottom: 8px;
+    }
+  }
+
+  .connection-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+
+    .cw-button {
+      margin-top: 8px;
+    }
+  }
+}

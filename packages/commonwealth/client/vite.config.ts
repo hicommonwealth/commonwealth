@@ -61,6 +61,9 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_CRECIMIENTO_HACKATHON': JSON.stringify(
       env.FLAG_CRECIMIENTO_HACKATHON,
     ),
+    'process.env.FLAG_MCP_GOOGLE_SHEETS': JSON.stringify(
+      env.FLAG_MCP_GOOGLE_SHEETS,
+    ),
   };
 
   return {
@@ -134,6 +137,7 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 8080,
       host: 'localhost',
+      allowedHosts: ['cw.ryancodez.com', 'localhost'],
       proxy: {
         '/api': {
           target: env.BACKEND_PROXY_URL || 'http://localhost:3000',

@@ -43,7 +43,7 @@ function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
   app.use(api.integration.PATH, api.integration.build());
 
   // MCP endpoint
-  app.use(api.mcp.PATH, api.mcp.router);
+  app.use(api.mcpServer.PATH, api.mcpServer.router);
 
   registerRoute(router, 'get', '/feed', get_atom_feed_router);
 
