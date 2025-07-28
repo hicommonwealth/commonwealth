@@ -15,8 +15,7 @@
         "cpu": 1,
         "memoryBytes": 1000000000
       }
-    },
-    "healthcheckPath": "/api/health"
+    }
   },
   "environments": {
     "production": {
