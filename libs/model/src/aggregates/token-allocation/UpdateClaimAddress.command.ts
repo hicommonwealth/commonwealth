@@ -1,14 +1,7 @@
-import {
-  type Command,
-  InvalidActor,
-  InvalidState,
-  logger,
-} from '@hicommonwealth/core';
+import { type Command, InvalidActor, InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
-
-const log = logger(import.meta);
 
 export function UpdateClaimAddress(): Command<
   typeof schemas.UpdateClaimAddress
@@ -53,44 +46,36 @@ export function UpdateClaimAddress(): Command<
         throw new InvalidState('Invalid EVM address!');
       }
 
-      await models.sequelize.transaction(async (transaction) => {
-        // cannot update claim address after is has been synchronized with magna
-        const magna_synced = await models.sequelize.query(
-          `
-          SELECT * FROM "HistoricalAllocations" 
-          WHERE user_id = :user_id AND magna_synced_at IS NOT NULL;
+      const result = await models.sequelize.query<{ address: string }>(
+        `
+          WITH magna_check AS (
+            SELECT EXISTS (
+              SELECT 1 FROM "HistoricalAllocations"
+              WHERE user_id = :user_id 
+              AND magna_synced_at IS NOT NULL
+              FOR UPDATE
+            ) as is_synced
+          )
+          INSERT INTO "ClaimAddresses" (user_id, address, created_at, updated_at)
+          SELECT :user_id, :address, NOW(), NOW()
+          WHERE NOT (SELECT is_synced FROM magna_check)
+          ON CONFLICT (user_id) DO UPDATE SET address = EXCLUDED.address, updated_at = NOW()
+          RETURNING address;
         `,
-          {
-            type: QueryTypes.SELECT,
-            replacements: {
-              user_id: address.user_id,
-            },
-            transaction,
+        {
+          type: QueryTypes.SELECT,
+          replacements: {
+            user_id: address.user_id,
+            address: address.address,
           },
-        );
-        if (magna_synced.length > 0) {
-          throw new InvalidState(
-            'Cannot update claim address after user has been synchronized with magna',
-          );
-        }
+        },
+      );
 
-        await models.sequelize.query(
-          `
-          INSERT INTO "ClaimAddresses"
-          VALUES (:user_id, :address, NOW(), NOW())
-          ON CONFLICT DO UPDATE 
-          SET address = EXCLUDED.address, updated_at = NOW();
-        `,
-          {
-            type: QueryTypes.UPSERT,
-            replacements: {
-              user_id: address.user_id,
-              address: address.address,
-            },
-            transaction,
-          },
+      if (result.length === 0) {
+        throw new InvalidState(
+          'Cannot update claim address after user has been synchronized with magna',
         );
-      });
+      }
 
       return {
         claim_address: address.address,

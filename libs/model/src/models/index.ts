@@ -82,6 +82,7 @@ export * from './tags';
 export * from './thread';
 export * from './thread_rank';
 export * from './thread_version_history';
+export * from './token-allocation';
 export * from './topic';
 export * from './twitter_cursor';
 export * from './types';

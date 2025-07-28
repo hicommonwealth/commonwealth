@@ -11,10 +11,16 @@ import { z } from 'zod';
 import { seed, seedRecord } from '../../src/tester';
 import { getSignersInfo } from './canvas-signers';
 
+export type CommunitySeedRoles =
+  | 'admin'
+  | 'member'
+  | 'nonmember'
+  | 'banned'
+  | 'rejected'
+  | 'superadmin';
+
 export type CommunitySeedOptions = {
-  roles: Array<
-    'admin' | 'member' | 'nonmember' | 'banned' | 'rejected' | 'superadmin'
-  >;
+  roles: Array<CommunitySeedRoles>;
   chain_node?: Partial<z.infer<typeof schemas.ChainNode>>;
   chain_base?: ChainBase;
   bech32_prefix?: string;
@@ -29,6 +35,19 @@ export type CommunitySeedOptions = {
   stakes?: z.infer<typeof schemas.CommunityStake>[];
   weighted_voting?: schemas.TopicWeightedVoting;
   override_addresses?: Array<string>;
+};
+
+export type CommunitySeedResult = {
+  base: z.infer<typeof schemas.Community>;
+  community: z.infer<typeof schemas.Community>;
+  node: z.infer<typeof schemas.ChainNode>;
+  actors: Record<CommunitySeedRoles[number], Actor>;
+  addresses: Record<
+    CommunitySeedRoles[number],
+    z.infer<typeof schemas.Address>
+  >;
+  users: Record<CommunitySeedRoles[number], z.infer<typeof schemas.User>>;
+  roles: Array<CommunitySeedRoles[number]>;
 };
 
 /**
@@ -51,7 +70,7 @@ export async function seedCommunity({
   stakes,
   weighted_voting,
   override_addresses,
-}: CommunitySeedOptions) {
+}: CommunitySeedOptions): Promise<CommunitySeedResult> {
   const actors = {} as Record<(typeof roles)[number], Actor>;
   const addresses = {} as Record<
     (typeof roles)[number],
@@ -134,7 +153,7 @@ export async function seedCommunity({
     const address = community!.Addresses!.find((a) => a.user_id === user.id);
     actors[role] = {
       user: {
-        id: user.id,
+        id: user.id!,
         email: user.profile.email!,
         isAdmin: role === 'superadmin',
       },
@@ -143,5 +162,13 @@ export async function seedCommunity({
     addresses[role] = address!;
   });
 
-  return { base, community, node, actors, addresses, users, roles };
+  return {
+    base: base!,
+    community: community!,
+    node: node!,
+    actors,
+    addresses,
+    users,
+    roles,
+  };
 }
