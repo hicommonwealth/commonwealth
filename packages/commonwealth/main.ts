@@ -87,12 +87,11 @@ export async function main(
       }
     });
 
-    // Disable https redirects on non-prod Railway apps
-    if (
-      config.RAILWAY.RAILWAY_PUBLIC_DOMAIN &&
-      config.APP_ENV !== 'production'
-    ) {
-      log.warn('HTTP -> HTTPS redirects disabled');
+    // Disable https redirects on Railway apps
+    if (config.RAILWAY.RAILWAY_GIT_COMMIT_SHA) {
+      log.warn(
+        'ExpressJS HTTP -> HTTPS redirects disabled. Redirects may be handled by Railway.',
+      );
     } else {
       // redirect to https:// unless we are using a test domain or using 192.168.1.range (local network range)
       app.use(
