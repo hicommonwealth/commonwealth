@@ -170,16 +170,12 @@ const GroupCard = ({
                 <CWDivider className="divider-spacing" />
                 <div className="row topic-row">
                   <CWText type="b2" className="topic-name">
-                    <span className="topic-name-flex">
-                      {t.name}
-                      {privateTopicsEnabled && t.is_private && (
-                        <CWIcon
-                          iconName="lockedNew"
-                          iconSize="small"
-                          className="icon-margin-left"
-                        />
-                      )}
-                    </span>
+                    {t.name}
+                    {privateTopicsEnabled && t.is_private ? (
+                      <CWIcon iconName="lock" />
+                    ) : (
+                      ''
+                    )}
                   </CWText>
                   <div className="actions-container">
                     {(t.permissions || ['None']).sort().map((p, idx) => (

@@ -8,7 +8,12 @@ import { weightedVotingValueToLabel } from 'helpers';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { components } from 'react-select';
+import {
+  MultiValueProps,
+  OptionProps,
+  SingleValueProps,
+  components,
+} from 'react-select';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -48,6 +53,12 @@ import {
   groupValidationSchema,
   requirementSubFormValidationSchema,
 } from './validations';
+
+type TopicOption = {
+  label: React.ReactNode;
+  value: string | number;
+  helpText?: string;
+};
 
 type CWRequirementsRadioButtonProps = {
   maxRequirements: number;
@@ -197,22 +208,24 @@ const GroupForm = ({
     (currentGroup?.topics || []).filter((t) => t.is_private).map((t) => t.id),
   );
 
-  const topicOptions = sortedTopics.map((topic) => ({
-    label: (
-      <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-        {topic.name}
-        {privateTopicIds.has(topic.id) && (
-          <CWIcon
-            iconName="lockedNew"
-            iconSize="small"
-            style={{ marginLeft: 6 }}
-          />
-        )}
-      </span>
-    ),
-    value: topic.id,
-    helpText: weightedVotingValueToLabel(topic.weighted_voting!),
-  }));
+  const topicOptions = sortedTopics
+    .filter((topic) => topic.id !== undefined)
+    .map((topic) => ({
+      label: (
+        <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+          {topic.name}
+          {privateTopicIds.has(topic.id) && (
+            <CWIcon
+              iconName="lockedNew"
+              iconSize="small"
+              style={{ marginLeft: 6 }}
+            />
+          )}
+        </span>
+      ),
+      value: topic.id as number,
+      helpText: weightedVotingValueToLabel(topic.weighted_voting!),
+    }));
 
   const handleImageProcessingChange = useCallback(
     ({ isGenerating, isUploading }) => {
@@ -674,20 +687,26 @@ const GroupForm = ({
                   placeholder="Type in topic name"
                   options={topicOptions}
                   components={{
-                    // eslint-disable-next-line react/prop-types
-                    Option: ({ data, ...props }) => (
+                    Option: ({
+                      data,
+                      ...props
+                    }: OptionProps<TopicOption, true>) => (
                       <components.Option {...props} data={data}>
                         {data.label}
                       </components.Option>
                     ),
-                    // eslint-disable-next-line react/prop-types
-                    SingleValue: ({ data, ...props }) => (
+                    SingleValue: ({
+                      data,
+                      ...props
+                    }: SingleValueProps<TopicOption, true>) => (
                       <components.SingleValue {...props} data={data}>
                         {data.label}
                       </components.SingleValue>
                     ),
-                    // eslint-disable-next-line react/prop-types
-                    MultiValueLabel: ({ data, ...props }) => (
+                    MultiValueLabel: ({
+                      data,
+                      ...props
+                    }: MultiValueProps<TopicOption, true>) => (
                       <components.MultiValueLabel {...props} data={data}>
                         {data.label}
                       </components.MultiValueLabel>
