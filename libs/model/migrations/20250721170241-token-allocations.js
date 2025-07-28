@@ -51,6 +51,10 @@ export default {
             type: Sequelize.DECIMAL,
             allowNull: false,
           },
+          magna_synced_at: {
+            type: Sequelize.DATE,
+            allowNull: true,
+          },
         },
         { transaction },
       );

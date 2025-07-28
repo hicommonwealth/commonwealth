@@ -53,7 +53,26 @@ export function UpdateClaimAddress(): Command<
         throw new InvalidState('Invalid EVM address!');
       }
 
-      try {
+      await models.sequelize.transaction(async (transaction) => {
+        // cannot update claim address after is has been synchronized with magna
+        const magna_synced = await models.sequelize.query(
+          `
+          SELECT * FROM "HistoricalAllocations" 
+          WHERE user_id = :user_id AND magna_synced_at IS NOT NULL;
+        `,
+          {
+            type: QueryTypes.SELECT,
+            replacements: {
+              user_id: address.user_id,
+            },
+          },
+        );
+        if (magna_synced.length > 0) {
+          throw new InvalidState(
+            'Cannot update claim address after user has been synchronized with magna',
+          );
+        }
+
         await models.sequelize.query(
           `
           INSERT INTO "ClaimAddresses"
@@ -67,12 +86,10 @@ export function UpdateClaimAddress(): Command<
               user_id: address.user_id,
               address: address.address,
             },
+            transaction,
           },
         );
-      } catch (error) {
-        log.error('Failed to update claim_address', error as Error);
-        throw new Error('Failed to update claim_address');
-      }
+      });
 
       return {
         claim_address: address.address,

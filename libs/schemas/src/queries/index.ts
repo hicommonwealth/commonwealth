@@ -13,7 +13,7 @@ export * from './subscription.schemas';
 export * from './super-admin.schemas';
 export * from './tag.schemas';
 export * from './thread.schemas';
+export * from './token-allocation.schemas';
 export * from './token.schemas';
-export * from './tokenAllocation.schemas';
 export * from './user.schemas';
 export * from './webhook.schemas';
