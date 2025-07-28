@@ -152,11 +152,14 @@ export function createRmqConfig({
     const bindings = config.vhosts![vhost].bindings as {
       [key: string]: BindingConfig;
     };
+
+    const consumerInputs = consumer()?.inputs ?? consumer();
+
     bindings[`${consumerName}Binding`] = {
       source: RascalExchanges.MessageRelayer,
       destination: queue,
       destinationType: 'queue',
-      bindingKeys: Object.keys(consumer().inputs).reduce((acc, key) => {
+      bindingKeys: Object.keys(consumerInputs).reduce((acc, key) => {
         if (!overrides) acc.push(key);
         else if (overrides[key] !== null) acc.push(overrides[key] || key);
         return acc;

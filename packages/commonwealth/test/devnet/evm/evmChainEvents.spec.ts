@@ -1,6 +1,5 @@
 import { dispose } from '@hicommonwealth/core';
 import {
-  ChildContractNames,
   EvmEventSignatures,
   ValidChains,
   getBlockNumber,
@@ -48,7 +47,7 @@ vi.mock('../../../server/workers/evmChainEvents/getEventSources');
 
 const namespaceDeployedLog = {
   address: getFactoryContract(ValidChains.SepoliaBase).NamespaceFactory,
-  topics: [EvmEventSignatures.NamespaceFactory.NamespaceDeployed],
+  topics: [EvmEventSignatures['NamespaceFactory.NamespaceDeployed']],
   // eslint-disable-next-line max-len
   data: '0x0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb9226600000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266000000000000000000000000000000000000000000000000000000000000001363657465737431373237373734373236393138000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
   blockHash:
@@ -192,7 +191,7 @@ describe('EVM Chain Events Devnet Tests', () => {
           [namespaceFactoryAddress]: [
             {
               event_signature:
-                EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+                EvmEventSignatures['NamespaceFactory.NamespaceDeployed'],
               eth_chain_id: 1,
               contract_address: namespaceFactoryAddress,
               meta: {
@@ -241,7 +240,7 @@ describe('EVM Chain Events Devnet Tests', () => {
           [namespaceFactoryAddress]: [
             {
               event_signature:
-                EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+                EvmEventSignatures['NamespaceFactory.NamespaceDeployed'],
               eth_chain_id: 1,
               contract_address: namespaceFactoryAddress,
               meta: {
@@ -251,7 +250,7 @@ describe('EVM Chain Events Devnet Tests', () => {
           ],
           [communityStakeAddress]: [
             {
-              event_signature: EvmEventSignatures.CommunityStake.Trade,
+              event_signature: EvmEventSignatures['CommunityStake.Trade'],
               eth_chain_id: 1,
               contract_address: communityStakeAddress,
               meta: {
@@ -316,7 +315,7 @@ describe('EVM Chain Events Devnet Tests', () => {
           [namespaceFactoryAddress]: [
             {
               event_signature:
-                EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+                EvmEventSignatures['NamespaceFactory.NamespaceDeployed'],
               eth_chain_id: 1,
               contract_address: namespaceFactoryAddress,
               meta: {
@@ -391,7 +390,9 @@ describe('EVM Chain Events Devnet Tests', () => {
                       eth_chain_id: sepoliaBaseChainId,
                       contract_address: namespaceFactoryAddress,
                       event_signature:
-                        EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+                        EvmEventSignatures[
+                          'NamespaceFactory.NamespaceDeployed'
+                        ],
                       meta: {
                         events_migrated: true,
                       },
@@ -401,7 +402,8 @@ describe('EVM Chain Events Devnet Tests', () => {
                     {
                       eth_chain_id: sepoliaBaseChainId,
                       contract_address: stakeAddress,
-                      event_signature: EvmEventSignatures.CommunityStake.Trade,
+                      event_signature:
+                        EvmEventSignatures['CommunityStake.Trade'],
                       meta: {
                         events_migrated: true,
                       },
@@ -455,17 +457,18 @@ describe('EVM Chain Events Devnet Tests', () => {
 
         expect(events[0].event_payload.eventSource).to.deep.equal({
           ethChainId: chainNode.eth_chain_id!,
-          eventSignature: EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+          eventSignature:
+            EvmEventSignatures['NamespaceFactory.NamespaceDeployed'],
         });
         eventSchemas.NamespaceDeployed.parse(events[0].event_payload);
         expect(events[1].event_payload.eventSource).to.deep.equal({
           ethChainId: chainNode.eth_chain_id!,
-          eventSignature: EvmEventSignatures.CommunityStake.Trade,
+          eventSignature: EvmEventSignatures['CommunityStake.Trade'],
         });
         eventSchemas.CommunityStakeTrade.parse(events[1].event_payload);
         expect(events[2].event_payload.eventSource).to.deep.equal({
           ethChainId: chainNode.eth_chain_id!,
-          eventSignature: EvmEventSignatures.CommunityStake.Trade,
+          eventSignature: EvmEventSignatures['CommunityStake.Trade'],
         });
         eventSchemas.CommunityStakeTrade.parse(events[2].event_payload);
       },
@@ -475,22 +478,24 @@ describe('EVM Chain Events Devnet Tests', () => {
       const evmEventSource = await models.EvmEventSource.create({
         eth_chain_id: sepoliaBaseChainId,
         contract_address: namespaceFactoryAddress,
-        event_signature: EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+        event_signature:
+          EvmEventSignatures['NamespaceFactory.NamespaceDeployed'],
         created_at_block: namespaceDeployedBlock,
         events_migrated: false,
         // Unrelated to NamespaceFactory tests here but required for type
-        contract_name: ChildContractNames.SingleContest,
+        contract_name: 'Contests.SingleContestStarted',
         parent_contract_address: '',
       });
 
       const fakeEvmEventSource = await models.EvmEventSource.create({
         eth_chain_id: 1,
         contract_address: namespaceFactoryAddress,
-        event_signature: EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+        event_signature:
+          EvmEventSignatures['NamespaceFactory.NamespaceDeployed'],
         created_at_block: namespaceDeployedBlock,
         events_migrated: false,
         // Unrelated to NamespaceFactory tests here but required for type
-        contract_name: ChildContractNames.SingleContest,
+        contract_name: 'Contests.SingleContestStarted',
         parent_contract_address: '',
       });
 
@@ -509,7 +514,7 @@ describe('EVM Chain Events Devnet Tests', () => {
                     eth_chain_id: sepoliaBaseChainId,
                     contract_address: namespaceFactoryAddress,
                     event_signature:
-                      EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+                      EvmEventSignatures['NamespaceFactory.NamespaceDeployed'],
                     meta: {
                       created_at_block: namespaceDeployedBlock,
                       events_migrated: false,
@@ -573,7 +578,8 @@ describe('EVM Chain Events Devnet Tests', () => {
 
       expect(events[0].event_payload.eventSource).to.deep.equal({
         ethChainId: chainNode.eth_chain_id!,
-        eventSignature: EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+        eventSignature:
+          EvmEventSignatures['NamespaceFactory.NamespaceDeployed'],
       });
       eventSchemas.NamespaceDeployed.parse(events[0].event_payload);
 
@@ -623,11 +629,11 @@ describe('EVM Chain Events Devnet Tests', () => {
           eth_chain_id: sepoliaBaseChainId,
           contract_address: namespaceFactoryAddress,
           event_signature:
-            EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+            EvmEventSignatures['NamespaceFactory.NamespaceDeployed'],
           created_at_block: namespaceDeployedBlock,
           events_migrated: false,
           // Unrelated to NamespaceFactory tests here but required for type
-          contract_name: ChildContractNames.SingleContest,
+          contract_name: 'Contests.SingleContestStarted',
           parent_contract_address: '',
         });
 
@@ -635,11 +641,11 @@ describe('EVM Chain Events Devnet Tests', () => {
           eth_chain_id: 1,
           contract_address: namespaceFactoryAddress,
           event_signature:
-            EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+            EvmEventSignatures['NamespaceFactory.NamespaceDeployed'],
           created_at_block: namespaceDeployedBlock,
           events_migrated: false,
           // Unrelated to NamespaceFactory tests here but required for type
-          contract_name: ChildContractNames.SingleContest,
+          contract_name: 'Contests.SingleContestStarted',
           parent_contract_address: '',
         });
 
@@ -663,7 +669,9 @@ describe('EVM Chain Events Devnet Tests', () => {
                       eth_chain_id: sepoliaBaseChainId,
                       contract_address: namespaceFactoryAddress,
                       event_signature:
-                        EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+                        EvmEventSignatures[
+                          'NamespaceFactory.NamespaceDeployed'
+                        ],
                       meta: {
                         created_at_block: latestBlockNum - 5,
                         events_migrated: false,

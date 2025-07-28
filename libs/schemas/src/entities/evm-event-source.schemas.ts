@@ -1,6 +1,10 @@
-import { ChildContractNames } from '@hicommonwealth/evm-protocols';
 import { EVM_ADDRESS } from '@hicommonwealth/schemas';
 import { z } from 'zod';
+
+export enum ChildContractNames {
+  SingleContest = 'SingleContest',
+  RecurringContest = 'RecurringContest',
+}
 
 export const EvmEventSource = z.object({
   eth_chain_id: z.number(),

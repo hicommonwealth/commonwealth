@@ -87,7 +87,7 @@ describe('chainEventCreated Event Handler', () => {
         name: 'CommunityStakeTrade',
         payload: {
           eventSource: {
-            eventSignature: EvmEventSignatures.CommunityStake.Trade,
+            eventSignature: EvmEventSignatures['CommunityStake.Trade'],
           },
           parsedArgs: {
             trader: '0x1',
@@ -108,7 +108,7 @@ describe('chainEventCreated Event Handler', () => {
         name: 'CommunityStakeTrade',
         payload: {
           eventSource: {
-            eventSignature: EvmEventSignatures.CommunityStake.Trade,
+            eventSignature: EvmEventSignatures['CommunityStake.Trade'],
           },
           parsedArgs: {
             trader: '0x1',
@@ -136,7 +136,7 @@ describe('chainEventCreated Event Handler', () => {
         name: 'CommunityStakeTrade',
         payload: {
           eventSource: {
-            eventSignature: EvmEventSignatures.CommunityStake.Trade,
+            eventSignature: EvmEventSignatures['CommunityStake.Trade'],
           },
           parsedArgs: {
             trader: '0x1',
@@ -177,7 +177,7 @@ describe('chainEventCreated Event Handler', () => {
           name: 'CommunityStakeTrade',
           payload: {
             eventSource: {
-              eventSignature: EvmEventSignatures.CommunityStake.Trade,
+              eventSignature: EvmEventSignatures['CommunityStake.Trade'],
             },
             parsedArgs: {
               trader: '0x1',

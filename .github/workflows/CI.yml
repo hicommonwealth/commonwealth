@@ -113,6 +113,9 @@ jobs:
       - name: check-types
         run: pnpm -r check-types
 
+      - name: Ensure common protocol event schema up to date
+        run: pnpm -F evm-protocols verify-event-schema
+
 
   # Lint Diff
   commonwealth-lint-diff:

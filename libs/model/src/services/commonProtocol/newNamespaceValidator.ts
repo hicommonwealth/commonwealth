@@ -1,7 +1,7 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import {
-  EvmEventSignatures,
   decodeParameters,
+  EvmEventSignatures,
   getNamespace,
   getTransactionReceipt,
   mustBeProtocolChainId,
@@ -118,7 +118,7 @@ export const validateNamespace = async (
     if (l.topics && l.topics.length > 0) {
       return (
         l.topics[0].toString() ===
-        EvmEventSignatures.NamespaceFactory.CommunityNamespaceCreated
+        EvmEventSignatures['TokenCommunityManager.CommunityNamespaceCreated']
       );
     }
     return false;

@@ -215,7 +215,7 @@ export async function getLaunchpadTokenCreatedTransaction({
     if (l.topics && l.topics.length > 0) {
       return (
         l.topics[0].toString() ===
-        EvmEventSignatures.NamespaceFactory.NamespaceDeployed
+        EvmEventSignatures['NamespaceFactory.NamespaceDeployed']
       );
     }
     return false;
@@ -237,7 +237,8 @@ export async function getLaunchpadTokenCreatedTransaction({
   const tokenRegisteredLog = txReceipt.logs.find((l) => {
     if (l.topics && l.topics.length > 0) {
       return (
-        l.topics[0].toString() === EvmEventSignatures.Launchpad.TokenRegistered
+        l.topics[0].toString() ===
+        EvmEventSignatures['Launchpad.TokenRegistered']
       );
     }
     return false;

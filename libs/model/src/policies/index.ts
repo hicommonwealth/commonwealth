@@ -1,11 +1,12 @@
 export * from './ChainEventCreated.policy';
+export * from './commonProtocolPolicies/extractPolicyKeys';
+export { default as LaunchpadPolicy } from './commonProtocolPolicies/Launchpad.policy';
 export * from './CommunityGoals.policy';
 export * from './ContestWorker.policy';
 export * from './CreateUnverifiedUser.policy';
 export * from './DiscordBot.policy';
 export * from './EventStream.policy';
 export * from './FarcasterWorker.policy';
-export * from './Launchpad.policy';
 export * from './Nominations.policy';
 export * from './Notifications.policy';
 export * from './ReactionWorker.policy';

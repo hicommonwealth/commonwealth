@@ -1,6 +1,5 @@
 import { InvalidState, Projection, logger } from '@hicommonwealth/core';
 import {
-  ChildContractNames,
   EvmEventSignatures,
   calculateVoteWeight,
   getContestScore,
@@ -191,19 +190,19 @@ async function createInitialContest(
     }
 
     const childContractName = isOneOff
-      ? ChildContractNames.SingleContest
-      : ChildContractNames.RecurringContest;
+      ? 'Contests.SingleContestStarted'
+      : 'ContestGovernor.NewRecurringContestStarted';
 
     const sigs = isOneOff
       ? [
-          EvmEventSignatures.Contests.ContentAdded,
-          EvmEventSignatures.Contests.SingleContestStarted,
-          EvmEventSignatures.Contests.SingleContestVoterVoted,
+          EvmEventSignatures['ContestGovernorSingle.ContentAdded'],
+          EvmEventSignatures['ContestGovernorSingle.NewSingleContestStarted'],
+          EvmEventSignatures['ContestGovernorSingle.VoterVoted'],
         ]
       : [
-          EvmEventSignatures.Contests.ContentAdded,
-          EvmEventSignatures.Contests.RecurringContestStarted,
-          EvmEventSignatures.Contests.RecurringContestVoterVoted,
+          EvmEventSignatures['ContestGovernor.ContentAdded'],
+          EvmEventSignatures['ContestGovernor.NewRecurringContestStarted'],
+          EvmEventSignatures['ContestGovernor.VoterVoted'],
         ];
     const sourcesToCreate: EvmEventSourceAttributes[] = sigs.map(
       (eventSignature) => {

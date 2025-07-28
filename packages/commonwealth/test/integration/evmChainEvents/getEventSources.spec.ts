@@ -1,7 +1,7 @@
 import { dispose } from '@hicommonwealth/core';
 import {
-  EventRegistry,
   EvmEventSignatures,
+  factoryContracts,
   getFactoryContract,
   ValidChains,
 } from '@hicommonwealth/evm-protocols';
@@ -29,9 +29,9 @@ describe('getEventSources', () => {
 
   test('should get Event-Registry and EvmEventSources', async () => {
     const result = await getEventSources();
-    expect(Object.keys(result)).deep.equal(Object.keys(EventRegistry));
+    expect(Object.keys(result)).deep.equal(Object.keys(factoryContracts));
     let flag = false;
-    for (const ethChainId in EventRegistry) {
+    for (const ethChainId in factoryContracts) {
       expect(result[ethChainId]).haveOwnProperty('rpc');
       expect(result[ethChainId]).to.haveOwnProperty('contracts');
       expect(
@@ -49,7 +49,8 @@ describe('getEventSources', () => {
           {
             eth_chain_id: parseInt(ethChainId),
             contract_address: singleContestAddress,
-            event_signature: EvmEventSignatures.Contests.SingleContestStarted,
+            event_signature:
+              EvmEventSignatures['Contests.SingleContestStarted'],
             meta: {
               events_migrated: true,
             },
@@ -62,7 +63,7 @@ describe('getEventSources', () => {
             eth_chain_id: parseInt(ethChainId),
             contract_address: recurringContestAddress,
             event_signature:
-              EvmEventSignatures.Contests.RecurringContestStarted,
+              EvmEventSignatures['ContestGovernor.NewRecurringContestStarted'],
             meta: {
               events_migrated: true,
             },
