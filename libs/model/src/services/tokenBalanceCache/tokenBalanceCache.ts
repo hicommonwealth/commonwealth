@@ -11,6 +11,7 @@ import {
   GetEvmBalancesOptions,
   GetSPLBalancesOptions,
   GetSuiNativeBalanceOptions,
+  GetSuiNftBalanceOptions,
   GetSuiTokenBalanceOptions,
 } from './types';
 
@@ -42,10 +43,14 @@ export async function getBalances(
       balances = await getSolanaBalances(options, ttl);
     } else if (
       options.balanceSourceType === BalanceSourceType.SuiNative ||
-      options.balanceSourceType === BalanceSourceType.SuiToken
+      options.balanceSourceType === BalanceSourceType.SuiToken ||
+      options.balanceSourceType === BalanceSourceType.SuiNFT
     ) {
       balances = await getSuiBalances(
-        options as GetSuiNativeBalanceOptions | GetSuiTokenBalanceOptions,
+        options as
+          | GetSuiNativeBalanceOptions
+          | GetSuiTokenBalanceOptions
+          | GetSuiNftBalanceOptions,
         ttl,
       );
     } else {
@@ -56,9 +61,14 @@ export async function getBalances(
       options.balanceSourceType === BalanceSourceType.SPL
         ? 'solana'
         : options.balanceSourceType === BalanceSourceType.SuiNative ||
-            options.balanceSourceType === BalanceSourceType.SuiToken
-          ? (options as GetSuiNativeBalanceOptions | GetSuiTokenBalanceOptions)
-              .sourceOptions.suiNetwork
+            options.balanceSourceType === BalanceSourceType.SuiToken ||
+            options.balanceSourceType === BalanceSourceType.SuiNFT
+          ? (
+              options as
+                | GetSuiNativeBalanceOptions
+                | GetSuiTokenBalanceOptions
+                | GetSuiNftBalanceOptions
+            ).sourceOptions.suiNetwork
           : (options as GetEvmBalancesOptions).sourceOptions.evmChainId ||
             (options as GetCosmosBalancesOptions).sourceOptions.cosmosChainId;
 
@@ -68,7 +78,9 @@ export async function getBalances(
       (options as GetSuiNativeBalanceOptions).sourceOptions.objectId ||
       (options.balanceSourceType === BalanceSourceType.SuiToken
         ? (options as GetSuiTokenBalanceOptions).sourceOptions.coinType
-        : undefined);
+        : options.balanceSourceType === BalanceSourceType.SuiNFT
+          ? (options as GetSuiNftBalanceOptions).sourceOptions.collectionId
+          : undefined);
 
     const msg =
       `Failed to fetch balance(s) for ${options.addresses.length} address(es)` +
@@ -85,12 +97,19 @@ export async function getBalances(
       cosmosChainId: (options as GetCosmosBalancesOptions).sourceOptions
         ?.cosmosChainId,
       suiNetwork: (
-        options as GetSuiNativeBalanceOptions | GetSuiTokenBalanceOptions
+        options as
+          | GetSuiNativeBalanceOptions
+          | GetSuiTokenBalanceOptions
+          | GetSuiNftBalanceOptions
       ).sourceOptions?.suiNetwork,
       objectId: (options as GetSuiNativeBalanceOptions).sourceOptions?.objectId,
       coinType:
         options.balanceSourceType === BalanceSourceType.SuiToken
           ? (options as GetSuiTokenBalanceOptions).sourceOptions.coinType
+          : undefined,
+      collectionId:
+        options.balanceSourceType === BalanceSourceType.SuiNFT
+          ? (options as GetSuiNftBalanceOptions).sourceOptions.collectionId
           : undefined,
     });
   }
