@@ -20,7 +20,7 @@ export * as SuperAdmin from './aggregates/super-admin';
 export * as Tag from './aggregates/tag';
 export * as Thread from './aggregates/thread';
 export * as Token from './aggregates/token';
-export * as TokenAllocation from './aggregates/tokenAllocation';
+export * as TokenAllocation from './aggregates/token-allocation';
 export * as User from './aggregates/user';
 export * as Wallet from './aggregates/wallet';
 export * as Webhook from './aggregates/webhook';

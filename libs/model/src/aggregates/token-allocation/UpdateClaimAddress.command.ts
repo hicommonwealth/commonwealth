@@ -11,10 +11,10 @@ import { models } from '../../database';
 const log = logger(import.meta);
 
 export function UpdateClaimAddress(): Command<
-  typeof schemas.UpdateClaimableAddress
+  typeof schemas.UpdateClaimAddress
 > {
   return {
-    ...schemas.UpdateClaimableAddress,
+    ...schemas.UpdateClaimAddress,
     auth: [],
     secure: true,
     body: async ({ payload, actor }) => {
