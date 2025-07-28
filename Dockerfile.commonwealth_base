@@ -25,7 +25,7 @@ ENV NODE_ENV=production
 
 COPY --from=build /prod/commonwealth /prod/commonwealth
 COPY --from=build /usr/src/app/libs/model/.sequelizerc /prod/commonwealth/.sequelizerc
-COPY --from=build /usr/src/app/libs/model/sequelize.json /prod/commonwealth/sequelize.json
+COPY --from=build /usr/src/app/libs/model/sequelize.js /prod/commonwealth/sequelize.js
 COPY --from=build /usr/src/app/libs/model/migrations /prod/commonwealth/migrations
 
 WORKDIR /prod/commonwealth

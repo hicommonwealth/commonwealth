@@ -379,4 +379,19 @@
       color: colors.$neutral-500;
     }
   }
+
+  &.info {
+    background-color: colors.$primary-50;
+    border: 1px solid colors.$primary-600;
+
+    .Text {
+      color: colors.$primary-600;
+    }
+
+    .Icon {
+      stroke: colors.$primary-600;
+      padding: 0;
+      fill: none;
+    }
+  }
 }
