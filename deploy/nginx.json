@@ -6,7 +6,6 @@
     "watchPatterns": ["deploy/dockerfiles/nginx/**", "deploy/nginx.json"]
   },
   "deploy": {
-    "startCommand": "/bin/sh -c \"envsubst '\\$BACKEND_URL' < /etc/nginx/nginx.conf > /tmp/nginx.conf && mv /tmp/nginx.conf /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'\"",
     "restartPolicyType": "ALWAYS",
     "region": "us-east4-eqdc4a",
     "limitOverride": {
