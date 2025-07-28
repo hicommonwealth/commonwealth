@@ -24,6 +24,7 @@ import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';
 import Group from './group';
 import GroupGatedAction from './groupGatedAction';
+import GroupSnapshot from './groupSnapshot';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LaunchpadTrade from './launchpad_trade';
 import MCPServer from './mcp_server';
@@ -81,6 +82,7 @@ export const Factories = {
   EvmEventSource,
   Group,
   GroupGatedAction,
+  GroupSnapshot,
   LastProcessedEvmBlock,
   LaunchpadTrade,
   MCPServer,
