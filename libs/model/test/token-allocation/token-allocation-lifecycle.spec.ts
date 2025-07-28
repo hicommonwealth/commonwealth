@@ -5,10 +5,10 @@ import { models } from '../../src/database';
 import { CommunitySeedResult, seedCommunity } from '../utils';
 
 describe('Token Allocation Lifecycle', () => {
-  let communitySeed: CommunitySeedResult;
+  let community: CommunitySeedResult;
 
   beforeAll(async () => {
-    communitySeed = await seedCommunity({
+    community = await seedCommunity({
       roles: ['admin', 'member'],
     });
   });
@@ -19,9 +19,9 @@ describe('Token Allocation Lifecycle', () => {
 
   describe('UpdateClaimAddress', () => {
     it('should update claim address when no magna sync exists', async () => {
-      const address = communitySeed.addresses.member;
+      const address = community.addresses.member;
       const result = await command(UpdateClaimAddress(), {
-        actor: communitySeed.actors.member,
+        actor: community.actors.member,
         payload: { address_id: address.id! },
       });
 
@@ -30,19 +30,19 @@ describe('Token Allocation Lifecycle', () => {
 
       // Verify in database
       const found = await models.ClaimAddresses.findAll({
-        where: { user_id: communitySeed.actors.member.user.id },
+        where: { user_id: community.actors.member.user.id },
       });
       expect(found.length).to.equal(1);
       expect(found[0].address).to.equal(address.address);
     });
 
     it('should throw error when magna sync exists', async () => {
-      const user_id = communitySeed.actors.admin.user.id;
+      const user_id = community.actors.admin.user.id;
 
       // Create historical allocation with magna sync
       await models.HistoricalAllocations.create({
         user_id,
-        address: communitySeed.addresses.member.address,
+        address: community.addresses.member.address,
         created_at: new Date(),
         updated_at: new Date(),
         magna_synced_at: new Date(),
@@ -61,8 +61,8 @@ describe('Token Allocation Lifecycle', () => {
 
       expect(
         command(UpdateClaimAddress(), {
-          actor: communitySeed.actors.admin,
-          payload: { address_id: communitySeed.addresses.admin.id! },
+          actor: community.actors.admin,
+          payload: { address_id: community.addresses.admin.id! },
         }),
       ).rejects.toThrowError();
     });
@@ -70,8 +70,8 @@ describe('Token Allocation Lifecycle', () => {
     it('should throw error when address belongs to different user', async () => {
       expect(
         command(UpdateClaimAddress(), {
-          actor: communitySeed.actors.admin,
-          payload: { address_id: communitySeed.addresses.member.id! },
+          actor: community.actors.admin,
+          payload: { address_id: community.addresses.member.id! },
         }),
       ).rejects.toThrowError();
     });
