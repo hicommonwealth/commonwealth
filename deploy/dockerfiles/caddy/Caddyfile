@@ -1,12 +1,12 @@
 {
-    admin off
-    persist_config off
-    auto_https off
-    log {
-        format console
-    }
+	admin off
+	persist_config off
+	auto_https off
+	log {
+		format console
+	}
 }
 
 :{$PORT} {
-    reverse_proxy prod-web.railway.internal:8080
+	reverse_proxy prod-web.railway.internal:8080
 }
