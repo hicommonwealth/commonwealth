@@ -107,12 +107,14 @@
     bottom: 40px;
     align-self: center;
     display: flex;
+    padding: 12px;
     flex-direction: column;
     @include media_queries.extraSmall {
       position: absolute;
     }
     .footer {
       display: block;
+      padding: 12px;
 
       a,
       a:visited,
@@ -125,6 +127,7 @@
       display: flex;
       gap: 1rem;
       width: 100%;
+      padding: 12px;
       position: relative;
       align-items: center;
       justify-content: space-between;

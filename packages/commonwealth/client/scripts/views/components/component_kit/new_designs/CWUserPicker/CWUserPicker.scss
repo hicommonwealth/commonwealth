@@ -1,0 +1,174 @@
+.CWUserPicker {
+  width: 100%;
+  flex: 1;
+  min-width: 0;
+
+  &__control {
+    position: relative;
+    width: 100%;
+  }
+
+  &__input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 16px;
+    font-size: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    outline: none;
+    background: #fff;
+    transition: border-color 0.2s;
+    font-family: inherit;
+    min-height: 40px;
+    max-height: 40px;
+    line-height: 24px;
+    letter-spacing: 0.02em;
+    color: #222;
+    padding-right: 48px; // enough space for arrow and ID
+    &:focus {
+      border-color: #888;
+      background: #fff;
+    }
+    &::placeholder {
+      color: #888;
+      opacity: 1;
+    }
+  }
+  &__input--overlay {
+    color: transparent;
+    caret-color: transparent;
+  }
+
+  &__arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__dropdown-table {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 10;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+    margin-top: 2px;
+    max-height: 260px;
+    overflow-y: auto;
+    min-width: 240px;
+    padding: 0;
+  }
+
+  &__dropdown-header {
+    display: flex;
+    font-size: 13px;
+    font-weight: 600;
+    color: #888;
+    background: #fafbfc;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 6px 0 6px 0;
+  }
+
+  &__dropdown-col {
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    &--avatar {
+      width: 36px;
+      justify-content: center;
+      padding-left: 8px;
+      padding-right: 0;
+    }
+    &--name {
+      flex: 2;
+      min-width: 0;
+      justify-content: flex-start;
+    }
+    &--id {
+      flex: 1;
+      min-width: 0;
+      justify-content: flex-end;
+      color: #aaa;
+      font-size: 13px;
+    }
+  }
+
+  &__dropdown-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+    min-height: 44px;
+    &:last-child {
+      border-bottom: none;
+    }
+    &:hover,
+    &:focus {
+      background: #f5f5f5;
+    }
+    img {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      margin-right: 0;
+    }
+  }
+
+  &__selected-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border-radius: 6px;
+    pointer-events: none;
+    padding: 0 16px;
+    font-size: 15px;
+    min-height: 40px;
+    max-height: 40px;
+    padding-right: 48px; // match input padding
+    .CWUserPicker__dropdown-col {
+      padding: 0 8px;
+      &--avatar {
+        width: 36px;
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      &--name {
+        flex: 2;
+        min-width: 0;
+        justify-content: flex-start;
+      }
+      &--id {
+        flex: 1;
+        min-width: 0;
+        justify-content: flex-end;
+        color: #aaa;
+        font-size: 13px;
+      }
+    }
+    img {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      margin-right: 0;
+    }
+  }
+}

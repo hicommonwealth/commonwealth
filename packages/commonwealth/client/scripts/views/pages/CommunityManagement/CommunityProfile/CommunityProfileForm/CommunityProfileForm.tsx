@@ -1,6 +1,4 @@
 import { DefaultPage } from '@hicommonwealth/shared';
-import { useUpdateCommunityTags } from 'client/scripts/state/api/communities/editCommunityTags';
-import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
@@ -14,6 +12,8 @@ import {
   useGetCommunityByIdQuery,
   useUpdateCommunityMutation,
 } from 'state/api/communities';
+import { useUpdateCommunityTags } from 'state/api/communities/editCommunityTags';
+import { buildUpdateCommunityInput } from 'state/api/communities/updateCommunity';
 import { LinksArray, useLinksArray } from 'views/components/LinksArray';
 import {
   PreferenceTags,
@@ -23,6 +23,7 @@ import {
   CWImageInput,
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
+import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -33,6 +34,7 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import ErrorPage from '../../../error';
 import CommunityTrustLevel from '../CommunityTrustLevel/CommunityTrustLevel';
 import './CommunityProfileForm.scss';
@@ -74,6 +76,7 @@ const CommunityProfileForm = () => {
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
     communityId: community?.id || '',
   });
+  const { communityToken, isPinnedToken } = useTokenTradeWidget();
 
   const {
     isLoadingTags,
@@ -174,6 +177,9 @@ const CommunityProfileForm = () => {
             ? JSON.parse(values.customStages)
             : [],
           iconUrl: values.communityProfileImageURL,
+          launchpadTokenImage: values.updateTokenImage
+            ? values.communityProfileImageURL || community.icon_url || ''
+            : undefined,
           defaultPage: values.defaultPage,
           aiFeaturesEnabled: values.aiFeaturesEnabled,
         }),
@@ -301,15 +307,24 @@ const CommunityProfileForm = () => {
               label="Community Description"
               placeholder="Enter a description of your community or project"
             />
-            <CWImageInput
-              hookToForm
-              withAIImageGeneration
-              name="communityProfileImageURL"
-              canSelectImageBehavior={false}
-              imageBehavior={ImageBehavior.Circle}
-              onImageProcessingChange={handleImageProcessingChange}
-              label="Community Profile Image (Accepts JPG and PNG files)"
-            />
+
+            <div className="community-img-update">
+              <CWImageInput
+                hookToForm
+                withAIImageGeneration
+                name="communityProfileImageURL"
+                canSelectImageBehavior={false}
+                imageBehavior={ImageBehavior.Circle}
+                onImageProcessingChange={handleImageProcessingChange}
+                label="Community Profile Image (Accepts JPG and PNG files)"
+              />
+              <CWCheckbox
+                name="updateTokenImage"
+                hookToForm
+                label="Update community token image"
+                disabled={!communityToken && !isPinnedToken}
+              />
+            </div>
           </section>
 
           <section className="trust-level-section">
