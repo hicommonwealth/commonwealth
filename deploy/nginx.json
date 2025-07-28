@@ -3,7 +3,7 @@
   "build": {
     "builder": "DOCKERFILE",
     "dockerfilePath": "deploy/dockerfiles/nginx/nginx.dockerfile",
-    "watchPatterns": ["deploy/dockerfiles/nginx/**"]
+    "watchPatterns": ["deploy/dockerfiles/nginx/**", "deploy/nginx.json"]
   },
   "deploy": {
     "startCommand": "/bin/sh -c \"envsubst '\\$BACKEND_URL' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'\"",
