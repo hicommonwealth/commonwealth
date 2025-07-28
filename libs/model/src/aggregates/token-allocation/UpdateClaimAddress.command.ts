@@ -65,6 +65,7 @@ export function UpdateClaimAddress(): Command<
             replacements: {
               user_id: address.user_id,
             },
+            transaction,
           },
         );
         if (magna_synced.length > 0) {
