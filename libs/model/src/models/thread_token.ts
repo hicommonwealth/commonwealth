@@ -18,6 +18,7 @@ export default (
         allowNull: false,
         primaryKey: true,
       },
+      namespace: { type: Sequelize.STRING, allowNull: false },
       thread_id: {
         type: Sequelize.STRING,
         allowNull: false,

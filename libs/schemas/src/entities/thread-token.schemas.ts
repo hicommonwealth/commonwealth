@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 export const ThreadToken = z.object({
   token_address: z.string(),
+  namespace: z.string(),
   thread_id: z.string(),
   name: z.string(),
   symbol: z.string(),

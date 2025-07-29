@@ -13,6 +13,7 @@ module.exports = {
             primaryKey: true,
           },
           thread_id: { type: Sequelize.STRING, allowNull: false },
+          namespace: { type: Sequelize.STRING, allowNull: true },
           name: { type: Sequelize.STRING, allowNull: false },
           symbol: { type: Sequelize.STRING, allowNull: false },
           created_at: { type: Sequelize.DATE, allowNull: false },
