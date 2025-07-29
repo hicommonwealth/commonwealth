@@ -176,6 +176,7 @@ const ModalBase = ({
   const hasWalletConnect = findWalletById(WalletId.WalletConnect);
   const isOkxWalletAvailable = findWalletById(WalletId.OKX);
   const isBinanceWalletAvailable = findWalletById(WalletId.Binance);
+  const isGateWalletAvailable = findWalletById(WalletId.Gate);
   const evmWallets = filterWalletNames(ChainBase.Ethereum) as EVMWallets[];
   const cosmosWallets = filterWalletNames(ChainBase.CosmosSDK);
   const solanaWallets = filterWalletNames(ChainBase.Solana);
@@ -190,6 +191,9 @@ const ModalBase = ({
       if (isBinanceWalletAvailable) {
         configEvmWallets.push('binance');
       }
+      if (isGateWalletAvailable) {
+        configEvmWallets.push('gate');
+      }
     }
     if (hasWalletConnect) {
       configEvmWallets.push('walletconnect');
@@ -202,7 +206,7 @@ const ModalBase = ({
       ...(evmWallets.includes('walletconnect') ? ['walletconnect'] : []),
       ...evmWallets.filter((x) => {
         if (!partnershipWalletEnabled) {
-          if (x === 'okx' || x === 'binance') return false;
+          if (x === 'okx' || x === 'binance' || x === 'gate') return false;
         }
 
         return x !== 'walletconnect';
