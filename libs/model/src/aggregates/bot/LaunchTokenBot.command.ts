@@ -9,13 +9,12 @@ import {
 } from '@hicommonwealth/core';
 import {
   createPrivateEvmClient,
-  factoryContracts,
   getErc20TokenInfo,
+  getFactoryContract,
   getLaunchpadTokenCreatedTransaction,
   getTargetMarketCap,
   isValidChain,
   launchToken,
-  ValidChains,
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
@@ -67,7 +66,7 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
       });
       const launchpadContract = new web3.eth.Contract(
         LaunchpadAbi,
-        factoryContracts[eth_chain_id as ValidChains.SepoliaBase].launchpad,
+        getFactoryContract(eth_chain_id).Launchpad,
       );
       const receipt = await launchToken(
         launchpadContract,
@@ -78,8 +77,7 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
         web3.utils.toWei(totalSupply.toString(), 'ether') as string,
         web3.eth.defaultAccount as string,
         830000,
-        factoryContracts[eth_chain_id as ValidChains.SepoliaBase]
-          .tokenCommunityManager,
+        getFactoryContract(eth_chain_id).TokenCommunityManager,
       );
 
       const tokenData = await getLaunchpadTokenCreatedTransaction({

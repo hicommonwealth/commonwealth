@@ -1,4 +1,4 @@
-import { factoryContracts } from '@hicommonwealth/evm-protocols';
+import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
 import { ContractMethods } from 'state/api/config';
 import { lazyLoadCommunityStakes } from '../../../helpers/ContractHelpers/LazyCommunityStakes';
@@ -19,8 +19,8 @@ const getUserStakeBalance = async ({
 }: GetUserStakeBalanceProps) => {
   const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
-    factoryContracts[ethChainId].communityStake,
-    factoryContracts[ethChainId].factory,
+    getFactoryContract(ethChainId).CommunityStake,
+    getFactoryContract(ethChainId).NamespaceFactory,
     chainRpc,
   );
 

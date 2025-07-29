@@ -71,11 +71,7 @@ const {
 const { createToken, createTrade, getLaunchpadTrades, getTokenInfoAlchemy } =
   launchpad.trpcRouter;
 const { launchTokenBot } = bot.trpcRouter;
-const {
-  createPoll,
-  deletePoll,
-  createPollVote,
-} = poll.trpcRouter;
+const { createPoll, deletePoll, createPollVote } = poll.trpcRouter;
 
 const api = {
   getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
@@ -152,7 +148,9 @@ const api = {
   deletePoll,
   createPollVote,
   getPolls: trpc.query(Poll.GetPolls, trpc.Tag.Poll, { forceSecure: true }),
-  getPollVotes: trpc.query(Poll.GetPollVotes, trpc.Tag.Poll, { forceSecure: true }),
+  getPollVotes: trpc.query(Poll.GetPollVotes, trpc.Tag.Poll, {
+    forceSecure: true,
+  }),
 };
 
 const PATH = '/api/v1';
