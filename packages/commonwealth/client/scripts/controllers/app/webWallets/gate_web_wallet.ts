@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let window: any;
 
 import type Web3 from 'web3';
@@ -23,6 +23,7 @@ class GateWebWalletController implements IWebWallet<string> {
   private _enabling = false;
   private _accounts: string[];
   private _provider: Web3BaseProvider;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _web3: Web3 | any;
 
   public readonly name = WalletId.Gate;
@@ -103,7 +104,7 @@ class GateWebWalletController implements IWebWallet<string> {
       let ethereum = window.gatewallet;
 
       if (window.gatewallet.providers?.length) {
-        window.gatewallet.providers.forEach(async (p) => {
+        window.gatewallet.providers.forEach((p) => {
           if (p.isGateWallet) ethereum = p;
         });
       }
