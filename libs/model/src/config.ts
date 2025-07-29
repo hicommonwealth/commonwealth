@@ -97,6 +97,7 @@ const {
   CONTEST_DURATION_IN_SEC,
   MOONPAY_PUBLISHABLE_KEY,
   MOONPAY_SECRET_KEY,
+  REORG_SAFETY_DISABLED,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -122,13 +123,17 @@ export const config = configure(
       API_KEY: SENDGRID_API_KEY,
     },
     DB: {
-      URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
+      URI:
+        target.NODE_ENV === 'test' || !DATABASE_URL
+          ? DEFAULTS.DATABASE_URL
+          : DATABASE_URL,
       NAME,
       NO_SSL: NO_SSL === 'true',
       TRACE: DATABASE_LOG_TRACE === 'true',
     },
     WEB3: {
       PRIVATE_KEY: PRIVATE_KEY || '',
+      REORG_SAFETY_DISABLED: REORG_SAFETY_DISABLED !== 'true',
       LAUNCHPAD_PRIVATE_KEY: LAUNCHPAD_PRIVATE_KEY || '',
       CONTEST_BOT_PRIVATE_KEY: CONTEST_BOT_PRIVATE_KEY || '',
       EVM_CHAINS_WHITELIST: EVM_CHAINS_WHITELIST || '',
@@ -390,6 +395,7 @@ export const config = configure(
       LAUNCHPAD_CHAIN_ID: z.number(),
       LAUNCHPAD_CONNECTOR_WEIGHT: z.number(),
       LAUNCHPAD_INITIAL_PRICE: z.number(),
+      REORG_SAFETY_DISABLED: z.boolean().optional(),
     }),
     TBC: z.object({
       TTL_SECS: z.number().int(),
@@ -700,7 +706,6 @@ export const config = configure(
           config: target,
           requiredAppEnvs: ['production'],
           requiredServices: [...WebServices, 'knock', 'consumer'],
-          defaultCheck: DEFAULTS.KNOCK_IN_APP_FEED_ID,
         }),
       ),
     }),

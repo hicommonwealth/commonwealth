@@ -9,6 +9,8 @@ let sequelize: Sequelize;
 let models: DB;
 
 function connect_sequelize() {
+  config.APP_ENV === 'local' &&
+    console.log(`Sequelize connecting to ${config.DB.URI}`);
   sequelize = new Sequelize(config.DB.URI, {
     // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
     // operatorsAliases: false,
