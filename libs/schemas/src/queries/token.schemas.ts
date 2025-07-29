@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { LaunchpadToken, LaunchpadTrade } from '../entities';
+import { LaunchpadToken, LaunchpadTrade, ThreadToken } from '../entities';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const TokenView = LaunchpadToken.extend({
@@ -21,19 +21,29 @@ export const GetTokens = {
 };
 
 export const GetToken = {
-  input: z
-    .object({
-      community_id: z.string().optional(),
-      thread_id: z.number().optional(),
-      with_stats: z.boolean().optional(),
-    })
-    .refine(
-      (data) => data.community_id !== undefined || data.thread_id !== undefined,
-      {
-        message: 'Either community_id or thread_id must be provided',
-      },
-    ),
+  input: z.object({
+    community_id: z.string(),
+    with_stats: z.boolean().optional(),
+  }),
   output: z.union([TokenView, z.null()]),
+};
+
+const NullishThreadToken = z.object(
+  Object.fromEntries(
+    Object.entries(ThreadToken.shape).map(([key, schema]) => [
+      key,
+      schema.optional().nullable(),
+    ]),
+  ),
+);
+
+export const GetThreadToken = {
+  input: z.object({
+    thread_id: z.coerce.number(),
+  }),
+  output: NullishThreadToken.extend({
+    thread_purchase_token: z.string().optional(),
+  }),
 };
 
 export const LaunchpadTradeView = LaunchpadTrade.extend({

@@ -13,6 +13,7 @@ import {
   events,
   LaunchpadToken,
   Thread,
+  ThreadToken,
 } from '@hicommonwealth/schemas';
 import {
   buildCommunityUrl,
@@ -62,6 +63,10 @@ const EventStreamSchemas = {
   LaunchpadTokenGraduated: {
     input: events.LaunchpadTokenGraduated,
     output: LaunchpadToken,
+  },
+  ThreadTokenGraduated: {
+    input: events.ThreadTokenGraduated,
+    output: ThreadToken,
   },
 } as const;
 
@@ -225,6 +230,25 @@ const eventStreamMappers: EventStreamMappers = {
       url: communityUrl,
     };
   },
+  ThreadTokenGraduated: async (payload) => {
+    const threadToken = await models.ThreadToken.findOne({
+      where: { token_address: payload.token.token_address },
+    });
+    mustExist('ThreadToken', threadToken);
+    const community = await models.Community.findOne({
+      where: { namespace: threadToken.namespace },
+    });
+    mustExist('Community', community);
+    const communityUrl = buildCommunityUrl(
+      getBaseUrl(config.APP_ENV),
+      community.id,
+    );
+    return {
+      type: 'ThreadTokenGraduated',
+      data: threadToken.get({ plain: true }),
+      url: communityUrl,
+    };
+  },
 };
 
 export function EventStreamPolicy(): Policy<{
@@ -240,6 +264,7 @@ export function EventStreamPolicy(): Policy<{
       LaunchpadTokenCreated: EventStreamSchemas.LaunchpadTokenCreated.input,
       LaunchpadTokenTraded: EventStreamSchemas.LaunchpadTokenTraded.input,
       LaunchpadTokenGraduated: EventStreamSchemas.LaunchpadTokenGraduated.input,
+      ThreadTokenGraduated: EventStreamSchemas.ThreadTokenGraduated.input,
     },
     body: {
       ContestStarted: async ({ payload }) => {
@@ -265,12 +290,12 @@ export function EventStreamPolicy(): Policy<{
           await eventStreamMappers.ThreadCreated(payload),
         );
       },
-      LaunchpadTokenCreated: async ({ payload }) => {
+      LaunchpadTokenCreated: async () => {
         // await pushToEventStream(
         //   await eventStreamMappers.LaunchpadTokenCreated(payload),
         // );
       },
-      LaunchpadTokenTraded: async ({ payload }) => {
+      LaunchpadTokenTraded: async () => {
         // await pushToEventStream(
         //   await eventStreamMappers.LaunchpadTokenTraded(payload),
         // );
@@ -278,6 +303,11 @@ export function EventStreamPolicy(): Policy<{
       LaunchpadTokenGraduated: async ({ payload }) => {
         await pushToEventStream(
           await eventStreamMappers.LaunchpadTokenGraduated(payload),
+        );
+      },
+      ThreadTokenGraduated: async ({ payload }) => {
+        await pushToEventStream(
+          await eventStreamMappers.ThreadTokenGraduated(payload),
         );
       },
     },
