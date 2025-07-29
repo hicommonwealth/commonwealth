@@ -10,6 +10,7 @@ describe('Token Allocation Lifecycle', () => {
   beforeAll(async () => {
     community = await seedCommunity({
       roles: ['admin', 'member'],
+      network: 'ethereum',
     });
   });
 
@@ -20,6 +21,7 @@ describe('Token Allocation Lifecycle', () => {
   describe('UpdateClaimAddress', () => {
     it('should update claim address when no magna sync exists', async () => {
       const address = community.addresses.member;
+
       const result = await command(UpdateClaimAddress(), {
         actor: community.actors.member,
         payload: { address_id: address.id! },
