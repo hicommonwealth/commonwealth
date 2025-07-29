@@ -462,14 +462,22 @@ const GroupForm = ({
   const handleWatchForm = (values: FormSubmitValues) => {
     if (values?.topics?.length > 0) {
       const updatedTopicPermissions: TopicPermissionToggleGroupSubFormsState[] =
-        values.topics.map((topic) => ({
-          topic: {
-            id: Number(topic.value),
-            is_private: false,
-            name: topic.label,
-          },
-          permission: [],
-        }));
+        values.topics.map((topic) => {
+          const existingTopic = topicPermissionsToggleGroupSubForms.find(
+            (existing) => existing.topic.id === Number(topic.value),
+          );
+          const currentGroupTopic = (currentGroup?.topics || []).find(
+            (t) => t.id === Number(topic.value),
+          );
+          return {
+            topic: {
+              id: Number(topic.value),
+              is_private: currentGroupTopic?.is_private ?? false,
+              name: topic.label,
+            },
+            permission: existingTopic?.permission || [],
+          };
+        });
       setTopicPermissionsToggleGroupSubForms(updatedTopicPermissions);
     } else {
       setTopicPermissionsToggleGroupSubForms([]);
