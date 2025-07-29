@@ -1,8 +1,24 @@
 import Sequelize from 'sequelize';
 import { ModelInstance } from './types';
 
-export const HistoricalAllocations = (sequelize: Sequelize.Sequelize) =>
-  sequelize.define(
+export type HistoricalAllocation = {
+  user_id: number;
+  num_threads: number;
+  thread_score: number;
+  num_comments: number;
+  comment_score: number;
+  num_reactions: number;
+  reactions_score: number;
+  unadjusted_score: number;
+  adjusted_score: number;
+  percent_score: number;
+  token_allocation: number;
+  magna_synced_at: Date | null;
+};
+export const HistoricalAllocations = (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ModelInstance<HistoricalAllocation>> =>
+  sequelize.define<ModelInstance<HistoricalAllocation>>(
     'HistoricalAllocations',
     {
       user_id: {
