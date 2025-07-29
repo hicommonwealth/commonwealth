@@ -6,18 +6,18 @@ import {
   NamespaceFactoryAbi,
 } from '@commonxyz/common-protocol-abis';
 import {
-  EvmEventSignatures,
   decodeLog,
-  factoryContracts,
+  EvmEventSignatures,
+  getFactoryContract,
 } from '@hicommonwealth/evm-protocols';
 import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import {
   Chain,
+  getContract,
   HttpTransport,
   PublicClient,
   TransactionReceipt,
-  getContract,
 } from 'viem';
 import {
   EvmProtocolChain,
@@ -554,7 +554,7 @@ export const deployERC20Contest = async ({
     });
 
     const { request } = await client.simulateContract({
-      address: factoryContracts[chain.eth_chain_id].factory,
+      address: getFactoryContract(chain.eth_chain_id).NamespaceFactory,
       abi: NamespaceFactoryAbi,
       functionName: 'newSingleERC20Contest',
       args: [
@@ -607,7 +607,7 @@ export const deployNamespace = async (
   }
 
   const { request } = await client.simulateContract({
-    address: factoryContracts[chain.eth_chain_id].factory,
+    address: getFactoryContract(chain.eth_chain_id).NamespaceFactory,
     abi: NamespaceFactoryAbi,
     functionName: 'deployNamespace',
     ...(await client.estimateFeesPerGas()),

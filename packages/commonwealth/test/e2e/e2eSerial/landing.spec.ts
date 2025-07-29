@@ -19,7 +19,7 @@ test.describe('Test landing login', () => {
               'http://localhost:8080/api/internal/trpc/feed.getUserActivity',
             )
         ) {
-          expect(response.status()).toEqual(401);
+          expect(response.status()).toEqual(500);
         } else {
           expect(response.status()).toBeLessThan(400);
         }

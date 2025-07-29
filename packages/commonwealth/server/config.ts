@@ -118,6 +118,18 @@ export const config = configure(
         ? EVM_CE_ETH_CHAIN_ID_OVERRIDE.split(',').map((id) => parseInt(id))
         : undefined,
     },
+    SOLANA_CE: {
+      POLL_INTERVAL_MS: parseInt(
+        process.env.SOLANA_CE_POLL_INTERVAL ?? '60000',
+        10,
+      ),
+      LOG_TRACE: process.env.SOLANA_CE_LOG_TRACE !== 'false',
+      MAX_SLOT_RANGE: parseInt(
+        process.env.SOLANA_CE_MAX_SLOT_RANGE ?? '10000',
+        10,
+      ),
+      // No need for CHAIN_CONFIGS as we now use IDLs to get program IDs
+    },
     LIBP2P_PRIVATE_KEY,
     SNAPSHOT_WEBHOOK_SECRET,
     GITHUB: {
@@ -274,6 +286,12 @@ export const config = configure(
       POLL_INTERVAL_MS: z.number().int().positive(),
       LOG_TRACE: z.boolean(),
       ETH_CHAIN_ID_OVERRIDE: z.array(z.number()).optional(),
+    }),
+    SOLANA_CE: z.object({
+      POLL_INTERVAL_MS: z.number().int().positive(),
+      LOG_TRACE: z.boolean(),
+      MAX_SLOT_RANGE: z.number().int().positive(),
+      // We no longer need CHAIN_CONFIGS as we use IDLs to get program IDs
     }),
     RAILWAY: z.object({
       RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
