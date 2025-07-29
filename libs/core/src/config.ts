@@ -177,7 +177,7 @@ const {
   MIXPANEL_TOKEN,
   DEV_MODULITH,
   RAILWAY_DATADOG_HOST,
-  RAILWAY_DATADOG_PORT,
+  RAILWAY_DATADOG_STATSD_PORT,
   RAILWAY_GIT_COMMIT_SHA,
 } = process.env;
 
@@ -224,8 +224,8 @@ export const config = configure(
     RAILWAY: {
       GIT_COMMIT_SHA: RAILWAY_GIT_COMMIT_SHA,
       DATADOG_HOST: RAILWAY_DATADOG_HOST,
-      DATADOG_PORT: RAILWAY_DATADOG_PORT
-        ? parseInt(RAILWAY_DATADOG_PORT, 10)
+      DATADOG_STATSD_PORT: RAILWAY_DATADOG_STATSD_PORT
+        ? parseInt(RAILWAY_DATADOG_STATSD_PORT, 10)
         : undefined,
     },
   },
@@ -359,7 +359,7 @@ export const config = configure(
     RAILWAY: z.object({
       GIT_COMMIT_SHA: z.string().optional(),
       DATADOG_HOST: z.string().optional(),
-      DATADOG_PORT: z.number().optional(),
+      DATADOG_STATSD_PORT: z.number().optional(),
     }),
   }),
 );

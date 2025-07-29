@@ -7,7 +7,7 @@ export const HotShotsStats = (): Stats => {
   if (config.RAILWAY.GIT_COMMIT_SHA) {
     statsdConfig = {
       host: config.RAILWAY.DATADOG_HOST,
-      port: config.RAILWAY.DATADOG_PORT,
+      port: config.RAILWAY.DATADOG_STATSD_PORT,
       protocol: 'udp',
       cacheDns: true,
       udpSocketOptions: {
