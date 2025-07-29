@@ -159,6 +159,7 @@ export const buildAssociations = (db: DB) => {
       asMany: 'reactions',
     })
     .withMany(db.Comment)
+    .withOne(db.ThreadToken)
     .withMany(db.ThreadVersionHistory)
     .withOne(db.ThreadRank, {
       onDelete: 'CASCADE',
