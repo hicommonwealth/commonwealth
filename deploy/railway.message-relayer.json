@@ -2,7 +2,23 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "DOCKERFILE",
-    "dockerfilePath": "railway.dockerfile"
+    "dockerfilePath": "railway.dockerfile",
+    "watchPatterns": [
+      "deploy/railway.message-relayer.json",
+      "railway.dockerfile",
+      "libs",
+      "packages",
+      "package.json",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      "tsconfig.json",
+      "vite.config.ts",
+      "tsconfig.vite.json",
+      ".nvmrc",
+      ".dockerignore",
+      "scripts",
+      ".gitignore"
+    ]
   },
   "deploy": {
     "preDeployCommand": "npm run pre-deploy",
