@@ -18,6 +18,7 @@ const useFetchQuestsQuery = ({
   order_by,
   order_direction,
   include_system_quests,
+  include_active_only,
   search,
   enabled = true,
 }: UseFetchQuestsProps) => {
@@ -32,6 +33,7 @@ const useFetchQuestsQuery = ({
       order_by,
       order_direction,
       include_system_quests,
+      include_active_only,
       search,
     },
     {
