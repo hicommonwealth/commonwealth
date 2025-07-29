@@ -38,8 +38,6 @@ const {
   TWITTER_WORKER_POLL_INTERVAL,
   TWITTER_ENABLED_BOTS,
   EVM_CE_ETH_CHAIN_ID_OVERRIDE,
-  RAILWAY_PUBLIC_DOMAIN,
-  RAILWAY_GIT_COMMIT_SHA,
   RELEASER_URL,
   RELEASER_API_KEY,
 } = process.env;
@@ -166,8 +164,6 @@ export const config = configure(
         : DEFAULTS.CACHE_GET_COMMUNITIES_JOIN_COMMUNITY,
     },
     RAILWAY: {
-      RAILWAY_PUBLIC_DOMAIN,
-      RAILWAY_GIT_COMMIT_SHA,
       RELEASER_URL,
       RELEASER_API_KEY,
     },
@@ -297,8 +293,6 @@ export const config = configure(
       // We no longer need CHAIN_CONFIGS as we use IDLs to get program IDs
     }),
     RAILWAY: z.object({
-      RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
-      RAILWAY_GIT_COMMIT_SHA: z.string().optional(),
       RELEASER_URL: z.string().optional(),
       // Enable once migrated to Railway
       // .refine(
