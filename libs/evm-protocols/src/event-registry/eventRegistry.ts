@@ -7,7 +7,9 @@ import {
   LaunchpadAbi,
   NamespaceFactoryAbi,
   ReferralFeeManagerAbi,
+  TokenBondingCurveAbi,
   TokenCommunityManagerAbi,
+  TokenLaunchpadAbi,
 } from '@commonxyz/common-protocol-abis';
 import { ValidChains, getFactoryContract } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
