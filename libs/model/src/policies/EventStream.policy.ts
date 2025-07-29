@@ -235,8 +235,12 @@ const eventStreamMappers: EventStreamMappers = {
       where: { token_address: payload.token.token_address },
     });
     mustExist('ThreadToken', threadToken);
+    const thread = await models.Thread.findOne({
+      where: { id: threadToken.thread_id },
+    });
+    mustExist('Thread', thread);
     const community = await models.Community.findOne({
-      where: { namespace: threadToken.namespace },
+      where: { id: thread.community_id },
     });
     mustExist('Community', community);
     const communityUrl = buildCommunityUrl(
