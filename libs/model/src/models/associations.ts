@@ -4,7 +4,10 @@ import type { DB } from './factories';
  * Associates models with type safety
  */
 export const buildAssociations = (db: DB) => {
-  db.User.withMany(db.Address)
+  db.User.withMany(db.Address, {
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  })
     .withMany(db.ProfileTags)
     .withMany(db.SubscriptionPreference, {
       asMany: 'SubscriptionPreferences',
@@ -93,7 +96,9 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Address)
+    .withMany(db.Address, {
+      onUpdate: 'CASCADE',
+    })
     .withMany(db.Thread, {
       asOne: 'Community',
       onUpdate: 'CASCADE',

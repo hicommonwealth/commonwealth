@@ -803,6 +803,24 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             }),
         );
       },
+      XpAwarded: async ({ id, payload }) => {
+        const user = await models.User.findOne({
+          where: { id: payload.user_id },
+        });
+        if (!user) return;
+        const action_metas = await getQuestActionMetas(payload, 'XpAwarded');
+        await recordXpsForQuest({
+          event_id: id,
+          user_id: payload.user_id,
+          event_created_at: payload.created_at,
+          action_metas,
+          scope: {
+            amount: payload.xp_amount,
+            award_reason: payload.reason,
+            awarded_by_user_id: payload.by_user_id,
+          },
+        });
+      },
     },
   };
 }

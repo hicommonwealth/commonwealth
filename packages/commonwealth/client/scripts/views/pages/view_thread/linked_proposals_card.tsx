@@ -81,7 +81,7 @@ export const LinkedProposalsCard = ({
           }`,
         );
       } else {
-        loadMultipleSpacesData(app.chain.meta?.snapshot_spaces || [])
+        loadMultipleSpacesData(app.chain?.meta?.snapshot_spaces || [])
           .then((data) => {
             for (const { space: _space, proposals } of data) {
               const matchingSnapshot = proposals.find(
@@ -124,8 +124,8 @@ export const LinkedProposalsCard = ({
     linkedProposals?.source === 'snapshot';
 
   if (
-    app.chain.meta.base !== ChainBase.Ethereum &&
-    app.chain.meta.base !== ChainBase.CosmosSDK
+    app.chain?.meta.base !== ChainBase.Ethereum &&
+    app.chain?.meta.base !== ChainBase.CosmosSDK
   ) {
     return <></>;
   }

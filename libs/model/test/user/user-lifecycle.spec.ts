@@ -23,6 +23,7 @@ import {
   UpdateRoleErrors,
 } from '../../src/aggregates/community';
 import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
+import { AwardXp } from '../../src/aggregates/super-admin';
 import { CreateThread } from '../../src/aggregates/thread';
 import {
   GetUserProfile,
@@ -399,6 +400,15 @@ describe('User lifecycle', () => {
           reward_amount: 10,
           creator_reward_weight: 0,
           participation_limit: QuestParticipationLimit.OncePerQuest,
+        },
+        {
+          id: -100,
+          quest_id: -1,
+          event_name: 'XpAwarded',
+          reward_amount: 0,
+          creator_reward_weight: 0,
+          participation_period: QuestParticipationPeriod.Daily,
+          participation_limit: QuestParticipationLimit.OncePerPeriod,
         },
       ]);
 
@@ -986,6 +996,62 @@ describe('User lifecycle', () => {
       expect(after!.xp_points).toBe(before!.xp_points! + 10 + 13);
     });
 
+    it('should award manual xp to a user and log the reason', async () => {
+      const initialProfile = await query(GetUserProfile(), {
+        actor: member,
+        payload: {},
+      });
+      const initialXp = initialProfile?.xp_points || 0;
+
+      const watermark = new Date();
+
+      // Award manual XP
+      const reason = 'Manual XP for test';
+      const xpAmount = 42;
+      await command(AwardXp(), {
+        actor: superadmin,
+        payload: {
+          user_id: member.user.id!,
+          xp_amount: xpAmount,
+          reason,
+        },
+      });
+
+      // drain the outbox
+      await drainOutbox(['XpAwarded'], Xp, watermark);
+
+      // Query updated profile
+      const user = await models.User.findOne({
+        where: { id: member.user.id },
+      });
+      expect(user?.xp_points).to.equal(initialXp + xpAmount);
+
+      // Query XP logs
+      const logs = await models.XpLog.findAll({
+        where: { user_id: member.user.id },
+        order: [['id', 'DESC']],
+      });
+      const manualLog = logs.find(
+        (l) => l.action_meta_id === -100 && l.scope?.award_reason === reason,
+      );
+      expect(manualLog).to.exist;
+      expect(manualLog?.xp_points).to.equal(xpAmount);
+      expect(manualLog?.scope?.award_reason).to.equal(reason);
+    });
+
+    it("should fail to award manual xp to a user if they've already awarded today", async () => {
+      expect(
+        command(AwardXp(), {
+          actor: superadmin,
+          payload: {
+            user_id: member.user.id!,
+            xp_amount: 42,
+            reason: 'Manual XP for test',
+          },
+        }),
+      ).rejects.toThrowError('User already has manual XP awards logged today');
+    });
+
     it('should query ranked by xp points', async () => {
       // dump xp logs to debug xp ranking
       const logs = await query(GetXps(), {
@@ -1009,11 +1075,18 @@ describe('User lifecycle', () => {
         payload: { top: 10 },
       });
       expect(xps1!.length).to.equal(4);
-      // member has 25+18+18+13+12+11+10+10+10+10+10=147 xp points + 4+10 creator points = 161 total
-      // admin has 11+10+10+5+5+5 xp points + 2+2 creator points = 50 total
-      // new_user has 16+11+10 xp points = 37 total
-      // superadmin has 11 xp points
-      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([161, 50, 37, 11]);
+      // member has
+      //   25+18+18+13+12+11+10+10+10+10+10=147 xp points
+      //   4+10 creator points
+      //   42 awarded points = 203 total
+      // admin has
+      //   11+10+10+5+5+5 xp points
+      //   2+2 creator points = 50 total
+      // new_user has
+      //   16+11+10 xp points = 37 total
+      // superadmin has
+      //   11 xp points
+      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([203, 50, 37, 11]);
 
       const xps2 = await query(GetXpsRanked(), {
         actor: admin,
@@ -1021,8 +1094,11 @@ describe('User lifecycle', () => {
       });
       expect(xps2!.length).to.equal(2);
       // new_user has 16 for SignUpFlowCompleted
-      // member has 10 for WalletLinked and 4 for SignUpFlowCompleted as referrer
-      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([16, 14]);
+      // member has
+      //   10 for WalletLinked
+      //   4 for SignUpFlowCompleted as referrer
+      //   42 for AwardXp
+      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([16, 56]);
     });
   });
 

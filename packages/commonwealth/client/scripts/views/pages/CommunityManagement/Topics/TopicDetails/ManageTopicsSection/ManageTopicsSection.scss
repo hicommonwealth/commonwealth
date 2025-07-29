@@ -58,6 +58,69 @@
         .CWIconButton {
           margin-left: 4px;
         }
+
+        .topic-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-left: 8px;
+
+          .recalculate-votes-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+
+            .last-refresh-text {
+              color: colors.$neutral-500;
+              font-size: 11px;
+              white-space: nowrap;
+            }
+          }
+        }
+      }
+    }
+
+    // Styles for draggable topics list
+    .height-preserving-container {
+      .topic-row {
+        @include topicRowStyles;
+        border: 1px solid colors.$neutral-200;
+        margin-bottom: 4px;
+        border-radius: 4px;
+
+        &:hover {
+          background-color: colors.$neutral-50;
+        }
+
+        &.is-dragging {
+          background-color: colors.$neutral-100;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .CWIconButton {
+          margin-left: 4px;
+        }
+
+        .topic-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-left: 8px;
+
+          .recalculate-votes-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+
+            .last-refresh-text {
+              color: colors.$neutral-500;
+              font-size: 11px;
+              white-space: nowrap;
+            }
+          }
+        }
       }
     }
   }

@@ -24,3 +24,5 @@ external-production-openapi.json
 external-openapi.json
 .eslintcache
 .envrc
+tracing
+latest.dump

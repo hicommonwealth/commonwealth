@@ -31,6 +31,7 @@ export function GetTopicById(): Query<typeof schemas.GetTopicById> {
           gatingGroups: groupGatedActions.map((gga) => ({
             id: gga.group_id,
             name: gga.Group?.metadata?.name ?? null,
+            is_private: gga.is_private,
           })),
         };
 

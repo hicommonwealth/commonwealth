@@ -19,11 +19,17 @@ import {
 import { openConfirmation } from './confirmation_modal';
 
 import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import clsx from 'clsx';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
+import useFetchGroupsQuery from 'state/api/groups/fetchGroups';
+import { useGroupTopicUpdater } from 'state/api/groups/useGroupTopicUpdater';
+import useGetTopicByIdQuery from 'state/api/topics/getTopicById';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWSelectList } from '../components/component_kit/new_designs/CWSelectList';
 import { ReactQuillEditor } from '../components/react_quill_editor';
 import './edit_topic_modal.scss';
 
@@ -38,12 +44,16 @@ export const EditTopicModal = ({
   onModalClose,
   noRedirect,
 }: EditTopicModalProps) => {
+  const privateTopicsEnabled = useFlag('privateTopics');
+
   const {
     description: descriptionProp,
     featured_in_sidebar: featuredInSidebarProp,
     id,
     name: nameProp,
   } = topic;
+
+  const utils = trpc.useUtils();
 
   const navigate = useCommonNavigate();
   const { mutateAsync: editTopic } = useEditTopicMutation();
@@ -68,6 +78,30 @@ export const EditTopicModal = ({
   const [name, setName] = useState<string>(nameProp);
   const [characterCount, setCharacterCount] = useState(0);
   const [descErrorMsg, setDescErrorMsg] = useState<string | null>(null);
+
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
+  const communityId = app.activeChainId() || '';
+
+  const { data: groups } = useFetchGroupsQuery({
+    communityId: communityId,
+    enabled: !!communityId,
+  });
+
+  const { data: topicData } = useGetTopicByIdQuery({
+    topicId: id ?? 0,
+    includeGatingGroups: true,
+    apiEnabled: !!id,
+  });
+
+  useEffect(() => {
+    if (topicData?.gatingGroups) {
+      setSelectedGroups(topicData.gatingGroups.map((g) => g.id));
+      setIsPrivate(topicData.gatingGroups.some((g) => g.is_private));
+    }
+  }, [topicData]);
+
+  const updateGroupTopicsBulk = useGroupTopicUpdater();
 
   const getCharacterCount = (delta) => {
     if (!delta || !delta.ops) {
@@ -124,6 +158,29 @@ export const EditTopicModal = ({
             ? JSON.stringify(newPostTemplate)
             : '',
       });
+
+      const updatedTopicId = id;
+      const prevGroupIds = topicData?.gatingGroups?.map((g) => g.id) || [];
+      const groupsToRemove = prevGroupIds.filter(
+        (groupId) => !selectedGroups.includes(groupId),
+      );
+
+      if (typeof updatedTopicId === 'number') {
+        await updateGroupTopicsBulk({
+          groupIds: groupsToRemove,
+          topicId: updatedTopicId,
+          remove: true,
+        });
+        await updateGroupTopicsBulk({
+          groupIds: selectedGroups,
+          topicId: updatedTopicId,
+          name,
+        });
+        await utils.community.getTopicById.invalidate({
+          topic_id: updatedTopicId,
+        });
+      }
+
       if (noRedirect) {
         onModalClose();
         notifySuccess('Settings saved.');
@@ -260,6 +317,27 @@ export const EditTopicModal = ({
           value=""
           disabled={!!topic.archived_at}
         />
+        {privateTopicsEnabled && (
+          <CWCheckbox
+            label="Private topic"
+            checked={isPrivate}
+            onChange={() => setIsPrivate(!isPrivate)}
+            disabled={!!topic.archived_at}
+          />
+        )}
+        {privateTopicsEnabled && isPrivate && (
+          <CWSelectList
+            isMulti
+            label="Allowed groups"
+            options={groups?.map((g) => ({ label: g.name, value: g.id }))}
+            value={groups
+              ?.filter((g) => selectedGroups.includes(g.id))
+              .map((g) => ({ label: g.name, value: g.id }))}
+            onChange={(selected) =>
+              setSelectedGroups(selected.map((opt) => opt.value))
+            }
+          />
+        )}
         <div
           className={clsx(
             'new-topic-template-section',

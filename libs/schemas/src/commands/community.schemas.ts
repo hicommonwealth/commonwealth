@@ -153,6 +153,7 @@ export const UpdateCommunity = {
       snapshot: Snapshot.or(z.array(Snapshot)).optional(),
       transactionHash: z.string().optional(),
       launchpad_weighted_voting: z.boolean().optional(),
+      launchpad_token_image: z.string().optional(),
     }),
   output: Community,
   context: AuthContext,
@@ -492,4 +493,16 @@ export const SetAddressWallet = {
   }),
   output: z.boolean(),
   context: AuthContext,
+};
+
+export const RefreshWeightedVotes = {
+  input: z.object({
+    topic_id: PG_INT,
+    community_id: z.string(),
+  }),
+  output: z.object({
+    topic_id: PG_INT,
+    community_id: z.string(),
+  }),
+  context: TopicContext,
 };

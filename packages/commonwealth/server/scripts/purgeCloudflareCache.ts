@@ -1,12 +1,6 @@
-import { logger } from '@hicommonwealth/core';
-import fetch from 'node-fetch';
-import { config } from '../config';
-
-const log = logger(import.meta);
-
 async function purgeCache(zoneId?: string, apiKey?: string) {
   if (!zoneId || !apiKey) {
-    log.warn('Missing Cloudflare env variables. Skipping cache purge');
+    console.warn('Missing Cloudflare env variables. Skipping cache purge');
     return;
   }
 
@@ -27,15 +21,18 @@ async function purgeCache(zoneId?: string, apiKey?: string) {
     });
 
     const responseData = await response.json();
-    log.info('Cache purge request successful:');
-    log.info(responseData);
+    if (response.status < 400 || responseData.success === false) {
+      console.error('Cache purge request failed', responseData);
+    } else {
+      console.info('Cache purge request successful:', responseData);
+    }
   } catch (error) {
-    log.error('Error purging cache:', error.message);
+    console.error('Error purging cache:', error.message);
   }
 }
 
-purgeCache(config.CLOUDFLARE.ZONE_ID, config.CLOUDFLARE.API_KEY)
-  .then(() => log.info('finished cloudflare purge script'))
+purgeCache(process.env.CF_ZONE_ID, process.env.CF_API_KEY)
+  .then(() => console.info('finished cloudflare purge script'))
   .catch((e) => {
-    log.error('cloudflare purge script failed:', e);
+    console.error('cloudflare purge script failed:', e);
   });
