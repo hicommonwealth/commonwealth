@@ -74,6 +74,7 @@ export function CreateThreadToken(): Command<typeof schemas.CreateThreadToken> {
           where: { token_address: tokenAddress.toLowerCase() },
           defaults: {
             token_address: tokenAddress.toLowerCase(),
+            namespace: '',
             name,
             symbol,
             initial_supply: Number(BigInt(totalSupply) / BigInt(1e18)),

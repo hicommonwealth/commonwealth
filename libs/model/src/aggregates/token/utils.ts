@@ -6,13 +6,11 @@ import {
 import {
   factoryContracts,
   getLaunchpadToken,
+  getPostTokenFunded,
   mustBeProtocolChainId,
   transferLaunchpadLiquidityToUniswap,
-} from '@hicommonwealth/evm-protocols';
-import {
-  getPostTokenFunded,
   transferPostLiquidityToUniswap,
-} from '@hicommonwealth/evm-protocols/src/common-protocol';
+} from '@hicommonwealth/evm-protocols';
 import { QueryTypes } from 'sequelize';
 import { config } from '../../config';
 import { models } from '../../database';
