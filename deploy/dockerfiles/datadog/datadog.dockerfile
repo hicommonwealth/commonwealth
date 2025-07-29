@@ -10,4 +10,6 @@ ENV DD_PROCESS_CONFIG_PROCESS_COLLECTION_ENABLED=false
 ENV DD_USE_DOGSTATSD=true
 ENV DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
 
+COPY deploy/dockerfiles/datadog/rabbitmq.yaml /etc/datadog-agent/conf.d/rabbitmq.d/conf.yaml
+
 ARG DD_API_KEY
