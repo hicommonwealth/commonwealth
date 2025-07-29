@@ -37,17 +37,13 @@ describe('Token Allocation Lifecycle', () => {
     });
 
     it('should throw error when magna sync exists', async () => {
-      const user_id = community.actors.admin.user.id;
+      const user_id = community.actors.admin.user.id!;
 
       // Create historical allocation with magna sync
       await models.HistoricalAllocations.create({
         user_id,
-        address: community.addresses.member.address,
-        created_at: new Date(),
-        updated_at: new Date(),
         magna_synced_at: new Date(),
         token_allocation: 100,
-        percent_allocation: 100,
         num_threads: 100,
         thread_score: 100,
         num_comments: 100,
