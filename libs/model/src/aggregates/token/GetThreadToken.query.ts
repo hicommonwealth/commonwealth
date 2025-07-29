@@ -3,26 +3,14 @@ import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
-import { mustExist } from '../../middleware/guards';
 
-export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
+export function GetThreadToken(): Query<typeof schemas.GetThreadToken> {
   return {
-    ...schemas.GetToken,
+    ...schemas.GetThreadToken,
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { community_id, with_stats } = payload;
-
-      const community = await models.Community.findOne({
-        where: {
-          id: community_id,
-        },
-      });
-      mustExist('Community', community);
-
-      if (!community.namespace) {
-        return null;
-      }
+      const { thread_id, with_stats } = payload;
 
       const sql = `
           ${
@@ -32,7 +20,7 @@ export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
                     ORDER BY token_address, timestamp DESC),
                     older_trades AS (SELECT DISTINCT ON (token_address) *
                       FROM "LaunchpadTrades"
-                      WHERE timestamp >=
+                      WHERE timestamp <=
                             (SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP - INTERVAL '24 hours'))
                       ORDER BY token_address, timestamp ASC),
                     trades AS (SELECT lt.token_address,
@@ -46,15 +34,14 @@ export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
           SELECT T.*${with_stats ? ', trades.latest_price, trades.old_price' : ''}
           FROM "LaunchpadTokens" as T
           ${with_stats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
-          WHERE T.namespace = :namespace;
+          LEFT JOIN "Threads" AS TT ON TT.launchpad_token_address = T.token_address
+          WHERE TT.id = :threadId;
       `;
 
       const token = await models.sequelize.query<
         z.infer<typeof schemas.TokenView>
       >(sql, {
-        replacements: {
-          namespace: community.namespace,
-        },
+        replacements: { threadId: thread_id },
         type: QueryTypes.SELECT,
       });
       if (!token || !Array.isArray(token) || token.length !== 1) return null;

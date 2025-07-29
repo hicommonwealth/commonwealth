@@ -21,18 +21,18 @@ export const GetTokens = {
 };
 
 export const GetToken = {
-  input: z
-    .object({
-      community_id: z.string().optional(),
-      thread_id: z.number().optional(),
-      with_stats: z.boolean().optional(),
-    })
-    .refine(
-      (data) => data.community_id !== undefined || data.thread_id !== undefined,
-      {
-        message: 'Either community_id or thread_id must be provided',
-      },
-    ),
+  input: z.object({
+    community_id: z.string(),
+    with_stats: z.boolean().optional(),
+  }),
+  output: z.union([TokenView, z.null()]),
+};
+
+export const GetThreadToken = {
+  input: z.object({
+    thread_id: z.number(),
+    with_stats: z.boolean().optional(),
+  }),
   output: z.union([TokenView, z.null()]),
 };
 
