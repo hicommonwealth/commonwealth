@@ -8,7 +8,7 @@ cd libs/model
 echo "Migrating DB..."
 echo ""
 
-npx -y --package=sequelize@^6.32.1 --package=sequelize-cli@^6.2.0 --package=pg@^8.11.3 sequelize-cli db:migrate --config sequelize.json
+npx -y --package=sequelize@^6.32.1 --package=sequelize-cli@^6.2.0 --package=pg@^8.11.3 sequelize-cli db:migrate --config sequelize.js
 echo ""
 
 # Purge the Cloudflare Cache
