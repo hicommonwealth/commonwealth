@@ -100,8 +100,8 @@ const StakeIntegration = ({
         {stakeEnabled ? (
           <>
             <ContractInfo
-              contractAddress={contractInfo?.factory}
-              smartContractAddress={contractInfo?.communityStake}
+              contractAddress={contractInfo?.NamespaceFactory}
+              smartContractAddress={contractInfo?.CommunityStake}
               voteWeightPerStake="1"
               namespace={community?.namespace}
               symbol={community?.default_symbol}

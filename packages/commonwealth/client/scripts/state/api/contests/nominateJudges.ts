@@ -20,7 +20,7 @@ const nominateJudges = async ({
   ethChainId,
   chainRpc,
 }: NominateJudgesProps) => {
-  const contractAddress = factoryContracts[ethChainId]?.communityNomination;
+  const contractAddress = factoryContracts[ethChainId]?.CommunityNominations;
 
   if (!contractAddress) {
     throw new Error(`Contract address not found for chain ID ${ethChainId}`);

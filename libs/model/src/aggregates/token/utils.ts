@@ -4,7 +4,7 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import {
-  factoryContracts,
+  getFactoryContract,
   getLaunchpadToken,
   mustBeProtocolChainId,
   transferLaunchpadLiquidityToUniswap,
@@ -73,18 +73,10 @@ export async function handleCapReached(
     !token.liquidity_transferred &&
     remainingLiquidity < transferLiquidityThreshold
   ) {
-    const contracts = factoryContracts[eth_chain_id];
-    const lpBondingCurveAddress = (contracts as { lpBondingCurve: string })
-      .lpBondingCurve;
-
-    if (!lpBondingCurveAddress) {
-      throw new Error('Token bondingCurveAddress not found');
-    }
-
     const onChainTokenData = await getLaunchpadToken({
       rpc: url,
       tokenAddress: token_address,
-      lpBondingCurveAddress,
+      lpBondingCurveAddress: getFactoryContract(eth_chain_id).LPBondingCurve,
     });
 
     mustExist('env LAUNCHPAD_PRIVATE_KEY', !!config.WEB3.LAUNCHPAD_PRIVATE_KEY);
@@ -93,7 +85,7 @@ export async function handleCapReached(
       await transferLaunchpadLiquidityToUniswap({
         rpc: url,
         tokenAddress: token_address,
-        lpBondingCurveAddress,
+        lpBondingCurveAddress: getFactoryContract(eth_chain_id).LPBondingCurve,
         privateKey: config.WEB3.LAUNCHPAD_PRIVATE_KEY!,
       });
 

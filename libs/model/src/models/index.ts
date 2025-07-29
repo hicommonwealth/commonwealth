@@ -22,6 +22,35 @@ export const syncDb = async (db: DB, log = false) => {
       ADD CONSTRAINT xp_logs_user_id_action_meta_id_event_created_at_name
         UNIQUE NULLS NOT DISTINCT (user_id, action_meta_id, event_created_at, name);
   `);
+
+  await db.sequelize.query(`
+CREATE OR REPLACE FUNCTION public.notify_insert_outbox_function()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NEW.relayed = false THEN
+    PERFORM pg_notify('outbox_channel', NEW.event_id::TEXT);
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_trigger
+    WHERE tgname = 'outbox_insert_trigger'
+  ) THEN
+    CREATE TRIGGER outbox_insert_trigger
+    AFTER INSERT ON public."Outbox"
+    FOR EACH ROW
+    EXECUTE FUNCTION public.notify_insert_outbox_function();
+  END IF;
+END;
+$$;
+  `);
 };
 
 /**
