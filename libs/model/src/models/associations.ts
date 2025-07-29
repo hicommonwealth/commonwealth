@@ -164,7 +164,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     });
 
-  db.ThreadTokenTrade.withOne(db.ThreadToken, {
+  db.ThreadToken.withMany(db.ThreadTokenTrade, {
     foreignKey: 'token_address',
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
