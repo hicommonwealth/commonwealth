@@ -7,59 +7,10 @@ import {
   LaunchpadAbi,
   NamespaceFactoryAbi,
   ReferralFeeManagerAbi,
-  TokenBondingCurveAbi,
   TokenCommunityManagerAbi,
-  TokenLaunchpadAbi,
 } from '@commonxyz/common-protocol-abis';
-import { veBridgeAbi } from '../abis/veBridgeAbi';
-import { ValidChains, factoryContracts } from '../common-protocol';
+import { ValidChains, getFactoryContract } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
-
-type ContractAddresses = {
-  [key in ValidChains]:
-    | (typeof factoryContracts)[key]['factory']
-    | (typeof factoryContracts)[key]['communityStake']
-    | (key extends keyof typeof factoryContracts
-        ? 'communityNomination' extends keyof (typeof factoryContracts)[key]
-          ? (typeof factoryContracts)[key]['communityNomination']
-          : never
-        : never)
-    | (key extends keyof typeof factoryContracts
-        ? 'launchpad' extends keyof (typeof factoryContracts)[key]
-          ? (typeof factoryContracts)[key]['launchpad']
-          : never
-        : never)
-    | (key extends keyof typeof factoryContracts
-        ? 'lpBondingCurve' extends keyof (typeof factoryContracts)[key]
-          ? (typeof factoryContracts)[key]['lpBondingCurve']
-          : never
-        : never)
-    | (key extends keyof typeof factoryContracts
-        ? 'tokenCommunityManager' extends keyof (typeof factoryContracts)[key]
-          ? (typeof factoryContracts)[key]['tokenCommunityManager']
-          : never
-        : never)
-    | (key extends keyof typeof factoryContracts
-        ? 'referralFeeManager' extends keyof (typeof factoryContracts)[key]
-          ? (typeof factoryContracts)[key]['referralFeeManager']
-          : never
-        : never)
-    | (key extends keyof typeof factoryContracts
-        ? 'veBridge' extends keyof (typeof factoryContracts)[key]
-          ? (typeof factoryContracts)[key]['veBridge']
-          : never
-        : never)
-    | (key extends keyof typeof factoryContracts
-        ? 'tokenLaunchpad' extends keyof (typeof factoryContracts)[key]
-          ? (typeof factoryContracts)[key]['tokenLaunchpad']
-          : never
-        : never)
-    | (key extends keyof typeof factoryContracts
-        ? 'tokenBondingCurve' extends keyof (typeof factoryContracts)[key]
-          ? (typeof factoryContracts)[key]['tokenBondingCurve']
-          : never
-        : never);
-};
 
 // Unique names used to identify contracts that are deployed by users at runtime
 export enum ChildContractNames {
@@ -78,12 +29,6 @@ export type ContractSource = {
       abi: Readonly<Array<unknown>>;
       eventSignatures: Array<EvmEventSignature>;
     };
-  };
-};
-
-export type EventRegistryType = {
-  [key in ValidChains]: {
-    [address in ContractAddresses[key]]: ContractSource;
   };
 };
 
@@ -150,19 +95,6 @@ const referralFeeManagerSource: ContractSource = {
   eventSignatures: [EvmEventSignatures.Referrals.FeeDistributed],
 };
 
-const tokenStakingSource: ContractSource = {
-  abi: veBridgeAbi,
-  eventSignatures: [
-    EvmEventSignatures.TokenStaking.TokenLocked,
-    EvmEventSignatures.TokenStaking.TokenLockDurationIncreased,
-    EvmEventSignatures.TokenStaking.TokenUnlocked,
-    EvmEventSignatures.TokenStaking.TokenPermanentConverted,
-    EvmEventSignatures.TokenStaking.TokenDelegated,
-    EvmEventSignatures.TokenStaking.TokenUndelegated,
-    EvmEventSignatures.TokenStaking.TokenMerged,
-  ],
-};
-
 const tokenLaunchpadSource: ContractSource = {
   abi: TokenLaunchpadAbi,
   eventSignatures: [
@@ -187,85 +119,100 @@ const tokenBondingCurveSource: ContractSource = {
  */
 export const EventRegistry = {
   [ValidChains.Base]: {
-    [factoryContracts[ValidChains.Base].factory]: namespaceFactorySource,
-    [factoryContracts[ValidChains.Base].communityStake]: communityStakesSource,
-    [factoryContracts[ValidChains.Base].launchpad]: launchpadSource,
-    [factoryContracts[ValidChains.Base].lpBondingCurve]: lpBondingCurveSource,
-    [factoryContracts[ValidChains.Base].tokenCommunityManager]:
+    [getFactoryContract(ValidChains.Base).NamespaceFactory]:
+      namespaceFactorySource,
+    [getFactoryContract(ValidChains.Base).CommunityStake]:
+      communityStakesSource,
+    [getFactoryContract(ValidChains.Base).Launchpad]: launchpadSource,
+    [getFactoryContract(ValidChains.Base).LPBondingCurve]: lpBondingCurveSource,
+    [getFactoryContract(ValidChains.Base).TokenCommunityManager]:
       tokenCommunityManagerSource,
-    [factoryContracts[ValidChains.Base].referralFeeManager]:
+    [getFactoryContract(ValidChains.Base).ReferralFeeManager]:
       referralFeeManagerSource,
   },
   [ValidChains.SepoliaBase]: {
-    [factoryContracts[ValidChains.SepoliaBase].factory]: namespaceFactorySource,
-    [factoryContracts[ValidChains.SepoliaBase].communityNomination]:
+    [getFactoryContract(ValidChains.SepoliaBase).NamespaceFactory]:
+      namespaceFactorySource,
+    [getFactoryContract(ValidChains.SepoliaBase).CommunityNominations]:
       communityNominationsSource,
-    [factoryContracts[ValidChains.SepoliaBase].communityStake]:
+    [getFactoryContract(ValidChains.SepoliaBase).CommunityStake]:
       communityStakesSource,
-    [factoryContracts[ValidChains.SepoliaBase].launchpad]: launchpadSource,
-    [factoryContracts[ValidChains.SepoliaBase].lpBondingCurve]:
+    [getFactoryContract(ValidChains.SepoliaBase).Launchpad]: launchpadSource,
+    [getFactoryContract(ValidChains.SepoliaBase).LPBondingCurve]:
       lpBondingCurveSource,
-    [factoryContracts[ValidChains.SepoliaBase].tokenCommunityManager]:
+    [getFactoryContract(ValidChains.SepoliaBase).TokenCommunityManager]:
       tokenCommunityManagerSource,
-    [factoryContracts[ValidChains.SepoliaBase].referralFeeManager]:
+    [getFactoryContract(ValidChains.SepoliaBase).ReferralFeeManager]:
       referralFeeManagerSource,
-    [factoryContracts[ValidChains.SepoliaBase].veBridge]: tokenStakingSource,
-    [factoryContracts[ValidChains.SepoliaBase].tokenLaunchpad]:
+    [getFactoryContract(ValidChains.SepoliaBase).TokenLaunchpad]:
       tokenLaunchpadSource,
-    [factoryContracts[ValidChains.SepoliaBase].tokenBondingCurve]:
+    [getFactoryContract(ValidChains.SepoliaBase).TokenBondingCurve]:
       tokenBondingCurveSource,
   },
   [ValidChains.Sepolia]: {
-    [factoryContracts[ValidChains.Sepolia].factory]: namespaceFactorySource,
-    [factoryContracts[ValidChains.Sepolia].communityStake]:
+    [getFactoryContract(ValidChains.Sepolia).NamespaceFactory]:
+      namespaceFactorySource,
+    [getFactoryContract(ValidChains.Sepolia).CommunityStake]:
       communityStakesSource,
   },
   [ValidChains.Blast]: {
-    [factoryContracts[ValidChains.Blast].factory]: namespaceFactorySource,
-    [factoryContracts[ValidChains.Blast].communityStake]: communityStakesSource,
+    [getFactoryContract(ValidChains.Blast).NamespaceFactory]:
+      namespaceFactorySource,
+    [getFactoryContract(ValidChains.Blast).CommunityStake]:
+      communityStakesSource,
   },
   [ValidChains.Linea]: {
-    [factoryContracts[ValidChains.Linea].factory]: namespaceFactorySource,
-    [factoryContracts[ValidChains.Linea].communityStake]: communityStakesSource,
+    [getFactoryContract(ValidChains.Linea).NamespaceFactory]:
+      namespaceFactorySource,
+    [getFactoryContract(ValidChains.Linea).CommunityStake]:
+      communityStakesSource,
   },
   [ValidChains.Optimism]: {
-    [factoryContracts[ValidChains.Optimism].factory]: namespaceFactorySource,
-    [factoryContracts[ValidChains.Optimism].communityStake]:
+    [getFactoryContract(ValidChains.Optimism).NamespaceFactory]:
+      namespaceFactorySource,
+    [getFactoryContract(ValidChains.Optimism).CommunityStake]:
       communityStakesSource,
   },
   [ValidChains.Mainnet]: {
-    [factoryContracts[ValidChains.Mainnet].factory]: namespaceFactorySource,
-    [factoryContracts[ValidChains.Mainnet].communityStake]:
+    [getFactoryContract(ValidChains.Mainnet).NamespaceFactory]:
+      namespaceFactorySource,
+    [getFactoryContract(ValidChains.Mainnet).CommunityStake]:
       communityStakesSource,
   },
   [ValidChains.Arbitrum]: {
-    [factoryContracts[ValidChains.Arbitrum].factory]: namespaceFactorySource,
-    [factoryContracts[ValidChains.Arbitrum].communityStake]:
+    [getFactoryContract(ValidChains.Arbitrum).NamespaceFactory]:
+      namespaceFactorySource,
+    [getFactoryContract(ValidChains.Arbitrum).CommunityStake]:
       communityStakesSource,
   },
   [ValidChains.BSC]: {
-    [factoryContracts[ValidChains.BSC].factory]: namespaceFactorySource,
-    [factoryContracts[ValidChains.BSC].communityStake]: communityStakesSource,
+    [getFactoryContract(ValidChains.BSC).NamespaceFactory]:
+      namespaceFactorySource,
+    [getFactoryContract(ValidChains.BSC).CommunityStake]: communityStakesSource,
   },
   [ValidChains.SKALE_TEST]: {
-    [factoryContracts[ValidChains.SKALE_TEST].factory]: namespaceFactorySource,
-    [factoryContracts[ValidChains.SKALE_TEST].communityStake]:
+    [getFactoryContract(ValidChains.SKALE_TEST).NamespaceFactory]:
+      namespaceFactorySource,
+    [getFactoryContract(ValidChains.SKALE_TEST).CommunityStake]:
       communityStakesSource,
   },
   [ValidChains.Anvil]: {
-    [factoryContracts[ValidChains.Anvil].factory]: namespaceFactorySource,
-    [factoryContracts[ValidChains.Anvil].communityStake]: communityStakesSource,
-    [factoryContracts[ValidChains.Anvil].communityNomination]:
+    [getFactoryContract(ValidChains.Anvil).NamespaceFactory]:
+      namespaceFactorySource,
+    [getFactoryContract(ValidChains.Anvil).CommunityStake]:
+      communityStakesSource,
+    [getFactoryContract(ValidChains.Anvil).CommunityNominations]:
       communityNominationsSource,
-    [factoryContracts[ValidChains.Anvil].launchpad]: launchpadSource,
-    [factoryContracts[ValidChains.Anvil].lpBondingCurve]: lpBondingCurveSource,
-    [factoryContracts[ValidChains.Anvil].tokenCommunityManager]:
+    [getFactoryContract(ValidChains.Anvil).Launchpad]: launchpadSource,
+    [getFactoryContract(ValidChains.Anvil).LPBondingCurve]:
+      lpBondingCurveSource,
+    [getFactoryContract(ValidChains.Anvil).TokenCommunityManager]:
       tokenCommunityManagerSource,
-    [factoryContracts[ValidChains.Anvil].referralFeeManager]:
+    [getFactoryContract(ValidChains.Anvil).ReferralFeeManager]:
       referralFeeManagerSource,
-    [factoryContracts[ValidChains.Anvil].veBridge]: tokenStakingSource,
-    [factoryContracts[ValidChains.Anvil].tokenLaunchpad]: tokenLaunchpadSource,
-    [factoryContracts[ValidChains.Anvil].tokenBondingCurve]:
+    [getFactoryContract(ValidChains.Anvil).TokenLaunchpad]:
+      tokenLaunchpadSource,
+    [getFactoryContract(ValidChains.Anvil).TokenBondingCurve]:
       tokenBondingCurveSource,
   },
-} as const satisfies EventRegistryType;
+};

@@ -20,6 +20,7 @@ export const communityProfileValidationSchema = z.object({
   communityProfileImageURL: z.string({
     invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
   }),
+  updateTokenImage: z.boolean().default(false),
   defaultPage: z.string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT }),
   hasStagesEnabled: z.boolean({
     invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,

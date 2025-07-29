@@ -47,4 +47,5 @@ export const trpcRouter = trpc.router({
     trpc.Tag.SuperAdmin,
   ),
   rerankThreads: trpc.command(SuperAdmin.RerankThreads, trpc.Tag.SuperAdmin),
+  awardXp: trpc.command(SuperAdmin.AwardXp, trpc.Tag.SuperAdmin),
 });

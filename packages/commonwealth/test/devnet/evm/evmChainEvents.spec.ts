@@ -3,8 +3,8 @@ import {
   ChildContractNames,
   EvmEventSignatures,
   ValidChains,
-  factoryContracts,
   getBlockNumber,
+  getFactoryContract,
 } from '@hicommonwealth/evm-protocols';
 import {
   CommunityStake,
@@ -47,7 +47,7 @@ import { startEvmPolling } from '../../../server/workers/evmChainEvents/startEvm
 vi.mock('../../../server/workers/evmChainEvents/getEventSources');
 
 const namespaceDeployedLog = {
-  address: factoryContracts[ValidChains.SepoliaBase].factory,
+  address: getFactoryContract(ValidChains.SepoliaBase).NamespaceFactory,
   topics: [EvmEventSignatures.NamespaceFactory.NamespaceDeployed],
   // eslint-disable-next-line max-len
   data: '0x0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb9226600000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266000000000000000000000000000000000000000000000000000000000000001363657465737431373237373734373236393138000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
@@ -61,13 +61,15 @@ const namespaceDeployedLog = {
   logIndex: 4,
   removed: false,
 };
-const namespaceFactoryAddress =
-  factoryContracts[ValidChains.SepoliaBase].factory;
+const namespaceFactoryAddress = getFactoryContract(
+  ValidChains.SepoliaBase,
+).NamespaceFactory;
 const namespaceFactory = new NamespaceFactory();
 const namespaceName = `cetest${new Date().getTime()}`;
 
-const communityStakeAddress =
-  factoryContracts[ValidChains.SepoliaBase].communityStake;
+const communityStakeAddress = getFactoryContract(
+  ValidChains.SepoliaBase,
+).CommunityStake;
 const communityStake = new CommunityStake();
 
 describe('EVM Chain Events Devnet Tests', () => {
@@ -146,7 +148,7 @@ describe('EVM Chain Events Devnet Tests', () => {
           rpc: localRpc,
           maxBlockRange: 10,
           contractAddresses: [
-            factoryContracts[ValidChains.SepoliaBase].factory,
+            getFactoryContract(ValidChains.SepoliaBase).NamespaceFactory,
           ],
           startingBlockNum: namespaceDeployedBlock - 11,
           endingBlockNum: namespaceDeployedBlock - 1,
@@ -158,7 +160,7 @@ describe('EVM Chain Events Devnet Tests', () => {
           rpc: localRpc,
           maxBlockRange: 500,
           contractAddresses: [
-            factoryContracts[ValidChains.SepoliaBase].factory,
+            getFactoryContract(ValidChains.SepoliaBase).NamespaceFactory,
           ],
           startingBlockNum: namespaceDeployedBlock,
           endingBlockNum: namespaceDeployedBlock,
@@ -206,7 +208,8 @@ describe('EVM Chain Events Devnet Tests', () => {
         [
           namespaceDeployedLog,
           {
-            address: factoryContracts[ValidChains.SepoliaBase].factory,
+            address: getFactoryContract(ValidChains.SepoliaBase)
+              .NamespaceFactory,
             topics: ['0xfake_topic'],
           } as Log,
         ],
@@ -371,7 +374,7 @@ describe('EVM Chain Events Devnet Tests', () => {
       { timeout: 80_000 },
       async () => {
         const stakeAddress =
-          factoryContracts[sepoliaBaseChainId].communityStake;
+          getFactoryContract(sepoliaBaseChainId).CommunityStake;
 
         const { getEventSources } = await import(
           '../../../server/workers/evmChainEvents/getEventSources'

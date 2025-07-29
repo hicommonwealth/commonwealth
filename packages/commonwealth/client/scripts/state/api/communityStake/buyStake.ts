@@ -1,8 +1,8 @@
-import { factoryContracts } from '@hicommonwealth/evm-protocols';
+import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
+import { lazyLoadCommunityStakes } from 'helpers/ContractHelpers/LazyCommunityStakes';
 import { ContractMethods, queryClient } from 'state/api/config';
 import { setActiveAccountOnTransactionSuccess } from 'views/modals/ManageCommunityStakeModal/utils';
-import { lazyLoadCommunityStakes } from '../../../helpers/ContractHelpers/LazyCommunityStakes';
 
 interface BuyStakeProps {
   namespace: string;
@@ -11,7 +11,6 @@ interface BuyStakeProps {
   chainRpc: string;
   walletAddress: string;
   ethChainId: number;
-  chainId?: string;
 }
 
 const buyStake = async ({
@@ -21,12 +20,11 @@ const buyStake = async ({
   chainRpc,
   walletAddress,
   ethChainId,
-  chainId,
 }: BuyStakeProps) => {
   const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
-    factoryContracts[ethChainId].communityStake,
-    factoryContracts[ethChainId].factory,
+    getFactoryContract(ethChainId).CommunityStake,
+    getFactoryContract(ethChainId).NamespaceFactory,
     chainRpc,
     `${ethChainId}`,
   );
