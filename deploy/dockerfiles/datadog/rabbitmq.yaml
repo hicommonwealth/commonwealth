@@ -1,9 +1,9 @@
 init_config:
 
 instances:
-  - rabbitmq_api_url: %%env_RABBITMQ_API_URL%%
-    rabbitmq_user: %%env_RABBITMQ_DEFAULT_USER%%
-    rabbitmq_pass: %%env_RABBITMQ_DEFAULT_PASS%%
-    tag_families: true
-    vhosts:
-      - /
+  rabbitmq_api_url: %%env_RABBITMQ_API_URL%%
+  rabbitmq_user: %%env_RABBITMQ_DEFAULT_USER%%
+  rabbitmq_pass: %%env_RABBITMQ_DEFAULT_PASS%%
+  tag_families: true
+  vhosts:
+    - /
