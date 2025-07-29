@@ -219,6 +219,10 @@ export const trpcRouter = trpc.router({
     Community.SetAddressWallet,
     trpc.Tag.Community,
   ),
+  setCommunityMcpServers: trpc.command(
+    Community.SetCommunityMCPServers,
+    trpc.Tag.Community,
+  ),
   getRoles: trpc.query(Community.GetRoles, trpc.Tag.Community),
   refreshWeightedVotes: trpc.command(
     Community.RefreshWeightedVotes,

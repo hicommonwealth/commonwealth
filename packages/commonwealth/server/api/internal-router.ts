@@ -18,6 +18,7 @@ import * as search from './search';
 import * as subscription from './subscription';
 import * as superAdmin from './super-admin';
 import * as tag from './tag';
+import * as mcpServers from './mcp-servers';
 import * as thread from './thread';
 import * as user from './user';
 import * as wallet from './wallet';
@@ -42,6 +43,7 @@ const api = {
   tag: tag.trpcRouter,
   search: search.trpcRouter,
   configuration: configuration.trpcRouter,
+  mcpServers: mcpServers.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {
