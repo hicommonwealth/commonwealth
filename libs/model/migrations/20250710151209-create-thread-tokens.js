@@ -12,7 +12,7 @@ export default {
             allowNull: false,
             primaryKey: true,
           },
-          thread_id: { type: Sequelize.STRING, allowNull: false },
+          thread_id: { type: Sequelize.INTEGER, allowNull: false },
           namespace: { type: Sequelize.STRING, allowNull: true },
           name: { type: Sequelize.STRING, allowNull: false },
           symbol: { type: Sequelize.STRING, allowNull: false },

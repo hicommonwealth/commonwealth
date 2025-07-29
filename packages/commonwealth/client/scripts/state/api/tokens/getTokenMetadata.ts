@@ -1,3 +1,4 @@
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { fetchCachedNodes } from 'state/api/nodes';
@@ -19,9 +20,11 @@ export const getTokenMetadata = async ({
   tokenId,
   nodeEthChainId,
 }: UseTokenMetadataQueryProps): Promise<GetTokenMetadataResponse> => {
-  const node = fetchCachedNodes()?.find(
-    (n) => n?.ethChainId === nodeEthChainId,
-  );
+  const nodeToFind =
+    nodeEthChainId === ValidChains.Anvil
+      ? ValidChains.SepoliaBase
+      : nodeEthChainId;
+  const node = fetchCachedNodes()?.find((n) => n?.ethChainId === nodeToFind);
 
   if (!node) {
     throw new Error('Node not found');

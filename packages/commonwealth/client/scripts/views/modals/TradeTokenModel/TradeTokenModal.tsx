@@ -7,7 +7,8 @@ const TradeTokenModal = ({
   isOpen,
   onModalClose,
   tradeConfig,
-}: TradeTokenModalProps) => {
+  communityId,
+}: TradeTokenModalProps & { communityId?: string }) => {
   if (tradeConfig.mode === TradingMode.Swap) {
     return (
       <UniswapTradeModal
@@ -23,6 +24,7 @@ const TradeTokenModal = ({
       isOpen={isOpen}
       tradeConfig={tradeConfig}
       onModalClose={onModalClose}
+      communityId={communityId}
     />
   );
 };

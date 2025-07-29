@@ -13,10 +13,12 @@ export type CommonTradingConfig = {
   mode: TradingMode.Buy | TradingMode.Sell;
   token: LaunchpadToken;
   addressType: ChainBase;
+  thread_token_initialize?: boolean;
 };
 
 export type CommonTradeTokenModalProps = {
   isOpen: boolean;
   onModalClose?: () => void;
   tradeConfig: CommonTradingConfig;
+  communityId?: string;
 };

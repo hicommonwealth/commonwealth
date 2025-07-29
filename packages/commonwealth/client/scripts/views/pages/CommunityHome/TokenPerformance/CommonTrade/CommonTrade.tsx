@@ -17,7 +17,7 @@ export type CommonTradeProps = Omit<
   'isOpen' | 'onModalClose'
 >;
 
-const CommonTrade = ({ tradeConfig }: CommonTradeProps) => {
+const CommonTrade = ({ tradeConfig, communityId }: CommonTradeProps) => {
   const { trading, addresses, isActionPending, onCTAClick } =
     useCommonTradeTokenForm({
       tradeConfig: {
@@ -26,6 +26,7 @@ const CommonTrade = ({ tradeConfig }: CommonTradeProps) => {
         buyTokenPresetAmounts: [100, 300, 1000],
         sellTokenPresetAmounts: ['Max'],
       },
+      communityId: communityId,
       addressType: tradeConfig.addressType,
       onTradeComplete: () => {},
     });

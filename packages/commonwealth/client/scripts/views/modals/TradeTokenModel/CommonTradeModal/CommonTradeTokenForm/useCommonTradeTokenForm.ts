@@ -19,6 +19,7 @@ const useCommonTradeTokenForm = ({
   tradeConfig,
   addressType,
   onTradeComplete,
+  communityId,
 }: UseCommonTradeTokenFormProps) => {
   const [tradingMode, setTradingMode] = useState<TradingMode>(
     tradeConfig.mode || TradingMode.Buy,
@@ -54,8 +55,8 @@ const useCommonTradeTokenForm = ({
 
   const { data: tokenCommunity, isLoading: isLoadingTokenCommunity } =
     useGetCommunityByIdQuery({
-      id: tradeConfig.token.community_id,
-      enabled: !!tradeConfig.token.community_id,
+      id: tradeConfig.token.community_id || communityId,
+      enabled: !!tradeConfig.token.community_id || !!communityId,
       includeNodeInfo: true,
     });
 
@@ -99,6 +100,7 @@ const useCommonTradeTokenForm = ({
     commonFeePercentage: COMMON_PLATFORM_FEE_PERCENTAGE,
     tradeConfig,
     onTradeComplete,
+    threadTokenInitialize: tradeConfig.thread_token_initialize,
     tokenCommunity: tokenCommunity as z.infer<typeof ExtendedCommunity>,
   });
 

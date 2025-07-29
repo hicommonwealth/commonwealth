@@ -21,6 +21,7 @@ const CommonTradeModal = ({
   isOpen,
   onModalClose,
   tradeConfig,
+  communityId,
 }: CommonTradeTokenModalProps) => {
   const { trading, addresses, isActionPending, onCTAClick } =
     useCommonTradeTokenForm({
@@ -30,6 +31,7 @@ const CommonTradeModal = ({
         buyTokenPresetAmounts: [100, 300, 1000],
         sellTokenPresetAmounts: ['25%', '50%', '75%', 'Max'],
       },
+      communityId,
       addressType: tradeConfig.addressType,
       onTradeComplete: () => onModalClose?.(),
     });

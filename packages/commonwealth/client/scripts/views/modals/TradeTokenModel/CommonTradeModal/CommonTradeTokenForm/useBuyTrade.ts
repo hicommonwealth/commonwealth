@@ -20,6 +20,7 @@ const useBuyTrade = ({
   selectedAddress,
   commonFeePercentage,
   onTradeComplete,
+  threadTokenInitialize,
 }: UseBuyTradeProps) => {
   const user = useUserStore();
   const [baseCurrencyBuyAmountString, setBaseCurrencyBuyAmountString] =
