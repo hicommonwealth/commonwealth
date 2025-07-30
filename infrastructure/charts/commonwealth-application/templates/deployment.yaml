@@ -20,6 +20,12 @@ spec:
       containers:
         - name: commonwealth-server{{ .Values.commonwealthServerSuffix }}
           image: {{ .Values.cwServerImage }}
+          command:
+            - node
+          args:
+            - --import=extensionless/register
+            - --enable-source-maps
+            - ./build/server.js
           volumeMounts:
             - name: env-volume
               mountPath: /app/.env #TODO: Filepath inside the container. Fix
