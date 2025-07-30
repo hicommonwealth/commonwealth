@@ -1,3 +1,4 @@
+import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import { buildUpdateGroupInput } from 'client/scripts/state/api/groups/editGroup';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -53,6 +54,11 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const [allowedAddresses, setAllowedAddresses] = useState<string[]>(
     initialAllowlist ?? [],
   );
+
+  useRunOnceOnCondition({
+    callback: () => setAllowedAddresses(initialAllowlist),
+    shouldRun: initialAllowlist?.length > 0,
+  });
 
   const { isAddedToHomeScreen } = useAppStatus();
 

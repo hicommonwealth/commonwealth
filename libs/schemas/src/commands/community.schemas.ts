@@ -153,6 +153,7 @@ export const UpdateCommunity = {
       snapshot: Snapshot.or(z.array(Snapshot)).optional(),
       transactionHash: z.string().optional(),
       launchpad_weighted_voting: z.boolean().optional(),
+      launchpad_token_image: z.string().optional(),
     }),
   output: Community,
   context: AuthContext,
