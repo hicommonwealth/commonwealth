@@ -96,6 +96,7 @@ const {
   UNLEASH_FRONTEND_API_TOKEN,
   CONTEST_DURATION_IN_SEC,
   REORG_SAFETY_DISABLED,
+  SEND_EMAILS,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -319,6 +320,7 @@ export const config = configure(
         KNOCK_PUBLIC_API_KEY || DEFAULTS.KNOCK_PUBLIC_API_KEY,
       KNOCK_IN_APP_FEED_ID:
         KNOCK_IN_APP_FEED_ID || DEFAULTS.KNOCK_IN_APP_FEED_ID,
+      SEND_EMAILS: SEND_EMAILS === 'true',
     },
     UNLEASH: {
       FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
@@ -702,6 +704,7 @@ export const config = configure(
           requiredServices: [...WebServices, 'knock', 'consumer'],
         }),
       ),
+      SEND_EMAILS: z.boolean(),
     }),
     UNLEASH: z.object({
       FRONTEND_API_TOKEN: z

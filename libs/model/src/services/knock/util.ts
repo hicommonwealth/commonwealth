@@ -1,4 +1,4 @@
-import { config } from '@hicommonwealth/model';
+import { config } from '../../config';
 
 function parseCustomDomain(customDomain: string) {
   let parsedDomain = customDomain;
