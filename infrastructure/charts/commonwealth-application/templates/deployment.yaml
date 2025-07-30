@@ -28,7 +28,7 @@ spec:
             - ./build/server.js
           volumeMounts:
             - name: env-volume
-              mountPath: /app/.env #TODO: Filepath inside the container. Fix
+              mountPath: /prod/commonwealth
               subPath: .env
           ports:
             - containerPort: 8080
