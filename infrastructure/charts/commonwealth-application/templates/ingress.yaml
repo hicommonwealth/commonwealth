@@ -19,7 +19,7 @@ spec:
               service:
                 name: commonwealth-server{{ .Values.commonwealthServerSuffix }}
                 port:
-                  number: 8080
+                  number: 80
   tls:
     - hosts:
         - {{ .Values.hostUrl }}

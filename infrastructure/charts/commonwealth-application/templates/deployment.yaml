@@ -28,7 +28,7 @@ spec:
             - ./build/server.js
           volumeMounts:
             - name: env-volume
-              mountPath: /prod/commonwealth
+              mountPath: /prod/commonwealth/.env
               subPath: .env
           ports:
             - containerPort: 8080
