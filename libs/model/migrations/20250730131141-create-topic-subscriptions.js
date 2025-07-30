@@ -13,6 +13,7 @@ export default {
             model: 'Users',
             key: 'id',
           },
+          onDelete: 'CASCADE',
         },
         topic_id: {
           type: Sequelize.INTEGER,
@@ -22,6 +23,7 @@ export default {
             model: 'Topics',
             key: 'id',
           },
+          onDelete: 'CASCADE',
         },
         created_at: {
           type: Sequelize.DATE,
@@ -33,7 +35,7 @@ export default {
         },
       });
 
-      await queryInterface.createIndex('TopicSubscriptions', 'topic_id', {
+      await queryInterface.addIndex('TopicSubscriptions', ['topic_id'], {
         transaction,
       });
     });

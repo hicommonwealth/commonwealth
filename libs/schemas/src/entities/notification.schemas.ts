@@ -131,3 +131,10 @@ export const CommunityAlert = z
       }).optional(),
     }),
   );
+
+export const TopicSubscription = z.object({
+  user_id: PG_INT,
+  topic_id: z.string(),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
+});
