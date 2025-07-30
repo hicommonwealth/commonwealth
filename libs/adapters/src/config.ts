@@ -109,7 +109,7 @@ export const config = configure(
         requiredInEnvironmentServices({
           config: target,
           requiredAppEnvs: DeployedEnvironments,
-          requiredServices: ['consumer', 'message-relayer', 'knock'],
+          requiredServices: ['consumer', 'message-relayer'],
           defaultCheck: DEFAULTS.RABBITMQ_URI,
         }),
       ),
@@ -201,7 +201,7 @@ export const config = configure(
         const fn = requiredInEnvironmentServices({
           config: target,
           requiredAppEnvs: ProdLikeEnvironments,
-          requiredServices: [...WebServices, 'consumer', 'knock'],
+          requiredServices: [...WebServices, 'consumer'],
         });
         if (data.FLAG_KNOCK_INTEGRATION_ENABLED) {
           return fn(

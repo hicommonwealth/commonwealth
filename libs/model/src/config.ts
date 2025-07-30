@@ -693,7 +693,7 @@ export const config = configure(
         requiredInEnvironmentServices({
           config: target,
           requiredAppEnvs: ProdLikeEnvironments,
-          requiredServices: [...WebServices, 'knock', 'consumer'],
+          requiredServices: [...WebServices, 'consumer'],
           defaultCheck: DEFAULTS.KNOCK_PUBLIC_API_KEY,
         }),
       ),
@@ -701,7 +701,7 @@ export const config = configure(
         requiredInEnvironmentServices({
           config: target,
           requiredAppEnvs: ['production'],
-          requiredServices: [...WebServices, 'knock', 'consumer'],
+          requiredServices: [...WebServices, 'consumer'],
         }),
       ),
       SEND_EMAILS: z.boolean(),
