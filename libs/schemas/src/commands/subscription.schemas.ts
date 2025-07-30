@@ -5,6 +5,7 @@ import {
   CommunityAlert,
   SubscriptionPreference,
   ThreadSubscription,
+  TopicSubscription,
 } from '../entities';
 import { PG_INT } from '../utils';
 
@@ -52,6 +53,14 @@ export const CreateCommentSubscription = {
     comment_id: PG_INT,
   }),
   output: CommentSubscription,
+  context: VerifiedContext,
+};
+
+export const CreateTopicSubscription = {
+  input: z.object({
+    topic_id: z.string(),
+  }),
+  output: TopicSubscription,
   context: VerifiedContext,
 };
 

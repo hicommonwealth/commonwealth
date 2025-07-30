@@ -30,6 +30,14 @@ export const trpcRouter = trpc.router({
     Subscription.GetCommentSubscriptions,
     trpc.Tag.Subscription,
   ),
+  getTopicSubscriptions: trpc.query(
+    Subscription.GetTopicSubscriptions,
+    trpc.Tag.Subscription,
+  ),
+  createTopicSubscription: trpc.command(
+    Subscription.CreateTopicSubscription,
+    trpc.Tag.Subscription,
+  ),
   getCommunityAlerts: trpc.query(
     Subscription.GetCommunityAlerts,
     trpc.Tag.Subscription,

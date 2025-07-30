@@ -1,9 +1,12 @@
 import { TopicSubscription } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
+import type { TopicAttributes } from './topic';
 import type { ModelInstance } from './types';
 
-export type TopicSubscriptionAttributes = z.infer<typeof TopicSubscription>;
+export type TopicSubscriptionAttributes = z.infer<typeof TopicSubscription> & {
+  topic?: TopicAttributes;
+};
 
 export type TopicSubscriptionInstance =
   ModelInstance<TopicSubscriptionAttributes> & {
