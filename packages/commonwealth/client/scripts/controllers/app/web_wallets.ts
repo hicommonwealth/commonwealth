@@ -13,6 +13,7 @@ import CosmosEvmMetamaskWalletController from './webWallets/cosmos_evm_metamask_
 import KeplrEthereumWalletController from './webWallets/keplr_ethereum_web_wallet';
 import KeplrWebWalletController from './webWallets/keplr_web_wallet';
 import LeapWebWalletController from './webWallets/leap_web_wallet';
+import MagicWebWalletController from './webWallets/magic_web_wallet';
 import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
 import OkxWebWalletController from './webWallets/okx_web_wallet';
 import OkxSuiWebWalletController from './webWallets/okxSui_web_wallet';
@@ -101,11 +102,7 @@ export default class WebWalletController {
       throw new Error('No wallet available');
     }
 
-    if (userStore.getState().addresses?.[0]?.walletId === 'magic') {
-      throw new Error(
-        'On-chain Transactions not currently available for magic',
-      );
-    }
+    // Note: Magic wallet transactions are now supported through MagicWebWalletController
     for (const wallet of availableWallets) {
       const countEnabled = availableWallets.filter((x) => x.enabled).length;
       if (countEnabled == 0) {
@@ -128,6 +125,7 @@ export default class WebWalletController {
       new OkxWebWalletController(),
       new PolkadotWebWalletController(),
       new MetamaskWebWalletController(),
+      new MagicWebWalletController(),
       new WalletConnectWebWalletController(),
       new KeplrWebWalletController(),
       new LeapWebWalletController(),
