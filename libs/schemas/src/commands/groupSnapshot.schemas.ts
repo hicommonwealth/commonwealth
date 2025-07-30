@@ -1,18 +1,15 @@
 import { z } from 'zod';
 import { AuthContext } from '../context';
+import { PG_INT } from '../utils';
 
 export const CreateGroupSnapshot = {
   input: z.object({
-    groupId: z.number(),
-    source: z.object({
-      type: z.literal('sui_nft'),
-      suiNetwork: z.string(),
-      collectionId: z.string(),
-    }),
-    blockHeight: z.bigint().optional(),
+    community_id: z.string(),
+    group_id: PG_INT,
+    block_height: z.bigint().optional(),
   }),
   output: z.object({
-    snapshotId: z.number(),
+    snapshot_id: z.number(),
     status: z.enum(['pending', 'active', 'error', 'superseded']),
     message: z.string(),
   }),

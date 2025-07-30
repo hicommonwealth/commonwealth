@@ -35,11 +35,5 @@ export const TaskPayloads = {
   CountAggregator: z.object({}),
   CaptureGroupSnapshot: z.object({
     groupId: z.number(),
-    source: z.object({
-      type: z.literal('sui_nft'),
-      suiNetwork: z.string(),
-      collectionId: z.string(),
-    }),
-    blockHeight: z.bigint().optional(),
   }),
 } as const satisfies Record<GraphileTaskNames, ZodType | ZodUndefined>;
