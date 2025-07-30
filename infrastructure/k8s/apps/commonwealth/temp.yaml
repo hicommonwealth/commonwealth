@@ -22,7 +22,7 @@ metadata:
   labels:
     app: commonwealth-server
   annotations:
-    reloader.stakater.com/match: "true"
+    reloader.stakater.com/auto: "true"
 spec:
   replicas: 1
   selector:
@@ -37,14 +37,13 @@ spec:
         - name: commonwealth-server
           image: public.ecr.aws/f8g0x5p7/commonwealth:latest
           command:
-            - node
+            - sh
           args:
-            - --import=extensionless/register
-            - --enable-source-maps
-            - ./build/server.js
+            - -c
+            - sleep infinity
           volumeMounts:
             - name: env-volume
-              mountPath: /prod/commonwealth
+              mountPath: /prod/commonwealth/.env
               subPath: .env
           ports:
             - containerPort: 8080
@@ -82,7 +81,6 @@ metadata:
   namespace: commonwealth
   annotations:
     kubernetes.io/ingress.class: 'nginx'
-    nginx.ingress.kubernetes.io/backend-protocol: 'HTTPS'
 spec:
   ingressClassName: nginx
 
@@ -96,7 +94,7 @@ spec:
               service:
                 name: commonwealth-server
                 port:
-                  number: 8080
+                  number: 80
   tls:
     - hosts:
         - commonwealth.unique.rocks
@@ -116,10 +114,13 @@ spec:
   target:
     name: commonwealth-server-env
     template:
-      type: Opaque
       engineVersion: v2
+      type: Opaque
       data:
         .env: |
+          {{- range $k, $v := . }}
+          {{ $k }}={{ $v }}
+          {{- end }}
   dataFrom:
     - extract:
         key: secret/baseenv

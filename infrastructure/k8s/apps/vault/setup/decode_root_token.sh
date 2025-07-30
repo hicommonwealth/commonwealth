@@ -1,5 +1,5 @@
 #!/bin/bash
-
+## Note you need the vault-root file from the s3 bucket in this directory
 if [ -z "$1" ]; then
   echo "Usage: $0 <key-id>"
   exit 1
