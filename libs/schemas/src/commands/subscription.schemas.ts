@@ -47,6 +47,14 @@ export const DeleteCommunityAlert = {
   context: VerifiedContext,
 };
 
+export const DeleteTopicSubscription = {
+  input: z.object({
+    topic_ids: z.array(PG_INT),
+  }),
+  output: z.number().describe('Number of topic subscriptions deleted'),
+  context: VerifiedContext,
+};
+
 export const CreateCommentSubscription = {
   input: z.object({
     id: z.number(),

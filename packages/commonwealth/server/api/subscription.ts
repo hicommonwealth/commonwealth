@@ -26,6 +26,10 @@ export const trpcRouter = trpc.router({
     Subscription.DeleteThreadSubscription,
     trpc.Tag.Subscription,
   ),
+  deleteTopicSubscription: trpc.command(
+    Subscription.DeleteTopicSubscription,
+    trpc.Tag.Subscription,
+  ),
   getCommentSubscriptions: trpc.query(
     Subscription.GetCommentSubscriptions,
     trpc.Tag.Subscription,
@@ -36,6 +40,10 @@ export const trpcRouter = trpc.router({
   ),
   createTopicSubscription: trpc.command(
     Subscription.CreateTopicSubscription,
+    trpc.Tag.Subscription,
+  ),
+  getSubscribableTopics: trpc.query(
+    Subscription.GetSubscribableTopics,
     trpc.Tag.Subscription,
   ),
   getCommunityAlerts: trpc.query(
