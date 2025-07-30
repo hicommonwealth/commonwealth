@@ -172,6 +172,9 @@ async function processViewCounts() {
   for (const [threadId, count] of <[string, string][]>(
     Object.entries(threadIdHash)
   )) {
+    if (!Number(threadId) || !Number(count)) {
+      continue;
+    }
     const threadRankIncrease = Math.round(
       config.HEURISTIC_WEIGHTS.VIEW_COUNT_WEIGHT * parseInt(count),
     );
