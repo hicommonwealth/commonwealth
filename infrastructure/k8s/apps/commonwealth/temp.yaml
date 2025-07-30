@@ -1,0 +1,125 @@
+---
+# Source: commonwealth-server/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: commonwealth-server
+  namespace: commonwealth
+spec:
+  selector:
+    app: commonwealth-server
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+# Source: commonwealth-server/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: commonwealth-server
+  namespace: commonwealth
+  labels:
+    app: commonwealth-server
+  annotations:
+    reloader.stakater.com/match: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: commonwealth-server
+  template:
+    metadata:
+      labels:
+        app: commonwealth-server
+    spec:
+      containers:
+        - name: commonwealth-server
+          image: public.ecr.aws/f8g0x5p7/commonwealth:latest
+          command:
+            - node
+          args:
+            - --import=extensionless/register
+            - --enable-source-maps
+            - ./build/server.js
+          volumeMounts:
+            - name: env-volume
+              mountPath: /prod/commonwealth
+              subPath: .env
+          ports:
+            - containerPort: 8080
+      volumes:
+        - name: env-volume
+          secret:
+            secretName: commonwealth-server-env
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: commonwealth-redis
+  namespace: commonwealth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.2-alpine
+          ports:
+            - containerPort: 6379
+---
+# Source: commonwealth-server/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: commonwealth-server
+  namespace: commonwealth
+  annotations:
+    kubernetes.io/ingress.class: 'nginx'
+    nginx.ingress.kubernetes.io/backend-protocol: 'HTTPS'
+spec:
+  ingressClassName: nginx
+
+  rules:
+    - host: commonwealth.unique.rocks
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: commonwealth-server
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - commonwealth.unique.rocks
+      secretName: wildcard-cert-dns-tls
+---
+# Source: commonwealth-server/templates/external-secrets.yaml
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: commonwealth-server-env
+  namespace: commonwealth
+spec:
+  refreshInterval: 1m
+  secretStoreRef:
+    name: vault-backend
+    kind: ClusterSecretStore
+  target:
+    name: commonwealth-server-env
+    template:
+      type: Opaque
+      engineVersion: v2
+      data:
+        .env: |
+  dataFrom:
+    - extract:
+        key: secret/baseenv
