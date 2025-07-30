@@ -1,53 +1,71 @@
 // Magna API TypeScript types
 
-export interface MagnaAllocationsRequest {
-  tokenId: string;
-  cursor?: string;
-  limit?: number;
-  walletAddress?: string;
-}
-
 export interface MagnaStakeholder {
-  id: string;
-  type: string | null;
-  employeeNumber: string | null;
-  name: string | null;
-  contactEmail: string | null;
+  name?: string;
+  email?: string;
+  xHandle?: string;
+  employeeNumber?: string;
 }
 
-export interface MagnaCategory {
-  id: string;
-  name: string;
+export interface MagnaCustomAttribute {
+  key: string;
+  value: string;
+}
+
+export interface CreateAllocationRequest {
+  amount: string;
+  contractId: string;
+  tokenId: string;
+  category: string;
+  description?: string | null;
+  unlockScheduleId?: string;
+  unlockStartAt?: string;
+  vestingScheduleId?: string;
+  vestingStartAt?: string;
+  releaseMode?: 'LINEAR' | 'CLIFF';
+  walletAddress?: string;
+  stakeholder?: MagnaStakeholder;
+  receivedOffMagna?: string;
+  cancellable?: boolean;
+  customAttributes?: MagnaCustomAttribute[];
 }
 
 export interface MagnaAllocation {
   id: string;
   key: string;
-  description: string | null;
   amount: string;
-  funded: string;
+  receivedOffMagna: string | null;
+  funded: string | null;
   received: string;
-  walletAddress: string;
+  state: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status: string;
+  isWalletSubmitted: boolean | null;
+  releaseMode: string | null;
+  description: string | null;
+  releasable: string;
+  claimable: string | null;
+  pendingRelease: string | null;
+  vaultId: string | null;
+  grantId: string | null;
+  custodyType: string;
+  projectId: string;
+  tokenId: string;
+  stakeholderId: string;
+  walletId: string | null;
+  categoryId: string;
   createdAt: string;
   updatedAt: string;
   cancelledAt: string | null;
-  state:
-    | 'MISSING_WALLET'
-    | 'NOT_STARTED'
-    | 'CANCELED'
-    | 'COMPLETED'
-    | 'UP_TO_DATE';
-  stakeholder: MagnaStakeholder;
-  customAttributes: unknown[];
-  category: MagnaCategory;
-  unlockStartAt: string;
-  vestingStartAt: string;
+  scheduledCancelAt: string | null;
+  unlockScheduleId: string | null;
+  unlockStartAt: string | null;
+  vestingScheduleId: string | null;
+  vestingStartAt: string | null;
 }
 
-export interface MagnaAllocationsResponse {
+export interface MagnaResponse<T> {
   isProcessed: boolean;
-  result: {
-    items: MagnaAllocation[];
-    total: number;
-  };
+  result: T;
 }
+
+export type MagnaAllocationResponse = MagnaResponse<MagnaAllocation>;

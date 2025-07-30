@@ -1,19 +1,26 @@
-import type { HistoricalAllocation } from '@hicommonwealth/model/models';
-import { MagnaAllocationsResponse } from './types';
+import { CreateAllocationRequest, MagnaAllocationResponse } from './types';
 
-export async function bulkInsertAllocations(
+/**
+ * Creates a new allocation in Magna
+ */
+export async function createAllocation(
   apiUrl: string,
   apiToken: string,
-  batch: HistoricalAllocation[],
-): Promise<MagnaAllocationsResponse> {
-  const response = await fetch(apiUrl, {
+  body: CreateAllocationRequest,
+): Promise<MagnaAllocationResponse> {
+  const response = await fetch(`${apiUrl}/api/external/v1/allocations`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'x-magna-api-token': apiToken,
     },
-    body: JSON.stringify(batch), // TODO: map to Magna Allocation format
+    body: JSON.stringify(body),
   });
-  if (!response.ok) throw new Error(await response.text());
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to create allocation: ${error}`);
+  }
+
   return response.json();
 }
