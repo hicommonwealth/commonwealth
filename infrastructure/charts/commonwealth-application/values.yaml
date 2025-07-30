@@ -1,4 +1,4 @@
-cwServerImage: 'arn:aws:iam::775434881122:role/vault-server-role-development'
+cwServerImage: 'public.ecr.aws/f8g0x5p7/commonwealth:latest'
 hostUrl: 'commonwealth.unique.rocks'
 commonwealthServerSuffix: ''
 commonwealthSecretsNameSuffix: ''
