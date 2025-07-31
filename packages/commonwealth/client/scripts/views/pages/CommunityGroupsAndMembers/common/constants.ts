@@ -14,6 +14,8 @@ export const SOL_NFT_SPECIFICATION = 'metaplex';
 
 export const SUI_NFT_SPECIFICATION = 'sui_nft';
 
+export const TRUST_LEVEL_SPECIFICATION = 'trust_level';
+
 export const ERC_SPECIFICATIONS = {
   ERC_20: 'erc20',
   ERC_721: 'erc721',
@@ -51,6 +53,7 @@ export const requirementTypes = [
   { value: SUI_NFT_SPECIFICATION, label: 'Sui NFT' },
   { value: SPL_SPECIFICATION, label: 'Solana SPL Token' },
   { value: SOL_NFT_SPECIFICATION, label: 'Solana NFT' },
+  { value: TRUST_LEVEL_SPECIFICATION, label: 'Trust Level' },
 ];
 
 export const conditionTypes = [
