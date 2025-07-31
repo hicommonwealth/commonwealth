@@ -12,10 +12,6 @@ export function GetGroupSnapshot(): Query<typeof schemas.GetGroupSnapshot> {
 
       const snapshot = await models.GroupSnapshot.findByPk(snapshotId);
 
-      if (!snapshot) {
-        return null;
-      }
-
       return snapshot;
     },
   };

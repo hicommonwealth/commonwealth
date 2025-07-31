@@ -33,11 +33,7 @@ export function GetSnapshotBalances(): Query<
         });
       }
 
-      if (!snapshot) {
-        return null;
-      }
-
-      if (snapshot.status === 'error') {
+      if (!snapshot || snapshot.status === 'error') {
         return null;
       }
 
