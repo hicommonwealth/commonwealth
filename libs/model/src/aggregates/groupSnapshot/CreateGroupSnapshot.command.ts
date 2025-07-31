@@ -80,12 +80,7 @@ export function CreateGroupSnapshot(): Command<
           .filter((address): address is string => !!address) || [];
 
       if (addresses.length === 0) {
-        log.warn('No addresses found for group', { group_id, community_id });
-        return {
-          snapshot_id: 0,
-          status: 'error' as const,
-          message: 'No addresses found in group',
-        };
+        throw new InvalidInput('No addresses found in group');
       }
 
       log.info(`Found ${addresses.length} addresses in group`, {
@@ -136,11 +131,7 @@ export function CreateGroupSnapshot(): Command<
         source: suiNFTSource,
       });
 
-      return {
-        snapshot_id: snapshot.id!,
-        status: snapshot.status,
-        message: `Successfully created snapshot for ${addresses.length} addresses with ${Object.keys(balances).length} addresses having balances`,
-      };
+      return snapshot;
     },
   };
 }
