@@ -82,7 +82,6 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   if (isLoading) {
     return <LoadingIndicator />;
   }
-  console.log('foundGroup => ', foundGroup);
 
   const getInitialValues = () => {
     return {
