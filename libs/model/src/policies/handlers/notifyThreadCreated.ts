@@ -91,7 +91,7 @@ export const notifyThreadCreated: EventHandler<
       await provider.triggerWorkflow({
         key: WorkflowKeys.ThreadCreated,
         users: topicSubscriptions.map((t) => ({
-          id: `topic-${t.user_id}`,
+          id: t.user_id,
         })),
         data: {
           topic_id: payload.topic_id, // used for batching
