@@ -18,8 +18,8 @@ In this scenario you would need to manually delete the load balancer for full cl
 2. `kubectl create secret generic cloudflare-secrets \
    --namespace cert-manager \
    --from-literal CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}`
-3. `kubectl apply -f cert-manager/cluster-issuer.yaml`
-4. `kubectl apply -f cert-manager/certificate.yaml`
+3. `kubectl apply -f cert-manager/certificate-nginx.yaml`
+3. `kubectl apply -f cert-manager/certificate-vault.yaml`
 5. Wait for `kubectl get certificate -n ingress-nginx` to be in READY true
 
 # Setup cloudflare-tunnel
@@ -32,6 +32,7 @@ In this scenario you would need to manually delete the load balancer for full cl
 
 # Apply Ingress to argocd
 1. `kubectl apply -f argocd/ingress-argocd.yaml`
+2. Check to see if argocd subdomain is created, for example argocd.unique.rocks
 
 # Setup vault
 1. `kubectl apply -f vault/vault-application.yaml`

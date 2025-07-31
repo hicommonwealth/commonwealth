@@ -4,7 +4,7 @@ metadata:
   name: cert-manager
   namespace: argocd
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argoproj.io/foreground
 spec:
   destination:
     namespace: cert-manager
