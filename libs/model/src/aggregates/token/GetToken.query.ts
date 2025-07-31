@@ -11,7 +11,7 @@ export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { community_id, thread_id, with_stats } = payload;
+      const { community_id, with_stats } = payload;
 
       const community = await models.Community.findOne({
         where: {
@@ -23,19 +23,6 @@ export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
       if (!community.namespace) {
         return null;
       }
-
-      const threadTokenSql = `
-        JOIN "Threads" AS TT ON TT.launchpad_token_address = T.token_address
-        WHERE TT.thread_id = :threadId
-      `;
-
-      const replacements = community_id
-        ? {
-            namespace: community.namespace,
-          }
-        : {
-            threadId: thread_id,
-          };
 
       const sql = `
           ${
@@ -59,13 +46,15 @@ export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
           SELECT T.*${with_stats ? ', trades.latest_price, trades.old_price' : ''}
           FROM "LaunchpadTokens" as T
           ${with_stats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
-          ${community_id ? 'WHERE T.namespace = :namespace' : threadTokenSql};
+          WHERE T.namespace = :namespace;
       `;
 
       const token = await models.sequelize.query<
         z.infer<typeof schemas.TokenView>
       >(sql, {
-        replacements,
+        replacements: {
+          namespace: community.namespace,
+        },
         type: QueryTypes.SELECT,
       });
       if (!token || !Array.isArray(token) || token.length !== 1) return null;

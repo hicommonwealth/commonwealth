@@ -3,6 +3,8 @@ export * from './CreateThread.command';
 export * from './CreateThreadReaction.command';
 export * from './DeleteLinks.command';
 export * from './DeleteThread.command';
+export * from './CreateThreadToken.command';
+export * from './CreateThreadTokenTrade.command';
 export * from './GetActiveThreads.query';
 export * from './GetLinks.query';
 export * from './GetThreadById.query';

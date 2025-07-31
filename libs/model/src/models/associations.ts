@@ -164,6 +164,12 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     });
 
+  db.ThreadToken.withMany(db.ThreadTokenTrade, {
+    foreignKey: 'token_address',
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
+
   db.Comment.withMany(db.Reaction, {
     asMany: 'reactions',
   }).withMany(db.CommentVersionHistory);

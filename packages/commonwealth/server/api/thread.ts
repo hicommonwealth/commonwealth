@@ -262,4 +262,9 @@ export const trpcRouter = trpc.router({
   getActiveThreads: trpc.query(Thread.GetActiveThreads, trpc.Tag.Thread, {
     ttlSecs: 60,
   }),
+  createThreadToken: trpc.command(Thread.CreateThreadToken, trpc.Tag.Thread),
+  createThreadTokenTrade: trpc.command(
+    Thread.CreateThreadTokenTrade,
+    trpc.Tag.Thread,
+  ),
 });

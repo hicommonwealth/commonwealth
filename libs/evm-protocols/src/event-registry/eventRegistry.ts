@@ -7,7 +7,9 @@ import {
   LaunchpadAbi,
   NamespaceFactoryAbi,
   ReferralFeeManagerAbi,
+  TokenBondingCurveAbi,
   TokenCommunityManagerAbi,
+  TokenLaunchpadAbi,
 } from '@commonxyz/common-protocol-abis';
 import { ValidChains, getFactoryContract } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
@@ -95,6 +97,24 @@ const referralFeeManagerSource: ContractSource = {
   eventSignatures: [EvmEventSignatures.Referrals.FeeDistributed],
 };
 
+const tokenLaunchpadSource: ContractSource = {
+  abi: TokenLaunchpadAbi,
+  eventSignatures: [
+    EvmEventSignatures.TokenLaunchpad.LaunchpadCreated,
+    EvmEventSignatures.TokenLaunchpad.NewTokenCreated,
+    EvmEventSignatures.TokenLaunchpad.TokenRegistered,
+  ],
+};
+
+const tokenBondingCurveSource: ContractSource = {
+  abi: TokenBondingCurveAbi,
+  eventSignatures: [
+    EvmEventSignatures.TokenBondingCurve.LiquidityTransferred,
+    EvmEventSignatures.TokenBondingCurve.TokenRegistered,
+    EvmEventSignatures.TokenBondingCurve.Trade,
+  ],
+};
+
 /**
  * Note that this object does not contain details for contracts deployed by users
  * at runtime. Those contracts remain in the EvmEventSources table.
@@ -126,6 +146,10 @@ export const EventRegistry = {
       tokenCommunityManagerSource,
     [getFactoryContract(ValidChains.SepoliaBase).ReferralFeeManager]:
       referralFeeManagerSource,
+    [getFactoryContract(ValidChains.SepoliaBase).TokenLaunchpad]:
+      tokenLaunchpadSource,
+    [getFactoryContract(ValidChains.SepoliaBase).TokenBondingCurve]:
+      tokenBondingCurveSource,
   },
   [ValidChains.Sepolia]: {
     [getFactoryContract(ValidChains.Sepolia).NamespaceFactory]:
@@ -188,5 +212,9 @@ export const EventRegistry = {
       tokenCommunityManagerSource,
     [getFactoryContract(ValidChains.Anvil).ReferralFeeManager]:
       referralFeeManagerSource,
+    [getFactoryContract(ValidChains.Anvil).TokenLaunchpad]:
+      tokenLaunchpadSource,
+    [getFactoryContract(ValidChains.Anvil).TokenBondingCurve]:
+      tokenBondingCurveSource,
   },
 };

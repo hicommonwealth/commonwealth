@@ -15,6 +15,7 @@ import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
 import { DiscordEventBase, Tweet } from '../integrations';
 import { EVM_ADDRESS_STRICT, EVM_BYTES, PG_INT } from '../utils';
+import { ThreadToken } from '../entities/thread-token.schemas';
 
 // All events should carry this common metadata
 export const EventMetadata = z.object({
@@ -425,6 +426,10 @@ export const events = {
 
   LaunchpadTokenGraduated: z.object({
     token: LaunchpadToken,
+  }),
+
+  ThreadTokenGraduated: z.object({
+    token: ThreadToken,
   }),
 
   LaunchpadTokenTraded: z.object({

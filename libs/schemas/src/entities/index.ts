@@ -7,6 +7,8 @@ export * from './discordBotConfig.schemas';
 export * from './evm-event-source.schemas';
 export * from './group-permission.schemas';
 export * from './group.schemas';
+export * from './thread-token-trade.schemas';
+export * from './thread-token.schemas';
 export * from './launchpad-token.schemas';
 export * from './launchpad.schemas';
 export * from './mcp.schemas';

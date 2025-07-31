@@ -20,6 +20,8 @@ import {
   ReferrerCommunityJoinedNotification,
   ReferrerSignedUpNotification,
   SnapshotProposalCreatedNotification,
+  ThreadTokenCapReachedNotification,
+  ThreadTokenTradeEventNotification,
   TradeEventNotification,
   UpvoteNotification,
   UserMentionedNotification,
@@ -551,6 +553,9 @@ export enum WorkflowKeys {
   // Launchpad
   LaunchpadTradeEvent = 'launchpad-trade-event',
   LaunchpadCapReached = 'launchpad-cap-reached',
+  // Thread Token
+  ThreadTokenTradeEvent = 'thread-token-trade-event',
+  ThreadTokenCapReached = 'thread-token-cap-reached',
 }
 
 export enum KnockChannelIds {
@@ -649,6 +654,14 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof CapReachedNotification>;
             key: WorkflowKeys.LaunchpadCapReached;
+          }
+        | {
+            data: z.infer<typeof ThreadTokenTradeEventNotification>;
+            key: WorkflowKeys.ThreadTokenTradeEvent;
+          }
+        | {
+            data: z.infer<typeof ThreadTokenCapReachedNotification>;
+            key: WorkflowKeys.ThreadTokenCapReached;
           }
       ))
   | WebhookProviderOptions;
