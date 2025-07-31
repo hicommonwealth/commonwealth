@@ -16,8 +16,6 @@ provider "aws" {
   region = var.AWS_REGION
 }
 
-data "aws_availability_zones" "available" {}
-
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
   version = "5.21.0" # Can also upgrade when eks upgrade supports v6
@@ -32,6 +30,8 @@ module "vpc" {
 
   enable_nat_gateway = false
   single_nat_gateway = false
+
+  map_public_ip_on_launch = true
 
   tags = {
     Terraform   = "true"
@@ -56,23 +56,11 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
 
   vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.public_subnets
+  subnet_ids = module.vpc.private_subnets
 
-  cluster_addons = {
-    # Enables ip prefix delegation which increases the maximum pod limit per node
-    vpc-cni = {
-      most_recent    = true
-      before_compute = true
-      configuration_values = jsonencode({
-        env = {
-          ENABLE_PREFIX_DELEGATION = "true"
-          WARM_PREFIX_TARGET       = "1"
-        }
-      })
-    }
-    aws-ebs-csi-driver = {
-      service_account_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.cluster_name}-ebs-csi-controller"
-    }
+  eks_managed_node_group_defaults = {
+    attach_cluster_primary_security_group = true
+    associate_public_ip_address           = true
   }
 
   eks_managed_node_groups = {
@@ -83,16 +71,13 @@ module "eks" {
       capacity_type = "SPOT"
 
       subnet_ids = [
-        module.vpc.private_subnets[0], # Only in us-east-1a to prevent cross region PV issues on spot bootup
+        module.vpc.public_subnets[0], # Only in us-east-1a to prevent cross region PV issues on spot bootup
       ]
 
       desired_size = 2
       min_size     = 1
       max_size     = 2
 
-      iam_role_additional_policies = {
-        EBS_CSI = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
-      }
     }
   }
 
@@ -100,162 +85,4 @@ module "eks" {
     Environment = var.ENV_NAME
     Terraform   = "true"
   }
-}
-
-locals {
-  ebs_csi_service_account_namespace = "kube-system"
-  ebs_csi_service_account_name      = "ebs-csi-controller-sa"
-}
-
-resource "aws_iam_policy" "ebs_csi_controller" {
-  name_prefix = "ebs-csi-controller"
-  description = "EKS ebs-csi-controller policy for cluster ${local.cluster_name}"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ec2:CreateSnapshot",
-          "ec2:AttachVolume",
-          "ec2:DetachVolume",
-          "ec2:ModifyVolume",
-          "ec2:DescribeAvailabilityZones",
-          "ec2:DescribeInstances",
-          "ec2:DescribeSnapshots",
-          "ec2:DescribeTags",
-          "ec2:DescribeVolumes",
-          "ec2:CreateTags",
-          "ec2:DeleteTags",
-          "ec2:CreateVolume",
-          "ec2:DeleteVolume"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
-module "ebs_csi_controller_role" {
-  source      = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version     = "5.11.1"
-  create_role = true
-  role_name   = "${local.cluster_name}-ebs-csi-controller"
-  provider_url = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
-  role_policy_arns = [aws_iam_policy.ebs_csi_controller.arn]
-  oidc_fully_qualified_subjects = [
-    "system:serviceaccount:${local.ebs_csi_service_account_namespace}:${local.ebs_csi_service_account_name}"
-  ]
-}
-
-## KMS for vault
-module "vault_unseal_s3" {
-  source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 4.11.0"
-
-  bucket = "bank-vaults-${var.ENV_NAME}"
-  acl    = "private"
-
-  control_object_ownership = true
-  object_ownership         = "ObjectWriter"
-
-  versioning = {
-    enabled = true
-  }
-
-  tags = {
-    Name        = "vault-unseal-${var.ENV_NAME}"
-    Environment = var.ENV_NAME
-  }
-}
-
-locals {
-  oidc_provider_sub = "${module.eks.oidc_provider}:sub"
-}
-
-resource "aws_iam_role" "irsa_role_iam" {
-  name = "vault-server-role-${var.ENV_NAME}"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Federated = module.eks.oidc_provider_arn
-        }
-        Action = "sts:AssumeRoleWithWebIdentity"
-        Condition = {
-          StringEquals : {
-            # Note if we change the namespace for the vault service, we will also need to update the default
-            (local.oidc_provider_sub) = "system:serviceaccount:default:vault"
-          },
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "vault_s3_access" {
-  name = "vault-s3-access"
-  role = aws_iam_role.irsa_role_iam.name
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid    = "AllowVaultToListBucket",
-        Effect = "Allow",
-        Action = "s3:ListBucket",
-        Resource = "arn:aws:s3:::bank-vaults-development"
-      },
-      {
-        Sid    = "AllowVaultToUseObjectsInBucket",
-        Effect = "Allow",
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject"
-        ],
-        Resource = "arn:aws:s3:::bank-vaults-${var.ENV_NAME}/*"
-      }
-    ]
-  })
-}
-
-data "aws_caller_identity" "current" {}
-
-module "vault_kms" {
-  source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
-
-  description = "KMS key for Vault auto-unseal"
-  deletion_window_in_days = 7
-
-  key_users = [
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.irsa_role_iam.name}"
-  ]
-
-  key_administrators = [
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/kurtis"
-  ]
-
-  aliases = ["vault-unseal-${var.ENV_NAME}"]
-
-  tags = {
-    Name        = "vault-kms"
-    Environment = var.ENV_NAME
-  }
-
-  depends_on = [aws_iam_role.irsa_role_iam]
-}
-
-# Write output here, will need to feed them into vault charts
-resource "local_file" "vault_outputs" {
-  filename = "${path.module}/.env"
-  content  = <<EOF
-irsaRoleArn=${aws_iam_role.irsa_role_iam.arn}
-kmsKeyId=${module.vault_kms.key_id}
-awsRegion=${var.AWS_REGION}
-EOF
 }
