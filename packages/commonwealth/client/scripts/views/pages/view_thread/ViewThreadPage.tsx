@@ -17,6 +17,7 @@ import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import useTopicGating from 'hooks/useTopicGating';
@@ -51,6 +52,7 @@ import { StickCommentProvider } from 'views/components/StickEditorContainer/cont
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { ThreadTokenWidget } from 'views/components/viewThreadPage/ThreadTokenWidget';
 import { PageNotFound } from 'views/pages/404';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
@@ -133,6 +135,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const commentsRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   const forceRerender = useForceRerender();
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -607,6 +610,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
 
   const sidebarComponent = [
+    tokenizedThreadsEnabled
+      ? {
+          label: 'Links',
+          item: (
+            <div className="cards-colum">
+              <ThreadTokenWidget
+                threadId={threadId}
+                communityId={thread?.communityId}
+              />
+            </div>
+          ),
+        }
+      : {},
     ...(showLinkedProposalOptions || showLinkedThreadOptions
       ? [
           {

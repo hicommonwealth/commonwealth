@@ -1,0 +1,49 @@
+import * as Abis from '@commonxyz/common-protocol-abis';
+import { logger } from '@hicommonwealth/core';
+import type { Abi, AbiEvent } from 'viem';
+import { toEventSelector } from 'viem';
+
+const log = logger(import.meta);
+
+// This file is intended to be run with the name of an ABI. It will print out
+// all the event names mapped to signatures which you will add/replace in
+// the eventSignatures.ts file
+
+// Example Usage: `pnpm generate-event-signature TokenLaunchpadAbi`
+function generateEventSignatureBlock(abiKey: string, abi: Abi): string {
+  const contractName = abiKey.replace(/Abi$/, ''); // Strip "Abi" from the end
+  const events = abi.filter(
+    (entry): entry is AbiEvent => entry.type === 'event',
+  );
+
+  const lines = [`${contractName}: {`];
+  for (const event of events) {
+    const selector = toEventSelector(event);
+    lines.push(`  ${event.name}: '${selector}',`);
+  }
+  lines.push('},');
+  return lines.join('\n');
+}
+
+function main() {
+  const contractName = process.argv[2];
+
+  if (!contractName) {
+    log.error('Usage: pnpm ts-exec generate-event-signature.ts <ContractName>');
+    return;
+  }
+
+  const abi = Abis[contractName];
+
+  if (!abi || !Array.isArray(abi)) {
+    log.error(`ABI not found for contract: ${contractName}`);
+    return;
+  }
+
+  const block = generateEventSignatureBlock(contractName, abi);
+  console.log(block);
+}
+
+if (import.meta.url.endsWith(process.argv[1])) {
+  main();
+}

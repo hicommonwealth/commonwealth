@@ -124,6 +124,7 @@ export const doesActionRequireBasicRewardAmount = (action: QuestActionType) => {
     'ContestEnded',
     'LaunchpadTokenRecordCreated',
     'LaunchpadTokenGraduated',
+    'ThreadTokenGraduated',
     'CommunityGoalReached',
   ];
   const channelQuest: QuestActionType[] = [

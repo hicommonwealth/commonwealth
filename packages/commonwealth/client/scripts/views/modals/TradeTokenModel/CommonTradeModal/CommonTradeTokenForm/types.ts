@@ -15,6 +15,7 @@ export type UseCommonTradeTokenFormProps = {
     sellTokenPresetAmounts?: TokenPresetAmounts[]; // we could also do 25%, 50% etc
   };
   addressType?: ChainBase;
+  communityId?: string;
   onTradeComplete?: () => void;
 };
 
@@ -24,6 +25,7 @@ export type UseBuyTradeProps = UseCommonTradeTokenFormProps & {
   tokenCommunity?: z.infer<typeof ExtendedCommunity>;
   selectedAddress?: string;
   commonFeePercentage: number;
+  threadTokenInitialize?: boolean;
 };
 
 export type UseSellTradeProps = UseBuyTradeProps;
