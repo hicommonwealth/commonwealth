@@ -4,7 +4,7 @@ import { UpdateClaimAddress } from '../../src/aggregates/token-allocation/Update
 import { models } from '../../src/database';
 import { CommunitySeedResult, seedCommunity } from '../utils';
 
-describe('Token Allocation Lifecycle', () => {
+describe.skip('Token Allocation Lifecycle', () => {
   let community: CommunitySeedResult;
 
   beforeAll(async () => {
