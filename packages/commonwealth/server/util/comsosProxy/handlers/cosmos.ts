@@ -115,8 +115,7 @@ export async function cosmosHandler(
       );
 
       if (
-        // @ts-expect-error StrictNullChecks
-        IGNORE_COSMOS_CHAIN_IDS.includes(community.ChainNode.cosmos_chain_id)
+        IGNORE_COSMOS_CHAIN_IDS.includes(community!.ChainNode!.cosmos_chain_id!)
       ) {
         log.warn('Ignoring external proxy request for dev Cosmos chain', {
           cosmos_chain_id: community!.ChainNode!.cosmos_chain_id,
@@ -143,8 +142,7 @@ export async function cosmosHandler(
     return res.status(response.status || 200).send(response?.data);
   } catch (err) {
     log.error('Failed to query external Cosmos proxy', err, {
-      // @ts-expect-error StrictNullChecks
-      chainNode: community?.ChainNode.cosmos_chain_id,
+      chainNode: community!.ChainNode!.cosmos_chain_id,
     });
     return res.status(err?.response?.status || 500).json({
       message: err?.message || 'Failed to query external Cosmos proxy',
