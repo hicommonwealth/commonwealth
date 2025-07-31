@@ -12,20 +12,13 @@ export interface SnapshotSource {
   collectionId: string;
 }
 
-export interface GetSnapshotOptions {
-  addresses: string[];
-  source: SnapshotSource;
-  blockHeight?: bigint;
-}
-
 export class SuiNFTProvider {
   /**
-   * Get a snapshot of NFT balances at a specific block height or latest
+   * Get latest NFT balances
    */
-  static async getSnapshot(
+  static async getNFTBalances(
     addresses: string[],
     source: SnapshotSource,
-    blockHeight?: bigint,
   ): Promise<Balances> {
     const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
       where: {
@@ -40,59 +33,31 @@ export class SuiNFTProvider {
       throw new Error(msg);
     }
 
-    const client = new SuiClient({
-      url: chainNode.private_url || chainNode.url,
-    });
+    const options: GetSuiNftBalanceOptions = {
+      addresses,
+      balanceSourceType: 'SuiNFT' as any,
+      sourceOptions: {
+        suiNetwork: source.suiNetwork,
+        collectionId: source.collectionId,
+      },
+      batchSize: 100,
+    };
 
-    try {
-      // For now, we'll get the current balances since Sui doesn't have a straightforward
-      // way to query historical NFT ownership at specific block heights.
-      // In production, you might want to use checkpoints or maintain your own indexing
-      const options: GetSuiNftBalanceOptions = {
-        addresses,
-        balanceSourceType: 'SuiNFT' as any,
-        sourceOptions: {
-          suiNetwork: source.suiNetwork,
-          collectionId: source.collectionId,
-        },
-        batchSize: 100,
-      };
+    const balances = await __get_suinft_balances(
+      chainNode.private_url || chainNode.url,
+      options,
+    );
 
-      // If a specific block height is requested, we need to handle historical data
-      if (blockHeight) {
-        log.warn(
-          `Historical block queries not fully implemented for Sui NFTs. Using current state.`,
-          { blockHeight: blockHeight.toString() },
-        );
-        // TODO: Implement checkpoint-based historical queries
-        // For now, fall back to current state
-      }
-
-      const balances = await __get_suinft_balances(
-        chainNode.private_url || chainNode.url,
-        options,
-      );
-
-      log.info(
-        `Successfully captured snapshot for ${addresses.length} addresses`,
-        {
-          network: source.suiNetwork,
-          collectionId: source.collectionId,
-          blockHeight: blockHeight?.toString(),
-          addressCount: addresses.length,
-        },
-      );
-
-      return balances;
-    } catch (error) {
-      log.error('Failed to capture Sui NFT snapshot', error as Error, {
+    log.info(
+      `Successfully captured snapshot for ${addresses.length} addresses`,
+      {
         network: source.suiNetwork,
         collectionId: source.collectionId,
-        blockHeight: blockHeight?.toString(),
         addressCount: addresses.length,
-      });
-      throw error;
-    }
+      },
+    );
+
+    return balances;
   }
 
   /**

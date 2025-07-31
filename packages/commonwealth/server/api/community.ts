@@ -125,6 +125,10 @@ export const trpcRouter = trpc.router({
     GroupSnapshot.GetGroupSnapshot,
     trpc.Tag.Community,
   ),
+  getSnapshotBalances: trpc.query(
+    GroupSnapshot.GetSnapshotBalances,
+    trpc.Tag.Community,
+  ),
   createGroupSnapshot: trpc.command(
     GroupSnapshot.CreateGroupSnapshot,
     trpc.Tag.Community,

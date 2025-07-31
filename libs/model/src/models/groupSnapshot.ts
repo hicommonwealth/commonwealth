@@ -1,21 +1,11 @@
+import { GroupSnapshot } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import type { GroupAttributes } from './group';
 import type { ModelInstance } from './types';
 
-export type GroupSnapshotStatus = 'pending' | 'active' | 'error' | 'superseded';
+export type GroupSnapshotStatus = 'active' | 'error' | 'superseded';
 
-export type GroupSnapshotAttributes = {
-  id?: number;
-  group_id: number;
-  block_height?: bigint | null;
-  snapshot_source: string;
-  balance_map: Record<string, string>; // address -> balance mapping
-  status: GroupSnapshotStatus;
-  error_message?: string | null;
-  snapshot_date: Date;
-  created_at?: Date;
-  updated_at?: Date;
-
+export type GroupSnapshotAttributes = z.infer<typeof GroupSnapshot> & {
   // associations
   group?: GroupAttributes;
 };

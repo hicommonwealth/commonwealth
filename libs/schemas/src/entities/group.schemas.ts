@@ -147,3 +147,16 @@ export const Membership = z.object({
   group: Group.optional(),
   address: Address.optional(),
 });
+
+export const GroupSnapshot = z.object({
+  id: z.number(),
+  group_id: z.number(),
+  block_height: z.bigint().nullable(),
+  snapshot_source: z.string(),
+  balance_map: z.record(z.string()),
+  status: z.enum(['pending', 'active', 'error', 'superseded']),
+  error_message: z.string().nullable(),
+  snapshot_date: z.date(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});

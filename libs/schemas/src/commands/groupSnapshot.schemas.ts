@@ -6,7 +6,6 @@ export const CreateGroupSnapshot = {
   input: z.object({
     community_id: z.string(),
     group_id: PG_INT,
-    block_height: z.bigint().optional(),
   }),
   output: z.object({
     snapshot_id: z.number(),
