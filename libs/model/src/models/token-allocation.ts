@@ -13,6 +13,7 @@ export type HistoricalAllocation = {
   adjusted_score: number;
   percent_score: number;
   token_allocation: number;
+  magna_allocation_id: string | null;
   magna_synced_at: Date | null;
 };
 export const HistoricalAllocations = (
@@ -64,6 +65,10 @@ export const HistoricalAllocations = (
       token_allocation: {
         type: Sequelize.DECIMAL,
         allowNull: false,
+      },
+      magna_allocation_id: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       magna_synced_at: {
         type: Sequelize.DATE,
