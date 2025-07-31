@@ -100,7 +100,7 @@ export function CreateGroupSnapshot(): Command<
 
       const snapshot = await models.sequelize.transaction(
         async (transaction) => {
-          const snapshot = await models.GroupSnapshot.create(
+          const snap = await models.GroupSnapshot.create(
             {
               group_id,
               block_height: blockHeight,
@@ -117,12 +117,12 @@ export function CreateGroupSnapshot(): Command<
               where: {
                 group_id,
                 status: 'active',
-                id: { [Op.ne]: snapshot.id! },
+                id: { [Op.ne]: snap.id! },
               },
               transaction,
             },
           );
-          return snapshot;
+          return snap;
         },
       );
 
