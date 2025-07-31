@@ -16,7 +16,6 @@ import {
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import useAuthentication from 'views/modals/AuthModal/useAuthentication';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -39,8 +38,6 @@ const WalletCard = () => {
   );
   const [isFundsModalOpen, setIsFundsModalOpen] = useState(false);
   const user = useUserStore();
-
-  const { openMagicWallet } = useAuthentication({});
 
   const uniqueAddresses = getUniqueUserAddresses({
     forChain: ChainBase.Ethereum,

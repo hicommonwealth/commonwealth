@@ -10,6 +10,7 @@ import {
   CWModalBody,
   CWModalFooter,
 } from 'views/components/component_kit/new_designs/CWModal';
+import useAuthentication from '../../AuthModal/useAuthentication';
 import { FundWalletItem } from './FundWalletItem';
 import useMagicWallet from './useMagicWallet';
 import { formatUsdBalance, handleRefreshBalance } from './utils';
@@ -32,6 +33,8 @@ const WalletFundsContent = ({
 
   const [isMoonpayVisible, setIsMoonpayVisible] = useState(false);
   const utils = trpc.useUtils();
+
+  const { openMagicWallet } = useAuthentication({});
 
   const {
     data: userBalance = '0',
@@ -82,6 +85,7 @@ const WalletFundsContent = ({
 
   const formattedBalanceUsd = formatUsdBalance(userBalance, ethToUsdRate);
   const isLoading = isMagicLoading || isBalanceLoading;
+  console.log('userAddress => ', { userAddress, userBalance, ethToUsdRate });
 
   return (
     <div className="WalletFundsContent">
@@ -108,6 +112,13 @@ const WalletFundsContent = ({
             title="View wallet information"
             onClick={handleShowWalletAddress}
           />
+          <FundWalletItem
+            icon="walletNew"
+            title="Manage wallet"
+            onClick={() => {
+              openMagicWallet().catch(console.error);
+            }}
+          />
         </div>
       </CWModalBody>
       <CWModalFooter>
@@ -119,6 +130,7 @@ const WalletFundsContent = ({
         walletAddress={userAddress}
         onClose={handleCloseMoonpay}
         onUrlSignatureRequested={onUrlSignatureRequested}
+        // onUnsupportedRegion={() => console.log('un supported region')}
         defaultCurrencyCode="eth_base"
       />
     </div>

@@ -106,6 +106,7 @@ import {
   UserSwitchIcon,
   UsersIcon,
   UsersThreeIcon,
+  Wallet,
   WarningIcon,
   XLogoIcon,
 } from '@phosphor-icons/react';
@@ -318,6 +319,7 @@ export const iconLookup = {
   vote: Icons.CWVote,
   views: Icons.CWViews,
   wallet: Icons.CWWallet,
+  walletNew: (props) => withPhosphorIcon(Wallet)(props),
   warning: (props) => withPhosphorIcon(WarningIcon)(props),
   website: Icons.CWWebsite,
   write: Icons.CWWrite,
