@@ -34,7 +34,7 @@ export const TopicEntry = ({
         notifySuccess('Unsubscribed!');
       } else {
         await createTopicSubscription.mutateAsync({
-          topic_id: id.toString(),
+          topic_id: id,
         });
         notifySuccess('Subscribed!');
       }

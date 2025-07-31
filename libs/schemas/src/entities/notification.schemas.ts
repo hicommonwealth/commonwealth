@@ -1,3 +1,4 @@
+import { Topic } from '@hicommonwealth/schemas';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
@@ -134,7 +135,9 @@ export const CommunityAlert = z
 
 export const TopicSubscription = z.object({
   user_id: PG_INT,
-  topic_id: z.string(),
-  created_at: z.string().optional(),
-  updated_at: z.string().optional(),
+  topic_id: PG_INT,
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+
+  Topic: Topic.optional(),
 });

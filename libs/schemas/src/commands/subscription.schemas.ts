@@ -66,7 +66,7 @@ export const CreateCommentSubscription = {
 
 export const CreateTopicSubscription = {
   input: z.object({
-    topic_id: z.string(),
+    topic_id: PG_INT,
   }),
   output: TopicSubscription,
   context: VerifiedContext,

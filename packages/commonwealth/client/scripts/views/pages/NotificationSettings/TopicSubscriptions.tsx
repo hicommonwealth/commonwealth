@@ -24,14 +24,21 @@ export const TopicSubscriptions = () => {
   const subscribedTopics = topicSubscriptions.data || [];
   const availableTopics = subscribableTopics.data || [];
 
-  const allTopics = [
-    ...subscribedTopics.map((topic) => ({
-      ...topic,
-      subscription: topic,
+  type TopicEntryData = {
+    id: number;
+    name: string;
+    community_id: string;
+    subscription?: z.infer<typeof TopicSubscription>;
+  };
+  const allTopics: TopicEntryData[] = [
+    ...subscribedTopics.map((subscription) => ({
+      id: subscription.topic_id,
+      name: subscription.Topic.name,
+      community_id: subscription.Topic.community_id,
+      subscription,
     })),
     ...availableTopics.map((topic) => ({
       ...topic,
-      subscription: undefined,
     })),
   ].filter((topic) => !topicsFilter.includes(topic.id));
 
@@ -53,13 +60,13 @@ export const TopicSubscriptions = () => {
         Subscribe to topics to receive notifications about new discussions.
       </CWText>
 
-      {allTopics.map((topic) => (
+      {allTopics.map((topic: TopicEntryData) => (
         <TopicEntry
           key={topic.id}
           id={topic.id}
           name={topic.name}
           community_id={topic.community_id}
-          subscription={topic.subscription as z.infer<typeof TopicSubscription>}
+          subscription={topic.subscription}
         />
       ))}
     </>
