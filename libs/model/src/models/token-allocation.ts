@@ -81,8 +81,16 @@ export const HistoricalAllocations = (
     },
   );
 
-export const AuraAllocations = (sequelize: Sequelize.Sequelize) =>
-  sequelize.define(
+export type AuraAllocation = {
+  user_id: number;
+  total_xp: number;
+  percent_allocation: number;
+  token_allocation: number;
+};
+export const AuraAllocations = (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ModelInstance<AuraAllocation>> =>
+  sequelize.define<ModelInstance<AuraAllocation>>(
     'AuraAllocations',
     {
       user_id: {
