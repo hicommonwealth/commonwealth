@@ -1,6 +1,7 @@
 import { TopicSubscription } from '@hicommonwealth/schemas';
 import React, { useMemo } from 'react';
 import useUserStore from 'state/ui/user';
+import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWCollapsible } from 'views/components/component_kit/cw_collapsible';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
@@ -67,12 +68,16 @@ export const TopicSubscriptions = () => {
     return grouped;
   }, [allTopics]);
 
-  // Create a map of community_id to community name
-  const communityNameMap = useMemo(() => {
-    const map: { [community_id: string]: string } = {};
+  // Create a map of community_id to community info
+  const communityInfoMap = useMemo(() => {
+    const map: { [community_id: string]: { name: string; iconUrl?: string } } =
+      {};
     user.communities.forEach((community) => {
       if (community.id) {
-        map[community.id] = community.name || community.id;
+        map[community.id] = {
+          name: community.name || community.id,
+          iconUrl: community.iconUrl,
+        };
       }
     });
     return map;
@@ -100,34 +105,42 @@ export const TopicSubscriptions = () => {
         Subscribe to topics to receive notifications about new discussions.
       </CWText>
 
-      {Object.entries(groupedTopics).map(([community_id, topics]) => (
-        <CWCollapsible
-          key={community_id}
-          headerContent={
-            <div className="community-header">
-              <CWText type="h5" fontWeight="medium">
-                {communityNameMap[community_id] || community_id}
-              </CWText>
-              <CWText type="caption" className="text-muted">
-                {topics.length} topic{topics.length !== 1 ? 's' : ''}
-              </CWText>
-            </div>
-          }
-          collapsibleContent={
-            <div className="topics-container">
-              {topics.map((topic: TopicEntryData) => (
-                <TopicEntry
-                  key={topic.id}
-                  id={topic.id}
-                  name={topic.name}
-                  community_id={topic.community_id}
-                  subscription={topic.subscription}
-                />
-              ))}
-            </div>
-          }
-        />
-      ))}
+      {Object.entries(groupedTopics).map(([community_id, topics]) => {
+        const communityInfo = communityInfoMap[community_id];
+        return (
+          <CWCollapsible
+            key={community_id}
+            iconSize="small"
+            headerContent={
+              <div className="community-header">
+                <div className="community-info">
+                  <CommunityInfo
+                    name={communityInfo?.name || community_id}
+                    iconUrl={communityInfo?.iconUrl || ''}
+                    communityId={community_id}
+                  />
+                </div>
+                <CWText type="caption" className="text-muted">
+                  {topics.length} topic{topics.length !== 1 ? 's' : ''}
+                </CWText>
+              </div>
+            }
+            collapsibleContent={
+              <div className="topics-container">
+                {topics.map((topic: TopicEntryData) => (
+                  <TopicEntry
+                    key={topic.id}
+                    id={topic.id}
+                    name={topic.name}
+                    community_id={topic.community_id}
+                    subscription={topic.subscription}
+                  />
+                ))}
+              </div>
+            }
+          />
+        );
+      })}
     </>
   );
 };

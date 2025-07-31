@@ -49,7 +49,7 @@ export const TopicEntry = ({
     <div key={id} className="notification-row TopicEntry">
       <div className="section">
         <div className="topic-info">
-          <CWText type="h5" fontWeight="medium">
+          <CWText type="caption" fontWeight="regular">
             {name}
           </CWText>
         </div>

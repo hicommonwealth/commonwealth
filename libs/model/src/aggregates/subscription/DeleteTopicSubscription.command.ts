@@ -1,14 +1,13 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
-import { authVerified } from '../../middleware/auth';
 
 export function DeleteTopicSubscription(): Command<
   typeof schemas.DeleteTopicSubscription
 > {
   return {
     ...schemas.DeleteTopicSubscription,
-    auth: [authVerified()],
+    auth: [],
     secure: true,
     body: async ({ payload, actor }) => {
       return await models.TopicSubscription.destroy({
