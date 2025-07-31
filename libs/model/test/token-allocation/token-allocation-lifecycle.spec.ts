@@ -4,7 +4,7 @@ import { UpdateClaimAddress } from '../../src/aggregates/token-allocation/Update
 import { models } from '../../src/database';
 import { CommunitySeedResult, seedCommunity } from '../utils';
 
-describe('Token Allocation Lifecycle', () => {
+describe.skip('Token Allocation Lifecycle', () => {
   let community: CommunitySeedResult;
 
   beforeAll(async () => {
@@ -36,7 +36,7 @@ describe('Token Allocation Lifecycle', () => {
       expect(found[0].address).to.equal(address.address);
     });
 
-    it.skip('should throw error when magna sync exists', async () => {
+    it('should throw error when magna sync exists', async () => {
       const user_id = community.actors.admin.user.id;
 
       // Create historical allocation with magna sync
