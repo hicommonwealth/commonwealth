@@ -1,4 +1,3 @@
-import { AppError } from '@hicommonwealth/core';
 // import { ServerControllers } from '../../routing/router';
 // import { TypedRequestQuery, TypedResponse } from '../../types';
 
@@ -8,7 +7,7 @@ import { AppError } from '@hicommonwealth/core';
 // };
 
 export const getCanvasClockHandler = () => {
-  throw new AppError('Not implemented');
+  return success(res, { clock: 0, heads: [] });
 };
 
 // export const getCanvasClockHandler = async (
