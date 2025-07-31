@@ -15,6 +15,7 @@ import { PushNotificationsToggle } from 'views/pages/NotificationSettings/PushNo
 import { PushNotificationsToggleMaster } from 'views/pages/NotificationSettings/PushNotificationsToggleMaster';
 import { ReactNativeAboutSection } from 'views/pages/NotificationSettings/ReactNativeAboutSection';
 import { ThreadSubscriptions } from 'views/pages/NotificationSettings/ThreadSubscriptions';
+import { TopicSubscriptions } from 'views/pages/NotificationSettings/TopicSubscriptions';
 import { useSupportsPushNotifications } from 'views/pages/NotificationSettings/useSupportsPushNotifications';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import { z } from 'zod';
@@ -26,7 +27,8 @@ type NotificationSection =
   | 'push-notifications'
   | 'community-alerts'
   | 'threads'
-  | 'comments';
+  | 'comments'
+  | 'topics';
 
 const NotificationSettings = () => {
   const supportsPushNotifications = useSupportsPushNotifications();
@@ -82,6 +84,12 @@ const NotificationSettings = () => {
               label="Comments"
               isSelected={section === 'comments'}
               onClick={() => setSection('comments')}
+            />
+
+            <CWTab
+              label="Topics"
+              isSelected={section === 'topics'}
+              onClick={() => setSection('topics')}
             />
           </CWTabsRow>
         </ScrollContainer>
@@ -171,6 +179,12 @@ const NotificationSettings = () => {
         {section === 'comments' && (
           <>
             <CommentSubscriptions />
+          </>
+        )}
+
+        {section === 'topics' && (
+          <>
+            <TopicSubscriptions />
           </>
         )}
         <ReactNativeAboutSection />
