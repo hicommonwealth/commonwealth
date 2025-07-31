@@ -76,7 +76,6 @@ const _NotificationsPolicy = {
     },
   ),
   overrides: {
-    ThreadCreated: null,
     ThreadUpvoted: `ThreadUpvoted.#`,
   },
 };
