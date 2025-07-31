@@ -1,10 +1,10 @@
-import { Topic } from '@hicommonwealth/schemas';
 import { NotificationCategories } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 import { Comment } from './comment.schemas';
 import { Community } from './community.schemas';
 import { Thread } from './thread.schemas';
+import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
 export const NotificationCategory = z.object({
