@@ -52,9 +52,6 @@ export const TopicEntry = ({
           <CWText type="h5" fontWeight="medium">
             {name}
           </CWText>
-          <CWText type="caption" className="text-muted">
-            Community: {community_id}
-          </CWText>
         </div>
 
         <div className="toggle">

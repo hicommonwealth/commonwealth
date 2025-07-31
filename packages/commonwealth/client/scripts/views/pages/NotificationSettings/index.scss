@@ -85,4 +85,36 @@
     margin-top: 8px;
     margin-bottom: 8px;
   }
+
+  .community-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 0;
+  }
+
+  .topics-container {
+    padding-left: 16px;
+    margin-top: 8px;
+  }
+
+  .TopicEntry {
+    .section {
+      margin-top: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      flex-grow: 1;
+    }
+
+    .toggle {
+      margin-left: auto;
+    }
+
+    .topic-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
 }
