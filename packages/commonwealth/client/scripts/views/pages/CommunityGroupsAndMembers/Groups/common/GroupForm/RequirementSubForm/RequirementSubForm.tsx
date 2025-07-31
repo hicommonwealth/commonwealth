@@ -127,8 +127,7 @@ const RequirementSubForm = ({
             });
           }}
           className="w-350"
-          // @ts-expect-error <StrictNullChecks/>
-          customError={errors.requirementType}
+          customError={errors?.requirementType || ''}
         />
         {isRemoveable && (
           <CWIconButton
@@ -192,8 +191,7 @@ const RequirementSubForm = ({
                   requirementChain: newValue.value,
                 });
               }}
-              // @ts-expect-error <StrictNullChecks/>
-              customError={errors.requirementChain}
+              customError={errors?.requirementChain || ''}
             />
             {!isTokenRequirement &&
               !isSuiTokenRequirement &&
@@ -211,12 +209,10 @@ const RequirementSubForm = ({
                   })}
                   onInput={(e) => {
                     onChange({
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      requirementContractAddress: (e.target as any).value,
+                      requirementContractAddress: e.target.value,
                     });
                   }}
-                  // @ts-expect-error <StrictNullChecks/>
-                  customError={errors.requirementContractAddress}
+                  customError={errors?.requirementContractAddress || ''}
                 />
               )}
             {isSuiTokenRequirement && (
@@ -233,12 +229,10 @@ const RequirementSubForm = ({
                 })}
                 onInput={(e) => {
                   onChange({
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    requirementCoinType: (e.target as any).value,
+                    requirementCoinType: e.target.value,
                   });
                 }}
-                // @ts-expect-error <StrictNullChecks/>
-                customError={errors.requirementCoinType}
+                customError={errors?.requirementCoinType || ''}
               />
             )}
             <CWSelectList
@@ -259,8 +253,7 @@ const RequirementSubForm = ({
                   requirementCondition: newValue.value,
                 });
               }}
-              // @ts-expect-error <StrictNullChecks/>
-              customError={errors.requirementCondition}
+              customError={errors?.requirementCondition || ''}
               // ---
               // ATM the API only supports the "More" option, we make this field disabled with "More" as the
               // only selected option
@@ -279,11 +272,10 @@ const RequirementSubForm = ({
               })}
               onInput={(e) => {
                 onChange({
-                  requirementAmount: (e.target as any).value,
+                  requirementAmount: e.target.value,
                 });
               }}
-              // @ts-expect-error <StrictNullChecks/>
-              customError={errors.requirementAmount}
+              customError={errors?.requirementAmount || ''}
               fullWidth
             />
             {is1155Requirement && (
@@ -297,11 +289,10 @@ const RequirementSubForm = ({
                 })}
                 onInput={(e) => {
                   onChange({
-                    requirementTokenId: (e.target as any).value,
+                    requirementTokenId: e.target.value,
                   });
                 }}
-                // @ts-expect-error <StrictNullChecks/>
-                customError={errors.requirementTokenId}
+                customError={errors?.requirementTokenId || ''}
                 fullWidth
               />
             )}
@@ -319,12 +310,10 @@ const RequirementSubForm = ({
                 })}
                 onInput={(e) => {
                   onChange({
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    requirementContractAddress: (e.target as any).value,
+                    requirementContractAddress: e.target.value,
                   });
                 }}
-                // @ts-expect-error <StrictNullChecks/>
-                customError={errors.requirementContractAddress}
+                customError={errors?.requirementContractAddress || ''}
               />
             )}
           </div>
