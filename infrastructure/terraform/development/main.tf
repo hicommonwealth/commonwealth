@@ -16,6 +16,8 @@ provider "aws" {
   region = var.AWS_REGION
 }
 
+data "aws_availability_zones" "available" {}
+
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
   version = "5.21.0" # Can also upgrade when eks upgrade supports v6
@@ -23,9 +25,10 @@ module "vpc" {
   name = "eks-vpc-${var.ENV_NAME}"
   cidr = "10.0.0.0/16"
 
-  azs = ["us-east-1b"]
-  public_subnets = ["10.0.10.0/24"]
-  private_subnets = ["10.0.20.0/24"]
+  # Control plane needs to run on AZ
+  azs = ["us-east-1a", "us-east-1b"]
+  public_subnets = ["10.0.10.0/24", "10.0.11.0/24"]
+  private_subnets = ["10.0.20.0/24", "10.0.21.0/24"]
 
   enable_nat_gateway = false
   single_nat_gateway = false
@@ -78,6 +81,10 @@ module "eks" {
       ami_type      = "BOTTLEROCKET_ARM_64"
       instance_types = ["t4g.large", "t4g.medium"]
       capacity_type = "SPOT"
+
+      subnet_ids = [
+        module.vpc.private_subnets[0], # Only in us-east-1a to prevent cross region PV issues on spot bootup
+      ]
 
       desired_size = 2
       min_size     = 1
@@ -180,6 +187,7 @@ resource "aws_iam_role" "irsa_role_iam" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals : {
+            # Note if we change the namespace for the vault service, we will also need to update the default
             (local.oidc_provider_sub) = "system:serviceaccount:default:vault"
           },
         }
@@ -225,7 +233,7 @@ module "vault_kms" {
   deletion_window_in_days = 7
 
   key_users = [
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/vault-server-role-${var.ENV_NAME}"
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.irsa_role_iam.name}"
   ]
 
   key_administrators = [
@@ -238,6 +246,8 @@ module "vault_kms" {
     Name        = "vault-kms"
     Environment = var.ENV_NAME
   }
+
+  depends_on = [aws_iam_role.irsa_role_iam]
 }
 
 # Write output here, will need to feed them into vault charts
