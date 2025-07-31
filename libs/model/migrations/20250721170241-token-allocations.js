@@ -51,10 +51,6 @@ export default {
             type: Sequelize.DECIMAL,
             allowNull: false,
           },
-          magna_allocation_id: {
-            type: Sequelize.STRING,
-            allowNull: true,
-          },
           magna_synced_at: {
             type: Sequelize.DATE,
             allowNull: true,
