@@ -51,6 +51,7 @@ export const notifyThreadCreated: EventHandler<
     models.TopicSubscription.findAll({
       where: {
         topic_id: payload.topic_id,
+        user_id: { [Op.ne]: author.user_id },
       },
       include: [{ model: models.Topic, required: true, attributes: ['name'] }],
     }),
