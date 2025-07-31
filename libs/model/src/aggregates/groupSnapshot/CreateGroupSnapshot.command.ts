@@ -94,12 +94,16 @@ export function CreateGroupSnapshot(): Command<
         collectionId: suiNFTSource.collection_id,
       });
 
+      const blockHeight = await SuiNFTProvider.getLatestBlockHeight(
+        suiNFTSource.sui_network,
+      );
+
       const snapshot = await models.sequelize.transaction(
         async (transaction) => {
           const snapshot = await models.GroupSnapshot.create(
             {
               group_id,
-              block_height: null,
+              block_height: blockHeight,
               snapshot_source: `sui_nft:${suiNFTSource.sui_network}:${suiNFTSource.collection_id}`,
               balance_map: balances,
               status: 'active',
