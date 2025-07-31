@@ -1,10 +1,10 @@
 import { InvalidInput, logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { models } from 'model/src/database';
-import { SuiNFTProvider } from 'model/src/services/tokenBalanceCache/providers/SuiNFTProvider';
 import { Op } from 'sequelize';
+import { models } from '../../database';
 import { authRoles, mustExist } from '../../middleware';
+import { SuiNFTProvider } from '../../services/tokenBalanceCache/providers/SuiNFTProvider';
 
 const log = logger(import.meta);
 
