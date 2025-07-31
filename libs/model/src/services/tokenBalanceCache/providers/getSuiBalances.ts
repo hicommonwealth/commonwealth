@@ -6,13 +6,18 @@ import {
   Balances,
   GetSuiNativeBalanceOptions,
   GetSuiTokenBalanceOptions,
+  GetSuiNftBalanceOptions,
 } from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';
+import { __get_suinft_balances } from './get_suinft_balances';
 
 const log = logger(import.meta);
 
 export async function getSuiBalances(
-  options: GetSuiNativeBalanceOptions | GetSuiTokenBalanceOptions,
+  options:
+    | GetSuiNativeBalanceOptions
+    | GetSuiTokenBalanceOptions
+    | GetSuiNftBalanceOptions,
   ttl?: number,
 ): Promise<Balances> {
   const cachedBalances = await getCachedBalances(options, options.addresses);
@@ -34,10 +39,16 @@ export async function getSuiBalances(
     return cachedBalances;
   }
 
-  const freshBalances: Balances = await __get_sui_balances(
-    chainNode.private_url || chainNode.url,
-    options,
-  );
+  const freshBalances: Balances =
+    options.balanceSourceType === BalanceSourceType.SuiNFT
+      ? await __get_suinft_balances(
+          chainNode.private_url || chainNode.url,
+          options as GetSuiNftBalanceOptions,
+        )
+      : await __get_sui_balances(
+          chainNode.private_url || chainNode.url,
+          options as GetSuiNativeBalanceOptions | GetSuiTokenBalanceOptions,
+        );
 
   await cacheBalances(options, freshBalances, ttl);
 

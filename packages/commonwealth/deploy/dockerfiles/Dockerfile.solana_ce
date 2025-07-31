@@ -1,0 +1,2 @@
+FROM commonwealth
+CMD NODE_ENV=production SERVICE=sol-ce ./datadog-entrypoint.sh node --import=extensionless/register --max_old_space_size=$(./scripts/get-max-old-space-size.sh) --enable-source-maps build/server/workers/solanaChainEvents/startSolanaPolling.js

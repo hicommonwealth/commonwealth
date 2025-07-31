@@ -162,6 +162,12 @@ function _thresholdCheck(
         contractAddress = thresholdData.source.coin_type;
         break;
       }
+      case 'sui_nft': {
+        balanceSourceType = BalanceSourceType.SuiNFT;
+        chainId = thresholdData.source.sui_network.toString();
+        contractAddress = thresholdData.source.collection_id;
+        break;
+      }
       case 'erc20': {
         balanceSourceType = BalanceSourceType.ERC20;
         contractAddress = thresholdData.source.contract_address;
@@ -250,6 +256,11 @@ function _thresholdCheck(
             return (
               b.options.sourceOptions.suiNetwork === chainId &&
               b.options.sourceOptions.coinType === contractAddress
+            );
+          case BalanceSourceType.SuiNFT:
+            return (
+              b.options.sourceOptions.suiNetwork === chainId &&
+              b.options.sourceOptions.collectionId === contractAddress
             );
           default:
             return null;

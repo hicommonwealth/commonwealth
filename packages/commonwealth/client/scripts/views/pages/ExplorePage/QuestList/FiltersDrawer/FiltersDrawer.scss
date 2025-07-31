@@ -11,6 +11,13 @@
       }
     }
 
+    .active-filter {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
     .content-container {
       padding: 20px 32px;
 

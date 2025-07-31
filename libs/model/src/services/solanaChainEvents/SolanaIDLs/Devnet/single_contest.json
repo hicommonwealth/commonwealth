@@ -1,0 +1,771 @@
+{
+  "address": "Emx5wMhCNPULbwyY5SJpFVr1UFpgyPqugtkNvMUBoh9n",
+  "metadata": {
+    "name": "single_contest",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "add_content",
+      "discriminator": [183, 126, 202, 103, 73, 114, 135, 191],
+      "accounts": [
+        {
+          "name": "contest",
+          "writable": true
+        },
+        {
+          "name": "content",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [99, 111, 110, 116, 101, 110, 116]
+              },
+              {
+                "kind": "account",
+                "path": "contest"
+              },
+              {
+                "kind": "account",
+                "path": "contest.content_count",
+                "account": "Contest"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": ["contest"]
+        },
+        {
+          "name": "creator"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "url",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "claim_all_rewards",
+      "discriminator": [132, 203, 246, 173, 206, 240, 85, 120],
+      "accounts": [
+        {
+          "name": "contest",
+          "writable": true
+        },
+        {
+          "name": "prize_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "contest"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": ["contest"]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_protocol_fee",
+      "discriminator": [165, 228, 133, 48, 99, 249, 255, 33],
+      "accounts": [
+        {
+          "name": "contest"
+        },
+        {
+          "name": "prize_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "contest"
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_fee_destination_token_account",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": ["contest"]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "deposit_prize",
+      "discriminator": [245, 164, 83, 19, 96, 75, 73, 130],
+      "accounts": [
+        {
+          "name": "contest"
+        },
+        {
+          "name": "prize_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "contest"
+              }
+            ]
+          }
+        },
+        {
+          "name": "depositor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "depositor_token_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "end_contest",
+      "discriminator": [87, 244, 178, 174, 95, 229, 104, 167],
+      "accounts": [
+        {
+          "name": "contest",
+          "writable": true
+        },
+        {
+          "name": "prize_vault",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "contest"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": ["contest"]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_contest",
+      "discriminator": [8, 124, 233, 229, 42, 156, 92, 3],
+      "accounts": [
+        {
+          "name": "contest",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "prize_mint"
+        },
+        {
+          "name": "prize_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "contest"
+              }
+            ]
+          }
+        },
+        {
+          "name": "protocol_fee_destination"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "contest_length_seconds",
+          "type": "i64"
+        },
+        {
+          "name": "winner_shares",
+          "type": {
+            "vec": "u16"
+          }
+        },
+        {
+          "name": "protocol_fee_percentage",
+          "type": "u16"
+        },
+        {
+          "name": "seed",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "vote_content",
+      "discriminator": [140, 96, 200, 175, 50, 118, 41, 99],
+      "accounts": [
+        {
+          "name": "contest",
+          "writable": true
+        },
+        {
+          "name": "content",
+          "writable": true
+        },
+        {
+          "name": "vote_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [118, 111, 116, 101]
+              },
+              {
+                "kind": "account",
+                "path": "content"
+              },
+              {
+                "kind": "account",
+                "path": "voter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": ["contest"]
+        },
+        {
+          "name": "voter"
+        },
+        {
+          "name": "voter_token_account"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Content",
+      "discriminator": [3, 76, 253, 21, 4, 198, 52, 206]
+    },
+    {
+      "name": "Contest",
+      "discriminator": [216, 26, 88, 18, 251, 80, 201, 96]
+    },
+    {
+      "name": "VoteRecord",
+      "discriminator": [112, 9, 123, 165, 234, 9, 157, 167]
+    }
+  ],
+  "events": [
+    {
+      "name": "ContentAdded",
+      "discriminator": [2, 8, 195, 62, 212, 6, 60, 31]
+    },
+    {
+      "name": "NewContest",
+      "discriminator": [95, 90, 145, 160, 242, 149, 175, 197]
+    },
+    {
+      "name": "TokenSwept",
+      "discriminator": [253, 129, 39, 72, 84, 197, 14, 52]
+    },
+    {
+      "name": "TransferFailed",
+      "discriminator": [230, 99, 47, 56, 170, 164, 175, 37]
+    },
+    {
+      "name": "VoterVoted",
+      "discriminator": [80, 109, 162, 174, 107, 152, 162, 54]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidContestLength",
+      "msg": "The contest end time must be after the start time."
+    },
+    {
+      "code": 6001,
+      "name": "NoWinnerSharesProvided",
+      "msg": "Winner shares cannot be empty."
+    },
+    {
+      "code": 6002,
+      "name": "InvalidWinnerSharesSum",
+      "msg": "Sum of winner shares must equal 10000 basis points (100%)."
+    },
+    {
+      "code": 6003,
+      "name": "InvalidProtocolFeePercentage",
+      "msg": "Protocol fee percentage must be between 0 and 10000 basis points."
+    },
+    {
+      "code": 6004,
+      "name": "TimestampOverflow",
+      "msg": "Timestamp calculation resulted in an overflow."
+    },
+    {
+      "code": 6005,
+      "name": "NumericOverflow",
+      "msg": "Numeric calculation resulted in an overflow."
+    },
+    {
+      "code": 6006,
+      "name": "ContestAlreadyEnded",
+      "msg": "Contest has already ended."
+    },
+    {
+      "code": 6007,
+      "name": "ContestNotActive",
+      "msg": "Contest is not active (either not started or already ended)."
+    },
+    {
+      "code": 6008,
+      "name": "UrlTooLong",
+      "msg": "Content URL exceeds maximum allowed length."
+    },
+    {
+      "code": 6009,
+      "name": "ContentNotInContest",
+      "msg": "The provided content account does not belong to this contest."
+    },
+    {
+      "code": 6010,
+      "name": "ZeroVotingPower",
+      "msg": "Voter has zero voting power (zero token balance)."
+    },
+    {
+      "code": 6011,
+      "name": "IncorrectPrizeMint",
+      "msg": "Voter token account is for the wrong SPL Token mint."
+    },
+    {
+      "code": 6012,
+      "name": "InvalidTokenOwner",
+      "msg": "Voter token account is not owned by the voter."
+    },
+    {
+      "code": 6013,
+      "name": "ZeroDepositAmount",
+      "msg": "Deposit amount must be greater than zero."
+    },
+    {
+      "code": 6014,
+      "name": "ContestNotEndedYet",
+      "msg": "Contest has not reached its end time yet."
+    },
+    {
+      "code": 6015,
+      "name": "InvalidAuthority",
+      "msg": "Invalid authority for this action."
+    },
+    {
+      "code": 6016,
+      "name": "NotContentCreator",
+      "msg": "Signer is not the creator of this content."
+    },
+    {
+      "code": 6017,
+      "name": "NotAWinner",
+      "msg": "The content creator is not among the winners."
+    },
+    {
+      "code": 6018,
+      "name": "RewardAlreadyClaimed",
+      "msg": "This reward has already been claimed."
+    },
+    {
+      "code": 6019,
+      "name": "ZeroRewardAmount",
+      "msg": "Calculated reward amount is zero."
+    },
+    {
+      "code": 6020,
+      "name": "InvalidFeeDestinationOwner",
+      "msg": "Fee destination token account owner does not match contest fee destination."
+    },
+    {
+      "code": 6021,
+      "name": "NoFeeToClaim",
+      "msg": "No protocol fee to claim."
+    },
+    {
+      "code": 6022,
+      "name": "BumpError",
+      "msg": "Failed to get bump seed."
+    },
+    {
+      "code": 6023,
+      "name": "InternalError",
+      "msg": "Internal error during calculation."
+    },
+    {
+      "code": 6024,
+      "name": "IncorrectNumberOfAccounts",
+      "msg": "Incorrect number of accounts provided."
+    },
+    {
+      "code": 6025,
+      "name": "InvalidContentId",
+      "msg": "Invalid content ID provided."
+    }
+  ],
+  "types": [
+    {
+      "name": "Content",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "contest",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "url",
+            "type": "string"
+          },
+          {
+            "name": "cumulative_votes",
+            "type": "u64"
+          },
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ContentAdded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "contest",
+            "type": "pubkey"
+          },
+          {
+            "name": "content_id",
+            "type": "u64"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "url",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Contest",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "prize_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "prize_vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "protocol_fee_destination",
+            "type": "pubkey"
+          },
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          },
+          {
+            "name": "winner_shares",
+            "type": {
+              "vec": "u16"
+            }
+          },
+          {
+            "name": "protocol_fee_percentage",
+            "type": "u16"
+          },
+          {
+            "name": "content_count",
+            "type": "u64"
+          },
+          {
+            "name": "contest_ended",
+            "type": "bool"
+          },
+          {
+            "name": "claimed_mask",
+            "type": "u128"
+          },
+          {
+            "name": "total_prize",
+            "type": "u64"
+          },
+          {
+            "name": "protocol_fee",
+            "type": "u64"
+          },
+          {
+            "name": "winner_ids",
+            "type": {
+              "vec": "u64"
+            }
+          },
+          {
+            "name": "seed",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "vault_bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NewContest",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "contest",
+            "type": "pubkey"
+          },
+          {
+            "name": "start_time",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          },
+          {
+            "name": "one_off",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenSwept",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TransferFailed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token",
+            "type": "pubkey"
+          },
+          {
+            "name": "to",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VoteRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "voter",
+            "type": "pubkey"
+          },
+          {
+            "name": "content",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VoterVoted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "contest",
+            "type": "pubkey"
+          },
+          {
+            "name": "voter",
+            "type": "pubkey"
+          },
+          {
+            "name": "content_id",
+            "type": "u64"
+          },
+          {
+            "name": "voting_power",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
+  "constants": [
+    {
+      "name": "CONTENT_SEED",
+      "type": "bytes",
+      "value": "[99, 111, 110, 116, 101, 110, 116]"
+    },
+    {
+      "name": "CONTEST_SEED",
+      "type": "bytes",
+      "value": "[99, 111, 110, 116, 101, 115, 116]"
+    },
+    {
+      "name": "VAULT_SEED",
+      "type": "bytes",
+      "value": "[118, 97, 117, 108, 116]"
+    },
+    {
+      "name": "VOTE_SEED",
+      "type": "bytes",
+      "value": "[118, 111, 116, 101]"
+    }
+  ]
+}

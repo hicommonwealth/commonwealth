@@ -5,7 +5,7 @@ import {
   getTransactionReceipt,
 } from '@hicommonwealth/evm-protocols';
 import Web3, { AbiFunctionFragment } from 'web3';
-import { ValidChains, factoryContracts } from '../chainConfig';
+import { ValidChains, getFactoryContract } from '../chainConfig';
 
 export const checkCommunityStakeWhitelist = async ({
   eth_chain_id,
@@ -50,7 +50,7 @@ export const checkCommunityStakeWhitelist = async ({
     stake_id,
   ]);
   const whitelistResponse = await web3.eth.call({
-    to: factoryContracts[eth_chain_id].communityStake,
+    to: getFactoryContract(eth_chain_id).CommunityStake,
     data: calldata,
   });
   return !!web3.eth.abi.decodeParameter('bool', whitelistResponse);
@@ -106,7 +106,7 @@ export const getAndVerifyStakeTrade = async ({
   stakeDirection: 'buy' | 'sell';
   timestamp: number;
 }> => {
-  const communityStakeAddress = factoryContracts[ethChainId].communityStake;
+  const communityStakeAddress = getFactoryContract(ethChainId).CommunityStake;
 
   const { evmClient, txReceipt } = await getTransactionReceipt({
     rpc,

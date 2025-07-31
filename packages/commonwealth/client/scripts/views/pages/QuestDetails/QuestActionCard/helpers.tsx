@@ -69,6 +69,7 @@ export const actionCopies = {
       ) : (
         ''
       ),
+    // eslint-disable-next-line react/no-multi-comp
     ['TweetEngagement']: (likes: number, retweets: number, replies: number) => (
       <div>
         <ul>
@@ -127,7 +128,14 @@ export const actionCopies = {
         </ul>
       </div>
     ),
-    ['LaunchpadTokenRecordCreated']: () => '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['LaunchpadTokenRecordCreated']: () => (
+      <div>
+        <ul>
+          <li>● Active address requires ETH on Base to launch a token</li>
+        </ul>
+      </div>
+    ),
     ['LaunchpadTokenGraduated']: () => '',
     // eslint-disable-next-line react/no-multi-comp
     ['LaunchpadTokenTraded']: (
@@ -154,6 +162,7 @@ export const actionCopies = {
             ● No Aura is awarded if your trade amount multiplied by the aura
             multiplier does not equal at least 1 Aura.
           </li>
+          <li>● Active address requires ETH on Base to launch a token</li>
         </ul>
       </div>
     ),

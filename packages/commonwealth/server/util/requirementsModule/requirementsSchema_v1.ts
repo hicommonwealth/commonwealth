@@ -119,6 +119,22 @@ export default {
       },
       required: ['source_type', 'sui_network', 'coin_type'],
     },
+    SuiNFTSource: {
+      type: 'object',
+      properties: {
+        source_type: {
+          type: 'string',
+          enum: ['sui_nft'],
+        },
+        sui_network: {
+          type: 'string',
+        },
+        collection_id: {
+          type: 'string',
+        },
+      },
+      required: ['source_type', 'sui_network', 'collection_id'],
+    },
     ThresholdData: {
       type: 'object',
       properties: {
@@ -134,6 +150,7 @@ export default {
             { $ref: '#/definitions/CosmosContractSource' },
             { $ref: '#/definitions/SuiSource' },
             { $ref: '#/definitions/SuiTokenSource' },
+            { $ref: '#/definitions/SuiNFTSource' },
           ],
         },
       },

@@ -45,6 +45,8 @@
   },
   "dependencies": {
     "@commonxyz/common-protocol-abis": "1.4.11",
+    "@coral-xyz/anchor": "^0.31.1",
+    "@solana/web3.js": "^1.98.2",
     "extensionless": "^1.9.6",
     "sharp": "^0.33.5"
   },

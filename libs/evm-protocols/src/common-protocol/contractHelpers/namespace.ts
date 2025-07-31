@@ -1,5 +1,5 @@
 import { NamespaceFactoryAbi } from '@commonxyz/common-protocol-abis';
-import { factoryContracts } from '@hicommonwealth/evm-protocols';
+import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { stringToHex } from 'viem';
 import { EvmProtocolChain, getPublicClient } from '../utils';
 
@@ -14,7 +14,7 @@ export const getNamespace = async (
 ): Promise<`0x${string}`> => {
   const client = getPublicClient(chain);
   return await client.readContract({
-    address: factoryContracts[chain.eth_chain_id].factory as `0x${string}`,
+    address: getFactoryContract(chain.eth_chain_id).NamespaceFactory,
     abi: NamespaceFactoryAbi,
     functionName: 'getNamespace',
     args: [stringToHex(namespace, { size: 32 })],

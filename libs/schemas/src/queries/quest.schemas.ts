@@ -49,6 +49,7 @@ export const GetQuests = {
     end_after: z.coerce.date().optional(),
     end_before: z.coerce.date().optional(),
     include_system_quests: z.boolean().default(false).optional(),
+    include_active_only: z.boolean().default(false).optional(),
   }),
   output: PaginatedResultSchema.extend({
     results: z.array(QuestView),

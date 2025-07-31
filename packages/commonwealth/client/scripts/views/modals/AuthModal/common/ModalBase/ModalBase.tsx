@@ -23,6 +23,8 @@ import {
   CWModalBody,
   CWModalFooter,
 } from '../../../../components/component_kit/new_designs/CWModal';
+import { CWTab } from '../../../../components/component_kit/new_designs/CWTabs';
+import CWTabsRow from '../../../../components/component_kit/new_designs/CWTabs/CWTabsRow';
 import { TemporaryCrecimientoModalBase } from '../../TemporaryCrecimientoModalBase';
 import { AuthModalType, ModalBaseProps, ModalBaseTabs } from '../../types';
 import useAuthentication from '../../useAuthentication';
@@ -408,7 +410,7 @@ const ModalBase = ({
           ) : (
             (showAuthOptionTypesFor || [])?.length > 0 && (
               <>
-                {/* {shouldShowSSOOptions &&
+                {shouldShowSSOOptions &&
                   // @ts-expect-error StrictNullChecks*
                   showAuthOptionTypesFor?.length > 1 &&
                   !showAuthOptionFor && (
@@ -428,7 +430,7 @@ const ModalBase = ({
                         />
                       ))}
                     </CWTabsRow>
-                  )} */}
+                  )}
 
                 <section className="auth-options">
                   {/* On the wallets tab, if no wallet is found, show "No wallets Found" */}

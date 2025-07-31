@@ -24,7 +24,7 @@ const configureNominations = async ({
   ethChainId,
   chainRpc,
 }: ConfigureNominationsProps) => {
-  const factoryAddress = factoryContracts[ethChainId]?.factory;
+  const factoryAddress = factoryContracts[ethChainId]?.NamespaceFactory;
   const namespaceFactory = new NamespaceFactory(factoryAddress, chainRpc);
 
   const txReceipt = await namespaceFactory.configureNominations(

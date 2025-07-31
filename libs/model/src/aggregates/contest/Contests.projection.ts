@@ -3,9 +3,9 @@ import {
   ChildContractNames,
   EvmEventSignatures,
   calculateVoteWeight,
-  factoryContracts,
   getContestScore,
   getContestStatus,
+  getFactoryContract,
   getTokenAttributes,
   getTransaction,
   isValidChain,
@@ -212,7 +212,8 @@ async function createInitialContest(
           contract_address: contest_address,
           event_signature: eventSignature,
           contract_name: childContractName,
-          parent_contract_address: factoryContracts[ethChainId].factory,
+          parent_contract_address:
+            getFactoryContract(ethChainId).NamespaceFactory,
           created_at_block: blockNumber,
         };
       },

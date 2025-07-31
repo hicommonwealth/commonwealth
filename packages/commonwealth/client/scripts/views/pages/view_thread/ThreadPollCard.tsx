@@ -11,7 +11,7 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import Permissions from '../../../utils/Permissions';
 import { PollCard } from '../../components/Polls';
-import { getPollTimestamp, getPollEndDateString } from './helpers';
+import { getPollEndDateString, getPollTimestamp } from './helpers';
 import './poll_cards.scss';
 
 type ThreadPollCardProps = {

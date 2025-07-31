@@ -3,7 +3,7 @@ import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
 import { useFetchNodesQuery } from 'state/api/nodes';
 
 const useNamespaceFactory = (ethChainId: number) => {
-  const chainFactoryAddress = factoryContracts[ethChainId]?.factory;
+  const chainFactoryAddress = factoryContracts[ethChainId]?.NamespaceFactory;
 
   const { data: nodes } = useFetchNodesQuery();
 

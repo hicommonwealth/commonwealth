@@ -7,6 +7,7 @@ import {
   type SolanaSource,
   type SuiSource,
   type SuiTokenSource,
+  type SuiNFTSource,
 } from '@hicommonwealth/shared';
 import type { GroupAttributes } from '../models/group';
 import type {
@@ -19,6 +20,7 @@ import type {
   GetSPLBalancesOptions,
   GetSuiNativeBalanceOptions,
   GetSuiTokenBalanceOptions,
+  GetSuiNftBalanceOptions,
 } from '../services/tokenBalanceCache/types';
 
 export function makeGetBalancesOptions(
@@ -220,6 +222,30 @@ export function makeGetBalancesOptions(
                 sourceOptions: {
                   suiNetwork: castedSource.sui_network,
                   coinType: castedSource.coin_type,
+                },
+                addresses,
+              });
+            }
+            break;
+          }
+          case BalanceSourceType.SuiNFT: {
+            const castedSource = requirement.data.source as SuiNFTSource;
+            const existingOptions = allOptions.find((opt) => {
+              const castedOpt = opt as GetSuiNftBalanceOptions;
+              return (
+                castedOpt.balanceSourceType === BalanceSourceType.SuiNFT &&
+                castedOpt.sourceOptions.suiNetwork ===
+                  castedSource.sui_network &&
+                castedOpt.sourceOptions.collectionId ===
+                  castedSource.collection_id
+              );
+            });
+            if (!existingOptions) {
+              allOptions.push({
+                balanceSourceType: BalanceSourceType.SuiNFT,
+                sourceOptions: {
+                  suiNetwork: castedSource.sui_network,
+                  collectionId: castedSource.collection_id,
                 },
                 addresses,
               });

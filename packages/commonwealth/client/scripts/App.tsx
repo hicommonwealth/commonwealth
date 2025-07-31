@@ -8,10 +8,8 @@ import { HelmetProvider } from 'react-helmet-async';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
-import { DefaultPrivyProvider } from 'views/components/DefaultPrivyProvider/DefaultPrivyProvider';
 import { DisableMavaOnMobile } from 'views/components/DisableMavaOnMobile';
 import ForceMobileAuth from 'views/components/ForceMobileAuth';
-import { PrivyMobileAuthenticator } from 'views/components/PrivyMobile/PrivyMobileAuthenticator';
 import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
 import { ReactNativeLogForwarder } from 'views/components/ReactNativeBridge/ReactNativeLogForwarder';
 import { ReactNativeScrollToTopListener } from 'views/components/ReactNativeBridge/ReactNativeScrollToTopListener';
@@ -36,17 +34,18 @@ const App = () => {
                 {isLoading ? (
                   <Splash />
                 ) : (
-                  <PrivyMobileAuthenticator>
-                    <DefaultPrivyProvider>
-                      <ForceMobileAuth>
-                        <OnBoardingWrapperForMobile>
-                          <ReactNativeBridgeUser />
-                          <ReactNativeScrollToTopListener />
-                          <RouterProvider router={router()} />
-                        </OnBoardingWrapperForMobile>
-                      </ForceMobileAuth>
-                    </DefaultPrivyProvider>
-                  </PrivyMobileAuthenticator>
+                  // Add Those components back in when we are ready to use Privy
+                  // <PrivyMobileAuthenticator>
+                  // <DefaultPrivyProvider>
+                  <ForceMobileAuth>
+                    <OnBoardingWrapperForMobile>
+                      <ReactNativeBridgeUser />
+                      <ReactNativeScrollToTopListener />
+                      <RouterProvider router={router()} />
+                    </OnBoardingWrapperForMobile>
+                  </ForceMobileAuth>
+                  // </DefaultPrivyProvider>
+                  // </PrivyMobileAuthenticator>
                 )}
                 <ToastContainer />
                 {import.meta.env.DEV && (
