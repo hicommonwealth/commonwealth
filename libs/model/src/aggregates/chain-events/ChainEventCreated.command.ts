@@ -1,7 +1,7 @@
 import { type Command } from '@hicommonwealth/core';
 import {
   EvmEventSignatures,
-  factoryContracts,
+  getFactoryContract,
   ValidChains,
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
@@ -99,14 +99,14 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
           anyAddressEqual(
             [
               // Namespace/Contest factory contract events
-              factoryContracts[ValidChains.Base].factory,
-              factoryContracts[ValidChains.SepoliaBase].factory,
-              factoryContracts[ValidChains.Sepolia].factory,
+              getFactoryContract(ValidChains.Base).NamespaceFactory,
+              getFactoryContract(ValidChains.SepoliaBase).NamespaceFactory,
+              getFactoryContract(ValidChains.Sepolia).NamespaceFactory,
 
               // CommunityStake contract events
-              factoryContracts[ValidChains.Base].communityStake,
-              factoryContracts[ValidChains.SepoliaBase].communityStake,
-              factoryContracts[ValidChains.Sepolia].communityStake,
+              getFactoryContract(ValidChains.Base).CommunityStake,
+              getFactoryContract(ValidChains.SepoliaBase).CommunityStake,
+              getFactoryContract(ValidChains.Sepolia).CommunityStake,
             ],
             contractAddress,
           )

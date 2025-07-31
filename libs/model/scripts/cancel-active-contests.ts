@@ -9,9 +9,8 @@ import { models } from '../src/database';
 const log = logger(import.meta);
 
 async function cancelActiveContests() {
-  const { host } = models.sequelize.config;
-  if (config.APP_ENV !== 'local' || host !== 'localhost') {
-    throw new Error('script can only be run on localhost DB');
+  if (config.APP_ENV !== 'local') {
+    throw new Error('Cannot cancel active contests in non-local environments');
   }
   const activeContests = await models.ContestManager.update(
     { cancelled: true },

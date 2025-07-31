@@ -48,6 +48,11 @@ import ThreadRank from './thread_rank';
 import ThreadSubscription from './thread_subscriptions';
 import ThreadVersionHistory from './thread_version_history';
 import LaunchpadToken from './token';
+import {
+  AuraAllocations,
+  ClaimAddresses,
+  HistoricalAllocations,
+} from './token-allocation';
 import Topic from './topic';
 import TwitterCursor from './twitter_cursor';
 import User from './user';
@@ -59,7 +64,9 @@ import XpLog from './xp_log';
 export const Factories = {
   Address,
   ApiKey,
+  AuraAllocations,
   ChainNode,
+  ClaimAddresses,
   Collaboration,
   Comment,
   CommentVersionHistory,
@@ -81,6 +88,7 @@ export const Factories = {
   EvmEventSource,
   Group,
   GroupGatedAction,
+  HistoricalAllocations,
   LastProcessedEvmBlock,
   LaunchpadTrade,
   MCPServer,

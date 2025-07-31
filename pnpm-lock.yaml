@@ -18,6 +18,12 @@ importers:
       '@commonxyz/common-protocol-abis':
         specifier: 1.4.11
         version: 1.4.11
+      '@coral-xyz/anchor':
+        specifier: ^0.31.1
+        version: 0.31.1(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)
+      '@solana/web3.js':
+        specifier: ^1.98.2
+        version: 1.98.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)
       extensionless:
         specifier: ^1.9.6
         version: 1.9.6
@@ -154,7 +160,7 @@ importers:
         version: 3.7.0(@swc/helpers@0.5.12)(vite@6.3.5(@types/node@20.12.10)(jiti@2.4.2)(lightningcss@1.27.0)(sass@1.77.0)(terser@5.42.0)(tsx@4.9.3)(yaml@2.8.0))
       '@vitest/coverage-istanbul':
         specifier: ^1.6.0
-        version: 1.6.0(vitest@1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.42.0))
+        version: 1.6.0(vitest@1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.42.0))
       chance:
         specifier: ^1.1.11
         version: 1.1.11
@@ -280,7 +286,7 @@ importers:
         version: 4.3.2(typescript@5.8.2)(vite@6.3.5(@types/node@20.12.10)(jiti@2.4.2)(lightningcss@1.27.0)(sass@1.77.0)(terser@5.42.0)(tsx@4.9.3)(yaml@2.8.0))
       vitest:
         specifier: ^1.6.1
-        version: 1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.42.0)
+        version: 1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.42.0)
       wait-on:
         specifier: ^7.2.0
         version: 7.2.0
@@ -602,13 +608,13 @@ importers:
         version: 1.66.0(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.25.51)
       '@privy-io/server-auth':
         specifier: ^1.19.0
-        version: 1.19.2(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)(viem@2.24.3(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.25.51))
+        version: 1.19.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.24.3(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.25.51))
       '@sendgrid/mail':
         specifier: ^6.5.0
         version: 6.5.5
       '@solana/spl-token':
         specifier: ^0.4.6
-        version: 0.4.6(@solana/web3.js@1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10))(bufferutil@4.0.8)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(utf-8-validate@5.0.10)
+        version: 0.4.6(@solana/web3.js@1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10))(bufferutil@4.0.8)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.2)(utf-8-validate@5.0.10)
       '@solana/web3.js':
         specifier: ^1.91.6
         version: 1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
@@ -653,13 +659,13 @@ importers:
         version: 1.0.0(encoding@0.1.13)
       pg:
         specifier: ^8.11.3
-        version: 8.11.5
+        version: 8.13.0
       quill-delta-to-markdown:
         specifier: ^0.6.0
         version: 0.6.0
       sequelize:
         specifier: ^6.32.1
-        version: 6.37.3(pg@8.11.5)
+        version: 6.37.3(pg@8.13.0)
       umzug:
         specifier: ^3.7.0
         version: 3.8.0(@types/node@24.0.3)
@@ -815,6 +821,9 @@ importers:
       '@canvas-js/interfaces':
         specifier: ^0.13.14
         version: 0.13.14
+      '@coral-xyz/anchor':
+        specifier: ^0.31.1
+        version: 0.31.1(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)
       '@cosmjs/amino':
         specifier: ^0.31.3
         version: 0.31.3
@@ -2999,10 +3008,6 @@ packages:
     resolution: {integrity: sha512-Nms86NXrsaeU9vbBJKni6gXiEXZ4CVpYVzEjDH9Sb8vmZ3UljyA1GSOJl/6LGPO8EHLuSF9H+IxNXHPX8QHJ4g==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/runtime@7.25.7':
-    resolution: {integrity: sha512-FjoyLe754PMiYsFaN5C94ttGiOmBNYTf6pLr4xXHAT5uctHb092PBszndLDR5XA/jghQvn4n7JMHl7dmTgbm9w==}
-    engines: {node: '>=6.9.0'}
-
   '@babel/runtime@7.26.0':
     resolution: {integrity: sha512-FDSOghenHTiToteC/QRlv2q3DhPZ/oOXTBoirfWNx1Cx3TMVcGWQtMMmQcSvb/JjpNeGzx8Pq/b4fKEJuWm1sw==}
     engines: {node: '>=6.9.0'}
@@ -3327,6 +3332,20 @@ packages:
   '@confio/ics23@0.6.8':
     resolution: {integrity: sha512-wB6uo+3A50m0sW/EWcU64xpV/8wShZ6bMTa7pF8eYsTrSkQA7oLUIJcs/wb8g4y2Oyq701BaGiO6n/ak5WXO1w==}
     deprecated: Unmaintained. The codebase for this package was moved to https://github.com/cosmos/ics23 but then the JS implementation was removed in https://github.com/cosmos/ics23/pull/353. Please consult the maintainers of https://github.com/cosmos for further assistance.
+
+  '@coral-xyz/anchor-errors@0.31.1':
+    resolution: {integrity: sha512-NhNEku4F3zzUSBtrYz84FzYWm48+9OvmT1Hhnwr6GnPQry2dsEqH/ti/7ASjjpoFTWRnPXrjAIT1qM6Isop+LQ==}
+    engines: {node: '>=10'}
+
+  '@coral-xyz/anchor@0.31.1':
+    resolution: {integrity: sha512-QUqpoEK+gi2S6nlYc2atgT2r41TT3caWr/cPUEL8n8Md9437trZ68STknq897b82p5mW0XrTBNOzRbmIRJtfsA==}
+    engines: {node: '>=17'}
+
+  '@coral-xyz/borsh@0.31.1':
+    resolution: {integrity: sha512-9N8AU9F0ubriKfNE3g1WF0/4dtlGXoBN/hd1PvbNBamBNwRgHxH4P+o3Zt7rSEloW1HUs6LfZEchlx9fW7POYw==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      '@solana/web3.js': ^1.69.0
 
   '@cosmjs/amino@0.31.3':
     resolution: {integrity: sha512-36emtUq895sPRX8PTSOnG+lhJDCVyIcE0Tr5ct59sUbgQiI14y43vj/4WAlJ/utSOxy+Zhj9wxcs4AZfu0BHsw==}
@@ -5589,7 +5608,6 @@ packages:
   '@lens-protocol/client@2.3.1':
     resolution: {integrity: sha512-Ey1yg8N2lp51wyWXKacOs36aOHlmCsF4ysCBJH4C85wwxIFBKbN5jXZX9Zxd1Gfe658SxKU2zGjBsg3X6LikiA==}
     engines: {node: '>=18 <21'}
-    deprecated: 2.x is no longer supported, see @canary for 3.x
     peerDependencies:
       '@lens-protocol/metadata': ^1.0.0
     peerDependenciesMeta:
@@ -8817,11 +8835,23 @@ packages:
   '@solana/codecs-core@2.0.0-preview.2':
     resolution: {integrity: sha512-gLhCJXieSCrAU7acUJjbXl+IbGnqovvxQLlimztPoGgfLQ1wFYu+XJswrEVQqknZYK1pgxpxH3rZ+OKFs0ndQg==}
 
+  '@solana/codecs-core@2.1.1':
+    resolution: {integrity: sha512-iPQW3UZ2Vi7QFBo2r9tw0NubtH8EdrhhmZulx6lC8V5a+qjaxovtM/q/UW2BTNpqqHLfO0tIcLyBLrNH4HTWPg==}
+    engines: {node: '>=20.18.0'}
+    peerDependencies:
+      typescript: '>=5.3.3'
+
   '@solana/codecs-data-structures@2.0.0-preview.2':
     resolution: {integrity: sha512-Xf5vIfromOZo94Q8HbR04TbgTwzigqrKII0GjYr21K7rb3nba4hUW2ir8kguY7HWFBcjHGlU5x3MevKBOLp3Zg==}
 
   '@solana/codecs-numbers@2.0.0-preview.2':
     resolution: {integrity: sha512-aLZnDTf43z4qOnpTcDsUVy1Ci9im1Md8thWipSWbE+WM9ojZAx528oAql+Cv8M8N+6ALKwgVRhPZkto6E59ARw==}
+
+  '@solana/codecs-numbers@2.1.1':
+    resolution: {integrity: sha512-m20IUPJhPUmPkHSlZ2iMAjJ7PaYUvlMtFhCQYzm9BEBSI6OCvXTG3GAPpAnSGRBfg5y+QNqqmKn4QHU3B6zzCQ==}
+    engines: {node: '>=20.18.0'}
+    peerDependencies:
+      typescript: '>=5.3.3'
 
   '@solana/codecs-strings@2.0.0-preview.2':
     resolution: {integrity: sha512-EgBwY+lIaHHgMJIqVOGHfIfpdmmUDNoNO/GAUGeFPf+q0dF+DtwhJPEMShhzh64X2MeCZcmSO6Kinx0Bvmmz2g==}
@@ -8834,6 +8864,13 @@ packages:
   '@solana/errors@2.0.0-preview.2':
     resolution: {integrity: sha512-H2DZ1l3iYF5Rp5pPbJpmmtCauWeQXRJapkDg8epQ8BJ7cA2Ut/QEtC3CMmw/iMTcuS6uemFNLcWvlOfoQhvQuA==}
     hasBin: true
+
+  '@solana/errors@2.1.1':
+    resolution: {integrity: sha512-sj6DaWNbSJFvLzT8UZoabMefQUfSW/8tXK7NTiagsDmh+Q87eyQDDC9L3z+mNmx9b6dEf6z660MOIplDD2nfEw==}
+    engines: {node: '>=20.18.0'}
+    hasBin: true
+    peerDependencies:
+      typescript: '>=5.3.3'
 
   '@solana/options@2.0.0-preview.2':
     resolution: {integrity: sha512-FAHqEeH0cVsUOTzjl5OfUBw2cyT8d5Oekx4xcn5hn+NyPAfQJgM3CEThzgRD6Q/4mM5pVUnND3oK/Mt1RzSE/w==}
@@ -8898,8 +8935,8 @@ packages:
   '@solana/web3.js@1.95.2':
     resolution: {integrity: sha512-SjlHp0G4qhuhkQQc+YXdGkI8EerCqwxvgytMgBpzMUQTafrkNant3e7pgilBGgjy/iM40ICvWBLgASTPMrQU7w==}
 
-  '@solana/web3.js@1.98.0':
-    resolution: {integrity: sha512-nz3Q5OeyGFpFCR+erX2f6JPt3sKhzhYcSycBCSPkWjzSVDh/Rr1FqTVMRe58FKO16/ivTUcuJjeS5MyBvpkbzA==}
+  '@solana/web3.js@1.98.2':
+    resolution: {integrity: sha512-BqVwEG+TaG2yCkBMbD3C4hdpustR4FpuUFRPUmqRZYYlPI9Hg4XMWxHWOWRzHE9Lkc9NDjzXFX7lDXSgzC7R1A==}
 
   '@spruceid/siwe-parser@1.1.3':
     resolution: {integrity: sha512-oQ8PcwDqjGWJvLmvAF2yzd6iniiWxK0Qtz+Dw+gLD/W5zOQJiKIUXwslHOm8VB8OOOKW9vfR3dnPBhHaZDvRsw==}
@@ -9558,6 +9595,9 @@ packages:
 
   '@types/pg@8.11.6':
     resolution: {integrity: sha512-/2WmmBXHLsfRqzfHW7BNZ8SbYzE8OSk7i3WjFYvfgRHj7S1xj+16Je5fUKv3lVdVzk/zn9TXOqf+avFCFIE0yQ==}
+
+  '@types/pg@8.15.4':
+    resolution: {integrity: sha512-I6UNVBAoYbvuWkkU3oosC8yxqH21f4/Jc4DK71JLG3dT2mdlGe1z+ep/LQGXaKaOgcvUrsQoPRqfgtMcvZiJhg==}
 
   '@types/phoenix@1.6.6':
     resolution: {integrity: sha512-PIzZZlEppgrpoT2QgbnDU+MMzuR6BbCjllj0bM70lWoejMeNJAxCchxnv7J3XFkI8MpygtRpzXrIlmWUBclP5A==}
@@ -10404,7 +10444,6 @@ packages:
   '@xmtp/frames-validator@0.6.2':
     resolution: {integrity: sha512-BoNn1YoAr5Rw/A5xuKOOz3KaJefAQ1ps+Ph3FjnqdU7WJVPB2oJ9ExcmaWwF3K+/IMjf9SncUMoTO9eLP1vhRQ==}
     engines: {node: '>=18'}
-    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   '@xmtp/proto@3.61.1':
     resolution: {integrity: sha512-momxDvGw4OoiLlNz6xmvEGnsx9CCZSR+o964EheH9ITx/iAqnV8ebpX3ZDtPuadEQg9AL21JAktw5pi7zmos0w==}
@@ -11261,6 +11300,10 @@ packages:
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
+
+  buffer-layout@1.2.2:
+    resolution: {integrity: sha512-kWSuLN694+KTk8SrYvCqwP2WcgQjoRCiF5b4QDvkkz8EmgD+aWAIceGFKMIAdmF/pH+vpgNV3d3kAKorcdAmWA==}
+    engines: {node: '>=4.5'}
 
   buffer-more-ints@1.0.0:
     resolution: {integrity: sha512-EMetuGFz5SLsT0QTnXzINh4Ksr+oo4i+UGTXEshiGCQWnsgSs7ZhJ8fzlwQ+OzEMs0MpDAMr1hxnblp5a4vcHg==}
@@ -19502,6 +19545,9 @@ packages:
   superstruct@0.14.2:
     resolution: {integrity: sha512-nPewA6m9mR3d6k7WkZ8N8zpTWfenFH3q9pA2PkuiZxINr9DKB2+40wEQf0ixn8VaGuJ78AB6iWOtStI+/4FKZQ==}
 
+  superstruct@0.15.5:
+    resolution: {integrity: sha512-4AOeU+P5UuE/4nOUkmcQdW5y7i9ndt1cQd/3iUe+LTz3RxESf/W/5lg4B74HbDMMv8PHnPnGCQFH45kBcrQYoQ==}
+
   superstruct@1.0.4:
     resolution: {integrity: sha512-7JpaAoX2NGyoFlI9NBh66BQXGONc+uE+MRS5i2iOBKuS4e+ccgMDjATgZldkah+33DakBxDHiss9kvUcGAO8UQ==}
     engines: {node: '>=14.0.0'}
@@ -19807,6 +19853,9 @@ packages:
   token-types@4.2.1:
     resolution: {integrity: sha512-6udB24Q737UD/SDsKAHI9FCRP7Bqc9D/MQUV02ORQg5iskjtLJlZJNdN4kKtcdtwCeWIwIHDGaUsTsCCAa8sFQ==}
     engines: {node: '>=10'}
+
+  toml@3.0.0:
+    resolution: {integrity: sha512-y/mWCZinnvxjTKYhJ+pYxwD0mRLVvOtdS2Awbgxln6iEnt4rk0yBxeSBHkGJcPucRiG0e55mwWp+g/05rsrd6w==}
 
   toposort-class@1.0.1:
     resolution: {integrity: sha512-OsLcGGbYF3rMjPUf8oKktyvCiUxSbqMMS39m33MAjLTC1DVIH6x3WSt63/M77ihI09+Sdfk1AXvfhCEeUmC7mg==}
@@ -21623,7 +21672,7 @@ snapshots:
       '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/core': 3.576.0
-      '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-bucket-endpoint': 3.577.0
       '@aws-sdk/middleware-expect-continue': 3.577.0
       '@aws-sdk/middleware-flexible-checksums': 3.577.0
@@ -21684,7 +21733,7 @@ snapshots:
       '@aws-crypto/sha256-js': 3.0.0
       '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/core': 3.576.0
-      '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-host-header': 3.577.0
       '@aws-sdk/middleware-logger': 3.577.0
       '@aws-sdk/middleware-recursion-detection': 3.577.0
@@ -21773,7 +21822,7 @@ snapshots:
       '@aws-crypto/sha256-js': 3.0.0
       '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/core': 3.576.0
-      '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-host-header': 3.577.0
       '@aws-sdk/middleware-logger': 3.577.0
       '@aws-sdk/middleware-recursion-detection': 3.577.0
@@ -21841,12 +21890,12 @@ snapshots:
       '@smithy/util-stream': 3.0.1
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-ini@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)':
+  '@aws-sdk/credential-provider-ini@3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))(@aws-sdk/client-sts@3.577.0)':
     dependencies:
       '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/credential-provider-env': 3.577.0
       '@aws-sdk/credential-provider-process': 3.577.0
-      '@aws-sdk/credential-provider-sso': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/credential-provider-sso': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))
       '@aws-sdk/credential-provider-web-identity': 3.577.0(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/types': 3.577.0
       '@smithy/credential-provider-imds': 3.0.0
@@ -21858,13 +21907,13 @@ snapshots:
       - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
-  '@aws-sdk/credential-provider-node@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)':
+  '@aws-sdk/credential-provider-node@3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))(@aws-sdk/client-sts@3.577.0)':
     dependencies:
       '@aws-sdk/credential-provider-env': 3.577.0
       '@aws-sdk/credential-provider-http': 3.577.0
-      '@aws-sdk/credential-provider-ini': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/credential-provider-ini': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/credential-provider-process': 3.577.0
-      '@aws-sdk/credential-provider-sso': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/credential-provider-sso': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))
       '@aws-sdk/credential-provider-web-identity': 3.577.0(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/types': 3.577.0
       '@smithy/credential-provider-imds': 3.0.0
@@ -21885,10 +21934,10 @@ snapshots:
       '@smithy/types': 3.0.0
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-sso@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
+  '@aws-sdk/credential-provider-sso@3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))':
     dependencies:
       '@aws-sdk/client-sso': 3.577.0
-      '@aws-sdk/token-providers': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/token-providers': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))
       '@aws-sdk/types': 3.577.0
       '@smithy/property-provider': 3.0.0
       '@smithy/shared-ini-file-loader': 3.0.0
@@ -22036,7 +22085,7 @@ snapshots:
       '@smithy/types': 3.0.0
       tslib: 2.8.1
 
-  '@aws-sdk/token-providers@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
+  '@aws-sdk/token-providers@3.577.0(@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0))':
     dependencies:
       '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/types': 3.577.0
@@ -24359,10 +24408,6 @@ snapshots:
     dependencies:
       regenerator-runtime: 0.14.1
 
-  '@babel/runtime@7.25.7':
-    dependencies:
-      regenerator-runtime: 0.14.1
-
   '@babel/runtime@7.26.0':
     dependencies:
       regenerator-runtime: 0.14.1
@@ -25339,6 +25384,35 @@ snapshots:
       '@noble/hashes': 1.7.1
       protobufjs: 6.11.4
 
+  '@coral-xyz/anchor-errors@0.31.1': {}
+
+  '@coral-xyz/anchor@0.31.1(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@coral-xyz/anchor-errors': 0.31.1
+      '@coral-xyz/borsh': 0.31.1(@solana/web3.js@1.98.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10))
+      '@noble/hashes': 1.7.1
+      '@solana/web3.js': 1.98.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)
+      bn.js: 5.2.1
+      bs58: 4.0.1
+      buffer-layout: 1.2.2
+      camelcase: 6.3.0
+      cross-fetch: 3.1.8(encoding@0.1.13)
+      eventemitter3: 4.0.7
+      pako: 2.1.0
+      superstruct: 0.15.5
+      toml: 3.0.0
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - typescript
+      - utf-8-validate
+
+  '@coral-xyz/borsh@0.31.1(@solana/web3.js@1.98.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10))':
+    dependencies:
+      '@solana/web3.js': 1.98.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)
+      bn.js: 5.2.1
+      buffer-layout: 1.2.2
+
   '@cosmjs/amino@0.31.3':
     dependencies:
       '@cosmjs/crypto': 0.31.3
@@ -25598,7 +25672,7 @@ snapshots:
       '@discordjs/rest': 2.4.0
       '@discordjs/util': 1.1.1
       '@sapphire/async-queue': 1.5.3
-      '@types/ws': 8.5.12
+      '@types/ws': 8.5.14
       '@vladfrangu/async_event_emitter': 2.4.6
       discord-api-types: 0.37.83
       tslib: 2.8.1
@@ -25681,7 +25755,7 @@ snapshots:
 
   '@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1)':
     dependencies:
-      '@babel/runtime': 7.25.7
+      '@babel/runtime': 7.26.0
       '@emotion/babel-plugin': 11.11.0
       '@emotion/cache': 11.11.0
       '@emotion/serialize': 1.1.4
@@ -28513,7 +28587,7 @@ snapshots:
 
   '@knocklabs/client@0.8.21(react@18.3.1)':
     dependencies:
-      '@babel/runtime': 7.25.7
+      '@babel/runtime': 7.26.0
       axios: 1.7.5
       axios-retry: 3.9.1
       eventemitter2: 6.4.9
@@ -30083,7 +30157,7 @@ snapshots:
 
   '@mui/utils@5.15.14(@types/react@18.3.3)(react@18.3.1)':
     dependencies:
-      '@babel/runtime': 7.25.7
+      '@babel/runtime': 7.26.0
       '@types/prop-types': 15.7.12
       prop-types: 15.8.1
       react: 18.3.1
@@ -30836,7 +30910,7 @@ snapshots:
 
   '@polkadot/extension-inject@0.40.4(@polkadot/api@6.0.5(encoding@0.1.13))':
     dependencies:
-      '@babel/runtime': 7.25.7
+      '@babel/runtime': 7.26.0
       '@polkadot/api': 6.0.5(encoding@0.1.13)
 
   '@polkadot/extension-inject@0.46.9(@polkadot/api@6.0.5(encoding@0.1.13))(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@6.0.3)':
@@ -31355,11 +31429,11 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@privy-io/server-auth@1.19.2(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)(viem@2.24.3(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.25.51))':
+  '@privy-io/server-auth@1.19.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.24.3(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.25.51))':
     dependencies:
       '@noble/curves': 1.8.1
       '@noble/hashes': 1.7.1
-      '@solana/web3.js': 1.98.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)
       canonicalize: 2.1.0
       dotenv: 16.4.5
       jose: 4.15.9
@@ -31373,6 +31447,7 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - typescript
       - utf-8-validate
 
   '@protobufjs/aspromise@1.1.2': {}
@@ -34024,15 +34099,16 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
-  '@solana/buffer-layout-utils@0.2.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
+  '@solana/buffer-layout-utils@0.2.0(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@solana/buffer-layout': 4.0.1
-      '@solana/web3.js': 1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)
       bigint-buffer: 1.1.5
       bignumber.js: 9.1.2
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - typescript
       - utf-8-validate
 
   '@solana/buffer-layout@4.0.1':
@@ -34042,6 +34118,11 @@ snapshots:
   '@solana/codecs-core@2.0.0-preview.2':
     dependencies:
       '@solana/errors': 2.0.0-preview.2
+
+  '@solana/codecs-core@2.1.1(typescript@5.8.2)':
+    dependencies:
+      '@solana/errors': 2.1.1(typescript@5.8.2)
+      typescript: 5.8.2
 
   '@solana/codecs-data-structures@2.0.0-preview.2':
     dependencies:
@@ -34053,6 +34134,12 @@ snapshots:
     dependencies:
       '@solana/codecs-core': 2.0.0-preview.2
       '@solana/errors': 2.0.0-preview.2
+
+  '@solana/codecs-numbers@2.1.1(typescript@5.8.2)':
+    dependencies:
+      '@solana/codecs-core': 2.1.1(typescript@5.8.2)
+      '@solana/errors': 2.1.1(typescript@5.8.2)
+      typescript: 5.8.2
 
   '@solana/codecs-strings@2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)':
     dependencies:
@@ -34076,6 +34163,12 @@ snapshots:
       chalk: 5.4.1
       commander: 12.0.0
 
+  '@solana/errors@2.1.1(typescript@5.8.2)':
+    dependencies:
+      chalk: 5.4.1
+      commander: 13.1.0
+      typescript: 5.8.2
+
   '@solana/options@2.0.0-preview.2':
     dependencies:
       '@solana/codecs-core': 2.0.0-preview.2
@@ -34097,10 +34190,10 @@ snapshots:
     transitivePeerDependencies:
       - fastestsmallesttextencoderdecoder
 
-  '@solana/spl-token@0.4.6(@solana/web3.js@1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10))(bufferutil@4.0.8)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(utf-8-validate@5.0.10)':
+  '@solana/spl-token@0.4.6(@solana/web3.js@1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10))(bufferutil@4.0.8)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@solana/buffer-layout': 4.0.1
-      '@solana/buffer-layout-utils': 0.2.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
+      '@solana/buffer-layout-utils': 0.2.0(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)
       '@solana/spl-token-group': 0.0.4(@solana/web3.js@1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)
       '@solana/spl-token-metadata': 0.1.4(@solana/web3.js@1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)
       '@solana/web3.js': 1.91.8(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
@@ -34109,6 +34202,7 @@ snapshots:
       - bufferutil
       - encoding
       - fastestsmallesttextencoderdecoder
+      - typescript
       - utf-8-validate
 
   '@solana/spl-type-length-value@0.1.0':
@@ -34228,14 +34322,14 @@ snapshots:
       - encoding
       - utf-8-validate
 
-  '@solana/web3.js@1.98.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
+  '@solana/web3.js@1.98.2(bufferutil@4.0.8)(encoding@0.1.13)(typescript@5.8.2)(utf-8-validate@5.0.10)':
     dependencies:
-      '@babel/runtime': 7.27.6
+      '@babel/runtime': 7.26.0
       '@noble/curves': 1.8.1
       '@noble/hashes': 1.7.1
       '@solana/buffer-layout': 4.0.1
+      '@solana/codecs-numbers': 2.1.1(typescript@5.8.2)
       agentkeepalive: 4.5.0
-      bigint-buffer: 1.1.5
       bn.js: 5.2.1
       borsh: 0.7.0
       bs58: 4.0.1
@@ -34248,6 +34342,7 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - encoding
+      - typescript
       - utf-8-validate
 
   '@spruceid/siwe-parser@1.1.3':
@@ -35088,6 +35183,12 @@ snapshots:
       pg-protocol: 1.6.1
       pg-types: 4.0.2
 
+  '@types/pg@8.15.4':
+    dependencies:
+      '@types/node': 20.17.6
+      pg-protocol: 1.7.0
+      pg-types: 2.2.0
+
   '@types/phoenix@1.6.6': {}
 
   '@types/prop-types@15.7.12': {}
@@ -35881,7 +35982,7 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  '@vitest/coverage-istanbul@1.6.0(vitest@1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.42.0))':
+  '@vitest/coverage-istanbul@1.6.0(vitest@1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.42.0))':
     dependencies:
       debug: 4.3.4
       istanbul-lib-coverage: 3.2.2
@@ -35892,7 +35993,7 @@ snapshots:
       magicast: 0.3.4
       picocolors: 1.0.0
       test-exclude: 6.0.0
-      vitest: 1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.42.0)
+      vitest: 1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.42.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -38875,6 +38976,8 @@ snapshots:
 
   buffer-from@1.1.2: {}
 
+  buffer-layout@1.2.2: {}
+
   buffer-more-ints@1.0.0: {}
 
   buffer-reverse@1.0.1: {}
@@ -39943,7 +40046,7 @@ snapshots:
 
   date-fns@2.30.0:
     dependencies:
-      '@babel/runtime': 7.25.7
+      '@babel/runtime': 7.26.0
 
   date-fns@3.6.0: {}
 
@@ -40330,7 +40433,7 @@ snapshots:
 
   downshift@7.6.2(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.25.7
+      '@babel/runtime': 7.26.0
       compute-scroll-into-view: 2.0.4
       prop-types: 15.8.1
       react: 18.3.1
@@ -40415,7 +40518,7 @@ snapshots:
 
   elliptic@6.5.5:
     dependencies:
-      bn.js: 4.12.0
+      bn.js: 4.12.1
       brorand: 1.1.0
       hash.js: 1.1.7
       hmac-drbg: 1.0.1
@@ -41170,7 +41273,7 @@ snapshots:
 
   ethereumjs-abi@0.6.8:
     dependencies:
-      bn.js: 4.12.0
+      bn.js: 4.12.1
       ethereumjs-util: 6.2.1
 
   ethereumjs-util@4.5.1:
@@ -41194,7 +41297,7 @@ snapshots:
   ethereumjs-util@6.2.1:
     dependencies:
       '@types/bn.js': 4.11.6
-      bn.js: 4.12.0
+      bn.js: 4.12.1
       create-hash: 1.2.0
       elliptic: 6.5.5
       ethereum-cryptography: 0.1.3
@@ -42461,7 +42564,7 @@ snapshots:
     dependencies:
       '@graphile/logger': 0.2.0
       '@types/debug': 4.1.12
-      '@types/pg': 8.11.10
+      '@types/pg': 8.15.4
       cosmiconfig: 8.3.6(typescript@5.8.2)
       graphile-config: 0.0.1-beta.14
       json5: 2.2.3
@@ -43967,35 +44070,6 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3):
-    dependencies:
-      cssstyle: 4.4.0
-      data-urls: 5.0.0
-      decimal.js: 10.5.0
-      form-data: 4.0.3
-      html-encoding-sniffer: 4.0.0
-      http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.6
-      is-potential-custom-element-name: 1.0.1
-      nwsapi: 2.2.20
-      parse5: 7.3.0
-      rrweb-cssom: 0.6.0
-      saxes: 6.0.0
-      symbol-tree: 3.2.4
-      tough-cookie: 4.1.4
-      w3c-xmlserializer: 5.0.0
-      webidl-conversions: 7.0.0
-      whatwg-encoding: 3.1.1
-      whatwg-mimetype: 4.0.0
-      whatwg-url: 14.2.0
-      ws: 8.18.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
-      xml-name-validator: 5.0.0
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-    optional: true
-
   jsesc@0.5.0: {}
 
   jsesc@2.5.2: {}
@@ -45241,7 +45315,7 @@ snapshots:
       metro-babel-transformer: 0.80.12
       metro-cache: 0.80.12
       metro-cache-key: 0.80.12
-      metro-config: 0.80.12(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      metro-config: 0.80.12(bufferutil@4.0.8)(utf-8-validate@6.0.3)
       metro-core: 0.80.12
       metro-file-map: 0.80.12
       metro-resolver: 0.80.12
@@ -48029,7 +48103,7 @@ snapshots:
 
   react-popper-tooltip@4.4.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.25.7
+      '@babel/runtime': 7.26.0
       '@popperjs/core': 2.11.8
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -48053,7 +48127,7 @@ snapshots:
 
   react-redux@7.2.9(react-dom@18.3.1(react@18.3.1))(react-native@0.75.1(@babel/core@7.27.4)(@babel/preset-env@7.25.3(@babel/core@7.27.4))(@types/react@18.3.3)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.8.2)(utf-8-validate@5.0.10))(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.25.7
+      '@babel/runtime': 7.26.0
       '@types/react-redux': 7.1.33
       hoist-non-react-statics: 3.3.2
       loose-envify: 1.4.0
@@ -48150,7 +48224,7 @@ snapshots:
 
   react-textarea-autosize@8.5.3(@types/react@18.3.3)(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.25.7
+      '@babel/runtime': 7.26.0
       react: 18.3.1
       use-composed-ref: 1.3.0(react@18.3.1)
       use-latest: 1.2.1(@types/react@18.3.3)(react@18.3.1)
@@ -48165,7 +48239,7 @@ snapshots:
 
   react-transition-group@4.4.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.25.7
+      '@babel/runtime': 7.26.0
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
@@ -48320,7 +48394,7 @@ snapshots:
 
   redux@4.2.1:
     dependencies:
-      '@babel/runtime': 7.25.7
+      '@babel/runtime': 7.26.0
 
   reflect-metadata@0.1.13: {}
 
@@ -48981,6 +49055,29 @@ snapshots:
       wkx: 0.5.0
     optionalDependencies:
       pg: 8.11.5
+    transitivePeerDependencies:
+      - supports-color
+
+  sequelize@6.37.3(pg@8.13.0):
+    dependencies:
+      '@types/debug': 4.1.12
+      '@types/validator': 13.11.9
+      debug: 4.4.1(supports-color@8.1.1)
+      dottie: 2.0.6
+      inflection: 1.13.4
+      lodash: 4.17.21
+      moment: 2.30.1
+      moment-timezone: 0.5.45
+      pg-connection-string: 2.7.0
+      retry-as-promised: 7.0.4
+      semver: 7.7.2
+      sequelize-pool: 7.1.0
+      toposort-class: 1.0.1
+      uuid: 8.3.2
+      validator: 13.11.0
+      wkx: 0.5.0
+    optionalDependencies:
+      pg: 8.13.0
     transitivePeerDependencies:
       - supports-color
 
@@ -49828,6 +49925,8 @@ snapshots:
 
   superstruct@0.14.2: {}
 
+  superstruct@0.15.5: {}
+
   superstruct@1.0.4: {}
 
   superstruct@2.0.2: {}
@@ -50208,6 +50307,8 @@ snapshots:
     dependencies:
       '@tokenizer/token': 0.3.0
       ieee754: 1.2.1
+
+  toml@3.0.0: {}
 
   toposort-class@1.0.1: {}
 
@@ -51277,7 +51378,7 @@ snapshots:
       tsx: 4.9.3
       yaml: 2.8.0
 
-  vitest@1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.42.0):
+  vitest@1.6.1(@types/node@20.12.10)(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))(lightningcss@1.27.0)(sass@1.77.0)(terser@5.42.0):
     dependencies:
       '@vitest/expect': 1.6.1
       '@vitest/runner': 1.6.1
@@ -51301,7 +51402,7 @@ snapshots:
       why-is-node-running: 2.2.2
     optionalDependencies:
       '@types/node': 20.12.10
-      jsdom: 24.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      jsdom: 24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - less
       - lightningcss

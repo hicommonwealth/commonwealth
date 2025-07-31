@@ -52,9 +52,10 @@ import usePrivyEmailDialogStore, {
 } from 'views/components/Privy/stores/usePrivyEmailDialogStore';
 import { smsDialogStore } from 'views/components/Privy/stores/usePrivySMSDialogStore';
 import type { PrivySignInSSOProvider } from 'views/components/Privy/types';
+import { OAuthProvider } from 'views/components/Privy/types';
 import { useConnectedWallet } from 'views/components/Privy/useConnectedWallet';
-import { usePrivyAuthWithOAuth } from 'views/components/Privy/usePrivyAuthWithOAuth';
 import { usePrivySignOn } from 'views/components/Privy/usePrivySignOn';
+import { PrivyAuth } from 'views/modals/AuthModal/PrivyAuth';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityInteractionEvent,
@@ -156,7 +157,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     };
   }, [handlePrivyError, handlePrivySuccess]);
 
-  const privyAuthWithOAuth = usePrivyAuthWithOAuth(privyCallbacks);
+  const privyAuthWithOAuth = privyEnabled && PrivyAuth(privyCallbacks);
 
   // Handle SMS login completion (similar to OAuth pattern)
   const handleSMSLoginComplete = useCallback(async () => {
@@ -464,7 +465,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const onSocialLoginPrivy = async (provider: WalletSsoSource) => {
     setIsMagicLoading(true);
     console.log('onSocialLoginPrivy: ' + provider);
-    privyAuthWithOAuth.onInitOAuth(provider);
+    if (privyAuthWithOAuth) {
+      privyAuthWithOAuth.onInitOAuth(provider as OAuthProvider);
+    }
   };
 
   const onSocialLogin = privyEnabled ? onSocialLoginPrivy : onSocialLoginMagic;

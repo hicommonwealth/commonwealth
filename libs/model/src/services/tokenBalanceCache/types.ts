@@ -100,6 +100,13 @@ export type GetSuiTokenBalanceOptions = GetSuiBalancesBase & {
   };
 };
 
+export type GetSuiNftBalanceOptions = GetSuiBalancesBase & {
+  balanceSourceType: BalanceSourceType.SuiNFT;
+  sourceOptions: {
+    collectionId: string;
+  };
+};
+
 export type GetErcBalanceOptions =
   | GetErc20BalanceOptions
   | GetErc721BalanceOptions
@@ -120,7 +127,8 @@ export type GetCwBalancesOptions =
 
 export type GetSuiBalancesOptions =
   | GetSuiNativeBalanceOptions
-  | GetSuiTokenBalanceOptions;
+  | GetSuiTokenBalanceOptions
+  | GetSuiNftBalanceOptions;
 
 export type GetBalancesOptions =
   | GetEvmBalancesOptions
