@@ -49,7 +49,7 @@ export function ListGroupSnapshots(): Query<typeof schemas.ListGroupSnapshots> {
       replacements.offset = offset;
 
       const snapshots = await models.sequelize.query<
-        z.infer<typeof schemas.GroupSnapshotView> & { total?: number }
+        z.infer<typeof schemas.GroupSnapshot> & { total?: number }
       >(sql, {
         replacements,
         type: QueryTypes.SELECT,

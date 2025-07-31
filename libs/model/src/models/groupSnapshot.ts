@@ -1,5 +1,6 @@
 import { GroupSnapshot } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
+import { z } from 'zod';
 import type { GroupAttributes } from './group';
 import type { ModelInstance } from './types';
 
