@@ -12,7 +12,7 @@ async function main() {
     process.exit(1);
   }
 
-  const RAILWAY_GIT_COMMIT_SHA: string = config.RAILWAY.RAILWAY_GIT_COMMIT_SHA!;
+  const RAILWAY_GIT_COMMIT_SHA: string = config.RAILWAY.GIT_COMMIT_SHA!;
   const RELEASER_URL: string = config.RAILWAY.RELEASER_URL!;
   const RELEASER_API_KEY: string = config.RAILWAY.RELEASER_API_KEY!;
 
