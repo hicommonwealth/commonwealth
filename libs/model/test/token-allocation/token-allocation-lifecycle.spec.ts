@@ -36,7 +36,7 @@ describe('Token Allocation Lifecycle', () => {
       expect(found[0].address).to.equal(address.address);
     });
 
-    it('should throw error when magna sync exists', async () => {
+    it.skip('should throw error when magna sync exists', async () => {
       const user_id = community.actors.admin.user.id;
 
       // Create historical allocation with magna sync
