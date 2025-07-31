@@ -32,11 +32,17 @@ In this scenario you would need to manually delete the load balancer for full cl
 
 # Apply Ingress to argocd
 1. `kubectl apply -f argocd/ingress-argocd.yaml`
-2. Check to see if argocd subdomain is created, for example argocd.unique.rocks
+If you get an error like `tls: failed to verify certificate: x509: certificate signed by unknown authority`
+Then run:
+`CA=$(kubectl -n ingress-nginx get secret ingress-nginx-admission -ojsonpath='{.data.ca}')
+kubectl patch validatingwebhookconfigurations ingress-nginx-admission --type='json' -p='[{"op": "add", "path": "/webhooks/0/clientConfig/caBundle", "value":"'$CA'"}]'`
+To copy the cabundle from the secrets into the webhook and reapply the manifest.
+
+Now check to see if argocd subdomain is created, for example argocd.unique.rocks
 
 # Setup vault
-1. `kubectl apply -f vault/vault-application.yaml`
-2. `kubectl apply -f vault/vault-operator.yaml`
+1. `kubectl apply -f vault/vault-operator.yaml`
+2. `kubectl apply -f vault/vault-application.yaml`
 
 # Get root token and setup initial secrets
 1. `export VAULT_ADDR=https://vault.<domain_name>`
