@@ -5,6 +5,7 @@ import { Op } from 'sequelize';
 import { models } from '../../database';
 import { authRoles, mustExist } from '../../middleware';
 import { SuiNFTProvider } from '../../services/tokenBalanceCache/providers/SuiNFTProvider';
+import { Requirement } from '../../utils';
 
 const log = logger(import.meta);
 
@@ -15,7 +16,7 @@ type SuiNFTSource = {
   token_standard?: string;
 };
 
-function extractSuiNFTSource(requirements: any[]): SuiNFTSource | null {
+function extractSuiNFTSource(requirements: Requirement[]): SuiNFTSource | null {
   for (const requirement of requirements) {
     if (requirement.rule === 'threshold' && requirement.data?.source) {
       const source = requirement.data.source;

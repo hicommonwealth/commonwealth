@@ -1,4 +1,5 @@
 import { logger } from '@hicommonwealth/core';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { SuiClient } from '@mysten/sui/client';
 import { models } from '../../../database';
 import type { Balances, GetSuiNftBalanceOptions } from '../types';
@@ -35,7 +36,7 @@ export class SuiNFTProvider {
 
     const options: GetSuiNftBalanceOptions = {
       addresses,
-      balanceSourceType: 'SuiNFT' as any,
+      balanceSourceType: BalanceSourceType.SuiNFT,
       sourceOptions: {
         suiNetwork: source.suiNetwork,
         collectionId: source.collectionId,

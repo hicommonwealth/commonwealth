@@ -18,7 +18,7 @@ export function ListGroupSnapshots(): Query<typeof schemas.ListGroupSnapshots> {
       const offset = limit! * (cursor! - 1);
 
       const whereConditions = ['gs.group_id = :groupId'];
-      const replacements: { [key: string]: any } = { groupId };
+      const replacements: { [key: string]: string | number } = { groupId };
 
       if (status) {
         whereConditions.push('gs.status = :status');
