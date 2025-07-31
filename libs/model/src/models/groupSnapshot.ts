@@ -31,6 +31,8 @@ export default (
           model: 'Groups',
           key: 'id',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       block_height: {
         type: Sequelize.BIGINT,
