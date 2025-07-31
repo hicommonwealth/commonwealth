@@ -90,9 +90,9 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
       groupDescription: foundGroup.description,
       groupImageUrl: foundGroup.groupImageUrl || '',
       requirements: (foundGroup?.requirements || [])
-        .filter((r) => r?.data?.source || r.rule === 'trust-level')
+        .filter((r) => r?.data?.source || r.rule === TRUST_LEVEL_SPECIFICATION)
         .map((requirement) =>
-          requirement.rule === 'trust-level'
+          requirement.rule === TRUST_LEVEL_SPECIFICATION
             ? {
                 requirementType: {
                   value: TRUST_LEVEL_SPECIFICATION,

@@ -14,7 +14,7 @@ export const SOL_NFT_SPECIFICATION = 'metaplex';
 
 export const SUI_NFT_SPECIFICATION = 'sui_nft';
 
-export const TRUST_LEVEL_SPECIFICATION = 'trust_level';
+export const TRUST_LEVEL_SPECIFICATION = 'trust-level';
 
 export const ERC_SPECIFICATIONS = {
   ERC_20: 'erc20',

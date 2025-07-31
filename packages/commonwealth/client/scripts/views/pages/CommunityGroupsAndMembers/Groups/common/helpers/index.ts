@@ -211,7 +211,7 @@ export const makeGroupDataBaseAPIPayload = (
     if (x.requirementType === TRUST_LEVEL_SPECIFICATION) {
       // @ts-expect-error StrictNullChecks
       payload.requirements.push({
-        rule: 'trust-level',
+        rule: TRUST_LEVEL_SPECIFICATION,
         data: {
           minimum_trust_level: parseInt(x.requirementTrustLevel || '0'),
         },

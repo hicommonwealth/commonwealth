@@ -80,7 +80,10 @@ const GroupsSection = ({
               groupDescription={group.description}
               // @ts-expect-error <StrictNullChecks/>
               requirements={group.requirements
-                .filter((r) => r?.data?.source || r.rule === 'trust-level')
+                .filter(
+                  (r) =>
+                    r?.data?.source || r.rule === TRUST_LEVEL_SPECIFICATION,
+                )
                 .map((r) => ({
                   requirementType: requirementTypes?.find((x) =>
                     r?.data?.source?.source_type
