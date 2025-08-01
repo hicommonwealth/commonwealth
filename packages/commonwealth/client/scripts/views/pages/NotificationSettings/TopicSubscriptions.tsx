@@ -132,7 +132,6 @@ export const TopicSubscriptions = () => {
                     key={topic.id}
                     id={topic.id}
                     name={topic.name}
-                    community_id={topic.community_id}
                     subscription={topic.subscription}
                   />
                 ))}

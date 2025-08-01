@@ -142,6 +142,13 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                         created_at: updated_user.created_at!,
                       },
                     },
+                    {
+                      event_name: 'UserUpdated',
+                      event_payload: {
+                        old_user: user,
+                        new_user: updated_user,
+                      },
+                    },
                   ],
                   transaction,
                 );

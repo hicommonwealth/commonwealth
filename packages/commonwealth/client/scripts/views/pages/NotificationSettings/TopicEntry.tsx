@@ -10,16 +10,10 @@ import { z } from 'zod';
 type TopicEntryProps = Readonly<{
   id: number;
   name: string;
-  community_id: string;
   subscription?: z.infer<typeof TopicSubscription>;
 }>;
 
-export const TopicEntry = ({
-  name,
-  community_id,
-  id,
-  subscription,
-}: TopicEntryProps) => {
+export const TopicEntry = ({ name, id, subscription }: TopicEntryProps) => {
   const [subscribed, setSubscribed] = useState(!!subscription);
 
   const createTopicSubscription = useCreateTopicSubscriptionMutation();

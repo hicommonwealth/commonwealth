@@ -109,6 +109,7 @@ export async function emitSignInEvents({
         user_id: user.id!,
         created_at: created_at!,
         referrer_address,
+        user,
       },
     } as EventPair<'UserCreated'>);
 
