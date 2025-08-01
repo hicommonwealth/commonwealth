@@ -4,12 +4,14 @@ import { z } from 'zod';
 import { ChainNodeAttributes } from './chain_node';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
+import type { TopicSubscriptionAttributes } from './topic_subscription';
 import type { ModelInstance } from './types';
 
 export type TopicAttributes = z.infer<typeof Topic> & {
   // associations
   community?: CommunityAttributes;
   threads?: ThreadAttributes[];
+  subscriptions?: TopicSubscriptionAttributes[];
   ChainNode?: ChainNodeAttributes;
 };
 export type TopicInstance = ModelInstance<TopicAttributes>;
