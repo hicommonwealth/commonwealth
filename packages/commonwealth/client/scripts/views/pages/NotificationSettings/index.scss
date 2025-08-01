@@ -85,4 +85,78 @@
     margin-top: 8px;
     margin-bottom: 8px;
   }
+
+  .community-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 0;
+    border-bottom: 1px solid colors.$neutral-200;
+
+    .community-info {
+      display: flex;
+      align-items: center;
+      flex: 1;
+
+      // Make community name more prominent
+      .CommunityInfo {
+        .community-name {
+          font-size: 18px;
+          font-weight: 600;
+          color: colors.$neutral-900;
+        }
+      }
+    }
+  }
+
+  // Make chevron icons smaller in collapsible headers
+  .Collapsible {
+    .expand-icon-button {
+      .CWIconButton {
+        width: 16px !important;
+        height: 16px !important;
+
+        .CWIcon {
+          width: 12px !important;
+          height: 12px !important;
+        }
+      }
+    }
+  }
+
+  .topics-container {
+    padding-left: 16px;
+    margin-top: 8px;
+  }
+
+  .TopicEntry {
+    .section {
+      margin-top: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      flex-grow: 1;
+    }
+
+    .toggle {
+      margin-left: auto;
+
+      .Toggle {
+        transform: scale(0.8);
+      }
+    }
+
+    .topic-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      // Make topic names less prominent
+      .Text {
+        font-size: 14px;
+        font-weight: 400;
+        color: colors.$neutral-700;
+      }
+    }
+  }
 }

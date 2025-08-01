@@ -54,6 +54,7 @@ import {
   HistoricalAllocations,
 } from './token-allocation';
 import Topic from './topic';
+import TopicSubscription from './topic_subscription';
 import TwitterCursor from './twitter_cursor';
 import User from './user';
 import Vote from './vote';
@@ -114,6 +115,7 @@ export const Factories = {
   ThreadSubscription,
   ThreadVersionHistory,
   Topic,
+  TopicSubscription,
   TwitterCursor,
   User,
   Vote,
