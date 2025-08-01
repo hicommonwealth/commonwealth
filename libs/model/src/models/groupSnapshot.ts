@@ -4,8 +4,6 @@ import { z } from 'zod';
 import type { GroupAttributes } from './group';
 import type { ModelInstance } from './types';
 
-export type GroupSnapshotStatus = 'active' | 'error' | 'superseded';
-
 export type GroupSnapshotAttributes = z.infer<typeof GroupSnapshot> & {
   // associations
   group?: GroupAttributes;
@@ -51,7 +49,7 @@ export default (
         allowNull: false,
       },
       status: {
-        type: Sequelize.ENUM('pending', 'active', 'error', 'superseded'),
+        type: Sequelize.STRING,
         allowNull: false,
         defaultValue: 'pending',
       },

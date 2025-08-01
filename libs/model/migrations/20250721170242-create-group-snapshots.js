@@ -44,7 +44,7 @@ export default {
             comment: 'Copy of the group requirements at the time of snapshot',
           },
           status: {
-            type: Sequelize.ENUM('active', 'error', 'superseded'),
+            type: Sequelize.STRING,
             allowNull: false,
             comment: 'Lifecycle status of the snapshot',
           },

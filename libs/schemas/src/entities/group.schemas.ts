@@ -155,7 +155,7 @@ export const GroupSnapshot = z.object({
   snapshot_source: z.string(),
   balance_map: z.record(z.string()),
   group_requirements: z.array(Requirement),
-  status: z.enum(['pending', 'active', 'error', 'superseded']),
+  status: z.enum(['active', 'superseded']),
   error_message: z.string().nullable(),
   snapshot_date: z.date(),
   created_at: z.coerce.date().optional(),
