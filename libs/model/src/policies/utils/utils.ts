@@ -63,6 +63,18 @@ export const getThreadUrl = (
   return getBaseUrl(customDomain) + `/${communityId}/discussion/${threadId}`;
 };
 
+export const getTopicUrl = (
+  communityId: string,
+  topicId: number,
+  topicName: string,
+  customDomain?: string | null,
+): string => {
+  return (
+    getBaseUrl(customDomain) +
+    `/${communityId}/discussions/${topicId}-${encodeURIComponent(topicName)}`
+  );
+};
+
 export const getChainProposalUrl = (
   communityId: string,
   proposalId: string,
