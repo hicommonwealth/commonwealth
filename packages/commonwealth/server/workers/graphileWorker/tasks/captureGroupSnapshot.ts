@@ -27,7 +27,7 @@ export async function captureGroupSnapshot(payload: { groupId: number }) {
       throw new Error(`Group with id ${groupId} not found`);
     }
 
-    const result = await command(GroupSnapshot.CreateGroupSnapshot(), {
+    await command(GroupSnapshot.CreateGroupSnapshot(), {
       actor: systemActor({}),
       payload: {
         community_id: group.community_id,
