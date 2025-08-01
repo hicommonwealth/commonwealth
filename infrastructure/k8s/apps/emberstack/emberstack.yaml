@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: reflector
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io/foreground
+spec:
+  destination:
+    namespace: cert-manager
+    server: https://kubernetes.default.svc
+  source:
+    path: ''
+    repoURL: https://emberstack.github.io/helm-charts
+    targetRevision: 9.1.22
+    chart: reflector
+    helm:
+      values: ''
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

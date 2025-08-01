@@ -1,0 +1,1 @@
+Used for copying the wildcard-cert-dns-tls secret into all namesapces so they can be used by ingress

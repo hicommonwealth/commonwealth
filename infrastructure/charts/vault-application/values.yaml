@@ -1,3 +1,3 @@
 irsaRoleArn: 'arn:aws:iam::775434881122:role/vault-server-role-development'
-kmsKeyId: '9d18dcc1-f40f-47c2-86dd-a6b72e2a6f43'
+kmsKeyId: 'f92f7c72-1e10-4882-874d-d1d61af1b931'
 kmsRegion: 'us-east-1'
