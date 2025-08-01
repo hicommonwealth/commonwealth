@@ -20,6 +20,7 @@ export function GetSnapshotBalances(): Query<
           where: {
             id: snapshotId,
             group_id: groupId,
+            status: 'active',
           },
         });
       } else {
@@ -33,7 +34,7 @@ export function GetSnapshotBalances(): Query<
         });
       }
 
-      if (!snapshot || snapshot.status === 'error') {
+      if (!snapshot) {
         return null;
       }
 
