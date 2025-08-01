@@ -162,6 +162,13 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'Metamask',
   },
+  gate: {
+    icon: {
+      name: 'gate',
+      isCustom: true,
+    },
+    label: 'Gate Wallet',
+  },
   coinbase: {
     icon: {
       name: 'coinbase',
