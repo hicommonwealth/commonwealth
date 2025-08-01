@@ -31,6 +31,9 @@ export * from './policies';
 // Config
 export * from './config';
 
+// Integrations
+export * from './integrations';
+
 // Exported utils (might be leaks)
 export {
   refreshMemberships,

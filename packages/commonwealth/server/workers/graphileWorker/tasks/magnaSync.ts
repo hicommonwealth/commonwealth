@@ -1,5 +1,9 @@
 import { logger } from '@hicommonwealth/core';
-import { TokenAllocation } from '@hicommonwealth/model';
+import {
+  TokenAllocationSyncArgs,
+  TokenAllocationSyncResponse,
+  magnaSync,
+} from '@hicommonwealth/model';
 import { GraphileTask, TaskPayloads } from '@hicommonwealth/model/services';
 import { config } from '../../../config';
 import * as magnaApi from '../../magna/api';
@@ -14,7 +18,7 @@ async function createMagnaAllocation({
   user_email,
   wallet_address,
   token_allocation,
-}: TokenAllocation.TokenAllocationSyncArgs): Promise<TokenAllocation.TokenAllocationSyncResponse> {
+}: TokenAllocationSyncArgs): Promise<TokenAllocationSyncResponse> {
   const response = await magnaApi.createAllocation(
     config.MAGNA.API_URL!,
     config.MAGNA.API_KEY!,
@@ -44,7 +48,7 @@ export const magnaSyncTask: GraphileTask<typeof TaskPayloads.MagnaSync> = {
       return;
     }
     log.info('Starting MagnaSync job...');
-    await TokenAllocation.magnaSync(createMagnaAllocation);
+    await magnaSync(createMagnaAllocation);
     log.info('MagnaSync job completed!');
   },
 };

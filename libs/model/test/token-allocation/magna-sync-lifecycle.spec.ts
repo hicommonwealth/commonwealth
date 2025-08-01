@@ -2,9 +2,9 @@ import { dispose } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model/db';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
-import { magnaSync } from 'model/src/aggregates/token-allocation';
 import { Op } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { magnaSync } from '../../src/integrations/token-allocation/magna.sync';
 import { CommunitySeedResult, seedCommunity } from '../utils';
 
 const chance = new Chance();
