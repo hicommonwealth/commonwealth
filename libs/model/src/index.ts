@@ -8,6 +8,7 @@ export * as Contest from './aggregates/contest';
 export * as DiscordBot from './aggregates/discordBot';
 export * as Email from './aggregates/emails';
 export * as Feed from './aggregates/feed';
+export * as GroupSnapshot from './aggregates/groupSnapshot';
 export * as LoadTest from './aggregates/load-testing';
 export * as MCPServer from './aggregates/mcp-server';
 export * as Poll from './aggregates/poll';
