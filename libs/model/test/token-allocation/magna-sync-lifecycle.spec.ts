@@ -63,6 +63,17 @@ describe('MagnaSync Lifecycle', () => {
         }),
       ),
     );
+    // add aura allocations to some users
+    await Promise.all(
+      users.slice(0, Math.floor(users.length * 0.8)).map((user) =>
+        models.AuraAllocations.create({
+          user_id: user.id!,
+          total_xp: chance.integer({ min: 0, max: 100 }),
+          percent_allocation: chance.integer({ min: 0, max: 100 }),
+          token_allocation: chance.integer({ min: 0, max: 100 }),
+        }),
+      ),
+    );
 
     // Execute sync
     await magnaSync(

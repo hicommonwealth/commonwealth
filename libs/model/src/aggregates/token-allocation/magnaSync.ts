@@ -43,11 +43,12 @@ export async function magnaSync(
             U.profile->>'name' as user_name,
             U.profile->>'email' as user_email,
             C.address as wallet_address,
-            A.token_allocation
+            A.token_allocation + COALESCE(AA.token_allocation, 0) as token_allocation
           FROM
             "HistoricalAllocations" A
             JOIN "Users" U ON A.user_id = U.id
             JOIN "ClaimAddresses" C ON A.user_id = C.user_id
+            LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
           WHERE
             A.magna_synced_at IS NULL AND C.address IS NOT NULL
           ORDER BY
