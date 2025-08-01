@@ -90,6 +90,7 @@
     "@hicommonwealth/evm-protocols": "workspace:*",
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
+    "@knocklabs/node": "catalog:",
     "@magic-sdk/admin": "^2.4.1",
     "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
     "@metaplex-foundation/umi": "^1.2.0",

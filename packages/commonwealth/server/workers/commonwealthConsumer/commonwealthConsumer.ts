@@ -1,11 +1,17 @@
 import {
   config,
   HotShotsStats,
+  KnockProvider,
   RedisCache,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { cache, logger, stats } from '@hicommonwealth/core';
+import {
+  cache,
+  logger,
+  notificationsProvider,
+  stats,
+} from '@hicommonwealth/core';
 import {
   bootstrapBindings,
   bootstrapContestRolloverLoop,
@@ -20,6 +26,12 @@ config.CACHE.REDIS_URL &&
   cache({
     adapter: new RedisCache(config.CACHE.REDIS_URL),
   });
+
+if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)
+  notificationsProvider({
+    adapter: KnockProvider(),
+  });
+else notificationsProvider();
 
 let isServiceHealthy = false;
 
