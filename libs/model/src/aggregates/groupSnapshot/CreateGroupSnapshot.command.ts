@@ -5,6 +5,7 @@ import { Op } from 'sequelize';
 import { models } from '../../database';
 import { authRoles, mustExist } from '../../middleware';
 import { SuiNFTProvider } from '../../services/tokenBalanceCache/providers/SuiNFTProvider';
+import { getBalances } from '../../services/tokenBalanceCache/tokenBalanceCache';
 import { Requirement } from '../../utils';
 
 const log = logger(import.meta);
@@ -89,10 +90,13 @@ export function CreateGroupSnapshot(): Command<
         community_id,
       });
 
-      const balances = await SuiNFTProvider.getNFTBalances(addresses, {
-        type: 'sui_nft',
-        suiNetwork: suiNFTSource.sui_network,
-        collectionId: suiNFTSource.collection_id,
+      const balances = await getBalances({
+        addresses,
+        balanceSourceType: BalanceSourceType.SuiNFT,
+        sourceOptions: {
+          suiNetwork: suiNFTSource.sui_network,
+          collectionId: suiNFTSource.collection_id,
+        },
       });
 
       const blockHeight = await SuiNFTProvider.getLatestBlockHeight(
