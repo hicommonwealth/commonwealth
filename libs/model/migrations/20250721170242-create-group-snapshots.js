@@ -46,7 +46,6 @@ export default {
           status: {
             type: Sequelize.ENUM('active', 'error', 'superseded'),
             allowNull: false,
-            defaultValue: 'pending',
             comment: 'Lifecycle status of the snapshot',
           },
           error_message: {
