@@ -53,6 +53,7 @@ import {
   getCompletionModelValue,
   MAX_MODELS_SELECTABLE,
 } from './utils';
+import { useFetchMcpServersQuery, McpServer } from 'state/api/mcp';
 
 import './StickyInput.scss';
 
@@ -93,6 +94,11 @@ const StickyInput = (props: StickyInputProps) => {
   const { generateCompletion } = useAiCompletion();
 
   const aiModelPopover = usePopover();
+
+  const { data: mcpServers } = useFetchMcpServersQuery();
+  const [selectedMcpServer, setSelectedMcpServer] = useState<McpServer | null>(
+    null,
+  );
 
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
@@ -172,6 +178,7 @@ const StickyInput = (props: StickyInputProps) => {
           stream: true,
           systemPrompt,
           useWebSearch: webSearchEnabled,
+          ...(selectedMcpServer && { mcpServerUrl: selectedMcpServer.server_url }),
           includeContextualMentions: true,
           communityId: props.communityId,
           onError: (error) => {
@@ -203,6 +210,7 @@ const StickyInput = (props: StickyInputProps) => {
           stream: true,
           systemPrompt,
           useWebSearch: webSearchEnabled,
+          ...(selectedMcpServer && { mcpServerUrl: selectedMcpServer.server_url }),
           includeContextualMentions: true,
           communityId: props.communityId,
           onError: (error) => {
@@ -228,6 +236,7 @@ const StickyInput = (props: StickyInputProps) => {
     setContentDelta,
     webSearchEnabled,
     selectedModels,
+    selectedMcpServer,
     props.communityId,
   ]);
 
@@ -591,6 +600,8 @@ const StickyInput = (props: StickyInputProps) => {
                   isDisabled={!canComment}
                   onKeyDown={handleKeyDown}
                   justClosed={setJustClosedMentionDropdown}
+                  mcpServers={mcpServers || []}
+                  onMcpServerSelect={setSelectedMcpServer}
                   placeholder={placeholderText}
                 />
               </div>
