@@ -111,6 +111,7 @@ export function CreateGroupSnapshot(): Command<
               block_height: blockHeight,
               snapshot_source: `sui_nft:${suiNFTSource.sui_network}:${suiNFTSource.collection_id}`,
               balance_map: balances,
+              group_requirements: group.requirements,
               status: 'active',
               snapshot_date: new Date(),
             },

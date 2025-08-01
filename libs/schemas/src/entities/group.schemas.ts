@@ -154,6 +154,7 @@ export const GroupSnapshot = z.object({
   block_height: z.bigint().nullable(),
   snapshot_source: z.string(),
   balance_map: z.record(z.string()),
+  group_requirements: z.array(Requirement),
   status: z.enum(['pending', 'active', 'error', 'superseded']),
   error_message: z.string().nullable(),
   snapshot_date: z.date(),

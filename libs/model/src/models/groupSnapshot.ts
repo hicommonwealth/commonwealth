@@ -46,6 +46,10 @@ export default (
         type: Sequelize.JSONB,
         allowNull: false,
       },
+      group_requirements: {
+        type: Sequelize.JSONB,
+        allowNull: false,
+      },
       status: {
         type: Sequelize.ENUM('pending', 'active', 'error', 'superseded'),
         allowNull: false,

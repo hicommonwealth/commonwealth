@@ -38,6 +38,11 @@ export default {
             allowNull: false,
             comment: 'JSON mapping of addresses to their balance amounts',
           },
+          group_requirements: {
+            type: Sequelize.JSONB,
+            allowNull: false,
+            comment: 'Copy of the group requirements at the time of snapshot',
+          },
           status: {
             type: Sequelize.ENUM('pending', 'active', 'error', 'superseded'),
             allowNull: false,
