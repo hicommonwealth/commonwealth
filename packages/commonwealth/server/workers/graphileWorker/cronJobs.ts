@@ -2,6 +2,7 @@ import {
   type CustomCronItem,
   GraphileTaskNames,
 } from '@hicommonwealth/model/services';
+import { config } from '../../config';
 
 function buildCustomCronItem({
   task,
@@ -21,7 +22,7 @@ function buildCustomCronItem({
   };
 }
 
-export const cronItems: Array<CustomCronItem> = [
+export const cronItems: Array<CustomCronItem | undefined> = [
   buildCustomCronItem({
     task: GraphileTaskNames.CleanSubscriptions,
     match: '0 8 * * *', // 8 AM everyday
@@ -46,4 +47,10 @@ export const cronItems: Array<CustomCronItem> = [
     task: GraphileTaskNames.CountAggregator,
     match: '*/10 * * * *', // every 10 minutes
   }),
+  config.MAGNA?.API_KEY && config.MAGNA?.API_URL
+    ? buildCustomCronItem({
+        task: GraphileTaskNames.MagnaSync,
+        match: '0 * * * *', // every hour
+      })
+    : undefined,
 ];

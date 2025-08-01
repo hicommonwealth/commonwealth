@@ -41,6 +41,9 @@ const {
   RAILWAY_GIT_COMMIT_SHA,
   RELEASER_URL,
   RELEASER_API_KEY,
+  MAGNA_API_KEY,
+  MAGNA_API_URL,
+  MAGNA_BATCH_SIZE,
 } = process.env;
 
 const DEFAULTS = {
@@ -57,6 +60,7 @@ const DEFAULTS = {
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_IN: 60 * 60,
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_OUT: 60 * 60 * 2,
   CACHE_GET_COMMUNITIES_JOIN_COMMUNITY: 60 * 60 * 24,
+  MAGNA_BATCH_SIZE: '10',
 };
 
 export const config = configure(
@@ -168,6 +172,11 @@ export const config = configure(
       RAILWAY_GIT_COMMIT_SHA,
       RELEASER_URL,
       RELEASER_API_KEY,
+    },
+    MAGNA: {
+      API_KEY: MAGNA_API_KEY,
+      API_URL: MAGNA_API_URL,
+      BATCH_SIZE: parseInt(MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE, 10),
     },
   },
   z.object({
@@ -312,6 +321,11 @@ export const config = configure(
       //     requiredAppEnvs: ['production', 'frick', 'frack', 'beta', 'demo'],
       //     requiredServices: 'all',
       //   }),)
+    }),
+    MAGNA: z.object({
+      API_KEY: z.string().optional(),
+      API_URL: z.string().optional(),
+      BATCH_SIZE: z.number(),
     }),
   }),
 );

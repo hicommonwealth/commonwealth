@@ -10,6 +10,7 @@ describe.skip('Token Allocation Lifecycle', () => {
   beforeAll(async () => {
     community = await seedCommunity({
       roles: ['admin', 'member'],
+      network: 'ethereum',
     });
   });
 
@@ -20,6 +21,7 @@ describe.skip('Token Allocation Lifecycle', () => {
   describe('UpdateClaimAddress', () => {
     it('should update claim address when no magna sync exists', async () => {
       const address = community.addresses.member;
+
       const result = await command(UpdateClaimAddress(), {
         actor: community.actors.member,
         payload: { address_id: address.id! },
@@ -37,17 +39,13 @@ describe.skip('Token Allocation Lifecycle', () => {
     });
 
     it('should throw error when magna sync exists', async () => {
-      const user_id = community.actors.admin.user.id;
+      const user_id = community.actors.admin.user.id!;
 
       // Create historical allocation with magna sync
       await models.HistoricalAllocations.create({
         user_id,
-        address: community.addresses.member.address,
-        created_at: new Date(),
-        updated_at: new Date(),
         magna_synced_at: new Date(),
         token_allocation: 100,
-        percent_allocation: 100,
         num_threads: 100,
         thread_score: 100,
         num_comments: 100,

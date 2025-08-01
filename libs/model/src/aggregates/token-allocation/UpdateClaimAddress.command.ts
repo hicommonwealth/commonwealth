@@ -36,7 +36,7 @@ export function UpdateClaimAddress(): Command<
         },
       );
 
-      if (address.user_id !== actor.user.id) {
+      if (address?.user_id !== actor.user.id) {
         throw new InvalidActor(actor, 'Cannot update claim address');
       }
 

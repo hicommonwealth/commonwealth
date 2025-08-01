@@ -23,6 +23,7 @@ export type CommunitySeedOptions = {
   roles: Array<CommunitySeedRoles>;
   chain_node?: Partial<z.infer<typeof schemas.ChainNode>>;
   chain_base?: ChainBase;
+  network?: string;
   bech32_prefix?: string;
   ss58_prefix?: number;
   groups?: {
@@ -61,6 +62,7 @@ export async function seedCommunity({
   roles,
   chain_node = { eth_chain_id: 1 },
   chain_base = ChainBase.Ethereum,
+  network = 'ethereum',
   bech32_prefix = undefined,
   ss58_prefix = undefined,
   groups = [],
@@ -97,6 +99,7 @@ export async function seedCommunity({
     tier: CommunityTierMap.ManuallyVerified,
     chain_node_id: node!.id!,
     base: chain_base,
+    network,
     active: true,
     lifetime_thread_count: 0,
     profile_count: 1,
@@ -116,6 +119,7 @@ export async function seedCommunity({
     tier: CommunityTierMap.ChainVerified,
     chain_node_id: node!.id!,
     base: chain_base,
+    network,
     bech32_prefix,
     ss58_prefix,
     namespace,

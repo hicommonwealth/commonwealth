@@ -95,7 +95,7 @@ export async function apiKeyAuthMiddleware(
     }
 
     user = address.User!;
-    delete user.ApiKey;
+    delete user!.ApiKey;
 
     // cache for 2 minutes
     await cache().setKey(

@@ -1,8 +1,25 @@
 import Sequelize from 'sequelize';
 import { ModelInstance } from './types';
 
-export const HistoricalAllocations = (sequelize: Sequelize.Sequelize) =>
-  sequelize.define(
+export type HistoricalAllocation = {
+  user_id: number;
+  num_threads: number;
+  thread_score: number;
+  num_comments: number;
+  comment_score: number;
+  num_reactions: number;
+  reactions_score: number;
+  unadjusted_score: number;
+  adjusted_score: number;
+  percent_score: number;
+  token_allocation: number;
+  magna_allocation_id: string | null;
+  magna_synced_at: Date | null;
+};
+export const HistoricalAllocations = (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ModelInstance<HistoricalAllocation>> =>
+  sequelize.define<ModelInstance<HistoricalAllocation>>(
     'HistoricalAllocations',
     {
       user_id: {
@@ -49,6 +66,10 @@ export const HistoricalAllocations = (sequelize: Sequelize.Sequelize) =>
         type: Sequelize.DECIMAL,
         allowNull: false,
       },
+      magna_allocation_id: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       magna_synced_at: {
         type: Sequelize.DATE,
         allowNull: true,
@@ -60,8 +81,16 @@ export const HistoricalAllocations = (sequelize: Sequelize.Sequelize) =>
     },
   );
 
-export const AuraAllocations = (sequelize: Sequelize.Sequelize) =>
-  sequelize.define(
+export type AuraAllocation = {
+  user_id: number;
+  total_xp: number;
+  percent_allocation: number;
+  token_allocation: number;
+};
+export const AuraAllocations = (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ModelInstance<AuraAllocation>> =>
+  sequelize.define<ModelInstance<AuraAllocation>>(
     'AuraAllocations',
     {
       user_id: {
