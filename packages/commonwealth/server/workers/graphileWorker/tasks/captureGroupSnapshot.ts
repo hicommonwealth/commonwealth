@@ -35,10 +35,6 @@ export async function captureGroupSnapshot(payload: { groupId: number }) {
       },
     });
 
-    if (result.status === 'error') {
-      throw new Error(result.error_message ?? 'Unknown error');
-    }
-
     log.info('Group snapshot captured', { groupId });
   } catch (error) {
     log.error('Failed to capture group snapshot', error as Error, {
