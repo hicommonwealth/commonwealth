@@ -45,7 +45,13 @@ const UniswapTradeModal = ({
   const blockExplorerUrl = tokenCommunity?.ChainNode?.block_explorer;
 
   const { uniswapWidget, isMagicUser, isMagicConfigured } =
-    useUniswapTradeModal({ tradeConfig, ethChainId, rpcUrl, blockExplorerUrl });
+    useUniswapTradeModal({
+      tradeConfig,
+      ethChainId,
+      rpcUrl,
+      blockExplorerUrl,
+      node: tokenCommunity?.ChainNode,
+    });
 
   const { currentChain, isWrongNetwork, promptNetworkSwitch } =
     useNetworkSwitching({
