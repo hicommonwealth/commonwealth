@@ -5,6 +5,7 @@ import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from 'views/components/component_kit/cw_text';
+import TokenClaimAddress from './TokenClaimAddress';
 
 import './RewardsCard.scss';
 
@@ -52,6 +53,7 @@ const RewardsCard = ({
         </CWText>
       )}
       <div className="rewards-card-body">{children}</div>
+      {title === 'Rewards' && <TokenClaimAddress />}
     </CWCard>
   );
 };

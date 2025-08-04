@@ -1,13 +1,16 @@
 import { z } from 'zod';
 import { EVM_ADDRESS_STRICT, PG_INT } from '../utils';
 
+export const ClaimAddressView = z.object({
+  user_id: PG_INT,
+  address: EVM_ADDRESS_STRICT,
+  magna_synced_at: z
+    .string()
+    .nullish()
+    .describe('When the address was synced with magna and made not updatable.'),
+});
+
 export const GetClaimAddress = {
   input: z.void(),
-  output: z.union([
-    z.object({
-      user_id: PG_INT,
-      address: EVM_ADDRESS_STRICT,
-    }),
-    z.undefined(),
-  ]),
+  output: ClaimAddressView.nullish(),
 };
