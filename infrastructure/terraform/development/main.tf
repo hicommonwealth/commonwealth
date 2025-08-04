@@ -63,6 +63,11 @@ module "eks" {
     associate_public_ip_address           = true
   }
 
+  // Remove automatic SG tag on cluster SG. If not done, ingress will get confused when syncing LB
+  node_security_group_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = null
+  }
+
   cluster_addons = {
     # Enables ip prefix delegation which increases the maximum pod limit per node
     vpc-cni = {

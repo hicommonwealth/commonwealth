@@ -1,7 +1,7 @@
 # Setup infra
 1. `terraform init` to install providers (Only needs to be run once)
 2. `terraform apply` (This requires vars ENV_NAME and DIGITALOCEAN_TOKEN)
-3. Connect aws cluster `aws eks update-kubeconfig --name commonwealth-${ENV_NAME} --region ${AWS_REGION}`
+3. Connect aws cluster `aws eks update-kubeconfig --name commonwealth-development --region us-east-1`
 ### Note on destroy
 If you destroy without first deleting the ingress-nginx Application, you will leave a dangling load balancer
 which will prevent the VPC from being deleted.
@@ -13,6 +13,10 @@ In this scenario you would need to manually delete the load balancer for full cl
 # Setup nginx ingress
 1. `kubectl apply -f ingress-nginx.yaml`
 
+# Setup emberstack
+1. `kubectl apply -f emberstack/emberstack.yaml`
+
+
 # Setup cert-manager
 1. `kubectl apply -f cert-manager/cert-manager.yaml`
 2. `kubectl create secret generic cloudflare-secrets \
@@ -20,7 +24,7 @@ In this scenario you would need to manually delete the load balancer for full cl
    --from-literal CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}`
 3. `kubectl apply -f cert-manager/certificate-nginx.yaml`
 3. `kubectl apply -f cert-manager/certificate-vault.yaml`
-5. Wait for `kubectl get certificate -n ingress-nginx` to be in READY true
+5. Wait for `kubectl get certificate` to be in READY true
 
 # Setup cloudflare-tunnel
 1. `kubectl apply -f cloudflare-operator/cloudflare-operator.yaml`

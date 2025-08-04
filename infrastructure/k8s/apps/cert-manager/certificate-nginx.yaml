@@ -1,36 +1,24 @@
 apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
+kind: Issuer
 metadata:
-  name: letsencrypt-dns
+  name: nginx-selfsigned
 spec:
-  acme:
-    email: kurtis@common.xyz
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
-    privateKeySecretRef:
-      name: letsencrypt-dns-key
-    solvers:
-      - dns01:
-          cloudflare:
-            apiTokenSecretRef:
-              name: cloudflare-secrets
-              key: CLOUDFLARE_API_TOKEN
+  selfSigned: {}
+
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: wildcard-cert-dns
-  namespace: default
+  name: nginx-tls
+  namespace: ingress-nginx
 spec:
-  secretName: wildcard-cert-dns-tls
-  issuerRef:
-    name: letsencrypt-dns
-    kind: ClusterIssuer
-  commonName: '*.unique.rocks'
+  commonName: nginx
+  usages:
+    - server auth
   dnsNames:
-    - '*.unique.rocks'
-  secretTemplate:
-    annotations:
-      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: ".*"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: ".*"
+    - ingress-nginx-controller.ingress-nginx.svc.cluster.local
+  ipAddresses:
+    - 127.0.0.1
+  secretName: nginx-tls
+  issuerRef:
+    name: nginx-selfsigned

@@ -25,6 +25,8 @@ spec:
             forwarded-for-header: "CF-Connecting-IP"
             use-forwarded-headers: "true"
             proxy-real-ip-cidr: "10.0.0.0/16"
+          extraArgs:
+            wildcard-tls-secret: ingress-nginx/wildcard-cert-dns-tls
         defaultBackend:
           image:
             repository: registry.k8s.io/defaultbackend-arm64
