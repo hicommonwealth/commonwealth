@@ -2,17 +2,22 @@
   .claim-address-body {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-top: 1rem;
+    gap: 8px;
 
     .claim-address-row {
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      width: 100%;
 
-      .cw-text-input-wrapper {
+      .CWSelectList {
         width: 100%;
+        .SelectList {
+          padding: 4px 8px !important;
+          line-height: initial;
+          min-height: initial;
+          max-height: 40px;
+          width: 100%;
+        }
       }
     }
   }

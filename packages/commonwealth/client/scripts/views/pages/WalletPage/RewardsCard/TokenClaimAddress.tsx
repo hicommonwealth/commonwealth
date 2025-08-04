@@ -5,12 +5,15 @@ import useGetClaimAddressQuery from 'state/api/tokenAllocations/getClaimAddress'
 import useUpdateClaimAddressMutation from 'state/api/tokenAllocations/updateClamiAddress';
 import useUserStore from 'state/ui/user';
 import { CWCard } from 'views/components/component_kit/cw_card';
-import {
-  CWDropdown,
-  DropdownItemType,
-} from 'views/components/component_kit/cw_dropdown';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
+import {
+  CustomAddressOption,
+  CustomAddressOptionElement,
+} from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+// eslint-disable-next-line max-len
+import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import './TokenClaimAddress.scss';
 
 const TokenClaimAddress = () => {
@@ -41,40 +44,52 @@ const TokenClaimAddress = () => {
     }
   };
 
-  const dropdownOptions: DropdownItemType[] = evmAddresses.map((account) => ({
-    label: account.address || 'Unknown Address',
-    value: account.addressId!,
-  }));
-
   return (
     <CWCard className="TokenClaimAddress">
-      <CWText>Token Claim Address</CWText>
       {isLoading ? (
         <CWText>Loading...</CWText>
       ) : (
         <div className="claim-address-body">
           <div className="claim-address-row">
-            <CWText>{claimAddress?.address || '-'}</CWText>
-          </div>
-          <div className="claim-address-row">
-            <CWDropdown
-              options={dropdownOptions}
-              onSelect={(item) => {
+            <CWSelectList
+              components={{
+                Option: (originalProps) =>
+                  CustomAddressOption({
+                    originalProps,
+                    selectedAddressValue: selectedAddress?.address || '',
+                  }),
+              }}
+              noOptionsMessage={() => 'No available addresses'}
+              value={convertAddressToDropdownOption(
+                selectedAddress?.address || '',
+              )}
+              defaultValue={convertAddressToDropdownOption(
+                claimAddress?.address || '',
+              )}
+              formatOptionLabel={(option) => (
+                <CustomAddressOptionElement
+                  value={option.value}
+                  label={option.label}
+                  selectedAddressValue={selectedAddress?.address || ''}
+                />
+              )}
+              label="Token Claim Address"
+              isClearable={false}
+              isSearchable={false}
+              options={(evmAddresses || []).map((account) =>
+                convertAddressToDropdownOption(account.address!),
+              )}
+              onChange={(option) => {
                 const account = evmAddresses.find(
-                  (acc) => acc.addressId === item.value,
+                  (acc) => acc.address === option?.value,
                 );
                 setSelectedAddress(account);
               }}
-              initialValue={
-                dropdownOptions.find(
-                  (option) => option.label === claimAddress?.address,
-                ) || dropdownOptions[0]
-              }
             />
           </div>
           <div className="claim-address-row">
             <CWButton
-              label="Update"
+              label={isUpdating ? 'Updating...' : 'Update'}
               onClick={handleUpdate}
               disabled={
                 isUpdating ||
@@ -82,9 +97,9 @@ const TokenClaimAddress = () => {
                 !selectedAddress ||
                 selectedAddress.address === claimAddress?.address
               }
-            >
-              {isUpdating ? 'Updating...' : 'Update Claim Address'}
-            </CWButton>
+              buttonWidth="full"
+              buttonHeight="sm"
+            />
           </div>
         </div>
       )}
