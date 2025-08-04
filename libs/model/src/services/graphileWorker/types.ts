@@ -10,6 +10,7 @@ export enum GraphileTaskNames {
   RunDbMaintenance = 'RunDbMaintenance',
   AwardTwitterQuestXp = 'AwardTweetEngagementXp',
   CountAggregator = 'CountAggregator',
+  CaptureGroupSnapshot = 'CaptureGroupSnapshot',
   MagnaSync = 'MagnaSync',
 }
 
@@ -33,5 +34,8 @@ export const TaskPayloads = {
   RunDbMaintenance: z.object({}),
   AwardTweetEngagementXp: events.TweetEngagementCapReached,
   CountAggregator: z.object({}),
+  CaptureGroupSnapshot: z.object({
+    groupId: z.number(),
+  }),
   MagnaSync: z.object({}),
 } as const satisfies Record<GraphileTaskNames, ZodType | ZodUndefined>;

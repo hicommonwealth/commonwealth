@@ -6,6 +6,7 @@ export * from './comment.schemas';
 export * from './community.schemas';
 export * from './contest.schemas';
 export * from './discord.schemas';
+export * from './groupSnapshot.schemas';
 export * from './load-testing.schemas';
 export * from './magic.schemas';
 export * from './poll.schemas';

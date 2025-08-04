@@ -7,6 +7,7 @@ import {
 import { Task } from 'graphile-worker';
 import { ZodType, ZodUndefined, z } from 'zod';
 import { archiveOutboxTask } from './tasks/archiveOutbox';
+import { captureGroupSnapshotTask } from './tasks/captureGroupSnapshot';
 import { cleanChainEventXpSourcesTask } from './tasks/cleanChainEventXpSources';
 import { cleanSubscriptionsTask } from './tasks/cleanSubscriptions';
 import { countAggregatorTask } from './tasks/countAggregator';
@@ -35,5 +36,6 @@ export const graphileTasks: {
   [GraphileTaskNames.RunDbMaintenance]: runDbMaintenanceTask,
   [GraphileTaskNames.AwardTwitterQuestXp]: awardTweetEngagementXpTask,
   [GraphileTaskNames.CountAggregator]: countAggregatorTask,
+  [GraphileTaskNames.CaptureGroupSnapshot]: captureGroupSnapshotTask,
   [GraphileTaskNames.MagnaSync]: magnaSyncTask,
 } as const;
