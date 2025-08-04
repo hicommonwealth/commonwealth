@@ -1,4 +1,5 @@
 import { gql, GraphQLClient, RequestOptions } from 'graphql-request';
+
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -54,8 +55,26 @@ export type AccessRule = {
 export enum ActiveFeatureFlag {
   CephVolumes = 'CEPH_VOLUMES',
   DefaultToRailpack = 'DEFAULT_TO_RAILPACK',
+  ExtensionsTab = 'EXTENSIONS_TAB',
+  LogExplorerV2 = 'LOG_EXPLORER_V2',
+  NewGhReposApi = 'NEW_GH_REPOS_API',
+  NewVolumeMountPanel = 'NEW_VOLUME_MOUNT_PANEL',
   PriorityBoarding = 'PRIORITY_BOARDING',
   V3NewProjectPage = 'V3_NEW_PROJECT_PAGE',
+}
+
+export enum ActivePlatformFlag {
+  DefaultNewUsersRailpack = 'DEFAULT_NEW_USERS_RAILPACK',
+  DemoPercentageRollout = 'DEMO_PERCENTAGE_ROLLOUT',
+  EnableMetalRegistryAms = 'ENABLE_METAL_REGISTRY_AMS',
+  EnableMetalRegistryDc4 = 'ENABLE_METAL_REGISTRY_DC4',
+  EnableMetalRegistryGcpRegions = 'ENABLE_METAL_REGISTRY_GCP_REGIONS',
+  EnableMetalRegistrySg3 = 'ENABLE_METAL_REGISTRY_SG3',
+  EnableMetalRegistrySv2 = 'ENABLE_METAL_REGISTRY_SV2',
+  NewGhReposApi = 'NEW_GH_REPOS_API',
+  NonDestructiveVolumeMigrations = 'NON_DESTRUCTIVE_VOLUME_MIGRATIONS',
+  ReferralCash = 'REFERRAL_CASH',
+  UpdatedVmQueries = 'UPDATED_VM_QUERIES',
 }
 
 export enum ActiveServiceFeatureFlag {
@@ -126,7 +145,7 @@ export type ApiTokenCreateInput = {
 
 export type BanReasonHistory = Node & {
   __typename?: 'BanReasonHistory';
-  actor: User;
+  actor?: Maybe<User>;
   banReason?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
@@ -390,6 +409,7 @@ export type Deployment = Node & {
   sockets: Array<DeploymentSocket>;
   staticUrl?: Maybe<Scalars['String']['output']>;
   status: DeploymentStatus;
+  statusUpdatedAt?: Maybe<Scalars['DateTime']['output']>;
   suggestAddServiceDomain: Scalars['Boolean']['output'];
   updatedAt: Scalars['DateTime']['output'];
   url?: Maybe<Scalars['String']['output']>;
@@ -654,6 +674,8 @@ export type EnvironmentVolumeInstancesArgs = {
 };
 
 export type EnvironmentCreateInput = {
+  /** If true, the changes will be applied in the background and the mutation will return immediately. If false, the mutation will wait for the changes to be applied before returning. */
+  applyChangesInBackground?: InputMaybe<Scalars['Boolean']['input']>;
   ephemeral?: InputMaybe<Scalars['Boolean']['input']>;
   name: Scalars['String']['input'];
   projectId: Scalars['String']['input'];
@@ -787,9 +809,11 @@ export type ExplicitOwnerInput = {
 
 export type ExternalWorkspace = {
   __typename?: 'ExternalWorkspace';
+  allowDeprecatedRegions?: Maybe<Scalars['Boolean']['output']>;
   avatar?: Maybe<Scalars['String']['output']>;
   banReason?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
+  customerId?: Maybe<Scalars['String']['output']>;
   customerState: SubscriptionState;
   discordRole?: Maybe<Scalars['String']['output']>;
   hasBAA: Scalars['Boolean']['output'];
@@ -850,6 +874,7 @@ export type GitHubRepo = {
   installationId: Scalars['String']['output'];
   isPrivate: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
+  ownerAvatarUrl?: Maybe<Scalars['String']['output']>;
 };
 
 export type GitHubRepoDeployInput = {
@@ -1109,6 +1134,7 @@ export enum MetricTag {
   ServiceId = 'SERVICE_ID',
   Unrecognized = 'UNRECOGNIZED',
   VolumeId = 'VOLUME_ID',
+  VolumeInstanceId = 'VOLUME_INSTANCE_ID',
 }
 
 /** The tags that were used to group the metric. */
@@ -1120,6 +1146,7 @@ export type MetricTags = {
   projectId?: Maybe<Scalars['String']['output']>;
   serviceId?: Maybe<Scalars['String']['output']>;
   volumeId?: Maybe<Scalars['String']['output']>;
+  volumeInstanceId?: Maybe<Scalars['String']['output']>;
 };
 
 /** The result of a metrics query. */
@@ -1131,6 +1158,29 @@ export type MetricsResult = {
   tags: MetricTags;
   /** The samples of the metric. */
   values: Array<Metric>;
+};
+
+export enum MonitorAlertResourceType {
+  Service = 'SERVICE',
+  Volume = 'VOLUME',
+}
+
+export enum MonitorStatus {
+  Alert = 'ALERT',
+  Ok = 'OK',
+}
+
+export enum MonitorThresholdCondition {
+  Above = 'above',
+  Below = 'below',
+}
+
+export type MonitorThresholdConfig = {
+  __typename?: 'MonitorThresholdConfig';
+  condition: MonitorThresholdCondition;
+  measurement?: Maybe<MetricMeasurement>;
+  threshold: Scalars['Float']['output'];
+  type: Scalars['String']['output'];
 };
 
 export type Mutation = {
@@ -1439,8 +1489,6 @@ export type Mutation = {
   userFlagsSet: Scalars['Boolean']['output'];
   /** Updates the profile for the authenticated user */
   userProfileUpdate: Scalars['Boolean']['output'];
-  /** Disconnect your Railway account from Slack. */
-  userSlackDisconnect: Scalars['Boolean']['output'];
   /** Update date of TermsAgreedOn */
   userTermsUpdate?: Maybe<User>;
   /** Update currently logged in user */
@@ -2181,6 +2229,16 @@ export type ObservabilityDashboard = Node & {
   items: Array<ObservabilityDashboardItemInstance>;
 };
 
+export type ObservabilityDashboardAlert = Node & {
+  __typename?: 'ObservabilityDashboardAlert';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  resolvedAt?: Maybe<Scalars['DateTime']['output']>;
+  resourceId?: Maybe<Scalars['String']['output']>;
+  resourceType: MonitorAlertResourceType;
+  status: MonitorStatus;
+};
+
 export type ObservabilityDashboardCreateInput = {
   environmentId: Scalars['String']['input'];
   /** If no items are provided, a default dashboard will be created. */
@@ -2192,6 +2250,7 @@ export type ObservabilityDashboardItem = Node & {
   config: ObservabilityDashboardItemConfig;
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  monitors: Array<ObservabilityDashboardMonitor>;
   name: Scalars['String']['output'];
   type: ObservabilityDashboardItemType;
 };
@@ -2233,6 +2292,22 @@ export enum ObservabilityDashboardItemType {
   VolumeMetricsItem = 'VOLUME_METRICS_ITEM',
 }
 
+export type ObservabilityDashboardMonitor = Node & {
+  __typename?: 'ObservabilityDashboardMonitor';
+  alerts: Array<ObservabilityDashboardAlert>;
+  config: ObservabilityDashboardMonitorConfig;
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ObservabilityDashboardMonitorAlertsArgs = {
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type ObservabilityDashboardMonitorConfig = MonitorThresholdConfig;
+
 export type ObservabilityDashboardUpdateInput = {
   dashboardItem: ObservabilityDashboardItemCreateInput;
   displayConfig: Scalars['DisplayConfig']['input'];
@@ -2272,6 +2347,33 @@ export type PlanLimitOverride = Node & {
   config: Scalars['SubscriptionPlanLimit']['output'];
   id: Scalars['ID']['output'];
 };
+
+export enum PlatformFeatureFlag {
+  DefaultNewUsersRailpack = 'DEFAULT_NEW_USERS_RAILPACK',
+  DemoPercentageRollout = 'DEMO_PERCENTAGE_ROLLOUT',
+  EnableMetalRegistryAms = 'ENABLE_METAL_REGISTRY_AMS',
+  EnableMetalRegistryDc4 = 'ENABLE_METAL_REGISTRY_DC4',
+  EnableMetalRegistryGcpRegions = 'ENABLE_METAL_REGISTRY_GCP_REGIONS',
+  EnableMetalRegistrySg3 = 'ENABLE_METAL_REGISTRY_SG3',
+  EnableMetalRegistrySv2 = 'ENABLE_METAL_REGISTRY_SV2',
+  NewGhReposApi = 'NEW_GH_REPOS_API',
+  NonDestructiveVolumeMigrations = 'NON_DESTRUCTIVE_VOLUME_MIGRATIONS',
+  ReferralCash = 'REFERRAL_CASH',
+  UpdatedVmQueries = 'UPDATED_VM_QUERIES',
+}
+
+export type PlatformFeatureFlagStatus = {
+  __typename?: 'PlatformFeatureFlagStatus';
+  flag: PlatformFeatureFlag;
+  rolloutPercentage: Scalars['Int']['output'];
+  status: Scalars['Boolean']['output'];
+  type: PlatformFeatureFlagType;
+};
+
+export enum PlatformFeatureFlagType {
+  Boolean = 'BOOLEAN',
+  Percentage = 'PERCENTAGE',
+}
 
 export type PlatformStatus = {
   __typename?: 'PlatformStatus';
@@ -2546,7 +2648,6 @@ export type ProjectCreateInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   isPublic?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  plugins?: InputMaybe<Array<Scalars['String']['input']>>;
   prDeploys?: InputMaybe<Scalars['Boolean']['input']>;
   repo?: InputMaybe<ProjectCreateRepo>;
   runtime?: InputMaybe<PublicRuntime>;
@@ -2800,6 +2901,7 @@ export type ProviderAuth = Node & {
   __typename?: 'ProviderAuth';
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
+  isAuthEnabled: Scalars['Boolean']['output'];
   metadata: Scalars['JSON']['output'];
   provider: Scalars['String']['output'];
   userId: Scalars['String']['output'];
@@ -2833,6 +2935,8 @@ export type Query = {
   __typename?: 'Query';
   /** Get all volume instances for a given volume */
   adminVolumeInstancesForVolume: Array<VolumeInstance>;
+  /** Returns the platform feature flags enabled for the current user */
+  allPlatformFeatureFlags: Array<PlatformFeatureFlagStatus>;
   /** Gets all API tokens for the authenticated user. */
   apiTokens: QueryApiTokensConnection;
   /** Fetch logs for a build */
@@ -2964,9 +3068,11 @@ export type Query = {
   serviceInstance: ServiceInstance;
   /** Check if the upstream repo for a service has an update available */
   serviceInstanceIsUpdatable: Scalars['Boolean']['output'];
-  /** Get the resource limits for a service instance */
-  serviceInstanceLimitOverride: Scalars['ServiceInstanceLimit']['output'];
-  /** Get the resource limits for a service instance */
+  /** Get the service instance resource limit overrides (null if no overrides set) */
+  serviceInstanceLimitOverride?: Maybe<
+    Scalars['ServiceInstanceLimit']['output']
+  >;
+  /** Get the merged resource limits for a service instance (includes plan defaults) */
   serviceInstanceLimits: Scalars['ServiceInstanceLimit']['output'];
   /** Gets all sessions for authenticated user. */
   sessions: QuerySessionsConnection;
@@ -2994,8 +3100,6 @@ export type Query = {
   usage: Array<AggregatedUsage>;
   /** Get the user id corresponding to a Discord id */
   userIdForDiscordId: Scalars['String']['output'];
-  /** Get the user id corresponding to a Slack id */
-  userIdForSlackId?: Maybe<Scalars['String']['output']>;
   /**
    * Get the total kickback earnings for a user.
    * @deprecated This field is deprecated and will be removed in future versions.
@@ -3128,6 +3232,7 @@ export type QueryEgressGatewaysArgs = {
 
 export type QueryEnvironmentArgs = {
   id: Scalars['String']['input'];
+  projectId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type QueryEnvironmentLogsArgs = {
@@ -3378,13 +3483,11 @@ export type QueryServiceInstanceIsUpdatableArgs = {
 
 export type QueryServiceInstanceLimitOverrideArgs = {
   environmentId: Scalars['String']['input'];
-  projectId: Scalars['String']['input'];
   serviceId: Scalars['String']['input'];
 };
 
 export type QueryServiceInstanceLimitsArgs = {
   environmentId: Scalars['String']['input'];
-  projectId: Scalars['String']['input'];
   serviceId: Scalars['String']['input'];
 };
 
@@ -3440,6 +3543,7 @@ export type QueryTemplatesArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
   recommended?: InputMaybe<Scalars['Boolean']['input']>;
+  verified?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type QueryUsageArgs = {
@@ -3454,10 +3558,6 @@ export type QueryUsageArgs = {
 
 export type QueryUserIdForDiscordIdArgs = {
   discordId: Scalars['String']['input'];
-};
-
-export type QueryUserIdForSlackIdArgs = {
-  slackId: Scalars['String']['input'];
 };
 
 export type QueryUserKickbackEarningsArgs = {
@@ -3822,9 +3922,19 @@ export type RegionDeploymentConstraints = {
   __typename?: 'RegionDeploymentConstraints';
   /** Admin only region */
   adminOnly?: Maybe<Scalars['Boolean']['output']>;
+  /** Deprecation information for the region */
+  deprecationInfo?: Maybe<RegionDeprecationInfo>;
   runtimeExclusivity?: Maybe<Array<Scalars['String']['output']>>;
   /** Staging only region */
   stagingOnly?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type RegionDeprecationInfo = {
+  __typename?: 'RegionDeprecationInfo';
+  /** Specifies if the region is deprecated */
+  isDeprecated: Scalars['Boolean']['output'];
+  /** Replacement region for the deprecated region */
+  replacementRegion: Scalars['String']['output'];
 };
 
 export enum RegistrationStatus {
@@ -4035,6 +4145,7 @@ export type ServiceInstance = Node & {
   cronSchedule?: Maybe<Scalars['String']['output']>;
   deletedAt?: Maybe<Scalars['DateTime']['output']>;
   domains: AllDomains;
+  drainingSeconds?: Maybe<Scalars['Int']['output']>;
   environmentId: Scalars['String']['output'];
   healthcheckPath?: Maybe<Scalars['String']['output']>;
   healthcheckTimeout?: Maybe<Scalars['Int']['output']>;
@@ -4044,6 +4155,7 @@ export type ServiceInstance = Node & {
   nextCronRunAt?: Maybe<Scalars['DateTime']['output']>;
   nixpacksPlan?: Maybe<Scalars['JSON']['output']>;
   numReplicas?: Maybe<Scalars['Int']['output']>;
+  overlapSeconds?: Maybe<Scalars['Int']['output']>;
   preDeployCommand?: Maybe<Scalars['JSON']['output']>;
   railpackInfo?: Maybe<Scalars['RailpackInfo']['output']>;
   railwayConfigFile?: Maybe<Scalars['String']['output']>;
@@ -4074,11 +4186,13 @@ export type ServiceInstanceUpdateInput = {
   buildCommand?: InputMaybe<Scalars['String']['input']>;
   builder?: InputMaybe<Builder>;
   cronSchedule?: InputMaybe<Scalars['String']['input']>;
+  drainingSeconds?: InputMaybe<Scalars['Int']['input']>;
   healthcheckPath?: InputMaybe<Scalars['String']['input']>;
   healthcheckTimeout?: InputMaybe<Scalars['Int']['input']>;
   multiRegionConfig?: InputMaybe<Scalars['JSON']['input']>;
   nixpacksPlan?: InputMaybe<Scalars['JSON']['input']>;
   numReplicas?: InputMaybe<Scalars['Int']['input']>;
+  overlapSeconds?: InputMaybe<Scalars['Int']['input']>;
   preDeployCommand?: InputMaybe<Array<Scalars['String']['input']>>;
   railwayConfigFile?: InputMaybe<Scalars['String']['input']>;
   region?: InputMaybe<Scalars['String']['input']>;
@@ -4448,6 +4562,7 @@ export type Template = Node & {
   image?: Maybe<Scalars['String']['output']>;
   isApproved: Scalars['Boolean']['output'];
   isV2Template: Scalars['Boolean']['output'];
+  isVerified: Scalars['Boolean']['output'];
   languages?: Maybe<Array<Scalars['String']['output']>>;
   /** @deprecated Deprecated in favor of listing the fields individually. */
   metadata: Scalars['TemplateMetadata']['output'];
@@ -4671,6 +4786,7 @@ export type User = Node & {
   isVerified: Scalars['Boolean']['output'];
   lastLogin: Scalars['DateTime']['output'];
   name?: Maybe<Scalars['String']['output']>;
+  platformFeatureFlags: Array<ActivePlatformFlag>;
   profile?: Maybe<UserProfile>;
   /** @deprecated This field will not return anything anymore, go through the workspace's projects */
   projects: UserProjectsConnection;
@@ -4720,6 +4836,21 @@ export type UserFlagsRemoveInput = {
 export type UserFlagsSetInput = {
   flags: Array<UserFlag>;
   userId?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserGithubRepo = Node & {
+  __typename?: 'UserGithubRepo';
+  createdAt: Scalars['DateTime']['output'];
+  defaultBranch: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  fullName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  installationId: Scalars['String']['output'];
+  isPrivate: Scalars['Boolean']['output'];
+  lastPushedAt: Scalars['DateTime']['output'];
+  name: Scalars['String']['output'];
+  ownerAvatarUrl?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type UserKickbackEarnings = {
@@ -4841,6 +4972,8 @@ export type VariableCollectionUpsertInput = {
   /** When set to true, removes all existing variables before upserting the new collection. */
   replace?: InputMaybe<Scalars['Boolean']['input']>;
   serviceId?: InputMaybe<Scalars['String']['input']>;
+  /** Skip deploys for affected services */
+  skipDeploys?: InputMaybe<Scalars['Boolean']['input']>;
   variables: Scalars['EnvironmentVariables']['input'];
 };
 
@@ -4856,6 +4989,8 @@ export type VariableUpsertInput = {
   name: Scalars['String']['input'];
   projectId: Scalars['String']['input'];
   serviceId?: InputMaybe<Scalars['String']['input']>;
+  /** Skip deploys for affected services */
+  skipDeploys?: InputMaybe<Scalars['Boolean']['input']>;
   value: Scalars['String']['input'];
 };
 
@@ -5110,6 +5245,7 @@ export enum WorkflowStatus {
 
 export type Workspace = Node & {
   __typename?: 'Workspace';
+  allowDeprecatedRegions?: Maybe<Scalars['Boolean']['output']>;
   avatar?: Maybe<Scalars['String']['output']>;
   banReason?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
@@ -5438,6 +5574,7 @@ export function getSdk(
     },
   };
 }
+
 export type Sdk = ReturnType<typeof getSdk>;
 export type DeploymentQueryVariables = Exact<{
   id: Scalars['String']['input'];
