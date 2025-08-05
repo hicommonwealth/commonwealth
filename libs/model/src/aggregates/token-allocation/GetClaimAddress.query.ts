@@ -17,10 +17,9 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
           SELECT
             A.user_id,
             A.address,
-            H.magna_synced_at
+            A.magna_synced_at
           FROM
             "ClaimAddresses" A
-            LEFT JOIN "HistoricalAllocations" H ON H.user_id = A.user_id
           WHERE
             A.user_id = :user_id
           LIMIT 1;
