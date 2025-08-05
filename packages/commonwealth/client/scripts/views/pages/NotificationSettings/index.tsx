@@ -1,12 +1,16 @@
 import { CommunityAlert } from '@hicommonwealth/schemas';
 import React, { useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
+import { useUpdateUserEmailMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
+import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import ScrollContainer from 'views/components/ScrollContainer';
 import { PageNotFound } from 'views/pages/404';
 import { CommentSubscriptions } from 'views/pages/NotificationSettings/CommentSubscriptions';
@@ -35,6 +39,11 @@ const NotificationSettings = () => {
   const threadSubscriptions = useThreadSubscriptions();
   const communityAlerts = useCommunityAlertsQuery({});
   const user = useUserStore();
+  const { mutateAsync: updateEmail, isPending: isUpdatingEmail } =
+    useUpdateUserEmailMutation({});
+
+  const [emailValue, setEmailValue] = useState(user.email || '');
+  const [isEmailDirty, setIsEmailDirty] = useState(false);
 
   const communityAlertsIndex = createIndexForCommunityAlerts(
     communityAlerts.data || [],
@@ -43,11 +52,30 @@ const NotificationSettings = () => {
   const [section, setSection] =
     useState<NotificationSection>('push-notifications');
 
+  const handleEmailChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value;
+    setEmailValue(value);
+    setIsEmailDirty(value !== user.email);
+  };
+
+  const handleUpdateEmail = async () => {
+    if (!isEmailDirty || !emailValue.trim()) return;
+    try {
+      await updateEmail({ email: emailValue.trim() });
+      setIsEmailDirty(false);
+    } catch (error) {
+      // Error handling is done by the mutation hook
+    }
+  };
+
   if (threadSubscriptions.isLoading) {
     return <LoadingIndicator />;
   } else if (!user.isLoggedIn) {
     return <PageNotFound />;
   }
+
+  const isEmailVerified = user.isEmailVerified;
+  const isEmailDisabled = isEmailVerified;
 
   return (
     <CWPageLayout>
@@ -59,6 +87,94 @@ const NotificationSettings = () => {
         <CWText className="page-subheader-text">
           Manage the emails and alerts you receive about your activity
         </CWText>
+
+        {/* Email Settings Section */}
+        <div className="email-settings-section">
+          <CWText type="h4" fontWeight="semiBold" className="section-header">
+            Email Settings
+          </CWText>
+
+          <CWText className="page-subheader-text">
+            Update your email address for notifications and account management
+          </CWText>
+
+          <div className="email-input-container">
+            {isEmailVerified ? (
+              <CWTooltip
+                content="Verified emails used to sign-in cannot be updated"
+                placement="top"
+                renderTrigger={(handleInteraction) => (
+                  <div
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                    style={{ width: '100%' }}
+                  >
+                    <CWTextInput
+                      fullWidth
+                      placeholder="Enter your email address"
+                      label="Email Address"
+                      value={emailValue}
+                      onInput={handleEmailChange}
+                      disabled={isEmailDisabled}
+                      readOnly={isEmailDisabled}
+                    />
+                  </div>
+                )}
+              />
+            ) : (
+              <CWTextInput
+                fullWidth
+                placeholder="Enter your email address"
+                label="Email Address"
+                value={emailValue}
+                onInput={handleEmailChange}
+                disabled={isEmailDisabled}
+                readOnly={isEmailDisabled}
+              />
+            )}
+
+            {isEmailVerified ? (
+              <CWTooltip
+                content="Verified emails used to sign-in cannot be updated"
+                placement="top"
+                renderTrigger={(handleInteraction) => (
+                  <div
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                  >
+                    <CWButton
+                      label="Update Email"
+                      buttonType="primary"
+                      buttonHeight="sm"
+                      type="button"
+                      disabled={
+                        !isEmailDirty ||
+                        isEmailDisabled ||
+                        isUpdatingEmail ||
+                        !emailValue.trim()
+                      }
+                      onClick={handleUpdateEmail}
+                    />
+                  </div>
+                )}
+              />
+            ) : (
+              <CWButton
+                label="Update Email"
+                buttonType="primary"
+                buttonHeight="sm"
+                type="button"
+                disabled={
+                  !isEmailDirty ||
+                  isEmailDisabled ||
+                  isUpdatingEmail ||
+                  !emailValue.trim()
+                }
+                onClick={handleUpdateEmail}
+              />
+            )}
+          </div>
+        </div>
 
         <ScrollContainer>
           <CWTabsRow>
