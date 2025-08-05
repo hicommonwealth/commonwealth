@@ -4,7 +4,7 @@ import { UpdateClaimAddress } from '../../src/aggregates/token-allocation/Update
 import { models } from '../../src/database';
 import { CommunitySeedResult, seedCommunity } from '../utils';
 
-describe.skip('Token Allocation Lifecycle', () => {
+describe('Token Allocation Lifecycle', () => {
   let community: CommunitySeedResult;
 
   beforeAll(async () => {
@@ -24,7 +24,7 @@ describe.skip('Token Allocation Lifecycle', () => {
 
       const result = await command(UpdateClaimAddress(), {
         actor: community.actors.member,
-        payload: { address_id: address.id! },
+        payload: { address: address.address as `0x${string}` },
       });
 
       // Verify the claim address was set
@@ -40,27 +40,21 @@ describe.skip('Token Allocation Lifecycle', () => {
 
     it('should throw error when magna sync exists', async () => {
       const user_id = community.actors.admin.user.id!;
+      const address = community.addresses.admin.address! as `0x${string}`;
 
-      // Create historical allocation with magna sync
-      await models.HistoricalAllocations.create({
+      // set magna watermark
+      await models.ClaimAddresses.create({
         user_id,
+        address,
         magna_synced_at: new Date(),
-        token_allocation: 100,
-        num_threads: 100,
-        thread_score: 100,
-        num_comments: 100,
-        comment_score: 100,
-        num_reactions: 100,
-        reactions_score: 100,
-        unadjusted_score: 100,
-        adjusted_score: 100,
-        percent_score: 100,
+        created_at: new Date(),
+        updated_at: new Date(),
       });
 
       expect(
         command(UpdateClaimAddress(), {
           actor: community.actors.admin,
-          payload: { address_id: community.addresses.admin.id! },
+          payload: { address },
         }),
       ).rejects.toThrowError();
     });
@@ -69,7 +63,9 @@ describe.skip('Token Allocation Lifecycle', () => {
       expect(
         command(UpdateClaimAddress(), {
           actor: community.actors.admin,
-          payload: { address_id: community.addresses.member.id! },
+          payload: {
+            address: community.addresses.member.address as `0x${string}`,
+          },
         }),
       ).rejects.toThrowError();
     });

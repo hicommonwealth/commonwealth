@@ -12,7 +12,6 @@ export function UpdateClaimAddress(): Command<
     secure: true,
     body: async ({ payload, actor }) => {
       const { address } = payload;
-      console.log({ payload });
 
       const [addr] = await models.sequelize.query<{
         user_id: number;
@@ -45,18 +44,11 @@ export function UpdateClaimAddress(): Command<
 
       const result = await models.sequelize.query<{ address: string }>(
         `
-          WITH magna_check AS (
-            SELECT EXISTS (
-              SELECT 1 FROM "HistoricalAllocations"
-              WHERE user_id = :user_id 
-              AND magna_synced_at IS NOT NULL
-              FOR UPDATE
-            ) as is_synced
-          )
           INSERT INTO "ClaimAddresses" (user_id, address, created_at, updated_at)
           SELECT :user_id, :address, NOW(), NOW()
-          WHERE NOT (SELECT is_synced FROM magna_check)
-          ON CONFLICT (user_id) DO UPDATE SET address = EXCLUDED.address, updated_at = NOW()
+          ON CONFLICT (user_id) DO
+          UPDATE SET address = EXCLUDED.address, updated_at = NOW()
+          WHERE "ClaimAddresses".magna_synced_at IS NULL
           RETURNING address;
         `,
         {
