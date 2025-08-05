@@ -172,6 +172,7 @@ async function createMagicAddressInstances({
     oauth_username,
     oauth_phone_number,
     oauth_email_verified,
+    oauth_user_id,
   } = verifiedInfo;
   await bumpTier(user, verifiedInfo, transaction);
 
@@ -199,6 +200,7 @@ async function createMagicAddressInstances({
         oauth_username,
         oauth_phone_number,
         oauth_email_verified,
+        oauth_user_id,
       },
       transaction,
     });
