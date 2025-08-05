@@ -65,7 +65,9 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function getServices(envId: string) {
+type ServiceMap = Record<ServiceName, { id: string; domain: string }>;
+
+async function getServices(envId: string): Promise<ServiceMap> {
   log.info('Fetching services...');
 
   const maxRetryTime = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -81,14 +83,16 @@ async function getServices(envId: string) {
 
       // Check if we have any service instances
       if (services.environment.serviceInstances.edges.length > 0) {
-        const serviceMap: Partial<Record<ServiceName, string>> = {};
+        const serviceMap: Partial<ServiceMap> = {};
         for (const edge of services.environment.serviceInstances.edges) {
           if (ServiceNames.includes(edge.node.serviceName as ServiceName)) {
-            serviceMap[edge.node.serviceName as ServiceName] =
-              edge.node.serviceId;
+            serviceMap[edge.node.serviceName as ServiceName] = {
+              id: edge.node.serviceId,
+              domain: edge.node.domains.serviceDomains[0].domain,
+            };
           }
         }
-        return serviceMap;
+        return serviceMap as ServiceMap;
       }
 
       // If no services found, calculate delay with exponential backoff
@@ -192,13 +196,14 @@ export async function deployReviewApp({
         environmentId: envId,
         variables: {
           DATABASE_URL: dbUrl,
+          SERVER_URL: serviceMap['web'].domain,
         },
       },
     });
     log.info('Database URL successfully updated!');
   }
 
-  for (const [serviceName, serviceId] of Object.entries(serviceMap)) {
+  for (const [serviceName, { id: serviceId }] of Object.entries(serviceMap)) {
     await updateService({
       envId,
       serviceId,
@@ -209,7 +214,7 @@ export async function deployReviewApp({
   }
 
   const deploymentIds: string[] = [];
-  for (const serviceId of Object.values(serviceMap)) {
+  for (const { id: serviceId } of Object.values(serviceMap)) {
     deploymentIds.push(await deploy({ envId, serviceId }));
   }
 

@@ -60,7 +60,9 @@ export enum ActiveFeatureFlag {
   NewGhReposApi = 'NEW_GH_REPOS_API',
   NewVolumeMountPanel = 'NEW_VOLUME_MOUNT_PANEL',
   PriorityBoarding = 'PRIORITY_BOARDING',
+  RawSqlQueries = 'RAW_SQL_QUERIES',
   V3NewProjectPage = 'V3_NEW_PROJECT_PAGE',
+  VolumeDragAnimation = 'VOLUME_DRAG_ANIMATION',
 }
 
 export enum ActivePlatformFlag {
@@ -71,15 +73,14 @@ export enum ActivePlatformFlag {
   EnableMetalRegistryGcpRegions = 'ENABLE_METAL_REGISTRY_GCP_REGIONS',
   EnableMetalRegistrySg3 = 'ENABLE_METAL_REGISTRY_SG3',
   EnableMetalRegistrySv2 = 'ENABLE_METAL_REGISTRY_SV2',
+  EnableRawSqlQueries = 'ENABLE_RAW_SQL_QUERIES',
   NewGhReposApi = 'NEW_GH_REPOS_API',
-  NonDestructiveVolumeMigrations = 'NON_DESTRUCTIVE_VOLUME_MIGRATIONS',
   ReferralCash = 'REFERRAL_CASH',
   UpdatedVmQueries = 'UPDATED_VM_QUERIES',
 }
 
 export enum ActiveServiceFeatureFlag {
   CopyVolumeToEnvironment = 'COPY_VOLUME_TO_ENVIRONMENT',
-  NonDestructiveVolumeMigrations = 'NON_DESTRUCTIVE_VOLUME_MIGRATIONS',
   Placeholder = 'PLACEHOLDER',
 }
 
@@ -2356,8 +2357,8 @@ export enum PlatformFeatureFlag {
   EnableMetalRegistryGcpRegions = 'ENABLE_METAL_REGISTRY_GCP_REGIONS',
   EnableMetalRegistrySg3 = 'ENABLE_METAL_REGISTRY_SG3',
   EnableMetalRegistrySv2 = 'ENABLE_METAL_REGISTRY_SV2',
+  EnableRawSqlQueries = 'ENABLE_RAW_SQL_QUERIES',
   NewGhReposApi = 'NEW_GH_REPOS_API',
-  NonDestructiveVolumeMigrations = 'NON_DESTRUCTIVE_VOLUME_MIGRATIONS',
   ReferralCash = 'REFERRAL_CASH',
   UpdatedVmQueries = 'UPDATED_VM_QUERIES',
 }
@@ -5072,6 +5073,7 @@ export type VolumeInstanceBackup = {
   id: Scalars['String']['output'];
   name?: Maybe<Scalars['String']['output']>;
   referencedMB?: Maybe<Scalars['Int']['output']>;
+  scheduleId?: Maybe<Scalars['String']['output']>;
   usedMB?: Maybe<Scalars['Int']['output']>;
 };
 
@@ -5311,6 +5313,11 @@ export const EnvironmentDocument = gql`
           node {
             serviceId
             serviceName
+            domains {
+              serviceDomains {
+                domain
+              }
+            }
           }
         }
       }
@@ -5635,6 +5642,13 @@ export type EnvironmentQuery = {
           __typename?: 'ServiceInstance';
           serviceId: string;
           serviceName: string;
+          domains: {
+            __typename?: 'AllDomains';
+            serviceDomains: Array<{
+              __typename?: 'ServiceDomain';
+              domain: string;
+            }>;
+          };
         };
       }>;
     };
