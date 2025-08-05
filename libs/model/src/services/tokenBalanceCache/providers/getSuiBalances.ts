@@ -5,8 +5,8 @@ import { models } from '../../../database';
 import {
   Balances,
   GetSuiNativeBalanceOptions,
-  GetSuiTokenBalanceOptions,
   GetSuiNftBalanceOptions,
+  GetSuiTokenBalanceOptions,
 } from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';
 import { __get_suinft_balances } from './get_suinft_balances';
