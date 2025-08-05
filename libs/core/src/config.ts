@@ -46,7 +46,6 @@ const Services = [
   'graphile',
   'discord-listener',
   'twitter',
-  'knock',
   'evm-ce',
   'web-modulith',
 ] as const;

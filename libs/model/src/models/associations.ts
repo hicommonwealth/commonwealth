@@ -258,6 +258,19 @@ export const buildAssociations = (db: DB) => {
     },
   );
 
+  db.TopicSubscription.withManyToMany(
+    {
+      model: db.Topic,
+      as: 'subscriptions',
+      onDelete: 'CASCADE',
+    },
+    {
+      model: db.User,
+      as: 'topicSubscriptions',
+      onDelete: 'CASCADE',
+    },
+  );
+
   db.CommentSubscription.withManyToMany(
     {
       model: db.Comment,

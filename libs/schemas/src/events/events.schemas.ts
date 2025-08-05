@@ -12,10 +12,11 @@ import { FarcasterAction } from '../entities/farcaster.schemas';
 import { LaunchpadToken } from '../entities/launchpad-token.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
+import { ThreadToken } from '../entities/thread-token.schemas';
 import { Thread } from '../entities/thread.schemas';
+import { User } from '../entities/user.schemas';
 import { DiscordEventBase, Tweet } from '../integrations';
 import { EVM_ADDRESS_STRICT, EVM_BYTES, PG_INT } from '../utils';
-import { ThreadToken } from '../entities/thread-token.schemas';
 
 // All events should carry this common metadata
 export const EventMetadata = z.object({
@@ -71,6 +72,7 @@ export const events = {
     user_id: z.number(),
     created_at: z.coerce.date(),
     referrer_address: z.string().nullish(),
+    user: User,
   }),
 
   AddressOwnershipTransferred: z.object({
@@ -358,6 +360,11 @@ export const events = {
     address: z.string(),
     referred_by_address: z.string().nullish(),
     created_at: z.coerce.date(),
+  }),
+
+  UserUpdated: z.object({
+    old_user: User,
+    new_user: User,
   }),
 
   QuestStarted: z.object({

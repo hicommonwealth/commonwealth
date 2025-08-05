@@ -67,8 +67,9 @@ export async function bootstrapBindings(options?: {
       hooks = item.hooks;
     }
 
-    // match worker name
+    // match worker name (options.worker defined in rascalConsumerMap)
     if ((options?.worker || '') !== (worker || '')) continue;
+    // policies run on the Commonwealth consumer by default
     await brokerInstance.subscribe(consumer, retryStrategy, hooks);
   }
 }
