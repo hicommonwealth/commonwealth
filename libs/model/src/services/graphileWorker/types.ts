@@ -11,6 +11,7 @@ export enum GraphileTaskNames {
   AwardTwitterQuestXp = 'AwardTweetEngagementXp',
   CountAggregator = 'CountAggregator',
   CaptureGroupSnapshot = 'CaptureGroupSnapshot',
+  MagnaSync = 'MagnaSync',
 }
 
 export type GraphileTask<Input extends ZodType> = {
@@ -36,4 +37,5 @@ export const TaskPayloads = {
   CaptureGroupSnapshot: z.object({
     groupId: z.number(),
   }),
+  MagnaSync: z.object({}),
 } as const satisfies Record<GraphileTaskNames, ZodType | ZodUndefined>;
