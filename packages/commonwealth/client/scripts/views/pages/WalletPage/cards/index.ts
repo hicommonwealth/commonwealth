@@ -1,4 +1,5 @@
-export { default as RewardsCard } from '../RewardsCard/RewardsCard';
-export { default as QuestSummaryCard } from './QuestSummaryCard';
-export { default as ReferralCard } from './ReferralCard';
-export { default as WalletCard } from './WalletCard';
+import QuestSummaryCard from './QuestSummaryCard';
+import ReferralCard from './ReferralCard';
+import WalletCard from './WalletCard';
+
+export { QuestSummaryCard, ReferralCard, WalletCard };
