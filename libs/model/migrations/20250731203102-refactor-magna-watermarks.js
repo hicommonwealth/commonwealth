@@ -4,6 +4,11 @@
 export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.changeColumn('ClaimAddresses', 'address', {
+        type: Sequelize.STRING,
+        allowNull: true,
+        transaction,
+      });
       await queryInterface.addColumn('ClaimAddresses', 'magna_allocation_id', {
         type: Sequelize.STRING,
         allowNull: true,
@@ -26,6 +31,11 @@ export default {
 
   async down(queryInterface) {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.changeColumn('ClaimAddresses', 'address', {
+        type: Sequelize.STRING,
+        allowNull: false,
+        transaction,
+      });
       await queryInterface.removeColumn(
         'ClaimAddresses',
         'magna_allocation_id',

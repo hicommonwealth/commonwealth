@@ -108,7 +108,7 @@ export const AuraAllocations = (
 
 type ClaimAddress = {
   user_id: number;
-  address: string;
+  address: string | null;
   magna_allocation_id: string | null;
   magna_synced_at: Date | null;
   created_at: Date;
@@ -126,7 +126,7 @@ export const ClaimAddresses = (
       },
       address: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       magna_allocation_id: {
         type: Sequelize.STRING,

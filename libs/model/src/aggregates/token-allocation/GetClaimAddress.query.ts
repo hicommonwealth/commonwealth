@@ -17,9 +17,12 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
           SELECT
             A.user_id,
             A.address,
-            A.magna_synced_at
+            A.magna_synced_at,
+            COALESCE(HA.token_allocation, 0)::numeric + COALESCE(AA.token_allocation, 0)::numeric as tokens
           FROM
             "ClaimAddresses" A
+            LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
+            LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
           WHERE
             A.user_id = :user_id
           LIMIT 1;

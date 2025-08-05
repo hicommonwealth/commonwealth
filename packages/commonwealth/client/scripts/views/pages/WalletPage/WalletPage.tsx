@@ -22,12 +22,7 @@ import {
 } from '../../components/component_kit/new_designs/CWTabs';
 import { PageNotFound } from '../404';
 import './WalletPage.scss';
-import {
-  QuestSummaryCard,
-  ReferralCard,
-  RewardsCard,
-  WalletCard,
-} from './cards';
+import { QuestSummaryCard, ReferralCard, WalletCard } from './cards';
 import { ReferralTable, TokenTXHistoryTable, XPEarningsTable } from './tables';
 import { MobileTabType, TableType } from './types';
 import {
@@ -135,8 +130,6 @@ const WalletPage = () => {
 
           {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) &&
             xpEnabled && <QuestSummaryCard />}
-
-          <RewardsCard title="Rewards" icon="trophy" />
         </div>
 
         <div className="wallet-tab-container">
