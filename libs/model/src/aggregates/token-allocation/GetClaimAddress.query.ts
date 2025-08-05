@@ -1,6 +1,7 @@
 import { InvalidState, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
+import z from 'zod';
 import { models } from '../../database';
 
 export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
@@ -9,14 +10,19 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
     auth: [],
     secure: true,
     body: async ({ actor }) => {
-      const claimAddress = await models.sequelize.query<{
-        user_id: number;
-        address: `0x${string}`;
-      }>(
+      const claimAddress = await models.sequelize.query<
+        z.infer<typeof schemas.ClaimAddressView>
+      >(
         `
-          SELECT user_id, address
-          FROM "ClaimAddresses"
-          WHERE user_id = :user_id
+          SELECT
+            A.user_id,
+            A.address,
+            H.magna_synced_at
+          FROM
+            "ClaimAddresses" A
+            LEFT JOIN "HistoricalAllocations" H ON H.user_id = A.user_id
+          WHERE
+            A.user_id = :user_id
           LIMIT 1;
         `,
         {
@@ -33,19 +39,7 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
         throw new InvalidState('Duplicate claim addresses found');
       }
 
-      const address = await models.Address.findOne({
-        where: {
-          user_id: actor.user.id,
-          address: claimAddress[0].address,
-        },
-      });
-
-      if (address)
-        return {
-          address: address.address as `0x${string}`,
-          user_id: address.user_id!,
-        };
-      else return claimAddress[0];
+      return claimAddress[0];
     },
   };
 }

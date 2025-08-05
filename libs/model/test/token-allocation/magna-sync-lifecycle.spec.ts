@@ -86,7 +86,7 @@ describe('MagnaSync Lifecycle', () => {
     );
 
     // Verify database updates
-    const updates = await models.HistoricalAllocations.findAll({
+    const updates = await models.ClaimAddresses.findAll({
       where: { magna_synced_at: { [Op.ne]: null } },
     });
     updates.forEach((update) => {

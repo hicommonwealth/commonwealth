@@ -40,17 +40,19 @@ export async function magnaSync(
         `
           SELECT
             A.user_id,
+            A.address as wallet_address,
             U.profile->>'name' as user_name,
             U.profile->>'email' as user_email,
-            C.address as wallet_address,
-            A.token_allocation + COALESCE(AA.token_allocation, 0) as token_allocation
+            COALESCE(HA.token_allocation, 0) 
+              + COALESCE(AA.token_allocation, 0) as token_allocation -- combined in initial drop
           FROM
-            "HistoricalAllocations" A
+            "ClaimAddresses" A -- this is the driving table with sync watermarks
             JOIN "Users" U ON A.user_id = U.id
-            JOIN "ClaimAddresses" C ON A.user_id = C.user_id
+            LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
             LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
           WHERE
-            A.magna_synced_at IS NULL AND C.address IS NOT NULL
+            A.address IS NOT NULL -- there is an address to sync
+            AND A.magna_synced_at IS NULL -- and it hasn't been synced yet
           ORDER BY
             A.user_id ASC
           LIMIT :limit
@@ -70,9 +72,12 @@ export async function magnaSync(
         try {
           const response = await apiCallback(args);
           if (response.id) {
-            // Mark as synced in DB
-            await models.HistoricalAllocations.update(
-              { magna_allocation_id: response.id, magna_synced_at: new Date() },
+            // set sync watermark
+            await models.ClaimAddresses.update(
+              {
+                magna_allocation_id: response.id,
+                magna_synced_at: new Date(),
+              },
               { where: { user_id: args.user_id } },
             );
             log.info(`Synced allocation for user ${args.user_id}`);
