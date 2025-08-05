@@ -11,9 +11,10 @@ export function UpdateClaimAddress(): Command<
     auth: [],
     secure: true,
     body: async ({ payload, actor }) => {
-      const { address_id } = payload;
+      const { address } = payload;
+      console.log({ payload });
 
-      const [address] = await models.sequelize.query<{
+      const [addr] = await models.sequelize.query<{
         user_id: number;
         address: `0x${string}`;
         community_id: number;
@@ -22,7 +23,7 @@ export function UpdateClaimAddress(): Command<
           SELECT A.user_id, A.address, C.id as community_id
           FROM "Addresses" A
                  LEFT JOIN "Communities" C ON C.id = A.community_id
-          WHERE A.id = :address_id
+          WHERE A.address = :address
             AND C.network = 'ethereum'
             AND C.base = 'ethereum'
             AND A.address LIKE '0x%'
@@ -30,21 +31,17 @@ export function UpdateClaimAddress(): Command<
         `,
         {
           type: QueryTypes.SELECT,
-          replacements: {
-            address_id,
-          },
+          replacements: { address },
         },
       );
 
-      if (address?.user_id !== actor.user.id) {
-        throw new InvalidActor(actor, 'Cannot update claim address');
-      }
-
-      if (!address) {
-        throw new InvalidState('Address not found!');
-      } else if (!address.community_id) {
-        throw new InvalidState('Invalid EVM address!');
-      }
+      if (!addr) throw new InvalidState('Address not found!');
+      if (!addr.community_id) throw new InvalidState('Invalid EVM address!');
+      if (addr.user_id !== actor.user.id)
+        throw new InvalidActor(
+          actor,
+          'Cannot update claim address. User mismatch.',
+        );
 
       const result = await models.sequelize.query<{ address: string }>(
         `
@@ -65,20 +62,19 @@ export function UpdateClaimAddress(): Command<
         {
           type: QueryTypes.SELECT,
           replacements: {
-            user_id: address.user_id,
-            address: address.address,
+            user_id: addr.user_id,
+            address: addr.address,
           },
         },
       );
 
-      if (result.length === 0) {
+      if (result.length === 0)
         throw new InvalidState(
           'Cannot update claim address after user has been synchronized with magna',
         );
-      }
 
       return {
-        claim_address: address.address,
+        claim_address: addr.address,
       };
     },
   };

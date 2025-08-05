@@ -1,5 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import AddressInfo from 'client/scripts/models/AddressInfo';
+import CWBanner from 'client/scripts/views/components/component_kit/new_designs/CWBanner';
 import React, { useEffect, useState } from 'react';
 import useGetClaimAddressQuery from 'state/api/tokenAllocations/getClaimAddress';
 import useUpdateClaimAddressMutation from 'state/api/tokenAllocations/updateClamiAddress';
@@ -38,9 +39,19 @@ const TokenClaimAddress = () => {
     setEvmAddresses([...addresses.values()]);
   }, [user]);
 
+  useEffect(() => {
+    if (claimAddress?.address) {
+      setSelectedAddress(
+        evmAddresses.find((a) => a.address === claimAddress?.address),
+      );
+    }
+  }, [claimAddress?.address, evmAddresses]);
+
   const handleUpdate = () => {
     if (selectedAddress) {
-      updateClaimAddress({ address_id: selectedAddress.addressId! });
+      updateClaimAddress({
+        address: selectedAddress.address! as `0x${string}`,
+      });
     }
   };
 
@@ -50,6 +61,13 @@ const TokenClaimAddress = () => {
         <CWText>Loading...</CWText>
       ) : (
         <div className="claim-address-body">
+          <div className="claim-address-row">
+            <CWBanner
+              type="info"
+              body="TODO: Read from claims and show: You have 1000 C tokens available
+              to claim"
+            />
+          </div>
           <div className="claim-address-row">
             <CWSelectList
               components={{
