@@ -5,9 +5,9 @@ import {
   type CosmosSource,
   type NativeSource,
   type SolanaSource,
+  type SuiNFTSource,
   type SuiSource,
   type SuiTokenSource,
-  type SuiNFTSource,
 } from '@hicommonwealth/shared';
 import type { GroupAttributes } from '../models/group';
 import type {
@@ -19,8 +19,8 @@ import type {
   GetEthNativeBalanceOptions,
   GetSPLBalancesOptions,
   GetSuiNativeBalanceOptions,
-  GetSuiTokenBalanceOptions,
   GetSuiNftBalanceOptions,
+  GetSuiTokenBalanceOptions,
 } from '../services/tokenBalanceCache/types';
 
 export function makeGetBalancesOptions(

@@ -12,6 +12,7 @@ import { FarcasterAction } from '../entities/farcaster.schemas';
 import { LaunchpadToken } from '../entities/launchpad-token.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
+import { ThreadToken } from '../entities/thread-token.schemas';
 import { Thread } from '../entities/thread.schemas';
 import { User } from '../entities/user.schemas';
 import { DiscordEventBase, Tweet } from '../integrations';
@@ -432,6 +433,10 @@ export const events = {
 
   LaunchpadTokenGraduated: z.object({
     token: LaunchpadToken,
+  }),
+
+  ThreadTokenGraduated: z.object({
+    token: ThreadToken,
   }),
 
   LaunchpadTokenTraded: z.object({
