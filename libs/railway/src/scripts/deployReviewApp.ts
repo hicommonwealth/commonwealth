@@ -45,54 +45,84 @@ async function getEnvironmentId(envName: string) {
           sourceEnvironmentId: config.RAILWAY!.REVIEW_APPS.PARENT_ENV_ID,
           skipInitialDeploys: false,
           stageInitialChanges: false,
+          applyChangesInBackground: true,
         },
       });
       envId = newEnv.environmentCreate.id;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      // If timeout, poll for the environment
-      if (e.message && e.message.includes('504')) {
-        log.warn('Timeout creating environment, polling for existence...');
-        for (let i = 0; i < 6; i++) {
-          await new Promise((res) => setTimeout(res, 30_000)); // wait 30 seconds
-          const envsRetry = await sdk.environments({
-            projectId: config.RAILWAY!.REVIEW_APPS.PROJECT_ID!,
-          });
-          const found = envsRetry.environments.edges.find(
-            (edge) => edge.node.name === envName,
-          );
-          if (found) {
-            envId = found.node.id;
-            log.info(`Environment ${envName} found after timeout!`);
-            break;
-          }
-        }
-        if (!envId)
-          throw new Error(
-            'Environment creation timed out and not found after polling.',
-          );
-      } else {
-        throw e;
-      }
+    } catch (e) {
+      log.error(
+        'Failed to create environment.',
+        e instanceof Error ? e : undefined,
+      );
+      throw e;
     }
   }
 
   return { envId, created: !existingEnv };
 }
 
-async function getServices(envId: string) {
-  log.info('Fetching services...');
-  const services = await sdk.environment({
-    id: envId,
-  });
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
-  const serviceMap: Partial<Record<ServiceName, string>> = {};
-  for (const edge of services.environment.serviceInstances.edges) {
-    if (ServiceNames.includes(edge.node.serviceName as ServiceName)) {
-      serviceMap[edge.node.serviceName as ServiceName] = edge.node.serviceId;
+type ServiceMap = Record<ServiceName, { id: string; domain: string }>;
+
+async function getServices(envId: string): Promise<ServiceMap> {
+  log.info('Fetching services...');
+
+  const maxRetryTime = 5 * 60 * 1000; // 5 minutes in milliseconds
+  const baseDelay = 1000; // 1 second base delay
+  let totalTime = 0;
+  let attempt = 0;
+
+  while (totalTime < maxRetryTime) {
+    try {
+      const services = await sdk.environment({
+        id: envId,
+      });
+
+      // Check if we have any service instances
+      if (services.environment.serviceInstances.edges.length > 0) {
+        const serviceMap: Partial<ServiceMap> = {};
+        for (const edge of services.environment.serviceInstances.edges) {
+          if (ServiceNames.includes(edge.node.serviceName as ServiceName)) {
+            serviceMap[edge.node.serviceName as ServiceName] = {
+              id: edge.node.serviceId,
+              domain: edge.node.domains.serviceDomains[0].domain,
+            };
+          }
+        }
+        return serviceMap as ServiceMap;
+      }
+
+      // If no services found, calculate delay with exponential backoff
+      const delay = Math.min(baseDelay * Math.pow(2, attempt), 30000); // Cap at 30 seconds
+      log.info(
+        `No services found yet. Retrying in ${delay}ms (attempt ${attempt + 1})...`,
+      );
+
+      await sleep(delay);
+      totalTime += delay;
+      attempt++;
+    } catch (error) {
+      log.error(
+        'Error fetching services:',
+        error instanceof Error ? error : undefined,
+      );
+
+      // On error, also use exponential backoff
+      const delay = Math.min(baseDelay * Math.pow(2, attempt), 30000);
+      log.info(
+        `Retrying after error in ${delay}ms (attempt ${attempt + 1})...`,
+      );
+
+      await sleep(delay);
+      totalTime += delay;
+      attempt++;
     }
   }
-  return serviceMap;
+
+  throw new Error('Failed to fetch services after 5 minutes of retrying');
 }
 
 async function updateService({
@@ -166,13 +196,14 @@ export async function deployReviewApp({
         environmentId: envId,
         variables: {
           DATABASE_URL: dbUrl,
+          SERVER_URL: serviceMap['web'].domain,
         },
       },
     });
     log.info('Database URL successfully updated!');
   }
 
-  for (const [serviceName, serviceId] of Object.entries(serviceMap)) {
+  for (const [serviceName, { id: serviceId }] of Object.entries(serviceMap)) {
     await updateService({
       envId,
       serviceId,
@@ -183,7 +214,7 @@ export async function deployReviewApp({
   }
 
   const deploymentIds: string[] = [];
-  for (const serviceId of Object.values(serviceMap)) {
+  for (const { id: serviceId } of Object.values(serviceMap)) {
     deploymentIds.push(await deploy({ envId, serviceId }));
   }
 

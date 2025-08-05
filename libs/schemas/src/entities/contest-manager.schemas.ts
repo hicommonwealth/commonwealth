@@ -13,6 +13,7 @@ const ContestManagerEnvironments = [
   'beta',
   'demo',
   'production',
+  'review-app',
 ] as const;
 type ContestManagerEnvironments = (typeof ContestManagerEnvironments)[number];
 export const ContestManagerEnvironmentsSchema = z
