@@ -42,6 +42,7 @@ export const QuestEvents = {
   CommunityGoalReached: events.CommunityGoalReached,
   MembershipsRefreshed: events.MembershipsRefreshed,
   ...ChannelQuestEvents,
+  XpAwarded: events.XpAwarded,
 } as const;
 
 export const QuestActionNames = [
@@ -76,6 +77,11 @@ export const QuestActionScope = z.object({
     .optional()
     .describe('Rewards when over configured meta value'),
   discord_server_id: z.string().optional().describe('Discord server id'),
+  award_reason: z.string().optional().describe('Reason for awarding XP'),
+  awarded_by_user_id: z
+    .number()
+    .optional()
+    .describe('User id of user who awarded XP'),
 });
 
 export enum QuestParticipationLimit {

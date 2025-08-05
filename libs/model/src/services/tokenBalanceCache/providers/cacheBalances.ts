@@ -88,6 +88,8 @@ function buildCacheKey(options: GetBalancesOptions, address: string): string {
         : `sui_${options.sourceOptions.suiNetwork}_${address}`;
     case BalanceSourceType.SuiToken:
       return `sui_${options.sourceOptions.suiNetwork}_${address}_${options.sourceOptions.coinType}`;
+    case BalanceSourceType.SuiNFT:
+      return `sui_${options.sourceOptions.suiNetwork}_${address}_${options.sourceOptions.collectionId}`;
   }
 }
 

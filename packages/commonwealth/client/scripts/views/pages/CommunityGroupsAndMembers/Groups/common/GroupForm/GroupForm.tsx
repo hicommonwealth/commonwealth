@@ -55,7 +55,7 @@ import {
 } from './validations';
 
 type TopicOption = {
-  label: React.ReactNode;
+  label: string;
   value: string | number;
   helpText?: string;
 };
@@ -211,18 +211,7 @@ const GroupForm = ({
   const topicOptions = sortedTopics
     .filter((topic) => topic.id !== undefined)
     .map((topic) => ({
-      label: (
-        <span style={{ display: 'inline-flex', alignItems: 'center' }}>
-          {topic.name}
-          {privateTopicIds.has(topic.id) && (
-            <CWIcon
-              iconName="lockedNew"
-              iconSize="small"
-              style={{ marginLeft: 6 }}
-            />
-          )}
-        </span>
-      ),
+      label: topic.name,
       value: topic.id as number,
       helpText: weightedVotingValueToLabel(topic.weighted_voting!),
     }));
@@ -473,14 +462,22 @@ const GroupForm = ({
   const handleWatchForm = (values: FormSubmitValues) => {
     if (values?.topics?.length > 0) {
       const updatedTopicPermissions: TopicPermissionToggleGroupSubFormsState[] =
-        values.topics.map((topic) => ({
-          topic: {
-            id: Number(topic.value),
-            is_private: false,
-            name: topic.label,
-          },
-          permission: [],
-        }));
+        values.topics.map((topic) => {
+          const existingTopic = topicPermissionsToggleGroupSubForms.find(
+            (existing) => existing.topic.id === Number(topic.value),
+          );
+          const currentGroupTopic = (currentGroup?.topics || []).find(
+            (t) => t.id === Number(topic.value),
+          );
+          return {
+            topic: {
+              id: Number(topic.value),
+              is_private: currentGroupTopic?.is_private ?? false,
+              name: topic.label,
+            },
+            permission: existingTopic?.permission || [],
+          };
+        });
       setTopicPermissionsToggleGroupSubForms(updatedTopicPermissions);
     } else {
       setTopicPermissionsToggleGroupSubForms([]);
@@ -693,6 +690,13 @@ const GroupForm = ({
                     }: OptionProps<TopicOption, true>) => (
                       <components.Option {...props} data={data}>
                         {data.label}
+                        {privateTopicIds.has(data.value) && (
+                          <CWIcon
+                            iconName="lockedNew"
+                            iconSize="small"
+                            style={{ marginLeft: 6 }}
+                          />
+                        )}
                       </components.Option>
                     ),
                     SingleValue: ({
@@ -701,6 +705,13 @@ const GroupForm = ({
                     }: SingleValueProps<TopicOption, true>) => (
                       <components.SingleValue {...props} data={data}>
                         {data.label}
+                        {privateTopicIds.has(data.value) && (
+                          <CWIcon
+                            iconName="lockedNew"
+                            iconSize="small"
+                            style={{ marginLeft: 6 }}
+                          />
+                        )}
                       </components.SingleValue>
                     ),
                     MultiValueLabel: ({
@@ -709,6 +720,13 @@ const GroupForm = ({
                     }: MultiValueProps<TopicOption, true>) => (
                       <components.MultiValueLabel {...props} data={data}>
                         {data.label}
+                        {privateTopicIds.has(data.value) && (
+                          <CWIcon
+                            iconName="lockedNew"
+                            iconSize="small"
+                            style={{ marginLeft: 6 }}
+                          />
+                        )}
                       </components.MultiValueLabel>
                     ),
                   }}

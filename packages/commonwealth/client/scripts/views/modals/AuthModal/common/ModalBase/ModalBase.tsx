@@ -17,16 +17,14 @@ import {
 } from 'views/components/AuthButton/types';
 import { PrivyEmailDialog } from 'views/components/Privy/dialogs/PrivyEmailDialog';
 import { PrivySMSDialog } from 'views/components/Privy/dialogs/PrivySMSDialog';
-import {
-  CWTab,
-  CWTabsRow,
-} from 'views/components/component_kit/new_designs/CWTabs';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import {
   CWModalBody,
   CWModalFooter,
 } from '../../../../components/component_kit/new_designs/CWModal';
+import { CWTab } from '../../../../components/component_kit/new_designs/CWTabs';
+import CWTabsRow from '../../../../components/component_kit/new_designs/CWTabs/CWTabsRow';
 import { TemporaryCrecimientoModalBase } from '../../TemporaryCrecimientoModalBase';
 import { AuthModalType, ModalBaseProps, ModalBaseTabs } from '../../types';
 import useAuthentication from '../../useAuthentication';
@@ -382,7 +380,7 @@ const ModalBase = ({
           <CWIcon iconName="close" onClick={onClose} className="close-btn" />
         )}
 
-        <img src={commonLogo} className="logo" />
+        <img src={commonLogo} className={clsx('logo', { mobileApp })} />
 
         <CWText type="h2" className="header" isCentered>
           {copy.title}
@@ -399,7 +397,7 @@ const ModalBase = ({
           </CWText>
         )}
 
-        <CWModalBody className={clsx('content', bodyClassName)}>
+        <CWModalBody className={clsx('content', bodyClassName, { mobileApp })}>
           {showcrecimientoHackathonModal ? (
             <TemporaryCrecimientoModalBase
               onOtherMethodsSignIn={() =>

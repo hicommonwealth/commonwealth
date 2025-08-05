@@ -10,6 +10,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import './AdminPanel.scss';
 import Analytics from './Analytics';
+import AwardXpTask from './AwardXpTask';
 import ChangeResourceTimestamps from './ChangeResourceTimestamps';
 import CommunityTagsManagementTask from './CommunityTagsManagement';
 import CommunityTier from './CommunityTier';
@@ -64,6 +65,7 @@ const AdminPanelPage = () => {
         <ConnectChainToCommunity />
         <CommunityTagsManagementTask />
         <MakeSiteAdminTask />
+        <AwardXpTask />
         <TopUsers />
         <TriggerNotificationsWorkflow />
         <EnableDigestEmail />

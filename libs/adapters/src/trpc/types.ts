@@ -36,6 +36,7 @@ export enum Tag {
   Search = 'Search',
   Configuration = 'Configuration',
   MCP = 'MCP',
+  TokenAllocation = 'TokenAllocation',
 }
 
 /**

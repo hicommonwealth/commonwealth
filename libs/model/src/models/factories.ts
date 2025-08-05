@@ -24,6 +24,7 @@ import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';
 import Group from './group';
 import GroupGatedAction from './groupGatedAction';
+import GroupSnapshot from './groupSnapshot';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LaunchpadTrade from './launchpad_trade';
 import MCPServer from './mcp_server';
@@ -48,7 +49,13 @@ import ThreadRank from './thread_rank';
 import ThreadSubscription from './thread_subscriptions';
 import ThreadVersionHistory from './thread_version_history';
 import LaunchpadToken from './token';
+import {
+  AuraAllocations,
+  ClaimAddresses,
+  HistoricalAllocations,
+} from './token-allocation';
 import Topic from './topic';
+import TopicSubscription from './topic_subscription';
 import TwitterCursor from './twitter_cursor';
 import User from './user';
 import Vote from './vote';
@@ -59,7 +66,9 @@ import XpLog from './xp_log';
 export const Factories = {
   Address,
   ApiKey,
+  AuraAllocations,
   ChainNode,
+  ClaimAddresses,
   Collaboration,
   Comment,
   CommentVersionHistory,
@@ -81,6 +90,8 @@ export const Factories = {
   EvmEventSource,
   Group,
   GroupGatedAction,
+  GroupSnapshot,
+  HistoricalAllocations,
   LastProcessedEvmBlock,
   LaunchpadTrade,
   MCPServer,
@@ -106,6 +117,7 @@ export const Factories = {
   ThreadSubscription,
   ThreadVersionHistory,
   Topic,
+  TopicSubscription,
   TwitterCursor,
   User,
   Vote,

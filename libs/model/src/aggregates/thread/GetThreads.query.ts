@@ -287,7 +287,11 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
       return schemas.buildPaginatedResponse(
         threads,
         threads.at(0)?.total_num_thread_results || 0,
-        { limit: replacements.limit, cursor: replacements.page },
+        {
+          limit: replacements.limit,
+          cursor: replacements.page,
+          offset: replacements.offset,
+        },
       );
     },
   };

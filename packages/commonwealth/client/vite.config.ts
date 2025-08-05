@@ -156,6 +156,7 @@ export default defineConfig(({ mode }) => {
           secure: false,
         },
       },
+      allowedHosts: ['common.ngrok.app'],
     },
     resolve: {
       alias: [

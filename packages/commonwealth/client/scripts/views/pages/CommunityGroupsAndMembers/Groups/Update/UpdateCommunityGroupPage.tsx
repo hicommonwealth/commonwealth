@@ -1,3 +1,4 @@
+import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import { buildUpdateGroupInput } from 'client/scripts/state/api/groups/editGroup';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -53,6 +54,11 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const [allowedAddresses, setAllowedAddresses] = useState<string[]>(
     initialAllowlist ?? [],
   );
+
+  useRunOnceOnCondition({
+    callback: () => setAllowedAddresses(initialAllowlist),
+    shouldRun: initialAllowlist?.length > 0,
+  });
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -120,6 +126,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
               requirementContractAddress:
                 requirement.data.source.contract_address ||
                 requirement.data.source.object_id ||
+                requirement.data.source.collection_id ||
                 '',
               requirementCoinType: requirement.data.source.coin_type || '',
               // API doesn't return this, api internally uses the "more than" option, so we set it here explicitly

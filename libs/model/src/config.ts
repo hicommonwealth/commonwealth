@@ -96,6 +96,8 @@ const {
   UNLEASH_FRONTEND_API_TOKEN,
   CONTEST_DURATION_IN_SEC,
   KLAVIS_API_KEY,
+  REORG_SAFETY_DISABLED,
+  SEND_EMAILS,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -121,13 +123,17 @@ export const config = configure(
       API_KEY: SENDGRID_API_KEY,
     },
     DB: {
-      URI: DATABASE_URL ?? DEFAULTS.DATABASE_URL,
+      URI:
+        target.NODE_ENV === 'test' || !DATABASE_URL
+          ? DEFAULTS.DATABASE_URL
+          : DATABASE_URL,
       NAME,
       NO_SSL: NO_SSL === 'true',
       TRACE: DATABASE_LOG_TRACE === 'true',
     },
     WEB3: {
       PRIVATE_KEY: PRIVATE_KEY || '',
+      REORG_SAFETY_DISABLED: REORG_SAFETY_DISABLED !== 'true',
       LAUNCHPAD_PRIVATE_KEY: LAUNCHPAD_PRIVATE_KEY || '',
       CONTEST_BOT_PRIVATE_KEY: CONTEST_BOT_PRIVATE_KEY || '',
       EVM_CHAINS_WHITELIST: EVM_CHAINS_WHITELIST || '',
@@ -315,6 +321,7 @@ export const config = configure(
         KNOCK_PUBLIC_API_KEY || DEFAULTS.KNOCK_PUBLIC_API_KEY,
       KNOCK_IN_APP_FEED_ID:
         KNOCK_IN_APP_FEED_ID || DEFAULTS.KNOCK_IN_APP_FEED_ID,
+      SEND_EMAILS: SEND_EMAILS === 'true',
     },
     UNLEASH: {
       FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
@@ -388,6 +395,7 @@ export const config = configure(
       LAUNCHPAD_CHAIN_ID: z.number(),
       LAUNCHPAD_CONNECTOR_WEIGHT: z.number(),
       LAUNCHPAD_INITIAL_PRICE: z.number(),
+      REORG_SAFETY_DISABLED: z.boolean().optional(),
     }),
     TBC: z.object({
       TTL_SECS: z.number().int(),
@@ -689,7 +697,7 @@ export const config = configure(
         requiredInEnvironmentServices({
           config: target,
           requiredAppEnvs: ProdLikeEnvironments,
-          requiredServices: [...WebServices, 'knock', 'consumer'],
+          requiredServices: [...WebServices, 'consumer'],
           defaultCheck: DEFAULTS.KNOCK_PUBLIC_API_KEY,
         }),
       ),
@@ -697,10 +705,10 @@ export const config = configure(
         requiredInEnvironmentServices({
           config: target,
           requiredAppEnvs: ['production'],
-          requiredServices: [...WebServices, 'knock', 'consumer'],
-          defaultCheck: DEFAULTS.KNOCK_IN_APP_FEED_ID,
+          requiredServices: [...WebServices, 'consumer'],
         }),
       ),
+      SEND_EMAILS: z.boolean(),
     }),
     UNLEASH: z.object({
       FRONTEND_API_TOKEN: z

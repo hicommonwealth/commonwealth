@@ -35,7 +35,6 @@ const {
   LOAD_TESTING_AUTH_TOKEN,
   SEND_WEBHOOKS,
   SEND_WEBHOOKS_CONFIRMATION_TIMESTAMP,
-  SEND_EMAILS,
   DISABLE_LOCAL_QUEUE_PURGE,
   R2_ACCESS_KEY_ID,
   R2_SECRET_ACCESS_KEY,
@@ -73,7 +72,6 @@ export const config = configure(
           SEND_WEBHOOKS_CONFIRMATION_TIMESTAMP ?? '0',
         ),
       },
-      SEND_EMAILS: SEND_EMAILS === 'true',
     },
     PUSH_NOTIFICATIONS: {
       KNOCK_FCM_CHANNEL_ID,
@@ -111,7 +109,7 @@ export const config = configure(
         requiredInEnvironmentServices({
           config: target,
           requiredAppEnvs: DeployedEnvironments,
-          requiredServices: ['consumer', 'message-relayer', 'knock'],
+          requiredServices: ['consumer', 'message-relayer'],
           defaultCheck: DEFAULTS.RABBITMQ_URI,
         }),
       ),
@@ -159,7 +157,6 @@ export const config = configure(
           .describe(
             'A flag indicating whether the Knock integration is enabled or disabled',
           ),
-        SEND_EMAILS: z.boolean(),
         WEBHOOKS: z
           .object({
             SEND: z
@@ -204,7 +201,7 @@ export const config = configure(
         const fn = requiredInEnvironmentServices({
           config: target,
           requiredAppEnvs: ProdLikeEnvironments,
-          requiredServices: [...WebServices, 'consumer', 'knock'],
+          requiredServices: [...WebServices, 'consumer'],
         });
         if (data.FLAG_KNOCK_INTEGRATION_ENABLED) {
           return fn(
