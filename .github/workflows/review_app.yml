@@ -174,7 +174,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             if (process.env.DEPLOYMENT_URL) {
-              const message = `🚀 Review app deployed!\n\nYou can access the review app at: [${process.env.DEPLOYMENT_URL}](${process.env.DEPLOYMENT_URL})`;
+              const message = `🚀 Review app deployed!\n\nYou can access the review app at: [${process.env.DEPLOYMENT_URL}](https://${process.env.DEPLOYMENT_URL})`;
             
               github.rest.issues.createComment({
                 issue_number: ${{ steps.set_pr_number.outputs.pr_number }},
@@ -184,7 +184,7 @@ jobs:
               });
             } else {
               console.log('No deployment URL found to comment on PR');
-              const message = `❌ Review app deployed but deployment URL not found. Check the Railway dashboard manually to get the URL.`
+              const message = `⚠️ Review app deployed but deployment URL not found.\n\nCheck the Railway dashboard manually to get the URL.`
               github.rest.issues.createComment({
                   issue_number: ${{ steps.set_pr_number.outputs.pr_number }},
                   owner: context.repo.owner,
