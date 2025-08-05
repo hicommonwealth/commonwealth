@@ -40,6 +40,13 @@ const SuiTokenSource = z.object({
   coin_type: z.string(),
 });
 
+const SuiNFTSource = z.object({
+  source_type: z.enum([BalanceSourceType.SuiNFT]),
+  sui_network: z.string(),
+  collection_id: z.string(),
+  token_standard: z.string().optional(),
+});
+
 const NativeSource = z.object({
   source_type: z.enum([BalanceSourceType.ETHNative]),
   evm_chain_id: PG_INT,
@@ -67,6 +74,7 @@ export const ThresholdData = z.object({
     SolanaSource,
     SuiSource,
     SuiTokenSource,
+    SuiNFTSource,
   ]),
 });
 
@@ -138,4 +146,18 @@ export const Membership = z.object({
   // associations
   group: Group.optional(),
   address: Address.optional(),
+});
+
+export const GroupSnapshot = z.object({
+  id: z.number().optional(),
+  group_id: z.number(),
+  block_height: z.bigint().nullable(),
+  snapshot_source: z.string(),
+  balance_map: z.record(z.string()),
+  group_requirements: z.array(Requirement),
+  status: z.enum(['active', 'superseded']),
+  error_message: z.string().nullable(),
+  snapshot_date: z.date(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });

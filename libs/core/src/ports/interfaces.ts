@@ -20,6 +20,7 @@ import {
   ReferrerCommunityJoinedNotification,
   ReferrerSignedUpNotification,
   SnapshotProposalCreatedNotification,
+  ThreadCreatedNotification,
   TradeEventNotification,
   UpvoteNotification,
   UserMentionedNotification,
@@ -528,6 +529,7 @@ export interface BlobStorage extends Disposable {
  * Notifications
  */
 export enum WorkflowKeys {
+  ThreadCreated = 'thread-created',
   CommentCreation = 'comment-creation',
   SnapshotProposals = 'snapshot-proposals',
   UserMentioned = 'user-mentioned',
@@ -649,6 +651,10 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof CapReachedNotification>;
             key: WorkflowKeys.LaunchpadCapReached;
+          }
+        | {
+            data: z.infer<typeof ThreadCreatedNotification>;
+            key: WorkflowKeys.ThreadCreated;
           }
       ))
   | WebhookProviderOptions;

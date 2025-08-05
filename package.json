@@ -54,7 +54,7 @@
     "@cosmjs/encoding": "0.32.3",
     "@hicommonwealth/eslint-plugin": "workspace:*",
     "@istanbuljs/nyc-config-typescript": "^0.1.3",
-    "@knocklabs/node": "^0.6.13",
+    "@knocklabs/node": "catalog:",
     "@openfeature/web-sdk": "^1.0.2",
     "@osmonauts/lcd": "^0.10.0",
     "@playwright/test": "^1.43.1",

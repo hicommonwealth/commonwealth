@@ -5,12 +5,12 @@ import {
   RepeatFrequency,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model/db';
-import { SubscriptionPreferenceInstance } from '@hicommonwealth/model/models';
 import { events } from '@hicommonwealth/schemas';
 import { DaysOfWeek } from '@knocklabs/node';
 import z from 'zod';
 import { config } from '../../config';
+import { models } from '../../database';
+import { SubscriptionPreferenceInstance } from '../../models';
 
 const log = logger(import.meta);
 
@@ -187,12 +187,16 @@ export const processSubscriptionPreferencesUpdated: EventHandler<
     await handleEmailPreferenceUpdates(payload, subPreferences);
   }
 
-  const userProperties: { [key: string]: boolean } = {};
+  const userProperties: {
+    mobile_push_notifications_enabled?: boolean;
+    mobile_push_discussion_activity_enabled?: boolean;
+    mobile_push_admin_alerts_enabled?: boolean;
+  } = {};
   const keys = [
     'mobile_push_notifications_enabled',
     'mobile_push_discussion_activity_enabled',
     'mobile_push_admin_alerts_enabled',
-  ];
+  ] as const;
   keys.forEach((key) => {
     if (key in payload) {
       userProperties[key] = payload[key];
