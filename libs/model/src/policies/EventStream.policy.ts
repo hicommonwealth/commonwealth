@@ -75,7 +75,7 @@ const getContestManagerUrl = (
 ) => {
   if (contestManager.is_farcaster_contest) {
     return buildContestLeaderboardUrl(
-      getBaseUrl(config.APP_ENV),
+      getBaseUrl(config.APP_ENV, undefined, config.SERVER_URL),
       contestManager.community_id,
       contestManager.contest_address,
     );

@@ -48,6 +48,7 @@ type OauthInfo = {
   oauth_email_verified: boolean | null;
   oauth_username: string | null;
   oauth_phone_number: string | null;
+  oauth_user_id: string | null;
 };
 
 async function getVerifiedInfo(
@@ -77,6 +78,7 @@ async function getVerifiedInfo(
       : null,
     oauth_username: verifiedUserInfo.username || null,
     oauth_phone_number: verifiedUserInfo.phoneNumber || null,
+    oauth_user_id: verifiedUserInfo.userId || null,
   };
 }
 
@@ -87,6 +89,7 @@ async function updateAddressesOauth(
     oauth_email_verified,
     oauth_username,
     oauth_phone_number,
+    oauth_user_id,
   }: OauthInfo,
   addressInstance: z.infer<typeof Address>,
   transaction?: Transaction,
@@ -98,7 +101,8 @@ async function updateAddressesOauth(
     (oauth_phone_number &&
       addressInstance.oauth_phone_number !== oauth_phone_number) ||
     (oauth_email_verified !== null &&
-      addressInstance.oauth_email_verified !== oauth_email_verified)
+      addressInstance.oauth_email_verified !== oauth_email_verified) ||
+    (oauth_user_id && addressInstance.oauth_user_id !== oauth_user_id)
   ) {
     await models.Address.update(
       {
@@ -107,6 +111,7 @@ async function updateAddressesOauth(
         oauth_username,
         oauth_phone_number,
         oauth_email_verified,
+        oauth_user_id,
       },
       {
         where: {
@@ -167,6 +172,7 @@ async function createMagicAddressInstances({
     oauth_username,
     oauth_phone_number,
     oauth_email_verified,
+    oauth_user_id,
   } = verifiedInfo;
   await bumpTier(user, verifiedInfo, transaction);
 
@@ -194,6 +200,7 @@ async function createMagicAddressInstances({
         oauth_username,
         oauth_phone_number,
         oauth_email_verified,
+        oauth_user_id,
       },
       transaction,
     });

@@ -24,6 +24,11 @@ query environment($id: String!) {
         node {
           serviceId
           serviceName
+          domains {
+            serviceDomains {
+              domain
+            }
+          }
         }
       }
     }
