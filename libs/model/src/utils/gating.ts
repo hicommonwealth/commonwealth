@@ -67,7 +67,7 @@ export function filterGates(actor: Actor) {
 export function buildOpenGates(actor: Actor) {
   return `
 user_addresses AS (
-  SELECT a.id FROM "Addresses" a WHERE a.user_id = ${actor.user.id}
+  SELECT a.id FROM "Addresses" a WHERE a.user_id = ${actor.user?.id}
 ),
 open_gates AS (
   SELECT T.id as topic_id
