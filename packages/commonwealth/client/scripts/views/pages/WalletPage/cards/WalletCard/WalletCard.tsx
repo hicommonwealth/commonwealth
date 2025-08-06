@@ -214,9 +214,12 @@ const WalletCard = () => {
                   {
                     label: `Claim to ${formatAddressShort(claimAddress?.address, 6)}`,
                     buttonType: 'primary',
+                    disabled: !claimAddress.magna_allocation_id,
                     onClick: () => {
-                      // handleClaim();
-                      alert('TODO handle claim');
+                      // handleClaim(claimAddress.magna_allocation_id);
+                      alert(
+                        `TODO: claim from magna using id: ${claimAddress.magna_allocation_id}`,
+                      );
                     },
                   },
                 ]}

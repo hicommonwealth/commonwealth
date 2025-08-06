@@ -5,6 +5,7 @@ export const ClaimAddressView = z.object({
   user_id: PG_INT,
   address: EVM_ADDRESS_STRICT.nullish(),
   tokens: z.coerce.number().nullish(),
+  magna_allocation_id: z.string().nullish(),
   magna_synced_at: z
     .date()
     .or(z.string())
