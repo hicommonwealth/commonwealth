@@ -9,23 +9,6 @@ export default {
         allowNull: true,
         transaction,
       });
-      await queryInterface.addColumn('ClaimAddresses', 'magna_allocation_id', {
-        type: Sequelize.STRING,
-        allowNull: true,
-        transaction,
-      });
-      await queryInterface.addColumn('ClaimAddresses', 'magna_synced_at', {
-        type: Sequelize.DATE,
-        allowNull: true,
-        transaction,
-      });
-      await queryInterface.removeColumn(
-        'HistoricalAllocations',
-        'magna_synced_at',
-        {
-          transaction,
-        },
-      );
     });
   },
 
@@ -36,25 +19,6 @@ export default {
         allowNull: false,
         transaction,
       });
-      await queryInterface.removeColumn(
-        'ClaimAddresses',
-        'magna_allocation_id',
-        {
-          transaction,
-        },
-      );
-      await queryInterface.removeColumn('ClaimAddresses', 'magna_synced_at', {
-        transaction,
-      });
-      await queryInterface.addColumn(
-        'HistoricalAllocations',
-        'magna_synced_at',
-        {
-          type: Sequelize.DATE,
-          allowNull: true,
-          transaction,
-        },
-      );
     });
   },
 };
