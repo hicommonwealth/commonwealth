@@ -11,18 +11,17 @@ const SUPPLY = {
   TOTAL: 10_000_000_000,
   SPLITS: {
     // For 3% total allocation (300M):
-    HISTORICAL: 0.5, // 10B * 0.03 * 0.50 = 150M tokens
-    AURA: 0.5, // 10B * 0.03 * 0.50 = 150M tokens
-    ONGOING: 0.01, // 10B * 0.03 * 0.01 = 3M tokens (future weekly)
+    HISTORICAL: 0.5, // Example 10B * 0.03 * 0.50 = 150M tokens
+    AURA: 0.5, // Example 10B * 0.03 * 0.50 = 150M tokens
   },
 };
 
 // Time Decay Configuration
 const DECAY = {
   HALF_LIFE_DAYS: 365, // 1 year
-  FACTOR: Math.log(4) / 365, // ≈ 0.001899 (used in exp calculation)
+  FACTOR: Math.log(6) / 365, // ≈ 0.001899 (used in exp calculation)
   // Helper function to calculate decay multiplier, unused
-  getMultiplier: (ageDays: number) => Math.exp((Math.log(4) / 365) * ageDays),
+  getMultiplier: (ageDays: number) => Math.exp((Math.log(6) / 365) * ageDays),
 };
 
 interface ScoringConfig {
@@ -57,7 +56,7 @@ function parseArguments(): ScoringConfig {
   let auraOutputPath = `results/aura-allocation-${timestamp}.csv`;
   let noVietnamese = true;
   let minLength: number | undefined = 30;
-  let supplyPercent = 0.03; // Default to 3%
+  let supplyPercent = 0.01; // Default to 3%
   let historicalOrder: string = 'token_allocation DESC';
   let auraOrder: string = 'token_allocation DESC';
   let auraEndDate: string = new Date().toISOString();
