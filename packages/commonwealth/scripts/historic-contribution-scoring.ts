@@ -6,7 +6,24 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { QueryTypes } from 'sequelize';
 
-const totalSupply = 10_000_000_000;
+// Token Supply Configuration
+const SUPPLY = {
+  TOTAL: 10_000_000_000,
+  SPLITS: {
+    // For 3% total allocation (300M):
+    HISTORICAL: 0.5, // 10B * 0.03 * 0.50 = 150M tokens
+    AURA: 0.5, // 10B * 0.03 * 0.50 = 150M tokens
+    ONGOING: 0.01, // 10B * 0.03 * 0.01 = 3M tokens (future weekly)
+  },
+};
+
+// Time Decay Configuration
+const DECAY = {
+  HALF_LIFE_DAYS: 365, // 1 year
+  FACTOR: Math.log(4) / 365, // ≈ 0.001899 (used in exp calculation)
+  // Helper function to calculate decay multiplier, unused
+  getMultiplier: (ageDays: number) => Math.exp((Math.log(4) / 365) * ageDays),
+};
 
 interface ScoringConfig {
   historicalEndDate: string;
@@ -29,14 +46,18 @@ function parseArguments(): ScoringConfig {
 
   // Default values
   let historicalEndDate = '2025-05-01T12:00:00.000Z'; // May 1st at noon
-  let threadWeight = 5;
-  let commentWeight = 2;
+  let threadWeight = 10;
+  let commentWeight = 5;
   let reactionWeight = 1;
-  let historicalOutputPath = 'historic-allocation.csv';
-  let auraOutputPath = 'aura-allocation.csv';
-  let noVietnamese = false;
-  let minLength: number | undefined = undefined;
-  let supplyPercent = 0.025; // Default to 2.5%
+  const timestamp = new Date()
+    .toISOString()
+    .replace(/[:]/g, '-')
+    .replace(/\..+/, '');
+  let historicalOutputPath = `results/historic-allocation-${timestamp}.csv`;
+  let auraOutputPath = `results/aura-allocation-${timestamp}.csv`;
+  let noVietnamese = true;
+  let minLength: number | undefined = 30;
+  let supplyPercent = 0.03; // Default to 3%
   let historicalOrder: string = 'token_allocation DESC';
   let auraOrder: string = 'token_allocation DESC';
   let auraEndDate: string = new Date().toISOString();
@@ -378,6 +399,8 @@ type AuraAllocation = {
 async function getHistoricalTokenAllocations(
   config: ScoringConfig,
 ): Promise<Array<HistoricalAllocation>> {
+  const historicalPoolTokens =
+    config.supplyPercent * SUPPLY.TOTAL * SUPPLY.SPLITS.HISTORICAL;
   return await models.sequelize.query<HistoricalAllocation>(
     `
       INSERT INTO "HistoricalAllocations"
@@ -412,7 +435,7 @@ async function getHistoricalTokenAllocations(
                            AND (T.user_id IS NOT NULL OR C.user_id IS NOT NULL)),
            thread_scores AS (SELECT T.user_id,
                                     SUM(exp(
-                                          (ln(2) / 365) *
+                                          ${DECAY.FACTOR} *
                                           EXTRACT(EPOCH FROM (:historicalEndDate::timestamptz - T.thread_created_at)) /
                                           86400
                                         ) * ${config.threadWeight}) as score,
@@ -421,7 +444,7 @@ async function getHistoricalTokenAllocations(
                              GROUP BY T.user_id),
            comment_scores AS (SELECT C.user_id,
                                      SUM(exp(
-                                           (ln(2) / 365) *
+                                           ${DECAY.FACTOR} *
                                            EXTRACT(EPOCH FROM
                                                    (:historicalEndDate::timestamptz - C.comment_created_at)) / 86400
                                          ) * ${config.commentWeight}) as score,
@@ -430,7 +453,7 @@ async function getHistoricalTokenAllocations(
                               GROUP BY C.user_id),
            reaction_scores AS (SELECT R.user_id,
                                       SUM(exp(
-                                            (ln(2) / 365) *
+                                            ${DECAY.FACTOR} *
                                             EXTRACT(EPOCH FROM
                                                     (:historicalEndDate::timestamptz - R.reaction_created_at)) / 86400
                                           ) * ${config.reactionWeight}) as score,
@@ -453,17 +476,13 @@ async function getHistoricalTokenAllocations(
                                    LEFT JOIN comment_scores CS ON CS.user_id = U.user_id
                                    LEFT JOIN reaction_scores RS ON RS.user_id = U.user_id)
       SELECT *,
-             (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) *
-             100                                                  as percent_allocation,
-             (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) *
-             ${(config.supplyPercent / 2) * totalSupply}::NUMERIC as token_allocation
+             (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) * 100 as percent_allocation,
+             (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) * ${historicalPoolTokens}::NUMERIC as token_allocation
       FROM final_scores
       ORDER BY ${config.historicalOrder} NULLS LAST;
     `,
     {
-      replacements: {
-        historicalEndDate: config.historicalEndDate,
-      },
+      replacements: { historicalEndDate: config.historicalEndDate },
       type: QueryTypes.SELECT,
     },
   );
@@ -472,6 +491,8 @@ async function getHistoricalTokenAllocations(
 async function getAuraTokenAllocations(
   config: ScoringConfig,
 ): Promise<Array<AuraAllocation>> {
+  const auraPoolTokens =
+    config.supplyPercent * SUPPLY.TOTAL * SUPPLY.SPLITS.AURA;
   return await models.sequelize.query<AuraAllocation>(
     `
       INSERT INTO "AuraAllocations"
@@ -491,17 +512,15 @@ async function getAuraTokenAllocations(
                           WHERE :historicalEndDate < created_at
                             AND created_at < :auraEndDate
                           GROUP BY creator_user_id)
-      SELECT U.id                                                          as user_id,
+      SELECT U.id as user_id,
              COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0) as total_xp,
              (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC /
-             (SELECT total_xp_awarded FROM xp_sum) *
-             100                                                           as percent_allocation,
+             (SELECT total_xp_awarded FROM xp_sum) * 100 as percent_allocation,
              (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC /
-             (SELECT total_xp_awarded FROM xp_sum) *
-             ${(config.supplyPercent / 2) * totalSupply}::NUMERIC          as token_allocation
+             (SELECT total_xp_awarded FROM xp_sum) * ${auraPoolTokens}::NUMERIC as token_allocation
       FROM "Users" U
-             LEFT JOIN user_xp UX ON UX.user_id = U.id
-             LEFT JOIN creator_xp CX ON CX.creator_user_id = U.id
+        LEFT JOIN user_xp UX ON UX.user_id = U.id
+        LEFT JOIN creator_xp CX ON CX.creator_user_id = U.id
       ORDER BY ${config.auraOrder} NULLS LAST;
     `,
     {
@@ -613,9 +632,19 @@ async function main() {
     console.log('Generating aura token allocations...');
     await getAuraTokenAllocations(config);
 
-    // // Write both CSV files
-    // writeScoresToCSV(scores, config.historicalOutputPath);
-    // writeScoresToCSV(auraScores, config.auraOutputPath);
+    // Get the scores from the database
+    const historicScores = await models.sequelize.query<HistoricalAllocation>(
+      'SELECT * FROM "HistoricalAllocations" ORDER BY token_allocation DESC',
+      { type: QueryTypes.SELECT },
+    );
+    const auraScores = await models.sequelize.query<AuraAllocation>(
+      'SELECT * FROM "AuraAllocations" ORDER BY token_allocation DESC',
+      { type: QueryTypes.SELECT },
+    );
+
+    // Write both CSV files
+    writeScoresToCSV(historicScores, config.historicalOutputPath);
+    writeScoresToCSV(auraScores, config.auraOutputPath);
     process.exit(0);
   } catch (error) {
     console.error('Error:', error instanceof Error ? error.message : error);
