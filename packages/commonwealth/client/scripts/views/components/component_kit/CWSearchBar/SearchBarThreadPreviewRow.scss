@@ -1,7 +1,7 @@
-@use '../../../../../styles/shared';
+@use '../../../../styles/shared';
 @use 'CWSearchBar.scss';
-@use '../../../../../styles/mixins/colors.module';
-@use '../../../../../styles/mixins/text';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/text';
 
 .SearchBarThreadPreviewRow {
   display: flex;

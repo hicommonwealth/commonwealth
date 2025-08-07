@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { useFormContext } from 'react-hook-form';
-import type { ValidationStatus } from '../../cw_validation_text';
-import { getClasses } from '../../helpers';
-import { ComponentType } from '../../types';
+import type { ValidationStatus } from '../cw_validation_text';
+import { getClasses } from '../helpers';
+import { ComponentType } from '../types';
 import { MessageRow } from './MessageRow';
 import { useTextInputWithValidation } from './useTextInputWithValidation';
 

@@ -1,8 +1,8 @@
-@use '../../../../../styles/shared.scss';
-@use '../../../../../styles/mixins/border_radius';
-@use '../../../../../styles/mixins/colors.module';
-@use '../../../../../styles/mixins/elevation';
-@use '../../../../../styles/mixins/media_queries';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/elevation';
+@use '../../../../styles/mixins/media_queries';
 
 .CWPhoneInput {
   display: flex;

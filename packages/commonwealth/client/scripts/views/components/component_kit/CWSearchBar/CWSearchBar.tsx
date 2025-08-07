@@ -3,14 +3,14 @@ import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import type { NavigateOptions, To } from 'react-router';
 
 import { CWText } from 'views/components/component_kit/cw_text';
-import { notifyError } from '../../../../../controllers/app/notifications';
-import useSearchResults from '../../../../../hooks/useSearchResults';
-import SearchQuery from '../../../../../models/SearchQuery';
-import { useCommonNavigate } from '../../../../../navigation/helpers';
-import app from '../../../../../state';
-import { getClasses } from '../../helpers';
-import { ComponentType } from '../../types';
+import { notifyError } from '../../../../controllers/app/notifications';
+import useSearchResults from '../../../../hooks/useSearchResults';
+import SearchQuery from '../../../../models/SearchQuery';
+import { useCommonNavigate } from '../../../../navigation/helpers';
+import app from '../../../../state';
 import { CWTag } from '../CWTag';
+import { getClasses } from '../helpers';
+import { ComponentType } from '../types';
 import { SearchBarDropdown } from './SearchBarDropdown';
 
 import { useGetCommunityByIdQuery } from 'state/api/communities';

@@ -2,8 +2,8 @@ import React from 'react';
 
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/CWTag';
-import { CWIcon } from '../../cw_icons/cw_icon';
-import type { IconName } from '../../cw_icons/cw_icon_lookup';
+import { CWIcon } from '../cw_icons/cw_icon';
+import type { IconName } from '../cw_icons/cw_icon_lookup';
 
 import { getClasses } from 'views/components/component_kit/helpers';
 import { ComponentType } from 'views/components/component_kit/types';

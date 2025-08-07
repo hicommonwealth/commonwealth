@@ -9,7 +9,7 @@ import { ComponentType } from 'views/components/component_kit/types';
 
 import { VirtualElement } from '@popperjs/core';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { getClasses } from '../../helpers';
+import { getClasses } from '../helpers';
 import './CWPopover.scss';
 
 export type AnchorType = HTMLElement | SVGSVGElement;

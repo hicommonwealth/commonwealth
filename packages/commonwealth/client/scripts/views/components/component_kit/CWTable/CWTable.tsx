@@ -86,12 +86,12 @@ import {
 import clsx from 'clsx';
 import { getRelativeTimestamp } from 'helpers/dates';
 import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
-import { Avatar } from '../../../Avatar';
-import { CWIcon } from '../../cw_icons/cw_icon';
-import { CWText } from '../../cw_text';
-import { ComponentType } from '../../types';
+import { Avatar } from '../../Avatar';
+import { CWIcon } from '../cw_icons/cw_icon';
+import { CWText } from '../cw_text';
 import CWIconButton from '../CWIconButton';
 import CWPopover, { usePopover } from '../CWPopover';
+import { ComponentType } from '../types';
 
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { prettyVoteWeight } from 'shared/adapters/currency';

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import useSearchProfilesQuery from 'state/api/profiles/searchProfiles';
 import { useDebounceValue } from 'usehooks-ts';
-import { CWLabel } from '../../cw_label';
+import { CWLabel } from '../cw_label';
 import './CWUserPicker.scss';
 
 export type CWUserPickerOption = {

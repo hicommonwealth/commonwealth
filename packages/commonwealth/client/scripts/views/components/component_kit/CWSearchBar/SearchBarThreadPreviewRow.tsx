@@ -1,10 +1,10 @@
 import moment from 'moment';
 import React, { FC } from 'react';
 
-import { useCommonNavigate } from '../../../../../navigation/helpers';
-import { renderTruncatedHighlights } from '../../../react_quill_editor/highlighter';
-import { User } from '../../../user/user';
-import { CWText } from '../../cw_text';
+import { useCommonNavigate } from '../../../../navigation/helpers';
+import { renderTruncatedHighlights } from '../../react_quill_editor/highlighter';
+import { User } from '../../user/user';
+import { CWText } from '../cw_text';
 
 import { getDecodedString } from '@hicommonwealth/shared';
 import { ThreadView } from 'client/scripts/models/Thread';

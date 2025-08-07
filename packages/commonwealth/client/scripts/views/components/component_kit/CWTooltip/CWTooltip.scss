@@ -1,6 +1,6 @@
-@use '../../../../../styles/shared.scss';
-@use '../../../../../styles/mixins/colors.module';
-@use '../../../../../styles/mixins/text';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/text';
 
 @mixin tip($top, $right, $bottom, $left) {
   position: absolute;

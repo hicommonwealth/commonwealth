@@ -1,6 +1,6 @@
-@use '../../../../../styles/shared.scss';
-@use '../../../../../styles/mixins/colors.module';
-@use '../../../../../styles/mixins/inputs';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/inputs';
 
 @mixin iconPositionStyles {
   position: absolute;

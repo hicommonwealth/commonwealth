@@ -1,7 +1,7 @@
 import { Warning, WarningOctagon, X } from '@phosphor-icons/react';
 import React, { FC } from 'react';
 
-import { CWText } from '../../../cw_text';
+import { CWText } from '../../cw_text';
 
 import './CWModalHeader.scss';
 

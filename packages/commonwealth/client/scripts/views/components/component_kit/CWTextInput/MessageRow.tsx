@@ -1,10 +1,10 @@
 import { CheckCircle, Warning } from '@phosphor-icons/react';
 import React, { FC } from 'react';
 
-import { CWLabel } from '../../cw_label';
-import { CWText } from '../../cw_text';
-import { ValidationStatus } from '../../cw_validation_text';
-import { getClasses } from '../../helpers';
+import { CWLabel } from '../cw_label';
+import { CWText } from '../cw_text';
+import { ValidationStatus } from '../cw_validation_text';
+import { getClasses } from '../helpers';
 
 import './MessageRow.scss';
 

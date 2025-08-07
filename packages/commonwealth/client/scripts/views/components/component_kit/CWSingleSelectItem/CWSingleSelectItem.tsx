@@ -2,7 +2,7 @@ import { CopySimple } from '@phosphor-icons/react';
 import { formatAddressShort } from 'client/scripts/helpers';
 import React from 'react';
 import { SingleValueProps } from 'react-select';
-import { CWIcon } from '../../cw_icons/cw_icon';
+import { CWIcon } from '../cw_icons/cw_icon';
 import './CWSingleSelectItem.scss';
 type CustomSingleValueProps = {
   showCopyIcon?: boolean;

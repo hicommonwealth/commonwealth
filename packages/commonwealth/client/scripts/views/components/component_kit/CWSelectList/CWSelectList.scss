@@ -1,7 +1,7 @@
-@use '../../../../../styles/shared.scss';
-@use '../../../../../styles/mixins/border_radius';
-@use '../../../../../styles/mixins/colors.module';
-@use '../../../../../styles/mixins/inputs';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/inputs';
 
 .CWSelectList {
   &.disabled {

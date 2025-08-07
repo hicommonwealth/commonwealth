@@ -4,10 +4,10 @@ import React, { FC } from 'react';
 import { getDecodedString } from '@hicommonwealth/shared';
 // eslint-disable-next-line max-len
 import { MarkdownHitHighlighterWithFallback } from 'views/components/MarkdownHitHighlighterWithFallback/MarkdownHitHighlighterWithFallback';
-import { useCommonNavigate } from '../../../../../navigation/helpers';
-import { ReplyResult } from '../../../../pages/search/helpers';
-import { renderTruncatedHighlights } from '../../../react_quill_editor/highlighter';
-import { CWText } from '../../cw_text';
+import { useCommonNavigate } from '../../../../navigation/helpers';
+import { ReplyResult } from '../../../pages/search/helpers';
+import { renderTruncatedHighlights } from '../../react_quill_editor/highlighter';
+import { CWText } from '../cw_text';
 
 import './SearchBarCommentPreviewRow.scss';
 

@@ -4,7 +4,7 @@ import Drawer from 'react-modern-drawer';
 
 import useBrowserWindow from 'hooks/useBrowserWindow';
 
-import { ComponentType } from '../../types';
+import { ComponentType } from '../types';
 
 import 'react-modern-drawer/dist/index.css';
 import './CWDrawer.scss';

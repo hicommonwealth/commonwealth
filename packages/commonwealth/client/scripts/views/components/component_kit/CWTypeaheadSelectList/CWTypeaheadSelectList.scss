@@ -1,8 +1,8 @@
-@use '../../../../../styles/shared';
-@use '../../../../../styles/mixins/border_radius';
-@use '../../../../../styles/mixins/colors.module';
-@use '../../../../../styles/mixins/elevation';
-@use '../../../../../styles/mixins/inputs';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/elevation';
+@use '../../../../styles/mixins/inputs';
 
 .TypeaheadSelectList {
   .CWSelectList .SelectList {

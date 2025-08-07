@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
-import { ComponentType } from '../../types';
 import { CWSelectList } from '../CWSelectList';
+import { ComponentType } from '../types';
 import './CWTypeaheadSelectList.scss';
 export type SelectListOption = {
   value: string;

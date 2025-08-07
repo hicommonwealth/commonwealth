@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 
 import { CommunityMember } from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import { useCommonNavigate } from '../../../../../navigation/helpers';
-import { User } from '../../../user/user';
+import { useCommonNavigate } from '../../../../navigation/helpers';
+import { User } from '../../user/user';
 
 import './SearchBarMemberPreviewRow.scss';
 

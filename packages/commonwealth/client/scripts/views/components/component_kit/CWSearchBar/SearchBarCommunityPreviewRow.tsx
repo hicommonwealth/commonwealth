@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
-import { useCommonNavigate } from '../../../../../navigation/helpers';
-import { CommunityResult } from '../../../../pages/search/helpers';
-import { CommunityLabel } from '../../../community_label';
+import { useCommonNavigate } from '../../../../navigation/helpers';
+import { CommunityResult } from '../../../pages/search/helpers';
+import { CommunityLabel } from '../../community_label';
 import './SearchBarCommunityPreviewRow.scss';
 
 interface SearchBarCommunityPreviewRowProps {

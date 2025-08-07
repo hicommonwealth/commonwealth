@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { getClasses } from '../../../helpers';
+import { getClasses } from '../../helpers';
 
 import './CWModalBody.scss';
 

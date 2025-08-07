@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 
-import { SearchScope } from '../../../../../models/SearchQuery';
-import { CWDivider } from '../../cw_divider';
-import { CWText } from '../../cw_text';
+import { SearchScope } from '../../../../models/SearchQuery';
+import { CWDivider } from '../cw_divider';
+import { CWText } from '../cw_text';
 import { SearchBarCommentPreviewRow } from './SearchBarCommentPreviewRow';
 import { SearchBarCommunityPreviewRow } from './SearchBarCommunityPreviewRow';
 import { SearchBarMemberPreviewRow } from './SearchBarMemberPreviewRow';
@@ -15,7 +15,7 @@ import {
   ThreadView,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import { SearchResults } from '../../../../../hooks/useSearchResults';
+import { SearchResults } from '../../../../hooks/useSearchResults';
 import './SearchBarDropdown.scss';
 
 interface SearchBarPreviewSectionProps {

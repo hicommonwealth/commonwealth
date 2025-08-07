@@ -17,15 +17,15 @@ import { z } from 'zod';
 import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
-} from '../../../../../../../shared/analytics/types';
-import useAppStatus from '../../../../../hooks/useAppStatus';
-import { useCommunityCardPrice } from '../../../../../hooks/useCommunityCardPrice';
-import { CWCommunityAvatar } from '../../cw_community_avatar';
-import { CWIcon } from '../../cw_icons/cw_icon';
-import { CWText } from '../../cw_text';
-import { ComponentType } from '../../types';
+} from '../../../../../../shared/analytics/types';
+import useAppStatus from '../../../../hooks/useAppStatus';
+import { useCommunityCardPrice } from '../../../../hooks/useCommunityCardPrice';
+import { CWCommunityAvatar } from '../cw_community_avatar';
+import { CWIcon } from '../cw_icons/cw_icon';
+import { CWText } from '../cw_text';
 import { CWButton } from '../CWButton';
 import { CWTooltip } from '../CWTooltip';
+import { ComponentType } from '../types';
 import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
 

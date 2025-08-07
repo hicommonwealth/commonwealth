@@ -1,7 +1,7 @@
-@use '../../../../../styles/shared.scss';
-@use '../../../../../styles/mixins/border_radius';
-@use '../../../../../styles/mixins/colors.module';
-@use '../../../../../styles/mixins/elevation';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/elevation';
 
 .MuiModal-root {
   position: fixed;

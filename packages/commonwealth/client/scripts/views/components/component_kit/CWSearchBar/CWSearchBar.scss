@@ -1,7 +1,7 @@
-@use '../../../../../styles/shared';
-@use '../../../../../styles/mixins/colors.module';
-@use '../../../../../styles/mixins/media_queries';
-@use '../../../../../styles/mixins/text';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
+@use '../../../../styles/mixins/text';
 
 @mixin everyRowStyles {
   cursor: pointer;

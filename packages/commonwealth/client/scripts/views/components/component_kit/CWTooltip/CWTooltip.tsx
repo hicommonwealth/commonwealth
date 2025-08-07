@@ -7,7 +7,7 @@ import CWPopover, {
   PopoverTriggerProps,
   usePopover,
 } from 'views/components/component_kit/CWPopover';
-import { CWText } from '../../cw_text';
+import { CWText } from '../cw_text';
 import { TooltipContainer } from './TooltipContainer';
 
 export type TooltipProps = {
