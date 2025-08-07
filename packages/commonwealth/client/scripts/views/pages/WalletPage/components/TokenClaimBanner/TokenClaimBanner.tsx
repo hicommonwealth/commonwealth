@@ -16,6 +16,7 @@ import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+// eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import './TokenClaimBanner.scss';
 
@@ -175,7 +176,10 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                     We are going live on Base. You must set an EVM address to
                     claim your allocation.
                     <CWTooltip
-                      content="Commonwealth tokens will be launched on Base network. Ensure your address is compatible with Base/Ethereum."
+                      content={
+                        'Commonwealth tokens will be launched on Base network. ' +
+                        'Ensure your address is compatible with Base/Ethereum.'
+                      }
                       renderTrigger={(handleInteraction) => (
                         <CWIcon
                           iconName="info"
@@ -242,7 +246,10 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                     We are going live on Base. You must set an EVM address to
                     claim your allocation.
                     <CWTooltip
-                      content="Commonwealth tokens will be launched on Base network. Ensure your address is compatible with Base/Ethereum."
+                      content={
+                        'Commonwealth tokens will be launched on Base network. ' +
+                        'Ensure your address is compatible with Base/Ethereum.'
+                      }
                       renderTrigger={(handleInteraction) => (
                         <CWIcon
                           iconName="info"
@@ -256,7 +263,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                   </p>
                   <p className="security-notice">
                     <strong>Before claiming, verify:</strong> Check the official
-                    project website and social media, ensure you're on the
+                    project website and social media, ensure you&apos;re on the
                     correct domain (check URL carefully), verify your wallet is
                     connected to the correct network, and never approve
                     unlimited token allowances.
