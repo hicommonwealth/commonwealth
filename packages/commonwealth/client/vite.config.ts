@@ -61,6 +61,9 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_CRECIMIENTO_HACKATHON': JSON.stringify(
       env.FLAG_CRECIMIENTO_HACKATHON,
     ),
+    'process.env.FLAG_MCP_GOOGLE_SHEETS': JSON.stringify(
+      env.FLAG_MCP_GOOGLE_SHEETS,
+    ),
   };
 
   return {
