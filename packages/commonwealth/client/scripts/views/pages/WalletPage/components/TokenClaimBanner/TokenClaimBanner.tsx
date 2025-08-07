@@ -89,7 +89,9 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     });
   }
 
-  const handleAddressChange = (option: any) => {
+  const handleAddressChange = (
+    option: { label: string; value: string } | null,
+  ) => {
     if (option?.value === '__connect_new__') {
       onConnectNewAddress?.();
     } else {
@@ -147,10 +149,9 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
               iconSize="medium"
               className="copy-icon"
               onClick={() => {
-                navigator.clipboard.writeText(selectedAddress.address);
+                void navigator.clipboard.writeText(selectedAddress.address);
                 // TODO: Add success toast
               }}
-              title="Copy address to clipboard"
             />
           )}
         </div>
@@ -182,7 +183,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                       }
                       renderTrigger={(handleInteraction) => (
                         <CWIcon
-                          iconName="info"
+                          iconName="infoFilled"
                           iconSize="small"
                           className="info-icon"
                           onMouseEnter={handleInteraction}
@@ -252,7 +253,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                       }
                       renderTrigger={(handleInteraction) => (
                         <CWIcon
-                          iconName="info"
+                          iconName="infoFilled"
                           iconSize="small"
                           className="info-icon"
                           onMouseEnter={handleInteraction}
