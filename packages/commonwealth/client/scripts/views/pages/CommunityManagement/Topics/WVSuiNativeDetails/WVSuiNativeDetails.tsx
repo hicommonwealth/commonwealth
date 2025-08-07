@@ -10,6 +10,7 @@ import { CreateTopicStep } from '../utils';
 
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
+import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
 import './WVSuiNativeDetails.scss';
 
@@ -27,6 +28,30 @@ const WVSuiNativeDetails = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const chainNodeId = app?.chain?.meta?.ChainNode?.id;
+
+  // Validation function for Sui contract address format
+  const validateSuiAddress = (
+    value: string,
+  ): [ValidationStatus, string] | [] => {
+    if (!value) return [];
+
+    const segments = value.split('::');
+    if (segments.length < 3) {
+      return [
+        'failure',
+        'Address must contain at least 3 segments separated by "::"',
+      ];
+    }
+
+    // Check if each segment is non-empty
+    for (const segment of segments) {
+      if (!segment.trim()) {
+        return ['failure', 'All segments must be non-empty'];
+      }
+    }
+
+    return ['success', 'Valid Sui address format'];
+  };
 
   const handleSubmit = async () => {
     if (!tokenAddress || !chainNodeId) {
@@ -75,6 +100,7 @@ const WVSuiNativeDetails = ({
         onInput={(e) => setTokenAddress(e.target.value)}
         placeholder="Enter Sui Coin Type"
         fullWidth
+        inputValidationFn={validateSuiAddress}
       />
 
       <CWText type="h5">Vote weight multiplier</CWText>
