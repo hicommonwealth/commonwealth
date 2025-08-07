@@ -54,8 +54,7 @@ export interface TopicFormSPL {
 }
 
 export interface TopicFormSuiNative {
-  tokenSymbol?: string;
-  tokenDecimals?: number;
+  tokenAddress?: string;
   voteWeightMultiplier?: number;
   chainNodeId?: number;
   weightedVoting?: TopicWeightedVoting | null;
@@ -63,7 +62,6 @@ export interface TopicFormSuiNative {
 
 export interface TopicFormSuiToken {
   tokenAddress?: string;
-  tokenSymbol?: string;
   tokenDecimals?: number;
   voteWeightMultiplier?: number;
   chainNodeId?: number;
@@ -169,8 +167,7 @@ export const Topics = () => {
           : {}),
         ...(suiNative
           ? {
-              token_symbol: suiNative.tokenSymbol,
-              token_decimals: suiNative.tokenDecimals,
+              token_address: suiNative.tokenAddress,
               vote_weight_multiplier: suiNative.voteWeightMultiplier,
               chain_node_id: suiNative.chainNodeId,
               weighted_voting: suiNative.weightedVoting,
@@ -179,7 +176,6 @@ export const Topics = () => {
         ...(suiToken
           ? {
               token_address: suiToken.tokenAddress,
-              token_symbol: suiToken.tokenSymbol,
               token_decimals: suiToken.tokenDecimals,
               vote_weight_multiplier: suiToken.voteWeightMultiplier,
               chain_node_id: suiToken.chainNodeId,

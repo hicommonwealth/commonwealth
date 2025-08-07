@@ -22,15 +22,14 @@ const WVSuiNativeDetails = ({
   onStepChange,
   onCreateTopic,
 }: WVSuiNativeDetailsProps) => {
-  const [tokenSymbol, setTokenSymbol] = useState('');
-  const [tokenDecimals, setTokenDecimals] = useState(9);
+  const [tokenAddress, setTokenAddress] = useState('');
   const [multiplier, setMultiplier] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
   const chainNodeId = app?.chain?.meta?.ChainNode?.id;
 
   const handleSubmit = async () => {
-    if (!tokenSymbol || !chainNodeId) {
+    if (!tokenAddress || !chainNodeId) {
       notifyError('Please fill in all required fields');
       return;
     }
@@ -39,8 +38,7 @@ const WVSuiNativeDetails = ({
     try {
       await onCreateTopic({
         suiNative: {
-          tokenSymbol,
-          tokenDecimals,
+          tokenAddress,
           voteWeightMultiplier: multiplier,
           chainNodeId,
           weightedVoting: TopicWeightedVoting.SuiNative,
@@ -67,30 +65,16 @@ const WVSuiNativeDetails = ({
 
       <CWText type="h4">Connect Sui Native Token</CWText>
 
+      <CWText type="h5">Coin Type</CWText>
       <CWText type="b1" className="description">
-        The native SUI token will be used for weighted voting
-      </CWText>
-
-      <CWText type="h5">Token Symbol</CWText>
-      <CWText type="b1" className="description">
-        Enter the token symbol (e.g., SUI)
+        Enter the Sui Coin Type (e.g.,
+        0xe1b45a0e641b9955a20aa0ad1c1f4ad86aad8afb07296d4085e349a50e90bdca::blue::BLUE)
       </CWText>
       <CWTextInput
-        value={tokenSymbol}
-        onInput={(e) => setTokenSymbol(e.target.value)}
-        placeholder="Enter token symbol"
-      />
-
-      <CWText type="h5">Token Decimals</CWText>
-      <CWText type="b1" className="description">
-        Enter the number of decimals for the token
-      </CWText>
-      <CWTextInput
-        type="number"
-        min={0}
-        value={tokenDecimals}
-        onInput={(e) => setTokenDecimals(Number(e.target.value))}
-        placeholder="Enter token decimals"
+        value={tokenAddress}
+        onInput={(e) => setTokenAddress(e.target.value)}
+        placeholder="Enter Sui Coin Type"
+        fullWidth
       />
 
       <CWText type="h5">Vote weight multiplier</CWText>
@@ -137,7 +121,7 @@ const WVSuiNativeDetails = ({
           disabled={isLoading}
         />
         <CWButton
-          disabled={!tokenSymbol || !multiplier || isLoading || !chainNodeId}
+          disabled={!tokenAddress || !multiplier || isLoading || !chainNodeId}
           type="button"
           buttonWidth="wide"
           label="Enable weighted voting for topic"
