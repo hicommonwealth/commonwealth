@@ -1,5 +1,5 @@
 import React from 'react';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTag } from 'views/components/component_kit/CWTag';
 import './AppliedFiltersAndTagsRow.scss';
 
 interface AppliedFiltersAndTagsRowProps {

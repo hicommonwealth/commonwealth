@@ -1,4 +1,4 @@
-import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
+import { SelectedCommunity } from 'views/components/component_kit/CWCommunitySelector';
 
 export type SocialLinkField = {
   value?: string;

@@ -1,8 +1,8 @@
 import { COMMUNITY_SPAM_TIER } from '@hicommonwealth/schemas';
 import { DisabledCommunitySpamTier, UserTierMap } from '@hicommonwealth/shared';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
-import { CWToggle } from 'client/scripts/views/components/component_kit/cw_toggle';
-import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList';
+import { CWToggle } from 'client/scripts/views/components/component_kit/cw_toggle_old';
+import { CWSelectList } from 'client/scripts/views/components/component_kit/CWSelectList';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
@@ -11,7 +11,7 @@ import {
   useUpdateCommunityMutation,
 } from 'state/api/communities';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import { z } from 'zod';
 import './SpamLevel.scss';
 import { SpamLevelOptions } from './utils';

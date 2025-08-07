@@ -1,6 +1,6 @@
 import React from 'react';
 
-import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
+import CWFormSteps from 'views/components/component_kit/CWFormSteps';
 
 import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/types';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
@@ -12,7 +12,7 @@ import useCreateCommunity from './useCreateCommunity';
 import { CreateCommunityStep, getFormSteps } from './utils';
 
 import { useFlag } from 'client/scripts/hooks/useFlag';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import useAppStatus from '../../../hooks/useAppStatus';
 import './CreateCommunity.scss';
 import CommunityInformationStep from './steps/CommunityInformationStep';

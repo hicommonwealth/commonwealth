@@ -2,9 +2,9 @@ import { ChainBase } from '@hicommonwealth/shared';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import { getClasses } from 'views/components/component_kit/helpers';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import {
   CW_SPECIFICATIONS,
   ERC_SPECIFICATIONS,

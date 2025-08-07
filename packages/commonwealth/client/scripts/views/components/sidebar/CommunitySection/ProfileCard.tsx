@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
-import { CWTooltip } from '../../../components/component_kit/new_designs/CWTooltip';
+import { CWTooltip } from '../../../components/component_kit/CWTooltip';
 import TrustLevelRole from '../../TrustLevelRole';
 
 import './ProfileCard.scss';

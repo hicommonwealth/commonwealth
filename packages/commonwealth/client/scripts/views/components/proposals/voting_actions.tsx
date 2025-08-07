@@ -22,9 +22,9 @@ import useUserStore from 'state/ui/user';
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { calculateTimeRemaining } from '../../pages/Snapshots/ViewSnapshotProposal/SnapshotPollCard/utils';
-import { CWButton } from '../component_kit/new_designs/CWButton';
+import { CWButton } from '../component_kit/CWButton';
 
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
+import { CWTooltip } from '../component_kit/CWTooltip';
 import { CannotVote } from './cannot_vote';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';

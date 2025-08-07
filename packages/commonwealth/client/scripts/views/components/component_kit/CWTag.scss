@@ -1,0 +1,397 @@
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+
+.Tag {
+  font-family: shared.$font-family-neue-haas-unica;
+  border-radius: border_radius.$border-radius-corners-wider;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 24px;
+  font-size: 12px;
+  gap: 2px;
+  padding: 4px 8px;
+  width: fit-content;
+
+  .Text {
+    line-height: 16px;
+  }
+
+  &.disabled,
+  &.spam {
+    background-color: colors.$neutral-300 !important;
+
+    .Text,
+    .Icon {
+      color: colors.$white !important;
+    }
+  }
+
+  &.new {
+    background-color: colors.$yellow-50;
+    border: 1px solid colors.$yellow-600;
+
+    .Text {
+      color: colors.$yellow-600;
+    }
+
+    .Icon {
+      stroke: colors.$yellow-600;
+      padding: 0;
+      fill: none;
+    }
+  }
+
+  &.trending {
+    background-color: colors.$green-50;
+    border: 1px solid colors.$green-600;
+
+    .Text,
+    .Icon {
+      color: colors.$green-600;
+    }
+
+    svg {
+      fill: none;
+    }
+  }
+
+  &.pill {
+    background-color: colors.$primary-100;
+    padding: 2px 8px;
+    height: 28px;
+    border-radius: 14px;
+    cursor: pointer;
+
+    .Text {
+      color: colors.$primary-600;
+      font-weight: 500;
+    }
+
+    .close-container {
+      background-color: colors.$primary-100;
+      display: flex;
+      margin-left: 6px;
+
+      svg {
+        width: 14px;
+        height: 14px;
+        color: colors.$primary-600;
+      }
+
+      &:hover {
+        > svg {
+          background-color: colors.$primary-200;
+        }
+      }
+    }
+
+    .pill-close-icon {
+      color: colors.$primary-600 !important;
+      width: 14px !important;
+      height: 14px !important;
+    }
+
+    &:hover {
+      background-color: colors.$primary-200;
+
+      .close-container {
+        background-color: colors.$primary-200;
+      }
+    }
+  }
+
+  &.poll {
+    background-color: colors.$purple-50;
+
+    .Text,
+    .Icon {
+      color: colors.$purple-600;
+    }
+  }
+
+  &.active {
+    background-color: colors.$pink-100;
+
+    .Text,
+    .Icon {
+      color: colors.$pink-700;
+    }
+  }
+
+  &.poll,
+  &.active {
+    padding: 4px 12px;
+    border-radius: border_radius.$border-radius-tags;
+  }
+
+  &.passed {
+    background-color: colors.$green-300;
+
+    .Text,
+    .Icon {
+      color: colors.$green-700;
+    }
+  }
+
+  &.failed {
+    background-color: colors.$rorange-300;
+
+    .Text,
+    .Icon {
+      color: colors.$rorange-700;
+    }
+  }
+
+  &.proposal {
+    background-color: colors.$primary-100;
+
+    .Text,
+    .Icon {
+      color: colors.$primary-600;
+    }
+  }
+
+  &.referendum {
+    background-color: colors.$neutral-100;
+    border-radius: border_radius.$border-radius-corners;
+
+    .Text,
+    .Icon {
+      color: colors.$neutral-600;
+    }
+  }
+
+  &.stage {
+    background-color: colors.$green-600;
+
+    .Text,
+    .Icon {
+      color: colors.$white;
+    }
+
+    &.phase-1 {
+      background-color: colors.$rorange-600;
+    }
+
+    &.phase-2 {
+      background-color: colors.$rorange-400;
+    }
+
+    &.phase-3 {
+      background-color: colors.$yellow-500;
+    }
+
+    &.phase-4 {
+      background-color: colors.$green-600;
+    }
+
+    &.phase-5 {
+      background-color: colors.$green-500;
+    }
+
+    &.phase-6 {
+      background-color: colors.$primary-600;
+    }
+
+    &.phase-7 {
+      background-color: colors.$primary-400;
+    }
+
+    &.phase-8 {
+      background-color: colors.$purple-600;
+    }
+
+    &.phase-9 {
+      background-color: colors.$purple-400;
+    }
+  }
+
+  &.input,
+  &.group {
+    background-color: colors.$neutral-100;
+    padding: 2px 8px;
+    gap: 8px;
+
+    .close-container {
+      background-color: colors.$neutral-100;
+      display: flex;
+      margin-left: 8px;
+
+      &:hover {
+        > svg {
+          background-color: colors.$neutral-200;
+        }
+      }
+    }
+
+    .Text {
+      font-size: 14px;
+      line-height: 20px;
+      color: colors.$neutral-800;
+    }
+
+    &:hover {
+      background-color: colors.$neutral-200;
+
+      .close-container {
+        background-color: colors.$neutral-200;
+
+        > svg {
+          background-color: colors.$neutral-200;
+        }
+      }
+
+      .Text {
+        color: colors.$neutral-900;
+      }
+    }
+
+    &.container:hover {
+      background-color: colors.$neutral-200;
+    }
+  }
+
+  &.group {
+    .Text {
+      font-size: 12px;
+      line-height: 16px;
+      color: colors.$neutral-700;
+    }
+  }
+
+  &.contest {
+    background-color: colors.$neutral-900;
+    color: colors.$white;
+
+    .Text {
+      color: colors.$white;
+    }
+
+    .Icon {
+      margin-right: 4px;
+    }
+
+    &.prize-1 {
+      background-color: colors.$yellow-500;
+      color: colors.$neutral-900;
+
+      .Text {
+        color: colors.$neutral-900;
+      }
+    }
+
+    &.prize-2 {
+      background-color: colors.$neutral-100;
+      color: colors.$neutral-900;
+
+      .Text {
+        color: colors.$neutral-900;
+      }
+    }
+
+    &.prize-3 {
+      background-color: colors.$yellow-600;
+    }
+  }
+
+  &.address,
+  &.login {
+    background-color: colors.$neutral-200;
+    gap: 8px;
+
+    .Text,
+    .Icon {
+      color: colors.$neutral-600;
+    }
+
+    .Icon {
+      &.envelope {
+        fill: none;
+      }
+    }
+
+    &:hover {
+      background-color: colors.$neutral-300;
+
+      .Text,
+      .Icon {
+        color: colors.$neutral-800;
+      }
+    }
+  }
+
+  &.address {
+    padding: 2px 8px;
+    gap: 10px;
+  }
+
+  &.action {
+    display: grid;
+    align-items: center;
+    color: colors.$neutral-500;
+    max-width: 20px;
+    max-height: 20px;
+    width: fit-content;
+    height: fit-content;
+    padding: 0;
+
+    &:hover {
+      cursor: pointer;
+      color: colors.$neutral-600;
+    }
+    &.pill-close-icon {
+      color: colors.$primary-600 !important;
+    }
+  }
+
+  &.filter {
+    padding: 12px 16px;
+    height: auto;
+    background-color: colors.$white;
+    border: 1px solid colors.$black;
+
+    .Text {
+      font-size: 14px !important;
+    }
+
+    .close-container {
+      margin-left: 8px;
+    }
+
+    .Text,
+    .Icon,
+    svg {
+      color: colors.$black !important;
+    }
+  }
+
+  &.amount {
+    height: auto;
+    background-color: colors.$neutral-200;
+    padding: 8px 12px;
+    border-radius: 40px;
+    cursor: pointer;
+
+    .Text {
+      font-size: 16px;
+      color: colors.$neutral-500;
+    }
+  }
+
+  &.info {
+    background-color: colors.$primary-50;
+    border: 1px solid colors.$primary-600;
+
+    .Text {
+      color: colors.$primary-600;
+    }
+
+    .Icon {
+      stroke: colors.$primary-600;
+      padding: 0;
+      fill: none;
+    }
+  }
+}

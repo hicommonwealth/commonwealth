@@ -4,9 +4,9 @@ import type Substrate from 'controllers/chain/substrate/adapter';
 import React, { useState } from 'react';
 import app from 'state';
 import { addressSwapper } from 'utils';
-import { CWButton } from '../new_designs/CWButton';
-import { CWModalBody, CWModalHeader } from '../new_designs/CWModal';
-import { CWRadioButton } from '../new_designs/cw_radio_button';
+import { CWButton } from '../CWButton';
+import { CWModalBody, CWModalHeader } from '../CWModal';
+import { CWRadioButton } from '../cw_radio_button';
 import './AccountSelector.scss';
 
 type LinkAccountItemProps = {

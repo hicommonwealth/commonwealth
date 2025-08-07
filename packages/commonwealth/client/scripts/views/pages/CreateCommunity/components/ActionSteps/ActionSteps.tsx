@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import { MessageRow } from 'views/components/component_kit/CWTextInput/MessageRow';
 
 import ActionStep from './ActionStep';
 import { ActionStepsProps } from './types';

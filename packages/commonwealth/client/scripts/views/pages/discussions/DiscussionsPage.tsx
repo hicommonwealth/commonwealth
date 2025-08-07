@@ -54,9 +54,9 @@ import { useFlag } from 'client/scripts/hooks/useFlag';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import TokenBanner from 'views/components/TokenBanner';
+import CWBanner from 'views/components/component_kit/CWBanner';
 import { CWGatedTopicBanner } from 'views/components/component_kit/CWGatedTopicBanner';
-import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import {
   createDeltaFromText,
   getTextFromDelta,
@@ -67,8 +67,8 @@ import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils'
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
+import CWIconButton from '../../components/component_kit/CWIconButton';
 import { CWText } from '../../components/component_kit/cw_text';
-import CWIconButton from '../../components/component_kit/new_designs/CWIconButton';
 import OverviewPage from '../overview';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import './DiscussionsPage.scss';

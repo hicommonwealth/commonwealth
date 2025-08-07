@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import app from 'state';
 import { useCreateCommunityAlertMutation } from 'state/api/trpc/subscription/useCreateCommunityAlertMutation';
 import { useDeleteCommunityAlertMutation } from 'state/api/trpc/subscription/useDeleteCommunityAlertMutation';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import { z } from 'zod';
 import { useUserStore } from '../../state/ui/user/user';
 

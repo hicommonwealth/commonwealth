@@ -1,1 +1,0 @@
-export { CWRelatedCommunityCard } from './CWRelatedCommunityCard'

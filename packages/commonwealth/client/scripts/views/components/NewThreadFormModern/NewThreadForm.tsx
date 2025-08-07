@@ -23,10 +23,10 @@ import { MarkdownSubmitButton } from 'views/components/MarkdownEditor/MarkdownSu
 import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
 import CustomTopicOption from 'views/components/NewThreadFormLegacy/CustomTopicOption';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
+import { MessageRow } from 'views/components/component_kit/CWTextInput/MessageRow';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
 import { AnyProposal, ThreadKind } from '../../../models/types';
@@ -35,7 +35,7 @@ import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProp
 import { useSnapshotProposal } from '../../pages/NewProposalViewPage/useSnapshotProposal';
 import { LinkedProposalsCard } from '../../pages/view_thread/linked_proposals_card';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
-import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
+import { CWSelectList } from '../component_kit/CWSelectList';
 import ContestThreadBanner from './ContestThreadBanner';
 
 import {

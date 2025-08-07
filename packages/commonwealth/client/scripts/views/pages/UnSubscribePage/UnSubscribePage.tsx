@@ -1,8 +1,8 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useUnSubscribeEmailMutation } from 'state/api/trpc/subscription/useUnSubscribeEmailMutation';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
+import { CWModal } from '../../components/component_kit/CWModal';
+import CWPageLayout from '../../components/component_kit/CWPageLayout';
 import UnSubscribeModal from '../../modals/UnSubscribeModal/UnSubscribeModal';
 import { PageNotFound } from '../404';
 

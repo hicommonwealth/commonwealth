@@ -1,6 +1,6 @@
 import React from 'react';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import { LinkItemProps } from '../types';
 import './LinkItem.scss';
 

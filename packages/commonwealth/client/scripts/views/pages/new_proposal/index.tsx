@@ -3,7 +3,7 @@ import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { userStore } from 'state/ui/user';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../404';

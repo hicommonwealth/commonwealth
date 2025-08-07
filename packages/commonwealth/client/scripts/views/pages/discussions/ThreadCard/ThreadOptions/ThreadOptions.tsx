@@ -5,10 +5,10 @@ import {
   GatedActionEnum,
   verify,
 } from '@hicommonwealth/shared';
+import { CWButton } from 'client/scripts/views/components/component_kit/CWButton';
+import { CWTooltip } from 'client/scripts/views/components/component_kit/CWTooltip';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { pluralize } from 'helpers';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
@@ -17,7 +17,7 @@ import Permissions from 'utils/Permissions';
 import { downloadDataAsFile } from 'utils/downloadDataAsFile';
 import ShareButton from 'views/components/ShareButton';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { CWThreadAction } from 'views/components/component_kit/cw_thread_action';
 import { ToggleThreadSubscribe } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
 import { AdminActions, AdminActionsProps } from './AdminActions';
 import { ReactionButton } from './ReactionButton';

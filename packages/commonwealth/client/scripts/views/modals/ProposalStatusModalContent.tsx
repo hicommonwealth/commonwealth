@@ -7,12 +7,12 @@ import { parseCustomStages, threadStageToLabel } from '../../helpers';
 import { ThreadStage } from '../../models/types';
 import { SelectList } from '../components/component_kit/cw_select_list';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import { CWButton } from '../components/component_kit/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../components/component_kit/new_designs/CWModal';
+} from '../components/component_kit/CWModal';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 import './UpdateProposalStatusModal.scss';

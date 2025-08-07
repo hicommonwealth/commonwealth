@@ -1,7 +1,7 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import { QuestAction } from 'helpers/quest';
 import React from 'react';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTag } from 'views/components/component_kit/CWTag';
 
 type TotalQuestActionXPTagProps = {
   questAction: QuestAction;

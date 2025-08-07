@@ -5,7 +5,7 @@ import { z } from 'zod';
 import {
   CWModalBody,
   CWModalHeader,
-} from '../components/component_kit/new_designs/CWModal';
+} from '../components/component_kit/CWModal';
 import { User } from '../components/user/user';
 
 import './offchain_voting_modal.scss';

@@ -19,21 +19,21 @@ import {
   PreferenceTags,
   usePreferenceTags,
 } from 'views/components/PreferenceTags';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import { CWForm } from 'views/components/component_kit/CWForm';
 import {
   CWImageInput,
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
+import { CWTag } from 'views/components/component_kit/CWTag';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWRadioButton } from 'views/components/component_kit/cw_radio_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
-import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import { CWToggle } from 'views/components/component_kit/cw_toggle';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import ErrorPage from '../../../error';
 import CommunityTrustLevel from '../CommunityTrustLevel/CommunityTrustLevel';

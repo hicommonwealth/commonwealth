@@ -2,11 +2,11 @@ import { APIOrderDirection } from 'helpers/constants';
 import NodeInfo from 'models/NodeInfo';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
+import { CWTable } from 'views/components/component_kit/CWTable';
 import { ViewType } from 'views/pages/DirectoryPage/useDirectoryPageData';
-import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWTableColumnInfo } from '../../components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
+import CWCircleMultiplySpinner from '../../components/component_kit/CWCircleMultiplySpinner';
+import { CWTableColumnInfo } from '../../components/component_kit/CWTable/CWTable';
+import { useCWTableState } from '../../components/component_kit/CWTable/useCWTableState';
 import CommunityDirectoryCard from './CommunityDirectoryCard';
 import './DirectoryPageContent.scss';
 

@@ -1,10 +1,10 @@
 import clsx from 'clsx';
 import React from 'react';
+import { CWRadioButton } from 'views/components/component_kit/cw_radio_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
-import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
+import { MessageRow } from 'views/components/component_kit/CWTextInput/MessageRow';
 import './CWRepetitionCycleRadioButton.scss';
 import { CWRepetitionCycleRadioButtonProps } from './types';
 

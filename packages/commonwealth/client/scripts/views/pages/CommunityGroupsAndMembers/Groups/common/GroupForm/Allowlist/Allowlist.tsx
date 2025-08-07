@@ -8,11 +8,11 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import { OptionConfig, Select } from 'views/components/Select';
+import CWPagination from 'views/components/component_kit/CWPagination';
+import { CWTableColumnInfo } from 'views/components/component_kit/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/CWTable/useCWTableState';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWPagination from 'views/components/component_kit/new_designs/CWPagination';
-import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import MembersSection, {
   Member,
 } from '../../../../Members/MembersSection/MembersSection';

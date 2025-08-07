@@ -12,8 +12,8 @@ import useUserStore from 'state/ui/user';
 import { CommunityLabel } from '../community_label';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
+import { CWButton } from './CWButton';
 import { getClasses, isWindowSmallInclusive } from './helpers';
-import { CWButton } from './new_designs/CWButton';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
 

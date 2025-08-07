@@ -5,11 +5,11 @@ import app from 'state';
 import { downloadDataAsFile } from 'utils/downloadDataAsFile';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
-import { CWTooltip } from '../../components/component_kit/new_designs/CWTooltip';
+import { CWButton } from '../../components/component_kit/CWButton';
+import { CWTooltip } from '../../components/component_kit/CWTooltip';
 import { openConfirmation } from '../../modals/confirmation_modal';
-import JSONViewer from './JSONViewer';
 import './json_display.scss';
+import JSONViewer from './JSONViewer';
 
 interface DataType {
   title?: string;

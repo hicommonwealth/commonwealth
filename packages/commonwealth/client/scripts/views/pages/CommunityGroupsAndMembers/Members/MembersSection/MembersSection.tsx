@@ -7,11 +7,11 @@ import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { Avatar } from 'views/components/Avatar';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
-import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWModal } from 'views/components/component_kit/CWModal';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTable } from 'views/components/component_kit/CWTable';
+import { CWTableState } from 'views/components/component_kit/CWTable/useCWTableState';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,

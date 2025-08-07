@@ -14,12 +14,12 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import { CWButton } from '../components/component_kit/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../components/component_kit/new_designs/CWModal';
+} from '../components/component_kit/CWModal';
 import { User } from '../components/user/user';
 
 import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';

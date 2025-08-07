@@ -3,8 +3,8 @@ import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer, {
   CWDrawerTopBar,
-} from 'views/components/component_kit/new_designs/CWDrawer';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
+} from 'views/components/component_kit/CWDrawer';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
 import './FiltersDrawer.scss';
 
 export interface ThreadFilters {

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
+import { CWTooltip } from '../component_kit/CWTooltip';
 
 import { truncateText } from '../Breadcrumbs/utils';
 import './cw_breadcrumbs.scss';

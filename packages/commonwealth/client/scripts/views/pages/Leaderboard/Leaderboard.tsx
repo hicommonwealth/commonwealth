@@ -1,5 +1,5 @@
 import React from 'react';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { CWText } from '../../components/component_kit/cw_text';
 import './Leaderboard.scss';
 import QuestsExplorer from './QuestsExplorer';

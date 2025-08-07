@@ -9,7 +9,7 @@ import {
 import { $createParagraphNode } from 'lexical';
 import React, { useCallback } from 'react';
 import { EditorTooltip } from 'views/components/MarkdownEditor/toolbars/EditorTooltip';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import CWIconButton from 'views/components/component_kit/CWIconButton';
 import './HeadingButton.scss';
 
 export type HeadingButtonProps = Readonly<{

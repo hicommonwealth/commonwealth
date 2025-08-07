@@ -12,17 +12,17 @@ import useNominateJudgesMutation from 'client/scripts/state/api/contests/nominat
 import useMintAdminTokenMutation from 'client/scripts/state/api/members/mintAdminRoleonChain';
 import useUserStore from 'client/scripts/state/ui/user';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'client/scripts/views/components/component_kit/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from 'client/scripts/views/components/component_kit/new_designs/CWModal';
-import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList/CWSelectList';
+} from 'client/scripts/views/components/component_kit/CWModal';
+import { CWSelectList } from 'client/scripts/views/components/component_kit/CWSelectList/CWSelectList';
 import {
   CWTab,
   CWTabsRow,
-} from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
+} from 'client/scripts/views/components/component_kit/CWTabs';
 import useCommunityContests from 'client/scripts/views/pages/CommunityManagement/Contests/useCommunityContests';
 import { useFlag } from 'hooks/useFlag';
 import React, { useMemo, useState } from 'react';

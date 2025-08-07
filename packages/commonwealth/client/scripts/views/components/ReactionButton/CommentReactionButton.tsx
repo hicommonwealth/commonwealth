@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { prettyVoteWeight } from 'shared/adapters/currency';
 import app from 'state';
 import useUserStore from 'state/ui/user';
-import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
+import CWUpvoteSmall from 'views/components/component_kit/CWUpvoteSmall';
 import {
   useCreateCommentReactionMutation,
   useDeleteCommentReactionMutation,

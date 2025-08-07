@@ -2,7 +2,7 @@ import React from 'react';
 import type { GroupBase, OptionProps, Props } from 'react-select';
 import Select, { components } from 'react-select';
 
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
 import './cw_select_list.scss';
 
 const CustomOption = (

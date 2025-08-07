@@ -10,12 +10,12 @@ import {
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import { CWButton } from '../components/component_kit/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../components/component_kit/new_designs/CWModal';
+} from '../components/component_kit/CWModal';
 import { openConfirmation } from './confirmation_modal';
 
 import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
@@ -27,9 +27,9 @@ import { DeltaStatic } from 'quill';
 import useFetchGroupsQuery from 'state/api/groups/fetchGroups';
 import { useGroupTopicUpdater } from 'state/api/groups/useGroupTopicUpdater';
 import useGetTopicByIdQuery from 'state/api/topics/getTopicById';
-import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import { MessageRow } from 'views/components/component_kit/CWTextInput/MessageRow';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWSelectList } from '../components/component_kit/new_designs/CWSelectList';
+import { CWSelectList } from '../components/component_kit/CWSelectList';
 import { ReactQuillEditor } from '../components/react_quill_editor';
 import './edit_topic_modal.scss';
 

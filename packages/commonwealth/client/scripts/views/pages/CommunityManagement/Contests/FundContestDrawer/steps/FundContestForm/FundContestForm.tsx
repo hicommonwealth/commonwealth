@@ -2,10 +2,10 @@ import React from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
+import { MessageRow } from 'views/components/component_kit/CWTextInput/MessageRow';
 import CopyAddressInput from 'views/pages/CommunityManagement/Contests/CopyAddressInput';
 
 import { displayAmount } from '../../utils';

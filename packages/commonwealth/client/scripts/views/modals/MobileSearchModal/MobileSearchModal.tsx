@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearchBar';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWSearchBar } from 'views/components/component_kit/CWSearchBar';
 
 import './MobileSearchModal.scss';
 

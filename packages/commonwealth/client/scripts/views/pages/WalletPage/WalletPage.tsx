@@ -14,14 +14,10 @@ import { GetLaunchpadTrades } from '@hicommonwealth/schemas';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWMobileTab } from '../../components/component_kit/new_designs/CWMobileTab';
-import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
-import {
-  CWTab,
-  CWTabsRow,
-} from '../../components/component_kit/new_designs/CWTabs';
+import { CWMobileTab } from '../../components/component_kit/CWMobileTab';
+import CWPageLayout from '../../components/component_kit/CWPageLayout';
+import { CWTab, CWTabsRow } from '../../components/component_kit/CWTabs';
 import { PageNotFound } from '../404';
-import './WalletPage.scss';
 import { QuestSummaryCard, ReferralCard, WalletCard } from './cards';
 import { ReferralTable, TokenTXHistoryTable, XPEarningsTable } from './tables';
 import { MobileTabType, TableType } from './types';
@@ -33,6 +29,7 @@ import {
   tabToTable,
   typeToIcon,
 } from './utils';
+import './WalletPage.scss';
 
 type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._type;
 

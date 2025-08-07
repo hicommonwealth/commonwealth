@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
+import { CWRadioButton } from 'views/components/component_kit/cw_radio_button';
 
 const RadioButtonsShowcase = () => {
   const [isRadioOneChecked, setIsRadioOneChecked] = useState(false);

@@ -13,8 +13,8 @@ import animation2 from '../../../../assets/animation/onboarding_2.json';
 import animation3 from '../../../../assets/animation/onboarding_3.json';
 import animation4 from '../../../../assets/animation/onboarding_4.json';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
-import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
+import { CWButton } from '../../components/component_kit/CWButton';
+import CWPageLayout from '../../components/component_kit/CWPageLayout';
 import './OnBoarding.scss';
 
 const slides = [

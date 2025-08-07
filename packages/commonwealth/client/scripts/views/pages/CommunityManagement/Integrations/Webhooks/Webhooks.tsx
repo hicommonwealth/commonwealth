@@ -13,11 +13,11 @@ import {
   useFetchWebhooksQuery,
 } from 'state/api/webhooks';
 import _ from 'underscore';
-import { Link, LinksArray, useLinksArray } from 'views/components/LinksArray';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWModal } from 'views/components/component_kit/CWModal';
+import { CWTag } from 'views/components/component_kit/CWTag';
+import { Link, LinksArray, useLinksArray } from 'views/components/LinksArray';
 import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
 import z from 'zod';
 import './Webhooks.scss';

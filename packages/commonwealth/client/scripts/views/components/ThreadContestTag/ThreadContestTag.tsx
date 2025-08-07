@@ -4,8 +4,8 @@ import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWPopover, {
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+} from 'views/components/component_kit/CWPopover';
+import { CWTag } from 'views/components/component_kit/CWTag';
 
 import './ThreadContestTag.scss';
 

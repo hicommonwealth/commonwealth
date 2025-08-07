@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWModalHeader } from 'views/components/component_kit/new_designs/CWModal';
+import { CWModalHeader } from 'views/components/component_kit/CWModal';
 
+import { useStakeAddresses } from './hooks';
 import StakeExchangeForm from './StakeExchangeForm';
 import TransactionFailed from './TransactionFailed';
 import TransactionLoading from './TransactionLoading';
 import TransactionSucceeded from './TransactionSucceeded';
-import { useStakeAddresses } from './hooks';
 import {
   ManageCommunityStakeModalProps,
   ManageCommunityStakeModalState,

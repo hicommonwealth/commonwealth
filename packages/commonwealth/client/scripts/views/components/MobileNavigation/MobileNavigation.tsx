@@ -3,7 +3,7 @@ import { matchRoutes, useLocation } from 'react-router-dom';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import useUserStore from 'state/ui/user';
-import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
+import CWDrawer from 'views/components/component_kit/CWDrawer';
 
 import CreateContentDrawer from './CreateContentDrawer';
 import NavigationButton, { NavigationButtonProps } from './NavigationButton';

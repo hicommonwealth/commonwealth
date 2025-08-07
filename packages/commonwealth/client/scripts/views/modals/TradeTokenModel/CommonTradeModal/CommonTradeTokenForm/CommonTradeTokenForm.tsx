@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import {
-  CWTab,
-  CWTabsRow,
-} from 'views/components/component_kit/new_designs/CWTabs';
-import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWIconButton from 'views/components/component_kit/CWIconButton';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTab, CWTabsRow } from 'views/components/component_kit/CWTabs';
+import { withTooltip } from 'views/components/component_kit/CWTooltip';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -17,9 +14,9 @@ import AddressBalance from './AddressBalance';
 import BuyAmountSelection from './AmountSelections/BuyAmountSelection';
 import SellAmountSelection from './AmountSelections/SellAmountSelection';
 import './CommonTradeTokenForm.scss';
+import { convertAddressToDropdownOption } from './helpers';
 import BuyReceipt from './ReceiptDetails/BuyReceipt';
 import SellReceipt from './ReceiptDetails/SellReceipt';
-import { convertAddressToDropdownOption } from './helpers';
 import { CommonTradeTokenFormProps } from './types';
 
 const CommonTradeTokenForm = ({

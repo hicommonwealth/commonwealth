@@ -8,7 +8,7 @@ import {
 import React, { useCallback } from 'react';
 import { EditorTooltip } from 'views/components/MarkdownEditor/toolbars/EditorTooltip';
 import { listTypeToIconName } from 'views/components/MarkdownEditor/toolbars/listTypeToIconName';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import CWIconButton from 'views/components/component_kit/CWIconButton';
 import './ListButton.scss';
 
 export type ListType = 'number' | 'bullet' | 'check';

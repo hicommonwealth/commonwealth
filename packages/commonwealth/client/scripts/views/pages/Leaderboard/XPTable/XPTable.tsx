@@ -6,11 +6,11 @@ import { useFetchQuestsQuery } from 'state/api/quest';
 import useGetXPsRanked from 'state/api/user/getXPsRanked';
 import { Avatar } from 'views/components/Avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
-import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTable } from 'views/components/component_kit/CWTable';
+import { CWTableColumnInfo } from 'views/components/component_kit/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/CWTable/useCWTableState';
+import { CWTag } from 'views/components/component_kit/CWTag';
 import TrustLevelRole from 'views/components/TrustLevelRole';
 
 import './XPTable.scss';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import './CustomURL.scss';
 
 const CustomURL = () => {

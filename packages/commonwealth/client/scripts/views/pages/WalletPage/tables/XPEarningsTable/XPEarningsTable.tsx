@@ -9,17 +9,14 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import {
   CWTable,
   CWTableColumnInfo,
-} from 'views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
-import {
-  CWTag,
-  TagType,
-} from 'views/components/component_kit/new_designs/CWTag';
-import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+} from 'views/components/component_kit/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/CWTable/useCWTableState';
+import { CWTag, TagType } from 'views/components/component_kit/CWTag';
+import { withTooltip } from 'views/components/component_kit/CWTooltip';
 import { FullUser } from 'views/components/user/fullUser';
 import z from 'zod';
-import './XPEarningsTable.scss';
 import { getTagConfigForRewardType } from './helpers';
+import './XPEarningsTable.scss';
 
 const columns: CWTableColumnInfo[] = [
   {

@@ -15,7 +15,7 @@ import {
   useCosmosProposalTallyQuery,
   useCosmosProposalVotesQuery,
 } from 'state/api/proposals';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import type { AnyProposal } from '../../../models/types';

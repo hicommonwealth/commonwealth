@@ -1,8 +1,8 @@
 import React from 'react';
 import { GetTokenMetadataResponse } from 'state/api/tokens/getTokenMetadata';
 import TokenBanner from '../TokenBanner';
-import { CWTextInput } from '../component_kit/new_designs/CWTextInput';
-import { TextInputProps } from '../component_kit/new_designs/CWTextInput/CWTextInput';
+import { CWTextInput } from '../component_kit/CWTextInput';
+import { TextInputProps } from '../component_kit/CWTextInput/CWTextInput';
 
 type TokenFinderProps = {
   tokenValue: string;

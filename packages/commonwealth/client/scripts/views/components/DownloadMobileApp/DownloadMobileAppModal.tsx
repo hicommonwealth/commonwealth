@@ -3,7 +3,7 @@ import {
   CWModal,
   CWModalBody,
   CWModalHeader,
-} from 'views/components/component_kit/new_designs/CWModal';
+} from 'views/components/component_kit/CWModal';
 import { DownloadMobileAppContent } from 'views/components/DownloadMobileApp/DownloadMobileAppContent';
 import './DownloadMobileAppModal.scss';
 

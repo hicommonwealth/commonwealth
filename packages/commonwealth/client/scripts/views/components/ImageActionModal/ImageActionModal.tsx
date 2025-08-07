@@ -1,17 +1,17 @@
 import { notifyError } from 'controllers/app/notifications';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useUploadFileMutation } from 'state/api/general';
+import { CWText } from '../component_kit/cw_text';
+import { CWButton } from '../component_kit/CWButton';
 import { CWImageInput } from '../component_kit/CWImageInput';
 import { ImageProcessingProps } from '../component_kit/CWImageInput/types';
-import { CWText } from '../component_kit/cw_text';
-import { CWButton } from '../component_kit/new_designs/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../component_kit/new_designs/CWModal';
-import { CWResponsiveDialog } from '../component_kit/new_designs/CWResponsiveDialog';
-import { CWTag } from '../component_kit/new_designs/CWTag';
+} from '../component_kit/CWModal';
+import { CWResponsiveDialog } from '../component_kit/CWResponsiveDialog';
+import { CWTag } from '../component_kit/CWTag';
 import './ImageActionModal.scss';
 import { ReferenceImageItem } from './ReferenceImageItem';
 import { useImageModalContext } from './useImageModalContext';

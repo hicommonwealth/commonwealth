@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useRefreshCustomDomainQuery from 'state/api/communities/refreshCustomDomain';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import { notifyError } from '../../../controllers/app/notifications';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 

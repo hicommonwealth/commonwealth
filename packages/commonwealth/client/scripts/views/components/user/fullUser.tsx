@@ -10,19 +10,19 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useSetUserTierMutation from 'state/api/superAdmin/setUserTier';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import CWPopover, {
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
+} from 'views/components/component_kit/CWPopover';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import TrustLevelRole from '../TrustLevelRole';
+import { CWModal } from '../component_kit/CWModal';
+import { CWTag } from '../component_kit/CWTag';
+import { CWTooltip } from '../component_kit/CWTooltip';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWModal } from '../component_kit/new_designs/CWModal';
-import { CWTag } from '../component_kit/new_designs/CWTag';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import { UserSkeleton } from './UserSkeleton';
 import './user.scss';
 import { FullUserAttrsWithSkeletonProp } from './user.types';

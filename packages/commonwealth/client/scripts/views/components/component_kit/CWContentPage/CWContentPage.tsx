@@ -19,7 +19,7 @@ import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptio
 import { ViewThreadUpvotesDrawer } from '../../UpvoteDrawer';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
-import { CWTab, CWTabsRow } from '../new_designs/CWTabs';
+import { CWTab, CWTabsRow } from '../CWTabs';
 import { ComponentType } from '../types';
 import './CWContentPage.scss';
 import { CWContentPageSkeleton } from './CWContentPageSkeleton';

@@ -7,9 +7,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import { CWTag } from 'views/components/component_kit/CWTag';
 import { AuthModal } from 'views/modals/AuthModal';
 import TradeTokenModal, {
   TradingConfig,

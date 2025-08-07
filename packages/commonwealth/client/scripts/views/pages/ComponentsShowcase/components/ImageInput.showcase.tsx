@@ -1,6 +1,6 @@
 import { VALIDATION_MESSAGES } from 'client/scripts/helpers/formValidations/messages';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import { CWForm } from 'client/scripts/views/components/component_kit/new_designs/CWForm';
+import { CWButton } from 'client/scripts/views/components/component_kit/CWButton';
+import { CWForm } from 'client/scripts/views/components/component_kit/CWForm';
 import React, { useState } from 'react';
 import {
   CWImageInput,

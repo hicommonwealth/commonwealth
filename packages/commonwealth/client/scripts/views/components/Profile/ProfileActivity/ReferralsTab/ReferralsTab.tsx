@@ -8,14 +8,12 @@ import { APIOrderDirection } from 'helpers/constants';
 import { Avatar } from '../../../Avatar';
 import { CWIcon } from '../../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../component_kit/cw_text';
-import CWIconButton from '../../../component_kit/new_designs/CWIconButton';
-import CWPopover, {
-  usePopover,
-} from '../../../component_kit/new_designs/CWPopover';
-import { CWTable } from '../../../component_kit/new_designs/CWTable';
-import { CWTableColumnInfo } from '../../../component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from '../../../component_kit/new_designs/CWTable/useCWTableState';
-import { CWTextInput } from '../../../component_kit/new_designs/CWTextInput';
+import CWIconButton from '../../../component_kit/CWIconButton';
+import CWPopover, { usePopover } from '../../../component_kit/CWPopover';
+import { CWTable } from '../../../component_kit/CWTable';
+import { CWTableColumnInfo } from '../../../component_kit/CWTable/CWTable';
+import { useCWTableState } from '../../../component_kit/CWTable/useCWTableState';
+import { CWTextInput } from '../../../component_kit/CWTextInput';
 
 import { PRODUCTION_DOMAIN, S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import './ReferralsTab.scss';

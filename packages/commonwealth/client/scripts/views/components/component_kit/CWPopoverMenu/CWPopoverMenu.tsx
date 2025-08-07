@@ -5,11 +5,11 @@ import { PopperOwnProps, PopperPlacementType } from '@mui/base/Popper';
 
 import './CWPopoverMenu.scss';
 
-import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import CWPopover, {
   PopoverTriggerProps,
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
+} from 'views/components/component_kit/CWPopover';
+import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import type {
   ComponentMenuItem,
   DefaultMenuItem,

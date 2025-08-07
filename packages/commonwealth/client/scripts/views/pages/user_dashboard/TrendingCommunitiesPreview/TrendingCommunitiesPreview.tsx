@@ -1,4 +1,4 @@
-import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
+import { CWTag } from 'client/scripts/views/components/component_kit/CWTag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Link } from 'react-router-dom';

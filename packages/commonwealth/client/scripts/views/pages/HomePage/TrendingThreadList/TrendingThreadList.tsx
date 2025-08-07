@@ -17,7 +17,7 @@ import {
 } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import useGetActiveThreadsQuery from 'client/scripts/state/api/threads/getActiveThreads';
 import useUserStore from 'client/scripts/state/ui/user';
-import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
+import { CWTag } from 'client/scripts/views/components/component_kit/CWTag';
 import { VirtuosoGrid } from 'react-virtuoso';
 import { EmptyThreadCard } from 'views/components/EmptyThreadCard/EmptyThreadCard';
 import { PageNotFound } from '../../404';

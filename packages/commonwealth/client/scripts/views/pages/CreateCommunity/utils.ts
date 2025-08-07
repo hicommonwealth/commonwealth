@@ -1,5 +1,5 @@
 import React from 'react';
-import { CWFormStepsProps } from 'views/components/component_kit/new_designs/CWFormSteps/CWFormSteps';
+import { CWFormStepsProps } from 'views/components/component_kit/CWFormSteps/CWFormSteps';
 
 export enum CreateCommunityStep {
   CommunityTypeSelection = 'CommunityTypeSelection',

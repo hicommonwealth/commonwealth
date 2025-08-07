@@ -1,7 +1,7 @@
 import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
 import { IOS_APP_STORE_LANDING_URL } from 'views/components/DownloadMobileApp/MobileLandingURLs';
 import ShareSection from '../ShareSection';
 import './DownloadMobileAppContent.scss';

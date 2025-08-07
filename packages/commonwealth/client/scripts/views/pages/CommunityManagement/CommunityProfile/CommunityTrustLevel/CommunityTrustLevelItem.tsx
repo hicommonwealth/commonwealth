@@ -1,10 +1,10 @@
 import { CommunityVerificationItem } from '@hicommonwealth/shared';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
+import { CWTag } from 'client/scripts/views/components/component_kit/CWTag';
 import React from 'react';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { ButtonType } from 'views/components/component_kit/new_designs/CWButton/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { ButtonType } from 'views/components/component_kit/CWButton/CWButton';
 import { Status } from './types';
 
 type ComponentIcon =

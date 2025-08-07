@@ -1,7 +1,7 @@
 import AddressInfo from 'models/AddressInfo';
 import { useState } from 'react';
 import { chainIdsWithStakeEnabled } from 'views/components/CommunityInformationForm/constants';
-import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
+import { SelectedCommunity } from 'views/components/component_kit/CWCommunitySelector';
 import { CreateCommunityStep, handleChangeStep } from './utils';
 
 const useCreateCommunity = () => {

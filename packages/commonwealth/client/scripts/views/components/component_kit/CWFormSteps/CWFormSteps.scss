@@ -1,0 +1,13 @@
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/media_queries';
+
+.FormSteps {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  flex-wrap: wrap;
+
+  @include media_queries.extraSmall {
+    flex-direction: column;
+  }
+}

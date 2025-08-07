@@ -2,10 +2,10 @@ import React from 'react';
 import { isMobile } from 'react-device-detect';
 import app from 'state';
 import { CWText } from '../component_kit/cw_text';
-import CWIconButton from '../component_kit/new_designs/CWIconButton';
+import CWIconButton from '../component_kit/CWIconButton';
 import CWPopover, {
   UsePopoverProps,
-} from '../component_kit/new_designs/CWPopover/CWPopover';
+} from '../component_kit/CWPopover/CWPopover';
 import { User } from '../user/user';
 import './UpvotePopover.scss';
 

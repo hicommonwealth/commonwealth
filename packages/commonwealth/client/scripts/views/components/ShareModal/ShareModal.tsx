@@ -3,7 +3,7 @@ import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from 'views/components/component_kit/new_designs/CWModal';
+} from 'views/components/component_kit/CWModal';
 import ShareSection from 'views/components/ShareSection';
 
 type ShareModalProps = {

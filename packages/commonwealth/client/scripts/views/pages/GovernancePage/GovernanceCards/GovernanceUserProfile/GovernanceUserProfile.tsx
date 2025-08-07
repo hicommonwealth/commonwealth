@@ -3,8 +3,8 @@ import useUserStore from 'client/scripts/state/ui/user';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import { CWIconButton } from 'client/scripts/views/components/component_kit/cw_icon_button';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
+import { CWButton } from 'client/scripts/views/components/component_kit/CWButton';
+import { CWTooltip } from 'client/scripts/views/components/component_kit/CWTooltip';
 import {
   handleMouseEnter,
   handleMouseLeave,

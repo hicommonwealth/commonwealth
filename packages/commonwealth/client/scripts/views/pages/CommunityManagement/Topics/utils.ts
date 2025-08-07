@@ -1,4 +1,4 @@
-import { CWFormStepsProps } from 'views/components/component_kit/new_designs/CWFormSteps';
+import { CWFormStepsProps } from 'views/components/component_kit/CWFormSteps';
 
 export enum CreateTopicStep {
   TopicDetails = 'TopicDetails',

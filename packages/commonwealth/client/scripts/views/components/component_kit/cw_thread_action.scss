@@ -1,0 +1,82 @@
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+
+.ThreadAction {
+  border-radius: 6px;
+  display: inline-flex;
+  padding: 4px 8px;
+  align-items: center;
+  width: fit-content;
+  color: colors.$neutral-500;
+  border: 0;
+
+  .Text {
+    color: colors.$neutral-500;
+    margin-left: 4px;
+  }
+
+  &:focus {
+    outline: 0;
+  }
+
+  &.upvoteSelected {
+    color: colors.$primary-500;
+
+    &:hover {
+      color: colors.$primary-500;
+    }
+
+    .Text {
+      color: colors.$primary-500 !important;
+    }
+  }
+
+  &.default {
+    color: colors.$neutral-500;
+  }
+
+  &:hover {
+    background-color: colors.$neutral-100;
+    color: colors.$neutral-600;
+    cursor: pointer;
+
+    .Text {
+      color: colors.$neutral-600;
+    }
+  }
+
+  &.disabled {
+    color: colors.$neutral-400;
+    background-color: inherit;
+    cursor: not-allowed;
+
+    .Text {
+      color: colors.$neutral-400;
+    }
+  }
+
+  &.subscribe {
+    color: colors.$neutral-500;
+
+    &:hover {
+      background-color: colors.$neutral-100;
+      color: colors.$neutral-600;
+    }
+
+    &.selected {
+      color: colors.$primary-500;
+
+      &:hover {
+        color: colors.$primary-500;
+      }
+
+      .Text {
+        color: colors.$primary-500 !important;
+      }
+    }
+
+    .Text {
+      color: colors.$neutral-500;
+    }
+  }
+}

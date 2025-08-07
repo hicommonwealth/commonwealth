@@ -4,7 +4,7 @@ import { DEFAULT_ICON_SIZE } from 'views/components/MarkdownEditor/utils/iconCom
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import type { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 
-import { AnchorType } from 'views/components/component_kit/new_designs/CWPopover';
+import { AnchorType } from 'views/components/component_kit/CWPopover';
 import './FileUploadButton.scss';
 
 type FileUploadButtonProps = Readonly<{

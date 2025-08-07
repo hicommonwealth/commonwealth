@@ -12,22 +12,19 @@ import {
 import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWCommunitySelector, {
+  CommunityType,
+} from 'views/components/component_kit/CWCommunitySelector';
+import { CWForm, CWFormRef } from 'views/components/component_kit/CWForm';
 import {
   CWImageInput,
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
+import { CWModal } from 'views/components/component_kit/CWModal';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import { CWLabel } from 'views/components/component_kit/cw_label';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCommunitySelector, {
-  CommunityType,
-} from 'views/components/component_kit/new_designs/CWCommunitySelector';
-import {
-  CWForm,
-  CWFormRef,
-} from 'views/components/component_kit/new_designs/CWForm';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { AuthModal } from 'views/modals/AuthModal';
 import NewCommunityAdminModal from 'views/modals/NewCommunityAdminModal';
 import { communityTypeOptions } from 'views/pages/CreateCommunity/steps/CommunityTypeStep/helpers';

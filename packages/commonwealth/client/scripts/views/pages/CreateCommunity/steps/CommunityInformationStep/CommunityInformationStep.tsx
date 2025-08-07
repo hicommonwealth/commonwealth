@@ -15,9 +15,9 @@ import { useTurnstile } from 'views/components/useTurnstile';
 // eslint-disable-next-line max-len
 import { alphabeticallyStakeWiseSortedChains as sortedChains } from 'views/components/CommunityInformationForm/constants';
 import { CommunityInformationFormSubmitValues } from 'views/components/CommunityInformationForm/types';
-import FeatureHint from 'views/components/FeatureHint';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
+import { SelectedCommunity } from 'views/components/component_kit/CWCommunitySelector';
+import FeatureHint from 'views/components/FeatureHint';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import './CommunityInformationStep.scss';
 

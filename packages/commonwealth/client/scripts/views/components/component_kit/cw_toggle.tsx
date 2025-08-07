@@ -1,48 +1,99 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import './cw_toggle.scss';
 
+import { useFormContext } from 'react-hook-form';
+import { CWIcon } from './cw_icons/cw_icon';
+import type { IconName } from './cw_icons/cw_icon_lookup';
 import { getClasses } from './helpers';
 import type { BaseStyleProps } from './types';
 import { ComponentType } from './types';
 
+type FormFieldValidationProps = {
+  hookToForm?: boolean;
+  name?: string;
+};
+
 export type ToggleStyleProps = {
   checked?: boolean;
-} & BaseStyleProps;
+  size?: 'xs' | 'small' | 'large';
+} & BaseStyleProps &
+  FormFieldValidationProps;
 
-type ToggleProps = {
-  onChange?: (e?: any) => void;
-  readOnly?: boolean;
+export type ToggleProps = {
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  icon?: IconName;
+  label?: string;
+  iconColor?: string;
 } & ToggleStyleProps;
 
-export const CWToggle = ({
-  className,
-  disabled = false,
-  onChange,
-  checked,
-  readOnly,
-}: ToggleProps) => {
+export const CWToggle = (props: ToggleProps) => {
+  const {
+    className,
+    disabled = false,
+    onChange,
+    checked,
+    size = 'small',
+    name,
+    hookToForm,
+    icon,
+    label,
+    iconColor,
+  } = props;
+
   const params = {
     disabled,
     onChange,
     checked,
     type: 'checkbox',
-    readOnly,
   };
+
+  const formContext = useFormContext();
+  const formFieldContext =
+    hookToForm && name ? formContext.register(name) : ({} as any);
+  const [formCheckedStatus, setFormCheckedStatus] = useState(
+    hookToForm && name && formContext?.getValues?.(name),
+  );
 
   return (
     <label
       className={getClasses<ToggleStyleProps>(
         {
-          checked,
+          size,
+          checked: hookToForm && name ? formCheckedStatus : checked,
           disabled,
           className,
         },
         ComponentType.Toggle,
       )}
     >
-      <input className="toggle-input" {...params} />
-      <div className="slider" />
+      <input
+        // @ts-expect-error <StrictNullChecks/>
+        type="checkbox"
+        {...params}
+        {...(hookToForm &&
+          name && {
+            ...formFieldContext,
+            onChange: async (e) => {
+              setFormCheckedStatus(e.target.checked);
+              formFieldContext.onChange(e);
+              await params?.onChange?.(e);
+            },
+          })}
+        className="toggle-input"
+      />
+      <div className="slider">
+        {icon && checked && (
+          <div className="icon-container">
+            <CWIcon
+              iconName={icon}
+              iconSize={size}
+              className={iconColor === '#757575' ? 'icon-gray-500' : ''}
+            />
+          </div>
+        )}
+      </div>
+      {label && <span className="toggle-label">{label}</span>}
     </label>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import CWPagination from 'views/components/component_kit/new_designs/CWPagination';
+import CWPagination from 'views/components/component_kit/CWPagination';
 
 const PaginationsShowcase = () => {
   const handleChange = (

@@ -9,14 +9,14 @@ import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import CWPopover, {
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
+} from 'views/components/component_kit/CWPopover';
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import TrustLevelRole from '../TrustLevelRole';
+import { CWButton } from '../component_kit/CWButton';
+import { CWModal } from '../component_kit/CWModal';
 import { CWText } from '../component_kit/cw_text';
-import { CWButton } from '../component_kit/new_designs/CWButton';
-import { CWModal } from '../component_kit/new_designs/CWModal';
 import { UserSkeleton } from './UserSkeleton';
 import './user.scss';
 import type { UserAttrsWithSkeletonProp } from './user.types';

@@ -1,0 +1,38 @@
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+
+.CWMobileTab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  outline: none;
+  border: 1px solid colors.$neutral-700;
+  padding: 10px 16px;
+  border-radius: 6px;
+
+  .Text {
+    white-space: nowrap;
+  }
+
+  svg {
+    fill: colors.$neutral-700;
+  }
+
+  &.isActive {
+    border-color: colors.$primary-600;
+
+    svg {
+      fill: colors.$primary-600;
+    }
+
+    .Text {
+      color: colors.$primary-600;
+    }
+  }
+
+  &:focus,
+  &:active {
+    outline: none;
+  }
+}

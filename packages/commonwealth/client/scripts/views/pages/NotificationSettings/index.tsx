@@ -3,12 +3,9 @@ import React, { useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import { useUpdateUserEmailMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
+import { CWTab, CWTabsRow } from 'views/components/component_kit/CWTabs';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import {
-  CWTab,
-  CWTabsRow,
-} from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import ScrollContainer from 'views/components/ScrollContainer';

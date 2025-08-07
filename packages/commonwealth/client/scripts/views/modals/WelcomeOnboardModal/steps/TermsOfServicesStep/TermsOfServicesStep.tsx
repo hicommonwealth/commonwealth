@@ -4,11 +4,8 @@ import { Link } from 'react-router-dom';
 import TermsPage from 'client/scripts/views/pages/terms';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import {
-  CWForm,
-  CWFormRef,
-} from 'views/components/component_kit/new_designs/CWForm';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWForm, CWFormRef } from 'views/components/component_kit/CWForm';
 import { termsOfServicesFormValidation } from './validations';
 
 import './TermsOfServicesStep.scss';

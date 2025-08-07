@@ -10,9 +10,9 @@ import {
   useEditThreadMutation,
 } from 'state/api/threads';
 import useUserStore from 'state/ui/user';
+import { CWModal } from 'views/components/component_kit/CWModal';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { CWThreadAction } from 'views/components/component_kit/cw_thread_action';
 import { ArchiveThreadModal } from 'views/modals/ArchiveThreadModal';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';

@@ -4,8 +4,8 @@ import { useAnimation } from 'hooks/useAnimation';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 
 import CopyAddressInput from '../../../CopyAddressInput';
 import FundContestDrawer from '../../../FundContestDrawer';

@@ -6,8 +6,8 @@ import { useGetPinnedTokenByCommunityId } from 'state/api/communities';
 import { useGetTokenByCommunityId } from 'state/api/tokens';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
 import './Token.scss';
 
 const Token = () => {

@@ -3,7 +3,7 @@ import app from 'state';
 import { useEditThreadMutation } from 'state/api/threads';
 import type Thread from '../../models/Thread';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import { CWButton } from '../components/component_kit/CWButton';
 import './ArchiveThreadModal.scss';
 
 import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';

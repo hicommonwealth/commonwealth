@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 
 import {
   BaseMixpanelPayload,
@@ -10,7 +10,7 @@ import {
 } from '../../../../../../shared/analytics/types';
 import useAppStatus from '../../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../../hooks/useBrowserAnalyticsTrack';
-import { ButtonHeight } from '../../component_kit/new_designs/CWButton/CWButton';
+import { ButtonHeight } from '../../component_kit/CWButton/CWButton';
 import './CreateCommunityButton.scss';
 
 type CreateCommunityButtonProps = {

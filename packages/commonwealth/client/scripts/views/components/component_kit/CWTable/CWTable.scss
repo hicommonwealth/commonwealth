@@ -1,0 +1,104 @@
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/text';
+
+.Table {
+  overflow-x: auto;
+
+  table {
+    @include text.b2;
+    letter-spacing: 0.14px;
+    font-weight: 400;
+    border-collapse: collapse;
+    color: colors.$neutral-800;
+    width: 100%;
+
+    thead {
+      border-top: 1px solid colors.$neutral-200;
+      border-bottom: 1px solid colors.$neutral-200;
+      background-color: colors.$neutral-50;
+
+      tr {
+        th {
+          .header-content {
+            padding: 14px 16px;
+            gap: 4px;
+            display: flex;
+
+            &.numeric {
+              justify-content: flex-end;
+            }
+
+            .header-text {
+              font-family: shared.$font-family-neue-haas-unica;
+              font-weight: 700;
+              display: flex;
+              align-items: center;
+            }
+
+            .header-info {
+              font-size: 12px;
+              color: colors.$neutral-500;
+            }
+
+            .icon-container {
+              height: 24px;
+              width: 24px;
+              border-radius: border_radius.$border-radius-corners-wider;
+              padding: 4px;
+
+              .Icon {
+                &.arrow-up-blue,
+                &.arrow-down-blue {
+                  fill: none;
+                }
+              }
+
+              &:hover {
+                background-color: colors.$neutral-100;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid colors.$neutral-200;
+
+        &:hover {
+          background-color: colors.$neutral-50;
+        }
+
+        td {
+          padding: 14px 16px;
+          vertical-align: top;
+          word-break: break-word;
+
+          .numeric {
+            text-align: end;
+          }
+
+          .avatar-cell {
+            font-weight: 500;
+            display: flex;
+            gap: 8px;
+
+            .text {
+              white-space: nowrap;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.explanation-container {
+  .multiline-content {
+    white-space: pre-line;
+    line-height: 1.4;
+  }
+}

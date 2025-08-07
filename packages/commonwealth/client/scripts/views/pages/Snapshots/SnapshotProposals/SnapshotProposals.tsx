@@ -4,11 +4,8 @@ import React, { useState } from 'react';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import { CardsCollection } from 'views/components/cards_collection';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import {
-  CWTab,
-  CWTabsRow,
-} from 'views/components/component_kit/new_designs/CWTabs';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
+import { CWTab, CWTabsRow } from 'views/components/component_kit/CWTabs';
 
 import { SnapshotProposalCard } from './SnapshotProposalCard';
 

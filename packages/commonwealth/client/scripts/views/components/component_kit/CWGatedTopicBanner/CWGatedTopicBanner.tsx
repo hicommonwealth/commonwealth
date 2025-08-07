@@ -12,8 +12,8 @@ import {
   MixpanelClickthroughPayload,
 } from '../../../../../../shared/analytics/types';
 import useAppStatus from '../../../../hooks/useAppStatus';
-import CWBanner from '../new_designs/CWBanner';
-import { CWTag } from '../new_designs/CWTag';
+import CWBanner from '../CWBanner';
+import { CWTag } from '../CWTag';
 import './CWGatedTopicBanner.scss';
 
 interface CWGatedTopicBannerProps {

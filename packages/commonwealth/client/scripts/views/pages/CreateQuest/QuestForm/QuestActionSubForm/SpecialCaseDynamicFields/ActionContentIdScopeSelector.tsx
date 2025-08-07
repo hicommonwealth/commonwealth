@@ -1,6 +1,6 @@
 import React from 'react';
+import { CWRadioButton } from 'views/components/component_kit/cw_radio_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { QuestActionContentIdScope } from '../types';
 import { SpecialCaseDynamicFieldsProps } from './types';
 

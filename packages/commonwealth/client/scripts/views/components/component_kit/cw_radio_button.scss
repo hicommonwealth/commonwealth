@@ -1,66 +1,40 @@
 @use '../../../styles/shared.scss';
-@use '../../../styles/mixins/border_radius';
-@use '../../../styles/mixins/choice';
 @use '../../../styles/mixins/colors.module';
 
-@mixin radioCore($color) {
-  display: grid;
-  place-content: center;
-
-  &::after {
-    color: $color;
-    content: '';
-    width: 6px;
-    height: 6px;
-    box-shadow: inset 12px 12px;
-    clip-path: circle(50%);
-  }
-}
-
-.RadioButton {
-  align-items: center;
-  cursor: pointer;
+.container {
   display: flex;
   flex-direction: row;
-  position: relative;
+  align-items: center;
+  justify-content: center;
+  margin-right: auto;
+  width: fit-content;
+  cursor: pointer;
 
-  .radio-input {
-    @include choice.hideInput;
-  }
+  .radio-button {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: colors.$neutral-400;
+    z-index: 1;
 
-  .radio-control {
-    @include choice.controlStyles;
-
-    border-radius: border_radius.$border-radius-round;
-  }
-
-  &:hover .radio-control {
-    @include radioCore(colors.$primary-200);
-    @include choice.hoverColors;
-  }
-
-  &.checked .radio-control {
-    @include radioCore(colors.$primary-500);
-    @include choice.checkedColors;
-  }
-
-  &.checked:hover .radio-control {
-    @include radioCore(colors.$primary-600);
-    @include choice.checkedHoverColors;
-  }
-
-  &.checked.disabled .radio-control {
-    @include radioCore(colors.$neutral-300);
-    @include choice.disabledColors;
-  }
-
-  &.disabled {
-    cursor: not-allowed;
-
-    .radio-control {
-      // same color as background, so it's invisble on hover
-      @include radioCore(colors.$neutral-200);
-      @include choice.disabledColors;
+    &:hover {
+      accent-color: colors.$primary-600;
     }
+
+    &:checked {
+      accent-color: colors.$primary-500;
+    }
+
+    &:checked:hover {
+      accent-color: colors.$primary-600;
+    }
+  }
+
+  .label {
+    margin-left: 5px;
+  }
+
+  &.margin-right-10 {
+    margin-right: 10px;
   }
 }

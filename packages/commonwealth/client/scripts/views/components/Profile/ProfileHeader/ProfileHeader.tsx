@@ -15,7 +15,7 @@ import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import type NewProfile from '../../../../models/NewProfile';
 import { SharePopover } from '../../SharePopover';
 import TrustLevelRole from '../../TrustLevelRole';

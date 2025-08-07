@@ -3,19 +3,19 @@ import { slugifyPreserveDashes } from 'utils';
 
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useFetchPublicEnvVarQuery } from 'state/api/configuration';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CommunityType } from 'views/components/component_kit/CWCommunitySelector';
+import { CWForm } from 'views/components/component_kit/CWForm';
 import {
   CWImageInput,
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTextArea } from 'views/components/component_kit/cw_text_area';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
-import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { CWToggle } from '../component_kit/new_designs/cw_toggle';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
+import { CWToggle } from '../component_kit/cw_toggle';
 import './CommunityInformationForm.scss';
 import {
   BASE_ID,

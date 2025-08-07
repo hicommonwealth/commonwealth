@@ -2,9 +2,9 @@ import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import useUserStore from 'state/ui/user';
 import { saveToClipboard } from 'utils/clipboard';
+import { PopoverTriggerProps } from 'views/components/component_kit/CWPopover';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
-import { PopoverTriggerProps } from 'views/components/component_kit/new_designs/CWPopover';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { CWThreadAction } from 'views/components/component_kit/cw_thread_action';
 
 const TWITTER_SHARE_LINK_PREFIX = 'https://twitter.com/intent/tweet?text=';
 

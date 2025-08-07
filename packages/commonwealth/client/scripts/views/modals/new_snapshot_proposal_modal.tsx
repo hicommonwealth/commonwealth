@@ -8,7 +8,7 @@ import { CWDropdown } from '../components/component_kit/cw_dropdown';
 import {
   CWModalBody,
   CWModalHeader,
-} from '../components/component_kit/new_designs/CWModal';
+} from '../components/component_kit/CWModal';
 
 import './new_snapshot_proposal_modal.scss';
 

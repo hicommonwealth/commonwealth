@@ -2,7 +2,7 @@ import React from 'react';
 
 import { DOCS_SUBDOMAIN } from '@hicommonwealth/shared';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
 import {
   handleIconClick,
   handleMouseEnter,

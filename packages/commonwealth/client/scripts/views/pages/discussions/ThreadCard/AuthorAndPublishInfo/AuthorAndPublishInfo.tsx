@@ -7,15 +7,15 @@ import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import { LockWithTooltip } from 'views/components/LockWithTooltip';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/CWPopover';
+import { CWTag } from 'views/components/component_kit/CWTag';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import CWPopover, {
-  usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CommentVersionHistory } from '../../../../../models/Comment';
 import { UserProfile } from '../../../../../models/MinimumProfile';
 import {
@@ -23,7 +23,7 @@ import {
   ThreadVersionHistory,
 } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
-import { CWSelectList } from '../../../../components/component_kit/new_designs/CWSelectList/index';
+import { CWSelectList } from '../../../../components/component_kit/CWSelectList/index';
 import { FullUser } from '../../../../components/user/fullUser';
 import { NewThreadTag } from '../../NewThreadTag';
 import './AuthorAndPublishInfo.scss';

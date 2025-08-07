@@ -50,7 +50,7 @@ import { StickyCommentElementSelector } from 'views/components/StickEditorContai
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';

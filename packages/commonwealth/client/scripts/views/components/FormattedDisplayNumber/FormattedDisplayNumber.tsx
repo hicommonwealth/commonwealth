@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { formatDisplayNumber, FormatNumberOptions } from 'helpers/formatting';
 import React from 'react';
 import { CWText, TextStyleProps } from '../component_kit/cw_text';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
+import { CWTooltip } from '../component_kit/CWTooltip';
 import FractionalValue from '../FractionalValue';
 
 type FormattedDisplayNumberProps = {

@@ -13,16 +13,16 @@ import { CWLabel } from '../components/component_kit/cw_label';
 import { SelectList } from '../components/component_kit/cw_select_list';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import { CWButton } from '../components/component_kit/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../components/component_kit/new_designs/CWModal';
+} from '../components/component_kit/CWModal';
 
 import { DEFAULT_POLL_DURATION } from '@hicommonwealth/shared';
 import { parseCustomDuration, SetLocalPolls } from 'utils/polls';
-import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import CWCircleMultiplySpinner from '../components/component_kit/CWCircleMultiplySpinner';
 import './poll_editor_modal.scss';
 
 const getPollDurationCopy = (

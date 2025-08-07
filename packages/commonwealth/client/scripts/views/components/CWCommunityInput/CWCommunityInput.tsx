@@ -3,7 +3,7 @@ import { components } from 'react-select';
 import { useSearchCommunitiesQuery } from 'state/api/communities';
 import { useDebounce } from 'usehooks-ts';
 import CommunityInfo from '../component_kit/CommunityInfo';
-import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
+import { CWSelectList } from '../component_kit/CWSelectList';
 import './CWCommunityInput.scss';
 
 type CWCommunityInputProps = Parameters<typeof CWSelectList>[0] & {

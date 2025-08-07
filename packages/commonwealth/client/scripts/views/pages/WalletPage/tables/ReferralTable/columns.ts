@@ -1,4 +1,4 @@
-import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
+import { CWTableColumnInfo } from 'views/components/component_kit/CWTable/CWTable';
 
 export const columns: CWTableColumnInfo[] = [
   {

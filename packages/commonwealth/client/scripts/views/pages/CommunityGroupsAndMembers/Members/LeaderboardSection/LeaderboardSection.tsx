@@ -8,10 +8,10 @@ import { useDebounce } from 'usehooks-ts';
 import { Avatar } from 'views/components/Avatar';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
-import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWTable } from 'views/components/component_kit/CWTable';
+import { useCWTableState } from 'views/components/component_kit/CWTable/useCWTableState';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import { fromWei } from 'web3-utils';
 import { MemberResultsOrderBy } from '../index.types';
 

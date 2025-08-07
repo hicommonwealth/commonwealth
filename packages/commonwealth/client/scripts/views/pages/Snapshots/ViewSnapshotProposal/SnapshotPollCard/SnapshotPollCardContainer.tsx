@@ -6,7 +6,7 @@ import type {
   SnapshotSpace,
 } from 'helpers/snapshot_utils';
 import moment from 'moment';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWModal } from 'views/components/component_kit/CWModal';
 import { ConfirmSnapshotVoteModal } from 'views/modals/confirm_snapshot_vote_modal';
 
 import { VoteOption } from 'client/scripts/views/components/proposals/VotingResultView';

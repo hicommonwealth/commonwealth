@@ -12,7 +12,7 @@ import { AccountSelector } from 'views/components/component_kit/AccountSelector/
 import TOSModal from 'views/modals/TOSModal';
 import { useToggleCommunityStarMutation } from '../../../state/api/communities/index';
 import { AuthModal } from '../../modals/AuthModal';
-import { CWModal } from '../component_kit/new_designs/CWModal';
+import { CWModal } from '../component_kit/CWModal';
 
 const useJoinCommunity = () => {
   const [isAccountSelectorModalOpen, setIsAccountSelectorModalOpen] =

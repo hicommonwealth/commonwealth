@@ -1,0 +1,61 @@
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+
+.FormStep {
+  display: flex;
+  padding: 8px 12px;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  cursor: default;
+
+  .index {
+    color: colors.$white;
+    font-size: 14px;
+    border-radius: 50%;
+    background-color: colors.$primary-400;
+    width: 24px;
+    height: 24px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &.completed {
+    background-color: colors.$neutral-100;
+
+    svg {
+      scale: 1.25;
+    }
+
+    .label {
+      font-weight: 400;
+      color: colors.$neutral-400;
+    }
+  }
+
+  &.active {
+    background-color: colors.$primary-50;
+
+    .index {
+      background-color: colors.$primary-400;
+    }
+
+    .label {
+      font-weight: 500;
+      color: colors.$neutral-900;
+    }
+  }
+
+  &.inactive {
+    background-color: colors.$neutral-100;
+
+    .index {
+      background-color: colors.$neutral-400;
+    }
+
+    .label {
+      font-weight: 400;
+      color: colors.$neutral-400;
+    }
+  }
+}

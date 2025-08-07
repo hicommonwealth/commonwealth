@@ -5,7 +5,7 @@ import app from 'state';
 import { useTokenMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
 import { PageNotFound } from 'views/pages/404';
 import { ContestType } from '../types';
 import { isJudgedContest } from '../utils';

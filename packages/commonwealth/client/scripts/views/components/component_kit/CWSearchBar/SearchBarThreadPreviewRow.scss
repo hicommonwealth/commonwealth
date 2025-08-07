@@ -1,0 +1,52 @@
+@use '../../../../styles/shared';
+@use 'CWSearchBar.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/text';
+
+.SearchBarThreadPreviewRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  @include CWSearchBar.everyRowStyles;
+
+  .header-row {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+
+    .User {
+      align-items: center;
+      display: flex;
+
+      .user-avatar {
+        position: unset;
+      }
+
+      .username {
+        @include text.caption;
+
+        font-weight: 500;
+      }
+    }
+
+    .last-updated-text.Text {
+      color: colors.$neutral-500;
+    }
+  }
+
+  .content-row {
+    .Text {
+      display: inline;
+    }
+  }
+
+  .excerpt-text.Text {
+    color: colors.$neutral-600;
+  }
+}
+
+.SearchQuillRenderer {
+  max-height: 72px;
+  overflow-y: hidden;
+}

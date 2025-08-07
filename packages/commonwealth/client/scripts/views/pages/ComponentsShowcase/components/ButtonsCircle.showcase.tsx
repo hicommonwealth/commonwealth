@@ -1,6 +1,6 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWCircleButton from 'views/components/component_kit/new_designs/CWCircleButton';
+import CWCircleButton from 'views/components/component_kit/CWCircleButton';
 
 const ButtonsCircleShowcase = () => {
   return (

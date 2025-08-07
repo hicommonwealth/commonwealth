@@ -1,12 +1,12 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import {
   CWModal,
   CWModalBody,
   CWModalHeader,
-} from 'views/components/component_kit/new_designs/CWModal';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
+} from 'views/components/component_kit/CWModal';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
 import { CWDivider } from '../../component_kit/cw_divider';
 import './CommunitySelectionModal.scss';
 

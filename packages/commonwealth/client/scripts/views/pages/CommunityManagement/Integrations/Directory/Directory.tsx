@@ -11,10 +11,10 @@ import {
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { CWLabel } from 'views/components/component_kit/cw_label';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWToggle } from 'views/components/component_kit/cw_toggle';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { CWTypeaheadSelectList } from 'views/components/component_kit/new_designs/CWTypeaheadSelectList';
+import { CWToggle } from 'views/components/component_kit/cw_toggle_old';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
+import { CWTypeaheadSelectList } from 'views/components/component_kit/CWTypeaheadSelectList';
 import './Directory.scss';
 
 const Directory = () => {

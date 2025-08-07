@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer, {
   CWDrawerTopBar,
-} from 'views/components/component_kit/new_designs/CWDrawer';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
-import CWTab from '../../components/component_kit/new_designs/CWTabs/CWTab';
-import CWTabsRow from '../../components/component_kit/new_designs/CWTabs/CWTabsRow';
+} from 'views/components/component_kit/CWDrawer';
+import { CWButton } from '../../components/component_kit/CWButton';
+import CWTab from '../../components/component_kit/CWTabs/CWTab';
+import CWTabsRow from '../../components/component_kit/CWTabs/CWTabsRow';
 import './DirectorySettingsDrawer.scss';
 import ManualSelection from './ManualSelection';
 import TagSelection from './TagSelection';

@@ -2,7 +2,7 @@ import React from 'react';
 import SocialAccountLinkModal from '../modals/SocialAccountLinkModal';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import type { IconName } from './component_kit/cw_icons/cw_icon_lookup';
-import { CWModal } from './component_kit/new_designs/CWModal';
+import { CWModal } from './component_kit/CWModal';
 
 type SocialAccountProps = {
   iconName: IconName;

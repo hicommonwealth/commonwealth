@@ -10,11 +10,11 @@ import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import type Thread from '../../../models/Thread';
 import { ProposalState } from '../../components/NewThreadFormModern/NewThreadForm';
+import { CWButton } from '../../components/component_kit/CWButton';
+import CWCircleMultiplySpinner from '../../components/component_kit/CWCircleMultiplySpinner';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
+import { CWModal } from '../../components/component_kit/CWModal';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import './linked_proposals_card.scss';
 

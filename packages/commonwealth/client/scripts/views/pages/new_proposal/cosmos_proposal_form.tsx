@@ -24,16 +24,16 @@ import {
   naturalDenomToMinimal,
 } from '../../../../../shared/utils';
 import useAppStatus from '../../../hooks/useAppStatus';
-import { Skeleton } from '../../components/Skeleton';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
+import { CWButton } from '../../components/component_kit/CWButton';
 import {
   ReactQuillEditor,
   createDeltaFromText,
   getTextFromDelta,
 } from '../../components/react_quill_editor';
+import { Skeleton } from '../../components/Skeleton';
 
 export const CosmosProposalForm = () => {
   const [cosmosProposalType, setCosmosProposalType] = useState<

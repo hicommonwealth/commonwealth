@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 
 import {
   BaseMixpanelPayload,
@@ -13,7 +13,7 @@ import { useBrowserAnalyticsTrack } from '../../../../hooks/useBrowserAnalyticsT
 import {
   ButtonHeight,
   ButtonWidth,
-} from '../../component_kit/new_designs/CWButton/CWButton';
+} from '../../component_kit/CWButton/CWButton';
 import './TokenLaunchButton.scss';
 
 type TokenLaunchButtonProps = {

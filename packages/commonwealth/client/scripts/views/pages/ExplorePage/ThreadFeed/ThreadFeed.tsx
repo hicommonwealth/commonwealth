@@ -16,9 +16,9 @@ import {
   useFetchUserActivityQuery,
 } from 'state/api/feeds/fetchUserActivity';
 import useUserStore from 'state/ui/user';
-import { CWButton } from '../../../components/component_kit/new_designs/CWButton';
-import { CWModal } from '../../../components/component_kit/new_designs/CWModal';
-import { CWTag } from '../../../components/component_kit/new_designs/CWTag';
+import { CWButton } from '../../../components/component_kit/CWButton';
+import { CWModal } from '../../../components/component_kit/CWModal';
+import { CWTag } from '../../../components/component_kit/CWTag';
 import ThreadPreviewModal from '../../../modals/ThreadPreviewModal';
 import { PageNotFound } from '../../404';
 import { ThreadCard } from '../../discussions/ThreadCard';

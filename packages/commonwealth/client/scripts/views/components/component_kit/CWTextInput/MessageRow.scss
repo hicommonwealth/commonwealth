@@ -1,0 +1,37 @@
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+
+.MessageRow {
+  display: flex;
+  align-items: center;
+
+  .icon {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+
+    &.success > svg {
+      color: colors.$green-600;
+    }
+
+    &.failure > svg {
+      color: colors.$rorange-500;
+    }
+  }
+
+  .feedback-message-text.Text {
+    display: grid;
+    align-items: flex-end;
+    justify-content: flex-end;
+    text-align: left;
+    margin-left: 4px;
+
+    &.success {
+      color: colors.$green-600;
+    }
+
+    &.failure {
+      color: colors.$rorange-500;
+    }
+  }
+}

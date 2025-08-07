@@ -1,9 +1,9 @@
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import React from 'react';
-import { CWDateTimeInput } from 'views/components/component_kit/CWDateTimeInput';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWDateTimeInput } from 'views/components/component_kit/CWDateTimeInput';
+import { CWForm } from 'views/components/component_kit/CWForm';
 import { z } from 'zod';
 
 export const validation = z.object({

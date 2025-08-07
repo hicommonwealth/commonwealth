@@ -1,7 +1,7 @@
 import React from 'react';
 
-import CWCircleButton from 'views/components/component_kit/new_designs/CWCircleButton';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import CWCircleButton from 'views/components/component_kit/CWCircleButton';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 
 import './NumberSelector.scss';
 

@@ -12,15 +12,15 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { SelectList } from 'views/components/component_kit/cw_select_list';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWForm } from 'views/components/component_kit/CWForm';
 import {
   CWImageInput,
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
+import { MessageRow } from 'views/components/component_kit/CWTextInput/MessageRow';
 import TokenFinder, { useTokenFinder } from 'views/components/TokenFinder';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';

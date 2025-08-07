@@ -2,7 +2,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import './NoContestsCard.scss';
 
 const NoContestsCard = () => {

@@ -5,8 +5,8 @@ import DatePicker, { DatePickerProps } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useFormContext } from 'react-hook-form';
 import { CWIcon } from '../cw_icons/cw_icon';
-import { TextInputSize } from '../new_designs/CWTextInput/CWTextInput';
-import { MessageRow } from '../new_designs/CWTextInput/MessageRow';
+import { TextInputSize } from '../CWTextInput/CWTextInput';
+import { MessageRow } from '../CWTextInput/MessageRow';
 import './CWDateTimeInput.scss';
 
 type CWDateTimeInputProps = DatePickerProps & {

@@ -22,14 +22,14 @@ import { CWText } from '../../../../components/component_kit/cw_text';
 import {
   CWModalBody,
   CWModalFooter,
-} from '../../../../components/component_kit/new_designs/CWModal';
-import { CWTab } from '../../../../components/component_kit/new_designs/CWTabs';
-import CWTabsRow from '../../../../components/component_kit/new_designs/CWTabs/CWTabsRow';
+} from '../../../../components/component_kit/CWModal';
+import { CWTab } from '../../../../components/component_kit/CWTabs';
+import CWTabsRow from '../../../../components/component_kit/CWTabs/CWTabsRow';
 import { TemporaryCrecimientoModalBase } from '../../TemporaryCrecimientoModalBase';
 import { AuthModalType, ModalBaseProps, ModalBaseTabs } from '../../types';
 import useAuthentication from '../../useAuthentication';
-import { EVMWalletsSubModal } from './EVMWalletsSubModal';
 import { EmailForm } from './EmailForm';
+import { EVMWalletsSubModal } from './EVMWalletsSubModal';
 import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';
 import './ModalBase.scss';
 import { SMSForm } from './SMSForm';

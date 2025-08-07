@@ -1,7 +1,7 @@
 import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import app from 'state';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { PageNotFound } from '../404';
 import QuestList from '../ExplorePage/QuestList';
 import './QuestsList.scss';

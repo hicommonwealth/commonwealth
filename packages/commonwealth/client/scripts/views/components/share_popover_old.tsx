@@ -3,9 +3,9 @@ import app from '../../state';
 
 import { useLocation } from 'react-router-dom';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
+import { PopoverTriggerProps } from 'views/components/component_kit/CWPopover';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
-import { PopoverTriggerProps } from 'views/components/component_kit/new_designs/CWPopover';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { CWThreadAction } from 'views/components/component_kit/cw_thread_action';
 
 type SharePopoverProps = {
   commentId?: number;

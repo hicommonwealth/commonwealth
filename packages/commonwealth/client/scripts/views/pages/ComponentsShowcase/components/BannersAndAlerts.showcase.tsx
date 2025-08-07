@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWBanner, {
-  BannerType,
-} from 'views/components/component_kit/new_designs/CWBanner';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWBanner, { BannerType } from 'views/components/component_kit/CWBanner';
+import { CWButton } from 'views/components/component_kit/CWButton';
 
 const bannerTypes: BannerType[] = [
   'default',

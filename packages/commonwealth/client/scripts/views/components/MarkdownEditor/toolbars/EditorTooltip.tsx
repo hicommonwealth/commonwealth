@@ -1,8 +1,8 @@
 import React from 'react';
 import { useMarkdownEditorMode } from 'views/components/MarkdownEditor/useMarkdownEditorMode';
-import { AnchorType } from 'views/components/component_kit/new_designs/CWPopover';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { TooltipProps } from 'views/components/component_kit/new_designs/CWTooltip/CWTooltip';
+import { AnchorType } from 'views/components/component_kit/CWPopover';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
+import { TooltipProps } from 'views/components/component_kit/CWTooltip/CWTooltip';
 
 function nullRenderTrigger() {
   // noop render trigger that does nothing on mobile.

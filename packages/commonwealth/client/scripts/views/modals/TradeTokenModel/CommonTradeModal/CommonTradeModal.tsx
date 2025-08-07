@@ -7,7 +7,7 @@ import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../../../components/component_kit/new_designs/CWModal';
+} from '../../../components/component_kit/CWModal';
 import TokenIcon from '../TokenIcon';
 import './CommonTradeModal.scss';
 import TradeTokenForm, {

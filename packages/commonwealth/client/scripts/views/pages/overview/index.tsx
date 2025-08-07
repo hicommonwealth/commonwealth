@@ -10,12 +10,12 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo } from 'react';
 import app from 'state';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWTable } from '../../components/component_kit/new_designs/CWTable';
-import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
+import { CWTable } from '../../components/component_kit/CWTable';
+import { useCWTableState } from '../../components/component_kit/CWTable/useCWTableState';
 import '../discussions/DiscussionsPage.scss';
+import './index.scss';
 import OverViewPageColumn from './OverViewPageColumn';
 import ThreadCell from './ThreadCell';
-import './index.scss';
 type OverViewPageProps = {
   topicId?: string | number | undefined;
   featuredFilter?: ThreadFeaturedFilterTypes;

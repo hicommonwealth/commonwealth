@@ -6,12 +6,12 @@ import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { z } from 'node_modules/zod';
 import React from 'react';
 import { useUpdateResourceTimestamps } from 'state/api/superAdmin';
-import CWDateTimeInput from 'views/components/component_kit/CWDateTimeInput';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWDateTimeInput from 'views/components/component_kit/CWDateTimeInput';
+import { CWForm } from 'views/components/component_kit/CWForm';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import './AdminPanel.scss';
 
 const validationSchema = z

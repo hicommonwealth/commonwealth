@@ -10,7 +10,7 @@ import { useEditThreadMutation } from 'state/api/threads';
 import useUserStore from 'state/ui/user';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import type Thread from '../../../models/Thread';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
+import { CWButton } from '../../components/component_kit/CWButton';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';

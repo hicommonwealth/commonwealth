@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
-import { CWButton } from '../component_kit/new_designs/CWButton';
+import { CWButton } from '../component_kit/CWButton';
 import './PreferenceTags.scss';
 import { ICONS } from './config';
 import { PreferenceTagsProps } from './types';

@@ -3,7 +3,7 @@ import React from 'react';
 import useUserStore from 'state/ui/user';
 import { useAuthModalStore } from '../../state/ui/modals';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import { CWButton } from '../components/component_kit/CWButton';
 import { AuthModal, AuthModalType } from '../modals/AuthModal';
 import './404.scss';
 

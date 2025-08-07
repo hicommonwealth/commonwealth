@@ -5,11 +5,11 @@ import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWPopover, {
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
+} from 'views/components/component_kit/CWPopover';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
-import { CWButton } from '../component_kit/new_designs/CWButton';
-import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
+import { CWButton } from '../component_kit/CWButton';
+import { MessageRow } from '../component_kit/CWTextInput/MessageRow';
 import { Option } from './Option';
 import './Select.scss';
 

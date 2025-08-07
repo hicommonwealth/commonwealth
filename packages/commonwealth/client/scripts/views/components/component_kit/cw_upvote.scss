@@ -1,0 +1,77 @@
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+
+.Upvote {
+  min-width: 40px;
+  height: 54px;
+  border-radius: 6px;
+  border: 1px solid colors.$neutral-200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px;
+  gap: 2px;
+  background-color: colors.$white;
+  color: colors.$neutral-400;
+
+  .Text {
+    color: colors.$neutral-400;
+    max-width: 40px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:hover {
+    cursor: pointer;
+    border-color: colors.$primary-600;
+    color: colors.$primary-600;
+
+    .Text {
+      color: colors.$primary-600;
+    }
+  }
+
+  &.active {
+    border-color: colors.$primary-500;
+    color: colors.$primary-500;
+
+    .Text {
+      color: colors.$primary-500;
+    }
+
+    &:hover {
+      border-color: colors.$primary-600;
+      color: colors.$primary-600;
+
+      .Text {
+        color: colors.$primary-600;
+      }
+    }
+  }
+
+  &.disabled {
+    background-color: colors.$neutral-200;
+    border-color: colors.$neutral-400;
+    cursor: not-allowed;
+
+    .Text {
+      color: colors.$neutral-400;
+    }
+
+    &:hover {
+      .Text {
+        color: colors.$neutral-400;
+      }
+
+      svg {
+        fill: colors.$neutral-400;
+      }
+    }
+  }
+}

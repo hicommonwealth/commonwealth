@@ -21,20 +21,17 @@ import useGroupMutationBannerStore from 'state/ui/group';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
+import CWBanner from 'views/components/component_kit/CWBanner';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTableColumnInfo } from 'views/components/component_kit/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/CWTable/useCWTableState';
+import { CWTab, CWTabsRow } from 'views/components/component_kit/CWTabs';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
-import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
-import {
-  CWTab,
-  CWTabsRow,
-} from 'views/components/component_kit/new_designs/CWTabs';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import useAppStatus from '../../../../hooks/useAppStatus';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';

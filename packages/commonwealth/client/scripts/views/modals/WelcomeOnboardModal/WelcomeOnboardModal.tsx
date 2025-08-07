@@ -6,11 +6,7 @@ import { useFlag } from 'hooks/useFlag';
 import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { CWText } from '../../components/component_kit/cw_text';
-import {
-  CWModal,
-  CWModalHeader,
-} from '../../components/component_kit/new_designs/CWModal';
-import './WelcomeOnboardModal.scss';
+import { CWModal, CWModalHeader } from '../../components/component_kit/CWModal';
 import { InviteModal } from './steps/InviteModal';
 import { JoinCommunityStep } from './steps/JoinCommunityStep';
 import { MagicWalletCreationStep } from './steps/MagicWalletCreationStep';
@@ -18,6 +14,7 @@ import { PersonalInformationStep } from './steps/PersonalInformationStep';
 import { PreferencesStep } from './steps/PreferencesStep';
 import { TermsOfServicesStep } from './steps/TermsOfServicesStep';
 import { WelcomeOnboardModalProps, WelcomeOnboardModalSteps } from './types';
+import './WelcomeOnboardModal.scss';
 
 const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
   const { isWindowSmallInclusive } = useBrowserWindow({});

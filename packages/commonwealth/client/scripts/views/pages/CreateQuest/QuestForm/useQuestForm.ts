@@ -44,7 +44,7 @@ import {
   useCreateGoalMetaMutation,
   useGetGoalMetasQuery,
 } from 'state/api/superAdmin';
-import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
+import { CWFormRef } from 'views/components/component_kit/CWForm';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { QuestAction, QuestActionContentIdScope } from './QuestActionSubForm';

@@ -9,7 +9,7 @@ import {
 } from 'commonwealth-mdxeditor';
 import { TextFormatType } from 'lexical';
 import React, { useCallback } from 'react';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import CWIconButton from 'views/components/component_kit/CWIconButton';
 import { EditorTooltip } from 'views/components/MarkdownEditor/toolbars/EditorTooltip';
 import { formatToIconName } from 'views/components/MarkdownEditor/toolbars/formatToIconName';
 import './FormatButton.scss';

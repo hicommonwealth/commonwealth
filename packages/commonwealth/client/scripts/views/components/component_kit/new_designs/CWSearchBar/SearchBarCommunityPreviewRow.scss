@@ -1,6 +1,0 @@
-@use '../../../../../styles/shared';
-@use 'CWSearchBar.scss';
-
-.SearchBarCommunityPreviewRow {
-  @include CWSearchBar.everyRowStyles;
-}

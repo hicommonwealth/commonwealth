@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
-import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
+import { CWButton } from '../../components/component_kit/CWButton';
+import { CWTextInput } from '../../components/component_kit/CWTextInput';
 import './AdminPanel.scss';
 
 const EnableDigestEmail = () => {

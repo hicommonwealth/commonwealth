@@ -7,7 +7,7 @@ import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import { DeleteAddressModal } from 'client/scripts/views/modals/delete_address_modal';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
-import { CWModal } from '../../component_kit/new_designs/CWModal';
+import { CWModal } from '../../component_kit/CWModal';
 import AddressCreate from './AddressCreate';
 import AddressItem from './AddressItem';
 import './AddressList.scss';

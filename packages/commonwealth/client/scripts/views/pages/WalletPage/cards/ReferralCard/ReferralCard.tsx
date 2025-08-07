@@ -2,11 +2,8 @@ import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import { useInviteLinkModal } from 'state/ui/modals';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import {
-  CWTab,
-  CWTabsRow,
-} from 'views/components/component_kit/new_designs/CWTabs';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWTab, CWTabsRow } from 'views/components/component_kit/CWTabs';
 
 import RewardsCard from '../../RewardsCard';
 import Trend from '../Trend';

@@ -12,9 +12,9 @@ import {
   useUpdateFeaturedTopicsOrderMutation,
 } from 'state/api/topics/updateFeaturedTopicsOrder';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWIconButton from 'views/components/component_kit/CWIconButton';
+import { CWModal } from 'views/components/component_kit/CWModal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import DraggableTopicsList from 'views/modals/order_topics_modal/draggable_topics_list';
 import './ManageTopicsSection.scss';

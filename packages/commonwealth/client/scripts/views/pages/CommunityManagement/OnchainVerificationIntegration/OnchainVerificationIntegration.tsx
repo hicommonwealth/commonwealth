@@ -8,7 +8,7 @@ import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { PageNotFound } from '../../404';
 import CommunityOnchainTransactions from '../../CreateCommunity/steps/CommunityOnchainTransactions';
 import { TransactionType } from '../../CreateCommunity/steps/CommunityOnchainTransactions/helpers/transactionUtils';

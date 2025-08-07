@@ -2,7 +2,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useGetTagUsage } from 'state/api/tags';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWResponsiveDialog } from 'views/components/component_kit/new_designs/CWResponsiveDialog';
+import { CWResponsiveDialog } from 'views/components/component_kit/CWResponsiveDialog';
 
 import './TagUsageDialog.scss';
 

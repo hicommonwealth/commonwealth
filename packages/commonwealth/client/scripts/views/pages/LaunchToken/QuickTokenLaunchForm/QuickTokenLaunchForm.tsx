@@ -19,12 +19,12 @@ import {
 import { useCreateTokenMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import PageCounter from 'views/components/PageCounter';
+import CWBanner from 'views/components/component_kit/CWBanner';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
 import { ImageProcessed } from 'views/components/component_kit/CWImageInput';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import TokenLaunchButton from 'views/components/sidebar/TokenLaunchButton';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { fromWei } from 'web3-utils';

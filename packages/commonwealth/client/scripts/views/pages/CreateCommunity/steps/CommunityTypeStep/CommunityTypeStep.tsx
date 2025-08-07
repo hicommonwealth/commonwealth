@@ -4,8 +4,8 @@ import AddressInfo from 'models/AddressInfo';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCommunitySelector, {
   SelectedCommunity,
-} from 'views/components/component_kit/new_designs/CWCommunitySelector';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+} from 'views/components/component_kit/CWCommunitySelector';
+import { CWModal } from 'views/components/component_kit/CWModal';
 import NewCommunityAdminModal from 'views/modals/NewCommunityAdminModal';
 import {
   BaseMixpanelPayload,

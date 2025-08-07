@@ -1,0 +1,15 @@
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/media_queries';
+
+.RadioPanelGroup {
+  display: flex;
+  gap: 16px;
+
+  @include media_queries.extraSmall {
+    flex-direction: column;
+
+    .RadioPanel {
+      width: 100%;
+    }
+  }
+}

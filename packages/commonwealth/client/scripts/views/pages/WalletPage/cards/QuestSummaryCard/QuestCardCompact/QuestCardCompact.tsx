@@ -2,10 +2,10 @@ import clsx from 'clsx';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
+import { withTooltip } from 'views/components/component_kit/CWTooltip';
 import './QuestCardCompact.scss';
 
 type QuestCardCompactProps = {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import { SpecialCaseDynamicFieldsProps } from './types';
 
 const BasicPointsInput = ({

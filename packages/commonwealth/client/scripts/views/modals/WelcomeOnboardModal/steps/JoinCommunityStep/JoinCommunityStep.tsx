@@ -4,10 +4,10 @@ import { useFetchCommunitiesQuery } from 'state/api/communities';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
-import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { JoinCommunityCard } from './JoinCommunityCard';
 import './JoinCommunityStep.scss';
 

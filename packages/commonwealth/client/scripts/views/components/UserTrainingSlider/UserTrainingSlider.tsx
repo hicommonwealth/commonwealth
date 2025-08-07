@@ -6,7 +6,7 @@ import useAdminActionCardsStore from 'state/ui/adminOnboardingCards';
 import useUserStore from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { ActionCard, CardsSlider, DismissModal } from '../CardsSlider';
-import { CWModal } from '../component_kit/new_designs/CWModal';
+import { CWModal } from '../component_kit/CWModal';
 import './UserTrainingSlider.scss';
 import { CARD_TYPES } from './constants';
 import { UserTrainingCardTypes } from './types';

@@ -1,9 +1,9 @@
-import { CWForm } from 'client/scripts/views/components/component_kit/new_designs/CWForm';
-import { CWPhoneInput } from 'client/scripts/views/components/component_kit/new_designs/CWPhoneInput/CWPhoneInput';
+import { CWForm } from 'client/scripts/views/components/component_kit/CWForm';
+import { CWPhoneInput } from 'client/scripts/views/components/component_kit/CWPhoneInput/CWPhoneInput';
 import React, { useState } from 'react';
 import 'react-phone-input-2/lib/style.css';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWButton } from '../../../../../components/component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import { CWButton } from '../../../../../components/component_kit/CWButton';
 import './SMSForm.scss';
 import { SMSValidationSchema } from './validation';
 type SMSFormProps = {

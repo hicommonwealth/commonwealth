@@ -1,11 +1,11 @@
 import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'helpers/constants';
 import React from 'react';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
-import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWTable } from 'views/components/component_kit/CWTable';
+import { CWTableColumnInfo } from 'views/components/component_kit/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/CWTable/useCWTableState';
+import { CWTag } from 'views/components/component_kit/CWTag';
 
 const tagTypes = [
   'passed',

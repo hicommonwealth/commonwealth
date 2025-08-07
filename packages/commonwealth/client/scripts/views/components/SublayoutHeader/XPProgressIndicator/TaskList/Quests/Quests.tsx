@@ -3,10 +3,10 @@ import React from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import './Quests.scss';
 import QuestTask from './QuestTask';
 import { QuestTaskQuest } from './QuestTask/QuestTask';
-import './Quests.scss';
 
 type QuestsProps = {
   className?: string;

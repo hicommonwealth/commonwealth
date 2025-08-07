@@ -1,6 +1,6 @@
 import React from 'react';
 import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
-import { CWTooltip } from '../components/component_kit/new_designs/CWTooltip';
+import { CWTooltip } from '../components/component_kit/CWTooltip';
 import './community_label.scss';
 import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 import type { IconSize } from './component_kit/cw_icons/types';

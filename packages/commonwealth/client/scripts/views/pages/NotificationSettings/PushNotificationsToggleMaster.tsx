@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 // eslint-disable-next-line max-len
-import { CWToggle } from 'views/components/component_kit/cw_toggle';
+import { CWToggle } from 'views/components/component_kit/cw_toggle_old';
 // eslint-disable-next-line max-len
 import { useSubscriptionPreferenceSettingToggle } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSettingToggle';
 // eslint-disable-next-line max-len

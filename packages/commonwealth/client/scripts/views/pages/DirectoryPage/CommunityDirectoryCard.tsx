@@ -1,7 +1,7 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import React from 'react';
 import useUserStore from 'state/ui/user';
-import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
+import { CWRelatedCommunityCard } from 'views/components/component_kit/CWRelatedCommunityCard';
 import { z } from 'zod';
 import { CommunityData } from './DirectoryPageContent'; // Import CommunityData type
 

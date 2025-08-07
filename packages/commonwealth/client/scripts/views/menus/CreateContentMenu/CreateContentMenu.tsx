@@ -19,7 +19,7 @@ import useUserStore, { userStore } from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
 import {
   handleIconClick,
   handleMouseEnter,

@@ -5,15 +5,15 @@ import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from 'client/scripts/views/components/component_kit/new_designs/CWModal';
-import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList';
+} from 'client/scripts/views/components/component_kit/CWModal';
+import { CWSelectList } from 'client/scripts/views/components/component_kit/CWSelectList';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import useEditCommunityTokenMutation from 'state/api/communities/editCommunityToken';
 import { useEditTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import TokenFinder from 'views/components/TokenFinder/TokenFinder';
 import useTokenFinder from 'views/components/TokenFinder/useTokenFinder';
 import './TokenizationModal.scss';

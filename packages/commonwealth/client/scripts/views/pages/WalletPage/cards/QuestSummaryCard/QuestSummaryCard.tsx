@@ -5,11 +5,8 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import useUserStore from 'state/ui/user';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import {
-  CWTab,
-  CWTabsRow,
-} from 'views/components/component_kit/new_designs/CWTabs';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import { CWTab, CWTabsRow } from 'views/components/component_kit/CWTabs';
 import RewardsCard from '../../RewardsCard';
 import QuestCardCompact from './QuestCardCompact';
 import './QuestSummaryCard.scss';

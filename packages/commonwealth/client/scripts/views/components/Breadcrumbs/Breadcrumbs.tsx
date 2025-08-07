@@ -5,7 +5,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
 import { useSnapshotProposal } from '../../pages/NewProposalViewPage/useSnapshotProposal';
 import { CWBreadcrumbs } from '../component_kit/cw_breadcrumbs';

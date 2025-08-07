@@ -1,7 +1,7 @@
 import moment from 'moment';
 import React from 'react';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
+import { CWTooltip } from '../component_kit/CWTooltip';
 
 type ArchiveTrayWithTooltipProps = {
   archivedAt: moment.Moment;

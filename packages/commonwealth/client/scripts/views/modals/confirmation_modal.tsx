@@ -5,14 +5,14 @@ import { createRoot } from 'react-dom/client';
 
 import { uuidv4 } from '../../lib/util';
 import { CWText } from '../components/component_kit/cw_text';
-import type { ButtonProps } from '../components/component_kit/new_designs/CWButton';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import type { ButtonProps } from '../components/component_kit/CWButton';
+import { CWButton } from '../components/component_kit/CWButton';
 import {
   CWModal,
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../components/component_kit/new_designs/CWModal';
+} from '../components/component_kit/CWModal';
 
 import './confirmation_modal.scss';
 

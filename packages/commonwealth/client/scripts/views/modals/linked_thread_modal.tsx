@@ -8,12 +8,12 @@ import {
   useAddThreadLinksMutation,
   useDeleteThreadLinksMutation,
 } from '../../state/api/threads';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import { CWButton } from '../components/component_kit/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../components/component_kit/new_designs/CWModal';
+} from '../components/component_kit/CWModal';
 import { ThreadSelector } from '../components/thread_selector';
 
 type LinkedThreadModalProps = {

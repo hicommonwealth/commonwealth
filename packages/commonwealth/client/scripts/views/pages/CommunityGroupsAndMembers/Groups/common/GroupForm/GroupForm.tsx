@@ -17,17 +17,17 @@ import {
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWForm } from 'views/components/component_kit/CWForm';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
+import { MessageRow } from 'views/components/component_kit/CWTextInput/MessageRow';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWRadioButton } from 'views/components/component_kit/cw_radio_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
-import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { ZodError, ZodObject } from 'zod';
 import {
   AMOUNT_CONDITIONS,

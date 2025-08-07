@@ -1,9 +1,9 @@
 import React from 'react';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import {
   CWModalBody,
   CWModalHeader,
-} from 'views/components/component_kit/new_designs/CWModal';
+} from 'views/components/component_kit/CWModal';
 
 type SnapshotSpaceSelectorModalProps = {
   snapshotSpacesArray: string[];

@@ -1,9 +1,9 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWIconButton } from 'client/scripts/views/components/component_kit/new_designs/CWIconButton/CWIconButton';
+import { CWIconButton } from 'client/scripts/views/components/component_kit/CWIconButton/CWIconButton';
 import CWPopover, {
   usePopover,
-} from 'client/scripts/views/components/component_kit/new_designs/CWPopover/CWPopover';
+} from 'client/scripts/views/components/component_kit/CWPopover/CWPopover';
 import React from 'react';
 import { getChainName } from './utils';
 

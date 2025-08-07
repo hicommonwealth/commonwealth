@@ -1,6 +1,6 @@
 import React from 'react';
 import useUserStore from 'state/ui/user';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { TransactionsTab } from '../../components/Profile/ProfileActivity/TransactionsTab/TransactionsTab';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../404';

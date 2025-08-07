@@ -5,7 +5,7 @@ import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { PollCardProps, VoteInformation } from 'views/components/Polls';
 
-import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
+import { CWTooltip } from 'client/scripts/views/components/component_kit/CWTooltip';
 import VotingActionCard from 'client/scripts/views/components/proposals/VotingActionCard';
 import { VoteOption } from 'client/scripts/views/components/proposals/VotingResultView';
 import '../../../../components/Polls/PollCard/PollCard.scss';

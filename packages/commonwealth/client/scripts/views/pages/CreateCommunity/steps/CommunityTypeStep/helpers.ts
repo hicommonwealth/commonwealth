@@ -7,7 +7,7 @@ import skaleImg from 'assets/img/communitySelector/skale.svg';
 import solanaImg from 'assets/img/communitySelector/solana.svg';
 import soneiumImg from 'assets/img/communitySelector/soneium.png';
 import suiImg from 'assets/img/communitySelector/sui.svg'; // Add Sui image import
-import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
+import { CommunityType } from 'views/components/component_kit/CWCommunitySelector';
 
 export const communityTypeOptions = [
   {
