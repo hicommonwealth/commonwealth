@@ -8,6 +8,9 @@ import {
   RepeatFrequency,
   WorkflowKeys,
 } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model/db';
+import { processSubscriptionPreferencesUpdated } from '@hicommonwealth/model/services';
+import * as tester from '@hicommonwealth/model/tester';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   afterAll,
@@ -21,10 +24,6 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-// eslint-disable-next-line max-len
-import { models } from '@hicommonwealth/model/db';
-import * as tester from '@hicommonwealth/model/tester';
-import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/subscriptionPreferencesUpdated';
 
 function SpyNotificationsProvider(stubs?: {
   triggerWorkflowStub?: Mock<

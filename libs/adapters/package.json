@@ -27,7 +27,7 @@
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
-    "@knocklabs/node": "^0.6.13",
+    "@knocklabs/node": "catalog:",
     "@trpc/server": "^11.3.0",
     "amqplib": "^0.10.3",
     "async-rwlock": "^1.1.1",

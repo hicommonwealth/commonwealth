@@ -29,6 +29,8 @@ type QuestListProps = {
   hideSearchTag?: boolean;
 };
 
+const COMMON_X_OKX_QUEST_ID = -3;
+
 const QuestList = ({
   minQuests = 8,
   questsForCommunityId,
@@ -71,7 +73,11 @@ const QuestList = ({
     include_active_only: filters.activeOnly || false,
     enabled: xpEnabled,
   });
-  const quests = (questsList?.pages || []).flatMap((page) => page.results);
+  // OKX<>Common quest is to be hidden from this display only, it should be
+  // visible in other places and user's cab still earn aura for it.
+  const quests = (questsList?.pages || [])
+    .flatMap((page) => page.results)
+    .filter((q) => q.id !== COMMON_X_OKX_QUEST_ID);
 
   const { data: xpProgressions = [], isLoading: isLoadingXPProgression } =
     useGetXPs({

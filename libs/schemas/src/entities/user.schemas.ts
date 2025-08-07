@@ -95,7 +95,7 @@ export const Address = z.object({
   oauth_email_verified: z.boolean().nullish(),
   oauth_username: z.string().max(255).nullish(),
   oauth_phone_number: z.string().max(255).nullish(),
-
+  oauth_user_id: z.string().max(255).nullish(),
   User: User.optional().nullish(),
 
   created_at: z.coerce.date().optional(),

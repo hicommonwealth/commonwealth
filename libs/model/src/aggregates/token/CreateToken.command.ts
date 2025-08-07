@@ -93,23 +93,6 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
           group_id = group.id;
         }
 
-        // If token launch is a tokenized thread, link to thread
-        if (Number(name))
-          await models.sequelize.query(
-            `UPDATE "Threads"
-             SET launchpad_token_address = :launchpadTokenAddress,
-                 is_linking_token = false
-             WHERE id = :threadId
-               AND is_linking_token = false;`,
-            {
-              replacements: {
-                launchpadTokenAddress: token_address.toLowerCase(),
-                threadId: name,
-              },
-              transaction,
-            },
-          );
-
         // emit enriched event
         if (created)
           await emitEvent(

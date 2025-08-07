@@ -20,6 +20,9 @@ import {
   ReferrerCommunityJoinedNotification,
   ReferrerSignedUpNotification,
   SnapshotProposalCreatedNotification,
+  ThreadCreatedNotification,
+  ThreadTokenCapReachedNotification,
+  ThreadTokenTradeEventNotification,
   TradeEventNotification,
   UpvoteNotification,
   UserMentionedNotification,
@@ -528,6 +531,7 @@ export interface BlobStorage extends Disposable {
  * Notifications
  */
 export enum WorkflowKeys {
+  ThreadCreated = 'thread-created',
   CommentCreation = 'comment-creation',
   SnapshotProposals = 'snapshot-proposals',
   UserMentioned = 'user-mentioned',
@@ -551,6 +555,9 @@ export enum WorkflowKeys {
   // Launchpad
   LaunchpadTradeEvent = 'launchpad-trade-event',
   LaunchpadCapReached = 'launchpad-cap-reached',
+  // Thread Token
+  ThreadTokenTradeEvent = 'thread-token-trade-event',
+  ThreadTokenCapReached = 'thread-token-cap-reached',
 }
 
 export enum KnockChannelIds {
@@ -649,6 +656,18 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof CapReachedNotification>;
             key: WorkflowKeys.LaunchpadCapReached;
+          }
+        | {
+            data: z.infer<typeof ThreadCreatedNotification>;
+            key: WorkflowKeys.ThreadCreated;
+          }
+        | {
+            data: z.infer<typeof ThreadTokenTradeEventNotification>;
+            key: WorkflowKeys.ThreadTokenTradeEvent;
+          }
+        | {
+            data: z.infer<typeof ThreadTokenCapReachedNotification>;
+            key: WorkflowKeys.ThreadTokenCapReached;
           }
       ))
   | WebhookProviderOptions;
