@@ -33,14 +33,16 @@ export function UpdateComment(): Command<typeof schemas.UpdateComment> {
           uniqueMentions(parseUserMentions(body)),
         );
 
-        const { contentUrl } = await uploadIfLarge('comments', body);
+        const { truncatedBody, contentUrl } = await uploadIfLarge(
+          'comments',
+          body,
+        );
 
         // == mutation transaction boundary ==
         await models.sequelize.transaction(async (transaction) => {
           await models.Comment.update(
-            // TODO: text should be set to truncatedBody once client renders content_url
             {
-              body,
+              body: truncatedBody || body,
               search: getCommentSearchVector(body),
               content_url: contentUrl,
             },
@@ -50,8 +52,7 @@ export function UpdateComment(): Command<typeof schemas.UpdateComment> {
           await models.CommentVersionHistory.create(
             {
               comment_id: comment.id!,
-              // TODO: text should be set to truncatedBody once client renders content_url
-              body,
+              body: truncatedBody || comment.body,
               timestamp: new Date(),
               content_url: contentUrl,
             },

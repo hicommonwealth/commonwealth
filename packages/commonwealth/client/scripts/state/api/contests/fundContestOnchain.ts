@@ -1,6 +1,6 @@
+import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
 
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import Contest from 'helpers/ContractHelpers/Contest';
 import { ContractMethods, queryClient } from 'state/api/config';
 
@@ -21,7 +21,7 @@ const fundContestOnchain = async ({
 }: FundContestOnchainProps) => {
   const contest = new Contest(
     contestAddress,
-    commonProtocol.factoryContracts[ethChainId].factory,
+    getFactoryContract(ethChainId).NamespaceFactory,
     chainRpc,
     ethChainId,
   );

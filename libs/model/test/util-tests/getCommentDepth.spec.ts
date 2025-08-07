@@ -1,13 +1,13 @@
 import { dispose } from '@hicommonwealth/core';
-import { expect } from 'chai';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { models } from '../../src/database';
 import {
   CommentInstance,
   getCommentSearchVector,
   getThreadSearchVector,
-  models,
-  tester,
-} from '../../src';
+} from '../../src/models';
+import * as tester from '../../src/tester';
+
 import { getCommentDepth } from '../../src/utils/getCommentDepth';
 
 describe('getCommentDepth', () => {

@@ -17,10 +17,11 @@ import {
   LaunchpadPolicy,
   NominationsWorker,
   NotificationsPolicy,
+  NotificationsSettingsPolicy,
+  ReactionWorker,
   TwitterEngagementPolicy,
   User,
 } from '@hicommonwealth/model';
-import { NotificationsSettingsPolicy } from '../workers/knock/NotificationsSettings.policy';
 
 const _ContestWorker: Consumer<ReturnType<typeof ContestWorker>> = {
   consumer: ContestWorker,
@@ -56,12 +57,10 @@ const _Xp: Consumer<ReturnType<typeof User.Xp>> = {
 
 const _NotificationsSettingsPolicy = {
   consumer: NotificationsSettingsPolicy,
-  worker: 'knock',
 };
 
 const _NotificationsPolicy = {
   consumer: NotificationsPolicy,
-  worker: 'knock',
   // This disables retry strategies on any handler error/failure
   // This is because we cannot guarantee whether a Knock workflow trigger
   // call was successful or not. It is better to 'miss' notifications then
@@ -77,9 +76,12 @@ const _NotificationsPolicy = {
     },
   ),
   overrides: {
-    ThreadCreated: null,
     ThreadUpvoted: `ThreadUpvoted.#`,
   },
+};
+
+const _ReactionWorker = {
+  consumer: ReactionWorker,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,4 +102,5 @@ export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   _Xp,
   _NotificationsSettingsPolicy,
   _NotificationsPolicy,
+  _ReactionWorker,
 ];

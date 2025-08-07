@@ -1,23 +1,26 @@
 import { LaunchpadAbi } from '@commonxyz/common-protocol-abis';
 import {
   AppError,
-  InvalidState,
-  ServerError,
   command,
+  InvalidState,
   logger,
+  ServerError,
   type Command,
 } from '@hicommonwealth/core';
 import {
-  commonProtocol as cp,
+  createPrivateEvmClient,
   getErc20TokenInfo,
+  getFactoryContract,
   getLaunchpadTokenCreatedTransaction,
+  getTargetMarketCap,
+  isValidChain,
+  launchToken,
 } from '@hicommonwealth/evm-protocols';
-import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import _ from 'lodash';
 import { z } from 'zod';
+import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 import { CreateCommunity } from '../community';
@@ -32,7 +35,7 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
       const { name, symbol, totalSupply, eth_chain_id, icon_url, description } =
         payload;
 
-      if (!cp.isValidChain(eth_chain_id)) {
+      if (!isValidChain(eth_chain_id)) {
         throw new AppError('eth_chain_id is not supported');
       }
 
@@ -57,17 +60,15 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
 
       mustExist('Chain Node', chainNode);
 
-      const web3 = cp.createPrivateEvmClient({
+      const web3 = createPrivateEvmClient({
         rpc: chainNode.private_url!,
         privateKey: config.WEB3.LAUNCHPAD_PRIVATE_KEY,
       });
       const launchpadContract = new web3.eth.Contract(
         LaunchpadAbi,
-        cp.factoryContracts[
-          eth_chain_id as cp.ValidChains.SepoliaBase
-        ].launchpad,
+        getFactoryContract(eth_chain_id).Launchpad,
       );
-      const receipt = await cp.launchToken(
+      const receipt = await launchToken(
         launchpadContract,
         name,
         symbol,
@@ -76,8 +77,7 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
         web3.utils.toWei(totalSupply.toString(), 'ether') as string,
         web3.eth.defaultAccount as string,
         830000,
-        cp.factoryContracts[eth_chain_id as cp.ValidChains.SepoliaBase]
-          .tokenCommunityManager,
+        getFactoryContract(eth_chain_id).TokenCommunityManager,
       );
 
       const tokenData = await getLaunchpadTokenCreatedTransaction({
@@ -121,7 +121,7 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
           initial_supply: Number(tokenInfo.totalSupply / BigInt(1e18)),
           liquidity_transferred: false,
           launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity,
-          eth_market_cap_target: cp.getTargetMarketCap(),
+          eth_market_cap_target: getTargetMarketCap(),
           description: description ?? null,
           icon_url: icon_url ?? null,
         },
@@ -155,7 +155,7 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
         community_url: `${config.SERVER_URL}/${communityId}`,
         ...token!.toJSON(),
       };
-      return response as unknown as z.infer<typeof TokenView> & {
+      return response as unknown as z.infer<typeof schemas.TokenView> & {
         community_url: string;
       };
     },

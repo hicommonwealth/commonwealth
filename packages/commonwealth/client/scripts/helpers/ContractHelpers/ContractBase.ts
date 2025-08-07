@@ -1,4 +1,4 @@
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { ChainBase } from '@hicommonwealth/shared';
 import WebWalletController from 'controllers/app/web_wallets';
 import IWebWallet from 'models/IWebWallet';
@@ -81,7 +81,7 @@ abstract class ContractBase {
   }
 
   async estimateGas(): Promise<bigint | null> {
-    if (this.chainId && parseInt(this.chainId) === cp.ValidChains.SKALE_TEST) {
+    if (this.chainId && parseInt(this.chainId) === ValidChains.SKALE_TEST) {
       return BigInt(0.00012 * 1e9);
     }
     try {

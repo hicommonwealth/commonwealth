@@ -2,7 +2,14 @@ import {
   LaunchpadAbi,
   LPBondingCurveAbi,
 } from '@commonxyz/common-protocol-abis';
-import { commonProtocol as cp, erc20Abi } from '@hicommonwealth/evm-protocols';
+import {
+  buyToken,
+  erc20Abi,
+  getPrice,
+  launchToken,
+  sellToken,
+  transferLiquidity,
+} from '@hicommonwealth/evm-protocols';
 import { fetchCachedPublicEnvVar } from 'client/scripts/state/api/configuration';
 import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -60,7 +67,7 @@ class LaunchpadBondingCurve extends ContractBase {
     const initialBuyValue = 4.44e14 + this.LAUNCHPAD_INITIAL_PRICE;
     const connectorWeight = this.LAUNCHPAD_CONNECTOR_WEIGHT;
     const maxFeePerGas = await this.estimateGas();
-    const txReceipt = await cp.launchToken(
+    const txReceipt = await launchToken(
       this.launchpadFactory,
       name,
       symbol,
@@ -92,7 +99,7 @@ class LaunchpadBondingCurve extends ContractBase {
       await this.initialize(true, chainId, providerInstance);
     }
     const maxFeePerGas = await this.estimateGas();
-    const txReceipt = await cp.buyToken(
+    const txReceipt = await buyToken(
       this.contract,
       this.tokenAddress,
       walletAddress,
@@ -147,7 +154,7 @@ class LaunchpadBondingCurve extends ContractBase {
       this.tokenAddress,
     );
     const maxFeePerGas = await this.estimateGas();
-    const txReceipt = await cp.sellToken(
+    const txReceipt = await sellToken(
       this.contract,
       this.tokenAddress,
       amountSell,
@@ -163,7 +170,7 @@ class LaunchpadBondingCurve extends ContractBase {
       await this.initialize(true);
     }
 
-    const txReceipt = await cp.transferLiquidity(
+    const txReceipt = await transferLiquidity(
       this.contract,
       this.tokenAddress,
       walletAddress,
@@ -176,7 +183,7 @@ class LaunchpadBondingCurve extends ContractBase {
       await this.initialize(false, chainId);
     }
 
-    const amountOut = await cp.getPrice(
+    const amountOut = await getPrice(
       this.contract,
       this.tokenAddress,
       amountIn,

@@ -8,6 +8,7 @@ import type { CommunityAttributes, CommunityInstance } from './community';
 import type { CommunityAlertAttributes } from './community_alerts';
 import type { SubscriptionPreferenceAttributes } from './subscription_preference';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
+import { TopicSubscriptionAttributes } from './topic_subscription';
 import type { ModelInstance } from './types';
 
 export type EmailNotificationInterval = 'weekly' | 'never';
@@ -19,6 +20,7 @@ export type UserAttributes = z.infer<typeof User> & {
   SubscriptionPreferences?: SubscriptionPreferenceAttributes;
   threadSubscriptions?: ThreadSubscriptionAttributes[];
   commentSubscriptions?: CommentSubscriptionAttributes[];
+  topicSubscriptions?: TopicSubscriptionAttributes[];
   communityAlerts?: CommunityAlertAttributes[];
 };
 
@@ -97,6 +99,11 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       },
       privy_id: {
         type: Sequelize.STRING,
+        allowNull: true,
+      },
+      notify_user_name_change: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
         allowNull: true,
       },
     },

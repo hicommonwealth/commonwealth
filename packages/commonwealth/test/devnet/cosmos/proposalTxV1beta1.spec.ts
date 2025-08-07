@@ -1,7 +1,6 @@
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
 import { dispose } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
-import chai from 'chai';
+import * as tester from '@hicommonwealth/model/tester';
 import { CosmosApiType } from 'controllers/chain/cosmos/chain';
 import {
   getRPCClient,
@@ -18,15 +17,13 @@ import {
   ProposalStatus,
   VoteOption,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import {
   deposit,
   sendTx,
   setupTestSigner,
   waitOneBlock,
 } from './utils/helpers';
-
-const { expect, assert } = chai;
 
 describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () => {
   let rpc: CosmosApiType;
@@ -71,9 +68,9 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
     const msg = encodeMsgSubmitProposal(signer, deposit, content);
     const resp = await sendTx(rpcUrlBeta, msg, isAmino);
 
-    expect(resp.transactionHash).to.not.be.undefined;
-    expect(resp.rawLog).to.not.be.undefined;
-    expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
+    expect(resp.transactionHash).not.toBeUndefined();
+    expect(resp.rawLog).not.toBeUndefined();
+    expect(isDeliverTxSuccess(resp)).toBe(true);
 
     // @ts-expect-error StrictNullChecks
     const rawLog = JSON.parse(resp.rawLog);
@@ -85,7 +82,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
       (a) => a.key === 'proposal_type',
     )?.value;
 
-    expect(proposalType).to.eql(expectedProposalType);
+    expect(proposalType).toEqual(expectedProposalType);
   };
 
   const voteTest = async (
@@ -94,17 +91,17 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
   ): Promise<void> => {
     await waitOneBlock(rpcUrlBeta);
     const activeProposals = await getActiveVotingProposals();
-    assert.isAtLeast(activeProposals.length, 1);
+    expect(activeProposals.length).toBeGreaterThanOrEqual(1);
     const proposal = activeProposals[activeProposals.length - 1];
     const msg = encodeMsgVote(signer, proposal.proposalId, voteOption);
 
     const resp = await sendTx(rpcUrlBeta, msg, isAmino);
 
-    expect(resp.transactionHash).to.not.be.undefined;
-    expect(resp.rawLog).to.not.be.undefined;
+    expect(resp.transactionHash).not.toBeUndefined();
+    expect(resp.rawLog).not.toBeUndefined();
     // @ts-expect-error StrictNullChecks
     const voteValue = parseVoteValue(resp.rawLog);
-    expect(voteValue.option).to.eql(voteOption);
+    expect(voteValue.option).toEqual(voteOption);
   };
 
   describe('Direct signer', () => {
@@ -193,15 +190,14 @@ describe('Cosmos Governance v1beta1 util Tests', () => {
       const rpc = await getRPCClient(tmClient);
 
       const proposals = await getActiveProposalsV1Beta1(rpc);
-      expect(proposals.length).to.be.greaterThan(0);
+      expect(proposals.length).toBeGreaterThan(0);
 
       proposals.forEach((proposal) => {
-        expect(proposal.state.completed).to.eq(false);
-        expect(proposal.state.status).to.be.oneOf([
-          'VotingPeriod',
-          'DepositPeriod',
-        ]);
-        expect(proposal.state.tally).to.not.be.null;
+        expect(proposal.state.completed).toBe(false);
+        expect(['VotingPeriod', 'DepositPeriod']).toContain(
+          proposal.state.status,
+        );
+        expect(proposal.state.tally).not.toBeNull();
       });
     });
   });

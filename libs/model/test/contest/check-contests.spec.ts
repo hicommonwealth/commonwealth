@@ -1,11 +1,13 @@
 import { dispose, handleEvent } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
-import { ContestWorker, emitEvent, models } from '@hicommonwealth/model';
 import { CommunityTierMap } from '@hicommonwealth/shared';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { Contests } from '../../src/aggregates/contest';
+import { models } from '../../src/database';
+import { ContestWorker } from '../../src/policies';
 import { seed } from '../../src/tester';
+import { emitEvent } from '../../src/utils';
 import { drainOutbox } from '../utils';
 
 describe.skip('Check Contests', () => {

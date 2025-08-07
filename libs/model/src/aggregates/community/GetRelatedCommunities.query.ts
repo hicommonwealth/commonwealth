@@ -9,7 +9,7 @@ export function GetRelatedCommunities(): Query<
   return {
     ...schemas.GetRelatedCommunities,
     auth: [],
-    secure: true,
+    secure: false,
     body: async ({ payload }) => {
       const { chain_node_id } = payload;
 

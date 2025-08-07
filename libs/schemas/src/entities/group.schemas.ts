@@ -1,8 +1,8 @@
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 import { GroupGatedAction } from './group-permission.schemas';
-import { Address } from './user.schemas';
+import { Address, USER_TIER } from './user.schemas';
 
 const ContractSource = z.object({
   source_type: z.enum([
@@ -40,6 +40,13 @@ const SuiTokenSource = z.object({
   coin_type: z.string(),
 });
 
+const SuiNFTSource = z.object({
+  source_type: z.enum([BalanceSourceType.SuiNFT]),
+  sui_network: z.string(),
+  collection_id: z.string(),
+  token_standard: z.string().optional(),
+});
+
 const NativeSource = z.object({
   source_type: z.enum([BalanceSourceType.ETHNative]),
   evm_chain_id: PG_INT,
@@ -56,7 +63,8 @@ const CosmosContractSource = z.object({
   cosmos_chain_id: z.string(),
   contract_address: z.string(),
 });
-const ThresholdData = z.object({
+
+export const ThresholdData = z.object({
   threshold: z.string().regex(/^[0-9]+$/),
   source: z.union([
     ContractSource,
@@ -66,11 +74,17 @@ const ThresholdData = z.object({
     SolanaSource,
     SuiSource,
     SuiTokenSource,
+    SuiNFTSource,
   ]),
 });
 
-const AllowlistData = z.object({
+export const AllowlistData = z.object({
   allow: z.array(z.string().regex(/^0x[a-fA-F0-9]{40}$/)),
+});
+
+export const TrustLevelData = z.object({
+  minimum_trust_level: USER_TIER,
+  sso_required: z.array(z.nativeEnum(WalletSsoSource)).optional(),
 });
 
 export const Requirement = z.union([
@@ -81,6 +95,10 @@ export const Requirement = z.union([
   z.object({
     rule: z.literal('allow'),
     data: AllowlistData,
+  }),
+  z.object({
+    rule: z.literal('trust-level'),
+    data: TrustLevelData,
   }),
 ]);
 
@@ -128,4 +146,18 @@ export const Membership = z.object({
   // associations
   group: Group.optional(),
   address: Address.optional(),
+});
+
+export const GroupSnapshot = z.object({
+  id: z.number().optional(),
+  group_id: z.number(),
+  block_height: z.bigint().nullable(),
+  snapshot_source: z.string(),
+  balance_map: z.record(z.string()),
+  group_requirements: z.array(Requirement),
+  status: z.enum(['active', 'superseded']),
+  error_message: z.string().nullable(),
+  snapshot_date: z.date(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
 });

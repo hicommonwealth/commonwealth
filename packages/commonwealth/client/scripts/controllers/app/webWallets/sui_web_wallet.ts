@@ -7,7 +7,7 @@ import BlockInfo from '../../../models/BlockInfo';
 import IWebWallet from '../../../models/IWebWallet';
 
 // Define interface for the wallet from @mysten/wallet-standard
-interface Wallet {
+export interface Wallet {
   name: string;
   icon?: string;
   chains: string[];
@@ -37,8 +37,8 @@ class SuiWebWalletController implements IWebWallet<string> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _session: any;
 
-  public readonly name = WalletId.SuiWallet;
-  public readonly label = 'Sui Wallet';
+  public name = WalletId.SuiWallet;
+  public label = 'Sui Wallet';
   public readonly chain = ChainBase.Sui;
   public readonly defaultNetwork = ChainNetwork.Sui;
 
@@ -69,7 +69,7 @@ class SuiWebWalletController implements IWebWallet<string> {
   }
 
   // Get the best available Sui wallet provider
-  private getSuiWalletProvider(): Wallet | null {
+  protected getSuiWalletProvider(): Wallet | null {
     const availableWallets = getWallets().get() as unknown[] as Wallet[];
 
     if (availableWallets.length === 0) {

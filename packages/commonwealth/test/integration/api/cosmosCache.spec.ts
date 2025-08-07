@@ -3,47 +3,45 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable max-len */
 import { CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
+import fetch from 'node-fetch';
 import { TestServer, testServer } from 'server-test';
 import {
   cosmosLCDDuration,
   cosmosRPCDuration,
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
 const V1BETA1_CHAIN_ID = 'csdk-beta';
 const V1_CHAIN_ID = 'csdk';
 const V1BETA1_API = `/api/cosmosProxy`;
 const V1_API = `/api/cosmosProxy/v1`;
 
-chai.use(chaiHttp);
-const expect = chai.expect;
-
-function verifyNoCacheResponse(res) {
-  expect(res.body).to.not.be.null;
-  expect(res).to.have.status(200);
-  expect(res).to.not.have.header('X-Cache', 'HIT');
+function verifyNoCacheResponse(res, body) {
+  expect(body).not.toBeNull();
+  expect(res.status).toBe(200);
+  expect(res.headers.get('x-cache')).not.toBe('HIT');
 }
 
 describe('Cosmos Cache', () => {
   let server: TestServer;
+  let baseUrl: string;
   const route_namespace: CacheNamespaces = CacheNamespaces.Route_Response;
 
-  async function verifyCacheResponse(key, res, resEarlier) {
-    expect(res).to.have.status(200);
-    expect(res).to.have.header('X-Cache', 'HIT');
+  async function verifyCacheResponse(key, res, body, resEarlier, bodyEarlier) {
+    expect(res.status).toBe(200);
+    expect(res.headers.get('x-cache')).toBe('HIT');
     const valFromRedis = await server.cacheDecorator.checkCache(key);
-    expect(valFromRedis).to.not.be.null;
+    expect(valFromRedis).not.toBeNull();
     // @ts-expect-error StrictNullChecks
-    expect(JSON.parse(valFromRedis)).to.be.deep.equal(res.body);
+    expect(JSON.parse(valFromRedis)).toEqual(body);
     // @ts-expect-error StrictNullChecks
-    expect(JSON.parse(valFromRedis)).to.be.deep.equal(resEarlier.body);
+    expect(JSON.parse(valFromRedis)).toEqual(bodyEarlier);
   }
 
   beforeAll(async () => {
     server = await testServer();
+    baseUrl = server.baseUrl;
     await cache().ready();
   });
 
@@ -61,32 +59,38 @@ describe('Cosmos Cache', () => {
         'accept-language': 'en-US,en;q=0.9',
       },
     ) {
-      return chai.request(server.app).post(path).set(headers).send(body);
+      const res = await fetch(`${baseUrl}${path}`, {
+        method: 'POST',
+        headers,
+        body,
+      });
+      const resBody = await res.json();
+      return { res, body: resBody };
     }
 
     async function rpcTestIsCached(body, key) {
-      const res1 = await makeRPCRequest(body);
-      verifyNoCacheResponse(res1);
-      const res2 = await makeRPCRequest(body);
-      await verifyCacheResponse(key, res2, res1);
+      const { res: res1, body: body1 } = await makeRPCRequest(body);
+      verifyNoCacheResponse(res1, body1);
+      const { res: res2, body: body2 } = await makeRPCRequest(body);
+      await verifyCacheResponse(key, res2, body2, res1, body1);
     }
 
     function rpcTestKeyAndDuration(body, expectedKey, expectedDuration) {
-      const request = {
+      const requestObj = {
         originalUrl: `${V1BETA1_API}/${V1BETA1_CHAIN_ID}`,
       };
-      const key = cosmosRPCKey(request, body);
+      const key = cosmosRPCKey(requestObj, body);
       const duration = cosmosRPCDuration(body);
 
-      expect(key).to.be.equal(expectedKey);
-      expect(duration).to.be.equal(expectedDuration);
+      expect(key).toBe(expectedKey);
+      expect(duration).toBe(expectedDuration);
     }
 
     const rpcProposalsCacheExpectedTest = async (
       proposalStatus: string,
       expectedDuration: number,
     ) => {
-      const request = {
+      const requestObj = {
         originalUrl: `${V1BETA1_API}/${V1BETA1_CHAIN_ID}`,
       };
       const params = {
@@ -103,11 +107,11 @@ describe('Cosmos Cache', () => {
       const bodyString = JSON.stringify(body);
       const expectedKey = `${V1BETA1_API}/${V1BETA1_CHAIN_ID}_{"path":"/cosmos.gov.v1beta1.Query/Proposals","data":"${proposalStatus}","prove":false}`;
 
-      const key = cosmosRPCKey(request, body);
-      expect(key).to.be.equal(expectedKey);
+      const key = cosmosRPCKey(requestObj, body);
+      expect(key).toBe(expectedKey);
 
       const duration = cosmosRPCDuration(body);
-      expect(duration).to.be.equal(expectedDuration);
+      expect(duration).toBe(expectedDuration);
 
       await rpcTestIsCached(bodyString, expectedKey);
     };
@@ -277,11 +281,13 @@ describe('Cosmos Cache', () => {
     };
 
     async function lcdTestIsCached(url) {
-      const res1 = await chai.request(server.app).get(url);
-      await verifyNoCacheResponse(res1);
+      const res1 = await fetch(`${baseUrl}${url}`);
+      const body1 = await res1.json();
+      await verifyNoCacheResponse(res1, body1);
 
-      const res2 = await await chai.request(server.app).get(url);
-      await verifyCacheResponse(url, res2, res1);
+      const res2 = await fetch(`${baseUrl}${url}`);
+      const body2 = await res2.json();
+      await verifyCacheResponse(url, res2, body2, res1, body1);
     }
 
     function lcdTestDuration(
@@ -289,13 +295,13 @@ describe('Cosmos Cache', () => {
       url: string,
       query?: any,
     ) {
-      const request = {
+      const requestObj = {
         originalUrl: url,
         url,
         query,
       };
-      const duration = cosmosLCDDuration(request);
-      expect(duration).to.be.equal(expectedDuration);
+      const duration = cosmosLCDDuration(requestObj);
+      expect(duration).toBe(expectedDuration);
     }
 
     test('should have 7-day duration for an an individual proposal', () => {

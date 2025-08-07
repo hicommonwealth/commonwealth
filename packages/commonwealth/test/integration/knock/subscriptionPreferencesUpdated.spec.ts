@@ -8,10 +8,10 @@ import {
   RepeatFrequency,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { processSubscriptionPreferencesUpdated } from '@hicommonwealth/model/services';
+import * as tester from '@hicommonwealth/model/tester';
 import * as schemas from '@hicommonwealth/schemas';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   afterAll,
   afterEach,
@@ -24,10 +24,6 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-// eslint-disable-next-line max-len
-import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/subscriptionPreferencesUpdated';
-
-chai.use(chaiAsPromised);
 
 function SpyNotificationsProvider(stubs?: {
   triggerWorkflowStub?: Mock<

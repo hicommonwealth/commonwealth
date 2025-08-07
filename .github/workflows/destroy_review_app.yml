@@ -32,6 +32,8 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
           else
             echo "pr_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
           fi

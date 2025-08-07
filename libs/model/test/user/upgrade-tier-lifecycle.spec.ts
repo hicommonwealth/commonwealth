@@ -1,6 +1,5 @@
 import { config, dispose } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { emitEvent, tokenBalanceCache } from '@hicommonwealth/model';
+import * as commonProtocol from '@hicommonwealth/evm-protocols';
 import { Community, EventPair, User } from '@hicommonwealth/schemas';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
@@ -11,7 +10,9 @@ import {
 } from '../../src/aggregates/user/UpgradeTier.policy';
 import { models } from '../../src/database';
 import { USDC_BASE_MAINNET_ADDRESS } from '../../src/services/openai/parseBotCommand';
+import * as tokenBalanceCache from '../../src/services/tokenBalanceCache';
 import { seed } from '../../src/tester';
+import { emitEvent } from '../../src/utils/utils';
 import { drainOutbox } from '../utils';
 
 // TODO: use bigint helper util

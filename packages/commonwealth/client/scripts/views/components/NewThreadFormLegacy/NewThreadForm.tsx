@@ -449,7 +449,7 @@ export const NewThreadForm = forwardRef<
             walletAddress: userSelectedAddress,
             authorAddress: userSelectedAddress,
             communityTreasuryAddress:
-              app.chain?.meta?.communityTreasuryAddress || '',
+              app.chain?.meta?.namespace_governance_address || '',
             chainRpc: community.ChainNode?.url || '',
             paymentTokenAddress: communityToken.token_address,
           });

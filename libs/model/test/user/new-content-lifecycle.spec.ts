@@ -1,8 +1,7 @@
 import { Actor, dispose, query } from '@hicommonwealth/core';
 import { Address, Topic } from '@hicommonwealth/schemas';
 import { CommunityTierMap } from '@hicommonwealth/shared';
-import { expect } from 'chai';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import { GetNewContent } from '../../src/aggregates/user';
 import { seed } from '../../src/tester';

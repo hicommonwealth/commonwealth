@@ -4,6 +4,7 @@ import { PG_INT } from '../utils';
 import { Comment } from './comment.schemas';
 import { Community } from './community.schemas';
 import { Thread } from './thread.schemas';
+import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
 export const NotificationCategory = z.object({
@@ -131,3 +132,12 @@ export const CommunityAlert = z
       }).optional(),
     }),
   );
+
+export const TopicSubscription = z.object({
+  user_id: PG_INT,
+  topic_id: PG_INT,
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+
+  Topic: Topic.optional(),
+});

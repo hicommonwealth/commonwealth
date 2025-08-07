@@ -74,7 +74,7 @@ jobs:
       - name: Run serial e2e tests
         run: |
           pnpm -F commonwealth bootstrap-test-db &&
-          (cd packages/commonwealth && node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (cd packages/commonwealth && SERVICE=web node --import=extensionless/register --enable-source-maps ./build/server.js) &
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
       - name: Archive code coverage results
         uses: actions/upload-artifact@v4
@@ -215,7 +215,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      # TODO: use devmode instead to avoid building
       - name: Build
         run: pnpm -r build
 

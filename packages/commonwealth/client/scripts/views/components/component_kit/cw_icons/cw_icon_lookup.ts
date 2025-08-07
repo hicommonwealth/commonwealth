@@ -350,6 +350,7 @@ export const iconLookup = {
 export const customIconLookup = {
   base: CustomIcons.CWBase,
   blast: CustomIcons.CWBlast,
+  binance: CustomIcons.CWBinance,
   google: Icons.CWGoogle,
   github: Icons.CWGithub,
   email: CustomIcons.CWEmail,
@@ -371,6 +372,10 @@ export const customIconLookup = {
   solflare: CustomIcons.CWSolflare,
   sui: CustomIcons.CWSui,
   'sui-wallet': CustomIcons.CWSui,
+  suiet: CustomIcons.CWSuiet,
+  bitget: CustomIcons.CWBitget,
+  'okx-wallet': CustomIcons.CWOKX,
+  'suiet-wallet': CustomIcons.CWSuiet,
   terrastation: CustomIcons.CWTerraStation2,
   unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,

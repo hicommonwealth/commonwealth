@@ -14,7 +14,7 @@ import {
 } from '../../src/aggregates/user';
 import { models } from '../../src/database';
 import { ChainEventPolicy } from '../../src/policies';
-import { commonProtocol } from '../../src/services';
+import { newNamespaceValidator } from '../../src/services/commonProtocol';
 import { seed } from '../../src/tester';
 import { drainOutbox, seedCommunity } from '../utils';
 
@@ -146,10 +146,9 @@ describe('Referral lifecycle', () => {
     await models.Outbox.bulkCreate(chainEvents1);
 
     // simulate UI updating the namespace address
-    vi.spyOn(
-      commonProtocol.newNamespaceValidator,
-      'validateNamespace',
-    ).mockResolvedValue(namespaceAddress);
+    vi.spyOn(newNamespaceValidator, 'validateNamespace').mockResolvedValue(
+      namespaceAddress,
+    );
     await command(UpdateCommunity(), {
       actor: nonMember,
       payload: {

@@ -9,7 +9,9 @@ import {
   dispose,
   disposeAdapter,
 } from '@hicommonwealth/core';
-import { models, tester, User } from '@hicommonwealth/model';
+import { User } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import * as tester from '@hicommonwealth/model/tester';
 import { ApiKey, User as UserSchema } from '@hicommonwealth/schemas';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { NextFunction, Request, Response } from 'express';

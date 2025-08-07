@@ -1,17 +1,14 @@
 import { dispose } from '@hicommonwealth/core';
-import { ThreadAttributes, models } from '@hicommonwealth/model';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
+import { models } from '@hicommonwealth/model/db';
+import { ThreadAttributes } from '@hicommonwealth/model/models';
 import jwt from 'jsonwebtoken';
+import fetch from 'node-fetch';
 import { Op } from 'sequelize';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { attributesOf } from '../../../server/util/sequelizeHelpers';
 import { JoinCommunityArgs, ThreadArgs } from '../../util/modelUtils';
-
-chai.use(chaiHttp);
-const { expect } = chai;
 
 describe('User Dashboard API', () => {
   const chain = 'sushi';
@@ -41,9 +38,11 @@ describe('User Dashboard API', () => {
   let topicId: number;
   let topicId2: number;
   let server: TestServer;
+  let baseUrl: string;
 
   beforeAll(async () => {
     server = await testServer();
+    baseUrl = server.baseUrl;
 
     const topic = await models.Topic.findOne({
       where: { community_id: chain },
@@ -74,11 +73,11 @@ describe('User Dashboard API', () => {
       { id: userId, email: firstUser.email },
       config.AUTH.JWT_SECRET,
     );
-    expect(userId).to.not.be.null;
-    expect(userAddress).to.not.be.null;
-    expect(userAddressId).to.not.be.null;
-    expect(userJWT).to.not.be.null;
-    expect(userDid).to.not.be.null;
+    expect(userId).not.toBeNull();
+    expect(userAddress).not.toBeNull();
+    expect(userAddressId).not.toBeNull();
+    expect(userJWT).not.toBeNull();
+    expect(userDid).not.toBeNull();
 
     const secondUser = await server.seeder.createAndVerifyAddress(
       { chain: chain2 },
@@ -93,11 +92,11 @@ describe('User Dashboard API', () => {
       config.AUTH.JWT_SECRET,
     );
     userSession2 = { session: secondUser.session, sign: secondUser.sign };
-    expect(userId2).to.not.be.null;
-    expect(userAddress2).to.not.be.null;
-    expect(userAddressId2).to.not.be.null;
-    expect(userJWT2).to.not.be.null;
-    expect(userDid2).to.not.be.null;
+    expect(userId2).not.toBeNull();
+    expect(userAddress2).not.toBeNull();
+    expect(userAddressId2).not.toBeNull();
+    expect(userJWT2).not.toBeNull();
+    expect(userDid2).not.toBeNull();
 
     // make second user join alex community
     const communityArgs: JoinCommunityArgs = {
@@ -106,7 +105,7 @@ describe('User Dashboard API', () => {
       chain,
     };
     const res = await server.seeder.joinCommunity(communityArgs);
-    expect(res).to.equal(true);
+    expect(res).toBe(true);
 
     // sets user-2 to be admin of the alex community
     const isAdmin = await server.seeder.updateRole({
@@ -114,7 +113,7 @@ describe('User Dashboard API', () => {
       chainOrCommObj: { chain_id: chain2 },
       role: 'admin',
     });
-    expect(isAdmin).to.not.be.null;
+    expect(isAdmin).not.toBeNull();
 
     const threadOneArgs: ThreadArgs = {
       chainId: chain2,
@@ -130,8 +129,8 @@ describe('User Dashboard API', () => {
       topicId: topicId2,
     };
     threadOne = await server.seeder.createThread(threadOneArgs);
-    expect(threadOne.status).to.equal('Success');
-    expect(threadOne.result).to.not.be.null;
+    expect(threadOne.status).toBe('Success');
+    expect(threadOne.result).not.toBeNull();
 
     const threadTwoArgs: ThreadArgs = {
       chainId: chain,
@@ -149,8 +148,8 @@ describe('User Dashboard API', () => {
     //
     // // create a thread in both 'sushi' and 'alex' communities
     const threadTwo = await server.seeder.createThread(threadTwoArgs);
-    expect(threadTwo.status).to.equal('Success');
-    expect(threadTwo.result).to.not.be.null;
+    expect(threadTwo.status).toBe('Success');
+    expect(threadTwo.result).not.toBeNull();
   });
 
   afterAll(async () => {
@@ -161,27 +160,32 @@ describe('User Dashboard API', () => {
     const apiUrl = '/api/v1/GetUserActivity';
 
     test('should fail without JWT', async () => {
-      const res = await chai.request
-        .agent(server.app)
-        .get(apiUrl)
-        .set('Accept', 'application/json')
-        .set('address', userAddress)
-        .send({ chain });
-      expect(res).to.not.be.null;
-      expect(res.error).to.not.be.null;
+      const res = await fetch(`${baseUrl}${apiUrl}`, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          address: userAddress,
+        },
+      });
+      expect(res).not.toBeNull();
+      expect(res.status).not.toBe(200);
     });
 
     test('should return user activity for joined communities only', async () => {
-      const res = await chai.request
-        .agent(server.app)
-        .get(apiUrl)
-        .set('Accept', 'application/json')
-        .set('address', userAddress)
-        .send({ chain, jwt: userJWT });
-
-      expect(res.status).to.be.equal(200);
-      expect(res.text).to.not.be.null;
-      const resBody = JSON.parse(res.text);
+      const url = new URL(`${baseUrl}${apiUrl}`);
+      url.searchParams.set('chain', chain);
+      url.searchParams.set('jwt', userJWT);
+      const res = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          address: userAddress,
+        },
+      });
+      expect(res.status).toBe(200);
+      const resText = await res.text();
+      expect(resText).not.toBeNull();
+      const resBody = JSON.parse(resText);
       const threadIds = resBody?.results?.map((a) => a.id);
       const chains = await models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
@@ -192,7 +196,7 @@ describe('User Dashboard API', () => {
         },
         raw: true,
       });
-      expect(chains).to.deep.equal([{ community_id: chain }]);
+      expect(chains).toEqual([{ community_id: chain }]);
     });
 
     test('should return user activity for newly joined communities', async () => {
@@ -203,19 +207,22 @@ describe('User Dashboard API', () => {
         chain: chain2,
       };
       const communityCreated = await server.seeder.joinCommunity(communityArgs);
-      expect(communityCreated).to.equal(true);
+      expect(communityCreated).toBe(true);
 
-      const res = await chai.request
-        .agent(server.app)
-        .get(apiUrl)
-        .set('Accept', 'application/json')
-        .set('address', userAddress)
-        .send({ chain, jwt: userJWT });
-
-      expect(res.status).to.be.equal(200);
-      expect(res.text).to.not.be.null;
-
-      const resBody = JSON.parse(res.text);
+      const url = new URL(`${baseUrl}${apiUrl}`);
+      url.searchParams.set('chain', chain);
+      url.searchParams.set('jwt', userJWT);
+      const res = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          address: userAddress,
+        },
+      });
+      expect(res.status).toBe(200);
+      const resText = await res.text();
+      expect(resText).not.toBeNull();
+      const resBody = JSON.parse(resText);
       const threadIds = resBody?.results.map((a) => a.id);
       const chains = await models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
@@ -227,7 +234,7 @@ describe('User Dashboard API', () => {
         order: [['community_id', 'ASC']],
         raw: true,
       });
-      expect(chains).to.deep.equal([
+      expect(chains).toEqual([
         { community_id: chain2 },
         { community_id: chain },
       ]);
@@ -249,21 +256,24 @@ describe('User Dashboard API', () => {
           topicId,
         };
         const res = await server.seeder.createThread(threadArgs);
-        expect(res.status).to.equal('Success');
-        expect(res.result).to.not.be.null;
+        expect(res.status).toBe('Success');
+        expect(res.result).not.toBeNull();
       }
 
-      const res = await chai.request
-        .agent(server.app)
-        .get(apiUrl)
-        .set('Accept', 'application/json')
-        .set('address', userAddress)
-        .send({ chain, jwt: userJWT });
-
-      expect(res.status).to.be.equal(200);
-      expect(res.text).to.not.be.null;
-
-      const resBody = JSON.parse(res.text);
+      const url = new URL(`${baseUrl}${apiUrl}`);
+      url.searchParams.set('chain', chain);
+      url.searchParams.set('jwt', userJWT);
+      const res = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          address: userAddress,
+        },
+      });
+      expect(res.status).toBe(200);
+      const resText = await res.text();
+      expect(resText).not.toBeNull();
+      const resBody = JSON.parse(resText);
       const threadIds = resBody.results.map((a) => a.id);
       const chains = (
         await models.Thread.findAll({
@@ -276,7 +286,7 @@ describe('User Dashboard API', () => {
           raw: true,
         })
       ).map((x) => x.community_id);
-      expect(chains.includes(threadOne.chainId)).to.be.false;
+      expect(chains.includes(threadOne.chainId)).toBe(false);
     });
   });
 

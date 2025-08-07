@@ -1,12 +1,8 @@
 import { Actor, dispose, query } from '@hicommonwealth/core';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import { seed } from 'model/src/tester';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { GetStakeHistoricalPrice } from '../../src/aggregates/community/GetStakeHistoricalPrice.query';
-
-chai.use(chaiAsPromised);
+import { seed } from '../../src/tester';
 
 describe('Stake Historical Price', () => {
   let community_id: string;

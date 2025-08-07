@@ -60,7 +60,7 @@ export function useSignIn() {
       });
       return {
         account,
-        newlyCreated: address.first_community,
+        newlyCreated: address.is_welcome_onboard_flow_complete,
         joinedCommunity: address.address_created,
       };
     },

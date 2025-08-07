@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import app from 'state';
 import {
   useGetCommunityByIdQuery,
@@ -22,13 +22,16 @@ const MCPIntegration = () => {
     includeMcpServers: true,
   });
 
-  const { data: servers = [], isLoading } = useFetchMcpServersQuery();
+  const { data: servers = [], isLoading } =
+    useFetchMcpServersQuery(communityId);
   const utils = trpc.useUtils();
   const { mutateAsync: setServers, isPending } =
     useSetCommunityMcpServersMutation();
 
-  const enabledIds =
-    community?.MCPServerCommunities?.map((s) => s.mcp_server_id) || [];
+  const enabledIds = useMemo(
+    () => community?.MCPServerCommunities?.map((s) => s.mcp_server_id) || [],
+    [community?.MCPServerCommunities],
+  );
 
   const onToggle = useCallback(
     async (serverId: number, enable: boolean) => {
@@ -56,7 +59,7 @@ const MCPIntegration = () => {
         <CWText type="h2">Manage MCP Integrations</CWText>
         <div className="servers">
           {servers.map((server) => {
-            const enabled = enabledIds.includes(server.id);
+            const enabled = enabledIds.includes(server.id!);
             return (
               <CWCard
                 key={server.id}
@@ -68,7 +71,7 @@ const MCPIntegration = () => {
                   <CWToggle
                     checked={enabled}
                     disabled={isPending}
-                    onChange={() => onToggle(server.id, !enabled)}
+                    onChange={() => onToggle(server.id!, !enabled)}
                   />
                 </div>
                 <CWText type="b1">{server.description}</CWText>

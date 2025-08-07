@@ -70,7 +70,14 @@ export async function getSessionFromWallet(
   }
 
   // Special handling for Sui Wallet
-  if (wallet.name === WalletId.SuiWallet) {
+  if (
+    [
+      WalletId.SuiWallet,
+      WalletId.SuietWallet,
+      WalletId.bitgetWallet,
+      WalletId.OkxWallet,
+    ].includes(wallet.name)
+  ) {
     if (newSession) {
       const address = wallet.accounts[0];
       if (!address) {

@@ -1,14 +1,17 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { notifyError } from 'controllers/app/notifications';
 import { deinitChainOrCommunity, loadCommunityChainInfo } from 'helpers/chain';
 import withRouter, { useCommonNavigate } from 'navigation/helpers';
 import React, { ReactNode, Suspense, useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
+import { useSelectCommunityMutation } from 'state/api/communities/selectCommunity';
 import {
   useFetchCustomDomainQuery,
   useFetchPublicEnvVarQuery,
 } from 'state/api/configuration';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useErrorStore from 'state/ui/error';
 import useUserStore from 'state/ui/user';
 import { MobileScrollBuffer } from 'views/components/MobileNavigation/MobileScrollBuffer';
@@ -19,13 +22,14 @@ import { z } from 'zod';
 import useAppStatus from '../hooks/useAppStatus';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import { useGetCommunityByIdQuery } from '../state/api/communities';
-import { useSelectCommunityMutation } from '../state/api/communities/selectCommunity';
+import { useUpdateUserMutation } from '../state/api/user';
 import './Layout.scss';
 import SubLayout from './Sublayout';
 import MetaTags from './components/MetaTags';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWText } from './components/component_kit/cw_text';
 import CWCircleMultiplySpinner from './components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { openConfirmation } from './modals/confirmation_modal';
 
 type LayoutAttrs = {
   Component: ReactNode | any;
@@ -54,6 +58,11 @@ const LayoutComponent = ({
   const user = useUserStore();
   const appError = useErrorStore();
 
+  const { data } = useFetchProfileByIdQuery({
+    apiCallEnabled: user.notifyUserNameChange,
+  });
+
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [communityToLoad, setCommunityToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
@@ -68,6 +77,53 @@ const LayoutComponent = ({
       user.setData({ isOnPWA: isAddedToHomeScreen });
     }
   }, [isAddedToHomeScreen, user.isOnPWA, user]);
+
+  const { mutateAsync: updateUser } = useUpdateUserMutation();
+
+  useEffect(() => {
+    if (user.notifyUserNameChange && data && !confirmationModalOpen) {
+      setConfirmationModalOpen(true);
+
+      const handleAcknowledge = async () => {
+        try {
+          await updateUser({
+            id: user.id,
+            profile: data.profile,
+            notify_user_name_change: false,
+          });
+          user.setData({ notifyUserNameChange: false });
+        } catch (err) {
+          notifyError('Failed to update profile');
+        }
+      };
+
+      openConfirmation({
+        title: 'Notice',
+        onClose: () => {
+          handleAcknowledge().catch(() => {}); // prevents unhandled promise
+        },
+        description:
+          'User name has been set to Anonymous due to duplicate ' +
+          'name. Please change your name in the edit profile section.',
+        buttons: [
+          {
+            label: 'Confirm',
+            buttonHeight: 'sm',
+            onClick: () => {
+              handleAcknowledge().catch(() => {});
+            },
+          },
+        ],
+        hideWarning: true,
+      });
+    }
+  }, [
+    user.notifyUserNameChange,
+    updateUser,
+    user,
+    data,
+    confirmationModalOpen,
+  ]);
 
   // If community id was updated ex: `${PRODUCTION_DOMAIN}/{community-id}/**/*`
   // redirect to new community id ex: `${PRODUCTION_DOMAIN}/{new-community-id}/**/*`

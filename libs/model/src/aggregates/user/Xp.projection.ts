@@ -621,6 +621,32 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           },
         });
       },
+      LaunchpadTokenGraduated: async ({ id, payload }) => {
+        const user_id =
+          payload.token.creator_address &&
+          (await getUserByAddress(payload.token.creator_address));
+        config.LOG_XP_LAUNCHPAD &&
+          log.info('Xp->LaunchpadTokenGraduated', { id, payload, user_id });
+        if (!user_id) return;
+
+        const created_at = payload.token.updated_at
+          ? new Date(payload.token.updated_at)
+          : new Date();
+        const action_metas = await getQuestActionMetas(
+          { created_at },
+          'LaunchpadTokenGraduated',
+        );
+        await recordXpsForQuest({
+          event_id: id,
+          user_id,
+          event_created_at: created_at,
+          action_metas,
+          scope: {
+            namespace: payload.token.namespace,
+            launchpad_token_address: payload.token.token_address,
+          },
+        });
+      },
       WalletLinked: async ({ id, payload }) => {
         const action_metas = await getQuestActionMetas(payload, 'WalletLinked');
         // TODO: use action meta attributes to determine denomination and conversion to XP,
@@ -776,6 +802,24 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
               });
             }),
         );
+      },
+      XpAwarded: async ({ id, payload }) => {
+        const user = await models.User.findOne({
+          where: { id: payload.user_id },
+        });
+        if (!user) return;
+        const action_metas = await getQuestActionMetas(payload, 'XpAwarded');
+        await recordXpsForQuest({
+          event_id: id,
+          user_id: payload.user_id,
+          event_created_at: payload.created_at,
+          action_metas,
+          scope: {
+            amount: payload.xp_amount,
+            award_reason: payload.reason,
+            awarded_by_user_id: payload.by_user_id,
+          },
+        });
       },
     },
   };

@@ -12,6 +12,12 @@ export function useConnectedWallet() {
   >();
 
   useEffect(() => {
+    if (!privy.authenticated) {
+      setConnectedWallet(undefined);
+    }
+  }, [privy.authenticated]);
+
+  useEffect(() => {
     async function doAsync() {
       if (!privy.authenticated) {
         return;

@@ -27,7 +27,9 @@ const ThreadRedirect = ({ id }: { id: number }) => {
       if (newThread) {
         const newParams = new URLSearchParams(window.location.search);
         newParams.delete('newThread');
-        newParams.append('topic', topic.id);
+        if (topic.id !== undefined) {
+          newParams.append('topic', String(topic.id));
+        }
         navigate(
           `/new/discussion?${newParams.toString()}`,
           { replace: true },

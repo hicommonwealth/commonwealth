@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import Permissions from 'client/scripts/utils/Permissions';
 import clsx from 'clsx';
@@ -45,8 +45,7 @@ const StakeIntegration = ({
   });
 
   const contractInfo =
-    // @ts-expect-error <StrictNullChecks/>
-    commonProtocol?.factoryContracts[app?.chain?.meta?.ChainNode?.eth_chain_id];
+    factoryContracts[app?.chain?.meta?.ChainNode?.eth_chain_id || ''];
 
   if (!contractInfo) {
     return <PageNotFound />;
@@ -101,8 +100,8 @@ const StakeIntegration = ({
         {stakeEnabled ? (
           <>
             <ContractInfo
-              contractAddress={contractInfo?.factory}
-              smartContractAddress={contractInfo?.communityStake}
+              contractAddress={contractInfo?.NamespaceFactory}
+              smartContractAddress={contractInfo?.CommunityStake}
               voteWeightPerStake="1"
               namespace={community?.namespace}
               symbol={community?.default_symbol}

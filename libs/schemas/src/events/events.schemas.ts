@@ -12,7 +12,9 @@ import { FarcasterAction } from '../entities/farcaster.schemas';
 import { LaunchpadToken } from '../entities/launchpad-token.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
+import { ThreadToken } from '../entities/thread-token.schemas';
 import { Thread } from '../entities/thread.schemas';
+import { User } from '../entities/user.schemas';
 import { DiscordEventBase, Tweet } from '../integrations';
 import { EVM_ADDRESS_STRICT, EVM_BYTES, PG_INT } from '../utils';
 
@@ -70,6 +72,7 @@ export const events = {
     user_id: z.number(),
     created_at: z.coerce.date(),
     referrer_address: z.string().nullish(),
+    user: User,
   }),
 
   AddressOwnershipTransferred: z.object({
@@ -359,6 +362,11 @@ export const events = {
     created_at: z.coerce.date(),
   }),
 
+  UserUpdated: z.object({
+    old_user: User,
+    new_user: User,
+  }),
+
   QuestStarted: z.object({
     id: PG_INT.nullish(),
     name: z.string().max(255),
@@ -427,6 +435,10 @@ export const events = {
     token: LaunchpadToken,
   }),
 
+  ThreadTokenGraduated: z.object({
+    token: ThreadToken,
+  }),
+
   LaunchpadTokenTraded: z.object({
     block_timestamp: z.coerce.bigint(),
     transaction_hash: z.string(),
@@ -457,6 +469,13 @@ export const events = {
       _namespaceDeployer: EVM_ADDRESS_STRICT,
       nameSpaceAddress: EVM_ADDRESS_STRICT,
     }),
+  }),
+
+  CommunityNamespaceCreated: z.object({
+    name: z.string(),
+    token: z.string(),
+    namespaceAddress: z.string(),
+    governanceAddress: z.string(),
   }),
 
   WalletLinked: z.object({
@@ -608,6 +627,19 @@ export const events = {
     community_id: z.string(),
     tag_names: z.array(z.string()),
     selected_community_ids: z.array(z.string()),
+    created_at: z.coerce.date(),
+  }),
+
+  RefreshWeightedVotesRequested: z.object({
+    topic_id: PG_INT,
+    community_id: z.string(),
+  }),
+
+  XpAwarded: z.object({
+    by_user_id: PG_INT,
+    user_id: PG_INT,
+    xp_amount: z.number(),
+    reason: z.string(),
     created_at: z.coerce.date(),
   }),
 } as const;

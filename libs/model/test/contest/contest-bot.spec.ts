@@ -1,13 +1,13 @@
 /* eslint-disable max-len */
 
+import { describe, expect, test } from 'vitest';
 import {
   ContestMetadataResponse,
   DEFAULT_CONTEST_BOT_PARAMS,
   getContestUSDCAddress,
   parseBotCommand,
   ParseBotCommandError,
-} from 'model/src/services/openai/parseBotCommand';
-import { describe, expect, test } from 'vitest';
+} from '../../src/services/openai/parseBotCommand';
 
 type TestCase = {
   input: string;

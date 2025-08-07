@@ -22,6 +22,7 @@ const useUpdateUserMutation = ({
     onSuccess: async (updated) => {
       await utils.user.getUserProfile.refetch({}); // we access this in some page which fetches auth user profile
       await utils.user.getUserProfile.refetch({ userId: user.id });
+      await utils.user.getUserAddresses.invalidate();
 
       updated.is_welcome_onboard_flow_complete &&
         user.setData({

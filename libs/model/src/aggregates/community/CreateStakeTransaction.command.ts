@@ -1,7 +1,7 @@
 import type { Command } from '@hicommonwealth/core';
 import {
-  commonProtocol,
   getAndVerifyStakeTrade,
+  ValidChains,
 } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
@@ -48,7 +48,7 @@ export function CreateStakeTransaction(): Command<
       mustExist('Community namespace', community!.namespace);
 
       if (
-        !Object.values(commonProtocol.ValidChains).includes(
+        !Object.values(ValidChains).includes(
           community!.ChainNode!.eth_chain_id!,
         )
       ) {
@@ -59,8 +59,7 @@ export function CreateStakeTransaction(): Command<
         community!.ChainNode!.private_url || community!.ChainNode!.url;
 
       const res = await getAndVerifyStakeTrade({
-        ethChainId: community!.ChainNode!
-          .eth_chain_id as commonProtocol.ValidChains,
+        ethChainId: community!.ChainNode!.eth_chain_id as ValidChains,
         rpc,
         txHash: transaction_hash,
         namespace: community.namespace!,

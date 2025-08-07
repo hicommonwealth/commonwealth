@@ -1,6 +1,12 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { expect } from 'chai';
-import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+} from 'vitest';
 import {
   GetSubscriptionPreferences,
   UpdateSubscriptionPreferences,

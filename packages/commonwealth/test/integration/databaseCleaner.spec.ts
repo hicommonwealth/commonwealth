@@ -2,17 +2,12 @@ import { dispose } from '@hicommonwealth/core';
 import {
   getCommentSearchVector,
   getThreadSearchVector,
-  tester,
   type DB,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/models';
+import * as tester from '@hicommonwealth/model/tester';
 import { UserTierMap } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
-import { Sequelize } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { cleanSubscriptions } from '../../server/workers/graphileWorker/tasks/cleanSubscriptions';
-
-chai.use(chaiHttp);
 
 describe('DatabaseCleaner Tests', async () => {
   let models: DB;
@@ -59,13 +54,15 @@ describe('DatabaseCleaner Tests', async () => {
         profile: {},
         tier: UserTierMap.ManuallyVerified,
       });
-      // @ts-expect-error StrictNullChecks
       await models.Address.create({
         user_id: oldUser.id,
         address: '0x1234',
         community_id: 'ethereum',
         verification_token: 'blah',
-        last_active: Sequelize.literal(`NOW() - INTERVAL '13 months'`) as any,
+        last_active: new Date(Date.now() - 13 * 30 * 24 * 60 * 60 * 1000), // 13 months ago,
+        ghost_address: false,
+        role: 'member',
+        is_banned: false,
       });
 
       // create new user and address
@@ -75,13 +72,15 @@ describe('DatabaseCleaner Tests', async () => {
         profile: {},
         tier: UserTierMap.ManuallyVerified,
       });
-      // @ts-expect-error StrictNullChecks
       const address = await models.Address.create({
         user_id: newUser.id,
         address: '0x2345',
         community_id: 'ethereum',
         verification_token: 'blah',
-        last_active: Sequelize.literal(`NOW()`) as any,
+        last_active: new Date(),
+        ghost_address: false,
+        role: 'member',
+        is_banned: false,
       });
 
       const topic = await models.Topic.create({

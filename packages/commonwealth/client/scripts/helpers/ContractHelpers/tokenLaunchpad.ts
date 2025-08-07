@@ -2,7 +2,14 @@ import {
   TokenBondingCurveAbi,
   TokenLaunchpadAbi,
 } from '@commonxyz/common-protocol-abis';
-import { commonProtocol as cp, erc20Abi } from '@hicommonwealth/evm-protocols';
+import {
+  buyPostToken,
+  erc20Abi,
+  getPostPrice,
+  launchPostToken,
+  sellPostToken,
+  transferPostLiquidity,
+} from '@hicommonwealth/evm-protocols';
 import { Contract } from 'web3';
 import ContractBase from './ContractBase';
 
@@ -58,7 +65,7 @@ class TokenLaunchpad extends ContractBase {
         await this.initialize(true, chainId);
       }
 
-      return await cp.launchPostToken(
+      return await launchPostToken(
         this.launchpadFactory,
         name,
         symbol,
@@ -90,7 +97,7 @@ class TokenLaunchpad extends ContractBase {
       if (!this.initialized || !this.walletEnabled) {
         await this.initialize(true);
       }
-      return await cp.buyPostToken(
+      return await buyPostToken(
         this.contract,
         postTokenAddress,
         recipient,
@@ -115,7 +122,7 @@ class TokenLaunchpad extends ContractBase {
       if (!this.initialized || !this.walletEnabled) {
         await this.initialize(true);
       }
-      return await cp.sellPostToken(
+      return await sellPostToken(
         this.contract,
         postTokenAddress,
         amount,
@@ -139,7 +146,7 @@ class TokenLaunchpad extends ContractBase {
       if (!this.initialized || !this.walletEnabled) {
         await this.initialize(true);
       }
-      return await cp.transferPostLiquidity(
+      return await transferPostLiquidity(
         this.contract,
         tokenAddress,
         amountIn,
@@ -162,7 +169,7 @@ class TokenLaunchpad extends ContractBase {
       await this.initialize(true, chainId);
     }
 
-    const amountOut = await cp.getPostPrice(
+    const amountOut = await getPostPrice(
       this.contract,
       postTokenAddress,
       amountIn,

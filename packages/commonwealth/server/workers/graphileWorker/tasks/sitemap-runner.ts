@@ -1,5 +1,5 @@
 import { logger, stats } from '@hicommonwealth/core';
-import { TaskPayloads } from '@hicommonwealth/model';
+import { TaskPayloads } from '@hicommonwealth/model/services';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import {
   createDatabasePaginatorDefault,

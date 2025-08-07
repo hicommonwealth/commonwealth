@@ -1,12 +1,11 @@
 import { disposeAdapter } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { delay } from '@hicommonwealth/shared';
-import { expect } from 'chai';
 import {
   numUnrelayedEvents,
   resetNumUnrelayedEvents,
 } from 'server/bindings/relayForever';
-import { afterEach, describe, test } from 'vitest';
+import { afterEach, describe, expect, test } from 'vitest';
 import { startMessageRelayer } from '../../../server/workers/messageRelayer/messageRelayer';
 import { testOutboxEvents } from './util';
 
@@ -70,7 +69,7 @@ describe('messageRelayer', { timeout: 20_000 }, () => {
       },
     });
     await pgClient.end();
-    expect(events.length).to.equal(3);
+    expect(events.length).to.equal(6);
     expect(numUnrelayedEvents).to.equal(0);
   });
 });

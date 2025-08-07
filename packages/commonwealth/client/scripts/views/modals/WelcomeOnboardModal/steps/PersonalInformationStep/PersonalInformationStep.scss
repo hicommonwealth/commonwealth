@@ -6,6 +6,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
   gap: 16px;
 
   .h4 {
@@ -36,16 +37,12 @@
       }
     }
   }
-  .footerContainer {
-    bottom: 40px;
+  .personal-info-footer {
     align-self: center;
     display: flex;
     flex-direction: column;
-    width: 90vw;
-    max-width: 400px;
-    @include media_queries.extraSmall {
-      position: absolute;
-    }
+    margin-top: auto;
+
     .primary {
       padding-left: 2rem;
       padding-right: 2rem;

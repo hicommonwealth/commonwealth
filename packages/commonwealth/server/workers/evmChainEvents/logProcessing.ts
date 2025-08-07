@@ -1,12 +1,12 @@
 import { logger as _logger, stats } from '@hicommonwealth/core';
 import {
-  EvmBlockDetails,
-  EvmChainSource,
-  EvmContractSources,
-  EvmEvent,
-  Log,
+  type EvmBlockDetails,
+  type EvmChainSource,
+  type EvmContractSources,
+  type EvmEvent,
+  type Log,
   chainEventMappers,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/services';
 import { EventPairs } from '@hicommonwealth/schemas';
 import { createPublicClient, getAddress, http } from 'viem';
 import { config } from '../../config';

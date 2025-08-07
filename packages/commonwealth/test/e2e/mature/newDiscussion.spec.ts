@@ -1,4 +1,5 @@
-import { config, models } from '@hicommonwealth/model';
+import { config } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { test } from '@playwright/test';
 import { e2eSeeder, login, type E2E_Seeder } from '../utils/e2eUtils';
 

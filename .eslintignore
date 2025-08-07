@@ -16,3 +16,4 @@ libs/chains/src/cosmos-ts
 *.nyc_output
 *coverage.json
 **/graphql.ts
+migrations

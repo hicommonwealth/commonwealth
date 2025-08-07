@@ -7,7 +7,6 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
-import { ChainEventPolicy, emitEvent } from '@hicommonwealth/model';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   ChainBase,
@@ -17,6 +16,7 @@ import {
   UserTierMap,
 } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
+import _ from 'lodash';
 import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
   BanAddress,
@@ -48,7 +48,9 @@ import type {
   MCPServerAttributes,
   TopicAttributes,
 } from '../../src/models';
+import { ChainEventPolicy } from '../../src/policies/ChainEventCreated.policy';
 import { seed } from '../../src/tester';
+import { emitEvent } from '../../src/utils/utils';
 import { drainOutbox } from '../utils';
 
 const chance = Chance();
@@ -370,7 +372,9 @@ describe('Community lifecycle', () => {
         },
       });
       expect(result).to.have.length(1);
-      expect(result?.[0]).to.toMatchObject(mcpServer);
+      expect(result?.[0]).to.toMatchObject(
+        _.omit(mcpServer, 'server_url', 'source_identifier'),
+      );
 
       const communityResult = await query(GetCommunity(), {
         actor: superAdminActor,
@@ -746,12 +750,22 @@ describe('Community lifecycle', () => {
           directory_page_enabled: true,
           directory_page_chain_node_id: ethNode.id,
           type: ChainType.Offchain,
+          name: `${new Date().getTime()}`,
+          description: `${new Date().getTime()}`,
+          social_links: ['http://discord.gg', 'https://t.me/'],
         },
       });
 
       assert.equal(updated?.directory_page_enabled, true);
       assert.equal(updated?.directory_page_chain_node_id, ethNode.id);
       assert.equal(updated?.type, 'offchain');
+      assert.equal(updated?.default_symbol, 'EDG');
+      // don't allow updating base
+      assert.equal(updated?.base, 'ethereum');
+      assert.equal(updated?.icon_url, 'assets/img/protocols/edg.png');
+      assert.equal(updated?.active, true);
+      expect(updated?.social_links).toContain('http://discord.gg');
+      expect(updated?.social_links).toContain('https://t.me/');
     });
 
     test('ensure update community does not override allow_tokenized_threads', async () => {

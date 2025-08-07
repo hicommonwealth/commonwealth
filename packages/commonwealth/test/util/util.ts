@@ -5,17 +5,16 @@ import {
 import {
   ChildContractNames,
   EvmEventSignatures,
-  commonProtocol,
+  getFactoryContract,
+  ValidChains,
 } from '@hicommonwealth/evm-protocols';
-import {
-  EvmEventSourceInstance,
-  createTestRpc,
-  models,
-} from '@hicommonwealth/model';
+import { createTestRpc } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { EvmEventSourceInstance } from '@hicommonwealth/model/models';
 import { AbiType } from '@hicommonwealth/shared';
 
 export async function createContestEventSources(
-  ethChainId: commonProtocol.ValidChains,
+  ethChainId: ValidChains,
   singleContestContractAddress: string,
   recurringContestContractAddress: string,
 ): Promise<{
@@ -27,9 +26,8 @@ export async function createContestEventSources(
       contract_address: singleContestContractAddress,
       event_signature: EvmEventSignatures.Contests.SingleContestStarted,
       contract_name: ChildContractNames.SingleContest,
-      parent_contract_address:
-        commonProtocol.factoryContracts[commonProtocol.ValidChains.SepoliaBase]
-          .factory,
+      parent_contract_address: getFactoryContract(ValidChains.SepoliaBase)
+        .NamespaceFactory,
       created_at_block: 1,
       events_migrated: true,
     },
@@ -38,9 +36,8 @@ export async function createContestEventSources(
       contract_address: recurringContestContractAddress,
       event_signature: EvmEventSignatures.Contests.RecurringContestStarted,
       contract_name: ChildContractNames.RecurringContest,
-      parent_contract_address:
-        commonProtocol.factoryContracts[commonProtocol.ValidChains.SepoliaBase]
-          .factory,
+      parent_contract_address: getFactoryContract(ValidChains.SepoliaBase)
+        .NamespaceFactory,
       created_at_block: 1,
       events_migrated: true,
     },
@@ -52,37 +49,35 @@ export async function createContestEventSources(
 }
 
 export const singleEventSource = {
-  [commonProtocol.ValidChains.SepoliaBase]: {
-    rpc: createTestRpc(commonProtocol.ValidChains.SepoliaBase),
+  [ValidChains.SepoliaBase]: {
+    rpc: createTestRpc(ValidChains.SepoliaBase),
     contracts: {
-      [commonProtocol.factoryContracts[
-        commonProtocol.ValidChains.SepoliaBase
-      ].communityStake.toLowerCase()]: {
+      [getFactoryContract(
+        ValidChains.SepoliaBase,
+      ).CommunityStake.toLowerCase()]: {
         abi: CommunityStakeAbi,
         sources: [
           {
-            eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
+            eth_chain_id: ValidChains.SepoliaBase,
             event_signature: EvmEventSignatures.CommunityStake.Trade,
-            contract_address:
-              commonProtocol.factoryContracts[
-                commonProtocol.ValidChains.SepoliaBase
-              ].communityStake.toLowerCase(),
+            contract_address: getFactoryContract(
+              ValidChains.SepoliaBase,
+            ).CommunityStake.toLowerCase(),
           },
         ],
       },
-      [commonProtocol.factoryContracts[
-        commonProtocol.ValidChains.SepoliaBase
-      ].factory.toLowerCase()]: {
+      [getFactoryContract(
+        ValidChains.SepoliaBase,
+      ).NamespaceFactory.toLowerCase()]: {
         abi: NamespaceFactoryAbi as unknown as AbiType,
         sources: [
           {
-            eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
+            eth_chain_id: ValidChains.SepoliaBase,
             event_signature:
               EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-            contract_address:
-              commonProtocol.factoryContracts[
-                commonProtocol.ValidChains.SepoliaBase
-              ].factory.toLowerCase(),
+            contract_address: getFactoryContract(
+              ValidChains.SepoliaBase,
+            ).NamespaceFactory.toLowerCase(),
           },
         ],
       },
@@ -93,37 +88,31 @@ export const singleEventSource = {
 
 export const multipleEventSource = {
   ...singleEventSource,
-  [commonProtocol.ValidChains.Base]: {
-    rpc: createTestRpc(commonProtocol.ValidChains.Base),
+  [ValidChains.Base]: {
+    rpc: createTestRpc(ValidChains.Base),
     contracts: {
-      [commonProtocol.factoryContracts[
-        commonProtocol.ValidChains.Base
-      ].communityStake.toLowerCase()]: {
+      [getFactoryContract(ValidChains.Base).CommunityStake.toLowerCase()]: {
         abi: CommunityStakeAbi,
         sources: [
           {
-            eth_chain_id: commonProtocol.ValidChains.Base,
+            eth_chain_id: ValidChains.Base,
             event_signature: EvmEventSignatures.CommunityStake.Trade,
-            contract_address:
-              commonProtocol.factoryContracts[
-                commonProtocol.ValidChains.Base
-              ].communityStake.toLowerCase(),
+            contract_address: getFactoryContract(
+              ValidChains.Base,
+            ).CommunityStake.toLowerCase(),
           },
         ],
       },
-      [commonProtocol.factoryContracts[
-        commonProtocol.ValidChains.Base
-      ].factory.toLowerCase()]: {
+      [getFactoryContract(ValidChains.Base).NamespaceFactory.toLowerCase()]: {
         abi: NamespaceFactoryAbi,
         sources: [
           {
-            eth_chain_id: commonProtocol.ValidChains.Base,
+            eth_chain_id: ValidChains.Base,
             event_signature:
               EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-            contract_address:
-              commonProtocol.factoryContracts[
-                commonProtocol.ValidChains.Base
-              ].factory.toLowerCase(),
+            contract_address: getFactoryContract(
+              ValidChains.Base,
+            ).NamespaceFactory.toLowerCase(),
           },
         ],
       },

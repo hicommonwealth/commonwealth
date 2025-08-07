@@ -1,5 +1,3 @@
-import { useFlag } from 'hooks/useFlag';
-import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback } from 'react';
 import { AuthModalType } from '../../modals/AuthModal';
 import { CWButton } from '../component_kit/new_designs/CWButton';
@@ -15,16 +13,9 @@ const AuthButtons = ({
   fullWidthButtons = false,
   smallHeightButtons = false,
 }: AuthButtonsProps) => {
-  const navigate = useCommonNavigate();
-  const privyEnabled = useFlag('privy');
-
   const handleSignIn = useCallback(() => {
-    if (privyEnabled) {
-      navigate('/sign-in');
-    } else {
-      onButtonClick(AuthModalType.SignIn);
-    }
-  }, [navigate, onButtonClick, privyEnabled]);
+    onButtonClick(AuthModalType.SignIn);
+  }, [onButtonClick]);
 
   const isDisabled = location.pathname.includes('/finishsociallogin');
 

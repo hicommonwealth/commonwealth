@@ -2,8 +2,9 @@ import { dispose } from '@hicommonwealth/core';
 import {
   ChildContractNames,
   EvmEventSignatures,
-  commonProtocol,
+  ValidChains,
   getBlockNumber,
+  getFactoryContract,
 } from '@hicommonwealth/evm-protocols';
 import {
   CommunityStake,
@@ -13,14 +14,15 @@ import {
   mineBlocks,
 } from '@hicommonwealth/evm-testing';
 import {
-  ChainNodeInstance,
-  EvmChainSource,
-  LastProcessedEvmBlockInstance,
-  Log,
   createEventRegistryChainNodes,
   equalEvmAddresses,
-  models,
 } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import {
+  ChainNodeInstance,
+  LastProcessedEvmBlockInstance,
+} from '@hicommonwealth/model/models';
+import { EvmChainSource, Log } from '@hicommonwealth/model/services';
 import { EventPair, events as eventSchemas } from '@hicommonwealth/schemas';
 import { Anvil } from '@viem/anvil';
 import { Op } from 'sequelize';
@@ -45,9 +47,7 @@ import { startEvmPolling } from '../../../server/workers/evmChainEvents/startEvm
 vi.mock('../../../server/workers/evmChainEvents/getEventSources');
 
 const namespaceDeployedLog = {
-  address:
-    commonProtocol.factoryContracts[commonProtocol.ValidChains.SepoliaBase]
-      .factory,
+  address: getFactoryContract(ValidChains.SepoliaBase).NamespaceFactory,
   topics: [EvmEventSignatures.NamespaceFactory.NamespaceDeployed],
   // eslint-disable-next-line max-len
   data: '0x0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb9226600000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266000000000000000000000000000000000000000000000000000000000000001363657465737431373237373734373236393138000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
@@ -61,15 +61,15 @@ const namespaceDeployedLog = {
   logIndex: 4,
   removed: false,
 };
-const namespaceFactoryAddress =
-  commonProtocol.factoryContracts[commonProtocol.ValidChains.SepoliaBase]
-    .factory;
+const namespaceFactoryAddress = getFactoryContract(
+  ValidChains.SepoliaBase,
+).NamespaceFactory;
 const namespaceFactory = new NamespaceFactory();
 const namespaceName = `cetest${new Date().getTime()}`;
 
-const communityStakeAddress =
-  commonProtocol.factoryContracts[commonProtocol.ValidChains.SepoliaBase]
-    .communityStake;
+const communityStakeAddress = getFactoryContract(
+  ValidChains.SepoliaBase,
+).CommunityStake;
 const communityStake = new CommunityStake();
 
 describe('EVM Chain Events Devnet Tests', () => {
@@ -79,7 +79,7 @@ describe('EVM Chain Events Devnet Tests', () => {
   let anvil: Anvil | undefined;
 
   beforeAll(async () => {
-    anvil = await getAnvil(commonProtocol.ValidChains.SepoliaBase);
+    anvil = await getAnvil(ValidChains.SepoliaBase);
 
     let res = await namespaceFactory.deployNamespace(namespaceName);
     namespaceDeployedBlock = res.block;
@@ -148,9 +148,7 @@ describe('EVM Chain Events Devnet Tests', () => {
           rpc: localRpc,
           maxBlockRange: 10,
           contractAddresses: [
-            commonProtocol.factoryContracts[
-              commonProtocol.ValidChains.SepoliaBase
-            ].factory,
+            getFactoryContract(ValidChains.SepoliaBase).NamespaceFactory,
           ],
           startingBlockNum: namespaceDeployedBlock - 11,
           endingBlockNum: namespaceDeployedBlock - 1,
@@ -162,9 +160,7 @@ describe('EVM Chain Events Devnet Tests', () => {
           rpc: localRpc,
           maxBlockRange: 500,
           contractAddresses: [
-            commonProtocol.factoryContracts[
-              commonProtocol.ValidChains.SepoliaBase
-            ].factory,
+            getFactoryContract(ValidChains.SepoliaBase).NamespaceFactory,
           ],
           startingBlockNum: namespaceDeployedBlock,
           endingBlockNum: namespaceDeployedBlock,
@@ -212,10 +208,8 @@ describe('EVM Chain Events Devnet Tests', () => {
         [
           namespaceDeployedLog,
           {
-            address:
-              commonProtocol.factoryContracts[
-                commonProtocol.ValidChains.SepoliaBase
-              ].factory,
+            address: getFactoryContract(ValidChains.SepoliaBase)
+              .NamespaceFactory,
             topics: ['0xfake_topic'],
           } as Log,
         ],
@@ -353,14 +347,14 @@ describe('EVM Chain Events Devnet Tests', () => {
   });
 
   describe('EVM Chain Events End to End Tests', () => {
-    const sepoliaBaseChainId = commonProtocol.ValidChains.SepoliaBase;
+    const sepoliaBaseChainId = ValidChains.SepoliaBase;
 
     let chainNode: ChainNodeInstance;
 
     beforeAll(async () => {
       const chainNodes = await createEventRegistryChainNodes();
       const sepoliaBaseChainNode = chainNodes.find(
-        (c) => c.eth_chain_id === commonProtocol.ValidChains.SepoliaBase,
+        (c) => c.eth_chain_id === ValidChains.SepoliaBase,
       );
       sepoliaBaseChainNode!.url = localRpc;
       sepoliaBaseChainNode!.private_url = localRpc;
@@ -380,7 +374,7 @@ describe('EVM Chain Events Devnet Tests', () => {
       { timeout: 80_000 },
       async () => {
         const stakeAddress =
-          commonProtocol.factoryContracts[sepoliaBaseChainId].communityStake;
+          getFactoryContract(sepoliaBaseChainId).CommunityStake;
 
         const { getEventSources } = await import(
           '../../../server/workers/evmChainEvents/getEventSources'

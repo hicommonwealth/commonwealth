@@ -1,3 +1,4 @@
+export * from './AwardXp.command';
 export * from './CreateChainNode.command';
 export * from './CreateCommunityGoalMeta.command';
 export * from './EnableDigestEmail';
@@ -6,6 +7,7 @@ export * from './GetCommunityGoalMetas.query';
 export * from './GetCommunityMembersStats.query';
 export * from './GetStats.query';
 export * from './GetTopUsers.query';
+export * from './ReRankThreads.command';
 export * from './SetCommunityTier.command';
 export * from './SetUserTier.command';
 export * from './TriggerNotificationsWorkflow.command';

@@ -1,5 +1,6 @@
 import { dispose } from '@hicommonwealth/core';
-import { models, UserAttributes } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { UserAttributes } from '@hicommonwealth/model/models';
 import { WhereOptions } from 'sequelize';
 
 async function main() {
@@ -28,8 +29,7 @@ async function main() {
         address: process.env.SUPER_ADMIN_WALLET_ADDRESS,
       },
     });
-    // @ts-expect-error StrictNullChecks
-    where['id'] = address.user_id;
+    where['id'] = address!.user_id!;
   }
 
   await models.User.update(

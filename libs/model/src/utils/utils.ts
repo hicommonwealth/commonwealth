@@ -252,7 +252,10 @@ export async function uploadIfLarge(
       content: content,
       contentType: 'text/markdown',
     });
-    return { contentUrl: url, truncatedBody: safeTruncateBody(content, 500) };
+    return {
+      contentUrl: url,
+      truncatedBody: safeTruncateBody(content, CONTENT_CHAR_LIMIT),
+    };
   } else return { contentUrl: null, truncatedBody: null };
 }
 

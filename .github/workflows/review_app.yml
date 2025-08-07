@@ -161,9 +161,9 @@ jobs:
           RAILWAY_PARENT_ENV_ID: ${{ secrets.RAILWAY_PARENT_ENV_ID }}
         run: |
           pnpm -F railway deploy-review-app \
-            --env=pr-${{ steps.set_pr_number.outputs.pr_number }} \
-            --commit=${{ steps.set_effective_sha.outputs.sha }} \
-            --db-url=${{ steps.create_neon_branch.outputs.db_url }}
+            --env="pr-${{ steps.set_pr_number.outputs.pr_number }}" \
+            --commit="${{ steps.set_effective_sha.outputs.sha }}" \
+            --db-url="${{ steps.create_neon_branch.outputs.db_url }}"
 
       - name: Comment on PR with Deployment URL
         if: |
@@ -174,8 +174,8 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             if (process.env.DEPLOYMENT_URL) {
-              const message = `🚀 Review app deployed!\n\nYou can access the review app at: [${process.env.DEPLOYMENT_URL}](${process.env.DEPLOYMENT_URL})`;
-              
+              const message = `🚀 Review app deployed!\n\nYou can access the review app at: [${process.env.DEPLOYMENT_URL}](https://${process.env.DEPLOYMENT_URL})`;
+            
               github.rest.issues.createComment({
                 issue_number: ${{ steps.set_pr_number.outputs.pr_number }},
                 owner: context.repo.owner,
@@ -184,7 +184,29 @@ jobs:
               });
             } else {
               console.log('No deployment URL found to comment on PR');
+              const message = `⚠️ Review app deployed but deployment URL not found.\n\nCheck the Railway dashboard manually to get the URL.`
+              github.rest.issues.createComment({
+                  issue_number: ${{ steps.set_pr_number.outputs.pr_number }},
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: message
+              });
             }
+
+      - name: Comment on PR if Deployment Fails
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const message = `❌ Review app deployment failed!\n\nYou can view the failed workflow run for details: [View Run](${runUrl})`;
+            github.rest.issues.createComment({
+              issue_number: ${{ steps.set_pr_number.outputs.pr_number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });
 
       # TODO: check if this posts a new comment for each commit to an open PR if this updates the comment
       # TODO: if this creates a new comment for each commit, we need to update if so it only posts a

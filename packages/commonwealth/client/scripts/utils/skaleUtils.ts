@@ -1,4 +1,4 @@
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import axios from 'axios';
 import { BASE_API_PATH } from 'utils/trpcClient';
 
@@ -6,7 +6,7 @@ export const distributeSkale = async (
   walletAccount: string,
   chainId?: string,
 ) => {
-  if (chainId && parseInt(chainId) === cp.ValidChains.SKALE_TEST) {
+  if (chainId && parseInt(chainId) === ValidChains.SKALE_TEST) {
     const payload = {
       '0': {
         address: walletAccount,

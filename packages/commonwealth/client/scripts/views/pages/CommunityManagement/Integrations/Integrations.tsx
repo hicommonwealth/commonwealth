@@ -7,8 +7,9 @@ import CustomTOS from './CustomTOS';
 import CustomURL from './CustomURL';
 import Directory from './Directory';
 import Discord from './Discord';
-import MCP from './MCP';
+import GoogleSheetsMCP from './GoogleSheetsMCP';
 import './Integrations.scss';
+import MCP from './MCP';
 import OnchainVerification from './OnchainVerification';
 import Snapshots from './Snapshots';
 import SpamLevel from './SpamLevel';
@@ -21,6 +22,8 @@ const Integrations = () => {
   const isEthereum = app.chain.meta.base === ChainBase.Ethereum;
 
   const isJudgementEnabled = useFlag('judgeContest');
+  const mcpGoogleSheetsEnabled = useFlag('mcpGoogleSheets');
+  const mcpIntegrationsEnabled = useFlag('mcpIntegrationsEnabled');
 
   return (
     <CommunityManagementLayout
@@ -29,7 +32,7 @@ const Integrations = () => {
       featureHint={{
         title: 'Everything in one place',
         description: `
-         You can link to your projects custom terms of service page. 
+         You can link to your projects custom terms of service page.
          You can also contact us to create a custom URL that points to your Common community.
             `,
       }}
@@ -42,8 +45,9 @@ const Integrations = () => {
         <Stake />
         {isEthereum && <Snapshots />}
         <Tokenization />
-        <MCP />
+        {mcpIntegrationsEnabled && <MCP />}
         <Discord />
+        {mcpGoogleSheetsEnabled && <GoogleSheetsMCP />}
         <Webhooks />
         <CustomTOS />
         <CustomURL />

@@ -1,6 +1,6 @@
+import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
 
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import Contest from 'helpers/ContractHelpers/Contest';
 
 interface DeployRecurringContestOnchainProps {
@@ -32,7 +32,7 @@ const deployRecurringContestOnchain = async ({
 }: DeployRecurringContestOnchainProps) => {
   const contest = new Contest(
     '',
-    commonProtocol.factoryContracts[ethChainId].factory,
+    getFactoryContract(ethChainId).NamespaceFactory,
     chainRpc,
     ethChainId,
   );

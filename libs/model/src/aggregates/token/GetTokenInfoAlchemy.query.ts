@@ -1,6 +1,7 @@
 import { logger, type Query } from '@hicommonwealth/core';
-import { config, models } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { config } from '../../config';
+import { models } from '../../database';
 
 const errorObject = {
   network: '',
@@ -62,8 +63,11 @@ export function GetTokenInfoAlchemy(): Query<
       const json = await response.json();
 
       if (json?.error) {
+        if (json?.error?.message?.includes('Token not found')) {
+          return errorObject; // don't want to spam rollbar with errors
+        }
         log.error(
-          json.error.message ||
+          `GetTokenInfoAlchemy: ${json.error.message}` ||
             'Unknown error from alchemy in GetTokenInfoAlchemy query',
         );
         return errorObject;

@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import {
   notifyError,
   notifyInfo,
@@ -33,7 +33,7 @@ const ConnectTokenStep = ({
   // base chain node info
   const nodes = fetchCachedNodes();
   const baseNode = nodes?.find(
-    (n) => n.ethChainId === commonProtocol.ValidChains.Base,
+    (n) => n.ethChainId === ValidChains.Base,
   ) as NodeInfo; // this is expected to exist
 
   const {

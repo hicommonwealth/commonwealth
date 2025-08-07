@@ -189,6 +189,7 @@ export function updateActiveUser(data?: z.infer<(typeof GetStatus)['output']>) {
       referredByAddress: undefined,
       xpPoints: 0,
       xpReferrerPoints: 0,
+      notifyUserNameChange: false,
     });
   } else {
     const addresses = data.addresses.map((a) => {
@@ -236,6 +237,7 @@ export function updateActiveUser(data?: z.infer<(typeof GetStatus)['output']>) {
       referredByAddress: data.referred_by_address || undefined,
       xpReferrerPoints: data.xp_referrer_points || undefined,
       tier: data.tier || undefined,
+      notifyUserNameChange: data.notify_user_name_change || false,
     });
   }
 }

@@ -5,7 +5,7 @@
 */
 
 import { config, logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { exit } from 'process';
 
 const log = logger(import.meta);

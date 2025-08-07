@@ -2,13 +2,10 @@ import type { ILogger } from '@hicommonwealth/core';
 import { InvalidInput, Policy } from '@hicommonwealth/core';
 import { Events, events } from '@hicommonwealth/schemas';
 import { delay } from '@hicommonwealth/shared';
-import chai from 'chai';
 import { AckOrNack } from 'rascal';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { RabbitMQAdapter } from '../../src/rabbitmq/RabbitMQAdapter';
 import { createRmqConfig } from '../../src/rabbitmq/createRmqConfig';
-
-const expect = chai.expect;
 
 const idInput = '123';
 let idOutput: string | undefined;

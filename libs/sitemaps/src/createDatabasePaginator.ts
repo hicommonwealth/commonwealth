@@ -1,9 +1,6 @@
-import {
-  config,
-  models,
-  ThreadInstance,
-  UserAttributes,
-} from '@hicommonwealth/model';
+import { config } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { ThreadInstance, UserAttributes } from '@hicommonwealth/model/models';
 import { getThreadUrl, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 

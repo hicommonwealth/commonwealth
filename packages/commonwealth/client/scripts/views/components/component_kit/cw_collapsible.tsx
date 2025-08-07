@@ -8,10 +8,11 @@ import { ComponentType } from './types';
 type CollapsibleProps = {
   collapsibleContent: React.ReactNode;
   headerContent: React.ReactNode;
+  iconSize?: 'small' | 'medium' | 'large';
 };
 
 export const CWCollapsible = (props: CollapsibleProps) => {
-  const { collapsibleContent, headerContent } = props;
+  const { collapsibleContent, headerContent, iconSize } = props;
 
   const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
 
@@ -22,7 +23,7 @@ export const CWCollapsible = (props: CollapsibleProps) => {
           <div className="expand-icon-button">
             <CWIconButton
               iconName={isExpanded ? 'chevronDown' : 'chevronRight'}
-              iconSize="large"
+              iconSize={iconSize ? iconSize : 'large'}
               onClick={() => {
                 setIsExpanded(!isExpanded);
               }}

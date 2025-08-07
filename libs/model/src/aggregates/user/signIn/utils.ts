@@ -12,7 +12,7 @@ import { config } from '../../../config';
 import { models } from '../../../database';
 import { AddressAttributes } from '../../../models/address';
 import { UserAttributes } from '../../../models/user';
-import * as services from '../../../services';
+import { getBalances } from '../../../services/tokenBalanceCache';
 import { VerifiedUserInfo } from '../../../utils/oauth/types';
 import { emitSignInEvents } from './emitSignInEvents';
 
@@ -113,7 +113,7 @@ async function checkNativeWalletBalance(
   const tier = foundUser?.tier || UserTierMap.NewlyVerifiedWallet;
   if (tier < UserTierMap.SocialVerified) {
     const balances = ethChainId
-      ? await services.tokenBalanceCache.getBalances({
+      ? await getBalances({
           addresses: [address],
           balanceSourceType: BalanceSourceType.ETHNative,
           sourceOptions: { evmChainId: ethChainId },

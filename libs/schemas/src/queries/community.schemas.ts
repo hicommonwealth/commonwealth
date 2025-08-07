@@ -230,6 +230,8 @@ export const TopicView = Topic.extend({
   updated_at: z.date().or(z.string()).nullish(),
   deleted_at: z.date().or(z.string()).nullish(),
   archived_at: z.date().or(z.string()).nullish(),
+  recalculated_votes_start: z.date().or(z.string()).nullish(),
+  recalculated_votes_finish: z.date().or(z.string()).nullish(),
   total_threads: z.number().default(0),
   active_contest_managers: z.array(ConstestManagerView).optional(),
   allow_tokenized_threads: z.boolean().optional(),
@@ -251,9 +253,19 @@ export const GetTopics = {
 export const GetTopicById = {
   input: z.object({
     topic_id: z.number(),
+    includeGatingGroups: z.boolean().optional(),
   }),
-  // TODO: fix type
-  output: z.any(),
+  output: Topic.extend({
+    gatingGroups: z
+      .array(
+        z.object({
+          id: z.number(),
+          name: z.string().nullable(),
+          is_private: z.boolean(),
+        }),
+      )
+      .optional(),
+  }).optional(),
 };
 
 export const GetPinnedTokens = {

@@ -9,7 +9,8 @@ import {
   handleEvent,
   logger,
 } from '@hicommonwealth/core';
-import { ContestWorker, models } from '@hicommonwealth/model';
+import { ContestWorker } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { Client } from 'pg';
 import { config } from 'server/config';
 import { setupListener } from './pgListener';
@@ -66,8 +67,9 @@ export async function bootstrapBindings(options?: {
       hooks = item.hooks;
     }
 
-    // match worker name
+    // match worker name (options.worker defined in rascalConsumerMap)
     if ((options?.worker || '') !== (worker || '')) continue;
+    // policies run on the Commonwealth consumer by default
     await brokerInstance.subscribe(consumer, retryStrategy, hooks);
   }
 }

@@ -4,7 +4,8 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { logger, stats } from '@hicommonwealth/core';
-import { emitEvent, models } from '@hicommonwealth/model';
+import { emitEvent } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { WalletSsoSource } from '@hicommonwealth/shared';
 import {
   Client,

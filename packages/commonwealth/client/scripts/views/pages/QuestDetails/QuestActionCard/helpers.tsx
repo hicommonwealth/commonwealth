@@ -18,6 +18,7 @@ export const actionCopies = {
     ['XpChainEventCreated']: 'Engage on Blockchain',
     ['LaunchpadTokenRecordCreated']: 'Launch a Token on Common',
     ['LaunchpadTokenTraded']: 'Trade a Launchpad Token on Common',
+    ['LaunchpadTokenGraduated']: 'Graduate a Launchpad Token',
     ['ContestEnded']: 'Engage on a Contest till completion',
     ['CommunityGoalReached']: 'Complete the community goal',
     ['RecurringContestManagerDeployed']: 'Create a Recurring Contest',
@@ -40,6 +41,7 @@ export const actionCopies = {
     ['XpChainEventCreated']: () => '',
     ['LaunchpadTokenRecordCreated']: () => '',
     ['LaunchpadTokenTraded']: () => '',
+    ['LaunchpadTokenGraduated']: () => '',
     ['ContestEnded']: '',
     ['CommunityGoalReached']: () => '',
     ['RecurringContestManagerDeployed']: '',
@@ -67,6 +69,7 @@ export const actionCopies = {
       ) : (
         ''
       ),
+    // eslint-disable-next-line react/no-multi-comp
     ['TweetEngagement']: (likes: number, retweets: number, replies: number) => (
       <div>
         <ul>
@@ -125,7 +128,15 @@ export const actionCopies = {
         </ul>
       </div>
     ),
-    ['LaunchpadTokenRecordCreated']: () => '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['LaunchpadTokenRecordCreated']: () => (
+      <div>
+        <ul>
+          <li>● Active address requires ETH on Base to launch a token</li>
+        </ul>
+      </div>
+    ),
+    ['LaunchpadTokenGraduated']: () => '',
     // eslint-disable-next-line react/no-multi-comp
     ['LaunchpadTokenTraded']: (
       amountMultipler: string | number,
@@ -151,6 +162,7 @@ export const actionCopies = {
             ● No Aura is awarded if your trade amount multiplied by the aura
             multiplier does not equal at least 1 Aura.
           </li>
+          <li>● Active address requires ETH on Base to launch a token</li>
         </ul>
       </div>
     ),
@@ -201,6 +213,7 @@ export const actionCopies = {
     ['MembershipsRefreshed']: '',
     ['XpChainEventCreated']: '',
     ['LaunchpadTokenRecordCreated']: '',
+    ['LaunchpadTokenGraduated']: '',
     ['LaunchpadTokenTraded']: '',
     ['ContestEnded']: '',
     ['CommunityGoalReached']: '',

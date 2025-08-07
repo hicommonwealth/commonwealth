@@ -238,7 +238,7 @@ const PersonalInformationStep = ({
             />
           </div>
 
-          <div className="footerContainer">
+          <div className="personal-info-footer">
             <CWButton
               label="Next"
               buttonWidth="full"

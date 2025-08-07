@@ -1,4 +1,3 @@
-import { assert } from 'chai';
 import {
   countLinesMarkdown,
   countLinesQuill,
@@ -9,7 +8,7 @@ import {
   serializeDelta,
 } from 'client/scripts/views/components/react_quill_editor/utils';
 import { DeltaStatic } from 'quill';
-import { describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 describe('react quill editor unit tests', () => {
   describe('createDeltaFromText', () => {
@@ -20,7 +19,7 @@ describe('react quill editor unit tests', () => {
         ___isMarkdown: false,
       } as any as SerializableDeltaStatic;
       const result = createDeltaFromText(text);
-      assert.deepEqual(result, expectedDelta);
+      expect(result).toEqual(expectedDelta);
     });
 
     test('should convert text to delta (richtext) – bad input case', () => {
@@ -30,7 +29,7 @@ describe('react quill editor unit tests', () => {
         ___isMarkdown: false,
       } as any as SerializableDeltaStatic;
       const result = createDeltaFromText(text);
-      assert.deepEqual(result, expectedDelta);
+      expect(result).toEqual(expectedDelta);
     });
 
     test('should convert text to delta (markdown)', () => {
@@ -40,7 +39,7 @@ describe('react quill editor unit tests', () => {
         ___isMarkdown: true,
       } as any as SerializableDeltaStatic;
       const result = createDeltaFromText(text, true);
-      assert.deepEqual(result, expectedDelta);
+      expect(result).toEqual(expectedDelta);
     });
   });
 
@@ -51,7 +50,7 @@ describe('react quill editor unit tests', () => {
       } as SerializableDeltaStatic;
       const expectedText = 'wasup';
       const result = getTextFromDelta(delta);
-      assert.equal(result, expectedText);
+      expect(result).toBe(expectedText);
     });
   });
 
@@ -61,7 +60,7 @@ describe('react quill editor unit tests', () => {
       const content = 'hello\nthere\nblah\n';
       const expectedNumLines = 3;
       const result = countLinesMarkdown(content);
-      assert.equal(result, expectedNumLines);
+      expect(result).toBe(expectedNumLines);
     });
   });
 
@@ -73,7 +72,7 @@ describe('react quill editor unit tests', () => {
       } as DeltaStatic;
       const expectedNumLines = 4;
       const result = countLinesQuill(delta);
-      assert.equal(result, expectedNumLines);
+      expect(result).toBe(expectedNumLines);
     });
   });
 
@@ -86,7 +85,7 @@ describe('react quill editor unit tests', () => {
       const expectedOutput =
         '{"ops":[{"insert":"hello"}],"___isMarkdown":false}';
       const result = serializeDelta(original);
-      assert.equal(result, expectedOutput);
+      expect(result).toBe(expectedOutput);
     });
 
     test('should serialize a DeltaStatic (markdown) to string', () => {
@@ -96,7 +95,7 @@ describe('react quill editor unit tests', () => {
       } as SerializableDeltaStatic;
       const expectedOutput = 'hello';
       const result = serializeDelta(original);
-      assert.equal(result, expectedOutput);
+      expect(result).toBe(expectedOutput);
     });
   });
 
@@ -108,7 +107,7 @@ describe('react quill editor unit tests', () => {
         ___isMarkdown: false,
       } as SerializableDeltaStatic;
       const result = deserializeDelta(original);
-      assert.deepEqual(result, expectedOutput);
+      expect(result).toEqual(expectedOutput);
     });
 
     test('should deserialize a string (richtext) to DeltaStatic - bad input case', () => {
@@ -120,7 +119,7 @@ describe('react quill editor unit tests', () => {
       } as SerializableDeltaStatic;
       // @ts-expect-error StrictNullChecks
       const result = deserializeDelta(original);
-      assert.deepEqual(result, expectedOutput);
+      expect(result).toEqual(expectedOutput);
     });
 
     test('should deserialize a string (markdown) to DeltaStatic', () => {
@@ -130,7 +129,7 @@ describe('react quill editor unit tests', () => {
         ___isMarkdown: true,
       } as SerializableDeltaStatic;
       const result = deserializeDelta(original);
-      assert.deepEqual(result, expectedOutput);
+      expect(result).toEqual(expectedOutput);
     });
   });
 });

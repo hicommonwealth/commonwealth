@@ -66,6 +66,7 @@ export const User = z.object({
   xp_points: PG_INT.default(0).nullish(),
   xp_referrer_points: PG_INT.default(0).nullish(),
   privy_id: z.string().max(255).nullish(),
+  notify_user_name_change: z.boolean().default(false).nullish(),
 
   ProfileTags: z.array(ProfileTags).optional(),
   ApiKey: ApiKey.optional(),
@@ -94,7 +95,7 @@ export const Address = z.object({
   oauth_email_verified: z.boolean().nullish(),
   oauth_username: z.string().max(255).nullish(),
   oauth_phone_number: z.string().max(255).nullish(),
-
+  oauth_user_id: z.string().max(255).nullish(),
   User: User.optional().nullish(),
 
   created_at: z.coerce.date().optional(),

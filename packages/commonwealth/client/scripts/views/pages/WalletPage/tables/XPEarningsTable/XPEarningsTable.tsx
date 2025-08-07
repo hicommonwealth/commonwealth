@@ -61,6 +61,18 @@ const columns: CWTableColumnInfo[] = [
 ];
 
 function buildActionLink(log: z.infer<typeof XpLogView>) {
+  if (log.event_name === 'XpAwarded') {
+    return (
+      <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <CWIcon
+          iconName="trophy"
+          iconSize="small"
+          style={{ color: '#FFD700' }}
+        />
+        {log.scope?.award_reason}
+      </span>
+    );
+  }
   const title = splitCamelOrPascalCase(log.event_name);
   if (log.scope) {
     switch (log.event_name as keyof typeof QuestEvents) {

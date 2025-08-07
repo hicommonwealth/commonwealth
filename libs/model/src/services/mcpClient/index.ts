@@ -1,3 +1,4 @@
+import { config } from '@hicommonwealth/core';
 import { MCPServer } from '@hicommonwealth/schemas';
 import OpenAI from 'openai';
 import { z } from 'zod';
@@ -26,10 +27,16 @@ export function buildMCPClientOptions(
   allServers: CommonMCPServerWithHeaders[],
   previousResponseId: string | null,
 ): OpenAI.Responses.ResponseCreateParamsStreaming {
+  const mentionedServers = allServers.filter((server) =>
+    userInput.includes(`@${server.handle}`),
+  );
+  if (config.APP_ENV === 'local') {
+    console.log('mentionedServers: ', mentionedServers);
+  }
   return {
     model: 'gpt-4o-mini',
-    instructions: buildSystemPrompt(allServers),
-    tools: allServers.map((server) => ({
+    instructions: buildSystemPrompt(mentionedServers),
+    tools: mentionedServers.map((server) => ({
       type: 'mcp',
       server_label: server.handle!,
       server_url: server.server_url!,

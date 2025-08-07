@@ -1,8 +1,36 @@
 import { WalletSsoSource } from '@hicommonwealth/shared';
+import { ConnectedWallet } from '@privy-io/react-auth';
 import {
   OAuthProvider,
   PrivySignInSSOProvider,
 } from 'views/components/Privy/types';
+
+const DEFAULT_WAIT_TIMEOUT = 5000;
+const DEFAULT_POLL_INTERVAL = 100;
+
+/**
+ * Generic function to wait for a condition to be met with polling
+ */
+export async function waitForCondition<T>(
+  checkCondition: () => T | null | undefined,
+  timeout: number = DEFAULT_WAIT_TIMEOUT,
+  interval: number = DEFAULT_POLL_INTERVAL,
+): Promise<T | null> {
+  // Check if condition is already met
+  const initialResult = checkCondition();
+  if (initialResult) return initialResult;
+
+  let waitTime = 0;
+  while (waitTime < timeout) {
+    await new Promise((resolve) => setTimeout(resolve, interval));
+    waitTime += interval;
+
+    const result = checkCondition();
+    if (result) return result;
+  }
+
+  return null;
+}
 
 export function toSignInProvider(
   provider: WalletSsoSource | OAuthProvider,
@@ -27,4 +55,33 @@ export function toSignInProvider(
     default:
       throw new Error('Not supported: ' + provider);
   }
+}
+
+export function isOauthProvider(
+  value: WalletSsoSource | OAuthProvider,
+): value is OAuthProvider {
+  switch (value) {
+    case 'google':
+    case 'github':
+    case 'discord':
+    case 'twitter':
+    case 'apple':
+      return true;
+    default:
+      return false;
+  }
+}
+
+export async function waitForWallet(
+  walletRef: React.RefObject<ConnectedWallet | undefined>,
+): Promise<boolean> {
+  const result = await waitForCondition(() => walletRef.current);
+  return !!result;
+}
+
+export async function waitForOAuthToken(
+  provider: string,
+  oAuthTokensRef: React.RefObject<Record<string, string>>,
+): Promise<string | null> {
+  return await waitForCondition(() => oAuthTokensRef.current?.[provider]);
 }

@@ -1,8 +1,9 @@
 import { type Command } from '@hicommonwealth/core';
-import { getCommentSearchVector, models } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { models } from '../../database';
 import { authComment } from '../../middleware';
 import { mustBeAuthorizedComment } from '../../middleware/guards';
+import { getCommentSearchVector } from '../../models';
 
 export function ToggleCommentSpam(): Command<typeof schemas.ToggleCommentSpam> {
   return {

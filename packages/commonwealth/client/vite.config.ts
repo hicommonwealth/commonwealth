@@ -58,6 +58,15 @@ export default defineConfig(({ mode }) => {
       env.FLAG_NEW_PROFILE_PAGE,
     ),
     'process.env.FLAG_PRIVATE_TOPICS': JSON.stringify(env.FLAG_PRIVATE_TOPICS),
+    'process.env.FLAG_CRECIMIENTO_HACKATHON': JSON.stringify(
+      env.FLAG_CRECIMIENTO_HACKATHON,
+    ),
+    'process.env.FLAG_MCP_GOOGLE_SHEETS': JSON.stringify(
+      env.FLAG_MCP_GOOGLE_SHEETS,
+    ),
+    'process.env.FLAG_MCP_INTEGRATIONS_ENABLED': JSON.stringify(
+      env.FLAG_MCP_INTEGRATIONS_ENABLED,
+    ),
   };
 
   return {
@@ -116,6 +125,8 @@ export default defineConfig(({ mode }) => {
         'firebase/messaging',
         'eventsource-client',
         'react-datepicker',
+        'react-turnstile',
+        'react-dom',
         'moment/moment',
       ],
     },
@@ -147,6 +158,7 @@ export default defineConfig(({ mode }) => {
           secure: false,
         },
       },
+      allowedHosts: ['common.ngrok.app'],
     },
     resolve: {
       alias: [

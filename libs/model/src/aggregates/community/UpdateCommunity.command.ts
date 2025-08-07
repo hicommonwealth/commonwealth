@@ -9,7 +9,8 @@ import { z } from 'zod';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
-import { checkSnapshotObjectExists, commonProtocol } from '../../services';
+import { checkSnapshotObjectExists } from '../../services';
+import { newNamespaceValidator } from '../../services/commonProtocol';
 import { emitEvent } from '../../utils/utils';
 
 export const UpdateCommunityErrors = {
@@ -32,6 +33,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         description,
         default_symbol,
         icon_url,
+        launchpad_token_image,
         active,
         type,
         stages_enabled,
@@ -98,7 +100,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
 
         community.namespace = namespace;
         community.namespace_address =
-          await commonProtocol.newNamespaceValidator.validateNamespace(
+          await newNamespaceValidator.validateNamespace(
             namespace!,
             transactionHash,
             actor.address!,
@@ -161,6 +163,25 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
 
       await models.sequelize.transaction(async (transaction) => {
         await community.save({ transaction });
+
+        // update LaunchpadToken image if requested
+        if (launchpad_token_image !== undefined) {
+          const foundNamespace = namespace || community.namespace;
+          if (foundNamespace) {
+            const launchpadToken = await models.LaunchpadToken.findOne({
+              where: { namespace: foundNamespace },
+              transaction,
+            });
+            if (launchpadToken) {
+              // Prefer payload icon_url, else use community.icon_url
+              const newIconUrl = launchpad_token_image || community.icon_url;
+              if (newIconUrl && launchpadToken.icon_url !== newIconUrl) {
+                launchpadToken.icon_url = newIconUrl;
+                await launchpadToken.save({ transaction });
+              }
+            }
+          }
+        }
 
         if (weightedVotingProps) {
           // update general topic to use weighted voting

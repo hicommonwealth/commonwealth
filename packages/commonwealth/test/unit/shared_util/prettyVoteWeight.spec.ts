@@ -1,7 +1,6 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { expect } from 'chai';
 import { prettyVoteWeight } from 'shared/adapters/currency';
-import { describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 describe('prettyVoteWeight', () => {
   test('Unweighted', () => {

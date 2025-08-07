@@ -17,12 +17,13 @@ import {
   express as expressAdapter,
 } from '@hicommonwealth/adapters';
 import { AppError, query } from '@hicommonwealth/core';
-import { Community, generateTokenIdea, User } from '@hicommonwealth/model';
+import { Community, User } from '@hicommonwealth/model';
 import { get_atom_feed_router } from 'server/api/get-atom-feed-router';
 import generateImageHandler from '../routes/generateImage';
 import getUploadSignature from '../routes/getUploadSignature';
 import logout from '../routes/logout';
 
+import { generateTokenIdea } from '@hicommonwealth/model/services';
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { config } from '../config';
 import { aiCompletionHandler } from '../routes/ai';
@@ -42,7 +43,7 @@ function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
   app.use(api.integration.PATH, api.integration.build());
 
   // MCP endpoint
-  app.use(api.mcp.PATH, api.mcp.router);
+  app.use(api.mcpServer.PATH, api.mcpServer.router);
 
   registerRoute(router, 'get', '/feed', get_atom_feed_router);
 

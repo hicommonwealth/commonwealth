@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { factoryContracts, ValidChains } from '@hicommonwealth/evm-protocols';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import NodeInfo from 'models/NodeInfo';
 import { fetchCachedNodes } from 'state/api/nodes';
@@ -41,11 +41,9 @@ const particularChainNodes = (nodeInfo: NodeInfo) => {
   );
 };
 
-export const chainIdsWithStakeEnabled = Object.values(
-  commonProtocol.factoryContracts,
-)
+export const chainIdsWithStakeEnabled = Object.values(factoryContracts)
   // we don't support stake on Blast anymore as of 23 Sept, 2024 (#9196)
-  .filter((chain) => chain.chainId !== commonProtocol.ValidChains.Blast)
+  .filter((chain) => chain.chainId !== ValidChains.Blast)
   .map((c) => c.chainId);
 
 // Get chain id's from the fetchCachedNodes for all eth, cosmos, and sui chains
