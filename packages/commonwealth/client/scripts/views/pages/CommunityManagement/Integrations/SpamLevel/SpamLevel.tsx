@@ -1,7 +1,7 @@
 import { COMMUNITY_SPAM_TIER } from '@hicommonwealth/schemas';
 import { DisabledCommunitySpamTier, UserTierMap } from '@hicommonwealth/shared';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
-import { CWToggle } from 'client/scripts/views/components/component_kit/cw_toggle';
+import { CWToggle } from 'client/scripts/views/components/component_kit/cw_toggle_old';
 import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useCallback, useEffect, useState } from 'react';

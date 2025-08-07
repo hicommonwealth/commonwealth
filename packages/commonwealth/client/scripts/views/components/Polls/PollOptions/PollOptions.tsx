@@ -1,5 +1,5 @@
+import { CWRadioButton } from 'client/scripts/views/components/component_kit/cw_radio_button_old';
 import React from 'react';
-import { CWRadioButton } from 'views/components/component_kit/cw_radio_button';
 
 import './PollOptions.scss';
 

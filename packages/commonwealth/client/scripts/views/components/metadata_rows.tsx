@@ -4,10 +4,10 @@ import { CWLabel } from './component_kit/cw_label';
 import { CWText } from './component_kit/cw_text';
 import { CWTextArea } from './component_kit/cw_text_area';
 
-import type { RadioButtonType } from './component_kit/cw_radio_button';
+import type { RadioButtonType } from './component_kit/cw_radio_button_old';
 import { CWRadioGroup } from './component_kit/cw_radio_group';
 import { CWTextInput } from './component_kit/cw_text_input';
-import { CWToggle } from './component_kit/cw_toggle';
+import { CWToggle } from './component_kit/cw_toggle_old';
 import { ValidationStatus } from './component_kit/cw_validation_text';
 
 type InputRowProps = {

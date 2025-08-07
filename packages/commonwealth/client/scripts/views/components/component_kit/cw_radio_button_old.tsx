@@ -1,6 +1,6 @@
 import React from 'react';
 
-import './cw_radio_button.scss';
+import './cw_radio_button_old.scss';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 

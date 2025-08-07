@@ -4,7 +4,7 @@ import React, { useCallback, useState } from 'react';
 import { useCreateCommunityAlertMutation } from 'state/api/trpc/subscription/useCreateCommunityAlertMutation';
 import { useDeleteCommunityAlertMutation } from 'state/api/trpc/subscription/useDeleteCommunityAlertMutation';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
-import { CWToggle } from 'views/components/component_kit/cw_toggle';
+import { CWToggle } from 'views/components/component_kit/cw_toggle_old';
 import { z } from 'zod';
 
 type CommunityEntryProps = Readonly<{

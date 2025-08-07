@@ -2,8 +2,8 @@ import React from 'react';
 
 import './cw_radio_group.scss';
 
-import type { RadioButtonType } from './cw_radio_button';
-import { CWRadioButton } from './cw_radio_button';
+import type { RadioButtonType } from './cw_radio_button_old';
+import { CWRadioButton } from './cw_radio_button_old';
 import { ComponentType } from './types';
 
 type RadioGroupProps = {

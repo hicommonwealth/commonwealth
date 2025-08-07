@@ -1,6 +1,6 @@
 import { GatedActionEnum, UserFriendlyActionMap } from '@hicommonwealth/shared';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWToggle } from 'client/scripts/views/components/component_kit/cw_toggle';
+import { CWToggle } from 'client/scripts/views/components/component_kit/cw_toggle_old';
 import React from 'react';
 import {
   Topic,
