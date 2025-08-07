@@ -3,9 +3,12 @@ import { EVM_ADDRESS_STRICT, PG_INT } from '../utils';
 
 export const ClaimAddressView = z.object({
   user_id: PG_INT,
-  address: EVM_ADDRESS_STRICT,
+  address: EVM_ADDRESS_STRICT.nullish(),
+  tokens: z.coerce.number().nullish(),
+  magna_allocation_id: z.string().nullish(),
   magna_synced_at: z
-    .string()
+    .date()
+    .or(z.string())
     .nullish()
     .describe('When the address was synced with magna and made not updatable.'),
 });
