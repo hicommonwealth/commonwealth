@@ -45,6 +45,7 @@ const {
   MAGNA_API_KEY,
   MAGNA_API_URL,
   MAGNA_CONTRACT_ID,
+  MAGNA_TOKEN_ID,
   MAGNA_BATCH_SIZE,
 } = process.env;
 
@@ -179,6 +180,7 @@ export const config = configure(
       API_KEY: MAGNA_API_KEY,
       API_URL: MAGNA_API_URL,
       CONTRACT_ID: MAGNA_CONTRACT_ID,
+      TOKEN_ID: MAGNA_TOKEN_ID,
       BATCH_SIZE: parseInt(MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE, 10),
     },
   },
@@ -329,6 +331,7 @@ export const config = configure(
       API_KEY: z.string().optional(),
       API_URL: z.string().optional(),
       CONTRACT_ID: EVM_ADDRESS.optional(),
+      TOKEN_ID: EVM_ADDRESS.optional(),
       BATCH_SIZE: z.number(),
     }),
   }),

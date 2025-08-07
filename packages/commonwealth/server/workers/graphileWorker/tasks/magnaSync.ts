@@ -10,9 +10,6 @@ import * as magnaApi from '../../magna/api';
 
 const log = logger(import.meta);
 
-// Common Token
-const tokenId = '0xD7DA840121aeb9792b202bd84Db32B2816B30c0e';
-
 async function createMagnaAllocation({
   user_name,
   user_email,
@@ -26,7 +23,7 @@ async function createMagnaAllocation({
       walletAddress: wallet_address,
       amount: token_allocation.toString(),
       contractId: config.MAGNA.CONTRACT_ID!,
-      tokenId,
+      tokenId: config.MAGNA.TOKEN_ID!,
       category: 'Initial Airdrop',
       description: `Allocation for inital C token airdrop for ${user_name}`,
       stakeholder: {
@@ -46,7 +43,8 @@ export const magnaSyncTask: GraphileTask<typeof TaskPayloads.MagnaSync> = {
     if (
       !config.MAGNA.API_URL ||
       !config.MAGNA.API_KEY ||
-      !config.MAGNA.CONTRACT_ID
+      !config.MAGNA.CONTRACT_ID ||
+      !config.MAGNA.TOKEN_ID
     ) {
       log.error('Missing Magna configuration');
       return;
