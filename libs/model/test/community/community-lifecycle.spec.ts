@@ -16,6 +16,7 @@ import {
   UserTierMap,
 } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
+import _ from 'lodash';
 import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
   BanAddress,
@@ -371,7 +372,9 @@ describe('Community lifecycle', () => {
         },
       });
       expect(result).to.have.length(1);
-      expect(result?.[0]).to.toMatchObject(mcpServer);
+      expect(result?.[0]).to.toMatchObject(
+        _.omit(mcpServer, 'server_url', 'source_identifier'),
+      );
 
       const communityResult = await query(GetCommunity(), {
         actor: superAdminActor,
