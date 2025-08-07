@@ -68,6 +68,7 @@ export const trpcRouter = trpc.router({
   getStatus: trpc.query(User.GetStatus, trpc.Tag.User),
   updateEmail: trpc.command(User.UpdateEmail, trpc.Tag.User),
   getMutualConnections: trpc.query(User.GetMutualConnections, trpc.Tag.User),
+  getMoonpaySignature: trpc.query(User.GetMoonpaySignatureQuery, trpc.Tag.User),
   // Not really part of the user, but no better place to put it
   distributeSkale: trpc.command(User.DistributeSkale, trpc.Tag.Token),
 });

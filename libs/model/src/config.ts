@@ -95,6 +95,8 @@ const {
   KNOCK_IN_APP_FEED_ID,
   UNLEASH_FRONTEND_API_TOKEN,
   CONTEST_DURATION_IN_SEC,
+  MOONPAY_PUBLISHABLE_KEY,
+  MOONPAY_SECRET_KEY,
   REORG_SAFETY_DISABLED,
   SEND_EMAILS,
 } = process.env;
@@ -324,6 +326,10 @@ export const config = configure(
     },
     UNLEASH: {
       FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
+    },
+    MOONPAY: {
+      PUBLISHABLE_KEY: MOONPAY_PUBLISHABLE_KEY || '',
+      SECRET_KEY: MOONPAY_SECRET_KEY || '',
     },
   },
   z.object({
@@ -717,6 +723,10 @@ export const config = configure(
             requiredServices: [...WebServices],
           }),
         ),
+    }),
+    MOONPAY: z.object({
+      PUBLISHABLE_KEY: z.string().optional(),
+      SECRET_KEY: z.string().optional(),
     }),
   }),
 );
