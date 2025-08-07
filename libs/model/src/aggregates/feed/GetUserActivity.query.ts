@@ -12,6 +12,8 @@ export function GetUserActivity(): Query<typeof schemas.ActivityFeed> {
     auth: [authOptionalVerified],
     secure: true,
     body: async ({ payload, actor }) => {
+      if (!actor.user?.id) return [];
+
       const { comment_limit = 3, limit = 10, cursor = 1 } = payload;
 
       const query = buildUserActivityQuery(actor);
@@ -27,6 +29,7 @@ export function GetUserActivity(): Query<typeof schemas.ActivityFeed> {
           comment_limit,
           offset,
         },
+        logging: console.log,
       });
 
       return schemas.buildPaginatedResponse(
