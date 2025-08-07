@@ -7,12 +7,12 @@
   gap: 8px;
   width: 100%;
 
-  > .CWSelectList > .SelectList {
+  .CWSelectList > .SelectList {
     padding: 4px 8px !important;
     line-height: initial;
     min-height: initial;
     max-height: 40px;
-    width: fit-content;
+    width: 100%;
   }
 
   .add-funds-btn {
