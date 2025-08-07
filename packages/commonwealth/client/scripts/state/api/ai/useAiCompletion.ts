@@ -1,4 +1,7 @@
-import { CompletionOptions } from '@hicommonwealth/shared';
+import {
+  CompletionOptions,
+  DEFAULT_COMPLETION_MODEL,
+} from '@hicommonwealth/shared';
 import { notifyInfo } from 'client/scripts/controllers/app/notifications';
 import { useCallback, useState } from 'react';
 import { userStore } from 'state/ui/user';
@@ -118,7 +121,7 @@ ${contextualData}
           prompt: string;
         } = {
           prompt: userPrompt,
-          model: options?.model || 'gpt-4o',
+          model: options?.model || DEFAULT_COMPLETION_MODEL,
           maxTokens: options?.maxTokens,
           stream: streamMode,
           useOpenRouter: options?.useOpenRouter,
