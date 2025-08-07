@@ -38,6 +38,7 @@ interface ScoringConfig {
   auraOrder?: string;
   auraEndDate?: string;
   setClaimAddresses?: boolean;
+  topN?: number;
 }
 
 function parseArguments(): ScoringConfig {
@@ -61,6 +62,7 @@ function parseArguments(): ScoringConfig {
   let auraOrder: string = 'token_allocation DESC';
   let auraEndDate: string = new Date().toISOString();
   let setClaimAddresses = false;
+  let topN: number | undefined = undefined;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -246,6 +248,15 @@ function parseArguments(): ScoringConfig {
         setClaimAddresses = true;
         break;
 
+      case '--top-n':
+      case '-n':
+        const topNValue = parseInt(args[i], 10);
+        if (isNaN(topNValue) || topNValue < 0) {
+          throw new Error('Top N value must be a non-negative integer');
+        }
+        topN = topNValue;
+        break;
+
       case '-h':
       case '--help':
         printUsage();
@@ -271,6 +282,7 @@ function parseArguments(): ScoringConfig {
     auraOrder,
     auraEndDate,
     setClaimAddresses,
+    topN,
   };
 }
 
@@ -332,7 +344,7 @@ function isValidAuraOrder(orderClause: string): boolean {
 
 function printUsage(): void {
   console.log(`
-Usage: ts-node historic-contribution-scoring.ts [options]
+Usage: pnpm ts-exec historic-contribution-scoring.ts [options]
 
 Options:
   -he, --historical-end-date <ISO_DATE>  Historical end datetime (ISO string, default: 2025-05-01T12:00:00.000Z)
@@ -344,10 +356,11 @@ Options:
   -nv, --no-vietnamese              Exclude Vietnamese content (default: false)
   -ml, --minLength <NUMBER>         Minimum content length (integer, default: undefined)
   -sp, --supply-percent <NUMBER>    Supply percent for token allocation (0-100, default: 2.5)
-  -ho, --historical-order <ORDER>  Historical allocation ordering (default: "token_allocation DESC")
-  -ao, --aura-order <ORDER>        Aura allocation ordering (default: "token_allocation DESC")
-  -aed, --aura-end-date <ISO_DATE> Aura allocation end date (default: NOW())
-  -sca, --set-claim-addresses       Truncate and set claim addresses table (optional)
+  -ho, --historical-order <ORDER>   Historical allocation ordering (default: "token_allocation DESC")
+  -ao, --aura-order <ORDER>         Aura allocation ordering (default: "token_allocation DESC")
+  -aed, --aura-end-date <ISO_DATE>  Aura allocation end date (default: NOW())
+  -sca, --set-claim-addresses       Assigns last used EVM address to users in ClaimAddresses table (optional)
+  -n, --top-n                       Only allocates top N users (integer, optional, used for testing)
   -h, --help                        Show this help message
 
 Examples:
@@ -371,6 +384,7 @@ Examples:
   pnpm ts-exec scripts/historic-contribution-scoring.ts --aura-end-date 2025-08-01T12:00:00.000Z
   pnpm ts-exec scripts/historic-contribution-scoring.ts -sca
   pnpm ts-exec scripts/historic-contribution-scoring.ts --set-claim-addresses
+  pnpm ts-exec scripts/historic-contribution-scoring.ts --top-n 100 --set-claim-addresses
 `);
 }
 
@@ -591,7 +605,9 @@ async function main() {
   try {
     const config = parseArguments();
 
-    console.log('Scoring Configuration:');
+    console.log(
+      `Scoring Configuration:${config.topN ? ` TOP ${config.topN}` : ''}`,
+    );
 
     console.log(`\n\tHistorical Configuration:`);
     console.log(`\t\tHistorical End Date: ${config.historicalEndDate}`);
