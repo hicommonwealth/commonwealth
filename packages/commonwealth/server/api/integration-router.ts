@@ -85,6 +85,7 @@ function build() {
   );
 
   // klavis oauth callback
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   router.get('/klavis/oauth-callback', async (req, res, next) => {
     try {
       const { instanceId, original_url } = req.query;
