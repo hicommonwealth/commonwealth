@@ -137,7 +137,6 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 8080,
       host: 'localhost',
-      allowedHosts: ['cw.ryancodez.com', 'localhost'],
       proxy: {
         '/api': {
           target: env.BACKEND_PROXY_URL || 'http://localhost:3000',
