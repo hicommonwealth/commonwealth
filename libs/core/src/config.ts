@@ -18,6 +18,7 @@ const AppEnvironments = [
   'beta',
   'demo',
   'production',
+  'review-app',
 ] as const;
 type Environment = (typeof Environments)[number];
 type AppEnvironment = (typeof AppEnvironments)[number];
@@ -27,6 +28,7 @@ export const DeployedEnvironments = [
   'frick',
   'demo',
   'frack',
+  'review-app',
 ] as const satisfies AppEnvironment[];
 export const ProdLikeEnvironments = [
   'production',
@@ -269,7 +271,7 @@ export const config = configure(
           DEV_MODULITH: DEV_MODULITH === 'true',
         },
 
-        requiredAppEnvs: ['frick', 'frack', 'beta', 'demo', 'production'],
+        requiredAppEnvs: DeployedEnvironments,
         requiredServices: 'all',
         defaultCheck: DEFAULTS.SERVER_URL,
       }),

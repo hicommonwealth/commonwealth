@@ -456,8 +456,17 @@ export async function alchemyGetTokenPrices({
 }
 
 export const getBaseUrl = (
-  env: 'local' | 'CI' | 'frick' | 'frack' | 'beta' | 'demo' | 'production',
+  env:
+    | 'local'
+    | 'CI'
+    | 'frick'
+    | 'frack'
+    | 'beta'
+    | 'demo'
+    | 'production'
+    | 'review-app',
   localOverride?: string,
+  serverUrl?: string,
 ) => {
   switch (env) {
     case 'local':
@@ -474,6 +483,9 @@ export const getBaseUrl = (
       return 'https://frick.commonwealth.im';
     case 'frack':
       return 'https://frack.commonwealth.im';
+    case 'review-app':
+      if (serverUrl) return serverUrl;
+      else throw new Error('Must provide a server url in review apps');
     default:
       return `https://${PRODUCTION_DOMAIN}`;
   }

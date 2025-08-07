@@ -82,6 +82,7 @@ export default (
       oauth_email_verified: { type: Sequelize.BOOLEAN, allowNull: true },
       oauth_username: { type: Sequelize.STRING, allowNull: true },
       oauth_phone_number: { type: Sequelize.STRING, allowNull: true },
+      oauth_user_id: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -92,6 +93,7 @@ export default (
       indexes: [
         { fields: ['address', 'community_id'], unique: true },
         { fields: ['user_id'] },
+        { fields: ['oauth_user_id'] },
       ],
       hooks: {
         beforeCreate(instance: AddressInstance) {
