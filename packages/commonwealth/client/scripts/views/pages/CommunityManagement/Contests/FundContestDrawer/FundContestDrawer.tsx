@@ -4,7 +4,7 @@ import app from 'state';
 import { useFundContestOnchainMutation } from 'state/api/contests';
 import CWDrawer, {
   CWDrawerTopBar,
-} from 'views/components/component_kit/new_designs/CWDrawer';
+} from 'views/components/component_kit/CWDrawer';
 
 import {
   FundContestFailure,

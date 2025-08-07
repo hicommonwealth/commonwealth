@@ -1,16 +1,16 @@
 import { Webhook, WebhookSupportedEvents } from '@hicommonwealth/schemas';
 import React, { useState } from 'react';
 import { saveToClipboard } from 'utils/clipboard';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import CWIconButton from 'views/components/component_kit/CWIconButton';
 import z from 'zod';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import { CWButton } from '../components/component_kit/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../components/component_kit/new_designs/CWModal';
+} from '../components/component_kit/CWModal';
 import './webhook_settings_modal.scss';
 
 type WebhookSettingsModalProps = {

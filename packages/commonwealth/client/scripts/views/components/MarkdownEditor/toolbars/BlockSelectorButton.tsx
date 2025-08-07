@@ -4,10 +4,10 @@ import React, { useCallback } from 'react';
 import { HeadingButton } from 'views/components/MarkdownEditor/toolbars/HeadingButton';
 import { PlaceholderIcon } from 'views/components/MarkdownEditor/toolbars/PlaceholderIcon';
 import { blockTypeToIconName } from 'views/components/MarkdownEditor/toolbars/blockTypeToIconName';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import CWPopover, {
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
+} from 'views/components/component_kit/CWPopover';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import './BlockSelectorButton.scss';
 
 type BlockSelectorButtonProps = Readonly<{

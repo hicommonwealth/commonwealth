@@ -2,7 +2,7 @@ import React from 'react';
 
 import useUserStore from 'state/ui/user';
 import { CWText } from '../../../component_kit/cw_text';
-import { CWTable } from '../../../component_kit/new_designs/CWTable';
+import { CWTable } from '../../../component_kit/CWTable';
 import { CommunityStake } from './CommunityStake/CommunityStake';
 import './CommunityTab.scss';
 import { LastActive } from './LastActive/LastActive';

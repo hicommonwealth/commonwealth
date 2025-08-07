@@ -3,19 +3,19 @@ import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
 import React, { useRef, useState } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import { CWModal } from '../../components/component_kit/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import IdeaLaunchpad from '../ExplorePage/IdeaLaunchpad';
 import { TrendingCommunitiesPreview } from '../user_dashboard/TrendingCommunitiesPreview/TrendingCommunitiesPreview';
 import ActiveContestList from './ActiveContestList/ActiveContestList';
 import './HomePage.scss';
+import IOSBanner from './iOSBanner';
 import TrendingThreadList from './TrendingThreadList/TrendingThreadList';
 import TrendingTokensList from './TrendingTokenList/TrendingTokenList';
 import XpQuestList from './XpQuestList/XpQuestList';
-import IOSBanner from './iOSBanner';
 
 const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null);

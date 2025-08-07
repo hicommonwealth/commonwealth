@@ -7,12 +7,12 @@ import {
 } from 'client/scripts/state/api/communities/deleteAddress';
 import AddressInfo from '../../models/AddressInfo';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import { CWButton } from '../components/component_kit/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../components/component_kit/new_designs/CWModal';
+} from '../components/component_kit/CWModal';
 import './delete_address_modal.scss';
 
 type DeleteAddressModalAttrs = {

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React, { useState } from 'react';
+import { CWRadioButton } from '../cw_radio_button';
 import { CWText } from '../cw_text';
-import { CWRadioButton } from '../new_designs/cw_radio_button';
 import { ImageBehavior } from './types';
 
 export type ImageBehaviorSelectorProps = {

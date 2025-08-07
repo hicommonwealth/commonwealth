@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
+import { CWButton } from '../../components/component_kit/CWButton';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import { CWModal } from '../../components/component_kit/CWModal';
 import { NewSnapshotProposalModal } from '../../modals/new_snapshot_proposal_modal';
 
 import './snapshot_creation_card.scss';

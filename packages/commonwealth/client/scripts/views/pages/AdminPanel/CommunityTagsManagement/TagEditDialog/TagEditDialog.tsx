@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWResponsiveDialog } from 'views/components/component_kit/new_designs/CWResponsiveDialog';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWResponsiveDialog } from 'views/components/component_kit/CWResponsiveDialog';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 
 import './TagEditDialog.scss';
 

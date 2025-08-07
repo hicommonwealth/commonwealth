@@ -8,14 +8,14 @@ import useDeferredConditionTriggerCallback from 'client/scripts/hooks/useDeferre
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import useUserStore from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
+import { CWButton } from 'client/scripts/views/components/component_kit/CWButton';
 import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { AuthModal } from 'client/scripts/views/modals/AuthModal';
 import clsx from 'clsx';
 import React from 'react';
 import { smartTrim } from 'shared/utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTag } from 'views/components/component_kit/CWTag';
 import { CWCard } from '../../../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../../../components/component_kit/cw_text';

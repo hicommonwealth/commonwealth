@@ -3,11 +3,11 @@ import React from 'react';
 import { generateImagePromptWithContext } from 'state/api/ai/prompts';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
-import { CWButton } from '../new_designs/CWButton';
-import CWCircleMultiplySpinner from '../new_designs/CWCircleMultiplySpinner';
-import CWIconButton from '../new_designs/CWIconButton';
-import { CWTextInput } from '../new_designs/CWTextInput';
-import { MessageRow } from '../new_designs/CWTextInput/MessageRow';
+import { CWButton } from '../CWButton';
+import CWCircleMultiplySpinner from '../CWCircleMultiplySpinner';
+import CWIconButton from '../CWIconButton';
+import { CWTextInput } from '../CWTextInput';
+import { MessageRow } from '../CWTextInput/MessageRow';
 import { ImageBehavior, UploadControlProps } from './types';
 import { useUploadControl } from './useUploadControl';
 

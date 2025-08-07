@@ -3,7 +3,7 @@ import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWCustomIcon } from '../component_kit/cw_icons/cw_custom_icon';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { CWTag } from '../component_kit/new_designs/CWTag';
+import { CWTag } from '../component_kit/CWTag';
 import './AuthButton.scss';
 import { AUTH_TYPES } from './constants';
 import { AuthButtonProps } from './types';

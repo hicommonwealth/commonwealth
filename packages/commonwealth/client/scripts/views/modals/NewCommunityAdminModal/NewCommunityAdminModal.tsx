@@ -4,14 +4,14 @@ import { formatAddressShort } from 'helpers';
 import _ from 'lodash';
 import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { SelectedCommunity } from 'views/components/component_kit/CWCommunitySelector';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from 'views/components/component_kit/new_designs/CWModal';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
+} from 'views/components/component_kit/CWModal';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityCreationEvent,

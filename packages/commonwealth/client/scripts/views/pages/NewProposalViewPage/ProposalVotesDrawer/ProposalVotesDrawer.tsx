@@ -2,7 +2,7 @@ import { SnapshotProposalVote } from 'client/scripts/helpers/snapshot_utils';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import CWDrawer, {
   CWDrawerTopBar,
-} from 'client/scripts/views/components/component_kit/new_designs/CWDrawer';
+} from 'client/scripts/views/components/component_kit/CWDrawer';
 import React, { Dispatch, SetStateAction } from 'react';
 import ProposalVotesTable from '../ProposalVotesTable/ProposalVotesTable';
 import './ProposalVotesDrawer.scss';

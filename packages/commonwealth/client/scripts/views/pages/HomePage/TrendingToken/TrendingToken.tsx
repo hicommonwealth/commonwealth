@@ -2,10 +2,10 @@ import {
   navigateToCommunity,
   useCommonNavigate,
 } from 'client/scripts/navigation/helpers';
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+import { CWButton } from 'client/scripts/views/components/component_kit/CWButton';
 import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
 import { TokenCardProps } from 'client/scripts/views/components/TokenCard/TokenCard';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import clsx from 'clsx';
 import { useTokenPricing } from 'hooks/useTokenPricing';
 import React from 'react';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWTag } from 'views/components/component_kit/CWTag';
+import CWCircleMultiplySpinner from '../../components/component_kit/CWCircleMultiplySpinner';
 import './ShowAddedTags.scss';
 
 interface ShowAddedTagsProps {

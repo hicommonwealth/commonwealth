@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import { CWToggle } from 'views/components/component_kit/cw_toggle';
 
 const TogglesShowcase = () => {
   const [isSmallToggled, setIsSmallToggled] = useState(false);

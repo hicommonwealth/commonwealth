@@ -1,8 +1,8 @@
 import React from 'react';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWButton } from '../../../../../components/component_kit/new_designs/CWButton';
-import { CWForm } from '../../../../../components/component_kit/new_designs/CWForm';
-import { CWTextInput } from '../../../../../components/component_kit/new_designs/CWTextInput';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import { CWButton } from '../../../../../components/component_kit/CWButton';
+import { CWForm } from '../../../../../components/component_kit/CWForm';
+import { CWTextInput } from '../../../../../components/component_kit/CWTextInput';
 import './EmailForm.scss';
 import { emailValidationSchema } from './validation';
 

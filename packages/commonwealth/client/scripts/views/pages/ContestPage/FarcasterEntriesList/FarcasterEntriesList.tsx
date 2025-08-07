@@ -5,7 +5,7 @@ import { prettyVoteWeight } from 'shared/adapters/currency';
 import { Select } from 'views/components/Select';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
+import { CWUpvote } from 'views/components/component_kit/cw_upvote';
 import { SortType, sortOptions } from '../types';
 
 import './FarcasterEntriesList.scss';

@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 import { DownloadMobileAppModal } from 'views/components/DownloadMobileApp/DownloadMobileAppModal';
 import { IOS_APP_STORE_LANDING_URL } from 'views/components/DownloadMobileApp/MobileLandingURLs';
 import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
-import { CWButton } from '../component_kit/new_designs/CWButton';
-import CWIconButton from '../component_kit/new_designs/CWIconButton';
+import { CWButton } from '../component_kit/CWButton';
+import CWIconButton from '../component_kit/CWIconButton';
 import './DownloadMobileApp.scss';
 
 export const DownloadMobileApp = () => {

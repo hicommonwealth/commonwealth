@@ -1,11 +1,11 @@
 import { ArrowCircleRight, MagnifyingGlass } from '@phosphor-icons/react';
 import { notifySuccess } from 'controllers/app/notifications';
 import React from 'react';
-import { CWImageInput } from 'views/components/component_kit/CWImageInput';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWImageInput } from 'views/components/component_kit/CWImageInput';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 
 const InputsShowcase = () => {
   return (

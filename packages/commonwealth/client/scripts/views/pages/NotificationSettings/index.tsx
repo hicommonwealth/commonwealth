@@ -2,11 +2,8 @@ import { CommunityAlert } from '@hicommonwealth/schemas';
 import React, { useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import useUserStore from 'state/ui/user';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import {
-  CWTab,
-  CWTabsRow,
-} from 'views/components/component_kit/new_designs/CWTabs';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
+import { CWTab, CWTabsRow } from 'views/components/component_kit/CWTabs';
 import ScrollContainer from 'views/components/ScrollContainer';
 import { PageNotFound } from 'views/pages/404';
 import { CommentSubscriptions } from 'views/pages/NotificationSettings/CommentSubscriptions';

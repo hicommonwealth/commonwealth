@@ -13,10 +13,10 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
 import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
 import { smartTrim } from '../../../../../../shared/utils';
-import { Skeleton } from '../../Skeleton';
 import { CWCommunityAvatar } from '../../component_kit/cw_community_avatar';
 import { CWText } from '../../component_kit/cw_text';
-import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
+import { CWTooltip } from '../../component_kit/CWTooltip';
+import { Skeleton } from '../../Skeleton';
 import { CWIcon } from '../cw_icons/cw_icon';
 
 const SidebarHeader = ({

@@ -4,8 +4,8 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useRerankThreadsMutation } from 'state/api/superAdmin';
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWTextInput } from '../../components/component_kit/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
 
 const RerankThreads = () => {

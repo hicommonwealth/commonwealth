@@ -12,8 +12,8 @@ import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
 import React, { useEffect, useState } from 'react';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import { withTooltip } from 'views/components/component_kit/CWTooltip';
 import { AuthModal } from 'views/modals/AuthModal';
 import { NetworkIndicator } from 'views/modals/TradeTokenModel/NetworkIndicator';
 

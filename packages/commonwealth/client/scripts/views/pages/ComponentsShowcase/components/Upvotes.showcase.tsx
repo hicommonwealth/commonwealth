@@ -1,7 +1,7 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
-import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
+import { CWUpvote } from 'views/components/component_kit/cw_upvote';
+import CWUpvoteSmall from 'views/components/component_kit/CWUpvoteSmall';
 
 const UpvotesShowcase = () => {
   return (

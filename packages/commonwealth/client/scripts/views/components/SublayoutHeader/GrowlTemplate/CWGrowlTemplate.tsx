@@ -6,7 +6,7 @@ import { CWGrowl } from 'views/components/component_kit/cw_growl';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from '../../component_kit/new_designs/CWButton';
+import { CWButton } from '../../component_kit/CWButton';
 import './CWGrowlTemplate.scss';
 
 interface CWGrowlTemplateProps {

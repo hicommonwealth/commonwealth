@@ -1,9 +1,9 @@
 import moment from 'moment/moment';
 import React from 'react';
 
-import NumberSelector from 'views/components/NumberSelector';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import { MessageRow } from 'views/components/component_kit/CWTextInput/MessageRow';
+import NumberSelector from 'views/components/NumberSelector';
 
 import { getPrizeColor } from '../utils';
 

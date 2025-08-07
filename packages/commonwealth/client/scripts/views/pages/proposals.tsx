@@ -11,14 +11,14 @@ import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
 } from 'state/api/proposals';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import { ProposalCard } from 'views/components/ProposalCard';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
 import { CardsCollection } from '../components/cards_collection';
 import { CWText } from '../components/component_kit/cw_text';
-import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import CWCircleMultiplySpinner from '../components/component_kit/CWCircleMultiplySpinner';
 import './proposals.scss';
 
 const ProposalsPage = () => {

@@ -15,10 +15,10 @@ import useUserStore from 'state/ui/user';
 import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
 import CWPopover, {
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
-import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
-import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
+} from 'views/components/component_kit/CWPopover';
+import CWUpvoteSmall from 'views/components/component_kit/CWUpvoteSmall';
+import { TooltipWrapper } from 'views/components/component_kit/cw_thread_action';
+import { CWUpvote } from 'views/components/component_kit/cw_upvote';
 import { AuthModal } from 'views/modals/AuthModal';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import { buildEtherscanLink } from 'views/modals/ManageCommunityStakeModal/utils';
 
 import CopyAddressInput from '../../../CopyAddressInput';

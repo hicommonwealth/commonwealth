@@ -28,7 +28,7 @@ import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
 import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate';
 import useJoinCommunity from './components/SublayoutHeader/useJoinCommunity';
-import { CWModal } from './components/component_kit/new_designs/CWModal';
+import { CWModal } from './components/component_kit/CWModal';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
 import InviteLinkModal from './modals/InviteLinkModal';

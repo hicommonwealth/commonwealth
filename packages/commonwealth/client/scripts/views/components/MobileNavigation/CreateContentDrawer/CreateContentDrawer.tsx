@@ -5,7 +5,7 @@ import app from 'state';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import CWIconButton from 'views/components/component_kit/CWIconButton';
 
 import { useFlag } from 'hooks/useFlag';
 import useUserStore from 'state/ui/user';

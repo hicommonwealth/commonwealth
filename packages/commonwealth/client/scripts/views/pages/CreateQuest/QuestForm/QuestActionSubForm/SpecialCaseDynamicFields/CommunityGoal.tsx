@@ -1,8 +1,8 @@
 import { CommunityGoalTypes } from '@hicommonwealth/shared';
 import { capitalize } from 'lodash';
 import React from 'react';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import { SpecialCaseDynamicFieldsProps } from './types';
 
 const CommunityGoals = ({

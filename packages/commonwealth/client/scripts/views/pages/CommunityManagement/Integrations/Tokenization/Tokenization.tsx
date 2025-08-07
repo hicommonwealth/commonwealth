@@ -1,11 +1,11 @@
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
+import { CWModal } from 'client/scripts/views/components/component_kit/CWModal';
 import React, { useState } from 'react';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import './Tokenization.scss';
 import TokenizationModal from './TokenizationModal';
 

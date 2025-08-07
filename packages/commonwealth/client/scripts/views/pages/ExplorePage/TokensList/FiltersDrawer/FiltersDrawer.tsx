@@ -1,12 +1,12 @@
 import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import CWAccordion from 'views/components/CWAccordion';
-import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer, {
   CWDrawerTopBar,
-} from 'views/components/component_kit/new_designs/CWDrawer';
-import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
-import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+} from 'views/components/component_kit/CWDrawer';
+import { CWRadioButton } from 'views/components/component_kit/cw_radio_button';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWToggle } from 'views/components/component_kit/cw_toggle';
 import './FiltersDrawer.scss';
 import {
   sortOrderLabelsToDirectionsMap,

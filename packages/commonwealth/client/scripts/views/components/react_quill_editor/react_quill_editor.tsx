@@ -7,10 +7,10 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import ReactQuill, { Quill } from 'react-quill';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import type { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
-import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
+import { CWTab, CWTabsRow } from '../component_kit/CWTabs';
 import { CustomQuillFooter } from './CustomQuillFooter';
-import QuillTooltip from './QuillTooltip';
 import { LoadingIndicator } from './loading_indicator';
+import QuillTooltip from './QuillTooltip';
 import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
 import { convertTwitterLinksToEmbeds } from './twitter_embed';
 import { useImageDropAndPaste } from './use_image_drop_and_paste';
@@ -23,8 +23,8 @@ import { useQuillPasteText } from './useQuillPasteText';
 
 import { useFormContext } from 'react-hook-form';
 import 'react-quill/dist/quill.snow.css';
-import { CWModal } from '../component_kit/new_designs/CWModal';
-import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
+import { CWModal } from '../component_kit/CWModal';
+import { MessageRow } from '../component_kit/CWTextInput/MessageRow';
 import { MarkdownPreview } from './MarkdownPreview';
 import './react_quill_editor.scss';
 

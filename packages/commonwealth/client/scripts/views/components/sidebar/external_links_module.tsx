@@ -4,8 +4,8 @@ import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { SocialAccountLinkModal } from '../../modals/SocialAccountLinkModal/SocialAccountLinkModal';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWModal } from '../component_kit/new_designs/CWModal';
+import CWCircleMultiplySpinner from '../component_kit/CWCircleMultiplySpinner';
+import { CWModal } from '../component_kit/CWModal';
 import './external_links_module.scss';
 
 export const ExternalLinksModule = () => {

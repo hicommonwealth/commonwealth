@@ -1,14 +1,14 @@
 import { notifySuccess } from 'controllers/app/notifications';
 import React from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
+import CWIconButton from 'views/components/component_kit/CWIconButton';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/CWPopover';
 import {
   PopoverMenu,
   PopoverMenuItem,
 } from 'views/components/component_kit/CWPopoverMenu';
-import { CWText } from 'views/components/component_kit/cw_text';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
-import CWPopover, {
-  usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
 
 const popoverMenuOptions = (): Array<PopoverMenuItem> => {
   return [

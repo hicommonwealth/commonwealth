@@ -1,7 +1,7 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWModalBody } from 'views/components/component_kit/new_designs/CWModal';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import { CWModalBody } from 'views/components/component_kit/CWModal';
 
 import './TransactionLoading.scss';
 

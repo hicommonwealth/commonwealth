@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ShareDialog } from 'views/components/ShareDialog/ShareDialog';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { CWThreadAction } from 'views/components/component_kit/cw_thread_action';
 
 type ShareButtonProps = {
   url: string;

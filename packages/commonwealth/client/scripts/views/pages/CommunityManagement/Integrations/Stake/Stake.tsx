@@ -5,8 +5,8 @@ import { chainIdsWithStakeEnabled } from 'views/components/CommunityInformationF
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
 import './Stake.scss';
 
 const Stake = () => {

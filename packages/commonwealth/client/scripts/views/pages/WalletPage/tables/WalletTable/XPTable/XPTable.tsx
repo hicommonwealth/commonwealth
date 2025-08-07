@@ -2,9 +2,9 @@ import { APIOrderDirection } from 'helpers/constants';
 import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
-import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
+import { CWTable } from 'views/components/component_kit/CWTable';
+import { CWTableColumnInfo } from 'views/components/component_kit/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/CWTable/useCWTableState';
 import './XPTable.scss';
 
 const columns: CWTableColumnInfo[] = [

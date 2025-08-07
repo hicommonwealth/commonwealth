@@ -1,8 +1,8 @@
 import useGetTopUsersQuery from 'client/scripts/state/api/superAdmin/getTopUsers';
 import React from 'react';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
-import CWCircleRingSpinner from '../../components/component_kit/new_designs/CWCircleRingSpinner';
+import { CWButton } from '../../components/component_kit/CWButton';
+import CWCircleRingSpinner from '../../components/component_kit/CWCircleRingSpinner';
 import './AdminPanel.scss';
 import { downloadCSV as downloadAsCSV } from './utils';
 

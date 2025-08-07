@@ -4,12 +4,12 @@ import React from 'react';
 import { useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
 import KnockNotifications from 'views/components/KnockNotifications';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWSearchBar } from 'views/components/component_kit/CWSearchBar';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearchBar';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CreateContentPopover } from 'views/menus/CreateContentMenu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 

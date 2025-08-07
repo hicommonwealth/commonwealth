@@ -2,8 +2,8 @@ import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import React, { useCallback, useState } from 'react';
 
 import app from 'state';
-import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWFormSteps from 'views/components/component_kit/CWFormSteps';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import StakeIntegration from 'views/pages/CommunityManagement/StakeIntegration';
 import CommunityOnchainTransactions from 'views/pages/CreateCommunity/steps/CommunityOnchainTransactions';
 import { TransactionType } from 'views/pages/CreateCommunity/steps/CommunityOnchainTransactions/helpers';

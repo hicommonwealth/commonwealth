@@ -6,8 +6,8 @@ import useUserStore from 'client/scripts/state/ui/user';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import { CWTextInput } from 'client/scripts/views/components/component_kit/new_designs/CWTextInput';
+import { CWButton } from 'client/scripts/views/components/component_kit/CWButton';
+import { CWTextInput } from 'client/scripts/views/components/component_kit/CWTextInput';
 import React from 'react';
 
 import './InviteModal.scss';

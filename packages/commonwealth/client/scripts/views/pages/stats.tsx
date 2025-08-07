@@ -3,7 +3,7 @@ import { useFetchCommunityStatsQuery } from 'client/scripts/state/api/communitie
 import Permissions from 'client/scripts/utils/Permissions';
 import React from 'react';
 import useUserStore from 'state/ui/user';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import ErrorPage from 'views/pages/error';
 import z from 'zod';

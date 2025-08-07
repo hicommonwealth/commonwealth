@@ -7,12 +7,12 @@ import {
   useAddThreadLinksMutation,
   useDeleteThreadLinksMutation,
 } from 'state/api/threads';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from 'views/components/component_kit/new_designs/CWModal';
+} from 'views/components/component_kit/CWModal';
 import type Thread from '../../models/Thread';
 import { UrlSelector } from '../components/UrlLinkSelector/UrlSelector';
 import { CWText } from '../components/component_kit/cw_text';

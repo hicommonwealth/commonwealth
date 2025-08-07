@@ -1,5 +1,5 @@
 import { CompletionModel } from '@hicommonwealth/shared';
-import { CWSelectList } from 'client/scripts/views/components/component_kit/new_designs/CWSelectList/CWSelectList';
+import { CWSelectList } from 'client/scripts/views/components/component_kit/CWSelectList/CWSelectList';
 import React from 'react';
 import { CWText } from '../component_kit/cw_text';
 import './AIModelSelector.scss';

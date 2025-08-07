@@ -3,7 +3,7 @@ import React from 'react';
 import useBeforeUnload from 'hooks/useBeforeUnload';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import ActionSteps from 'views/pages/CreateCommunity/components/ActionSteps';
 import Hint from 'views/pages/CreateCommunity/components/Hint';
 

@@ -16,7 +16,7 @@ import { Link } from 'react-router-dom';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { SharePopover } from '../../../SharePopover';
-import { CWThreadAction } from '../../../component_kit/new_designs/cw_thread_action';
+import { CWThreadAction } from '../../../component_kit/cw_thread_action';
 import type { CommentWithAssociatedThread } from '../ProfileActivity';
 import './ProfileActivityRow.scss';
 

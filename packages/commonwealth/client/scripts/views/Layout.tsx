@@ -26,9 +26,9 @@ import { useUpdateUserMutation } from '../state/api/user';
 import './Layout.scss';
 import SubLayout from './Sublayout';
 import MetaTags from './components/MetaTags';
+import CWCircleMultiplySpinner from './components/component_kit/CWCircleMultiplySpinner';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWText } from './components/component_kit/cw_text';
-import CWCircleMultiplySpinner from './components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { openConfirmation } from './modals/confirmation_modal';
 
 type LayoutAttrs = {

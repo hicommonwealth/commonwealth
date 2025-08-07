@@ -3,9 +3,9 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUpdateCustomDomainMutation from 'state/api/communities/updateCustomDomain';
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import { notifySuccess } from '../../../controllers/app/notifications';
-import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
+import { CWTextInput } from '../../components/component_kit/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
 
 const UpdateCustomDomainTask = () => {

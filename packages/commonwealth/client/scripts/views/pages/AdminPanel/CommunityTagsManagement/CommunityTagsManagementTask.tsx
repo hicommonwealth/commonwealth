@@ -10,11 +10,11 @@ import {
 } from 'state/api/tags';
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
-import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWTable } from 'views/components/component_kit/CWTable';
+import { CWTableColumnInfo } from 'views/components/component_kit/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/CWTable/useCWTableState';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import TagEditDialog from './TagEditDialog';
 import TagUsageDialog from './TagUsageDialog';

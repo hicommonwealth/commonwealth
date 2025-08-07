@@ -4,7 +4,7 @@ import { CustomLinkEdit } from 'views/components/MarkdownEditor/customLinkDialog
 import { CustomLinkPreview } from 'views/components/MarkdownEditor/customLinkDialog/CustomLinkPreview';
 import CWPopover, {
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
+} from 'views/components/component_kit/CWPopover';
 import './CustomLinkDialogForDesktop.scss';
 
 /**

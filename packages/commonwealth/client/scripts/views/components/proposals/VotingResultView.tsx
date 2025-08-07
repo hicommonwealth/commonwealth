@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
-import './VotingResultView.scss';
+import { CWTooltip } from '../component_kit/CWTooltip';
 import { formatVoteCount, getCombinedBarColor } from './utils';
+import './VotingResultView.scss';
 
 export interface VoteOption {
   label: string;

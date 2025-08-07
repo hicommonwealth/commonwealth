@@ -1,7 +1,7 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTypeaheadSelectList } from 'views/components/component_kit/new_designs/CWTypeaheadSelectList';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTypeaheadSelectList } from 'views/components/component_kit/CWTypeaheadSelectList';
 
 export const optionList = [
   { value: '1inch', label: '1 Inch' },

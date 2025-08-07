@@ -1,12 +1,12 @@
 import { filterLinks } from 'helpers/threads';
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWModal } from 'views/components/component_kit/CWModal';
 import type Thread from '../../../models/Thread';
 import { LinkSource } from '../../../models/Thread';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
+import { CWButton } from '../../components/component_kit/CWButton';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { LinkedUrlModal } from '../../modals/linked_url_modal';
 import './linked_threads_card.scss';
 

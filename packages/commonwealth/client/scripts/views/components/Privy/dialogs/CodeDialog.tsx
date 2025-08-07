@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from '../../component_kit/new_designs/CWButton';
+import { CWButton } from '../../component_kit/CWButton';
 import './CodeDialog.scss';
 
 type Props = {

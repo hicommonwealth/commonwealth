@@ -13,12 +13,12 @@ import {
 } from 'state/api/communities';
 import { fetchCachedNodes } from 'state/api/nodes';
 import TokenFinder, { useTokenFinder } from 'views/components/TokenFinder';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import { CWForm } from 'views/components/component_kit/CWForm';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWRadioButton } from 'views/components/component_kit/cw_radio_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
-import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import './ConnectTokenStep.scss';
 import { ConnectTokenStepProps, ConnectTokenStepSubmitValues } from './types';
 import { connectTokenFormValidationSchema } from './validation';

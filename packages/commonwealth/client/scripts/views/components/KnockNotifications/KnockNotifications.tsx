@@ -13,7 +13,7 @@ import {
   handleMouseEnter,
   handleMouseLeave,
 } from '../../menus/utils';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip/CWTooltip';
+import { CWTooltip } from '../component_kit/CWTooltip/CWTooltip';
 import CustomNotificationCell from './CustomNotificationCell';
 import './KnockNotifications.scss';
 

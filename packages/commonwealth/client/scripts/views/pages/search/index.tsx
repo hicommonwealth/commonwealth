@@ -15,7 +15,7 @@ import { useInView } from 'react-intersection-observer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import {
   APIOrderBy,
@@ -28,10 +28,7 @@ import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
 import { useCommonNavigate } from '../../../navigation/helpers';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWText } from '../../components/component_kit/cw_text';
-import {
-  CWTab,
-  CWTabsRow,
-} from '../../components/component_kit/new_designs/CWTabs';
+import { CWTab, CWTabsRow } from '../../components/component_kit/CWTabs';
 import ErrorPage from '../error';
 import { renderSearchResults } from './helpers';
 

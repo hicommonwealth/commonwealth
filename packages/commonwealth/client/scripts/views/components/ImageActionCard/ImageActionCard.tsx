@@ -1,6 +1,6 @@
 import React from 'react';
+import { CWButton } from '../component_kit/CWButton';
 import { CWContentPageCard } from '../component_kit/CWContentPageCard';
-import { CWButton } from '../component_kit/new_designs/CWButton';
 
 import './ImageActionCard.scss';
 

@@ -1,10 +1,10 @@
 import { formatAddressShort } from 'client/scripts/helpers';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
-import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
 import { CWIconButton } from 'client/scripts/views/components/component_kit/cw_icon_button';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
+import { CWTooltip } from 'client/scripts/views/components/component_kit/CWTooltip';
+import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
 import { LaunchpadToken } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
 import { useTokenPricing } from 'hooks/useTokenPricing';

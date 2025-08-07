@@ -6,7 +6,7 @@ import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { Skeleton } from 'views/components/Skeleton';
 import { CardsCollection } from 'views/components/cards_collection';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 
 import { SnapshotSpaceCard } from './SnapshotSpaceCard';
 

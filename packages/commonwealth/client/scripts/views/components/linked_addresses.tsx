@@ -12,10 +12,10 @@ import { DeleteAddressModal } from '../modals/delete_address_modal';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWCustomIcon } from './component_kit/cw_icons/cw_custom_icon';
 import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
-import { CWIdentificationTag } from './component_kit/new_designs/CWIdentificationTag';
-import { CWModal } from './component_kit/new_designs/CWModal';
-import { CWTable } from './component_kit/new_designs/CWTable';
-import { CWTableColumnInfo } from './component_kit/new_designs/CWTable/CWTable';
+import { CWIdentificationTag } from './component_kit/CWIdentificationTag';
+import { CWModal } from './component_kit/CWModal';
+import { CWTable } from './component_kit/CWTable';
+import { CWTableColumnInfo } from './component_kit/CWTable/CWTable';
 
 /* eslint-disable react/no-multi-comp */
 

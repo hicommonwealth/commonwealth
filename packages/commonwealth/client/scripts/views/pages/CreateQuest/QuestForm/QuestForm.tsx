@@ -3,23 +3,23 @@ import clsx from 'clsx';
 import { capitalize } from 'lodash';
 import React from 'react';
 import CWCommunityInput from 'views/components/CWCommunityInput';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import CWDateTimeInput from 'views/components/component_kit/CWDateTimeInput';
+import { CWForm } from 'views/components/component_kit/CWForm';
 import {
   CWImageInput,
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTextArea } from 'views/components/component_kit/cw_text_area';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import CWPopover, {
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
+} from 'views/components/component_kit/CWPopover';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
+import { withTooltip } from 'views/components/component_kit/CWTooltip';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWRadioButton } from 'views/components/component_kit/cw_radio_button';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import QuestActionSubForm, { QuestAction } from './QuestActionSubForm';
 import './QuestForm.scss';
 import { QuestFormProps, QuestTypes } from './types';

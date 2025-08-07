@@ -28,13 +28,13 @@ import {
   ViewCommentUpvotesDrawer,
   ViewUpvotesDrawerTrigger,
 } from 'views/components/UpvoteDrawer';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
+import { CWTag } from 'views/components/component_kit/CWTag';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { CWThreadAction } from 'views/components/component_kit/cw_thread_action';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { z } from 'zod';

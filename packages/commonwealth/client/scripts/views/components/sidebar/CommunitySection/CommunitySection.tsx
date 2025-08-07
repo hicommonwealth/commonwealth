@@ -16,7 +16,7 @@ import {
   useCommunityStake,
 } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWModal } from 'views/components/component_kit/CWModal';
 import { getUniqueTopicIdsIncludedInActiveContest } from 'views/components/sidebar/helpers';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
@@ -26,10 +26,10 @@ import Permissions from '../../../../utils/Permissions';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
 import { AdminSection } from '../AdminSection';
 import DirectoryMenuItem from '../DirectoryMenuItem';
-import SidebarSignInButton from '../SidebarSignInButton/SidebarSignInButton';
 import { DiscussionSection } from '../discussion_section';
 import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
+import SidebarSignInButton from '../SidebarSignInButton/SidebarSignInButton';
 import './CommunitySection.scss';
 import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
 import ProfileCard from './ProfileCard';

@@ -3,7 +3,7 @@ import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTag } from 'views/components/component_kit/CWTag';
 
 type TotalQuestXPTagProps = {
   questId: number;

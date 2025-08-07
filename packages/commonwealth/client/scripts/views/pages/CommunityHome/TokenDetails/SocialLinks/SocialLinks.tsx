@@ -3,7 +3,7 @@ import app from 'client/scripts/state';
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import AuthButton from 'client/scripts/views/components/AuthButton';
 import React, { useState } from 'react';
-import { CWModal } from '../../../../components/component_kit/new_designs/CWModal';
+import { CWModal } from '../../../../components/component_kit/CWModal';
 import { SocialAccountLinkModal } from '../../../../modals/SocialAccountLinkModal/SocialAccountLinkModal';
 import './SocialLinks.scss';
 

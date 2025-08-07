@@ -8,8 +8,8 @@ import { CWLabel } from './cw_label';
 import type { BaseTextInputProps } from './cw_text_input';
 import { MessageRow, useTextInputWithValidation } from './cw_text_input';
 import type { ValidationStatus } from './cw_validation_text';
+import { MessageRow as NewMessageRow } from './CWTextInput/MessageRow';
 import { getClasses } from './helpers';
-import { MessageRow as NewMessageRow } from './new_designs/CWTextInput/MessageRow';
 import { ComponentType } from './types';
 
 type TextAreaStyleProps = {

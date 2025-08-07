@@ -5,7 +5,7 @@ import { isMobileApp } from 'hooks/useReactNativeWebView';
 import React, { useEffect, useState } from 'react';
 import { useAuthModalStore, useWelcomeOnboardModal } from 'state/ui/modals';
 import { AuthTypes } from 'views/components/AuthButton/types';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWModal } from 'views/components/component_kit/CWModal';
 import './AuthModal.scss';
 import { CreateAccountModal } from './CreateAccountModal';
 import { RevalidateSessionModal } from './RevalidateSessionModal';

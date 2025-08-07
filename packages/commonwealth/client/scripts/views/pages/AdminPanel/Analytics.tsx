@@ -2,7 +2,7 @@ import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
 import useGetStatsQuery from 'client/scripts/state/api/superAdmin/getStats';
 import React, { useState } from 'react';
 import { CWText } from '../../components/component_kit/cw_text';
-import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import CWCircleMultiplySpinner from '../../components/component_kit/CWCircleMultiplySpinner';
 import './AdminPanel.scss';
 import CommunityFinder from './CommunityFinder';
 

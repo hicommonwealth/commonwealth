@@ -9,12 +9,10 @@ import app from 'state';
 import { User } from 'views/components/user/user';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from '../../component_kit/cw_text';
-import CWDrawer, {
-  CWDrawerTopBar,
-} from '../../component_kit/new_designs/CWDrawer';
-import { CWTable } from '../../component_kit/new_designs/CWTable';
-import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
+import CWDrawer, { CWDrawerTopBar } from '../../component_kit/CWDrawer';
+import { CWTable } from '../../component_kit/CWTable';
+import { CWTableColumnInfo } from '../../component_kit/CWTable/CWTable';
+import { useCWTableState } from '../../component_kit/CWTable/useCWTableState';
 import './ViewUpvotesDrawer.scss';
 
 type Profile = Account | AddressInfo | MinimumProfile;

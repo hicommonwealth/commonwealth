@@ -2,7 +2,7 @@ import React from 'react';
 import type { Components, ItemContent } from 'react-virtuoso';
 import { Virtuoso } from 'react-virtuoso';
 import './cw_query_list.scss';
-import CWCircleMultiplySpinner from './new_designs/CWCircleMultiplySpinner';
+import CWCircleMultiplySpinner from './CWCircleMultiplySpinner';
 
 interface QueryListProps<ListItem> {
   loading: boolean;

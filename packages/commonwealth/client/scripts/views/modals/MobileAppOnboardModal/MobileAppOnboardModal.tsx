@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWModal } from 'views/components/component_kit/CWModal';
 import { NotificationModal } from 'views/modals/MobileAppOnboardModal/NotificationModal';
 import './MobileAppOnboardModal.scss';
 

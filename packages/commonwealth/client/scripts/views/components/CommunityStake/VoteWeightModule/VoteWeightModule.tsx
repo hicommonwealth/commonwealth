@@ -2,18 +2,18 @@ import { findDenominationIcon } from 'helpers/findDenomination';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWIconButton from 'views/components/component_kit/CWIconButton';
 import CWPopover, {
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
+} from 'views/components/component_kit/CWPopover';
 import { ManageCommunityStakeModalMode } from 'views/modals/ManageCommunityStakeModal/types';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 
 import { disabledStakeButtonTooltipText } from 'helpers/tooltipTexts';
 import app from 'state';
 import useUserStore from 'state/ui/user';
-import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
+import { CWTooltip } from '../../component_kit/CWTooltip';
 import './VoteWeightModule.scss';
 
 type VoteWeightModuleProps = {

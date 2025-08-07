@@ -7,7 +7,7 @@ import { formatAddressShort } from 'shared/utils';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWContentPageCard } from '../component_kit/CWContentPageCard';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
+import { CWTooltip } from '../component_kit/CWTooltip';
 import './DetailCard.scss';
 
 type DetailCardProps = {

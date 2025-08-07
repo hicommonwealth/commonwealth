@@ -5,9 +5,9 @@ import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import { Virtuoso } from 'react-virtuoso';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import type { Topic } from '../../../models/Topic';
-import CWIconButton from '../../components/component_kit/new_designs/CWIconButton';
+import CWIconButton from '../../components/component_kit/CWIconButton';
 
 const reorder = (list: Topic[], startIndex, endIndex): Topic[] => {
   const result = Array.from(list);

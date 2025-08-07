@@ -1,6 +1,10 @@
 import { TopicWeightedVoting, VoteView } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import React, { useState } from 'react';
+import { CWCard } from 'views/components/component_kit/cw_card';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWModal } from 'views/components/component_kit/CWModal';
 import {
   CastVoteProps,
   CastVoteSection,
@@ -12,10 +16,6 @@ import {
   VoteDisplay,
 } from 'views/components/Polls';
 import { buildVoteDirectionString } from 'views/components/Polls/utils';
-import { CWCard } from 'views/components/component_kit/cw_card';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { z } from 'zod';
 import { downloadCSV } from '../../../pages/AdminPanel/utils';
 import {

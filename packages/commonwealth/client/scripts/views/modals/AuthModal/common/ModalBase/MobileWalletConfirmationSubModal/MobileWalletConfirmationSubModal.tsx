@@ -1,13 +1,13 @@
 import commonLogo from 'assets/img/branding/common-logo.svg';
 import React from 'react';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import { CWIcon } from '../../../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../../components/component_kit/cw_text';
 import {
   CWModal,
   CWModalBody,
   CWModalFooter,
-} from '../../../../../components/component_kit/new_designs/CWModal';
+} from '../../../../../components/component_kit/CWModal';
 import './MobileWalletConfirmationSubModal.scss';
 
 type MobileWalletConfirmationSubModal = {

@@ -14,16 +14,16 @@ import { useGetGoalMetasQuery } from 'state/api/superAdmin';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { PageNotFound } from '../404';
 import QuestForm from '../CreateQuest/QuestForm';
-import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
 import {
   buildRedirectURLFromContentId,
   inferContentIdTypeFromContentId,
 } from '../CreateQuest/QuestForm/helpers';
+import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
 import { QuestTypes } from '../CreateQuest/QuestForm/types';
 import './UpdateQuest.scss';
 

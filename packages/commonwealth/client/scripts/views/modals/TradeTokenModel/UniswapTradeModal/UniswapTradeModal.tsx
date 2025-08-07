@@ -10,21 +10,21 @@ import React, { useEffect, useState } from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
 import {
   CWModal,
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from 'views/components/component_kit/new_designs/CWModal';
-import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+} from 'views/components/component_kit/CWModal';
+import { withTooltip } from 'views/components/component_kit/CWTooltip';
 import { AuthModal } from 'views/modals/AuthModal';
 import { formatJsonRpcMap } from 'views/modals/TradeTokenModel/UniswapTradeModal/useJsonRpcUrlMap';
 import { LaunchpadToken } from '../CommonTradeModal/types';
 import TokenIcon from '../TokenIcon';
-import './UniswapTradeModal.scss';
 import { ExternalToken, UniswapTradeTokenModalProps } from './types';
+import './UniswapTradeModal.scss';
 import useUniswapTradeModal from './useUniswapTradeModal';
 
 const UniswapTradeModal = ({

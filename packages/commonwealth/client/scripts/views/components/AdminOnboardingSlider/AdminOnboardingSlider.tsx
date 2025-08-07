@@ -15,7 +15,7 @@ import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards
 import Permissions from 'utils/Permissions';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { ActionCard, CardsSlider, DismissModal } from '../CardsSlider';
-import { CWModal } from '../component_kit/new_designs/CWModal';
+import { CWModal } from '../component_kit/CWModal';
 
 const CARD_TYPES = {
   'launch-contest': {

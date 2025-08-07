@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from 'views/components/component_kit/cw_text';
-import {
-  CWTab,
-  CWTabsRow,
-} from 'views/components/component_kit/new_designs/CWTabs';
+import { CWTab, CWTabsRow } from 'views/components/component_kit/CWTabs';
 
 const tabsList = [
   { label: 'First', id: 0 },

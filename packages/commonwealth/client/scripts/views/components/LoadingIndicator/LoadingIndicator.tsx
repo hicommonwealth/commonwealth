@@ -1,6 +1,6 @@
 import React from 'react';
 import { CWText } from '../component_kit/cw_text';
-import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultiplySpinner';
+import CWCircleMultiplySpinner from '../component_kit/CWCircleMultiplySpinner';
 import './LoadingIndicator.scss';
 
 type LoadingIndicatorProps = {

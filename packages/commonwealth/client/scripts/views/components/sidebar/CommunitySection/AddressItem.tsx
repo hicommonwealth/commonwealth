@@ -7,17 +7,17 @@ import {
 } from 'client/scripts/views/menus/utils';
 import useAuthentication from 'client/scripts/views/modals/AuthModal/useAuthentication';
 import React from 'react';
-import { PopoverMenu } from '../../component_kit/CWPopoverMenu';
 import { CWIconButton } from '../../component_kit/cw_icon_button';
 import { CWCustomIcon } from '../../component_kit/cw_icons/cw_custom_icon';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
-import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
+import { PopoverMenu } from '../../component_kit/CWPopoverMenu';
+import { CWTooltip } from '../../component_kit/CWTooltip';
 
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { getChainIcon, getSsoIconName } from 'client/scripts/utils/chainUtils';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import { formatAddressShort } from 'shared/utils';
-import { CWIdentificationTag } from '../../component_kit/new_designs/CWIdentificationTag';
+import { CWIdentificationTag } from '../../component_kit/CWIdentificationTag';
 import './AddressItem.scss';
 
 type AddressItemProps = {

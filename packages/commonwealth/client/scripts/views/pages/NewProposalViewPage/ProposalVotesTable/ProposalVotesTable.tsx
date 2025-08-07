@@ -1,9 +1,9 @@
 import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import { SnapshotProposalVote } from 'client/scripts/helpers/snapshot_utils';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWTable } from 'client/scripts/views/components/component_kit/new_designs/CWTable';
-import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'client/scripts/views/components/component_kit/new_designs/CWTable/useCWTableState';
+import { CWTable } from 'client/scripts/views/components/component_kit/CWTable';
+import { CWTableColumnInfo } from 'client/scripts/views/components/component_kit/CWTable/CWTable';
+import { useCWTableState } from 'client/scripts/views/components/component_kit/CWTable/useCWTableState';
 import React from 'react';
 import app from 'state';
 import { User } from 'views/components/user/user';

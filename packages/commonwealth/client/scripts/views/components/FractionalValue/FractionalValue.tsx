@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 import { CWText, TextStyleProps } from '../component_kit/cw_text';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
+import { CWTooltip } from '../component_kit/CWTooltip';
 import './FractionalValue.scss';
 import { formatFractionalValue } from './helpers';
 

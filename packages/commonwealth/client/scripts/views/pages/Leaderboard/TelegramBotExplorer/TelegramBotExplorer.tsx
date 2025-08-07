@@ -1,9 +1,9 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import ExploreCard from '../common/ExploreCard';
 import './TelegramBotExplorer.scss';
-import { CWTag } from '/views/components/component_kit/new_designs/CWTag';
+import { CWTag } from '/views/components/component_kit/CWTag';
 
 const TelegramBotExplorer = () => {
   return (

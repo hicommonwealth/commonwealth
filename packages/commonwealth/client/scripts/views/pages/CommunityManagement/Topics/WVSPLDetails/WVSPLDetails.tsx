@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 
 import { CreateTopicStep } from '../utils';
 

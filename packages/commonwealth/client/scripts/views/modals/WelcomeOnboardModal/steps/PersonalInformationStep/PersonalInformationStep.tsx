@@ -19,12 +19,9 @@ import { generateUsername } from 'unique-username-generator';
 import { useDebounce } from 'usehooks-ts';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import {
-  CWForm,
-  CWFormRef,
-} from 'views/components/component_kit/new_designs/CWForm';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWForm, CWFormRef } from 'views/components/component_kit/CWForm';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import { z } from 'zod';
 import './PersonalInformationStep.scss';
 import { personalInformationFormValidation } from './validations';

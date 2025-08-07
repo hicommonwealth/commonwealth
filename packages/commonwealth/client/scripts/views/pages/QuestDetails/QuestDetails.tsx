@@ -23,18 +23,18 @@ import {
 import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
-import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import CWPopover, {
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+} from 'views/components/component_kit/CWPopover';
+import { CWTag } from 'views/components/component_kit/CWTag';
+import { withTooltip } from 'views/components/component_kit/CWTooltip';
+import useXPProgress from 'views/components/SublayoutHeader/XPProgressIndicator/useXPProgress';
 import { AuthModal, AuthModalType } from 'views/modals/AuthModal';
 import { AuthOptions, AuthOptionTypes } from 'views/modals/AuthModal/types';
 import { openConfirmation } from 'views/modals/confirmation_modal';

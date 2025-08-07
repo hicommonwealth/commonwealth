@@ -3,7 +3,7 @@ import { matchRoutes, useLocation } from 'react-router-dom';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTag } from 'views/components/component_kit/CWTag';
 import { SubSectionGroup } from '../sidebar_section';
 
 import { useGetCommunityByIdQuery } from 'state/api/communities';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import magicWalletModalImage from '../../../../../../assets/img/magic-wallet-modal-image.svg';
 import './MagicWalletCreationStep.scss';
 

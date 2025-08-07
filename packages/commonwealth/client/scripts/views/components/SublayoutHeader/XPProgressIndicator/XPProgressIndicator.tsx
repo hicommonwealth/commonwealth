@@ -4,14 +4,12 @@ import ClickAwayListener from '@mui/base/ClickAwayListener';
 import clsx from 'clsx';
 import useUserStore from 'state/ui/user';
 import { CWText } from '../../component_kit/cw_text';
-import CWPopover, {
-  usePopover,
-} from '../../component_kit/new_designs/CWPopover';
+import CWPopover, { usePopover } from '../../component_kit/CWPopover';
 import TaskList from './TaskList';
-import WeeklyProgressGoal from './WeeklyProgressGoal';
-import './XPProgressIndicator.scss';
 import { XPProgressIndicatorMode, XPProgressIndicatorProps } from './types';
 import useXPProgress from './useXPProgress';
+import WeeklyProgressGoal from './WeeklyProgressGoal';
+import './XPProgressIndicator.scss';
 
 const XPProgressIndicator = ({
   mode = XPProgressIndicatorMode.Detailed,

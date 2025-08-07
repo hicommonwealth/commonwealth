@@ -3,13 +3,13 @@ import React from 'react';
 import { Avatar } from 'views/components/Avatar';
 
 import clsx from 'clsx';
-import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import CWIconButton from 'views/components/component_kit/CWIconButton';
 import CWPopover, {
   CWPopoverProps,
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
+} from 'views/components/component_kit/CWPopover';
+import { Skeleton } from 'views/components/Skeleton';
 
 import { formatAddressShort } from 'client/scripts/helpers';
 import './TokenBanner.scss';

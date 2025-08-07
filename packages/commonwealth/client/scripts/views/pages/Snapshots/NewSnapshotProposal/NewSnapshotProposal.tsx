@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import { CWModal } from 'views/components/component_kit/CWModal';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 
 import NewSnapshotProposalForm from './NewSnapshotProposalForm';
 import SnapshotSpaceSelectorModal from './SnapshotSpaceSelectorModal';

@@ -1,6 +1,6 @@
 import { useReactNativeWebView } from 'hooks/useReactNativeWebView';
 import React, { useCallback } from 'react';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 
 /**
  * Create an about section for loading the React native 'about' page.

@@ -10,10 +10,10 @@ import {
 import useUserStore from 'state/ui/user';
 import { saveToClipboard } from 'utils/clipboard';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
 import { openConfirmation } from '../../../modals/confirmation_modal';
-import CWIconButton from '../../component_kit/new_designs/CWIconButton';
+import CWIconButton from '../../component_kit/CWIconButton';
 import ProfileSection from '../Section';
 import './ManageAPIKeys.scss';
 

@@ -1,6 +1,6 @@
 import { doesActionRewardShareForReferrer } from 'helpers/quest';
 import React from 'react';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
 import { QuestAction } from '../types';
 import { SpecialCaseDynamicFieldsProps } from './types';
 

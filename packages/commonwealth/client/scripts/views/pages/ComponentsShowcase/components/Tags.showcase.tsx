@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWIdentificationTag } from 'views/components/component_kit/new_designs/CWIdentificationTag';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWIdentificationTag } from 'views/components/component_kit/CWIdentificationTag';
+import { CWTag } from 'views/components/component_kit/CWTag';
 
 const TagsShowcase = () => {
   const [communityId, setCommunityId] = useState<string | null>('dydx');

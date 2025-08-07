@@ -30,9 +30,9 @@ import {
   useManageCommunityStakeModalStore,
 } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
+import { CWToggle } from 'views/components/component_kit/cw_toggle';
+import CWIconButton from 'views/components/component_kit/CWIconButton';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
-import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
-import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { usePrivyMobileLogout } from 'views/components/PrivyMobile/usePrivyMobileLogout';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { MobileTabType } from '../../pages/WalletPage/types';

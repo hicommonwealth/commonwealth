@@ -1,4 +1,4 @@
-import { RadioButtonProps } from 'views/components/component_kit/new_designs/cw_radio_button';
+import { RadioButtonProps } from 'views/components/component_kit/cw_radio_button';
 import useCWRepetitionCycleRadioButton from './useCWRepetitionCycleRadioButton';
 
 export type RepetitionCycleOption = {

@@ -4,13 +4,13 @@ import { calculateQuestTimelineLabel } from 'helpers/quest';
 import moment from 'moment';
 import React, { ReactNode } from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import { Skeleton } from 'views/components/Skeleton';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { withTooltip } from 'views/components/component_kit/CWTooltip';
+import { Skeleton } from 'views/components/Skeleton';
 import './QuestCard.scss';
 
 interface QuestCardProps {

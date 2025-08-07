@@ -2,7 +2,7 @@ import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_che
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 // eslint-disable-next-line max-len
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'client/scripts/views/components/component_kit/CWButton';
 import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 // eslint-disable-next-line max-len

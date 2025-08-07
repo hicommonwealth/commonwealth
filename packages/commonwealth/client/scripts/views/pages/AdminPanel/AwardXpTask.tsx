@@ -5,10 +5,10 @@ import app from 'state';
 import useAwardXpMutation from 'state/api/superAdmin/awardXp';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import CWUserPicker from 'views/components/component_kit/new_designs/CWUserPicker/CWUserPicker';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWForm } from 'views/components/component_kit/CWForm';
+import { CWTextInput } from 'views/components/component_kit/CWTextInput';
+import CWUserPicker from 'views/components/component_kit/CWUserPicker/CWUserPicker';
 import { z } from 'zod';
 import './AdminPanel.scss';
 

@@ -1,8 +1,8 @@
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from '../component_kit/new_designs/CWButton';
-import { CWTextInput } from '../component_kit/new_designs/CWTextInput';
+import { CWButton } from '../component_kit/CWButton';
+import { CWTextInput } from '../component_kit/CWTextInput';
 import TokenLaunchButton from '../sidebar/TokenLaunchButton';
 import './LaunchIdeaCard.scss';
 

@@ -8,8 +8,8 @@ import {
 } from 'state/api/tokens';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import { PageNotFound } from '../../404';
 import ConnectTokenForm from './ConnectTokenForm';
 import ManageConnectedToken from './ManageConnectedToken';

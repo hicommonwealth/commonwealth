@@ -3,12 +3,12 @@ import { linkValidationSchema } from '../../../helpers/formValidations/common';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import { CWTextInput } from '../component_kit/cw_text_input';
-import { CWButton } from '../component_kit/new_designs/CWButton';
+import { CWButton } from '../component_kit/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
-} from '../component_kit/new_designs/CWModal';
+} from '../component_kit/CWModal';
 import './LinkModal.scss';
 
 type LinkModalProps = {

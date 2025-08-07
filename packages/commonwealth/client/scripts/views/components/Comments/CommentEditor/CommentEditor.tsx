@@ -14,12 +14,12 @@ import { useTurnstile } from 'views/components/useTurnstile';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import { ImageActionModal } from '../../ImageActionModal/ImageActionModal';
+import { CWButton } from '../../component_kit/CWButton';
+import { CWTooltip } from '../../component_kit/CWTooltip';
 import { CWText } from '../../component_kit/cw_text';
+import { CWThreadAction } from '../../component_kit/cw_thread_action';
+import { CWToggle } from '../../component_kit/cw_toggle';
 import { CWValidationText } from '../../component_kit/cw_validation_text';
-import { CWButton } from '../../component_kit/new_designs/CWButton';
-import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
-import { CWThreadAction } from '../../component_kit/new_designs/cw_thread_action';
-import { CWToggle } from '../../component_kit/new_designs/cw_toggle';
 import {
   createDeltaFromText,
   ReactQuillEditor,

@@ -1,11 +1,11 @@
 import commonLogo from 'assets/img/branding/common.svg';
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
-import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
+import { CWTooltip } from 'views/components/component_kit/CWTooltip';
 import './XpQuestCard.scss';
 
 interface QuestCardProps {

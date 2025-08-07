@@ -13,7 +13,7 @@ import useCreateThreadMutation, {
 } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import {
   createDeltaFromText,
   getTextFromDelta,
@@ -21,7 +21,7 @@ import {
 import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import { CWModal } from '../../components/component_kit/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import ActiveContestList from '../HomePage/ActiveContestList/ActiveContestList';
 import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';

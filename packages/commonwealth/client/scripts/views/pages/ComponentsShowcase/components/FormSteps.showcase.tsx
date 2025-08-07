@@ -1,5 +1,5 @@
 import React from 'react';
-import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
+import CWFormSteps from 'views/components/component_kit/CWFormSteps';
 
 const FormStepsShowcase = () => {
   return (

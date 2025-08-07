@@ -5,9 +5,9 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useSetCommunityTierMutation from 'state/api/superAdmin/setCommunityTier';
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import { CWSelectList } from 'views/components/component_kit/CWSelectList';
+import { CWTextInput } from '../../components/component_kit/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
 
 const getTierLabel = (tier: CommunityTierMap) => {

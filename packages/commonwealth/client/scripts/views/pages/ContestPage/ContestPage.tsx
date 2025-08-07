@@ -3,9 +3,9 @@ import moment from 'moment';
 import React, { useState } from 'react';
 import 'react-farcaster-embed/dist/styles.css';
 import useFetchFarcasterCastsQuery from 'state/api/contests/getFarcasterCasts';
-import ContestCard from 'views/components/ContestCard';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
+import ContestCard from 'views/components/ContestCard';
 import { PageNotFound } from 'views/pages/404';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 

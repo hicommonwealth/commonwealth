@@ -1,8 +1,8 @@
 import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleRingSpinner from 'views/components/component_kit/new_designs/CWCircleRingSpinner';
+import { CWButton } from 'views/components/component_kit/CWButton';
+import CWCircleRingSpinner from 'views/components/component_kit/CWCircleRingSpinner';
 import './ActionStep.scss';
 import { ActionStepProps } from './types';
 

@@ -4,7 +4,7 @@ import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import clsx from 'clsx';
 import { CWText } from '../../component_kit/cw_text';
-import { CWButton } from '../../component_kit/new_designs/CWButton';
+import { CWButton } from '../../component_kit/CWButton';
 import './SidebarSignInButton.scss';
 
 interface SidebarSignInButtonProps {

@@ -1,5 +1,5 @@
 import React from 'react';
-import CWCircleMultiplySpinner from './views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import CWCircleMultiplySpinner from './views/components/component_kit/CWCircleMultiplySpinner';
 
 export const Splash = () => {
   return (

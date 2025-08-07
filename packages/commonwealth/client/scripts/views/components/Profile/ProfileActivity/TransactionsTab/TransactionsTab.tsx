@@ -9,9 +9,9 @@ import { buildEtherscanLink } from 'views/modals/ManageCommunityStakeModal/utils
 import useAuthentication from '../../../../modals/AuthModal/useAuthentication';
 import { CWIcon } from '../../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../component_kit/cw_text';
-import { CWButton } from '../../../component_kit/new_designs/CWButton';
-import { CWSelectList } from '../../../component_kit/new_designs/CWSelectList';
-import { CWTextInput } from '../../../component_kit/new_designs/CWTextInput';
+import { CWButton } from '../../../component_kit/CWButton';
+import { CWSelectList } from '../../../component_kit/CWSelectList';
+import { CWTextInput } from '../../../component_kit/CWTextInput';
 import { FilterOptions } from '../types';
 import MyTokens from './MyTokens';
 import NoTransactionHistory from './NoTransactionHistory';

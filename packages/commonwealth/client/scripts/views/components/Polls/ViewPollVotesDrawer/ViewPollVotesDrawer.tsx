@@ -6,10 +6,10 @@ import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer, {
   CWDrawerTopBar,
-} from 'views/components/component_kit/new_designs/CWDrawer';
-import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
-import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
+} from 'views/components/component_kit/CWDrawer';
+import { CWTable } from 'views/components/component_kit/CWTable';
+import { CWTableColumnInfo } from 'views/components/component_kit/CWTable/CWTable';
+import { useCWTableState } from 'views/components/component_kit/CWTable/useCWTableState';
 import { User } from 'views/components/user/user';
 import { z } from 'zod';
 

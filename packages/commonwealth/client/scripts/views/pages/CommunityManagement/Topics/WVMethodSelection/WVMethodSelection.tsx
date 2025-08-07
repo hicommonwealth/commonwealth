@@ -4,10 +4,10 @@ import app from 'state';
 import { chainIdsWithStakeEnabled } from 'views/components/CommunityInformationForm/constants';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import CWRadioPanel, {
   CWRadioPanelGroup,
-} from 'views/components/component_kit/new_designs/CWRadioPanel';
+} from 'views/components/component_kit/CWRadioPanel';
 
 import { CreateTopicStep } from '../utils';
 

@@ -10,7 +10,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import useUserStore from 'state/ui/user';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import HomePage from 'views/pages/HomePage/HomePage';
 import {
   MixpanelPWAEvent,
@@ -19,11 +19,8 @@ import {
 import useAppStatus from '../../../hooks/useAppStatus';
 import LaunchTokenCard from '../../components/LaunchTokenCard';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
+import { CWTab, CWTabsRow } from '../../components/component_kit/CWTabs';
 import { CWText } from '../../components/component_kit/cw_text';
-import {
-  CWTab,
-  CWTabsRow,
-} from '../../components/component_kit/new_designs/CWTabs';
 import { ThreadFeed } from '../ExplorePage/ThreadFeed/ThreadFeed';
 import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
 import './index.scss';

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 import { CWText } from '../component_kit/cw_text';
-import CWIconButton from '../component_kit/new_designs/CWIconButton';
+import CWIconButton from '../component_kit/CWIconButton';
 import './PageCounter.scss';
 
 type PageCounterProps = {

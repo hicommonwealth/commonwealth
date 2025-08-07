@@ -1,12 +1,12 @@
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { IS_STRIKETHROUGH } from 'commonwealth-mdxeditor';
 import React, { useCallback } from 'react';
-import { FormatButton } from 'views/components/MarkdownEditor/toolbars/FormatButton';
-import { ListButton } from 'views/components/MarkdownEditor/toolbars/ListButton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import CWPopover, {
   usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
+} from 'views/components/component_kit/CWPopover';
+import { FormatButton } from 'views/components/MarkdownEditor/toolbars/FormatButton';
+import { ListButton } from 'views/components/MarkdownEditor/toolbars/ListButton';
 
 import { InsertCodeBlockButton } from 'views/components/MarkdownEditor/toolbars/InsertCodeBlockButton';
 import { TableButton } from 'views/components/MarkdownEditor/toolbars/TableButton';

@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
-import FeatureHint from 'views/components/FeatureHint';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
+import FeatureHint from 'views/components/FeatureHint';
 import { PageNotFound } from '../../../404';
 import './CommunityManagementLayout.scss';
 

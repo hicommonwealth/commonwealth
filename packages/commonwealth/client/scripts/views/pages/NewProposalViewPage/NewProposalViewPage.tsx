@@ -9,16 +9,13 @@ import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWPageLayout from 'views/components/component_kit/CWPageLayout';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import { LoadingIndicator } from '../../components/LoadingIndicator/LoadingIndicator';
 import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
 import CWAccordView from '../../components/component_kit/CWAccordView/CWAccordView';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
-import {
-  CWTab,
-  CWTabsRow,
-} from '../../components/component_kit/new_designs/CWTabs';
+import { CWTab, CWTabsRow } from '../../components/component_kit/CWTabs';
 import DetailCard from '../../components/proposals/DetailCard';
 import TimeLineCard from '../../components/proposals/TimeLineCard';
 import VotingResultView from '../../components/proposals/VotingResultView';

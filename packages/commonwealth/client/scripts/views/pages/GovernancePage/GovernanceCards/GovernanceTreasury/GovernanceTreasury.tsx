@@ -1,12 +1,12 @@
 import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
-import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
 import { CWIconButton } from 'client/scripts/views/components/component_kit/cw_icon_button';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import { CWIdentificationTag } from 'client/scripts/views/components/component_kit/new_designs/CWIdentificationTag';
-import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
+import { CWButton } from 'client/scripts/views/components/component_kit/CWButton';
+import { CWIdentificationTag } from 'client/scripts/views/components/component_kit/CWIdentificationTag';
+import { CWTooltip } from 'client/scripts/views/components/component_kit/CWTooltip';
+import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
 import { LaunchpadToken } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
 import { useTokenPricing } from 'hooks/useTokenPricing';

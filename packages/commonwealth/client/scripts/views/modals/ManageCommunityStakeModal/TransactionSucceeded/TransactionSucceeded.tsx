@@ -5,11 +5,11 @@ import { saveToClipboard } from 'utils/clipboard';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import {
   CWModalBody,
   CWModalFooter,
-} from 'views/components/component_kit/new_designs/CWModal';
+} from 'views/components/component_kit/CWModal';
 
 import { ManageCommunityStakeModalMode } from '../types';
 import { buildEtherscanLink } from '../utils';

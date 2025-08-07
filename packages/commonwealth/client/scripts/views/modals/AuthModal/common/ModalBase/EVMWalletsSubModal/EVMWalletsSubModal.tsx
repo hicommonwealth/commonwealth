@@ -1,5 +1,5 @@
 import usePrefersColorScheme from 'client/scripts/hooks/useColorScheme';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'client/scripts/views/components/component_kit/CWButton';
 import clsx from 'clsx';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -7,7 +7,7 @@ import AuthButton from 'views/components/AuthButton';
 import { EVMWallets } from 'views/components/AuthButton/types';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIcon } from '../../../../../components/component_kit/cw_icons/cw_icon';
-import { CWModal } from '../../../../../components/component_kit/new_designs/CWModal';
+import { CWModal } from '../../../../../components/component_kit/CWModal';
 import './EVMWalletsSubModal.scss';
 type EVMWalletsSubModalProps = {
   isOpen: boolean;

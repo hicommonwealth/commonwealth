@@ -1,12 +1,12 @@
 import React from 'react';
 import { useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/CWButton';
 import {
   PreferenceTags,
   usePreferenceTags,
 } from 'views/components/PreferenceTags';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './PreferencesStep.scss';
 
 type PreferencesStepProps = {

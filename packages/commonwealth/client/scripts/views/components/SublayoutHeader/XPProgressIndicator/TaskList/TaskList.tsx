@@ -2,7 +2,7 @@ import { QuestAction } from 'client/scripts/helpers/quest';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import React from 'react';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
 import TotalQuestXPTag from 'views/pages/QuestDetails/TotalQuestXPTag';
 import WeeklyProgressGoal from '../WeeklyProgressGoal';
 import useXPProgress from '../useXPProgress';

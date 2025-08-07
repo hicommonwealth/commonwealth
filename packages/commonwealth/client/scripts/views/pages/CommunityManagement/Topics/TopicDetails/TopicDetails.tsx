@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 
-import FeatureHint from 'views/components/FeatureHint';
 import { CWText } from 'views/components/component_kit/cw_text';
-import {
-  CWTab,
-  CWTabsRow,
-} from 'views/components/component_kit/new_designs/CWTabs';
+import { CWTab, CWTabsRow } from 'views/components/component_kit/CWTabs';
+import FeatureHint from 'views/components/FeatureHint';
 
 import { CreateTopicStep } from '../utils';
 import CreateTopicSection from './CreateTopicsSection';

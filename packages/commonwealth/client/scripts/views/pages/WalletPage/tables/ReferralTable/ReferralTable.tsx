@@ -7,10 +7,10 @@ import { APIOrderDirection } from 'helpers/constants';
 import { Avatar } from 'views/components/Avatar';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
-import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
-import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import CWCircleMultiplySpinner from 'views/components/component_kit/CWCircleMultiplySpinner';
+import { CWTable } from 'views/components/component_kit/CWTable';
+import { useCWTableState } from 'views/components/component_kit/CWTable/useCWTableState';
+import { withTooltip } from 'views/components/component_kit/CWTooltip';
 import { Referral } from '../../types';
 import { columns } from './columns';
 

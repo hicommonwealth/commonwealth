@@ -1,7 +1,7 @@
 import commonLogo from 'assets/img/branding/common-logo.svg';
 import referralImage from 'assets/img/referral-background-mobile.png';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { CWButton } from 'client/scripts/views/components/component_kit/CWButton';
 import React from 'react';
 import { AuthModal } from '../../../AuthModal';
 import './OptionalWalletModal.scss';

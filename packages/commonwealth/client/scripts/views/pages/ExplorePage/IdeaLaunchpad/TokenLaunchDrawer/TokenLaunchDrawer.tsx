@@ -9,7 +9,7 @@ import {
 } from 'shared/analytics/types';
 import CWDrawer, {
   CWDrawerTopBar,
-} from 'views/components/component_kit/new_designs/CWDrawer';
+} from 'views/components/component_kit/CWDrawer';
 import QuickTokenLaunchForm from '../../../LaunchToken/QuickTokenLaunchForm';
 // eslint-disable-next-line max-len
 import { triggerTokenLaunchFormAbort } from '../../../LaunchToken/QuickTokenLaunchForm/steps/TokenInformationFormStep/helpers';

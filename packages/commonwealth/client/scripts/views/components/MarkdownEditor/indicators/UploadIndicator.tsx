@@ -1,6 +1,6 @@
 import React from 'react';
 
-import CWCircleRingSpinner from 'views/components/component_kit/new_designs/CWCircleRingSpinner';
+import CWCircleRingSpinner from 'views/components/component_kit/CWCircleRingSpinner';
 import { Indicator } from 'views/components/MarkdownEditor/indicators/Indicator';
 
 export const UploadIndicator = () => {

@@ -6,7 +6,7 @@ import './quill_formatted_text.scss';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
+import { CWTooltip } from '../component_kit/CWTooltip';
 import { renderTruncatedHighlights } from './highlighter';
 import { QuillRendererProps } from './quill_renderer';
 import { renderQuillDelta } from './render_quill_delta';

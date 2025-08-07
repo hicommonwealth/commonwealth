@@ -6,11 +6,11 @@ import { Link } from 'react-router-dom';
 import app from 'state';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
 import Thread, { LinkSource } from '../../../models/Thread';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../../components/component_kit/CWButton';
+import CWCircleMultiplySpinner from '../../components/component_kit/CWCircleMultiplySpinner';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
+import { CWModal } from '../../components/component_kit/CWModal';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 import './linked_threads_card.scss';
 
