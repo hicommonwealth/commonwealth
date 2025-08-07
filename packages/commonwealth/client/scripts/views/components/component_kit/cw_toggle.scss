@@ -1,7 +1,7 @@
-@use '../../../../styles/shared.scss';
-@use '../../../../styles/mixins/border_radius';
-@use '../../../../styles/mixins/choice';
-@use '../../../../styles/mixins/colors.module';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/choice';
+@use '../../../styles/mixins/colors.module';
 
 .Toggle {
   background-color: colors.$neutral-200;

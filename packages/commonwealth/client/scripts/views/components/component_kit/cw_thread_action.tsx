@@ -11,10 +11,10 @@ import {
 } from '@phosphor-icons/react';
 import React, { FC } from 'react';
 
-import { CWTooltip } from '../../component_kit/CWTooltip';
-import { CWText } from '../cw_text';
-import { getClasses } from '../helpers';
-import { ComponentType } from '../types';
+import { CWTooltip } from '../component_kit/CWTooltip';
+import { CWText } from './cw_text';
+import { getClasses } from './helpers';
+import { ComponentType } from './types';
 
 import './cw_thread_action.scss';
 

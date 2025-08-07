@@ -1,7 +1,7 @@
-@use '../../../../../styles/shared';
+@use '../../../../styles/shared';
 @use 'buttons';
-@use '../../../../../styles/mixins/border_radius';
-@use '../../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
 
 .btn-border {
   &.primary {

@@ -2,11 +2,11 @@ import React from 'react';
 
 import './CWCircleButton.scss';
 
-import { CWIcon } from '../../cw_icons/cw_icon';
-import type { IconName } from '../../cw_icons/cw_icon_lookup';
-import { getClasses } from '../../helpers';
-import type { BaseStyleProps } from '../../types';
-import { ComponentType } from '../../types';
+import { CWIcon } from '../cw_icons/cw_icon';
+import type { IconName } from '../cw_icons/cw_icon_lookup';
+import { getClasses } from '../helpers';
+import type { BaseStyleProps } from '../types';
+import { ComponentType } from '../types';
 
 type CircleButtonType = 'primary' | 'secondary';
 

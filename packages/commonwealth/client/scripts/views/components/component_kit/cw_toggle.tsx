@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 import './cw_toggle.scss';
 
 import { useFormContext } from 'react-hook-form';
-import { CWIcon } from '../cw_icons/cw_icon';
-import type { IconName } from '../cw_icons/cw_icon_lookup';
-import { getClasses } from '../helpers';
-import type { BaseStyleProps } from '../types';
-import { ComponentType } from '../types';
+import { CWIcon } from './cw_icons/cw_icon';
+import type { IconName } from './cw_icons/cw_icon_lookup';
+import { getClasses } from './helpers';
+import type { BaseStyleProps } from './types';
+import { ComponentType } from './types';
 
 type FormFieldValidationProps = {
   hookToForm?: boolean;

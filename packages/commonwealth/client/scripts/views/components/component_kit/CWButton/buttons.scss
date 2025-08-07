@@ -1,5 +1,5 @@
-@use '../../../../../styles/mixins/buttons';
-@use '../../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/buttons';
+@use '../../../../styles/mixins/colors.module';
 
 @mixin iconAndTextColors($icon-color, $text-color) {
   .Icon.button-icon {

@@ -1,12 +1,12 @@
 import { X } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import React from 'react';
-import { CWCommunityAvatar } from '../cw_community_avatar';
-import { CWIcon } from '../cw_icons/cw_icon';
-import type { CustomIconName, IconName } from '../cw_icons/cw_icon_lookup';
-import { CWText } from '../cw_text';
-import { getClasses } from '../helpers';
-import { ComponentType } from '../types';
+import { CWCommunityAvatar } from './cw_community_avatar';
+import { CWIcon } from './cw_icons/cw_icon';
+import type { CustomIconName, IconName } from './cw_icons/cw_icon_lookup';
+import { CWText } from './cw_text';
+import { getClasses } from './helpers';
+import { ComponentType } from './types';
 
 import './CWTag.scss';
 
