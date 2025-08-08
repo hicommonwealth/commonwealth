@@ -13,6 +13,7 @@ import WVConsent from './WVConsent';
 import WVERC20Details from './WVERC20Details';
 import WVMethodSelection from './WVMethodSelection';
 import WVSPLDetails from './WVSPLDetails';
+import WVSuiNFTDetails from './WVSuiNFTDetails';
 import WVSuiNativeDetails from './WVSuiNativeDetails';
 import WVSuiTokenDetails from './WVSuiTokenDetails';
 import { CreateTopicStep, getCreateTopicSteps } from './utils';
@@ -62,6 +63,7 @@ export interface TopicFormSuiNative {
 
 export interface TopicFormSuiToken {
   tokenAddress?: string;
+  tokenSymbol?: string;
   tokenDecimals?: number;
   voteWeightMultiplier?: number;
   chainNodeId?: number;
@@ -176,6 +178,7 @@ export const Topics = () => {
         ...(suiToken
           ? {
               token_address: suiToken.tokenAddress,
+              token_symbol: suiToken.tokenSymbol,
               token_decimals: suiToken.tokenDecimals,
               vote_weight_multiplier: suiToken.voteWeightMultiplier,
               chain_node_id: suiToken.chainNodeId,
@@ -272,6 +275,13 @@ export const Topics = () => {
       case CreateTopicStep.WVSuiTokenDetails:
         return (
           <WVSuiTokenDetails
+            onStepChange={setCreateTopicStep}
+            onCreateTopic={handleCreateTopic}
+          />
+        );
+      case CreateTopicStep.WVSuiNFTDetails:
+        return (
+          <WVSuiNFTDetails
             onStepChange={setCreateTopicStep}
             onCreateTopic={handleCreateTopic}
           />
