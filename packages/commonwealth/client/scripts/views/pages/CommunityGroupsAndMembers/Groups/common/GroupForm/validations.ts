@@ -14,6 +14,9 @@ export const requirementSubFormValidationSchema = z.object({
   requirementChain: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+  requirementTrustLevel: z
+    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   requirementContractAddress: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),

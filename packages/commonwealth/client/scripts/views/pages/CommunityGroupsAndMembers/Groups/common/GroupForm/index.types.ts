@@ -7,6 +7,7 @@ export type RequirementSubFormsState = {
 };
 
 export type RequirementSubType = {
+  requirementTrustLevel?: string;
   requirementType?: string;
   requirementContractAddress?: string;
   requirementChain?: string;
@@ -44,6 +45,7 @@ export type LabelType = {
 };
 
 export type RequirementSubTypeWithLabel = {
+  requirementTrustLevel?: LabelType;
   requirementCoinType?: string;
   requirementType?: LabelType;
   requirementContractAddress?: string;
