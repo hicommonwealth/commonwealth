@@ -9,6 +9,7 @@ import Directory from './Directory';
 import Discord from './Discord';
 import GoogleSheetsMCP from './GoogleSheetsMCP';
 import './Integrations.scss';
+import LaunchToken from './LaunchToken';
 import OnchainVerification from './OnchainVerification';
 import Snapshots from './Snapshots';
 import SpamLevel from './SpamLevel';
@@ -37,6 +38,7 @@ const Integrations = () => {
     >
       <section className="Integrations">
         <Directory />
+        <LaunchToken />
         <SpamLevel />
         <Token />
         {isEthereum && isJudgementEnabled && <OnchainVerification />}
