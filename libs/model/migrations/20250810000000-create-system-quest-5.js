@@ -96,7 +96,7 @@ export default {
           "updated_at"
         )
         VALUES (
-          -9,                     -- id (new, avoiding existing IDs)
+          -11,                    -- id (new, avoiding existing IDs - changed from -9 to avoid conflict with Binance quest)
           -5,                     -- quest_id
           'SSOLinked',            -- event_name
           5,                      -- reward_amount (same as quest -2)
