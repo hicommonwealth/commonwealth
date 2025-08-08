@@ -35,6 +35,9 @@ type CWRelatedCommunityCardProps = {
   threadCount: string | number;
   canBuyStake?: boolean;
   onStakeBtnClick?: () => void;
+  hasToken?: boolean;
+  canTradeToken?: boolean;
+  onTokenBtnClick?: () => void;
   ethUsdRate?: string;
   historicalPrice?: string;
   onlyShowIfStakeEnabled?: boolean;
@@ -46,6 +49,9 @@ export const CWRelatedCommunityCard = ({
   threadCount,
   canBuyStake,
   onStakeBtnClick,
+  hasToken,
+  canTradeToken,
+  onTokenBtnClick,
   ethUsdRate,
   historicalPrice,
   onlyShowIfStakeEnabled,
@@ -108,6 +114,10 @@ export const CWRelatedCommunityCard = ({
         },
       });
     }
+  };
+
+  const handleTradeTokenClick = () => {
+    onTokenBtnClick?.();
   };
 
   const disableStakeButton = !user.isLoggedIn || !canBuyStake;
@@ -219,26 +229,44 @@ export const CWRelatedCommunityCard = ({
             </CWText>
           </div>
         </div>
-        {stakeEnabled && (
+        {(stakeEnabled || hasToken) && (
           <div className="actions">
-            {disableStakeButton ? (
-              <CWTooltip
-                placement="right"
-                content={disabledStakeButtonTooltipText({
-                  isLoggedIn: user.isLoggedIn,
-                  connectBaseChainToBuy: community?.base,
-                })}
-                renderTrigger={(handleInteraction) => (
-                  <span
-                    onMouseEnter={handleInteraction}
-                    onMouseLeave={handleInteraction}
-                  >
-                    {stakeButton}
-                  </span>
+            {stakeEnabled && (
+              <>
+                {disableStakeButton ? (
+                  <CWTooltip
+                    placement="right"
+                    content={disabledStakeButtonTooltipText({
+                      isLoggedIn: user.isLoggedIn,
+                      connectBaseChainToBuy: community?.base,
+                    })}
+                    renderTrigger={(handleInteraction) => (
+                      <span
+                        onMouseEnter={handleInteraction}
+                        onMouseLeave={handleInteraction}
+                      >
+                        {stakeButton}
+                      </span>
+                    )}
+                  />
+                ) : (
+                  stakeButton
                 )}
+              </>
+            )}
+            {hasToken && (
+              <CWButton
+                label="Trade Token"
+                buttonType="secondary"
+                buttonAlt="green"
+                buttonHeight="sm"
+                buttonWidth="narrow"
+                disabled={!canTradeToken}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleTradeTokenClick();
+                }}
               />
-            ) : (
-              stakeButton
             )}
           </div>
         )}
