@@ -10,6 +10,9 @@ import { config } from '../../../config';
 const log = logger(import.meta);
 
 const updateSitemaps = async () => {
+  if (config.DISABLE_SITEMAP) {
+    return;
+  }
   if (!['production', 'local'].includes(config.APP_ENV)) {
     throw new Error('Must be in production or local environment');
   }
