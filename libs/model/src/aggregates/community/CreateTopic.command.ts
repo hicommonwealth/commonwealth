@@ -77,10 +77,9 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
       if (payload.weighted_voting) {
         let tokenSymbol = payload.token_symbol;
 
-        // For Sui-based voting (SuiNative and SuiToken), extract token symbol from contract address
+        // For Sui coin type token, extract token symbol from contract address
         if (
-          (payload.weighted_voting === schemas.TopicWeightedVoting.SuiNative ||
-            payload.weighted_voting === schemas.TopicWeightedVoting.SuiToken) &&
+          payload.weighted_voting === schemas.TopicWeightedVoting.SuiToken &&
           payload.token_address
         ) {
           tokenSymbol = extractTokenSymbolFromAddress(payload.token_address);
