@@ -86,12 +86,18 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
           tokenSymbol = extractTokenSymbolFromAddress(payload.token_address);
         }
 
+        // For Sui native, use 9 decimals
+        const tokenDecimals =
+          payload.weighted_voting === schemas.TopicWeightedVoting.SuiNative
+            ? 9
+            : payload.token_decimals;
+
         options = {
           ...options,
           weighted_voting: payload.weighted_voting,
           token_address: payload.token_address || undefined,
           token_symbol: tokenSymbol || undefined,
-          token_decimals: payload.token_decimals || undefined,
+          token_decimals: tokenDecimals || undefined,
           vote_weight_multiplier: payload.vote_weight_multiplier || undefined,
           chain_node_id: payload.chain_node_id || undefined,
         };

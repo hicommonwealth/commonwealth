@@ -55,7 +55,6 @@ export interface TopicFormSPL {
 }
 
 export interface TopicFormSuiNative {
-  tokenAddress?: string;
   voteWeightMultiplier?: number;
   chainNodeId?: number;
   weightedVoting?: TopicWeightedVoting | null;
@@ -169,7 +168,6 @@ export const Topics = () => {
           : {}),
         ...(suiNative
           ? {
-              token_address: suiNative.tokenAddress,
               vote_weight_multiplier: suiNative.voteWeightMultiplier,
               chain_node_id: suiNative.chainNodeId,
               weighted_voting: suiNative.weightedVoting,
