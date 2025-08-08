@@ -13,18 +13,18 @@ export interface MagnaCustomAttribute {
 }
 
 export interface CreateAllocationRequest {
-  amount: string;
   contractId: string;
   tokenId: string;
+  amount: number;
+  walletAddress: string;
+  stakeholder: MagnaStakeholder;
+  unlockScheduleId: string;
+  unlockStartAt: string;
   category: string;
   description?: string | null;
-  unlockScheduleId?: string;
-  unlockStartAt?: string;
   vestingScheduleId?: string;
   vestingStartAt?: string;
   releaseMode?: 'LINEAR' | 'CLIFF';
-  walletAddress?: string;
-  stakeholder?: MagnaStakeholder;
   receivedOffMagna?: string;
   cancellable?: boolean;
   customAttributes?: MagnaCustomAttribute[];
@@ -66,6 +66,7 @@ export interface MagnaAllocation {
 export interface MagnaResponse<T> {
   isProcessed: boolean;
   result: T;
+  errors: unknown;
 }
 
 export type MagnaAllocationResponse = MagnaResponse<MagnaAllocation>;

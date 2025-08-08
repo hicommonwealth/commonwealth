@@ -16,36 +16,40 @@ async function createMagnaAllocation({
   wallet_address,
   token_allocation,
 }: TokenAllocationSyncArgs): Promise<TokenAllocationSyncResponse> {
-  const response = await magnaApi.createAllocation(
-    config.MAGNA.API_URL!,
-    config.MAGNA.API_KEY!,
-    {
-      walletAddress: wallet_address,
-      amount: token_allocation.toString(),
-      contractId: config.MAGNA.CONTRACT_ID!,
-      tokenId: config.MAGNA.TOKEN_ID!,
-      category: 'Initial Airdrop',
-      description: `Allocation for inital C token airdrop for ${user_name}`,
-      stakeholder: {
-        name: user_name,
-        email: user_email,
+  try {
+    const response = await magnaApi.createAllocation(
+      config.MAGNA!.API_URL,
+      config.MAGNA!.API_KEY,
+      {
+        contractId: config.MAGNA!.CONTRACT_ID,
+        tokenId: config.MAGNA!.TOKEN_ID,
+        amount: token_allocation,
+        walletAddress: wallet_address,
+        stakeholder: user_email
+          ? {
+              name: user_name,
+              email: user_email,
+            }
+          : { name: user_name },
+        unlockScheduleId: config.MAGNA!.UNLOCK_SCHEDULE_ID,
+        unlockStartAt: config.MAGNA!.UNLOCK_START_AT.toISOString(),
+        category: 'Initial Airdrop',
+        description: `Allocation for inital C token airdrop for ${user_name}`,
       },
-    },
-  );
-  // TODO: determine if allocation was created or already exists
-  if (response.isProcessed) return { id: response.result.id };
-  else return { error: "Couldn't create allocation" };
+    );
+    if (response.isProcessed) {
+      if (response.result.id) return { id: response.result.id };
+      else return { error: 'Allocation ID not found in reponse' };
+    } else return { error: JSON.stringify(response) };
+  } catch (error) {
+    return { error: error.message };
+  }
 }
 
 export const magnaSyncTask: GraphileTask<typeof TaskPayloads.MagnaSync> = {
   input: TaskPayloads.MagnaSync,
   fn: async () => {
-    if (
-      !config.MAGNA.API_URL ||
-      !config.MAGNA.API_KEY ||
-      !config.MAGNA.CONTRACT_ID ||
-      !config.MAGNA.TOKEN_ID
-    ) {
+    if (!config.MAGNA) {
       log.error('Missing Magna configuration');
       return;
     }
