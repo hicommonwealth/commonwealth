@@ -50,8 +50,7 @@ export const cronItems: Array<CustomCronItem | undefined> = [
   config.MAGNA
     ? buildCustomCronItem({
         task: GraphileTaskNames.MagnaSync,
-        //match: '0 * * * *', // every hour
-        match: '*/5 * * * *', // every 5 minutes
+        match: '0 * * * *', // every hour
       })
     : undefined,
 ];
