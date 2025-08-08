@@ -95,6 +95,7 @@ const {
   KNOCK_IN_APP_FEED_ID,
   UNLEASH_FRONTEND_API_TOKEN,
   CONTEST_DURATION_IN_SEC,
+  KLAVIS_API_KEY,
   REORG_SAFETY_DISABLED,
   SEND_EMAILS,
 } = process.env;
@@ -324,6 +325,9 @@ export const config = configure(
     },
     UNLEASH: {
       FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
+    },
+    KLAVIS: {
+      API_KEY: KLAVIS_API_KEY,
     },
   },
   z.object({
@@ -717,6 +721,9 @@ export const config = configure(
             requiredServices: [...WebServices],
           }),
         ),
+    }),
+    KLAVIS: z.object({
+      API_KEY: z.string().optional(),
     }),
   }),
 );

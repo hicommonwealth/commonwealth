@@ -20,9 +20,11 @@ import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
+import { AuthModal } from '../../modals/AuthModal';
 import { PageNotFound } from '../404';
 import './WalletPage.scss';
 import { QuestSummaryCard, ReferralCard, WalletCard } from './cards';
+import TokenClaimBanner from './components/TokenClaimBanner';
 import { ReferralTable, TokenTXHistoryTable, XPEarningsTable } from './tables';
 import { MobileTabType, TableType } from './types';
 import {
@@ -44,6 +46,7 @@ const WalletPage = () => {
 
   const [mobileTab, setMobileTab] = useState<MobileTabType>(getInitialTab());
   const [tableTab, setTableTab] = useState(tabToTable[getInitialTab()]);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const { data: referrals, isLoading: isReferralsLoading } =
     useGetUserReferralsQuery({
@@ -113,6 +116,11 @@ const WalletPage = () => {
           })}
         </div>
 
+        {/* Token claim banner - full width above cards */}
+        <TokenClaimBanner
+          onConnectNewAddress={() => setIsAuthModalOpen(true)}
+        />
+
         {/* on mobile show only one card */}
         <div className="wallet-card-container">
           {(!isWindowSmallInclusive ||
@@ -162,6 +170,12 @@ const WalletPage = () => {
         )}
         {xpEnabled && tableTab === TableType.XPEarnings && <XPEarningsTable />}
       </section>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={() => setIsAuthModalOpen(false)}
+      />
     </CWPageLayout>
   );
 };

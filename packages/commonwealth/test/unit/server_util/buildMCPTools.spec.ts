@@ -2,7 +2,7 @@ import { command, dispose } from '@hicommonwealth/core';
 import { User } from '@hicommonwealth/model';
 import { seed } from '@hicommonwealth/model/tester';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { buildMCPTools } from '../../../server/api/mcp';
+import { buildMCPTools } from '../../../server/api/mcp-server';
 
 describe('buildMCPTools', () => {
   const address = '0x1234567890123456789012345678901234567890';

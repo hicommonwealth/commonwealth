@@ -1,4 +1,7 @@
-import { CompletionModel } from '@hicommonwealth/shared';
+import {
+  CompletionModel,
+  DEFAULT_COMPLETION_MODEL,
+} from '@hicommonwealth/shared';
 import { AIModelOption } from 'client/scripts/state/ui/user/userAiSettings';
 import { ModelOption } from 'views/components/AIModelSelector';
 
@@ -12,7 +15,7 @@ const createModelOption = <T extends CompletionModel>(
 
 export const getCompletionModelValue = (
   modelOption: ModelOption | AIModelOption | undefined,
-  fallback: CompletionModel = 'gpt-4o',
+  fallback: CompletionModel = DEFAULT_COMPLETION_MODEL,
 ): CompletionModel => {
   if (!modelOption?.value) return fallback;
   return modelOption.value as string as CompletionModel;

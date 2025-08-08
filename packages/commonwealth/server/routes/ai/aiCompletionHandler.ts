@@ -1,5 +1,8 @@
 import { logger } from '@hicommonwealth/core';
-import { CompletionOptions } from '@hicommonwealth/shared';
+import {
+  CompletionOptions,
+  DEFAULT_COMPLETION_MODEL,
+} from '@hicommonwealth/shared';
 import { Request, Response } from 'express';
 import { OpenAI } from 'openai';
 import { config } from '../../config';
@@ -24,7 +27,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     const {
       prompt: initialPrompt,
       systemPrompt: initialSystemPrompt,
-      model = 'gpt-4o',
+      model = DEFAULT_COMPLETION_MODEL,
       temperature,
       maxTokens = 1000,
       stream = true,
