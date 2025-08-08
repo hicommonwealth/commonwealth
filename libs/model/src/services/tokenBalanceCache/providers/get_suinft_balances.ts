@@ -8,6 +8,9 @@ export async function __get_suinft_balances(
   rpcEndpoint: string,
   options: GetSuiNftBalanceOptions,
 ): Promise<Balances> {
+  // remove extra metadata from collection id if present
+  const collectionId = options.sourceOptions.collectionId.split('::')[0];
+
   const client = new SuiClient({ url: rpcEndpoint });
   const balances: Balances = {};
   const batchSize = options.batchSize || 100;
@@ -36,12 +39,12 @@ export async function __get_suinft_balances(
             if (!obj.data) return false;
 
             // Method 1: Check if the object type matches the collection ID exactly
-            if (obj.data.type === options.sourceOptions.collectionId) {
+            if (obj.data.type === collectionId) {
               return true;
             }
 
             // Method 2: Check if the object type contains the collection ID as part of the struct
-            if (obj.data.type?.includes(options.sourceOptions.collectionId)) {
+            if (obj.data.type?.includes(collectionId)) {
               return true;
             }
 
@@ -51,18 +54,12 @@ export async function __get_suinft_balances(
               const content = obj.data.content as any;
 
               // Look for collection field in the content
-              if (
-                content.fields?.collection ===
-                options.sourceOptions.collectionId
-              ) {
+              if (content.fields?.collection === collectionId) {
                 return true;
               }
 
               // Look for collection_id field
-              if (
-                content.fields?.collection_id ===
-                options.sourceOptions.collectionId
-              ) {
+              if (content.fields?.collection_id === collectionId) {
                 return true;
               }
 
@@ -76,9 +73,7 @@ export async function __get_suinft_balances(
                   'creator',
                 ];
                 for (const field of collectionFields) {
-                  if (
-                    content.fields[field] === options.sourceOptions.collectionId
-                  ) {
+                  if (content.fields[field] === collectionId) {
                     return true;
                   }
                 }
@@ -88,9 +83,7 @@ export async function __get_suinft_balances(
             // Method 4: Check display metadata
             if (obj.data.display?.data) {
               const displayData = obj.data.display.data;
-              if (
-                displayData.collection === options.sourceOptions.collectionId
-              ) {
+              if (displayData.collection === collectionId) {
                 return true;
               }
             }
