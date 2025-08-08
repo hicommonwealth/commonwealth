@@ -1,0 +1,22 @@
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+
+.MCP {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .header {
+    .h4 {
+      color: colors.$neutral-900 !important;
+    }
+
+    .b1 {
+      color: colors.$neutral-500 !important;
+    }
+  }
+
+  .btn-border {
+    margin: 0 !important;
+  }
+}
