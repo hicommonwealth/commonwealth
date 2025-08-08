@@ -33,8 +33,6 @@ export async function magnaSync(
   try {
     let found = true;
     while (found) {
-      await delay(breatherMs); // take a breath to keep rate limit at BATCH_SIZE/sec
-
       // Load next batch of allocations to sync with Magna
       const batch = await models.sequelize.query<TokenAllocationSyncArgs>(
         `
@@ -43,8 +41,9 @@ export async function magnaSync(
             A.address as wallet_address,
             U.profile->>'name' as user_name,
             U.profile->>'email' as user_email,
-            COALESCE(HA.token_allocation, 0) 
-              + COALESCE(AA.token_allocation, 0) as token_allocation -- combined in initial drop
+            -- combined in initial drop?
+            COALESCE(HA.token_allocation, 0)::double precision 
+            + COALESCE(AA.token_allocation, 0)::double precision as token_allocation
           FROM
             "ClaimAddresses" A -- this is the driving table with sync watermarks
             JOIN "Users" U ON A.user_id = U.id
@@ -82,8 +81,9 @@ export async function magnaSync(
             );
             log.info(`Synced allocation for user ${args.user_id}`);
           } else {
+            const error = JSON.stringify(response);
             log.error(
-              `Failed to sync allocation for user ${args.user_id}: ${response.error}`,
+              `Failed to sync allocation for user ${args.user_id}: ${error}`,
             );
           }
         } catch (err) {
@@ -94,6 +94,8 @@ export async function magnaSync(
         }
       });
       await Promise.all(promises);
+
+      await delay(breatherMs); // take a breath to keep rate limit at BATCH_SIZE/sec
     }
   } catch (err) {
     log.error('Error syncing with Magna', err as Error);
