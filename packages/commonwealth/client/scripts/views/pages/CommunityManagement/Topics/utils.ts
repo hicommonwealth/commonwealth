@@ -9,6 +9,7 @@ export enum CreateTopicStep {
   WVSPLDetails = 'WVSPLDetails',
   WVSuiNativeDetails = 'WVSuiNativeDetails',
   WVSuiTokenDetails = 'WVSuiTokenDetails',
+  WVSuiNFTDetails = 'WVSuiNFTDetails',
   WVStake = 'WVStake',
 }
 
@@ -32,6 +33,7 @@ export const getCreateTopicSteps = (
         createTopicStep === CreateTopicStep.WVSPLDetails ||
         createTopicStep === CreateTopicStep.WVSuiNativeDetails ||
         createTopicStep === CreateTopicStep.WVSuiTokenDetails ||
+        createTopicStep === CreateTopicStep.WVSuiNFTDetails ||
         createTopicStep === CreateTopicStep.WVStake
           ? 'active'
           : 'inactive',

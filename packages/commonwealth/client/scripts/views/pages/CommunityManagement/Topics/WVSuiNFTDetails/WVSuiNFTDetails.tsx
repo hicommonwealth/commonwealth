@@ -10,52 +10,27 @@ import { CreateTopicStep } from '../utils';
 
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
-import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
-import './WVSuiTokenDetails.scss';
+import './WVSuiNFTDetails.scss';
 
-interface WVSuiTokenDetailsProps {
+interface WVSuiNFTDetailsProps {
   onStepChange: (step: CreateTopicStep) => void;
   onCreateTopic: (props: HandleCreateTopicProps) => Promise<void>;
 }
 
-const WVSuiTokenDetails = ({
+const WVSuiNFTDetails = ({
   onStepChange,
   onCreateTopic,
-}: WVSuiTokenDetailsProps) => {
-  const [tokenAddress, setTokenAddress] = useState('');
-  const [tokenDecimals, setTokenDecimals] = useState(9);
+}: WVSuiNFTDetailsProps) => {
+  const [collectionId, setCollectionId] = useState('');
+  const [tokenSymbol, setTokenSymbol] = useState('');
   const [multiplier, setMultiplier] = useState(1);
   const [loading, setLoading] = useState(false);
 
   const chainNodeId = app?.chain?.meta?.ChainNode?.id;
 
-  // Validation function for Sui contract address format
-  const validateSuiAddress = (
-    value: string,
-  ): [ValidationStatus, string] | [] => {
-    if (!value) return [];
-
-    const segments = value.split('::');
-    if (segments.length < 3) {
-      return [
-        'failure',
-        'Address must contain at least 3 segments separated by "::"',
-      ];
-    }
-
-    // Check if each segment is non-empty
-    for (const segment of segments) {
-      if (!segment.trim()) {
-        return ['failure', 'All segments must be non-empty'];
-      }
-    }
-
-    return ['success', 'Valid Sui address format'];
-  };
-
   const handleSubmit = async () => {
-    if (!tokenAddress || !chainNodeId) {
+    if (!collectionId || !tokenSymbol || !chainNodeId) {
       notifyError('Please fill in all required fields');
       return;
     }
@@ -64,11 +39,12 @@ const WVSuiTokenDetails = ({
     try {
       await onCreateTopic({
         suiToken: {
-          tokenAddress,
-          tokenDecimals,
+          tokenAddress: collectionId,
+          tokenSymbol,
+          tokenDecimals: 0, // NFTs typically don't have decimals
           voteWeightMultiplier: multiplier,
           chainNodeId,
-          weightedVoting: TopicWeightedVoting.SuiToken,
+          weightedVoting: TopicWeightedVoting.SuiNFT,
         },
       });
     } catch (err) {
@@ -80,7 +56,7 @@ const WVSuiTokenDetails = ({
   };
 
   return (
-    <div className="WVSuiTokenDetails">
+    <div className="WVSuiNFTDetails">
       <CWText type="h2">Weighted voting</CWText>
       <CWText type="b1" className="description">
         Activate weighted voting to allow members to cast votes proportional to
@@ -90,38 +66,35 @@ const WVSuiTokenDetails = ({
 
       <CWDivider />
 
-      <CWText type="h4">Connect Sui Token</CWText>
+      <CWText type="h4">Connect Sui NFT</CWText>
 
-      <CWText type="h5">Coin Type</CWText>
+      <CWText type="h5">Sui NFT Collection ID</CWText>
       <CWText type="b1" className="description">
-        Enter the Sui Coin Type (e.g.,
-        0xe1b45a0e641b9955a20aa0ad1c1f4ad86aad8afb07296d4085e349a50e90bdca::blue::BLUE)
+        Enter the Sui NFT Collection ID
       </CWText>
       <CWTextInput
-        value={tokenAddress}
-        onInput={(e) => setTokenAddress(e.target.value)}
-        placeholder="Enter Sui Coin Type"
+        value={collectionId}
+        onInput={(e) => setCollectionId(e.target.value)}
+        placeholder="0x1234…"
         fullWidth
-        inputValidationFn={validateSuiAddress}
       />
 
-      <CWText type="h5">Token Decimals</CWText>
+      <CWText type="h5">Token Symbol</CWText>
       <CWText type="b1" className="description">
-        Enter the number of decimals for the token
+        Enter the token symbol (e.g., MYNFT)
       </CWText>
       <CWTextInput
-        type="number"
-        min={0}
-        value={tokenDecimals}
-        onInput={(e) => setTokenDecimals(Number(e.target.value))}
-        placeholder="Enter token decimals"
+        value={tokenSymbol}
+        onInput={(e) => setTokenSymbol(e.target.value)}
+        placeholder="Enter token symbol"
+        fullWidth
       />
 
       <CWText type="h5">Vote weight multiplier</CWText>
 
       <div className="input-row">
         <CWText type="b1" className="description">
-          1 token is equal to
+          1 NFT is equal to
         </CWText>
         <CWTextInput
           type="number"
@@ -135,7 +108,7 @@ const WVSuiTokenDetails = ({
         </CWText>
       </div>
       <CWText type="b1" className="description">
-        Vote weight per token held by the user will be {multiplier || 0}.
+        Vote weight per NFT held by the user will be {multiplier || 0}.
       </CWText>
 
       <CWText className="info" fontWeight="medium">
@@ -161,7 +134,13 @@ const WVSuiTokenDetails = ({
           disabled={loading}
         />
         <CWButton
-          disabled={!tokenAddress || !multiplier || loading || !chainNodeId}
+          disabled={
+            !collectionId ||
+            !tokenSymbol ||
+            !multiplier ||
+            loading ||
+            !chainNodeId
+          }
           type="button"
           buttonWidth="wide"
           label="Enable weighted voting for topic"
@@ -171,4 +150,4 @@ const WVSuiTokenDetails = ({
     </div>
   );
 };
-export default WVSuiTokenDetails;
+export default WVSuiNFTDetails;
