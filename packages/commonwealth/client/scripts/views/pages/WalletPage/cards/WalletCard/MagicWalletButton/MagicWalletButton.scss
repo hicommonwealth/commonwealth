@@ -1,0 +1,122 @@
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
+
+.MagicWalletButton {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  justify-content: space-between;
+  border: 1px solid colors.$neutral-50;
+  background-color: colors.$neutral-50;
+  padding: 8px;
+  border-radius: 8px;
+
+  .button-container {
+    background-color: colors.$neutral-100;
+    border: 1px solid colors.$purple-100;
+    border-radius: 6px !important;
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    justify-content: center;
+    align-items: center;
+
+    .Icon {
+      width: 36px !important;
+      background-color: colors.$purple-25;
+    }
+
+    .btn-border {
+      border: 0 !important;
+      margin: 0 !important;
+      border-left: 1px solid colors.$purple-100;
+
+      &:focus,
+      &:focus-within {
+        border: 0 !important;
+        padding: 0 !important;
+      }
+
+      .Button {
+        border-radius: 0 !important;
+      }
+    }
+
+    .CWSelectList {
+      border-radius: 0 !important;
+      border-left: 1px solid colors.$purple-100;
+      cursor: pointer !important;
+
+      .SelectList {
+        border: 0 !important;
+        border-radius: 0 !important;
+        border-top-right-radius: 6px !important;
+        border-bottom-right-radius: 6px !important;
+        width: 90px !important;
+        padding: 2px 4px !important;
+
+        .cwsl__control {
+          cursor: pointer !important;
+        }
+
+        .cwsl__value-container {
+          .cwsl__single-value,
+          .cwsl__single-value > div {
+            width: 100% !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 6px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            min-height: 28px !important;
+
+            svg {
+              width: 18px !important;
+              height: 18px !important;
+            }
+
+            .Text {
+              font-size: 13px !important;
+            }
+          }
+
+          .cwsl__single-value {
+            margin-top: -2px !important;
+          }
+
+          input {
+            display: none !important;
+          }
+
+          .Icon {
+            background-color: transparent !important;
+            width: auto !important;
+          }
+        }
+
+        .cwsl__indicators {
+          display: none !important;
+        }
+
+        .cwsl__menu {
+          width: 100%;
+          min-width: 240px !important;
+          right: 0;
+          left: initial;
+
+          .cwsl__option {
+            justify-content: flex-start;
+            gap: 8px !important;
+          }
+
+          .Icon {
+            background-color: transparent !important;
+            width: auto !important;
+          }
+        }
+      }
+    }
+  }
+}

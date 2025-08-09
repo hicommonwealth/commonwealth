@@ -6,6 +6,7 @@ import {
 import {
   blobStorage,
   cache,
+  disableService,
   dispose,
   logger,
   stats,
@@ -23,6 +24,7 @@ import { graphileTasks, taskFactory } from './tasks';
 const log = logger(import.meta);
 
 export async function startGraphileWorker(initAdapters: boolean = false) {
+  await disableService();
   if (initAdapters) {
     if (!config.CACHE.REDIS_URL) {
       log.warn(

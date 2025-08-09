@@ -17,10 +17,15 @@ async function main() {
   const RELEASER_API_KEY: string = config.RAILWAY.RELEASER_API_KEY!;
 
   if (!RAILWAY_GIT_COMMIT_SHA || !RELEASER_URL || !RELEASER_API_KEY) {
-    console.error(
-      `Error: RAILWAY_GIT_COMMIT_SHA, RELEASER_URL, RELEASER_API_KEY is not set.`,
+    console.warn(
+      `WARNING: RAILWAY_GIT_COMMIT_SHA, RELEASER_URL, RELEASER_API_KEY is not set. Release will not execute!`,
     );
-    process.exit(1);
+
+    // TODO: exit the process with an error once migration to Railway is complete.
+    //  This is temporarily disabled until release running in production is migrated
+    //  from Heroku to Railway.
+    process.exit(0);
+    // process.exit(1);
   }
 
   const url = `${RELEASER_URL}/queue`;

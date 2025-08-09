@@ -47,7 +47,7 @@ export const cronItems: Array<CustomCronItem | undefined> = [
     task: GraphileTaskNames.CountAggregator,
     match: '*/10 * * * *', // every 10 minutes
   }),
-  config.MAGNA?.API_KEY && config.MAGNA?.API_URL
+  config.MAGNA
     ? buildCustomCronItem({
         task: GraphileTaskNames.MagnaSync,
         match: '0 * * * *', // every hour
