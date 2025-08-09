@@ -1,7 +1,6 @@
 import Chance from 'chance';
 import RandExp from 'randexp';
 import { z, ZodEmail, ZodURL, ZodUUID, type ZodType } from 'zod';
-import { $ZodCheckRegex } from 'zod/v4/core';
 
 const chance = new Chance();
 
@@ -36,13 +35,16 @@ export function generateMockFromZod<T extends ZodType>(v: T): z.infer<T> {
     }) as z.infer<T>;
 
   if (v instanceof z.ZodString) {
-    const check = v._zod.def.checks?.at(0);
+    const check = v.def.checks?.at(0);
     if (check) {
       if (check instanceof ZodUUID) return chance.guid() as z.infer<T>;
       else if (check instanceof ZodEmail) return chance.email() as z.infer<T>;
       else if (check instanceof ZodURL) return chance.url() as z.infer<T>;
-      else if (check instanceof $ZodCheckRegex)
-        return new RandExp(check._zod.def.pattern).gen() as z.infer<T>;
+      else {
+        // @ts-expect-error something with zod v4 types
+        const regex = check._zod?.def?.pattern;
+        if (regex) return new RandExp(regex).gen() as unknown as z.infer<T>;
+      }
     }
     return chance.name() as z.infer<T>;
   }

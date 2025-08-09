@@ -291,18 +291,11 @@ export const GetCommunitySelectedTagsAndCommunities = {
       profile_count: PG_INT.nullish(),
       namespace: z.string().nullish(),
       chain_node_id: PG_INT.nullish(),
-      tag_names: z
-        .array(z.string())
-        .nullish()
-        .transform((val) => val || []),
-      selected_community_ids: z
-        .array(z.string())
-        .nullish()
-        .transform((val) => val || []),
+      tag_names: z.array(z.string()).default([]),
+      selected_community_ids: z.array(z.string()).default([]),
     })
     .array()
-    .nullish()
-    .transform((val) => val || []),
+    .default([]),
 };
 
 export const UpdateCommunityDirectoryTags = {

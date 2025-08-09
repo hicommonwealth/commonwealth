@@ -368,9 +368,9 @@ importers:
       swagger-ui-express:
         specifier: ^5.0.0
         version: 5.0.0(express@4.19.2)
-      trpc-swagger:
-        specifier: ^2.0.0
-        version: 2.0.0(@trpc/client@11.3.1(@trpc/server@11.3.1(typescript@5.8.2))(typescript@5.8.2))(@trpc/server@11.3.1(typescript@5.8.2))(@types/express@4.17.21)(@types/node@24.0.3)(zod@4.0.17)
+      trpc-to-openapi:
+        specifier: ^3.0.1
+        version: 3.0.1(@trpc/server@11.3.1(typescript@5.8.2))(zod-openapi@5.3.1(zod@4.0.17))(zod@4.0.17)
       typescript-logging:
         specifier: ^0.6.4
         version: 0.6.4
@@ -724,7 +724,7 @@ importers:
     devDependencies:
       '@graphql-codegen/cli':
         specifier: ^5.0.7
-        version: 5.0.7(@parcel/watcher@2.4.1)(@types/node@24.0.3)(bufferutil@4.0.8)(encoding@0.1.13)(enquirer@2.4.1)(graphql@16.9.0)(typescript@5.8.2)(utf-8-validate@6.0.3)
+        version: 5.0.7(@parcel/watcher@2.4.1)(@types/node@24.0.3)(bufferutil@4.0.8)(crossws@0.3.5)(encoding@0.1.13)(enquirer@2.4.1)(graphql@16.9.0)(typescript@5.8.2)(utf-8-validate@6.0.3)
       '@graphql-codegen/typescript':
         specifier: ^4.1.6
         version: 4.1.6(encoding@0.1.13)(graphql@16.9.0)
@@ -8416,6 +8416,11 @@ packages:
     cpu: [x64]
     os: [linux]
 
+  '@rollup/rollup-linux-x64-gnu@4.6.1':
+    resolution: {integrity: sha512-DNGZvZDO5YF7jN5fX8ZqmGLjZEXIJRdJEdTFMhiyXqyXubBa0WVLDWSNlQ5JR2PNgDbEV1VQowhVRUh+74D+RA==}
+    cpu: [x64]
+    os: [linux]
+
   '@rollup/rollup-linux-x64-musl@4.26.0':
     resolution: {integrity: sha512-+HJD2lFS86qkeF8kNu0kALtifMpPCZU80HvwztIKnYwym3KnA1os6nsX4BGSTLtS2QVAGG1P3guRgsYyMA0Yhg==}
     cpu: [x64]
@@ -11492,9 +11497,6 @@ packages:
     resolution: {integrity: sha512-13sOfMv2+DWduEU+/xbun3LScLoqN17nBeTLUsmDfKdoiC1fr0n9PU4guu4AhRcOVFk/sW8LyZWHuhWtQZiF+g==}
     engines: {node: '>=4'}
 
-  chalk-scripts@1.2.10:
-    resolution: {integrity: sha512-zR775ajFSwpgLsVTJrDHYHtA0Is8Y1UJdQ7m6DZeWqzT786UuuT75/PSIdiTmZhbzhZC9Iw/DAifAYmfhN9CWA==}
-
   chalk@2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
     engines: {node: '>=4'}
@@ -11900,6 +11902,9 @@ packages:
   cookie-es@1.1.0:
     resolution: {integrity: sha512-L2rLOcK0wzWSfSDA33YR+PUHDG10a8px7rUHKWbGLP4YfbsMed2KFUw5fczvDPbT98DDe3LEzviswl810apTEw==}
 
+  cookie-es@1.2.2:
+    resolution: {integrity: sha512-+W7VmiVINB+ywl1HGXJXmrqkOhpKrIiVZV6tQuV54ZyQC7MMuBt81Vc336GMLoHBq5hV/F9eXgt5Mnx0Rha5Fg==}
+
   cookie-parser@1.4.6:
     resolution: {integrity: sha512-z3IzaNjdwUC2olLIB5/ITd0/setiaFMLYiZJle7xg5Fe9KWAceil7xszYfHHBtDFYLSgJduS2Ty0P1uJdPDJeA==}
     engines: {node: '>= 0.8.0'}
@@ -12061,6 +12066,9 @@ packages:
     peerDependenciesMeta:
       uWebSockets.js:
         optional: true
+
+  crossws@0.3.5:
+    resolution: {integrity: sha512-ojKiDvcmByhwa8YYqbQI/hg7MEU0NC03+pSdEq4ZUnZR9xXpwk7E43SMNGkn+JxJGPFtNvQ48+vV2p+P1ml5PA==}
 
   crypt@0.0.2:
     resolution: {integrity: sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==}
@@ -12383,10 +12391,6 @@ packages:
   denque@2.1.0:
     resolution: {integrity: sha512-HVQE3AAb/pxF8fQAoiqpvg9i3evqug3hoiwakOyZAwJm+6vZehbkYXZ0l4JxS+I3QxM97v5aaRNhj8v5oBhekw==}
     engines: {node: '>=0.10'}
-
-  depd@1.1.2:
-    resolution: {integrity: sha512-7emPTl6Dpo6JRXOXjLRxck+FlLRX5847cLKEn00PLAgc3g2hTZZgr+e4c2v6QpSmLeFP3n5yUo7ft6avBK/5jQ==}
-    engines: {node: '>= 0.6'}
 
   depd@2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
@@ -14031,6 +14035,9 @@ packages:
   h3@1.11.1:
     resolution: {integrity: sha512-AbaH6IDnZN6nmbnJOH72y3c5Wwh9P97soSVdGSBbcDACRdkC0FEWf25pzx4f/NuOCK6quHmW18yF2Wx+G4Zi1A==}
 
+  h3@1.15.1:
+    resolution: {integrity: sha512-+ORaOBttdUm1E2Uu/obAyCguiI7MbBvsLTndc3gyK3zU+SYLoZXlyCP9Xgy0gikkGufFLTZXCXD6+4BsufnmHA==}
+
   handlebars@4.7.8:
     resolution: {integrity: sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ==}
     engines: {node: '>=0.4.7'}
@@ -14501,6 +14508,9 @@ packages:
 
   iron-webcrypto@1.1.1:
     resolution: {integrity: sha512-5xGwQUWHQSy039rFr+5q/zOmj7GP0Ypzvo34Ep+61bPIhaLduEDp/PvLGlU3awD2mzWUR0weN2vJ1mILydFPEg==}
+
+  iron-webcrypto@1.2.1:
+    resolution: {integrity: sha512-feOM6FaSr6rEABp/eDfVseKyTMDt+KGpeB35SkVn9Tyn0CqvVsY3EwI0v5i8nMHyJnzCIQf7nsy3p41TPkJZhg==}
 
   is-absolute@1.0.0:
     resolution: {integrity: sha512-dOWoqflvcydARa360Gvv18DZ/gRuHKi2NU/wU5X1ZFzdYfH29nkiNZsF3mp4OJ3H4yo9Mx8A/uAGNzpzPN3yBA==}
@@ -16673,17 +16683,8 @@ packages:
   node-int64@0.4.0:
     resolution: {integrity: sha512-O5lz91xSOeoXP6DulyHfllpq+Eg00MWitZIbtPfoSEvqIHdl5gfcY6hYzDWnj0qD5tz52PI08u9qUvSVeUBeHw==}
 
-  node-mocks-http@1.17.2:
-    resolution: {integrity: sha512-HVxSnjNzE9NzoWMx9T9z4MLqwMpLwVvA0oVZ+L+gXskYXEJ6tFn3Kx4LargoB6ie7ZlCLplv7QbWO6N+MysWGA==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@types/express': ^4.17.21 || ^5.0.0
-      '@types/node': '*'
-    peerDependenciesMeta:
-      '@types/express':
-        optional: true
-      '@types/node':
-        optional: true
+  node-mock-http@1.0.2:
+    resolution: {integrity: sha512-zWaamgDUdo9SSLw47we78+zYw/bDr5gH8pH7oRRs8V3KmBtu8GLgGIbV2p/gRPd3LWpEOpjQj7X1FOU3VFMJ8g==}
 
   node-object-hash@3.0.0:
     resolution: {integrity: sha512-jLF6tlyletktvSAawuPmH1SReP0YfZQ+tBrDiTCK+Ai7eXPMS9odi5xW/iKC7ZhrWJJ0Z5xYcW/x+1fVMn1Qvw==}
@@ -16930,6 +16931,9 @@ packages:
 
   openapi3-ts@2.0.2:
     resolution: {integrity: sha512-TxhYBMoqx9frXyOgnRHufjQfPXomTIHYKhSKJ6jHfj13kS8OEIhvmE8CTuQyKtjjWttAjX5DPxM1vmalEpo8Qw==}
+
+  openapi3-ts@4.4.0:
+    resolution: {integrity: sha512-9asTNB9IkKEzWMcHmVZE7Ts3kC9G7AFHfs8i7caD8HbI76gEjdkId4z/AkP83xdZsH7PLAnnbl47qZkXuxpArw==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -19920,12 +19924,12 @@ packages:
     resolution: {integrity: sha512-kr8SKKw94OI+xTGOkfsvwZQ8mWoikZDd2n8XZHjJVZUARZT+4/VV6cacRS6CLsH9bNm+HFIPU1Zx4CnNnb4qlQ==}
     engines: {node: '>=6'}
 
-  trpc-swagger@2.0.0:
-    resolution: {integrity: sha512-yE4KZ+p3DYqO5xA1D3e1Ac4pPifrSnJEact5lMHn+njoeRLFSKInSb+OBVkjE1DkWje5rwzl6kRgXExL/HOw3Q==}
+  trpc-to-openapi@3.0.1:
+    resolution: {integrity: sha512-XxQl/DvjrtSUkdkixyv403p+JAi/rKSqjfjQb30gR8hbIR4z2ixD+y3Sl0TJVRrx5dLPNJjt+UU/dfMQeTdfiQ==}
     peerDependencies:
-      '@trpc/client': ^11.0.0
-      '@trpc/server': ^11.0.0
-      zod: ^3.14.4
+      '@trpc/server': ^11.1.0
+      zod: ^4.0.0
+      zod-openapi: ^5.0.1
 
   ts-api-utils@1.3.0:
     resolution: {integrity: sha512-UQMIo7pb8WRomKR1/+MFVLTroIvDVtMX3K6OUir8ynLyzB8Jeriont2bTAtmNPa1ekAgN7YPDyf6V+ygrdU+eQ==}
@@ -21342,6 +21346,12 @@ packages:
     resolution: {integrity: sha512-zK7YHHz4ZXpW89AHXUPbQVGKI7uvkd3hzusTdotCg1UxyaVtg0zFJSTfW/Dq5f7OBBVnq6cZIaC8Ti4hb6dtCA==}
     engines: {node: '>= 14'}
 
+  zod-openapi@5.3.1:
+    resolution: {integrity: sha512-lRb4p4+WAhLGBvQCQf5SFxeZtnzO5m3GmCT4IDjOzGNlZFiVOuey9rWN+EVEDSVJC59B54tP2gxah1wVUplONw==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      zod: ^3.25.74 || ^4.0.0
+
   zod-to-json-schema@3.24.5:
     resolution: {integrity: sha512-/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==}
     peerDependencies:
@@ -21684,8 +21694,8 @@ snapshots:
       '@aws-crypto/sha1-browser': 3.0.0
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
-      '@aws-sdk/client-sts': 3.577.0
+      '@aws-sdk/client-sso-oidc': 3.577.0
+      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
       '@aws-sdk/core': 3.576.0
       '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-bucket-endpoint': 3.577.0
@@ -21742,11 +21752,11 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0)':
+  '@aws-sdk/client-sso-oidc@3.577.0':
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sts': 3.577.0
+      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
       '@aws-sdk/core': 3.576.0
       '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-host-header': 3.577.0
@@ -21785,7 +21795,6 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.8.1
     transitivePeerDependencies:
-      - '@aws-sdk/client-sts'
       - aws-crt
 
   '@aws-sdk/client-sso@3.577.0':
@@ -21831,11 +21840,11 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sts@3.577.0':
+  '@aws-sdk/client-sts@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/client-sso-oidc': 3.577.0
       '@aws-sdk/core': 3.576.0
       '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-host-header': 3.577.0
@@ -21874,6 +21883,7 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.8.1
     transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
   '@aws-sdk/core@3.576.0':
@@ -21907,7 +21917,7 @@ snapshots:
 
   '@aws-sdk/credential-provider-ini@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sts': 3.577.0
+      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
       '@aws-sdk/credential-provider-env': 3.577.0
       '@aws-sdk/credential-provider-process': 3.577.0
       '@aws-sdk/credential-provider-sso': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
@@ -21964,7 +21974,7 @@ snapshots:
 
   '@aws-sdk/credential-provider-web-identity@3.577.0(@aws-sdk/client-sts@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sts': 3.577.0
+      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
       '@aws-sdk/types': 3.577.0
       '@smithy/property-provider': 3.0.0
       '@smithy/types': 3.0.0
@@ -22102,7 +22112,7 @@ snapshots:
 
   '@aws-sdk/token-providers@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/client-sso-oidc': 3.577.0
       '@aws-sdk/types': 3.577.0
       '@smithy/property-provider': 3.0.0
       '@smithy/shared-ini-file-loader': 3.0.0
@@ -27600,7 +27610,7 @@ snapshots:
       graphql: 16.9.0
       tslib: 2.6.2
 
-  '@graphql-codegen/cli@5.0.7(@parcel/watcher@2.4.1)(@types/node@24.0.3)(bufferutil@4.0.8)(encoding@0.1.13)(enquirer@2.4.1)(graphql@16.9.0)(typescript@5.8.2)(utf-8-validate@6.0.3)':
+  '@graphql-codegen/cli@5.0.7(@parcel/watcher@2.4.1)(@types/node@24.0.3)(bufferutil@4.0.8)(crossws@0.3.5)(encoding@0.1.13)(enquirer@2.4.1)(graphql@16.9.0)(typescript@5.8.2)(utf-8-validate@6.0.3)':
     dependencies:
       '@babel/generator': 7.26.2
       '@babel/template': 7.25.9
@@ -27615,8 +27625,8 @@ snapshots:
       '@graphql-tools/graphql-file-loader': 8.0.20(graphql@16.9.0)
       '@graphql-tools/json-file-loader': 8.0.18(graphql@16.9.0)
       '@graphql-tools/load': 8.1.0(graphql@16.9.0)
-      '@graphql-tools/prisma-loader': 8.0.17(@types/node@24.0.3)(bufferutil@4.0.8)(encoding@0.1.13)(graphql@16.9.0)(utf-8-validate@6.0.3)
-      '@graphql-tools/url-loader': 8.0.31(@types/node@24.0.3)(bufferutil@4.0.8)(graphql@16.9.0)(utf-8-validate@6.0.3)
+      '@graphql-tools/prisma-loader': 8.0.17(@types/node@24.0.3)(bufferutil@4.0.8)(crossws@0.3.5)(encoding@0.1.13)(graphql@16.9.0)(utf-8-validate@6.0.3)
+      '@graphql-tools/url-loader': 8.0.31(@types/node@24.0.3)(bufferutil@4.0.8)(crossws@0.3.5)(graphql@16.9.0)(utf-8-validate@6.0.3)
       '@graphql-tools/utils': 10.8.6(graphql@16.9.0)
       '@whatwg-node/fetch': 0.10.8
       chalk: 4.1.2
@@ -27624,7 +27634,7 @@ snapshots:
       debounce: 1.2.1
       detect-indent: 6.1.0
       graphql: 16.9.0
-      graphql-config: 5.1.5(@types/node@24.0.3)(bufferutil@4.0.8)(graphql@16.9.0)(typescript@5.8.2)(utf-8-validate@6.0.3)
+      graphql-config: 5.1.5(@types/node@24.0.3)(bufferutil@4.0.8)(crossws@0.3.5)(graphql@16.9.0)(typescript@5.8.2)(utf-8-validate@6.0.3)
       inquirer: 8.2.6
       is-glob: 4.0.3
       jiti: 1.21.0
@@ -27852,13 +27862,13 @@ snapshots:
       '@graphql-tools/utils': 10.8.6(graphql@16.9.0)
       graphql: 16.9.0
 
-  '@graphql-tools/executor-graphql-ws@2.0.5(bufferutil@4.0.8)(graphql@16.9.0)(utf-8-validate@6.0.3)':
+  '@graphql-tools/executor-graphql-ws@2.0.5(bufferutil@4.0.8)(crossws@0.3.5)(graphql@16.9.0)(utf-8-validate@6.0.3)':
     dependencies:
       '@graphql-tools/executor-common': 0.0.4(graphql@16.9.0)
       '@graphql-tools/utils': 10.8.6(graphql@16.9.0)
       '@whatwg-node/disposablestack': 0.0.6
       graphql: 16.9.0
-      graphql-ws: 6.0.5(graphql@16.9.0)(ws@8.18.2(bufferutil@4.0.8)(utf-8-validate@6.0.3))
+      graphql-ws: 6.0.5(crossws@0.3.5)(graphql@16.9.0)(ws@8.18.2(bufferutil@4.0.8)(utf-8-validate@6.0.3))
       isomorphic-ws: 5.0.0(ws@8.18.2(bufferutil@4.0.8)(utf-8-validate@6.0.3))
       tslib: 2.8.1
       ws: 8.18.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
@@ -27993,9 +28003,9 @@ snapshots:
       graphql: 16.9.0
       tslib: 2.8.1
 
-  '@graphql-tools/prisma-loader@8.0.17(@types/node@24.0.3)(bufferutil@4.0.8)(encoding@0.1.13)(graphql@16.9.0)(utf-8-validate@6.0.3)':
+  '@graphql-tools/prisma-loader@8.0.17(@types/node@24.0.3)(bufferutil@4.0.8)(crossws@0.3.5)(encoding@0.1.13)(graphql@16.9.0)(utf-8-validate@6.0.3)':
     dependencies:
-      '@graphql-tools/url-loader': 8.0.31(@types/node@24.0.3)(bufferutil@4.0.8)(graphql@16.9.0)(utf-8-validate@6.0.3)
+      '@graphql-tools/url-loader': 8.0.31(@types/node@24.0.3)(bufferutil@4.0.8)(crossws@0.3.5)(graphql@16.9.0)(utf-8-validate@6.0.3)
       '@graphql-tools/utils': 10.8.6(graphql@16.9.0)
       '@types/js-yaml': 4.0.9
       '@whatwg-node/fetch': 0.10.8
@@ -28048,9 +28058,9 @@ snapshots:
       graphql: 16.9.0
       tslib: 2.8.1
 
-  '@graphql-tools/url-loader@8.0.31(@types/node@24.0.3)(bufferutil@4.0.8)(graphql@16.9.0)(utf-8-validate@6.0.3)':
+  '@graphql-tools/url-loader@8.0.31(@types/node@24.0.3)(bufferutil@4.0.8)(crossws@0.3.5)(graphql@16.9.0)(utf-8-validate@6.0.3)':
     dependencies:
-      '@graphql-tools/executor-graphql-ws': 2.0.5(bufferutil@4.0.8)(graphql@16.9.0)(utf-8-validate@6.0.3)
+      '@graphql-tools/executor-graphql-ws': 2.0.5(bufferutil@4.0.8)(crossws@0.3.5)(graphql@16.9.0)(utf-8-validate@6.0.3)
       '@graphql-tools/executor-http': 1.3.3(@types/node@24.0.3)(graphql@16.9.0)
       '@graphql-tools/executor-legacy-ws': 1.1.17(bufferutil@4.0.8)(graphql@16.9.0)(utf-8-validate@6.0.3)
       '@graphql-tools/utils': 10.8.6(graphql@16.9.0)
@@ -32689,7 +32699,7 @@ snapshots:
       chalk: 4.1.2
       execa: 5.1.1
       metro: 0.80.12(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      metro-config: 0.80.12(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      metro-config: 0.80.12(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       metro-core: 0.80.12
       node-fetch: 2.7.0(encoding@0.1.13)
       querystring: 0.2.1
@@ -33493,6 +33503,9 @@ snapshots:
     optional: true
 
   '@rollup/rollup-linux-x64-gnu@4.43.0':
+    optional: true
+
+  '@rollup/rollup-linux-x64-gnu@4.6.1':
     optional: true
 
   '@rollup/rollup-linux-x64-musl@4.26.0':
@@ -39184,12 +39197,6 @@ snapshots:
       pathval: 1.1.1
       type-detect: 4.0.8
 
-  chalk-scripts@1.2.10:
-    dependencies:
-      chalk: 5.4.1
-      performance-now: 2.1.0
-      uuid: 9.0.1
-
   chalk@2.4.2:
     dependencies:
       ansi-styles: 3.2.1
@@ -39711,6 +39718,8 @@ snapshots:
 
   cookie-es@1.1.0: {}
 
+  cookie-es@1.2.2: {}
+
   cookie-parser@1.4.6:
     dependencies:
       cookie: 0.4.1
@@ -39905,6 +39914,10 @@ snapshots:
       which: 2.0.2
 
   crossws@0.2.4: {}
+
+  crossws@0.3.5:
+    dependencies:
+      uncrypto: 0.1.3
 
   crypt@0.0.2: {}
 
@@ -40238,8 +40251,6 @@ snapshots:
   denodeify@1.2.1: {}
 
   denque@2.1.0: {}
-
-  depd@1.1.2: {}
 
   depd@2.0.0: {}
 
@@ -42599,13 +42610,13 @@ snapshots:
       - supports-color
       - typescript
 
-  graphql-config@5.1.5(@types/node@24.0.3)(bufferutil@4.0.8)(graphql@16.9.0)(typescript@5.8.2)(utf-8-validate@6.0.3):
+  graphql-config@5.1.5(@types/node@24.0.3)(bufferutil@4.0.8)(crossws@0.3.5)(graphql@16.9.0)(typescript@5.8.2)(utf-8-validate@6.0.3):
     dependencies:
       '@graphql-tools/graphql-file-loader': 8.0.20(graphql@16.9.0)
       '@graphql-tools/json-file-loader': 8.0.18(graphql@16.9.0)
       '@graphql-tools/load': 8.1.0(graphql@16.9.0)
       '@graphql-tools/merge': 9.0.24(graphql@16.9.0)
-      '@graphql-tools/url-loader': 8.0.31(@types/node@24.0.3)(bufferutil@4.0.8)(graphql@16.9.0)(utf-8-validate@6.0.3)
+      '@graphql-tools/url-loader': 8.0.31(@types/node@24.0.3)(bufferutil@4.0.8)(crossws@0.3.5)(graphql@16.9.0)(utf-8-validate@6.0.3)
       '@graphql-tools/utils': 10.8.6(graphql@16.9.0)
       cosmiconfig: 8.3.6(typescript@5.8.2)
       graphql: 16.9.0
@@ -42664,10 +42675,11 @@ snapshots:
       graphql: 16.9.0
       tslib: 2.8.1
 
-  graphql-ws@6.0.5(graphql@16.9.0)(ws@8.18.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)):
+  graphql-ws@6.0.5(crossws@0.3.5)(graphql@16.9.0)(ws@8.18.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)):
     dependencies:
       graphql: 16.9.0
     optionalDependencies:
+      crossws: 0.3.5
       ws: 8.18.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
 
   graphql@15.9.0: {}
@@ -42690,6 +42702,18 @@ snapshots:
       unenv: 1.10.0
     transitivePeerDependencies:
       - uWebSockets.js
+
+  h3@1.15.1:
+    dependencies:
+      cookie-es: 1.2.2
+      crossws: 0.3.5
+      defu: 6.1.4
+      destr: 2.0.3
+      iron-webcrypto: 1.2.1
+      node-mock-http: 1.0.2
+      radix3: 1.1.2
+      ufo: 1.5.4
+      uncrypto: 0.1.3
 
   handlebars@4.7.8:
     dependencies:
@@ -43210,6 +43234,8 @@ snapshots:
   ipaddr.js@1.9.1: {}
 
   iron-webcrypto@1.1.1: {}
+
+  iron-webcrypto@1.2.1: {}
 
   is-absolute@1.0.0:
     dependencies:
@@ -45033,6 +45059,21 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  metro-config@0.80.12(bufferutil@4.0.8)(utf-8-validate@5.0.10):
+    dependencies:
+      connect: 3.7.0
+      cosmiconfig: 5.2.1
+      flow-enums-runtime: 0.0.6
+      jest-validate: 29.7.0
+      metro: 0.80.12(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      metro-cache: 0.80.12
+      metro-core: 0.80.12
+      metro-runtime: 0.80.12
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
   metro-config@0.80.12(bufferutil@4.0.8)(utf-8-validate@6.0.3):
     dependencies:
       connect: 3.7.0
@@ -45337,7 +45378,7 @@ snapshots:
       metro-babel-transformer: 0.80.12
       metro-cache: 0.80.12
       metro-cache-key: 0.80.12
-      metro-config: 0.80.12(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      metro-config: 0.80.12(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       metro-core: 0.80.12
       metro-file-map: 0.80.12
       metro-resolver: 0.80.12
@@ -46141,21 +46182,7 @@ snapshots:
 
   node-int64@0.4.0: {}
 
-  node-mocks-http@1.17.2(@types/express@4.17.21)(@types/node@24.0.3):
-    dependencies:
-      accepts: 1.3.8
-      content-disposition: 0.5.4
-      depd: 1.1.2
-      fresh: 0.5.2
-      merge-descriptors: 1.0.3
-      methods: 1.1.2
-      mime: 1.6.0
-      parseurl: 1.3.3
-      range-parser: 1.2.1
-      type-is: 1.6.18
-    optionalDependencies:
-      '@types/express': 4.17.21
-      '@types/node': 24.0.3
+  node-mock-http@1.0.2: {}
 
   node-object-hash@3.0.0: {}
 
@@ -46486,6 +46513,10 @@ snapshots:
   openapi3-ts@2.0.2:
     dependencies:
       yaml: 1.10.2
+
+  openapi3-ts@4.4.0:
+    dependencies:
+      yaml: 2.8.0
 
   optionator@0.9.4:
     dependencies:
@@ -50401,20 +50432,16 @@ snapshots:
     dependencies:
       matchit: 1.1.0
 
-  trpc-swagger@2.0.0(@trpc/client@11.3.1(@trpc/server@11.3.1(typescript@5.8.2))(typescript@5.8.2))(@trpc/server@11.3.1(typescript@5.8.2))(@types/express@4.17.21)(@types/node@24.0.3)(zod@4.0.17):
+  trpc-to-openapi@3.0.1(@trpc/server@11.3.1(typescript@5.8.2))(zod-openapi@5.3.1(zod@4.0.17))(zod@4.0.17):
     dependencies:
-      '@trpc/client': 11.3.1(@trpc/server@11.3.1(typescript@5.8.2))(typescript@5.8.2)
       '@trpc/server': 11.3.1(typescript@5.8.2)
-      chalk-scripts: 1.2.10
       co-body: 6.2.0
-      lodash.clonedeep: 4.5.0
-      node-mocks-http: 1.17.2(@types/express@4.17.21)(@types/node@24.0.3)
-      openapi-types: 12.1.3
+      h3: 1.15.1
+      openapi3-ts: 4.4.0
       zod: 4.0.17
-      zod-to-json-schema: 3.24.5(zod@4.0.17)
-    transitivePeerDependencies:
-      - '@types/express'
-      - '@types/node'
+      zod-openapi: 5.3.1(zod@4.0.17)
+    optionalDependencies:
+      '@rollup/rollup-linux-x64-gnu': 4.6.1
 
   ts-api-utils@1.3.0(typescript@5.8.2):
     dependencies:
@@ -51267,7 +51294,7 @@ snapshots:
       '@scure/bip32': 1.6.2
       '@scure/bip39': 1.5.4
       abitype: 1.0.8(typescript@5.8.2)(zod@4.0.17)
-      isows: 1.0.6(ws@8.18.2(bufferutil@4.0.8)(utf-8-validate@6.0.3))
+      isows: 1.0.6(ws@8.18.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       ox: 0.6.9(typescript@5.8.2)(zod@4.0.17)
       ws: 8.18.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
     optionalDependencies:
@@ -52576,13 +52603,13 @@ snapshots:
       compress-commons: 6.0.2
       readable-stream: 4.5.2
 
+  zod-openapi@5.3.1(zod@4.0.17):
+    dependencies:
+      zod: 4.0.17
+
   zod-to-json-schema@3.24.5(zod@3.25.64):
     dependencies:
       zod: 3.25.64
-
-  zod-to-json-schema@3.24.5(zod@4.0.17):
-    dependencies:
-      zod: 4.0.17
 
   zod@3.22.4: {}
 
