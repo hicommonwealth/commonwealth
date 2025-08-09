@@ -45,15 +45,15 @@ export const EVM_ADDRESS = z.string().regex(EVM_ADDRESS_STRICT_REGEX);
 
 export const EVM_ADDRESS_STRICT = z.templateLiteral([
   z.literal('0x'),
-  z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  z.string().regex(/^[0-9a-fA-F]{40}$/),
 ]);
 export const EVM_EVENT_SIGNATURE_STRICT = z.templateLiteral([
   z.literal('0x'),
-  z.string().regex(/^0x[0-9a-fA-F]{64}$/),
+  z.string().regex(/^[0-9a-fA-F]{64}$/),
 ]);
 export const EVM_BYTES = z.templateLiteral([
   z.literal('0x'),
-  z.string().regex(/^0x[0-9a-fA-F]*$/),
+  z.string().regex(/^[0-9a-fA-F]*$/),
 ]);
 
 export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
