@@ -3,7 +3,7 @@ import { events } from '@hicommonwealth/schemas';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { generateUsername } from 'unique-username-generator';
-import { ZodUndefined } from 'zod/v4';
+import { ZodUndefined } from 'zod';
 import { models } from '../database';
 
 const inputs = {

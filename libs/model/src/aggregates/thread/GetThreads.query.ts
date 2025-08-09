@@ -1,7 +1,7 @@
 import { InvalidInput, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { models } from '../../database';
 import { authOptional } from '../../middleware';
 import { filterGates, joinGates, withGates } from '../../utils/gating';

@@ -10,7 +10,7 @@ import {
   WebServices,
 } from '@hicommonwealth/core';
 import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 const {
   SENDGRID_API_KEY,

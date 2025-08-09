@@ -4,7 +4,7 @@ import {
   TokenAllocationSyncResponse,
   magnaSync,
 } from '@hicommonwealth/model';
-import { GraphileTask, TaskPayloads } from '@hicommonwealth/model/services';
+import { TaskPayloads } from '@hicommonwealth/model/services';
 import { config } from '../../../config';
 import * as magnaApi from '../../magna/api';
 
@@ -40,7 +40,7 @@ async function createMagnaAllocation({
   else return { error: "Couldn't create allocation" };
 }
 
-export const magnaSyncTask: GraphileTask<typeof TaskPayloads.MagnaSync> = {
+export const magnaSyncTask = {
   input: TaskPayloads.MagnaSync,
   fn: async () => {
     if (

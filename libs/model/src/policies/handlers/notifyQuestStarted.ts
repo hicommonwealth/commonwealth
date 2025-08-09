@@ -5,7 +5,7 @@ import {
   NotificationUser,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import z from 'zod/v4';
+import z from 'zod';
 
 export const notifyQuestStarted: EventHandler<
   'QuestStarted',

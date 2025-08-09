@@ -1,7 +1,7 @@
 import { cache, CacheNamespaces, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { models } from '../../database';
 
 export function GetTopHolders(): Query<typeof schemas.GetTopHolders> {

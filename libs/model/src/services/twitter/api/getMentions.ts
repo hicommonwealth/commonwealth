@@ -3,7 +3,7 @@ import {
   GetTwitterMentionsTimelineResponse,
   Tweet,
 } from '@hicommonwealth/schemas';
-import z from 'zod/v4';
+import z from 'zod';
 import { TwitterBotConfig } from '../types';
 import { getFromTwitter } from '../utils';
 

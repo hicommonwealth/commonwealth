@@ -138,7 +138,7 @@ describe('Tiered middleware', () => {
       profile_count: 1,
       allow_tokenized_threads: true,
       groups: [],
-      topics: [{}],
+      topics: [{ name: 'test' }],
       Addresses: [
         {
           role: 'member',

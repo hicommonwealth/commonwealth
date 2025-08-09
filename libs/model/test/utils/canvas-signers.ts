@@ -6,7 +6,7 @@ import {
   sign,
   toCanvasSignedDataApiArgs,
 } from '@hicommonwealth/shared';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 export const getTestSigner = () => {
   return new SIWESigner({ signer: createEvmSigner() });

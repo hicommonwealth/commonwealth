@@ -2,7 +2,7 @@ import { Actor, dispose, query } from '@hicommonwealth/core';
 import { Address, Topic } from '@hicommonwealth/schemas';
 import { CommunityTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { GetNewContent } from '../../src/aggregates/user';
 import { seed } from '../../src/tester';
 
@@ -38,6 +38,7 @@ describe('New Content lifecycle', () => {
     });
     [topic] = (await seed('Topic', {
       community_id: community!.id,
+      name: 'test',
     })) as [z.infer<typeof Topic>, unknown];
 
     actor1 = {

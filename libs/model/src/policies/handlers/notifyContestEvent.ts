@@ -8,7 +8,7 @@ import {
 } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { Op, QueryTypes } from 'sequelize';
-import z from 'zod/v4';
+import z from 'zod';
 import { models } from '../../database';
 
 async function getContestDetails(contest_address: string, contest_id: number) {

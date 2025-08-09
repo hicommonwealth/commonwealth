@@ -11,7 +11,7 @@ import {
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import { Op, Sequelize, Transaction } from 'sequelize';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { config } from '../../config';
 import { models, sequelize } from '../../database';
 

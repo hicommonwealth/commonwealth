@@ -14,7 +14,7 @@ import {
   notificationsProvider,
 } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import z from 'zod/v4';
+import z from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
 import { generateUnsubscribeLink } from '../../utils';

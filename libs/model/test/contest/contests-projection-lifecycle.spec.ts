@@ -18,7 +18,7 @@ import {
   test,
   vi,
 } from 'vitest';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { Contests } from '../../src/aggregates/contest/Contests.projection';
 import { GetAllContests } from '../../src/aggregates/contest/GetAllContests.query';
 import { models } from '../../src/database';

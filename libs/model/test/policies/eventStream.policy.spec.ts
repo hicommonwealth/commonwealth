@@ -12,7 +12,7 @@ import {
   test,
   vi,
 } from 'vitest';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { models } from '../../src/database';
 import {
   EVENT_STREAM_WINDOW_SIZE,

@@ -1,7 +1,7 @@
 import { Query } from '@hicommonwealth/core';
 import { ALL_COMMUNITIES, UserTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { models } from '../../database';
 
 export enum SearchEntityType {
@@ -58,7 +58,7 @@ export const SearchEntitiesInput = z.object({
 
 export const SearchEntityResult = z.object({
   id: z.string(),
-  type: z.nativeEnum(SearchEntityType),
+  type: z.enum(SearchEntityType),
   name: z.string(),
   description: z.string().optional(),
   avatar_url: z.string().optional().nullable(),

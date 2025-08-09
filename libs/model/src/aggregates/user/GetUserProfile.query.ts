@@ -4,7 +4,7 @@ import {
   UserProfileView,
 } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import z from 'zod/v4';
+import z from 'zod';
 import { models } from '../../database';
 import { authOptionalVerified } from '../../middleware';
 

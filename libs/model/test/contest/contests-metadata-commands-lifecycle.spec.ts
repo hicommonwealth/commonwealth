@@ -1,7 +1,7 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import z from 'zod/v4';
+import z from 'zod';
 import * as Contest from '../../src/aggregates/contest';
 import { TopicAttributes } from '../../src/models';
 import { seed } from '../../src/tester';
@@ -71,7 +71,7 @@ describe('Contests metadata commands lifecycle', () => {
             verified: new Date(),
           },
         ],
-        topics: [{}, {}, {}],
+        topics: [{ name: 'test1' }, { name: 'test2' }, { name: 'test3' }],
         contest_managers: [
           {
             contest_address: '0x1',

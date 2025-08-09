@@ -2,7 +2,7 @@ import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
-import z from 'zod/v4';
+import z from 'zod';
 import {
   CreateThreadSubscription,
   DeleteThreadSubscription,
@@ -38,7 +38,7 @@ describe('Thread subscription lifecycle', () => {
           verified: new Date(),
         },
       ],
-      topics: [{}],
+      topics: [{ name: 'test' }],
     });
 
     [threadOne] = await seed('Thread', {

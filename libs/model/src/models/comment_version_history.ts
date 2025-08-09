@@ -1,7 +1,7 @@
 import { CommentVersionHistory } from '@hicommonwealth/schemas';
 import { MAX_TRUNCATED_CONTENT_LENGTH } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { CommentAttributes } from './comment';
 import type { ModelInstance } from './types';
 import { beforeValidateBodyHook } from './utils';

@@ -4,7 +4,7 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import z from 'zod/v4';
+import z from 'zod';
 import { models } from '../../database';
 
 export const notifyReferrerCommunityCreated: EventHandler<

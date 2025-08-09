@@ -96,7 +96,7 @@ describe('community goals lifecycle', () => {
       active: true,
       lifetime_thread_count: 0,
       profile_count: 0,
-      topics: [{}],
+      topics: [{ name: 'test' }],
       Addresses: [
         {
           user_id: superadmin.user.id,

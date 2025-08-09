@@ -7,7 +7,7 @@ import {
   UserTierMap,
   WalletId,
 } from '@hicommonwealth/shared';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { seed, seedRecord } from '../../src/tester';
 import { getSignersInfo } from './canvas-signers';
 
@@ -137,7 +137,7 @@ export async function seedCommunity({
       };
     }),
     groups: groups.map(({ id }) => ({ id })),
-    topics: [{ weighted_voting }],
+    topics: weighted_voting ? [{ name: 'test', weighted_voting }] : [],
     CommunityStakes: stakes ?? [],
     custom_stages,
   });

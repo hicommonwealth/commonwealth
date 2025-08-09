@@ -1,5 +1,5 @@
 import { command, EventHandler } from '@hicommonwealth/core';
-import { ZodUndefined } from 'zod/v4';
+import { ZodUndefined } from 'zod';
 import { LinkNamespace } from '../../aggregates/community';
 import { systemActor } from '../../middleware';
 

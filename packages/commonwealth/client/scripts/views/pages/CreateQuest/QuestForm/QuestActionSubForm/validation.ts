@@ -23,12 +23,12 @@ const questSubFormValidationSchema = z.object({
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   instructionsLink: linkValidationSchema.optional,
-  participationLimit: z.nativeEnum(QuestParticipationLimit, {
+  participationLimit: z.enum(QuestParticipationLimit, {
     invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
   }),
   // these 2 below are only used for initial values validation and not for
   // internal state validation, that is handled by a custom function
-  participationPeriod: z.nativeEnum(QuestParticipationPeriod).optional(),
+  participationPeriod: z.enum(QuestParticipationPeriod).optional(),
   participationTimesPerPeriod: z.number().or(z.string()).optional(),
 });
 
@@ -84,7 +84,7 @@ export const buildQuestSubFormValidationSchema = (
       }) as unknown as typeof baseSchema;
     } else if (requiresSsoSource) {
       baseSchema = baseSchema.extend({
-        contentIdentifier: z.nativeEnum(WalletSsoSource).optional(),
+        contentIdentifier: z.enum(WalletSsoSource).optional(),
       }) as unknown as typeof baseSchema;
     } else {
       baseSchema = baseSchema.extend({

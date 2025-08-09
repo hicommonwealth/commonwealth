@@ -16,7 +16,7 @@ import {
   test,
   vi,
 } from 'vitest';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { GetRecapEmailDataQuery } from '../../src/aggregates/emails';
 import { seed } from '../../src/tester';
 import {
@@ -68,7 +68,7 @@ describe('Recap email lifecycle', () => {
           user_id: recipientUser!.id,
         },
       ],
-      topics: [{}],
+      topics: [{ name: 'test' }],
     });
 
     [thread] = await seed('Thread', {

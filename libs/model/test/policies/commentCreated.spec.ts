@@ -17,7 +17,7 @@ import {
   test,
   vi,
 } from 'vitest';
-import z from 'zod/v4';
+import z from 'zod';
 import { models } from '../../src/database';
 import { notifyCommentCreated } from '../../src/policies/handlers/notifyCommentCreated';
 import { getCommentUrl, getProfileUrl } from '../../src/policies/utils/utils';
@@ -77,7 +77,7 @@ describe('CommentCreated Event Handler', () => {
           user_id: mentionedUser!.id,
         },
       ],
-      topics: [{}],
+      topics: [{ name: 'test' }],
     });
     [thread] = await tester.seed('Thread', {
       community_id: community!.id!,

@@ -5,7 +5,7 @@ import { BalanceType } from '@hicommonwealth/shared';
 import Chance from 'chance';
 import dayjs from 'dayjs';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
-import z from 'zod/v4';
+import z from 'zod';
 import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
 import { CreateLaunchpadTrade, CreateToken } from '../../src/aggregates/token';
 import { GetXps, Xp } from '../../src/aggregates/user';

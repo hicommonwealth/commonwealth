@@ -1,6 +1,6 @@
 import { TopicSubscription } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance } from './types';
 

@@ -2,7 +2,7 @@ import { notificationsProvider, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware';

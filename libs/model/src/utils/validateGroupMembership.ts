@@ -8,7 +8,7 @@ import {
 } from '@hicommonwealth/schemas';
 import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
 import { toBigInt } from 'web3-utils';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import type { OptionsWithBalances } from '../services/tokenBalanceCache/types';
 
 type AllowlistData = z.infer<typeof AllowlistData>;

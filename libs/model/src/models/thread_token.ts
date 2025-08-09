@@ -1,6 +1,6 @@
 import { ThreadToken } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import type { ModelInstance } from './types';
 
 export type ThreadTokenAttributes = z.infer<typeof ThreadToken>;

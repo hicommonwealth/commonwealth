@@ -5,7 +5,7 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { EmailNotificationInterval, events } from '@hicommonwealth/schemas';
-import z from 'zod/v4';
+import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
 import { SubscriptionPreferenceInstance } from '../../models';

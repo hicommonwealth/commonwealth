@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
 import { GetTweetsWithMetricsResponse } from '@hicommonwealth/schemas';
-import z from 'zod/v4';
+import z from 'zod';
 import { TwitterBotConfig } from '../types';
 import { getFromTwitter } from '../utils';
 

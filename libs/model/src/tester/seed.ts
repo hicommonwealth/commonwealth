@@ -1,10 +1,5 @@
-import { generateMock } from '@anatine/zod-mock';
 import { DeepPartial } from '@hicommonwealth/core';
-import {
-  Aggregates,
-  aggregateSchema,
-  AggregateType,
-} from '@hicommonwealth/schemas';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   CommunityTierMap,
   DisabledCommunitySpamTier,
@@ -13,6 +8,7 @@ import {
 import { randomInt } from 'crypto';
 import { Model, type ModelStatic } from 'sequelize';
 import {
+  z,
   ZodArray,
   ZodNullable,
   ZodObject,
@@ -22,6 +18,9 @@ import {
 } from 'zod';
 import { models } from '../database';
 import type { State } from '../models';
+import { generateMockFromZod } from './mock';
+
+type AggregateType<T extends schemas.Aggregates> = z.infer<(typeof schemas)[T]>;
 
 /**
  * Seed options
@@ -34,11 +33,13 @@ export type SeedOptions = {
   log?: boolean;
 };
 
-function isNullable(value: ZodUnknown) {
-  console.log('isNullable', value);
+function isNullable(
+  value: ZodUnknown | ZodOptional<ZodUnknown> | ZodNullable<ZodUnknown>,
+) {
   if (value instanceof ZodNullable) return true;
-  if (!('innerType' in value)) return false;
-  return isNullable(value.innerType as ZodUnknown);
+  if (value instanceof ZodOptional)
+    return isNullable(value.unwrap() as ZodUnknown);
+  return false;
 }
 
 function isArray(
@@ -67,7 +68,7 @@ function isString(
  * @returns tuple with main aggregate record and array of total records created
  * @see "libs/model/\_\_tests\_\_/community/group-lifecycle.spec.ts"
  */
-export async function seed<T extends Aggregates>(
+export async function seed<T extends schemas.Aggregates>(
   name: T,
   values?: DeepPartial<AggregateType<T>>,
   options: SeedOptions = { mock: true },
@@ -80,7 +81,7 @@ export async function seed<T extends Aggregates>(
 /**
  * Seeds multiple aggregates and returns record indexed by keys
  */
-export async function seedRecord<T extends Aggregates, K>(
+export async function seedRecord<T extends schemas.Aggregates, K>(
   name: T,
   keys: Readonly<Array<keyof K>>,
   valuesFn: (key: keyof K) => DeepPartial<AggregateType<T>>,
@@ -105,7 +106,7 @@ async function _seed(
   records: State[],
   level: number,
 ) {
-  const schema = aggregateSchema(model.name as Aggregates);
+  const schema = schemas[model.name as schemas.Aggregates];
   if (schema && options.mock && schema instanceof ZodObject) {
     if (model.name === 'User' && !('tier' in values)) {
       values['tier'] = UserTierMap.ManuallyVerified;
@@ -119,7 +120,7 @@ async function _seed(
       if (!('spam_tier_level' in values))
         values['spam_tier_level'] = DisabledCommunitySpamTier;
     }
-    const mocked = generateMock(schema, {});
+    const mocked = generateMockFromZod(schema);
     // force undefined associations
     const undefs = {} as State;
     Object.entries(schema.shape).forEach(([key, value]) => {
@@ -137,33 +138,36 @@ async function _seed(
     // eslint-disable-next-line no-param-reassign
     values = { ...mocked, ...undefs, ...values };
   }
-  const record = (
-    await model.create(values, { logging: options.log ? console.log : false })
-  ).toJSON();
-  records.push(record);
-
-  if (typeof values === 'object') {
-    for (const [key, value] of Object.entries(values)) {
-      const association = model.associations[key];
-      if (association && Array.isArray(value)) {
-        record[key] = [];
-        for (const el of value) {
-          const child = await _seed(
-            association.target,
-            {
-              ...el,
-              [association.foreignKey]: record[model.primaryKeyAttribute],
-            },
-            options,
-            records,
-            level + 1,
-          );
-          record[key].push(child);
+  try {
+    const record = (
+      await model.create(values, { logging: options.log ? console.log : false })
+    ).toJSON();
+    records.push(record);
+    if (typeof values === 'object') {
+      for (const [key, value] of Object.entries(values)) {
+        const association = model.associations[key];
+        if (association && Array.isArray(value)) {
+          record[key] = [];
+          for (const el of value) {
+            const child = await _seed(
+              association.target,
+              {
+                ...el,
+                [association.foreignKey]: record[model.primaryKeyAttribute],
+              },
+              options,
+              records,
+              level + 1,
+            );
+            record[key].push(child);
+          }
         }
       }
     }
+    level === 0 && options.log && console.log(model.tableName, record);
+    return record;
+  } catch (e) {
+    console.error(e, values);
+    throw e;
   }
-
-  level === 0 && options.log && console.log(model.tableName, record);
-  return record;
 }

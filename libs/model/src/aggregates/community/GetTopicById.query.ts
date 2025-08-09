@@ -1,6 +1,6 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import type { z } from 'zod/v4';
+import type { z } from 'zod';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
 

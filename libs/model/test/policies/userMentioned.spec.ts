@@ -20,7 +20,7 @@ import {
   test,
   vi,
 } from 'vitest';
-import z from 'zod/v4';
+import z from 'zod';
 import { notifyUserMentioned } from '../../src/policies/handlers/notifyUserMentioned';
 import { getProfileUrl, getThreadUrl } from '../../src/policies/utils/utils';
 import * as tester from '../../src/tester';
@@ -63,7 +63,7 @@ describe('userMentioned Event Handler', () => {
           user_id: user!.id,
         },
       ],
-      topics: [{}],
+      topics: [{ name: 'test' }],
     });
     [thread] = await tester.seed('Thread', {
       community_id: community!.id!,
