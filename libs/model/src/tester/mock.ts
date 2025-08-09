@@ -16,7 +16,7 @@ export function generateMockFromZod<T extends ZodType>(v: T): z.infer<T> {
 
   if (v instanceof z.ZodObject) {
     const shape = v.shape as Record<string, ZodType>;
-    const o: Record<string, any> = {};
+    const o: Record<string, unknown> = {};
     for (const key in shape) {
       o[key] = generateMockFromZod(shape[key]);
     }
