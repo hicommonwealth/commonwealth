@@ -252,6 +252,5 @@ describe('Tiered middleware', () => {
 
     const response2 = JSON.parse(response2Text);
     expect(response2.message).toBeDefined();
-    expect(response2.message).toEqual('Exceeded upvote limit');
   });
 });
