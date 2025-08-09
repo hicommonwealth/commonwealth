@@ -108,18 +108,29 @@ async function _seed(
 ) {
   const schema = schemas[model.name as schemas.Aggregates];
   if (schema && options.mock && schema instanceof ZodObject) {
-    if (model.name === 'User' && !('tier' in values)) {
-      values['tier'] = UserTierMap.ManuallyVerified;
+    // override User defaults to fix loose schemas
+    if (model.name === 'User') {
+      if (!('tier' in values)) values['tier'] = UserTierMap.ManuallyVerified;
     }
-    if (model.name === 'Address' && !('is_banned' in values)) {
-      values['is_banned'] = false;
+    // override Address defaults to fix loose schemas
+    if (model.name === 'Address') {
+      if (!('is_banned' in values)) values['is_banned'] = false;
+      if (!('verification_token' in values)) values['verification_token'] = '';
     }
+    // override Community defaults to fix loose schemas
     if (model.name === 'Community') {
       if (!('tier' in values))
         values['tier'] = CommunityTierMap.ManuallyVerified;
       if (!('spam_tier_level' in values))
         values['spam_tier_level'] = DisabledCommunitySpamTier;
+      if (!('environment' in values)) values['environment'] = 'local';
+      if (!('profile_count' in values)) values['profile_count'] = 0;
     }
+    // override Group defaults to fix loose schemas
+    if (model.name === 'Group') {
+      if (!('is_system_managed' in values)) values['is_system_managed'] = false;
+    }
+
     const mocked = generateMockFromZod(schema);
     // force undefined associations
     const undefs = {} as State;

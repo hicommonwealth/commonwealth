@@ -82,6 +82,11 @@ describe('Seed lifecycle', () => {
   });
 
   describe('Community', () => {
+    test('Should seed with defaults', async () => {
+      const community = await testSeed('Community');
+      expect(community.id).to.be.a('string');
+    });
+
     test('Should seed with overrides', async () => {
       const node = await testSeed('ChainNode');
       const user = await testSeed('User', { selected_community_id: null });
@@ -137,6 +142,7 @@ describe('Seed lifecycle', () => {
         ],
         groups: [
           {
+            is_system_managed: false,
             metadata: {
               name: 'hello',
               description: 'blah',

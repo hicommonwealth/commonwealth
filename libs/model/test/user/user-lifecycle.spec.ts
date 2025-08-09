@@ -1085,14 +1085,14 @@ describe('User lifecycle', () => {
       //   25+18+18+13+12+11+10+10+10+10+10=147 xp points
       //   4+10 creator points
       //   42 awarded points = 203 total
+      // admin has
+      //   11+10+10+5+5+5 xp points
+      //   2+2 creator points = 50 total
       // new_user has
       //   16+11+10 xp points = 37 total
-      // admin has
-      //   11+5+5+5 xp points
-      //   2+2 creator points = 30 total
       // superadmin has
       //   11 xp points
-      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([203, 37, 30, 11]);
+      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([203, 50, 37, 11]);
 
       const xps2 = await query(GetXpsRanked(), {
         actor: admin,
