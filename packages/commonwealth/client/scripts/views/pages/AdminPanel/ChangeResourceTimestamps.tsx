@@ -17,37 +17,25 @@ import './AdminPanel.scss';
 const validationSchema = z
   .object({
     resource_id: z
-      .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+      .string()
       .nonempty({ message: VALIDATION_MESSAGES.INVALID_INPUT })
-      .or(z.number({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })),
-    resource_name: z.object(
-      {
-        value: z.enum(['Quests']),
-        label: z.string(),
-      },
-      {
-        invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-        required_error: VALIDATION_MESSAGES.NO_INPUT,
-      },
-    ),
-    date_field_name: z.object(
-      {
-        value: z.enum([
-          'start_date',
-          'end_date',
-          'created_at',
-          'updated_at',
-          'deleted_at',
-        ]),
-        label: z.string(),
-      },
-      {
-        invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-        required_error: VALIDATION_MESSAGES.NO_INPUT,
-      },
-    ), // add more date fields as required
+      .or(z.number()),
+    resource_name: z.object({
+      value: z.enum(['Quests']),
+      label: z.string(),
+    }),
+    date_field_name: z.object({
+      value: z.enum([
+        'start_date',
+        'end_date',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+      ]),
+      label: z.string(),
+    }), // add more date fields as required
     date_field_value: z
-      .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+      .string()
       .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   })
   .refine(

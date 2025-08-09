@@ -161,6 +161,7 @@ const TrendingThreadList = ({
     allThreads = feed.pages
       .flatMap((p) => p.results)
       .filter((t) => !t.marked_as_spam_at)
+      // @ts-expect-error User is required in one of the results
       .map((t) => new Thread(t))
       .slice(0, 3);
   }

@@ -57,7 +57,7 @@ function chainEvent<
         gasLimit: 1n,
       },
     },
-  };
+  } as EventPair<E>;
 }
 
 describe('Referral lifecycle', () => {

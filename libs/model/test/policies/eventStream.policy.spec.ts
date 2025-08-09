@@ -284,44 +284,44 @@ describe('EventStream Policy Integration Tests', () => {
   test('should process multiple events of different types through the outbox', async () => {
     const outboxEvents = [
       {
-        event_name: 'ContestStarted',
+        event_name: 'ContestStarted' as const,
         event_payload: {
           contest_address: contestManagers[0].contest_address,
           contest_id: 1,
           start_time: new Date(),
           end_time: new Date(),
           is_one_off: true,
-        } satisfies z.infer<typeof events.ContestStarted>,
+        },
       },
       {
-        event_name: 'ContestEnded',
+        event_name: 'ContestEnded' as const,
         event_payload: {
           contest_address: contestManagers[0].contest_address,
           contest_id: 1,
           is_one_off: true,
           winners: [],
           created_at: new Date(),
-        } satisfies z.infer<typeof events.ContestEnded>,
+        },
       },
       {
-        event_name: 'ContestEnding',
+        event_name: 'ContestEnding' as const,
         event_payload: {
           contest_address: contestManagers[0].contest_address,
           contest_id: 1,
           is_one_off: true,
           created_at: new Date(),
-        } satisfies z.infer<typeof events.ContestEnding>,
+        },
       },
       {
-        event_name: 'CommunityCreated',
+        event_name: 'CommunityCreated' as const,
         event_payload: {
           created_at: new Date(),
           community_id: communityId,
           user_id: 1,
-        } satisfies z.infer<typeof events.CommunityCreated>,
+        },
       },
       {
-        event_name: 'ThreadCreated',
+        event_name: 'ThreadCreated' as const,
         event_payload: {
           id: threadId,
           community_id: communityId,
@@ -330,7 +330,7 @@ describe('EventStream Policy Integration Tests', () => {
           kind: 'thread',
           body: 'Test Body',
           topic_id: 1,
-        } satisfies z.infer<typeof events.ThreadCreated>,
+        },
       },
       // {
       //   event_name: 'LaunchpadTokenCreated',
@@ -355,7 +355,7 @@ describe('EventStream Policy Integration Tests', () => {
       //   } satisfies z.infer<typeof events.LaunchpadTokenTraded>),
       // },
       {
-        event_name: 'LaunchpadTokenGraduated',
+        event_name: 'LaunchpadTokenGraduated' as const,
         event_payload: serializeBigIntObj({
           token: {
             token_address: '0x7777777777777777777777777777777777777777',
@@ -367,7 +367,7 @@ describe('EventStream Policy Integration Tests', () => {
             launchpad_liquidity: 1n,
             eth_market_cap_target: 1000,
           },
-        } satisfies z.infer<typeof events.LaunchpadTokenGraduated>),
+        }),
       },
     ];
 
@@ -401,14 +401,15 @@ describe('EventStream Policy Integration Tests', () => {
   test('should only keep the most recent events when exceeding the window size', async () => {
     // fill the event stream with the initial events
     const initialEvents = contestManagers.map((contestManager) => ({
-      event_name: 'ContestStarted',
+      event_name: 'ContestStarted' as const,
       event_payload: {
         contest_address: contestManager.contest_address,
         contest_id: 0,
         start_time: new Date(),
         end_time: new Date(),
         is_one_off: true,
-      } satisfies z.infer<typeof events.ContestStarted>,
+      },
+      created_at: new Date(),
     }));
 
     await models.Outbox.bulkCreate(initialEvents);
