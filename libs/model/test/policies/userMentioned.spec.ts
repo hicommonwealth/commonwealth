@@ -63,7 +63,7 @@ describe('userMentioned Event Handler', () => {
           user_id: user!.id,
         },
       ],
-      topics: [{ name: 'test' }],
+      topics: [{ name: 'user-mentioned-test-topic' }],
     });
     [thread] = await tester.seed('Thread', {
       community_id: community!.id!,

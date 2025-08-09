@@ -18,7 +18,7 @@ export function generateMockFromZod<T extends ZodType>(v: T): z.infer<T> {
     if (v.format === 'safeint')
       return chance.integer({
         min: Math.min(v.minValue || 0, 0),
-        max: Math.min(v.maxValue || 1000, 1000),
+        max: Math.min(v.maxValue || 100_000_000, 100_000_000),
       }) as z.infer<T>;
     return chance.floating({
       min: 0,

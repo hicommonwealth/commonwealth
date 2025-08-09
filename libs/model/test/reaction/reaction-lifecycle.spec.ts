@@ -34,7 +34,7 @@ describe('Reactions lifecycle', () => {
           },
         ],
         // CommunityStakes: [],
-        topics: [{ name: 'test' }],
+        topics: [{ name: 'reaction-test-topic' }],
         // groups: [],
         // contest_managers: [],
       },

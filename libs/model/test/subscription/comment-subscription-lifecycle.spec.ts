@@ -39,7 +39,7 @@ describe('Comment subscription lifecycle', () => {
           verified: new Date(),
         },
       ],
-      topics: [{ name: 'test' }],
+      topics: [{ name: 'comment-subscription-test-topic' }],
     });
 
     const [thread] = await seed('Thread', {

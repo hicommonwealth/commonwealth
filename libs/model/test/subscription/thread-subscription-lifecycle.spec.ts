@@ -38,7 +38,7 @@ describe('Thread subscription lifecycle', () => {
           verified: new Date(),
         },
       ],
-      topics: [{ name: 'test' }],
+      topics: [{ name: 'thread-subscription-test-topic' }],
     });
 
     [threadOne] = await seed('Thread', {

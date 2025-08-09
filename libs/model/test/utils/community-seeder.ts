@@ -7,9 +7,12 @@ import {
   UserTierMap,
   WalletId,
 } from '@hicommonwealth/shared';
+import Chance from 'chance';
 import { z } from 'zod';
 import { seed, seedRecord } from '../../src/tester';
 import { getSignersInfo } from './canvas-signers';
+
+const chance = new Chance();
 
 export type CommunitySeedRoles =
   | 'admin'
@@ -20,6 +23,7 @@ export type CommunitySeedRoles =
   | 'superadmin';
 
 export type CommunitySeedOptions = {
+  id?: string;
   roles: Array<CommunitySeedRoles>;
   chain_node?: Partial<z.infer<typeof schemas.ChainNode>>;
   chain_base?: ChainBase;
@@ -59,6 +63,7 @@ export type CommunitySeedResult = {
  * @param groups - array of group ids and permissions to be assigned to the topic
  */
 export async function seedCommunity({
+  id,
   roles,
   chain_node = { eth_chain_id: 1 },
   chain_base = ChainBase.Ethereum,
@@ -96,6 +101,7 @@ export async function seedCommunity({
 
   // seed base community
   const [base] = await seed('Community', {
+    id: `base-of-${id || chance.company()}`,
     tier: CommunityTierMap.ManuallyVerified,
     chain_node_id: node!.id!,
     base: chain_base,
@@ -116,6 +122,7 @@ export async function seedCommunity({
   });
 
   const [community] = await seed('Community', {
+    id: id || chance.company(),
     tier: CommunityTierMap.ChainVerified,
     chain_node_id: node!.id!,
     base: chain_base,
@@ -137,7 +144,7 @@ export async function seedCommunity({
       };
     }),
     groups: groups.map(({ id }) => ({ id })),
-    topics: weighted_voting ? [{ name: 'test', weighted_voting }] : [],
+    topics: [{ name: 'seed text', weighted_voting }],
     CommunityStakes: stakes ?? [],
     custom_stages,
   });

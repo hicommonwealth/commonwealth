@@ -42,9 +42,7 @@ async function testSeed<T extends schemas.Aggregates>(
   return data as z.infer<(typeof schemas)[T]>;
 }
 
-describe('Seed functions', () => {
-  let shouldExit = true;
-
+describe('Seed lifecycle', () => {
   afterAll(async () => {
     await dispose()();
   });
@@ -53,12 +51,9 @@ describe('Seed functions', () => {
     test('Should seed with defaults', async () => {
       await testSeed('User', { selected_community_id: null });
       await testSeed('User', { selected_community_id: null });
-      shouldExit = false;
     });
 
     test('Should seed with overrides', async () => {
-      expect(shouldExit).to.be.false;
-      shouldExit = true;
       const values = {
         email: 'temp@gmail.com',
         emailVerified: true,
@@ -68,35 +63,26 @@ describe('Seed functions', () => {
       // are explicitly excluded via sequelize model config
       const result = await testSeed('User', values);
       expect(result).contains(values);
-      shouldExit = false;
     });
   });
 
   describe('ChainNode', () => {
     test('Should seed with defaults', async () => {
-      expect(shouldExit).to.be.false;
-      shouldExit = true;
       await testSeed('ChainNode');
       await testSeed('ChainNode');
-      shouldExit = false;
     });
 
     test('Should seed with overrides', async () => {
-      expect(shouldExit).to.be.false;
-      shouldExit = true;
       await testSeed('ChainNode', {
         url: 'mainnet1.edgewa.re',
         name: 'Edgeware Mainnet',
         balance_type: BalanceType.Substrate,
       });
-      shouldExit = false;
     });
   });
 
   describe('Community', () => {
     test('Should seed with overrides', async () => {
-      expect(shouldExit).to.be.false;
-      shouldExit = true;
       const node = await testSeed('ChainNode');
       const user = await testSeed('User', { selected_community_id: null });
       await testSeed('Community', {
@@ -159,12 +145,9 @@ describe('Seed functions', () => {
         ],
         topics: [{ name: 'test1' }, { name: 'test2' }],
       });
-      shouldExit = false;
     });
 
     test('Should not mock data', async () => {
-      expect(shouldExit).to.be.false;
-      shouldExit = true;
       await expect(
         seed(
           'Community',
@@ -175,7 +158,6 @@ describe('Seed functions', () => {
           { mock: false },
         ),
       ).rejects.toThrow(ValidationError);
-      shouldExit = false;
     });
   });
 });
