@@ -1,13 +1,28 @@
 import { Stats, config, logger } from '@hicommonwealth/core';
-import { StatsD } from 'hot-shots';
+import { ClientOptions, StatsD } from 'hot-shots';
 
 export const HotShotsStats = (): Stats => {
   const log = logger(import.meta);
+  let statsdConfig: ClientOptions | undefined;
+  if (config.RAILWAY.GIT_COMMIT_SHA) {
+    statsdConfig = {
+      host: config.RAILWAY.DATADOG_HOST,
+      port: config.RAILWAY.DATADOG_STATSD_PORT,
+      protocol: 'udp',
+      cacheDns: true,
+      udpSocketOptions: {
+        type: 'udp6',
+        reuseAddr: true,
+        ipv6Only: true,
+      },
+    };
+  }
   let client: StatsD | undefined = new StatsD({
     globalTags: { env: config.NODE_ENV || 'development' },
     errorHandler: (error) => {
       log.error('Caught statsd socket error', error);
     },
+    ...(statsdConfig ? statsdConfig : {}),
   });
   return {
     name: 'HotShotStats',

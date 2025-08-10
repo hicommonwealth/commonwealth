@@ -1,4 +1,8 @@
-import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
+import {
+  DEFAULT_COMPLETION_MODEL,
+  DEFAULT_COMPLETION_MODEL_LABEL,
+  MAX_COMMENT_DEPTH,
+} from '@hicommonwealth/shared';
 import {
   AIModelOption,
   useUserAiSettingsStore,
@@ -54,8 +58,8 @@ type ExtendedCommentViewParams = CommentViewParams & {
 };
 
 const DEFAULT_MODEL: AIModelOption = {
-  value: 'gpt-4o',
-  label: 'GPT-4o',
+  value: DEFAULT_COMPLETION_MODEL,
+  label: DEFAULT_COMPLETION_MODEL_LABEL,
 };
 
 export const TreeHierarchy = ({

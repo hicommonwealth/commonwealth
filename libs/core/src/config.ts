@@ -177,6 +177,9 @@ const {
   HEROKU_API_TOKEN,
   MIXPANEL_TOKEN,
   DEV_MODULITH,
+  RAILWAY_DATADOG_HOST,
+  RAILWAY_DATADOG_STATSD_PORT,
+  RAILWAY_GIT_COMMIT_SHA,
 } = process.env;
 
 const DEFAULTS = {
@@ -218,6 +221,13 @@ export const config = configure(
     },
     ANALYTICS: {
       MIXPANEL_TOKEN: MIXPANEL_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
+    },
+    RAILWAY: {
+      GIT_COMMIT_SHA: RAILWAY_GIT_COMMIT_SHA,
+      DATADOG_HOST: RAILWAY_DATADOG_HOST,
+      DATADOG_STATSD_PORT: RAILWAY_DATADOG_STATSD_PORT
+        ? parseInt(RAILWAY_DATADOG_STATSD_PORT, 10)
+        : undefined,
     },
   },
   z.object({
@@ -346,6 +356,11 @@ export const config = configure(
       }, 'ROLLBAR_SERVER_TOKEN and ROLLBAR_ENV may only be set in production to a non-default value.'),
     ANALYTICS: z.object({
       MIXPANEL_TOKEN: z.string(),
+    }),
+    RAILWAY: z.object({
+      GIT_COMMIT_SHA: z.string().optional(),
+      DATADOG_HOST: z.string().optional(),
+      DATADOG_STATSD_PORT: z.number().optional(),
     }),
   }),
 );

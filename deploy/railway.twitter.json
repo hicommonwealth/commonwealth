@@ -2,7 +2,23 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "DOCKERFILE",
-    "dockerfilePath": "Dockerfile.railway"
+    "dockerfilePath": "railway.dockerfile",
+    "watchPatterns": [
+      "deploy/railway.twitter.json",
+      "railway.dockerfile",
+      "libs",
+      "packages",
+      "package.json",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      "tsconfig.json",
+      "vite.config.ts",
+      "tsconfig.vite.json",
+      ".nvmrc",
+      ".dockerignore",
+      "scripts",
+      ".gitignore"
+    ]
   },
   "deploy": {
     "preDeployCommand": "npm run pre-deploy",
@@ -13,7 +29,7 @@
     "limitOverride": {
       "containers": {
         "cpu": 1,
-        "memoryBytes": 100000000
+        "memoryBytes": 1000000000
       }
     }
   }

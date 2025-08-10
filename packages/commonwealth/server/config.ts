@@ -11,6 +11,7 @@ import { ChainBase, TwitterBotName } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
+  DISABLE_SITEMAP,
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
@@ -37,8 +38,6 @@ const {
   TWITTER_WORKER_POLL_INTERVAL,
   TWITTER_ENABLED_BOTS,
   EVM_CE_ETH_CHAIN_ID_OVERRIDE,
-  RAILWAY_PUBLIC_DOMAIN,
-  RAILWAY_GIT_COMMIT_SHA,
   RELEASER_URL,
   RELEASER_API_KEY,
   MAGNA_API_KEY,
@@ -70,6 +69,7 @@ const DEFAULTS = {
 export const config = configure(
   [model_config, adapters_config],
   {
+    DISABLE_SITEMAP: DISABLE_SITEMAP === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     PRERENDER_TOKEN,
     GENERATE_IMAGE_RATE_LIMIT: parseInt(
@@ -172,8 +172,6 @@ export const config = configure(
         : DEFAULTS.CACHE_GET_COMMUNITIES_JOIN_COMMUNITY,
     },
     RAILWAY: {
-      RAILWAY_PUBLIC_DOMAIN,
-      RAILWAY_GIT_COMMIT_SHA,
       RELEASER_URL,
       RELEASER_API_KEY,
     },
@@ -193,6 +191,7 @@ export const config = configure(
       : undefined,
   },
   z.object({
+    DISABLE_SITEMAP: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
@@ -316,8 +315,6 @@ export const config = configure(
       // We no longer need CHAIN_CONFIGS as we use IDLs to get program IDs
     }),
     RAILWAY: z.object({
-      RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
-      RAILWAY_GIT_COMMIT_SHA: z.string().optional(),
       RELEASER_URL: z.string().optional(),
       // Enable once migrated to Railway
       // .refine(
