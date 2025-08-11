@@ -1,5 +1,8 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
-import type { ImageGenerationModel } from '@hicommonwealth/shared';
+import {
+  DEFAULT_IMAGE_MODEL,
+  ImageGenerationModel,
+} from '@hicommonwealth/shared';
 import { Buffer } from 'buffer';
 import fetch from 'node-fetch';
 import OpenAI, { toFile } from 'openai';
@@ -65,7 +68,7 @@ const generateImageWithOpenAI = async (
 ) => {
   const generationParams = {
     prompt,
-    model: options.model || 'gpt-image-1',
+    model: options.model || DEFAULT_IMAGE_MODEL,
     n: options.n || 1,
     quality: options.quality,
     size: options.size || '1024x1024',
@@ -148,7 +151,7 @@ const editImageWithOpenAI = async (
     const payload: OpenAI.Images.ImageEditParams = {
       image: imageFile,
       prompt,
-      model: options.model || 'gpt-image-1',
+      model: options.model || DEFAULT_IMAGE_MODEL,
       n: options.n || 1,
       size: options.size || '1024x1024',
     };
@@ -192,7 +195,7 @@ const editImageWithOpenAI = async (
     // Log parameters for debugging
     const params = {
       prompt,
-      model: options.model || 'gpt-image-1',
+      model: options.model || DEFAULT_IMAGE_MODEL,
       size: options.size || '1024x1024',
       hasReferenceImage: referenceImagesData.length > 0,
       hasMask: !!options.mask,
@@ -230,7 +233,7 @@ export const generateImage = async (
 
   // --- Model selection logic ---
   // If model starts with 'runware', use Runware. Otherwise, use OpenAI.
-  const model = options.model || 'gpt-image-1';
+  const model = options.model || DEFAULT_IMAGE_MODEL;
   const isRunwareModel = model.toLowerCase().startsWith('runware');
   const isOpenAIModel = !isRunwareModel;
 

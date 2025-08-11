@@ -1,5 +1,6 @@
 import { config } from '@hicommonwealth/core';
 import { MCPServer } from '@hicommonwealth/schemas';
+import { DEFAULT_COMPLETION_MODEL } from '@hicommonwealth/shared';
 import OpenAI from 'openai';
 import { z } from 'zod';
 
@@ -34,7 +35,7 @@ export function buildMCPClientOptions(
     console.log('mentionedServers: ', mentionedServers);
   }
   return {
-    model: 'gpt-4o-mini',
+    model: DEFAULT_COMPLETION_MODEL,
     instructions: buildSystemPrompt(mentionedServers),
     tools: mentionedServers.map((server) => ({
       type: 'mcp',
