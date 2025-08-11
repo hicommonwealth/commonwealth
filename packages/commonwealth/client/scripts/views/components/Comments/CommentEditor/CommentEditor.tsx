@@ -1,4 +1,4 @@
-import { ContentType } from '@hicommonwealth/shared';
+import { ContentType, DEFAULT_COMPLETION_MODEL } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import { isCommandClick } from 'helpers';
@@ -138,7 +138,7 @@ ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
       const { systemPrompt, userPrompt } = generateCommentPrompt(context);
 
       generateCompletion(userPrompt, {
-        model: 'gpt-4o-mini',
+        model: DEFAULT_COMPLETION_MODEL,
         stream: true,
         systemPrompt,
         includeContextualMentions: true,
