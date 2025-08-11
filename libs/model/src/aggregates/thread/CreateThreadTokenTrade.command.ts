@@ -21,10 +21,10 @@ import { models } from '../../database';
 import { mustExist } from '../../middleware';
 
 export function CreateThreadTokenTrade(): Command<
-  typeof schemas.CreateLaunchpadTrade
+  typeof schemas.CreateThreadTokenTrade
 > {
   return {
-    ...schemas.CreateLaunchpadTrade,
+    ...schemas.CreateThreadTokenTrade,
     auth: [],
     body: async ({ payload }) => {
       const { eth_chain_id, transaction_hash } = payload;
@@ -37,7 +37,7 @@ export function CreateThreadTokenTrade(): Command<
       });
       if (existingTrade) {
         return existingTrade?.get({ plain: true }) as unknown as z.infer<
-          typeof schemas.LaunchpadTradeView
+          typeof schemas.CreateThreadTokenTrade
         >;
       }
 
@@ -109,7 +109,7 @@ export function CreateThreadTokenTrade(): Command<
       });
 
       return trade.get({ plain: true }) as unknown as z.infer<
-        typeof schemas.LaunchpadTradeView
+        typeof schemas.CreateThreadTokenTrade
       >;
     },
   };

@@ -154,3 +154,19 @@ export const CreateThreadTokenTrade = {
   output: ThreadTokenTradeView,
   context: AuthContext,
 };
+
+export const GetThreadTokenTrades = {
+  input: z.object({
+    thread_id: PG_INT.optional(),
+  }),
+  output: z.object({
+    result: z
+      .record(
+        z.object({
+          name: z.string().nullish(),
+          addresses: z.record(z.array(ThreadTokenTrade)),
+        }),
+      )
+      .nullable(),
+  }),
+};
