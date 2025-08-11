@@ -1,5 +1,6 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { GetThreadTokenTradesOutput } from '@hicommonwealth/schemas';
 import { models } from 'model/src/database';
 
 export function GetThreadTokenHolders(): Query<
@@ -55,7 +56,7 @@ export function GetThreadTokenHolders(): Query<
             thread_id: payload.thread_id,
           },
         },
-      );
+      ) as unknown as z.infer<GetThreadTokenTradesOutput>;
     },
   };
 }

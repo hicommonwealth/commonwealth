@@ -151,22 +151,23 @@ export const CreateThreadTokenTrade = {
     eth_chain_id: z.number(),
     transaction_hash: z.string().length(66),
   }),
-  output: ThreadTokenTradeView,
-  context: AuthContext,
+  output: ThreadTokenTradeView.optional(),
 };
+
+export const GetThreadTokenTradesOutput = z.object({
+  result: z
+    .record(
+      z.object({
+        name: z.string().nullish(),
+        addresses: z.record(z.array(ThreadTokenTrade)),
+      }),
+    )
+    .nullable(),
+});
 
 export const GetThreadTokenTrades = {
   input: z.object({
     thread_id: PG_INT.optional(),
   }),
-  output: z.object({
-    result: z
-      .record(
-        z.object({
-          name: z.string().nullish(),
-          addresses: z.record(z.array(ThreadTokenTrade)),
-        }),
-      )
-      .nullable(),
-  }),
+  output: GetThreadTokenTradesOutput,
 };

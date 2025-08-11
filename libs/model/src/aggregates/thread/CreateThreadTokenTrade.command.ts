@@ -37,7 +37,7 @@ export function CreateThreadTokenTrade(): Command<
       });
       if (existingTrade) {
         return existingTrade?.get({ plain: true }) as unknown as z.infer<
-          typeof schemas.CreateThreadTokenTrade
+          typeof schemas.ThreadTokenTradeView
         >;
       }
 
@@ -109,7 +109,7 @@ export function CreateThreadTokenTrade(): Command<
       });
 
       return trade.get({ plain: true }) as unknown as z.infer<
-        typeof schemas.CreateThreadTokenTrade
+        typeof schemas.ThreadTokenTradeView
       >;
     },
   };
