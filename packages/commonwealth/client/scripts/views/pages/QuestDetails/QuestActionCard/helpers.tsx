@@ -55,12 +55,12 @@ export const actionCopies = {
           <strong>IMPORTANT:</strong> Sign up MUST BE DONE VIA THE BINANCE
           WALLET APP. <br />
           Steps to complete:
-          <ul>
-            <ol>Open Binance Wallet app</ol>
-            <ol>Create your account or sign in</ol>
-            <ol>Connect your wallet to Common</ol>
-            <ol>Complete the signup process</ol>
-          </ul>
+          <ol>
+            <li>1. Open Binance Wallet app</li>
+            <li>2. Create your account or sign in</li>
+            <li>3. Connect your wallet to Common</li>
+            <li>4. Complete the signup process</li>
+          </ol>
           Visit Binance to explore more onchain:{' '}
           <a href="https://www.binance.com/en/web3">
             https://www.binance.com/en/web3
@@ -83,12 +83,12 @@ export const actionCopies = {
           <strong>IMPORTANT:</strong> Sign up MUST BE DONE VIA THE BINANCE
           WALLET APP. <br />
           Steps to complete:
-          <ul>
-            <ol>Open Binance Wallet app</ol>
-            <ol>Create your account or sign in</ol>
-            <ol>Connect your wallet to Common</ol>
-            <ol>Complete the signup process</ol>
-          </ul>
+          <ol>
+            <li>1. Open Binance Wallet app</li>
+            <li>2. Create your account or sign in</li>
+            <li>3. Connect your wallet to Common</li>
+            <li>4. Complete the signup process</li>
+          </ol>
           Visit Binance to explore more onchain:{' '}
           <a href="https://www.binance.com/en/web3">
             https://www.binance.com/en/web3
