@@ -11,7 +11,7 @@ export function GetThreadTokenHolders(): Query<
     ...schemas.GetThreadTokenTrades,
     auth: [],
     body: async ({ payload }) => {
-      return models.sequelize.query(
+      return (await models.sequelize.query(
         `WITH base AS (
             SELECT
              U.id AS user_id,
@@ -57,7 +57,7 @@ export function GetThreadTokenHolders(): Query<
             thread_id: payload.thread_id,
           },
         },
-      ) as unknown as z.infer<typeof GetThreadTokenTradesOutput>;
+      )) as unknown as z.infer<typeof GetThreadTokenTradesOutput>;
     },
   };
 }
