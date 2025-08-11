@@ -2,6 +2,7 @@ import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { GetThreadTokenTradesOutput } from '@hicommonwealth/schemas';
 import { models } from 'model/src/database';
+import z from 'zod';
 
 export function GetThreadTokenHolders(): Query<
   typeof schemas.GetThreadTokenTrades
@@ -56,7 +57,7 @@ export function GetThreadTokenHolders(): Query<
             thread_id: payload.thread_id,
           },
         },
-      ) as unknown as z.infer<GetThreadTokenTradesOutput>;
+      ) as unknown as z.infer<typeof GetThreadTokenTradesOutput>;
     },
   };
 }
