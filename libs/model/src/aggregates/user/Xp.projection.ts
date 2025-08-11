@@ -117,7 +117,7 @@ async function recordXpsForQuest({
   await sequelize.transaction(async (transaction) => {
     const shared_with_user_id = shared_with_address
       ? await getUserByAddress(shared_with_address)
-      : undefined;
+      : null;
 
     for (const action_meta of action_metas) {
       if (!action_meta?.id) continue;
@@ -179,7 +179,7 @@ async function recordXpsForQuest({
       );
       const shared_xp_points = shared_with_user_id
         ? Math.round(reward_amount * action_meta.creator_reward_weight)
-        : undefined;
+        : null;
       const xp_points = reward_amount - (shared_xp_points ?? 0);
 
       await models.sequelize.query(
