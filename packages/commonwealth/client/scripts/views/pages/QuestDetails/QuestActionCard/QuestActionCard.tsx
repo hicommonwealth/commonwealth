@@ -202,17 +202,19 @@ const QuestActionCard = ({
                     )}
                   </CWText>
                 )}
-                {/* For binance quest */}
                 {['WalletLinked', 'SignUpFlowCompleted'].includes(
                   questAction.event_name,
-                ) &&
-                  questAction.quest_id === -4 && (
-                    <CWText type="caption">
-                      {actionCopies.explainer[questAction.event_name](
-                        WalletId.Binance,
-                      )}
-                    </CWText>
-                  )}
+                ) && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction.quest_id === -4 // for binance system quest
+                        ? WalletId.Binance
+                        : buildRedirectURLFromContentId(
+                            questAction.content_id || '',
+                          ),
+                    )}
+                  </CWText>
+                )}
               </>
             )}
             <QuestActionXpShares questAction={questAction} />
