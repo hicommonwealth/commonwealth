@@ -1,8 +1,8 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { GetThreadTokenTradesOutput } from '@hicommonwealth/schemas';
-import { models } from 'model/src/database';
 import z from 'zod';
+import { models } from '../../database';
 
 export function GetThreadTokenHolders(): Query<
   typeof schemas.GetThreadTokenTrades
