@@ -1,6 +1,7 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   canUserPerformGatedAction,
+  DEFAULT_COMPLETION_MODEL,
   DisabledCommunitySpamTier,
   GatedActionEnum,
   LinkSource,
@@ -605,7 +606,7 @@ export const NewThreadForm = forwardRef<
           );
 
         await generateCompletion(bodyUserPrompt, {
-          model: 'gpt-4o-mini',
+          model: DEFAULT_COMPLETION_MODEL,
           stream: true,
           systemPrompt: bodySystemPrompt,
           includeContextualMentions: true,
@@ -630,7 +631,7 @@ export const NewThreadForm = forwardRef<
             void (async () => {
               try {
                 await generateCompletion(titleUserPrompt, {
-                  model: 'gpt-4o-mini',
+                  model: DEFAULT_COMPLETION_MODEL,
                   stream: false,
                   systemPrompt: titleSystemPrompt,
                   includeContextualMentions: true,
