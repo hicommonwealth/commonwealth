@@ -5,7 +5,6 @@ import {
   notificationsProvider,
   NotificationsProviderGetMessagesReturn,
   NotificationsProviderSchedulesReturn,
-  RepeatFrequency,
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model/db';
@@ -49,6 +48,7 @@ function SpyNotificationsProvider(stubs?: {
       stubs?.createSchedulesStub || vi.fn(() => Promise.resolve([])),
     deleteSchedules:
       stubs?.deleteSchedulesStub || vi.fn(() => Promise.resolve(new Set())),
+    updateSchedules: vi.fn(() => Promise.resolve([])),
     identifyUser:
       stubs?.identifyUserStub || vi.fn(() => Promise.resolve({ id: '' })),
     registerClientRegistrationToken:
@@ -182,7 +182,7 @@ describe('subscriptionPreferencesUpdated', () => {
     ).to.have.property('hours');
     expect(
       (provider.createSchedules as Mock).mock.calls[0][0].schedule[0].frequency,
-    ).to.equal(RepeatFrequency.Weekly);
+    ).to.equal('Weekly');
   });
 
   test('should not create a schedule if one already exists', async () => {

@@ -2,44 +2,23 @@ import {
   EventHandler,
   logger,
   notificationsProvider,
-  RepeatFrequency,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { events } from '@hicommonwealth/schemas';
-import { DaysOfWeek } from '@knocklabs/node';
+import { EmailNotificationInterval, events } from '@hicommonwealth/schemas';
 import z from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
 import { SubscriptionPreferenceInstance } from '../../models';
+import { mapDateToDaysOfWeek } from './util';
 
 const log = logger(import.meta);
 
 const output = z.boolean();
 
-function mapDateToDaysOfWeek(
-  date: Date,
-): (typeof DaysOfWeek)[keyof typeof DaysOfWeek] {
-  switch (date.getDay()) {
-    case 0:
-      return DaysOfWeek.Sun;
-    case 1:
-      return DaysOfWeek.Mon;
-    case 2:
-      return DaysOfWeek.Tue;
-    case 3:
-      return DaysOfWeek.Wed;
-    case 4:
-      return DaysOfWeek.Thu;
-    case 5:
-      return DaysOfWeek.Fri;
-    default:
-      return DaysOfWeek.Sat;
-  }
-}
-
 async function createScheduleIfNotExists(
   workflowKey: WorkflowKeys.EmailRecap | WorkflowKeys.EmailDigest,
   userId: string,
+  emailNotificationInterval: z.infer<typeof EmailNotificationInterval>,
 ): Promise<boolean> {
   const provider = notificationsProvider();
 
@@ -48,13 +27,13 @@ async function createScheduleIfNotExists(
     workflow_id: workflowKey,
   });
 
-  if (existingSchedules.length === 0) {
+  if (existingSchedules.length === 0 && emailNotificationInterval !== 'never') {
     await provider.createSchedules({
       user_ids: [userId],
       workflow_id: workflowKey,
       schedule: [
         {
-          frequency: RepeatFrequency.Weekly,
+          frequency: emailNotificationInterval,
           days: [mapDateToDaysOfWeek(new Date())],
           hours: 12,
         },
@@ -140,6 +119,7 @@ async function handleEmailPreferenceUpdates(
       await createScheduleIfNotExists(
         WorkflowKeys.EmailRecap,
         String(payload.user_id),
+        subscriptionPreferences.User!.emailNotificationInterval || 'never',
       );
     }
 
@@ -147,6 +127,7 @@ async function handleEmailPreferenceUpdates(
       await createScheduleIfNotExists(
         WorkflowKeys.EmailDigest,
         String(payload.user_id),
+        subscriptionPreferences.User!.emailNotificationInterval || 'never',
       );
     }
   }
@@ -167,7 +148,6 @@ async function handleEmailPreferenceUpdates(
   }
 }
 
-// TODO: this should be in libs/model, but currently depending on libs/adapter for config
 export const processSubscriptionPreferencesUpdated: EventHandler<
   'SubscriptionPreferencesUpdated',
   typeof output
@@ -177,6 +157,13 @@ export const processSubscriptionPreferencesUpdated: EventHandler<
     where: {
       user_id: payload.user_id,
     },
+    include: [
+      {
+        model: models.User,
+        required: true,
+        attributes: ['id', 'email', 'emailNotificationInterval'],
+      },
+    ],
   });
 
   if (!subPreferences) {
