@@ -8,10 +8,12 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'client/scripts/helpers/snapshot_utils';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
 import { AnyProposal } from 'client/scripts/models/types';
 import useGetThreadByIdQuery from 'client/scripts/state/api/threads/getThreadById';
+import useGetThreadToken from 'client/scripts/state/api/tokens/getThreadToken';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -45,6 +47,7 @@ import useUserStore, {
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
+import { ThreadTokenWidget } from 'views/components/NewThreadFormLegacy/ToketWidget';
 import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
@@ -112,6 +115,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [searchParams] = useSearchParams();
   const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [savedEdits, setSavedEdits] = useState('');
@@ -151,6 +155,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     threadId: +threadId,
     apiCallEnabled: !!threadId && !!communityId,
   });
+
+  const { data: threadToken } = useGetThreadToken({
+    thread_id: threadId,
+    enabled: !!threadId && !!communityId,
+  });
+
+  console.log('threadToken', threadToken);
 
   const thread = useMemo(() => {
     return threadView;
@@ -607,6 +618,25 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
 
   const sidebarComponent = [
+    ...(tokenizedThreadsEnabled
+      ? [
+          {
+            label: 'Token',
+            item: (
+              <div className="cards-column">
+                <ThreadTokenWidget
+                  tokenizedThreadsEnabled={tokenizedThreadsEnabled}
+                  threadId={thread?.id}
+                  communityId={thread?.communityId}
+                  addressType={app.chain?.base || 'ethereum'}
+                  chainNode={app.chain?.meta?.ChainNode}
+                  tokenCommunity={app.chain?.meta}
+                />
+              </div>
+            ),
+          },
+        ]
+      : []),
     ...(showLinkedProposalOptions || showLinkedThreadOptions
       ? [
           {
@@ -845,7 +875,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               showLinkedThreadOptions ||
               pollsData?.length > 0 ||
               isAuthor ||
-              !!hasWebLinks)
+              !!hasWebLinks ||
+              !!threadToken)
           }
           onCommentClick={scrollToFirstComment}
           isSpamThread={!!thread?.markedAsSpamAt}

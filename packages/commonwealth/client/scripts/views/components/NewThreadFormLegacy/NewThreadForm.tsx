@@ -832,6 +832,8 @@ export const NewThreadForm = forwardRef<
                   selectedTopicId={threadTopic?.id}
                   communityId={selectedCommunityId}
                   addressType={app.chain?.base || 'ethereum'}
+                  chainNode={app.chain?.meta?.ChainNode}
+                  tokenCommunity={app.chain?.meta}
                 />
               </div>
             ),
