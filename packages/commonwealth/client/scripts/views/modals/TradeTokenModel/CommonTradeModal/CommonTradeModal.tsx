@@ -21,6 +21,7 @@ const CommonTradeModal = ({
   isOpen,
   onModalClose,
   tradeConfig,
+  isThreadToken = false,
 }: CommonTradeTokenModalProps) => {
   const { trading, addresses, isActionPending, onCTAClick } =
     useCommonTradeTokenForm({
@@ -32,6 +33,7 @@ const CommonTradeModal = ({
       },
       addressType: tradeConfig.addressType,
       onTradeComplete: () => onModalClose?.(),
+      isThreadToken,
     });
 
   useBeforeUnload(isActionPending);

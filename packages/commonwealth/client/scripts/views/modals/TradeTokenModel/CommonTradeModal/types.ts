@@ -19,4 +19,5 @@ export type CommonTradeTokenModalProps = {
   isOpen: boolean;
   onModalClose?: () => void;
   tradeConfig: CommonTradingConfig;
+  isThreadToken?: boolean;
 };
