@@ -71,7 +71,7 @@ export const EmailsSection = () => {
         id: user.id,
         [key]: next,
         email_notifications_enabled: emailNotificationsEnabled,
-      } as any);
+      });
       await subscriptionPreferences.refetch();
     },
     [
@@ -192,7 +192,10 @@ export const EmailsSection = () => {
             value={emailFrequencyOptions.find(
               (o) => o.value === currentEmailInterval,
             )}
-            onChange={(opt: any) => handleFrequencyChange(opt)}
+            onChange={(opt: {
+              value: z.infer<typeof EmailNotificationInterval>;
+              label: string;
+            }) => handleFrequencyChange(opt)}
             isDisabled={isUpdatingSettings}
           />
         </div>
