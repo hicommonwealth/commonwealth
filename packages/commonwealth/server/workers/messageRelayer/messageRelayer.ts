@@ -1,5 +1,5 @@
 import { ServiceKey, startHealthCheckLoop } from '@hicommonwealth/adapters';
-import { logger } from '@hicommonwealth/core';
+import { disableService, logger } from '@hicommonwealth/core';
 import { bootstrapBindings, bootstrapRelayer } from 'server/bindings/bootstrap';
 
 const log = logger(import.meta);
@@ -18,6 +18,7 @@ startHealthCheckLoop({
 });
 
 export async function startMessageRelayer(maxRelayIterations?: number) {
+  await disableService();
   await bootstrapBindings({ worker: 'none' });
   const pgClient = await bootstrapRelayer(maxRelayIterations);
   isServiceHealthy = true;

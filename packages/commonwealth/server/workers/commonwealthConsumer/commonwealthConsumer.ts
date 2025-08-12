@@ -8,6 +8,7 @@ import {
 } from '@hicommonwealth/adapters';
 import {
   cache,
+  disableService,
   logger,
   notificationsProvider,
   stats,
@@ -53,6 +54,7 @@ startHealthCheckLoop({
 // properly handling/processing those messages. Using the script is rarely necessary in
 // local development.
 async function main() {
+  await disableService();
   try {
     log.info('Starting main consumer');
     await bootstrapBindings();

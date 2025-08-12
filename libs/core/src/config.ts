@@ -180,6 +180,7 @@ const {
   RAILWAY_DATADOG_HOST,
   RAILWAY_DATADOG_STATSD_PORT,
   RAILWAY_GIT_COMMIT_SHA,
+  DISABLE_SERVICE,
 } = process.env;
 
 const DEFAULTS = {
@@ -198,6 +199,7 @@ export const config = configure(
     APP_ENV: APP_ENV as AppEnvironment,
     APP_ENV_PASSWORD: APP_ENV_PASSWORD,
     SERVICE: SERVICE as Service,
+    DISABLE_SERVICE: DISABLE_SERVICE === 'true',
     MAGIC_API_KEY,
     MAGIC_PUBLISHABLE_KEY: MAGIC_PUBLISHABLE_KEY || 'pk_live_EF89AABAFB87D6F4',
     MAGIC_CLIENT_ID,
@@ -270,6 +272,7 @@ export const config = configure(
           requiredServices: 'all',
         }),
       ),
+    DISABLE_SERVICE: z.boolean(),
     NODE_ENV: z.enum(Environments),
     DEV_MODULITH: z.boolean(),
     IS_CI: z.boolean(),
