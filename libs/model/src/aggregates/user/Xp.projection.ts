@@ -185,7 +185,7 @@ async function recordXpsForQuest({
       await models.sequelize.query(
         `
         WITH inserted AS (
-          INSERT INTO "XpLog" (
+          INSERT INTO "XpLogs" (
             -- UNIQUE KEY
             user_id,
             action_meta_id,
@@ -215,29 +215,36 @@ async function recordXpsForQuest({
           )
           ON CONFLICT (user_id, action_meta_id, event_created_at, name) DO NOTHING
           RETURNING 1
+        ),
+        update_user AS (
+          UPDATE "Users"
+          SET xp_points = COALESCE(xp_points, 0) + :xp_points
+          WHERE id = :user_id 
+            AND EXISTS(SELECT 1 FROM inserted)
+          RETURNING 1
+        ),
+        update_creator AS (
+          UPDATE "Users"
+          SET 
+            xp_points = COALESCE(xp_points, 0) 
+              + CASE WHEN :is_referral THEN 0 ELSE :shared_xp_points END,
+            xp_referrer_points = COALESCE(xp_referrer_points, 0) 
+              + CASE WHEN :is_referral THEN :shared_xp_points ELSE 0 END
+          WHERE id = :shared_with_user_id 
+            AND :shared_xp_points IS NOT NULL
+            AND EXISTS(SELECT 1 FROM inserted)
+          RETURNING 1
         )
-        UPDATE "User"
-        SET xp_points = COALESCE(xp_points, 0) + :xp_points
-        FROM inserted
-        WHERE id = :user_id;
-
-        UPDATE "User"
+        UPDATE "Quests"
         SET 
-          xp_points = COALESCE(xp_points, 0) + CASE WHEN :is_referral THEN 0 ELSE :shared_xp_points END,
-          xp_referrer_points = COALESCE(xp_referrer_points, 0) + CASE WHEN :is_referral THEN :shared_xp_points ELSE 0 END
-        FROM inserted
-        WHERE id = :shared_with_user_id AND :shared_xp_points IS NOT NULL;
-
-        UPDATE "Quest"
-        SET 
-          xp_awarded = xp_awarded + (:xp_points + COALESCE(:shared_xp_points, 0)),
+          xp_awarded = xp_awarded + :reward_amount,
           end_date = CASE 
-                      WHEN (xp_awarded + (:xp_points + COALESCE(:shared_xp_points, 0))) >= max_xp_to_end
-                      THEN NOW()
-                      ELSE end_date
-                    END
-        FROM inserted
-        WHERE id = :quest_id;`,
+              WHEN (xp_awarded + :reward_amount) >= max_xp_to_end
+              THEN NOW()
+              ELSE end_date
+            END
+        WHERE id = :quest_id
+          AND EXISTS(SELECT 1 FROM inserted);`,
         {
           replacements: {
             quest_id: action_meta.quest_id,
@@ -246,10 +253,11 @@ async function recordXpsForQuest({
             event_created_at,
             user_id,
             shared_with_user_id,
+            reward_amount,
             xp_points,
             shared_xp_points,
             is_referral: !!shared_with?.referrer_address,
-            scope,
+            scope: scope ? JSON.stringify(scope) : null,
           },
           transaction,
         },
