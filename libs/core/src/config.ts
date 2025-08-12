@@ -49,6 +49,7 @@ const Services = [
   'discord-listener',
   'twitter',
   'evm-ce',
+  'sol-ce',
   'web-modulith',
 ] as const;
 export const WebServices = ['web', 'web-modulith'] as const satisfies Service[];
