@@ -89,3 +89,21 @@ If in the production environment also add Datadog environment variables to the s
 RELEASER_API_KEY="${{Prod Releaser.API_KEY}}"
 RELEASER_URL="${{Prod Releaser.RELEASER_URL}}"
 ```
+
+# Scaling
+
+## Horizontal
+
+Railway does not have native automated horizontal scaling. To scale there are 2 options:
+- Manually scale the number of service replicas as needed. Replicas can be in different regions.
+- Use a 3rd party service like [Judo Scale](https://judoscale.com/docs/railway-getting-started)
+to automatically horizontally scale the number of replicas. This mainly works for the web service
+and not for the workers.
+
+## Vertical
+
+On the Railway pro plan, we have access to 32 GB RAM and 32 vCPU per service instance. Railway charges per-use.
+This means you can effectively give each instance the maximum amount of RAM and CPU and Railway won't
+charge us unless those resources are used. Note that Node only uses 1 process and dynamically adapts
+memory usage based on available memory. As such, more than 1 vCPU is not helpful but leaving more RAM
+available works as intended.
