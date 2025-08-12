@@ -52,7 +52,7 @@ export default {
           "updated_at"
         )
         VALUES (
-          -7,                     -- id (new, avoiding existing IDs)
+          -11,                    -- id (new, starting at -11)
           -5,                     -- quest_id
           'SignUpFlowCompleted',  -- event_name
           10,                     -- reward_amount (same as quest -2)
@@ -74,7 +74,7 @@ export default {
           "updated_at"
         )
         VALUES (
-          -8,                     -- id (new, avoiding existing IDs)
+          -12,                    -- id (new, continuing sequence from -11)
           -5,                     -- quest_id
           'WalletLinked',         -- event_name
           5,                      -- reward_amount (same as quest -2, not 10!)
@@ -96,7 +96,7 @@ export default {
           "updated_at"
         )
         VALUES (
-          -11,                    -- id (new, avoiding existing IDs - changed from -9 to avoid conflict with Binance quest)
+          -13,                    -- id (new, continuing sequence from -12)
           -5,                     -- quest_id
           'SSOLinked',            -- event_name
           5,                      -- reward_amount (same as quest -2)
@@ -119,7 +119,7 @@ export default {
           "updated_at"
         )
         VALUES (
-          -101,                   -- id (new, avoiding existing IDs)
+          -14,                    -- id (new, continuing sequence from -13)
           -5,                     -- quest_id
           'XpAwarded',            -- event_name
           0,                      -- reward_amount
