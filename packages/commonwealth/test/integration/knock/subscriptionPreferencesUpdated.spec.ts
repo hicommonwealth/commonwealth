@@ -143,6 +143,16 @@ describe('subscriptionPreferencesUpdated', () => {
         },
       },
     );
+    await models.User.update(
+      {
+        emailNotificationInterval: 'weekly',
+      },
+      {
+        where: {
+          id: user!.id!,
+        },
+      },
+    );
 
     const provider = notificationsProvider({
       adapter: SpyNotificationsProvider({
@@ -182,7 +192,7 @@ describe('subscriptionPreferencesUpdated', () => {
     ).to.have.property('hours');
     expect(
       (provider.createSchedules as Mock).mock.calls[0][0].schedule[0].frequency,
-    ).to.equal('Weekly');
+    ).to.equal('weekly');
   });
 
   test('should not create a schedule if one already exists', async () => {
