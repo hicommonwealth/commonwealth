@@ -10,7 +10,7 @@ import {
   UserTierMap,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
-import { Op, Sequelize } from 'sequelize';
+import { Op, Sequelize, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../../config';
 import { models, sequelize } from '../../database';
@@ -92,6 +92,48 @@ async function getQuestActionMetas(
     ],
   });
   return metas.flatMap((q) => q.get({ plain: true }).action_metas);
+}
+
+async function accumulatePoints(
+  quest_id: number,
+  user_id: number,
+  xp_points: number,
+  transaction: Transaction,
+  shared_user_id?: number,
+  shared_xp_points?: number,
+  is_referral?: boolean,
+) {
+  await models.User.update(
+    { xp_points: sequelize.literal(`COALESCE(xp_points, 0) + ${xp_points}`) },
+    { where: { id: user_id }, transaction },
+  );
+  if (shared_xp_points) {
+    await models.User.update(
+      {
+        xp_points: sequelize.literal(
+          `COALESCE(xp_points, 0) + ${is_referral ? 0 : shared_xp_points}`,
+        ),
+        xp_referrer_points: sequelize.literal(
+          `COALESCE(xp_referrer_points, 0) + ${is_referral ? shared_xp_points : 0}`,
+        ),
+      },
+      { where: { id: shared_user_id }, transaction },
+    );
+  }
+  // update xp_awarded and end quest if max_xp_to_end is reached
+  const xp_awarded = xp_points + (shared_xp_points || 0);
+  await models.Quest.update(
+    {
+      xp_awarded: sequelize.literal(`xp_awarded + ${xp_awarded}`),
+      end_date: sequelize.literal(`
+        CASE WHEN (xp_awarded + ${xp_awarded}) >= max_xp_to_end
+        THEN NOW()
+        ELSE end_date
+        END
+      `),
+    },
+    { where: { id: quest_id }, transaction },
+  );
 }
 
 async function recordXpsForQuest({
@@ -182,78 +224,36 @@ async function recordXpsForQuest({
         : undefined;
       const xp_points = reward_amount - (shared_xp_points ?? 0);
 
-      await models.sequelize.query(
-        `
-        WITH inserted AS (
-          INSERT INTO "XpLog" (
-            -- UNIQUE KEY
-            user_id,
-            action_meta_id,
-            event_created_at,
-            name, -- NULL unless tweeter engagment event
-
-            -- VALUES
-            xp_points,
-            creator_user_id,
-            creator_xp_points,
-            event_id,
-            scope,
-            created_at
-          )
-          VALUES (
-            :user_id,
-            :action_meta_id,
-            :event_created_at,
-            NULL,
-
-            :xp_points,
-            :shared_with_user_id,
-            :shared_xp_points,
-            :event_id,
-            :scope,
-            NOW()
-          )
-          ON CONFLICT (user_id, action_meta_id, event_created_at, name) DO NOTHING
-          RETURNING 1
-        )
-        UPDATE "User"
-        SET xp_points = COALESCE(xp_points, 0) + :xp_points
-        FROM inserted
-        WHERE id = :user_id;
-
-        UPDATE "User"
-        SET 
-          xp_points = COALESCE(xp_points, 0) + CASE WHEN :is_referral THEN 0 ELSE :shared_xp_points END,
-          xp_referrer_points = COALESCE(xp_referrer_points, 0) + CASE WHEN :is_referral THEN :shared_xp_points ELSE 0 END
-        FROM inserted
-        WHERE id = :shared_with_user_id AND :shared_xp_points IS NOT NULL;
-
-        UPDATE "Quest"
-        SET 
-          xp_awarded = xp_awarded + (:xp_points + COALESCE(:shared_xp_points, 0)),
-          end_date = CASE 
-                      WHEN (xp_awarded + (:xp_points + COALESCE(:shared_xp_points, 0))) >= max_xp_to_end
-                      THEN NOW()
-                      ELSE end_date
-                    END
-        FROM inserted
-        WHERE id = :quest_id;`,
-        {
-          replacements: {
-            quest_id: action_meta.quest_id,
-            action_meta_id: action_meta.id,
-            event_id,
-            event_created_at,
-            user_id,
-            shared_with_user_id,
-            xp_points,
-            shared_xp_points,
-            is_referral: !!shared_with?.referrer_address,
-            scope,
-          },
-          transaction,
+      const [, created] = await models.XpLog.findOrCreate({
+        where: {
+          user_id,
+          action_meta_id: action_meta.id,
+          event_created_at,
         },
-      );
+        defaults: {
+          event_id,
+          user_id,
+          action_meta_id: action_meta.id,
+          event_created_at,
+          xp_points,
+          creator_user_id: shared_with_user_id,
+          creator_xp_points: shared_xp_points,
+          created_at: new Date(),
+          scope,
+        },
+        transaction,
+      });
+
+      if (created)
+        await accumulatePoints(
+          action_meta.quest_id,
+          user_id,
+          xp_points,
+          transaction,
+          shared_with_user_id,
+          shared_xp_points,
+          !!shared_with?.referrer_address,
+        );
     }
   });
 }
