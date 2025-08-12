@@ -1,3 +1,3 @@
-import TokenWidget from './TokenWidget';
+import ThreadTokenWidget from './ThreadTokenWidget';
 
-export { TokenWidget };
+export { ThreadTokenWidget };
