@@ -139,6 +139,24 @@ export async function getVotingWeight(
       throw new InvalidState('Insufficient Sui token balance');
     }
     return numTokens;
+  } else if (topic.weighted_voting === TopicWeightedVoting.SuiNFT) {
+    // Sui NFT support
+    const chainNode = topic.ChainNode || community.ChainNode!;
+    mustExist('Chain Node', chainNode);
+    mustExist('Topic Token Address', topic.token_address);
+    mustExist('Chain Node Balance Type', chainNode.balance_type);
+    mustExist('Chain Node ID', chainNode.id);
+
+    const numTokens = await getWeightedSuiNFTs(
+      address,
+      topic.token_address!,
+      chainNode.id!,
+      topic.vote_weight_multiplier!,
+    );
+    if (numTokens === BigInt(0)) {
+      throw new InvalidState('Insufficient Sui NFT balance');
+    }
+    return numTokens;
   } else if (topic.weighted_voting === TopicWeightedVoting.ERC1155ID) {
     // similar to stake voting, but for community nomination token on namespace
     mustExist('Chain Node Eth Chain Id', namespaceChainNode?.eth_chain_id);
@@ -278,6 +296,37 @@ export async function getWeightedSuiTokens(
 
   if (BigInt(tokenBalance || 0) <= BigInt(0)) {
     throw new InvalidState('Insufficient Sui token balance');
+  }
+  const result = calculateVoteWeight(tokenBalance, voteWeightMultiplier);
+  return result || BigInt(0);
+}
+
+export async function getWeightedSuiNFTs(
+  address: string,
+  collectionId: string,
+  chainNodeId: number,
+  voteWeightMultiplier: number,
+): Promise<bigint> {
+  // Get the chain node to determine the network
+  const chainNode = await models.ChainNode.findByPk(chainNodeId);
+  mustExist('Chain Node', chainNode);
+
+  const balanceOptions: GetBalancesOptions = {
+    balanceSourceType: BalanceSourceType.SuiNFT,
+    addresses: [address],
+    sourceOptions: {
+      // Use the network from the chain node's identifier for the network
+      suiNetwork: chainNode.name,
+      collectionId,
+    },
+    cacheRefresh: true,
+  };
+
+  const balances = await getBalances(balanceOptions);
+  const tokenBalance = balances[address];
+
+  if (BigInt(tokenBalance || 0) <= BigInt(0)) {
+    throw new InvalidState('Insufficient Sui NFT balance');
   }
   const result = calculateVoteWeight(tokenBalance, voteWeightMultiplier);
   return result || BigInt(0);

@@ -22,16 +22,14 @@ const WVSuiNativeDetails = ({
   onStepChange,
   onCreateTopic,
 }: WVSuiNativeDetailsProps) => {
-  const [tokenSymbol, setTokenSymbol] = useState('');
-  const [tokenDecimals, setTokenDecimals] = useState(9);
   const [multiplier, setMultiplier] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
   const chainNodeId = app?.chain?.meta?.ChainNode?.id;
 
   const handleSubmit = async () => {
-    if (!tokenSymbol || !chainNodeId) {
-      notifyError('Please fill in all required fields');
+    if (!chainNodeId) {
+      notifyError('Chain node ID is required');
       return;
     }
 
@@ -39,8 +37,6 @@ const WVSuiNativeDetails = ({
     try {
       await onCreateTopic({
         suiNative: {
-          tokenSymbol,
-          tokenDecimals,
           voteWeightMultiplier: multiplier,
           chainNodeId,
           weightedVoting: TopicWeightedVoting.SuiNative,
@@ -66,32 +62,6 @@ const WVSuiNativeDetails = ({
       <CWDivider />
 
       <CWText type="h4">Connect Sui Native Token</CWText>
-
-      <CWText type="b1" className="description">
-        The native SUI token will be used for weighted voting
-      </CWText>
-
-      <CWText type="h5">Token Symbol</CWText>
-      <CWText type="b1" className="description">
-        Enter the token symbol (e.g., SUI)
-      </CWText>
-      <CWTextInput
-        value={tokenSymbol}
-        onInput={(e) => setTokenSymbol(e.target.value)}
-        placeholder="Enter token symbol"
-      />
-
-      <CWText type="h5">Token Decimals</CWText>
-      <CWText type="b1" className="description">
-        Enter the number of decimals for the token
-      </CWText>
-      <CWTextInput
-        type="number"
-        min={0}
-        value={tokenDecimals}
-        onInput={(e) => setTokenDecimals(Number(e.target.value))}
-        placeholder="Enter token decimals"
-      />
 
       <CWText type="h5">Vote weight multiplier</CWText>
 
@@ -137,7 +107,7 @@ const WVSuiNativeDetails = ({
           disabled={isLoading}
         />
         <CWButton
-          disabled={!tokenSymbol || !multiplier || isLoading || !chainNodeId}
+          disabled={!multiplier || isLoading || !chainNodeId}
           type="button"
           buttonWidth="wide"
           label="Enable weighted voting for topic"
