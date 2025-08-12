@@ -15,6 +15,7 @@ import {
   useCreateTokenTradeMutation,
   useGetERC20BalanceQuery,
   useGetThreadToken,
+  useTokenMetadataQuery,
 } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
@@ -63,10 +64,17 @@ const ThreadTokenWidget = ({
     return userAddresses[0]?.address || '';
   }, [user.addresses, addressType]);
 
-  const primaryTokenSymbol = 'ETH';
   const primaryTokenAddress = tokenCommunity?.thread_purchase_token || '';
   const ethChainId = tokenCommunity?.ChainNode?.eth_chain_id || 1;
   const chainRpc = tokenCommunity?.ChainNode?.url || '';
+
+  const { data: tokenMetadata } = useTokenMetadataQuery({
+    tokenId: primaryTokenAddress,
+    nodeEthChainId: ethChainId,
+    apiEnabled: !!primaryTokenAddress && !!ethChainId,
+  });
+
+  const primaryTokenSymbol = tokenMetadata?.symbol || 'ETH';
 
   const { data: primaryTokenRateData } = useFetchTokenUsdRateQuery({
     tokenSymbol: primaryTokenSymbol,
