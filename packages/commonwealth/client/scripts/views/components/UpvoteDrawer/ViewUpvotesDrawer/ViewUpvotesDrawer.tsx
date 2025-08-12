@@ -25,6 +25,7 @@ type ViewUpvotesDrawerProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   tokenDecimals?: number | null | undefined;
   topicWeight?: TopicWeightedVoting | null | undefined;
+  launchpadTokenAddress?: string;
 };
 
 type TabType = 'upvotes' | 'holders' | 'tradeActivity';
@@ -38,6 +39,7 @@ export const ViewUpvotesDrawer = ({
   setIsOpen,
   tokenDecimals,
   topicWeight,
+  launchpadTokenAddress,
 }: ViewUpvotesDrawerProps) => {
   const [activeTab, setActiveTab] = useState<TabType>('upvotes');
 
@@ -112,7 +114,9 @@ export const ViewUpvotesDrawer = ({
               />
             )}
             {activeTab === 'holders' && <HoldersTab />}
-            {activeTab === 'tradeActivity' && <TradeActivityTab />}
+            {activeTab === 'tradeActivity' && launchpadTokenAddress && (
+              <TradeActivityTab tokenAddress={launchpadTokenAddress} />
+            )}
           </div>
         </div>
       </CWDrawer>
