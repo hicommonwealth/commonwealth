@@ -220,27 +220,27 @@ export async function main(
   setupAPI(app, cacheDecorator);
 
   app.use('/.well-known/assetlinks.json', (req: Request, res: Response) => {
-    res.sendFile(`${__dirname}/.well-known/assetlinks.json`);
+    res.sendFile(`${__dirname}/build/.well-known/assetlinks.json`);
   });
 
   app.use(
     '/.well-known/apple-app-site-association',
     (req: Request, res: Response) => {
       res.setHeader('Content-Type', 'application/json');
-      res.sendFile(`${__dirname}/.well-known/apple-app-site-association`);
+      res.sendFile(`${__dirname}/build/.well-known/apple-app-site-association`);
     },
   );
 
   app.use('/robots.txt', (req: Request, res: Response) => {
-    res.sendFile(`${__dirname}/robots.txt`);
+    res.sendFile(`${__dirname}/build/robots.txt`);
   });
 
   app.use('/blank.html', (req: Request, res: Response) => {
-    res.sendFile(`${__dirname}/blank.html`);
+    res.sendFile(`${__dirname}/build/blank.html`);
   });
 
   app.use('/manifest.json', (req: Request, res: Response) => {
-    res.sendFile(`${__dirname}/manifest.json`);
+    res.sendFile(`${__dirname}/build/manifest.json`);
   });
 
   app.use('/.well-known/farcaster.json', (req, res) => {
@@ -248,12 +248,12 @@ export async function main(
   });
 
   app.use('/firebase-messaging-sw.js', (req: Request, res: Response) => {
-    res.sendFile(`${__dirname}/firebase-messaging-sw.js`);
+    res.sendFile(`${__dirname}/build/firebase-messaging-sw.js`);
   });
 
   app.use(
     '/assets',
-    express.static(path.join(__dirname, 'assets'), {
+    express.static(path.join(__dirname, 'build', 'assets'), {
       setHeaders: (res) => {
         res.setHeader('Cache-Control', 'public');
       },
@@ -262,7 +262,7 @@ export async function main(
 
   app.use(
     '/brand_assets',
-    express.static(path.join(__dirname, 'brand_assets'), {
+    express.static(path.join(__dirname, 'build', 'brand_assets'), {
       setHeaders: (res) => {
         res.setHeader('Cache-Control', 'public');
       },
@@ -271,7 +271,7 @@ export async function main(
 
   app.get('*', async (req: Request, res: Response) => {
     try {
-      const indexFilePath = path.join(__dirname, 'index.html');
+      const indexFilePath = path.join(__dirname, 'build', 'index.html');
       const html = await renderIndex(indexFilePath);
       res.send(html);
     } catch (err) {
