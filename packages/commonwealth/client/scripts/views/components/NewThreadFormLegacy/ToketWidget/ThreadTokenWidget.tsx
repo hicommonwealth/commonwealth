@@ -1,28 +1,10 @@
-import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import TokenLaunchpad from 'helpers/ContractHelpers/tokenLaunchpad';
-import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
-import React, { useEffect, useMemo, useState } from 'react';
-import {
-  useFetchTokenUsdRateQuery,
-  useGetUserEthBalanceQuery,
-} from 'state/api/communityStake';
-import {
-  useBuyThreadTokenMutation,
-  useSellThreadTokenMutation,
-} from 'state/api/threads';
-import {
-  useCreateTokenTradeMutation,
-  useGetERC20BalanceQuery,
-  useGetThreadToken,
-  useTokenMetadataQuery,
-} from 'state/api/tokens';
-import useUserStore from 'state/ui/user';
-import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
+import React, { useEffect } from 'react';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
 import './ThreadTokenWidget.scss';
+import { useThreadTokenWidget } from './useThreadTokenWidget';
 
 interface ThreadTokenWidgetProps {
   tokenizedThreadsEnabled?: boolean;
@@ -43,103 +25,52 @@ const ThreadTokenWidget = ({
   chainNode,
   tokenCommunity,
 }: ThreadTokenWidgetProps) => {
-  const [amount, setAmount] = useState<string>('0');
-  const [tokenGainAmount, setTokenGainAmount] = useState<number>(0);
-  const [isLoadingTokenGain, setIsLoadingTokenGain] = useState<boolean>(false);
-  const [isSellMode, setIsSellMode] = useState<boolean>(false);
+  const {
+    amount,
+    setAmount,
+    tokenGainAmount,
+    setTokenGainAmount,
+    isLoadingTokenGain,
+    setIsLoadingTokenGain,
+    isSellMode,
+    setIsSellMode,
 
-  const { data: threadToken, isLoading: isLoadingThreadToken } =
-    useGetThreadToken({
-      thread_id: threadId || 0,
-      enabled: !!threadId,
-    });
-
-  const user = useUserStore();
-  const { linkSpecificAddressToSpecificCommunity } = useJoinCommunity();
-
-  const selectedAddress = useMemo(() => {
-    const userAddresses = user.addresses.filter((addr) =>
-      addressType ? addr.community.base === addressType : true,
-    );
-    return userAddresses[0]?.address || '';
-  }, [user.addresses, addressType]);
-
-  const primaryTokenAddress = tokenCommunity?.thread_purchase_token || '';
-  const ethChainId = tokenCommunity?.ChainNode?.eth_chain_id || 1;
-  const chainRpc = tokenCommunity?.ChainNode?.url || '';
-
-  const { data: tokenMetadata } = useTokenMetadataQuery({
-    tokenId: primaryTokenAddress,
-    nodeEthChainId: ethChainId,
-    apiEnabled: !!primaryTokenAddress && !!ethChainId,
-  });
-
-  const primaryTokenSymbol = tokenMetadata?.symbol || 'ETH';
-
-  const { data: primaryTokenRateData } = useFetchTokenUsdRateQuery({
-    tokenSymbol: primaryTokenSymbol,
-    enabled: tokenizedThreadsEnabled && !!selectedAddress,
-  });
-
-  const { data: userBalance = '0.0', isLoading: isLoadingBalance } =
-    useGetUserEthBalanceQuery({
-      chainRpc,
-      ethChainId,
-      walletAddress: selectedAddress,
-      apiEnabled: tokenizedThreadsEnabled && !!selectedAddress && !!chainRpc,
-    });
-
-  const { data: userTokenBalance = '0.0', isLoading: isLoadingTokenBalance } =
-    useGetERC20BalanceQuery({
-      nodeRpc: chainRpc,
-      tokenAddress: String(threadToken?.token_address || ''),
-      userAddress: selectedAddress,
-      enabled:
-        tokenizedThreadsEnabled &&
-        !!selectedAddress &&
-        !!threadToken?.token_address,
-    });
-
-  const { mutateAsync: buyThreadToken, isPending: isBuying } =
-    useBuyThreadTokenMutation();
-  const { mutateAsync: sellThreadToken, isPending: isSelling } =
-    useSellThreadTokenMutation();
-  const { mutateAsync: createTokenTrade, isPending: isCreatingTokenTrade } =
-    useCreateTokenTradeMutation();
-
-  const { isWrongNetwork, promptNetworkSwitch } = useNetworkSwitching({
-    ethChainId,
-    rpcUrl: chainRpc,
-    provider: undefined,
-  });
-
-  const tokenLaunchpad = useMemo(() => {
-    if (
-      chainRpc &&
-      ethChainId &&
-      selectedAddress &&
-      tokenCommunity &&
-      tokenizedThreadsEnabled
-    ) {
-      const factoryAddress = getFactoryContract(ethChainId).TokenLaunchpad;
-      const bondingCurve = getFactoryContract(ethChainId).TokenBondingCurve;
-      const paymentTokenAddress = primaryTokenAddress;
-
-      return new TokenLaunchpad(
-        factoryAddress,
-        bondingCurve,
-        paymentTokenAddress,
-        chainRpc,
-      );
-    }
-    return null;
-  }, [
-    chainRpc,
-    ethChainId,
+    threadToken,
+    isLoadingThreadToken,
     selectedAddress,
-    tokenCommunity,
+    primaryTokenAddress,
+    ethChainId,
+    chainRpc,
+    tokenMetadata,
+    primaryTokenSymbol,
+    primaryTokenRateData,
+    userBalance,
+    isLoadingBalance,
+    userTokenBalance,
+    isLoadingTokenBalance,
+
+    buyThreadToken,
+    sellThreadToken,
+    createTokenTrade,
+    isBuying,
+    isSelling,
+    isCreatingTokenTrade,
+
+    isWrongNetwork,
+    promptNetworkSwitch,
+
+    tokenLaunchpad,
+
+    user,
+    linkSpecificAddressToSpecificCommunity,
+  } = useThreadTokenWidget({
     tokenizedThreadsEnabled,
-  ]);
+    threadId,
+    communityId,
+    addressType,
+    chainNode,
+    tokenCommunity,
+  });
 
   useEffect(() => {
     const fetchTokenGain = async () => {
@@ -161,7 +92,7 @@ const ThreadTokenWidget = ({
         const amountOut = await tokenLaunchpad.getAmountOut(
           String(threadToken.token_address),
           amountInWei,
-          !isSellMode, // true for buy, false for sell
+          !isSellMode,
           `${ethChainId}`,
         );
         setTokenGainAmount(amountOut);
@@ -340,6 +271,18 @@ const ThreadTokenWidget = ({
         <div className="wallet-connection-message">
           <CWText type="b2" className="message-text">
             Connect your wallet to trade thread tokens
+          </CWText>
+        </div>
+      </div>
+    );
+  }
+
+  if (!tokenLaunchpad) {
+    return (
+      <div className="ThreadTokenWidget">
+        <div className="wallet-connection-message">
+          <CWText type="b2" className="message-text">
+            Thread token trading is not available on this network.
           </CWText>
         </div>
       </div>

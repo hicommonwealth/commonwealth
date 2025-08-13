@@ -1,3 +1,4 @@
 import ThreadTokenWidget from './ThreadTokenWidget';
+import { useThreadTokenWidget } from './useThreadTokenWidget';
 
-export { ThreadTokenWidget };
+export { ThreadTokenWidget, useThreadTokenWidget };
