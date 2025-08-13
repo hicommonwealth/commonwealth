@@ -1,4 +1,7 @@
-import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import {
+  EmailNotificationInterval,
+  ExtendedCommunity,
+} from '@hicommonwealth/schemas';
 import { WalletId } from '@hicommonwealth/shared';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
@@ -6,8 +9,6 @@ import { z } from 'zod';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';
-
-export type EmailNotificationInterval = 'weekly' | 'never';
 
 export type UserCommunities = {
   id: string;
@@ -19,7 +20,7 @@ export type UserCommunities = {
 type CommonProps = {
   id: number;
   email: string;
-  emailNotificationInterval: EmailNotificationInterval | '';
+  emailNotificationInterval: z.infer<typeof EmailNotificationInterval> | '';
   knockJWT: string;
   addresses: AddressInfo[];
   activeCommunity: z.infer<typeof ExtendedCommunity> | null;
