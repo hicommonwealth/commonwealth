@@ -90,7 +90,7 @@ export const launchAndBuyThreadTokenUtility = async ({
       chainId: parseInt(communityId || '0'),
       walletAddress: selectedAddress,
       authorAddress: selectedAddress,
-      communityTreasuryAddress: '',
+      communityTreasuryAddress: selectedAddress,
       paymentTokenAddress: primaryTokenAddress,
       ethChainId,
       chainRpc,
@@ -98,13 +98,7 @@ export const launchAndBuyThreadTokenUtility = async ({
 
     const createTokenReceipt = await createThreadToken(createTokenPayload);
 
-    const amountInWei = parseFloat(amount) * 1e18;
-    const minAmountOut = tokenGainAmount * 0.95 * 1e18; // 5% slippage tolerance
-
-    await createTokenTrade({
-      eth_chain_id: ethChainId,
-      transaction_hash: createTokenReceipt.transactionHash,
-    });
+    console.log('createTokenReceipt', createTokenReceipt);
 
     const isMemberOfCommunity = user.addresses.find(
       (x) => x.community.id === tokenCommunity.id,
