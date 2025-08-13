@@ -3,6 +3,7 @@ import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import React, { Dispatch, SetStateAction, useState } from 'react';
+import { trpc } from 'utils/trpcClient';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from '../../component_kit/cw_text';
 import CWDrawer, {
@@ -25,7 +26,7 @@ type ViewUpvotesDrawerProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   tokenDecimals?: number | null | undefined;
   topicWeight?: TopicWeightedVoting | null | undefined;
-  launchpadTokenAddress?: string;
+  thread_id?: number;
 };
 
 type TabType = 'upvotes' | 'holders' | 'tradeActivity';
@@ -39,9 +40,14 @@ export const ViewUpvotesDrawer = ({
   setIsOpen,
   tokenDecimals,
   topicWeight,
-  launchpadTokenAddress,
+  thread_id,
 }: ViewUpvotesDrawerProps) => {
   const [activeTab, setActiveTab] = useState<TabType>('upvotes');
+
+  const { data: holders, isLoading: isTokenHoldersLoading } =
+    trpc.thread.getThreadTokenHolders.useQuery({
+      thread_id,
+    });
 
   const getAuthorCommunityId = (contentAuthor: Profile) => {
     if (contentAuthor instanceof MinimumProfile) {
@@ -113,9 +119,11 @@ export const ViewUpvotesDrawer = ({
                 topicWeight={topicWeight}
               />
             )}
-            {activeTab === 'holders' && <HoldersTab />}
-            {activeTab === 'tradeActivity' && launchpadTokenAddress && (
-              <TradeActivityTab tokenAddress={launchpadTokenAddress} />
+            {activeTab === 'holders' && (
+              <HoldersTab data={holders} isLoading={isTokenHoldersLoading} />
+            )}
+            {activeTab === 'tradeActivity' && thread_id && (
+              <TradeActivityTab thread_id={thread_id} />
             )}
           </div>
         </div>

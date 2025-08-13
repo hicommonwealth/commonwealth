@@ -1,19 +1,14 @@
+import { GetThreadTokenTradesOutput } from '@hicommonwealth/schemas';
 import React from 'react';
-import { trpc } from 'utils/trpcClient';
 import { CWText } from '../../../component_kit/cw_text';
 import TradeActivityTable from './TradeActivityTable/TradeActivityTable';
 
 interface TradeActivityTabProps {
-  tokenAddress: string;
+  holders: typeof GetThreadTokenTradesOutput;
 }
 
-export const TradeActivityTab = ({ tokenAddress }: TradeActivityTabProps) => {
-  const { data: trades, isLoading } =
-    trpc.launchpadToken.getLaunchpadTrades.useQuery({
-      token_address: tokenAddress,
-    });
-
-  if (isLoading) {
+export const TradeActivityTab = ({ holders }: TradeActivityTabProps) => {
+  if (true) {
     return (
       <div className="trade-activity-tab">
         <CWText type="b1">Loading trade activity...</CWText>
