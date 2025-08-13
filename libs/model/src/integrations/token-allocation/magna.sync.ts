@@ -6,6 +6,8 @@ import { QueryTypes } from 'sequelize';
 const log = logger(import.meta);
 
 export type TokenAllocationSyncArgs = {
+  category: string;
+  description: string;
   user_id: number;
   user_name: string;
   user_email: string;
@@ -37,6 +39,8 @@ export async function magnaSync(
       const batch = await models.sequelize.query<TokenAllocationSyncArgs>(
         `
           SELECT
+            'Initial Airdrop' as category,
+            'Allocation for inital Common token airdrop for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
             A.user_id,
             A.address as wallet_address,
             U.profile->>'name' as user_name,

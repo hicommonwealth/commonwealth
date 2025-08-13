@@ -13,6 +13,7 @@ export interface MagnaCustomAttribute {
 }
 
 export interface CreateAllocationRequest {
+  key: string; // unique allocation key to avoid duplicates
   contractId: string;
   tokenId: string;
   amount: number;

@@ -11,6 +11,8 @@ import * as magnaApi from '../../magna/api';
 const log = logger(import.meta);
 
 async function createMagnaAllocation({
+  category,
+  description,
   user_name,
   user_email,
   wallet_address,
@@ -21,6 +23,9 @@ async function createMagnaAllocation({
       config.MAGNA!.API_URL,
       config.MAGNA!.API_KEY,
       {
+        key: `A-${category}-${wallet_address}`,
+        category,
+        description,
         contractId: config.MAGNA!.CONTRACT_ID,
         tokenId: config.MAGNA!.TOKEN_ID,
         amount: token_allocation,
@@ -33,8 +38,6 @@ async function createMagnaAllocation({
           : { name: user_name },
         unlockScheduleId: config.MAGNA!.UNLOCK_SCHEDULE_ID,
         unlockStartAt: config.MAGNA!.UNLOCK_START_AT.toISOString(),
-        category: 'Initial Airdrop',
-        description: `Allocation for inital C token airdrop for ${user_name}`,
       },
     );
     if (response.isProcessed) {
