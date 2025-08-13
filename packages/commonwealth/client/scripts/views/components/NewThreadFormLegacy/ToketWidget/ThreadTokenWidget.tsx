@@ -63,6 +63,7 @@ const ThreadTokenWidget = ({
 
     user,
     linkSpecificAddressToSpecificCommunity,
+    isPrimaryTokenConfigured,
   } = useThreadTokenWidget({
     tokenizedThreadsEnabled,
     threadId,
@@ -262,6 +263,10 @@ const ThreadTokenWidget = ({
   };
 
   if (!tokenizedThreadsEnabled) {
+    return null;
+  }
+
+  if (!isPrimaryTokenConfigured) {
     return null;
   }
 

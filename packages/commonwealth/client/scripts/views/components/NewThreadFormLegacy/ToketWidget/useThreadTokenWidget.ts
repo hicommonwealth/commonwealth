@@ -69,6 +69,8 @@ export const useThreadTokenWidget = ({
 
   const primaryTokenSymbol = tokenMetadata?.symbol || 'ETH';
 
+  console.log('primaryTokenSymbol', primaryTokenSymbol);
+
   const { data: primaryTokenRateData } = useFetchTokenUsdRateQuery({
     tokenSymbol: primaryTokenSymbol,
     enabled: tokenizedThreadsEnabled && !!selectedAddress,
@@ -78,7 +80,6 @@ export const useThreadTokenWidget = ({
     !primaryTokenAddress ||
     primaryTokenAddress === '0x0000000000000000000000000000000000000000';
 
-  // Get ETH balance if primary token is ETH
   const { data: userEthBalance = '0.0', isLoading: isLoadingEthBalance } =
     useGetUserEthBalanceQuery({
       chainRpc,
@@ -91,7 +92,6 @@ export const useThreadTokenWidget = ({
         isPrimaryTokenEth,
     });
 
-  // Get ERC20 balance if primary token is an ERC20 token (WETH, USDC, etc.)
   const {
     data: userPrimaryTokenBalance = '0.0',
     isLoading: isLoadingPrimaryTokenBalance,
@@ -106,7 +106,6 @@ export const useThreadTokenWidget = ({
       !isPrimaryTokenEth,
   });
 
-  // Use the appropriate balance based on token type
   const userBalance = isPrimaryTokenEth
     ? userEthBalance
     : userPrimaryTokenBalance;
@@ -174,6 +173,8 @@ export const useThreadTokenWidget = ({
     tokenizedThreadsEnabled,
   ]);
 
+  const isPrimaryTokenConfigured = !!primaryTokenAddress;
+
   return {
     // State
     amount,
@@ -218,5 +219,7 @@ export const useThreadTokenWidget = ({
     // User
     user,
     linkSpecificAddressToSpecificCommunity,
+
+    isPrimaryTokenConfigured,
   };
 };
