@@ -34,6 +34,20 @@ export const createThreadToken = async ({
 }: CreateThreadTokenProps) => {
   mustBeProtocolChainId(ethChainId);
 
+  console.log('createThreadToken', {
+    name,
+    symbol,
+    threadId,
+    initPurchaseAmount,
+    chainId,
+    walletAddress,
+    authorAddress,
+    communityTreasuryAddress,
+    chainRpc,
+    paymentTokenAddress,
+    ethChainId,
+  });
+
   if (
     !getFactoryContract(ethChainId).TokenLaunchpad ||
     !getFactoryContract(ethChainId).TokenBondingCurve

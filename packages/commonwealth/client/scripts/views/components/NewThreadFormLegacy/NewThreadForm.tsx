@@ -46,6 +46,7 @@ import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import {
   useAddThreadLinksMutation,
+  useBuyThreadTokenMutation,
   useCreateThreadMutation,
   useCreateThreadPollMutation,
 } from 'state/api/threads';
@@ -73,6 +74,7 @@ import { DeltaStatic } from 'quill';
 // eslint-disable-next-line max-len
 import useCreateThreadTokenMutation from 'client/scripts/state/api/threads/createThreadToken';
 import {
+  useCreateTokenTradeMutation,
   useGetTokenByCommunityId,
   useGetTokenizedThreadsAllowedQuery,
 } from 'client/scripts/state/api/tokens';
@@ -112,6 +114,7 @@ import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { ThreadTokenWidget } from './ToketWidget';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+import { launchAndBuyThreadTokenUtility } from './useLaunchAndBuyThreadToken';
 
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
@@ -170,6 +173,8 @@ export const NewThreadForm = forwardRef<
 
     const { mutateAsync: createPoll } = useCreateThreadPollMutation();
     const { mutateAsync: createThreadToken } = useCreateThreadTokenMutation();
+    const { mutateAsync: buyThreadToken } = useBuyThreadTokenMutation();
+    const { mutateAsync: createTokenTrade } = useCreateTokenTradeMutation();
 
     const user = useUserStore();
     const { data: userProfile } = useFetchProfileByIdQuery({
@@ -265,7 +270,11 @@ export const NewThreadForm = forwardRef<
           ?.every((n) => n >= 2)
       : false;
 
-    const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
+    const {
+      handleJoinCommunity,
+      JoinCommunityModals,
+      linkSpecificAddressToSpecificCommunity,
+    } = useJoinCommunity();
     const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
 
     const { actionGroups, bypassGating } = useTopicGating({
@@ -428,36 +437,6 @@ export const NewThreadForm = forwardRef<
         });
 
         const thread = await createThread(input);
-
-        if (tokenizedThreadsAllowed?.tokenized_threads_enabled) {
-          if (!communityToken?.token_address) {
-            notifyError('Community token not found');
-            return;
-          }
-
-          if (!community?.ChainNode?.id) {
-            notifyError('chainId not found');
-            return;
-          }
-
-          await createThreadToken({
-            name: community.id,
-            symbol: communityToken.symbol,
-            threadId: thread.id!,
-            ethChainId: app?.chain?.meta?.ChainNode?.eth_chain_id || 0,
-            initPurchaseAmount: 1e18,
-            chainId: community.ChainNode?.id,
-            walletAddress: userSelectedAddress,
-            authorAddress: userSelectedAddress,
-            communityTreasuryAddress:
-              app.chain?.meta?.namespace_governance_address || '',
-            chainRpc: community.ChainNode?.url || '',
-            paymentTokenAddress: communityToken.token_address,
-          });
-
-          notifySuccess('Thread token created successfully');
-        }
-
         if (thread && linkedProposals) {
           addThreadLinks({
             thread_id: thread.id!,
@@ -819,6 +798,187 @@ export const NewThreadForm = forwardRef<
       [threadContentDelta, setThreadContentDelta, handleCloseImageModal],
     );
 
+    const handleLaunchAndBuyToken = useCallback(
+      async (threadId: number, amount: string, tokenGainAmount: number) => {
+        if (!community || !userSelectedAddress || !selectedCommunityId) {
+          notifyError('Invalid form state!');
+          return;
+        }
+
+        if (isTurnstileEnabled && !turnstileToken) {
+          notifyError('Please complete the verification');
+          return;
+        }
+
+        if (
+          !canUserPerformGatedAction(
+            actionGroups,
+            GatedActionEnum.CREATE_THREAD,
+            bypassGating,
+          )
+        ) {
+          notifyError('Topic is gated!');
+          return;
+        }
+
+        if (!isDiscussion && !detectURL(threadUrl)) {
+          notifyError('Must provide a valid URL.');
+          return;
+        }
+
+        // In AI mode, provide default values so the backend validation is not broken.
+        const effectiveTitle = isAIEnabled
+          ? threadTitle.trim() || DEFAULT_THREAD_TITLE
+          : threadTitle;
+
+        const effectiveBody = isAIEnabled
+          ? getTextFromDelta(threadContentDelta).trim()
+            ? serializeDelta(threadContentDelta)
+            : DEFAULT_THREAD_BODY
+          : serializeDelta(threadContentDelta);
+
+        if (!isAIEnabled) {
+          const deltaString = JSON.stringify(threadContentDelta);
+          checkNewThreadErrors(
+            { threadKind, threadUrl, threadTitle, threadTopic },
+            deltaString,
+            !!hasTopics,
+          );
+        }
+
+        setIsSaving(true);
+
+        try {
+          if (!threadTopic) {
+            console.error('NewThreadForm: No topic selected');
+            notifyError('Please select a topic');
+            return;
+          }
+
+          const input = await buildCreateThreadInput({
+            address: userSelectedAddress || '',
+            kind: threadKind,
+            stage: ThreadStage.Discussion,
+            communityId: selectedCommunityId,
+            communityBase: community.base,
+            title: effectiveTitle,
+            topic: threadTopic,
+            body: effectiveBody,
+            url: threadUrl,
+            ethChainIdOrBech32Prefix: getEthChainIdOrBech32Prefix({
+              base: community.base,
+              bech32_prefix: community?.bech32_prefix || '',
+              eth_chain_id: community?.ChainNode?.eth_chain_id || 0,
+            }),
+            turnstileToken,
+          });
+
+          const thread = await createThread(input);
+
+          if (
+            tokenizedThreadsAllowed?.tokenized_threads_enabled &&
+            thread?.id
+          ) {
+            if (!community?.ChainNode?.id) {
+              notifyError('chainId not found');
+              return;
+            }
+
+            if (!app.chain?.meta.thread_purchase_token) {
+              notifyError('Thred purchase token not found');
+              return;
+            }
+
+            await launchAndBuyThreadTokenUtility({
+              threadId: thread.id!,
+              threadTitle: effectiveTitle,
+              threadBody: effectiveBody,
+              selectedAddress: userSelectedAddress,
+              primaryTokenAddress: app.chain?.meta.thread_purchase_token,
+              ethChainId: community?.ChainNode?.id,
+              chainRpc: community.ChainNode?.url || '',
+              tokenCommunity: app.chain?.meta,
+              communityId: selectedCommunityId,
+              createThreadToken,
+              buyThreadToken,
+              createTokenTrade,
+              user,
+              linkSpecificAddressToSpecificCommunity,
+              tokenGainAmount: tokenGainAmount,
+              amount: amount,
+            });
+
+            notifySuccess('Thread created and token launched successfully!');
+          } else {
+            notifySuccess('Thread created successfully!');
+          }
+
+          if (thread && linkedProposals) {
+            await addThreadLinks({
+              thread_id: thread.id!,
+              links: [
+                {
+                  source: linkedProposals.source as LinkSource,
+                  identifier: linkedProposals.identifier,
+                  title: linkedProposals.title,
+                },
+              ],
+            });
+          }
+
+          // Reset form
+          setThreadTitle('');
+          setThreadContentDelta(createDeltaFromText(''));
+          setThreadUrl('');
+          setLinkedProposals(null);
+          setPollData(undefined);
+          resetTurnstile();
+
+          // Navigate to the new thread
+          navigate(`/discussion/${thread.id}`);
+        } catch (error) {
+          console.error('Error creating thread:', error);
+          notifyError('Failed to create thread');
+        } finally {
+          setIsSaving(false);
+        }
+      },
+      [
+        community,
+        userSelectedAddress,
+        selectedCommunityId,
+        isTurnstileEnabled,
+        turnstileToken,
+        actionGroups,
+        bypassGating,
+        isDiscussion,
+        threadUrl,
+        isAIEnabled,
+        threadTitle,
+        threadContentDelta,
+        hasTopics,
+        threadKind,
+        threadTopic,
+        createThread,
+        tokenizedThreadsAllowed?.tokenized_threads_enabled,
+        communityToken?.token_address,
+        community?.ChainNode?.id,
+        community?.ChainNode?.url,
+        app?.chain?.meta?.ChainNode?.eth_chain_id,
+        app?.chain?.meta?.namespace_governance_address,
+        createThreadToken,
+        linkedProposals,
+        addThreadLinks,
+        setThreadTitle,
+        setThreadContentDelta,
+        setThreadUrl,
+        setLinkedProposals,
+        setPollData,
+        resetTurnstile,
+        navigate,
+      ],
+    );
+
     const sidebarComponent = [
       tokenizedThreadsEnabled
         ? {
@@ -834,6 +994,9 @@ export const NewThreadForm = forwardRef<
                   addressType={app.chain?.base || 'ethereum'}
                   chainNode={app.chain?.meta?.ChainNode}
                   tokenCommunity={app.chain?.meta}
+                  threadTitle={threadTitle}
+                  threadBody={threadContentDelta}
+                  onThreadCreated={handleLaunchAndBuyToken}
                 />
               </div>
             ),

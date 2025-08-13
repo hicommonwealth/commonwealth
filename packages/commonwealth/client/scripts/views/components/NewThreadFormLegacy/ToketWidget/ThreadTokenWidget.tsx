@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
+import { useLaunchAndBuyThreadToken } from '../useLaunchAndBuyThreadToken';
 import './ThreadTokenWidget.scss';
 import { useThreadTokenWidget } from './useThreadTokenWidget';
 
@@ -14,6 +15,13 @@ interface ThreadTokenWidgetProps {
   addressType?: string;
   chainNode?: any;
   tokenCommunity?: any;
+  threadTitle?: string;
+  threadBody?: string;
+  onThreadCreated?: (
+    threadId: number,
+    amount: string,
+    tokenGainAmount: number,
+  ) => void;
 }
 
 const ThreadTokenWidget = ({
@@ -24,7 +32,32 @@ const ThreadTokenWidget = ({
   addressType,
   chainNode,
   tokenCommunity,
+  threadTitle,
+  threadBody,
+  onThreadCreated,
 }: ThreadTokenWidgetProps) => {
+  const isThreadCreationMode = !threadId;
+
+  const threadTokenWidgetHook = useThreadTokenWidget({
+    tokenizedThreadsEnabled,
+    threadId,
+    communityId,
+    addressType,
+    chainNode,
+    tokenCommunity,
+  });
+
+  const launchAndBuyHook = useLaunchAndBuyThreadToken({
+    tokenizedThreadsEnabled,
+    communityId,
+    addressType,
+    chainNode,
+    tokenCommunity,
+    threadTitle,
+    threadBody,
+    selectedTopicId,
+  });
+
   const {
     amount,
     setAmount,
@@ -34,102 +67,142 @@ const ThreadTokenWidget = ({
     setIsLoadingTokenGain,
     isSellMode,
     setIsSellMode,
-
     threadToken,
     isLoadingThreadToken,
+    userTokenBalance,
+    isLoadingTokenBalance,
+    buyThreadToken,
+    sellThreadToken,
+    isSelling,
+  } = threadTokenWidgetHook;
+
+  const {
     selectedAddress,
     primaryTokenAddress,
     ethChainId,
     chainRpc,
-    tokenMetadata,
     primaryTokenSymbol,
-    primaryTokenRateData,
     userBalance,
     isLoadingBalance,
-    userTokenBalance,
-    isLoadingTokenBalance,
-
-    buyThreadToken,
-    sellThreadToken,
     createTokenTrade,
     isBuying,
-    isSelling,
     isCreatingTokenTrade,
-
     isWrongNetwork,
     promptNetworkSwitch,
-
     tokenLaunchpad,
-
     user,
     linkSpecificAddressToSpecificCommunity,
     isPrimaryTokenConfigured,
-  } = useThreadTokenWidget({
-    tokenizedThreadsEnabled,
-    threadId,
-    communityId,
-    addressType,
-    chainNode,
-    tokenCommunity,
-  });
+  } = isThreadCreationMode ? launchAndBuyHook : threadTokenWidgetHook;
+
+  const { tokenMetadata, primaryTokenRateData } = threadTokenWidgetHook;
+
+  const {
+    threadFormAmount,
+    setThreadFormAmount,
+    threadFormTokenGainAmount,
+    isLoadingThreadFormTokenGain,
+    calculateTokenGain,
+    launchAndBuyThreadToken,
+    isCreatingThreadToken,
+  } = isThreadCreationMode ? launchAndBuyHook : {};
+
+  const currentAmount = isThreadCreationMode ? threadFormAmount : amount;
+  const setCurrentAmount = isThreadCreationMode
+    ? setThreadFormAmount
+    : setAmount;
+  const currentTokenGainAmount = isThreadCreationMode
+    ? threadFormTokenGainAmount
+    : tokenGainAmount;
+  const setCurrentTokenGainAmount = isThreadCreationMode
+    ? (val: number) => {}
+    : setTokenGainAmount;
+  const currentIsLoadingTokenGain = isThreadCreationMode
+    ? isLoadingThreadFormTokenGain
+    : isLoadingTokenGain;
+  const setCurrentIsLoadingTokenGain = isThreadCreationMode
+    ? (val: boolean) => {}
+    : setIsLoadingTokenGain;
+
+  const safeCurrentAmount = currentAmount || '0';
+  const safeCurrentTokenGainAmount = currentTokenGainAmount || 0;
+  const safeSetCurrentAmount = setCurrentAmount || (() => {});
 
   useEffect(() => {
     const fetchTokenGain = async () => {
       if (
         !tokenLaunchpad ||
-        !amount ||
-        parseFloat(amount) <= 0 ||
-        !threadToken?.token_address
+        !safeCurrentAmount ||
+        parseFloat(safeCurrentAmount) <= 0 ||
+        (isThreadCreationMode ? false : !threadToken?.token_address)
       ) {
-        setTokenGainAmount(0);
+        setCurrentTokenGainAmount(0);
         return;
       }
 
       try {
-        setIsLoadingTokenGain(true);
-        const inputAmount = parseFloat(amount);
+        setCurrentIsLoadingTokenGain(true);
+        const inputAmount = parseFloat(safeCurrentAmount);
         const amountInWei = inputAmount * 1e18;
 
-        const amountOut = await tokenLaunchpad.getAmountOut(
-          String(threadToken.token_address),
-          amountInWei,
-          !isSellMode,
-          `${ethChainId}`,
-        );
-        setTokenGainAmount(amountOut);
+        if (isThreadCreationMode) {
+          await calculateTokenGain?.(safeCurrentAmount);
+        } else {
+          const amountOut = await tokenLaunchpad.getAmountOut(
+            String(threadToken?.token_address || ''),
+            amountInWei,
+            !isSellMode,
+            `${ethChainId}`,
+          );
+          setCurrentTokenGainAmount(amountOut);
+        }
       } catch (error) {
         console.error('Error calculating token gain:', error);
-        setTokenGainAmount(0);
+        setCurrentTokenGainAmount(0);
       } finally {
-        setIsLoadingTokenGain(false);
+        setCurrentIsLoadingTokenGain(false);
       }
     };
 
     void fetchTokenGain();
   }, [
-    amount,
+    safeCurrentAmount,
     tokenLaunchpad,
     threadToken?.token_address,
     ethChainId,
     isSellMode,
+    isThreadCreationMode,
+    calculateTokenGain,
   ]);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (/^\d*\.?\d*$/.test(value) || value === '') {
-      setAmount(value);
+      safeSetCurrentAmount(value);
     }
   };
 
   const handlePresetClick = (presetAmount: string) => {
     if (presetAmount === 'MAX') {
-      setAmount(isSellMode ? userTokenBalance : userBalance);
+      safeSetCurrentAmount(isSellMode ? userTokenBalance : userBalance);
     } else {
-      setAmount(presetAmount);
+      safeSetCurrentAmount(presetAmount);
     }
   };
 
   const handleBuyClick = async () => {
+    if (isThreadCreationMode) {
+      if (!threadTitle || !threadBody) {
+        notifyError('Please fill in thread title and body first');
+        return;
+      }
+
+      if (onThreadCreated) {
+        onThreadCreated(0, safeCurrentAmount, safeCurrentTokenGainAmount);
+      }
+      return;
+    }
+
     if (!selectedAddress) {
       notifyError('Please connect your wallet first');
       return;
@@ -140,12 +213,12 @@ const ThreadTokenWidget = ({
       return;
     }
 
-    if (!amount || parseFloat(amount) <= 0) {
+    if (!safeCurrentAmount || parseFloat(safeCurrentAmount) <= 0) {
       notifyError('Please enter a valid amount');
       return;
     }
 
-    if (parseFloat(amount) > parseFloat(userBalance)) {
+    if (parseFloat(safeCurrentAmount) > parseFloat(userBalance)) {
       notifyError('Insufficient balance');
       return;
     }
@@ -161,8 +234,8 @@ const ThreadTokenWidget = ({
     }
 
     try {
-      const amountInWei = parseFloat(amount) * 1e18;
-      const minAmountOut = tokenGainAmount * 0.95 * 1e18; // 5% slippage tolerance
+      const amountInWei = parseFloat(safeCurrentAmount) * 1e18;
+      const minAmountOut = safeCurrentTokenGainAmount * 0.95 * 1e18;
 
       const payload = {
         chainRpc,
@@ -197,7 +270,7 @@ const ThreadTokenWidget = ({
       }
 
       notifySuccess('Thread token purchased successfully!');
-      setAmount('0');
+      safeSetCurrentAmount('0');
     } catch (error) {
       notifyError('Failed to purchase thread token');
       console.error('Purchase error:', error);
@@ -205,6 +278,11 @@ const ThreadTokenWidget = ({
   };
 
   const handleSellClick = async () => {
+    if (isThreadCreationMode) {
+      notifyError('Cannot sell tokens before thread is created');
+      return;
+    }
+
     if (!selectedAddress) {
       notifyError('Please connect your wallet first');
       return;
@@ -215,12 +293,12 @@ const ThreadTokenWidget = ({
       return;
     }
 
-    if (!amount || parseFloat(amount) <= 0) {
+    if (!safeCurrentAmount || parseFloat(safeCurrentAmount) <= 0) {
       notifyError('Please enter a valid amount');
       return;
     }
 
-    if (parseFloat(amount) > parseFloat(userTokenBalance)) {
+    if (parseFloat(safeCurrentAmount) > parseFloat(userTokenBalance)) {
       notifyError('Insufficient token balance');
       return;
     }
@@ -236,7 +314,7 @@ const ThreadTokenWidget = ({
     }
 
     try {
-      const amountToken = parseFloat(amount) * 1e18;
+      const amountToken = parseFloat(safeCurrentAmount) * 1e18;
 
       const payload = {
         chainRpc,
@@ -255,7 +333,7 @@ const ThreadTokenWidget = ({
       });
 
       notifySuccess('Thread token sold successfully!');
-      setAmount('0');
+      safeSetCurrentAmount('0');
     } catch (error) {
       notifyError('Failed to sell thread token');
       console.error('Sell error:', error);
@@ -294,21 +372,29 @@ const ThreadTokenWidget = ({
     );
   }
 
+  const shouldShowSellMode = !isThreadCreationMode;
+
   return (
     <div className="ThreadTokenWidget">
       <div className="purchase-token-card">
         <div className="header">
           <div className="title-section">
             <CWText type="h4" fontWeight="semiBold">
-              {isSellMode ? 'Sell Token' : 'Purchase Token'}
+              {isThreadCreationMode
+                ? 'Launch + Buy Token'
+                : isSellMode
+                  ? 'Sell Token'
+                  : 'Purchase Token'}
             </CWText>
-            <div
-              className="swap-icon-container"
-              onClick={() => setIsSellMode(!isSellMode)}
-            >
-              <CWIcon iconName="arrowRightPhosphor" className="swap-icon" />
-              <CWIcon iconName="arrowLeftPhosphor" className="swap-icon" />
-            </div>
+            {shouldShowSellMode && (
+              <div
+                className="swap-icon-container"
+                onClick={() => setIsSellMode(!isSellMode)}
+              >
+                <CWIcon iconName="arrowRightPhosphor" className="swap-icon" />
+                <CWIcon iconName="arrowLeftPhosphor" className="swap-icon" />
+              </div>
+            )}
           </div>
 
           <div className="balance-section">
@@ -317,13 +403,13 @@ const ThreadTokenWidget = ({
             </CWText>
             <div className="balance-amount">
               <CWText type="caption" fontWeight="regular">
-                {isSellMode
-                  ? isLoadingTokenBalance
+                {isThreadCreationMode || !isSellMode
+                  ? isLoadingBalance
                     ? 'Loading...'
-                    : `${userTokenBalance} ${threadToken?.symbol || 'TOKEN'}`
-                  : isLoadingBalance
+                    : `${userBalance} ${primaryTokenSymbol}`
+                  : isLoadingTokenBalance
                     ? 'Loading...'
-                    : `${userBalance} ${primaryTokenSymbol}`}
+                    : `${userTokenBalance} ${threadToken?.symbol || 'TOKEN'}`}
               </CWText>
             </div>
           </div>
@@ -332,16 +418,16 @@ const ThreadTokenWidget = ({
         <div className="amount-input-section">
           <input
             type="text"
-            value={amount}
+            value={safeCurrentAmount}
             onChange={handleAmountChange}
             placeholder="0"
             className="amount-input"
           />
           <div className="input-currency">
             <CWText type="b2">
-              {parseFloat(amount) > 0
-                ? `${amount} ${isSellMode ? threadToken?.symbol || 'TOKEN' : primaryTokenSymbol}`
-                : `0.000 ${isSellMode ? threadToken?.symbol || 'TOKEN' : primaryTokenSymbol}`}
+              {parseFloat(safeCurrentAmount) > 0
+                ? `${safeCurrentAmount} ${isThreadCreationMode || !isSellMode ? primaryTokenSymbol : threadToken?.symbol || 'TOKEN'}`
+                : `0.000 ${isThreadCreationMode || !isSellMode ? primaryTokenSymbol : threadToken?.symbol || 'TOKEN'}`}
             </CWText>
             <CWIcon iconName="chevronDown" className="chevron-icon" />
           </div>
@@ -373,23 +459,39 @@ const ThreadTokenWidget = ({
             You receive
           </CWText>
           <CWText type="h5" fontWeight="semiBold" className="receive-amount">
-            {isLoadingTokenGain
+            {currentIsLoadingTokenGain
               ? 'Calculating...'
-              : `${tokenGainAmount.toFixed(2)} ${isSellMode ? primaryTokenSymbol : threadToken?.symbol || 'TOKEN'}`}
+              : `${safeCurrentTokenGainAmount.toFixed(2)} ${isThreadCreationMode || !isSellMode ? 'TOKEN' : primaryTokenSymbol}`}
           </CWText>
         </div>
 
         <CWButton
-          label={isSellMode ? 'Sell' : 'Buy'}
+          label={
+            isThreadCreationMode ? 'Launch + Buy' : isSellMode ? 'Sell' : 'Buy'
+          }
           buttonType="primary"
           buttonWidth="full"
-          onClick={isSellMode ? handleSellClick : handleBuyClick}
+          onClick={
+            isThreadCreationMode
+              ? handleBuyClick
+              : isSellMode
+                ? handleSellClick
+                : handleBuyClick
+          }
           disabled={
-            (isSellMode ? isSelling : isBuying) ||
+            (isThreadCreationMode
+              ? isCreatingThreadToken
+              : isSellMode
+                ? isSelling
+                : isBuying) ||
             isCreatingTokenTrade ||
-            parseFloat(amount) <= 0 ||
-            parseFloat(amount) >
-              parseFloat(isSellMode ? userTokenBalance : userBalance) ||
+            parseFloat(safeCurrentAmount) <= 0 ||
+            parseFloat(safeCurrentAmount) >
+              parseFloat(
+                isThreadCreationMode || !isSellMode
+                  ? userBalance
+                  : userTokenBalance,
+              ) ||
             isWrongNetwork
           }
           className="buy-button"
