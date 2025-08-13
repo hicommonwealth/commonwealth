@@ -13,7 +13,7 @@ import {
 } from '@hicommonwealth/shared';
 import { randomBytes } from 'crypto';
 import fetch from 'node-fetch';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 

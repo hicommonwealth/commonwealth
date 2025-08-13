@@ -1,6 +1,6 @@
 import { Community } from '@hicommonwealth/schemas';
 import { getDecodedString, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
-import z from 'zod';
+import z from 'zod/v4';
 import { config } from '../../config';
 
 export const REGEX_IMAGE =

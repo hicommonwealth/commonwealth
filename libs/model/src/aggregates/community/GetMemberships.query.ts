@@ -1,7 +1,7 @@
 import { command, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 import { systemActor } from '../../middleware';
 import { mustExist } from '../../middleware/guards';

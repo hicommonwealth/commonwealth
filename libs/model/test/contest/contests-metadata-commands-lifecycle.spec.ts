@@ -1,7 +1,7 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import z from 'zod';
+import z from 'zod/v4';
 import * as Contest from '../../src/aggregates/contest';
 import { TopicAttributes } from '../../src/models';
 import { seed } from '../../src/tester';

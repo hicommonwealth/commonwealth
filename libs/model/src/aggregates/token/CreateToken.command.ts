@@ -2,7 +2,7 @@ import { type Command } from '@hicommonwealth/core';
 import * as protocols from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 import { authRoles, mustExist } from '../../middleware';
 import { emitEvent } from '../../utils/utils';

@@ -24,7 +24,7 @@ import {
 } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { privateKeyToAccount } from 'viem/accounts';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { config } from '../../config';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';

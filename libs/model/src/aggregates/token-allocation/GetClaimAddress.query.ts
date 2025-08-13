@@ -1,7 +1,7 @@
 import { InvalidState, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import z from 'zod';
+import z from 'zod/v4';
 import { models } from '../../database';
 
 export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {

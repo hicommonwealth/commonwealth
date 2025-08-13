@@ -21,7 +21,7 @@ import {
   Thread,
   User,
 } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { seed } from '../../src/tester';
 
 type ArrayItemType<T> = T extends Array<infer U> ? U : never;

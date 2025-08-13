@@ -1,6 +1,10 @@
 import { generateMock } from '@anatine/zod-mock';
 import { DeepPartial } from '@hicommonwealth/core';
-import * as schemas from '@hicommonwealth/schemas';
+import {
+  Aggregates,
+  aggregateSchema,
+  AggregateType,
+} from '@hicommonwealth/schemas';
 import {
   CommunityTierMap,
   DisabledCommunitySpamTier,
@@ -8,7 +12,7 @@ import {
 } from '@hicommonwealth/shared';
 import { randomInt } from 'crypto';
 import { Model, type ModelStatic } from 'sequelize';
-import z, {
+import {
   ZodArray,
   ZodNullable,
   ZodObject,
@@ -31,16 +35,17 @@ export type SeedOptions = {
 };
 
 function isNullable(value: ZodUnknown) {
+  console.log('isNullable', value);
   if (value instanceof ZodNullable) return true;
-  if (!('innerType' in value._def)) return false;
-  return isNullable(value._def.innerType as ZodUnknown);
+  if (!('innerType' in value)) return false;
+  return isNullable(value.innerType as ZodUnknown);
 }
 
 function isArray(
   value: ZodUnknown | ZodOptional<ZodUnknown> | ZodNullable<ZodUnknown>,
 ) {
   if (value instanceof ZodOptional || value instanceof ZodNullable)
-    return isArray(value._def.innerType);
+    return isArray(value.unwrap());
   return value instanceof ZodArray;
 }
 
@@ -48,7 +53,7 @@ function isString(
   value: ZodUnknown | ZodOptional<ZodUnknown> | ZodNullable<ZodUnknown>,
 ) {
   if (value instanceof ZodOptional || value instanceof ZodNullable)
-    return isString(value._def.innerType);
+    return isString(value.unwrap());
   return value instanceof ZodString;
 }
 
@@ -62,11 +67,11 @@ function isString(
  * @returns tuple with main aggregate record and array of total records created
  * @see "libs/model/\_\_tests\_\_/community/group-lifecycle.spec.ts"
  */
-export async function seed<T extends schemas.Aggregates>(
+export async function seed<T extends Aggregates>(
   name: T,
-  values?: DeepPartial<z.infer<(typeof schemas)[T]>>,
+  values?: DeepPartial<AggregateType<T>>,
   options: SeedOptions = { mock: true },
-): Promise<[z.infer<(typeof schemas)[T]> | undefined, State[]]> {
+): Promise<[AggregateType<T> | undefined, State[]]> {
   const records: State[] = [];
   await _seed(models![name], values ?? {}, options, records, 0);
   return [records.at(0) as any, records];
@@ -75,11 +80,11 @@ export async function seed<T extends schemas.Aggregates>(
 /**
  * Seeds multiple aggregates and returns record indexed by keys
  */
-export async function seedRecord<T extends schemas.Aggregates, K>(
+export async function seedRecord<T extends Aggregates, K>(
   name: T,
   keys: Readonly<Array<keyof K>>,
-  valuesFn: (key: keyof K) => DeepPartial<z.infer<(typeof schemas)[T]>>,
-): Promise<Record<keyof K, z.infer<(typeof schemas)[T]>>> {
+  valuesFn: (key: keyof K) => DeepPartial<AggregateType<T>>,
+): Promise<Record<keyof K, AggregateType<T>>> {
   const values = await Promise.all(
     keys.map(async (key) => {
       const [value] = await seed(name, valuesFn(key));
@@ -89,7 +94,7 @@ export async function seedRecord<T extends schemas.Aggregates, K>(
   return values.reduce(
     (record, [key, value]) =>
       Object.assign(record, { [key!.toString()]: value }),
-    {} as Record<keyof K, z.infer<(typeof schemas)[T]>>,
+    {} as Record<keyof K, AggregateType<T>>,
   );
 }
 
@@ -100,7 +105,7 @@ async function _seed(
   records: State[],
   level: number,
 ) {
-  const schema = schemas[model.name as schemas.Entities];
+  const schema = aggregateSchema(model.name as Aggregates);
   if (schema && options.mock && schema instanceof ZodObject) {
     if (model.name === 'User' && !('tier' in values)) {
       values['tier'] = UserTierMap.ManuallyVerified;
@@ -120,12 +125,12 @@ async function _seed(
     Object.entries(schema.shape).forEach(([key, value]) => {
       if (key !== 'id' && typeof values[key] === 'undefined') {
         if (model.associations[key]) {
-          if (isArray(value)) undefs[key] = [];
+          if (isArray(value as ZodUnknown)) undefs[key] = [];
           else undefs[key] = undefined;
-        } else if (isNullable(value)) undefs[key] = null;
+        } else if (isNullable(value as ZodUnknown)) undefs[key] = null;
       }
       // super-randomize string pks to avoid CI failures
-      if (model.primaryKeyAttribute === key && isString(value))
+      if (model.primaryKeyAttribute === key && isString(value as ZodUnknown))
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (mocked as any)[key] = `${(mocked as any)[key]}-${randomInt(1000)}`;
     });

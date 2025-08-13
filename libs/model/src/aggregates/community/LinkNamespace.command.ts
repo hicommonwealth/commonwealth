@@ -7,7 +7,7 @@ import {
   NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
 } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 import { emitEvent } from '../../utils';
 

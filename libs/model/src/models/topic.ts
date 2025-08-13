@@ -1,6 +1,6 @@
 import { Topic } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { ChainNodeAttributes } from './chain_node';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';

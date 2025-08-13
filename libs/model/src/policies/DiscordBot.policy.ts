@@ -5,7 +5,7 @@ import {
   DISCORD_BOT_EMAIL,
   UserTierMap,
 } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import {
   CreateComment,
   DeleteComment,

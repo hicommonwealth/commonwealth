@@ -1,6 +1,6 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 
 export function GetTopicSubscriptions(): Query<

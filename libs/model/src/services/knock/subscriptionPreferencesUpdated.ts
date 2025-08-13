@@ -7,7 +7,7 @@ import {
 } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { DaysOfWeek } from '@knocklabs/node';
-import z from 'zod';
+import z from 'zod/v4';
 import { config } from '../../config';
 import { models } from '../../database';
 import { SubscriptionPreferenceInstance } from '../../models';

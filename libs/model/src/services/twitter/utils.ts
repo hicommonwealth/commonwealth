@@ -3,7 +3,7 @@ import { TwitterApiResponses } from '@hicommonwealth/schemas';
 import { delay } from '@hicommonwealth/shared';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
-import z from 'zod';
+import z from 'zod/v4';
 import { config as envConfig } from '../../config';
 import { RequiredTwitterBotConfig, TwitterBotConfig } from './types';
 

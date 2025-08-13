@@ -10,7 +10,7 @@ import {
   WebhookDestinations,
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
-import z from 'zod';
+import z from 'zod/v4';
 import {
   getPreviewImageUrl,
   getRenderedTitle,

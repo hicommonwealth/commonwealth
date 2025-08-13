@@ -1,6 +1,6 @@
 import { EventHandler, logger } from '@hicommonwealth/core';
 import { getStakeTradeInfo } from '@hicommonwealth/evm-protocols';
-import { ZodUndefined } from 'zod';
+import { ZodUndefined } from 'zod/v4';
 import { models } from '../../database';
 import { chainNodeMustExist } from '../utils/utils';
 

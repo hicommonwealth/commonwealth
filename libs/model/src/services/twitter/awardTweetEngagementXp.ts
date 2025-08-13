@@ -2,11 +2,15 @@ import { logger } from '@hicommonwealth/core';
 import { XpLogName } from '@hicommonwealth/schemas';
 import { WalletSsoSource } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { config } from '../../config';
 import { models, sequelize } from '../../database';
 import { QuestActionMetaAttributes, QuestAttributes } from '../../models/quest';
-import { GraphileTask, TaskPayloads } from '../graphileWorker';
+import {
+  GraphileTaskHandler,
+  GraphileTaskNames,
+  TaskPayloads,
+} from '../graphileWorker';
 import { getLikingUsers } from './api/getLikingUsers';
 import { getReplies } from './api/getReplies';
 import { getRetweets } from './api/getRetweets';
@@ -77,9 +81,9 @@ async function awardBatchTweetEngagementXp({
   );
 }
 
-export const awardTweetEngagementXp = async (
-  payload: z.infer<typeof TaskPayloads.AwardTweetEngagementXp>,
-) => {
+export const awardTweetEngagementXp: GraphileTaskHandler<
+  GraphileTaskNames.AwardTwitterEngagementXp
+> = async (payload) => {
   const quest = await models.Quest.findOne({
     where: {
       id: payload.quest_id,
@@ -218,9 +222,7 @@ export const awardTweetEngagementXp = async (
   }
 };
 
-export const awardTweetEngagementXpTask: GraphileTask<
-  typeof TaskPayloads.AwardTweetEngagementXp
-> = {
-  input: TaskPayloads.AwardTweetEngagementXp,
+export const awardTweetEngagementXpTask = {
+  input: TaskPayloads.AwardTwitterEngagementXp,
   fn: awardTweetEngagementXp,
 };

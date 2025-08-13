@@ -1,6 +1,6 @@
 import { SubscriptionPreference } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import type { ModelInstance } from './types';
 
 export type SubscriptionPreferenceAttributes = z.infer<

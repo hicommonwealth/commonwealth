@@ -20,7 +20,7 @@ import {
   test,
   vi,
 } from 'vitest';
-import z from 'zod';
+import z from 'zod/v4';
 import { notifyUserMentioned } from '../../src/policies/handlers/notifyUserMentioned';
 import { getProfileUrl, getThreadUrl } from '../../src/policies/utils/utils';
 import * as tester from '../../src/tester';

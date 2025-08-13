@@ -5,7 +5,7 @@ import {
   Query,
 } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../database';
 import { generateUnsubscribeLink } from '../../utils';
 

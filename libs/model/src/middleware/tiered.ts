@@ -11,7 +11,7 @@ import {
 } from '@hicommonwealth/shared';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
-import { ZodType } from 'zod';
+import { ZodType } from 'zod/v4';
 import { config } from '../config';
 import { models } from '../database';
 

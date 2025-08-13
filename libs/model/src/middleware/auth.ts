@@ -29,7 +29,7 @@ import {
   Role,
 } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
-import { ZodType, z } from 'zod';
+import { ZodType, z } from 'zod/v4';
 import { models } from '../database';
 import { AddressInstance } from '../models';
 import { BannedActor, NonMember, RejectedMember } from './errors';

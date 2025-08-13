@@ -1,6 +1,6 @@
 import { Group } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import z from 'zod';
+import z from 'zod/v4';
 import type { CommunityAttributes } from './community';
 import type { MembershipAttributes } from './membership';
 import type { ModelInstance } from './types';

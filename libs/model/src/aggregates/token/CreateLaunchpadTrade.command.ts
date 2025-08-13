@@ -3,7 +3,7 @@ import { Command, InvalidState } from '@hicommonwealth/core';
 import { getPublicClient } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { parseEventLogs } from 'viem';
-import z from 'zod';
+import z from 'zod/v4';
 import { models } from '../../database';
 import { mustExist } from '../../middleware';
 import { handleCapReached } from './utils';

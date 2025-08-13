@@ -7,7 +7,7 @@ import {
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceSourceType, GatedActionEnum } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { config } from '../../config';
 import { models } from '../../database';
 import {

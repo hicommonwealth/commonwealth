@@ -16,7 +16,7 @@ import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
 import jsonwebtoken from 'jsonwebtoken';
 import { MagicUser } from 'passport-magic';
 import { Op, Transaction, WhereOptions } from 'sequelize';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { emitSignInEvents } from '../aggregates/user/signIn/emitSignInEvents';
 import { config } from '../config';
 import { models, sequelize } from '../database';

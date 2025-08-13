@@ -2,7 +2,7 @@ import { Actor, dispose, query } from '@hicommonwealth/core';
 import { Address, Topic } from '@hicommonwealth/schemas';
 import { CommunityTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { GetNewContent } from '../../src/aggregates/user';
 import { seed } from '../../src/tester';
 

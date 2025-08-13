@@ -10,7 +10,7 @@ import {
   verifyReaction,
   verifyThread,
 } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const ThreadSignature = z.object({
   title: z.string(),

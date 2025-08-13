@@ -3,7 +3,7 @@ import * as commonProtocol from '@hicommonwealth/evm-protocols';
 import { Community, EventPair, User } from '@hicommonwealth/schemas';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import {
   UPGRADE_MIN_USDC_BALANCE,
   UpgradeTierPolicy,

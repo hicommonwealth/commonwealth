@@ -8,7 +8,7 @@ import { verifyEventSource } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
 import { toEventHash } from 'viem';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { config } from '../../config';
 import { models } from '../../database';
 import {
@@ -165,7 +165,7 @@ async function updateChannelQuest(
       );
       log.trace(`Created quest tweet ${tweetId} for quest ${quest.id}`);
       const job = await scheduleTask(
-        GraphileTaskNames.AwardTwitterQuestXp,
+        GraphileTaskNames.AwardTwitterEngagementXp,
         {
           quest_id: quest.id!,
           quest_ended: true,

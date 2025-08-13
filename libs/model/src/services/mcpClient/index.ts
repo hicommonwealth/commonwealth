@@ -2,7 +2,7 @@ import { config } from '@hicommonwealth/core';
 import { MCPServer } from '@hicommonwealth/schemas';
 import { DEFAULT_COMPLETION_MODEL } from '@hicommonwealth/shared';
 import OpenAI from 'openai';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export type CommonMCPServerWithHeaders = z.infer<typeof MCPServer> & {
   headers?: Record<string, string>;

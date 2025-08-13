@@ -3,7 +3,7 @@ import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { Community } from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { models } from '../../src/database';
 import { handleCommunityStakeTrades } from '../../src/policies/handlers/handleCommunityStakeTrades';
 import * as tester from '../../src/tester';

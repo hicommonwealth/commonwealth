@@ -6,7 +6,7 @@ import {
 } from '@hicommonwealth/core';
 import { getCommunityUrl } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
-import { ZodBoolean } from 'zod';
+import { ZodBoolean } from 'zod/v4';
 import { models } from '../../database';
 
 const log = logger(import.meta);

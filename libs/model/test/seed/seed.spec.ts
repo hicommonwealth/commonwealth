@@ -9,7 +9,7 @@ import {
 } from '@hicommonwealth/shared';
 import { Model, ValidationError, type ModelStatic } from 'sequelize';
 import { afterAll, describe, expect, test } from 'vitest';
-import z from 'zod';
+import z from 'zod/v4';
 import { models } from '../../src/database';
 import { SeedOptions, seed } from '../../src/tester';
 
