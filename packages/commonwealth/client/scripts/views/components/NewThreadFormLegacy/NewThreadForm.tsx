@@ -895,7 +895,7 @@ export const NewThreadForm = forwardRef<
               threadBody: effectiveBody,
               selectedAddress: userSelectedAddress,
               primaryTokenAddress: app.chain?.meta.thread_purchase_token,
-              ethChainId: community?.ChainNode?.id,
+              ethChainId: community?.ChainNode?.eth_chain_id || 0,
               chainRpc: community.ChainNode?.url || '',
               tokenCommunity: app.chain?.meta,
               communityId: selectedCommunityId,
@@ -982,7 +982,7 @@ export const NewThreadForm = forwardRef<
     const sidebarComponent = [
       tokenizedThreadsEnabled
         ? {
-            label: 'Links',
+            label: 'Token',
             item: (
               <div className="cards-colum">
                 <ThreadTokenWidget

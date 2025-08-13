@@ -69,8 +69,6 @@ export const useThreadTokenWidget = ({
 
   const primaryTokenSymbol = tokenMetadata?.symbol || 'ETH';
 
-  console.log('primaryTokenSymbol', primaryTokenSymbol);
-
   const { data: primaryTokenRateData } = useFetchTokenUsdRateQuery({
     tokenSymbol: primaryTokenSymbol,
     enabled: tokenizedThreadsEnabled && !!selectedAddress,
