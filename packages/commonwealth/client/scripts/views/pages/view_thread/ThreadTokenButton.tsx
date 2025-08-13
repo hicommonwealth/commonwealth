@@ -12,14 +12,14 @@ interface ThreadTokenButtonProps {
   tokenCommunity?: any;
 }
 
-const ThreadTokenButton: React.FC<ThreadTokenButtonProps> = ({
+const ThreadTokenButton = ({
   threadId,
   threadTitle,
   communityId,
   addressType,
   chainNode,
   tokenCommunity,
-}) => {
+}: ThreadTokenButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: threadToken, isLoading } = useGetThreadToken({

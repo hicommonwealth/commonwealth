@@ -16,7 +16,6 @@ export type UseCommonTradeTokenFormProps = {
   };
   addressType?: ChainBase;
   onTradeComplete?: () => void;
-  isThreadToken?: boolean;
 };
 
 export type UseBuyTradeProps = UseCommonTradeTokenFormProps & {
