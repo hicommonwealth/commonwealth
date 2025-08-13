@@ -27,12 +27,14 @@ export function constructFindAddressBySsoQueryFilter(
       AND
   `;
 
-  if (['github', 'discord', 'twitter'].includes(ssoInfo.provider)) {
+  if (['github', 'discord'].includes(ssoInfo.provider)) {
     query += ` oauth_username = :oauthUsername`;
+  } else if (ssoInfo.provider === 'twitter') {
+    query += ` oauth_user_id = :oauthUserId`;
   } else if (['google', 'email', 'apple'].includes(ssoInfo.provider)) {
-    query += `oauth_email = :oauthEmail`;
+    query += ` oauth_email = :oauthEmail`;
   } else if (['SMS'].includes(ssoInfo.provider)) {
-    query += `oauth_phone_number = :oauthPhoneNumber`;
+    query += ` oauth_phone_number = :oauthPhoneNumber`;
   } else {
     throw new Error(`Unsupported OAuth provider: '${ssoInfo.provider}'`);
   }
@@ -90,6 +92,7 @@ export async function findUserBySso(
         oauthUsername: ssoInfo.username,
         oauthEmail: ssoInfo.email,
         oauthPhoneNumber: ssoInfo.phoneNumber,
+        oauthUserId: ssoInfo.userId,
       },
       transaction,
     },
@@ -269,6 +272,7 @@ async function transferAddressOwnership({
             oauthUsername: findByOpts.ssoInfo.username,
             oauthEmail: findByOpts.ssoInfo.email,
             oauthPhoneNumber: findByOpts.ssoInfo.phoneNumber,
+            oauthUserId: findByOpts.ssoInfo.userId,
           },
         },
       );

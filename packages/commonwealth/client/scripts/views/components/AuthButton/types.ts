@@ -24,6 +24,7 @@ export type SuiWallets = 'sui-wallet' | 'suiet' | 'okx-wallet' | 'bitget';
 export type EVMWallets =
   | 'walletconnect'
   | 'metamask'
+  | 'gate'
   | 'coinbase'
   | 'okx'
   | 'binance';

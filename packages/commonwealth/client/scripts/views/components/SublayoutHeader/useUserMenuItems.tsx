@@ -124,7 +124,7 @@ const useUserMenuItems = ({
       privyMobileLogout({}).catch(console.error);
 
       notifySuccess('Signed out');
-      darkModeStore.getState().setDarkMode(false);
+      darkModeStore.getState().reCalculateDarkMode();
       setLocalStorageItem(LocalStorageKeys.HasSeenNotifications, 'true');
       setLocalStorageItem(LocalStorageKeys.HasSeenOnboarding, 'true');
     } catch (err) {
