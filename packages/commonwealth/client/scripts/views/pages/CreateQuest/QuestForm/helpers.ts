@@ -170,6 +170,9 @@ export const buildRedirectURLFromContentId = (
   if (idType === 'sso') {
     return `${idOrURL}`;
   }
+  if (idType === 'wallet') {
+    return `${idOrURL}`;
+  }
 
   return '';
 };
