@@ -41,6 +41,7 @@ const {
   EVM_CE_ETH_CHAIN_ID_OVERRIDE,
   RELEASER_URL,
   RELEASER_API_KEY,
+  RELEASER_WAIT_ONLY,
   MAGNA_API_KEY,
   MAGNA_API_URL,
   MAGNA_CONTRACT_ID,
@@ -172,6 +173,7 @@ export const config = configure(
     RAILWAY: {
       RELEASER_URL,
       RELEASER_API_KEY,
+      RELEASER_WAIT_ONLY: RELEASER_WAIT_ONLY === 'false',
     },
     MAGNA: {
       API_KEY: MAGNA_API_KEY,
@@ -321,6 +323,11 @@ export const config = configure(
       //     requiredAppEnvs: ['production', 'frick', 'frack', 'beta', 'demo'],
       //     requiredServices: 'all',
       //   }),)
+      RELEASER_WAIT_ONLY: z
+        .boolean()
+        .describe(
+          `When true, will not trigger a release but will await the result.`,
+        ),
     }),
     MAGNA: z.object({
       API_KEY: z.string().optional(),

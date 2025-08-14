@@ -1,5 +1,3 @@
 FROM commonwealth
 RUN apt-get update && apt-get install -y curl # Needed for heroku
-CMD SERVICE=web node --import=extensionless/register --enable-source-maps build/server/scripts/releasePhaseEnvCheck.js && \
-  npx sequelize-cli db:migrate --config sequelize.js && \
-  SERVICE=web node --import=extensionless/register --enable-source-maps build/server/scripts/purgeCloudflareCache.js
+CMD SERVICE=web RAILWAY_GIT_COMMIT_SHA="$HEROKU_RELEASE_COMMIT" node --import=extensionless/register --enable-source-maps build/server/scripts/pre-deploy.js
