@@ -161,6 +161,11 @@ const useBuyThreadToken = ({
         return;
       }
 
+      if (!tokenCommunity.thread_purchase_token) {
+        notifyError('Thread purchase token not found');
+        return;
+      }
+
       const amountInWei = baseCurrencyBuyAmountDecimals * 1e18;
       const minAmountOut = tokenGainAmount * 0.95 * 1e18;
 
@@ -171,7 +176,7 @@ const useBuyThreadToken = ({
         amountIn: amountInWei,
         walletAddress: selectedAddress,
         minAmountOut: minAmountOut,
-        paymentTokenAddress: tokenCommunity.thread_purchase_token || '',
+        paymentTokenAddress: tokenCommunity.thread_purchase_token,
       };
 
       const txReceipt = await buyThreadToken(payload);

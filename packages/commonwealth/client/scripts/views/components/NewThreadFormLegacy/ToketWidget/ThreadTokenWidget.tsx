@@ -258,6 +258,8 @@ const ThreadTokenWidget = ({
 
       const txReceipt = await buyThreadToken(payload);
 
+      console.log('txReceipt buyToken', txReceipt);
+
       await createTokenTrade({
         eth_chain_id: ethChainId,
         transaction_hash: txReceipt.transactionHash,
