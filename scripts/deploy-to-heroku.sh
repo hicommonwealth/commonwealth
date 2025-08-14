@@ -43,7 +43,6 @@ deploy_heroku_app() {
 
      heroku_tag=registry.heroku.com/${app_name}/${base_name}
 
-     # Pass the commit SHA as a build argument
      docker build -f ${dockerfile} -t ${heroku_tag}:latest --build-arg RAILWAY_GIT_COMMIT_SHA=${git_commit_sha} .
 
      echo docker image ls
