@@ -173,7 +173,7 @@ export const config = configure(
     RAILWAY: {
       RELEASER_URL,
       RELEASER_API_KEY,
-      RELEASER_WAIT_ONLY: RELEASER_WAIT_ONLY === 'false',
+      RELEASER_WAIT_ONLY: RELEASER_WAIT_ONLY === 'true',
     },
     MAGNA: {
       API_KEY: MAGNA_API_KEY,
