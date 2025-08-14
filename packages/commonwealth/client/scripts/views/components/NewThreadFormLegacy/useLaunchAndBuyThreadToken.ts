@@ -92,7 +92,7 @@ export const launchAndBuyThreadTokenUtility = async ({
       symbol: tokenSymbol,
       threadId,
       initPurchaseAmount,
-      chainId: parseInt(communityId || '0'),
+      chainId: ethChainId,
       walletAddress: selectedAddress,
       authorAddress: selectedAddress,
       communityTreasuryAddress: selectedAddress,
