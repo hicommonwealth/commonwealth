@@ -16,6 +16,7 @@ export enum MentionEntityType {
   THREAD = 'thread',
   COMMUNITY = 'community',
   PROPOSAL = 'proposal',
+  MCP_SERVER = 'mcp_server',
 }
 
 export const MENTION_DENOTATION_CHARS = {
@@ -23,6 +24,7 @@ export const MENTION_DENOTATION_CHARS = {
   '#': MentionEntityType.TOPIC,
   '!': MentionEntityType.THREAD,
   '~': MentionEntityType.COMMUNITY,
+  '%': MentionEntityType.MCP_SERVER,
 } as const;
 
 export const ENTITY_TYPE_INDICATORS = {
@@ -31,6 +33,7 @@ export const ENTITY_TYPE_INDICATORS = {
   [MentionEntityType.TOPIC]: '🏷️',
   [MentionEntityType.THREAD]: '💬',
   [MentionEntityType.PROPOSAL]: '📋',
+  [MentionEntityType.MCP_SERVER]: '🔧',
   deleted: '❌',
 } as const;
 
@@ -40,6 +43,7 @@ export const GLOBAL_SEARCH_PRIORITY = [
   MentionEntityType.TOPIC,
   MentionEntityType.THREAD,
   MentionEntityType.PROPOSAL,
+  MentionEntityType.MCP_SERVER,
 ] as const;
 
 export const ENTITY_TO_SEARCH_SCOPE = {
@@ -61,6 +65,8 @@ export const MENTION_LINK_FORMATS = {
     `[~${name}](/${id})`,
   [MentionEntityType.PROPOSAL]: (name: string, id: string) =>
     `[${name}](/proposal/${id})`,
+  [MentionEntityType.MCP_SERVER]: (name: string, handleAndId: string) =>
+    `[%${name}](/mcp-server/${handleAndId})`,
 } as const;
 
 export const DENOTATION_SEARCH_CONFIG = {
@@ -83,6 +89,11 @@ export const DENOTATION_SEARCH_CONFIG = {
     scopes: [SearchScope.Communities],
     communityScoped: false,
     description: 'Search all communities',
+  },
+  '%': {
+    scopes: ['MCPServers'],
+    communityScoped: true,
+    description: 'Search MCP servers in current community',
   },
 } as const;
 
@@ -110,6 +121,8 @@ export const formatEntityDisplayName = (
       return result.name || 'Unknown Community';
     case MentionEntityType.PROPOSAL:
       return result.name || 'Unknown Proposal';
+    case MentionEntityType.MCP_SERVER:
+      return result.name || 'Unknown MCP Server';
     default:
       return 'Unknown Entity';
   }

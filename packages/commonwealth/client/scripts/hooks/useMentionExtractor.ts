@@ -23,6 +23,8 @@ const MENTION_PATTERNS = {
   community: /\[~([^\]]+)\]\(\/([^)]+)\)/g,
   // [ProposalTitle](/proposal/proposalId)
   proposal: /\[([^\]]+)\]\(\/proposal\/([^)]+)\)/g,
+  // [%MCPServerName](/mcp-server/serverHandle/id)
+  mcp_server: /\[%([^\]]+)\]\(\/mcp-server\/([^\/]+)\/([^)]+)\)/g,
 };
 
 const mentionConfigs = [
@@ -51,6 +53,11 @@ const mentionConfigs = [
     type: MentionEntityType.PROPOSAL,
     getLinkPath: (id: string) => `/proposal/${id}`,
   },
+  {
+    pattern: MENTION_PATTERNS.mcp_server,
+    type: MentionEntityType.MCP_SERVER,
+    getLinkPath: (handle: string, id: string) => `/mcp-server/${handle}/${id}`,
+  },
 ];
 
 export const useMentionExtractor = () => {
@@ -63,12 +70,23 @@ export const useMentionExtractor = () => {
         let match;
 
         while ((match = regex.exec(text)) !== null) {
-          mentions.push({
-            id: match[2],
-            type,
-            name: match[1],
-            link: getLinkPath(match[2]),
-          });
+          // Handle MCP server pattern which has 3 capture groups: name, handle, id
+          if (type === MentionEntityType.MCP_SERVER && match[3]) {
+            mentions.push({
+              id: match[3], // ID is the third capture group
+              type,
+              name: match[1], // Name is the first capture group
+              link: getLinkPath(match[2], match[3]), // Pass handle and id
+            });
+          } else {
+            // Handle other patterns with 2 capture groups: name, id
+            mentions.push({
+              id: match[2],
+              type,
+              name: match[1],
+              link: getLinkPath(match[2]),
+            });
+          }
         }
       });
 
@@ -152,6 +170,7 @@ export const useMentionExtractor = () => {
         [MentionEntityType.THREAD]: [],
         [MentionEntityType.COMMUNITY]: [],
         [MentionEntityType.PROPOSAL]: [],
+        [MentionEntityType.MCP_SERVER]: [],
       };
 
       mentions.forEach((mention) => {
