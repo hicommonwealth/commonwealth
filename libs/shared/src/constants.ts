@@ -20,7 +20,6 @@ export const DISCORD_BOT_ADDRESS = '0xdiscordbot';
 
 export const MCP_BOT_NAME = 'MCP Bot';
 export const MCP_BOT_EMAIL = 'mcp@common.xyz';
-export const MCP_BOT_ADDRESS = '0xmcpbot';
 
 export const DEFAULT_NAME = 'Anonymous';
 

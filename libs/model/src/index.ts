@@ -48,10 +48,12 @@ export {
 export { generateImage } from './utils/generateImage';
 export { magicLogin } from './utils/magic';
 export {
+  extractMCPMentions,
   findMentionDiff,
   parseUserMentions,
   uniqueMentions,
 } from './utils/parseUserMentions';
+export type { MCPMention } from './utils/parseUserMentions';
 export { pgMultiRowUpdate } from './utils/pgMultiRowUpdate';
 export {
   createEventRegistryChainNodes,

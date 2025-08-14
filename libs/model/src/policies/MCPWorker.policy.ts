@@ -1,15 +1,16 @@
 import { Actor, command, logger, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import { MCP_BOT_ADDRESS } from '@hicommonwealth/shared';
 import { OpenAI } from 'openai';
 import { Op } from 'sequelize';
 import { CreateComment } from '../aggregates/comment';
+import { JoinCommunity } from '../aggregates/community';
 import { config } from '../config';
 import { models } from '../database';
 import {
   buildMCPClientOptions,
   CommonMCPServerWithHeaders,
 } from '../services/mcpClient';
+import { extractMCPMentions } from '../utils/parseUserMentions';
 
 const log = logger(import.meta);
 
@@ -27,44 +28,23 @@ async function getActor() {
   });
   if (!userInstance) throw new Error('MCPBot user not found!');
 
+  const address = await models.Address.findOne({
+    where: {
+      user_id: userInstance.id!,
+    },
+    order: [['last_active', 'DESC']],
+  });
+  if (!address) throw new Error('MCPBot address not found!');
+
   actor = {
     user: {
       id: userInstance.id!,
       email: userInstance.email!,
       isAdmin: userInstance.isAdmin!,
     },
-    address: MCP_BOT_ADDRESS,
+    address: address.address!,
   };
   return actor;
-}
-
-/**
- * Extracts MCP server mentions from comment text using regex
- * @param commentBody The comment text to parse
- * @returns Array of objects containing handle and id for each mentioned MCP server
- */
-function extractMCPMentions(
-  commentBody: string,
-): Array<{ handle: string; id: string; name: string }> {
-  // Regex pattern matches: [@MCPServerName](/mcp-server/handle/id)
-  const mcpMentionPattern = /\[%([^\]]+)\]\(\/mcp-server\/([^/]+\/[^)]+)\)/g;
-  const mentions: Array<{ handle: string; id: string; name: string }> = [];
-  let match;
-
-  while ((match = mcpMentionPattern.exec(commentBody)) !== null) {
-    const handleAndId = match[2]; // This will be "handle/id"
-    const [handle, id] = handleAndId.split('/');
-
-    if (handle && id) {
-      mentions.push({
-        name: match[1], // Display name
-        handle: handle, // Server handle
-        id: id, // Server ID
-      });
-    }
-  }
-
-  return mentions;
 }
 
 /**
@@ -207,9 +187,19 @@ export function MCPWorker(): Policy<typeof inputs> {
             return;
           }
 
+          const actor = await getActor();
+
+          // if actor is not a member of the community, join the community
+          if (!actor.user.isAdmin) {
+            await command(JoinCommunity(), {
+              actor,
+              payload: { community_id: thread.community_id! },
+            });
+          }
+
           // Create a reply comment with the MCP response
           await command(CreateComment(), {
-            actor: await getActor(),
+            actor,
             payload: {
               thread_id: thread.id!,
               body: responseText,
