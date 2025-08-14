@@ -4,14 +4,15 @@
 
 set -e
 
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <email> <api_key> <app_name>"
+if [ "$#" -ne 4 ]; then
+    echo "Usage: $0 <email> <api_key> <app_name> <commit_sha>"
     exit 1
 fi
 
 email=$1
 api_key=$2
 app_name=$3
+commit_sha=$4
 
 cat >~/.netrc <<EOF
 machine api.heroku.com
@@ -32,6 +33,7 @@ docker build -f Dockerfile.datadog -t datadog-base .
 deploy_heroku_app() {
   local app_path=$1
   local app_name=$2
+  local git_commit_sha=$3
 
   process_types=""
   for dockerfile in ${app_path}/Dockerfile.*; do
@@ -39,7 +41,8 @@ deploy_heroku_app() {
 
      heroku_tag=registry.heroku.com/${app_name}/${base_name}
 
-     docker build -f ${dockerfile} -t ${heroku_tag}:latest .
+     # Pass the commit SHA as a build argument
+     docker build -f ${dockerfile} -t ${heroku_tag}:latest --build-arg RAILWAY_GIT_COMMIT_SHA=${git_commit_sha} .
 
      echo docker image ls
 
@@ -66,4 +69,4 @@ deploy_heroku_app() {
 }
 
 docker build . --target commonwealth -t commonwealth -f Dockerfile.commonwealth_base
-deploy_heroku_app "./packages/commonwealth/deploy/dockerfiles" ${app_name}
+deploy_heroku_app "./packages/commonwealth/deploy/dockerfiles" ${app_name} ${commit_sha}

@@ -1,3 +1,8 @@
 FROM commonwealth
 RUN apt-get update && apt-get install -y curl # Needed for heroku
-CMD SERVICE=web RAILWAY_GIT_COMMIT_SHA="$HEROKU_RELEASE_COMMIT" node --import=extensionless/register --enable-source-maps build/server/scripts/pre-deploy.js
+
+# Accept build argument for commit SHA
+ARG RAILWAY_GIT_COMMIT_SHA=""
+
+# Explicitly pass the environment variable to the node command
+CMD SERVICE=web RAILWAY_GIT_COMMIT_SHA="${RAILWAY_GIT_COMMIT_SHA}" node --import=extensionless/register --enable-source-maps build/server/scripts/pre-deploy.js
