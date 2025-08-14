@@ -8,12 +8,12 @@ import { withRetries } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { createPublicClient, Hash, http, parseEventLogs } from 'viem';
 import { models } from '../../database';
-import { authRoles, mustExist } from '../../middleware';
+import { mustExist } from '../../middleware';
 
 export function CreateThreadToken(): Command<typeof schemas.CreateThreadToken> {
   return {
     ...schemas.CreateThreadToken,
-    auth: [authRoles('admin')],
+    auth: [],
     body: async ({ payload }) => {
       const { eth_chain_id, transaction_hash } = payload;
 
