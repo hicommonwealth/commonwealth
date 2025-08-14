@@ -20,9 +20,9 @@ import {
   CustomAddressOptionElement,
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import RewardsCard from '../../RewardsCard';
+import MagicWalletButton from './MagicWalletButton/MagicWalletButton';
 import './WalletCard.scss';
 import useUserWalletHoldings from './useUserWalletHoldings';
 
@@ -115,22 +115,7 @@ const WalletCard = () => {
           <FractionalValue type="h4" value={userCombinedUSDBalance} />
         </CWText>
         <CWDivider />
-        {!isSelectedAddressMagic && (
-          <div className="add-funds-container">
-            <CWButton
-              buttonType="secondary"
-              buttonHeight="sm"
-              buttonWidth="narrow"
-              label="Manage Funds"
-              onClick={() => {
-                openMagicWallet().catch(console.error);
-              }}
-            />
-            <CWText type="caption">
-              Buy, Send, and Receive funds for your magic wallet.
-            </CWText>
-          </div>
-        )}
+        <MagicWalletButton userSelectedAddress={userSelectedAddress} />
         <CWTabsRow>
           {Object.values(WalletBalanceTabs).map((tab) => (
             <CWTab
