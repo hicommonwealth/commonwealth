@@ -49,6 +49,7 @@ import {
   useBuyThreadTokenMutation,
   useCreateThreadMutation,
   useCreateThreadPollMutation,
+  useStoreThreadTokenMutation,
 } from 'state/api/threads';
 import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -175,6 +176,7 @@ export const NewThreadForm = forwardRef<
     const { mutateAsync: createThreadToken } = useCreateThreadTokenMutation();
     const { mutateAsync: buyThreadToken } = useBuyThreadTokenMutation();
     const { mutateAsync: createTokenTrade } = useCreateTokenTradeMutation();
+    const { mutateAsync: storeThreadToken } = useStoreThreadTokenMutation();
 
     const user = useUserStore();
     const { data: userProfile } = useFetchProfileByIdQuery({
@@ -902,6 +904,7 @@ export const NewThreadForm = forwardRef<
               createThreadToken,
               buyThreadToken,
               createTokenTrade,
+              storeThreadToken,
               user,
               linkSpecificAddressToSpecificCommunity,
               tokenGainAmount: tokenGainAmount,

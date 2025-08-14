@@ -1,6 +1,9 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useState } from 'react';
-import { useBuyThreadTokenMutation } from 'state/api/threads';
+import {
+  useBuyThreadTokenMutation,
+  useStoreThreadTokenMutation,
+} from 'state/api/threads';
 import useCreateThreadTokenMutation from 'state/api/threads/createThreadToken';
 import { useCreateTokenTradeMutation } from 'state/api/tokens';
 import { useThreadTokenWidget } from './ToketWidget/useThreadTokenWidget';
@@ -30,6 +33,7 @@ export const launchAndBuyThreadTokenUtility = async ({
   createThreadToken,
   buyThreadToken,
   createTokenTrade,
+  storeThreadToken,
   user,
   linkSpecificAddressToSpecificCommunity,
   tokenGainAmount = 0,
@@ -47,6 +51,7 @@ export const launchAndBuyThreadTokenUtility = async ({
   createThreadToken: any;
   buyThreadToken: any;
   createTokenTrade: any;
+  storeThreadToken: any;
   user: any;
   linkSpecificAddressToSpecificCommunity: any;
   tokenGainAmount?: number;
@@ -80,7 +85,7 @@ export const launchAndBuyThreadTokenUtility = async ({
 
   try {
     const tokenSymbol = threadTitle.substring(0, 5).toUpperCase();
-    const initPurchaseAmount = parseFloat(amount) * 1e18;
+    const initPurchaseAmount = Math.floor(parseFloat(amount) * 1e18);
 
     const createTokenPayload = {
       name: threadTitle,
@@ -98,7 +103,18 @@ export const launchAndBuyThreadTokenUtility = async ({
 
     const createTokenReceipt = await createThreadToken(createTokenPayload);
 
-    console.log('createTokenReceipt', createTokenReceipt);
+    try {
+      await storeThreadToken({
+        community_id: communityId,
+        eth_chain_id: ethChainId,
+        transaction_hash: createTokenReceipt.transactionHash,
+      });
+    } catch (error) {
+      console.warn(
+        'Failed to store thread token in database (block may not be indexed yet):',
+        error,
+      );
+    }
 
     const isMemberOfCommunity = user.addresses.find(
       (x) => x.community.id === tokenCommunity.id,
@@ -168,6 +184,8 @@ export const useLaunchAndBuyThreadToken = ({
     useBuyThreadTokenMutation();
   const { mutateAsync: createTokenTrade, isPending: isCreatingTokenTrade } =
     useCreateTokenTradeMutation();
+  const { mutateAsync: storeThreadToken, isPending: isStoringThreadToken } =
+    useStoreThreadTokenMutation();
 
   const calculateTokenGain = async (amount: string) => {
     if (!amount || parseFloat(amount) <= 0) {
@@ -184,8 +202,8 @@ export const useLaunchAndBuyThreadToken = ({
         try {
           const amountOut = await tokenLaunchpad.getAmountOut(
             '', // token address will be empty for launch
-            amountInWei,
-            true, // true for buy
+            Math.floor(amountInWei),
+            true,
             `${ethChainId}`,
           );
           setThreadFormTokenGainAmount(amountOut);
@@ -220,6 +238,7 @@ export const useLaunchAndBuyThreadToken = ({
         createThreadToken,
         buyThreadToken,
         createTokenTrade,
+        storeThreadToken,
         user,
         linkSpecificAddressToSpecificCommunity,
         tokenGainAmount: threadFormTokenGainAmount,
@@ -255,9 +274,11 @@ export const useLaunchAndBuyThreadToken = ({
     createThreadToken,
     buyThreadToken,
     createTokenTrade,
+    storeThreadToken,
     isCreatingThreadToken,
     isBuying,
     isCreatingTokenTrade,
+    isStoringThreadToken,
 
     // Network
     isWrongNetwork,

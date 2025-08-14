@@ -12,6 +12,7 @@ import useGetThreadsByIdQuery from './getThreadsById';
 import useGetThreadsByLinkQuery from './getThreadsByLink';
 import useSearchThreadsQuery from './searchThreads';
 import useSellThreadTokenMutation from './sellThreadToken';
+import useStoreThreadTokenMutation from './storeThreadToken';
 
 export {
   useAddThreadLinksMutation,
@@ -28,4 +29,5 @@ export {
   useGetThreadsByLinkQuery,
   useSearchThreadsQuery,
   useSellThreadTokenMutation,
+  useStoreThreadTokenMutation,
 };
