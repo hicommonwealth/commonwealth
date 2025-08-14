@@ -6,6 +6,7 @@ import { QueryTypes } from 'sequelize';
 const log = logger(import.meta);
 
 export type TokenAllocationSyncArgs = {
+  key: string;
   category: string;
   description: string;
   user_id: number;
@@ -15,20 +16,8 @@ export type TokenAllocationSyncArgs = {
   token_allocation: number;
 };
 
-/**
- * Callback Response.
- *
- * Should return id if allocation was created or already exists.
- *
- * - id: Allocation ID
- * - error: Error message if failed to create allocation
- */
-export type TokenAllocationSyncResponse = { id?: string; error?: string };
-
 export async function magnaSync(
-  apiCallback: (
-    args: TokenAllocationSyncArgs,
-  ) => Promise<TokenAllocationSyncResponse>,
+  apiCallback: (args: TokenAllocationSyncArgs) => Promise<boolean>,
   batchSize = 10,
   breatherMs = 1000,
 ) {
@@ -39,8 +28,9 @@ export async function magnaSync(
       const batch = await models.sequelize.query<TokenAllocationSyncArgs>(
         `
           SELECT
-            'Initial Airdrop' as category,
-            'Allocation for inital Common token airdrop for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
+            'initial-airdrop-' || A.address as key,
+            'initial-airdrop' as category,
+            'Inital Common Token Airdrop for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
             A.user_id,
             A.address as wallet_address,
             U.profile->>'name' as user_name,
@@ -73,23 +63,15 @@ export async function magnaSync(
 
       const promises = batch.map(async (args) => {
         try {
-          const response = await apiCallback(args);
-          if (response.id) {
-            // set sync watermark
-            await models.ClaimAddresses.update(
-              {
-                magna_allocation_id: response.id,
-                magna_synced_at: new Date(),
-              },
-              { where: { user_id: args.user_id } },
-            );
-            log.info(`Synced allocation for user ${args.user_id}`);
-          } else {
-            const error = JSON.stringify(response);
-            log.error(
-              `Failed to sync allocation for user ${args.user_id}: ${error}`,
-            );
-          }
+          await apiCallback(args);
+          await models.ClaimAddresses.update(
+            {
+              magna_allocation_id: args.key,
+              magna_synced_at: new Date(),
+            },
+            { where: { user_id: args.user_id } },
+          );
+          log.info(`Synced allocation for user ${args.user_id}`);
         } catch (err) {
           log.error(
             `Failed to sync allocation for user ${args.user_id}:`,
