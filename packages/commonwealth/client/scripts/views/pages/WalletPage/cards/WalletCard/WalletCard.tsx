@@ -1,8 +1,7 @@
-import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { getUniqueUserAddresses } from 'helpers/user';
 import React, { useState } from 'react';
-import useUserStore from 'state/ui/user';
 import FractionalValue from 'views/components/FractionalValue';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -14,7 +13,6 @@ import {
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import useAuthentication from 'views/modals/AuthModal/useAuthentication';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -36,10 +34,6 @@ const WalletCard = () => {
     WalletBalanceTabs.Tokens,
   );
 
-  const user = useUserStore();
-
-  const { openMagicWallet } = useAuthentication({});
-
   const uniqueAddresses = getUniqueUserAddresses({
     forChain: ChainBase.Ethereum,
   });
@@ -47,10 +41,6 @@ const WalletCard = () => {
   const [userSelectedAddress, setUserSelectedAddress] = useState<string>(
     uniqueAddresses[0],
   );
-
-  const isSelectedAddressMagic =
-    user.addresses.find((a) => a.address === userSelectedAddress)?.walletId ===
-    WalletId.Magic;
 
   const { isLoadingTokensInfo, userCombinedUSDBalance, userTokens, refetch } =
     useUserWalletHoldings({

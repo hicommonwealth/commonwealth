@@ -1,5 +1,6 @@
 import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { WalletId } from '@hicommonwealth/shared';
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 import React, { useState } from 'react';
 import { components } from 'react-select';
 import useUserStore from 'state/ui/user';
@@ -37,12 +38,13 @@ const MagicWalletButton = ({ userSelectedAddress }: MagicWalletButtonProps) => {
     value: ValidChains;
     icon: IconName;
   }>(chainOptions[0]);
+  const [open, setIsOpen] = useState(false);
 
   const isSelectedAddressMagic =
     user.addresses.find((a) => a.address === userSelectedAddress)?.walletId ===
     WalletId.Magic;
 
-  if (!isSelectedAddressMagic) return <></>;
+  if (isSelectedAddressMagic) return <></>;
 
   return (
     <div className="MagicWalletButton">
@@ -76,15 +78,21 @@ const MagicWalletButton = ({ userSelectedAddress }: MagicWalletButtonProps) => {
           value={selectedNetwork}
           defaultValue={selectedNetwork}
           formatOptionLabel={(option) => (
-            <div>
-              <CWIcon iconName={option.icon as any} iconSize="small" />
-              <CWText type="caption">{option.label.split(' ').at(-1)}</CWText>
-            </div>
+            <ClickAwayListener onClickAway={() => setIsOpen(false)}>
+              <div onClick={() => setIsOpen(!open)}>
+                <CWIcon iconName={option.icon as any} iconSize="small" />
+                <CWText type="caption">{option.label.split(' ').at(-1)}</CWText>
+              </div>
+            </ClickAwayListener>
           )}
+          menuIsOpen={open}
           isClearable={false}
           isSearchable={false}
           options={chainOptions}
-          onChange={(option) => option && setSelectedNetwork(option)}
+          onChange={(option) => {
+            option && setSelectedNetwork(option);
+            setIsOpen(false);
+          }}
         />
       </div>
       <CWText type="caption">

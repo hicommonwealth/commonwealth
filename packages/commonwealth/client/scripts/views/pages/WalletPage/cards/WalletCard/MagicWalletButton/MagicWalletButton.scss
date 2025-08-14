@@ -54,24 +54,26 @@
         border-top-right-radius: 6px !important;
         border-bottom-right-radius: 6px !important;
         width: 90px !important;
+        padding: 6px 8px !important;
 
         .cwsl__control {
           cursor: pointer !important;
         }
 
         .cwsl__value-container {
-          .cwsl__single-value {
+          .cwsl__single-value,
+          .cwsl__single-value>div {
             width: 100% !important;
             display: flex !important;
             flex-direction: row !important;
             align-items: center !important;
-            gap: 4px !important;
+            gap: 6px !important;
             margin: 0 !important;
             padding: 0 !important;
           }
 
-          .cwsl__single-value {
-            margin-top: 12px !important;
+          input {
+            display: none !important;
           }
 
           .Icon {
