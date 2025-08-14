@@ -53,6 +53,9 @@ const {
   deleteThread,
   addLinks,
   deleteLinks,
+  createThreadToken,
+  createThreadTokenTrade,
+  getThreadTokenHolders,
 } = thread.trpcRouter;
 const {
   createComment,
@@ -129,6 +132,9 @@ const api = {
   deleteThread,
   addLinks,
   deleteLinks,
+  createThreadToken,
+  createThreadTokenTrade,
+  getThreadTokenHolders,
   createComment,
   updateComment,
   deleteComment,
