@@ -23,6 +23,8 @@ let actor: Actor;
 async function getActor() {
   if (actor) return actor;
 
+  if (!config.MCP.BOT_EMAIL) throw new Error('MCPBot email not configured!');
+
   const userInstance = await models.User.findOne({
     where: { email: config.MCP.BOT_EMAIL },
   });
