@@ -148,8 +148,17 @@ const ThreadTokenWidget = ({
         if (isThreadCreationMode) {
           await calculateTokenGain?.(safeCurrentAmount);
         } else {
+          const tokenAddress = threadToken?.token_address;
+          if (!tokenAddress) {
+            console.warn(
+              'No valid token address found for token gain calculation',
+            );
+            setCurrentTokenGainAmount(0);
+            return;
+          }
+
           const amountOut = await tokenLaunchpad.getAmountOut(
-            String(threadToken?.token_address || ''),
+            String(tokenAddress),
             amountInWei,
             !isSellMode,
             `${ethChainId}`,
