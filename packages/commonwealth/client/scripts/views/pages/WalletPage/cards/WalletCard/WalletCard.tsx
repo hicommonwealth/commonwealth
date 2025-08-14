@@ -5,7 +5,6 @@ import React, { useState } from 'react';
 import useUserStore from 'state/ui/user';
 import FractionalValue from 'views/components/FractionalValue';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWIconButton } from 'views/components/component_kit/new_designs/CWIconButton/CWIconButton';
@@ -21,6 +20,7 @@ import {
   CustomAddressOptionElement,
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
+import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import RewardsCard from '../../RewardsCard';
 import './WalletCard.scss';
@@ -115,17 +115,21 @@ const WalletCard = () => {
           <FractionalValue type="h4" value={userCombinedUSDBalance} />
         </CWText>
         <CWDivider />
-        {isSelectedAddressMagic && (
-          <button
-            type="button"
-            className="add-funds-btn"
-            onClick={() => {
-              openMagicWallet().catch(console.error);
-            }}
-          >
-            <CWIcon iconName="plus" iconSize="small" />
-            <CWText type="caption">Add Funds</CWText>
-          </button>
+        {!isSelectedAddressMagic && (
+          <div className="add-funds-container">
+            <CWButton
+              buttonType="secondary"
+              buttonHeight="sm"
+              buttonWidth="narrow"
+              label="Manage Funds"
+              onClick={() => {
+                openMagicWallet().catch(console.error);
+              }}
+            />
+            <CWText type="caption">
+              Buy, Send, and Receive funds for your magic wallet.
+            </CWText>
+          </div>
         )}
         <CWTabsRow>
           {Object.values(WalletBalanceTabs).map((tab) => (

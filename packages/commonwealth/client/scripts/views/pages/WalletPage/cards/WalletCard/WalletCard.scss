@@ -15,18 +15,16 @@
     width: 100%;
   }
 
-  .add-funds-btn {
-    all: unset;
+  .add-funds-container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 4px;
-    align-items: center;
-    cursor: pointer;
-    color: colors.$green-600;
-
-    .Text {
-      color: colors.$green-600;
-    }
+    align-items: flex-start;
+    justify-content: space-between;
+    border: 1px solid colors.$neutral-50;
+    background-color: colors.$neutral-50;
+    padding: 8px;
+    border-radius: 8px;
   }
 
   .list {
