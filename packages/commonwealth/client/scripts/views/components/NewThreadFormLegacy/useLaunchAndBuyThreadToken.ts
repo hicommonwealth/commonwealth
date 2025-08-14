@@ -2,10 +2,10 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useState } from 'react';
 import {
   useBuyThreadTokenMutation,
+  useCreateThreadTokenTradeMutation,
   useStoreThreadTokenMutation,
 } from 'state/api/threads';
 import useCreateThreadTokenMutation from 'state/api/threads/createThreadToken';
-import { useCreateTokenTradeMutation } from 'state/api/tokens';
 import { useThreadTokenWidget } from './ToketWidget/useThreadTokenWidget';
 
 interface UseLaunchAndBuyThreadTokenProps {
@@ -183,7 +183,7 @@ export const useLaunchAndBuyThreadToken = ({
   const { mutateAsync: buyThreadToken, isPending: isBuying } =
     useBuyThreadTokenMutation();
   const { mutateAsync: createTokenTrade, isPending: isCreatingTokenTrade } =
-    useCreateTokenTradeMutation();
+    useCreateThreadTokenTradeMutation();
   const { mutateAsync: storeThreadToken, isPending: isStoringThreadToken } =
     useStoreThreadTokenMutation();
 

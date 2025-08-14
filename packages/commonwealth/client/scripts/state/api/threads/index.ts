@@ -3,6 +3,7 @@ import useBuyThreadTokenMutation from './buyThreadToken';
 import useCreateThreadReactionMutation from './createReaction';
 import useCreateThreadMutation from './createThread';
 import useCreateThreadPollMutation from './createThreadPoll';
+import useCreateThreadTokenTradeMutation from './createThreadTokenTrade';
 import useDeleteThreadReactionMutation from './deleteReaction';
 import useDeleteThreadMutation from './deleteThread';
 import useDeleteThreadLinksMutation from './deleteThreadLinks';
@@ -20,6 +21,7 @@ export {
   useCreateThreadMutation,
   useCreateThreadPollMutation,
   useCreateThreadReactionMutation,
+  useCreateThreadTokenTradeMutation,
   useDeleteThreadLinksMutation,
   useDeleteThreadMutation,
   useDeleteThreadReactionMutation,

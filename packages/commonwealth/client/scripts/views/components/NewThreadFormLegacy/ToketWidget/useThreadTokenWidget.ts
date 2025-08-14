@@ -8,10 +8,10 @@ import {
 } from 'state/api/communityStake';
 import {
   useBuyThreadTokenMutation,
+  useCreateThreadTokenTradeMutation,
   useSellThreadTokenMutation,
 } from 'state/api/threads';
 import {
-  useCreateTokenTradeMutation,
   useGetERC20BalanceQuery,
   useGetThreadToken,
   useTokenMetadataQuery,
@@ -127,7 +127,7 @@ export const useThreadTokenWidget = ({
   const { mutateAsync: sellThreadToken, isPending: isSelling } =
     useSellThreadTokenMutation();
   const { mutateAsync: createTokenTrade, isPending: isCreatingTokenTrade } =
-    useCreateTokenTradeMutation();
+    useCreateThreadTokenTradeMutation();
 
   const { isWrongNetwork, promptNetworkSwitch } = useNetworkSwitching({
     ethChainId,

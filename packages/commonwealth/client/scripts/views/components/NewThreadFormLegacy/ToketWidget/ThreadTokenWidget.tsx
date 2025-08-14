@@ -1,5 +1,6 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useEffect } from 'react';
+import { useCreateThreadTokenTradeMutation } from 'state/api/threads';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
@@ -106,6 +107,9 @@ const ThreadTokenWidget = ({
     launchAndBuyThreadToken,
     isCreatingThreadToken,
   } = isThreadCreationMode ? launchAndBuyHook : {};
+
+  const { mutateAsync: createThreadTokenTrade } =
+    useCreateThreadTokenTradeMutation();
 
   const currentAmount = isThreadCreationMode ? threadFormAmount : amount;
   const setCurrentAmount = isThreadCreationMode
@@ -258,9 +262,7 @@ const ThreadTokenWidget = ({
 
       const txReceipt = await buyThreadToken(payload);
 
-      console.log('txReceipt buyToken', txReceipt);
-
-      await createTokenTrade({
+      await createThreadTokenTrade({
         eth_chain_id: ethChainId,
         transaction_hash: txReceipt.transactionHash,
       });
@@ -338,7 +340,7 @@ const ThreadTokenWidget = ({
 
       const txReceipt = await sellThreadToken(payload);
 
-      await createTokenTrade({
+      await createThreadTokenTrade({
         eth_chain_id: ethChainId,
         transaction_hash: txReceipt.transactionHash,
       });
