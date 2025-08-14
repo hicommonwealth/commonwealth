@@ -476,7 +476,7 @@ export const useMention = ({
                 return;
               }
 
-              const mcpData = await utils.mcpServers.getAllMcpServers.fetch({
+              const mcpData = await utils.mcp.getCommunityMcpServers.fetch({
                 community_id: communityId,
               });
 
