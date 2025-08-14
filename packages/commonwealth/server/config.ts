@@ -7,7 +7,6 @@ import {
   WebServices,
 } from '@hicommonwealth/core';
 import { config as model_config } from '@hicommonwealth/model';
-import { EVM_ADDRESS } from '@hicommonwealth/schemas';
 import { ChainBase, TwitterBotName } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
@@ -44,6 +43,9 @@ const {
   MAGNA_API_KEY,
   MAGNA_API_URL,
   MAGNA_CONTRACT_ID,
+  MAGNA_TOKEN_ID,
+  MAGNA_UNLOCK_SCHEDULE_ID,
+  MAGNA_UNLOCK_START_AT,
   MAGNA_BATCH_SIZE,
 } = process.env;
 
@@ -173,12 +175,20 @@ export const config = configure(
       RELEASER_URL,
       RELEASER_API_KEY,
     },
-    MAGNA: {
-      API_KEY: MAGNA_API_KEY,
-      API_URL: MAGNA_API_URL,
-      CONTRACT_ID: MAGNA_CONTRACT_ID,
-      BATCH_SIZE: parseInt(MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE, 10),
-    },
+    MAGNA: MAGNA_TOKEN_ID
+      ? {
+          API_URL: MAGNA_API_URL || '',
+          API_KEY: MAGNA_API_KEY || '',
+          CONTRACT_ID: MAGNA_CONTRACT_ID || '',
+          TOKEN_ID: MAGNA_TOKEN_ID || '',
+          UNLOCK_SCHEDULE_ID: MAGNA_UNLOCK_SCHEDULE_ID || '',
+          UNLOCK_START_AT: new Date(MAGNA_UNLOCK_START_AT || '9999-12-31'),
+          BATCH_SIZE: parseInt(
+            MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE,
+            10,
+          ),
+        }
+      : undefined,
   },
   z.object({
     DISABLE_SITEMAP: z.boolean(),
@@ -322,11 +332,16 @@ export const config = configure(
       //     requiredServices: 'all',
       //   }),)
     }),
-    MAGNA: z.object({
-      API_KEY: z.string().optional(),
-      API_URL: z.string().optional(),
-      CONTRACT_ID: EVM_ADDRESS.optional(),
-      BATCH_SIZE: z.number(),
-    }),
+    MAGNA: z
+      .object({
+        API_URL: z.string().url(),
+        API_KEY: z.string(),
+        CONTRACT_ID: z.string().uuid(),
+        TOKEN_ID: z.string().uuid(),
+        UNLOCK_SCHEDULE_ID: z.string().uuid(),
+        UNLOCK_START_AT: z.date(),
+        BATCH_SIZE: z.number(),
+      })
+      .optional(),
   }),
 );
