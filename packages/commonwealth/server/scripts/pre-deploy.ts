@@ -18,50 +18,52 @@ async function main() {
 
   if (!RAILWAY_GIT_COMMIT_SHA || !RELEASER_URL || !RELEASER_API_KEY) {
     console.warn(
-      `WARNING: RAILWAY_GIT_COMMIT_SHA, RELEASER_URL, RELEASER_API_KEY is not set. Release will not execute!`,
+      `Error: RAILWAY_GIT_COMMIT_SHA, RELEASER_URL, RELEASER_API_KEY is not set.`,
     );
-
-    // TODO: exit the process with an error once migration to Railway is complete.
-    //  This is temporarily disabled until release running in production is migrated
-    //  from Heroku to Railway.
-    process.exit(0);
-    // process.exit(1);
+    process.exit(1);
   }
 
-  const url = `${RELEASER_URL}/queue`;
-  console.log(
-    `Triggering release for commit: ${RAILWAY_GIT_COMMIT_SHA} at ${url}`,
-  );
-  try {
-    const response: Response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': RELEASER_API_KEY,
-      },
-      body: JSON.stringify({ commitSha: RAILWAY_GIT_COMMIT_SHA }),
-    });
-    const json = await response.json();
+  if (!config.RAILWAY.RELEASER_WAIT_ONLY) {
+    const url = `${RELEASER_URL}/queue`;
+    console.log(
+      `Triggering release for commit: ${RAILWAY_GIT_COMMIT_SHA} at ${url}`,
+    );
+    try {
+      const response: Response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': RELEASER_API_KEY,
+        },
+        body: JSON.stringify({ commitSha: RAILWAY_GIT_COMMIT_SHA }),
+      });
+      const json = await response.json();
 
-    if (response.status === 200) {
-      console.log(json);
-    } else if (response.status === 202) {
-      if (['failed', 'timeout'].includes(json.release.release_status)) {
-        console.error(`Release already failed. Exiting...`, json.release);
-        process.exit(1);
-      } else if (json.release.release_status === 'success') {
-        console.log('Release already executed successfully.', json.release);
-        process.exit(0);
-      } else {
+      if (response.status === 200) {
         console.log(json);
+      } else if (response.status === 202) {
+        if (['failed', 'timeout'].includes(json.release.release_status)) {
+          console.error(`Release already failed. Exiting...`, json.release);
+          process.exit(1);
+        } else if (json.release.release_status === 'success') {
+          console.log('Release already executed successfully.', json.release);
+          process.exit(0);
+        } else {
+          console.log(json);
+        }
+      } else {
+        console.error(`Failed to queue release. Status: ${response.status}`);
+        process.exit(1);
       }
-    } else {
-      console.error(`Failed to queue release. Status: ${response.status}`);
+    } catch (err) {
+      console.error('Failed to queue release:', err);
       process.exit(1);
     }
-  } catch (err) {
-    console.error('Failed to queue release:', err);
-    process.exit(1);
+  } else {
+    console.warn(
+      'RELEASER_WAIT_ONLY set to true.' +
+        ' Pre-deploy will not trigger a new release but will wait for the release status.',
+    );
   }
 
   // Wait for release to complete with a 30-minute timeout
@@ -88,7 +90,7 @@ async function main() {
         // eslint-disable-next-line n/no-process-exit
         process.exit(1);
       } else if (res.status === 200) {
-        const data: { release_status: string } = await res.json();
+        const data: { release_status?: string } = await res.json();
         if (!data.release_status) {
           console.warn('Release not found!');
         }

@@ -77,10 +77,11 @@ you must re-deploy a new commit to trigger a new release.
     RELEASER_API_KEY="${{Demo Releaser.API_KEY}}"
     RELEASER_URL="${{Demo Releaser.RELEASER_URL}}"
     ```
-5. Set a service name that is unique among all environments in the project (e.g. prefix with env name)
-6. In the service settings, specify the path to the railway config as code file, e.g.:
+5. Set the `RABBITMQ_FRAME_SIZE` env var to `131072` (if it is not included in the shared variables)
+6. Set a service name that is unique among all environments in the project (e.g. prefix with env name)
+7. In the service settings, specify the path to the railway config as code file, e.g.:
 `deploy/railway.web.json`
-7. In the service settings, link the commonwealth repo and select a branch to deploy from
+8. In the service settings, link the commonwealth repo and select a branch to deploy from
 
 ### Note
 
