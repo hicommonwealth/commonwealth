@@ -11,5 +11,6 @@ export * from './GetThreadById.query';
 export * from './GetThreadCount.query';
 export * from './GetThreads.query';
 export * from './GetThreadsByIds.query';
+export * from './GetThreadTokenHolders.query';
 export * from './SearchThreads.query';
 export * from './UpdateThread.command';

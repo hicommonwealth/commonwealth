@@ -5,7 +5,7 @@ import { Comment } from './comment.schemas';
 import { Community } from './community.schemas';
 import { Thread } from './thread.schemas';
 import { Topic } from './topic.schemas';
-import { Address } from './user.schemas';
+import { Address, User } from './user.schemas';
 
 export const NotificationCategory = z.object({
   name: z.string().max(255),
@@ -40,6 +40,8 @@ export const SubscriptionPreference = z.object({
   mobile_push_admin_alerts_enabled: z.boolean().default(false),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
+
+  User: User.optional(),
 });
 
 export const ThreadSubscription = z.object({

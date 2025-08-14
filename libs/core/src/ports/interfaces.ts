@@ -1,4 +1,8 @@
-import { Events, OutboxEvents } from '@hicommonwealth/schemas';
+import {
+  EmailNotificationInterval,
+  Events,
+  OutboxEvents,
+} from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
 import { z } from 'zod';
 import {
@@ -699,13 +703,6 @@ export type NotificationsProviderGetMessagesReturn = Array<{
   __cursor?: string;
 }>;
 
-export const RepeatFrequency = {
-  Monthly: 'monthly',
-  Weekly: 'weekly',
-  Daily: 'daily',
-  Hourly: 'hourly',
-} as const;
-
 const DaysOfWeek = {
   Mon: 'mon',
   Tue: 'tue',
@@ -717,7 +714,7 @@ const DaysOfWeek = {
 } as const;
 
 export type NotificationsProviderScheduleRepeats = Array<{
-  frequency: (typeof RepeatFrequency)[keyof typeof RepeatFrequency];
+  frequency: z.infer<typeof EmailNotificationInterval>;
   interval?: number;
   day_of_month?: number;
   days?:
@@ -776,6 +773,15 @@ export interface NotificationsProvider extends Disposable {
     user_ids: string[];
     workflow_id: WorkflowKeys;
     schedule: NotificationsProviderScheduleRepeats;
+  }): Promise<NotificationsProviderSchedulesReturn>;
+
+  updateSchedules(options: {
+    schedule_ids: string[];
+    schedule: Array<
+      Omit<NotificationsProviderScheduleRepeats[0], 'frequency'> & {
+        frequency: Exclude<z.infer<typeof EmailNotificationInterval>, 'never'>;
+      }
+    >;
   }): Promise<NotificationsProviderSchedulesReturn>;
 
   /**
