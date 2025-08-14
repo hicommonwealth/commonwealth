@@ -14,6 +14,8 @@ api_key=$2
 app_name=$3
 commit_sha=$4
 
+echo "Deploying Git commit sha: $commit_sha"
+
 cat >~/.netrc <<EOF
 machine api.heroku.com
     login ${email}
