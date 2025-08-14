@@ -44,7 +44,7 @@ const MagicWalletButton = ({ userSelectedAddress }: MagicWalletButtonProps) => {
     user.addresses.find((a) => a.address === userSelectedAddress)?.walletId ===
     WalletId.Magic;
 
-  if (isSelectedAddressMagic) return <></>;
+  if (!isSelectedAddressMagic) return <></>;
 
   return (
     <div className="MagicWalletButton">
