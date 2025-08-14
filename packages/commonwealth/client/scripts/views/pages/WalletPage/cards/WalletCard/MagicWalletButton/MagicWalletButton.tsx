@@ -80,7 +80,7 @@ const MagicWalletButton = ({ userSelectedAddress }: MagicWalletButtonProps) => {
           formatOptionLabel={(option) => (
             <ClickAwayListener onClickAway={() => setIsOpen(false)}>
               <div onClick={() => setIsOpen(!open)}>
-                <CWIcon iconName={option.icon as any} iconSize="small" />
+                <CWIcon iconName={option.icon} iconSize="small" />
                 <CWText type="caption">{option.label.split(' ').at(-1)}</CWText>
               </div>
             </ClickAwayListener>
