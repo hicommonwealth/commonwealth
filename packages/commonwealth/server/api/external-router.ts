@@ -55,7 +55,6 @@ const {
   deleteLinks,
   createThreadToken,
   createThreadTokenTrade,
-  getThreadTokenHolders,
 } = thread.trpcRouter;
 const {
   createComment,
@@ -134,7 +133,11 @@ const api = {
   deleteLinks,
   createThreadToken,
   createThreadTokenTrade,
-  getThreadTokenHolders,
+  getThreadTokenHolders: trpc.query(
+    Thread.GetThreadTokenHolders,
+    trpc.Tag.Thread,
+    { forceSecure: true },
+  ),
   createComment,
   updateComment,
   deleteComment,
