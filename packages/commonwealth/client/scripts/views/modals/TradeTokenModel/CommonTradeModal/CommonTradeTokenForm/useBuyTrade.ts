@@ -139,9 +139,15 @@ const useBuyTrade = ({
     change: React.ChangeEvent<HTMLInputElement> | TokenPresetAmounts,
   ) => {
     if (typeof change == 'number') {
-      // preset amounts are in tradeConfig.ethBuyCurrency
-      const ethToBuyFromUSDPresetAmount = change / ethToCurrencyRate;
-      setBaseCurrencyBuyAmountString(`${ethToBuyFromUSDPresetAmount}`);
+      // Check if preset amounts are in ETH or USD currency
+      if (tradeConfig.ethBuyCurrency === 'ETH') {
+        // preset amounts are already in ETH
+        setBaseCurrencyBuyAmountString(`${change}`);
+      } else {
+        // preset amounts are in tradeConfig.ethBuyCurrency (USD)
+        const ethToBuyFromUSDPresetAmount = change / ethToCurrencyRate;
+        setBaseCurrencyBuyAmountString(`${ethToBuyFromUSDPresetAmount}`);
+      }
     } else if (typeof change == 'string') {
       // not handling string type preset amounts atm
     } else {

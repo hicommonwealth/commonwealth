@@ -65,10 +65,27 @@ const BuyAmountSelection = ({ trading }: BuyAmountSelectionProps) => {
               <CWTag
                 key={presetAmount}
                 type="amount"
-                label={getAmountWithCurrencySymbol(
-                  presetAmount as number,
-                  trading.amounts.buy.invest.ethBuyCurrency,
-                )}
+                label={
+                  trading.amounts.buy.invest.ethBuyCurrency === 'ETH' ? (
+                    <div className="eth-amount-with-usd">
+                      <span className="eth-amount">{presetAmount} ETH</span>
+                      <span className="usd-equivalent">
+                        (~$
+                        {(
+                          (presetAmount as number) *
+                          trading.amounts.buy.invest.baseCurrency
+                            .unitEthExchangeRate
+                        ).toFixed(2)}
+                        )
+                      </span>
+                    </div>
+                  ) : (
+                    getAmountWithCurrencySymbol(
+                      presetAmount as number,
+                      trading.amounts.buy.invest.ethBuyCurrency,
+                    )
+                  )
+                }
                 onClick={() =>
                   trading.amounts.buy.invest.baseCurrency.onAmountChange(
                     presetAmount,

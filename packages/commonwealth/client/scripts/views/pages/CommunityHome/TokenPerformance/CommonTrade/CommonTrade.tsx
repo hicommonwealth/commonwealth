@@ -22,8 +22,8 @@ const CommonTrade = ({ tradeConfig }: CommonTradeProps) => {
     useCommonTradeTokenForm({
       tradeConfig: {
         ...tradeConfig,
-        ethBuyCurrency: TRADING_CURRENCY,
-        buyTokenPresetAmounts: [100, 300, 1000],
+        ethBuyCurrency: 'ETH' as any, // Use ETH as the denomination for preset amounts
+        buyTokenPresetAmounts: [0.000555, 0.00555, 0.0555],
         sellTokenPresetAmounts: ['Max'],
       },
       addressType: tradeConfig.addressType,
