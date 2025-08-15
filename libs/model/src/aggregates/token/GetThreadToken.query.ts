@@ -13,7 +13,7 @@ export function GetThreadToken(): Query<typeof schemas.GetThreadToken> {
       const { thread_id } = payload;
 
       const token = await models.sequelize.query<
-        z.infer<typeof schemas.TokenView>
+        NonNullable<z.infer<typeof schemas.GetThreadToken.output>>
       >(
         `
       SELECT thread_purchase_token, TT.* from "Communities" C

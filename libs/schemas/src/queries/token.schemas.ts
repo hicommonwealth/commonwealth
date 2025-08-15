@@ -37,13 +37,28 @@ const NullishThreadToken = z.object(
   ),
 );
 
+const GetThreadTokenOutput = z
+  .object({
+    thread_purchase_token: z.string().nullable(),
+    token_address: z.string().nullable(),
+    thread_id: z.number().nullable(),
+    name: z.string().nullable(),
+    symbol: z.string().nullable(),
+    created_at: z.date().nullable(),
+    updated_at: z.date().nullable(),
+    initial_supply: z.number().nullable(),
+    liquidity_transferred: z.boolean().nullable(),
+    launchpad_liquidity: z.string().nullable(),
+    eth_market_cap_target: z.number().nullable(),
+    creator_address: z.string().nullable(),
+  })
+  .nullable();
+
 export const GetThreadToken = {
   input: z.object({
     thread_id: z.coerce.number(),
   }),
-  output: NullishThreadToken.extend({
-    thread_purchase_token: z.string().optional(),
-  }),
+  output: GetThreadTokenOutput,
 };
 
 export const LaunchpadTradeView = LaunchpadTrade.extend({

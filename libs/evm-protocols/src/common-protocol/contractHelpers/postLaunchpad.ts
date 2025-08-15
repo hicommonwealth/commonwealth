@@ -100,7 +100,7 @@ export const buyPostToken = async (
       .getETHFeeAmount(tokenAddress, amountIn, true)
       .call();
     const txReceipt = await contract.methods
-      .buyToken(tokenAddress, recipient, amountIn, minAmountOut)
+      .buyToken(tokenAddress, amountIn, minAmountOut)
       .send({ from: walletAddress, value: feeAmount });
     return txReceipt;
   } catch (error) {
