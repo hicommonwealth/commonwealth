@@ -8,8 +8,7 @@ export async function __get_suinft_balances(
   rpcEndpoint: string,
   options: GetSuiNftBalanceOptions,
 ): Promise<Balances> {
-  // remove extra metadata from collection id if present
-  const collectionId = options.sourceOptions.collectionId.split('::')[0];
+  const collectionId = options.sourceOptions.collectionId;
 
   const client = new SuiClient({ url: rpcEndpoint });
   const balances: Balances = {};
@@ -37,6 +36,11 @@ export async function __get_suinft_balances(
           // Custom filtering logic for NFT collections
           const validNFTs = res.data.filter((obj) => {
             if (!obj.data) return false;
+
+            // ignore fungible tokens
+            if (obj.data.type?.startsWith('0x2::coin::Coin<')) {
+              return false;
+            }
 
             // Method 1: Check if the object type matches the collection ID exactly
             if (obj.data.type === collectionId) {
