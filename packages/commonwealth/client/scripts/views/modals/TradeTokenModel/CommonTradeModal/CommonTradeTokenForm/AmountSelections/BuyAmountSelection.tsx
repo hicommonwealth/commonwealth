@@ -49,7 +49,13 @@ const BuyAmountSelection = ({ trading }: BuyAmountSelectionProps) => {
       </div>
 
       <CWText type="caption" className="invest-to-gain-amounts">
-        = {trading.token.icon_url && <TokenIcon url={trading.token.icon_url} />}
+        = (~$
+        {(
+          parseFloat(inputValue?.trim()?.length > 0 ? inputValue : '0') *
+          trading.amounts.buy.invest.baseCurrency.unitEthExchangeRate
+        ).toFixed(2)}
+        ) ={' '}
+        {trading.token.icon_url && <TokenIcon url={trading.token.icon_url} />}
         <FormattedDisplayNumber
           value={trading.amounts.buy.gain.token}
           options={{ decimals: 4 }}
