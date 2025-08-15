@@ -12,11 +12,11 @@ const BuyReceipt = ({ trading }: ReceiptDetailsProps) => {
   const { invest, gain } = trading.amounts.buy;
   const baseCurrencyName = invest.baseCurrency.name;
   const baseCurrencySymbol = currencyNameToSymbolMap[baseCurrencyName];
-  const ethBuyCurrency = trading.amounts.buy.invest.ethBuyCurrency;
+  const buyCurrency = trading.amounts.buy.invest.buyCurrency;
   const isLeftSymbolCurrency =
-    currencySymbolPlacements.onLeft.includes(ethBuyCurrency);
+    currencySymbolPlacements.onLeft.includes(buyCurrency);
   const isRightSymbolCurrency =
-    currencySymbolPlacements.onRight.includes(ethBuyCurrency);
+    currencySymbolPlacements.onRight.includes(buyCurrency);
 
   const ethUsed = invest.baseCurrency.toEth - invest.commonPlatformFee.eth;
   const ethFee = invest.commonPlatformFee.eth;
@@ -24,7 +24,7 @@ const BuyReceipt = ({ trading }: ReceiptDetailsProps) => {
   return (
     <div className="ReceiptDetails">
       <div className="entry">
-        <CWText type="caption">Exchange Rate ({ethBuyCurrency}/ETH)</CWText>
+        <CWText type="caption">Exchange Rate ({buyCurrency}/ETH)</CWText>
         <CWText type="caption">
           <FormattedDisplayNumber
             type="caption"

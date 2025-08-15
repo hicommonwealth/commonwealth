@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { getAmountWithCurrencySymbol } from 'helpers/currency';
 import React, { useEffect, useState } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -66,25 +65,18 @@ const BuyAmountSelection = ({ trading }: BuyAmountSelectionProps) => {
                 key={presetAmount}
                 type="amount"
                 label={
-                  trading.amounts.buy.invest.ethBuyCurrency === 'ETH' ? (
-                    <div className="eth-amount-with-usd">
-                      <span className="eth-amount">{presetAmount} ETH</span>
-                      <span className="usd-equivalent">
-                        (~$
-                        {(
-                          (presetAmount as number) *
-                          trading.amounts.buy.invest.baseCurrency
-                            .unitEthExchangeRate
-                        ).toFixed(2)}
-                        )
-                      </span>
-                    </div>
-                  ) : (
-                    getAmountWithCurrencySymbol(
-                      presetAmount as number,
-                      trading.amounts.buy.invest.ethBuyCurrency,
-                    )
-                  )
+                  <div className="eth-amount-with-usd">
+                    <span className="eth-amount">{presetAmount} ETH</span>
+                    <span className="usd-equivalent">
+                      (~$
+                      {(
+                        (presetAmount as number) *
+                        trading.amounts.buy.invest.baseCurrency
+                          .unitEthExchangeRate
+                      ).toFixed(2)}
+                      )
+                    </span>
+                  </div>
                 }
                 onClick={() =>
                   trading.amounts.buy.invest.baseCurrency.onAmountChange(
