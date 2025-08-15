@@ -1,5 +1,8 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
+import {
+  currencyNameToSymbolMap,
+  SupportedFiatCurrencies,
+} from 'helpers/currency';
 import { useTokenPricing } from 'hooks/useTokenPricing';
 import moment from 'moment'; // Import moment for ordinal numbers
 import React, { useState } from 'react';
@@ -25,9 +28,9 @@ const PRIZE_POOL_DISPLAY_PERCENTAGE = '0.15%';
 const PRIZE_DISTRIBUTION_PERCENTAGES = [0.5, 0.35, 0.15];
 
 export const PotentialContestCard = ({
-  currency = SupportedCurrencies.USD,
+  currency = SupportedFiatCurrencies.USD,
 }: {
-  currency?: SupportedCurrencies;
+  currency?: SupportedFiatCurrencies;
 }) => {
   const currencySymbol = currencyNameToSymbolMap[currency];
   const { communityToken, isLoadingToken, isPinnedToken } =

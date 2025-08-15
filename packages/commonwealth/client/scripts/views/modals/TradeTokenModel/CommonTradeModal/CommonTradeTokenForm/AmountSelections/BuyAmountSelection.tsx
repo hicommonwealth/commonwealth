@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { getAmountWithCurrencySymbol } from 'helpers/currency';
 import React, { useEffect, useState } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -50,7 +49,13 @@ const BuyAmountSelection = ({ trading }: BuyAmountSelectionProps) => {
       </div>
 
       <CWText type="caption" className="invest-to-gain-amounts">
-        = {trading.token.icon_url && <TokenIcon url={trading.token.icon_url} />}
+        = (~$
+        {(
+          parseFloat(inputValue?.trim()?.length > 0 ? inputValue : '0') *
+          trading.amounts.buy.invest.baseCurrency.unitEthExchangeRate
+        ).toFixed(2)}
+        ) ={' '}
+        {trading.token.icon_url && <TokenIcon url={trading.token.icon_url} />}
         <FormattedDisplayNumber
           value={trading.amounts.buy.gain.token}
           options={{ decimals: 4 }}
@@ -65,10 +70,20 @@ const BuyAmountSelection = ({ trading }: BuyAmountSelectionProps) => {
               <CWTag
                 key={presetAmount}
                 type="amount"
-                label={getAmountWithCurrencySymbol(
-                  presetAmount as number,
-                  trading.amounts.buy.invest.ethBuyCurrency,
-                )}
+                label={
+                  <div className="eth-amount-with-usd">
+                    <span className="eth-amount">{presetAmount} ETH</span>
+                    <span className="usd-equivalent">
+                      (~$
+                      {(
+                        (presetAmount as number) *
+                        trading.amounts.buy.invest.baseCurrency
+                          .unitEthExchangeRate
+                      ).toFixed(2)}
+                      )
+                    </span>
+                  </div>
+                }
                 onClick={() =>
                   trading.amounts.buy.invest.baseCurrency.onAmountChange(
                     presetAmount,

@@ -1,5 +1,8 @@
 import clsx from 'clsx';
-import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
+import {
+  currencyNameToSymbolMap,
+  SupportedFiatCurrencies,
+} from 'helpers/currency';
 import numeral from 'numeral';
 import React from 'react';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
@@ -7,13 +10,13 @@ import { CWText } from '../component_kit/cw_text';
 import './MarketCapProgress.scss';
 
 interface MarketCapProgressProps {
-  currency?: SupportedCurrencies;
+  currency?: SupportedFiatCurrencies;
   marketCap: { current: number; goal: number; isCapped: boolean };
   onBodyClick?: (e: React.MouseEvent) => void;
 }
 
 const MarketCapProgress = ({
-  currency = SupportedCurrencies.USD,
+  currency = SupportedFiatCurrencies.USD,
   marketCap,
   onBodyClick,
 }: MarketCapProgressProps) => {

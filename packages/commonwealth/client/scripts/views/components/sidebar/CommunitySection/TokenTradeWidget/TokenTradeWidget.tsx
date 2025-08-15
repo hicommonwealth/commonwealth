@@ -1,7 +1,10 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { formatAddressShort } from 'helpers';
-import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
+import {
+  currencyNameToSymbolMap,
+  SupportedFiatCurrencies,
+} from 'helpers/currency';
 import { useTokenPricing } from 'hooks/useTokenPricing';
 import React, { useState } from 'react';
 import { saveToClipboard } from 'utils/clipboard';
@@ -26,11 +29,11 @@ import { TokenTradeWidgetSkeleton } from './TokenTradeWidgetSkeleton';
 import { useTokenTradeWidget } from './useTokenTradeWidget';
 
 interface TokenTradeWidgetProps {
-  currency?: SupportedCurrencies;
+  currency?: SupportedFiatCurrencies;
 }
 
 export const TokenTradeWidget = ({
-  currency = SupportedCurrencies.USD,
+  currency = SupportedFiatCurrencies.USD,
 }: TokenTradeWidgetProps) => {
   const currencySymbol = currencyNameToSymbolMap[currency];
 

@@ -1,6 +1,6 @@
 import { X } from '@phosphor-icons/react';
 import clsx from 'clsx';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { CWCommunityAvatar } from '../cw_community_avatar';
 import { CWIcon } from '../cw_icons/cw_icon';
 import type { CustomIconName, IconName } from '../cw_icons/cw_icon_lookup';
@@ -34,7 +34,7 @@ export type TagType =
 
 export type TagProps = {
   iconName?: IconName | CustomIconName;
-  label: string;
+  label: ReactNode;
   type: TagType;
   onClick?: (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   onCloseClick?: () => void;
@@ -61,6 +61,8 @@ export const CWTag = ({
   onMouseLeave,
 }: TagProps) => {
   const displayLabel = () => {
+    if (typeof label !== 'string') return label;
+
     if (!trimAt) {
       return label;
     }
@@ -68,7 +70,6 @@ export const CWTag = ({
     if (label?.length <= trimAt) {
       return label;
     }
-
     return label.slice(0, trimAt) + '...';
   };
 

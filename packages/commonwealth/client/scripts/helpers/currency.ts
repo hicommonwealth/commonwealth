@@ -1,4 +1,8 @@
-export enum SupportedCurrencies {
+export enum SupportedCryptoCurrencies {
+  ETH = 'ETH',
+}
+
+export enum SupportedFiatCurrencies {
   USD = 'USD',
 }
 
@@ -7,27 +11,31 @@ export enum CurrenciesSymbols {
 }
 
 export const currencyNameToSymbolMap: Record<
-  SupportedCurrencies,
+  SupportedFiatCurrencies,
   CurrenciesSymbols
 > = {
-  [SupportedCurrencies.USD]: CurrenciesSymbols.USD,
+  [SupportedFiatCurrencies.USD]: CurrenciesSymbols.USD,
   // add more when supported
 };
 
 export const currencySymbolPlacements = {
-  onLeft: [SupportedCurrencies.USD],
-  onRight: [] as string[], // some currencies use right side placements
+  onLeft: [SupportedFiatCurrencies.USD],
+  onRight: [SupportedCryptoCurrencies.ETH], // some currencies use right side placements
 };
 
 export const getAmountWithCurrencySymbol = (
   amount: number,
-  currencyName: SupportedCurrencies,
+  currencyName: SupportedFiatCurrencies | SupportedCryptoCurrencies,
 ) => {
   const symbol = currencyNameToSymbolMap[currencyName];
-  const leftSymbol = currencySymbolPlacements.onLeft.includes(currencyName)
+  const leftSymbol = currencySymbolPlacements.onLeft.includes(
+    currencyName as SupportedFiatCurrencies,
+  )
     ? symbol
     : '';
-  const rightymbol = currencySymbolPlacements.onRight.includes(currencyName)
+  const rightymbol = currencySymbolPlacements.onRight.includes(
+    currencyName as SupportedCryptoCurrencies,
+  )
     ? symbol
     : '';
 
