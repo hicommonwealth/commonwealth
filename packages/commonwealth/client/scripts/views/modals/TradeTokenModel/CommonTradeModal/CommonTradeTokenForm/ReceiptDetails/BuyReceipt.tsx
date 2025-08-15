@@ -1,4 +1,3 @@
-import { currencyNameToSymbolMap } from 'helpers/currency';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import FormattedDisplayNumber from '../../../../../components/FormattedDisplayNumber/FormattedDisplayNumber';
@@ -7,8 +6,6 @@ import './ReceiptDetails.scss';
 
 const BuyReceipt = ({ trading }: ReceiptDetailsProps) => {
   const { invest, gain } = trading.amounts.buy;
-  const baseCurrencyName = invest.baseCurrency.name;
-  const baseCurrencySymbol = currencyNameToSymbolMap[baseCurrencyName];
   const ethFee = invest.commonPlatformFee.eth;
 
   return (
@@ -16,14 +13,6 @@ const BuyReceipt = ({ trading }: ReceiptDetailsProps) => {
       <div className="entry">
         <CWText type="caption">Exchange Rate (USD/ETH)</CWText>
         <CWText type="caption">
-          {/* <FormattedDisplayNumber
-            type="caption"
-            value={invest.baseCurrency.unitEthExchangeRate}
-            options={{
-              decimals: 6,
-              currencySymbol: '$',
-            }}
-          /> */}
           1 ETH = {trading.amounts.buy.invest.baseCurrency.unitEthExchangeRate}{' '}
           USD
         </CWText>
