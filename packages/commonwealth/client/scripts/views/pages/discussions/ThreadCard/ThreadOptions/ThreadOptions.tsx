@@ -25,6 +25,7 @@ import './ThreadOptions.scss';
 
 type OptionsProps = AdminActionsProps & {
   thread?: Thread;
+  threadToken?: any;
   upvoteBtnVisible?: boolean;
   commentBtnVisible?: boolean;
   shareEndpoint?: string;
@@ -44,10 +45,12 @@ type OptionsProps = AdminActionsProps & {
   showOnlyThreadActionIcons?: boolean;
   actionGroups: ActionGroups;
   bypassGating: boolean;
+  onTradeClick?: () => void;
 };
 
 export const ThreadOptions = ({
   thread,
+  threadToken,
   upvoteBtnVisible = false,
   commentBtnVisible = true,
   shareEndpoint,
@@ -76,6 +79,7 @@ export const ThreadOptions = ({
   showOnlyThreadActionIcons = false,
   actionGroups,
   bypassGating,
+  onTradeClick,
 }: OptionsProps) => {
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   const userStore = useUserStore();
@@ -153,6 +157,18 @@ export const ThreadOptions = ({
                 onCommentClick && onCommentClick();
               }}
               tooltipText={permissions.CREATE_COMMENT.tooltip}
+            />
+          )}
+
+          {threadToken?.token_address && onTradeClick && (
+            <CWThreadAction
+              label={showOnlyThreadActionIcons ? '' : 'Trade'}
+              action="fund"
+              onClick={(e) => {
+                e.preventDefault();
+                onTradeClick();
+              }}
+              tooltipText="Trade thread token"
             />
           )}
 
