@@ -618,7 +618,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
 
   const sidebarComponent = [
-    ...(tokenizedThreadsEnabled
+    ...(tokenizedThreadsEnabled && threadToken?.token_address
       ? [
           {
             label: 'Token',
