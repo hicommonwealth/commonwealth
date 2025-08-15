@@ -450,7 +450,11 @@ export const useMention = ({
               return;
             }
 
-            if (searchTerm.length < MENTION_CONFIG.MIN_SEARCH_LENGTH) {
+            // Skip minimum search length requirement for MCP servers
+            if (
+              searchTerm.length < MENTION_CONFIG.MIN_SEARCH_LENGTH &&
+              mentionChar !== '%'
+            ) {
               const node = document.createElement('div');
               node.className = 'mention-empty-state';
               node.innerText = `Type at least ${MENTION_CONFIG.MIN_SEARCH_LENGTH} characters to
