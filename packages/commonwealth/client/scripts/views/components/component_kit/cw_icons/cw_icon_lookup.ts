@@ -366,7 +366,6 @@ export const customIconLookup = {
   leap: CustomIcons.CWLeap,
   magic: CustomIcons.CWMagic,
   metamask: CustomIcons.CWMetaMask,
-  gate: CustomIcons.CWGate,
   near: CustomIcons.CWNearWallet,
   phantom: CustomIcons.CWPhantom,
   backpack: CustomIcons.CWBackpack,
