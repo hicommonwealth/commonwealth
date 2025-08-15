@@ -6,6 +6,7 @@ import {
   Comment,
   CommentVersionHistory,
   ContestManager,
+  EmailNotificationInterval,
   Link,
   ProfileTags,
   Thread,
@@ -66,10 +67,8 @@ export const UserView = z.object({
   disableRichText: z.boolean().default(false).optional(),
   emailVerified: z.boolean().default(false).nullish(),
   selected_community_id: z.string().max(255).nullish(),
-  emailNotificationInterval: z
-    .enum(['weekly', 'never'])
-    .default('never')
-    .optional(),
+  emailNotificationInterval:
+    EmailNotificationInterval.default('never').optional(),
   promotional_emails_enabled: z.boolean().nullish(),
   is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
 

@@ -12,6 +12,7 @@ import {
   analytics,
   blobStorage,
   cache,
+  disableService,
   logger,
   notificationsProvider,
   stats,
@@ -68,6 +69,15 @@ const app = express();
  * - Once we fully decouple the models, we can remove the import from `main.ts` that's causing this issue
  */
 const start = async () => {
+  if (config.DISABLE_SERVICE) {
+    // set-up health check endpoint to allow successful deployment on Railway
+    app.get('/api/health', (_req, res) => {
+      res.status(200).send('Service is disabled');
+    });
+    app.listen(config.PORT);
+    await disableService();
+  }
+
   // importing here to avoid conflicts with notifications provider port
   const { main } = await import('./main');
 

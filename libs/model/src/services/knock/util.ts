@@ -1,3 +1,4 @@
+import { DaysOfWeek } from '@knocklabs/node';
 import { config } from '../../config';
 
 function parseCustomDomain(customDomain: string) {
@@ -57,3 +58,24 @@ export const getProfileUrl = (
 ): string => {
   return getBaseUrl(customDomain) + `/profile/id/${userId}`;
 };
+
+export function mapDateToDaysOfWeek(
+  date: Date,
+): (typeof DaysOfWeek)[keyof typeof DaysOfWeek] {
+  switch (date.getDay()) {
+    case 0:
+      return DaysOfWeek.Sun;
+    case 1:
+      return DaysOfWeek.Mon;
+    case 2:
+      return DaysOfWeek.Tue;
+    case 3:
+      return DaysOfWeek.Wed;
+    case 4:
+      return DaysOfWeek.Thu;
+    case 5:
+      return DaysOfWeek.Fri;
+    default:
+      return DaysOfWeek.Sat;
+  }
+}

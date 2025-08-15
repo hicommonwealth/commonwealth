@@ -4,7 +4,7 @@ import { Reaction, Thread } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import * as middleware from '@hicommonwealth/model/middleware';
 import { CountAggregatorKeys, LinkSource } from '@hicommonwealth/shared';
-import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
+import { MixpanelCommunityInteractionEvent } from 'analytics/types';
 import { config } from '../config';
 import {
   createThreadRank,
@@ -13,7 +13,6 @@ import {
   shouldRankThread,
   updateRankOnThreadIneligibility,
 } from './ranking';
-
 const log = logger(import.meta);
 
 export const trpcRouter = trpc.router({
@@ -265,6 +264,10 @@ export const trpcRouter = trpc.router({
   createThreadToken: trpc.command(Thread.CreateThreadToken, trpc.Tag.Thread),
   createThreadTokenTrade: trpc.command(
     Thread.CreateThreadTokenTrade,
+    trpc.Tag.Thread,
+  ),
+  getThreadTokenHolders: trpc.query(
+    Thread.GetThreadTokenHolders,
     trpc.Tag.Thread,
   ),
 });

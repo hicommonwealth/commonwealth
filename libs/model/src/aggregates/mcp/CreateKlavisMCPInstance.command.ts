@@ -59,7 +59,7 @@ export function CreateKlavisMCPInstance(): Command<
           case 'Google Sheets':
             await models.MCPServer.create({
               name: serverType,
-              description: serverType,
+              description: `${serverType} connected by user #${actor.user.id}`,
               handle: 'google_sheets',
               source: 'klavis',
               source_identifier: instance.instanceId,

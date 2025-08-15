@@ -1,3 +1,4 @@
+import { WalletId } from '@hicommonwealth/shared';
 import { pluralize } from 'helpers';
 import React, { ReactNode } from 'react';
 
@@ -47,7 +48,27 @@ export const actionCopies = {
     ['RecurringContestManagerDeployed']: '',
   },
   explainer: {
-    ['SignUpFlowCompleted']: () => '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['SignUpFlowCompleted']: (walletId?: WalletId) =>
+      walletId === WalletId.Binance ? (
+        <div>
+          <strong>IMPORTANT:</strong> Sign up MUST BE DONE VIA THE BINANCE
+          WALLET APP. <br />
+          Steps to complete:
+          <ol>
+            <li>1. Open Binance Wallet app</li>
+            <li>2. Create your account or sign in</li>
+            <li>3. Connect your wallet to Common</li>
+            <li>4. Complete the signup process</li>
+          </ol>
+          Visit Binance to explore more onchain:{' '}
+          <a href="https://www.binance.com/en/web3">
+            https://www.binance.com/en/web3
+          </a>
+        </div>
+      ) : (
+        ``
+      ),
     ['CommunityCreated']: (chainName?: string) =>
       chainName ? `● Must be created on the ${chainName} chain.` : '',
     ['CommunityJoined']: () => '',
@@ -55,7 +76,28 @@ export const actionCopies = {
     ['ThreadUpvoted']: () => '',
     ['CommentCreated']: () => '',
     ['CommentUpvoted']: () => '',
-    ['WalletLinked']: () => '',
+    // eslint-disable-next-line react/no-multi-comp
+    ['WalletLinked']: (walletId?: WalletId) =>
+      walletId === WalletId.Binance ? (
+        <div>
+          <strong>IMPORTANT:</strong> Sign up MUST BE DONE VIA THE BINANCE
+          WALLET APP. <br />
+          Steps to complete:
+          <ol>
+            <li>1. Open Binance Wallet app</li>
+            <li>2. Create your account or sign in</li>
+            <li>3. Connect your wallet to Common</li>
+            <li>4. Complete the signup process</li>
+          </ol>
+          Visit Binance to explore more onchain:{' '}
+          <a href="https://www.binance.com/en/web3">
+            https://www.binance.com/en/web3
+          </a>
+        </div>
+      ) : (
+        ``
+      ),
+    // eslint-disable-next-line react/no-multi-comp
     ['SSOLinked']: (ssoType?: string) =>
       ssoType ? (
         <div>

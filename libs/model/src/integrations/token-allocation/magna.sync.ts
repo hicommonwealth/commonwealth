@@ -6,6 +6,9 @@ import { QueryTypes } from 'sequelize';
 const log = logger(import.meta);
 
 export type TokenAllocationSyncArgs = {
+  key: string;
+  category: string;
+  description: string;
   user_id: number;
   user_name: string;
   user_email: string;
@@ -13,38 +16,28 @@ export type TokenAllocationSyncArgs = {
   token_allocation: number;
 };
 
-/**
- * Callback Response.
- *
- * Should return id if allocation was created or already exists.
- *
- * - id: Allocation ID
- * - error: Error message if failed to create allocation
- */
-export type TokenAllocationSyncResponse = { id?: string; error?: string };
-
 export async function magnaSync(
-  apiCallback: (
-    args: TokenAllocationSyncArgs,
-  ) => Promise<TokenAllocationSyncResponse>,
+  apiCallback: (args: TokenAllocationSyncArgs) => Promise<boolean>,
   batchSize = 10,
   breatherMs = 1000,
 ) {
   try {
     let found = true;
     while (found) {
-      await delay(breatherMs); // take a breath to keep rate limit at BATCH_SIZE/sec
-
       // Load next batch of allocations to sync with Magna
       const batch = await models.sequelize.query<TokenAllocationSyncArgs>(
         `
           SELECT
+            'initial-airdrop-' || A.address as key,
+            'initial-airdrop' as category,
+            'Inital Common Token Airdrop for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
             A.user_id,
             A.address as wallet_address,
             U.profile->>'name' as user_name,
             U.profile->>'email' as user_email,
-            COALESCE(HA.token_allocation, 0) 
-              + COALESCE(AA.token_allocation, 0) as token_allocation -- combined in initial drop
+            -- combined in initial drop?
+            COALESCE(HA.token_allocation, 0)::double precision 
+            + COALESCE(AA.token_allocation, 0)::double precision as token_allocation
           FROM
             "ClaimAddresses" A -- this is the driving table with sync watermarks
             JOIN "Users" U ON A.user_id = U.id
@@ -70,22 +63,15 @@ export async function magnaSync(
 
       const promises = batch.map(async (args) => {
         try {
-          const response = await apiCallback(args);
-          if (response.id) {
-            // set sync watermark
-            await models.ClaimAddresses.update(
-              {
-                magna_allocation_id: response.id,
-                magna_synced_at: new Date(),
-              },
-              { where: { user_id: args.user_id } },
-            );
-            log.info(`Synced allocation for user ${args.user_id}`);
-          } else {
-            log.error(
-              `Failed to sync allocation for user ${args.user_id}: ${response.error}`,
-            );
-          }
+          await apiCallback(args);
+          await models.ClaimAddresses.update(
+            {
+              magna_allocation_id: args.key,
+              magna_synced_at: new Date(),
+            },
+            { where: { user_id: args.user_id } },
+          );
+          log.info(`Synced allocation for user ${args.user_id}`);
         } catch (err) {
           log.error(
             `Failed to sync allocation for user ${args.user_id}:`,
@@ -94,6 +80,8 @@ export async function magnaSync(
         }
       });
       await Promise.all(promises);
+
+      await delay(breatherMs); // take a breath to keep rate limit at BATCH_SIZE/sec
     }
   } catch (err) {
     log.error('Error syncing with Magna', err as Error);

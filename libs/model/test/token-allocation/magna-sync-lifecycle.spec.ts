@@ -77,10 +77,7 @@ describe('MagnaSync Lifecycle', () => {
 
     // Execute sync
     await magnaSync(
-      (args) => {
-        // mock call to magna api that creates allocations
-        return Promise.resolve({ id: `magna-id-${args.user_id}` });
-      },
+      () => Promise.resolve(true),
       10,
       0, // Set breather to 0 to speed up test
     );
@@ -90,7 +87,9 @@ describe('MagnaSync Lifecycle', () => {
       where: { magna_synced_at: { [Op.ne]: null } },
     });
     updates.forEach((update) => {
-      expect(update.magna_allocation_id).toBe(`magna-id-${update.user_id}`);
+      expect(update.magna_allocation_id).toBe(
+        `initial-airdrop-${update.address}`,
+      );
     });
   });
 });

@@ -4,29 +4,6 @@
 .NotificationSettings {
   max-width: 650px;
 
-  .email-settings-section {
-    margin-bottom: 32px;
-    padding: 24px;
-    border: 1px solid colors.$neutral-200;
-    border-radius: 8px;
-    background-color: colors.$neutral-50;
-
-    .email-input-container {
-      display: flex;
-      gap: 16px;
-      align-items: flex-end;
-      margin-top: 16px;
-
-      .CWTextInput {
-        flex: 1;
-      }
-
-      .CWButton {
-        flex-shrink: 0;
-      }
-    }
-  }
-
   .setting-container {
     display: flex;
     margin-top: 16px;
@@ -109,6 +86,41 @@
     margin-bottom: 8px;
   }
 
+  /* Emails section specific */
+  .EmailsSection {
+    .email-card {
+      background: colors.$neutral-50;
+      border: 1px solid colors.$neutral-200;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+      margin-top: 12px;
+
+      .email-card-header {
+        margin-bottom: 20px;
+      }
+
+      .email-card-body {
+        .email-row {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+        }
+      }
+    }
+
+    .top-frequency {
+      margin-top: 8px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid colors.$neutral-200;
+    }
+
+    .toggle-list {
+      margin-top: 8px;
+    }
+  }
+
   .community-header {
     display: flex;
     align-items: center;
@@ -116,6 +128,7 @@
     width: 100%;
     padding: 12px 0;
     border-bottom: 1px solid colors.$neutral-200;
+    margin-bottom: 8px;
 
     .community-info {
       display: flex;
@@ -133,16 +146,22 @@
     }
   }
 
-  // Make chevron icons smaller in collapsible headers
+  // Make chevron icons smaller in collapsible headers and align with community header
   .Collapsible {
-    .expand-icon-button {
-      .CWIconButton {
-        width: 16px !important;
-        height: 16px !important;
+    .collapsible-header {
+      align-items: flex-start;
 
-        .CWIcon {
-          width: 12px !important;
-          height: 12px !important;
+      .expand-icon-button {
+        margin-top: 2px;
+
+        .CWIconButton {
+          width: 16px !important;
+          height: 16px !important;
+
+          .CWIcon {
+            width: 12px !important;
+            height: 12px !important;
+          }
         }
       }
     }
@@ -164,6 +183,7 @@
     .toggle {
       margin-left: auto;
 
+      // Make toggle smaller
       .Toggle {
         transform: scale(0.8);
       }

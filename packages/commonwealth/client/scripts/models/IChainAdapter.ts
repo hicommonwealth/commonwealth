@@ -43,7 +43,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
     // only on `1inch`, force enable dark mode
     if (this.meta.id === '1inch') {
-      darkModeStore.getState().setDarkMode(true);
+      darkModeStore.getState().setDarkMode(true, { noPersist: true });
     }
 
     this._serverLoaded = true;
@@ -55,7 +55,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     console.log(`${this.meta.name} stopped`);
 
     if (this.meta.id === '1inch') {
-      darkModeStore.getState().setDarkMode(false);
+      darkModeStore.getState().reCalculateDarkMode();
     }
   }
 
@@ -78,7 +78,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     console.log(`Stopping ${this.meta.id}...`);
 
     if (this.meta.id === '1inch' && darkModeStore.getState().isDarkMode) {
-      darkModeStore.getState().setDarkMode(false);
+      darkModeStore.getState().reCalculateDarkMode();
     }
   }
 

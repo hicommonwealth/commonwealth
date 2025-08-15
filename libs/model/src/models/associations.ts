@@ -162,6 +162,9 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.ThreadVersionHistory)
     .withOne(db.ThreadRank, {
       onDelete: 'CASCADE',
+    })
+    .withMany(db.ThreadToken, {
+      foreignKey: 'thread_id',
     });
 
   db.ThreadToken.withMany(db.ThreadTokenTrade, {

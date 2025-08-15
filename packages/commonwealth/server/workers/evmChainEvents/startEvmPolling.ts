@@ -1,4 +1,4 @@
-import { dispose, logger } from '@hicommonwealth/core';
+import { disableService, dispose, logger } from '@hicommonwealth/core';
 import { factoryContracts } from '@hicommonwealth/evm-protocols';
 import { getAddress } from 'viem';
 import { config } from '../../config';
@@ -17,6 +17,7 @@ const log = logger(import.meta);
 export async function startEvmPolling(
   interval: number,
 ): Promise<NodeJS.Timeout> {
+  await disableService();
   log.info(`Starting EVM poller`);
   if (interval > 500_000) {
     throw new Error(

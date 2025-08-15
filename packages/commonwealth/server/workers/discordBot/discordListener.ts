@@ -3,7 +3,7 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
+import { disableService, logger, stats } from '@hicommonwealth/core';
 import { emitEvent } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import { WalletSsoSource } from '@hicommonwealth/shared';
@@ -41,6 +41,7 @@ log.info(
 );
 
 async function startDiscordListener() {
+  await disableService();
   config.APP_ENV === 'local' && console.log(config);
 
   const client = new Client({

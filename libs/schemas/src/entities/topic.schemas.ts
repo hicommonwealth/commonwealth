@@ -8,6 +8,7 @@ export enum TopicWeightedVoting {
   SPL = 'spl',
   SuiNative = 'sui_native',
   SuiToken = 'sui_token',
+  SuiNFT = 'sui_nft',
   ERC1155ID = 'erc1155id',
 }
 

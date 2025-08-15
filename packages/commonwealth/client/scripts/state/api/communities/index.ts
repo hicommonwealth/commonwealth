@@ -14,6 +14,7 @@ import useUpdateCommunityMutation from './updateCommunity';
 import useUpdateCommunityDirectoryTags from './updateCommunityDirectoryTags';
 import useUpdateCustomDomainMutation from './updateCustomDomain';
 import { useUpdateRoleMutation } from './updateRole';
+import useSetCommunityMcpServersMutation from './setCommunityMcpServers';
 
 export {
   useEditCommunityBannerMutation,
@@ -32,4 +33,5 @@ export {
   useUpdateCommunityMutation,
   useUpdateCustomDomainMutation,
   useUpdateRoleMutation,
+  useSetCommunityMcpServersMutation,
 };

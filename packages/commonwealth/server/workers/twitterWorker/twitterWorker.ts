@@ -3,7 +3,12 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { composeSequelizeLogger, logger, stats } from '@hicommonwealth/core';
+import {
+  composeSequelizeLogger,
+  disableService,
+  logger,
+  stats,
+} from '@hicommonwealth/core';
 import { emitEvent, pgMultiRowUpdate } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import {
@@ -253,6 +258,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
 
 // eslint-disable-next-line @typescript-eslint/require-await
 async function main() {
+  await disableService();
   try {
     if (config.TWITTER.ENABLED_BOTS.length === 0) {
       log.info('No Twitter bots enabled. Exiting...');

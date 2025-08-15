@@ -3,7 +3,6 @@ import {
   NotificationsProvider,
   NotificationsProviderGetMessagesOptions,
   NotificationsProviderGetMessagesReturn,
-  NotificationsProviderScheduleRepeats,
   NotificationsProviderSchedulesReturn,
   NotificationsProviderTriggerOptions,
   WorkflowKeys,
@@ -25,7 +24,7 @@ function formatScheduleResponse(
     recipient: s.recipient,
     data: s.data,
     workflow: s.workflow,
-    repeats: s.repeats as unknown as NotificationsProviderScheduleRepeats,
+    repeats: s.repeats,
     last_occurrence_at: s.last_occurrence_at
       ? new Date(s.last_occurrence_at)
       : undefined,
@@ -154,6 +153,14 @@ export function KnockProvider(): NotificationsProvider {
       const res = await knock.workflows.createSchedules(options.workflow_id, {
         recipients: options.user_ids,
         repeats: options.schedule as unknown as ScheduleRepeatProperties[],
+      });
+      return formatScheduleResponse(res);
+    },
+
+    async updateSchedules(options) {
+      const res = await knock.workflows.updateSchedules({
+        schedule_ids: options.schedule_ids,
+        repeats: options.schedule as ScheduleRepeatProperties[],
       });
       return formatScheduleResponse(res);
     },
