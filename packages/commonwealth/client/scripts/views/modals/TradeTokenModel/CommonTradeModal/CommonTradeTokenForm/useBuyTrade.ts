@@ -94,7 +94,6 @@ const useBuyTrade = ({
       if (
         !launchPad ||
         !chainNode ||
-        baseCurrencyBuyAmountDecimals <= 0 ||
         commonPlatformFeeForBuyTradeInEth >= baseCurrencyBuyAmountDecimals
       ) {
         setTokenGainAmount(0);
