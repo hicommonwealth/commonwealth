@@ -48,6 +48,7 @@ export type PollCardProps = PollOptionProps &
     isLoadingVotes?: boolean;
     endTimestamp?: string;
     allowRevotes?: boolean;
+    userHasVoted?: boolean;
   };
 
 export const PollCard = ({
@@ -75,6 +76,7 @@ export const PollCard = ({
   topicWeight,
   isLoadingVotes = false,
   allowRevotes = false,
+  userHasVoted = false,
 }: PollCardProps) => {
   const [selectedOptions, setSelectedOptions] = useState<Array<string>>([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -204,6 +206,7 @@ export const PollCard = ({
               timeRemaining={timeRemaining}
               tooltipErrorMessage={tooltipErrorMessage}
               onVoteCast={castVote}
+              isRevoting={userHasVoted && allowRevotes}
             />
           </>
         )}

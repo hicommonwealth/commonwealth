@@ -187,6 +187,7 @@ export const ThreadPollCard = ({
         isPreview={false}
         tooltipErrorMessage={permissions.tooltip}
         allowRevotes={poll.allow_revotes}
+        userHasVoted={!!userVote}
         onVoteCast={(option, isSelected) => {
           if (option !== undefined) {
             handlePollVote(poll, option, isSelected ?? false);
