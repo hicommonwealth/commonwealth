@@ -147,11 +147,14 @@
 
       .receive-label {
         color: colors.$neutral-500;
-        margin-bottom: 4px;
+        margin-bottom: 0;
+        font-size: 12px;
       }
 
       .receive-amount {
-        font-size: 14px;
+        font-size: 12px;
+        color: colors.$neutral-700;
+        margin-bottom: 0;
       }
     }
 

@@ -468,13 +468,17 @@ const ThreadTokenWidget = ({
         </div>
 
         <div className="receive-section">
-          <CWText type="b2" className="receive-label">
+          <CWText type="caption" className="receive-label">
             You receive
           </CWText>
-          <CWText type="h5" fontWeight="semiBold" className="receive-amount">
+          <CWText
+            type="caption"
+            fontWeight="regular"
+            className="receive-amount"
+          >
             {currentIsLoadingTokenGain
               ? 'Calculating...'
-              : `${safeCurrentTokenGainAmount.toFixed(2)} ${isThreadCreationMode || !isSellMode ? 'TOKEN' : primaryTokenSymbol}`}
+              : `${safeCurrentTokenGainAmount.toFixed(5)} ${isThreadCreationMode || !isSellMode ? threadToken?.symbol || 'TOKEN' : primaryTokenSymbol}`}
           </CWText>
         </div>
 
