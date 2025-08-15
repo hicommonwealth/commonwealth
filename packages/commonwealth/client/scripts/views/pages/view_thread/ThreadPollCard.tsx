@@ -91,12 +91,19 @@ export const ThreadPollCard = ({
       return;
     }
 
+    const isRevoting = !!userVote && votedPoll.allow_revotes;
+    const confirmationTitle = isRevoting ? 'Update Vote' : 'Info';
+    const confirmationDescription = isRevoting
+      ? `Are you sure you want to update your vote to '${option}'?`
+      : `Submit a vote for '${option}'?`;
+    const submitButtonLabel = isRevoting ? 'Update Vote' : 'Submit';
+
     openConfirmation({
-      title: 'Info',
-      description: `Submit a vote for '${option}'?`,
+      title: confirmationTitle,
+      description: confirmationDescription,
       buttons: [
         {
-          label: 'Submit',
+          label: submitButtonLabel,
           buttonType: 'primary',
           buttonHeight: 'sm',
           onClick: () => {
@@ -164,7 +171,7 @@ export const ThreadPollCard = ({
         pollEnded={
           !!poll.ends_at && moment(poll.ends_at).isBefore(moment().utc())
         }
-        hasVoted={!!userVote}
+        hasVoted={!!userVote && !poll.allow_revotes}
         disableVoteButton={!permissions.allowed || isCreateThreadPage}
         votedFor={userVote?.option || ''}
         proposalTitle={poll.prompt}
@@ -179,6 +186,7 @@ export const ThreadPollCard = ({
         incrementalVoteCast={1}
         isPreview={false}
         tooltipErrorMessage={permissions.tooltip}
+        allowRevotes={poll.allow_revotes}
         onVoteCast={(option, isSelected) => {
           if (option !== undefined) {
             handlePollVote(poll, option, isSelected ?? false);
