@@ -11,8 +11,8 @@ const GoogleSheetsMCP = () => {
   const communityId = app.activeChainId() || '';
 
   const { data: mcpServers = [], isLoading } =
-    trpc.mcp.getPrivateCommunityMCPServers.useQuery(
-      { community_id: communityId },
+    trpc.mcp.getCommunityMcpServers.useQuery(
+      { community_id: communityId, private_only: true },
       { enabled: !!communityId },
     );
 

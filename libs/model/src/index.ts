@@ -11,7 +11,6 @@ export * as Feed from './aggregates/feed';
 export * as GroupSnapshot from './aggregates/groupSnapshot';
 export * as LoadTest from './aggregates/load-testing';
 export * as MCP from './aggregates/mcp';
-export * as MCPServer from './aggregates/mcp-server';
 export * as Poll from './aggregates/poll';
 export * as Quest from './aggregates/quest';
 export * as Reaction from './aggregates/reaction';
@@ -48,10 +47,12 @@ export {
 export { generateImage } from './utils/generateImage';
 export { magicLogin } from './utils/magic';
 export {
+  extractMCPMentions,
   findMentionDiff,
   parseUserMentions,
   uniqueMentions,
 } from './utils/parseUserMentions';
+export type { MCPMention } from './utils/parseUserMentions';
 export { pgMultiRowUpdate } from './utils/pgMultiRowUpdate';
 export {
   createEventRegistryChainNodes,

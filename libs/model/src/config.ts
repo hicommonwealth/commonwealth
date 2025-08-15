@@ -98,6 +98,7 @@ const {
   KLAVIS_API_KEY,
   REORG_SAFETY_DISABLED,
   SEND_EMAILS,
+  MCP_BOT_EMAIL,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -314,6 +315,7 @@ export const config = configure(
     MCP: {
       MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
       MCP_KEY_BYPASS: MCP_KEY_BYPASS,
+      BOT_EMAIL: MCP_BOT_EMAIL || 'mcp@common.xyz',
     },
     LOG_XP_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
     NOTIFICATIONS: {
@@ -690,6 +692,7 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && data),
           'MCP_KEY_BYPASS cannot be set in production',
         ),
+      BOT_EMAIL: z.string(),
     }),
     LOG_XP_LAUNCHPAD: z.boolean().default(false),
     NOTIFICATIONS: z.object({

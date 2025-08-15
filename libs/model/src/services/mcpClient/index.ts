@@ -3,6 +3,7 @@ import { MCPServer } from '@hicommonwealth/schemas';
 import { DEFAULT_COMPLETION_MODEL } from '@hicommonwealth/shared';
 import OpenAI from 'openai';
 import { z } from 'zod';
+import { extractMCPMentions } from '../..';
 
 export type CommonMCPServerWithHeaders = z.infer<typeof MCPServer> & {
   headers?: Record<string, string>;
@@ -14,9 +15,9 @@ const buildSystemPrompt = (
 ) => `You are an AI assistant with access to MCP (Model Context Protocol) servers that provide tools for interacting with Commonwealth communities, threads, users and more.
 
 Available MCP servers and their mention handles:
-${allServers.map((server) => `- @${server.handle}: ${server.name} - ${server.description}`).join('\n')}
+${allServers.map((server) => `- %${server.handle}: ${server.name} - ${server.description}`).join('\n')}
 
-When a user mentions a server handle prefixed with @ (e.g., @common), you should use the MCP tools from that specific server to help answer their question. Multiple servers can be mentioned in a single message.
+When a user mentions a server using the format [%ServerName](/mcp-server/handle/id), you should use the MCP tools from that specific server to help answer their question. Multiple servers can be mentioned in a single message.
 
 If no specific server is mentioned, you can provide general assistance based on your knowledge, but you won't have access to real-time data from the MCP servers.
 
@@ -28,8 +29,15 @@ export function buildMCPClientOptions(
   allServers: CommonMCPServerWithHeaders[],
   previousResponseId: string | null,
 ): OpenAI.Responses.ResponseCreateParamsStreaming {
+  // Extract MCP mentions from user input using the same logic as the MCPWorker policy
+  const extractedMentions = extractMCPMentions(userInput);
+
+  // Match extracted mentions with available servers by handle and id
   const mentionedServers = allServers.filter((server) =>
-    userInput.includes(`@${server.handle}`),
+    extractedMentions.some(
+      (mention) =>
+        mention.handle === server.handle && mention.id === String(server.id),
+    ),
   );
   if (config.APP_ENV === 'local') {
     console.log('mentionedServers: ', mentionedServers);

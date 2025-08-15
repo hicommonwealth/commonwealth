@@ -57,7 +57,25 @@ async function getAllServers(): Promise<CommonMCPServerWithHeaders[]> {
           }
         : undefined,
   }));
-  return dbServers;
+
+  // Handle duplicate handles by adding number suffixes
+  const handleCounts: Map<string, number> = new Map();
+  const processedServers = dbServers.map((server) => {
+    const originalHandle = server.handle;
+    const count = handleCounts.get(originalHandle) || 0;
+    handleCounts.set(originalHandle, count + 1);
+
+    // Add suffix starting from 1 for duplicates
+    const finalHandle =
+      count > 0 ? `${originalHandle}${count}` : originalHandle;
+
+    return {
+      ...server,
+      handle: finalHandle,
+    };
+  });
+
+  return processedServers;
 }
 
 async function startChatBot() {
