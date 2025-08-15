@@ -10,6 +10,7 @@ export type CastVoteProps = {
   timeRemaining: string;
   tooltipErrorMessage: string;
   onVoteCast: (selectedOption?: string, isSelected?: boolean) => void;
+  isRevoting?: boolean;
 };
 
 export const CastVoteSection = ({
@@ -17,7 +18,10 @@ export const CastVoteSection = ({
   onVoteCast,
   timeRemaining,
   tooltipErrorMessage,
+  isRevoting = false,
 }: CastVoteProps) => {
+  const buttonLabel = isRevoting ? 'Update Vote' : 'Vote';
+
   return (
     <div className="CastVoteSection">
       {disableVoteButton ? (
@@ -30,7 +34,7 @@ export const CastVoteSection = ({
               onMouseLeave={handleInteraction}
             >
               <CWButton
-                label="Vote"
+                label={buttonLabel}
                 buttonType="primary"
                 buttonHeight="sm"
                 disabled={disableVoteButton}
@@ -41,7 +45,7 @@ export const CastVoteSection = ({
         />
       ) : (
         <CWButton
-          label="Vote"
+          label={buttonLabel}
           buttonType="primary"
           buttonHeight="sm"
           disabled={disableVoteButton}

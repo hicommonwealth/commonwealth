@@ -12,6 +12,7 @@ export interface LocalPoll {
   community_id?: string;
   custom_duration?: string;
   ends_at: Date | undefined;
+  allow_revotes?: boolean;
   votes: [];
 }
 

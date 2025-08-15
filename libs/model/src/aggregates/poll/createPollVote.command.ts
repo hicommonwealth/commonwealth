@@ -44,14 +44,13 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
         address.address,
       );
 
-      // findOrCreate doesn't work because `poll_id` and `option` not
-      // optional in the Vote schema
       let vote = await models.Vote.findOne({
         where: {
           poll_id: payload.poll_id,
           address: address.address,
         },
       });
+
       if (!vote) {
         vote = await models.Vote.create({
           poll_id: payload.poll_id,
@@ -62,6 +61,12 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
           calculated_voting_weight: calculated_voting_weight?.toString(),
           option: payload.option,
         });
+      } else if (poll.allow_revotes) {
+        vote.option = payload.option;
+        vote.calculated_voting_weight = calculated_voting_weight?.toString();
+        await vote.save();
+      } else {
+        throw new InvalidState('User has already voted in this poll');
       }
 
       return vote.toJSON();

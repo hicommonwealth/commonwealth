@@ -41,6 +41,18 @@
       gap: 4px;
       width: 100%;
     }
+
+    .poll-title-and-badge {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+
+      .poll-revotable-badge {
+        flex-shrink: 0;
+      }
+    }
   }
 
   .poll-voting-section {

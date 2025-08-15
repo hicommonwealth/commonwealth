@@ -70,6 +70,7 @@ export const PollEditorModal = ({
     `${DEFAULT_POLL_DURATION}`,
   );
   const [customDurationEnabled, setCustomDurationEnabled] = useState(false);
+  const [allowRevotes, setAllowRevotes] = useState(false);
   const [options, setOptions] = useState(TWO_EMPTY_OPTIONS);
   const [prompt, setPrompt] = useState('');
   const modalContainerRef = useRef(null);
@@ -134,6 +135,7 @@ export const PollEditorModal = ({
               ? null
               : parseInt(customDuration)
             : DEFAULT_POLL_DURATION,
+          allow_revotes: allowRevotes,
         }).catch(console.error);
 
         notifySuccess('Poll creation succeeded');
@@ -148,6 +150,7 @@ export const PollEditorModal = ({
             ends_at: parsedDuration
               ? moment().add(parsedDuration, 'days').toDate()
               : undefined,
+            allow_revotes: allowRevotes,
             votes: [],
           },
         ]);
@@ -227,6 +230,17 @@ export const PollEditorModal = ({
                   />
                 )}
               </div>
+            </div>
+            <div className="allow-revotes-row">
+              <CWCheckbox
+                label="Allow vote updates"
+                checked={allowRevotes}
+                onChange={() => setAllowRevotes((prev) => !prev)}
+                value=""
+              />
+              <CWText type="caption" className="poll-revotes-text">
+                When enabled, voters can change their selection after voting.
+              </CWText>
             </div>
           </CWModalBody>
           <CWModalFooter>

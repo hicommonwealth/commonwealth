@@ -20,6 +20,11 @@ export default (
       prompt: { type: Sequelize.STRING, allowNull: false },
       options: { type: Sequelize.ARRAY(Sequelize.STRING), allowNull: false },
       ends_at: { type: Sequelize.DATE, allowNull: true },
+      allow_revotes: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
 
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: true },
