@@ -8,7 +8,7 @@ export async function __get_suinft_balances(
   rpcEndpoint: string,
   options: GetSuiNftBalanceOptions,
 ): Promise<Balances> {
-  const collectionId = options.sourceOptions.collectionId;
+  const collectionId = options.sourceOptions.collectionId.split('::')[0];
 
   const client = new SuiClient({ url: rpcEndpoint });
   const balances: Balances = {};
