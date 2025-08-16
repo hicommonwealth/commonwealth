@@ -6,7 +6,7 @@ import { Topic } from './topic.schemas';
 import { Address, USER_TIER } from './user.schemas';
 
 export const Link = z.object({
-  source: z.nativeEnum(LinkSource),
+  source: z.enum(LinkSource),
   identifier: z.string(),
   title: z.string().nullable().optional(),
 });

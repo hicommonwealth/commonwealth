@@ -62,7 +62,7 @@
 
         .cwsl__value-container {
           .cwsl__single-value,
-          .cwsl__single-value>div {
+          .cwsl__single-value > div {
             width: 100% !important;
             display: flex !important;
             flex-direction: row !important;
@@ -96,7 +96,6 @@
           }
         }
 
-
         .cwsl__indicators {
           display: none !important;
         }
@@ -120,5 +119,4 @@
       }
     }
   }
-
 }

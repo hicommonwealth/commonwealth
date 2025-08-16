@@ -35,7 +35,7 @@ describe('Digest email lifecycle', () => {
           user_id: authorUser!.id,
         },
       ],
-      topics: [{}],
+      topics: [{ name: 'digest-test-topic1' }],
     });
     [communityTwo] = await seed('Community', {
       tier: CommunityTierMap.ChainVerified,
@@ -48,7 +48,7 @@ describe('Digest email lifecycle', () => {
           user_id: authorUser!.id,
         },
       ],
-      topics: [{}],
+      topics: [{ name: 'digest-test-topic2' }],
     });
     // create an additional community to ensure only specific threads are selected
     [communityThree] = await seed('Community', {
@@ -62,7 +62,7 @@ describe('Digest email lifecycle', () => {
           user_id: authorUser!.id,
         },
       ],
-      topics: [{}],
+      topics: [{ name: 'digest-test-topic3' }],
     });
   });
 

@@ -37,6 +37,7 @@ describe('allow_tokenized_threads lifecycle', () => {
     });
     await seed('Topic', {
       community_id,
+      name: 'test',
       id: topic_id,
       allow_tokenized_threads: false,
     });

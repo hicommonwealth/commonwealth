@@ -28,7 +28,7 @@
     "@hicommonwealth/core": "workspace:*",
     "graphql": "^16.9.0",
     "graphql-request": "^7.1.0",
-    "zod": "^3.25.46"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.7",

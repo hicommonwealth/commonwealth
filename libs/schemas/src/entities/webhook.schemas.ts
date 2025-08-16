@@ -12,7 +12,7 @@ export const WebhookSupportedEvents = z.union([
 export const Webhook = z.object({
   id: PG_INT.optional(),
   url: z.string(),
-  destination: z.nativeEnum(WebhookDestinations),
+  destination: z.enum(WebhookDestinations),
   events: z.array(WebhookSupportedEvents),
   community_id: z.string(),
   created_at: z.coerce.date().optional(),

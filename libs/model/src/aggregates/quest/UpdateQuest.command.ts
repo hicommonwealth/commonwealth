@@ -165,7 +165,7 @@ async function updateChannelQuest(
       );
       log.trace(`Created quest tweet ${tweetId} for quest ${quest.id}`);
       const job = await scheduleTask(
-        GraphileTaskNames.AwardTwitterQuestXp,
+        GraphileTaskNames.AwardTwitterEngagementXp,
         {
           quest_id: quest.id!,
           quest_ended: true,

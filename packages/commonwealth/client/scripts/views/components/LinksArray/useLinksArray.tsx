@@ -36,7 +36,7 @@ const useLinksArray = ({
       return '';
     } catch (e: any) {
       const zodError = e as ZodError;
-      return zodError.errors[0].message || VALIDATION_MESSAGES.INVALID_INPUT;
+      return zodError.message || VALIDATION_MESSAGES.INVALID_INPUT;
     }
   };
 

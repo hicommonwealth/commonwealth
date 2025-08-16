@@ -212,6 +212,7 @@ const DiscussionsPage = () => {
     if (isInitialLoading || !data) return;
     const threads = sortPinned(
       sortByFeaturedFilter(
+        // @ts-expect-error User is required in one of the results
         data.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [],
         featuredFilter,
       ),

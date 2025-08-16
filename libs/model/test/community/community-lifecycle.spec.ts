@@ -275,6 +275,7 @@ describe('Community lifecycle', () => {
       handle: 'mcp',
       source: 'test',
       server_url: 'https://mcp.example.com',
+      source_identifier: 'test',
     });
     mcpServer = server!;
   });

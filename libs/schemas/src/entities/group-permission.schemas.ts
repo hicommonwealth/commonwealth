@@ -6,7 +6,7 @@ export const GroupGatedAction = z.object({
   group_id: PG_INT,
   topic_id: PG_INT,
   is_private: z.boolean(),
-  gated_actions: z.array(z.nativeEnum(GatedActionEnum)),
+  gated_actions: z.array(z.enum(GatedActionEnum)),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });

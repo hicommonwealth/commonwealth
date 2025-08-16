@@ -84,7 +84,7 @@ export const AllowlistData = z.object({
 
 export const TrustLevelData = z.object({
   minimum_trust_level: USER_TIER,
-  sso_required: z.array(z.nativeEnum(WalletSsoSource)).optional(),
+  sso_required: z.array(z.enum(WalletSsoSource)).optional(),
 });
 
 export const Requirement = z.union([
@@ -153,7 +153,7 @@ export const GroupSnapshot = z.object({
   group_id: z.number(),
   block_height: z.bigint().nullable(),
   snapshot_source: z.string(),
-  balance_map: z.record(z.string()),
+  balance_map: z.record(z.string(), z.string()),
   group_requirements: z.array(Requirement),
   status: z.enum(['active', 'superseded']),
   error_message: z.string().nullable(),

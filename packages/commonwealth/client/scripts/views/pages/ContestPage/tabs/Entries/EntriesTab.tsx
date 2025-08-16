@@ -61,6 +61,7 @@ const EntriesTab = ({
 
   // TODO: Replace Thread with ThreadView -> should we use Memo here?
   const sortedThreads = sortByFeaturedFilter(
+    // @ts-expect-error User is required in one of the results
     threads?.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [],
     threadSort,
   );

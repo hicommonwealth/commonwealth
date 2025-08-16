@@ -38,7 +38,7 @@ export const communityChains = {
 
 export const communityTypes = Object.keys(CommunityType) as CommunityType[];
 
-const getPickedKeys = (schema: z.AnyZodObject) => {
+const getPickedKeys = (schema: z.ZodObject) => {
   return Object.keys(schema.shape);
 };
 

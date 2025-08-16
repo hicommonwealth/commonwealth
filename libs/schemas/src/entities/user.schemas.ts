@@ -39,7 +39,7 @@ export const ProfileTags = z.object({
   Tag: Tags.nullish(),
 });
 
-export const USER_TIER = z.nativeEnum(UserTierMap);
+export const USER_TIER = z.enum(UserTierMap);
 
 export const EmailNotificationInterval = z.enum([
   'never',
@@ -91,7 +91,7 @@ export const Address = z.object({
   verified: z.date().nullish(),
   last_active: z.date().nullish(),
   ghost_address: z.boolean().default(false),
-  wallet_id: z.nativeEnum(WalletId).nullish(),
+  wallet_id: z.enum(WalletId).nullish(),
   block_info: z.string().max(255).nullish(),
   role: z.enum(Roles).default('member'),
   is_banned: z.boolean().default(false),

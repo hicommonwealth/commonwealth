@@ -41,7 +41,7 @@ const useSocialLinks = () => {
         const zodError = e as ZodError;
         updatedSocialLinks[index] = {
           ...updatedSocialLinks[index],
-          error: zodError.errors[0].message,
+          error: zodError.message,
         };
       }
     });
@@ -71,7 +71,7 @@ const useSocialLinks = () => {
       const zodError = e as ZodError;
       updatedSocialLinks[index] = {
         ...updatedSocialLinks[index],
-        error: zodError.errors[0].message,
+        error: zodError.message,
       };
     }
     setSocialLinks([...updatedSocialLinks]);

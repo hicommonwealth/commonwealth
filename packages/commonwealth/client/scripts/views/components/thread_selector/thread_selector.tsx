@@ -44,6 +44,7 @@ export const ThreadSelector = ({
   const searchResults = useMemo(() => {
     // TODO: replace Thread with ThreadView
     return (
+      // @ts-expect-error User is required in one of the results
       threadsData?.pages.flatMap((p) => p.results.map((t) => new Thread(t))) ||
       []
     );

@@ -129,8 +129,8 @@ export const QuestActionMeta = z
     reward_amount: z.number(),
     creator_reward_weight: z.number().min(0).max(1).default(0),
     amount_multiplier: z.number().min(0).nullish(),
-    participation_limit: z.nativeEnum(QuestParticipationLimit).nullish(),
-    participation_period: z.nativeEnum(QuestParticipationPeriod).nullish(),
+    participation_limit: z.enum(QuestParticipationLimit).nullish(),
+    participation_period: z.enum(QuestParticipationPeriod).nullish(),
     instructions_link: z.string().url().optional().nullish(),
     participation_times_per_period: z.number().nullish(),
     content_id: z
@@ -155,7 +155,7 @@ export const QuestScore = z
   .object({
     user_id: PG_INT,
     points: z.number(),
-    period: z.nativeEnum(QuestParticipationPeriod).optional(),
+    period: z.enum(QuestParticipationPeriod).optional(),
   })
   .describe('Value type with user total/period score');
 

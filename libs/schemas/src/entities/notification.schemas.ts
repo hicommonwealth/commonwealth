@@ -18,7 +18,7 @@ export const NotificationCategory = z.object({
 export const Subscription = z.object({
   id: PG_INT,
   subscriber_id: PG_INT,
-  category_id: z.nativeEnum(NotificationCategories),
+  category_id: z.enum(NotificationCategories),
   is_active: z.boolean().default(true),
   immediate_email: z.boolean().default(false),
   community_id: z.string().max(255).optional().nullable(),

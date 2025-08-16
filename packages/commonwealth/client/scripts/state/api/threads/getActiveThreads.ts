@@ -22,6 +22,7 @@ const useGetActiveThreadsQuery = ({
     {
       staleTime: GET_THREADS_STALE_TIME,
       enabled,
+      // @ts-expect-error User is required in one of the results
       select: (data) => data.map((t) => new Thread(t)),
     },
   );

@@ -89,6 +89,7 @@ describe('Upgrade Tiers lifecycle', () => {
 
     const [topic1] = await seed('Topic', {
       id: 1,
+      name: 'test',
       community_id: community1!.id,
     });
 

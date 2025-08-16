@@ -45,8 +45,8 @@ export const CreateCommunity = {
     social_links: z.array(z.string().url()).default([]),
     tags: z.array(z.string()).default([]), // community tags are dynamic, tags should be validated in service method
     directory_page_enabled: z.boolean().default(false),
-    type: z.nativeEnum(ChainType).default(ChainType.Offchain),
-    base: z.nativeEnum(ChainBase),
+    type: z.enum(ChainType).default(ChainType.Offchain),
+    base: z.enum(ChainBase),
     allow_tokenized_threads: z.boolean().optional(),
     thread_purchase_token: z.string().optional(),
 
@@ -281,7 +281,7 @@ export const CreateGroup = {
         z.object({
           id: PG_INT,
           is_private: z.boolean().optional(),
-          permissions: z.array(z.nativeEnum(GatedActionEnum)),
+          permissions: z.array(z.enum(GatedActionEnum)),
         }),
       )
       .optional(),
@@ -319,7 +319,7 @@ export const UpdateGroup = {
         z.object({
           id: PG_INT,
           is_private: z.boolean().optional(),
-          permissions: z.array(z.nativeEnum(GatedActionEnum)),
+          permissions: z.array(z.enum(GatedActionEnum)),
         }),
       )
       .optional(),
@@ -414,10 +414,10 @@ export const JoinCommunity = {
   }),
   output: z.object({
     community_id: z.string(),
-    base: z.nativeEnum(ChainBase),
+    base: z.enum(ChainBase),
     address_id: z.number(),
     address: z.string(),
-    wallet_id: z.nativeEnum(WalletId).optional(),
+    wallet_id: z.enum(WalletId).optional(),
     ss58Prefix: z.number().optional(),
   }),
   context: VerifiedContext,
@@ -489,7 +489,7 @@ export const ToggleCommunityStar = {
 export const SetAddressWallet = {
   input: z.object({
     community_id: z.string(),
-    wallet_id: z.nativeEnum(WalletId),
+    wallet_id: z.enum(WalletId),
   }),
   output: z.boolean(),
   context: AuthContext,

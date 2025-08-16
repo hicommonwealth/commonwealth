@@ -2,7 +2,7 @@ import { type AuthStrategies, type User } from '@hicommonwealth/core';
 import { TRPCError, initTRPC } from '@trpc/server';
 import type { Request } from 'express';
 import passport from 'passport';
-import type { OpenApiMeta } from 'trpc-swagger';
+import { OpenApiMeta } from 'trpc-to-openapi';
 import { ZodType, z } from 'zod';
 import { config } from '../config';
 import type { BuildProcOptions, Context, Metadata } from './types';
@@ -111,14 +111,9 @@ export const buildproc = <Input extends ZodType, Output extends ZodType>({
         description: md.input.description, // zod property description
         path: `/${name}`,
         tags: [tag],
-        headers: [
-          {
-            in: 'header',
-            name: 'address',
-            required: false,
-            schema: { type: 'string' },
-          },
-        ],
+        requestHeaders: z.object({
+          address: z.string().optional(),
+        }),
         protect: secure,
       },
     })

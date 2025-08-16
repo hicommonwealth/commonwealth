@@ -18,27 +18,30 @@ describe('messageRelayer', { timeout: 20_000 }, () => {
   test('should correctly increment number of unrelayed events on startup', async () => {
     await models.Outbox.bulkCreate([
       {
-        event_name: 'ChainEventCreated',
+        event_name: 'XpChainEventCreated',
         event_payload: {
           event_name: 'ChainEventCreated',
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
+        created_at: new Date(),
         relayed: true,
       },
       {
-        event_name: 'ChainEventCreated',
+        event_name: 'XpChainEventCreated',
         event_payload: {
           event_name: 'ChainEventCreated',
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
+        created_at: new Date(),
         relayed: false,
       },
       {
-        event_name: 'ChainEventCreated',
+        event_name: 'XpChainEventCreated',
         event_payload: {
           event_name: 'ChainEventCreated',
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
+        created_at: new Date(),
         relayed: false,
       },
     ]);

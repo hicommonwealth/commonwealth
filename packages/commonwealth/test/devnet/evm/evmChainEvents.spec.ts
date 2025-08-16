@@ -453,16 +453,19 @@ describe('EVM Chain Events Devnet Tests', () => {
           ).to.be.true;
         }
 
+        // @ts-expect-error eventSource not found in event payload
         expect(events[0].event_payload.eventSource).to.deep.equal({
           ethChainId: chainNode.eth_chain_id!,
           eventSignature: EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
         });
         eventSchemas.NamespaceDeployed.parse(events[0].event_payload);
+        // @ts-expect-error eventSource not found in event payload
         expect(events[1].event_payload.eventSource).to.deep.equal({
           ethChainId: chainNode.eth_chain_id!,
           eventSignature: EvmEventSignatures.CommunityStake.Trade,
         });
         eventSchemas.CommunityStakeTrade.parse(events[1].event_payload);
+        // @ts-expect-error eventSource not found in event payload
         expect(events[2].event_payload.eventSource).to.deep.equal({
           ethChainId: chainNode.eth_chain_id!,
           eventSignature: EvmEventSignatures.CommunityStake.Trade,
@@ -571,6 +574,7 @@ describe('EVM Chain Events Devnet Tests', () => {
       expect(events.length).to.equal(1);
       expect(events[0].event_name).to.equal('NamespaceDeployed');
 
+      // @ts-expect-error eventSource not found in event payload
       expect(events[0].event_payload.eventSource).to.deep.equal({
         ethChainId: chainNode.eth_chain_id!,
         eventSignature: EvmEventSignatures.NamespaceFactory.NamespaceDeployed,

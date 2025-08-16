@@ -49,6 +49,7 @@ describe('User lifecycle', () => {
 
   beforeAll(async () => {
     const { community, actors } = await seedCommunity({
+      id: 'user-lifecycle-test-community',
       roles: ['admin', 'member', 'superadmin'],
     });
     community_id = community!.id;
@@ -1073,7 +1074,7 @@ describe('User lifecycle', () => {
         actor: admin,
         payload: {},
       });
-      logTable(logs.sort((a, b) => b.xp_points - a.xp_points));
+      logTable(logs.sort((a, b) => b.user_id - a.user_id));
 
       const xps1 = await query(GetXpsRanked(), {
         actor: admin,
