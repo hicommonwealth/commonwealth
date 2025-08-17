@@ -1,15 +1,20 @@
+import moment from 'moment';
 import React from 'react';
 
 import { handleRedirectClicks } from 'helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
+import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
+import Permissions from 'utils/Permissions';
 import { SidebarSectionGroup } from '../sidebar_section';
 import type { SectionGroupAttrs, SidebarSectionAttrs } from '../types';
 import { useSidebarTreeToggle } from '../useSidebarTreeToggle';
 
 const AdminSection = () => {
   const communityId = app.activeChainId() || '';
+
+  const { data: community } = useGetCommunityByIdQuery({ id: communityId });
 
   const navigate = useCommonNavigate();
   const location = useLocation();
@@ -187,6 +192,19 @@ const AdminSection = () => {
     },
   ];
 
+  const isAdmin = React.useMemo(
+    () => Permissions.isSiteAdmin() || Permissions.isCommunityAdmin(community),
+    [community],
+  );
+  const isNewCommunity = React.useMemo(() => {
+    if (!community?.created_at) {
+      return false;
+    }
+    return moment(community.created_at).isAfter(moment().subtract(24, 'hours'));
+  }, [community?.created_at]);
+
+  const shouldShowNewTag = isAdmin && isNewCommunity;
+
   const sidebarSectionData: SidebarSectionAttrs = {
     title: 'Admin Capabilities',
     className: 'AdminSection',
@@ -198,6 +216,7 @@ const AdminSection = () => {
     displayData: adminGroupData,
     isActive: true,
     toggleDisabled: false,
+    isNew: shouldShowNewTag,
   };
 
   return <SidebarSectionGroup {...sidebarSectionData} />;
