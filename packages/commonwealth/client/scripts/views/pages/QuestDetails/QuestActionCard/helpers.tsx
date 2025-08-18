@@ -30,8 +30,9 @@ const binanceWalletCopy = (
     <ol>
       <li>1. Open Binance Wallet app</li>
       <li>2. Create your account or sign in</li>
-      <li>3. Connect your wallet to Common</li>
-      <li>4. Complete the signup process</li>
+      <li>3. Click on wallet tab</li>
+      <li>4. Visit Common</li>
+      <li>5. Complete the signup/signin process to earn Aura</li>
     </ol>
     <br />
     Visit Binance to explore more onchain:{' '}
