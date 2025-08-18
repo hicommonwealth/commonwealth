@@ -137,11 +137,11 @@ async function recordXpsForQuest({
         continue;
     }
     // get logged actions for this user and action meta
-    const log = await models.XpLog.findAll({
+    const xpLog = await models.XpLog.findAll({
       where: { user_id, action_meta_id: action_meta.id },
     });
     // validate action participation
-    if (log.length > 0) {
+    if (xpLog.length > 0) {
       if (
         (action_meta.participation_limit ??
           QuestParticipationLimit.OncePerQuest) ===
@@ -157,7 +157,7 @@ async function recordXpsForQuest({
           : action_meta.participation_period === QuestParticipationPeriod.Weekly
             ? 'week'
             : 'day';
-      const actions_in_period = log.filter((l) =>
+      const actions_in_period = xpLog.filter((l) =>
         isWithinPeriod(event_created_at, l.created_at, period),
       );
       if (actions_in_period.length >= tpp) continue;
