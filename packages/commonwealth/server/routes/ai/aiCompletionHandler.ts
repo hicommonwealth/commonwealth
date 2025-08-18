@@ -1,10 +1,17 @@
 import { logger } from '@hicommonwealth/core';
+import { extractMCPMentions } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import {
+  buildMCPClientOptions,
+  CommonMCPServerWithHeaders,
+} from '@hicommonwealth/model/services';
 import {
   CompletionOptions,
   DEFAULT_COMPLETION_MODEL,
 } from '@hicommonwealth/shared';
 import { Request, Response } from 'express';
 import { OpenAI } from 'openai';
+import { Op } from 'sequelize';
 import { config } from '../../config';
 import { extractOpenRouterError } from './utils';
 
@@ -18,9 +25,57 @@ interface StructuredPrompt {
 type RequestBody = Omit<CompletionOptions, 'prompt'> & {
   prompt: string | StructuredPrompt;
   contextualMentions?: boolean;
+  communityId?: string;
 };
 
 const log = logger(import.meta);
+
+/**
+ * Gets all available MCP servers for a community
+ * @param communityId The community ID
+ * @returns Array of MCP servers with headers
+ */
+async function getAllMCPServers(
+  communityId: string,
+): Promise<CommonMCPServerWithHeaders[]> {
+  const mcpServers = await models.MCPServer.scope('withPrivateData').findAll({
+    where: {
+      private_community_id: {
+        [Op.or]: [communityId, null],
+      },
+    },
+  });
+
+  return mcpServers.map((server) => ({
+    ...server.toJSON(),
+    headers: {}, // Add any necessary headers for authentication
+  }));
+}
+
+/**
+ * Finds MCP servers that are mentioned in the text
+ * @param text The text to parse
+ * @param allServers All available MCP servers for the community
+ * @returns Array of mentioned MCP servers
+ */
+function findMentionedMCPServers(
+  text: string,
+  allServers: CommonMCPServerWithHeaders[],
+): CommonMCPServerWithHeaders[] {
+  const extractedMentions = extractMCPMentions(text);
+
+  if (extractedMentions.length === 0) {
+    return [];
+  }
+
+  // Match extracted mentions with available servers by handle and id
+  return allServers.filter((server) =>
+    extractedMentions.some(
+      (mention) =>
+        mention.handle === server.handle && mention.id === String(server.id),
+    ),
+  );
+}
 
 export const aiCompletionHandler = async (req: Request, res: Response) => {
   const requestId = Math.random().toString(36).substr(2, 9);
@@ -41,6 +96,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       stream = true,
       useOpenRouter = false,
       useWebSearch = false,
+      communityId,
     } = req.body as RequestBody;
 
     let finalUserPrompt: string;
@@ -74,8 +130,47 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       });
     }
 
-    // Choose between OpenAI and OpenRouter
-    const useOR = useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true';
+    // Check for MCP mentions and determine if we should use MCP path
+    let useMCPPath = false;
+    let mentionedMCPServers: CommonMCPServerWithHeaders[] = [];
+
+    if (communityId) {
+      try {
+        const allServers = await getAllMCPServers(communityId);
+        mentionedMCPServers = findMentionedMCPServers(
+          finalUserPrompt,
+          allServers,
+        );
+        useMCPPath = mentionedMCPServers.length > 0;
+
+        if (useMCPPath) {
+          const extractedMentions = extractMCPMentions(finalUserPrompt);
+          log.info(
+            `[${requestId}] MCP path enabled with mentions: ${extractedMentions
+              .map((m) => `${m.handle}(${m.id})`)
+              .join(', ')}`,
+          );
+        }
+      } catch (mcpError) {
+        log.error(`[${requestId}] Error checking MCP servers:`, mcpError);
+        // Continue with regular path if MCP check fails
+      }
+    }
+
+    // MCP path only supports OpenAI, not OpenRouter
+    if (
+      useMCPPath &&
+      (useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true')
+    ) {
+      return res.status(400).json({
+        error: 'MCP features are only available with OpenAI, not OpenRouter',
+      });
+    }
+
+    // Choose between OpenAI and OpenRouter (unless using MCP path)
+    const useOR = useMCPPath
+      ? false
+      : useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true';
     const apiKey = useOR
       ? config.OPENAI.OPENROUTER_API_KEY
       : config.OPENAI.API_KEY;
@@ -138,6 +233,120 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     };
 
     const openai = new OpenAI(openAIConfig);
+
+    // Handle MCP path separately with OpenAI responses API
+    if (useMCPPath) {
+      log.info(
+        `[${requestId}] Using MCP path with ${mentionedMCPServers.length} servers`,
+      );
+
+      try {
+        // Build MCP client options using the same logic as MCPWorker
+        const mcpOptions = buildMCPClientOptions(
+          finalUserPrompt,
+          mentionedMCPServers,
+          null, // no previous response ID for now
+        );
+
+        // Override any model settings to ensure consistency
+        mcpOptions.model = model || DEFAULT_COMPLETION_MODEL;
+        // Note: OpenAI Responses API doesn't support temperature or max_tokens
+        // These parameters are controlled by the model's default settings
+
+        // Force streaming for MCP path to match expected behavior
+        mcpOptions.stream = true;
+
+        log.info(
+          `[${requestId}] Creating MCP response with model: ${mcpOptions.model}`,
+        );
+
+        if (stream) {
+          // Set proper headers for streaming
+          res.setHeader('Content-Type', 'text/plain');
+          res.setHeader('Cache-Control', 'no-cache');
+          res.setHeader('X-Accel-Buffering', 'no');
+
+          const response = await openai.responses.create(mcpOptions);
+
+          let chunkCount = 0;
+          let totalContentLength = 0;
+
+          for await (const event of response) {
+            chunkCount++;
+
+            if (event.type === 'response.output_text.delta') {
+              const contentToStream = event.delta || '';
+
+              if (contentToStream) {
+                totalContentLength += contentToStream.length;
+
+                try {
+                  res.write(contentToStream);
+                  if (res.flush) res.flush();
+
+                  if (chunkCount % 10 === 0) {
+                    log.info(`[${requestId}] MCP streaming progress`, {
+                      chunkCount,
+                      totalContentLength,
+                      lastChunkSize: contentToStream.length,
+                    });
+                  }
+                } catch (writeError) {
+                  log.error(
+                    `[${requestId}] Error writing MCP chunk ${chunkCount}:`,
+                    writeError,
+                  );
+                  throw writeError;
+                }
+              }
+            }
+          }
+
+          log.info(`[${requestId}] MCP streaming completed successfully`, {
+            totalChunks: chunkCount,
+            totalContentLength,
+          });
+
+          res.end();
+          return;
+        } else {
+          // For non-streaming MCP requests, we still need to use the streaming API
+          // and collect the full response
+          const response = await openai.responses.create(mcpOptions);
+
+          let responseText = '';
+          for await (const event of response) {
+            if (event.type === 'response.output_text.delta') {
+              const deltaText = event.delta || '';
+              responseText += deltaText;
+            }
+          }
+
+          const finalResponse =
+            responseText ||
+            'I apologize, but I was unable to generate a response.';
+
+          res.json({
+            completion: finalResponse,
+          });
+          return;
+        }
+      } catch (mcpError) {
+        log.error(`[${requestId}] Error in MCP path:`, mcpError);
+
+        if (!res.headersSent) {
+          const error = mcpError as Error & { status?: number };
+          return res.status(error.status || 500).json({
+            error: error.message || 'MCP completion failed',
+            status: error.status || 500,
+          });
+        }
+
+        res.write('\nError during MCP processing');
+        res.end();
+        return;
+      }
+    }
 
     if (stream) {
       log.info(`[${requestId}] Setting up streaming response`);

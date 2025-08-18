@@ -126,6 +126,7 @@ ${contextualData}
         const requestBody: Partial<CompletionOptions> & {
           jwt?: string | null;
           prompt: string;
+          communityId?: string;
         } = {
           prompt: userPrompt,
           model: options?.model || DEFAULT_COMPLETION_MODEL,
@@ -136,6 +137,7 @@ ${contextualData}
           ...(typeof options?.useWebSearch === 'boolean'
             ? { useWebSearch: options.useWebSearch }
             : {}),
+          ...(options?.communityId && { communityId: options.communityId }),
         };
 
         if (typeof options?.temperature === 'number') {
