@@ -38,6 +38,10 @@
   height: 0;
   margin-top: -16px;
 
+  .btn-border {
+    margin: 0 !important;
+  }
+
   &.hasAppliedFilter {
     margin-top: initial;
     height: auto;
