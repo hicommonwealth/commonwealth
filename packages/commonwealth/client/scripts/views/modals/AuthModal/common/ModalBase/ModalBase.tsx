@@ -109,6 +109,7 @@ const ModalBase = ({
   const copy = MODAL_COPY[layoutType];
 
   const partnershipWalletEnabled = useFlag('partnershipWallet');
+  const gateWalletEnabled = useFlag('gateWallet');
   const crecimientoHackathonEnabled = useFlag('crecimientoHackathon');
 
   const { farcasterContext, signInToFarcasterFrame } = useFarcasterStore();
@@ -186,15 +187,16 @@ const ModalBase = ({
   const suiWallets = filterWalletNames(ChainBase.Sui);
   const getEVMWalletsForMainModal = () => {
     const configEvmWallets: string[] = [];
+    if (isGateWalletAvailable && gateWalletEnabled) {
+      configEvmWallets.push('gate');
+    }
+
     if (partnershipWalletEnabled) {
       if (isOkxWalletAvailable) {
         configEvmWallets.push('okx');
       }
       if (isBinanceWalletAvailable) {
         configEvmWallets.push('binance');
-      }
-      if (isGateWalletAvailable) {
-        configEvmWallets.push('gate');
       }
     }
     if (hasWalletConnect) {

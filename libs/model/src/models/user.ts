@@ -11,8 +11,6 @@ import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import { TopicSubscriptionAttributes } from './topic_subscription';
 import type { ModelInstance } from './types';
 
-export type EmailNotificationInterval = 'weekly' | 'never';
-
 export type UserAttributes = z.infer<typeof User> & {
   selectedCommunity?: CommunityAttributes;
   Addresses?: AddressAttributes[];

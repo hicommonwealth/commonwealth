@@ -2,7 +2,7 @@ import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { AuthContext, VerifiedContext } from '../context';
-import { Address, User } from '../entities';
+import { Address, EmailNotificationInterval, User } from '../entities';
 
 export const SignIn = {
   input: z.object({
@@ -115,7 +115,7 @@ export const UpdateSettings = {
   input: z.object({
     disable_rich_text: z.boolean().optional(),
     enable_promotional_emails: z.boolean().optional(),
-    email_interval: z.enum(['never', 'weekly']).optional(),
+    email_interval: EmailNotificationInterval.optional(),
   }),
   output: z.boolean(),
   context: VerifiedContext,

@@ -1,4 +1,5 @@
 import type { Session } from '@canvas-js/interfaces';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import {
   ChainBase,
   DEFAULT_NAME,
@@ -46,6 +47,7 @@ import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar
 import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
+import { getMagicForChain } from 'utils/magicNetworkUtils';
 import { EIP1193Provider } from 'viem';
 import usePrivyEmailDialogStore, {
   emailDialogStore,
@@ -117,8 +119,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   useEffect(() => {
     connectedWalletRef.current = connectedWallet;
   }, [connectedWallet]);
-
-  const magic = new Magic(configurationData!.MAGIC_PUBLISHABLE_KEY);
 
   const isWalletConnectEnabled = _.some(
     wallets,
@@ -884,11 +884,21 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     props?.onModalClose?.();
   };
 
-  const openMagicWallet = async () => {
+  const openMagicWallet = async (targetEthChainId = ValidChains.Base) => {
     try {
-      await magic.wallet.showUI();
+      // try to open for the specified chain
+      const chainMagic = getMagicForChain(targetEthChainId);
+      if (chainMagic) {
+        await chainMagic.wallet.showUI();
+        return;
+      }
+
+      // fallback to open for default chain
+      const fallback = new Magic(configurationData!.MAGIC_PUBLISHABLE_KEY);
+      await fallback.wallet.showUI();
     } catch (error) {
       console.trace(error);
+      notifyError('Failed to open magic wallet!');
     }
   };
 
