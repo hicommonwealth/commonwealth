@@ -22,8 +22,13 @@ const binanceWalletCopy = (
       iOS
     </a>{' '}
     — View{' '}
-    <a href="#" target="_blank" rel="noreferrer">
-      demo
+    <a
+      // eslint-disable-next-line max-len
+      href="https://docs.common.xyz/commonwealth/commonaura/commonaura/season-2/season-2-week-1/system-quest-4-or-binance-wallet"
+      target="_blank"
+      rel="noreferrer"
+    >
+      demo docs
     </a>
     <br />
     Steps to complete:
