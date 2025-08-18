@@ -1,3 +1,4 @@
+import { MCP_MENTION_SYMBOL } from '@hicommonwealth/shared';
 import { DeltaStatic } from 'quill';
 import { useCallback } from 'react';
 import {
@@ -23,8 +24,11 @@ const MENTION_PATTERNS = {
   community: /\[~([^\]]+)\]\(\/([^)]+)\)/g,
   // [ProposalTitle](/proposal/proposalId)
   proposal: /\[([^\]]+)\]\(\/proposal\/([^)]+)\)/g,
-  // [%MCPServerName](/mcp-server/serverHandle/id)
-  mcp_server: /\[%([^\]]+)\]\(\/mcp-server\/([^\/]+)\/([^)]+)\)/g,
+  // [/MCPServerName](/mcp-server/serverHandle/id)
+  mcp_server: new RegExp(
+    `\\[\\${MCP_MENTION_SYMBOL}([^\\]]+)\\]\\(\\/mcp-server\\/([^\\/]+)\\/([^)]+)\\)`,
+    'g',
+  ),
 };
 
 const mentionConfigs = [
@@ -76,7 +80,10 @@ export const useMentionExtractor = () => {
               id: match[3], // ID is the third capture group
               type,
               name: match[1], // Name is the first capture group
-              link: getLinkPath(match[2], match[3]), // Pass handle and id
+              link: (getLinkPath as (handle: string, id: string) => string)(
+                match[2],
+                match[3],
+              ), // Pass handle and id
             });
           } else {
             // Handle other patterns with 2 capture groups: name, id
@@ -84,7 +91,7 @@ export const useMentionExtractor = () => {
               id: match[2],
               type,
               name: match[1],
-              link: getLinkPath(match[2]),
+              link: (getLinkPath as (id: string) => string)(match[2]),
             });
           }
         }

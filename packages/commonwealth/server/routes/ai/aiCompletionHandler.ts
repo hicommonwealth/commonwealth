@@ -241,7 +241,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       );
 
       try {
-        // Build MCP client options using the same logic as MCPWorker
+        // Build MCP client options
         const mcpOptions = buildMCPClientOptions(
           finalUserPrompt,
           mentionedMCPServers,

@@ -1,4 +1,5 @@
 import { Comment, Thread, events } from '@hicommonwealth/schemas';
+import { MCP_MENTION_SYMBOL } from '@hicommonwealth/shared';
 import { Transaction } from 'sequelize';
 import z from 'zod';
 import { models } from '../database';
@@ -131,8 +132,11 @@ export const emitMentions = async (
  * @returns Array of objects containing handle and id for each mentioned MCP server
  */
 export const extractMCPMentions = (commentBody: string): MCPMention[] => {
-  // Regex pattern matches: [%MCPServerName](/mcp-server/handle/id)
-  const mcpMentionPattern = /\[%([^\]]+)\]\(\/mcp-server\/([^/]+\/[^)]+)\)/g;
+  // Regex pattern matches: [/MCPServerName](/mcp-server/handle/id)
+  const mcpMentionPattern = new RegExp(
+    `\\[\\${MCP_MENTION_SYMBOL}([^\\]]+)\\]\\(\\/mcp-server\\/([^/]+\\/[^)]+)\\)`,
+    'g',
+  );
   const mentions: MCPMention[] = [];
   let match;
 

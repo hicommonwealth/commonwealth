@@ -4,13 +4,14 @@ import { MutableRefObject, useCallback, useMemo } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import MinimumProfile from '../../../models/MinimumProfile';
 
-import { UserTierMap } from '@hicommonwealth/shared';
+import { MCP_MENTION_SYMBOL, UserTierMap } from '@hicommonwealth/shared';
 import app from 'client/scripts/state';
 import _ from 'lodash';
 import { trpc } from 'utils/trpcClient';
 import {
   DENOTATION_SEARCH_CONFIG,
   ENTITY_TYPE_INDICATORS,
+  MCPServerSearchResult,
   MENTION_CONFIG,
   MENTION_DENOTATION_CHARS,
   MENTION_LINK_FORMATS,
@@ -348,12 +349,13 @@ export const useMention = ({
   };
 
   const createMCPServerMentionItem = (
-    result: MentionSearchResult,
+    result: MCPServerSearchResult | MentionSearchResult,
     node: HTMLElement,
   ) => {
     const serverName = result.name;
     const serverId = result.id;
-    const serverHandle = result.handle || serverName;
+    const serverHandle =
+      'handle' in result && result.handle ? result.handle : result.name;
     const description = result.description || 'MCP Server';
 
     const nameSpan = document.createElement('span');
@@ -473,7 +475,7 @@ export const useMention = ({
             }
 
             // Handle MCP server search separately
-            if (mentionChar === '%') {
+            if (mentionChar === MCP_MENTION_SYMBOL) {
               const communityId = app.activeChainId() || '';
               if (!communityId) {
                 renderList([], searchTerm);
@@ -502,13 +504,16 @@ export const useMention = ({
                 )
                 .slice(0, MENTION_CONFIG.MAX_SEARCH_RESULTS);
 
-              const results = filteredServers.map((server) => ({
-                id: String(server.id),
-                name: server.name,
-                handle: server.handle,
-                description: server.description,
-                type: 'mcp_server' as const,
-              }));
+              const results: MCPServerSearchResult[] = filteredServers.map(
+                (server) => ({
+                  id: String(server.id),
+                  name: server.name,
+                  description: server.description,
+                  type: 'mcp_server' as const,
+                  created_at: new Date().toISOString(),
+                  handle: server.handle,
+                }),
+              );
 
               if (results.length === 0) {
                 const node = document.createElement('div');
@@ -528,8 +533,9 @@ export const useMention = ({
               }
 
               const formattedMatches = results.map((result) => {
-                const entityType = MentionEntityType.MCP_SERVER;
-                return createEntityMentionItem(entityType, result);
+                const node = document.createElement('div');
+                node.className = 'ql-mention-item';
+                return createMCPServerMentionItem(result, node);
               });
 
               renderList(formattedMatches, searchTerm);

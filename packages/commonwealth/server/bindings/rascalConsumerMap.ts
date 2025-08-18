@@ -15,7 +15,6 @@ import {
   EventStreamPolicy,
   FarcasterWorker,
   LaunchpadPolicy,
-  MCPWorker,
   NominationsWorker,
   NotificationsPolicy,
   NotificationsSettingsPolicy,
@@ -85,11 +84,6 @@ const _ReactionWorker = {
   consumer: ReactionWorker,
 };
 
-const _MCPWorker: Consumer<ReturnType<typeof MCPWorker>> = {
-  consumer: MCPWorker,
-  retryStrategy: buildRetryStrategy(undefined, 20_000),
-};
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   ChainEventPolicy,
@@ -109,5 +103,4 @@ export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   _NotificationsSettingsPolicy,
   _NotificationsPolicy,
   _ReactionWorker,
-  _MCPWorker,
 ];

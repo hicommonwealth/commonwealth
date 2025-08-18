@@ -1,6 +1,9 @@
 import { config } from '@hicommonwealth/core';
 import { MCPServer } from '@hicommonwealth/schemas';
-import { DEFAULT_COMPLETION_MODEL } from '@hicommonwealth/shared';
+import {
+  DEFAULT_COMPLETION_MODEL,
+  MCP_MENTION_SYMBOL,
+} from '@hicommonwealth/shared';
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { extractMCPMentions } from '../..';
@@ -15,9 +18,9 @@ const buildSystemPrompt = (
 ) => `You are an AI assistant with access to MCP (Model Context Protocol) servers that provide tools for interacting with Commonwealth communities, threads, users and more.
 
 Available MCP servers and their mention handles:
-${allServers.map((server) => `- %${server.handle}: ${server.name} - ${server.description}`).join('\n')}
+${allServers.map((server) => `- ${MCP_MENTION_SYMBOL}${server.handle}: ${server.name} - ${server.description}`).join('\n')}
 
-When a user mentions a server using the format [%ServerName](/mcp-server/handle/id), you should use the MCP tools from that specific server to help answer their question. Multiple servers can be mentioned in a single message.
+When a user mentions a server using the format [${MCP_MENTION_SYMBOL}ServerName](/mcp-server/handle/id), you should use the MCP tools from that specific server to help answer their question. Multiple servers can be mentioned in a single message.
 
 If no specific server is mentioned, you can provide general assistance based on your knowledge, but you won't have access to real-time data from the MCP servers.
 
@@ -29,7 +32,7 @@ export function buildMCPClientOptions(
   allServers: CommonMCPServerWithHeaders[],
   previousResponseId: string | null,
 ): OpenAI.Responses.ResponseCreateParamsStreaming {
-  // Extract MCP mentions from user input using the same logic as the MCPWorker policy
+  // Extract MCP mentions from user input
   const extractedMentions = extractMCPMentions(userInput);
 
   // Match extracted mentions with available servers by handle and id

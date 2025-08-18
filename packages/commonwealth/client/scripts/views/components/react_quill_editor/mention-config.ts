@@ -1,3 +1,4 @@
+import { MCP_MENTION_SYMBOL } from '@hicommonwealth/shared';
 import { SearchScope } from 'models/SearchQuery';
 import { z } from 'zod';
 import { SearchEntityResult } from '../../../../../../../libs/model/src/aggregates/search';
@@ -24,7 +25,7 @@ export const MENTION_DENOTATION_CHARS = {
   '#': MentionEntityType.TOPIC,
   '!': MentionEntityType.THREAD,
   '~': MentionEntityType.COMMUNITY,
-  '%': MentionEntityType.MCP_SERVER,
+  [MCP_MENTION_SYMBOL]: MentionEntityType.MCP_SERVER,
 } as const;
 
 export const ENTITY_TYPE_INDICATORS = {
@@ -66,7 +67,7 @@ export const MENTION_LINK_FORMATS = {
   [MentionEntityType.PROPOSAL]: (name: string, id: string) =>
     `[${name}](/proposal/${id})`,
   [MentionEntityType.MCP_SERVER]: (name: string, handleAndId: string) =>
-    `[%${name}](/mcp-server/${handleAndId})`,
+    `[${MCP_MENTION_SYMBOL}${name}](/mcp-server/${handleAndId})`,
 } as const;
 
 export const DENOTATION_SEARCH_CONFIG = {
@@ -90,7 +91,7 @@ export const DENOTATION_SEARCH_CONFIG = {
     communityScoped: false,
     description: 'Search all communities',
   },
-  '%': {
+  [MCP_MENTION_SYMBOL]: {
     scopes: ['MCPServers'],
     communityScoped: true,
     description: 'Search MCP servers in current community',
@@ -98,7 +99,19 @@ export const DENOTATION_SEARCH_CONFIG = {
 } as const;
 
 // Type alias for search results from SearchEntities query
-export type MentionSearchResult = z.infer<typeof SearchEntityResult>;
+export type MentionSearchResult = z.infer<typeof SearchEntityResult> & {
+  handle?: string; // Additional property for MCP servers
+};
+
+// Type for MCP server search results
+export type MCPServerSearchResult = {
+  id: string;
+  name: string;
+  description?: string;
+  handle: string;
+  type: 'mcp_server';
+  created_at: string;
+};
 
 export const getEntityTypeFromSearchResult = (
   result: MentionSearchResult,
