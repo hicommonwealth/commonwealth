@@ -2,6 +2,45 @@ import { WalletId } from '@hicommonwealth/shared';
 import { pluralize } from 'helpers';
 import React, { ReactNode } from 'react';
 
+const binanceWalletCopy = (
+  <div>
+    <strong>IMPORTANT:</strong> Sign up MUST BE DONE VIA THE BINANCE MOBILE APP{' '}
+    — Download:{' '}
+    <a
+      href="https://play.google.com/store/apps/details?id=com.binance.dev&hl=en&pli=1"
+      target="_blank"
+      rel="noreferrer"
+    >
+      Android
+    </a>{' '}
+    |{' '}
+    <a
+      href="https://apps.apple.com/kn/app/binance-buy-bitcoin-crypto/id1436799971"
+      target="_blank"
+      rel="noreferrer"
+    >
+      iOS
+    </a>{' '}
+    — View{' '}
+    <a href="#" target="_blank" rel="noreferrer">
+      demo
+    </a>
+    <br />
+    Steps to complete:
+    <ol>
+      <li>1. Open Binance Wallet app</li>
+      <li>2. Create your account or sign in</li>
+      <li>3. Connect your wallet to Common</li>
+      <li>4. Complete the signup process</li>
+    </ol>
+    <br />
+    Visit Binance to explore more onchain:{' '}
+    <a href="https://www.binance.com/en/web3">
+      https://www.binance.com/en/web3
+    </a>
+  </div>
+);
+
 export const actionCopies = {
   title: {
     ['SignUpFlowCompleted']: 'Sign in to Common',
@@ -50,25 +89,7 @@ export const actionCopies = {
   explainer: {
     // eslint-disable-next-line react/no-multi-comp
     ['SignUpFlowCompleted']: (walletId?: WalletId) =>
-      walletId === WalletId.Binance ? (
-        <div>
-          <strong>IMPORTANT:</strong> Sign up MUST BE DONE VIA THE BINANCE
-          WALLET APP. <br />
-          Steps to complete:
-          <ol>
-            <li>1. Open Binance Wallet app</li>
-            <li>2. Create your account or sign in</li>
-            <li>3. Connect your wallet to Common</li>
-            <li>4. Complete the signup process</li>
-          </ol>
-          Visit Binance to explore more onchain:{' '}
-          <a href="https://www.binance.com/en/web3">
-            https://www.binance.com/en/web3
-          </a>
-        </div>
-      ) : (
-        ``
-      ),
+      walletId === WalletId.Binance ? binanceWalletCopy : ``,
     ['CommunityCreated']: (chainName?: string) =>
       chainName ? `● Must be created on the ${chainName} chain.` : '',
     ['CommunityJoined']: () => '',
@@ -78,25 +99,7 @@ export const actionCopies = {
     ['CommentUpvoted']: () => '',
     // eslint-disable-next-line react/no-multi-comp
     ['WalletLinked']: (walletId?: WalletId) =>
-      walletId === WalletId.Binance ? (
-        <div>
-          <strong>IMPORTANT:</strong> Sign up MUST BE DONE VIA THE BINANCE
-          WALLET APP. <br />
-          Steps to complete:
-          <ol>
-            <li>1. Open Binance Wallet app</li>
-            <li>2. Create your account or sign in</li>
-            <li>3. Connect your wallet to Common</li>
-            <li>4. Complete the signup process</li>
-          </ol>
-          Visit Binance to explore more onchain:{' '}
-          <a href="https://www.binance.com/en/web3">
-            https://www.binance.com/en/web3
-          </a>
-        </div>
-      ) : (
-        ``
-      ),
+      walletId === WalletId.Binance ? binanceWalletCopy : ``,
     // eslint-disable-next-line react/no-multi-comp
     ['SSOLinked']: (ssoType?: string) =>
       ssoType ? (
