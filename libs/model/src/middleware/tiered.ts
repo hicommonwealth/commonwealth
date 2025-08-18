@@ -93,9 +93,16 @@ export function tiered({
     if (!hasTierRateLimits(tier)) return;
     const tierLimitsPerHour = USER_TIERS[tier].hourlyRateLimits;
 
+    console.log(
+      'config.IGNORE_CONTENT_CREATION_LIMIT',
+      config.IGNORE_CONTENT_CREATION_LIMIT,
+    );
     if (creates) {
       const last_creates = await getUserCount(user.id, 'creates');
-      if (last_creates >= tierLimitsPerHour.create)
+      if (
+        !config.IGNORE_CONTENT_CREATION_LIMIT &&
+        last_creates >= tierLimitsPerHour.create
+      )
         throw new InvalidActor(actor, 'Exceeded content creation limit');
     }
     if (upvotes) {

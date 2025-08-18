@@ -23,6 +23,14 @@ type RequestBody = Omit<CompletionOptions, 'prompt'> & {
 const log = logger(import.meta);
 
 export const aiCompletionHandler = async (req: Request, res: Response) => {
+  const requestId = Math.random().toString(36).substr(2, 9);
+  log.info(`[${requestId}] AI completion request started`, {
+    model: req.body?.model || DEFAULT_COMPLETION_MODEL,
+    stream: req.body?.stream !== false,
+    userAgent: req.headers['user-agent'],
+    contentLength: req.headers['content-length'],
+  });
+
   try {
     const {
       prompt: initialPrompt,
@@ -112,9 +120,9 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
 
     // Log the final model, provider, and web search status
     log.info(
-      `AI completion request: 
-      \n modelId=${modelId}, 
-      \n provider=${useOR ? 'OpenRouter' : 'OpenAI'}, 
+      `AI completion request:
+      \n modelId=${modelId},
+      \n provider=${useOR ? 'OpenRouter' : 'OpenAI'},
       \n webSearch=${!!useWebSearch}
       \n contextualMentions=${!!(finalSystemPrompt && finalSystemPrompt.includes('CONTEXTUAL INFORMATION:'))}`,
     );
@@ -132,10 +140,20 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     const openai = new OpenAI(openAIConfig);
 
     if (stream) {
+      log.info(`[${requestId}] Setting up streaming response`);
+
       // Set proper headers for streaming
       res.setHeader('Content-Type', 'text/plain');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('X-Accel-Buffering', 'no');
+
+      log.info(`[${requestId}] Streaming headers set`, {
+        headers: {
+          'Content-Type': res.getHeader('Content-Type'),
+          'Cache-Control': res.getHeader('Cache-Control'),
+          'X-Accel-Buffering': res.getHeader('X-Accel-Buffering'),
+        },
+      });
 
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -162,12 +180,25 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
             addOpenAiWebSearchOptions && { web_search_options: {} }),
         };
 
+        log.info(`[${requestId}] Starting OpenAI streaming request`, {
+          model: streamConfig.model,
+          maxTokens: streamConfig.max_tokens,
+          messageCount: messages.length,
+        });
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const streamResponse =
           await openai.chat.completions.create(streamConfig);
 
+        log.info(`[${requestId}] OpenAI stream created successfully`);
+
+        let chunkCount = 0;
+        let totalContentLength = 0;
+
         for await (const chunk of streamResponse) {
+          chunkCount++;
           const choice = chunk.choices?.[0];
+
           if (choice) {
             let annotationsFoundInChunk = false;
             // Check for annotations on delta (OpenRouter might put them here)
@@ -193,24 +224,60 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
             }
 
             if (annotationsFoundInChunk) {
-              // If annotations are found, you might want to handle them or store them
-              // For now, we are just logging them per chunk.
+              log.info(
+                `[${requestId}] Annotations found in chunk ${chunkCount}`,
+              );
             }
           }
 
           const contentToStream = choice?.delta?.content || '';
           if (contentToStream) {
-            res.write(contentToStream);
-            if (res.flush) res.flush(); // Force flush for immediate client update
+            totalContentLength += contentToStream.length;
+
+            try {
+              res.write(contentToStream);
+              if (res.flush) res.flush(); // Force flush for immediate client update
+
+              if (chunkCount % 10 === 0) {
+                log.info(`[${requestId}] Streaming progress`, {
+                  chunkCount,
+                  totalContentLength,
+                  lastChunkSize: contentToStream.length,
+                });
+              }
+            } catch (writeError) {
+              log.error(
+                `[${requestId}] Error writing chunk ${chunkCount}:`,
+                writeError,
+              );
+              throw writeError;
+            }
+          } else if (chunkCount % 20 === 0) {
+            log.info(`[${requestId}] Empty chunk ${chunkCount} received`);
           }
         }
+
+        log.info(`[${requestId}] Streaming completed successfully`, {
+          totalChunks: chunkCount,
+          totalContentLength,
+        });
 
         res.end();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (streamError: unknown) {
+        log.error(
+          `[${requestId}] Streaming error occurred:`,
+          streamError as Error,
+        );
+
         // Check for OpenRouter-specific error format
         const orError = extractOpenRouterError(streamError);
         if (orError) {
+          log.error(
+            `[${requestId}] OpenRouter error:`,
+            new Error(orError.message),
+          );
+
           if (!res.headersSent) {
             return res.status(orError.code || 500).json({
               error: orError.message,
@@ -225,12 +292,17 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
         // Handle other errors
         if (!res.headersSent) {
           const error = streamError as Error & { status?: number };
+          log.error(`[${requestId}] Unhandled streaming error:`, error);
+
           return res.status(error.status || 500).json({
             error: error.message || 'Streaming failed',
             status: error.status || 500,
           });
         }
 
+        log.error(
+          `[${requestId}] Error during streaming with headers already sent`,
+        );
         res.write('\nError during streaming');
         res.end();
       }
@@ -316,9 +388,19 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     const errorMessage =
       err.message || 'An error occurred while processing your request';
 
-    res.status(statusCode).json({
-      error: errorMessage,
-      status: statusCode,
-    });
+    log.error(`[${requestId}] Top-level error in aiCompletionHandler:`, err);
+
+    if (!res.headersSent) {
+      res.status(statusCode).json({
+        error: errorMessage,
+        status: statusCode,
+      });
+    } else {
+      log.error(
+        `[${requestId}] Cannot send error response - headers already sent`,
+      );
+    }
+  } finally {
+    log.info(`[${requestId}] AI completion request ended`);
   }
 };

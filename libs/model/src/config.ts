@@ -99,6 +99,7 @@ const {
   REORG_SAFETY_DISABLED,
   SEND_EMAILS,
   MCP_BOT_EMAIL,
+  IGNORE_CONTENT_CREATION_LIMIT,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -331,6 +332,7 @@ export const config = configure(
     KLAVIS: {
       API_KEY: KLAVIS_API_KEY,
     },
+    IGNORE_CONTENT_CREATION_LIMIT: IGNORE_CONTENT_CREATION_LIMIT === 'true',
   },
   z.object({
     SENDGRID: z.object({
@@ -728,5 +730,6 @@ export const config = configure(
     KLAVIS: z.object({
       API_KEY: z.string().optional(),
     }),
+    IGNORE_CONTENT_CREATION_LIMIT: z.boolean().optional(),
   }),
 );
