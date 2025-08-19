@@ -452,7 +452,6 @@ export const ThreadCard = ({
         addressType={app.chain?.base || 'ethereum'}
         chainNode={app.chain?.meta?.ChainNode}
         tokenCommunity={app.chain?.meta}
-        threadTitle={thread.title}
       />
       <CWDivider className="ThreadDivider" />
     </>

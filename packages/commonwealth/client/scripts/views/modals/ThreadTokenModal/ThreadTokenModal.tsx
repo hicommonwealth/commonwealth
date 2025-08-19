@@ -17,7 +17,6 @@ interface ThreadTokenModalProps {
   addressType?: string;
   chainNode?: any;
   tokenCommunity?: any;
-  threadTitle?: string;
 }
 
 const ThreadTokenModal = ({
@@ -28,7 +27,6 @@ const ThreadTokenModal = ({
   addressType,
   chainNode,
   tokenCommunity,
-  threadTitle,
 }: ThreadTokenModalProps) => {
   return (
     <CWModal

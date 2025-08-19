@@ -59,7 +59,6 @@ const ThreadTokenButton = ({
         addressType={addressType}
         chainNode={chainNode}
         tokenCommunity={tokenCommunity}
-        threadTitle={threadTitle}
       />
     </>
   );
