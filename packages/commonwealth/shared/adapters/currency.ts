@@ -77,12 +77,16 @@ export const prettyVoteWeight = (
     useGrouping: false,
   });
   const weiValue =
-    weightType === TopicWeightedVoting.Stake
+    weightType &&
+    [TopicWeightedVoting.Stake, TopicWeightedVoting.SuiNFT].includes(weightType)
       ? parseInt(wei) * multiplier
       : calculateVoteWeight(weiStr, multiplier || 1);
 
   // for non-weighted and stake, just render as-is
-  if (!weightType || weightType === TopicWeightedVoting.Stake) {
+  if (
+    !weightType ||
+    [TopicWeightedVoting.Stake, TopicWeightedVoting.SuiNFT].includes(weightType)
+  ) {
     return parseFloat((weiValue || 0).toString()).toString();
   }
 

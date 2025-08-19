@@ -79,7 +79,7 @@ export function GetStatus(): Query<typeof schemas.GetStatus> {
         tier: user.tier,
         email: user.email,
         emailVerified: user.emailVerified,
-        emailInterval: user.emailNotificationInterval,
+        emailNotificationInterval: user.emailNotificationInterval,
         promotional_emails_enabled: user.promotional_emails_enabled,
         is_welcome_onboard_flow_complete: user.is_welcome_onboard_flow_complete,
         selected_community_id: user.selected_community_id,

@@ -9,6 +9,7 @@ import Directory from './Directory';
 import Discord from './Discord';
 import GoogleSheetsMCP from './GoogleSheetsMCP';
 import './Integrations.scss';
+import MCP from './MCP';
 import OnchainVerification from './OnchainVerification';
 import Snapshots from './Snapshots';
 import SpamLevel from './SpamLevel';
@@ -22,6 +23,7 @@ const Integrations = () => {
 
   const isJudgementEnabled = useFlag('judgeContest');
   const mcpGoogleSheetsEnabled = useFlag('mcpGoogleSheets');
+  const mcpIntegrationsEnabled = useFlag('mcpIntegrationsEnabled');
 
   return (
     <CommunityManagementLayout
@@ -43,6 +45,7 @@ const Integrations = () => {
         <Stake />
         {isEthereum && <Snapshots />}
         <Tokenization />
+        {mcpIntegrationsEnabled && <MCP />}
         <Discord />
         {mcpGoogleSheetsEnabled && <GoogleSheetsMCP />}
         <Webhooks />

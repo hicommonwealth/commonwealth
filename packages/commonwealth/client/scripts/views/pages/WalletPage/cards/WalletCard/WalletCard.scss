@@ -15,20 +15,6 @@
     width: 100%;
   }
 
-  .add-funds-btn {
-    all: unset;
-    display: flex;
-    flex-direction: row;
-    gap: 4px;
-    align-items: center;
-    cursor: pointer;
-    color: colors.$green-600;
-
-    .Text {
-      color: colors.$green-600;
-    }
-  }
-
   .list {
     max-height: 100px;
     overflow: scroll;

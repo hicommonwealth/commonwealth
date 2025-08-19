@@ -1,4 +1,4 @@
-import { dispose, logger } from '@hicommonwealth/core';
+import { disableService, dispose, logger } from '@hicommonwealth/core';
 import { config } from '../../config';
 import {
   processChainNode,
@@ -16,6 +16,7 @@ export async function startSolanaPolling(
   interval: number,
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
 ): Promise<NodeJS.Timeout> {
+  await disableService();
   log.info(`Starting Solana poller`);
   if (interval > 300_000) {
     throw new Error(

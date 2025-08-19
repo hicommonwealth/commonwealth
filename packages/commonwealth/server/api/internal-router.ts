@@ -13,6 +13,7 @@ import * as integrations from './integrations';
 import * as launchpadToken from './launchpadToken';
 import * as loadTest from './load-test';
 import * as mcp from './mcp';
+import * as mcpServers from './mcp-servers';
 import * as poll from './poll';
 import * as quest from './quest';
 import * as search from './search';
@@ -44,6 +45,7 @@ const api = {
   tag: tag.trpcRouter,
   search: search.trpcRouter,
   configuration: configuration.trpcRouter,
+  mcpServers: mcpServers.trpcRouter,
   mcp: mcp.trpcRouter,
   tokenAllocation: tokenAllocation.trpcRouter,
 };

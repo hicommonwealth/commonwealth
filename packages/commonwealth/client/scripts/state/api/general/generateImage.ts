@@ -1,4 +1,7 @@
-import type { ImageGenerationModel } from '@hicommonwealth/shared';
+import {
+  DEFAULT_IMAGE_MODEL,
+  ImageGenerationModel,
+} from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { ApiEndpoints, SERVER_URL } from 'state/api/config';
@@ -49,7 +52,7 @@ interface GenerateImageProps {
 
 export const generateImage = async ({
   prompt,
-  model = 'gpt-image-1',
+  model = DEFAULT_IMAGE_MODEL,
   n,
   quality,
   response_format,

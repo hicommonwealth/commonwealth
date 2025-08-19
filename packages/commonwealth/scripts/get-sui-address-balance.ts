@@ -9,7 +9,7 @@ import { BalanceSourceType } from '@hicommonwealth/shared';
 
 /**
  * Standalone script to get SUI native balance for a given address using the token balance cache
- * Usage: npx tsx get-sui-address-balance.ts <sui-address>
+ * Usage: pnpm get-sui-address-balance <sui-address>
  */
 
 async function getSuiAddressBalance(
@@ -20,10 +20,10 @@ async function getSuiAddressBalance(
     // get sui chain node to determine the network
     const suiChainNode = await models.ChainNode.findOne({
       where: {
-        name: 'Sui Testnet',
+        name: 'Sui Mainnet',
       },
     });
-    mustExist('Sui Testnet chain node not found', suiChainNode);
+    mustExist('Sui Mainnet chain node not found', suiChainNode);
 
     // Validate address format (Sui addresses are 0x followed by 64 hex characters)
     const suiAddressPattern = /^0x[a-fA-F0-9]{64}$/;
@@ -81,8 +81,8 @@ Arguments:
   --force-refresh  Skip cache and force fetch fresh balance data
 
 Examples:
-  npx tsx get-sui-address-balance.ts 0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
-  npx tsx get-sui-address-balance.ts 0x1234... --force-refresh
+  pnpm get-sui-address-balance 0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+  pnpm get-sui-address-balance 0x1234... --force-refresh
 
 Environment Variables:
   RAW_OUTPUT=true    Output only the raw balance in MIST (useful for programmatic use)

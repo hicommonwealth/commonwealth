@@ -1,9 +1,6 @@
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import {
-  QuestParticipationLimit,
-  QuestParticipationPeriod,
-} from '@hicommonwealth/schemas';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
   UserTierMap,
@@ -12,6 +9,7 @@ import {
 import Chance from 'chance';
 import dayjs from 'dayjs';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import z from 'zod';
 import {
   CreateComment,
   CreateCommentReaction,
@@ -76,6 +74,18 @@ describe('User lifecycle', () => {
     await dispose()();
   });
 
+  function logTable(logs: z.infer<(typeof schemas.GetXps)['output']>) {
+    const table = logs?.map((x) => ({
+      quest: x.quest_id,
+      user: x.user_profile?.name,
+      event: x.event_name,
+      xp: x.xp_points,
+      creator: x.creator_profile?.name,
+      creator_xp: x.creator_xp_points,
+    }));
+    console.table(table);
+  }
+
   describe('xp', () => {
     it('should project xp points', async () => {
       // setup quest
@@ -107,8 +117,9 @@ describe('User lifecycle', () => {
               event_name: 'CommentCreated',
               reward_amount: 5,
               creator_reward_weight: 0,
-              participation_limit: QuestParticipationLimit.OncePerPeriod,
-              participation_period: QuestParticipationPeriod.Monthly,
+              participation_limit:
+                schemas.QuestParticipationLimit.OncePerPeriod,
+              participation_period: schemas.QuestParticipationPeriod.Monthly,
               participation_times_per_period: 2,
             },
             {
@@ -299,15 +310,17 @@ describe('User lifecycle', () => {
               event_name: 'CommentCreated',
               reward_amount: 5,
               creator_reward_weight: 0,
-              participation_limit: QuestParticipationLimit.OncePerPeriod,
-              participation_period: QuestParticipationPeriod.Daily,
+              participation_limit:
+                schemas.QuestParticipationLimit.OncePerPeriod,
+              participation_period: schemas.QuestParticipationPeriod.Daily,
             },
             {
               event_name: 'CommentUpvoted',
               reward_amount: 20,
               creator_reward_weight: 0.1,
-              participation_limit: QuestParticipationLimit.OncePerPeriod,
-              participation_period: QuestParticipationPeriod.Daily,
+              participation_limit:
+                schemas.QuestParticipationLimit.OncePerPeriod,
+              participation_period: schemas.QuestParticipationPeriod.Daily,
               participation_times_per_period: 3,
               content_id: `thread:${thread_id}`,
             },
@@ -383,7 +396,7 @@ describe('User lifecycle', () => {
           event_name: 'SignUpFlowCompleted',
           reward_amount: 20,
           creator_reward_weight: 0.2,
-          participation_limit: QuestParticipationLimit.OncePerQuest,
+          participation_limit: schemas.QuestParticipationLimit.OncePerQuest,
         },
         {
           id: -2,
@@ -391,7 +404,7 @@ describe('User lifecycle', () => {
           event_name: 'WalletLinked',
           reward_amount: 10,
           creator_reward_weight: 0,
-          participation_limit: QuestParticipationLimit.OncePerQuest,
+          participation_limit: schemas.QuestParticipationLimit.OncePerQuest,
         },
         {
           id: -3,
@@ -399,7 +412,7 @@ describe('User lifecycle', () => {
           event_name: 'SSOLinked',
           reward_amount: 10,
           creator_reward_weight: 0,
-          participation_limit: QuestParticipationLimit.OncePerQuest,
+          participation_limit: schemas.QuestParticipationLimit.OncePerQuest,
         },
         {
           id: -100,
@@ -407,8 +420,8 @@ describe('User lifecycle', () => {
           event_name: 'XpAwarded',
           reward_amount: 0,
           creator_reward_weight: 0,
-          participation_period: QuestParticipationPeriod.Daily,
-          participation_limit: QuestParticipationLimit.OncePerPeriod,
+          participation_period: schemas.QuestParticipationPeriod.Daily,
+          participation_limit: schemas.QuestParticipationLimit.OncePerPeriod,
         },
       ]);
 
@@ -603,11 +616,11 @@ describe('User lifecycle', () => {
     });
 
     it('should query previous xp logs', async () => {
-      // 8 events (skipping negative system quest id)
       const xps1 = await query(GetXps(), {
         actor: admin,
         payload: {},
       });
+      logTable(xps1);
       expect(xps1!.length).to.equal(9);
       xps1?.forEach((xp) => {
         expect(xp.quest_id).to.be.a('number');
@@ -624,12 +637,13 @@ describe('User lifecycle', () => {
         expect(xp.event_name).to.equal('CommentUpvoted');
       });
 
-      // 4 events after first CommentUpvoted
+      // 6 events from first CommentUpvoted
       const xps3 = await query(GetXps(), {
         actor: admin,
         payload: { from: new Date(xps2!.at(-1)!.created_at) },
       });
-      expect(xps3!.length).to.equal(5);
+      logTable(xps3);
+      expect(xps3!.length).to.equal(6);
 
       // 4 events for member (ThreadCreated and CommentUpvoted)
       const xps4 = await query(GetXps(), {
@@ -788,8 +802,9 @@ describe('User lifecycle', () => {
               event_name: 'CommentCreated',
               reward_amount: 25,
               creator_reward_weight: 0,
-              participation_limit: QuestParticipationLimit.OncePerPeriod,
-              participation_period: QuestParticipationPeriod.Daily,
+              participation_limit:
+                schemas.QuestParticipationLimit.OncePerPeriod,
+              participation_period: schemas.QuestParticipationPeriod.Daily,
             },
           ],
         },
@@ -1058,17 +1073,7 @@ describe('User lifecycle', () => {
         actor: admin,
         payload: {},
       });
-      const table = logs
-        ?.map((x) => ({
-          quest: x.quest_id,
-          user: x.user_profile?.name,
-          event: x.event_name,
-          xp: x.xp_points,
-          creator: x.creator_profile?.name,
-          creator_xp: x.creator_xp_points,
-        }))
-        .sort((a, b) => b.xp - a.xp);
-      console.table(table);
+      logTable(logs.sort((a, b) => b.xp_points - a.xp_points));
 
       const xps1 = await query(GetXpsRanked(), {
         actor: admin,

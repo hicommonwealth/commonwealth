@@ -22,6 +22,7 @@ enum WVMethod {
   SPL = 'SPL',
   SuiNative = 'SuiNative',
   SuiToken = 'SuiToken',
+  SuiNFT = 'SuiNFT',
   Stake = 'Stake',
 }
 
@@ -46,6 +47,10 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
 
     if (selectedWVMethod === WVMethod.SuiToken) {
       return onStepChange(CreateTopicStep.WVSuiTokenDetails);
+    }
+
+    if (selectedWVMethod === WVMethod.SuiNFT) {
+      return onStepChange(CreateTopicStep.WVSuiNFTDetails);
     }
 
     onStepChange(CreateTopicStep.WVERC20Details);
@@ -120,8 +125,8 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
               <CWRadioPanel
                 value={WVMethod.SuiNative}
                 onSelect={setSelectedWVMethod}
-                label="Connect Sui Native"
-                description="Sui Native Object"
+                label="Sui Native"
+                description="Use native Sui tokens for weighted voting"
                 popover={{
                   title: 'Sui Native',
                   body: (
@@ -137,10 +142,10 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
               <CWRadioPanel
                 value={WVMethod.SuiToken}
                 onSelect={setSelectedWVMethod}
-                label="Connect Sui Token"
-                description="Sui Coin Type"
+                label="Sui Coin Type"
+                description="Use custom Sui coin types for weighted voting"
                 popover={{
-                  title: 'Sui Token',
+                  title: 'Sui Coin Type',
                   body: (
                     <CWText type="b2">
                       Use Sui tokens for weighted voting and running contests
@@ -148,6 +153,22 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
                   ),
                 }}
                 isSelected={selectedWVMethod === WVMethod.SuiToken}
+              />
+
+              <CWRadioPanel
+                value={WVMethod.SuiNFT}
+                onSelect={setSelectedWVMethod}
+                label="Sui NFT Type"
+                description="Use Sui NFTs for weighted voting"
+                popover={{
+                  title: 'Sui NFT Type',
+                  body: (
+                    <CWText type="b2">
+                      Use Sui NFTs for weighted voting and running contests
+                    </CWText>
+                  ),
+                }}
+                isSelected={selectedWVMethod === WVMethod.SuiNFT}
               />
             </>
           )}

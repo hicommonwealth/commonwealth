@@ -8,19 +8,19 @@ export async function createAllocation(
   apiToken: string,
   body: CreateAllocationRequest,
 ): Promise<MagnaAllocationResponse> {
-  const response = await fetch(`${apiUrl}/api/external/v1/allocations`, {
+  const request = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'x-magna-api-token': apiToken,
     },
     body: JSON.stringify(body),
-  });
+  };
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to create allocation: ${error}`);
-  }
+  const response = await fetch(
+    `${apiUrl}/api/external/v1/allocations/create`,
+    request,
+  );
 
   return response.json();
 }
