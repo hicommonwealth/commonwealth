@@ -8,7 +8,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';
 import { models } from '../../database';
-import { emitEvent } from '../../utils';
+import { emitEvent } from '../../utils/outbox';
 
 const log = logger(import.meta);
 

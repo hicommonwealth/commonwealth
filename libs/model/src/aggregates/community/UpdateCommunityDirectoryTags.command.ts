@@ -2,7 +2,7 @@ import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
-import { emitEvent } from '../../utils';
+import { emitEvent } from '../../utils/outbox';
 import { updateCommunityDirectoryTags } from '../../utils/updateCommunityDirectoryTags';
 
 export function UpdateCommunityDirectoryTags(): Command<

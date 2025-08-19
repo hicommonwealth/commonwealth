@@ -5,7 +5,7 @@ import { BalanceSourceType } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authRoles, mustExist } from '../../middleware';
-import { emitEvent } from '../../utils';
+import { emitEvent } from '../../utils/outbox';
 
 export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {

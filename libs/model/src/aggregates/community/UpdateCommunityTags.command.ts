@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
-import { emitEvent } from '../../utils';
+import { emitEvent } from '../../utils/outbox';
 import { updateTags } from '../../utils/updateTags';
 
 export function UpdateCommunityTags(): Command<
