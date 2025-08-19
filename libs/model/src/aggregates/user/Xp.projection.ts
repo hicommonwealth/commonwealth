@@ -59,6 +59,14 @@ async function getUserByAddress(address: string) {
   return addr?.user_id ?? undefined;
 }
 
+async function getReferrerByUserId(user_id: number) {
+  const user = await models.User.findOne({
+    where: { id: user_id },
+    attributes: ['referred_by_address'],
+  });
+  return user?.referred_by_address ?? null;
+}
+
 /*
  * Finds all active quest action metas for a given event
  */
@@ -112,13 +120,19 @@ async function recordXpsForQuest({
   };
   scope?: z.infer<typeof schemas.QuestActionScope>;
 }) {
-  const shared_with_address =
-    shared_with?.creator_address || shared_with?.referrer_address;
-  await sequelize.transaction(async (transaction) => {
-    const shared_with_user_id = shared_with_address
-      ? await getUserByAddress(shared_with_address)
+  const creator_user_id = shared_with?.creator_address
+    ? await getUserByAddress(shared_with.creator_address)
+    : null;
+  const has_referrer = Object.prototype.hasOwnProperty.call(
+    shared_with || {},
+    'referrer_address',
+  );
+  const referrer_user_id =
+    has_referrer && shared_with?.referrer_address
+      ? await getUserByAddress(shared_with.referrer_address)
       : null;
-
+  await sequelize.transaction(async (transaction) => {
+    
     for (const action_meta of action_metas) {
       if (!action_meta?.id) continue;
       if (action_meta.content_id) {
@@ -177,10 +191,19 @@ async function recordXpsForQuest({
       const reward_amount = Math.round(
         (scope?.amount || action_meta.reward_amount) * x,
       );
-      const shared_xp_points = shared_with_user_id
+      const creator_xp_points = creator_user_id
         ? Math.round(reward_amount * action_meta.creator_reward_weight)
-        : null;
-      const xp_points = reward_amount - (shared_xp_points ?? 0);
+        : 0;
+      const referrer_xp_points = has_referrer
+        ? Math.round(reward_amount * 0.1)
+        : 0;
+      const xp_points =
+        reward_amount - creator_xp_points - referrer_xp_points;
+      const log_creator_user_id =
+        creator_user_id ?? (referrer_user_id ?? null);
+      const log_creator_xp_points = creator_user_id
+        ? creator_xp_points
+        : referrer_xp_points || null;
 
       await models.sequelize.query(
         `
@@ -207,8 +230,8 @@ async function recordXpsForQuest({
             NULL,
 
             :xp_points,
-            :shared_with_user_id,
-            :shared_xp_points,
+            :log_creator_user_id,
+            :log_creator_xp_points,
             :event_id,
             :scope,
             NOW()
@@ -219,24 +242,28 @@ async function recordXpsForQuest({
         update_user AS (
           UPDATE "Users"
           SET xp_points = COALESCE(xp_points, 0) + :xp_points
-          WHERE id = :user_id 
+          WHERE id = :user_id
             AND EXISTS(SELECT 1 FROM inserted)
           RETURNING 1
         ),
         update_creator AS (
           UPDATE "Users"
-          SET 
-            xp_points = COALESCE(xp_points, 0) 
-              + CASE WHEN :is_referral THEN 0 ELSE :shared_xp_points END,
-            xp_referrer_points = COALESCE(xp_referrer_points, 0) 
-              + CASE WHEN :is_referral THEN :shared_xp_points ELSE 0 END
-          WHERE id = :shared_with_user_id 
-            AND :shared_xp_points IS NOT NULL
+          SET xp_points = COALESCE(xp_points, 0) + :creator_xp_points
+          WHERE id = :creator_user_id
+            AND :creator_xp_points > 0
+            AND EXISTS(SELECT 1 FROM inserted)
+          RETURNING 1
+        ),
+        update_referrer AS (
+          UPDATE "Users"
+          SET xp_referrer_points = COALESCE(xp_referrer_points, 0) + :referrer_xp_points
+          WHERE id = :referrer_user_id
+            AND :referrer_xp_points > 0
             AND EXISTS(SELECT 1 FROM inserted)
           RETURNING 1
         )
         UPDATE "Quests"
-        SET 
+        SET
           xp_awarded = xp_awarded + :reward_amount,
           end_date = CASE 
               WHEN (xp_awarded + :reward_amount) >= max_xp_to_end
@@ -252,11 +279,14 @@ async function recordXpsForQuest({
             event_id,
             event_created_at,
             user_id,
-            shared_with_user_id,
+            creator_user_id,
+            creator_xp_points,
+            referrer_user_id,
+            referrer_xp_points,
+            log_creator_user_id,
+            log_creator_xp_points,
             reward_amount,
             xp_points,
-            shared_xp_points,
-            is_referral: !!shared_with?.referrer_address,
             scope: scope ? JSON.stringify(scope) : null,
           },
           transaction,
@@ -287,7 +317,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           event_created_at: payload.created_at!,
           action_metas,
           shared_with: {
-            referrer_address: referee_address?.referred_by_address,
+            referrer_address: referee_address?.referred_by_address ?? null,
           },
         });
       },
@@ -296,6 +326,9 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           where: { id: payload.community_id },
         });
         if (!community) return;
+        const user = await models.User.findOne({
+          where: { id: payload.user_id },
+        });
         const action_metas = await getQuestActionMetas(
           payload,
           'CommunityCreated',
@@ -306,7 +339,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             user_id: payload.user_id,
             event_created_at: payload.created_at!,
             action_metas,
-            shared_with: { referrer_address: payload.referrer_address },
+            shared_with: { referrer_address: user?.referred_by_address ?? null },
             scope: {
               chain_id: community.chain_node_id || undefined,
               community_id: community.id,
@@ -331,7 +364,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             user_id: payload.user_id,
             event_created_at: payload.created_at!,
             action_metas,
-            shared_with: { referrer_address: user?.referred_by_address },
+            shared_with: { referrer_address: user?.referred_by_address ?? null },
             scope: { community_id: payload.community_id },
           });
         }
@@ -339,6 +372,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       ThreadCreated: async ({ id, payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
         if (!user_id) return;
+        const referrer_address = await getReferrerByUserId(user_id);
         const action_metas = await getQuestActionMetas(
           payload,
           'ThreadCreated',
@@ -348,6 +382,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           user_id,
           event_created_at: payload.created_at!,
           action_metas,
+          shared_with: { referrer_address },
           scope: {
             community_id: payload.community_id,
             topic_id: payload.topic_id,
@@ -358,6 +393,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       ThreadUpvoted: async ({ id, payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
         if (!user_id) return;
+        const referrer_address = await getReferrerByUserId(user_id);
         const thread = await models.Thread.findOne({
           where: { id: payload.thread_id },
           include: [
@@ -379,7 +415,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           user_id,
           event_created_at: payload.created_at!,
           action_metas,
-          shared_with: { creator_address: thread!.Address!.address },
+          shared_with: {
+            creator_address: thread!.Address!.address,
+            referrer_address,
+          },
           scope: {
             community_id: thread.community_id,
             topic_id: thread.topic_id,
@@ -390,6 +429,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       CommentCreated: async ({ id, payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
         if (!user_id) return;
+        const referrer_address = await getReferrerByUserId(user_id);
         const thread = await models.Thread.findOne({
           where: { id: payload.thread_id },
         });
@@ -403,6 +443,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           user_id,
           event_created_at: payload.created_at!,
           action_metas,
+          shared_with: { referrer_address },
           scope: {
             community_id: thread.community_id,
             topic_id: thread.topic_id,
@@ -414,6 +455,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       CommentUpvoted: async ({ id, payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
         if (!user_id) return;
+        const referrer_address = await getReferrerByUserId(user_id);
         const comment = await models.Comment.findOne({
           where: { id: payload.comment_id },
           include: [
@@ -443,7 +485,10 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           user_id,
           event_created_at: payload.created_at!,
           action_metas,
-          shared_with: { creator_address: comment!.Address!.address },
+          shared_with: {
+            creator_address: comment!.Address!.address,
+            referrer_address,
+          },
           scope: {
             community_id: comment.Thread!.community_id,
             topic_id: comment.Thread!.topic_id,

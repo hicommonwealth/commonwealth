@@ -187,7 +187,7 @@ describe('User lifecycle', () => {
         actor: admin,
         payload: {},
       });
-      expect(admin_profile?.xp_points).to.equal(12);
+      expect(admin_profile?.xp_points).to.equal(10);
 
       // expect xp points awarded to member who created a thread
       // and upvoted a comment
@@ -195,7 +195,7 @@ describe('User lifecycle', () => {
         actor: member,
         payload: {},
       });
-      expect(member_profile?.xp_points).to.equal(28);
+      expect(member_profile?.xp_points).to.equal(25);
 
       // validate xp audit log
       const logs = await models.XpLog.findAll();
@@ -207,7 +207,7 @@ describe('User lifecycle', () => {
           event_id: 0,
           event_created_at: logs[0].event_created_at,
           user_id: member.user.id,
-          xp_points: 10,
+          xp_points: 9,
           action_meta_id: updated!.action_metas![0].id,
           creator_user_id: null,
           creator_xp_points: null,
@@ -224,7 +224,7 @@ describe('User lifecycle', () => {
           event_id: 0,
           event_created_at: logs[1].event_created_at,
           user_id: admin.user.id,
-          xp_points: 5,
+          xp_points: 4,
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
@@ -242,7 +242,7 @@ describe('User lifecycle', () => {
           event_id: 0,
           event_created_at: logs[2].event_created_at,
           user_id: admin.user.id,
-          xp_points: 5,
+          xp_points: 4,
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
@@ -260,7 +260,7 @@ describe('User lifecycle', () => {
           event_id: 0,
           event_created_at: logs[3].event_created_at,
           user_id: member.user.id,
-          xp_points: 18,
+          xp_points: 16,
           action_meta_id: updated!.action_metas![2].id,
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
@@ -483,9 +483,9 @@ describe('User lifecycle', () => {
         actor: admin,
         payload: {},
       });
-      // accumulating xp points from the first test (12 + 7)
+      // accumulating xp points from the first test (10 + 6)
       // notice that the second comment created action is not counted
-      expect(admin_profile?.xp_points).to.equal(12 + 7);
+      expect(admin_profile?.xp_points).to.equal(10 + 6);
 
       // expect xp points awarded to member who created a thread
       // and upvoted a comment, plus a referrer reward of 10 (50% of 20)
@@ -494,12 +494,12 @@ describe('User lifecycle', () => {
         payload: {},
       });
       // accumulating xp points
-      // - 28 from the first test
-      // - 28 from the second test
-      expect(member_profile?.xp_points).to.equal(28 + 28);
-      // - 10 from the referral when new user joined the community
-      // - 4 from the referral on a sign-up flow completed
-      expect(member_profile?.xp_referrer_points).to.equal(10 + 4);
+      // - 25 from the first test
+      // - 25 from the second test
+      expect(member_profile?.xp_points).to.equal(25 + 25);
+      // - 2 from the referral when new user joined the community
+      // - 2 from the referral on a sign-up flow completed
+      expect(member_profile?.xp_referrer_points).to.equal(2 + 2);
 
       // expect xp points awarded to user joining the community
       const new_user_profile = await query(GetUserProfile(), {
@@ -511,9 +511,9 @@ describe('User lifecycle', () => {
         },
         payload: {},
       });
-      // joining community awards 10 xp points (50% of 20)
-      // sign up flow completed awards 16 xp points (80% of 20)
-      expect(new_user_profile?.xp_points).to.equal(10 + 16);
+      // joining community awards 18 xp points (90% of 20)
+      // sign up flow completed awards 18 xp points (90% of 20)
+      expect(new_user_profile?.xp_points).to.equal(18 + 18);
 
       // validate xp audit log
       const logs = await models.XpLog.findAll({});
@@ -530,7 +530,7 @@ describe('User lifecycle', () => {
           event_id: 0,
           event_created_at: last[0].event_created_at,
           user_id: member.user.id,
-          xp_points: 10,
+          xp_points: 9,
           name: null,
           action_meta_id: updated!.action_metas![0].id,
           creator_user_id: null,
@@ -547,7 +547,7 @@ describe('User lifecycle', () => {
           event_id: 0,
           event_created_at: last[1].event_created_at,
           user_id: admin.user.id,
-          xp_points: 5,
+          xp_points: 4,
           name: null,
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
@@ -565,7 +565,7 @@ describe('User lifecycle', () => {
           event_id: 0,
           event_created_at: last[2].event_created_at,
           user_id: member.user.id,
-          xp_points: 18,
+          xp_points: 16,
           name: null,
           action_meta_id: updated!.action_metas![2].id,
           creator_user_id: admin.user.id,
@@ -583,11 +583,11 @@ describe('User lifecycle', () => {
           event_id: 0,
           event_created_at: last[3].event_created_at,
           user_id: new_address!.user_id!,
-          xp_points: 10,
+          xp_points: 18,
           name: null,
           action_meta_id: updated!.action_metas![3].id,
           creator_user_id: member.user.id,
-          creator_xp_points: 10,
+          creator_xp_points: 2,
           created_at: last[3].created_at,
           scope: {
             community_id,
@@ -598,11 +598,11 @@ describe('User lifecycle', () => {
           event_id: 0,
           event_created_at: last[4].event_created_at,
           user_id: new_address!.user_id!,
-          xp_points: 16,
+          xp_points: 18,
           name: null,
           action_meta_id: -1, // this is system quest action
           creator_user_id: member.user.id,
-          creator_xp_points: 4,
+          creator_xp_points: 2,
           created_at: last[4].created_at,
           scope: null,
         },
@@ -763,13 +763,13 @@ describe('User lifecycle', () => {
       // drain the outbox
       await drainOutbox(['ThreadCreated'], Xp);
 
-      // expect 20 (double xp) points awarded to member who created the thread
+      // expect 18 (double xp minus referral slice) points awarded to member who created the thread
       const member_profile = await query(GetUserProfile(), {
         actor: member,
         payload: {},
       });
-      expect(member_profile?.xp_points).to.equal(28 + 28 + 20);
-      expect(member_profile?.xp_referrer_points).to.equal(10 + 4);
+      expect(member_profile?.xp_points).to.equal(25 + 25 + 18);
+      expect(member_profile?.xp_referrer_points).to.equal(2 + 2);
     });
 
     it('should end quest when max_xp_to_end is reached', async () => {
