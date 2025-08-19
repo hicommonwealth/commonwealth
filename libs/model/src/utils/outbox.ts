@@ -1,5 +1,5 @@
 import { logger } from '@hicommonwealth/core';
-import { EventPairs, OutboxEvents } from '@hicommonwealth/schemas';
+import { EventPair, EventPairs, OutboxEvents } from '@hicommonwealth/schemas';
 import { Model, ModelStatic, Transaction } from 'sequelize';
 import { config } from '../config';
 import type { OutboxAttributes } from '../models/outbox';
@@ -12,6 +12,17 @@ const EventPriorities: Partial<Record<OutboxEvents, number>> = {
   UserCreated: -1,
   SignUpFlowCompleted: -1,
   UserUpdated: -1,
+};
+
+const EventFilters: Partial<{
+  [K in OutboxEvents]: (event: EventPair<K>) => boolean;
+}> = {
+  UserUpdated: (event) => {
+    return (
+      !!event.event_payload.new_user.email &&
+      event.event_payload.new_user.email !== event.event_payload.old_user.email
+    );
+  },
 };
 
 /**
@@ -28,7 +39,11 @@ export async function emitEvent(
 ) {
   const records: Array<EventPairs> = [];
   for (const event of values) {
-    if (!config.OUTBOX.BLACKLISTED_EVENTS.includes(event.event_name)) {
+    const filter = EventFilters[event.event_name];
+    if (
+      !config.OUTBOX.BLACKLISTED_EVENTS.includes(event.event_name) &&
+      (!filter || filter(event))
+    ) {
       records.push({
         ...event,
         priority:
@@ -50,6 +65,6 @@ export async function emitEvent(
   }
 
   if (records.length > 0) {
-    await outbox.bulkCreate(values, { transaction });
+    await outbox.bulkCreate(records, { transaction });
   }
 }
