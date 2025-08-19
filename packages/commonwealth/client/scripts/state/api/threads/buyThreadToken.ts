@@ -46,12 +46,6 @@ const buyThreadToken = async ({
     );
   }
 
-  if (!factoryAddress || !bondingCurve) {
-    throw new Error(
-      `Required contract addresses not found for chain ID: ${ethChainId}`,
-    );
-  }
-
   const tokenLaunchpad = new TokenLaunchpad(
     factoryAddress,
     bondingCurve,
