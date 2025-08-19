@@ -15,7 +15,9 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
       SELECT *
       FROM "Outbox"
       WHERE relayed = false
-      ORDER BY created_at ASC
+      -- NULLS FIRST only needed at the beginning to process existing events
+      -- NULLS FIRST should eventually be removed
+      ORDER BY priority DESC NULLS FIRST, created_at ASC
       LIMIT :prefetch
       FOR UPDATE SKIP LOCKED;
     `,
