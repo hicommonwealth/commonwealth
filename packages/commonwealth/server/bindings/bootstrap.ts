@@ -76,12 +76,17 @@ export async function bootstrapBindings(options?: {
 export async function bootstrapRelayer(
   maxRelayIterations?: number,
 ): Promise<void> {
-  setInterval(async () => {
+  setInterval(() => {
     // Report Outbox stats once per minute
-    const count = await models.Outbox.count({
+    models.Outbox.count({
       where: { relayed: false },
-    });
-    stats().gauge('messageRelayerNumUnrelayedEvents', count);
+    })
+      .then((count) => {
+        stats().gauge('messageRelayerNumUnrelayedEvents', count);
+      })
+      .catch((err) => {
+        log.error('Failed to update Outbox stats', err);
+      });
   }, 60_000);
 
   relayForever(maxRelayIterations).catch((err) => {
