@@ -161,8 +161,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     enabled: !!threadId && !!communityId,
   });
 
-  console.log('threadToken', threadToken);
-
   const thread = useMemo(() => {
     return threadView;
   }, [threadView]);
