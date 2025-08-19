@@ -42,7 +42,8 @@ export async function emitEvent(
     const filter = EventFilters[event.event_name];
     if (
       !config.OUTBOX.BLACKLISTED_EVENTS.includes(event.event_name) &&
-      (!filter || filter(event))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (!filter || filter(event as any))
     ) {
       records.push({
         ...event,
