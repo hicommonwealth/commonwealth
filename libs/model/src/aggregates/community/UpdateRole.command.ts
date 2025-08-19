@@ -4,7 +4,7 @@ import { Op } from 'sequelize';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
-import { emitEvent } from '../../utils/utils';
+import { emitEvent } from '../../utils';
 
 export const UpdateRoleErrors = {
   MustHaveAdmin: 'Communities must have at least one admin',

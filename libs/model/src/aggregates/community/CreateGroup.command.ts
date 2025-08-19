@@ -6,7 +6,7 @@ import { models, sequelize } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustNotExist } from '../../middleware/guards';
 import { GroupAttributes } from '../../models';
-import { emitEvent } from '../../utils/utils';
+import { emitEvent } from '../../utils';
 
 export const MAX_GROUPS_PER_COMMUNITY = 20;
 

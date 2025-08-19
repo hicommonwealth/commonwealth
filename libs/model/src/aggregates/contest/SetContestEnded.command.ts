@@ -9,7 +9,7 @@ import { config } from '../../config';
 import { models } from '../../database';
 import { systemActor } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
-import { emitEvent, getChainNodeUrl } from '../../utils/utils';
+import { emitEvent, getChainNodeUrl } from '../../utils';
 import { UpdateContestManagerFrameHashes } from './UpdateContestManagerFrameHashes.command';
 
 const log = logger(import.meta);

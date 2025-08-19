@@ -6,7 +6,7 @@ import { models } from '../../../database';
 import { AddressAttributes } from '../../../models/address';
 import { UserAttributes } from '../../../models/user';
 import { getBalances } from '../../../services/tokenBalanceCache';
-import { emitEvent } from '../../../utils/utils';
+import { emitEvent } from '../../../utils';
 
 const log = logger(import.meta);
 

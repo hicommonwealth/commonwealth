@@ -2,8 +2,8 @@ import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
+import { emitEvent } from '../../utils';
 import { updateCommunityDirectoryTags } from '../../utils/updateCommunityDirectoryTags';
-import { emitEvent } from '../../utils/utils';
 
 export function UpdateCommunityDirectoryTags(): Command<
   typeof schemas.UpdateCommunityDirectoryTags

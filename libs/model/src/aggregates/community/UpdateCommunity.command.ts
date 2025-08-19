@@ -11,7 +11,7 @@ import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
 import { checkSnapshotObjectExists } from '../../services';
 import { newNamespaceValidator } from '../../services/commonProtocol';
-import { emitEvent } from '../../utils/utils';
+import { emitEvent } from '../../utils';
 
 export const UpdateCommunityErrors = {
   SnapshotOnlyOnEthereum:

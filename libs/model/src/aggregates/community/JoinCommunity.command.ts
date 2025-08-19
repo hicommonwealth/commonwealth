@@ -14,8 +14,8 @@ import {
 import { models } from '../../database';
 import { authVerified } from '../../middleware/auth';
 import { mustExist } from '../../middleware/guards';
+import { emitEvent } from '../../utils';
 import { findCompatibleAddress } from '../../utils/findBaseAddress';
-import { emitEvent } from '../../utils/utils';
 
 export const JoinCommunityErrors = {
   NotVerifiedAddressOrUser: 'Not verified address or user',
