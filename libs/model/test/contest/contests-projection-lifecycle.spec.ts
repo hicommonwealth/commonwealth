@@ -19,9 +19,9 @@ import {
   vi,
 } from 'vitest';
 import { z } from 'zod';
-import { Contests } from '../../src/aggregates/contest/Contests.projection';
 import { GetAllContests } from '../../src/aggregates/contest/GetAllContests.query';
 import { models } from '../../src/database';
+import { ContestsProjection } from '../../src/projections/Contests.projection';
 import { seed } from '../../src/tester';
 import { createEventRegistryChainNodes } from '../../src/utils';
 
@@ -213,7 +213,7 @@ describe('Contests projection lifecycle', () => {
       },
     } as unknown as any);
 
-    await handleEvent(Contests(), {
+    await handleEvent(ContestsProjection(), {
       id: 0,
       name: 'RecurringContestManagerDeployed',
       payload: {
@@ -226,7 +226,7 @@ describe('Contests projection lifecycle', () => {
       },
     });
 
-    await handleEvent(Contests(), {
+    await handleEvent(ContestsProjection(), {
       id: 0,
       name: 'ContestStarted',
       payload: {
@@ -238,7 +238,7 @@ describe('Contests projection lifecycle', () => {
       },
     });
 
-    await handleEvent(Contests(), {
+    await handleEvent(ContestsProjection(), {
       id: 0,
       name: 'OneOffContestManagerDeployed',
       payload: {
@@ -262,7 +262,7 @@ describe('Contests projection lifecycle', () => {
       'OneOffContestManagerDeployed should have created a Contest',
     ).to.exist;
 
-    await handleEvent(Contests(), {
+    await handleEvent(ContestsProjection(), {
       id: 0,
       name: 'ContestStarted',
       payload: {
@@ -274,7 +274,7 @@ describe('Contests projection lifecycle', () => {
       },
     });
 
-    await handleEvent(Contests(), {
+    await handleEvent(ContestsProjection(), {
       id: 0,
       name: 'ContestContentAdded',
       payload: {
@@ -285,7 +285,7 @@ describe('Contests projection lifecycle', () => {
       },
     });
 
-    await handleEvent(Contests(), {
+    await handleEvent(ContestsProjection(), {
       id: 0,
       name: 'ContestContentAdded',
       payload: {
@@ -297,7 +297,7 @@ describe('Contests projection lifecycle', () => {
       },
     });
 
-    await handleEvent(Contests(), {
+    await handleEvent(ContestsProjection(), {
       id: 0,
       name: 'ContestContentUpvoted',
       payload: {
@@ -309,7 +309,7 @@ describe('Contests projection lifecycle', () => {
       },
     });
 
-    await handleEvent(Contests(), {
+    await handleEvent(ContestsProjection(), {
       id: 0,
       name: 'ContestContentUpvoted',
       payload: {
@@ -321,7 +321,7 @@ describe('Contests projection lifecycle', () => {
       },
     });
 
-    await handleEvent(Contests(), {
+    await handleEvent(ContestsProjection(), {
       id: 0,
       name: 'ContestContentUpvoted',
       payload: {

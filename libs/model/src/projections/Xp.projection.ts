@@ -12,8 +12,8 @@ import {
 } from '@hicommonwealth/shared';
 import { Op, Sequelize } from 'sequelize';
 import { z } from 'zod';
-import { config } from '../../config';
-import { models } from '../../database';
+import { config } from '../config';
+import { models } from '../database';
 
 const log = logger(import.meta);
 
@@ -254,7 +254,7 @@ async function recordXpsForQuest({
   }
 }
 
-export function Xp(): Projection<typeof schemas.QuestEvents> {
+export function XpProjection(): Projection<typeof schemas.QuestEvents> {
   return {
     inputs: schemas.QuestEvents,
     body: {

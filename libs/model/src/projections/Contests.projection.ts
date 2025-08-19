@@ -25,19 +25,15 @@ import {
 import { QueryTypes } from 'sequelize';
 import { privateKeyToAccount } from 'viem/accounts';
 import { z } from 'zod';
-import { config } from '../../config';
-import { models } from '../../database';
-import { mustExist } from '../../middleware/guards';
-import { EvmEventSourceAttributes } from '../../models';
-import { contractHelpers } from '../../services/commonProtocol';
-import { DEFAULT_CONTEST_BOT_PARAMS } from '../../services/openai/parseBotCommand';
-import { getWeightedNumTokens } from '../../services/stakeHelper';
-import {
-  decodeThreadContentUrl,
-  getChainNodeUrl,
-  publishCast,
-} from '../../utils';
-import { findActiveContestManager } from '../../utils/findActiveContestManager';
+import { config } from '../config';
+import { models } from '../database';
+import { mustExist } from '../middleware/guards';
+import { EvmEventSourceAttributes } from '../models';
+import { contractHelpers } from '../services/commonProtocol';
+import { DEFAULT_CONTEST_BOT_PARAMS } from '../services/openai/parseBotCommand';
+import { getWeightedNumTokens } from '../services/stakeHelper';
+import { decodeThreadContentUrl, getChainNodeUrl, publishCast } from '../utils';
+import { findActiveContestManager } from '../utils/findActiveContestManager';
 
 const log = logger(import.meta);
 
@@ -347,7 +343,7 @@ async function isGraduatedContest(
   return validDeployers.includes(deployerAddress.toLowerCase());
 }
 
-export function Contests(): Projection<typeof inputs> {
+export function ContestsProjection(): Projection<typeof inputs> {
   return {
     inputs,
     body: {

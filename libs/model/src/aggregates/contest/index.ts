@@ -1,6 +1,5 @@
 export * from './CancelContestManagerMetadata.command';
 export * from './ConfigureNominationsMetadata.command';
-export * from './Contests.projection';
 export * from './CreateContestManagerMetadata.command';
 export * from './DeleteContestManagerMetadata.command';
 export * from './FarcasterCastWebhook.command';

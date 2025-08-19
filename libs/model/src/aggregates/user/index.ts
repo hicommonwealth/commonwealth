@@ -19,4 +19,3 @@ export * from './signIn/SignIn.command';
 export * from './UpdateEmail.command';
 export * from './UpdateSettings.command';
 export * from './UpdateUser.command';
-export * from './Xp.projection';

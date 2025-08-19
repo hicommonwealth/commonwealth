@@ -30,6 +30,8 @@ export * as Webhook from './aggregates/webhook';
 // Policies
 export * from './policies';
 
+export * from './projections';
+
 // Config
 export * from './config';
 

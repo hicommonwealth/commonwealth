@@ -8,7 +8,7 @@ import {
 import {
   ChainEventPolicy,
   CommunityGoalsPolicy,
-  Contest,
+  ContestsProjection,
   ContestWorker,
   CreateUnverifiedUser,
   DiscordBotPolicy,
@@ -20,7 +20,7 @@ import {
   NotificationsSettingsPolicy,
   ReactionWorker,
   TwitterEngagementPolicy,
-  User,
+  XpProjection,
 } from '@hicommonwealth/model';
 
 const _ContestWorker: Consumer<ReturnType<typeof ContestWorker>> = {
@@ -47,8 +47,8 @@ const _FarcasterWorker: Consumer<ReturnType<typeof FarcasterWorker>> = {
   retryStrategy: buildRetryStrategy(undefined, 20_000),
 };
 
-const _Xp: Consumer<ReturnType<typeof User.Xp>> = {
-  consumer: User.Xp,
+const _Xp: Consumer<ReturnType<typeof XpProjection>> = {
+  consumer: XpProjection,
   overrides: {
     ThreadCreated: `ThreadCreated.#`,
     ThreadUpvoted: `ThreadUpvoted.#`,
@@ -91,7 +91,7 @@ const _ReactionWorker = {
 export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   ChainEventPolicy,
   DiscordBotPolicy,
-  Contest.Contests,
+  ContestsProjection,
   NominationsWorker,
   FarcasterWorker,
   EventStreamPolicy,
