@@ -80,6 +80,7 @@ const _NotificationsPolicy = {
 
     // These events don't have Knock workflows and thus should not be emitted
     CommunityJoined: null,
+    SignUpFlowCompleted: null,
   },
 };
 
