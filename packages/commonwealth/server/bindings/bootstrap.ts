@@ -8,14 +8,13 @@ import {
   broker,
   handleEvent,
   logger,
+  stats,
 } from '@hicommonwealth/core';
 import { ContestWorker } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
-import { Client } from 'pg';
 import { config } from 'server/config';
-import { setupListener } from './pgListener';
 import { rascalConsumerMap } from './rascalConsumerMap';
-import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
+import { relayForever } from './relayForever';
 
 const log = logger(import.meta);
 
@@ -76,13 +75,14 @@ export async function bootstrapBindings(options?: {
 
 export async function bootstrapRelayer(
   maxRelayIterations?: number,
-): Promise<Client> {
-  const count = await models.Outbox.count({
-    where: { relayed: false },
-  });
-  incrementNumUnrelayedEvents(count);
-
-  const pgClient = await setupListener();
+): Promise<void> {
+  setInterval(async () => {
+    // Report Outbox stats once per minute
+    const count = await models.Outbox.count({
+      where: { relayed: false },
+    });
+    stats().gauge('messageRelayerNumUnrelayedEvents', count);
+  }, 60_000);
 
   relayForever(maxRelayIterations).catch((err) => {
     log.fatal(
@@ -90,8 +90,6 @@ export async function bootstrapRelayer(
       err,
     );
   });
-
-  return pgClient;
 }
 
 export function bootstrapContestRolloverLoop() {

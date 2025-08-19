@@ -7,20 +7,23 @@ import { config } from '../config';
 
 const log = logger(import.meta);
 
-export async function relay(broker: Broker, models: DB): Promise<number> {
+export async function relay(
+  broker: Broker,
+  models: DB,
+): Promise<{ numFetched: number; numPublished: number }> {
   const publishedEventIds: number[] = [];
+  let events: z.infer<typeof Outbox>[] = [];
   await models.sequelize.transaction(async (transaction) => {
-    const events = await models.sequelize.query<z.infer<typeof Outbox>>(
+    events = await models.sequelize.query<z.infer<typeof Outbox>>(
       `
-      SELECT *
-      FROM "Outbox"
-      WHERE relayed = false
-      -- NULLS FIRST only needed at the beginning to process existing events
-      -- NULLS FIRST should eventually be removed
-      ORDER BY priority DESC NULLS FIRST, created_at ASC
-      LIMIT :prefetch
-      FOR UPDATE SKIP LOCKED;
-    `,
+        SELECT *
+        FROM "Outbox"
+        WHERE relayed = false
+        -- NULLS FIRST only needed at the beginning to process existing events
+        -- NULLS FIRST should eventually be removed
+        ORDER BY priority DESC NULLS FIRST, created_at ASC
+        LIMIT :prefetch FOR UPDATE SKIP LOCKED;
+      `,
       {
         transaction,
         type: QueryTypes.SELECT,
@@ -72,5 +75,8 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
     }
   });
 
-  return publishedEventIds.length;
+  return {
+    numFetched: events.length,
+    numPublished: publishedEventIds.length,
+  };
 }
