@@ -11,6 +11,7 @@ export type OutboxEvents = keyof OutboxSchemas;
 export type EventPair<K extends OutboxEvents> = {
   event_name: K;
   event_payload: z.infer<OutboxSchemas[K]>;
+  priority?: number;
 };
 export type EventPairs = {
   [K in OutboxEvents]: EventPair<K>;
