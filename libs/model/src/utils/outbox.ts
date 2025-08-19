@@ -50,6 +50,6 @@ export async function emitEvent(
   }
 
   if (records.length > 0) {
-    await outbox.bulkCreate(values, { transaction });
+    await outbox.bulkCreate(records, { transaction });
   }
 }
