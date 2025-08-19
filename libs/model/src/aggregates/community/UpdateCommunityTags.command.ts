@@ -3,8 +3,8 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
+import { emitEvent } from '../../utils';
 import { updateTags } from '../../utils/updateTags';
-import { emitEvent } from '../../utils/utils';
 
 export function UpdateCommunityTags(): Command<
   typeof schemas.UpdateCommunityTags
