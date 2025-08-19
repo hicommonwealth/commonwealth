@@ -47,6 +47,35 @@ type TokenIdea = {
   symbol: string;
 };
 
+const TOKEN_IDEA_LRU_KEY = 'tokenLaunchpadRecentSuggestions';
+const TOKEN_IDEA_LRU_SIZE = 20;
+
+type RecentSuggestion = { name: string; symbol: string };
+
+const getRecentSuggestions = (): RecentSuggestion[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const stored = window.localStorage.getItem(TOKEN_IDEA_LRU_KEY);
+    return stored ? (JSON.parse(stored) as RecentSuggestion[]) : [];
+  } catch {
+    return [];
+  }
+};
+
+const pushRecentSuggestion = (suggestion: RecentSuggestion) => {
+  if (typeof window === 'undefined') return;
+  const list = getRecentSuggestions().filter(
+    (s) => s.name !== suggestion.name || s.symbol !== suggestion.symbol,
+  );
+  list.unshift(suggestion);
+  if (list.length > TOKEN_IDEA_LRU_SIZE) list.length = TOKEN_IDEA_LRU_SIZE;
+  try {
+    window.localStorage.setItem(TOKEN_IDEA_LRU_KEY, JSON.stringify(list));
+  } catch {
+    // ignore write errors
+  }
+};
+
 type UseGenerateTokenIdeaProps = {
   maxIdeasLimit?: number;
 };
@@ -75,6 +104,8 @@ export const useGenerateTokenIdea = ({
     totalIdeasGenerated.current = totalIdeasGenerated.current + 1;
     setActiveTokenIdeaIndex(ideaIndex);
 
+    const recentSuggestions = getRecentSuggestions();
+
     try {
       setTokenIdeas((ti) => {
         const temp = [...ti];
@@ -98,11 +129,13 @@ export const useGenerateTokenIdea = ({
           jwt: userStore.getState().jwt,
           ideaPrompt,
           auth: true,
+          recentSuggestions,
         }),
         fetch: fetch,
       });
 
       let timeoutSec = 30;
+      const newToken: Partial<TokenIdea> = {};
       for await (const { data, event } of es) {
         if (event === 'imageURL') {
           // we dont want imageURL to be updated in chunks
@@ -118,9 +151,11 @@ export const useGenerateTokenIdea = ({
             };
             return temp;
           });
+          newToken[event as keyof TokenIdea] = data;
 
           es.close();
         } else {
+          newToken[event as keyof TokenIdea] = data;
           for (let i = 1; i <= data.length; i++) {
             setTimeout(() => {
               setTokenIdeas((ti) => {
@@ -155,6 +190,13 @@ export const useGenerateTokenIdea = ({
             }, timeoutSec);
           }
         }
+      }
+
+      if (newToken.name && newToken.symbol) {
+        pushRecentSuggestion({
+          name: newToken.name,
+          symbol: newToken.symbol,
+        });
       }
     } catch (error) {
       setTokenIdeas((ti) => {
