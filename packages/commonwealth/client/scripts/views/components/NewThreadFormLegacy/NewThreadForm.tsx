@@ -929,7 +929,6 @@ export const NewThreadForm = forwardRef<
             });
           }
 
-          // Reset form
           setThreadTitle('');
           setThreadContentDelta(createDeltaFromText(''));
           setThreadUrl('');
@@ -937,7 +936,6 @@ export const NewThreadForm = forwardRef<
           setPollData(undefined);
           resetTurnstile();
 
-          // Navigate to the new thread
           navigate(`/discussion/${thread.id}`);
         } catch (error) {
           console.error('Error creating thread:', error);

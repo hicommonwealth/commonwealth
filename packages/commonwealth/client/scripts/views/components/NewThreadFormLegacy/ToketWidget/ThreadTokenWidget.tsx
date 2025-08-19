@@ -69,7 +69,6 @@ const ThreadTokenWidget = ({
     isSellMode,
     setIsSellMode,
     threadToken,
-    isLoadingThreadToken,
     userTokenBalance,
     isLoadingTokenBalance,
     buyThreadToken,
@@ -85,7 +84,6 @@ const ThreadTokenWidget = ({
     primaryTokenSymbol,
     userBalance,
     isLoadingBalance,
-    createTokenTrade,
     isBuying,
     isCreatingTokenTrade,
     isWrongNetwork,
@@ -95,8 +93,6 @@ const ThreadTokenWidget = ({
     linkSpecificAddressToSpecificCommunity,
     isPrimaryTokenConfigured,
   } = isThreadCreationMode ? launchAndBuyHook : threadTokenWidgetHook;
-
-  const { tokenMetadata, primaryTokenRateData } = threadTokenWidgetHook;
 
   const {
     threadFormAmount,
