@@ -11,6 +11,12 @@
     align-items: center;
     margin-bottom: 16px;
 
+    .header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
     .see-all-link {
       cursor: pointer;
       color: colors.$primary-500;

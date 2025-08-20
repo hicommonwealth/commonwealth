@@ -1,0 +1,36 @@
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+
+.RainbowText {
+  position: relative;
+  display: inline-block;
+  background-image: linear-gradient(
+    90deg,
+    #5798e7,
+    /* primary-500 */ #b0d374,
+    /* green-500 */ #f6d983,
+    /* yellow-500 */ #f7a48b,
+    /* rorange-500 */ #f4adeb,
+    /* pink-500 */ #c4a7fa,
+    /* purple-400 */ #9cc7fd /* back to primary for loop */
+  );
+  // Text shadow for glow effect
+  // text-shadow: 0 0 4px rgba(255, 255, 255, 0.63),
+  // 0 0 8px rgba(45, 43, 43, 0.4);
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation-name: rainbow-slide;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+
+  @keyframes rainbow-slide {
+    0% {
+      background-position: 0% 50%;
+    }
+
+    100% {
+      background-position: 100% 50%;
+    }
+  }
+}
