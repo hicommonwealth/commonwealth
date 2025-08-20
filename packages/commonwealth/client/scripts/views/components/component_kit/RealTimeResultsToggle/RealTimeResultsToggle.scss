@@ -1,0 +1,13 @@
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+
+.RealTimeResultsToggle {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+
+  .caption {
+    font-size: 14px !important;
+  }
+}

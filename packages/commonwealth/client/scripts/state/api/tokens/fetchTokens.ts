@@ -6,6 +6,7 @@ const FETCH_TOKENS_STALE_TIME = 60 * 3_000; // 3 mins
 
 type UseFetchTokensProps = z.infer<typeof GetTokens.input> & {
   enabled?: boolean;
+  refetchInterval?: number;
 };
 
 const useFetchTokensQuery = ({
@@ -16,6 +17,7 @@ const useFetchTokensQuery = ({
   with_stats = false,
   enabled = true,
   is_graduated,
+  refetchInterval,
 }: UseFetchTokensProps) => {
   return trpc.launchpadToken.getTokens.useInfiniteQuery(
     {
@@ -30,6 +32,7 @@ const useFetchTokensQuery = ({
       gcTime: FETCH_TOKENS_STALE_TIME,
       enabled,
       initialCursor: 1,
+      refetchInterval,
       getNextPageParam: (lastPage) => {
         const nextPageNum = lastPage.page + 1;
         if (nextPageNum <= lastPage.totalPages) return nextPageNum;

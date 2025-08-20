@@ -1,6 +1,5 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
-import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import clsx from 'clsx';
 import { APIOrderDirection } from 'helpers/constants';
 import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
@@ -10,8 +9,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import RealTimeResultsToggle from 'views/components/component_kit/RealTimeResultsToggle/RealTimeResultsToggle';
+import { RealTimeToggleLocalStorageKeys } from 'views/components/component_kit/RealTimeResultsToggle/types';
+import useRealTimeResultsToggle from 'views/components/component_kit/RealTimeResultsToggle/useRealTimeResultsToggle';
 import { AuthModal } from 'views/modals/AuthModal';
 import TradeTokenModal, { TradingMode } from 'views/modals/TradeTokenModel';
 import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
@@ -27,6 +30,12 @@ type TrendingTokensListProps = {
   variant?: 'trending' | 'recent' | 'marketcap' | 'graduated';
   heading?: string;
   limit?: number;
+};
+
+const variantToRealtimeKeyMap = {
+  trending: RealTimeToggleLocalStorageKeys.TrendingTokens,
+  recent: RealTimeToggleLocalStorageKeys.GraduatedTokens,
+  graduated: RealTimeToggleLocalStorageKeys.RecentlyLaunchedTokens,
 };
 
 const TrendingTokensList = ({
@@ -52,6 +61,12 @@ const TrendingTokensList = ({
     shouldRunTrigger: user.isLoggedIn,
   });
 
+  const foundRealtimeStorageKey = variantToRealtimeKeyMap[variant];
+  const { isRealTime, setIsRealTime } = useRealTimeResultsToggle({
+    localStorageKey: foundRealtimeStorageKey,
+  });
+  console.log('isRealTime => ', isRealTime);
+
   const { data: tokensList, isInitialLoading } = useFetchTokensQuery({
     cursor: 1,
     limit,
@@ -65,6 +80,7 @@ const TrendingTokensList = ({
     order_direction: APIOrderDirection.Desc,
     is_graduated: variant === 'graduated',
     enabled: launchpadEnabled,
+    refetchInterval: isRealTime ? 3 : undefined, // refetch after every 3 sec if realime
   });
   const tokens = (tokensList?.pages || [])
     .flatMap((page) => page.results)
@@ -97,7 +113,15 @@ const TrendingTokensList = ({
   return (
     <div className="TokensList">
       <div className="heading-container">
-        <CWText type="h2">{heading}</CWText>
+        <div className="header">
+          <CWText type="h2">{heading}</CWText>
+          {foundRealtimeStorageKey && (
+            <RealTimeResultsToggle
+              localStorageKey={foundRealtimeStorageKey}
+              onChange={(change) => setIsRealTime(change.isRealTime)}
+            />
+          )}
+        </div>
         <Link to="/explore?tab=tokens">
           <div className="link-right">
             <CWText className="link">Tokens</CWText>
