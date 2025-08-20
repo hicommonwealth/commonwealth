@@ -10,6 +10,7 @@ export const CreatePoll = {
     prompt: z.string(),
     options: z.array(z.string()),
     duration: PG_INT.min(1).max(31).default(DEFAULT_POLL_DURATION).nullable(), // null means infinite
+    allow_revotes: z.boolean().default(false),
   }),
   output: Poll,
   context: ThreadContext,
