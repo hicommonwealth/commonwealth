@@ -148,9 +148,13 @@ export const QuickTokenLaunchForm = ({
   });
 
   const user = useUserStore();
-  const isMagicAddress =
-    user?.addresses?.find?.((a) => a === selectedAddress)?.walletId ===
-    WalletId.Magic;
+  const userWalletId = user?.addresses?.find?.(
+    (a) => a === selectedAddress,
+  )?.walletId;
+  const userCanSignTransactions = ![
+    WalletId.Magic,
+    WalletId.WalletConnect,
+  ].includes(userWalletId as unknown as WalletId);
 
   const { mutateAsync: createCommunityMutation } = useCreateCommunityMutation();
 
@@ -185,7 +189,7 @@ export const QuickTokenLaunchForm = ({
   };
 
   const handleTokenLaunch = (tokenInfo: FormSubmitValues) => {
-    if (isCreatingQuickToken || isMagicAddress) return;
+    if (isCreatingQuickToken || !userCanSignTransactions) return;
 
     const handleAsync = async () => {
       setIsCreatingQuickToken(true);
@@ -512,7 +516,7 @@ export const QuickTokenLaunchForm = ({
                 body={`Launching your token on BASE requires a small amount of BASE ETH to cover gas fees.
                       ${ethFee ? `Estimated fee: ${ethFee} BASE ETH.` : ''}`}
               />
-              {isMagicAddress && (
+              {!userCanSignTransactions && (
                 <CWBanner
                   type="error"
                   body="Only wallets accessible via desktop plugin are able to launch tokens"
@@ -580,7 +584,7 @@ export const QuickTokenLaunchForm = ({
                   buttonType="submit"
                   buttonLabel={isSmallScreen ? 'Launch' : 'Launch Token'}
                   disabled={
-                    isMagicAddress ||
+                    !userCanSignTransactions ||
                     isProcessingProfileImage ||
                     isCreatingQuickToken ||
                     generatedTokenIdea?.isChunking
