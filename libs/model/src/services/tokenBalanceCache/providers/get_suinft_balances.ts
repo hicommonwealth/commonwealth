@@ -1,12 +1,15 @@
 import { logger } from '@hicommonwealth/core';
-import { SuiClient } from '@mysten/sui/client';
+import { SuiClient, SuiObjectResponse } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 import type { Balances, GetSuiNftBalanceOptions } from '../types';
 
 const log = logger(import.meta);
 
 // Helper function to check if an NFT belongs to the specified collection
-function isFromCollection(obj: any, collectionId: string): boolean {
+function isFromCollection(
+  obj: SuiObjectResponse,
+  collectionId: string,
+): boolean {
   if (!obj.data) return false;
 
   // ignore fungible tokens
@@ -203,7 +206,8 @@ export async function __get_suinft_balances(
         balances[address] = finalBalance;
 
         console.log(
-          `Address ${address}: Total voting power: ${totalVotingPower}, NFT count: ${nftCount}, Final balance: ${finalBalance}`,
+          `Address ${address}: Total voting power: ${totalVotingPower}, ` +
+            `NFT count: ${nftCount}, Final balance: ${finalBalance}`,
         );
       } catch (e) {
         log.error(`Failed to fetch Sui NFT balance for ${address}`, e as Error);
