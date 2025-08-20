@@ -7,6 +7,7 @@ export function GetTokenStats(): Query<typeof schemas.GetTokenStats> {
   return {
     ...schemas.GetTokenStats,
     auth: [],
+    secure: false,
     async body({ payload }) {
       const { token_address } = payload;
       const sql = `
