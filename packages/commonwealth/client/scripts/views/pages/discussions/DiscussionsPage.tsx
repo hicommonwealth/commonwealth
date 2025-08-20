@@ -385,7 +385,12 @@ const DiscussionsPage = () => {
     }
   };
 
-  if (privateTopicsEnabled && isPrivateTopic && !isAllowedMember) {
+  if (
+    privateTopicsEnabled &&
+    isPrivateTopic &&
+    !isAllowedMember &&
+    !bypassGating
+  ) {
     return (
       <StickCommentProvider mode="thread">
         <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">

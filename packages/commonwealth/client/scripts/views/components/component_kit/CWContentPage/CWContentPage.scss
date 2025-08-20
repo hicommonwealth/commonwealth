@@ -71,6 +71,7 @@
 .ContentPage {
   display: flex;
   flex: 1;
+  min-height: calc(100vh - #{shared.$global-header-height});
 
   .sidebar-view {
     display: flex;
