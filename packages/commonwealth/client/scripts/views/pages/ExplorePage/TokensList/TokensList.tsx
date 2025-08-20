@@ -10,6 +10,9 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import RealTimeResultsToggle from 'views/components/component_kit/RealTimeResultsToggle/RealTimeResultsToggle';
+import { RealTimeToggleLocalStorageKeys } from 'views/components/component_kit/RealTimeResultsToggle/types';
+import useRealTimeResultsToggle from 'views/components/component_kit/RealTimeResultsToggle/useRealTimeResultsToggle';
 import { AuthModal } from 'views/modals/AuthModal';
 import TradeTokenModal, {
   TradingConfig,
@@ -64,6 +67,9 @@ const TokensList = ({
     withTokenSortBy: TokenSortOptions.Price,
     withTokenSortOrder: TokenSortDirections.Descending,
   });
+  const { isRealTime, setIsRealTime } = useRealTimeResultsToggle({
+    localStorageKey: RealTimeToggleLocalStorageKeys.Tokens,
+  });
 
   const {
     data: tokensList,
@@ -92,6 +98,7 @@ const TokensList = ({
       ],
     is_graduated: filters.isGraduated,
     enabled: launchpadEnabled,
+    refetchInterval: isRealTime ? 3 : undefined,
   });
   const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
 
@@ -170,6 +177,11 @@ const TokensList = ({
               onCloseClick={removeIsGraduatedFilter}
             />
           )}
+          <RealTimeResultsToggle
+            label="⚡️ Auto refresh"
+            localStorageKey={RealTimeToggleLocalStorageKeys.Tokens}
+            onChange={(change) => setIsRealTime(change.isRealTime)}
+          />
           <FiltersDrawer
             isOpen={isFilterDrawerOpen}
             onClose={() => setIsFilterDrawerOpen(false)}

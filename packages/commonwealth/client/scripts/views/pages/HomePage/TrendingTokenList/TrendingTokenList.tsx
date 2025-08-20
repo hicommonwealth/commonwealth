@@ -65,7 +65,6 @@ const TrendingTokensList = ({
   const { isRealTime, setIsRealTime } = useRealTimeResultsToggle({
     localStorageKey: foundRealtimeStorageKey,
   });
-  console.log('isRealTime => ', isRealTime);
 
   const { data: tokensList, isInitialLoading } = useFetchTokensQuery({
     cursor: 1,
