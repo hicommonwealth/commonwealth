@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { USER_TIERS } from '@hicommonwealth/shared';
+import { COMMUNITY_TIERS, USER_TIERS } from '@hicommonwealth/shared';
 import { useFlag } from 'hooks/useFlag';
 import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
@@ -10,7 +10,7 @@ import { getCommunityTrustLevel, getUserTrustLevel } from './utils';
 
 interface TrustLevelRoleProps {
   type: 'community' | 'user';
-  level: number;
+  level?: number;
   size?: 'small' | 'medium' | 'large' | 'xl';
   withTooltip?: boolean;
 }
@@ -30,9 +30,13 @@ const TrustLevelRole = ({
       ? getCommunityTrustLevel(level)
       : getUserTrustLevel(level);
 
-  const tier = Object.values(USER_TIERS).find(
-    (t) => t.clientInfo?.trustLevel === level,
-  );
+  const tiers = type === 'community' ? COMMUNITY_TIERS : USER_TIERS;
+  const tier =
+    level !== undefined
+      ? Object.values(tiers).find(
+          (t) => t.clientInfo?.trustLevel === level,
+        )
+      : undefined;
 
   const tooltipContent = tier ? (
     <div style={{ maxWidth: 240 }}>
