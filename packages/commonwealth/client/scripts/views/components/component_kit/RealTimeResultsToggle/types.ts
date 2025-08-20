@@ -1,7 +1,9 @@
 export enum RealTimeToggleLocalStorageKeys {
-  Tokens = 'tokens',
-  // specific filters
-  TrendingTokens = 'trending-tokens',
-  RecentlyLaunchedTokens = 'recently-launched-tokens',
-  GraduatedTokens = 'graduated-tokens',
+  // home page realtime toggles
+  HomeTrendingTokens = 'home-trending-tokens',
+  HomeRecentlyLaunchedTokens = 'home-recently-launched-tokens',
+  HomeGraduatedTokens = 'home-graduated-tokens',
+  // explore page realtime toggles
+  ExploreThreads = 'explore-threads',
+  ExploreTokens = 'explore-tokens',
 }

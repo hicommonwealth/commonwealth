@@ -68,7 +68,7 @@ const TokensList = ({
     withTokenSortOrder: TokenSortDirections.Descending,
   });
   const { isRealTime, setIsRealTime } = useRealTimeResultsToggle({
-    localStorageKey: RealTimeToggleLocalStorageKeys.Tokens,
+    localStorageKey: RealTimeToggleLocalStorageKeys.ExploreTokens,
   });
 
   const {
@@ -179,7 +179,7 @@ const TokensList = ({
           )}
           <RealTimeResultsToggle
             label="⚡️ Auto refresh"
-            localStorageKey={RealTimeToggleLocalStorageKeys.Tokens}
+            localStorageKey={RealTimeToggleLocalStorageKeys.ExploreTokens}
             onChange={(change) => setIsRealTime(change.isRealTime)}
           />
           <FiltersDrawer

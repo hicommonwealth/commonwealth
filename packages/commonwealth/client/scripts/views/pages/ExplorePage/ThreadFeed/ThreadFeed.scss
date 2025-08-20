@@ -4,17 +4,6 @@
   gap: 16px;
   height: 100%;
 
-  .thread-filters {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-
-    &.hasAppliedFilter {
-      margin-bottom: 8px;
-    }
-  }
-
   .no-feed-message {
     display: flex;
     justify-content: center;
@@ -23,6 +12,18 @@
     font-size: 16px;
     color: var(--text-secondary);
     margin-top: 24px;
+  }
+}
+
+.thread-filters {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+
+  &.hasAppliedFilter {
+    margin-bottom: 8px;
   }
 }
 

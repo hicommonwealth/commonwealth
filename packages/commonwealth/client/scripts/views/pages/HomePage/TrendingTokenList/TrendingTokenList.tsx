@@ -33,9 +33,9 @@ type TrendingTokensListProps = {
 };
 
 const variantToRealtimeKeyMap = {
-  trending: RealTimeToggleLocalStorageKeys.TrendingTokens,
-  recent: RealTimeToggleLocalStorageKeys.GraduatedTokens,
-  graduated: RealTimeToggleLocalStorageKeys.RecentlyLaunchedTokens,
+  trending: RealTimeToggleLocalStorageKeys.HomeTrendingTokens,
+  recent: RealTimeToggleLocalStorageKeys.HomeGraduatedTokens,
+  graduated: RealTimeToggleLocalStorageKeys.HomeRecentlyLaunchedTokens,
 };
 
 const TrendingTokensList = ({

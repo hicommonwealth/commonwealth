@@ -16,6 +16,9 @@ import {
   useFetchUserActivityQuery,
 } from 'state/api/feeds/fetchUserActivity';
 import useUserStore from 'state/ui/user';
+import RealTimeResultsToggle from 'views/components/component_kit/RealTimeResultsToggle/RealTimeResultsToggle';
+import { RealTimeToggleLocalStorageKeys } from 'views/components/component_kit/RealTimeResultsToggle/types';
+import useRealTimeResultsToggle from 'views/components/component_kit/RealTimeResultsToggle/useRealTimeResultsToggle';
 import { CWButton } from '../../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../../components/component_kit/new_designs/CWModal';
 import { CWTag } from '../../../components/component_kit/new_designs/CWTag';
@@ -125,6 +128,10 @@ export const ThreadFeed = ({
     in_community_id: undefined,
   });
 
+  const { isRealTime, setIsRealTime } = useRealTimeResultsToggle({
+    localStorageKey: RealTimeToggleLocalStorageKeys.ExploreThreads,
+  });
+
   const {
     data: feed,
     isLoading,
@@ -136,6 +143,7 @@ export const ThreadFeed = ({
     ...(filters.in_community_id && { community_id: filters.in_community_id }),
     ...(searchText?.trim() && { search: searchText.trim() }),
     apiEnabled: !!user.activeAccount?.address,
+    refetchInterval: isRealTime ? 3 : undefined,
   });
 
   if (isLoading) {
@@ -203,6 +211,12 @@ export const ThreadFeed = ({
               onCloseClick={removeCommunityFilter}
             />
           )}
+
+          <RealTimeResultsToggle
+            label="⚡️ Auto refresh"
+            localStorageKey={RealTimeToggleLocalStorageKeys.ExploreThreads}
+            onChange={(change) => setIsRealTime(change.isRealTime)}
+          />
           <FiltersDrawer
             isOpen={isFilterDrawerOpen}
             onClose={() => setIsFilterDrawerOpen(false)}
