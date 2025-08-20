@@ -1,5 +1,6 @@
 import { logger } from '@hicommonwealth/core';
 import { SuiClient } from '@mysten/sui/client';
+import { Transaction } from '@mysten/sui/transactions';
 import type { Balances, GetSuiNftBalanceOptions } from '../types';
 
 const log = logger(import.meta);
@@ -32,6 +33,78 @@ export async function __get_suinft_balances(
               showDisplay: true,
             },
           });
+          console.log('RES', JSON.stringify(res, null, 2));
+
+          // Call voting_power function for each valid NFT
+          for (const obj of res.data) {
+            if (obj.data?.type && obj.data.type.includes('VoteEscrowedToken')) {
+              try {
+                console.log(
+                  `Attempting to get voting power for NFT type: ${obj.data.type}`,
+                );
+                console.log(`Collection ID: ${collectionId}`);
+
+                // Create transaction block to call voting_power function
+                const tx = new Transaction();
+
+                // Get clock object (Sui system clock)
+                const clockObjectId = '0x6'; // Standard Sui clock object ID
+
+                // Extract package ID and module from the NFT type (more reliable than collection ID)
+                const nftType = obj.data.type;
+                const typeMatch = nftType.match(/^(0x[a-fA-F0-9]+)::([^:]+)::/);
+
+                if (!typeMatch) {
+                  console.warn(`Could not parse NFT type: ${nftType}`);
+                  continue;
+                }
+
+                const [, packageId, moduleName] = typeMatch;
+                console.log(
+                  `Calling ${packageId}::${moduleName}::voting_power`,
+                );
+
+                // Extract the type parameter from the VoteEscrowedToken type
+                const typeParamMatch = nftType.match(
+                  /VoteEscrowedToken<(.+?)>/,
+                );
+                const typeArguments = typeParamMatch ? [typeParamMatch[1]] : [];
+
+                tx.moveCall({
+                  target: `${packageId}::${moduleName}::voting_power`,
+                  arguments: [
+                    tx.object(obj.data.objectId), // VoteEscrowedToken object
+                    tx.object(clockObjectId), // Clock object
+                  ],
+                  typeArguments: typeArguments,
+                });
+
+                // Execute the transaction as a dev inspect to get the result without sending
+                const result = await client.devInspectTransactionBlock({
+                  transactionBlock: tx,
+                  sender: address, // Use the current address as sender
+                });
+
+                if (result.results && result.results[0]?.returnValues) {
+                  const votingPower = result.results[0].returnValues[0];
+                  if (votingPower && votingPower[0]) {
+                    // Parse the voting power (assuming it's returned as bytes representing u64)
+                    const votingPowerValue = new DataView(
+                      new Uint8Array(votingPower[0]).buffer,
+                    ).getBigUint64(0, true);
+                    console.log(
+                      `Voting power for NFT ${obj.data.objectId}: ${votingPowerValue.toString()}`,
+                    );
+                  }
+                }
+              } catch (votingPowerError) {
+                console.warn(
+                  `Failed to get voting power for NFT ${obj.data?.objectId}:`,
+                  votingPowerError,
+                );
+              }
+            }
+          }
 
           // Custom filtering logic for NFT collections
           const validNFTs = res.data.filter((obj) => {
