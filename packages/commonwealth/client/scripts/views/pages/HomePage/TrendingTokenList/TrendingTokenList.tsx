@@ -117,6 +117,7 @@ const TrendingTokensList = ({
           <CWText type="h2">{heading}</CWText>
           {foundRealtimeStorageKey && (
             <RealTimeResultsToggle
+              label="⚡️ Auto refresh"
               localStorageKey={foundRealtimeStorageKey}
               onChange={(change) => setIsRealTime(change.isRealTime)}
             />

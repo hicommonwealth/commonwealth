@@ -9,11 +9,13 @@ import useRealTimeResultsToggle from './useRealTimeResultsToggle';
 type RealTimeResultsToggleProps = {
   localStorageKey: RealTimeToggleLocalStorageKeys;
   onChange?: ({ isRealTime }: { isRealTime: boolean }) => void;
+  label?: string;
 };
 
 const RealTimeResultsToggle = ({
   localStorageKey,
   onChange,
+  label = '⚡️ Realtime Results',
 }: RealTimeResultsToggleProps) => {
   const { isRealTime, setIsRealTime } = useRealTimeResultsToggle({
     localStorageKey,
@@ -24,11 +26,11 @@ const RealTimeResultsToggle = ({
       {isRealTime ? (
         <RainbowText>
           <CWText type="caption" fontWeight="bold">
-            ⚡️ Realtime Results
+            {label}
           </CWText>
         </RainbowText>
       ) : (
-        <CWText type="caption">⚡️ Realtime Results</CWText>
+        <CWText type="caption">{label}</CWText>
       )}
       <CWToggle
         iconColor="#757575"
