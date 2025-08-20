@@ -113,10 +113,10 @@ const ModalBase = ({
   const [isSMSAllowed, setIsSMSAllowed] = useState(false);
 
   useEffect(() => {
-    fetch('https://ipapi.co/json/')
+    fetch('/api/ipCountry')
       .then((res) => res.json())
       .then((data) => {
-        const country = data.country_code?.toUpperCase();
+        const country = data.country?.toUpperCase();
         setIsSMSAllowed(['US', 'CA'].includes(country));
       })
       .catch(() => {
