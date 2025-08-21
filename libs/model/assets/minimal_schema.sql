@@ -2536,6 +2536,13 @@ CREATE UNIQUE INDEX "Quests_community_id_name_key" ON public."Quests" USING btre
 
 
 --
+-- Name: LaunchpadTokens_liquidity_transferred_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX "LaunchpadTokens_liquidity_transferred_created_at" ON public."LaunchpadTokens" USING btree (liquidity_transferred, created_at DESC);
+
+
+--
 -- Name: address_trgm_idx; Type: INDEX; Schema: public; Owner: -
 --
 

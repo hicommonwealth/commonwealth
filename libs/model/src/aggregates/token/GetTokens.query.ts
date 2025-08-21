@@ -22,9 +22,17 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
 
       // pagination configuration
       const direction = order_direction || 'DESC';
-      let order_col: string = order_by || 'name';
-      if (order_by === 'market_cap' || order_by === 'price') {
-        order_col = 'trades.latest_price';
+      let order_col: string;
+      switch (order_by) {
+        case 'market_cap':
+        case 'price':
+          order_col = 'trades.latest_price';
+          break;
+        case 'created_at':
+        case 'name':
+        default:
+          order_col = `T.${order_by || 'name'}`;
+          break;
       }
       const includeStats = with_stats || order_col === 'trades.latest_price';
 
@@ -43,10 +51,18 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
         limit,
       };
 
-      const where_conditions = [
-        search ? 'WHERE LOWER(T.name) LIKE :search' : '',
-        is_graduated ? 'WHERE T.liquidity_transferred IS TRUE' : '',
-      ].filter(Boolean);
+      const conditions: string[] = [];
+      if (search) {
+        conditions.push('LOWER(T.name) LIKE :search');
+      }
+      if (typeof is_graduated === 'boolean') {
+        conditions.push(
+          `T.liquidity_transferred IS ${is_graduated ? 'TRUE' : 'FALSE'}`,
+        );
+      }
+      const where_clause = conditions.length
+        ? `WHERE ${conditions.join(' AND ')}`
+        : '';
 
       const sql = `
       ${
@@ -79,7 +95,7 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
       FROM "LaunchpadTokens" AS T
       JOIN "Communities" AS C ON T.namespace = C.namespace
       ${includeStats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
-      ${where_conditions.join(' AND ')}
+      ${where_clause}
       ORDER BY T.token_address ${direction}, ${order_col} ${direction}
       LIMIT :limit OFFSET :offset
     `;
