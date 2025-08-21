@@ -9,6 +9,7 @@ export * from './magic';
 export * from './makeGetBalancesOptions';
 export * from './oauth/getVerifiedUserInfo';
 export * from './oauth/types';
+export * from './outbox';
 export * from './parseUserMentions';
 export * from './pgMultiRowUpdate';
 export * from './sanitizeDeletedComment';

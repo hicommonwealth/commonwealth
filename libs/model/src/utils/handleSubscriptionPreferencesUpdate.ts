@@ -3,7 +3,7 @@ import { SubscriptionPreference } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
-import { emitEvent } from './utils';
+import { emitEvent } from './outbox';
 
 function getDifferences(
   fullObject: Record<string, unknown>,

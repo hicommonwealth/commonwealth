@@ -145,12 +145,6 @@ const QuestList = ({
               setFilters((f) => ({ ...f, startingBefore: undefined }))
             }
           />
-          <FiltersDrawer
-            isOpen={isFilterDrawerOpen}
-            onClose={() => setIsFilterDrawerOpen(false)}
-            filters={filters}
-            onFiltersChange={(newFilters) => setFilters(newFilters)}
-          />
         </div>
       )}
       {isInitialLoading ? (
@@ -232,6 +226,13 @@ const QuestList = ({
       ) : (
         <></>
       )}
+
+      <FiltersDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        filters={filters}
+        onFiltersChange={(newFilters) => setFilters(newFilters)}
+      />
     </div>
   );
 };
