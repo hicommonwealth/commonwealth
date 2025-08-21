@@ -60,9 +60,11 @@ class LaunchpadBondingCurve extends ContractBase {
     symbol: string,
     walletAddress: string,
     chainId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    magicProvider?: any,
   ) {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true, chainId);
+      await this.initialize(true, chainId, magicProvider);
     }
     const initialBuyValue = 4.44e14 + this.LAUNCHPAD_INITIAL_PRICE;
     const connectorWeight = this.LAUNCHPAD_CONNECTOR_WEIGHT;
@@ -165,9 +167,13 @@ class LaunchpadBondingCurve extends ContractBase {
     return txReceipt;
   }
 
-  async transferLiquidity(walletAddress: string) {
+  async transferLiquidity(
+    walletAddress: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    magicProvider?: any,
+  ) {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true);
+      await this.initialize(true, undefined, magicProvider);
     }
 
     const txReceipt = await transferLiquidity(

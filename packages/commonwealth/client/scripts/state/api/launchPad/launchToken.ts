@@ -1,6 +1,8 @@
 import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
+import { userStore } from 'state/ui/user';
+import { getMagicForChain } from 'utils/magicNetworkUtils';
 
 interface LaunchTokenProps {
   chainRpc: string;
@@ -17,6 +19,26 @@ const launchToken = async ({
   symbol,
   walletAddress,
 }: LaunchTokenProps) => {
+  // Check if the selected address belongs to a Magic user
+  const userAddresses = userStore.getState().addresses;
+  const isMagicAddress = userAddresses.some(
+    (addr) =>
+      addr.address.toLowerCase() === walletAddress.toLowerCase() &&
+      addr.walletId?.toLowerCase().includes('magic'),
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let magicProvider: any = null;
+  if (isMagicAddress) {
+    const magic = getMagicForChain(ethChainId);
+    if (magic) {
+      magicProvider = magic.rpcProvider;
+    } else {
+      // Handle error appropriately - maybe throw or notify
+      throw new Error('Could not initialize Magic for transaction.');
+    }
+  }
+
   const launchPad = new LaunchpadBondingCurve(
     getFactoryContract(ethChainId).LPBondingCurve,
     getFactoryContract(ethChainId).Launchpad,
@@ -30,6 +52,7 @@ const launchToken = async ({
     symbol,
     walletAddress,
     `${ethChainId}`,
+    magicProvider,
   );
 };
 
