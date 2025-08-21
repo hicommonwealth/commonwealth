@@ -1,3 +1,4 @@
+import { Community } from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useState } from 'react';
 import {
@@ -5,19 +6,18 @@ import {
   useCreateThreadTokenTradeMutation,
   useStoreThreadTokenMutation,
 } from 'state/api/threads';
-import useCreateThreadTokenMutation from 'state/api/threads/createThreadToken';
+import useCreateThreadTokenMutation, {
+  CreateThreadTokenProps,
+} from 'state/api/threads/createThreadToken';
+import { z } from 'zod';
 import { useThreadTokenWidget } from './ToketWidget/useThreadTokenWidget';
-
 interface UseLaunchAndBuyThreadTokenProps {
   tokenizedThreadsEnabled?: boolean;
   communityId?: string;
   addressType?: string;
-  chainNode?: any;
-  tokenCommunity?: any;
-
+  tokenCommunity?: z.infer<typeof Community>;
   threadTitle?: string;
   threadBody?: string;
-  selectedTopicId?: number;
 }
 
 export const launchAndBuyThreadTokenUtility = async ({
@@ -31,8 +31,6 @@ export const launchAndBuyThreadTokenUtility = async ({
   tokenCommunity,
   communityId,
   createThreadToken,
-  buyThreadToken,
-  createTokenTrade,
   storeThreadToken,
   user,
   linkSpecificAddressToSpecificCommunity,
@@ -46,14 +44,14 @@ export const launchAndBuyThreadTokenUtility = async ({
   primaryTokenAddress: string;
   ethChainId: number;
   chainRpc: string;
-  tokenCommunity: any;
+  tokenCommunity?: z.infer<typeof Community>;
   communityId: string;
-  createThreadToken: any;
-  buyThreadToken: any;
-  createTokenTrade: any;
-  storeThreadToken: any;
-  user: any;
-  linkSpecificAddressToSpecificCommunity: any;
+  createThreadToken: (
+    payload: CreateThreadTokenProps,
+  ) => Promise<{ transactionHash: string }>;
+  storeThreadToken: (payload: any) => Promise<unknown>;
+  user: { addresses: Array<{ community: { id: string } }> };
+  linkSpecificAddressToSpecificCommunity: (payload: any) => Promise<unknown>;
   tokenGainAmount?: number;
   amount?: string;
 }) => {
@@ -144,11 +142,9 @@ export const useLaunchAndBuyThreadToken = ({
   tokenizedThreadsEnabled = false,
   communityId,
   addressType,
-  chainNode,
   tokenCommunity,
   threadTitle,
   threadBody,
-  selectedTopicId,
 }: UseLaunchAndBuyThreadTokenProps) => {
   const [threadFormAmount, setThreadFormAmount] = useState<string>('0');
   const [threadFormTokenGainAmount, setThreadFormTokenGainAmount] =
@@ -231,11 +227,9 @@ export const useLaunchAndBuyThreadToken = ({
         primaryTokenAddress,
         ethChainId,
         chainRpc,
-        tokenCommunity,
+        tokenCommunity: tokenCommunity!,
         communityId: communityId || '',
         createThreadToken,
-        buyThreadToken,
-        createTokenTrade,
         storeThreadToken,
         user,
         linkSpecificAddressToSpecificCommunity,

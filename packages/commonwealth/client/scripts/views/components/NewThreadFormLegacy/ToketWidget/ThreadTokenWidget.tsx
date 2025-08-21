@@ -1,4 +1,4 @@
-import { ChainNode, Community } from '@hicommonwealth/schemas';
+import { Community } from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useEffect, useMemo } from 'react';
 import { useCreateThreadTokenTradeMutation } from 'state/api/threads';
@@ -12,11 +12,9 @@ import { useThreadTokenWidget } from './useThreadTokenWidget';
 
 interface ThreadTokenWidgetProps {
   tokenizedThreadsEnabled?: boolean;
-  selectedTopicId?: number;
   threadId?: number;
   communityId?: string;
   addressType?: string;
-  chainNode?: z.infer<typeof ChainNode>;
   tokenCommunity?: z.infer<typeof Community>;
   threadTitle?: string;
   threadBody?: string;
@@ -29,11 +27,9 @@ interface ThreadTokenWidgetProps {
 
 const ThreadTokenWidget = ({
   tokenizedThreadsEnabled = false,
-  selectedTopicId,
   threadId,
   communityId,
   addressType,
-  chainNode,
   tokenCommunity,
   threadTitle,
   threadBody,
@@ -52,11 +48,9 @@ const ThreadTokenWidget = ({
     tokenizedThreadsEnabled,
     communityId,
     addressType,
-    chainNode,
     tokenCommunity,
     threadTitle,
     threadBody,
-    selectedTopicId,
   });
 
   const {

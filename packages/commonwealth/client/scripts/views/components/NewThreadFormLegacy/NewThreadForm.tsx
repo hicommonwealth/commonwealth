@@ -902,8 +902,6 @@ export const NewThreadForm = forwardRef<
               tokenCommunity: app.chain?.meta,
               communityId: selectedCommunityId,
               createThreadToken,
-              buyThreadToken,
-              createTokenTrade,
               storeThreadToken,
               user,
               linkSpecificAddressToSpecificCommunity,
@@ -991,10 +989,8 @@ export const NewThreadForm = forwardRef<
                   tokenizedThreadsEnabled={
                     tokenizedThreadsAllowed?.tokenized_threads_enabled
                   }
-                  selectedTopicId={threadTopic?.id}
                   communityId={selectedCommunityId}
                   addressType={app.chain?.base || 'ethereum'}
-                  chainNode={app.chain?.meta?.ChainNode}
                   tokenCommunity={app.chain?.meta}
                   threadTitle={threadTitle}
                   threadBody={threadContentDelta}
