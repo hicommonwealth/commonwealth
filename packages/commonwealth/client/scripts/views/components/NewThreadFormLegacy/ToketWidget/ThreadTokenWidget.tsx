@@ -1,6 +1,8 @@
+import { ChainNode, Community } from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useEffect } from 'react';
 import { useCreateThreadTokenTradeMutation } from 'state/api/threads';
+import { z } from 'zod';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
@@ -14,8 +16,8 @@ interface ThreadTokenWidgetProps {
   threadId?: number;
   communityId?: string;
   addressType?: string;
-  chainNode?: any;
-  tokenCommunity?: any;
+  chainNode?: z.infer<typeof ChainNode>;
+  tokenCommunity?: z.infer<typeof Community>;
   threadTitle?: string;
   threadBody?: string;
   onThreadCreated?: (
@@ -100,7 +102,6 @@ const ThreadTokenWidget = ({
     threadFormTokenGainAmount,
     isLoadingThreadFormTokenGain,
     calculateTokenGain,
-    launchAndBuyThreadToken,
     isCreatingThreadToken,
   } = isThreadCreationMode ? launchAndBuyHook : {};
 
@@ -115,13 +116,13 @@ const ThreadTokenWidget = ({
     ? threadFormTokenGainAmount
     : tokenGainAmount;
   const setCurrentTokenGainAmount = isThreadCreationMode
-    ? (val: number) => {}
+    ? (_val: number) => {}
     : setTokenGainAmount;
   const currentIsLoadingTokenGain = isThreadCreationMode
     ? isLoadingThreadFormTokenGain
     : isLoadingTokenGain;
   const setCurrentIsLoadingTokenGain = isThreadCreationMode
-    ? (val: boolean) => {}
+    ? (_val: boolean) => {}
     : setIsLoadingTokenGain;
 
   const safeCurrentAmount = currentAmount || '0';
@@ -182,6 +183,8 @@ const ThreadTokenWidget = ({
     isSellMode,
     isThreadCreationMode,
     calculateTokenGain,
+    setCurrentIsLoadingTokenGain,
+    setCurrentTokenGainAmount,
   ]);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -435,8 +438,16 @@ const ThreadTokenWidget = ({
           <div className="input-currency">
             <CWText type="b2">
               {parseFloat(safeCurrentAmount) > 0
-                ? `${safeCurrentAmount} ${isThreadCreationMode || !isSellMode ? primaryTokenSymbol : threadToken?.symbol || 'TOKEN'}`
-                : `0.000 ${isThreadCreationMode || !isSellMode ? primaryTokenSymbol : threadToken?.symbol || 'TOKEN'}`}
+                ? `${safeCurrentAmount} ${
+                    isThreadCreationMode || !isSellMode
+                      ? primaryTokenSymbol
+                      : threadToken?.symbol || 'TOKEN'
+                  }`
+                : `0.000 ${
+                    isThreadCreationMode || !isSellMode
+                      ? primaryTokenSymbol
+                      : threadToken?.symbol || 'TOKEN'
+                  }`}
             </CWText>
             <CWIcon iconName="chevronDown" className="chevron-icon" />
           </div>
@@ -474,7 +485,11 @@ const ThreadTokenWidget = ({
           >
             {currentIsLoadingTokenGain
               ? 'Calculating...'
-              : `${safeCurrentTokenGainAmount.toFixed(5)} ${isThreadCreationMode || !isSellMode ? threadToken?.symbol || 'TOKEN' : primaryTokenSymbol}`}
+              : `${safeCurrentTokenGainAmount.toFixed(5)} ${
+                  isThreadCreationMode || !isSellMode
+                    ? threadToken?.symbol || 'TOKEN'
+                    : primaryTokenSymbol
+                }`}
           </CWText>
         </div>
 
