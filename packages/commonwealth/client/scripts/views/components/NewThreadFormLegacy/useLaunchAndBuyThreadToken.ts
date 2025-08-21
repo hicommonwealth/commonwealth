@@ -11,6 +11,22 @@ import useCreateThreadTokenMutation, {
 } from 'state/api/threads/createThreadToken';
 import { z } from 'zod';
 import { useThreadTokenWidget } from './ToketWidget/useThreadTokenWidget';
+
+interface StoreThreadTokenPayload {
+  community_id: string;
+  eth_chain_id: number;
+  transaction_hash: string;
+}
+
+interface LinkCommunityPayload {
+  address: string;
+  community: {
+    base: string;
+    iconUrl: string;
+    id: string;
+    name: string;
+  };
+}
 interface UseLaunchAndBuyThreadTokenProps {
   tokenizedThreadsEnabled?: boolean;
   communityId?: string;
@@ -49,9 +65,11 @@ export const launchAndBuyThreadTokenUtility = async ({
   createThreadToken: (
     payload: CreateThreadTokenProps,
   ) => Promise<{ transactionHash: string }>;
-  storeThreadToken: (payload: any) => Promise<unknown>;
+  storeThreadToken: (payload: StoreThreadTokenPayload) => Promise<unknown>;
   user: { addresses: Array<{ community: { id: string } }> };
-  linkSpecificAddressToSpecificCommunity: (payload: any) => Promise<unknown>;
+  linkSpecificAddressToSpecificCommunity: (
+    payload: LinkCommunityPayload,
+  ) => Promise<unknown>;
   tokenGainAmount?: number;
   amount?: string;
 }) => {

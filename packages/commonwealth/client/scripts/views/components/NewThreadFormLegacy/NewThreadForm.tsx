@@ -46,7 +46,6 @@ import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import {
   useAddThreadLinksMutation,
-  useBuyThreadTokenMutation,
   useCreateThreadMutation,
   useCreateThreadPollMutation,
   useStoreThreadTokenMutation,
@@ -75,7 +74,6 @@ import { DeltaStatic } from 'quill';
 // eslint-disable-next-line max-len
 import useCreateThreadTokenMutation from 'client/scripts/state/api/threads/createThreadToken';
 import {
-  useCreateTokenTradeMutation,
   useGetTokenByCommunityId,
   useGetTokenizedThreadsAllowedQuery,
 } from 'client/scripts/state/api/tokens';
@@ -174,8 +172,6 @@ export const NewThreadForm = forwardRef<
 
     const { mutateAsync: createPoll } = useCreateThreadPollMutation();
     const { mutateAsync: createThreadToken } = useCreateThreadTokenMutation();
-    const { mutateAsync: buyThreadToken } = useBuyThreadTokenMutation();
-    const { mutateAsync: createTokenTrade } = useCreateTokenTradeMutation();
     const { mutateAsync: storeThreadToken } = useStoreThreadTokenMutation();
 
     const user = useUserStore();
