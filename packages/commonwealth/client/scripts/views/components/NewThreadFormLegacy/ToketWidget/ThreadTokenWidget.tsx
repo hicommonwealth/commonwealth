@@ -213,7 +213,7 @@ const ThreadTokenWidget = ({
       }
 
       if (onThreadCreated) {
-        onThreadCreated(0, safeCurrentAmount, safeCurrentTokenGainAmount);
+        await onThreadCreated(0, safeCurrentAmount, safeCurrentTokenGainAmount);
       }
       return;
     }
@@ -502,13 +502,15 @@ const ThreadTokenWidget = ({
           }
           buttonType="primary"
           buttonWidth="full"
-          onClick={
-            isThreadCreationMode
-              ? handleBuyClick
-              : isSellMode
-                ? handleSellClick
-                : handleBuyClick
-          }
+          onClick={async () => {
+            if (isThreadCreationMode) {
+              await handleBuyClick();
+            } else if (isSellMode) {
+              await handleSellClick();
+            } else {
+              await handleBuyClick();
+            }
+          }}
           disabled={
             (isThreadCreationMode
               ? isCreatingThreadToken
