@@ -172,9 +172,7 @@ export const useLaunchAndBuyThreadToken = ({
     isPrimaryTokenConfigured,
   } = useThreadTokenWidget({
     tokenizedThreadsEnabled,
-    communityId,
     addressType,
-    chainNode,
     tokenCommunity,
   });
 

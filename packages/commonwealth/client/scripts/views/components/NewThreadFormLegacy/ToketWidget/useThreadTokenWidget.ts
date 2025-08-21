@@ -1,4 +1,5 @@
 import { getFactoryContract } from '@hicommonwealth/evm-protocols';
+import { Community } from '@hicommonwealth/schemas';
 import TokenLaunchpad from 'helpers/ContractHelpers/tokenLaunchpad';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
 import { useMemo, useState } from 'react';
@@ -18,22 +19,19 @@ import {
 } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
+import { z } from 'zod';
 
 interface UseThreadTokenWidgetProps {
   tokenizedThreadsEnabled?: boolean;
   threadId?: number;
-  communityId?: string;
   addressType?: string;
-  chainNode?: any;
-  tokenCommunity?: any;
+  tokenCommunity?: z.infer<typeof Community>;
 }
 
 export const useThreadTokenWidget = ({
   tokenizedThreadsEnabled = false,
   threadId,
-  communityId,
   addressType,
-  chainNode,
   tokenCommunity,
 }: UseThreadTokenWidgetProps) => {
   const [amount, setAmount] = useState<string>('0');
@@ -169,6 +167,7 @@ export const useThreadTokenWidget = ({
     selectedAddress,
     tokenCommunity,
     tokenizedThreadsEnabled,
+    primaryTokenAddress,
   ]);
 
   const isPrimaryTokenConfigured = !!primaryTokenAddress;

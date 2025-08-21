@@ -44,9 +44,7 @@ const ThreadTokenWidget = ({
   const threadTokenWidgetHook = useThreadTokenWidget({
     tokenizedThreadsEnabled,
     threadId,
-    communityId,
     addressType,
-    chainNode,
     tokenCommunity,
   });
 
