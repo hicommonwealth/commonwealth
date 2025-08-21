@@ -502,13 +502,13 @@ const ThreadTokenWidget = ({
           }
           buttonType="primary"
           buttonWidth="full"
-          onClick={async () => {
+          onClick={() => {
             if (isThreadCreationMode) {
-              await handleBuyClick();
+              void handleBuyClick();
             } else if (isSellMode) {
-              await handleSellClick();
+              void handleSellClick();
             } else {
-              await handleBuyClick();
+              void handleBuyClick();
             }
           }}
           disabled={
