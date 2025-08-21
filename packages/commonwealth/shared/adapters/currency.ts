@@ -47,13 +47,13 @@ export function formatBigNumberShort(num: number, numDecimals: number): string {
     return divided.toFixed(numDecimals).replace(/\.?0+$/, '');
   };
 
-  return num > trillion
+  return num >= trillion
     ? `${round(num, trillion)}t`
-    : num > billion
+    : num >= billion
       ? `${round(num, billion)}b`
-      : num > million
+      : num >= million
         ? `${round(num, million)}m`
-        : num > thousand
+        : num >= thousand
           ? `${round(num, thousand)}k`
           : num.toString();
 }
@@ -82,12 +82,17 @@ export const prettyVoteWeight = (
       ? parseInt(wei) * multiplier
       : calculateVoteWeight(weiStr, multiplier || 1);
 
-  // for non-weighted and stake, just render as-is
+  // for non-weighted and stake, apply formatting for large numbers
   if (
     !weightType ||
     [TopicWeightedVoting.Stake, TopicWeightedVoting.SuiNFT].includes(weightType)
   ) {
-    return parseFloat((weiValue || 0).toString()).toString();
+    const rawNumber = parseFloat((weiValue || 0).toString());
+    // Apply formatting for large numbers to improve readability
+    if (rawNumber >= 1000) {
+      return formatBigNumberShort(rawNumber, 2);
+    }
+    return rawNumber.toString();
   }
 
   const n = Number(weiValue) / 10 ** (tokenNumDecimals || 18);
