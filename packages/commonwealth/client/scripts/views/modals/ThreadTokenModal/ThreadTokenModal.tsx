@@ -9,14 +9,20 @@ import {
 import { ThreadTokenWidget } from '../../components/NewThreadFormLegacy/ToketWidget';
 import './ThreadTokenModal.scss';
 
+import { ChainNode, Community } from '@hicommonwealth/schemas';
+import { z } from 'zod';
+
+type ChainNodeType = z.infer<typeof ChainNode>;
+type CommunityType = z.infer<typeof Community>;
+
 interface ThreadTokenModalProps {
   isOpen: boolean;
   onModalClose?: () => void;
   threadId?: number;
   communityId?: string;
   addressType?: string;
-  chainNode?: any;
-  tokenCommunity?: any;
+  chainNode?: ChainNodeType;
+  tokenCommunity?: CommunityType;
 }
 
 const ThreadTokenModal = ({
