@@ -10,6 +10,10 @@
     align-items: center;
     flex-wrap: wrap;
 
+    .btn-border {
+      margin: 0 !important;
+    }
+
     &.hasAppliedFilter {
       margin-bottom: 8px;
     }

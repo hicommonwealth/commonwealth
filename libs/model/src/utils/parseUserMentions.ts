@@ -2,7 +2,7 @@ import { Comment, Thread, events } from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
 import z from 'zod';
 import { models } from '../database';
-import { emitEvent } from './utils';
+import { emitEvent } from './outbox';
 
 export type UserMention = {
   userId: string;
