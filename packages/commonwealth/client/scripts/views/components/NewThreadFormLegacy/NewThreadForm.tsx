@@ -961,8 +961,6 @@ export const NewThreadForm = forwardRef<
         createThread,
         tokenizedThreadsAllowed?.tokenized_threads_enabled,
         createThreadToken,
-        buyThreadToken,
-        createTokenTrade,
         storeThreadToken,
         user,
         linkSpecificAddressToSpecificCommunity,
