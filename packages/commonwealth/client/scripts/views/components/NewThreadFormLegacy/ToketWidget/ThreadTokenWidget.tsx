@@ -22,7 +22,7 @@ interface ThreadTokenWidgetProps {
     threadId: number,
     amount: string,
     tokenGainAmount: number,
-  ) => void;
+  ) => void | Promise<void>;
 }
 
 const ThreadTokenWidget = ({
