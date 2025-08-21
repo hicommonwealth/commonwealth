@@ -1,3 +1,4 @@
+import { GetThreadToken } from '@hicommonwealth/schemas';
 import {
   ActionGroups,
   CanvasSignedData,
@@ -19,13 +20,14 @@ import ShareButton from 'views/components/ShareButton';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ToggleThreadSubscribe } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
+import { z } from 'zod';
 import { AdminActions, AdminActionsProps } from './AdminActions';
 import { ReactionButton } from './ReactionButton';
 import './ThreadOptions.scss';
 
 type OptionsProps = AdminActionsProps & {
   thread?: Thread;
-  threadToken?: any;
+  threadToken?: z.infer<typeof GetThreadToken.output>;
   upvoteBtnVisible?: boolean;
   commentBtnVisible?: boolean;
   shareEndpoint?: string;

@@ -1,3 +1,4 @@
+import { GetThreadToken } from '@hicommonwealth/schemas';
 import { ActionGroups, GatedActionEnum } from '@hicommonwealth/shared';
 import { useShowImage } from 'client/scripts/hooks/useShowImage';
 import clsx from 'clsx';
@@ -22,6 +23,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import ThreadTokenModal from 'views/modals/ThreadTokenModal/ThreadTokenModal';
+import { z } from 'zod';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
 import app from '../../../../state/index';
@@ -132,10 +134,11 @@ export const ThreadCard = ({
       enabled: !!thread.communityId && !showSkeleton,
     });
 
-  const { data: threadToken } = useGetThreadToken({
-    thread_id: thread.id,
-    enabled: !!thread.id && !!thread.communityId,
-  });
+  const { data: threadToken }: { data: z.infer<typeof GetThreadToken.output> } =
+    useGetThreadToken({
+      thread_id: thread.id,
+      enabled: !!thread.id && !!thread.communityId,
+    });
 
   if (showSkeleton || isLoadingCommunity || !community) {
     return (
