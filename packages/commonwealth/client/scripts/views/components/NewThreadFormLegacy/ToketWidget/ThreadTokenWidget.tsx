@@ -1,6 +1,6 @@
 import { ChainNode, Community } from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useCreateThreadTokenTradeMutation } from 'state/api/threads';
 import { z } from 'zod';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
@@ -115,15 +115,18 @@ const ThreadTokenWidget = ({
   const currentTokenGainAmount = isThreadCreationMode
     ? threadFormTokenGainAmount
     : tokenGainAmount;
-  const setCurrentTokenGainAmount = isThreadCreationMode
-    ? (_val: number) => {}
-    : setTokenGainAmount;
+  const setCurrentTokenGainAmount = useMemo(
+    () => (isThreadCreationMode ? (_val: number) => {} : setTokenGainAmount),
+    [isThreadCreationMode, setTokenGainAmount],
+  );
   const currentIsLoadingTokenGain = isThreadCreationMode
     ? isLoadingThreadFormTokenGain
     : isLoadingTokenGain;
-  const setCurrentIsLoadingTokenGain = isThreadCreationMode
-    ? (_val: boolean) => {}
-    : setIsLoadingTokenGain;
+  const setCurrentIsLoadingTokenGain = useMemo(
+    () =>
+      isThreadCreationMode ? (_val: boolean) => {} : setIsLoadingTokenGain,
+    [isThreadCreationMode, setIsLoadingTokenGain],
+  );
 
   const safeCurrentAmount = currentAmount || '0';
   const safeCurrentTokenGainAmount = currentTokenGainAmount || 0;
