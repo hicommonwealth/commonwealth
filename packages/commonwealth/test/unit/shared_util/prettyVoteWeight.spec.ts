@@ -10,7 +10,11 @@ describe('prettyVoteWeight', () => {
 
     expect(prettyVoteWeight('5'), 'handle unweighted > 1').to.eq('5');
 
-    expect(prettyVoteWeight('5000'), 'handle unweighted > 1000').to.eq('5000');
+    expect(prettyVoteWeight('5000'), 'handle unweighted > 1000').to.eq('5k');
+
+    expect(prettyVoteWeight('1908887952'), 'handle very large unweighted numbers').to.eq('1.91b');
+
+    expect(prettyVoteWeight('1000000'), 'handle million threshold unweighted').to.eq('1m');
   });
   test('erc20 and native ETH', () => {
     expect(
@@ -144,5 +148,37 @@ describe('prettyVoteWeight', () => {
       prettyVoteWeight('20', 18, TopicWeightedVoting.Stake, 0.5),
       'multiply < 1',
     ).to.eq('10');
+
+    expect(
+      prettyVoteWeight('5000', 18, TopicWeightedVoting.Stake),
+      'handle large stake numbers',
+    ).to.eq('5k');
+
+    expect(
+      prettyVoteWeight('1908887952', 18, TopicWeightedVoting.Stake),
+      'handle very large stake numbers',
+    ).to.eq('1.91b');
+
+    expect(
+      prettyVoteWeight('1000000', 18, TopicWeightedVoting.Stake),
+      'handle million threshold',
+    ).to.eq('1m');
+  });
+
+  test('unweighted large numbers', () => {
+    expect(
+      prettyVoteWeight('1908887952'),
+      'handle very large unweighted numbers',
+    ).to.eq('1.91b');
+
+    expect(
+      prettyVoteWeight('1000000'),
+      'handle million threshold unweighted',
+    ).to.eq('1m');
+
+    expect(
+      prettyVoteWeight('5000'),
+      'handle thousands unweighted',
+    ).to.eq('5k');
   });
 });
