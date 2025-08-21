@@ -50,7 +50,7 @@ import type {
 } from '../../src/models';
 import { ChainEventPolicy } from '../../src/policies/ChainEventCreated.policy';
 import { seed } from '../../src/tester';
-import { emitEvent } from '../../src/utils/utils';
+import { emitEvent } from '../../src/utils';
 import { drainOutbox } from '../utils';
 
 const chance = Chance();

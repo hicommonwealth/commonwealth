@@ -71,7 +71,11 @@ const ProfileCard = () => {
             >
               <h3 className="profile-name">
                 {data?.profile.name}
-                <TrustLevelRole type="user" level={data?.tier} />
+                <TrustLevelRole
+                  type="user"
+                  level={data?.tier}
+                  withTooltip
+                />
               </h3>
             </Link>
           )}

@@ -50,6 +50,7 @@ const UserTrustLevel = () => {
     <div className="UserTrustLevel">
       {tiers.map((level) => {
         const isLocked = level.level > currentTier + 1;
+        const isCurrentLevel = level.level === currentTier;
 
         return (
           <LevelBox
@@ -59,7 +60,14 @@ const UserTrustLevel = () => {
             description={level.description}
             status={level.status}
             isLocked={isLocked}
-            icon={<TrustLevelRole type="user" level={level.level} size="xl" />}
+            icon={
+              <TrustLevelRole
+                type="user"
+                level={level.level}
+                size="xl"
+                withTooltip={isCurrentLevel}
+              />
+            }
             items={level.items}
             showArrow={level.redirect}
             onItemClick={handleItemClick}

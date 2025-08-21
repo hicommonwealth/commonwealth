@@ -46,6 +46,7 @@ export {
 } from './utils/farcasterUtils';
 export { generateImage } from './utils/generateImage';
 export { magicLogin } from './utils/magic';
+export { emitEvent } from './utils/outbox';
 export {
   extractMCPMentions,
   findMentionDiff,
@@ -61,7 +62,6 @@ export {
 export {
   R2_ADAPTER_KEY,
   buildChainNodeUrl,
-  emitEvent,
   equalEvmAddresses,
   getSaltedApiKeyHash,
   uploadIfLarge,
