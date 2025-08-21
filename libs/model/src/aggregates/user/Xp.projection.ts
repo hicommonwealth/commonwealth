@@ -10,7 +10,7 @@ import {
   UserTierMap,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
-import { Op, Sequelize } from 'sequelize';
+import { Op } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
@@ -39,10 +39,13 @@ async function getUserByAddress(address: string) {
   const addr = await models.Address.findOne({
     where: {
       [Op.and]: [
-        Sequelize.where(
-          Sequelize.fn('LOWER', Sequelize.col('address')),
-          Sequelize.fn('LOWER', address),
-        ),
+        {
+          [Op.or]: [
+            { address: address }, // exact match
+            { address: address.toLowerCase() }, // lowercase variant
+            { address: address.toUpperCase() }, // uppercase variant (optional)
+          ],
+        },
         { user_id: { [Op.not]: null } },
       ],
     },
@@ -56,6 +59,7 @@ async function getUserByAddress(address: string) {
       },
     ],
   });
+
   return addr?.user_id ?? undefined;
 }
 
