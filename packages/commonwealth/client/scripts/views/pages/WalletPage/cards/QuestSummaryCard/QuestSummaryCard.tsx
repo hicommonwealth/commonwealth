@@ -4,6 +4,7 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
+import useGetXPsRanked from 'state/api/user/getXPsRanked';
 import useUserStore from 'state/ui/user';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
@@ -26,6 +27,15 @@ const QuestSummaryCard = () => {
   );
   const xpEnabled = useFlag('xp');
   const user = useUserStore();
+
+  // Get user's XP rank
+  const { data: userRankData } = useGetXPsRanked({
+    user_id: user.id,
+    limit: 1,
+    enabled: xpEnabled && !!user.id,
+  });
+
+  const userRank = userRankData?.pages?.[0]?.results?.[0]?.rank;
 
   const {
     data: onGoingQuestsList,
@@ -78,9 +88,14 @@ const QuestSummaryCard = () => {
       <div className="QuestSummaryCard">
         <div className="xp-body">
           <CWText fontWeight="bold" type="h4">
-            {user.xpPoints} Aura&nbsp;
+            {`${user.xpPoints || 0}`} Aura&nbsp;
             <CWText type="caption">earned from quests</CWText>
           </CWText>
+          {userRank && (
+            <CWText type="caption" className="user-rank">
+              Rank #{userRank} on the leaderboard
+            </CWText>
+          )}
         </div>
         <CWTabsRow>
           {Object.values(QuestTimeline).map((type) => (
