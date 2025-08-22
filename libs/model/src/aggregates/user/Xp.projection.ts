@@ -55,7 +55,8 @@ async function getUserByAddress(address: string) {
         model: models.User,
         attributes: ['id'],
         required: true,
-        where: { tier: { [Op.ne]: UserTierMap.BannedUser } },
+        // don't reward unverified or banned users
+        where: { tier: { [Op.gt]: UserTierMap.BannedUser } },
       },
     ],
   });
