@@ -625,9 +625,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 <ThreadTokenWidget
                   tokenizedThreadsEnabled={tokenizedThreadsEnabled}
                   threadId={thread?.id}
-                  communityId={thread?.communityId}
                   addressType={app.chain?.base || 'ethereum'}
-                  chainNode={app.chain?.meta?.ChainNode}
                   tokenCommunity={app.chain?.meta}
                 />
               </div>

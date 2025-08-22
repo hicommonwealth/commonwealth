@@ -54,9 +54,7 @@ const ThreadTokenModal = ({
             <ThreadTokenWidget
               tokenizedThreadsEnabled={true}
               threadId={threadId}
-              communityId={communityId}
               addressType={addressType}
-              chainNode={chainNode}
               tokenCommunity={tokenCommunity}
             />
           </CWModalBody>

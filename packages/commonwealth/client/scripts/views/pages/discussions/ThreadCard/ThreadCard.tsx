@@ -1,4 +1,3 @@
-import { GetThreadToken } from '@hicommonwealth/schemas';
 import { ActionGroups, GatedActionEnum } from '@hicommonwealth/shared';
 import { useShowImage } from 'client/scripts/hooks/useShowImage';
 import clsx from 'clsx';
@@ -23,7 +22,6 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import ThreadTokenModal from 'views/modals/ThreadTokenModal/ThreadTokenModal';
-import { z } from 'zod';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
 import app from '../../../../state/index';
@@ -134,11 +132,22 @@ export const ThreadCard = ({
       enabled: !!thread.communityId && !showSkeleton,
     });
 
-  const { data: threadToken }: { data: z.infer<typeof GetThreadToken.output> } =
-    useGetThreadToken({
-      thread_id: thread.id,
-      enabled: !!thread.id && !!thread.communityId,
-    });
+  const { data: threadTokenRaw } = useGetThreadToken({
+    thread_id: thread.id,
+    enabled: !!thread.id && !!thread.communityId,
+  });
+
+  const threadToken = threadTokenRaw
+    ? {
+        ...threadTokenRaw,
+        created_at: threadTokenRaw.created_at
+          ? new Date(threadTokenRaw.created_at)
+          : null,
+        updated_at: threadTokenRaw.updated_at
+          ? new Date(threadTokenRaw.updated_at)
+          : null,
+      }
+    : null;
 
   if (showSkeleton || isLoadingCommunity || !community) {
     return (
@@ -453,7 +462,6 @@ export const ThreadCard = ({
         threadId={thread.id}
         communityId={thread.communityId}
         addressType={app.chain?.base || 'ethereum'}
-        chainNode={app.chain?.meta?.ChainNode}
         tokenCommunity={app.chain?.meta}
       />
       <CWDivider className="ThreadDivider" />
