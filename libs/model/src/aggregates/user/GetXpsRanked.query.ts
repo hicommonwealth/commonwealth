@@ -107,7 +107,7 @@ select * from full_ranking
           type: QueryTypes.SELECT,
           raw: true,
         });
-        
+
         // Return single result as paginated response
         return schemas.buildPaginatedResponse(userResult, userResult.length, {
           limit: 1,
