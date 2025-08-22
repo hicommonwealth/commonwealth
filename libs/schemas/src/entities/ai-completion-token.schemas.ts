@@ -15,7 +15,6 @@ export const AICompletionToken = z.object({
   updated_at: z.coerce.date().optional(),
 });
 
-// Schema for creating a token (without the auto-generated token field)
 export const AICompletionTokenCreation = z.object({
   user_id: PG_INT,
   community_id: z.string(),

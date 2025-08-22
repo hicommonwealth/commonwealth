@@ -17,13 +17,14 @@ export type AICompletionTokenInstance =
 export default (
   sequelize: Sequelize.Sequelize,
 ): Sequelize.ModelStatic<AICompletionTokenInstance> =>
-  sequelize.define<
-    AICompletionTokenInstance,
-    AICompletionTokenCreationAttributes
-  >(
+  sequelize.define<AICompletionTokenInstance>(
     'AICompletionToken',
     {
-      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       token: {
         type: Sequelize.UUID,
         allowNull: false,
