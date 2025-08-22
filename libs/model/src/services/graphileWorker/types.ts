@@ -12,6 +12,7 @@ export enum GraphileTaskNames {
   CountAggregator = 'CountAggregator',
   CaptureGroupSnapshot = 'CaptureGroupSnapshot',
   MagnaSync = 'MagnaSync',
+  RefreshMaterializedViews = 'RefreshMaterializedViews',
 }
 
 export type GraphileTask<Input extends ZodType> = {
@@ -27,6 +28,7 @@ export type CustomCronItem = CronItem & {
 };
 
 export const TaskPayloads = {
+  RefreshMaterializedViews: z.object({}),
   ArchiveOutbox: z.object({}),
   UpdateSitemap: z.object({}),
   CleanSubscriptions: z.object({}),
