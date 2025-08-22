@@ -21,7 +21,13 @@ export function GetXpsRanked(): Query<typeof schemas.GetXpsRanked> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { limit = 10, cursor = 1, quest_id, search = '', user_id } = payload;
+      const {
+        limit = 10,
+        cursor = 1,
+        quest_id,
+        search = '',
+        user_id,
+      } = payload;
       const searchCondition = search
         ? `AND LOWER(u.profile->>'name') LIKE LOWER($search)`
         : '';
@@ -79,22 +85,17 @@ full_ranking as (
 	from
 		ranked_users r
 		join "Users" u on r.user_id = u.id
-	where 1=1 ${search ? `AND LOWER(u.profile->>'name') LIKE LOWER($search)` : ''}
+	${search ? `WHERE u.profile->>'name' ILIKE $search` : ''}
 )
 select * from full_ranking
 `
         : `
 with full_ranking as (
-	select
-		id as user_id,
-		coalesce(xp_points, 0) + coalesce(xp_referrer_points, 0) as xp_points,
-		tier,
-		profile->>'name' as user_name,
-		profile->>'avatar_url' as avatar_url,
-		(ROW_NUMBER() OVER (ORDER BY coalesce(xp_points, 0) + coalesce(xp_referrer_points, 0) DESC, id ASC))::int as rank
-	from
-		"Users" U
-	where tier != ${UserTierMap.BannedUser} ${searchCondition}
+	select *
+	from user_leaderboard
+	where tier != ${UserTierMap.BannedUser} ${
+    search ? `AND user_name ILIKE $search` : ''
+  }
 )
 select * from full_ranking
 `;
@@ -135,6 +136,7 @@ select * from full_ranking
           bind,
           type: QueryTypes.SELECT,
           raw: true,
+          logging: true,
         }),
         models.sequelize.query<{ count: string }>(countSql, {
           bind,
