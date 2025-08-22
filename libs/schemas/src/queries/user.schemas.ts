@@ -236,15 +236,16 @@ export const XpRankedUser = z.object({
 });
 
 export const GetXpsRanked = {
-  input: z.object({
-    top: z.number(),
+  input: PaginationParamsSchema.extend({
     search: z.string().optional(),
     quest_id: z
       .number()
       .optional()
       .describe('Filters events by a specific quest id'),
   }),
-  output: z.array(XpRankedUser),
+  output: PaginatedResultSchema.extend({
+    results: z.array(XpRankedUser),
+  }),
 };
 
 export const RandomResourceIdsView = z.object({
