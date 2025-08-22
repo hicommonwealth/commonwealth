@@ -1077,9 +1077,9 @@ describe('User lifecycle', () => {
 
       const xps1 = await query(GetXpsRanked(), {
         actor: admin,
-        payload: { top: 10 },
+        payload: { limit: 10, cursor: 1 },
       });
-      expect(xps1!.length).to.equal(4);
+      expect(xps1!.totalResults).to.equal(4);
       // member has
       //   25+18+18+13+12+11+10+10+10+10+10=147 xp points
       //   4+10 creator points
@@ -1091,19 +1091,19 @@ describe('User lifecycle', () => {
       //   16+11+10 xp points = 37 total
       // superadmin has
       //   11 xp points
-      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([203, 50, 37, 11]);
+      expect(xps1.results?.map((x) => x.xp_points)).to.deep.eq([203, 50, 37, 11]);
 
       const xps2 = await query(GetXpsRanked(), {
         actor: admin,
-        payload: { top: 10, quest_id: -1 },
+        payload: { limit: 10,cursor: 1, quest_id: -1 },
       });
-      expect(xps2!.length).to.equal(2);
+      expect(xps2!.totalResults).to.equal(2);
       // new_user has 16 for SignUpFlowCompleted
       // member has
       //   10 for WalletLinked
       //   4 for SignUpFlowCompleted as referrer
       //   42 for AwardXp
-      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([16, 56]);
+      expect(xps2.results?.map((x) => x.xp_points)).to.deep.eq([16, 56]);
     });
   });
 
