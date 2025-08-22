@@ -1103,7 +1103,7 @@ describe('User lifecycle', () => {
       //   10 for WalletLinked
       //   4 for SignUpFlowCompleted as referrer
       //   42 for AwardXp
-      expect(xps2.results?.map((x) => x.xp_points)).to.deep.eq([16, 56]);
+      expect(xps2.results?.map((x) => x.xp_points)).to.deep.eq([56, 16]);
     });
   });
 
