@@ -2,6 +2,7 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
+import { Link } from 'node_modules/react-router-dom/dist';
 import React, { useState } from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import useGetXPsRanked from 'state/api/user/getXPsRanked';
@@ -87,13 +88,18 @@ const QuestSummaryCard = () => {
     >
       <div className="QuestSummaryCard">
         <div className="xp-body">
-          <CWText fontWeight="bold" type="h4">
-            {`${user.xpPoints || 0}`} Aura&nbsp;
-            <CWText type="caption">earned from quests</CWText>
+          <CWText type="caption">
+            <strong>{`${user.xpPoints || 0}`} Aura</strong>&nbsp;earned from
+            quests
           </CWText>
           {userRank && (
-            <CWText type="caption" className="user-rank">
-              Rank #{userRank} on the leaderboard
+            <CWText fontWeight="bold" type="h5">
+              <CWText type="caption">
+                You are&nbsp;<strong>#{userRank}</strong>&nbsp;on the&nbsp;
+              </CWText>
+              <Link rel="noreferrer" to="/leaderboard">
+                leaderboard
+              </Link>
             </CWText>
           )}
         </div>
