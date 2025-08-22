@@ -19,11 +19,14 @@ export const XpLog = z.object({
   xp_points: PG_INT,
   creator_user_id: PG_INT.nullish(),
   creator_xp_points: PG_INT.nullish(),
+  referrer_user_id: PG_INT.nullish(),
+  referrer_xp_points: PG_INT.nullish(),
   created_at: z.coerce.date(),
   scope: QuestActionScope.nullish(),
 
   // associations
   user: User.optional(),
   creator: User.optional(),
+  referrer: User.optional(),
   quest_action_meta: QuestActionMeta.optional(),
 });

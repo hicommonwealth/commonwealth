@@ -82,6 +82,8 @@ describe('User lifecycle', () => {
       xp: x.xp_points,
       creator: x.creator_profile?.name,
       creator_xp: x.creator_xp_points,
+      referrer: x.referrer_profile?.name,
+      referrer_xp: x.referrer_xp_points,
     }));
     console.table(table);
   }

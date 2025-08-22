@@ -243,16 +243,16 @@ async function recordXpsForQuest({
     ),
     update_creator AS (
       UPDATE "Users"
-      SET xp_points = COALESCE(xp_points, 0) + :creator_xp_points, 
-      WHERE id = :creator_user_id 
+      SET xp_points = COALESCE(xp_points, 0) + :creator_xp_points
+      WHERE id = COALESCE(:creator_user_id, 0)
         AND :creator_xp_points IS NOT NULL
         AND EXISTS(SELECT 1 FROM inserted)
       RETURNING 1
     ),
     update_referrer AS (
       UPDATE "Users"
-      SET xp_referrer_points = COALESCE(xp_referrer_points, 0) + :referrer_xp_points,
-      WHERE id = :referrer_user_id
+      SET xp_referrer_points = COALESCE(xp_referrer_points, 0) + :referrer_xp_points
+      WHERE id = COALESCE(:referrer_user_id, 0)
         AND :referrer_xp_points IS NOT NULL
         AND EXISTS(SELECT 1 FROM inserted)
       RETURNING 1
