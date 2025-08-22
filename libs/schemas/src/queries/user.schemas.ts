@@ -233,6 +233,7 @@ export const XpRankedUser = z.object({
   tier: z.number(),
   user_name: z.string().nullish(),
   avatar_url: z.string().nullish(),
+  rank: z.number(),
 });
 
 export const GetXpsRanked = {
@@ -242,6 +243,10 @@ export const GetXpsRanked = {
       .number()
       .optional()
       .describe('Filters events by a specific quest id'),
+    user_id: z
+      .number()
+      .optional()
+      .describe('Get XP ranking for a specific user'),
   }),
   output: PaginatedResultSchema.extend({
     results: z.array(XpRankedUser),

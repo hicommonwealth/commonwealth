@@ -17,6 +17,7 @@ const useGetXPsRanked = ({
   limit = 100,
   quest_id,
   search,
+  user_id,
   enabled = true,
 }: UseGetXPsRankedProps) => {
   return trpc.user.getXpsRanked.useInfiniteQuery(
@@ -24,6 +25,7 @@ const useGetXPsRanked = ({
       limit,
       quest_id,
       search,
+      user_id,
     },
     {
       enabled,
