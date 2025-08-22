@@ -90,6 +90,14 @@ export default {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      // Drop the materialized view and its indexes
+      await queryInterface.sequelize.query(
+        `
+        DROP MATERIALIZED VIEW IF EXISTS user_leaderboard;
+      `,
+        { transaction },
+      );
+
       // Drop the index
       await queryInterface.sequelize.query(
         `
