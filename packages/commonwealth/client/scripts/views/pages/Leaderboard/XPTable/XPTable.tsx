@@ -92,7 +92,7 @@ const XPTable = ({
 
   const flatData = (pages?.pages || []).flatMap((p) => p.results);
   const rankings = flatData.map((rank, index) => ({
-    rank: index,
+    rank: index + 1,
     user_id: rank.user_id,
     user_profile: {
       id: rank.user_id,

@@ -21,13 +21,7 @@ export function GetXpsRanked(): Query<typeof schemas.GetXpsRanked> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { limit = 10, cursor = 1, quest_id, search = '', user_id } = payload as unknown as {
-        limit?: number;
-        cursor?: number;
-        quest_id?: number;
-        search?: string;
-        user_id?: number;
-      };
+      const { limit = 10, cursor = 1, quest_id, search = '', user_id } = payload;
       const searchCondition = search
         ? `AND LOWER(u.profile->>'name') LIKE LOWER($search)`
         : '';
@@ -152,6 +146,7 @@ select * from full_ranking
       return schemas.buildPaginatedResponse(results, parseInt(count, 10), {
         limit: paginationBind.limit,
         cursor,
+        offset: limit * (cursor - 1),
       });
     },
   };
