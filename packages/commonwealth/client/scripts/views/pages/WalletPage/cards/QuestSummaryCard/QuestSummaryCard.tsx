@@ -93,10 +93,8 @@ const QuestSummaryCard = () => {
             quests
           </CWText>
           {userRank && (
-            <CWText fontWeight="bold" type="h5">
-              <CWText type="caption">
-                You are&nbsp;<strong>#{userRank}</strong>&nbsp;on the&nbsp;
-              </CWText>
+            <CWText type="caption">
+              You are&nbsp;<strong>{userRank}</strong>&nbsp;on the&nbsp;
               <Link rel="noreferrer" to="/leaderboard">
                 leaderboard
               </Link>
