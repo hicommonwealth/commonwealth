@@ -31,7 +31,7 @@ export default {
     const refEventIds = referral_event_ids.map((r) => r.id);
     console.log('✅ Loaded referral_event_ids', refEventIds);
 
-    const batchSize = 10000;
+    const batchSize = 20_000;
     let offset = 0;
     let updated;
     do {
@@ -59,7 +59,7 @@ export default {
         },
       );
 
-      console.log(`Updated ${updated.length} rows`);
+      console.log(`Updated ${updated.length} rows at offset ${offset}`);
       offset += batchSize;
     } while (updated.length > 0);
 
