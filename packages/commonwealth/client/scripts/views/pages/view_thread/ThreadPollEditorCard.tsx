@@ -71,6 +71,7 @@ export const ThreadPollEditorCard = ({
       model: DEFAULT_COMPLETION_MODEL,
       stream: true,
       systemPrompt,
+      communityId: thread?.communityId,
       onError: (error) => {
         console.error('Error generating Poll:', error);
         notifyError('Failed to generate  Poll');
