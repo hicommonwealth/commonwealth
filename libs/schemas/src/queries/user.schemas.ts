@@ -186,6 +186,7 @@ export const GetUserReferralFees = {
 export const XpLogView = XpLog.omit({
   user: true,
   creator: true,
+  referrer: true,
   quest_action_meta: true,
 }).extend({
   user_profile: UserProfile,
