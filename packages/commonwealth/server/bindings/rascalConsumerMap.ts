@@ -77,6 +77,9 @@ const _NotificationsPolicy = {
   ),
   overrides: {
     ThreadUpvoted: `ThreadUpvoted.#`,
+
+    // These events don't have Knock workflows and thus should not be emitted
+    CommunityJoined: null,
   },
 };
 
