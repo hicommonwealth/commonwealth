@@ -7,6 +7,52 @@ import { models } from '../../database';
 
 type RankedUser = z.infer<typeof schemas.XpRankedUser>;
 
+const questRankingsQuery = (search: string) => `
+  with as_user as (select l.user_id,
+                          sum(l.xp_points)::int as xp_points
+                   from "XpLogs" l
+                          join "QuestActionMetas" m on l.action_meta_id = m.id
+                          join "Quests" q on m.quest_id = q.id
+                          join "Users" u on l.user_id = u.id
+                   where q.id = $quest_id
+                     AND u.tier != ${UserTierMap.BannedUser}
+                   group by l.user_id),
+       as_creator as (select l.creator_user_id             as user_id,
+                             sum(l.creator_xp_points)::int as xp_points
+                      from "XpLogs" l
+                             join "QuestActionMetas" m on l.action_meta_id = m.id
+                             join "Quests" q on m.quest_id = q.id
+                             join "Users" u on l.creator_user_id = u.id
+                      where q.id = $quest_id
+                        AND u.tier != ${UserTierMap.BannedUser}
+                      group by l.creator_user_id),
+       ranked_users as (select coalesce(u.user_id, c.user_id)                      as user_id,
+                               coalesce(u.xp_points, 0) + coalesce(c.xp_points, 0) as xp_points
+                        from as_user u
+                               full outer join as_creator c on u.user_id = c.user_id),
+       full_ranking as (select r.user_id,
+                               r.xp_points,
+                               u.tier,
+                               u.profile ->> 'name'                                                as user_name,
+                               u.profile ->> 'avatar_url'                                          as avatar_url,
+                               (ROW_NUMBER() OVER (ORDER BY r.xp_points DESC, r.user_id ASC))::int as rank
+                        from ranked_users r
+                               join "Users" u on r.user_id = u.id
+                          ${search ? `WHERE u.profile->>'name' ILIKE $search` : ''})
+  select *
+  from full_ranking
+`;
+
+const globalRankingsQuery = (search: string) => `
+  with full_ranking as (select *
+                        from user_leaderboard
+                        where tier != ${UserTierMap.BannedUser} ${
+                          search ? `AND user_name ILIKE $search` : ''
+                        })
+  select *
+  from full_ranking
+`;
+
 /**
  * Returns the top users with the most XP points.
  * @param limit The number of users to return per page.
@@ -29,72 +75,10 @@ export function GetXpsRanked(): Query<typeof schemas.GetXpsRanked> {
         user_id,
       } = payload;
       const searchParam = search ? `%${search}%` : '';
+
       const baseQuery = quest_id
-        ? `
-with
-as_user as (
-	select
-		l.user_id,
-		sum(l.xp_points)::int as xp_points
-	from
-		"XpLogs" l
-		join "QuestActionMetas" m on l.action_meta_id = m.id
-		join "Quests" q on m.quest_id = q.id
-	  join "Users" u on l.user_id = u.id 
-	where
-		q.id = $quest_id
-		AND u.tier != ${UserTierMap.BannedUser}
-	group by
-		l.user_id
-),
-as_creator as (
-	select
-		l.creator_user_id as user_id,
-		sum(l.creator_xp_points)::int as xp_points
-	from
-		"XpLogs" l
-		join "QuestActionMetas" m on l.action_meta_id = m.id
-		join "Quests" q on m.quest_id = q.id
-	  join "Users" u on l.creator_user_id = u.id 
-	where
-		q.id = $quest_id
-		AND u.tier != ${UserTierMap.BannedUser}
-	group by
-		l.creator_user_id
-),
-ranked_users as (
-	select
-		coalesce(u.user_id, c.user_id) as user_id,
-		coalesce(u.xp_points, 0) + coalesce(c.xp_points, 0) as xp_points
-	from
-		as_user u
-		full outer join as_creator c on u.user_id = c.user_id
-),
-full_ranking as (
-	select
-		r.user_id,
-		r.xp_points,
-		u.tier,
-		u.profile->>'name' as user_name,
-		u.profile->>'avatar_url' as avatar_url,
-		(ROW_NUMBER() OVER (ORDER BY r.xp_points DESC, r.user_id ASC))::int as rank
-	from
-		ranked_users r
-		join "Users" u on r.user_id = u.id
-	${search ? `WHERE u.profile->>'name' ILIKE $search` : ''}
-)
-select * from full_ranking
-`
-        : `
-with full_ranking as (
-	select *
-	from user_leaderboard
-	where tier != ${UserTierMap.BannedUser} ${
-    search ? `AND user_name ILIKE $search` : ''
-  }
-)
-select * from full_ranking
-`;
+        ? questRankingsQuery(search)
+        : globalRankingsQuery(search);
 
       // If user_id is provided, we need to get the user's rank from the full dataset
       if (user_id) {
@@ -125,7 +109,8 @@ select * from full_ranking
         ? { quest_id, search: searchParam, ...paginationBind }
         : { search: searchParam, ...paginationBind };
 
-      const countSql = `SELECT COUNT(*) FROM (${baseQuery}) as count_table`;
+      const countSql = `SELECT COUNT(*)
+                        FROM (${baseQuery}) as count_table`;
 
       const [results, [{ count }]] = await Promise.all([
         models.sequelize.query<RankedUser>(paginatedSql, {
