@@ -10,6 +10,7 @@ export default {
         {
           name: 'LaunchpadTokens_liquidity_transferred_created_at',
           transaction,
+          order: ['liquidity_transferred', 'created_at DESC'],
         },
       );
     });
@@ -25,4 +26,3 @@ export default {
     });
   },
 };
-
