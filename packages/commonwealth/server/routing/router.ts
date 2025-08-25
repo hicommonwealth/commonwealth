@@ -69,6 +69,14 @@ function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
     // otherwise, return false
     return res.json({ customDomain: null });
   });
+  registerRoute(router, 'get', '/ipCountry', async (req, res) => {
+    const country = (
+      (req.headers['cf-ipcountry'] as string | undefined) ||
+      (req.headers['x-vercel-ip-country'] as string | undefined) ||
+      (req.headers['x-country'] as string | undefined)
+    )?.toUpperCase();
+    return res.json({ country });
+  });
   registerRoute(router, 'get', '/finishUpdateEmail', async (req, res) => {
     const { token, email } = req.query;
     try {
