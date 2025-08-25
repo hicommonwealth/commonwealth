@@ -231,7 +231,7 @@ const CommonDomainRoutes = () => [
   <Route
     key="/quests"
     path="/quests"
-    element={withLayout(QuestsListPage, { type: 'common' })}
+    element={<Navigate to="/explore?tab=quests" />}
   />,
   <Route
     key="/:scope/quests/:id"
