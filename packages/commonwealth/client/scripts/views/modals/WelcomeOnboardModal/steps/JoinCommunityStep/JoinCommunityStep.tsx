@@ -1,6 +1,7 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import React from 'react';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
+import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -32,7 +33,7 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
 
   const { data: communitiesList, isLoading: isLoadingCommunities } =
     useFetchCommunitiesQuery({
-      limit: 4,
+      limit: 3,
       relevance_by: 'tag_ids',
       include_node_info: true,
       order_by: 'lifetime_thread_count',
@@ -43,7 +44,20 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
       enabled: !isLoadingProfile,
     });
 
-  const suggestedCommunities = communitiesList?.pages?.[0].results || [];
+  const { data: commonCommunity, isLoading: isLoadingCommonCommunity } =
+    useGetCommunityByIdQuery({
+      id: 'common',
+      includeNodeInfo: true,
+    });
+
+  let suggestedCommunities = communitiesList?.pages?.[0].results || [];
+
+  if (commonCommunity) {
+    suggestedCommunities = suggestedCommunities.filter(
+      (community) => community.id !== commonCommunity.id,
+    );
+    suggestedCommunities.splice(1, 0, commonCommunity);
+  }
 
   const handleCommunityJoin = (community: {
     id: string;
@@ -69,7 +83,7 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
       <CWText type="h4" fontWeight="semiBold">
         Based on your interests we think you&apos;ll like...
       </CWText>
-      {isLoadingCommunities ? (
+      {isLoadingCommunities || isLoadingCommonCommunity ? (
         <CWCircleMultiplySpinner />
       ) : (
         <div className="communities-list">

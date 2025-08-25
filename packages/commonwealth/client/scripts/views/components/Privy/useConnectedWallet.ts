@@ -1,8 +1,9 @@
 import { ConnectedWallet, usePrivy, useWallets } from '@privy-io/react-auth';
+import { useFlag } from 'hooks/useFlag';
 import { useEffect, useState } from 'react';
 import { useMemoizedFunction } from 'views/components/Privy/useMemoizedFunction';
 
-export function useConnectedWallet() {
+function useConnectedWalletEnabled() {
   const wallets = useWallets();
   const privy = usePrivy();
   const createWallet = useMemoizedFunction(privy.createWallet);
@@ -53,4 +54,15 @@ export function useConnectedWallet() {
   ]);
 
   return connectedWallet;
+}
+
+export function useConnectedWallet() {
+  const privyEnabled = useFlag('privy');
+  const hook = privyEnabled
+    ? useConnectedWalletEnabled
+    : () => {
+        return undefined;
+      };
+  const data = hook();
+  return data;
 }
