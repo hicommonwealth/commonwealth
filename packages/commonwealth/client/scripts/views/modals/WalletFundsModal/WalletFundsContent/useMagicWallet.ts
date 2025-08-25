@@ -65,7 +65,7 @@ const useMagicWallet = ({
     };
 
     initMagic();
-  }, [chainId]);
+  }, [chainId, chainNode]);
 
   return {
     magic,

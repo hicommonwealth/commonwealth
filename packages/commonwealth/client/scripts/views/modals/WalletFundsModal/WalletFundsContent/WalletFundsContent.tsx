@@ -64,9 +64,9 @@ const WalletFundsContent = ({
     setIsMoonpayVisible(true);
   };
 
-  const handleCloseMoonpay = () => {
+  const handleCloseMoonpay = async () => {
     setIsMoonpayVisible(false);
-    handleRefreshBalance(refetch);
+    await handleRefreshBalance(refetch);
   };
 
   const onUrlSignatureRequested = async (url: string): Promise<string> => {
@@ -130,9 +130,7 @@ const WalletFundsContent = ({
         variant="overlay"
         visible={isMoonpayVisible}
         walletAddress={userAddress}
-        onClose={async () => {
-          handleCloseMoonpay();
-        }}
+        onClose={handleCloseMoonpay}
         onUrlSignatureRequested={onUrlSignatureRequested}
         // onUnsupportedRegion={() => console.log('un supported region')}
         defaultCurrencyCode="eth_base"

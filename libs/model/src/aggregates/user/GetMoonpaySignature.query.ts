@@ -11,6 +11,7 @@ export function GetMoonpaySignatureQuery(): Query<
     ...schemas.GetMoonpaySignature,
     auth: [authVerified()],
     secure: true,
+    // eslint-disable-next-line @typescript-eslint/require-await
     body: async ({ payload }) => {
       if (!config.MOONPAY.SECRET_KEY) {
         throw new Error('MoonPay secret key not configured');
