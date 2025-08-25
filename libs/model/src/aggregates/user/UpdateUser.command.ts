@@ -111,9 +111,15 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                 const existingUsername = await models.User.findOne({
                   where: {
                     id: { [Op.ne]: id },
-                    profile: {
-                      name: updates?.profile?.name,
-                    },
+                    [Op.and]: [
+                      models.sequelize.where(
+                        models.sequelize.fn(
+                          'LOWER',
+                          models.sequelize.col("profile->>'name'")
+                        ),
+                        updates.profile.name.toLowerCase(),
+                      ),
+                    ],
                   },
                 });
                 if (existingUsername) {
