@@ -229,6 +229,11 @@ const CommonDomainRoutes = () => [
     element={withLayout(UpdateQuestPage, { type: 'common' })}
   />,
   <Route
+    key="/quests"
+    path="/quests"
+    element={<Navigate to="/explore?tab=quests" />}
+  />,
+  <Route
     key="/:scope/quests/:id"
     path="/:scope/quests/:id"
     element={withLayout(QuestDetailsPage, { scoped: true })}
