@@ -25,8 +25,6 @@ const generateSchemas = async () => {
         // Can't define index in model since it uses NULLS NOT DISTINCT
         // See 20250409215621-add-unique-name-xp-log.js for more info
         'UNIQUE(action_meta_id,event_created_at,name,user_id)',
-        // Missing in migration for performace reasons, but once this is settled we can remove it
-        'FOREIGN KEY Users(referrer_user_id) UPDATE NO ACTION DELETE NO ACTION"',
       ],
     },
   });
@@ -44,6 +42,8 @@ const generateSchemas = async () => {
         // Can't define index in model since it uses NULLS NOT DISTINCT
         // See 20250409215621-add-unique-name-xp-log.js for more info
         'UNIQUE(action_meta_id,event_created_at,name,user_id)',
+        // Missing in migration for performace reasons, but once this is settled we can remove it
+        'FOREIGN KEY Users(referrer_user_id) UPDATE NO ACTION DELETE NO ACTION"',
       ],
     },
   });
