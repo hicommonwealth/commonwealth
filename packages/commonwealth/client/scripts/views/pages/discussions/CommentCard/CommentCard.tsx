@@ -315,13 +315,13 @@ Community Description: ${communityDescription}`;
               !completedText.startsWith('Error generating reply')
             ) {
               try {
-                if (!user.activeAccount?.id) {
+                if (!user.activeAccount?.address) {
                   throw new Error('No active user account found');
                 }
 
                 // Create AI completion token with the generated content
                 const tokenResponse = await createAICompletionToken({
-                  user_id: user.activeAccount.id,
+                  user_id: user.id,
                   community_id: comment.community_id,
                   thread_id: comment.thread_id,
                   parent_comment_id: isRootComment ? undefined : comment.id,
