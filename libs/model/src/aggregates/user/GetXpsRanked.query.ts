@@ -28,11 +28,7 @@ export function GetXpsRanked(): Query<typeof schemas.GetXpsRanked> {
         search = '',
         user_id,
       } = payload;
-      const searchCondition = search
-        ? `AND LOWER(u.profile->>'name') LIKE LOWER($search)`
-        : '';
       const searchParam = search ? `%${search}%` : '';
-
       const baseQuery = quest_id
         ? `
 with
