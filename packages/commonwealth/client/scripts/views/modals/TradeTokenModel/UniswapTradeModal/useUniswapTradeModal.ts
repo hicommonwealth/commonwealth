@@ -60,6 +60,7 @@ const useUniswapTradeModal = ({
   ethChainId,
   rpcUrl,
   blockExplorerUrl,
+  node,
 }: UseUniswapTradeModalProps) => {
   const [isLoadingInitialState, setIsLoadingInitialState] = useState(true);
   const [ethersProvider, setEthersProvider] = useState<
@@ -77,7 +78,7 @@ const useUniswapTradeModal = ({
       const configureMagicProvider = () => {
         try {
           if (!ethChainId) return;
-          const magic = getMagicForChain(ethChainId);
+          const magic = getMagicForChain(ethChainId, node);
           if (!magic) return;
 
           const ethersCompatibleProvider = new Web3Provider(magic.rpcProvider);
@@ -90,7 +91,7 @@ const useUniswapTradeModal = ({
 
       void configureMagicProvider();
     }
-  }, [userIsMagicUser, isMagicConfigured, ethChainId]);
+  }, [userIsMagicUser, isMagicConfigured, ethChainId, node]);
 
   // Initialize token list
   useRunOnceOnCondition({
@@ -155,7 +156,7 @@ const useUniswapTradeModal = ({
       if (userIsMagicUser) {
         console.log('[Network Debug] Using Magic authentication flow');
         // Use the utility function to get Magic instance for the Base chain
-        const magic = getMagicForChain(ethChainId);
+        const magic = getMagicForChain(ethChainId, node);
 
         if (!magic) {
           return false;

@@ -1,12 +1,15 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { getUniqueUserAddresses } from 'helpers/user';
 import React, { useState } from 'react';
+import useUserStore from 'state/ui/user';
 import FractionalValue from 'views/components/FractionalValue';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWIconButton } from 'views/components/component_kit/new_designs/CWIconButton/CWIconButton';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
   CWTab,
@@ -19,6 +22,7 @@ import {
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
+import { WalletFundsModal } from 'views/modals/WalletFundsModal/WalletFundsModal';
 import RewardsCard from '../../RewardsCard';
 import MagicWalletButton from './MagicWalletButton/MagicWalletButton';
 import './WalletCard.scss';
@@ -33,6 +37,8 @@ const WalletCard = () => {
   const [activeTab, setActiveTab] = useState<WalletBalanceTabs>(
     WalletBalanceTabs.Tokens,
   );
+  const [isFundsModalOpen, setIsFundsModalOpen] = useState(false);
+  const user = useUserStore();
 
   const uniqueAddresses = getUniqueUserAddresses({
     forChain: ChainBase.Ethereum,
@@ -41,6 +47,10 @@ const WalletCard = () => {
   const [userSelectedAddress, setUserSelectedAddress] = useState<string>(
     uniqueAddresses[0],
   );
+
+  const isSelectedAddressMagic =
+    user.addresses.find((a) => a.address === userSelectedAddress)?.walletId ===
+    WalletId.Magic;
 
   const { isLoadingTokensInfo, userCombinedUSDBalance, userTokens, refetch } =
     useUserWalletHoldings({
@@ -136,7 +146,24 @@ const WalletCard = () => {
             <CWText isCentered>🚧 Coming Soon, Hang tight!</CWText>
           )}
         </div>
+        {isSelectedAddressMagic && (
+          <CWButton
+            label="Deposit Funds"
+            buttonWidth="full"
+            type="submit"
+            buttonHeight="sm"
+            onClick={() => setIsFundsModalOpen(true)}
+          />
+        )}
       </div>
+      <CWModal
+        size="medium"
+        open={isFundsModalOpen}
+        onClose={() => setIsFundsModalOpen(false)}
+        content={
+          <WalletFundsModal onClose={() => setIsFundsModalOpen(false)} />
+        }
+      />
     </RewardsCard>
   );
 };
