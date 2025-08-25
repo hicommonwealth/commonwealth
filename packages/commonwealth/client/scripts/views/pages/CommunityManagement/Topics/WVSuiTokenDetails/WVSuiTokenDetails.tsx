@@ -10,6 +10,7 @@ import { CreateTopicStep } from '../utils';
 
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
+import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
 import './WVSuiTokenDetails.scss';
 
@@ -23,15 +24,38 @@ const WVSuiTokenDetails = ({
   onCreateTopic,
 }: WVSuiTokenDetailsProps) => {
   const [tokenAddress, setTokenAddress] = useState('');
-  const [tokenSymbol, setTokenSymbol] = useState('');
   const [tokenDecimals, setTokenDecimals] = useState(9);
   const [multiplier, setMultiplier] = useState(1);
   const [loading, setLoading] = useState(false);
 
   const chainNodeId = app?.chain?.meta?.ChainNode?.id;
 
+  // Validation function for Sui contract address format
+  const validateSuiAddress = (
+    value: string,
+  ): [ValidationStatus, string] | [] => {
+    if (!value) return [];
+
+    const segments = value.split('::');
+    if (segments.length < 3) {
+      return [
+        'failure',
+        'Address must contain at least 3 segments separated by "::"',
+      ];
+    }
+
+    // Check if each segment is non-empty
+    for (const segment of segments) {
+      if (!segment.trim()) {
+        return ['failure', 'All segments must be non-empty'];
+      }
+    }
+
+    return ['success', 'Valid Sui address format'];
+  };
+
   const handleSubmit = async () => {
-    if (!tokenAddress || !tokenSymbol || !chainNodeId) {
+    if (!tokenAddress || !chainNodeId) {
       notifyError('Please fill in all required fields');
       return;
     }
@@ -41,7 +65,6 @@ const WVSuiTokenDetails = ({
       await onCreateTopic({
         suiToken: {
           tokenAddress,
-          tokenSymbol,
           tokenDecimals,
           voteWeightMultiplier: multiplier,
           chainNodeId,
@@ -78,16 +101,8 @@ const WVSuiTokenDetails = ({
         value={tokenAddress}
         onInput={(e) => setTokenAddress(e.target.value)}
         placeholder="Enter Sui Coin Type"
-      />
-
-      <CWText type="h5">Token Symbol</CWText>
-      <CWText type="b1" className="description">
-        Enter the token symbol (e.g., BLUE)
-      </CWText>
-      <CWTextInput
-        value={tokenSymbol}
-        onInput={(e) => setTokenSymbol(e.target.value)}
-        placeholder="Enter token symbol"
+        fullWidth
+        inputValidationFn={validateSuiAddress}
       />
 
       <CWText type="h5">Token Decimals</CWText>
@@ -146,13 +161,7 @@ const WVSuiTokenDetails = ({
           disabled={loading}
         />
         <CWButton
-          disabled={
-            !tokenAddress ||
-            !tokenSymbol ||
-            !multiplier ||
-            loading ||
-            !chainNodeId
-          }
+          disabled={!tokenAddress || !multiplier || loading || !chainNodeId}
           type="button"
           buttonWidth="wide"
           label="Enable weighted voting for topic"

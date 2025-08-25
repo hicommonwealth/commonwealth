@@ -12,6 +12,15 @@ export function GetUserActivity(): Query<typeof schemas.ActivityFeed> {
     auth: [authOptionalVerified],
     secure: true,
     body: async ({ payload, actor }) => {
+      if (!actor.user?.id)
+        return {
+          results: [],
+          limit: payload.limit,
+          page: 1,
+          totalPages: 0,
+          totalResults: 0,
+        };
+
       const { comment_limit = 3, limit = 10, cursor = 1 } = payload;
 
       const query = buildUserActivityQuery(actor);

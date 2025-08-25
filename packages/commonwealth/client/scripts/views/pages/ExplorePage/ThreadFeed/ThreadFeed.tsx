@@ -135,6 +135,7 @@ export const ThreadFeed = ({
     limit: 10,
     ...(filters.in_community_id && { community_id: filters.in_community_id }),
     ...(searchText?.trim() && { search: searchText.trim() }),
+    apiEnabled: !!user.activeAccount?.address,
   });
 
   if (isLoading) {

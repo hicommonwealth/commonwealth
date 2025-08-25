@@ -5,6 +5,7 @@ import {
   CommunityAlert,
   SubscriptionPreference,
   ThreadSubscription,
+  TopicSubscription,
 } from '../entities';
 import { PG_INT } from '../utils';
 
@@ -46,12 +47,28 @@ export const DeleteCommunityAlert = {
   context: VerifiedContext,
 };
 
+export const DeleteTopicSubscription = {
+  input: z.object({
+    topic_ids: z.array(PG_INT),
+  }),
+  output: z.number().describe('Number of topic subscriptions deleted'),
+  context: VerifiedContext,
+};
+
 export const CreateCommentSubscription = {
   input: z.object({
     id: z.number(),
     comment_id: PG_INT,
   }),
   output: CommentSubscription,
+  context: VerifiedContext,
+};
+
+export const CreateTopicSubscription = {
+  input: z.object({
+    topic_id: PG_INT,
+  }),
+  output: TopicSubscription,
   context: VerifiedContext,
 };
 

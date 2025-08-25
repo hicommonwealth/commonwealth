@@ -2,6 +2,7 @@ import { trpc } from '@hicommonwealth/adapters';
 import { command } from '@hicommonwealth/core';
 import {
   Community,
+  GroupSnapshot,
   refreshMemberships,
   refreshProfileCount,
 } from '@hicommonwealth/model';
@@ -116,6 +117,22 @@ export const trpcRouter = trpc.router({
     ]),
   ]),
   getGroups: trpc.query(Community.GetGroups, trpc.Tag.Community),
+  listGroupSnapshots: trpc.query(
+    GroupSnapshot.ListGroupSnapshots,
+    trpc.Tag.Community,
+  ),
+  getGroupSnapshot: trpc.query(
+    GroupSnapshot.GetGroupSnapshot,
+    trpc.Tag.Community,
+  ),
+  getSnapshotBalances: trpc.query(
+    GroupSnapshot.GetSnapshotBalances,
+    trpc.Tag.Community,
+  ),
+  createGroupSnapshot: trpc.command(
+    GroupSnapshot.CreateGroupSnapshot,
+    trpc.Tag.Community,
+  ),
   updateRole: trpc.command(Community.UpdateRole, trpc.Tag.Community),
   getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community),
   getMemberships: trpc.query(Community.GetMemberships, trpc.Tag.Community),
@@ -217,6 +234,10 @@ export const trpcRouter = trpc.router({
   ),
   setAddressWallet: trpc.command(
     Community.SetAddressWallet,
+    trpc.Tag.Community,
+  ),
+  setCommunityMcpServers: trpc.command(
+    Community.SetCommunityMCPServers,
     trpc.Tag.Community,
   ),
   getRoles: trpc.query(Community.GetRoles, trpc.Tag.Community),

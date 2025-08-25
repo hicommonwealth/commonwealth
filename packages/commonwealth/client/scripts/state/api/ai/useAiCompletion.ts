@@ -1,4 +1,7 @@
-import { CompletionOptions } from '@hicommonwealth/shared';
+import {
+  CompletionOptions,
+  DEFAULT_COMPLETION_MODEL,
+} from '@hicommonwealth/shared';
 import { notifyInfo } from 'client/scripts/controllers/app/notifications';
 import { useCallback, useState } from 'react';
 import { userStore } from 'state/ui/user';
@@ -81,6 +84,13 @@ export const useAiCompletion = () => {
 
   const generateCompletion = useCallback(
     async (userPrompt: string, options?: AiCompletionOptions) => {
+      const requestId = Math.random().toString(36).substr(2, 9);
+      console.log(`[${requestId}] Starting AI completion request`, {
+        promptLength: userPrompt.length,
+        model: options?.model,
+        stream: options?.stream !== false,
+      });
+
       setIsLoading(true);
       setError(null);
       setCompletion('');
@@ -102,7 +112,7 @@ export const useAiCompletion = () => {
           const contextSection = `
 
 CONTEXTUAL INFORMATION:
-The user has mentioned the following entities in their message. 
+The user has mentioned the following entities in their message.
 Use this context to provide more informed and relevant responses:
 
 ${contextualData}
@@ -116,9 +126,10 @@ ${contextualData}
         const requestBody: Partial<CompletionOptions> & {
           jwt?: string | null;
           prompt: string;
+          communityId?: string;
         } = {
           prompt: userPrompt,
-          model: options?.model || 'gpt-4o',
+          model: options?.model || DEFAULT_COMPLETION_MODEL,
           maxTokens: options?.maxTokens,
           stream: streamMode,
           useOpenRouter: options?.useOpenRouter,
@@ -126,6 +137,7 @@ ${contextualData}
           ...(typeof options?.useWebSearch === 'boolean'
             ? { useWebSearch: options.useWebSearch }
             : {}),
+          ...(options?.communityId && { communityId: options.communityId }),
         };
 
         if (typeof options?.temperature === 'number') {
@@ -136,12 +148,23 @@ ${contextualData}
           requestBody.systemPrompt = enhancedSystemPrompt;
         }
 
+        console.log(`[${requestId}] Sending request to /api/aicompletion`, {
+          bodySize: JSON.stringify(requestBody).length,
+          stream: streamMode,
+        });
+
         const response = await fetch('/api/aicompletion', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(requestBody),
+        });
+
+        console.log(`[${requestId}] Received response`, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
         });
 
         if (!response.ok) {
@@ -162,6 +185,8 @@ ${contextualData}
 
         // Handle streaming vs. non-streaming response
         if (streamMode) {
+          console.log(`[${requestId}] Starting streaming response processing`);
+
           if (!response.body) {
             throw new Error('ReadableStream not supported in this browser.');
           }
@@ -170,11 +195,19 @@ ${contextualData}
           const decoder = new TextDecoder();
 
           let buffer = '';
+          let chunkCount = 0;
 
           while (true) {
             const { done, value } = await reader.read();
+            chunkCount++;
 
             if (done) {
+              console.log(`[${requestId}] Streaming completed`, {
+                totalChunks: chunkCount,
+                totalLength: accumulatedText.length,
+                bufferRemaining: buffer.length,
+              });
+
               // Process any remaining text in the buffer
               if (buffer.length > 0) {
                 accumulatedText += buffer;
@@ -188,8 +221,16 @@ ${contextualData}
             // Decode the new chunk and add to buffer
             const chunk = decoder.decode(value, { stream: true });
 
+            if (chunkCount % 10 === 0) {
+              console.log(`[${requestId}] Processing chunk ${chunkCount}`, {
+                chunkSize: chunk.length,
+                totalAccumulated: accumulatedText.length,
+              });
+            }
+
             // Check if the chunk contains an error message
             if (chunk.startsWith('\nError:')) {
+              console.error(`[${requestId}] Error chunk received:`, chunk);
               throw new Error(chunk.substring(8));
             }
 
@@ -214,10 +255,14 @@ ${contextualData}
         }
       } catch (err) {
         const tempError = err instanceof Error ? err : new Error(String(err));
-        console.error('AI completion error:', tempError);
+        console.error(`[${requestId}] AI completion error:`, {
+          error: tempError.message,
+          stack: tempError.stack,
+        });
         setError(tempError);
         options?.onError?.(tempError);
       } finally {
+        console.log(`[${requestId}] AI completion request finished`);
         setIsLoading(false);
       }
 

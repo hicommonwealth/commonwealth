@@ -6,6 +6,18 @@
   border: 1px solid colors.$neutral-200;
   border-radius: 12px;
 
+  a,
+  a:visited,
+  a:hover,
+  a:active {
+    color: #5f88e7 !important;
+    color: inherit;
+  }
+
+  a:visited .link {
+    color: #4c83ff;
+  }
+
   .header {
     padding: 0 !important;
     width: 100%;

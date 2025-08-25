@@ -11,10 +11,12 @@ import ScrollContainer from 'views/components/ScrollContainer';
 import { PageNotFound } from 'views/pages/404';
 import { CommentSubscriptions } from 'views/pages/NotificationSettings/CommentSubscriptions';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
+import EmailsSection from 'views/pages/NotificationSettings/EmailsSection';
 import { PushNotificationsToggle } from 'views/pages/NotificationSettings/PushNotificationsToggle';
 import { PushNotificationsToggleMaster } from 'views/pages/NotificationSettings/PushNotificationsToggleMaster';
 import { ReactNativeAboutSection } from 'views/pages/NotificationSettings/ReactNativeAboutSection';
 import { ThreadSubscriptions } from 'views/pages/NotificationSettings/ThreadSubscriptions';
+import { TopicSubscriptions } from 'views/pages/NotificationSettings/TopicSubscriptions';
 import { useSupportsPushNotifications } from 'views/pages/NotificationSettings/useSupportsPushNotifications';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
 import { z } from 'zod';
@@ -24,9 +26,11 @@ import './index.scss';
 
 type NotificationSection =
   | 'push-notifications'
+  | 'emails'
   | 'community-alerts'
   | 'threads'
-  | 'comments';
+  | 'comments'
+  | 'topics';
 
 const NotificationSettings = () => {
   const supportsPushNotifications = useSupportsPushNotifications();
@@ -58,6 +62,8 @@ const NotificationSettings = () => {
           Manage the emails and alerts you receive about your activity
         </CWText>
 
+        {/* Emails section moved into its own tab */}
+
         <ScrollContainer>
           <CWTabsRow>
             {supportsPushNotifications && (
@@ -67,6 +73,11 @@ const NotificationSettings = () => {
                 onClick={() => setSection('push-notifications')}
               />
             )}
+            <CWTab
+              label="Emails"
+              isSelected={section === 'emails'}
+              onClick={() => setSection('emails')}
+            />
             <CWTab
               label="Community"
               isSelected={section === 'community-alerts'}
@@ -82,6 +93,12 @@ const NotificationSettings = () => {
               label="Comments"
               isSelected={section === 'comments'}
               onClick={() => setSection('comments')}
+            />
+
+            <CWTab
+              label="Topics"
+              isSelected={section === 'topics'}
+              onClick={() => setSection('topics')}
             />
           </CWTabsRow>
         </ScrollContainer>
@@ -108,6 +125,12 @@ const NotificationSettings = () => {
                 />
               );
             })}
+          </>
+        )}
+
+        {section === 'emails' && (
+          <>
+            <EmailsSection />
           </>
         )}
 
@@ -171,6 +194,12 @@ const NotificationSettings = () => {
         {section === 'comments' && (
           <>
             <CommentSubscriptions />
+          </>
+        )}
+
+        {section === 'topics' && (
+          <>
+            <TopicSubscriptions />
           </>
         )}
         <ReactNativeAboutSection />

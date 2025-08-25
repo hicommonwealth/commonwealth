@@ -11,7 +11,7 @@ import { CreateLaunchpadTrade, CreateToken } from '../../src/aggregates/token';
 import { GetXps, Xp } from '../../src/aggregates/user';
 import { config } from '../../src/config';
 import { models } from '../../src/database';
-import { emitEvent, equalEvmAddresses } from '../../src/utils/utils';
+import { emitEvent, equalEvmAddresses } from '../../src/utils';
 import { drainOutbox, seedCommunity } from '../utils';
 
 const chance = new Chance();

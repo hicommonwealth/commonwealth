@@ -36,25 +36,24 @@
   }
 
   .content {
-    .header {
-      color: colors.$neutral-600;
-    }
-
     padding: 0 48px;
 
     @include media_queries.extraSmall {
       padding: 0 32px;
     }
+
+    .header {
+      color: colors.$neutral-600;
+    }
   }
 
   .footer {
     padding-bottom: 48px;
+    justify-content: center;
 
     @include media_queries.extraSmall {
       padding-bottom: 32px;
     }
-
-    justify-content: center;
 
     .Text {
       display: initial;

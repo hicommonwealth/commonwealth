@@ -5,9 +5,11 @@ import {
   notificationsProvider,
   NotificationsProviderGetMessagesReturn,
   NotificationsProviderSchedulesReturn,
-  RepeatFrequency,
   WorkflowKeys,
 } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model/db';
+import { processSubscriptionPreferencesUpdated } from '@hicommonwealth/model/services';
+import * as tester from '@hicommonwealth/model/tester';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   afterAll,
@@ -21,10 +23,6 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-// eslint-disable-next-line max-len
-import { models } from '@hicommonwealth/model/db';
-import * as tester from '@hicommonwealth/model/tester';
-import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/subscriptionPreferencesUpdated';
 
 function SpyNotificationsProvider(stubs?: {
   triggerWorkflowStub?: Mock<
@@ -50,6 +48,7 @@ function SpyNotificationsProvider(stubs?: {
       stubs?.createSchedulesStub || vi.fn(() => Promise.resolve([])),
     deleteSchedules:
       stubs?.deleteSchedulesStub || vi.fn(() => Promise.resolve(new Set())),
+    updateSchedules: vi.fn(() => Promise.resolve([])),
     identifyUser:
       stubs?.identifyUserStub || vi.fn(() => Promise.resolve({ id: '' })),
     registerClientRegistrationToken:
@@ -144,6 +143,16 @@ describe('subscriptionPreferencesUpdated', () => {
         },
       },
     );
+    await models.User.update(
+      {
+        emailNotificationInterval: 'weekly',
+      },
+      {
+        where: {
+          id: user!.id!,
+        },
+      },
+    );
 
     const provider = notificationsProvider({
       adapter: SpyNotificationsProvider({
@@ -183,7 +192,7 @@ describe('subscriptionPreferencesUpdated', () => {
     ).to.have.property('hours');
     expect(
       (provider.createSchedules as Mock).mock.calls[0][0].schedule[0].frequency,
-    ).to.equal(RepeatFrequency.Weekly);
+    ).to.equal('weekly');
   });
 
   test('should not create a schedule if one already exists', async () => {

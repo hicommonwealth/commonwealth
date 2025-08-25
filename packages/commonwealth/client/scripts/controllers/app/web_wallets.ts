@@ -10,6 +10,7 @@ import BinanceWebWalletController from './webWallets/binance_web_wallet';
 import BitgetWebWalletController from './webWallets/bitget_web_wallet';
 import CoinbaseWebWalletController from './webWallets/coinbase_web_wallet';
 import CosmosEvmMetamaskWalletController from './webWallets/cosmos_evm_metamask_web_wallet';
+import GateWebWalletController from './webWallets/gate_web_wallet';
 import KeplrEthereumWalletController from './webWallets/keplr_ethereum_web_wallet';
 import KeplrWebWalletController from './webWallets/keplr_web_wallet';
 import LeapWebWalletController from './webWallets/leap_web_wallet';
@@ -128,6 +129,7 @@ export default class WebWalletController {
       new OkxWebWalletController(),
       new PolkadotWebWalletController(),
       new MetamaskWebWalletController(),
+      new GateWebWalletController(),
       new WalletConnectWebWalletController(),
       new KeplrWebWalletController(),
       new LeapWebWalletController(),

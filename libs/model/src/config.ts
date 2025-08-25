@@ -95,7 +95,11 @@ const {
   KNOCK_IN_APP_FEED_ID,
   UNLEASH_FRONTEND_API_TOKEN,
   CONTEST_DURATION_IN_SEC,
+  KLAVIS_API_KEY,
   REORG_SAFETY_DISABLED,
+  SEND_EMAILS,
+  MCP_BOT_EMAIL,
+  IGNORE_CONTENT_CREATION_LIMIT,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -131,7 +135,7 @@ export const config = configure(
     },
     WEB3: {
       PRIVATE_KEY: PRIVATE_KEY || '',
-      REORG_SAFETY_DISABLED: REORG_SAFETY_DISABLED !== 'true',
+      REORG_SAFETY_DISABLED: REORG_SAFETY_DISABLED === 'true',
       LAUNCHPAD_PRIVATE_KEY: LAUNCHPAD_PRIVATE_KEY || '',
       CONTEST_BOT_PRIVATE_KEY: CONTEST_BOT_PRIVATE_KEY || '',
       EVM_CHAINS_WHITELIST: EVM_CHAINS_WHITELIST || '',
@@ -312,6 +316,7 @@ export const config = configure(
     MCP: {
       MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
       MCP_KEY_BYPASS: MCP_KEY_BYPASS,
+      BOT_EMAIL: MCP_BOT_EMAIL || 'mcp@common.xyz',
     },
     LOG_XP_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
     NOTIFICATIONS: {
@@ -319,10 +324,15 @@ export const config = configure(
         KNOCK_PUBLIC_API_KEY || DEFAULTS.KNOCK_PUBLIC_API_KEY,
       KNOCK_IN_APP_FEED_ID:
         KNOCK_IN_APP_FEED_ID || DEFAULTS.KNOCK_IN_APP_FEED_ID,
+      SEND_EMAILS: SEND_EMAILS === 'true',
     },
     UNLEASH: {
       FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
     },
+    KLAVIS: {
+      API_KEY: KLAVIS_API_KEY,
+    },
+    IGNORE_CONTENT_CREATION_LIMIT: IGNORE_CONTENT_CREATION_LIMIT === 'true',
   },
   z.object({
     SENDGRID: z.object({
@@ -684,6 +694,7 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && data),
           'MCP_KEY_BYPASS cannot be set in production',
         ),
+      BOT_EMAIL: z.string(),
     }),
     LOG_XP_LAUNCHPAD: z.boolean().default(false),
     NOTIFICATIONS: z.object({
@@ -691,7 +702,7 @@ export const config = configure(
         requiredInEnvironmentServices({
           config: target,
           requiredAppEnvs: ProdLikeEnvironments,
-          requiredServices: [...WebServices, 'knock', 'consumer'],
+          requiredServices: [...WebServices, 'consumer'],
           defaultCheck: DEFAULTS.KNOCK_PUBLIC_API_KEY,
         }),
       ),
@@ -699,9 +710,10 @@ export const config = configure(
         requiredInEnvironmentServices({
           config: target,
           requiredAppEnvs: ['production'],
-          requiredServices: [...WebServices, 'knock', 'consumer'],
+          requiredServices: [...WebServices, 'consumer'],
         }),
       ),
+      SEND_EMAILS: z.boolean(),
     }),
     UNLEASH: z.object({
       FRONTEND_API_TOKEN: z
@@ -715,5 +727,9 @@ export const config = configure(
           }),
         ),
     }),
+    KLAVIS: z.object({
+      API_KEY: z.string().optional(),
+    }),
+    IGNORE_CONTENT_CREATION_LIMIT: z.boolean().optional(),
   }),
 );

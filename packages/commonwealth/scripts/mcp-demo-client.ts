@@ -41,25 +41,41 @@ const client = new OpenAI({
   apiKey: config.OPENAI.API_KEY,
 });
 
-export async function getAllServers(): Promise<CommonMCPServerWithHeaders[]> {
-  const dbServers = (await models.MCPServer.findAll()).filter(
-    (server) => server.id !== 1, // exclude common prod server
-  );
-  const allServers: CommonMCPServerWithHeaders[] = [
-    {
-      id: 0,
-      name: 'Common MCP Server',
-      description: 'Common MCP Server',
-      source: 'common',
-      server_url: `https://${MCP_DEMO_CLIENT_SERVER_URL}/mcp`,
-      handle: 'common',
-      headers: {
-        Authorization: `Bearer ${MCP_KEY_BYPASS}`,
-      },
-    },
-    ...dbServers,
-  ];
-  return allServers;
+async function getAllServers(): Promise<CommonMCPServerWithHeaders[]> {
+  const dbServers = (
+    await models.MCPServer.scope('withPrivateData').findAll()
+  ).map((server) => ({
+    ...server.toJSON(),
+    server_url:
+      server.id === 1
+        ? `https://${MCP_DEMO_CLIENT_SERVER_URL}/mcp`
+        : server.server_url,
+    headers:
+      server.id === 1
+        ? {
+            Authorization: `Bearer ${MCP_KEY_BYPASS}`,
+          }
+        : undefined,
+  }));
+
+  // Handle duplicate handles by adding number suffixes
+  const handleCounts: Map<string, number> = new Map();
+  const processedServers = dbServers.map((server) => {
+    const originalHandle = server.handle;
+    const count = handleCounts.get(originalHandle) || 0;
+    handleCounts.set(originalHandle, count + 1);
+
+    // Add suffix starting from 1 for duplicates
+    const finalHandle =
+      count > 0 ? `${originalHandle}${count}` : originalHandle;
+
+    return {
+      ...server,
+      handle: finalHandle,
+    };
+  });
+
+  return processedServers;
 }
 
 async function startChatBot() {

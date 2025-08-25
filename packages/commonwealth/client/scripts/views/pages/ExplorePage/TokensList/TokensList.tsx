@@ -170,12 +170,6 @@ const TokensList = ({
               onCloseClick={removeIsGraduatedFilter}
             />
           )}
-          <FiltersDrawer
-            isOpen={isFilterDrawerOpen}
-            onClose={() => setIsFilterDrawerOpen(false)}
-            filters={filters}
-            onFiltersChange={(newFilters) => setFilters(newFilters)}
-          />
         </div>
       )}
       {isInitialLoading ? (
@@ -246,6 +240,12 @@ const TokensList = ({
           onModalClose={() => setTokenLaunchModalConfig({ isOpen: false })}
         />
       )}
+      <FiltersDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        filters={filters}
+        onFiltersChange={(newFilters) => setFilters(newFilters)}
+      />
     </div>
   );
 };

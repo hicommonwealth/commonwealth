@@ -8,8 +8,9 @@ export * as Contest from './aggregates/contest';
 export * as DiscordBot from './aggregates/discordBot';
 export * as Email from './aggregates/emails';
 export * as Feed from './aggregates/feed';
+export * as GroupSnapshot from './aggregates/groupSnapshot';
 export * as LoadTest from './aggregates/load-testing';
-export * as MCPServer from './aggregates/mcp-server';
+export * as MCP from './aggregates/mcp';
 export * as Poll from './aggregates/poll';
 export * as Quest from './aggregates/quest';
 export * as Reaction from './aggregates/reaction';
@@ -31,6 +32,9 @@ export * from './policies';
 // Config
 export * from './config';
 
+// Integrations
+export * from './integrations';
+
 // Exported utils (might be leaks)
 export {
   refreshMemberships,
@@ -42,11 +46,14 @@ export {
 } from './utils/farcasterUtils';
 export { generateImage } from './utils/generateImage';
 export { magicLogin } from './utils/magic';
+export { emitEvent } from './utils/outbox';
 export {
+  extractMCPMentions,
   findMentionDiff,
   parseUserMentions,
   uniqueMentions,
 } from './utils/parseUserMentions';
+export type { MCPMention } from './utils/parseUserMentions';
 export { pgMultiRowUpdate } from './utils/pgMultiRowUpdate';
 export {
   createEventRegistryChainNodes,
@@ -55,7 +62,6 @@ export {
 export {
   R2_ADAPTER_KEY,
   buildChainNodeUrl,
-  emitEvent,
   equalEvmAddresses,
   getSaltedApiKeyHash,
   uploadIfLarge,

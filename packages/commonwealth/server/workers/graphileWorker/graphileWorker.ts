@@ -6,11 +6,16 @@ import {
 import {
   blobStorage,
   cache,
+  disableService,
   dispose,
   logger,
   stats,
 } from '@hicommonwealth/core';
-import { GraphileTaskNames, preset } from '@hicommonwealth/model/services';
+import {
+  CustomCronItem,
+  GraphileTaskNames,
+  preset,
+} from '@hicommonwealth/model/services';
 import { Task, parseCronItems, run } from 'graphile-worker';
 import { config } from '../../config';
 import { cronItems } from './cronJobs';
@@ -19,6 +24,7 @@ import { graphileTasks, taskFactory } from './tasks';
 const log = logger(import.meta);
 
 export async function startGraphileWorker(initAdapters: boolean = false) {
+  await disableService();
   if (initAdapters) {
     if (!config.CACHE.REDIS_URL) {
       log.warn(
@@ -39,12 +45,14 @@ export async function startGraphileWorker(initAdapters: boolean = false) {
   }
 
   for (const cronJob of cronItems) {
-    if (!graphileTasks[cronJob.task])
+    if (cronJob && !graphileTasks[cronJob.task])
       throw new Error(`Cron job task not found: ${cronJob.task}`);
   }
 
   await run({
-    parsedCronItems: parseCronItems(cronItems),
+    parsedCronItems: parseCronItems(
+      cronItems.filter((x): x is CustomCronItem => x !== undefined),
+    ),
     preset,
     taskList: Object.entries(graphileTasks).reduce(
       (acc, [taskName, task]) => ({

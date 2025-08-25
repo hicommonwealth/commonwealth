@@ -1,6 +1,8 @@
 export * from './AddLinks.command';
 export * from './CreateThread.command';
 export * from './CreateThreadReaction.command';
+export * from './CreateThreadToken.command';
+export * from './CreateThreadTokenTrade.command';
 export * from './DeleteLinks.command';
 export * from './DeleteThread.command';
 export * from './GetActiveThreads.query';
@@ -9,5 +11,6 @@ export * from './GetThreadById.query';
 export * from './GetThreadCount.query';
 export * from './GetThreads.query';
 export * from './GetThreadsByIds.query';
+export * from './GetThreadTokenHolders.query';
 export * from './SearchThreads.query';
 export * from './UpdateThread.command';

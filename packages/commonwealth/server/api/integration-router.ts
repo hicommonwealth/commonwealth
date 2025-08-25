@@ -1,6 +1,13 @@
 import { express } from '@hicommonwealth/adapters';
-import { AppError } from '@hicommonwealth/core';
-import { ChainEvents, Contest, Snapshot, config } from '@hicommonwealth/model';
+import { AppError, command } from '@hicommonwealth/core';
+import {
+  ChainEvents,
+  Contest,
+  MCP,
+  Snapshot,
+  config,
+} from '@hicommonwealth/model';
+import { systemActor } from '@hicommonwealth/model/middleware';
 import { Router, raw } from 'express';
 import farcasterRouter from 'server/farcaster/router';
 import { validateFarcasterAction } from 'server/middleware/validateFarcasterAction';
@@ -76,6 +83,26 @@ function build() {
     },
     express.command(Snapshot.CreateSnapshotProposal()),
   );
+
+  // klavis oauth callback
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  router.get('/klavis/oauth-callback', async (req, res, next) => {
+    try {
+      const { instanceId, original_url } = req.query;
+      if (typeof instanceId !== 'string' || !instanceId.length) {
+        throw new AppError('Instance ID is required', 500);
+      }
+      await command(MCP.KlavisOAuthCallback(), {
+        actor: systemActor({}),
+        payload: {
+          instanceId: instanceId as string,
+        },
+      });
+      res.redirect(original_url as string);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   return router;
 }

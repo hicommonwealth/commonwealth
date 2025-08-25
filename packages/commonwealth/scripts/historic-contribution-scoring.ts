@@ -6,9 +6,26 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { QueryTypes } from 'sequelize';
 
-const totalSupply = 10_000_000_000;
+// Token Supply Configuration
+const SUPPLY = {
+  TOTAL: 10_000_000_000,
+  SPLITS: {
+    // For 3% total allocation (300M):
+    HISTORICAL: 0.5, // Example 10B * 0.03 * 0.50 = 150M tokens
+    AURA: 0.5, // Example 10B * 0.03 * 0.50 = 150M tokens
+  },
+};
+
+// Time Decay Configuration
+const DECAY = {
+  HALF_LIFE_DAYS: 365, // 1 year
+  FACTOR: Math.log(6) / 365, // ≈ 0.001899 (used in exp calculation)
+  // Helper function to calculate decay multiplier, unused
+  getMultiplier: (ageDays: number) => Math.exp((Math.log(6) / 365) * ageDays),
+};
 
 interface ScoringConfig {
+  supply: number;
   historicalEndDate: string;
   threadWeight: number;
   commentWeight: number;
@@ -22,6 +39,7 @@ interface ScoringConfig {
   auraOrder?: string;
   auraEndDate?: string;
   setClaimAddresses?: boolean;
+  topN?: number;
 }
 
 function parseArguments(): ScoringConfig {
@@ -29,18 +47,24 @@ function parseArguments(): ScoringConfig {
 
   // Default values
   let historicalEndDate = '2025-05-01T12:00:00.000Z'; // May 1st at noon
-  let threadWeight = 5;
-  let commentWeight = 2;
+  let threadWeight = 10;
+  let commentWeight = 5;
   let reactionWeight = 1;
-  let historicalOutputPath = 'historic-allocation.csv';
-  let auraOutputPath = 'aura-allocation.csv';
-  let noVietnamese = false;
-  let minLength: number | undefined = undefined;
-  let supplyPercent = 0.025; // Default to 2.5%
+  const timestamp = new Date()
+    .toISOString()
+    .replace(/[:]/g, '-')
+    .replace(/\..+/, '');
+  let historicalOutputPath = `results/historic-allocation-${timestamp}.csv`;
+  let auraOutputPath = `results/aura-allocation-${timestamp}.csv`;
+  let noVietnamese = true;
+  let minLength: number | undefined = 30;
+  let supplyPercent = 0.01; // Default to 1%
   let historicalOrder: string = 'token_allocation DESC';
   let auraOrder: string = 'token_allocation DESC';
   let auraEndDate: string = new Date().toISOString();
   let setClaimAddresses = false;
+  let topN: number | undefined = undefined;
+  let supply = SUPPLY.TOTAL;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -226,18 +250,41 @@ function parseArguments(): ScoringConfig {
         setClaimAddresses = true;
         break;
 
+      case '--top-n':
+      case '-n':
+        if (i + 1 >= args.length) {
+          throw new Error('Top N value is required after -n or --top-n flag');
+        }
+        const topNValue = parseInt(args[i + 1], 10);
+        if (isNaN(topNValue) || topNValue <= 0) {
+          throw new Error('Top N value must be a positive integer');
+        }
+        topN = topNValue;
+        i++;
+        break;
+
+      case '--supply':
+      case '-s':
+        if (i + 1 >= args.length) {
+          throw new Error('Supply value is required after -s or --supply flag');
+        }
+        const supplyValue = parseInt(args[i + 1], 10);
+        if (isNaN(supplyValue) || supplyValue < 0) {
+          throw new Error('Supply value must be a non-negative number');
+        }
+        supply = supplyValue;
+        i++;
+        break;
+
       case '-h':
       case '--help':
         printUsage();
         process.exit(0);
-        break;
-
-      default:
-        throw new Error(`Unknown argument: ${arg}`);
     }
   }
 
   return {
+    supply,
     historicalEndDate,
     threadWeight,
     commentWeight,
@@ -251,6 +298,7 @@ function parseArguments(): ScoringConfig {
     auraOrder,
     auraEndDate,
     setClaimAddresses,
+    topN,
   };
 }
 
@@ -312,7 +360,7 @@ function isValidAuraOrder(orderClause: string): boolean {
 
 function printUsage(): void {
   console.log(`
-Usage: ts-node historic-contribution-scoring.ts [options]
+Usage: pnpm ts-exec historic-contribution-scoring.ts [options] 
 
 Options:
   -he, --historical-end-date <ISO_DATE>  Historical end datetime (ISO string, default: 2025-05-01T12:00:00.000Z)
@@ -324,10 +372,12 @@ Options:
   -nv, --no-vietnamese              Exclude Vietnamese content (default: false)
   -ml, --minLength <NUMBER>         Minimum content length (integer, default: undefined)
   -sp, --supply-percent <NUMBER>    Supply percent for token allocation (0-100, default: 2.5)
-  -ho, --historical-order <ORDER>  Historical allocation ordering (default: "token_allocation DESC")
-  -ao, --aura-order <ORDER>        Aura allocation ordering (default: "token_allocation DESC")
-  -aed, --aura-end-date <ISO_DATE> Aura allocation end date (default: NOW())
-  -sca, --set-claim-addresses       Truncate and set claim addresses table (optional)
+  -ho, --historical-order <ORDER>   Historical allocation ordering (default: "token_allocation DESC")
+  -ao, --aura-order <ORDER>         Aura allocation ordering (default: "token_allocation DESC")
+  -aed, --aura-end-date <ISO_DATE>  Aura allocation end date (default: NOW())
+  -sca, --set-claim-addresses       Assigns last used EVM address to users in ClaimAddresses table (optional)
+  -n, --top-n <NUMBER>              Only allocates top N users (integer, optional, used for testing)
+  -s, --supply <NUMBER>             Supply for token allocation (default: 10_000_000_000)
   -h, --help                        Show this help message
 
 Examples:
@@ -351,6 +401,7 @@ Examples:
   pnpm ts-exec scripts/historic-contribution-scoring.ts --aura-end-date 2025-08-01T12:00:00.000Z
   pnpm ts-exec scripts/historic-contribution-scoring.ts -sca
   pnpm ts-exec scripts/historic-contribution-scoring.ts --set-claim-addresses
+  pnpm ts-exec scripts/historic-contribution-scoring.ts -n 100 -sca -s 10000
 `);
 }
 
@@ -375,167 +426,228 @@ type AuraAllocation = {
   token_allocation: number;
 };
 
+async function populateClaimAddresses(config: ScoringConfig): Promise<void> {
+  const query = `
+    INSERT INTO "ClaimAddresses" (user_id, address, created_at, updated_at)
+    WITH
+      users AS (
+        SELECT user_id FROM "HistoricalAllocations"
+        UNION ALL
+        SELECT user_id FROM "AuraAllocations"
+      ),
+      user_evm_address AS (
+        SELECT
+          a.user_id,
+          a.address,
+          ROW_NUMBER() OVER (PARTITION BY a.user_id ORDER BY a.last_active DESC) as rn
+        FROM "Addresses" a
+        JOIN users u ON a.user_id = u.user_id
+        JOIN "Communities" c ON a.community_id = c.id
+        WHERE c.network = 'ethereum'
+          AND c.base = 'ethereum'
+          AND a.address LIKE '0x%'
+          AND LENGTH(a.address) = 42
+      )
+    SELECT 
+      u.user_id,
+      CASE WHEN :setClaimAddresses THEN uea.address ELSE NULL END AS address,
+      NOW() AS created_at,
+      NOW() AS updated_at
+    FROM users u
+    LEFT JOIN user_evm_address uea ON u.user_id = uea.user_id AND uea.rn = 1
+    ON CONFLICT (user_id) DO NOTHING;
+  `;
+
+  await models.sequelize.query(query, {
+    replacements: {
+      setClaimAddresses: config.setClaimAddresses,
+    },
+    type: QueryTypes.INSERT,
+  });
+}
+
 async function getHistoricalTokenAllocations(
   config: ScoringConfig,
 ): Promise<Array<HistoricalAllocation>> {
-  return await models.sequelize.query<HistoricalAllocation>(
-    `
-      INSERT INTO "HistoricalAllocations"
-      WITH users AS (SELECT U.id as user_id, U.created_at
-                     FROM "Users" U),
-           addresses AS (SELECT U.user_id as user_id, A.id as address_id, A.address
-                         FROM users U
-                                JOIN "Addresses" A on U.user_id = A.user_id),
-           threads AS (SELECT T.id as thread_id, T.created_at as thread_created_at, A.user_id as user_id
-                       FROM "Threads" T
-                              JOIN addresses A ON T.address_id = A.address_id
-                       WHERE T.created_at < :historicalEndDate ${
-                         config.noVietnamese
-                           ? `AND NOT (T.body ~ '[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]')`
-                           : ''
-                       } ${config.minLength ? `AND LENGTH(T.body) >= ${config.minLength}` : ''}),
-           comments AS (SELECT C.id as comment_id, C.created_at as comment_created_at, A.user_id as user_id
-                        FROM "Comments" C
-                               JOIN addresses A ON C.address_id = A.address_id
-                        WHERE C.created_at < :historicalEndDate ${
-                          config.noVietnamese
-                            ? `AND NOT (C.body ~ '[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]')`
-                            : ''
-                        } ${config.minLength ? `AND LENGTH(C.body) >= ${config.minLength}` : ''}),
-           reactions AS (SELECT R.id                           as reaction_id,
-                                R.created_at                   as reaction_created_at,
-                                COALESCE(T.user_id, C.user_id) as user_id
-                         FROM "Reactions" R
-                                LEFT JOIN threads T ON T.thread_id = R.thread_id
-                                LEFT JOIN comments C ON C.comment_id = R.comment_id
-                         WHERE R.created_at < :historicalEndDate
-                           AND (T.user_id IS NOT NULL OR C.user_id IS NOT NULL)),
-           thread_scores AS (SELECT T.user_id,
-                                    SUM(exp(
-                                          (ln(2) / 365) *
-                                          EXTRACT(EPOCH FROM (:historicalEndDate::timestamptz - T.thread_created_at)) /
-                                          86400
-                                        ) * ${config.threadWeight}) as score,
-                                    COUNT(*)                        as num_threads
-                             FROM threads T
-                             GROUP BY T.user_id),
-           comment_scores AS (SELECT C.user_id,
-                                     SUM(exp(
-                                           (ln(2) / 365) *
-                                           EXTRACT(EPOCH FROM
-                                                   (:historicalEndDate::timestamptz - C.comment_created_at)) / 86400
-                                         ) * ${config.commentWeight}) as score,
-                                     COUNT(*)                         as num_comments
-                              FROM comments C
-                              GROUP BY C.user_id),
-           reaction_scores AS (SELECT R.user_id,
-                                      SUM(exp(
-                                            (ln(2) / 365) *
-                                            EXTRACT(EPOCH FROM
-                                                    (:historicalEndDate::timestamptz - R.reaction_created_at)) / 86400
-                                          ) * ${config.reactionWeight}) as score,
-                                      COUNT(*)                          as num_reactions
-                               FROM reactions R
-                               GROUP BY R.user_id),
-           final_scores as (SELECT U.user_id                              as user_id,
-                                   COALESCE(TS.num_threads, 0)            as num_threads,
-                                   COALESCE(TS.score, 0)                  as thread_score,
-                                   COALESCE(CS.num_comments, 0)           as num_comments,
-                                   COALESCE(CS.score, 0)                  as comment_score,
-                                   COALESCE(RS.num_reactions, 0)          as num_reactions,
-                                   COALESCE(RS.score, 0)                  as reaction_score,
-                                   COALESCE(TS.score, 0) + COALESCE(CS.score, 0) +
-                                   COALESCE(RS.score, 0)                  as unadjusted_score,
-                                   sqrt((COALESCE(TS.score, 0) + COALESCE(CS.score, 0) +
-                                         COALESCE(RS.score, 0))::NUMERIC) as adjusted_score
-                            FROM users U
-                                   LEFT JOIN thread_scores TS ON TS.user_id = U.user_id
-                                   LEFT JOIN comment_scores CS ON CS.user_id = U.user_id
-                                   LEFT JOIN reaction_scores RS ON RS.user_id = U.user_id)
-      SELECT *,
-             (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) *
-             100                                                  as percent_allocation,
-             (adjusted_score::NUMERIC / (SELECT SUM(adjusted_score::NUMERIC) FROM final_scores)) *
-             ${(config.supplyPercent / 2) * totalSupply}::NUMERIC as token_allocation
-      FROM final_scores
-      ORDER BY ${config.historicalOrder} NULLS LAST;
-    `,
-    {
-      replacements: {
-        historicalEndDate: config.historicalEndDate,
-      },
-      type: QueryTypes.SELECT,
+  const historicalPoolTokens =
+    config.supplyPercent * config.supply * SUPPLY.SPLITS.HISTORICAL;
+  const query = `
+    INSERT INTO "HistoricalAllocations"
+    WITH
+      users AS (
+        SELECT U.id AS user_id, U.created_at
+        FROM "Users" U
+      ),
+      addresses AS (
+        SELECT
+          U.user_id AS user_id,
+          A.id AS address_id,
+          A.address
+        FROM users U
+        JOIN "Addresses" A ON U.user_id = A.user_id
+      ),
+      threads AS (
+        SELECT
+          T.id AS thread_id,
+          T.created_at AS thread_created_at,
+          A.user_id AS user_id
+        FROM "Threads" T
+        JOIN addresses A ON T.address_id = A.address_id
+        WHERE T.created_at < :historicalEndDate
+        ${
+          config.noVietnamese
+            ? `AND NOT (T.body ~ '[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]')`
+            : ''
+        }
+        ${config.minLength ? `AND LENGTH(T.body) >= ${config.minLength}` : ''}
+      ),
+      comments AS (
+        SELECT
+          C.id AS comment_id,
+          C.created_at AS comment_created_at,
+          A.user_id AS user_id
+        FROM "Comments" C
+        JOIN addresses A ON C.address_id = A.address_id
+        WHERE C.created_at < :historicalEndDate
+        ${
+          config.noVietnamese
+            ? `AND NOT (C.body ~ '[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]')`
+            : ''
+        }
+        ${config.minLength ? `AND LENGTH(C.body) >= ${config.minLength}` : ''}
+      ),
+      reactions AS (
+        SELECT
+          R.id AS reaction_id,
+          R.created_at AS reaction_created_at,
+          COALESCE(T.user_id, C.user_id) AS user_id
+        FROM "Reactions" R
+        LEFT JOIN threads T ON T.thread_id = R.thread_id
+        LEFT JOIN comments C ON C.comment_id = R.comment_id
+        WHERE R.created_at < :historicalEndDate
+          AND (T.user_id IS NOT NULL OR C.user_id IS NOT NULL)
+      ),
+      thread_scores AS (
+        SELECT
+          T.user_id,
+          SUM(
+            exp(
+              ${DECAY.FACTOR} *
+              EXTRACT(EPOCH FROM (:historicalEndDate::timestamptz - T.thread_created_at)) / 86400
+            ) * ${config.threadWeight}
+          ) AS score,
+          COUNT(*) AS num_threads
+        FROM threads T
+        GROUP BY T.user_id
+      ),
+      comment_scores AS (
+        SELECT
+          C.user_id,
+          SUM(
+            exp(
+              ${DECAY.FACTOR} *
+              EXTRACT(EPOCH FROM (:historicalEndDate::timestamptz - C.comment_created_at)) / 86400
+            ) * ${config.commentWeight}
+          ) AS score,
+          COUNT(*) AS num_comments
+        FROM comments C
+        GROUP BY C.user_id
+      ),
+      reaction_scores AS (
+        SELECT
+          R.user_id,
+          SUM(
+            exp(
+              ${DECAY.FACTOR} *
+              EXTRACT(EPOCH FROM (:historicalEndDate::timestamptz - R.reaction_created_at)) / 86400
+            ) * ${config.reactionWeight}
+          ) AS score,
+          COUNT(*) AS num_reactions
+        FROM reactions R
+        GROUP BY R.user_id
+      ),
+      final_scores AS (
+        SELECT
+          U.user_id AS user_id,
+          COALESCE(TS.num_threads, 0) AS num_threads,
+          COALESCE(TS.score, 0) AS thread_score,
+          COALESCE(CS.num_comments, 0) AS num_comments,
+          COALESCE(CS.score, 0) AS comment_score,
+          COALESCE(RS.num_reactions, 0) AS num_reactions,
+          COALESCE(RS.score, 0) AS reaction_score,
+          COALESCE(TS.score, 0) + COALESCE(CS.score, 0) + COALESCE(RS.score, 0) AS unadjusted_score,
+          sqrt((COALESCE(TS.score, 0) + COALESCE(CS.score, 0) + COALESCE(RS.score, 0))::NUMERIC) AS adjusted_score
+        FROM users U
+        LEFT JOIN thread_scores TS ON TS.user_id = U.user_id
+        LEFT JOIN comment_scores CS ON CS.user_id = U.user_id
+        LEFT JOIN reaction_scores RS ON RS.user_id = U.user_id
+      )
+    SELECT
+      *,
+      (adjusted_score / (SELECT SUM(adjusted_score) FROM final_scores)) * 100 AS percent_allocation,
+      (adjusted_score / (SELECT SUM(adjusted_score) FROM final_scores)) * ${historicalPoolTokens}::NUMERIC AS token_allocation
+    FROM final_scores
+    ORDER BY ${config.historicalOrder} NULLS LAST
+    ${config.topN ? `LIMIT :topN` : ''}
+  `;
+
+  return await models.sequelize.query<HistoricalAllocation>(query, {
+    replacements: {
+      historicalEndDate: config.historicalEndDate,
+      topN: config.topN,
     },
-  );
+    type: QueryTypes.SELECT,
+  });
 }
 
 async function getAuraTokenAllocations(
   config: ScoringConfig,
 ): Promise<Array<AuraAllocation>> {
-  return await models.sequelize.query<AuraAllocation>(
-    `
-      INSERT INTO "AuraAllocations"
-      WITH xp_sum AS (SELECT SUM(xp_points) + SUM(creator_xp_points) as total_xp_awarded
-                      FROM "XpLogs"
-                      WHERE :historicalEndDate < created_at
-                        AND created_at < :auraEndDate),
-           user_xp AS (SELECT user_id,
-                              SUM(xp_points) as xp_points
-                       FROM "XpLogs"
-                       WHERE :historicalEndDate < created_at
-                         AND created_at < :auraEndDate
-                       GROUP BY user_id),
-           creator_xp AS (SELECT creator_user_id,
-                                 SUM(creator_xp_points) as creator_xp_points
-                          FROM "XpLogs"
-                          WHERE :historicalEndDate < created_at
-                            AND created_at < :auraEndDate
-                          GROUP BY creator_user_id)
-      SELECT U.id                                                          as user_id,
-             COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0) as total_xp,
-             (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC /
-             (SELECT total_xp_awarded FROM xp_sum) *
-             100                                                           as percent_allocation,
-             (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC /
-             (SELECT total_xp_awarded FROM xp_sum) *
-             ${(config.supplyPercent / 2) * totalSupply}::NUMERIC          as token_allocation
-      FROM "Users" U
-             LEFT JOIN user_xp UX ON UX.user_id = U.id
-             LEFT JOIN creator_xp CX ON CX.creator_user_id = U.id
-      ORDER BY ${config.auraOrder} NULLS LAST;
-    `,
-    {
-      replacements: {
-        historicalEndDate: config.historicalEndDate,
-        auraEndDate: config.auraEndDate,
-      },
-      type: QueryTypes.SELECT,
+  const auraPoolTokens =
+    config.supplyPercent * config.supply * SUPPLY.SPLITS.AURA;
+  const query = `
+    INSERT INTO "AuraAllocations"
+    WITH
+      xp_sum AS (
+        SELECT SUM(xp_points) + SUM(creator_xp_points) AS total_xp_awarded
+        FROM "XpLogs"
+        WHERE :historicalEndDate < created_at AND created_at < :auraEndDate
+      ),
+      user_xp AS (
+        SELECT user_id, SUM(xp_points) AS xp_points
+        FROM "XpLogs"
+        WHERE :historicalEndDate < created_at AND created_at < :auraEndDate
+        GROUP BY user_id
+      ),
+      creator_xp AS (
+        SELECT creator_user_id, SUM(creator_xp_points) AS creator_xp_points
+        FROM "XpLogs"
+        WHERE :historicalEndDate < created_at AND created_at < :auraEndDate
+        GROUP BY creator_user_id
+      )
+    SELECT
+      U.id AS user_id,
+      COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0) AS total_xp,
+      (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC /
+      (SELECT total_xp_awarded FROM xp_sum) * 100 AS percent_allocation,
+      (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC /
+      (SELECT total_xp_awarded FROM xp_sum) * ${auraPoolTokens}::NUMERIC AS token_allocation
+    FROM "Users" U
+    LEFT JOIN user_xp UX ON UX.user_id = U.id
+    LEFT JOIN creator_xp CX ON CX.creator_user_id = U.id
+    ORDER BY ${config.auraOrder} NULLS LAST
+    ${config.topN ? `LIMIT :topN` : ''}
+    ;
+  `;
+
+  return await models.sequelize.query<AuraAllocation>(query, {
+    replacements: {
+      historicalEndDate: config.historicalEndDate,
+      auraEndDate: config.auraEndDate,
+      topN: config.topN,
     },
-  );
-}
-
-async function setClaimableAddresses() {
-  await models.sequelize.query(`
-    WITH max_last_active AS (SELECT A.user_id,
-                                    MAX(A.last_active) as max_last_active
-                             FROM "Addresses" A
-                                    JOIN "Communities" C ON C.id = A.community_id
-                             WHERE C.network = 'ethereum'
-                               AND C.base = 'ethereum'
-                               AND A.address LIKE '0x%'
-                               AND LENGTH(A.address) = 42
-                             GROUP BY A.user_id),
-         max_addresses AS (SELECT A.address,
-                                  A.user_id
-                           FROM "Addresses" A
-                                  JOIN max_last_active MLA ON A.user_id = MLA.user_id
-                           WHERE A.last_active = MLA.max_last_active)
-
-    INSERT
-    INTO "ClaimAddresses" (user_id, address, created_at, updated_at)
-    SELECT user_id, address, NOW() as created_at, NOW() as updated_at
-    FROM max_addresses;
-  `);
+    type: QueryTypes.SELECT,
+  });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -573,49 +685,71 @@ async function main() {
   try {
     const config = parseArguments();
 
-    console.log('Scoring Configuration:');
-
-    console.log(`\n\tHistorical Configuration:`);
-    console.log(`\t\tHistorical End Date: ${config.historicalEndDate}`);
-    console.log(`\t\tThread Weight: ${config.threadWeight}`);
-    console.log(`\t\tComment Weight: ${config.commentWeight}`);
-    console.log(`\t\tReaction Weight: ${config.reactionWeight}`);
-    console.log(`\t\tNo Vietnamese: ${config.noVietnamese}`);
     console.log(
-      `\t\tMin Length: ${config.minLength ?? 'no minimum content length'}`,
+      `Scoring Configuration:${config.topN ? ` TOP ${config.topN}` : ''}`,
     );
-    console.log(`\t\tHistorical Order: ${config.historicalOrder}`);
-    console.log(`\t\tHistorical Output Path: ${config.historicalOutputPath}`);
 
-    console.log(`\n\tAura Configuration:`);
-    console.log(`\t\tAura End Date: ${config.auraEndDate}`);
-    console.log(`\t\tAura Order: ${config.auraOrder}`);
-    console.log(`\t\tAura Output Path: ${config.auraOutputPath}`);
+    console.log(`
+	Historical Configuration:`);
+    console.log(`		Historical End Date: ${config.historicalEndDate}`);
+    console.log(`		Thread Weight: ${config.threadWeight}`);
+    console.log(`		Comment Weight: ${config.commentWeight}`);
+    console.log(`		Reaction Weight: ${config.reactionWeight}`);
+    console.log(`		No Vietnamese: ${config.noVietnamese}`);
+    console.log(
+      `		Min Length: ${config.minLength ?? 'no minimum content length'}`,
+    );
+    console.log(`		Historical Order: ${config.historicalOrder}`);
+    console.log(`		Historical Output Path: ${config.historicalOutputPath}`);
 
-    console.log(`\n\tShared Configuration:`);
-    console.log(`\t\tSupply Percent: ${config.supplyPercent}`);
+    console.log(`
+	Aura Configuration:`);
+    console.log(`		Aura End Date: ${config.auraEndDate}`);
+    console.log(`		Aura Order: ${config.auraOrder}`);
+    console.log(`		Aura Output Path: ${config.auraOutputPath}`);
 
-    console.log(`\n`);
+    console.log(`
+	Shared Configuration:`);
+    console.log(`		Supply: ${config.supply}`);
+    console.log(`		Supply Percent: ${config.supplyPercent}`);
+    console.log(
+      `		Set Claim Addresses: ${config.setClaimAddresses ? 'Yes' : 'No'}`,
+    );
 
-    console.log('Truncating tables if they exist');
-    await models.sequelize.query(`TRUNCATE "HistoricalAllocations";`);
-    await models.sequelize.query(`TRUNCATE "AuraAllocations"`);
-    if (config.setClaimAddresses) {
-      await models.sequelize.query(`TRUNCATE "ClaimAddresses";`);
-      console.log('ClaimAddresses table truncated');
-      console.log('Setting claim addresses...');
-      await setClaimableAddresses();
-      console.log('Claim addresses set');
-    }
+    console.log(`
+`);
+
+    console.log('Truncating tables...');
+    await models.sequelize.query(
+      `TRUNCATE "HistoricalAllocations", "AuraAllocations", "ClaimAddresses" RESTART IDENTITY;`,
+    );
+    console.log('Tables truncated.');
 
     console.log('Generating historical token allocations...');
     await getHistoricalTokenAllocations(config);
+    console.log('Historical token allocations generated.');
+
     console.log('Generating aura token allocations...');
     await getAuraTokenAllocations(config);
+    console.log('Aura token allocations generated.');
 
-    // // Write both CSV files
-    // writeScoresToCSV(scores, config.historicalOutputPath);
-    // writeScoresToCSV(auraScores, config.auraOutputPath);
+    console.log('Populating claim addresses...');
+    await populateClaimAddresses(config);
+    console.log('Claim addresses populated.');
+
+    // Get the scores from the database
+    const historicScores = await models.sequelize.query<HistoricalAllocation>(
+      'SELECT * FROM "HistoricalAllocations" ORDER BY token_allocation DESC',
+      { type: QueryTypes.SELECT },
+    );
+    const auraScores = await models.sequelize.query<AuraAllocation>(
+      'SELECT * FROM "AuraAllocations" ORDER BY token_allocation DESC',
+      { type: QueryTypes.SELECT },
+    );
+
+    // Write both CSV files
+    writeScoresToCSV(historicScores, config.historicalOutputPath);
+    writeScoresToCSV(auraScores, config.auraOutputPath);
     process.exit(0);
   } catch (error) {
     console.error('Error:', error instanceof Error ? error.message : error);

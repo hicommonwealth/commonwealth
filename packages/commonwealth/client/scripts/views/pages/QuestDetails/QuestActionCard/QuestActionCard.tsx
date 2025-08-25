@@ -1,4 +1,5 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
+import { WalletId } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import {
   getTotalRepititionCountsForQuestAction,
@@ -129,6 +130,8 @@ const QuestActionCard = ({
               'XpChainEventCreated',
               'CommunityGoalReached',
               'SSOLinked',
+              'WalletLinked',
+              'SignUpFlowCompleted',
             ].includes(questAction.event_name) && (
               <>
                 {questAction.event_name === 'CommunityCreated' &&
@@ -196,6 +199,19 @@ const QuestActionCard = ({
                       buildRedirectURLFromContentId(
                         questAction.content_id || '',
                       ),
+                    )}
+                  </CWText>
+                )}
+                {['WalletLinked', 'SignUpFlowCompleted'].includes(
+                  questAction.event_name,
+                ) && (
+                  <CWText type="caption">
+                    {actionCopies.explainer[questAction.event_name](
+                      questAction.quest_id === -4 // for binance system quest
+                        ? WalletId.Binance
+                        : buildRedirectURLFromContentId(
+                            questAction.content_id || '',
+                          ),
                     )}
                   </CWText>
                 )}

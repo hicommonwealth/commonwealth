@@ -61,6 +61,13 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_CRECIMIENTO_HACKATHON': JSON.stringify(
       env.FLAG_CRECIMIENTO_HACKATHON,
     ),
+    'process.env.FLAG_MCP_GOOGLE_SHEETS': JSON.stringify(
+      env.FLAG_MCP_GOOGLE_SHEETS,
+    ),
+    'process.env.FLAG_MCP_INTEGRATIONS_ENABLED': JSON.stringify(
+      env.FLAG_MCP_INTEGRATIONS_ENABLED,
+    ),
+    'process.env.FLAG_GATE_WALLET': JSON.stringify(env.FLAG_GATE_WALLET),
   };
 
   return {

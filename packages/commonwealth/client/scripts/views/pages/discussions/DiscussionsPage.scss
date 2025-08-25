@@ -8,10 +8,10 @@ $size: 48px;
   overflow: auto;
   padding-top: 0;
   height: 100%;
+  padding-bottom: 12px;
 
   .layout-container {
     height: 100%;
-    padding-bottom: 20px;
   }
 
   .BreadcrumbsPageLayout {
@@ -90,4 +90,24 @@ $size: 48px;
       padding: 24px;
     }
   }
+}
+
+// Remove margin-top from DesktopStickyInput on discussions page only
+// Use CSS specificity to target only when DiscussionsPageLayout is present
+.DiscussionsPageLayout {
+  // Target sibling DesktopStickyInput elements
+  & ~ div .DesktopStickyInput,
+  & + .DesktopStickyInput {
+    margin-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}
+
+// Fallback: global override for discussions page
+// This should have higher specificity due to being loaded later
+body:has(.DiscussionsPageLayout) .DesktopStickyInput {
+  margin-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
 }

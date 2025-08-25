@@ -162,7 +162,16 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.ThreadVersionHistory)
     .withOne(db.ThreadRank, {
       onDelete: 'CASCADE',
+    })
+    .withMany(db.ThreadToken, {
+      foreignKey: 'thread_id',
     });
+
+  db.ThreadToken.withMany(db.ThreadTokenTrade, {
+    foreignKey: 'token_address',
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
 
   db.Comment.withMany(db.Reaction, {
     asMany: 'reactions',
@@ -248,6 +257,19 @@ export const buildAssociations = (db: DB) => {
     {
       model: db.User,
       as: 'threadSubscriptions',
+      onDelete: 'CASCADE',
+    },
+  );
+
+  db.TopicSubscription.withManyToMany(
+    {
+      model: db.Topic,
+      as: 'subscriptions',
+      onDelete: 'CASCADE',
+    },
+    {
+      model: db.User,
+      as: 'topicSubscriptions',
       onDelete: 'CASCADE',
     },
   );

@@ -8,14 +8,13 @@ import {
   broker,
   handleEvent,
   logger,
+  stats,
 } from '@hicommonwealth/core';
 import { ContestWorker } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
-import { Client } from 'pg';
 import { config } from 'server/config';
-import { setupListener } from './pgListener';
 import { rascalConsumerMap } from './rascalConsumerMap';
-import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
+import { relayForever } from './relayForever';
 
 const log = logger(import.meta);
 
@@ -67,21 +66,28 @@ export async function bootstrapBindings(options?: {
       hooks = item.hooks;
     }
 
-    // match worker name
+    // match worker name (options.worker defined in rascalConsumerMap)
     if ((options?.worker || '') !== (worker || '')) continue;
+    // policies run on the Commonwealth consumer by default
     await brokerInstance.subscribe(consumer, retryStrategy, hooks);
   }
 }
 
 export async function bootstrapRelayer(
   maxRelayIterations?: number,
-): Promise<Client> {
-  const count = await models.Outbox.count({
-    where: { relayed: false },
-  });
-  incrementNumUnrelayedEvents(count);
-
-  const pgClient = await setupListener();
+): Promise<void> {
+  setInterval(() => {
+    // Report Outbox stats once per minute
+    models.Outbox.count({
+      where: { relayed: false },
+    })
+      .then((count) => {
+        stats().gauge('messageRelayerNumUnrelayedEvents', count);
+      })
+      .catch((err) => {
+        log.error('Failed to update Outbox stats', err);
+      });
+  }, 60_000);
 
   relayForever(maxRelayIterations).catch((err) => {
     log.fatal(
@@ -89,8 +95,6 @@ export async function bootstrapRelayer(
       err,
     );
   });
-
-  return pgClient;
 }
 
 export function bootstrapContestRolloverLoop() {

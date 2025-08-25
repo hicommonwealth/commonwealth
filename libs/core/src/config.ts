@@ -18,6 +18,7 @@ const AppEnvironments = [
   'beta',
   'demo',
   'production',
+  'review-app',
 ] as const;
 type Environment = (typeof Environments)[number];
 type AppEnvironment = (typeof AppEnvironments)[number];
@@ -27,6 +28,7 @@ export const DeployedEnvironments = [
   'frick',
   'demo',
   'frack',
+  'review-app',
 ] as const satisfies AppEnvironment[];
 export const ProdLikeEnvironments = [
   'production',
@@ -46,8 +48,8 @@ const Services = [
   'graphile',
   'discord-listener',
   'twitter',
-  'knock',
   'evm-ce',
+  'sol-ce',
   'web-modulith',
 ] as const;
 export const WebServices = ['web', 'web-modulith'] as const satisfies Service[];
@@ -176,6 +178,10 @@ const {
   HEROKU_API_TOKEN,
   MIXPANEL_TOKEN,
   DEV_MODULITH,
+  RAILWAY_DATADOG_HOST,
+  RAILWAY_DATADOG_STATSD_PORT,
+  RAILWAY_GIT_COMMIT_SHA,
+  DISABLE_SERVICE,
 } = process.env;
 
 const DEFAULTS = {
@@ -194,6 +200,7 @@ export const config = configure(
     APP_ENV: APP_ENV as AppEnvironment,
     APP_ENV_PASSWORD: APP_ENV_PASSWORD,
     SERVICE: SERVICE as Service,
+    DISABLE_SERVICE: DISABLE_SERVICE === 'true',
     MAGIC_API_KEY,
     MAGIC_PUBLISHABLE_KEY: MAGIC_PUBLISHABLE_KEY || 'pk_live_EF89AABAFB87D6F4',
     MAGIC_CLIENT_ID,
@@ -217,6 +224,13 @@ export const config = configure(
     },
     ANALYTICS: {
       MIXPANEL_TOKEN: MIXPANEL_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
+    },
+    RAILWAY: {
+      GIT_COMMIT_SHA: RAILWAY_GIT_COMMIT_SHA,
+      DATADOG_HOST: RAILWAY_DATADOG_HOST,
+      DATADOG_STATSD_PORT: RAILWAY_DATADOG_STATSD_PORT
+        ? parseInt(RAILWAY_DATADOG_STATSD_PORT, 10)
+        : undefined,
     },
   },
   z.object({
@@ -259,6 +273,7 @@ export const config = configure(
           requiredServices: 'all',
         }),
       ),
+    DISABLE_SERVICE: z.boolean(),
     NODE_ENV: z.enum(Environments),
     DEV_MODULITH: z.boolean(),
     IS_CI: z.boolean(),
@@ -270,7 +285,7 @@ export const config = configure(
           DEV_MODULITH: DEV_MODULITH === 'true',
         },
 
-        requiredAppEnvs: ['frick', 'frack', 'beta', 'demo', 'production'],
+        requiredAppEnvs: DeployedEnvironments,
         requiredServices: 'all',
         defaultCheck: DEFAULTS.SERVER_URL,
       }),
@@ -345,6 +360,11 @@ export const config = configure(
       }, 'ROLLBAR_SERVER_TOKEN and ROLLBAR_ENV may only be set in production to a non-default value.'),
     ANALYTICS: z.object({
       MIXPANEL_TOKEN: z.string(),
+    }),
+    RAILWAY: z.object({
+      GIT_COMMIT_SHA: z.string().optional(),
+      DATADOG_HOST: z.string().optional(),
+      DATADOG_STATSD_PORT: z.number().optional(),
     }),
   }),
 );

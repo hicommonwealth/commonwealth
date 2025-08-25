@@ -19,6 +19,8 @@ export * from './referral.schemas';
 export * from './snapshot.schemas';
 export * from './stake.schemas';
 export * from './tag.schemas';
+export * from './thread-token-trade.schemas';
+export * from './thread-token.schemas';
 export * from './thread.schemas';
 export * from './topic.schemas';
 export * from './twitter-cursors.schemas';
