@@ -1,4 +1,4 @@
-import { ChainBase, DefaultPage } from '@hicommonwealth/shared';
+import { ChainBase, DefaultPage, WalletId } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
@@ -148,6 +148,13 @@ export const QuickTokenLaunchForm = ({
   });
 
   const user = useUserStore();
+  const userWalletId = user?.addresses?.find?.(
+    (a) => a === selectedAddress,
+  )?.walletId;
+  const userCanSignTransactions = ![
+    WalletId.Magic,
+    WalletId.WalletConnect,
+  ].includes(userWalletId as unknown as WalletId);
 
   const { mutateAsync: createCommunityMutation } = useCreateCommunityMutation();
 
@@ -182,7 +189,7 @@ export const QuickTokenLaunchForm = ({
   };
 
   const handleTokenLaunch = (tokenInfo: FormSubmitValues) => {
-    if (isCreatingQuickToken) return;
+    if (isCreatingQuickToken || !userCanSignTransactions) return;
 
     const handleAsync = async () => {
       setIsCreatingQuickToken(true);
@@ -509,6 +516,12 @@ export const QuickTokenLaunchForm = ({
                 body={`Launching your token on BASE requires a small amount of BASE ETH to cover gas fees.
                       ${ethFee ? `Estimated fee: ${ethFee} BASE ETH.` : ''}`}
               />
+              {!userCanSignTransactions && (
+                <CWBanner
+                  type="error"
+                  body="Only wallets accessible via desktop plugin are able to launch tokens"
+                />
+              )}
               <div className="cta-elements">
                 {/* allows to switch b/w generated ideas */}
                 <PageCounter
@@ -571,6 +584,7 @@ export const QuickTokenLaunchForm = ({
                   buttonType="submit"
                   buttonLabel={isSmallScreen ? 'Launch' : 'Launch Token'}
                   disabled={
+                    !userCanSignTransactions ||
                     isProcessingProfileImage ||
                     isCreatingQuickToken ||
                     generatedTokenIdea?.isChunking
