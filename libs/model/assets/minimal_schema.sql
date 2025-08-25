@@ -2689,14 +2689,7 @@ CREATE INDEX groups_chain_id ON public."Groups" USING btree (community_id);
 CREATE INDEX idx_threads_is_not_spam ON public."Threads" USING btree (((marked_as_spam_at IS NULL)));
 
 
---
--- Name: idx_users_profile_name; Type: INDEX; Schema: public; Owner: -
---
 
-CREATE INDEX idx_users_profile_name ON public."Users" USING gin (((profile ->> 'name'::text)) public.gin_trgm_ops);
-
-
---
 -- Name: launchpad_trades_token_address_timestamp; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2879,10 +2872,11 @@ CREATE INDEX topics_community_id_idx ON public."Topics" USING btree (community_i
 
 
 --
+
 -- Name: unique_profile_name_not_anonymous; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX unique_profile_name_not_anonymous ON public."Users" USING btree (((profile ->> 'name'::text))) WHERE ((profile ->> 'name'::text) IS DISTINCT FROM 'Anonymous'::text);
+CREATE UNIQUE INDEX unique_profile_name_not_anonymous ON public."Users" USING btree (LOWER((profile ->> 'name'::text))) WHERE (LOWER((profile ->> 'name'::text)) IS DISTINCT FROM 'anonymous'::text);
 
 
 --
