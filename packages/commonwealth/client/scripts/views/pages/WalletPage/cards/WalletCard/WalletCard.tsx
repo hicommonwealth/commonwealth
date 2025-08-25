@@ -2,6 +2,7 @@ import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import { getUniqueUserAddresses } from 'helpers/user';
 import React, { useState } from 'react';
+import useUserStore from 'state/ui/user';
 import FractionalValue from 'views/components/FractionalValue';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -20,7 +21,6 @@ import {
   CustomAddressOptionElement,
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
-import useUserStore from 'state/ui/user';
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { WalletFundsModal } from 'views/modals/WalletFundsModal/WalletFundsModal';
 import RewardsCard from '../../RewardsCard';
