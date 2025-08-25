@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
 import { TokenAllocationSyncArgs, magnaSync } from '@hicommonwealth/model';
-import { GraphileTask, TaskPayloads } from '@hicommonwealth/model/services';
+import { TaskPayloads } from '@hicommonwealth/model/services';
 import { config } from '../../../config';
 import * as magnaApi from '../../magna/api';
 
@@ -39,7 +39,7 @@ async function createMagnaAllocation({
   return response.isProcessed;
 }
 
-export const magnaSyncTask: GraphileTask<typeof TaskPayloads.MagnaSync> = {
+export const magnaSyncTask = {
   input: TaskPayloads.MagnaSync,
   fn: async () => {
     if (!config.MAGNA) {
