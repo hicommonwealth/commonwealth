@@ -64,10 +64,9 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
         ? `WHERE ${conditions.join(' AND ')}`
         : '';
 
-      const sql = `
-      ${
-        includeStats
-          ? `WITH latest_trades AS (
+      const sql = includeStats
+        ? `
+      WITH latest_trades AS (
                 SELECT DISTINCT ON (token_address) *
                 FROM "LaunchpadTrades"
                 ORDER BY token_address, timestamp DESC
@@ -84,19 +83,27 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
                         ot.price AS old_price
                 FROM latest_trades lt
                 LEFT JOIN older_trades ot ON lt.token_address = ot.token_address
-            )`
-          : ''
-      }
+            )
       SELECT DISTINCT ON (T.token_address) 
             T.*,
             C.id AS community_id,
-            ${includeStats ? 'trades.latest_price, trades.old_price,' : ''}
+            trades.latest_price, trades.old_price,
             count(*) OVER () AS total
       FROM "LaunchpadTokens" AS T
       JOIN "Communities" AS C ON T.namespace = C.namespace
-      ${includeStats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
+      LEFT JOIN trades ON trades.token_address = T.token_address
       ${where_clause}
       ORDER BY T.token_address ${direction}, ${order_col} ${direction}
+      LIMIT :limit OFFSET :offset
+    `
+        : `
+      SELECT T.*,
+            C.id AS community_id,
+            count(*) OVER () AS total
+      FROM "LaunchpadTokens" AS T
+      JOIN "Communities" AS C ON T.namespace = C.namespace
+      ${where_clause}
+      ORDER BY ${order_col} ${direction}
       LIMIT :limit OFFSET :offset
     `;
 
