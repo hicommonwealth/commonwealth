@@ -12,72 +12,11 @@ on:
     types:
       - completed
 
-  schedule:
-    - cron: "0 22 * * *"
-
 permissions:
   contents: read
   pull-requests: write
 
 jobs:
-  open-pr-beta-to-production:
-    name: Open/ensure PR beta → production
-    runs-on: ubuntu-latest
-    if: |
-      github.ref == 'refs/heads/beta' ||
-      github.event_name == 'schedule' ||
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check if beta is ahead of production
-        id: ahead
-        run: |
-          git fetch origin beta production
-          # returns nonzero if there are commits in beta not in production
-          if git log --oneline origin/production..origin/beta | grep .; then
-            echo "ahead=true" >> $GITHUB_OUTPUT
-          else
-            echo "ahead=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Ensure PR exists
-        if: steps.ahead.outputs.ahead == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const head = "beta";
-            const base = "production";
-            
-            // Is there already an open PR from beta -> production?
-            const { data: prs } = await github.rest.pulls.list({
-              owner, repo, state: "open", head: `${owner}:${head}`, base
-            });
-            
-            if (prs.length > 0) {
-              core.info(`Open PR already exists: #${prs[0].number}`);
-              return;
-            }
-            
-            // Create a new PR
-            const title = "Merge beta → production";
-            const body = [
-              "Automated PR to merge **beta** into **production**.",
-              "",
-              "- Created by GitHub Actions.",
-              "- Triggers: push/schedule/workflow_run."
-            ].join("\n");
-            
-            const { data: pr } = await github.rest.pulls.create({
-              owner, repo, title, head, base, body, maintainer_can_modify: true
-            });
-            
-            core.info(`Created PR #${pr.number}`);
-
   deploy:
     runs-on: ubuntu-latest
     steps:

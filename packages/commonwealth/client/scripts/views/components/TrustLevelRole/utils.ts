@@ -28,7 +28,7 @@ const hasCommunityClientInfo = (
   return 'clientInfo' in tier && tier.clientInfo !== undefined;
 };
 
-export const getUserTrustLevel = (level: number): TrustLevelResult => {
+export const getUserTrustLevel = (level?: number): TrustLevelResult => {
   if (!level) {
     return { icon: DEFAULT_ICON };
   }
@@ -43,7 +43,7 @@ export const getUserTrustLevel = (level: number): TrustLevelResult => {
   return { icon: userTier.clientInfo?.componentIcon || DEFAULT_ICON };
 };
 
-export const getCommunityTrustLevel = (level: number): TrustLevelResult => {
+export const getCommunityTrustLevel = (level?: number): TrustLevelResult => {
   if (!level) {
     return { icon: DEFAULT_ICON };
   }
