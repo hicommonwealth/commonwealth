@@ -4,19 +4,35 @@
 export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      const indexes = await queryInterface.sequelize.query(
-        `SELECT indexname FROM pg_indexes WHERE indexname = 'LaunchpadTokens_liquidity_transferred_created_at'`,
+      // Index for liquidity_transferred
+      const liquidityIndex = await queryInterface.sequelize.query(
+        `SELECT indexname FROM pg_indexes WHERE indexname = 'LaunchpadTokens_liquidity_transferred'`,
         { type: Sequelize.QueryTypes.SELECT, transaction },
       );
-
-      if (indexes.length === 0) {
+      if (liquidityIndex.length === 0) {
         await queryInterface.addIndex(
           'LaunchpadTokens',
-          ['liquidity_transferred', 'created_at'],
+          ['liquidity_transferred'],
           {
-            name: 'LaunchpadTokens_liquidity_transferred_created_at',
+            name: 'LaunchpadTokens_liquidity_transferred',
             transaction,
-            order: ['liquidity_transferred', 'created_at DESC'],
+          },
+        );
+      }
+
+      // Index for created_at DESC (latest first)
+      const createdAtIndex = await queryInterface.sequelize.query(
+        `SELECT indexname FROM pg_indexes WHERE indexname = 'LaunchpadTokens_created_at_desc'`,
+        { type: Sequelize.QueryTypes.SELECT, transaction },
+      );
+      if (createdAtIndex.length === 0) {
+        await queryInterface.addIndex(
+          'LaunchpadTokens',
+          ['created_at'],
+          {
+            name: 'LaunchpadTokens_created_at_desc',
+            transaction,
+            order: [['created_at', 'DESC']], // ensures "latest first"
           },
         );
       }
@@ -25,11 +41,8 @@ export default {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.removeIndex(
-        'LaunchpadTokens',
-        'LaunchpadTokens_liquidity_transferred_created_at',
-        { transaction },
-      );
+      await queryInterface.removeIndex('LaunchpadTokens', 'LaunchpadTokens_liquidity_transferred', { transaction });
+      await queryInterface.removeIndex('LaunchpadTokens', 'LaunchpadTokens_created_at_desc', { transaction });
     });
   },
 };
