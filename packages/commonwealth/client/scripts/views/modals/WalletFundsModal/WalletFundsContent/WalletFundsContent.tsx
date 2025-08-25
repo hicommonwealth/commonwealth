@@ -133,9 +133,7 @@ const WalletFundsContent = ({
         onClose={async () => {
           handleCloseMoonpay();
         }}
-        onUrlSignatureRequested={(url) => {
-          onUrlSignatureRequested(url).catch(console.error);
-        }}
+        onUrlSignatureRequested={onUrlSignatureRequested}
         // onUnsupportedRegion={() => console.log('un supported region')}
         defaultCurrencyCode="eth_base"
       />
