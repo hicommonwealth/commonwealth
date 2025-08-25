@@ -2873,10 +2873,10 @@ CREATE INDEX topics_community_id_idx ON public."Topics" USING btree (community_i
 
 --
 
--- Name: unique_profile_name_not_anonymous; Type: INDEX; Schema: public; Owner: -
+-- Name: unique_profile_name_lower; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX unique_profile_name_not_anonymous ON public."Users" USING btree (LOWER((profile ->> 'name'::text))) WHERE (LOWER((profile ->> 'name'::text)) IS DISTINCT FROM 'anonymous'::text);
+CREATE UNIQUE INDEX unique_profile_name_lower ON public."Users" USING btree (LOWER((profile ->> 'name'::text)));
 
 
 --

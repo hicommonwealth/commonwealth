@@ -6,9 +6,8 @@ export default {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.sequelize.query(
         `
-        CREATE UNIQUE INDEX IF NOT EXISTS unique_profile_name_not_anonymous
-          ON public."Users" (LOWER(profile ->> 'name'))
-          WHERE (LOWER(profile ->> 'name') IS DISTINCT FROM 'anonymous');
+        CREATE UNIQUE INDEX IF NOT EXISTS unique_profile_name_lower
+          ON public."Users" (LOWER(profile ->> 'name'));
       `,
         { transaction },
       );
@@ -19,7 +18,7 @@ export default {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.sequelize.query(
         `
-        DROP INDEX IF EXISTS unique_profile_name_not_anonymous;
+        DROP INDEX IF EXISTS unique_profile_name_lower;
       `,
         { transaction },
       );
