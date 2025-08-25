@@ -3,11 +3,12 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import useInitApp from 'hooks/useInitApp';
 import router from 'navigation/Router';
-import React, { StrictMode } from 'react';
+import React, { StrictMode, useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
+import { detectInsufficientFundsError } from 'utils/magicWalletErrors';
 import { DisableMavaOnMobile } from 'views/components/DisableMavaOnMobile';
 import ForceMobileAuth from 'views/components/ForceMobileAuth';
 import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
@@ -20,6 +21,36 @@ import OnBoardingWrapperForMobile from './views/pages/OnBoarding/OnBoardingWrapp
 
 const App = () => {
   const { isLoading } = useInitApp();
+
+  // Global error handler for unhandled promise rejections
+  useEffect(() => {
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error(
+        'Unhandled Promise Rejection caught by global handler:',
+        event.reason,
+      );
+
+      // Check if this is a Magic wallet insufficient funds error
+      if (detectInsufficientFundsError(event.reason)) {
+        console.log(
+          'Global handler detected Magic wallet insufficient funds error',
+        );
+        // The error has been caught, prevent the default unhandled rejection behavior
+        event.preventDefault();
+        // Note: We don't show a modal here because it would be out of context
+        // The specific UI components should handle this error appropriately
+      }
+    };
+
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener(
+        'unhandledrejection',
+        handleUnhandledRejection,
+      );
+    };
+  }, []);
 
   return (
     <StrictMode>

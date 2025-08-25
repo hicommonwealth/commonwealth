@@ -41,7 +41,7 @@ export const launchToken = async (
   // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
   const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
 
-  const txReceipt = contractCall.send({
+  const txReceipt = await contractCall.send({
     from: walletAddress,
     value,
     type: '0x2',

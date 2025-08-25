@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 import { userStore } from 'state/ui/user';
 import { getMagicForChain } from 'utils/magicNetworkUtils';
+import { createMagicWalletError } from 'utils/magicWalletErrors';
 
 interface LaunchTokenProps {
   chainRpc: string;
@@ -47,13 +48,38 @@ const launchToken = async ({
     chainRpc,
   );
 
-  return await launchPad.launchToken(
-    name,
-    symbol,
-    walletAddress,
-    `${ethChainId}`,
-    magicProvider,
-  );
+  try {
+    return await launchPad.launchToken(
+      name,
+      symbol,
+      walletAddress,
+      `${ethChainId}`,
+      magicProvider,
+    );
+  } catch (error) {
+    // Enhanced error handling for Magic wallet users
+    if (isMagicAddress && error instanceof Error) {
+      const magicError = createMagicWalletError(error);
+
+      // Create a new error with enhanced message for Magic wallet users
+      const enhancedError = new Error(magicError.message);
+      enhancedError.name =
+        magicError.type === 'insufficient_funds'
+          ? 'MagicInsufficientFundsError'
+          : 'MagicWalletError';
+
+      // Preserve original error details for debugging
+      (enhancedError as any).originalError = error;
+      (enhancedError as any).magicErrorType = magicError.type;
+      (enhancedError as any).actionRequired = magicError.actionRequired;
+      (enhancedError as any).isMagicWallet = true;
+
+      throw enhancedError;
+    }
+
+    // Re-throw original error for non-Magic wallets
+    throw error;
+  }
 };
 
 const useLaunchTokenMutation = () => {

@@ -18,6 +18,7 @@ import {
 } from 'state/api/launchPad';
 import { useCreateTokenMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
+import { detectInsufficientFundsError } from 'utils/magicWalletErrors';
 import PageCounter from 'views/components/PageCounter';
 import { ImageProcessed } from 'views/components/component_kit/CWImageInput';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -26,6 +27,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import TokenLaunchButton from 'views/components/sidebar/TokenLaunchButton';
+import useAuthentication from 'views/modals/AuthModal/useAuthentication';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { fromWei } from 'web3-utils';
 import useCreateTokenCommunity from '../useCreateTokenCommunity';
@@ -105,6 +107,7 @@ export const QuickTokenLaunchForm = ({
     maxIdeasLimit: MAX_IDEAS_LIMIT,
   });
   const [isCreatingQuickToken, setIsCreatingQuickToken] = useState(false);
+  const [isOperationCancelled, setIsOperationCancelled] = useState(false);
   const [
     createdCommunityIdsToTokenInfoMap,
     setCreatedCommunityIdsToTokenInfoMap,
@@ -148,6 +151,7 @@ export const QuickTokenLaunchForm = ({
   });
 
   const user = useUserStore();
+  const { openMagicWallet } = useAuthentication({});
 
   const { mutateAsync: createCommunityMutation } = useCreateCommunityMutation();
 
@@ -181,10 +185,23 @@ export const QuickTokenLaunchForm = ({
     });
   };
 
+  const handleCancelLaunch = () => {
+    setIsOperationCancelled(true);
+    setIsCreatingQuickToken(false);
+    // Reset any state that might be needed
+    setTransactionHash('');
+
+    // Reset cancellation flag after a short delay to allow for cleanup
+    setTimeout(() => {
+      setIsOperationCancelled(false);
+    }, 1000);
+  };
+
   const handleTokenLaunch = (tokenInfo: FormSubmitValues) => {
     if (isCreatingQuickToken) return;
 
     const handleAsync = async () => {
+      setIsOperationCancelled(false); // Reset cancellation flag
       setIsCreatingQuickToken(true);
 
       try {
@@ -350,6 +367,11 @@ export const QuickTokenLaunchForm = ({
         setCreatedCommunityId(communityId);
         onCommunityCreated(communityId);
       } catch (e) {
+        // If operation was cancelled, don't show error messages
+        if (isOperationCancelled) {
+          return;
+        }
+
         console.error(`Error creating token: `, e, e.name);
 
         if (isRateLimitError(e)) {
@@ -363,6 +385,55 @@ export const QuickTokenLaunchForm = ({
         ) {
           notifyError('Transaction rejected!');
         } else if (
+          e?.name === 'MagicInsufficientFundsError' ||
+          detectInsufficientFundsError(e as Error)
+        ) {
+          // Enhanced Magic wallet insufficient funds error handling
+          const isMagicWallet =
+            (e as any)?.isMagicWallet ||
+            user.addresses.some(
+              (addr) =>
+                addr.address.toLowerCase() ===
+                  selectedAddress?.address?.toLowerCase() &&
+                addr.walletId?.toLowerCase().includes('magic'),
+            );
+
+          if (isMagicWallet) {
+            // Create enhanced error modal for Magic wallet users
+            openConfirmation({
+              title: 'Insufficient Funds',
+              description: [
+                "Your Magic wallet doesn't have enough ETH to pay for gas fees.",
+                '',
+                'To proceed with launching your token, you need to add funds to your Magic wallet.',
+                '',
+                'You can:',
+                '• Transfer ETH from another wallet',
+                '• Use a fiat on-ramp service in your Magic wallet',
+                '• Get ETH from a friend or exchange',
+              ].join('\n'),
+              buttons: [
+                {
+                  label: 'Add Funds to Magic Wallet',
+                  buttonType: 'primary',
+                  onClick: () => {
+                    // Open Magic wallet for the specific chain
+                    openMagicWallet(baseNode?.ethChainId).catch(console.error);
+                  },
+                },
+                {
+                  label: 'Try Again Later',
+                  buttonType: 'secondary',
+                  onClick: () => {
+                    // Just close the modal
+                  },
+                },
+              ],
+            });
+          } else {
+            notifyError('Insufficient funds to launch token!');
+          }
+        } else if (
           e?.data?.message?.toLowerCase().includes('insufficient funds')
         ) {
           notifyError('Insufficient funds to launch token!');
@@ -374,7 +445,62 @@ export const QuickTokenLaunchForm = ({
       }
     };
 
-    handleAsync().catch(console.error);
+    handleAsync().catch((error) => {
+      // If operation was cancelled, don't show error messages
+      if (isOperationCancelled) {
+        return;
+      }
+
+      console.error('Unhandled error in handleAsync:', error);
+
+      // Additional safety net for Magic wallet insufficient funds errors
+      if (detectInsufficientFundsError(error)) {
+        const isMagicWallet = user.addresses.some(
+          (addr) =>
+            addr.address.toLowerCase() ===
+              selectedAddress?.address?.toLowerCase() &&
+            addr.walletId?.toLowerCase().includes('magic'),
+        );
+
+        if (isMagicWallet) {
+          // Create enhanced error modal for Magic wallet users
+          openConfirmation({
+            title: 'Insufficient Funds',
+            description: [
+              "Your Magic wallet doesn't have enough ETH to pay for gas fees.",
+              '',
+              'To proceed with launching your token, you need to add funds to your Magic wallet.',
+              '',
+              'You can:',
+              '• Transfer ETH from another wallet',
+              '• Use a fiat on-ramp service in your Magic wallet',
+              '• Get ETH from a friend or exchange',
+            ].join('\n'),
+            buttons: [
+              {
+                label: 'Add Funds to Magic Wallet',
+                buttonType: 'primary',
+                onClick: () => {
+                  // Open Magic wallet for the specific chain
+                  openMagicWallet(baseNode?.ethChainId).catch(console.error);
+                },
+              },
+              {
+                label: 'Try Again Later',
+                buttonType: 'secondary',
+                onClick: () => {
+                  // Just close the modal
+                },
+              },
+            ],
+          });
+          return; // Prevent further error handling
+        }
+      }
+
+      // For non-Magic wallet errors or non-insufficient funds errors
+      notifyError('An unexpected error occurred. Please try again.');
+    });
   };
 
   const handleSubmit = (tokenInfo: FormSubmitValues) => {
@@ -460,7 +586,25 @@ export const QuickTokenLaunchForm = ({
         </CWText>
       )}
 
-      {isCreatingQuickToken && <CWCircleMultiplySpinner />}
+      {isCreatingQuickToken && (
+        <div className="launch-loading-container">
+          <CWCircleMultiplySpinner />
+          <div className="loading-actions">
+            <CWText type="b1" className="loading-message">
+              Your token is being created on the blockchain. This may take a few
+              moments...
+            </CWText>
+            <CWButton
+              type="button"
+              buttonType="secondary"
+              buttonWidth="narrow"
+              label="Back to Edit"
+              onClick={handleCancelLaunch}
+              className="back-button"
+            />
+          </div>
+        </div>
+      )}
 
       {createdCommunityId ? (
         <SuccessStep communityId={createdCommunityId} withToken />
