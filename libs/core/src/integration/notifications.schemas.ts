@@ -247,3 +247,23 @@ export const CapReachedNotification = z.object({
   community_id: z.string().describe('The community associated with the token'),
   symbol: z.string().describe('The token symbol'),
 });
+
+export const ThreadCreatedNotification = z.object({
+  community_name: z.string().describe('The community name'),
+  topic_id: z.number().describe('The topic id'),
+  topic_name: z.string().describe('The topic name'),
+  topic_url: z.string().describe('The topic url'),
+});
+
+export const ThreadTokenTradeEventNotification = z.object({
+  community_id: z.string().describe('The community associated with the token'),
+  thread_id: z.number().describe('The thread associated with the token'),
+  symbol: z.string().describe('The token symbol'),
+  is_buy: z.boolean().describe('If the trade was a buy or sell'),
+});
+
+export const ThreadTokenCapReachedNotification = z.object({
+  community_id: z.string().describe('The community associated with the token'),
+  thread_id: z.number().describe('The thread associated with the token'),
+  symbol: z.string().describe('The token symbol'),
+});

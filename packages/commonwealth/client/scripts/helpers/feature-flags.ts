@@ -44,6 +44,9 @@ const featureFlags = {
   newProfilePage: buildFlag(process.env.FLAG_NEW_PROFILE_PAGE),
   privateTopics: buildFlag(process.env.FLAG_PRIVATE_TOPICS),
   crecimientoHackathon: buildFlag(process.env.FLAG_CRECIMIENTO_HACKATHON),
+  mcpGoogleSheets: buildFlag(process.env.FLAG_MCP_GOOGLE_SHEETS),
+  mcpIntegrationsEnabled: buildFlag(process.env.FLAG_MCP_INTEGRATIONS_ENABLED),
+  gateWallet: buildFlag(process.env.FLAG_GATE_WALLET),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

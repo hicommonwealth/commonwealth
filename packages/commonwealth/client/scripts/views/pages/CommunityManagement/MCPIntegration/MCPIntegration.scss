@@ -1,0 +1,33 @@
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+
+.MCPIntegration {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .servers {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .server-card {
+    padding: 16px;
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+
+      .h4 {
+        color: colors.$neutral-900 !important;
+      }
+    }
+
+    .b1 {
+      color: colors.$neutral-500 !important;
+    }
+  }
+}

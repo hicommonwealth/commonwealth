@@ -4,7 +4,10 @@ import {
   CommunityAlert,
   SubscriptionPreference,
   ThreadSubscription,
+  Topic,
+  TopicSubscription,
 } from '../entities';
+import { PG_INT } from '../utils';
 
 export const GetSubscriptionPreferences = {
   input: z.object({}),
@@ -19,6 +22,26 @@ export const GetCommunityAlerts = {
 export const GetCommentSubscriptions = {
   input: z.object({}),
   output: CommentSubscription.array(),
+};
+
+export const GetTopicSubscriptions = {
+  input: z.object({}),
+  output: TopicSubscription.extend({
+    Topic: Topic.pick({ id: true, name: true, community_id: true }).extend({
+      id: PG_INT,
+    }),
+  }).array(),
+};
+
+export const GetSubscribableTopics = {
+  input: z.object({}),
+  output: z
+    .object({
+      id: PG_INT,
+      name: z.string(),
+      community_id: z.string(),
+    })
+    .array(),
 };
 
 export const GetThreadSubscriptions = {

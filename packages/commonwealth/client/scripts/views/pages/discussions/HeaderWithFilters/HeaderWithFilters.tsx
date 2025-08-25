@@ -222,11 +222,43 @@ export const HeaderWithFilters = ({
     }
   };
 
+  const layoutSelector = (
+    <Select
+      containerClassname="layout-selector"
+      selected={selectedView || ThreadViewFilterTypes.All}
+      onSelect={(item) => {
+        setSelectedView?.((item as ViewType).value);
+      }}
+      options={[
+        {
+          id: 1,
+          value: ThreadViewFilterTypes.All,
+          label: 'Row',
+          iconLeft: 'viewAll',
+        },
+
+        {
+          id: 2,
+          value: ThreadViewFilterTypes.Overview,
+          label: 'Overview',
+          iconLeft: 'viewOverView',
+        },
+
+        {
+          id: 3,
+          value: ThreadViewFilterTypes.CardView,
+          label: 'ImageView',
+          iconLeft: 'kanban',
+        },
+      ]}
+    />
+  );
+
   return (
     <div className="HeaderWithFilters">
       <div className="header-row">
         {!isOnArchivePage && views && views.length ? (
-          <div className="filter-section">
+          <div className="filter-section filter-section-header">
             {!user.activeAccount && (
               <div className="join-community-header-button">
                 <CWButton
@@ -239,34 +271,7 @@ export const HeaderWithFilters = ({
                 />
               </div>
             )}
-            <Select
-              selected={selectedView || ThreadViewFilterTypes.All}
-              onSelect={(item) => {
-                setSelectedView?.((item as ViewType).value);
-              }}
-              options={[
-                {
-                  id: 1,
-                  value: ThreadViewFilterTypes.All,
-                  label: 'Row',
-                  iconLeft: 'viewAll',
-                },
-
-                {
-                  id: 2,
-                  value: ThreadViewFilterTypes.Overview,
-                  label: 'Overview',
-                  iconLeft: 'viewOverView',
-                },
-
-                {
-                  id: 3,
-                  value: ThreadViewFilterTypes.CardView,
-                  label: 'ImageView',
-                  iconLeft: 'kanban',
-                },
-              ]}
-            />
+            {!isWindowExtraSmall && layoutSelector}
           </div>
         ) : (
           <CWText type="h3" fontWeight="semiBold" className="header-text">
@@ -327,6 +332,7 @@ export const HeaderWithFilters = ({
           <div className="filter-row" ref={filterRowRef}>
             <div className="filter-section">
               {!isWindowExtraSmall && <p className="filter-label">Sort</p>}
+              {isWindowExtraSmall && layoutSelector}
               <Select
                 selected={featuredFilter || ThreadFeaturedFilterTypes.Newest}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any

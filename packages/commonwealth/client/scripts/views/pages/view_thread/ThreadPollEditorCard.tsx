@@ -1,3 +1,4 @@
+import { DEFAULT_COMPLETION_MODEL } from '@hicommonwealth/shared';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { useAiCompletion } from 'client/scripts/state/api/ai';
 import { generatePollPrompt } from 'client/scripts/state/api/ai/prompts';
@@ -67,9 +68,10 @@ export const ThreadPollEditorCard = ({
     const { systemPrompt, userPrompt } = generatePollPrompt(context);
 
     generateCompletion(userPrompt, {
-      model: 'gpt-4o-mini',
+      model: DEFAULT_COMPLETION_MODEL,
       stream: true,
       systemPrompt,
+      communityId: thread?.communityId,
       onError: (error) => {
         console.error('Error generating Poll:', error);
         notifyError('Failed to generate  Poll');

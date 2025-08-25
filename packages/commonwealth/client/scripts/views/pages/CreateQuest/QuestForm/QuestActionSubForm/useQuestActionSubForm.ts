@@ -13,9 +13,9 @@ import { QuestAction, QuestActionSubFormProps } from './types';
 
 // these restrictions are only on client side, update per future requirements
 const MAX_REPETITION_COUNTS = {
-  PER_DAY: 4,
-  PER_WEEK: 28,
-  PER_MONTH: 120,
+  PER_DAY: 100,
+  PER_WEEK: 700,
+  PER_MONTH: 3000,
 };
 
 const useQuestActionSubForm = ({

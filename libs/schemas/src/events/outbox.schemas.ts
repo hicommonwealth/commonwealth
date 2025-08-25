@@ -11,6 +11,7 @@ export type OutboxEvents = keyof OutboxSchemas;
 export type EventPair<K extends OutboxEvents> = {
   event_name: K;
   event_payload: z.infer<OutboxSchemas[K]>;
+  priority?: number;
 };
 export type EventPairs = {
   [K in OutboxEvents]: EventPair<K>;
@@ -27,6 +28,7 @@ export const Outbox = z.union(
       event_name: z.literal(event_name),
       event_payload: events[event_name],
       relayed: z.boolean().optional(),
+      priority: PG_INT.optional(),
       created_at: z.coerce.date().optional(),
       updated_at: z.coerce.date().optional(),
     }),

@@ -4,13 +4,14 @@ import { MutableRefObject, useCallback, useMemo } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import MinimumProfile from '../../../models/MinimumProfile';
 
-import { UserTierMap } from '@hicommonwealth/shared';
+import { MCP_MENTION_SYMBOL, UserTierMap } from '@hicommonwealth/shared';
 import app from 'client/scripts/state';
 import _ from 'lodash';
 import { trpc } from 'utils/trpcClient';
 import {
   DENOTATION_SEARCH_CONFIG,
   ENTITY_TYPE_INDICATORS,
+  MCPServerSearchResult,
   MENTION_CONFIG,
   MENTION_DENOTATION_CHARS,
   MENTION_LINK_FORMATS,
@@ -78,9 +79,15 @@ export const useMention = ({
       const entityId = getEntityId(entityType, item);
       const entityName = formatEntityDisplayName(entityType, item);
 
+      // For MCP servers, use handle/id format
+      const linkIdentifier =
+        entityType === MentionEntityType.MCP_SERVER
+          ? `${item.handle || 'unknown'}/${entityId}`
+          : entityId;
+
       const mentionText = MENTION_LINK_FORMATS[entityType](
         entityName,
-        entityId,
+        linkIdentifier,
       );
 
       const delta = new Delta()
@@ -124,6 +131,8 @@ export const useMention = ({
           return createCommunityMentionItem(result, node);
         case MentionEntityType.PROPOSAL:
           return createProposalMentionItem(result, node);
+        case MentionEntityType.MCP_SERVER:
+          return createMCPServerMentionItem(result, node);
         default:
           return createGenericMentionItem(result, node);
       }
@@ -339,6 +348,42 @@ export const useMention = ({
     };
   };
 
+  const createMCPServerMentionItem = (
+    result: MCPServerSearchResult | MentionSearchResult,
+    node: HTMLElement,
+  ) => {
+    const serverName = result.name;
+    const serverId = result.id;
+    const serverHandle =
+      'handle' in result && result.handle ? result.handle : result.name;
+    const description = result.description || 'MCP Server';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.innerText = serverHandle;
+    nameSpan.className = 'ql-mention-name';
+
+    const descSpan = document.createElement('span');
+    descSpan.innerText = description;
+    descSpan.className = 'ql-mention-desc';
+
+    const textWrap = document.createElement('div');
+    textWrap.className = 'ql-mention-text-wrap';
+    textWrap.appendChild(nameSpan);
+    textWrap.appendChild(descSpan);
+    node.appendChild(textWrap);
+
+    return {
+      link: `/mcp-server/${serverHandle}/${serverId}`,
+      name: serverName,
+      component: node.outerHTML,
+      type: MentionEntityType.MCP_SERVER,
+      id: serverId,
+      mcp_server_id: serverId,
+      handle: serverHandle,
+      description: description,
+    };
+  };
+
   const createGenericMentionItem = (
     result: MentionSearchResult,
     node: HTMLElement,
@@ -375,9 +420,12 @@ export const useMention = ({
         'thread_id',
         'community_id',
         'proposal_id',
+        'mcp_server_id',
         'profile_name',
         'topic_name',
         'title',
+        'handle',
+        'description',
       ],
       renderItem: (item) => item.component,
       onSelect: selectMention,
@@ -404,10 +452,14 @@ export const useMention = ({
               return;
             }
 
-            if (searchTerm.length < MENTION_CONFIG.MIN_SEARCH_LENGTH) {
+            // Skip minimum search length requirement for MCP servers
+            if (
+              searchTerm.length < MENTION_CONFIG.MIN_SEARCH_LENGTH &&
+              mentionChar !== '%'
+            ) {
               const node = document.createElement('div');
               node.className = 'mention-empty-state';
-              node.innerText = `Type at least ${MENTION_CONFIG.MIN_SEARCH_LENGTH} characters to 
+              node.innerText = `Type at least ${MENTION_CONFIG.MIN_SEARCH_LENGTH} characters to
               ${mentionSearchConfig.description.toLowerCase()}`;
               renderList(
                 [
@@ -422,7 +474,75 @@ export const useMention = ({
               return;
             }
 
-            // Determine search scope and community
+            // Handle MCP server search separately
+            if (mentionChar === MCP_MENTION_SYMBOL) {
+              const communityId = app.activeChainId() || '';
+              if (!communityId) {
+                renderList([], searchTerm);
+                return;
+              }
+
+              const mcpData = await utils.mcp.getCommunityMcpServers.fetch({
+                community_id: communityId,
+              });
+
+              const mcpServers = mcpData || [];
+
+              // Filter MCP servers based on search term
+              const filteredServers = mcpServers
+                .filter(
+                  (server) =>
+                    server.name
+                      ?.toLowerCase()
+                      .includes(searchTerm.toLowerCase()) ||
+                    server.handle
+                      ?.toLowerCase()
+                      .includes(searchTerm.toLowerCase()) ||
+                    server.description
+                      ?.toLowerCase()
+                      .includes(searchTerm.toLowerCase()),
+                )
+                .slice(0, MENTION_CONFIG.MAX_SEARCH_RESULTS);
+
+              const results: MCPServerSearchResult[] = filteredServers.map(
+                (server) => ({
+                  id: String(server.id),
+                  name: server.name,
+                  description: server.description,
+                  type: 'mcp_server' as const,
+                  created_at: new Date().toISOString(),
+                  handle: server.handle,
+                }),
+              );
+
+              if (results.length === 0) {
+                const node = document.createElement('div');
+                node.className = 'mention-empty-state';
+                node.innerText = `No MCP servers found for "${searchTerm}".`;
+                renderList(
+                  [
+                    {
+                      link: '#',
+                      name: '',
+                      component: node.outerHTML,
+                    },
+                  ],
+                  searchTerm,
+                );
+                return;
+              }
+
+              const formattedMatches = results.map((result) => {
+                const node = document.createElement('div');
+                node.className = 'ql-mention-item';
+                return createMCPServerMentionItem(result, node);
+              });
+
+              renderList(formattedMatches, searchTerm);
+              return;
+            }
+
+            // Determine search scope and community for regular entities
             const searchScope = mentionSearchConfig.scopes || ['All'];
             const communityId = mentionSearchConfig.communityScoped
               ? app.activeChainId() || ''

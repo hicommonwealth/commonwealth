@@ -41,6 +41,14 @@ export const ProfileTags = z.object({
 
 export const USER_TIER = z.nativeEnum(UserTierMap);
 
+export const EmailNotificationInterval = z.enum([
+  'never',
+  'monthly',
+  'weekly',
+  'daily',
+  'hourly',
+]);
+
 export const User = z.object({
   id: PG_INT.optional(),
   tier: USER_TIER,
@@ -49,10 +57,8 @@ export const User = z.object({
   disableRichText: z.boolean().default(false).optional(),
   emailVerified: z.boolean().default(false).nullish(),
   selected_community_id: z.string().max(255).nullish(),
-  emailNotificationInterval: z
-    .enum(['weekly', 'never'])
-    .default('never')
-    .optional(),
+  emailNotificationInterval:
+    EmailNotificationInterval.default('never').optional(),
   promotional_emails_enabled: z.boolean().nullish(),
   is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
 
@@ -95,7 +101,7 @@ export const Address = z.object({
   oauth_email_verified: z.boolean().nullish(),
   oauth_username: z.string().max(255).nullish(),
   oauth_phone_number: z.string().max(255).nullish(),
-
+  oauth_user_id: z.string().max(255).nullish(),
   User: User.optional().nullish(),
 
   created_at: z.coerce.date().optional(),

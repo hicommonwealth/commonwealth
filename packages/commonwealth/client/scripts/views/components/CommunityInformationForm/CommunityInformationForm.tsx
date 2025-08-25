@@ -95,13 +95,13 @@ const CommunityInformationForm = ({
 
     if (withChainsConfig?.community?.type === CommunityType.Solana) {
       return sortedChains
-        .filter((chainType) => chainType.chainBase === CommunityType.Solana)
+        .filter((chainType) => chainType.chainBase === 'solana')
         .map(mappedChainValue);
     }
 
     if (withChainsConfig?.community?.type === CommunityType.Sui) {
       return sortedChains
-        .filter((chainType) => chainType.chainBase === CommunityType.Sui)
+        .filter((chainType) => chainType.chainBase === 'sui')
         .map(mappedChainValue);
     }
 
@@ -110,8 +110,8 @@ const CommunityInformationForm = ({
         (chainType) =>
           chainType.chainBase ===
           (withChainsConfig?.community?.type === CommunityType.Cosmos
-            ? CommunityType.Cosmos
-            : CommunityType.Ethereum),
+            ? 'cosmos'
+            : 'ethereum'),
       )
       .map(mappedChainValue);
   };
@@ -138,6 +138,7 @@ const CommunityInformationForm = ({
               return options?.find((o) => o.value === SONEIUM_ID);
             case CommunityType.Polygon:
             case CommunityType.Solana:
+            case CommunityType.Sui:
               return options?.[0];
           }
         })(),
@@ -194,7 +195,8 @@ const CommunityInformationForm = ({
           placeholder="Select chain"
           isDisabled={
             withChainsConfig.community.type === CommunityType.Polygon ||
-            withChainsConfig.community.type === CommunityType.Solana
+            withChainsConfig.community.type === CommunityType.Solana ||
+            withChainsConfig.community.type === CommunityType.Sui
           }
           options={getChainOptions()}
         />

@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { EVM_ADDRESS_STRICT, PG_INT } from '../utils';
+import { EVM_ADDRESS_STRICT } from '../utils';
 
 export const UpdateClaimAddress = {
   input: z.object({
-    address_id: PG_INT,
+    address: EVM_ADDRESS_STRICT,
   }),
   output: z.object({
     claim_address: EVM_ADDRESS_STRICT,

@@ -5,6 +5,24 @@ import { authRoles } from '../../middleware';
 import { TopicAttributes } from '../../models';
 import { sanitizeQuillText } from '../../utils';
 
+/**
+ * Extracts token symbol from a Sui contract address
+ * Contract addresses are in format: package_id::module_name::SYMBOL
+ * This function returns the 3rd segment (SYMBOL)
+ */
+function extractTokenSymbolFromAddress(
+  tokenAddress: string,
+): string | undefined {
+  if (!tokenAddress) return undefined;
+
+  const segments = tokenAddress.split('::');
+  if (segments.length >= 3) {
+    return segments[2];
+  }
+
+  return undefined;
+}
+
 const Errors = {
   DefaultTemplateRequired: 'Default Template required',
   StakeNotAllowed:
@@ -57,12 +75,28 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
       }
 
       if (payload.weighted_voting) {
+        let tokenSymbol = payload.token_symbol;
+
+        // For Sui coin type token, extract token symbol from contract address
+        if (
+          payload.weighted_voting === schemas.TopicWeightedVoting.SuiToken &&
+          payload.token_address
+        ) {
+          tokenSymbol = extractTokenSymbolFromAddress(payload.token_address);
+        }
+
+        // For Sui native, use 9 decimals
+        const tokenDecimals =
+          payload.weighted_voting === schemas.TopicWeightedVoting.SuiNative
+            ? 9
+            : payload.token_decimals;
+
         options = {
           ...options,
           weighted_voting: payload.weighted_voting,
           token_address: payload.token_address || undefined,
-          token_symbol: payload.token_symbol || undefined,
-          token_decimals: payload.token_decimals || undefined,
+          token_symbol: tokenSymbol || undefined,
+          token_decimals: tokenDecimals || undefined,
           vote_weight_multiplier: payload.vote_weight_multiplier || undefined,
           chain_node_id: payload.chain_node_id || undefined,
         };

@@ -32,8 +32,7 @@ export const seedDb = async () => {
           isAdmin: true,
           is_welcome_onboard_flow_complete: true,
           disableRichText: false,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          emailNotificationInterval: 'never' as any,
+          emailNotificationInterval: 'never' as const,
           profile: {},
           tier: UserTierMap.NewlyVerifiedWallet,
         }),

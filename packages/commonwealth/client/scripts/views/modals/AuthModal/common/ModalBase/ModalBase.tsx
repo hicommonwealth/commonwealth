@@ -23,6 +23,8 @@ import {
   CWModalBody,
   CWModalFooter,
 } from '../../../../components/component_kit/new_designs/CWModal';
+import { CWTab } from '../../../../components/component_kit/new_designs/CWTabs';
+import CWTabsRow from '../../../../components/component_kit/new_designs/CWTabs/CWTabsRow';
 import { TemporaryCrecimientoModalBase } from '../../TemporaryCrecimientoModalBase';
 import { AuthModalType, ModalBaseProps, ModalBaseTabs } from '../../types';
 import useAuthentication from '../../useAuthentication';
@@ -107,6 +109,7 @@ const ModalBase = ({
   const copy = MODAL_COPY[layoutType];
 
   const partnershipWalletEnabled = useFlag('partnershipWallet');
+  const gateWalletEnabled = useFlag('gateWallet');
   const crecimientoHackathonEnabled = useFlag('crecimientoHackathon');
 
   const { farcasterContext, signInToFarcasterFrame } = useFarcasterStore();
@@ -176,6 +179,7 @@ const ModalBase = ({
   const hasWalletConnect = findWalletById(WalletId.WalletConnect);
   const isOkxWalletAvailable = findWalletById(WalletId.OKX);
   const isBinanceWalletAvailable = findWalletById(WalletId.Binance);
+  const isGateWalletAvailable = findWalletById(WalletId.Gate);
   const evmWallets = filterWalletNames(ChainBase.Ethereum) as EVMWallets[];
   const cosmosWallets = filterWalletNames(ChainBase.CosmosSDK);
   const solanaWallets = filterWalletNames(ChainBase.Solana);
@@ -183,6 +187,10 @@ const ModalBase = ({
   const suiWallets = filterWalletNames(ChainBase.Sui);
   const getEVMWalletsForMainModal = () => {
     const configEvmWallets: string[] = [];
+    if (isGateWalletAvailable && gateWalletEnabled) {
+      configEvmWallets.push('gate');
+    }
+
     if (partnershipWalletEnabled) {
       if (isOkxWalletAvailable) {
         configEvmWallets.push('okx');
@@ -202,7 +210,7 @@ const ModalBase = ({
       ...(evmWallets.includes('walletconnect') ? ['walletconnect'] : []),
       ...evmWallets.filter((x) => {
         if (!partnershipWalletEnabled) {
-          if (x === 'okx' || x === 'binance') return false;
+          if (x === 'okx' || x === 'binance' || x === 'gate') return false;
         }
 
         return x !== 'walletconnect';
@@ -408,7 +416,7 @@ const ModalBase = ({
           ) : (
             (showAuthOptionTypesFor || [])?.length > 0 && (
               <>
-                {/* {shouldShowSSOOptions &&
+                {shouldShowSSOOptions &&
                   // @ts-expect-error StrictNullChecks*
                   showAuthOptionTypesFor?.length > 1 &&
                   !showAuthOptionFor && (
@@ -428,7 +436,7 @@ const ModalBase = ({
                         />
                       ))}
                     </CWTabsRow>
-                  )} */}
+                  )}
 
                 <section className="auth-options">
                   {/* On the wallets tab, if no wallet is found, show "No wallets Found" */}

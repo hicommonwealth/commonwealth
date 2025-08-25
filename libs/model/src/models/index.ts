@@ -113,6 +113,7 @@ export * from './thread_rank';
 export * from './thread_version_history';
 export * from './token-allocation';
 export * from './topic';
+export * from './topic_subscription';
 export * from './twitter_cursor';
 export * from './types';
 export * from './user';

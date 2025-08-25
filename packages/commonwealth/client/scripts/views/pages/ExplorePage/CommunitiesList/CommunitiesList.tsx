@@ -316,12 +316,6 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
               onCloseClick={() => removeTagFilter(id)}
             />
           ))}
-        <FiltersDrawer
-          isOpen={isFilterDrawerOpen}
-          onClose={() => setIsFilterDrawerOpen(false)}
-          filters={filters}
-          onFiltersChange={(newFilters) => setFilters(newFilters)}
-        />
       </div>
       <CWText type="b2" className="communities-count">
         {!isLoading && communities?.pages?.[0]?.totalResults
@@ -417,6 +411,13 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
           }}
         />
       )}
+
+      <FiltersDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        filters={filters}
+        onFiltersChange={(newFilters) => setFilters(newFilters)}
+      />
     </>
   );
 };

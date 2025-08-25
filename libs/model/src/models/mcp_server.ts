@@ -19,6 +19,36 @@ export default (sequelize: Sequelize.Sequelize): MCPServerModelStatic =>
       handle: { type: Sequelize.STRING, allowNull: false },
       server_url: { type: Sequelize.STRING, allowNull: false },
       source: { type: Sequelize.STRING, allowNull: false },
+      source_identifier: { type: Sequelize.STRING, allowNull: false },
+      private_community_id: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        references: {
+          model: 'Communities',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'NO ACTION',
+      },
+      tools: {
+        type: Sequelize.JSON,
+        allowNull: false,
+        defaultValue: [],
+      },
+      auth_required: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      auth_completed: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      auth_user_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
     },
@@ -28,12 +58,13 @@ export default (sequelize: Sequelize.Sequelize): MCPServerModelStatic =>
       updatedAt: 'updated_at',
       tableName: 'MCPServers',
       underscored: true,
-      indexes: [
-        {
-          fields: ['name'],
-          unique: true,
-          name: 'MCPServers_name_unique',
+      defaultScope: {
+        attributes: {
+          exclude: ['source_identifier', 'server_url'],
         },
-      ],
+      },
+      scopes: {
+        withPrivateData: {},
+      },
     },
   );

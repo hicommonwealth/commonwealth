@@ -50,6 +50,11 @@ export type OpenRouterModel =
 // Union type that includes both OpenAI and OpenRouter models
 export type CompletionModel = OpenAIModel | OpenRouterModel;
 
+export const DEFAULT_COMPLETION_MODEL = 'gpt-4o-mini';
+export const DEFAULT_COMPLETION_MODEL_LABEL = 'GPT-4o-mini';
+export const DEFAULT_NANO_MODEL = 'gpt-4.1-nano';
+export const DEFAULT_IMAGE_MODEL = 'gpt-image-1';
+
 // Supported image generation models
 export type ImageGenerationModel = 'gpt-image-1' | 'runware:100@1';
 

@@ -82,7 +82,7 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
       />
 
       <CWText type="h3" className="title" isCentered>
-        Get a referral bonus for inviting friends to common!{' '}
+        Get a referral bonus for inviting friends to Common!{' '}
       </CWText>
 
       <div className="share-section">

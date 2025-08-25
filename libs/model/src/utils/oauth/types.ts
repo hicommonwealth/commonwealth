@@ -6,4 +6,5 @@ export type VerifiedUserInfo = {
   emailVerified?: boolean;
   phoneNumber?: string;
   username?: string;
+  userId?: string;
 };
