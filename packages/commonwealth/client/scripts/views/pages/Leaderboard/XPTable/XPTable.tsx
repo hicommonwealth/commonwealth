@@ -1,6 +1,6 @@
 import { APIOrderDirection } from 'helpers/constants';
 import { useFlag } from 'hooks/useFlag';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import useGetXPsRanked from 'state/api/user/getXPsRanked';
@@ -13,9 +13,10 @@ import { useCWTableState } from 'views/components/component_kit/new_designs/CWTa
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import TrustLevelRole from 'views/components/TrustLevelRole';
 
+import CWCircleMultiplySpinner from 'client/scripts/views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import './XPTable.scss';
 
-const USERS_PER_PAGE = 100;
+const USERS_PER_PAGE = 50;
 
 const columns: CWTableColumnInfo[] = [
   {
@@ -49,7 +50,6 @@ const XPTable = ({
   hideFilters = false,
   onClearSearch,
 }: XPTableProps) => {
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedQuest, setSelectedQuest] = useState<{
     value: string;
     label: string;
@@ -76,13 +76,22 @@ const XPTable = ({
     label: quest.name,
   }));
 
-  const { data = [], isLoading } = useGetXPsRanked({
-    top: currentPage * USERS_PER_PAGE,
+  const {
+    data: pages,
+    isLoading,
+    isInitialLoading,
+    fetchNextPage,
+    hasNextPage,
+    refetch,
+  } = useGetXPsRanked({
+    limit: USERS_PER_PAGE,
+    cursor: 1,
     quest_id: selectedQuest ? parseInt(selectedQuest.value) : undefined,
     search: searchText?.trim(),
   });
 
-  const rankings = data.map((rank, index) => ({
+  const flatData = (pages?.pages || []).flatMap((p) => p.results);
+  const rankings = flatData.map((rank, index) => ({
     rank: index + 1,
     user_id: rank.user_id,
     user_profile: {
@@ -93,6 +102,15 @@ const XPTable = ({
     },
     xp: rank.xp_points,
   }));
+
+  // refetch when search text changes
+  useEffect(() => {
+    refetch();
+  }, [searchText, refetch]);
+
+  const handleScrollEnd = useCallback(() => {
+    if (hasNextPage) fetchNextPage();
+  }, [hasNextPage, fetchNextPage]);
 
   return (
     <>
@@ -111,7 +129,6 @@ const XPTable = ({
               value={selectedQuest}
               onChange={(option) => {
                 setSelectedQuest(option as { value: string; label: string });
-                setCurrentPage(1);
               }}
               options={questOptions}
               isClearable
@@ -121,7 +138,7 @@ const XPTable = ({
         </div>
       )}
       <section className="XPTable">
-        {!isLoading && rankings.length === 0 ? (
+        {!isInitialLoading && rankings?.length === 0 ? (
           <CWText type="h2" className="empty-rankings">
             No Users have earned aura yet{' '}
             {selectedQuest ? `for "${selectedQuest.label}" quest` : ''}
@@ -132,7 +149,7 @@ const XPTable = ({
               columnInfo={tableState.columns}
               sortingState={tableState.sorting}
               setSortingState={tableState.setSorting}
-              rowData={rankings.map((rank) => ({
+              rowData={(rankings || []).map((rank) => ({
                 ...rank,
                 username: {
                   sortValue: rank.user_profile.name,
@@ -159,7 +176,10 @@ const XPTable = ({
                   ),
                 },
               }))}
+              isLoadingMoreRows={isLoading}
+              onScrollEnd={handleScrollEnd}
             />
+            {!isLoading && hasNextPage && <CWCircleMultiplySpinner />}
           </>
         )}
       </section>

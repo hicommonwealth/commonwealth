@@ -78,7 +78,7 @@ const ReferralCard = ({
           {currentTab === ReferralTabs.XP && (
             <div className="xp-body">
               <CWText fontWeight="bold" type="h4">
-                {user.xpReferrerPoints} Aura&nbsp;
+                {`${user.xpReferrerPoints || 0}`} Aura&nbsp;
                 <CWText type="caption">earned from referrals</CWText>
               </CWText>
             </div>
