@@ -87,8 +87,8 @@ you must re-deploy a new commit to trigger a new release.
 
 If in the production environment also add Datadog environment variables to the service e.g.:
 ```
-RELEASER_API_KEY="${{Prod Releaser.API_KEY}}"
-RELEASER_URL="${{Prod Releaser.RELEASER_URL}}"
+RAILWAY_DATADOG_HOST=prod-datadog.railway.internal
+RAILWAY_DATADOG_STATSD_PORT=8125
 ```
 
 # Scaling
