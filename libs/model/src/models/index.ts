@@ -74,6 +74,7 @@ export const buildDb = (sequelize: Sequelize): DB => {
 };
 
 export * from './address';
+export * from './ai_completion_token';
 export * from './api_key';
 export * from './chain_event_xp_sources';
 export * from './chain_node';

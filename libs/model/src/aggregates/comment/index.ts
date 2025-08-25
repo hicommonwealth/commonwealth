@@ -1,3 +1,5 @@
+export * from './CreateAICompletionComment.command';
+export * from './CreateAICompletionToken.command';
 export * from './CreateComment.command';
 export * from './CreateCommentReaction.command';
 export * from './DeleteComment.command';
