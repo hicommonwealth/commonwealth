@@ -120,7 +120,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
               <CWText type="b1" className="stat-value">
                 {karma}
               </CWText>
-              <CWText type="caption">Karma earned across Common</CWText>
+              <CWText type="caption">Aura earned across Common</CWText>
             </div>
           </div>
         </div>

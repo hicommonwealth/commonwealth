@@ -18,7 +18,7 @@ import {
 export const UserProfileAddressView = AddressView.extend({
   Community: z.object({
     id: z.string(),
-    base: z.nativeEnum(ChainBase),
+    base: z.enum(ChainBase),
     ss58_prefix: PG_INT.nullish(),
   }),
 });
@@ -67,13 +67,13 @@ export const UserStatusAddressView = z.object({
   id: PG_INT,
   address: z.string(),
   role: z.enum(['member', 'moderator', 'admin']),
-  wallet_id: z.nativeEnum(WalletId),
+  wallet_id: z.enum(WalletId),
   oauth_provider: z.string().nullish(),
   ghost_address: z.boolean().nullish(),
   last_active: z.coerce.date().or(z.string()).nullish(),
   Community: z.object({
     id: z.string(),
-    base: z.nativeEnum(ChainBase),
+    base: z.enum(ChainBase),
     ss58_prefix: PG_INT.nullish(),
   }),
 });
@@ -278,7 +278,7 @@ export const GetMoonpaySignature = {
 export const MutualCommunityView = z.object({
   id: z.string(),
   name: z.string(),
-  base: z.nativeEnum(ChainBase),
+  base: z.enum(ChainBase),
   icon_url: z.string().nullish(),
 });
 
