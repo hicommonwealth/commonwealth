@@ -48,8 +48,10 @@ const useMagicWallet = ({
 
           // Get user address
           try {
-            const metadata = await magicInstance.user.getMetadata();
-            if (metadata.publicAddress) {
+            const metadata = await magicInstance.user
+              .getMetadata()
+              .catch(() => null);
+            if (metadata?.publicAddress) {
               setUserAddress(metadata.publicAddress);
             }
           } catch {

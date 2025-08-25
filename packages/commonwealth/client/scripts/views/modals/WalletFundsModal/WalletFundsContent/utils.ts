@@ -9,6 +9,7 @@ export const formatUsdBalance = (
 };
 
 export const handleRefreshBalance = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetch: () => Promise<any>,
 ): Promise<void> => {
   await refetch();

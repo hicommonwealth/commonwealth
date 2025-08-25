@@ -5,6 +5,7 @@ const ETH_BALANCE_STALE_TIME = 60 * 1_000; // 1 min
 
 interface UseGetEthereumBalanceQueryProps {
   userAddress: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rpcProvider: any;
   enabled?: boolean;
 }
