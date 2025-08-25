@@ -808,18 +808,100 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           where: { id: payload.user_id },
         });
         if (!user) return;
+
         const action_metas = await getQuestActionMetas(payload, 'XpAwarded');
-        await recordXpsForQuest({
-          event_id: id,
-          user_id: payload.user_id,
-          event_created_at: payload.created_at,
-          action_metas,
-          scope: {
-            amount: payload.xp_amount,
-            award_reason: payload.reason,
-            awarded_by_user_id: payload.by_user_id,
-          },
-        });
+
+        // If no action metas found, log a warning but don't fail
+        if (action_metas.length === 0) {
+          console.warn(
+            `No quest action metas found for XpAwarded event. Event ID: ${id}, User ID: ${payload.user_id}. This might indicate missing system quest or action meta configuration.`,
+          );
+
+          // Try to find action meta -100 directly and ensure system quest exists
+          let actionMeta = await models.QuestActionMeta.findOne({
+            where: { id: -100, event_name: 'XpAwarded' },
+          });
+
+          if (!actionMeta) {
+            // System quest or action meta is missing, try to create them
+            await models.sequelize.transaction(async (transaction) => {
+              // Ensure system quest exists
+              let systemQuest = await models.Quest.findOne({
+                where: { id: -2 },
+                transaction,
+              });
+
+              if (!systemQuest) {
+                systemQuest = await models.Quest.create(
+                  {
+                    id: -2,
+                    name: 'System Quest - Manual Awards',
+                    description:
+                      'System quest for manual XP awards and other system-level XP events',
+                    quest_type: 'common',
+                    image_url:
+                      'https://assets.commonwealth.im/fab3f073-9bf1-4ac3-8625-8b2ee258b5a8.png',
+                    start_date: new Date('2020-01-01T00:00:00Z'),
+                    end_date: new Date('2100-01-01T00:00:00Z'),
+                    xp_awarded: 0,
+                    max_xp_to_end: 999999999,
+                  },
+                  { transaction },
+                );
+              }
+
+              // Create action meta
+              actionMeta = await models.QuestActionMeta.create(
+                {
+                  id: -100,
+                  quest_id: -2,
+                  event_name: 'XpAwarded',
+                  reward_amount: 0,
+                  creator_reward_weight: 0,
+                  participation_limit:
+                    schemas.QuestParticipationLimit.OncePerPeriod,
+                  participation_period: schemas.QuestParticipationPeriod.Daily,
+                },
+                { transaction },
+              );
+            });
+
+            // Try to get action metas again
+            const retryActionMetas = await getQuestActionMetas(
+              payload,
+              'XpAwarded',
+            );
+            if (retryActionMetas.length > 0) {
+              await recordXpsForQuest({
+                event_id: id,
+                user_id: payload.user_id,
+                event_created_at: payload.created_at,
+                action_metas: retryActionMetas,
+                scope: {
+                  amount: payload.xp_amount,
+                  award_reason: payload.reason,
+                  awarded_by_user_id: payload.by_user_id,
+                },
+              });
+            } else {
+              console.error(
+                `Failed to create or retrieve action metas for XpAwarded event. Event ID: ${id}, User ID: ${payload.user_id}`,
+              );
+            }
+          }
+        } else {
+          await recordXpsForQuest({
+            event_id: id,
+            user_id: payload.user_id,
+            event_created_at: payload.created_at,
+            action_metas,
+            scope: {
+              amount: payload.xp_amount,
+              award_reason: payload.reason,
+              awarded_by_user_id: payload.by_user_id,
+            },
+          });
+        }
       },
     },
   };
