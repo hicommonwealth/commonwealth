@@ -4,19 +4,25 @@ import { Op } from 'sequelize';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 
-export function GetAllMCPServers(): Query<typeof schemas.GetAllMCPServers> {
+export function GetCommunityMCPServers(): Query<
+  typeof schemas.GetCommunityMCPServers
+> {
   return {
-    ...schemas.GetAllMCPServers,
+    ...schemas.GetCommunityMCPServers,
     auth: [authRoles('admin', 'moderator', 'member')],
     body: async ({ payload }) => {
-      const { community_id } = payload;
+      const { community_id, private_only } = payload;
+
+      const whereCondition = private_only
+        ? { private_community_id: community_id }
+        : {
+            private_community_id: {
+              [Op.or]: [community_id, null],
+            },
+          };
 
       const mcpServers = await models.MCPServer.findAll({
-        where: {
-          private_community_id: {
-            [Op.or]: [community_id, null],
-          },
-        },
+        where: whereCondition,
         order: [['name', 'ASC']],
       });
 

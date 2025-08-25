@@ -288,6 +288,7 @@ Community Description: ${communityDescription}`;
           systemPrompt: systemPrompt,
           model: streamingModelId as CompletionModel,
           stream: true,
+          communityId: comment.community_id,
           onChunk: (chunk) => {
             if (mounted) {
               accumulatedText += chunk;
