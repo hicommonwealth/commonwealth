@@ -8,6 +8,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import useGetThreadToken from 'state/api/tokens/getThreadToken';
 import useUserStore from 'state/ui/user';
 import {
   default as MarkdownViewerUsingQuillOrNewEditor,
@@ -20,6 +21,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import ThreadTokenModal from 'views/modals/ThreadTokenModal/ThreadTokenModal';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
 import app from '../../../../state/index';
@@ -116,14 +118,36 @@ export const ThreadCard = ({
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
   const [showCommentVisible, setShowCommentVisible] =
     useState<boolean>(showCommentState);
+  const [isTradeModalOpen, setIsTradeModalOpen] = useState<boolean>(false);
   const toggleShowComments = () => setShowCommentVisible((prev) => !prev);
   const showImage = useShowImage();
+
+  const handleTradeClick = () => {
+    setIsTradeModalOpen(true);
+  };
 
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
       id: thread.communityId,
       enabled: !!thread.communityId && !showSkeleton,
     });
+
+  const { data: threadTokenRaw } = useGetThreadToken({
+    thread_id: thread.id,
+    enabled: !!thread.id && !!thread.communityId,
+  });
+
+  const threadToken = threadTokenRaw
+    ? {
+        ...threadTokenRaw,
+        created_at: threadTokenRaw.created_at
+          ? new Date(threadTokenRaw.created_at)
+          : null,
+        updated_at: threadTokenRaw.updated_at
+          ? new Date(threadTokenRaw.updated_at)
+          : null,
+      }
+    : null;
 
   if (showSkeleton || isLoadingCommunity || !community) {
     return (
@@ -319,6 +343,7 @@ export const ThreadCard = ({
                   totalComments={thread.numberOfComments}
                   shareEndpoint={`${window.location.origin}${threadHref}`}
                   thread={thread}
+                  threadToken={threadToken}
                   upvoteBtnVisible={
                     !hideReactionButton && isWindowSmallInclusive
                   }
@@ -351,6 +376,7 @@ export const ThreadCard = ({
                   showOnlyThreadActionIcons={showOnlyThreadActionIcons}
                   actionGroups={actionGroups}
                   bypassGating={bypassGating}
+                  onTradeClick={handleTradeClick}
                 />
               )}
             </div>
@@ -430,6 +456,14 @@ export const ThreadCard = ({
           setIsOpen={setIsUpvoteDrawerOpen}
         />
       )}
+      <ThreadTokenModal
+        isOpen={isTradeModalOpen}
+        onModalClose={() => setIsTradeModalOpen(false)}
+        threadId={thread.id}
+        communityId={thread.communityId}
+        addressType={app.chain?.base || 'ethereum'}
+        tokenCommunity={app.chain?.meta}
+      />
       <CWDivider className="ThreadDivider" />
     </>
   );
