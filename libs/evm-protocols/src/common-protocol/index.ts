@@ -7,4 +7,5 @@ export * from './contractHelpers/postLaunchpad';
 export * from './contractHelpers/stake';
 export * from './contractHelpers/tokens';
 export * from './contractHelpers/tokenStaking';
+export * from './contractHelpers/veCommon';
 export * from './utils';
