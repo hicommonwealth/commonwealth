@@ -5,7 +5,7 @@ import z from 'zod';
 
 export const topicCreationValidationSchema = z.object({
   topicName: z
-    .string()
+    .string({ error: VALIDATION_MESSAGES.NO_INPUT })
     .min(1, { message: VALIDATION_MESSAGES.NO_INPUT })
     .superRefine((value, ctx) => {
       const disallowedCharMatches = value.match(DISALLOWED_TOPIC_NAMES_REGEX);

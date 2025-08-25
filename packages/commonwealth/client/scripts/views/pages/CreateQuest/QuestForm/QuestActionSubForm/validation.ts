@@ -19,12 +19,16 @@ import { z } from 'zod';
 import { QuestActionSubFormConfig } from './types';
 
 const questSubFormValidationSchema = z.object({
-  action: z.string().nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+  action: z
+    .string({ error: VALIDATION_MESSAGES.NO_INPUT })
+    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   instructionsLink: linkValidationSchema.optional,
-  participationLimit: z.enum(QuestParticipationLimit),
+  participationLimit: z.nativeEnum(QuestParticipationLimit, {
+    error: VALIDATION_MESSAGES.NO_INPUT,
+  }),
   // these 2 below are only used for initial values validation and not for
   // internal state validation, that is handled by a custom function
-  participationPeriod: z.enum(QuestParticipationPeriod).optional(),
+  participationPeriod: z.nativeEnum(QuestParticipationPeriod).optional(),
   participationTimesPerPeriod: z.number().or(z.string()).optional(),
 });
 
@@ -80,7 +84,7 @@ export const buildQuestSubFormValidationSchema = (
       }) as unknown as typeof baseSchema;
     } else if (requiresSsoSource) {
       baseSchema = baseSchema.extend({
-        contentIdentifier: z.enum(WalletSsoSource).optional(),
+        contentIdentifier: z.nativeEnum(WalletSsoSource).optional(),
       }) as unknown as typeof baseSchema;
     } else {
       baseSchema = baseSchema.extend({
@@ -220,10 +224,10 @@ export const buildQuestSubFormValidationSchema = (
   if (requiresChainEvent) {
     baseSchema = baseSchema.extend({
       ethChainId: z
-        .string()
+        .string({ error: VALIDATION_MESSAGES.NO_INPUT })
         .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
       contractAddress: z
-        .string()
+        .string({ error: VALIDATION_MESSAGES.NO_INPUT })
         .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
         .refine((val) => EVM_ADDRESS_STRICT_REGEX.test(val), {
           message: VALIDATION_MESSAGES.MUST_BE_FORMAT(
@@ -231,7 +235,7 @@ export const buildQuestSubFormValidationSchema = (
           ),
         }),
       eventSignature: z
-        .string()
+        .string({ error: VALIDATION_MESSAGES.NO_INPUT })
         .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
         .refine(
           (val) => {
@@ -247,7 +251,7 @@ export const buildQuestSubFormValidationSchema = (
           },
         ),
       transactionHash: z
-        .string()
+        .string({ error: VALIDATION_MESSAGES.NO_INPUT })
         .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
         .refine((val) => EVM_EVENT_SIGNATURE_STRICT_REGEX.test(val), {
           message: VALIDATION_MESSAGES.MUST_BE_FORMAT(

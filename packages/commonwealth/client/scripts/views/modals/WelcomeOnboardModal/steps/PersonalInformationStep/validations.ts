@@ -3,7 +3,9 @@ import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import z from 'zod';
 
 export const personalInformationFormValidation = z.object({
-  username: z.string().nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+  username: z
+    .string({ error: VALIDATION_MESSAGES.NO_INPUT })
+    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   email: emailValidationSchema,
   enableAccountNotifications: z.boolean(),
   enableProductUpdates: z.boolean(),
