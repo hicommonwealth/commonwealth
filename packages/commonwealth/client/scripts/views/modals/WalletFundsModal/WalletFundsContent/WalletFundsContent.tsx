@@ -60,11 +60,11 @@ const WalletFundsContent = ({
     }
   };
 
-  const handleShowMoonpay = async () => {
+  const handleShowMoonpay = () => {
     setIsMoonpayVisible(true);
   };
 
-  const handleCloseMoonpay = async () => {
+  const handleCloseMoonpay = () => {
     setIsMoonpayVisible(false);
     handleRefreshBalance(refetch);
   };
@@ -110,7 +110,9 @@ const WalletFundsContent = ({
           <FundWalletItem
             icon="barcode"
             title="View wallet information"
-            onClick={handleShowWalletAddress}
+            onClick={() => {
+              handleShowWalletAddress().catch(console.error);
+            }}
           />
           <FundWalletItem
             icon="walletNew"
@@ -128,8 +130,12 @@ const WalletFundsContent = ({
         variant="overlay"
         visible={isMoonpayVisible}
         walletAddress={userAddress}
-        onClose={handleCloseMoonpay}
-        onUrlSignatureRequested={onUrlSignatureRequested}
+        onClose={async () => {
+          handleCloseMoonpay();
+        }}
+        onUrlSignatureRequested={(url) => {
+          onUrlSignatureRequested(url).catch(console.error);
+        }}
         // onUnsupportedRegion={() => console.log('un supported region')}
         defaultCurrencyCode="eth_base"
       />
