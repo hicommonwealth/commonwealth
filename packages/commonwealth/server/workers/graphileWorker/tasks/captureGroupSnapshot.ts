@@ -2,13 +2,11 @@ import { command, logger } from '@hicommonwealth/core';
 import { GroupSnapshot } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import { systemActor } from '@hicommonwealth/model/middleware';
-import { GraphileTask, TaskPayloads } from '@hicommonwealth/model/services';
+import { TaskPayloads } from '@hicommonwealth/model/services';
 
 const log = logger(import.meta);
 
-export const captureGroupSnapshotTask: GraphileTask<
-  typeof TaskPayloads.CaptureGroupSnapshot
-> = {
+export const captureGroupSnapshotTask = {
   input: TaskPayloads.CaptureGroupSnapshot,
   fn: captureGroupSnapshot,
 };

@@ -2,9 +2,10 @@ import { GetLaunchpadTrades } from '@hicommonwealth/schemas';
 import React from 'react';
 
 import { TransactionsTab } from 'views/components/Profile/ProfileActivity/TransactionsTab';
+import { z } from 'zod';
 import './TokenTXHistoryTable.scss';
 
-type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._type;
+type GetLaunchpadTradesOutput = z.infer<typeof GetLaunchpadTrades.output>;
 
 type TokenTXHistoryTableProps = {
   trades?: GetLaunchpadTradesOutput;

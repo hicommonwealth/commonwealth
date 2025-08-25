@@ -8,7 +8,7 @@ export const SignIn = {
   input: z.object({
     address: z.string(),
     community_id: z.string(),
-    wallet_id: z.nativeEnum(WalletId),
+    wallet_id: z.enum(WalletId),
     session: z.string(),
     block_info: z.string().nullish(),
     referrer_address: z.string().nullish(),
@@ -37,7 +37,7 @@ export const SignIn = {
       .optional(),
   }),
   output: Address.extend({
-    community_base: z.nativeEnum(ChainBase),
+    community_base: z.enum(ChainBase),
     community_ss58_prefix: z.number().nullish(),
     was_signed_in: z.boolean().describe('True when user was already signed in'),
     user_created: z
