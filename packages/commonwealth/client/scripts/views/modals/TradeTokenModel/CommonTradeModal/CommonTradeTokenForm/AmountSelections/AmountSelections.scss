@@ -87,5 +87,29 @@
     @include media_queries.extraSmall {
       margin-top: 4px;
     }
+
+    .Tag {
+      border-radius: 8px !important;
+    }
+
+    .eth-amount-with-usd {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+
+      .eth-amount {
+        font-weight: 500;
+        line-height: 1.2;
+        font-size: 0.8em;
+      }
+
+      .usd-equivalent {
+        font-size: 0.75em;
+        opacity: 0.7;
+        line-height: 1;
+        margin-top: 1px;
+      }
+    }
   }
 }
