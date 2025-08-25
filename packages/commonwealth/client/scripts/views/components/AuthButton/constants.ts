@@ -168,6 +168,10 @@ export const AUTH_TYPES: AuthTypesList = {
       isCustom: true,
     },
     label: 'Gate Wallet',
+    description: {
+      text: '+10 Aura w/ Gate Signup',
+      hasBackground: true,
+    },
   },
   coinbase: {
     icon: {
