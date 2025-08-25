@@ -4,15 +4,22 @@
 export default {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.addIndex(
-        'LaunchpadTokens',
-        ['liquidity_transferred', 'created_at'],
-        {
-          name: 'LaunchpadTokens_liquidity_transferred_created_at',
-          transaction,
-          order: ['liquidity_transferred', 'created_at DESC'],
-        },
+      const indexes = await queryInterface.sequelize.query(
+        `SELECT indexname FROM pg_indexes WHERE indexname = 'LaunchpadTokens_liquidity_transferred_created_at'`,
+        { type: Sequelize.QueryTypes.SELECT, transaction },
       );
+
+      if (indexes.length === 0) {
+        await queryInterface.addIndex(
+          'LaunchpadTokens',
+          ['liquidity_transferred', 'created_at'],
+          {
+            name: 'LaunchpadTokens_liquidity_transferred_created_at',
+            transaction,
+            order: ['liquidity_transferred', 'created_at DESC'],
+          },
+        );
+      }
     });
   },
 
