@@ -26,6 +26,10 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.XpLog, {
       foreignKey: 'creator_user_id',
       asOne: 'creator',
+    })
+    .withMany(db.XpLog, {
+      foreignKey: 'referrer_user_id',
+      asOne: 'referrer',
     });
 
   db.Quest.withMany(db.QuestActionMeta, {
