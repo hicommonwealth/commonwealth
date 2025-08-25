@@ -18,7 +18,10 @@ import UserDropdown from './UserDropdown';
 import { ChainBase } from '@hicommonwealth/shared';
 import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
-import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
+import {
+  fetchCachedNodes,
+  useFetchNodesQuery,
+} from 'client/scripts/state/api/nodes';
 import { useFlag } from 'hooks/useFlag';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
@@ -56,6 +59,8 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
     }, 200);
   };
 
+  // Ensure chain node data is loaded before attempting to read from cache
+  useFetchNodesQuery();
   const nodes = fetchCachedNodes();
   const baseNode = nodes?.find((node) => node.id === baseNodeId);
 
