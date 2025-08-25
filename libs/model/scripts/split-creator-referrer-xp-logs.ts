@@ -37,6 +37,8 @@ async function main() {
           SELECT id FROM "XpLogs"
           WHERE 
             action_meta_id = ANY(:meta_ids::int[])
+            AND referrer_user_id IS NULL -- only update xp logs that haven't been updated yet
+            AND creator_user_id IS NOT NULL
           ORDER BY id
           LIMIT ${batchSize} OFFSET ${offset}
         )
