@@ -6,11 +6,12 @@ import './RequirementCard.scss';
 
 type RequirementCardProps = {
   requirementType: string;
-  requirementChain: string;
+  requirementChain?: string;
   requirementContractAddress?: string;
-  requirementCondition: string;
-  requirementAmount: string;
+  requirementCondition?: string;
+  requirementAmount?: string;
   requirementTokenId?: string;
+  requirementTrustLevel?: string | number;
 };
 
 const RequirementCard = ({
@@ -20,6 +21,7 @@ const RequirementCard = ({
   requirementCondition,
   requirementAmount,
   requirementTokenId,
+  requirementTrustLevel,
 }: RequirementCardProps) => {
   const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
@@ -30,37 +32,44 @@ const RequirementCard = ({
         <InfoBlock label="Requirement type" value={requirementType} />
       </div>
 
-      {requirementType && (
-        <div
-          className={getClasses<{
-            'cols-3'?: boolean;
-            'cols-4'?: boolean;
-            'cols-5'?: boolean;
-            'row-1': boolean;
-            'row-2': boolean;
-          }>({
-            'cols-3': isTokenRequirement,
-            'cols-4': !isTokenRequirement && !is1155Requirement,
-            'cols-5': !isTokenRequirement && is1155Requirement,
-            'row-1': !isTokenRequirement && is1155Requirement,
-            'row-2': !(!isTokenRequirement && is1155Requirement),
-          })}
-        >
-          <InfoBlock label="Chain" value={requirementChain} />
-          {!!requirementContractAddress && (
+      {requirementType &&
+        (!requirementTrustLevel ? (
+          <div
+            className={getClasses<{
+              'cols-3'?: boolean;
+              'cols-4'?: boolean;
+              'cols-5'?: boolean;
+              'row-1': boolean;
+              'row-2': boolean;
+            }>({
+              'cols-3': isTokenRequirement,
+              'cols-4': !isTokenRequirement && !is1155Requirement,
+              'cols-5': !isTokenRequirement && is1155Requirement,
+              'row-1': !isTokenRequirement && is1155Requirement,
+              'row-2': !(!isTokenRequirement && is1155Requirement),
+            })}
+          >
+            <InfoBlock label="Chain" value={requirementChain || ''} />
+            {!!requirementContractAddress && (
+              <InfoBlock
+                label="Contract address"
+                value={requirementContractAddress}
+              />
+            )}
+            <InfoBlock label="Condition" value={requirementCondition || ''} />
+            <InfoBlock label="Amount" value={requirementAmount || ''} />
+            {is1155Requirement && (
+              <InfoBlock label="Id" value={requirementTokenId || ''} />
+            )}
+          </div>
+        ) : (
+          <div>
             <InfoBlock
-              label="Contract address"
-              value={requirementContractAddress}
+              label="Trust Level"
+              value={requirementTrustLevel?.toString() || ''}
             />
-          )}
-          <InfoBlock label="Condition" value={requirementCondition} />
-          <InfoBlock label="Amount" value={requirementAmount} />
-          {is1155Requirement && (
-            // @ts-expect-error <StrictNullChecks/>
-            <InfoBlock label="Id" value={requirementTokenId} />
-          )}
-        </div>
-      )}
+          </div>
+        ))}
     </div>
   );
 };
