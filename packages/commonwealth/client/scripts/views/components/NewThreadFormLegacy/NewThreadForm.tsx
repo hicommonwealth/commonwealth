@@ -13,7 +13,7 @@ import {
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { notifyError } from 'controllers/app/notifications';
 import {
   getEthChainIdOrBech32Prefix,
   SessionKeyError,
@@ -429,34 +429,34 @@ export const NewThreadForm = forwardRef<
 
         const thread = await createThread(input);
 
-        if (tokenizedThreadsAllowed?.tokenized_threads_enabled) {
-          if (!communityToken?.token_address) {
-            notifyError('Community token not found');
-            return;
-          }
-
-          if (!community?.ChainNode?.id) {
-            notifyError('chainId not found');
-            return;
-          }
-
-          await createThreadToken({
-            name: community.id,
-            symbol: communityToken.symbol,
-            threadId: thread.id!,
-            ethChainId: app?.chain?.meta?.ChainNode?.eth_chain_id || 0,
-            initPurchaseAmount: 1e18,
-            chainId: community.ChainNode?.id,
-            walletAddress: userSelectedAddress,
-            authorAddress: userSelectedAddress,
-            communityTreasuryAddress:
-              app.chain?.meta?.namespace_governance_address || '',
-            chainRpc: community.ChainNode?.url || '',
-            paymentTokenAddress: communityToken.token_address,
-          });
-
-          notifySuccess('Thread token created successfully');
-        }
+        // if (tokenizedThreadsAllowed?.tokenized_threads_enabled) {
+        //   if (!communityToken?.token_address) {
+        //     notifyError('Community token not found');
+        //     return;
+        //   }
+        //
+        //   if (!community?.ChainNode?.id) {
+        //     notifyError('chainId not found');
+        //     return;
+        //   }
+        //
+        //   await createThreadToken({
+        //     name: community.id,
+        //     symbol: communityToken.symbol,
+        //     threadId: thread.id!,
+        //     ethChainId: app?.chain?.meta?.ChainNode?.eth_chain_id || 0,
+        //     initPurchaseAmount: 1e18,
+        //     chainId: community.ChainNode?.id,
+        //     walletAddress: userSelectedAddress,
+        //     authorAddress: userSelectedAddress,
+        //     communityTreasuryAddress:
+        //       app.chain?.meta?.namespace_governance_address || '',
+        //     chainRpc: community.ChainNode?.url || '',
+        //     paymentTokenAddress: communityToken.token_address,
+        //   });
+        //
+        //   notifySuccess('Thread token created successfully');
+        // }
 
         if (thread && linkedProposals) {
           addThreadLinks({

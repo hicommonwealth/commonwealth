@@ -11,53 +11,55 @@ export function GetThreadTokenHolders(): Query<
     ...schemas.GetThreadTokenTrades,
     auth: [],
     body: async ({ payload }) => {
-      return (await models.sequelize.query(
+      const [result] = await models.sequelize.query(
         `WITH base AS (
             SELECT
-             U.id AS user_id,
-             U.profile->>'name' AS user_name,
-             A.id AS address_id,
-             A.address AS address,
-             TTT.*
-         FROM "ThreadTokens" AS TT
+                U.id                         AS user_id,
+                U.profile->>'name'           AS user_name,
+             U.profile->>'avatar_url'     AS avatar_url,
+             A.id                         AS address_id,
+             A.address                    AS address,
+             TTT.*                                        -- trade fields
+         FROM "ThreadTokens"      AS TT
              JOIN "ThreadTokenTrades" AS TTT ON TT.token_address = TTT.token_address
-             LEFT JOIN "Addresses" AS A   ON TTT.trader_address = A.address
-             LEFT JOIN "Users" AS U   ON U.id = A.user_id
+             LEFT JOIN "Addresses"    AS A   ON TTT.trader_address = A.address
+             LEFT JOIN "Users"        AS U   ON U.id = A.user_id
          WHERE TT.thread_id = :thread_id
              ),
-             trades_by_address AS (
+             trades_by_user AS (
          SELECT
              user_id,
              user_name,
-             COALESCE(address_id::text, address) AS addr_key,
-             jsonb_agg(to_jsonb(base)) AS trades
+             avatar_url,
+             jsonb_agg(
+             (to_jsonb(base) - 'user_name' - 'avatar_url')
+             ORDER BY base."timestamp" DESC
+             ) AS trades
          FROM base
          WHERE user_id IS NOT NULL
-         GROUP BY user_id, user_name, addr_key
-             ),
-             addresses_by_user AS (
-                SELECT
-                    user_id,
-                    user_name,
-                    jsonb_object_agg(addr_key, trades) AS addresses
-                FROM trades_by_address
-                GROUP BY user_id, user_name
+         GROUP BY user_id, user_name, avatar_url
              )
-        SELECT jsonb_object_agg(
-          user_id::text,
-          jsonb_build_object(
-                  'name',      user_name,
-                  'addresses', addresses
+        SELECT jsonb_build_object(
+          'trades',
+          jsonb_agg(
+            jsonb_build_object(
+              'user_id',    user_id,
+              'name',       user_name,
+              'avatar_url', avatar_url,
+              'trades',     trades
+            ) ORDER BY user_id
           )
         ) AS result
-        FROM addresses_by_user;
+        FROM trades_by_user;
         `,
         {
           replacements: {
             thread_id: payload.thread_id,
           },
         },
-      )) as unknown as z.infer<typeof GetThreadTokenTradesOutput>;
+      );
+
+      return result[0] as unknown as z.infer<typeof GetThreadTokenTradesOutput>;
     },
   };
 }
