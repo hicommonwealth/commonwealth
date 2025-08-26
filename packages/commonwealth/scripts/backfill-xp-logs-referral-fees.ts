@@ -2,9 +2,9 @@
  * Backfills xp logs with referral fees
  */
 import { logger } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model/db';
 import { exit } from 'process';
 import { QueryTypes } from 'sequelize';
-import { models } from '../src/database';
 
 const log = logger(import.meta);
 
@@ -17,74 +17,78 @@ async function main() {
     ALTER TABLE "XpLogs" ADD COLUMN IF NOT EXISTS backfill_referrer_xp_points INT;
   `);
 
-  await models.sequelize.query(
-    `
+  const batchSize = 50_000;
+  let lastId = 0,
+    count = 0,
+    total = 0;
+  do {
+    const rows = await models.sequelize.query<{
+      count: number;
+      max_id: number;
+    }>(
+      `
 WITH l AS (
 SELECT 
-    xl.id AS log_id,
-    m.event_name,
-    m.reward_amount,
-    coalesce(m.creator_reward_weight, 0) as creator_reward_weight,
-    xl.user_id,
-    xl.creator_user_id,
-    xl.referrer_user_id,
-    xl.referrer_xp_points,
-    u.referred_by_address,
-    ref_user.*
+  xl.id AS log_id,
+  m.event_name,
+  m.reward_amount,
+  CASE WHEN m.event_name IN ('SignUpFlowCompleted', 'CommunityCreated', 'CommunityJoined') THEN TRUE ELSE FALSE END as is_referral_event,
+  coalesce(m.creator_reward_weight, 0) as creator_reward_weight,
+  xl.user_id,
+  xl.creator_user_id,
+  xl.referrer_user_id,
+  xl.referrer_xp_points,
+  u.referred_by_address,
+  ref_user.*
 FROM
-    "XpLogs" xl
-    JOIN "QuestActionMetas" m ON xl.action_meta_id = m.id
-    JOIN "Users" u ON u.id = xl.user_id
-    LEFT JOIN LATERAL (
-        SELECT DISTINCT ON (a.address)
-            r.id AS confirmed_referrer_user_id,
-            r.profile->>'name' AS referrer_name
-        FROM
-            "Addresses" a
-            JOIN "Users" r ON a.user_id = r.id
-        WHERE
-            u.tier > 1
-            AND a.is_banned = false
-            AND (
-              a.address = u.referred_by_address
-              OR a.address = LOWER(u.referred_by_address)
-              OR a.address = UPPER(u.referred_by_address)
-            )
-        ORDER BY a.address, r.id  -- pick the “first” by r.id
-      ) AS ref_user ON true
-   WHERE
-    u.referred_by_address IS NOT NULL -- we should reset logged referrers if referred_by_address is null
-)
--- update backfill columns with correct values
-UPDATE "XpLogs" xl
-SET
-	backfill_referrer_user_id = l.confirmed_referrer_user_id,
-	backfill_referrer_xp_points = referrer_xp_points
+  "XpLogs" xl
+  JOIN "QuestActionMetas" m ON xl.action_meta_id = m.id
+  JOIN "Users" u ON u.id = xl.user_id
+  LEFT JOIN LATERAL (
+    SELECT DISTINCT ON (a.address)
+      r.id AS confirmed_referrer_user_id,
+      r.profile->>'name' AS referrer_name
+    FROM
+      "Addresses" a
+      JOIN "Users" r ON a.user_id = r.id
+    WHERE
+      a.address = u.referred_by_address -- TODO: do we need case-insensitive matching?
+      AND u.tier > 1 AND a.is_banned = FALSE -- make sure referrer is not a banned user
+    ORDER BY
+      a.address, r.id -- pick the "first" by r.id, TODO: should we pick by activity date instead?...it could be more inestable
+  ) AS ref_user ON true
 WHERE
-	referrer_user_id IS NOT NULL
-	AND (
-		coalesce(referrer_user_id,-1) <> coalesce(confirmed_referrer_user_id,-1)
-		OR coalesce(referrer_xp_points,0) <> reward_amount * creator_reward_weight
-	);
--- "referral" events with referrer or fee mismatch
-select * from l
-where
-	referrer_user_id IS NOT NULL
-	AND (
-		coalesce(referrer_user_id,-1) <> coalesce(confirmed_referrer_user_id,-1)
-		OR coalesce(referrer_xp_points,0) <> reward_amount * creator_reward_weight
-	)
-union
--- other events where 10% referral is due
-select * from l
-where
-	referrer_user_id IS NULL and reward_amount >= 10 -- ?
-	--referrer_xp_points = reward_amount * .1
-;
-      `,
-    { type: QueryTypes.SELECT },
-  );
-  log.info('✅ Backfill completed!');
+  u.referred_by_address IS NOT NULL -- always review referrers by looking at the users referred by address column (driver)
+  AND xl.id > :lastId
+LIMIT ${batchSize}
+),
+updated as ( -- update backfill columns with correct values
+  UPDATE "XpLogs" xl
+  SET
+    backfill_referrer_user_id = l.confirmed_referrer_user_id,
+    backfill_referrer_xp_points = CASE
+      WHEN l.is_referral_event = TRUE THEN l.reward_amount * l.creator_reward_weight
+      ELSE l.reward_amount * 0.1 -- 10% referral on non-referral events
+    END
+  FROM l
+  WHERE xl.id = l.log_id
+  RETURNING id
+)
+SELECT COUNT(*)::INT AS count, COALESCE(MAX(id), :lastId)::INT AS max_id FROM updated;
+`,
+      {
+        replacements: { lastId },
+        type: QueryTypes.SELECT,
+      },
+    );
+    if (rows.length === 0) break;
+    count = rows[0].count;
+    lastId = rows[0].max_id;
+    total += count;
+    log.info(`Updated ${count} rows at ${lastId}...`);
+  } while (count > 0);
+
+  log.info(`✅ Backfill completed with ${total} updated rows!`);
   exit(0);
 }
 
