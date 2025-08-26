@@ -28,6 +28,7 @@ type ViewUpvotesDrawerProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   tokenDecimals?: number | null | undefined;
   topicWeight?: TopicWeightedVoting | null | undefined;
+  tokenSymbol?: string;
 };
 
 type Upvoter = {
@@ -69,6 +70,7 @@ export const ViewUpvotesDrawer = ({
   setIsOpen,
   tokenDecimals,
   topicWeight,
+  tokenSymbol,
 }: ViewUpvotesDrawerProps) => {
   const tableState = useCWTableState({
     columns: columns.map((c) =>
@@ -199,6 +201,7 @@ export const ViewUpvotesDrawer = ({
                       topicWeight,
                       1,
                       6,
+                      tokenSymbol,
                     )}
                   </CWText>
                 </div>

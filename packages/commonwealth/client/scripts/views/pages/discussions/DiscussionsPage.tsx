@@ -212,7 +212,6 @@ const DiscussionsPage = () => {
     if (isInitialLoading || !data) return;
     const threads = sortPinned(
       sortByFeaturedFilter(
-        // @ts-expect-error User is required in one of the results
         data.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [],
         featuredFilter,
       ),
@@ -297,8 +296,10 @@ const DiscussionsPage = () => {
       ? prettyVoteWeight(
           formatDecimalToWei(voteBalance, topicObj!.token_decimals ?? 18),
           topicObj!.token_decimals,
-          topicObj!.weighted_voting,
+          topicObj!.weighted_voting as TopicWeightedVoting,
           topicObj!.vote_weight_multiplier || 1,
+          undefined,
+          topicObj?.token_symbol || undefined,
         )
       : '';
 

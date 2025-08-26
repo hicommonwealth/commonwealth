@@ -19,6 +19,7 @@ export interface EntriesTabProps {
   isFarcasterContest: boolean;
   contestDecimals: number;
   voteWeightMultiplier: number;
+  contestTokenSymbol?: string;
 }
 
 const EntriesTab = ({
@@ -28,6 +29,7 @@ const EntriesTab = ({
   isFarcasterContest,
   contestDecimals,
   voteWeightMultiplier,
+  contestTokenSymbol,
 }: EntriesTabProps) => {
   const [selectedSort, setSelectedSort] = React.useState<SortType>(
     SortType.Upvotes,
@@ -61,7 +63,6 @@ const EntriesTab = ({
 
   // TODO: Replace Thread with ThreadView -> should we use Memo here?
   const sortedThreads = sortByFeaturedFilter(
-    // @ts-expect-error User is required in one of the results
     threads?.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [],
     threadSort,
   );
@@ -80,6 +81,7 @@ const EntriesTab = ({
           onSortChange={handleSortChange}
           contestDecimals={contestDecimals}
           voteWeightMultiplier={voteWeightMultiplier}
+          contestTokenSymbol={contestTokenSymbol}
         />
       ) : (
         <CommonEntriesList
