@@ -186,6 +186,7 @@ export const GetUserReferralFees = {
 export const XpLogView = XpLog.omit({
   user: true,
   creator: true,
+  referrer: true,
   quest_action_meta: true,
 }).extend({
   user_profile: UserProfile,
@@ -194,7 +195,8 @@ export const XpLogView = XpLog.omit({
   event_name: z.string(),
   reward_amount: z.number(),
   creator_profile: UserProfile.nullish(),
-  is_creator: z.boolean().describe('Actor is the creator or referrer'),
+  referrer_profile: UserProfile.nullish(),
+  is_creator: z.boolean().describe('Actor is the creator'),
   is_referral: z.boolean().describe('Is a referral event'),
   created_at: z.date().or(z.string()),
   event_created_at: z.date().or(z.string()),

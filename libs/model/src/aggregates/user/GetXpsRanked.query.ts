@@ -39,7 +39,7 @@ as_user as (
 	  join "Users" u on l.user_id = u.id 
 	where
 		q.id = :quest_id
-		AND u.tier != ${UserTierMap.BannedUser}
+		AND u.tier > ${UserTierMap.BannedUser}
 	group by
 		l.user_id
 ),
@@ -54,17 +54,33 @@ as_creator as (
 	  join "Users" u on l.creator_user_id = u.id 
 	where
 		q.id = :quest_id
-		AND u.tier != ${UserTierMap.BannedUser}
+		AND u.tier > ${UserTierMap.BannedUser}
 	group by
 		l.creator_user_id
 ),
+as_referrer as (
+	select
+		l.referrer_user_id as user_id,
+		sum(l.referrer_xp_points)::int as xp_points
+	from
+		"XpLogs" l
+		join "QuestActionMetas" m on l.action_meta_id = m.id
+		join "Quests" q on m.quest_id = q.id
+	  join "Users" u on l.referrer_user_id = u.id 
+	where
+		q.id = :quest_id
+		AND u.tier > ${UserTierMap.BannedUser}
+	group by
+		l.referrer_user_id
+),
 top_users as (
 	select
-		coalesce(u.user_id, c.user_id) as user_id,
-		coalesce(u.xp_points, 0) + coalesce(c.xp_points, 0) as xp_points
+		coalesce(u.user_id, c.user_id, r.user_id) as user_id,
+		coalesce(u.xp_points, 0) + coalesce(c.xp_points, 0) + coalesce(r.xp_points, 0) as xp_points
 	from
 		as_user u
 		full outer join as_creator c on u.user_id = c.user_id
+    full outer join as_referrer r on u.user_id = r.user_id
 	order by
 		2 desc
 	limit :top
@@ -87,7 +103,7 @@ select
  	profile->>'avatar_url' as avatar_url
 from
 	"Users" U
-where tier != ${UserTierMap.BannedUser} ${searchCondition}
+where tier > ${UserTierMap.BannedUser} ${searchCondition}
 order by xp_points desc
 limit :top;
 `;
