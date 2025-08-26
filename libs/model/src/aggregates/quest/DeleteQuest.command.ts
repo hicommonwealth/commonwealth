@@ -1,4 +1,5 @@
 import { Command } from '@hicommonwealth/core';
+import { getQuestXpLeaderboardViewName } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { isSuperAdmin } from '../../middleware';
@@ -45,6 +46,12 @@ export function DeleteQuest(): Command<typeof schemas.DeleteQuest> {
           where: { id: quest_id },
           transaction,
         });
+        await models.sequelize.query(
+          `
+          DROP MATERIALIZED VIEW IF EXISTS "${getQuestXpLeaderboardViewName(quest_id)}";
+        `,
+          { transaction },
+        );
       });
 
       return rows ? rows > 0 : false;

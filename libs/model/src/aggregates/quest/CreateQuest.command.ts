@@ -7,7 +7,7 @@ import { mustBeValidDateRange, mustNotExist } from '../../middleware/guards';
 import { QuestInstance } from '../../models/quest';
 import { getQuestXpLeaderboardViewName } from '../../utils';
 
-async function createQuestMaterializedView(
+export async function createQuestMaterializedView(
   quest_id: number,
   transaction: Transaction,
 ) {
@@ -48,7 +48,7 @@ async function createQuestMaterializedView(
           FROM "XpLogs" l
                    JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
                    JOIN "Quests" q ON m.quest_id = q.id
-          WHERE l.creator_user_id IS NOT NULL AND q.id = ${quest_id}
+          WHERE l.referrer_user_id IS NOT NULL AND q.id = ${quest_id}
       ),
            aggregated_xp AS (
                SELECT
@@ -63,7 +63,7 @@ async function createQuestMaterializedView(
           a.user_id,
           (a.total_user_xp + a.total_creator_xp + a.total_referrer_xp) as xp_points,
           u.tier,
-          ROW_NUMBER() OVER (ORDER BY (a.total_user_xp + a.total_creator_xp) DESC, a.user_id ASC)::int as rank
+          ROW_NUMBER() OVER (ORDER BY (a.total_user_xp + a.total_creator_xp + a.total_referrer_xp) DESC, a.user_id ASC)::int as rank
       FROM aggregated_xp a
                JOIN "Users" u ON a.user_id = u.id
       WHERE u.tier > 1;

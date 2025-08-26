@@ -20,7 +20,11 @@ import {
   UpdateRole,
   UpdateRoleErrors,
 } from '../../src/aggregates/community';
-import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
+import {
+  CreateQuest,
+  createQuestMaterializedView,
+  UpdateQuest,
+} from '../../src/aggregates/quest';
 import { AwardXp } from '../../src/aggregates/super-admin';
 import { CreateThread } from '../../src/aggregates/thread';
 import {
@@ -34,6 +38,7 @@ import { models } from '../../src/database';
 import * as tokenBalanceCache from '../../src/services/tokenBalanceCache';
 import { seed } from '../../src/tester';
 import * as utils from '../../src/utils';
+import { getQuestXpLeaderboardViewName } from '../../src/utils';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
 import { createSIWESigner, signIn } from '../utils/sign-in';
@@ -90,6 +95,35 @@ describe('User lifecycle', () => {
   }
 
   describe('xp', () => {
+    beforeAll(async () => {
+      await models.sequelize.query(`
+        CREATE OR REPLACE FUNCTION public.update_total_xp()
+        RETURNS TRIGGER AS '
+        BEGIN
+            NEW.total_xp = NEW.xp_points + NEW.xp_referrer_points;
+            RETURN NEW;
+        END;
+        ' LANGUAGE plpgsql;
+        
+        CREATE TRIGGER update_total_xp_trigger
+        BEFORE INSERT OR UPDATE OF xp_points, xp_referrer_points
+        ON public."Users"
+        FOR EACH ROW
+        EXECUTE FUNCTION public.update_total_xp();
+      
+        CREATE MATERIALIZED VIEW user_leaderboard AS
+        SELECT 
+            id as user_id,
+            total_xp as xp_points,
+            tier,
+            (ROW_NUMBER() OVER (ORDER BY total_xp DESC, id ASC))::int as rank
+        FROM "Users" WHERE tier > 1;
+        
+        CREATE UNIQUE INDEX user_leaderboard_user_id_idx ON public.user_leaderboard (user_id);
+        CREATE INDEX user_leaderboard_rank_idx ON public.user_leaderboard (rank);
+      `);
+    });
+
     it('should project xp points', async () => {
       // setup quest
       const quest = await command(CreateQuest(), {
@@ -398,6 +432,10 @@ describe('User lifecycle', () => {
         start_date: new Date(),
         end_date: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7),
         quest_type: 'common',
+      });
+
+      await models.sequelize.transaction(async (transaction) => {
+        await createQuestMaterializedView(-1, transaction);
       });
 
       await models.QuestActionMeta.bulkCreate([
@@ -1089,6 +1127,10 @@ describe('User lifecycle', () => {
     });
 
     it('should query ranked by xp points', async () => {
+      await models.sequelize.query(`
+        REFRESH MATERIALIZED VIEW user_leaderboard;
+      `);
+
       // dump xp logs to debug xp ranking
       const logs = await query(GetXps(), {
         actor: admin,
@@ -1116,6 +1158,9 @@ describe('User lifecycle', () => {
         203, 50, 37, 11,
       ]);
 
+      await models.sequelize.query(`
+        REFRESH MATERIALIZED VIEW "${getQuestXpLeaderboardViewName(-1)}";
+      `);
       const xps2 = await query(GetXpsRanked(), {
         actor: admin,
         payload: { limit: 10, cursor: 1, quest_id: -1 },
