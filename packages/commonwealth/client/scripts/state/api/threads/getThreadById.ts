@@ -8,6 +8,7 @@ const useGetThreadByIdQuery = (thread_id: number, enabled = true) => {
     { thread_id },
     {
       staleTime: THREAD_STALE_TIME,
+      // @ts-expect-error User is required in one of the results
       select: (data) => new Thread(data),
       enabled,
       retry: (failureCount, error) => {

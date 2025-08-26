@@ -327,7 +327,7 @@ export const SearchThreads = {
 export const GetLinks = {
   input: z.object({
     thread_id: PG_INT.optional(),
-    link_source: z.nativeEnum(LinkSource).optional(),
+    link_source: z.enum(LinkSource).optional(),
     link_identifier: z.string().optional(),
   }),
   output: z.object({

@@ -376,7 +376,7 @@ const GroupForm = ({
       };
     } catch (e: any) {
       const zodError = e as ZodError;
-      const message = zodError.errors[0].message;
+      const message = zodError.message;
 
       allRequirements[index] = {
         ...allRequirements[index],
@@ -433,7 +433,7 @@ const GroupForm = ({
       } catch (e: any) {
         const zodError = e as ZodError;
         const errors = {};
-        zodError.errors.map((x) => {
+        zodError.issues.map((x) => {
           errors[x.path[0]] = x.message;
         });
 

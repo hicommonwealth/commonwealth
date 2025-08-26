@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 export const validation = z.object({
   date: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string({ error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
 });
 

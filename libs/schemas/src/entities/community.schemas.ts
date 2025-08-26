@@ -20,7 +20,7 @@ import { CommunityTags } from './tag.schemas';
 import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
-export const COMMUNITY_TIER = z.nativeEnum(CommunityTierMap);
+export const COMMUNITY_TIER = z.enum(CommunityTierMap);
 export const COMMUNITY_SPAM_TIER = z.union([
   z.literal(DisabledCommunitySpamTier),
   z.literal(UserTierMap.NewlyVerifiedWallet),
@@ -36,10 +36,10 @@ export const Community = z.object({
   chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),
   network: z.string().default(ChainNetwork.Ethereum),
-  base: z.nativeEnum(ChainBase),
+  base: z.enum(ChainBase),
   icon_url: z.string().nullish(),
   active: z.boolean(),
-  type: z.nativeEnum(ChainType).default(ChainType.Chain),
+  type: z.enum(ChainType).default(ChainType.Chain),
   description: z.string().nullish(),
   social_links: z.array(z.string().url().nullish()).default([]),
   ss58_prefix: PG_INT.nullish(),
@@ -49,7 +49,7 @@ export const Community = z.object({
   block_explorer_ids: z.string().nullish(),
   collapsed_on_homepage: z.boolean().default(false),
   default_summary_view: z.boolean().nullish(),
-  default_page: z.nativeEnum(DefaultPage).nullish(),
+  default_page: z.enum(DefaultPage).nullish(),
   has_homepage: z.enum(['true', 'false']).default('false').nullish(),
   terms: z.string().trim().or(z.literal('')).or(z.string().url()).nullish(),
   admin_only_polling: z.boolean().nullish(),
@@ -91,7 +91,7 @@ export const Community = z.object({
   CommunityTags: z.array(CommunityTags).nullish(),
   ChainNode: ChainNode.extend({
     url: z.string().max(255).nullish(),
-    balance_type: z.nativeEnum(BalanceType).nullish(),
+    balance_type: z.enum(BalanceType).nullish(),
     name: z.string().max(255).nullish(),
   }).nullish(),
   topics: z.array(Topic).optional(),

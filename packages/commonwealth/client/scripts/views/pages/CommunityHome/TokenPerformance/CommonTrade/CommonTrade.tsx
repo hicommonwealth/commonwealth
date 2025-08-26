@@ -1,16 +1,14 @@
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import CommonTradeTokenForm, {
-  useCommonTradeTokenForm,
-} from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm';
-import { CommonTradeTokenModalProps } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
-import TokenIcon from 'client/scripts/views/modals/TradeTokenModel/TokenIcon';
-import { SupportedCurrencies } from 'helpers/currency';
+import { SupportedCryptoCurrencies } from 'helpers/currency';
 import useBeforeUnload from 'hooks/useBeforeUnload';
 import React from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
+import CommonTradeTokenForm, {
+  useCommonTradeTokenForm,
+} from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm';
+import { CommonTradeTokenModalProps } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
+import TokenIcon from 'views/modals/TradeTokenModel/TokenIcon';
 
 import './CommonTrade.scss';
-
-const TRADING_CURRENCY = SupportedCurrencies.USD;
 
 export type CommonTradeProps = Omit<
   CommonTradeTokenModalProps,
@@ -22,8 +20,8 @@ const CommonTrade = ({ tradeConfig }: CommonTradeProps) => {
     useCommonTradeTokenForm({
       tradeConfig: {
         ...tradeConfig,
-        ethBuyCurrency: TRADING_CURRENCY,
-        buyTokenPresetAmounts: [100, 300, 1000],
+        buyCurrency: SupportedCryptoCurrencies.ETH,
+        buyTokenPresetAmounts: [0.000555, 0.00555, 0.0555],
         sellTokenPresetAmounts: ['Max'],
       },
       addressType: tradeConfig.addressType,

@@ -63,7 +63,7 @@ describe('userMentioned Event Handler', () => {
           user_id: user!.id,
         },
       ],
-      topics: [{}],
+      topics: [{ name: 'user-mentioned-test-topic' }],
     });
     [thread] = await tester.seed('Thread', {
       community_id: community!.id!,
@@ -129,7 +129,9 @@ describe('userMentioned Event Handler', () => {
       data: {
         community_id: community!.id,
         community_name: community!.name,
-        author: author?.profile.name,
+        author:
+          author?.profile.name ||
+          community!.Addresses![0].address.substring(0, 8),
         author_address_id: community!.Addresses![0].id,
         author_address: community!.Addresses![0].address,
         author_user_id: author!.id?.toString(),

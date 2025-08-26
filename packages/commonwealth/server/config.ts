@@ -207,8 +207,8 @@ export const config = configure(
           defaultCheck: DEFAULTS.SESSION_SECRET,
         }),
       ),
-      MAGIC_SUPPORTED_BASES: z.array(z.nativeEnum(ChainBase)),
-      MAGIC_DEFAULT_CHAIN: z.nativeEnum(ChainBase),
+      MAGIC_SUPPORTED_BASES: z.array(z.enum(ChainBase)),
+      MAGIC_DEFAULT_CHAIN: z.enum(ChainBase),
     }),
     TELEGRAM: z.object({
       BOT_TOKEN: z
@@ -289,7 +289,7 @@ export const config = configure(
     TWITTER: z
       .object({
         WORKER_POLL_INTERVAL: z.number().int().gte(0),
-        ENABLED_BOTS: z.array(z.nativeEnum(TwitterBotName)),
+        ENABLED_BOTS: z.array(z.enum(TwitterBotName)),
       })
       .refine((data) => {
         if (data.ENABLED_BOTS.length === 0) return true;
