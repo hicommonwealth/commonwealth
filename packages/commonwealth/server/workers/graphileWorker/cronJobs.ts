@@ -55,6 +55,6 @@ export const cronItems: Array<CustomCronItem | undefined> = [
     : undefined,
   buildCustomCronItem({
     task: GraphileTaskNames.RefreshMaterializedViews,
-    match: '*/15 * * * *',
+    match: '*/30 * * * *', // every 30 minutes
   }),
 ];
