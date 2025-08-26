@@ -1,24 +1,21 @@
-import { WalletId } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
-import useUserStore from 'state/ui/user';
 import FractionalValue from 'views/components/FractionalValue';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWIconButton } from 'views/components/component_kit/new_designs/CWIconButton/CWIconButton';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 // eslint-disable-next-line max-len
-import { WalletFundsModal } from 'views/modals/WalletFundsModal/WalletFundsModal';
+
 import RewardsCard from '../../RewardsCard';
 // import MagicWalletButton from './MagicWalletButton/MagicWalletButton';
 import AddressSelector from './AddressSelector/AddressSelector';
 import useAddressSelector from './AddressSelector/useAddressSelector';
+import MagicWalletButton from './MagicWalletButton/MagicWalletButton';
 import NetworkSelector from './NetworkSelector/NetworkSelector';
 import useNetworkSelector from './NetworkSelector/useNetworkSelector';
 import './WalletCard.scss';
@@ -33,15 +30,9 @@ const WalletCard = () => {
   const [activeTab, setActiveTab] = useState<WalletBalanceTabs>(
     WalletBalanceTabs.Tokens,
   );
-  const [isFundsModalOpen, setIsFundsModalOpen] = useState(false);
-  const user = useUserStore();
   const { selectedNetwork, setSelectedNetwork } = useNetworkSelector({});
   const { selectedAddress, setSelectedAddress, uniqueAddresses } =
     useAddressSelector();
-
-  const isSelectedAddressMagic =
-    user.addresses.find((a) => a.address === selectedAddress)?.walletId ===
-    WalletId.Magic;
 
   const { isLoadingTokensInfo, userCombinedUSDBalance, userTokens, refetch } =
     useUserWalletHoldings({
@@ -89,7 +80,7 @@ const WalletCard = () => {
           />
         </div>
         <CWText type="caption">
-          Showing total token balance for {selectedNetwork.label}
+          Total token balance for {selectedNetwork.label}
         </CWText>
         {isLoadingTokensInfo ? (
           <CWCircleMultiplySpinner />
@@ -99,7 +90,10 @@ const WalletCard = () => {
             <FractionalValue type="h4" value={userCombinedUSDBalance} />
           </CWText>
         )}
-        {/* <MagicWalletButton userSelectedAddress={userSelectedAddress} /> */}
+        <MagicWalletButton
+          userSelectedAddress={selectedAddress}
+          selectedNetworkChainId={selectedNetwork.value}
+        />
         <CWTabsRow>
           {Object.values(WalletBalanceTabs).map((tab) => (
             <CWTab
@@ -130,24 +124,7 @@ const WalletCard = () => {
             <CWText isCentered>🚧 Coming Soon, Hang tight!</CWText>
           )}
         </div>
-        {isSelectedAddressMagic && (
-          <CWButton
-            label="Deposit Funds"
-            buttonWidth="full"
-            type="submit"
-            buttonHeight="sm"
-            onClick={() => setIsFundsModalOpen(true)}
-          />
-        )}
       </div>
-      <CWModal
-        size="medium"
-        open={isFundsModalOpen}
-        onClose={() => setIsFundsModalOpen(false)}
-        content={
-          <WalletFundsModal onClose={() => setIsFundsModalOpen(false)} />
-        }
-      />
     </RewardsCard>
   );
 };

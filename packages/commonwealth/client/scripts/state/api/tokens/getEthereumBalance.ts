@@ -23,7 +23,11 @@ export const getEthereumBalance = async ({
 
 export const getEthereumBalanceQueryKey = (
   params: Omit<UseGetEthereumBalanceQueryProps, 'enabled'>,
-) => ['ethereum-balance', params.userAddress];
+) => [
+  'ethereum-balance',
+  params.userAddress,
+  params.rpcProvider?.sdk?.networkHash,
+];
 
 const useGetEthereumBalanceQuery = ({
   userAddress,

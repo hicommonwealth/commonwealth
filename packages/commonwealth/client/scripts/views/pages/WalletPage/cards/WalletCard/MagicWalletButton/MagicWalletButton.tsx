@@ -1,52 +1,34 @@
-import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { WalletId } from '@hicommonwealth/shared';
-import ClickAwayListener from '@mui/base/ClickAwayListener';
-import { notifySuccess } from 'controllers/app/notifications';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import React, { useState } from 'react';
-import { components } from 'react-select';
+import { MoonPayBuyWidget } from '@moonpay/moonpay-react';
+import React, { useEffect, useState } from 'react';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useGetEthereumBalanceQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { trpc } from 'utils/trpcClient';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import useAuthentication from 'views/modals/AuthModal/useAuthentication';
 import useMagicWallet from 'views/modals/WalletFundsModal/WalletFundsContent/useMagicWallet';
-import { formatUsdBalance } from 'views/modals/WalletFundsModal/WalletFundsContent/utils';
+import {
+  formatUsdBalance,
+  handleRefreshBalance,
+} from 'views/modals/WalletFundsModal/WalletFundsContent/utils';
 import './MagicWalletButton.scss';
 
 type MagicWalletButtonProps = {
-  userSelectedAddress?: string;
+  userSelectedAddress: string;
+  selectedNetworkChainId: number;
 };
 
-const chainOptions = [
-  {
-    label: 'Ethereum Base',
-    value: ValidChains.Base,
-    icon: 'base' as IconName,
-  },
-  {
-    label: 'Ethereum Mainnet',
-    value: ValidChains.Mainnet,
-    icon: 'ethereum' as IconName,
-  },
-] as const;
-
-const MagicWalletButton = ({ userSelectedAddress }: MagicWalletButtonProps) => {
+const MagicWalletButton = ({
+  userSelectedAddress,
+  selectedNetworkChainId,
+}: MagicWalletButtonProps) => {
   const user = useUserStore();
 
   const { openMagicWallet } = useAuthentication({});
-  const [selectedNetwork, setSelectedNetwork] = useState<{
-    label: string;
-    value: ValidChains;
-    icon: IconName;
-  }>(chainOptions[0]);
-  const [open, setIsOpen] = useState(false);
 
   const isSelectedAddressMagic =
     user.addresses.find((a) => a.address === userSelectedAddress)?.walletId ===
@@ -56,7 +38,10 @@ const MagicWalletButton = ({ userSelectedAddress }: MagicWalletButtonProps) => {
     magic,
     userAddress,
     isLoading: isMagicLoading,
-  } = useMagicWallet({ chainId: selectedNetwork.value });
+  } = useMagicWallet({ chainId: selectedNetworkChainId });
+
+  const [isMoonpayVisible, setIsMoonpayVisible] = useState(false);
+  const utils = trpc.useUtils();
 
   const {
     data: userBalance = '0',
@@ -72,6 +57,21 @@ const MagicWalletButton = ({ userSelectedAddress }: MagicWalletButtonProps) => {
     tokenSymbol: 'ETH',
   });
 
+  const handleCloseMoonpay = async () => {
+    setIsMoonpayVisible(false);
+    await handleRefreshBalance(refetch);
+  };
+
+  const onUrlSignatureRequested = async (url: string): Promise<string> => {
+    try {
+      const result = await utils.user.getMoonpaySignature.fetch({ url });
+      return result?.signature || '';
+    } catch (error) {
+      console.error('Failed to get MoonPay signature:', error);
+      throw new Error('Failed to get signature');
+    }
+  };
+
   const ethToUsdRate = parseFloat(
     ethToCurrencyRateData?.data?.data?.amount || '0',
   );
@@ -79,87 +79,61 @@ const MagicWalletButton = ({ userSelectedAddress }: MagicWalletButtonProps) => {
   const formattedBalanceUsd = formatUsdBalance(userBalance, ethToUsdRate);
   const isLoading = isMagicLoading || isBalanceLoading;
 
-  useNecessaryEffect(() => {
+  useEffect(() => {
+    if (isBalanceLoading) return;
     refetch();
-  }, [refetch, selectedNetwork.value, magic?.rpcProvider, userAddress]);
+  }, [selectedNetworkChainId, refetch, isBalanceLoading]);
 
   if (!isSelectedAddressMagic) return <></>;
 
   return (
     <div className="MagicWalletButton">
-      <CWText type="caption">
-        Showing balance for {selectedNetwork.label}
-      </CWText>
       <CWText className="usd-value">
         {isLoading ? (
           <CWCircleMultiplySpinner />
         ) : (
-          <>
-            {formattedBalanceUsd}
-            &ensp;
-            <CWIconButton
-              iconName="arrowClockwise"
-              className="refresh-btn"
-              disabled={isBalanceLoading}
-              onClick={() => {
-                if (isBalanceLoading) return;
-                refetch();
-                notifySuccess('Refreshed balance!');
-              }}
-            />
-          </>
+          `Wallet Balance ${formattedBalanceUsd}`
         )}
       </CWText>
+      <CWText type="caption" isCentered>
+        Deposit, and manage your funds for via Magic and Moonpay.
+      </CWText>
       <div className="button-container">
-        <CWIcon iconName="magic" />
+        <span>
+          <CWIcon iconName="magic" />
+        </span>
         <CWButton
           buttonType="secondary"
           buttonHeight="sm"
           buttonWidth="narrow"
-          label="Manage Funds"
+          label="Manage Funds via Magic"
           onClick={() => {
-            openMagicWallet(selectedNetwork.value).catch(console.error);
-          }}
-        />
-        <CWSelectList
-          components={{
-            // eslint-disable-next-line react/no-multi-comp
-            Option: (originalProps) => (
-              <components.Option {...originalProps}>
-                <CWIcon
-                  // eslint-disable-next-line react/destructuring-assignment
-                  iconName={originalProps.data.icon}
-                  iconSize="small"
-                />
-                {/* eslint-disable-next-line react/destructuring-assignment */}
-                {originalProps.data.label} ({originalProps.data.value})
-              </components.Option>
-            ),
-          }}
-          noOptionsMessage={() => ''}
-          value={selectedNetwork}
-          defaultValue={selectedNetwork}
-          formatOptionLabel={(option) => (
-            <ClickAwayListener onClickAway={() => setIsOpen(false)}>
-              <div onClick={() => setIsOpen(!open)}>
-                <CWIcon iconName={option.icon} iconSize="large" />
-                <CWText type="caption">{option.label.split(' ').at(-1)}</CWText>
-              </div>
-            </ClickAwayListener>
-          )}
-          menuIsOpen={open}
-          isClearable={false}
-          isSearchable={false}
-          options={chainOptions}
-          onChange={(option) => {
-            option && setSelectedNetwork(option);
-            setIsOpen(false);
+            openMagicWallet(selectedNetworkChainId).catch(console.error);
           }}
         />
       </div>
-      <CWText type="caption">
-        Buy, Send, and Receive funds for your magic wallet.
-      </CWText>
+      <div className="button-container">
+        <span>
+          <CWIcon iconName="moonpay" />
+        </span>
+        <CWButton
+          buttonType="secondary"
+          buttonHeight="sm"
+          buttonWidth="narrow"
+          label="Deposit Funds via Moonpay"
+          onClick={() => {
+            setIsMoonpayVisible(true);
+          }}
+        />
+      </div>
+      <MoonPayBuyWidget
+        variant="overlay"
+        visible={isMoonpayVisible}
+        walletAddress={userAddress}
+        onClose={handleCloseMoonpay}
+        onUrlSignatureRequested={onUrlSignatureRequested}
+        defaultCurrencyCode="eth_base"
+      />
     </div>
   );
 };
