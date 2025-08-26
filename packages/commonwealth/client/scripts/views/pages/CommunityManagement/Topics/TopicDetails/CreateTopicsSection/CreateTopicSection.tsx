@@ -240,7 +240,16 @@ export const CreateTopicSection = ({
           </div>
           {privateTopicsEnabled && (
             <CWCheckbox
-              label="Private topic"
+              label={
+                <div>
+                  <CWText type="b2">Private topic</CWText>
+                  <CWText type="caption" className="checkbox-label-caption">
+                    Only members of the selected group will be able to see and
+                    contribute to this topic. Admins always have access by
+                    default.
+                  </CWText>
+                </div>
+              }
               checked={isPrivate}
               onChange={() => setIsPrivate(!isPrivate)}
             />
