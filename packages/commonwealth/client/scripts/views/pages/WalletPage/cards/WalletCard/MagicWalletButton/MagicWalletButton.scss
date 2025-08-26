@@ -12,6 +12,10 @@
   padding: 8px;
   border-radius: 8px;
 
+  .refresh-btn {
+    cursor: pointer;
+  }
+
   .button-container {
     background-color: colors.$neutral-100;
     border: 1px solid colors.$purple-100;

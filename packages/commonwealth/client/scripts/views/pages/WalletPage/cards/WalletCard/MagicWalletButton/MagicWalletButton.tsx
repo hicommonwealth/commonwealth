@@ -1,15 +1,23 @@
 import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { WalletId } from '@hicommonwealth/shared';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
+import { notifySuccess } from 'controllers/app/notifications';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { useState } from 'react';
 import { components } from 'react-select';
+import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
+import { useGetEthereumBalanceQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import useAuthentication from 'views/modals/AuthModal/useAuthentication';
+import useMagicWallet from 'views/modals/WalletFundsModal/WalletFundsContent/useMagicWallet';
+import { formatUsdBalance } from 'views/modals/WalletFundsModal/WalletFundsContent/utils';
 import './MagicWalletButton.scss';
 
 type MagicWalletButtonProps = {
@@ -44,10 +52,64 @@ const MagicWalletButton = ({ userSelectedAddress }: MagicWalletButtonProps) => {
     user.addresses.find((a) => a.address === userSelectedAddress)?.walletId ===
     WalletId.Magic;
 
+  const {
+    magic,
+    userAddress,
+    isLoading: isMagicLoading,
+  } = useMagicWallet({ chainId: selectedNetwork.value });
+
+  const {
+    data: userBalance = '0',
+    isLoading: isBalanceLoading,
+    refetch,
+  } = useGetEthereumBalanceQuery({
+    userAddress,
+    rpcProvider: magic?.rpcProvider,
+    enabled: !!userAddress && !!magic?.rpcProvider,
+  });
+
+  const { data: ethToCurrencyRateData } = useFetchTokenUsdRateQuery({
+    tokenSymbol: 'ETH',
+  });
+
+  const ethToUsdRate = parseFloat(
+    ethToCurrencyRateData?.data?.data?.amount || '0',
+  );
+
+  const formattedBalanceUsd = formatUsdBalance(userBalance, ethToUsdRate);
+  const isLoading = isMagicLoading || isBalanceLoading;
+
+  useNecessaryEffect(() => {
+    refetch();
+  }, [refetch, selectedNetwork.value, magic?.rpcProvider, userAddress]);
+
   if (!isSelectedAddressMagic) return <></>;
 
   return (
     <div className="MagicWalletButton">
+      <CWText type="caption">
+        Showing balance for {selectedNetwork.label}
+      </CWText>
+      <CWText className="usd-value">
+        {isLoading ? (
+          <CWCircleMultiplySpinner />
+        ) : (
+          <>
+            {formattedBalanceUsd}
+            &ensp;
+            <CWIconButton
+              iconName="arrowClockwise"
+              className="refresh-btn"
+              disabled={isBalanceLoading}
+              onClick={() => {
+                if (isBalanceLoading) return;
+                refetch();
+                notifySuccess('Refreshed balance!');
+              }}
+            />
+          </>
+        )}
+      </CWText>
       <div className="button-container">
         <CWIcon iconName="magic" />
         <CWButton
