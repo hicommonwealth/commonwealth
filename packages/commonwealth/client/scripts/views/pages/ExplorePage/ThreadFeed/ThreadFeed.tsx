@@ -156,6 +156,7 @@ export const ThreadFeed = ({
   }
 
   const allThreads =
+    // @ts-expect-error User is required in one of the results
     feed?.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [];
 
   const openModal = (thread: Thread) => {

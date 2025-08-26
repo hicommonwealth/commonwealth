@@ -49,6 +49,7 @@ describe('User lifecycle', () => {
 
   beforeAll(async () => {
     const { community, actors } = await seedCommunity({
+      id: 'user-lifecycle-test-community',
       roles: ['admin', 'member', 'superadmin'],
     });
     community_id = community!.id;
@@ -82,6 +83,8 @@ describe('User lifecycle', () => {
       xp: x.xp_points,
       creator: x.creator_profile?.name,
       creator_xp: x.creator_xp_points,
+      referrer: x.referrer_profile?.name,
+      referrer_xp: x.referrer_xp_points,
     }));
     console.table(table);
   }
@@ -211,6 +214,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![0].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: logs[0].created_at,
           scope: {
             community_id,
@@ -228,6 +233,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: logs[1].created_at,
           scope: {
             community_id,
@@ -246,6 +253,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: logs[2].created_at,
           scope: {
             community_id,
@@ -264,6 +273,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![2].id,
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: logs[3].created_at,
           scope: {
             community_id,
@@ -535,6 +546,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![0].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: last[0].created_at,
           scope: {
             community_id,
@@ -552,6 +565,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: last[1].created_at,
           scope: {
             community_id,
@@ -570,6 +585,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![2].id,
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: last[2].created_at,
           scope: {
             community_id,
@@ -586,8 +603,10 @@ describe('User lifecycle', () => {
           xp_points: 10,
           name: null,
           action_meta_id: updated!.action_metas![3].id,
-          creator_user_id: member.user.id,
-          creator_xp_points: 10,
+          creator_user_id: null,
+          creator_xp_points: null,
+          referrer_user_id: member.user.id,
+          referrer_xp_points: 10,
           created_at: last[3].created_at,
           scope: {
             community_id,
@@ -601,8 +620,10 @@ describe('User lifecycle', () => {
           xp_points: 16,
           name: null,
           action_meta_id: -1, // this is system quest action
-          creator_user_id: member.user.id,
-          creator_xp_points: 4,
+          creator_user_id: null,
+          creator_xp_points: null,
+          referrer_user_id: member.user.id,
+          referrer_xp_points: 4,
           created_at: last[4].created_at,
           scope: null,
         },
@@ -1073,30 +1094,33 @@ describe('User lifecycle', () => {
         actor: admin,
         payload: {},
       });
-      logTable(logs.sort((a, b) => b.xp_points - a.xp_points));
+      logTable(logs.sort((a, b) => b.user_id - a.user_id));
 
       const xps1 = await query(GetXpsRanked(), {
         actor: admin,
         payload: { limit: 10, cursor: 1 },
       });
       expect(xps1!.totalResults).to.equal(4);
-      // member has
+      // member has 203 total points
+      //   42 awarded points
       //   25+18+18+13+12+11+10+10+10+10+10=147 xp points
-      //   4+10 creator points
-      //   42 awarded points = 203 total
-      // admin has
+      //   4+10 referrer points
+      // admin has 50 total points
       //   11+10+10+5+5+5 xp points
-      //   2+2 creator points = 50 total
-      // new_user has
-      //   16+11+10 xp points = 37 total
+      //   2+2 creator points
+      // new_user has 37 total points
+      //   16+11+10 xp points
       // superadmin has
       //   11 xp points
-      expect(xps1.results?.map((x) => x.xp_points)).to.deep.eq([203, 50, 37, 11]);
+      expect(xps1.results?.map((x) => x.xp_points)).to.deep.eq([
+        203, 50, 37, 11,
+      ]);
 
       const xps2 = await query(GetXpsRanked(), {
         actor: admin,
-        payload: { limit: 10,cursor: 1, quest_id: -1 },
+        payload: { limit: 10, cursor: 1, quest_id: -1 },
       });
+      console.log(xps2);
       expect(xps2!.totalResults).to.equal(2);
       // new_user has 16 for SignUpFlowCompleted
       // member has

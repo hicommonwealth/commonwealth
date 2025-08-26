@@ -481,7 +481,7 @@ export const events = {
   WalletLinked: z.object({
     user_id: z.number(),
     new_user: z.boolean(),
-    wallet_id: z.nativeEnum(WalletId),
+    wallet_id: z.enum(WalletId),
     community_id: z.string(),
     balance: z.string(),
     created_at: z.coerce.date(),
@@ -490,7 +490,7 @@ export const events = {
   SSOLinked: z.object({
     user_id: z.number(),
     new_user: z.boolean(),
-    oauth_provider: z.nativeEnum(WalletSsoSource),
+    oauth_provider: z.enum(WalletSsoSource),
     community_id: z.string(),
     created_at: z.coerce.date(),
   }),

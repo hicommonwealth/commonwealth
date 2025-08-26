@@ -22,6 +22,7 @@ const useGetThreadsByIdQuery = ({
     {
       staleTime: THREAD_STALE_TIME,
       enabled: apiCallEnabled,
+      // @ts-expect-error User is required in one of the results
       select: (data) => data.map((t) => new Thread(t)),
     },
   );

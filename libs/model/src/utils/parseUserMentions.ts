@@ -1,4 +1,5 @@
 import { Comment, Thread, events } from '@hicommonwealth/schemas';
+import { MCP_MENTION_SYMBOL } from '@hicommonwealth/shared';
 import { Transaction } from 'sequelize';
 import z from 'zod';
 import { models } from '../database';
@@ -15,6 +16,12 @@ export type UserMentionQuery = {
   user_id: number;
   profile_name: string;
 }[];
+
+export type MCPMention = {
+  handle: string;
+  id: string;
+  name: string;
+};
 
 const hash = (mention: UserMention) =>
   `name:${mention.profileName}id:${mention.userId}`;
@@ -117,4 +124,34 @@ export const emitMentions = async (
 
     await emitEvent(models.Outbox, values, transaction);
   }
+};
+
+/**
+ * Extracts MCP server mentions from comment text using regex
+ * @param commentBody The comment text to parse
+ * @returns Array of objects containing handle and id for each mentioned MCP server
+ */
+export const extractMCPMentions = (commentBody: string): MCPMention[] => {
+  // Regex pattern matches: [/MCPServerName](/mcp-server/handle/id)
+  const mcpMentionPattern = new RegExp(
+    `\\[\\${MCP_MENTION_SYMBOL}([^\\]]+)\\]\\(\\/mcp-server\\/([^/]+\\/[^)]+)\\)`,
+    'g',
+  );
+  const mentions: MCPMention[] = [];
+  let match;
+
+  while ((match = mcpMentionPattern.exec(commentBody)) !== null) {
+    const handleAndId = match[2]; // This will be "handle/id"
+    const [handle, id] = handleAndId.split('/');
+
+    if (handle && id) {
+      mentions.push({
+        name: match[1], // Display name
+        handle: handle, // Server handle
+        id: id, // Server ID
+      });
+    }
+  }
+
+  return mentions;
 };
