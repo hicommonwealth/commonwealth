@@ -14,29 +14,27 @@ async function createQuestMaterializedView(
   const viewName = getQuestXpLeaderboardViewName(quest_id);
   await models.sequelize.query(
     `
-    CREATE MATERIALIZED VIEW ${viewName} AS
+    CREATE MATERIALIZED VIEW "${viewName}" AS
       WITH user_xp_combined AS (
           SELECT
               l.user_id as user_id,
-              q.id as quest_id,
               l.xp_points as xp_points,
               0 as creator_xp_points
           FROM "XpLogs" l
                    JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
                    JOIN "Quests" q ON m.quest_id = q.id
-          WHERE l.user_id IS NOT NULL
+          WHERE l.user_id IS NOT NULL AND q.id = ${quest_id}
       
           UNION ALL
       
           SELECT
               l.creator_user_id as user_id,
-              q.id as quest_id,
               0 as xp_points,
               l.creator_xp_points as creator_xp_points
           FROM "XpLogs" l
                    JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
                    JOIN "Quests" q ON m.quest_id = q.id
-          WHERE l.creator_user_id IS NOT NULL
+          WHERE l.creator_user_id IS NOT NULL AND q.id = ${quest_id}
       ),
            aggregated_xp AS (
                SELECT
@@ -45,13 +43,13 @@ async function createQuestMaterializedView(
                    SUM(xp_points)::int as total_user_xp,
                    SUM(creator_xp_points)::int as total_creator_xp
                FROM user_xp_combined
-               GROUP BY user_id, quest_id
+               GROUP BY user_id
            )
       SELECT
           a.user_id,
           (a.total_user_xp + a.total_creator_xp) as total_xp,
           u.tier,
-          ROW_NUMBER() OVER (PARTITION BY a.quest_id ORDER BY (a.total_user_xp + a.total_creator_xp) DESC, a.user_id ASC)::int as rank
+          ROW_NUMBER() OVER (ORDER BY (a.total_user_xp + a.total_creator_xp) DESC, a.user_id ASC)::int as rank
       FROM aggregated_xp a
                JOIN "Users" u ON a.user_id = u.id
       WHERE u.tier > 1;
@@ -61,16 +59,16 @@ async function createQuestMaterializedView(
 
   await models.sequelize.query(
     `
-    CREATE UNIQUE INDEX idx_quest_xp_leaderboard_user_id 
-    ON ${viewName} (user_id)
+    CREATE UNIQUE INDEX "${viewName}_user_id"
+    ON "${viewName}" (user_id)
   `,
     { transaction },
   );
 
   await models.sequelize.query(
     `
-    CREATE INDEX idx_quest_xp_leaderboard_user_id 
-    ON ${viewName} (rank DESC);
+    CREATE INDEX "${viewName}_rank"
+    ON "${viewName}" (rank DESC);
   `,
     { transaction },
   );

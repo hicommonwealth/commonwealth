@@ -24,7 +24,7 @@ export const refreshMaterializedViews = async (): Promise<void> => {
 
   for (const { id } of activeQuests) {
     await models.sequelize.query(`
-      REFRESH MATERIALIZED VIEW CONCURRENTLY ${getQuestXpLeaderboardViewName(id!)}
+      REFRESH MATERIALIZED VIEW CONCURRENTLY "${getQuestXpLeaderboardViewName(id!)}"
     `);
   }
 };
