@@ -83,7 +83,7 @@ export const prettyVoteWeight = (
       ? parseInt(wei) * multiplier
       : calculateVoteWeight(weiStr, multiplier || 1);
 
-  // for non-weighted and stake, apply formatting for large numbers
+  // for non-weighted and stake or sui nft, apply formatting for large numbers
   if (
     !weightType ||
     [TopicWeightedVoting.Stake, TopicWeightedVoting.SuiNFT].includes(weightType)
