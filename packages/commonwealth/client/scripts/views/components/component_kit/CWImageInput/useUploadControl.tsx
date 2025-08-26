@@ -81,22 +81,38 @@ export const useUploadControl = ({
 
   const isLoading = isUploadingImage || isGeneratingImage || loading;
   const areActionsDisabled = disabled || !imageInputRef.current || isLoading;
+  const ignoreNextClickRef = useRef(false);
 
   const openFilePicker = () => {
     if (areActionsDisabled) return;
+
+    // Ignore the next click triggered when the native file picker closes
+    ignoreNextClickRef.current = true;
 
     imageInputRef?.current?.click();
   };
 
   const handlePickedFile = useCallback(
     (inputEvent: InputEvent) => {
-      const file = inputEvent?.target
-        ? (inputEvent.target as HTMLInputElement)?.files?.[0]
+      const target = inputEvent?.target
+        ? (inputEvent.target as HTMLInputElement)
         : null;
+      const file = target?.files?.[0] || null;
 
       if (areActionsDisabled || !file) return;
 
-      uploadPickedImage({ file }).catch(console.error);
+      // Clear the value of the input so that selecting the same file again
+      // will trigger a new change event and prevent accidental re-uploads
+      // caused by the input retaining its previous value.
+      uploadPickedImage({ file })
+        .catch(console.error)
+        .finally(() => {
+          if (target) {
+            target.value = '';
+          }
+          // Reset the suppression flag in case no click event fires
+          ignoreNextClickRef.current = false;
+        });
     },
     [areActionsDisabled, uploadPickedImage],
   );
@@ -408,6 +424,7 @@ export const useUploadControl = ({
     formFieldErrorMessage,
     imageToRender,
     openFilePicker,
+    ignoreNextClickRef,
     registeredFormContext,
     dropzoneRef,
     imageInputRef,
