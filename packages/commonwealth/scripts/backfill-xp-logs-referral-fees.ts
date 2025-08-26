@@ -15,6 +15,7 @@ async function main() {
   await models.sequelize.query(`
     ALTER TABLE "XpLogs" ADD COLUMN IF NOT EXISTS backfill_referrer_user_id INT;
     ALTER TABLE "XpLogs" ADD COLUMN IF NOT EXISTS backfill_referrer_xp_points INT;
+    ALTER TABLE "XpLogs" ADD COLUMN IF NOT EXISTS backfill_is_referral_event BOOLEAN;
   `);
 
   const batchSize = 50_000;
@@ -69,7 +70,8 @@ updated as ( -- update backfill columns with correct values
     backfill_referrer_xp_points = CASE
       WHEN l.is_referral_event = TRUE THEN l.reward_amount * l.creator_reward_weight
       ELSE l.reward_amount * 0.1 -- 10% referral on non-referral events
-    END
+    END,
+    backfill_is_referral_event = l.is_referral_event
   FROM l
   WHERE xl.id = l.log_id
   RETURNING id
