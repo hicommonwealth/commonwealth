@@ -1,30 +1,26 @@
-import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import { WalletId } from '@hicommonwealth/shared';
 import { notifySuccess } from 'controllers/app/notifications';
-import { getUniqueUserAddresses } from 'helpers/user';
 import React, { useState } from 'react';
 import useUserStore from 'state/ui/user';
 import FractionalValue from 'views/components/FractionalValue';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWIconButton } from 'views/components/component_kit/new_designs/CWIconButton/CWIconButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import {
-  CustomAddressOption,
-  CustomAddressOptionElement,
-} from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
-import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import { WalletFundsModal } from 'views/modals/WalletFundsModal/WalletFundsModal';
 import RewardsCard from '../../RewardsCard';
-import MagicWalletButton from './MagicWalletButton/MagicWalletButton';
+// import MagicWalletButton from './MagicWalletButton/MagicWalletButton';
+import AddressSelector from './AddressSelector/AddressSelector';
+import useAddressSelector from './AddressSelector/useAddressSelector';
+import NetworkSelector from './NetworkSelector/NetworkSelector';
+import useNetworkSelector from './NetworkSelector/useNetworkSelector';
 import './WalletCard.scss';
 import useUserWalletHoldings from './useUserWalletHoldings';
 
@@ -39,22 +35,18 @@ const WalletCard = () => {
   );
   const [isFundsModalOpen, setIsFundsModalOpen] = useState(false);
   const user = useUserStore();
-
-  const uniqueAddresses = getUniqueUserAddresses({
-    forChain: ChainBase.Ethereum,
-  });
-
-  const [userSelectedAddress, setUserSelectedAddress] = useState<string>(
-    uniqueAddresses[0],
-  );
+  const { selectedNetwork, setSelectedNetwork } = useNetworkSelector({});
+  const { selectedAddress, setSelectedAddress, uniqueAddresses } =
+    useAddressSelector();
 
   const isSelectedAddressMagic =
-    user.addresses.find((a) => a.address === userSelectedAddress)?.walletId ===
+    user.addresses.find((a) => a.address === selectedAddress)?.walletId ===
     WalletId.Magic;
 
   const { isLoadingTokensInfo, userCombinedUSDBalance, userTokens, refetch } =
     useUserWalletHoldings({
-      userSelectedAddress,
+      userSelectedAddress: selectedAddress,
+      selectedNetworkChainId: selectedNetwork.value,
     });
 
   const handleRefresh = async () => {
@@ -79,43 +71,35 @@ const WalletCard = () => {
       }
     >
       <div className="WalletCard">
-        <CWSelectList
-          components={{
-            Option: (originalProps) =>
-              CustomAddressOption({
-                originalProps,
-                selectedAddressValue: userSelectedAddress || '',
-              }),
-          }}
-          noOptionsMessage={() => 'No available Metamask address'}
-          value={convertAddressToDropdownOption(userSelectedAddress || '')}
-          defaultValue={convertAddressToDropdownOption(
-            userSelectedAddress || '',
-          )}
-          formatOptionLabel={(option) => (
-            <CustomAddressOptionElement
-              value={option.value}
-              label={option.label}
-              selectedAddressValue={userSelectedAddress || ''}
-            />
-          )}
-          label="Select address"
-          isClearable={false}
-          isSearchable={false}
-          options={(uniqueAddresses || [])?.map(convertAddressToDropdownOption)}
-          onChange={(option) =>
-            option?.value && setUserSelectedAddress(option.value)
-          }
-        />
+        <div className="network-address-selector">
+          <AddressSelector
+            address={selectedAddress}
+            addressList={uniqueAddresses}
+            onAddressSelected={(address) => {
+              setSelectedAddress(address);
+              handleRefresh().catch(console.error);
+            }}
+          />
+          <NetworkSelector
+            network={selectedNetwork}
+            onNetworkSelected={(network) => {
+              setSelectedNetwork(network);
+              handleRefresh().catch(console.error);
+            }}
+          />
+        </div>
         <CWText type="caption">
-          Showing balance for Ethereum on Base (EVM)
+          Showing total token balance for {selectedNetwork.label}
         </CWText>
-        <CWText type="h4">
-          $&nbsp;
-          <FractionalValue type="h4" value={userCombinedUSDBalance} />
-        </CWText>
-        <CWDivider />
-        <MagicWalletButton userSelectedAddress={userSelectedAddress} />
+        {isLoadingTokensInfo ? (
+          <CWCircleMultiplySpinner />
+        ) : (
+          <CWText type="h4">
+            $&nbsp;
+            <FractionalValue type="h4" value={userCombinedUSDBalance} />
+          </CWText>
+        )}
+        {/* <MagicWalletButton userSelectedAddress={userSelectedAddress} /> */}
         <CWTabsRow>
           {Object.values(WalletBalanceTabs).map((tab) => (
             <CWTab
