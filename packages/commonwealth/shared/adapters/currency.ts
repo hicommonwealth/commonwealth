@@ -72,6 +72,7 @@ export const prettyVoteWeight = (
   weightType?: TopicWeightedVoting | null | undefined,
   multiplier: number = 1,
   decimalsOverride?: number, // number of digits after decimal
+  tokenSymbol?: string,
 ): string => {
   const weiStr = parseFloat(wei).toLocaleString('fullwide', {
     useGrouping: false,
@@ -87,7 +88,16 @@ export const prettyVoteWeight = (
     !weightType ||
     [TopicWeightedVoting.Stake, TopicWeightedVoting.SuiNFT].includes(weightType)
   ) {
-    const rawNumber = parseFloat((weiValue || 0).toString());
+    let rawNumber = parseFloat((weiValue || 0).toString());
+
+    // Sui NAVX NFTs use voting power with 9 decimals
+    if (
+      weightType === TopicWeightedVoting.SuiNFT &&
+      ['NAVX', 'veNAVX'].includes(tokenSymbol!)
+    ) {
+      rawNumber /= 10 ** 9;
+    }
+
     // Apply formatting for large numbers to improve readability
     if (rawNumber >= 1000) {
       return formatBigNumberShort(rawNumber, 2);
