@@ -1,9 +1,10 @@
-import { InvalidState, type Command } from '@hicommonwealth/core';
+import { command, InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { systemActor } from '../../middleware/auth';
 import { mustExist } from '../../middleware/guards';
 import { getBotUser } from '../../utils/botUser';
+import { JoinCommunity } from '../community';
 import { CreateComment } from './CreateComment.command';
 
 export const CreateAICompletionCommentErrors = {
@@ -19,7 +20,7 @@ export function CreateAICompletionComment(): Command<
 > {
   return {
     ...schemas.CreateAICompletionComment,
-    auth: [], // No authentication required - token-based access
+    auth: [],
     body: async ({ payload }) => {
       const { token } = payload;
 
@@ -37,14 +38,14 @@ export function CreateAICompletionComment(): Command<
         throw new InvalidState(CreateAICompletionCommentErrors.TokenExpired);
       }
 
-      // Get the bot user
-      const botUser = await getBotUser();
+      // Get the bot user with address
+      const { user: botUser, address: botUserAddress } = await getBotUser();
       if (!botUser) {
         throw new InvalidState(CreateAICompletionCommentErrors.BotUserNotFound);
       }
 
-      // Find the bot user's address in the community
-      const botAddress = await models.Address.findOne({
+      // Find the bot user's address in the specific community
+      let botAddress = await models.Address.findOne({
         where: {
           user_id: botUser.id,
           community_id: completionToken.community_id,
@@ -52,9 +53,33 @@ export function CreateAICompletionComment(): Command<
       });
 
       if (!botAddress) {
-        throw new InvalidState(
-          CreateAICompletionCommentErrors.BotAddressNotFound,
-        );
+        // Join community using the bot's primary address
+        const botActor = systemActor({
+          address: botUserAddress.address,
+          id: botUser.id!,
+          email: botUser.email || 'ai-bot@common.xyz',
+        });
+
+        await command(JoinCommunity(), {
+          actor: botActor,
+          payload: { community_id: completionToken.community_id },
+        });
+
+        // Fetch the newly created address
+        const newBotAddress = await models.Address.findOne({
+          where: {
+            user_id: botUser.id,
+            community_id: completionToken.community_id,
+          },
+        });
+
+        if (!newBotAddress) {
+          throw new InvalidState(
+            CreateAICompletionCommentErrors.BotAddressNotFound,
+          );
+        }
+
+        botAddress = newBotAddress;
       }
 
       // Get the thread to use as context

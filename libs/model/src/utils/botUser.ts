@@ -1,22 +1,37 @@
 import { config } from '../config';
 import { models } from '../database';
+import type { AddressInstance } from '../models/address';
 import type { UserInstance } from '../models/user';
 
-/**
- * Gets the AI bot user from the database using the AI_BOT_USER_ID environment variable
- * @returns Promise<UserInstance> The bot user instance
- * @throws Error if AI_BOT_USER_ID is not set or bot user is not found
- */
-export const getBotUser = async (): Promise<UserInstance> => {
-  const botUserId = config.AI.BOT_USER_ID;
-  if (!botUserId) {
-    throw new Error('AI_BOT_USER_ID environment variable is not set');
+export interface BotUserWithAddress {
+  user: UserInstance;
+  address: AddressInstance;
+}
+
+export const getBotUser = async (): Promise<BotUserWithAddress> => {
+  const botUserAddress = config.AI.BOT_USER_ADDRESS;
+  if (!botUserAddress) {
+    throw new Error('AI_BOT_USER_ADDRESS environment variable is not set');
   }
 
-  const botUser = await models.User.findByPk(botUserId);
-  if (!botUser) {
-    throw new Error(`Bot user with ID ${botUserId} not found in database`);
+  const address = await models.Address.findOne({
+    where: { address: botUserAddress },
+    include: [
+      {
+        model: models.User,
+        required: true,
+      },
+    ],
+  });
+
+  if (!address || !address.User) {
+    throw new Error(
+      `Bot user with address ${botUserAddress} not found in database`,
+    );
   }
 
-  return botUser;
+  return {
+    user: address.User! as UserInstance,
+    address,
+  };
 };
