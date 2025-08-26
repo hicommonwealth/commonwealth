@@ -1,7 +1,7 @@
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import React, { useEffect, useState } from 'react';
 import type { Topic } from '../../models/Topic';
-import { useCommonNavigate } from '../../navigation/helpers';
+import { getScopePrefix, useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
 import {
   useEditTopicMutation,
@@ -83,10 +83,22 @@ export const EditTopicModal = ({
   const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
   const communityId = app.activeChainId() || '';
 
-  const { data: groups } = useFetchGroupsQuery({
+  const { data: groups, refetch: refetchGroups } = useFetchGroupsQuery({
     communityId: communityId,
     enabled: !!communityId,
   });
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        refetchGroups();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [refetchGroups]);
 
   const { data: topicData } = useGetTopicByIdQuery({
     topicId: id ?? 0,
@@ -328,7 +340,19 @@ export const EditTopicModal = ({
         {privateTopicsEnabled && isPrivate && (
           <CWSelectList
             isMulti
-            label="Allowed groups"
+            label={
+              <div>
+                Allowed groups{' '}
+                <a
+                  href={`${getScopePrefix()}/members/groups/create`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Create group
+                </a>
+              </div>
+            }
+            instructionalMessage="Create a group in a new tab, then return to see it here."
             options={groups?.map((g) => ({ label: g.name, value: g.id }))}
             value={groups
               ?.filter((g) => selectedGroups.includes(g.id))

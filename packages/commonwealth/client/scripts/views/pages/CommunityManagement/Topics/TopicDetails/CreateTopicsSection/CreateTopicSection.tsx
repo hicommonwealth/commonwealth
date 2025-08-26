@@ -4,6 +4,7 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { getScopePrefix } from 'navigation/helpers';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -69,10 +70,22 @@ export const CreateTopicSection = ({
   const [isPrivate, setIsPrivate] = useState(false);
   const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
 
-  const { data: groups } = useFetchGroupsQuery({
+  const { data: groups, refetch: refetchGroups } = useFetchGroupsQuery({
     communityId: communityId,
     enabled: !!communityId,
   });
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        refetchGroups();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [refetchGroups]);
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
@@ -257,7 +270,19 @@ export const CreateTopicSection = ({
           {privateTopicsEnabled && isPrivate && (
             <CWSelectList
               isMulti
-              label="Allowed groups"
+              label={
+                <div>
+                  Allowed groups{' '}
+                  <a
+                    href={`${getScopePrefix()}/members/groups/create`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Create group
+                  </a>
+                </div>
+              }
+              instructionalMessage="Create a group in a new tab, then return to see it here."
               options={groups?.map((g) => ({ label: g.name, value: g.id }))}
               value={groups
                 ?.filter((g) => selectedGroups.includes(g.id))
