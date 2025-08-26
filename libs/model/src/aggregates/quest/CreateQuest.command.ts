@@ -19,7 +19,8 @@ async function createQuestMaterializedView(
           SELECT
               l.user_id as user_id,
               l.xp_points as xp_points,
-              0 as creator_xp_points
+              0 as creator_xp_points,
+              0 as referrer_xp_points
           FROM "XpLogs" l
                    JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
                    JOIN "Quests" q ON m.quest_id = q.id
@@ -30,7 +31,20 @@ async function createQuestMaterializedView(
           SELECT
               l.creator_user_id as user_id,
               0 as xp_points,
-              l.creator_xp_points as creator_xp_points
+              l.creator_xp_points as creator_xp_points,
+              0 as referrer_xp_points
+          FROM "XpLogs" l
+                   JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
+                   JOIN "Quests" q ON m.quest_id = q.id
+          WHERE l.creator_user_id IS NOT NULL AND q.id = ${quest_id}
+          
+          UNION ALL
+          
+          SELECT
+              l.referrer_user_id as user_id,
+              0 as xp_points,
+              0 as creator_xp_points,
+              l.referrer_xp_points as referrer_xp_points
           FROM "XpLogs" l
                    JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
                    JOIN "Quests" q ON m.quest_id = q.id
@@ -39,15 +53,15 @@ async function createQuestMaterializedView(
            aggregated_xp AS (
                SELECT
                    user_id,
-                   quest_id,
                    SUM(xp_points)::int as total_user_xp,
-                   SUM(creator_xp_points)::int as total_creator_xp
+                   SUM(creator_xp_points)::int as total_creator_xp,
+                   SUM(referrer_xp_points)::int as total_referrer_xp
                FROM user_xp_combined
                GROUP BY user_id
            )
       SELECT
           a.user_id,
-          (a.total_user_xp + a.total_creator_xp) as total_xp,
+          (a.total_user_xp + a.total_creator_xp + a.total_referrer_xp) as xp_points,
           u.tier,
           ROW_NUMBER() OVER (ORDER BY (a.total_user_xp + a.total_creator_xp) DESC, a.user_id ASC)::int as rank
       FROM aggregated_xp a
