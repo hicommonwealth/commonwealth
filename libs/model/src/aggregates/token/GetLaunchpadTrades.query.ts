@@ -9,7 +9,11 @@ export function GetLaunchpadTrades(): Query<typeof schemas.GetLaunchpadTrades> {
     ...schemas.GetLaunchpadTrades,
     auth: [],
     body: async ({ payload }) => {
-      if (!payload.token_address && !payload.trader_addresses) {
+      if (
+        !payload.token_address &&
+        !payload.trader_addresses &&
+        !payload.user_id
+      ) {
         throw new AppError('Must provide a parameter');
       }
 
@@ -26,6 +30,8 @@ export function GetLaunchpadTrades(): Query<typeof schemas.GetLaunchpadTrades> {
         whereClauseCondition = `WHERE tokens.token_address = :token_address`;
       } else if (payload.trader_addresses && uniqueAddresses.length > 0) {
         whereClauseCondition = `WHERE trades.trader_address IN (:uniqueAddresses)`;
+      } else if (payload.user_id) {
+        whereClauseCondition = `WHERE trades.trader_address IN (SELECT address FROM "Addresses" WHERE user_id = :user_id)`;
       }
 
       const trades = await models.sequelize.query(
@@ -52,13 +58,14 @@ export function GetLaunchpadTrades(): Query<typeof schemas.GetLaunchpadTrades> {
             ORDER BY address, id
           ) a ON true
           LEFT JOIN
-            "Users" u ON u.id = a.user_id
+            "Users" u ON u.id = a.user_id ${''}
           ${whereClauseCondition}
         `,
         {
           replacements: {
             token_address: payload.token_address,
             uniqueAddresses: uniqueAddresses,
+            user_id: payload.user_id,
           },
           type: QueryTypes.SELECT,
         },

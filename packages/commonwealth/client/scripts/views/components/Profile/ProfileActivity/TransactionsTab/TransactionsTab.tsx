@@ -2,6 +2,7 @@ import { GetLaunchpadTrades } from '@hicommonwealth/schemas';
 import { formatUnits } from 'ethers/lib/utils';
 import { formatAddressShort } from 'helpers';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import { useGetLaunchpadTradesQuery } from 'state/api/launchPad';
 import { useTokensMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
@@ -115,11 +116,15 @@ const TransactionsTab = ({
     }));
   }, [searchText]);
 
-  const user = useUserStore();
+  const location = useLocation();
+  const pathParts = location.pathname.split('/');
+  const user_id = parseInt(pathParts[pathParts.length - 1]);
 
   const { data: launchpadData } = useGetLaunchpadTradesQuery({
-    trader_addresses: user.addresses.map((u) => u.address),
+    user_id,
   });
+
+  const user = useUserStore();
 
   const hasMagic = user.hasMagicWallet;
 
