@@ -83,7 +83,6 @@ export function GetXpsRanked(): Query<typeof schemas.GetXpsRanked> {
           bind,
           type: QueryTypes.SELECT,
           raw: true,
-          logging: console.log,
         }),
         models.sequelize.query<{ count: string }>(countSql, {
           bind,
