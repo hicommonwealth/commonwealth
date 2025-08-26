@@ -41,9 +41,8 @@ async function getUserByAddress(address: string) {
       [Op.and]: [
         {
           [Op.or]: [
-            { address: address }, // exact match
-            { address: address.toLowerCase() }, // lowercase variant
-            { address: address.toUpperCase() }, // uppercase variant (optional)
+            { address: address.toLowerCase() },
+            { address: getEvmAddress(address) },
           ],
         },
         { user_id: { [Op.not]: null } },
