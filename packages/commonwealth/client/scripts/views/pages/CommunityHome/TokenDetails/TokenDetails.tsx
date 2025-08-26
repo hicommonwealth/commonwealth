@@ -1,4 +1,6 @@
+import { ChainBase } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'client/scripts/helpers';
+import app from 'client/scripts/state';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
 import { CWIconButton } from 'client/scripts/views/components/component_kit/cw_icon_button';
@@ -55,6 +57,7 @@ const TokenDetails = ({
   // Use values directly from hook (market cap fallback is handled inside hook)
   const finalMarketCap = tokenPricing?.marketCapCurrent;
   const displayPrice = tokenPricing?.currentPrice; // Use price directly from hook
+  const isEvmChain = app.chain.base === ChainBase.Ethereum;
 
   return (
     <div className="token-details">
@@ -88,64 +91,68 @@ const TokenDetails = ({
       </div>
 
       <div className="token-stats">
-        <div className="stat-item">
-          <CWText type="b1" className="faded">
-            24h Change
-          </CWText>
-          <div>
-            {communityToken ? (
-              <>
-                {' '}
-                {tokenPricing && (
-                  <PricePercentageChange
-                    pricePercentage24HourChange={
-                      tokenPricing.pricePercentage24HourChange
-                    }
-                    alignment="left"
-                    className="pad-8"
-                  />
-                )}
-              </>
-            ) : (
-              <CWText>N/A</CWText>
-            )}
+        {isEvmChain && (
+          <div className="stat-item">
+            <CWText type="b1" className="faded">
+              24h Change
+            </CWText>
+            <div>
+              {communityToken ? (
+                <>
+                  {' '}
+                  {tokenPricing && (
+                    <PricePercentageChange
+                      pricePercentage24HourChange={
+                        tokenPricing.pricePercentage24HourChange
+                      }
+                      alignment="left"
+                      className="pad-8"
+                    />
+                  )}
+                </>
+              ) : (
+                <CWText>N/A</CWText>
+              )}
+            </div>
           </div>
-        </div>
-        <div className="stat-item">
-          <CWText type="b1" className="faded">
-            Address
-          </CWText>
-          <CWText>
-            {communityToken && address ? (
-              <>
-                {formatAddressShort(address)}
-                <CWTooltip
-                  placement="top"
-                  content="address copied!"
-                  renderTrigger={(handleInteraction, isTooltipOpen) => {
-                    return (
-                      <CWIconButton
-                        iconName="copySimple"
-                        onClick={(event) => {
-                          saveToClipboard(address).catch(console.error);
-                          handleInteraction(event);
-                        }}
-                        onMouseLeave={(e) => {
-                          if (isTooltipOpen) {
-                            handleInteraction(e);
-                          }
-                        }}
-                        className="copy-icon"
-                      />
-                    );
-                  }}
-                />
-              </>
-            ) : (
-              <CWText>N/A</CWText>
-            )}
-          </CWText>
-        </div>
+        )}
+        {isEvmChain && (
+          <div className="stat-item">
+            <CWText type="b1" className="faded">
+              Address
+            </CWText>
+            <CWText>
+              {communityToken && address ? (
+                <>
+                  {formatAddressShort(address)}
+                  <CWTooltip
+                    placement="top"
+                    content="address copied!"
+                    renderTrigger={(handleInteraction, isTooltipOpen) => {
+                      return (
+                        <CWIconButton
+                          iconName="copySimple"
+                          onClick={(event) => {
+                            saveToClipboard(address).catch(console.error);
+                            handleInteraction(event);
+                          }}
+                          onMouseLeave={(e) => {
+                            if (isTooltipOpen) {
+                              handleInteraction(e);
+                            }
+                          }}
+                          className="copy-icon"
+                        />
+                      );
+                    }}
+                  />
+                </>
+              ) : (
+                <CWText>N/A</CWText>
+              )}
+            </CWText>
+          </div>
+        )}
         {communityToken && (
           <>
             <div className="stat-item">
