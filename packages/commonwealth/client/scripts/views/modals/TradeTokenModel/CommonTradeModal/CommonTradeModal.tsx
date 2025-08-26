@@ -1,4 +1,4 @@
-import { SupportedCurrencies } from 'helpers/currency';
+import { SupportedCryptoCurrencies } from 'helpers/currency';
 import useBeforeUnload from 'hooks/useBeforeUnload';
 import React from 'react';
 import { CWText } from '../../../components/component_kit/cw_text';
@@ -15,8 +15,6 @@ import TradeTokenForm, {
 } from './CommonTradeTokenForm';
 import { CommonTradeTokenModalProps } from './types';
 
-const TRADING_CURRENCY = SupportedCurrencies.USD; // make configurable when needed
-
 const CommonTradeModal = ({
   isOpen,
   onModalClose,
@@ -26,8 +24,8 @@ const CommonTradeModal = ({
     useCommonTradeTokenForm({
       tradeConfig: {
         ...tradeConfig,
-        ethBuyCurrency: TRADING_CURRENCY,
-        buyTokenPresetAmounts: [100, 300, 1000],
+        buyCurrency: SupportedCryptoCurrencies.ETH,
+        buyTokenPresetAmounts: [0.000555, 0.00555, 0.0555],
         sellTokenPresetAmounts: ['25%', '50%', '75%', 'Max'],
       },
       addressType: tradeConfig.addressType,

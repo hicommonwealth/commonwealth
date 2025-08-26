@@ -42,7 +42,12 @@ const TopHolders = ({ supply }: { supply: number }) => {
     },
   ];
 
-  const rowData = topHolders?.results.map((holder) => {
+  // Map API results to the structure expected by CWTable. If no data is
+  // returned from the API (for example, due to a network error), default to an
+  // empty array so that CWTable doesn't receive `undefined` row data which
+  // would cause runtime errors when it attempts to access properties like
+  // `originalRows.length`.
+  const rowData = topHolders?.results?.map((holder) => {
     const name = holder.name || '';
     const percentage = (holder.tokens * 100) / supply;
     return {
@@ -89,7 +94,7 @@ const TopHolders = ({ supply }: { supply: number }) => {
         sortValue: percentage,
       },
     };
-  });
+    }) ?? [];
 
   return (
     <div className="TopHolders">
@@ -109,7 +114,7 @@ const TopHolders = ({ supply }: { supply: number }) => {
         {isLoading ? (
           <CWText>Loading...</CWText>
         ) : (
-          <CWTable columnInfo={columnInfo} rowData={rowData!} />
+        <CWTable columnInfo={columnInfo} rowData={rowData} />
         )}
       </div>
     </div>
