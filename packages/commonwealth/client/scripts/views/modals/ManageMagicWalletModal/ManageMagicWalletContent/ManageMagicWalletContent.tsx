@@ -5,6 +5,7 @@ import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useGetEthereumBalanceQuery } from 'state/api/tokens';
 import { trpc } from 'utils/trpcClient';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
   CWModalBody,
@@ -90,50 +91,65 @@ const ManageMagicWalletContent = ({
   return (
     <div className="ManageMagicWalletContent">
       <CWModalBody>
-        <CWText className="usd-value">
-          {isLoading ? <CWCircleMultiplySpinner /> : formattedBalanceUsd}
-        </CWText>
-        <CWText
-          className="refresh-link"
-          onClick={() => handleRefreshBalance(refetch)}
-          role="button"
-        >
-          Refresh Balance
-        </CWText>
+        {!isMoonpayVisible && (
+          <>
+            <CWText className="usd-value">
+              {isLoading ? <CWCircleMultiplySpinner /> : formattedBalanceUsd}
+            </CWText>
+            <CWText
+              className="refresh-link"
+              onClick={() => handleRefreshBalance(refetch)}
+              role="button"
+            >
+              Refresh Balance
+            </CWText>
 
-        <div className="fund-options">
-          <ManageWalletItem
-            icon="moonpay"
-            title="Deposit Funds via Moonpay"
-            onClick={handleShowMoonpay}
-          />
-          <ManageWalletItem
-            icon="walletNew"
-            title="Open Magic Wallet"
-            onClick={() => {
-              openMagicWallet().catch(console.error);
-            }}
-          />
-          <ManageWalletItem
-            icon="barcode"
-            title="Share wallet address"
-            onClick={() => {
-              handleShowWalletAddress().catch(console.error);
-            }}
-          />
-        </div>
+            <div className="fund-options">
+              <ManageWalletItem
+                icon="moonpay"
+                title="Deposit Funds via Moonpay"
+                onClick={handleShowMoonpay}
+              />
+              <ManageWalletItem
+                icon="walletNew"
+                title="Open Magic Wallet"
+                onClick={() => {
+                  openMagicWallet().catch(console.error);
+                }}
+              />
+              <ManageWalletItem
+                icon="barcode"
+                title="Share wallet address"
+                onClick={() => {
+                  handleShowWalletAddress().catch(console.error);
+                }}
+              />
+            </div>
+          </>
+        )}
+        {isMoonpayVisible && (
+          <div className="go-back">
+            <CWButton
+              iconLeft="arrowLeftPhosphor"
+              label="Back"
+              onClick={() => setIsMoonpayVisible(false)}
+              buttonType="tertiary"
+              buttonHeight="sm"
+            />
+          </div>
+        )}
+        <MoonPayBuyWidget
+          variant="embedded"
+          visible={isMoonpayVisible}
+          walletAddress={userAddress}
+          onClose={handleCloseMoonpay}
+          onUrlSignatureRequested={onUrlSignatureRequested}
+          defaultCurrencyCode="eth_base"
+        />
       </CWModalBody>
       <CWModalFooter>
         <></>
       </CWModalFooter>
-      <MoonPayBuyWidget
-        variant="overlay"
-        visible={isMoonpayVisible}
-        walletAddress={userAddress}
-        onClose={handleCloseMoonpay}
-        onUrlSignatureRequested={onUrlSignatureRequested}
-        defaultCurrencyCode="eth_base"
-      />
     </div>
   );
 };

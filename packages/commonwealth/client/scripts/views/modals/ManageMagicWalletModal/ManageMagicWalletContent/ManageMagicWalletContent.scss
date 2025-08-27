@@ -31,5 +31,24 @@
       gap: 12px;
       width: 100%;
     }
+
+    .go-back {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      width: 80%;
+    }
+
+    #moonpay-react-sdk-embedded-frame {
+      border: 0 !important;
+      border-radius: 0 !important;
+      outline: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      iframe {
+        border: 0 !important;
+      }
+    }
   }
 }
