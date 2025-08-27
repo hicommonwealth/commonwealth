@@ -104,21 +104,21 @@ const WalletFundsContent = ({
         <div className="fund-options">
           <FundWalletItem
             icon="moonpay"
-            title="Moonpay"
+            title="Deposit Funds via Moonpay"
             onClick={handleShowMoonpay}
           />
           <FundWalletItem
-            icon="barcode"
-            title="View wallet information"
+            icon="walletNew"
+            title="Open Magic Wallet"
             onClick={() => {
-              handleShowWalletAddress().catch(console.error);
+              openMagicWallet().catch(console.error);
             }}
           />
           <FundWalletItem
-            icon="walletNew"
-            title="Manage wallet"
+            icon="barcode"
+            title="Share wallet address"
             onClick={() => {
-              openMagicWallet().catch(console.error);
+              handleShowWalletAddress().catch(console.error);
             }}
           />
         </div>

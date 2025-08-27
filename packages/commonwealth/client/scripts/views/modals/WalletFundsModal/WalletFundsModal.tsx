@@ -7,16 +7,14 @@ import './WalletFundsModal.scss';
 
 interface WalletFundsModalProps {
   onClose: () => void;
+  chainId: number;
 }
 
-const WalletFundsModal = ({ onClose }: WalletFundsModalProps) => {
+const WalletFundsModal = ({ onClose, chainId }: WalletFundsModalProps) => {
   return (
     <div className="WalletFundsModal">
-      <CWModalHeader
-        label="Add funds to your Common wallet"
-        onModalClose={onClose}
-      />
-      <WalletFundsContent />
+      <CWModalHeader label="Manage Common Wallet" onModalClose={onClose} />
+      <WalletFundsContent chainId={chainId} />
     </div>
   );
 };

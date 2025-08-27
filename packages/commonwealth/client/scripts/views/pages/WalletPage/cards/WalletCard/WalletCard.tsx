@@ -9,13 +9,10 @@ import {
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-// eslint-disable-next-line max-len
-
 import RewardsCard from '../../RewardsCard';
-// import MagicWalletButton from './MagicWalletButton/MagicWalletButton';
 import AddressSelector from './AddressSelector/AddressSelector';
 import useAddressSelector from './AddressSelector/useAddressSelector';
-import MagicWalletButton from './MagicWalletButton/MagicWalletButton';
+import MagicWalletManager from './MagicWalletManager/MagicWalletManager';
 import NetworkSelector from './NetworkSelector/NetworkSelector';
 import useNetworkSelector from './NetworkSelector/useNetworkSelector';
 import './WalletCard.scss';
@@ -90,7 +87,7 @@ const WalletCard = () => {
             <FractionalValue type="h4" value={userCombinedUSDBalance} />
           </CWText>
         )}
-        <MagicWalletButton
+        <MagicWalletManager
           userSelectedAddress={selectedAddress}
           selectedNetworkChainId={selectedNetwork.value}
         />
