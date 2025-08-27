@@ -93,7 +93,7 @@ export const prettyVoteWeight = (
     // Sui NAVX NFTs use voting power with 9 decimals
     if (
       weightType === TopicWeightedVoting.SuiNFT &&
-      ['NAVX', 'veNAVX'].includes(tokenSymbol!)
+      ['NAVX', 'veNAVX', 'MOCK_NAVX_TOKEN'].includes(tokenSymbol!)
     ) {
       rawNumber /= 10 ** 9;
     }
