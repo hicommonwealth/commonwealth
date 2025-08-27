@@ -12,6 +12,7 @@ import { cleanChainEventXpSourcesTask } from './tasks/cleanChainEventXpSources';
 import { cleanSubscriptionsTask } from './tasks/cleanSubscriptions';
 import { countAggregatorTask } from './tasks/countAggregator';
 import { magnaSyncTask } from './tasks/magnaSync';
+import { refreshMaterializedViewsTask } from './tasks/refreshMaterializedViews';
 import { runDbMaintenanceTask } from './tasks/runDbMaintenance';
 import { sitemapTask } from './tasks/sitemap-runner';
 
@@ -27,6 +28,7 @@ export const graphileTasks: {
   [GraphileTaskNames.CountAggregator]: countAggregatorTask,
   [GraphileTaskNames.CaptureGroupSnapshot]: captureGroupSnapshotTask,
   [GraphileTaskNames.MagnaSync]: magnaSyncTask,
+  [GraphileTaskNames.RefreshMaterializedViews]: refreshMaterializedViewsTask,
 } as const;
 
 export function taskFactory<K extends keyof typeof TaskPayloads>({

@@ -3,8 +3,8 @@
 .QuestSummaryCard {
   .xp-body {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
     margin-top: 14px;
     margin-bottom: 10px;
 
@@ -12,7 +12,24 @@
       display: flex;
       align-items: center;
     }
+
+    .user-rank {
+      margin-top: 4px;
+
+    }
   }
+  a,
+a:visited,
+a:hover,
+a:active {
+color: #4c83ff !important;
+color: inherit;
+text-decoration: underline;
+}
+
+a:visited .link {
+color: #4c83ff;
+}
 
   .list {
     display: flex;
