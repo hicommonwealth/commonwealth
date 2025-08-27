@@ -8,7 +8,7 @@ import CommonEntriesList from '../../CommonEntriesList';
 import FarcasterEntriesList from '../../FarcasterEntriesList';
 import { SortType } from '../../types';
 
-import { Thread } from 'client/scripts/models/Thread';
+import { Thread, ThreadView } from 'client/scripts/models/Thread';
 import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import './EntriesTab.scss';
 
@@ -63,8 +63,9 @@ const EntriesTab = ({
 
   // TODO: Replace Thread with ThreadView -> should we use Memo here?
   const sortedThreads = sortByFeaturedFilter(
-    threads?.pages.flatMap((p) => p.results.map((t) => new Thread(t as any))) ||
-      [],
+    threads?.pages.flatMap((p) =>
+      p.results.map((t) => new Thread(t as ThreadView)),
+    ) || [],
     threadSort,
   );
 

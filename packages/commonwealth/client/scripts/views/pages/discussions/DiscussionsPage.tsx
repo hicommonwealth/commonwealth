@@ -29,7 +29,7 @@ import {
   sanitizeTopicName,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
-import Thread from 'client/scripts/models/Thread';
+import Thread, { ThreadView } from 'client/scripts/models/Thread';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import { useFetchNodesQuery } from 'client/scripts/state/api/nodes';
 import { useDateCursor } from 'client/scripts/state/api/threads/dateCursor';
@@ -212,8 +212,9 @@ const DiscussionsPage = () => {
     if (isInitialLoading || !data) return;
     const threads = sortPinned(
       sortByFeaturedFilter(
-        data.pages.flatMap((p) => p.results.map((t) => new Thread(t as any))) ||
-          [],
+        data.pages.flatMap((p) =>
+          p.results.map((t) => new Thread(t as ThreadView)),
+        ) || [],
         featuredFilter,
       ),
     );
