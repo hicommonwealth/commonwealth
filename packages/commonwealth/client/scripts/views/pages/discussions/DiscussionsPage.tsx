@@ -212,7 +212,8 @@ const DiscussionsPage = () => {
     if (isInitialLoading || !data) return;
     const threads = sortPinned(
       sortByFeaturedFilter(
-        data.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [],
+        data.pages.flatMap((p) => p.results.map((t) => new Thread(t as any))) ||
+          [],
         featuredFilter,
       ),
     );
