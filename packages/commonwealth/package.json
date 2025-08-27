@@ -9,6 +9,8 @@
   },
   "type": "module",
   "scripts": {
+    "split-creator-referrer-xp-logs": "tsx scripts/split-creator-referrer-xp-logs.ts",
+    "backfill-xp-logs-referral-fees": "tsx scripts/backfill-xp-logs-referral-fees.ts",
     "async-delete-spam-comments": "tsx scripts/async-delete-spam-comments.ts",
     "async-delete-spam-threads": "tsx scripts/async-delete-spam-threads.ts",
     "add-component-showcase": "tsx ./scripts/add-component-showcase.ts",

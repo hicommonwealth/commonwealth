@@ -195,7 +195,7 @@ async function recordXpsForQuest({
     const creator_xp_points = creator_address ? shared_reward : null;
     const referrer_xp_points = referrer_address
       ? creator_xp_points
-        ? reward_amount * 0.1 // automatically share 10% of the reward with referrer when not a referral event
+        ? reward_amount * config.XP.REFERRER_FEE_RATIO
         : shared_reward
       : null;
     await models.sequelize.query(
@@ -576,7 +576,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       },
       LaunchpadTokenRecordCreated: async ({ id, payload }) => {
         const user_id = await getUserByAddress(payload.creator_address);
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenRecordCreated', { id, payload, user_id });
         if (!user_id) return;
 
@@ -585,7 +585,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           { created_at },
           'LaunchpadTokenRecordCreated',
         );
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenRecordCreated', {
             id,
             payload,
@@ -605,14 +605,14 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       },
       LaunchpadTokenTraded: async ({ id, payload }) => {
         const user_id = await getUserByAddress(payload.trader_address);
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenTraded', { id, payload, user_id });
         if (!user_id) return;
 
         const token = await models.LaunchpadToken.findOne({
           where: { token_address: payload.token_address.toLowerCase() },
         });
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenTraded', { id, payload, user_id, token });
         if (!token) return;
 
@@ -628,7 +628,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
 
         // payload eth_amount is in wei, a little misleading
         const eth_amount = Number(payload.eth_amount) / 1e18;
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenTraded', {
             id,
             payload,
@@ -655,7 +655,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const user_id =
           payload.token.creator_address &&
           (await getUserByAddress(payload.token.creator_address));
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenGraduated', { id, payload, user_id });
         if (!user_id) return;
 

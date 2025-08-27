@@ -221,7 +221,7 @@ const useBuyThreadToken = ({
   return {
     amounts: {
       invest: {
-        ethBuyCurrency: tradeConfig.ethBuyCurrency,
+        ethBuyCurrency: tradeConfig.buyCurrency,
         baseCurrency: {
           name: primaryTokenSymbol,
           amount: baseCurrencyBuyAmountString,
