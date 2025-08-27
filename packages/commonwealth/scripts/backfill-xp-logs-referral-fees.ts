@@ -9,7 +9,10 @@ import { QueryTypes } from 'sequelize';
 const log = logger(import.meta);
 
 async function main() {
-  log.info('✅ Backfilling xp logs with referral fees...');
+  const feeRatio = process.argv.length > 2 ? parseFloat(process.argv[2]) : 0;
+  log.info(
+    `✅ Backfilling xp logs with referral fees using a fee ratio of ${feeRatio}`,
+  );
 
   // create a backfill referral fee column if it doesn't exist
   await models.sequelize.query(`
@@ -69,7 +72,7 @@ updated as ( -- update backfill columns with correct values
     backfill_referrer_user_id = l.confirmed_referrer_user_id,
     backfill_referrer_xp_points = CASE
       WHEN l.is_referral_event = TRUE THEN l.reward_amount * l.creator_reward_weight
-      ELSE l.reward_amount * 0.1 -- 10% referral on non-referral events
+      ELSE l.reward_amount * :feeRatio 
     END,
     backfill_is_referral_event = l.is_referral_event
   FROM l
@@ -78,10 +81,7 @@ updated as ( -- update backfill columns with correct values
 )
 SELECT COUNT(*)::INT AS count, COALESCE(MAX(id), :lastId)::INT AS max_id FROM updated;
 `,
-      {
-        replacements: { lastId },
-        type: QueryTypes.SELECT,
-      },
+      { replacements: { lastId, feeRatio }, type: QueryTypes.SELECT },
     );
     if (rows.length === 0) break;
     count = rows[0].count;
