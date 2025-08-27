@@ -1,3 +1,5 @@
+@use '../../../../styles/mixins/media_queries';
+
 .ManageMagicWalletContent {
   .CWModalBody {
     display: flex;
@@ -38,6 +40,9 @@
       justify-content: space-between;
       align-items: center;
       width: 80%;
+      @include media_queries.smallInclusive {
+        width: 100% !important;
+      }
     }
 
     #moonpay-react-sdk-embedded-frame {
@@ -46,6 +51,12 @@
       outline: 0 !important;
       margin: 0 !important;
       box-shadow: none !important;
+      @include media_queries.smallInclusive {
+        width: 100% !important;
+        min-height: 300px !important;
+        height: 400px !important;
+        max-height: 100% !important;
+      }
       iframe {
         border: 0 !important;
       }
