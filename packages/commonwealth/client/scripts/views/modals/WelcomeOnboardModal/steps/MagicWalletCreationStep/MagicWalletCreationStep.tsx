@@ -1,6 +1,6 @@
 import React from 'react';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { WalletFundsContent } from '../../../WalletFundsModal/WalletFundsContent';
+import { ManageMagicWalletContent } from '../../../ManageMagicWalletModal/ManageMagicWalletContent';
 
 import './MagicWalletCreationStep.scss';
 
@@ -13,7 +13,7 @@ const MagicWalletCreationStep = ({
 }: MagicWalletCreationStepProps) => {
   return (
     <section className="MagicWalletCreationStep">
-      <WalletFundsContent />
+      <ManageMagicWalletContent />
       <div className="button-container">
         <CWButton
           label="Skip"

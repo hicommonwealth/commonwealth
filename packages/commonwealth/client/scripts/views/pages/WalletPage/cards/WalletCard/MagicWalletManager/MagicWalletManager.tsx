@@ -7,9 +7,9 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { WalletFundsModal } from 'views/modals/WalletFundsModal';
-import useMagicWallet from 'views/modals/WalletFundsModal/WalletFundsContent/useMagicWallet';
-import { formatUsdBalance } from 'views/modals/WalletFundsModal/WalletFundsContent/utils';
+import { ManageMagicWalletModal } from 'views/modals/ManageMagicWalletModal';
+import useMagicWallet from 'views/modals/ManageMagicWalletModal/ManageMagicWalletContent/useMagicWallet';
+import { formatUsdBalance } from 'views/modals/ManageMagicWalletModal/ManageMagicWalletContent/utils';
 import './MagicWalletManager.scss';
 
 type MagicWalletManagerProps = {
@@ -88,7 +88,7 @@ const MagicWalletManager = ({
         open={isFundsModalOpen}
         onClose={() => setIsFundsModalOpen(false)}
         content={
-          <WalletFundsModal
+          <ManageMagicWalletModal
             onClose={() => setIsFundsModalOpen(false)}
             chainId={selectedNetworkChainId}
           />

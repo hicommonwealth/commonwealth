@@ -6,17 +6,17 @@ import {
 } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from 'views/components/component_kit/cw_text';
 
-import './FundWalletItem.scss';
+import './ManageWalletItem.scss';
 
-interface FundWalletItemProps {
+interface ManageWalletItemProps {
   icon: IconName | CustomIconName;
   title: string;
   onClick?: () => void;
 }
 
-const FundWalletItem = ({ icon, title, onClick }: FundWalletItemProps) => {
+const ManageWalletItem = ({ icon, title, onClick }: ManageWalletItemProps) => {
   return (
-    <div className="FundWalletItem" onClick={onClick}>
+    <div className="ManageWalletItem" onClick={onClick}>
       <div className="icon-wrapper">
         <CWIcon iconName={icon} iconSize="large" />
       </div>
@@ -27,4 +27,4 @@ const FundWalletItem = ({ icon, title, onClick }: FundWalletItemProps) => {
   );
 };
 
-export { FundWalletItem };
+export { ManageWalletItem };

@@ -1,1 +1,0 @@
-export { FundWalletItem } from './FundWalletItem';

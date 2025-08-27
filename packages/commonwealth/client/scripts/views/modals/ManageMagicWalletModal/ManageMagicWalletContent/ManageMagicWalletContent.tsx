@@ -11,20 +11,20 @@ import {
   CWModalFooter,
 } from 'views/components/component_kit/new_designs/CWModal';
 import useAuthentication from '../../AuthModal/useAuthentication';
-import { FundWalletItem } from './FundWalletItem';
+import './ManageMagicWalletContent.scss';
+import { ManageWalletItem } from './ManageWalletItem';
 import useMagicWallet from './useMagicWallet';
 import { formatUsdBalance, handleRefreshBalance } from './utils';
-import './WalletFundsContent.scss';
 
 const BASE_MAINNET_CHAIN_ID = ValidChains.Base;
 
-interface WalletFundsContentProps {
+interface ManageMagicWalletContentProps {
   chainId?: number;
 }
 
-const WalletFundsContent = ({
+const ManageMagicWalletContent = ({
   chainId = BASE_MAINNET_CHAIN_ID,
-}: WalletFundsContentProps = {}) => {
+}: ManageMagicWalletContentProps = {}) => {
   const {
     magic,
     userAddress,
@@ -88,7 +88,7 @@ const WalletFundsContent = ({
   console.log('userAddress => ', { userAddress, userBalance, ethToUsdRate });
 
   return (
-    <div className="WalletFundsContent">
+    <div className="ManageMagicWalletContent">
       <CWModalBody>
         <CWText className="usd-value">
           {isLoading ? <CWCircleMultiplySpinner /> : formattedBalanceUsd}
@@ -102,19 +102,19 @@ const WalletFundsContent = ({
         </CWText>
 
         <div className="fund-options">
-          <FundWalletItem
+          <ManageWalletItem
             icon="moonpay"
             title="Deposit Funds via Moonpay"
             onClick={handleShowMoonpay}
           />
-          <FundWalletItem
+          <ManageWalletItem
             icon="walletNew"
             title="Open Magic Wallet"
             onClick={() => {
               openMagicWallet().catch(console.error);
             }}
           />
-          <FundWalletItem
+          <ManageWalletItem
             icon="barcode"
             title="Share wallet address"
             onClick={() => {
@@ -132,11 +132,10 @@ const WalletFundsContent = ({
         walletAddress={userAddress}
         onClose={handleCloseMoonpay}
         onUrlSignatureRequested={onUrlSignatureRequested}
-        // onUnsupportedRegion={() => console.log('un supported region')}
         defaultCurrencyCode="eth_base"
       />
     </div>
   );
 };
 
-export { WalletFundsContent };
+export { ManageMagicWalletContent };
