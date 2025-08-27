@@ -8,7 +8,12 @@ import app from 'state';
 import { useFetchNodesQuery } from 'state/api/nodes';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles/index';
 import TopicGatingHelpMessage from '../../Groups/TopicGatingHelpMessage/index';
-import { getChainTypes, requirementTypes } from '../../common/constants';
+import { GroupTrustLevelOptions } from '../../Groups/common/GroupForm/RequirementSubForm/helpers';
+import {
+  getChainTypes,
+  requirementTypes,
+  TRUST_LEVEL_SPECIFICATION,
+} from '../../common/constants';
 import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
 import GroupCard from './GroupCard';
 import './GroupsSection.scss';
@@ -75,10 +80,15 @@ const GroupsSection = ({
               groupDescription={group.description}
               // @ts-expect-error <StrictNullChecks/>
               requirements={group.requirements
-                .filter((r) => r?.data?.source) // filter erc groups
+                .filter(
+                  (r) =>
+                    r?.data?.source || r.rule === TRUST_LEVEL_SPECIFICATION,
+                )
                 .map((r) => ({
-                  requirementType: requirementTypes?.find(
-                    (x) => x.value === r?.data?.source?.source_type,
+                  requirementType: requirementTypes?.find((x) =>
+                    r?.data?.source?.source_type
+                      ? x.value === r?.data?.source?.source_type
+                      : x.value === TRUST_LEVEL_SPECIFICATION,
                   )?.label,
                   requirementChain:
                     getChainTypes(chainNodes || [])
@@ -96,13 +106,19 @@ const GroupsSection = ({
                       ?.label?.split('-')
                       ?.join(' ') || '',
                   requirementContractAddress:
-                    r.data.source.contract_address ||
-                    r.data.source.collection_id,
-                  requirementTokenId: r.data.source.token_id,
+                    r?.data?.source?.contract_address ||
+                    r?.data?.source?.collection_id,
+                  requirementTokenId: r?.data?.source?.token_id,
                   requirementAmount: `${convertRequirementAmountFromWeiToTokens(
                     r?.data?.source?.source_type,
-                    r.data.threshold,
+                    r?.data?.threshold,
                   )}`,
+                  requirementTrustLevel:
+                    GroupTrustLevelOptions.find(
+                      (requirementType) =>
+                        requirementType.value.toString() ===
+                        r?.data?.minimum_trust_level?.toString(),
+                    )?.label || '',
                   requirementCondition: 'More than', // hardcoded in api
                 }))}
               requirementsToFulfill={

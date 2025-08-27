@@ -9,6 +9,6 @@ export const MagicLogin = z.object({
   avatarUrl: z.string().nullish(),
   magicAddress: z.string(),
   session: z.string().nullish(),
-  walletSsoSource: z.nativeEnum(WalletSsoSource),
+  walletSsoSource: z.enum(WalletSsoSource),
   referrer_address: z.string().nullish(),
 });

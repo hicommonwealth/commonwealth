@@ -28,7 +28,6 @@ import CWTabsRow from '../../../../components/component_kit/new_designs/CWTabs/C
 import { TemporaryCrecimientoModalBase } from '../../TemporaryCrecimientoModalBase';
 import { AuthModalType, ModalBaseProps, ModalBaseTabs } from '../../types';
 import useAuthentication from '../../useAuthentication';
-import { EVMWalletsSubModal } from './EVMWalletsSubModal';
 import { EmailForm } from './EmailForm';
 import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';
 import './ModalBase.scss';
@@ -119,13 +118,6 @@ const ModalBase = ({
       ? 1
       : 0,
   );
-  const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] = useState(
-    () => {
-      return triggerOpenEVMWalletsSubModal
-        ? triggerOpenEVMWalletsSubModal
-        : false;
-    },
-  );
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
     useState(false);
   const [isAuthenticatingWithSMS, setIsAuthenticatingWithSMS] = useState(false);
@@ -138,7 +130,6 @@ const ModalBase = ({
   const handleClose = async () => {
     setIsAuthenticatingWithEmail(false);
     setIsAuthenticatingWithSMS(false);
-    setIsEVMWalletsModalVisible(false);
     isWalletConnectEnabled &&
       (await onResetWalletConnect().catch(console.error));
     await onClose();
@@ -187,10 +178,18 @@ const ModalBase = ({
   const suiWallets = filterWalletNames(ChainBase.Sui);
   const getEVMWalletsForMainModal = () => {
     const configEvmWallets: string[] = [];
+
+    // Always put MetaMask first if available
+    if (evmWallets.includes('metamask')) {
+      configEvmWallets.push('metamask');
+    }
+
+    // Add gate wallet if available and enabled
     if (isGateWalletAvailable && gateWalletEnabled) {
       configEvmWallets.push('gate');
     }
 
+    // Add partnership wallets if enabled
     if (partnershipWalletEnabled) {
       if (isOkxWalletAvailable) {
         configEvmWallets.push('okx');
@@ -199,23 +198,24 @@ const ModalBase = ({
         configEvmWallets.push('binance');
       }
     }
-    if (hasWalletConnect) {
-      configEvmWallets.push('walletconnect');
-    }
-    return configEvmWallets;
-  };
-  const getEVMWalletsForEVMSubModal = () => {
-    const configEvmWallets: string[] = [
-      // to ensure it always comes first
-      ...(evmWallets.includes('walletconnect') ? ['walletconnect'] : []),
-      ...evmWallets.filter((x) => {
-        if (!partnershipWalletEnabled) {
-          if (x === 'okx' || x === 'binance' || x === 'gate') return false;
-        }
 
-        return x !== 'walletconnect';
-      }),
-    ];
+    // Add other EVM wallets (excluding ones already handled above)
+    evmWallets.forEach((wallet) => {
+      if (!configEvmWallets.includes(wallet)) {
+        // Skip partnership wallets if not enabled
+        if (
+          (wallet === 'okx' || wallet === 'binance') &&
+          !partnershipWalletEnabled
+        ) {
+          return;
+        }
+        // Skip gate wallet if not enabled
+        if (wallet === 'gate' && !gateWalletEnabled) {
+          return;
+        }
+        configEvmWallets.push(wallet);
+      }
+    });
 
     return configEvmWallets;
   };
@@ -329,12 +329,6 @@ const ModalBase = ({
 
     // if any wallet option is selected
     if (activeTabIndex === 0) {
-      // if wallet connect option is selected, open the EVM wallet list modal
-      if (option === 'walletconnect' && !isEVMWalletsModalVisible) {
-        setIsEVMWalletsModalVisible(true);
-        return;
-      }
-
       // @ts-expect-error <StrictNullChecks>
       await onWalletSelect(wallets.find((wallet) => wallet.name === option));
     }
@@ -514,27 +508,6 @@ const ModalBase = ({
           )}
         </CWModalFooter>
       </section>
-      <EVMWalletsSubModal
-        availableWallets={
-          getEVMWalletsForEVMSubModal().filter((wallet) =>
-            showAuthOptionFor ? wallet === showAuthOptionFor : true,
-          ) as EVMWallets[]
-        }
-        isOpen={isEVMWalletsModalVisible}
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onClose={async () => {
-          setIsEVMWalletsModalVisible(false);
-          isWalletConnectEnabled && (await onResetWalletConnect());
-        }}
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onWalletSelect={async (option) => await onAuthMethodSelect(option)}
-        disabled={isMagicLoading}
-        canResetWalletConnect={isWalletConnectEnabled}
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onResetWalletConnect={onResetWalletConnect}
-        isUserFromWebView={isUserFromWebView}
-        handleNextOrSkip={handleSuccess}
-      />
       {/* Signature verification modal is only displayed on mobile */}
       <MobileWalletConfirmationSubModal
         isOpen={isMobileWalletVerificationStep}

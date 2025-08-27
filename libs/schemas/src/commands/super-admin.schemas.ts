@@ -49,7 +49,7 @@ export const TriggerNotificationsWorkflow = {
 export const SetCommunityTier = {
   input: z.object({
     community_id: z.string(),
-    tier: z.nativeEnum(CommunityTierMap),
+    tier: z.enum(CommunityTierMap),
   }),
   output: z.object({
     success: z.boolean(),
@@ -59,7 +59,7 @@ export const SetCommunityTier = {
 export const SetUserTier = {
   input: z.object({
     user_id: z.number(),
-    tier: z.nativeEnum(UserTierMap),
+    tier: z.enum(UserTierMap),
   }),
   output: z.object({
     success: z.boolean(),

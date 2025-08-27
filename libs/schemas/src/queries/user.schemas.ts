@@ -18,7 +18,7 @@ import {
 export const UserProfileAddressView = AddressView.extend({
   Community: z.object({
     id: z.string(),
-    base: z.nativeEnum(ChainBase),
+    base: z.enum(ChainBase),
     ss58_prefix: PG_INT.nullish(),
   }),
 });
@@ -67,13 +67,13 @@ export const UserStatusAddressView = z.object({
   id: PG_INT,
   address: z.string(),
   role: z.enum(['member', 'moderator', 'admin']),
-  wallet_id: z.nativeEnum(WalletId),
+  wallet_id: z.enum(WalletId),
   oauth_provider: z.string().nullish(),
   ghost_address: z.boolean().nullish(),
   last_active: z.coerce.date().or(z.string()).nullish(),
   Community: z.object({
     id: z.string(),
-    base: z.nativeEnum(ChainBase),
+    base: z.enum(ChainBase),
     ss58_prefix: PG_INT.nullish(),
   }),
 });
@@ -186,6 +186,7 @@ export const GetUserReferralFees = {
 export const XpLogView = XpLog.omit({
   user: true,
   creator: true,
+  referrer: true,
   quest_action_meta: true,
 }).extend({
   user_profile: UserProfile,
@@ -194,7 +195,8 @@ export const XpLogView = XpLog.omit({
   event_name: z.string(),
   reward_amount: z.number(),
   creator_profile: UserProfile.nullish(),
-  is_creator: z.boolean().describe('Actor is the creator or referrer'),
+  referrer_profile: UserProfile.nullish(),
+  is_creator: z.boolean().describe('Actor is the creator'),
   is_referral: z.boolean().describe('Is a referral event'),
   created_at: z.date().or(z.string()),
   event_created_at: z.date().or(z.string()),
@@ -233,18 +235,24 @@ export const XpRankedUser = z.object({
   tier: z.number(),
   user_name: z.string().nullish(),
   avatar_url: z.string().nullish(),
+  rank: z.number(),
 });
 
 export const GetXpsRanked = {
-  input: z.object({
-    top: z.number(),
+  input: PaginationParamsSchema.extend({
     search: z.string().optional(),
     quest_id: z
       .number()
       .optional()
       .describe('Filters events by a specific quest id'),
+    user_id: z
+      .number()
+      .optional()
+      .describe('Get XP ranking for a specific user'),
   }),
-  output: z.array(XpRankedUser),
+  output: PaginatedResultSchema.extend({
+    results: z.array(XpRankedUser),
+  }),
 };
 
 export const RandomResourceIdsView = z.object({
@@ -268,7 +276,7 @@ export const GetAddressStatus = {
 export const MutualCommunityView = z.object({
   id: z.string(),
   name: z.string(),
-  base: z.nativeEnum(ChainBase),
+  base: z.enum(ChainBase),
   icon_url: z.string().nullish(),
 });
 

@@ -9,6 +9,8 @@
   },
   "type": "module",
   "scripts": {
+    "split-creator-referrer-xp-logs": "tsx scripts/split-creator-referrer-xp-logs.ts",
+    "backfill-xp-logs-referral-fees": "tsx scripts/backfill-xp-logs-referral-fees.ts",
     "async-delete-spam-comments": "tsx scripts/async-delete-spam-comments.ts",
     "async-delete-spam-threads": "tsx scripts/async-delete-spam-threads.ts",
     "add-component-showcase": "tsx ./scripts/add-component-showcase.ts",
@@ -269,8 +271,7 @@
     "viem": "^2.23.2",
     "web3": "^4.7.0",
     "web3-utils": "^4.2.2",
-    "zod": "^3.25.46",
-    "zod-to-json-schema": "^3.24.5",
+    "zod": "catalog:",
     "zustand": "^4.3.8"
   },
   "devDependencies": {

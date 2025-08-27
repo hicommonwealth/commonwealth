@@ -91,6 +91,7 @@ const {
   EVM_CHAINS_WHITELIST,
   MCP_KEY_BYPASS,
   LOG_XP_LAUNCHPAD,
+  XP_REFERRER_FEE_RATIO,
   KNOCK_PUBLIC_API_KEY,
   KNOCK_IN_APP_FEED_ID,
   UNLEASH_FRONTEND_API_TOKEN,
@@ -117,6 +118,7 @@ const DEFAULTS = {
   TIER_SOCIAL_VERIFIED_MIN_ETH: '0.006',
   KNOCK_PUBLIC_API_KEY: 'pk_test_Hd4ZpzlVcz9bqepJQoo9BvZHokgEqvj4T79fPdKqpYM',
   KNOCK_IN_APP_FEED_ID: 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb',
+  XP_REFERRER_FEE_RATIO: '0',
 };
 
 export const config = configure(
@@ -322,7 +324,12 @@ export const config = configure(
       MCP_KEY_BYPASS: MCP_KEY_BYPASS,
       BOT_EMAIL: MCP_BOT_EMAIL || 'mcp@common.xyz',
     },
-    LOG_XP_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
+    XP: {
+      REFERRER_FEE_RATIO: parseFloat(
+        XP_REFERRER_FEE_RATIO || DEFAULTS.XP_REFERRER_FEE_RATIO,
+      ),
+      LOG_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
+    },
     NOTIFICATIONS: {
       KNOCK_PUBLIC_API_KEY:
         KNOCK_PUBLIC_API_KEY || DEFAULTS.KNOCK_PUBLIC_API_KEY,
@@ -545,7 +552,7 @@ export const config = configure(
       THREAD_PRIORITY: z.coerce.number(),
       PROFILE_PRIORITY: z.coerce.number(),
     }),
-    DEFAULT_COMMONWEALTH_LOGO: z.string().url(),
+    DEFAULT_COMMONWEALTH_LOGO: z.url(),
     TEST_EVM: z.object({
       ETH_RPC: z.string(),
       PROVIDER_URL: z.string(),
@@ -703,7 +710,10 @@ export const config = configure(
         ),
       BOT_EMAIL: z.string(),
     }),
-    LOG_XP_LAUNCHPAD: z.boolean().default(false),
+    XP: z.object({
+      REFERRER_FEE_RATIO: z.number(),
+      LOG_LAUNCHPAD: z.boolean().default(false),
+    }),
     NOTIFICATIONS: z.object({
       KNOCK_PUBLIC_API_KEY: z.string().refine(
         requiredInEnvironmentServices({
