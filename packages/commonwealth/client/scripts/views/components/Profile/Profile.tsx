@@ -57,6 +57,7 @@ const Profile = ({ userId }: ProfileProps) => {
         data.threads.map((t) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { Comments, ...rest } = t; // comments aren't needed for display here
+          // @ts-expect-error User is required in one of the results
           return new Thread({ ...rest, user_tier: data.tier });
         }),
       );

@@ -77,7 +77,6 @@
     "create-neon-branch": "chmod u+x scripts/create-neon-branch.sh && ./scripts/create-neon-branch.sh"
   },
   "dependencies": {
-    "@anatine/zod-mock": "^3.13.3",
     "@canvas-js/chain-ethereum": "^0.13.14",
     "@canvas-js/interfaces": "^0.12.1",
     "@cosmjs/cosmwasm-stargate": "^0.31.3",
@@ -123,9 +122,10 @@
     "uuid": "^9.0.1",
     "viem": "^2.23.2",
     "web3-utils": "^4.2.2",
-    "zod": "^3.25.46"
+    "zod": "catalog:"
   },
   "devDependencies": {
+    "randexp": "^0.5.3",
     "sequelize-cli": "^6.6.3",
     "tsx": "^4.7.2"
   }

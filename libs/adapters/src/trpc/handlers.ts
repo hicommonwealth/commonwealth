@@ -68,6 +68,7 @@ export const command = <
     md,
     tag,
     outMiddlewares,
+    // @ts-expect-error inferring type
   }).mutation(async ({ ctx, input }) => {
     try {
       return await coreCommand(

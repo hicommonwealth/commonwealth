@@ -188,6 +188,12 @@ export const ThreadView = Thread.extend({
   user_tier: USER_TIER.nullish(),
   avatar_url: z.string().nullish(),
   address_last_active: z.date().or(z.string()).nullish(),
+  last_purchase_activity: z
+    .object({
+      is_buy: z.boolean().nullish(),
+      price: z.number().nullish(),
+    })
+    .nullish(),
 });
 
 export const OrderByQueriesKeys = z.enum([
@@ -327,7 +333,7 @@ export const SearchThreads = {
 export const GetLinks = {
   input: z.object({
     thread_id: PG_INT.optional(),
-    link_source: z.nativeEnum(LinkSource).optional(),
+    link_source: z.enum(LinkSource).optional(),
     link_identifier: z.string().optional(),
   }),
   output: z.object({

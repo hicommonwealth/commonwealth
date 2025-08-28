@@ -220,13 +220,12 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
           </div>
           {growlEnabled && showGrowlOnMobile && (
             <CWGrowlTemplate
-              headerText=""
-              bodyText=""
-              buttonText=""
-              buttonLink=""
-              growlType=""
-              growlImage=""
-              extraText=""
+              headerText="What are Trust Levels?"
+              bodyText="Trust levels reflect your reputation in the community. Climb the ranks to unlock new abilities and earn recognition."
+              buttonText="Learn more"
+              buttonLink="https://docs.commonwealth.im/trust-levels"
+              growlType="trust_levels"
+              expiryDays={7}
             />
           )}
         </div>
