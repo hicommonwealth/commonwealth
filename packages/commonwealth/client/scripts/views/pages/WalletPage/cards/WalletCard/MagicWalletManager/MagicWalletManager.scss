@@ -15,4 +15,39 @@
   .refresh-btn {
     cursor: pointer;
   }
+
+  .magic-btn-container {
+    background-color: colors.$neutral-100;
+    border: 1px solid colors.$purple-100;
+    border-radius: 6px !important;
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    justify-content: center;
+    align-items: center;
+
+    .Icon {
+      width: 36px !important;
+      background-color: colors.$purple-25;
+    }
+
+    .btn-border {
+      border: 0 !important;
+      margin: 0 !important;
+      border-left: 1px solid colors.$purple-100;
+
+      &:focus,
+      &:focus-within {
+        border: 0 !important;
+        padding: 0 !important;
+      }
+    }
+
+    span {
+      min-width: 36px !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 }
