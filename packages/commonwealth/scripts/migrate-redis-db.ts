@@ -4,6 +4,7 @@ import { createClient, RedisClientType } from 'redis';
 interface BackupItem {
   key: string;
   type: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
   ttl: number;
 }
@@ -16,7 +17,7 @@ class RedisBackupRestore {
     const socketOptions = {
       tls: true,
       rejectUnauthorized: false,
-    };
+    } as const;
     this.sourceClient = createClient({
       url: sourceUrl,
       socket: {
@@ -76,6 +77,7 @@ class RedisBackupRestore {
 
           if (ttl === -2) return null; // Key expired or doesn't exist
 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           let value: any;
 
           // Get value based on type
