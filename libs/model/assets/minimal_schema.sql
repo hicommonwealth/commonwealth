@@ -243,8 +243,8 @@ CREATE FUNCTION public.old_subscriptions_insert() RETURNS trigger
               ) THEN
                 INSERT INTO "CommunityAlerts" (user_id, community_id, created_at, updated_at)
                 VALUES (
-                  NEW.subscriber_id, 
-                  (SELECT id FROM "Communities" WHERE NEW.snapshot_id = ANY(snapshot_spaces) LIMIT 1), 
+                  NEW.subscriber_id,
+                  (SELECT id FROM "Communities" WHERE NEW.snapshot_id = ANY(snapshot_spaces) LIMIT 1),
                   NEW.created_at, NEW.updated_at
                 );
               END IF;
@@ -2533,17 +2533,6 @@ CREATE UNIQUE INDEX "MCPServers_name_unique" ON public."MCPServers" USING btree 
 --
 
 CREATE UNIQUE INDEX "Quests_community_id_name_key" ON public."Quests" USING btree (community_id, name);
-
-
---
--- Name: LaunchpadTokens_liquidity_transferred; Type: INDEX; Schema: public; Owner: -
-
-CREATE INDEX "LaunchpadTokens_liquidity_transferred" ON public."LaunchpadTokens" USING btree (liquidity_transferred);
-
---
--- Name: LaunchpadTokens_created_at_desc; Type: INDEX; Schema: public; Owner: -
-
-CREATE INDEX "LaunchpadTokens_created_at_desc" ON public."LaunchpadTokens" USING btree (created_at DESC);
 
 
 --
