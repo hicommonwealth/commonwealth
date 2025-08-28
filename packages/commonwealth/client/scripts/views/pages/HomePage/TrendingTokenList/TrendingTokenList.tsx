@@ -55,7 +55,7 @@ const TrendingTokensList = ({
   const { data: tokensList, isInitialLoading } = useFetchTokensQuery({
     cursor: 1,
     limit,
-    with_stats: variant !== 'recent', // Only include stats for trending/graduated, not for recently launched
+    with_stats: variant !== 'recent',
     order_by: (() => {
       if (variant === 'recent') return 'created_at';
       if (variant === 'marketcap' || variant === 'graduated')
