@@ -138,7 +138,7 @@ class RedisBackupRestore {
     console.log(`Starting restore of ${backup.length} keys...`);
 
     let restored = 0;
-    const batchSize = 100;
+    const batchSize = 2_000_000;
 
     // Process in batches to avoid overwhelming the server
     for (let i = 0; i < backup.length; i += batchSize) {
@@ -199,20 +199,6 @@ class RedisBackupRestore {
     }
 
     console.log(`Restore complete: ${restored} keys restored`);
-  }
-
-  async backupToFile(filename: string): Promise<void> {
-    const backup = await this.backup();
-    const fs = await import('fs/promises');
-    await fs.writeFile(filename, JSON.stringify(backup, null, 2));
-    console.log(`Backup saved to ${filename}`);
-  }
-
-  async restoreFromFile(filename: string): Promise<void> {
-    const fs = await import('fs/promises');
-    const data = await fs.readFile(filename, 'utf-8');
-    const backup: BackupItem[] = JSON.parse(data);
-    await this.restore(backup);
   }
 
   // Direct backup and restore without file
