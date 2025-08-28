@@ -55,7 +55,7 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
       if (search) {
         conditions.push('LOWER(T.name) LIKE :search');
       }
-      if (typeof is_graduated === 'boolean') {
+      if (is_graduated) {
         conditions.push(
           `T.liquidity_transferred IS ${is_graduated ? 'TRUE' : 'FALSE'}`,
         );
