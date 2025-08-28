@@ -57,6 +57,7 @@ const TrendingTokensList = ({
     limit,
     with_stats: variant !== 'recent',
     order_by: (() => {
+      if (variant === 'trending') return '24_hr_pct_change';
       if (variant === 'recent') return 'created_at';
       if (variant === 'marketcap' || variant === 'graduated')
         return 'market_cap';

@@ -24,6 +24,10 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
       const direction = order_direction || 'DESC';
       let order_col: string;
       switch (order_by) {
+        case '24_hr_pct_change':
+          order_col =
+            '(trades.latest_price - trades.old_price) / trades.old_price';
+          break;
         case 'market_cap':
         case 'price':
           order_col = 'trades.latest_price';
@@ -60,6 +64,9 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
           `T.liquidity_transferred IS ${is_graduated ? 'TRUE' : 'FALSE'}`,
         );
       }
+      if (order_by === '24_hr_pct_change' && includeStats) {
+        conditions.push(`trades.old_price > 0`);
+      }
       const where_clause = conditions.length
         ? `WHERE ${conditions.join(' AND ')}`
         : '';
@@ -84,7 +91,7 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
                 FROM latest_trades lt
                 LEFT JOIN older_trades ot ON lt.token_address = ot.token_address
             )
-      SELECT DISTINCT ON (T.token_address) 
+      SELECT
             T.*,
             C.id AS community_id,
             trades.latest_price, trades.old_price,
@@ -93,7 +100,7 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
       JOIN "Communities" AS C ON T.namespace = C.namespace
       LEFT JOIN trades ON trades.token_address = T.token_address
       ${where_clause}
-      ORDER BY T.token_address ${direction}, ${order_col} ${direction}
+      ORDER BY ${order_col} ${direction}
       LIMIT :limit OFFSET :offset
     `
         : `
@@ -118,6 +125,7 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
         replacements,
         type: QueryTypes.SELECT,
         nest: true,
+        logging: true,
       });
 
       return schemas.buildPaginatedResponse(
