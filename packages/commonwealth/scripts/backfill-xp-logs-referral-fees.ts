@@ -64,6 +64,8 @@ FROM
 WHERE
   u.referred_by_address IS NOT NULL -- always review referrers by looking at the users referred by address column (driver)
   AND xl.id > :lastId
+ORDER BY
+  xl.id
 LIMIT ${batchSize}
 ),
 updated as ( -- update backfill columns with correct values
