@@ -450,7 +450,9 @@ Community Description: ${communityDescription}`;
               profile={{
                 address: comment.address,
                 avatarUrl: comment.avatar_url || '',
-                name: comment.profile_name || DEFAULT_NAME,
+                name: isStreamingAIReply
+                  ? 'AI Assistant'
+                  : comment.profile_name || DEFAULT_NAME,
                 userId: comment.user_id,
                 lastActive: comment.last_active as unknown as string,
                 tier: comment.user_tier || UserTierMap.IncompleteUser,
