@@ -12,6 +12,20 @@ export default {
           transaction,
         },
       );
+      await queryInterface.removeIndex(
+        'LaunchpadTrades',
+        'launchpad_trades_token_address_timestamp',
+        {
+          transaction,
+        },
+      );
+      await queryInterface.sequelize.query(
+        `
+        CREATE INDEX IF NOT EXISTS "launchpad_trades_token_address_timestamp"
+        ON "LaunchpadTrades" (token_address, timestamp DESC);
+      `,
+        { transaction },
+      );
       await queryInterface.addIndex('LaunchpadTokens', ['created_at'], {
         name: 'LaunchpadTokens_created_at_desc',
         transaction,
@@ -30,6 +44,20 @@ export default {
       await queryInterface.removeIndex(
         'LaunchpadTokens',
         'LaunchpadTokens_created_at_desc',
+        { transaction },
+      );
+      await queryInterface.removeIndex(
+        'LaunchpadTrades',
+        'launchpad_trades_token_address_timestamp',
+        {
+          transaction,
+        },
+      );
+      await queryInterface.sequelize.query(
+        `
+        CREATE INDEX IF NOT EXISTS "launchpad_trades_token_address_timestamp"
+        ON "LaunchpadTrades" (token_address, timestamp);
+      `,
         { transaction },
       );
     });
