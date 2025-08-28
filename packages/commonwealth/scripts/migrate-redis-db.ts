@@ -15,20 +15,18 @@ class RedisBackupRestore {
 
   constructor(sourceUrl: string, targetUrl: string) {
     const socketOptions = {
-      tls: true,
-      rejectUnauthorized: false,
+      socket: {
+        tls: true,
+        rejectUnauthorized: false,
+      },
     } as const;
     this.sourceClient = createClient({
       url: sourceUrl,
-      socket: {
-        ...(sourceUrl.includes('rediss') ? socketOptions : {}),
-      },
+      ...(sourceUrl.includes('rediss') ? socketOptions : {}),
     });
     this.targetClient = createClient({
       url: targetUrl,
-      socket: {
-        ...(targetUrl.includes('rediss') ? socketOptions : {}),
-      },
+      ...(targetUrl.includes('rediss') ? socketOptions : {}),
     });
   }
 
