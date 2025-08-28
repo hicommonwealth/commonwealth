@@ -48,6 +48,7 @@ const {
   MAGNA_UNLOCK_SCHEDULE_ID,
   MAGNA_UNLOCK_START_AT,
   MAGNA_BATCH_SIZE,
+  RAILWAY_PUBLIC_DOMAIN,
 } = process.env;
 
 const DEFAULTS = {
@@ -176,6 +177,7 @@ export const config = configure(
       RELEASER_URL,
       RELEASER_API_KEY,
       RELEASER_WAIT_ONLY: RELEASER_WAIT_ONLY === 'true',
+      RAILWAY_PUBLIC_DOMAIN,
     },
     MAGNA: MAGNA_TOKEN_ID
       ? {
@@ -338,6 +340,7 @@ export const config = configure(
         .describe(
           `When true, will not trigger a release but will await the result.`,
         ),
+      RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
     }),
     MAGNA: z
       .object({
