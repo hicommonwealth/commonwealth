@@ -46,7 +46,7 @@ async function main() {
               AND creator_user_id IS NOT NULL
             ORDER BY id
             LIMIT ${batchSize}
-          )          
+          )
           RETURNING id
         )
         SELECT COUNT(*)::INT AS count, COALESCE(MAX(id), :lastId)::INT AS max_id FROM updated;

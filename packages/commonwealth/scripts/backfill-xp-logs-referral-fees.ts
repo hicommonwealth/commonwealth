@@ -57,9 +57,9 @@ FROM
       JOIN "Users" r ON a.user_id = r.id
     WHERE
       a.address = u.referred_by_address -- TODO: do we need case-insensitive matching?
-      AND u.tier > 1 AND a.is_banned = FALSE -- make sure referrer is not a banned user
+      AND r.tier > 1 AND a.is_banned = FALSE -- make sure referrer is not a banned user
     ORDER BY
-      a.address, r.id -- pick the "first" by r.id, TODO: should we pick by activity date instead?...it could be more inestable
+      a.address, r.id -- pick "first" match by r.id
   ) AS ref_user ON true
 WHERE
   u.referred_by_address IS NOT NULL -- always review referrers by looking at the users referred by address column (driver)
@@ -71,6 +71,7 @@ updated as ( -- update backfill columns with correct values
   SET
     backfill_referrer_user_id = l.confirmed_referrer_user_id,
     backfill_referrer_xp_points = CASE
+      WHEN l.confirmed_referrer_user_id IS NULL THEN NULL -- no referrer found
       WHEN l.is_referral_event = TRUE THEN l.reward_amount * l.creator_reward_weight
       ELSE l.reward_amount * :feeRatio 
     END,

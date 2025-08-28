@@ -19,7 +19,7 @@ const log = logger(import.meta);
 
 async function getUserByAddressId(address_id: number) {
   const addr = await models.Address.findOne({
-    where: { id: address_id },
+    where: { id: address_id, is_banned: false },
     attributes: ['user_id'],
     include: [
       {
@@ -27,7 +27,7 @@ async function getUserByAddressId(address_id: number) {
         attributes: ['id'],
         required: true,
         where: {
-          tier: { [Op.ne]: UserTierMap.BannedUser },
+          tier: { [Op.gt]: UserTierMap.BannedUser },
         },
       },
     ],
@@ -46,6 +46,7 @@ async function getUserByAddress(address: string) {
           ],
         },
         { user_id: { [Op.not]: null } },
+        { is_banned: { [Op.eq]: false } },
       ],
     },
     attributes: ['user_id'],
