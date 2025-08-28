@@ -100,7 +100,7 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
       JOIN "Communities" AS C ON T.namespace = C.namespace
       LEFT JOIN trades ON trades.token_address = T.token_address
       ${where_clause}
-      ORDER BY ${order_col} ${direction}
+      ORDER BY ${order_col} ${direction} ${order_col === 'trades.latest_price' ? 'NULLS LAST' : ''}
       LIMIT :limit OFFSET :offset
     `
         : `
