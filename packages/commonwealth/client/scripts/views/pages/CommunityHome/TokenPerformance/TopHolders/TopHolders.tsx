@@ -47,53 +47,54 @@ const TopHolders = ({ supply }: { supply: number }) => {
   // empty array so that CWTable doesn't receive `undefined` row data which
   // would cause runtime errors when it attempts to access properties like
   // `originalRows.length`.
-  const rowData = topHolders?.results?.map((holder) => {
-    const name = holder.name || '';
-    const percentage = (holder.tokens * 100) / supply;
-    return {
-      user: {
-        customElement: (
-          <FullUser
-            userAddress={holder.address}
-            userCommunityId={communityId}
-            profile={{
-              address: holder.address,
-              name: name.length > 8 ? name.substring(0, 8) + '...' : name,
-              userId: holder.user_id,
-              tier: holder.tier,
-              lastActive: new Date().toISOString(),
-              avatarUrl: holder.avatar_url || '',
-            }}
-            shouldShowPopover
-            shouldShowRole
-            shouldShowAddressWithDisplayName={true}
-            className="top-holder-user"
-            avatarSize={24}
-          />
-        ),
-      },
-      tokens: {
-        customElement: (
-          <div className="tokens-cell">
-            <FormattedDisplayNumber
-              value={holder.tokens}
-              options={{
-                decimals: 1,
-                useShortSuffixes: true,
+  const rowData =
+    topHolders?.results?.map((holder) => {
+      const name = holder.name || '';
+      const percentage = (holder.tokens * 100) / supply;
+      return {
+        user: {
+          customElement: (
+            <FullUser
+              userAddress={holder.address}
+              userCommunityId={communityId}
+              profile={{
+                address: holder.address,
+                name: name.length > 8 ? name.substring(0, 8) + '...' : name,
+                userId: holder.user_id,
+                tier: holder.tier,
+                lastActive: new Date().toISOString(),
+                avatarUrl: holder.avatar_url || '',
               }}
-              tooltipContent={holder.tokens.toLocaleString()}
+              shouldShowPopover
+              shouldShowRole
+              shouldShowAddressWithDisplayName={true}
+              className="top-holder-user"
+              avatarSize={24}
             />
-          </div>
-        ),
-        sortValue: holder.tokens,
-      },
-      percentDisplay: {
-        customElement: (
-          <div className="percent-cell">{percentage.toFixed(2)}%</div>
-        ),
-        sortValue: percentage,
-      },
-    };
+          ),
+        },
+        tokens: {
+          customElement: (
+            <div className="tokens-cell">
+              <FormattedDisplayNumber
+                value={holder.tokens}
+                options={{
+                  decimals: 1,
+                  useShortSuffixes: true,
+                }}
+                tooltipContent={holder.tokens.toLocaleString()}
+              />
+            </div>
+          ),
+          sortValue: holder.tokens,
+        },
+        percentDisplay: {
+          customElement: (
+            <div className="percent-cell">{percentage.toFixed(2)}%</div>
+          ),
+          sortValue: percentage,
+        },
+      };
     }) ?? [];
 
   return (
@@ -114,7 +115,7 @@ const TopHolders = ({ supply }: { supply: number }) => {
         {isLoading ? (
           <CWText>Loading...</CWText>
         ) : (
-        <CWTable columnInfo={columnInfo} rowData={rowData} />
+          <CWTable columnInfo={columnInfo} rowData={rowData} />
         )}
       </div>
     </div>

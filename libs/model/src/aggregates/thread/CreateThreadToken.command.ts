@@ -8,12 +8,12 @@ import { withRetries } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { createPublicClient, Hash, http, parseEventLogs } from 'viem';
 import { models } from '../../database';
-import { authRoles, mustExist } from '../../middleware';
+import { mustExist } from '../../middleware';
 
 export function CreateThreadToken(): Command<typeof schemas.CreateThreadToken> {
   return {
     ...schemas.CreateThreadToken,
-    auth: [authRoles('admin')],
+    auth: [],
     body: async ({ payload }) => {
       const { eth_chain_id, transaction_hash } = payload;
 
@@ -28,10 +28,12 @@ export function CreateThreadToken(): Command<typeof schemas.CreateThreadToken> {
         transport: http(rpc),
       });
 
-      const receipt = await withRetries(() =>
-        client.getTransactionReceipt({
-          hash: transaction_hash as Hash,
-        }),
+      const receipt = await withRetries(
+        () =>
+          client.getTransactionReceipt({
+            hash: transaction_hash as Hash,
+          }),
+        15000,
       );
 
       const parsedLogs = parseEventLogs({
@@ -81,7 +83,7 @@ export function CreateThreadToken(): Command<typeof schemas.CreateThreadToken> {
             launchpad_liquidity: BigInt(launchpadLiquidity).toString(),
             eth_market_cap_target: protocols.getTargetMarketCap(),
             creator_address: receipt.from,
-            thread_id: threadId.toString(),
+            thread_id: Number(threadId),
             created_at: date,
             updated_at: date,
           },
