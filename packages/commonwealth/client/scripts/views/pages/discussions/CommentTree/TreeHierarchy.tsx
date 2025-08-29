@@ -1,6 +1,7 @@
 import {
   DEFAULT_COMPLETION_MODEL,
   DEFAULT_COMPLETION_MODEL_LABEL,
+  DEFAULT_AI_ASSISTANT_NAME,
   MAX_COMMENT_DEPTH,
 } from '@hicommonwealth/shared';
 import {
@@ -449,7 +450,7 @@ export const TreeHierarchy = ({
                   reply_count: 0,
                   user_id: user.id,
                   // Use AI Assistant for profile_name
-                  profile_name: 'AI Assistant',
+                  profile_name: DEFAULT_AI_ASSISTANT_NAME,
                 }}
                 isStreamingAIReply={true}
                 streamingModelId={instance.modelId}
