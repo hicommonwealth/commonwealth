@@ -1,3 +1,4 @@
+import { GetThreadToken } from '@hicommonwealth/schemas';
 import { truncate } from 'helpers/truncate';
 import useTopicGating from 'hooks/useTopicGating';
 import { IThreadCollaborator } from 'models/Thread';
@@ -9,6 +10,7 @@ import app from 'state';
 import useUserStore from 'state/ui/user';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { isHot } from 'views/pages/discussions/helpers';
+import { z } from 'zod';
 import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
@@ -16,6 +18,7 @@ import { Thread } from '../../../../models/Thread';
 import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
+import { ThreadTokenDrawer } from '../../ThreadTokenDrawer';
 import { ViewThreadUpvotesDrawer } from '../../UpvoteDrawer';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
@@ -87,6 +90,7 @@ type ContentPageProps = {
   proposalDetailSidebar?: SidebarComponents;
   showActionIcon?: boolean;
   isChatMode?: boolean;
+  threadToken?: z.infer<typeof GetThreadToken.output> | null;
 };
 
 export const CWContentPage = ({
@@ -131,11 +135,13 @@ export const CWContentPage = ({
   proposalDetailSidebar,
   showActionIcon = false,
   isChatMode,
+  threadToken,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
   const user = useUserStore();
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
+  const [isTokenDrawerOpen, setIsTokenDrawerOpen] = useState<boolean>(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const communityId = app.activeChainId() || '';
 
@@ -161,6 +167,10 @@ export const CWContentPage = ({
       pathname: location.pathname,
       search: `?${newQueryParams.toString()}`,
     });
+  };
+
+  const handleTokenDrawerClick = () => {
+    setIsTokenDrawerOpen(true);
   };
 
   if (showSkeleton) {
@@ -263,6 +273,8 @@ export const CWContentPage = ({
             editingDisabled={editingDisabled}
             actionGroups={actionGroups}
             bypassGating={bypassGating}
+            onTokenDrawerClick={handleTokenDrawerClick}
+            threadToken={threadToken}
           />,
         )}
 
@@ -362,6 +374,14 @@ export const CWContentPage = ({
         isOpen={isUpvoteDrawerOpen}
         setIsOpen={setIsUpvoteDrawerOpen}
       />
+      {thread?.id && (
+        <ThreadTokenDrawer
+          threadId={thread.id}
+          communityId={thread.communityId}
+          isOpen={isTokenDrawerOpen}
+          setIsOpen={setIsTokenDrawerOpen}
+        />
+      )}
     </div>
   );
 };

@@ -15,6 +15,7 @@ import {
   default as MarkdownViewerWithFallback,
 } from 'views/components/MarkdownViewerWithFallback';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
+import { ThreadTokenDrawer } from 'views/components/ThreadTokenDrawer';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -119,11 +120,16 @@ export const ThreadCard = ({
   const [showCommentVisible, setShowCommentVisible] =
     useState<boolean>(showCommentState);
   const [isTradeModalOpen, setIsTradeModalOpen] = useState<boolean>(false);
+  const [isTokenDrawerOpen, setIsTokenDrawerOpen] = useState<boolean>(false);
   const toggleShowComments = () => setShowCommentVisible((prev) => !prev);
   const showImage = useShowImage();
 
   const handleTradeClick = () => {
     setIsTradeModalOpen(true);
+  };
+
+  const handleTokenDrawerClick = () => {
+    setIsTokenDrawerOpen(true);
   };
 
   const { data: community, isLoading: isLoadingCommunity } =
@@ -377,6 +383,7 @@ export const ThreadCard = ({
                   actionGroups={actionGroups}
                   bypassGating={bypassGating}
                   onTradeClick={handleTradeClick}
+                  onTokenDrawerClick={handleTokenDrawerClick}
                 />
               )}
             </div>
@@ -464,6 +471,14 @@ export const ThreadCard = ({
         addressType={app.chain?.base || 'ethereum'}
         tokenCommunity={app.chain?.meta}
       />
+      {threadToken?.token_address && (
+        <ThreadTokenDrawer
+          threadId={thread.id}
+          communityId={thread.communityId}
+          isOpen={isTokenDrawerOpen}
+          setIsOpen={setIsTokenDrawerOpen}
+        />
+      )}
       <CWDivider className="ThreadDivider" />
     </>
   );

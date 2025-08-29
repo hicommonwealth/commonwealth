@@ -17,6 +17,7 @@ import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { downloadDataAsFile } from 'utils/downloadDataAsFile';
 import ShareButton from 'views/components/ShareButton';
+import { ThreadTokenDrawerTrigger } from 'views/components/ThreadTokenDrawer';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ToggleThreadSubscribe } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
@@ -48,6 +49,7 @@ type OptionsProps = AdminActionsProps & {
   actionGroups: ActionGroups;
   bypassGating: boolean;
   onTradeClick?: () => void;
+  onTokenDrawerClick?: () => void;
 };
 
 export const ThreadOptions = ({
@@ -82,6 +84,7 @@ export const ThreadOptions = ({
   actionGroups,
   bypassGating,
   onTradeClick,
+  onTokenDrawerClick,
 }: OptionsProps) => {
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   const userStore = useUserStore();
@@ -171,6 +174,17 @@ export const ThreadOptions = ({
                 onTradeClick();
               }}
               tooltipText="Trade thread token"
+            />
+          )}
+
+          {threadToken?.token_address && onTokenDrawerClick && (
+            <ThreadTokenDrawerTrigger
+              onClick={(e) => {
+                e.preventDefault();
+                onTokenDrawerClick();
+              }}
+              label={showOnlyThreadActionIcons ? '' : 'Holders'}
+              showLabel={!showOnlyThreadActionIcons}
             />
           )}
 
