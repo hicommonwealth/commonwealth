@@ -25,6 +25,7 @@ import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
 import { useSearchCommunitiesQuery } from '../../../../scripts/state/api/communities';
 import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
 import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
+import { useFetchTokensQuery } from '../../../../scripts/state/api/tokens';
 import { useCommonNavigate } from '../../../navigation/helpers';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -167,6 +168,19 @@ const SearchPage = () => {
   });
 
   const {
+    data: tokensData,
+    error: tokensError,
+    fetchNextPage: tokensFetchNextPage,
+    isLoading: tokensIsLoading,
+  } = useFetchTokensQuery({
+    search: search_term,
+    cursor: 1,
+    limit: 20,
+    with_stats: true,
+    enabled: activeTab === SearchScope.Tokens && search_term.length > 0,
+  });
+
+  const {
     data: profilesData,
     error: profilesError,
     fetchNextPage: profilesFetchNextPage,
@@ -199,6 +213,11 @@ const SearchPage = () => {
             [],
           ) || []
         );
+      case SearchScope.Tokens:
+        return (
+          tokensData?.pages?.reduce((acc, p) => [...acc, ...p.results], []) ||
+          []
+        );
       case SearchScope.Members:
         return (
           profilesData?.pages?.reduce((acc, p) => [...acc, ...p.results], []) ||
@@ -217,6 +236,8 @@ const SearchPage = () => {
         return commentsData?.pages?.[0]?.totalResults || 0;
       case SearchScope.Communities:
         return communityData?.pages?.[0]?.totalResults || 0;
+      case SearchScope.Tokens:
+        return tokensData?.pages?.[0]?.totalResults || 0;
       case SearchScope.Members:
         return profilesData?.pages?.[0]?.totalResults || 0;
       default:
@@ -240,7 +261,11 @@ const SearchPage = () => {
   // when error, notify
   useEffect(() => {
     const err =
-      threadsError || commentsError || communityError || profilesError;
+      threadsError ||
+      commentsError ||
+      communityError ||
+      profilesError ||
+      tokensError;
     if (err) {
       notifyError(err.message);
     }
@@ -258,6 +283,9 @@ const SearchPage = () => {
           break;
         case SearchScope.Communities:
           chainsFetchNextPage();
+          break;
+        case SearchScope.Tokens:
+          tokensFetchNextPage();
           break;
         case SearchScope.Members:
           profilesFetchNextPage();
@@ -281,6 +309,8 @@ const SearchPage = () => {
         return commentsIsLoading;
       case SearchScope.Communities:
         return communityIsLoading;
+      case SearchScope.Tokens:
+        return tokensIsLoading;
       case SearchScope.Members:
         return profilesIsLoading;
       default:

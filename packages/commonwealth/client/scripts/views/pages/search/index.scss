@@ -116,6 +116,10 @@
           }
         }
       }
+
+      .token-result-row {
+        @include searchRowStyles;
+      }
     }
   }
 }

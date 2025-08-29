@@ -1,4 +1,8 @@
-import { SearchUserProfilesView, ThreadView } from '@hicommonwealth/schemas';
+import {
+  SearchUserProfilesView,
+  ThreadView,
+  TokenView,
+} from '@hicommonwealth/schemas';
 import { getDecodedString } from '@hicommonwealth/shared';
 import moment from 'moment';
 import React, { useMemo } from 'react';
@@ -190,6 +194,30 @@ const CommunityResultRow = ({
   );
 };
 
+export type TokenResult = z.infer<typeof TokenView> & { community_id: string };
+
+type TokenResultRowProps = {
+  token: TokenResult;
+  setRoute: any;
+};
+
+// eslint-disable-next-line react/no-multi-comp
+const TokenResultRow = ({ token, setRoute }: TokenResultRowProps) => {
+  const handleClick = () => {
+    setRoute('/', {}, token.community_id);
+  };
+
+  return (
+    <div
+      key={token.token_address}
+      className="token-result-row"
+      onClick={handleClick}
+    >
+      <CommunityLabel name={token.name || ''} iconUrl={token.icon_url || ''} />
+    </div>
+  );
+};
+
 export type MemberResult = z.infer<typeof SearchUserProfilesView>;
 
 type MemberResultRowProps = {
@@ -261,6 +289,8 @@ export const renderSearchResults = (
             setRoute={setRoute}
           />
         );
+      case SearchScope.Tokens:
+        return <TokenResultRow token={res} setRoute={setRoute} />;
       case SearchScope.Replies:
         return (
           <ReplyResultRow

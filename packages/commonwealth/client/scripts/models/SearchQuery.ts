@@ -5,6 +5,7 @@ export enum SearchScope {
   'Proposals' = 'Proposals',
   'Threads' = 'Threads',
   'Replies' = 'Replies',
+  'Tokens' = 'Tokens',
   'All' = 'All',
 }
 
@@ -12,6 +13,7 @@ export const VALID_SEARCH_SCOPES: SearchScope[] = [
   SearchScope.Threads,
   SearchScope.Replies,
   SearchScope.Communities,
+  SearchScope.Tokens,
   SearchScope.Members,
   SearchScope.Topics,
   SearchScope.Proposals,
@@ -120,6 +122,7 @@ export default class SearchQuery implements SearchParams {
       SearchScope.Threads,
       SearchScope.Replies,
       SearchScope.Communities,
+      SearchScope.Tokens,
       SearchScope.Members,
     ];
   }

@@ -6,6 +6,7 @@ import {
   SearchCommunityView,
   SearchUserProfilesView,
   ThreadView,
+  TokenView,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
@@ -15,17 +16,19 @@ import { useSearchCommentsQuery } from '../state/api/comments';
 import { useSearchCommunitiesQuery } from '../state/api/communities';
 import { useSearchProfilesQuery } from '../state/api/profiles';
 import { useSearchThreadsQuery } from '../state/api/threads';
+import { useFetchTokensQuery } from '../state/api/tokens';
 
 export type SearchResults = {
   [SearchScope.Threads]: z.infer<typeof ThreadView>[];
   [SearchScope.Replies]: z.infer<typeof CommentSearchView>[];
   [SearchScope.Communities]: z.infer<typeof SearchCommunityView>[];
   [SearchScope.Members]: z.infer<typeof SearchUserProfilesView>[];
+  [SearchScope.Tokens]: z.infer<typeof TokenView>[];
 };
 
 const NUM_RESULTS_PER_SECTION = 2;
 
-type Filter = 'threads' | 'replies' | 'communities' | 'members';
+type Filter = 'threads' | 'replies' | 'communities' | 'members' | 'tokens';
 
 const useSearchResults = (
   searchTerm: string,
@@ -93,14 +96,23 @@ const useSearchResults = (
       debouncedSearchTerm?.length >= 3,
   });
 
+  const { data: tokensData } = useFetchTokensQuery({
+    search: sharedQueryOptions.searchTerm,
+    cursor: 1,
+    limit: sharedQueryOptions.limit,
+    with_stats: false,
+    enabled: queryEnabled && filters.includes('tokens'),
+  });
+
   const searchResults = useMemo(() => {
     return {
       [SearchScope.Threads]: threadsData?.pages?.[0]?.results || [],
       [SearchScope.Replies]: commentsData?.pages?.[0]?.results || [],
       [SearchScope.Communities]: communityData?.pages?.[0]?.results || [],
       [SearchScope.Members]: profilesData?.pages?.[0]?.results || [],
+      [SearchScope.Tokens]: tokensData?.pages?.[0]?.results || [],
     };
-  }, [threadsData, communityData, profilesData, commentsData]);
+  }, [threadsData, communityData, profilesData, commentsData, tokensData]);
 
   // @ts-expect-error User is required in one of the results
   return { searchResults };

@@ -73,6 +73,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
     // @ts-expect-error <StrictNullChecks/>
     communityId === 'all_communities' ? 'communities' : null,
     'members',
+    'tokens',
   ]);
 
   //on mobile, focus the input when the component (search modal) mounts

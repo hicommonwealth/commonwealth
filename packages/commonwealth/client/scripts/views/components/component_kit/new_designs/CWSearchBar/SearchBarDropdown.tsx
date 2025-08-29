@@ -7,12 +7,14 @@ import { SearchBarCommentPreviewRow } from './SearchBarCommentPreviewRow';
 import { SearchBarCommunityPreviewRow } from './SearchBarCommunityPreviewRow';
 import { SearchBarMemberPreviewRow } from './SearchBarMemberPreviewRow';
 import { SearchBarThreadPreviewRow } from './SearchBarThreadPreviewRow';
+import { SearchBarTokenPreviewRow } from './SearchBarTokenPreviewRow';
 
 import {
   CommentSearchView,
   SearchCommunityView,
   SearchUserProfilesView,
   ThreadView,
+  TokenView,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { SearchResults } from '../../../../../hooks/useSearchResults';
@@ -23,7 +25,8 @@ interface SearchBarPreviewSectionProps {
     | z.infer<typeof ThreadView>[]
     | z.infer<typeof CommentSearchView>[]
     | z.infer<typeof SearchCommunityView>[]
-    | z.infer<typeof SearchUserProfilesView>[];
+    | z.infer<typeof SearchUserProfilesView>[]
+    | z.infer<typeof TokenView>[];
   searchTerm: string;
   searchScope: SearchScope;
   onSearchItemClick?: () => void;
@@ -47,6 +50,7 @@ const SearchBarPreviewSection: FC<SearchBarPreviewSectionProps> = ({
     [SearchScope.Replies]: 'Comments',
     [SearchScope.Communities]: 'Communities',
     [SearchScope.Members]: 'Members',
+    [SearchScope.Tokens]: 'Tokens',
   };
 
   const PreviewRowComponentMap = {
@@ -54,6 +58,7 @@ const SearchBarPreviewSection: FC<SearchBarPreviewSectionProps> = ({
     [SearchScope.Replies]: SearchBarCommentPreviewRow,
     [SearchScope.Communities]: SearchBarCommunityPreviewRow,
     [SearchScope.Members]: SearchBarMemberPreviewRow,
+    [SearchScope.Tokens]: SearchBarTokenPreviewRow,
   };
 
   const PreviewRowComponent = PreviewRowComponentMap[searchScope];
