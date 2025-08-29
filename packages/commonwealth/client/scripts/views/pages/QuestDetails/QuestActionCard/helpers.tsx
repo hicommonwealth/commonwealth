@@ -68,9 +68,7 @@ const gateWalletCopy = (
     </ol>
     <br />
     Visit Gate to explore more onchain:{' '}
-    <a href="https://www.gate.io">
-      https://www.gate.io
-    </a>
+    <a href="https://www.gate.io">https://www.gate.io</a>
   </div>
 );
 
