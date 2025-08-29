@@ -121,6 +121,8 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
       { path: ':scope/discussions/*' },
       { path: '/archived' },
       { path: ':scope/archived' },
+      { path: '/profile/id/*' },
+      { path: ':scope/profile/id/*' },
     ],
     location,
   );
