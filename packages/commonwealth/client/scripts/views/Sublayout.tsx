@@ -121,8 +121,6 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
       { path: ':scope/discussions/*' },
       { path: '/archived' },
       { path: ':scope/archived' },
-      { path: '/profile/id/*' },
-      { path: ':scope/profile/id/*' },
     ],
     location,
   );
@@ -199,7 +197,9 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             resizing,
           )}
         >
-          <SublayoutBanners banner={banner || ''} terms={terms || ''} />
+          {isInsideCommunity && (
+            <SublayoutBanners banner={banner || ''} terms={terms || ''} />
+          )}
 
           <div className="Body">
             <div
