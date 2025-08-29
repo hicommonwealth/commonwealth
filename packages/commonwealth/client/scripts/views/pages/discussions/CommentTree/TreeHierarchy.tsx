@@ -50,6 +50,7 @@ export interface TreeHierarchyProps
       | StreamingReplyInstance[]
       | ((prevInstances: StreamingReplyInstance[]) => StreamingReplyInstance[]),
   ) => void;
+  autoLoadNestedParentLevelReplies?: Boolean;
 }
 
 type ExtendedCommentViewParams = CommentViewParams & {
@@ -66,7 +67,7 @@ const DEFAULT_MODEL: AIModelOption = {
 export const TreeHierarchy = ({
   pageRef,
   thread,
-  parentCommentId,
+  parentComment,
   isThreadLocked,
   isThreadArchived,
   isReplyingToCommentId,
@@ -86,6 +87,7 @@ export const TreeHierarchy = ({
   streamingInstances,
   setStreamingInstances,
   permissions,
+  autoLoadNestedParentLevelReplies,
 }: TreeHierarchyProps) => {
   const user = useUserStore();
   const communityId = app.activeChainId() || '';
@@ -96,6 +98,15 @@ export const TreeHierarchy = ({
   const isLoadingOlderMessagesRef = useRef(false);
   const previousCommentsLengthRef = useRef(0);
   const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false);
+  const [loadButtonClicked, setLoadButtonClicked] = useState(
+    autoLoadNestedParentLevelReplies || false,
+  );
+  const [
+    _autoLoadNestedParentLevelReplies,
+    setAutoLoadNestedParentLevelReplies,
+  ] = useState(false);
+  // do not load all children beyond 2nd level, allow 2nd level to be expanded, level starts from 0
+  const shouldLoadWithBtnClick = parentComment && parentComment?.level >= 1;
 
   const {
     data: paginatedComments,
@@ -107,7 +118,7 @@ export const TreeHierarchy = ({
   } = useFetchCommentsQuery({
     thread_id: parseInt(`${thread.id}`) || 0,
     include_reactions: true,
-    parent_id: parentCommentId,
+    parent_id: parentComment?.id,
     include_spam_comments: commentFilters.includeSpam,
     order_by: commentFilters.sortType,
     cursor: 1,
@@ -119,7 +130,7 @@ export const TreeHierarchy = ({
     if (!paginatedComments?.pages) return [];
 
     const pages = paginatedComments.pages;
-    if (isChatMode && !parentCommentId) {
+    if (isChatMode && !parentComment?.id) {
       // For chat mode, reverse the pages array so older messages (newer pages) appear first
       return [...pages].reverse().flatMap((page) => page.results);
     }
@@ -129,7 +140,7 @@ export const TreeHierarchy = ({
   }, [
     paginatedComments?.pages,
     isChatMode,
-    parentCommentId,
+    parentComment?.id,
   ]) as ExtendedCommentViewParams[];
 
   const handleGenerateAIReply = useCallback(
@@ -147,6 +158,8 @@ export const TreeHierarchy = ({
         );
         return Promise.resolve();
       }
+
+      setAutoLoadNestedParentLevelReplies(true); // show the replies afterwards
 
       // If useDefaultModelOnly is true, only use the first selected model
       const modelsToUse = useDefaultModelOnly
@@ -204,7 +217,7 @@ export const TreeHierarchy = ({
     if (
       isChatMode &&
       commentFilters.sortType === 'oldest' &&
-      !parentCommentId
+      !parentComment?.id
     ) {
       const shouldAutoScroll =
         // When first entering chat mode
@@ -245,7 +258,7 @@ export const TreeHierarchy = ({
     isChatMode,
     allComments.length,
     commentFilters.sortType,
-    parentCommentId,
+    parentComment?.id,
     allComments,
   ]);
 
@@ -271,13 +284,13 @@ export const TreeHierarchy = ({
     return <CWCircleMultiplySpinner />;
   }
 
-  const rootStreamingInstances = parentCommentId
+  const rootStreamingInstances = parentComment?.id
     ? []
     : streamingInstances.filter(
         (instance) => instance.targetCommentId === thread.id,
       );
 
-  if (rootStreamingInstances.length > 0 && !parentCommentId) {
+  if (rootStreamingInstances.length > 0 && !parentComment?.id) {
     return (
       <>
         {rootStreamingInstances.map((instance) => {
@@ -343,13 +356,35 @@ export const TreeHierarchy = ({
     );
   }
 
+  if (shouldLoadWithBtnClick && !loadButtonClicked) {
+    if (
+      !isInitialCommentsLoading &&
+      !isLoadingComments &&
+      allComments.length === 0
+    ) {
+      // IMP: don't show anything. The load button, glitches, if clicked when no comments exist
+    } else {
+      return (
+        <CWButton
+          containerClassName="m-auto"
+          buttonType="secondary"
+          buttonHeight="sm"
+          buttonWidth="narrow"
+          label="Load replies"
+          disabled={isLoadingComments || isInitialCommentsLoading}
+          onClick={() => setLoadButtonClicked(true)}
+        />
+      );
+    }
+  }
+
   if (
     allComments.length === 0 &&
-    !parentCommentId &&
+    !parentComment?.id &&
     rootStreamingInstances.length === 0
   )
     return <></>;
-  if (allComments.length === 0 && parentCommentId) return <></>;
+  if (allComments.length === 0 && parentComment?.id) return <></>;
 
   const renderCommentItem = (
     comment: ExtendedCommentViewParams,
@@ -424,10 +459,11 @@ export const TreeHierarchy = ({
             thread={thread}
             canReact={canReact}
             canReply={canReply}
-            parentCommentId={comment.id}
+            parentComment={{ id: comment.id, level: comment.comment_level }}
             streamingInstances={streamingInstances}
             setStreamingInstances={setStreamingInstances}
             permissions={permissions}
+            autoLoadNestedParentLevelReplies={_autoLoadNestedParentLevelReplies}
           />
         )}
         {streamingInstances
@@ -518,11 +554,11 @@ export const TreeHierarchy = ({
     <>
       <div
         className={clsx('CommentsTree', {
-          'replies-container': !!parentCommentId,
-          'chat-mode': isChatMode && !parentCommentId,
+          'replies-container': !!parentComment?.id,
+          'chat-mode': isChatMode && !parentComment?.id,
         })}
       >
-        {parentCommentId ? (
+        {parentComment?.id ? (
           // For replies, render directly without Virtuoso to avoid nesting issues
           <div>{allComments.map(renderCommentItem)}</div>
         ) : (
@@ -536,7 +572,7 @@ export const TreeHierarchy = ({
             })}
             {...(isChatMode &&
               commentFilters.sortType === 'oldest' &&
-              !parentCommentId && {
+              !parentComment?.id && {
                 followOutput: !isLoadingOlderMessages,
                 reversed: true,
               })}
@@ -545,7 +581,7 @@ export const TreeHierarchy = ({
             components={{
               // eslint-disable-next-line react/no-multi-comp
               EmptyPlaceholder: () => <></>,
-              ...(isChatMode && !parentCommentId
+              ...(isChatMode && !parentComment?.id
                 ? {
                     // eslint-disable-next-line react/no-multi-comp
                     Header: () => {
