@@ -5,9 +5,10 @@
 
 .ContestCard {
   max-width: 600px;
-  width: unset;
+  width: 330px;
   padding: 0;
   position: relative;
+  border: 1px solid colors.$neutral-300;
 
   @include media_queries.smallInclusive {
     min-width: 330px;
@@ -16,6 +17,7 @@
   &.isHorizontal {
     flex-direction: row;
     max-width: unset;
+    width: 100%;
 
     .contest-image {
       border-radius: border_radius.$border-radius-corners 0 0
