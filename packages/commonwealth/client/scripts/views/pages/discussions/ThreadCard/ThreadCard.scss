@@ -3,19 +3,24 @@
 @use '../../../../styles/mixins/colors.module';
 @use '../../../../styles/mixins/media_queries';
 @use '../../../../styles/mixins/text';
+@use '../../../../styles/mixins/elevation';
 
 .ThreadCard {
   cursor: pointer;
   display: flex;
   align-items: flex-start;
   width: 100%;
-  border-radius: 6px;
+  border-radius: border_radius.$border-radius-corners;
   padding: 16px;
   gap: 16px;
   text-decoration: none;
   color: unset !important;
   overflow: hidden;
   min-width: 100%;
+  background-color: colors.$white;
+  border: 1px solid colors.$neutral-300;
+  box-shadow: elevation.$elevation-1;
+  transition: box-shadow 0.2s;
 
   @include media_queries.smallInclusive {
     padding: 12px;
@@ -23,7 +28,7 @@
 
   &.showSkeleton {
     &:hover {
-      background: unset;
+      box-shadow: elevation.$elevation-1;
     }
   }
 
@@ -34,13 +39,14 @@
       background: colors.$neutral-50;
       text-decoration: none;
       color: unset;
+      box-shadow: elevation.$elevation-3;
     }
   }
 
   &:hover {
-    background: colors.$neutral-50;
     text-decoration: none;
     color: unset;
+    box-shadow: elevation.$elevation-3;
   }
 
   .content-wrapper {
