@@ -1,6 +1,6 @@
 import React from 'react';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { CWText } from '../component_kit/cw_text';
+import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
+import { CWText } from '../../component_kit/cw_text';
 import './ThreadTokenDrawerTrigger.scss';
 
 interface ThreadTokenDrawerTriggerProps {
