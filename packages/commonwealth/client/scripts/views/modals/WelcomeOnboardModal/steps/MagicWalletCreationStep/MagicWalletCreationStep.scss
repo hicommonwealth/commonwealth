@@ -18,4 +18,15 @@
   .primary {
     background-color: colors.$primary-600 !important;
   }
+
+  .button-container {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .CWModalFooter {
+    display: none;
+  }
 }

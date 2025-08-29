@@ -92,6 +92,7 @@ type CommentCardProps = {
   onStreamingComplete?: () => void;
   // voting
   tokenNumDecimals?: number;
+  tokenSymbol?: string;
   // Add props for root-level comment generation
   isRootComment?: boolean;
   threadContext?: string;
@@ -141,6 +142,7 @@ export const CommentCard = ({
   parentCommentText,
   onStreamingComplete,
   tokenNumDecimals,
+  tokenSymbol,
   isRootComment,
   threadContext,
   threadTitle,
@@ -499,6 +501,7 @@ Community Description: ${communityDescription}`;
                     onReaction={handleReaction}
                     weightType={weightType}
                     tokenNumDecimals={tokenNumDecimals}
+                    tokenSymbol={tokenSymbol}
                   />
                 )}
 
@@ -516,6 +519,7 @@ Community Description: ${communityDescription}`;
                       setIsOpen={setIsUpvoteDrawerOpen}
                       tokenDecimals={tokenNumDecimals}
                       weightType={weightType}
+                      tokenSymbol={tokenSymbol}
                     />
                   </>
                 )}

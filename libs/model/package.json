@@ -74,7 +74,6 @@
     "dump-db": "chmod u+x scripts/dump-db.sh && ./scripts/dump-db.sh",
     "reset-db": "chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh",
     "cancel-active-contests": "tsx scripts/cancel-active-contests.ts",
-    "split-creator-referrer-xp-logs": "tsx scripts/split-creator-referrer-xp-logs.ts",
     "create-neon-branch": "chmod u+x scripts/create-neon-branch.sh && ./scripts/create-neon-branch.sh"
   },
   "dependencies": {
