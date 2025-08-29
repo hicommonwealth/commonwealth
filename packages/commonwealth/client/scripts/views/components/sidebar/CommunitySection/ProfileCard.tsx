@@ -2,7 +2,7 @@ import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import useUserStore from 'client/scripts/state/ui/user';
 import clsx from 'clsx';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
 import { CWTooltip } from '../../../components/component_kit/new_designs/CWTooltip';
 import TrustLevelRole from '../../TrustLevelRole';
@@ -16,6 +16,7 @@ enum ImageBehavior {
 
 const ProfileCard = () => {
   const userData = useUserStore();
+  const navigate = useNavigate();
 
   const { data } = useFetchProfileByIdQuery({
     apiCallEnabled: userData.isLoggedIn,
@@ -59,21 +60,28 @@ const ProfileCard = () => {
           }
           placement="top"
           renderTrigger={(handleInteraction, isTooltipOpen) => (
-            <Link
+            <div
               onMouseEnter={(e) => {
                 handleMouseEnter({ e, isTooltipOpen, handleInteraction });
               }}
               onMouseLeave={(e) => {
                 handleMouseLeave({ e, isTooltipOpen, handleInteraction });
               }}
-              to={`/profile/id/${userData.id}`}
               className="user-info"
             >
-              <h3 className="profile-name">
-                {data?.profile.name}{' '}
+              <Link to={`/profile/id/${userData.id}`}>
+                <h3 className="profile-name">{data?.profile.name}</h3>
+              </Link>
+              <span
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigate('/profile/edit');
+                }}
+              >
                 <TrustLevelRole type="user" level={data?.tier} withTooltip />
-              </h3>
-            </Link>
+              </span>
+            </div>
           )}
         />
       </div>
