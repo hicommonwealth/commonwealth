@@ -273,6 +273,8 @@ const ContestCard = ({
       className={clsx('ContestCard', {
         isHorizontal: isHorizontal && !isWindowMediumSmallInclusive,
       })}
+      elevation="elevation-1"
+      interactive
     >
       {imageUrl && (
         <div className="contest-image-container">
