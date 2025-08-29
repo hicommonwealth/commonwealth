@@ -1,5 +1,6 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import { APIOrderDirection } from '../../../helpers/constants';
+import { useGetThreadTokenTradesQuery } from '../../../state/api/tokens';
 import { CWText } from '../component_kit/cw_text';
 import CWDrawer, {
   CWDrawerTopBar,
@@ -21,13 +22,9 @@ type TradeActivity = {
   id: string;
   type: 'buy' | 'sell';
   amount: string;
-  price: string;
-  timestamp: string;
-  user: {
-    name: string;
-    avatarUrl: string;
-    address: string;
-  };
+  price: number;
+  timestamp: number;
+  address: string;
 };
 
 type TokenHolder = {
@@ -104,45 +101,6 @@ const tokenHolderColumns: CWTableColumnInfo[] = [
   },
 ];
 
-const mockTradeActivity: TradeActivity[] = [
-  {
-    id: '1',
-    type: 'buy',
-    amount: '1000',
-    price: '0.001 ETH',
-    timestamp: '2024-01-15T10:30:00Z',
-    user: {
-      name: 'Alice',
-      avatarUrl: '',
-      address: '0x1234...5678',
-    },
-  },
-  {
-    id: '2',
-    type: 'sell',
-    amount: '500',
-    price: '0.0012 ETH',
-    timestamp: '2024-01-15T09:15:00Z',
-    user: {
-      name: 'Bob',
-      avatarUrl: '',
-      address: '0x8765...4321',
-    },
-  },
-  {
-    id: '3',
-    type: 'buy',
-    amount: '2000',
-    price: '0.0009 ETH',
-    timestamp: '2024-01-15T08:45:00Z',
-    user: {
-      name: 'Charlie',
-      avatarUrl: '',
-      address: '0xabcd...efgh',
-    },
-  },
-];
-
 const mockTokenHolders: TokenHolder[] = [
   {
     id: '1',
@@ -180,12 +138,8 @@ const mockTokenHolders: TokenHolder[] = [
 ];
 
 const tabs = [
-  {
-    id: 'trade-activity',
-    label: 'Trade Activity',
-    iconLeft: 'chartLineUp' as const,
-  },
-  { id: 'token-holders', label: 'Token Holders', iconLeft: 'users' as const },
+  { id: 'token-holders', label: 'Token Holders' },
+  { id: 'trade-activity', label: 'Trade Activity' },
 ];
 
 export const ThreadTokenDrawer = ({
@@ -194,7 +148,17 @@ export const ThreadTokenDrawer = ({
   isOpen,
   setIsOpen,
 }: ThreadTokenDrawerProps) => {
-  const [activeTab, setActiveTab] = useState(tabs[0].id);
+  const [activeTab, setActiveTab] = useState('trade-activity');
+
+  const { data: tradesData, isLoading: isLoadingTrades } =
+    useGetThreadTokenTradesQuery(
+      {
+        thread_id: threadId,
+      },
+      {
+        enabled: isOpen && !!threadId,
+      },
+    );
 
   const tradeActivityTableState = useCWTableState({
     columns: tradeActivityColumns,
@@ -208,15 +172,14 @@ export const ThreadTokenDrawer = ({
     initialSortDirection: APIOrderDirection.Desc,
   });
 
-  const getTradeActivityRowData = (activities: TradeActivity[]) => {
+  const getTradeActivityRowData = (activities: any[]) => {
     return activities.map((activity) => ({
       user: {
-        sortValue: activity.user.name,
+        sortValue: activity.address,
         customElement: (
           <div className="user-info">
-            <CWText type="b2">{activity.user.name}</CWText>
-            <CWText type="caption" className="address">
-              {activity.user.address}
+            <CWText type="b2" className="address">
+              {activity.address}
             </CWText>
           </div>
         ),
@@ -231,9 +194,9 @@ export const ThreadTokenDrawer = ({
           </div>
         ),
       },
-      amount: activity.amount,
-      price: activity.price,
-      timestamp: activity.timestamp,
+      amount: parseFloat(activity.amount).toLocaleString(),
+      price: `${activity.price} ETH`,
+      timestamp: new Date(activity.timestamp * 1000).toISOString(),
     }));
   };
 
@@ -264,12 +227,20 @@ export const ThreadTokenDrawer = ({
             <CWText type="h4" className="tab-header">
               Recent Trade Activity
             </CWText>
-            {mockTradeActivity.length > 0 ? (
+            {isLoadingTrades ? (
+              <div className="loading-state">
+                <CWText type="b1" className="loading-text">
+                  Loading trade activity...
+                </CWText>
+              </div>
+            ) : tradesData &&
+              (tradesData as any).result &&
+              (tradesData as any).result.length > 0 ? (
               <CWTable
                 columnInfo={tradeActivityTableState.columns}
                 sortingState={tradeActivityTableState.sorting}
                 setSortingState={tradeActivityTableState.setSorting}
-                rowData={getTradeActivityRowData(mockTradeActivity)}
+                rowData={getTradeActivityRowData((tradesData as any).result)}
               />
             ) : (
               <div className="empty-state">
@@ -329,7 +300,6 @@ export const ThreadTokenDrawer = ({
               <CWTab
                 key={tab.id}
                 label={tab.label}
-                iconLeft={tab.iconLeft}
                 isSelected={activeTab === tab.id}
                 onClick={() => setActiveTab(tab.id)}
               />
