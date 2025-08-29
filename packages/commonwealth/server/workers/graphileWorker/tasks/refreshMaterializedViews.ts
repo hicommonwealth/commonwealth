@@ -2,7 +2,7 @@ import { logger } from '@hicommonwealth/core';
 import { getQuestXpLeaderboardViewName } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import { TaskPayloads } from '@hicommonwealth/model/services';
-import { Op, literal } from 'sequelize';
+import Sequelize from 'sequelize';
 
 const log = logger(import.meta);
 
@@ -12,15 +12,18 @@ export const refreshMaterializedViews = async (): Promise<void> => {
     REFRESH MATERIALIZED VIEW CONCURRENTLY user_leaderboard;
   `);
 
-  const activeQuests = await models.Quest.findAll({
-    attributes: ['id'],
-    where: {
-      start_date: {
-        [Op.lte]: new Date(), // NOW() >= start_date
-      },
-      [Op.and]: [literal("NOW() <= end_date + INTERVAL '1 week'")],
+  const activeQuests = await models.sequelize.query<{ id: number }>(
+    `
+    SELECT id
+    FROM "Quests"
+    WHERE start_date <= NOW()
+      AND NOW() <= end_date + INTERVAL '1 week';
+  `,
+    {
+      type: Sequelize.QueryTypes.SELECT,
+      raw: true,
     },
-  });
+  );
 
   for (const { id } of activeQuests) {
     await models.sequelize.query(`
