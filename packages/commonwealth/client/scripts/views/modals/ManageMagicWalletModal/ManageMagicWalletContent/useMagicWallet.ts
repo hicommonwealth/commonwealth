@@ -83,7 +83,7 @@ const useMagicWallet = ({
   }, [chainId, chainNode]);
 
   useNecessaryEffect(() => {
-    initMagic();
+    initMagic().catch(console.error);
   }, [initMagic]);
 
   return {

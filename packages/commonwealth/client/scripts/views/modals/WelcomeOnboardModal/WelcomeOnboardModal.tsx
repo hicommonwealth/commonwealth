@@ -22,7 +22,6 @@ import { WelcomeOnboardModalProps, WelcomeOnboardModalSteps } from './types';
 const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const referralsEnabled = useFlag('referrals');
-  const moonpayFundsEnabled = useFlag('moonpayFunds');
 
   const [activeStep, setActiveStep] = useState<WelcomeOnboardModalSteps>(
     WelcomeOnboardModalSteps.TermsOfServices,
@@ -87,7 +86,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
         };
       }
       case WelcomeOnboardModalSteps.MagicWallet: {
-        return hasMagic && moonpayFundsEnabled
+        return hasMagic
           ? {
               index: 5,
               title: 'Add funds to your wallet',

@@ -1,5 +1,6 @@
 import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { MoonPayBuyWidget } from '@moonpay/moonpay-react';
+import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useGetEthereumBalanceQuery } from 'state/api/tokens';
@@ -26,6 +27,7 @@ interface ManageMagicWalletContentProps {
 const ManageMagicWalletContent = ({
   chainId = BASE_MAINNET_CHAIN_ID,
 }: ManageMagicWalletContentProps = {}) => {
+  const moonpayFundsEnabled = useFlag('moonpayFunds');
   const {
     magic,
     userAddress,
@@ -105,11 +107,13 @@ const ManageMagicWalletContent = ({
             </CWText>
 
             <div className="fund-options">
-              <ManageWalletItem
-                icon="moonpay"
-                title="Deposit Funds via Moonpay"
-                onClick={handleShowMoonpay}
-              />
+              {moonpayFundsEnabled && (
+                <ManageWalletItem
+                  icon="moonpay"
+                  title="Deposit Funds via Moonpay"
+                  onClick={handleShowMoonpay}
+                />
+              )}
               <ManageWalletItem
                 icon="walletNew"
                 title="Open Magic Wallet"
