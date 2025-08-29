@@ -14,8 +14,8 @@ export function GetThreadTokenHolders(): Query<
       const [result] = await models.sequelize.query(
         `WITH base AS (
             SELECT
-                U.id                         AS user_id,
-                U.profile->>'name'           AS user_name,
+             U.id                         AS user_id,
+             COALESCE(U.profile->>'name') AS user_name,
              U.profile->>'avatar_url'     AS avatar_url,
              A.id                         AS address_id,
              A.address                    AS address,
@@ -36,7 +36,7 @@ export function GetThreadTokenHolders(): Query<
              ORDER BY base."timestamp" DESC
              ) AS trades
          FROM base
-         WHERE user_id IS NOT NULL
+         WHERE user_id
          GROUP BY user_id, user_name, avatar_url
              )
         SELECT jsonb_build_object(
