@@ -1,4 +1,4 @@
-import { type Command } from '@hicommonwealth/core';
+import { type Command, stats } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authComment } from '../../middleware';
@@ -36,6 +36,7 @@ export function DeleteComment(): Command<typeof schemas.DeleteComment> {
         //   }
         // }
 
+        // Update the comment to mark it as deleted
         await models.sequelize.query(
           `
           UPDATE "Comments"
@@ -45,6 +46,26 @@ export function DeleteComment(): Command<typeof schemas.DeleteComment> {
         `,
           { replacements: { commentId: comment.id }, transaction },
         );
+
+        // Decrement the thread's net comment count since we're using paranoid deletion
+        // and the afterDestroy hook won't be triggered. Keep comment_count unchanged
+        // as it's used for frontend pagination of the comment tree.
+        await models.Thread.update(
+          {
+            net_comment_count: models.sequelize.literal(
+              'net_comment_count - 1',
+            ),
+          },
+          {
+            where: { id: comment.thread_id },
+            transaction,
+          },
+        );
+
+        // Track stats for comment count decrement (consistent with afterDestroy hook)
+        stats().decrement('cw.hook.comment-count', {
+          thread_id: String(comment.thread_id),
+        });
       });
 
       return {
