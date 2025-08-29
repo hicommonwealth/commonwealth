@@ -88,7 +88,7 @@ export const TokenTradeWidget = ({
           weight="fill"
           onClick={() => setIsWidgetExpanded((e) => !e)}
         />
-        <CWText type="b2" fontWeight="semiBold">
+        <CWText type="caption" fontWeight="medium">
           Token
         </CWText>
 
@@ -213,7 +213,6 @@ export const TokenTradeWidget = ({
           onModalClose={() => setTokenLaunchModalConfig({ isOpen: false })}
         />
       )}
-      <CWDivider />
     </section>
   );
 };
