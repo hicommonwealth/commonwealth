@@ -115,6 +115,7 @@ export type CWTableColumnInfo = {
   numeric: boolean;
   tokenDecimals?: number | null | undefined;
   weightedVoting?: TopicWeightedVoting | null | undefined;
+  tokenSymbol?: string;
   sortable: boolean;
   chronological?: boolean;
   customElementKey?: string;
@@ -201,6 +202,9 @@ export const CWTable = ({
                           numericColVal,
                           col.tokenDecimals,
                           col.weightedVoting,
+                          1,
+                          undefined,
+                          col.tokenSymbol,
                         )
                       : numericColVal}
                   </div>
@@ -278,18 +282,24 @@ export const CWTable = ({
   };
 
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && !isLoadingMoreRows) {
-        onScrollEnd?.();
-      }
-    });
+    if (!tableRef.current) return;
+    const observeRef = tableRef.current;
 
-    if (tableRef.current) {
-      observer.observe(tableRef.current);
-    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const firstEntry = entries[0];
+        if (firstEntry.isIntersecting && !isLoadingMoreRows) {
+          onScrollEnd?.();
+        }
+      },
+      { root: null, rootMargin: '0px', threshold: 0.1 },
+    );
+
+    observer.observe(observeRef);
 
     return () => {
-      observer?.disconnect();
+      observer.unobserve(observeRef);
+      observer.disconnect();
     };
   }, [isLoadingMoreRows, tableRef, onScrollEnd]);
 

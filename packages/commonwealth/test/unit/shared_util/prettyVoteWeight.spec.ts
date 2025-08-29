@@ -184,4 +184,78 @@ describe('prettyVoteWeight', () => {
 
     expect(prettyVoteWeight('5000'), 'handle thousands unweighted').to.eq('5k');
   });
+
+  test('Sui NAVX NFT with 9 decimals', () => {
+    expect(
+      prettyVoteWeight(
+        '1000000000',
+        undefined,
+        TopicWeightedVoting.SuiNFT,
+        1,
+        undefined,
+        'NAVX',
+      ),
+      'handle NAVX with 9 decimal places',
+    ).to.eq('1');
+
+    expect(
+      prettyVoteWeight(
+        '5000000000',
+        undefined,
+        TopicWeightedVoting.SuiNFT,
+        1,
+        undefined,
+        'NAVX',
+      ),
+      'handle NAVX with 9 decimal places and 5 base value',
+    ).to.eq('5');
+
+    expect(
+      prettyVoteWeight(
+        '1500000000000',
+        undefined,
+        TopicWeightedVoting.SuiNFT,
+        1,
+        undefined,
+        'NAVX',
+      ),
+      'handle large NAVX value with formatting',
+    ).to.eq('1.5k');
+
+    expect(
+      prettyVoteWeight(
+        '1000000000',
+        undefined,
+        TopicWeightedVoting.SuiNFT,
+        1,
+        undefined,
+        'veNAVX',
+      ),
+      'handle veNAVX with 9 decimal places',
+    ).to.eq('1');
+
+    expect(
+      prettyVoteWeight(
+        '1000000000',
+        undefined,
+        TopicWeightedVoting.SuiNFT,
+        1,
+        undefined,
+        'OTHER',
+      ),
+      'handle other token without decimal adjustment',
+    ).to.eq('1b');
+
+    expect(
+      prettyVoteWeight(
+        '1000000000',
+        undefined,
+        TopicWeightedVoting.SuiNFT,
+        1,
+        undefined,
+        undefined,
+      ),
+      'handle SuiNFT without token symbol',
+    ).to.eq('1b');
+  });
 });

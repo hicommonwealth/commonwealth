@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { buildCreateThreadReactionInput } from 'client/scripts/state/api/threads/createReaction';
 import { buildDeleteThreadReactionInput } from 'client/scripts/state/api/threads/deleteReaction';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
@@ -147,9 +148,10 @@ export const ReactionButton = ({
       ? reactionWeightsSum
       : thread.reactionCount.toString(),
     thread.topic!.token_decimals,
-    thread.topic!.weighted_voting,
+    thread.topic!.weighted_voting as TopicWeightedVoting,
     1,
     size === 'big' ? 1 : 6,
+    thread.topic?.token_symbol || undefined,
   );
 
   return (

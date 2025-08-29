@@ -1,7 +1,7 @@
-import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
+import { type Command, InvalidInput, InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
-import { Op } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
 import { authVerified } from '../../middleware/auth';
 import { mustExist } from '../../middleware/guards';
@@ -108,14 +108,25 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                 updates?.profile?.name &&
                 updates?.profile?.name !== 'Anonymous'
               ) {
-                const existingUsername = await models.User.findOne({
-                  where: {
-                    id: { [Op.ne]: id },
-                    profile: {
-                      name: updates?.profile?.name,
+                const [existingUsername] = await models.sequelize.query<{
+                  id: number;
+                }>(
+                  `
+                  SELECT id
+                  FROM "Users"
+                  WHERE id != :id
+                    AND (profile ->> 'name') IS DISTINCT FROM 'Anonymous'
+                    AND (profile ->> 'name') = :profile_name
+                  LIMIT 1;
+                `,
+                  {
+                    replacements: {
+                      id,
+                      profile_name: updates.profile.name,
                     },
+                    type: QueryTypes.SELECT,
                   },
-                });
+                );
                 if (existingUsername) {
                   throw new InvalidState('Username already exists');
                 }

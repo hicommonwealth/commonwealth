@@ -23,6 +23,7 @@ interface FarcasterEntriesListProps {
   onSortChange: (sort: SortType) => void;
   contestDecimals: number;
   voteWeightMultiplier: number;
+  contestTokenSymbol?: string;
 }
 
 export const FarcasterEntriesList = ({
@@ -32,6 +33,7 @@ export const FarcasterEntriesList = ({
   onSortChange,
   contestDecimals,
   voteWeightMultiplier,
+  contestTokenSymbol,
 }: FarcasterEntriesListProps) => {
   if (isLoading) {
     return (
@@ -53,6 +55,7 @@ export const FarcasterEntriesList = ({
       TopicWeightedVoting.ERC20,
       voteWeightMultiplier,
       1,
+      contestTokenSymbol,
     );
   };
 

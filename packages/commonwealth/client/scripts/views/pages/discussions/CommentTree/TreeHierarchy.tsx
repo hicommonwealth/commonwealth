@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   DEFAULT_COMPLETION_MODEL,
   DEFAULT_COMPLETION_MODEL_LABEL,
@@ -328,6 +329,11 @@ export const TreeHierarchy = ({
                 shareURL=""
                 maxReplyLimitReached={false}
                 isThreadArchived={false}
+                weightType={
+                  thread.topic?.weighted_voting as TopicWeightedVoting
+                }
+                tokenNumDecimals={thread.topic?.token_decimals || undefined}
+                tokenSymbol={thread.topic?.token_symbol || undefined}
                 permissions={permissions}
               />
             </div>
@@ -391,8 +397,9 @@ export const TreeHierarchy = ({
             canToggleSpam={!isThreadLocked && (isCommentAuthor || isAdminOrMod)}
             comment={comment}
             shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
-            weightType={thread.topic?.weighted_voting}
+            weightType={thread.topic?.weighted_voting as TopicWeightedVoting}
             tokenNumDecimals={thread.topic?.token_decimals || undefined}
+            tokenSymbol={thread.topic?.token_symbol || undefined}
             threadContext={thread.body}
             permissions={permissions}
           />
@@ -473,7 +480,11 @@ export const TreeHierarchy = ({
                 canDelete={false}
                 canToggleSpam={false}
                 shareURL=""
+                weightType={
+                  thread.topic?.weighted_voting as TopicWeightedVoting
+                }
                 tokenNumDecimals={thread.topic?.token_decimals || undefined}
+                tokenSymbol={thread.topic?.token_symbol || undefined}
               />
             </div>
           ))}
