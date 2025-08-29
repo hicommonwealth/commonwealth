@@ -377,7 +377,6 @@ export const CWContentPage = ({
       {thread?.id && (
         <ThreadTokenDrawer
           threadId={thread.id}
-          communityId={thread.communityId}
           isOpen={isTokenDrawerOpen}
           setIsOpen={setIsTokenDrawerOpen}
         />

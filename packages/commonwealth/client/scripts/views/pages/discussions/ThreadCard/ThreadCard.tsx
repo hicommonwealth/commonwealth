@@ -474,7 +474,6 @@ export const ThreadCard = ({
       {threadToken?.token_address && (
         <ThreadTokenDrawer
           threadId={thread.id}
-          communityId={thread.communityId}
           isOpen={isTokenDrawerOpen}
           setIsOpen={setIsTokenDrawerOpen}
         />

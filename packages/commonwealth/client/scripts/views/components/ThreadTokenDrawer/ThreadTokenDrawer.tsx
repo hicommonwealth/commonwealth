@@ -11,7 +11,6 @@ import { TradeActivityTab } from './TradeActivityTab/TradeActivityTab';
 
 type ThreadTokenDrawerProps = {
   threadId: number;
-  communityId: string;
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
@@ -23,7 +22,6 @@ const tabs = [
 
 export const ThreadTokenDrawer = ({
   threadId,
-  communityId,
   isOpen,
   setIsOpen,
 }: ThreadTokenDrawerProps) => {
