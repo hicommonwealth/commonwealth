@@ -4,6 +4,7 @@ import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
+import { useMentionExtractor } from 'hooks/useMentionExtractor';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -13,6 +14,7 @@ import useUserStore from 'state/ui/user';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
+import { MentionEntityType } from '../react_quill_editor/mention-config';
 import { serializeDelta } from '../react_quill_editor/utils';
 import { StickyInput } from '../StickEditorContainer';
 import { ArchiveMsg } from './ArchiveMsg';
@@ -54,6 +56,7 @@ export const CreateComment = ({
 
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+  const { extractMentionsFromDelta } = useMentionExtractor();
 
   // get restored draft on init
   const restoredDraft = useMemo(() => {
@@ -122,6 +125,12 @@ export const CreateComment = ({
       // Store the ID before any state changes
       const commentId = newComment.id;
 
+      // Check for MCP mentions in the comment content
+      const mentions = extractMentionsFromDelta(contentDelta);
+      const hasMCPMentions = mentions.some(
+        (mention) => mention.type === MentionEntityType.MCP_SERVER,
+      );
+
       // Now update state
       setErrorMsg(null);
       setContentDelta(createDeltaFromText(''));
@@ -131,8 +140,11 @@ export const CreateComment = ({
         handleIsReplying(false);
       }
 
+      // Automatically trigger AI reply if MCP mentions are detected, regardless of AI toggle state
+      const shouldTriggerAI = aiCommentsToggleEnabled || hasMCPMentions;
+
       // Notify parent about the new comment and its AI status
-      onCommentCreated?.(commentId, aiCommentsToggleEnabled);
+      onCommentCreated?.(commentId, shouldTriggerAI);
 
       return commentId;
     } catch (err) {
