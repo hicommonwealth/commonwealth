@@ -31,7 +31,7 @@ export const buildDynamicQuestFormValidationSchema = ({
       description: z
         .string({ error: VALIDATION_MESSAGES.NO_INPUT })
         .min(10, { message: VALIDATION_MESSAGES.MIN_CHAR_LIMIT_REQUIRED(10) })
-        .max(250, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
+        .max(400, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
         .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
       image: linkValidationSchema.optional,
       max_xp_to_end: numberNonDecimalGTZeroValidationSchema.refine(
