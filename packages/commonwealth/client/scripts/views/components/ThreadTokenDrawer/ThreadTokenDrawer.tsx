@@ -69,7 +69,7 @@ export const ThreadTokenDrawer = ({
 
         <div className="content-container">
           <CWText type="h3" className="drawer-header">
-            Thread Token
+            Activity
           </CWText>
 
           <CWTabsRow className="tabs-container">

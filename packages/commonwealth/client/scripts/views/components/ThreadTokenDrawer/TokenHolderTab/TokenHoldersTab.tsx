@@ -109,9 +109,6 @@ export const TokenHoldersTab = () => {
 
   return (
     <div className="tab-content">
-      <CWText type="h4" className="tab-header">
-        Token Holders
-      </CWText>
       {mockTokenHolders.length > 0 ? (
         <CWTable
           columnInfo={tokenHolderTableState.columns}

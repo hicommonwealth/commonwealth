@@ -93,9 +93,6 @@ export const TradeActivityTab = ({
 
   return (
     <div className="tab-content">
-      <CWText type="h4" className="tab-header">
-        Recent Trade Activity
-      </CWText>
       {isLoadingTrades ? (
         <div className="loading-state">
           <CWText type="b1" className="loading-text">
