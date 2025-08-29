@@ -35,6 +35,7 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         search = '',
         has_launchpad_token,
         has_pinned_token,
+        has_any_token,
       } = payload;
 
       // pagination configuration
@@ -155,6 +156,24 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                             SELECT 1
                             FROM   "PinnedTokens" AS "PinnedTokens"
                             WHERE  "PinnedTokens"."community_id" = "Community"."id"
+                          )
+                        `,
+              )}
+              ${iQ(
+                has_any_token,
+                `
+                          AND (
+                            EXISTS (
+                              SELECT 1
+                              FROM "LaunchpadTokens" AS "LaunchpadTokens"
+                              WHERE "LaunchpadTokens"."namespace" = "Community"."namespace"
+                            )
+                            OR
+                            EXISTS (
+                              SELECT 1
+                              FROM "PinnedTokens" AS "PinnedTokens"
+                              WHERE "PinnedTokens"."community_id" = "Community"."id"
+                            )
                           )
                         `,
               )}

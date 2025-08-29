@@ -18,6 +18,7 @@ export type CommunityFilters = {
   withStakeEnabled?: boolean;
   withLaunchpadToken?: boolean;
   withPinnedToken?: boolean;
+  withAnyToken?: boolean;
   withTagsIds?: number[];
   withCommunityType?: CommunityType;
   withCommunitySortBy?: CommunitySortOptions;

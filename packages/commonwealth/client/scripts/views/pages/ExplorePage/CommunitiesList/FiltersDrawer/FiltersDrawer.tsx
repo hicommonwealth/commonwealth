@@ -45,6 +45,8 @@ export const FiltersDrawer = ({
     onFiltersChange({
       ...filters,
       withLaunchpadToken: !filters.withLaunchpadToken,
+      // Clear "Has Token" filter when selecting specific token filter
+      withAnyToken: !filters.withLaunchpadToken ? false : filters.withAnyToken,
     });
   };
 
@@ -52,6 +54,20 @@ export const FiltersDrawer = ({
     onFiltersChange({
       ...filters,
       withPinnedToken: !filters.withPinnedToken,
+      // Clear "Has Token" filter when selecting specific token filter
+      withAnyToken: !filters.withPinnedToken ? false : filters.withAnyToken,
+    });
+  };
+
+  const onAnyTokenFilterChange = () => {
+    onFiltersChange({
+      ...filters,
+      withAnyToken: !filters.withAnyToken,
+      // Clear specific token filters when selecting "Has Token"
+      withLaunchpadToken: !filters.withAnyToken
+        ? false
+        : filters.withLaunchpadToken,
+      withPinnedToken: !filters.withAnyToken ? false : filters.withPinnedToken,
     });
   };
 
@@ -148,6 +164,17 @@ export const FiltersDrawer = ({
                 size="small"
                 checked={filters.withStakeEnabled}
                 onChange={() => onStakeFilterChange()}
+              />
+            </div>
+
+            <div className="stake-filter">
+              <CWText type="h5" fontWeight="semiBold">
+                Has Token
+              </CWText>
+              <CWToggle
+                size="small"
+                checked={filters.withAnyToken}
+                onChange={() => onAnyTokenFilterChange()}
               />
             </div>
 

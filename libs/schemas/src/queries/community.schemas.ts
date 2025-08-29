@@ -58,6 +58,7 @@ export const GetCommunities = {
     has_groups: z.boolean().optional(),
     has_launchpad_token: z.boolean().optional(),
     has_pinned_token: z.boolean().optional(),
+    has_any_token: z.boolean().optional(),
     include_last_30_day_thread_count: z.boolean().optional(),
     order_by: z
       .enum([

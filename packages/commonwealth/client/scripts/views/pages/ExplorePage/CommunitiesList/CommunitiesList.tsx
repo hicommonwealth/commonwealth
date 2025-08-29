@@ -74,6 +74,7 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
     withStakeEnabled: undefined,
     withLaunchpadToken: undefined,
     withPinnedToken: undefined,
+    withAnyToken: undefined,
     withTagsIds: undefined,
     withCommunitySortBy: CommunitySortOptions.MemberCount,
     withCommunitySortOrder: CommunitySortDirections.Descending,
@@ -129,6 +130,7 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
     stake_enabled: filters.withStakeEnabled,
     has_launchpad_token: filters.withLaunchpadToken,
     has_pinned_token: filters.withPinnedToken,
+    has_any_token: filters.withAnyToken,
     cursor: 1,
     tag_ids: filters.withTagsIds,
     community_type: filters.withCommunityType
@@ -174,6 +176,13 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
     setFilters({
       ...filters,
       withPinnedToken: false,
+    });
+  };
+
+  const removeAnyTokenFilter = () => {
+    setFilters({
+      ...filters,
+      withAnyToken: false,
     });
   };
 
@@ -307,6 +316,13 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
             onCloseClick={removePinnedTokenFilter}
           />
         )}
+        {filters.withAnyToken && (
+          <CWTag
+            label="With: Token"
+            type="filter"
+            onCloseClick={removeAnyTokenFilter}
+          />
+        )}
         {filters.withTagsIds &&
           filters.withTagsIds.map((id) => (
             <CWTag
@@ -397,6 +413,9 @@ const CommunitiesList: React.FC<CommunitiesListProps> = ({
                   {filters.withCommunityEcosystem ||
                   filters.withNetwork ||
                   filters.withStakeEnabled ||
+                  filters.withLaunchpadToken ||
+                  filters.withPinnedToken ||
+                  filters.withAnyToken ||
                   filters.withTagsIds ||
                   filters.withCommunityType ||
                   filters.withEcosystemChainId
