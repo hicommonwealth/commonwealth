@@ -2,6 +2,7 @@ import React, { FC, ReactNode } from 'react';
 
 import './CWTooltip.scss';
 
+import type { VirtualElement } from '@popperjs/core';
 import { Placement } from '@popperjs/core/lib';
 import CWPopover, {
   PopoverTriggerProps,
@@ -24,9 +25,31 @@ export const CWTooltip: FC<TooltipProps> = ({
 }) => {
   const popoverProps = usePopover();
 
+  const handleInteraction = (e: React.MouseEvent<HTMLElement>) => {
+    if (popoverProps.open) {
+      popoverProps.setAnchorEl(null);
+      return;
+    }
+
+    const virtualElement: VirtualElement = {
+      getBoundingClientRect: () => ({
+        width: 0,
+        height: 0,
+        top: e.clientY,
+        bottom: e.clientY,
+        left: e.clientX,
+        right: e.clientX,
+      }),
+      // @ts-expect-error <StrictNullChecks/>
+      contextElement: e.currentTarget,
+    };
+
+    popoverProps.setAnchorEl(virtualElement);
+  };
+
   return (
     <>
-      {renderTrigger(popoverProps.handleInteraction, popoverProps.open)}
+      {renderTrigger(handleInteraction, popoverProps.open)}
       {content && (
         <CWPopover
           disablePortal={disablePortal}
