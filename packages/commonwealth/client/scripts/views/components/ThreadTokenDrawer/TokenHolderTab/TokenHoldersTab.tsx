@@ -1,5 +1,6 @@
 import React from 'react';
 import { APIOrderDirection } from '../../../../helpers/constants';
+import { useGetThreadTokenHoldersQuery } from '../../../../state/api/tokens/getThreadTokenHolders';
 import { CWText } from '../../component_kit/cw_text';
 import { CWTable } from '../../component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTable';
@@ -16,6 +17,10 @@ type TokenHolder = {
     avatarUrl: string;
   };
 };
+
+interface TokenHoldersTabProps {
+  threadId: number;
+}
 
 const tokenHolderColumns: CWTableColumnInfo[] = [
   {
@@ -46,7 +51,16 @@ const mockTokenHolders: TokenHolder[] = [
   },
 ];
 
-export const TokenHoldersTab = () => {
+export const TokenHoldersTab = ({ threadId }: TokenHoldersTabProps) => {
+  const { data: holdersData, isLoading: isLoadingHolders } =
+    useGetThreadTokenHoldersQuery(
+      { thread_id: threadId },
+      { enabled: !!threadId },
+    );
+
+  console.log('TokenHoldersTab - holdersData:', holdersData);
+  console.log('TokenHoldersTab - isLoadingHolders:', isLoadingHolders);
+
   const tokenHolderTableState = useCWTableState({
     columns: tokenHolderColumns,
     initialSortColumn: 'balance',

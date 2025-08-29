@@ -50,7 +50,7 @@ export const ThreadTokenDrawer = ({
         );
 
       case 'token-holders':
-        return <TokenHoldersTab />;
+        return <TokenHoldersTab threadId={threadId} />;
 
       default:
         return null;
