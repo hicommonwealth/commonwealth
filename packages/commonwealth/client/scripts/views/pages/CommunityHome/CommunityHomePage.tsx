@@ -4,6 +4,7 @@ import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { isRateLimitError, RATE_LIMIT_MESSAGE } from 'helpers/rateLimit';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
 import type { DeltaStatic } from 'quill';
@@ -113,7 +114,11 @@ const CommunityHome = () => {
       console.error('Error creating thread:', error);
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
-      notifyError(`Failed to create thread: ${errorMessage}`);
+      if (isRateLimitError(error)) {
+        notifyError(RATE_LIMIT_MESSAGE);
+      } else {
+        notifyError(`Failed to create thread: ${errorMessage}`);
+      }
       return -1;
     }
   };
