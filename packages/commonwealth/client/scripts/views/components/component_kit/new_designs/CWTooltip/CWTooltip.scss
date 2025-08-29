@@ -34,7 +34,7 @@
   isolation: isolate;
   max-width: 232px;
   height: fit-content;
-  max-height: 40px;
+  min-height: 40px;
 
   flex: none;
   order: 0;
@@ -93,5 +93,6 @@
       'lnum' on;
     color: colors.$white;
     word-break: break-word;
+    white-space: normal;
   }
 }
