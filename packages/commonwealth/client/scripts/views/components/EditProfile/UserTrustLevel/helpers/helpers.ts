@@ -20,17 +20,13 @@ export const getLevelRedirect = (tier: UserTierMap): boolean => {
   return [UserTierMap.SocialVerified, UserTierMap.ChainVerified].includes(tier);
 };
 
-export const getLevelStatus = (level: number, currentTier: number): Status => {
-  const tierEntry = Object.entries(USER_TIERS).find(([key]) => {
-    const tier = USER_TIERS[parseInt(key) as UserTierMap] as Tier & {
-      clientInfo?: { trustLevel: number };
-    };
-    return tier.clientInfo?.trustLevel === level;
-  });
-
-  if (!tierEntry) return 'Not Started';
-  const tierNum = parseInt(tierEntry[0]) as UserTierMap;
-  return tierNum <= currentTier ? 'Done' : 'Not Started';
+export const getLevelStatus = (
+  level: number,
+  currentTier: UserTierMap,
+): Status => {
+  const currentTrustLevel =
+    USER_TIERS[currentTier]?.clientInfo?.trustLevel || 0;
+  return currentTrustLevel >= level ? 'Done' : 'Not Started';
 };
 
 export const getCommunityNavigation = (
@@ -61,7 +57,7 @@ export const getCommunityNavigation = (
   }
 };
 
-export const mapTiers = (currentTier: number): TierInfo[] => {
+export const mapTiers = (currentTier: UserTierMap): TierInfo[] => {
   return Object.entries(USER_TIERS)
     .filter(([key]) => {
       const tier = parseInt(key) as UserTierMap;

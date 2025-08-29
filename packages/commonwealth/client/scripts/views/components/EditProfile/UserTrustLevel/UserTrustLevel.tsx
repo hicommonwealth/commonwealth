@@ -1,4 +1,6 @@
 import {
+  USER_TIERS,
+  UserTierMap,
   UserVerificationItem,
   UserVerificationItemType,
 } from '@hicommonwealth/shared';
@@ -25,7 +27,10 @@ const UserTrustLevel = () => {
     apiCallEnabled: userData.isLoggedIn,
   });
 
-  const currentTier = data?.tier || 0;
+  const currentTier: UserTierMap =
+    (data?.tier as UserTierMap) ?? (userData.tier as UserTierMap);
+  const currentTrustLevel =
+    USER_TIERS[currentTier]?.clientInfo?.trustLevel || 0;
 
   const handleItemClick = (item: UserVerificationItem) => {
     if (item.type === 'VERIFY_SOCIAL') {
@@ -49,8 +54,8 @@ const UserTrustLevel = () => {
   return (
     <div className="UserTrustLevel">
       {tiers.map((level) => {
-        const isLocked = level.level > currentTier + 1;
-        const isCurrentLevel = level.level === currentTier;
+        const isLocked = level.level > currentTrustLevel + 1;
+        const isCurrentLevel = level.level === currentTrustLevel;
 
         return (
           <LevelBox
