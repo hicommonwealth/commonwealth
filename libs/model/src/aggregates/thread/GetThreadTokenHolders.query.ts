@@ -14,7 +14,7 @@ export function GetThreadTokenHolders(): Query<
       const [result] = await models.sequelize.query(
         `WITH base AS (
             SELECT
-             U.id                         AS user_id,
+             COALESCE(U.id, -1)           AS user_id,
              COALESCE(U.profile->>'name') AS user_name,
              U.profile->>'avatar_url'     AS avatar_url,
              A.id                         AS address_id,
