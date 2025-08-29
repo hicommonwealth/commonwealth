@@ -1,22 +1,10 @@
 import React from 'react';
 import { APIOrderDirection } from '../../../../helpers/constants';
-import { useGetThreadTokenHoldersQuery } from '../../../../state/api/tokens/getThreadTokenHolders';
 import { CWText } from '../../component_kit/cw_text';
 import { CWTable } from '../../component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
-
-type TokenHolder = {
-  id: string;
-  address: string;
-  balance: string;
-  percentage: string;
-  lastActivity: string;
-  user: {
-    name: string;
-    avatarUrl: string;
-  };
-};
+import { TokenHolder, useTokenHolders } from './useTokenHolders';
 
 interface TokenHoldersTabProps {
   threadId: number;
@@ -25,9 +13,9 @@ interface TokenHoldersTabProps {
 const tokenHolderColumns: CWTableColumnInfo[] = [
   {
     key: 'user',
-    header: 'Username',
+    header: 'User',
     numeric: false,
-    sortable: true,
+    sortable: false,
   },
   {
     key: 'percentage',
@@ -37,58 +25,50 @@ const tokenHolderColumns: CWTableColumnInfo[] = [
   },
 ];
 
-const mockTokenHolders: TokenHolder[] = [
-  {
-    id: '1',
-    address: '0x1234...5678',
-    balance: '5000',
-    percentage: '25%',
-    lastActivity: '2024-01-15T10:30:00Z',
-    user: {
-      name: 'Alice',
-      avatarUrl: '',
-    },
-  },
-];
-
 export const TokenHoldersTab = ({ threadId }: TokenHoldersTabProps) => {
-  const { data: holdersData, isLoading: isLoadingHolders } =
-    useGetThreadTokenHoldersQuery(
-      { thread_id: threadId },
-      { enabled: !!threadId },
-    );
-
-  console.log('TokenHoldersTab - holdersData:', holdersData);
-  console.log('TokenHoldersTab - isLoadingHolders:', isLoadingHolders);
+  const { tokenHolders, isLoading: isLoadingHolders } =
+    useTokenHolders(threadId);
 
   const tokenHolderTableState = useCWTableState({
     columns: tokenHolderColumns,
-    initialSortColumn: 'balance',
+    initialSortColumn: 'percentage',
     initialSortDirection: APIOrderDirection.Desc,
   });
 
   const getTokenHolderRowData = (holders: TokenHolder[]) => {
     return holders.map((holder) => ({
       user: {
-        sortValue: holder.user.name,
+        sortValue: holder.name || 'Unknown',
         customElement: (
           <div className="user-info">
-            <CWText type="b2">{holder.user.name}</CWText>
+            <CWText type="b2">{holder.name || 'Unknown'}</CWText>
           </div>
         ),
       },
-      percentage: holder.percentage,
+      percentage: `${holder.percentage.toFixed(2)}%`,
     }));
   };
 
+  if (isLoadingHolders) {
+    return (
+      <div className="tab-content">
+        <div className="empty-state">
+          <CWText type="b1" className="empty-text">
+            Loading token holders...
+          </CWText>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="tab-content">
-      {mockTokenHolders.length > 0 ? (
+      {tokenHolders.length > 0 ? (
         <CWTable
           columnInfo={tokenHolderTableState.columns}
           sortingState={tokenHolderTableState.sorting}
           setSortingState={tokenHolderTableState.setSorting}
-          rowData={getTokenHolderRowData(mockTokenHolders)}
+          rowData={getTokenHolderRowData(tokenHolders)}
         />
       ) : (
         <div className="empty-state">

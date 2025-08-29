@@ -62,10 +62,6 @@ export function GetThreadTokenHolders(): Query<
         },
       );
 
-      console.log(result);
-      console.log(result);
-      console.log(result);
-      console.log(result);
       return result as unknown as z.infer<typeof GetThreadTokenTrades.output>;
     },
   };
