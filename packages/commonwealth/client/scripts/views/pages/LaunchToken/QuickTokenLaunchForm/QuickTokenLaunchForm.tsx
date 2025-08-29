@@ -501,7 +501,10 @@ export const QuickTokenLaunchForm = ({
             <>
               <CWBanner
                 type="info"
-                body={`Launching your token will create an associated community on Base, requires 0.000444 ETH and a compatible EVM wallet.`}
+                body={[
+                  'Launching your token will create an associated community on Base and requires ',
+                  '0.000444 ETH and a compatible EVM wallet.',
+                ].join('')}
               />
               <div className="cta-elements">
                 {/* allows to switch b/w generated ideas */}
