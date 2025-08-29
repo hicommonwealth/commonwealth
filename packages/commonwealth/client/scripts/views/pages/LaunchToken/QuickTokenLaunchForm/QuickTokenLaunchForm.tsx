@@ -501,17 +501,7 @@ export const QuickTokenLaunchForm = ({
             <>
               <CWBanner
                 type="info"
-                body={`Launching token will create a complimentary community.
-                      You can edit your community post launch.`}
-              />
-              <CWBanner
-                type="info"
-                body={`Launching your token on BASE requires a small amount of BASE ETH to cover gas fees.
-                      ${ethFee ? `Estimated fee: ${ethFee} BASE ETH.` : ''}`}
-              />
-              <CWBanner
-                type="info"
-                body="The wallet connected to Common needs to be accessed via a desktop plugin with approximately 3 USD in ETH."
+                body={`Launching your token will create an associated community on Base, requires 0.000444 ETH and a compatible EVM wallet.`}
               />
               <div className="cta-elements">
                 {/* allows to switch b/w generated ideas */}
