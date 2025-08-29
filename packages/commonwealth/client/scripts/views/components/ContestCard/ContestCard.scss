@@ -1,6 +1,7 @@
 @use '../../../styles/shared';
 @use '../../../styles/mixins/colors.module';
 @use '../../../styles/mixins/media_queries';
+@use '../../../styles/mixins/border_radius';
 
 .ContestCard {
   max-width: 600px;
@@ -9,7 +10,7 @@
   position: relative;
 
   @include media_queries.smallInclusive {
-    min-width: 350px;
+    min-width: 330px;
   }
 
   &.isHorizontal {
@@ -17,7 +18,8 @@
     max-width: unset;
 
     .contest-image {
-      border-radius: 5px 0 0 5px;
+      border-radius: border_radius.$border-radius-corners 0 0
+        border_radius.$border-radius-corners;
       max-height: 240px;
       max-width: 522px;
     }
@@ -38,7 +40,7 @@
     padding: 12px;
 
     .contest-image {
-      border-radius: 6px;
+      border-radius: border_radius.$border-radius-corners;
       width: 100%;
       max-height: 275px;
       object-fit: cover;
