@@ -85,28 +85,20 @@ export const TradeActivityTab = ({
 
   return (
     <div className="tab-content">
-      {isLoadingTrades ? (
-        <div className="loading-state">
-          <CWText type="b1" className="loading-text">
-            Loading trade activity...
-          </CWText>
-        </div>
-      ) : tradesData &&
-        (tradesData as any).result &&
-        (tradesData as any).result.length > 0 ? (
-        <CWTable
-          columnInfo={tradeActivityTableState.columns}
-          sortingState={tradeActivityTableState.sorting}
-          setSortingState={tradeActivityTableState.setSorting}
-          rowData={getTradeActivityRowData((tradesData as any).result)}
-        />
-      ) : (
-        <div className="empty-state">
-          <CWText type="b1" className="empty-text">
-            No trade activity yet.
-          </CWText>
-        </div>
-      )}
+      <CWTable
+        columnInfo={tradeActivityTableState.columns}
+        sortingState={tradeActivityTableState.sorting}
+        setSortingState={tradeActivityTableState.setSorting}
+        rowData={
+          isLoadingTrades
+            ? []
+            : tradesData &&
+                (tradesData as any).result &&
+                (tradesData as any).result.length > 0
+              ? getTradeActivityRowData((tradesData as any).result)
+              : []
+        }
+      />
     </div>
   );
 };
