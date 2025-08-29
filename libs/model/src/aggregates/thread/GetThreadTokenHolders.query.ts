@@ -18,53 +18,54 @@ export function GetThreadTokenHolders(): Query<
                 COALESCE(U.id::text, TTT.trader_address) AS holder_key,
                 U.id AS user_id,
                 U.profile->>'avatar_url' AS avatar_url,
-                COALESCE(U.profile->>'name', TTT.trader_address) as holder_name,
-                SUM(
-                        CASE WHEN TTT.is_buy
-                                 THEN TTT.community_token_amount
-                             ELSE -TTT.community_token_amount
-                            END
-                ) AS net_tokens
-            FROM "ThreadTokenTrades" TTT
-                     JOIN "ThreadTokens" TT
-                          ON TT.token_address = TTT.token_address
-                     LEFT JOIN "Addresses" A
-                               ON TTT.trader_address = A.address
-                     LEFT JOIN "Users" U
-                               ON U.id = A.user_id
-            WHERE TT.thread_id = :thread_id
-            GROUP BY 
+             COALESCE(U.profile->>'name', TTT.trader_address) as holder_name,
+             SUM(
+                CASE WHEN TTT.is_buy
+                    THEN TTT.community_token_amount
+                    ELSE -TTT.community_token_amount
+                END
+             ) AS net_tokens
+         FROM "ThreadTokenTrades" TTT
+             JOIN "ThreadTokens" TT
+         ON TT.token_address = TTT.token_address
+             LEFT JOIN "Addresses" A
+             ON TTT.trader_address = A.address
+             LEFT JOIN "Users" U
+             ON U.id = A.user_id
+         WHERE TT.thread_id = :thread_id
+         GROUP BY
              TT.thread_id,
              holder_key,
              U.id,
-             U.profile->>'avatar_url',
-             TTT.trader_address,
-             U.profile->>'name'
-        ),
-              totals AS (
-                  SELECT thread_id, SUM(net_tokens) AS total_tokens
-                  FROM trade_flows
-                  GROUP BY thread_id
-              )
-         SELECT
-             user_id,
-             avatar_url,
-             f.holder_name,
-             f.net_tokens,
-             ROUND(100.0 * f.net_tokens / NULLIF(t.total_tokens, 0), 2) AS percent_share
-         FROM trade_flows f
-                  JOIN totals t
-                       ON f.thread_id = t.thread_id
-         ORDER BY percent_share DESC;
+             TTT.trader_address
+             ),
+             totals AS (
+         SELECT thread_id, SUM(net_tokens) AS total_tokens
+         FROM trade_flows
+         GROUP BY thread_id
+             )
+        SELECT
+            user_id,
+            avatar_url,
+            f.holder_name,
+            f.net_tokens,
+            ROUND(100.0 * f.net_tokens / NULLIF(t.total_tokens, 0), 2) AS percent_share
+        FROM trade_flows f
+                 JOIN totals t
+                      ON f.thread_id = t.thread_id
+        ORDER BY percent_share DESC;
         `,
         {
           replacements: {
             thread_id: payload.thread_id,
           },
-          logging: true,
         },
       );
 
+      console.log(result);
+      console.log(result);
+      console.log(result);
+      console.log(result);
       return result as unknown as z.infer<typeof GetThreadTokenTrades.output>;
     },
   };

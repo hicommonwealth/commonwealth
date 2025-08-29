@@ -160,11 +160,11 @@ export const GetThreadTokenTrades = {
   }),
   output: z
     .object({
-      user_id: z.number().nullish(),
+      user_id: z.string().nullish(),
       avatar_url: z.string().nullish(),
       holder_name: z.string(),
-      net_tokens: z.number(),
-      percent_share: z.number(),
+      net_tokens: z.string(),
+      percent_share: z.string(),
     })
     .array(),
 };
