@@ -22,9 +22,21 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
 
       // pagination configuration
       const direction = order_direction || 'DESC';
-      let order_col: string = order_by || 'name';
-      if (order_by === 'market_cap' || order_by === 'price') {
-        order_col = 'trades.latest_price';
+      let order_col: string;
+      switch (order_by) {
+        case '24_hr_pct_change':
+          order_col =
+            '(trades.latest_price - trades.old_price) / trades.old_price';
+          break;
+        case 'market_cap':
+        case 'price':
+          order_col = 'trades.latest_price';
+          break;
+        case 'created_at':
+        case 'name':
+        default:
+          order_col = `T.${order_by || 'name'}`;
+          break;
       }
       const includeStats = with_stats || order_col === 'trades.latest_price';
 
@@ -43,15 +55,25 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
         limit,
       };
 
-      const where_conditions = [
-        search ? 'WHERE LOWER(T.name) LIKE :search' : '',
-        is_graduated ? 'WHERE T.liquidity_transferred IS TRUE' : '',
-      ].filter(Boolean);
+      const conditions: string[] = [];
+      if (search) {
+        conditions.push('LOWER(T.name) LIKE :search');
+      }
+      if (is_graduated) {
+        conditions.push(
+          `T.liquidity_transferred IS ${is_graduated ? 'TRUE' : 'FALSE'}`,
+        );
+      }
+      if (order_by === '24_hr_pct_change' && includeStats) {
+        conditions.push(`trades.old_price > 0`);
+      }
+      const where_clause = conditions.length
+        ? `WHERE ${conditions.join(' AND ')}`
+        : '';
 
-      const sql = `
-      ${
-        includeStats
-          ? `WITH latest_trades AS (
+      const sql = includeStats
+        ? `
+      WITH latest_trades AS (
                 SELECT DISTINCT ON (token_address) *
                 FROM "LaunchpadTrades"
                 ORDER BY token_address, timestamp DESC
@@ -68,19 +90,27 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
                         ot.price AS old_price
                 FROM latest_trades lt
                 LEFT JOIN older_trades ot ON lt.token_address = ot.token_address
-            )`
-          : ''
-      }
-      SELECT DISTINCT ON (T.token_address) 
+            )
+      SELECT
             T.*,
             C.id AS community_id,
-            ${includeStats ? 'trades.latest_price, trades.old_price,' : ''}
+            trades.latest_price, trades.old_price,
             count(*) OVER () AS total
       FROM "LaunchpadTokens" AS T
       JOIN "Communities" AS C ON T.namespace = C.namespace
-      ${includeStats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
-      ${where_conditions.join(' AND ')}
-      ORDER BY T.token_address ${direction}, ${order_col} ${direction}
+      LEFT JOIN trades ON trades.token_address = T.token_address
+      ${where_clause}
+      ORDER BY ${order_col} ${direction} ${order_col === 'trades.latest_price' ? 'NULLS LAST' : ''}
+      LIMIT :limit OFFSET :offset
+    `
+        : `
+      SELECT T.*,
+            C.id AS community_id,
+            count(*) OVER () AS total
+      FROM "LaunchpadTokens" AS T
+      JOIN "Communities" AS C ON T.namespace = C.namespace
+      ${where_clause}
+      ORDER BY ${order_col} ${direction}
       LIMIT :limit OFFSET :offset
     `;
 
@@ -95,6 +125,7 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
         replacements,
         type: QueryTypes.SELECT,
         nest: true,
+        logging: true,
       });
 
       return schemas.buildPaginatedResponse(

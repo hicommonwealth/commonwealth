@@ -11,7 +11,9 @@ export const TokenView = LaunchpadToken.extend({
 export const GetTokens = {
   input: PaginationParamsSchema.extend({
     search: z.string().optional(),
-    order_by: z.enum(['name', 'price', 'market_cap', 'created_at']).optional(),
+    order_by: z
+      .enum(['name', 'price', 'market_cap', 'created_at', '24_hr_pct_change'])
+      .optional(),
     with_stats: z.boolean().optional(),
     is_graduated: z.boolean().optional(),
   }),
