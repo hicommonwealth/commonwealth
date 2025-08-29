@@ -3,8 +3,7 @@ import useUserStore from 'client/scripts/state/ui/user';
 import clsx from 'clsx';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
-import { CWTooltip } from '../../../components/component_kit/new_designs/CWTooltip';
+// removed tooltip hover for profile name
 import TrustLevelRole from '../../TrustLevelRole';
 
 import './ProfileCard.scss';
@@ -52,38 +51,20 @@ const ProfileCard = () => {
             alt="Profile"
           />
         </Link>
-        <CWTooltip
-          content={
-            data?.profile.name && data?.profile.name.length > 17
-              ? data?.profile.name
-              : null
-          }
-          placement="top"
-          renderTrigger={(handleInteraction, isTooltipOpen) => (
-            <div
-              onMouseEnter={(e) => {
-                handleMouseEnter({ e, isTooltipOpen, handleInteraction });
-              }}
-              onMouseLeave={(e) => {
-                handleMouseLeave({ e, isTooltipOpen, handleInteraction });
-              }}
-              className="user-info"
-            >
-              <Link to={`/profile/id/${userData.id}`}>
-                <h3 className="profile-name">{data?.profile.name}</h3>
-              </Link>
-              <span
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  navigate('/profile/edit');
-                }}
-              >
-                <TrustLevelRole type="user" level={data?.tier} withTooltip />
-              </span>
-            </div>
-          )}
-        />
+        <div className="user-info">
+          <Link to={`/profile/id/${userData.id}`}>
+            <h3 className="profile-name">{data?.profile.name}</h3>
+          </Link>
+          <span
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              navigate('/profile/edit');
+            }}
+          >
+            <TrustLevelRole type="user" level={data?.tier} withTooltip />
+          </span>
+        </div>
       </div>
     </div>
   );
