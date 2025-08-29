@@ -1,31 +1,23 @@
 import React from 'react';
+import { formatAddressShort } from '../../../../helpers';
 import { APIOrderDirection } from '../../../../helpers/constants';
 import { CWText } from '../../component_kit/cw_text';
 import { CWTable } from '../../component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
 
-type TradeActivity = {
-  id: string;
-  type: 'buy' | 'sell';
-  amount: string;
-  price: number;
-  timestamp: number;
-  address: string;
-};
-
 const tradeActivityColumns: CWTableColumnInfo[] = [
   {
     key: 'user',
-    header: 'User',
+    header: 'Address',
     numeric: false,
-    sortable: true,
+    sortable: false,
   },
   {
     key: 'type',
     header: 'Type',
     numeric: false,
-    sortable: true,
+    sortable: false,
   },
   {
     key: 'amount',
@@ -70,7 +62,7 @@ export const TradeActivityTab = ({
         customElement: (
           <div className="user-info">
             <CWText type="b2" className="address">
-              {activity.address}
+              {formatAddressShort(activity.address, 6, 4)}
             </CWText>
           </div>
         ),
@@ -86,7 +78,7 @@ export const TradeActivityTab = ({
         ),
       },
       amount: parseFloat(activity.amount).toLocaleString(),
-      price: `${activity.price} ETH`,
+      price: `${activity.price.toFixed(8)}`,
       timestamp: new Date(activity.timestamp * 1000).toISOString(),
     }));
   };
