@@ -1,6 +1,6 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { GetThreadTokenTradesOutput } from '@hicommonwealth/schemas';
+import { GetThreadTokenTrades } from '@hicommonwealth/schemas';
 import z from 'zod';
 import { models } from '../../database';
 
@@ -12,53 +12,60 @@ export function GetThreadTokenHolders(): Query<
     auth: [],
     body: async ({ payload }) => {
       const [result] = await models.sequelize.query(
-        `WITH base AS (
+        `WITH trade_flows AS (
             SELECT
-             U.id                         AS user_id,
-             COALESCE(U.profile->>'name') AS user_name,
-             U.profile->>'avatar_url'     AS avatar_url,
-             A.id                         AS address_id,
-             A.address                    AS address,
-             TTT.*                                        -- trade fields
-         FROM "ThreadTokens"      AS TT
-             JOIN "ThreadTokenTrades" AS TTT ON TT.token_address = TTT.token_address
-             LEFT JOIN "Addresses"    AS A   ON TTT.trader_address = A.address
-             LEFT JOIN "Users"        AS U   ON U.id = A.user_id
-         WHERE TT.thread_id = :thread_id
-             ),
-             trades_by_user AS (
+                TT.thread_id,
+                COALESCE(U.id::text, TTT.trader_address) AS holder_key,
+                U.id AS user_id,
+                U.profile->>'avatar_url' AS avatar_url,
+                COALESCE(U.profile->>'name', TTT.trader_address) as holder_name,
+                SUM(
+                        CASE WHEN TTT.is_buy
+                                 THEN TTT.community_token_amount
+                             ELSE -TTT.community_token_amount
+                            END
+                ) AS net_tokens
+            FROM "ThreadTokenTrades" TTT
+                     JOIN "ThreadTokens" TT
+                          ON TT.token_address = TTT.token_address
+                     LEFT JOIN "Addresses" A
+                               ON TTT.trader_address = A.address
+                     LEFT JOIN "Users" U
+                               ON U.id = A.user_id
+            WHERE TT.thread_id = :thread_id
+            GROUP BY 
+             TT.thread_id,
+             holder_key,
+             U.id,
+             U.profile->>'avatar_url',
+             TTT.trader_address,
+             U.profile->>'name'
+        ),
+              totals AS (
+                  SELECT thread_id, SUM(net_tokens) AS total_tokens
+                  FROM trade_flows
+                  GROUP BY thread_id
+              )
          SELECT
              user_id,
-             user_name,
              avatar_url,
-             jsonb_agg(
-             (to_jsonb(base) - 'user_name' - 'avatar_url')
-             ORDER BY base."timestamp" DESC
-             ) AS trades
-         FROM base
-         GROUP BY user_id, user_name, avatar_url
-             )
-        SELECT jsonb_build_object(
-          'trades',
-          jsonb_agg(
-            jsonb_build_object(
-              'user_id',    user_id,
-              'name',       user_name,
-              'avatar_url', avatar_url,
-              'trades',     trades
-            ) ORDER BY user_id
-          )
-        ) AS result
-        FROM trades_by_user;
+             f.holder_name,
+             f.net_tokens,
+             ROUND(100.0 * f.net_tokens / NULLIF(t.total_tokens, 0), 2) AS percent_share
+         FROM trade_flows f
+                  JOIN totals t
+                       ON f.thread_id = t.thread_id
+         ORDER BY percent_share DESC;
         `,
         {
           replacements: {
             thread_id: payload.thread_id,
           },
+          logging: true,
         },
       );
 
-      return result[0] as unknown as z.infer<typeof GetThreadTokenTradesOutput>;
+      return result as unknown as z.infer<typeof GetThreadTokenTrades.output>;
     },
   };
 }

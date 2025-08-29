@@ -154,20 +154,17 @@ export const CreateThreadTokenTrade = {
   output: ThreadTokenTradeView.optional(),
 };
 
-export const GetThreadTokenTradesOutput = z.object({
-  result: z
-    .object({
-      user_id: z.number(),
-      name: z.string().nullable(),
-      avatar_url: z.string().url().nullable(),
-      trades: z.record(z.string(), z.array(ThreadTokenTrade)),
-    })
-    .nullable(),
-});
-
 export const GetThreadTokenTrades = {
   input: z.object({
     thread_id: PG_INT.optional(),
   }),
-  output: GetThreadTokenTradesOutput,
+  output: z
+    .object({
+      user_id: z.number().nullish(),
+      avatar_url: z.string().nullish(),
+      holder_name: z.string(),
+      net_tokens: z.number(),
+      percent_share: z.number(),
+    })
+    .array(),
 };
