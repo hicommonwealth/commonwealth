@@ -26,22 +26,28 @@ export const CWTooltip: FC<TooltipProps> = ({
   const popoverProps = usePopover();
 
   const handleInteraction = (e: React.MouseEvent<HTMLElement>) => {
-    if (popoverProps.open) {
+    const { type, clientX, clientY, currentTarget } = e;
+
+    if (type === 'mouseleave') {
       popoverProps.setAnchorEl(null);
       return;
     }
+
+    const x = clientX;
+    const y = clientY;
+    const contextEl = currentTarget as HTMLElement;
 
     const virtualElement: VirtualElement = {
       getBoundingClientRect: () => ({
         width: 0,
         height: 0,
-        top: e.clientY,
-        bottom: e.clientY,
-        left: e.clientX,
-        right: e.clientX,
+        top: y,
+        bottom: y,
+        left: x,
+        right: x,
       }),
       // @ts-expect-error <StrictNullChecks/>
-      contextElement: e.currentTarget,
+      contextElement: contextEl,
     };
 
     popoverProps.setAnchorEl(virtualElement);
