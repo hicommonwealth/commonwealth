@@ -54,7 +54,7 @@ const TrustLevelRole = ({
   if (withTooltip && tooltipContent) {
     return (
       <CWTooltip
-        placement="top"
+        placement="bottom"
         content={tooltipContent}
         renderTrigger={(handleInteraction, isTooltipOpen) => (
           <span

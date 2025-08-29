@@ -45,6 +45,7 @@ const UserDropdown = ({ onAuthModalOpen }: UserDropdownProps) => {
             avatarSize={24}
             userAddress={user?.address}
             userCommunityId={user?.community?.id}
+            shouldShowTrustLevelTooltip
           />
           <CWIcon
             iconName={isOpen ? 'caretUp' : 'caretDown'}

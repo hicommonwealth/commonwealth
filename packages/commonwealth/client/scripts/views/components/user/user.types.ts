@@ -14,6 +14,8 @@ export type UserAttrs = {
   userCommunityId: string;
   shouldShowAsDeleted?: boolean;
   shouldShowRole?: boolean;
+  // when true, shows TrustLevelRole with tooltip on hover where applicable
+  shouldShowTrustLevelTooltip?: boolean;
   shouldHideAvatar?: boolean;
   shouldShowAvatarOnly?: boolean;
   shouldLinkProfile?: boolean;
