@@ -198,6 +198,12 @@ export default {
 
   async down(queryInterface) {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      const quest_id = -7;
+      const viewName = `quest_${quest_id}_xp_leaderboard`;
+      await queryInterface.sequelize.query(
+        `DROP MATERIALIZED VIEW IF EXISTS "${viewName}";`,
+        { transaction },
+      );
       await queryInterface.sequelize.query(
         `
         DELETE FROM "QuestActionMetas" WHERE "quest_id" = -7;
