@@ -29,13 +29,12 @@
   background-color: colors.$neutral-900;
   border-radius: 4px;
   border: none;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   padding: 4px 8px;
   isolation: isolate;
-  width: 232px;
+  max-width: 232px;
   height: fit-content;
-  max-height: 200px;
+  min-height: 40px;
 
   flex: none;
   order: 0;
@@ -80,6 +79,8 @@
   }
 
   .Text {
+    @include text.multiline-text-ellipsis(2);
+
     text-align: center;
     font-family: 'NeueHaasUnica';
     font-style: normal;
@@ -92,5 +93,6 @@
       'lnum' on;
     color: colors.$white;
     word-break: break-word;
+    white-space: normal;
   }
 }
