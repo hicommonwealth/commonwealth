@@ -39,14 +39,16 @@ export const CWTooltip: FC<TooltipProps> = ({
 
     const virtualElement: VirtualElement = {
       getBoundingClientRect: () => ({
+        x: x,
+        y: y,
         width: 0,
         height: 0,
         top: y,
         bottom: y,
         left: x,
         right: x,
-      }),
-      // @ts-expect-error <StrictNullChecks/>
+        toJSON: () => ({}),
+      } as DOMRect),
       contextElement: contextEl,
     };
 
