@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatAddressShort } from '../../../../helpers';
+import { formatAddressShort, weiToTokens } from '../../../../helpers';
 import { APIOrderDirection } from '../../../../helpers/constants';
 import { CWText } from '../../component_kit/cw_text';
 import { CWTable } from '../../component_kit/new_designs/CWTable';
@@ -77,7 +77,7 @@ export const TradeActivityTab = ({
           </div>
         ),
       },
-      amount: parseFloat(activity.amount).toLocaleString(),
+      amount: parseFloat(weiToTokens(activity.amount, 18)).toLocaleString(),
       price: `${activity.price.toFixed(8)}`,
       timestamp: new Date(activity.timestamp * 1000).toISOString(),
     }));
