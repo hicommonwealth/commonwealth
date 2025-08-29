@@ -20,14 +20,8 @@ type TokenHolder = {
 const tokenHolderColumns: CWTableColumnInfo[] = [
   {
     key: 'user',
-    header: 'Holder',
+    header: 'Username',
     numeric: false,
-    sortable: true,
-  },
-  {
-    key: 'balance',
-    header: 'Balance',
-    numeric: true,
     sortable: true,
   },
   {
@@ -35,13 +29,6 @@ const tokenHolderColumns: CWTableColumnInfo[] = [
     header: 'Percentage',
     numeric: true,
     sortable: true,
-  },
-  {
-    key: 'lastActivity',
-    header: 'Last Activity',
-    numeric: true,
-    sortable: true,
-    chronological: true,
   },
 ];
 
@@ -54,28 +41,6 @@ const mockTokenHolders: TokenHolder[] = [
     lastActivity: '2024-01-15T10:30:00Z',
     user: {
       name: 'Alice',
-      avatarUrl: '',
-    },
-  },
-  {
-    id: '2',
-    address: '0x8765...4321',
-    balance: '3000',
-    percentage: '15%',
-    lastActivity: '2024-01-15T09:15:00Z',
-    user: {
-      name: 'Bob',
-      avatarUrl: '',
-    },
-  },
-  {
-    id: '3',
-    address: '0xabcd...efgh',
-    balance: '2000',
-    percentage: '10%',
-    lastActivity: '2024-01-15T08:45:00Z',
-    user: {
-      name: 'Charlie',
       avatarUrl: '',
     },
   },
@@ -95,15 +60,10 @@ export const TokenHoldersTab = () => {
         customElement: (
           <div className="user-info">
             <CWText type="b2">{holder.user.name}</CWText>
-            <CWText type="caption" className="address">
-              {holder.address}
-            </CWText>
           </div>
         ),
       },
-      balance: holder.balance,
       percentage: holder.percentage,
-      lastActivity: holder.lastActivity,
     }));
   };
 
