@@ -58,6 +58,8 @@ const MODAL_COPY = {
 
 const mobileApp = isMobileApp();
 
+const SMS_ALLOWED_COUNTRIES = ['US', 'CA', 'AS', 'GU', 'MP', 'PR', 'VI'];
+
 const SSO_OPTIONS_DEFAULT: AuthSSOs[] = [
   'google',
   'discord',
@@ -117,7 +119,7 @@ const ModalBase = ({
       .then((res) => res.json())
       .then((data) => {
         const country = data.country?.toUpperCase();
-        setIsSMSAllowed(['US', 'CA'].includes(country));
+        setIsSMSAllowed(SMS_ALLOWED_COUNTRIES.includes(country));
       })
       .catch(() => {
         setIsSMSAllowed(false);
