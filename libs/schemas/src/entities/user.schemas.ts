@@ -69,8 +69,9 @@ export const User = z.object({
     .nullish()
     .describe('Number of referrals that have earned ETH'),
   referral_eth_earnings: z.number().optional(),
-  xp_points: PG_INT.default(0).nullish(),
-  xp_referrer_points: PG_INT.default(0).nullish(),
+  xp_points: PG_INT.default(0).optional(),
+  xp_referrer_points: PG_INT.default(0).optional(),
+  total_xp: PG_INT.default(0).optional(),
   privy_id: z.string().max(255).nullish(),
   notify_user_name_change: z.boolean().default(false).nullish(),
 

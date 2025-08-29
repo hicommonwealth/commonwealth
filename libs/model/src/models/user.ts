@@ -77,11 +77,16 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       },
       selected_community_id: { type: Sequelize.STRING, allowNull: true },
       profile: { type: Sequelize.JSONB, allowNull: false },
-      xp_points: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: true },
+      xp_points: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
       xp_referrer_points: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
-        allowNull: true,
+        allowNull: false,
+      },
+      total_xp: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
       },
       unsubscribe_uuid: { type: Sequelize.STRING, allowNull: true },
       referred_by_address: { type: Sequelize.STRING, allowNull: true },
@@ -115,6 +120,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
         { fields: ['email'], unique: true },
         { fields: ['privy_id'], unique: true },
         { fields: ['xp_points'], unique: false },
+        { fields: ['tier', 'total_xp'], unique: false },
       ],
       defaultScope: {
         attributes: {

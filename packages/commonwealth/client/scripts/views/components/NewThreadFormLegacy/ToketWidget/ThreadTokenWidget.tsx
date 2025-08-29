@@ -480,7 +480,8 @@ const ThreadTokenWidget = ({
           >
             {currentIsLoadingTokenGain
               ? 'Calculating...'
-              : `${safeCurrentTokenGainAmount.toFixed(5)} ${
+              : // TODO: we can use fraction value comp here
+                `${safeCurrentTokenGainAmount.toFixed(8)} ${
                   isThreadCreationMode || !isSellMode
                     ? threadToken?.symbol || 'TOKEN'
                     : primaryTokenSymbol

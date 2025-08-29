@@ -2,9 +2,9 @@
  * Splits creator and referrer columns in xp logs
  */
 import { logger } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model/db';
 import { exit } from 'process';
 import { QueryTypes } from 'sequelize';
-import { models } from '../src/database';
 
 const log = logger(import.meta);
 
@@ -46,7 +46,7 @@ async function main() {
               AND creator_user_id IS NOT NULL
             ORDER BY id
             LIMIT ${batchSize}
-          )          
+          )
           RETURNING id
         )
         SELECT COUNT(*)::INT AS count, COALESCE(MAX(id), :lastId)::INT AS max_id FROM updated;

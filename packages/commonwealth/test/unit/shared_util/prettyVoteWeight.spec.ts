@@ -12,9 +12,15 @@ describe('prettyVoteWeight', () => {
 
     expect(prettyVoteWeight('5000'), 'handle unweighted > 1000').to.eq('5k');
 
-    expect(prettyVoteWeight('1908887952'), 'handle very large unweighted numbers').to.eq('1.91b');
+    expect(
+      prettyVoteWeight('1908887952'),
+      'handle very large unweighted numbers',
+    ).to.eq('1.91b');
 
-    expect(prettyVoteWeight('1000000'), 'handle million threshold unweighted').to.eq('1m');
+    expect(
+      prettyVoteWeight('1000000'),
+      'handle million threshold unweighted',
+    ).to.eq('1m');
   });
   test('erc20 and native ETH', () => {
     expect(
@@ -176,9 +182,6 @@ describe('prettyVoteWeight', () => {
       'handle million threshold unweighted',
     ).to.eq('1m');
 
-    expect(
-      prettyVoteWeight('5000'),
-      'handle thousands unweighted',
-    ).to.eq('5k');
+    expect(prettyVoteWeight('5000'), 'handle thousands unweighted').to.eq('5k');
   });
 });

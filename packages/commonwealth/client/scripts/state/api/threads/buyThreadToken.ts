@@ -26,6 +26,8 @@ const buyThreadToken = async ({
     !ethChainId ||
     !chainRpc ||
     !tokenAddress ||
+    !amountIn ||
+    !minAmountOut ||
     !walletAddress ||
     !paymentTokenAddress
   ) {
