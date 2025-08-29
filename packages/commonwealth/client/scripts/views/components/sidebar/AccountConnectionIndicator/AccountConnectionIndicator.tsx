@@ -2,13 +2,15 @@ import { useFlag } from 'client/scripts/hooks/useFlag';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import NewProfile from 'client/scripts/models/NewProfile';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
-import React from 'react';
+import React, { useState } from 'react';
 import app from 'state';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { SharePopover } from '../../SharePopover';
 import { AddressList } from '../CommunitySection/AddressList';
+import { DeleteAddressModal } from 'client/scripts/views/modals/delete_address_modal';
 
 import './AccountConnectionIndicator.scss';
 
@@ -34,6 +36,8 @@ const AccountConnectionIndicator = ({
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const referralsEnabled = useFlag('referrals');
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
+  const [isHovering, setIsHovering] = useState(false);
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
 
   if (!profile) {
     return null;
@@ -70,12 +74,19 @@ const AccountConnectionIndicator = ({
 
         <div className="status-button">
           <CWButton
-            {...(connected ? { iconLeft: 'checkCircleFilled' } : {})}
+            {...(connected && !isHovering ? { iconLeft: 'checkCircleFilled' } : {})}
             buttonHeight="sm"
             buttonWidth="full"
-            label={connected ? 'Joined' : 'Join community'}
-            disabled={connected}
-            onClick={handleJoinCommunity}
+            buttonType={connected && isHovering ? 'destructive' : 'primary'}
+            buttonAlt={connected && isHovering ? 'rorange' : undefined}
+            label={connected ? (isHovering ? 'Leave' : 'Joined') : 'Join community'}
+            onMouseEnter={connected ? () => setIsHovering(true) : undefined}
+            onMouseLeave={connected ? () => setIsHovering(false) : undefined}
+            onClick={
+              connected
+                ? () => setIsLeaveModalOpen(true)
+                : handleJoinCommunity
+            }
           />
           <SharePopover
             linkToShare={
@@ -88,6 +99,24 @@ const AccountConnectionIndicator = ({
         </div>
       </div>
       {JoinCommunityModals}
+      <CWModal
+        size="small"
+        open={isLeaveModalOpen}
+        onClose={() => setIsLeaveModalOpen(false)}
+        content={
+          addresses && addresses[0] ? (
+            <DeleteAddressModal
+              addresses={addresses}
+              address={addresses[0]}
+              chain={addresses[0].community?.id || ''}
+              closeModal={() => setIsLeaveModalOpen(false)}
+              communityName={app.chain?.meta?.name || ''}
+              isBulkDelete
+              isLastCommunityAddress
+            />
+          ) : null
+        }
+      />
     </>
   );
 };
