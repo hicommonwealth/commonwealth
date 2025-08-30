@@ -213,7 +213,11 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
         onClick={(e) => clickHandler(e, title)}
       >
         {carat}
-        <CWText type="caption" fontWeight="medium">
+        <CWText
+          type="caption"
+          fontWeight="medium"
+          className="status-text"
+        >
           {title}
         </CWText>
       </div>

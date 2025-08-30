@@ -88,7 +88,11 @@ export const TokenTradeWidget = ({
           weight="fill"
           onClick={() => setIsWidgetExpanded((e) => !e)}
         />
-        <CWText type="caption" fontWeight="medium">
+        <CWText
+          type="caption"
+          fontWeight="medium"
+          className="status-text"
+        >
           Token
         </CWText>
 
