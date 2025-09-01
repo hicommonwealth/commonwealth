@@ -2,6 +2,7 @@ import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   DEFAULT_COMPLETION_MODEL,
   DEFAULT_COMPLETION_MODEL_LABEL,
+  DEFAULT_AI_ASSISTANT_NAME,
   MAX_COMMENT_DEPTH,
 } from '@hicommonwealth/shared';
 import {
@@ -308,7 +309,7 @@ export const TreeHierarchy = ({
             reaction_count: 0,
             reply_count: 0,
             user_id: user.id,
-            profile_name: user.activeAccount?.address || '',
+            profile_name: 'AI Assistant',
           };
           return (
             <div
@@ -491,8 +492,8 @@ export const TreeHierarchy = ({
                   reaction_count: 0,
                   reply_count: 0,
                   user_id: user.id,
-                  // Use fallbacks for profile_name
-                  profile_name: user.activeAccount?.address || 'AI Assistant',
+                  // Use AI Assistant for profile_name
+                  profile_name: DEFAULT_AI_ASSISTANT_NAME,
                 }}
                 isStreamingAIReply={true}
                 streamingModelId={instance.modelId}
