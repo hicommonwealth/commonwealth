@@ -76,8 +76,22 @@
           font-weight: 600;
         }
 
-        .bold {
-          font-family: shared.$font-family-monospace;
+        .amount-with-usd {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          text-align: right;
+
+          .token-amount {
+            font-family: shared.$font-family-monospace;
+          }
+
+          .usd-equivalent {
+            font-size: 0.75em;
+            opacity: 0.7;
+            line-height: 1;
+            margin-top: 1px;
+          }
         }
       }
 

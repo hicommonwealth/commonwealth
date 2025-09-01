@@ -12,7 +12,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import FractionalValue from 'views/components/FractionalValue';
+import FormattedDisplayNumber from 'views/components/FormattedDisplayNumber/FormattedDisplayNumber';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import { Skeleton } from 'views/components/Skeleton';
 import MarketCapProgress from 'views/components/TokenCard/MarketCapProgress';
@@ -73,8 +73,12 @@ export const PotentialContestCard = ({
   const projectedTotalPrizePool =
     (tokenPricing?.marketCapCurrent || 0) * PRIZE_POOL_PERCENTAGE;
 
-  const projectedPrizes = PRIZE_DISTRIBUTION_PERCENTAGES.map(
+  const projectedPrizesUsd = PRIZE_DISTRIBUTION_PERCENTAGES.map(
     (percentage) => projectedTotalPrizePool * percentage,
+  );
+
+  const projectedPrizesToken = projectedPrizesUsd.map((usd) =>
+    tokenPricing?.currentPrice ? usd / tokenPricing.currentPrice : 0,
   );
 
   const handleCTAClick = (mode: TradingMode) => {
@@ -101,17 +105,36 @@ export const PotentialContestCard = ({
         </div>
 
         <div className="prizes prizes--projected">
-          {projectedPrizes.map((prizeValue, index) => (
-            <div className={`prize-row prize-row-${index + 1}`} key={index}>
-              <CWText className="label" fontWeight="bold">
-                {moment.localeData().ordinal(index + 1)} Prize
-              </CWText>
-              <CWText fontWeight="bold">
-                {currencySymbol}
-                <FractionalValue fontWeight="bold" value={prizeValue} />
-              </CWText>
-            </div>
-          ))}
+          {projectedPrizesUsd.map((prizeUsd, index) => {
+            const tokenAmount = projectedPrizesToken[index];
+            return (
+              <div className={`prize-row prize-row-${index + 1}`} key={index}>
+                <CWText className="label" fontWeight="bold">
+                  {moment.localeData().ordinal(index + 1)} Prize
+                </CWText>
+                <div className="amount-with-usd">
+                  <CWText fontWeight="bold" className="token-amount">
+                    <FormattedDisplayNumber
+                      fontWeight="bold"
+                      value={tokenAmount}
+                      options={{ decimals: 4, useShortSuffixes: false }}
+                    />
+                    &nbsp;{launchpadToken.symbol}
+                  </CWText>
+                  <CWText type="caption" className="usd-equivalent">
+                    <FormattedDisplayNumber
+                      value={prizeUsd}
+                      options={{
+                        currencySymbol,
+                        decimals: 2,
+                        useShortSuffixes: false,
+                      }}
+                    />
+                  </CWText>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <CWText type="b2" className="prize-explanation font-size-small">

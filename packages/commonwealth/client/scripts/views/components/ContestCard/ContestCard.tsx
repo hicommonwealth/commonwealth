@@ -12,6 +12,7 @@ import app from 'state';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
 import useDeleteContestMutation from 'state/api/contests/deleteContest';
 import useUserStore from 'state/ui/user';
+import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import { Skeleton } from 'views/components/Skeleton';
 import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import { CWCard } from 'views/components/component_kit/cw_card';
@@ -35,7 +36,7 @@ import ContestAlert from './ContestAlert';
 import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
 import { useFlag } from 'hooks/useFlag';
 import { smartTrim } from 'shared/utils';
-import FractionalValue from 'views/components/FractionalValue';
+import FormattedDisplayNumber from 'views/components/FormattedDisplayNumber/FormattedDisplayNumber';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 
 import './ContestCard.scss';
@@ -139,6 +140,12 @@ const ContestCard = ({
     payoutStructure,
     decimals,
   );
+
+  const { data: tokenUsdRateData } = useFetchTokenUsdRateQuery({
+    tokenSymbol: ticker || 'ETH',
+    enabled: !!ticker,
+  });
+  const tokenUsdRate = parseFloat(tokenUsdRateData?.data?.data?.amount || '0');
 
   const handleCancel = () => {
     cancelContest({
@@ -365,20 +372,41 @@ const ContestCard = ({
               </CWText>
               <div className="prizes">
                 {prizes && prizes.length > 0 ? (
-                  prizes?.map((prize, index) => (
-                    <div className="prize-row" key={index}>
-                      <CWText className="label">
-                        {moment.localeData().ordinal(index + 1)} Prize
-                      </CWText>
-                      <CWText fontWeight="bold">
-                        <FractionalValue
-                          fontWeight="bold"
-                          value={Number(prize.replace(/,/g, ''))}
-                        />
-                        &nbsp;{ticker}
-                      </CWText>
-                    </div>
-                  ))
+                  prizes?.map((prize, index) => {
+                    const prizeTokenValue = Number(prize.replace(/,/g, ''));
+                    const prizeUsdValue = tokenUsdRate
+                      ? prizeTokenValue * tokenUsdRate
+                      : null;
+                    return (
+                      <div className="prize-row" key={index}>
+                        <CWText className="label">
+                          {moment.localeData().ordinal(index + 1)} Prize
+                        </CWText>
+                        <div className="amount-with-usd">
+                          <CWText fontWeight="bold" className="token-amount">
+                            <FormattedDisplayNumber
+                              fontWeight="bold"
+                              value={prizeTokenValue}
+                              options={{ decimals: 4, useShortSuffixes: false }}
+                            />
+                            &nbsp;{ticker}
+                          </CWText>
+                          {prizeUsdValue !== null && (
+                            <CWText type="caption" className="usd-equivalent">
+                              <FormattedDisplayNumber
+                                value={prizeUsdValue}
+                                options={{
+                                  currencySymbol: '$',
+                                  decimals: 2,
+                                  useShortSuffixes: false,
+                                }}
+                              />
+                            </CWText>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
                 ) : (
                   <CWText>No prizes available</CWText>
                 )}
