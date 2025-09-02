@@ -40,7 +40,7 @@
         "restartPolicyMaxRetries": null,
         "multiRegionConfig": {
           "us-east4-eqdc4a": {
-            "numReplicas": 3
+            "numReplicas": 4
           }
         },
         "limitOverride": {
