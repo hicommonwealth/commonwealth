@@ -9,6 +9,6 @@
 
 :{$PORT} {
     reverse_proxy {$HEROKU_DOMAIN:https://commonwealth-frack.herokuapp.com} {$INTERNAL_DOMAIN} {
-        lb_policy weighted 90 10
+        lb_policy weighted_round_robin 90 10
     }
 }
