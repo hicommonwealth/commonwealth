@@ -9,7 +9,7 @@
 
 :{$PORT} {
     @ten_percent {
-        expression rand() < 0.1
+        expression int(hash(uuid())) % 10 == 0
     }
     
     handle @ten_percent {
