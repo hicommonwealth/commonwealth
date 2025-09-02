@@ -60,15 +60,12 @@ const ActiveContestList = ({
   const isGraduated = launchpadToken?.liquidity_transferred;
   const hasActiveContests = activeContests.length > 0;
 
-  const showPotentialCardCase1 =
-    isLaunchpadToken && !isGraduated && !hasActiveContests;
-  const showPotentialCardCase2 =
-    isLaunchpadToken && !isGraduated && hasActiveContests;
+  const shouldRenderPotentialCard = isLaunchpadToken && !isGraduated;
 
-  const shouldRenderPotentialCard =
-    showPotentialCardCase1 || showPotentialCardCase2;
-
-  const activeContestsLimited = activeContests.slice(0, 3);
+  const activeContestsLimited = activeContests.slice(
+    0,
+    shouldRenderPotentialCard ? 2 : 3,
+  );
 
   const communityIds = [
     ...new Set(activeContestsLimited.map((contest) => contest.community_id)),
@@ -106,7 +103,6 @@ const ActiveContestList = ({
         </Link>
       </div>
       <>
-        {shouldRenderPotentialCard && <PotentialContestCard />}
         {!isLoading &&
           !shouldRenderPotentialCard &&
           !isCommunityHomePage &&
@@ -119,16 +115,15 @@ const ActiveContestList = ({
           !shouldRenderPotentialCard &&
           isCommunityHomePage &&
           !hasActiveContests && <NoContestsCard />}
-        {isLoading ? (
-          <div className="content">
+        <div className="content">
+          {shouldRenderPotentialCard && <PotentialContestCard />}
+          {isLoading ? (
             <>
               <Skeleton height="300px" />
               <Skeleton height="300px" />
             </>
-          </div>
-        ) : (
-          <div className="content">
-            {activeContestsLimited.map((contest) => {
+          ) : (
+            activeContestsLimited.map((contest) => {
               const sortedContests = (contest?.contests || []).toSorted(
                 (a, b) => (moment(a.end_time).isBefore(b.end_time) ? -1 : 1),
               );
@@ -156,9 +151,9 @@ const ActiveContestList = ({
                   community={community[contest.community_id as string]}
                 />
               );
-            })}
-          </div>
-        )}
+            })
+          )}
+        </div>
       </>
     </div>
   );
