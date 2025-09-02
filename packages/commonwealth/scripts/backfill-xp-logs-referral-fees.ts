@@ -35,7 +35,7 @@ WITH l AS (
 SELECT 
   xl.id AS log_id,
   m.event_name,
-  m.reward_amount,
+  CASE WHEN m.reward_amount > 0 THEN m.reward_amount * COALESCE(m.amount_multiplier, 1) ELSE xl.xp_points END as reward_amount,
   CASE WHEN m.event_name IN ('SignUpFlowCompleted', 'CommunityCreated', 'CommunityJoined') THEN TRUE ELSE FALSE END as is_referral_event,
   coalesce(m.creator_reward_weight, 0) as creator_reward_weight,
   xl.user_id,
