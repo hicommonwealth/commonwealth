@@ -32,7 +32,7 @@ export default {
           2000000,                                -- max_xp_to_end
           now(),                                  -- created_at
           now()                                   -- updated_at
-        );
+        ) ON CONFLICT DO NOTHING;
         `,
         { transaction },
       );
@@ -62,7 +62,7 @@ export default {
           'once_per_quest',       -- participation_limit
           now(),                  -- created_at
           now()                   -- updated_at
-        );
+        ) ON CONFLICT DO NOTHING;
 
         -- Action Meta -16: WalletLinked with Gate Wallet (10 XP)
         INSERT INTO "QuestActionMetas" (
@@ -86,7 +86,7 @@ export default {
           'once_per_quest',       -- participation_limit
           now(),                  -- created_at
           now()                   -- updated_at
-        );
+        ) ON CONFLICT DO NOTHING;
         `,
         { transaction },
       );
@@ -95,7 +95,7 @@ export default {
       const viewName = `quest_${quest_id}_xp_leaderboard`;
       await queryInterface.sequelize.query(
         `
-    CREATE MATERIALIZED VIEW "${viewName}" AS
+    CREATE MATERIALIZED VIEW IF NOT EXISTS "${viewName}" AS
       WITH user_xp_combined AS (
           SELECT
               l.user_id as user_id,
