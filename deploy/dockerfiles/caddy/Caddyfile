@@ -8,14 +8,7 @@
 }
 
 :{$PORT} {
-	reverse_proxy {
-		# 90% of traffic to frack domain
-		to https://commonwealth-frack.herokuapp.com {
-			lb_policy weighted 90
-		}
-		# 10% of traffic to internal domain
-		to prod-web.railway.internal:8080 {
-			lb_policy weighted 10
-		}
+	reverse_proxy {$FRACK_DOMAIN:https://commonwealth-frack.herokuapp.com} {$INTERNAL_DOMAIN:prod-web.railway.internal:8080} {
+		lb_policy weighted 90 10
 	}
 }
