@@ -5,7 +5,7 @@ import { useFlag } from 'client/scripts/hooks/useFlag';
 import useFarcasterStore from 'client/scripts/state/ui/farcaster';
 import clsx from 'clsx';
 import { isMobileApp } from 'hooks/useReactNativeWebView';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import AuthButton from 'views/components/AuthButton';
@@ -57,6 +57,8 @@ const MODAL_COPY = {
 
 const mobileApp = isMobileApp();
 
+const SMS_ALLOWED_COUNTRIES = ['US', 'CA', 'AS', 'GU', 'MP', 'PR', 'VI'];
+
 const SSO_OPTIONS_DEFAULT: AuthSSOs[] = [
   'google',
   'discord',
@@ -74,8 +76,6 @@ const SSO_OPTIONS_MOBILE: AuthSSOs[] = [
   'email',
   'SMS',
 ] as const;
-
-const SSO_OPTIONS = mobileApp ? SSO_OPTIONS_MOBILE : SSO_OPTIONS_DEFAULT;
 
 /**
  * AuthModal base component with customizable options, callbacks, layouts and auth options display strategy.
@@ -110,6 +110,28 @@ const ModalBase = ({
   const partnershipWalletEnabled = useFlag('partnershipWallet');
   const gateWalletEnabled = useFlag('gateWallet');
   const crecimientoHackathonEnabled = useFlag('crecimientoHackathon');
+
+  const [isSMSAllowed, setIsSMSAllowed] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/ipCountry')
+      .then((res) => res.json())
+      .then((data) => {
+        const country = data.country?.toUpperCase();
+        setIsSMSAllowed(SMS_ALLOWED_COUNTRIES.includes(country));
+      })
+      .catch(() => {
+        setIsSMSAllowed(false);
+      });
+  }, []);
+
+  const ssoOptions = useMemo(
+    () =>
+      (mobileApp ? SSO_OPTIONS_MOBILE : SSO_OPTIONS_DEFAULT).filter(
+        (opt) => opt !== 'SMS' || isSMSAllowed,
+      ),
+    [isSMSAllowed],
+  );
 
   const { farcasterContext, signInToFarcasterFrame } = useFarcasterStore();
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
@@ -291,7 +313,7 @@ const ModalBase = ({
     },
     {
       name: 'Email or Social',
-      options: SSO_OPTIONS,
+      options: ssoOptions,
     },
   ];
 
@@ -302,7 +324,7 @@ const ModalBase = ({
       if (isMobileApp()) return 1;
 
       if (showAuthOptionFor) {
-        return SSO_OPTIONS.includes(showAuthOptionFor as AuthSSOs) ? 1 : 0;
+        return ssoOptions.includes(showAuthOptionFor as AuthSSOs) ? 1 : 0;
       }
 
       if (
@@ -315,7 +337,7 @@ const ModalBase = ({
 
       return 0;
     });
-  }, [showAuthOptionTypesFor, showAuthOptionFor, shouldShowSSOOptions]);
+  }, [showAuthOptionTypesFor, showAuthOptionFor, shouldShowSSOOptions, ssoOptions]);
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {

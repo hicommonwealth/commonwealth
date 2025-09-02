@@ -69,6 +69,10 @@ function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
     // otherwise, return false
     return res.json({ customDomain: null });
   });
+  registerRoute(router, 'get', '/ipCountry', (req, res) => {
+    const country = (req.headers['CF-IPCountry'] as string)?.toUpperCase();
+    return res.json({ country });
+  });
   registerRoute(router, 'get', '/finishUpdateEmail', async (req, res) => {
     const { token, email } = req.query;
     try {

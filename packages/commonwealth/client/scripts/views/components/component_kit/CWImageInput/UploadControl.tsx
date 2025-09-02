@@ -40,6 +40,7 @@ export const UploadControl = ({
     formFieldErrorMessage,
     imageToRender,
     openFilePicker,
+    ignoreNextClickRef,
     registeredFormContext,
     dropzoneRef,
     imageInputRef,
@@ -95,7 +96,18 @@ export const UploadControl = ({
         { hasImageURL: !!imageToRender },
         uploadControlClassName,
       )}
-      onClick={() => openFilePicker()}
+      onClick={(e) => {
+        // Ignore the synthetic click triggered after the native file picker closes
+        if (ignoreNextClickRef.current) {
+          ignoreNextClickRef.current = false;
+          return;
+        }
+
+        // Prevent reopening when the click originates from the hidden input itself
+        if (e.target !== imageInputRef.current) {
+          openFilePicker();
+        }
+      }}
       onKeyUp={(e) =>
         e.target === e.currentTarget &&
         (e.key === 'Enter' || e.key === ' ') &&
