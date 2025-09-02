@@ -1,14 +1,22 @@
 {
-	admin off
-	persist_config off
-	auto_https off
-	log {
-		format console
-	}
+    admin off
+    persist_config off
+    auto_https off
+    log {
+       format console
+    }
 }
 
 :{$PORT} {
-	reverse_proxy {$FRACK_DOMAIN:https://commonwealth-frack.herokuapp.com} {$INTERNAL_DOMAIN:prod-web.railway.internal:8080} {
-		lb_policy weighted 90 10
-	}
+    @ten_percent {
+        expression rand() < 0.1
+    }
+    
+    handle @ten_percent {
+        reverse_proxy {$INTERNAL_DOMAIN:http://prod-web.railway.internal:8080}
+    }
+    
+    handle {
+        reverse_proxy {$FRACK_DOMAIN:https://commonwealth-frack.herokuapp.com}
+    }
 }
