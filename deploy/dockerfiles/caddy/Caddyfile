@@ -1,14 +1,14 @@
 {
-    admin off
-    persist_config off
-    auto_https off
-    log {
-       format console
-    }
+	admin off
+	persist_config off
+	auto_https off
+	log {
+		format console
+	}
 }
 
 :{$PORT} {
-    reverse_proxy {$HEROKU_DOMAIN:https://commonwealth-frack.herokuapp.com} {$INTERNAL_DOMAIN} {
-        lb_policy weighted_round_robin 90 10
-    }
+	reverse_proxy {$HEROKU_DOMAIN:https://commonwealth-frack.herokuapp.com} {$INTERNAL_DOMAIN} {
+		lb_policy weighted_round_robin 90 10
+	}
 }
