@@ -165,7 +165,7 @@ const XPTable = ({
                           address={rank.user_profile.id}
                         />
                         <p>
-                          {rank.user_profile.name}
+                          {rank.user_profile.name}{' '}
                           <TrustLevelRole
                             type="user"
                             level={rank.user_profile.tier}

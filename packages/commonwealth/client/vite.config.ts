@@ -68,6 +68,7 @@ export default defineConfig(({ mode }) => {
       env.FLAG_MCP_INTEGRATIONS_ENABLED,
     ),
     'process.env.FLAG_GATE_WALLET': JSON.stringify(env.FLAG_GATE_WALLET),
+    'process.env.FLAG_MOONPAY_FUNDS': JSON.stringify(env.FLAG_MOONPAY_FUNDS),
   };
 
   return {

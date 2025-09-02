@@ -246,6 +246,7 @@ export const PollCard = ({
           setIsOpen={setPollVotesDrawerOpen}
           tokenDecimals={tokenDecimals}
           topicWeight={topicWeight}
+          tokenSymbol={tokenSymbol}
           communityId={communityId}
           onDownloadCsv={handleDownloadCsv}
           isLoading={isLoadingVotes}

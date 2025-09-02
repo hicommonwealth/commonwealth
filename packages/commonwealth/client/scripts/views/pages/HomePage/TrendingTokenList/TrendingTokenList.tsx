@@ -6,7 +6,7 @@ import { APIOrderDirection } from 'helpers/constants';
 import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
@@ -55,8 +55,9 @@ const TrendingTokensList = ({
   const { data: tokensList, isInitialLoading } = useFetchTokensQuery({
     cursor: 1,
     limit,
-    with_stats: true,
+    with_stats: variant !== 'recent',
     order_by: (() => {
+      if (variant === 'trending') return '24_hr_pct_change';
       if (variant === 'recent') return 'created_at';
       if (variant === 'marketcap' || variant === 'graduated')
         return 'market_cap';
@@ -69,6 +70,12 @@ const TrendingTokensList = ({
   const tokens = (tokensList?.pages || [])
     .flatMap((page) => page.results)
     .slice(0, limit);
+
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    listRef.current?.scrollTo({ left: 0 });
+  }, []);
 
   const openAuthModalOrTriggerCallback = () => {
     if (user.isLoggedIn) {
@@ -117,7 +124,7 @@ const TrendingTokensList = ({
           </CWText>
         </div>
       ) : (
-        <div className="list">
+        <div className="list" ref={listRef}>
           {(tokens || []).map((token) => {
             return (
               <TrendingToken

@@ -96,11 +96,14 @@ const {
   KNOCK_IN_APP_FEED_ID,
   UNLEASH_FRONTEND_API_TOKEN,
   CONTEST_DURATION_IN_SEC,
+  MOONPAY_PUBLISHABLE_KEY,
+  MOONPAY_SECRET_KEY,
   KLAVIS_API_KEY,
   REORG_SAFETY_DISABLED,
   SEND_EMAILS,
   MCP_BOT_EMAIL,
   IGNORE_CONTENT_CREATION_LIMIT,
+  AI_BOT_USER_ADDRESS,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -242,6 +245,9 @@ export const config = configure(
       USE_OPENROUTER: process.env.USE_OPENROUTER || 'false',
       OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
     },
+    AI: {
+      BOT_USER_ADDRESS: AI_BOT_USER_ADDRESS || undefined,
+    },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
     },
@@ -335,6 +341,10 @@ export const config = configure(
     },
     UNLEASH: {
       FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
+    },
+    MOONPAY: {
+      PUBLISHABLE_KEY: MOONPAY_PUBLISHABLE_KEY || '',
+      SECRET_KEY: MOONPAY_SECRET_KEY || '',
     },
     KLAVIS: {
       API_KEY: KLAVIS_API_KEY,
@@ -577,6 +587,9 @@ export const config = configure(
       USE_OPENROUTER: z.string().optional(),
       OPENROUTER_API_KEY: z.string().optional(),
     }),
+    AI: z.object({
+      BOT_USER_ADDRESS: z.string().optional(),
+    }),
     BOT: z.object({
       CONTEST_BOT_NAMESPACE: z
         .string()
@@ -736,6 +749,10 @@ export const config = configure(
             requiredServices: [...WebServices],
           }),
         ),
+    }),
+    MOONPAY: z.object({
+      PUBLISHABLE_KEY: z.string().optional(),
+      SECRET_KEY: z.string().optional(),
     }),
     KLAVIS: z.object({
       API_KEY: z.string().optional(),

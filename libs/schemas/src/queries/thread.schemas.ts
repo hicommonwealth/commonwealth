@@ -188,6 +188,12 @@ export const ThreadView = Thread.extend({
   user_tier: USER_TIER.nullish(),
   avatar_url: z.string().nullish(),
   address_last_active: z.date().or(z.string()).nullish(),
+  last_purchase_activity: z
+    .object({
+      is_buy: z.boolean().nullish(),
+      price: z.number().nullish(),
+    })
+    .nullish(),
 });
 
 export const OrderByQueriesKeys = z.enum([

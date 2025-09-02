@@ -849,6 +849,7 @@ describe('Thread lifecycle', () => {
         },
       });
       const initialCommentCount = threadInstance!.comment_count;
+      const initialNetCommentCount = threadInstance!.net_comment_count;
       const tbd = await command(CreateComment(), {
         actor: actors.member,
         payload: {
@@ -858,6 +859,9 @@ describe('Thread lifecycle', () => {
       });
       await threadInstance!.reload();
       expect(threadInstance!.comment_count).to.equal(initialCommentCount! + 1);
+      expect(threadInstance!.net_comment_count).to.equal(
+        initialNetCommentCount! + 1,
+      );
       expect(tbd).to.include({
         thread_id: thread!.id,
         body,
@@ -869,10 +873,13 @@ describe('Thread lifecycle', () => {
       });
       expect(deleted).to.include({ comment_id: tbd!.id! });
 
-      // This is fails because we paranoidly delete the comment and comment count is used to correctly
-      // render the comment tree. See DeleteComment.command.ts for more details.
-      // await threadInstance!.reload();
-      // expect(threadInstance!.comment_count).to.equal(initialCommentCount!);
+      // Verify that net_comment_count is decremented but comment_count remains unchanged
+      // for proper frontend pagination of comment trees
+      await threadInstance!.reload();
+      expect(threadInstance!.comment_count).to.equal(initialCommentCount! + 1);
+      expect(threadInstance!.net_comment_count).to.equal(
+        initialNetCommentCount!,
+      );
     });
 
     test('should delete a comment as admin', async () => {

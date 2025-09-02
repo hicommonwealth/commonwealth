@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
+import { formatBigNumberShort } from 'adapters/currency';
 import React from 'react';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -28,6 +29,10 @@ const JoinCommunityCard = ({
     community?.profileCount > 1000
       ? `${(community?.profileCount / 1000) | 0}K+`
       : community?.profileCount;
+  const formattedThreadCount = formatBigNumberShort(
+    community?.lifetimeThreadCount || 0,
+    0,
+  );
   return (
     <div className="JoinCommunityCard">
       <CWCommunityAvatar
@@ -51,8 +56,11 @@ const JoinCommunityCard = ({
 
           <CWText className="dot">•</CWText>
 
-          <CWText type="b2" title={`${community?.lifetimeThreadCount}`}>
-            {community?.lifetimeThreadCount}&nbsp;
+          <CWText
+            type="b2"
+            title={`${(community?.lifetimeThreadCount || 0).toLocaleString('en-US')}`}
+          >
+            {formattedThreadCount}&nbsp;
             {pluralizeWithoutNumberPrefix(
               community?.lifetimeThreadCount,
               'Thread',

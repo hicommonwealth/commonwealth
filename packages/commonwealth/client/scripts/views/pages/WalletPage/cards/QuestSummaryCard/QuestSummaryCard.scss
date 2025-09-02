@@ -15,21 +15,20 @@
 
     .user-rank {
       margin-top: 4px;
-
     }
   }
   a,
-a:visited,
-a:hover,
-a:active {
-color: #4c83ff !important;
-color: inherit;
-text-decoration: underline;
-}
+  a:visited,
+  a:hover,
+  a:active {
+    color: #4c83ff !important;
+    color: inherit;
+    text-decoration: underline;
+  }
 
-a:visited .link {
-color: #4c83ff;
-}
+  a:visited .link {
+    color: #4c83ff;
+  }
 
   .list {
     display: flex;

@@ -9,8 +9,8 @@
   },
   "type": "module",
   "scripts": {
-    "split-creator-referrer-xp-logs": "tsx scripts/split-creator-referrer-xp-logs.ts",
-    "backfill-xp-logs-referral-fees": "tsx scripts/backfill-xp-logs-referral-fees.ts",
+    "split-creator-referrer-xp-logs": "node --import=extensionless/register build/scripts/split-creator-referrer-xp-logs.js",
+    "backfill-xp-logs-referral-fees": "node --import=extensionless/register build/scripts/backfill-xp-logs-referral-fees.js",
     "async-delete-spam-comments": "tsx scripts/async-delete-spam-comments.ts",
     "async-delete-spam-threads": "tsx scripts/async-delete-spam-threads.ts",
     "add-component-showcase": "tsx ./scripts/add-component-showcase.ts",
@@ -124,6 +124,7 @@
     "@magic-sdk/admin": "^2.4.1",
     "@metamask/eth-sig-util": "^4.0.0",
     "@modelcontextprotocol/sdk": "^1.12.1",
+    "@moonpay/moonpay-react": "^1.10.2",
     "@mui/base": "5.0.0-beta.5",
     "@mysten/sui": "^1.28.2",
     "@mysten/wallet-standard": "^0.14.7",

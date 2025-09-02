@@ -46,6 +46,7 @@ type ViewPollVotesDrawerProps = {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   tokenDecimals?: number | null | undefined;
   topicWeight?: TopicWeightedVoting | null | undefined; // For formatting vote weights
+  tokenSymbol?: string; // Token symbol for Sui NAVX special handling
   communityId: string; // Community context, potentially for fetching profiles or other details.
   onDownloadCsv: () => void; // Callback to trigger CSV download.
   isLoading?: boolean; // To show loading state for votes
@@ -54,6 +55,7 @@ type ViewPollVotesDrawerProps = {
 const getColumns = (
   tokenDecimals?: number | null,
   topicWeight?: TopicWeightedVoting | null,
+  tokenSymbol?: string,
 ): CWTableColumnInfo[] => [
   {
     key: 'voter',
@@ -74,6 +76,7 @@ const getColumns = (
     sortable: true,
     tokenDecimals,
     weightedVoting: topicWeight,
+    tokenSymbol,
   },
   {
     key: 'timestamp',
@@ -93,13 +96,14 @@ export const ViewPollVotesDrawer = ({
   setIsOpen,
   tokenDecimals,
   topicWeight,
+  tokenSymbol,
   communityId,
   onDownloadCsv,
   isLoading = false,
 }: ViewPollVotesDrawerProps) => {
   const columns = useMemo(
-    () => getColumns(tokenDecimals, topicWeight),
-    [tokenDecimals, topicWeight],
+    () => getColumns(tokenDecimals, topicWeight, tokenSymbol),
+    [tokenDecimals, topicWeight, tokenSymbol],
   );
 
   const tableState = useCWTableState({
@@ -149,6 +153,9 @@ export const ViewPollVotesDrawer = ({
           opt.totalWeightForOption.toString(),
           tokenDecimals,
           topicWeight,
+          1,
+          undefined,
+          tokenSymbol,
         ),
       }));
     }
@@ -163,6 +170,9 @@ export const ViewPollVotesDrawer = ({
           opt.totalWeightForOption.toString(),
           tokenDecimals,
           topicWeight,
+          1,
+          undefined,
+          tokenSymbol,
         ),
       };
     });
@@ -251,6 +261,7 @@ export const ViewPollVotesDrawer = ({
                       topicWeight,
                       1,
                       6,
+                      tokenSymbol,
                     )}
                   </CWText>
                 </div>
