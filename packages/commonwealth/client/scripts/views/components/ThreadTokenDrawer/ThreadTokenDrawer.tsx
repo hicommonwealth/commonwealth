@@ -7,7 +7,10 @@ import CWDrawer, {
 import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
 import './ThreadTokenDrawer.scss';
 import { TokenHoldersTab } from './TokenHolderTab/TokenHoldersTab';
-import { TradeActivityTab } from './TradeActivityTab/TradeActivityTab';
+import {
+  TradeActivityTab,
+  TradesData,
+} from './TradeActivityTab/TradeActivityTab';
 
 type ThreadTokenDrawerProps = {
   threadId: number;
@@ -42,7 +45,7 @@ export const ThreadTokenDrawer = ({
       case 'trade-activity':
         return (
           <TradeActivityTab
-            tradesData={tradesData}
+            tradesData={tradesData as TradesData}
             isLoadingTrades={isLoadingTrades}
           />
         );

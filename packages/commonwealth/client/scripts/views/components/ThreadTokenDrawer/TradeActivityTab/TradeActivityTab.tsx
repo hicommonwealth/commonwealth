@@ -6,6 +6,19 @@ import { CWTable } from '../../component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
 
+export type TradeActivity = {
+  id: string;
+  type: 'buy' | 'sell';
+  amount: string;
+  price: number;
+  timestamp: number;
+  address: string;
+};
+
+export type TradesData = {
+  result: TradeActivity[] | null;
+};
+
 const tradeActivityColumns: CWTableColumnInfo[] = [
   {
     key: 'user',
@@ -41,7 +54,7 @@ const tradeActivityColumns: CWTableColumnInfo[] = [
 ];
 
 interface TradeActivityTabProps {
-  tradesData: any;
+  tradesData: TradesData | undefined;
   isLoadingTrades: boolean;
 }
 
@@ -55,7 +68,7 @@ export const TradeActivityTab = ({
     initialSortDirection: APIOrderDirection.Desc,
   });
 
-  const getTradeActivityRowData = (activities: any[]) => {
+  const getTradeActivityRowData = (activities: TradeActivity[]) => {
     return activities.map((activity) => ({
       user: {
         sortValue: activity.address,
@@ -92,10 +105,8 @@ export const TradeActivityTab = ({
         rowData={
           isLoadingTrades
             ? []
-            : tradesData &&
-                (tradesData as any).result &&
-                (tradesData as any).result.length > 0
-              ? getTradeActivityRowData((tradesData as any).result)
+            : tradesData?.result && tradesData.result.length > 0
+              ? getTradeActivityRowData(tradesData.result)
               : []
         }
       />
