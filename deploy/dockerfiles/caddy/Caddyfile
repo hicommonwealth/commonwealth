@@ -8,15 +8,7 @@
 }
 
 :{$PORT} {
-    @ten_percent {
-        expression int(hash(uuid())) % 10 == 0
-    }
-    
-    handle @ten_percent {
-        reverse_proxy {$INTERNAL_DOMAIN:http://prod-web.railway.internal:8080}
-    }
-    
-    handle {
-        reverse_proxy {$FRACK_DOMAIN:https://commonwealth-frack.herokuapp.com}
+    reverse_proxy {$HEROKU_DOMAIN:https://commonwealth-frack.herokuapp.com} {$INTERNAL_DOMAIN} {
+        lb_policy weighted 90 10
     }
 }
