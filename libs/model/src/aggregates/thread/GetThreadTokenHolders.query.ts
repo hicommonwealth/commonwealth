@@ -1,14 +1,13 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { GetThreadTokenTrades } from '@hicommonwealth/schemas';
 import z from 'zod';
 import { models } from '../../database';
 
 export function GetThreadTokenHolders(): Query<
-  typeof schemas.GetThreadTokenTrades
+  typeof schemas.GetThreadTokenHolders
 > {
   return {
-    ...schemas.GetThreadTokenTrades,
+    ...schemas.GetThreadTokenHolders,
     auth: [],
     body: async ({ payload }) => {
       const [result] = await models.sequelize.query(
@@ -62,7 +61,9 @@ export function GetThreadTokenHolders(): Query<
         },
       );
 
-      return result as unknown as z.infer<typeof GetThreadTokenTrades.output>;
+      return result as unknown as z.infer<
+        typeof schemas.GetThreadTokenHolders.output
+      >;
     },
   };
 }

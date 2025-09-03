@@ -154,7 +154,7 @@ export const CreateThreadTokenTrade = {
   output: ThreadTokenTradeView.optional(),
 };
 
-export const GetThreadTokenTrades = {
+export const GetThreadTokenHolders = {
   input: z.object({
     thread_id: PG_INT.optional(),
   }),
