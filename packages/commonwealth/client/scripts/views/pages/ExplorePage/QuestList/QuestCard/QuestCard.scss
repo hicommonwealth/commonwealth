@@ -11,8 +11,8 @@
   flex-direction: column;
   gap: 14px;
   background-color: colors.$white;
-  max-width: 600px;
-  width: 330px;
+  width: 100%;
+  min-width: 330px;
   min-height: 360px;
   border: 1px solid colors.$neutral-300;
   cursor: pointer;
@@ -21,11 +21,6 @@
 
   &:hover {
     box-shadow: elevation.$elevation-3;
-  }
-
-  @include media_queries.smallInclusive {
-    width: 100%;
-    min-width: 330px;
   }
 
   .text-dark {
