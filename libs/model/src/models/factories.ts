@@ -23,6 +23,7 @@ import DiscordBotConfig from './discord_bot_config';
 import Dlq from './dlq';
 import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';
+import GovernanceProposal from './governance_proposals';
 import Group from './group';
 import GroupGatedAction from './groupGatedAction';
 import GroupSnapshot from './groupSnapshot';
@@ -35,6 +36,7 @@ import Outbox from './outbox';
 import PinnedToken from './pinned_token';
 import Poll from './poll';
 import ProfileTags from './profile_tags';
+import ProposalVote from './proposal_votes';
 import { Quest, QuestActionMeta } from './quest';
 import QuestTweets from './quest_tweets';
 import Reaction from './reaction';
@@ -92,6 +94,7 @@ export const Factories = {
   Dlq,
   EmailUpdateToken,
   EvmEventSource,
+  GovernanceProposal,
   Group,
   GroupGatedAction,
   GroupSnapshot,
@@ -105,6 +108,7 @@ export const Factories = {
   PinnedToken,
   Poll,
   ProfileTags,
+  ProposalVote,
   Quest,
   QuestActionMeta,
   QuestTweets,
