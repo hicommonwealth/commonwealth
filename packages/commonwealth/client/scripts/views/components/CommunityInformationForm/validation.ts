@@ -7,18 +7,18 @@ import z from 'zod';
 
 export const baseCommunityInformationFormValidationSchema = z.object({
   communityName: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string({ error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
     .max(255, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
     .regex(COMMUNITY_NAME_REGEX, {
       message: COMMUNITY_NAME_ERROR,
     }),
   communityDescription: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string({ error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
     .max(250, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED }),
   communityProfileImageURL: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+    .string({ error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   tokenizeCommunity: z.boolean().default(true),
 });
@@ -30,8 +30,7 @@ export const communityChainValidation = z.object({
       label: z.string().default('').optional(),
     },
     {
-      invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-      required_error: VALIDATION_MESSAGES.NO_INPUT,
+      error: VALIDATION_MESSAGES.NO_INPUT,
     },
   ),
 });

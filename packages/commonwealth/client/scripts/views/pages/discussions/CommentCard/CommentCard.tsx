@@ -17,7 +17,10 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useCreateCommentMutation } from 'state/api/comments';
-import { buildCreateCommentInput } from 'state/api/comments/createComment';
+import {
+  useCreateAICompletionCommentMutation,
+  useCreateAICompletionTokenMutation,
+} from 'state/api/comments/aiCompletion';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore, { useAIFeatureEnabled } from 'state/ui/user';
@@ -92,6 +95,7 @@ type CommentCardProps = {
   onStreamingComplete?: () => void;
   // voting
   tokenNumDecimals?: number;
+  tokenSymbol?: string;
   // Add props for root-level comment generation
   isRootComment?: boolean;
   threadContext?: string;
@@ -141,6 +145,7 @@ export const CommentCard = ({
   parentCommentText,
   onStreamingComplete,
   tokenNumDecimals,
+  tokenSymbol,
   isRootComment,
   threadContext,
   threadTitle,
@@ -164,6 +169,15 @@ export const CommentCard = ({
     communityId: comment.community_id,
     existingNumberOfComments: 0,
   });
+
+  const { mutateAsync: createAICompletionToken } =
+    useCreateAICompletionTokenMutation();
+  const { mutateAsync: createAICompletionComment } =
+    useCreateAICompletionCommentMutation({
+      communityId: comment.community_id,
+      threadId: comment.thread_id,
+      existingNumberOfComments: 0,
+    });
   const [commentText, setCommentText] = useState(comment.body);
   const commentBody = React.useMemo(() => {
     const rawContent = editDraft || commentText || comment.body;
@@ -288,12 +302,47 @@ Community Description: ${communityDescription}`;
           systemPrompt: systemPrompt,
           model: streamingModelId as CompletionModel,
           stream: true,
+          communityId: comment.community_id,
           onChunk: (chunk) => {
             if (mounted) {
               accumulatedText += chunk;
               setStreamingText(accumulatedText);
               finalText = accumulatedText;
             }
+          },
+          onComplete: async (completedText) => {
+            if (
+              mounted &&
+              completedText &&
+              !completedText.startsWith('Error generating reply')
+            ) {
+              try {
+                if (!user.activeAccount?.address) {
+                  throw new Error('No active user account found');
+                }
+
+                // Create AI completion token with the generated content
+                const tokenResponse = await createAICompletionToken({
+                  user_id: user.id,
+                  community_id: comment.community_id,
+                  thread_id: comment.thread_id,
+                  parent_comment_id: isRootComment ? undefined : comment.id,
+                  content: completedText,
+                  expires_in_minutes: 60, // Token expires in 1 hour
+                });
+
+                // Immediately use the token to create the bot comment
+                await createAICompletionComment({
+                  token: tokenResponse.token,
+                });
+              } catch (error) {
+                console.error('Error creating AI completion comment:', error);
+                setStreamingText(
+                  `Failed to post reply from ${modelName || 'AI'}.`,
+                );
+              }
+            }
+            onStreamingCompleteRef.current?.();
           },
           onError: (error) => {
             if (mounted) {
@@ -309,25 +358,7 @@ Community Description: ${communityDescription}`;
           },
         });
 
-        if (mounted) {
-          if (finalText && !finalText.startsWith('Error generating reply')) {
-            if (!activeUserAddress) {
-              throw new Error('No active account found');
-            }
-            const input = await buildCreateCommentInput({
-              communityId: comment.community_id,
-              address: activeUserAddress,
-              threadId: comment.thread_id,
-              parentCommentId: isRootComment ? null : comment.id,
-              threadMsgId: null,
-              unescapedText: finalText,
-              parentCommentMsgId: null,
-              existingNumberOfComments: 0,
-            });
-            await createCommentRef.current(input);
-          }
-          onStreamingCompleteRef.current?.();
-        }
+        // Token creation and comment posting is now handled in onComplete callback above
       } catch (error) {
         if (mounted) {
           console.error(
@@ -421,7 +452,9 @@ Community Description: ${communityDescription}`;
               profile={{
                 address: comment.address,
                 avatarUrl: comment.avatar_url || '',
-                name: comment.profile_name || DEFAULT_NAME,
+                name: isStreamingAIReply
+                  ? 'AI Assistant'
+                  : comment.profile_name || DEFAULT_NAME,
                 userId: comment.user_id,
                 lastActive: comment.last_active as unknown as string,
                 tier: comment.user_tier || UserTierMap.IncompleteUser,
@@ -498,6 +531,7 @@ Community Description: ${communityDescription}`;
                     onReaction={handleReaction}
                     weightType={weightType}
                     tokenNumDecimals={tokenNumDecimals}
+                    tokenSymbol={tokenSymbol}
                   />
                 )}
 
@@ -515,6 +549,7 @@ Community Description: ${communityDescription}`;
                       setIsOpen={setIsUpvoteDrawerOpen}
                       tokenDecimals={tokenNumDecimals}
                       weightType={weightType}
+                      tokenSymbol={tokenSymbol}
                     />
                   </>
                 )}

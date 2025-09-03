@@ -1,3 +1,4 @@
+export * from './ai-completion-token.schemas';
 export * from './chain-event-xp-source.schemas';
 export * from './chain.schemas';
 export * from './comment.schemas';

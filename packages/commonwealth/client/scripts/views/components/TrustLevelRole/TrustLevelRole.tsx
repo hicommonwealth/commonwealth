@@ -33,9 +33,7 @@ const TrustLevelRole = ({
   const tiers = type === 'community' ? COMMUNITY_TIERS : USER_TIERS;
   const tier =
     level !== undefined
-      ? Object.values(tiers).find(
-          (t) => t.clientInfo?.trustLevel === level,
-        )
+      ? Object.values(tiers).find((t) => t.clientInfo?.trustLevel === level)
       : undefined;
 
   const tooltipContent = tier ? (
@@ -56,7 +54,7 @@ const TrustLevelRole = ({
   if (withTooltip && tooltipContent) {
     return (
       <CWTooltip
-        placement="top"
+        placement="bottom"
         content={tooltipContent}
         renderTrigger={(handleInteraction, isTooltipOpen) => (
           <span

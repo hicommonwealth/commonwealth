@@ -24,6 +24,7 @@ type CommentReactionButtonProps = {
   onReaction?: () => void;
   weightType?: TopicWeightedVoting | null;
   tokenNumDecimals?: number;
+  tokenSymbol?: string;
 };
 
 export const CommentReactionButton = ({
@@ -33,6 +34,7 @@ export const CommentReactionButton = ({
   onReaction,
   weightType,
   tokenNumDecimals,
+  tokenSymbol,
 }: CommentReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const user = useUserStore();
@@ -122,6 +124,7 @@ export const CommentReactionButton = ({
     weightType,
     1,
     6,
+    tokenSymbol,
   );
 
   return (

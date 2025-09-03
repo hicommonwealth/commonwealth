@@ -1,5 +1,8 @@
 import clsx from 'clsx';
-import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
+import {
+  currencyNameToSymbolMap,
+  SupportedFiatCurrencies,
+} from 'helpers/currency';
 import { useTokenPricing } from 'hooks/useTokenPricing';
 import React from 'react';
 import { useGetTokenStatsQuery } from 'state/api/tokens';
@@ -29,7 +32,7 @@ interface TokenStats {
 
 export interface TokenCardProps {
   token: LaunchpadToken;
-  currency?: SupportedCurrencies;
+  currency?: SupportedFiatCurrencies;
   className?: string;
   onCTAClick?: (mode: TradingMode) => void;
   onCardBodyClick?: () => void;
@@ -39,7 +42,7 @@ const MAX_CHARS_FOR_LABELS = 9;
 
 const TokenCard = ({
   token,
-  currency = SupportedCurrencies.USD,
+  currency = SupportedFiatCurrencies.USD,
   className,
   onCardBodyClick,
   onCTAClick,

@@ -6,6 +6,7 @@ import { useGetLaunchpadTradesQuery } from 'state/api/launchPad';
 import { useTokensMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import { buildEtherscanLink } from 'views/modals/ManageCommunityStakeModal/utils';
+import { z } from 'zod';
 import useAuthentication from '../../../../modals/AuthModal/useAuthentication';
 import { CWIcon } from '../../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../component_kit/cw_text';
@@ -19,7 +20,7 @@ import TransactionsHistory from './TransactionHistory';
 import './TransactionsTab.scss';
 import useTransactionHistory from './useTransactionHistory';
 
-type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._type;
+type GetLaunchpadTradesOutput = z.infer<typeof GetLaunchpadTrades.output>;
 
 type TransactionHistoryItem = {
   address: string;

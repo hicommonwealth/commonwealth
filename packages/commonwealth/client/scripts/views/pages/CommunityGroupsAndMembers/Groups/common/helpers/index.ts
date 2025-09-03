@@ -7,6 +7,7 @@ import {
   SPL_SPECIFICATION,
   SUI_NFT_SPECIFICATION,
   TOKENS,
+  TRUST_LEVEL_SPECIFICATION,
 } from '../../../common/constants';
 import { convertRequirementAmountFromTokensToWei } from '../../../common/helpers';
 import { AllowListGroupFilters } from '../GroupForm/Allowlist/index.types';
@@ -202,6 +203,17 @@ export const makeGroupDataBaseAPIPayload = (
               token_symbol: 'COS',
             }),
           },
+        },
+      });
+      return;
+    }
+
+    if (x.requirementType === TRUST_LEVEL_SPECIFICATION) {
+      // @ts-expect-error StrictNullChecks
+      payload.requirements.push({
+        rule: TRUST_LEVEL_SPECIFICATION,
+        data: {
+          minimum_trust_level: parseInt(x.requirementTrustLevel || '0'),
         },
       });
       return;

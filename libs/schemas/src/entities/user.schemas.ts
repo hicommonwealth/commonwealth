@@ -39,7 +39,7 @@ export const ProfileTags = z.object({
   Tag: Tags.nullish(),
 });
 
-export const USER_TIER = z.nativeEnum(UserTierMap);
+export const USER_TIER = z.enum(UserTierMap);
 
 export const EmailNotificationInterval = z.enum([
   'never',
@@ -69,8 +69,9 @@ export const User = z.object({
     .nullish()
     .describe('Number of referrals that have earned ETH'),
   referral_eth_earnings: z.number().optional(),
-  xp_points: PG_INT.default(0).nullish(),
-  xp_referrer_points: PG_INT.default(0).nullish(),
+  xp_points: PG_INT.default(0).optional(),
+  xp_referrer_points: PG_INT.default(0).optional(),
+  total_xp: PG_INT.default(0).optional(),
   privy_id: z.string().max(255).nullish(),
   notify_user_name_change: z.boolean().default(false).nullish(),
 
@@ -91,7 +92,7 @@ export const Address = z.object({
   verified: z.date().nullish(),
   last_active: z.date().nullish(),
   ghost_address: z.boolean().default(false),
-  wallet_id: z.nativeEnum(WalletId).nullish(),
+  wallet_id: z.enum(WalletId).nullish(),
   block_info: z.string().max(255).nullish(),
   role: z.enum(Roles).default('member'),
   is_banned: z.boolean().default(false),

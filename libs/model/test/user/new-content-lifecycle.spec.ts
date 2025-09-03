@@ -38,6 +38,7 @@ describe('New Content lifecycle', () => {
     });
     [topic] = (await seed('Topic', {
       community_id: community!.id,
+      name: 'test',
     })) as [z.infer<typeof Topic>, unknown];
 
     actor1 = {

@@ -91,13 +91,19 @@ const {
   EVM_CHAINS_WHITELIST,
   MCP_KEY_BYPASS,
   LOG_XP_LAUNCHPAD,
+  XP_REFERRER_FEE_RATIO,
   KNOCK_PUBLIC_API_KEY,
   KNOCK_IN_APP_FEED_ID,
   UNLEASH_FRONTEND_API_TOKEN,
   CONTEST_DURATION_IN_SEC,
+  MOONPAY_PUBLISHABLE_KEY,
+  MOONPAY_SECRET_KEY,
   KLAVIS_API_KEY,
   REORG_SAFETY_DISABLED,
   SEND_EMAILS,
+  MCP_BOT_EMAIL,
+  IGNORE_CONTENT_CREATION_LIMIT,
+  AI_BOT_USER_ADDRESS,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -114,6 +120,7 @@ const DEFAULTS = {
   TIER_SOCIAL_VERIFIED_MIN_ETH: '0.006',
   KNOCK_PUBLIC_API_KEY: 'pk_test_Hd4ZpzlVcz9bqepJQoo9BvZHokgEqvj4T79fPdKqpYM',
   KNOCK_IN_APP_FEED_ID: 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb',
+  XP_REFERRER_FEE_RATIO: '0',
 };
 
 export const config = configure(
@@ -238,6 +245,9 @@ export const config = configure(
       USE_OPENROUTER: process.env.USE_OPENROUTER || 'false',
       OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
     },
+    AI: {
+      BOT_USER_ADDRESS: AI_BOT_USER_ADDRESS || undefined,
+    },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
     },
@@ -314,8 +324,14 @@ export const config = configure(
     MCP: {
       MCP_DEMO_CLIENT_SERVER_URL: MCP_DEMO_CLIENT_SERVER_URL,
       MCP_KEY_BYPASS: MCP_KEY_BYPASS,
+      BOT_EMAIL: MCP_BOT_EMAIL || 'mcp@common.xyz',
     },
-    LOG_XP_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
+    XP: {
+      REFERRER_FEE_RATIO: parseFloat(
+        XP_REFERRER_FEE_RATIO || DEFAULTS.XP_REFERRER_FEE_RATIO,
+      ),
+      LOG_LAUNCHPAD: LOG_XP_LAUNCHPAD === 'true',
+    },
     NOTIFICATIONS: {
       KNOCK_PUBLIC_API_KEY:
         KNOCK_PUBLIC_API_KEY || DEFAULTS.KNOCK_PUBLIC_API_KEY,
@@ -326,9 +342,14 @@ export const config = configure(
     UNLEASH: {
       FRONTEND_API_TOKEN: UNLEASH_FRONTEND_API_TOKEN,
     },
+    MOONPAY: {
+      PUBLISHABLE_KEY: MOONPAY_PUBLISHABLE_KEY || '',
+      SECRET_KEY: MOONPAY_SECRET_KEY || '',
+    },
     KLAVIS: {
       API_KEY: KLAVIS_API_KEY,
     },
+    IGNORE_CONTENT_CREATION_LIMIT: IGNORE_CONTENT_CREATION_LIMIT === 'true',
   },
   z.object({
     SENDGRID: z.object({
@@ -537,7 +558,7 @@ export const config = configure(
       THREAD_PRIORITY: z.coerce.number(),
       PROFILE_PRIORITY: z.coerce.number(),
     }),
-    DEFAULT_COMMONWEALTH_LOGO: z.string().url(),
+    DEFAULT_COMMONWEALTH_LOGO: z.url(),
     TEST_EVM: z.object({
       ETH_RPC: z.string(),
       PROVIDER_URL: z.string(),
@@ -565,6 +586,9 @@ export const config = configure(
       ORGANIZATION: z.string().optional(),
       USE_OPENROUTER: z.string().optional(),
       OPENROUTER_API_KEY: z.string().optional(),
+    }),
+    AI: z.object({
+      BOT_USER_ADDRESS: z.string().optional(),
     }),
     BOT: z.object({
       CONTEST_BOT_NAMESPACE: z
@@ -690,8 +714,12 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && data),
           'MCP_KEY_BYPASS cannot be set in production',
         ),
+      BOT_EMAIL: z.string(),
     }),
-    LOG_XP_LAUNCHPAD: z.boolean().default(false),
+    XP: z.object({
+      REFERRER_FEE_RATIO: z.number(),
+      LOG_LAUNCHPAD: z.boolean().default(false),
+    }),
     NOTIFICATIONS: z.object({
       KNOCK_PUBLIC_API_KEY: z.string().refine(
         requiredInEnvironmentServices({
@@ -722,8 +750,13 @@ export const config = configure(
           }),
         ),
     }),
+    MOONPAY: z.object({
+      PUBLISHABLE_KEY: z.string().optional(),
+      SECRET_KEY: z.string().optional(),
+    }),
     KLAVIS: z.object({
       API_KEY: z.string().optional(),
     }),
+    IGNORE_CONTENT_CREATION_LIMIT: z.boolean().optional(),
   }),
 );

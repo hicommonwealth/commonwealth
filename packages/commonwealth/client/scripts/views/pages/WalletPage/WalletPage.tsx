@@ -13,6 +13,7 @@ import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup
 import { GetLaunchpadTrades } from '@hicommonwealth/schemas';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
+import { z } from 'zod';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWMobileTab } from '../../components/component_kit/new_designs/CWMobileTab';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
@@ -36,7 +37,7 @@ import {
   typeToIcon,
 } from './utils';
 
-type GetLaunchpadTradesOutput = typeof GetLaunchpadTrades.output._type;
+type GetLaunchpadTradesOutput = z.infer<typeof GetLaunchpadTrades.output>;
 
 const WalletPage = () => {
   const user = useUserStore();

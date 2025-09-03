@@ -10,6 +10,7 @@ import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
 import { DisableMavaOnMobile } from 'views/components/DisableMavaOnMobile';
 import ForceMobileAuth from 'views/components/ForceMobileAuth';
+import MoonPayProvider from 'views/components/MoonPayProvider';
 import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
 import { ReactNativeLogForwarder } from 'views/components/ReactNativeBridge/ReactNativeLogForwarder';
 import { ReactNativeScrollToTopListener } from 'views/components/ReactNativeBridge/ReactNativeScrollToTopListener';
@@ -37,13 +38,15 @@ const App = () => {
                   // Add Those components back in when we are ready to use Privy
                   // <PrivyMobileAuthenticator>
                   // <DefaultPrivyProvider>
-                  <ForceMobileAuth>
-                    <OnBoardingWrapperForMobile>
-                      <ReactNativeBridgeUser />
-                      <ReactNativeScrollToTopListener />
-                      <RouterProvider router={router()} />
-                    </OnBoardingWrapperForMobile>
-                  </ForceMobileAuth>
+                  <MoonPayProvider>
+                    <ForceMobileAuth>
+                      <OnBoardingWrapperForMobile>
+                        <ReactNativeBridgeUser />
+                        <ReactNativeScrollToTopListener />
+                        <RouterProvider router={router()} />
+                      </OnBoardingWrapperForMobile>
+                    </ForceMobileAuth>
+                  </MoonPayProvider>
                   // </DefaultPrivyProvider>
                   // </PrivyMobileAuthenticator>
                 )}

@@ -157,9 +157,10 @@ export const CreateThreadTokenTrade = {
 export const GetThreadTokenTradesOutput = z.object({
   result: z
     .record(
+      z.string(),
       z.object({
         name: z.string().nullish(),
-        addresses: z.record(z.array(ThreadTokenTrade)),
+        addresses: z.record(z.string(), z.array(ThreadTokenTrade)),
       }),
     )
     .nullable(),

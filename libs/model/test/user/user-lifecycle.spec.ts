@@ -20,7 +20,11 @@ import {
   UpdateRole,
   UpdateRoleErrors,
 } from '../../src/aggregates/community';
-import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
+import {
+  CreateQuest,
+  createQuestMaterializedView,
+  UpdateQuest,
+} from '../../src/aggregates/quest';
 import { AwardXp } from '../../src/aggregates/super-admin';
 import { CreateThread } from '../../src/aggregates/thread';
 import {
@@ -34,6 +38,7 @@ import { models } from '../../src/database';
 import * as tokenBalanceCache from '../../src/services/tokenBalanceCache';
 import { seed } from '../../src/tester';
 import * as utils from '../../src/utils';
+import { getQuestXpLeaderboardViewName } from '../../src/utils';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
 import { createSIWESigner, signIn } from '../utils/sign-in';
@@ -49,6 +54,7 @@ describe('User lifecycle', () => {
 
   beforeAll(async () => {
     const { community, actors } = await seedCommunity({
+      id: 'user-lifecycle-test-community',
       roles: ['admin', 'member', 'superadmin'],
     });
     community_id = community!.id;
@@ -82,11 +88,42 @@ describe('User lifecycle', () => {
       xp: x.xp_points,
       creator: x.creator_profile?.name,
       creator_xp: x.creator_xp_points,
+      referrer: x.referrer_profile?.name,
+      referrer_xp: x.referrer_xp_points,
     }));
     console.table(table);
   }
 
   describe('xp', () => {
+    beforeAll(async () => {
+      await models.sequelize.query(`
+        CREATE OR REPLACE FUNCTION public.update_total_xp()
+        RETURNS TRIGGER AS '
+        BEGIN
+            NEW.total_xp = NEW.xp_points + NEW.xp_referrer_points;
+            RETURN NEW;
+        END;
+        ' LANGUAGE plpgsql;
+        
+        CREATE TRIGGER update_total_xp_trigger
+        BEFORE INSERT OR UPDATE OF xp_points, xp_referrer_points
+        ON public."Users"
+        FOR EACH ROW
+        EXECUTE FUNCTION public.update_total_xp();
+      
+        CREATE MATERIALIZED VIEW user_leaderboard AS
+        SELECT 
+            id as user_id,
+            total_xp as xp_points,
+            tier,
+            (ROW_NUMBER() OVER (ORDER BY total_xp DESC, id ASC))::int as rank
+        FROM "Users" WHERE tier > 1;
+        
+        CREATE UNIQUE INDEX user_leaderboard_user_id_idx ON public.user_leaderboard (user_id);
+        CREATE INDEX user_leaderboard_rank_idx ON public.user_leaderboard (rank);
+      `);
+    });
+
     it('should project xp points', async () => {
       // setup quest
       const quest = await command(CreateQuest(), {
@@ -211,6 +248,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![0].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: logs[0].created_at,
           scope: {
             community_id,
@@ -228,6 +267,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: logs[1].created_at,
           scope: {
             community_id,
@@ -246,6 +287,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: logs[2].created_at,
           scope: {
             community_id,
@@ -264,6 +307,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![2].id,
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: logs[3].created_at,
           scope: {
             community_id,
@@ -387,6 +432,10 @@ describe('User lifecycle', () => {
         start_date: new Date(),
         end_date: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7),
         quest_type: 'common',
+      });
+
+      await models.sequelize.transaction(async (transaction) => {
+        await createQuestMaterializedView(-1, transaction);
       });
 
       await models.QuestActionMeta.bulkCreate([
@@ -535,6 +584,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![0].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: last[0].created_at,
           scope: {
             community_id,
@@ -552,6 +603,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: last[1].created_at,
           scope: {
             community_id,
@@ -570,6 +623,8 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![2].id,
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: last[2].created_at,
           scope: {
             community_id,
@@ -586,8 +641,10 @@ describe('User lifecycle', () => {
           xp_points: 10,
           name: null,
           action_meta_id: updated!.action_metas![3].id,
-          creator_user_id: member.user.id,
-          creator_xp_points: 10,
+          creator_user_id: null,
+          creator_xp_points: null,
+          referrer_user_id: member.user.id,
+          referrer_xp_points: 10,
           created_at: last[3].created_at,
           scope: {
             community_id,
@@ -601,8 +658,10 @@ describe('User lifecycle', () => {
           xp_points: 16,
           name: null,
           action_meta_id: -1, // this is system quest action
-          creator_user_id: member.user.id,
-          creator_xp_points: 4,
+          creator_user_id: null,
+          creator_xp_points: null,
+          referrer_user_id: member.user.id,
+          referrer_xp_points: 4,
           created_at: last[4].created_at,
           scope: null,
         },
@@ -1068,42 +1127,52 @@ describe('User lifecycle', () => {
     });
 
     it('should query ranked by xp points', async () => {
+      await models.sequelize.query(`
+        REFRESH MATERIALIZED VIEW user_leaderboard;
+      `);
+
       // dump xp logs to debug xp ranking
       const logs = await query(GetXps(), {
         actor: admin,
         payload: {},
       });
-      logTable(logs.sort((a, b) => b.xp_points - a.xp_points));
+      logTable(logs.sort((a, b) => b.user_id - a.user_id));
 
       const xps1 = await query(GetXpsRanked(), {
         actor: admin,
-        payload: { top: 10 },
+        payload: { limit: 10, cursor: 1 },
       });
-      expect(xps1!.length).to.equal(4);
-      // member has
+      expect(xps1!.totalResults).to.equal(4);
+      // member has 203 total points
+      //   42 awarded points
       //   25+18+18+13+12+11+10+10+10+10+10=147 xp points
-      //   4+10 creator points
-      //   42 awarded points = 203 total
-      // admin has
+      //   4+10 referrer points
+      // admin has 50 total points
       //   11+10+10+5+5+5 xp points
-      //   2+2 creator points = 50 total
-      // new_user has
-      //   16+11+10 xp points = 37 total
+      //   2+2 creator points
+      // new_user has 37 total points
+      //   16+11+10 xp points
       // superadmin has
       //   11 xp points
-      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([203, 50, 37, 11]);
+      expect(xps1.results?.map((x) => x.xp_points)).to.deep.eq([
+        203, 50, 37, 11,
+      ]);
 
+      await models.sequelize.query(`
+        REFRESH MATERIALIZED VIEW "${getQuestXpLeaderboardViewName(-1)}";
+      `);
       const xps2 = await query(GetXpsRanked(), {
         actor: admin,
-        payload: { top: 10, quest_id: -1 },
+        payload: { limit: 10, cursor: 1, quest_id: -1 },
       });
-      expect(xps2!.length).to.equal(2);
+      console.log(xps2);
+      expect(xps2!.totalResults).to.equal(2);
       // new_user has 16 for SignUpFlowCompleted
       // member has
       //   10 for WalletLinked
       //   4 for SignUpFlowCompleted as referrer
       //   42 for AwardXp
-      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([16, 56]);
+      expect(xps2.results?.map((x) => x.xp_points)).to.deep.eq([56, 16]);
     });
   });
 

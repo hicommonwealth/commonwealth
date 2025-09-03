@@ -88,7 +88,12 @@ export async function main(
     });
 
     // Disable https redirects on Railway apps
-    if (config.RAILWAY.GIT_COMMIT_SHA) {
+    // GIT_COMMIT_SHA is set on stable environments and RAILWAY_PUBLIC_DOMAIN is
+    // set on review apps
+    if (
+      config.RAILWAY.GIT_COMMIT_SHA ||
+      (config.RAILWAY.RAILWAY_PUBLIC_DOMAIN && config.APP_ENV !== 'production')
+    ) {
       log.warn(
         'ExpressJS HTTP -> HTTPS redirects disabled. Redirects may be handled by Railway.',
       );

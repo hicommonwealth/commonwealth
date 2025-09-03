@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 import type { Associable } from './types';
 
 import Address from './address';
+import AICompletionToken from './ai_completion_token';
 import ApiKey from './api_key';
 import ChainEventXpSource from './chain_event_xp_sources';
 import ChainNode from './chain_node';
@@ -67,6 +68,7 @@ import XpLog from './xp_log';
 
 export const Factories = {
   Address,
+  AICompletionToken,
   ApiKey,
   AuraAllocations,
   ChainNode,

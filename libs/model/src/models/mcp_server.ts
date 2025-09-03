@@ -66,12 +66,5 @@ export default (sequelize: Sequelize.Sequelize): MCPServerModelStatic =>
       scopes: {
         withPrivateData: {},
       },
-      indexes: [
-        {
-          fields: ['source', 'source_identifier'],
-          unique: true,
-          name: 'MCPServers_source_source_identifier_unique',
-        },
-      ],
     },
   );
