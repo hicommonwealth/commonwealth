@@ -1,28 +1,10 @@
 import { Query } from '@hicommonwealth/core';
+import {
+  ThreadTokenTradesOutput,
+  ThreadTokenTradesSchema,
+} from '@hicommonwealth/schemas';
 import z from 'zod';
 import { models } from '../../database';
-
-const ThreadTokenTradesInput = z.object({ thread_id: z.number() });
-
-const ThreadTokenTradesOutput = z.object({
-  result: z
-    .array(
-      z.object({
-        id: z.string(),
-        type: z.enum(['buy', 'sell']),
-        amount: z.string(),
-        price: z.number(),
-        timestamp: z.number(),
-        address: z.string(),
-      }),
-    )
-    .nullable(),
-});
-
-const ThreadTokenTradesSchema = {
-  input: ThreadTokenTradesInput,
-  output: ThreadTokenTradesOutput,
-};
 
 export function GetThreadTokenTrades(): Query<typeof ThreadTokenTradesSchema> {
   return {
