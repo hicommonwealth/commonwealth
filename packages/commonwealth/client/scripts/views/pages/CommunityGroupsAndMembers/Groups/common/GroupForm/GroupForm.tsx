@@ -136,6 +136,7 @@ const getRequirementSubFormSchema = (
   requirementType: string,
 ): ZodObject<any> => {
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
+  const isERC721Requirement = requirementType === ERC_SPECIFICATIONS.ERC_721;
   const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
   const isTrustLevelRequirement = requirementType === TRUST_LEVEL_SPECIFICATION;
 
@@ -158,6 +159,13 @@ const getRequirementSubFormSchema = (
   }
 
   if (is1155Requirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+    });
+  }
+
+  if (isERC721Requirement) {
     return requirementSubFormValidationSchema.omit({
       requirementTokenId: true,
       requirementTrustLevel: true,
