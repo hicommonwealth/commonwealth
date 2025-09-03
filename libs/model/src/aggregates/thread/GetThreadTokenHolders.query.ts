@@ -9,7 +9,11 @@ export function GetThreadTokenHolders(): Query<
   return {
     ...schemas.GetThreadTokenHolders,
     auth: [],
-    body: async ({ payload }) => {
+    body: async ({
+      payload,
+    }: {
+      payload: z.infer<typeof schemas.GetThreadTokenHolders.input>;
+    }) => {
       const [result] = await models.sequelize.query(
         `WITH trade_flows AS (
             SELECT
