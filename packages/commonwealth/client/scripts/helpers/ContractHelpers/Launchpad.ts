@@ -69,6 +69,22 @@ class LaunchpadBondingCurve extends ContractBase {
     const initialBuyValue = 4.44e14 + this.LAUNCHPAD_INITIAL_PRICE;
     const connectorWeight = this.LAUNCHPAD_CONNECTOR_WEIGHT;
     const maxFeePerGas = await this.estimateGas();
+
+    // Note: check if the user has enough funds to cover the gas cost and the initial buy value
+    // Adding this check here because `const txReceipt = await launchToken(` doesn't throw an error
+    // for magic when user has insufficient funds and the transaction fails internally without actually
+    // throwing an error.
+    const balance = await this.web3.eth.getBalance(walletAddress);
+    const gasPrice = await this.web3.eth.getGasPrice();
+    const estimatedGasCost = BigInt(gasPrice) * 200000n; // setting a conservative gas limit guess (e.g. 200k)
+    if (
+      magicProvider &&
+      BigInt(balance) < BigInt(initialBuyValue) + estimatedGasCost
+    ) {
+      throw new Error(
+        '[Magic] Insufficient funds: balance too low for gas + value',
+      );
+    }
     const txReceipt = await launchToken(
       this.launchpadFactory,
       name,

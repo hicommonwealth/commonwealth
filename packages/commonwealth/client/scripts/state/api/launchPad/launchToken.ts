@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 import { userStore } from 'state/ui/user';
 import { getMagicForChain } from 'utils/magicNetworkUtils';
+import { fetchNodes } from '../nodes';
 
 interface LaunchTokenProps {
   chainRpc: string;
@@ -30,7 +31,9 @@ const launchToken = async ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let magicProvider: any = null;
   if (isMagicAddress) {
-    const magic = getMagicForChain(ethChainId);
+    const node = await fetchNodes();
+    const chainNode = node.find((n) => n.ethChainId === ethChainId);
+    const magic = getMagicForChain(ethChainId, chainNode);
     if (magic) {
       magicProvider = magic.rpcProvider;
     } else {

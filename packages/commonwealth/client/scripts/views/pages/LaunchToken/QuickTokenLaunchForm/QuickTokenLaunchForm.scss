@@ -6,9 +6,11 @@
   div.h3 {
     margin-bottom: 16px;
   }
+
   .debugTxHashGap {
     padding-top: 36px;
   }
+
   .debugTxHash {
     color: colors.$neutral-500;
     display: flex;
@@ -69,6 +71,21 @@
           }
         }
       }
+    }
+  }
+
+  .magic-wallet-manage-container {
+    display: flex;
+    flex-direction: column;
+    // justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+
+    @include media_queries.extraSmall {
+      flex-direction: column;
+      justify-content: center;
     }
   }
 }
