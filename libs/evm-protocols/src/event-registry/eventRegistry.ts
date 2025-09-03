@@ -1,3 +1,4 @@
+import { VoteGovernanceAbi } from '@commonxyz/common-governance-abis';
 import {
   CommunityNominationsAbi,
   CommunityStakeAbi,
@@ -112,6 +113,15 @@ const tokenBondingCurveSource: ContractSource = {
     EvmEventSignatures.TokenBondingCurve.LiquidityTransferred,
     EvmEventSignatures.TokenBondingCurve.TokenRegistered,
     EvmEventSignatures.TokenBondingCurve.Trade,
+  ],
+};
+
+const VoteGovernanceSource: ContractSource = {
+  abi: VoteGovernanceAbi,
+  eventSignatures: [
+    EvmEventSignatures.VoteGovernance.AddressVoteCast,
+    EvmEventSignatures.VoteGovernance.TokenVoteCast,
+    EvmEventSignatures.VoteGovernance.OzProposalCreated,
   ],
 };
 
