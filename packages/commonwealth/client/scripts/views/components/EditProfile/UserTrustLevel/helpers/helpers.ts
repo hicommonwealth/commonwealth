@@ -24,8 +24,10 @@ export const getLevelStatus = (
   level: number,
   currentTier: UserTierMap,
 ): Status => {
+  const tierInfo = USER_TIERS[currentTier];
   const currentTrustLevel =
-    USER_TIERS[currentTier]?.clientInfo?.trustLevel || 0;
+    (tierInfo && 'clientInfo' in tierInfo && tierInfo.clientInfo?.trustLevel) ||
+    0;
   return currentTrustLevel >= level ? 'Done' : 'Not Started';
 };
 

@@ -29,8 +29,10 @@ const UserTrustLevel = () => {
 
   const currentTier: UserTierMap =
     (data?.tier as UserTierMap) ?? (userData.tier as UserTierMap);
+  const tierInfo = USER_TIERS[currentTier];
   const currentTrustLevel =
-    USER_TIERS[currentTier]?.clientInfo?.trustLevel || 0;
+    (tierInfo && 'clientInfo' in tierInfo && tierInfo.clientInfo?.trustLevel) ||
+    0;
 
   const handleItemClick = (item: UserVerificationItem) => {
     if (item.type === 'VERIFY_SOCIAL') {
