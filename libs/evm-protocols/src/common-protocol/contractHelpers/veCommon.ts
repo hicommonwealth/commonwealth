@@ -138,8 +138,8 @@ export const getUserTokenIds = async (
   veCommonContract: Contract<typeof veCommonAbi>,
   userAddress: string,
 ) => {
-  const tokenIds = await veCommonContract.methods.getUserTokenIds(userAddress);
-  return tokenIds.call();
+  const tokenIds = veCommonContract.methods.getUserTokenIds(userAddress);
+  return await tokenIds.call();
 };
 
 export const getTokenData = async (
