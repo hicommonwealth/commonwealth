@@ -1,6 +1,7 @@
 export * from './accountAbstraction';
 export * from './chainConfig';
 export * from './contractHelpers/contest';
+export * from './contractHelpers/governance';
 export * from './contractHelpers/launchpad';
 export * from './contractHelpers/namespace';
 export * from './contractHelpers/postLaunchpad';
