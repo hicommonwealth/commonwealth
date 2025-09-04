@@ -1,5 +1,3 @@
-// Import ABIs - these would come from '@commonxyz/common-protocol-abis' when available
-// For now, using the local veBridgeAbi and assuming VeCommonAbi will be available
 import { veBridgeAbi, veCommonAbi } from '@commonxyz/common-governance-abis';
 import {
   calculateVotingPowerForToken,
