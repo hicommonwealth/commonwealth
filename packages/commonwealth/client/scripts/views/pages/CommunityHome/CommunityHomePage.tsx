@@ -4,8 +4,8 @@ import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { isRateLimitError, RATE_LIMIT_MESSAGE } from 'helpers/rateLimit';
 import { findDenominationString } from 'helpers/findDenomination';
+import { isRateLimitError, RATE_LIMIT_MESSAGE } from 'helpers/rateLimit';
 import { useFlag } from 'hooks/useFlag';
 import type { DeltaStatic } from 'quill';
 import React, { useRef, useState } from 'react';
@@ -114,7 +114,13 @@ const CommunityHome = () => {
       console.error('Error creating thread:', error);
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
-      if (isRateLimitError(error)) {
+
+      // Type guard to check if error has the structure expected by isRateLimitError
+      const isErrorObject = (err: unknown): err is Record<string, any> => {
+        return typeof err === 'object' && err !== null;
+      };
+
+      if (isErrorObject(error) && isRateLimitError(error)) {
         notifyError(RATE_LIMIT_MESSAGE);
       } else {
         notifyError(`Failed to create thread: ${errorMessage}`);
