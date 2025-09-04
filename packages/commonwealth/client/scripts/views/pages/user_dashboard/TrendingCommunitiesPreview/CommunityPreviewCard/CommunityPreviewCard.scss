@@ -1,14 +1,16 @@
 @use '../../../../../styles/shared';
 @use '../../../../../styles/mixins/colors.module';
 @use '../../../../../styles/mixins/media_queries';
+@use '../../../../../styles/mixins/border_radius';
 
 .CommunityPreviewCard.Card {
   display: flex;
   flex-direction: row;
   gap: 12px;
   padding: 8px;
-  width: 392px;
-  border-radius: 12px;
+  width: 330px;
+  border: 1px solid colors.$neutral-300;
+  border-radius: border_radius.$border-radius-corners;
   min-height: 78px;
   position: relative;
   flex-wrap: wrap;
