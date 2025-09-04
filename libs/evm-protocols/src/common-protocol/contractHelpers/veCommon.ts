@@ -1,10 +1,8 @@
-// Note: VeCommonAbi and VeBridgeAbi would be imported from '@commonxyz/common-protocol-abis'
-// when they become available. For now, we'll use any type for contracts.
+import { veBridgeAbi, veCommonAbi } from '@commonxyz/common-governance-abis';
+import { Contract } from 'web3';
 
-// veBridge contract helper functions
 export const veBridgeLockTokens = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  veBridgeContract: any,
+  veBridgeContract: Contract<typeof veBridgeAbi>,
   amount: string,
   lockDuration: number,
   isPermanent: boolean,
@@ -28,16 +26,17 @@ export const veBridgeLockTokens = async (
     from: walletAddress,
     type: '0x2',
     gas: gasResult.toString(),
-    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
-    maxPriorityFeePerGas,
+    maxFeePerGas: maxFeePerGas ? String(maxFeePerGas * 2n) : undefined,
+    maxPriorityFeePerGas: maxPriorityFeePerGas
+      ? String(maxPriorityFeePerGas)
+      : undefined,
   });
 
   return txReceipt;
 };
 
 export const veBridgeWithdrawTokens = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  veBridgeContract: any,
+  veBridgeContract: Contract<typeof veBridgeAbi>,
   tokenId: string,
   walletAddress: string,
   maxFeePerGas?: bigint,
@@ -55,16 +54,17 @@ export const veBridgeWithdrawTokens = async (
     from: walletAddress,
     type: '0x2',
     gas: gasResult.toString(),
-    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
-    maxPriorityFeePerGas,
+    maxFeePerGas: maxFeePerGas ? String(maxFeePerGas * 2n) : undefined,
+    maxPriorityFeePerGas: maxPriorityFeePerGas
+      ? String(maxPriorityFeePerGas)
+      : undefined,
   });
 
   return txReceipt;
 };
 
 export const veBridgeMergeTokens = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  veBridgeContract: any,
+  veBridgeContract: Contract<typeof veBridgeAbi>,
   fromTokenId: string,
   toTokenId: string,
   walletAddress: string,
@@ -86,16 +86,17 @@ export const veBridgeMergeTokens = async (
     from: walletAddress,
     type: '0x2',
     gas: gasResult.toString(),
-    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
-    maxPriorityFeePerGas,
+    maxFeePerGas: maxFeePerGas ? String(maxFeePerGas * 2n) : undefined,
+    maxPriorityFeePerGas: maxPriorityFeePerGas
+      ? String(maxPriorityFeePerGas)
+      : undefined,
   });
 
   return txReceipt;
 };
 
 export const veBridgeDelegateTokens = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  veBridgeContract: any,
+  veBridgeContract: Contract<typeof veBridgeAbi>,
   tokenId: string,
   delegatee: string,
   walletAddress: string,
@@ -114,8 +115,10 @@ export const veBridgeDelegateTokens = async (
     from: walletAddress,
     type: '0x2',
     gas: gasResult.toString(),
-    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
-    maxPriorityFeePerGas,
+    maxFeePerGas: maxFeePerGas ? String(maxFeePerGas * 2n) : undefined,
+    maxPriorityFeePerGas: maxPriorityFeePerGas
+      ? String(maxPriorityFeePerGas)
+      : undefined,
   });
 
   return txReceipt;
@@ -123,18 +126,16 @@ export const veBridgeDelegateTokens = async (
 
 // veCommon contract helper functions
 export const getVotingPowerForUser = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  veCommonContract: any,
+  veCommonContract: Contract<typeof veCommonAbi>,
   userAddress: string,
 ) => {
   const votingPower =
-    await veCommonContract.methods.getVotingPowerForUser(userAddress);
-  return votingPower.call();
+    veCommonContract.methods.getVotingPowerForUser(userAddress);
+  return await votingPower.call();
 };
 
 export const getUserTokenIds = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  veCommonContract: any,
+  veCommonContract: Contract<typeof veCommonAbi>,
   userAddress: string,
 ) => {
   const tokenIds = await veCommonContract.methods.getUserTokenIds(userAddress);
@@ -142,34 +143,31 @@ export const getUserTokenIds = async (
 };
 
 export const getTokenData = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  veCommonContract: any,
+  veCommonContract: Contract<typeof veCommonAbi>,
   tokenId: string,
 ) => {
-  const tokenData = await veCommonContract.methods.getTokenData(tokenId);
-  return tokenData.call();
+  const tokenData = veCommonContract.methods.getTokenData(tokenId);
+  return await tokenData.call();
 };
 
 export const calculateVotingPowerForToken = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  veCommonContract: any,
+  veCommonContract: Contract<typeof veCommonAbi>,
   tokenId: string,
 ) => {
   const votingPower =
-    await veCommonContract.methods.calculateVotingPowerForToken(tokenId);
-  return votingPower.call();
+    veCommonContract.methods.calculateVotingPowerForToken(tokenId);
+  return await votingPower.call();
 };
 
 export const getVotingPowerForAddressTimepoint = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  veCommonContract: any,
+  veCommonContract: Contract<typeof veCommonAbi>,
   userAddress: string,
   timepoint: number,
 ) => {
   const votingPower =
-    await veCommonContract.methods.getVotingPowerForAddressTimepoint(
+    veCommonContract.methods.getVotingPowerForAddressTimepoint(
       userAddress,
       timepoint,
     );
-  return votingPower.call();
+  return await votingPower.call();
 };

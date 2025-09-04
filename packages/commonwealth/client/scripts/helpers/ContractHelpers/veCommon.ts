@@ -1,88 +1,24 @@
 // Import ABIs - these would come from '@commonxyz/common-protocol-abis' when available
 // For now, using the local veBridgeAbi and assuming VeCommonAbi will be available
+import { veBridgeAbi, veCommonAbi } from '@commonxyz/common-governance-abis';
 import {
   calculateVotingPowerForToken,
   getTokenData,
   getUserTokenIds,
   getVotingPowerForAddressTimepoint,
   getVotingPowerForUser,
-  veBridgeAbi,
   veBridgeDelegateTokens,
   veBridgeLockTokens,
   veBridgeMergeTokens,
   veBridgeWithdrawTokens,
 } from '@hicommonwealth/evm-protocols';
 import { Contract } from 'web3';
-import { AbiItem } from 'web3-utils';
 import ContractBase from './ContractBase';
-
-// Placeholder ABI for veCommon - this should be replaced with the actual ABI when available
-// This contains the minimum required methods for the functions we're implementing
-const veCommonAbi: AbiItem[] = [
-  {
-    inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
-    name: 'getVotingPowerForUser',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
-    name: 'getUserTokenIds',
-    outputs: [{ internalType: 'uint256[]', name: '', type: 'uint256[]' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }],
-    name: 'getTokenData',
-    outputs: [
-      {
-        components: [
-          { internalType: 'uint256', name: 'bias', type: 'uint256' },
-          { internalType: 'uint256', name: 'slope', type: 'uint256' },
-          {
-            components: [
-              { internalType: 'uint256', name: 'amount', type: 'uint256' },
-              { internalType: 'uint256', name: 'end', type: 'uint256' },
-              { internalType: 'uint256', name: 'start', type: 'uint256' },
-              { internalType: 'bool', name: 'isPermanent', type: 'bool' },
-            ],
-            internalType: 'struct veCommon.LockedBalance',
-            name: 'locked',
-            type: 'tuple',
-          },
-        ],
-        internalType: 'struct veCommon.TokenData',
-        name: '',
-        type: 'tuple',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }],
-    name: 'calculateVotingPowerForToken',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: '_user', type: 'address' },
-      { internalType: 'uint256', name: 'timepoint', type: 'uint256' },
-    ],
-    name: 'getVotingPowerForAddressTimepoint',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-] as AbiItem[];
 
 /**
  * @title VeCommonHelper - A helper class for interacting with veBridge and veCommon contracts
- * @notice This class provides easy-to-use methods for veToken operations like locking, withdrawing, and voting power queries
+ * @notice This class provides easy-to-use methods for veToken operations like locking,
+ *  withdrawing, and voting power queries
  * @dev Extends ContractBase to handle web3 initialization and gas estimation
  */
 class VeCommonHelper extends ContractBase {
