@@ -24,6 +24,9 @@ importers:
 
   .:
     dependencies:
+      '@commonxyz/common-governance-abis':
+        specifier: ^0.0.2
+        version: 0.0.2
       '@commonxyz/common-protocol-abis':
         specifier: 1.4.11
         version: 1.4.11
@@ -3339,6 +3342,9 @@ packages:
   '@coinbase/wallet-sdk@4.3.0':
     resolution: {integrity: sha512-T3+SNmiCw4HzDm4we9wCHCxlP0pqCiwKe4sOwPH3YAK2KSKjxPRydKu6UQJrdONFVLG7ujXvbd/6ZqmvJb8rkw==}
 
+  '@commonxyz/common-governance-abis@0.0.2':
+    resolution: {integrity: sha512-1x3vbkJp7Tvzj85PGtfit1e7Lb8CNywEJct3249sLCScgRISIeHg5e+uUI+TwI7CO9RJzB8yLKxHyRA+1lxT8g==}
+
   '@commonxyz/common-protocol-abis@1.4.11':
     resolution: {integrity: sha512-MJWrj6NLma4+t7VtyPk3fsk92ozUD1YyNBJGgOKxdirQKKIkYXwR1+JIVmQXGrnE2MOp4S2cJhWpyMCc17Vv/Q==}
 
@@ -5621,6 +5627,7 @@ packages:
   '@lens-protocol/client@2.3.1':
     resolution: {integrity: sha512-Ey1yg8N2lp51wyWXKacOs36aOHlmCsF4ysCBJH4C85wwxIFBKbN5jXZX9Zxd1Gfe658SxKU2zGjBsg3X6LikiA==}
     engines: {node: '>=18 <21'}
+    deprecated: 2.x is no longer supported, see @canary for 3.x
     peerDependencies:
       '@lens-protocol/metadata': ^1.0.0
     peerDependenciesMeta:
@@ -10461,6 +10468,7 @@ packages:
   '@xmtp/frames-validator@0.6.2':
     resolution: {integrity: sha512-BoNn1YoAr5Rw/A5xuKOOz3KaJefAQ1ps+Ph3FjnqdU7WJVPB2oJ9ExcmaWwF3K+/IMjf9SncUMoTO9eLP1vhRQ==}
     engines: {node: '>=18'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   '@xmtp/proto@3.61.1':
     resolution: {integrity: sha512-momxDvGw4OoiLlNz6xmvEGnsx9CCZSR+o964EheH9ITx/iAqnV8ebpX3ZDtPuadEQg9AL21JAktw5pi7zmos0w==}
@@ -25415,6 +25423,8 @@ snapshots:
       clsx: 1.2.1
       eventemitter3: 5.0.1
       preact: 10.24.3
+
+  '@commonxyz/common-governance-abis@0.0.2': {}
 
   '@commonxyz/common-protocol-abis@1.4.11': {}
 

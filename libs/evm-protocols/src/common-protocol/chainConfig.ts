@@ -1,3 +1,4 @@
+import * as govAbis from '@commonxyz/common-governance-abis';
 import * as abis from '@commonxyz/common-protocol-abis';
 
 // Chains with deployed namespace factories. As new chains are enabled, add here.
@@ -56,9 +57,13 @@ export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
 export const NOMINATION_FEE = 0.00005;
 
-type AbiContractName = {
-  [K in keyof typeof abis]: K extends `${infer Base}Abi` ? Base : never;
-}[keyof typeof abis];
+type AbiContractName =
+  | {
+      [K in keyof typeof abis]: K extends `${infer Base}Abi` ? Base : never;
+    }[keyof typeof abis]
+  | {
+      [K in keyof typeof govAbis]: K extends `${infer Base}Abi` ? Base : never;
+    }[keyof typeof govAbis];
 
 export type FactoryContractsType = {
   [chain in ValidChains]: {

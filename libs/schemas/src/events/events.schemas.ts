@@ -580,6 +580,32 @@ export const events = {
     }),
   }).describe('Nomination configured'),
 
+  CmnOzProposalCreated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      proposalId: z.bigint(),
+      proposerAddress: EVM_ADDRESS_STRICT,
+      description: z.string(),
+      voteStartTimestamp: z.bigint(),
+      voteEndTimestamp: z.bigint(),
+    }),
+  }),
+
+  CmnTokenVoteCast: ChainEventBase.extend({
+    parsedArgs: z.object({
+      proposalId: z.bigint(),
+      tokenId: z.bigint(),
+      support: z.number(),
+    }),
+  }),
+
+  CmnAddressVoteCast: ChainEventBase.extend({
+    parsedArgs: z.object({
+      proposalId: z.bigint(),
+      voterAddress: z.string(),
+      support: z.number(),
+    }),
+  }),
+
   NamespaceLinked: z.object({
     namespace_address: z.string(),
     deployer_address: z.string(),
