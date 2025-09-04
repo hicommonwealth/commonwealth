@@ -31,6 +31,7 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
   );
   const navigate = useCommonNavigate();
 
+  // cause redeploy
   const { getContestByAddress, contestsData } = useCommunityContests();
   const contest = getContestByAddress(contestAddress);
 
