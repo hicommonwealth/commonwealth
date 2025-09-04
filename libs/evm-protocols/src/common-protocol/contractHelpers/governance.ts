@@ -1,198 +1,9 @@
-import { Web3 } from 'web3';
+import { VoteGovernanceAbi } from '@commonxyz/common-governance-abis';
+import { Contract, Web3 } from 'web3';
 import { createPrivateEvmClient } from '../utils';
 
-// Basic Governor ABI with the functions we need
-export const VoteGovernanceAbi = [
-  // Proposal functions
-  {
-    inputs: [
-      { name: 'targets', type: 'address[]' },
-      { name: 'values', type: 'uint256[]' },
-      { name: 'calldatas', type: 'bytes[]' },
-      { name: 'description', type: 'string' },
-    ],
-    name: 'propose',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { name: 'targets', type: 'address[]' },
-      { name: 'values', type: 'uint256[]' },
-      { name: 'calldatas', type: 'bytes[]' },
-      { name: 'description', type: 'string' },
-      { name: 'hook', type: 'address' },
-    ],
-    name: 'proposeWithHook',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  // Voting functions
-  {
-    inputs: [
-      { name: 'proposalId', type: 'uint256' },
-      { name: 'tokenId', type: 'uint256' },
-      { name: 'support', type: 'uint8' },
-    ],
-    name: 'castVoteWithTokenId',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { name: 'proposalId', type: 'uint256' },
-      { name: 'support', type: 'uint8' },
-    ],
-    name: 'castVoteWithAddress',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  // Execution and cancellation
-  {
-    inputs: [
-      { name: 'targets', type: 'address[]' },
-      { name: 'values', type: 'uint256[]' },
-      { name: 'calldatas', type: 'bytes[]' },
-      { name: 'descriptionHash', type: 'bytes32' },
-    ],
-    name: 'execute',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { name: 'targets', type: 'address[]' },
-      { name: 'values', type: 'uint256[]' },
-      { name: 'calldatas', type: 'bytes[]' },
-      { name: 'descriptionHash', type: 'bytes32' },
-    ],
-    name: 'cancel',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  // View functions
-  {
-    inputs: [{ name: 'proposalId', type: 'uint256' }],
-    name: 'state',
-    outputs: [{ name: '', type: 'uint8' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'proposalId', type: 'uint256' }],
-    name: 'proposalVotes',
-    outputs: [
-      { name: 'againstVotes', type: 'uint256' },
-      { name: 'forVotes', type: 'uint256' },
-      { name: 'abstainVotes', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'proposalId', type: 'uint256' }],
-    name: '_tokenProposalVotes',
-    outputs: [
-      { name: 'againstVotes', type: 'uint256' },
-      { name: 'forVotes', type: 'uint256' },
-      { name: 'abstainVotes', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'proposalId', type: 'uint256' }],
-    name: 'proposals',
-    outputs: [
-      { name: 'votingPowerSnapshot', type: 'uint256' },
-      { name: 'proposalHook', type: 'address' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { name: 'proposalId', type: 'uint256' },
-      { name: 'tokenId', type: 'uint256' },
-    ],
-    name: 'hasVotedTokenId',
-    outputs: [{ name: '', type: 'bool' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { name: 'proposalId', type: 'uint256' },
-      { name: 'account', type: 'address' },
-    ],
-    name: 'hasVoted',
-    outputs: [{ name: '', type: 'bool' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'proposalId', type: 'uint256' }],
-    name: 'getProposalVotingPowerSnapshot',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'proposalId', type: 'uint256' }],
-    name: 'getProposalHook',
-    outputs: [{ name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getActiveProposals',
-    outputs: [{ name: '', type: 'uint256[]' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  // Events
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: 'proposalId', type: 'uint256' },
-      { indexed: false, name: 'proposer', type: 'address' },
-      { indexed: false, name: 'description', type: 'string' },
-    ],
-    name: 'ProposalCreated',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: 'proposalId', type: 'uint256' },
-      { indexed: true, name: 'tokenId', type: 'uint256' },
-      { indexed: false, name: 'support', type: 'uint8' },
-    ],
-    name: 'TokenVoteCast',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: 'proposalId', type: 'uint256' },
-      { indexed: true, name: 'voter', type: 'address' },
-      { indexed: false, name: 'support', type: 'uint8' },
-    ],
-    name: 'AddressVoteCast',
-    type: 'event',
-  },
-] as const;
-
 export const proposeGovernance = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   targets: string[],
   values: number[],
   calldatas: string[],
@@ -200,7 +11,7 @@ export const proposeGovernance = async (
   walletAddress: string,
   maxFeePerGas?: bigint,
 ) => {
-  const contractCall = await contract.methods.propose(
+  const contractCall = contract.methods.propose(
     targets,
     values,
     calldatas,
@@ -214,19 +25,19 @@ export const proposeGovernance = async (
   // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
   const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
 
-  const txReceipt = contractCall.send({
+  return contractCall.send({
     from: walletAddress,
     type: '0x2',
     gas: gasResult.toString(),
-    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
-    maxPriorityFeePerGas,
+    maxFeePerGas: maxFeePerGas ? String(maxFeePerGas * 2n) : undefined,
+    maxPriorityFeePerGas: maxPriorityFeePerGas
+      ? String(maxPriorityFeePerGas)
+      : undefined,
   });
-  return txReceipt;
 };
 
 export const proposeGovernanceWithHook = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   targets: string[],
   values: number[],
   calldatas: string[],
@@ -254,15 +65,16 @@ export const proposeGovernanceWithHook = async (
     from: walletAddress,
     type: '0x2',
     gas: gasResult.toString(),
-    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
-    maxPriorityFeePerGas,
+    maxFeePerGas: maxFeePerGas ? String(maxFeePerGas * 2n) : undefined,
+    maxPriorityFeePerGas: maxPriorityFeePerGas
+      ? String(maxPriorityFeePerGas)
+      : undefined,
   });
   return txReceipt;
 };
 
 export const castVoteWithTokenId = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   proposalId: number,
   tokenId: number,
   support: number, // 0 = Against, 1 = For, 2 = Abstain
@@ -286,15 +98,16 @@ export const castVoteWithTokenId = async (
     from: walletAddress,
     type: '0x2',
     gas: gasResult ? gasResult.toString() : undefined,
-    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
-    maxPriorityFeePerGas,
+    maxFeePerGas: maxFeePerGas ? String(maxFeePerGas * 2n) : undefined,
+    maxPriorityFeePerGas: maxPriorityFeePerGas
+      ? String(maxPriorityFeePerGas)
+      : undefined,
   });
   return txReceipt;
 };
 
 export const castVoteWithAddress = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   proposalId: number,
   support: number, // 0 = Against, 1 = For, 2 = Abstain
   walletAddress: string,
@@ -316,15 +129,16 @@ export const castVoteWithAddress = async (
     from: walletAddress,
     type: '0x2',
     gas: gasResult ? gasResult.toString() : undefined,
-    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
-    maxPriorityFeePerGas,
+    maxFeePerGas: maxFeePerGas ? String(maxFeePerGas * 2n) : undefined,
+    maxPriorityFeePerGas: maxPriorityFeePerGas
+      ? String(maxPriorityFeePerGas)
+      : undefined,
   });
   return txReceipt;
 };
 
 export const executeProposal = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   targets: string[],
   values: number[],
   calldatas: string[],
@@ -342,7 +156,7 @@ export const executeProposal = async (
 
   const gasResult = await contractCall.estimateGas({
     from: walletAddress,
-    value: ethValue || 0,
+    value: ethValue ? String(ethValue) : '0',
   });
 
   // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
@@ -350,18 +164,19 @@ export const executeProposal = async (
 
   const txReceipt = await contractCall.send({
     from: walletAddress,
-    value: ethValue || 0,
+    value: ethValue ? String(ethValue) : '0',
     type: '0x2',
     gas: gasResult.toString(),
-    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
-    maxPriorityFeePerGas,
+    maxFeePerGas: maxFeePerGas ? String(maxFeePerGas * 2n) : undefined,
+    maxPriorityFeePerGas: maxPriorityFeePerGas
+      ? String(maxPriorityFeePerGas)
+      : undefined,
   });
   return txReceipt;
 };
 
 export const cancelProposal = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   targets: string[],
   values: number[],
   calldatas: string[],
@@ -387,93 +202,85 @@ export const cancelProposal = async (
     from: walletAddress,
     type: '0x2',
     gas: gasResult.toString(),
-    maxFeePerGas: maxFeePerGas ? maxFeePerGas * 2n : undefined,
-    maxPriorityFeePerGas,
+    maxFeePerGas: maxFeePerGas ? String(maxFeePerGas * 2n) : undefined,
+    maxPriorityFeePerGas: maxPriorityFeePerGas
+      ? String(maxPriorityFeePerGas)
+      : undefined,
   });
   return txReceipt;
 };
 
 export const getProposalState = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   proposalId: number,
 ) => {
-  const state = await contract.methods.state(proposalId);
-  return state.call();
+  const state = contract.methods.state(proposalId);
+  return await state.call();
 };
 
 export const getProposalVotes = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   proposalId: number,
 ) => {
-  const votes = await contract.methods.proposalVotes(proposalId);
-  return votes.call();
+  const votes = contract.methods.proposalVotes(proposalId);
+  return await votes.call();
 };
 
 export const getTokenProposalVotes = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   proposalId: number,
 ) => {
-  const votes = await contract.methods._tokenProposalVotes(proposalId);
-  return votes.call();
+  const votes = contract.methods._tokenProposalVotes(proposalId);
+  return await votes.call();
 };
 
 export const getProposalDetails = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   proposalId: number,
 ) => {
-  const details = await contract.methods.proposals(proposalId);
-  return details.call();
+  const details = contract.methods.proposals(proposalId);
+  return await details.call();
 };
 
 export const hasVotedWithTokenId = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   proposalId: number,
   tokenId: number,
 ) => {
-  const voted = await contract.methods.hasVotedTokenId(proposalId, tokenId);
-  return voted.call();
+  const voted = contract.methods.hasVotedTokenId(proposalId, tokenId);
+  return await voted.call();
 };
 
 export const hasVotedWithAddress = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   proposalId: number,
   address: string,
 ) => {
-  const voted = await contract.methods.hasVoted(proposalId, address);
-  return voted.call();
+  const voted = contract.methods.hasVoted(proposalId, address);
+  return await voted.call();
 };
 
 export const getProposalVotingPowerSnapshot = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   proposalId: number,
 ) => {
-  const snapshot =
-    await contract.methods.getProposalVotingPowerSnapshot(proposalId);
-  return snapshot.call();
+  const snapshot = contract.methods.getProposalVotingPowerSnapshot(proposalId);
+  return await snapshot.call();
 };
 
 export const getProposalHook = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
   proposalId: number,
 ) => {
-  const hook = await contract.methods.getProposalHook(proposalId);
-  return hook.call();
+  const hook = contract.methods.getProposalHook(proposalId);
+  return await hook.call();
 };
 
 export const getActiveProposals = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contract: any,
+  contract: Contract<typeof VoteGovernanceAbi>,
 ) => {
-  const proposals = await contract.methods.getActiveProposals();
-  return proposals.call();
+  const proposals = contract.methods.getActiveProposals();
+  return await proposals.call();
 };
 
 // Enhanced helper to get comprehensive proposal information

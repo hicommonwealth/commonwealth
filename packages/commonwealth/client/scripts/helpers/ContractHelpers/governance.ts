@@ -1,5 +1,5 @@
+import { VoteGovernanceAbi } from '@commonxyz/common-governance-abis';
 import {
-  VoteGovernanceAbi,
   cancelProposal,
   castVoteWithAddress,
   castVoteWithTokenId,
@@ -281,9 +281,18 @@ class VoteGovernance extends ContractBase {
 
     const votes = await getProposalVotes(this.contract, proposalId);
     return {
-      against: votes.againstVotes,
-      for: votes.forVotes,
-      abstain: votes.abstainVotes,
+      against:
+        typeof votes.againstVotes === 'string'
+          ? votes.againstVotes
+          : String(votes.againstVotes),
+      for:
+        typeof votes.forVotes === 'string'
+          ? votes.forVotes
+          : String(votes.forVotes),
+      abstain:
+        typeof votes.abstainVotes === 'string'
+          ? votes.abstainVotes
+          : String(votes.abstainVotes),
     };
   }
 
@@ -300,9 +309,18 @@ class VoteGovernance extends ContractBase {
 
     const votes = await getTokenProposalVotes(this.contract, proposalId);
     return {
-      against: votes.againstVotes,
-      for: votes.forVotes,
-      abstain: votes.abstainVotes,
+      against:
+        typeof votes.againstVotes === 'string'
+          ? votes.againstVotes
+          : String(votes.againstVotes),
+      for:
+        typeof votes.forVotes === 'string'
+          ? votes.forVotes
+          : String(votes.forVotes),
+      abstain:
+        typeof votes.abstainVotes === 'string'
+          ? votes.abstainVotes
+          : String(votes.abstainVotes),
     };
   }
 
@@ -319,7 +337,10 @@ class VoteGovernance extends ContractBase {
 
     const details = await getProposalDetails(this.contract, proposalId);
     return {
-      votingPowerSnapshot: details.votingPowerSnapshot,
+      votingPowerSnapshot:
+        typeof details.votingPowerSnapshot === 'string'
+          ? details.votingPowerSnapshot
+          : String(details.votingPowerSnapshot),
       proposalHook: details.proposalHook,
     };
   }
