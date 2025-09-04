@@ -38,11 +38,11 @@ export const GetCommunities = {
           // eslint-disable-next-line max-len
           " - When 'memberships', results would be 'DESC' ordered, the communities with auth-user membership will come before non-membership communities\n",
       ),
-    network: z.nativeEnum(ChainNetwork).optional(),
-    base: z.nativeEnum(ChainBase).optional(),
+    network: z.enum(ChainNetwork).optional(),
+    base: z.enum(ChainBase).optional(),
     eth_chain_id: z.number().optional(),
     cosmos_chain_id: z.string().optional(),
-    community_type: z.nativeEnum(CommunityType).optional(),
+    community_type: z.enum(CommunityType).optional(),
     // NOTE 8/7/24: passing arrays in GET requests directly is not supported.
     //    Instead we support comma-separated strings of ids.
     tag_ids: z
@@ -107,7 +107,7 @@ export const GetCommunity = {
 export const TopicPermissionsView = z.object({
   id: z.number(),
   is_private: z.boolean(),
-  permissions: z.array(z.nativeEnum(GatedActionEnum)),
+  permissions: z.array(z.enum(GatedActionEnum)),
 });
 
 export const MembershipView = z.object({
@@ -291,18 +291,11 @@ export const GetCommunitySelectedTagsAndCommunities = {
       profile_count: PG_INT.nullish(),
       namespace: z.string().nullish(),
       chain_node_id: PG_INT.nullish(),
-      tag_names: z
-        .array(z.string())
-        .nullish()
-        .transform((val) => val || []),
-      selected_community_ids: z
-        .array(z.string())
-        .nullish()
-        .transform((val) => val || []),
+      tag_names: z.array(z.string()).default([]),
+      selected_community_ids: z.array(z.string()).default([]),
     })
     .array()
-    .nullish()
-    .transform((val) => val || []),
+    .default([]),
 };
 
 export const UpdateCommunityDirectoryTags = {
@@ -359,7 +352,7 @@ export const GroupView = Group.omit({ GroupGatedActions: true }).extend({
   topics: z.array(
     TopicView.omit({ total_threads: true }).extend({
       is_private: z.boolean(),
-      permissions: z.array(z.nativeEnum(GatedActionEnum)),
+      permissions: z.array(z.enum(GatedActionEnum)),
     }),
   ),
 });

@@ -11,7 +11,9 @@ export const TokenView = LaunchpadToken.extend({
 export const GetTokens = {
   input: PaginationParamsSchema.extend({
     search: z.string().optional(),
-    order_by: z.enum(['name', 'price', 'market_cap', 'created_at']).optional(),
+    order_by: z
+      .enum(['name', 'price', 'market_cap', 'created_at', '24_hr_pct_change'])
+      .optional(),
     with_stats: z.boolean().optional(),
     is_graduated: z.boolean().optional(),
   }),
@@ -37,13 +39,28 @@ const NullishThreadToken = z.object(
   ),
 );
 
+const GetThreadTokenOutput = z
+  .object({
+    thread_purchase_token: z.string().nullable(),
+    token_address: z.string().nullable(),
+    thread_id: z.number().nullable(),
+    name: z.string().nullable(),
+    symbol: z.string().nullable(),
+    created_at: z.date().nullable(),
+    updated_at: z.date().nullable(),
+    initial_supply: z.number().nullable(),
+    liquidity_transferred: z.boolean().nullable(),
+    launchpad_liquidity: z.string().nullable(),
+    eth_market_cap_target: z.number().nullable(),
+    creator_address: z.string().nullable(),
+  })
+  .nullable();
+
 export const GetThreadToken = {
   input: z.object({
     thread_id: z.coerce.number(),
   }),
-  output: NullishThreadToken.extend({
-    thread_purchase_token: z.string().optional(),
-  }),
+  output: GetThreadTokenOutput,
 };
 
 export const LaunchpadTradeView = LaunchpadTrade.extend({

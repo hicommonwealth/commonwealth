@@ -7,7 +7,8 @@ import {
 } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { emitEvent, getThreadContestManagers } from '../utils/utils';
+import { emitEvent } from '../utils/outbox';
+import { getThreadContestManagers } from '../utils/utils';
 import { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
@@ -92,6 +93,11 @@ export default (
         defaultValue: 0,
       },
       comment_count: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      net_comment_count: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,

@@ -33,6 +33,7 @@ import {
   AMOUNT_CONDITIONS,
   ERC_SPECIFICATIONS,
   TOKENS,
+  TRUST_LEVEL_SPECIFICATION,
   conditionTypes,
 } from '../../../common/constants';
 import Allowlist from './Allowlist';
@@ -135,19 +136,45 @@ const getRequirementSubFormSchema = (
   requirementType: string,
 ): ZodObject<any> => {
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
+  const isERC721Requirement = requirementType === ERC_SPECIFICATIONS.ERC_721;
   const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
+  const isTrustLevelRequirement = requirementType === TRUST_LEVEL_SPECIFICATION;
 
-  const schema = isTokenRequirement
-    ? requirementSubFormValidationSchema.omit({
-        requirementContractAddress: true,
-        requirementTokenId: true,
-      })
-    : !is1155Requirement
-      ? requirementSubFormValidationSchema.omit({
-          requirementTokenId: true,
-        })
-      : requirementSubFormValidationSchema;
-  return schema;
+  if (isTrustLevelRequirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementChain: true,
+      requirementContractAddress: true,
+      requirementCondition: true,
+      requirementAmount: true,
+      requirementTokenId: true,
+    });
+  }
+
+  if (isTokenRequirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementContractAddress: true,
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+    });
+  }
+
+  if (is1155Requirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+    });
+  }
+
+  if (isERC721Requirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+    });
+  }
+
+  return requirementSubFormValidationSchema.omit({
+    requirementTrustLevel: true,
+  });
 };
 
 const GroupForm = ({
@@ -241,6 +268,7 @@ const GroupForm = ({
             requirementType: x?.requirementType?.value || '',
             requirementTokenId: x?.requirementTokenId || '',
             requirementCoinType: x?.requirementCoinType || '',
+            requirementTrustLevel: x?.requirementTrustLevel?.value || '',
           },
           errors: {},
         })),
@@ -356,7 +384,7 @@ const GroupForm = ({
       };
     } catch (e: any) {
       const zodError = e as ZodError;
-      const message = zodError.errors[0].message;
+      const message = zodError.message;
 
       allRequirements[index] = {
         ...allRequirements[index],
@@ -413,7 +441,7 @@ const GroupForm = ({
       } catch (e: any) {
         const zodError = e as ZodError;
         const errors = {};
-        zodError.errors.map((x) => {
+        zodError.issues.map((x) => {
           errors[x.path[0]] = x.message;
         });
 

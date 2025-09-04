@@ -57,7 +57,7 @@ export async function startGraphileWorker(initAdapters: boolean = false) {
     taskList: Object.entries(graphileTasks).reduce(
       (acc, [taskName, task]) => ({
         ...acc,
-        [taskName]: taskFactory<typeof task.input>(task),
+        [taskName]: taskFactory(task),
       }),
       {} as Record<GraphileTaskNames, Task>,
     ),

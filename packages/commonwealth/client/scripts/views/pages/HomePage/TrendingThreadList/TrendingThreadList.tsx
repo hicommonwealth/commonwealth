@@ -46,12 +46,14 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const { data: domain } = useFetchCustomDomainQuery();
-
+  const activeCommunityId = app.activeChainId();
+  const isSameCommunity = thread.communityId === activeCommunityId;
+  const omitChainId = isSameCommunity || domain?.isCustomDomain;
   const discussionLink = getProposalUrlPath(
     thread?.slug,
     `${thread?.identifier}-${slugify(thread.title)}`,
-    false,
-    thread?.communityId,
+    omitChainId,
+    omitChainId ? undefined : thread?.communityId,
   );
 
   const { data: community } = useGetCommunityByIdQuery({
@@ -88,14 +90,19 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       thread={thread}
       canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
       onStageTagClick={() => {
-        navigate(
-          `${
-            domain?.isCustomDomain ? '' : `/${thread.communityId}`
-          }/discussions?stage=${thread.stage}`,
-        );
+        const path = `${
+          isSameCommunity || domain?.isCustomDomain ? '' : `/${thread.communityId}`
+        }/discussions?stage=${thread.stage}`;
+        navigate(path, {}, domain?.isCustomDomain ? null : undefined);
       }}
       threadHref={discussionLink}
-      onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
+      onCommentBtnClick={() =>
+        navigate(
+          `${discussionLink}?focusComments=true`,
+          {},
+          domain?.isCustomDomain ? null : undefined,
+        )
+      }
       customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer
@@ -161,6 +168,7 @@ const TrendingThreadList = ({
     allThreads = feed.pages
       .flatMap((p) => p.results)
       .filter((t) => !t.marked_as_spam_at)
+      // @ts-expect-error User is required in one of the results
       .map((t) => new Thread(t))
       .slice(0, 3);
   }

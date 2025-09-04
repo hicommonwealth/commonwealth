@@ -10,8 +10,6 @@ import {
 } from '@hicommonwealth/shared';
 import { useLoginWithEmail, useLoginWithSms } from '@privy-io/react-auth';
 import axios from 'axios';
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import { BASE_API_PATH } from 'client/scripts/utils/trpcClient';
 import {
   completeClientLogin,
   setActiveAccount,
@@ -37,6 +35,7 @@ import {
   getLocalStorageItem,
   removeLocalStorageItem,
 } from 'helpers/localStorage';
+import { useFlag } from 'hooks/useFlag';
 import _ from 'lodash';
 import { Magic } from 'magic-sdk';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -44,10 +43,12 @@ import { isMobile } from 'react-device-detect';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import app, { initAppState } from 'state';
 import useFetchPublicEnvVarQuery from 'state/api/configuration/fetchPublicEnvVar';
+import { fetchNodes } from 'state/api/nodes';
 import { fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { getMagicForChain } from 'utils/magicNetworkUtils';
+import { BASE_API_PATH } from 'utils/trpcClient';
 import { EIP1193Provider } from 'viem';
 import usePrivyEmailDialogStore, {
   emailDialogStore,
@@ -886,8 +887,15 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const openMagicWallet = async (targetEthChainId = ValidChains.Base) => {
     try {
+      const node = await fetchNodes();
+      const chainNode = node.find((n) => n.ethChainId === targetEthChainId);
+      if (!chainNode) {
+        notifyError('Failed to open magic wallet!');
+        return;
+      }
+
       // try to open for the specified chain
-      const chainMagic = getMagicForChain(targetEthChainId);
+      const chainMagic = getMagicForChain(targetEthChainId, chainNode);
       if (chainMagic) {
         await chainMagic.wallet.showUI();
         return;

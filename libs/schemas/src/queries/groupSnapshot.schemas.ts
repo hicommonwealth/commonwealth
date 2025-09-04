@@ -30,7 +30,7 @@ export const GetSnapshotBalances = {
   }),
   output: z
     .object({
-      balances: z.record(z.string()),
+      balances: z.record(z.string(), z.string()),
       snapshotId: z.number(),
       groupId: z.number(),
     })

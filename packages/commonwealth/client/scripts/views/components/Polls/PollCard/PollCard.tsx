@@ -16,6 +16,7 @@ import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { z } from 'zod';
 import { downloadCSV } from '../../../pages/AdminPanel/utils';
 import {
@@ -46,6 +47,8 @@ export type PollCardProps = PollOptionProps &
     topicWeight?: TopicWeightedVoting | null;
     isLoadingVotes?: boolean;
     endTimestamp?: string;
+    allowRevotes?: boolean;
+    userHasVoted?: boolean;
   };
 
 export const PollCard = ({
@@ -72,6 +75,8 @@ export const PollCard = ({
   tokenDecimals,
   topicWeight,
   isLoadingVotes = false,
+  allowRevotes = false,
+  userHasVoted = false,
 }: PollCardProps) => {
   const [selectedOptions, setSelectedOptions] = useState<Array<string>>([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -141,9 +146,18 @@ export const PollCard = ({
     <CWCard className="PollCard">
       <div className="poll-title-section">
         <div className="poll-title-wrapper">
-          <CWText type="b2" className="poll-title-text">
-            {proposalTitle}
-          </CWText>
+          <div className="poll-title-and-badge">
+            <CWText type="b2" className="poll-title-text">
+              {proposalTitle}
+            </CWText>
+            {allowRevotes && (
+              <CWTag
+                label="Revotable"
+                type="pill"
+                classNames="poll-revotable-badge"
+              />
+            )}
+          </div>
           {endTimestamp && (
             <CWText type="caption" className="poll-end-timestamp">
               {`Ends ${endTimestamp}`}
@@ -192,6 +206,7 @@ export const PollCard = ({
               timeRemaining={timeRemaining}
               tooltipErrorMessage={tooltipErrorMessage}
               onVoteCast={castVote}
+              isRevoting={userHasVoted && allowRevotes}
             />
           </>
         )}
@@ -231,6 +246,7 @@ export const PollCard = ({
           setIsOpen={setPollVotesDrawerOpen}
           tokenDecimals={tokenDecimals}
           topicWeight={topicWeight}
+          tokenSymbol={tokenSymbol}
           communityId={communityId}
           onDownloadCsv={handleDownloadCsv}
           isLoading={isLoadingVotes}

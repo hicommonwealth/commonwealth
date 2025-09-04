@@ -47,13 +47,13 @@ export function formatBigNumberShort(num: number, numDecimals: number): string {
     return divided.toFixed(numDecimals).replace(/\.?0+$/, '');
   };
 
-  return num > trillion
+  return num >= trillion
     ? `${round(num, trillion)}t`
-    : num > billion
+    : num >= billion
       ? `${round(num, billion)}b`
-      : num > million
+      : num >= million
         ? `${round(num, million)}m`
-        : num > thousand
+        : num >= thousand
           ? `${round(num, thousand)}k`
           : num.toString();
 }
@@ -72,6 +72,7 @@ export const prettyVoteWeight = (
   weightType?: TopicWeightedVoting | null | undefined,
   multiplier: number = 1,
   decimalsOverride?: number, // number of digits after decimal
+  tokenSymbol?: string,
 ): string => {
   const weiStr = parseFloat(wei).toLocaleString('fullwide', {
     useGrouping: false,
@@ -82,12 +83,26 @@ export const prettyVoteWeight = (
       ? parseInt(wei) * multiplier
       : calculateVoteWeight(weiStr, multiplier || 1);
 
-  // for non-weighted and stake, just render as-is
+  // for non-weighted and stake or sui nft, apply formatting for large numbers
   if (
     !weightType ||
     [TopicWeightedVoting.Stake, TopicWeightedVoting.SuiNFT].includes(weightType)
   ) {
-    return parseFloat((weiValue || 0).toString()).toString();
+    let rawNumber = parseFloat((weiValue || 0).toString());
+
+    // Sui NAVX NFTs use voting power with 9 decimals
+    if (
+      weightType === TopicWeightedVoting.SuiNFT &&
+      ['NAVX', 'veNAVX', 'MOCK_NAVX_TOKEN'].includes(tokenSymbol!)
+    ) {
+      rawNumber /= 10 ** 9;
+    }
+
+    // Apply formatting for large numbers to improve readability
+    if (rawNumber >= 1000) {
+      return formatBigNumberShort(rawNumber, 2);
+    }
+    return rawNumber.toString();
   }
 
   const n = Number(weiValue) / 10 ** (tokenNumDecimals || 18);

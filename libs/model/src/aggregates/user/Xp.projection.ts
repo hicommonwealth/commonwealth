@@ -10,16 +10,16 @@ import {
   UserTierMap,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
-import { Op, Sequelize } from 'sequelize';
+import { Op } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../../config';
-import { models, sequelize } from '../../database';
+import { models } from '../../database';
 
 const log = logger(import.meta);
 
 async function getUserByAddressId(address_id: number) {
   const addr = await models.Address.findOne({
-    where: { id: address_id },
+    where: { id: address_id, is_banned: false },
     attributes: ['user_id'],
     include: [
       {
@@ -27,7 +27,7 @@ async function getUserByAddressId(address_id: number) {
         attributes: ['id'],
         required: true,
         where: {
-          tier: { [Op.ne]: UserTierMap.BannedUser },
+          tier: { [Op.gt]: UserTierMap.BannedUser },
         },
       },
     ],
@@ -39,11 +39,14 @@ async function getUserByAddress(address: string) {
   const addr = await models.Address.findOne({
     where: {
       [Op.and]: [
-        Sequelize.where(
-          Sequelize.fn('LOWER', Sequelize.col('address')),
-          Sequelize.fn('LOWER', address),
-        ),
+        {
+          [Op.or]: [
+            { address: address.toLowerCase() },
+            { address: getEvmAddress(address) },
+          ],
+        },
         { user_id: { [Op.not]: null } },
+        { is_banned: { [Op.eq]: false } },
       ],
     },
     attributes: ['user_id'],
@@ -52,10 +55,12 @@ async function getUserByAddress(address: string) {
         model: models.User,
         attributes: ['id'],
         required: true,
-        where: { tier: { [Op.ne]: UserTierMap.BannedUser } },
+        // don't reward unverified or banned users
+        where: { tier: { [Op.gt]: UserTierMap.BannedUser } },
       },
     ],
   });
+
   return addr?.user_id ?? undefined;
 }
 
@@ -112,158 +117,176 @@ async function recordXpsForQuest({
   };
   scope?: z.infer<typeof schemas.QuestActionScope>;
 }) {
-  const shared_with_address =
-    shared_with?.creator_address || shared_with?.referrer_address;
-  await sequelize.transaction(async (transaction) => {
-    const shared_with_user_id = shared_with_address
-      ? await getUserByAddress(shared_with_address)
-      : null;
-
-    for (const action_meta of action_metas) {
-      if (!action_meta?.id) continue;
-      if (action_meta.content_id) {
-        const [scoped, id] = action_meta.content_id.split(':');
-        if (!scoped || !id) continue; // this shouldn't happen, but just in case
-        if (
-          (scoped === 'chain' && +id !== scope?.chain_id) ||
-          (scoped === 'topic' && +id !== scope?.topic_id) ||
-          (scoped === 'thread' && +id !== scope?.thread_id) ||
-          (scoped === 'comment' && +id !== scope?.comment_id) ||
-          (scoped === 'group' && +id !== scope?.group_id) ||
-          (scoped === 'wallet' && id !== scope?.wallet) ||
-          (scoped === 'sso' && id !== scope?.sso) ||
-          (scoped === 'goal' && +id !== scope?.goal_id) ||
-          (scoped === 'threshold' && +id > (scope?.threshold || 0)) ||
-          (scoped === 'discord_server_id' && id !== scope?.discord_server_id)
-        )
-          continue;
-      }
-
-      // get logged actions for this user and action meta
-      const log = await models.XpLog.findAll({
-        where: { user_id, action_meta_id: action_meta.id },
-      });
-
-      // validate action participation
-      if (log.length > 0) {
-        if (
-          (action_meta.participation_limit ??
-            QuestParticipationLimit.OncePerQuest) ===
-          QuestParticipationLimit.OncePerQuest
-        )
-          // when participation_limit is once_per_quest, ignore after the first action
-          continue;
-
-        // participation_limit is once_per_period
-        const tpp = action_meta.participation_times_per_period ?? 1;
-        const period =
-          action_meta.participation_period === QuestParticipationPeriod.Monthly
-            ? 'month'
-            : action_meta.participation_period ===
-                QuestParticipationPeriod.Weekly
-              ? 'week'
-              : 'day';
-        const actions_in_period = log.filter((l) =>
-          isWithinPeriod(event_created_at, l.created_at, period),
-        );
-        if (actions_in_period.length >= tpp) continue;
-      }
-
-      // calculate xp points and log it
-      const x =
-        (action_meta.amount_multiplier ?? 0) > 0
-          ? action_meta.amount_multiplier!
-          : 1;
-      const reward_amount = Math.round(
-        (scope?.amount || action_meta.reward_amount) * x,
-      );
-      const shared_xp_points = shared_with_user_id
-        ? Math.round(reward_amount * action_meta.creator_reward_weight)
-        : null;
-      const xp_points = reward_amount - (shared_xp_points ?? 0);
-
-      await models.sequelize.query(
-        `
-        WITH inserted AS (
-          INSERT INTO "XpLogs" (
-            -- UNIQUE KEY
-            user_id,
-            action_meta_id,
-            event_created_at,
-            name, -- NULL unless tweeter engagment event
-
-            -- VALUES
-            xp_points,
-            creator_user_id,
-            creator_xp_points,
-            event_id,
-            scope,
-            created_at
-          )
-          VALUES (
-            :user_id,
-            :action_meta_id,
-            :event_created_at,
-            NULL,
-
-            :xp_points,
-            :shared_with_user_id,
-            :shared_xp_points,
-            :event_id,
-            :scope,
-            NOW()
-          )
-          ON CONFLICT (user_id, action_meta_id, event_created_at, name) DO NOTHING
-          RETURNING 1
-        ),
-        update_user AS (
-          UPDATE "Users"
-          SET xp_points = COALESCE(xp_points, 0) + :xp_points
-          WHERE id = :user_id 
-            AND EXISTS(SELECT 1 FROM inserted)
-          RETURNING 1
-        ),
-        update_creator AS (
-          UPDATE "Users"
-          SET 
-            xp_points = COALESCE(xp_points, 0) 
-              + CASE WHEN :is_referral THEN 0 ELSE :shared_xp_points END,
-            xp_referrer_points = COALESCE(xp_referrer_points, 0) 
-              + CASE WHEN :is_referral THEN :shared_xp_points ELSE 0 END
-          WHERE id = :shared_with_user_id 
-            AND :shared_xp_points IS NOT NULL
-            AND EXISTS(SELECT 1 FROM inserted)
-          RETURNING 1
-        )
-        UPDATE "Quests"
-        SET 
-          xp_awarded = xp_awarded + :reward_amount,
-          end_date = CASE 
-              WHEN (xp_awarded + :reward_amount) >= max_xp_to_end
-              THEN NOW()
-              ELSE end_date
-            END
-        WHERE id = :quest_id
-          AND EXISTS(SELECT 1 FROM inserted);`,
-        {
-          replacements: {
-            quest_id: action_meta.quest_id,
-            action_meta_id: action_meta.id,
-            event_id,
-            event_created_at,
-            user_id,
-            shared_with_user_id,
-            reward_amount,
-            xp_points,
-            shared_xp_points,
-            is_referral: !!shared_with?.referrer_address,
-            scope: scope ? JSON.stringify(scope) : null,
-          },
-          transaction,
-        },
-      );
-    }
+  // TODO: Find a better way to load all user's details in a single query
+  // load user to check for referrer
+  const user = await models.User.findOne({
+    where: { id: user_id },
+    attributes: ['id', 'referred_by_address'],
   });
+  const creator_address = shared_with?.creator_address;
+  const referrer_address =
+    shared_with?.referrer_address || user?.referred_by_address;
+  const creator_user_id = creator_address
+    ? await getUserByAddress(creator_address)
+    : null;
+  const referrer_user_id = referrer_address
+    ? await getUserByAddress(referrer_address)
+    : null;
+
+  for (const action_meta of action_metas) {
+    if (!action_meta?.id) continue;
+    if (action_meta.content_id) {
+      const [scoped, id] = action_meta.content_id.split(':');
+      if (!scoped || !id) continue; // this shouldn't happen, but just in case
+      if (
+        (scoped === 'chain' && +id !== scope?.chain_id) ||
+        (scoped === 'topic' && +id !== scope?.topic_id) ||
+        (scoped === 'thread' && +id !== scope?.thread_id) ||
+        (scoped === 'comment' && +id !== scope?.comment_id) ||
+        (scoped === 'group' && +id !== scope?.group_id) ||
+        (scoped === 'wallet' && id !== scope?.wallet) ||
+        (scoped === 'sso' && id !== scope?.sso) ||
+        (scoped === 'goal' && +id !== scope?.goal_id) ||
+        (scoped === 'threshold' && +id > (scope?.threshold || 0)) ||
+        (scoped === 'discord_server_id' && id !== scope?.discord_server_id)
+      )
+        continue;
+    }
+    // get logged actions for this user and action meta
+    const xpLog = await models.XpLog.findAll({
+      where: { user_id, action_meta_id: action_meta.id },
+    });
+    // validate action participation
+    if (xpLog.length > 0) {
+      if (
+        (action_meta.participation_limit ??
+          QuestParticipationLimit.OncePerQuest) ===
+        QuestParticipationLimit.OncePerQuest
+      )
+        // when participation_limit is once_per_quest, ignore after the first action
+        continue;
+      // participation_limit is once_per_period
+      const tpp = action_meta.participation_times_per_period ?? 1;
+      const period =
+        action_meta.participation_period === QuestParticipationPeriod.Monthly
+          ? 'month'
+          : action_meta.participation_period === QuestParticipationPeriod.Weekly
+            ? 'week'
+            : 'day';
+      const actions_in_period = xpLog.filter((l) =>
+        isWithinPeriod(event_created_at, l.created_at, period),
+      );
+      if (actions_in_period.length >= tpp) continue;
+    }
+
+    // calculate xp points and log it
+    const x =
+      (action_meta.amount_multiplier ?? 0) > 0
+        ? action_meta.amount_multiplier!
+        : 1;
+    const reward_amount = Math.round(
+      (scope?.amount || action_meta.reward_amount) * x,
+    );
+    if (reward_amount <= 0) continue;
+
+    const shared_reward = shared_with
+      ? Math.round(reward_amount * action_meta.creator_reward_weight)
+      : null;
+    const xp_points = reward_amount - (shared_reward ?? 0);
+    const creator_xp_points = creator_address ? shared_reward : null;
+    const referrer_xp_points = referrer_address
+      ? creator_xp_points
+        ? reward_amount * config.XP.REFERRER_FEE_RATIO
+        : shared_reward
+      : null;
+    await models.sequelize.query(
+      `
+    WITH inserted AS (
+      INSERT INTO "XpLogs" (
+        -- UNIQUE KEY
+        user_id,
+        action_meta_id,
+        event_created_at,
+        name, -- NULL unless tweeter engagment event
+        -- VALUES
+        xp_points,
+        creator_user_id,
+        creator_xp_points,
+        referrer_user_id,
+        referrer_xp_points,
+        event_id,
+        scope,
+        created_at
+      )
+      VALUES (
+        :user_id,
+        :action_meta_id,
+        :event_created_at,
+        NULL,
+        :xp_points,
+        :creator_user_id,
+        :creator_xp_points,
+        :referrer_user_id,
+        :referrer_xp_points,
+        :event_id,
+        :scope,
+        NOW()
+      )
+      ON CONFLICT (user_id, action_meta_id, event_created_at, name) DO NOTHING
+      RETURNING 1
+    ),
+    update_user AS (
+      UPDATE "Users"
+      SET xp_points = COALESCE(xp_points, 0) + :xp_points
+      WHERE id = :user_id 
+        AND EXISTS(SELECT 1 FROM inserted)
+      RETURNING 1
+    ),
+    update_creator AS (
+      UPDATE "Users"
+      SET xp_points = COALESCE(xp_points, 0) + :creator_xp_points
+      WHERE id = COALESCE(:creator_user_id, 0)
+        AND :creator_xp_points IS NOT NULL
+        AND EXISTS(SELECT 1 FROM inserted)
+      RETURNING 1
+    ),
+    update_referrer AS (
+      UPDATE "Users"
+      SET xp_referrer_points = COALESCE(xp_referrer_points, 0) + :referrer_xp_points
+      WHERE id = COALESCE(:referrer_user_id, 0)
+        AND :referrer_xp_points IS NOT NULL
+        AND EXISTS(SELECT 1 FROM inserted)
+      RETURNING 1
+    )
+    UPDATE "Quests"
+    SET 
+      xp_awarded = xp_awarded + :total_reward,
+      end_date = CASE 
+          WHEN (xp_awarded + :total_reward) >= max_xp_to_end
+          THEN NOW()
+          ELSE end_date
+        END
+    WHERE id = :quest_id
+      AND EXISTS(SELECT 1 FROM inserted);`,
+      {
+        replacements: {
+          quest_id: action_meta.quest_id,
+          action_meta_id: action_meta.id,
+          event_id,
+          event_created_at,
+          user_id,
+          creator_user_id,
+          referrer_user_id,
+          xp_points,
+          creator_xp_points,
+          referrer_xp_points,
+          total_reward:
+            xp_points + (creator_xp_points ?? 0) + (referrer_xp_points ?? 0),
+          scope: scope ? JSON.stringify(scope) : null,
+        },
+      },
+    );
+  }
 }
 
 export function Xp(): Projection<typeof schemas.QuestEvents> {
@@ -554,7 +577,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       },
       LaunchpadTokenRecordCreated: async ({ id, payload }) => {
         const user_id = await getUserByAddress(payload.creator_address);
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenRecordCreated', { id, payload, user_id });
         if (!user_id) return;
 
@@ -563,7 +586,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           { created_at },
           'LaunchpadTokenRecordCreated',
         );
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenRecordCreated', {
             id,
             payload,
@@ -583,14 +606,14 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       },
       LaunchpadTokenTraded: async ({ id, payload }) => {
         const user_id = await getUserByAddress(payload.trader_address);
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenTraded', { id, payload, user_id });
         if (!user_id) return;
 
         const token = await models.LaunchpadToken.findOne({
           where: { token_address: payload.token_address.toLowerCase() },
         });
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenTraded', { id, payload, user_id, token });
         if (!token) return;
 
@@ -606,7 +629,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
 
         // payload eth_amount is in wei, a little misleading
         const eth_amount = Number(payload.eth_amount) / 1e18;
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenTraded', {
             id,
             payload,
@@ -633,7 +656,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const user_id =
           payload.token.creator_address &&
           (await getUserByAddress(payload.token.creator_address));
-        config.LOG_XP_LAUNCHPAD &&
+        config.XP.LOG_LAUNCHPAD &&
           log.info('Xp->LaunchpadTokenGraduated', { id, payload, user_id });
         if (!user_id) return;
 

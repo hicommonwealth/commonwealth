@@ -58,7 +58,7 @@ export const SearchEntitiesInput = z.object({
 
 export const SearchEntityResult = z.object({
   id: z.string(),
-  type: z.nativeEnum(SearchEntityType),
+  type: z.enum(SearchEntityType),
   name: z.string(),
   description: z.string().optional(),
   avatar_url: z.string().optional().nullable(),
@@ -68,11 +68,7 @@ export const SearchEntityResult = z.object({
   created_at: z.date().or(z.string()).nullable(),
   member_count: z.number().optional().nullable(),
   status: z.string().optional().nullable(),
-  relevance_score: z
-    .union([z.number(), z.string()])
-    .transform((val) => (typeof val === 'string' ? parseFloat(val) : val))
-    .optional()
-    .nullable(),
+  relevance_score: z.coerce.number().optional().nullable(),
 });
 
 export const SearchEntitiesOutput = z.object({

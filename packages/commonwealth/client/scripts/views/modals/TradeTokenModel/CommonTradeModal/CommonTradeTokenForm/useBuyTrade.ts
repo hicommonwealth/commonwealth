@@ -1,6 +1,7 @@
 import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
+import { SupportedCryptoCurrencies } from 'helpers/currency';
 import { useEffect, useMemo, useState } from 'react';
 import {
   useFetchTokenUsdRateQuery,
@@ -35,7 +36,7 @@ const useBuyTrade = ({
 
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
     useFetchTokenUsdRateQuery({
-      tokenSymbol: 'ETH',
+      tokenSymbol: SupportedCryptoCurrencies.ETH,
       enabled,
     });
   const ethToCurrencyRate = parseFloat(
@@ -93,7 +94,6 @@ const useBuyTrade = ({
       if (
         !launchPad ||
         !chainNode ||
-        baseCurrencyBuyAmountDecimals <= 0 ||
         commonPlatformFeeForBuyTradeInEth >= baseCurrencyBuyAmountDecimals
       ) {
         setTokenGainAmount(0);
@@ -139,9 +139,15 @@ const useBuyTrade = ({
     change: React.ChangeEvent<HTMLInputElement> | TokenPresetAmounts,
   ) => {
     if (typeof change == 'number') {
-      // preset amounts are in tradeConfig.ethBuyCurrency
-      const ethToBuyFromUSDPresetAmount = change / ethToCurrencyRate;
-      setBaseCurrencyBuyAmountString(`${ethToBuyFromUSDPresetAmount}`);
+      // Check if preset amounts are in ETH or USD currency
+      if (tradeConfig.buyCurrency === SupportedCryptoCurrencies.ETH) {
+        // preset amounts are already in ETH
+        setBaseCurrencyBuyAmountString(`${change}`);
+      } else {
+        // preset amounts are in tradeConfig.buyCurrency (USD)
+        const ethToBuyFromUSDPresetAmount = change / ethToCurrencyRate;
+        setBaseCurrencyBuyAmountString(`${ethToBuyFromUSDPresetAmount}`);
+      }
     } else if (typeof change == 'string') {
       // not handling string type preset amounts atm
     } else {
@@ -224,10 +230,10 @@ const useBuyTrade = ({
     // Note: not exporting state setters directly, all "buy token" business logic should be done in this hook
     amounts: {
       invest: {
-        ethBuyCurrency: tradeConfig.ethBuyCurrency,
+        buyCurrency: tradeConfig.buyCurrency,
         baseCurrency: {
-          // eth will be the currency used to buy token, and eth will be bought with tradeConfig.ethBuyCurrency
-          name: 'ETH',
+          // eth will be the currency used to buy token, and eth will be bought with tradeConfig.buyCurrency
+          name: SupportedCryptoCurrencies.ETH,
           amount: baseCurrencyBuyAmountString,
           onAmountChange: onBaseCurrencyBuyAmountChange,
           presetAmounts: tradeConfig.buyTokenPresetAmounts,

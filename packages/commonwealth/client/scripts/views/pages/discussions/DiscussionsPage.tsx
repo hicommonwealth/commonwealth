@@ -29,7 +29,7 @@ import {
   sanitizeTopicName,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
-import Thread from 'client/scripts/models/Thread';
+import Thread, { ThreadView } from 'client/scripts/models/Thread';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import { useFetchNodesQuery } from 'client/scripts/state/api/nodes';
 import { useDateCursor } from 'client/scripts/state/api/threads/dateCursor';
@@ -212,7 +212,9 @@ const DiscussionsPage = () => {
     if (isInitialLoading || !data) return;
     const threads = sortPinned(
       sortByFeaturedFilter(
-        data.pages.flatMap((p) => p.results.map((t) => new Thread(t))) || [],
+        data.pages.flatMap((p) =>
+          p.results.map((t) => new Thread(t as ThreadView)),
+        ) || [],
         featuredFilter,
       ),
     );
@@ -296,8 +298,10 @@ const DiscussionsPage = () => {
       ? prettyVoteWeight(
           formatDecimalToWei(voteBalance, topicObj!.token_decimals ?? 18),
           topicObj!.token_decimals,
-          topicObj!.weighted_voting,
+          topicObj!.weighted_voting as TopicWeightedVoting,
           topicObj!.vote_weight_multiplier || 1,
+          undefined,
+          topicObj?.token_symbol || undefined,
         )
       : '';
 
@@ -384,7 +388,12 @@ const DiscussionsPage = () => {
     }
   };
 
-  if (privateTopicsEnabled && isPrivateTopic && !isAllowedMember) {
+  if (
+    privateTopicsEnabled &&
+    isPrivateTopic &&
+    !isAllowedMember &&
+    !bypassGating
+  ) {
     return (
       <StickCommentProvider mode="thread">
         <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">

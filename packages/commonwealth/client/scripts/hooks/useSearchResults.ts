@@ -102,6 +102,7 @@ const useSearchResults = (
     };
   }, [threadsData, communityData, profilesData, commentsData]);
 
+  // @ts-expect-error User is required in one of the results
   return { searchResults };
 };
 

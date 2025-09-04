@@ -48,6 +48,7 @@ const {
   MAGNA_UNLOCK_SCHEDULE_ID,
   MAGNA_UNLOCK_START_AT,
   MAGNA_BATCH_SIZE,
+  RAILWAY_PUBLIC_DOMAIN,
 } = process.env;
 
 const DEFAULTS = {
@@ -176,6 +177,7 @@ export const config = configure(
       RELEASER_URL,
       RELEASER_API_KEY,
       RELEASER_WAIT_ONLY: RELEASER_WAIT_ONLY === 'true',
+      RAILWAY_PUBLIC_DOMAIN,
     },
     MAGNA: MAGNA_TOKEN_ID
       ? {
@@ -207,8 +209,8 @@ export const config = configure(
           defaultCheck: DEFAULTS.SESSION_SECRET,
         }),
       ),
-      MAGIC_SUPPORTED_BASES: z.array(z.nativeEnum(ChainBase)),
-      MAGIC_DEFAULT_CHAIN: z.nativeEnum(ChainBase),
+      MAGIC_SUPPORTED_BASES: z.array(z.enum(ChainBase)),
+      MAGIC_DEFAULT_CHAIN: z.enum(ChainBase),
     }),
     TELEGRAM: z.object({
       BOT_TOKEN: z
@@ -289,7 +291,7 @@ export const config = configure(
     TWITTER: z
       .object({
         WORKER_POLL_INTERVAL: z.number().int().gte(0),
-        ENABLED_BOTS: z.array(z.nativeEnum(TwitterBotName)),
+        ENABLED_BOTS: z.array(z.enum(TwitterBotName)),
       })
       .refine((data) => {
         if (data.ENABLED_BOTS.length === 0) return true;
@@ -338,6 +340,7 @@ export const config = configure(
         .describe(
           `When true, will not trigger a release but will await the result.`,
         ),
+      RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
     }),
     MAGNA: z
       .object({

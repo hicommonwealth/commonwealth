@@ -72,6 +72,7 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
     voteWeightMultiplier: contest?.vote_weight_multiplier || 1,
     topicId: contest?.topic_id || undefined,
     isFarcasterContest: !!contest?.is_farcaster_contest,
+    contestTokenSymbol: contest?.ticker,
   };
 
   const isJudgedContest = !!contest?.namespace_judge_token_id;

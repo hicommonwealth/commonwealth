@@ -22,6 +22,6 @@
   "dependencies": {
     "@hicommonwealth/evm-protocols": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
-    "zod": "^3.25.46"
+    "zod": "catalog:"
   }
 }

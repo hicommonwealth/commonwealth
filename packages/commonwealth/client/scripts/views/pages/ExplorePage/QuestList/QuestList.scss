@@ -13,18 +13,16 @@
     display: grid;
     gap: 16px;
     margin: 16px 0;
-    grid-template-columns: 1fr 1fr 1fr 1fr !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
 
-    @include media_queries.extraSmall {
-      grid-template-columns: 1fr !important;
-    }
-
-    @include media_queries.small {
+    // 800px–1199px: 2 columns
+    @media only screen and (max-width: 1199px) {
       grid-template-columns: 1fr 1fr !important;
     }
 
-    @include media_queries.mediumSmall {
-      grid-template-columns: 1fr 1fr 1fr !important;
+    // 0–799px: 1 column
+    @media only screen and (max-width: 799px) {
+      grid-template-columns: 1fr !important;
     }
   }
 }
@@ -38,6 +36,10 @@
   height: 0;
   margin-top: -16px;
 
+  .btn-border {
+    margin: 0 !important;
+  }
+
   &.hasAppliedFilter {
     margin-top: initial;
     height: auto;
@@ -46,6 +48,7 @@
   .Tag {
     .Text {
       text-transform: capitalize;
+      white-space: initial !important;
     }
   }
 

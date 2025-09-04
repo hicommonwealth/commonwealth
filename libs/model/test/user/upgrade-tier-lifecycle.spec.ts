@@ -12,7 +12,7 @@ import { models } from '../../src/database';
 import { USDC_BASE_MAINNET_ADDRESS } from '../../src/services/openai/parseBotCommand';
 import * as tokenBalanceCache from '../../src/services/tokenBalanceCache';
 import { seed } from '../../src/tester';
-import { emitEvent } from '../../src/utils/utils';
+import { emitEvent } from '../../src/utils';
 import { drainOutbox } from '../utils';
 
 // TODO: use bigint helper util
@@ -89,6 +89,7 @@ describe('Upgrade Tiers lifecycle', () => {
 
     const [topic1] = await seed('Topic', {
       id: 1,
+      name: 'test',
       community_id: community1!.id,
     });
 
