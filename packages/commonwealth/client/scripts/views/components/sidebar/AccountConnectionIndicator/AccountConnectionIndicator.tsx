@@ -2,6 +2,7 @@ import { useFlag } from 'client/scripts/hooks/useFlag';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import NewProfile from 'client/scripts/models/NewProfile';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
+import { DeleteAddressModal } from 'client/scripts/views/modals/delete_address_modal';
 import React, { useState } from 'react';
 import app from 'state';
 import { useInviteLinkModal } from 'state/ui/modals';
@@ -10,7 +11,6 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { SharePopover } from '../../SharePopover';
 import { AddressList } from '../CommunitySection/AddressList';
-import { DeleteAddressModal } from 'client/scripts/views/modals/delete_address_modal';
 
 import './AccountConnectionIndicator.scss';
 
@@ -43,6 +43,17 @@ const AccountConnectionIndicator = ({
     return null;
   }
 
+  // Find the current connected address instead of using addresses[0]
+  const currentAddress = addresses?.find((addr) => addr.address === address);
+
+  // Calculate if this is the last address for this community
+  const isLastCommunityAddress = addresses ? addresses.length === 1 : false;
+
+  // Get community info from the current address or app state
+  const communityId =
+    currentAddress?.community?.id || app.activeChainId() || '';
+  const communityName = app.chain?.meta?.name || '';
+
   return (
     <>
       <div className="AccountConnectionIndicator">
@@ -74,18 +85,20 @@ const AccountConnectionIndicator = ({
 
         <div className="status-button">
           <CWButton
-            {...(connected && !isHovering ? { iconLeft: 'checkCircleFilled' } : {})}
+            {...(connected && !isHovering
+              ? { iconLeft: 'checkCircleFilled' }
+              : {})}
             buttonHeight="sm"
             buttonWidth="full"
             buttonType={connected && isHovering ? 'destructive' : 'primary'}
             buttonAlt={connected && isHovering ? 'rorange' : undefined}
-            label={connected ? (isHovering ? 'Leave' : 'Joined') : 'Join community'}
+            label={
+              connected ? (isHovering ? 'Leave' : 'Joined') : 'Join community'
+            }
             onMouseEnter={connected ? () => setIsHovering(true) : undefined}
             onMouseLeave={connected ? () => setIsHovering(false) : undefined}
             onClick={
-              connected
-                ? () => setIsLeaveModalOpen(true)
-                : handleJoinCommunity
+              connected ? () => setIsLeaveModalOpen(true) : handleJoinCommunity
             }
           />
           <SharePopover
@@ -104,15 +117,15 @@ const AccountConnectionIndicator = ({
         open={isLeaveModalOpen}
         onClose={() => setIsLeaveModalOpen(false)}
         content={
-          addresses && addresses[0] ? (
+          currentAddress && addresses ? (
             <DeleteAddressModal
               addresses={addresses}
-              address={addresses[0]}
-              chain={addresses[0].community?.id || ''}
+              address={currentAddress}
+              chain={communityId}
               closeModal={() => setIsLeaveModalOpen(false)}
-              communityName={app.chain?.meta?.name || ''}
-              isBulkDelete
-              isLastCommunityAddress
+              communityName={communityName}
+              isBulkDelete={false}
+              isLastCommunityAddress={isLastCommunityAddress}
             />
           ) : null
         }
