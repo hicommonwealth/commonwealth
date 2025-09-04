@@ -4,7 +4,6 @@ import { APIOrderDirection } from 'helpers/constants';
 import moment from 'moment';
 import React from 'react';
 import { useGetXPs } from 'state/api/user';
-import useUserStore from 'state/ui/user';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import {
   CWTable,
@@ -125,17 +124,15 @@ function buildActionLink(log: z.infer<typeof XpLogView>) {
   return title;
 }
 
-export const XPEarningsTable = () => {
+export const XPEarningsTable = ({ userId }: { userId: number }) => {
   const tableState = useCWTableState({
     columns,
     initialSortColumn: 'earnTime',
     initialSortDirection: APIOrderDirection.Desc,
   });
 
-  const user = useUserStore();
-
   const { data: xpLogs = [] } = useGetXPs({
-    user_or_creator_id: user.id,
+    user_or_creator_id: userId,
   });
 
   const tableData = xpLogs.map((log) => ({
@@ -165,7 +162,7 @@ export const XPEarningsTable = () => {
     },
     completedBy: {
       customElement:
-        log.is_creator && log.user_id !== user.id ? (
+        log.is_creator && log.user_id !== userId ? (
           <FullUser
             profile={{
               address: '',
@@ -183,8 +180,8 @@ export const XPEarningsTable = () => {
         ),
     },
     auraAmount:
-      (user.id === log.user_id ? log.xp_points : 0) +
-      (user.id === log.creator_user_id ? log.creator_xp_points || 0 : 0),
+      (userId === log.user_id ? log.xp_points : 0) +
+      (userId === log.creator_user_id ? log.creator_xp_points || 0 : 0),
     questLink: {
       customElement: (
         <a

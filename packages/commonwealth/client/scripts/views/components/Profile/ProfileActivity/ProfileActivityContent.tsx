@@ -1,5 +1,6 @@
 import Thread from 'models/Thread';
 import React from 'react';
+import { XPEarningsTable } from '../../../pages/WalletPage/tables';
 import { CWText } from '../../component_kit/cw_text';
 import './../Profile.scss';
 import CommunityTab from './CommunityTab';
@@ -14,18 +15,21 @@ export enum ProfileActivityType {
   Communities,
   Threads,
   MyTokens,
+  Aura,
 }
 
 type ProfileActivityContentProps = {
   option: ProfileActivityType;
   threads: Thread[];
   comments: CommentWithAssociatedThread[];
+  userId: number;
 };
 
 const ProfileActivityContent = ({
   option,
   comments,
   threads,
+  userId,
 }: ProfileActivityContentProps) => {
   if (option === ProfileActivityType.Threads) {
     if (threads.length === 0) {
@@ -53,6 +57,10 @@ const ProfileActivityContent = ({
 
   if (option === ProfileActivityType.MyTokens) {
     return <TransactionsTab transactionsType="tokens" />;
+  }
+
+  if (option === ProfileActivityType.Aura) {
+    return <XPEarningsTable userId={userId} />;
   }
 
   if (option === ProfileActivityType.Communities) {
