@@ -311,7 +311,9 @@ const EditProfile = () => {
                     }
                     uploadCompleteCallback={(uploadUrl: string) => {
                       setIsUploadingProfileImage(false);
-                      setAvatarUrl(uploadUrl);
+                      if (uploadUrl) {
+                        setAvatarUrl(uploadUrl);
+                      }
                     }}
                   />
                 </div>
