@@ -111,6 +111,7 @@ type ClaimAddress = {
   address: string | null;
   magna_allocation_id: string | null;
   magna_synced_at: Date | null;
+  magna_claimed_at: Date | null;
   created_at: Date;
   updated_at: Date;
 };
@@ -133,6 +134,10 @@ export const ClaimAddresses = (
         allowNull: true,
       },
       magna_synced_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      magna_claimed_at: {
         type: Sequelize.DATE,
         allowNull: true,
       },

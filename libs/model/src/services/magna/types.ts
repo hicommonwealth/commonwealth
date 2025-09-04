@@ -64,6 +64,18 @@ export interface MagnaAllocation {
   vestingStartAt: string | null;
 }
 
+export interface ClaimAllocationRequest {
+  sender: string;
+  userCountryCode?: string;
+}
+
+export interface MagnaClaim {
+  parameters: {
+    instructions: Array<string>;
+    transactionId: string;
+  };
+}
+
 export interface MagnaResponse<T> {
   isProcessed: boolean;
   result: T;
@@ -71,3 +83,4 @@ export interface MagnaResponse<T> {
 }
 
 export type MagnaAllocationResponse = MagnaResponse<MagnaAllocation>;
+export type MagnaClaimResponse = MagnaResponse<MagnaClaim>;

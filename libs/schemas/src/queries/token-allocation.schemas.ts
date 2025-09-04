@@ -11,6 +11,11 @@ export const ClaimAddressView = z.object({
     .or(z.string())
     .nullish()
     .describe('When the address was synced with magna and made not updatable.'),
+  magna_claimed_at: z
+    .date()
+    .or(z.string())
+    .nullish()
+    .describe('When the allocation was claimed by the user.'),
 });
 
 export const GetClaimAddress = {
