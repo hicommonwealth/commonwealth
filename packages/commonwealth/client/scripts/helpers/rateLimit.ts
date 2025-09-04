@@ -1,7 +1,7 @@
 export const RATE_LIMIT_MESSAGE =
   'You are being rate limited. Please wait and try again.';
 
-interface RateLimitErrorType {
+export interface RateLimitErrorType {
   data?: { httpStatus?: number; message?: string };
   status?: number;
   response?: { status?: number; data?: { message?: string } };

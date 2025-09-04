@@ -5,7 +5,11 @@ import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetc
 import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { findDenominationString } from 'helpers/findDenomination';
-import { isRateLimitError, RATE_LIMIT_MESSAGE } from 'helpers/rateLimit';
+import {
+  isRateLimitError,
+  RATE_LIMIT_MESSAGE,
+  RateLimitErrorType,
+} from 'helpers/rateLimit';
 import { useFlag } from 'hooks/useFlag';
 import type { DeltaStatic } from 'quill';
 import React, { useRef, useState } from 'react';
@@ -116,11 +120,12 @@ const CommunityHome = () => {
         error instanceof Error ? error.message : 'Unknown error';
 
       // Type guard to check if error has the structure expected by isRateLimitError
-      const isErrorObject = (err: unknown): err is Record<string, any> => {
+      const isRateLimitErrorType = (
+        err: unknown,
+      ): err is RateLimitErrorType => {
         return typeof err === 'object' && err !== null;
       };
-
-      if (isErrorObject(error) && isRateLimitError(error)) {
+      if (isRateLimitErrorType(error) && isRateLimitError(error)) {
         notifyError(RATE_LIMIT_MESSAGE);
       } else {
         notifyError(`Failed to create thread: ${errorMessage}`);
