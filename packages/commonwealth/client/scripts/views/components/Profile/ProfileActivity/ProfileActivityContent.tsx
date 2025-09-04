@@ -1,3 +1,4 @@
+import XPTable from 'client/scripts/views/pages/Leaderboard/XPTable';
 import Thread from 'models/Thread';
 import React from 'react';
 import { CWText } from '../../component_kit/cw_text';
@@ -14,6 +15,7 @@ export enum ProfileActivityType {
   Communities,
   Threads,
   MyTokens,
+  Leaderboard,
 }
 
 type ProfileActivityContentProps = {
@@ -57,6 +59,10 @@ const ProfileActivityContent = ({
 
   if (option === ProfileActivityType.Communities) {
     return <CommunityTab />;
+  }
+
+  if (option === ProfileActivityType.Leaderboard) {
+    return <XPTable />;
   }
 
   const allActivities: Array<CommentWithAssociatedThread | Thread> = [
