@@ -233,7 +233,10 @@ export const NewThreadForm = () => {
     // }
   };
 
-  const showBanner = !user.activeAccount && isBannerVisible;
+  // Only show join banner when a community is selected and the user has not
+  // connected an address for it. On unscoped pages there is no community, so we
+  // should not prompt the user to join.
+  const showBanner = !!communityId && !user.activeAccount && isBannerVisible;
 
   const permissions = Permissions.getCreateThreadPermission({
     actionGroups,
