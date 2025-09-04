@@ -60,6 +60,13 @@ const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
             }}
             isSelected={selectedActivity === ProfileActivityType.MyTokens}
           />
+          <CWTab
+            label="Leaderboard"
+            onClick={() => {
+              setSelectedActivity(ProfileActivityType.Leaderboard);
+            }}
+            isSelected={selectedActivity === ProfileActivityType.Leaderboard}
+          />
           {newProfilePageEnabled && (
             <CWTab
               label={
