@@ -25,8 +25,6 @@ import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manag
 import Permissions from '../../../../utils/Permissions';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
 import { AdminSection } from '../AdminSection';
-import DirectoryMenuItem from '../DirectoryMenuItem';
-import { SidebarSectionGroup } from '../sidebar_section';
 import SidebarSignInButton from '../SidebarSignInButton/SidebarSignInButton';
 import { DiscussionSection } from '../discussion_section';
 import { ExternalLinksModule } from '../external_links_module';
@@ -185,17 +183,7 @@ export const CommunitySection = ({
         )}
         <GovernanceSection isContestAvailable={isContestAvailable} />
         <CWDivider />
-        <SidebarSectionGroup
-          title="Apps"
-          displayData={[]}
-          onClick={(e, _toggle) => {}}
-          extraComponents={
-            <>
-              <DirectoryMenuItem />
-              <ExternalLinksModule />
-            </>
-          }
-        />
+        <ExternalLinksModule />
         <div className="buttons-container">
           {user.isLoggedIn && app.chain && (
             <div className="subscription-button">

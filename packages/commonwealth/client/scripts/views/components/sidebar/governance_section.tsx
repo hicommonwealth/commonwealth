@@ -113,6 +113,10 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
           children: {},
         },
       }),
+      Directory: {
+        toggledState: false,
+        children: {},
+      },
     },
   };
 
@@ -155,6 +159,10 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
   );
   const matchesGovernanceRoute = matchRoutes(
     [{ path: '/governance' }, { path: ':scope/governance' }],
+    location,
+  );
+  const matchesDirectoryRoute = matchRoutes(
+    [{ path: '/directory' }, { path: ':scope/directory' }],
     location,
   );
 
@@ -305,14 +313,34 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     },
   };
 
+  // Directory
+  const directoryData: SectionGroupAttrs = {
+    title: 'Directory',
+    containsChildren: false,
+    displayData: null,
+    hasDefaultToggle: false,
+    isActive: !!matchesDirectoryRoute,
+    isVisible: community?.directory_page_enabled || false,
+    isUpdated: true,
+    onClick: (e, toggle: boolean) => {
+      e.preventDefault();
+      resetSidebarState();
+      handleRedirectClicks(navigate, e, `/directory`, communityId, () => {
+        setGovernanceToggleTree('children.Directory.toggledState', toggle);
+      });
+    },
+  };
+
   let governanceGroupData: SectionGroupAttrs[] = [
     membersData,
     snapshotData,
     proposalsData,
     questsData,
+    directoryData,
   ];
 
-  if (!hasProposals) governanceGroupData = [membersData, questsData];
+  if (!hasProposals)
+    governanceGroupData = [membersData, questsData, directoryData];
   if (isContestAvailable) {
     governanceGroupData.push(contestData);
   }
