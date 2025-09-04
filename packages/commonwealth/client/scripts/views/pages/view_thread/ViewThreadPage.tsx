@@ -1,3 +1,4 @@
+import { GetThreadToken } from '@hicommonwealth/schemas';
 import {
   ContentType,
   GatedActionEnum,
@@ -56,6 +57,7 @@ import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity'
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { z } from 'zod';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
@@ -940,6 +942,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           hasPendingEdits={!!editsToSave}
           activeThreadVersionId={activeThreadVersionId}
           onChangeVersionHistoryNumber={handleVersionHistoryChange}
+          threadToken={threadToken as z.infer<typeof GetThreadToken.output>}
           body={(threadOptionsComp) => (
             <div className="thread-content">
               {thread && isEditingBody && threadBody ? (
