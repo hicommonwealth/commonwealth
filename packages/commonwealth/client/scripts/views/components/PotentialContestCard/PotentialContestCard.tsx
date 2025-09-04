@@ -4,7 +4,6 @@ import {
   SupportedFiatCurrencies,
 } from 'helpers/currency';
 import { useTokenPricing } from 'hooks/useTokenPricing';
-import moment from 'moment'; // Import moment for ordinal numbers
 import React, { useState } from 'react';
 import { useInviteLinkModal } from 'state/ui/modals';
 import { CWCard } from 'views/components/component_kit/cw_card';
@@ -12,7 +11,7 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import FormattedDisplayNumber from 'views/components/FormattedDisplayNumber/FormattedDisplayNumber';
+import { PrizeDisplay } from 'views/components/PrizeDisplay';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import { Skeleton } from 'views/components/Skeleton';
 import MarketCapProgress from 'views/components/TokenCard/MarketCapProgress';
@@ -108,31 +107,15 @@ export const PotentialContestCard = ({
           {projectedPrizesUsd.map((prizeUsd, index) => {
             const tokenAmount = projectedPrizesToken[index];
             return (
-              <div className={`prize-row prize-row-${index + 1}`} key={index}>
-                <CWText className="label" fontWeight="bold">
-                  {moment.localeData().ordinal(index + 1)} Prize
-                </CWText>
-                <div className="amount-with-usd">
-                  <CWText fontWeight="bold" className="token-amount">
-                    <FormattedDisplayNumber
-                      fontWeight="bold"
-                      value={tokenAmount}
-                      options={{ decimals: 4, useShortSuffixes: false }}
-                    />
-                    &nbsp;{launchpadToken.symbol}
-                  </CWText>
-                  <CWText type="caption" className="usd-equivalent">
-                    <FormattedDisplayNumber
-                      value={prizeUsd}
-                      options={{
-                        currencySymbol,
-                        decimals: 2,
-                        useShortSuffixes: false,
-                      }}
-                    />
-                  </CWText>
-                </div>
-              </div>
+              <PrizeDisplay
+                key={index}
+                tokenAmount={tokenAmount}
+                tokenSymbol={launchpadToken.symbol}
+                usdAmount={prizeUsd}
+                position={index + 1}
+                currencySymbol={currencySymbol}
+                className={`prize-row-${index + 1}`}
+              />
             );
           })}
         </div>

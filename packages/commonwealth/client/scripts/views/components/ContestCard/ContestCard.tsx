@@ -5,6 +5,7 @@ import React from 'react';
 import { buildContestPrizes } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
+import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useRerender from 'hooks/useRerender';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
@@ -12,7 +13,6 @@ import app from 'state';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
 import useDeleteContestMutation from 'state/api/contests/deleteContest';
 import useUserStore from 'state/ui/user';
-import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import { Skeleton } from 'views/components/Skeleton';
 import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import { CWCard } from 'views/components/component_kit/cw_card';
@@ -36,7 +36,7 @@ import ContestAlert from './ContestAlert';
 import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
 import { useFlag } from 'hooks/useFlag';
 import { smartTrim } from 'shared/utils';
-import FormattedDisplayNumber from 'views/components/FormattedDisplayNumber/FormattedDisplayNumber';
+import { PrizeDisplay } from 'views/components/PrizeDisplay';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 
 import './ContestCard.scss';
@@ -378,33 +378,14 @@ const ContestCard = ({
                       ? prizeTokenValue * tokenUsdRate
                       : null;
                     return (
-                      <div className="prize-row" key={index}>
-                        <CWText className="label">
-                          {moment.localeData().ordinal(index + 1)} Prize
-                        </CWText>
-                        <div className="amount-with-usd">
-                          <CWText fontWeight="bold" className="token-amount">
-                            <FormattedDisplayNumber
-                              fontWeight="bold"
-                              value={prizeTokenValue}
-                              options={{ decimals: 4, useShortSuffixes: false }}
-                            />
-                            &nbsp;{ticker}
-                          </CWText>
-                          {prizeUsdValue !== null && (
-                            <CWText type="caption" className="usd-equivalent">
-                              <FormattedDisplayNumber
-                                value={prizeUsdValue}
-                                options={{
-                                  currencySymbol: '$',
-                                  decimals: 2,
-                                  useShortSuffixes: false,
-                                }}
-                              />
-                            </CWText>
-                          )}
-                        </div>
-                      </div>
+                      <PrizeDisplay
+                        key={index}
+                        tokenAmount={prizeTokenValue}
+                        tokenSymbol={ticker || 'ETH'}
+                        usdAmount={prizeUsdValue}
+                        position={index + 1}
+                        currencySymbol="$"
+                      />
                     );
                   })
                 ) : (

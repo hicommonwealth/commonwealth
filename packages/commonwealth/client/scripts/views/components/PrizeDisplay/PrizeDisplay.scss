@@ -1,0 +1,36 @@
+@use '../../../styles/shared';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+
+.prize-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: 6px;
+
+  .label {
+    color: colors.$neutral-600;
+    font-family: shared.$font-family-silka;
+    font-weight: 600;
+  }
+
+  .amount-with-usd {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+
+    .token-amount {
+      word-break: break-word;
+      font-family: shared.$font-family-monospace;
+    }
+
+    .usd-equivalent {
+      font-size: 0.75em;
+      opacity: 0.7;
+      line-height: 1;
+      margin-top: 1px;
+    }
+  }
+}
