@@ -46,7 +46,7 @@ export const proposeGovernanceWithHook = async (
   walletAddress: string,
   maxFeePerGas?: bigint,
 ) => {
-  const contractCall = await contract.methods.proposeWithHook(
+  const contractCall = contract.methods.proposeWithHook(
     targets,
     values,
     calldatas,
@@ -61,7 +61,7 @@ export const proposeGovernanceWithHook = async (
   // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
   const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
 
-  const txReceipt = contractCall.send({
+  return contractCall.send({
     from: walletAddress,
     type: '0x2',
     gas: gasResult.toString(),
@@ -70,7 +70,6 @@ export const proposeGovernanceWithHook = async (
       ? String(maxPriorityFeePerGas)
       : undefined,
   });
-  return txReceipt;
 };
 
 export const castVoteWithTokenId = async (
@@ -94,7 +93,7 @@ export const castVoteWithTokenId = async (
   // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
   const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
 
-  const txReceipt = await contractCall.send({
+  return await contractCall.send({
     from: walletAddress,
     type: '0x2',
     gas: gasResult ? gasResult.toString() : undefined,
@@ -103,7 +102,6 @@ export const castVoteWithTokenId = async (
       ? String(maxPriorityFeePerGas)
       : undefined,
   });
-  return txReceipt;
 };
 
 export const castVoteWithAddress = async (
@@ -125,7 +123,7 @@ export const castVoteWithAddress = async (
   // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
   const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
 
-  const txReceipt = await contractCall.send({
+  return await contractCall.send({
     from: walletAddress,
     type: '0x2',
     gas: gasResult ? gasResult.toString() : undefined,
@@ -134,7 +132,6 @@ export const castVoteWithAddress = async (
       ? String(maxPriorityFeePerGas)
       : undefined,
   });
-  return txReceipt;
 };
 
 export const executeProposal = async (
@@ -162,7 +159,7 @@ export const executeProposal = async (
   // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
   const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
 
-  const txReceipt = await contractCall.send({
+  return await contractCall.send({
     from: walletAddress,
     value: ethValue ? String(ethValue) : '0',
     type: '0x2',
@@ -172,7 +169,6 @@ export const executeProposal = async (
       ? String(maxPriorityFeePerGas)
       : undefined,
   });
-  return txReceipt;
 };
 
 export const cancelProposal = async (
@@ -198,7 +194,7 @@ export const cancelProposal = async (
   // Calculate maxPriorityFeePerGas as 1/3 of maxFeePerGas if provided
   const maxPriorityFeePerGas = maxFeePerGas ? maxFeePerGas / 3n : undefined;
 
-  const txReceipt = await contractCall.send({
+  return contractCall.send({
     from: walletAddress,
     type: '0x2',
     gas: gasResult.toString(),
@@ -207,7 +203,6 @@ export const cancelProposal = async (
       ? String(maxPriorityFeePerGas)
       : undefined,
   });
-  return txReceipt;
 };
 
 export const getProposalState = async (
