@@ -2,7 +2,6 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
 import app from 'client/scripts/state';
-import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
@@ -14,6 +13,7 @@ import { PageNotFound } from '../404';
 import GovernanceCards from './GovernanceCards';
 import GovernanceHeader from './GovernanceHeader/GovernanceHeader';
 import './GovernancePage.scss';
+import ProposalListing from './ProposalListing/ProposalListing';
 
 const GovernancePage = () => {
   const governancePageEnabled = useFlag('governancePage');
@@ -34,19 +34,19 @@ const GovernancePage = () => {
     };
   }, [setLoading]);
 
-  const communityId = app.activeChainId() || '';
-  const { data: community } = useGetCommunityByIdQuery({
-    id: communityId,
-    enabled: !!communityId,
-  });
-
   const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
-  const onEtherem = community?.base !== ChainBase.Ethereum;
+  const onEtherem = app.chain?.base === ChainBase.Ethereum;
 
-  const { data: activeCosmosProposals } = useActiveCosmosProposalsQuery({
+  const {
+    data: activeCosmosProposals,
+    isLoading: isLoadingActicCosmosProposal,
+  } = useActiveCosmosProposalsQuery({
     isApiReady: !!app.chain?.apiInitialized,
   });
-  const { data: completedCosmosProposals } = useCompletedCosmosProposalsQuery({
+  const {
+    data: completedCosmosProposals,
+    isLoading: isLoadingCompletedCosmosProposal,
+  } = useCompletedCosmosProposalsQuery({
     isApiReady: !!app.chain?.apiInitialized,
   });
 
@@ -63,6 +63,12 @@ const GovernancePage = () => {
     return <LoadingIndicator message="Connecting to chain" />;
   }
 
+  if (
+    onCosmos &&
+    (isLoadingActicCosmosProposal || isLoadingCompletedCosmosProposal)
+  )
+    return <PageLoading message="Connecting to chain" />;
+
   const activeProposalsCount = activeCosmosProposals?.length || 0;
   const inactiveProposalsCount =
     onCosmos && completedCosmosProposals ? completedCosmosProposals.length : 0;
@@ -77,6 +83,11 @@ const GovernancePage = () => {
       <div className="GovernancePage">
         <GovernanceHeader />
         <GovernanceCards totalProposals={totalProposalsCount} />
+        <ProposalListing
+          chain={onCosmos ? ChainBase.CosmosSDK : ChainBase.Ethereum}
+          activeCosmosProposals={activeCosmosProposals}
+          completedCosmosProposals={completedCosmosProposals}
+        />
       </div>
     </CWPageLayout>
   );
