@@ -121,7 +121,7 @@
     "@magic-ext/farcaster": "^1.1.0",
     "@magic-ext/oauth": "^22.17.0",
     "@magic-ext/oauth2": "^9.16.0",
-    "@magic-sdk/admin": "^2.4.1",
+    "@magic-sdk/admin": "^2.5.0",
     "@metamask/eth-sig-util": "^4.0.0",
     "@modelcontextprotocol/sdk": "^1.12.1",
     "@moonpay/moonpay-react": "^1.10.2",
