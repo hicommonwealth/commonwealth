@@ -30,6 +30,21 @@
     .profile-info {
       text-align: center;
 
+      .profile-name {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 4px;
+        text-align: center;
+        gap: 8px;
+      }
+
+      .bio {
+        line-height: 1.5;
+        max-width: 250px;
+        margin-bottom: 16px;
+      }
+
       .karma-section {
         margin-top: 16px;
         display: flex;

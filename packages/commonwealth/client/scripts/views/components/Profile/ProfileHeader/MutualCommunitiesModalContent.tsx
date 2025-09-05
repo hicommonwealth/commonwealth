@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import type NewProfile from '../../../../models/NewProfile';
 import { CWText } from '../../component_kit/cw_text';
 import { CWTab, CWTabsRow } from '../../component_kit/new_designs/CWTabs';
+import TrustLevelRole from '../../TrustLevelRole';
 import './MutualCommunitiesModalContent.scss';
 
 type MutualCommunity = {
@@ -58,9 +59,13 @@ export const MutualCommunitiesModalContent = ({
             )}
           </div>
           <div className="profile-info">
-            <CWText type="h3" fontWeight="semiBold">
-              {viewedUserProfile.name || DEFAULT_NAME}
-            </CWText>
+            <div className="profile-name">
+              <CWText type="h3" fontWeight="semiBold">
+                {viewedUserProfile.name || DEFAULT_NAME}
+              </CWText>
+              <TrustLevelRole type="user" level={viewedUserProfile.tier} />
+            </div>
+
             {viewedUserProfile.bio && (
               <CWText type="b2" color="secondary">
                 {viewedUserProfile.bio}
