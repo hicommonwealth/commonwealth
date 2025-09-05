@@ -2,7 +2,7 @@
   .modal-content {
     display: flex;
     gap: 32px;
-    min-height: 400px;
+    min-height: 500px;
   }
 
   .profile-section {
@@ -62,13 +62,12 @@
 
     .tab-content {
       flex: 1;
-      padding: 24px 0;
     }
 
     .mutual-communities-content {
       .empty-state {
         text-align: center;
-        padding: 40px 20px;
+        padding: 40px 80px;
       }
 
       .communities-list {
@@ -76,16 +75,18 @@
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 16px;
+          padding: 12px;
           border-radius: 8px;
           border: 1px solid var(--border-color);
-          margin-bottom: 12px;
+          margin-bottom: 2px;
           cursor: pointer;
           transition: all 0.2s ease;
 
           &:hover {
             border-color: var(--primary-color);
             background-color: var(--background-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
           }
 
           .community-info {
