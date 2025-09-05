@@ -14,6 +14,7 @@ type MutualCommunity = {
   name: string;
   base: string;
   icon_url?: string | null;
+  tier: string;
 };
 
 type MutualCommunitiesModalProps = {

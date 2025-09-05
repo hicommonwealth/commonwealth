@@ -13,6 +13,7 @@ type MutualCommunity = {
   name: string;
   base: string;
   icon_url?: string | null;
+  tier: string;
 };
 
 type MutualCommunitiesModalContentProps = {
@@ -126,9 +127,15 @@ export const MutualCommunitiesModalContent = ({
                             </div>
                           )}
                           <div className="community-details">
-                            <CWText type="b2" fontWeight="semiBold">
-                              {community.name}
-                            </CWText>
+                            <div className="community-name-row">
+                              <CWText type="b2" fontWeight="semiBold">
+                                {community.name}
+                              </CWText>
+                              <TrustLevelRole
+                                type="community"
+                                level={Number(community.tier)}
+                              />
+                            </div>
                             <CWText type="caption" color="secondary">
                               {community.base}
                             </CWText>
