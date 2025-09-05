@@ -337,7 +337,12 @@ const ModalBase = ({
 
       return 0;
     });
-  }, [showAuthOptionTypesFor, showAuthOptionFor, shouldShowSSOOptions, ssoOptions]);
+  }, [
+    showAuthOptionTypesFor,
+    showAuthOptionFor,
+    shouldShowSSOOptions,
+    ssoOptions,
+  ]);
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
