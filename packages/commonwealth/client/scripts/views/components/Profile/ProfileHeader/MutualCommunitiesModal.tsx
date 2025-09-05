@@ -1,3 +1,4 @@
+import { CommunityTierMap } from '@hicommonwealth/shared';
 import React from 'react';
 import type NewProfile from '../../../../models/NewProfile';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
@@ -14,7 +15,7 @@ type MutualCommunity = {
   name: string;
   base: string;
   icon_url?: string | null;
-  tier: string;
+  tier: CommunityTierMap;
 };
 
 type MutualCommunitiesModalProps = {

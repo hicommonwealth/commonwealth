@@ -1,4 +1,4 @@
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { CommunityTierMap, DEFAULT_NAME } from '@hicommonwealth/shared';
 import jdenticon from 'jdenticon';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +13,7 @@ type MutualCommunity = {
   name: string;
   base: string;
   icon_url?: string | null;
-  tier: string;
+  tier: CommunityTierMap;
 };
 
 type MutualCommunitiesModalContentProps = {
@@ -133,7 +133,7 @@ export const MutualCommunitiesModalContent = ({
                               </CWText>
                               <TrustLevelRole
                                 type="community"
-                                level={Number(community.tier)}
+                                level={community.tier}
                               />
                             </div>
                             <CWText type="caption" color="secondary">
