@@ -72,14 +72,15 @@ export const GetLaunchpadTrades = {
   input: z.object({
     token_address: z.string().optional(),
     trader_addresses: z.string().optional(),
+    user_id: z.number().optional(),
   }),
   output: LaunchpadTrade.extend({
     community_token_amount: z.string(),
     floating_supply: z.string(),
     name: z.string(),
     symbol: z.string(),
-    community_id: z.string(),
-    community_icon_url: z.string(),
+    community_id: z.string().nullish(),
+    community_icon_url: z.string().nullish(),
     user_id: z.number().nullish(),
     user_name: z.string().nullish(),
     user_avatar_url: z.string().nullish(),
