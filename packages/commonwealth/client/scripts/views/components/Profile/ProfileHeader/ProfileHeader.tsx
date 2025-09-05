@@ -1,7 +1,8 @@
 import jdenticon from 'jdenticon';
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { MutualCommunitiesModal } from './MutualCommunitiesModal';
 import './ProfileHeader.scss';
 
 import {
@@ -32,6 +33,8 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const user = useUserStore();
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
   const referralsEnabled = useFlag('referrals');
+  const [isMutualCommunitiesModalOpen, setIsMutualCommunitiesModalOpen] =
+    useState(false);
 
   const { data: mutualConnections } = useMutualConnectionsQuery(
     {
@@ -126,7 +129,11 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
         </div>
         {!isOwner &&
           (mutualConnections?.mutual_communities?.length ?? 0) > 0 && (
-            <div className="mutual-connections">
+            <div
+              className="mutual-connections"
+              onClick={() => setIsMutualCommunitiesModalOpen(true)}
+              style={{ cursor: 'pointer' }}
+            >
               <div className="mutual-icons">
                 {(mutualConnections?.mutual_communities ?? [])
                   .slice(0, 5)
@@ -151,6 +158,14 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
             </div>
           )}
       </div>
+
+      <MutualCommunitiesModal
+        isOpen={isMutualCommunitiesModalOpen}
+        onClose={() => setIsMutualCommunitiesModalOpen(false)}
+        viewedUserProfile={profile}
+        mutualCommunities={mutualConnections?.mutual_communities ?? []}
+        karma={karma}
+      />
     </div>
   );
 };
