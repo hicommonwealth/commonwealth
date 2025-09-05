@@ -3,6 +3,7 @@
     display: flex;
     gap: 32px;
     min-height: 500px;
+    max-height: 550px;
   }
 
   .profile-section {
@@ -62,15 +63,46 @@
 
     .tab-content {
       flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
     .mutual-communities-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+
       .empty-state {
         text-align: center;
         padding: 40px 80px;
       }
 
       .communities-list {
+        height: 450px;
+        overflow-y: auto;
+        padding-right: 8px;
+
+        &::-webkit-scrollbar {
+          width: 10px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 5px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: #888;
+          border-radius: 5px;
+          border: 2px solid #f1f1f1;
+
+          &:hover {
+            background: #555;
+          }
+        }
+
         .community-item {
           display: flex;
           align-items: center;
