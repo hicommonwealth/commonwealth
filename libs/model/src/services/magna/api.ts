@@ -1,3 +1,4 @@
+import { logger } from '@hicommonwealth/core';
 import { config } from '../../config';
 import {
   ClaimAllocationRequest,
@@ -6,49 +7,45 @@ import {
   MagnaClaimResponse,
 } from './types';
 
-/**
- * Creates a new allocation in Magna
- */
-export async function createMagnaAllocation(
-  body: CreateAllocationRequest,
-): Promise<MagnaAllocationResponse> {
+const log = logger(import.meta);
+
+async function callMagnaApi<Body, Response>(
+  path: string,
+  body?: Body,
+): Promise<Response> {
+  const method = body ? 'POST' : 'GET';
   const request = {
-    method: 'POST',
+    method,
     headers: {
       'Content-Type': 'application/json',
       'x-magna-api-token': config.MAGNA!.API_KEY,
     },
-    body: JSON.stringify(body),
+    body: body ? JSON.stringify(body) : undefined,
   };
 
-  const response = await fetch(
-    `${config.MAGNA!.API_URL}/api/external/v1/allocations/create`,
-    request,
-  );
+  const response = await fetch(`${config.MAGNA!.API_URL}/${path}`, request);
+  const json = await response.json();
 
-  return response.json();
+  log.info(`${method} /${path}`, { body, response: JSON.stringify(json) });
+
+  return json;
 }
 
-/**
- * Claims a magna allocation
- */
-export async function claimMagnaAllocation(
+export async function createAllocation(
+  body: CreateAllocationRequest,
+): Promise<MagnaAllocationResponse> {
+  return callMagnaApi('allocations/create', body);
+}
+
+export async function claimAllocation(
   allocationId: string,
   body: ClaimAllocationRequest,
 ): Promise<MagnaClaimResponse> {
-  const request = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-magna-api-token': config.MAGNA!.API_KEY,
-    },
-    body: JSON.stringify(body),
-  };
+  return callMagnaApi(`allocations/${allocationId}/claim`, body);
+}
 
-  const response = await fetch(
-    `${config.MAGNA!.API_URL}/api/external/v1/allocations/${allocationId}/claim`,
-    request,
-  );
-
-  return response.json();
+export async function getAllocation(
+  allocationId: string,
+): Promise<MagnaAllocationResponse> {
+  return callMagnaApi(`allocations/${allocationId}`);
 }

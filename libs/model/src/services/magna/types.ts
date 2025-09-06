@@ -1,10 +1,11 @@
-// Magna API TypeScript types
+import { AllocationStatus } from '@hicommonwealth/schemas';
 
 export interface MagnaStakeholder {
-  name?: string;
-  email?: string;
-  xHandle?: string;
-  employeeNumber?: string;
+  id?: string;
+  type?: string | null;
+  employeeNumber?: string | null;
+  name?: string | null;
+  contactEmail?: string | null;
 }
 
 export interface MagnaCustomAttribute {
@@ -34,34 +35,23 @@ export interface CreateAllocationRequest {
 export interface MagnaAllocation {
   id: string;
   key: string;
-  amount: string;
-  receivedOffMagna: string | null;
-  funded: string | null;
-  received: string;
-  state: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  status: string;
-  isWalletSubmitted: boolean | null;
-  releaseMode: string | null;
   description: string | null;
-  releasable: string;
+  amount: string;
+  funded: string | null;
   claimable: string | null;
-  pendingRelease: string | null;
-  vaultId: string | null;
-  grantId: string | null;
-  custodyType: string;
-  projectId: string;
-  tokenId: string;
-  stakeholderId: string;
-  walletId: string | null;
-  categoryId: string;
-  createdAt: string;
-  updatedAt: string;
-  cancelledAt: string | null;
-  scheduledCancelAt: string | null;
-  unlockScheduleId: string | null;
-  unlockStartAt: string | null;
-  vestingScheduleId: string | null;
-  vestingStartAt: string | null;
+  received: string | null;
+  createdAt: Date;
+  updatedAt: Date | null;
+  cancelledAt: Date | null;
+  walletAddress: string;
+  status: (typeof AllocationStatus)[number];
+  stakeholder: MagnaStakeholder;
+  category: {
+    id: string;
+    name: string;
+  };
+  unlockStartAt: Date | null;
+  vestingStartAt: Date | null;
 }
 
 export interface ClaimAllocationRequest {

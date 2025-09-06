@@ -1,23 +1,19 @@
 import { logger } from '@hicommonwealth/core';
 import { TokenAllocationSyncArgs, magnaSync } from '@hicommonwealth/model';
-import {
-  TaskPayloads,
-  createMagnaAllocation,
-} from '@hicommonwealth/model/services';
+import { TaskPayloads, createAllocation } from '@hicommonwealth/model/services';
 import { config } from '../../../config';
 
 const log = logger(import.meta);
 
-async function createAllocation({
+async function callback({
   key,
   category,
   description,
   user_name,
-  user_email,
   wallet_address,
   token_allocation,
-}: TokenAllocationSyncArgs): Promise<boolean> {
-  const response = await createMagnaAllocation({
+}: TokenAllocationSyncArgs): Promise<string> {
+  const response = await createAllocation({
     key,
     category,
     description,
@@ -25,16 +21,17 @@ async function createAllocation({
     tokenId: config.MAGNA!.TOKEN_ID,
     amount: token_allocation,
     walletAddress: wallet_address,
-    stakeholder: user_email
-      ? {
-          name: user_name,
-          email: user_email,
-        }
-      : { name: user_name },
+    stakeholder: { name: user_name },
     unlockScheduleId: config.MAGNA!.UNLOCK_SCHEDULE_ID,
     unlockStartAt: config.MAGNA!.UNLOCK_START_AT.toISOString(),
   });
-  return response.isProcessed;
+  if (!response.isProcessed || !response.result.id) {
+    log.error(`Failed to create allocation for ${key}`, undefined, {
+      response,
+    });
+    throw new Error('Failed to create allocation');
+  }
+  return response.result.id;
 }
 
 export const magnaSyncTask = {
@@ -45,7 +42,7 @@ export const magnaSyncTask = {
       return;
     }
     log.info('Starting MagnaSync job...');
-    await magnaSync(createAllocation);
+    await magnaSync(callback);
     log.info('MagnaSync job completed!');
   },
 };

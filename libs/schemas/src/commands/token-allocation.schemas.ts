@@ -12,10 +12,10 @@ export const UpdateClaimAddress = {
 
 export const ClaimToken = {
   input: z.object({
-    address: EVM_ADDRESS_STRICT,
     allocation_id: z.string(),
   }),
   output: z.object({
+    magna_allocation_id: z.string(),
     transaction_id: z.string(),
     instructions: z.array(z.string()),
   }),

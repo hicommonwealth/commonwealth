@@ -2,6 +2,8 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'client/scripts/helpers';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import {
+  useClaimTokenMutation,
+  useGetAllocationQuery,
   useGetClaimAddressQuery,
   useUpdateClaimAddressMutation,
 } from 'client/scripts/state/api/tokenAllocations';
@@ -45,8 +47,13 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     useGetClaimAddressQuery({
       enabled: true,
     });
+  const { data: allocation, isLoading: isLoadingAllocation } =
+    useGetAllocationQuery({
+      magna_allocation_id: claimAddress?.magna_allocation_id,
+    });
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
+  const { mutate: claimToken, isPending: isClaiming } = useClaimTokenMutation();
 
   useEffect(() => {
     const addresses = new Map<string, AddressInfo>();
@@ -159,13 +166,15 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     </div>
   ) : null;
 
-  const formattedBalance = formatTokenBalance(claimAddress.tokens || 0);
+  const formattedBalance = formatTokenBalance(
+    allocation?.amount || claimAddress.tokens || 0,
+  );
 
   return (
     <div className="TokenClaimBanner">
-      {claimAddress?.address ? (
+      {claimAddress && (
         <CWBanner
-          type="success"
+          type={claimAddress.address ? 'success' : 'warning'}
           body={
             <div className="banner-content">
               <h2 className="token-balance">
@@ -216,77 +225,22 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                     aria-label="Save the selected address for token claiming"
                   />
                 )}
-                <CWButton
-                  label={`Claim to ${formatAddressShort(claimAddress?.address, 6)}`}
-                  buttonType="primary"
-                  disabled={!claimAddress.magna_allocation_id}
-                  onClick={() => {
-                    // handleClaim(claimAddress.magna_allocation_id);
-                    alert(
-                      `TODO: claim from magna using id: ${claimAddress.magna_allocation_id}`,
-                    );
-                  }}
-                  buttonHeight="sm"
-                  aria-label={`Claim ${formattedBalance} tokens to address ${claimAddress?.address}`}
-                />
-              </div>
-            </div>
-          }
-        />
-      ) : (
-        <CWBanner
-          type="warning"
-          body={
-            <div className="banner-content">
-              <h2 className="token-balance">
-                You have {formattedBalance} C tokens!
-              </h2>
-              <div className="notice-section">
-                <div className="notice-text">
-                  <p className="base-notice">
-                    We are going live on Base. You must set an EVM address to
-                    claim your allocation.
-                    <CWTooltip
-                      content={
-                        'Commonwealth tokens will be launched on Base network. ' +
-                        'Ensure your address is compatible with Base/Ethereum.'
-                      }
-                      renderTrigger={(handleInteraction) => (
-                        <CWIcon
-                          iconName="infoFilled"
-                          iconSize="small"
-                          className="info-icon"
-                          onMouseEnter={handleInteraction}
-                          onMouseLeave={handleInteraction}
-                        />
-                      )}
-                    />
-                  </p>
-                  <p className="security-notice">
-                    <strong>Before claiming, verify:</strong> Check the official
-                    project website and social media, ensure you&apos;re on the
-                    correct domain (check URL carefully), verify your wallet is
-                    connected to the correct network, and never approve
-                    unlimited token allowances.
-                  </p>
-                </div>
-              </div>
-              {addressFormContent}
-              <div className="banner-actions">
-                {!claimAddress?.magna_synced_at && (
+                {allocation?.status === 'CLAIM_AVAILABLE' ? (
                   <CWButton
-                    label={isUpdating ? 'Saving...' : 'Save address'}
-                    onClick={handleClaimAddressUpdate}
-                    disabled={
-                      isUpdating ||
-                      !selectedAddress ||
-                      selectedAddress.address === claimAddress?.address
-                    }
+                    label={`Claim to ${formatAddressShort(allocation?.walletAddress, 6)}`}
                     buttonType="primary"
+                    onClick={() => {
+                      claimToken({
+                        allocation_id: allocation?.magna_allocation_id!,
+                      });
+                    }}
+                    disabled={isClaiming || isLoadingAllocation}
                     buttonHeight="sm"
-                    aria-label="Save the selected address for token claiming"
+                    aria-label={`Claim ${formattedBalance} tokens to address ${allocation?.walletAddress}`}
                   />
-                )}
+                ) : allocation ? (
+                  <p>Allocation Status: {`${allocation.status}`}</p>
+                ) : null}
               </div>
             </div>
           }

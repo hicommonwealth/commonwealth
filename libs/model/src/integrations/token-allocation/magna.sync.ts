@@ -11,13 +11,12 @@ export type TokenAllocationSyncArgs = {
   description: string;
   user_id: number;
   user_name: string;
-  user_email: string;
   wallet_address: string;
   token_allocation: number;
 };
 
 export async function magnaSync(
-  apiCallback: (args: TokenAllocationSyncArgs) => Promise<boolean>,
+  apiCallback: (args: TokenAllocationSyncArgs) => Promise<string>,
   batchSize = 10,
   breatherMs = 1000,
 ) {
@@ -34,8 +33,6 @@ export async function magnaSync(
             A.user_id,
             A.address as wallet_address,
             U.profile->>'name' as user_name,
-            U.profile->>'email' as user_email,
-            -- combined in initial drop?
             COALESCE(HA.token_allocation, 0)::double precision 
             + COALESCE(AA.token_allocation, 0)::double precision as token_allocation
           FROM
@@ -63,10 +60,10 @@ export async function magnaSync(
 
       const promises = batch.map(async (args) => {
         try {
-          await apiCallback(args);
+          const allocationId = await apiCallback(args);
           await models.ClaimAddresses.update(
             {
-              magna_allocation_id: args.key,
+              magna_allocation_id: allocationId,
               magna_synced_at: new Date(),
             },
             { where: { user_id: args.user_id } },

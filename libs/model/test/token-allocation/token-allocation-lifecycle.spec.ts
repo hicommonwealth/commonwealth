@@ -18,13 +18,13 @@ describe('Token Allocation Lifecycle', () => {
     });
     // mock magna api
     vi.mock('../../src/services/magna/api', () => ({
-      createMagnaAllocation: vi.fn().mockResolvedValue({
+      createAllocation: vi.fn().mockResolvedValue({
         isProcessed: true,
         result: {
           key: 'initial-airdrop-0x1234',
         },
       }),
-      claimMagnaAllocation: vi.fn().mockResolvedValue({
+      claimAllocation: vi.fn().mockResolvedValue({
         isProcessed: true,
         result: {
           parameters: {
