@@ -231,7 +231,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                     buttonType="primary"
                     onClick={() => {
                       claimToken({
-                        allocation_id: allocation?.magna_allocation_id!,
+                        allocation_id: allocation!.magna_allocation_id!,
                       });
                     }}
                     disabled={isClaiming || isLoadingAllocation}
