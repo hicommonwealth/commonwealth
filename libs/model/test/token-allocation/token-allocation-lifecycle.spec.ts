@@ -115,10 +115,7 @@ describe('Token Allocation Lifecycle', () => {
       // claim token
       const result = await command(ClaimToken(), {
         actor: community.actors.member,
-        payload: {
-          address: community.addresses.member.address as `0x${string}`,
-          allocation_id,
-        },
+        payload: { allocation_id },
       });
 
       expect(result.transaction_id).to.be.a('string');
