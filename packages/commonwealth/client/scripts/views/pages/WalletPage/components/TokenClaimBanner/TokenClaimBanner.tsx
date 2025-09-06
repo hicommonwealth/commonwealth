@@ -44,12 +44,12 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     AddressInfo | undefined
   >(undefined);
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
-    useGetClaimAddressQuery({
-      enabled: true,
-    });
+    useGetClaimAddressQuery({ enabled: true });
   const { data: allocation, isLoading: isLoadingAllocation } =
     useGetAllocationQuery({
       magna_allocation_id: claimAddress?.magna_allocation_id,
+      enabled:
+        !!claimAddress?.magna_allocation_id && !claimAddress.magna_claimed_at,
     });
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
