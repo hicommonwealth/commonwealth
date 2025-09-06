@@ -41,13 +41,6 @@ const {
   RELEASER_URL,
   RELEASER_API_KEY,
   RELEASER_WAIT_ONLY,
-  MAGNA_API_KEY,
-  MAGNA_API_URL,
-  MAGNA_CONTRACT_ID,
-  MAGNA_TOKEN_ID,
-  MAGNA_UNLOCK_SCHEDULE_ID,
-  MAGNA_UNLOCK_START_AT,
-  MAGNA_BATCH_SIZE,
   RAILWAY_PUBLIC_DOMAIN,
 } = process.env;
 
@@ -65,7 +58,6 @@ const DEFAULTS = {
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_IN: 60 * 60,
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_OUT: 60 * 60 * 2,
   CACHE_GET_COMMUNITIES_JOIN_COMMUNITY: 60 * 60 * 24,
-  MAGNA_BATCH_SIZE: '10',
 };
 
 export const config = configure(
@@ -179,20 +171,6 @@ export const config = configure(
       RELEASER_WAIT_ONLY: RELEASER_WAIT_ONLY === 'true',
       RAILWAY_PUBLIC_DOMAIN,
     },
-    MAGNA: MAGNA_TOKEN_ID
-      ? {
-          API_URL: MAGNA_API_URL || '',
-          API_KEY: MAGNA_API_KEY || '',
-          CONTRACT_ID: MAGNA_CONTRACT_ID || '',
-          TOKEN_ID: MAGNA_TOKEN_ID || '',
-          UNLOCK_SCHEDULE_ID: MAGNA_UNLOCK_SCHEDULE_ID || '',
-          UNLOCK_START_AT: new Date(MAGNA_UNLOCK_START_AT || '9999-12-31'),
-          BATCH_SIZE: parseInt(
-            MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE,
-            10,
-          ),
-        }
-      : undefined,
   },
   z.object({
     DISABLE_SITEMAP: z.boolean(),
@@ -342,16 +320,5 @@ export const config = configure(
         ),
       RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
     }),
-    MAGNA: z
-      .object({
-        API_URL: z.string().url(),
-        API_KEY: z.string(),
-        CONTRACT_ID: z.string().uuid(),
-        TOKEN_ID: z.string().uuid(),
-        UNLOCK_SCHEDULE_ID: z.string().uuid(),
-        UNLOCK_START_AT: z.date(),
-        BATCH_SIZE: z.number(),
-      })
-      .optional(),
   }),
 );

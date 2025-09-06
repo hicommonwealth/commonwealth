@@ -19,6 +19,7 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
             A.address,
             A.magna_allocation_id,
             A.magna_synced_at,
+            A.magna_claimed_at,
             COALESCE(HA.token_allocation, 0)::numeric + COALESCE(AA.token_allocation, 0)::numeric as tokens
           FROM
             "ClaimAddresses" A

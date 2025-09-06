@@ -10,4 +10,12 @@ export const trpcRouter = trpc.router({
     TokenAllocation.GetClaimAddress,
     trpc.Tag.TokenAllocation,
   ),
+  getAllocation: trpc.query(
+    TokenAllocation.GetAllocation,
+    trpc.Tag.TokenAllocation,
+  ),
+  claimToken: trpc.command(
+    TokenAllocation.ClaimToken,
+    trpc.Tag.TokenAllocation,
+  ),
 });
