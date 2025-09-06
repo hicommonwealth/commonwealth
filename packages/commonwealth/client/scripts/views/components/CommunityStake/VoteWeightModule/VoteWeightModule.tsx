@@ -1,6 +1,7 @@
 import { findDenominationIcon } from 'helpers/findDenomination';
-import React from 'react';
+import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
@@ -39,6 +40,7 @@ export const VoteWeightModule = ({
   );
 
   const popoverProps = usePopover();
+  const [isWidgetExpanded, setIsWidgetExpanded] = useState(true);
 
   const handleBuyStakeClick = async () => {
     onOpenStakeModal('buy');
@@ -58,80 +60,92 @@ export const VoteWeightModule = ({
   );
 
   return (
-    <div className="VoteWeightModule">
-      <div className="content">
-        <div className="title-container">
-          <CWText type="caption" fontWeight="uppercase">
-            Vote Weight
-          </CWText>
-          <CWIconButton
-            iconName="infoEmpty"
-            buttonSize="sm"
-            onMouseEnter={popoverProps.handleInteraction}
-            onMouseLeave={popoverProps.handleInteraction}
-          />
-        </div>
-        <CWText className="vote-weight" type="h3" fontWeight="bold">
-          {voteWeight}
+    <section className="VoteWeightModule">
+      <div className="pad-8 header">
+        <CWIconButton
+          iconName={isWidgetExpanded ? 'caretUp' : 'caretDown'}
+          weight="fill"
+          onClick={() => setIsWidgetExpanded((e) => !e)}
+        />
+        <CWText
+          type="caption"
+          fontWeight="medium"
+          className="status-text"
+        >
+          Vote Weight
         </CWText>
-        <div className="info-and-actions">
-          <div className="info">
-            <CWText type="caption" className="stake-num">
-              You have {stakeNumber || 0} stake
-            </CWText>
-            <CWText type="caption" className="stake-value">
-              valued at
-              <span className="denominationIcon">
-                {findDenominationIcon(denomination)}
-              </span>
-              {capDecimals(String(stakeValue))} {denomination}
-            </CWText>
-          </div>
-          {stakeNumber >= 1 ? (
-            <div className="actions">
-              <CWButton
-                label="Buy stake"
-                buttonType="secondary"
-                buttonAlt="green"
-                buttonHeight="sm"
-                buttonWidth="full"
-                // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                onClick={handleBuyStakeClick}
-              />
-              <CWButton
-                label="Sell stake"
-                buttonType="secondary"
-                buttonAlt="rorange"
-                buttonHeight="sm"
-                buttonWidth="full"
-                onClick={() => onOpenStakeModal('sell')}
-              />
-            </div>
-          ) : (
-            <div className="action">
-              {canBuyStake ? (
-                buyButton
-              ) : (
-                <CWTooltip
-                  placement="right"
-                  content={disabledStakeButtonTooltipText({
-                    connectBaseChainToBuy: app?.chain?.base,
-                  })}
-                  renderTrigger={(handleInteraction) => (
-                    <span
-                      className="w-full"
-                      onMouseEnter={handleInteraction}
-                      onMouseLeave={handleInteraction}
-                    >
-                      {buyButton}
-                    </span>
-                  )}
-                />
-              )}
-            </div>
-          )}
-        </div>
+        <CWIconButton
+          iconName="infoEmpty"
+          buttonSize="sm"
+          onMouseEnter={popoverProps.handleInteraction}
+          onMouseLeave={popoverProps.handleInteraction}
+        />
       </div>
+
+      {isWidgetExpanded && (
+        <div className="content">
+          <CWText className="vote-weight" type="h3" fontWeight="bold">
+            {voteWeight}
+          </CWText>
+          <div className="info-and-actions">
+            <div className="info">
+              <CWText type="caption" className="stake-num">
+                You have {stakeNumber || 0} stake
+              </CWText>
+              <CWText type="caption" className="stake-value">
+                valued at
+                <span className="denominationIcon">
+                  {findDenominationIcon(denomination)}
+                </span>
+                {capDecimals(String(stakeValue))} {denomination}
+              </CWText>
+            </div>
+            {stakeNumber >= 1 ? (
+              <div className="actions">
+                <CWButton
+                  label="Buy stake"
+                  buttonType="secondary"
+                  buttonAlt="green"
+                  buttonHeight="sm"
+                  buttonWidth="full"
+                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                  onClick={handleBuyStakeClick}
+                />
+                <CWButton
+                  label="Sell stake"
+                  buttonType="secondary"
+                  buttonAlt="rorange"
+                  buttonHeight="sm"
+                  buttonWidth="full"
+                  onClick={() => onOpenStakeModal('sell')}
+                />
+              </div>
+            ) : (
+              <div className="action">
+                {canBuyStake ? (
+                  buyButton
+                ) : (
+                  <CWTooltip
+                    placement="right"
+                    content={disabledStakeButtonTooltipText({
+                      connectBaseChainToBuy: app?.chain?.base,
+                    })}
+                    renderTrigger={(handleInteraction) => (
+                      <span
+                        className="w-full"
+                        onMouseEnter={handleInteraction}
+                        onMouseLeave={handleInteraction}
+                      >
+                        {buyButton}
+                      </span>
+                    )}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <CWPopover
         title={
@@ -168,6 +182,7 @@ export const VoteWeightModule = ({
         }
         {...popoverProps}
       />
-    </div>
+      <CWDivider />
+    </section>
   );
 };
