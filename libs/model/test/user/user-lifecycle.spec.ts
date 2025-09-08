@@ -20,11 +20,7 @@ import {
   UpdateRole,
   UpdateRoleErrors,
 } from '../../src/aggregates/community';
-import {
-  CreateQuest,
-  createQuestMaterializedView,
-  UpdateQuest,
-} from '../../src/aggregates/quest';
+import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
 import { AwardXp } from '../../src/aggregates/super-admin';
 import { CreateThread } from '../../src/aggregates/thread';
 import {
@@ -38,7 +34,10 @@ import { models } from '../../src/database';
 import * as tokenBalanceCache from '../../src/services/tokenBalanceCache';
 import { seed } from '../../src/tester';
 import * as utils from '../../src/utils';
-import { getQuestXpLeaderboardViewName } from '../../src/utils';
+import {
+  createQuestMaterializedView,
+  getQuestXpLeaderboardViewName,
+} from '../../src/utils';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
 import { createSIWESigner, signIn } from '../utils/sign-in';
