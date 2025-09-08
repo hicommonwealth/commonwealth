@@ -1,5 +1,6 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { QueryTypes } from 'sequelize';
 import z from 'zod';
 import { models } from '../../database';
 
@@ -14,7 +15,9 @@ export function GetThreadTokenHolders(): Query<
     }: {
       payload: z.infer<typeof schemas.GetThreadTokenHolders.input>;
     }) => {
-      const [result] = await models.sequelize.query(
+      const [result] = await models.sequelize.query<
+        z.infer<typeof schemas.GetThreadTokenHolders.output>
+      >(
         `WITH trade_flows AS (
             SELECT
                 TT.thread_id,
@@ -62,12 +65,11 @@ export function GetThreadTokenHolders(): Query<
           replacements: {
             thread_id: payload.thread_id,
           },
+          type: QueryTypes.SELECT,
         },
       );
 
-      return result as unknown as z.infer<
-        typeof schemas.GetThreadTokenHolders.output
-      >;
+      return Array.isArray(result) ? result : [result];
     },
   };
 }
