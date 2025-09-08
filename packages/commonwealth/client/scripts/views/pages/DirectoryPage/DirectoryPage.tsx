@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import app from 'state';
 import {
   useGetCommunityByIdQuery,
@@ -146,15 +146,21 @@ const DirectoryPage = () => {
     [],
   );
 
+  const initialDataLoaded = useRef(false);
+
   useEffect(() => {
-    if (isLoadingTagsAndCommunities) {
-      return;
-    }
+    if (initialDataLoaded.current) return;
+    if (isLoadingTagsAndCommunities) return;
+
     if (tagsAndCommunitiesError) {
       console.error(
         'Error loading tags and communities:',
         tagsAndCommunitiesError,
       );
+      return;
+    }
+
+    if (!filteredRelatedCommunitiesData || !tableData) {
       return;
     }
 
@@ -175,24 +181,21 @@ const DirectoryPage = () => {
     setSelectedTags(initialTags);
     setSelectedCommunities(initialCommunities);
 
-    if (filteredRelatedCommunitiesData) {
-      const initialFilteredCommunities = getFilteredCommunities(
-        filteredRelatedCommunitiesData,
-        initialTags,
-        initialCommunities,
-      );
-      setFilteredCommunities(initialFilteredCommunities);
+    const initialFilteredCommunities = getFilteredCommunities(
+      filteredRelatedCommunitiesData,
+      initialTags,
+      initialCommunities,
+    );
+    setFilteredCommunities(initialFilteredCommunities);
 
-      if (tableData) {
-        const newTableData = getFilteredCommunities(
-          tableData,
-          initialTags,
-          initialCommunities,
-        );
+    const newTableData = getFilteredCommunities(
+      tableData,
+      initialTags,
+      initialCommunities,
+    );
+    setFilteredTableData(newTableData);
 
-        setFilteredTableData(newTableData);
-      }
-    }
+    initialDataLoaded.current = true;
   }, [
     communityTagsAndCommunities,
     isLoadingTagsAndCommunities,

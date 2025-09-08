@@ -18,6 +18,7 @@ import {
   getEthChainIdOrBech32Prefix,
   SessionKeyError,
 } from 'controllers/server/sessions';
+import { isRateLimitError, RATE_LIMIT_MESSAGE } from 'helpers/rateLimit';
 import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import useAppStatus from 'hooks/useAppStatus';
@@ -494,7 +495,11 @@ export const NewThreadForm = forwardRef<
         }
 
         console.error('NewThreadForm: Unhandled error:', err?.message);
-        notifyError(err.message);
+        if (isRateLimitError(err)) {
+          notifyError(RATE_LIMIT_MESSAGE);
+        } else {
+          notifyError(err.message);
+        }
 
         // Reset turnstile if there's an error
         resetTurnstile();
@@ -933,7 +938,11 @@ export const NewThreadForm = forwardRef<
           navigate(`/discussion/${thread.id}`);
         } catch (error) {
           console.error('Error creating thread:', error);
-          notifyError('Failed to create thread');
+          if (isRateLimitError(error)) {
+            notifyError(RATE_LIMIT_MESSAGE);
+          } else {
+            notifyError('Failed to create thread');
+          }
         } finally {
           setIsSaving(false);
         }
