@@ -58,7 +58,7 @@ export function GetLaunchpadTrades(): Query<typeof schemas.GetLaunchpadTrades> {
             ORDER BY address, id
           ) a ON true
           LEFT JOIN
-            "Users" u ON u.id = a.user_id ${''}
+            "Users" u ON u.id = a.user_id
           ${whereClauseCondition}
         `,
         {
