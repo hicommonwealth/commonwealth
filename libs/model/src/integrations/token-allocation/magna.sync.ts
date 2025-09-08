@@ -1,7 +1,7 @@
 import { logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model/db';
 import { delay } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
+import { models } from '../../database';
 
 const log = logger(import.meta);
 
