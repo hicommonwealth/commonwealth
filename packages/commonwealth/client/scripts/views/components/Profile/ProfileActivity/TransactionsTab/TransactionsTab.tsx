@@ -95,7 +95,7 @@ const transformLaunchpadTradeData = (
       transaction_hash: trade.transaction_hash,
       community_id: trade.token_address,
     };
-  });
+  }) as unknown as TransactionHistoryItem[];
 };
 
 const TransactionsTab = ({
