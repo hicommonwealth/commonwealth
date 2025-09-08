@@ -26,7 +26,11 @@ async function callMagnaApi<Body, Response>(
   const response = await fetch(`${config.MAGNA!.API_URL}/${path}`, request);
   const json = await response.json();
 
-  log.info(`${method} /${path}`, { body, response: JSON.stringify(json) });
+  log.info(`${method} /${path}`, {
+    status: response.status,
+    body,
+    response: JSON.stringify(json),
+  });
 
   return json;
 }
