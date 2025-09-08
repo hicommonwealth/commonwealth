@@ -1,6 +1,7 @@
 import * as schemas from '@hicommonwealth/schemas';
-import Sequelize from 'sequelize';
+import Sequelize, { Transaction } from 'sequelize';
 import { z } from 'zod';
+import { models } from '../database';
 import type { ModelInstance } from './types';
 
 export type QuestAttributes = z.infer<typeof schemas.Quest>;
@@ -95,3 +96,20 @@ export const QuestActionMeta = (
       tableName: 'QuestActionMetas',
     },
   );
+
+export async function createQuestMaterializedView(
+  quest_id: number,
+  transaction: Transaction,
+) {
+  await models.sequelize.query(
+    `
+    SELECT create_quest_xp_leaderboard(:quest_id, 3);
+  `,
+    {
+      transaction,
+      replacements: {
+        quest_id,
+      },
+    },
+  );
+}

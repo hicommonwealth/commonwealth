@@ -3,8 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { isSuperAdmin } from '../../middleware';
 import { mustBeValidDateRange, mustNotExist } from '../../middleware/guards';
-import { QuestInstance } from '../../models/quest';
-import { createQuestMaterializedView } from '../../utils';
+import { createQuestMaterializedView, QuestInstance } from '../../models/quest';
 
 export function CreateQuest(): Command<typeof schemas.CreateQuest> {
   return {

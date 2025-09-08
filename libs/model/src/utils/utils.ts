@@ -8,11 +8,10 @@ import {
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { createHash } from 'crypto';
 import { hasher } from 'node-object-hash';
-import { QueryTypes, Sequelize, Transaction } from 'sequelize';
+import { QueryTypes, Sequelize } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config';
 
-import { models } from '../database';
 import { parseFarcasterContentUrl } from './farcasterUtils';
 
 const log = logger(import.meta);
@@ -277,21 +276,4 @@ export async function tweetExists(tweetId: string) {
 
 export function getQuestXpLeaderboardViewName(quest_id: number) {
   return `quest_${quest_id}_xp_leaderboard`;
-}
-
-export async function createQuestMaterializedView(
-  quest_id: number,
-  transaction: Transaction,
-) {
-  await models.sequelize.query(
-    `
-    SELECT create_quest_xp_leaderboard(:quest_id, 3);
-  `,
-    {
-      transaction,
-      replacements: {
-        quest_id,
-      },
-    },
-  );
 }
