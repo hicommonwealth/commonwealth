@@ -2,6 +2,7 @@ import { CompletionModel, ContentType } from '@hicommonwealth/shared';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { notifyError } from 'controllers/app/notifications';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useMentionExtractor } from 'hooks/useMentionExtractor';
 import { Thread } from 'models/Thread';
 import type { Topic } from 'models/Topic';
 import React, {
@@ -37,6 +38,7 @@ import {
   createDeltaFromText,
   ReactQuillEditor,
 } from 'views/components/react_quill_editor';
+import { MentionEntityType } from 'views/components/react_quill_editor/mention-config';
 import { useTurnstile } from 'views/components/useTurnstile';
 import {
   handleIconClick,
@@ -79,6 +81,7 @@ const StickyInput = (props: StickyInputProps) => {
   const { menuVisible } = useSidebarStore();
   const { mode, setIsExpanded, isExpanded } = useContext(StickCommentContext);
   const { isAIEnabled } = useAIFeatureEnabled();
+  const { extractMentionsFromDelta } = useMentionExtractor();
   const {
     aiCommentsToggleEnabled,
     setAICommentsToggleEnabled,
@@ -258,6 +261,12 @@ const StickyInput = (props: StickyInputProps) => {
         throw new Error('Invalid comment ID');
       }
 
+      // Check for MCP mentions in the comment content before resetting
+      const mentions = extractMentionsFromDelta(contentDelta);
+      const hasMCPMentions = mentions.some(
+        (mention) => mention.type === MentionEntityType.MCP_SERVER,
+      );
+
       // Also reset the editor content since it's separate from the store
       setContentDelta(createDeltaFromText(''));
 
@@ -265,12 +274,16 @@ const StickyInput = (props: StickyInputProps) => {
         resetTurnstile();
       }
 
-      if (effectiveAiCommentsToggleEnabled) {
+      // Automatically trigger AI reply if MCP mentions are detected, regardless of AI toggle state
+      if (effectiveAiCommentsToggleEnabled || hasMCPMentions) {
         handleAiReply(commentId);
       }
 
       try {
-        await listenForComment(commentId, !!effectiveAiCommentsToggleEnabled);
+        await listenForComment(
+          commentId,
+          !!(effectiveAiCommentsToggleEnabled || hasMCPMentions),
+        );
       } catch (error) {
         console.warn('StickyInput - Failed to jump to comment:', error);
       }
@@ -292,6 +305,8 @@ const StickyInput = (props: StickyInputProps) => {
     stickyCommentReset,
     isTurnstileEnabled,
     resetTurnstile,
+    extractMentionsFromDelta,
+    contentDelta,
   ]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

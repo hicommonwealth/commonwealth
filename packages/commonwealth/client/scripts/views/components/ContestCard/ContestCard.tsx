@@ -5,6 +5,7 @@ import React from 'react';
 import { buildContestPrizes } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
+import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useRerender from 'hooks/useRerender';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
@@ -35,7 +36,7 @@ import ContestAlert from './ContestAlert';
 import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
 import { useFlag } from 'hooks/useFlag';
 import { smartTrim } from 'shared/utils';
-import FractionalValue from 'views/components/FractionalValue';
+import { PrizeDisplay } from 'views/components/PrizeDisplay';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 
 import './ContestCard.scss';
@@ -139,6 +140,12 @@ const ContestCard = ({
     payoutStructure,
     decimals,
   );
+
+  const { data: tokenUsdRateData } = useFetchTokenUsdRateQuery({
+    tokenSymbol: ticker || 'ETH',
+    enabled: !!ticker,
+  });
+  const tokenUsdRate = parseFloat(tokenUsdRateData?.data?.data?.amount || '0');
 
   const handleCancel = () => {
     cancelContest({
@@ -273,6 +280,8 @@ const ContestCard = ({
       className={clsx('ContestCard', {
         isHorizontal: isHorizontal && !isWindowMediumSmallInclusive,
       })}
+      elevation="elevation-1"
+      interactive
     >
       {imageUrl && (
         <div className="contest-image-container">
@@ -365,20 +374,22 @@ const ContestCard = ({
               </CWText>
               <div className="prizes">
                 {prizes && prizes.length > 0 ? (
-                  prizes?.map((prize, index) => (
-                    <div className="prize-row" key={index}>
-                      <CWText className="label">
-                        {moment.localeData().ordinal(index + 1)} Prize
-                      </CWText>
-                      <CWText fontWeight="bold">
-                        <FractionalValue
-                          fontWeight="bold"
-                          value={Number(prize.replace(/,/g, ''))}
-                        />
-                        &nbsp;{ticker}
-                      </CWText>
-                    </div>
-                  ))
+                  prizes?.map((prize, index) => {
+                    const prizeTokenValue = Number(prize.replace(/,/g, ''));
+                    const prizeUsdValue = tokenUsdRate
+                      ? prizeTokenValue * tokenUsdRate
+                      : null;
+                    return (
+                      <PrizeDisplay
+                        key={index}
+                        tokenAmount={prizeTokenValue}
+                        tokenSymbol={ticker || 'ETH'}
+                        usdAmount={prizeUsdValue}
+                        position={index + 1}
+                        currencySymbol="$"
+                      />
+                    );
+                  })
                 ) : (
                   <CWText>No prizes available</CWText>
                 )}

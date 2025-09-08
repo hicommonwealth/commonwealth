@@ -197,7 +197,9 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             resizing,
           )}
         >
-          <SublayoutBanners banner={banner || ''} terms={terms || ''} />
+          {isInsideCommunity && (
+            <SublayoutBanners banner={banner || ''} terms={terms || ''} />
+          )}
 
           <div className="Body">
             <div

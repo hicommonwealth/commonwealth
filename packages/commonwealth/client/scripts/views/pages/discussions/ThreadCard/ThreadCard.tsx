@@ -449,6 +449,7 @@ export const ThreadCard = ({
                     )
                   }
                   tokenNumDecimals={thread.topic?.token_decimals || undefined}
+                  tokenSymbol={thread.topic?.token_symbol || undefined}
                 />
               </Link>
             ))}
