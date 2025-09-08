@@ -6,6 +6,24 @@ export default {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.sequelize.query(
         `
+        DROP MATERIALIZED VIEW user_leaderboard;
+      
+        CREATE MATERIALIZED VIEW user_leaderboard AS
+        SELECT 
+            id as user_id,
+            total_xp as xp_points,
+            tier,
+            (ROW_NUMBER() OVER (ORDER BY total_xp DESC, id ASC))::int as rank
+        FROM "Users" WHERE tier > 3;
+        
+        CREATE UNIQUE INDEX user_leaderboard_user_id_idx ON public.user_leaderboard (user_id);
+        CREATE INDEX user_leaderboard_rank_idx ON public.user_leaderboard (rank);
+      `,
+        { transaction },
+      );
+
+      await queryInterface.sequelize.query(
+        `
       CREATE OR REPLACE FUNCTION create_quest_xp_leaderboard(quest_id_param INTEGER, tier_param INTEGER)
           RETURNS VOID
           LANGUAGE plpgsql
