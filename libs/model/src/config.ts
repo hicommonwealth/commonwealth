@@ -103,6 +103,7 @@ const {
   SEND_EMAILS,
   MCP_BOT_EMAIL,
   IGNORE_CONTENT_CREATION_LIMIT,
+  AI_BOT_USER_ADDRESS,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -243,6 +244,9 @@ export const config = configure(
       ORGANIZATION: OPENAI_ORGANIZATION || 'org-D0ty00TJDApqHYlrn1gge2Ql',
       USE_OPENROUTER: process.env.USE_OPENROUTER || 'false',
       OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+    },
+    AI: {
+      BOT_USER_ADDRESS: AI_BOT_USER_ADDRESS || undefined,
     },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
@@ -582,6 +586,9 @@ export const config = configure(
       ORGANIZATION: z.string().optional(),
       USE_OPENROUTER: z.string().optional(),
       OPENROUTER_API_KEY: z.string().optional(),
+    }),
+    AI: z.object({
+      BOT_USER_ADDRESS: z.string().optional(),
     }),
     BOT: z.object({
       CONTEST_BOT_NAMESPACE: z

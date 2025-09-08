@@ -4,7 +4,7 @@
 export default {
   async up(queryInterface) {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      // Create Quest -6
+      // Create Quest -7 (System Quest 7) - copy of quest -5 "Welcome to Common"
       await queryInterface.sequelize.query(
         `
         INSERT INTO "Quests" (
@@ -21,15 +21,15 @@ export default {
           "updated_at"
         )
         VALUES (
-          -6,                                     -- id
-          'Bonus: Sign Up with Gate Wallet',      -- name
-          'This is a bonus powered by Gate for initial sign up with Gate wallet. Visit Gate to explore more onchain: https://www.gate.io', -- description
+          -7,                                     -- id
+          'Welcome to Common',                    -- name (same as quest -5)
+          'Onboard to Common and gain XP',       -- description (same as quest -5)
           'common',                               -- quest_type
-          'https://assets.commonwealth.im/gate-wallet-quest.png', -- image_url
-          now(),                                  -- start_date
-          '2100-01-01 00:00:00+00',               -- end_date
+          'https://assets.commonwealth.im/fab3f073-9bf1-4ac3-8625-8b2ee258b5a8.png', -- image_url (same as quest -5)
+          now(),                                  -- start_date (now)
+          now() + interval '4 months',            -- end_date (4 months from now)
           0,                                      -- xp_awarded
-          2000000,                                -- max_xp_to_end
+          2000000,                                -- max_xp_to_end (same as quest -5)
           now(),                                  -- created_at
           now()                                   -- updated_at
         );
@@ -37,15 +37,14 @@ export default {
         { transaction },
       );
 
-      // Create Action Metas for Quest -6
+      // Create Action Metas for Quest -7 (same as quest -5 but with new IDs)
       await queryInterface.sequelize.query(
         `
-        -- Action Meta -15: SignUpFlowCompleted (0 XP)
+        -- Action Meta: SignUpFlowCompleted (equivalent to ID -11 from quest -5)
         INSERT INTO "QuestActionMetas" (
           "id",
           "quest_id",
           "event_name",
-          "content_id",
           "reward_amount",
           "creator_reward_weight",
           "participation_limit",
@@ -53,23 +52,43 @@ export default {
           "updated_at"
         )
         VALUES (
-          -15,                    -- id
-          -6,                     -- quest_id
+          -17,                    -- id (new, starting at -17)
+          -7,                     -- quest_id
           'SignUpFlowCompleted',  -- event_name
-          NULL,                   -- content_id
-          0,                      -- reward_amount
+          10,                     -- reward_amount (same as quest -5)
+          0.2,                    -- creator_reward_weight (same as quest -5)
+          'once_per_quest',       -- participation_limit
+          now(),                  -- created_at
+          now()                   -- updated_at
+        );
+
+        -- Action Meta: WalletLinked (equivalent to ID -12 from quest -5)
+        INSERT INTO "QuestActionMetas" (
+          "id",
+          "quest_id",
+          "event_name",
+          "reward_amount",
+          "creator_reward_weight",
+          "participation_limit",
+          "created_at",
+          "updated_at"
+        )
+        VALUES (
+          -18,                    -- id (new, continuing sequence from -17)
+          -7,                     -- quest_id
+          'WalletLinked',         -- event_name
+          5,                      -- reward_amount (same as quest -5)
           0,                      -- creator_reward_weight
           'once_per_quest',       -- participation_limit
           now(),                  -- created_at
           now()                   -- updated_at
         );
 
-        -- Action Meta -16: WalletLinked with Gate Wallet (10 XP)
+        -- Action Meta: SSOLinked (equivalent to ID -13 from quest -5)
         INSERT INTO "QuestActionMetas" (
           "id",
           "quest_id",
           "event_name",
-          "content_id",
           "reward_amount",
           "creator_reward_weight",
           "participation_limit",
@@ -77,13 +96,36 @@ export default {
           "updated_at"
         )
         VALUES (
-          -16,                    -- id
-          -6,                     -- quest_id
-          'WalletLinked',         -- event_name
-          'wallet:gate',          -- content_id
-          10,                     -- reward_amount
+          -19,                    -- id (new, continuing sequence from -18)
+          -7,                     -- quest_id
+          'SSOLinked',            -- event_name
+          5,                      -- reward_amount (same as quest -5)
           0,                      -- creator_reward_weight
           'once_per_quest',       -- participation_limit
+          now(),                  -- created_at
+          now()                   -- updated_at
+        );
+
+        -- Action Meta: XpAwarded for manual awards (equivalent to ID -14 from quest -5)
+        INSERT INTO "QuestActionMetas" (
+          "id",
+          "quest_id",
+          "event_name",
+          "reward_amount",
+          "creator_reward_weight",
+          "participation_limit",
+          "participation_period",
+          "created_at",
+          "updated_at"
+        )
+        VALUES (
+          -20,                    -- id (new, continuing sequence from -19)
+          -7,                     -- quest_id
+          'XpAwarded',            -- event_name
+          0,                      -- reward_amount
+          0,                      -- creator_reward_weight
+          'once_per_period',      -- participation_limit
+          'daily',                -- participation_period
           now(),                  -- created_at
           now()                   -- updated_at
         );
@@ -91,7 +133,7 @@ export default {
         { transaction },
       );
 
-      const quest_id = -6;
+      const quest_id = -7;
       const viewName = `quest_${quest_id}_xp_leaderboard`;
       await queryInterface.sequelize.query(
         `
@@ -156,10 +198,16 @@ export default {
 
   async down(queryInterface) {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      const quest_id = -7;
+      const viewName = `quest_${quest_id}_xp_leaderboard`;
+      await queryInterface.sequelize.query(
+        `DROP MATERIALIZED VIEW IF EXISTS "${viewName}";`,
+        { transaction },
+      );
       await queryInterface.sequelize.query(
         `
-        DELETE FROM "QuestActionMetas" WHERE "id" IN (-15, -16);
-        DELETE FROM "Quests" WHERE "id" = -6;
+        DELETE FROM "QuestActionMetas" WHERE "quest_id" = -7;
+        DELETE FROM "Quests" WHERE "id" = -7;
         `,
         { transaction },
       );

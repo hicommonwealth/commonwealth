@@ -3,15 +3,15 @@ import { trpc } from 'utils/trpcClient';
 const FETCH_TOKENS_STALE_TIME = 60 * 3_000; // 3 mins
 
 type UseGetLaunchpadTradesProps = {
-  trader_addresses: string[];
+  user_id: number;
 };
 
 const useGetLaunchpadTradesQuery = ({
-  trader_addresses,
+  user_id,
 }: UseGetLaunchpadTradesProps) => {
   return trpc.launchpadToken.getLaunchpadTrades.useQuery(
     {
-      trader_addresses: trader_addresses.join(','),
+      user_id,
     },
     {
       gcTime: FETCH_TOKENS_STALE_TIME,
