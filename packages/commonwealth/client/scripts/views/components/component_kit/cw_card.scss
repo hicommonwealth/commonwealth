@@ -16,9 +16,14 @@ $default-card-height: 100px;
   min-height: $default-card-height;
   padding: 16px;
   width: $default-card-width;
+  transition: box-shadow 0.2s;
 
   &.interactive {
     cursor: pointer;
+
+    &:hover {
+      box-shadow: elevation.$elevation-1;
+    }
   }
 
   &.fullWidth {
@@ -63,9 +68,4 @@ $default-card-height: 100px;
     box-shadow: elevation.$elevation-5;
   }
 
-  &.interactive {
-    &:hover {
-      box-shadow: elevation.$elevation-1;
-    }
-  }
 }

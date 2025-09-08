@@ -155,7 +155,7 @@ export const SubSectionGroup = (props: SectionGroupAttrs) => {
 // eslint-disable-next-line react/no-multi-comp
 export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
   const {
-    displayData,
+    displayData = [],
     extraComponents,
     hasDefaultToggle,
     onClick,
@@ -213,17 +213,18 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
         onClick={(e) => clickHandler(e, title)}
       >
         {carat}
-        <CWText>{title}</CWText>
+        <CWText type="caption" fontWeight="medium" className="status-text">
+          {title}
+        </CWText>
       </div>
       {toggled && (
         <div className="sections-container">
-          {/* @ts-expect-error StrictNullChecks*/}
           {displayData.map((sectionGroup, i) => (
             <SubSectionGroup {...sectionGroup} key={i} />
           ))}
+          {extraComponents}
         </div>
       )}
-      {extraComponents}
     </div>
   );
 };

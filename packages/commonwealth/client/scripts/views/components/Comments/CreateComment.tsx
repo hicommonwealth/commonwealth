@@ -2,6 +2,7 @@ import { ContentType } from '@hicommonwealth/shared';
 import { buildCreateCommentInput } from 'client/scripts/state/api/comments/createComment';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
+import { isRateLimitError, RATE_LIMIT_MESSAGE } from 'helpers/rateLimit';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
 import { useMentionExtractor } from 'hooks/useMentionExtractor';
@@ -155,7 +156,11 @@ export const CreateComment = ({
       const errMsg = err?.responseJSON?.error || err?.message;
       console.error('CreateComment - Error:', errMsg);
 
-      notifyError('Failed to create comment');
+      if (isRateLimitError(err)) {
+        notifyError(RATE_LIMIT_MESSAGE);
+      } else {
+        notifyError('Failed to create comment');
+      }
       setErrorMsg(errMsg);
       throw err;
     } finally {
