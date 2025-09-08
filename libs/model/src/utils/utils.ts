@@ -273,7 +273,3 @@ export async function tweetExists(tweetId: string) {
 
   return true;
 }
-
-export function getQuestXpLeaderboardViewName(quest_id: number) {
-  return `quest_${quest_id}_xp_leaderboard`;
-}

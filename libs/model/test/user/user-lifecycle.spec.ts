@@ -31,11 +31,13 @@ import {
   Xp,
 } from '../../src/aggregates/user';
 import { models } from '../../src/database';
-import { createQuestMaterializedView } from '../../src/models/quest';
 import * as tokenBalanceCache from '../../src/services/tokenBalanceCache';
 import { seed } from '../../src/tester';
 import * as utils from '../../src/utils';
-import { getQuestXpLeaderboardViewName } from '../../src/utils';
+import {
+  createQuestMaterializedView,
+  getQuestXpLeaderboardViewName,
+} from '../../src/utils/quests';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
 import { createSIWESigner, signIn } from '../utils/sign-in';
