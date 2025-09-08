@@ -1,8 +1,8 @@
 import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
+import MagicWebWalletController from 'controllers/app/webWallets/MagicWebWallet';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 import { userStore } from 'state/ui/user';
-import { getMagicForChain } from 'utils/magicNetworkUtils';
 import { fetchNodes } from '../nodes';
 import { resetBalancesCache } from './helpers/resetBalancesCache';
 
@@ -31,15 +31,12 @@ const sellToken = async ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let magicProvider: any = null;
   if (isMagicAddress) {
-    const node = await fetchNodes();
-    const chainNode = node.find((n) => n.ethChainId === ethChainId);
-    const magic = getMagicForChain(ethChainId, chainNode);
-    if (magic) {
-      magicProvider = magic.rpcProvider;
-    } else {
-      // Handle error appropriately - maybe throw or notify
-      throw new Error('Could not initialize Magic for transaction.');
-    }
+    // Ensure nodes are fetched (kept for side effects if needed)
+    await fetchNodes();
+
+    const controller = new MagicWebWalletController();
+    await controller.enable(`${ethChainId}`);
+    magicProvider = controller.provider as unknown as any;
   }
 
   const launchPad = new LaunchpadBondingCurve(
