@@ -29,6 +29,8 @@
     "create-peer-id": "tsx scripts/create-peer-id.ts",
     "db-doc": "chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/Database-ERD.md",
     "delete-all-local-contests": "tsx ./scripts/delete-all-local-contests.ts",
+    "dlq-analyze": "node --import=extensionless/register build/scripts/dlq-analyze.js",
+    "dlq-replay": "node --import=extensionless/register build/scripts/dlq-replay.js",
     "delete-user": "chmod u+x scripts/delete-user.sh && ./scripts/delete-user.sh",
     "e2e-start-server": "pnpm bootstrap-test-db && NODE_ENV=test ETH_RPC=e2e-test pnpm start",
     "emit-event": "chmod u+x scripts/emit-event.sh && ./scripts/emit-event.sh",

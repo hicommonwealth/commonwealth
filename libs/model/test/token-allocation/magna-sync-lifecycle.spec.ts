@@ -1,9 +1,9 @@
 import { dispose } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model/db';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { Op } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { models } from '../../src/database';
 import { magnaSync } from '../../src/integrations/token-allocation/magna.sync';
 import { CommunitySeedResult, seedCommunity } from '../utils';
 
