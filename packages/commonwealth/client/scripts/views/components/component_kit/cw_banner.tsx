@@ -45,7 +45,11 @@ export const CWMessageBanner = ({
         ComponentType.MessageBanner,
       )}
     >
-      <QuillRenderer doc={bannerContent as string} hideFormatting />
+      {typeof bannerContent === 'string' ? (
+        <QuillRenderer doc={bannerContent as string} hideFormatting />
+      ) : (
+        bannerContent
+      )}
       {onClose && (
         <CWIconButton
           iconName="close"
