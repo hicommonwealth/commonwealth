@@ -49,6 +49,7 @@ const {
   MAGNA_UNLOCK_START_AT,
   MAGNA_BATCH_SIZE,
   RAILWAY_PUBLIC_DOMAIN,
+  SLACK_WEBHOOK_URL_ALL_ENG,
 } = process.env;
 
 const DEFAULTS = {
@@ -193,6 +194,11 @@ export const config = configure(
           ),
         }
       : undefined,
+    SLACK: {
+      CHANNELS: {
+        ALL_ENG: SLACK_WEBHOOK_URL_ALL_ENG,
+      },
+    },
   },
   z.object({
     DISABLE_SITEMAP: z.boolean(),
@@ -353,5 +359,10 @@ export const config = configure(
         BATCH_SIZE: z.number(),
       })
       .optional(),
+    SLACK: z.object({
+      CHANNELS: z.object({
+        ALL_ENG: z.url().optional(),
+      }),
+    }),
   }),
 );

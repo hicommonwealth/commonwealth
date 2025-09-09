@@ -1,10 +1,10 @@
 import { Command } from '@hicommonwealth/core';
-import { getQuestXpLeaderboardViewName } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { isSuperAdmin } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
 import { removeJob } from '../../services';
+import { getQuestXpLeaderboardViewName } from '../../utils';
 
 export function DeleteQuest(): Command<typeof schemas.DeleteQuest> {
   return {
