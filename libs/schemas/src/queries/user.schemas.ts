@@ -2,6 +2,7 @@ import { ChainBase, Roles, WalletId } from '@hicommonwealth/shared';
 import { ZodType, z } from 'zod';
 import { AuthContext, VerifiedContext } from '../context';
 import { ReferralFees, User } from '../entities';
+import { COMMUNITY_TIER } from '../entities/community.schemas';
 import { Tags } from '../entities/tag.schemas';
 import { USER_TIER, UserProfile } from '../entities/user.schemas';
 import { XpLog } from '../entities/xp.schemas';
@@ -288,6 +289,7 @@ export const MutualCommunityView = z.object({
   name: z.string(),
   base: z.enum(ChainBase),
   icon_url: z.string().nullish(),
+  tier: COMMUNITY_TIER,
 });
 
 export const GetMutualConnections = {

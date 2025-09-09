@@ -363,3 +363,13 @@ export function bumpCommunityTier(
     object.tier = tier;
   }
 }
+
+export const TierRateLimitErrors = {
+  CREATES: 'Exceeded content creation limit',
+  UPVOTES: 'Exceeded upvote limit',
+  AI_IMAGES: 'Exceeded ai image creation limit',
+  AI_TEXT: 'Exceeded ai text creation limit',
+} as const;
+
+export type TierRateLimitErrorMessage =
+  (typeof TierRateLimitErrors)[keyof typeof TierRateLimitErrors];

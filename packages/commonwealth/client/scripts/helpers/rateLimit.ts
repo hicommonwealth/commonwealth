@@ -1,3 +1,8 @@
+import {
+  TierRateLimitErrorMessage,
+  TierRateLimitErrors,
+} from '@hicommonwealth/shared';
+
 export const RATE_LIMIT_MESSAGE =
   'You are being rate limited. Please wait and try again.';
 
@@ -17,5 +22,11 @@ export const isRateLimitError = (err: RateLimitErrorType) => {
   const lowerMsg = String(msg).toLowerCase();
   return (
     lowerMsg.includes('rate limit') || lowerMsg.includes('too many requests')
+  );
+};
+
+export const isTierRateLimitError = (err: Error): boolean => {
+  return Object.values(TierRateLimitErrors).includes(
+    err.message as TierRateLimitErrorMessage,
   );
 };
