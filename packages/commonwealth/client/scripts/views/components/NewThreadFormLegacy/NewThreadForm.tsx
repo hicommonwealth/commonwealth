@@ -5,6 +5,7 @@ import {
   DisabledCommunitySpamTier,
   GatedActionEnum,
   LinkSource,
+  TierRateLimitErrors,
 } from '@hicommonwealth/shared';
 import {
   SnapshotProposal,
@@ -18,8 +19,8 @@ import {
   getEthChainIdOrBech32Prefix,
   SessionKeyError,
 } from 'controllers/server/sessions';
-import { isRateLimitError, RATE_LIMIT_MESSAGE } from 'helpers/rateLimit';
 import { weightedVotingValueToLabel } from 'helpers';
+import { isRateLimitError, RATE_LIMIT_MESSAGE } from 'helpers/rateLimit';
 import { detectURL } from 'helpers/threads';
 import useAppStatus from 'hooks/useAppStatus';
 import { useFlag } from 'hooks/useFlag';
@@ -477,7 +478,7 @@ export const NewThreadForm = forwardRef<
           resetTurnstile();
         }
 
-        if (err?.message?.includes('Exceeded content creation limit')) {
+        if (err?.message?.includes(TierRateLimitErrors.CREATES)) {
           console.log('NewThreadForm: Content creation limit exceeded');
           notifyError(
             'Exceeded content creation limit. Please try again later based on your trust level.',

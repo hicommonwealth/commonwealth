@@ -6,6 +6,7 @@ import {
 } from '@hicommonwealth/core';
 import {
   hasTierRateLimits,
+  TierRateLimitErrors,
   USER_TIERS,
   UserTierMap,
 } from '@hicommonwealth/shared';
@@ -99,22 +100,22 @@ export function tiered({
         !config.IGNORE_CONTENT_CREATION_LIMIT &&
         last_creates >= tierLimitsPerHour.create
       )
-        throw new InvalidActor(actor, 'Exceeded content creation limit');
+        throw new InvalidActor(actor, TierRateLimitErrors.CREATES);
     }
     if (upvotes) {
       const last_upvotes = await getUserCount(user.id, 'upvotes');
       if (last_upvotes >= tierLimitsPerHour.upvote)
-        throw new InvalidActor(actor, 'Exceeded upvote limit');
+        throw new InvalidActor(actor, TierRateLimitErrors.UPVOTES);
     }
     if (ai.images) {
       const last_ai_images = await getUserCount(user.id, 'ai-images');
       if (last_ai_images >= tierLimitsPerHour.ai.images)
-        throw new InvalidActor(actor, 'Exceeded ai image creation limit');
+        throw new InvalidActor(actor, TierRateLimitErrors.AI_IMAGES);
     }
     if (ai.text) {
       const last_ai_text = await getUserCount(user.id, 'ai-text');
       if (last_ai_text >= tierLimitsPerHour.ai.text)
-        throw new InvalidActor(actor, 'Exceeded ai text creation limit');
+        throw new InvalidActor(actor, TierRateLimitErrors.AI_TEXT);
     }
   };
 }
