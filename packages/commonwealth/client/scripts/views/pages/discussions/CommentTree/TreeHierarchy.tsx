@@ -1,8 +1,8 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
+  DEFAULT_AI_ASSISTANT_NAME,
   DEFAULT_COMPLETION_MODEL,
   DEFAULT_COMPLETION_MODEL_LABEL,
-  DEFAULT_AI_ASSISTANT_NAME,
   MAX_COMMENT_DEPTH,
 } from '@hicommonwealth/shared';
 import {
