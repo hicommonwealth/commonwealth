@@ -32,7 +32,7 @@ interface NFTOwnership {
   quantity: number;
 }
 
-interface NFTTrait {
+export interface NFTTrait {
   trait_type: string;
   display_type: string | null;
   max_value: string | null;
@@ -84,13 +84,14 @@ async function createNFTCollectionTable(): Promise<void> {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS nft_collection_data
     (
-      id             SERIAL PRIMARY KEY,
-      token_id       VARCHAR(255) NOT NULL,
+      token_id       INTEGER NOT NULL PRIMARY KEY,
       name           VARCHAR(500),
       holder_address VARCHAR(42)  NOT NULL,
       opensea_url    TEXT,
-      traits         JSONB,
-      rarity         JSONB,
+      traits         JSONB NOT NULL,
+      opensea_rarity         JSONB,
+      calculated_rarity INTEGER,
+      rarity_tier INTEGER,
       created_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
       updated_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     );
@@ -108,26 +109,20 @@ async function createNFTCollectionTable(): Promise<void> {
 // Get already processed token IDs
 async function getProcessedTokenIds(): Promise<Set<string>> {
   console.log('Checking for already processed token IDs...');
+  const rows = await models.sequelize.query<{ token_id: string }>(
+    `SELECT DISTINCT token_id FROM nft_collection_data`,
+    {
+      type: QueryTypes.SELECT,
+    },
+  );
 
-  try {
-    const rows = await models.sequelize.query<{ token_id: string }>(
-      `SELECT DISTINCT token_id FROM nft_collection_data`,
-      {
-        type: QueryTypes.SELECT,
-      },
-    );
+  const processedIds = new Set<string>();
+  rows.forEach((row) => {
+    processedIds.add(row.token_id);
+  });
 
-    const processedIds = new Set<string>();
-    rows.forEach((row) => {
-      processedIds.add(row.token_id);
-    });
-
-    console.log(`Found ${processedIds.size} already processed tokens`);
-    return processedIds;
-  } catch (error) {
-    console.error('Error fetching processed token IDs:', error);
-    return new Set<string>();
-  }
+  console.log(`Found ${processedIds.size} already processed tokens`);
+  return processedIds;
 }
 
 // Fetch collection assets
@@ -188,25 +183,19 @@ async function fetchNFTDetails(
 ): Promise<NFTDetails | null> {
   const url = `https://api.opensea.io/api/v2/chain/${CHAIN}/contract/${contractAddress}/nfts/${tokenId}`;
 
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'X-API-KEY': OPENSEA_API_KEY!,
-        Accept: 'application/json',
-      },
-    });
+  const response = await fetch(url, {
+    headers: {
+      'X-API-KEY': OPENSEA_API_KEY!,
+      Accept: 'application/json',
+    },
+  });
 
-    if (!response.ok) {
-      console.warn(`Failed to fetch NFT ${tokenId}: ${response.status}`);
-      return null;
-    }
-
-    const data = (await response.json()) as NFTDetails;
-    return data;
-  } catch (error) {
-    console.error(`Error fetching NFT ${tokenId}:`, error);
-    return null;
+  if (!response.ok) {
+    console.warn(`Failed to fetch NFT ${tokenId}: ${response.status}`);
+    throw new Error('Failed to fetch NFT');
   }
+
+  return (await response.json()) as NFTDetails;
 }
 
 // Insert single NFT data into the database immediately after fetch
@@ -231,7 +220,7 @@ async function insertSingleNFTData(
   }
 
   const insertQuery = `
-    INSERT INTO nft_collection_data (token_id, name, holder_address, opensea_url, traits, rarity)
+    INSERT INTO nft_collection_data (token_id, name, holder_address, opensea_url, traits, opensea_rarity)
     VALUES (?, ?, ?, ?, ?::jsonb, ?::jsonb)
   `;
 
@@ -266,76 +255,67 @@ async function insertSingleNFTData(
 
 // Main function
 async function main() {
-  try {
-    console.log('Starting NFT data export...');
+  console.log('Starting NFT data export...');
 
-    // Step 0: Create the database table
-    await createNFTCollectionTable();
+  // Step 0: Create the database table
+  await createNFTCollectionTable();
 
-    // Step 1: Get already processed token IDs
-    const processedTokenIds = await getProcessedTokenIds();
+  // Step 1: Get already processed token IDs
+  const processedTokenIds = await getProcessedTokenIds();
 
-    // Step 2: Fetch all collection assets
-    const assets = await fetchCollectionAssets();
-    console.log(`Found ${assets.length} assets in collection`);
+  // Step 2: Fetch all collection assets
+  const assets = await fetchCollectionAssets();
+  console.log(`Found ${assets.length} assets in collection`);
 
-    if (assets.length === 0) {
-      console.log('No assets found. Please check your collection slug.');
-      return;
-    }
-
-    // Step 3: Filter out already processed assets
-    const unprocessedAssets = assets.filter(
-      (asset) => !processedTokenIds.has(asset.identifier),
-    );
-    console.log(
-      `Found ${unprocessedAssets.length} unprocessed assets (${assets.length - unprocessedAssets.length} already processed)`,
-    );
-
-    if (unprocessedAssets.length === 0) {
-      console.log('All assets have already been processed!');
-      return;
-    }
-
-    // Step 4: Fetch detailed data for each unprocessed NFT and save immediately
-    console.log('Fetching detailed NFT data and saving to database...');
-    let processedCount = 0;
-
-    for (let i = 0; i < unprocessedAssets.length; i++) {
-      const asset = unprocessedAssets[i];
-      console.log(
-        `Processing NFT ${i + 1}/${unprocessedAssets.length}: ${asset.identifier}`,
-      );
-
-      try {
-        const details = await fetchNFTDetails(asset.contract, asset.identifier);
-
-        // Save to database immediately after fetch
-        await insertSingleNFTData(asset, details);
-        processedCount++;
-
-        console.log(
-          `Progress: ${processedCount}/${unprocessedAssets.length} processed`,
-        );
-      } catch (error) {
-        console.error(`Failed to process NFT ${asset.identifier}:`, error);
-        // Continue with next NFT instead of failing the entire process
-      }
-
-      // Rate limiting delay
-      if (i < unprocessedAssets.length - 1) {
-        await delay(DELAY_MS);
-      }
-    }
-
-    console.log(`✅ Processing completed`);
-    console.log(`Total new records processed: ${processedCount}`);
-    console.log(
-      `Total records in database: ${processedTokenIds.size + processedCount}`,
-    );
-  } catch (error) {
-    console.error('Error in main execution:', error);
+  if (assets.length === 0) {
+    console.log('No assets found. Please check your collection slug.');
+    return;
   }
+
+  // Step 3: Filter out already processed assets
+  const unprocessedAssets = assets.filter(
+    (asset) => !processedTokenIds.has(asset.identifier),
+  );
+  console.log(
+    `Found ${unprocessedAssets.length} unprocessed assets (${assets.length - unprocessedAssets.length} already processed)`,
+  );
+
+  if (unprocessedAssets.length === 0) {
+    console.log('All assets have already been processed!');
+    return;
+  }
+
+  // Step 4: Fetch detailed data for each unprocessed NFT and save immediately
+  console.log('Fetching detailed NFT data and saving to database...');
+  let processedCount = 0;
+
+  for (let i = 0; i < unprocessedAssets.length; i++) {
+    const asset = unprocessedAssets[i];
+    console.log(
+      `Processing NFT ${i + 1}/${unprocessedAssets.length}: ${asset.identifier}`,
+    );
+
+    const details = await fetchNFTDetails(asset.contract, asset.identifier);
+
+    // Save to database immediately after fetch
+    await insertSingleNFTData(asset, details);
+    processedCount++;
+
+    console.log(
+      `Progress: ${processedCount}/${unprocessedAssets.length} processed`,
+    );
+
+    // Rate limiting delay
+    if (i < unprocessedAssets.length - 1) {
+      await delay(DELAY_MS);
+    }
+  }
+
+  console.log(`✅ Processing completed`);
+  console.log(`Total new records processed: ${processedCount}`);
+  console.log(
+    `Total records in database: ${processedTokenIds.size + processedCount}`,
+  );
 }
 
 main()
