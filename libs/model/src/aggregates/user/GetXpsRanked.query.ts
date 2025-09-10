@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
-import { getQuestXpLeaderboardViewName } from '../../utils/utils';
+import { getQuestXpLeaderboardViewName } from '../../utils/quests';
 
 type RankedUser = z.infer<typeof schemas.XpRankedUser>;
 

@@ -20,10 +20,16 @@ export type CommentWithAssociatedThread = Comment<IUniqueId> & {
 type ProfileActivityProps = {
   comments: CommentWithAssociatedThread[];
   threads: Thread[];
+  userId: number;
 };
 
-const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
+const ProfileActivity = ({
+  comments,
+  threads,
+  userId,
+}: ProfileActivityProps) => {
   const newProfilePageEnabled = useFlag('newProfilePage');
+  const xpEnabled = useFlag('xp');
 
   const [selectedActivity, setSelectedActivity] = useState(
     ProfileActivityType.Comments,
@@ -60,6 +66,15 @@ const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
             }}
             isSelected={selectedActivity === ProfileActivityType.MyTokens}
           />
+          {xpEnabled && (
+            <CWTab
+              label="Aura"
+              onClick={() => {
+                setSelectedActivity(ProfileActivityType.Aura);
+              }}
+              isSelected={selectedActivity === ProfileActivityType.Aura}
+            />
+          )}
           {newProfilePageEnabled && (
             <CWTab
               label={
@@ -92,6 +107,7 @@ const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
           option={selectedActivity}
           threads={threads}
           comments={comments}
+          userId={userId}
         />
       </div>
     </div>

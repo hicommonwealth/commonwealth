@@ -4,7 +4,7 @@ import { models } from '../../database';
 import { isSuperAdmin } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
 import { removeJob } from '../../services';
-import { getQuestXpLeaderboardViewName } from '../../utils';
+import { getQuestXpLeaderboardViewName } from '../../utils/quests';
 
 export function DeleteQuest(): Command<typeof schemas.DeleteQuest> {
   return {
