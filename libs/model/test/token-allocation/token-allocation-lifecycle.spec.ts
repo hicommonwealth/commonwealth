@@ -27,10 +27,10 @@ describe('Token Allocation Lifecycle', () => {
       claimAllocation: vi.fn().mockResolvedValue({
         isProcessed: true,
         result: {
-          parameters: {
-            instructions: ['claim'],
-            transactionId: '0x1234',
-          },
+          from: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          to: '0xb0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          data: '0x1234',
+          platformFee: null,
         },
       }),
     }));
@@ -118,8 +118,9 @@ describe('Token Allocation Lifecycle', () => {
         payload: { allocation_id },
       });
 
-      expect(result.transaction_id).to.be.a('string');
-      expect(result.instructions).to.be.an('array');
+      expect(result.from).to.be.a('string');
+      expect(result.to).to.be.a('string');
+      expect(result.data).to.be.a('string');
     });
   });
 });
