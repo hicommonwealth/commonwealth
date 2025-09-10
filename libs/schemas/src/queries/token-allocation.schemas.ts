@@ -44,6 +44,7 @@ export const GetAllocation = {
       amount: z.number(),
       funded: z.number(),
       claimable: z.number(),
+      unlock_start_at: z.date().or(z.string()).nullish(),
     })
     .nullish(),
 };

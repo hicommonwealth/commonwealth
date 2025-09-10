@@ -18,6 +18,7 @@ export function GetAllocation(): Query<typeof schemas.GetAllocation> {
           amount: parseFloat(allocation.amount),
           funded: parseFloat(allocation.funded || '0'),
           claimable: parseFloat(allocation.claimable || '0'),
+          unlock_start_at: allocation.unlockStartAt,
         };
       }
       return null;

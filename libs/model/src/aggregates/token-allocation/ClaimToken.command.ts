@@ -57,8 +57,10 @@ export function ClaimToken(): Command<typeof schemas.ClaimToken> {
         );
         return {
           magna_allocation_id: claim.magna_allocation_id,
-          transaction_id: response.result.parameters.transactionId,
-          instructions: response.result.parameters.instructions,
+          from: response.result.from,
+          to: response.result.to,
+          data: response.result.data,
+          platform_fee: response.result.platformFee,
         };
       }
       throw new InvalidState('Claim failed!', response.errors);

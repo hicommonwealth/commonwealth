@@ -16,7 +16,9 @@ export const ClaimToken = {
   }),
   output: z.object({
     magna_allocation_id: z.string(),
-    transaction_id: z.string(),
-    instructions: z.array(z.string()),
+    from: EVM_ADDRESS_STRICT,
+    to: EVM_ADDRESS_STRICT,
+    data: z.string(),
+    platform_fee: z.number().nullish(),
   }),
 };

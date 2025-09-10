@@ -60,10 +60,10 @@ export interface ClaimAllocationRequest {
 }
 
 export interface MagnaClaim {
-  parameters: {
-    instructions: Array<string>;
-    transactionId: string;
-  };
+  from: string;
+  to: string;
+  data: string;
+  platformFee: number | null;
 }
 
 export interface MagnaResponse<T> {
