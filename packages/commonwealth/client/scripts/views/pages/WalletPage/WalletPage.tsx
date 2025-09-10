@@ -169,7 +169,9 @@ const WalletPage = () => {
         {tableTab === TableType.Referrals && (
           <ReferralTable referrals={referrals} isLoading={isReferralsLoading} />
         )}
-        {xpEnabled && tableTab === TableType.XPEarnings && <XPEarningsTable />}
+        {xpEnabled && tableTab === TableType.XPEarnings && (
+          <XPEarningsTable userId={user.id} />
+        )}
       </section>
 
       <AuthModal
