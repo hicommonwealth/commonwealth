@@ -57,8 +57,8 @@ export function ClaimToken(): Command<typeof schemas.ClaimToken> {
         );
         return {
           magna_allocation_id: claim.magna_allocation_id,
-          from: response.result.from,
-          to: response.result.to,
+          from: response.result.from as `0x${string}`,
+          to: response.result.to as `0x${string}`,
           data: response.result.data,
           platform_fee: response.result.platformFee,
         };
