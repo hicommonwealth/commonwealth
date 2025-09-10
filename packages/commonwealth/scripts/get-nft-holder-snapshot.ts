@@ -1,5 +1,6 @@
-import { createObjectCsvWriter } from 'csv-writer';
+import { models } from '@hicommonwealth/model/db';
 import fetch from 'node-fetch';
+import { QueryTypes } from 'sequelize';
 
 // Configuration
 const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY;
@@ -55,17 +56,79 @@ interface NFTDetails {
   };
 }
 
-interface CSVRow {
+interface NFTCollectionRow {
   token_id: string;
   name: string;
   holder_address: string;
   opensea_url: string;
-  traits: string; // JSON string of the entire traits array
-  rarity: string; // JSON string of the entire rarity object
+  traits: NFTTrait[]; // Keep as object for JSONB insertion
+  rarity: {
+    strategy_id: string;
+    strategy_version: string;
+    rank: number;
+    score?: number;
+    calculated_rank?: string | null;
+    max_rank?: number;
+    total_supply?: number;
+    ranking_features?: Record<string, number> | null;
+  }; // Keep as object for JSONB insertion
 }
 
 // Helper function to delay execution
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Create the nft_collection_data table if it doesn't exist
+async function createNFTCollectionTable(): Promise<void> {
+  console.log("Creating nft_collection_data table if it doesn't exist...");
+
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS nft_collection_data
+    (
+      id             SERIAL PRIMARY KEY,
+      token_id       VARCHAR(255) NOT NULL,
+      name           VARCHAR(500),
+      holder_address VARCHAR(42)  NOT NULL,
+      opensea_url    TEXT,
+      traits         JSONB,
+      rarity         JSONB,
+      created_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      updated_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    );
+  `;
+
+  try {
+    await models.sequelize.query(createTableQuery);
+    console.log('✅ nft_collection_data table created/verified successfully');
+  } catch (error) {
+    console.error('Error creating nft_collection_data table:', error);
+    throw error;
+  }
+}
+
+// Get already processed token IDs
+async function getProcessedTokenIds(): Promise<Set<string>> {
+  console.log('Checking for already processed token IDs...');
+
+  try {
+    const rows = await models.sequelize.query<{ token_id: string }>(
+      `SELECT DISTINCT token_id FROM nft_collection_data`,
+      {
+        type: QueryTypes.SELECT,
+      },
+    );
+
+    const processedIds = new Set<string>();
+    rows.forEach((row) => {
+      processedIds.add(row.token_id);
+    });
+
+    console.log(`Found ${processedIds.size} already processed tokens`);
+    return processedIds;
+  } catch (error) {
+    console.error('Error fetching processed token IDs:', error);
+    return new Set<string>();
+  }
+}
 
 // Fetch collection assets
 async function fetchCollectionAssets(): Promise<NFTAsset[]> {
@@ -139,7 +202,6 @@ async function fetchNFTDetails(
     }
 
     const data = (await response.json()) as NFTDetails;
-    console.log('NTF Details: ', data);
     return data;
   } catch (error) {
     console.error(`Error fetching NFT ${tokenId}:`, error);
@@ -147,39 +209,59 @@ async function fetchNFTDetails(
   }
 }
 
-// Convert NFT data to CSV format
-function convertToCSVFormat(
-  assets: NFTAsset[],
-  nftDetailsArray: (NFTDetails | null)[],
-): CSVRow[] {
-  const csvData: CSVRow[] = [];
+// Insert single NFT data into the database immediately after fetch
+async function insertSingleNFTData(
+  asset: NFTAsset,
+  details: NFTDetails | null,
+): Promise<void> {
+  if (!details) return;
 
-  assets.forEach((asset, index) => {
-    const details = nftDetailsArray[index];
+  // Handle multiple owners (create a row for each owner)
+  const owners =
+    details.nft.owners.length > 0
+      ? details.nft.owners
+      : [{ address: 'Unknown', quantity: 1 }];
 
-    if (!details) return;
+  const [owner] = details.nft.owners;
 
-    // Handle multiple owners (create a row for each owner)
-    const owners =
-      details.nft.owners.length > 0
-        ? details.nft.owners
-        : [{ address: 'Unknown', quantity: 1 }];
+  if (!owner) {
+    throw new Error(
+      `Expected 1 owner for NFT ${asset.identifier}, got ${owners.length}`,
+    );
+  }
 
-    owners.forEach((owner) => {
-      const row: CSVRow = {
-        token_id: asset.identifier,
-        name: asset.name || `Token ${asset.identifier}`,
-        holder_address: owner.address,
-        opensea_url: asset.opensea_url,
-        traits: JSON.stringify(details.nft.traits || []),
-        rarity: JSON.stringify(details.nft.rarity || {}),
-      };
+  const insertQuery = `
+    INSERT INTO nft_collection_data (token_id, name, holder_address, opensea_url, traits, rarity)
+    VALUES (?, ?, ?, ?, ?::jsonb, ?::jsonb)
+  `;
 
-      csvData.push(row);
+  try {
+    const queryParams = [
+      asset.identifier,
+      asset.name || `Token ${asset.identifier}`,
+      owner.address,
+      asset.opensea_url,
+      JSON.stringify(details.nft.traits || []),
+      JSON.stringify(
+        details.nft.rarity || {
+          strategy_id: '',
+          strategy_version: '',
+          rank: 0,
+        },
+      ),
+    ];
+
+    await models.sequelize.query(insertQuery, {
+      replacements: queryParams,
     });
-  });
 
-  return csvData;
+    console.log(
+      `✅ Saved NFT ${asset.identifier} with ${owners.length} owner(s)`,
+    );
+  } catch (error) {
+    console.error(`Error inserting NFT ${asset.identifier}:`, error);
+    throw error;
+  }
 }
 
 // Main function
@@ -187,7 +269,13 @@ async function main() {
   try {
     console.log('Starting NFT data export...');
 
-    // Step 1: Fetch all collection assets
+    // Step 0: Create the database table
+    await createNFTCollectionTable();
+
+    // Step 1: Get already processed token IDs
+    const processedTokenIds = await getProcessedTokenIds();
+
+    // Step 2: Fetch all collection assets
     const assets = await fetchCollectionAssets();
     console.log(`Found ${assets.length} assets in collection`);
 
@@ -196,47 +284,55 @@ async function main() {
       return;
     }
 
-    // Step 2: Fetch detailed data for each NFT
-    console.log('Fetching detailed NFT data...');
-    const nftDetailsArray: (NFTDetails | null)[] = [];
+    // Step 3: Filter out already processed assets
+    const unprocessedAssets = assets.filter(
+      (asset) => !processedTokenIds.has(asset.identifier),
+    );
+    console.log(
+      `Found ${unprocessedAssets.length} unprocessed assets (${assets.length - unprocessedAssets.length} already processed)`,
+    );
 
-    for (let i = 0; i < assets.length; i++) {
-      const asset = assets[i];
+    if (unprocessedAssets.length === 0) {
+      console.log('All assets have already been processed!');
+      return;
+    }
+
+    // Step 4: Fetch detailed data for each unprocessed NFT and save immediately
+    console.log('Fetching detailed NFT data and saving to database...');
+    let processedCount = 0;
+
+    for (let i = 0; i < unprocessedAssets.length; i++) {
+      const asset = unprocessedAssets[i];
       console.log(
-        `Fetching details for NFT ${i + 1}/${assets.length}: ${asset.identifier}`,
+        `Processing NFT ${i + 1}/${unprocessedAssets.length}: ${asset.identifier}`,
       );
 
-      const details = await fetchNFTDetails(asset.contract, asset.identifier);
-      nftDetailsArray.push(details);
+      try {
+        const details = await fetchNFTDetails(asset.contract, asset.identifier);
+
+        // Save to database immediately after fetch
+        await insertSingleNFTData(asset, details);
+        processedCount++;
+
+        console.log(
+          `Progress: ${processedCount}/${unprocessedAssets.length} processed`,
+        );
+      } catch (error) {
+        console.error(`Failed to process NFT ${asset.identifier}:`, error);
+        // Continue with next NFT instead of failing the entire process
+      }
 
       // Rate limiting delay
-      if (i < assets.length - 1) {
+      if (i < unprocessedAssets.length - 1) {
         await delay(DELAY_MS);
       }
     }
 
-    // Step 3: Convert to CSV format
-    console.log('Converting data to CSV format...');
-    const csvData = convertToCSVFormat(assets, nftDetailsArray);
-
-    // Step 4: Write to CSV file
-    const headers = [
-      { id: 'token_id', title: 'Token ID' },
-      { id: 'name', title: 'Name' },
-      { id: 'holder_address', title: 'Holder Address' },
-      { id: 'opensea_url', title: 'OpenSea URL' },
-      { id: 'traits', title: 'Traits (JSON)' },
-      { id: 'rarity', title: 'Rarity (JSON)' },
-    ];
-
-    const csvWriter = createObjectCsvWriter({
-      path: `${COLLECTION_SLUG}_nfts.csv`,
-      header: headers,
-    });
-
-    await csvWriter.writeRecords(csvData);
-    console.log(`✅ CSV file created: ${COLLECTION_SLUG}_nfts.csv`);
-    console.log(`Total records: ${csvData.length}`);
+    console.log(`✅ Processing completed`);
+    console.log(`Total new records processed: ${processedCount}`);
+    console.log(
+      `Total records in database: ${processedTokenIds.size + processedCount}`,
+    );
   } catch (error) {
     console.error('Error in main execution:', error);
   }
