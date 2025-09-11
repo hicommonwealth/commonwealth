@@ -1,5 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'client/scripts/helpers';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import {
   useClaimTokenMutation,
@@ -45,6 +46,8 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const [selectedAddress, setSelectedAddress] = useState<
     AddressInfo | undefined
   >(undefined);
+  const claimsEnabled = useFlag('claims');
+  const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
     useGetClaimAddressQuery({ enabled: true });
   const { data: allocation, isLoading: isLoadingAllocation } =
@@ -114,7 +117,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     }
   };
 
-  if (!claimAddress?.tokens || isLoadingClaimAddress) {
+  if (!claimAddress?.tokens || isLoadingClaimAddress || !claimsEnabled) {
     return null;
   }
 
