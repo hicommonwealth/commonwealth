@@ -18,4 +18,8 @@ export const trpcRouter = trpc.router({
     TokenAllocation.ClaimToken,
     trpc.Tag.TokenAllocation,
   ),
+  updateClaimTransactionHash: trpc.command(
+    TokenAllocation.UpdateClaimTransactionHash,
+    trpc.Tag.TokenAllocation,
+  ),
 });

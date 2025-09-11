@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { EVM_ADDRESS_STRICT } from '../utils';
+import { EVM_ADDRESS_STRICT, EVM_TRANSACTION_HASH } from '../utils';
 
 export const UpdateClaimAddress = {
   input: z.object({
@@ -21,4 +21,11 @@ export const ClaimToken = {
     data: z.string(),
     platform_fee: z.number().nullish(),
   }),
+};
+
+export const UpdateClaimTransactionHash = {
+  input: z.object({
+    transaction_hash: EVM_TRANSACTION_HASH,
+  }),
+  output: z.boolean(),
 };

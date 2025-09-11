@@ -7,11 +7,13 @@ import {
   useGetAllocationQuery,
   useGetClaimAddressQuery,
   useUpdateClaimAddressMutation,
+  useUpdateClaimTransactionHashMutation,
 } from 'client/scripts/state/api/tokenAllocations';
 import CWBanner from 'client/scripts/views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
+import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
@@ -59,6 +61,8 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
   const { mutate: claimToken, isPending: isClaiming } = useClaimTokenMutation();
+  const { mutate: updateClaimTransactionHash, isPending: isUpdatingTxHash } =
+    useUpdateClaimTransactionHashMutation();
 
   useEffect(() => {
     const addresses = new Map<string, AddressInfo>();
@@ -227,6 +231,17 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                     </div>
                   </div>
                   {addressFormContent}
+                  <CWCheckbox
+                    checked={isAcknowledged}
+                    onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
+                    label={
+                      <div>
+                        I understand that once incentives are added, there are
+                        non-refundable and can NOT be withdrawn under any
+                        circumstances.
+                      </div>
+                    }
+                  />
                   <div className="banner-actions">
                     {!claimAddress?.magna_synced_at && (
                       <CWButton
@@ -253,6 +268,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                           claimToken({
                             allocation_id: allocation.magna_allocation_id,
                           });
+                          // TODO: @Malik - Open wallet to sign with data from claim and update claim transaction hash after signing
                         }}
                         disabled={isClaiming || isLoadingAllocation}
                         buttonHeight="sm"

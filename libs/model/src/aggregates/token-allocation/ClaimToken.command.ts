@@ -48,11 +48,17 @@ export function ClaimToken(): Command<typeof schemas.ClaimToken> {
         await models.sequelize.query(
           `
           UPDATE "ClaimAddresses"
-          SET magna_claimed_at = NOW()
-          WHERE user_id = :user_id`,
+          SET 
+            magna_claimed_at = NOW(),
+            magna_claim_data = :data
+          WHERE
+            user_id = :user_id`,
           {
             type: QueryTypes.UPDATE,
-            replacements: { user_id: actor.user.id },
+            replacements: {
+              user_id: actor.user.id,
+              data: response.result.data,
+            },
           },
         );
         return {
