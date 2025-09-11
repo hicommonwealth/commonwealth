@@ -14,6 +14,7 @@ import { pluralize } from 'helpers';
 import { formatMarketCap } from 'helpers/formatting';
 import { useTokenPricing } from 'hooks/useTokenPricing';
 import Thread from 'models/Thread';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -125,7 +126,7 @@ export const ThreadOptions = ({
 
 
   const { pricing: tokenPricing, isLoading: isPricingLoading } = useTokenPricing({
-    token: threadToken as any, // Cast to LaunchpadToken type
+    token: threadToken as unknown as LaunchpadToken,
   });
   const lastPurchaseActivity = thread.lastPurchaseActivity;
 
