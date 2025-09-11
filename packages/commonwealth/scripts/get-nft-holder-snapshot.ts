@@ -7,7 +7,7 @@ const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY;
 const COLLECTION_SLUG = 'pudgypenguins';
 const CHAIN = 'ethereum';
 const DELAY_MS = 500; // Delay between API calls to respect rate limits
-const TESTING_NFT_COUNT = 10;
+const TESTING_NFT_COUNT = 21;
 
 // Types
 interface NFTAsset {
@@ -92,10 +92,14 @@ async function createNFTCollectionTable(): Promise<void> {
       opensea_rarity         JSONB,
       calculated_rarity INTEGER,
       rarity_tier INTEGER,
+      equal_distribution_allocation NUMERIC,
+      rarity_distribution_allocation NUMERIC,
+      total_token_allocation NUMERIC,
       created_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
       updated_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     );
   `;
+  // TODO: create trigger to update total_token_allocation
 
   try {
     await models.sequelize.query(createTableQuery);
