@@ -22,6 +22,7 @@ import {
   CustomAddressOptionElement,
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
+import useSignTokenClaimMutation from 'client/scripts/state/api/tokenAllocations/signTokenClaim';
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import './TokenClaimBanner.scss';
 
@@ -60,6 +61,8 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
   const { mutate: claimToken, isPending: isClaiming } = useClaimTokenMutation();
+  const { mutate: signTokenClaim, isPending: isSigningTokenClaim } =
+    useSignTokenClaimMutation();
   const { mutate: updateClaimTransactionHash, isPending: isUpdatingTxHash } =
     useUpdateClaimTransactionHashMutation();
 
