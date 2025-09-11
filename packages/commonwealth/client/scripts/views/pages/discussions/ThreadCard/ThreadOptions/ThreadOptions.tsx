@@ -11,6 +11,8 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { pluralize } from 'helpers';
+import { formatMarketCap } from 'helpers/formatting';
+import { useTokenPricing } from 'hooks/useTokenPricing';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
@@ -121,6 +123,12 @@ export const ThreadOptions = ({
     }
   }, [thread.canvasSignedData]);
 
+
+  const { pricing: tokenPricing, isLoading: isPricingLoading } = useTokenPricing({
+    token: threadToken as any, // Cast to LaunchpadToken type
+  });
+  const lastPurchaseActivity = thread.lastPurchaseActivity;
+
   return (
     <>
       <div className="ThreadOptions">
@@ -166,14 +174,44 @@ export const ThreadOptions = ({
           )}
 
           {threadToken?.token_address && onTradeClick && (
-            <CWThreadAction
-              label={showOnlyThreadActionIcons ? '' : 'Trade'}
-              action="fund"
-              onClick={(e) => {
-                e.preventDefault();
-                onTradeClick();
-              }}
-              tooltipText="Trade thread token"
+            <CWTooltip
+              placement="top"
+              content={
+                tokenPricing?.marketCapCurrent
+                  ? `Market Cap: ${formatMarketCap(tokenPricing.marketCapCurrent)}`
+                  : lastPurchaseActivity?.is_buy !== undefined
+                    ? `Last trade: ${lastPurchaseActivity.is_buy ? 'Buy' : 'Sell'}`
+                    : 'View market cap'
+              }
+              renderTrigger={(handleInteraction) => (
+                <button
+                  className="ThreadAction"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onTradeClick();
+                  }}
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                >
+                  {lastPurchaseActivity?.is_buy !== undefined && (
+                    <CWIcon
+                      iconName={
+                        lastPurchaseActivity.is_buy ? 'arrowUpHalfGreen' : 'arrowDownHalfOrange'
+                      }
+                      iconSize="small"
+                    />
+                  )}
+                  {!showOnlyThreadActionIcons && (
+                    <CWText type="caption" fontWeight="regular">
+                      {isPricingLoading
+                        ? 'Loading...'
+                        : tokenPricing?.marketCapCurrent
+                          ? formatMarketCap(tokenPricing.marketCapCurrent)
+                          : 'Market Cap'}
+                    </CWText>
+                  )}
+                </button>
+              )}
             />
           )}
 
