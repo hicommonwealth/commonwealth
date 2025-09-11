@@ -243,7 +243,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                     }
                   />
                   <div className="banner-actions">
-                    {!claimAddress?.magna_synced_at && (
+                    {!claimAddress?.magna_synced_at && isAcknowledged && (
                       <CWButton
                         label={isUpdating ? 'Saving...' : 'Save address'}
                         onClick={handleClaimAddressUpdate}
