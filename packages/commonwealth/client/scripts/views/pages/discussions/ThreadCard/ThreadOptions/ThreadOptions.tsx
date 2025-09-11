@@ -161,7 +161,7 @@ export const ThreadOptions = ({
                 showOnlyThreadActionIcons
                   ? ''
                   : // @ts-expect-error <StrictNullChecks/>
-                    pluralize(totalComments, 'Comment')
+                  pluralize(totalComments, 'Comment')
               }
               action="comment"
               disabled={!permissions.CREATE_COMMENT.allowed}
@@ -171,6 +171,17 @@ export const ThreadOptions = ({
                 onCommentClick && onCommentClick();
               }}
               tooltipText={permissions.CREATE_COMMENT.tooltip}
+            />
+          )}
+
+          {threadToken?.token_address && onTokenDrawerClick && (
+            <ThreadTokenDrawerTrigger
+              onClick={(e) => {
+                e.preventDefault();
+                onTokenDrawerClick();
+              }}
+              label={showOnlyThreadActionIcons ? '' : 'Holders'}
+              showLabel={!showOnlyThreadActionIcons}
             />
           )}
 
@@ -216,16 +227,6 @@ export const ThreadOptions = ({
             />
           )}
 
-          {threadToken?.token_address && onTokenDrawerClick && (
-            <ThreadTokenDrawerTrigger
-              onClick={(e) => {
-                e.preventDefault();
-                onTokenDrawerClick();
-              }}
-              label={showOnlyThreadActionIcons ? '' : 'Holders'}
-              showLabel={!showOnlyThreadActionIcons}
-            />
-          )}
 
           {shareEndpoint && (
             <ShareButton
