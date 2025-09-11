@@ -98,8 +98,28 @@ async function createNFTCollectionTable(): Promise<void> {
       created_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
       updated_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     );
+
+  -- Trigger function to update total_token_allocation
+  CREATE OR REPLACE FUNCTION update_total_token_allocation()
+  RETURNS TRIGGER AS $$
+  BEGIN
+    NEW.total_token_allocation := 
+      COALESCE(NEW.equal_distribution_allocation, 0) + 
+      COALESCE(NEW.rarity_distribution_allocation, 0);
+    RETURN NEW;
+  END;
+  $$ LANGUAGE plpgsql;
+
+  -- Drop the trigger if it already exists to avoid duplication
+  DROP TRIGGER IF EXISTS trg_update_total_token_allocation ON nft_collection_data;
+
+  -- Create the trigger to fire BEFORE INSERT OR UPDATE
+  CREATE TRIGGER trg_update_total_token_allocation
+  BEFORE INSERT OR UPDATE OF equal_distribution_allocation, rarity_distribution_allocation
+  ON nft_collection_data
+  FOR EACH ROW
+  EXECUTE FUNCTION update_total_token_allocation();
   `;
-  // TODO: create trigger to update total_token_allocation
 
   try {
     await models.sequelize.query(createTableQuery);
