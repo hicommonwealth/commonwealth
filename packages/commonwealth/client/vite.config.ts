@@ -161,7 +161,7 @@ export default defineConfig(({ mode }) => {
           secure: false,
         },
       },
-      allowedHosts: ['common.ngrok.app'],
+      allowedHosts: ['common.ngrok.app', 'tim.affinity.fun'],
     },
     resolve: {
       alias: [
