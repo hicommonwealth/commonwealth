@@ -40,7 +40,6 @@ const formatTokenBalance = (balance: string | number): string => {
 
 const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const user = useUserStore();
-  const [formattedBalance, setFormattedBalance] = useState<string>('0');
   const [formattedClaimable, setFormattedClaimable] = useState<string>('0');
 
   // token claim address
@@ -80,11 +79,14 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
         evmAddresses.find((a) => a.address === claimAddress?.address),
       );
     }
-    // use tokens as proxy for allocation amount to display something before magna syncs
-    setFormattedBalance(
-      formatTokenBalance(allocation?.amount || claimAddress?.tokens || 0),
+    setFormattedClaimable(
+      formatTokenBalance(
+        allocation?.claimable ||
+          allocation?.amount ||
+          claimAddress?.tokens ||
+          0,
+      ),
     );
-    setFormattedClaimable(formatTokenBalance(allocation?.claimable || 0));
   }, [claimAddress, evmAddresses, allocation]);
 
   const handleClaimAddressUpdate = () => {
@@ -126,7 +128,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   }
 
   // Create the address form content to include in actions
-  const addressFormContent = !claimAddress?.magna_synced_at ? (
+  const addressFormContent = (
     <div className="claim-address-body">
       <div className="claim-address-row">
         <div className="address-input-row">
@@ -178,72 +180,109 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
         </div>
       </div>
     </div>
-  ) : null;
+  );
 
-  return (
+  return claimAddress ? (
     <div className="TokenClaimBanner">
-      {claimAddress && (
-        <CWBanner
-          type={claimAddress.address ? 'success' : 'warning'}
-          body={
-            <div className="banner-content">
-              <h2 className="token-balance">
-                You have {formattedBalance} Common tokens!
-              </h2>
-              {claimAddress?.magna_claimed_at ? (
+      <CWBanner
+        type={claimAddress.address ? 'success' : 'warning'}
+        body={
+          <div className="banner-content">
+            <h2 className="token-balance">
+              You have {formattedClaimable} Common tokens!
+            </h2>
+            {claimAddress.magna_claimed_at ? (
+              <div className="notice-section">
+                <div className="notice-text">
+                  <p className="base-notice">
+                    You claimed your tokens on{' '}
+                    {new Date(claimAddress.magna_claimed_at).toLocaleString()}
+                    TODO: TxHash: {'0x0000000000000000000000000000000000000000'}
+                  </p>
+                </div>
+              </div>
+            ) : claimAddress?.magna_synced_at ? (
+              allocation &&
+              allocation.magna_allocation_id &&
+              allocation.walletAddress &&
+              allocation.claimable > 0 ? (
                 <div className="notice-section">
-                  <div className="notice-text">
-                    <p className="base-notice">
-                      You claimed your tokens on{' '}
-                      {new Date(claimAddress.magna_claimed_at).toLocaleString()}
-                    </p>
+                  <CWButton
+                    label={`Claim to ${formatAddressShort(allocation.walletAddress, 6)}`}
+                    buttonType="primary"
+                    onClick={() => {
+                      claimToken({
+                        allocation_id: allocation.magna_allocation_id,
+                      });
+                      // TODO: @Malik - Open wallet to sign with data from claim and update claim transaction hash after signing
+                    }}
+                    disabled={isClaiming || isLoadingAllocation}
+                    buttonHeight="sm"
+                    aria-label={`Claim to ${formatAddressShort(allocation.walletAddress, 6)}`}
+                  />
+                  <div className="security-notice">
+                    <strong>Before Claiming</strong>
+                    <ul>
+                      <li>
+                        Verify that you are on the <strong>common.xyz</strong>{' '}
+                        domain
+                      </li>
+                      <li>
+                        Your wallet is connected to the <strong>Base</strong>{' '}
+                        network
+                      </li>
+                      <li>Never approve unlimited token allowances</li>
+                    </ul>
                   </div>
                 </div>
+              ) : allocation?.unlock_start_at ? (
+                <div className="notice-section">
+                  <p>
+                    You can claim your tokens after{' '}
+                    {new Date(allocation.unlock_start_at).toLocaleDateString()}
+                  </p>
+                </div>
               ) : (
-                <>
-                  <div className="notice-section">
-                    <div className="notice-text">
-                      <p className="base-notice">
-                        We are going live on Base. You must set an EVM address
-                        to claim your allocation.
-                        <CWTooltip
-                          content={
-                            'Commonwealth tokens will be launched on Base network. ' +
-                            'Ensure your address is compatible with Base/Ethereum.'
-                          }
-                          renderTrigger={(handleInteraction) => (
-                            <CWIcon
-                              iconName="infoFilled"
-                              iconSize="small"
-                              className="info-icon"
-                              onMouseEnter={handleInteraction}
-                              onMouseLeave={handleInteraction}
-                            />
-                          )}
+                <div className="notice-section">
+                  <p>You can claim your tokens after the unlock date</p>
+                </div>
+              )
+            ) : (
+              <div className="notice-section">
+                <div className="notice-text">
+                  <p className="base-notice">
+                    We are going live on Base. You must set an EVM address to
+                    claim your allocation.
+                    <CWTooltip
+                      content={
+                        'Commonwealth tokens will be launched on Base network. ' +
+                        'Ensure your address is compatible with Base/Ethereum.'
+                      }
+                      renderTrigger={(handleInteraction) => (
+                        <CWIcon
+                          iconName="infoFilled"
+                          iconSize="small"
+                          className="info-icon"
+                          onMouseEnter={handleInteraction}
+                          onMouseLeave={handleInteraction}
                         />
-                      </p>
-                      <p className="security-notice">
-                        <strong>Before claiming, verify:</strong> check that you
-                        are on the main: common.xyz domain, verify your wallet
-                        is connected to the correct network, and never approve
-                        unlimited token allowances.
-                      </p>
-                    </div>
-                  </div>
-                  {addressFormContent}
-                  <CWCheckbox
-                    checked={isAcknowledged}
-                    onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
-                    label={
-                      <div>
-                        I understand that once incentives are added, there are
-                        non-refundable and can NOT be withdrawn under any
-                        circumstances.
-                      </div>
-                    }
-                  />
+                      )}
+                    />
+                  </p>
                   <div className="banner-actions">
-                    {!claimAddress?.magna_synced_at && isAcknowledged && (
+                    {addressFormContent}
+                    <CWCheckbox
+                      checked={isAcknowledged}
+                      onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
+                      label={
+                        <p>
+                          I understand that once incentives are added, there are
+                          non-refundable and can NOT be withdrawn under any
+                          circumstances.
+                        </p>
+                      }
+                    />
+                    {isAcknowledged && (
                       <CWButton
                         label={isUpdating ? 'Saving...' : 'Save address'}
                         onClick={handleClaimAddressUpdate}
@@ -257,40 +296,15 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                         aria-label="Save the selected address for token claiming"
                       />
                     )}
-                    {allocation &&
-                    allocation.magna_allocation_id &&
-                    allocation.walletAddress &&
-                    allocation.claimable > 0 ? (
-                      <CWButton
-                        label={`Claim ${allocation.claimable} Common tokens to ${formatAddressShort(allocation.walletAddress, 6)}`}
-                        buttonType="primary"
-                        onClick={() => {
-                          claimToken({
-                            allocation_id: allocation.magna_allocation_id,
-                          });
-                          // TODO: @Malik - Open wallet to sign with data from claim and update claim transaction hash after signing
-                        }}
-                        disabled={isClaiming || isLoadingAllocation}
-                        buttonHeight="sm"
-                        aria-label={`Claim ${formattedClaimable} tokens to address ${allocation.walletAddress}`}
-                      />
-                    ) : allocation?.unlock_start_at ? (
-                      <p>
-                        You can claim your tokens after{' '}
-                        {new Date(
-                          allocation.unlock_start_at,
-                        ).toLocaleDateString()}
-                      </p>
-                    ) : null}
                   </div>
-                </>
-              )}
-            </div>
-          }
-        />
-      )}
+                </div>
+              </div>
+            )}
+          </div>
+        }
+      />
     </div>
-  );
+  ) : null;
 };
 
 export default TokenClaimBanner;
