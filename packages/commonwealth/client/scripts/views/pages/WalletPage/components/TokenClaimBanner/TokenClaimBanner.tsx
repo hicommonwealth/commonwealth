@@ -185,7 +185,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   return claimAddress ? (
     <div className="TokenClaimBanner">
       <CWBanner
-        type={claimAddress.address ? 'success' : 'warning'}
+        type={claimAddress.address ? 'info' : 'error'}
         body={
           <div className="banner-content">
             <h2 className="token-balance">
@@ -207,32 +207,32 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
               allocation.walletAddress &&
               allocation.claimable > 0 ? (
                 <div className="notice-section">
-                  <CWButton
-                    label={`Claim to ${formatAddressShort(allocation.walletAddress, 6)}`}
-                    buttonType="primary"
-                    onClick={() => {
-                      claimToken({
-                        allocation_id: allocation.magna_allocation_id,
-                      });
-                      // TODO: @Malik - Open wallet to sign with data from claim and update claim transaction hash after signing
-                    }}
-                    disabled={isClaiming || isLoadingAllocation}
-                    buttonHeight="sm"
-                    aria-label={`Claim to ${formatAddressShort(allocation.walletAddress, 6)}`}
-                  />
-                  <div className="security-notice">
-                    <strong>Before Claiming</strong>
-                    <ul>
-                      <li>
-                        Verify that you are on the <strong>common.xyz</strong>{' '}
-                        domain
-                      </li>
-                      <li>
-                        Your wallet is connected to the <strong>Base</strong>{' '}
-                        network
-                      </li>
-                      <li>Never approve unlimited token allowances</li>
-                    </ul>
+                  <div className="notice-text">
+                    <p style={{ textAlign: 'left' }}>
+                      <strong>Before Claiming</strong>
+                      <ul style={{ listStyleType: 'disc' }}>
+                        <li>
+                          Verify that you are on the <strong>common.xyz</strong>{' '}
+                          domain
+                        </li>
+                        <li>
+                          Your wallet is connected to the <strong>Base</strong>{' '}
+                          network
+                        </li>
+                        <li>Never approve unlimited token allowances</li>
+                      </ul>
+                    </p>
+                    <CWButton
+                      label={`Claim to ${formatAddressShort(allocation.walletAddress, 6)}`}
+                      onClick={() => {
+                        claimToken({
+                          allocation_id: allocation.magna_allocation_id,
+                        });
+                        // TODO: @Malik - Open wallet to sign with data from claim and update claim transaction hash after signing
+                      }}
+                      disabled={isClaiming || isLoadingAllocation}
+                      aria-label={`Claim to ${formatAddressShort(allocation.walletAddress, 6)}`}
+                    />
                   </div>
                 </div>
               ) : allocation?.unlock_start_at ? (
