@@ -72,6 +72,7 @@ const TokenInformationFormStep = ({
     cursor: 1,
     limit: 50,
     search: debouncedSearchTerm,
+    token_type: 'launchpad',
     enabled: !!debouncedSearchTerm,
   });
 

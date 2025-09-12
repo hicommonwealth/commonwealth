@@ -16,6 +16,7 @@ import {
   FiltersDrawerProps,
   TokenSortDirections,
   TokenSortOptions,
+  TokenTypes,
 } from './types';
 
 export const FiltersDrawer = ({
@@ -25,6 +26,14 @@ export const FiltersDrawer = ({
   onFiltersChange,
 }: FiltersDrawerProps) => {
   const launchpadEnabled = useFlag('launchpad');
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+
+  const onTokenTypeChange = (tokenType: TokenTypes) => {
+    onFiltersChange({
+      ...filters,
+      withTokenType: tokenType,
+    });
+  };
 
   const onTokenSortOptionChange = (sortOption: TokenSortOptions) => {
     onFiltersChange({
@@ -85,6 +94,28 @@ export const FiltersDrawer = ({
                 onChange={() => onIsGraduatedChange(!filters.isGraduated)}
               />
             </div>
+
+            {launchpadEnabled && tokenizedThreadsEnabled && (
+              <CWAccordion
+                header="Token type"
+                content={
+                  <div className="options-list">
+                    {Object.entries(TokenTypes).map(([tokenType]) => (
+                      <CWRadioButton
+                        key={tokenType}
+                        groupName="token-type"
+                        value={tokenType}
+                        label={tokenType}
+                        checked={filters.withTokenType === tokenType}
+                        onChange={() =>
+                          onTokenTypeChange(tokenType as TokenTypes)
+                        }
+                      />
+                    ))}
+                  </div>
+                }
+              />
+            )}
 
             {launchpadEnabled && (
               <>
