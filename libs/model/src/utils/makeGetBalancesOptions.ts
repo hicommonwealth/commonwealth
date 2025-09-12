@@ -236,7 +236,7 @@ export function makeGetBalancesOptions(
                 castedOpt.balanceSourceType === BalanceSourceType.SuiNFT &&
                 castedOpt.sourceOptions.suiNetwork ===
                   castedSource.sui_network &&
-                castedOpt.sourceOptions.collectionId ===
+                castedOpt.sourceOptions.fullObjectType ===
                   castedSource.collection_id
               );
             });
@@ -245,7 +245,7 @@ export function makeGetBalancesOptions(
                 balanceSourceType: BalanceSourceType.SuiNFT,
                 sourceOptions: {
                   suiNetwork: castedSource.sui_network,
-                  collectionId: castedSource.collection_id,
+                  fullObjectType: castedSource.collection_id,
                 },
                 addresses,
               });

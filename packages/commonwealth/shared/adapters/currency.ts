@@ -98,6 +98,15 @@ export const prettyVoteWeight = (
       rawNumber /= 10 ** 9;
     }
 
+    console.log({
+      wei,
+      tokenNumDecimals,
+      weightType,
+      multiplier,
+      decimalsOverride,
+      tokenSymbol,
+    });
+
     // Apply formatting for large numbers to improve readability
     if (rawNumber >= 1000) {
       return formatBigNumberShort(rawNumber, 2);

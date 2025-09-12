@@ -303,7 +303,7 @@ export async function getWeightedSuiTokens(
 
 export async function getWeightedSuiNFTs(
   address: string,
-  collectionId: string,
+  fullObjectType: string,
   chainNodeId: number,
   voteWeightMultiplier: number,
 ): Promise<bigint> {
@@ -317,7 +317,7 @@ export async function getWeightedSuiNFTs(
     sourceOptions: {
       // Use the network from the chain node's identifier for the network
       suiNetwork: chainNode.name,
-      collectionId,
+      fullObjectType,
     },
     cacheRefresh: true,
   };
