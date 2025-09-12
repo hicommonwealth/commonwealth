@@ -28,12 +28,6 @@ class SignTokenClaim extends ContractBase {
       value: '0x0', // idk what this does
     };
 
-    try {
-      tx.gas = await this.web3.eth.sendTransaction(tx);
-    } catch (err) {
-      tx.gas = 300000;
-    }
-
     const fee = await this.estimateGas();
     if (fee) {
       tx.maxFeePerGas = fee.toString();

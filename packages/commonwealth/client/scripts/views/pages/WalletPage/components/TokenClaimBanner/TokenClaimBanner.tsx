@@ -199,7 +199,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                     You claimed your tokens on{' '}
                     {new Date(claimAddress.magna_claimed_at).toLocaleString()}
                   </p>
-                  {transactionHash && (
+                  {transactionHash ? (
                     <a
                       href={`https://basescan.org/tx/${transactionHash}`}
                       target="_blank"
@@ -208,6 +208,11 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                       {transactionHash.slice(0, 6)}...
                       {transactionHash.slice(-4)}
                     </a>
+                  ) : (
+                    <p>
+                      Something went wrong when saving the transaction hash...
+                      Please check your wallet to confirm the transaction.
+                    </p>
                   )}
                 </div>
               </div>

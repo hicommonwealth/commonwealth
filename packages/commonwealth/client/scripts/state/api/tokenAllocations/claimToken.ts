@@ -10,9 +10,7 @@ import { fetchNodes } from '../nodes';
 
 const useClaimTokenMutation = () => {
   const utils = trpc.useUtils();
-  const [transactionHash, setTransactionHash] = useState<string>(
-    '0x0000000000000000000000000000000000000000',
-  );
+  const [transactionHash, setTransactionHash] = useState<string>('');
 
   const updateClaimTransactionHash =
     trpc.tokenAllocation.updateClaimTransactionHash.useMutation({
