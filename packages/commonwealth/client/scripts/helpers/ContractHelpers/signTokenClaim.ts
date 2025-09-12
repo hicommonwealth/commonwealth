@@ -21,11 +21,13 @@ class SignTokenClaim extends ContractBase {
       await this.initialize(true, chainId);
     }
 
-    const tx: any = {
+    const tx = {
       from: walletAddress,
       to: this.tokenAddress,
       data, // magna sends the full abi-encoded calldata
       value: '0x0', // idk what this does
+      maxFeePerGas: '0x0',
+      maxPriorityFeePerGas: '0x0',
     };
 
     const fee = await this.estimateGas();
