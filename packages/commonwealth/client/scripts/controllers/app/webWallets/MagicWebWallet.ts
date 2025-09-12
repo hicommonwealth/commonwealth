@@ -20,6 +20,7 @@ class MagicWebWalletController implements IWebWallet<string> {
   private _enabling = false;
   private _accounts: string[];
   private _provider: ExternalProvider;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _web3: Web3 | any;
   private _accountsChangedHandler?: (accounts: string[]) => Promise<void>;
   private _chainChangedHandler?: (chainId: string) => Promise<void>;
@@ -126,6 +127,7 @@ class MagicWebWalletController implements IWebWallet<string> {
       }
 
       const Web3 = (await import('web3')).default;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this._web3 = { givenProvider: magic.rpcProvider } as any;
 
       // Request accounts via EIP-1193
@@ -201,6 +203,7 @@ class MagicWebWalletController implements IWebWallet<string> {
     await this._web3.givenProvider.on('disconnect', this._disconnectHandler);
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   public async switchNetwork(chainId?: string) {
     try {
       const targetChainIdStr = chainId ?? this.getChainId();
@@ -218,6 +221,7 @@ class MagicWebWalletController implements IWebWallet<string> {
       );
       if (!magic) return;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this._web3 = { givenProvider: magic.rpcProvider } as any;
       this._provider = magic.rpcProvider as unknown as ExternalProvider;
     } catch (error) {
@@ -225,6 +229,7 @@ class MagicWebWalletController implements IWebWallet<string> {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   public async reset() {
     try {
       if (this._web3?.givenProvider?.removeListener) {
