@@ -5,15 +5,19 @@ import type { Balances, GetSuiNftBalanceOptions } from '../types';
 
 const log = logger(import.meta);
 
-function isMatchingNFT(obj: any, fullObjectType: string): boolean {
-  return obj.data.type === fullObjectType;
+function isMatchingNFT(
+  obj: { data?: { type?: string | null } | null },
+  fullObjectType: string,
+): boolean {
+  return obj.data?.type === fullObjectType;
 }
 
 export async function __get_suinft_balances(
   rpcEndpoint: string,
   options: GetSuiNftBalanceOptions,
 ): Promise<Balances> {
-  // example: 0xf21c5d05c7886648e7a6e2519b7df1df21c9004568f895583c8ba1de1b402f54::vault::VoteEscrowedToken<0x4a5313fa76e8abad0f812467de9bd7188abefba666fe9e262a2ded0863d60ea8::mock_navx_token::MOCK_NAVX_TOKEN>
+  // example: 0xf21c5d05c7886648e7a6e2519b7df1df21c9004568f895583c8ba1de1b402f54::vault::
+  // VoteEscrowedToken<0x4a5313fa76e8abad0f812467de9bd7188abefba666fe9e262a2ded0863d60ea8::mock_navx_token::MOCK_NAVX_TOKEN>
 
   console.log(JSON.stringify(options, null, 2));
 
