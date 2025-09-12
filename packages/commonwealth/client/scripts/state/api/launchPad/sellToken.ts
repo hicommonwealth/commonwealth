@@ -36,6 +36,7 @@ const sellToken = async ({
 
     const controller = new MagicWebWalletController();
     await controller.enable(`${ethChainId}`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     magicProvider = controller.provider as unknown as any;
   }
 
