@@ -42,6 +42,9 @@ const formatTokenBalance = (balance: string | number): string => {
 const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const user = useUserStore();
   const [formattedClaimable, setFormattedClaimable] = useState<string>('0');
+  const [transactionHash, setTransactionHash] = useState<string>(
+    '0x0000000000000000000000000000000000000000',
+  );
 
   // token claim address
   const [evmAddresses, setEvmAddresses] = useState<AddressInfo[]>([]);
@@ -202,8 +205,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                     {new Date(claimAddress.magna_claimed_at).toLocaleString()}
                   </p>
                   <p className="base-notice">
-                    TODO: Transaction Hash:{' '}
-                    '0x0000000000000000000000000000000000000000'
+                    TODO: Transaction Hash: {transactionHash}
                   </p>
                 </div>
               </div>
