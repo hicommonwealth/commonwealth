@@ -73,4 +73,4 @@ export interface MagnaResponse<T> {
 }
 
 export type MagnaAllocationResponse = MagnaResponse<MagnaAllocation>;
-export type MagnaClaimResponse = MagnaResponse<MagnaClaim>;
+export type MagnaClaimResponse = MagnaResponse<MagnaClaim[]>;

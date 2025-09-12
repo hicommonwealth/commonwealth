@@ -43,30 +43,31 @@ export function ClaimToken(): Command<typeof schemas.ClaimToken> {
         sender: actor.address!,
       });
 
-      if (response.isProcessed) {
+      if (response.isProcessed && response.result.length > 0) {
         // acknowledge the claim
+        const claim_data = response.result[0];
         await models.sequelize.query(
           `
           UPDATE "ClaimAddresses"
           SET 
             magna_claimed_at = NOW(),
-            magna_claim_data = :data
+            magna_claim_data = :claim_data
           WHERE
             user_id = :user_id`,
           {
             type: QueryTypes.UPDATE,
             replacements: {
               user_id: actor.user.id,
-              data: response.result.data,
+              claim_data: JSON.stringify(claim_data),
             },
           },
         );
         return {
           magna_allocation_id: claim.magna_allocation_id,
-          from: response.result.from as `0x${string}`,
-          to: response.result.to as `0x${string}`,
-          data: response.result.data,
-          platform_fee: response.result.platformFee,
+          from: claim_data.from as `0x${string}`,
+          to: claim_data.to as `0x${string}`,
+          data: claim_data.data,
+          platform_fee: claim_data.platformFee,
         };
       }
       throw new InvalidState('Claim failed!', response.errors);

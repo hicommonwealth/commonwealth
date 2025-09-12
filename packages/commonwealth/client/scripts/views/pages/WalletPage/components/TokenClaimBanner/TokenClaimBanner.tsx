@@ -200,7 +200,10 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                   <p className="base-notice">
                     You claimed your tokens on{' '}
                     {new Date(claimAddress.magna_claimed_at).toLocaleString()}
-                    TODO: TxHash: {'0x0000000000000000000000000000000000000000'}
+                  </p>
+                  <p className="base-notice">
+                    TODO: Transaction Hash:{' '}
+                    {'0x0000000000000000000000000000000000000000'}
                   </p>
                 </div>
               </div>
