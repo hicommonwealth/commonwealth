@@ -15,7 +15,7 @@ class SignTokenClaim extends ContractBase {
     await super.initialize(withWallet, chainId);
   }
 
-  async signTokenClaim(
+  async sign(
     walletAddress: string,
     chainId: string,
     data: string, // the data returned by magna

@@ -17,11 +17,7 @@ const signTokenClaim = async ({
   data,
 }: SignTokenClaimProps) => {
   const signTokenClaim = new SignTokenClaim(tokenAddress, chainRpc);
-  return await signTokenClaim.signTokenClaim(
-    walletAddress,
-    `${ethChainId}`,
-    data,
-  );
+  return await signTokenClaim.sign(walletAddress, `${ethChainId}`, data);
 };
 
 const useSignTokenClaimMutation = () => {

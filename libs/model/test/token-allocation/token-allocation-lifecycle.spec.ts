@@ -26,12 +26,14 @@ describe('Token Allocation Lifecycle', () => {
       }),
       claimAllocation: vi.fn().mockResolvedValue({
         isProcessed: true,
-        result: {
-          from: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-          to: '0xb0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-          data: '0x1234',
-          platformFee: null,
-        },
+        result: [
+          {
+            from: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            to: '0xb0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            data: '0x1234',
+            platformFee: null,
+          },
+        ],
       }),
     }));
   });

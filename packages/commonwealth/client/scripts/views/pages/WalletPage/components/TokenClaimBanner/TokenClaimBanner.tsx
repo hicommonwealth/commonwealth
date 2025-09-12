@@ -203,7 +203,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                   </p>
                   <p className="base-notice">
                     TODO: Transaction Hash:{' '}
-                    {'0x0000000000000000000000000000000000000000'}
+                    '0x0000000000000000000000000000000000000000'
                   </p>
                 </div>
               </div>
