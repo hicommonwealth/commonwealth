@@ -35,16 +35,16 @@ export const usePostcoinTokenPricing = ({
   );
 
   // Calculate pricing from token data
-  const currentPrice = token.latest_price || 0;
-  const oldPrice = token.old_price || 0;
+  const currentPrice = token?.latest_price || 0;
+  const oldPrice = token?.old_price || 0;
 
   // Calculate 24h price change percentage
   const pricePercentage24HourChange =
     oldPrice > 0 ? ((currentPrice - oldPrice) / oldPrice) * 100 : 0;
 
   // Calculate market cap (current price * initial supply)
-  const marketCapCurrent = currentPrice * (token.initial_supply || 0);
-  const marketCapGoal = token.eth_market_cap_target || 0;
+  const marketCapCurrent = currentPrice * (token?.initial_supply || 0);
+  const marketCapGoal = token?.eth_market_cap_target || 0;
   const isMarketCapGoalReached = marketCapCurrent >= marketCapGoal;
 
   const pricing: PostcoinTokenPricing = {
@@ -164,5 +164,5 @@ export const useTokenPricing = ({ token }: { token: Token }) => {
   });
 
   // Return the appropriate pricing based on token type
-  return token.token_type === 'postcoin' ? postcoinPricing : launchpadPricing;
+  return token?.token_type === 'postcoin' ? postcoinPricing : launchpadPricing;
 };
