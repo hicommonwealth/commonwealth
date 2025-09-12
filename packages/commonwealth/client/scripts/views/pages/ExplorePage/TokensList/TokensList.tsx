@@ -1,5 +1,6 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
+import { TokenType } from 'client/scripts/views/components/TokenCard/TokenCard';
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
@@ -15,7 +16,6 @@ import TradeTokenModal, {
   TradingConfig,
   TradingMode,
 } from 'views/modals/TradeTokenModel';
-import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
 import FiltersDrawer, {
@@ -26,10 +26,6 @@ import FiltersDrawer, {
   tokenSortOptionsLabelToKeysMap,
 } from './FiltersDrawer';
 import './TokensList.scss';
-
-const TokenWithCommunity = TokenView.extend({
-  community_id: z.string(),
-});
 
 type TokensListProps = {
   hideHeader?: boolean;
@@ -50,6 +46,7 @@ const TokensList = ({
 }: TokensListProps) => {
   const navigate = useCommonNavigate();
   const launchpadEnabled = useFlag('launchpad');
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
     isOpen: boolean;
@@ -76,6 +73,11 @@ const TokensList = ({
     cursor: 1,
     limit: 8,
     with_stats: true,
+    token_type: !tokenizedThreadsEnabled
+      ? 'launchpad'
+      : filters.withTokenType
+        ? (filters.withTokenType.toLowerCase() as 'launchpad' | 'postcoin')
+        : undefined,
     order_by: (() => {
       if (filters?.withTokenSortBy) {
         return tokenSortOptionsLabelToKeysMap[
@@ -101,6 +103,13 @@ const TokensList = ({
     }
   };
 
+  const removeTokenTypeFilter = () => {
+    setFilters({
+      ...filters,
+      withTokenType: undefined,
+    });
+  };
+
   const removeCommunitySortByFilter = () => {
     setFilters({
       ...filters,
@@ -118,7 +127,7 @@ const TokensList = ({
 
   const handleCTAClick = (
     mode: TradingMode,
-    token: z.infer<typeof TokenWithCommunity>,
+    token: z.infer<typeof TokenView>,
   ) => {
     setTokenLaunchModalConfig({
       isOpen: true,
@@ -148,6 +157,13 @@ const TokensList = ({
               label={`Search: ${searchText?.trim()}`}
               type="filter"
               onCloseClick={onClearSearch}
+            />
+          )}
+          {filters.withTokenType && (
+            <CWTag
+              label={filters.withTokenType}
+              type="filter"
+              onCloseClick={removeTokenTypeFilter}
             />
           )}
           {filters.withTokenSortBy && (
@@ -192,12 +208,9 @@ const TokensList = ({
             return (
               <TokenCard
                 key={token.name}
-                token={token as LaunchpadToken}
+                token={token as TokenType}
                 onCTAClick={(mode) => {
-                  handleCTAClick(
-                    mode,
-                    token as z.infer<typeof TokenWithCommunity>,
-                  );
+                  handleCTAClick(mode, token as z.infer<typeof TokenView>);
                 }}
                 onCardBodyClick={() =>
                   navigateToCommunity({

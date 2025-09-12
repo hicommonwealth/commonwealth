@@ -1,4 +1,4 @@
-import { TokenView } from '@hicommonwealth/schemas';
+import { LaunchpadTokenView, ThreadTokenView } from '@hicommonwealth/schemas';
 import { calculateTokenPricing } from 'helpers/launchpad';
 import NodeInfo from 'models/NodeInfo';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -12,7 +12,65 @@ import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/ty
 import { z } from 'zod';
 import useUserStore from '../state/ui/user';
 
-export const useTokenPricing = ({ token }: { token: LaunchpadToken }) => {
+interface PostcoinTokenPricing {
+  currentPrice: number;
+  pricePercentage24HourChange: number;
+  marketCapCurrent: number;
+  marketCapGoal: number;
+  isMarketCapGoalReached: boolean;
+}
+
+export const usePostcoinTokenPricing = ({
+  token,
+}: {
+  token: z.infer<typeof ThreadTokenView>;
+}) => {
+  const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
+    useFetchTokenUsdRateQuery({
+      tokenSymbol: 'ETH',
+    });
+
+  const ethToUsdRate = parseFloat(
+    ethToCurrencyRateData?.data?.data?.amount || '0',
+  );
+
+  // Calculate pricing from token data
+  const currentPrice = token.latest_price || 0;
+  const oldPrice = token.old_price || 0;
+
+  // Calculate 24h price change percentage
+  const pricePercentage24HourChange =
+    oldPrice > 0 ? ((currentPrice - oldPrice) / oldPrice) * 100 : 0;
+
+  // Calculate market cap (current price * initial supply)
+  const marketCapCurrent = currentPrice * (token.initial_supply || 0);
+  const marketCapGoal = token.eth_market_cap_target || 0;
+  const isMarketCapGoalReached = marketCapCurrent >= marketCapGoal;
+
+  const pricing: PostcoinTokenPricing = {
+    currentPrice,
+    pricePercentage24HourChange,
+    marketCapCurrent,
+    marketCapGoal,
+    isMarketCapGoalReached,
+  };
+
+  return {
+    pricing,
+    ethToUsdRate,
+    isLoading: isLoadingETHToCurrencyRate,
+  };
+};
+
+export type Token =
+  | z.infer<typeof LaunchpadTokenView>
+  | z.infer<typeof ThreadTokenView>;
+
+const useLaunchpadTokenPricing = ({
+  token,
+}: {
+  token: z.infer<typeof LaunchpadTokenView>;
+}) => {
   const { data: tokenCommunity } = useGetCommunityByIdQuery({
     id: token?.community_id || 'ethereum',
     enabled: !!token?.community_id,
@@ -59,7 +117,7 @@ export const useTokenPricing = ({ token }: { token: LaunchpadToken }) => {
   );
 
   let pricing = calculateTokenPricing(
-    token as z.infer<typeof TokenView>,
+    token as z.infer<typeof LaunchpadTokenView>,
     ethToUsdRate,
     ethPerToken,
   );
@@ -93,4 +151,18 @@ export const useTokenPricing = ({ token }: { token: LaunchpadToken }) => {
   }
 
   return { pricing, ethToUsdRate, isLoading: isLoadingETHToCurrencyRate };
+};
+
+export const useTokenPricing = ({ token }: { token: Token }) => {
+  // Always call both hooks, but only use the result from the appropriate one
+  const postcoinPricing = usePostcoinTokenPricing({
+    token: token as z.infer<typeof ThreadTokenView>,
+  });
+
+  const launchpadPricing = useLaunchpadTokenPricing({
+    token: token as z.infer<typeof LaunchpadTokenView>,
+  });
+
+  // Return the appropriate pricing based on token type
+  return token.token_type === 'postcoin' ? postcoinPricing : launchpadPricing;
 };
