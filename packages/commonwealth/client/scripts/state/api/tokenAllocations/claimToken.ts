@@ -3,12 +3,10 @@ import {
   notifySuccess,
 } from 'client/scripts/controllers/app/notifications';
 import SignTokenClaim from 'client/scripts/helpers/ContractHelpers/signTokenClaim';
+import { BASE_ID } from 'client/scripts/views/components/CommunityInformationForm/constants';
 import { useState } from 'react';
 import { trpc } from 'utils/trpcClient';
-
-// TODO: Pass or config?
-const baseRpc = '';
-const baseChainId = '1';
+import { fetchNodes } from '../nodes';
 
 const useClaimTokenMutation = () => {
   const utils = trpc.useUtils();
@@ -37,8 +35,19 @@ const useClaimTokenMutation = () => {
       // ensure transaction is signed and transaction hash is updated
       if (!data.transaction_hash) {
         try {
-          const stc = new SignTokenClaim(data.to, baseRpc);
-          const tx_hash = await stc.sign(data.from, baseChainId, data.data);
+          const nodes = await fetchNodes();
+          const baseNode = nodes?.find(
+            (node) => node.ethChainId === parseInt(BASE_ID),
+          );
+          if (!baseNode) {
+            throw new Error('Failed to find base node');
+          }
+          const stc = new SignTokenClaim(data.to, baseNode.url);
+          const tx_hash = await stc.sign(
+            data.from,
+            `${baseNode.ethChainId}`,
+            data.data,
+          );
           setTransactionHash(tx_hash);
           // persist transaction hash
           // TODO: how to recover if this step fails?
