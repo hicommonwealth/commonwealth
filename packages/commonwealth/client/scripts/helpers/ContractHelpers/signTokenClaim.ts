@@ -23,10 +23,11 @@ class SignTokenClaim extends ContractBase {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }
+    // TODO: Make sure this is idempotent, maybe find transaction first or handle errors gracefully and return the tx hash
     // TODO: Do we need a claim token function from a contract with ABI?
     // const txReceipt = await claimToken(...);
     // return txReceipt;
-    return '0x0000000000000000000000000000000000000000000000000000000000000000';
+    return '0x12300000000000000000000000000000000000000000000000000000000000';
   }
 }
 

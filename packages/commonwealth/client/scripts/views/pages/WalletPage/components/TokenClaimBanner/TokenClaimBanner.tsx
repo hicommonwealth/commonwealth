@@ -7,7 +7,6 @@ import {
   useGetAllocationQuery,
   useGetClaimAddressQuery,
   useUpdateClaimAddressMutation,
-  useUpdateClaimTransactionHashMutation,
 } from 'client/scripts/state/api/tokenAllocations';
 import CWBanner from 'client/scripts/views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
@@ -22,7 +21,6 @@ import {
   CustomAddressOptionElement,
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
-import useSignTokenClaimMutation from 'client/scripts/state/api/tokenAllocations/signTokenClaim';
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import './TokenClaimBanner.scss';
 
@@ -42,9 +40,6 @@ const formatTokenBalance = (balance: string | number): string => {
 const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const user = useUserStore();
   const [formattedClaimable, setFormattedClaimable] = useState<string>('0');
-  const [transactionHash, setTransactionHash] = useState<string>(
-    '0x0000000000000000000000000000000000000000',
-  );
 
   // token claim address
   const [evmAddresses, setEvmAddresses] = useState<AddressInfo[]>([]);
@@ -63,11 +58,11 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     });
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
-  const { mutate: claimToken, isPending: isClaiming } = useClaimTokenMutation();
-  const { mutate: signTokenClaim, isPending: isSigningTokenClaim } =
-    useSignTokenClaimMutation();
-  const { mutate: updateClaimTransactionHash, isPending: isUpdatingTxHash } =
-    useUpdateClaimTransactionHashMutation();
+  const {
+    mutate: claimToken,
+    isPending: isClaiming,
+    transactionHash,
+  } = useClaimTokenMutation();
 
   useEffect(() => {
     const addresses = new Map<string, AddressInfo>();
@@ -204,9 +199,16 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                     You claimed your tokens on{' '}
                     {new Date(claimAddress.magna_claimed_at).toLocaleString()}
                   </p>
-                  <p className="base-notice">
-                    TODO: Transaction Hash: {transactionHash}
-                  </p>
+                  {transactionHash && (
+                    <a
+                      href={`https://basescan.org/tx/${transactionHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {transactionHash.slice(0, 6)}...
+                      {transactionHash.slice(-4)}
+                    </a>
+                  )}
                 </div>
               </div>
             ) : claimAddress?.magna_synced_at ? (
@@ -236,7 +238,6 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                         claimToken({
                           allocation_id: allocation.magna_allocation_id,
                         });
-                        // TODO: @Malik - Open wallet to sign with data from claim and update claim transaction hash after signing
                       }}
                       disabled={isClaiming || isLoadingAllocation}
                       aria-label={`Claim to ${formatAddressShort(allocation.walletAddress, 6)}`}
