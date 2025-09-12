@@ -7,6 +7,7 @@ import { hexToNumber } from 'web3-utils';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
+import { fetchNodes } from 'client/scripts/state/api/nodes';
 import { setActiveAccount } from 'controllers/app/login';
 import { Magic } from 'magic-sdk';
 import app from 'state';
@@ -97,10 +98,18 @@ class MagicWebWalletController implements IWebWallet<string> {
       const chainIdStr = forceChainId ?? this.getChainId();
       const chainIdNum = parseInt(chainIdStr, 10);
 
+      const nodes = await fetchNodes();
+      const chainNode = nodes.find((n) => n.ethChainId === chainIdNum);
       // Determine RPC URL from current app chain node
+
+      if (!nodes || !chainNode) {
+        throw new Error('Missing RPC URL for Magic initialization');
+      }
+
+      // Use the first URL if multiple are provided
       const wsRpcUrl = app.chain?.meta?.ChainNode?.url ?? '';
-      const urls = wsRpcUrl ? wsRpcUrl.split(',').map((u) => u.trim()) : [];
-      const primaryUrl = urls[0];
+      const primaryUrl =
+        wsRpcUrl || chainNode.url.split(',').map((url) => url.trim())?.[0];
 
       if (!primaryUrl) {
         throw new Error('Missing RPC URL for Magic initialization');
@@ -117,7 +126,8 @@ class MagicWebWalletController implements IWebWallet<string> {
 
       // Ensure user is logged in or prompt via Magic UI
       try {
-        await magic.user.getInfo();
+        const info = await magic.user.getInfo();
+        console.log('info => ', info);
       } catch {
         try {
           await magic.wallet.showUI();
@@ -209,10 +219,18 @@ class MagicWebWalletController implements IWebWallet<string> {
       const targetChainIdStr = chainId ?? this.getChainId();
       const targetChainId = parseInt(targetChainIdStr, 10);
 
+      const nodes = await fetchNodes();
+      const chainNode = nodes.find((n) => n.ethChainId === targetChainId);
+      // Determine RPC URL from current app chain node
+
+      if (!nodes || !chainNode) {
+        throw new Error('Missing RPC URL for Magic initialization');
+      }
+
       // Reinitialize Magic with the new network (Magic does not support wallet_switchEthereumChain)
       const wsRpcUrl = app.chain?.meta?.ChainNode?.url ?? '';
-      const urls = wsRpcUrl ? wsRpcUrl.split(',').map((u) => u.trim()) : [];
-      const primaryUrl = urls[0];
+      const primaryUrl =
+        wsRpcUrl || chainNode.url.split(',').map((url) => url.trim())?.[0];
       if (!primaryUrl) return;
 
       const magic: Magic | null = getMagicInstanceForChain(
