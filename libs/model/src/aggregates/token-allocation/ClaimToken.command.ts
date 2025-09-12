@@ -92,7 +92,7 @@ export function ClaimToken(): Command<typeof schemas.ClaimToken> {
         to: claim_data.to as `0x${string}`,
         data: claim_data.data,
         platform_fee: claim_data.platformFee,
-        transaction_hash: claim.magna_claim_tx_hash,
+        transaction_hash: claim.magna_claim_tx_hash as `0x${string}`,
       };
     },
   };
