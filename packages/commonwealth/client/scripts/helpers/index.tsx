@@ -273,3 +273,5 @@ export const weightedVotingValueToLabel = (
 
   return '';
 };
+
+export { formatMarketCap } from './formatting';
