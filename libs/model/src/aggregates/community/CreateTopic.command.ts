@@ -7,19 +7,18 @@ import { sanitizeQuillText } from '../../utils';
 
 /**
  * Extracts token symbol from a Sui contract address
- * Contract addresses are in format: package_id::module_name::SYMBOL
- * This function returns the 3rd segment (SYMBOL)
+ * Handles complex format with angle brackets:
+ * "0x123::vault::VoteEscrowedToken<0x456::mock_navx_token::MOCK_NAVX_TOKEN>"
  */
 function extractTokenSymbolFromAddress(
   tokenAddress: string,
 ): string | undefined {
   if (!tokenAddress) return undefined;
-
-  const segments = tokenAddress.split('::');
-  if (segments.length >= 3) {
-    return segments[2];
+  // Extract token symbol from complex format with angle brackets
+  const angleMatch = tokenAddress.match(/<[^>]*::([^:>]+)>/);
+  if (angleMatch) {
+    return angleMatch[1];
   }
-
   return undefined;
 }
 

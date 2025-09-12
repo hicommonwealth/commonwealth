@@ -1,80 +1,19 @@
 import { logger } from '@hicommonwealth/core';
-import { SuiClient, SuiObjectResponse } from '@mysten/sui/client';
+import { SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 import type { Balances, GetSuiNftBalanceOptions } from '../types';
 
 const log = logger(import.meta);
 
-// Helper function to check if an NFT belongs to the specified collection
-function isFromCollection(
-  obj: SuiObjectResponse,
-  collectionId: string,
-): boolean {
-  if (!obj.data) return false;
-
-  // ignore fungible tokens
-  if (obj.data.type?.startsWith('0x2::coin::Coin<')) {
-    return false;
-  }
-
-  // Method 1: Check if the object type matches the collection ID exactly
-  if (obj.data.type === collectionId) {
-    return true;
-  }
-
-  // Method 2: Check if the object type contains the collection ID as part of the struct
-  if (obj.data.type?.includes(collectionId)) {
-    return true;
-  }
-
-  // Method 3: Check content for collection metadata
-  if (obj.data.content && typeof obj.data.content === 'object') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const content = obj.data.content as any;
-
-    // Look for collection field in the content
-    if (content.fields?.collection === collectionId) {
-      return true;
-    }
-
-    // Look for collection_id field
-    if (content.fields?.collection_id === collectionId) {
-      return true;
-    }
-
-    // Look for collection in dataType moveObject
-    if (content.dataType === 'moveObject' && content.fields) {
-      // Check various common collection field names
-      const collectionFields = [
-        'collection',
-        'collection_id',
-        'collection_name',
-        'creator',
-      ];
-      for (const field of collectionFields) {
-        if (content.fields[field] === collectionId) {
-          return true;
-        }
-      }
-    }
-  }
-
-  // Method 4: Check display metadata
-  if (obj.data.display?.data) {
-    const displayData = obj.data.display.data;
-    if (displayData.collection === collectionId) {
-      return true;
-    }
-  }
-
-  return false;
+function isMatchingNFT(obj: any, fullObjectType: string): boolean {
+  return obj.data.type === fullObjectType;
 }
 
 export async function __get_suinft_balances(
   rpcEndpoint: string,
   options: GetSuiNftBalanceOptions,
 ): Promise<Balances> {
-  const collectionId = options.sourceOptions.collectionId.split('::')[0];
+  // example: 0xf21c5d05c7886648e7a6e2519b7df1df21c9004568f895583c8ba1de1b402f54::vault::VoteEscrowedToken<0x4a5313fa76e8abad0f812467de9bd7188abefba666fe9e262a2ded0863d60ea8::mock_navx_token::MOCK_NAVX_TOKEN>
 
   const client = new SuiClient({ url: rpcEndpoint });
   const balances: Balances = {};
@@ -107,8 +46,11 @@ export async function __get_suinft_balances(
 
             // Check if this is a VoteEscrowedToken (has voting power)
             if (obj.data.type && obj.data.type.includes('VoteEscrowedToken')) {
-              // Check if it belongs to the specified collection
-              if (isFromCollection(obj, collectionId)) {
+              console.log(
+                `\nFound VoteEscrowedToken: ${JSON.stringify(obj, null, 2)}\n`,
+              );
+              // Check if it matches the specified package address and struct name
+              if (isMatchingNFT(obj, options.sourceOptions.fullObjectType)) {
                 try {
                   console.log(
                     `Getting voting power for NFT type: ${obj.data.type}`,
@@ -143,8 +85,11 @@ export async function __get_suinft_balances(
                     ? [typeParamMatch[1]]
                     : [];
 
+                  const target = `${packageId}::${moduleName}::voting_power`;
+                  console.log(`Calling ${target}`);
+
                   tx.moveCall({
-                    target: `${packageId}::${moduleName}::voting_power`,
+                    target,
                     arguments: [
                       tx.object(obj.data.objectId), // VoteEscrowedToken object
                       tx.object(clockObjectId), // Clock object
@@ -188,8 +133,8 @@ export async function __get_suinft_balances(
                 }
               }
             } else {
-              // Regular NFT without voting power - check if it's from the collection
-              if (isFromCollection(obj, collectionId)) {
+              // Not a veNFT, but still matches
+              if (isMatchingNFT(obj, options.sourceOptions.fullObjectType)) {
                 nftCount++;
               }
             }
