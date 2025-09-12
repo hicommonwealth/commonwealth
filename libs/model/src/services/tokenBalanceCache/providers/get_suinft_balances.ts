@@ -15,6 +15,8 @@ export async function __get_suinft_balances(
 ): Promise<Balances> {
   // example: 0xf21c5d05c7886648e7a6e2519b7df1df21c9004568f895583c8ba1de1b402f54::vault::VoteEscrowedToken<0x4a5313fa76e8abad0f812467de9bd7188abefba666fe9e262a2ded0863d60ea8::mock_navx_token::MOCK_NAVX_TOKEN>
 
+  console.log(JSON.stringify(options, null, 2));
+
   const client = new SuiClient({ url: rpcEndpoint });
   const balances: Balances = {};
   const batchSize = options.batchSize || 100;
