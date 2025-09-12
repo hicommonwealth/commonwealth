@@ -118,3 +118,33 @@ export function formatDisplayNumber(
     return `${currencySymbol}${formattedNumber}`;
   }
 }
+
+/**
+ * Formats a market cap value with currency symbol and short suffixes (K/M/B/T)
+ * @param value - The market cap value to format
+ * @param currencySymbol - The currency symbol to prepend (default: '$')
+ * @param decimals - Number of decimal places (default: 1)
+ * @returns Formatted string like "$1.8K", "$2.5M", etc.
+ */
+export function formatMarketCap(
+  value: number | string | undefined | null,
+  currencySymbol: string = '$',
+  decimals: number = 1,
+): string {
+  if (value === null || value === undefined || value === '') {
+    return 'N/A';
+  }
+
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+
+  if (isNaN(num)) {
+    return 'N/A';
+  }
+
+  if (num === 0) {
+    return `${currencySymbol}0`;
+  }
+
+  const formattedNumber = formatBigNumberShort(num, decimals);
+  return `${currencySymbol}${formattedNumber}`;
+}

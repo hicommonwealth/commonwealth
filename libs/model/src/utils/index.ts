@@ -12,6 +12,7 @@ export * from './oauth/types';
 export * from './outbox';
 export * from './parseUserMentions';
 export * from './pgMultiRowUpdate';
+export * from './quests';
 export * from './sanitizeDeletedComment';
 export * from './sanitizeQuillText';
 export * from './testChainNodeUtils';

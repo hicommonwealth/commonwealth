@@ -1,4 +1,3 @@
-import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import {
@@ -10,12 +9,9 @@ import { CWSelectList } from 'client/scripts/views/components/component_kit/new_
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import useEditCommunityTokenMutation from 'state/api/communities/editCommunityToken';
 import { useEditTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import TokenFinder from 'views/components/TokenFinder/TokenFinder';
-import useTokenFinder from 'views/components/TokenFinder/useTokenFinder';
 import './TokenizationModal.scss';
 
 interface TokenizationModalProps {
@@ -39,7 +35,6 @@ const TokenizationModal = ({
   const [showInfoBox, setShowInfoBox] = useState(true);
 
   const communityId = app.activeChainId() || '';
-  const nodeEthChainId = app.chain.meta.ChainNode?.eth_chain_id || 0;
 
   const { data: topics = [] } = useFetchTopicsQuery({
     communityId,
@@ -47,24 +42,7 @@ const TokenizationModal = ({
     apiEnabled: !!communityId,
   });
 
-  const { data: community } = useGetCommunityByIdQuery({
-    id: communityId,
-    enabled: !!communityId,
-  });
-
-  const {
-    tokenMetadata,
-    tokenMetadataLoading,
-    getTokenError,
-    setTokenValue,
-    tokenValue,
-  } = useTokenFinder({
-    nodeEthChainId,
-    initialTokenValue: community?.thread_purchase_token || undefined,
-  });
-
   const { mutateAsync: editTopic } = useEditTopicMutation();
-  const { mutateAsync: editCommunityToken } = useEditCommunityTokenMutation();
 
   useEffect(() => {
     const tokenizedTopicIds = topics
@@ -108,14 +86,6 @@ const TokenizationModal = ({
   };
 
   const handleSaveChanges = async () => {
-    if (tokenValue.trim()) {
-      const tokenError = getTokenError(true);
-      if (tokenError) {
-        notifyError(tokenError);
-        return;
-      }
-    }
-
     setIsSaving(true);
     try {
       const updatePromises = selectedTopics.map((topicId) =>
@@ -135,11 +105,6 @@ const TokenizationModal = ({
       );
 
       await Promise.all([...updatePromises, ...deselectPromises]);
-
-      await editCommunityToken({
-        community_id: communityId,
-        thread_purchase_token: tokenValue.trim(),
-      });
 
       notifySuccess('Topics updated successfully');
       onSaveChanges();
@@ -218,28 +183,6 @@ const TokenizationModal = ({
               selectedTopics.includes(option.value),
             )}
             onChange={handleTopicSelection}
-          />
-        </div>
-
-        <div className="token-section">
-          <CWText type="b2" fontWeight="semiBold">
-            Primary token
-          </CWText>
-          <CWText type="caption" className="caption">
-            Enter a token to purchase and sell threads in this community.
-          </CWText>
-
-          <TokenFinder
-            tokenValue={tokenValue}
-            setTokenValue={setTokenValue}
-            tokenError={getTokenError()}
-            debouncedTokenValue={tokenValue}
-            tokenMetadataLoading={tokenMetadataLoading}
-            tokenMetadata={tokenMetadata}
-            placeholder="Enter token address"
-            tokenAddress={community?.thread_purchase_token || ''}
-            chainName={app.chain.meta.ChainNode?.name || ''}
-            chainEthId={app.chain.meta.ChainNode?.eth_chain_id || 0}
           />
         </div>
       </CWModalBody>

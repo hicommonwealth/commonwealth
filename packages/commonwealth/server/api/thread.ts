@@ -270,4 +270,8 @@ export const trpcRouter = trpc.router({
     Thread.GetThreadTokenHolders,
     trpc.Tag.Thread,
   ),
+  getThreadTokenTrades: trpc.query(
+    Thread.GetThreadTokenTrades,
+    trpc.Tag.Thread,
+  ),
 });

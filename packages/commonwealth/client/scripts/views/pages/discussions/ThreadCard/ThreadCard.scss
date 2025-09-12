@@ -76,6 +76,16 @@
 
           @include shared.flame($size: small);
         }
+
+        .holders-icon {
+          cursor: pointer;
+          color: colors.$neutral-600;
+          transition: color 0.2s ease;
+
+          &:hover {
+            color: colors.$neutral-800;
+          }
+        }
       }
     }
 

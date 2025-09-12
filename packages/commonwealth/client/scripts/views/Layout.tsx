@@ -23,6 +23,7 @@ import useAppStatus from '../hooks/useAppStatus';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import { useGetCommunityByIdQuery } from '../state/api/communities';
 import { useUpdateUserMutation } from '../state/api/user';
+import CWLayoutBanner from './CWLayoutBanner/CWLayoutBanner';
 import './Layout.scss';
 import SubLayout from './Sublayout';
 import MetaTags from './components/MetaTags';
@@ -247,6 +248,7 @@ const LayoutComponent = ({
       {renderDefaultMetatags && <MetaTags />}
       <ReactNativeBridgeRouter />
       <div className="Layout">
+        <CWLayoutBanner />
         {type === 'blank' ? (
           childToRender()
         ) : (

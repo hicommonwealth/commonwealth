@@ -124,3 +124,25 @@ export const GetTokenStats = {
     volume_24h: z.number(),
   }),
 };
+
+export const ThreadTokenTradesInput = z.object({ thread_id: z.number() });
+
+export const ThreadTokenTradesOutput = z.object({
+  result: z
+    .array(
+      z.object({
+        id: z.string(),
+        type: z.enum(['buy', 'sell']),
+        amount: z.string(),
+        price: z.number(),
+        timestamp: z.number(),
+        address: z.string(),
+      }),
+    )
+    .nullable(),
+});
+
+export const ThreadTokenTradesSchema = {
+  input: ThreadTokenTradesInput,
+  output: ThreadTokenTradesOutput,
+};

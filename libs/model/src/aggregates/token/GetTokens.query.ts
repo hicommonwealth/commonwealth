@@ -125,7 +125,6 @@ export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
         replacements,
         type: QueryTypes.SELECT,
         nest: true,
-        logging: true,
       });
 
       return schemas.buildPaginatedResponse(

@@ -100,11 +100,25 @@ export function PinToken(): Command<typeof schemas.PinToken> {
         throw new InvalidState(PinTokenErrors.FailedToFetchPrice);
       }
 
-      return await models.PinnedToken.create({
-        community_id,
-        chain_node_id,
-        contract_address,
-      });
+      const pinnedToken = await models.sequelize.transaction(
+        async (transaction) => {
+          await models.Community.update(
+            { thread_purchase_token: contract_address },
+            { where: { id: community.id }, transaction },
+          );
+
+          return await models.PinnedToken.create(
+            {
+              community_id,
+              chain_node_id,
+              contract_address,
+            },
+            { transaction },
+          );
+        },
+      );
+
+      return pinnedToken;
     },
   };
 }

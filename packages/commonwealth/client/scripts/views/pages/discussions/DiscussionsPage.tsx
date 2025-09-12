@@ -327,7 +327,9 @@ const DiscussionsPage = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
 
-  const handleSubmitThread = async (): Promise<number> => {
+  const handleSubmitThread = async (
+    turnstileToken?: string,
+  ): Promise<number> => {
     if (isSubmitting) return -1;
 
     let useTopicObj = topicObj;
@@ -368,6 +370,7 @@ const DiscussionsPage = () => {
         stage: '',
         topic: useTopicObj,
         url: '',
+        turnstileToken,
       });
 
       const newThread = await createThread(threadInput);

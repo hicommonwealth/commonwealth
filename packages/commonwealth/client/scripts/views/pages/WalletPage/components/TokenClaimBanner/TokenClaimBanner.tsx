@@ -1,5 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'client/scripts/helpers';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import {
   useGetClaimAddressQuery,
@@ -9,6 +10,7 @@ import CWBanner from 'client/scripts/views/components/component_kit/new_designs/
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
+import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
@@ -41,9 +43,11 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const [selectedAddress, setSelectedAddress] = useState<
     AddressInfo | undefined
   >(undefined);
+  const claimsEnabled = useFlag('claims');
+  const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
     useGetClaimAddressQuery({
-      enabled: true,
+      enabled: claimsEnabled,
     });
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
@@ -100,7 +104,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     }
   };
 
-  if (!claimAddress?.tokens || isLoadingClaimAddress) {
+  if (!claimAddress?.tokens || isLoadingClaimAddress || !claimsEnabled) {
     return null;
   }
 
@@ -159,7 +163,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     </div>
   ) : null;
 
-  const formattedBalance = formatTokenBalance(claimAddress.tokens || 0);
+  const formattedBalance = formatTokenBalance(claimAddress?.tokens || 0);
 
   return (
     <div className="TokenClaimBanner">
@@ -201,6 +205,17 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                 </div>
               </div>
               {addressFormContent}
+              <CWCheckbox
+                checked={isAcknowledged}
+                onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
+                label={
+                  <div>
+                    I understand that once incentives are added, there are
+                    non-refundable and can NOT be withdrawn under any
+                    circumstances.
+                  </div>
+                }
+              />
               <div className="banner-actions">
                 {!claimAddress?.magna_synced_at && (
                   <CWButton
@@ -219,7 +234,9 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                 <CWButton
                   label={`Claim to ${formatAddressShort(claimAddress?.address, 6)}`}
                   buttonType="primary"
-                  disabled={!claimAddress.magna_allocation_id}
+                  disabled={
+                    !claimAddress?.magna_allocation_id ? !isAcknowledged : false
+                  }
                   onClick={() => {
                     // handleClaim(claimAddress.magna_allocation_id);
                     alert(
