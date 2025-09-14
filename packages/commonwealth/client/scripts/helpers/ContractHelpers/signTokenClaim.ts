@@ -38,8 +38,8 @@ class SignTokenClaim extends ContractBase {
 
     const sendTx = this.web3.eth.sendTransaction(tx);
 
-    return new Promise<string>((resolve, reject) => {
-      sendTx
+    return await new Promise<string>((resolve, reject) => {
+      void sendTx
         .once('transactionHash', (hash) => {
           resolve(hash);
         })
