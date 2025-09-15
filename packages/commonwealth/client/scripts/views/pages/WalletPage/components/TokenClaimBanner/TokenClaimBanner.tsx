@@ -3,7 +3,7 @@ import { formatAddressShort } from 'client/scripts/helpers';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import {
-  useClaimTokenMutation,
+  useClaimAndSignToken,
   useGetAllocationQuery,
   useGetClaimAddressQuery,
   useUpdateClaimAddressMutation,
@@ -47,22 +47,21 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     AddressInfo | undefined
   >(undefined);
   const claimsEnabled = useFlag('claims');
+  const {
+    run: claimToken,
+    isPending: isClaiming,
+    transactionHash,
+  } = useClaimAndSignToken();
   const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
     useGetClaimAddressQuery({ enabled: true });
   const { data: allocation, isLoading: isLoadingAllocation } =
     useGetAllocationQuery({
       magna_allocation_id: claimAddress?.magna_allocation_id,
-      enabled:
-        !!claimAddress?.magna_allocation_id && !claimAddress.magna_claimed_at,
+      enabled: !!claimAddress?.magna_allocation_id && !transactionHash,
     });
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
-  const {
-    mutate: claimToken,
-    isPending: isClaiming,
-    transactionHash,
-  } = useClaimTokenMutation();
 
   useEffect(() => {
     const addresses = new Map<string, AddressInfo>();
@@ -192,28 +191,20 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
             <h2 className="token-balance">
               You have {formattedClaimable} Common tokens!
             </h2>
-            {claimAddress.magna_claimed_at ? (
+            {claimAddress.magna_claimed_at && transactionHash ? (
               <div className="notice-section">
                 <div className="notice-text">
                   <p className="base-notice">
                     You claimed your tokens on{' '}
                     {new Date(claimAddress.magna_claimed_at).toLocaleString()}
                   </p>
-                  {transactionHash ? (
-                    <a
-                      href={`https://basescan.org/tx/${transactionHash}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {transactionHash.slice(0, 6)}...
-                      {transactionHash.slice(-4)}
-                    </a>
-                  ) : (
-                    <p>
-                      Something went wrong when saving the transaction hash...
-                      Please check your wallet to confirm the transaction.
-                    </p>
-                  )}
+                  <a
+                    href={`https://basescan.org/tx/${transactionHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {transactionHash.slice(0, 6)}...{transactionHash.slice(-4)}
+                  </a>
                 </div>
               </div>
             ) : claimAddress?.magna_synced_at ? (

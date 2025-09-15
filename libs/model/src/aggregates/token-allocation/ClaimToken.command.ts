@@ -29,14 +29,12 @@ export function ClaimToken(): Command<typeof schemas.ClaimToken> {
           FROM
             "ClaimAddresses" C
           WHERE
-            C.address = :address
-            AND C.user_id = :user_id
+            C.user_id = :user_id
             AND C.magna_allocation_id = :allocation_id;
         `,
         {
           type: QueryTypes.SELECT,
           replacements: {
-            address: actor.address, // must be authenticated with claim address
             user_id: actor.user.id,
             allocation_id,
           },
