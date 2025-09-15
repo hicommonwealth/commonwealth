@@ -43,9 +43,9 @@ class SignTokenClaim extends ContractBase {
       maxPriorityFeePerGas,
     };
 
-    return await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       try {
-        this.web3.eth
+        void this.web3.eth
           .sendTransaction(tx)
           .once('transactionHash', (hash) => resolve(hash as `0x${string}`))
           .once('error', (err) => reject(err));

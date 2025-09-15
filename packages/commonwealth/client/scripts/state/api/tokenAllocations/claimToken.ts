@@ -55,7 +55,7 @@ export const useClaimAndSignToken = () => {
       setTransactionHash(txHash);
       notifySuccess('Token claimed successfully');
       return txHash;
-    } catch (error: any) {
+    } catch (error) {
       notifyError(error.message ?? 'Something went wrong');
       throw error; // let caller handle if needed
     }
