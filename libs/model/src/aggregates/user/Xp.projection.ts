@@ -14,6 +14,7 @@ import { Op } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
+import { getUserByAddress } from '../../utils/getUserByAddress';
 
 const log = logger(import.meta);
 
@@ -32,35 +33,6 @@ async function getUserByAddressId(address_id: number) {
       },
     ],
   });
-  return addr?.user_id ?? undefined;
-}
-
-async function getUserByAddress(address: string) {
-  const addr = await models.Address.findOne({
-    where: {
-      [Op.and]: [
-        {
-          [Op.or]: [
-            { address: address.toLowerCase() },
-            { address: getEvmAddress(address) },
-          ],
-        },
-        { user_id: { [Op.not]: null } },
-        { is_banned: { [Op.eq]: false } },
-      ],
-    },
-    attributes: ['user_id'],
-    include: [
-      {
-        model: models.User,
-        attributes: ['id'],
-        required: true,
-        // don't reward unverified or banned users
-        where: { tier: { [Op.gt]: UserTierMap.BannedUser } },
-      },
-    ],
-  });
-
   return addr?.user_id ?? undefined;
 }
 
@@ -489,8 +461,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           attributes: ['community_id', 'creator_address'],
         });
         if (!contest?.creator_address) return;
-        const user_id = await getUserByAddress(contest.creator_address);
-        if (!user_id) return;
+        const user = await getUserByAddress(contest.creator_address);
+        if (!user?.user_id) return;
 
         const action_metas = await getQuestActionMetas(
           {
@@ -501,7 +473,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
         await recordXpsForQuest({
           event_id: id,
-          user_id,
+          user_id: user.user_id,
           event_created_at: payload.created_at!,
           action_metas,
           scope: {
@@ -517,8 +489,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           attributes: ['community_id', 'creator_address'],
         });
         if (!contest?.creator_address) return;
-        const user_id = await getUserByAddress(contest.creator_address);
-        if (!user_id) return;
+        const user = await getUserByAddress(contest.creator_address);
+        if (!user?.user_id) return;
 
         const action_metas = await getQuestActionMetas(
           {
@@ -529,7 +501,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
         await recordXpsForQuest({
           event_id: id,
-          user_id,
+          user_id: user.user_id,
           event_created_at: payload.created_at!,
           action_metas,
           scope: {
@@ -553,8 +525,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
         if (total_prize <= 0) return;
 
-        const user_id = await getUserByAddress(contest.creator_address);
-        if (!user_id) return;
+        const user = await getUserByAddress(contest.creator_address);
+        if (!user?.user_id) return;
 
         const action_metas = await getQuestActionMetas(
           {
@@ -565,7 +537,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
         await recordXpsForQuest({
           event_id: id,
-          user_id,
+          user_id: user.user_id,
           event_created_at: payload.created_at!,
           action_metas,
           scope: {
@@ -576,10 +548,14 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         });
       },
       LaunchpadTokenRecordCreated: async ({ id, payload }) => {
-        const user_id = await getUserByAddress(payload.creator_address);
+        const user = await getUserByAddress(payload.creator_address);
         config.XP.LOG_LAUNCHPAD &&
-          log.info('Xp->LaunchpadTokenRecordCreated', { id, payload, user_id });
-        if (!user_id) return;
+          log.info('Xp->LaunchpadTokenRecordCreated', {
+            id,
+            payload,
+            user_id: user?.user_id,
+          });
+        if (!user?.user_id) return;
 
         const created_at = payload.created_at;
         const action_metas = await getQuestActionMetas(
@@ -590,12 +566,12 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           log.info('Xp->LaunchpadTokenRecordCreated', {
             id,
             payload,
-            user_id,
+            user_id: user.user_id,
             action_metas,
           });
         await recordXpsForQuest({
           event_id: id,
-          user_id,
+          user_id: user.user_id,
           event_created_at: created_at,
           action_metas,
           scope: {
@@ -605,16 +581,25 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         });
       },
       LaunchpadTokenTraded: async ({ id, payload }) => {
-        const user_id = await getUserByAddress(payload.trader_address);
+        const user = await getUserByAddress(payload.trader_address);
         config.XP.LOG_LAUNCHPAD &&
-          log.info('Xp->LaunchpadTokenTraded', { id, payload, user_id });
-        if (!user_id) return;
+          log.info('Xp->LaunchpadTokenTraded', {
+            id,
+            payload,
+            user_id: user?.user_id,
+          });
+        if (!user?.user_id) return;
 
         const token = await models.LaunchpadToken.findOne({
           where: { token_address: payload.token_address.toLowerCase() },
         });
         config.XP.LOG_LAUNCHPAD &&
-          log.info('Xp->LaunchpadTokenTraded', { id, payload, user_id, token });
+          log.info('Xp->LaunchpadTokenTraded', {
+            id,
+            payload,
+            user_id: user.user_id,
+            token,
+          });
         if (!token) return;
 
         const community = await models.Community.findOne({
@@ -633,14 +618,14 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           log.info('Xp->LaunchpadTokenTraded', {
             id,
             payload,
-            user_id,
+            user_id: user.user_id,
             created_at,
             action_metas,
             eth_amount,
           });
         await recordXpsForQuest({
           event_id: id,
-          user_id,
+          user_id: user.user_id,
           event_created_at: created_at,
           action_metas,
           scope: {
@@ -653,12 +638,17 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         });
       },
       LaunchpadTokenGraduated: async ({ id, payload }) => {
-        const user_id =
-          payload.token.creator_address &&
-          (await getUserByAddress(payload.token.creator_address));
+        let user: { user_id: number } | undefined;
+        if (payload.token.creator_address) {
+          user = await getUserByAddress(payload.token.creator_address);
+        }
         config.XP.LOG_LAUNCHPAD &&
-          log.info('Xp->LaunchpadTokenGraduated', { id, payload, user_id });
-        if (!user_id) return;
+          log.info('Xp->LaunchpadTokenGraduated', {
+            id,
+            payload,
+            user_id: user?.user_id,
+          });
+        if (!user?.user_id) return;
 
         const created_at = payload.token.updated_at
           ? new Date(payload.token.updated_at)
@@ -669,7 +659,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
         await recordXpsForQuest({
           event_id: id,
-          user_id,
+          user_id: user.user_id,
           event_created_at: created_at,
           action_metas,
           scope: {
@@ -794,8 +784,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           rpc: chainNode.private_url || chainNode.url,
           txHash: payload.transaction_hash,
         });
-        const user_id = await getUserByAddress(getEvmAddress(tx.from));
-        if (!user_id) return;
+        const user = await getUserByAddress(getEvmAddress(tx.from));
+        if (!user?.user_id) return;
         const action_metas = await getQuestActionMetas(
           payload,
           'XpChainEventCreated',
@@ -810,7 +800,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         if (action_metas.length === 0) return;
         await recordXpsForQuest({
           event_id: id,
-          user_id,
+          user_id: user.user_id,
           event_created_at: payload.created_at,
           action_metas,
         });
