@@ -103,7 +103,7 @@ export type GetSuiTokenBalanceOptions = GetSuiBalancesBase & {
 export type GetSuiNftBalanceOptions = GetSuiBalancesBase & {
   balanceSourceType: BalanceSourceType.SuiNFT;
   sourceOptions: {
-    collectionId: string;
+    fullObjectType: string;
   };
 };
 
