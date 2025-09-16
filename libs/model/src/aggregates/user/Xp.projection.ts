@@ -98,10 +98,10 @@ async function recordXpsForQuest({
   const creator_address = shared_with?.creator_address;
   const referrer_address =
     shared_with?.referrer_address || user?.referred_by_address;
-  const creator_user_id = creator_address
+  const creator = creator_address
     ? await getUserByAddress(creator_address)
     : null;
-  const referrer_user_id = referrer_address
+  const referrer = referrer_address
     ? await getUserByAddress(referrer_address)
     : null;
 
@@ -247,8 +247,8 @@ async function recordXpsForQuest({
           event_id,
           event_created_at,
           user_id,
-          creator_user_id,
-          referrer_user_id,
+          creator_user_id: creator.user_id,
+          referrer_user_id: referrer.user_id,
           xp_points,
           creator_xp_points,
           referrer_xp_points,
