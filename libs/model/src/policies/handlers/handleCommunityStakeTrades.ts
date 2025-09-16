@@ -1,9 +1,8 @@
 import { EventHandler, logger } from '@hicommonwealth/core';
 import { getStakeTradeInfo } from '@hicommonwealth/evm-protocols';
-import { UserTierMap } from '@hicommonwealth/shared';
 import { ZodUndefined } from 'zod';
 import { models } from '../../database';
-import { getUserByAddress } from '../../utils/getUserByAddress';
+import { bumpTierInTx } from '../../utils/tiers';
 import { chainNodeMustExist } from '../utils/utils';
 
 const log = logger(import.meta);
@@ -80,22 +79,6 @@ export const handleCommunityStakeTrades: EventHandler<
       },
       { transaction },
     );
-    const user = await getUserByAddress(trader, {
-      transaction,
-      forUpdate: true,
-    });
-    if (user && user.tier < UserTierMap.ChainVerified) {
-      await models.User.update(
-        {
-          tier: UserTierMap.ChainVerified,
-        },
-        {
-          where: {
-            id: user.user_id,
-          },
-          transaction,
-        },
-      );
-    }
+    await bumpTierInTx(trader, transaction);
   });
 };

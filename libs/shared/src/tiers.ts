@@ -319,7 +319,7 @@ export type CommunityVerificationItemType =
  * Used to bump a user tier to a higher tier. Will never bump a user who is
  * already banned. [SIDE EFFECT] The targetObject is modified with the new tier.
  */
-export function bumpUserTier<
+export function bumpUserTierInPlace<
   T extends { tier?: UserTierMap | null | undefined },
 >({
   oldTier,

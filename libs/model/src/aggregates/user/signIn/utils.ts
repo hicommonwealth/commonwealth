@@ -2,7 +2,7 @@ import { InvalidActor, logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
-  bumpUserTier,
+  bumpUserTierInPlace,
   UserTierMap,
 } from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
@@ -170,7 +170,7 @@ export async function findOrCreateUser({
   if (signedInUser?.id) {
     const values: Partial<UserAttributes> = {};
     if (!signedInUser.privy_id && privyUserId) values.privy_id = privyUserId;
-    bumpUserTier({
+    bumpUserTierInPlace({
       oldTier: signedInUser.tier,
       newTier: tier,
       targetObject: values,
@@ -179,7 +179,7 @@ export async function findOrCreateUser({
   } else if (foundUser?.id) {
     const values: Partial<UserAttributes> = {};
     if (!foundUser.privy_id && privyUserId) values.privy_id = privyUserId;
-    bumpUserTier({
+    bumpUserTierInPlace({
       oldTier: foundUser.tier,
       newTier: tier,
       targetObject: values,

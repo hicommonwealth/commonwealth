@@ -3,7 +3,7 @@ import { logger, ServerError } from '@hicommonwealth/core';
 import { Address, MagicLogin } from '@hicommonwealth/schemas';
 import {
   ALL_COMMUNITIES,
-  bumpUserTier,
+  bumpUserTierInPlace,
   CANVAS_TOPIC,
   ChainBase,
   deserializeCanvas,
@@ -133,7 +133,10 @@ async function bumpTier(
     !verifiedInfo.oauth_email ||
     (verifiedInfo.oauth_email && verifiedInfo.oauth_email_verified)
   ) {
-    bumpUserTier({ newTier: UserTierMap.SocialVerified, targetObject: user });
+    bumpUserTierInPlace({
+      newTier: UserTierMap.SocialVerified,
+      targetObject: user,
+    });
     await user.save({ transaction });
   }
 }
