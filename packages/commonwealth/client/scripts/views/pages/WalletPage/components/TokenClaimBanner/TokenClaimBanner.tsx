@@ -3,7 +3,7 @@ import { formatAddressShort } from 'client/scripts/helpers';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import {
-  useClaimAndSignToken,
+  useClaimTokenFlow,
   useGetAllocationQuery,
   useGetClaimAddressQuery,
   useUpdateClaimAddressMutation,
@@ -48,10 +48,10 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   >(undefined);
   const claimsEnabled = useFlag('claims');
   const {
-    run: claimToken,
+    claim: claimToken,
     isPending: isClaiming,
     transactionHash,
-  } = useClaimAndSignToken();
+  } = useClaimTokenFlow();
   const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
     useGetClaimAddressQuery({ enabled: true });
