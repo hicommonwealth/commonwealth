@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { models } from '../../database';
 import { authRoles, mustExist } from '../../middleware';
 import { emitEvent } from '../../utils/outbox';
-import { bumpTierInTx } from '../../utils/tiers';
+import { bumpToChainVerified } from '../../utils/tiers';
 
 export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
@@ -120,7 +120,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
             transaction,
           );
 
-        await bumpTierInTx(creator_address, transaction);
+        await bumpToChainVerified(creator_address, transaction);
 
         return {
           ...token!.toJSON(),

@@ -9,7 +9,7 @@ export type CommunityVerificationItem = {
 };
 
 type TierClientInfo = {
-  trustLevel: 0 | 1 | 2 | 3 | 4 | 5;
+  trustLevel: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   icon: string;
   componentIcon:
     | 'stopSymbol'
@@ -48,8 +48,9 @@ export enum UserTierMap {
   VerifiedWallet = 3,
   SocialVerified = 4,
   ChainVerified = 5,
-  ManuallyVerified = 6,
-  SystemUser = 7,
+  FullyVerified = 6,
+  ManuallyVerified = 7,
+  SystemUser = 8,
 }
 
 export const DisabledCommunitySpamTier = -1 as const;
@@ -164,11 +165,21 @@ export const USER_TIERS = {
       },
     },
   },
+  [UserTierMap.FullyVerified]: {
+    name: 'Fully Verified',
+    description:
+      'User has completed all verification requirements and achieved highest community trust.',
+    clientInfo: {
+      trustLevel: 5,
+      icon: '💎',
+      componentIcon: 'starGolden',
+    },
+  },
   [UserTierMap.ManuallyVerified]: {
     name: 'Manual Verification',
     description: 'Manually reviewed and verified by our team',
     clientInfo: {
-      trustLevel: 5,
+      trustLevel: 6,
       icon: '⭐',
       componentIcon: 'starGolden',
     },

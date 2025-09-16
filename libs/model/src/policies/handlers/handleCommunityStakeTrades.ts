@@ -2,7 +2,7 @@ import { EventHandler, logger } from '@hicommonwealth/core';
 import { getStakeTradeInfo } from '@hicommonwealth/evm-protocols';
 import { ZodUndefined } from 'zod';
 import { models } from '../../database';
-import { bumpTierInTx } from '../../utils/tiers';
+import { bumpToChainVerified } from '../../utils/tiers';
 import { chainNodeMustExist } from '../utils/utils';
 
 const log = logger(import.meta);
@@ -79,6 +79,6 @@ export const handleCommunityStakeTrades: EventHandler<
       },
       { transaction },
     );
-    await bumpTierInTx(trader, transaction);
+    await bumpToChainVerified(trader, transaction);
   });
 };

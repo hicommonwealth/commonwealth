@@ -10,7 +10,7 @@ import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { emitEvent } from '../../utils';
-import { bumpTierInTx } from '../../utils/tiers';
+import { bumpToChainVerified } from '../../utils/tiers';
 
 const log = logger(import.meta);
 
@@ -238,7 +238,7 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
             transaction,
           );
 
-          await bumpTierInTx(deployer_address, transaction);
+          await bumpToChainVerified(deployer_address, transaction);
         }
       });
 

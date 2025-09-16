@@ -4,7 +4,7 @@ import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { chainNodeMustExist } from '../../policies/utils/utils';
-import { bumpTierInTx } from '../../utils/tiers';
+import { bumpToChainVerified } from '../../utils/tiers';
 import { handleCapReached } from './utils';
 
 export function ProjectLaunchpadTrade(): Command<
@@ -92,7 +92,7 @@ export function ProjectLaunchpadTrade(): Command<
             }
           }
         }
-        await bumpTierInTx(trader_address, transaction);
+        await bumpToChainVerified(trader_address, transaction);
       });
 
       // If cap reached, transfer to uniswap

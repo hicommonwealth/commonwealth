@@ -3,7 +3,7 @@ import { Transaction } from 'sequelize';
 import { models } from '../database';
 import { getUserByAddress } from './getUserByAddress';
 
-export async function bumpTierInTx(
+export async function bumpToChainVerified(
   userAddress: string,
   transaction: Transaction,
 ) {
