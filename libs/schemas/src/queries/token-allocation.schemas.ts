@@ -29,6 +29,7 @@ export const ClaimAddressView = z.object({
     .or(z.string())
     .nullish()
     .describe('When the allocation was claimed by the user.'),
+  magna_claim_tx_hash: z.string().nullish(),
 });
 
 export const GetClaimAddress = {

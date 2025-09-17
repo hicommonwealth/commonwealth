@@ -46,6 +46,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const [selectedAddress, setSelectedAddress] = useState<
     AddressInfo | undefined
   >(undefined);
+  const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
   const claimsEnabled = useFlag('claims');
   const {
     claim: claimToken,
@@ -87,7 +88,10 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
           0,
       ),
     );
-  }, [claimAddress, evmAddresses, allocation]);
+    setTxHash(
+      (claimAddress?.magna_claim_tx_hash as `0x${string}`) ?? transactionHash,
+    );
+  }, [claimAddress, evmAddresses, allocation, transactionHash]);
 
   const handleClaimAddressUpdate = () => {
     if (selectedAddress) {
@@ -192,7 +196,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
             <h2 className="token-balance">
               You have {formattedClaimable} {claimAddress.token} tokens!
             </h2>
-            {claimAddress.magna_claimed_at && transactionHash ? (
+            {claimAddress.magna_claimed_at && txHash ? (
               <div className="notice-section">
                 <div className="notice-text">
                   <p className="base-notice">
@@ -200,11 +204,11 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                     {new Date(claimAddress.magna_claimed_at).toLocaleString()}
                   </p>
                   <a
-                    href={`https://basescan.org/tx/${transactionHash}`}
+                    href={`https://basescan.org/tx/${txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {transactionHash.slice(0, 6)}...{transactionHash.slice(-4)}
+                    {txHash.slice(0, 6)}...{txHash.slice(-4)}
                   </a>
                 </div>
               </div>
