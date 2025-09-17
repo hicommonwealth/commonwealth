@@ -11,14 +11,18 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { pluralize } from 'helpers';
+import { formatMarketCap } from 'helpers/formatting';
+import { useTokenPricing } from 'hooks/useTokenPricing';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { downloadDataAsFile } from 'utils/downloadDataAsFile';
 import ShareButton from 'views/components/ShareButton';
+import { ThreadTokenDrawerTrigger } from 'views/components/ThreadTokenDrawer';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ToggleThreadSubscribe } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
 import { z } from 'zod';
 import { AdminActions, AdminActionsProps } from './AdminActions';
@@ -48,6 +52,7 @@ type OptionsProps = AdminActionsProps & {
   actionGroups: ActionGroups;
   bypassGating: boolean;
   onTradeClick?: () => void;
+  onTokenDrawerClick?: () => void;
 };
 
 export const ThreadOptions = ({
@@ -82,6 +87,7 @@ export const ThreadOptions = ({
   actionGroups,
   bypassGating,
   onTradeClick,
+  onTokenDrawerClick,
 }: OptionsProps) => {
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   const userStore = useUserStore();
@@ -117,6 +123,12 @@ export const ThreadOptions = ({
       // ignore errors or missing data
     }
   }, [thread.canvasSignedData]);
+
+  const { pricing: tokenPricing, isLoading: isPricingLoading } =
+    useTokenPricing({
+      token: threadToken as unknown as LaunchpadToken,
+    });
+  const lastPurchaseActivity = thread.lastPurchaseActivity;
 
   return (
     <>
@@ -162,15 +174,58 @@ export const ThreadOptions = ({
             />
           )}
 
-          {threadToken?.token_address && onTradeClick && (
-            <CWThreadAction
-              label={showOnlyThreadActionIcons ? '' : 'Trade'}
-              action="fund"
+          {threadToken?.token_address && onTokenDrawerClick && (
+            <ThreadTokenDrawerTrigger
               onClick={(e) => {
                 e.preventDefault();
-                onTradeClick();
+                onTokenDrawerClick();
               }}
-              tooltipText="Trade thread token"
+              label={showOnlyThreadActionIcons ? '' : 'Holders'}
+              showLabel={!showOnlyThreadActionIcons}
+            />
+          )}
+
+          {threadToken?.token_address && onTradeClick && (
+            <CWTooltip
+              placement="top"
+              content={
+                tokenPricing?.marketCapCurrent
+                  ? `Market Cap: ${formatMarketCap(tokenPricing.marketCapCurrent)}`
+                  : lastPurchaseActivity?.is_buy !== undefined
+                    ? `Last trade: ${lastPurchaseActivity.is_buy ? 'Buy' : 'Sell'}`
+                    : 'View market cap'
+              }
+              renderTrigger={(handleInteraction) => (
+                <button
+                  className="ThreadAction"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onTradeClick();
+                  }}
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                >
+                  {lastPurchaseActivity?.is_buy !== undefined && (
+                    <CWIcon
+                      iconName={
+                        lastPurchaseActivity.is_buy
+                          ? 'arrowUpHalfGreen'
+                          : 'arrowDownHalfOrange'
+                      }
+                      iconSize="small"
+                    />
+                  )}
+                  {!showOnlyThreadActionIcons && (
+                    <CWText type="caption" fontWeight="regular">
+                      {isPricingLoading
+                        ? 'Loading...'
+                        : tokenPricing?.marketCapCurrent
+                          ? formatMarketCap(tokenPricing.marketCapCurrent)
+                          : 'Market Cap'}
+                    </CWText>
+                  )}
+                </button>
+              )}
             />
           )}
 

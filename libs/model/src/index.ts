@@ -63,7 +63,8 @@ export {
   R2_ADAPTER_KEY,
   buildChainNodeUrl,
   equalEvmAddresses,
-  getQuestXpLeaderboardViewName,
   getSaltedApiKeyHash,
   uploadIfLarge,
 } from './utils/utils';
+
+export { getQuestXpLeaderboardViewName } from './utils/quests';

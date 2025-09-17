@@ -77,7 +77,7 @@ describe('MagnaSync Lifecycle', () => {
 
     // Execute sync
     await magnaSync(
-      () => Promise.resolve(true),
+      (args) => Promise.resolve(args.key),
       10,
       0, // Set breather to 0 to speed up test
     );

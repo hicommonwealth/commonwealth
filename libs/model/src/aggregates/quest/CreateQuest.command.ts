@@ -1,92 +1,10 @@
 import { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Transaction } from 'sequelize';
 import { models } from '../../database';
 import { isSuperAdmin } from '../../middleware';
 import { mustBeValidDateRange, mustNotExist } from '../../middleware/guards';
 import { QuestInstance } from '../../models/quest';
-import { getQuestXpLeaderboardViewName } from '../../utils';
-
-export async function createQuestMaterializedView(
-  quest_id: number,
-  transaction: Transaction,
-) {
-  const viewName = getQuestXpLeaderboardViewName(quest_id);
-  await models.sequelize.query(
-    `
-    CREATE MATERIALIZED VIEW "${viewName}" AS
-      WITH user_xp_combined AS (
-          SELECT
-              l.user_id as user_id,
-              l.xp_points as xp_points,
-              0 as creator_xp_points,
-              0 as referrer_xp_points
-          FROM "XpLogs" l
-                   JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
-                   JOIN "Quests" q ON m.quest_id = q.id
-          WHERE l.user_id IS NOT NULL AND q.id = ${quest_id}
-      
-          UNION ALL
-      
-          SELECT
-              l.creator_user_id as user_id,
-              0 as xp_points,
-              l.creator_xp_points as creator_xp_points,
-              0 as referrer_xp_points
-          FROM "XpLogs" l
-                   JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
-                   JOIN "Quests" q ON m.quest_id = q.id
-          WHERE l.creator_user_id IS NOT NULL AND q.id = ${quest_id}
-          
-          UNION ALL
-          
-          SELECT
-              l.referrer_user_id as user_id,
-              0 as xp_points,
-              0 as creator_xp_points,
-              l.referrer_xp_points as referrer_xp_points
-          FROM "XpLogs" l
-                   JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
-                   JOIN "Quests" q ON m.quest_id = q.id
-          WHERE l.referrer_user_id IS NOT NULL AND q.id = ${quest_id}
-      ),
-           aggregated_xp AS (
-               SELECT
-                   user_id,
-                   SUM(xp_points)::int as total_user_xp,
-                   SUM(creator_xp_points)::int as total_creator_xp,
-                   SUM(referrer_xp_points)::int as total_referrer_xp
-               FROM user_xp_combined
-               GROUP BY user_id
-           )
-      SELECT
-          a.user_id,
-          (a.total_user_xp + a.total_creator_xp + a.total_referrer_xp) as xp_points,
-          u.tier,
-          ROW_NUMBER() OVER (ORDER BY (a.total_user_xp + a.total_creator_xp + a.total_referrer_xp) DESC, a.user_id ASC)::int as rank
-      FROM aggregated_xp a
-               JOIN "Users" u ON a.user_id = u.id
-      WHERE u.tier > 1;
-  `,
-    { transaction },
-  );
-
-  await models.sequelize.query(
-    `
-    CREATE UNIQUE INDEX "${viewName}_user_id"
-    ON "${viewName}" (user_id)
-  `,
-    { transaction },
-  );
-
-  await models.sequelize.query(
-    `
-    CREATE INDEX "${viewName}_rank"
-    ON "${viewName}" (rank DESC);
-  `,
-    { transaction },
-  );
-}
+import { createQuestMaterializedView } from '../../utils/quests';
 
 export function CreateQuest(): Command<typeof schemas.CreateQuest> {
   return {

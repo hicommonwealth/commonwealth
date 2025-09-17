@@ -59,7 +59,10 @@ const useSellThreadTokenMutation = () => {
   return useMutation({
     mutationFn: sellThreadToken,
     onSuccess: async (_, variables) => {
-      await resetBalancesCache(_, variables);
+      await resetBalancesCache(_, {
+        ...variables,
+        paymentTokenAddress: variables.paymentTokenAddress,
+      });
     },
   });
 };

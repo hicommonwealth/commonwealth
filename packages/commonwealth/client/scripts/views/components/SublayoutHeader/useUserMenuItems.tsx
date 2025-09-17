@@ -85,7 +85,7 @@ const useUserMenuItems = ({
   const userData = useUserStore();
   const hasMagic = userData.hasMagicWallet;
 
-  const { openMagicWallet } = useAuthentication({});
+  const { openMagicWallet, revealMagicPrivateKey } = useAuthentication({});
 
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake();
@@ -300,6 +300,13 @@ const useUserMenuItems = ({
                 </div>
               ),
               onClick: () => openMagicWallet(),
+            },
+            {
+              type: 'default',
+              label: 'Reveal private key',
+              onClick: () => {
+                revealMagicPrivateKey().catch(console.error);
+              },
             },
           ]
         : []),

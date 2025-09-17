@@ -79,7 +79,7 @@ export async function getBalances(
       (options.balanceSourceType === BalanceSourceType.SuiToken
         ? (options as GetSuiTokenBalanceOptions).sourceOptions.coinType
         : options.balanceSourceType === BalanceSourceType.SuiNFT
-          ? (options as GetSuiNftBalanceOptions).sourceOptions.collectionId
+          ? (options as GetSuiNftBalanceOptions).sourceOptions.fullObjectType
           : undefined);
 
     const msg =
@@ -107,9 +107,9 @@ export async function getBalances(
         options.balanceSourceType === BalanceSourceType.SuiToken
           ? (options as GetSuiTokenBalanceOptions).sourceOptions.coinType
           : undefined,
-      collectionId:
+      fullObjectType:
         options.balanceSourceType === BalanceSourceType.SuiNFT
-          ? (options as GetSuiNftBalanceOptions).sourceOptions.collectionId
+          ? (options as GetSuiNftBalanceOptions).sourceOptions.fullObjectType
           : undefined,
     });
   }

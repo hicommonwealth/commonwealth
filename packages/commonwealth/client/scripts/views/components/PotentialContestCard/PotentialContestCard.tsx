@@ -60,7 +60,7 @@ export const PotentialContestCard = ({
     isGoalReached
   ) {
     if (isLoading) {
-    return (
+      return (
         <CWCard
           className="PotentialContestCard PotentialContestCard--Skeleton"
           elevation="elevation-1"
@@ -96,7 +96,11 @@ export const PotentialContestCard = ({
   };
 
   return (
-    <CWCard className="PotentialContestCard" elevation="elevation-1" interactive>
+    <CWCard
+      className="PotentialContestCard"
+      elevation="elevation-1"
+      interactive
+    >
       <div className="contest-body">
         <div className="header-row">
           <CWText type="h4">Projected Weekly Prizes</CWText>

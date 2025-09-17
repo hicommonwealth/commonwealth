@@ -62,6 +62,13 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
           transaction,
         });
 
+        if (community_id) {
+          await models.Community.update(
+            { thread_purchase_token: token_address },
+            { where: { id: community_id }, transaction },
+          );
+        }
+
         // create token holders group
         let group_id: number | undefined = undefined;
         if (community_id && created) {
