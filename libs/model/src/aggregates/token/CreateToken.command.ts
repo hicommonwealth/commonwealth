@@ -1,12 +1,12 @@
 import { type Command } from '@hicommonwealth/core';
 import * as protocols from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import { BalanceSourceType, UserTierMap } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { models } from '../../database';
 import { authRoles, mustExist } from '../../middleware';
 import { emitEvent } from '../../utils/outbox';
-import { bumpToChainVerified } from '../../utils/tiers';
+import { setUserTier } from '../../utils/tiers';
 
 export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
@@ -120,7 +120,11 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
             transaction,
           );
 
-        await bumpToChainVerified(creator_address, transaction);
+        await setUserTier({
+          userAddress: creator_address,
+          newTier: UserTierMap.ChainVerified,
+          transaction,
+        });
 
         return {
           ...token!.toJSON(),

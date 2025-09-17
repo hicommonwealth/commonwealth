@@ -326,43 +326,6 @@ export type CommunityVerificationItemType =
   | keyof (typeof COMMUNITY_TIERS)[CommunityTierMap.SocialVerified]['clientInfo']['verificationItems']
   | keyof (typeof COMMUNITY_TIERS)[CommunityTierMap.ChainVerified]['clientInfo']['verificationItems'];
 
-/**
- * Used to bump a user tier to a higher tier. Will never bump a user who is
- * already banned. [SIDE EFFECT] The targetObject is modified with the new tier.
- */
-export function bumpUserTierInPlace<
-  T extends { tier?: UserTierMap | null | undefined },
->({
-  oldTier,
-  newTier,
-  targetObject,
-}: {
-  newTier: UserTierMap;
-  targetObject: T;
-  oldTier?: UserTierMap;
-}) {
-  // Prevent bumping banned users
-  if (
-    (oldTier && oldTier === UserTierMap.BannedUser) ||
-    targetObject.tier === UserTierMap.BannedUser
-  ) {
-    return;
-  }
-
-  if (oldTier && oldTier < newTier) {
-    targetObject.tier = newTier;
-    return;
-  }
-
-  if (
-    targetObject.tier === undefined ||
-    targetObject.tier === null ||
-    targetObject.tier < newTier
-  ) {
-    targetObject.tier = newTier;
-  }
-}
-
 export function bumpCommunityTier(
   tier: CommunityTierMap,
   object: { tier: CommunityTierMap | null },

@@ -3,7 +3,6 @@ import { logger, ServerError } from '@hicommonwealth/core';
 import { Address, MagicLogin } from '@hicommonwealth/schemas';
 import {
   ALL_COMMUNITIES,
-  bumpUserTierInPlace,
   CANVAS_TOPIC,
   ChainBase,
   deserializeCanvas,
@@ -25,6 +24,7 @@ import { CommunityInstance } from '../models/community';
 import { UserInstance } from '../models/user';
 import { getVerifiedUserInfo } from './oauth/getVerifiedUserInfo';
 import { VerifiedUserInfo } from './oauth/types';
+import { setUserTier } from './tiers';
 
 const log = logger(import.meta);
 
@@ -130,14 +130,25 @@ async function bumpTier(
   transaction?: Transaction,
 ) {
   if (
-    !verifiedInfo.oauth_email ||
-    (verifiedInfo.oauth_email && verifiedInfo.oauth_email_verified)
+    (!verifiedInfo.oauth_email ||
+      (verifiedInfo.oauth_email && verifiedInfo.oauth_email_verified)) &&
+    user.tier !== UserTierMap.SocialVerified
   ) {
-    bumpUserTierInPlace({
-      newTier: UserTierMap.SocialVerified,
-      targetObject: user,
-    });
-    await user.save({ transaction });
+    if (!transaction) {
+      await models.sequelize.transaction(async (transaction) => {
+        await setUserTier({
+          userId: user.id!,
+          newTier: UserTierMap.SocialVerified,
+          transaction,
+        });
+      });
+    } else {
+      await setUserTier({
+        userId: user.id!,
+        newTier: UserTierMap.SocialVerified,
+        transaction,
+      });
+    }
   }
 }
 

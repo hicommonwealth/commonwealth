@@ -82,6 +82,7 @@ export function tiered({
     if (tier === UserTierMap.IncompleteUser)
       tier = UserTierMap.NewlyVerifiedWallet;
     if (tier > user.tier)
+      // TODO: update to use setUserTier function
       await models.User.update({ tier }, { where: { id: user.id } });
 
     if (tier < minTier)

@@ -1,10 +1,6 @@
 import { InvalidActor, logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
-import {
-  BalanceSourceType,
-  bumpUserTierInPlace,
-  UserTierMap,
-} from '@hicommonwealth/shared';
+import { BalanceSourceType, UserTierMap } from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
 import { Transaction } from 'sequelize';
 import { z } from 'zod';
@@ -14,6 +10,7 @@ import { AddressAttributes } from '../../../models/address';
 import { UserAttributes } from '../../../models/user';
 import { getBalances } from '../../../services/tokenBalanceCache';
 import { VerifiedUserInfo } from '../../../utils/oauth/types';
+import { setUserTier } from '../../../utils/tiers';
 import { emitSignInEvents } from './emitSignInEvents';
 
 const log = logger(import.meta);
@@ -167,25 +164,27 @@ export async function findOrCreateUser({
       await models.User.update(values, { where: { id }, transaction });
   };
 
-  if (signedInUser?.id) {
-    const values: Partial<UserAttributes> = {};
-    if (!signedInUser.privy_id && privyUserId) values.privy_id = privyUserId;
-    bumpUserTierInPlace({
-      oldTier: signedInUser.tier,
-      newTier: tier,
-      targetObject: values,
-    });
-    await updateUser(signedInUser.id, values);
-  } else if (foundUser?.id) {
-    const values: Partial<UserAttributes> = {};
-    if (!foundUser.privy_id && privyUserId) values.privy_id = privyUserId;
-    bumpUserTierInPlace({
-      oldTier: foundUser.tier,
-      newTier: tier,
-      targetObject: values,
-    });
-    await updateUser(foundUser.id, values);
-  }
+  await models.sequelize.transaction(async (transaction) => {
+    if (signedInUser?.id) {
+      const values: Partial<UserAttributes> = {};
+      if (!signedInUser.privy_id && privyUserId) values.privy_id = privyUserId;
+      await setUserTier({
+        userId: signedInUser.id!,
+        newTier: tier,
+        transaction,
+      });
+      await updateUser(signedInUser.id, values);
+    } else if (foundUser?.id) {
+      const values: Partial<UserAttributes> = {};
+      if (!foundUser.privy_id && privyUserId) values.privy_id = privyUserId;
+      await setUserTier({
+        userId: foundUser.id!,
+        newTier: tier,
+        transaction,
+      });
+      await updateUser(foundUser.id, values);
+    }
+  });
 
   // Signed-in user signing in with another users address (address transfer) OR
   // Signed-out user signing in with an address they own

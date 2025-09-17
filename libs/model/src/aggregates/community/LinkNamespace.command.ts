@@ -5,12 +5,13 @@ import {
   bumpCommunityTier,
   CommunityTierMap,
   NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
+  UserTierMap,
 } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { emitEvent } from '../../utils';
-import { bumpToChainVerified } from '../../utils/tiers';
+import { setUserTier } from '../../utils/tiers';
 
 const log = logger(import.meta);
 
@@ -238,7 +239,11 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
             transaction,
           );
 
-          await bumpToChainVerified(deployer_address, transaction);
+          await setUserTier({
+            userAddress: deployer_address,
+            newTier: UserTierMap.ChainVerified,
+            transaction,
+          });
         }
       });
 
