@@ -910,6 +910,35 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
+  const revealMagicPrivateKey = useCallback(
+    async (targetEthChainId = ValidChains.Base) => {
+      try {
+        const nodes = await fetchNodes();
+        const chainNode = nodes.find((n) => n.ethChainId === targetEthChainId);
+
+        let magicInstance: Magic | null = null;
+        if (chainNode) {
+          magicInstance = getMagicForChain(targetEthChainId, chainNode);
+        }
+
+        if (!magicInstance && configurationData?.MAGIC_PUBLISHABLE_KEY) {
+          magicInstance = new Magic(configurationData.MAGIC_PUBLISHABLE_KEY);
+        }
+
+        if (!magicInstance) {
+          notifyError('Failed to reveal private key!');
+          return;
+        }
+
+        await magicInstance.user.revealPrivateKey();
+      } catch (error) {
+        console.error('Failed to reveal private key with Magic:', error);
+        notifyError('Failed to reveal private key!');
+      }
+    },
+    [configurationData],
+  );
+
   const onFarcasterLogin = async (
     signature: string,
     message: string,
@@ -966,6 +995,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     setSMS,
     onVerifyMobileWalletSignature,
     openMagicWallet,
+    revealMagicPrivateKey,
   };
 };
 
