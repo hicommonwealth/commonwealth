@@ -1,5 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
+import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -122,6 +123,15 @@ const TokenInformationFormStep = ({
     [isTokenNameTaken, openAddressSelectionModal, selectedAddress, onSubmit],
   );
 
+  const handleFormErrors = useCallback(
+    (errors: Record<string, { message: string }>) => {
+      if (errors.description) {
+        notifyError('Description must be 180 characters or less.');
+      }
+    },
+    [],
+  );
+
   useEffect(() => {
     if (shouldSubmitOnAddressSelection.current) {
       formMethodsRef.current &&
@@ -179,6 +189,7 @@ const TokenInformationFormStep = ({
       // @ts-expect-error <StrictNullChecks/>
       ref={formMethodsRef}
       onSubmit={handleSubmit}
+      onErrors={handleFormErrors}
       onWatch={onFormUpdate}
       validationSchema={tokenInformationFormValidationSchema}
       className={clsx('TokenInformationFormStep', containerClassName)}
