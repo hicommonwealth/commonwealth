@@ -88,8 +88,6 @@ const ManageMagicWalletContent = ({
 
   const formattedBalanceUsd = formatUsdBalance(userBalance, ethToUsdRate);
   const isLoading = isMagicLoading || isBalanceLoading;
-  console.log('userAddress => ', { userAddress, userBalance, ethToUsdRate });
-
   return (
     <div className="ManageMagicWalletContent">
       <CWModalBody>
