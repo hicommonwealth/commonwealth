@@ -1,6 +1,7 @@
 import { logger } from '@hicommonwealth/core';
 import { delay } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
+import { config } from '../../config';
 import { models } from '../../database';
 
 const log = logger(import.meta);
@@ -27,9 +28,9 @@ export async function magnaSync(
       const batch = await models.sequelize.query<TokenAllocationSyncArgs>(
         `
           SELECT
-            'initial-airdrop-' || A.address as key,
-            'initial-airdrop' as category,
-            'Inital Common Token Airdrop for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
+            :category || '-' || A.address as key,
+            :category as category,
+            :description || ' for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
             A.user_id,
             A.address as wallet_address,
             U.profile->>'name' as user_name,
@@ -49,7 +50,11 @@ export async function magnaSync(
         `,
         {
           type: QueryTypes.SELECT,
-          replacements: { limit: batchSize },
+          replacements: {
+            category: config.MAGNA!.EVENT,
+            description: config.MAGNA!.EVENT_DESC,
+            limit: batchSize,
+          },
         },
       );
       // break when no more allocations to sync

@@ -15,6 +15,8 @@ export const AllocationStatus = [
 export const ClaimAddressView = z.object({
   user_id: PG_INT,
   address: EVM_ADDRESS_STRICT.nullish(),
+  token: z.string(),
+  description: z.string(),
   tokens: z.coerce.number().nullish(),
   magna_allocation_id: z.string().nullish(),
   magna_synced_at: z
@@ -40,6 +42,8 @@ export const GetAllocation = {
     .object({
       magna_allocation_id: z.uuid(),
       walletAddress: EVM_ADDRESS_STRICT,
+      token: z.string(),
+      description: z.string(),
       status: z.enum(AllocationStatus),
       amount: z.number(),
       funded: z.number(),

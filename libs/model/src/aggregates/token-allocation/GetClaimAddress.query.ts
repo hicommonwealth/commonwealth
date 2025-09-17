@@ -2,6 +2,7 @@ import { InvalidState, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
+import { config } from '../../config';
 import { models } from '../../database';
 
 export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
@@ -43,7 +44,11 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
         throw new InvalidState('Duplicate claim addresses found');
       }
 
-      return claimAddress[0];
+      return {
+        ...claimAddress[0],
+        token: config.MAGNA?.TOKEN || '',
+        description: config.MAGNA?.EVENT_DESC || '',
+      };
     },
   };
 }

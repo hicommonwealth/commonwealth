@@ -106,7 +106,10 @@ const {
   AI_BOT_USER_ADDRESS,
   MAGNA_API_KEY,
   MAGNA_API_URL,
+  MAGNA_EVENT,
+  MAGNA_EVENT_DESC,
   MAGNA_CONTRACT_ID,
+  MAGNA_TOKEN,
   MAGNA_TOKEN_ID,
   MAGNA_UNLOCK_SCHEDULE_ID,
   MAGNA_UNLOCK_START_AT,
@@ -358,20 +361,32 @@ export const config = configure(
       API_KEY: KLAVIS_API_KEY,
     },
     IGNORE_CONTENT_CREATION_LIMIT: IGNORE_CONTENT_CREATION_LIMIT === 'true',
-    MAGNA: MAGNA_TOKEN_ID
-      ? {
-          API_URL: MAGNA_API_URL || '',
-          API_KEY: MAGNA_API_KEY || '',
-          CONTRACT_ID: MAGNA_CONTRACT_ID || '',
-          TOKEN_ID: MAGNA_TOKEN_ID || '',
-          UNLOCK_SCHEDULE_ID: MAGNA_UNLOCK_SCHEDULE_ID || '',
-          UNLOCK_START_AT: new Date(MAGNA_UNLOCK_START_AT || '9999-12-31'),
-          BATCH_SIZE: parseInt(
-            MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE,
-            10,
-          ),
-        }
-      : undefined,
+    MAGNA:
+      MAGNA_API_URL &&
+      MAGNA_API_KEY &&
+      MAGNA_EVENT &&
+      MAGNA_EVENT_DESC &&
+      MAGNA_CONTRACT_ID &&
+      MAGNA_TOKEN &&
+      MAGNA_TOKEN_ID &&
+      MAGNA_UNLOCK_SCHEDULE_ID &&
+      MAGNA_UNLOCK_START_AT
+        ? {
+            API_URL: MAGNA_API_URL,
+            API_KEY: MAGNA_API_KEY,
+            EVENT: MAGNA_EVENT,
+            EVENT_DESC: MAGNA_EVENT_DESC,
+            CONTRACT_ID: MAGNA_CONTRACT_ID,
+            TOKEN: MAGNA_TOKEN,
+            TOKEN_ID: MAGNA_TOKEN_ID,
+            UNLOCK_SCHEDULE_ID: MAGNA_UNLOCK_SCHEDULE_ID,
+            UNLOCK_START_AT: new Date(MAGNA_UNLOCK_START_AT),
+            BATCH_SIZE: parseInt(
+              MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE,
+              10,
+            ),
+          }
+        : undefined,
   },
   z.object({
     SENDGRID: z.object({
@@ -784,7 +799,10 @@ export const config = configure(
       .object({
         API_URL: z.url(),
         API_KEY: z.string(),
+        EVENT: z.string().min(5),
+        EVENT_DESC: z.string().min(5),
         CONTRACT_ID: z.uuid(),
+        TOKEN: z.string().min(1),
         TOKEN_ID: z.uuid(),
         UNLOCK_SCHEDULE_ID: z.uuid(),
         UNLOCK_START_AT: z.date(),

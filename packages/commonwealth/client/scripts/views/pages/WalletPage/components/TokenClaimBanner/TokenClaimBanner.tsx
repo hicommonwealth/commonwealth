@@ -188,8 +188,9 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
         type={claimAddress.address ? 'info' : 'error'}
         body={
           <div className="banner-content">
+            <h3 className="description">{claimAddress.description}</h3>
             <h2 className="token-balance">
-              You have {formattedClaimable} Common tokens!
+              You have {formattedClaimable} {claimAddress.token} tokens!
             </h2>
             {claimAddress.magna_claimed_at && transactionHash ? (
               <div className="notice-section">
