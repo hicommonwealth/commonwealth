@@ -301,6 +301,11 @@ const useUserMenuItems = ({
               ),
               onClick: () => openMagicWallet(),
             },
+            {
+              type: 'default',
+              label: 'Export private key',
+              onClick: () => navigate('/export-magic', {}, null),
+            },
           ]
         : []),
       ...(referralsEnabled
