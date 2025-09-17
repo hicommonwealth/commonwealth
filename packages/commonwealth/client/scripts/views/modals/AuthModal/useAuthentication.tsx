@@ -932,8 +932,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
         await magicInstance.user.revealPrivateKey();
       } catch (error) {
-        console.error('Failed to reveal private key with Magic:', error);
-        notifyError('Failed to reveal private key!');
+        if (!error?.message?.toLowerCase()?.includes('user canceled')) {
+          console.error('Failed to reveal private key with Magic:', error);
+          notifyError('Failed to reveal private key!');
+        }
       }
     },
     [configurationData],
