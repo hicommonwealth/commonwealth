@@ -164,27 +164,25 @@ export async function findOrCreateUser({
       await models.User.update(values, { where: { id }, transaction });
   };
 
-  await models.sequelize.transaction(async (transaction) => {
-    if (signedInUser?.id) {
-      const values: Partial<UserAttributes> = {};
-      if (!signedInUser.privy_id && privyUserId) values.privy_id = privyUserId;
-      await setUserTier({
-        userId: signedInUser.id!,
-        newTier: tier,
-        transaction,
-      });
-      await updateUser(signedInUser.id, values);
-    } else if (foundUser?.id) {
-      const values: Partial<UserAttributes> = {};
-      if (!foundUser.privy_id && privyUserId) values.privy_id = privyUserId;
-      await setUserTier({
-        userId: foundUser.id!,
-        newTier: tier,
-        transaction,
-      });
-      await updateUser(foundUser.id, values);
-    }
-  });
+  if (signedInUser?.id) {
+    const values: Partial<UserAttributes> = {};
+    if (!signedInUser.privy_id && privyUserId) values.privy_id = privyUserId;
+    await setUserTier({
+      userId: signedInUser.id!,
+      newTier: tier,
+      transaction,
+    });
+    await updateUser(signedInUser.id, values);
+  } else if (foundUser?.id) {
+    const values: Partial<UserAttributes> = {};
+    if (!foundUser.privy_id && privyUserId) values.privy_id = privyUserId;
+    await setUserTier({
+      userId: foundUser.id!,
+      newTier: tier,
+      transaction,
+    });
+    await updateUser(foundUser.id, values);
+  }
 
   // Signed-in user signing in with another users address (address transfer) OR
   // Signed-out user signing in with an address they own
