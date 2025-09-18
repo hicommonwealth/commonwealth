@@ -33,6 +33,9 @@ export const UserProfileView = z.object({
   userId: PG_INT,
   tier: USER_TIER,
   profile: UserProfile,
+  wallet_verified: z.boolean(),
+  social_verified: z.boolean(),
+  chain_verified: z.boolean(),
   totalUpvotes: z.number().int(),
   addresses: z.array(UserProfileAddressView) as ZodType<
     UserProfileAddressView[]
@@ -49,13 +52,13 @@ export const UserProfileView = z.object({
   xp_referrer_points: PG_INT.default(0),
 });
 
-type UserProfileView = z.infer<typeof UserProfileView>;
+export type UserProfileViewType = z.infer<typeof UserProfileView>;
 
 export const GetUserProfile = {
   input: z.object({
     userId: PG_INT.optional(),
   }),
-  output: UserProfileView as ZodType<UserProfileView>,
+  output: UserProfileView as ZodType<UserProfileViewType>,
   context: VerifiedContext,
 };
 

@@ -4,7 +4,6 @@ import {
   hasTierClientInfo,
   TierIcons,
   USER_TIERS,
-  UserTier,
 } from '@hicommonwealth/shared';
 
 const DEFAULT_ICON = 'stopSymbol';
@@ -21,27 +20,14 @@ const hasCommunityClientInfo = (
   return 'clientInfo' in tier && tier.clientInfo !== undefined;
 };
 
-export const getUserTrustLevel = (level?: number): TrustLevelResult => {
-  if (!level) {
+export const getUserTrustLevelIcon = (tier?: number): TrustLevelResult => {
+  if (!tier) {
     return { icon: DEFAULT_ICON };
   }
-
-  const userTierKey = level;
-
-  if (!hasTierClientInfo(userTierKey)) {
+  if (!hasTierClientInfo(tier)) {
     return { icon: DEFAULT_ICON };
   }
-
-  const userTier = Object.values(USER_TIERS).find((tier: UserTier) => {
-    return tier.clientInfo?.trustLevel === level;
-  }) as UserTier & {
-    clientInfo: { trustLevel: number; componentIcon: TierIcons };
-  };
-
-  if (!userTier) {
-    return { icon: DEFAULT_ICON };
-  }
-  return { icon: userTier.clientInfo!.componentIcon || DEFAULT_ICON };
+  return { icon: USER_TIERS[tier].clientInfo!.componentIcon || DEFAULT_ICON };
 };
 
 export const getCommunityTrustLevel = (level?: number): TrustLevelResult => {

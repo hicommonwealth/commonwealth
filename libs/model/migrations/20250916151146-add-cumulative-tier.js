@@ -82,16 +82,6 @@ export default {
         },
         { transaction },
       );
-      await queryInterface.addColumn(
-        'Users',
-        'manually_verified',
-        {
-          type: Sequelize.BOOLEAN,
-          allowNull: true,
-          defaultValue: false,
-        },
-        { transaction },
-      );
 
       await queryInterface.sequelize.query(
         `
@@ -99,7 +89,7 @@ export default {
         SET wallet_verified = true
         FROM "Addresses" A
         WHERE A.user_id = "Users".id
-          AND "Users".created_at + INTERVAL '1 week' > A.last_active;
+          AND "Users".created_at + INTERVAL '1 week' < A.last_active;
       `,
         { transaction },
       );
@@ -214,6 +204,54 @@ export default {
       `,
         { transaction },
       );
+
+      // Set any NULL verified columns to false before adding NOT NULL constraints
+      await queryInterface.sequelize.query(
+        `
+        UPDATE "Users"
+        SET wallet_verified = COALESCE(wallet_verified, false),
+            social_verified = COALESCE(social_verified, false),
+            chain_verified = COALESCE(chain_verified, false)
+        WHERE wallet_verified IS NULL 
+           OR social_verified IS NULL 
+           OR chain_verified IS NULL;
+      `,
+        { transaction },
+      );
+
+      // Add NOT NULL constraints to the verified columns
+      await queryInterface.changeColumn(
+        'Users',
+        'wallet_verified',
+        {
+          type: Sequelize.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
+        { transaction },
+      );
+
+      await queryInterface.changeColumn(
+        'Users',
+        'social_verified',
+        {
+          type: Sequelize.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
+        { transaction },
+      );
+
+      await queryInterface.changeColumn(
+        'Users',
+        'chain_verified',
+        {
+          type: Sequelize.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
+        { transaction },
+      );
     });
   },
 
@@ -266,6 +304,17 @@ export default {
          WHERE user_tier_at_creation IN (7, 8);`,
         { transaction },
       );
+
+      // Remove the verified columns
+      await queryInterface.removeColumn('Users', 'wallet_verified', {
+        transaction,
+      });
+      await queryInterface.removeColumn('Users', 'social_verified', {
+        transaction,
+      });
+      await queryInterface.removeColumn('Users', 'chain_verified', {
+        transaction,
+      });
     });
   },
 };

@@ -1,23 +1,30 @@
 import React from 'react';
 
-import { COMMUNITY_TIERS, USER_TIERS } from '@hicommonwealth/shared';
+import {
+  COMMUNITY_TIERS,
+  CommunityTierMap,
+  Tier,
+  USER_TIERS,
+  UserTier,
+  UserTierMap,
+} from '@hicommonwealth/shared';
 import { useFlag } from 'hooks/useFlag';
 import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
-import { getCommunityTrustLevel, getUserTrustLevel } from './utils';
+import { getCommunityTrustLevel, getUserTrustLevelIcon } from './utils';
 
 interface TrustLevelRoleProps {
   type: 'community' | 'user';
-  level?: number;
+  tier?: UserTierMap | CommunityTierMap;
   size?: 'small' | 'medium' | 'large' | 'xl';
   withTooltip?: boolean;
 }
 
 const TrustLevelRole = ({
   type,
-  level,
+  tier,
   size = 'small',
   withTooltip = false,
 }: TrustLevelRoleProps) => {
@@ -27,19 +34,16 @@ const TrustLevelRole = ({
 
   const { icon } =
     type === 'community'
-      ? getCommunityTrustLevel(level)
-      : getUserTrustLevel(level);
+      ? getCommunityTrustLevel(tier)
+      : getUserTrustLevelIcon(tier);
 
   const tiers = type === 'community' ? COMMUNITY_TIERS : USER_TIERS;
-  const tier =
-    level !== undefined
-      ? Object.values(tiers).find((t) => t.clientInfo?.trustLevel === level)
-      : undefined;
+  const tierData: Tier | UserTier = tier ? tiers[tier] : undefined;
 
-  const tooltipContent = tier ? (
+  const tooltipContent = tierData ? (
     <div style={{ maxWidth: 240 }}>
       <CWText type="b2">
-        {tier.name}: {tier.description}
+        {tierData.name}: {tierData.description}
       </CWText>
       <a
         href="https://docs.common.xyz/commonwealth/account-overview/user-trust-levels#trust-levels-on-common"

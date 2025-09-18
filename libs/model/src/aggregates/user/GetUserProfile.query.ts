@@ -1,8 +1,5 @@
 import { InvalidInput, type Query } from '@hicommonwealth/core';
-import {
-  GetUserProfile as GetUserProfileSchema,
-  UserProfileView,
-} from '@hicommonwealth/schemas';
+import { GetUserProfile as GetUserProfileSchema } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
 import { models } from '../../database';
@@ -63,6 +60,9 @@ SELECT
   u.profile,
   u.tier,
   u.referred_by_address,
+  u.wallet_verified,
+  u.social_verified,
+  u.chain_verified,
   COALESCE(u.referral_count, 0) AS referral_count,
   COALESCE(u.referral_eth_earnings, 0) AS referral_eth_earnings,
   COALESCE(u.xp_points, 0) AS xp_points,
