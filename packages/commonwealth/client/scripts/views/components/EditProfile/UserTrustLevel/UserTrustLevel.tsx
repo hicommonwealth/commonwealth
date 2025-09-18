@@ -56,8 +56,8 @@ const UserTrustLevel = () => {
   return (
     <div className="UserTrustLevel">
       {tiers.map((level) => {
-        const isLocked = level.level > currentTrustLevel + 1;
-        const isCurrentLevel = level.level === currentTrustLevel;
+        const isLocked = level.tier > currentTier + 1;
+        const isCurrentTier = level.tier === currentTier;
 
         return (
           <LevelBox
@@ -72,7 +72,7 @@ const UserTrustLevel = () => {
                 type="user"
                 level={level.level}
                 size="xl"
-                withTooltip={isCurrentLevel}
+                withTooltip={isCurrentTier}
               />
             }
             items={level.items}

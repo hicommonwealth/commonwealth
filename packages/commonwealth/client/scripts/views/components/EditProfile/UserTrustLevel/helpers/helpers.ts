@@ -8,6 +8,7 @@ import {
 
 type Status = 'Done' | 'Not Started';
 interface TierInfo {
+  tier: UserTierMap;
   level: number;
   title: string;
   description: string;
@@ -77,6 +78,7 @@ export const mapTiers = (currentTier: UserTierMap): TierInfo[] => {
         };
       };
       return {
+        tier: tierNum,
         level: tierWithClientInfo.clientInfo?.trustLevel || 0,
         title: tier.name,
         description: tier.description,
