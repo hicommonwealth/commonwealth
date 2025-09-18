@@ -77,6 +77,9 @@ const _NotificationsPolicy = {
   ),
   overrides: {
     ThreadUpvoted: `ThreadUpvoted.#`,
+    CommunityCreated: null,
+    SignUpFlowCompleted: null,
+    CommunityJoined: null,
   },
 };
 
