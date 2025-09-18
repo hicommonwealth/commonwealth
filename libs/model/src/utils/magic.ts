@@ -135,11 +135,11 @@ async function bumpTier(
     user.tier !== UserTierMap.SocialVerified
   ) {
     if (!transaction) {
-      await models.sequelize.transaction(async (transaction) => {
+      await models.sequelize.transaction(async (txn) => {
         await setUserTier({
           userId: user.id!,
           newTier: UserTierMap.SocialVerified,
-          transaction,
+          transaction: txn,
         });
       });
     } else {
