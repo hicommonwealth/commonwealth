@@ -37,12 +37,14 @@ export async function magnaSync(
             U.profile->>'email' as user_email,
             -- combined in initial drop?
             COALESCE(HA.token_allocation, 0)::double precision 
-            + COALESCE(AA.token_allocation, 0)::double precision as token_allocation
+            + COALESCE(AA.token_allocation, 0)::double precision
+            + COALESCE(N.total_token_allocation, 0)::double precision as token_allocation
           FROM
             "ClaimAddresses" A -- this is the driving table with sync watermarks
             JOIN "Users" U ON A.user_id = U.id
             LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
             LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
+            LEFT JOIN "nft_collection_data" N ON A.user_id = N.user_id
           WHERE
             A.address IS NOT NULL -- there is an address to sync
             AND A.magna_synced_at IS NULL -- and it hasn't been synced yet
