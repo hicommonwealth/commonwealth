@@ -1,5 +1,8 @@
 import { InvalidInput, type Query } from '@hicommonwealth/core';
-import { GetUserProfile as GetUserProfileSchema } from '@hicommonwealth/schemas';
+import {
+  GetUserProfile as GetUserProfileSchema,
+  UserProfileView,
+} from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
 import { models } from '../../database';
