@@ -85,6 +85,8 @@ async function createNFTCollectionTable(): Promise<void> {
     CREATE TABLE IF NOT EXISTS nft_collection_data
     (
       token_id       INTEGER NOT NULL PRIMARY KEY,
+      user_id        INTEGER,
+      user_tier      INTEGER,
       name           VARCHAR(500),
       holder_address VARCHAR(42)  NOT NULL,
       opensea_url    TEXT,

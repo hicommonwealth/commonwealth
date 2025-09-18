@@ -1,5 +1,6 @@
 import { dispose } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model/db';
+import { UserTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { NFTTrait } from './get-nft-holder-snapshot';
 
@@ -39,6 +40,18 @@ const RarityTierWeightsByRank = [1, 5, 10];
 //  Tier 1 (index 1): has a weight of 5
 //  Tier 0 (index 0): has a weight of 1
 const RarityTierWeightsByPercentile = [1, 5, 10, 20, 50];
+
+const UserTierWeightsMap: Record<UserTierMap, number> = {
+  [UserTierMap.IncompleteUser]: 0,
+  [UserTierMap.BannedUser]: 0,
+  [UserTierMap.NewlyVerifiedWallet]: 1,
+  [UserTierMap.VerifiedWallet]: 1,
+  [UserTierMap.SocialVerified]: 1.5,
+  [UserTierMap.ChainVerified]: 2,
+  // TODO: add FullyVerified tier with weight equal to manually verified
+  [UserTierMap.ManuallyVerified]: 3,
+  [UserTierMap.SystemUser]: 0,
+};
 
 const TokenSupply = 10_000_000_000;
 const EqualDistributionPercent = 0.6;
@@ -407,15 +420,16 @@ async function assignRarityTierByRank() {
 }
 
 async function calculateEqualDistributionAllocations() {
-  console.log('Starting equal distribution allocation calculation...');
+  console.log('Starting tier-weighted distribution allocation calculation...');
 
-  // Fetch all NFTs with their calculated rarity, ordered by rarity (highest first) for remainder distribution
+  // Fetch all NFTs with their calculated rarity and user tier
   const nfts = await models.sequelize.query<{
     token_id: number;
     calculated_rarity: number;
+    user_tier: number | null;
   }>(
     `
-      SELECT token_id, calculated_rarity
+      SELECT token_id, calculated_rarity, user_tier
       FROM nft_collection_data
       WHERE calculated_rarity IS NOT NULL
       ORDER BY calculated_rarity DESC, token_id;
@@ -425,7 +439,7 @@ async function calculateEqualDistributionAllocations() {
     },
   );
 
-  console.log(`Found ${nfts.length} NFTs for equal distribution`);
+  console.log(`Found ${nfts.length} NFTs for tier-weighted distribution`);
 
   if (nfts.length === 0) {
     console.log(
@@ -439,101 +453,6 @@ async function calculateEqualDistributionAllocations() {
     TokenSupply * EqualDistributionPercent,
   );
 
-  // Calculate base allocation per NFT (whole number)
-  const baseAllocation = Math.floor(totalEqualDistributionTokens / nfts.length);
-  const remainder = totalEqualDistributionTokens - baseAllocation * nfts.length;
-
-  // Assign allocations
-  let processedCount = 0;
-  let totalAllocated = 0;
-
-  for (let index = 0; index < nfts.length; index++) {
-    const nft = nfts[index];
-    // Each NFT gets base allocation, plus 1 extra token if within remainder range
-    // Remainder is distributed to highest rarity NFTs first (already sorted by rarity DESC)
-    const allocation = baseAllocation + (index < remainder ? 1 : 0);
-    totalAllocated += allocation;
-
-    // Update the equal_distribution_allocation column in the database
-    await models.sequelize.query(
-      `
-        UPDATE nft_collection_data
-        SET equal_distribution_allocation = :allocation,
-            updated_at                    = NOW()
-        WHERE token_id = :tokenId;
-      `,
-      {
-        replacements: {
-          allocation,
-          tokenId: nft.token_id,
-        },
-        type: QueryTypes.UPDATE,
-      },
-    );
-
-    processedCount++;
-
-    // Log progress every 1000 tokens
-    if (processedCount % 1000 === 0) {
-      console.log(`Processed ${processedCount}/${nfts.length} tokens...`);
-    }
-  }
-
-  if (totalAllocated !== totalEqualDistributionTokens) {
-    throw new Error('Failed to allocate all tokens');
-  }
-
-  // Verify total allocation
-  console.log(`\nAllocation Summary:`);
-  console.log(`- Total tokens allocated: ${totalAllocated.toLocaleString()}`);
-  console.log(`- Base allocation: ${baseAllocation.toLocaleString()}`);
-  console.log(
-    `- NFTs receiving base allocation: ${(nfts.length - remainder).toLocaleString()}`,
-  );
-  console.log(`- NFTs receiving base + 1: ${remainder.toLocaleString()}`);
-
-  console.log(
-    `✅ Equal distribution allocation completed! Processed ${processedCount}/${nfts.length} tokens successfully.`,
-  );
-}
-
-async function calculateRarityDistributionAllocation(
-  tierAssignmentType: 'r' | 'p',
-) {
-  console.log('Starting rarity distribution allocation calculation...');
-
-  // Fetch all NFTs with their calculated rarity and rarity tier
-  const nfts = await models.sequelize.query<{
-    token_id: number;
-    calculated_rarity: number;
-    rarity_tier: number;
-  }>(
-    `
-      SELECT token_id, calculated_rarity, rarity_tier
-      FROM nft_collection_data
-      WHERE calculated_rarity IS NOT NULL AND rarity_tier IS NOT NULL
-      ORDER BY calculated_rarity DESC, token_id ASC;
-    `,
-    {
-      type: QueryTypes.SELECT,
-    },
-  );
-
-  console.log(`Found ${nfts.length} NFTs for rarity distribution`);
-
-  if (nfts.length === 0) {
-    console.log(
-      'No NFTs found with calculated rarity and rarity tier. Run updateAllNftRarity and tier assignment first.',
-    );
-    return;
-  }
-
-  // Select the appropriate weight array based on tier assignment type
-  const weights =
-    tierAssignmentType === 'r'
-      ? RarityTierWeightsByRank
-      : RarityTierWeightsByPercentile;
-
   // Calculate the sum of all weights
   let totalWeightSum = 0;
   const nftWeights: {
@@ -543,7 +462,9 @@ async function calculateRarityDistributionAllocation(
   }[] = [];
 
   for (const nft of nfts) {
-    const weight = weights[nft.rarity_tier] || 0;
+    // Get user tier weight, default to IncompleteUser (0) if no user_tier
+    const userTier = nft.user_tier ?? UserTierMap.IncompleteUser;
+    const weight = UserTierWeightsMap[userTier as UserTierMap] || 0;
     totalWeightSum += weight;
     nftWeights.push({
       token_id: nft.token_id,
@@ -556,11 +477,6 @@ async function calculateRarityDistributionAllocation(
     console.log('Total weight sum is 0. No tokens will be allocated.');
     return;
   }
-
-  // Calculate total tokens for rarity distribution
-  const totalRarityDistributionTokens = Math.floor(
-    TokenSupply * RarityDistributionPercent,
-  );
 
   // Calculate allocations for each NFT based on weight percentage
   let processedCount = 0;
@@ -577,6 +493,209 @@ async function calculateRarityDistributionAllocation(
 
     // Calculate allocation (floor to ensure whole numbers)
     const allocation = Math.floor(
+      totalEqualDistributionTokens * weightPercentage,
+    );
+    totalAllocated += allocation;
+
+    allocations.push({
+      token_id: nftWeight.token_id,
+      allocation,
+      calculated_rarity: nftWeight.calculated_rarity,
+    });
+  }
+
+  // Calculate remainder tokens that need to be distributed
+  const remainder = totalEqualDistributionTokens - totalAllocated;
+
+  // Sort allocations by calculated_rarity DESC, token_id ASC for remainder distribution
+  allocations.sort((a, b) => {
+    if (a.calculated_rarity !== b.calculated_rarity) {
+      return b.calculated_rarity - a.calculated_rarity; // DESC
+    }
+    return a.token_id - b.token_id; // ASC
+  });
+
+  // Distribute remainder tokens one by one to highest rarity NFTs first
+  for (let i = 0; i < remainder && i < allocations.length; i++) {
+    allocations[i].allocation += 1;
+    totalAllocated += 1;
+  }
+
+  // Update the database with allocations
+  processedCount = 0;
+  for (const allocation of allocations) {
+    await models.sequelize.query(
+      `
+        UPDATE nft_collection_data
+        SET equal_distribution_allocation = :allocation,
+            updated_at                    = NOW()
+        WHERE token_id = :tokenId;
+      `,
+      {
+        replacements: {
+          allocation: allocation.allocation,
+          tokenId: allocation.token_id,
+        },
+        type: QueryTypes.UPDATE,
+      },
+    );
+
+    processedCount++;
+
+    // Log progress every 1000 tokens
+    if (processedCount % 1000 === 0) {
+      console.log(
+        `Processed ${processedCount}/${allocations.length} tokens...`,
+      );
+    }
+  }
+
+  if (totalAllocated !== totalEqualDistributionTokens) {
+    throw new Error(
+      `Failed to allocate all tokens. Expected: ${totalEqualDistributionTokens}, Actual: ${totalAllocated}`,
+    );
+  }
+
+  // Calculate tier distribution summary
+  const tierSummary: {
+    [tier: number]: { count: number; totalAllocation: number };
+  } = {};
+  for (const allocation of allocations) {
+    const nft = nfts.find((n) => n.token_id === allocation.token_id);
+    if (nft) {
+      const tier = nft.user_tier ?? UserTierMap.IncompleteUser;
+      if (!tierSummary[tier]) {
+        tierSummary[tier] = { count: 0, totalAllocation: 0 };
+      }
+      tierSummary[tier].count += 1;
+      tierSummary[tier].totalAllocation += allocation.allocation;
+    }
+  }
+
+  // Verify total allocation
+  console.log(`\nTier-Weighted Distribution Allocation Summary:`);
+  console.log(`- Total tokens allocated: ${totalAllocated.toLocaleString()}`);
+  console.log(`- Total weight sum: ${totalWeightSum.toLocaleString()}`);
+  console.log(`- Remainder tokens distributed: ${remainder.toLocaleString()}`);
+
+  console.log('\nAllocation by user tier:');
+  Object.keys(tierSummary)
+    .map(Number)
+    .sort((a, b) => b - a) // Sort by tier DESC (highest tier first)
+    .forEach((tier) => {
+      const summary = tierSummary[tier];
+      const avgAllocation = (summary.totalAllocation / summary.count).toFixed(
+        2,
+      );
+      const tierWeight = UserTierWeightsMap[tier as UserTierMap] || 0;
+      console.log(
+        `Tier ${tier} (weight: ${tierWeight}): ${summary.count} NFTs, ${summary.totalAllocation.toLocaleString()} tokens (avg: ${avgAllocation})`,
+      );
+    });
+
+  console.log(
+    `✅ Tier-weighted distribution allocation completed! Processed ${processedCount}/${allocations.length} tokens successfully.`,
+  );
+}
+
+async function calculateRarityDistributionAllocation(
+  tierAssignmentType: 'r' | 'p',
+) {
+  console.log(
+    'Starting combined rarity and user tier distribution allocation calculation...',
+  );
+
+  // Fetch all NFTs with their calculated rarity, rarity tier, and user tier
+  const nfts = await models.sequelize.query<{
+    token_id: number;
+    calculated_rarity: number;
+    rarity_tier: number;
+    user_tier: number | null;
+  }>(
+    `
+      SELECT token_id, calculated_rarity, rarity_tier, user_tier
+      FROM nft_collection_data
+      WHERE calculated_rarity IS NOT NULL AND rarity_tier IS NOT NULL
+      ORDER BY calculated_rarity DESC, token_id ASC;
+    `,
+    {
+      type: QueryTypes.SELECT,
+    },
+  );
+
+  console.log(
+    `Found ${nfts.length} NFTs for combined rarity and user tier distribution`,
+  );
+
+  if (nfts.length === 0) {
+    console.log(
+      'No NFTs found with calculated rarity and rarity tier. Run updateAllNftRarity and tier assignment first.',
+    );
+    return;
+  }
+
+  // Select the appropriate rarity weight array based on tier assignment type
+  const rarityWeights =
+    tierAssignmentType === 'r'
+      ? RarityTierWeightsByRank
+      : RarityTierWeightsByPercentile;
+
+  // Calculate the sum of all combined weights (rarity weight * user tier weight)
+  let totalWeightSum = 0;
+  const nftWeights: {
+    token_id: number;
+    weight: number;
+    calculated_rarity: number;
+    rarity_weight: number;
+    user_tier_weight: number;
+  }[] = [];
+
+  for (const nft of nfts) {
+    const rarityWeight = rarityWeights[nft.rarity_tier] || 0;
+    const userTier = nft.user_tier ?? UserTierMap.IncompleteUser;
+    const userTierWeight = UserTierWeightsMap[userTier as UserTierMap] || 0;
+
+    // Combined weight is the product of rarity weight and user tier weight
+    // This gives higher allocations to both rare NFTs AND higher tier users
+    const combinedWeight = rarityWeight * userTierWeight; // Use minimum 0.1 to avoid zero weights
+
+    totalWeightSum += combinedWeight;
+    nftWeights.push({
+      token_id: nft.token_id,
+      weight: combinedWeight,
+      calculated_rarity: nft.calculated_rarity,
+      rarity_weight: rarityWeight,
+      user_tier_weight: userTierWeight,
+    });
+  }
+
+  if (totalWeightSum === 0) {
+    console.log('Total weight sum is 0. No tokens will be allocated.');
+    return;
+  }
+
+  // Calculate total tokens for rarity distribution
+  const totalRarityDistributionTokens = Math.floor(
+    TokenSupply * RarityDistributionPercent,
+  );
+
+  // Calculate allocations for each NFT based on combined weight percentage
+  let processedCount = 0;
+  let totalAllocated = 0;
+  const allocations: {
+    token_id: number;
+    allocation: number;
+    calculated_rarity: number;
+    rarity_weight: number;
+    user_tier_weight: number;
+  }[] = [];
+
+  for (const nftWeight of nftWeights) {
+    // Calculate percentage of total weights this NFT has
+    const weightPercentage = nftWeight.weight / totalWeightSum;
+
+    // Calculate allocation (floor to ensure whole numbers)
+    const allocation = Math.floor(
       totalRarityDistributionTokens * weightPercentage,
     );
     totalAllocated += allocation;
@@ -585,6 +704,8 @@ async function calculateRarityDistributionAllocation(
       token_id: nftWeight.token_id,
       allocation,
       calculated_rarity: nftWeight.calculated_rarity,
+      rarity_weight: nftWeight.rarity_weight,
+      user_tier_weight: nftWeight.user_tier_weight,
     });
   }
 
@@ -640,45 +761,242 @@ async function calculateRarityDistributionAllocation(
     );
   }
 
-  // Calculate tier distribution summary
-  const tierSummary: {
+  // Calculate rarity tier distribution summary
+  const rarityTierSummary: {
     [tier: number]: { count: number; totalAllocation: number };
   } = {};
+
+  // Calculate user tier distribution summary
+  const userTierSummary: {
+    [tier: number]: { count: number; totalAllocation: number };
+  } = {};
+
   for (const allocation of allocations) {
     const nft = nfts.find((n) => n.token_id === allocation.token_id);
     if (nft) {
-      const tier = nft.rarity_tier;
-      if (!tierSummary[tier]) {
-        tierSummary[tier] = { count: 0, totalAllocation: 0 };
+      // Rarity tier summary
+      const rarityTier = nft.rarity_tier;
+      if (!rarityTierSummary[rarityTier]) {
+        rarityTierSummary[rarityTier] = { count: 0, totalAllocation: 0 };
       }
-      tierSummary[tier].count += 1;
-      tierSummary[tier].totalAllocation += allocation.allocation;
+      rarityTierSummary[rarityTier].count += 1;
+      rarityTierSummary[rarityTier].totalAllocation += allocation.allocation;
+
+      // User tier summary
+      const userTier = nft.user_tier ?? UserTierMap.IncompleteUser;
+      if (!userTierSummary[userTier]) {
+        userTierSummary[userTier] = { count: 0, totalAllocation: 0 };
+      }
+      userTierSummary[userTier].count += 1;
+      userTierSummary[userTier].totalAllocation += allocation.allocation;
     }
   }
 
   // Verify total allocation
-  console.log(`\nRarity Distribution Allocation Summary:`);
+  console.log(
+    `\nCombined Rarity and User Tier Distribution Allocation Summary:`,
+  );
   console.log(`- Total tokens allocated: ${totalAllocated.toLocaleString()}`);
-  console.log(`- Total weight sum: ${totalWeightSum.toLocaleString()}`);
+  console.log(
+    `- Total combined weight sum: ${totalWeightSum.toLocaleString()}`,
+  );
   console.log(`- Remainder tokens distributed: ${remainder.toLocaleString()}`);
 
-  console.log('\nAllocation by tier:');
-  Object.keys(tierSummary)
+  console.log('\nAllocation by rarity tier:');
+  Object.keys(rarityTierSummary)
     .map(Number)
     .sort((a, b) => b - a) // Sort by tier DESC (highest tier first)
     .forEach((tier) => {
-      const summary = tierSummary[tier];
+      const summary = rarityTierSummary[tier];
       const avgAllocation = (summary.totalAllocation / summary.count).toFixed(
         2,
       );
+      const rarityWeight =
+        tierAssignmentType === 'r'
+          ? RarityTierWeightsByRank[tier] || 0
+          : RarityTierWeightsByPercentile[tier] || 0;
       console.log(
-        `Tier ${tier}: ${summary.count} NFTs, ${summary.totalAllocation.toLocaleString()} tokens (avg: ${avgAllocation})`,
+        `Rarity Tier ${tier} (weight: ${rarityWeight}): ${summary.count} NFTs, ${summary.totalAllocation.toLocaleString()} tokens (avg: ${avgAllocation})`,
+      );
+    });
+
+  console.log('\nAllocation by user tier:');
+  Object.keys(userTierSummary)
+    .map(Number)
+    .sort((a, b) => b - a) // Sort by tier DESC (highest tier first)
+    .forEach((tier) => {
+      const summary = userTierSummary[tier];
+      const avgAllocation = (summary.totalAllocation / summary.count).toFixed(
+        2,
+      );
+      const userTierWeight = UserTierWeightsMap[tier as UserTierMap] || 0;
+      console.log(
+        `User Tier ${tier} (weight: ${userTierWeight}): ${summary.count} NFTs, ${summary.totalAllocation.toLocaleString()} tokens (avg: ${avgAllocation})`,
       );
     });
 
   console.log(
-    `✅ Rarity distribution allocation completed! Processed ${processedCount}/${allocations.length} tokens successfully.`,
+    `✅ Combined rarity and user tier distribution allocation completed! Processed ${processedCount}/${allocations.length} tokens successfully.`,
   );
+}
+
+async function resolveUsers() {
+  console.log('Starting user resolution for NFT holders...');
+
+  // Update user_id and user_tier by joining with Addresses and Users tables
+  const updateQuery = `
+    UPDATE nft_collection_data 
+    SET 
+      user_id = u.id,
+      user_tier = u.tier,
+      updated_at = NOW()
+    FROM "Addresses" a
+    INNER JOIN "Users" u ON a.user_id = u.id
+    WHERE LOWER(nft_collection_data.holder_address) = LOWER(a.address)
+      AND (nft_collection_data.user_id IS NULL OR nft_collection_data.user_tier IS NULL);
+  `;
+
+  try {
+    const [, updatedRows] = await models.sequelize.query(updateQuery, {
+      type: QueryTypes.UPDATE,
+    });
+
+    console.log(`✅ Updated ${updatedRows} NFT records with user information`);
+
+    // If in testing mode, assign random tiers to NFTs without resolved users
+    if (process.env.TESTING === 'true') {
+      console.log(
+        '🧪 Testing mode detected - assigning random user tiers to unresolved NFTs...',
+      );
+
+      // Get all valid user tier values (excluding SystemUser for testing)
+      const validTiers = [
+        UserTierMap.NewlyVerifiedWallet,
+        UserTierMap.VerifiedWallet,
+        UserTierMap.SocialVerified,
+        UserTierMap.ChainVerified,
+        UserTierMap.ManuallyVerified,
+      ];
+
+      // Get all NFTs that don't have user tiers assigned
+      const nftsWithoutTiers = await models.sequelize.query<{
+        token_id: number;
+      }>(
+        `
+          SELECT token_id
+          FROM nft_collection_data
+          WHERE user_tier IS NULL;
+        `,
+        {
+          type: QueryTypes.SELECT,
+        },
+      );
+
+      console.log(
+        `Found ${nftsWithoutTiers.length} NFTs without user tiers for random assignment`,
+      );
+
+      // Assign random tiers
+      let randomAssignmentCount = 0;
+      for (const nft of nftsWithoutTiers) {
+        const randomTier =
+          validTiers[Math.floor(Math.random() * validTiers.length)];
+
+        await models.sequelize.query(
+          `
+            UPDATE nft_collection_data
+            SET user_tier = :tier,
+                updated_at = NOW()
+            WHERE token_id = :tokenId;
+          `,
+          {
+            replacements: {
+              tier: randomTier,
+              tokenId: nft.token_id,
+            },
+            type: QueryTypes.UPDATE,
+          },
+        );
+
+        randomAssignmentCount++;
+
+        // Log progress every 1000 tokens
+        if (randomAssignmentCount % 1000 === 0) {
+          console.log(
+            `Assigned random tiers to ${randomAssignmentCount}/${nftsWithoutTiers.length} NFTs...`,
+          );
+        }
+      }
+
+      console.log(
+        `✅ Assigned random user tiers to ${randomAssignmentCount} NFTs for testing`,
+      );
+    }
+
+    // Get summary statistics
+    const statsQuery = `
+      SELECT 
+        COUNT(*) as total_nfts,
+        COUNT(user_id) as nfts_with_users,
+        COUNT(*) - COUNT(user_id) as nfts_without_users,
+        COUNT(DISTINCT user_id) as unique_users,
+        COUNT(DISTINCT user_tier) as unique_tiers
+      FROM nft_collection_data;
+    `;
+
+    const [stats] = await models.sequelize.query<{
+      total_nfts: number;
+      nfts_with_users: number;
+      nfts_without_users: number;
+      unique_users: number;
+      unique_tiers: number;
+    }>(statsQuery, {
+      type: QueryTypes.SELECT,
+    });
+
+    console.log('\n📊 User Resolution Summary:');
+    console.log(`- Total NFTs: ${stats.total_nfts.toLocaleString()}`);
+    console.log(
+      `- NFTs with resolved users: ${stats.nfts_with_users.toLocaleString()}`,
+    );
+    console.log(
+      `- NFTs without users: ${stats.nfts_without_users.toLocaleString()}`,
+    );
+    console.log(`- Unique users: ${stats.unique_users.toLocaleString()}`);
+    console.log(`- Unique user tiers: ${stats.unique_tiers.toLocaleString()}`);
+
+    // Show tier distribution for resolved users
+    const tierDistributionQuery = `
+      SELECT 
+        user_tier,
+        COUNT(*) as nft_count,
+        COUNT(DISTINCT user_id) as user_count
+      FROM nft_collection_data 
+      WHERE user_id IS NOT NULL
+      GROUP BY user_tier
+      ORDER BY user_tier;
+    `;
+
+    const tierStats = await models.sequelize.query<{
+      user_tier: number;
+      nft_count: number;
+      user_count: number;
+    }>(tierDistributionQuery, {
+      type: QueryTypes.SELECT,
+    });
+
+    if (tierStats.length > 0) {
+      console.log('\n📈 User Tier Distribution:');
+      tierStats.forEach((tier) => {
+        console.log(
+          `Tier ${tier.user_tier}: ${tier.nft_count.toLocaleString()} NFTs from ${tier.user_count.toLocaleString()} users`,
+        );
+      });
+    }
+  } catch (error) {
+    console.error('Error resolving users:', error);
+    throw error;
+  }
 }
 
 // Parse command line arguments
@@ -717,6 +1035,9 @@ async function main() {
   } else {
     await assignRarityTierByPercentile();
   }
+
+  console.log('\n');
+  await resolveUsers();
 
   console.log('\n');
   await calculateEqualDistributionAllocations();
