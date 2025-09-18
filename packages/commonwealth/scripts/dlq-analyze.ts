@@ -27,7 +27,7 @@ async function sendToSlack(results: DlqSummary[]) {
     return acc;
   }, {});
 
-  const allBlocks: any[] = [
+  const allBlocks = [
     {
       type: 'section',
       text: { type: 'mrkdwn', text: '*DLQ Event Summary*' },
@@ -127,9 +127,4 @@ async function main() {
   }
 }
 
-main()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    log.error(err);
-    process.exit(1);
-  });
+void main();

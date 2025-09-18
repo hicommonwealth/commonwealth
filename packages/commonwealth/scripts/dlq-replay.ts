@@ -56,7 +56,4 @@ async function main(eventIds: string[]) {
 }
 
 const eventIdsToReplay = process.argv.slice(2);
-main(eventIdsToReplay).catch((err) => {
-  log.error(err);
-  process.exit(1);
-});
+void main(eventIdsToReplay);
