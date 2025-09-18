@@ -117,12 +117,12 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       social_verified: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
-        allowNull: true,
+        allowNull: false,
       },
       chain_verified: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
-        allowNull: true,
+        allowNull: false,
       },
     },
     {
