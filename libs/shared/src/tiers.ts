@@ -8,17 +8,20 @@ export type CommunityVerificationItem = {
   type: string;
 };
 
+export type TierIcons =
+  | 'stopSymbol'
+  | 'socialVerified'
+  | 'sandClock'
+  | 'globe'
+  | 'pins'
+  | 'whiteCheck'
+  | 'starGolden'
+  | 'diamond';
+
 type TierClientInfo = {
   trustLevel: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   icon: string;
-  componentIcon:
-    | 'stopSymbol'
-    | 'socialVerified'
-    | 'sandClock'
-    | 'globe'
-    | 'pins'
-    | 'whiteCheck'
-    | 'starGolden';
+  componentIcon: TierIcons;
   verificationItems?: Record<string, UserVerificationItem>;
 };
 
@@ -168,11 +171,11 @@ export const USER_TIERS = {
   [UserTierMap.FullyVerified]: {
     name: 'Fully Verified',
     description:
-      'User has completed all verification requirements and achieved highest community trust.',
+      'Completed all verification requirements and achieved the highest community trust.',
     clientInfo: {
       trustLevel: 5,
       icon: '💎',
-      componentIcon: 'starGolden',
+      componentIcon: 'diamond',
     },
   },
   [UserTierMap.ManuallyVerified]: {

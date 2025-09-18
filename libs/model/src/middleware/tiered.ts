@@ -15,6 +15,7 @@ import { Op } from 'sequelize';
 import { ZodType } from 'zod';
 import { config } from '../config';
 import { models } from '../database';
+import { setUserTier } from '../utils/tiers';
 
 type Counters = 'creates' | 'upvotes' | 'ai-images' | 'ai-text';
 
@@ -82,8 +83,13 @@ export function tiered({
     if (tier === UserTierMap.IncompleteUser)
       tier = UserTierMap.NewlyVerifiedWallet;
     if (tier > user.tier)
-      // TODO: update to use setUserTier function
-      await models.User.update({ tier }, { where: { id: user.id } });
+      await models.sequelize.transaction(async (transaction) => {
+        await setUserTier({
+          userId: user.id!,
+          newTier: tier,
+          transaction,
+        });
+      });
 
     if (tier < minTier)
       throw new InvalidActor(

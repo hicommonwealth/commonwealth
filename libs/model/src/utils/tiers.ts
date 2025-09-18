@@ -41,7 +41,12 @@ async function userHasChainTxn(userId: number, transaction: Transaction) {
       )
       SELECT 1 FROM txns LIMIT 1;
     `,
-    { transaction, replacements: { userId }, type: QueryTypes.SELECT },
+    {
+      transaction,
+      replacements: { userId },
+      type: QueryTypes.SELECT,
+      logging: console.log,
+    },
   );
   return txns.length > 0;
 }
@@ -69,12 +74,16 @@ async function getUserByAddress({
   const res = await models.sequelize.query<UserByAddress>(
     `
     WITH target_user AS (
-      SELECT a.user_id, U.tier, U.created_at
-      FROM "Addresses" a
-      JOIN "Users" U ON U.id = a.user_id
-      ${userId ? 'WHERE user_id = :userId' : `WHERE address = :address OR LOWER(address) = :address ${isEvmAddress(address!) ? 'OR address = :address' : ''}`}
-      AND a.user_id IS NOT NULL
-      FOR NO KEY UPDATE OF "Users"
+      SELECT U.id as user_id, U.tier, U.created_at
+      FROM "Users" U
+      ${
+        userId
+          ? 'WHERE U.id = :userId'
+          : `JOIN "Addresses" A ON A.user_id = U.id` +
+            ` WHERE address = :address OR LOWER(address) = :address AND A.user_id IS NOT NULL AND is_banned = false` +
+            ` ${isEvmAddress(address!) ? 'OR address = :address' : ''}`
+      }
+      FOR NO KEY UPDATE OF U
       LIMIT 1
     ),
     magic_address AS (
@@ -95,7 +104,12 @@ async function getUserByAddress({
     UNION ALL
     SELECT * FROM active_address;
   `,
-    { transaction, replacements: { address }, type: QueryTypes.SELECT },
+    {
+      transaction,
+      replacements: { address, userId },
+      type: QueryTypes.SELECT,
+      logging: console.log,
+    },
   );
   return res;
 }
@@ -119,11 +133,13 @@ export async function setUserTier({
   transaction: Transaction;
 }) {
   let tierToUpdate = newTier;
+  console.time('GetUserQuery');
   const user = await getUserByAddress({
     address: userAddress,
     transaction,
     userId,
   });
+  console.timeEnd('GetUserQuery');
 
   if (user.length === 0) {
     log.debug(`User with address ${userAddress} is not found`);
@@ -138,15 +154,12 @@ export async function setUserTier({
   ) as UserByAddress;
   const tier = magicAddress!.tier;
 
-  if (tier === UserTierMap.IncompleteUser) {
-    log.debug(`User with address ${userAddress} is incomplete`);
-    // TODO: should we allow bumping via this function?
-    return;
-  } else if (tier === UserTierMap.BannedUser) {
+  if (tier === UserTierMap.BannedUser) {
     log.debug(`User with address ${userAddress} is banned`);
     return;
   }
 
+  console.time('FullTierVerification');
   if (newTier === UserTierMap.ChainVerified) {
     if (tier === UserTierMap.SocialVerified && activeAddress.id) {
       tierToUpdate = UserTierMap.FullyVerified;
@@ -178,6 +191,7 @@ export async function setUserTier({
       }
     }
   }
+  console.timeEnd('FullTierVerification');
 
   if (tierToUpdate < tier) {
     log.debug(`User with address ${userAddress} is already at a higher tier`, {
