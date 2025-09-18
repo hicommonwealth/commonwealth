@@ -46,6 +46,8 @@ export async function main(
     withPrerender?: boolean;
   },
 ) {
+  // TODO: check Redis var for maintenance mode
+
   const log = logger(import.meta);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
