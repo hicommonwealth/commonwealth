@@ -4,6 +4,7 @@ import {
   hasTierClientInfo,
   TierIcons,
   USER_TIERS,
+  UserTierMap,
 } from '@hicommonwealth/shared';
 
 const DEFAULT_ICON = 'stopSymbol';
@@ -20,7 +21,7 @@ const hasCommunityClientInfo = (
   return 'clientInfo' in tier && tier.clientInfo !== undefined;
 };
 
-export const getUserTrustLevelIcon = (tier?: number): TrustLevelResult => {
+export const getUserTrustLevelIcon = (tier?: UserTierMap): TrustLevelResult => {
   if (!tier) {
     return { icon: DEFAULT_ICON };
   }

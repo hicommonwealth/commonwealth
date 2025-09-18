@@ -35,7 +35,7 @@ const TrustLevelRole = ({
   const { icon } =
     type === 'community'
       ? getCommunityTrustLevel(tier)
-      : getUserTrustLevelIcon(tier);
+      : getUserTrustLevelIcon(tier as UserTierMap);
 
   const tiers = type === 'community' ? COMMUNITY_TIERS : USER_TIERS;
   const tierData: Tier | UserTier = tier ? tiers[tier] : undefined;
