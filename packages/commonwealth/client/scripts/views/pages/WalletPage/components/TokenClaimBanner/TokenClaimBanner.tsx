@@ -1,7 +1,10 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'client/scripts/helpers';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import {
+  useClaimTokenFlow,
+  useGetAllocationQuery,
   useGetClaimAddressQuery,
   useUpdateClaimAddressMutation,
 } from 'client/scripts/state/api/tokenAllocations';
@@ -9,6 +12,7 @@ import CWBanner from 'client/scripts/views/components/component_kit/new_designs/
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
+import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
@@ -35,15 +39,27 @@ const formatTokenBalance = (balance: string | number): string => {
 
 const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const user = useUserStore();
+  const [formattedClaimable, setFormattedClaimable] = useState<string>('0');
 
   // token claim address
   const [evmAddresses, setEvmAddresses] = useState<AddressInfo[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<
     AddressInfo | undefined
   >(undefined);
+  const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
+  const claimsEnabled = useFlag('claims');
+  const {
+    claim: claimToken,
+    isPending: isClaiming,
+    transactionHash,
+  } = useClaimTokenFlow();
+  const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
-    useGetClaimAddressQuery({
-      enabled: true,
+    useGetClaimAddressQuery({ enabled: true });
+  const { data: allocation, isLoading: isLoadingAllocation } =
+    useGetAllocationQuery({
+      magna_allocation_id: claimAddress?.magna_allocation_id,
+      enabled: !!claimAddress?.magna_allocation_id && !transactionHash,
     });
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
@@ -64,7 +80,18 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
         evmAddresses.find((a) => a.address === claimAddress?.address),
       );
     }
-  }, [claimAddress?.address, evmAddresses]);
+    setFormattedClaimable(
+      formatTokenBalance(
+        allocation?.claimable ||
+          allocation?.amount ||
+          claimAddress?.tokens ||
+          0,
+      ),
+    );
+    setTxHash(
+      (claimAddress?.magna_claim_tx_hash as `0x${string}`) ?? transactionHash,
+    );
+  }, [claimAddress, evmAddresses, allocation, transactionHash]);
 
   const handleClaimAddressUpdate = () => {
     if (selectedAddress) {
@@ -100,12 +127,12 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     }
   };
 
-  if (!claimAddress?.tokens || isLoadingClaimAddress) {
+  if (!claimAddress?.tokens || isLoadingClaimAddress || !claimsEnabled) {
     return null;
   }
 
   // Create the address form content to include in actions
-  const addressFormContent = !claimAddress?.magna_synced_at ? (
+  const addressFormContent = (
     <div className="claim-address-body">
       <div className="claim-address-row">
         <div className="address-input-row">
@@ -157,143 +184,137 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
         </div>
       </div>
     </div>
-  ) : null;
-
-  const formattedBalance = formatTokenBalance(claimAddress.tokens || 0);
-
-  return (
-    <div className="TokenClaimBanner">
-      {claimAddress?.address ? (
-        <CWBanner
-          type="success"
-          body={
-            <div className="banner-content">
-              <h2 className="token-balance">
-                You have {formattedBalance} C tokens!
-              </h2>
-              <div className="notice-section">
-                <div className="notice-text">
-                  <p className="base-notice">
-                    We are going live on Base. You must set an EVM address to
-                    claim your allocation.
-                    <CWTooltip
-                      content={
-                        'Commonwealth tokens will be launched on Base network. ' +
-                        'Ensure your address is compatible with Base/Ethereum.'
-                      }
-                      renderTrigger={(handleInteraction) => (
-                        <CWIcon
-                          iconName="infoFilled"
-                          iconSize="small"
-                          className="info-icon"
-                          onMouseEnter={handleInteraction}
-                          onMouseLeave={handleInteraction}
-                        />
-                      )}
-                    />
-                  </p>
-                  <p className="security-notice">
-                    <strong>Before claiming, verify:</strong> check that you are
-                    on the main: common.xyz domain, verify your wallet is
-                    connected to the correct network, and never approve
-                    unlimited token allowances.
-                  </p>
-                </div>
-              </div>
-              {addressFormContent}
-              <div className="banner-actions">
-                {!claimAddress?.magna_synced_at && (
-                  <CWButton
-                    label={isUpdating ? 'Saving...' : 'Save address'}
-                    onClick={handleClaimAddressUpdate}
-                    disabled={
-                      isUpdating ||
-                      !selectedAddress ||
-                      selectedAddress.address === claimAddress?.address
-                    }
-                    buttonType="secondary"
-                    buttonHeight="sm"
-                    aria-label="Save the selected address for token claiming"
-                  />
-                )}
-                <CWButton
-                  label={`Claim to ${formatAddressShort(claimAddress?.address, 6)}`}
-                  buttonType="primary"
-                  disabled={!claimAddress.magna_allocation_id}
-                  onClick={() => {
-                    // handleClaim(claimAddress.magna_allocation_id);
-                    alert(
-                      `TODO: claim from magna using id: ${claimAddress.magna_allocation_id}`,
-                    );
-                  }}
-                  buttonHeight="sm"
-                  aria-label={`Claim ${formattedBalance} tokens to address ${claimAddress?.address}`}
-                />
-              </div>
-            </div>
-          }
-        />
-      ) : (
-        <CWBanner
-          type="warning"
-          body={
-            <div className="banner-content">
-              <h2 className="token-balance">
-                You have {formattedBalance} C tokens!
-              </h2>
-              <div className="notice-section">
-                <div className="notice-text">
-                  <p className="base-notice">
-                    We are going live on Base. You must set an EVM address to
-                    claim your allocation.
-                    <CWTooltip
-                      content={
-                        'Commonwealth tokens will be launched on Base network. ' +
-                        'Ensure your address is compatible with Base/Ethereum.'
-                      }
-                      renderTrigger={(handleInteraction) => (
-                        <CWIcon
-                          iconName="infoFilled"
-                          iconSize="small"
-                          className="info-icon"
-                          onMouseEnter={handleInteraction}
-                          onMouseLeave={handleInteraction}
-                        />
-                      )}
-                    />
-                  </p>
-                  <p className="security-notice">
-                    <strong>Before claiming, verify:</strong> Check the official
-                    project website and social media, ensure you&apos;re on the
-                    correct domain (check URL carefully), verify your wallet is
-                    connected to the correct network, and never approve
-                    unlimited token allowances.
-                  </p>
-                </div>
-              </div>
-              {addressFormContent}
-              <div className="banner-actions">
-                {!claimAddress?.magna_synced_at && (
-                  <CWButton
-                    label={isUpdating ? 'Saving...' : 'Save address'}
-                    onClick={handleClaimAddressUpdate}
-                    disabled={
-                      isUpdating ||
-                      !selectedAddress ||
-                      selectedAddress.address === claimAddress?.address
-                    }
-                    buttonType="primary"
-                    buttonHeight="sm"
-                    aria-label="Save the selected address for token claiming"
-                  />
-                )}
-              </div>
-            </div>
-          }
-        />
-      )}
-    </div>
   );
+
+  return claimAddress ? (
+    <div className="TokenClaimBanner">
+      <CWBanner
+        type={claimAddress.address ? 'info' : 'error'}
+        body={
+          <div className="banner-content">
+            <h3 className="description">{claimAddress.description}</h3>
+            <h2 className="token-balance">
+              You have {formattedClaimable} {claimAddress.token} tokens!
+            </h2>
+            {claimAddress.magna_claimed_at && txHash ? (
+              <div className="notice-section">
+                <div className="notice-text">
+                  <p className="base-notice">
+                    You claimed your tokens on{' '}
+                    {new Date(claimAddress.magna_claimed_at).toLocaleString()}
+                  </p>
+                  <a
+                    href={`https://basescan.org/tx/${txHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {txHash.slice(0, 6)}...{txHash.slice(-4)}
+                  </a>
+                </div>
+              </div>
+            ) : claimAddress?.magna_synced_at ? (
+              allocation &&
+              allocation.magna_allocation_id &&
+              allocation.walletAddress &&
+              allocation.claimable > 0 ? (
+                <div className="notice-section">
+                  <div className="notice-text">
+                    <p style={{ textAlign: 'left' }}>
+                      <strong>Before Claiming</strong>
+                      <ul style={{ listStyleType: 'disc' }}>
+                        <li>
+                          Verify that you are on the <strong>common.xyz</strong>{' '}
+                          domain
+                        </li>
+                        <li>
+                          Your wallet is connected to the <strong>Base</strong>{' '}
+                          network
+                        </li>
+                        <li>Never approve unlimited token allowances</li>
+                      </ul>
+                    </p>
+                    <CWButton
+                      label={`Claim to ${formatAddressShort(allocation.walletAddress, 6)}`}
+                      onClick={() => {
+                        claimToken({
+                          allocation_id: allocation.magna_allocation_id,
+                        });
+                      }}
+                      disabled={isClaiming || isLoadingAllocation}
+                      aria-label={`Claim to ${formatAddressShort(allocation.walletAddress, 6)}`}
+                    />
+                  </div>
+                </div>
+              ) : allocation?.unlock_start_at ? (
+                <div className="notice-section">
+                  <p>
+                    You can claim your tokens after{' '}
+                    {new Date(allocation.unlock_start_at).toLocaleDateString()}
+                  </p>
+                </div>
+              ) : (
+                <div className="notice-section">
+                  <p>You can claim your tokens after the unlock date</p>
+                </div>
+              )
+            ) : (
+              <div className="notice-section">
+                <div className="notice-text">
+                  <p className="base-notice">
+                    We are going live on Base. You must set an EVM address to
+                    claim your allocation.
+                    <CWTooltip
+                      content={
+                        'Commonwealth tokens will be launched on Base network. ' +
+                        'Ensure your address is compatible with Base/Ethereum.'
+                      }
+                      renderTrigger={(handleInteraction) => (
+                        <CWIcon
+                          iconName="infoFilled"
+                          iconSize="small"
+                          className="info-icon"
+                          onMouseEnter={handleInteraction}
+                          onMouseLeave={handleInteraction}
+                        />
+                      )}
+                    />
+                  </p>
+                  <div className="banner-actions">
+                    {addressFormContent}
+                    <CWCheckbox
+                      checked={isAcknowledged}
+                      onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
+                      label={
+                        <p>
+                          I understand that once incentives are added, there are
+                          non-refundable and can NOT be withdrawn under any
+                          circumstances.
+                        </p>
+                      }
+                    />
+                    {isAcknowledged && (
+                      <CWButton
+                        label={isUpdating ? 'Saving...' : 'Save address'}
+                        onClick={handleClaimAddressUpdate}
+                        disabled={
+                          isUpdating ||
+                          !selectedAddress ||
+                          selectedAddress.address === claimAddress?.address
+                        }
+                        buttonType="secondary"
+                        buttonHeight="sm"
+                        aria-label="Save the selected address for token claiming"
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        }
+      />
+    </div>
+  ) : null;
 };
 
 export default TokenClaimBanner;

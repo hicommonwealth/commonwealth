@@ -1,7 +1,8 @@
 import { logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model/db';
 import { delay } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
+import { config } from '../../config';
+import { models } from '../../database';
 
 const log = logger(import.meta);
 
@@ -11,13 +12,12 @@ export type TokenAllocationSyncArgs = {
   description: string;
   user_id: number;
   user_name: string;
-  user_email: string;
   wallet_address: string;
   token_allocation: number;
 };
 
 export async function magnaSync(
-  apiCallback: (args: TokenAllocationSyncArgs) => Promise<boolean>,
+  apiCallback: (args: TokenAllocationSyncArgs) => Promise<string>,
   batchSize = 10,
   breatherMs = 1000,
 ) {
@@ -28,14 +28,12 @@ export async function magnaSync(
       const batch = await models.sequelize.query<TokenAllocationSyncArgs>(
         `
           SELECT
-            'initial-airdrop-' || A.address as key,
-            'initial-airdrop' as category,
-            'Inital Common Token Airdrop for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
+            :category || '-' || A.address as key,
+            :category as category,
+            :description || ' for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
             A.user_id,
             A.address as wallet_address,
             U.profile->>'name' as user_name,
-            U.profile->>'email' as user_email,
-            -- combined in initial drop?
             COALESCE(HA.token_allocation, 0)::double precision 
             + COALESCE(AA.token_allocation, 0)::double precision
             + COALESCE(N.total_token_allocation, 0)::double precision as token_allocation
@@ -54,7 +52,11 @@ export async function magnaSync(
         `,
         {
           type: QueryTypes.SELECT,
-          replacements: { limit: batchSize },
+          replacements: {
+            category: config.MAGNA!.EVENT,
+            description: config.MAGNA!.EVENT_DESC,
+            limit: batchSize,
+          },
         },
       );
       // break when no more allocations to sync
@@ -65,10 +67,10 @@ export async function magnaSync(
 
       const promises = batch.map(async (args) => {
         try {
-          await apiCallback(args);
+          const allocationId = await apiCallback(args);
           await models.ClaimAddresses.update(
             {
-              magna_allocation_id: args.key,
+              magna_allocation_id: allocationId,
               magna_synced_at: new Date(),
             },
             { where: { user_id: args.user_id } },

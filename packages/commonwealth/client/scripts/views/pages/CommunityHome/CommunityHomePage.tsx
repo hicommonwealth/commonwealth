@@ -75,7 +75,9 @@ const CommunityHome = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
 
-  const handleCreateThread = async (): Promise<number> => {
+  const handleCreateThread = async (
+    turnstileToken?: string,
+  ): Promise<number> => {
     if (!user.activeAccount || !community || !topics || topics.length === 0) {
       notifyError('User, community data, or topics missing.');
       return -1;
@@ -103,6 +105,7 @@ const CommunityHome = () => {
         body: bodyText,
         ethChainIdOrBech32Prefix:
           app.chain.meta.ChainNode?.eth_chain_id ?? undefined,
+        turnstileToken,
       });
 
       const newThread = await createThread(input);

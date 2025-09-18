@@ -21,7 +21,14 @@ export function UnpinToken(): Command<typeof schemas.UnpinToken> {
 
       if (!pinnedToken) throw new InvalidState(UnpinTokenErrors.NotFound);
 
-      await pinnedToken.destroy();
+      await models.sequelize.transaction(async (transaction) => {
+        await models.Community.update(
+          { thread_purchase_token: null },
+          { where: { id: pinnedToken.community_id }, transaction },
+        );
+
+        await pinnedToken.destroy({ transaction });
+      });
       return {};
     },
   };

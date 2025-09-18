@@ -104,6 +104,16 @@ const {
   MCP_BOT_EMAIL,
   IGNORE_CONTENT_CREATION_LIMIT,
   AI_BOT_USER_ADDRESS,
+  MAGNA_API_KEY,
+  MAGNA_API_URL,
+  MAGNA_EVENT,
+  MAGNA_EVENT_DESC,
+  MAGNA_CONTRACT_ID,
+  MAGNA_TOKEN,
+  MAGNA_TOKEN_ID,
+  MAGNA_UNLOCK_SCHEDULE_ID,
+  MAGNA_UNLOCK_START_AT,
+  MAGNA_BATCH_SIZE,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -121,6 +131,7 @@ const DEFAULTS = {
   KNOCK_PUBLIC_API_KEY: 'pk_test_Hd4ZpzlVcz9bqepJQoo9BvZHokgEqvj4T79fPdKqpYM',
   KNOCK_IN_APP_FEED_ID: 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb',
   XP_REFERRER_FEE_RATIO: '0',
+  MAGNA_BATCH_SIZE: '10',
 };
 
 export const config = configure(
@@ -350,6 +361,32 @@ export const config = configure(
       API_KEY: KLAVIS_API_KEY,
     },
     IGNORE_CONTENT_CREATION_LIMIT: IGNORE_CONTENT_CREATION_LIMIT === 'true',
+    MAGNA:
+      MAGNA_API_URL &&
+      MAGNA_API_KEY &&
+      MAGNA_EVENT &&
+      MAGNA_EVENT_DESC &&
+      MAGNA_CONTRACT_ID &&
+      MAGNA_TOKEN &&
+      MAGNA_TOKEN_ID &&
+      MAGNA_UNLOCK_SCHEDULE_ID &&
+      MAGNA_UNLOCK_START_AT
+        ? {
+            API_URL: MAGNA_API_URL,
+            API_KEY: MAGNA_API_KEY,
+            EVENT: MAGNA_EVENT,
+            EVENT_DESC: MAGNA_EVENT_DESC,
+            CONTRACT_ID: MAGNA_CONTRACT_ID,
+            TOKEN: MAGNA_TOKEN,
+            TOKEN_ID: MAGNA_TOKEN_ID,
+            UNLOCK_SCHEDULE_ID: MAGNA_UNLOCK_SCHEDULE_ID,
+            UNLOCK_START_AT: new Date(MAGNA_UNLOCK_START_AT),
+            BATCH_SIZE: parseInt(
+              MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE,
+              10,
+            ),
+          }
+        : undefined,
   },
   z.object({
     SENDGRID: z.object({
@@ -758,5 +795,19 @@ export const config = configure(
       API_KEY: z.string().optional(),
     }),
     IGNORE_CONTENT_CREATION_LIMIT: z.boolean().optional(),
+    MAGNA: z
+      .object({
+        API_URL: z.url(),
+        API_KEY: z.string(),
+        EVENT: z.string().min(5),
+        EVENT_DESC: z.string().min(5),
+        CONTRACT_ID: z.uuid(),
+        TOKEN: z.string().min(1),
+        TOKEN_ID: z.uuid(),
+        UNLOCK_SCHEDULE_ID: z.uuid(),
+        UNLOCK_START_AT: z.date(),
+        BATCH_SIZE: z.number(),
+      })
+      .optional(),
   }),
 );

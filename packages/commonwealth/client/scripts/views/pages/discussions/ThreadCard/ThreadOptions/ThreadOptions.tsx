@@ -11,7 +11,10 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { pluralize } from 'helpers';
+import { formatMarketCap } from 'helpers/formatting';
+import { useTokenPricing } from 'hooks/useTokenPricing';
 import Thread from 'models/Thread';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -121,6 +124,12 @@ export const ThreadOptions = ({
     }
   }, [thread.canvasSignedData]);
 
+
+  const { pricing: tokenPricing, isLoading: isPricingLoading } = useTokenPricing({
+    token: threadToken as unknown as LaunchpadToken,
+  });
+  const lastPurchaseActivity = thread.lastPurchaseActivity;
+
   return (
     <>
       <div className="ThreadOptions">
@@ -152,7 +161,7 @@ export const ThreadOptions = ({
                 showOnlyThreadActionIcons
                   ? ''
                   : // @ts-expect-error <StrictNullChecks/>
-                    pluralize(totalComments, 'Comment')
+                  pluralize(totalComments, 'Comment')
               }
               action="comment"
               disabled={!permissions.CREATE_COMMENT.allowed}
@@ -162,18 +171,6 @@ export const ThreadOptions = ({
                 onCommentClick && onCommentClick();
               }}
               tooltipText={permissions.CREATE_COMMENT.tooltip}
-            />
-          )}
-
-          {threadToken?.token_address && onTradeClick && (
-            <CWThreadAction
-              label={showOnlyThreadActionIcons ? '' : 'Trade'}
-              action="fund"
-              onClick={(e) => {
-                e.preventDefault();
-                onTradeClick();
-              }}
-              tooltipText="Trade thread token"
             />
           )}
 
@@ -187,6 +184,49 @@ export const ThreadOptions = ({
               showLabel={!showOnlyThreadActionIcons}
             />
           )}
+
+          {threadToken?.token_address && onTradeClick && (
+            <CWTooltip
+              placement="top"
+              content={
+                tokenPricing?.marketCapCurrent
+                  ? `Market Cap: ${formatMarketCap(tokenPricing.marketCapCurrent)}`
+                  : lastPurchaseActivity?.is_buy !== undefined
+                    ? `Last trade: ${lastPurchaseActivity.is_buy ? 'Buy' : 'Sell'}`
+                    : 'View market cap'
+              }
+              renderTrigger={(handleInteraction) => (
+                <button
+                  className="ThreadAction"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onTradeClick();
+                  }}
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                >
+                  {lastPurchaseActivity?.is_buy !== undefined && (
+                    <CWIcon
+                      iconName={
+                        lastPurchaseActivity.is_buy ? 'arrowUpHalfGreen' : 'arrowDownHalfOrange'
+                      }
+                      iconSize="small"
+                    />
+                  )}
+                  {!showOnlyThreadActionIcons && (
+                    <CWText type="caption" fontWeight="regular">
+                      {isPricingLoading
+                        ? 'Loading...'
+                        : tokenPricing?.marketCapCurrent
+                          ? formatMarketCap(tokenPricing.marketCapCurrent)
+                          : 'Market Cap'}
+                    </CWText>
+                  )}
+                </button>
+              )}
+            />
+          )}
+
 
           {shareEndpoint && (
             <ShareButton

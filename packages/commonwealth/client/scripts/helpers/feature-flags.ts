@@ -47,7 +47,8 @@ const featureFlags = {
   mcpGoogleSheets: buildFlag(process.env.FLAG_MCP_GOOGLE_SHEETS),
   mcpIntegrationsEnabled: buildFlag(process.env.FLAG_MCP_INTEGRATIONS_ENABLED),
   gateWallet: buildFlag(process.env.FLAG_GATE_WALLET),
-  moonpayFunds: buildFlag(process.env.FLAG_MOONPAY_FUNDS)
+  moonpayFunds: buildFlag(process.env.FLAG_MOONPAY_FUNDS),
+  claims: buildFlag(process.env.FLAG_CLAIMS),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;
