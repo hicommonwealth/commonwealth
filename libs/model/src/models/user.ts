@@ -109,6 +109,21 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
         defaultValue: false,
         allowNull: true,
       },
+      wallet_verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      social_verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      chain_verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
     },
     {
       timestamps: true,

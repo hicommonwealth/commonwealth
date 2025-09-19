@@ -74,6 +74,9 @@ export const User = z.object({
   total_xp: PG_INT.default(0).optional(),
   privy_id: z.string().max(255).nullish(),
   notify_user_name_change: z.boolean().default(false).nullish(),
+  wallet_verified: z.boolean().default(false).optional(),
+  social_verified: z.boolean().default(false).optional(),
+  chain_verified: z.boolean().default(false).optional(),
 
   ProfileTags: z.array(ProfileTags).optional(),
   ApiKey: ApiKey.optional(),

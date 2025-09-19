@@ -1,5 +1,5 @@
+import { UserProfileViewType } from '@hicommonwealth/schemas';
 import {
-  USER_TIERS,
   UserTierMap,
   UserVerificationItem,
   UserVerificationItemType,
@@ -29,10 +29,6 @@ const UserTrustLevel = () => {
 
   const currentTier: UserTierMap =
     (data?.tier as UserTierMap) ?? (userData.tier as UserTierMap);
-  const tierInfo = USER_TIERS[currentTier];
-  const currentTrustLevel =
-    (tierInfo && 'clientInfo' in tierInfo && tierInfo.clientInfo?.trustLevel) ||
-    0;
 
   const handleItemClick = (item: UserVerificationItem) => {
     if (item.type === 'VERIFY_SOCIAL') {
@@ -51,32 +47,40 @@ const UserTrustLevel = () => {
     setSelectedAction(null);
   };
 
-  const tiers = mapTiers(currentTier);
+  if (!data) return null;
+
+  const tiers = mapTiers(data as UserProfileViewType);
 
   return (
     <div className="UserTrustLevel">
-      {tiers.map((level) => {
-        const isLocked = level.level > currentTrustLevel + 1;
-        const isCurrentLevel = level.level === currentTrustLevel;
+      {tiers.map((tierInfo) => {
+        let isLocked = false;
+        if (
+          tierInfo.tier === UserTierMap.ManuallyVerified &&
+          data.tier !== UserTierMap.ManuallyVerified
+        ) {
+          isLocked = true;
+        }
+        const isCurrentTier = tierInfo.tier === currentTier;
 
         return (
           <LevelBox
-            key={level.level}
-            level={level.level}
-            title={level.title}
-            description={level.description}
-            status={level.status}
+            key={tierInfo.level}
+            level={tierInfo.level}
+            title={tierInfo.title}
+            description={tierInfo.description}
+            status={tierInfo.status}
             isLocked={isLocked}
             icon={
               <TrustLevelRole
                 type="user"
-                level={level.level}
+                tier={tierInfo.tier}
                 size="xl"
-                withTooltip={isCurrentLevel}
+                withTooltip={isCurrentTier}
               />
             }
-            items={level.items}
-            showArrow={level.redirect}
+            items={tierInfo.items}
+            showArrow={tierInfo.redirect}
             onItemClick={handleItemClick}
           />
         );
