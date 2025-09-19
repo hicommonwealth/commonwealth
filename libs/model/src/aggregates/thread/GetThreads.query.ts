@@ -102,6 +102,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 T.has_poll,
                 T.last_commented_on,
                 T.comment_count,
+                T.view_count,
                 T.marked_as_spam_at,
                 T.archived_at,
                 T.topic_id,
