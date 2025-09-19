@@ -72,6 +72,7 @@ export interface MagnaResponse<T> {
   error?: {
     type: string;
     message: string;
+    context?: { existingAllocationId?: string };
   };
 }
 

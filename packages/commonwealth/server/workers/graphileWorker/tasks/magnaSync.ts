@@ -29,11 +29,13 @@ async function callback({
   if (response && response.isProcessed && response.result?.id)
     return response.result.id;
 
-  // TODO: Handle conflicts: if the allocation already exists, we don't need to create it again
-  // if (response.error === 'conflict') {
-  //   log.info(`Allocation already exists for ${key}`);
-  //   return response.result.id;
-  // }
+  // Handle conflicts: if the allocation already exists, we don't need to create it again
+  if (response.error?.context?.existingAllocationId) {
+    log.info(
+      `Allocation already exists for ${key}: ${response.error.context.existingAllocationId}`,
+    );
+    return response.error.context.existingAllocationId;
+  }
 
   log.error(`Failed to create allocation for ${key}`, undefined, {
     response,
