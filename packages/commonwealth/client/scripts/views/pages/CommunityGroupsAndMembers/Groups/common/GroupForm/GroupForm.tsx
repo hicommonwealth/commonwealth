@@ -32,6 +32,7 @@ import { ZodError, ZodObject } from 'zod';
 import {
   AMOUNT_CONDITIONS,
   ERC_SPECIFICATIONS,
+  SUI_NFT_SPECIFICATION,
   TOKENS,
   TRUST_LEVEL_SPECIFICATION,
   conditionTypes,
@@ -139,6 +140,8 @@ const getRequirementSubFormSchema = (
   const isERC721Requirement = requirementType === ERC_SPECIFICATIONS.ERC_721;
   const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
   const isTrustLevelRequirement = requirementType === TRUST_LEVEL_SPECIFICATION;
+  const isSuiTokenRequirement = requirementType === TOKENS.SUI_TOKEN_TYPE;
+  const isSuiNftRequirement = requirementType === SUI_NFT_SPECIFICATION;
 
   if (isTrustLevelRequirement) {
     return requirementSubFormValidationSchema.omit({
@@ -147,6 +150,23 @@ const getRequirementSubFormSchema = (
       requirementCondition: true,
       requirementAmount: true,
       requirementTokenId: true,
+      requirementCoinType: true,
+    });
+  }
+
+  if (isSuiTokenRequirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementContractAddress: true,
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+    });
+  }
+
+  if (isSuiNftRequirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+      requirementCoinType: true,
     });
   }
 
@@ -155,6 +175,7 @@ const getRequirementSubFormSchema = (
       requirementContractAddress: true,
       requirementTokenId: true,
       requirementTrustLevel: true,
+      requirementCoinType: true,
     });
   }
 
@@ -162,6 +183,7 @@ const getRequirementSubFormSchema = (
     return requirementSubFormValidationSchema.omit({
       requirementTokenId: true,
       requirementTrustLevel: true,
+      requirementCoinType: true,
     });
   }
 
@@ -169,11 +191,13 @@ const getRequirementSubFormSchema = (
     return requirementSubFormValidationSchema.omit({
       requirementTokenId: true,
       requirementTrustLevel: true,
+      requirementCoinType: true,
     });
   }
 
   return requirementSubFormValidationSchema.omit({
     requirementTrustLevel: true,
+    requirementCoinType: true,
   });
 };
 
