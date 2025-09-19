@@ -68,8 +68,11 @@ export interface MagnaClaim {
 
 export interface MagnaResponse<T> {
   isProcessed: boolean;
-  result: T;
-  errors: unknown;
+  result?: T;
+  error?: {
+    type: string;
+    message: string;
+  };
 }
 
 export type MagnaAllocationResponse = MagnaResponse<MagnaAllocation>;

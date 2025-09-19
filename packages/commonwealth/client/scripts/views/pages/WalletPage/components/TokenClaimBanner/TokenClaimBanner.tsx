@@ -245,7 +245,9 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                     />
                   </div>
                 </div>
-              ) : allocation?.unlock_start_at ? (
+              ) : allocation &&
+                allocation.claimable > 0 &&
+                allocation.unlock_start_at ? (
                 <div className="notice-section">
                   <p>
                     You can claim your tokens after{' '}
@@ -254,7 +256,9 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                 </div>
               ) : (
                 <div className="notice-section">
-                  <p>You can claim your tokens after the unlock date</p>
+                  <p>
+                    Please contact tech@common.foundation or reach out in the Common Discord if you need help.
+                  </p>
                 </div>
               )
             ) : (
