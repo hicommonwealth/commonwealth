@@ -257,8 +257,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
               ) : (
                 <div className="notice-section">
                   <p>
-                    Please contact tech@common.foundation if you have not claimed your tokens
-                    yet.
+                    Please contact tech@common.foundation or reach out in the Common Discord if you need help.
                   </p>
                 </div>
               )
