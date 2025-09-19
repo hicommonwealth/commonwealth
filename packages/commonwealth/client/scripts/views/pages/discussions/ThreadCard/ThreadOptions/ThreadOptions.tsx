@@ -14,7 +14,6 @@ import { pluralize } from 'helpers';
 import { formatMarketCap } from 'helpers/formatting';
 import { useTokenPricing } from 'hooks/useTokenPricing';
 import Thread from 'models/Thread';
-import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -23,6 +22,7 @@ import ShareButton from 'views/components/ShareButton';
 import { ThreadTokenDrawerTrigger } from 'views/components/ThreadTokenDrawer';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ToggleThreadSubscribe } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
 import { z } from 'zod';
 import { AdminActions, AdminActionsProps } from './AdminActions';
@@ -124,10 +124,10 @@ export const ThreadOptions = ({
     }
   }, [thread.canvasSignedData]);
 
-
-  const { pricing: tokenPricing, isLoading: isPricingLoading } = useTokenPricing({
-    token: threadToken as unknown as LaunchpadToken,
-  });
+  const { pricing: tokenPricing, isLoading: isPricingLoading } =
+    useTokenPricing({
+      token: threadToken as unknown as LaunchpadToken,
+    });
   const lastPurchaseActivity = thread.lastPurchaseActivity;
 
   return (
@@ -161,7 +161,7 @@ export const ThreadOptions = ({
                 showOnlyThreadActionIcons
                   ? ''
                   : // @ts-expect-error <StrictNullChecks/>
-                  pluralize(totalComments, 'Comment')
+                    pluralize(totalComments, 'Comment')
               }
               action="comment"
               disabled={!permissions.CREATE_COMMENT.allowed}
@@ -208,7 +208,9 @@ export const ThreadOptions = ({
                   {lastPurchaseActivity?.is_buy !== undefined && (
                     <CWIcon
                       iconName={
-                        lastPurchaseActivity.is_buy ? 'arrowUpHalfGreen' : 'arrowDownHalfOrange'
+                        lastPurchaseActivity.is_buy
+                          ? 'arrowUpHalfGreen'
+                          : 'arrowDownHalfOrange'
                       }
                       iconSize="small"
                     />
@@ -226,7 +228,6 @@ export const ThreadOptions = ({
               )}
             />
           )}
-
 
           {shareEndpoint && (
             <ShareButton

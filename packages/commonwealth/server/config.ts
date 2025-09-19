@@ -42,6 +42,7 @@ const {
   RELEASER_API_KEY,
   RELEASER_WAIT_ONLY,
   RAILWAY_PUBLIC_DOMAIN,
+  SLACK_WEBHOOK_URL_ALL_ENG,
 } = process.env;
 
 const DEFAULTS = {
@@ -170,6 +171,11 @@ export const config = configure(
       RELEASER_API_KEY,
       RELEASER_WAIT_ONLY: RELEASER_WAIT_ONLY === 'true',
       RAILWAY_PUBLIC_DOMAIN,
+    },
+    SLACK: {
+      CHANNELS: {
+        ALL_ENG: SLACK_WEBHOOK_URL_ALL_ENG,
+      },
     },
   },
   z.object({
@@ -319,6 +325,11 @@ export const config = configure(
           `When true, will not trigger a release but will await the result.`,
         ),
       RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
+    }),
+    SLACK: z.object({
+      CHANNELS: z.object({
+        ALL_ENG: z.string().optional(),
+      }),
     }),
   }),
 );
