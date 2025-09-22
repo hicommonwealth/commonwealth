@@ -55,6 +55,10 @@ export const EVM_BYTES = z.templateLiteral([
   z.literal('0x'),
   z.string().regex(/^[0-9a-fA-F]*$/),
 ]);
+export const EVM_TRANSACTION_HASH = z.templateLiteral([
+  z.literal('0x'),
+  z.string().regex(/^[0-9a-fA-F]{64}$/),
+]);
 
 export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
   const fileSizeBytes = await getFileSizeBytes(val);

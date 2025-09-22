@@ -1,5 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
+import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -72,6 +73,7 @@ const TokenInformationFormStep = ({
     cursor: 1,
     limit: 50,
     search: debouncedSearchTerm,
+    token_type: 'launchpad',
     enabled: !!debouncedSearchTerm,
   });
 
@@ -119,6 +121,15 @@ const TokenInformationFormStep = ({
       onSubmit(values); // token gets created with signature step, this info is only used to generate community details
     },
     [isTokenNameTaken, openAddressSelectionModal, selectedAddress, onSubmit],
+  );
+
+  const handleFormErrors = useCallback(
+    (errors: Record<string, { message: string }>) => {
+      if (errors.description) {
+        notifyError('Description must be 180 characters or less.');
+      }
+    },
+    [],
   );
 
   useEffect(() => {
@@ -178,6 +189,7 @@ const TokenInformationFormStep = ({
       // @ts-expect-error <StrictNullChecks/>
       ref={formMethodsRef}
       onSubmit={handleSubmit}
+      onErrors={handleFormErrors}
       onWatch={onFormUpdate}
       validationSchema={tokenInformationFormValidationSchema}
       className={clsx('TokenInformationFormStep', containerClassName)}
