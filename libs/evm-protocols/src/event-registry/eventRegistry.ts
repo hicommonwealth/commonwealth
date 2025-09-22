@@ -107,6 +107,15 @@ const tokenLaunchpadSource: ContractSource = {
   ],
 };
 
+const voteGovernanceSource: ContractSource = {
+  abi: VoteGovernanceAbi,
+  eventSignatures: [
+    EvmEventSignatures.VoteGovernance.OzProposalCreated,
+    EvmEventSignatures.VoteGovernance.TokenVoteCast,
+    EvmEventSignatures.VoteGovernance.AddressVoteCast,
+  ],
+};
+
 const tokenBondingCurveSource: ContractSource = {
   abi: TokenBondingCurveAbi,
   eventSignatures: [
@@ -160,6 +169,8 @@ export const EventRegistry = {
       tokenLaunchpadSource,
     [getFactoryContract(ValidChains.SepoliaBase).TokenBondingCurve]:
       tokenBondingCurveSource,
+    [getFactoryContract(ValidChains.SepoliaBase).VoteGovernance]:
+      voteGovernanceSource,
   },
   [ValidChains.Sepolia]: {
     [getFactoryContract(ValidChains.Sepolia).NamespaceFactory]:
