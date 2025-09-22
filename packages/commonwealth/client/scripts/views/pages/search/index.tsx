@@ -186,7 +186,7 @@ const SearchPage = () => {
   const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
   const {
-    data: toeknsData,
+    data: tokensData,
     error: tokensError,
     isLoading: tokensIsLoading,
     fetchNextPage: tokensFetchNextPage,
@@ -226,7 +226,7 @@ const SearchPage = () => {
           []
         );
       case SearchScope.Tokens:
-        return (toeknsData?.pages || []).flatMap((page) => page.results) || [];
+        return (tokensData?.pages || []).flatMap((page) => page.results) || [];
       default:
         return [];
     }
@@ -236,7 +236,7 @@ const SearchPage = () => {
     commentsData,
     profilesData,
     threadsData,
-    toeknsData,
+    tokensData,
   ]);
 
   const totalResults = useMemo(() => {
@@ -250,7 +250,7 @@ const SearchPage = () => {
       case SearchScope.Members:
         return profilesData?.pages?.[0]?.totalResults || 0;
       case SearchScope.Tokens:
-        return toeknsData?.pages?.[0]?.totalResults || 0;
+        return tokensData?.pages?.[0]?.totalResults || 0;
       default:
         return 0;
     }
@@ -260,7 +260,7 @@ const SearchPage = () => {
     commentsData,
     profilesData,
     threadsData,
-    toeknsData,
+    tokensData,
   ]);
 
   const totalResultsText = pluralize(totalResults, activeTab.toLowerCase());

@@ -280,7 +280,7 @@ const TokenResultRow = ({ token, setRoute }: TokenResultRowProps) => {
         onCTAClick={(mode) => {
           handleCTAClick(mode, token as z.infer<typeof TokenView>);
         }}
-        onCardBodyClick={() => setRoute(token.community_id, {}, null)}
+        onCardBodyClick={() => setRoute('', {}, token.community_id)}
       />
       {tokenLaunchModalConfig.tradeConfig && (
         <TradeTokenModal
