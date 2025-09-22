@@ -419,7 +419,7 @@ const CommunityMembersPage = () => {
                 }))
               }
             />
-            {(groups && groups.length > 0) && (
+            {groups && groups.length > 0 && (
               <div className="select-dropdown-container">
                 <CWText type="b2" fontWeight="bold" className="filter-text">
                   Filter
