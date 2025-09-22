@@ -8,7 +8,6 @@ import {
 import { useTokenPricing } from 'hooks/useTokenPricing';
 import React, { useState } from 'react';
 import { saveToClipboard } from 'utils/clipboard';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -88,7 +87,7 @@ export const TokenTradeWidget = ({
           weight="fill"
           onClick={() => setIsWidgetExpanded((e) => !e)}
         />
-        <CWText type="b2" fontWeight="semiBold">
+        <CWText type="caption" fontWeight="medium" className="status-text">
           Token
         </CWText>
 
@@ -213,7 +212,6 @@ export const TokenTradeWidget = ({
           onModalClose={() => setTokenLaunchModalConfig({ isOpen: false })}
         />
       )}
-      <CWDivider />
     </section>
   );
 };

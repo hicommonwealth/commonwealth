@@ -5,6 +5,11 @@ import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetc
 import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { findDenominationString } from 'helpers/findDenomination';
+import {
+  isRateLimitError,
+  RATE_LIMIT_MESSAGE,
+  RateLimitErrorType,
+} from 'helpers/rateLimit';
 import { useFlag } from 'hooks/useFlag';
 import type { DeltaStatic } from 'quill';
 import React, { useRef, useState } from 'react';
@@ -70,7 +75,9 @@ const CommunityHome = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
 
-  const handleCreateThread = async (): Promise<number> => {
+  const handleCreateThread = async (
+    turnstileToken?: string,
+  ): Promise<number> => {
     if (!user.activeAccount || !community || !topics || topics.length === 0) {
       notifyError('User, community data, or topics missing.');
       return -1;
@@ -98,6 +105,7 @@ const CommunityHome = () => {
         body: bodyText,
         ethChainIdOrBech32Prefix:
           app.chain.meta.ChainNode?.eth_chain_id ?? undefined,
+        turnstileToken,
       });
 
       const newThread = await createThread(input);
@@ -113,7 +121,18 @@ const CommunityHome = () => {
       console.error('Error creating thread:', error);
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
-      notifyError(`Failed to create thread: ${errorMessage}`);
+
+      // Type guard to check if error has the structure expected by isRateLimitError
+      const isRateLimitErrorType = (
+        err: unknown,
+      ): err is RateLimitErrorType => {
+        return typeof err === 'object' && err !== null;
+      };
+      if (isRateLimitErrorType(error) && isRateLimitError(error)) {
+        notifyError(RATE_LIMIT_MESSAGE);
+      } else {
+        notifyError(`Failed to create thread: ${errorMessage}`);
+      }
       return -1;
     }
   };

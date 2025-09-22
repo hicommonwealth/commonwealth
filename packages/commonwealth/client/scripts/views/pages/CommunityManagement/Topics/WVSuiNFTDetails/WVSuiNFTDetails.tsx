@@ -22,15 +22,14 @@ const WVSuiNFTDetails = ({
   onStepChange,
   onCreateTopic,
 }: WVSuiNFTDetailsProps) => {
-  const [collectionId, setCollectionId] = useState('');
-  const [tokenSymbol, setTokenSymbol] = useState('');
+  const [fullObjectType, setFullObjectType] = useState('');
   const [multiplier, setMultiplier] = useState(1);
   const [loading, setLoading] = useState(false);
 
   const chainNodeId = app?.chain?.meta?.ChainNode?.id;
 
   const handleSubmit = async () => {
-    if (!collectionId || !tokenSymbol || !chainNodeId) {
+    if (!fullObjectType || !chainNodeId) {
       notifyError('Please fill in all required fields');
       return;
     }
@@ -39,8 +38,7 @@ const WVSuiNFTDetails = ({
     try {
       await onCreateTopic({
         suiToken: {
-          tokenAddress: collectionId,
-          tokenSymbol,
+          tokenAddress: fullObjectType,
           tokenDecimals: 0, // NFTs typically don't have decimals
           voteWeightMultiplier: multiplier,
           chainNodeId,
@@ -68,25 +66,16 @@ const WVSuiNFTDetails = ({
 
       <CWText type="h4">Connect Sui NFT</CWText>
 
-      <CWText type="h5">Sui NFT Collection ID</CWText>
+      <CWText type="h5">Sui NFT Object Type</CWText>
       <CWText type="b1" className="description">
-        Enter the Sui NFT Collection ID
+        {
+          'Enter full object type (e.g., 0x1234::vault::VoteEscrowedToken<0x7890::my_token::MY_TOKEN>)'
+        }
       </CWText>
       <CWTextInput
-        value={collectionId}
-        onInput={(e) => setCollectionId(e.target.value)}
+        value={fullObjectType}
+        onInput={(e) => setFullObjectType(e.target.value)}
         placeholder="0x1234…"
-        fullWidth
-      />
-
-      <CWText type="h5">Token Symbol</CWText>
-      <CWText type="b1" className="description">
-        Enter the token symbol (e.g., MYNFT)
-      </CWText>
-      <CWTextInput
-        value={tokenSymbol}
-        onInput={(e) => setTokenSymbol(e.target.value)}
-        placeholder="Enter token symbol"
         fullWidth
       />
 
@@ -134,13 +123,7 @@ const WVSuiNFTDetails = ({
           disabled={loading}
         />
         <CWButton
-          disabled={
-            !collectionId ||
-            !tokenSymbol ||
-            !multiplier ||
-            loading ||
-            !chainNodeId
-          }
+          disabled={!fullObjectType || !multiplier || loading || !chainNodeId}
           type="button"
           buttonWidth="wide"
           label="Enable weighted voting for topic"

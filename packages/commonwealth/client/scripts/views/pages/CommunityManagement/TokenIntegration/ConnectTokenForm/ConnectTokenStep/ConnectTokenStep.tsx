@@ -44,7 +44,7 @@ const ConnectTokenStep = ({
     tokenMetadataLoading,
     tokenValue,
   } = useTokenFinder({
-    nodeEthChainId: baseNode.ethChainId || 0,
+    nodeEthChainId: baseNode?.ethChainId || 0,
   });
 
   const { mutateAsync: pinToken, isPending: isPinningToken } =
@@ -101,7 +101,7 @@ const ConnectTokenStep = ({
       onSubmit={handleSubmit}
       className="ConnectTokenStep"
       initialValues={{
-        chainNodeId: baseNode.id,
+        chainNodeId: baseNode?.id,
       }}
     >
       <div className="chain-selector">

@@ -5,6 +5,7 @@ import {
   DisabledCommunitySpamTier,
   GatedActionEnum,
   LinkSource,
+  TierRateLimitErrors,
 } from '@hicommonwealth/shared';
 import {
   SnapshotProposal,
@@ -19,6 +20,7 @@ import {
   SessionKeyError,
 } from 'controllers/server/sessions';
 import { weightedVotingValueToLabel } from 'helpers';
+import { isRateLimitError, RATE_LIMIT_MESSAGE } from 'helpers/rateLimit';
 import { detectURL } from 'helpers/threads';
 import useAppStatus from 'hooks/useAppStatus';
 import { useFlag } from 'hooks/useFlag';
@@ -476,7 +478,7 @@ export const NewThreadForm = forwardRef<
           resetTurnstile();
         }
 
-        if (err?.message?.includes('Exceeded content creation limit')) {
+        if (err?.message?.includes(TierRateLimitErrors.CREATES)) {
           console.log('NewThreadForm: Content creation limit exceeded');
           notifyError(
             'Exceeded content creation limit. Please try again later based on your trust level.',
@@ -494,7 +496,11 @@ export const NewThreadForm = forwardRef<
         }
 
         console.error('NewThreadForm: Unhandled error:', err?.message);
-        notifyError(err.message);
+        if (isRateLimitError(err)) {
+          notifyError(RATE_LIMIT_MESSAGE);
+        } else {
+          notifyError(err.message);
+        }
 
         // Reset turnstile if there's an error
         resetTurnstile();
@@ -933,7 +939,11 @@ export const NewThreadForm = forwardRef<
           navigate(`/discussion/${thread.id}`);
         } catch (error) {
           console.error('Error creating thread:', error);
-          notifyError('Failed to create thread');
+          if (isRateLimitError(error)) {
+            notifyError(RATE_LIMIT_MESSAGE);
+          } else {
+            notifyError('Failed to create thread');
+          }
         } finally {
           setIsSaving(false);
         }

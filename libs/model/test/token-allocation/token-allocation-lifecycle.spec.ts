@@ -1,6 +1,10 @@
 import { command, dispose } from '@hicommonwealth/core';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { UpdateClaimAddress } from '../../src/aggregates/token-allocation/UpdateClaimAddress.command';
+import { QueryTypes } from 'sequelize';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import {
+  ClaimToken,
+  UpdateClaimAddress,
+} from '../../src/aggregates/token-allocation';
 import { models } from '../../src/database';
 import { CommunitySeedResult, seedCommunity } from '../utils';
 
@@ -12,9 +16,30 @@ describe('Token Allocation Lifecycle', () => {
       roles: ['admin', 'member'],
       network: 'ethereum',
     });
+    // mock magna api
+    vi.mock('../../src/services/magna/api', () => ({
+      createAllocation: vi.fn().mockResolvedValue({
+        isProcessed: true,
+        result: {
+          key: 'initial-airdrop-0x1234',
+        },
+      }),
+      claimAllocation: vi.fn().mockResolvedValue({
+        isProcessed: true,
+        result: [
+          {
+            from: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            to: '0xb0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            data: '0x1234',
+            platformFee: null,
+          },
+        ],
+      }),
+    }));
   });
 
   afterAll(async () => {
+    vi.clearAllMocks();
     await dispose()();
   });
 
@@ -68,6 +93,36 @@ describe('Token Allocation Lifecycle', () => {
           },
         }),
       ).rejects.toThrowError();
+    });
+
+    it('should claim token', async () => {
+      const allocation_id = 'initial-airdrop-0x1234';
+
+      // mock allocation
+      await models.sequelize.query(
+        `
+        UPDATE "ClaimAddresses" 
+        SET magna_allocation_id = :allocation_id 
+        WHERE user_id = :user_id;
+      `,
+        {
+          type: QueryTypes.UPDATE,
+          replacements: {
+            user_id: community.actors.member.user.id,
+            allocation_id,
+          },
+        },
+      );
+
+      // claim token
+      const result = await command(ClaimToken(), {
+        actor: community.actors.member,
+        payload: { allocation_id },
+      });
+
+      expect(result.from).to.be.a('string');
+      expect(result.to).to.be.a('string');
+      expect(result.data).to.be.a('string');
     });
   });
 });

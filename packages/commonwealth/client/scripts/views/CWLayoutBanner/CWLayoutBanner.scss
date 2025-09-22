@@ -1,0 +1,36 @@
+@use '../../styles/shared.scss';
+@use '../../styles/mixins/colors.module';
+
+.CWLayoutBanner {
+  justify-content: center !important;
+
+  .layout-banner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    .btn-border {
+      border: 0 !important;
+    }
+
+    .Button.secondary {
+      border: 0 !important;
+      background: linear-gradient(
+        90deg,
+        rgba(0, 121, 204, 1) 0%,
+        rgba(5, 15, 163, 1) 27%,
+        rgba(255, 16, 0, 1) 59%,
+        rgba(255, 16, 0, 1) 100%
+      );
+      min-width: auto;
+      width: auto;
+
+      div {
+        color: white !important;
+      }
+    }
+  }
+}

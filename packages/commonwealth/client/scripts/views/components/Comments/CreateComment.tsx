@@ -3,6 +3,11 @@ import { buildCreateCommentInput } from 'client/scripts/state/api/comments/creat
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
+import {
+  isRateLimitError,
+  isTierRateLimitError,
+  RATE_LIMIT_MESSAGE,
+} from 'helpers/rateLimit';
 import { useDraft } from 'hooks/useDraft';
 import { useMentionExtractor } from 'hooks/useMentionExtractor';
 import Account from 'models/Account';
@@ -155,7 +160,13 @@ export const CreateComment = ({
       const errMsg = err?.responseJSON?.error || err?.message;
       console.error('CreateComment - Error:', errMsg);
 
-      notifyError('Failed to create comment');
+      if (isRateLimitError(err)) {
+        notifyError(RATE_LIMIT_MESSAGE);
+      } else if (isTierRateLimitError(err)) {
+        notifyError(err.message);
+      } else {
+        notifyError('Failed to create comment');
+      }
       setErrorMsg(errMsg);
       throw err;
     } finally {

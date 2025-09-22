@@ -69,6 +69,7 @@ export default defineConfig(({ mode }) => {
     ),
     'process.env.FLAG_GATE_WALLET': JSON.stringify(env.FLAG_GATE_WALLET),
     'process.env.FLAG_MOONPAY_FUNDS': JSON.stringify(env.FLAG_MOONPAY_FUNDS),
+    'process.env.FLAG_CLAIMS': JSON.stringify(env.FLAG_CLAIMS),
   };
 
   return {
@@ -160,7 +161,7 @@ export default defineConfig(({ mode }) => {
           secure: false,
         },
       },
-      allowedHosts: ['common.ngrok.app'],
+      allowedHosts: ['common.ngrok.app', 'tim.affinity.fun'],
     },
     resolve: {
       alias: [

@@ -25,8 +25,8 @@ importers:
   .:
     dependencies:
       '@commonxyz/common-governance-abis':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^0.0.3
+        version: 0.0.3
       '@commonxyz/common-protocol-abis':
         specifier: 1.4.11
         version: 1.4.11
@@ -3342,8 +3342,8 @@ packages:
   '@coinbase/wallet-sdk@4.3.0':
     resolution: {integrity: sha512-T3+SNmiCw4HzDm4we9wCHCxlP0pqCiwKe4sOwPH3YAK2KSKjxPRydKu6UQJrdONFVLG7ujXvbd/6ZqmvJb8rkw==}
 
-  '@commonxyz/common-governance-abis@0.0.2':
-    resolution: {integrity: sha512-1x3vbkJp7Tvzj85PGtfit1e7Lb8CNywEJct3249sLCScgRISIeHg5e+uUI+TwI7CO9RJzB8yLKxHyRA+1lxT8g==}
+  '@commonxyz/common-governance-abis@0.0.3':
+    resolution: {integrity: sha512-679NR5D4sxdm9RczroauX/BF84tULVSkmz/KtzMuFUq4fo0/iQ9HF30xk7X9ADnC2iyrslR7ZB2WHOwDYoMfVQ==}
 
   '@commonxyz/common-protocol-abis@1.4.11':
     resolution: {integrity: sha512-MJWrj6NLma4+t7VtyPk3fsk92ozUD1YyNBJGgOKxdirQKKIkYXwR1+JIVmQXGrnE2MOp4S2cJhWpyMCc17Vv/Q==}
@@ -25424,7 +25424,7 @@ snapshots:
       eventemitter3: 5.0.1
       preact: 10.24.3
 
-  '@commonxyz/common-governance-abis@0.0.2': {}
+  '@commonxyz/common-governance-abis@0.0.3': {}
 
   '@commonxyz/common-protocol-abis@1.4.11': {}
 
@@ -28436,14 +28436,14 @@ snapshots:
     dependencies:
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 20.17.6
+      '@types/node': 24.0.3
       jest-mock: 29.7.0
 
   '@jest/fake-timers@29.7.0':
     dependencies:
       '@jest/types': 29.6.3
       '@sinonjs/fake-timers': 10.3.0
-      '@types/node': 20.17.6
+      '@types/node': 24.0.3
       jest-message-util: 29.7.0
       jest-mock: 29.7.0
       jest-util: 29.7.0
@@ -28456,7 +28456,7 @@ snapshots:
     dependencies:
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 20.17.6
+      '@types/node': 24.0.3
       '@types/yargs': 15.0.19
       chalk: 4.1.2
 
@@ -28465,7 +28465,7 @@ snapshots:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 20.17.6
+      '@types/node': 24.0.3
       '@types/yargs': 17.0.32
       chalk: 4.1.2
 
@@ -35143,7 +35143,7 @@ snapshots:
 
   '@types/node-forge@1.3.11':
     dependencies:
-      '@types/node': 20.17.6
+      '@types/node': 24.0.3
 
   '@types/node@10.12.18': {}
 
@@ -35172,7 +35172,6 @@ snapshots:
   '@types/node@24.0.3':
     dependencies:
       undici-types: 7.8.0
-    optional: true
 
   '@types/node@8.10.66': {}
 
@@ -39306,7 +39305,7 @@ snapshots:
 
   chrome-launcher@0.15.2:
     dependencies:
-      '@types/node': 20.17.6
+      '@types/node': 24.0.3
       escape-string-regexp: 4.0.0
       is-wsl: 2.2.0
       lighthouse-logger: 1.4.2
@@ -43907,7 +43906,7 @@ snapshots:
       '@jest/environment': 29.7.0
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 20.17.6
+      '@types/node': 24.0.3
       jest-mock: 29.7.0
       jest-util: 29.7.0
 
@@ -43928,13 +43927,13 @@ snapshots:
   jest-mock@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 20.17.6
+      '@types/node': 24.0.3
       jest-util: 29.7.0
 
   jest-util@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 20.17.6
+      '@types/node': 24.0.3
       chalk: 4.1.2
       ci-info: 3.9.0
       graceful-fs: 4.2.11
@@ -43951,7 +43950,7 @@ snapshots:
 
   jest-worker@29.7.0:
     dependencies:
-      '@types/node': 20.17.6
+      '@types/node': 24.0.3
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
@@ -50780,8 +50779,7 @@ snapshots:
 
   undici-types@6.19.8: {}
 
-  undici-types@7.8.0:
-    optional: true
+  undici-types@7.8.0: {}
 
   undici@5.28.4:
     dependencies:

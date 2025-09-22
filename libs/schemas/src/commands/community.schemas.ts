@@ -224,15 +224,15 @@ export const UpdateTopic = {
       community_id: z.string(),
     })
     .merge(
-      Topic.pick({
-        name: true,
-        description: true,
-        telegram: true,
-        featured_in_sidebar: true,
-        featured_in_new_post: true,
-        default_offchain_template: true,
-        allow_tokenized_threads: true,
-      }).partial(),
+      z.object({
+        name: z.string().trim().min(1).max(255).optional(),
+        description: z.string().optional(),
+        telegram: z.string().max(255).nullish(),
+        featured_in_sidebar: z.boolean().optional(),
+        featured_in_new_post: z.boolean().optional(),
+        default_offchain_template: z.string().nullish(),
+        allow_tokenized_threads: z.boolean().optional(),
+      }),
     ),
   output: z.object({
     topic: Topic.partial(),
