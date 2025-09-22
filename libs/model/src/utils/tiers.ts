@@ -31,8 +31,8 @@ export async function setUserTier({
       userId
         ? 'WHERE U.id = :userId'
         : `JOIN "Addresses" A ON A.user_id = U.id` +
-          ` WHERE address = :address OR LOWER(address) = :address AND A.user_id IS NOT NULL AND is_banned = false` +
-          ` ${isEvmAddress(userAddress!) ? 'OR address = :address' : ''}`
+          ` WHERE (address = :address OR LOWER(address) = :address ` +
+          `${isEvmAddress(userAddress!) ? 'OR address = :address' : ''}) AND A.user_id IS NOT NULL AND is_banned = false`
     }
     FOR NO KEY UPDATE OF U
     LIMIT 1;
