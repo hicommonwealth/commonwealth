@@ -191,7 +191,7 @@ export default {
         `
         UPDATE "Users"
         SET tier = 5
-        WHERE chain_verified = true
+        WHERE chain_verified = true;
       `,
         { transaction },
       );

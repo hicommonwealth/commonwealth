@@ -76,7 +76,6 @@ export async function setUserTier({
     }
     user.wallet_verified = true;
   }
-  console.timeEnd('FullTierVerification');
 
   await user.save({ transaction });
 }
