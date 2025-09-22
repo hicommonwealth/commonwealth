@@ -125,15 +125,6 @@ const tokenBondingCurveSource: ContractSource = {
   ],
 };
 
-const VoteGovernanceSource: ContractSource = {
-  abi: VoteGovernanceAbi,
-  eventSignatures: [
-    EvmEventSignatures.VoteGovernance.AddressVoteCast,
-    EvmEventSignatures.VoteGovernance.TokenVoteCast,
-    EvmEventSignatures.VoteGovernance.OzProposalCreated,
-  ],
-};
-
 /**
  * Note that this object does not contain details for contracts deployed by users
  * at runtime. Those contracts remain in the EvmEventSources table.
