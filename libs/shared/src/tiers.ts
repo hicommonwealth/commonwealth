@@ -8,17 +8,20 @@ export type CommunityVerificationItem = {
   type: string;
 };
 
+export type TierIcons =
+  | 'stopSymbol'
+  | 'socialVerified'
+  | 'sandClock'
+  | 'globe'
+  | 'pins'
+  | 'whiteCheck'
+  | 'starGolden'
+  | 'diamond';
+
 type TierClientInfo = {
-  trustLevel: 0 | 1 | 2 | 3 | 4 | 5;
+  trustLevel: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   icon: string;
-  componentIcon:
-    | 'stopSymbol'
-    | 'socialVerified'
-    | 'sandClock'
-    | 'globe'
-    | 'pins'
-    | 'whiteCheck'
-    | 'starGolden';
+  componentIcon: TierIcons;
   verificationItems?: Record<string, UserVerificationItem>;
 };
 
@@ -48,8 +51,9 @@ export enum UserTierMap {
   VerifiedWallet = 3,
   SocialVerified = 4,
   ChainVerified = 5,
-  ManuallyVerified = 6,
-  SystemUser = 7,
+  FullyVerified = 6,
+  ManuallyVerified = 7,
+  SystemUser = 8,
 }
 
 export const DisabledCommunitySpamTier = -1 as const;
@@ -164,11 +168,21 @@ export const USER_TIERS = {
       },
     },
   },
+  [UserTierMap.FullyVerified]: {
+    name: 'Fully Verified',
+    description:
+      'Completed all verification requirements and achieved the highest community trust.',
+    clientInfo: {
+      trustLevel: 5,
+      icon: '💎',
+      componentIcon: 'diamond',
+    },
+  },
   [UserTierMap.ManuallyVerified]: {
     name: 'Manual Verification',
     description: 'Manually reviewed and verified by our team',
     clientInfo: {
-      trustLevel: 5,
+      trustLevel: 6,
       icon: '⭐',
       componentIcon: 'starGolden',
     },
@@ -314,43 +328,6 @@ export type UserVerificationItemType =
 export type CommunityVerificationItemType =
   | keyof (typeof COMMUNITY_TIERS)[CommunityTierMap.SocialVerified]['clientInfo']['verificationItems']
   | keyof (typeof COMMUNITY_TIERS)[CommunityTierMap.ChainVerified]['clientInfo']['verificationItems'];
-
-/**
- * Used to bump a user tier to a higher tier. Will never bump a user who is
- * already banned. [SIDE EFFECT] The targetObject is modified with the new tier.
- */
-export function bumpUserTier<
-  T extends { tier?: UserTierMap | null | undefined },
->({
-  oldTier,
-  newTier,
-  targetObject,
-}: {
-  newTier: UserTierMap;
-  targetObject: T;
-  oldTier?: UserTierMap;
-}) {
-  // Prevent bumping banned users
-  if (
-    (oldTier && oldTier === UserTierMap.BannedUser) ||
-    targetObject.tier === UserTierMap.BannedUser
-  ) {
-    return;
-  }
-
-  if (oldTier && oldTier < newTier) {
-    targetObject.tier = newTier;
-    return;
-  }
-
-  if (
-    targetObject.tier === undefined ||
-    targetObject.tier === null ||
-    targetObject.tier < newTier
-  ) {
-    targetObject.tier = newTier;
-  }
-}
 
 export function bumpCommunityTier(
   tier: CommunityTierMap,
