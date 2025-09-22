@@ -27,6 +27,7 @@ export default (sequelize: Sequelize.Sequelize): ProposalVoteModelStatic =>
       tx_hash: {
         type: Sequelize.STRING,
         allowNull: false,
+        primaryKey: true,
       },
       timestamp: {
         type: Sequelize.DECIMAL(78, 0),

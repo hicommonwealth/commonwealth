@@ -60,6 +60,7 @@ export default {
           tx_hash: {
             type: Sequelize.STRING,
             allowNull: false,
+            primaryKey: true,
           },
           timestamp: {
             type: Sequelize.DECIMAL(78, 0),
