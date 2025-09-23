@@ -68,20 +68,20 @@ function formatCoinBalance(balance: string, symbol?: string): string {
   // For formatting purposes, we'll assume 9 decimals unless specified otherwise
   const decimals = 9;
   const balanceNumber = BigInt(balance);
-  const main = balanceNumber / BigInt(10 ** decimals);
+  const wholePart = balanceNumber / BigInt(10 ** decimals);
   const remainder = balanceNumber % BigInt(10 ** decimals);
 
   const displaySymbol = symbol || 'TOKENS';
 
   if (remainder === BigInt(0)) {
-    return `${main} ${displaySymbol}`;
+    return `${wholePart} ${displaySymbol}`;
   } else {
     // Format with decimal places, removing trailing zeros
     const decimal = remainder
       .toString()
       .padStart(decimals, '0')
       .replace(/0+$/, '');
-    return `${main}.${decimal} ${displaySymbol}`;
+    return `${wholePart}.${decimal} ${displaySymbol}`;
   }
 }
 
@@ -102,11 +102,14 @@ Usage: pnpm get-sui-coin-balance <sui-address> <coin-type> [--force-refresh]
 
 Arguments:
   sui-address      The Sui address to check balance for (0x followed by 64 hex characters)
-  coin-type        The coin type identifier (e.g., 0x4a5313fa76e8abad0f812467de9bd7188abefba666fe9e262a2ded0863d60ea8::mock_navx_token::MOCK_NAVX_TOKEN)
+  coin-type        The coin type identifier
+                   (e.g., 0x4a5313fa76e8abad0f812467de9bd7188abefba666fe9e262a2ded0863d60ea8::
+                   mock_navx_token::MOCK_NAVX_TOKEN)
   --force-refresh  Skip cache and force fetch fresh balance data
 
 Examples:
-  pnpm get-sui-coin-balance 0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef 0x4a5313fa76e8abad0f812467de9bd7188abefba666fe9e262a2ded0863d60ea8::mock_navx_token::MOCK_NAVX_TOKEN
+  pnpm get-sui-coin-balance 0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef \
+    0x4a5313fa76e8abad0f812467de9bd7188abefba666fe9e262a2ded0863d60ea8::mock_navx_token::MOCK_NAVX_TOKEN
   pnpm get-sui-coin-balance 0x1234... 0x4a5313... --force-refresh
 
 Environment Variables:
