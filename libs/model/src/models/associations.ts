@@ -319,4 +319,10 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
     },
   );
+
+  db.GovernanceProposal.withMany(db.ProposalVote, {
+    foreignKey: ['eth_chain_id', 'proposal_id'],
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
 };

@@ -6,6 +6,7 @@ export * from './community.schemas';
 export * from './contest-manager.schemas';
 export * from './discordBotConfig.schemas';
 export * from './evm-event-source.schemas';
+export * from './governance.schemas';
 export * from './group-permission.schemas';
 export * from './group.schemas';
 export * from './launchpad-token.schemas';

@@ -1,15 +1,17 @@
-import { logger, type Command } from '@hicommonwealth/core';
+import { type Command, logger } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
   bumpCommunityTier,
   CommunityTierMap,
   NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
+  UserTierMap,
 } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { emitEvent } from '../../utils';
+import { setUserTier } from '../../utils/tiers';
 
 const log = logger(import.meta);
 
@@ -236,6 +238,12 @@ export function LinkNamespace(): Command<typeof schemas.LinkNamespace> {
             ],
             transaction,
           );
+
+          await setUserTier({
+            userAddress: deployer_address,
+            newTier: UserTierMap.ChainVerified,
+            transaction,
+          });
         }
       });
 

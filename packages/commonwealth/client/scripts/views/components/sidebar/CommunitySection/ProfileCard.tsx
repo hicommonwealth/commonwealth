@@ -62,7 +62,7 @@ const ProfileCard = () => {
               navigate('/profile/edit');
             }}
           >
-            <TrustLevelRole type="user" level={data?.tier} withTooltip />
+            <TrustLevelRole type="user" tier={data?.tier} withTooltip />
           </span>
         </div>
       </div>
