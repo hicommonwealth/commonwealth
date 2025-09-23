@@ -10,12 +10,12 @@ import {
 } from 'client/scripts/state/api/tokenAllocations';
 import CWBanner from 'client/scripts/views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { AuthModal } from 'client/scripts/views/modals/AuthModal';
 import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -37,10 +37,26 @@ const formatTokenBalance = (balance: string | number): string => {
   });
 };
 
+const getNextSyncJobTime = () => {
+  const now = new Date();
+  const nextHour = new Date(now);
+  nextHour.setHours(now.getHours() + 1, 0, 0, 0); // Set to next hour on the hour
+  const timeLeftMs = nextHour.getTime() - now.getTime();
+  const timeLeftMinutes = Math.ceil(timeLeftMs / (1000 * 60));
+
+  const nextSyncJobTimeLeft =
+    timeLeftMinutes < 60
+      ? `${timeLeftMinutes} minute${timeLeftMinutes !== 1 ? 's' : ''}`
+      : // eslint-disable-next-line max-len
+        `${Math.floor(timeLeftMinutes / 60)} hour${Math.floor(timeLeftMinutes / 60) !== 1 ? 's' : ''} and ${timeLeftMinutes % 60} minute${timeLeftMinutes % 60 !== 1 ? 's' : ''}`;
+  return nextSyncJobTimeLeft;
+};
+
 const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const user = useUserStore();
   const [formattedClaimable, setFormattedClaimable] = useState<string>('0');
 
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   // token claim address
   const [evmAddresses, setEvmAddresses] = useState<AddressInfo[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<
@@ -55,11 +71,14 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   } = useClaimTokenFlow();
   const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
-    useGetClaimAddressQuery({ enabled: true });
+    useGetClaimAddressQuery({ enabled: user.isLoggedIn });
   const { data: allocation, isLoading: isLoadingAllocation } =
     useGetAllocationQuery({
       magna_allocation_id: claimAddress?.magna_allocation_id,
-      enabled: !!claimAddress?.magna_allocation_id && !transactionHash,
+      enabled:
+        !!claimAddress?.magna_allocation_id &&
+        !transactionHash &&
+        user.isLoggedIn,
     });
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
@@ -127,7 +146,37 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     }
   };
 
-  if (!claimAddress?.tokens || isLoadingClaimAddress || !claimsEnabled) {
+  if (!claimsEnabled) {
+    return <></>;
+  }
+
+  if (!user.isLoggedIn) {
+    return (
+      <div className="TokenClaimBanner">
+        <CWBanner
+          type="info"
+          body={
+            <div className="banner-content">
+              <h3 className="description">
+                Login to check your potential COMMON claim
+              </h3>
+              <CWButton
+                label="Login"
+                onClick={() => setIsAuthModalOpen(true)}
+              />
+            </div>
+          }
+        />
+
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+        />
+      </div>
+    );
+  }
+
+  if (!claimAddress?.tokens || isLoadingClaimAddress) {
     return null;
   }
 
@@ -268,21 +317,11 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                   <p className="base-notice">
                     We are going live on Base. You must set an EVM address to
                     claim your allocation.
-                    <CWTooltip
-                      content={
-                        'Commonwealth tokens will be launched on Base network. ' +
-                        'Ensure your address is compatible with Base/Ethereum.'
-                      }
-                      renderTrigger={(handleInteraction) => (
-                        <CWIcon
-                          iconName="infoFilled"
-                          iconSize="small"
-                          className="info-icon"
-                          onMouseEnter={handleInteraction}
-                          onMouseLeave={handleInteraction}
-                        />
-                      )}
-                    />
+                  </p>
+                  <p className="base-notice">
+                    Once you set an EVM address we need to sync onchain, we
+                    process these syncs at the top of every hour. You should be
+                    able to claim in {getNextSyncJobTime()}
                   </p>
                   <div className="banner-actions">
                     {addressFormContent}
