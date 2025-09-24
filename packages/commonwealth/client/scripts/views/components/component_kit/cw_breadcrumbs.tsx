@@ -20,9 +20,11 @@ type BreadcrumbsProps = {
   tooltipStr?: string;
 };
 
-const handleNavigation = (label, navigate, isParent) => {
+const handleNavigation = (label, navigate, isParent, path) => {
   if (label === 'Discussions' && isParent) {
     navigate(`/discussions`);
+  } else if (path) {
+    navigate(path);
   }
 };
 const handleMouseInteraction = (
@@ -45,7 +47,7 @@ export const CWBreadcrumbs = ({
         const isCurrent = index === breadcrumbs.length - 1;
         return (
           <React.Fragment key={index}>
-            {isParent && breadcrumbs.length !== 1 ? (
+            {isParent && breadcrumbs.length !== 1 && tooltipStr ? (
               <CWTooltip
                 content={tooltipStr}
                 placement="bottom"
@@ -63,7 +65,7 @@ export const CWBreadcrumbs = ({
                       'current-text': isCurrent,
                       'parent-text': !isCurrent,
                     })}
-                    onClick={() => handleNavigation(label, navigate, isParent)}
+                    onClick={() => handleNavigation(label, navigate, isParent, path)}
                   >
                     {truncateText(label)}
                   </CWText>
