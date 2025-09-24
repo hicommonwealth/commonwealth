@@ -158,6 +158,11 @@ export const PollCard = ({
               />
             )}
           </div>
+          {topicWeight && tokenSymbol && (
+            <CWText type="caption" className="poll-voting-token">
+              {`Weighted by ${tokenSymbol} token`}
+            </CWText>
+          )}
           {endTimestamp && (
             <CWText type="caption" className="poll-end-timestamp">
               {`Ends ${endTimestamp}`}

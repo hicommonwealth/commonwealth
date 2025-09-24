@@ -1036,6 +1036,9 @@ export const NewThreadForm = forwardRef<
                         showDeleteButton={true}
                         isCreateThreadPage={true}
                         setLocalPoll={setPollData}
+                        tokenSymbol={threadTopic?.token_symbol ?? undefined}
+                        topicWeight={threadTopic?.weighted_voting ?? undefined}
+                        tokenDecimals={threadTopic?.token_decimals ?? undefined}
                       />
                     );
                   })}

@@ -22,6 +22,7 @@ type ThreadPollCardProps = {
   setLocalPoll?: SetLocalPolls;
   tokenDecimals?: number;
   topicWeight?: TopicWeightedVoting | null;
+  tokenSymbol?: string;
   voterProfiles?: Record<
     string,
     { address: string; name: string; avatarUrl?: string }
@@ -39,6 +40,7 @@ export const ThreadPollCard = ({
   setLocalPoll,
   tokenDecimals,
   topicWeight,
+  tokenSymbol,
   voterProfiles,
   isLoadingVotes,
   actionGroups,
@@ -167,6 +169,7 @@ export const ThreadPollCard = ({
         voterProfiles={voterProfiles}
         tokenDecimals={tokenDecimals}
         topicWeight={topicWeight}
+        tokenSymbol={tokenSymbol}
         isLoadingVotes={isLoadingVotes}
         pollEnded={
           !!poll.ends_at && moment(poll.ends_at).isBefore(moment().utc())

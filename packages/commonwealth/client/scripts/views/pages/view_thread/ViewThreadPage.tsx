@@ -711,6 +711,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       showDeleteButton={isAuthor || isAdmin}
                       tokenDecimals={thread?.topic?.token_decimals ?? undefined}
                       topicWeight={thread?.topic?.weighted_voting}
+                      tokenSymbol={thread?.topic?.token_symbol ?? undefined}
                       voterProfiles={voterProfiles}
                       isLoadingVotes={isLoadingProfiles}
                     />

@@ -35,6 +35,11 @@
       color: colors.$neutral-500;
     }
 
+    .poll-voting-token.Text {
+      color: colors.$primary-600;
+      font-weight: 500;
+    }
+
     .poll-title-wrapper {
       display: flex;
       flex-direction: column;
