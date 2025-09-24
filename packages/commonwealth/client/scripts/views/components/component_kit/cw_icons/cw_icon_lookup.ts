@@ -345,6 +345,7 @@ export const iconLookup = {
   whiteCheck: Icons.CWWhiteCheck,
   pins: Icons.CWPin,
   starGolden: Icons.CWStarGolden,
+  diamond: Icons.CWDiamond,
   socialVerified: Icons.CWSocialVerified,
   sandClock: Icons.CWSandClock,
   stopSymbol: Icons.CWStopSymbol,

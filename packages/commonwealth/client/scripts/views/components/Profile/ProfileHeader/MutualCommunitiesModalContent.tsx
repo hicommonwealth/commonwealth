@@ -64,7 +64,7 @@ export const MutualCommunitiesModalContent = ({
               <CWText type="h3" fontWeight="semiBold">
                 {viewedUserProfile.name || DEFAULT_NAME}
               </CWText>
-              <TrustLevelRole type="user" level={viewedUserProfile.tier} />
+              <TrustLevelRole type="user" tier={viewedUserProfile.tier} />
             </div>
 
             {viewedUserProfile.bio && (
@@ -133,7 +133,7 @@ export const MutualCommunitiesModalContent = ({
                               </CWText>
                               <TrustLevelRole
                                 type="community"
-                                level={community.tier}
+                                tier={community.tier}
                               />
                             </div>
                             <CWText type="caption" color="secondary">

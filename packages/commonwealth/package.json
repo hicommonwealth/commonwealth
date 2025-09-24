@@ -47,6 +47,7 @@
     "refresh-all-memberships": "tsx ./scripts/refresh-all-memberships.ts",
     "resize-large-images": "tsx ./scripts/resizeImages.ts",
     "get-sui-balance": "tsx ./scripts/get-sui-address-balance.ts",
+    "get-sui-coin-balance": "tsx ./scripts/get-sui-coin-balance.ts",
     "get-sui-nft-balance": "tsx ./scripts/get-sui-address-nft-balance.ts",
     "set-super-admin": "chmod u+x scripts/set-super-admin.sh && ./scripts/set-super-admin.sh",
     "start": "concurrently -p '{name}' -c red,green 'PORT=3000 pnpm run start-api' 'wait-on http://localhost:3000/api/health && vite -c ./client/vite.config.ts --host'",

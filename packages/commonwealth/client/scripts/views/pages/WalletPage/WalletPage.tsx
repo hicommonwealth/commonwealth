@@ -43,6 +43,7 @@ const WalletPage = () => {
   const user = useUserStore();
   const rewardsEnabled = useFlag('rewardsPage');
   const xpEnabled = useFlag('xp');
+  const claimsEnabled = useFlag('claims');
   const navigate = useCommonNavigate();
 
   const [mobileTab, setMobileTab] = useState<MobileTabType>(getInitialTab());
@@ -91,6 +92,17 @@ const WalletPage = () => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
 
   if (!user.isLoggedIn || !rewardsEnabled) {
+    if (claimsEnabled) {
+      return (
+        <CWPageLayout className="WalletPageLayout">
+          <section className="WalletPage">
+            <TokenClaimBanner
+              onConnectNewAddress={() => setIsAuthModalOpen(true)}
+            />
+          </section>
+        </CWPageLayout>
+      );
+    }
     return <PageNotFound />;
   }
 

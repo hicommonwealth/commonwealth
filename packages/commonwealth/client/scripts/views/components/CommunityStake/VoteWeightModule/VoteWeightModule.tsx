@@ -67,11 +67,7 @@ export const VoteWeightModule = ({
           weight="fill"
           onClick={() => setIsWidgetExpanded((e) => !e)}
         />
-        <CWText
-          type="caption"
-          fontWeight="medium"
-          className="status-text"
-        >
+        <CWText type="caption" fontWeight="medium" className="status-text">
           Vote Weight
         </CWText>
         <CWIconButton

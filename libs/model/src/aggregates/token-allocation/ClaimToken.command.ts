@@ -51,7 +51,11 @@ export function ClaimToken(): Command<typeof schemas.ClaimToken> {
           sender: actor.address!,
         });
 
-        if (response.isProcessed && response.result.length > 0) {
+        if (
+          response.isProcessed &&
+          response.result &&
+          response.result.length > 0
+        ) {
           // acknowledge the claim
           const claim_data = response.result[0];
           await models.sequelize.query(
@@ -79,7 +83,7 @@ export function ClaimToken(): Command<typeof schemas.ClaimToken> {
             transaction_hash: null,
           };
         }
-        throw new InvalidState('Claim failed!', response.errors);
+        throw new InvalidState('Claim failed!', response.error);
       }
 
       // idempotent reponse to claim
