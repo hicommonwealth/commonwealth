@@ -193,28 +193,26 @@ const RequirementSubForm = ({
               }}
               customError={errors?.requirementChain || ''}
             />
-            {!isTokenRequirement &&
-              !isSuiTokenRequirement &&
-              !isSuiNftRequirement && (
-                <CWTextInput
-                  key={defaultValues.requirementContractAddress}
-                  name="requirementContractAddress"
-                  label="Contract Address"
-                  placeholder="Input contract address"
-                  containerClassName="w-full"
-                  fullWidth
-                  manualStatusMessage=""
-                  {...(defaultValues.requirementContractAddress && {
-                    defaultValue: defaultValues.requirementContractAddress,
-                  })}
-                  onInput={(e) => {
-                    onChange({
-                      requirementContractAddress: e.target.value,
-                    });
-                  }}
-                  customError={errors?.requirementContractAddress || ''}
-                />
-              )}
+            {!isTokenRequirement && !isSuiTokenRequirement && (
+              <CWTextInput
+                key={defaultValues.requirementContractAddress}
+                name="requirementContractAddress"
+                label="Contract Address"
+                placeholder="Input contract address"
+                containerClassName="w-full"
+                fullWidth
+                manualStatusMessage=""
+                {...(defaultValues.requirementContractAddress && {
+                  defaultValue: defaultValues.requirementContractAddress,
+                })}
+                onInput={(e) => {
+                  onChange({
+                    requirementContractAddress: e.target.value,
+                  });
+                }}
+                customError={errors?.requirementContractAddress || ''}
+              />
+            )}
             {isSuiTokenRequirement && (
               <CWTextInput
                 key={defaultValues.requirementCoinType}
