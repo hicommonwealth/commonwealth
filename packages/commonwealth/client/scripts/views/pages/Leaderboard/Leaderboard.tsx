@@ -1,4 +1,5 @@
 import React from 'react';
+import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWText } from '../../components/component_kit/cw_text';
 import './Leaderboard.scss';
@@ -21,6 +22,11 @@ const Leaderboard = () => {
         <CWText type="h2">Aura Leaderboard</CWText>
         <section className="body">
           <section className="left">
+            <CWBanner
+              type="info"
+              body="Leaderboards only include users level 4 and above"
+              className="leaderboard-info-banner"
+            />
             <XPTable />
           </section>
           <section className="right">
