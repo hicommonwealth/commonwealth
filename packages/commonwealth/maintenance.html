@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Commonwealth - Maintenance Mode</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+      }
+
+      .maintenance-container {
+        text-align: center;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 90%;
+        backdrop-filter: blur(10px);
+      }
+
+      .maintenance-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: #667eea;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #2d3748;
+        font-weight: 700;
+      }
+
+      .subtitle {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        color: #4a5568;
+        line-height: 1.6;
+      }
+
+      .message {
+        font-size: 1rem;
+        color: #718096;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        margin: 2rem auto;
+        border: 4px solid #e2e8f0;
+        border-left: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e2e8f0;
+        color: #a0aec0;
+        font-size: 0.9rem;
+      }
+
+      .retry-button {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.75rem 2rem;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+      }
+
+      .retry-button:hover {
+        background: #5a67d8;
+      }
+
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 2rem;
+        }
+
+        .subtitle {
+          font-size: 1.1rem;
+        }
+
+        .maintenance-container {
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="maintenance-container">
+      <div class="maintenance-icon">🔧</div>
+      <h1>Under Maintenance</h1>
+      <p class="subtitle">
+        We're currently performing scheduled maintenance to improve your
+        experience.
+      </p>
+      <p class="message">
+        Our team is working hard to get Commonwealth back online as quickly as
+        possible. We apologize for any inconvenience this may cause.
+      </p>
+      <div class="spinner"></div>
+      <a href="javascript:window.location.reload();" class="retry-button"
+        >Try Again</a
+      >
+      <div class="footer">
+        <p>Thank you for your patience!</p>
+        <p>- The Commonwealth Team</p>
+      </div>
+    </div>
+
+    <script>
+      // Auto-refresh every 30 seconds to check if maintenance is over
+      setTimeout(function () {
+        window.location.reload();
+      }, 30000);
+    </script>
+  </body>
+</html>
