@@ -361,7 +361,13 @@ export const HeaderWithFilters = ({
                   className="token-info-button"
                 />
                 <CWPopover
-                  title="Token Address"
+                  title={
+                    selectedTopic.weighted_voting ===
+                      TopicWeightedVoting.SuiToken ||
+                    selectedTopic.weighted_voting === TopicWeightedVoting.SuiNFT
+                      ? 'Object Type'
+                      : 'Token Address'
+                  }
                   body={
                     <div className="token-address-popover-content">
                       <div className="token-address-text">
