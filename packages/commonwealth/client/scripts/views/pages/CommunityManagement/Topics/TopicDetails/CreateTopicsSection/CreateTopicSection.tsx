@@ -4,6 +4,7 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -38,8 +39,13 @@ export const CreateTopicSection = ({
   topicFormData,
 }: CreateTopicSectionProps) => {
   const privateTopicsEnabled = useFlag('privateTopics');
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
   const communityId = app.activeChainId() || '';
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    includeNodeInfo: true,
+  });
   const { data: topics } = useFetchTopicsQuery({
     communityId: communityId,
     includeArchivedTopics: true,
@@ -68,6 +74,11 @@ export const CreateTopicSection = ({
 
   const [isPrivate, setIsPrivate] = useState(false);
   const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
+  const [allowTokenizedThreads, setAllowTokenizedThreads] = useState<boolean>(
+    topicFormData?.allowTokenizedThreads !== undefined 
+      ? topicFormData.allowTokenizedThreads 
+      : (community?.allow_tokenized_threads || false),
+  );
 
   const { data: groups } = useFetchGroupsQuery({
     communityId: communityId,
@@ -141,6 +152,7 @@ export const CreateTopicSection = ({
         featuredInNewPost && newPostTemplate
           ? JSON.stringify(newPostTemplate)
           : '',
+      allowTokenizedThreads,
     });
     if (onGroupsSelected) onGroupsSelected(selectedGroups);
     onStepChange(CreateTopicStep.WVConsent);
@@ -149,6 +161,12 @@ export const CreateTopicSection = ({
   useEffect(() => {
     if (onGroupsSelected) onGroupsSelected(selectedGroups);
   }, [selectedGroups, onGroupsSelected]);
+
+  useEffect(() => {
+    if (community && topicFormData?.allowTokenizedThreads === undefined) {
+      setAllowTokenizedThreads(community.allow_tokenized_threads || false);
+    }
+  }, [community, topicFormData?.allowTokenizedThreads]);
 
   return (
     <div className="CreateTopicSection">
@@ -265,6 +283,24 @@ export const CreateTopicSection = ({
               onChange={(selected) =>
                 setSelectedGroups(selected.map((opt) => opt.value))
               }
+            />
+          )}
+          {tokenizedThreadsEnabled && (
+            <CWCheckbox
+              label={
+                <div>
+                  <CWText type="b2">Allow Tokenized Threads</CWText>
+                  <CWText type="caption" className="checkbox-label-caption">
+                    Threads created in this topic will count as entries during
+                    community-wide contests and can be tokenized for trading.
+                  </CWText>
+                </div>
+              }
+              checked={allowTokenizedThreads}
+              onChange={() => {
+                setAllowTokenizedThreads(!allowTokenizedThreads);
+              }}
+              value=""
             />
           )}
         </div>
