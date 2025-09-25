@@ -148,9 +148,10 @@ export const Topics = () => {
         featured_in_new_post: topicFormData.featuredInNewPost || false,
         default_offchain_template: topicFormData.newPostTemplate || '',
         community_id: app.activeChainId() || '',
-        allow_tokenized_threads: topicFormData.allowTokenizedThreads !== undefined
-          ? topicFormData.allowTokenizedThreads 
-          : (community?.allow_tokenized_threads || false),
+        allow_tokenized_threads:
+          topicFormData.allowTokenizedThreads !== undefined
+            ? topicFormData.allowTokenizedThreads
+            : community?.allow_tokenized_threads || false,
         ...(erc20
           ? {
               token_address: erc20.tokenAddress,

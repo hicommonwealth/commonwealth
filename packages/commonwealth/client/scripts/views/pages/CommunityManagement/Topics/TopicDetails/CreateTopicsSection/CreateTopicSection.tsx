@@ -75,9 +75,9 @@ export const CreateTopicSection = ({
   const [isPrivate, setIsPrivate] = useState(false);
   const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
   const [allowTokenizedThreads, setAllowTokenizedThreads] = useState<boolean>(
-    topicFormData?.allowTokenizedThreads !== undefined 
-      ? topicFormData.allowTokenizedThreads 
-      : (community?.allow_tokenized_threads || false),
+    topicFormData?.allowTokenizedThreads !== undefined
+      ? topicFormData.allowTokenizedThreads
+      : community?.allow_tokenized_threads || false,
   );
 
   const { data: groups } = useFetchGroupsQuery({
