@@ -3,6 +3,45 @@
 @use '../../../../styles/mixins/media_queries';
 @use '../../../../styles/mixins/text';
 
+// Global styles for token address popover content (rendered in portal)
+.token-address-popover-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 320px;
+  min-width: 250px;
+
+  .token-address-text {
+    font-family: monospace;
+    font-size: 12px;
+    color: colors.$neutral-600;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    white-space: normal;
+    line-height: 1.4;
+    flex: 1;
+    padding-right: 4px;
+  }
+
+  .copy-button {
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: opacity 0.2s ease;
+
+    svg {
+      fill: colors.$neutral-500;
+      transition: fill 0.2s ease;
+    }
+
+    &:hover {
+      svg {
+        fill: colors.$neutral-700;
+      }
+    }
+  }
+}
+
 .HeaderWithFilters {
   background-color: colors.$white;
   display: flex;
@@ -67,44 +106,6 @@
           &:hover {
             svg {
               fill: colors.$neutral-600;
-            }
-          }
-        }
-
-        .token-address-popover-content {
-          display: flex;
-          align-items: flex-start;
-          gap: 8px;
-          max-width: 320px;
-          min-width: 250px;
-
-          .token-address-text {
-            font-family: monospace;
-            font-size: 12px;
-            color: colors.$neutral-600;
-            word-break: break-all;
-            overflow-wrap: break-word;
-            white-space: normal;
-            line-height: 1.4;
-            flex: 1;
-            padding-right: 4px;
-          }
-
-          .copy-button {
-            cursor: pointer;
-            flex-shrink: 0;
-            margin-top: 2px;
-            transition: opacity 0.2s ease;
-
-            svg {
-              fill: colors.$neutral-500;
-              transition: fill 0.2s ease;
-            }
-
-            &:hover {
-              svg {
-                fill: colors.$neutral-700;
-              }
             }
           }
         }
