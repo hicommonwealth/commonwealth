@@ -46,9 +46,9 @@ const UserTierWeightsMap: Record<UserTierMap, number> = {
   [UserTierMap.BannedUser]: 0,
   [UserTierMap.NewlyVerifiedWallet]: 1,
   [UserTierMap.VerifiedWallet]: 1,
-  [UserTierMap.SocialVerified]: 1.5,
+  [UserTierMap.SocialVerified]: 2,
   [UserTierMap.ChainVerified]: 2,
-  // TODO: add FullyVerified tier with weight equal to manually verified
+  [UserTierMap.FullyVerified]: 3,
   [UserTierMap.ManuallyVerified]: 3,
   [UserTierMap.SystemUser]: 0,
 };
