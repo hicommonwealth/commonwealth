@@ -24,7 +24,8 @@ const Leaderboard = () => {
           <section className="left">
             <CWBanner
               type="info"
-              body="Leaderboards only include users level 4 and above"
+              body="Leaderboards only include users level 4 and above. You can always view your Aura by navigating to your profile or rewards page"
+              
               className="leaderboard-info-banner"
             />
             <XPTable />
