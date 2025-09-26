@@ -1,3 +1,4 @@
+import { VoteGovernanceAbi } from '@commonxyz/common-governance-abis';
 import {
   CommunityNominationsAbi,
   CommunityStakeAbi,
@@ -367,6 +368,89 @@ const communityNamespaceCreatedMapper: EvmMapper<
   };
 };
 
+const cmnOzProposalCreatedMapper: EvmMapper<'CmnOzProposalCreated'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: VoteGovernanceAbi,
+    eventName: 'ProposalCreated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+
+  // Will never happen - this is just here for type narrowing because
+  // the ABI has 2 events with the same 'ProposalCreated' name.
+  if (!('voteStart' in decoded.args))
+    throw new Error(
+      'CmnOzProposalCreatedMapper cannot process non-OZ proposal events',
+    );
+
+  const {
+    proposalId,
+    proposer: proposerAddress,
+    description,
+    voteStart: voteStartTimestamp,
+    voteEnd: voteEndTimestamp,
+  } = decoded.args;
+
+  return {
+    event_name: 'CmnOzProposalCreated',
+    event_payload: {
+      ...event,
+      parsedArgs: {
+        proposalId,
+        proposerAddress,
+        description,
+        voteStartTimestamp,
+        voteEndTimestamp,
+      },
+    },
+  };
+};
+
+const cmnTokenVoteCastMapper: EvmMapper<'CmnTokenVoteCast'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: VoteGovernanceAbi,
+    eventName: 'TokenVoteCast',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+
+  return {
+    event_name: 'CmnTokenVoteCast',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
+const cmnAddressVoteCastMapper: EvmMapper<'CmnAddressVoteCast'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: VoteGovernanceAbi,
+    eventName: 'AddressVoteCast',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  const { proposalId, voter: voterAddress, support } = decoded.args;
+
+  return {
+    event_name: 'CmnAddressVoteCast',
+    event_payload: {
+      ...event,
+      parsedArgs: {
+        proposalId,
+        voterAddress,
+        support,
+      },
+    },
+  };
+};
+
 // TODO: type should match EventRegistry event signatures
 export const chainEventMappers: Record<string, EvmMapper<OutboxEvents>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]:
@@ -410,6 +494,12 @@ export const chainEventMappers: Record<string, EvmMapper<OutboxEvents>> = {
   // TokenCommunityManager
   [EvmEventSignatures.TokenCommunityManager.CommunityNamespaceCreated]:
     communityNamespaceCreatedMapper,
+
+  // Common VoteGovernance
+  [EvmEventSignatures.VoteGovernance.OzProposalCreated]:
+    cmnOzProposalCreatedMapper,
+  [EvmEventSignatures.VoteGovernance.TokenVoteCast]: cmnTokenVoteCastMapper,
+  [EvmEventSignatures.VoteGovernance.AddressVoteCast]: cmnAddressVoteCastMapper,
 
   // User defined events (no hardcoded event signatures)
   XpChainEventCreated: xpChainEventCreatedMapper,

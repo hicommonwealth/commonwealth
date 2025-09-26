@@ -6,7 +6,9 @@ import { getTokenEthExchangeRateQueryKey } from '../tokenEthExchangeRate';
 
 export const resetBalancesCache = async (
   _: unknown,
-  variables: Omit<BuyTokenProps, 'amountEth'> & { paymentTokenAddress?: string },
+  variables: Omit<BuyTokenProps, 'amountEth'> & {
+    paymentTokenAddress?: string;
+  },
 ) => {
   await queryClient.invalidateQueries({
     queryKey: getUserEthBalanceQueryKey({

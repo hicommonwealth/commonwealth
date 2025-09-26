@@ -41,6 +41,9 @@ export const requirementSubFormValidationSchema = z.object({
   requirementTrustLevel: z
     .string({ error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+  requirementCoinType: z
+    .string({ error: VALIDATION_MESSAGES.NO_INPUT })
+    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
 });
 
 export const groupValidationSchema = z.object({

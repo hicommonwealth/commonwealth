@@ -1,9 +1,11 @@
 import { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { UserTierMap } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 import { chainNodeMustExist } from '../../policies/utils/utils';
+import { setUserTier } from '../../utils/tiers';
 import { handleCapReached } from './utils';
 
 export function ProjectLaunchpadTrade(): Command<
@@ -91,6 +93,11 @@ export function ProjectLaunchpadTrade(): Command<
             }
           }
         }
+        await setUserTier({
+          userAddress: trader_address,
+          newTier: UserTierMap.ChainVerified,
+          transaction,
+        });
       });
 
       // If cap reached, transfer to uniswap

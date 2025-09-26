@@ -93,7 +93,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
       <div className="profile-name-and-bio">
         <CWText type="h3" className="name">
           {name || DEFAULT_NAME}
-          <TrustLevelRole type="user" level={profile.tier} />
+          <TrustLevelRole type="user" tier={profile.tier} />
         </CWText>
 
         {referralsEnabled && isCurrentUser && (

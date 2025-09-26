@@ -1,3 +1,4 @@
+import * as govAbis from '@commonxyz/common-governance-abis';
 import * as abis from '@commonxyz/common-protocol-abis';
 
 // Chains with deployed namespace factories. As new chains are enabled, add here.
@@ -56,9 +57,13 @@ export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
 export const NOMINATION_FEE = 0.00005;
 
-type AbiContractName = {
-  [K in keyof typeof abis]: K extends `${infer Base}Abi` ? Base : never;
-}[keyof typeof abis];
+type AbiContractName =
+  | {
+      [K in keyof typeof abis]: K extends `${infer Base}Abi` ? Base : never;
+    }[keyof typeof abis]
+  | {
+      [K in keyof typeof govAbis]: K extends `${infer Base}Abi` ? Base : never;
+    }[keyof typeof govAbis];
 
 export type FactoryContractsType = {
   [chain in ValidChains]: {
@@ -82,6 +87,7 @@ export const factoryContracts: FactoryContractsType = {
     TokenCommunityManager: '0x5620CfB48748c1bE2DFB919Eee7414B491CCba20',
     ReferralFeeManager: '0xb80174D6069F9c14CE694Bc8c842aAe0E8e0f8C5',
     // veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
+    VoteGovernance: '0x959982eFDa4ed7840a67CF56042e46ad16A1EF88',
     CommunityNominations: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
     TokenLaunchpad: '0x26B3f37507c38a84C5eFAB888D422170102cCF10',
     TokenBondingCurve: '0x112eAB263b0eEe88b6996Ff4A03D9629dad8a2b8',

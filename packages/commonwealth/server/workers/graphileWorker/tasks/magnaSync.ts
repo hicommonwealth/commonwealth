@@ -25,13 +25,22 @@ async function callback({
     unlockScheduleId: config.MAGNA!.UNLOCK_SCHEDULE_ID,
     unlockStartAt: config.MAGNA!.UNLOCK_START_AT.toISOString(),
   });
-  if (!response.isProcessed || !response.result.id) {
-    log.error(`Failed to create allocation for ${key}`, undefined, {
-      response,
-    });
-    throw new Error('Failed to create allocation');
+  // happy path
+  if (response && response.isProcessed && response.result?.id)
+    return response.result.id;
+
+  // Handle conflicts: if the allocation already exists, we don't need to create it again
+  if (response.error?.context?.existingAllocationId) {
+    log.info(
+      `Allocation already exists for ${key}: ${response.error.context.existingAllocationId}`,
+    );
+    return response.error.context.existingAllocationId;
   }
-  return response.result.id;
+
+  log.error(`Failed to create allocation for ${key}`, undefined, {
+    response,
+  });
+  throw new Error('Failed to create allocation');
 }
 
 export const magnaSyncTask = {

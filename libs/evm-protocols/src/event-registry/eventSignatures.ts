@@ -79,6 +79,15 @@ export const EvmEventSignatures = {
       '0xc2fe88a1a3c1957424571593960b97f158a519d0aa4cef9e13a247c64f1f4c35',
     Trade: '0x9adcf0ad0cda63c4d50f26a48925cf6405df27d422a39c456b5f03f661c82982',
   },
+  VoteGovernance: {
+    // ProposalCreated event emitted from Open-Zeppelin contracts NOT our custom events
+    OzProposalCreated:
+      '0x7d84a6263ae0d98d3329bd7b46bb4e8d6f98cd35a7adb45c274c8b7fd5ebd5e0',
+    TokenVoteCast:
+      '0xa38bcba884a6ed1fc325894138c0d3bbef2cb0a2bb0c08e0a5fd6f68bb489aa6',
+    AddressVoteCast:
+      '0x6bb3294cbf7bb5be016222362f15788eaf057845ed68df382e8d39be9aab8124',
+  },
 } as const;
 
 type Values<T> = T[keyof T];

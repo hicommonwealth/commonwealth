@@ -3,7 +3,13 @@ import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import app from 'state';
 import {
   useGetCommunityByIdQuery,

@@ -1,3 +1,4 @@
+import { UserProfileViewType } from '@hicommonwealth/schemas';
 import {
   Tier,
   USER_TIERS,
@@ -7,7 +8,9 @@ import {
 } from '@hicommonwealth/shared';
 
 type Status = 'Done' | 'Not Started';
+
 interface TierInfo {
+  tier: UserTierMap;
   level: number;
   title: string;
   description: string;
@@ -21,14 +24,66 @@ export const getLevelRedirect = (tier: UserTierMap): boolean => {
 };
 
 export const getLevelStatus = (
-  level: number,
+  user: UserProfileViewType,
   currentTier: UserTierMap,
 ): Status => {
-  const tierInfo = USER_TIERS[currentTier];
-  const currentTrustLevel =
-    (tierInfo && 'clientInfo' in tierInfo && tierInfo.clientInfo?.trustLevel) ||
-    0;
-  return currentTrustLevel >= level ? 'Done' : 'Not Started';
+  if (currentTier === UserTierMap.VerifiedWallet) {
+    return user.wallet_verified ? 'Done' : 'Not Started';
+  } else if (currentTier === UserTierMap.SocialVerified) {
+    return user.social_verified ? 'Done' : 'Not Started';
+  } else if (currentTier === UserTierMap.ChainVerified) {
+    return user.chain_verified ? 'Done' : 'Not Started';
+  } else if (currentTier === UserTierMap.NewlyVerifiedWallet) {
+    return 'Done';
+  } else if (currentTier === UserTierMap.ManuallyVerified) {
+    return user.tier === UserTierMap.ManuallyVerified ? 'Done' : 'Not Started';
+  } else if (currentTier === UserTierMap.FullyVerified) {
+    return user.wallet_verified &&
+      user.social_verified &&
+      user.chain_verified &&
+      user.tier === UserTierMap.FullyVerified
+      ? 'Done'
+      : 'Not Started';
+  } else {
+    return 'Not Started';
+  }
+};
+
+export const mapTiers = (user: UserProfileViewType): TierInfo[] => {
+  return Object.entries(USER_TIERS)
+    .filter(([key]) => {
+      const tier = parseInt(key) as UserTierMap;
+      return (
+        tier >= UserTierMap.NewlyVerifiedWallet &&
+        tier <= UserTierMap.ManuallyVerified
+      );
+    })
+    .map(([key, tier]) => {
+      const tierNum = parseInt(key) as UserTierMap;
+      const tierWithClientInfo = tier as Tier & {
+        clientInfo?: {
+          trustLevel: number;
+          verificationItems?: Record<string, UserVerificationItem>;
+        };
+      };
+      return {
+        tier: tierNum,
+        level: tierWithClientInfo.clientInfo?.trustLevel || 0,
+        title: tier.name,
+        description: tier.description,
+        status: getLevelStatus(user, parseInt(key) as UserTierMap),
+        items: tierWithClientInfo.clientInfo?.verificationItems
+          ? Object.values(tierWithClientInfo.clientInfo.verificationItems).map(
+              (item) => ({
+                ...item,
+                status: getLevelStatus(user, parseInt(key) as UserTierMap),
+              }),
+            )
+          : [],
+        redirect: getLevelRedirect(tierNum),
+      };
+    })
+    .sort((a, b) => a.level - b.level);
 };
 
 export const getCommunityNavigation = (
@@ -57,46 +112,4 @@ export const getCommunityNavigation = (
     default:
       return '/';
   }
-};
-
-export const mapTiers = (currentTier: UserTierMap): TierInfo[] => {
-  return Object.entries(USER_TIERS)
-    .filter(([key]) => {
-      const tier = parseInt(key) as UserTierMap;
-      return (
-        tier >= UserTierMap.NewlyVerifiedWallet &&
-        tier <= UserTierMap.ManuallyVerified
-      );
-    })
-    .map(([key, tier]) => {
-      const tierNum = parseInt(key) as UserTierMap;
-      const tierWithClientInfo = tier as Tier & {
-        clientInfo?: {
-          trustLevel: number;
-          verificationItems?: Record<string, UserVerificationItem>;
-        };
-      };
-      return {
-        level: tierWithClientInfo.clientInfo?.trustLevel || 0,
-        title: tier.name,
-        description: tier.description,
-        status: getLevelStatus(
-          tierWithClientInfo.clientInfo?.trustLevel || 0,
-          currentTier,
-        ),
-        items: tierWithClientInfo.clientInfo?.verificationItems
-          ? Object.values(tierWithClientInfo.clientInfo.verificationItems).map(
-              (item) => ({
-                ...item,
-                status: getLevelStatus(
-                  tierWithClientInfo.clientInfo?.trustLevel || 0,
-                  currentTier,
-                ),
-              }),
-            )
-          : [],
-        redirect: getLevelRedirect(tierNum),
-      };
-    })
-    .sort((a, b) => a.level - b.level);
 };

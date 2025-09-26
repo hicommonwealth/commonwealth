@@ -116,7 +116,7 @@ export const User = ({
           {profile?.name} &nbsp;
           <TrustLevelRole
             type="user"
-            level={profile?.tier}
+            tier={profile?.tier}
             withTooltip={!!shouldShowTrustLevelTooltip}
           />
         </>
@@ -126,7 +126,7 @@ export const User = ({
             {profile?.name} &nbsp;
             <TrustLevelRole
               type="user"
-              level={profile?.tier}
+              tier={profile?.tier}
               withTooltip={!!shouldShowTrustLevelTooltip}
             />
           </div>
@@ -226,12 +226,12 @@ export const User = ({
                 ) : !shouldShowAddressWithDisplayName ? (
                   <>
                     {profile?.name} &nbsp;
-                    <TrustLevelRole type="user" level={profile?.tier} />
+                    <TrustLevelRole type="user" tier={profile?.tier} />
                   </>
                 ) : (
                   <>
                     {profile?.name} &nbsp;
-                    <TrustLevelRole type="user" level={profile?.tier} />
+                    <TrustLevelRole type="user" tier={profile?.tier} />
                     <div className="id-short">{redactedAddress}</div>
                   </>
                 )}

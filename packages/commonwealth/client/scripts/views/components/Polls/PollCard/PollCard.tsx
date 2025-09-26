@@ -45,6 +45,7 @@ export type PollCardProps = PollOptionProps &
     voterProfiles?: Record<string, VoterProfileData>;
     tokenDecimals?: number;
     topicWeight?: TopicWeightedVoting | null;
+    tokenAddress?: string;
     isLoadingVotes?: boolean;
     endTimestamp?: string;
     allowRevotes?: boolean;
@@ -74,6 +75,7 @@ export const PollCard = ({
   voterProfiles = {},
   tokenDecimals,
   topicWeight,
+  tokenAddress,
   isLoadingVotes = false,
   allowRevotes = false,
   userHasVoted = false,
@@ -138,7 +140,9 @@ export const PollCard = ({
       };
     });
 
-    const filename = `${proposalTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${moment().format('YYYYMMDD_HHmmss')}_votes.csv`;
+    const filename = `${proposalTitle
+      .replace(/[^a-z0-9]/gi, '_')
+      .toLowerCase()}_${moment().format('YYYYMMDD_HHmmss')}_votes.csv`;
     downloadCSV(csvData, filename);
   };
 
@@ -247,6 +251,7 @@ export const PollCard = ({
           tokenDecimals={tokenDecimals}
           topicWeight={topicWeight}
           tokenSymbol={tokenSymbol}
+          tokenAddress={tokenAddress}
           communityId={communityId}
           onDownloadCsv={handleDownloadCsv}
           isLoading={isLoadingVotes}

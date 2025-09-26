@@ -12,6 +12,13 @@
     justify-content: center;
     width: 100%;
 
+    .headline {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
     .btn-border {
       border: 0 !important;
     }

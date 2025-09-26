@@ -1,10 +1,6 @@
 import { InvalidActor, logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
-import {
-  BalanceSourceType,
-  bumpUserTier,
-  UserTierMap,
-} from '@hicommonwealth/shared';
+import { BalanceSourceType, UserTierMap } from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
 import { Transaction } from 'sequelize';
 import { z } from 'zod';
@@ -14,6 +10,7 @@ import { AddressAttributes } from '../../../models/address';
 import { UserAttributes } from '../../../models/user';
 import { getBalances } from '../../../services/tokenBalanceCache';
 import { VerifiedUserInfo } from '../../../utils/oauth/types';
+import { setUserTier } from '../../../utils/tiers';
 import { emitSignInEvents } from './emitSignInEvents';
 
 const log = logger(import.meta);
@@ -170,19 +167,19 @@ export async function findOrCreateUser({
   if (signedInUser?.id) {
     const values: Partial<UserAttributes> = {};
     if (!signedInUser.privy_id && privyUserId) values.privy_id = privyUserId;
-    bumpUserTier({
-      oldTier: signedInUser.tier,
+    await setUserTier({
+      userId: signedInUser.id!,
       newTier: tier,
-      targetObject: values,
+      transaction,
     });
     await updateUser(signedInUser.id, values);
   } else if (foundUser?.id) {
     const values: Partial<UserAttributes> = {};
     if (!foundUser.privy_id && privyUserId) values.privy_id = privyUserId;
-    bumpUserTier({
-      oldTier: foundUser.tier,
+    await setUserTier({
+      userId: foundUser.id!,
       newTier: tier,
-      targetObject: values,
+      transaction,
     });
     await updateUser(foundUser.id, values);
   }

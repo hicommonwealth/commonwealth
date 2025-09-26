@@ -5,6 +5,7 @@ export * from './CreateUnverifiedUser.policy';
 export * from './DiscordBot.policy';
 export * from './EventStream.policy';
 export * from './FarcasterWorker.policy';
+export * from './Governance.policy';
 export * from './Launchpad.policy';
 
 export * from './Nominations.policy';
