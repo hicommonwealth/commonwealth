@@ -2,6 +2,7 @@
 
 import { dispose } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model/db';
+import { UserTierMap } from '@hicommonwealth/shared';
 import * as fs from 'fs';
 import * as path from 'path';
 import { QueryTypes } from 'sequelize';
@@ -22,6 +23,18 @@ const DECAY = {
   FACTOR: Math.log(6) / 365, // ≈ 0.001899 (used in exp calculation)
   // Helper function to calculate decay multiplier, unused
   getMultiplier: (ageDays: number) => Math.exp((Math.log(6) / 365) * ageDays),
+};
+
+const UserTierWeightsMap: Record<UserTierMap, number> = {
+  [UserTierMap.IncompleteUser]: 0,
+  [UserTierMap.BannedUser]: 0,
+  [UserTierMap.NewlyVerifiedWallet]: 1,
+  [UserTierMap.VerifiedWallet]: 1,
+  [UserTierMap.SocialVerified]: 2,
+  [UserTierMap.ChainVerified]: 2,
+  [UserTierMap.FullyVerified]: 3,
+  [UserTierMap.ManuallyVerified]: 3,
+  [UserTierMap.SystemUser]: 0,
 };
 
 interface ScoringConfig {
@@ -475,8 +488,9 @@ async function getHistoricalTokenAllocations(
     INSERT INTO "HistoricalAllocations"
     WITH
       users AS (
-        SELECT U.id AS user_id, U.created_at
+        SELECT U.id AS user_id, U.created_at, U.tier
         FROM "Users" U
+        WHERE tier > 1
       ),
       addresses AS (
         SELECT
@@ -485,6 +499,7 @@ async function getHistoricalTokenAllocations(
           A.address
         FROM users U
         JOIN "Addresses" A ON U.user_id = A.user_id
+        WHERE A.is_banned = false
       ),
       threads AS (
         SELECT
@@ -575,8 +590,32 @@ async function getHistoricalTokenAllocations(
           COALESCE(CS.score, 0) AS comment_score,
           COALESCE(RS.num_reactions, 0) AS num_reactions,
           COALESCE(RS.score, 0) AS reaction_score,
-          COALESCE(TS.score, 0) + COALESCE(CS.score, 0) + COALESCE(RS.score, 0) AS unadjusted_score,
-          sqrt((COALESCE(TS.score, 0) + COALESCE(CS.score, 0) + COALESCE(RS.score, 0))::NUMERIC) AS adjusted_score
+          (COALESCE(TS.score, 0) + COALESCE(CS.score, 0) + COALESCE(RS.score, 0)) * 
+            CASE U.tier
+              WHEN 0 THEN ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+              WHEN 1 THEN ${UserTierWeightsMap[UserTierMap.BannedUser]}
+              WHEN 2 THEN ${UserTierWeightsMap[UserTierMap.NewlyVerifiedWallet]}
+              WHEN 3 THEN ${UserTierWeightsMap[UserTierMap.VerifiedWallet]}
+              WHEN 4 THEN ${UserTierWeightsMap[UserTierMap.SocialVerified]}
+              WHEN 5 THEN ${UserTierWeightsMap[UserTierMap.ChainVerified]}
+              WHEN 6 THEN ${UserTierWeightsMap[UserTierMap.FullyVerified]}
+              WHEN 7 THEN ${UserTierWeightsMap[UserTierMap.ManuallyVerified]}
+              WHEN 8 THEN ${UserTierWeightsMap[UserTierMap.SystemUser]}
+              ELSE ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+            END AS unadjusted_score,
+          sqrt(((COALESCE(TS.score, 0) + COALESCE(CS.score, 0) + COALESCE(RS.score, 0)) * 
+            CASE U.tier
+              WHEN 0 THEN ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+              WHEN 1 THEN ${UserTierWeightsMap[UserTierMap.BannedUser]}
+              WHEN 2 THEN ${UserTierWeightsMap[UserTierMap.NewlyVerifiedWallet]}
+              WHEN 3 THEN ${UserTierWeightsMap[UserTierMap.VerifiedWallet]}
+              WHEN 4 THEN ${UserTierWeightsMap[UserTierMap.SocialVerified]}
+              WHEN 5 THEN ${UserTierWeightsMap[UserTierMap.ChainVerified]}
+              WHEN 6 THEN ${UserTierWeightsMap[UserTierMap.FullyVerified]}
+              WHEN 7 THEN ${UserTierWeightsMap[UserTierMap.ManuallyVerified]}
+              WHEN 8 THEN ${UserTierWeightsMap[UserTierMap.SystemUser]}
+              ELSE ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+            END)::NUMERIC) AS adjusted_score
         FROM users U
         LEFT JOIN thread_scores TS ON TS.user_id = U.user_id
         LEFT JOIN comment_scores CS ON CS.user_id = U.user_id
@@ -608,33 +647,63 @@ async function getAuraTokenAllocations(
   const query = `
     INSERT INTO "AuraAllocations"
     WITH
+      user_weighted_xp AS (
+        SELECT 
+          user_id,
+          SUM(XL.xp_points) * 
+            CASE U.tier
+              WHEN 0 THEN ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+              WHEN 1 THEN ${UserTierWeightsMap[UserTierMap.BannedUser]}
+              WHEN 2 THEN ${UserTierWeightsMap[UserTierMap.NewlyVerifiedWallet]}
+              WHEN 3 THEN ${UserTierWeightsMap[UserTierMap.VerifiedWallet]}
+              WHEN 4 THEN ${UserTierWeightsMap[UserTierMap.SocialVerified]}
+              WHEN 5 THEN ${UserTierWeightsMap[UserTierMap.ChainVerified]}
+              WHEN 6 THEN ${UserTierWeightsMap[UserTierMap.FullyVerified]}
+              WHEN 7 THEN ${UserTierWeightsMap[UserTierMap.ManuallyVerified]}
+              WHEN 8 THEN ${UserTierWeightsMap[UserTierMap.SystemUser]}
+              ELSE ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+            END AS weighted_xp_points
+        FROM "XpLogs" XL
+        LEFT JOIN "Users" U ON XL.user_id = U.id
+        WHERE :historicalEndDate < XL.created_at AND XL.created_at < :auraEndDate
+        GROUP BY user_id, U.tier
+      ),
+      creator_weighted_xp AS (
+        SELECT 
+          creator_user_id,
+          SUM(creator_xp_points) * 
+            CASE U.tier
+              WHEN 0 THEN ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+              WHEN 1 THEN ${UserTierWeightsMap[UserTierMap.BannedUser]}
+              WHEN 2 THEN ${UserTierWeightsMap[UserTierMap.NewlyVerifiedWallet]}
+              WHEN 3 THEN ${UserTierWeightsMap[UserTierMap.VerifiedWallet]}
+              WHEN 4 THEN ${UserTierWeightsMap[UserTierMap.SocialVerified]}
+              WHEN 5 THEN ${UserTierWeightsMap[UserTierMap.ChainVerified]}
+              WHEN 6 THEN ${UserTierWeightsMap[UserTierMap.FullyVerified]}
+              WHEN 7 THEN ${UserTierWeightsMap[UserTierMap.ManuallyVerified]}
+              WHEN 8 THEN ${UserTierWeightsMap[UserTierMap.SystemUser]}
+              ELSE ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+            END AS weighted_creator_xp_points
+        FROM "XpLogs" XL
+        LEFT JOIN "Users" U ON XL.creator_user_id = U.id
+        WHERE :historicalEndDate < XL.created_at AND XL.created_at < :auraEndDate
+        GROUP BY creator_user_id, U.tier
+      ),
       xp_sum AS (
-        SELECT SUM(xp_points) + SUM(creator_xp_points) AS total_xp_awarded
-        FROM "XpLogs"
-        WHERE :historicalEndDate < created_at AND created_at < :auraEndDate
-      ),
-      user_xp AS (
-        SELECT user_id, SUM(xp_points) AS xp_points
-        FROM "XpLogs"
-        WHERE :historicalEndDate < created_at AND created_at < :auraEndDate
-        GROUP BY user_id
-      ),
-      creator_xp AS (
-        SELECT creator_user_id, SUM(creator_xp_points) AS creator_xp_points
-        FROM "XpLogs"
-        WHERE :historicalEndDate < created_at AND created_at < :auraEndDate
-        GROUP BY creator_user_id
+        SELECT 
+          (SELECT SUM(weighted_xp_points) FROM user_weighted_xp) + 
+          (SELECT SUM(weighted_creator_xp_points) FROM creator_weighted_xp) AS total_xp_awarded
       )
     SELECT
       U.id AS user_id,
-      COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0) AS total_xp,
-      (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC /
+      COALESCE(UWX.weighted_xp_points, 0) + COALESCE(CWX.weighted_creator_xp_points, 0) AS total_xp,
+      (COALESCE(UWX.weighted_xp_points, 0) + COALESCE(CWX.weighted_creator_xp_points, 0))::NUMERIC /
       (SELECT total_xp_awarded FROM xp_sum) * 100 AS percent_allocation,
-      (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC /
+      (COALESCE(UWX.weighted_xp_points, 0) + COALESCE(CWX.weighted_creator_xp_points, 0))::NUMERIC /
       (SELECT total_xp_awarded FROM xp_sum) * ${auraPoolTokens}::NUMERIC AS token_allocation
     FROM "Users" U
-    LEFT JOIN user_xp UX ON UX.user_id = U.id
-    LEFT JOIN creator_xp CX ON CX.creator_user_id = U.id
+    LEFT JOIN user_weighted_xp UWX ON UWX.user_id = U.id
+    LEFT JOIN creator_weighted_xp CWX ON CWX.creator_user_id = U.id
     ORDER BY ${config.auraOrder} NULLS LAST
     ${config.topN ? `LIMIT :topN` : ''}
     ;
