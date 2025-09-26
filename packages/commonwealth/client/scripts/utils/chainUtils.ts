@@ -48,6 +48,8 @@ export const getChainIcon = (
         return 'nearIcon';
       case ChainBase.Substrate:
         return 'polkadot';
+      case ChainBase.Sui:
+        return 'sui';
       case ChainBase.Ethereum:
       default:
         return 'eth';
