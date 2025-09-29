@@ -1048,11 +1048,11 @@ async function main() {
 
 main()
   .then(() => {
-    // eslint-disable-next-line n/no-process-exit
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('EXIT', true);
   })
   .catch((error) => {
     console.error('Error in main execution:', error);
-    // eslint-disable-next-line n/no-process-exit
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('ERROR', true);
   });
