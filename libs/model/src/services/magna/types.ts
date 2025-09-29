@@ -63,7 +63,6 @@ export interface MagnaClaim {
   from: string;
   to: string;
   data: string;
-  platformFee: number | null;
 }
 
 export interface MagnaResponse<T> {
