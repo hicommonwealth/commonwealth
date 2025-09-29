@@ -319,6 +319,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
         </div>;
       }
 
+      // claim is available but we landed on an error case
       return (
         <div className="notice-section">
           <p>
