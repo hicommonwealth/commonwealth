@@ -1,13 +1,17 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { WalletId } from '@hicommonwealth/shared';
+import { Op } from 'sequelize';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
+import { DeleteAddressErrors } from './DeleteAddress.command';
 
 export const DeleteAllAddressesErrors = {
   CannotDeleteMagic: 'Cannot delete Magic Link address',
   CannotDeleteOnlyAdmin:
     'Community must have at least 1 admin. Please assign another community member as admin, to leave this community.',
+  CannotDeleteLastAddress:
+    'Cannot delete last community. Please join another community before leaving this one.',
 };
 
 export function DeleteAllAddresses(): Command<
@@ -20,10 +24,20 @@ export function DeleteAllAddresses(): Command<
     body: async ({ actor, payload }) => {
       const { community_id, address } = payload;
 
+      const otherAddresses = await models.Address.count({
+        where: {
+          user_id: actor.user.id,
+          community_id: { [Op.ne]: community_id },
+        },
+      });
+      if (otherAddresses === 0)
+        throw new InvalidInput(DeleteAddressErrors.CannotDeleteLastAddress);
+
       const addr = await models.Address.findOne({
         where: { community_id, address, user_id: actor.user.id },
       });
       mustExist('Address', addr);
+
       if (addr.wallet_id === WalletId.Magic)
         throw new InvalidInput(DeleteAllAddressesErrors.CannotDeleteMagic);
 
