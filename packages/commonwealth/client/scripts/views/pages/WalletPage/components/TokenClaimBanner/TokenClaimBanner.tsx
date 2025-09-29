@@ -15,6 +15,7 @@ import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
   CustomAddressOption,
@@ -157,11 +158,14 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
           type="info"
           body={
             <div className="banner-content">
-              <h3 className="description">
-                Login to check your potential COMMON claim
-              </h3>
+              <h3 className="description">You do not have a COMMON claim.</h3>
+              <CWText>
+                This won&apos;t be the only opportunity to earn COMMON,
+                we&apos;ll have&nbsp;
+                <a href="#"> future community rewards to allocate.</a>
+              </CWText>
               <CWButton
-                label="Login"
+                label="Login to stay updated"
                 onClick={() => setIsAuthModalOpen(true)}
               />
             </div>
