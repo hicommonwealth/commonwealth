@@ -15,6 +15,105 @@ interface DumpConfig {
   zipFile: string;
 }
 
+// Rate limiter for content_url fetching (600 requests per minute)
+class RateLimiter {
+  private requests: number[] = [];
+  private readonly maxRequests = 600;
+  private readonly timeWindow = 60000; // 1 minute in milliseconds
+
+  async waitIfNeeded(): Promise<void> {
+    const now = Date.now();
+
+    // Remove requests older than 1 minute
+    this.requests = this.requests.filter(
+      (time) => now - time < this.timeWindow,
+    );
+
+    // If we're at the limit, wait until we can make another request
+    if (this.requests.length >= this.maxRequests) {
+      const oldestRequest = Math.min(...this.requests);
+      const waitTime = this.timeWindow - (now - oldestRequest) + 100; // Add 100ms buffer
+      console.log(
+        `Rate limit reached, waiting ${Math.ceil(waitTime / 1000)}s...`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
+      return this.waitIfNeeded(); // Check again after waiting
+    }
+
+    // Add current request timestamp
+    this.requests.push(now);
+  }
+}
+
+const rateLimiter = new RateLimiter();
+
+async function fetchContentFromUrl(contentUrl: string): Promise<string | null> {
+  try {
+    await rateLimiter.waitIfNeeded();
+
+    const response = await fetch(contentUrl);
+    if (!response.ok) {
+      console.warn(
+        `Failed to fetch content from ${contentUrl}: ${response.status} ${response.statusText}`,
+      );
+      return null;
+    }
+
+    const content = await response.text();
+    return content;
+  } catch (error) {
+    console.warn(
+      `Error fetching content from ${contentUrl}:`,
+      error instanceof Error ? error.message : error,
+    );
+    return null;
+  }
+}
+
+async function enrichContentWithFullBody(
+  items: Record<string, unknown>[],
+  bodyField: string = 'body',
+  contentUrlField: string = 'content_url',
+): Promise<Record<string, unknown>[]> {
+  const itemsWithContentUrl = items.filter((item) => item[contentUrlField]);
+
+  if (itemsWithContentUrl.length > 0) {
+    console.log(
+      `Fetching full content for ${itemsWithContentUrl.length} items with content_url...`,
+    );
+
+    for (let i = 0; i < itemsWithContentUrl.length; i++) {
+      const item = itemsWithContentUrl[i];
+      const contentUrl = item[contentUrlField] as string;
+
+      if (contentUrl) {
+        const fullContent = await fetchContentFromUrl(contentUrl);
+        if (fullContent !== null) {
+          item[bodyField] = fullContent;
+        }
+
+        // Log progress every 50 items
+        if ((i + 1) % 50 === 0) {
+          console.log(
+            `Progress: ${i + 1}/${itemsWithContentUrl.length} content URLs processed`,
+          );
+        }
+      }
+    }
+
+    console.log(
+      `Completed fetching content for ${itemsWithContentUrl.length} items`,
+    );
+  }
+
+  // Remove content_url field from all items since we've used it to enrich the content
+  items.forEach((item) => {
+    delete item[contentUrlField];
+  });
+
+  return items;
+}
+
 function parseArguments(): DumpConfig {
   const args = process.argv.slice(2);
 
@@ -56,8 +155,9 @@ Examples:
 This script will:
 1. Validate the community_id exists in the Communities table
 2. Export data from Threads, Comments, Polls, Votes, Reactions, Users, Topics, and Addresses tables
-3. Create CSV files for each table in a folder named "[community_id]-dump"
-4. Compress the folder into a tar.gz archive for easy download
+3. Fetch full content from CloudFlare R2 for threads/comments with content_url (respects 600 req/min rate limit)
+4. Create CSV files for each table in a folder named "[community_id]-dump"
+5. Compress the folder into a tar.gz archive for easy download
 `);
 }
 
@@ -167,12 +267,13 @@ async function exportThreads(
     paranoid: false,
   });
 
-  const filePath = path.join(outputDir, 'Threads.csv');
-  await writeDataToCSV(
+  // Fetch full content for threads with content_url
+  const enrichedThreads = await enrichContentWithFullBody(
     threads as unknown as Record<string, unknown>[],
-    filePath,
-    'Threads',
   );
+
+  const filePath = path.join(outputDir, 'Threads.csv');
+  await writeDataToCSV(enrichedThreads, filePath, 'Threads');
 }
 
 async function exportComments(
@@ -224,12 +325,13 @@ async function exportComments(
     paranoid: false,
   });
 
-  const filePath = path.join(outputDir, 'Comments.csv');
-  await writeDataToCSV(
+  // Fetch full content for comments with content_url
+  const enrichedComments = await enrichContentWithFullBody(
     comments as unknown as Record<string, unknown>[],
-    filePath,
-    'Comments',
   );
+
+  const filePath = path.join(outputDir, 'Comments.csv');
+  await writeDataToCSV(enrichedComments, filePath, 'Comments');
 }
 
 async function exportPolls(
