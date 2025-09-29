@@ -3,6 +3,10 @@ import fetch from 'node-fetch';
 import { QueryTypes } from 'sequelize';
 import { config } from '../server/config';
 
+// Parse command line arguments
+const args = process.argv.slice(2);
+const shouldClearTable = args.includes('--clear');
+
 // Configuration
 const OPENSEA_API_KEY = config.OPENSEA_API_KEY;
 const COLLECTION_SLUG = 'lamumu-by-common';
@@ -77,6 +81,15 @@ interface NFTCollectionRow {
 
 // Helper function to delay execution
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Clear all existing NFT data from the table
+async function clearNftSnapshotTable(): Promise<void> {
+  console.log('Clearing existing NFT snapshot data...');
+  await models.sequelize.query(
+    'TRUNCATE TABLE "NftSnapshot" RESTART IDENTITY;',
+  );
+  console.log('✅ NFT snapshot table cleared');
+}
 
 // Get already processed token IDs
 async function getProcessedTokenIds(): Promise<Set<string>> {
@@ -231,6 +244,11 @@ async function main() {
   if (!config.OPENSEA_API_KEY) {
     console.error('OPENSEA_API_KEY is not set');
     return;
+  }
+
+  // Step 0: Clear table if --clear flag is provided
+  if (shouldClearTable) {
+    await clearNftSnapshotTable();
   }
 
   // Step 1: Get already processed token IDs
