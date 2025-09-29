@@ -47,6 +47,7 @@ type ViewPollVotesDrawerProps = {
   tokenDecimals?: number | null | undefined;
   topicWeight?: TopicWeightedVoting | null | undefined; // For formatting vote weights
   tokenSymbol?: string; // Token symbol for Sui NAVX special handling
+  tokenAddress?: string; // Token address for weighted voting display
   communityId: string; // Community context, potentially for fetching profiles or other details.
   onDownloadCsv: () => void; // Callback to trigger CSV download.
   isLoading?: boolean; // To show loading state for votes
@@ -87,6 +88,27 @@ const getColumns = (
   },
 ];
 
+function getTokenSymbolFallback(topicWeight: TopicWeightedVoting) {
+  switch (topicWeight) {
+    case TopicWeightedVoting.SuiNative:
+      return 'Sui Native';
+    case TopicWeightedVoting.SuiToken:
+      return 'Sui Token';
+    case TopicWeightedVoting.SuiNFT:
+      return 'Sui NFT';
+    case TopicWeightedVoting.SPL:
+      return 'SPL';
+    case TopicWeightedVoting.ERC20:
+      return 'ERC20';
+    case TopicWeightedVoting.Stake:
+      return 'Stake';
+    case TopicWeightedVoting.ERC1155ID:
+      return 'ERC1155ID';
+    default:
+      return 'ETH';
+  }
+}
+
 export const ViewPollVotesDrawer = ({
   header,
   votes,
@@ -97,6 +119,7 @@ export const ViewPollVotesDrawer = ({
   tokenDecimals,
   topicWeight,
   tokenSymbol,
+  tokenAddress,
   communityId,
   onDownloadCsv,
   isLoading = false,
@@ -198,9 +221,26 @@ export const ViewPollVotesDrawer = ({
               Download CSV
             </button>
           </div>
-
           <CWText type="h3">{header}</CWText>
-
+          {topicWeight && (
+            <div className="weighted-topic-info">
+              <CWText type="caption" className="weighted-topic-header">
+                Weighted by
+              </CWText>
+              <div className="token-info-stack">
+                {tokenSymbol ? (
+                  <span className="token-symbol">{tokenSymbol}</span>
+                ) : (
+                  <span className="token-symbol">
+                    {getTokenSymbolFallback(topicWeight)}
+                  </span>
+                )}
+                {tokenAddress && (
+                  <span className="token-address">{tokenAddress}</span>
+                )}
+              </div>
+            </div>
+          )}
           <div className="percentage-breakdown-section">
             <CWText type="h4">Vote Breakdown</CWText>
             {percentageBreakdown.map((opt) => (
@@ -217,7 +257,6 @@ export const ViewPollVotesDrawer = ({
               </div>
             ))}
           </div>
-
           {isLoading ? (
             <CWText className="loading-text" type="b1">
               Loading votes...

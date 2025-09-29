@@ -1,7 +1,9 @@
 import { EventHandler, logger } from '@hicommonwealth/core';
 import { getStakeTradeInfo } from '@hicommonwealth/evm-protocols';
+import { UserTierMap } from '@hicommonwealth/shared';
 import { ZodUndefined } from 'zod';
 import { models } from '../../database';
+import { setUserTier } from '../../utils/tiers';
 import { chainNodeMustExist } from '../utils/utils';
 
 const log = logger(import.meta);
@@ -64,14 +66,24 @@ export const handleCommunityStakeTrades: EventHandler<
     blockHash: payload.rawLog.blockHash,
   });
 
-  await models.StakeTransaction.create({
-    transaction_hash: payload.rawLog.transactionHash,
-    community_id: community.id,
-    stake_id: stakeInfo.stakeId,
-    stake_amount: stakeInfo.stakeAmount,
-    stake_price: ethAmount.toString(),
-    address: trader,
-    stake_direction: isBuy ? 'buy' : 'sell',
-    timestamp: stakeInfo.timestamp,
+  await models.sequelize.transaction(async (transaction) => {
+    await models.StakeTransaction.create(
+      {
+        transaction_hash: payload.rawLog.transactionHash,
+        community_id: community.id,
+        stake_id: stakeInfo.stakeId,
+        stake_amount: stakeInfo.stakeAmount,
+        stake_price: ethAmount.toString(),
+        address: trader,
+        stake_direction: isBuy ? 'buy' : 'sell',
+        timestamp: stakeInfo.timestamp,
+      },
+      { transaction },
+    );
+    await setUserTier({
+      userAddress: trader,
+      newTier: UserTierMap.ChainVerified,
+      transaction,
+    });
   });
 };

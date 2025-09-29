@@ -14,6 +14,7 @@ import {
   DiscordBotPolicy,
   EventStreamPolicy,
   FarcasterWorker,
+  GovernancePolicy,
   LaunchpadPolicy,
   NominationsWorker,
   NotificationsPolicy,
@@ -87,6 +88,10 @@ const _ReactionWorker = {
   consumer: ReactionWorker,
 };
 
+const _GovernancePolicy = {
+  consumer: GovernancePolicy,
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   ChainEventPolicy,
@@ -101,6 +106,7 @@ export const rascalConsumerMap: Consumer<EventsHandlerMetadata<any>>[] = [
   CommunityGoalsPolicy,
   LaunchpadPolicy,
   _ContestWorker,
+  _GovernancePolicy,
   _FarcasterWorker,
   _Xp,
   _NotificationsSettingsPolicy,
