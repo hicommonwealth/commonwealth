@@ -255,14 +255,6 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     allocation.claimable > 0 &&
     allocation.unlock_start_at;
 
-  console.log('data => ', {
-    canClaim,
-    hasClaimed,
-    isClaimAvailable,
-    isReadyForClaimNow,
-    isReadyForClaimAfterUnlock,
-  });
-
   const getClaimCopy = () => {
     if (!canClaim) return null;
 
