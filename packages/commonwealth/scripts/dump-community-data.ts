@@ -6,7 +6,7 @@ import { exec } from 'child_process';
 import * as csvWriter from 'csv-writer';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 import { promisify } from 'util';
 
 interface DumpConfig {
@@ -109,7 +109,7 @@ async function writeDataToCSV<T extends Record<string, unknown>>(
 
   // Process data to handle JSON objects and ensure proper serialization
   const processedData = data.map((item) => {
-    const processedItem: Record<string, any> = {};
+    const processedItem: Record<string, unknown> = {};
     headers.forEach((header) => {
       const value = item[header];
       if (value === null || value === undefined) {
@@ -168,7 +168,11 @@ async function exportThreads(
   });
 
   const filePath = path.join(outputDir, 'Threads.csv');
-  await writeDataToCSV(threads as any[], filePath, 'Threads');
+  await writeDataToCSV(
+    threads as unknown as Record<string, unknown>[],
+    filePath,
+    'Threads',
+  );
 }
 
 async function exportComments(
@@ -221,7 +225,11 @@ async function exportComments(
   });
 
   const filePath = path.join(outputDir, 'Comments.csv');
-  await writeDataToCSV(comments as any[], filePath, 'Comments');
+  await writeDataToCSV(
+    comments as unknown as Record<string, unknown>[],
+    filePath,
+    'Comments',
+  );
 }
 
 async function exportPolls(
@@ -245,7 +253,11 @@ async function exportPolls(
   });
 
   const filePath = path.join(outputDir, 'Polls.csv');
-  await writeDataToCSV(polls as any[], filePath, 'Polls');
+  await writeDataToCSV(
+    polls as unknown as Record<string, unknown>[],
+    filePath,
+    'Polls',
+  );
 }
 
 async function exportVotes(
@@ -268,7 +280,11 @@ async function exportVotes(
   });
 
   const filePath = path.join(outputDir, 'Votes.csv');
-  await writeDataToCSV(votes as any[], filePath, 'Poll Votes');
+  await writeDataToCSV(
+    votes as unknown as Record<string, unknown>[],
+    filePath,
+    'Poll Votes',
+  );
 }
 
 async function exportReactions(
@@ -307,7 +323,7 @@ async function exportReactions(
     .filter((id): id is number => id !== undefined);
 
   // Get reactions for threads and comments in the community
-  const whereConditions: any[] = [];
+  const whereConditions: WhereOptions = [];
   if (threadIdArray.length > 0) {
     whereConditions.push({ thread_id: { [Op.in]: threadIdArray } });
   }
@@ -343,7 +359,11 @@ async function exportReactions(
   });
 
   const filePath = path.join(outputDir, 'Reactions.csv');
-  await writeDataToCSV(reactions as any[], filePath, 'Reactions');
+  await writeDataToCSV(
+    reactions as unknown as Record<string, unknown>[],
+    filePath,
+    'Reactions',
+  );
 }
 
 async function exportUsers(
@@ -392,7 +412,11 @@ async function exportUsers(
   });
 
   const filePath = path.join(outputDir, 'Users.csv');
-  await writeDataToCSV(users as any[], filePath, 'Users');
+  await writeDataToCSV(
+    users as unknown as Record<string, unknown>[],
+    filePath,
+    'Users',
+  );
 }
 
 async function exportTopics(
@@ -416,7 +440,11 @@ async function exportTopics(
   });
 
   const filePath = path.join(outputDir, 'Topics.csv');
-  await writeDataToCSV(topics as any[], filePath, 'Topics');
+  await writeDataToCSV(
+    topics as unknown as Record<string, unknown>[],
+    filePath,
+    'Topics',
+  );
 }
 
 async function exportAddresses(
@@ -448,7 +476,11 @@ async function exportAddresses(
   });
 
   const filePath = path.join(outputDir, 'Addresses.csv');
-  await writeDataToCSV(addresses as any[], filePath, 'Addresses');
+  await writeDataToCSV(
+    addresses as unknown as Record<string, unknown>[],
+    filePath,
+    'Addresses',
+  );
 }
 
 async function createZipFile(
