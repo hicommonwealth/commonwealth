@@ -4,7 +4,6 @@ import { WalletId } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { models } from '../../database';
 import { mustExist } from '../../middleware/guards';
-import { DeleteAddressErrors } from './DeleteAddress.command';
 
 export const DeleteAllAddressesErrors = {
   CannotDeleteMagic: 'Cannot delete Magic Link address',
@@ -31,7 +30,9 @@ export function DeleteAllAddresses(): Command<
         },
       });
       if (otherAddresses === 0)
-        throw new InvalidInput(DeleteAddressErrors.CannotDeleteLastAddress);
+        throw new InvalidInput(
+          DeleteAllAddressesErrors.CannotDeleteLastAddress,
+        );
 
       const addr = await models.Address.findOne({
         where: { community_id, address, user_id: actor.user.id },
