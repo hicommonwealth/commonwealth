@@ -69,7 +69,7 @@ async function validateCommunity(communityId: string): Promise<void> {
   console.log(`✓ Community found: ${community.name}`);
 }
 
-async function createOutputDirectory(outputDir: string): Promise<void> {
+function createOutputDirectory(outputDir: string): void {
   if (fs.existsSync(outputDir)) {
     fs.rmSync(outputDir, { recursive: true, force: true });
   }
@@ -510,7 +510,7 @@ async function createZipFile(
   }
 }
 
-async function cleanupDirectory(outputDir: string): Promise<void> {
+function cleanupDirectory(outputDir: string): void {
   fs.rmSync(outputDir, { recursive: true, force: true });
   console.log(`✓ Cleaned up directory: ${outputDir}`);
 }
@@ -529,7 +529,7 @@ async function main() {
     await validateCommunity(config.communityId);
 
     // Create output directory
-    await createOutputDirectory(config.outputDir);
+    createOutputDirectory(config.outputDir);
 
     // Export all tables
     await exportThreads(config.communityId, config.outputDir);
@@ -547,7 +547,7 @@ async function main() {
     // Clean up directory only if archive was created successfully
     const archiveFile = config.zipFile.replace('.zip', '.tar.gz');
     if (fs.existsSync(archiveFile)) {
-      await cleanupDirectory(config.outputDir);
+      cleanupDirectory(config.outputDir);
     } else {
       console.log(`Directory preserved: ${config.outputDir}`);
     }
