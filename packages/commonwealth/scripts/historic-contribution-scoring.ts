@@ -2,6 +2,7 @@
 
 import { dispose } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model/db';
+import { UserTierMap } from '@hicommonwealth/shared';
 import * as fs from 'fs';
 import * as path from 'path';
 import { QueryTypes } from 'sequelize';
@@ -11,8 +12,8 @@ const SUPPLY = {
   TOTAL: 10_000_000_000,
   SPLITS: {
     // For 3% total allocation (300M):
-    HISTORICAL: 0.5, // Example 10B * 0.03 * 0.50 = 150M tokens
-    AURA: 0.5, // Example 10B * 0.03 * 0.50 = 150M tokens
+    HISTORICAL: 0.25, // Example 10B * 0.03 * 0.50 = 150M tokens
+    AURA: 0.25, // Example 10B * 0.03 * 0.50 = 150M tokens
   },
 };
 
@@ -22,6 +23,18 @@ const DECAY = {
   FACTOR: Math.log(6) / 365, // ≈ 0.001899 (used in exp calculation)
   // Helper function to calculate decay multiplier, unused
   getMultiplier: (ageDays: number) => Math.exp((Math.log(6) / 365) * ageDays),
+};
+
+const UserTierWeightsMap: Record<UserTierMap, number> = {
+  [UserTierMap.IncompleteUser]: 0,
+  [UserTierMap.BannedUser]: 0,
+  [UserTierMap.NewlyVerifiedWallet]: 1,
+  [UserTierMap.VerifiedWallet]: 1,
+  [UserTierMap.SocialVerified]: 1.25,
+  [UserTierMap.ChainVerified]: 1.5,
+  [UserTierMap.FullyVerified]: 1.75,
+  [UserTierMap.ManuallyVerified]: 2,
+  [UserTierMap.SystemUser]: 0,
 };
 
 interface ScoringConfig {
@@ -58,7 +71,7 @@ function parseArguments(): ScoringConfig {
   let auraOutputPath = `results/aura-allocation-${timestamp}.csv`;
   let noVietnamese = true;
   let minLength: number | undefined = 30;
-  let supplyPercent = 0.01; // Default to 1%
+  let supplyPercent = 0.03; // Default to 3%
   let historicalOrder: string = 'token_allocation DESC';
   let auraOrder: string = 'token_allocation DESC';
   let auraEndDate: string = new Date().toISOString();
@@ -475,8 +488,9 @@ async function getHistoricalTokenAllocations(
     INSERT INTO "HistoricalAllocations"
     WITH
       users AS (
-        SELECT U.id AS user_id, U.created_at
+        SELECT U.id AS user_id, U.created_at, U.tier
         FROM "Users" U
+        WHERE tier > 1
       ),
       addresses AS (
         SELECT
@@ -485,6 +499,7 @@ async function getHistoricalTokenAllocations(
           A.address
         FROM users U
         JOIN "Addresses" A ON U.user_id = A.user_id
+        WHERE A.is_banned = false
       ),
       threads AS (
         SELECT
@@ -575,8 +590,32 @@ async function getHistoricalTokenAllocations(
           COALESCE(CS.score, 0) AS comment_score,
           COALESCE(RS.num_reactions, 0) AS num_reactions,
           COALESCE(RS.score, 0) AS reaction_score,
-          COALESCE(TS.score, 0) + COALESCE(CS.score, 0) + COALESCE(RS.score, 0) AS unadjusted_score,
-          sqrt((COALESCE(TS.score, 0) + COALESCE(CS.score, 0) + COALESCE(RS.score, 0))::NUMERIC) AS adjusted_score
+          (COALESCE(TS.score, 0) + COALESCE(CS.score, 0) + COALESCE(RS.score, 0)) * 
+            CASE U.tier
+              WHEN 0 THEN ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+              WHEN 1 THEN ${UserTierWeightsMap[UserTierMap.BannedUser]}
+              WHEN 2 THEN ${UserTierWeightsMap[UserTierMap.NewlyVerifiedWallet]}
+              WHEN 3 THEN ${UserTierWeightsMap[UserTierMap.VerifiedWallet]}
+              WHEN 4 THEN ${UserTierWeightsMap[UserTierMap.SocialVerified]}
+              WHEN 5 THEN ${UserTierWeightsMap[UserTierMap.ChainVerified]}
+              WHEN 6 THEN ${UserTierWeightsMap[UserTierMap.FullyVerified]}
+              WHEN 7 THEN ${UserTierWeightsMap[UserTierMap.ManuallyVerified]}
+              WHEN 8 THEN ${UserTierWeightsMap[UserTierMap.SystemUser]}
+              ELSE ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+            END AS unadjusted_score,
+          sqrt(((COALESCE(TS.score, 0) + COALESCE(CS.score, 0) + COALESCE(RS.score, 0)) * 
+            CASE U.tier
+              WHEN 0 THEN ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+              WHEN 1 THEN ${UserTierWeightsMap[UserTierMap.BannedUser]}
+              WHEN 2 THEN ${UserTierWeightsMap[UserTierMap.NewlyVerifiedWallet]}
+              WHEN 3 THEN ${UserTierWeightsMap[UserTierMap.VerifiedWallet]}
+              WHEN 4 THEN ${UserTierWeightsMap[UserTierMap.SocialVerified]}
+              WHEN 5 THEN ${UserTierWeightsMap[UserTierMap.ChainVerified]}
+              WHEN 6 THEN ${UserTierWeightsMap[UserTierMap.FullyVerified]}
+              WHEN 7 THEN ${UserTierWeightsMap[UserTierMap.ManuallyVerified]}
+              WHEN 8 THEN ${UserTierWeightsMap[UserTierMap.SystemUser]}
+              ELSE ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+            END)::NUMERIC) AS adjusted_score
         FROM users U
         LEFT JOIN thread_scores TS ON TS.user_id = U.user_id
         LEFT JOIN comment_scores CS ON CS.user_id = U.user_id
@@ -608,33 +647,63 @@ async function getAuraTokenAllocations(
   const query = `
     INSERT INTO "AuraAllocations"
     WITH
+      user_weighted_xp AS (
+        SELECT 
+          user_id,
+          SUM(XL.xp_points) * 
+            CASE U.tier
+              WHEN 0 THEN ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+              WHEN 1 THEN ${UserTierWeightsMap[UserTierMap.BannedUser]}
+              WHEN 2 THEN ${UserTierWeightsMap[UserTierMap.NewlyVerifiedWallet]}
+              WHEN 3 THEN ${UserTierWeightsMap[UserTierMap.VerifiedWallet]}
+              WHEN 4 THEN ${UserTierWeightsMap[UserTierMap.SocialVerified]}
+              WHEN 5 THEN ${UserTierWeightsMap[UserTierMap.ChainVerified]}
+              WHEN 6 THEN ${UserTierWeightsMap[UserTierMap.FullyVerified]}
+              WHEN 7 THEN ${UserTierWeightsMap[UserTierMap.ManuallyVerified]}
+              WHEN 8 THEN ${UserTierWeightsMap[UserTierMap.SystemUser]}
+              ELSE ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+            END AS weighted_xp_points
+        FROM "XpLogs" XL
+        LEFT JOIN "Users" U ON XL.user_id = U.id
+        WHERE :historicalEndDate < XL.created_at AND XL.created_at < :auraEndDate
+        GROUP BY user_id, U.tier
+      ),
+      creator_weighted_xp AS (
+        SELECT 
+          creator_user_id,
+          SUM(creator_xp_points) * 
+            CASE U.tier
+              WHEN 0 THEN ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+              WHEN 1 THEN ${UserTierWeightsMap[UserTierMap.BannedUser]}
+              WHEN 2 THEN ${UserTierWeightsMap[UserTierMap.NewlyVerifiedWallet]}
+              WHEN 3 THEN ${UserTierWeightsMap[UserTierMap.VerifiedWallet]}
+              WHEN 4 THEN ${UserTierWeightsMap[UserTierMap.SocialVerified]}
+              WHEN 5 THEN ${UserTierWeightsMap[UserTierMap.ChainVerified]}
+              WHEN 6 THEN ${UserTierWeightsMap[UserTierMap.FullyVerified]}
+              WHEN 7 THEN ${UserTierWeightsMap[UserTierMap.ManuallyVerified]}
+              WHEN 8 THEN ${UserTierWeightsMap[UserTierMap.SystemUser]}
+              ELSE ${UserTierWeightsMap[UserTierMap.IncompleteUser]}
+            END AS weighted_creator_xp_points
+        FROM "XpLogs" XL
+        LEFT JOIN "Users" U ON XL.creator_user_id = U.id
+        WHERE :historicalEndDate < XL.created_at AND XL.created_at < :auraEndDate
+        GROUP BY creator_user_id, U.tier
+      ),
       xp_sum AS (
-        SELECT SUM(xp_points) + SUM(creator_xp_points) AS total_xp_awarded
-        FROM "XpLogs"
-        WHERE :historicalEndDate < created_at AND created_at < :auraEndDate
-      ),
-      user_xp AS (
-        SELECT user_id, SUM(xp_points) AS xp_points
-        FROM "XpLogs"
-        WHERE :historicalEndDate < created_at AND created_at < :auraEndDate
-        GROUP BY user_id
-      ),
-      creator_xp AS (
-        SELECT creator_user_id, SUM(creator_xp_points) AS creator_xp_points
-        FROM "XpLogs"
-        WHERE :historicalEndDate < created_at AND created_at < :auraEndDate
-        GROUP BY creator_user_id
+        SELECT 
+          (SELECT SUM(weighted_xp_points) FROM user_weighted_xp) + 
+          (SELECT SUM(weighted_creator_xp_points) FROM creator_weighted_xp) AS total_xp_awarded
       )
     SELECT
       U.id AS user_id,
-      COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0) AS total_xp,
-      (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC /
+      COALESCE(UWX.weighted_xp_points, 0) + COALESCE(CWX.weighted_creator_xp_points, 0) AS total_xp,
+      (COALESCE(UWX.weighted_xp_points, 0) + COALESCE(CWX.weighted_creator_xp_points, 0))::NUMERIC /
       (SELECT total_xp_awarded FROM xp_sum) * 100 AS percent_allocation,
-      (COALESCE(UX.xp_points, 0) + COALESCE(CX.creator_xp_points, 0))::NUMERIC /
+      (COALESCE(UWX.weighted_xp_points, 0) + COALESCE(CWX.weighted_creator_xp_points, 0))::NUMERIC /
       (SELECT total_xp_awarded FROM xp_sum) * ${auraPoolTokens}::NUMERIC AS token_allocation
     FROM "Users" U
-    LEFT JOIN user_xp UX ON UX.user_id = U.id
-    LEFT JOIN creator_xp CX ON CX.creator_user_id = U.id
+    LEFT JOIN user_weighted_xp UWX ON UWX.user_id = U.id
+    LEFT JOIN creator_weighted_xp CWX ON CWX.creator_user_id = U.id
     ORDER BY ${config.auraOrder} NULLS LAST
     ${config.topN ? `LIMIT :topN` : ''}
     ;
@@ -648,6 +717,166 @@ async function getAuraTokenAllocations(
     },
     type: QueryTypes.SELECT,
   });
+}
+
+async function distributeHistoricalRemainder(
+  config: ScoringConfig,
+): Promise<void> {
+  const historicalPoolTokens = Math.floor(
+    config.supplyPercent * config.supply * SUPPLY.SPLITS.HISTORICAL,
+  );
+
+  // Step 1: Update token_allocation to be the floor of its current value
+  await models.sequelize.query(
+    `
+      UPDATE "HistoricalAllocations"
+      SET token_allocation = FLOOR(token_allocation)
+    `,
+    { type: QueryTypes.UPDATE },
+  );
+
+  // Step 2: Calculate the total token_allocation
+  const [{ total_allocated }] = await models.sequelize.query<{
+    total_allocated: number;
+  }>(
+    `
+      SELECT SUM(token_allocation) as total_allocated
+      FROM "HistoricalAllocations"
+    `,
+    { type: QueryTypes.SELECT },
+  );
+
+  // Step 3: Calculate the remainder
+  const remainder = historicalPoolTokens - total_allocated;
+
+  console.log(
+    `Historical pool tokens: ${historicalPoolTokens.toLocaleString()}`,
+  );
+  console.log(`Total allocated: ${total_allocated.toLocaleString()}`);
+  console.log(`Remainder to distribute: ${remainder.toLocaleString()}`);
+
+  if (remainder <= 0) {
+    if (remainder < 0) {
+      console.warn(
+        `Warning: Negative historical remainder detected: ${remainder}. This may indicate an allocation error.`,
+      );
+    } else {
+      console.log('No historical remainder to distribute.');
+    }
+    return;
+  }
+
+  // Step 4: Distribute the remainder to top users ranked by percent_allocation, then by user_id
+  const topUsers = await models.sequelize.query<{ user_id: string }>(
+    `
+      SELECT user_id
+      FROM "HistoricalAllocations"
+      ORDER BY percent_allocation DESC, user_id DESC
+      LIMIT :remainder
+    `,
+    {
+      replacements: { remainder },
+      type: QueryTypes.SELECT,
+    },
+  );
+
+  // Update each of the top users with one additional token
+  for (const user of topUsers) {
+    await models.sequelize.query(
+      `
+        UPDATE "HistoricalAllocations"
+        SET token_allocation = token_allocation + 1
+        WHERE user_id = :userId
+      `,
+      {
+        replacements: { userId: user.user_id },
+        type: QueryTypes.UPDATE,
+      },
+    );
+  }
+
+  console.log(
+    `✅ Distributed ${remainder.toLocaleString()} remainder tokens to top ${topUsers.length} historical users.`,
+  );
+}
+
+async function distributeAuraRemainder(config: ScoringConfig): Promise<void> {
+  console.log('Distributing aura allocation remainder...');
+
+  const auraPoolTokens = Math.floor(
+    config.supplyPercent * config.supply * SUPPLY.SPLITS.AURA,
+  );
+
+  // Step 1: Update token_allocation to be the floor of its current value
+  await models.sequelize.query(
+    `
+      UPDATE "AuraAllocations"
+      SET token_allocation = FLOOR(token_allocation)
+    `,
+    { type: QueryTypes.UPDATE },
+  );
+
+  // Step 2: Calculate the total token_allocation
+  const [{ total_allocated }] = await models.sequelize.query<{
+    total_allocated: number;
+  }>(
+    `
+      SELECT SUM(token_allocation) as total_allocated
+      FROM "AuraAllocations"
+    `,
+    { type: QueryTypes.SELECT },
+  );
+
+  // Step 3: Calculate the remainder
+  const remainder = auraPoolTokens - total_allocated;
+
+  console.log(`Aura pool tokens: ${auraPoolTokens.toLocaleString()}`);
+  console.log(`Total allocated: ${total_allocated.toLocaleString()}`);
+  console.log(`Remainder to distribute: ${remainder.toLocaleString()}`);
+
+  if (remainder <= 0) {
+    if (remainder < 0) {
+      console.warn(
+        `Warning: Negative aura remainder detected: ${remainder}. This may indicate an allocation error.`,
+      );
+    } else {
+      console.log('No aura remainder to distribute.');
+    }
+    return;
+  }
+
+  // Step 4: Distribute the remainder to top users ranked by percent_allocation, then by user_id
+  const topUsers = await models.sequelize.query<{ user_id: string }>(
+    `
+      SELECT user_id
+      FROM "AuraAllocations"
+      ORDER BY percent_allocation DESC, user_id ASC
+      LIMIT :remainder
+    `,
+    {
+      replacements: { remainder },
+      type: QueryTypes.SELECT,
+    },
+  );
+
+  // Update each of the top users with one additional token
+  for (const user of topUsers) {
+    await models.sequelize.query(
+      `
+        UPDATE "AuraAllocations"
+        SET token_allocation = token_allocation + 1
+        WHERE user_id = :userId
+      `,
+      {
+        replacements: { userId: user.user_id },
+        type: QueryTypes.UPDATE,
+      },
+    );
+  }
+
+  console.log(
+    `✅ Distributed ${remainder.toLocaleString()} remainder tokens to top ${topUsers.length} aura users.`,
+  );
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -729,9 +958,17 @@ async function main() {
     await getHistoricalTokenAllocations(config);
     console.log('Historical token allocations generated.');
 
+    console.log('Distributing historical remainder...');
+    await distributeHistoricalRemainder(config);
+    console.log('Historical remainder distributed.');
+
     console.log('Generating aura token allocations...');
     await getAuraTokenAllocations(config);
     console.log('Aura token allocations generated.');
+
+    console.log('Distributing aura remainder...');
+    await distributeAuraRemainder(config);
+    console.log('Aura remainder distributed.');
 
     console.log('Populating claim addresses...');
     await populateClaimAddresses(config);

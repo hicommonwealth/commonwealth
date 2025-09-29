@@ -42,6 +42,7 @@ const {
   RELEASER_API_KEY,
   RELEASER_WAIT_ONLY,
   RAILWAY_PUBLIC_DOMAIN,
+  OPENSEA_API_KEY,
 } = process.env;
 
 const DEFAULTS = {
@@ -171,6 +172,7 @@ export const config = configure(
       RELEASER_WAIT_ONLY: RELEASER_WAIT_ONLY === 'true',
       RAILWAY_PUBLIC_DOMAIN,
     },
+    OPENSEA_API_KEY,
   },
   z.object({
     DISABLE_SITEMAP: z.boolean(),
@@ -320,5 +322,6 @@ export const config = configure(
         ),
       RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
     }),
+    OPENSEA_API_KEY: z.string().optional(),
   }),
 );
