@@ -1,10 +1,11 @@
 import { models } from '@hicommonwealth/model/db';
 import fetch from 'node-fetch';
 import { QueryTypes } from 'sequelize';
+import { config } from '../server/config';
 
 // Configuration
-const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY;
-const COLLECTION_SLUG = 'pudgypenguins';
+const OPENSEA_API_KEY = config.OPENSEA_API_KEY;
+const COLLECTION_SLUG = 'lamumu-by-common';
 const CHAIN = 'ethereum';
 const DELAY_MS = 500; // Delay between API calls to respect rate limits
 const TESTING_NFT_COUNT = 21;
@@ -77,74 +78,18 @@ interface NFTCollectionRow {
 // Helper function to delay execution
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Create the nft_collection_data table if it doesn't exist
-async function createNFTCollectionTable(): Promise<void> {
-  console.log("Creating nft_collection_data table if it doesn't exist...");
-
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS nft_collection_data
-    (
-      token_id       INTEGER NOT NULL PRIMARY KEY,
-      user_id        INTEGER,
-      user_tier      INTEGER,
-      name           VARCHAR(500),
-      holder_address VARCHAR(42)  NOT NULL,
-      opensea_url    TEXT,
-      traits         JSONB NOT NULL,
-      opensea_rarity         JSONB,
-      calculated_rarity INTEGER,
-      rarity_tier INTEGER,
-      equal_distribution_allocation NUMERIC,
-      rarity_distribution_allocation NUMERIC,
-      total_token_allocation NUMERIC,
-      created_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-      updated_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-    );
-
-  -- Trigger function to update total_token_allocation
-  CREATE OR REPLACE FUNCTION update_total_token_allocation()
-  RETURNS TRIGGER AS $$
-  BEGIN
-    NEW.total_token_allocation := 
-      COALESCE(NEW.equal_distribution_allocation, 0) + 
-      COALESCE(NEW.rarity_distribution_allocation, 0);
-    RETURN NEW;
-  END;
-  $$ LANGUAGE plpgsql;
-
-  -- Drop the trigger if it already exists to avoid duplication
-  DROP TRIGGER IF EXISTS trg_update_total_token_allocation ON nft_collection_data;
-
-  -- Create the trigger to fire BEFORE INSERT OR UPDATE
-  CREATE TRIGGER trg_update_total_token_allocation
-  BEFORE INSERT OR UPDATE OF equal_distribution_allocation, rarity_distribution_allocation
-  ON nft_collection_data
-  FOR EACH ROW
-  EXECUTE FUNCTION update_total_token_allocation();
-  `;
-
-  try {
-    await models.sequelize.query(createTableQuery);
-    console.log('✅ nft_collection_data table created/verified successfully');
-  } catch (error) {
-    console.error('Error creating nft_collection_data table:', error);
-    throw error;
-  }
-}
-
 // Get already processed token IDs
 async function getProcessedTokenIds(): Promise<Set<string>> {
   console.log('Checking for already processed token IDs...');
-  const rows = await models.sequelize.query<{ token_id: string }>(
-    `SELECT DISTINCT token_id FROM nft_collection_data`,
+  const rows = await models.sequelize.query<{ token_id: number }>(
+    `SELECT DISTINCT token_id FROM "NftSnapshot";`,
     {
       type: QueryTypes.SELECT,
     },
   );
-
   const processedIds = new Set<string>();
   rows.forEach((row) => {
-    processedIds.add(row.token_id);
+    processedIds.add(String(row.token_id));
   });
 
   console.log(`Found ${processedIds.size} already processed tokens`);
@@ -246,7 +191,7 @@ async function insertSingleNFTData(
   }
 
   const insertQuery = `
-    INSERT INTO nft_collection_data (token_id, name, holder_address, opensea_url, traits, opensea_rarity)
+    INSERT INTO "NftSnapshot" (token_id, name, holder_address, opensea_url, traits, opensea_rarity)
     VALUES (?, ?, ?, ?, ?::jsonb, ?::jsonb)
   `;
 
@@ -283,8 +228,10 @@ async function insertSingleNFTData(
 async function main() {
   console.log('Starting NFT data export...');
 
-  // Step 0: Create the database table
-  await createNFTCollectionTable();
+  if (!config.OPENSEA_API_KEY) {
+    console.error('OPENSEA_API_KEY is not set');
+    return;
+  }
 
   // Step 1: Get already processed token IDs
   const processedTokenIds = await getProcessedTokenIds();

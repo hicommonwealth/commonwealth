@@ -12,8 +12,8 @@ const SUPPLY = {
   TOTAL: 10_000_000_000,
   SPLITS: {
     // For 3% total allocation (300M):
-    HISTORICAL: 0.5, // Example 10B * 0.03 * 0.50 = 150M tokens
-    AURA: 0.5, // Example 10B * 0.03 * 0.50 = 150M tokens
+    HISTORICAL: 0.25, // Example 10B * 0.03 * 0.50 = 150M tokens
+    AURA: 0.25, // Example 10B * 0.03 * 0.50 = 150M tokens
   },
 };
 
@@ -71,7 +71,7 @@ function parseArguments(): ScoringConfig {
   let auraOutputPath = `results/aura-allocation-${timestamp}.csv`;
   let noVietnamese = true;
   let minLength: number | undefined = 30;
-  let supplyPercent = 0.01; // Default to 1%
+  let supplyPercent = 0.03; // Default to 3%
   let historicalOrder: string = 'token_allocation DESC';
   let auraOrder: string = 'token_allocation DESC';
   let auraEndDate: string = new Date().toISOString();
@@ -719,6 +719,166 @@ async function getAuraTokenAllocations(
   });
 }
 
+async function distributeHistoricalRemainder(
+  config: ScoringConfig,
+): Promise<void> {
+  const historicalPoolTokens = Math.floor(
+    config.supplyPercent * config.supply * SUPPLY.SPLITS.HISTORICAL,
+  );
+
+  // Step 1: Update token_allocation to be the floor of its current value
+  await models.sequelize.query(
+    `
+      UPDATE "HistoricalAllocations"
+      SET token_allocation = FLOOR(token_allocation)
+    `,
+    { type: QueryTypes.UPDATE },
+  );
+
+  // Step 2: Calculate the total token_allocation
+  const [{ total_allocated }] = await models.sequelize.query<{
+    total_allocated: number;
+  }>(
+    `
+      SELECT SUM(token_allocation) as total_allocated
+      FROM "HistoricalAllocations"
+    `,
+    { type: QueryTypes.SELECT },
+  );
+
+  // Step 3: Calculate the remainder
+  const remainder = historicalPoolTokens - total_allocated;
+
+  console.log(
+    `Historical pool tokens: ${historicalPoolTokens.toLocaleString()}`,
+  );
+  console.log(`Total allocated: ${total_allocated.toLocaleString()}`);
+  console.log(`Remainder to distribute: ${remainder.toLocaleString()}`);
+
+  if (remainder <= 0) {
+    if (remainder < 0) {
+      console.warn(
+        `Warning: Negative historical remainder detected: ${remainder}. This may indicate an allocation error.`,
+      );
+    } else {
+      console.log('No historical remainder to distribute.');
+    }
+    return;
+  }
+
+  // Step 4: Distribute the remainder to top users ranked by percent_allocation, then by user_id
+  const topUsers = await models.sequelize.query<{ user_id: string }>(
+    `
+      SELECT user_id
+      FROM "HistoricalAllocations"
+      ORDER BY percent_allocation DESC, user_id DESC
+      LIMIT :remainder
+    `,
+    {
+      replacements: { remainder },
+      type: QueryTypes.SELECT,
+    },
+  );
+
+  // Update each of the top users with one additional token
+  for (const user of topUsers) {
+    await models.sequelize.query(
+      `
+        UPDATE "HistoricalAllocations"
+        SET token_allocation = token_allocation + 1
+        WHERE user_id = :userId
+      `,
+      {
+        replacements: { userId: user.user_id },
+        type: QueryTypes.UPDATE,
+      },
+    );
+  }
+
+  console.log(
+    `✅ Distributed ${remainder.toLocaleString()} remainder tokens to top ${topUsers.length} historical users.`,
+  );
+}
+
+async function distributeAuraRemainder(config: ScoringConfig): Promise<void> {
+  console.log('Distributing aura allocation remainder...');
+
+  const auraPoolTokens = Math.floor(
+    config.supplyPercent * config.supply * SUPPLY.SPLITS.AURA,
+  );
+
+  // Step 1: Update token_allocation to be the floor of its current value
+  await models.sequelize.query(
+    `
+      UPDATE "AuraAllocations"
+      SET token_allocation = FLOOR(token_allocation)
+    `,
+    { type: QueryTypes.UPDATE },
+  );
+
+  // Step 2: Calculate the total token_allocation
+  const [{ total_allocated }] = await models.sequelize.query<{
+    total_allocated: number;
+  }>(
+    `
+      SELECT SUM(token_allocation) as total_allocated
+      FROM "AuraAllocations"
+    `,
+    { type: QueryTypes.SELECT },
+  );
+
+  // Step 3: Calculate the remainder
+  const remainder = auraPoolTokens - total_allocated;
+
+  console.log(`Aura pool tokens: ${auraPoolTokens.toLocaleString()}`);
+  console.log(`Total allocated: ${total_allocated.toLocaleString()}`);
+  console.log(`Remainder to distribute: ${remainder.toLocaleString()}`);
+
+  if (remainder <= 0) {
+    if (remainder < 0) {
+      console.warn(
+        `Warning: Negative aura remainder detected: ${remainder}. This may indicate an allocation error.`,
+      );
+    } else {
+      console.log('No aura remainder to distribute.');
+    }
+    return;
+  }
+
+  // Step 4: Distribute the remainder to top users ranked by percent_allocation, then by user_id
+  const topUsers = await models.sequelize.query<{ user_id: string }>(
+    `
+      SELECT user_id
+      FROM "AuraAllocations"
+      ORDER BY percent_allocation DESC, user_id ASC
+      LIMIT :remainder
+    `,
+    {
+      replacements: { remainder },
+      type: QueryTypes.SELECT,
+    },
+  );
+
+  // Update each of the top users with one additional token
+  for (const user of topUsers) {
+    await models.sequelize.query(
+      `
+        UPDATE "AuraAllocations"
+        SET token_allocation = token_allocation + 1
+        WHERE user_id = :userId
+      `,
+      {
+        replacements: { userId: user.user_id },
+        type: QueryTypes.UPDATE,
+      },
+    );
+  }
+
+  console.log(
+    `✅ Distributed ${remainder.toLocaleString()} remainder tokens to top ${topUsers.length} aura users.`,
+  );
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function writeScoresToCSV<T extends Record<string, unknown>>(
   scores: Array<T>,
@@ -798,9 +958,17 @@ async function main() {
     await getHistoricalTokenAllocations(config);
     console.log('Historical token allocations generated.');
 
+    console.log('Distributing historical remainder...');
+    await distributeHistoricalRemainder(config);
+    console.log('Historical remainder distributed.');
+
     console.log('Generating aura token allocations...');
     await getAuraTokenAllocations(config);
     console.log('Aura token allocations generated.');
+
+    console.log('Distributing aura remainder...');
+    await distributeAuraRemainder(config);
+    console.log('Aura remainder distributed.');
 
     console.log('Populating claim addresses...');
     await populateClaimAddresses(config);

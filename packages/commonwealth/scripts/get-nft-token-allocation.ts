@@ -46,14 +46,14 @@ const UserTierWeightsMap: Record<UserTierMap, number> = {
   [UserTierMap.BannedUser]: 0,
   [UserTierMap.NewlyVerifiedWallet]: 1,
   [UserTierMap.VerifiedWallet]: 1,
-  [UserTierMap.SocialVerified]: 2,
-  [UserTierMap.ChainVerified]: 2,
-  [UserTierMap.FullyVerified]: 3,
-  [UserTierMap.ManuallyVerified]: 3,
+  [UserTierMap.SocialVerified]: 1.25,
+  [UserTierMap.ChainVerified]: 1.5,
+  [UserTierMap.FullyVerified]: 1.75,
+  [UserTierMap.ManuallyVerified]: 2,
   [UserTierMap.SystemUser]: 0,
 };
 
-const TokenSupply = 10_000_000_000;
+const TokenSupply = 150_000_000;
 const EqualDistributionPercent = 0.6;
 const RarityDistributionPercent = 0.4;
 
@@ -114,7 +114,7 @@ async function calculateTraitRarity(trait_type: string, trait_value: string) {
   }>(
     `
       SELECT COUNT(*) as count
-      FROM nft_collection_data
+      FROM "NftSnapshot"
       WHERE traits @> $1::jsonb;
     `,
     {
@@ -130,7 +130,7 @@ async function calculateTraitRarity(trait_type: string, trait_value: string) {
   const [{ count: numNFTs }] = await models.sequelize.query<{ count: number }>(
     `
       SELECT COUNT(*) as count
-      FROM nft_collection_data
+      FROM "NftSnapshot"
     `,
     {
       type: QueryTypes.SELECT,
@@ -146,7 +146,7 @@ async function calculateNftRarity(tokenId: number) {
   const [{ traits }] = await models.sequelize.query<{ traits: NFTTrait[] }>(
     `
       SELECT traits
-      FROM nft_collection_data
+      FROM "NftSnapshot"
       WHERE token_id = ${tokenId};
     `,
     {
@@ -166,11 +166,11 @@ async function calculateNftRarity(tokenId: number) {
 async function updateAllNftRarity() {
   console.log('Starting NFT rarity calculation for all tokens...');
 
-  // Fetch all token IDs from the nft_collection_data table
+  // Fetch all token IDs from the "NftSnapshot" table
   const tokenIds = await models.sequelize.query<{ token_id: number }>(
     `
       SELECT token_id
-      FROM nft_collection_data
+      FROM "NftSnapshot"
       ORDER BY token_id;
     `,
     {
@@ -188,7 +188,7 @@ async function updateAllNftRarity() {
     // Update the calculated_rarity column for this token
     await models.sequelize.query(
       `
-        UPDATE nft_collection_data
+        UPDATE "NftSnapshot"
         SET calculated_rarity = :rarity,
             updated_at        = NOW()
         WHERE token_id = :tokenId;
@@ -220,7 +220,7 @@ async function assignRarityTierByPercentile() {
   }>(
     `
       SELECT token_id, calculated_rarity
-      FROM nft_collection_data
+      FROM "NftSnapshot"
       WHERE calculated_rarity IS NOT NULL
       ORDER BY calculated_rarity DESC, token_id;
     `,
@@ -265,7 +265,7 @@ async function assignRarityTierByPercentile() {
     // Update the rarity_tier in the database
     await models.sequelize.query(
       `
-        UPDATE nft_collection_data
+        UPDATE "NftSnapshot"
         SET rarity_tier = :rarityTier,
             updated_at  = NOW()
         WHERE token_id = :tokenId;
@@ -315,7 +315,7 @@ async function assignRarityTierByRank() {
   }>(
     `
       SELECT token_id, calculated_rarity
-      FROM nft_collection_data
+      FROM "NftSnapshot"
       WHERE calculated_rarity IS NOT NULL
       ORDER BY calculated_rarity DESC, token_id;
     `,
@@ -385,7 +385,7 @@ async function assignRarityTierByRank() {
     // Update the rarity_tier in the database
     await models.sequelize.query(
       `
-        UPDATE nft_collection_data
+        UPDATE "NftSnapshot"
         SET rarity_tier = :rarityTier,
             updated_at  = NOW()
         WHERE token_id = :tokenId;
@@ -430,7 +430,7 @@ async function calculateEqualDistributionAllocations() {
   }>(
     `
       SELECT token_id, calculated_rarity, user_tier
-      FROM nft_collection_data
+      FROM "NftSnapshot"
       WHERE calculated_rarity IS NOT NULL
       ORDER BY calculated_rarity DESC, token_id;
     `,
@@ -526,7 +526,7 @@ async function calculateEqualDistributionAllocations() {
   for (const allocation of allocations) {
     await models.sequelize.query(
       `
-        UPDATE nft_collection_data
+        UPDATE "NftSnapshot"
         SET equal_distribution_allocation = :allocation,
             updated_at                    = NOW()
         WHERE token_id = :tokenId;
@@ -614,7 +614,7 @@ async function calculateRarityDistributionAllocation(
   }>(
     `
       SELECT token_id, calculated_rarity, rarity_tier, user_tier
-      FROM nft_collection_data
+      FROM "NftSnapshot"
       WHERE calculated_rarity IS NOT NULL AND rarity_tier IS NOT NULL
       ORDER BY calculated_rarity DESC, token_id ASC;
     `,
@@ -731,7 +731,7 @@ async function calculateRarityDistributionAllocation(
   for (const allocation of allocations) {
     await models.sequelize.query(
       `
-        UPDATE nft_collection_data
+        UPDATE "NftSnapshot"
         SET rarity_distribution_allocation = :allocation,
             updated_at                     = NOW()
         WHERE token_id = :tokenId;
@@ -845,15 +845,15 @@ async function resolveUsers() {
 
   // Update user_id and user_tier by joining with Addresses and Users tables
   const updateQuery = `
-    UPDATE nft_collection_data 
+    UPDATE "NftSnapshot" 
     SET 
       user_id = u.id,
       user_tier = u.tier,
       updated_at = NOW()
     FROM "Addresses" a
     INNER JOIN "Users" u ON a.user_id = u.id
-    WHERE LOWER(nft_collection_data.holder_address) = LOWER(a.address)
-      AND (nft_collection_data.user_id IS NULL OR nft_collection_data.user_tier IS NULL);
+    WHERE LOWER("NftSnapshot".holder_address) = LOWER(a.address)
+      AND ("NftSnapshot".user_id IS NULL OR "NftSnapshot".user_tier IS NULL);
   `;
 
   try {
@@ -884,7 +884,7 @@ async function resolveUsers() {
       }>(
         `
           SELECT token_id
-          FROM nft_collection_data
+          FROM "NftSnapshot"
           WHERE user_tier IS NULL;
         `,
         {
@@ -904,7 +904,7 @@ async function resolveUsers() {
 
         await models.sequelize.query(
           `
-            UPDATE nft_collection_data
+            UPDATE "NftSnapshot"
             SET user_tier = :tier,
                 updated_at = NOW()
             WHERE token_id = :tokenId;
@@ -941,7 +941,7 @@ async function resolveUsers() {
         COUNT(*) - COUNT(user_id) as nfts_without_users,
         COUNT(DISTINCT user_id) as unique_users,
         COUNT(DISTINCT user_tier) as unique_tiers
-      FROM nft_collection_data;
+      FROM "NftSnapshot";
     `;
 
     const [stats] = await models.sequelize.query<{
@@ -971,7 +971,7 @@ async function resolveUsers() {
         user_tier,
         COUNT(*) as nft_count,
         COUNT(DISTINCT user_id) as user_count
-      FROM nft_collection_data 
+      FROM "NftSnapshot" 
       WHERE user_id IS NOT NULL
       GROUP BY user_tier
       ORDER BY user_tier;
