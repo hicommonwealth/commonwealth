@@ -239,6 +239,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     </div>
   );
 
+  const canClaim = !!claimAddress;
   const hasClaimed = claimAddress.magna_claimed_at && txHash;
   const isClaimAvailable = claimAddress?.magna_synced_at;
   const isReadyForClaimNow =
@@ -254,6 +255,8 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     allocation.unlock_start_at;
 
   const getClaimCopy = () => {
+    if (!canClaim) return null;
+
     if (hasClaimed) {
       return (
         <div className="notice-section">
@@ -330,6 +333,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
       );
     }
 
+    // Show ui to set address for claim
     return (
       <div className="notice-section">
         <div className="notice-text">
@@ -375,7 +379,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     );
   };
 
-  return claimAddress ? (
+  return canClaim ? (
     <div className="TokenClaimBanner">
       <CWBanner
         type={claimAddress.address ? 'info' : 'error'}
