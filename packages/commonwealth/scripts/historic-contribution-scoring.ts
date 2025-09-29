@@ -30,10 +30,10 @@ const UserTierWeightsMap: Record<UserTierMap, number> = {
   [UserTierMap.BannedUser]: 0,
   [UserTierMap.NewlyVerifiedWallet]: 1,
   [UserTierMap.VerifiedWallet]: 1,
-  [UserTierMap.SocialVerified]: 2,
-  [UserTierMap.ChainVerified]: 2,
-  [UserTierMap.FullyVerified]: 3,
-  [UserTierMap.ManuallyVerified]: 3,
+  [UserTierMap.SocialVerified]: 1.25,
+  [UserTierMap.ChainVerified]: 1.5,
+  [UserTierMap.FullyVerified]: 1.75,
+  [UserTierMap.ManuallyVerified]: 2,
   [UserTierMap.SystemUser]: 0,
 };
 
