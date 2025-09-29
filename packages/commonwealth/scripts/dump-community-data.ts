@@ -514,11 +514,11 @@ async function main() {
 
     // Clean up directory only if archive was created successfully
     const archiveFile = config.zipFile.replace('.zip', '.tar.gz');
-    // if (fs.existsSync(archiveFile)) {
-    //   await cleanupDirectory(config.outputDir);
-    // } else {
-    //   console.log(`Directory preserved: ${config.outputDir}`);
-    // }
+    if (fs.existsSync(archiveFile)) {
+      await cleanupDirectory(config.outputDir);
+    } else {
+      console.log(`Directory preserved: ${config.outputDir}`);
+    }
 
     console.log('');
     console.log(`✓ Community data dump completed successfully!`);
