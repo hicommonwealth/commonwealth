@@ -25,7 +25,7 @@ const BANNERS = {
 } as const;
 
 const CWLayoutBanner = () => {
-  const key = 'COMMON_CLAIM'
+  const key = 'COMMON_CLAIM';
   const config = BANNERS[key];
   const [isHidden, setIsHidden] = useState(
     localStorage.getItem(key)?.toLowerCase() === 'true',
