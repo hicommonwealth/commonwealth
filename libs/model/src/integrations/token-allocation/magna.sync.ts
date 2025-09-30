@@ -16,11 +16,42 @@ export type TokenAllocationSyncArgs = {
   token_allocation: number;
 };
 
+async function sendToSlack(created: number) {
+  const webhookUrl = config.SLACK.CHANNELS.ALL_ENG;
+  if (!webhookUrl) {
+    log.error(
+      'SLACK_WEBHOOK_URL_ALL_ENG is not set in the configuration. Cannot send Slack message.',
+    );
+    return;
+  }
+  try {
+    const payload = {
+      text: `:rotating_light: *Attention Product Team!* :rotating_light:\n
+*${created} new allocations* have been created in *Magna*.\n
+Please check the Magna dashboard for required signatures :memo: :rocket:`,
+    };
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) {
+      const responseBody = await response.text();
+      log.error(
+        `Error sending message to Slack: ${response.statusText} - ${responseBody}`,
+      );
+    }
+  } catch (error) {
+    log.error('Error sending message to Slack:', error as Error);
+  }
+}
+
 export async function magnaSync(
   apiCallback: (args: TokenAllocationSyncArgs) => Promise<string>,
   batchSize = 10,
   breatherMs = 1000,
 ) {
+  let created = 0;
   try {
     let found = true;
     while (found) {
@@ -76,6 +107,7 @@ export async function magnaSync(
             { where: { user_id: args.user_id } },
           );
           log.info(`Synced allocation for user ${args.user_id}`);
+          created++;
         } catch (err) {
           log.error(
             `Failed to sync allocation for user ${args.user_id}:`,
@@ -90,4 +122,5 @@ export async function magnaSync(
   } catch (err) {
     log.error('Error syncing with Magna', err as Error);
   }
+  if (created > 0) sendToSlack(created);
 }
