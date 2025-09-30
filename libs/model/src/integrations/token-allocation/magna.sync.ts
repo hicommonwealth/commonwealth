@@ -56,7 +56,7 @@ export async function magnaSync(
             JOIN "Users" U ON A.user_id = U.id
             LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
             LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
-            LEFT JOIN "nft_collection_data" N ON A.user_id = N.user_id
+            LEFT JOIN "NftSnapshot" N ON A.user_id = N.user_id
           WHERE
             A.address IS NOT NULL -- there is an address to sync
             AND A.magna_synced_at IS NULL -- and it hasn't been synced yet
