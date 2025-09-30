@@ -43,6 +43,7 @@ const {
   RELEASER_WAIT_ONLY,
   RAILWAY_PUBLIC_DOMAIN,
   SLACK_WEBHOOK_URL_ALL_ENG,
+  OPENSEA_API_KEY,
 } = process.env;
 
 const DEFAULTS = {
@@ -177,6 +178,7 @@ export const config = configure(
         ALL_ENG: SLACK_WEBHOOK_URL_ALL_ENG,
       },
     },
+    OPENSEA_API_KEY,
   },
   z.object({
     DISABLE_SITEMAP: z.boolean(),
@@ -331,5 +333,6 @@ export const config = configure(
         ALL_ENG: z.string().optional(),
       }),
     }),
+    OPENSEA_API_KEY: z.string().optional(),
   }),
 );

@@ -16,6 +16,89 @@ class SignTokenClaim extends ContractBase {
     await super.initialize(withWallet, chainId);
   }
 
+  async estimateContractGas(
+    contractAddress: string,
+    walletAddress: string,
+    data: string,
+  ): Promise<{
+    gasLimit: string;
+    maxFeePerGas: string;
+    maxPriorityFeePerGas: string;
+    requiredGasCost: string;
+    balance: string;
+    hasEnoughBalance: boolean;
+    requiredEth: string | number;
+    balanceEth: string | number;
+  }> {
+    try {
+      const gasLimit = await this.web3.eth.estimateGas({
+        from: walletAddress,
+        to: contractAddress,
+        data,
+      });
+
+      let maxPriorityFeePerGas: string;
+
+      try {
+        const fee = await this.web3.eth.getMaxPriorityFeePerGas();
+        maxPriorityFeePerGas = fee.toString();
+      } catch {
+        maxPriorityFeePerGas = this.web3.utils.toWei('1', 'gwei');
+      }
+
+      const block = await this.web3.eth.getBlock('pending');
+      const baseFee = block.baseFeePerGas?.toString() ?? '0';
+
+      const maxFeePerGas = (
+        BigInt(baseFee) + BigInt(maxPriorityFeePerGas)
+      ).toString();
+
+      // User balance
+      const balance = (
+        await this.web3.eth.getBalance(walletAddress)
+      ).toString();
+
+      const requiredGasCost = (
+        BigInt(gasLimit.toString()) * BigInt(maxFeePerGas)
+      ).toString();
+
+      const hasEnoughBalance = BigInt(balance) >= BigInt(requiredGasCost);
+
+      // format to ETH for readability
+      const requiredEth = parseFloat(
+        this.web3.utils.fromWei(requiredGasCost, 'ether'),
+      ).toFixed(5);
+      const balanceEth = parseFloat(
+        this.web3.utils.fromWei(balance, 'ether'),
+      ).toFixed(2);
+
+      return {
+        gasLimit: gasLimit.toString(),
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        requiredGasCost,
+        balance,
+        hasEnoughBalance,
+        // for ui
+        requiredEth,
+        balanceEth,
+      };
+    } catch {
+      // this shouldn't happen ideally
+      // fallback values
+      return {
+        gasLimit: '21000',
+        maxFeePerGas: this.web3.utils.toWei('2', 'gwei'),
+        maxPriorityFeePerGas: this.web3.utils.toWei('1', 'gwei'),
+        requiredGasCost: '0',
+        balance: '0',
+        hasEnoughBalance: false,
+        requiredEth: 0,
+        balanceEth: 0,
+      };
+    }
+  }
+
   async sign(
     walletAddress: string,
     chainId: string,
@@ -25,15 +108,14 @@ class SignTokenClaim extends ContractBase {
       await this.initialize(true, chainId);
     }
 
-    // estimateGas can fail — fallback to 1 gwei
-    let maxPriorityFeePerGas: string;
-    try {
-      const fee = await this.estimateGas();
-      maxPriorityFeePerGas =
-        fee?.toString() ?? this.web3.utils.toWei('1', 'gwei');
-    } catch {
-      maxPriorityFeePerGas = this.web3.utils.toWei('1', 'gwei');
+    const { maxPriorityFeePerGas, hasEnoughBalance, requiredEth, balanceEth } =
+      await this.estimateContractGas(this.tokenAddress, walletAddress, data);
+    if (!hasEnoughBalance) {
+      throw new Error(
+        `Not enough gas: requires ~${requiredEth} ETH for fees, but wallet only has ${balanceEth} ETH`,
+      );
     }
+
     const tx = {
       from: walletAddress,
       to: this.tokenAddress,
