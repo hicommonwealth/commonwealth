@@ -100,7 +100,6 @@
     "@cosmjs/tendermint-rpc": "^0.31.3",
     "@cosmjs/utils": "^0.31.3",
     "@ethersproject/providers": "^5.7.2",
-    "csv-writer": "^1.6.0",
     "@farcaster/frame-sdk": "^0.0.26",
     "@hicommonwealth/adapters": "workspace:*",
     "@hicommonwealth/chains": "workspace:*",
