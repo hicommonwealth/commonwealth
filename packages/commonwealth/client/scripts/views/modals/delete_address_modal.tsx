@@ -19,7 +19,7 @@ type DeleteAddressModalAttrs = {
   addresses: AddressInfo[];
   address: AddressInfo;
   chain: string;
-  closeModal: () => void;
+  closeModal: (isDeleted?: boolean) => void;
   isBulkDelete?: boolean;
   communityName: string;
   isLastCommunityAddress?: boolean;
@@ -44,7 +44,7 @@ export const DeleteAddressModal = ({
         address: address?.address,
       });
     else deleteAddress({ community_id: chain, address: address?.address });
-    closeModal();
+    closeModal(true);
   };
 
   return (
