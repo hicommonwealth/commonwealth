@@ -78,7 +78,7 @@ export const DeleteAddressModal = ({
         <CWButton
           label="Cancel"
           buttonType="secondary"
-          onClick={closeModal}
+          onClick={() => closeModal()}
           buttonHeight="sm"
         />
         <CWButton
