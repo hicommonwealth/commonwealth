@@ -122,5 +122,5 @@ export async function magnaSync(
   } catch (err) {
     log.error('Error syncing with Magna', err as Error);
   }
-  if (created > 0) sendToSlack(created);
+  if (created > 0) await sendToSlack(created);
 }
