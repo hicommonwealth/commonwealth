@@ -112,7 +112,8 @@ class SignTokenClaim extends ContractBase {
       await this.estimateContractGas(this.tokenAddress, walletAddress, data);
     if (!hasEnoughBalance) {
       throw new Error(
-        `Not enough gas: requires ~${requiredEth} ETH for fees, but wallet only has ${balanceEth} ETH`,
+        `Not enough gas: requires ~${requiredEth} ETH for fees, but wallet only has ${balanceEth} ETH.
+         Please add more ETH to your wallet to claim your tokens.`,
       );
     }
 
