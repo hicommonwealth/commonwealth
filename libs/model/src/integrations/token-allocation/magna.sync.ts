@@ -16,11 +16,42 @@ export type TokenAllocationSyncArgs = {
   token_allocation: number;
 };
 
+async function sendToSlack(created: number) {
+  const webhookUrl = config.SLACK.CHANNELS.ALL_ENG;
+  if (!webhookUrl) {
+    log.error(
+      'SLACK_WEBHOOK_URL_ALL_ENG is not set in the configuration. Cannot send Slack message.',
+    );
+    return;
+  }
+  try {
+    const payload = {
+      text: `:rotating_light: *Attention Product Team!* :rotating_light:\n
+*${created} new allocations* have been created in *Magna*.\n
+Please check the Magna dashboard for required signatures :memo: :rocket:`,
+    };
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) {
+      const responseBody = await response.text();
+      log.error(
+        `Error sending message to Slack: ${response.statusText} - ${responseBody}`,
+      );
+    }
+  } catch (error) {
+    log.error('Error sending message to Slack:', error as Error);
+  }
+}
+
 export async function magnaSync(
   apiCallback: (args: TokenAllocationSyncArgs) => Promise<string>,
   batchSize = 10,
   breatherMs = 1000,
 ) {
+  let created = 0;
   try {
     let found = true;
     while (found) {
@@ -35,12 +66,14 @@ export async function magnaSync(
             A.address as wallet_address,
             U.profile->>'name' as user_name,
             COALESCE(HA.token_allocation, 0)::double precision 
-            + COALESCE(AA.token_allocation, 0)::double precision as token_allocation
+            + COALESCE(AA.token_allocation, 0)::double precision
+            + COALESCE(N.total_token_allocation, 0)::double precision as token_allocation
           FROM
             "ClaimAddresses" A -- this is the driving table with sync watermarks
             JOIN "Users" U ON A.user_id = U.id
             LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
             LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
+            LEFT JOIN "nft_collection_data" N ON A.user_id = N.user_id
           WHERE
             A.address IS NOT NULL -- there is an address to sync
             AND A.magna_synced_at IS NULL -- and it hasn't been synced yet
@@ -74,6 +107,7 @@ export async function magnaSync(
             { where: { user_id: args.user_id } },
           );
           log.info(`Synced allocation for user ${args.user_id}`);
+          created++;
         } catch (err) {
           log.error(
             `Failed to sync allocation for user ${args.user_id}:`,
@@ -88,4 +122,5 @@ export async function magnaSync(
   } catch (err) {
     log.error('Error syncing with Magna', err as Error);
   }
+  if (created > 0) await sendToSlack(created);
 }

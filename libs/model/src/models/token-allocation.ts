@@ -11,7 +11,7 @@ export type HistoricalAllocation = {
   reactions_score: number;
   unadjusted_score: number;
   adjusted_score: number;
-  percent_score: number;
+  percent_allocation: number;
   token_allocation: number;
 };
 export const HistoricalAllocations = (
@@ -56,7 +56,7 @@ export const HistoricalAllocations = (
         type: Sequelize.DECIMAL,
         allowNull: false,
       },
-      percent_score: {
+      percent_allocation: {
         type: Sequelize.DECIMAL,
         allowNull: false,
       },

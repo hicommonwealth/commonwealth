@@ -19,7 +19,6 @@ export const ClaimToken = {
     from: EVM_ADDRESS_STRICT,
     to: EVM_ADDRESS_STRICT,
     data: z.string(),
-    platform_fee: z.number().nullish(),
     transaction_hash: EVM_TRANSACTION_HASH.nullish(),
   }),
 };

@@ -200,9 +200,9 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
               addresses={addresses}
               address={currentAddress}
               chain={currentAddress?.community?.id}
-              closeModal={() => {
+              closeModal={(isDeleted) => {
                 setIsRemoveModalOpen(false);
-                refreshProfiles(currentAddress);
+                isDeleted && refreshProfiles(currentAddress);
               }}
               isBulkDelete={isBulkDeleteState}
               communityName={selectedCommuinty}
