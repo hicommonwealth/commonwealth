@@ -274,7 +274,11 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
             <CWButton
               label="View transaction on BaseScan"
               onClick={() =>
-                window.open(`https://basescan.org/tx/${txHash}`, '_blank')
+                window.open(
+                  `https://basescan.org/tx/${txHash}`,
+                  '_blank',
+                  'noopener,noreferrer',
+                )
               }
               buttonType="secondary"
               className="tx-link-button"
