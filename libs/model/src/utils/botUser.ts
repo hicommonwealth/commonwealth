@@ -35,3 +35,17 @@ export const getBotUser = async (): Promise<BotUserWithAddress> => {
     address,
   };
 };
+
+/**
+ * Check if a given address_id belongs to the AI bot user
+ */
+export const isBotAddress = async (address_id: number): Promise<boolean> => {
+  try {
+    const { user: botUser } = await getBotUser();
+    const address = await models.Address.findByPk(address_id);
+    return address?.user_id === botUser.id;
+  } catch (error) {
+    // If bot user is not configured or not found, return false
+    return false;
+  }
+};

@@ -1,15 +1,42 @@
-import { type Command, stats } from '@hicommonwealth/core';
+import { InvalidActor, stats, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authComment } from '../../middleware';
 import { mustBeAuthorizedComment } from '../../middleware/guards';
+import { isBotAddress } from '../../utils/botUser';
 
 export function DeleteComment(): Command<typeof schemas.DeleteComment> {
   return {
     ...schemas.DeleteComment,
-    auth: [authComment({ author: true, roles: ['admin', 'moderator'] })],
+    auth: [authComment({ roles: ['admin', 'moderator', 'member'] })],
     body: async ({ actor, context }) => {
-      const { comment, community_id } = mustBeAuthorizedComment(actor, context);
+      const { comment, community_id, is_author, address } =
+        mustBeAuthorizedComment(actor, context);
+
+      // Check if user is authorized to delete this comment
+      // Allowed: comment author, admins, moderators, or user who triggered AI comment
+      const isAdmin = address.role === 'admin';
+      const isModerator = address.role === 'moderator';
+      let canDelete = is_author || isAdmin || isModerator;
+
+      // If not already authorized, check if this is an AI-generated comment
+      // and if the current user triggered it
+      if (!canDelete && comment.address_id) {
+        const isAIComment = await isBotAddress(comment.address_id);
+        if (isAIComment) {
+          // Look up the AICompletionToken to see who triggered this comment
+          const aiToken = await models.AICompletionToken.findOne({
+            where: { comment_id: comment.id },
+          });
+          if (aiToken && aiToken.user_id === actor.user.id) {
+            canDelete = true;
+          }
+        }
+      }
+
+      if (!canDelete) {
+        throw new InvalidActor(actor, 'Must be comment author or admin');
+      }
 
       // == mutation transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {
