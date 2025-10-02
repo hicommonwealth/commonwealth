@@ -26,3 +26,4 @@ external-openapi.json
 .envrc
 tracing
 latest.dump
+**/allocation-distribution
