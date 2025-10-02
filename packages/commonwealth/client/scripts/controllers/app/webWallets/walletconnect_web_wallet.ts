@@ -180,6 +180,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: chainIdHex }],
       });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (switchError: any) {
       // add chain/network to wallet if not added yet
       if (switchError.code === 4902) {
@@ -223,6 +224,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     }
 
     const Web3 = (await import('web3')).default;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this._web3 = new Web3(this._provider as any);
     this._accounts = await this._web3.eth.getAccounts();
   }
