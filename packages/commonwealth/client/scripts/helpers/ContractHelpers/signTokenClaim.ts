@@ -12,8 +12,10 @@ class SignTokenClaim extends ContractBase {
   async initialize(
     withWallet?: boolean,
     chainId?: string | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any,
   ): Promise<void> {
-    await super.initialize(withWallet, chainId);
+    await super.initialize(withWallet, chainId, providerInstance);
   }
 
   async estimateContractGas(
@@ -58,8 +60,9 @@ class SignTokenClaim extends ContractBase {
         await this.web3.eth.getBalance(walletAddress)
       ).toString();
 
+      const gasLimitWithBuffer = (BigInt(gasLimit) * 120n) / 100n; // +20%
       const requiredGasCost = (
-        BigInt(gasLimit.toString()) * BigInt(maxFeePerGas)
+        gasLimitWithBuffer * BigInt(maxFeePerGas)
       ).toString();
 
       const hasEnoughBalance = BigInt(balance) >= BigInt(requiredGasCost);
@@ -70,7 +73,7 @@ class SignTokenClaim extends ContractBase {
       ).toFixed(5);
       const balanceEth = parseFloat(
         this.web3.utils.fromWei(balance, 'ether'),
-      ).toFixed(2);
+      ).toFixed(5);
 
       return {
         gasLimit: gasLimit.toString(),
@@ -103,13 +106,21 @@ class SignTokenClaim extends ContractBase {
     walletAddress: string,
     chainId: string,
     data: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any,
   ): Promise<`0x${string}`> {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true, chainId);
+      await this.initialize(true, chainId, providerInstance);
     }
 
-    const { maxPriorityFeePerGas, hasEnoughBalance, requiredEth, balanceEth } =
-      await this.estimateContractGas(this.tokenAddress, walletAddress, data);
+    const {
+      maxPriorityFeePerGas,
+      maxFeePerGas,
+      hasEnoughBalance,
+      requiredEth,
+      balanceEth,
+      gasLimit,
+    } = await this.estimateContractGas(this.tokenAddress, walletAddress, data);
     if (!hasEnoughBalance) {
       throw new Error(
         `Not enough gas: requires ~${requiredEth} ETH for fees, but wallet only has ${balanceEth} ETH.
@@ -122,7 +133,8 @@ class SignTokenClaim extends ContractBase {
       to: this.tokenAddress,
       data, // magna sends the full abi-encoded calldata
       value: '0x0', // idk what this does
-      maxFeePerGas: maxPriorityFeePerGas,
+      gas: gasLimit,
+      maxFeePerGas,
       maxPriorityFeePerGas,
     };
 
