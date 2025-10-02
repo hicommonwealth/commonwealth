@@ -43,6 +43,7 @@ export const useClaimTokenFlow = () => {
 
           const controller = new MagicWebWalletController();
           await controller.enable(`${BASE_ID}`);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const stc = new SignTokenClaim(data.to, controller.provider as any);
           txHash = await stc.sign(
             data.from,

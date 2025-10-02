@@ -12,6 +12,7 @@ class SignTokenClaim extends ContractBase {
   async initialize(
     withWallet?: boolean,
     chainId?: string | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     providerInstance?: any,
   ): Promise<void> {
     await super.initialize(withWallet, chainId, providerInstance);
@@ -105,6 +106,7 @@ class SignTokenClaim extends ContractBase {
     walletAddress: string,
     chainId: string,
     data: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     providerInstance?: any,
   ): Promise<`0x${string}`> {
     if (!this.initialized || !this.walletEnabled) {
