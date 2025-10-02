@@ -8,7 +8,7 @@ const ProposalsEmptyState = () => {
   const navigate = useCommonNavigate();
 
   const handleConnectProposals = () => {
-    navigate('/community/integrations');
+    navigate('/manage/integrations');
   };
 
   return (

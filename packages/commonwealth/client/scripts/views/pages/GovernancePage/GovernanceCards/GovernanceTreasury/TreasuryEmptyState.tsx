@@ -8,7 +8,7 @@ const TreasuryEmptyState = () => {
   const navigate = useCommonNavigate();
 
   const handleConnectTreasury = () => {
-    navigate('/community/integrations');
+    navigate('/manage/integrations');
   };
 
   return (
