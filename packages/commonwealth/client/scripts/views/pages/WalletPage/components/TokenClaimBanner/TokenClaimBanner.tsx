@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import { notifySuccess } from 'client/scripts/controllers/app/notifications';
 import { formatAddressShort } from 'client/scripts/helpers';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import AddressInfo from 'client/scripts/models/AddressInfo';
@@ -230,7 +231,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
               className="copy-icon"
               onClick={() => {
                 void navigator.clipboard.writeText(selectedAddress.address);
-                // TODO: Add success toast
+                notifySuccess('Address copied to clipboard!');
               }}
             />
           )}
@@ -264,16 +265,25 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
           <div className="notice-text">
             <p className="base-notice">
               You claimed your tokens on{' '}
-              {claimAddress.magna_claimed_at &&
-                new Date(claimAddress.magna_claimed_at).toLocaleString()}
+              {claimAddress.magna_claimed_at && (
+                <strong>
+                  {new Date(claimAddress.magna_claimed_at).toLocaleString()}
+                </strong>
+              )}
             </p>
-            <a
-              href={`https://basescan.org/tx/${txHash}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {txHash.slice(0, 6)}...{txHash.slice(-4)}
-            </a>
+            <CWButton
+              label="View transaction on BaseScan"
+              onClick={() =>
+                window.open(
+                  `https://basescan.org/tx/${txHash}`,
+                  '_blank',
+                  'noopener,noreferrer',
+                )
+              }
+              buttonType="secondary"
+              className="tx-link-button"
+              aria-label="View transaction on BaseScan"
+            />
           </div>
         </div>
       );
