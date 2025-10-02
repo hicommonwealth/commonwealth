@@ -237,6 +237,7 @@ export const ThreadCard = ({
               hideTrendingTag={hideTrendingTag}
               communityHomeLayout={communityHomeLayout}
               shouldShowRole
+              viewsCount={thread.viewCount}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
