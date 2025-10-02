@@ -11,7 +11,7 @@ const shouldClearTable = args.includes('--clear');
 const OPENSEA_API_KEY = config.OPENSEA_API_KEY;
 const COLLECTION_SLUG = 'lamumu-by-common';
 const CHAIN = 'ethereum';
-const DELAY_MS = 500; // Delay between API calls to respect rate limits
+const DELAY_MS = 250; // Delay between API calls to respect rate limits
 const TESTING_NFT_COUNT = 21;
 
 // Types
