@@ -90,7 +90,7 @@ const GovernanceTresury = () => {
       </div>
       <div className="card-body">
         <div className="price-details">
-          <CWText fontWeight="semiBold" type="h1">
+          <CWText fontWeight="semiBold" type="h2">
             ${ethToUsdRate}
           </CWText>
           <div>
