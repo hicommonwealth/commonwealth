@@ -70,10 +70,10 @@ class SignTokenClaim extends ContractBase {
       // format to ETH for readability
       const requiredEth = parseFloat(
         this.web3.utils.fromWei(requiredGasCost, 'ether'),
-      ).toFixed(5);
+      ).toFixed(8);
       const balanceEth = parseFloat(
         this.web3.utils.fromWei(balance, 'ether'),
-      ).toFixed(5);
+      ).toFixed(8);
 
       return {
         gasLimit: gasLimit.toString(),
