@@ -181,8 +181,34 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     );
   }
 
-  if (!claimAddress?.tokens || isLoadingClaimAddress) {
+  if (isLoadingClaimAddress) {
     return null;
+  }
+
+  // Logged-in user with zero allocation: show an informational banner
+  const tokensNumber = Number(claimAddress?.tokens ?? 0);
+  if (user.isLoggedIn && claimAddress && tokensNumber <= 0) {
+    return (
+      <div className="TokenClaimBanner">
+        <CWBanner
+          type="info"
+          body={
+            <div className="banner-content">
+              <h3 className="description">No COMMON allocation at this time</h3>
+              <CWText>
+                This round recognizes earlier participation by community members
+                across activity, collectibles, and rewards history. Your account
+                isn’t included in this snapshot.
+              </CWText>
+              <CWText>
+                Keep participating—join communities, contribute, and watch for
+                future reward opportunities.
+              </CWText>
+            </div>
+          }
+        />
+      </div>
+    );
   }
 
   // Create the address form content to include in actions
