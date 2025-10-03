@@ -2,6 +2,7 @@ import { Actor, logger } from '@hicommonwealth/core';
 import { config } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import { User } from '@hicommonwealth/schemas';
+import { getWhitelistedTools } from '@hicommonwealth/shared';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {
@@ -74,12 +75,24 @@ async function checkBypass(req: Request) {
   return true;
 }
 
+// This MCP server represents the 'commonwealth-api' server handle
+const COMMONWEALTH_MCP_SERVER_HANDLE = 'commonwealth-api';
+
 // map external trpc router procedures to MCP tools
 export const buildMCPTools = (): Array<CommonMCPTool> => {
   const procedures = Object.keys(externalApi) as Array<
     keyof typeof externalApi
   >;
-  const tools = procedures.map((key) => {
+
+  // Get whitelist for the Commonwealth API server
+  const whitelistedTools = getWhitelistedTools(COMMONWEALTH_MCP_SERVER_HANDLE);
+
+  // Filter procedures based on whitelist if it exists
+  const filteredProcedures = whitelistedTools
+    ? procedures.filter((key) => whitelistedTools.includes(key))
+    : procedures;
+
+  const tools = filteredProcedures.map((key) => {
     const procedure = externalApi[key];
     const inputSchema = procedure._def.inputs[0] as ZodType;
     if (!inputSchema) {
