@@ -138,48 +138,48 @@ const ProposalListing = ({
     return unifiedProposals;
   }, [unifiedProposals, filter]);
 
-  const rowData = useMemo(
-    () =>
-      filteredProposals.map((proposal, idx) => ({
-        key: idx,
-        proposal: (
-          <div style={{ whiteSpace: 'nowrap' }}>
-            <CWTag label={proposal.status} type="proposal" />
-            <CWText fontWeight="semiBold">
-              {smartTrim(proposal.title, 30)}
-            </CWText>
-          </div>
-        ),
-        votes: (
-          // TODO : Will levrage the componet developed in ISSUE##11070
+  const rowData = useMemo(() => {
+    if (!filteredProposals.length) return [];
+    
+    return filteredProposals.map((proposal, idx) => ({
+      key: `${proposal.title}-${idx}`,
+      proposal: (
+        <div style={{ whiteSpace: 'nowrap' }}>
+          <CWTag label={proposal.status} type="proposal" />
+          <CWText fontWeight="semiBold">
+            {smartTrim(proposal.title, 30)}
+          </CWText>
+        </div>
+      ),
+      votes: (
+        // TODO : Will levrage the componet developed in ISSUE##11070
+        <CWText fontWeight="regular" type="caption">
+          N/A
+        </CWText>
+      ),
+      status: (
+        <div style={{ whiteSpace: 'nowrap' }}>
+          <CWText fontWeight="regular" type="caption">
+            {proposal.status || ''}
+          </CWText>
+        </div>
+      ),
+      quorum: (
+        <div style={{ whiteSpace: 'nowrap' }}>
           <CWText fontWeight="regular" type="caption">
             N/A
           </CWText>
-        ),
-        status: (
-          <div style={{ whiteSpace: 'nowrap' }}>
-            <CWText fontWeight="regular" type="caption">
-              {proposal.status || ''}
-            </CWText>
-          </div>
-        ),
-        quorum: (
-          <div style={{ whiteSpace: 'nowrap' }}>
-            <CWText fontWeight="regular" type="caption">
-              N/A
-            </CWText>
-          </div>
-        ),
-        comment: (
-          <div style={{ whiteSpace: 'nowrap' }}>
-            <CWText fontWeight="regular" type="caption">
-              No linked proposals found
-            </CWText>
-          </div>
-        ),
-      })),
-    [filteredProposals],
-  );
+        </div>
+      ),
+      comment: (
+        <div style={{ whiteSpace: 'nowrap' }}>
+          <CWText fontWeight="regular" type="caption">
+            No linked proposals found
+          </CWText>
+        </div>
+      ),
+    }));
+  }, [filteredProposals]);
 
   const handleSnapshotChange = useCallback(
     (selected: OptionType | null) => {
@@ -196,7 +196,7 @@ const ProposalListing = ({
 
   const TableComponent = useMemo(() => {
     return <CWTable columnInfo={columnInfo} rowData={rowData} />;
-  }, [rowData]);
+  }, [rowData, columnInfo]);
 
   if (chain === ChainBase.Ethereum && isSnapshotProposalsLoading) {
     return <LoadingIndicator message="Connecting to chain" />;
@@ -239,7 +239,13 @@ const ProposalListing = ({
 
       <div className="view-container">
         {view === 'table' ? (
-          <>{TableComponent}</>
+          filteredProposals.length > 0 ? (
+            TableComponent
+          ) : (
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              <CWText>No proposals found</CWText>
+            </div>
+          )
         ) : (
           <VirtuosoGrid
             data={filteredProposals}
