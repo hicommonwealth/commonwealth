@@ -1,0 +1,129 @@
+import { notifySuccess } from 'controllers/app/notifications';
+import React, { useState } from 'react';
+import FractionalValue from 'views/components/FractionalValue';
+import { CWText } from 'views/components/component_kit/cw_text';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWIconButton } from 'views/components/component_kit/new_designs/CWIconButton/CWIconButton';
+import {
+  CWTab,
+  CWTabsRow,
+} from 'views/components/component_kit/new_designs/CWTabs';
+import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import RewardsCard from '../../RewardsCard';
+import AddressSelector from './AddressSelector/AddressSelector';
+import useAddressSelector from './AddressSelector/useAddressSelector';
+import MagicWalletManager from './MagicWalletManager/MagicWalletManager';
+import NetworkSelector from './NetworkSelector/NetworkSelector';
+import useNetworkSelector from './NetworkSelector/useNetworkSelector';
+import './WalletCard.scss';
+import useUserWalletHoldings from './useUserWalletHoldings';
+
+enum WalletBalanceTabs {
+  Tokens = 'Tokens',
+  Stake = 'Stake',
+}
+
+const WalletCard = () => {
+  const [activeTab, setActiveTab] = useState<WalletBalanceTabs>(
+    WalletBalanceTabs.Tokens,
+  );
+  const { selectedNetwork, setSelectedNetwork } = useNetworkSelector({});
+  const { selectedAddress, setSelectedAddress, uniqueAddresses } =
+    useAddressSelector();
+
+  const { isLoadingTokensInfo, userCombinedUSDBalance, userTokens, refetch } =
+    useUserWalletHoldings({
+      userSelectedAddress: selectedAddress,
+      selectedNetworkChainId: selectedNetwork.value,
+    });
+
+  const handleRefresh = async () => {
+    await refetch();
+    notifySuccess('Wallet balances refreshed successfully');
+  };
+
+  return (
+    <RewardsCard
+      title="Wallet Balance"
+      icon="cardholder"
+      customAction={
+        <div style={{ marginLeft: 'auto' }}>
+          <CWIconButton
+            iconName="arrowClockwise"
+            onClick={() => {
+              handleRefresh().catch(console.error);
+            }}
+            disabled={isLoadingTokensInfo}
+          />
+        </div>
+      }
+    >
+      <div className="WalletCard">
+        <div className="network-address-selector">
+          <AddressSelector
+            address={selectedAddress}
+            addressList={uniqueAddresses}
+            onAddressSelected={(address) => {
+              setSelectedAddress(address);
+              handleRefresh().catch(console.error);
+            }}
+          />
+          <NetworkSelector
+            network={selectedNetwork}
+            onNetworkSelected={(network) => {
+              setSelectedNetwork(network);
+              handleRefresh().catch(console.error);
+            }}
+          />
+        </div>
+        <CWText type="caption">
+          Total token balance for {selectedNetwork.label}
+        </CWText>
+        {isLoadingTokensInfo ? (
+          <CWCircleMultiplySpinner />
+        ) : (
+          <CWText type="h4">
+            $&nbsp;
+            <FractionalValue type="h4" value={userCombinedUSDBalance} />
+          </CWText>
+        )}
+        <MagicWalletManager
+          userSelectedAddress={selectedAddress}
+          selectedNetworkChainId={selectedNetwork.value}
+        />
+        <CWTabsRow>
+          {Object.values(WalletBalanceTabs).map((tab) => (
+            <CWTab
+              key={tab}
+              label={tab}
+              isSelected={activeTab === tab}
+              onClick={() => setActiveTab(tab)}
+            />
+          ))}
+        </CWTabsRow>
+        <div className="list">
+          {activeTab === WalletBalanceTabs.Tokens ? (
+            isLoadingTokensInfo ? (
+              <CWCircleMultiplySpinner />
+            ) : (
+              userTokens.map((token) => (
+                <div className="balance-row" key={token.name}>
+                  {withTooltip(
+                    <CWText className="cursor-pointer">{token.name}</CWText>,
+                    token.symbol,
+                    true,
+                  )}
+                  <FractionalValue value={token.balance} />
+                </div>
+              ))
+            )
+          ) : (
+            <CWText isCentered>🚧 Coming Soon, Hang tight!</CWText>
+          )}
+        </div>
+      </div>
+    </RewardsCard>
+  );
+};
+
+export default WalletCard;

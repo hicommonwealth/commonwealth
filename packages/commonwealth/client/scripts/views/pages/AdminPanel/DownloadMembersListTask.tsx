@@ -1,20 +1,39 @@
+import useGetMembersStatsQuery from 'client/scripts/state/api/superAdmin/getMembersStats';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import { CWText } from '../../components/component_kit/cw_text';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import './AdminPanel.scss';
 import CommunityFinder from './CommunityFinder';
-import { downloadCSV, getCSVContent } from './utils';
+import { downloadCSV } from './utils';
 
 const DownloadMembersListTask = () => {
   const [componentKey, setComponentKey] = useState(1);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const [communityId, setCommunityId] = useState<string>('');
+  const { data: membersStats, isLoading: membersStatsLoading } =
+    useGetMembersStatsQuery({ communityId });
 
-  const openConfirmationModal = (communityId: string) => {
+  React.useEffect(() => {
+    if (!membersStatsLoading && membersStats) {
+      try {
+        setIsDownloading(true);
+        downloadCSV(membersStats.members, `${communityId}_members_list.csv`);
+        setIsDownloading(false);
+        setComponentKey((k) => k + 1);
+        notifySuccess('Members list downloaded');
+      } catch (e) {
+        notifyError('Error downloading members list');
+        console.error(e);
+      }
+    }
+  }, [membersStats, membersStatsLoading, communityId]);
+
+  const openConfirmationModal = (community_id: string) => {
     openConfirmation({
       title: 'Download Members List',
       description: `
-        This will download a CSV file with member information for ${communityId}. 
+        This will download a CSV file with member information for ${community_id}. 
         This can take a few seconds.
       `,
       buttons: [
@@ -22,19 +41,7 @@ const DownloadMembersListTask = () => {
           label: 'Download',
           buttonType: 'primary',
           buttonHeight: 'sm',
-          onClick: async () => {
-            try {
-              setIsDownloading(true);
-              const res = await getCSVContent({ id: communityId });
-              downloadCSV(res, `${communityId}_members_list.csv`);
-              setIsDownloading(false);
-              setComponentKey((k) => k + 1);
-              notifySuccess('Members list downloaded');
-            } catch (e) {
-              notifyError('Error downloading members list');
-              console.error(e);
-            }
-          },
+          onClick: () => setCommunityId(community_id),
         },
         {
           label: 'Cancel',
@@ -54,7 +61,7 @@ const DownloadMembersListTask = () => {
       <CommunityFinder
         ctaLabel="Download"
         actionDisabled={isDownloading}
-        onAction={(communityId) => openConfirmationModal(communityId)}
+        onAction={(community_id) => openConfirmationModal(community_id)}
       />
     </div>
   );

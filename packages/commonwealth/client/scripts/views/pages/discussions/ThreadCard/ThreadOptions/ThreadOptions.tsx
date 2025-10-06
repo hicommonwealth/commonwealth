@@ -1,6 +1,9 @@
+import { GetThreadToken } from '@hicommonwealth/schemas';
 import {
+  ActionGroups,
   CanvasSignedData,
   deserializeCanvas,
+  GatedActionEnum,
   verify,
 } from '@hicommonwealth/shared';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
@@ -8,22 +11,27 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { pluralize } from 'helpers';
-import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import { formatMarketCap } from 'helpers/formatting';
+import { useTokenPricing } from 'hooks/useTokenPricing';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { downloadDataAsFile } from 'utils/downloadDataAsFile';
 import ShareButton from 'views/components/ShareButton';
+import { ThreadTokenDrawerTrigger } from 'views/components/ThreadTokenDrawer';
 import { ViewUpvotesDrawerTrigger } from 'views/components/UpvoteDrawer';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ToggleThreadSubscribe } from 'views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
+import { z } from 'zod';
 import { AdminActions, AdminActionsProps } from './AdminActions';
 import { ReactionButton } from './ReactionButton';
 import './ThreadOptions.scss';
 
 type OptionsProps = AdminActionsProps & {
   thread?: Thread;
+  threadToken?: z.infer<typeof GetThreadToken.output>;
   upvoteBtnVisible?: boolean;
   commentBtnVisible?: boolean;
   shareEndpoint?: string;
@@ -31,7 +39,6 @@ type OptionsProps = AdminActionsProps & {
   canReact?: boolean;
   canComment?: boolean;
   totalComments?: number;
-  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   onCommentBtnClick?: () => any;
   upvoteDrawerBtnBelow?: boolean;
   hideUpvoteDrawerButton?: boolean;
@@ -42,16 +49,19 @@ type OptionsProps = AdminActionsProps & {
   showCommentVisible?: boolean;
   toggleShowComments?: () => void;
   showOnlyThreadActionIcons?: boolean;
+  actionGroups: ActionGroups;
+  bypassGating: boolean;
+  onTradeClick?: () => void;
+  onTokenDrawerClick?: () => void;
 };
 
 export const ThreadOptions = ({
   thread,
+  threadToken,
   upvoteBtnVisible = false,
   commentBtnVisible = true,
   shareEndpoint,
   canUpdateThread,
-  canReact = true,
-  canComment = true,
   totalComments,
   onLockToggle,
   onCollaboratorsEdit,
@@ -64,7 +74,6 @@ export const ThreadOptions = ({
   onSnapshotProposalFromThread,
   onSpamToggle,
   hasPendingEdits,
-  disabledActionsTooltipText = '',
   onCommentBtnClick = () => null,
   upvoteDrawerBtnBelow,
   hideUpvoteDrawerButton = false,
@@ -75,6 +84,10 @@ export const ThreadOptions = ({
   showCommentVisible,
   toggleShowComments,
   showOnlyThreadActionIcons = false,
+  actionGroups,
+  bypassGating,
+  onTradeClick,
+  onTokenDrawerClick,
 }: OptionsProps) => {
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   const userStore = useUserStore();
@@ -82,6 +95,16 @@ export const ThreadOptions = ({
   const handleDownloadMarkdown = () => {
     downloadDataAsFile(thread.body, 'text/markdown', thread.title + '.md');
   };
+
+  const permissions = Permissions.getMultipleActionsPermission({
+    actions: [
+      GatedActionEnum.CREATE_THREAD_REACTION,
+      GatedActionEnum.CREATE_COMMENT,
+    ] as const,
+    thread,
+    actionGroups,
+    bypassGating,
+  });
 
   const [verifiedCanvasSignedData, setVerifiedCanvasSignedData] =
     useState<CanvasSignedData | null>(null);
@@ -101,6 +124,12 @@ export const ThreadOptions = ({
     }
   }, [thread.canvasSignedData]);
 
+  const { pricing: tokenPricing, isLoading: isPricingLoading } =
+    useTokenPricing({
+      token: threadToken as unknown as LaunchpadToken,
+    });
+  const lastPurchaseActivity = thread.lastPurchaseActivity;
+
   return (
     <>
       <div className="ThreadOptions">
@@ -119,13 +148,9 @@ export const ThreadOptions = ({
             <ReactionButton
               thread={thread}
               size="small"
-              disabled={!canReact}
+              disabled={!permissions.CREATE_THREAD_REACTION.allowed}
               undoUpvoteDisabled={editingDisabled}
-              tooltipText={
-                typeof disabledActionsTooltipText === 'function'
-                  ? disabledActionsTooltipText?.('upvote')
-                  : disabledActionsTooltipText
-              }
+              tooltipText={permissions.CREATE_THREAD_REACTION.tooltip}
             />
           )}
 
@@ -139,17 +164,68 @@ export const ThreadOptions = ({
                     pluralize(totalComments, 'Comment')
               }
               action="comment"
-              disabled={!canComment}
+              disabled={!permissions.CREATE_COMMENT.allowed}
               onClick={(e) => {
                 e.preventDefault();
                 onCommentBtnClick();
                 onCommentClick && onCommentClick();
               }}
-              tooltipText={
-                typeof disabledActionsTooltipText === 'function'
-                  ? disabledActionsTooltipText?.('comment')
-                  : disabledActionsTooltipText
+              tooltipText={permissions.CREATE_COMMENT.tooltip}
+            />
+          )}
+
+          {threadToken?.token_address && onTokenDrawerClick && (
+            <ThreadTokenDrawerTrigger
+              onClick={(e) => {
+                e.preventDefault();
+                onTokenDrawerClick();
+              }}
+              label={showOnlyThreadActionIcons ? '' : 'Holders'}
+              showLabel={!showOnlyThreadActionIcons}
+            />
+          )}
+
+          {threadToken?.token_address && onTradeClick && (
+            <CWTooltip
+              placement="top"
+              content={
+                tokenPricing?.marketCapCurrent
+                  ? `Market Cap: ${formatMarketCap(tokenPricing.marketCapCurrent)}`
+                  : lastPurchaseActivity?.is_buy !== undefined
+                    ? `Last trade: ${lastPurchaseActivity.is_buy ? 'Buy' : 'Sell'}`
+                    : 'View market cap'
               }
+              renderTrigger={(handleInteraction) => (
+                <button
+                  className="ThreadAction"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onTradeClick();
+                  }}
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                >
+                  {lastPurchaseActivity?.is_buy !== undefined && (
+                    <CWIcon
+                      iconName={
+                        lastPurchaseActivity.is_buy
+                          ? 'arrowUpHalfGreen'
+                          : 'arrowDownHalfOrange'
+                      }
+                      iconSize="small"
+                    />
+                  )}
+                  {!showOnlyThreadActionIcons && (
+                    <CWText type="caption" fontWeight="regular">
+                      {isPricingLoading
+                        ? 'Loading...'
+                        : tokenPricing?.marketCapCurrent
+                          ? formatMarketCap(tokenPricing.marketCapCurrent)
+                          : 'Market Cap'}
+                    </CWText>
+                  )}
+                </button>
+              )}
             />
           )}
 

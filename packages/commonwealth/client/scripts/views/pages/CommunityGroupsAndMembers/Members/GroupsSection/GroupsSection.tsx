@@ -1,11 +1,19 @@
+import { jumpHighlightElement } from 'helpers/html';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import Group from 'models/Group';
 import MinimumProfile from 'models/MinimumProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import { useFetchNodesQuery } from 'state/api/nodes';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles/index';
 import TopicGatingHelpMessage from '../../Groups/TopicGatingHelpMessage/index';
-import { chainTypes, requirementTypes } from '../../common/constants';
+import { GroupTrustLevelOptions } from '../../Groups/common/GroupForm/RequirementSubForm/helpers';
+import {
+  getChainTypes,
+  requirementTypes,
+  TRUST_LEVEL_SPECIFICATION,
+} from '../../common/constants';
 import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
 import GroupCard from './GroupCard';
 import './GroupsSection.scss';
@@ -36,9 +44,27 @@ const GroupsSection = ({
     apiCallEnabled: profileAddresses?.length > 0,
   });
 
+  const { data: chainNodes } = useFetchNodesQuery();
+
   const profileMap = new Map<string, MinimumProfile>(
     profiles?.map((p) => [p.address, p]),
   );
+
+  useRunOnceOnCondition({
+    callback: () => {
+      const groupIdToHighlight = new URLSearchParams(
+        window.location.search,
+      ).get(`groupId`);
+      if (groupIdToHighlight) {
+        setTimeout(() => {
+          jumpHighlightElement({
+            elementQuerySelecter: `.group-${groupIdToHighlight}`,
+          });
+        }, 200);
+      }
+    },
+    shouldRun: filteredGroups?.length > 0,
+  });
 
   return (
     <section className="GroupsSection">
@@ -46,20 +72,26 @@ const GroupsSection = ({
 
       {filteredGroups?.length > 0 && (
         <section className="list-container">
-          {filteredGroups?.map((group, index) => (
+          {filteredGroups?.map((group) => (
             <GroupCard
-              key={index}
+              key={group.id}
+              groupId={group.id}
               groupName={group.name}
               groupDescription={group.description}
               // @ts-expect-error <StrictNullChecks/>
               requirements={group.requirements
-                .filter((r) => r?.data?.source) // filter erc groups
+                .filter(
+                  (r) =>
+                    r?.data?.source || r.rule === TRUST_LEVEL_SPECIFICATION,
+                )
                 .map((r) => ({
-                  requirementType: requirementTypes?.find(
-                    (x) => x.value === r?.data?.source?.source_type,
+                  requirementType: requirementTypes?.find((x) =>
+                    r?.data?.source?.source_type
+                      ? x.value === r?.data?.source?.source_type
+                      : x.value === TRUST_LEVEL_SPECIFICATION,
                   )?.label,
                   requirementChain:
-                    chainTypes
+                    getChainTypes(chainNodes || [])
                       ?.find(
                         (x) =>
                           `${x.value}` ===
@@ -67,17 +99,26 @@ const GroupsSection = ({
                             r?.data?.source?.evm_chain_id ||
                             r?.data?.source?.cosmos_chain_id ||
                             r?.data?.source?.solana_network ||
+                            r?.data?.source?.sui_network ||
                             ''
                           }`,
                       )
                       ?.label?.split('-')
                       ?.join(' ') || '',
-                  requirementContractAddress: r.data.source.contract_address,
-                  requirementTokenId: r.data.source.token_id,
+                  requirementContractAddress:
+                    r?.data?.source?.contract_address ||
+                    r?.data?.source?.collection_id,
+                  requirementTokenId: r?.data?.source?.token_id,
                   requirementAmount: `${convertRequirementAmountFromWeiToTokens(
                     r?.data?.source?.source_type,
-                    r.data.threshold,
+                    r?.data?.threshold,
                   )}`,
+                  requirementTrustLevel:
+                    GroupTrustLevelOptions.find(
+                      (requirementType) =>
+                        requirementType.value.toString() ===
+                        r?.data?.minimum_trust_level?.toString(),
+                    )?.label || '',
                   requirementCondition: 'More than', // hardcoded in api
                 }))}
               requirementsToFulfill={
@@ -93,6 +134,7 @@ const GroupsSection = ({
               topics={(group?.topics || []).map((x) => ({
                 id: x.id,
                 name: x.name,
+                is_private: x.is_private,
                 permissions: x.permissions,
               }))}
               canEdit={canManageGroups}

@@ -1,4 +1,6 @@
-import { dispose, logger } from '@hicommonwealth/core';
+import { disableService, dispose, logger } from '@hicommonwealth/core';
+import { factoryContracts } from '@hicommonwealth/evm-protocols';
+import { getAddress } from 'viem';
 import { config } from '../../config';
 import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
 
@@ -15,6 +17,7 @@ const log = logger(import.meta);
 export async function startEvmPolling(
   interval: number,
 ): Promise<NodeJS.Timeout> {
+  await disableService();
   log.info(`Starting EVM poller`);
   if (interval > 500_000) {
     throw new Error(
@@ -25,6 +28,26 @@ export async function startEvmPolling(
   log.info(
     `All chains will be polled for events every ${interval / 1000} seconds`,
   );
+
+  // Validate factory contract addresses are checksum
+  for (const [chainId, contracts] of Object.entries(factoryContracts)) {
+    for (const [contractName, address] of Object.entries(contracts)) {
+      if (typeof address === 'string') {
+        try {
+          if (getAddress(address) !== address) {
+            log.fatal(
+              `Invalid checksum address for ${contractName} on chain ${chainId}: ${address}`,
+            );
+          }
+        } catch (e) {
+          log.fatal(
+            `Invalid checksum address for ${contractName} on chain ${chainId}: ${address}`,
+          );
+        }
+      }
+    }
+  }
+
   await scheduleNodeProcessing(interval, processChainNode);
   return setInterval(
     scheduleNodeProcessing,

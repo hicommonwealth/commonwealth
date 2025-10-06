@@ -1,0 +1,46 @@
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/border_radius';
+
+.EmptyThreadCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  min-height: 250px;
+  width: 330px;
+  border: 1px solid colors.$neutral-300;
+  border-radius: border_radius.$border-radius-corners;
+  height: 280px;
+  box-sizing: border-box;
+  margin: 10px 0;
+  cursor: default;
+
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+
+    .icon {
+      color: colors.$neutral-600;
+      margin-bottom: 8px;
+    }
+
+    .title {
+      color: colors.$neutral-900;
+    }
+
+    .subtitle {
+      color: colors.$neutral-700;
+      max-width: 300px;
+    }
+
+    .start-thread-button {
+      margin-top: 16px;
+      min-width: 200px;
+    }
+  }
+}

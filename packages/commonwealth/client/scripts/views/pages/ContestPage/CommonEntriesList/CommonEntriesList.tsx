@@ -91,6 +91,8 @@ export const CommonEntriesList = ({
           thread={thread}
           communityId={communityId}
           contestsData={contestsData}
+          actionGroups={{}}
+          bypassGating={false}
         />
       ))}
     </div>

@@ -81,6 +81,21 @@ export async function verifyAddress(
       };
     }
 
+    if (community.base === ChainBase.Sui) {
+      // Sui address format validation - typically a 64-character hex string with 0x prefix
+      const suiAddressPattern = /^0x[a-fA-F0-9]{64}$/;
+
+      if (!suiAddressPattern.test(address)) {
+        throw new InvalidAddress(address, 'Invalid Sui address format');
+      }
+
+      return {
+        base: community.base,
+        encodedAddress: address,
+        eth_chain_id: community.ChainNode?.eth_chain_id,
+      };
+    }
+
     // cosmos or injective
     if (community.bech32_prefix) {
       const { words } = bech32.decode(address, 50);

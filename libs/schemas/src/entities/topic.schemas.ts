@@ -1,9 +1,15 @@
+import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 
 export enum TopicWeightedVoting {
   Stake = 'stake',
   ERC20 = 'erc20',
+  SPL = 'spl',
+  SuiNative = 'sui_native',
+  SuiToken = 'sui_token',
+  SuiNFT = 'sui_nft',
+  ERC1155ID = 'erc1155id',
 }
 
 export const Topic = z.object({
@@ -15,7 +21,7 @@ export const Topic = z.object({
     .max(255)
     .default('General')
     .refine(
-      (v) => !v.match(/["<>%{}|\\/^`]/g),
+      (v) => !v.match(DISALLOWED_TOPIC_NAMES_REGEX),
       'Name must not contain special characters',
     ),
   community_id: z.string().max(255),
@@ -26,9 +32,8 @@ export const Topic = z.object({
   default_offchain_template: z.string().nullish(),
   order: PG_INT.nullish(),
   channel_id: z.string().max(255).nullish(),
-  group_ids: z.array(PG_INT).default([]),
   default_offchain_template_backup: z.string().nullish(),
-  weighted_voting: z.nativeEnum(TopicWeightedVoting).nullish(),
+  weighted_voting: z.enum(TopicWeightedVoting).nullish(),
   chain_node_id: z
     .number()
     .int()
@@ -37,21 +42,23 @@ export const Topic = z.object({
   token_address: z
     .string()
     .nullish()
-    .describe('token address, used for ERC20 topics'),
+    .describe(
+      'token address, used for ERC20/SPL/SuiToken topics (for SuiToken, this stores the coin type)',
+    ),
   token_symbol: z
     .string()
     .nullish()
-    .describe('token symbol, used for ERC20 topics'),
+    .describe('token symbol, used for token-based topics'),
   vote_weight_multiplier: z
     .number()
     .gt(0)
     .nullish()
-    .describe('vote weight multiplier, used for ERC20 topics'),
+    .describe('vote weight multiplier, used for token weighted topics'),
   token_decimals: z
     .number()
     .gte(0)
     .nullish()
-    .describe('number of decimals of ERC20 token'),
+    .describe('number of decimals of token'),
   allow_tokenized_threads: z
     .boolean()
     .optional()
@@ -61,4 +68,6 @@ export const Topic = z.object({
   updated_at: z.coerce.date().optional(),
   deleted_at: z.coerce.date().nullish(),
   archived_at: z.coerce.date().nullish(),
+  recalculated_votes_start: z.coerce.date().nullish(),
+  recalculated_votes_finish: z.coerce.date().nullish(),
 });

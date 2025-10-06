@@ -1,24 +1,40 @@
+import { LaunchpadTokenView, ThreadTokenView } from '@hicommonwealth/schemas';
+import { getDefaultContestImage } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
+import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import clsx from 'clsx';
-import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
+import {
+  currencyNameToSymbolMap,
+  SupportedFiatCurrencies,
+} from 'helpers/currency';
+import { useTokenPricing } from 'hooks/useTokenPricing';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { TradingMode } from 'views/modals/TradeTokenModel';
+import z from 'zod';
+import { CWTag } from '../component_kit/new_designs/CWTag';
 import FractionalValue from '../FractionalValue';
 import MarketCapProgress from './MarketCapProgress';
 import PricePercentageChange from './PricePercentageChange';
 import './TokenCard.scss';
+import TokenHolderStats from './TokenHolderStats';
 
-export interface TokenCardProps {
-  name: string;
-  symbol: string;
-  iconURL: string;
-  currency?: SupportedCurrencies;
-  marketCap: { current: number; goal: number; isCapped: boolean };
-  price: number;
+interface TokenPricing {
+  currentPrice: number;
   pricePercentage24HourChange: number;
-  mode: TradingMode.Buy | TradingMode.Swap;
+  marketCapCurrent: number;
+  marketCapGoal: number;
+  isMarketCapGoalReached: boolean;
+}
+
+export type TokenType =
+  | z.infer<typeof LaunchpadTokenView>
+  | z.infer<typeof ThreadTokenView>;
+export interface TokenCardProps {
+  token: TokenType;
+  currency?: SupportedFiatCurrencies;
   className?: string;
   onCTAClick?: (mode: TradingMode) => void;
   onCardBodyClick?: () => void;
@@ -27,18 +43,20 @@ export interface TokenCardProps {
 const MAX_CHARS_FOR_LABELS = 9;
 
 const TokenCard = ({
-  name,
-  symbol,
-  iconURL,
-  currency = SupportedCurrencies.USD,
-  marketCap,
-  price,
-  pricePercentage24HourChange,
-  mode,
+  token,
+  currency = SupportedFiatCurrencies.USD,
   className,
   onCardBodyClick,
   onCTAClick,
 }: TokenCardProps) => {
+  const navigate = useCommonNavigate();
+  const { name, symbol, icon_url } = token;
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+
+  const { pricing } = useTokenPricing({ token }) as {
+    pricing: TokenPricing;
+  };
+
   const currencySymbol = currencyNameToSymbolMap[currency];
 
   const handleBodyClick = (e: React.MouseEvent) =>
@@ -53,6 +71,21 @@ const TokenCard = ({
     ? symbol.slice(0, MAX_CHARS_FOR_LABELS) + '...'
     : symbol;
 
+  const mode =
+    token.token_type === 'launchpad'
+      ? pricing.isMarketCapGoalReached
+        ? TradingMode.Swap
+        : TradingMode.Buy
+      : 'View thread';
+
+  const handleCTAClick = () => {
+    if (mode === 'View thread') {
+      token.thread_id && navigate(`/discussion/${token.thread_id}`, {}, null);
+    } else {
+      onCTAClick?.(mode);
+    }
+  };
+
   return (
     <div
       role="button"
@@ -60,7 +93,14 @@ const TokenCard = ({
       className={clsx('TokenCard', className)}
       onClick={handleBodyClick}
     >
-      <img src={iconURL} className="image" onClick={handleBodyClick} />
+      <img
+        src={icon_url || getDefaultContestImage()}
+        className="image"
+        onClick={handleBodyClick}
+      />
+      {tokenizedThreadsEnabled && (
+        <CWTag type="info" label={token.token_type} classNames="capitalize" />
+      )}
       {/* name and price row */}
       <div className="basic-info" onClick={handleBodyClick}>
         <div className="col">
@@ -81,7 +121,7 @@ const TokenCard = ({
           <CWText className="text-dark ml-auto" type="h4" fontWeight="regular">
             {currencySymbol}
             <FractionalValue
-              value={price}
+              value={pricing.currentPrice}
               type="h4"
               fontWeight="regular"
               className="text-dark"
@@ -89,16 +129,25 @@ const TokenCard = ({
           </CWText>
           <CWText className="ml-auto text-light" type="caption">
             <PricePercentageChange
-              pricePercentage24HourChange={pricePercentage24HourChange}
+              pricePercentage24HourChange={pricing.pricePercentage24HourChange}
             />
           </CWText>
         </div>
       </div>
-      {/* market cap row */}
       <MarketCapProgress
-        marketCap={marketCap}
+        marketCap={{
+          current: Number(pricing.marketCapCurrent),
+          goal: Number(pricing.marketCapGoal),
+          isCapped: Boolean(pricing.isMarketCapGoalReached),
+        }}
         currency={currency}
         onBodyClick={handleBodyClick}
+      />
+      <TokenHolderStats
+        tokenAddress={token.token_address}
+        currency={currency}
+        className="token-stats"
+        onClick={handleBodyClick}
       />
       {/* action cta */}
       <CWButton
@@ -107,7 +156,7 @@ const TokenCard = ({
         buttonWidth="full"
         buttonType="secondary"
         buttonAlt="green"
-        onClick={() => onCTAClick?.(mode)}
+        onClick={handleCTAClick}
       />
     </div>
   );

@@ -1,0 +1,93 @@
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+
+.ReferralTable {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .loading-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    gap: 8px;
+
+    .empty-state-text {
+      color: colors.$neutral-400;
+    }
+  }
+
+  .table-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    width: 100%;
+
+    &.text-right {
+      justify-content: flex-end;
+    }
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .community-cell {
+    .community-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: inherit;
+
+      .community-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        object-fit: cover;
+      }
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .no-community {
+      color: colors.$neutral-400;
+      font-style: italic;
+    }
+  }
+
+  .namespace-cell {
+    .no-namespace {
+      color: colors.$neutral-400;
+      font-style: italic;
+    }
+  }
+}

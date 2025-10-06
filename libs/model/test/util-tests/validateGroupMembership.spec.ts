@@ -1,10 +1,7 @@
-import {
-  OptionsWithBalances,
-  validateGroupMembership,
-} from '@hicommonwealth/model';
-import { BalanceSourceType, Requirement } from '@hicommonwealth/shared';
-import { expect } from 'chai';
-import { describe, test } from 'vitest';
+import { BalanceSourceType, WalletSsoSource } from '@hicommonwealth/shared';
+import { describe, expect, test } from 'vitest';
+import type { OptionsWithBalances } from '../../src/services/tokenBalanceCache/types';
+import { Requirement, validateGroupMembership } from '../../src/utils';
 
 type MockRequirementOptions = {
   threshold: string;
@@ -78,7 +75,7 @@ describe('validateGroupMembership', () => {
     ];
 
     const result = await validateGroupMembership(
-      '0x111',
+      { address: '0x111', address_id: 1, user_id: 1, user_tier: 1 },
       requirements,
       balances,
       1,
@@ -115,7 +112,7 @@ describe('validateGroupMembership', () => {
     ];
 
     const result = await validateGroupMembership(
-      '0x111',
+      { address: '0x111', address_id: 1, user_id: 1, user_tier: 1 },
       requirements,
       balances,
       1,
@@ -151,7 +148,7 @@ describe('validateGroupMembership', () => {
     ];
 
     const result = await validateGroupMembership(
-      '0x111',
+      { address: '0x111', address_id: 1, user_id: 1, user_tier: 1 },
       requirements,
       balances,
       1,
@@ -187,7 +184,7 @@ describe('validateGroupMembership', () => {
     ];
 
     const result = await validateGroupMembership(
-      '0x111',
+      { address: '0x111', address_id: 1, user_id: 1, user_tier: 1 },
       requirements,
       balances,
       1,
@@ -262,7 +259,7 @@ describe('validateGroupMembership', () => {
     ];
 
     const result = await validateGroupMembership(
-      '0x111',
+      { address: '0x111', address_id: 1, user_id: 1, user_tier: 1 },
       requirements,
       balances,
       3,
@@ -337,7 +334,7 @@ describe('validateGroupMembership', () => {
     ];
 
     const result = await validateGroupMembership(
-      '0x111',
+      { address: '0x111', address_id: 1, user_id: 1, user_tier: 1 },
       requirements,
       balances,
       1,
@@ -412,7 +409,7 @@ describe('validateGroupMembership', () => {
     ];
 
     const result = await validateGroupMembership(
-      '0x111',
+      { address: '0x111', address_id: 1, user_id: 1, user_tier: 1 },
       requirements,
       balances,
     );
@@ -485,7 +482,7 @@ describe('validateGroupMembership', () => {
     ];
 
     const result = await validateGroupMembership(
-      '0x111',
+      { address: '0x111', address_id: 1, user_id: 1, user_tier: 1 },
       requirements,
       balances,
       3,
@@ -560,9 +557,75 @@ describe('validateGroupMembership', () => {
     ];
 
     const result = await validateGroupMembership(
-      '0x111',
+      { address: '0x111', address_id: 1, user_id: 1, user_tier: 1 },
       requirements,
       balances,
+    );
+
+    expect(result.isValid).to.be.false;
+  });
+
+  test('should fail if user is not whitelisted', async () => {
+    const requirements: Requirement[] = [
+      {
+        rule: 'allow',
+        data: {
+          allow: ['0x111'],
+        },
+      },
+    ];
+
+    const result = await validateGroupMembership(
+      { address: '0x112', address_id: 1, user_id: 1, user_tier: 1 },
+      requirements,
+      [],
+    );
+
+    expect(result.isValid).to.be.false;
+  });
+
+  test('should fail if user is not trusted', async () => {
+    const requirements: Requirement[] = [
+      {
+        rule: 'trust-level',
+        data: {
+          minimum_trust_level: 3,
+        },
+      },
+    ];
+
+    const result = await validateGroupMembership(
+      { address: '0x111', address_id: 1, user_id: 1, user_tier: 1 },
+      requirements,
+      [],
+      1,
+    );
+
+    expect(result.isValid).to.be.false;
+  });
+
+  test('should fail if user is not trusted with sso', async () => {
+    const requirements: Requirement[] = [
+      {
+        rule: 'trust-level',
+        data: {
+          sso_required: [WalletSsoSource.Twitter, WalletSsoSource.Discord],
+          minimum_trust_level: 3,
+        },
+      },
+    ];
+
+    const result = await validateGroupMembership(
+      {
+        address: '0x111',
+        address_id: 1,
+        user_id: 1,
+        user_tier: 3,
+        wallet_sso: WalletSsoSource.Email,
+      },
+      requirements,
+      [],
+      1,
     );
 
     expect(result.isValid).to.be.false;

@@ -17,17 +17,16 @@ import './AdminPanel.scss';
 const validationSchema = z
   .object({
     resource_id: z
-      .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+      .string({ error: VALIDATION_MESSAGES.INVALID_INPUT })
       .nonempty({ message: VALIDATION_MESSAGES.INVALID_INPUT })
-      .or(z.number({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })),
+      .or(z.number({ error: VALIDATION_MESSAGES.NO_INPUT })),
     resource_name: z.object(
       {
         value: z.enum(['Quests']),
         label: z.string(),
       },
       {
-        invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-        required_error: VALIDATION_MESSAGES.NO_INPUT,
+        error: VALIDATION_MESSAGES.NO_INPUT,
       },
     ),
     date_field_name: z.object(
@@ -42,12 +41,11 @@ const validationSchema = z
         label: z.string(),
       },
       {
-        invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-        required_error: VALIDATION_MESSAGES.NO_INPUT,
+        error: VALIDATION_MESSAGES.NO_INPUT,
       },
     ), // add more date fields as required
     date_field_value: z
-      .string({ invalid_type_error: VALIDATION_MESSAGES.INVALID_INPUT })
+      .string({ error: VALIDATION_MESSAGES.INVALID_INPUT })
       .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   })
   .refine(
@@ -85,13 +83,14 @@ const validationSchema = z
   );
 
 const ChangeResourceTimestamps = () => {
-  const { mutateAsync: updateResourceTimestamps, isLoading } =
+  const { mutateAsync: updateResourceTimestamps, isPending } =
     useUpdateResourceTimestamps();
 
   const resourceNames = ['Quests'].map((x) => ({
     label: x,
     value: x,
   }));
+
   const dateFieldNames = [
     'created_at',
     'updated_at',
@@ -175,7 +174,7 @@ const ChangeResourceTimestamps = () => {
         <CWButton
           label="Submit"
           type="submit"
-          disabled={isLoading}
+          disabled={isPending}
           buttonWidth="wide"
         />
       </CWForm>

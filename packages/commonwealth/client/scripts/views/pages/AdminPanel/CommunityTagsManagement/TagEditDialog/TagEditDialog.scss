@@ -1,0 +1,29 @@
+@use '../../../../../styles/shared.scss';
+
+.TagEditDialog {
+  .tag-edit-container {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    min-width: 300px;
+
+    .dialog-title {
+      margin-bottom: 16px;
+    }
+
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .actions-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 8px;
+    }
+  }
+}

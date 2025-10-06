@@ -1,72 +1,75 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/icons';
 
 .IconButton {
-  @include baseIconStyles;
+  @include icons.baseIconStyles;
 
   &.black {
     cursor: pointer;
-    color: $neutral-800;
+    color: colors.$neutral-800;
 
     &:hover {
-      color: $neutral-900;
+      color: colors.$neutral-900;
     }
 
     &:active {
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
 
     &.selected {
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
   }
 
   &.neutral {
-    color: $neutral-500;
+    color: colors.$neutral-500;
     cursor: pointer;
 
     &:hover {
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
 
     &:active {
-      color: $neutral-800;
+      color: colors.$neutral-800;
     }
 
     &.selected {
-      color: $neutral-800;
+      color: colors.$neutral-800;
     }
   }
 
   &.primary {
-    color: $primary-200;
+    color: colors.$primary-200;
     cursor: pointer;
 
     &:hover {
-      color: $primary-400;
+      color: colors.$primary-400;
     }
 
     &:active {
-      color: $primary-500;
+      color: colors.$primary-500;
     }
 
     &.selected {
-      color: $primary-500;
+      color: colors.$primary-500;
     }
   }
 
   &.hasBackground {
-    border-radius: $border-radius-corners;
-    color: $white;
+    border-radius: border_radius.$border-radius-corners;
+    color: colors.$white;
     cursor: pointer;
 
     &:hover {
-      background-color: $neutral-700;
-      color: $neutral-300;
+      background-color: colors.$neutral-700;
+      color: colors.$neutral-300;
     }
   }
 
   &.disabled {
-    color: $neutral-200;
+    color: colors.$neutral-200;
     pointer-events: none;
   }
 }

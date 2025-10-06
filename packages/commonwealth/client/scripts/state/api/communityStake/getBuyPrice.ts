@@ -1,7 +1,7 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
+import { lazyLoadCommunityStakes } from 'helpers/ContractHelpers/LazyCommunityStakes';
 import { ContractMethods } from 'state/api/config';
-import { lazyLoadCommunityStakes } from '../../../helpers/ContractHelpers/LazyCommunityStakes';
 
 const GET_BUY_PRICE_STALE_TIME = 2 * 1_000; // 2 sec
 
@@ -16,9 +16,10 @@ const getBuyPrice = async ({
 }: GetBuyPriceProps) => {
   const CommunityStakes = await lazyLoadCommunityStakes();
   const communityStakes = new CommunityStakes(
-    commonProtocol.factoryContracts[ethChainId].communityStake,
-    commonProtocol.factoryContracts[ethChainId].factory,
+    getFactoryContract(ethChainId).CommunityStake,
+    getFactoryContract(ethChainId).NamespaceFactory,
     chainRpc,
+    `${ethChainId}`,
   );
 
   return await communityStakes.getBuyPrice(namespace, stakeId, amount);
@@ -56,7 +57,9 @@ const useGetBuyPriceQuery = ({
       getBuyPrice({ namespace, stakeId, amount, chainRpc, ethChainId }),
     enabled: apiEnabled,
     staleTime: GET_BUY_PRICE_STALE_TIME,
-    keepPreviousData,
+    placeholderData: keepPreviousData
+      ? (previousData) => previousData
+      : undefined,
   });
 };
 

@@ -2,8 +2,8 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { useSetDiscordBotConfigMutation } from 'state/api/discord';
+import { LoadingIndicator } from '../../../../components/LoadingIndicator/LoadingIndicator';
 import { PageNotFound } from '../../../404';
-import { PageLoading } from '../../../loading';
 
 const CallbackPage = () => {
   const navigate = useCommonNavigate();
@@ -59,7 +59,7 @@ const CallbackPage = () => {
   return failed ? (
     <PageNotFound message={'Error connecting Discord: ' + failureMessage} />
   ) : (
-    <PageLoading message="Connecting Discord" />
+    <LoadingIndicator message="Connecting Discord" />
   );
 };
 

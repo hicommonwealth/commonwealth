@@ -1,0 +1,195 @@
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
+
+.TokenClaimBanner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 24px;
+
+  // Override CWBanner styles for better layout
+  .CWBanner {
+    align-items: center;
+    justify-content: center;
+
+    // Hide the type icon (checkmark/warning icon)
+    .type-icon-container {
+      display: none;
+    }
+
+    .content-container {
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      > div:first-child {
+        text-align: center;
+        width: 100%;
+      }
+    }
+  }
+
+  .banner-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+
+    .token-balance {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 0 0 8px 0;
+      color: inherit;
+    }
+
+    .notice-section {
+      display: flex;
+      justify-content: center;
+
+      .notice-text {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        max-width: 600px;
+        align-items: center;
+
+        .base-notice {
+          font-size: 14px;
+          opacity: 0.9;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          line-height: 1.4;
+
+          .info-icon {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+        }
+
+        .security-notice {
+          font-size: 13px;
+          opacity: 0.85;
+          margin: 0;
+          line-height: 1.4;
+
+          strong {
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  .claim-address-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    max-width: 400px;
+    width: 100%;
+    margin: 8px 0;
+
+    .claim-address-row {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 350px;
+      align-items: center;
+      position: relative;
+
+      .address-input-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+
+        .CWSelectList {
+          flex: 1;
+        }
+
+        .copy-icon {
+          cursor: pointer;
+          opacity: 0.7;
+          transition: opacity 0.2s ease;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-top: 14px;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+
+  .banner-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    .Button {
+      min-width: 140px;
+    }
+  }
+
+  // Responsive design
+  @include media_queries.smallInclusive {
+    .banner-content {
+      .description {
+        font-size: 14px;
+      }
+      .token-balance {
+        font-size: 20px;
+      }
+
+      .notice-section {
+        .notice-text {
+          max-width: 100%;
+
+          .base-notice {
+            font-size: 13px;
+          }
+
+          .security-notice {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+
+    .claim-address-body {
+      max-width: 100%;
+
+      .claim-address-row {
+        max-width: 100%;
+      }
+    }
+
+    .banner-actions {
+      flex-direction: column;
+      align-items: center;
+
+      .Button {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+  }
+}

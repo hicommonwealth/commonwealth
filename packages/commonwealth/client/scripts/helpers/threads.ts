@@ -1,8 +1,7 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
 import { re_weburl } from 'lib/url-validation';
 import { Link, LinkSource } from 'models/Thread';
+
 // eslint-disable-next-line max-len
-import { convertGranularPermissionsToAccumulatedPermissions } from '../views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/helpers';
 
 export function detectURL(str: string) {
   if (str.slice(0, 4) !== 'http') str = `http://${str}`; // no https required because this is only used for regex match
@@ -39,43 +38,4 @@ export const getAddedAndDeleted = <T>(
   }, []);
 
   return { toAdd, toDelete };
-};
-
-type ThreadTooltipTextActions = 'upvote' | 'comment' | 'reply' | 'submit';
-
-export type GetThreadActionTooltipTextResponse =
-  | string
-  | ((action: ThreadTooltipTextActions) => string);
-
-const getActionTooltipForNonCommunityMember = (
-  action: ThreadTooltipTextActions,
-) => {
-  return `Join community to ${action}`;
-};
-
-export const getThreadActionTooltipText = ({
-  isCommunityMember = false,
-  isThreadArchived = false,
-  isThreadLocked = false,
-  isThreadTopicGated = false,
-  threadTopicInteractionRestrictions,
-}: {
-  isCommunityMember?: boolean;
-  isThreadArchived?: boolean;
-  isThreadLocked?: boolean;
-  isThreadTopicGated?: boolean;
-  threadTopicInteractionRestrictions?: PermissionEnum[];
-}): GetThreadActionTooltipTextResponse => {
-  if (!isCommunityMember) {
-    return getActionTooltipForNonCommunityMember;
-  }
-  if (isThreadArchived) return 'Thread is archived';
-  if (isThreadLocked) return 'Thread is locked';
-  if (isThreadTopicGated) return 'Topic is gated';
-  if (threadTopicInteractionRestrictions) {
-    return `Topic members are only allowed to ${convertGranularPermissionsToAccumulatedPermissions(
-      threadTopicInteractionRestrictions,
-    )}`;
-  }
-  return '';
 };

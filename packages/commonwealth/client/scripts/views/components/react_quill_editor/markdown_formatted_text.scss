@@ -1,21 +1,24 @@
-@import '../../../styles/shared.scss';
-@import './quill_formatted_text.scss';
+@use '../../../styles/shared.scss';
+@use 'quill_formatted_text.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/text';
 
 .MarkdownFormattedText {
-  @include b2;
+  @include text.b2;
   letter-spacing: 0.01em;
 
   position: relative;
   word-break: break-word;
-  @include formatted-text();
-  @include collapsible();
-  @include hidden-formatting();
+  @include quill_formatted_text.formatted-text();
+  @include quill_formatted_text.collapsible();
+  @include quill_formatted_text.hidden-formatting();
 
   width: 100%;
   overflow: auto;
 
   p {
-    @include b2;
+    @include text.b2;
     display: block;
     margin-block-start: 1em;
     margin-block-end: 1em;
@@ -24,12 +27,12 @@
   }
 
   a {
-    @include b2;
-    color: $primary-500;
+    @include text.b2;
+    color: colors.$primary-500;
   }
 
   h1 {
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
     font-weight: 600;
     font-size: 24px;
     line-height: 36px;
@@ -37,7 +40,7 @@
   }
 
   h2 {
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
     font-weight: 600;
     font-size: 20px;
     line-height: 28px;
@@ -48,7 +51,7 @@
   h4,
   h5,
   h6 {
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
     font-weight: 600;
     font-size: 18px;
     line-height: 24px;
@@ -59,25 +62,25 @@
     display: inline-block;
     max-width: 615px;
     border-spacing: 0;
-    border-radius: $border-radius-corners-wider;
-    border: 1px solid $neutral-200;
+    border-radius: border_radius.$border-radius-corners-wider;
+    border: 1px solid colors.$neutral-200;
 
     thead {
       tr {
         th {
-          @include b2;
+          @include text.b2;
           letter-spacing: 0.02em;
           font-weight: 700;
           padding: 16px;
-          background-color: $neutral-50;
-          border-bottom: 1px solid $neutral-200;
+          background-color: colors.$neutral-50;
+          border-bottom: 1px solid colors.$neutral-200;
 
           &:first-child {
-            border-top-left-radius: $border-radius-corners-wider;
+            border-top-left-radius: border_radius.$border-radius-corners-wider;
           }
 
           &:last-child {
-            border-top-right-radius: $border-radius-corners-wider;
+            border-top-right-radius: border_radius.$border-radius-corners-wider;
           }
         }
       }
@@ -86,21 +89,21 @@
     tbody {
       tr {
         td {
-          @include b2;
+          @include text.b2;
           letter-spacing: 0.01em;
           font-weight: 400;
           padding: 16px;
-          background-color: $white;
+          background-color: colors.$white;
         }
 
         &:last-child {
           td {
             &:first-child {
-              border-bottom-left-radius: $border-radius-corners-wider;
+              border-bottom-left-radius: border_radius.$border-radius-corners-wider;
             }
 
             &:last-child {
-              border-bottom-right-radius: $border-radius-corners-wider;
+              border-bottom-right-radius: border_radius.$border-radius-corners-wider;
             }
           }
         }
@@ -108,7 +111,7 @@
         &:not(:last-child) {
           th,
           td {
-            border-bottom: 1px solid $neutral-200;
+            border-bottom: 1px solid colors.$neutral-200;
           }
         }
       }
@@ -118,7 +121,7 @@
       th,
       td {
         &:not(:last-child) {
-          border-right: 1px solid $neutral-200;
+          border-right: 1px solid colors.$neutral-200;
         }
       }
     }
@@ -131,7 +134,7 @@
 
   ul,
   ol {
-    @include b2;
+    @include text.b2;
 
     li:has(input[type='checkbox']) {
       list-style: none;
@@ -165,12 +168,12 @@
   }
 
   mark {
-    background-color: $primary-50;
+    background-color: colors.$primary-50;
   }
 
   hr {
     margin: 12px 0;
-    color: $neutral-200;
+    color: colors.$neutral-200;
   }
 
   strong,
@@ -192,15 +195,15 @@
   }
 
   blockquote {
-    @include b2;
-    border-left: 2px solid $neutral-200;
+    @include text.b2;
+    border-left: 2px solid colors.$neutral-200;
     padding-left: 24px;
   }
 
   code {
-    @include b2;
-    background-color: $rorange-50;
-    color: $rorange-800;
+    @include text.b2;
+    background-color: colors.$rorange-50;
+    color: colors.$rorange-800;
     border-radius: 4px;
     padding: 0 8px;
   }
@@ -210,15 +213,15 @@
     padding: 12px;
     flex-direction: column;
     align-items: flex-start;
-    border-radius: $border-radius-corners-wider;
-    background-color: $neutral-50;
-    border: 1px solid $neutral-200;
+    border-radius: border_radius.$border-radius-corners-wider;
+    background-color: colors.$neutral-50;
+    border: 1px solid colors.$neutral-200;
 
     code {
       padding: 0;
-      color: $neutral-800;
-      background-color: $neutral-50;
-      font-family: $font-family-monospace;
+      color: colors.$neutral-800;
+      background-color: colors.$neutral-50;
+      font-family: shared.$font-family-monospace;
     }
   }
 

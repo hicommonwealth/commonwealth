@@ -1,9 +1,8 @@
 import { DefaultPage } from '@hicommonwealth/shared';
-import { useUpdateCommunityTags } from 'client/scripts/state/api/communities/editCommunityTags';
-import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
+import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useCallback, useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
@@ -13,6 +12,8 @@ import {
   useGetCommunityByIdQuery,
   useUpdateCommunityMutation,
 } from 'state/api/communities';
+import { useUpdateCommunityTags } from 'state/api/communities/editCommunityTags';
+import { buildUpdateCommunityInput } from 'state/api/communities/updateCommunity';
 import { LinksArray, useLinksArray } from 'views/components/LinksArray';
 import {
   PreferenceTags,
@@ -22,6 +23,7 @@ import {
   CWImageInput,
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
+import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -32,7 +34,9 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import ErrorPage from '../../../error';
+import CommunityTrustLevel from '../CommunityTrustLevel/CommunityTrustLevel';
 import './CommunityProfileForm.scss';
 import { FormSubmitValues } from './types';
 import { communityProfileValidationSchema } from './validation';
@@ -58,6 +62,8 @@ const CommunityProfileForm = () => {
     }[]
   >([]);
 
+  const aiCommentsFeatureEnabled = useFlag('aiComments');
+
   const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isCommunityLoading } =
     useGetCommunityByIdQuery({
@@ -70,6 +76,7 @@ const CommunityProfileForm = () => {
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
     communityId: community?.id || '',
   });
+  const { communityToken, isPinnedToken } = useTokenTradeWidget();
 
   const {
     isLoadingTags,
@@ -128,6 +135,13 @@ const CommunityProfileForm = () => {
     community?.id?.toLowerCase() || '',
   );
 
+  const handleImageProcessingChange = useCallback(
+    ({ isGenerating, isUploading }) => {
+      setIsProcessingProfileImage(isGenerating || isUploading);
+    },
+    [],
+  );
+
   const onSubmit = async (values: FormSubmitValues) => {
     if (
       !community?.id ||
@@ -148,8 +162,8 @@ const CommunityProfileForm = () => {
       });
 
       await editBanner({
-        communityId: community.id,
-        bannerText: values.communityBanner ?? '',
+        community_id: community.id,
+        banner_text: values.communityBanner ?? '',
       });
 
       await updateCommunity(
@@ -163,7 +177,11 @@ const CommunityProfileForm = () => {
             ? JSON.parse(values.customStages)
             : [],
           iconUrl: values.communityProfileImageURL,
+          launchpadTokenImage: values.updateTokenImage
+            ? values.communityProfileImageURL || community.icon_url || ''
+            : undefined,
           defaultPage: values.defaultPage,
+          aiFeaturesEnabled: values.aiFeaturesEnabled,
         }),
       );
 
@@ -216,6 +234,7 @@ const CommunityProfileForm = () => {
             ? JSON.stringify(community?.custom_stages || [])
             : '',
         communityBanner: community.communityBanner || '',
+        aiFeaturesEnabled: community.ai_features_enabled,
       }}
       validationSchema={communityProfileValidationSchema}
       onSubmit={onSubmit}
@@ -288,17 +307,36 @@ const CommunityProfileForm = () => {
               label="Community Description"
               placeholder="Enter a description of your community or project"
             />
-            <CWImageInput
-              hookToForm
-              withAIImageGeneration
-              name="communityProfileImageURL"
-              canSelectImageBehavior={false}
-              imageBehavior={ImageBehavior.Circle}
-              onImageProcessingChange={({ isGenerating, isUploading }) =>
-                setIsProcessingProfileImage(isGenerating || isUploading)
-              }
-              label="Community Profile Image (Accepts JPG and PNG files)"
-            />
+
+            <div className="community-img-update">
+              <CWImageInput
+                hookToForm
+                withAIImageGeneration
+                name="communityProfileImageURL"
+                canSelectImageBehavior={false}
+                imageBehavior={ImageBehavior.Circle}
+                onImageProcessingChange={handleImageProcessingChange}
+                label="Community Profile Image (Accepts JPG and PNG files)"
+              />
+              <CWCheckbox
+                name="updateTokenImage"
+                hookToForm
+                label="Update community token image"
+                disabled={!communityToken && !isPinnedToken}
+              />
+            </div>
+          </section>
+
+          <section className="trust-level-section">
+            <div className="header">
+              <CWText type="h4">Verification Status</CWText>
+              <CWText type="b1">
+                Build trust through verification. Each completed level below
+                enhances your community&apos;s credibility and provides members
+                with greater confidence.
+              </CWText>
+            </div>
+            <CommunityTrustLevel />
           </section>
 
           <section className="links-section">
@@ -392,6 +430,24 @@ const CommunityProfileForm = () => {
               hookToForm
             />
           </section>
+
+          {aiCommentsFeatureEnabled && (
+            <section className="ai-features-section">
+              <div className="header">
+                <CWText type="h4">Enable AI Features</CWText>
+                <div className="controls">
+                  <CWText type="b1">
+                    Control AI functionality for your community. When disabled,
+                    AI features like smart replies, comment suggestions and AI
+                    assistants will be hidden from all community members,
+                    regardless of their personal settings.
+                  </CWText>
+
+                  <CWToggle name="aiFeaturesEnabled" hookToForm size="large" />
+                </div>
+              </div>
+            </section>
+          )}
 
           <section className="default-page-section">
             <div className="header">

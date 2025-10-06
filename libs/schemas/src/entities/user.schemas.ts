@@ -35,10 +35,19 @@ export const ProfileTags = z.object({
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 
+  // associations
   Tag: Tags.nullish(),
 });
 
-export const USER_TIER = z.nativeEnum(UserTierMap);
+export const USER_TIER = z.enum(UserTierMap);
+
+export const EmailNotificationInterval = z.enum([
+  'never',
+  'monthly',
+  'weekly',
+  'daily',
+  'hourly',
+]);
 
 export const User = z.object({
   id: PG_INT.optional(),
@@ -48,10 +57,8 @@ export const User = z.object({
   disableRichText: z.boolean().default(false).optional(),
   emailVerified: z.boolean().default(false).nullish(),
   selected_community_id: z.string().max(255).nullish(),
-  emailNotificationInterval: z
-    .enum(['weekly', 'never'])
-    .default('never')
-    .optional(),
+  emailNotificationInterval:
+    EmailNotificationInterval.default('never').optional(),
   promotional_emails_enabled: z.boolean().nullish(),
   is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
 
@@ -62,9 +69,14 @@ export const User = z.object({
     .nullish()
     .describe('Number of referrals that have earned ETH'),
   referral_eth_earnings: z.number().optional(),
-  xp_points: PG_INT.default(0).nullish(),
-  xp_referrer_points: PG_INT.default(0).nullish(),
+  xp_points: PG_INT.default(0).optional(),
+  xp_referrer_points: PG_INT.default(0).optional(),
+  total_xp: PG_INT.default(0).optional(),
   privy_id: z.string().max(255).nullish(),
+  notify_user_name_change: z.boolean().default(false).nullish(),
+  wallet_verified: z.boolean().default(false).optional(),
+  social_verified: z.boolean().default(false).optional(),
+  chain_verified: z.boolean().default(false).optional(),
 
   ProfileTags: z.array(ProfileTags).optional(),
   ApiKey: ApiKey.optional(),
@@ -83,9 +95,8 @@ export const Address = z.object({
   verified: z.date().nullish(),
   last_active: z.date().nullish(),
   ghost_address: z.boolean().default(false),
-  wallet_id: z.nativeEnum(WalletId).nullish(),
+  wallet_id: z.enum(WalletId).nullish(),
   block_info: z.string().max(255).nullish(),
-  is_user_default: z.boolean().default(false),
   role: z.enum(Roles).default('member'),
   is_banned: z.boolean().default(false),
   hex: z.string().max(64).nullish(),
@@ -94,7 +105,7 @@ export const Address = z.object({
   oauth_email_verified: z.boolean().nullish(),
   oauth_username: z.string().max(255).nullish(),
   oauth_phone_number: z.string().max(255).nullish(),
-
+  oauth_user_id: z.string().max(255).nullish(),
   User: User.optional().nullish(),
 
   created_at: z.coerce.date().optional(),

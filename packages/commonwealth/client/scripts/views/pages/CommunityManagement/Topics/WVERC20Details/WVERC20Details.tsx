@@ -24,7 +24,9 @@ interface WVConsentProps {
 }
 
 const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
-  const options = alphabeticallySortedChains.filter((c) => c.hasStakeEnabled);
+  const options = alphabeticallySortedChains.filter(
+    (c) => !!c.ethChainId && !!c.alchemyMetadata,
+  );
 
   const defaultChain = options.find(
     (o) => o.value === app.chain.meta.ChainNode?.eth_chain_id,
@@ -104,6 +106,9 @@ const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
         disabled={editMode || tokenValue == ZERO_ADDRESS}
         fullWidth
         tokenError={getTokenError()}
+        tokenAddress={tokenValue}
+        chainName={selectedChain?.label || ''}
+        chainEthId={selectedChain?.ethChainId || 0}
       />
       <CWCheckbox
         label="Use native token"

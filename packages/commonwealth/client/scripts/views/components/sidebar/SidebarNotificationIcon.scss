@@ -1,4 +1,4 @@
-@import '../../../styles/';
+@use '../../../styles/mixins/colors.module';
 
 .SideBarNotificationIcon {
   .notification-icon-container {
@@ -10,7 +10,7 @@
 
   .notification-icon {
     font-size: 24px;
-    color: $neutral-800;
+    color: colors.$neutral-800;
     position: relative;
     cursor: pointer;
   }
@@ -19,7 +19,7 @@
     position: absolute;
     top: 22px;
     right: -5px;
-    background-color: $rorange-400;
+    background-color: colors.$rorange-400;
     color: white;
     font-size: 12px;
     font-weight: bold;

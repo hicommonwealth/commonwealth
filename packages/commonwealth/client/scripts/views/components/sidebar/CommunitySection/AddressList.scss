@@ -1,4 +1,5 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
 
 .AddressList {
   display: flex;
@@ -35,7 +36,7 @@
   }
 
   .label {
-    color: $neutral-600;
+    color: colors.$neutral-600;
     overflow: hidden;
     display: inline-block;
     text-overflow: ellipsis;
@@ -45,6 +46,6 @@
   }
 
   .caret-icon {
-    color: $neutral-400;
+    color: colors.$neutral-400;
   }
 }

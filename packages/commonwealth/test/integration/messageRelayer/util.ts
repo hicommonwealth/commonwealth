@@ -1,4 +1,4 @@
-import { OutboxAttributes } from '@hicommonwealth/model';
+import { OutboxAttributes } from '@hicommonwealth/model/models';
 
 export const testOutboxEvents: OutboxAttributes[] = [
   {

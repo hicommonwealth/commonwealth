@@ -1,7 +1,9 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
 
 .ProgressBar {
-  border-radius: $border-radius-corners;
+  border-radius: border_radius.$border-radius-corners;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -24,13 +26,13 @@
       }
 
       .subtext-text.Text {
-        color: $neutral-500;
+        color: colors.$neutral-500;
         margin-bottom: 4px;
       }
     }
 
     .progress-percentage-text.Text {
-      color: $neutral-500;
+      color: colors.$neutral-500;
       margin-bottom: 4px;
     }
   }
@@ -40,35 +42,35 @@
     width: 100%;
 
     &::-webkit-progress-bar {
-      background-color: $neutral-200;
-      border-radius: $border-radius-corners;
+      background-color: colors.$neutral-200;
+      border-radius: border_radius.$border-radius-corners;
     }
 
     &::-webkit-progress-value {
-      border-radius: $border-radius-corners;
+      border-radius: border_radius.$border-radius-corners;
     }
 
     &.ongoing {
       &::-webkit-progress-value {
-        background-color: $neutral-800;
+        background-color: colors.$neutral-800;
       }
     }
 
     &.passed {
       &::-webkit-progress-value {
-        background-color: $green-500;
+        background-color: colors.$green-500;
       }
     }
 
     &.selected {
       &::-webkit-progress-value {
-        background-color: $primary-300;
+        background-color: colors.$primary-300;
       }
     }
 
     &.neutral {
       &::-webkit-progress-value {
-        background-color: $neutral-500;
+        background-color: colors.$neutral-500;
       }
     }
   }

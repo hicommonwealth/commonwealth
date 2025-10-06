@@ -2,3 +2,7 @@ packages:
   - 'libs/**'
   - 'packages/commonwealth'
   - 'packages/load-testing'
+
+catalog:
+  '@knocklabs/node': ^0.6.13
+  'zod': ^4.1.1

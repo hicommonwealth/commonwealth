@@ -18,18 +18,21 @@ import UserDropdown from './UserDropdown';
 import { ChainBase } from '@hicommonwealth/shared';
 import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
-import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
+import {
+  fetchCachedNodes,
+  useFetchNodesQuery,
+} from 'client/scripts/state/api/nodes';
 import { useFlag } from 'hooks/useFlag';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
 import { AuthModalType } from 'views/modals/AuthModal';
-import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { CWCustomIcon } from '../../component_kit/cw_icons/cw_custom_icon';
 import { CWText } from '../../component_kit/cw_text';
 import XPProgressIndicator from '../XPProgressIndicator';
 
 import DownloadMobileApp from 'views/components/DownloadMobileApp';
+import FormattedDisplayNumber from '../../FormattedDisplayNumber/FormattedDisplayNumber';
 import './DesktopHeader.scss';
 
 interface DesktopHeaderProps {
@@ -56,6 +59,8 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
     }, 200);
   };
 
+  // Ensure chain node data is loaded before attempting to read from cache
+  useFetchNodesQuery();
   const nodes = fetchCachedNodes();
   const baseNode = nodes?.find((node) => node.id === baseNodeId);
 
@@ -165,7 +170,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
                     renderTrigger={(handleInteraction) => (
                       <div
                         className="rewards-button-container"
-                        onClick={() => navigate('/rewards', {}, null)}
+                        onClick={() => navigate('/wallet', {}, null)}
                         onMouseEnter={handleInteraction}
                         onMouseLeave={handleInteraction}
                       >
@@ -174,12 +179,15 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
                           weight="fill"
                           iconButtonTheme="black"
                         />
-                        <CWText
-                          className="earnings"
-                          fontWeight="medium"
+                        <FormattedDisplayNumber
+                          value={balance}
+                          options={{ decimals: 3, useShortSuffixes: false }}
+                          className="mr-1"
                           type="caption"
-                        >
-                          {capDecimals(balance || '0')} ETH
+                          fontWeight="medium"
+                        />
+                        <CWText type="caption" className="ml-1">
+                          ETH
                         </CWText>
                         <CWCustomIcon iconName="base" iconSize="xs" />
                       </div>

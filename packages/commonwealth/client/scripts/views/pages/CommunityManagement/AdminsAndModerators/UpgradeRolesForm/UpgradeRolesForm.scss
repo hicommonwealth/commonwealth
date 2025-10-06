@@ -1,4 +1,7 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/text';
 
 @mixin sharedIconStyles {
   position: absolute;
@@ -12,8 +15,8 @@
   gap: 16px;
 
   .members-container {
-    border: 1px solid $neutral-300;
-    border-radius: $border-radius-corners;
+    border: 1px solid colors.$neutral-300;
+    border-radius: border_radius.$border-radius-corners;
     display: flex;
     flex-direction: column;
     height: 200px;
@@ -21,7 +24,7 @@
     padding: 0 8px;
     width: 100%;
 
-    @include visibleScrollbar(light);
+    @include shared.visibleScrollbar(light);
   }
 
   .upgrade-buttons-container {
@@ -37,11 +40,11 @@
       position: relative;
 
       input {
-        @include b1;
+        @include text.b1;
 
-        border: 1px solid $neutral-300;
+        border: 1px solid colors.$neutral-300;
         border-radius: 6px;
-        color: $neutral-800;
+        color: colors.$neutral-800;
         height: 40px;
         padding: 8px 16px 8px 48px;
         width: 100%;
@@ -51,7 +54,7 @@
         }
 
         &::placeholder {
-          color: $neutral-500;
+          color: colors.$neutral-500;
         }
 
         &:focus {
@@ -59,7 +62,7 @@
         }
 
         &:focus-within {
-          border-color: $primary-500;
+          border-color: colors.$primary-500;
         }
       }
 

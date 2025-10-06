@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
 
 .WVERC20Details {
   display: flex;
@@ -7,7 +8,7 @@
   max-width: 596px;
 
   .description {
-    color: $neutral-500;
+    color: colors.$neutral-500;
     margin-top: -8px;
   }
 
@@ -37,7 +38,7 @@
 
     a {
       margin-left: 4px;
-      color: $primary-600;
+      color: colors.$primary-600;
     }
   }
 

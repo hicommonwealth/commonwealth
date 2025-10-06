@@ -5,6 +5,7 @@ import {
   ChainBase,
   ChainType,
   CommunityGoalTypes,
+  GatedActionEnum,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
   Roles,
@@ -12,8 +13,8 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { AuthContext, TopicContext, VerifiedContext } from '../context';
+import { MCPServer } from '../entities';
 import { Community } from '../entities/community.schemas';
-import { PermissionEnum } from '../entities/group-permission.schemas';
 import { Group, Requirement } from '../entities/group.schemas';
 import { PinnedToken } from '../entities/pinned-token.schemas';
 import { StakeTransaction } from '../entities/stake.schemas';
@@ -44,8 +45,8 @@ export const CreateCommunity = {
     social_links: z.array(z.string().url()).default([]),
     tags: z.array(z.string()).default([]), // community tags are dynamic, tags should be validated in service method
     directory_page_enabled: z.boolean().default(false),
-    type: z.nativeEnum(ChainType).default(ChainType.Offchain),
-    base: z.nativeEnum(ChainBase),
+    type: z.enum(ChainType).default(ChainType.Offchain),
+    base: z.enum(ChainBase),
     allow_tokenized_threads: z.boolean().optional(),
     thread_purchase_token: z.string().optional(),
 
@@ -151,8 +152,19 @@ export const UpdateCommunity = {
       featuredTopics: z.array(z.string()).optional(),
       snapshot: Snapshot.or(z.array(Snapshot)).optional(),
       transactionHash: z.string().optional(),
+      launchpad_weighted_voting: z.boolean().optional(),
+      launchpad_token_image: z.string().optional(),
     }),
   output: Community,
+  context: AuthContext,
+};
+
+export const SetCommunityMCPServers = {
+  input: z.object({
+    community_id: z.string(),
+    mcp_server_ids: z.array(z.number()),
+  }),
+  output: z.array(MCPServer),
   context: AuthContext,
 };
 
@@ -166,6 +178,15 @@ export const GenerateStakeholderGroups = {
       created: z.boolean(),
     })
     .partial(),
+};
+
+export const UpdateTopicsOrder = {
+  input: z.object({
+    community_id: z.string(),
+    ordered_ids: z.array(PG_INT),
+  }),
+  output: z.array(Topic),
+  context: AuthContext,
 };
 
 export const CreateTopic = {
@@ -203,21 +224,29 @@ export const UpdateTopic = {
       community_id: z.string(),
     })
     .merge(
-      Topic.pick({
-        name: true,
-        description: true,
-        group_ids: true,
-        telegram: true,
-        featured_in_sidebar: true,
-        featured_in_new_post: true,
-        default_offchain_template: true,
-        allow_tokenized_threads: true,
-      }).partial(),
+      z.object({
+        name: z.string().trim().min(1).max(255).optional(),
+        description: z.string().optional(),
+        telegram: z.string().max(255).nullish(),
+        featured_in_sidebar: z.boolean().optional(),
+        featured_in_new_post: z.boolean().optional(),
+        default_offchain_template: z.string().nullish(),
+        allow_tokenized_threads: z.boolean().optional(),
+      }),
     ),
   output: z.object({
     topic: Topic.partial(),
     user_id: z.number(),
   }),
+  context: TopicContext,
+};
+
+export const UpdateTopicChannel = {
+  input: z.object({
+    topic_id: z.number(),
+    channel_id: z.string().optional(),
+  }),
+  output: Topic,
   context: TopicContext,
 };
 
@@ -251,7 +280,8 @@ export const CreateGroup = {
       .array(
         z.object({
           id: PG_INT,
-          permissions: z.array(z.nativeEnum(PermissionEnum)),
+          is_private: z.boolean().optional(),
+          permissions: z.array(z.enum(GatedActionEnum)),
         }),
       )
       .optional(),
@@ -288,7 +318,8 @@ export const UpdateGroup = {
       .array(
         z.object({
           id: PG_INT,
-          permissions: z.array(z.nativeEnum(PermissionEnum)),
+          is_private: z.boolean().optional(),
+          permissions: z.array(z.enum(GatedActionEnum)),
         }),
       )
       .optional(),
@@ -359,6 +390,7 @@ export const RefreshCommunityMemberships = {
     community_id: z.string(),
     address: z.string().optional(),
     group_id: PG_INT.optional(),
+    refresh_all: z.boolean().optional(),
   }),
   output: z.object({
     community_id: z.string(),
@@ -382,10 +414,10 @@ export const JoinCommunity = {
   }),
   output: z.object({
     community_id: z.string(),
-    base: z.nativeEnum(ChainBase),
+    base: z.enum(ChainBase),
     address_id: z.number(),
     address: z.string(),
-    wallet_id: z.nativeEnum(WalletId).optional(),
+    wallet_id: z.enum(WalletId).optional(),
     ss58Prefix: z.number().optional(),
   }),
   context: VerifiedContext,
@@ -437,4 +469,40 @@ export const UpdateCommunityTags = {
     tags: z.array(Tags),
   }),
   context: AuthContext,
+};
+
+export const UpdateBanner = {
+  input: z.object({
+    community_id: z.string(),
+    banner_text: z.string(),
+  }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const ToggleCommunityStar = {
+  input: z.object({ community_id: z.string() }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const SetAddressWallet = {
+  input: z.object({
+    community_id: z.string(),
+    wallet_id: z.enum(WalletId),
+  }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const RefreshWeightedVotes = {
+  input: z.object({
+    topic_id: PG_INT,
+    community_id: z.string(),
+  }),
+  output: z.object({
+    topic_id: PG_INT,
+    community_id: z.string(),
+  }),
+  context: TopicContext,
 };

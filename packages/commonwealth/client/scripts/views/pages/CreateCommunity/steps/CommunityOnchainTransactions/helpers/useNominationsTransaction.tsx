@@ -11,6 +11,7 @@ interface UseNominationsTransactionProps {
   namespace: string;
   userAddress: string;
   chainId: string;
+  judgeId: number;
   onSuccess?: () => void;
 }
 
@@ -18,6 +19,7 @@ const useNominationsTransaction = ({
   namespace,
   userAddress,
   chainId,
+  judgeId,
   onSuccess,
 }: UseNominationsTransactionProps): TransactionHookResult => {
   const [transactionData, setTransactionData] = useState<TransactionData>(
@@ -50,8 +52,7 @@ const useNominationsTransaction = ({
         maxNominations: 5,
         ethChainId: parseInt(chainId),
         chainRpc,
-        // TODO: get from backend in https://github.com/hicommonwealth/commonwealth/issues/10993
-        judgeId: 101,
+        judgeId,
       });
 
       setTransactionData({

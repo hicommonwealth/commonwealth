@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
 
 .ManageRoles {
   display: flex;
@@ -6,8 +8,8 @@
   margin-bottom: 24px;
 
   .roles-container {
-    border: 2px solid $neutral-200;
-    border-radius: $border-radius-corners;
+    border: 2px solid colors.$neutral-200;
+    border-radius: border_radius.$border-radius-corners;
     height: 196px;
     overflow-y: auto;
     padding: 0 4px;
@@ -29,7 +31,7 @@
         cursor: pointer;
 
         &:hover {
-          color: $neutral-600;
+          color: colors.$neutral-600;
         }
       }
     }

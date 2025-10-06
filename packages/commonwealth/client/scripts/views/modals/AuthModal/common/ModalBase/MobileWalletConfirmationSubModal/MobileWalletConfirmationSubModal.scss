@@ -1,4 +1,6 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
+@use '../../../../../../styles/mixins/media_queries';
 
 .MobileWalletConfirmationSubModal {
   display: flex;
@@ -7,7 +9,7 @@
   gap: 16px;
   padding-top: 48px;
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     padding-top: 32px;
   }
 
@@ -24,7 +26,7 @@
     margin: auto;
     width: 227px;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       width: 175px;
     }
   }
@@ -34,29 +36,28 @@
   }
 
   .content {
-    .header {
-      color: $neutral-600;
-    }
-
     padding: 0 48px;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       padding: 0 32px;
+    }
+
+    .header {
+      color: colors.$neutral-600;
     }
   }
 
   .footer {
     padding-bottom: 48px;
+    justify-content: center;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       padding-bottom: 32px;
     }
 
-    justify-content: center;
-
     .Text {
       display: initial;
-      color: $neutral-400;
+      color: colors.$neutral-400;
     }
   }
 }

@@ -4,7 +4,7 @@ import { updateActiveAddresses } from 'controllers/app/login';
 import { DEFAULT_CHAIN } from 'helpers/constants';
 import app, { ApiStatus } from 'state';
 import { z } from 'zod';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from '../state/api/communities/getCommuityById';
+import { getCommunityByIdQuery } from '../state/api/communities/getCommuityById';
 import { userStore } from '../state/ui/user';
 
 export const deinitChainOrCommunity = async () => {
@@ -41,11 +41,8 @@ export const loadCommunityChainInfo = async (
     if (activeCommunity) {
       tempChain = activeCommunity;
     } else {
-      const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
-        DEFAULT_CHAIN,
-        true,
-      );
-      tempChain = communityInfo;
+      const communityInfo = await getCommunityByIdQuery(DEFAULT_CHAIN, true);
+      tempChain = communityInfo as z.infer<typeof ExtendedCommunity>;
     }
 
     if (!tempChain) {
@@ -91,6 +88,10 @@ export const loadCommunityChainInfo = async (
         const Ethereum = (await import('../controllers/chain/ethereum/adapter'))
           .default;
         return new Ethereum(tempChain, app);
+      }
+      case ChainBase.Sui: {
+        const Sui = (await import('../controllers/chain/sui/adapter')).default;
+        return new Sui(tempChain, app);
       }
       default:
         throw new Error('Invalid Chain');

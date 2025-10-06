@@ -1,4 +1,6 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .StakeExchangeForm {
   display: flex;
@@ -11,7 +13,7 @@
   .CWModalBody {
     overflow: auto;
 
-    @include heightSmallInclusive {
+    @include media_queries.heightSmallInclusive {
       max-height: 300px;
     }
   }
@@ -23,7 +25,7 @@
   .current-balance-row {
     display: flex;
     justify-content: space-between;
-    color: $neutral-500;
+    color: colors.$neutral-500;
 
     .balance-and-magic {
       display: flex;
@@ -33,17 +35,17 @@
       .wallet-btn {
         padding-top: 4px;
         text-decoration: none;
-        color: $primary-600;
+        color: colors.$primary-600;
         cursor: pointer;
       }
     }
 
     .Text {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
 
     .error {
-      color: $rorange-500;
+      color: colors.$rorange-500;
     }
   }
 
@@ -61,7 +63,7 @@
     .valued {
       display: flex;
       align-items: center;
-      color: $neutral-400;
+      color: colors.$neutral-400;
       margin-left: 4px;
     }
     .denominationIcon {
@@ -77,7 +79,7 @@
   }
 
   .exchange-stake-number-selector {
-    background-color: $neutral-50;
+    background-color: colors.$neutral-50;
     border-radius: 6px;
     padding: 8px 16px;
     display: flex;
@@ -86,7 +88,7 @@
 
     .header {
       text-transform: uppercase;
-      color: $neutral-400;
+      color: colors.$neutral-400;
     }
 
     .stake-selector-row {
@@ -100,7 +102,7 @@
         gap: 25px;
         align-items: center;
 
-        @include smallInclusive {
+        @include media_queries.smallInclusive {
           gap: 0;
         }
 
@@ -116,7 +118,7 @@
               width: 5ch;
               border-color: transparent;
               transition: width 0.2s ease-in-out;
-              border: 1px solid $neutral-200;
+              border: 1px solid colors.$neutral-200;
 
               &.expanded {
                 width: 8ch;
@@ -132,11 +134,11 @@
       justify-content: space-between;
 
       .Text {
-        color: $neutral-500;
+        color: colors.$neutral-500;
       }
 
       .label {
-        color: $neutral-400;
+        color: colors.$neutral-400;
         min-width: 90px;
       }
     }
@@ -147,7 +149,7 @@
   }
 
   .total-weight-summary {
-    background-color: $neutral-50;
+    background-color: colors.$neutral-50;
     border-radius: 6px;
     padding: 8px 16px;
     display: flex;
@@ -160,7 +162,7 @@
       justify-content: center;
       width: 214px;
 
-      @include smallInclusive {
+      @include media_queries.smallInclusive {
         width: 164px;
       }
     }
@@ -177,7 +179,7 @@
     }
 
     .Text {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 

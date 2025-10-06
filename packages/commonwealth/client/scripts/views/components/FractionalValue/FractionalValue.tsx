@@ -7,11 +7,13 @@ import { formatFractionalValue } from './helpers';
 
 type FractionalValueProps = {
   value: number;
+  currencySymbol?: string;
 } & TextStyleProps;
 
 const FractionalValue = ({
   value,
   className,
+  currencySymbol,
   ...rest
 }: FractionalValueProps) => {
   const formattedValue = formatFractionalValue(value);
@@ -20,7 +22,10 @@ const FractionalValue = ({
     <CWText className={clsx('FractionalValue', className)} {...rest}>
       {typeof formattedValue === 'string' ||
       typeof formattedValue === 'number' ? (
-        formattedValue
+        <>
+          {currencySymbol}
+          {formattedValue}
+        </>
       ) : (
         <CWTooltip
           placement="bottom"
@@ -32,6 +37,7 @@ const FractionalValue = ({
               onMouseEnter={handleInteraction}
               onMouseLeave={handleInteraction}
             >
+              {currencySymbol}
               0.0
               <sub>{formattedValue.decimal0Count - 1}</sub>
               {formattedValue.valueAfterDecimal0s}

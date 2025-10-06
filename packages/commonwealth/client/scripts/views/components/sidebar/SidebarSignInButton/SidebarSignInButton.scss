@@ -1,19 +1,21 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .SidebarSignInButton {
   display: flex;
-  width: $sidebar-width;
+  width: shared.$sidebar-width;
   margin-top: 60px;
   flex-direction: column;
   padding: 10px;
   align-items: center;
   height: 114px;
-  border-bottom: 1px solid $neutral-200;
+  border-bottom: 1px solid colors.$neutral-200;
 
   &.isInsideCommunity {
     width: auto;
   }
-  @include isWindowSmallToMediumInclusive {
+  @include media_queries.isWindowSmallToMediumInclusive {
     width: 100vw;
     &.isInsideCommunity {
       width: auto;

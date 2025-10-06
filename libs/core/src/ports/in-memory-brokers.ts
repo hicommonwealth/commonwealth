@@ -7,6 +7,7 @@ export const successfulInMemoryBroker = {
   subscribe: () => Promise.resolve(true),
   isHealthy: () => Promise.resolve(true),
   getRoutingKey: (): RoutingKey => 'ThreadCreated',
+  subscribeDlqHandler: () => Promise.resolve(true),
 };
 
 export const failingInMemoryBroker = {
@@ -15,4 +16,5 @@ export const failingInMemoryBroker = {
   publish: () => Promise.resolve(false),
   subscribe: () => Promise.resolve(false),
   isHealthy: () => Promise.resolve(false),
+  subscribeDlqHandler: () => Promise.resolve(false),
 };

@@ -1,4 +1,5 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .Integrations {
   display: flex;
@@ -9,21 +10,21 @@
   .header {
     .h4,
     .h5 {
-      color: $neutral-900 !important;
+      color: colors.$neutral-900 !important;
     }
 
     .b1 {
-      color: $neutral-500 !important;
+      color: colors.$neutral-500 !important;
     }
   }
 
   a {
-    color: $primary-500 !important;
+    color: colors.$primary-500 !important;
 
     &:visited,
     &:hover,
     &:active {
-      color: $primary-500 !important;
+      color: colors.$primary-500 !important;
     }
   }
 

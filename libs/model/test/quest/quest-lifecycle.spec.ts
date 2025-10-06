@@ -5,7 +5,7 @@ import {
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
 import { Chance } from 'chance';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import {
@@ -21,6 +21,30 @@ import { seed } from '../../src/tester';
 import { seedCommunity } from '../utils/community-seeder';
 
 const chance = new Chance();
+
+async function createQuest(
+  community_id: string,
+  actor: Actor,
+  start_date: Date,
+  end_date: Date,
+  name = chance.name() + Math.random(),
+  max_xp_to_end = 100,
+) {
+  const quest = await command(CreateQuest(), {
+    actor,
+    payload: {
+      community_id,
+      name,
+      description: chance.sentence(),
+      image_url: chance.url(),
+      start_date,
+      end_date,
+      max_xp_to_end,
+      quest_type: 'common',
+    },
+  });
+  return quest;
+}
 
 describe('Quest lifecycle', () => {
   let superadmin: Actor;
@@ -44,6 +68,103 @@ describe('Quest lifecycle', () => {
       reaction_weights_sum: '0',
     });
     thread_id = thread!.id!;
+
+    await models.sequelize.query(`
+      CREATE OR REPLACE FUNCTION create_quest_xp_leaderboard(quest_id_param INTEGER, tier_param INTEGER)
+          RETURNS VOID
+          LANGUAGE plpgsql
+        AS $$
+        DECLARE
+            view_name TEXT;
+            user_index_name TEXT;
+            rank_index_name TEXT;
+            create_view_sql TEXT;
+            create_user_index_sql TEXT;
+            create_rank_index_sql TEXT;
+        BEGIN
+            -- Generate dynamic names
+            view_name := 'quest_' || quest_id_param || '_xp_leaderboard';
+            user_index_name := 'quest_' || quest_id_param || '_xp_leaderboard_user_id';
+            rank_index_name := 'quest_' || quest_id_param || '_xp_leaderboard_rank';
+        
+            -- Drop existing view if it exists
+            EXECUTE 'DROP MATERIALIZED VIEW IF EXISTS "' || view_name || '" CASCADE';
+        
+            -- Build the CREATE MATERIALIZED VIEW statement
+            create_view_sql := '
+                CREATE MATERIALIZED VIEW "' || view_name || '" AS
+                WITH user_xp_combined AS (
+                    SELECT
+                        l.user_id as user_id,
+                        COALESCE(l.xp_points, 0) as xp_points,
+                        0 as creator_xp_points,
+                        0 as referrer_xp_points
+                    FROM "XpLogs" l
+                             JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
+                             JOIN "Quests" q ON m.quest_id = q.id
+                    WHERE l.user_id IS NOT NULL AND q.id = ' || quest_id_param || '
+        
+                    UNION ALL
+        
+                    SELECT
+                        l.creator_user_id as user_id,
+                        0 as xp_points,
+                        COALESCE(l.creator_xp_points, 0) as creator_xp_points,
+                        0 as referrer_xp_points
+                    FROM "XpLogs" l
+                             JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
+                             JOIN "Quests" q ON m.quest_id = q.id
+                    WHERE l.creator_user_id IS NOT NULL AND q.id = ' || quest_id_param || '
+        
+                    UNION ALL
+        
+                    SELECT
+                        l.referrer_user_id as user_id,
+                        0 as xp_points,
+                        0 as creator_xp_points,
+                        COALESCE(l.referrer_xp_points, 0) as referrer_xp_points
+                    FROM "XpLogs" l
+                             JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
+                             JOIN "Quests" q ON m.quest_id = q.id
+                    WHERE l.referrer_user_id IS NOT NULL AND q.id = ' || quest_id_param || '
+                ),
+                aggregated_xp AS (
+                    SELECT
+                        user_id,
+                        SUM(xp_points)::int as total_user_xp,
+                        SUM(creator_xp_points)::int as total_creator_xp,
+                        SUM(referrer_xp_points)::int as total_referrer_xp
+                    FROM user_xp_combined
+                    GROUP BY user_id
+                )
+                SELECT
+                    a.user_id,
+                    (a.total_user_xp + a.total_creator_xp + a.total_referrer_xp) as xp_points,
+                    u.tier,
+                    ROW_NUMBER() OVER (ORDER BY (a.total_user_xp + a.total_creator_xp + a.total_referrer_xp) DESC, a.user_id ASC)::int as rank
+                FROM aggregated_xp a
+                         JOIN "Users" u ON a.user_id = u.id
+                WHERE u.tier > ' || tier_param;
+        
+            -- Execute the CREATE MATERIALIZED VIEW
+            EXECUTE create_view_sql;
+        
+            -- Create indexes
+            create_user_index_sql := '
+                CREATE UNIQUE INDEX "' || user_index_name || '"
+                ON "' || view_name || '" (user_id)';
+        
+            create_rank_index_sql := '
+                CREATE INDEX "' || rank_index_name || '"
+                ON "' || view_name || '" (rank DESC)';
+        
+            EXECUTE create_user_index_sql;
+            EXECUTE create_rank_index_sql;
+        
+            RAISE NOTICE 'Created materialized view: %', view_name;
+        END;
+        $$;
+    `);
   });
 
   afterAll(async () => {
@@ -55,55 +176,36 @@ describe('Quest lifecycle', () => {
 
   describe('create', () => {
     it('should create a quest', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: 'test quest',
-          description: 'test description',
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+        'test quest',
+      );
       expect(quest?.name).toBe('test quest');
     });
 
     it('should create a global quest', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          name: 'test quest global',
-          description: 'test description',
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+        'test quest global',
+      );
       expect(quest?.name).toBe('test quest global');
     });
 
     it('should not create a quest with the same name', async () => {
       await expect(
-        command(CreateQuest(), {
-          actor: superadmin,
-          payload: {
-            community_id,
-            name: 'test quest',
-            description: 'test description',
-            image_url: chance.url(),
-            start_date: new Date(
-              new Date().getTime() + 1000 * 60 * 60 * 24 * 3,
-            ),
-            end_date: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 5),
-            max_xp_to_end: 100,
-            quest_type: 'common',
-          },
-        }),
+        createQuest(
+          community_id,
+          superadmin,
+          start_date,
+          end_date,
+          'test quest',
+        ),
       ).rejects.toThrowError(
         `Quest named "test quest" in community "${community_id}"`,
       );
@@ -112,19 +214,12 @@ describe('Quest lifecycle', () => {
 
   describe('update', () => {
     it('should update a quest', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name(),
-          description: chance.sentence(),
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
         [
           {
@@ -170,19 +265,13 @@ describe('Quest lifecycle', () => {
 
     it('should not update a quest with the same name', async () => {
       const name = chance.name() + Math.random();
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name,
-          description: 'test description',
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+        name,
+      );
       await expect(
         command(UpdateQuest(), {
           actor: superadmin,
@@ -199,19 +288,12 @@ describe('Quest lifecycle', () => {
     });
 
     it('should not update a quest that has started', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name() + Math.random(),
-          description: 'test description',
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       // hack to update the start_date
       const now = new Date();
       await models.Quest.update(
@@ -228,24 +310,17 @@ describe('Quest lifecycle', () => {
           },
         }),
       ).rejects.toThrowError(
-        `Start date ${moment(now).format('YYYY-MM-DD')} already passed`,
+        `Start date ${dayjs(now).format('YYYY-MM-DD')} already passed`,
       );
     });
 
     it('should not update a quest with invalid content_id', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name() + Math.random(),
-          description: 'test description',
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
 
       await expect(
         command(UpdateQuest(), {
@@ -271,19 +346,12 @@ describe('Quest lifecycle', () => {
 
   describe('query', () => {
     it('should get a quest', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name(),
-          description: chance.sentence(),
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       const retrieved = await query(GetQuest(), {
         actor: superadmin,
         payload: { quest_id: quest!.id! },
@@ -315,19 +383,7 @@ describe('Quest lifecycle', () => {
         ];
       const quests = await Promise.all(
         [...Array(3)].map(() =>
-          command(CreateQuest(), {
-            actor: superadmin,
-            payload: {
-              community_id,
-              name: chance.name() + Math.random(),
-              description: chance.sentence(),
-              image_url: chance.url(),
-              start_date,
-              end_date,
-              max_xp_to_end: 100,
-              quest_type: 'common',
-            },
-          }),
+          createQuest(community_id, superadmin, start_date, end_date),
         ),
       );
       await command(UpdateQuest(), {
@@ -341,7 +397,7 @@ describe('Quest lifecycle', () => {
         actor: superadmin,
         payload: { community_id, cursor: 1, limit: 10 },
       });
-      expect(retrieved?.results?.length).toBe(9);
+      expect(retrieved?.results?.length).toBe(10);
       quests
         .at(-1)
         ?.action_metas?.forEach((meta, index) =>
@@ -352,19 +408,12 @@ describe('Quest lifecycle', () => {
 
   describe('delete', () => {
     it('should delete a quest', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name() + Math.random(),
-          description: chance.sentence(),
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       const deleted = await command(DeleteQuest(), {
         actor: superadmin,
         payload: { quest_id: quest!.id! },
@@ -379,19 +428,12 @@ describe('Quest lifecycle', () => {
     });
 
     it('should be able to delete after started but with no actions', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name(),
-          description: chance.sentence(),
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       // hack to update the start_date
       const now = new Date();
       await models.Quest.update(
@@ -406,19 +448,12 @@ describe('Quest lifecycle', () => {
     });
 
     it('should not delete a quest with actions', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name(),
-          description: chance.sentence(),
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
         [
           {
@@ -467,19 +502,12 @@ describe('Quest lifecycle', () => {
 
   describe('cancel', () => {
     it('should cancel a quest', async () => {
-      const quest = await command(CreateQuest(), {
-        actor: superadmin,
-        payload: {
-          community_id,
-          name: chance.name() + Math.random(),
-          description: chance.sentence(),
-          image_url: chance.url(),
-          start_date,
-          end_date,
-          max_xp_to_end: 100,
-          quest_type: 'common',
-        },
-      });
+      const quest = await createQuest(
+        community_id,
+        superadmin,
+        start_date,
+        end_date,
+      );
       const cancelled = await command(CancelQuest(), {
         actor: superadmin,
         payload: { quest_id: quest!.id! },

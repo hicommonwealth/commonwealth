@@ -1,8 +1,11 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
+
 .ProfileThread {
   padding: 0px 60px 0px 60px;
-  border-bottom: 1px solid $neutral-200;
-  @include extraSmall {
+  border-bottom: 1px solid colors.$neutral-200;
+  @include media_queries.extraSmall {
     padding: 0px 30px 0px 30px;
   }
   .Divider {

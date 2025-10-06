@@ -54,16 +54,16 @@ const CreateContentDrawer = ({ onClose }: CreateContentDrawerProps) => {
         <CWText className="header" fontWeight="medium" type="caption">
           Universal create
         </CWText>
-        <div className="item" onClick={handleCreateCommunity}>
-          <CWIcon iconName="peopleNew" />
-          <CWText>Create community</CWText>
-        </div>
         {launchpadEnabled && (
           <div className="item" onClick={handleCreateTokenCommunity}>
             <CWIcon iconName="rocketLaunch" />
             <CWText>Launch Token</CWText>
           </div>
         )}
+        <div className="item" onClick={handleCreateCommunity}>
+          <CWIcon iconName="peopleNew" />
+          <CWText>Create community</CWText>
+        </div>
       </div>
       <CWIconButton iconName="close" onClick={onClose} />
     </div>

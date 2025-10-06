@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
-import { commonProtocol } from '../../services';
+import { communityStakeConfigValidator } from '../../services/commonProtocol';
 
 export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
   return {
@@ -21,26 +21,21 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
               model: models.ChainNode,
               attributes: ['eth_chain_id', 'url'],
             },
-            {
-              model: models.CommunityStake,
-            },
+            { model: models.CommunityStake },
           ],
-          attributes: ['namespace'],
         })
       )?.toJSON();
+      mustExist('Community', community);
 
       // !domain logic - invariants on loaded state & payload
-      mustExist('Community', community);
       if (
         community.CommunityStakes &&
         community.CommunityStakes.find((s) => s.stake_id === rest.stake_id)
       )
-        throw new InvalidState(
-          `Stake ${rest.stake_id} already configured in community ${community_id}`,
-        );
+        throw new InvalidState('Community stake already configured');
 
       // !domain, application, and infrastructure services (stateless, not related to entities or value objects)
-      await commonProtocol.communityStakeConfigValidator.validateCommunityStakeConfig(
+      await communityStakeConfigValidator.validateCommunityStakeConfig(
         community,
         rest.stake_id,
       );

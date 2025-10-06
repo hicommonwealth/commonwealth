@@ -1,3 +1,6 @@
+@use 'mixins/border_radius';
+@use 'mixins/colors.module';
+
 .m-auto {
   margin: auto !important;
 }
@@ -47,4 +50,15 @@
 
 .w-fit {
   width: fit-content;
+}
+
+// this is required for `client/scripts/helpers/html.ts#jumpHighlightElement()`
+.highlighted {
+  background-color: colors.$yellow-200;
+  border-radius: border_radius.$border-radius-corners;
+
+  &.highlightAnimationComplete {
+    background-color: transparent;
+    transition: background-color 1s ease-in-out;
+  }
 }

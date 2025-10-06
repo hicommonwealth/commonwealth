@@ -1,4 +1,5 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
 
 .FeatureHint {
   display: flex;
@@ -11,15 +12,15 @@
     flex-wrap: wrap;
 
     svg {
-      fill: $yellow-400;
+      fill: colors.$yellow-400;
     }
 
     .Text {
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
   }
 
   .hint {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 }

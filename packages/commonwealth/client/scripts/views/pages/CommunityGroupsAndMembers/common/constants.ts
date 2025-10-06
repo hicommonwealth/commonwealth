@@ -1,13 +1,20 @@
 import { fetchCachedNodes } from 'state/api/nodes';
+import NodeInfo from '../../../../models/NodeInfo';
 
 export const TOKENS = {
   COSMOS_TOKEN: 'cosmos_native',
   EVM_TOKEN: 'eth_native',
+  SUI_TOKEN: 'sui_native',
+  SUI_TOKEN_TYPE: 'sui_token',
 };
 
 export const SPL_SPECIFICATION = 'spl';
 
 export const SOL_NFT_SPECIFICATION = 'metaplex';
+
+export const SUI_NFT_SPECIFICATION = 'sui_nft';
+
+export const TRUST_LEVEL_SPECIFICATION = 'trust-level';
 
 export const ERC_SPECIFICATIONS = {
   ERC_20: 'erc20',
@@ -41,8 +48,12 @@ export const requirementTypes = [
   { value: ERC_SPECIFICATIONS.ERC_721, label: 'ERC-721' },
   { value: ERC_SPECIFICATIONS.ERC_1155, label: 'ERC-1155' },
   { value: TOKENS.EVM_TOKEN, label: 'EVM base tokens' },
+  { value: TOKENS.SUI_TOKEN, label: 'Sui Native Token' },
+  { value: TOKENS.SUI_TOKEN_TYPE, label: 'Sui Coin Type' },
+  { value: SUI_NFT_SPECIFICATION, label: 'Sui NFT Type' },
   { value: SPL_SPECIFICATION, label: 'Solana SPL Token' },
   { value: SOL_NFT_SPECIFICATION, label: 'Solana NFT' },
+  { value: TRUST_LEVEL_SPECIFICATION, label: 'Trust Level' },
 ];
 
 export const conditionTypes = [
@@ -52,25 +63,31 @@ export const conditionTypes = [
 ];
 
 // Get chain id's from the fetchCachedNodes for all eth and cosmos chains
-export const chainTypes =
-  fetchCachedNodes()
-    ?.filter(
+export const chainTypes = getChainTypes(fetchCachedNodes() || []);
+
+export function getChainTypes(chainNodes: NodeInfo[]) {
+  return chainNodes
+    .filter(
       (chain) =>
         chain.ethChainId ||
         chain.cosmosChainId ||
-        chain.balanceType === 'solana',
+        chain.balanceType === 'solana' ||
+        chain.balanceType === 'sui',
     )
-    ?.map((chain) => ({
+    .map((chain) => ({
       chainBase: chain.ethChainId
         ? 'ethereum'
         : chain.balanceType === 'solana'
           ? 'solana'
-          : 'cosmos',
+          : chain.balanceType === 'sui'
+            ? 'sui'
+            : 'cosmos',
       value:
-        chain.ethChainId ||
-        chain.cosmosChainId ||
-        chain.balanceType === 'solana'
+        chain.balanceType === 'solana' || chain.balanceType === 'sui'
           ? chain.name
-          : 0,
+          : chain.ethChainId || chain.cosmosChainId
+            ? chain.ethChainId || chain.cosmosChainId
+            : 0,
       label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
-    })) || [];
+    }));
+}

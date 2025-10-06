@@ -1,4 +1,5 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .TooltipIndicator {
   // cover the parent
@@ -26,9 +27,9 @@
     font-size: 12px;
     letter-spacing: 0.24px;
     border-radius: 4px;
-    background-color: $neutral-900;
+    background-color: colors.$neutral-900;
     padding: 4px 8px;
-    color: $white;
+    color: colors.$white;
     text-align: center;
   }
 }

@@ -1,4 +1,5 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .UserMenuItem {
   display: flex;
@@ -7,12 +8,12 @@
   width: 100%;
 
   .Text {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 
   &.isSignedIn {
     .Text {
-      color: $neutral-700;
+      color: colors.$neutral-700;
       font-weight: 500;
     }
   }
@@ -29,7 +30,7 @@
     display: flex;
 
     svg {
-      fill: $green-600;
+      fill: colors.$green-600;
       width: 16px;
       height: 16px;
     }

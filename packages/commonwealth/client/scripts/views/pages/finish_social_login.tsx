@@ -5,8 +5,8 @@ import React, { useEffect, useState } from 'react';
 import { initAppState } from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
+import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import ErrorPage from 'views/pages/error';
-import { PageLoading } from 'views/pages/loading';
 
 const validate = async (
   setRoute: (route: string) => void,
@@ -102,7 +102,7 @@ const FinishSocialLogin = () => {
   if (validationError) {
     return <ErrorPage message={validationError} />;
   } else {
-    return <PageLoading />;
+    return <LoadingIndicator />;
   }
 };
 

@@ -1,22 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import { ApiEndpoints, SERVER_URL } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
 
 const COMMUNITY_STAKE_STALE_TIME = 3 * 60 * 1_000; // 3 min
-
-type FetchCommunityStakeProps = Omit<
-  UseFetchCommunityStakeQueryProps,
-  'apiEnabled'
->;
-
-const fetchCommunityStake = async ({
-  communityId,
-  stakeId,
-}: FetchCommunityStakeProps) => {
-  return await axios.get(
-    `${SERVER_URL}/${ApiEndpoints.FETCH_COMMUNITY_STAKES}/${communityId}/${stakeId}`,
-  );
-};
 
 interface UseFetchCommunityStakeQueryProps {
   communityId: string;
@@ -29,12 +13,16 @@ const useFetchCommunityStakeQuery = ({
   stakeId,
   apiEnabled,
 }: UseFetchCommunityStakeQueryProps) => {
-  return useQuery({
-    queryKey: [ApiEndpoints.FETCH_COMMUNITY_STAKES, communityId, stakeId],
-    queryFn: () => fetchCommunityStake({ communityId, stakeId }),
-    staleTime: COMMUNITY_STAKE_STALE_TIME,
-    enabled: apiEnabled,
-  });
+  return trpc.community.getCommunityStake.useQuery(
+    {
+      community_id: communityId,
+      stake_id: stakeId,
+    },
+    {
+      staleTime: COMMUNITY_STAKE_STALE_TIME,
+      enabled: apiEnabled,
+    },
+  );
 };
 
 export default useFetchCommunityStakeQuery;

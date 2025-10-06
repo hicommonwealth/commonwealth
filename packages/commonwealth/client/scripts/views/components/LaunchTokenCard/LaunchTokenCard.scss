@@ -1,4 +1,5 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
 
 .LaunchTokenCard {
   background-image: url('assets/img/tokenLaunchCardBg.png');
@@ -9,6 +10,6 @@
   width: 100%;
 
   .Text {
-    color: $white;
+    color: colors.$white;
   }
 }

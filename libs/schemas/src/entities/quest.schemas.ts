@@ -1,9 +1,11 @@
 import z from 'zod';
 import { events } from '../events';
 import { PG_INT } from '../utils';
+import { ChainEventXpSource } from './chain-event-xp-source.schemas';
+import { CommunityGoalMeta } from './community.schemas';
 
 export const ChannelQuestEvents = {
-  CommonDiscordServerJoined: events.CommonDiscordServerJoined,
+  DiscordServerJoined: events.DiscordServerJoined,
   XpChainEventCreated: events.XpChainEventCreated,
   TwitterCommonMentioned: events.TwitterCommonMentioned,
 } as const;
@@ -31,14 +33,16 @@ export const QuestEvents = {
   RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
   OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
   ContestEnded: events.ContestEnded,
-  LaunchpadTokenCreated: events.LaunchpadTokenCreated,
+  LaunchpadTokenRecordCreated: events.LaunchpadTokenRecordCreated,
   LaunchpadTokenTraded: events.LaunchpadTokenTraded,
+  LaunchpadTokenGraduated: events.LaunchpadTokenGraduated,
   WalletLinked: events.WalletLinked,
   SSOLinked: events.SSOLinked,
   NamespaceLinked: events.NamespaceLinked,
   CommunityGoalReached: events.CommunityGoalReached,
   MembershipsRefreshed: events.MembershipsRefreshed,
   ...ChannelQuestEvents,
+  XpAwarded: events.XpAwarded,
 } as const;
 
 export const QuestActionNames = [
@@ -48,6 +52,37 @@ export const QuestActionNames = [
   ]),
   ...ChannelBatchActions,
 ];
+
+export const QuestActionScope = z.object({
+  chain_id: z.number().optional(),
+  community_id: z.string().optional(),
+  namespace: z.string().optional(),
+  contest_address: z.string().optional(),
+  launchpad_token_address: z.string().optional(),
+  topic_id: z.number().optional(),
+  thread_id: z.number().optional(),
+  comment_id: z.number().optional(),
+  group_id: z.number().optional(),
+  wallet: z.string().optional(),
+  sso: z.string().optional(),
+  amount: z
+    .number()
+    .optional()
+    .describe(
+      'Overrides reward_amount if present, used with trades x multiplier',
+    ),
+  goal_id: z.number().optional().describe('Community goal'),
+  threshold: z
+    .number()
+    .optional()
+    .describe('Rewards when over configured meta value'),
+  discord_server_id: z.string().optional().describe('Discord server id'),
+  award_reason: z.string().optional().describe('Reason for awarding XP'),
+  awarded_by_user_id: z
+    .number()
+    .optional()
+    .describe('User id of user who awarded XP'),
+});
 
 export enum QuestParticipationLimit {
   OncePerQuest = 'once_per_quest',
@@ -81,8 +116,8 @@ export const QuestTweet = z
 
 export const QuestActionMeta = z
   .object({
-    id: z.number().nullish(),
-    quest_id: z.number(),
+    id: z.number().nullish(), // to allow negative system quests
+    quest_id: z.number(), // to allow negative system quests
     //event names instead of enums for flexibility when adding new events
     event_name: z.enum([
       ...(Object.keys(QuestEvents) as [
@@ -94,21 +129,25 @@ export const QuestActionMeta = z
     reward_amount: z.number(),
     creator_reward_weight: z.number().min(0).max(1).default(0),
     amount_multiplier: z.number().min(0).nullish(),
-    participation_limit: z.nativeEnum(QuestParticipationLimit).nullish(),
-    participation_period: z.nativeEnum(QuestParticipationPeriod).nullish(),
+    participation_limit: z.enum(QuestParticipationLimit).nullish(),
+    participation_period: z.enum(QuestParticipationPeriod).nullish(),
     instructions_link: z.string().url().optional().nullish(),
     participation_times_per_period: z.number().nullish(),
     content_id: z
       .string()
       .regex(
-        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_url:https:\/\/discord\.(com\/invite\/|gg\/?)\w+)/,
+        /(chain:\d+)|(topic:\d+)|(thread:\d+)|(comment:\d+)|(group:\d+)|(wallet:\w+)|(sso:\w+)|(goal:\d+)|(threshold:\d+)|(tweet_url:https:\/\/x\.com\/[^]+\/status\/[^]+)|(discord_server_id:\d+)/,
       )
       .nullish(),
+    community_goal_meta_id: PG_INT.nullish(),
+    start_link: z.string().url().nullish(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
 
     // associations
     QuestTweet: QuestTweet.nullish(),
+    ChainEventXpSource: ChainEventXpSource.nullish(),
+    CommunityGoalMeta: CommunityGoalMeta.nullish(),
   })
   .describe('Quest action metadata associated to a quest instance');
 
@@ -116,7 +155,7 @@ export const QuestScore = z
   .object({
     user_id: PG_INT,
     points: z.number(),
-    period: z.nativeEnum(QuestParticipationPeriod).optional(),
+    period: z.enum(QuestParticipationPeriod).optional(),
   })
   .describe('Value type with user total/period score');
 

@@ -1,16 +1,25 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/elevation';
 
 .Trendingtoken {
-  border-radius: $border-radius-corners;
+  border-radius: border_radius.$border-radius-corners;
   padding: 8px 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background-color: $white;
+  background-color: colors.$white;
   width: 330px;
   height: 115px;
-  border: 1px solid $neutral-300;
+  border: 1px solid colors.$neutral-300;
   cursor: pointer;
+  box-shadow: elevation.$elevation-1;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: elevation.$elevation-3;
+  }
 
   .header {
     display: flex;
@@ -42,7 +51,7 @@
       }
 
       .creator {
-        color: $neutral-500;
+        color: colors.$neutral-500;
       }
     }
   }
@@ -56,5 +65,11 @@
       flex: 1;
       text-transform: capitalize;
     }
+  }
+
+  .PricePercentageChange {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }

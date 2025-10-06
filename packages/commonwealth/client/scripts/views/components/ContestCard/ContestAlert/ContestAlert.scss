@@ -1,11 +1,12 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .ContestAlert {
   display: flex;
   align-items: center;
   padding: 12px;
   border-radius: 6px;
-  background-color: $yellow-100;
+  background-color: colors.$yellow-100;
   margin-block: 8px;
   gap: 16px;
 
@@ -13,14 +14,14 @@
     width: 40px;
     height: 40px;
     padding: 4px;
-    background-color: $yellow-400;
-    fill: $yellow-800;
+    background-color: colors.$yellow-400;
+    fill: colors.$yellow-800;
     border-radius: 6px;
   }
 
   .right-side {
     .Text {
-      color: $yellow-800;
+      color: colors.$yellow-800;
     }
   }
 }

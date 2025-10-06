@@ -1,5 +1,3 @@
-import { ThresholdData } from './protocol';
-
 export const Roles = ['admin', 'moderator', 'member'] as const;
 export type Role = (typeof Roles)[number];
 
@@ -27,20 +25,6 @@ export enum NodeHealth {
   Failed = 'failed',
   Healthy = 'healthy',
 }
-
-export type AllowlistData = {
-  allow: string[];
-};
-
-export type Requirement =
-  | {
-      rule: 'threshold';
-      data: ThresholdData;
-    }
-  | {
-      rule: 'allow';
-      data: AllowlistData;
-    };
 
 export enum ContentType {
   Thread = 'thread',

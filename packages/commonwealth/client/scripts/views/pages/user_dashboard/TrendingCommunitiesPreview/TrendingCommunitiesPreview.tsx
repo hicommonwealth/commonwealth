@@ -1,3 +1,4 @@
+import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -10,17 +11,28 @@ import { CWText } from '../../../components/component_kit/cw_text';
 import { CommunityPreviewCard } from './CommunityPreviewCard';
 import './TrendingCommunitiesPreview.scss';
 
-export const TrendingCommunitiesPreview = () => {
+type TrendingCommunitiesPreviewProps = {
+  searchText?: string;
+  onClearSearch?: () => void;
+  hideSearchTag?: boolean;
+};
+
+export const TrendingCommunitiesPreview = ({
+  searchText,
+  onClearSearch,
+  hideSearchTag,
+}: TrendingCommunitiesPreviewProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
-  const { data: newContent } = useGetNewContent({ enabled: user.isLoggedIn });
+  const { data: newContent } = useGetNewContent({ enabled: !!user.isLoggedIn });
   const { data: paginatedTrendingCommunities } = useFetchCommunitiesQuery({
     cursor: 1,
     limit: 3,
     ...(user.isLoggedIn && {
       relevance_by: 'membership',
     }),
+    search: searchText?.trim(),
     include_last_30_day_thread_count: true,
     order_by: 'last_30_day_thread_count',
     order_direction: 'DESC',
@@ -59,6 +71,15 @@ export const TrendingCommunitiesPreview = () => {
           </div>
         </Link>
       </div>
+      <div className="filters">
+        {!hideSearchTag && searchText?.trim() && (
+          <CWTag
+            label={`Search: ${searchText?.trim()}`}
+            type="filter"
+            onCloseClick={onClearSearch}
+          />
+        )}
+      </div>
       <div className="community-preview-cards-collection">
         {trendingCommunities.map((sortedCommunity) => (
           <CommunityPreviewCard
@@ -68,6 +89,7 @@ export const TrendingCommunitiesPreview = () => {
               icon_url: sortedCommunity.community.icon_url || '',
               id: sortedCommunity.community.id || '',
               base: sortedCommunity.community.base || '',
+              tier: sortedCommunity.community.tier,
             }}
             monthlyThreadCount={
               sortedCommunity.community.last_30_day_thread_count || 0

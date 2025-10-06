@@ -45,7 +45,7 @@ export const DiscordConnections = ({
           buttonHeight: 'sm',
           onClick: async () => {
             try {
-              await setForumChannelConnection({ topicId });
+              await setForumChannelConnection({ topic_id: +topicId });
               setConnectionVerified(false);
               await refetchTopics();
               setConnectionVerified(true);

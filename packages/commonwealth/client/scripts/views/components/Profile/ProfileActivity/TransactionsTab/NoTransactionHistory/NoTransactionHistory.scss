@@ -1,12 +1,14 @@
-@import '../../../../../../styles/shared.scss';
+@use '../../../../../../styles/shared.scss';
+@use '../../../../../../styles/mixins/colors.module';
+@use '../../../../../../styles/mixins/media_queries';
 
 .NoTransactionHistory {
   width: 100%;
   border-radius: 6px;
-  border: 1px solid $neutral-200;
+  border: 1px solid colors.$neutral-200;
   padding: 40px;
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     padding: 24px;
   }
 
@@ -34,13 +36,13 @@
       text-align: center;
 
       a {
-        color: $primary-500;
+        color: colors.$primary-500;
         text-decoration: none;
 
         &:hover,
         &:active,
         &:focus {
-          color: $primary-500;
+          color: colors.$primary-500;
         }
       }
     }

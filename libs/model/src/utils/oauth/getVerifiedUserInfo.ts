@@ -31,6 +31,7 @@ async function getTwitterUser(token: string): Promise<VerifiedUserInfo> {
   return {
     provider: WalletSsoSource.Twitter,
     username: userData.data.username,
+    userId: userData.data.id,
   };
 }
 

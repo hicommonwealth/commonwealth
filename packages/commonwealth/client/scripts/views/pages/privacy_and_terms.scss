@@ -1,4 +1,6 @@
-@import '../../styles/shared.scss';
+@use '../../styles/shared.scss';
+@use '../../styles/mixins/colors.module';
+@use '../../styles/mixins/media_queries';
 
 .PrivacyPage {
   align-items: center;
@@ -16,19 +18,19 @@
     width: 736px;
     padding-top: 20px;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       width: 100%;
     }
   }
 
   p {
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
   }
 
   ul {
     list-style-type: disc;
     padding-left: 20px;
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
 
     &.hollow-container {
       padding: 10px;
@@ -37,7 +39,7 @@
 
   li {
     margin-bottom: 8px;
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
 
     &.hollow-bullet {
       list-style-type: circle;
@@ -56,14 +58,14 @@
     vertical-align: top;
     width: calc(100% / 4);
     padding: 5px;
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
   }
   a {
-    color: $primary-500;
+    color: colors.$primary-500;
   }
 
   .table-header {
-    background-color: $neutral-300;
+    background-color: colors.$neutral-300;
   }
 
   .column-header {
@@ -73,7 +75,7 @@
     display: inline;
     font-size: 24px;
     font-weight: bold;
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
   }
 }
 
@@ -89,7 +91,7 @@
 
   .link {
     text-decoration: underline;
-    color: $primary-600;
+    color: colors.$primary-600;
     cursor: pointer;
   }
 
@@ -102,7 +104,7 @@
     max-width: 736px;
     padding-top: 20px;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       width: 100%;
     }
 

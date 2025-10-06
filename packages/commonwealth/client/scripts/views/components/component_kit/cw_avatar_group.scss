@@ -1,4 +1,5 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .AvatarGroup {
   display: flex;
@@ -22,12 +23,12 @@
     }
 
     svg {
-      background: $white;
+      background: colors.$white;
       position: absolute;
     }
   }
   .avatar-group-count {
     margin-left: 8px;
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 }

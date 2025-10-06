@@ -1,0 +1,186 @@
+@use './../../../../styles/shared.scss';
+@use './../../../../styles/mixins/colors.module';
+
+.ThreadTokenWidget {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .purchase-token-card {
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid colors.$neutral-200;
+
+    .header {
+      margin-bottom: 20px;
+
+      .title-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+
+        .swap-icon-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          cursor: pointer;
+          padding: 4px;
+          border-radius: 4px;
+          transition: background-color 0.2s ease;
+
+          &:hover {
+            background-color: colors.$neutral-100;
+          }
+        }
+
+        .swap-icon {
+          color: colors.$primary-500;
+          font-size: 16px;
+          line-height: 1;
+          transition: color 0.2s ease;
+
+          &:first-child {
+            margin-bottom: -2px;
+          }
+
+          &:last-child {
+            margin-top: -2px;
+          }
+        }
+      }
+
+      .balance-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+
+        .balance-label {
+          color: colors.$neutral-500;
+          margin-bottom: 4px;
+        }
+
+        .balance-amount {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          .token-icon {
+            color: colors.$primary-500;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+
+    .amount-input-section {
+      margin-bottom: 16px;
+
+      .amount-input {
+        width: 100%;
+        height: 60px;
+        border: 2px solid colors.$primary-500;
+        border-radius: 8px;
+        padding: 0 16px;
+        font-size: 24px;
+        font-weight: 600;
+        text-align: center;
+        background: colors.$white;
+        outline: none;
+        margin-bottom: 8px;
+
+        &:focus {
+          border-color: colors.$primary-600;
+        }
+
+        &::placeholder {
+          color: colors.$neutral-400;
+        }
+      }
+
+      .input-currency {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        color: colors.$neutral-500;
+
+        .token-icon {
+          color: colors.$primary-500;
+          font-size: 12px;
+        }
+
+        .chevron-icon {
+          font-size: 12px;
+          margin-left: 4px;
+        }
+      }
+    }
+
+    .preset-amounts {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      justify-content: center;
+
+      button {
+        min-width: 60px;
+        height: 32px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+    }
+
+    .receive-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 12px;
+      background: colors.$neutral-25;
+      border-radius: 8px;
+      border: 1px solid colors.$neutral-200;
+
+      .receive-label {
+        color: colors.$neutral-500;
+        margin-bottom: 0;
+        font-size: 12px;
+      }
+
+      .receive-amount {
+        font-size: 12px;
+        color: colors.$neutral-700;
+        margin-bottom: 0;
+      }
+    }
+
+    .buy-button {
+      width: 100%;
+      height: 48px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .wallet-connection-message {
+    background: colors.$neutral-25;
+    border: 1px solid colors.$neutral-200;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+
+    .message-text {
+      color: colors.$neutral-600;
+    }
+  }
+}

@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { ChainNode, Community, ContestManager } from '../entities';
+import {
+  ChainNode,
+  Community,
+  ContestManager,
+  ContestManagerEnvironmentsSchema,
+} from '../entities';
 import { Contest, ContestAction } from '../projections';
 import { PG_INT } from '../utils';
 
@@ -22,6 +27,7 @@ export const GetAllContests = {
     contest_id: z.number().int().optional(),
     running: z.boolean().optional().describe('Only active contests'),
     with_chain_node: z.string().optional(),
+    search: z.string().optional().describe('Search contests by name'),
   }),
   output: z.array(ContestResults),
 };
@@ -54,15 +60,10 @@ export const GetActiveContestManagers = {
       max_contest_id: z.number(),
       end_time: z.coerce.date(),
       actions: z.array(ContestAction),
-      environment: z.enum([
-        'local',
-        'CI',
-        'frick',
-        'frack',
-        'beta',
-        'demo',
-        'production',
-      ]),
+      environment: ContestManagerEnvironmentsSchema,
+      namespace_judge_token_id: z.number().nullish(),
+      namespace_judges: z.array(z.string()).nullish(),
+      funding_token_address: z.string().nullish(),
     }),
   ),
 };
@@ -119,4 +120,13 @@ export const GetFarcasterContestCasts = {
     sort_by: z.enum(['upvotes', 'recent']).optional().default('upvotes'),
   }),
   output: z.array(z.any()),
+};
+
+export const GetJudgeStatus = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({
+    current_judge_id: z.number().int().nullish(),
+  }),
 };

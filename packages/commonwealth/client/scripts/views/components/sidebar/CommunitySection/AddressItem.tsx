@@ -14,7 +14,7 @@ import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
-import { getChainIcon } from 'client/scripts/utils/chainUtils';
+import { getChainIcon, getSsoIconName } from 'client/scripts/utils/chainUtils';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import { formatAddressShort } from 'shared/utils';
 import { CWIdentificationTag } from '../../component_kit/new_designs/CWIdentificationTag';
@@ -35,7 +35,7 @@ type AddressItemProps = {
 const AddressItem = (props: AddressItemProps) => {
   const { addressInfo, toggleRemoveModal, isSelected, isInsideCommunity } =
     props;
-  const { address, walletId, community } = addressInfo;
+  const { address, walletId, community, walletSsoSource } = addressInfo;
 
   const { openMagicWallet } = useAuthentication({});
 
@@ -58,7 +58,11 @@ const AddressItem = (props: AddressItemProps) => {
             iconSize="small"
           />
           <CWIdentificationTag
-            iconLeft={walletId}
+            iconLeft={
+              walletId === WalletId.Magic
+                ? getSsoIconName(walletSsoSource)
+                : walletId
+            }
             address={`\u2022 ${formatAddressShort(address)}`}
           />
         </div>

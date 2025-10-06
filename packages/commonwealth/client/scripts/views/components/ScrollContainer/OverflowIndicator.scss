@@ -1,4 +1,5 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
 
 .OverflowIndicator {
   display: flex;
@@ -16,7 +17,7 @@
   cursor: pointer;
 
   background-color: rgb(255, 255, 255);
-  color: $neutral-400;
+  color: colors.$neutral-400;
 }
 
 .OverflowIndicator .Gradient {

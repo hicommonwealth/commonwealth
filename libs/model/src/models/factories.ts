@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 import type { Associable } from './types';
 
 import Address from './address';
+import AICompletionToken from './ai_completion_token';
 import ApiKey from './api_key';
 import ChainEventXpSource from './chain_event_xp_sources';
 import ChainNode from './chain_node';
@@ -11,6 +12,7 @@ import CommentSubscription from './comment_subscriptions';
 import CommentVersionHistory from './comment_version_history';
 import Community from './community';
 import CommunityAlert from './community_alerts';
+import CommunityDirectoryTags from './community_directory_tags';
 import { CommunityGoalMeta, CommunityGoalReached } from './community_goal';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
@@ -18,17 +20,23 @@ import Contest from './contest';
 import ContestAction from './contest_action';
 import ContestManager from './contest_manager';
 import DiscordBotConfig from './discord_bot_config';
+import Dlq from './dlq';
 import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';
+import GovernanceProposal from './governance_proposals';
 import Group from './group';
-import GroupPermission from './groupPermission';
+import GroupGatedAction from './groupGatedAction';
+import GroupSnapshot from './groupSnapshot';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LaunchpadTrade from './launchpad_trade';
+import MCPServer from './mcp_server';
+import MCPServerCommunity from './mcp_server_community';
 import Membership from './membership';
 import Outbox from './outbox';
 import PinnedToken from './pinned_token';
 import Poll from './poll';
 import ProfileTags from './profile_tags';
+import ProposalVote from './proposal_votes';
 import { Quest, QuestActionMeta } from './quest';
 import QuestTweets from './quest_tweets';
 import Reaction from './reaction';
@@ -40,10 +48,19 @@ import StarredCommunity from './starred_community';
 import SubscriptionPreference from './subscription_preference';
 import Tags from './tags';
 import Thread from './thread';
+import ThreadRank from './thread_rank';
 import ThreadSubscription from './thread_subscriptions';
+import ThreadToken from './thread_token';
+import ThreadTokenTrade from './thread_token_trade';
 import ThreadVersionHistory from './thread_version_history';
 import LaunchpadToken from './token';
+import {
+  AuraAllocations,
+  ClaimAddresses,
+  HistoricalAllocations,
+} from './token-allocation';
 import Topic from './topic';
+import TopicSubscription from './topic_subscription';
 import TwitterCursor from './twitter_cursor';
 import User from './user';
 import Vote from './vote';
@@ -53,8 +70,11 @@ import XpLog from './xp_log';
 
 export const Factories = {
   Address,
+  AICompletionToken,
   ApiKey,
+  AuraAllocations,
   ChainNode,
+  ClaimAddresses,
   Collaboration,
   Comment,
   CommentVersionHistory,
@@ -65,22 +85,30 @@ export const Factories = {
   CommunityGoalReached,
   CommunityStake,
   CommunityTags,
+  CommunityDirectoryTags,
   Contest,
   ContestAction,
   ContestManager,
   ChainEventXpSource,
   DiscordBotConfig,
+  Dlq,
   EmailUpdateToken,
   EvmEventSource,
+  GovernanceProposal,
   Group,
-  GroupPermission,
+  GroupGatedAction,
+  GroupSnapshot,
+  HistoricalAllocations,
   LastProcessedEvmBlock,
   LaunchpadTrade,
+  MCPServer,
+  MCPServerCommunity,
   Membership,
   Outbox,
   PinnedToken,
   Poll,
   ProfileTags,
+  ProposalVote,
   Quest,
   QuestActionMeta,
   QuestTweets,
@@ -93,9 +121,11 @@ export const Factories = {
   Tags,
   SubscriptionPreference,
   Thread,
-  ThreadVersionHistory,
+  ThreadRank,
   ThreadSubscription,
+  ThreadVersionHistory,
   Topic,
+  TopicSubscription,
   TwitterCursor,
   User,
   Vote,
@@ -103,6 +133,8 @@ export const Factories = {
   Wallets,
   LaunchpadToken,
   XpLog,
+  ThreadToken,
+  ThreadTokenTrade,
 };
 
 export type DB = {

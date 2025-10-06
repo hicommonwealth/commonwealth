@@ -2,40 +2,36 @@ import {
   COMMUNITY_TIERS,
   CommunityTierMap,
   hasTierClientInfo,
+  TierIcons,
   USER_TIERS,
   UserTierMap,
 } from '@hicommonwealth/shared';
 
-const DEFAULT_ICON = '🚫';
+const DEFAULT_ICON = 'stopSymbol';
 
 interface TrustLevelResult {
-  icon: string;
+  icon: TierIcons;
 }
 
 const hasCommunityClientInfo = (
   tier: (typeof COMMUNITY_TIERS)[keyof typeof COMMUNITY_TIERS],
 ): tier is (typeof COMMUNITY_TIERS)[keyof typeof COMMUNITY_TIERS] & {
-  clientInfo: { trustLevel: number; icon: string };
+  clientInfo: { trustLevel: number; componentIcon: TierIcons };
 } => {
   return 'clientInfo' in tier && tier.clientInfo !== undefined;
 };
 
-export const getUserTrustLevel = (level: number): TrustLevelResult => {
-  if (!level) {
+export const getUserTrustLevelIcon = (tier?: UserTierMap): TrustLevelResult => {
+  if (!tier) {
     return { icon: DEFAULT_ICON };
   }
-
-  const userTierKey = level as UserTierMap;
-
-  if (!hasTierClientInfo(userTierKey)) {
+  if (!hasTierClientInfo(tier)) {
     return { icon: DEFAULT_ICON };
   }
-
-  const userTier = USER_TIERS[userTierKey];
-  return { icon: userTier.clientInfo?.icon || DEFAULT_ICON };
+  return { icon: USER_TIERS[tier].clientInfo!.componentIcon || DEFAULT_ICON };
 };
 
-export const getCommunityTrustLevel = (level: number): TrustLevelResult => {
+export const getCommunityTrustLevel = (level?: number): TrustLevelResult => {
   if (!level) {
     return { icon: DEFAULT_ICON };
   }
@@ -47,5 +43,5 @@ export const getCommunityTrustLevel = (level: number): TrustLevelResult => {
     return { icon: DEFAULT_ICON };
   }
 
-  return { icon: communityTier.clientInfo.icon };
+  return { icon: communityTier.clientInfo.componentIcon };
 };

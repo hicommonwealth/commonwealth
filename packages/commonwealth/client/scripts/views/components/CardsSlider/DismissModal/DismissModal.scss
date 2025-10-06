@@ -1,9 +1,10 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .DismissModal {
   .CWModalBody {
     .Text {
-      color: $neutral-500 !important;
+      color: colors.$neutral-500 !important;
     }
 
     padding-bottom: 24px !important;

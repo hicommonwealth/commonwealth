@@ -1,6 +1,5 @@
 import { dispose } from '@hicommonwealth/core';
-import { expect } from 'chai';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { models } from '../../src/database';
 import { seed } from '../../src/tester';
 
@@ -35,7 +34,7 @@ describe('Reactions lifecycle', () => {
           },
         ],
         // CommunityStakes: [],
-        topics: [{}],
+        topics: [{ name: 'reaction-test-topic' }],
         // groups: [],
         // contest_managers: [],
       },

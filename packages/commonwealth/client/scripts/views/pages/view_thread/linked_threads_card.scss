@@ -1,4 +1,5 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .LinkedThreadsCard {
   display: flex;
@@ -15,6 +16,6 @@
   }
 
   .no-threads-text.Text {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 }

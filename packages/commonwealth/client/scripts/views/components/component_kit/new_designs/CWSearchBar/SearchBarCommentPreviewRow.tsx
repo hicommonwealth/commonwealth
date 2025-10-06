@@ -26,7 +26,7 @@ export const SearchBarCommentPreviewRow: FC<
   const content = searchResult.body;
 
   const handleClick = () => {
-    const path = `/${searchResult.community_id}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
+    const path = `/${searchResult.community_id}/discussion/${searchResult.thread_id}?comment=${searchResult.id}`;
     navigate(path, {}, null);
     onSearchItemClick?.();
   };

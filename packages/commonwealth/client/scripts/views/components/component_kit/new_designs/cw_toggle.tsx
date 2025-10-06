@@ -75,7 +75,6 @@ export const CWToggle = (props: ToggleProps) => {
           name && {
             ...formFieldContext,
             onChange: async (e) => {
-              console.log('e??', e);
               setFormCheckedStatus(e.target.checked);
               formFieldContext.onChange(e);
               await params?.onChange?.(e);

@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { calculateVoteWeight, STAKE_ID } from '@hicommonwealth/evm-protocols';
 import app from 'state';
 import {
   useFetchCommunityStakeQuery,
@@ -27,7 +27,7 @@ const chainIds = {
 };
 
 const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
-  const { community, stakeId = commonProtocol.STAKE_ID, walletAddress } = props;
+  const { community, stakeId = STAKE_ID, walletAddress } = props;
   const user = useUserStore();
 
   const activeCommunityId = community?.id || app?.chain?.id || '';
@@ -44,7 +44,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
 
   const {
     isInitialLoading: communityStakeLoading,
-    data: stakeResponse,
+    data: stakeData,
     refetch: refetchStakeQuery,
   } = useFetchCommunityStakeQuery({
     communityId: activeCommunityId,
@@ -52,8 +52,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     apiEnabled: !!activeCommunityId,
   });
 
-  const stakeData = stakeResponse?.data?.result;
-  const stakeEnabled = stakeData?.stake_enabled;
+  const stakeEnabled = stakeData?.stake?.stake_enabled;
   const apiEnabled = Boolean(
     stakeEnabled &&
       (walletAddress || activeAccountAddress) &&
@@ -67,7 +66,7 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   } = useGetUserStakeBalanceQuery({
     // @ts-expect-error StrictNullChecks
     namespace: activeCommunityNamespace,
-    stakeId: commonProtocol.STAKE_ID,
+    stakeId: STAKE_ID,
     apiEnabled,
     chainRpc,
     walletAddress: walletAddress || activeAccountAddress,
@@ -77,9 +76,8 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
 
   const { isInitialLoading: buyPriceDataLoading, data: buyPriceData } =
     useGetBuyPriceQuery({
-      // @ts-expect-error StrictNullChecks
-      namespace: activeCommunityNamespace,
-      stakeId: commonProtocol.STAKE_ID,
+      namespace: activeCommunityNamespace!,
+      stakeId: STAKE_ID,
       amount: Number(userStakeBalanceData),
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
       chainRpc,
@@ -87,10 +85,10 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
       keepPreviousData: true,
     });
 
-  const currentVoteWeight = commonProtocol.calculateVoteWeight(
+  const currentVoteWeight = calculateVoteWeight(
     // @ts-expect-error StrictNullChecks
     userStakeBalanceData,
-    stakeData?.vote_weight,
+    stakeData?.stake?.vote_weight,
   );
   const stakeBalance = Number(userStakeBalanceData);
   const stakeValue = Number(buyPriceData?.price);

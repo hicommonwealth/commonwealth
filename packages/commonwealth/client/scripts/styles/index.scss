@@ -1,4 +1,5 @@
-@import 'shared';
+@use 'shared';
+@use 'mixins/colors.module';
 
 // page layout
 * {
@@ -50,11 +51,11 @@ body {
 }
 
 html {
-  font-family: $fonts;
+  font-family: shared.$fonts;
   font-size: 16px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  background: $white;
+  background: colors.$white;
 
   // animate the transition of the darkmode
   -webkit-transition: 0.2s -webkit-filter ease-in-out;
@@ -110,7 +111,7 @@ strong {
 }
 
 a {
-  color: $purple-400;
+  color: colors.$purple-400;
   text-decoration: none;
 
   &:hover {
@@ -119,20 +120,20 @@ a {
 }
 
 a:visited {
-  color: $purple-400;
+  color: colors.$purple-400;
 }
 
 code,
 pre {
-  font-family: $monospace-fonts;
+  font-family: shared.$monospace-fonts;
   font-size: 13.5px;
-  background: $neutral-300;
+  background: colors.$neutral-300;
   border-radius: 4px;
 }
 
 code {
   padding: 1px 3px;
-  color: $rorange-500;
+  color: colors.$rorange-500;
 }
 
 pre {
@@ -140,8 +141,8 @@ pre {
 }
 
 ::selection {
-  color: $white;
-  background: $primary-600;
+  color: colors.$white;
+  background: colors.$primary-600;
 }
 
 // shared styles

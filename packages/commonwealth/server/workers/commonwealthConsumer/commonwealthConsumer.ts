@@ -1,9 +1,18 @@
 import {
+  config,
   HotShotsStats,
+  KnockProvider,
+  RedisCache,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
+import {
+  cache,
+  disableService,
+  logger,
+  notificationsProvider,
+  stats,
+} from '@hicommonwealth/core';
 import {
   bootstrapBindings,
   bootstrapContestRolloverLoop,
@@ -13,6 +22,17 @@ import { fileURLToPath } from 'url';
 const log = logger(import.meta);
 
 stats({ adapter: HotShotsStats() });
+
+config.CACHE.REDIS_URL &&
+  cache({
+    adapter: new RedisCache(config.CACHE.REDIS_URL),
+  });
+
+if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)
+  notificationsProvider({
+    adapter: KnockProvider(),
+  });
+else notificationsProvider();
 
 let isServiceHealthy = false;
 
@@ -34,6 +54,7 @@ startHealthCheckLoop({
 // properly handling/processing those messages. Using the script is rarely necessary in
 // local development.
 async function main() {
+  await disableService();
   try {
     log.info('Starting main consumer');
     await bootstrapBindings();

@@ -5,7 +5,7 @@ import type Web3 from 'web3';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
+import { getCommunityByIdQuery } from 'state/api/communities/getCommuityById';
 import { userStore } from 'state/ui/user';
 import { hexToNumber } from 'web3-utils';
 import { z } from 'zod';
@@ -102,12 +102,14 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._chainInfo = app?.chain?.meta;
 
     if (!this._chainInfo && app.activeChainId()) {
-      const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
+      const communityInfo = await getCommunityByIdQuery(
         app.activeChainId() || '',
         true,
       );
 
-      this._chainInfo = communityInfo as z.infer<typeof ExtendedCommunity>;
+      this._chainInfo = communityInfo as unknown as z.infer<
+        typeof ExtendedCommunity
+      >;
     }
 
     const chainId = this._chainInfo?.ChainNode?.eth_chain_id || 1;

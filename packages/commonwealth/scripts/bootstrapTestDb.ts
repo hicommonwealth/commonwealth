@@ -1,9 +1,9 @@
 import { dispose } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
+import { bootstrap_testing } from '@hicommonwealth/model/tester';
 
 async function main() {
   console.log('Bootstrapping E2E test...');
-  await tester.bootstrap_testing();
+  await bootstrap_testing();
   await dispose()('EXIT', true);
 }
 void main();

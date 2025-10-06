@@ -1,13 +1,13 @@
 import { ExternalServiceUserIds, dispose, query } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { Community, User } from '@hicommonwealth/schemas';
-
 import { CommunityTierMap } from '@hicommonwealth/shared';
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import { GetDigestEmailDataQuery } from '../../src/aggregates/emails';
+import { models } from '../../src/database';
 import { seed } from '../../src/tester';
 import { generateThreads } from './util';
+
 describe('Digest email lifecycle', () => {
   let communityOne: z.infer<typeof Community> | undefined;
   let communityTwo: z.infer<typeof Community> | undefined;
@@ -25,7 +25,7 @@ describe('Digest email lifecycle', () => {
     });
 
     [communityOne] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: undefined,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -35,10 +35,10 @@ describe('Digest email lifecycle', () => {
           user_id: authorUser!.id,
         },
       ],
-      topics: [{}],
+      topics: [{ name: 'digest-test-topic1' }],
     });
     [communityTwo] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: undefined,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -48,11 +48,11 @@ describe('Digest email lifecycle', () => {
           user_id: authorUser!.id,
         },
       ],
-      topics: [{}],
+      topics: [{ name: 'digest-test-topic2' }],
     });
     // create an additional community to ensure only specific threads are selected
     [communityThree] = await seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: undefined,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -62,7 +62,7 @@ describe('Digest email lifecycle', () => {
           user_id: authorUser!.id,
         },
       ],
-      topics: [{}],
+      topics: [{ name: 'digest-test-topic3' }],
     });
   });
 

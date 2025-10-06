@@ -25,7 +25,7 @@ const useGetPinnedTokensByCommunityId = ({
       with_price,
     },
     {
-      cacheTime: FETCH_PINNED_TOKEN_STALE_TIME,
+      gcTime: FETCH_PINNED_TOKEN_STALE_TIME,
       enabled,
     },
   );

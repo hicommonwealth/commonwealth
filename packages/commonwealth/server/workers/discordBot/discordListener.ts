@@ -3,8 +3,9 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
-import { emitEvent, models } from '@hicommonwealth/model';
+import { disableService, logger, stats } from '@hicommonwealth/core';
+import { emitEvent } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { WalletSsoSource } from '@hicommonwealth/shared';
 import {
   Client,
@@ -40,6 +41,7 @@ log.info(
 );
 
 async function startDiscordListener() {
+  await disableService();
   config.APP_ENV === 'local' && console.log(config);
 
   const client = new Client({
@@ -145,8 +147,9 @@ async function startDiscordListener() {
       .then((address) =>
         emitEvent(models.Outbox, [
           {
-            event_name: 'CommonDiscordServerJoined',
+            event_name: 'DiscordServerJoined',
             event_payload: {
+              server_id: member.guild.id,
               user_id: address?.user_id,
               discord_username: member.user.username,
               joined_date: joinedAt,
@@ -155,7 +158,8 @@ async function startDiscordListener() {
         ]),
       )
       .catch((e) => {
-        log.error('Failed to emit CommonDiscordServerJoined event', e, {
+        log.error('Failed to emit DiscordServerJoined event', e, {
+          server_id: member.guild.id,
           discord_user_id: member.id,
           discord_username: member.user.username,
           discord_server_join_date: joinedAt,

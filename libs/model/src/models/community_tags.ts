@@ -1,17 +1,10 @@
+import { CommunityTags } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import { TagsAttributes } from './tags';
+import { z } from 'zod';
 import type { ModelInstance } from './types';
 
-export type CommunityTagsAttributes = {
-  community_id: string;
-  tag_id: number;
-  created_at?: Date;
-  updated_at?: Date;
-  Tag?: TagsAttributes;
-};
-
+export type CommunityTagsAttributes = z.infer<typeof CommunityTags>;
 export type CommunityTagsInstance = ModelInstance<CommunityTagsAttributes>;
-
 export type CommunityTagsModelStatic =
   Sequelize.ModelStatic<CommunityTagsInstance>;
 

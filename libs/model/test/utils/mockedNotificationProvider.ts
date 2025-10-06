@@ -29,6 +29,7 @@ export function SpyNotificationsProvider(stubs?: {
       stubs?.createSchedulesStub || vi.fn(() => Promise.resolve([])),
     deleteSchedules:
       stubs?.deleteSchedulesStub || vi.fn(() => Promise.resolve(new Set())),
+    updateSchedules: vi.fn(() => Promise.resolve([])),
     identifyUser:
       stubs?.identifyUserStub || vi.fn(() => Promise.resolve({ id: '' })),
     registerClientRegistrationToken:
@@ -37,6 +38,7 @@ export function SpyNotificationsProvider(stubs?: {
     unregisterClientRegistrationToken:
       stubs?.unregisterClientRegistrationToken ||
       vi.fn(() => Promise.resolve(true)),
+    signUserToken: vi.fn(() => Promise.resolve(undefined)),
   };
 }
 
@@ -68,6 +70,7 @@ export function ThrowingSpyNotificationsProvider(stubs?: {
       stubs?.createSchedulesStub || vi.fn(() => Promise.reject(ProviderError)),
     deleteSchedules:
       stubs?.deleteSchedulesStub || vi.fn(() => Promise.reject(ProviderError)),
+    updateSchedules: vi.fn(() => Promise.reject(ProviderError)),
     identifyUser:
       stubs?.identifyUserStub || vi.fn(() => Promise.reject(ProviderError)),
     registerClientRegistrationToken:
@@ -76,5 +79,6 @@ export function ThrowingSpyNotificationsProvider(stubs?: {
     unregisterClientRegistrationToken:
       stubs?.unregisterClientRegistrationToken ||
       vi.fn(() => Promise.reject(ProviderError)),
+    signUserToken: vi.fn(() => Promise.resolve(undefined)),
   };
 }

@@ -1,7 +1,6 @@
 import { dispose, query } from '@hicommonwealth/core';
 import { User } from '@hicommonwealth/model';
-import chai from 'chai';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 
 describe('getAddressProfile tests', () => {
@@ -26,14 +25,13 @@ describe('getAddressProfile tests', () => {
       actor: { user: { id: testUser.id, email: testUser.email! } },
       payload,
     });
-    chai.assert.equal(addresses?.length, 1);
-    chai.assert.equal(addresses?.at(0)?.name, testUser.profile.name);
-    chai.assert.equal(addresses?.at(0)?.avatarUrl, testUser.profile.avatar_url);
+    expect(addresses?.length).toBe(1);
+    expect(addresses?.at(0)?.name).toBe(testUser.profile.name);
+    expect(addresses?.at(0)?.avatarUrl).toBe(testUser.profile.avatar_url);
   });
 
   test('should return profile of multiple addresses of the same profile', async () => {
-    chai.assert.equal(
-      server.e2eTestEntities.testAddresses[0].user_id,
+    expect(server.e2eTestEntities.testAddresses[0].user_id).toBe(
       server.e2eTestEntities.testAddresses[1].user_id,
     );
 
@@ -50,35 +48,27 @@ describe('getAddressProfile tests', () => {
       actor: { user: { id: testUser.id, email: testUser.email! } },
       payload,
     });
-    chai.assert.equal(addresses?.length, 2);
+    expect(addresses?.length).toBe(2);
 
     const user1 = addresses?.at(0);
     const user2 = addresses?.at(1);
     const matchingUser = server.e2eTestEntities.testUsers.filter(
       (u) => u.id === user1?.userId,
     )[0];
-    chai.assert.equal(
-      user1?.userId,
-      server.e2eTestEntities.testAddresses[0].user_id,
-    );
-    chai.assert.equal(user1?.name, matchingUser.profile.name);
-    chai.assert.equal(user1?.avatarUrl, matchingUser.profile.avatar_url);
+    expect(user1?.userId).toBe(server.e2eTestEntities.testAddresses[0].user_id);
+    expect(user1?.name).toBe(matchingUser.profile.name);
+    expect(user1?.avatarUrl).toBe(matchingUser.profile.avatar_url);
 
-    chai.assert.equal(
-      user2?.userId,
-      server.e2eTestEntities.testAddresses[1].user_id,
-    );
-    chai.assert.equal(user2?.name, matchingUser.profile.name);
-    chai.assert.equal(user2?.avatarUrl, matchingUser.profile.avatar_url);
+    expect(user2?.userId).toBe(server.e2eTestEntities.testAddresses[1].user_id);
+    expect(user2?.name).toBe(matchingUser.profile.name);
+    expect(user2?.avatarUrl).toBe(matchingUser.profile.avatar_url);
   });
 
   test('should return profiles of multiple addresses of the different profiles', async () => {
-    chai.assert.equal(
-      server.e2eTestEntities.testAddresses[0].user_id,
+    expect(server.e2eTestEntities.testAddresses[0].user_id).toBe(
       server.e2eTestEntities.testAddresses[1].user_id,
     );
-    chai.assert.notEqual(
-      server.e2eTestEntities.testAddresses[1].user_id,
+    expect(server.e2eTestEntities.testAddresses[1].user_id).not.toBe(
       server.e2eTestEntities.testAddresses[2].user_id,
     );
 
@@ -96,6 +86,6 @@ describe('getAddressProfile tests', () => {
       actor: { user: { id: testUser.id, email: testUser.email! } },
       payload,
     });
-    chai.assert.equal(addresses?.length, 3);
+    expect(addresses?.length).toBe(3);
   });
 });

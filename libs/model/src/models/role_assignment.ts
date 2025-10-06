@@ -8,7 +8,6 @@ export type RoleAssignmentAttributes = {
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
-  is_user_default?: boolean;
 
   // associations
   CommunityRole?: CommunityRoleAttributes;

@@ -1,4 +1,6 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .Profile {
   display: flex;
@@ -15,7 +17,7 @@
     background-color: white;
     position: fixed;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       display: none;
     }
   }
@@ -35,7 +37,7 @@
     flex-direction: row;
     gap: 24px;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       flex-direction: column;
     }
   }
@@ -47,12 +49,12 @@
     justify-content: center;
     padding: 176px 0;
 
-    @include mediumSmallInclusive {
+    @include media_queries.mediumSmallInclusive {
       padding: 96px 0;
     }
 
     .empty-state-text {
-      color: $neutral-400;
+      color: colors.$neutral-400;
       text-align: center;
     }
   }

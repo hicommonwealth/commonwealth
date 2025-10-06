@@ -1,13 +1,14 @@
-@import '../../styles/shared.scss';
-@import './component_kit/cw_banner.scss';
+@use '../../styles/shared.scss';
+@use 'component_kit/cw_banner.scss';
+@use '../../styles/mixins/colors.module';
 
 .TermsBanner.Banner {
-  @include bannerStyles;
+  @include cw_banner.bannerStyles;
 
   .terms-text.Text {
     a {
       margin-left: 4px;
-      color: $primary-500;
+      color: colors.$primary-500;
     }
   }
 }

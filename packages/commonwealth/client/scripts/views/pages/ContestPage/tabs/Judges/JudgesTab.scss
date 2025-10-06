@@ -1,0 +1,89 @@
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/media_queries';
+
+.JudgesTab {
+  margin-top: 16px;
+
+  .loading-container,
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 0;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .filter-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .Text.b2.regular {
+    margin-bottom: 8px;
+  }
+
+  .search-section {
+    margin-top: 16px;
+    margin-bottom: 24px;
+
+    .search-container {
+      margin-bottom: 16px;
+    }
+
+    .search-results {
+      margin-top: 8px;
+
+      .data-container {
+        vertical-align: middle;
+      }
+
+      .no-results {
+        padding: 12px;
+        text-align: center;
+        color: #666;
+      }
+
+      .loading-container {
+        padding: 24px;
+        display: flex;
+        justify-content: center;
+      }
+    }
+  }
+
+  .judge-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .judge-list-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 4px 0;
+  }
+
+  .judge-list-user {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .judge-list-action {
+    flex-shrink: 0;
+  }
+
+  @include media_queries.extraSmall {
+    .judge-list-row {
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+    }
+  }
+}

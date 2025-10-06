@@ -1,10 +1,9 @@
 import { WalletId } from '@hicommonwealth/shared';
+import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
 import { setActiveAccount } from 'controllers/app/login';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
-import NodeInfo from 'models/NodeInfo';
 import app from 'state';
-import { ApiEndpoints, queryClient } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 
 export const convertTokenAmountToUsd = (
@@ -26,9 +25,7 @@ export const convertTokenAmountToUsd = (
 
 export const buildEtherscanLink = (txHash: string, chainNodeId?: number) => {
   const blockExplorer = chainNodeId
-    ? queryClient
-        .getQueryData<NodeInfo[]>([ApiEndpoints.FETCH_NODES])
-        ?.find((n) => n?.id === chainNodeId)?.block_explorer
+    ? fetchCachedNodes()?.find((n) => n?.id === chainNodeId)?.block_explorer
     : app.chain?.meta?.ChainNode?.block_explorer;
 
   const url = blockExplorer ?? 'https://basescan.org/';

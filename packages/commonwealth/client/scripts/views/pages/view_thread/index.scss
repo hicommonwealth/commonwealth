@@ -1,4 +1,7 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .thread-content {
   display: flex;
@@ -13,12 +16,12 @@
   }
 
   .callout-text {
-    background: $neutral-50;
+    background: colors.$neutral-50;
     display: flex;
     gap: 10px;
     color: #656167;
     padding: 16px 24px;
-    border-radius: $border-radius-corners;
+    border-radius: border_radius.$border-radius-corners;
 
     .Text {
       font-style: normal;
@@ -38,7 +41,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     .ContentPageCard.Card {
       width: 100%;
     }
@@ -47,10 +50,10 @@
 
 .thread-actions .popover-container {
   display: flex;
-  border-radius: $border-radius-corners;
+  border-radius: border_radius.$border-radius-corners;
 
   &:hover {
-    background-color: $neutral-100;
+    background-color: colors.$neutral-100;
   }
 }
 
@@ -69,7 +72,7 @@
   }
 }
 
-@include extraSmall {
+@include media_queries.extraSmall {
   .comments-filter-row {
     flex-direction: column;
     align-items: flex-start;

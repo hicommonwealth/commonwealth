@@ -1,6 +1,28 @@
+export type UserVerificationItem = {
+  label: string;
+  type: string;
+};
+
+export type CommunityVerificationItem = {
+  label: string;
+  type: string;
+};
+
+export type TierIcons =
+  | 'stopSymbol'
+  | 'socialVerified'
+  | 'sandClock'
+  | 'globe'
+  | 'pins'
+  | 'whiteCheck'
+  | 'starGolden'
+  | 'diamond';
+
 type TierClientInfo = {
-  trustLevel: 1 | 2 | 3 | 4 | 5;
+  trustLevel: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   icon: string;
+  componentIcon: TierIcons;
+  verificationItems?: Record<string, UserVerificationItem>;
 };
 
 type TierRateLimits = {
@@ -29,7 +51,9 @@ export enum UserTierMap {
   VerifiedWallet = 3,
   SocialVerified = 4,
   ChainVerified = 5,
-  ManuallyVerified = 6,
+  FullyVerified = 6,
+  ManuallyVerified = 7,
+  SystemUser = 8,
 }
 
 export const DisabledCommunitySpamTier = -1 as const;
@@ -58,6 +82,11 @@ export const USER_TIERS = {
         text: 0,
       },
     },
+    clientInfo: {
+      icon: '🚫',
+      trustLevel: 0,
+      componentIcon: 'stopSymbol',
+    },
   },
   [UserTierMap.NewlyVerifiedWallet]: {
     name: 'New Verified Wallet',
@@ -65,6 +94,7 @@ export const USER_TIERS = {
     clientInfo: {
       trustLevel: 1,
       icon: '🐣',
+      componentIcon: 'socialVerified',
     },
     hourlyRateLimits: {
       create: 1,
@@ -81,6 +111,7 @@ export const USER_TIERS = {
     clientInfo: {
       trustLevel: 2,
       icon: '⌛',
+      componentIcon: 'sandClock',
     },
     hourlyRateLimits: {
       create: 2,
@@ -97,6 +128,13 @@ export const USER_TIERS = {
     clientInfo: {
       trustLevel: 3,
       icon: '🌐',
+      componentIcon: 'globe',
+      verificationItems: {
+        VERIFY_SOCIAL: {
+          label: 'Verify Social Accounts',
+          type: 'VERIFY_SOCIAL',
+        },
+      },
     },
     hourlyRateLimits: {
       create: 5,
@@ -113,15 +151,45 @@ export const USER_TIERS = {
     clientInfo: {
       trustLevel: 4,
       icon: '🔗',
+      componentIcon: 'pins',
+      verificationItems: {
+        LAUNCH_COIN: {
+          label: 'Launch a Coin',
+          type: 'LAUNCH_COIN',
+        },
+        VERIFY_COMMUNITY: {
+          label: 'Verify Community',
+          type: 'VERIFY_COMMUNITY',
+        },
+        COMPLETE_CONTEST: {
+          label: 'Complete a Contest',
+          type: 'COMPLETE_CONTEST',
+        },
+      },
+    },
+  },
+  [UserTierMap.FullyVerified]: {
+    name: 'Fully Verified',
+    description:
+      'Completed all verification requirements and achieved the highest community trust.',
+    clientInfo: {
+      trustLevel: 5,
+      icon: '💎',
+      componentIcon: 'diamond',
     },
   },
   [UserTierMap.ManuallyVerified]: {
     name: 'Manual Verification',
     description: 'Manually reviewed and verified by our team',
     clientInfo: {
-      trustLevel: 5,
+      trustLevel: 6,
       icon: '⭐',
+      componentIcon: 'starGolden',
     },
+  },
+  [UserTierMap.SystemUser]: {
+    name: 'System User',
+    description: 'User created by the system.',
   },
 } as const satisfies Record<UserTierMap, UserTier>;
 
@@ -129,7 +197,7 @@ export enum CommunityTierMap {
   SpamCommunity = 0,
   Unverified = 1,
   SocialVerified = 2,
-  CommunityVerified = 3,
+  ChainVerified = 3,
   ManuallyVerified = 4,
   PremiumVerification = 5,
 }
@@ -145,6 +213,7 @@ export const COMMUNITY_TIERS = {
     clientInfo: {
       trustLevel: 1,
       icon: '🚫',
+      componentIcon: 'stopSymbol',
     },
   },
   [CommunityTierMap.SocialVerified]: {
@@ -153,14 +222,28 @@ export const COMMUNITY_TIERS = {
     clientInfo: {
       trustLevel: 2,
       icon: '🌐',
+      componentIcon: 'globe',
+      verificationItems: {
+        VERIFY_SOCIAL: {
+          label: 'Verify Social Accounts',
+          type: 'VERIFY_SOCIAL',
+        },
+      },
     },
   },
-  [CommunityTierMap.CommunityVerified]: {
+  [CommunityTierMap.ChainVerified]: {
     name: 'Community Verified',
     description: 'Ownership of verified community or domain',
     clientInfo: {
       trustLevel: 3,
       icon: '🔗',
+      componentIcon: 'pins',
+      verificationItems: {
+        LAUNCH_COIN: {
+          label: 'Launch a Coin',
+          type: 'LAUNCH_COIN',
+        },
+      },
     },
   },
   [CommunityTierMap.ManuallyVerified]: {
@@ -169,6 +252,7 @@ export const COMMUNITY_TIERS = {
     clientInfo: {
       trustLevel: 4,
       icon: '✅',
+      componentIcon: 'whiteCheck',
     },
   },
   [CommunityTierMap.PremiumVerification]: {
@@ -177,6 +261,7 @@ export const COMMUNITY_TIERS = {
     clientInfo: {
       trustLevel: 5,
       icon: '⭐',
+      componentIcon: 'starGolden',
     },
   },
 } as const satisfies Record<CommunityTierMap, Tier>;
@@ -213,3 +298,55 @@ export function hasTierClientInfo(
 ): tier is TierWithClientInfo {
   return 'clientInfo' in USER_TIERS[tier];
 }
+
+/**
+ * Returns true if a communities tier is equal to or higher than Manually Verified
+ */
+export function canIntegrateDiscord({ tier }: { tier: CommunityTierMap }) {
+  return tier >= CommunityTierMap.ManuallyVerified;
+}
+
+export type CommunityTierWithClientInfo = CommunityTierLevels &
+  {
+    [K in CommunityTierLevels]: (typeof COMMUNITY_TIERS)[K] extends {
+      clientInfo: TierClientInfo;
+    }
+      ? K
+      : never;
+  }[CommunityTierLevels];
+
+export function hasCommunityTierClientInfo(
+  tier: CommunityTierLevels,
+): tier is CommunityTierWithClientInfo {
+  return 'clientInfo' in COMMUNITY_TIERS[tier];
+}
+
+export type UserVerificationItemType =
+  | keyof (typeof USER_TIERS)[UserTierMap.SocialVerified]['clientInfo']['verificationItems']
+  | keyof (typeof USER_TIERS)[UserTierMap.ChainVerified]['clientInfo']['verificationItems'];
+
+export type CommunityVerificationItemType =
+  | keyof (typeof COMMUNITY_TIERS)[CommunityTierMap.SocialVerified]['clientInfo']['verificationItems']
+  | keyof (typeof COMMUNITY_TIERS)[CommunityTierMap.ChainVerified]['clientInfo']['verificationItems'];
+
+export function bumpCommunityTier(
+  tier: CommunityTierMap,
+  object: { tier: CommunityTierMap | null },
+) {
+  if (
+    object.tier === null ||
+    (object.tier !== CommunityTierMap.SpamCommunity && object.tier < tier)
+  ) {
+    object.tier = tier;
+  }
+}
+
+export const TierRateLimitErrors = {
+  CREATES: 'Exceeded content creation limit',
+  UPVOTES: 'Exceeded upvote limit',
+  AI_IMAGES: 'Exceeded ai image creation limit',
+  AI_TEXT: 'Exceeded ai text creation limit',
+} as const;
+
+export type TierRateLimitErrorMessage =
+  (typeof TierRateLimitErrors)[keyof typeof TierRateLimitErrors];

@@ -38,8 +38,8 @@ export const CommentFilters = ({
           {
             id: 2,
             value: CommentsFeaturedFilterTypes.Oldest,
-            label: 'Oldest',
-            iconLeft: 'clockCounterClockwise',
+            label: 'Chat',
+            iconLeft: 'chats',
           },
           {
             id: 3,

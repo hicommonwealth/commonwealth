@@ -1,7 +1,10 @@
-import { InvalidState, type Command } from '@hicommonwealth/core';
+import { InvalidState, logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
+import { getDiscordClient } from '../../utils';
+
+const log = logger(import.meta);
 
 export const Errors = {
   ConfigNotFound: 'Config not found.',
@@ -20,6 +23,17 @@ export function RemoveDiscordBotConfig(): Command<
         },
       });
       if (!config) throw new InvalidState(Errors.ConfigNotFound);
+
+      if (config.guild_id && config.guild_id !== '') {
+        const client = await getDiscordClient();
+        const guild = client.guilds.cache.get(config.guild_id);
+        if (guild) {
+          await guild.leave();
+          log.trace(`Left Discord server: ${config.guild_id}`);
+        } else {
+          log.trace(`Could not find a server with ID: ${config.guild_id}`);
+        }
+      }
 
       await models.sequelize.transaction(async (transaction) => {
         await models.Community.update(

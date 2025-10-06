@@ -1,61 +1,60 @@
-import {
-  currencyNameToSymbolMap,
-  currencySymbolPlacements,
-} from 'helpers/currency';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
+import FormattedDisplayNumber from '../../../../../components/FormattedDisplayNumber/FormattedDisplayNumber';
 import { ReceiptDetailsProps } from '../types';
 import './ReceiptDetails.scss';
 
 const BuyReceipt = ({ trading }: ReceiptDetailsProps) => {
   const { invest, gain } = trading.amounts.buy;
-  const baseCurrencyName = invest.baseCurrency.name;
-  const baseCurrencySymbol = currencyNameToSymbolMap[baseCurrencyName];
-  const ethBuyCurrency = trading.amounts.buy.invest.ethBuyCurrency;
-  const isLeftSymbolCurrency =
-    currencySymbolPlacements.onLeft.includes(ethBuyCurrency);
-  const isRightSymbolCurrency =
-    currencySymbolPlacements.onRight.includes(ethBuyCurrency);
+  const ethFee = invest.commonPlatformFee.eth;
 
   return (
     <div className="ReceiptDetails">
       <div className="entry">
-        <CWText type="caption">{ethBuyCurrency} to ETH rate</CWText>
+        <CWText type="caption">Exchange Rate (USD/ETH)</CWText>
         <CWText type="caption">
-          {isLeftSymbolCurrency ? baseCurrencySymbol : ''}{' '}
-          {invest.baseCurrency.unitEthExchangeRate.toFixed(18)}
-          {isRightSymbolCurrency ? baseCurrencySymbol : ''} = 1 ETH
+          1 ETH = {trading.amounts.buy.invest.baseCurrency.unitEthExchangeRate}{' '}
+          USD
         </CWText>
       </div>
       <div className="entry">
-        <CWText type="caption">Amount invested ({baseCurrencyName})</CWText>
+        <CWText type="caption">Amount Invested</CWText>
         <CWText type="caption">
-          {isLeftSymbolCurrency ? baseCurrencySymbol : ''}{' '}
-          {invest.baseCurrency.amount}
-          {isRightSymbolCurrency ? baseCurrencySymbol : ''}
+          <FormattedDisplayNumber
+            type="caption"
+            value={invest.baseCurrency.amount}
+            options={{
+              decimals: 4,
+              currencySymbol: '',
+            }}
+          />
+          &nbsp;ETH
         </CWText>
       </div>
       <div className="entry">
         <CWText type="caption">
-          Fee ({invest.commonPlatformFee.percentage}) ETH
+          Trading Fee ({invest.commonPlatformFee.percentage})
         </CWText>
         <CWText type="caption">
-          {invest.commonPlatformFee.eth.toFixed(18)} ETH
-        </CWText>
-      </div>
-      <div className="entry">
-        <CWText type="caption">Remaining ETH</CWText>
-        <CWText type="caption">
-          {(invest.baseCurrency.toEth - invest.commonPlatformFee.eth).toFixed(
-            18,
-          )}{' '}
-          ETH
+          <FormattedDisplayNumber
+            type="caption"
+            value={ethFee}
+            options={{
+              decimals: ethFee >= 1 ? 4 : 6,
+            }}
+          />
+          &nbsp;ETH
         </CWText>
       </div>
       <div className="entry">
-        <CWText type="caption">Gain {trading.token.symbol} amount</CWText>
+        <CWText type="caption">Tokens Received</CWText>
         <CWText type="caption">
-          {gain.token.toFixed(18)} {trading.token.symbol}
+          <FormattedDisplayNumber
+            type="caption"
+            value={gain.token}
+            options={{ decimals: 6 }}
+          />
+          &nbsp;{trading.token.symbol}
         </CWText>
       </div>
     </div>

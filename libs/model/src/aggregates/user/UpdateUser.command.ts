@@ -1,6 +1,7 @@
-import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { type Command, InvalidInput, InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
 import { authVerified } from '../../middleware/auth';
 import { mustExist } from '../../middleware/guards';
@@ -47,9 +48,15 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
         user.promotional_emails_enabled ??
         false;
 
+      const notify_user_name_change =
+        payload.notify_user_name_change ??
+        user.notify_user_name_change ??
+        false;
+
       const user_delta = getDelta(user, {
         is_welcome_onboard_flow_complete,
         promotional_emails_enabled,
+        notify_user_name_change,
         profile: {
           email,
           slug,
@@ -96,6 +103,35 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
               if (updates.profile.bio === '') {
                 updates.profile.bio = null;
               }
+
+              if (
+                updates?.profile?.name &&
+                updates?.profile?.name !== 'Anonymous'
+              ) {
+                const [existingUsername] = await models.sequelize.query<{
+                  id: number;
+                }>(
+                  `
+                  SELECT id
+                  FROM "Users"
+                  WHERE id != :id
+                    AND (profile ->> 'name') IS DISTINCT FROM 'Anonymous'
+                    AND (profile ->> 'name') = :profile_name
+                  LIMIT 1;
+                `,
+                  {
+                    replacements: {
+                      id,
+                      profile_name: updates.profile.name,
+                    },
+                    type: QueryTypes.SELECT,
+                  },
+                );
+                if (existingUsername) {
+                  throw new InvalidState('Username already exists');
+                }
+              }
+
               const [, rows] = await models.User.update(updates, {
                 where: { id: user.id },
                 returning: true,
@@ -117,6 +153,13 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                         created_at: updated_user.created_at!,
                       },
                     },
+                    {
+                      event_name: 'UserUpdated',
+                      event_payload: {
+                        old_user: user,
+                        new_user: updated_user,
+                      },
+                    },
                   ],
                   transaction,
                 );
@@ -126,7 +169,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
           },
         );
 
-        return updated;
+        return updated!;
       }
 
       // nothing changed

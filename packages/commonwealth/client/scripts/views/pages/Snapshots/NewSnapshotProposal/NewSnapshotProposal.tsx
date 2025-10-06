@@ -6,6 +6,8 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import NewSnapshotProposalForm from './NewSnapshotProposalForm';
 import SnapshotSpaceSelectorModal from './SnapshotSpaceSelectorModal';
 
+import { PageNotFound } from '../../404';
+import { isValidSnapshotName } from '../../CommunityManagement/Integrations/Snapshots/validation';
 import './NewSnapshotProposal.scss';
 
 type NewSnapshotProposalProps = {
@@ -15,6 +17,8 @@ type NewSnapshotProposalProps = {
 export const NewSnapshotProposal = ({
   snapshotId,
 }: NewSnapshotProposalProps) => {
+  const isValidSnapshot = isValidSnapshotName(snapshotId);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [snapshotSpace, setSnapshotSpace] = useState('');
 
@@ -33,6 +37,10 @@ export const NewSnapshotProposal = ({
     setSnapshotSpace(space);
     setIsModalOpen(false);
   };
+
+  if (!isValidSnapshot) {
+    return <PageNotFound />;
+  }
 
   return (
     <CWPageLayout>

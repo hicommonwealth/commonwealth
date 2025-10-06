@@ -1,14 +1,9 @@
 // Note, this login will not work for the homepage
-import {
-  models,
-  tester,
-  type DB,
-  type E2E_TestEntities,
-} from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import * as tester from '@hicommonwealth/model/tester';
 import { expect } from '@playwright/test';
 
-export type E2E_Seeder = E2E_TestEntities & {
-  testDb: DB;
+export type E2E_Seeder = tester.E2E_TestEntities & {
   testAddress: string;
   addAlchemyKey: () => Promise<void>;
   removeUser: () => Promise<void>;
@@ -20,15 +15,14 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
   // This connection is used to speed up tests, so we don't need to load in all the models with the associated
   // imports. This can only be used with raw sql queries.
 
-  const testDb = models;
   const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
-  const e2eEntities = await tester.e2eTestEntities(testDb);
+  const e2eEntities = await tester.e2eTestEntities();
 
   const createAddress = async function (chain, userId) {
     const blockInfo =
       '{"number":17693949,"hash":' +
       '"0x26664b8151811ad3a2c4fc9091d248e5105950c91b87d71ca7a1d30cfa0cbede", "timestamp":1689365027}';
-    await testDb.sequelize.query(`
+    await models.sequelize.query(`
     INSERT INTO "Addresses" (
       address,
       community_id,
@@ -41,7 +35,6 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       ghost_address,
       wallet_id,
       block_info,
-      is_user_default,
       role
     ) VALUES (
       '${testAddress}',
@@ -55,28 +48,26 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       false,
       'metamask',
       '${blockInfo}',
-      false,
       'member'
     ) ON CONFLICT DO NOTHING
   `);
   };
 
   return {
-    testDb,
     testAddress,
     ...e2eEntities,
 
     addAlchemyKey: async function () {
       // If chainNode for eth doesn't exist, add it and add key.
-      const ethChainNodeExists = await testDb.sequelize.query(
+      const ethChainNodeExists = await models.sequelize.query(
         'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 1 OR id = 37',
       );
-      const polygonChainNodeExists = await testDb.sequelize.query(
+      const polygonChainNodeExists = await models.sequelize.query(
         'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 137 OR id = 56',
       );
       if (ethChainNodeExists[0].length === 0) {
         try {
-          await testDb.sequelize.query(`
+          await models.sequelize.query(`
         INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name, created_at, updated_at)
         VALUES (37, 'https://eth-mainnet.g.alchemy.com/v2/', 1,
          'https://eth-mainnet.g.alchemy.com/v2/',
@@ -88,7 +79,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
 
         if (polygonChainNodeExists[0].length === 0) {
           try {
-            await testDb.sequelize.query(`
+            await models.sequelize.query(`
         INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name, created_at, updated_at)
         VALUES (56, 'https://polygon-mainnet.g.alchemy.com/v2/', 137,
         'https://polygon-mainnet.g.alchemy.com/v2/', 'ethereum',
@@ -105,7 +96,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
 
     // removes default user from the db. Subsequent login will need to go through the profile creation screen
     removeUser: async function () {
-      const userExists = await testDb.sequelize.query(
+      const userExists = await models.sequelize.query(
         `select 1 from "Addresses" where address = '${testAddress}'`,
       );
 
@@ -122,17 +113,17 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
     WHERE address = '${testAddress}';
 `;
 
-      await testDb.sequelize.query(removeQuery);
+      await models.sequelize.query(removeQuery);
     },
 
     createInitialUser: async function () {
-      const userExists = await testDb.sequelize.query(
+      const userExists = await models.sequelize.query(
         `select 1 from "Addresses" where address = '${testAddress}' and community_id = 'ethereum'`,
       );
 
       if (userExists[0].length > 0) return;
 
-      const userId = await testDb.sequelize.query(`
+      const userId = await models.sequelize.query(`
   INSERT INTO "Users" (
         email,
         created_at,
@@ -159,7 +150,7 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
 
     // adds user if it doesn't exist. Subsequent login will not need to go through the profile creation screen
     addAddressIfNone: async function (chain) {
-      const [addresses] = await testDb.sequelize.query(
+      const [addresses] = await models.sequelize.query(
         `select * from "Addresses" where address = '${testAddress}'`,
       );
 

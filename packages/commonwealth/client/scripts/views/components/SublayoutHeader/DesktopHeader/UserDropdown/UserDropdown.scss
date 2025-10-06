@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
 
 .UserDropdown {
   width: 256px;
@@ -20,19 +21,19 @@
   align-items: center;
   padding: 8px 16px;
   border-radius: 6px;
-  border: 1px solid $neutral-200;
-  background-color: $white;
+  border: 1px solid colors.$neutral-200;
+  background-color: colors.$white;
   cursor: pointer;
 
   font-size: 14px;
   font-weight: 700;
 
   &:hover {
-    background-color: $neutral-50;
+    background-color: colors.$neutral-50;
   }
 
   &.isOpen {
-    background-color: $neutral-100;
+    background-color: colors.$neutral-100;
   }
 
   &:focus {
@@ -40,7 +41,7 @@
   }
 
   .caret-icon {
-    fill: $neutral-500;
+    fill: colors.$neutral-500;
     margin-left: 8px;
   }
 }

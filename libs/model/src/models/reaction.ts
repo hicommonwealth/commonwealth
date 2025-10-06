@@ -8,8 +8,8 @@ import type {
   ModelInstance,
   ThreadInstance,
 } from '.';
-import { emitEvent, getThreadContestManagers } from '../utils/utils';
-
+import { emitEvent } from '../utils/outbox';
+import { getThreadContestManagers } from '../utils/utils';
 export type ReactionAttributes = z.infer<typeof Reaction>;
 export type ReactionInstance = ModelInstance<ReactionAttributes>;
 
@@ -29,6 +29,7 @@ export default (
         type: Sequelize.DECIMAL(78, 0),
         allowNull: true,
       },
+      user_tier_at_creation: { type: Sequelize.INTEGER, allowNull: true },
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
       canvas_msg_id: { type: Sequelize.STRING, allowNull: true },

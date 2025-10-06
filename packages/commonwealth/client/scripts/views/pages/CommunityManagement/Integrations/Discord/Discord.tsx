@@ -1,4 +1,8 @@
-import { DOCS_SUBDOMAIN, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import {
+  canIntegrateDiscord,
+  DOCS_SUBDOMAIN,
+  PRODUCTION_DOMAIN,
+} from '@hicommonwealth/shared';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { uuidv4 } from 'lib/util';
@@ -8,7 +12,10 @@ import {
   useGetCommunityByIdQuery,
   useUpdateCommunityMutation,
 } from 'state/api/communities';
-import { useFetchCustomDomainQuery } from 'state/api/configuration';
+import {
+  fetchCachedPublicEnvVar,
+  useFetchCustomDomainQuery,
+} from 'state/api/configuration';
 import {
   useCreateDiscordBotConfigMutation,
   useFetchDiscordChannelsQuery,
@@ -49,6 +56,7 @@ const Discord = () => {
     useSetForumChannelConnectionMutation();
 
   const { data: domain } = useFetchCustomDomainQuery();
+  const { DISCORD_CLIENT_ID } = fetchCachedPublicEnvVar() || {};
 
   const queryParams = useMemo(() => {
     return new URLSearchParams(window.location.search);
@@ -72,7 +80,7 @@ const Discord = () => {
 
   const {
     mutateAsync: removeDiscordBotConfig,
-    isLoading: isRemovingDiscordBotConfig,
+    isPending: isRemovingDiscordBotConfig,
   } = useRemoveDiscordBotConfigMutation();
 
   useEffect(() => {
@@ -108,7 +116,7 @@ const Discord = () => {
         }),
       );
       const link =
-        `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}` +
+        `https://discord.com/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}` +
         `&permissions=1024&scope=applications.commands%20bot&redirect_uri=${redirectURL}` +
         `/discord-callback&response_type=code&scope=bot&state=${currentState}`;
       window.open(link, '_parent');
@@ -168,7 +176,10 @@ const Discord = () => {
     topicId: string,
   ) => {
     try {
-      await setForumChannelConnection({ topicId, channelId });
+      await setForumChannelConnection({
+        topic_id: +topicId,
+        channel_id: channelId,
+      });
       await refetchTopics();
       const topicName = topics.find(
         (topic) => topic.id === Number(topicId),
@@ -189,6 +200,9 @@ const Discord = () => {
           <p>
             You can merge content from Discord directly into your community by
             connecting the Commonbot.{' '}
+            {community !== undefined && !canIntegrateDiscord(community)
+              ? 'Contact support to access this premium feature.'
+              : ''}
             <a
               target="_blank"
               rel="noopener noreferrer"
@@ -264,7 +278,12 @@ const Discord = () => {
             ? 'Disconnecting Discord...'
             : CTA_TEXT[connectionStatus]
         }
-        disabled={connectionStatus === 'connecting'}
+        disabled={(() => {
+          if (connectionStatus === 'connecting') return true;
+          if (connectionStatus === 'connected') return false;
+          if (community === undefined) return true;
+          return !canIntegrateDiscord(community);
+        })()}
         onClick={connectionStatus === 'none' ? onConnect : onDisconnect}
       />
     </section>

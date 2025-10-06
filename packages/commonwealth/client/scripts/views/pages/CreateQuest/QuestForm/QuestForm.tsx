@@ -303,10 +303,19 @@ const QuestForm = (props: QuestFormProps) => {
                 type="button"
                 buttonAlt="green"
                 onClick={addSubForm}
-                disabled={questActionSubForms.length >= MAX_ACTIONS_LIMIT}
+                disabled={
+                  questActionSubForms.length >= MAX_ACTIONS_LIMIT ||
+                  (watch('quest_type') === QuestTypes.Channel &&
+                    questActionSubForms.length >= 1)
+                }
               />,
-              'Cannot add more actions',
-              questActionSubForms.length >= MAX_ACTIONS_LIMIT,
+              watch('quest_type') === QuestTypes.Channel &&
+                questActionSubForms.length >= 1
+                ? `Only 1 action is allowed for channel quests`
+                : 'Cannot add more actions',
+              questActionSubForms.length >= MAX_ACTIONS_LIMIT ||
+                (watch('quest_type') === QuestTypes.Channel &&
+                  questActionSubForms.length >= 1),
             )}
           </div>
 

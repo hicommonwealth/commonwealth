@@ -13,7 +13,7 @@ type ContentPageCardProps = {
 
 export const CWContentPageCard = (props: ContentPageCardProps) => {
   const { content, header, showCollapsedIcon = false } = props;
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   return (
     <CWCard className={clsx('ContentPageCard', { isCollapsed: isCollapsed })}>
       <div className="header-container">

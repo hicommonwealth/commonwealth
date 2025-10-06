@@ -1,4 +1,5 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .ActionCard {
   display: flex;
@@ -7,7 +8,7 @@
   gap: 16px;
   padding: 16px;
   border-radius: 6px;
-  border: 1px solid $neutral-200;
+  border: 1px solid colors.$neutral-200;
   background: white;
   min-width: 245px;
   max-width: 245px;
@@ -25,17 +26,17 @@
     }
 
     .check-icon {
-      background-color: $primary-600;
+      background-color: colors.$primary-600;
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      color: $white;
+      color: colors.$white;
       padding: 8px;
     }
 
     .close-btn {
       margin-bottom: auto;
-      color: $neutral-500;
+      color: colors.$neutral-500;
       cursor: pointer;
       font-size: 20px;
     }
@@ -46,16 +47,16 @@
       font-weight: 600 !important;
 
       &:disabled {
-        color: $neutral-500;
+        color: colors.$neutral-500;
       }
     }
 
     .b2 {
       margin-top: 4px;
-      color: $neutral-500 !important;
+      color: colors.$neutral-500 !important;
 
       &:disabled {
-        color: $neutral-500;
+        color: colors.$neutral-500;
       }
     }
   }

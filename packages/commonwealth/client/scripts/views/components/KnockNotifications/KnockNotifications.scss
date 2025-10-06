@@ -1,4 +1,6 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .KnockNotifications svg {
   color: rgb(117, 117, 117);
@@ -13,16 +15,16 @@
         color: #656167;
         font-size: 14px;
         line-height: 20px;
-        font-family: $font-family-neue-haas-unica;
+        font-family: shared.$font-family-neue-haas-unica;
       }
       &:first-child {
         font-size: 16px;
         line-height: 20px;
-        font-family: $font-family-neue-haas-unica;
+        font-family: shared.$font-family-neue-haas-unica;
         strong {
           font-weight: 700;
           letter-spacing: 0.5px;
-          @include extraSmall {
+          @include media_queries.extraSmall {
             font-weight: 600;
             letter-spacing: 0.2px;
           }
@@ -35,7 +37,7 @@
         color: unset;
         font-size: unset;
         line-height: unset;
-        font-family: $font-family-neue-haas-unica;
+        font-family: shared.$font-family-neue-haas-unica;
         strong {
           font-weight: 700;
           letter-spacing: 0.8px;
@@ -52,7 +54,7 @@
       gap: 10px;
       padding: 10px;
       flex-direction: row;
-      border-bottom: 1px solid $neutral-200;
+      border-bottom: 1px solid colors.$neutral-200;
       align-items: flex-start;
       cursor: pointer;
       .avatar {

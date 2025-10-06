@@ -1,4 +1,6 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .BreadcrumbsPageLayout {
   padding-block: 0;
@@ -6,11 +8,11 @@
   .BreadcrumbsComponent {
     display: flex;
     align-items: center;
-    color: $neutral-400;
-    background-color: $white;
+    color: colors.$neutral-400;
+    background-color: colors.$white;
     padding-block: 16px;
     position: fixed;
-    z-index: 1 !important;
+    z-index: 10 !important;
     overflow: auto;
     width: 100%;
     max-width: 1040px;
@@ -19,7 +21,7 @@
     min-height: 52px !important;
     padding-bottom: 2px !important;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       position: static;
     }
     .disable-active-cursor {
@@ -34,7 +36,7 @@
     max-width: 1040px;
     max-height: 52px !important;
     min-height: 52px !important;
-    @include extraSmall {
+    @include media_queries.extraSmall {
       display: none;
     }
   }

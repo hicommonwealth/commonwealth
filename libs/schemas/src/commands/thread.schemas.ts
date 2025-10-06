@@ -1,6 +1,18 @@
 import { z } from 'zod';
-import { ReactionContext, ThreadContext, TopicContext } from '../context';
-import { Reaction, Thread } from '../entities';
+import {
+  AuthContext,
+  ReactionContext,
+  ThreadContext,
+  TopicContext,
+} from '../context';
+import {
+  COMMUNITY_TIER,
+  Link,
+  Reaction,
+  Thread,
+  ThreadToken,
+  ThreadTokenTrade,
+} from '../entities';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 
 export const CanvasThread = z.object({
@@ -25,7 +37,7 @@ export const CreateThread = {
     is_linking_token: z.boolean().optional(),
     turnstile_token: z.string().nullish(),
   }),
-  output: Thread,
+  output: Thread.extend({ community_tier: COMMUNITY_TIER }),
   context: TopicContext,
 };
 
@@ -52,7 +64,7 @@ export const UpdateThread = {
     is_linking_token: z.boolean().optional(),
     launchpad_token_address: z.string().nullish(),
   }),
-  output: Thread,
+  output: Thread.extend({ spam_toggled: z.boolean() }),
   context: ThreadContext,
 };
 
@@ -66,7 +78,10 @@ export const ThreadCanvasReaction = z.object({
 
 export const CreateThreadReaction = {
   input: ThreadCanvasReaction,
-  output: Reaction.extend({ community_id: z.string() }),
+  output: Reaction.extend({
+    community_id: z.string(),
+    thread_id: PG_INT,
+  }),
   context: ThreadContext,
 };
 
@@ -78,6 +93,7 @@ export const DeleteThread = {
   }),
   output: z.object({
     thread_id: PG_INT,
+    community_id: z.string(),
     canvas_signed_data: z.string().nullish(),
     canvas_msg_id: z.string().nullish(),
   }),
@@ -93,4 +109,62 @@ export const DeleteReaction = {
   }),
   output: Reaction,
   context: ReactionContext,
+};
+
+export const AddLinks = {
+  input: z.object({
+    thread_id: PG_INT,
+    links: z.array(Link),
+  }),
+  output: Thread.extend({
+    new_links: z.array(Link),
+  }),
+  context: ThreadContext,
+};
+
+export const DeleteLinks = {
+  input: z.object({
+    thread_id: PG_INT,
+    links: z.array(Link),
+  }),
+  output: Thread,
+  context: ThreadContext,
+};
+
+export const CreateThreadToken = {
+  input: z.object({
+    community_id: z.string(),
+    eth_chain_id: z.number(),
+    transaction_hash: z.string().length(66),
+  }),
+  output: ThreadToken,
+  context: AuthContext,
+};
+
+export const ThreadTokenTradeView = ThreadTokenTrade.extend({
+  community_token_amount: z.string(),
+  floating_supply: z.string(),
+});
+
+export const CreateThreadTokenTrade = {
+  input: z.object({
+    eth_chain_id: z.number(),
+    transaction_hash: z.string().length(66),
+  }),
+  output: ThreadTokenTradeView.optional(),
+};
+
+export const GetThreadTokenHolders = {
+  input: z.object({
+    thread_id: PG_INT.optional(),
+  }),
+  output: z
+    .object({
+      user_id: z.string().nullish(),
+      avatar_url: z.string().nullish(),
+      holder_name: z.string(),
+      net_tokens: z.string(),
+      percent_share: z.string(),
+    })
+    .array(),
 };

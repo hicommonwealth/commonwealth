@@ -1,7 +1,8 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .Divider {
-  background-color: $neutral-100;
+  background-color: colors.$neutral-100;
   height: 1px;
   width: 100%;
 

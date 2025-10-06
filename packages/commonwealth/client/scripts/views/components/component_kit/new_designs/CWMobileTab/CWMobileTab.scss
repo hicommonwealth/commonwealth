@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
 
 .CWMobileTab {
   display: flex;
@@ -6,7 +7,7 @@
   gap: 8px;
   cursor: pointer;
   outline: none;
-  border: 1px solid $neutral-700;
+  border: 1px solid colors.$neutral-700;
   padding: 10px 16px;
   border-radius: 6px;
 
@@ -15,18 +16,18 @@
   }
 
   svg {
-    fill: $neutral-700;
+    fill: colors.$neutral-700;
   }
 
   &.isActive {
-    border-color: $primary-600;
+    border-color: colors.$primary-600;
 
     svg {
-      fill: $primary-600;
+      fill: colors.$primary-600;
     }
 
     .Text {
-      color: $primary-600;
+      color: colors.$primary-600;
     }
   }
 

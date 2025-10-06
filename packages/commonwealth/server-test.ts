@@ -1,12 +1,12 @@
 /* eslint-disable dot-notation */
 import { CacheDecorator, RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
-import { tester, type DB, type E2E_TestEntities } from '@hicommonwealth/model';
+import * as tester from '@hicommonwealth/model/tester';
 import express from 'express';
 import 'express-async-errors'; // handle exceptions thrown in express routes
+import { main } from './main';
 import { config } from './server/config';
 import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
-const { main } = await import('./main');
 
 /**
  * Encapsulates all the infrastructure required for integration testing, including:
@@ -22,9 +22,9 @@ const { main } = await import('./main');
 export type TestServer = {
   app: express.Express;
   cacheDecorator: CacheDecorator;
-  models: DB;
   seeder: ModelSeeder;
-  e2eTestEntities: E2E_TestEntities;
+  e2eTestEntities: tester.E2E_TestEntities;
+  baseUrl: string;
 };
 
 /**
@@ -36,14 +36,16 @@ export const testServer = async (): Promise<TestServer> => {
   cache({
     adapter: new RedisCache('redis://localhost:6379'),
   });
-  const db = await tester.seedDb();
+  await tester.seedDb();
   const app = express();
-  const { server, cacheDecorator } = await main(app, db, {
-    port: 8081,
+  const seeder = modelSeeder(app);
+  const e2eTestEntities = await tester.e2eTestEntities();
+
+  const port = 8081;
+  const { server, cacheDecorator } = await main(app, {
+    port,
     withLoggingMiddleware: !config.LOGGING.TEST_WITHOUT_LOGS,
   });
-  const seeder = modelSeeder(app, db);
-  const e2eTestEntities = await tester.e2eTestEntities(db);
 
   // auto dispose server
   dispose(async () => {
@@ -53,8 +55,8 @@ export const testServer = async (): Promise<TestServer> => {
   return {
     app,
     cacheDecorator,
-    models: db,
     seeder,
     e2eTestEntities,
+    baseUrl: `http://localhost:${port}`,
   };
 };

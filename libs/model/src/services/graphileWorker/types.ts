@@ -1,6 +1,6 @@
 import { events } from '@hicommonwealth/schemas';
 import { CronItem, JobHelpers, PromiseOrDirect } from 'graphile-worker';
-import { z, ZodSchema, ZodUndefined } from 'zod';
+import { z } from 'zod';
 
 export enum GraphileTaskNames {
   ArchiveOutbox = 'ArchiveOutbox',
@@ -8,28 +8,36 @@ export enum GraphileTaskNames {
   CleanSubscriptions = 'CleanSubscriptions',
   CleanChainEventXpSources = 'CleanChainEventXpSources',
   RunDbMaintenance = 'RunDbMaintenance',
-  AwardTwitterQuestXp = 'AwardTweetEngagementXp',
+  AwardTwitterEngagementXp = 'AwardTwitterEngagementXp',
   CountAggregator = 'CountAggregator',
+  CaptureGroupSnapshot = 'CaptureGroupSnapshot',
+  MagnaSync = 'MagnaSync',
+  RefreshMaterializedViews = 'RefreshMaterializedViews',
 }
-
-export type GraphileTask<Input extends ZodSchema> = {
-  readonly input: Input;
-  readonly fn: (
-    payload: z.infer<Input>,
-    helpers: JobHelpers,
-  ) => PromiseOrDirect<void | unknown[]>;
-};
 
 export type CustomCronItem = CronItem & {
   task: GraphileTaskNames;
 };
 
 export const TaskPayloads = {
+  RefreshMaterializedViews: z.object({}),
   ArchiveOutbox: z.object({}),
   UpdateSitemap: z.object({}),
   CleanSubscriptions: z.object({}),
   CleanChainEventXpSources: z.object({}),
   RunDbMaintenance: z.object({}),
-  AwardTweetEngagementXp: events.TweetEngagementCapReached,
+  AwardTwitterEngagementXp: events.TweetEngagementCapReached,
   CountAggregator: z.object({}),
-} as const satisfies Record<GraphileTaskNames, ZodSchema | ZodUndefined>;
+  CaptureGroupSnapshot: z.object({ groupId: z.number() }),
+  MagnaSync: z.object({}),
+};
+
+export type GraphileTaskHandler<K extends keyof typeof TaskPayloads> = (
+  payload: z.infer<(typeof TaskPayloads)[K]>,
+  helpers?: JobHelpers,
+) => PromiseOrDirect<void | unknown[]>;
+
+export type GraphileTask<K extends keyof typeof TaskPayloads> = {
+  readonly input: (typeof TaskPayloads)[K];
+  readonly fn: GraphileTaskHandler<K>;
+};

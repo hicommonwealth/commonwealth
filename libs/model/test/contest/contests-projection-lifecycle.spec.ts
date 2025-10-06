@@ -7,11 +7,8 @@ import {
   query,
 } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
-import { createEventRegistryChainNodes, models } from '@hicommonwealth/model';
 import { ContestResults } from '@hicommonwealth/schemas';
 import { CONTEST_FEE_PERCENT, delay } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   afterAll,
   afterEach,
@@ -24,11 +21,9 @@ import {
 import { z } from 'zod';
 import { Contests } from '../../src/aggregates/contest/Contests.projection';
 import { GetAllContests } from '../../src/aggregates/contest/GetAllContests.query';
+import { models } from '../../src/database';
 import { seed } from '../../src/tester';
-
-chai.use(chaiAsPromised);
-
-const { commonProtocol } = evm;
+import { createEventRegistryChainNodes } from '../../src/utils';
 
 describe('Contests projection lifecycle', () => {
   const actor: Actor = { user: { email: '' } };
@@ -58,13 +53,14 @@ describe('Contests projection lifecycle', () => {
   const community_id = 'community-with-contests';
   const thread_id = 1;
   const thread_title = 'thread-in-contest';
-  const ticker = commonProtocol.Denominations.ETH;
-  const decimals = commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH];
+  const ticker = evm.Denominations.ETH;
+  const decimals = evm.WeiDecimals[evm.Denominations.ETH];
   const topic_id = 100;
 
   const getTokenAttributes = vi.spyOn(evm, 'getTokenAttributes');
   const getContestScore = vi.spyOn(evm, 'getContestScore');
   const getContestStatus = vi.spyOn(evm, 'getContestStatus');
+  const getTransaction = vi.spyOn(evm, 'getTransaction');
 
   beforeAll(async () => {
     try {
@@ -93,7 +89,7 @@ describe('Contests projection lifecycle', () => {
             },
           ],
           CommunityStakes: [],
-          topics: [{ id: topic_id, name: 'test-topic' }],
+          topics: [{ id: topic_id, name: 'General' }],
           groups: [],
           contest_managers: [
             {
@@ -209,20 +205,29 @@ describe('Contests projection lifecycle', () => {
       lastContentId: '1',
       prizeShare: 10,
       voterShare: 20,
-      contestToken: '0x000',
+      contestToken: recurring,
     });
+    getTransaction.mockResolvedValue({
+      tx: {
+        from: '0x0000000000000000000000000000000000000123',
+      },
+    } as unknown as any);
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'RecurringContestManagerDeployed',
       payload: {
         namespace,
         contest_address: recurring,
         interval: 10,
         block_number: 1,
+        eth_chain_id: 1,
+        transaction_hash: '0x0000000000000000000000000000000000000000',
       },
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestStarted',
       payload: {
         contest_address: recurring,
@@ -234,19 +239,34 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'OneOffContestManagerDeployed',
       payload: {
         namespace,
         contest_address: oneoff,
-        length: 1,
+        length: 100,
         block_number: 1,
+        eth_chain_id: 1,
+        transaction_hash: '0x0000000000000000000000000000000000000000',
       },
     });
 
+    const contest = await models.Contest.findOne({
+      where: {
+        contest_address: oneoff,
+        contest_id: 0,
+      },
+    });
+    expect(
+      contest,
+      'OneOffContestManagerDeployed should have created a Contest',
+    ).to.exist;
+
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestStarted',
       payload: {
-        contest_id: 1,
+        contest_id: 0,
         contest_address: oneoff,
         start_time,
         end_time,
@@ -255,6 +275,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentAdded',
       payload: {
         contest_address: oneoff,
@@ -265,6 +286,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentAdded',
       payload: {
         contest_address: recurring,
@@ -276,6 +298,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentUpvoted',
       payload: {
         contest_address: recurring,
@@ -287,6 +310,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentUpvoted',
       payload: {
         contest_address: recurring,
@@ -298,6 +322,7 @@ describe('Contests projection lifecycle', () => {
     });
 
     await handleEvent(Contests(), {
+      id: 0,
       name: 'ContestContentUpvoted',
       payload: {
         contest_address: oneoff,
@@ -344,9 +369,11 @@ describe('Contests projection lifecycle', () => {
         cancelled,
         created_at,
         topic_id: topic_id,
-        topics: [{ id: topic_id, name: 'test-topic' }],
+        topics: [{ id: topic_id, name: 'General' }],
         is_farcaster_contest: true,
         vote_weight_multiplier: null,
+        namespace_judge_token_id: null,
+        namespace_judges: null,
         contests: [
           {
             contest_id,

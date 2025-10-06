@@ -5,7 +5,7 @@ import { NavigateOptions, useLocation } from 'react-router-dom';
 import { DefaultPage } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
-import { PageLoading } from './loading';
+import { LoadingIndicator } from '../components/LoadingIndicator/LoadingIndicator';
 
 export default function DiscussionsRedirect() {
   const navigate = useCommonNavigate();
@@ -40,5 +40,5 @@ export default function DiscussionsRedirect() {
     }
   }, [navigate, location.search]);
 
-  return <PageLoading />;
+  return <LoadingIndicator />;
 }

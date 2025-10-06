@@ -1,8 +1,9 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .NewCommunityAdminModal {
   .description {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 
   .CWModalBody {

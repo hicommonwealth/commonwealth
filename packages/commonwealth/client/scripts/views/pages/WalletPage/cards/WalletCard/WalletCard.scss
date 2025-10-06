@@ -1,0 +1,28 @@
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+
+.WalletCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+
+  .network-address-selector {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .list {
+    max-height: 100px;
+    overflow: scroll;
+
+    .balance-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid colors.$neutral-50;
+    }
+  }
+}

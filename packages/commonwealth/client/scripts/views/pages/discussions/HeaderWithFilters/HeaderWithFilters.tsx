@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
@@ -9,14 +10,20 @@ import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
+import { saveToClipboard } from 'utils/clipboard';
 import Permissions from 'utils/Permissions';
-import ContestCard from 'views/components/ContestCard';
-import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
-import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
+import ContestCard from 'views/components/ContestCard';
+import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
+import { Select } from 'views/components/Select';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
@@ -28,6 +35,27 @@ import {
   ThreadViewFilterTypes,
 } from '../../../../models/types';
 import './HeaderWithFilters.scss';
+
+function getTokenSymbolFallback(topicWeight: TopicWeightedVoting) {
+  switch (topicWeight) {
+    case TopicWeightedVoting.SuiNative:
+      return 'Sui Native';
+    case TopicWeightedVoting.SuiToken:
+      return 'Sui Token';
+    case TopicWeightedVoting.SuiNFT:
+      return 'Sui NFT';
+    case TopicWeightedVoting.SPL:
+      return 'SPL';
+    case TopicWeightedVoting.ERC20:
+      return 'ERC20';
+    case TopicWeightedVoting.Stake:
+      return 'Stake';
+    case TopicWeightedVoting.ERC1155ID:
+      return 'ERC1155ID';
+    default:
+      return 'ETH';
+  }
+}
 
 type TabsProps = {
   label: string;
@@ -79,6 +107,8 @@ export const HeaderWithFilters = ({
     Topic | undefined
   >();
 
+  const tokenAddressPopover = usePopover();
+
   const filterRowRef = useRef<HTMLDivElement>();
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
@@ -92,6 +122,7 @@ export const HeaderWithFilters = ({
   });
 
   const user = useUserStore();
+  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
 
   const [searchParams] = useSearchParams();
   const contestAddress = searchParams.get('contest');
@@ -220,39 +251,56 @@ export const HeaderWithFilters = ({
     }
   };
 
+  const layoutSelector = (
+    <Select
+      containerClassname="layout-selector"
+      selected={selectedView || ThreadViewFilterTypes.All}
+      onSelect={(item) => {
+        setSelectedView?.((item as ViewType).value);
+      }}
+      options={[
+        {
+          id: 1,
+          value: ThreadViewFilterTypes.All,
+          label: 'Row',
+          iconLeft: 'viewAll',
+        },
+
+        {
+          id: 2,
+          value: ThreadViewFilterTypes.Overview,
+          label: 'Overview',
+          iconLeft: 'viewOverView',
+        },
+
+        {
+          id: 3,
+          value: ThreadViewFilterTypes.CardView,
+          label: 'ImageView',
+          iconLeft: 'kanban',
+        },
+      ]}
+    />
+  );
+
   return (
     <div className="HeaderWithFilters">
       <div className="header-row">
         {!isOnArchivePage && views && views.length ? (
-          <div className="filter-section">
-            <Select
-              selected={selectedView || ThreadViewFilterTypes.All}
-              onSelect={(item) => {
-                setSelectedView?.((item as ViewType).value);
-              }}
-              options={[
-                {
-                  id: 1,
-                  value: ThreadViewFilterTypes.All,
-                  label: 'Row',
-                  iconLeft: 'viewAll',
-                },
-
-                {
-                  id: 2,
-                  value: ThreadViewFilterTypes.Overview,
-                  label: 'Overview',
-                  iconLeft: 'viewOverView',
-                },
-
-                {
-                  id: 3,
-                  value: ThreadViewFilterTypes.CardView,
-                  label: 'ImageView',
-                  iconLeft: 'kanban',
-                },
-              ]}
-            />
+          <div className="filter-section filter-section-header">
+            {!user.activeAccount && (
+              <div className="join-community-header-button">
+                <CWButton
+                  label="Join Community"
+                  buttonType="primary"
+                  buttonHeight="sm"
+                  onClick={() => {
+                    void handleJoinCommunity();
+                  }}
+                />
+              </div>
+            )}
+            {!isWindowExtraSmall && layoutSelector}
           </div>
         ) : (
           <CWText type="h3" fontWeight="semiBold" className="header-text">
@@ -290,6 +338,62 @@ export const HeaderWithFilters = ({
         </div>
       </div>
 
+      {/* Display weighted topic information if topic is weighted */}
+      {selectedTopic?.weighted_voting && (
+        <div className="weighted-topic-info">
+          <CWText type="caption" className="weighted-topic-header">
+            Weighted by
+          </CWText>
+          <div className="token-info-stack">
+            {selectedTopic.token_symbol ? (
+              <span className="token-symbol">{selectedTopic.token_symbol}</span>
+            ) : (
+              <span className="token-symbol">
+                {getTokenSymbolFallback(selectedTopic.weighted_voting)}
+              </span>
+            )}
+            {selectedTopic.token_address && (
+              <div className="token-address-button-container">
+                <CWIconButton
+                  iconName="infoEmpty"
+                  iconSize="small"
+                  onClick={tokenAddressPopover.handleInteraction}
+                  className="token-info-button"
+                />
+                <CWPopover
+                  title={
+                    selectedTopic.weighted_voting ===
+                      TopicWeightedVoting.SuiToken ||
+                    selectedTopic.weighted_voting === TopicWeightedVoting.SuiNFT
+                      ? 'Object Type'
+                      : 'Token Address'
+                  }
+                  body={
+                    <div className="token-address-popover-content">
+                      <div className="token-address-text">
+                        {selectedTopic.token_address}
+                      </div>
+                      <CWIconButton
+                        iconName="copy"
+                        iconSize="small"
+                        onClick={() => {
+                          saveToClipboard(
+                            selectedTopic.token_address!,
+                            true,
+                          ).catch(console.error);
+                        }}
+                        className="copy-button"
+                      />
+                    </div>
+                  }
+                  {...tokenAddressPopover}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <>
         {selectedTopic?.description &&
           views &&
@@ -304,7 +408,7 @@ export const HeaderWithFilters = ({
           <CWText className="subheader-text">
             This section is for all archived posts. Archived posts will always
             be visible here and can be linked to new thread posts, but they
-            can’t be upvoted or receive new comments.
+            can&apos;t be upvoted or receive new comments.
           </CWText>
         )}
 
@@ -313,6 +417,7 @@ export const HeaderWithFilters = ({
           <div className="filter-row" ref={filterRowRef}>
             <div className="filter-section">
               {!isWindowExtraSmall && <p className="filter-label">Sort</p>}
+              {isWindowExtraSmall && layoutSelector}
               <Select
                 selected={featuredFilter || ThreadFeaturedFilterTypes.Newest}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -558,6 +663,7 @@ export const HeaderWithFilters = ({
               topics={contest.topics}
               decimals={contest.decimals}
               ticker={contest.ticker}
+              prizePercentage={contest.prize_percentage || undefined}
               finishDate={end_time ? moment(end_time).toISOString() : ''}
               isCancelled={contest.cancelled}
               isRecurring={!contest.funding_token_address}
@@ -576,6 +682,7 @@ export const HeaderWithFilters = ({
         })}
       </>
 
+      {JoinCommunityModals}
       <CWModal
         size="medium"
         content={

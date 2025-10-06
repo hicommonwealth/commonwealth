@@ -17,7 +17,14 @@ export const EmptyThreadsPlaceholder = ({
       {Array(3)
         .fill({})
         .map((x, i) => (
-          <ThreadCard key={i} showSkeleton thread={{} as any} />
+          <ThreadCard
+            key={i}
+            showSkeleton
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            thread={{} as any}
+            actionGroups={{}}
+            bypassGating={false}
+          />
         ))}
     </div>
   ) : (

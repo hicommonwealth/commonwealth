@@ -1,17 +1,15 @@
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import {
-  QuestParticipationLimit,
-  QuestParticipationPeriod,
-} from '@hicommonwealth/schemas';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   BalanceSourceType,
   UserTierMap,
   WalletId,
 } from '@hicommonwealth/shared';
 import Chance from 'chance';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import z from 'zod';
 import {
   CreateComment,
   CreateCommentReaction,
@@ -19,8 +17,11 @@ import {
 import {
   CreateGroup,
   RefreshCommunityMemberships,
+  UpdateRole,
+  UpdateRoleErrors,
 } from '../../src/aggregates/community';
 import { CreateQuest, UpdateQuest } from '../../src/aggregates/quest';
+import { AwardXp } from '../../src/aggregates/super-admin';
 import { CreateThread } from '../../src/aggregates/thread';
 import {
   GetUserProfile,
@@ -30,9 +31,13 @@ import {
   Xp,
 } from '../../src/aggregates/user';
 import { models } from '../../src/database';
-import * as services from '../../src/services';
+import * as tokenBalanceCache from '../../src/services/tokenBalanceCache';
 import { seed } from '../../src/tester';
 import * as utils from '../../src/utils';
+import {
+  createQuestMaterializedView,
+  getQuestXpLeaderboardViewName,
+} from '../../src/utils/quests';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
 import { createSIWESigner, signIn } from '../utils/sign-in';
@@ -48,6 +53,7 @@ describe('User lifecycle', () => {
 
   beforeAll(async () => {
     const { community, actors } = await seedCommunity({
+      id: 'user-lifecycle-test-community',
       roles: ['admin', 'member', 'superadmin'],
     });
     community_id = community!.id;
@@ -73,7 +79,145 @@ describe('User lifecycle', () => {
     await dispose()();
   });
 
+  function logTable(logs: z.infer<(typeof schemas.GetXps)['output']>) {
+    const table = logs?.map((x) => ({
+      quest: x.quest_id,
+      user: x.user_profile?.name,
+      event: x.event_name,
+      xp: x.xp_points,
+      creator: x.creator_profile?.name,
+      creator_xp: x.creator_xp_points,
+      referrer: x.referrer_profile?.name,
+      referrer_xp: x.referrer_xp_points,
+    }));
+    console.table(table);
+  }
+
   describe('xp', () => {
+    beforeAll(async () => {
+      await models.sequelize.query(`
+        CREATE OR REPLACE FUNCTION public.update_total_xp()
+        RETURNS TRIGGER AS '
+        BEGIN
+            NEW.total_xp = NEW.xp_points + NEW.xp_referrer_points;
+            RETURN NEW;
+        END;
+        ' LANGUAGE plpgsql;
+        
+        CREATE TRIGGER update_total_xp_trigger
+        BEFORE INSERT OR UPDATE OF xp_points, xp_referrer_points
+        ON public."Users"
+        FOR EACH ROW
+        EXECUTE FUNCTION public.update_total_xp();
+      
+        CREATE MATERIALIZED VIEW user_leaderboard AS
+        SELECT 
+            id as user_id,
+            total_xp as xp_points,
+            tier,
+            (ROW_NUMBER() OVER (ORDER BY total_xp DESC, id ASC))::int as rank
+        FROM "Users" WHERE tier > 1;
+        
+        CREATE UNIQUE INDEX user_leaderboard_user_id_idx ON public.user_leaderboard (user_id);
+        CREATE INDEX user_leaderboard_rank_idx ON public.user_leaderboard (rank);
+        
+        CREATE OR REPLACE FUNCTION create_quest_xp_leaderboard(quest_id_param INTEGER, tier_param INTEGER)
+          RETURNS VOID
+          LANGUAGE plpgsql
+        AS $$
+        DECLARE
+            view_name TEXT;
+            user_index_name TEXT;
+            rank_index_name TEXT;
+            create_view_sql TEXT;
+            create_user_index_sql TEXT;
+            create_rank_index_sql TEXT;
+        BEGIN
+            -- Generate dynamic names
+            view_name := 'quest_' || quest_id_param || '_xp_leaderboard';
+            user_index_name := 'quest_' || quest_id_param || '_xp_leaderboard_user_id';
+            rank_index_name := 'quest_' || quest_id_param || '_xp_leaderboard_rank';
+        
+            -- Drop existing view if it exists
+            EXECUTE 'DROP MATERIALIZED VIEW IF EXISTS "' || view_name || '" CASCADE';
+        
+            -- Build the CREATE MATERIALIZED VIEW statement
+            create_view_sql := '
+                CREATE MATERIALIZED VIEW "' || view_name || '" AS
+                WITH user_xp_combined AS (
+                    SELECT
+                        l.user_id as user_id,
+                        COALESCE(l.xp_points, 0) as xp_points,
+                        0 as creator_xp_points,
+                        0 as referrer_xp_points
+                    FROM "XpLogs" l
+                             JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
+                             JOIN "Quests" q ON m.quest_id = q.id
+                    WHERE l.user_id IS NOT NULL AND q.id = ' || quest_id_param || '
+        
+                    UNION ALL
+        
+                    SELECT
+                        l.creator_user_id as user_id,
+                        0 as xp_points,
+                        COALESCE(l.creator_xp_points, 0) as creator_xp_points,
+                        0 as referrer_xp_points
+                    FROM "XpLogs" l
+                             JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
+                             JOIN "Quests" q ON m.quest_id = q.id
+                    WHERE l.creator_user_id IS NOT NULL AND q.id = ' || quest_id_param || '
+        
+                    UNION ALL
+        
+                    SELECT
+                        l.referrer_user_id as user_id,
+                        0 as xp_points,
+                        0 as creator_xp_points,
+                        COALESCE(l.referrer_xp_points, 0) as referrer_xp_points
+                    FROM "XpLogs" l
+                             JOIN "QuestActionMetas" m ON l.action_meta_id = m.id
+                             JOIN "Quests" q ON m.quest_id = q.id
+                    WHERE l.referrer_user_id IS NOT NULL AND q.id = ' || quest_id_param || '
+                ),
+                aggregated_xp AS (
+                    SELECT
+                        user_id,
+                        SUM(xp_points)::int as total_user_xp,
+                        SUM(creator_xp_points)::int as total_creator_xp,
+                        SUM(referrer_xp_points)::int as total_referrer_xp
+                    FROM user_xp_combined
+                    GROUP BY user_id
+                )
+                SELECT
+                    a.user_id,
+                    (a.total_user_xp + a.total_creator_xp + a.total_referrer_xp) as xp_points,
+                    u.tier,
+                    ROW_NUMBER() OVER (ORDER BY (a.total_user_xp + a.total_creator_xp + a.total_referrer_xp) DESC, a.user_id ASC)::int as rank
+                FROM aggregated_xp a
+                         JOIN "Users" u ON a.user_id = u.id
+                WHERE u.tier > ' || tier_param;
+        
+            -- Execute the CREATE MATERIALIZED VIEW
+            EXECUTE create_view_sql;
+        
+            -- Create indexes
+            create_user_index_sql := '
+                CREATE UNIQUE INDEX "' || user_index_name || '"
+                ON "' || view_name || '" (user_id)';
+        
+            create_rank_index_sql := '
+                CREATE INDEX "' || rank_index_name || '"
+                ON "' || view_name || '" (rank DESC)';
+        
+            EXECUTE create_user_index_sql;
+            EXECUTE create_rank_index_sql;
+        
+            RAISE NOTICE 'Created materialized view: %', view_name;
+        END;
+        $$;
+      `);
+    });
+
     it('should project xp points', async () => {
       // setup quest
       const quest = await command(CreateQuest(), {
@@ -83,8 +227,8 @@ describe('User lifecycle', () => {
           description: chance.sentence(),
           image_url: chance.url(),
           community_id,
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 100,
           quest_type: 'common',
         },
@@ -104,8 +248,9 @@ describe('User lifecycle', () => {
               event_name: 'CommentCreated',
               reward_amount: 5,
               creator_reward_weight: 0,
-              participation_limit: QuestParticipationLimit.OncePerPeriod,
-              participation_period: QuestParticipationPeriod.Monthly,
+              participation_limit:
+                schemas.QuestParticipationLimit.OncePerPeriod,
+              participation_period: schemas.QuestParticipationPeriod.Monthly,
               participation_times_per_period: 2,
             },
             {
@@ -119,14 +264,14 @@ describe('User lifecycle', () => {
       });
       // hack start date to make it active
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
 
       const watermark = new Date();
 
       // act on community, triggering quest rewards
-      await command(CreateThread(), {
+      const thread = await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
@@ -145,7 +290,7 @@ describe('User lifecycle', () => {
           body: 'Comment body 1.1',
         },
       });
-      await command(CreateComment(), {
+      const comment2 = await command(CreateComment(), {
         actor: admin,
         payload: {
           thread_id,
@@ -190,52 +335,87 @@ describe('User lifecycle', () => {
         {
           id: 1,
           name: null,
+          event_id: 0,
           event_created_at: logs[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
           action_meta_id: updated!.action_metas![0].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: logs[0].created_at,
+          scope: {
+            community_id,
+            thread_id: thread!.id,
+            topic_id,
+          },
         },
         {
           id: 2,
           name: null,
+          event_id: 0,
           event_created_at: logs[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: logs[1].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 3,
           name: null,
+          event_id: 0,
           event_created_at: logs[2].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: logs[2].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment2!.id,
+          },
         },
         {
           id: 4,
           name: null,
+          event_id: 0,
           event_created_at: logs[3].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
           action_meta_id: updated!.action_metas![2].id,
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: logs[3].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
       ]);
 
       // hack end date to make it inactive
       await models.Quest.update(
-        { end_date: moment().subtract(3, 'day').toDate() },
+        { end_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
     });
@@ -248,8 +428,8 @@ describe('User lifecycle', () => {
           name: 'xp quest 2',
           description: chance.sentence(),
           image_url: chance.url(),
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 100,
           quest_type: 'common',
         },
@@ -269,15 +449,17 @@ describe('User lifecycle', () => {
               event_name: 'CommentCreated',
               reward_amount: 5,
               creator_reward_weight: 0,
-              participation_limit: QuestParticipationLimit.OncePerPeriod,
-              participation_period: QuestParticipationPeriod.Daily,
+              participation_limit:
+                schemas.QuestParticipationLimit.OncePerPeriod,
+              participation_period: schemas.QuestParticipationPeriod.Daily,
             },
             {
               event_name: 'CommentUpvoted',
               reward_amount: 20,
               creator_reward_weight: 0.1,
-              participation_limit: QuestParticipationLimit.OncePerPeriod,
-              participation_period: QuestParticipationPeriod.Daily,
+              participation_limit:
+                schemas.QuestParticipationLimit.OncePerPeriod,
+              participation_period: schemas.QuestParticipationPeriod.Daily,
               participation_times_per_period: 3,
               content_id: `thread:${thread_id}`,
             },
@@ -291,14 +473,14 @@ describe('User lifecycle', () => {
       });
       // hack start date to make it active
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
 
       const watermark = new Date();
 
       // act on community, triggering quest rewards
-      await command(CreateThread(), {
+      const thread = await command(CreateThread(), {
         actor: member,
         payload: {
           community_id,
@@ -346,6 +528,10 @@ describe('User lifecycle', () => {
         quest_type: 'common',
       });
 
+      await models.sequelize.transaction(async (transaction) => {
+        await createQuestMaterializedView(-1, transaction);
+      });
+
       await models.QuestActionMeta.bulkCreate([
         {
           id: -1,
@@ -353,7 +539,7 @@ describe('User lifecycle', () => {
           event_name: 'SignUpFlowCompleted',
           reward_amount: 20,
           creator_reward_weight: 0.2,
-          participation_limit: QuestParticipationLimit.OncePerQuest,
+          participation_limit: schemas.QuestParticipationLimit.OncePerQuest,
         },
         {
           id: -2,
@@ -361,7 +547,7 @@ describe('User lifecycle', () => {
           event_name: 'WalletLinked',
           reward_amount: 10,
           creator_reward_weight: 0,
-          participation_limit: QuestParticipationLimit.OncePerQuest,
+          participation_limit: schemas.QuestParticipationLimit.OncePerQuest,
         },
         {
           id: -3,
@@ -369,9 +555,22 @@ describe('User lifecycle', () => {
           event_name: 'SSOLinked',
           reward_amount: 10,
           creator_reward_weight: 0,
-          participation_limit: QuestParticipationLimit.OncePerQuest,
+          participation_limit: schemas.QuestParticipationLimit.OncePerQuest,
+        },
+        {
+          id: -100,
+          quest_id: -1,
+          event_name: 'XpAwarded',
+          reward_amount: 0,
+          creator_reward_weight: 0,
+          participation_period: schemas.QuestParticipationPeriod.Daily,
+          participation_limit: schemas.QuestParticipationLimit.OncePerPeriod,
         },
       ]);
+
+      vi.spyOn(tokenBalanceCache, 'getBalances').mockResolvedValue({
+        [member.address!]: '100',
+      });
 
       // user signs in a referral link, creating a new user and address
       const new_address = await signIn(
@@ -387,6 +586,8 @@ describe('User lifecycle', () => {
           email: '',
         },
       };
+
+      vi.clearAllMocks();
 
       // complete the sign up flow
       await command(UpdateUser(), {
@@ -469,6 +670,7 @@ describe('User lifecycle', () => {
       expect(last.map((l) => l.toJSON())).to.deep.equal([
         {
           id: 5,
+          event_id: 0,
           event_created_at: last[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
@@ -476,10 +678,18 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![0].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: last[0].created_at,
+          scope: {
+            community_id,
+            thread_id: thread!.id,
+            topic_id,
+          },
         },
         {
           id: 6,
+          event_id: 0,
           event_created_at: last[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
@@ -487,10 +697,19 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: last[1].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 7,
+          event_id: 0,
           event_created_at: last[2].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
@@ -498,45 +717,63 @@ describe('User lifecycle', () => {
           action_meta_id: updated!.action_metas![2].id,
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
+          referrer_user_id: null,
+          referrer_xp_points: null,
           created_at: last[2].created_at,
+          scope: {
+            community_id,
+            thread_id,
+            topic_id,
+            comment_id: comment!.id,
+          },
         },
         {
           id: 8,
+          event_id: 0,
           event_created_at: last[3].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 10,
           name: null,
           action_meta_id: updated!.action_metas![3].id,
-          creator_user_id: member.user.id,
-          creator_xp_points: 10,
+          creator_user_id: null,
+          creator_xp_points: null,
+          referrer_user_id: member.user.id,
+          referrer_xp_points: 10,
           created_at: last[3].created_at,
+          scope: {
+            community_id,
+          },
         },
         {
           id: 9,
+          event_id: 0,
           event_created_at: last[4].event_created_at,
           user_id: new_address!.user_id!,
           xp_points: 16,
           name: null,
           action_meta_id: -1, // this is system quest action
-          creator_user_id: member.user.id,
-          creator_xp_points: 4,
+          creator_user_id: null,
+          creator_xp_points: null,
+          referrer_user_id: member.user.id,
+          referrer_xp_points: 4,
           created_at: last[4].created_at,
+          scope: null,
         },
       ]);
 
       // hack end date to make it inactive
       await models.Quest.update(
-        { end_date: moment().subtract(3, 'day').toDate() },
+        { end_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
     });
 
     it('should query previous xp logs', async () => {
-      // 8 events (skipping negative system quest id)
       const xps1 = await query(GetXps(), {
         actor: admin,
         payload: {},
       });
+      logTable(xps1);
       expect(xps1!.length).to.equal(9);
       xps1?.forEach((xp) => {
         expect(xp.quest_id).to.be.a('number');
@@ -553,12 +790,13 @@ describe('User lifecycle', () => {
         expect(xp.event_name).to.equal('CommentUpvoted');
       });
 
-      // 4 events after first CommentUpvoted
+      // 6 events from first CommentUpvoted
       const xps3 = await query(GetXps(), {
         actor: admin,
-        payload: { from: xps2!.at(-1)!.created_at },
+        payload: { from: new Date(xps2!.at(-1)!.created_at) },
       });
-      expect(xps3!.length).to.equal(5);
+      logTable(xps3);
+      expect(xps3!.length).to.equal(6);
 
       // 4 events for member (ThreadCreated and CommentUpvoted)
       const xps4 = await query(GetXps(), {
@@ -603,8 +841,8 @@ describe('User lifecycle', () => {
           description: chance.sentence(),
           image_url: chance.url(),
           community_id,
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 100,
           quest_type: 'common',
         },
@@ -616,8 +854,8 @@ describe('User lifecycle', () => {
           description: chance.sentence(),
           image_url: chance.url(),
           community_id,
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 100,
           quest_type: 'common',
         },
@@ -653,11 +891,11 @@ describe('User lifecycle', () => {
 
       // hack start date to make it active
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest1!.id } },
       );
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest2!.id } },
       );
 
@@ -696,8 +934,8 @@ describe('User lifecycle', () => {
           description: chance.sentence(),
           image_url: chance.url(),
           community_id,
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 20,
           quest_type: 'common',
         },
@@ -717,15 +955,16 @@ describe('User lifecycle', () => {
               event_name: 'CommentCreated',
               reward_amount: 25,
               creator_reward_weight: 0,
-              participation_limit: QuestParticipationLimit.OncePerPeriod,
-              participation_period: QuestParticipationPeriod.Daily,
+              participation_limit:
+                schemas.QuestParticipationLimit.OncePerPeriod,
+              participation_period: schemas.QuestParticipationPeriod.Daily,
             },
           ],
         },
       });
       // hack start date to make it active
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
 
@@ -798,8 +1037,8 @@ describe('User lifecycle', () => {
           name: 'xp quest for memberships',
           description: chance.sentence(),
           image_url: chance.url(),
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 200,
           quest_type: 'common',
         },
@@ -821,7 +1060,7 @@ describe('User lifecycle', () => {
       });
       // hack start date to make it active
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
 
@@ -862,8 +1101,8 @@ describe('User lifecycle', () => {
           name: 'xp quest for wallet linking',
           description: chance.sentence(),
           image_url: chance.url(),
-          start_date: moment().add(2, 'day').toDate(),
-          end_date: moment().add(3, 'day').toDate(),
+          start_date: dayjs().add(2, 'day').toDate(),
+          end_date: dayjs().add(3, 'day').toDate(),
           max_xp_to_end: 200,
           quest_type: 'common',
         },
@@ -885,7 +1124,7 @@ describe('User lifecycle', () => {
       });
       // hack start date to make it active
       await models.Quest.update(
-        { start_date: moment().subtract(3, 'day').toDate() },
+        { start_date: dayjs().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
 
@@ -894,7 +1133,7 @@ describe('User lifecycle', () => {
       const address = await signer.getWalletAddress();
 
       // make sure address has a balance above threshold
-      vi.spyOn(services.tokenBalanceCache, 'getBalances').mockResolvedValue({
+      vi.spyOn(tokenBalanceCache, 'getBalances').mockResolvedValue({
         [address]: '100',
       });
 
@@ -905,6 +1144,11 @@ describe('User lifecycle', () => {
         member.user.id,
         undefined,
         WalletId.Coinbase,
+      );
+
+      await models.User.update(
+        { tier: UserTierMap.ManuallyVerified },
+        { where: { id: result!.user_id! } },
       );
 
       vi.clearAllMocks();
@@ -925,20 +1169,174 @@ describe('User lifecycle', () => {
       expect(after!.xp_points).toBe(before!.xp_points! + 10 + 13);
     });
 
+    it('should award manual xp to a user and log the reason', async () => {
+      const initialProfile = await query(GetUserProfile(), {
+        actor: member,
+        payload: {},
+      });
+      const initialXp = initialProfile?.xp_points || 0;
+
+      const watermark = new Date();
+
+      // Award manual XP
+      const reason = 'Manual XP for test';
+      const xpAmount = 42;
+      await command(AwardXp(), {
+        actor: superadmin,
+        payload: {
+          user_id: member.user.id!,
+          xp_amount: xpAmount,
+          reason,
+        },
+      });
+
+      // drain the outbox
+      await drainOutbox(['XpAwarded'], Xp, watermark);
+
+      // Query updated profile
+      const user = await models.User.findOne({
+        where: { id: member.user.id },
+      });
+      expect(user?.xp_points).to.equal(initialXp + xpAmount);
+
+      // Query XP logs
+      const logs = await models.XpLog.findAll({
+        where: { user_id: member.user.id },
+        order: [['id', 'DESC']],
+      });
+      const manualLog = logs.find(
+        (l) => l.action_meta_id === -100 && l.scope?.award_reason === reason,
+      );
+      expect(manualLog).to.exist;
+      expect(manualLog?.xp_points).to.equal(xpAmount);
+      expect(manualLog?.scope?.award_reason).to.equal(reason);
+    });
+
+    it("should fail to award manual xp to a user if they've already awarded today", async () => {
+      expect(
+        command(AwardXp(), {
+          actor: superadmin,
+          payload: {
+            user_id: member.user.id!,
+            xp_amount: 42,
+            reason: 'Manual XP for test',
+          },
+        }),
+      ).rejects.toThrowError('User already has manual XP awards logged today');
+    });
+
     it('should query ranked by xp points', async () => {
+      await models.sequelize.query(`
+        REFRESH MATERIALIZED VIEW user_leaderboard;
+      `);
+
+      // dump xp logs to debug xp ranking
+      const logs = await query(GetXps(), {
+        actor: admin,
+        payload: {},
+      });
+      logTable(logs.sort((a, b) => b.user_id - a.user_id));
+
       const xps1 = await query(GetXpsRanked(), {
         actor: admin,
-        payload: { top: 10 },
+        payload: { limit: 10, cursor: 1 },
       });
-      expect(xps1!.length).to.equal(4);
-      expect(xps1?.map((x) => x.xp_points)).to.deep.eq([147, 50, 37, 11]);
+      expect(xps1!.totalResults).to.equal(4);
+      // member has 203 total points
+      //   42 awarded points
+      //   25+18+18+13+12+11+10+10+10+10+10=147 xp points
+      //   4+10 referrer points
+      // admin has 50 total points
+      //   11+10+10+5+5+5 xp points
+      //   2+2 creator points
+      // new_user has 37 total points
+      //   16+11+10 xp points
+      // superadmin has
+      //   11 xp points
+      expect(xps1.results?.map((x) => x.xp_points)).to.deep.eq([
+        203, 50, 37, 11,
+      ]);
 
+      await models.sequelize.query(`
+        REFRESH MATERIALIZED VIEW "${getQuestXpLeaderboardViewName(-1)}";
+      `);
       const xps2 = await query(GetXpsRanked(), {
         actor: admin,
-        payload: { top: 10, quest_id: -1 },
+        payload: { limit: 10, cursor: 1, quest_id: -1 },
       });
-      expect(xps2!.length).to.equal(2);
-      expect(xps2?.map((x) => x.xp_points)).to.deep.eq([16, 10]);
+      console.log(xps2);
+      expect(xps2!.totalResults).to.equal(2);
+      // new_user has 16 for SignUpFlowCompleted
+      // member has
+      //   10 for WalletLinked
+      //   4 for SignUpFlowCompleted as referrer
+      //   42 for AwardXp
+      expect(xps2.results?.map((x) => x.xp_points)).to.deep.eq([56, 16]);
+    });
+  });
+
+  describe('roles', () => {
+    it('should fail to update to unknown role', async () => {
+      expect(
+        command(UpdateRole(), {
+          actor: superadmin,
+          payload: {
+            community_id,
+            address: member.address!,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            role: 'unknown' as any,
+          },
+        }),
+      ).rejects.toThrowError();
+    });
+
+    it('should update a member to a moderator', async () => {
+      const updated = await command(UpdateRole(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          address: member.address!,
+          role: 'moderator',
+        },
+      });
+      expect(updated?.role).to.equal('moderator');
+    });
+
+    it('should update a moderator to a member', async () => {
+      const updated = await command(UpdateRole(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          address: member.address!,
+          role: 'member',
+        },
+      });
+      expect(updated?.role).to.equal('member');
+    });
+
+    it('should fail to update an admin to a member if there is no other admin', async () => {
+      await expect(
+        command(UpdateRole(), {
+          actor: admin,
+          payload: {
+            community_id,
+            address: admin.address!,
+            role: 'member',
+          },
+        }),
+      ).rejects.toThrowError(UpdateRoleErrors.MustHaveAdmin);
+    });
+
+    it('should update a member to an admin', async () => {
+      const updated = await command(UpdateRole(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          address: admin.address!,
+          role: 'admin',
+        },
+      });
+      expect(updated?.role).to.equal('admin');
     });
   });
 });

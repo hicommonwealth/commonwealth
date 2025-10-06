@@ -1,10 +1,13 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
+
 .DetailCard {
   display: flex;
   width: 248px;
   overflow: hidden;
   flex-direction: column;
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     width: 100%;
   }
   .rb-container {
@@ -16,7 +19,7 @@
     .label {
       font-size: 14px;
       line-height: 20px;
-      color: $neutral-400;
+      color: colors.$neutral-400;
       font-weight: 400;
       line-height: 20px;
       font-family: 'NeueHaasUnica';
@@ -27,13 +30,13 @@
       line-height: 20px;
       font-size: 12px;
       line-height: 16px;
-      color: $neutral-850;
+      color: colors.$neutral-850;
       font-family: 'NeueHaasUnica';
       height: 24px;
       border-radius: 4px;
       padding: 4px 8px 4px 8px;
-      background-color: $yellow-50;
-      color: $yellow-700;
+      background-color: colors.$yellow-50;
+      color: colors.$yellow-700;
       width: fit-content;
     }
     .detail {
@@ -41,7 +44,7 @@
       line-height: 20px;
       font-size: 14px;
       line-height: 20px;
-      color: $neutral-850;
+      color: colors.$neutral-850;
       font-family: 'NeueHaasUnica';
     }
     .address {
@@ -57,7 +60,7 @@
       flex-wrap: wrap;
       .detail {
         @extend .detail;
-        color: $primary-500;
+        color: colors.$primary-500;
       }
     }
   }

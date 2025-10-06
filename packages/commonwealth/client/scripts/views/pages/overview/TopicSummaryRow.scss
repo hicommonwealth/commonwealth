@@ -1,12 +1,15 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
+@use '../../../styles/mixins/text';
 
 .TopicSummaryRow {
-  border-bottom: 1px solid $neutral-200;
+  border-bottom: 1px solid colors.$neutral-200;
   display: grid;
   grid-template-columns: 352px 1fr;
   gap: 16px;
 
-  @include mediumSmallInclusive {
+  @include media_queries.mediumSmallInclusive {
     display: flex;
     flex-direction: column;
     gap: unset;
@@ -18,7 +21,7 @@
     gap: 4px;
     padding: 16px 0;
 
-    @include mediumSmallInclusive {
+    @include media_queries.mediumSmallInclusive {
       gap: unset;
     }
 
@@ -26,7 +29,7 @@
       display: flex;
       flex-direction: column;
 
-      @include mediumSmallInclusive {
+      @include media_queries.mediumSmallInclusive {
         align-items: center;
         display: flex;
         flex-direction: row;
@@ -34,12 +37,12 @@
       }
 
       .topic-name-text.Text {
-        color: $primary-500;
+        color: colors.$primary-500;
         width: 100%;
       }
 
       .threads-count-text.Text {
-        color: $neutral-500;
+        color: colors.$neutral-500;
         width: 100%;
       }
     }
@@ -58,15 +61,15 @@
       padding: 16px;
 
       &.isPinned {
-        background: $neutral-100;
+        background: colors.$neutral-100;
 
         &:hover {
-          background: $neutral-200;
+          background: colors.$neutral-200;
         }
       }
 
       &:hover {
-        background: $neutral-50;
+        background: colors.$neutral-50;
       }
 
       &.isLoading {
@@ -75,7 +78,7 @@
         }
       }
 
-      @include mediumSmallInclusive {
+      @include media_queries.mediumSmallInclusive {
         padding: 16px 8px;
       }
 
@@ -98,7 +101,7 @@
             }
 
             .username {
-              @include caption;
+              @include text.caption;
 
               font-weight: 500;
             }
@@ -109,20 +112,20 @@
           display: flex;
           gap: 4px;
 
-          @include flame;
+          @include shared.flame;
         }
       }
 
       .last-updated-text.Text {
-        color: $neutral-500;
+        color: colors.$neutral-500;
       }
 
       .thread-preview {
-        @include multiline-text-ellipsis(2);
+        @include text.multiline-text-ellipsis(2);
         word-break: break-word;
 
         .MarkdownFormattedText {
-          @include caption;
+          @include text.caption;
 
           h1,
           h2,
@@ -152,13 +155,13 @@
               justify-content: flex-end;
 
               > * {
-                border: 2px solid $white;
+                border: 2px solid colors.$white;
                 margin-right: -4px;
               }
             }
 
             .Text {
-              color: $neutral-500;
+              color: colors.$neutral-500;
             }
           }
         }

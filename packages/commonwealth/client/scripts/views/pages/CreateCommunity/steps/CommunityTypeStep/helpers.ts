@@ -1,11 +1,12 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import baseImg from 'assets/img/communitySelector/base.svg';
-import blastImg from 'assets/img/communitySelector/blast.png';
 import cosmosImg from 'assets/img/communitySelector/cosmos.svg';
 import ethereumImg from 'assets/img/communitySelector/ethereum.svg';
 import polygonImg from 'assets/img/communitySelector/polygon.svg';
 import skaleImg from 'assets/img/communitySelector/skale.svg';
 import solanaImg from 'assets/img/communitySelector/solana.svg';
+import soneiumImg from 'assets/img/communitySelector/soneium.png';
+import suiImg from 'assets/img/communitySelector/sui.svg'; // Add Sui image import
 import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 
 export const communityTypeOptions = [
@@ -30,24 +31,15 @@ export const communityTypeOptions = [
       'Our integration with Solana allows you to create a community for your project with just a click!',
   },
   {
-    type: CommunityType.Blast,
-    img: blastImg,
-    chainBase: ChainBase.Ethereum,
-    title: 'Blast',
+    type: CommunityType.Sui,
+    img: suiImg,
+    chainBase: ChainBase.Sui,
+    title: 'Sui',
     isRecommended: false,
+    isHidden: false,
     description:
-      'Blast is an Ethereum Layer 2 network with high TVL, offering native yield, ' +
-      'and secure decentralized app platform.',
-  },
-  {
-    type: CommunityType.Ethereum,
-    img: ethereumImg,
-    chainBase: ChainBase.Ethereum,
-    title: 'Ethereum (EVM)',
-    isRecommended: false,
-    description:
-      'Tokens built on the ERC20 protocol are fungible, meaning they are interchangeable. ' +
-      'Select this community type if you have minted a token on the Ethereum blockchain.',
+      'Sui is a layer-1 blockchain designed for scalability and low-latency transactions. ' +
+      'Create a community for your Sui project with fast finality and powerful smart contract capabilities.',
   },
   {
     type: CommunityType.Skale,
@@ -61,6 +53,26 @@ export const communityTypeOptions = [
       'SKALE is an on-demand blockchain network with zero gas fees. ' +
       // eslint-disable-next-line max-len
       'Allowing quick deployment of interoperable EVM-compatible chains without compromising security or decentralization',
+  },
+  {
+    type: CommunityType.Soneium,
+    img: soneiumImg,
+    chainBase: ChainBase.Ethereum,
+    title: 'Soneium',
+    isRecommended: false,
+    description:
+      'Empowering individuals and communities to collaborate, create and fill the world ' +
+      'with emotion together. Powered by #Sony Block Solutions Labs.',
+  },
+  {
+    type: CommunityType.Ethereum,
+    img: ethereumImg,
+    chainBase: ChainBase.Ethereum,
+    title: 'Ethereum (EVM)',
+    isRecommended: false,
+    description:
+      'Select this community type to configure to any EVM based chain ' +
+      '(such as Optimism or Arbitrum) not featured above.',
   },
   {
     type: CommunityType.Cosmos,

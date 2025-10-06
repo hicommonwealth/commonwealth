@@ -1,8 +1,9 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/media_queries';
 
 .ContestThreadBanner {
   .content-container {
-    @include extraSmall {
+    @include media_queries.extraSmall {
       flex-direction: column;
     }
 
@@ -11,7 +12,7 @@
       padding-left: 64px;
       margin-top: 8px;
 
-      @include extraSmall {
+      @include media_queries.extraSmall {
         padding-left: 0;
         margin-left: unset !important;
       }

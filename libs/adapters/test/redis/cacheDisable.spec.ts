@@ -1,10 +1,9 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 import { CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
 import express, { RequestHandler, json } from 'express';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { config } from '../../src/config';
 import { CacheDecorator, RedisCache, XCACHE_VALUES } from '../../src/redis';
 import {
@@ -12,8 +11,6 @@ import {
   setupCacheTestEndpoints,
 } from './setupCacheEndpoints';
 
-chai.use(chaiHttp);
-const expect = chai.expect;
 const app = express();
 app.use(json() as RequestHandler);
 
@@ -23,21 +20,19 @@ const content_type = {
 };
 
 function verifyNoCacheResponse(
-  res: ChaiHttp.Response,
+  res: request.Response,
   status = 200,
   cacheHeader = XCACHE_VALUES.MISS,
 ) {
-  expect(res.body).to.not.be.null;
-  expect(res).to.have.status(status);
-  expect(res).to.not.have.header('X-Cache', XCACHE_VALUES.HIT);
-  expect(res).to.have.header('X-Cache', cacheHeader);
+  expect(res.body).not.toBeNull();
+  expect(res.status).toBe(status);
+  expect(res.headers['x-cache']).not.toBe(XCACHE_VALUES.HIT);
+  expect(res.headers['x-cache']).toBe(cacheHeader);
 }
 
 async function makeGetRequest(endpoint: string, headers = {}) {
   headers = { ...headers, Accept: 'application/json' };
-  const res = await chai.request(app).get(endpoint).set(headers);
-
-  return res;
+  return request(app).get(endpoint).set(headers);
 }
 
 async function makePostRequest(
@@ -46,9 +41,7 @@ async function makePostRequest(
   headers = {},
 ) {
   headers = { ...headers, Accept: 'application/json' };
-  const res = await chai.request(app).post(endpoint).set(headers).send(body);
-
-  return res;
+  return request(app).post(endpoint).set(headers).send(body);
 }
 
 describe('Cache Disable Tests', () => {
@@ -75,27 +68,24 @@ describe('Cache Disable Tests', () => {
   });
 
   test(`verify cache route ${CACHE_ENDPOINTS.TEXT} route and expire`, async () => {
-    // make request to /cachedummy/text twice, verify undef cache both first time & cache second time
     const res = await makeGetRequest(CACHE_ENDPOINTS.TEXT);
     verifyNoCacheResponse(res, 200, XCACHE_VALUES.UNDEF);
-    expect(res).to.have.header('content-type', content_type.html);
+    expect(res.headers['content-type']).toBe(content_type.html);
 
     const res2 = await makeGetRequest(CACHE_ENDPOINTS.TEXT);
-    verifyNoCacheResponse(res, 200, XCACHE_VALUES.UNDEF);
-    expect(res2).to.have.header('content-type', content_type.html);
+    verifyNoCacheResponse(res2, 200, XCACHE_VALUES.UNDEF);
+    expect(res2.headers['content-type']).toBe(content_type.html);
   });
 
   test(`verify cache control skip ${CACHE_ENDPOINTS.JSON} route and expire`, async () => {
-    // make request to /cachedummy/json twice, verify undef cache
     const res = await makeGetRequest(CACHE_ENDPOINTS.JSON, {
       'Cache-Control': 'no-cache',
     });
     verifyNoCacheResponse(res, 200, XCACHE_VALUES.UNDEF);
-    expect(res).to.have.header('content-type', content_type.json);
+    expect(res.headers['content-type']).toBe(content_type.json);
   });
 
   test(`verify no key or duration ${CACHE_ENDPOINTS.CUSTOM_KEY_DURATION} route and expire`, async () => {
-    // make request to /cachedummy/customkeyduration twice, verify undef cache with no key or duration
     const res = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {
       duration: 3,
     });
@@ -111,22 +101,21 @@ describe('Cache Disable Tests', () => {
     `verify key ${CACHE_ENDPOINTS.CUSTOM_KEY_DURATION} route and expire`,
     { timeout: 5_000 },
     async () => {
-      // make request to /cachedummy/customkeyduration twice, verify undef cache with both key and duration both times
       const res = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {
         key: 'test',
         duration: 3,
       });
       verifyNoCacheResponse(res, 200, XCACHE_VALUES.UNDEF);
-      expect(res).to.have.header('content-type', content_type.json);
-      expect(res.body).to.be.deep.equal({ key: 'test', duration: 3 });
+      expect(res.headers['content-type']).toBe(content_type.json);
+      expect(res.body).toEqual({ key: 'test', duration: 3 });
 
       const res2 = await makePostRequest(CACHE_ENDPOINTS.CUSTOM_KEY_DURATION, {
         key: 'test',
         duration: 3,
       });
       verifyNoCacheResponse(res2, 200, XCACHE_VALUES.UNDEF);
-      expect(res2).to.have.header('content-type', content_type.json);
-      expect(res2.body).to.be.deep.equal({ key: 'test', duration: 3 });
+      expect(res2.headers['content-type']).toBe(content_type.json);
+      expect(res2.body).toEqual({ key: 'test', duration: 3 });
     },
   );
 });

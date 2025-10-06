@@ -1,4 +1,7 @@
-import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import {
+  EmailNotificationInterval,
+  ExtendedCommunity,
+} from '@hicommonwealth/schemas';
 import { WalletId } from '@hicommonwealth/shared';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
@@ -6,8 +9,6 @@ import { z } from 'zod';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';
-
-export type EmailNotificationInterval = 'weekly' | 'never';
 
 export type UserCommunities = {
   id: string;
@@ -19,7 +20,7 @@ export type UserCommunities = {
 type CommonProps = {
   id: number;
   email: string;
-  emailNotificationInterval: EmailNotificationInterval | '';
+  emailNotificationInterval: z.infer<typeof EmailNotificationInterval> | '';
   knockJWT: string;
   addresses: AddressInfo[];
   activeCommunity: z.infer<typeof ExtendedCommunity> | null;
@@ -40,6 +41,7 @@ type CommonProps = {
   xpReferrerPoints: number;
   referredByAddress?: string;
   tier: number;
+  notifyUserNameChange: boolean;
 };
 
 export type UserStoreProps = CommonProps & {
@@ -71,6 +73,7 @@ export const userStore = createStore<UserStoreProps>()(
     xpReferrerPoints: 0,
     referredByAddress: undefined,
     tier: 0,
+    notifyUserNameChange: false,
     // when logged-in, set the auth-user values
     setData: (data) => {
       if (Object.keys(data).length > 0) {
@@ -78,11 +81,15 @@ export const userStore = createStore<UserStoreProps>()(
           const newState = { ...state, ...data };
 
           // Compute hasMagicWallet whenever addresses or activeAccount changes
-          const currentAddressInfo = newState.addresses?.find(
-            (addr) => addr.address === newState.activeAccount?.address,
+          const hasMagicWallet = Boolean(
+            newState.activeAccount?.walletId === WalletId.Magic ||
+              newState.accounts?.some(
+                (account) => account.walletId === WalletId.Magic,
+              ) ||
+              newState.addresses?.some(
+                (addr) => addr.walletId === WalletId.Magic,
+              ),
           );
-          const hasMagicWallet =
-            currentAddressInfo?.walletId === WalletId.Magic;
 
           return {
             ...newState,

@@ -1,4 +1,5 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
 
 .LinksArray {
   display: flex;
@@ -7,7 +8,7 @@
   width: 100%;
 
   .add-link-button {
-    color: $neutral-600 !important;
+    color: colors.$neutral-600 !important;
     outline: none;
     border: none;
     cursor: pointer;

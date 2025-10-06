@@ -1,4 +1,6 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 @mixin bannerTheme($main, $background, $accent) {
   border: 1px solid $main;
@@ -29,8 +31,8 @@
   padding: 16px;
   display: flex;
   border-radius: 6px;
-  border: 1px solid $neutral-600;
-  background: $neutral-25;
+  border: 1px solid colors.$neutral-600;
+  background: colors.$neutral-25;
   justify-content: flex-start;
   min-width: fit-content;
 
@@ -43,11 +45,11 @@
     padding-right: 5px;
 
     .header {
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
 
     .body {
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
   }
 
@@ -77,7 +79,7 @@
     margin-top: 24px;
     flex-wrap: wrap;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       justify-content: center;
 
       .btn-border,
@@ -93,30 +95,46 @@
     gap: 4px;
 
     .description {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 
   &.info {
-    @include bannerTheme($primary-700, $primary-25, $primary-500);
+    @include bannerTheme(
+      colors.$primary-700,
+      colors.$primary-25,
+      colors.$primary-500
+    );
   }
 
   &.success {
-    @include bannerTheme($green-700, $green-25, $green-600);
+    @include bannerTheme(
+      colors.$green-700,
+      colors.$green-25,
+      colors.$green-600
+    );
   }
 
   &.warning {
-    @include bannerTheme($yellow-700, $yellow-25, $yellow-600);
+    @include bannerTheme(
+      colors.$yellow-700,
+      colors.$yellow-25,
+      colors.$yellow-600
+    );
   }
 
   &.error {
-    @include bannerTheme($rorange-600, $rorange-25, $rorange-500);
+    @include bannerTheme(
+      colors.$rorange-600,
+      colors.$rorange-25,
+      colors.$rorange-500
+    );
 
     .Button.primary {
-      background-color: $rorange-500;
+      background-color: colors.$rorange-500;
 
       &:hover {
-        background-color: $rorange-400;
+        background-color: colors.$rorange-400;
       }
     }
   }

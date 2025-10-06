@@ -6,8 +6,6 @@ import {
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { CommunityTierMap, SnapshotEventType } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   Mock,
   afterAll,
@@ -20,16 +18,15 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { models, tester } from '../../src';
+import { models } from '../../src/database';
 import { notifySnapshotProposalCreated } from '../../src/policies/handlers/notifySnapshotProposalCreated';
 import { getSnapshotUrl } from '../../src/policies/utils/utils';
+import * as tester from '../../src/tester';
 import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
 } from '../utils/mockedNotificationProvider';
-
-chai.use(chaiAsPromised);
 
 const space = 'dydxgov.eth';
 const proposalId = '0x1';
@@ -41,7 +38,7 @@ describe('snapshotProposalCreated Event Handler', () => {
   beforeAll(async () => {
     [user] = await tester.seed('User', {});
     [community] = await tester.seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: null,
       lifetime_thread_count: 0,
       profile_count: 0,
@@ -71,6 +68,7 @@ describe('snapshotProposalCreated Event Handler', () => {
 
   test('should not throw if the proposal event is not supported', async () => {
     const res = await notifySnapshotProposalCreated({
+      id: 0,
       name: 'SnapshotProposalCreated',
       payload: { event: 'ranndommmm' } as z.infer<
         typeof schemas.events.SnapshotProposalCreated
@@ -81,6 +79,7 @@ describe('snapshotProposalCreated Event Handler', () => {
 
   test('should not throw if the proposal space or id is not provided', async () => {
     const res = await notifySnapshotProposalCreated({
+      id: 0,
       name: 'SnapshotProposalCreated',
       payload: {
         event: SnapshotEventType.Created,
@@ -95,6 +94,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     });
 
     const res = await notifySnapshotProposalCreated({
+      id: 0,
       name: 'SnapshotProposalCreated',
       payload: {
         event: SnapshotEventType.Created,
@@ -118,6 +118,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     });
 
     const res = await notifySnapshotProposalCreated({
+      id: 0,
       name: 'SnapshotProposalCreated',
       payload: {
         event: SnapshotEventType.Created,
@@ -156,6 +157,7 @@ describe('snapshotProposalCreated Event Handler', () => {
 
     await expect(
       notifySnapshotProposalCreated({
+        id: 0,
         name: 'SnapshotProposalCreated',
         payload: {
           event: SnapshotEventType.Created,
@@ -163,6 +165,6 @@ describe('snapshotProposalCreated Event Handler', () => {
           id: proposalId,
         } as z.infer<typeof schemas.events.SnapshotProposalCreated>,
       }),
-    ).to.eventually.be.rejectedWith(ProviderError);
+    ).rejects.toThrow(ProviderError);
   });
 });

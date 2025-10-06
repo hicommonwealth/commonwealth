@@ -1,13 +1,14 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .ValidationText.Text {
   margin-top: 4px;
 
   &.success {
-    color: $green-600;
+    color: colors.$green-600;
   }
 
   &.failure {
-    color: $rorange-500;
+    color: colors.$rorange-500;
   }
 }

@@ -1,8 +1,10 @@
-import { InvalidState, type Command } from '@hicommonwealth/core';
+import { InvalidState, logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
+
+const log = logger(import.meta);
 
 const Errors = {
   InvalidTopics: 'Invalid topics',
@@ -42,6 +44,19 @@ export function UpdateContestManagerMetadata(): Command<
           throw new InvalidState(Errors.InvalidTopics);
         }
         contestManager.topic_id = topic.id!;
+      }
+
+      // only set judge token ID once
+      if (typeof payload.namespace_judge_token_id !== 'undefined') {
+        if (contestManager.namespace_judge_token_id) {
+          log.warn(
+            `Judge token ID already set for contest manager ${contestManager.contest_address}`,
+          );
+        } else {
+          // TODO: check namespace contract to ensure token ID is valid?
+          contestManager.namespace_judge_token_id =
+            payload.namespace_judge_token_id;
+        }
       }
 
       await contestManager.save();

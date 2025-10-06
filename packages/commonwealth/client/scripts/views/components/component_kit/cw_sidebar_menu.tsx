@@ -129,9 +129,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
               className={isStarred ? 'star-filled' : 'star-empty'}
               onClick={async (e) => {
                 e.stopPropagation();
-                await toggleCommunityStar({
-                  community: item.id,
-                });
+                await toggleCommunityStar({ community_id: item.id });
                 setIsStarred((prevState) => !prevState);
               }}
             />

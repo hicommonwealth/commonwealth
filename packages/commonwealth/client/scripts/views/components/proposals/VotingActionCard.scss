@@ -1,6 +1,8 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+
 .VotingActionCard {
-  background: $neutral-50;
+  background: colors.$neutral-50;
   gap: 16px;
   border-radius: 6px;
   padding: 16px;
@@ -16,10 +18,10 @@
     border: none;
   }
   .poll-box {
-    border: 1px solid $neutral-200 !important;
+    border: 1px solid colors.$neutral-200 !important;
     padding: 16px;
     gap: 10px;
-    background: $neutral-50 !important;
+    background: colors.$neutral-50 !important;
     display: flex;
     flex-direction: column;
   }
@@ -30,7 +32,7 @@
     color: gray;
     height: 20px;
     .Text {
-      color: $neutral-400;
+      color: colors.$neutral-400;
       font-weight: 500;
       font-size: 12px;
       line-height: 16px;
@@ -40,19 +42,19 @@
       gap: 10px;
       align-items: center;
       .Text {
-        color: $neutral-500;
+        color: colors.$neutral-500;
         font-weight: 400;
         font-size: 14px;
         line-height: 20px;
       }
       .ViewActivity {
-        color: $primary-500;
+        color: colors.$primary-500;
       }
     }
   }
   .poll-title {
     .Text {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
   .voting-options {
@@ -61,7 +63,7 @@
     flex-direction: column;
     .option {
       width: 100%;
-      border: 1px solid $neutral-300;
+      border: 1px solid colors.$neutral-300;
       background: white;
       cursor: pointer;
       height: 52px;
@@ -69,7 +71,7 @@
       display: flex;
       align-items: center;
       &:focus {
-        border: 1px solid $black !important;
+        border: 1px solid colors.$black !important;
       }
       &.selected {
         border: 1px solid black;

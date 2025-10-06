@@ -1,4 +1,5 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/media_queries';
 
 .ProfileSection {
   margin-top: 24px;
@@ -7,7 +8,7 @@
     display: flex;
     justify-content: space-between;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       flex-direction: column-reverse;
 
       .top-right-element {
@@ -22,7 +23,7 @@
     width: 100%;
     margin: 24px 0;
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       flex-direction: column;
     }
 
@@ -30,7 +31,7 @@
       width: 40%;
       margin-right: 36px;
 
-      @include smallInclusive {
+      @include media_queries.smallInclusive {
         width: 100%;
       }
     }
@@ -38,7 +39,7 @@
     .right-side {
       width: 60%;
 
-      @include smallInclusive {
+      @include media_queries.smallInclusive {
         width: 100%;
         margin-top: 36px;
       }

@@ -56,7 +56,7 @@ const useCosmosProposalMetadataQuery = (proposal: AnyProposal) => {
     queryFn: () => fetchCosmosProposalMetadata(proposal),
     enabled:
       app.chain?.base === ChainBase.CosmosSDK && isCosmosV1 && !!proposalId,
-    cacheTime: PROPOSAL_METADATA_CACHE_TIME,
+    gcTime: PROPOSAL_METADATA_CACHE_TIME,
     staleTime: PROPOSAL_METADATA_STALE_TIME,
   });
 };

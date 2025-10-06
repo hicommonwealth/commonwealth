@@ -1,7 +1,4 @@
-import { TokenView } from '@hicommonwealth/schemas';
 import { formatAddressShort } from 'client/scripts/helpers';
-import { calculateTokenPricing } from 'client/scripts/helpers/launchpad';
-import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
 import { CWIconButton } from 'client/scripts/views/components/component_kit/cw_icon_button';
@@ -10,9 +7,11 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { LaunchpadToken } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
+import { useTokenPricing } from 'hooks/useTokenPricing';
+import numeral from 'numeral';
 import React from 'react';
 import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
-import { z } from 'zod';
+import FormattedDisplayNumber from '../../../components/FormattedDisplayNumber/FormattedDisplayNumber';
 import SocialLinks from './SocialLinks/SocialLinks';
 import './TokenDetails.scss';
 
@@ -30,22 +29,11 @@ const TokenDetails = ({
   const { communityToken, isLoadingToken, isPinnedToken } =
     useTokenTradeWidget();
 
-  const { data: ethToCurrencyRateData } = useFetchTokenUsdRateQuery({
-    tokenSymbol: 'ETH',
+  const { pricing: tokenPricing, isLoading: pricingLoading } = useTokenPricing({
+    token: communityToken as LaunchpadToken,
   });
 
-  const ethToUsdRate = parseFloat(
-    ethToCurrencyRateData?.data?.data?.amount || '0',
-  );
-
-  if (isLoadingToken) return;
-
-  const tokenPricing = communityToken
-    ? calculateTokenPricing(
-        communityToken as z.infer<typeof TokenView>,
-        ethToUsdRate,
-      )
-    : null;
+  if (isLoadingToken || pricingLoading) return;
 
   const address = communityToken
     ? isPinnedToken
@@ -59,11 +47,15 @@ const TokenDetails = ({
       : (communityToken as LaunchpadToken).icon_url
     : undefined;
 
-  const marketCap = communityToken
-    ? isPinnedToken
-      ? 'N/A'
-      : (communityToken as LaunchpadToken).eth_market_cap_target
-    : undefined;
+  const totalSupply = !isPinnedToken ? '1000000000' : null;
+  const formattedTotalSupply = totalSupply
+    ? numeral(totalSupply).format('0.00a')
+    : 'N/A';
+
+  // Use values directly from hook (market cap fallback is handled inside hook)
+  const finalMarketCap = tokenPricing?.marketCapCurrent;
+  const displayPrice = tokenPricing?.currentPrice; // Use price directly from hook
+  const hasLaunchpadToken = communityToken && !isPinnedToken && tokenPricing;
 
   return (
     <div className="token-details">
@@ -97,70 +89,98 @@ const TokenDetails = ({
       </div>
 
       <div className="token-stats">
-        <div className="stat-item">
-          <CWText type="b1" className="faded">
-            24h Change
-          </CWText>
-          <div>
-            {communityToken ? (
-              <>
-                {' '}
-                {tokenPricing && (
-                  <PricePercentageChange
-                    pricePercentage24HourChange={
-                      tokenPricing.pricePercentage24HourChange
-                    }
-                    alignment="left"
-                    className="pad-8"
-                  />
-                )}
-              </>
-            ) : (
-              <CWText>N/A</CWText>
-            )}
+        {hasLaunchpadToken && (
+          <div className="stat-item">
+            <CWText type="b1" className="faded">
+              24h Change
+            </CWText>
+            <div>
+              <PricePercentageChange
+                pricePercentage24HourChange={
+                  tokenPricing.pricePercentage24HourChange
+                }
+                alignment="left"
+                className="pad-8"
+              />
+            </div>
           </div>
-        </div>
-        <div className="stat-item">
-          <CWText type="b1" className="faded">
-            Address
-          </CWText>
-          <CWText>
-            {communityToken && address ? (
-              <>
-                {formatAddressShort(address)}
-                <CWTooltip
-                  placement="top"
-                  content="address copied!"
-                  renderTrigger={(handleInteraction, isTooltipOpen) => {
-                    return (
-                      <CWIconButton
-                        iconName="copySimple"
-                        onClick={(event) => {
-                          saveToClipboard(address).catch(console.error);
-                          handleInteraction(event);
-                        }}
-                        onMouseLeave={(e) => {
-                          if (isTooltipOpen) {
-                            handleInteraction(e);
-                          }
-                        }}
-                        className="copy-icon"
-                      />
-                    );
+        )}
+        {communityToken && address && (
+          <div className="stat-item">
+            <CWText type="b1" className="faded">
+              Address
+            </CWText>
+            <CWText>
+              {formatAddressShort(address)}
+              <CWTooltip
+                placement="top"
+                content="address copied!"
+                renderTrigger={(handleInteraction, isTooltipOpen) => {
+                  return (
+                    <CWIconButton
+                      iconName="copySimple"
+                      onClick={(event) => {
+                        saveToClipboard(address).catch(console.error);
+                        handleInteraction(event);
+                      }}
+                      onMouseLeave={(e) => {
+                        if (isTooltipOpen) {
+                          handleInteraction(e);
+                        }
+                      }}
+                      className="copy-icon"
+                    />
+                  );
+                }}
+              />
+            </CWText>
+          </div>
+        )}
+        {communityToken && (
+          <>
+            <div className="stat-item">
+              <CWText type="b1" className="faded">
+                Market Cap
+              </CWText>
+              <CWText className="stat-value">
+                {finalMarketCap !== null && finalMarketCap !== undefined
+                  ? `$${numeral(finalMarketCap).format('0.00a')}`
+                  : 'N/A'}
+              </CWText>
+            </div>
+            <div className="stat-item">
+              <CWText type="b1" className="faded">
+                Price
+              </CWText>
+              {displayPrice !== null && displayPrice !== undefined ? (
+                <FormattedDisplayNumber
+                  value={displayPrice}
+                  options={{
+                    decimals: 8,
+                    currencySymbol: '$',
                   }}
+                  type="b1"
+                  fontWeight="medium"
+                  className="stat-value"
                 />
-              </>
-            ) : (
-              <CWText>N/A</CWText>
+              ) : (
+                <CWText type="b1" fontWeight="medium" className="stat-value">
+                  N/A
+                </CWText>
+              )}
+            </div>
+            {!isPinnedToken && (
+              <div className="stat-item">
+                <CWText type="b1" className="faded">
+                  Total Supply
+                </CWText>
+                <CWText type="b1" fontWeight="medium">
+                  {formattedTotalSupply}
+                </CWText>
+              </div>
             )}
-          </CWText>
-        </div>
-        <div className="stat-item">
-          <CWText type="b1" className="faded">
-            Market Cap
-          </CWText>
-          {communityToken ? <CWText>{marketCap}</CWText> : <CWText>N/A</CWText>}
-        </div>
+          </>
+        )}
         <div className="token-footer">
           <CWText type="b1" className="faded">
             <CWIcon iconName="users" iconSize="small" className="footer-icon" />{' '}

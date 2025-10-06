@@ -49,6 +49,7 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
+      user_tier_at_creation: { type: Sequelize.INTEGER, allowNull: true },
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
@@ -94,6 +95,7 @@ export default (
           ).update(
             {
               comment_count: Sequelize.literal('comment_count + 1'),
+              net_comment_count: Sequelize.literal('net_comment_count + 1'),
               activity_rank_date: comment.created_at,
             },
             {
@@ -111,6 +113,7 @@ export default (
           ).update(
             {
               comment_count: Sequelize.literal('comment_count - 1'),
+              net_comment_count: Sequelize.literal('net_comment_count - 1'),
             },
             {
               where: { id: thread_id },

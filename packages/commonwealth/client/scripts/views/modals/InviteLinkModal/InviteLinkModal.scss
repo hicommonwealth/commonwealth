@@ -1,4 +1,5 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .InviteLinkModal {
   .content {
@@ -7,7 +8,7 @@
     gap: 16px;
 
     .b2 {
-      color: $neutral-400;
+      color: colors.$neutral-400;
       margin-top: -12px;
     }
 
@@ -25,16 +26,16 @@
   }
 
   input:read-only {
-    background-color: $neutral-50;
-    border-color: $neutral-200;
-    color: $neutral-400;
+    background-color: colors.$neutral-50;
+    border-color: colors.$neutral-200;
+    color: colors.$neutral-400;
 
     &:hover {
-      border-color: $neutral-200;
+      border-color: colors.$neutral-200;
     }
 
     &:focus-within {
-      border-color: $neutral-200 !important;
+      border-color: colors.$neutral-200 !important;
       box-shadow: none !important;
     }
   }

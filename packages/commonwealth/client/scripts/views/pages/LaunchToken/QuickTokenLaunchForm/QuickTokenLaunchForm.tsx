@@ -1,4 +1,4 @@
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, DefaultPage } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
@@ -12,7 +12,10 @@ import useCreateCommunityMutation, {
   buildCreateCommunityInput,
 } from 'state/api/communities/createCommunity';
 import { generateImage } from 'state/api/general/generateImage';
-import { useLaunchTokenMutation } from 'state/api/launchPad';
+import {
+  useEstimateGasQuery,
+  useLaunchTokenMutation,
+} from 'state/api/launchPad';
 import { useCreateTokenMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import PageCounter from 'views/components/PageCounter';
@@ -24,6 +27,7 @@ import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import TokenLaunchButton from 'views/components/sidebar/TokenLaunchButton';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { fromWei } from 'web3-utils';
 import useCreateTokenCommunity from '../useCreateTokenCommunity';
 import './QuickTokenLaunchForm.scss';
 import SuccessStep from './steps/SuccessStep';
@@ -42,6 +46,42 @@ type QuickTokenLaunchFormProps = {
 
 const MAX_IDEAS_LIMIT = 5;
 
+const RATE_LIMIT_MESSAGE =
+  'You are being rate limited. Please wait and try again.';
+
+interface RateLimitErrorType {
+  data?: {
+    httpStatus?: number;
+    message?: string;
+  };
+  status?: number;
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
+const isRateLimitError = (err: RateLimitErrorType) => {
+  const status = err?.data?.httpStatus || err?.status || err?.response?.status;
+  if (status === 429) return true;
+
+  if (status === 401) {
+    const msg =
+      err?.data?.message || err?.message || err?.response?.data?.message || '';
+    const lowerMsg = String(msg).toLowerCase();
+    return (
+      lowerMsg.includes('image') &&
+      lowerMsg.includes('prompt') &&
+      lowerMsg.includes('overload')
+    );
+  }
+
+  return false;
+};
+
 export const QuickTokenLaunchForm = ({
   onCancel,
   onCommunityCreated,
@@ -50,6 +90,7 @@ export const QuickTokenLaunchForm = ({
   isSmallScreen = false,
 }: QuickTokenLaunchFormProps) => {
   const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+  const [transactionHash, setTransactionHash] = useState('');
 
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const {
@@ -91,6 +132,14 @@ export const QuickTokenLaunchForm = ({
   } = useCreateTokenCommunity();
 
   const { mutateAsync: launchToken } = useLaunchTokenMutation();
+  const { data: estimatedPrice } = useEstimateGasQuery({
+    chainRpc: baseNode?.url || '',
+    ethChainId: baseNode?.ethChainId || 0,
+    apiEnabled: !!(baseNode?.url && baseNode?.ethChainId),
+  });
+  const ethFee = estimatedPrice
+    ? fromWei(estimatedPrice.toString(), 'ether')
+    : null;
 
   const { mutateAsync: createToken } = useCreateTokenMutation();
 
@@ -183,6 +232,7 @@ export const QuickTokenLaunchForm = ({
                 prompt: `Generate an image for a web3 token named "${
                   sanitizedTokenInfo.name
                 }" having a ticker/symbol of "${sanitizedTokenInfo.symbol}"`,
+                model: 'runware:100@1',
               });
           }
 
@@ -211,6 +261,9 @@ export const QuickTokenLaunchForm = ({
             try {
               response = await createCommunityMutation(communityPayload);
             } catch (e) {
+              if (isRateLimitError(e)) {
+                throw e;
+              }
               const errorMsg = e?.message?.toLowerCase() || '';
               if (
                 errorMsg.includes('name') &&
@@ -219,6 +272,8 @@ export const QuickTokenLaunchForm = ({
               ) {
                 // this is not a unique community name error, abort token creation
                 response = 'invalid_state';
+              } else {
+                throw e;
               }
             }
             if (response === 'invalid_state') {
@@ -262,12 +317,14 @@ export const QuickTokenLaunchForm = ({
           addressSelectorSelectedAddress: selectedAddress.address,
         });
 
+        setTransactionHash(txReceipt.transactionHash);
+
         const token = await createToken({
-          transaction_hash: txReceipt.transactionHash,
-          chain_node_id: baseNode.id,
           community_id: communityId,
-          icon_url: sanitizedTokenInfo.imageURL,
+          eth_chain_id: baseNode.ethChainId!,
+          transaction_hash: txReceipt.transactionHash,
           description: sanitizedTokenInfo.description,
+          icon_url: sanitizedTokenInfo.imageURL,
         });
 
         // 4. update community to reference the created token
@@ -286,6 +343,8 @@ export const QuickTokenLaunchForm = ({
           ...(sanitizedTokenInfo.imageURL && {
             icon_url: sanitizedTokenInfo.imageURL,
           }),
+          default_page: DefaultPage.Homepage,
+          launchpad_weighted_voting: true,
         }).catch(() => undefined); // failure of this call shouldn't break this handler
 
         setCreatedCommunityId(communityId);
@@ -293,7 +352,9 @@ export const QuickTokenLaunchForm = ({
       } catch (e) {
         console.error(`Error creating token: `, e, e.name);
 
-        if (e?.name === 'TransactionBlockTimeoutError') {
+        if (isRateLimitError(e)) {
+          notifyError(RATE_LIMIT_MESSAGE);
+        } else if (e?.name === 'TransactionBlockTimeoutError') {
           notifyError('Transaction not timely signed. Please try again!');
         } else if (
           e?.message
@@ -301,6 +362,10 @@ export const QuickTokenLaunchForm = ({
             .includes('user denied transaction signature')
         ) {
           notifyError('Transaction rejected!');
+        } else if (
+          e?.data?.message?.toLowerCase().includes('insufficient funds')
+        ) {
+          notifyError('Insufficient funds to launch token!');
         } else {
           notifyError('Failed to create token!');
         }
@@ -436,8 +501,10 @@ export const QuickTokenLaunchForm = ({
             <>
               <CWBanner
                 type="info"
-                body={`Launching token will create a complimentary community. 
-                        You can edit your community post launch.`}
+                body={[
+                  'Launching your token will create an associated community on Base and requires ',
+                  '0.000444 ETH and a compatible EVM wallet.',
+                ].join('')}
               />
               <div className="cta-elements">
                 {/* allows to switch b/w generated ideas */}
@@ -510,6 +577,17 @@ export const QuickTokenLaunchForm = ({
             </>
           )}
         />
+      )}
+
+      {!!transactionHash && (
+        <>
+          <CWText type="b1" className="debugTxHash debugTxHashGap">
+            Transaction hash is
+          </CWText>
+          <CWText type="b1" className="debugTxHash">
+            {transactionHash}
+          </CWText>
+        </>
       )}
     </div>
   );

@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
 
 .SnapshotVotesTable {
   display: flex;
@@ -11,8 +13,8 @@
 
     .vote-count {
       align-items: center;
-      background-color: $neutral-500;
-      border-radius: $border-radius-rounded-corners;
+      background-color: colors.$neutral-500;
+      border-radius: border_radius.$border-radius-rounded-corners;
       display: flex;
       height: 24px;
       justify-content: center;
@@ -20,24 +22,24 @@
       padding: 0 8px 2px;
 
       .vote-count-text.Text {
-        color: $white;
+        color: colors.$white;
       }
     }
   }
 
   .votes-container {
-    border: 2px solid $neutral-100;
-    border-radius: $border-radius-corners;
-    background-color: $neutral-50;
+    border: 2px solid colors.$neutral-100;
+    border-radius: border_radius.$border-radius-corners;
+    background-color: colors.$neutral-50;
 
     .column-header-row {
       display: flex;
-      border-bottom: 2px solid $neutral-100;
+      border-bottom: 2px solid colors.$neutral-100;
       padding: 8px 16px;
     }
 
     .column-header-text.Text {
-      color: $neutral-500;
+      color: colors.$neutral-500;
       flex: 1;
     }
 
@@ -66,14 +68,14 @@
 
     .view-more-footer {
       align-items: center;
-      border-top: 2px solid $neutral-100;
+      border-top: 2px solid colors.$neutral-100;
       cursor: pointer;
       display: flex;
       justify-content: center;
       padding: 8px 16px;
 
       .view-more-text.Text {
-        color: $purple-400;
+        color: colors.$purple-400;
       }
     }
   }

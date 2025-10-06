@@ -1,0 +1,25 @@
+.FiltersDrawer {
+  .filter-drawer {
+    width: 400px;
+  }
+
+  .content-container {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .filter-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      .login-message {
+        padding: 12px;
+        background-color: var(--color-bg-secondary);
+        border-radius: 8px;
+        text-align: center;
+      }
+    }
+  }
+}

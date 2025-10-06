@@ -1,3 +1,4 @@
+import { incrementUserCount, tiered } from '@hicommonwealth/model/middleware';
 import {
   NextFunction,
   Request,
@@ -49,5 +50,26 @@ export const methodNotAllowedMiddleware = () => {
     } else {
       return next();
     }
+  };
+};
+
+export const aiTieredMiddleware = (ai: {
+  images?: boolean;
+  text?: boolean;
+}) => {
+  return async (req: Request, _: Response, next: NextFunction) => {
+    const id = req.user?.id;
+    if (!id) throw Error('Unauthorized'); // this should never happen
+
+    await tiered({ ai })({
+      actor: { user: { id, email: '' } },
+      payload: {},
+    });
+
+    // increment in input middleware, even if request fails we still count it
+    ai.images && (await incrementUserCount(id, 'ai-images'));
+    ai.text && (await incrementUserCount(id, 'ai-text'));
+
+    next();
   };
 };

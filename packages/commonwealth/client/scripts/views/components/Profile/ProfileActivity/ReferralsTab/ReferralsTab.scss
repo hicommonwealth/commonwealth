@@ -1,4 +1,7 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
+@use '../../../../../styles/mixins/table';
 
 .ReferralsTab {
   display: flex;
@@ -11,23 +14,23 @@
   }
 
   input:read-only {
-    background-color: $neutral-50;
-    border-color: $neutral-200;
-    color: $neutral-400;
+    background-color: colors.$neutral-50;
+    border-color: colors.$neutral-200;
+    color: colors.$neutral-400;
 
     &:hover {
-      border-color: $neutral-200;
+      border-color: colors.$neutral-200;
     }
 
     &:focus-within {
-      border-color: $neutral-200 !important;
+      border-color: colors.$neutral-200 !important;
       box-shadow: none !important;
     }
   }
 
   table {
     width: 100%;
-    @include table-cell;
+    @include table.table-cell;
   }
 
   .referral-totals {
@@ -45,12 +48,12 @@
     justify-content: center;
     padding: 176px 0;
 
-    @include mediumSmallInclusive {
+    @include media_queries.mediumSmallInclusive {
       padding: 96px 0;
     }
 
     .empty-state-text {
-      color: $neutral-400;
+      color: colors.$neutral-400;
       text-align: center;
     }
   }

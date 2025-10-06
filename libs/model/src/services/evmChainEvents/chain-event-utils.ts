@@ -1,17 +1,20 @@
+import { VoteGovernanceAbi } from '@commonxyz/common-governance-abis';
 import {
+  CommunityNominationsAbi,
   CommunityStakeAbi,
   ContestGovernorAbi,
   ContestGovernorSingleAbi,
   LPBondingCurveAbi,
   NamespaceFactoryAbi,
   ReferralFeeManagerAbi,
+  TokenCommunityManagerAbi,
 } from '@commonxyz/common-protocol-abis';
 import {
   EvmEventSignatures,
   decodeLog,
   getEvmAddress,
 } from '@hicommonwealth/evm-protocols';
-import { Events } from '@hicommonwealth/schemas';
+import { OutboxEvents } from '@hicommonwealth/schemas';
 import { EvmEvent, EvmMapper } from './types';
 
 const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
@@ -138,25 +141,25 @@ const contestManagerDeployedMapper: EvmMapper<
     namespace: namespace as string,
     contest_address: contest_address as string,
     block_number: Number(event.block.number),
+    transaction_hash: event.rawLog.transactionHash,
+    eth_chain_id: event.eventSource.ethChainId,
   };
 
-  if (decoded.args.oneOff) {
-    return {
-      event_name: 'OneOffContestManagerDeployed',
-      event_payload: {
-        ...event_payload,
-        length: Number(interval),
-      },
-    };
-  }
-
-  return {
-    event_name: 'RecurringContestManagerDeployed',
-    event_payload: {
-      ...event_payload,
-      interval: Number(interval),
-    },
-  };
+  return decoded.args.oneOff
+    ? {
+        event_name: 'OneOffContestManagerDeployed',
+        event_payload: {
+          ...event_payload,
+          length: Number(interval),
+        },
+      }
+    : {
+        event_name: 'RecurringContestManagerDeployed',
+        event_payload: {
+          ...event_payload,
+          interval: Number(interval),
+        },
+      };
 };
 
 const recurringContestStartedMapper: EvmMapper<'ContestStarted'> = (
@@ -274,8 +277,8 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
   event: EvmEvent,
 ) => {
   if (
-    !('quest_action_meta_id' in event.meta) ||
-    !event.meta.quest_action_meta_id
+    !('quest_action_meta_ids' in event.meta) ||
+    !event.meta.quest_action_meta_ids
   ) {
     throw new Error('Custom XP chain event is missing quest action meta id');
   }
@@ -284,15 +287,172 @@ const xpChainEventCreatedMapper: EvmMapper<'XpChainEventCreated'> = (
     event_name: 'XpChainEventCreated',
     event_payload: {
       eth_chain_id: event.eventSource.ethChainId,
-      quest_action_meta_id: event.meta.quest_action_meta_id,
+      quest_action_meta_ids: event.meta.quest_action_meta_ids,
       transaction_hash: event.rawLog.transactionHash,
-      created_at: new Date(Number(event.block.timestamp)),
+      created_at: new Date(Number(event.block.timestamp) * 1_000),
+    },
+  };
+};
+
+const nominatorSettledMapper: EvmMapper<'NominatorSettled'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: CommunityNominationsAbi,
+    eventName: 'NominatorSettled',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'NominatorSettled',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
+const nominatorNominatedMapper: EvmMapper<'NominatorNominated'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: CommunityNominationsAbi,
+    eventName: 'NominatorNominated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'NominatorNominated',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
+const judgeNominatedMapper: EvmMapper<'JudgeNominated'> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: CommunityNominationsAbi,
+    eventName: 'JudgeNominated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'JudgeNominated',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
+const communityNamespaceCreatedMapper: EvmMapper<
+  'CommunityNamespaceCreated'
+> = (event: EvmEvent) => {
+  const decoded = decodeLog({
+    abi: TokenCommunityManagerAbi,
+    eventName: 'CommunityNamespaceCreated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+
+  const { name, token, namespaceAddress, governanceAddress } = decoded.args;
+  return {
+    event_name: 'CommunityNamespaceCreated',
+    event_payload: {
+      name,
+      token,
+      namespaceAddress,
+      governanceAddress,
+    },
+  };
+};
+
+const cmnOzProposalCreatedMapper: EvmMapper<'CmnOzProposalCreated'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: VoteGovernanceAbi,
+    eventName: 'ProposalCreated',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+
+  // Will never happen - this is just here for type narrowing because
+  // the ABI has 2 events with the same 'ProposalCreated' name.
+  if (!('voteStart' in decoded.args))
+    throw new Error(
+      'CmnOzProposalCreatedMapper cannot process non-OZ proposal events',
+    );
+
+  const {
+    proposalId,
+    proposer: proposerAddress,
+    description,
+    voteStart: voteStartTimestamp,
+    voteEnd: voteEndTimestamp,
+  } = decoded.args;
+
+  return {
+    event_name: 'CmnOzProposalCreated',
+    event_payload: {
+      ...event,
+      parsedArgs: {
+        proposalId,
+        proposerAddress,
+        description,
+        voteStartTimestamp,
+        voteEndTimestamp,
+      },
+    },
+  };
+};
+
+const cmnTokenVoteCastMapper: EvmMapper<'CmnTokenVoteCast'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: VoteGovernanceAbi,
+    eventName: 'TokenVoteCast',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+
+  return {
+    event_name: 'CmnTokenVoteCast',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
+const cmnAddressVoteCastMapper: EvmMapper<'CmnAddressVoteCast'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog({
+    abi: VoteGovernanceAbi,
+    eventName: 'AddressVoteCast',
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  const { proposalId, voter: voterAddress, support } = decoded.args;
+
+  return {
+    event_name: 'CmnAddressVoteCast',
+    event_payload: {
+      ...event,
+      parsedArgs: {
+        proposalId,
+        voterAddress,
+        support,
+      },
     },
   };
 };
 
 // TODO: type should match EventRegistry event signatures
-export const chainEventMappers: Record<string, EvmMapper<Events>> = {
+export const chainEventMappers: Record<string, EvmMapper<OutboxEvents>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]:
     namespaceDeployedMapper,
 
@@ -308,9 +468,19 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral]:
     referralNamespaceDeployedMapper,
 
-  // Contests
+  // Namespace Factory
   [EvmEventSignatures.NamespaceFactory.ContestManagerDeployed]:
     contestManagerDeployedMapper,
+
+  // Community Nominations
+  [EvmEventSignatures.CommunityNominations.NominatorSettled]:
+    nominatorSettledMapper,
+  [EvmEventSignatures.CommunityNominations.NominatorNominated]:
+    nominatorNominatedMapper,
+  [EvmEventSignatures.CommunityNominations.JudgeNominated]:
+    judgeNominatedMapper,
+
+  // Contests
   [EvmEventSignatures.Contests.RecurringContestStarted]:
     recurringContestStartedMapper,
   [EvmEventSignatures.Contests.SingleContestStarted]:
@@ -320,6 +490,16 @@ export const chainEventMappers: Record<string, EvmMapper<Events>> = {
     recurringContestVoteMapper,
   [EvmEventSignatures.Contests.SingleContestVoterVoted]:
     singleContestVoteMapper,
+
+  // TokenCommunityManager
+  [EvmEventSignatures.TokenCommunityManager.CommunityNamespaceCreated]:
+    communityNamespaceCreatedMapper,
+
+  // Common VoteGovernance
+  [EvmEventSignatures.VoteGovernance.OzProposalCreated]:
+    cmnOzProposalCreatedMapper,
+  [EvmEventSignatures.VoteGovernance.TokenVoteCast]: cmnTokenVoteCastMapper,
+  [EvmEventSignatures.VoteGovernance.AddressVoteCast]: cmnAddressVoteCastMapper,
 
   // User defined events (no hardcoded event signatures)
   XpChainEventCreated: xpChainEventCreatedMapper,

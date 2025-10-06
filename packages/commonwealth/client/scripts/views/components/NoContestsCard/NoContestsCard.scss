@@ -1,0 +1,20 @@
+@use '../../../styles/mixins/colors.module.scss';
+
+.NoContestsCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  border: 1px solid colors.$neutral-200;
+  border-radius: 6px;
+  padding: 40px 16px;
+
+  .title {
+    color: colors.$neutral-600;
+  }
+
+  .subtitle {
+    color: colors.$neutral-500;
+  }
+}

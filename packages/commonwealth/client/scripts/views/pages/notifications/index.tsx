@@ -3,6 +3,7 @@ import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import PageError from 'views/pages/error';
 import { KnockNotificationsContent } from 'views/pages/notifications/KnockNotificationsContent';
+import './index.scss';
 
 const NotificationsPage = () => {
   const user = useUserStore();
@@ -12,7 +13,7 @@ const NotificationsPage = () => {
   }
 
   return (
-    <CWPageLayout>
+    <CWPageLayout className="NotificationsPageLayout">
       <KnockNotificationsContent />
     </CWPageLayout>
   );

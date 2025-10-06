@@ -3,16 +3,20 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { composeSequelizeLogger, logger, stats } from '@hicommonwealth/core';
 import {
-  emitEvent,
+  composeSequelizeLogger,
+  disableService,
+  logger,
+  stats,
+} from '@hicommonwealth/core';
+import { emitEvent, pgMultiRowUpdate } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import {
   getMentions,
   getTweets,
-  models,
-  pgMultiRowUpdate,
-  TwitterBotConfig,
+  type TwitterBotConfig,
   TwitterBotConfigs,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/model/services';
 import { EventPair } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { fileURLToPath } from 'url';
@@ -177,7 +181,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
             : t.public_metrics.like_count;
         tweetUpdates.num_likes.push({
           newValue,
-          whenCaseValue: t.id,
+          whenCaseValue: `'${t.id}'`,
         });
         capReachedEvent.event_payload.like_cap_reached = true;
         log.trace(`Updating num_likes to ${newValue}`);
@@ -193,7 +197,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
             : t.public_metrics.reply_count;
         tweetUpdates.num_replies.push({
           newValue,
-          whenCaseValue: t.id,
+          whenCaseValue: `'${t.id}'`,
         });
         capReachedEvent.event_payload.reply_cap_reached = true;
         log.trace(`Updating num_replies to ${newValue}`);
@@ -209,7 +213,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
             : t.public_metrics.retweet_count;
         tweetUpdates.num_retweets.push({
           newValue,
-          whenCaseValue: t.id,
+          whenCaseValue: `'${t.id}'`,
         });
         capReachedEvent.event_payload.retweet_cap_reached = true;
         log.trace(`Updating num_retweets to ${newValue}`);
@@ -254,6 +258,7 @@ async function pollTweetMetrics(twitterBotConfig: TwitterBotConfig) {
 
 // eslint-disable-next-line @typescript-eslint/require-await
 async function main() {
+  await disableService();
   try {
     if (config.TWITTER.ENABLED_BOTS.length === 0) {
       log.info('No Twitter bots enabled. Exiting...');

@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/media_queries';
 
 .FormSteps {
   display: flex;
@@ -6,7 +7,7 @@
   width: 100%;
   flex-wrap: wrap;
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     flex-direction: column;
   }
 }

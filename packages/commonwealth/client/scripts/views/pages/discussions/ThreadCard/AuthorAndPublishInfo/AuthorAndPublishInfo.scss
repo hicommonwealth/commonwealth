@@ -1,4 +1,8 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/elevation';
+@use '../../../../../styles/mixins/text';
 
 .AuthorAndPublishInfo {
   align-items: center;
@@ -12,23 +16,23 @@
     &:visited,
     &:hover,
     &:active {
-      color: $neutral-800 !important;
+      color: colors.$neutral-800 !important;
       text-decoration: underline !important;
     }
 
     .Text {
-      color: $neutral-800 !important;
+      color: colors.$neutral-800 !important;
     }
 
     .name {
-      @include b1;
+      @include text.b1;
       line-height: 16px !important;
     }
   }
 
   .community-user-info {
     a {
-      color: $neutral-500 !important;
+      color: colors.$neutral-500 !important;
     }
   }
 
@@ -53,25 +57,25 @@
     }
 
     .username {
-      @include caption;
+      @include text.caption;
 
       font-weight: 500;
     }
   }
 
   .dot-indicator.Text {
-    color: $neutral-400;
+    color: colors.$neutral-400;
   }
 
   .section-text.Text {
-    color: $neutral-600;
+    color: colors.$neutral-600;
   }
 
   .publish-date {
     cursor: default;
 
     .Text {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
 
     &:hover {
@@ -103,31 +107,31 @@
     font-weight: 500;
 
     &.positive {
-      color: $green-500;
+      color: colors.$green-500;
     }
 
     &.negative {
-      color: $rorange-500;
+      color: colors.$rorange-500;
     }
   }
 }
 
 .collaborators {
-  background-color: $white;
-  border-radius: $border-radius-corners;
-  box-shadow: $elevation-2;
+  background-color: colors.$white;
+  border-radius: border_radius.$border-radius-corners;
+  box-shadow: elevation.$elevation-2;
   padding: 16px 16px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 
   .collaborator-user-name {
-    color: $neutral-600;
+    color: colors.$neutral-600;
   }
 
   .collaborator-user-name:hover {
     text-decoration: underline;
-    text-decoration-color: $neutral-600;
+    text-decoration-color: colors.$neutral-600;
   }
 }
 

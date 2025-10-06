@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { Denominations, WeiDecimals } from '@hicommonwealth/evm-protocols';
 import { MAX_SCHEMA_INT } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { Contest } from '../projections';
@@ -13,6 +13,7 @@ const ContestManagerEnvironments = [
   'beta',
   'demo',
   'production',
+  'review-app',
 ] as const;
 type ContestManagerEnvironments = (typeof ContestManagerEnvironments)[number];
 export const ContestManagerEnvironmentsSchema = z
@@ -50,10 +51,8 @@ export const ContestManager = z
       .min(0)
       .max(MAX_SCHEMA_INT)
       .describe('Recurring contest interval, 0 when one-off'),
-    ticker: z.string().default(commonProtocol.Denominations.ETH),
-    decimals: PG_INT.default(
-      commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
-    ),
+    ticker: z.string().default(Denominations.ETH),
+    decimals: PG_INT.default(WeiDecimals[Denominations.ETH]),
     created_at: z.coerce.date(),
     cancelled: z
       .boolean()
@@ -83,6 +82,8 @@ export const ContestManager = z
       .describe(
         "For bot-created contests, the hash of the farcaster author's cast that created the contest",
       ),
+    namespace_judge_token_id: PG_INT.nullish(),
+    namespace_judges: z.array(z.string()).nullish(),
     environment: ContestManagerEnvironmentsSchema.optional(),
     deleted_at: z.coerce.date().nullish().describe('Soft deletion timestamp'),
   })

@@ -1,10 +1,11 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/media_queries';
 
 .RadioPanelGroup {
   display: flex;
   gap: 16px;
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     flex-direction: column;
 
     .RadioPanel {

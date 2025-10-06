@@ -1,7 +1,9 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/media_queries';
+
 .AuthModal {
   overflow-y: scroll;
-  @include extraSmall {
+  @include media_queries.extraSmall {
     height: 100vh;
   }
 }

@@ -4,7 +4,10 @@ import type { DB } from './factories';
  * Associates models with type safety
  */
 export const buildAssociations = (db: DB) => {
-  db.User.withMany(db.Address)
+  db.User.withMany(db.Address, {
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  })
     .withMany(db.ProfileTags)
     .withMany(db.SubscriptionPreference, {
       asMany: 'SubscriptionPreferences',
@@ -23,6 +26,10 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.XpLog, {
       foreignKey: 'creator_user_id',
       asOne: 'creator',
+    })
+    .withMany(db.XpLog, {
+      foreignKey: 'referrer_user_id',
+      asOne: 'referrer',
     });
 
   db.Quest.withMany(db.QuestActionMeta, {
@@ -35,7 +42,7 @@ export const buildAssociations = (db: DB) => {
     foreignKey: 'action_meta_id',
     asOne: 'quest_action_meta',
   })
-    .withMany(db.ChainEventXpSource, {
+    .withOne(db.ChainEventXpSource, {
       foreignKey: 'quest_action_meta_id',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
@@ -45,6 +52,12 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });
+
+  db.CommunityGoalMeta.withMany(db.QuestActionMeta, {
+    foreignKey: 'community_goal_meta_id',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  });
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -87,7 +100,9 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Address)
+    .withMany(db.Address, {
+      onUpdate: 'CASCADE',
+    })
     .withMany(db.Thread, {
       asOne: 'Community',
       onUpdate: 'CASCADE',
@@ -133,7 +148,7 @@ export const buildAssociations = (db: DB) => {
     onUpdate: 'CASCADE',
     onDelete: 'SET NULL',
   })
-    .withMany(db.GroupPermission, {
+    .withMany(db.GroupGatedAction, {
       foreignKey: 'topic_id',
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
@@ -148,7 +163,19 @@ export const buildAssociations = (db: DB) => {
       asMany: 'reactions',
     })
     .withMany(db.Comment)
-    .withMany(db.ThreadVersionHistory);
+    .withMany(db.ThreadVersionHistory)
+    .withOne(db.ThreadRank, {
+      onDelete: 'CASCADE',
+    })
+    .withMany(db.ThreadToken, {
+      foreignKey: 'thread_id',
+    });
+
+  db.ThreadToken.withMany(db.ThreadTokenTrade, {
+    foreignKey: 'token_address',
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
 
   db.Comment.withMany(db.Reaction, {
     asMany: 'reactions',
@@ -182,7 +209,7 @@ export const buildAssociations = (db: DB) => {
     onDelete: 'CASCADE',
   });
 
-  db.Group.withMany(db.GroupPermission, {
+  db.Group.withMany(db.GroupGatedAction, {
     foreignKey: 'group_id',
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
@@ -238,6 +265,19 @@ export const buildAssociations = (db: DB) => {
     },
   );
 
+  db.TopicSubscription.withManyToMany(
+    {
+      model: db.Topic,
+      as: 'subscriptions',
+      onDelete: 'CASCADE',
+    },
+    {
+      model: db.User,
+      as: 'topicSubscriptions',
+      onDelete: 'CASCADE',
+    },
+  );
+
   db.CommentSubscription.withManyToMany(
     {
       model: db.Comment,
@@ -265,5 +305,24 @@ export const buildAssociations = (db: DB) => {
 
   db.LaunchpadToken.withMany(db.LaunchpadTrade, {
     foreignKey: 'token_address',
+  });
+
+  db.MCPServerCommunity.withManyToMany(
+    {
+      model: db.MCPServer,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+    {
+      model: db.Community,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  );
+
+  db.GovernanceProposal.withMany(db.ProposalVote, {
+    foreignKey: ['eth_chain_id', 'proposal_id'],
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   });
 };

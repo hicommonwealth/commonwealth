@@ -7,9 +7,9 @@ import { models } from '../../../database';
 import { mustExist } from '../../../middleware/guards';
 import { UserAttributes } from '../../../models/user';
 import {
-  type VerifiedAddress,
   verifyAddress,
   verifySessionSignature,
+  type VerifiedAddress,
 } from '../../../services/session';
 import { signInPrivy } from './privy';
 import { signInUser } from './utils';
@@ -129,8 +129,8 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         was_signed_in,
         user_created: res.newUser,
         address_created: res.newAddress,
-        // TODO: this does not seem to be used on client?
-        first_community: !(user_id || res.addressCount > 1),
+        is_welcome_onboard_flow_complete:
+          !!user?.is_welcome_onboard_flow_complete,
       };
     },
   };

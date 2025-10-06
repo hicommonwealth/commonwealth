@@ -1,10 +1,5 @@
-import axios from 'axios';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import { LinkSource } from 'models/Thread';
 import type { AnyProposal } from 'models/types';
-import React, { useState } from 'react';
-import { SERVER_URL } from 'state/api/config';
-import { userStore } from 'state/ui/user';
+import React from 'react';
 import {
   getStatusClass,
   getStatusText,
@@ -18,25 +13,6 @@ type ProposalSubheaderProps = {
 
 export const ProposalSubheader = (props: ProposalSubheaderProps) => {
   const { proposal } = props;
-  const [linkedThreads, setLinkedThreads] =
-    // @ts-expect-error <StrictNullChecks/>
-    useState<{ id: number; title: string }[]>(null);
-
-  useNecessaryEffect(() => {
-    if (!linkedThreads) {
-      axios
-        .post(`${SERVER_URL}/linking/getLinks`, {
-          link: {
-            source: LinkSource.Proposal,
-            identifier: proposal.identifier,
-          },
-          jwt: userStore.getState().jwt,
-        })
-        .then((response) => {
-          setLinkedThreads(response.data.result.threads);
-        });
-    }
-  }, []);
 
   return (
     <div className="ProposalSubheader">

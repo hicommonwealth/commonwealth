@@ -1,4 +1,5 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .CommentsTree {
   display: flex;
@@ -6,8 +7,17 @@
   scroll-margin-block-start: 40px;
 
   .replies-container {
-    border-left: 1px solid $neutral-200;
+    border-left: 1px solid colors.$neutral-200;
     padding-left: 24px;
     margin-left: 28px;
+  }
+
+  .comments-list {
+    .chat-load-older-container {
+      padding: 16px;
+      text-align: center;
+      border-bottom: 1px solid colors.$neutral-200;
+      background-color: colors.$neutral-50;
+    }
   }
 }

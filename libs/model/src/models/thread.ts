@@ -1,12 +1,14 @@
 import { CacheNamespaces, cache } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
 import {
+  CountAggregatorKeys,
   MAX_TRUNCATED_CONTENT_LENGTH,
   getDecodedString,
 } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { emitEvent, getThreadContestManagers } from '../utils/utils';
+import { emitEvent } from '../utils/outbox';
+import { getThreadContestManagers } from '../utils/utils';
 import { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
@@ -77,6 +79,7 @@ export default (
         type: Sequelize.DATE,
         allowNull: true,
       },
+      user_tier_at_creation: { type: Sequelize.INTEGER, allowNull: true },
 
       //counts
       reaction_count: {
@@ -90,6 +93,11 @@ export default (
         defaultValue: 0,
       },
       comment_count: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      net_comment_count: {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
@@ -138,10 +146,10 @@ export default (
         ) => {
           const { Outbox, Address } = sequelize.models;
 
-          await cache().setKey(
-            CacheNamespaces.Community_Thread_Count_Changed,
+          await cache().addToSet(
+            CacheNamespaces.CountAggregator,
+            CountAggregatorKeys.CommunityThreadCount,
             thread.community_id,
-            'true',
           );
 
           const { topic_id, community_id } = thread.get({
@@ -155,26 +163,28 @@ export default (
             thread.address_id,
           )) as AddressAttributes | null;
 
-          await emitEvent(
-            Outbox,
-            [
-              {
-                event_name: 'ThreadCreated',
-                event_payload: {
-                  ...thread.get({ plain: true }),
-                  address: address!.address,
-                  contestManagers,
+          if (!thread.marked_as_spam_at) {
+            await emitEvent(
+              Outbox,
+              [
+                {
+                  event_name: 'ThreadCreated',
+                  event_payload: {
+                    ...thread.get({ plain: true }),
+                    address: address!.address,
+                    contestManagers,
+                  },
                 },
-              },
-            ],
-            options.transaction,
-          );
+              ],
+              options.transaction,
+            );
+          }
         },
         afterDestroy: async (thread: ThreadInstance) => {
-          await cache().setKey(
-            CacheNamespaces.Community_Thread_Count_Changed,
+          await cache().addToSet(
+            CacheNamespaces.CountAggregator,
+            CountAggregatorKeys.CommunityThreadCount,
             thread.community_id,
-            'true',
           );
         },
       },

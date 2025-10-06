@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .WVConsent {
   display: flex;
@@ -15,12 +17,12 @@
       margin-top: 16px;
     }
 
-    @include smallInclusive {
+    @include media_queries.smallInclusive {
       margin-right: unset;
     }
 
     .description {
-      color: $neutral-500;
+      color: colors.$neutral-500;
       margin-top: -8px;
     }
 
@@ -29,7 +31,7 @@
 
       a {
         margin-left: 4px;
-        color: $primary-600;
+        color: colors.$primary-600;
       }
     }
 

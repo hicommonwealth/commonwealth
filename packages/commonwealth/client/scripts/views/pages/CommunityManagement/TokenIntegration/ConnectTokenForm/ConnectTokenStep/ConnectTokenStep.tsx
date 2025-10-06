@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import {
   notifyError,
   notifyInfo,
@@ -33,7 +33,7 @@ const ConnectTokenStep = ({
   // base chain node info
   const nodes = fetchCachedNodes();
   const baseNode = nodes?.find(
-    (n) => n.ethChainId === commonProtocol.ValidChains.Base,
+    (n) => n.ethChainId === ValidChains.Base,
   ) as NodeInfo; // this is expected to exist
 
   const {
@@ -44,13 +44,13 @@ const ConnectTokenStep = ({
     tokenMetadataLoading,
     tokenValue,
   } = useTokenFinder({
-    nodeEthChainId: baseNode.ethChainId || 0,
+    nodeEthChainId: baseNode?.ethChainId || 0,
   });
 
-  const { mutateAsync: pinToken, isLoading: isPinningToken } =
+  const { mutateAsync: pinToken, isPending: isPinningToken } =
     usePinTokenToCommunityMutation();
 
-  const { mutateAsync: unpinToken, isLoading: isUnpinningToken } =
+  const { mutateAsync: unpinToken, isPending: isUnpinningToken } =
     useUnpinTokenFromCommunityMutation({
       resetCacheOnSuccess: false,
     });
@@ -101,7 +101,7 @@ const ConnectTokenStep = ({
       onSubmit={handleSubmit}
       className="ConnectTokenStep"
       initialValues={{
-        chainNodeId: baseNode.id,
+        chainNodeId: baseNode?.id,
       }}
     >
       <div className="chain-selector">
@@ -140,6 +140,9 @@ const ConnectTokenStep = ({
           hookToForm
           fullWidth
           placeholder="Please enter primary token address"
+          tokenAddress={tokenValue}
+          chainName={baseNode.name}
+          chainEthId={baseNode.ethChainId}
         />
       </div>
       <CWDivider />

@@ -1,11 +1,13 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/text';
 
 .Text {
-  color: $neutral-800;
+  color: colors.$neutral-800;
   display: flex;
 
   &.disabled {
-    color: $neutral-300;
+    color: colors.$neutral-300;
   }
 
   &.noWrap {
@@ -20,59 +22,59 @@
   }
 
   &.b1 {
-    @include b1;
+    @include text.b1;
   }
 
   &.b2 {
-    @include b2;
+    @include text.b2;
   }
 
   &.h1 {
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
     font-size: 36px;
     line-height: 48px;
   }
 
   &.h2 {
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
     font-size: 28px;
     line-height: 40px;
   }
 
   &.h3 {
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
     font-size: 24px;
     line-height: 36px;
   }
 
   &.h4 {
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
     font-size: 20px;
     line-height: 28px;
   }
 
   &.h5 {
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
     font-size: 18px;
     line-height: 24px;
   }
 
   &.d1 {
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
     font-size: 64px;
     letter-spacing: -0.02em;
     line-height: 80px;
   }
 
   &.d2 {
-    font-family: $font-family-silka;
+    font-family: shared.$font-family-silka;
     font-size: 48px;
     letter-spacing: -0.01em;
     line-height: 64px;
   }
 
   &.caption {
-    @include caption;
+    @include text.caption;
 
     &.uppercase {
       font-weight: 500;
@@ -80,7 +82,7 @@
   }
 
   &.buttonMini {
-    font-family: $font-family-neue-haas-unica;
+    font-family: shared.$font-family-neue-haas-unica;
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.02em;
@@ -88,7 +90,7 @@
   }
 
   &.buttonSm {
-    font-family: $font-family-neue-haas-unica;
+    font-family: shared.$font-family-neue-haas-unica;
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.02em;
@@ -96,7 +98,7 @@
   }
 
   &.buttonLg {
-    font-family: $font-family-neue-haas-unica;
+    font-family: shared.$font-family-neue-haas-unica;
     font-size: 16px;
     font-weight: 500;
     letter-spacing: 0.04em;
@@ -104,14 +106,14 @@
   }
 
   &.monospace1 {
-    font-family: $font-family-monospace;
+    font-family: shared.$font-family-monospace;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
   }
 
   &.monospace2 {
-    font-family: $font-family-monospace;
+    font-family: shared.$font-family-monospace;
     font-size: 12px;
     font-weight: 400;
     line-height: 18px;
@@ -142,7 +144,7 @@
   }
 
   &.link {
-    color: $primary-500;
+    color: colors.$primary-500;
   }
 
   &.uppercase {
@@ -162,10 +164,10 @@
   }
 
   &.faded {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 
   &.blue {
-    color: $primary-400;
+    color: colors.$primary-400;
   }
 }

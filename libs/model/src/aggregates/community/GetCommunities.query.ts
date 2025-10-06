@@ -32,6 +32,9 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         eth_chain_id,
         cosmos_chain_id,
         community_type,
+        search = '',
+        has_launchpad_token,
+        has_pinned_token,
       } = payload;
 
       // pagination configuration
@@ -46,12 +49,14 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         user_id?: number;
         eth_chain_id?: number;
         cosmos_chain_id?: string;
+        search?: string;
       } = {};
       if (eth_chain_id) replacements.eth_chain_id = eth_chain_id;
       if (cosmos_chain_id) replacements.cosmos_chain_id = cosmos_chain_id;
       if (filtering_tags) replacements.tag_ids = tag_ids;
       if (relevance_by === 'membership')
         replacements.user_id = actor?.user?.id || 0;
+      if (search?.trim()) replacements.search = `%${search}%`;
 
       const date30DaysAgo = new Date(+new Date() - 1000 * 24 * 60 * 60 * 30);
       const communityCTE = `
@@ -102,13 +107,15 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   "Community"."updated_at",
                   "Community"."redirect",
                   "Community"."snapshot_spaces",
-                  "Community"."include_in_digest_email"
+                  "Community"."include_in_digest_email",
+                  COALESCE("Community"."ai_features_enabled", false) AS "ai_features_enabled"
                   ${iQ(threadFilter, `, COALESCE(tc.thread_count, 0) as last_30_day_thread_count`)}
           FROM    "Communities" AS "Community"
           ${iQ(threadFilter, 'LEFT JOIN thread_counts tc ON tc.community_id = "Community".id')}
           WHERE  "Community"."active" = true AND "Community".tier != ${CommunityTierMap.SpamCommunity}
               ${iQ(base, `AND "Community"."base" = '${base}'`)}
               ${iQ(network, `AND "Community"."network" = '${network}'`)}
+              ${iQ(search, `AND LOWER("Community"."name") LIKE LOWER(:search)`)}
               ${iQ(
                 community_type,
                 `
@@ -129,6 +136,26 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                             WHERE  ( "Groups"."community_id" = "Community"."id" )
                             LIMIT  1
                           ) IS NOT NULL
+                        `,
+              )}
+              ${iQ(
+                has_launchpad_token,
+                `
+                          AND EXISTS (
+                            SELECT 1
+                            FROM "LaunchpadTokens" AS "LaunchpadTokens"
+                            WHERE "LaunchpadTokens"."namespace" = "Community"."namespace"
+                          )
+                        `,
+              )}
+              ${iQ(
+                has_pinned_token,
+                `
+                          AND EXISTS (
+                            SELECT 1
+                            FROM   "PinnedTokens" AS "PinnedTokens"
+                            WHERE  "PinnedTokens"."community_id" = "Community"."id"
+                          )
                         `,
               )}
               ${iQ(

@@ -6,13 +6,16 @@ import { useUpdateSubscriptionPreferencesMutation } from 'state/api/trpc/subscri
 // eslint-disable-next-line max-len
 import useUserStore from 'state/ui/user';
 // eslint-disable-next-line max-len
+import { useNotificationsRequestPermissionsAsyncReceiver } from 'views/components/PrivyMobile/useNotificationsRequestPermissionsAsyncReceiver';
 import { SubscriptionPrefType } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSetting';
-import { verifyMobileNotificationPermissions } from './verifyMobileNotificationPermissions';
 
 export function useSubscriptionPreferenceSettingToggle(
   prefs: SubscriptionPrefType[],
 ) {
   const subscriptionPreferences = useSubscriptionPreferences();
+
+  const requestPermissions = useNotificationsRequestPermissionsAsyncReceiver();
+
   const { mutateAsync: updateSubscriptionPreferences } =
     useUpdateSubscriptionPreferencesMutation();
   const user = useUserStore();
@@ -21,8 +24,10 @@ export function useSubscriptionPreferenceSettingToggle(
     async (activate: boolean) => {
       if (activate) {
         // *** we have to first request permissions if we're activating.
-        const verified = await verifyMobileNotificationPermissions();
-        if (!verified) {
+        const { status: notificationPermissions } = await requestPermissions(
+          {},
+        );
+        if (notificationPermissions !== 'granted') {
           return;
         }
       }
@@ -46,6 +51,12 @@ export function useSubscriptionPreferenceSettingToggle(
 
       await subscriptionPreferences.refetch();
     },
-    [prefs, subscriptionPreferences, updateSubscriptionPreferences, user.id],
+    [
+      prefs,
+      requestPermissions,
+      subscriptionPreferences,
+      updateSubscriptionPreferences,
+      user.id,
+    ],
   );
 }

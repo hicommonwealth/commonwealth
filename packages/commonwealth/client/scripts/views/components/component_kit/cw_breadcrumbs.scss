@@ -1,4 +1,5 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .Breadcrumbs {
   align-items: center;
@@ -13,23 +14,23 @@
   }
 
   .current-text.Text {
-    color: $neutral-600;
+    color: colors.$neutral-600;
     font-weight: 500;
   }
 
   .separator-text.Text {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 
   .parent-text.Text {
-    color: $neutral-500;
+    color: colors.$neutral-500;
 
     &:hover {
-      color: $primary-300;
+      color: colors.$primary-300;
     }
 
     &:active {
-      color: $primary-500;
+      color: colors.$primary-500;
     }
   }
 }

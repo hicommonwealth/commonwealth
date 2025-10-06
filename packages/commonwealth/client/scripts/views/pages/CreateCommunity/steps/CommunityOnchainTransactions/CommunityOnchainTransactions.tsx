@@ -1,3 +1,4 @@
+import useGetJudgeStatusQuery from 'client/scripts/state/api/contests/getJudgeStatus';
 import AddressInfo from 'models/AddressInfo';
 import React, { useState } from 'react';
 import { openConfirmation } from 'views/modals/confirmation_modal';
@@ -54,6 +55,8 @@ const CommunityOnchainTransactions = ({
     symbol: symbol || (createdCommunityName || '').toUpperCase().slice(0, 4),
   });
 
+  const { data: judgeStatus } = useGetJudgeStatusQuery(createdCommunityId);
+
   const namespaceTransaction = useNamespaceTransaction({
     communityId: createdCommunityId,
     namespace: communityNamespaceData.namespace,
@@ -76,6 +79,7 @@ const CommunityOnchainTransactions = ({
     namespace: communityNamespaceData.namespace,
     userAddress: selectedAddress?.address,
     chainId,
+    judgeId: (judgeStatus?.current_judge_id || 100) + 1,
     onSuccess: () => onSignTransaction?.(TransactionType.ConfigureNominations),
   });
 

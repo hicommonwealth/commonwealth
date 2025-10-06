@@ -41,6 +41,7 @@ const SMSForm = ({ onSubmit, onCancel, isLoading }: SMSFormProps) => {
               name="SMS"
               label="Phone Number"
               country="us"
+              onlyCountries={['us', 'ca', 'as', 'gu', 'mp', 'pr', 'vi']}
               disabled={isLoading}
             />
             <div className="action-btns">
@@ -55,7 +56,7 @@ const SMSForm = ({ onSubmit, onCancel, isLoading }: SMSFormProps) => {
                 type="submit"
                 buttonWidth="wide"
                 buttonType="primary"
-                label="Sign in with Magic"
+                label="Sign In"
                 disabled={isLoading || !isPhoneNumberValid}
               />
             </div>

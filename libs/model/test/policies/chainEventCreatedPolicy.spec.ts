@@ -1,12 +1,13 @@
 import { EventContext, dispose } from '@hicommonwealth/core';
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { createTestRpc, models, tester } from '@hicommonwealth/model';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { Community } from '@hicommonwealth/schemas';
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
-import { expect } from 'chai';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
+import { models } from '../../src/database';
 import { handleCommunityStakeTrades } from '../../src/policies/handlers/handleCommunityStakeTrades';
+import * as tester from '../../src/tester';
+import { createTestRpc } from '../../src/utils';
 
 // These are all values for a real txn on the Ethereum Sepolia Testnet
 const transactionHash =
@@ -21,6 +22,7 @@ const blockTimestamp = 1712247912;
 
 async function processValidStakeTransaction() {
   const context: EventContext<'CommunityStakeTrade'> = {
+    id: 0,
     name: 'CommunityStakeTrade',
     payload: {
       rawLog: {
@@ -47,7 +49,7 @@ async function processValidStakeTransaction() {
         exchangeToken: '0x0000000000000000000000000000000000000000',
       },
       eventSource: {
-        ethChainId: cp.ValidChains.Sepolia,
+        ethChainId: ValidChains.Sepolia,
       },
       block: {
         number: 5628559n,
@@ -71,10 +73,10 @@ describe('ChainEventCreated Policy', () => {
     const [chainNode] = await tester.seed(
       'ChainNode',
       {
-        url: createTestRpc(cp.ValidChains.Sepolia),
-        private_url: createTestRpc(cp.ValidChains.Sepolia, 'private'),
+        url: createTestRpc(ValidChains.Sepolia),
+        private_url: createTestRpc(ValidChains.Sepolia, 'private'),
         name: 'Sepolia Testnet',
-        eth_chain_id: cp.ValidChains.Sepolia,
+        eth_chain_id: ValidChains.Sepolia,
         balance_type: BalanceType.Ethereum,
       },
       { mock: false },
@@ -85,7 +87,7 @@ describe('ChainEventCreated Policy', () => {
     });
 
     [community] = await tester.seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: chainNode?.id,
       namespace_address: namespaceAddress,
       lifetime_thread_count: 0,
@@ -118,8 +120,8 @@ describe('ChainEventCreated Policy', () => {
   test("should save stake transactions that don't exist", async () => {
     await processValidStakeTransaction();
     const txns = await models.StakeTransaction.findAll();
-    expect(txns.length).to.equal(1);
-    expect(txns[0].toJSON()).to.deep.equal({
+    expect(txns.length).toBe(1);
+    expect(txns[0].toJSON()).toEqual({
       transaction_hash: transactionHash,
       community_id: community!.id,
       stake_id: stakeId,
@@ -144,11 +146,64 @@ describe('ChainEventCreated Policy', () => {
     });
 
     const initialCount = await models.StakeTransaction.count();
-    expect(initialCount).to.equal(1);
+    expect(initialCount).toBe(1);
 
     await processValidStakeTransaction();
 
     const postCount = await models.StakeTransaction.count();
-    expect(postCount).to.equal(1);
+    expect(postCount).toBe(1);
+  });
+
+  test('should save judge nominations', async () => {
+    // const [chainNode] = await tester.seed('ChainNode', {
+    //   name: 'Sepolia Testnet',
+    //   eth_chain_id: 1,
+    // });
+    // await tester.seed('Community', {
+    //   chain_node_id: chainNode!.id!,
+    //   base: ChainBase.Ethereum,
+    //   active: true,
+    //   lifetime_thread_count: 0,
+    //   profile_count: 1,
+    //   allow_tokenized_threads: true,
+    //   namespace: 'abc',
+    //   namespace_nominations: null,
+    // });
+    // const event: EventContext<'JudgeNominated'> = {
+    //   name: 'JudgeNominated',
+    //   payload: {
+    //     parsedArgs: {
+    //       namespace: 'abc',
+    //       judgeId: 999n,
+    //       nominator: '0x0000000000000000000000000000000000000000',
+    //       currentNominations: 1n,
+    //       judge: '0x0000000000000000000000000000000000000000',
+    //     },
+    //     eventSource: {} as unknown as any,
+    //     rawLog: {} as unknown as any,
+    //     block: {} as unknown as any,
+    //   },
+    // };
+    // const events = [];
+    // events.push(event);
+    // events.push({
+    //   ...event,
+    //   payload: {
+    //     ...event.payload,
+    //     parsedArgs: {
+    //       ...event.payload.parsedArgs,
+    //       judgeId: 1000n,
+    //     },
+    //   },
+    // });
+    // for (const e of events) {
+    //   await handleJudgeNominated(e);
+    // }
+    // const community = await models.Community.findOne({
+    //   where: {
+    //     namespace: 'abc',
+    //   },
+    // });
+    // expect(community?.namespace_nominations).to.deep.equal([999, 1000]);
   });
 });

@@ -1,4 +1,6 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .Collapsible {
   display: flex;
@@ -19,12 +21,12 @@
         display: flex;
         margin-right: 8px;
 
-        @include smallInclusive {
+        @include media_queries.smallInclusive {
           margin-right: 4px;
         }
 
         .IconButton {
-          color: $neutral-500;
+          color: colors.$neutral-500;
         }
       }
     }

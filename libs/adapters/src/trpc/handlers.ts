@@ -14,7 +14,7 @@ import {
 } from '@hicommonwealth/core';
 import { Events } from '@hicommonwealth/schemas';
 import { TRPCError } from '@trpc/server';
-import { ZodSchema, ZodUndefined, z } from 'zod';
+import { ZodType, ZodUndefined, z } from 'zod';
 import { buildproc, procedure } from './builder';
 import { Tag, type OutputMiddleware } from './types';
 
@@ -53,9 +53,9 @@ const trpcerror = (error: unknown): TRPCError => {
  * @returns tRPC mutation procedure
  */
 export const command = <
-  Input extends ZodSchema,
-  Output extends ZodSchema,
-  Context extends ZodSchema,
+  Input extends ZodType,
+  Output extends ZodType,
+  Context extends ZodType,
 >(
   factory: () => Metadata<Input, Output, Context>,
   tag: Tag,
@@ -68,13 +68,14 @@ export const command = <
     md,
     tag,
     outMiddlewares,
+    // @ts-expect-error inferring type
   }).mutation(async ({ ctx, input }) => {
     try {
       return await coreCommand(
         md,
         {
           actor: ctx.actor,
-          payload: input!,
+          payload: input! as z.infer<Input>,
         },
         false,
       );
@@ -93,9 +94,9 @@ export const command = <
  * @returns tRPC query procedure
  */
 export const query = <
-  Input extends ZodSchema,
-  Output extends ZodSchema,
-  Context extends ZodSchema,
+  Input extends ZodType,
+  Output extends ZodType,
+  Context extends ZodType,
 >(
   factory: () => Metadata<Input, Output, Context>,
   tag: Tag,
@@ -117,7 +118,7 @@ export const query = <
     try {
       const cacheTTL =
         typeof options?.ttlSecs === 'function'
-          ? options.ttlSecs(input)
+          ? options.ttlSecs(input as z.infer<Input>)
           : options?.ttlSecs;
 
       const cacheKey = cacheTTL
@@ -145,7 +146,7 @@ export const query = <
         md,
         {
           actor: ctx.actor,
-          payload: input!,
+          payload: input! as z.infer<Input>,
         },
         false,
       );
@@ -175,7 +176,7 @@ export const query = <
 // TODO: add security options (API key, IP range, internal, etc)
 export const event = <
   Input extends EventSchemas,
-  Output extends ZodSchema | ZodUndefined = ZodUndefined,
+  Output extends ZodType | ZodUndefined = ZodUndefined,
 >(
   factory: () => EventsHandlerMetadata<Input, Output>,
   tag: Tag.Integration,
@@ -190,11 +191,15 @@ export const event = <
       },
     })
     .input(z.object(md.inputs))
-    .output(md.output ?? z.object({}).optional())
+    .output((md.output || z.object({})).optional())
     .mutation(async ({ input }) => {
       try {
         const [[name, payload]] = Object.entries(input as object);
-        return await handleEvent(md, { name: name as Events, payload }, false);
+        return await handleEvent(
+          md,
+          { id: 0, name: name as Events, payload },
+          false,
+        );
       } catch (error) {
         throw trpcerror(error);
       }

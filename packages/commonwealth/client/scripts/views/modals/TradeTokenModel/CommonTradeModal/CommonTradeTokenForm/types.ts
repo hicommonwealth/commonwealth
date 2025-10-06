@@ -1,16 +1,16 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
-import { SupportedCurrencies } from 'helpers/currency';
+import { SupportedCryptoCurrencies } from 'helpers/currency';
 import NodeInfo from 'models/NodeInfo';
 import { z } from 'zod';
 import { CommonTradingConfig } from '../types';
 import useCommonTradeTokenFormProps from './useCommonTradeTokenForm';
 
-export type TokenPresetAmounts = number | 'Max';
+export type TokenPresetAmounts = number | 'Max' | string;
 
 export type UseCommonTradeTokenFormProps = {
   tradeConfig: CommonTradingConfig & {
-    ethBuyCurrency: SupportedCurrencies;
+    buyCurrency: SupportedCryptoCurrencies;
     buyTokenPresetAmounts?: TokenPresetAmounts[];
     sellTokenPresetAmounts?: TokenPresetAmounts[]; // we could also do 25%, 50% etc
   };
@@ -20,7 +20,7 @@ export type UseCommonTradeTokenFormProps = {
 
 export type UseBuyTradeProps = UseCommonTradeTokenFormProps & {
   enabled: boolean;
-  chainNode: NodeInfo;
+  chainNode: NodeInfo | undefined;
   tokenCommunity?: z.infer<typeof ExtendedCommunity>;
   selectedAddress?: string;
   commonFeePercentage: number;

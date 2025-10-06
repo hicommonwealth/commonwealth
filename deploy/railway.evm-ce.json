@@ -1,0 +1,36 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "railway.dockerfile",
+    "watchPatterns": [
+      "deploy/railway.evm-ce.json",
+      "railway.dockerfile",
+      "libs",
+      "packages",
+      "package.json",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      "tsconfig.json",
+      "vite.config.ts",
+      "tsconfig.vite.json",
+      ".nvmrc",
+      ".dockerignore",
+      "scripts",
+      ".gitignore"
+    ]
+  },
+  "deploy": {
+    "preDeployCommand": "npm run pre-deploy",
+    "startCommand": "node --import=extensionless/register --enable-source-maps ./build/server/workers/evmChainEvents/startEvmPolling.js",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 3,
+    "region": "us-east4-eqdc4a",
+    "limitOverride": {
+      "containers": {
+        "cpu": 1,
+        "memoryBytes": 1000000000
+      }
+    }
+  }
+}

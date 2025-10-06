@@ -4,6 +4,7 @@ import { Router } from 'express';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
+import * as configuration from './configuration';
 import * as contest from './contest';
 import * as discordBot from './discordBot';
 import * as email from './emails';
@@ -11,11 +12,15 @@ import * as feed from './feed';
 import * as integrations from './integrations';
 import * as launchpadToken from './launchpadToken';
 import * as loadTest from './load-test';
+import * as mcp from './mcp';
 import * as poll from './poll';
 import * as quest from './quest';
+import * as search from './search';
 import * as subscription from './subscription';
 import * as superAdmin from './super-admin';
+import * as tag from './tag';
 import * as thread from './thread';
+import * as tokenAllocation from './tokenAllocation';
 import * as user from './user';
 import * as wallet from './wallet';
 import * as webhook from './webhook';
@@ -36,6 +41,11 @@ const api = {
   launchpadToken: launchpadToken.trpcRouter,
   poll: poll.trpcRouter,
   quest: quest.trpcRouter,
+  tag: tag.trpcRouter,
+  search: search.trpcRouter,
+  configuration: configuration.trpcRouter,
+  mcp: mcp.trpcRouter,
+  tokenAllocation: tokenAllocation.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {

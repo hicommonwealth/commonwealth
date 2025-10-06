@@ -1,11 +1,17 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase } from '@hicommonwealth/shared';
+import {
+  bumpCommunityTier,
+  ChainBase,
+  CommunityTierMap,
+} from '@hicommonwealth/shared';
+import { z } from 'zod';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
-import { checkSnapshotObjectExists, commonProtocol } from '../../services';
-import { emitEvent } from '../../utils/utils';
+import { checkSnapshotObjectExists } from '../../services';
+import { newNamespaceValidator } from '../../services/commonProtocol';
+import { emitEvent } from '../../utils/outbox';
 
 export const UpdateCommunityErrors = {
   SnapshotOnlyOnEthereum:
@@ -27,6 +33,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         description,
         default_symbol,
         icon_url,
+        launchpad_token_image,
         active,
         type,
         stages_enabled,
@@ -44,6 +51,8 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         allow_tokenized_threads,
         spam_tier_level,
         thread_purchase_token,
+        launchpad_weighted_voting,
+        ai_features_enabled,
       } = payload;
 
       const community = await models.Community.findOne({
@@ -91,12 +100,13 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
 
         community.namespace = namespace;
         community.namespace_address =
-          await commonProtocol.newNamespaceValidator.validateNamespace(
+          await newNamespaceValidator.validateNamespace(
             namespace!,
             transactionHash,
             actor.address!,
             community,
           );
+        bumpCommunityTier(CommunityTierMap.ChainVerified, community);
       }
 
       // TODO: use getDeltas to determine which fields to update
@@ -126,9 +136,61 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         (community.spam_tier_level = spam_tier_level);
       thread_purchase_token &&
         (community.thread_purchase_token = thread_purchase_token);
+      ai_features_enabled !== undefined &&
+        (community.ai_features_enabled = ai_features_enabled);
+
+      let weightedVotingProps: Partial<z.infer<typeof schemas.Topic>> | null =
+        null;
+
+      if (launchpad_weighted_voting) {
+        const foundNamespace = namespace || community.namespace;
+        if (foundNamespace) {
+          const launchpadToken = await models.LaunchpadToken.findOne({
+            where: { namespace: foundNamespace },
+          });
+          if (launchpadToken) {
+            weightedVotingProps = {
+              weighted_voting: schemas.TopicWeightedVoting.ERC20,
+              token_address: launchpadToken?.token_address,
+              token_symbol: launchpadToken?.symbol,
+              token_decimals: 18,
+              vote_weight_multiplier: 1,
+              chain_node_id: community.chain_node_id,
+            };
+          }
+        }
+      }
 
       await models.sequelize.transaction(async (transaction) => {
         await community.save({ transaction });
+
+        // update LaunchpadToken image if requested
+        if (launchpad_token_image !== undefined) {
+          const foundNamespace = namespace || community.namespace;
+          if (foundNamespace) {
+            const launchpadToken = await models.LaunchpadToken.findOne({
+              where: { namespace: foundNamespace },
+              transaction,
+            });
+            if (launchpadToken) {
+              // Prefer payload icon_url, else use community.icon_url
+              const newIconUrl = launchpad_token_image || community.icon_url;
+              if (newIconUrl && launchpadToken.icon_url !== newIconUrl) {
+                launchpadToken.icon_url = newIconUrl;
+                await launchpadToken.save({ transaction });
+              }
+            }
+          }
+        }
+
+        if (weightedVotingProps) {
+          // update general topic to use weighted voting
+          await models.Topic.update(weightedVotingProps, {
+            where: { name: 'General', community_id: community.id },
+            transaction,
+          });
+        }
+
         await emitEvent(
           models.Outbox,
           [

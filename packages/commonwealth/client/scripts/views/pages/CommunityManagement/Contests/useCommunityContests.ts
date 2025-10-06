@@ -11,6 +11,7 @@ type UseCommunityContestsProps =
       shouldPolling?: boolean;
       fetchAll?: boolean;
       isCommunityHomePage?: boolean;
+      search?: string;
     }
   | undefined;
 
@@ -19,6 +20,7 @@ const useCommunityContests = (props?: UseCommunityContestsProps) => {
     shouldPolling = false,
     fetchAll = false,
     isCommunityHomePage = false,
+    search,
   } = props || {};
   const { stakeEnabled } = useCommunityStake();
 
@@ -27,6 +29,7 @@ const useCommunityContests = (props?: UseCommunityContestsProps) => {
       community_id: app.activeChainId() || '',
       shouldPolling,
       fetchAll,
+      search,
     });
 
   // If we're on the community homepage, also fetch global contests (i.e. without filtering by community_id)
@@ -36,6 +39,7 @@ const useCommunityContests = (props?: UseCommunityContestsProps) => {
       community_id: '',
       shouldPolling,
       fetchAll: true,
+      search,
     });
 
   const { finishedContests, activeContests } = useMemo(() => {

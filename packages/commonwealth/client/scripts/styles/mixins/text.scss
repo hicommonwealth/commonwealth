@@ -1,3 +1,5 @@
+@use '../variables' as vars;
+
 @mixin coloredBottomBorder($color) {
   border-bottom: 4px solid $color;
   padding-bottom: 4px;
@@ -5,14 +7,14 @@
 }
 
 @mixin b1 {
-  font-family: $font-family-neue-haas-unica;
+  font-family: vars.$font-family-neue-haas-unica;
   font-size: 16px;
   letter-spacing: 0.01em;
   line-height: 24px;
 }
 
 @mixin b2 {
-  font-family: $font-family-neue-haas-unica;
+  font-family: vars.$font-family-neue-haas-unica;
   font-size: 14px;
   line-height: 20px;
 
@@ -23,7 +25,7 @@
 }
 
 @mixin caption {
-  font-family: $font-family-neue-haas-unica;
+  font-family: vars.$font-family-neue-haas-unica;
   font-size: 12px;
   letter-spacing: 0.02em;
   line-height: 18px;

@@ -10,8 +10,6 @@ import {
   CommunityTierMap,
   safeTruncateBody,
 } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   Mock,
   afterAll,
@@ -23,16 +21,14 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { tester } from '../../src';
 import { notifyUserMentioned } from '../../src/policies/handlers/notifyUserMentioned';
 import { getProfileUrl, getThreadUrl } from '../../src/policies/utils/utils';
+import * as tester from '../../src/tester';
 import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
 } from '../utils/mockedNotificationProvider';
-
-chai.use(chaiAsPromised);
 
 describe('userMentioned Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
@@ -53,7 +49,7 @@ describe('userMentioned Event Handler', () => {
     [user] = await tester.seed('User', {});
     [author] = await tester.seed('User', {});
     [community] = await tester.seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: chainNode?.id,
       lifetime_thread_count: 0,
       profile_count: 2,
@@ -67,7 +63,7 @@ describe('userMentioned Event Handler', () => {
           user_id: user!.id,
         },
       ],
-      topics: [{}],
+      topics: [{ name: 'user-mentioned-test-topic' }],
     });
     [thread] = await tester.seed('Thread', {
       community_id: community!.id!,
@@ -93,6 +89,7 @@ describe('userMentioned Event Handler', () => {
 
   test('should not throw if relevant community is not found', async () => {
     const res = await notifyUserMentioned({
+      id: 0,
       name: 'UserMentioned',
       payload: {
         communityId: 'nonexistent',
@@ -132,7 +129,9 @@ describe('userMentioned Event Handler', () => {
       data: {
         community_id: community!.id,
         community_name: community!.name,
-        author: author?.profile.name,
+        author:
+          author?.profile.name ||
+          community!.Addresses![0].address.substring(0, 8),
         author_address_id: community!.Addresses![0].id,
         author_address: community!.Addresses![0].address,
         author_user_id: author!.id?.toString(),
@@ -168,6 +167,6 @@ describe('userMentioned Event Handler', () => {
           thread,
         },
       }),
-    ).to.eventually.be.rejectedWith(ProviderError);
+    ).rejects.toThrow(ProviderError);
   });
 });

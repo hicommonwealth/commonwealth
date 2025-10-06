@@ -1,5 +1,6 @@
-@import '../MarkdownEditor/layout';
-@import './layout';
+@use '../MarkdownEditor/layout';
+@use 'layout' as layout2;
+@use '../../../styles/mixins/colors.module';
 
 .MarkdownViewer {
   .mdxeditor-root-contenteditable {
@@ -8,7 +9,7 @@
 
   .show-more-button {
     align-items: center;
-    color: $primary-500;
+    color: colors.$primary-500;
     cursor: pointer;
     display: flex;
     justify-content: space-between;

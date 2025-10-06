@@ -3,6 +3,7 @@ import {
   ERC_SPECIFICATIONS,
   SOL_NFT_SPECIFICATION,
   SPL_SPECIFICATION,
+  SUI_NFT_SPECIFICATION,
   TOKENS,
 } from './constants';
 
@@ -12,6 +13,9 @@ const converter = (
     | 'erc721'
     | 'eth_native'
     | 'cosmos_native'
+    | 'sui_native'
+    | 'sui_token'
+    | 'sui_nft'
     | 'spl'
     | 'metaplex',
   amount: string,
@@ -28,11 +32,22 @@ const converter = (
     return converterFunc(amount, 18);
   }
 
+  if (
+    requirementType === TOKENS.SUI_TOKEN ||
+    requirementType === TOKENS.SUI_TOKEN_TYPE
+  ) {
+    return converterFunc(amount, 9);
+  }
+
   if (requirementType == SPL_SPECIFICATION) {
     return converterFunc(amount, 6);
   }
 
   if (requirementType === SOL_NFT_SPECIFICATION) {
+    return amount;
+  }
+
+  if (requirementType === SUI_NFT_SPECIFICATION) {
     return amount;
   }
 
@@ -46,6 +61,9 @@ export const convertRequirementAmountFromWeiToTokens = (
     | 'erc721'
     | 'eth_native'
     | 'cosmos_native'
+    | 'sui_native'
+    | 'sui_token'
+    | 'sui_nft'
     | 'spl'
     | 'metaplex',
   amount: string,
@@ -59,6 +77,9 @@ export const convertRequirementAmountFromTokensToWei = (
     | 'erc721'
     | 'eth_native'
     | 'cosmos_native'
+    | 'sui_native'
+    | 'sui_token'
+    | 'sui_nft'
     | 'spl'
     | 'metaplex',
   amount: string,

@@ -9,20 +9,23 @@ import {
 import useSidebarStore from 'state/ui/sidebar';
 import './index.scss';
 
+import clsx from 'clsx';
+import { useFlag } from 'hooks/useFlag';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
+import { useFetchTokensQuery } from 'state/api/tokens';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { PageLoading } from 'views/pages/loading';
+import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import {
   APIOrderBy,
   APIOrderDirection,
 } from '../../../../scripts/helpers/constants';
-import { useSearchChainsQuery } from '../../../../scripts/state/api/chains';
 import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
+import { useSearchCommunitiesQuery } from '../../../../scripts/state/api/communities';
 import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
 import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
 import { useCommonNavigate } from '../../../navigation/helpers';
@@ -115,14 +118,10 @@ const SearchPage = () => {
     // @ts-expect-error <StrictNullChecks/>
     SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
 
-  const sharedQueryOptions = {
-    communityId: community,
-    searchTerm: queryParams.q || '',
-    limit: 20,
-    orderBy,
-    orderDirection,
-    includeCount: true,
-  };
+  const search_term = queryParams.q || '';
+  const community_id = community;
+  const order_by = orderBy;
+  const order_direction = orderDirection;
 
   const {
     data: threadsData,
@@ -130,10 +129,15 @@ const SearchPage = () => {
     fetchNextPage: threadsFetchNextPage,
     isLoading: threadsIsLoading,
   } = useSearchThreadsQuery({
-    ...sharedQueryOptions,
-    enabled:
-      activeTab === SearchScope.Threads &&
-      sharedQueryOptions?.searchTerm?.length > 3,
+    community_id,
+    search_term,
+    cursor: 1,
+    limit: 20,
+    order_by,
+    order_direction,
+    thread_title_only: true,
+    include_count: true,
+    enabled: activeTab === SearchScope.Threads && search_term?.length > 3,
   });
 
   const {
@@ -142,10 +146,13 @@ const SearchPage = () => {
     fetchNextPage: commentsFetchNextPage,
     isLoading: commentsIsLoading,
   } = useSearchCommentsQuery({
-    ...sharedQueryOptions,
-    enabled:
-      activeTab === SearchScope.Replies &&
-      sharedQueryOptions?.searchTerm?.length > 3,
+    community_id,
+    search: search_term,
+    cursor: 1,
+    limit: 20,
+    order_by,
+    order_direction,
+    enabled: activeTab === SearchScope.Replies && search_term.length > 3,
   });
 
   const {
@@ -153,11 +160,13 @@ const SearchPage = () => {
     error: communityError,
     fetchNextPage: chainsFetchNextPage,
     isLoading: communityIsLoading,
-  } = useSearchChainsQuery({
-    ...sharedQueryOptions,
-    enabled:
-      activeTab === SearchScope.Communities &&
-      sharedQueryOptions?.searchTerm?.length > 0,
+  } = useSearchCommunitiesQuery({
+    search: search_term,
+    cursor: 1,
+    limit: 20,
+    order_by: 'tier',
+    order_direction: 'DESC',
+    enabled: activeTab === SearchScope.Communities && search_term.length > 0,
   });
 
   const {
@@ -166,10 +175,30 @@ const SearchPage = () => {
     fetchNextPage: profilesFetchNextPage,
     isLoading: profilesIsLoading,
   } = useSearchProfilesQuery({
-    ...sharedQueryOptions,
-    enabled:
-      activeTab === SearchScope.Members &&
-      sharedQueryOptions?.searchTerm?.length > 0,
+    communityId: community,
+    searchTerm: search_term,
+    limit: 20,
+    orderBy,
+    orderDirection,
+    enabled: activeTab === SearchScope.Members && search_term.length > 0,
+  });
+
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
+
+  const {
+    data: tokensData,
+    error: tokensError,
+    isLoading: tokensIsLoading,
+    fetchNextPage: tokensFetchNextPage,
+  } = useFetchTokensQuery({
+    search: search_term,
+    cursor: 1,
+    limit: 20,
+    with_stats: true,
+    token_type: !tokenizedThreadsEnabled ? 'launchpad' : undefined,
+    order_by: APIOrderBy.CreatedAt,
+    order_direction: APIOrderDirection.Desc,
+    enabled: activeTab === SearchScope.Tokens && search_term.length > 0,
   });
 
   const results = useMemo(() => {
@@ -196,10 +225,19 @@ const SearchPage = () => {
           profilesData?.pages?.reduce((acc, p) => [...acc, ...p.results], []) ||
           []
         );
+      case SearchScope.Tokens:
+        return (tokensData?.pages || []).flatMap((page) => page.results) || [];
       default:
         return [];
     }
-  }, [activeTab, communityData, commentsData, profilesData, threadsData]);
+  }, [
+    activeTab,
+    communityData,
+    commentsData,
+    profilesData,
+    threadsData,
+    tokensData,
+  ]);
 
   const totalResults = useMemo(() => {
     switch (activeTab) {
@@ -211,10 +249,19 @@ const SearchPage = () => {
         return communityData?.pages?.[0]?.totalResults || 0;
       case SearchScope.Members:
         return profilesData?.pages?.[0]?.totalResults || 0;
+      case SearchScope.Tokens:
+        return tokensData?.pages?.[0]?.totalResults || 0;
       default:
         return 0;
     }
-  }, [activeTab, communityData, commentsData, profilesData, threadsData]);
+  }, [
+    activeTab,
+    communityData,
+    commentsData,
+    profilesData,
+    threadsData,
+    tokensData,
+  ]);
 
   const totalResultsText = pluralize(totalResults, activeTab.toLowerCase());
   const scopeText = useMemo(() => {
@@ -232,11 +279,15 @@ const SearchPage = () => {
   // when error, notify
   useEffect(() => {
     const err =
-      threadsError || commentsError || communityError || profilesError;
+      threadsError ||
+      commentsError ||
+      communityError ||
+      profilesError ||
+      tokensError;
     if (err) {
-      notifyError((err as Error).message);
+      notifyError(err.message);
     }
-  }, [communityError, commentsError, profilesError, threadsError]);
+  }, [communityError, commentsError, profilesError, threadsError, tokensError]);
 
   // when scroll to bottom, fetch next page
   useEffect(() => {
@@ -254,6 +305,9 @@ const SearchPage = () => {
         case SearchScope.Members:
           profilesFetchNextPage();
           break;
+        case SearchScope.Tokens:
+          tokensFetchNextPage();
+          break;
       }
     }
   }, [
@@ -263,6 +317,7 @@ const SearchPage = () => {
     commentsFetchNextPage,
     chainsFetchNextPage,
     profilesFetchNextPage,
+    tokensFetchNextPage,
   ]);
 
   const isLoading = useMemo(() => {
@@ -275,6 +330,8 @@ const SearchPage = () => {
         return communityIsLoading;
       case SearchScope.Members:
         return profilesIsLoading;
+      case SearchScope.Tokens:
+        return tokensIsLoading;
       default:
         return false;
     }
@@ -284,6 +341,7 @@ const SearchPage = () => {
     commentsIsLoading,
     profilesIsLoading,
     threadsIsLoading,
+    tokensIsLoading,
   ]);
 
   return (
@@ -303,13 +361,13 @@ const SearchPage = () => {
             </CWTabsRow>
           </div>
           <>
-            {sharedQueryOptions?.searchTerm?.length === 0 && (
+            {search_term.length === 0 && (
               <ErrorPage message="No search term provided!" />
             )}
-            {sharedQueryOptions?.searchTerm?.length > 0 && (
+            {search_term.length > 0 && (
               <>
                 {isLoading ? (
-                  <PageLoading />
+                  <LoadingIndicator />
                 ) : (
                   <>
                     <CWText className="search-results-caption">
@@ -348,7 +406,11 @@ const SearchPage = () => {
                           />
                         </div>
                       )}
-                    <div className="search-results-list">
+                    <div
+                      className={clsx('search-results-list', {
+                        grid: activeTab === SearchScope.Tokens,
+                      })}
+                    >
                       {renderSearchResults(
                         results,
                         // @ts-expect-error <StrictNullChecks/>

@@ -1,5 +1,6 @@
-@import '../../../styles/shared';
-@import './layout';
+@use '../../../styles/shared';
+@use 'layout';
+@use '../../../styles/mixins/colors.module';
 
 html,
 body,
@@ -19,12 +20,12 @@ body,
 }
 
 .mdxeditor-container {
-  outline: 1px solid $neutral-200;
+  outline: 1px solid colors.$neutral-200;
   border-radius: 4px;
 }
 
 .mdxeditor-container-active {
-  outline: 1px solid $primary-300;
+  outline: 1px solid colors.$primary-300;
 }
 
 .mdxeditor-container-mode-mobile {
@@ -34,18 +35,18 @@ body,
   }
 
   .mdxeditor-toolbar {
-    border-top: solid $neutral-200 1px;
+    border-top: solid colors.$neutral-200 1px;
 
     min-height: 45px !important;
   }
 }
 
 .mdxeditor-container-disabled {
-  background-color: $neutral-50;
+  background-color: colors.$neutral-50;
   cursor: not-allowed !important;
 
   .DesktopEditorFooter {
-    background-color: $neutral-50;
+    background-color: colors.$neutral-50;
   }
 
   * {
@@ -59,7 +60,7 @@ body,
 
 .mdxeditor-container-mode-desktop {
   .mdxeditor-root-contenteditable {
-    border-top: 1px solid $neutral-200;
+    border-top: 1px solid colors.$neutral-200;
 
     min-height: 150px;
     //max-height: 450px;

@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/media_queries';
 
 .Grid {
   display: grid;
@@ -12,12 +13,12 @@
   }
 
   &.menu-visible {
-    @include medium {
+    @include media_queries.medium {
       grid-template-columns: 1fr;
     }
   }
 
-  @include mediumSmallInclusive {
+  @include media_queries.mediumSmallInclusive {
     grid-template-columns: 1fr;
   }
 }

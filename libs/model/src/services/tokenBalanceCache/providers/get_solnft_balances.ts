@@ -1,7 +1,9 @@
 import { logger } from '@hicommonwealth/core';
-import { Metaplex, keypairIdentity } from '@metaplex-foundation/js';
-import { Connection, Keypair, PublicKey } from '@solana/web3.js';
-import { ChainNodeInstance } from 'model/src/models/chain_node';
+import { fetchAllDigitalAssetByOwner } from '@metaplex-foundation/mpl-token-metadata';
+import { isSome, publicKey } from '@metaplex-foundation/umi';
+import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
+import { Connection } from '@solana/web3.js';
+import type { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances, GetSPLBalancesOptions } from '../types';
 import { failingChainNodeError } from '../util';
 
@@ -83,21 +85,17 @@ async function getSingleSPLBalance(
   address: string,
 ): Promise<string> {
   try {
-    // Initialize Metaplex with a dummy keypair (for read-only operations)
-    const dummyKeypair = Keypair.generate();
-    const metaplex = Metaplex.make(connection).use(
-      keypairIdentity(dummyKeypair),
-    );
-    const ownerPublicKey = new PublicKey(address);
-    const nftId = new PublicKey(mintAddress);
-    const nfts = await metaplex
-      .nfts()
-      .findAllByOwner({ owner: ownerPublicKey });
+    const umi = createUmi(connection.rpcEndpoint);
+    const ownerPublicKey = publicKey(address);
+    const collectionKey = publicKey(mintAddress);
+
+    const nfts = await fetchAllDigitalAssetByOwner(umi, ownerPublicKey);
 
     // Filter NFTs belonging to the specific collection
     const collectionNFTs = nfts.filter(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (nft: any) => nft.collection?.key.toBase58() === nftId.toBase58(),
+      (nft) =>
+        isSome(nft.metadata.collection) &&
+        nft.metadata.collection.value.key === collectionKey,
     );
 
     return collectionNFTs.length.toString();

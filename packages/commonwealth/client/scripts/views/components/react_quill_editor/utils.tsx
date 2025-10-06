@@ -322,3 +322,49 @@ export const dompurifyConfigForHTML = {
   ADD_TAGS: [],
   ADD_ATTR: ['target'],
 };
+
+/**
+ * Extracts all image URLs from a Quill Delta object.
+ * @param delta The DeltaStatic object.
+ * @returns An array of image URLs found in the delta.
+ */
+export const getImageUrlsFromDelta = (delta: DeltaStatic): string[] => {
+  const urls: string[] = [];
+  if (!delta?.ops) {
+    return urls;
+  }
+
+  for (const op of delta.ops) {
+    if (op.insert && typeof op.insert === 'object' && op.insert.image) {
+      if (typeof op.insert.image === 'string') {
+        urls.push(op.insert.image);
+      }
+    }
+  }
+
+  return urls;
+};
+
+/**
+ * Extracts all image URLs from a Markdown string.
+ * Uses a regex to find `![alt text](url)` patterns.
+ * @param markdown The Markdown string.
+ * @returns An array of image URLs found in the string.
+ */
+export const getImageUrlsFromMarkdown = (markdown: string): string[] => {
+  const urls: string[] = [];
+  if (!markdown) {
+    return urls;
+  }
+  // Regex to find Markdown images: ![alt text](url)
+  // It captures the URL part.
+  const regex = /!\[.*?\]\((.*?)\)/g;
+  let match;
+  while ((match = regex.exec(markdown)) !== null) {
+    if (match[1]) {
+      // match[1] is the captured URL
+      urls.push(match[1]);
+    }
+  }
+  return urls;
+};

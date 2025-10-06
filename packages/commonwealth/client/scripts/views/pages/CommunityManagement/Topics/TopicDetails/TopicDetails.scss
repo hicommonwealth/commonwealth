@@ -1,11 +1,13 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .TopicDetails {
   header {
     margin-bottom: 32px;
 
     .subheader {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 
@@ -27,7 +29,7 @@
     }
   }
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     header {
       margin-bottom: 14px;
     }

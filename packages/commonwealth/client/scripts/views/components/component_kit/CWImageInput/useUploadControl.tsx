@@ -20,6 +20,10 @@ export const useUploadControl = ({
   onImageGenerated,
   onImageUploaded,
   onProcessedImagesListChange,
+  usePersistentPromptMode,
+  referenceImageUrls,
+  referenceTexts,
+  model,
 }: UploadControlProps) => {
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const [, setImageInputRefUpdated] = useState<boolean>(false); // sometimes the input ref doesnt get set in time
@@ -27,12 +31,13 @@ export const useUploadControl = ({
   const [isDraggingFile, setIsDraggingFile] = useState(false);
   const [imagePrompt, setImagePrompt] = useState('');
   const [isImageGenerationSectionOpen, setIsImageGenerationSectionOpen] =
-    useState(false);
+    useState(withAIImageGeneration && usePersistentPromptMode ? true : false);
   const [processedImages, setProcessedImages] = useState<ImageProcessed[]>([]);
   const [activeImageIndex, setActiveImageIndex] = useState(-1);
   const processedImagesRef = useRef(processedImages);
 
   const imageToRender = processedImages?.[activeImageIndex]?.url;
+  const hasAnyGeneratedImages = processedImages.some((img) => img.isGenerated);
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
@@ -58,7 +63,7 @@ export const useUploadControl = ({
 
   const {
     data: uploadedImageURL,
-    isLoading: isUploadingImage,
+    isPending: isUploadingImage,
     mutateAsync: uploadPickedImage,
     error: imageUploadError,
   } = useUploadFileMutation({
@@ -67,7 +72,7 @@ export const useUploadControl = ({
 
   const {
     data: generatedImageURL,
-    isLoading: isGeneratingImage,
+    isPending: isGeneratingImage,
     mutateAsync: generateImage,
     error: generateImageError,
   } = useGenerateImageMutation({
@@ -76,22 +81,38 @@ export const useUploadControl = ({
 
   const isLoading = isUploadingImage || isGeneratingImage || loading;
   const areActionsDisabled = disabled || !imageInputRef.current || isLoading;
+  const ignoreNextClickRef = useRef(false);
 
   const openFilePicker = () => {
     if (areActionsDisabled) return;
+
+    // Ignore the next click triggered when the native file picker closes
+    ignoreNextClickRef.current = true;
 
     imageInputRef?.current?.click();
   };
 
   const handlePickedFile = useCallback(
     (inputEvent: InputEvent) => {
-      const file = inputEvent?.target
-        ? (inputEvent.target as HTMLInputElement)?.files?.[0]
+      const target = inputEvent?.target
+        ? (inputEvent.target as HTMLInputElement)
         : null;
+      const file = target?.files?.[0] || null;
 
       if (areActionsDisabled || !file) return;
 
-      uploadPickedImage({ file }).catch(console.error);
+      // Clear the value of the input so that selecting the same file again
+      // will trigger a new change event and prevent accidental re-uploads
+      // caused by the input retaining its previous value.
+      uploadPickedImage({ file })
+        .catch(console.error)
+        .finally(() => {
+          if (target) {
+            target.value = '';
+          }
+          // Reset the suppression flag in case no click event fires
+          ignoreNextClickRef.current = false;
+        });
     },
     [areActionsDisabled, uploadPickedImage],
   );
@@ -207,7 +228,9 @@ export const useUploadControl = ({
 
   useEffect(() => {
     if (generatedImageURL) {
-      setImagePrompt('');
+      if (!usePersistentPromptMode) {
+        setImagePrompt('');
+      }
       setIsImageGenerationSectionOpen(false);
       const shouldUpdate =
         processedImagesRef.current.findIndex(
@@ -238,7 +261,7 @@ export const useUploadControl = ({
         ]);
       }
     }
-  }, [generatedImageURL]);
+  }, [generatedImageURL, usePersistentPromptMode]);
 
   useEffect(() => {
     generateImageError &&
@@ -367,6 +390,33 @@ export const useUploadControl = ({
     }
   }, [formFieldValue, imageToRender]);
 
+  const startNewPrompt = useCallback(() => {
+    setImagePrompt('');
+    setIsImageGenerationSectionOpen(true);
+  }, [setIsImageGenerationSectionOpen]);
+
+  const generateAndHandle = async () => {
+    if (!imagePrompt.trim()) {
+      notifyError('Please enter a prompt to generate an image.');
+      return;
+    }
+    try {
+      // Pass reference images and model to the mutation
+      await generateImage({
+        prompt: imagePrompt,
+        referenceImageUrls,
+        size: '1024x1024',
+        model,
+      });
+    } catch (error) {
+      // Error is handled by the mutation hook's onError, but log here if needed
+      console.error(
+        'Error explicitly caught during generateImage call:',
+        error,
+      );
+    }
+  };
+
   return {
     areActionsDisabled,
     isLoading,
@@ -374,6 +424,7 @@ export const useUploadControl = ({
     formFieldErrorMessage,
     imageToRender,
     openFilePicker,
+    ignoreNextClickRef,
     registeredFormContext,
     dropzoneRef,
     imageInputRef,
@@ -391,5 +442,9 @@ export const useUploadControl = ({
     imagePrompt,
     generateImage,
     setImageInputRefUpdated,
+    hasAnyGeneratedImages,
+    startNewPrompt,
+    generateAndHandle,
+    referenceTexts,
   };
 };

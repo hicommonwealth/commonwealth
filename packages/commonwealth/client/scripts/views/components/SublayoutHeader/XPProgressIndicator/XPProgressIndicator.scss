@@ -1,11 +1,12 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .XPProgressIndicator {
   all: unset;
   padding: 4px;
 
   .b2 {
-    color: $primary-500 !important;
+    color: colors.$primary-500 !important;
   }
 
   &:focus,
@@ -14,7 +15,7 @@
   }
 
   &:hover {
-    background-color: $neutral-100;
+    background-color: colors.$neutral-100;
     cursor: pointer;
     border-radius: 6px;
   }

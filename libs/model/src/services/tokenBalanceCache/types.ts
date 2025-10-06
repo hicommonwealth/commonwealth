@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { Denominations } from '@hicommonwealth/evm-protocols';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import { ChainNodeInstance } from '../../models/chain_node';
 
@@ -25,6 +25,13 @@ type GetCosmosBalancesBase = {
   addresses: string[];
   sourceOptions: {
     cosmosChainId: string;
+  };
+} & TbcConfigOptions;
+
+type GetSuiBalancesBase = {
+  addresses: string[];
+  sourceOptions: {
+    suiNetwork: string;
   };
 } & TbcConfigOptions;
 
@@ -79,6 +86,27 @@ export type GetSPLBalancesOptions = {
   solanaNetwork?: string;
 } & TbcConfigOptions;
 
+export type GetSuiNativeBalanceOptions = GetSuiBalancesBase & {
+  balanceSourceType: BalanceSourceType.SuiNative;
+  sourceOptions: {
+    objectId?: string;
+  };
+};
+
+export type GetSuiTokenBalanceOptions = GetSuiBalancesBase & {
+  balanceSourceType: BalanceSourceType.SuiToken;
+  sourceOptions: {
+    coinType: string;
+  };
+};
+
+export type GetSuiNftBalanceOptions = GetSuiBalancesBase & {
+  balanceSourceType: BalanceSourceType.SuiNFT;
+  sourceOptions: {
+    fullObjectType: string;
+  };
+};
+
 export type GetErcBalanceOptions =
   | GetErc20BalanceOptions
   | GetErc721BalanceOptions
@@ -97,10 +125,16 @@ export type GetCwBalancesOptions =
   | GetCw20BalanceOptions
   | GetCw721BalanceOptions;
 
+export type GetSuiBalancesOptions =
+  | GetSuiNativeBalanceOptions
+  | GetSuiTokenBalanceOptions
+  | GetSuiNftBalanceOptions;
+
 export type GetBalancesOptions =
   | GetEvmBalancesOptions
   | GetCosmosBalancesOptions
-  | GetSPLBalancesOptions;
+  | GetSPLBalancesOptions
+  | GetSuiBalancesOptions;
 
 export type GetTendermintClientOptions = {
   chainNode: ChainNodeInstance;
@@ -108,6 +142,6 @@ export type GetTendermintClientOptions = {
 };
 
 export type TokenAttributes = {
-  ticker: string | commonProtocol.Denominations;
+  ticker: string | Denominations;
   decimals: number;
 };

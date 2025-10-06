@@ -1,4 +1,4 @@
-import { Outbox } from '@hicommonwealth/core';
+import { Outbox } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import { ModelInstance } from './types';
@@ -39,6 +39,7 @@ export default (
         allowNull: false,
         defaultValue: false,
       },
+      priority: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 0 },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
     },

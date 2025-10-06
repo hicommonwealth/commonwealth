@@ -37,6 +37,11 @@ export function mapPrivyTypeToWalletSso(
   return walletSsoSource;
 }
 
+export function requiresAuthToken(ssoProvider: WalletSsoSource) {
+  // every other provider, other than SMS and email, provide auth tokens.
+  return !['SMS', 'email'].includes(ssoProvider);
+}
+
 export async function signInPrivy({
   payload,
   verificationData,
@@ -109,11 +114,15 @@ export async function signInPrivy({
     // TODO: existing linkedAccounts array may be sufficient to get the verifiedUserInfo and avoid
     //  this extra call to Privy
     const fullPrivyUser = await getPrivyUserById(privyUser.id);
-    if (!payload.privy.ssoOAuthToken) throw new Error('Missing OAuth token');
+
     if (!payload.privy.ssoProvider) throw new Error('Missing OAuth provider');
+
+    const walletSsoSource = mapPrivyTypeToWalletSso(payload.privy.ssoProvider);
+    if (requiresAuthToken(walletSsoSource) && !payload.privy.ssoOAuthToken)
+      throw new Error('Missing OAuth token');
     verifiedSsoInfo = await getVerifiedUserInfo({
       privyUser: fullPrivyUser,
-      walletSsoSource: mapPrivyTypeToWalletSso(payload.privy.ssoProvider),
+      walletSsoSource,
       token: payload.privy.ssoOAuthToken,
     });
   }

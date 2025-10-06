@@ -1,0 +1,14 @@
+{
+	admin off
+	persist_config off
+	auto_https off
+	log {
+		format console
+	}
+}
+
+:{$PORT} {
+	reverse_proxy {$HEROKU_DOMAIN} {$INTERNAL_DOMAIN} {
+		lb_policy weighted_round_robin 0 100
+	}
+}

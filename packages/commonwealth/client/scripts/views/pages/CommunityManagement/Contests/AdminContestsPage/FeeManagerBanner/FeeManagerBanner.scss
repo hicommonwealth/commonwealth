@@ -1,4 +1,5 @@
-@import '../../../../../../styles/shared';
+@use '../../../../../../styles/shared';
+@use '../../../../../../styles/mixins/colors.module';
 
 .FeeManagerBannerSkeleton {
   max-width: 600px;
@@ -9,8 +10,8 @@
 .FeeManagerBanner {
   padding: 10px;
   border-radius: 6px;
-  border: 1px solid $primary-200;
-  background: $primary-25;
+  border: 1px solid colors.$primary-200;
+  background: colors.$primary-25;
   display: flex;
   justify-content: space-between;
   max-width: 600px;
@@ -20,7 +21,7 @@
     display: flex;
 
     .info-stake {
-      color: $neutral-600;
+      color: colors.$neutral-600;
       display: inline;
 
       .CWIconButton {

@@ -10,6 +10,11 @@ interface GetActionStepsProps {
     errorText: string;
   };
   configureNominations: () => Promise<void>;
+  nominateSelfData: {
+    state: ActionStepProps['state'];
+    errorText: string;
+  };
+  nominateSelf: () => Promise<void>;
   isDirectDepositSelected: boolean;
   launchContestData: {
     state: ActionStepProps['state'];
@@ -22,6 +27,8 @@ export const getActionSteps = ({
   isJudgedContest,
   configureNominationsData,
   configureNominations,
+  nominateSelfData,
+  nominateSelf,
   isDirectDepositSelected,
   launchContestData,
   signTransaction,
@@ -45,8 +52,30 @@ export const getActionSteps = ({
             onClick: configureNominations,
           },
         },
+        {
+          label: 'Nominate self as a judge',
+          description: `This transaction nominates yourself as a judge for the contest, 
+          allowing you to participate in the judging process.`,
+          state: nominateSelfData.state,
+          errorText: nominateSelfData.errorText,
+          actionButton: {
+            label: nominateSelfData.state === 'completed' ? 'Signed' : 'Sign',
+            disabled:
+              nominateSelfData.state === 'loading' ||
+              nominateSelfData.state === 'completed' ||
+              configureNominationsData.state !== 'completed',
+            onClick: nominateSelf,
+          },
+        },
       ]
     : [];
+
+  const isLaunchStepDisabled = isJudgedContest
+    ? launchContestData.state === 'loading' ||
+      launchContestData.state === 'completed' ||
+      nominateSelfData.state !== 'completed'
+    : launchContestData.state === 'loading' ||
+      launchContestData.state === 'completed';
 
   return [
     ...judgeTokenStep,
@@ -61,9 +90,7 @@ export const getActionSteps = ({
       errorText: launchContestData.errorText,
       actionButton: {
         label: launchContestData.state === 'completed' ? 'Signed' : 'Sign',
-        disabled:
-          launchContestData.state === 'loading' ||
-          launchContestData.state === 'completed',
+        disabled: isLaunchStepDisabled,
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClick: signTransaction,
       },

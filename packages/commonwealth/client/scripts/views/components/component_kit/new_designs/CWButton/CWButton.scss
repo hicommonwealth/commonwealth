@@ -1,22 +1,24 @@
-@import '../../../../../styles/shared';
-@import './buttons';
+@use '../../../../../styles/shared';
+@use 'buttons';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
 
 .btn-border {
   &.primary {
     &:focus-within {
-      border: 2px solid $neutral-700;
+      border: 2px solid colors.$neutral-700;
     }
   }
 
   &.destructive {
     &:focus-within {
-      border: 2px solid $rorange-600;
+      border: 2px solid colors.$rorange-600;
     }
   }
 
   &.primary,
   &.destructive {
-    border: 2px solid $transparent;
+    border: 2px solid colors.$transparent;
     padding: 2px;
     border-radius: 10px;
     width: fit-content;
@@ -27,7 +29,7 @@
   }
 
   &.tertiary {
-    border: 2px solid $transparent;
+    border: 2px solid colors.$transparent;
     padding: 2px;
     border-radius: 10px;
     width: fit-content;
@@ -38,27 +40,27 @@
   }
 
   &.secondary {
-    border: 1px solid $neutral-700;
+    border: 1px solid colors.$neutral-700;
     width: fit-content;
     border-radius: 6px;
     margin: 3px;
 
     &:hover {
-      border: 1px solid $neutral-800;
+      border: 1px solid colors.$neutral-800;
     }
 
     &:active {
-      border: 1px solid $neutral-700;
+      border: 1px solid colors.$neutral-700;
     }
 
     &:focus-within {
-      border: 2px solid $neutral-800;
+      border: 2px solid colors.$neutral-800;
       padding: 2px;
       margin: 0;
     }
 
     &.disabled {
-      border: 1px solid $neutral-200;
+      border: 1px solid colors.$neutral-200;
     }
 
     &.full {
@@ -68,14 +70,14 @@
 
   &.tertiary {
     &:focus-within {
-      border: 2px solid $primary-600;
+      border: 2px solid colors.$primary-600;
     }
   }
 
   .Button {
     align-items: center;
     border: 2px solid transparent;
-    border-radius: $border-radius-corners-wider;
+    border-radius: border_radius.$border-radius-corners-wider;
     cursor: pointer;
     display: flex;
     flex-direction: row;
@@ -149,144 +151,213 @@
     }
 
     &.primary {
-      background-color: $neutral-700;
-      @include iconAndTextColors($neutral-25, $neutral-25);
+      background-color: colors.$neutral-700;
+      @include buttons.iconAndTextColors(
+        colors.$neutral-25,
+        colors.$neutral-25
+      );
 
       &:hover {
-        background-color: $neutral-800;
-        @include iconAndTextColors($neutral-25, $white);
+        background-color: colors.$neutral-800;
+        @include buttons.iconAndTextColors(colors.$neutral-25, colors.$white);
       }
 
       &:active {
-        background-color: $neutral-700;
-        @include iconAndTextColors($neutral-25, $white);
+        background-color: colors.$neutral-700;
+        @include buttons.iconAndTextColors(colors.$neutral-25, colors.$white);
       }
 
       &:focus {
-        background-color: $neutral-800;
-        @include iconAndTextColors($white, $white);
+        background-color: colors.$neutral-800;
+        @include buttons.iconAndTextColors(colors.$white, colors.$white);
       }
 
       &.disabled {
-        background-color: $neutral-200;
-        @include iconAndTextColors($neutral-400, $neutral-400);
+        background-color: colors.$neutral-200;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-400,
+          colors.$neutral-400
+        );
       }
     }
 
     &.secondary {
-      background-color: $white;
-      @include iconAndTextColors($neutral-800, $neutral-700);
+      background-color: colors.$white;
+      @include buttons.iconAndTextColors(
+        colors.$neutral-800,
+        colors.$neutral-700
+      );
 
       &:hover {
-        background-color: $neutral-50;
-        @include iconAndTextColors($neutral-800, $neutral-800);
+        background-color: colors.$neutral-50;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-800,
+          colors.$neutral-800
+        );
       }
 
       &:active {
-        background-color: $white;
-        @include iconAndTextColors($neutral-800, $neutral-700);
+        background-color: colors.$white;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-800,
+          colors.$neutral-700
+        );
       }
 
       &:focus {
-        background-color: $neutral-50;
-        @include iconAndTextColors($neutral-800, $neutral-800);
+        background-color: colors.$neutral-50;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-800,
+          colors.$neutral-800
+        );
       }
 
       &.disabled {
-        background-color: $neutral-50;
-        @include iconAndTextColors($neutral-400, $neutral-400);
+        background-color: colors.$neutral-50;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-400,
+          colors.$neutral-400
+        );
       }
     }
 
     &.tertiary {
-      @include iconAndTextColors($primary-500, $primary-500);
+      @include buttons.iconAndTextColors(
+        colors.$primary-500,
+        colors.$primary-500
+      );
 
       &:hover {
-        @include iconAndTextColors($primary-600, $primary-600);
+        @include buttons.iconAndTextColors(
+          colors.$primary-600,
+          colors.$primary-600
+        );
       }
 
       &:active {
-        @include iconAndTextColors($primary-500, $primary-500);
+        @include buttons.iconAndTextColors(
+          colors.$primary-500,
+          colors.$primary-500
+        );
       }
 
       &:focus {
-        @include iconAndTextColors($primary-600, $primary-600);
+        @include buttons.iconAndTextColors(
+          colors.$primary-600,
+          colors.$primary-600
+        );
       }
 
       &.disabled {
-        @include iconAndTextColors($neutral-400, $neutral-400);
+        @include buttons.iconAndTextColors(
+          colors.$neutral-400,
+          colors.$neutral-400
+        );
       }
     }
 
     &.destructive {
-      background-color: $rorange-500;
-      @include iconAndTextColors($white, $white);
+      background-color: colors.$rorange-500;
+      @include buttons.iconAndTextColors(colors.$white, colors.$white);
 
       &:hover {
-        background-color: $rorange-600;
+        background-color: colors.$rorange-600;
       }
 
       &:active {
-        background-color: $rorange-500;
+        background-color: colors.$rorange-500;
       }
 
       &:focus {
-        background-color: $rorange-600;
+        background-color: colors.$rorange-600;
       }
 
       &.disabled {
-        background-color: $neutral-200;
-        @include iconAndTextColors($neutral-400, $neutral-400);
+        background-color: colors.$neutral-200;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-400,
+          colors.$neutral-400
+        );
       }
     }
 
     &.green {
-      background-color: $green-50;
-      @include iconAndTextColors($neutral-800, $neutral-700);
+      background-color: colors.$green-50;
+      @include buttons.iconAndTextColors(
+        colors.$neutral-800,
+        colors.$neutral-700
+      );
 
       &:hover {
-        background-color: $green-100;
-        @include iconAndTextColors($neutral-800, $neutral-800);
+        background-color: colors.$green-100;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-800,
+          colors.$neutral-800
+        );
       }
 
       &:active {
-        background-color: $green-50;
-        @include iconAndTextColors($neutral-800, $neutral-700);
+        background-color: colors.$green-50;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-800,
+          colors.$neutral-700
+        );
       }
 
       &:focus {
-        background-color: $green-100;
-        @include iconAndTextColors($neutral-800, $neutral-800);
+        background-color: colors.$green-100;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-800,
+          colors.$neutral-800
+        );
       }
 
       &.disabled {
-        background-color: $neutral-50;
-        @include iconAndTextColors($neutral-400, $neutral-400);
+        background-color: colors.$neutral-50;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-400,
+          colors.$neutral-400
+        );
       }
     }
 
     &.rorange {
-      background-color: $rorange-50;
-      @include iconAndTextColors($neutral-800, $neutral-700);
+      background-color: colors.$rorange-50;
+      @include buttons.iconAndTextColors(
+        colors.$neutral-800,
+        colors.$neutral-700
+      );
 
       &:hover {
-        background-color: $rorange-100;
-        @include iconAndTextColors($neutral-800, $neutral-800);
+        background-color: colors.$rorange-100;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-800,
+          colors.$neutral-800
+        );
       }
 
       &:active {
-        background-color: $rorange-50;
-        @include iconAndTextColors($neutral-800, $neutral-700);
+        background-color: colors.$rorange-50;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-800,
+          colors.$neutral-700
+        );
       }
 
       &:focus {
-        background-color: $rorange-100;
-        @include iconAndTextColors($neutral-800, $neutral-800);
+        background-color: colors.$rorange-100;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-800,
+          colors.$neutral-800
+        );
       }
 
       &.disabled {
-        background-color: $neutral-50;
-        @include iconAndTextColors($neutral-400, $neutral-400);
+        background-color: colors.$neutral-50;
+        @include buttons.iconAndTextColors(
+          colors.$neutral-400,
+          colors.$neutral-400
+        );
       }
     }
   }

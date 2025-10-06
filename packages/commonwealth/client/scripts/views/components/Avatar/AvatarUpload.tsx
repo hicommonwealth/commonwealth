@@ -34,9 +34,7 @@ export const AvatarUpload = ({
 }: AvatarUploadProps) => {
   const [files, setFiles] = useState([]);
 
-  const { mutateAsync: uploadImage } = useUploadFileMutation({
-    onSuccess: uploadCompleteCallback,
-  });
+  const { mutateAsync: uploadImage } = useUploadFileMutation();
 
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
@@ -61,10 +59,15 @@ export const AvatarUpload = ({
     onDropAccepted: (acceptedFiles: Array<File>) => {
       uploadImage({
         file: acceptedFiles[0],
-      }).catch((e) => {
-        console.error(e);
-        notifyError('Failed to get an S3 signed upload URL');
-      });
+      })
+        .then((url) => {
+          uploadCompleteCallback?.(url);
+        })
+        .catch((e) => {
+          console.error(e);
+          notifyError('Failed to get an S3 signed upload URL');
+          uploadCompleteCallback?.('');
+        });
     },
   });
 

@@ -1,7 +1,7 @@
-import { config } from '@hicommonwealth/model';
 import { Community } from '@hicommonwealth/schemas';
 import { getDecodedString, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import z from 'zod';
+import { config } from '../../config';
 
 export const REGEX_IMAGE =
   /\b(https?:\/\/\S*?\.(?:png|jpe?g|gif)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b/;

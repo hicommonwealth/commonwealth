@@ -1,5 +1,6 @@
 import { config } from '@hicommonwealth/model';
 import { Anvil, createAnvil, CreateAnvilOptions } from '@viem/anvil';
+import { english, generateMnemonic } from 'viem/accounts';
 import Web3 from 'web3';
 import getProvider from './getProvider';
 
@@ -69,6 +70,7 @@ export async function getAnvil(
     autoImpersonate: true,
     startTimeout: 10_000,
     stopTimeout: 10_000,
+    mnemonic: generateMnemonic(english, 128),
     ...options,
   });
   await anvil.start();

@@ -2,11 +2,12 @@ import { getChainName } from '@hicommonwealth/evm-protocols';
 import { ChainBase } from '@hicommonwealth/shared';
 import { SupportedChainId, SwapWidget } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
-import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
+import NodeInfo, { ChainNode } from 'models/NodeInfo';
 import React, { useEffect, useState } from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { fetchNodes } from 'state/api/nodes';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -44,7 +45,15 @@ const UniswapTradeModal = ({
   const blockExplorerUrl = tokenCommunity?.ChainNode?.block_explorer;
 
   const { uniswapWidget, isMagicUser, isMagicConfigured } =
-    useUniswapTradeModal({ tradeConfig, ethChainId, rpcUrl, blockExplorerUrl });
+    useUniswapTradeModal({
+      tradeConfig,
+      ethChainId,
+      rpcUrl,
+      blockExplorerUrl,
+      node: tokenCommunity?.ChainNode
+        ? new NodeInfo(tokenCommunity.ChainNode as ChainNode)
+        : undefined,
+    });
 
   const { currentChain, isWrongNetwork, promptNetworkSwitch } =
     useNetworkSwitching({
@@ -112,7 +121,16 @@ const UniswapTradeModal = ({
     uniswapWidget.connectWallet,
   ]);
 
-  const nodes = fetchCachedNodes();
+  useEffect(() => {
+    if (isOpen && isWrongNetwork) {
+      void promptNetworkSwitch();
+    }
+  }, [isOpen, isWrongNetwork, promptNetworkSwitch]);
+
+  const [nodes, setNodes] = useState<NodeInfo[]>();
+  useEffect(() => {
+    fetchNodes().then(setNodes).catch(console.error);
+  }, []);
   const jsonRpcUrlMap = formatJsonRpcMap(nodes);
 
   const logo =

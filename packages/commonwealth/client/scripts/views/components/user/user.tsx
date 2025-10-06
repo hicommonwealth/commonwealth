@@ -27,6 +27,7 @@ export const User = ({
   shouldShowPopover,
   shouldShowRole,
   shouldShowAsDeleted = false,
+  shouldShowTrustLevelTooltip,
   userAddress,
   userCommunityId,
   shouldHideAvatar,
@@ -113,13 +114,21 @@ export const User = ({
       ) : !shouldShowAddressWithDisplayName ? (
         <>
           {profile?.name} &nbsp;
-          <TrustLevelRole type="user" level={profile?.tier} />
+          <TrustLevelRole
+            type="user"
+            tier={profile?.tier}
+            withTooltip={!!shouldShowTrustLevelTooltip}
+          />
         </>
       ) : (
         <>
           <div>
             {profile?.name} &nbsp;
-            <TrustLevelRole type="user" level={profile?.tier} />
+            <TrustLevelRole
+              type="user"
+              tier={profile?.tier}
+              withTooltip={!!shouldShowTrustLevelTooltip}
+            />
           </div>
           <div className="id-short">{fullAddress}</div>
         </>
@@ -217,12 +226,12 @@ export const User = ({
                 ) : !shouldShowAddressWithDisplayName ? (
                   <>
                     {profile?.name} &nbsp;
-                    <TrustLevelRole type="user" level={profile?.tier} />
+                    <TrustLevelRole type="user" tier={profile?.tier} />
                   </>
                 ) : (
                   <>
                     {profile?.name} &nbsp;
-                    <TrustLevelRole type="user" level={profile?.tier} />
+                    <TrustLevelRole type="user" tier={profile?.tier} />
                     <div className="id-short">{redactedAddress}</div>
                   </>
                 )}

@@ -1,4 +1,5 @@
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import useUpdateCommunityIdMutation from 'client/scripts/state/api/superAdmin/updateCommunityId';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
@@ -6,11 +7,12 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useDebounce } from 'usehooks-ts';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { updateCommunityId } from 'views/pages/AdminPanel/utils';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
 
 const UpdateCommunityIdTask = () => {
+  const { mutateAsync: updateCommunityId } = useUpdateCommunityIdMutation();
+
   const openConfirmationModal = () => {
     openConfirmation({
       title: 'Update Community Id',

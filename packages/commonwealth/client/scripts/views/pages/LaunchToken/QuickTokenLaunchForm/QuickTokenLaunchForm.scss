@@ -1,8 +1,20 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+@use '../../../../styles/mixins/media_queries';
 
 .QuickTokenLaunchForm {
   div.h3 {
     margin-bottom: 16px;
+  }
+  .debugTxHashGap {
+    padding-top: 36px;
+  }
+  .debugTxHash {
+    color: colors.$neutral-500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
   .display-none {
@@ -40,7 +52,7 @@
         flex-shrink: 0;
       }
 
-      @include mediumSmallMid {
+      @include media_queries.mediumSmallMid {
         gap: 8px;
 
         .CWButton {

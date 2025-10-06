@@ -1,5 +1,5 @@
 import { logger } from '@hicommonwealth/core';
-import { ChainNodeInstance } from '@hicommonwealth/model';
+import { ChainNodeInstance } from '../../../models';
 import { Balances } from '../types';
 import {
   evmBalanceFetcherBatching,

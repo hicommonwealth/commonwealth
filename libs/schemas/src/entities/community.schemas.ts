@@ -14,12 +14,13 @@ import { PG_INT } from '../utils';
 import { ChainNode } from './chain.schemas';
 import { ContestManager } from './contest-manager.schemas';
 import { Group } from './group.schemas';
+import { MCPServerCommunity } from './mcp.schemas';
 import { CommunityStake } from './stake.schemas';
 import { CommunityTags } from './tag.schemas';
 import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
-export const COMMUNITY_TIER = z.nativeEnum(CommunityTierMap);
+export const COMMUNITY_TIER = z.enum(CommunityTierMap);
 export const COMMUNITY_SPAM_TIER = z.union([
   z.literal(DisabledCommunitySpamTier),
   z.literal(UserTierMap.NewlyVerifiedWallet),
@@ -35,10 +36,10 @@ export const Community = z.object({
   chain_node_id: PG_INT.nullish(),
   default_symbol: z.string().default(''),
   network: z.string().default(ChainNetwork.Ethereum),
-  base: z.nativeEnum(ChainBase),
+  base: z.enum(ChainBase),
   icon_url: z.string().nullish(),
   active: z.boolean(),
-  type: z.nativeEnum(ChainType).default(ChainType.Chain),
+  type: z.enum(ChainType).default(ChainType.Chain),
   description: z.string().nullish(),
   social_links: z.array(z.string().url().nullish()).default([]),
   ss58_prefix: PG_INT.nullish(),
@@ -48,10 +49,11 @@ export const Community = z.object({
   block_explorer_ids: z.string().nullish(),
   collapsed_on_homepage: z.boolean().default(false),
   default_summary_view: z.boolean().nullish(),
-  default_page: z.nativeEnum(DefaultPage).nullish(),
+  default_page: z.enum(DefaultPage).nullish(),
   has_homepage: z.enum(['true', 'false']).default('false').nullish(),
   terms: z.string().trim().or(z.literal('')).or(z.string().url()).nullish(),
   admin_only_polling: z.boolean().nullish(),
+  ai_features_enabled: z.boolean(),
   bech32_prefix: z.string().nullish(),
   hide_projects: z.boolean().nullish(),
   token_name: z.string().nullish(),
@@ -64,6 +66,10 @@ export const Community = z.object({
   namespace: z.string().nullish(),
   namespace_address: z.string().nullish(),
   namespace_creator_address: z.string().nullish(),
+  namespace_verification_configured: z.boolean().optional(),
+  namespace_nominations: z.array(z.string()).nullish(),
+  namespace_verified: z.boolean().optional(),
+  namespace_governance_address: z.string().nullish(),
   redirect: z.string().nullish(),
   snapshot_spaces: z.array(z.string().max(255)).default([]),
   include_in_digest_email: z.boolean().nullish(),
@@ -72,6 +78,8 @@ export const Community = z.object({
   banner_text: z.string().nullish(),
   allow_tokenized_threads: z.boolean().optional(),
   thread_purchase_token: z.string().nullish(),
+  environment: z.string().optional(),
+  pending_namespace_judge_token_id: PG_INT.nullish(),
 
   // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),
@@ -83,12 +91,13 @@ export const Community = z.object({
   CommunityTags: z.array(CommunityTags).nullish(),
   ChainNode: ChainNode.extend({
     url: z.string().max(255).nullish(),
-    balance_type: z.nativeEnum(BalanceType).nullish(),
+    balance_type: z.enum(BalanceType).nullish(),
     name: z.string().max(255).nullish(),
   }).nullish(),
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),
+  MCPServerCommunities: z.array(MCPServerCommunity).optional(),
 });
 
 export const ExtendedCommunity = Community.extend({

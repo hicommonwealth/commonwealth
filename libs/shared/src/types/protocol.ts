@@ -8,6 +8,9 @@ export enum BalanceSourceType {
   CW721 = 'cw721',
   SPL = 'spl',
   SOLNFT = 'metaplex',
+  SuiNative = 'sui_native',
+  SuiToken = 'sui_token',
+  SuiNFT = 'sui_nft',
 }
 
 export enum BalanceType {
@@ -17,6 +20,7 @@ export enum BalanceType {
   Cosmos = 'cosmos',
   NEAR = 'near',
   Substrate = 'substrate',
+  Sui = 'sui',
 }
 
 export type ContractSource = {
@@ -33,6 +37,24 @@ export type SolanaSource = {
   source_type: BalanceSourceType.SPL | BalanceSourceType.SOLNFT;
   solana_network: string;
   contract_address: string;
+};
+
+export type SuiSource = {
+  source_type: BalanceSourceType.SuiNative;
+  sui_network: string;
+  object_id?: string;
+};
+
+export type SuiTokenSource = {
+  source_type: BalanceSourceType.SuiToken;
+  sui_network: string;
+  coin_type: string;
+};
+
+export type SuiNFTSource = {
+  source_type: BalanceSourceType.SuiNFT;
+  sui_network: string;
+  collection_id: string;
 };
 
 export type NativeSource = {
@@ -59,7 +81,10 @@ export type ThresholdData = {
     | NativeSource
     | CosmosSource
     | CosmosContractSource
-    | SolanaSource;
+    | SolanaSource
+    | SuiSource
+    | SuiTokenSource
+    | SuiNFTSource;
 };
 
 export type AbiType = Record<string, unknown>[];
@@ -86,6 +111,13 @@ export enum WalletId {
   Coinbase = 'coinbase',
   Farcaster = 'farcaster',
   OKX = 'okx',
+  SuiWallet = 'sui-wallet',
+  Binance = 'binance',
+  SuietWallet = 'suiet',
+  Suiet = 'suiet-wallet',
+  OkxWallet = 'okx-wallet',
+  bitgetWallet = 'bitget',
+  Gate = 'gate',
 }
 
 // Passed directly to Magic login.
@@ -112,6 +144,7 @@ export enum ChainBase {
   Ethereum = 'ethereum',
   NEAR = 'near',
   Solana = 'solana',
+  Sui = 'sui',
 }
 
 export enum ChainType {
@@ -140,24 +173,7 @@ export enum ChainNetwork {
   Evmos = 'evmos',
   Kava = 'kava',
   Kyve = 'kyve',
-  ArbitrumMainnet = 'arbitrum_mainnet',
-  Base = 'base',
-  Blast = 'blast',
-  EthereumMainnet = 'ethereum_mainnet',
-  Linea = 'linea',
-  Optimism = 'optimism',
-  Polygon = 'polygon',
-  HorizenEON = 'horizen_eon',
-  Harmony = 'harmony',
-  Gnosis = 'gnosis',
-  FuseMainnet = 'fuse_mainnet',
-  Fantom = 'fantom',
-  Soneium = 'soneium',
-  Core = 'core',
-  Celo = 'celo',
-  BSC = 'bsc',
-  Avalanche = 'avalanche',
-  Arthera = 'arthera',
+  Sui = 'sui',
 }
 
 /**

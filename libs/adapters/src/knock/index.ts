@@ -3,7 +3,6 @@ import {
   NotificationsProvider,
   NotificationsProviderGetMessagesOptions,
   NotificationsProviderGetMessagesReturn,
-  NotificationsProviderScheduleRepeats,
   NotificationsProviderSchedulesReturn,
   NotificationsProviderTriggerOptions,
   WorkflowKeys,
@@ -25,7 +24,7 @@ function formatScheduleResponse(
     recipient: s.recipient,
     data: s.data,
     workflow: s.workflow,
-    repeats: s.repeats as unknown as NotificationsProviderScheduleRepeats,
+    repeats: s.repeats,
     last_occurrence_at: s.last_occurrence_at
       ? new Date(s.last_occurrence_at)
       : undefined,
@@ -158,6 +157,14 @@ export function KnockProvider(): NotificationsProvider {
       return formatScheduleResponse(res);
     },
 
+    async updateSchedules(options) {
+      const res = await knock.workflows.updateSchedules({
+        schedule_ids: options.schedule_ids,
+        repeats: options.schedule as ScheduleRepeatProperties[],
+      });
+      return formatScheduleResponse(res);
+    },
+
     async deleteSchedules(options) {
       const res = await knock.workflows.deleteSchedules(options);
       return new Set(res.map((s) => s.id));
@@ -219,6 +226,16 @@ export function KnockProvider(): NotificationsProvider {
         log.warn('Push notifications not enabled');
         return false;
       }
+    },
+
+    async signUserToken(
+      userId: number,
+      expiresInSeconds: number,
+    ): Promise<string> {
+      return await Knock.signUserToken(`${userId}`, {
+        signingKey: config.NOTIFICATIONS.KNOCK_SIGNING_KEY,
+        expiresInSeconds,
+      });
     },
   };
 }

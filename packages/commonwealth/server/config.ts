@@ -1,11 +1,17 @@
 import { config as adapters_config } from '@hicommonwealth/adapters';
-import { configure, config as target } from '@hicommonwealth/core';
+import {
+  configure,
+  DeployedEnvironments,
+  requiredInEnvironmentServices,
+  config as target,
+  WebServices,
+} from '@hicommonwealth/core';
 import { config as model_config } from '@hicommonwealth/model';
-import { ChainBase, TwitterBotName } from '@hicommonwealth/shared';
+import { ChainBase, TwitterBotName, UserTierMap } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
-  SENDGRID_API_KEY,
+  DISABLE_SITEMAP,
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
@@ -24,7 +30,6 @@ const {
   LIBP2P_PRIVATE_KEY,
   DISPATCHER_APP_ID,
   DISPATCHER_APP_PRIVATE_KEY,
-  DEV_MODULITH,
   ENABLE_CLIENT_PUBLISHING,
   EVM_CE_LOG_TRACE,
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_IN,
@@ -33,6 +38,12 @@ const {
   TWITTER_WORKER_POLL_INTERVAL,
   TWITTER_ENABLED_BOTS,
   EVM_CE_ETH_CHAIN_ID_OVERRIDE,
+  RELEASER_URL,
+  RELEASER_API_KEY,
+  RELEASER_WAIT_ONLY,
+  RAILWAY_PUBLIC_DOMAIN,
+  OPENSEA_API_KEY,
+  TOKEN_ALLOCATION_CONFIG,
 } = process.env;
 
 const DEFAULTS = {
@@ -49,11 +60,52 @@ const DEFAULTS = {
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_IN: 60 * 60,
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_OUT: 60 * 60 * 2,
   CACHE_GET_COMMUNITIES_JOIN_COMMUNITY: 60 * 60 * 24,
+  TOKEN_ALLOCATION_CONFIG: {
+    // Shared configuration
+    userTierWeights: {
+      [UserTierMap.IncompleteUser]: 0,
+      [UserTierMap.BannedUser]: 0,
+      [UserTierMap.NewlyVerifiedWallet]: 1,
+      [UserTierMap.VerifiedWallet]: 1,
+      [UserTierMap.SocialVerified]: 2,
+      [UserTierMap.ChainVerified]: 3,
+      [UserTierMap.FullyVerified]: 4,
+      [UserTierMap.ManuallyVerified]: 5,
+      [UserTierMap.SystemUser]: 0,
+    },
+
+    // NFT allocation specific
+    nft: {
+      tokenSupply: 150_000_000,
+      rarityPercentiles: [100, 75, 15, 6.5, 3.5],
+      rarityRanks: [1, 10],
+      rarityTierWeightsByRank: [1, 5, 10],
+      rarityTierWeightsByPercentile: [1, 5, 10, 20, 50],
+      equalDistributionPercent: 0.6,
+      rarityDistributionPercent: 0.4,
+    },
+
+    // Historic contribution scoring specific
+    historic: {
+      supply: {
+        total: 150_000_000,
+        splits: {
+          historical: 0.5,
+          aura: 0.5,
+        },
+      },
+      decay: {
+        halfLifeDays: 365,
+        factor: Math.log(6) / 365, // ≈ 0.001899
+      },
+    },
+  },
 };
 
 export const config = configure(
   [model_config, adapters_config],
   {
+    DISABLE_SITEMAP: DISABLE_SITEMAP === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     PRERENDER_TOKEN,
     GENERATE_IMAGE_RATE_LIMIT: parseInt(
@@ -72,9 +124,6 @@ export const config = configure(
         DEFAULTS.MAGIC_SUPPORTED_BASES,
       MAGIC_DEFAULT_CHAIN:
         (MAGIC_DEFAULT_CHAIN as ChainBase) ?? DEFAULTS.MAGIC_DEFAULT_CHAIN,
-    },
-    SENDGRID: {
-      API_KEY: SENDGRID_API_KEY,
     },
     TELEGRAM: {
       BOT_TOKEN:
@@ -113,6 +162,18 @@ export const config = configure(
         ? EVM_CE_ETH_CHAIN_ID_OVERRIDE.split(',').map((id) => parseInt(id))
         : undefined,
     },
+    SOLANA_CE: {
+      POLL_INTERVAL_MS: parseInt(
+        process.env.SOLANA_CE_POLL_INTERVAL ?? '60000',
+        10,
+      ),
+      LOG_TRACE: process.env.SOLANA_CE_LOG_TRACE !== 'false',
+      MAX_SLOT_RANGE: parseInt(
+        process.env.SOLANA_CE_MAX_SLOT_RANGE ?? '10000',
+        10,
+      ),
+      // No need for CHAIN_CONFIGS as we now use IDLs to get program IDs
+    },
     LIBP2P_PRIVATE_KEY,
     SNAPSHOT_WEBHOOK_SECRET,
     GITHUB: {
@@ -121,7 +182,6 @@ export const config = configure(
         : undefined,
       DISPATCHER_APP_PRIVATE_KEY,
     },
-    DEV_MODULITH: DEV_MODULITH === 'true',
     ENABLE_CLIENT_PUBLISHING: ENABLE_CLIENT_PUBLISHING === 'true',
     TWITTER: {
       WORKER_POLL_INTERVAL: (() => {
@@ -147,42 +207,55 @@ export const config = configure(
         ? parseInt(CACHE_GET_COMMUNITIES_JOIN_COMMUNITY, 10)
         : DEFAULTS.CACHE_GET_COMMUNITIES_JOIN_COMMUNITY,
     },
+    RAILWAY: {
+      RELEASER_URL,
+      RELEASER_API_KEY,
+      RELEASER_WAIT_ONLY: RELEASER_WAIT_ONLY === 'true',
+      RAILWAY_PUBLIC_DOMAIN,
+    },
+    OPENSEA_API_KEY,
+    TOKEN_ALLOCATION: (() => {
+      try {
+        return TOKEN_ALLOCATION_CONFIG
+          ? JSON.parse(TOKEN_ALLOCATION_CONFIG)
+          : DEFAULTS.TOKEN_ALLOCATION_CONFIG;
+      } catch (error) {
+        console.warn(
+          'Invalid TOKEN_ALLOCATION_CONFIG JSON, using defaults:',
+          error,
+        );
+        return DEFAULTS.TOKEN_ALLOCATION_CONFIG;
+      }
+    })(),
   },
   z.object({
+    DISABLE_SITEMAP: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
     ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: z.number().int().positive(),
     AUTH: z.object({
-      SESSION_SECRET: z
-        .string()
-        .refine(
-          (data) =>
-            !(
-              model_config.APP_ENV === 'production' &&
-              data === DEFAULTS.SESSION_SECRET
-            ),
-          'SESSION_SECRET must be a non-default value in production',
-        ),
-      MAGIC_SUPPORTED_BASES: z.array(z.nativeEnum(ChainBase)),
-      MAGIC_DEFAULT_CHAIN: z.nativeEnum(ChainBase),
-    }),
-    SENDGRID: z.object({
-      API_KEY: z
-        .string()
-        .optional()
-        .refine(
-          (data) => !(model_config.APP_ENV === 'production' && !data),
-          'SENDGRID_API_KEY is required in production',
-        ),
+      SESSION_SECRET: z.string().refine(
+        requiredInEnvironmentServices({
+          config: model_config,
+          requiredAppEnvs: ['production'],
+          requiredServices: WebServices,
+          defaultCheck: DEFAULTS.SESSION_SECRET,
+        }),
+      ),
+      MAGIC_SUPPORTED_BASES: z.array(z.enum(ChainBase)),
+      MAGIC_DEFAULT_CHAIN: z.enum(ChainBase),
     }),
     TELEGRAM: z.object({
       BOT_TOKEN: z
         .string()
         .optional()
         .refine(
-          (data) => !(model_config.APP_ENV === 'production' && !data),
-          'TELEGRAM_BOT_TOKEN is required in production',
+          requiredInEnvironmentServices({
+            config: model_config,
+            requiredAppEnvs: ['production'],
+            requiredServices: WebServices,
+          }),
         ),
     }),
     CLOUDFLARE: z.object({
@@ -190,15 +263,21 @@ export const config = configure(
         .string()
         .optional()
         .refine(
-          (data) => !(['production'].includes(model_config.APP_ENV) && !data),
-          'CF_ZONE_ID is required in production',
+          requiredInEnvironmentServices({
+            config: model_config,
+            requiredAppEnvs: ['production'],
+            requiredServices: WebServices,
+          }),
         ),
       API_KEY: z
         .string()
         .optional()
         .refine(
-          (data) => !(['production'].includes(model_config.APP_ENV) && !data),
-          'CF_API_KEY is required in production',
+          requiredInEnvironmentServices({
+            config: model_config,
+            requiredAppEnvs: ['production'],
+            requiredServices: WebServices,
+          }),
         ),
     }),
     WORKERS: z.object({
@@ -210,37 +289,53 @@ export const config = configure(
       .string()
       .optional()
       .refine(
-        (data) => !(!['local', 'CI'].includes(model_config.APP_ENV) && !data),
-        'SNAPSHOT_WEBHOOK_SECRET is required in public environments',
+        requiredInEnvironmentServices({
+          config: model_config,
+          requiredAppEnvs: DeployedEnvironments,
+          requiredServices: WebServices,
+        }),
       ),
     GITHUB: z.object({
       DISPATCHER_APP_ID: z
         .number()
         .optional()
-        .refine((data) => !(model_config.APP_ENV === 'production' && !data))
+        .refine(
+          requiredInEnvironmentServices({
+            config: model_config,
+            requiredAppEnvs: ['production'],
+            requiredServices: WebServices,
+          }),
+        )
         .describe('The ID of the Common Workflow Dispatcher GitHub app'),
       DISPATCHER_APP_PRIVATE_KEY: z
         .string()
         .optional()
-        .refine((data) => !(model_config.APP_ENV === 'production' && !data))
+        .refine(
+          requiredInEnvironmentServices({
+            config: model_config,
+            requiredAppEnvs: ['production'],
+            requiredServices: WebServices,
+          }),
+        )
         .describe(
           'The private key of the Common Workflow Dispatcher GitHub app',
         ),
     }),
-    DEV_MODULITH: z.boolean(),
     ENABLE_CLIENT_PUBLISHING: z.boolean(),
     TWITTER: z
       .object({
         WORKER_POLL_INTERVAL: z.number().int().gte(0),
-        ENABLED_BOTS: z.array(z.nativeEnum(TwitterBotName)),
+        ENABLED_BOTS: z.array(z.enum(TwitterBotName)),
       })
-      .refine(
-        (data) =>
-          !(
-            data.ENABLED_BOTS.length > 0 &&
-            !model_config.TWITTER.APP_BEARER_TOKEN
-          ),
-      ),
+      .refine((data) => {
+        if (data.ENABLED_BOTS.length === 0) return true;
+        const fn = requiredInEnvironmentServices({
+          config: model_config,
+          requiredAppEnvs: ['production'],
+          requiredServices: WebServices,
+        });
+        return fn(model_config.TWITTER.APP_BEARER_TOKEN);
+      }),
     CACHE_TTL: z.object({
       GET_COMMUNITIES_TRENDING_SIGNED_IN: z.number(),
       GET_COMMUNITIES_TRENDING_SIGNED_OUT: z.number(),
@@ -250,6 +345,81 @@ export const config = configure(
       POLL_INTERVAL_MS: z.number().int().positive(),
       LOG_TRACE: z.boolean(),
       ETH_CHAIN_ID_OVERRIDE: z.array(z.number()).optional(),
+    }),
+    SOLANA_CE: z.object({
+      POLL_INTERVAL_MS: z.number().int().positive(),
+      LOG_TRACE: z.boolean(),
+      MAX_SLOT_RANGE: z.number().int().positive(),
+      // We no longer need CHAIN_CONFIGS as we use IDLs to get program IDs
+    }),
+    RAILWAY: z.object({
+      RELEASER_URL: z.string().optional(),
+      // Enable once migrated to Railway
+      // .refine(
+      //   requiredInEnvironmentServices({
+      //     config: model_config,
+      //     requiredAppEnvs: ['production', 'frick', 'frack', 'beta', 'demo'],
+      //     requiredServices: 'all',
+      //   }),)
+      RELEASER_API_KEY: z.string().optional(),
+      // Enable once migrated to Railway
+      // .refine(
+      //   requiredInEnvironmentServices({
+      //     config: model_config,
+      //     requiredAppEnvs: ['production', 'frick', 'frack', 'beta', 'demo'],
+      //     requiredServices: 'all',
+      //   }),)
+      RELEASER_WAIT_ONLY: z
+        .boolean()
+        .describe(
+          `When true, will not trigger a release but will await the result.`,
+        ),
+      RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
+    }),
+    OPENSEA_API_KEY: z.string().optional(),
+    TOKEN_ALLOCATION: z.object({
+      // Shared configuration
+      userTierWeights: z.record(z.string(), z.number()),
+
+      // NFT allocation specific
+      nft: z
+        .object({
+          tokenSupply: z.number().positive(),
+          rarityPercentiles: z.array(z.number()),
+          rarityRanks: z.array(z.number()),
+          rarityTierWeightsByRank: z.array(z.number()),
+          rarityTierWeightsByPercentile: z.array(z.number()),
+          equalDistributionPercent: z.number().min(0).max(1),
+          rarityDistributionPercent: z.number().min(0).max(1),
+        })
+        .refine(
+          (data) =>
+            data.equalDistributionPercent + data.rarityDistributionPercent ===
+            1,
+          {
+            message:
+              'equalDistributionPercent and rarityDistributionPercent must sum to 1',
+          },
+        ),
+
+      // Historic contribution scoring specific
+      historic: z.object({
+        supply: z.object({
+          total: z.number().positive(),
+          splits: z
+            .object({
+              historical: z.number().min(0).max(1),
+              aura: z.number().min(0).max(1),
+            })
+            .refine((data) => data.historical + data.aura === 1, {
+              message: 'historical and aura must sum to 1',
+            }),
+        }),
+        decay: z.object({
+          halfLifeDays: z.number().positive(),
+          factor: z.number().positive(),
+        }),
+      }),
     }),
   }),
 );

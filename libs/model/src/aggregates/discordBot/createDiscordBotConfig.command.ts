@@ -1,5 +1,6 @@
-import { type Command } from '@hicommonwealth/core';
+import { type Command, InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { canIntegrateDiscord, CommunityTierMap } from '@hicommonwealth/shared';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 
@@ -11,11 +12,28 @@ export function CreateDiscordBotConfig(): Command<
   return {
     ...schemas.CreateDiscordBotConfig,
     auth: [authRoles('admin')],
+    secure: true,
     body: async ({ payload }) => {
       const { community_id, verification_token } = payload;
       const token_expiration = new Date(
         +new Date() + TOKEN_EXPIRATION_MINUTES * 60 * 1000,
       );
+
+      const community = await models.Community.findOne({
+        attributes: ['tier'],
+        where: {
+          id: community_id,
+        },
+      });
+      if (!community) {
+        throw new InvalidState('Community not found');
+      }
+
+      if (!canIntegrateDiscord(community)) {
+        throw new InvalidState(
+          `Community tier must be at least ${CommunityTierMap.ManuallyVerified}`,
+        );
+      }
 
       const existing = await models.DiscordBotConfig.findOne({
         where: {

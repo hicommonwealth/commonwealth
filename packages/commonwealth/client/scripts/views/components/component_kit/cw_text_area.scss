@@ -1,4 +1,5 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/inputs';
 
 .TextArea {
   display: flex;
@@ -13,7 +14,7 @@
     padding: 6px 8px;
     resize: none;
 
-    @include inputStyles;
+    @include inputs.inputStyles;
   }
 
   .character-count {

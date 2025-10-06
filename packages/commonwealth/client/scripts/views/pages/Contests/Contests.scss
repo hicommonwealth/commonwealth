@@ -1,8 +1,9 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
 
 .Contests {
   .description {
-    color: $neutral-500;
+    color: colors.$neutral-500;
     max-width: 600px;
     display: inline-block;
     margin-bottom: 24px;

@@ -23,6 +23,7 @@ interface FundContestDrawerProps {
   contestAddress: string;
   fundingTokenAddress?: string;
   fundingTokenTicker: string;
+  isRecurring?: boolean;
 }
 
 export type FundContestStep = 'Form' | 'Loading' | 'Success' | 'Failure';
@@ -33,6 +34,7 @@ const FundContestDrawer = ({
   contestAddress,
   fundingTokenAddress,
   fundingTokenTicker,
+  isRecurring = false,
 }: FundContestDrawerProps) => {
   const [fundContestDrawerStep, setFundContestDrawerStep] =
     useState<FundContestStep>('Form');
@@ -59,6 +61,7 @@ const FundContestDrawer = ({
     chainRpc,
     ethChainId,
     userAddress: selectedAddress.value,
+    isRecurring,
   });
 
   const { mutateAsync: fundContest } = useFundContestOnchainMutation();

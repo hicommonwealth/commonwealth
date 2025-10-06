@@ -21,6 +21,7 @@ export enum MobileTabType {
   Entries = 'Entries',
   PriceChart = 'Price Chart',
   TokenSwap = 'Token Swap',
+  Judges = 'Judges',
 }
 
 interface ContestPageProps {
@@ -86,6 +87,7 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             topics={contest?.topics}
             decimals={contest?.decimals}
             ticker={contest?.ticker}
+            prizePercentage={contest?.prize_percentage || undefined}
             finishDate={end_time ? moment(end_time).toISOString() : ''}
             isCancelled={!!contest?.cancelled}
             isRecurring={!contest?.funding_token_address}
@@ -111,6 +113,7 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             onSortChange={(sort) => setSelectedSort(sort)}
             contestDecimals={contest?.decimals || 0}
             voteWeightMultiplier={contest?.vote_weight_multiplier || 0}
+            contestTokenSymbol={contest?.ticker}
           />
         </div>
       </div>

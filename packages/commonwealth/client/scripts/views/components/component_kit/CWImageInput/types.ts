@@ -1,3 +1,5 @@
+import type { ImageGenerationModel } from '@hicommonwealth/shared';
+
 export enum ImageBehavior {
   Fill = 'cover',
   Tiled = 'repeat',
@@ -21,7 +23,7 @@ export type ImageProcessingProps = {
 export type UploadControlProps = {
   imageURL?: string;
   onImageProcessingChange?: (process: ImageProcessingProps) => void;
-  onProcessedImagesListChange?: (processedImages: ImageProcessed[]) => void;
+  onProcessedImagesListChange?: (images: ImageProcessed[]) => void;
   onImageGenerated?: (generatedImageUrl: string) => void;
   onImageUploaded?: (uploadedImageURL: string) => void;
   canSwitchBetweenProcessedImages?: boolean;
@@ -33,4 +35,30 @@ export type UploadControlProps = {
   hookToForm?: boolean;
   imageBehavior?: ImageBehavior;
   uploadControlClassName?: string;
+  usePersistentPromptMode?: boolean;
+  onAddCurrentToReference?: () => void;
+  canAddCurrentToReference?: boolean;
+  referenceImageUrls?: string[];
+  referenceTexts?: string[];
+  model?: ImageGenerationModel;
 };
+
+export interface CWImageInputProps {
+  name: string;
+  label?: string;
+  hookToForm?: boolean;
+  initialImageUrl?: string;
+  initialPrompt?: string;
+  onImageUploaded?: (url: string) => void;
+  onImageGenerated?: (url: string) => void;
+  onImageProcessingChange?: (status: ImageProcessingProps) => void;
+  onAddCurrentToReference?: () => void;
+  withAIImageGeneration?: boolean;
+  loading?: boolean;
+  canSwitchBetweenProcessedImages?: boolean;
+  usePersistentPromptMode?: boolean;
+  canAddCurrentToReference?: boolean;
+  referenceImageUrls?: string[];
+  referenceTexts?: string[];
+  model?: ImageGenerationModel;
+}

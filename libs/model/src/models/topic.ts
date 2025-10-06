@@ -4,12 +4,14 @@ import { z } from 'zod';
 import { ChainNodeAttributes } from './chain_node';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
+import type { TopicSubscriptionAttributes } from './topic_subscription';
 import type { ModelInstance } from './types';
 
 export type TopicAttributes = z.infer<typeof Topic> & {
   // associations
   community?: CommunityAttributes;
   threads?: ThreadAttributes[];
+  subscriptions?: TopicSubscriptionAttributes[];
   ChainNode?: ChainNodeAttributes;
 };
 export type TopicInstance = ModelInstance<TopicAttributes>;
@@ -44,11 +46,6 @@ export default (
         allowNull: true,
       },
       channel_id: { type: Sequelize.STRING, allowNull: true },
-      group_ids: {
-        type: Sequelize.ARRAY(Sequelize.INTEGER),
-        allowNull: false,
-        defaultValue: [],
-      },
       telegram: { type: Sequelize.STRING, allowNull: true },
       weighted_voting: { type: Sequelize.STRING, allowNull: true },
       chain_node_id: { type: Sequelize.INTEGER, allowNull: true },
@@ -61,6 +58,8 @@ export default (
         allowNull: false,
         defaultValue: false,
       },
+      recalculated_votes_start: { type: Sequelize.DATE, allowNull: true },
+      recalculated_votes_finish: { type: Sequelize.DATE, allowNull: true },
     },
     {
       timestamps: true,

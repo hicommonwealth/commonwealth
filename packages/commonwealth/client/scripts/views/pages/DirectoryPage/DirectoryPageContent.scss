@@ -1,4 +1,6 @@
-@import '../../../styles/shared';
+@use '../../../styles/shared';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .directory-loader-container {
   display: flex;
@@ -12,11 +14,11 @@
   grid-template-columns: repeat(auto-fill, minmax(506px, 1fr));
   gap: 24px;
 
-  @include medium {
+  @include media_queries.medium {
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   }
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     grid-template-columns: 1fr;
   }
 }
@@ -32,13 +34,13 @@
     text-decoration: underline;
   }
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     min-width: unset;
   }
 }
 
 .directory-empty-state {
-  color: $neutral-500;
+  color: colors.$neutral-500;
 
   b {
     margin-left: 4px;

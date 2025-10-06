@@ -1,11 +1,12 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .CastVoteSection {
   align-items: center;
   display: flex;
 
   .time-remaining-text.Text {
-    color: $neutral-500;
+    color: colors.$neutral-500;
     margin-left: 16px;
   }
 }

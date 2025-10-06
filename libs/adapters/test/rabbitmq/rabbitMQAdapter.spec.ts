@@ -2,13 +2,10 @@ import type { ILogger } from '@hicommonwealth/core';
 import { InvalidInput, Policy } from '@hicommonwealth/core';
 import { Events, events } from '@hicommonwealth/schemas';
 import { delay } from '@hicommonwealth/shared';
-import chai from 'chai';
 import { AckOrNack } from 'rascal';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { RabbitMQAdapter } from '../../src/rabbitmq/RabbitMQAdapter';
 import { createRmqConfig } from '../../src/rabbitmq/createRmqConfig';
-
-const expect = chai.expect;
 
 const idInput = '123';
 let idOutput: string | undefined;
@@ -73,6 +70,7 @@ describe('RabbitMQ', () => {
   describe('Before initialization', () => {
     test('Should fail to publish messages if not initialized', async () => {
       const res = await rmqAdapter.publish({
+        id: 0,
         name: eventName,
         payload: {
           id: 'testing',
@@ -102,6 +100,7 @@ describe('RabbitMQ', () => {
 
     test('should publish a valid event and return true', async () => {
       const res = await rmqAdapter.publish({
+        id: 0,
         name: eventName,
         payload: {
           id: idInput,
@@ -140,6 +139,7 @@ describe('RabbitMQ', () => {
         const subRes = await rmqAdapter.subscribe(Snapshot);
         expect(subRes).to.be.true;
         const pubRes = await rmqAdapter.publish({
+          id: 0,
           name: eventName,
           payload: {
             id: idInput,
@@ -172,6 +172,7 @@ describe('RabbitMQ', () => {
         );
         expect(subRes).to.be.true;
         const pubRes1 = await rmqAdapter.publish({
+          id: 0,
           name: eventName,
           payload: {
             id: 1,
@@ -182,6 +183,7 @@ describe('RabbitMQ', () => {
         expect(retryExecuted).to.be.true;
         expect(shouldNotExecute).to.be.true;
         const pubRes = await rmqAdapter.publish({
+          id: 0,
           name: eventName,
           payload: {
             id: '1',

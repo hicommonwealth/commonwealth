@@ -1,4 +1,3 @@
-import { WEI_PER_ETHER } from '@hicommonwealth/shared';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { APIOrderDirection } from 'helpers/constants';
 import React from 'react';
@@ -48,40 +47,33 @@ const MyTokens = ({ transactions }: TransactionsProps) => {
       const key = (
         transaction.community.id + transaction.address
       ).toLowerCase();
-      const action = transaction.transaction_type === 'mint' ? 1 : -1;
+      const action =
+        transaction.transaction_type === 'mint' ||
+        transaction.transaction_type === 'buy'
+          ? 1
+          : -1;
+
+      const prev = accumulatedStakes[key] || {};
+      const amount = transaction.amount as number;
+      const avgPrice = transaction.price as number;
+      const isStake = transaction.transaction_category === 'stake';
+
+      const updatedAmount = (prev.amount || 0) + amount * action;
+      const updatedAvgPrice = (prev.avgPrice || 0) + avgPrice;
 
       accumulatedStakes[key] = {
         ...transaction,
-        ...(accumulatedStakes[key] || {}),
+        ...prev,
+        amount: updatedAmount,
+        avgPrice: updatedAvgPrice,
         assets: {
           label: {
-            holdings:
-              transaction.transaction_category === 'stake'
-                ? `${(accumulatedStakes[key]?.amount || 0) + (transaction.amount as number) * action} stakes`
-                : `${transaction.amount || 0} tokens`,
-            price:
-              transaction.transaction_category === 'stake'
-                ? `${
-                    (
-                      (accumulatedStakes[key]?.avgPrice || 0) +
-                        parseFloat(
-                          (
-                            parseFloat(`${transaction.price}`) /
-                            WEI_PER_ETHER /
-                            (transaction.amount as number)
-                          ).toFixed(5),
-                        ) *
-                          action || 0
-                    )?.toFixed?.(5) || 0.0
-                  } ${'ETH'}`
-                : // TODO: fix display value for this
-                  transaction.totalPrice,
+            holdings: isStake
+              ? `${updatedAmount} stakes`
+              : `${updatedAmount || 0} tokens`,
+            price: `${updatedAvgPrice} ETH`,
+            sortValue: updatedAmount,
           },
-          sortValue:
-            transaction.transaction_category === 'stake'
-              ? (accumulatedStakes[key]?.amount || 0) +
-                (transaction.amount as number) * action
-              : transaction.amount,
         },
       };
     });

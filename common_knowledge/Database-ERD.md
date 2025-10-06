@@ -363,7 +363,6 @@ erDiagram
     character-varying(255) wallet_id
     character-varying(255) block_info
     character-varying(64) hex
-    boolean is_user_default
     enum_Addresses_role role
     character-varying(255) wallet_sso_source
   }

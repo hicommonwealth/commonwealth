@@ -1,4 +1,5 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .Checkbox {
   display: flex;
@@ -57,7 +58,7 @@
 
     input[type='checkbox']:disabled + .checkbox-control:after {
       cursor: not-allowed;
-      background-color: $neutral-50;
+      background-color: colors.$neutral-50;
     }
   }
 

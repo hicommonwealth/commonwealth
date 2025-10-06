@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { STAKE_ID } from '@hicommonwealth/evm-protocols';
 import app from 'state';
 import {
   useFetchTokenUsdRateQuery,
@@ -47,7 +47,7 @@ const useStakeExchange = ({
   const { data: buyPriceData } = useGetBuyPriceQuery({
     // @ts-expect-error StrictNullChecks
     namespace: activeCommunityNamespace,
-    stakeId: commonProtocol.STAKE_ID,
+    stakeId: STAKE_ID,
     amount: numberOfStakeToExchange,
     apiEnabled: mode === 'buy' && !!address,
     chainRpc,
@@ -57,7 +57,7 @@ const useStakeExchange = ({
   const { data: sellPriceData } = useGetSellPriceQuery({
     // @ts-expect-error StrictNullChecks
     namespace: activeCommunityNamespace,
-    stakeId: commonProtocol.STAKE_ID,
+    stakeId: STAKE_ID,
     amount: numberOfStakeToExchange,
     apiEnabled: mode === 'sell',
     chainRpc,

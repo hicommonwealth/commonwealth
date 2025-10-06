@@ -22,6 +22,35 @@ export const syncDb = async (db: DB, log = false) => {
       ADD CONSTRAINT xp_logs_user_id_action_meta_id_event_created_at_name
         UNIQUE NULLS NOT DISTINCT (user_id, action_meta_id, event_created_at, name);
   `);
+
+  await db.sequelize.query(`
+CREATE OR REPLACE FUNCTION public.notify_insert_outbox_function()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NEW.relayed = false THEN
+    PERFORM pg_notify('outbox_channel', NEW.event_id::TEXT);
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_trigger
+    WHERE tgname = 'outbox_insert_trigger'
+  ) THEN
+    CREATE TRIGGER outbox_insert_trigger
+    AFTER INSERT ON public."Outbox"
+    FOR EACH ROW
+    EXECUTE FUNCTION public.notify_insert_outbox_function();
+  END IF;
+END;
+$$;
+  `);
 };
 
 /**
@@ -44,8 +73,8 @@ export const buildDb = (sequelize: Sequelize): DB => {
   return db;
 };
 
-// TODO: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
 export * from './address';
+export * from './ai_completion_token';
 export * from './api_key';
 export * from './chain_event_xp_sources';
 export * from './chain_node';
@@ -54,19 +83,24 @@ export * from './comment';
 export * from './comment_subscriptions';
 export * from './comment_version_history';
 export * from './community';
+export * from './community_directory_tags';
 export * from './community_role';
 export * from './community_stake';
 export * from './community_tags';
 export * from './discord_bot_config';
 export * from './email_update_token';
 export * from './evmEventSource';
+export * from './governance_proposals';
 export * from './group';
 export * from './lastProcessedEvmBlock';
 export * from './launchpad_trade';
+export * from './mcp_server';
+export * from './mcp_server_community';
 export * from './membership';
 export * from './outbox';
 export * from './poll';
 export * from './profile_tags';
+export * from './proposal_votes';
 export * from './reaction';
 export * from './referral';
 export * from './referral_fee';
@@ -78,8 +112,11 @@ export * from './starred_community';
 export * from './subscription_preference';
 export * from './tags';
 export * from './thread';
+export * from './thread_rank';
 export * from './thread_version_history';
+export * from './token-allocation';
 export * from './topic';
+export * from './topic_subscription';
 export * from './twitter_cursor';
 export * from './types';
 export * from './user';

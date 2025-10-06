@@ -1,8 +1,11 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/border_radius';
+@use '../../../../styles/mixins/choice';
+@use '../../../../styles/mixins/colors.module';
 
 .Toggle {
-  background-color: $neutral-200;
-  border-radius: $border-radius-rounded-corners;
+  background-color: colors.$neutral-200;
+  border-radius: border_radius.$border-radius-rounded-corners;
   display: inline-flex;
   align-items: center;
   position: relative;
@@ -34,16 +37,16 @@
   }
 
   &:hover {
-    background-color: $neutral-300;
+    background-color: colors.$neutral-300;
   }
 
   .toggle-input {
-    @include hideInput;
+    @include choice.hideInput;
   }
 
   .slider {
-    background-color: $white;
-    border-radius: $border-radius-round;
+    background-color: colors.$white;
+    border-radius: border_radius.$border-radius-round;
     position: absolute;
     transition: all ease-in-out 0.1s;
     box-shadow:
@@ -63,16 +66,16 @@
     }
 
     &.disabled {
-      background-color: $neutral-200;
+      background-color: colors.$neutral-200;
     }
   }
 
   &.checked {
-    background-color: $primary-500;
+    background-color: colors.$primary-500;
     transition: all ease-in-out 0.1s;
 
     &:hover {
-      background-color: $primary-600;
+      background-color: colors.$primary-600;
     }
 
     &.large {
@@ -88,27 +91,27 @@
     }
 
     &.disabled {
-      background-color: $neutral-200;
+      background-color: colors.$neutral-200;
 
       .slider {
-        background-color: $neutral-100;
+        background-color: colors.$neutral-100;
       }
     }
   }
 
   &.disabled {
-    background-color: $neutral-200;
+    background-color: colors.$neutral-200;
     pointer-events: none;
 
     .slider {
-      background-color: $neutral-100;
+      background-color: colors.$neutral-100;
     }
   }
 
   .toggle-label {
     font-size: 14px;
     font-weight: 500;
-    color: $neutral-800;
+    color: colors.$neutral-800;
   }
 
   .icon-container {

@@ -57,7 +57,8 @@ const ProposalVotesTable = ({ votes, choices }: ProposalVotesTableProps) => {
                     <CWText className="column-text" noWrap>
                       {
                         // @ts-expect-error <StrictNullChecks/>
-                        choices[reactor.choice]
+                        // convert from array idex to natural number
+                        choices[reactor.choice + 1]
                       }
                     </CWText>
                   ),

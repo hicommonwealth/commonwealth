@@ -1,5 +1,4 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
-import { getThreadActionTooltipText } from 'helpers/threads';
+import { GetThreadToken } from '@hicommonwealth/schemas';
 import { truncate } from 'helpers/truncate';
 import useTopicGating from 'hooks/useTopicGating';
 import { IThreadCollaborator } from 'models/Thread';
@@ -9,9 +8,9 @@ import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import useUserStore from 'state/ui/user';
-import Permissions from 'utils/Permissions';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { isHot } from 'views/pages/discussions/helpers';
+import { z } from 'zod';
 import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
@@ -19,6 +18,7 @@ import { Thread } from '../../../../models/Thread';
 import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
+import { ThreadTokenDrawer } from '../../ThreadTokenDrawer';
 import { ViewThreadUpvotesDrawer } from '../../UpvoteDrawer';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
@@ -89,6 +89,8 @@ type ContentPageProps = {
   shareUrl?: string;
   proposalDetailSidebar?: SidebarComponents;
   showActionIcon?: boolean;
+  isChatMode?: boolean;
+  threadToken?: z.infer<typeof GetThreadToken.output> | null;
 };
 
 export const CWContentPage = ({
@@ -132,22 +134,23 @@ export const CWContentPage = ({
   shareUrl,
   proposalDetailSidebar,
   showActionIcon = false,
+  isChatMode,
+  threadToken,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
   const user = useUserStore();
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
+  const [isTokenDrawerOpen, setIsTokenDrawerOpen] = useState<boolean>(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const communityId = app.activeChainId() || '';
 
-  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
+  const { actionGroups, bypassGating } = useTopicGating({
     communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
-    topicId: thread?.topic?.id || 0,
+    topicId: thread?.topic?.id,
   });
-
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const tabSelected = useMemo(() => {
     const tab = Object.fromEntries(urlQueryParams.entries())?.tab;
@@ -164,6 +167,10 @@ export const CWContentPage = ({
       pathname: location.pathname,
       search: `?${newQueryParams.toString()}`,
     });
+  };
+
+  const handleTokenDrawerClick = () => {
+    setIsTokenDrawerOpen(true);
   };
 
   if (showSkeleton) {
@@ -222,40 +229,8 @@ export const CWContentPage = ({
     </div>
   );
 
-  const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!user.activeAccount,
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: isRestrictedMembership,
-  });
-
-  const disabledReactPermissionTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!user.activeAccount,
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT_REACTION,
-      ) &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_THREAD_REACTION,
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
-  });
-
-  const disabledCommentPermissionTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!user.activeAccount,
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT,
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
-  });
-
   const mainBody = (
-    <div className="main-body-container">
+    <div className={`main-body-container ${isChatMode ? 'chat-mode' : ''}`}>
       <div className="header">
         {typeof title === 'string' ? (
           <h1 className="title">
@@ -291,31 +266,24 @@ export const CWContentPage = ({
             onEditStart={onEditStart}
             canUpdateThread={canUpdateThread}
             hasPendingEdits={hasPendingEdits}
-            canReact={
-              disabledReactPermissionTooltipText
-                ? !disabledReactPermissionTooltipText
-                : !disabledActionsTooltipText
-            }
-            canComment={
-              disabledCommentPermissionTooltipText
-                ? !disabledCommentPermissionTooltipText
-                : !disabledActionsTooltipText
-            }
             onProposalStageChange={onProposalStageChange}
-            disabledActionsTooltipText={
-              disabledReactPermissionTooltipText ||
-              disabledCommentPermissionTooltipText ||
-              disabledActionsTooltipText
-            }
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
             setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
             shareEndpoint={`${window.location.origin}${window.location.pathname}`}
             editingDisabled={editingDisabled}
+            actionGroups={actionGroups}
+            bypassGating={bypassGating}
+            onTokenDrawerClick={handleTokenDrawerClick}
+            threadToken={threadToken}
           />,
         )}
 
       {subBody}
-      {comments}
+      <div
+        className={`comments-section ${isChatMode ? 'chat-mode-comments' : ''}`}
+      >
+        {comments}
+      </div>
     </div>
   );
 
@@ -406,6 +374,13 @@ export const CWContentPage = ({
         isOpen={isUpvoteDrawerOpen}
         setIsOpen={setIsUpvoteDrawerOpen}
       />
+      {thread?.id && (
+        <ThreadTokenDrawer
+          threadId={thread.id}
+          isOpen={isTokenDrawerOpen}
+          setIsOpen={setIsTokenDrawerOpen}
+        />
+      )}
     </div>
   );
 };

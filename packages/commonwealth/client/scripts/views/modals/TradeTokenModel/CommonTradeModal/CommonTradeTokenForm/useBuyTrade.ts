@@ -1,13 +1,13 @@
+import { getFactoryContract } from '@hicommonwealth/evm-protocols';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { useState } from 'react';
+import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
+import { SupportedCryptoCurrencies } from 'helpers/currency';
+import { useEffect, useMemo, useState } from 'react';
 import {
   useFetchTokenUsdRateQuery,
   useGetUserEthBalanceQuery,
 } from 'state/api/communityStake';
-import {
-  useBuyTokenMutation,
-  useTokenEthExchangeRateQuery,
-} from 'state/api/launchPad';
+import { useBuyTokenMutation } from 'state/api/launchPad';
 import { useCreateTokenTradeMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
@@ -28,11 +28,15 @@ const useBuyTrade = ({
   const baseCurrencyBuyAmountDecimals =
     parseFloat(baseCurrencyBuyAmountString) || 0;
 
+  const [tokenGainAmount, setTokenGainAmount] = useState<number>(0);
+  const [isLoadingTokenGainAmount, setIsLoadingTokenGainAmount] =
+    useState<boolean>(false);
+
   const { linkSpecificAddressToSpecificCommunity } = useJoinCommunity();
 
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
     useFetchTokenUsdRateQuery({
-      tokenSymbol: 'ETH',
+      tokenSymbol: SupportedCryptoCurrencies.ETH,
       enabled,
     });
   const ethToCurrencyRate = parseFloat(
@@ -59,38 +63,91 @@ const useBuyTrade = ({
     apiEnabled: isSelectedAddressEthBalanceQueryEnabled,
   });
 
-  const isUnitEthToTokenBuyExchangeRateQueryEnabled = !!(
-    chainNode?.url &&
-    ethChainId &&
-    selectedAddress &&
-    tokenCommunity &&
-    enabled
-  );
-  const {
-    data: unitEthToTokenBuyExchangeRate = 0,
-    isLoading: isLoadingUnitEthToTokenBuyExchangeRate,
-  } = useTokenEthExchangeRateQuery({
-    chainRpc: chainNode.url,
+  const launchPad = useMemo(() => {
+    if (
+      chainNode?.url &&
+      ethChainId &&
+      selectedAddress &&
+      tokenCommunity &&
+      enabled
+    ) {
+      return new LaunchpadBondingCurve(
+        getFactoryContract(ethChainId).LPBondingCurve,
+        getFactoryContract(ethChainId).Launchpad,
+        tradeConfig.token.token_address,
+        getFactoryContract(ethChainId).TokenCommunityManager,
+        chainNode.url,
+      );
+    }
+    return null;
+  }, [
+    chainNode?.url,
     ethChainId,
-    mode: 'buy',
-    tokenAmount: 1 * 1e18, // convert to wei - get exchange rate of 1 unit token to eth
-    tokenAddress: tradeConfig.token.token_address,
-    enabled: isUnitEthToTokenBuyExchangeRateQueryEnabled,
-  });
+    selectedAddress,
+    tokenCommunity,
+    enabled,
+    tradeConfig.token.token_address,
+  ]);
 
-  const { mutateAsync: buyToken, isLoading: isBuyingToken } =
+  useEffect(() => {
+    const fetchTokenGainAmount = async () => {
+      if (
+        !launchPad ||
+        !chainNode ||
+        commonPlatformFeeForBuyTradeInEth >= baseCurrencyBuyAmountDecimals
+      ) {
+        setTokenGainAmount(0);
+        return;
+      }
+
+      try {
+        setIsLoadingTokenGainAmount(true);
+        // Convert to wei and account for platform fee
+        const amountInWei =
+          (baseCurrencyBuyAmountDecimals - commonPlatformFeeForBuyTradeInEth) *
+          1e18;
+        const amountOut = await launchPad.getAmountOut(
+          amountInWei,
+          true,
+          `${ethChainId}`,
+        );
+        setTokenGainAmount(amountOut);
+      } catch (error) {
+        console.error('Error fetching token gain amount:', error);
+        setTokenGainAmount(0);
+      } finally {
+        setIsLoadingTokenGainAmount(false);
+      }
+    };
+
+    void fetchTokenGainAmount();
+  }, [
+    launchPad,
+    chainNode,
+    baseCurrencyBuyAmountDecimals,
+    commonPlatformFeeForBuyTradeInEth,
+    ethChainId,
+  ]);
+
+  const { mutateAsync: buyToken, isPending: isBuyingToken } =
     useBuyTokenMutation();
 
-  const { mutateAsync: createTokenTrade, isLoading: isCreatingTokenTrade } =
+  const { mutateAsync: createTokenTrade, isPending: isCreatingTokenTrade } =
     useCreateTokenTradeMutation();
 
   const onBaseCurrencyBuyAmountChange = (
     change: React.ChangeEvent<HTMLInputElement> | TokenPresetAmounts,
   ) => {
     if (typeof change == 'number') {
-      // preset amounts are in tradeConfig.ethBuyCurrency
-      const ethToBuyFromUSDPresetAmount = change / ethToCurrencyRate;
-      setBaseCurrencyBuyAmountString(`${ethToBuyFromUSDPresetAmount}`);
+      // Check if preset amounts are in ETH or USD currency
+      if (tradeConfig.buyCurrency === SupportedCryptoCurrencies.ETH) {
+        // preset amounts are already in ETH
+        setBaseCurrencyBuyAmountString(`${change}`);
+      } else {
+        // preset amounts are in tradeConfig.buyCurrency (USD)
+        const ethToBuyFromUSDPresetAmount = change / ethToCurrencyRate;
+        setBaseCurrencyBuyAmountString(`${ethToBuyFromUSDPresetAmount}`);
+      }
     } else if (typeof change == 'string') {
       // not handling string type preset amounts atm
     } else {
@@ -108,7 +165,6 @@ const useBuyTrade = ({
 
   const handleTokenBuy = async () => {
     try {
-      // this condition wouldn't be called, but adding to avoid typescript issues
       if (
         !chainNode?.url ||
         !ethChainId ||
@@ -125,6 +181,7 @@ const useBuyTrade = ({
         amountEth: baseCurrencyBuyAmountDecimals * 1e18, // amount in wei
         walletAddress: selectedAddress,
         tokenAddress: tradeConfig.token.token_address,
+        tokenUrl: tradeConfig.token.icon_url!,
       };
       const txReceipt = await buyToken(payload);
 
@@ -167,16 +224,16 @@ const useBuyTrade = ({
       isBuyingToken ||
       isLoadingETHToCurrencyRate ||
       isCreatingTokenTrade ||
-      isLoadingUnitEthToTokenBuyExchangeRate);
+      isLoadingTokenGainAmount);
 
   return {
     // Note: not exporting state setters directly, all "buy token" business logic should be done in this hook
     amounts: {
       invest: {
-        ethBuyCurrency: tradeConfig.ethBuyCurrency,
+        buyCurrency: tradeConfig.buyCurrency,
         baseCurrency: {
-          // eth will be the currency used to buy token, and eth will be bought with tradeConfig.ethBuyCurrency
-          name: 'ETH',
+          // eth will be the currency used to buy token, and eth will be bought with tradeConfig.buyCurrency
+          name: SupportedCryptoCurrencies.ETH,
           amount: baseCurrencyBuyAmountString,
           onAmountChange: onBaseCurrencyBuyAmountChange,
           presetAmounts: tradeConfig.buyTokenPresetAmounts,
@@ -191,9 +248,8 @@ const useBuyTrade = ({
         },
       },
       gain: {
-        token:
-          unitEthToTokenBuyExchangeRate *
-          (baseCurrencyBuyAmountDecimals - commonPlatformFeeForBuyTradeInEth),
+        token: tokenGainAmount,
+        isLoading: isLoadingTokenGainAmount,
       },
     },
     selectedAddressEthBalance: {

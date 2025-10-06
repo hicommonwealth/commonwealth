@@ -3,29 +3,56 @@ import * as schemas from '@hicommonwealth/schemas';
 import {
   ChainBase,
   CommunityTierMap,
+  GatedActionEnum,
   UserTierMap,
   WalletId,
 } from '@hicommonwealth/shared';
+import Chance from 'chance';
 import { z } from 'zod';
 import { seed, seedRecord } from '../../src/tester';
 import { getSignersInfo } from './canvas-signers';
 
+const chance = new Chance();
+
+export type CommunitySeedRoles =
+  | 'admin'
+  | 'member'
+  | 'nonmember'
+  | 'banned'
+  | 'rejected'
+  | 'superadmin';
+
 export type CommunitySeedOptions = {
-  roles: Array<
-    'admin' | 'member' | 'nonmember' | 'banned' | 'rejected' | 'superadmin'
-  >;
+  id?: string;
+  roles: Array<CommunitySeedRoles>;
   chain_node?: Partial<z.infer<typeof schemas.ChainNode>>;
   chain_base?: ChainBase;
+  network?: string;
   bech32_prefix?: string;
   ss58_prefix?: number;
   groups?: {
     id: number;
-    permissions: schemas.PermissionEnum[];
+    permissions: GatedActionEnum[];
   }[];
   custom_stages?: string[];
+  namespace?: string;
   namespace_address?: string;
   stakes?: z.infer<typeof schemas.CommunityStake>[];
   weighted_voting?: schemas.TopicWeightedVoting;
+  override_addresses?: Array<string>;
+};
+
+export type CommunitySeedResult = {
+  base: z.infer<typeof schemas.Community>;
+  community: z.infer<typeof schemas.Community>;
+  node: z.infer<typeof schemas.ChainNode>;
+  actors: Record<CommunitySeedRoles[number], Actor>;
+  addresses: Record<
+    CommunitySeedRoles[number],
+    z.infer<typeof schemas.Address>
+  >;
+  users: Record<CommunitySeedRoles[number], z.infer<typeof schemas.User>>;
+  roles: Array<CommunitySeedRoles[number]>;
 };
 
 /**
@@ -36,17 +63,21 @@ export type CommunitySeedOptions = {
  * @param groups - array of group ids and permissions to be assigned to the topic
  */
 export async function seedCommunity({
+  id,
   roles,
   chain_node = { eth_chain_id: 1 },
   chain_base = ChainBase.Ethereum,
+  network = 'ethereum',
   bech32_prefix = undefined,
   ss58_prefix = undefined,
   groups = [],
   custom_stages,
+  namespace,
   namespace_address,
   stakes,
   weighted_voting,
-}: CommunitySeedOptions) {
+  override_addresses,
+}: CommunitySeedOptions): Promise<CommunitySeedResult> {
   const actors = {} as Record<(typeof roles)[number], Actor>;
   const addresses = {} as Record<
     (typeof roles)[number],
@@ -70,15 +101,17 @@ export async function seedCommunity({
 
   // seed base community
   const [base] = await seed('Community', {
+    id: `base-of-${id || chance.company()}`,
     tier: CommunityTierMap.ManuallyVerified,
     chain_node_id: node!.id!,
     base: chain_base,
+    network,
     active: true,
     lifetime_thread_count: 0,
     profile_count: 1,
     Addresses: roles.map((role, index) => {
       return {
-        address: signerInfo[index].address,
+        address: override_addresses?.[index] || signerInfo[index].address,
         user_id: users[role].id,
         role: role === 'admin' ? 'admin' : 'member',
         is_banned: role === 'banned',
@@ -89,17 +122,20 @@ export async function seedCommunity({
   });
 
   const [community] = await seed('Community', {
-    tier: CommunityTierMap.CommunityVerified,
+    id: id || chance.company(),
+    tier: CommunityTierMap.ChainVerified,
     chain_node_id: node!.id!,
     base: chain_base,
+    network,
     bech32_prefix,
     ss58_prefix,
+    namespace,
     namespace_address,
     active: true,
     profile_count: 1,
     Addresses: roles.map((role, index) => {
       return {
-        address: signerInfo[index].address,
+        address: override_addresses?.[index] || signerInfo[index].address,
         user_id: users[role].id,
         role: role === 'admin' ? 'admin' : 'member',
         is_banned: role === 'banned',
@@ -108,22 +144,17 @@ export async function seedCommunity({
       };
     }),
     groups: groups.map(({ id }) => ({ id })),
-    topics: [
-      {
-        group_ids: groups.map(({ id }) => id),
-        weighted_voting,
-      },
-    ],
+    topics: [{ name: 'seed text', weighted_voting }],
     CommunityStakes: stakes ?? [],
     custom_stages,
   });
 
   await Promise.all(
     groups.map((g) =>
-      seed('GroupPermission', {
+      seed('GroupGatedAction', {
         group_id: g.id,
         topic_id: community?.topics?.[0]?.id || 0,
-        allowed_actions: g.permissions,
+        gated_actions: g.permissions,
       }),
     ),
   );
@@ -133,7 +164,7 @@ export async function seedCommunity({
     const address = community!.Addresses!.find((a) => a.user_id === user.id);
     actors[role] = {
       user: {
-        id: user.id,
+        id: user.id!,
         email: user.profile.email!,
         isAdmin: role === 'superadmin',
       },
@@ -142,5 +173,13 @@ export async function seedCommunity({
     addresses[role] = address!;
   });
 
-  return { base, community, node, actors, addresses, users, roles };
+  return {
+    base: base!,
+    community: community!,
+    node: node!,
+    actors,
+    addresses,
+    users,
+    roles,
+  };
 }

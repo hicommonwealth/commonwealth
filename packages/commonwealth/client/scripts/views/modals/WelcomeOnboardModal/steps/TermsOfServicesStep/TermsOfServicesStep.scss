@@ -1,16 +1,20 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .TermsOfServicesStep {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
   gap: 16px;
+  overflow-y: scroll;
 
   .h4 {
-    color: $neutral-600;
+    color: colors.$neutral-600;
 
     .b1 {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
   .logo {
@@ -18,7 +22,7 @@
     margin: auto;
     width: 227px;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       width: 175px;
     }
   }
@@ -28,9 +32,9 @@
     border: 1px solid #e0dfe1;
     border-radius: 6px;
     overflow: auto;
-    @include extraSmall {
-      height: 50vh;
-      max-height: 50vh;
+    @include media_queries.extraSmall {
+      height: 60vh;
+      max-height: 60vh;
     }
   }
 
@@ -39,26 +43,16 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-top: 16px;
-    margin-bottom: 16px;
   }
-  .footerContainer {
-    bottom: 40px;
-    align-self: center;
+  .terms-footer {
     display: flex;
     flex-direction: column;
-    width: 90vw;
-    max-width: 400px;
-    @include heightSmallInclusive {
-      bottom: 0px;
-    }
-    @include extraSmall {
-      position: absolute;
-    }
+    margin-top: auto;
+
     .primary {
       padding-left: 2rem;
       padding-right: 2rem;
-      background-color: $primary-600 !important;
+      background-color: colors.$primary-600 !important;
     }
     .footer {
       display: block;
@@ -67,14 +61,14 @@
       a:visited,
       a:active,
       a:hover {
-        color: $primary-600;
+        color: colors.$primary-600;
       }
     }
     .button-container {
       display: flex;
       gap: 8px;
     }
-    @include heightSmallInclusive {
+    @include media_queries.heightSmallInclusive {
       .Text {
         font-size: 14px;
         line-height: 18px;

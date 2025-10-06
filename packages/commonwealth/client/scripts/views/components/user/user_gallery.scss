@@ -1,16 +1,17 @@
-@import '../../../styles/shared.scss';
-@import './user';
+@use '../../../styles/shared.scss';
+@use 'user';
+@use '../../../styles/mixins/colors.module';
 
 .UserGallery {
   .overflow-users-wrap {
-    @include circledAvatar();
+    @include user.circledAvatar();
 
     position: relative;
     display: inline-block;
     margin-right: -16px;
     margin-top: -3px;
     white-space: nowrap;
-    background-color: $primary-100;
+    background-color: colors.$primary-100;
 
     .overflow-users {
       position: absolute;
@@ -18,7 +19,7 @@
       left: 0;
       top: -50%;
       text-align: center;
-      color: $white;
+      color: colors.$white;
     }
   }
 }

@@ -1,6 +1,5 @@
 import { ThreadFeaturedFilterTypes } from 'client/scripts/models/types';
 import useFetchFarcasterCastsQuery from 'client/scripts/state/api/contests/getFarcasterCasts';
-import useFetchThreadsQuery from 'client/scripts/state/api/threads/fetchThreads';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 
@@ -9,6 +8,8 @@ import CommonEntriesList from '../../CommonEntriesList';
 import FarcasterEntriesList from '../../FarcasterEntriesList';
 import { SortType } from '../../types';
 
+import { Thread, ThreadView } from 'client/scripts/models/Thread';
+import useGetThreadsQuery from 'client/scripts/state/api/threads/getThreads';
 import './EntriesTab.scss';
 
 export interface EntriesTabProps {
@@ -18,6 +19,7 @@ export interface EntriesTabProps {
   isFarcasterContest: boolean;
   contestDecimals: number;
   voteWeightMultiplier: number;
+  contestTokenSymbol?: string;
 }
 
 const EntriesTab = ({
@@ -27,6 +29,7 @@ const EntriesTab = ({
   isFarcasterContest,
   contestDecimals,
   voteWeightMultiplier,
+  contestTokenSymbol,
 }: EntriesTabProps) => {
   const [selectedSort, setSelectedSort] = React.useState<SortType>(
     SortType.Upvotes,
@@ -44,14 +47,13 @@ const EntriesTab = ({
       ? ThreadFeaturedFilterTypes.Newest
       : ThreadFeaturedFilterTypes.MostLikes;
 
-  const { data: threads, isLoading: isThreadsLoading } = useFetchThreadsQuery({
-    communityId: communityId || '',
-    queryType: 'bulk',
-    page: 1,
+  const { data: threads, isLoading: isThreadsLoading } = useGetThreadsQuery({
+    community_id: communityId || '',
+    cursor: 1,
     limit: 30,
-    topicId,
-    orderBy: threadSort,
-    apiEnabled: !isFarcasterContest,
+    topic_id: topicId,
+    order_by: threadSort,
+    enabled: !isFarcasterContest,
     contestAddress,
   });
 
@@ -59,7 +61,13 @@ const EntriesTab = ({
     setSelectedSort(sort);
   };
 
-  const sortedThreads = sortByFeaturedFilter(threads || [], threadSort);
+  // TODO: Replace Thread with ThreadView -> should we use Memo here?
+  const sortedThreads = sortByFeaturedFilter(
+    threads?.pages.flatMap((p) =>
+      p.results.map((t) => new Thread(t as ThreadView)),
+    ) || [],
+    threadSort,
+  );
 
   return (
     <div className="EntriesTab">
@@ -75,6 +83,7 @@ const EntriesTab = ({
           onSortChange={handleSortChange}
           contestDecimals={contestDecimals}
           voteWeightMultiplier={voteWeightMultiplier}
+          contestTokenSymbol={contestTokenSymbol}
         />
       ) : (
         <CommonEntriesList

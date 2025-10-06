@@ -1,3 +1,5 @@
+import app from 'client/scripts/state';
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { useState } from 'react';
 import {
   TransactionData,
@@ -19,8 +21,16 @@ const useConfigureVerificationTransaction = ({
   chainId,
   onSuccess,
 }: UseConfigureVerificationTransactionProps): TransactionHookResult => {
+  const communityId = app?.chain?.meta?.id;
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
+
   const [transactionData, setTransactionData] = useState<TransactionData>(
-    defaultTransactionState,
+    community?.namespace_verification_configured
+      ? { state: 'completed', errorText: '' }
+      : defaultTransactionState,
   );
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));

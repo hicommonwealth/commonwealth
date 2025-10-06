@@ -3,13 +3,13 @@ import useCreateTopicMutation from './createTopic';
 import useEditTopicMutation from './editTopic';
 import useFetchTopicsQuery from './fetchTopics';
 import useGetTopicByIdQuery from './getTopicById';
-import useUpdateFeaturedTopicsOrderMutation from './updateFeaturedTopicsOrder';
+import useRefreshWeightedVotesMutation from './refreshWeightedVotes';
 
 export {
   useCreateTopicMutation,
   useEditTopicMutation,
   useFetchTopicsQuery,
   useGetTopicByIdQuery,
+  useRefreshWeightedVotesMutation,
   useToggleArchiveTopicMutation,
-  useUpdateFeaturedTopicsOrderMutation,
 };

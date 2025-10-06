@@ -5,13 +5,12 @@ import {
   notificationsProvider,
   NotificationsProviderGetMessagesReturn,
   NotificationsProviderSchedulesReturn,
-  RepeatFrequency,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
+import { processSubscriptionPreferencesUpdated } from '@hicommonwealth/model/services';
+import * as tester from '@hicommonwealth/model/tester';
 import * as schemas from '@hicommonwealth/schemas';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   afterAll,
   afterEach,
@@ -24,10 +23,6 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-// eslint-disable-next-line max-len
-import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/subscriptionPreferencesUpdated';
-
-chai.use(chaiAsPromised);
 
 function SpyNotificationsProvider(stubs?: {
   triggerWorkflowStub?: Mock<
@@ -53,6 +48,7 @@ function SpyNotificationsProvider(stubs?: {
       stubs?.createSchedulesStub || vi.fn(() => Promise.resolve([])),
     deleteSchedules:
       stubs?.deleteSchedulesStub || vi.fn(() => Promise.resolve(new Set())),
+    updateSchedules: vi.fn(() => Promise.resolve([])),
     identifyUser:
       stubs?.identifyUserStub || vi.fn(() => Promise.resolve({ id: '' })),
     registerClientRegistrationToken:
@@ -61,6 +57,7 @@ function SpyNotificationsProvider(stubs?: {
     unregisterClientRegistrationToken:
       stubs?.unregisterClientRegistrationToken ||
       vi.fn(() => Promise.resolve(true)),
+    signUserToken: vi.fn(() => Promise.resolve(undefined)),
   };
 }
 
@@ -113,6 +110,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -145,6 +143,16 @@ describe('subscriptionPreferencesUpdated', () => {
         },
       },
     );
+    await models.User.update(
+      {
+        emailNotificationInterval: 'weekly',
+      },
+      {
+        where: {
+          id: user!.id!,
+        },
+      },
+    );
 
     const provider = notificationsProvider({
       adapter: SpyNotificationsProvider({
@@ -154,6 +162,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -183,7 +192,7 @@ describe('subscriptionPreferencesUpdated', () => {
     ).to.have.property('hours');
     expect(
       (provider.createSchedules as Mock).mock.calls[0][0].schedule[0].frequency,
-    ).to.equal(RepeatFrequency.Weekly);
+    ).to.equal('weekly');
   });
 
   test('should not create a schedule if one already exists', async () => {
@@ -208,6 +217,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -247,6 +257,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
@@ -287,6 +298,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
+      id: 0,
       name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,

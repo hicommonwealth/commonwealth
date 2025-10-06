@@ -1,6 +1,3 @@
-import useFetchNodesQuery, {
-  fetchCachedNodes,
-  fetchNodesQuery,
-} from './fetchNodes';
+import useFetchNodesQuery, { fetchCachedNodes, fetchNodes } from './fetchNodes';
 
-export { fetchCachedNodes, fetchNodesQuery, useFetchNodesQuery };
+export { fetchCachedNodes, fetchNodes, useFetchNodesQuery };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { AuthModalType } from '../../modals/AuthModal';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 
@@ -13,6 +13,10 @@ const AuthButtons = ({
   fullWidthButtons = false,
   smallHeightButtons = false,
 }: AuthButtonsProps) => {
+  const handleSignIn = useCallback(() => {
+    onButtonClick(AuthModalType.SignIn);
+  }, [onButtonClick]);
+
   const isDisabled = location.pathname.includes('/finishsociallogin');
 
   return (
@@ -35,7 +39,7 @@ const AuthButtons = ({
         })}
         buttonWidth={fullWidthButtons ? 'full' : 'narrow'}
         disabled={isDisabled}
-        onClick={() => onButtonClick(AuthModalType.SignIn)}
+        onClick={handleSignIn}
       />
     </>
   );

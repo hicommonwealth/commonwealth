@@ -1,20 +1,23 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { GetThreadToken } from '@hicommonwealth/schemas';
 import {
   ContentType,
-  MIN_CHARS_TO_SHOW_MORE,
+  GatedActionEnum,
   getThreadUrl,
+  MIN_CHARS_TO_SHOW_MORE,
 } from '@hicommonwealth/shared';
 import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'client/scripts/helpers/snapshot_utils';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import useForceRerender from 'client/scripts/hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
-import { Thread, ThreadView } from 'client/scripts/models/Thread';
 import { AnyProposal } from 'client/scripts/models/types';
+import useGetThreadByIdQuery from 'client/scripts/state/api/threads/getThreadById';
+import useGetThreadToken from 'client/scripts/state/api/tokens/getThreadToken';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
-import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
+import { filterLinks } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
@@ -33,16 +36,19 @@ import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
-import { useFetchGroupsQuery } from 'state/api/groups';
+import useFetchProfilesByAddressesQuery from 'state/api/profiles/fetchProfilesByAddress';
 import {
   useAddThreadLinksMutation,
   useGetThreadPollsQuery,
-  useGetThreadsByIdQuery,
 } from 'state/api/threads';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import useUserStore, {
+  useAIFeatureEnabled,
+  useUserAiSettingsStore,
+} from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
+import { ThreadTokenWidget } from 'views/components/NewThreadFormLegacy/ToketWidget';
 import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
@@ -51,13 +57,14 @@ import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity'
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { z } from 'zod';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
-import Poll from '../../../models/Poll';
 import { Link, LinkSource } from '../../../models/Thread';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
+import { ImageActionModal } from '../../components/ImageActionModal/ImageActionModal';
 import MetaTags from '../../components/MetaTags';
 import {
   CWContentPage,
@@ -82,6 +89,7 @@ import { useCosmosProposal } from '../NewProposalViewPage/useCosmosProposal';
 import { useSnapshotProposal } from '../NewProposalViewPage/useSnapshotProposal';
 import { SnapshotPollCardContainer } from '../Snapshots/ViewSnapshotProposal/SnapshotPollCard';
 import { CommentTree } from '../discussions/CommentTree';
+import { StreamingReplyInstance } from '../discussions/CommentTree/TreeHierarchy';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { LinkedUrlCard } from './LinkedUrlCard';
 import { ThreadPollCard } from './ThreadPollCard';
@@ -96,11 +104,20 @@ import { SnapshotCreationCard } from './snapshot_creation_card';
 type ViewThreadPageProps = {
   identifier: string;
 };
+
+// Define the VoterProfileData type
+type VoterProfileData = {
+  address: string;
+  name: string; // Make name non-optional by providing a fallback
+  avatarUrl?: string;
+};
+
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
-  const threadId = identifier.split('-')[0];
+  const threadId = parseInt(`${identifier.split('-')?.[0] || 0}`);
   const [searchParams] = useSearchParams();
   const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
+  const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [savedEdits, setSavedEdits] = useState('');
@@ -113,7 +130,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const initalAiCommentPosted = useRef(false);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [proposalRedrawState, redrawProposals] = useState<boolean>(true);
-
+  const [imageActionModalOpen, setImageActionModalOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   useInitChainIfNeeded(app);
@@ -125,32 +143,29 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
 
   const communityId = app.activeChainId() || '';
-  const { data: groups = [] } = useFetchGroupsQuery({
-    communityId,
-    includeTopics: true,
-    enabled: !!communityId,
-  });
 
   const {
-    data,
+    data: threadView,
     error: fetchThreadError,
     isLoading,
-  } = useGetThreadsByIdQuery({
-    community_id: communityId,
-    thread_ids: [+threadId].filter(Boolean),
-    apiCallEnabled: !!threadId && !!communityId, // only call the api if we have thread id
-  });
+  } = useGetThreadByIdQuery(
+    threadId,
+    !!threadId && !!communityId, // only call the api if we have thread id
+  );
 
   const { data: pollsData = [] } = useGetThreadPollsQuery({
     threadId: +threadId,
-    communityId,
     apiCallEnabled: !!threadId && !!communityId,
   });
 
+  const { data: threadToken } = useGetThreadToken({
+    thread_id: threadId,
+    enabled: !!threadId && !!communityId,
+  });
+
   const thread = useMemo(() => {
-    const t = data?.at(0);
-    return t ? new Thread(t as ThreadView) : undefined;
-  }, [data]);
+    return threadView;
+  }, [threadView]);
 
   //  snapshot proposal hook
   const snapshotLink = thread?.links?.find(
@@ -249,17 +264,33 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     thread?.topic?.id,
   );
 
-  const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
+  const { isAIEnabled } = useAIFeatureEnabled();
 
-  const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
+  const { aiCommentsToggleEnabled, selectedModels } = useUserAiSettingsStore();
+
+  const effectiveAiCommentsToggleEnabled =
+    isAIEnabled && aiCommentsToggleEnabled;
+
+  const [streamingInstances, setStreamingInstances] = useState<
+    StreamingReplyInstance[]
+  >([]);
+
+  const [isChatMode, setIsChatMode] = useState(false);
+
+  const handleChatModeChange = useCallback((chatMode: boolean) => {
+    setIsChatMode(chatMode);
+  }, []);
 
   const handleGenerateAIComment = useCallback(
     async (mainThreadId: number): Promise<void> => {
-      if (!aiCommentsToggleEnabled || !user.activeAccount) {
+      if (
+        !effectiveAiCommentsToggleEnabled ||
+        !user.activeAccount ||
+        selectedModels.length === 0
+      ) {
         return;
       }
 
-      // Only generate AI comment if there are no existing comments
       if (
         (thread?.numberOfComments && thread.numberOfComments > 0) ||
         initalAiCommentPosted.current
@@ -267,13 +298,23 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         return;
       }
 
-      // Using await to satisfy the linter requirement
-      await Promise.resolve();
+      const newInstances: StreamingReplyInstance[] = selectedModels.map(
+        (model) => ({
+          targetCommentId: mainThreadId,
+          modelId: model.value,
+          modelName: model.label,
+        }),
+      );
 
-      setStreamingReplyIds([mainThreadId]);
+      setStreamingInstances(newInstances);
       initalAiCommentPosted.current = true;
     },
-    [aiCommentsToggleEnabled, user.activeAccount, thread],
+    [
+      effectiveAiCommentsToggleEnabled,
+      user.activeAccount,
+      thread,
+      selectedModels,
+    ],
   );
 
   useEffect(() => {
@@ -286,17 +327,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       setIsGloballyEditing(true);
       setIsEditingBody(true);
     }
-    if (thread && thread?.title) {
+    if (thread && thread?.title && !draftTitle) {
       setDraftTitle(thread.title);
     }
-  }, [isEdit, thread, isAdmin]);
+  }, [isEdit, thread, isAdmin, draftTitle]);
 
-  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    communityId,
-    threadId: parseInt(threadId),
-  });
+  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation();
 
-  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
+  const { actionGroups, bypassGating, isTopicGated } = useTopicGating({
     communityId,
     apiEnabled: !!user?.activeAccount?.address && !!communityId,
     userAddress: user?.activeAccount?.address || '',
@@ -326,16 +364,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     // Note: Disabling lint rule since we only want to run it once
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // find if the current topic is gated
-  const foundGatedTopic = groups.find((x) => {
-    if (thread?.topic) {
-      return (
-        Array.isArray(x.topics) &&
-        x?.topics?.find((y) => y.id === thread.topic!.id)
-      );
-    }
-  });
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -375,8 +403,45 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [thread?.versionHistory]);
 
-  if (typeof identifier !== 'string') {
-    return <PageNotFound />;
+  // Compute unique voter addresses from all polls
+  const uniqueVoterAddresses = useMemo(() => {
+    if (pollsData && pollsData.length > 0) {
+      const allAddresses = pollsData.flatMap((poll) =>
+        (poll.votes || []).map((vote) => vote.address),
+      );
+      return Array.from(new Set(allAddresses));
+    }
+    return [];
+  }, [pollsData]);
+
+  const { data: fetchedProfiles, isLoading: isLoadingProfiles } =
+    useFetchProfilesByAddressesQuery({
+      currentChainId: communityId,
+      profileChainIds: [communityId],
+      profileAddresses: uniqueVoterAddresses,
+      apiCallEnabled: !!communityId && uniqueVoterAddresses.length > 0,
+    });
+
+  const voterProfiles = useMemo(() => {
+    if (!fetchedProfiles || fetchedProfiles.length === 0) {
+      return {};
+    }
+
+    const profilesMap: Record<string, VoterProfileData> = {};
+    fetchedProfiles.forEach((profile) => {
+      if (profile.address) {
+        profilesMap[profile.address] = {
+          address: profile.address,
+          name: profile.name || '', // Provide fallback for name
+          avatarUrl: profile.avatarUrl,
+        };
+      }
+    });
+    return profilesMap;
+  }, [fetchedProfiles]);
+
+  if (typeof identifier !== 'string' || fetchThreadError) {
+    return <PageNotFound message={fetchThreadError?.message} />;
   }
 
   if (
@@ -447,8 +512,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (thread && toAdd.length > 0) {
       try {
         await addThreadLinks({
-          communityId,
-          threadId: thread.id,
+          thread_id: thread.id,
           links: toAdd,
         });
       } catch {
@@ -491,28 +555,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       Permissions.isThreadCollaborator(thread) ||
       (fromDiscordBot && isAdmin));
 
-  const gatedGroupsMatchingTopic = groups?.filter((x) =>
-    x?.topics?.find((y) => y?.id === thread?.topic?.id),
-  );
-
-  const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!user.activeAccount,
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: isRestrictedMembership,
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT,
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
+  const permissions = Permissions.getMultipleActionsPermission({
+    actions: [
+      GatedActionEnum.CREATE_COMMENT,
+      GatedActionEnum.CREATE_COMMENT_REACTION,
+    ] as const,
+    thread: thread!,
+    actionGroups,
+    bypassGating,
   });
-
-  const canComment =
-    !!user.activeAccount &&
-    !isRestrictedMembership &&
-    !disabledActionsTooltipText;
 
   const handleVersionHistoryChange = (versionId: number) => {
     const foundVersion = (thread?.versionHistory || []).find(
@@ -567,6 +618,23 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
 
   const sidebarComponent = [
+    ...(tokenizedThreadsEnabled && threadToken?.token_address
+      ? [
+          {
+            label: 'Token',
+            item: (
+              <div className="cards-column">
+                <ThreadTokenWidget
+                  tokenizedThreadsEnabled={tokenizedThreadsEnabled}
+                  threadId={thread?.id}
+                  addressType={app.chain?.base || 'ethereum'}
+                  tokenCommunity={app.chain?.meta}
+                />
+              </div>
+            ),
+          },
+        ]
+      : []),
     ...(showLinkedProposalOptions || showLinkedThreadOptions
       ? [
           {
@@ -632,13 +700,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ...new Map(
                     pollsData?.map((poll) => [poll.id, poll]),
                   ).values(),
-                ].map((poll: Poll) => {
+                ].map((poll) => {
                   return (
                     <ThreadPollCard
+                      thread={thread}
                       poll={poll}
                       key={poll.id}
-                      isTopicMembershipRestricted={isRestrictedMembership}
+                      actionGroups={actionGroups}
+                      bypassGating={bypassGating}
                       showDeleteButton={isAuthor || isAdmin}
+                      tokenDecimals={thread?.topic?.token_decimals ?? undefined}
+                      topicWeight={thread?.topic?.weighted_voting}
+                      voterProfiles={voterProfiles}
+                      isLoadingVotes={isLoadingProfiles}
                     />
                   );
                 })}
@@ -661,7 +735,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     : snapshotProposal
       ? 'snapshot'
       : '';
-  // @ts-expect-error <StrictNullChecks/>
   const status = snapshotProposal?.state || proposal?.status;
 
   const proposalDetailSidebar = [
@@ -671,8 +744,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             label: 'Detail',
             item: (
               <DetailCard
-                status={status}
-                governanceType={governanceType}
+                status={status || ''}
+                governanceType={governanceType || ''}
                 // @ts-expect-error <StrictNullChecks/>
                 publishDate={snapshotProposal?.created || proposal.createdAt}
                 id={proposalId || proposalLink?.identifier}
@@ -718,6 +791,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
+
   return (
     <StickCommentProvider>
       <MetaTags
@@ -799,7 +873,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               showLinkedThreadOptions ||
               pollsData?.length > 0 ||
               isAuthor ||
-              !!hasWebLinks)
+              !!hasWebLinks ||
+              !!threadToken)
           }
           onCommentClick={scrollToFirstComment}
           isSpamThread={!!thread?.markedAsSpamAt}
@@ -867,6 +942,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           hasPendingEdits={!!editsToSave}
           activeThreadVersionId={activeThreadVersionId}
           onChangeVersionHistoryNumber={handleVersionHistoryChange}
+          threadToken={threadToken as z.infer<typeof GetThreadToken.output>}
           body={(threadOptionsComp) => (
             <div className="thread-content">
               {thread && isEditingBody && threadBody ? (
@@ -930,13 +1006,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ) : thread && !isGloballyEditing && user.isLoggedIn ? (
                     <>
                       {threadOptionsComp}
-                      {foundGatedTopic &&
+                      {isTopicGated &&
                         !hideGatingBanner &&
-                        isRestrictedMembership && (
+                        !Permissions.isThreadAuthor(thread) && (
                           <CWGatedTopicBanner
-                            groupNames={gatedGroupsMatchingTopic.map(
-                              (g) => g.name,
-                            )}
+                            actions={[
+                              GatedActionEnum.CREATE_COMMENT,
+                              GatedActionEnum.CREATE_COMMENT_REACTION,
+                              GatedActionEnum.CREATE_THREAD_REACTION,
+                              GatedActionEnum.UPDATE_POLL,
+                            ]}
+                            actionGroups={actionGroups}
+                            bypassGating={bypassGating}
                             onClose={() => setHideGatingBanner(true)}
                           />
                         )}
@@ -957,8 +1038,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               {isWindowSmallInclusive && (snapshotProposal || proposal) && (
                 <>
                   <DetailCard
-                    status={status}
-                    governanceType={governanceType}
+                    status={status || ''}
+                    governanceType={governanceType || ''}
                     publishDate={
                       // @ts-expect-error <StrictNullChecks/>
                       snapshotProposal?.created || proposal.createdAt
@@ -1026,10 +1107,33 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 </>
               )}
               {isWindowSmallInclusive && (
-                <div className="action-cards">
-                  {sidebarComponent.map((view) => (
-                    <div key={view.label}>{view.item}</div>
-                  ))}
+                <div className="mobile-action-card-container ">
+                  <div className="actions">
+                    <div className="left-container">
+                      <CWIcon
+                        iconName="squaresFour"
+                        iconSize="medium"
+                        weight="bold"
+                      />
+                      <CWText type="h5" fontWeight="semiBold">
+                        Actions
+                      </CWText>
+                    </div>
+                    <CWIcon
+                      iconName={isCollapsed ? 'caretDown' : 'caretUp'}
+                      iconSize="small"
+                      className="caret-icon"
+                      weight="bold"
+                      onClick={() => setIsCollapsed(!isCollapsed)}
+                    />
+                  </div>
+
+                  <div className="action-cards">
+                    {!isCollapsed &&
+                      sidebarComponent.map((view) => (
+                        <div key={view.label}>{view.item}</div>
+                      ))}
+                  </div>
                 </div>
               )}
             </>
@@ -1041,46 +1145,55 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 commentsRef={commentsRef}
                 thread={thread!}
                 setIsGloballyEditing={setIsGloballyEditing}
-                canComment={canComment}
-                canReact={!isRestrictedMembership}
-                canReply={!isRestrictedMembership}
+                canComment={permissions.CREATE_COMMENT.allowed}
+                canReact={permissions.CREATE_COMMENT_REACTION.allowed}
+                canReply={permissions.CREATE_COMMENT.allowed}
                 fromDiscordBot={fromDiscordBot}
-                disabledActionsTooltipText={disabledActionsTooltipText}
                 onThreadCreated={handleGenerateAIComment}
-                aiCommentsToggleEnabled={aiCommentsToggleEnabled}
-                streamingReplyIds={streamingReplyIds}
-                setStreamingReplyIds={setStreamingReplyIds}
+                aiCommentsToggleEnabled={!!effectiveAiCommentsToggleEnabled}
+                streamingInstances={streamingInstances}
+                setStreamingInstances={setStreamingInstances}
+                permissions={permissions}
+                onChatModeChange={handleChatModeChange}
               />
-
-              <WithDefaultStickyComment>
-                {thread &&
-                  !thread.readOnly &&
-                  !fromDiscordBot &&
-                  !isGloballyEditing &&
-                  user.isLoggedIn && (
-                    <CreateComment
-                      rootThread={thread}
-                      canComment={canComment}
-                      aiCommentsToggleEnabled={aiCommentsToggleEnabled}
-                      tooltipText={
-                        typeof disabledActionsTooltipText === 'function'
-                          ? disabledActionsTooltipText?.('comment')
-                          : disabledActionsTooltipText
-                      }
-                    />
-                  )}
-              </WithDefaultStickyComment>
-
-              <StickyCommentElementSelector />
             </>
           }
           editingDisabled={isTopicInContest}
           sidebarComponents={sidebarComponent as unknown as SidebarComponents}
           proposalDetailSidebar={proposalDetailSidebar as SidebarComponents}
           showActionIcon={true}
+          isChatMode={isChatMode}
         />
+        <WithDefaultStickyComment>
+          {thread &&
+            !thread.readOnly &&
+            !fromDiscordBot &&
+            !isGloballyEditing &&
+            user.isLoggedIn && (
+              <CreateComment
+                rootThread={thread}
+                canComment={permissions.CREATE_COMMENT.allowed}
+                aiCommentsToggleEnabled={!!effectiveAiCommentsToggleEnabled}
+                tooltipText={permissions.CREATE_COMMENT.tooltip}
+              />
+            )}
+        </WithDefaultStickyComment>
+
+        <StickyCommentElementSelector />
       </CWPageLayout>
       {JoinCommunityModals}
+
+      {imageActionModalOpen && (
+        <ImageActionModal
+          isOpen={imageActionModalOpen}
+          onClose={() => setImageActionModalOpen(false)}
+          onApply={() => {
+            setImageActionModalOpen(false);
+            // TODO: Optionally focus the sticky editor or scroll to it?
+          }}
+          applyButtonLabel="Add to Comment"
+        />
+      )}
     </StickCommentProvider>
   );
 };

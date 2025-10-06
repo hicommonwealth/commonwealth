@@ -1,5 +1,7 @@
+import { OpenFeature } from '@openfeature/web-sdk';
 import { useEffect, useState } from 'react';
 import { initAppState } from 'state';
+import { initializeFeatureFlags } from '../helpers/feature-flags';
 import useGroupMutationBannerStore from '../state/ui/group';
 
 const useInitApp = () => {
@@ -12,6 +14,14 @@ const useInitApp = () => {
     readFromStorageAndSetGatingGroupBannerForCommunities();
 
     initAppState()
+      .then((envVars) => {
+        // Initialize feature flags if we have the required token
+        const provider = initializeFeatureFlags(
+          envVars.UNLEASH_FRONTEND_API_TOKEN,
+          envVars.HEROKU_APP_NAME,
+        );
+        OpenFeature.setProvider(provider);
+      })
       .catch((err) => console.log('App initialization failed', err))
       .finally(() => setIsLoading(false));
   }, [readFromStorageAndSetGatingGroupBannerForCommunities]);

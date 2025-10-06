@@ -1,4 +1,5 @@
-@import '../../../../../../../styles/shared';
+@use '../../../../../../../styles/shared';
+@use '../../../../../../../styles/mixins/colors.module';
 
 .InfoBlock {
   display: flex;
@@ -6,6 +7,6 @@
   gap: 14px;
 
   .caption {
-    color: $neutral-500;
+    color: colors.$neutral-500;
   }
 }

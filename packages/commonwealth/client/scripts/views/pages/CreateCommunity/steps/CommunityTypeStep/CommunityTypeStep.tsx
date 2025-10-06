@@ -86,8 +86,7 @@ const CommunityTypeStep = ({
   const [
     baseOption,
     solanaOption,
-    blastOption,
-    ethereumOption,
+    soneiumOption,
     skaleOption,
     ...advancedOptions
   ] = communityTypeOptions;
@@ -129,33 +128,6 @@ const CommunityTypeStep = ({
           }
         />
         <CWCommunitySelector
-          key={blastOption.type}
-          img={blastOption.img}
-          title={blastOption.title}
-          description={blastOption.description}
-          isRecommended={blastOption.isRecommended}
-          onClick={() =>
-            handleCommunitySelection({
-              type: blastOption.type,
-              chainBase: blastOption.chainBase,
-            })
-          }
-        />
-
-        <CWCommunitySelector
-          key={ethereumOption.type}
-          img={ethereumOption.img}
-          title={ethereumOption.title}
-          description={ethereumOption.description}
-          isRecommended={ethereumOption.isRecommended}
-          onClick={() =>
-            handleCommunitySelection({
-              type: ethereumOption.type,
-              chainBase: ethereumOption.chainBase,
-            })
-          }
-        />
-        <CWCommunitySelector
           key={skaleOption.type}
           img={skaleOption.img}
           title={skaleOption.title}
@@ -165,6 +137,20 @@ const CommunityTypeStep = ({
             handleCommunitySelection({
               type: skaleOption.type,
               chainBase: skaleOption.chainBase,
+            })
+          }
+        />
+
+        <CWCommunitySelector
+          key={soneiumOption.type}
+          img={soneiumOption.img}
+          title={soneiumOption.title}
+          description={soneiumOption.description}
+          isRecommended={soneiumOption.isRecommended}
+          onClick={() =>
+            handleCommunitySelection({
+              type: soneiumOption.type,
+              chainBase: soneiumOption.chainBase,
             })
           }
         />

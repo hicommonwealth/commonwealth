@@ -1,3 +1,4 @@
+import { config } from '@hicommonwealth/core';
 import {
   BalanceType,
   ChainBase,
@@ -31,8 +32,7 @@ export const seedDb = async () => {
           isAdmin: true,
           is_welcome_onboard_flow_complete: true,
           disableRichText: false,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          emailNotificationInterval: 'never' as any,
+          emailNotificationInterval: 'never' as const,
           profile: {},
           tier: UserTierMap.NewlyVerifiedWallet,
         }),
@@ -310,6 +310,9 @@ export const seedDb = async () => {
         has_homepage: 'false' as any,
         collapsed_on_homepage: false,
         directory_page_enabled: false,
+        namespace_verified: false,
+        environment: config.APP_ENV,
+        ai_features_enabled: true,
       })),
     );
 
@@ -419,7 +422,6 @@ export const seedDb = async () => {
         verification_token_expires: undefined,
         verified: new Date(),
         role: 'admin' as Role,
-        is_user_default: false,
         ghost_address: false,
         is_banned: false,
       })),

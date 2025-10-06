@@ -1,6 +1,7 @@
-import { models, ThreadAttributes } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 
+import { models } from '@hicommonwealth/model/db';
+import { ThreadAttributes } from '@hicommonwealth/model/models';
 import { parseArgs } from 'node:util';
 import { z } from 'zod';
 

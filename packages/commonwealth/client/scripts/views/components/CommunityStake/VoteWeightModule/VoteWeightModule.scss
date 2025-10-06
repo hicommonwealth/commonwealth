@@ -1,25 +1,34 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
 
 .VoteWeightModule {
-  padding: 16px 24px;
-  border-bottom: 1px solid $neutral-200;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+
+  .header {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    .Text {
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .pad-8 {
+    padding: 0px 8px;
+  }
 
   .content {
     display: flex;
     flex-direction: column;
     gap: 8px;
-
-    .title-container {
-      display: flex;
-      justify-content: space-between;
-
-      .Text {
-        color: $neutral-400;
-      }
-    }
+    padding: 0px 8px;
 
     .vote-weight {
-      color: $neutral-800;
+      color: colors.$neutral-800;
     }
 
     .info-and-actions {
@@ -29,13 +38,13 @@
 
       .info {
         .stake-num {
-          color: $neutral-800;
+          color: colors.$neutral-800;
         }
 
         .stake-value {
           display: flex;
           align-items: center;
-          color: $neutral-400;
+          color: colors.$neutral-400;
         }
 
         .denominationIcon {

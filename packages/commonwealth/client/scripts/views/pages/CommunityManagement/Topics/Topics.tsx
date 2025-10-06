@@ -1,5 +1,5 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import app from 'state';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
@@ -12,11 +12,16 @@ import TopicDetails from './TopicDetails';
 import WVConsent from './WVConsent';
 import WVERC20Details from './WVERC20Details';
 import WVMethodSelection from './WVMethodSelection';
+import WVSPLDetails from './WVSPLDetails';
+import WVSuiNFTDetails from './WVSuiNFTDetails';
+import WVSuiNativeDetails from './WVSuiNativeDetails';
+import WVSuiTokenDetails from './WVSuiTokenDetails';
 import { CreateTopicStep, getCreateTopicSteps } from './utils';
 
 import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { useGroupTopicUpdater } from 'state/api/groups/useGroupTopicUpdater';
 import { useCreateTopicMutation } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 
@@ -30,9 +35,33 @@ interface TopicFormRegular {
   featuredInSidebar?: boolean;
   featuredInNewPost?: boolean;
   newPostTemplate?: string;
+  allowTokenizedThreads?: boolean;
 }
 
 export interface TopicFormERC20 {
+  tokenAddress?: string;
+  tokenSymbol?: string;
+  tokenDecimals?: number;
+  voteWeightMultiplier?: number;
+  chainNodeId?: number;
+  weightedVoting?: TopicWeightedVoting | null;
+}
+
+export interface TopicFormSPL {
+  tokenAddress?: string;
+  tokenSymbol?: string;
+  tokenDecimals?: number;
+  voteWeightMultiplier?: number;
+  weightedVoting?: TopicWeightedVoting | null;
+}
+
+export interface TopicFormSuiNative {
+  voteWeightMultiplier?: number;
+  chainNodeId?: number;
+  weightedVoting?: TopicWeightedVoting | null;
+}
+
+export interface TopicFormSuiToken {
   tokenAddress?: string;
   tokenSymbol?: string;
   tokenDecimals?: number;
@@ -47,16 +76,25 @@ export interface TopicFormStake {
 
 export type HandleCreateTopicProps = {
   erc20?: TopicFormERC20;
+  spl?: TopicFormSPL;
+  suiNative?: TopicFormSuiNative;
+  suiToken?: TopicFormSuiToken;
   stake?: TopicFormStake;
 };
 
-export interface TopicForm extends TopicFormRegular, TopicFormERC20 {}
+export interface TopicForm
+  extends TopicFormRegular,
+    TopicFormERC20,
+    TopicFormSPL,
+    TopicFormSuiNative,
+    TopicFormSuiToken {}
 
 export const Topics = () => {
   const [topicFormData, setTopicFormData] = useState<TopicForm | null>(null);
   const [createTopicStep, setCreateTopicStep] = useState(
     CreateTopicStep.TopicDetails,
   );
+  const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
 
   const navigate = useCommonNavigate();
   const { mutateAsync: createTopic } = useCreateTopicMutation();
@@ -78,6 +116,12 @@ export const Topics = () => {
     setTopicFormData((prevState) => ({ ...prevState, ...data }));
   };
 
+  const handleGroupsSelected = useCallback((groups: number[]) => {
+    setSelectedGroups(groups);
+  }, []);
+
+  const updateGroupTopicsBulk = useGroupTopicUpdater();
+
   if (
     !user.isLoggedIn ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
@@ -87,6 +131,9 @@ export const Topics = () => {
 
   const handleCreateTopic = async ({
     erc20,
+    spl,
+    suiNative,
+    suiToken,
     stake,
   }: HandleCreateTopicProps) => {
     if (!topicFormData) {
@@ -94,13 +141,17 @@ export const Topics = () => {
     }
 
     try {
-      await createTopic({
+      const result = await createTopic({
         name: topicFormData.name,
         description: topicFormData.description,
         featured_in_sidebar: topicFormData.featuredInSidebar || false,
         featured_in_new_post: topicFormData.featuredInNewPost || false,
         default_offchain_template: topicFormData.newPostTemplate || '',
         community_id: app.activeChainId() || '',
+        allow_tokenized_threads:
+          topicFormData.allowTokenizedThreads !== undefined
+            ? topicFormData.allowTokenizedThreads
+            : community?.allow_tokenized_threads || false,
         ...(erc20
           ? {
               token_address: erc20.tokenAddress,
@@ -111,12 +162,48 @@ export const Topics = () => {
               weighted_voting: erc20.weightedVoting,
             }
           : {}),
+        ...(spl
+          ? {
+              token_address: spl.tokenAddress,
+              token_symbol: spl.tokenSymbol,
+              token_decimals: spl.tokenDecimals,
+              vote_weight_multiplier: spl.voteWeightMultiplier,
+              weighted_voting: spl.weightedVoting,
+            }
+          : {}),
+        ...(suiNative
+          ? {
+              vote_weight_multiplier: suiNative.voteWeightMultiplier,
+              chain_node_id: suiNative.chainNodeId,
+              weighted_voting: suiNative.weightedVoting,
+            }
+          : {}),
+        ...(suiToken
+          ? {
+              token_address: suiToken.tokenAddress,
+              token_symbol: suiToken.tokenSymbol,
+              token_decimals: suiToken.tokenDecimals,
+              vote_weight_multiplier: suiToken.voteWeightMultiplier,
+              chain_node_id: suiToken.chainNodeId,
+              weighted_voting: suiToken.weightedVoting,
+            }
+          : {}),
         ...(stake
           ? {
               weighted_voting: stake.weightedVoting,
             }
           : {}),
       });
+
+      const newTopicId = result.topic?.id;
+
+      for (const groupId of selectedGroups) {
+        await updateGroupTopicsBulk({
+          groupIds: [groupId],
+          topicId: newTopicId as number,
+          name: topicFormData.name,
+        });
+      }
 
       navigate(`/discussions/${encodeURI(topicFormData.name.trim())}`);
     } catch (err) {
@@ -136,6 +223,7 @@ export const Topics = () => {
           <TopicDetails
             onStepChange={setCreateTopicStep}
             onSetTopicFormData={handleSetTopicFormData}
+            onGroupsSelected={handleGroupsSelected}
             topicFormData={topicFormData}
           />
         );
@@ -147,12 +235,7 @@ export const Topics = () => {
           />
         );
       case CreateTopicStep.WVMethodSelection:
-        return (
-          <WVMethodSelection
-            onStepChange={setCreateTopicStep}
-            hasNamespace={!!community?.namespace}
-          />
-        );
+        return <WVMethodSelection onStepChange={setCreateTopicStep} />;
       case CreateTopicStep.WVNamespaceEnablement:
         return (
           <CommunityOnchainTransactions
@@ -174,6 +257,34 @@ export const Topics = () => {
       case CreateTopicStep.WVERC20Details:
         return (
           <WVERC20Details
+            onStepChange={setCreateTopicStep}
+            onCreateTopic={handleCreateTopic}
+          />
+        );
+      case CreateTopicStep.WVSPLDetails:
+        return (
+          <WVSPLDetails
+            onStepChange={setCreateTopicStep}
+            onCreateTopic={handleCreateTopic}
+          />
+        );
+      case CreateTopicStep.WVSuiNativeDetails:
+        return (
+          <WVSuiNativeDetails
+            onStepChange={setCreateTopicStep}
+            onCreateTopic={handleCreateTopic}
+          />
+        );
+      case CreateTopicStep.WVSuiTokenDetails:
+        return (
+          <WVSuiTokenDetails
+            onStepChange={setCreateTopicStep}
+            onCreateTopic={handleCreateTopic}
+          />
+        );
+      case CreateTopicStep.WVSuiNFTDetails:
+        return (
+          <WVSuiNFTDetails
             onStepChange={setCreateTopicStep}
             onCreateTopic={handleCreateTopic}
           />

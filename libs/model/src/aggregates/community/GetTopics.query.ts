@@ -80,7 +80,6 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
                                      t.default_offchain_template,
                                      t."order",
                                      t.channel_id,
-                                     t.group_ids,
                                      t.weighted_voting,
                                      t.token_symbol,
                                      t.vote_weight_multiplier,
@@ -93,6 +92,8 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
                                      t.updated_at::text           AS updated_at,
                                      t.deleted_at::text           AS deleted_at,
                                      t.archived_at::text          AS archived_at,
+                                     t.recalculated_votes_start::text AS recalculated_votes_start,
+                                     t.recalculated_votes_finish::text AS recalculated_votes_finish,
                                      (SELECT count(*)::int
                                       FROM "Threads"
                                       WHERE community_id = :community_id

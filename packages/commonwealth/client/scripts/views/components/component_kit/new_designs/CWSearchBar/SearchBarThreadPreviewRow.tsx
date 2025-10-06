@@ -2,18 +2,18 @@ import moment from 'moment';
 import React, { FC } from 'react';
 
 import { useCommonNavigate } from '../../../../../navigation/helpers';
-import { ThreadResult } from '../../../../pages/search/helpers';
 import { renderTruncatedHighlights } from '../../../react_quill_editor/highlighter';
 import { User } from '../../../user/user';
 import { CWText } from '../../cw_text';
 
 import { getDecodedString } from '@hicommonwealth/shared';
+import { ThreadView } from 'client/scripts/models/Thread';
 // eslint-disable-next-line max-len
 import { MarkdownHitHighlighterWithFallback } from 'views/components/MarkdownHitHighlighterWithFallback/MarkdownHitHighlighterWithFallback';
 import './SearchBarThreadPreviewRow.scss';
 
 interface SearchBarThreadPreviewRowProps {
-  searchResult: ThreadResult;
+  searchResult: ThreadView;
   searchTerm?: string;
   onSearchItemClick?: () => void;
 }
@@ -39,9 +39,9 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
       <div className="header-row">
         <User
           userCommunityId={searchResult?.community_id}
-          userAddress={searchResult?.address}
+          userAddress={searchResult?.Address?.address || ''}
           shouldShowAsDeleted={
-            !searchResult?.community_id && !searchResult?.address
+            !searchResult?.community_id && !searchResult?.Address?.address
           }
         />
         <CWText className="last-updated-text">•</CWText>

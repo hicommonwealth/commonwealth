@@ -1,7 +1,8 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { GatedActionEnum } from '@hicommonwealth/shared';
 import { models } from '../../database';
-import { authComment, tiered } from '../../middleware';
+import { authComment, mustExist, tiered } from '../../middleware';
 import { verifyReactionSignature } from '../../middleware/canvas';
 import { mustBeAuthorizedComment } from '../../middleware/guards';
 import { getVotingWeight } from '../../services/stakeHelper';
@@ -13,7 +14,7 @@ export function CreateCommentReaction(): Command<
     ...schemas.CreateCommentReaction,
     auth: [
       authComment({
-        action: schemas.PermissionEnum.CREATE_COMMENT_REACTION,
+        action: GatedActionEnum.CREATE_COMMENT_REACTION,
       }),
       verifyReactionSignature,
       tiered({ upvotes: true }),
@@ -26,6 +27,12 @@ export function CreateCommentReaction(): Command<
         thread.topic_id!,
         address.address,
       );
+
+      const user = await models.User.findOne({
+        where: { id: actor.user.id },
+        attributes: ['tier'],
+      });
+      mustExist('User', user);
 
       // == mutation transaction boundary ==
       const new_reaction_id = await models.sequelize.transaction(
@@ -43,6 +50,7 @@ export function CreateCommentReaction(): Command<
               calculated_voting_weight: calculated_voting_weight?.toString(),
               canvas_msg_id: payload.canvas_msg_id,
               canvas_signed_data: payload.canvas_signed_data,
+              user_tier_at_creation: user.tier,
             },
             transaction,
           });

@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
 
 .PreferencesStep {
   display: flex;
@@ -14,11 +16,11 @@
     align-items: center;
 
     .h4 {
-      color: $neutral-600;
+      color: colors.$neutral-600;
     }
 
     .h5 {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 
@@ -31,13 +33,13 @@
     gap: 10px;
 
     .primary {
-      background-color: $primary-600 !important;
+      background-color: colors.$primary-600 !important;
     }
-    @include extraSmall {
+    @include media_queries.extraSmall {
       bottom: 80px;
       gap: 16px;
     }
-    @include heightSmallInclusive {
+    @include media_queries.heightSmallInclusive {
       bottom: 4px;
     }
   }

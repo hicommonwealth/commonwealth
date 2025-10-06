@@ -1,7 +1,7 @@
 import { AppError, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
-import { commonProtocol } from '../../services';
+import { aaWallet } from '../../services/commonProtocol';
 
 export function SendTransaction(): Command<typeof schemas.SendTransaction> {
   return {
@@ -19,7 +19,7 @@ export function SendTransaction(): Command<typeof schemas.SendTransaction> {
         throw new AppError('User wallet not found');
       }
 
-      const userOpHash = await commonProtocol.aaWallet.sendUserOp(
+      const userOpHash = await aaWallet.sendUserOp(
         existingWallet.wallet_address,
         payload.to,
         payload.value,

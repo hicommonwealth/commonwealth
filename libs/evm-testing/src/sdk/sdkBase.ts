@@ -9,7 +9,7 @@ export abstract class SdkBase {
     this.web3 = getProvider();
   }
 
-  protected async getAccounts() {
+  public async getAccounts() {
     if (!this.accounts) {
       this.accounts = await this.web3.eth.getAccounts();
     }

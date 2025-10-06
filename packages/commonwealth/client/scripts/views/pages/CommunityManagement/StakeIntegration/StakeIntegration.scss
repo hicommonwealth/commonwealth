@@ -1,4 +1,5 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/media_queries';
 
 .StakeIntegration {
   display: flex;
@@ -15,7 +16,7 @@
     align-items: baseline;
     gap: 8px;
 
-    @include extraSmall {
+    @include media_queries.extraSmall {
       justify-content: flex-end;
     }
   }

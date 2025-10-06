@@ -1,4 +1,4 @@
-import { type Command } from '@hicommonwealth/core';
+import { type Command, stats } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authComment } from '../../middleware';
@@ -9,7 +9,7 @@ export function DeleteComment(): Command<typeof schemas.DeleteComment> {
     ...schemas.DeleteComment,
     auth: [authComment({ author: true, roles: ['admin', 'moderator'] })],
     body: async ({ actor, context }) => {
-      const { comment } = mustBeAuthorizedComment(actor, context);
+      const { comment, community_id } = mustBeAuthorizedComment(actor, context);
 
       // == mutation transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {
@@ -36,6 +36,7 @@ export function DeleteComment(): Command<typeof schemas.DeleteComment> {
         //   }
         // }
 
+        // Update the comment to mark it as deleted
         await models.sequelize.query(
           `
           UPDATE "Comments"
@@ -45,10 +46,35 @@ export function DeleteComment(): Command<typeof schemas.DeleteComment> {
         `,
           { replacements: { commentId: comment.id }, transaction },
         );
+
+        // Decrement the thread's net comment count since we're using paranoid deletion
+        // and the afterDestroy hook won't be triggered. Keep comment_count unchanged
+        // as it's used for frontend pagination of the comment tree.
+        await models.Thread.update(
+          {
+            net_comment_count: models.sequelize.literal(
+              'net_comment_count - 1',
+            ),
+          },
+          {
+            where: { id: comment.thread_id },
+            transaction,
+          },
+        );
+
+        // Track stats for comment count decrement (consistent with afterDestroy hook)
+        stats().decrement('cw.hook.comment-count', {
+          thread_id: String(comment.thread_id),
+        });
       });
 
       return {
         comment_id: comment.id!,
+        thread_id: comment.thread_id,
+        community_id,
+        body: comment.body,
+        marked_as_spam_at: comment.marked_as_spam_at,
+        user_tier_at_creation: comment.user_tier_at_creation,
         canvas_signed_data: comment.canvas_signed_data,
         canvas_msg_id: comment.canvas_msg_id,
       };

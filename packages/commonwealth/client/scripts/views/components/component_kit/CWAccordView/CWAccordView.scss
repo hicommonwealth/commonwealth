@@ -1,7 +1,9 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
+
 .AccordView {
   width: 100%;
-  border: 2px solid $neutral-200;
+  border: 2px solid colors.$neutral-200;
   border-radius: 6px;
   .accord-header {
     display: flex;
@@ -16,7 +18,7 @@
   .accord-title {
     font-size: 14px;
     font-weight: 500;
-    color: $neutral-800;
+    color: colors.$neutral-800;
     font-family: 'NeueHaasUnica';
   }
 }
@@ -25,5 +27,5 @@
   padding: 16px;
   font-size: 14px;
   border-radius: 6px;
-  border: 2px solid $neutral-200;
+  border: 2px solid colors.$neutral-200;
 }

@@ -1,3 +1,4 @@
+import { UserTierMap } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment';
 import React from 'react';
@@ -6,9 +7,11 @@ import {
   useDeleteApiKeyMutation,
   useGetApiKeyQuery,
 } from 'state/api/user';
+import useUserStore from 'state/ui/user';
 import { saveToClipboard } from 'utils/clipboard';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { openConfirmation } from '../../../modals/confirmation_modal';
 import CWIconButton from '../../component_kit/new_designs/CWIconButton';
 import ProfileSection from '../Section';
@@ -18,6 +21,7 @@ const ManageApiKey = () => {
   const { mutateAsync: createApiKey } = useCreateApiKeyMutation();
   const { mutateAsync: deleteApiKey } = useDeleteApiKeyMutation();
   const useGetApiKey = useGetApiKeyQuery();
+  const { tier } = useUserStore();
 
   const handleCreateAPIKey = () => {
     createApiKey({})
@@ -59,7 +63,9 @@ const ManageApiKey = () => {
       })
       .catch((err) => {
         console.error(err);
-        notifyError('Failed to create an API key');
+        const errorMessage =
+          err?.message || err?.error?.message || 'Failed to create an API key';
+        notifyError(errorMessage);
       });
   };
 
@@ -79,7 +85,11 @@ const ManageApiKey = () => {
               })
               .catch((err) => {
                 console.error(err);
-                notifyError('Failed to delete API key');
+                const errorMessage =
+                  err?.message ||
+                  err?.error?.message ||
+                  'Failed to delete API key';
+                notifyError(errorMessage);
               });
           },
         },
@@ -105,14 +115,45 @@ const ManageApiKey = () => {
 
   const createKeyUI = (
     <section className="flex-row">
-      <CWText type="h5">You don&apos;t have any active API key</CWText>
-      <CWButton
-        label="Create an API Key"
-        type="button"
-        buttonType="primary"
-        buttonWidth="narrow"
-        onClick={handleCreateAPIKey}
-      />
+      <div className="api-key-text">
+        <CWText type="h5">You don&apos;t have any active API key</CWText>
+        {tier < UserTierMap.SocialVerified && (
+          <CWText type="caption" className="tier-message">
+            You need to be Tier 4 (Social Verified) or higher to create an API
+            key
+          </CWText>
+        )}
+      </div>
+      {tier < UserTierMap.SocialVerified ? (
+        <CWTooltip
+          content="You need to be Tier 4 (Social Verified) or higher to create an API key"
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <div
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            >
+              <CWButton
+                label="Create an API Key"
+                type="button"
+                buttonType="primary"
+                buttonWidth="narrow"
+                onClick={handleCreateAPIKey}
+                disabled={true}
+              />
+            </div>
+          )}
+        />
+      ) : (
+        <CWButton
+          label="Create an API Key"
+          type="button"
+          buttonType="primary"
+          buttonWidth="narrow"
+          onClick={handleCreateAPIKey}
+          disabled={false}
+        />
+      )}
     </section>
   );
 

@@ -30,12 +30,12 @@ const columns = [
     numeric: false,
     sortable: true,
   },
-  // {
-  //   key: 'aura',
-  //   header: 'Aura',
-  //   numeric: true,
-  //   sortable: true,
-  // },
+  {
+    key: 'aura',
+    header: 'Aura',
+    numeric: true,
+    sortable: true,
+  },
   {
     key: 'referrals',
     header: 'Referrals',

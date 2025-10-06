@@ -1,4 +1,5 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
 
 .token-details {
   padding: 16px;
@@ -35,6 +36,12 @@
 
 .token-description {
   margin-top: 12px;
+
+  .Text:last-child {
+    display: inline-block;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
 }
 
 .token-stats {
@@ -51,7 +58,7 @@
 .stat-item {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .price-change.positive {
@@ -71,7 +78,7 @@
     font-size: 18px;
     margin-left: 6px;
     margin-right: 6px;
-    color: $neutral-500;
+    color: colors.$neutral-500;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -1,4 +1,5 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
 
 .AddressCreate {
   width: 256px;
@@ -10,10 +11,10 @@
   padding: 8px;
   border-radius: 6px;
   justify-content: center;
-  border: 1px solid $neutral-200;
-  background-color: $white;
+  border: 1px solid colors.$neutral-200;
+  background-color: colors.$white;
   cursor: pointer;
-  background-color: $neutral-100;
+  background-color: colors.$neutral-100;
 
   font-size: 14px;
   font-weight: 700;
@@ -22,11 +23,11 @@
   height: 26px;
 
   &:hover {
-    background-color: $neutral-50;
+    background-color: colors.$neutral-50;
   }
 
   &.isOpen {
-    background-color: $neutral-100;
+    background-color: colors.$neutral-100;
   }
 
   &:focus {
@@ -34,6 +35,6 @@
   }
 
   .caret-icon {
-    fill: $neutral-500;
+    fill: colors.$neutral-500;
   }
 }

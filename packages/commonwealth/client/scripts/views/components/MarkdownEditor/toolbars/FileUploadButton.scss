@@ -1,4 +1,5 @@
-@import '../../../../styles/shared';
+@use '../../../../styles/shared';
+@use '../../../../styles/mixins/colors.module';
 
 .FileUploadButton {
   display: flex;
@@ -20,7 +21,7 @@
   .FilePickerButton {
     cursor: pointer;
     border: none;
-    color: $neutral-500;
+    color: colors.$neutral-500;
     padding: 0;
   }
 

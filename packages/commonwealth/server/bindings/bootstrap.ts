@@ -1,47 +1,27 @@
-import {
-  RabbitMQAdapter,
-  buildRetryStrategy,
-  createRmqConfig,
-} from '@hicommonwealth/adapters';
+import { RabbitMQAdapter, createRmqConfig } from '@hicommonwealth/adapters';
 import {
   Broker,
+  ConsumerHooks,
+  EventSchemas,
+  EventsHandlerMetadata,
+  RetryStrategyFn,
   broker,
   handleEvent,
   logger,
   stats,
 } from '@hicommonwealth/core';
-import {
-  ChainEventPolicy,
-  CommunityGoalsPolicy,
-  Contest,
-  ContestWorker,
-  CreateUnverifiedUser,
-  DiscordBotPolicy,
-  FarcasterWorker,
-  LaunchpadPolicy,
-  TwitterEngagementPolicy,
-  User,
-  models,
-} from '@hicommonwealth/model';
-import { Client } from 'pg';
+import { ContestWorker } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model/db';
 import { config } from 'server/config';
-import { setupListener } from './pgListener';
 import { rascalConsumerMap } from './rascalConsumerMap';
-import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
+import { relayForever } from './relayForever';
 
 const log = logger(import.meta);
 
-function checkSubscriptionResponse(subRes: boolean, topic: string) {
-  if (!subRes) {
-    log.fatal(`Failed to subscribe to ${topic}. Requires restart!`, undefined, {
-      topic,
-    });
-  }
-}
-
-export async function bootstrapBindings(
-  skipRmqAdapter?: boolean,
-): Promise<void> {
+export async function bootstrapBindings(options?: {
+  skipRmqAdapter?: boolean;
+  worker?: string;
+}): Promise<void> {
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
@@ -51,11 +31,19 @@ export async function bootstrapBindings(
       }),
     );
     await rmqAdapter.init();
-    if (!skipRmqAdapter) {
-      broker({
-        adapter: rmqAdapter,
-      });
+    if (!options?.skipRmqAdapter) {
+      broker({ adapter: rmqAdapter });
     }
+
+    await rmqAdapter.subscribeDlqHandler(
+      async ({ consumer, event_id, ...dlq }) => {
+        await models.Dlq.findOrCreate({
+          where: { consumer, event_id },
+          defaults: { consumer, event_id, ...dlq },
+        });
+      },
+    );
+
     brokerInstance = rmqAdapter;
   } catch (e) {
     log.error(
@@ -64,73 +52,42 @@ export async function bootstrapBindings(
     throw e;
   }
 
-  const chainEventSubRes = await brokerInstance.subscribe(ChainEventPolicy);
-  checkSubscriptionResponse(chainEventSubRes, ChainEventPolicy.name);
+  for (const item of rascalConsumerMap) {
+    let consumer: () => EventsHandlerMetadata<EventSchemas>;
+    let worker: string | undefined;
+    let retryStrategy: RetryStrategyFn | undefined;
+    let hooks: ConsumerHooks | undefined;
 
-  const contestWorkerSubRes = await brokerInstance.subscribe(
-    ContestWorker,
-    buildRetryStrategy(undefined, 20_000),
-    {
-      beforeHandleEvent: (topic, event, context) => {
-        context.start = Date.now();
-      },
-      afterHandleEvent: (topic, event, context) => {
-        const duration = Date.now() - context.start;
-        const handler = `${topic}.${event.name}`;
-        stats().histogram(`cw.handlerExecutionTime`, duration, { handler });
-      },
-    },
-  );
-  checkSubscriptionResponse(contestWorkerSubRes, ContestWorker.name);
+    if (typeof item === 'function') consumer = item;
+    else {
+      consumer = item.consumer;
+      worker = item.worker;
+      retryStrategy = item.retryStrategy;
+      hooks = item.hooks;
+    }
 
-  const contestProjectionsSubRes = await brokerInstance.subscribe(
-    Contest.Contests,
-  );
-  checkSubscriptionResponse(contestProjectionsSubRes, Contest.Contests.name);
-
-  const xpProjectionSubRes = await brokerInstance.subscribe(User.Xp);
-  checkSubscriptionResponse(xpProjectionSubRes, User.Xp.name);
-
-  const farcasterWorkerSubRes = await brokerInstance.subscribe(
-    FarcasterWorker,
-    buildRetryStrategy(undefined, 20_000),
-  );
-  checkSubscriptionResponse(farcasterWorkerSubRes, FarcasterWorker.name);
-
-  const discordBotSubRes = await brokerInstance.subscribe(DiscordBotPolicy);
-  checkSubscriptionResponse(discordBotSubRes, DiscordBotPolicy.name);
-
-  const launchpadSubRes = await brokerInstance.subscribe(LaunchpadPolicy);
-  checkSubscriptionResponse(launchpadSubRes, LaunchpadPolicy.name);
-
-  const createUnverifiedUserSubRes =
-    await brokerInstance.subscribe(CreateUnverifiedUser);
-  checkSubscriptionResponse(
-    createUnverifiedUserSubRes,
-    CreateUnverifiedUser.name,
-  );
-
-  const twitterEngSubRes = await brokerInstance.subscribe(
-    TwitterEngagementPolicy,
-  );
-  checkSubscriptionResponse(twitterEngSubRes, TwitterEngagementPolicy.name);
-  const createCommunityGoalsSubRes =
-    await brokerInstance.subscribe(CommunityGoalsPolicy);
-  checkSubscriptionResponse(
-    createCommunityGoalsSubRes,
-    CommunityGoalsPolicy.name,
-  );
+    // match worker name (options.worker defined in rascalConsumerMap)
+    if ((options?.worker || '') !== (worker || '')) continue;
+    // policies run on the Commonwealth consumer by default
+    await brokerInstance.subscribe(consumer, retryStrategy, hooks);
+  }
 }
 
 export async function bootstrapRelayer(
   maxRelayIterations?: number,
-): Promise<Client> {
-  const count = await models.Outbox.count({
-    where: { relayed: false },
-  });
-  incrementNumUnrelayedEvents(count);
-
-  const pgClient = await setupListener();
+): Promise<void> {
+  setInterval(() => {
+    // Report Outbox stats once per minute
+    models.Outbox.count({
+      where: { relayed: false },
+    })
+      .then((count) => {
+        stats().gauge('messageRelayerNumUnrelayedEvents', count);
+      })
+      .catch((err) => {
+        log.error('Failed to update Outbox stats', err);
+      });
+  }, 60_000);
 
   relayForever(maxRelayIterations).catch((err) => {
     log.fatal(
@@ -138,8 +95,6 @@ export async function bootstrapRelayer(
       err,
     );
   });
-
-  return pgClient;
 }
 
 export function bootstrapContestRolloverLoop() {
@@ -148,6 +103,7 @@ export function bootstrapContestRolloverLoop() {
   const loop = async () => {
     try {
       await handleEvent(ContestWorker(), {
+        id: 0,
         name: 'ContestRolloverTimerTicked',
         payload: {},
       });

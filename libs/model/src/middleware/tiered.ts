@@ -6,36 +6,40 @@ import {
 } from '@hicommonwealth/core';
 import {
   hasTierRateLimits,
+  TierRateLimitErrors,
   USER_TIERS,
   UserTierMap,
 } from '@hicommonwealth/shared';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { Op } from 'sequelize';
-import { ZodSchema } from 'zod';
+import { ZodType } from 'zod';
+import { config } from '../config';
 import { models } from '../database';
+import { setUserTier } from '../utils/tiers';
 
-function builtKey(user_id: number, counter: 'creates' | 'upvotes') {
+type Counters = 'creates' | 'upvotes' | 'ai-images' | 'ai-text';
+
+function builtKey(user_id: number, counter: Counters) {
   return `${user_id}-${counter}-${new Date().toISOString().substring(0, 13)}`;
 }
 
-async function getUserCount(user_id: number, counter: 'creates' | 'upvotes') {
+async function getUserCount(user_id: number, counter: Counters) {
   const cacheKey = builtKey(user_id, counter);
   const count = await cache().getKey(CacheNamespaces.Tiered_Counter, cacheKey);
   return +(count ?? '0');
 }
 
-export async function incrementUserCount(
-  user_id: number,
-  counter: 'creates' | 'upvotes',
-) {
-  const cacheKey = builtKey(user_id, counter);
-  const value = await cache().incrementKey(
-    CacheNamespaces.Tiered_Counter,
-    cacheKey,
-    1,
-    60,
-  );
-  return value;
+export async function incrementUserCount(user_id: number, counter: Counters) {
+  if (!config.DISABLE_TIER_RATE_LIMITS) {
+    const cacheKey = builtKey(user_id, counter);
+    const value = await cache().incrementKey(
+      CacheNamespaces.Tiered_Counter,
+      cacheKey,
+      1,
+      60 * 60,
+    );
+    return value;
+  }
 }
 
 export function tiered({
@@ -49,7 +53,7 @@ export function tiered({
   ai?: { images?: boolean; text?: boolean };
   minTier?: UserTierMap;
 }) {
-  return async function ({ actor }: Context<ZodSchema, ZodSchema>) {
+  return async function ({ actor }: Context<ZodType, ZodType>) {
     if (!actor.user.id) throw new InvalidActor(actor, 'Must be a user');
 
     const user = await models.User.findOne({
@@ -64,12 +68,14 @@ export function tiered({
       ],
     });
     if (!user?.id) throw new InvalidActor(actor, 'Unverified user');
+    if (user.tier === UserTierMap.BannedUser)
+      throw new InvalidActor(actor, 'Banned user');
 
     // upgrade tier after a week
     let tier = user.tier;
     if (
       tier === UserTierMap.NewlyVerifiedWallet &&
-      moment().diff(moment(user.created_at), 'weeks') >= 1
+      dayjs().diff(dayjs(user.created_at), 'weeks') >= 1
     )
       tier = UserTierMap.VerifiedWallet;
 
@@ -77,7 +83,13 @@ export function tiered({
     if (tier === UserTierMap.IncompleteUser)
       tier = UserTierMap.NewlyVerifiedWallet;
     if (tier > user.tier)
-      await models.User.update({ tier }, { where: { id: user.id } });
+      await models.sequelize.transaction(async (transaction) => {
+        await setUserTier({
+          userId: user.id!,
+          newTier: tier,
+          transaction,
+        });
+      });
 
     if (tier < minTier)
       throw new InvalidActor(
@@ -91,23 +103,26 @@ export function tiered({
 
     if (creates) {
       const last_creates = await getUserCount(user.id, 'creates');
-      if (last_creates >= tierLimitsPerHour.create)
-        throw new InvalidActor(actor, 'Exceeded content creation limit');
+      if (
+        !config.IGNORE_CONTENT_CREATION_LIMIT &&
+        last_creates >= tierLimitsPerHour.create
+      )
+        throw new InvalidActor(actor, TierRateLimitErrors.CREATES);
     }
     if (upvotes) {
       const last_upvotes = await getUserCount(user.id, 'upvotes');
       if (last_upvotes >= tierLimitsPerHour.upvote)
-        throw new InvalidActor(actor, 'Exceeded upvote limit');
+        throw new InvalidActor(actor, TierRateLimitErrors.UPVOTES);
     }
     if (ai.images) {
-      // TODO: add tiered to ai image creation
-      // load amount of ai images created in the last hour
-      // compare with tier limits, throwing error if exceeded
+      const last_ai_images = await getUserCount(user.id, 'ai-images');
+      if (last_ai_images >= tierLimitsPerHour.ai.images)
+        throw new InvalidActor(actor, TierRateLimitErrors.AI_IMAGES);
     }
     if (ai.text) {
-      // TODO: add tiered to ai text creation
-      // load amount of ai text generated in the last hour
-      // compare with tier limits, throwing error if exceeded
+      const last_ai_text = await getUserCount(user.id, 'ai-text');
+      if (last_ai_text >= tierLimitsPerHour.ai.text)
+        throw new InvalidActor(actor, TierRateLimitErrors.AI_TEXT);
     }
   };
 }

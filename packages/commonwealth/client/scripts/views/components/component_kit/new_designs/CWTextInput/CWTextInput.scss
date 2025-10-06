@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/inputs';
 
 @mixin iconPositionStyles {
   position: absolute;
@@ -26,11 +28,11 @@
     }
 
     input {
-      @include inputStyles;
+      @include inputs.inputStyles;
       width: 100%;
 
       &.darkMode {
-        @include darkModeInputStyles;
+        @include inputs.darkModeInputStyles;
       }
 
       &.small {
@@ -51,16 +53,16 @@
       }
 
       &.hasLeftIcon {
-        padding-left: 32px;
+        padding-left: 40px !important;
       }
 
       &.hasRightIcon {
-        padding-right: 32px;
+        padding-right: 32px !important;
       }
     }
 
     .text-input-icon > svg {
-      fill: $neutral-400;
+      fill: colors.$neutral-400;
     }
 
     .text-input-left-icon > svg {
@@ -88,14 +90,14 @@
       align-items: center;
       font-size: 14px;
       padding-inline: 12px;
-      background-color: $neutral-50;
+      background-color: colors.$neutral-50;
       height: calc(100% - 2px);
       border-top-right-radius: 6px;
       border-bottom-right-radius: 6px;
-      color: $neutral-400;
+      color: colors.$neutral-400;
       position: absolute;
       right: 1px;
-      border-left: 1px solid $neutral-200;
+      border-left: 1px solid colors.$neutral-200;
     }
   }
 }

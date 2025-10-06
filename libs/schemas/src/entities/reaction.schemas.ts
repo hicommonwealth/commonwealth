@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { PG_INT } from '../utils';
-import { Address } from './user.schemas';
+import { Address, USER_TIER } from './user.schemas';
 
 export const Reaction = z.object({
   id: PG_INT.optional(),
@@ -14,6 +14,7 @@ export const Reaction = z.object({
   canvas_msg_id: z.string().max(255).nullish(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
+  user_tier_at_creation: USER_TIER.nullish(),
 
   // associations
   Address: Address.optional(),

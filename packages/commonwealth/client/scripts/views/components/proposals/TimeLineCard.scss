@@ -1,4 +1,7 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
+
 .TimeLineCard {
   display: flex;
   width: 248px;
@@ -10,16 +13,16 @@
     min-height: 40px;
   }
 
-  @include smallInclusive {
+  @include media_queries.smallInclusive {
     width: 100%;
     margin-bottom: 10px;
   }
   .timeline-header {
     display: flex;
     height: 40px;
-    border: 2px solid $neutral-75;
+    border: 2px solid colors.$neutral-75;
     width: 100%;
-    background: $neutral-50;
+    background: colors.$neutral-50;
     border-radius: 5px 5px 0px 0px;
     justify-content: space-between;
     align-items: center;
@@ -43,7 +46,7 @@
         position: relative;
         border-style: solid;
         border-width: 0px 0px 0px 2px;
-        border-color: $neutral-500;
+        border-color: colors.$neutral-500;
 
         &:last-child {
           border-left: 0;
@@ -66,23 +69,23 @@
             height: 28px;
             width: 28px;
             border-radius: 14px;
-            background-color: $primary-500;
+            background-color: colors.$primary-500;
           }
 
           svg {
             background: none;
             transition: all 500ms ease-in-out;
             &.active {
-              color: $white;
-              background-color: $primary-500;
+              color: colors.$white;
+              background-color: colors.$primary-500;
               height: 16px;
               width: 16px;
             }
             &.coming {
-              color: $neutral-600;
+              color: colors.$neutral-600;
             }
             &.past {
-              color: $neutral-600;
+              color: colors.$neutral-600;
             }
           }
         }
@@ -91,7 +94,7 @@
           top: -10px;
           .timestamp {
             .Text {
-              color: $neutral-500;
+              color: colors.$neutral-500;
               font-size: 14px;
               line-height: 20px;
             }
@@ -102,13 +105,13 @@
               line-height: 20px;
               font-weight: 500 !important;
               &.active {
-                color: $primary-500;
+                color: colors.$primary-500;
               }
               &.coming {
-                color: $neutral-600;
+                color: colors.$neutral-600;
               }
               &.past {
-                color: $neutral-600;
+                color: colors.$neutral-600;
               }
             }
           }

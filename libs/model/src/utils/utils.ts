@@ -1,6 +1,5 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
 import { isEvmAddress } from '@hicommonwealth/evm-protocols';
-import { EventPairs } from '@hicommonwealth/schemas';
 import {
   getThreadUrl,
   safeTruncateBody,
@@ -9,16 +8,10 @@ import {
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { createHash } from 'crypto';
 import { hasher } from 'node-object-hash';
-import {
-  Model,
-  ModelStatic,
-  QueryTypes,
-  Sequelize,
-  Transaction,
-} from 'sequelize';
+import { QueryTypes, Sequelize } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config';
-import type { OutboxAttributes } from '../models/outbox';
+
 import { parseFarcasterContentUrl } from './farcasterUtils';
 
 const log = logger(import.meta);
@@ -32,40 +25,6 @@ export function hashAbi(abi: AbiType): string {
     enc: 'hex',
   });
   return hashInstance.hash(abi);
-}
-
-/**
- * This functions takes either a new domain record or a pre-formatted event and inserts it into the Outbox. For core
- * domain events (e.g. new thread, new comment, etc.), the event_payload should be the complete domain record. The point
- * of this is that the emitter of a core domain event should never have to format the record itself. This
- * utility function centralizes event emission so that if any changes are required to the Outbox table or emission of
- * a specific event, this function can be updated without having to update the emitter code.
- */
-export async function emitEvent(
-  outbox: ModelStatic<Model<OutboxAttributes>>,
-  values: Array<EventPairs>,
-  transaction?: Transaction | null,
-) {
-  const records: Array<EventPairs> = [];
-  for (const event of values) {
-    if (!config.OUTBOX.BLACKLISTED_EVENTS.includes(event.event_name)) {
-      records.push(event);
-    } else {
-      log.warn(
-        `Event not inserted into outbox! ` +
-          `The event "${event.event_name}" is blacklisted.
-          Remove it from BLACKLISTED_EVENTS env in order to allow emitting this event.`,
-        {
-          event_name: event.event_name,
-          allowed_events: config.OUTBOX.BLACKLISTED_EVENTS,
-        },
-      );
-    }
-  }
-
-  if (records.length > 0) {
-    await outbox.bulkCreate(values, { transaction });
-  }
 }
 
 export function buildThreadContentUrl(communityId: string, threadId: number) {
@@ -155,13 +114,13 @@ export async function getThreadContestManagers(
     contest_address: string;
   }>(
     `
-        SELECT cm.contest_address, cm.cancelled, cm.ended
-        FROM "Communities" c
-                 JOIN "ContestManagers" cm ON cm.community_id = c.id
-        WHERE cm.topic_id = :topic_id
-          AND cm.community_id = :community_id
-          AND cm.cancelled IS NOT TRUE
-          AND cm.ended IS NOT TRUE
+      SELECT cm.contest_address, cm.cancelled, cm.ended
+      FROM "Communities" c
+             JOIN "ContestManagers" cm ON cm.community_id = c.id
+      WHERE cm.topic_id = :topic_id
+        AND cm.community_id = :community_id
+        AND cm.cancelled IS NOT TRUE
+        AND cm.ended IS NOT TRUE
     `,
     {
       type: QueryTypes.SELECT,
@@ -252,7 +211,10 @@ export async function uploadIfLarge(
       content: content,
       contentType: 'text/markdown',
     });
-    return { contentUrl: url, truncatedBody: safeTruncateBody(content, 500) };
+    return {
+      contentUrl: url,
+      truncatedBody: safeTruncateBody(content, CONTENT_CHAR_LIMIT),
+    };
   } else return { contentUrl: null, truncatedBody: null };
 }
 

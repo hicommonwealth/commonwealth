@@ -13,6 +13,8 @@ type ForceMobileAuthProps = {
  * expo-router this isn't possible.
  *
  * It's much easier to do this on the frontend.
+ *
+ * @deprecated We should remove this after we have fully migrated to privy.
  */
 export const ForceMobileAuth = memo(function ForceMobileAuth(
   props: ForceMobileAuthProps,
@@ -22,6 +24,10 @@ export const ForceMobileAuth = memo(function ForceMobileAuth(
   const user = useUserStore();
 
   const requiresMobileAuth = useCallback(() => {
+    if (window.PRIVY_MOBILE_ENABLED) {
+      return false;
+    }
+
     if (!isMobileApp()) {
       // do not require this in the default webapp.
       return false;

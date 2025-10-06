@@ -1,10 +1,20 @@
-import { SearchUserProfilesView } from '@hicommonwealth/schemas';
-import { getDecodedString } from '@hicommonwealth/shared';
+import {
+  LaunchpadTokenView,
+  SearchUserProfilesView,
+  ThreadTokenView,
+  ThreadView,
+  TokenView,
+} from '@hicommonwealth/schemas';
+import { ChainBase, getDecodedString } from '@hicommonwealth/shared';
 import moment from 'moment';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
+import TradeTokenModal, {
+  TradingConfig,
+  TradingMode,
+} from 'views/modals/TradeTokenModel';
 import { z } from 'zod';
 import { SearchScope } from '../../../models/SearchQuery';
 import { CommunityLabel } from '../../components/community_label';
@@ -12,22 +22,13 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import TokenCard from '../../components/TokenCard';
+import { TokenType } from '../../components/TokenCard/TokenCard';
 import { User } from '../../components/user/user';
 import './index.scss';
 
-export type ThreadResult = {
-  id: number;
-  community_id: string;
-  title: string;
-  body: string;
-  address_id: number;
-  address_user_id: number;
-  address: string;
-  address_community_id: string;
-  created_at: string;
-};
 type ThreadResultRowProps = {
-  thread: ThreadResult;
+  thread: z.infer<typeof ThreadView>;
   searchTerm: string;
   setRoute: any;
 };
@@ -65,11 +66,9 @@ const ThreadResultRow = ({
         </CWText>
         <div className="search-results-thread-subtitle">
           <User
-            userAddress={thread?.address}
-            userCommunityId={thread?.address_community_id}
-            shouldShowAsDeleted={
-              !thread?.address && !thread?.address_community_id
-            }
+            userAddress={thread?.Address?.address || ''}
+            userCommunityId={thread?.community_id}
+            shouldShowAsDeleted={!thread?.Address && !thread?.community_id}
           />
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
@@ -91,7 +90,7 @@ const ThreadResultRow = ({
 
 export type ReplyResult = {
   id: number;
-  proposalid: number;
+  thread_id: number;
   community_id: string;
   title: string;
   body: string;
@@ -111,7 +110,7 @@ const ReplyResultRow = ({
   searchTerm,
   setRoute,
 }: ReplyResultRowProps) => {
-  const proposalId = comment.proposalid;
+  const threadId = comment.thread_id;
   const communityId = comment.community_id;
 
   const { data: domain } = useFetchCustomDomainQuery();
@@ -121,11 +120,7 @@ const ReplyResultRow = ({
   }, [comment.title]);
 
   const handleClick = () => {
-    setRoute(
-      `/discussion/${proposalId}?comment=${comment.id}`,
-      {},
-      communityId,
-    );
+    setRoute(`/discussion/${threadId}?comment=${comment.id}`, {}, communityId);
   };
 
   if (domain?.isCustomDomain && domain?.customDomainId !== communityId) {
@@ -249,6 +244,56 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
   );
 };
 
+const UnionToken = z.union([LaunchpadTokenView, ThreadTokenView]);
+type TokenResultRowProps = {
+  token: z.infer<typeof UnionToken>;
+  searchTerm: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setRoute: any;
+};
+// eslint-disable-next-line react/no-multi-comp
+const TokenResultRow = ({ token, setRoute }: TokenResultRowProps) => {
+  const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
+    isOpen: boolean;
+    tradeConfig?: TradingConfig;
+  }>({ isOpen: false, tradeConfig: undefined });
+
+  const handleCTAClick = (
+    mode: TradingMode,
+    _token: z.infer<typeof TokenView>,
+  ) => {
+    setTokenLaunchModalConfig({
+      isOpen: true,
+      tradeConfig: {
+        mode: mode,
+        token: _token,
+        addressType: ChainBase.Ethereum,
+      } as TradingConfig,
+    });
+  };
+
+  return (
+    <>
+      <TokenCard
+        key={token.name}
+        token={token as TokenType}
+        onCTAClick={(mode) => {
+          handleCTAClick(mode, token as z.infer<typeof TokenView>);
+        }}
+        onCardBodyClick={() => setRoute('', {}, token.community_id)}
+      />
+      {tokenLaunchModalConfig.tradeConfig && (
+        <TradeTokenModal
+          isOpen={tokenLaunchModalConfig.isOpen}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          tradeConfig={tokenLaunchModalConfig.tradeConfig as any}
+          onModalClose={() => setTokenLaunchModalConfig({ isOpen: false })}
+        />
+      )}
+    </>
+  );
+};
+
 export const renderSearchResults = (
   results: any[],
   searchTerm: string,
@@ -282,6 +327,14 @@ export const renderSearchResults = (
         return (
           <ReplyResultRow
             comment={res}
+            searchTerm={searchTerm}
+            setRoute={setRoute}
+          />
+        );
+      case SearchScope.Tokens:
+        return (
+          <TokenResultRow
+            token={res}
             searchTerm={searchTerm}
             setRoute={setRoute}
           />

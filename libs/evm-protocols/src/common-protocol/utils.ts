@@ -376,3 +376,19 @@ export function generateWallet() {
   const privateKey = generatePrivateKey();
   return privateKeyToAccount(privateKey);
 }
+
+export async function withRetries<T>(
+  fn: () => Promise<T>,
+  retries = 3,
+  delayMs = 15000,
+): Promise<T> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (attempt === retries) throw err;
+      await new Promise((res) => setTimeout(res, delayMs));
+    }
+  }
+  throw new Error('Retry timeout exceeded');
+}

@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
 
 .Tab {
   outline: none;
@@ -10,24 +12,24 @@
   border-bottom: 2px solid transparent;
 
   &.isSelected {
-    border-bottom: 2px solid $primary-500;
+    border-bottom: 2px solid colors.$primary-500;
 
     .label {
-      color: $neutral-700;
-      -webkit-text-stroke: 0.5px $neutral-700;
+      color: colors.$neutral-700;
+      -webkit-text-stroke: 0.5px colors.$neutral-700;
     }
   }
 
   &:first-child {
     &.boxed.isSelected {
-      border-top-left-radius: $border-radius-corners-wider;
+      border-top-left-radius: border_radius.$border-radius-corners-wider;
     }
   }
 
   &.boxed {
     .Text,
     .Icon {
-      color: $neutral-400;
+      color: colors.$neutral-400;
     }
 
     .Icon {
@@ -37,12 +39,12 @@
 
     &.isSelected {
       border: none;
-      background-color: $white;
+      background-color: colors.$white;
 
       .Text.label,
       .Icon {
-        color: $primary-500;
-        -webkit-text-stroke: 0.5px $primary-500;
+        color: colors.$primary-500;
+        -webkit-text-stroke: 0.5px colors.$primary-500;
       }
     }
   }
@@ -52,7 +54,7 @@
     filter: grayscale(1);
 
     .label {
-      color: $neutral-400;
+      color: colors.$neutral-400;
     }
   }
 
@@ -62,14 +64,14 @@
 
   &:hover:not(.isDisabled) {
     .label {
-      color: $neutral-700;
-      -webkit-text-stroke: 0.5px $neutral-700;
+      color: colors.$neutral-700;
+      -webkit-text-stroke: 0.5px colors.$neutral-700;
     }
   }
 
   .label {
     display: block;
-    color: $neutral-500;
+    color: colors.$neutral-500;
     max-width: 250px;
     white-space: nowrap;
     overflow: hidden;

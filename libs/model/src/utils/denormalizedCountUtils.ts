@@ -6,24 +6,18 @@ import { systemActor } from '../middleware';
 
 const log = logger(import.meta);
 
-/*
- * Debounces community refreshes
- */
-export function debounceRefresh(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fn: (...args: any[]) => Promise<void>,
+export function debounceRefresh<Args extends unknown[]>(
+  fn: (...args: Args) => Promise<void>,
   delay: number,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): (...args: any[]) => Promise<void> {
+): (...args: Args) => Promise<void> {
   const timeouts = new Map<string, NodeJS.Timeout>();
   const timestamps = new Map<string, number>();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (...args: any[]) => {
+  return (...args: Args) => {
     const now = Date.now();
     const key = JSON.stringify(args);
 
-    // make sure to only keep 20 timeouts to avoid the maps to grow too large
+    // Evict old entries if cache grows too large
     if (timeouts.size > 20) {
       for (const [k, t] of timestamps) {
         if (now - t > delay * 2) {
@@ -33,17 +27,22 @@ export function debounceRefresh(
       }
     }
 
-    timeouts.has(key) && clearTimeout(timeouts.get(key)!);
+    // Clear previous timeout if it exists
+    if (timeouts.has(key)) {
+      clearTimeout(timeouts.get(key)!);
+    }
+
+    // Set new debounce timeout
     timeouts.set(
       key,
       setTimeout(() => {
-        void fn(args).then(() => {
-          // clean up after execution
+        void fn(...args).then(() => {
           timeouts.delete(key);
           timestamps.delete(key);
         });
       }, delay),
     );
+
     timestamps.set(key, now);
     return Promise.resolve();
   };
@@ -53,14 +52,14 @@ export const refreshProfileCount = debounceRefresh(
   async (community_id: string) => {
     await models.sequelize.query(
       `
-UPDATE "Communities" C
-SET profile_count = (
-    SELECT COUNT(*) 
-    FROM "Addresses" A 
-    WHERE A.community_id = C.id AND A.user_id IS NOT NULL AND A.verified IS NOT NULL
-)
-WHERE C.id = :community_id;
-    `,
+        UPDATE "Communities" C
+        SET profile_count = (SELECT COUNT(*)
+                             FROM "Addresses" A
+                             WHERE A.community_id = C.id
+                               AND A.user_id IS NOT NULL
+                               AND A.verified IS NOT NULL)
+        WHERE C.id = :community_id;
+      `,
       { replacements: { community_id } },
     );
   },
@@ -69,10 +68,22 @@ WHERE C.id = :community_id;
 
 export const refreshMemberships = debounceRefresh(
   async (community_id: string, group_id?: number) => {
-    await command(RefreshCommunityMemberships(), {
-      actor: systemActor({}),
-      payload: { community_id, group_id },
-    });
+    try {
+      await command(RefreshCommunityMemberships(), {
+        actor: systemActor({}),
+        payload: { community_id, group_id },
+      });
+    } catch (e) {
+      log.error(
+        'Failed to refresh community memberships',
+        e instanceof Error ? e : undefined,
+        {
+          ...(e instanceof Error ? { e } : {}),
+          community_id,
+          group_id,
+        },
+      );
+    }
   },
   10_000,
 );

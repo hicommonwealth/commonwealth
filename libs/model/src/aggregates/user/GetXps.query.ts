@@ -34,6 +34,12 @@ export function GetXps(): Query<typeof schemas.GetXps> {
           attributes: ['profile', 'tier'],
         },
         {
+          model: models.User,
+          as: 'referrer',
+          required: false,
+          attributes: ['profile', 'tier'],
+        },
+        {
           model: models.QuestActionMeta,
           as: 'quest_action_meta',
           required: true,
@@ -64,6 +70,7 @@ export function GetXps(): Query<typeof schemas.GetXps> {
             [Op.or]: [
               { user_id: user_or_creator_id },
               { creator_user_id: user_or_creator_id },
+              { referrer_user_id: user_or_creator_id },
             ],
           }),
         },
@@ -74,14 +81,23 @@ export function GetXps(): Query<typeof schemas.GetXps> {
 
       const finalXps = xps
         .map((xp) => {
-          const { user, creator, quest_action_meta, ...rest } = xp.toJSON();
+          const { user, creator, referrer, quest_action_meta, ...rest } =
+            xp.toJSON();
           return {
             ...rest,
             user_profile: user!.profile,
             quest_id: quest_action_meta!.quest_id,
             quest_action_meta_id: quest_action_meta!.id!,
             event_name: quest_action_meta!.event_name,
+            reward_amount: quest_action_meta!.reward_amount,
             creator_profile: creator?.profile,
+            referrer_profile: referrer?.profile,
+            is_creator: user_or_creator_id === rest.creator_user_id,
+            is_referral: [
+              'SignUpFlowCompleted',
+              'CommunityCreated',
+              'CommunityJoined',
+            ].includes(quest_action_meta!.event_name),
           };
         })
         .filter((x) => x.quest_id);

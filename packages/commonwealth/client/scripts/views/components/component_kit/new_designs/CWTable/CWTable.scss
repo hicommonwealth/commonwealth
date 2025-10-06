@@ -1,20 +1,23 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/text';
 
 .Table {
   overflow-x: auto;
 
   table {
-    @include b2;
+    @include text.b2;
     letter-spacing: 0.14px;
     font-weight: 400;
     border-collapse: collapse;
-    color: $neutral-800;
+    color: colors.$neutral-800;
     width: 100%;
 
     thead {
-      border-top: 1px solid $neutral-200;
-      border-bottom: 1px solid $neutral-200;
-      background-color: $neutral-50;
+      border-top: 1px solid colors.$neutral-200;
+      border-bottom: 1px solid colors.$neutral-200;
+      background-color: colors.$neutral-50;
 
       tr {
         th {
@@ -28,7 +31,7 @@
             }
 
             .header-text {
-              font-family: $font-family-neue-haas-unica;
+              font-family: shared.$font-family-neue-haas-unica;
               font-weight: 700;
               display: flex;
               align-items: center;
@@ -36,13 +39,13 @@
 
             .header-info {
               font-size: 12px;
-              color: $neutral-500;
+              color: colors.$neutral-500;
             }
 
             .icon-container {
               height: 24px;
               width: 24px;
-              border-radius: $border-radius-corners-wider;
+              border-radius: border_radius.$border-radius-corners-wider;
               padding: 4px;
 
               .Icon {
@@ -53,7 +56,7 @@
               }
 
               &:hover {
-                background-color: $neutral-100;
+                background-color: colors.$neutral-100;
               }
             }
           }
@@ -63,10 +66,10 @@
 
     tbody {
       tr {
-        border-bottom: 1px solid $neutral-200;
+        border-bottom: 1px solid colors.$neutral-200;
 
         &:hover {
-          background-color: $neutral-50;
+          background-color: colors.$neutral-50;
         }
 
         td {

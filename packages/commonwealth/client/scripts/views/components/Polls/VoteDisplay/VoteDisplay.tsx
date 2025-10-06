@@ -24,8 +24,8 @@ export const VoteDisplay = ({
     voteInformation.filter((vote) => vote.voteCount > 0).length > 0;
 
   const topResponse = atLeastOneVote
-    ? voteInformation.sort(
-        (option1, option2) => option2.voteCount - option1.voteCount,
+    ? voteInformation.sort((option1, option2) =>
+        Number(option2.voteCount - option1.voteCount),
       )[0].label
     : null;
 

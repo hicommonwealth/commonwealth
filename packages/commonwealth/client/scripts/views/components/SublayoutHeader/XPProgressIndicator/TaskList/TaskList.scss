@@ -1,11 +1,14 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/elevation';
+@use '../../../../../styles/mixins/media_queries';
 
 .TaskList {
   width: 300px;
-  background-color: $white;
-  border: 1px solid $neutral-200;
+  background-color: colors.$white;
+  border: 1px solid colors.$neutral-200;
   border-radius: 8px;
-  box-shadow: $elevation-4 !important;
+  box-shadow: elevation.$elevation-4 !important;
   margin-top: 4px;
   z-index: 999;
 
@@ -16,7 +19,7 @@
     padding: 16px 12px 8px 12px;
   }
 
-  @include extraSmall {
+  @include media_queries.extraSmall {
     width: 100%;
   }
 }

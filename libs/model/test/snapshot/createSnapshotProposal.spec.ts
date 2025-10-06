@@ -3,8 +3,9 @@ import { CreateSnapshotProposal as CreateSnapshotProposalSchema } from '@hicommo
 import { BalanceType, CommunityTierMap } from '@hicommonwealth/shared';
 import { afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
-import { models, tester } from '../../src';
 import { CreateSnapshotProposal } from '../../src/aggregates/snapshot';
+import { models } from '../../src/database';
+import * as tester from '../../src/tester';
 
 describe('Snapshot Listener API', { timeout: 5_000 }, () => {
   beforeAll(async () => {
@@ -20,7 +21,7 @@ describe('Snapshot Listener API', { timeout: 5_000 }, () => {
     );
 
     await tester.seed('Community', {
-      tier: CommunityTierMap.CommunityVerified,
+      tier: CommunityTierMap.ChainVerified,
       chain_node_id: chainNode?.id,
       lifetime_thread_count: 0,
       profile_count: 0,

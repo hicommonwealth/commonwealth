@@ -16,15 +16,15 @@ import {
   useCosmosProposalVotesQuery,
 } from 'state/api/proposals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import { PageLoading } from 'views/pages/loading';
+import { LoadingIndicator } from 'views/components/LoadingIndicator/LoadingIndicator';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import type { AnyProposal } from '../../../models/types';
-import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
-import { Skeleton } from '../../components/Skeleton';
 import CWAccordView from '../../components/component_kit/CWAccordView/CWAccordView';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
+import MarkdownViewerWithFallback from '../../components/MarkdownViewerWithFallback';
 import TimeLineCard from '../../components/proposals/TimeLineCard';
 import { VotingResults } from '../../components/proposals/voting_results';
+import { Skeleton } from '../../components/Skeleton';
 import { PageNotFound } from '../404';
 import { JSONDisplay } from './JSONDisplay';
 import { ProposalSubheader } from './proposal_components';
@@ -95,7 +95,7 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   }, [isAdapterLoaded, proposalId]);
 
   if (isFetchingProposal || !isAdapterLoaded) {
-    return <PageLoading message="Loading..." />;
+    return <LoadingIndicator message="Loading..." />;
   }
 
   if (cosmosError) {

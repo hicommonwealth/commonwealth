@@ -1,4 +1,6 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/inputs';
 
 @mixin iconPositionStyles {
   position: absolute;
@@ -22,11 +24,11 @@
     text-align: right;
 
     &.success {
-      color: $green-600;
+      color: colors.$green-600;
     }
 
     &.failure {
-      color: $rorange-500;
+      color: colors.$rorange-500;
     }
   }
 }
@@ -43,10 +45,10 @@
     position: relative;
 
     input {
-      @include inputStyles;
+      @include inputs.inputStyles;
 
       &.darkMode {
-        @include darkModeInputStyles;
+        @include inputs.darkModeInputStyles;
       }
 
       &.small {
@@ -78,7 +80,7 @@
     }
 
     ::placeholder {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
   }
 }

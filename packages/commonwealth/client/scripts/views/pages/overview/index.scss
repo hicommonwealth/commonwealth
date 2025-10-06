@@ -1,4 +1,6 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/media_queries';
 
 .OverviewPage {
   display: flex;
@@ -28,12 +30,12 @@
     gap: 32px;
     grid-template-columns: 352px 1fr;
 
-    @include mediumSmallInclusive {
+    @include media_queries.mediumSmallInclusive {
       display: none;
     }
 
     .threads-header-row-text.Text {
-      color: $neutral-500;
+      color: colors.$neutral-500;
     }
 
     .threads-header-container {
@@ -41,7 +43,7 @@
       justify-content: space-between;
 
       .threads-header-row-text.Text {
-        color: $neutral-500;
+        color: colors.$neutral-500;
       }
     }
   }
@@ -61,7 +63,7 @@
 
         td:nth-child(2) {
           div .Text {
-            color: $primary-500 !important;
+            color: colors.$primary-500 !important;
           }
         }
       }

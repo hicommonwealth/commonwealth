@@ -1,9 +1,10 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
 
 .ExploreCard {
   padding: 18px;
   border-radius: 6px;
-  border: 1px solid $neutral-200;
+  border: 1px solid colors.$neutral-200;
   display: flex;
   flex-direction: column;
   gap: 8px;

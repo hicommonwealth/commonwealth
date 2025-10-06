@@ -8,18 +8,17 @@ import type { CommunityAttributes, CommunityInstance } from './community';
 import type { CommunityAlertAttributes } from './community_alerts';
 import type { SubscriptionPreferenceAttributes } from './subscription_preference';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
+import { TopicSubscriptionAttributes } from './topic_subscription';
 import type { ModelInstance } from './types';
 
-export type EmailNotificationInterval = 'weekly' | 'never';
-
 export type UserAttributes = z.infer<typeof User> & {
-  // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
-  selectedCommunity?: CommunityAttributes | CommunityAttributes['id'];
-  Addresses?: AddressAttributes[] | AddressAttributes['id'][];
-  Communities?: CommunityAttributes[] | CommunityAttributes['id'][];
+  selectedCommunity?: CommunityAttributes;
+  Addresses?: AddressAttributes[];
+  Communities?: CommunityAttributes[];
   SubscriptionPreferences?: SubscriptionPreferenceAttributes;
   threadSubscriptions?: ThreadSubscriptionAttributes[];
   commentSubscriptions?: CommentSubscriptionAttributes[];
+  topicSubscriptions?: TopicSubscriptionAttributes[];
   communityAlerts?: CommunityAlertAttributes[];
 };
 
@@ -78,11 +77,16 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       },
       selected_community_id: { type: Sequelize.STRING, allowNull: true },
       profile: { type: Sequelize.JSONB, allowNull: false },
-      xp_points: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: true },
+      xp_points: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
       xp_referrer_points: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
-        allowNull: true,
+        allowNull: false,
+      },
+      total_xp: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
       },
       unsubscribe_uuid: { type: Sequelize.STRING, allowNull: true },
       referred_by_address: { type: Sequelize.STRING, allowNull: true },
@@ -100,6 +104,26 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
         type: Sequelize.STRING,
         allowNull: true,
       },
+      notify_user_name_change: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: true,
+      },
+      wallet_verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      social_verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      chain_verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
     },
     {
       timestamps: true,
@@ -111,6 +135,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
         { fields: ['email'], unique: true },
         { fields: ['privy_id'], unique: true },
         { fields: ['xp_points'], unique: false },
+        { fields: ['tier', 'total_xp'], unique: false },
       ],
       defaultScope: {
         attributes: {

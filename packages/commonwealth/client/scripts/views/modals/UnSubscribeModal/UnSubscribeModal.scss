@@ -1,10 +1,11 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/colors.module';
 
 .UnSubscribeModal {
   .CWModalBody {
     padding-bottom: 24px !important;
   }
   .CWModalFooter .primary {
-    background-color: $rorange-400 !important;
+    background-color: colors.$rorange-400 !important;
   }
 }

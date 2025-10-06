@@ -1,14 +1,14 @@
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { AuthContext, VerifiedContext } from '../context';
-import { Address, User } from '../entities';
+import { Address, EmailNotificationInterval, User } from '../entities';
 
 export const SignIn = {
   input: z.object({
     address: z.string(),
     community_id: z.string(),
-    wallet_id: z.nativeEnum(WalletId),
+    wallet_id: z.enum(WalletId),
     session: z.string(),
     block_info: z.string().nullish(),
     referrer_address: z.string().nullish(),
@@ -28,13 +28,16 @@ export const SignIn = {
             z.literal('discord_oauth'),
             z.literal('apple_oauth'),
             z.literal('twitter_oauth'),
+            z.literal('phone'),
+            z.literal('farcaster'),
+            z.literal('email'),
           ])
           .optional(),
       })
       .optional(),
   }),
   output: Address.extend({
-    community_base: z.nativeEnum(ChainBase),
+    community_base: z.enum(ChainBase),
     community_ss58_prefix: z.number().nullish(),
     was_signed_in: z.boolean().describe('True when user was already signed in'),
     user_created: z
@@ -47,9 +50,9 @@ export const SignIn = {
       .describe(
         'True when address is newly created, equivalent to joining a community',
       ),
-    first_community: z
+    is_welcome_onboard_flow_complete: z
       .boolean()
-      .describe('True when address joins the first community'),
+      .describe("True when user hasn't completed the welcome onboard flow"),
   }),
   context: AuthContext,
 };
@@ -101,11 +104,36 @@ export const DeleteApiKey = {
 export const DistributeSkale = {
   input: z.object({
     address: z.string(),
-    eth_chain_id: z
-      .number()
-      .refine((data) => data === cp.ValidChains.SKALE_TEST, {
-        message: `eth_chain_id must be a Skale chain Id`,
-      }),
+    eth_chain_id: z.number().refine((data) => data === ValidChains.SKALE_TEST, {
+      message: `eth_chain_id must be a Skale chain Id`,
+    }),
   }),
   output: z.undefined(),
+};
+
+export const UpdateSettings = {
+  input: z.object({
+    disable_rich_text: z.boolean().optional(),
+    enable_promotional_emails: z.boolean().optional(),
+    email_interval: EmailNotificationInterval.optional(),
+  }),
+  output: z.boolean(),
+  context: VerifiedContext,
+};
+
+export const UpdateEmail = {
+  input: z.object({
+    email: z.string().email(),
+  }),
+  output: User.extend({ email: z.string() }),
+  context: VerifiedContext,
+};
+
+export const FinishUpdateEmail = {
+  input: z.object({
+    email: z.string().email(),
+    token: z.string(),
+  }),
+  output: z.object({ redirect_path: z.string() }),
+  context: VerifiedContext,
 };

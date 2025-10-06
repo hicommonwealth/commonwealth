@@ -52,7 +52,7 @@ const useCosmosProposalDepositsQuery = (
       proposal.data?.status === 'DepositPeriod' &&
       !!poolParams,
     staleTime: DEPOSITS_STALE_TIME,
-    cacheTime: DEPOSITS_CACHE_TIME,
+    gcTime: DEPOSITS_CACHE_TIME,
   });
 };
 

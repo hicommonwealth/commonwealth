@@ -1,8 +1,7 @@
 import { Broker, successfulInMemoryBroker } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
-import { expect } from 'chai';
+import { models } from '@hicommonwealth/model/db';
 import { relay } from 'server/bindings/relay';
-import { afterEach, describe, test } from 'vitest';
+import { afterEach, describe, expect, test } from 'vitest';
 import { testOutboxEvents } from './util';
 
 describe('relay', () => {
@@ -20,7 +19,7 @@ describe('relay', () => {
       } as any,
     });
     const numRelayed = await relay(successfulInMemoryBroker, models);
-    expect(numRelayed).to.equal(1);
+    expect(numRelayed).to.deep.equal({ numPublished: 1, numFetched: 1 });
     const events = await models.Outbox.findAll({
       where: {
         relayed: true,
@@ -41,7 +40,7 @@ describe('relay', () => {
     };
     await models.Outbox.bulkCreate(testOutboxEvents);
     const numRelayed = await relay(spyBroker, models);
-    expect(numRelayed).to.equal(3);
+    expect(numRelayed).to.deep.equal({ numPublished: 3, numFetched: 3 });
     const events = await models.Outbox.findAll({
       where: {
         relayed: true,
@@ -66,7 +65,7 @@ describe('relay', () => {
     };
     await models.Outbox.bulkCreate(testOutboxEvents);
     const numRelayed = await relay(spyBroker, models);
-    expect(numRelayed).to.equal(1);
+    expect(numRelayed).to.deep.equal({ numPublished: 1, numFetched: 3 });
     expect(publishedEvents.length).to.equal(1);
 
     const relayedEvents = await models.Outbox.findAll({

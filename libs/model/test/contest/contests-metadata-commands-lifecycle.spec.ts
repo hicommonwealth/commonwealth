@@ -1,13 +1,10 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import z from 'zod';
-import { Contest, TopicAttributes } from '../../src/index';
+import * as Contest from '../../src/aggregates/contest';
+import { TopicAttributes } from '../../src/models';
 import { seed } from '../../src/tester';
-
-chai.use(chaiAsPromised);
 
 describe('Contests metadata commands lifecycle', () => {
   const community_id = 'community';
@@ -74,9 +71,10 @@ describe('Contests metadata commands lifecycle', () => {
             verified: new Date(),
           },
         ],
-        topics: [{}, {}, {}],
+        topics: [{ name: 'test1' }, { name: 'test2' }, { name: 'test3' }],
         contest_managers: [
           {
+            environment: 'local',
             contest_address: '0x1',
             name,
             interval,
@@ -89,6 +87,7 @@ describe('Contests metadata commands lifecycle', () => {
             cancelled: false,
           },
           {
+            environment: 'local',
             contest_address: '0x2',
             name,
             interval,
@@ -160,7 +159,9 @@ describe('Contests metadata commands lifecycle', () => {
           topic_id: topics[0].id,
         },
       });
-      expect(promise).to.be.rejectedWith('User is not admin in the community');
+      await expect(promise).rejects.toThrow(
+        'User is not admin in the community',
+      );
     });
 
     test('should fail to create if community does not exist', async () => {
@@ -181,7 +182,9 @@ describe('Contests metadata commands lifecycle', () => {
         },
       });
       // the auth middleware fails to find address if community doesn't exist
-      expect(promise).to.be.rejectedWith('User is not admin in the community');
+      await expect(promise).rejects.toThrow(
+        'User is not admin in the community',
+      );
     });
 
     test(`should create contest manager metadata`, async () => {
@@ -238,7 +241,9 @@ describe('Contests metadata commands lifecycle', () => {
         },
       });
 
-      expect(promise).to.be.rejectedWith('User is not admin in the community');
+      await expect(promise).rejects.toThrow(
+        'User is not admin in the community',
+      );
     });
 
     test('should fail to update if contest manager does not exist', async () => {
@@ -250,7 +255,7 @@ describe('Contests metadata commands lifecycle', () => {
           name: 'xxx',
         },
       });
-      expect(promise).to.be.rejectedWith('Contest Manager must exist');
+      await expect(promise).rejects.toThrow('Contest Manager must exist');
     });
 
     test('should update contest manager metadata', async () => {
@@ -322,7 +327,9 @@ describe('Contests metadata commands lifecycle', () => {
           contest_address,
         },
       });
-      expect(promise).to.be.rejectedWith('User is not admin in the community');
+      await expect(promise).rejects.toThrow(
+        'User is not admin in the community',
+      );
     });
 
     test('should fail to cancel if contest manager does not exist', async () => {
@@ -333,7 +340,7 @@ describe('Contests metadata commands lifecycle', () => {
           contest_address: 'does-not-exist',
         },
       });
-      expect(promise).to.be.rejectedWith('Contest Manager must exist');
+      await expect(promise).rejects.toThrow('Contest Manager must exist');
     });
 
     test('should cancel contest manager metadata', async () => {

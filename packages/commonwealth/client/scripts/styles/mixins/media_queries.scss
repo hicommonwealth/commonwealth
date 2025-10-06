@@ -1,77 +1,79 @@
+@use 'breakpoints.module';
+
 @mixin large {
-  @media only screen and (min-width: $breakpoint-large-min-px) {
+  @media only screen and (min-width: breakpoints.$breakpoint-large-min-px) {
     @content;
   }
 }
 
 @mixin mediumInclusive {
-  @media only screen and (max-width: $breakpoint-medium-max-px) {
+  @media only screen and (max-width: breakpoints.$breakpoint-medium-max-px) {
     @content;
   }
 }
 
 @mixin mediumAndUp {
-  @media only screen and (min-width: $breakpoint-small-max-px) {
+  @media only screen and (min-width: breakpoints.$breakpoint-small-max-px) {
     @content;
   }
 }
 
 @mixin medium {
-  @media only screen and (min-width: $breakpoint-medium-min-px) and (max-width: $breakpoint-medium-max-px) {
+  @media only screen and (min-width: breakpoints.$breakpoint-medium-min-px) and (max-width: breakpoints.$breakpoint-medium-max-px) {
     @content;
   }
 }
 
 @mixin mediumSmallInclusive {
-  @media only screen and (max-width: $breakpoint-medium-small-max-px) {
+  @media only screen and (max-width: breakpoints.$breakpoint-medium-small-max-px) {
     @content;
   }
 }
 
 @mixin mediumSmallMid {
-  @media only screen and (max-width: $breakpoint-medium-small-mid-px) {
+  @media only screen and (max-width: breakpoints.$breakpoint-medium-small-mid-px) {
     @content;
   }
 }
 
 @mixin mediumSmall {
-  @media only screen and (min-width: $breakpoint-medium-small-min-px) and (max-width: $breakpoint-medium-small-max-px) {
+  @media only screen and (min-width: breakpoints.$breakpoint-medium-small-min-px) and (max-width: breakpoints.$breakpoint-medium-small-max-px) {
     @content;
   }
 }
 
 @mixin smallInclusive {
-  @media only screen and (max-width: $breakpoint-small-max-px) {
+  @media only screen and (max-width: breakpoints.$breakpoint-small-max-px) {
     @content;
   }
 }
 
 @mixin isWindowSmallToMediumInclusive {
-  @media only screen and (max-width: $breakpoint-small-max-New-px) {
+  @media only screen and (max-width: breakpoints.$breakpoint-small-max-New-px) {
     @content;
   }
 }
 
 @mixin small {
-  @media only screen and (min-width: $breakpoint-small-min-px) and (max-width: $breakpoint-small-max-px) {
+  @media only screen and (min-width: breakpoints.$breakpoint-small-min-px) and (max-width: breakpoints.$breakpoint-small-max-px) {
     @content;
   }
 }
 
 @mixin extraSmall {
-  @media only screen and (max-width: $breakpoint-extra-small-max-px) {
+  @media only screen and (max-width: breakpoints.$breakpoint-extra-small-max-px) {
     @content;
   }
 }
 
 @mixin heightSmallInclusive {
-  @media only screen and (max-height: $breakpoint-height-small-max) {
+  @media only screen and (max-height: breakpoints.$breakpoint-height-small-max) {
     @content;
   }
 }
 
 @mixin mediumToLarge {
-  @media only screen and (min-width: $breakpoint-small-max-px) and (max-width: $breakpoint-medium-large-max) {
+  @media only screen and (min-width: breakpoints.$breakpoint-small-max-px) and (max-width: breakpoints.$breakpoint-medium-large-max) {
     @content;
   }
 }

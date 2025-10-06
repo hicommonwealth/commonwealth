@@ -1,19 +1,16 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
-import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
+import {
+  ActionGroups,
+  MIN_CHARS_TO_SHOW_MORE,
+  slugify,
+} from '@hicommonwealth/shared';
 import { extractImages } from 'client/scripts/helpers/feed';
-import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import Thread from 'client/scripts/models/Thread';
-import { Memberships } from 'client/scripts/state/api/groups/getMemberships';
-import useUserStore from 'client/scripts/state/ui/user';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import Permissions from 'utils/Permissions';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import { checkIsTopicInContest } from '../../components/NewThreadFormLegacy/helpers';
 import { ThreadCard } from './ThreadCard';
-
-type TopicPermission = { id: number; permissions: PermissionEnum[] };
 
 type contestsData = {
   all: Contest[];
@@ -28,8 +25,8 @@ export type RenderThreadCardProps = {
   hideTrendingTag?: boolean;
   hideSpamTag?: boolean;
   communityId: string;
-  memberships?: Memberships[];
-  topicPermissions?: TopicPermission[];
+  actionGroups: ActionGroups;
+  bypassGating: boolean;
   contestsData: contestsData;
 };
 
@@ -40,67 +37,16 @@ export const RenderThreadCard = ({
   hideSpamTag,
   hideTrendingTag,
   communityId,
-  memberships,
-  topicPermissions,
+  actionGroups,
+  bypassGating,
   contestsData,
 }: RenderThreadCardProps) => {
   const navigate = useCommonNavigate();
-  const user = useUserStore();
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const discussionLink = getProposalUrlPath(
     thread.slug,
     `${thread.identifier}-${slugify(thread.title)}`,
   );
-
-  const isTopicGated = !!(memberships || []).find(
-    (membership) =>
-      thread?.topic?.id &&
-      membership.topics.find((t) => t.id === thread.topic!.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      thread?.topic?.id &&
-      membership.topics.find((t) => t.id === thread.topic!.id) &&
-      membership.isAllowed,
-  );
-
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
-
-  const foundTopicPermissions = topicPermissions?.find(
-    (tp) => tp.id === thread.topic!.id,
-  );
-
-  const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!user.activeAccount,
-    isThreadArchived: !!thread?.archivedAt,
-    isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: isRestrictedMembership,
-  });
-
-  const disabledReactPermissionTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!user.activeAccount,
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_THREAD_REACTION,
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
-  });
-
-  const disabledCommentPermissionTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!user.activeAccount,
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_COMMENT,
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
-  });
 
   const isThreadTopicInContest = checkIsTopicInContest(
     contestsData?.all,
@@ -113,16 +59,6 @@ export const RenderThreadCard = ({
     <ThreadCard
       key={thread?.id + '-' + thread.readOnly}
       thread={thread}
-      canReact={
-        disabledReactPermissionTooltipText
-          ? !disabledReactPermissionTooltipText
-          : !disabledActionsTooltipText
-      }
-      canComment={
-        disabledCommentPermissionTooltipText
-          ? !disabledCommentPermissionTooltipText
-          : !disabledActionsTooltipText
-      }
       onEditStart={() => navigate(`${discussionLink}?isEdit=true`)}
       onStageTagClick={() => {
         navigate(`/discussions?stage=${thread.stage}`);
@@ -134,11 +70,6 @@ export const RenderThreadCard = ({
           scrollEle.scrollTop;
       }}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledActionsTooltipText={
-        disabledCommentPermissionTooltipText ||
-        disabledReactPermissionTooltipText ||
-        disabledActionsTooltipText
-      }
       hideRecentComments
       editingDisabled={isThreadTopicInContest}
       threadImage={images && isCardView && images.length ? images[0] : null}
@@ -148,6 +79,8 @@ export const RenderThreadCard = ({
       hideSpamTag={hideSpamTag}
       cutoffLines={6}
       maxChars={MIN_CHARS_TO_SHOW_MORE}
+      actionGroups={actionGroups}
+      bypassGating={bypassGating}
     />
   );
 };

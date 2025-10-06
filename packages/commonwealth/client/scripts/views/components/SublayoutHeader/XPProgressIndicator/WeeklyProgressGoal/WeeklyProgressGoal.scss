@@ -1,4 +1,6 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/border_radius';
+@use '../../../../../styles/mixins/colors.module';
 
 .WeeklyProgressGoal {
   min-width: 150px;
@@ -18,23 +20,23 @@
 
     .caption {
       font-size: 10px !important;
-      color: $primary-500 !important;
+      color: colors.$primary-500 !important;
     }
   }
 
   .progress-bar {
     height: 10px;
     width: 100%;
-    border: 1px solid $neutral-100;
+    border: 1px solid colors.$neutral-100;
 
     &::-webkit-progress-bar {
-      background-color: $neutral-200;
-      border-radius: $border-radius-corners;
+      background-color: colors.$neutral-200;
+      border-radius: border_radius.$border-radius-corners;
     }
 
     &::-webkit-progress-value {
-      background-color: $primary-400;
-      border-radius: $border-radius-corners;
+      background-color: colors.$primary-400;
+      border-radius: border_radius.$border-radius-corners;
     }
   }
 }

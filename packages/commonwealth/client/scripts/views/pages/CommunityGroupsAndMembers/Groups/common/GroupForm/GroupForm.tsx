@@ -1,4 +1,5 @@
 /* eslint-disable react/no-multi-comp */
+import { isGatedAction } from '@hicommonwealth/shared';
 import {
   CWImageInput,
   ImageBehavior,
@@ -6,11 +7,18 @@ import {
 import { weightedVotingValueToLabel } from 'helpers';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  MultiValueProps,
+  OptionProps,
+  SingleValueProps,
+  components,
+} from 'react-select';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -24,7 +32,9 @@ import { ZodError, ZodObject } from 'zod';
 import {
   AMOUNT_CONDITIONS,
   ERC_SPECIFICATIONS,
+  SUI_NFT_SPECIFICATION,
   TOKENS,
+  TRUST_LEVEL_SPECIFICATION,
   conditionTypes,
 } from '../../../common/constants';
 import Allowlist from './Allowlist';
@@ -32,7 +42,6 @@ import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import TopicPermissionToggleGroupSubForm from './TopicPermissionToggleGroupSubForm';
 import { REQUIREMENTS_TO_FULFILL } from './constants';
-import { isPermissionGuard } from './helpers';
 import {
   FormSubmitValues,
   GroupFormProps,
@@ -46,6 +55,12 @@ import {
   groupValidationSchema,
   requirementSubFormValidationSchema,
 } from './validations';
+
+type TopicOption = {
+  label: string;
+  value: string | number;
+  helpText?: string;
+};
 
 type CWRequirementsRadioButtonProps = {
   maxRequirements: number;
@@ -122,19 +137,68 @@ const getRequirementSubFormSchema = (
   requirementType: string,
 ): ZodObject<any> => {
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
+  const isERC721Requirement = requirementType === ERC_SPECIFICATIONS.ERC_721;
   const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
+  const isTrustLevelRequirement = requirementType === TRUST_LEVEL_SPECIFICATION;
+  const isSuiTokenRequirement = requirementType === TOKENS.SUI_TOKEN_TYPE;
+  const isSuiNftRequirement = requirementType === SUI_NFT_SPECIFICATION;
 
-  const schema = isTokenRequirement
-    ? requirementSubFormValidationSchema.omit({
-        requirementContractAddress: true,
-        requirementTokenId: true,
-      })
-    : !is1155Requirement
-      ? requirementSubFormValidationSchema.omit({
-          requirementTokenId: true,
-        })
-      : requirementSubFormValidationSchema;
-  return schema;
+  if (isTrustLevelRequirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementChain: true,
+      requirementContractAddress: true,
+      requirementCondition: true,
+      requirementAmount: true,
+      requirementTokenId: true,
+      requirementCoinType: true,
+    });
+  }
+
+  if (isSuiTokenRequirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementContractAddress: true,
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+    });
+  }
+
+  if (isSuiNftRequirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+      requirementCoinType: true,
+    });
+  }
+
+  if (isTokenRequirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementContractAddress: true,
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+      requirementCoinType: true,
+    });
+  }
+
+  if (is1155Requirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+      requirementCoinType: true,
+    });
+  }
+
+  if (isERC721Requirement) {
+    return requirementSubFormValidationSchema.omit({
+      requirementTokenId: true,
+      requirementTrustLevel: true,
+      requirementCoinType: true,
+    });
+  }
+
+  return requirementSubFormValidationSchema.omit({
+    requirementTrustLevel: true,
+    requirementCoinType: true,
+  });
 };
 
 const GroupForm = ({
@@ -154,6 +218,7 @@ const GroupForm = ({
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId,
+    includeTopics: true,
     enabled: !!communityId,
   });
 
@@ -182,6 +247,33 @@ const GroupForm = ({
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
 
+  const topicPrivacyMap = new Map<number, boolean>();
+  groups.forEach((group) => {
+    (group.topics || []).forEach((topic) => {
+      topicPrivacyMap.set(topic.id, topic.is_private);
+    });
+  });
+
+  const currentGroup = groups.find((g) => g.name === initialValues.groupName);
+  const privateTopicIds = new Set(
+    (currentGroup?.topics || []).filter((t) => t.is_private).map((t) => t.id),
+  );
+
+  const topicOptions = sortedTopics
+    .filter((topic) => topic.id !== undefined)
+    .map((topic) => ({
+      label: topic.name,
+      value: topic.id as number,
+      helpText: weightedVotingValueToLabel(topic.weighted_voting!),
+    }));
+
+  const handleImageProcessingChange = useCallback(
+    ({ isGenerating, isUploading }) => {
+      setIsProcessingProfileImage(isGenerating || isUploading);
+    },
+    [],
+  );
+
   useEffect(() => {
     if (initialValues.requirements) {
       setRequirementSubForms(
@@ -199,6 +291,8 @@ const GroupForm = ({
             requirementContractAddress: x?.requirementContractAddress || '',
             requirementType: x?.requirementType?.value || '',
             requirementTokenId: x?.requirementTokenId || '',
+            requirementCoinType: x?.requirementCoinType || '',
+            requirementTrustLevel: x?.requirementTrustLevel?.value || '',
           },
           errors: {},
         })),
@@ -217,15 +311,18 @@ const GroupForm = ({
 
     if (initialValues.topics) {
       const updatedInitialValues: TopicPermissionToggleGroupSubFormsState[] =
-        initialValues.topics.map(({ label, value, permission }) => ({
-          topic: {
-            id: Number(value),
-            name: label,
-          },
-          permission: (Array.isArray(permission)
-            ? permission.filter(isPermissionGuard)
-            : []) as Permission[],
-        }));
+        initialValues.topics.map(
+          ({ label, value, is_private, permission }) => ({
+            topic: {
+              id: Number(value),
+              is_private,
+              name: label,
+            },
+            permission: (Array.isArray(permission)
+              ? permission.filter(isGatedAction)
+              : []) as Permission[],
+          }),
+        );
       setTopicPermissionsToggleGroupSubForms(updatedInitialValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -311,7 +408,7 @@ const GroupForm = ({
       };
     } catch (e: any) {
       const zodError = e as ZodError;
-      const message = zodError.errors[0].message;
+      const message = zodError.message;
 
       allRequirements[index] = {
         ...allRequirements[index],
@@ -368,7 +465,7 @@ const GroupForm = ({
       } catch (e: any) {
         const zodError = e as ZodError;
         const errors = {};
-        zodError.errors.map((x) => {
+        zodError.issues.map((x) => {
           errors[x.path[0]] = x.message;
         });
 
@@ -404,6 +501,7 @@ const GroupForm = ({
       ...values,
       topics: topicPermissionsToggleGroupSubForms.map((t) => ({
         id: t.topic.id,
+        is_private: t.topic.is_private,
         permissions: t.permission,
       })),
       requirementsToFulfill,
@@ -416,13 +514,22 @@ const GroupForm = ({
   const handleWatchForm = (values: FormSubmitValues) => {
     if (values?.topics?.length > 0) {
       const updatedTopicPermissions: TopicPermissionToggleGroupSubFormsState[] =
-        values.topics.map((topic) => ({
-          topic: {
-            id: Number(topic.value),
-            name: topic.label,
-          },
-          permission: [],
-        }));
+        values.topics.map((topic) => {
+          const existingTopic = topicPermissionsToggleGroupSubForms.find(
+            (existing) => existing.topic.id === Number(topic.value),
+          );
+          const currentGroupTopic = (currentGroup?.topics || []).find(
+            (t) => t.id === Number(topic.value),
+          );
+          return {
+            topic: {
+              id: Number(topic.value),
+              is_private: currentGroupTopic?.is_private ?? false,
+              name: topic.label,
+            },
+            permission: existingTopic?.permission || [],
+          };
+        });
       setTopicPermissionsToggleGroupSubForms(updatedTopicPermissions);
     } else {
       setTopicPermissionsToggleGroupSubForms([]);
@@ -446,11 +553,11 @@ const GroupForm = ({
               ? REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
               : REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS
             : '',
-          topics:
-            initialValues?.topics?.map((t) => ({
-              label: t.label,
-              value: t.value,
-            })) || '',
+          topics: (initialValues?.topics || [])
+            .map((t) =>
+              topicOptions.find((opt) => opt.value === Number(t.value)),
+            )
+            .filter(Boolean),
         }}
         validationSchema={groupValidationSchema}
         onSubmit={handleSubmit}
@@ -500,9 +607,7 @@ const GroupForm = ({
 
               <CWImageInput
                 label="Group Image (Accepts JPG and PNG files)"
-                onImageProcessingChange={({ isGenerating, isUploading }) => {
-                  setIsProcessingProfileImage(isGenerating || isUploading);
-                }}
+                onImageProcessingChange={handleImageProcessingChange}
                 name="groupImageUrl"
                 hookToForm
                 imageBehavior={ImageBehavior.Circle}
@@ -629,13 +734,54 @@ const GroupForm = ({
                   isClearable={false}
                   label="Topics"
                   placeholder="Type in topic name"
-                  options={sortedTopics.map((topic) => ({
-                    label: topic.name,
-                    value: topic.id,
-                    helpText: weightedVotingValueToLabel(
-                      topic.weighted_voting!,
+                  options={topicOptions}
+                  components={{
+                    Option: ({
+                      data,
+                      ...props
+                    }: OptionProps<TopicOption, true>) => (
+                      <components.Option {...props} data={data}>
+                        {data.label}
+                        {privateTopicIds.has(data.value) && (
+                          <CWIcon
+                            iconName="lockedNew"
+                            iconSize="small"
+                            style={{ marginLeft: 6 }}
+                          />
+                        )}
+                      </components.Option>
                     ),
-                  }))}
+                    SingleValue: ({
+                      data,
+                      ...props
+                    }: SingleValueProps<TopicOption, true>) => (
+                      <components.SingleValue {...props} data={data}>
+                        {data.label}
+                        {privateTopicIds.has(data.value) && (
+                          <CWIcon
+                            iconName="lockedNew"
+                            iconSize="small"
+                            style={{ marginLeft: 6 }}
+                          />
+                        )}
+                      </components.SingleValue>
+                    ),
+                    MultiValueLabel: ({
+                      data,
+                      ...props
+                    }: MultiValueProps<TopicOption, true>) => (
+                      <components.MultiValueLabel {...props} data={data}>
+                        {data.label}
+                        {privateTopicIds.has(data.value) && (
+                          <CWIcon
+                            iconName="lockedNew"
+                            iconSize="small"
+                            style={{ marginLeft: 6 }}
+                          />
+                        )}
+                      </components.MultiValueLabel>
+                    ),
+                  }}
                 />
               </section>
 
@@ -648,11 +794,18 @@ const GroupForm = ({
                       fontWeight="semiBold"
                       className="header-text"
                     >
-                      Topic Permissions
+                      Topic Gated Actions
                     </CWText>
                     <CWText type="b2">
-                      Select which topics this group can create threads and
-                      within.
+                      Select the actions that members of this group can perform
+                      in each topic. Non-members of this group can perform the
+                      disabled actions unless they are gated by another group.
+                    </CWText>
+                    <CWText type="b2">
+                      For example, if you enable the &apos;Create threads&apos;
+                      option for a topic called &apos;General&apos;, only users
+                      in this group can create threads in &apos;General&apos;,
+                      but all users can comment, upvote, and vote in polls.
                     </CWText>
                   </div>
                   {topicPermissionsToggleGroupSubForms && (

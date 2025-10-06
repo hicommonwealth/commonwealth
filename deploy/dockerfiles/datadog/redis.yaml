@@ -1,0 +1,6 @@
+init_config:
+
+instances:
+  - host: '%%env_REDISHOST%%'
+    port: '%%env_REDISPORT%%'
+    password: '%%env_REDIS_PASSWORD%%'

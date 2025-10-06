@@ -1,4 +1,5 @@
-@import '../../../../../styles/shared';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
 
 .CopyAddressInput {
   display: flex;
@@ -6,8 +7,8 @@
   align-items: center;
   width: 100%;
   padding: 5px 12px;
-  background-color: $neutral-50;
-  border: 1px solid $neutral-200;
+  background-color: colors.$neutral-50;
+  border: 1px solid colors.$neutral-200;
   border-radius: 6px;
 
   .address {

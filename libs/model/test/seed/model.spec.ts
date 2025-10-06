@@ -1,7 +1,6 @@
 import { dispose } from '@hicommonwealth/core';
-import { expect } from 'chai';
 import { Sequelize } from 'sequelize';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { models } from '../../src/database';
 import { Factories } from '../../src/models/factories';
 import {
@@ -16,14 +15,19 @@ const generateSchemas = async () => {
   // TODO: resolve remaining conflicts!!!
   const model_schema = await get_info_schema(models.sequelize, {
     ignore_columns: {
-      GroupPermissions: ['allowed_actions'],
+      GroupGatedActions: ['gated_actions'],
+      Votes: ['user_id'],
     },
     ignore_constraints: {
       // Removed in migration
       Outbox: ['PRIMARY KEY(event_id)'],
-      // Can't define index in model since it uses NULLS NOT DISTINCT
-      // See 20250409215621-add-unique-name-xp-log.js for more info
-      XpLogs: ['UNIQUE(action_meta_id,event_created_at,name,user_id)'],
+      XpLogs: [
+        // Can't define index in model since it uses NULLS NOT DISTINCT
+        // See 20250409215621-add-unique-name-xp-log.js for more info
+        'UNIQUE(action_meta_id,event_created_at,name,user_id)',
+        // Missing in migration for performace reasons, but once this is settled we can remove it
+        'FOREIGN KEY Users(referrer_user_id) UPDATE NO ACTION DELETE NO ACTION',
+      ],
     },
   });
 
@@ -32,12 +36,15 @@ const generateSchemas = async () => {
       // Missing in model - migrations with backups
       Comments: ['root_id'],
       Topics: ['default_offchain_template_backup'],
-      GroupPermissions: ['allowed_actions'],
+      GroupGatedActions: ['gated_actions'],
+      Votes: ['user_id'],
     },
     ignore_constraints: {
-      // Can't define index in model since it uses NULLS NOT DISTINCT
-      // See 20250409215621-add-unique-name-xp-log.js for more info
-      XpLogs: ['UNIQUE(action_meta_id,event_created_at,name,user_id)'],
+      XpLogs: [
+        // Can't define index in model since it uses NULLS NOT DISTINCT
+        // See 20250409215621-add-unique-name-xp-log.js for more info
+        'UNIQUE(action_meta_id,event_created_at,name,user_id)',
+      ],
     },
   });
 

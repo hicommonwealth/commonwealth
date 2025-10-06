@@ -1,4 +1,5 @@
-@import '../../../../styles/shared.scss';
+@use '../../../../styles/shared.scss';
+@use '../../../../styles/mixins/colors.module';
 
 .AddressItem {
   display: flex;
@@ -13,9 +14,9 @@
     gap: 2px;
 
     .address {
-      background-color: $neutral-200;
+      background-color: colors.$neutral-200;
       border-radius: 6px;
-      color: $neutral-600;
+      color: colors.$neutral-600;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -49,7 +50,7 @@
       width: 17px;
       height: 17px;
       cursor: pointer;
-      fill: $green-600;
+      fill: colors.$green-600;
     }
 
     .open-wallet-icon {

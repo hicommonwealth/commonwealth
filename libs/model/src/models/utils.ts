@@ -43,8 +43,11 @@ export function oneToOne<Source extends State, Target extends State>(
   const targetKey = options?.targetKey ?? this.primaryKeyAttribute;
   const foreignKey = options?.foreignKey ?? getDefaultFK(this, target);
 
-  // sequelize is not creating fk when fk = pk
-  if (foreignKey === target.primaryKeyAttribute) {
+  // sequelize is not creating fk when fk = pk or fk in composite pk
+  if (
+    foreignKey === target.primaryKeyAttribute ||
+    target.primaryKeyAttributes.includes(foreignKey)
+  ) {
     mapFk(
       target,
       this,
@@ -239,16 +242,21 @@ export function mapFk<Source extends State, Target extends State>(
  * Creates composite FK constraints (not supported by sequelize)
  */
 export const createFk = ({ name, source, fk, target, pk, rules }: FkMap) => `
-ALTER TABLE IF EXISTS "${source}" ADD CONSTRAINT "${name}"
-FOREIGN KEY (${fk.join(',')}) REFERENCES "${target}"(${pk.join(',')})
-ON UPDATE ${rules?.onUpdate ?? 'NO ACTION'} ON DELETE ${rules?.onDelete ?? 'NO ACTION'};
+  ALTER TABLE IF EXISTS "${source}"
+    ADD CONSTRAINT "${name}"
+      FOREIGN KEY (${fk.join(',')}) REFERENCES "${target}" (${pk.join(',')})
+    ON
+  UPDATE ${rules?.onUpdate ?? 'NO ACTION'}
+  ON
+  DELETE ${rules?.onDelete ?? 'NO ACTION'};
 `;
 
 /**
  * Drops composite FK constraints (not supported by sequelize)
  */
 export const dropFk = ({ source, name }: FkMap) =>
-  `ALTER TABLE IF EXISTS "${source}" DROP CONSTRAINT IF EXISTS "${name}";`;
+  `ALTER TABLE IF EXISTS "${source}"
+    DROP CONSTRAINT IF EXISTS "${name}";`;
 
 /**
  * Model sync hooks that can be used to inspect sequelize generated scripts

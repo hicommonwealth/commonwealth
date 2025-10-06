@@ -6,11 +6,44 @@ import {
   getTransactionReceipt,
   mustBeProtocolChainId,
 } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
 import { BalanceSourceType } from '@hicommonwealth/shared';
+import { models } from '../../database';
 import { CommunityAttributes } from '../../models';
 import { equalEvmAddresses } from '../../utils';
 import { getBalances } from '../tokenBalanceCache';
+
+/**
+ * Helper function to implement retry logic for getTransactionReceipt with exponential backoff
+ */
+const getTransactionReceiptWithRetry = async (params: {
+  rpc: string;
+  txHash: string;
+  maxRetries?: number;
+  initialDelay?: number;
+}) => {
+  const { rpc, txHash, maxRetries = 3, initialDelay = 1000 } = params;
+  let retries = 0;
+
+  while (retries <= maxRetries) {
+    try {
+      return await getTransactionReceipt({ rpc, txHash });
+    } catch (error) {
+      console.log('getTransactionReceiptWithRetry ERR: ', error);
+      if (retries < maxRetries) {
+        retries++;
+        // Exponential backoff with base 2: 1s, 2s, 4s, 8s, etc
+        const backoffDelay = initialDelay * Math.pow(2, retries - 1);
+        await new Promise((resolve) => setTimeout(resolve, backoffDelay));
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  // This should never be reached due to the logic in the catch block,
+  // but TypeScript requires a return value for all code paths
+  throw new Error('Maximum retries reached');
+};
 
 /**
  * Validate if an attested new namespace is valid on-chain Checks:
@@ -59,9 +92,11 @@ export const validateNamespace = async (
   mustBeProtocolChainId(chain_id);
 
   //tx data validation
-  const { txReceipt } = await getTransactionReceipt({
+  const { txReceipt } = await getTransactionReceiptWithRetry({
     rpc: chainNode.private_url,
     txHash,
+    maxRetries: 5,
+    initialDelay: 1000,
   });
   if (!txReceipt.status) {
     throw new AppError('tx failed');

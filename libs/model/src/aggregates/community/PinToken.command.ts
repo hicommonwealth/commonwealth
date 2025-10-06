@@ -1,8 +1,8 @@
 import { InvalidState, logger, type Command } from '@hicommonwealth/core';
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { config } from '@hicommonwealth/model';
+import { ValidChains } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { alchemyGetTokenPrices } from '@hicommonwealth/shared';
+import { config } from '../../config';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
@@ -33,7 +33,7 @@ export function PinToken(): Command<typeof schemas.PinToken> {
       );
       mustExist('ChainNode', chainNode);
 
-      if (chainNode.eth_chain_id !== cp.ValidChains.Base)
+      if (chainNode.eth_chain_id !== ValidChains.Base)
         throw new InvalidState(PinTokenErrors.OnlyBaseSupport);
 
       const community = await models.Community.findOne({
@@ -100,11 +100,25 @@ export function PinToken(): Command<typeof schemas.PinToken> {
         throw new InvalidState(PinTokenErrors.FailedToFetchPrice);
       }
 
-      return await models.PinnedToken.create({
-        community_id,
-        chain_node_id,
-        contract_address,
-      });
+      const pinnedToken = await models.sequelize.transaction(
+        async (transaction) => {
+          await models.Community.update(
+            { thread_purchase_token: contract_address },
+            { where: { id: community.id }, transaction },
+          );
+
+          return await models.PinnedToken.create(
+            {
+              community_id,
+              chain_node_id,
+              contract_address,
+            },
+            { transaction },
+          );
+        },
+      );
+
+      return pinnedToken;
     },
   };
 }

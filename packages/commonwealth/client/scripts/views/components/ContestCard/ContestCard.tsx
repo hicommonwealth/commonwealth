@@ -5,6 +5,7 @@ import React from 'react';
 import { buildContestPrizes } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
+import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useRerender from 'hooks/useRerender';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
@@ -20,6 +21,7 @@ import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopoverOld } from 'views/components/share_popover_old';
 import { openConfirmation } from 'views/modals/confirmation_modal';
@@ -33,10 +35,13 @@ import ContestAlert from './ContestAlert';
 
 import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
 import { useFlag } from 'hooks/useFlag';
-import FractionalValue from 'views/components/FractionalValue';
+import { smartTrim } from 'shared/utils';
+import { PrizeDisplay } from 'views/components/PrizeDisplay';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 
 import './ContestCard.scss';
+
+const MAX_CHARS_FOR_TITLE = 28;
 
 const noFundsProps = {
   title: 'There are no funds for this contest',
@@ -76,6 +81,7 @@ interface ContestCardProps {
   };
   hideWhenNoPrizes?: boolean;
   contestBalance?: number;
+  prizePercentage?: number;
 }
 
 const ContestCard = ({
@@ -99,6 +105,7 @@ const ContestCard = ({
   community,
   hideWhenNoPrizes = false,
   contestBalance = 0,
+  prizePercentage,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -129,9 +136,16 @@ const ContestCard = ({
   const prizes = buildContestPrizes(
     // if onchain balance is zero, use projected balance
     Number(onchainContestBalance || contestBalance),
+    prizePercentage,
     payoutStructure,
     decimals,
   );
+
+  const { data: tokenUsdRateData } = useFetchTokenUsdRateQuery({
+    tokenSymbol: ticker || 'ETH',
+    enabled: !!ticker,
+  });
+  const tokenUsdRate = parseFloat(tokenUsdRateData?.data?.data?.amount || '0');
 
   const handleCancel = () => {
     cancelContest({
@@ -239,11 +253,35 @@ const ContestCard = ({
     return null;
   }
 
+  const isTitleTrimmed = name.length > MAX_CHARS_FOR_TITLE;
+  const trimmedTitle = smartTrim(name, MAX_CHARS_FOR_TITLE);
+
+  const renderTitleWithTooltip = (title: string, isTrimmed: boolean) => {
+    if (!isTrimmed) return <CWText type="h4">{title}</CWText>;
+
+    return (
+      <CWTooltip
+        placement="bottom"
+        content={name}
+        renderTrigger={(handleInteraction) => (
+          <span
+            onMouseEnter={handleInteraction}
+            onMouseLeave={handleInteraction}
+          >
+            <CWText type="h4">{trimmedTitle}</CWText>
+          </span>
+        )}
+      />
+    );
+  };
+
   return (
     <CWCard
       className={clsx('ContestCard', {
         isHorizontal: isHorizontal && !isWindowMediumSmallInclusive,
       })}
+      elevation="elevation-1"
+      interactive
     >
       {imageUrl && (
         <div className="contest-image-container">
@@ -273,7 +311,7 @@ const ContestCard = ({
                 iconUrl: community?.iconUrl || '',
               }}
             />
-            <CWText type="h3">{name}</CWText>
+            {renderTitleWithTooltip(trimmedTitle, isTitleTrimmed)}
           </div>
           {finishDate ? (
             <CWCountDownTimer
@@ -336,20 +374,22 @@ const ContestCard = ({
               </CWText>
               <div className="prizes">
                 {prizes && prizes.length > 0 ? (
-                  prizes?.map((prize, index) => (
-                    <div className="prize-row" key={index}>
-                      <CWText className="label">
-                        {moment.localeData().ordinal(index + 1)} Prize
-                      </CWText>
-                      <CWText fontWeight="bold">
-                        <FractionalValue
-                          fontWeight="bold"
-                          value={Number(prize.replace(/,/g, ''))}
-                        />
-                        &nbsp;{ticker}
-                      </CWText>
-                    </div>
-                  ))
+                  prizes?.map((prize, index) => {
+                    const prizeTokenValue = Number(prize.replace(/,/g, ''));
+                    const prizeUsdValue = tokenUsdRate
+                      ? prizeTokenValue * tokenUsdRate
+                      : null;
+                    return (
+                      <PrizeDisplay
+                        key={index}
+                        tokenAmount={prizeTokenValue}
+                        tokenSymbol={ticker || 'ETH'}
+                        usdAmount={prizeUsdValue}
+                        position={index + 1}
+                        currencySymbol="$"
+                      />
+                    );
+                  })
                 ) : (
                   <CWText>No prizes available</CWText>
                 )}

@@ -1,0 +1,11 @@
+.AppliedFiltersAndTagsRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+
+  .applied-filter-button {
+    height: 30px;
+  }
+}

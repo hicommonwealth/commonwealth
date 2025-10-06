@@ -3,6 +3,7 @@ import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import { PageNotFound } from 'client/scripts/views/pages/404';
+import { useFlag } from 'hooks/useFlag';
 import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -10,6 +11,7 @@ import { AddressList } from '../CommunitySection/AddressList';
 import { CommunitySectionSkeleton } from '../CommunitySection/CommunitySectionSkeleton';
 import ProfileCard from '../CommunitySection/ProfileCard';
 import CreateCommunityButton from '../CreateCommunityButton';
+import TokenLaunchButton from '../TokenLaunchButton';
 import './SidebarProfileSection.scss';
 
 interface SidebarProfileSectionProps {
@@ -32,6 +34,8 @@ export const SidebarProfileSection = ({
   const { setAuthModalType } = useAuthModalStore();
 
   const user = useUserStore();
+
+  const launchpadEnabled = useFlag('launchpad');
 
   const {
     data,
@@ -98,6 +102,7 @@ export const SidebarProfileSection = ({
         )}
 
         <CWDivider />
+        {launchpadEnabled && <TokenLaunchButton buttonHeight="sm" />}
         <CreateCommunityButton />
         <CWDivider />
       </div>

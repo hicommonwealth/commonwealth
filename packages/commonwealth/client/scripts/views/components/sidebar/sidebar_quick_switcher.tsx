@@ -1,3 +1,5 @@
+import { Feed, FeedItem } from '@knocklabs/client';
+import type { GenericData } from '@knocklabs/types';
 import useFetchNotifications from 'client/scripts/state/api/notifications/useFetchNotifications';
 import clsx from 'clsx';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
@@ -24,16 +26,28 @@ export const SidebarQuickSwitcher = ({
   const { setMenu } = useSidebarStore();
   const user = useUserStore();
 
-  const { items, feedClient } = useFetchNotifications();
+  // Safely access notification data
+  let items: FeedItem<GenericData>[] = [];
+  let feedClient: Feed | null = null;
+  try {
+    const notificationsData = useFetchNotifications();
+    items = notificationsData.items || [];
+    feedClient = notificationsData.feedClient;
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+  }
 
   const location = useLocation();
   const pathname = location.pathname;
   const communityId = pathname.split('/')[1];
 
-  const starredCommunities = user.communities.filter((x) => x.isStarred);
-  const unstarredCommunities = user.communities.filter((x) => !x.isStarred);
+  const starredCommunities = user.communities?.filter((x) => x.isStarred) || [];
+  const unstarredCommunities =
+    user.communities?.filter((x) => !x.isStarred) || [];
 
   const markCommunityNotificationsAsRead = async (communityName) => {
+    if (!feedClient || !items || !items.length) return;
+
     const unreadNotifications = items.filter(
       (item) =>
         !item.seen_at &&
@@ -54,15 +68,13 @@ export const SidebarQuickSwitcher = ({
       className={clsx('SidebarQuickSwitcher', { onMobile, isInsideCommunity })}
     >
       <div className="community-nav-bar">
-        {user.isLoggedIn && (
-          <CWIconButton
-            iconName="plusCirclePhosphor"
-            iconButtonTheme="neutral"
-            onClick={() => {
-              setMenu({ name: 'createContent' });
-            }}
-          />
-        )}
+        <CWIconButton
+          iconName="plusCirclePhosphor"
+          iconButtonTheme="neutral"
+          onClick={() => {
+            setMenu({ name: 'createContent' });
+          }}
+        />
         <CWIconButton
           iconName="compassPhosphor"
           iconButtonTheme="neutral"
@@ -104,14 +116,18 @@ export const SidebarQuickSwitcher = ({
                   }}
                 />
                 <SideBarNotificationIcon
-                  unreadCount={calculateUnreadCount(community.name, items)}
+                  unreadCount={
+                    items && items.length
+                      ? calculateUnreadCount(community.name, items)
+                      : 0
+                  }
                 />
               </div>
             ))}
           </>
         )}
         <div className="seprator">
-          {user.communities.filter((x) => x.isStarred).length !== 0 && (
+          {user.communities?.filter((x) => x.isStarred)?.length !== 0 && (
             <CWDivider />
           )}
         </div>
@@ -135,7 +151,11 @@ export const SidebarQuickSwitcher = ({
               }}
             />
             <SideBarNotificationIcon
-              unreadCount={calculateUnreadCount(community.name, items)}
+              unreadCount={
+                items && items.length
+                  ? calculateUnreadCount(community.name, items)
+                  : 0
+              }
             />
           </div>
         ))}

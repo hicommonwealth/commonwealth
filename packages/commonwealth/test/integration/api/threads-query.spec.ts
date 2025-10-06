@@ -3,17 +3,12 @@ import { dispose } from '@hicommonwealth/core';
 import {
   ThreadAttributes,
   getThreadSearchVector,
-  tester,
   type DB,
-} from '@hicommonwealth/model';
-import chai from 'chai';
-import chaiHttp from 'chai-http';
+} from '@hicommonwealth/model/models';
+import * as tester from '@hicommonwealth/model/tester';
 import { Optional } from 'sequelize';
 import { NullishPropertiesOf } from 'sequelize/lib/utils';
-import { afterAll, beforeAll, describe, test } from 'vitest';
-
-chai.use(chaiHttp);
-const { expect } = chai;
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
 describe('Thread queries', () => {
   let models: DB;

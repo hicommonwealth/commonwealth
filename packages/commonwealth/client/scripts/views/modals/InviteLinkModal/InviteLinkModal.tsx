@@ -17,7 +17,7 @@ const InviteLinkModal = memo(function InviteLinkModal({
   const currentUrl = window.location.origin;
 
   const inviteLink = `${currentUrl}${
-    communityId ? `/${communityId}/discussions` : '/dashboard'
+    communityId ? `/${communityId}` : '/dashboard'
   }`;
 
   const textAndLink = generateTextAndLink(!!communityId, inviteLink);

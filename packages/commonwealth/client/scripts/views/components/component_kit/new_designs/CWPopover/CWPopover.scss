@@ -1,15 +1,16 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared.scss';
+@use '../../../../../styles/mixins/colors.module';
 
 .Popover {
-  background-color: $white;
+  background-color: colors.$white;
   padding: 16px 20px;
   border-radius: 6px;
-  border: 1px solid $neutral-200;
+  border: 1px solid colors.$neutral-200;
   max-width: 320px;
 
   .popover-title {
     text-transform: uppercase;
-    color: $neutral-400;
+    color: colors.$neutral-400;
     margin-bottom: 12px;
   }
 }

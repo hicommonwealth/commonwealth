@@ -1,4 +1,7 @@
-@import '../../../styles/shared.scss';
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/choice';
+@use '../../../styles/mixins/colors.module';
 
 @mixin radioCore($color) {
   display: grid;
@@ -22,33 +25,33 @@
   position: relative;
 
   .radio-input {
-    @include hideInput;
+    @include choice.hideInput;
   }
 
   .radio-control {
-    @include controlStyles;
+    @include choice.controlStyles;
 
-    border-radius: $border-radius-round;
+    border-radius: border_radius.$border-radius-round;
   }
 
   &:hover .radio-control {
-    @include radioCore($primary-200);
-    @include hoverColors;
+    @include radioCore(colors.$primary-200);
+    @include choice.hoverColors;
   }
 
   &.checked .radio-control {
-    @include radioCore($primary-500);
-    @include checkedColors;
+    @include radioCore(colors.$primary-500);
+    @include choice.checkedColors;
   }
 
   &.checked:hover .radio-control {
-    @include radioCore($primary-600);
-    @include checkedHoverColors;
+    @include radioCore(colors.$primary-600);
+    @include choice.checkedHoverColors;
   }
 
   &.checked.disabled .radio-control {
-    @include radioCore($neutral-300);
-    @include disabledColors;
+    @include radioCore(colors.$neutral-300);
+    @include choice.disabledColors;
   }
 
   &.disabled {
@@ -56,8 +59,8 @@
 
     .radio-control {
       // same color as background, so it's invisble on hover
-      @include radioCore($neutral-200);
-      @include disabledColors;
+      @include radioCore(colors.$neutral-200);
+      @include choice.disabledColors;
     }
   }
 }

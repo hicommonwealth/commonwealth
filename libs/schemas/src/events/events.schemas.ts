@@ -9,12 +9,24 @@ import { NamespaceReferral } from '../commands/community.schemas';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
+import { LaunchpadToken } from '../entities/launchpad-token.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
+import { ThreadToken } from '../entities/thread-token.schemas';
 import { Thread } from '../entities/thread.schemas';
+import { User } from '../entities/user.schemas';
 import { DiscordEventBase, Tweet } from '../integrations';
 import { EVM_ADDRESS_STRICT, EVM_BYTES, PG_INT } from '../utils';
-import { EventMetadata } from './util.schemas';
+
+// All events should carry this common metadata
+export const EventMetadata = z.object({
+  created_at: z.coerce.date().optional().describe('When the event was emitted'),
+  // TODO: TBD
+  // aggregateType: z.enum(Aggregates).describe("Event emitter aggregate type")
+  // aggregateId: z.string().describe("Event emitter aggregate id")
+  // correlation: z.string().describe("Event correlation key")
+  // causation: z.object({}).describe("Event causation")
+});
 
 const ChainEventBase = z.object({
   eventSource: z.object({
@@ -60,6 +72,7 @@ export const events = {
     user_id: z.number(),
     created_at: z.coerce.date(),
     referrer_address: z.string().nullish(),
+    user: User,
   }),
 
   AddressOwnershipTransferred: z.object({
@@ -220,7 +233,8 @@ export const events = {
     parent_channel_id: true,
   }),
 
-  CommonDiscordServerJoined: z.object({
+  DiscordServerJoined: z.object({
+    server_id: z.string(),
     user_id: z.number().nullish(),
     discord_username: z.string(),
     joined_date: z.coerce.date(),
@@ -235,6 +249,8 @@ export const events = {
       .int()
       .positive()
       .describe('Recurring constest interval'),
+    transaction_hash: z.string().describe('Transaction hash'),
+    eth_chain_id: z.number().int().positive().describe('Ethereum chain id'),
     block_number: z
       .number()
       .int()
@@ -246,6 +262,8 @@ export const events = {
     namespace: z.string().describe('Community namespace'),
     contest_address: z.string().describe('Contest manager address'),
     length: z.number().int().positive().describe('Length of contest in days'),
+    transaction_hash: z.string().describe('Transaction hash'),
+    eth_chain_id: z.number().int().positive().describe('Ethereum chain id'),
     block_number: z
       .number()
       .int()
@@ -344,6 +362,11 @@ export const events = {
     created_at: z.coerce.date(),
   }),
 
+  UserUpdated: z.object({
+    old_user: User,
+    new_user: User,
+  }),
+
   QuestStarted: z.object({
     id: PG_INT.nullish(),
     name: z.string().max(255),
@@ -393,6 +416,29 @@ export const events = {
     eth_chain_id: z.number(),
   }),
 
+  LaunchpadTokenRecordCreated: z.object({
+    name: z.string(),
+    symbol: z.string(),
+    created_at: z.coerce.date(),
+    eth_chain_id: z.number(),
+    creator_address: EVM_ADDRESS_STRICT,
+    token_address: EVM_ADDRESS_STRICT,
+    namespace: z.string(),
+    curve_id: z.string(),
+    total_supply: z.string(),
+    launchpad_liquidity: z.string(),
+    reserve_ration: z.string(),
+    initial_purchase_eth_amount: z.string(),
+  }),
+
+  LaunchpadTokenGraduated: z.object({
+    token: LaunchpadToken,
+  }),
+
+  ThreadTokenGraduated: z.object({
+    token: ThreadToken,
+  }),
+
   LaunchpadTokenTraded: z.object({
     block_timestamp: z.coerce.bigint(),
     transaction_hash: z.string(),
@@ -425,10 +471,17 @@ export const events = {
     }),
   }),
 
+  CommunityNamespaceCreated: z.object({
+    name: z.string(),
+    token: z.string(),
+    namespaceAddress: z.string(),
+    governanceAddress: z.string(),
+  }),
+
   WalletLinked: z.object({
     user_id: z.number(),
     new_user: z.boolean(),
-    wallet_id: z.nativeEnum(WalletId),
+    wallet_id: z.enum(WalletId),
     community_id: z.string(),
     balance: z.string(),
     created_at: z.coerce.date(),
@@ -437,14 +490,14 @@ export const events = {
   SSOLinked: z.object({
     user_id: z.number(),
     new_user: z.boolean(),
-    oauth_provider: z.nativeEnum(WalletSsoSource),
+    oauth_provider: z.enum(WalletSsoSource),
     community_id: z.string(),
     created_at: z.coerce.date(),
   }),
 
   XpChainEventCreated: z.object({
     eth_chain_id: z.number(),
-    quest_action_meta_id: z.number(),
+    quest_action_meta_ids: z.array(z.number()),
     transaction_hash: z.string(),
     created_at: z.coerce.date(),
   }),
@@ -502,6 +555,57 @@ export const events = {
     }),
   }),
 
+  JudgeNominated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+      judge: EVM_ADDRESS_STRICT.describe('Judge address'),
+      judgeId: z.coerce.bigint().describe('Judge ID'),
+      nominator: EVM_ADDRESS_STRICT.describe('Nominator address'),
+      currentNominations: z.coerce
+        .bigint()
+        .describe('Current nomination count'),
+    }),
+  }).describe('Contest judge nominated'),
+
+  NominatorNominated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+      nominator: EVM_ADDRESS_STRICT.describe('Nominator address'),
+    }),
+  }).describe('Nomination token (ID 3) minted'),
+
+  NominatorSettled: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.string().describe('Community namespace'),
+    }),
+  }).describe('Nomination configured'),
+
+  CmnOzProposalCreated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      proposalId: z.bigint(),
+      proposerAddress: EVM_ADDRESS_STRICT,
+      description: z.string(),
+      voteStartTimestamp: z.bigint(),
+      voteEndTimestamp: z.bigint(),
+    }),
+  }),
+
+  CmnTokenVoteCast: ChainEventBase.extend({
+    parsedArgs: z.object({
+      proposalId: z.bigint(),
+      tokenId: z.bigint(),
+      support: z.number(),
+    }),
+  }),
+
+  CmnAddressVoteCast: ChainEventBase.extend({
+    parsedArgs: z.object({
+      proposalId: z.bigint(),
+      voterAddress: z.string(),
+      support: z.number(),
+    }),
+  }),
+
   NamespaceLinked: z.object({
     namespace_address: z.string(),
     deployer_address: z.string(),
@@ -542,6 +646,26 @@ export const events = {
         rejected: z.boolean().optional(),
       })
       .array(),
+    created_at: z.coerce.date(),
+  }),
+
+  CommunityDirectoryTagsUpdated: z.object({
+    community_id: z.string(),
+    tag_names: z.array(z.string()),
+    selected_community_ids: z.array(z.string()),
+    created_at: z.coerce.date(),
+  }),
+
+  RefreshWeightedVotesRequested: z.object({
+    topic_id: PG_INT,
+    community_id: z.string(),
+  }),
+
+  XpAwarded: z.object({
+    by_user_id: PG_INT,
+    user_id: PG_INT,
+    xp_amount: z.number(),
+    reason: z.string(),
     created_at: z.coerce.date(),
   }),
 } as const;

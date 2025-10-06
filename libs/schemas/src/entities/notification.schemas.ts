@@ -4,7 +4,8 @@ import { PG_INT } from '../utils';
 import { Comment } from './comment.schemas';
 import { Community } from './community.schemas';
 import { Thread } from './thread.schemas';
-import { Address } from './user.schemas';
+import { Topic } from './topic.schemas';
+import { Address, User } from './user.schemas';
 
 export const NotificationCategory = z.object({
   name: z.string().max(255),
@@ -17,7 +18,7 @@ export const NotificationCategory = z.object({
 export const Subscription = z.object({
   id: PG_INT,
   subscriber_id: PG_INT,
-  category_id: z.nativeEnum(NotificationCategories),
+  category_id: z.enum(NotificationCategories),
   is_active: z.boolean().default(true),
   immediate_email: z.boolean().default(false),
   community_id: z.string().max(255).optional().nullable(),
@@ -39,6 +40,8 @@ export const SubscriptionPreference = z.object({
   mobile_push_admin_alerts_enabled: z.boolean().default(false),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
+
+  User: User.optional(),
 });
 
 export const ThreadSubscription = z.object({
@@ -53,6 +56,7 @@ export const ThreadSubscription = z.object({
     address_id: true,
     title: true,
     comment_count: true,
+    net_comment_count: true,
     created_at: true,
     url: true,
   })
@@ -92,6 +96,7 @@ export const CommentSubscription = z.object({
           community_id: true,
           title: true,
           comment_count: true,
+          net_comment_count: true,
           created_at: true,
           url: true,
         })
@@ -131,3 +136,12 @@ export const CommunityAlert = z
       }).optional(),
     }),
   );
+
+export const TopicSubscription = z.object({
+  user_id: PG_INT,
+  topic_id: PG_INT,
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+
+  Topic: Topic.optional(),
+});
