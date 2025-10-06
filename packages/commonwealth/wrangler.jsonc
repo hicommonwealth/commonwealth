@@ -1,0 +1,14 @@
+{
+  "name": "common-proxy",
+  "main": "src/commonProxy.ts",
+  "compatibility_date": "2025-10-06",
+
+  // Routes determine which requests invoke this Worker
+  "routes": [
+    {
+      // Catch-all route for SaaS Custom Hostnames attached to this zone
+      "pattern": "*",
+      "custom_domain": true,
+    },
+  ],
+}
