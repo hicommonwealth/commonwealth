@@ -185,6 +185,7 @@ const ProposalListing = ({
     (selected: OptionType | null) => {
       if (selected && selected.value !== snapshot.value) {
         setSnapshot(selected);
+        setFilter(filterOptions[0]);
       }
     },
     [snapshot.value],
@@ -195,8 +196,8 @@ const ProposalListing = ({
   }, []);
 
   const TableComponent = useMemo(() => {
-    return <CWTable columnInfo={columnInfo} rowData={rowData} />;
-  }, [rowData, columnInfo]);
+    return <CWTable key={`table-${snapshot.value}-${filter.value}`} columnInfo={columnInfo} rowData={rowData} />;
+  }, [rowData, columnInfo, snapshot.value, filter.value]);
 
   if (chain === ChainBase.Ethereum && isSnapshotProposalsLoading) {
     return <LoadingIndicator message="Connecting to chain" />;
