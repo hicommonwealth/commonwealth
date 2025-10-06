@@ -1,10 +1,11 @@
-@import '../../../../../styles/shared.scss';
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
 
 .ProposalCard {
-  border: 1px solid $neutral-200;
+  border: 1px solid colors.$neutral-200;
   border-radius: 8px;
   padding: 16px;
-  background-color: $white;
+  background-color: colors.$white;
   width: 240px;
   height: 170px;
   display: flex;
@@ -20,7 +21,7 @@
 
     .progress-bar {
       height: 6px;
-      background: $neutral-200;
+      background: colors.$neutral-200;
       border-radius: 3px;
       margin: 8px 0;
     }

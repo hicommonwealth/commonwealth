@@ -67,7 +67,7 @@ const GovernancePage = () => {
     onCosmos &&
     (isLoadingActicCosmosProposal || isLoadingCompletedCosmosProposal)
   )
-    return <PageLoading message="Connecting to chain" />;
+    return <LoadingIndicator message="Connecting to chain" />;
 
   const activeProposalsCount = activeCosmosProposals?.length || 0;
   const inactiveProposalsCount =
