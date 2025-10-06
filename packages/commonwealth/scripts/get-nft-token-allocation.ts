@@ -1,61 +1,75 @@
+/**
+ * NFT Token Allocation Script
+ *
+ * This script calculates token allocations for NFT holders based on rarity and user tiers.
+ *
+ * Usage:
+ *   npm run script get-nft-token-allocation.ts [-t r|p] [--clear]
+ *
+ * Options:
+ *   -t r|p    Tier assignment type: 'r' for rank-based, 'p' for percentile-based (default: p)
+ *   --clear   Clear calculated columns before running (user_id, user_tier, calculated_rarity,
+ *             rarity_tier, equal_distribution_allocation, rarity_distribution_allocation)
+ *
+ * Examples:
+ *   npm run script get-nft-token-allocation.ts --clear
+ *   npm run script get-nft-token-allocation.ts -t r
+ *   npm run script get-nft-token-allocation.ts -t p --clear
+ */
+
 import { dispose } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model/db';
 import { UserTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
+import { config } from '../server/config';
 import { NFTTrait } from './get-nft-holder-snapshot';
 
 ////////////////// Configuration //////////////////
 
 // Higher tier is better i.e. rarer.
 
-// Define the percentiles to assign rarity tiers. Must always start at 100.
-// Must always be in descending order - index of percentile is the assigned rarity_tier.
-// Ex: [100, 10] -> NFTs would be classified into 2 tiers.
-//  Tier 1: top 10% of NFTs by rarity value
-//  Tier 0: rest of NFTs
-const RarityPercentiles = [100, 75, 15, 6.5, 3.5];
+// Get configuration from centralized config
+const {
+  userTierWeights,
+  nft: {
+    tokenSupply: TokenSupply,
+    // Define the percentiles to assign rarity tiers. Must always start at 100.
+    // Must always be in descending order - index of percentile is the assigned rarity_tier.
+    // Ex: [100, 10] -> NFTs would be classified into 2 tiers.
+    //  Tier 1: top 10% of NFTs by rarity value
+    //  Tier 0: rest of NFTs
+    rarityPercentiles: RarityPercentiles,
+    // Define the ranks to assign rarity tiers.
+    // Ex: [300, 400] -> NFTs would be classified into 3 tiers.
+    //  Tier 2: ranks 1-300 (top 300)
+    //  Tier 1: ranks 301-700 (next 400)
+    //  Tier 0: ranks 701+ (remaining)
+    rarityRanks: RarityRanks,
+    // The weights used to calculate token allocation for each NFT based on its rarity tier derived from rank.
+    // MUST always have one more weight than the number of RarityRanks.
+    // NOTE: rarity_tier is used as the index for the weight so this should be in reverse order of RarityRanks.
+    // Ex: If RarityRanks = [1, 10] then suppose RarityTierWeightsByRank = [1, 5, 10]
+    //  Tier 2 (index 2): has a weight of 10
+    //  Tier 1 (index 1): has a weight of 5
+    //  Tier 0 (index 0): has a weight of 1
+    rarityTierWeightsByRank: RarityTierWeightsByRank,
+    // The weights used to calculate token allocation for each NFT based on its rarity tier derived from percentile.
+    // MUST always be equal to the number of RarityPercentiles.
+    // Ex: If RarityPercentiles = [100, 75, 15, 6.5, 3.5] then suppose
+    // RarityTierWeightsByPercentile = [1, 5, 10, 20, 50]
+    //  Tier 4 (index 4): has a weight of 50
+    //  Tier 3 (index 3): has a weight of 20
+    //  Tier 2 (index 2): has a weight of 10
+    //  Tier 1 (index 1): has a weight of 5
+    //  Tier 0 (index 0): has a weight of 1
+    rarityTierWeightsByPercentile: RarityTierWeightsByPercentile,
+    equalDistributionPercent: EqualDistributionPercent,
+    rarityDistributionPercent: RarityDistributionPercent,
+  },
+} = config.TOKEN_ALLOCATION;
 
-// Define the ranks to assign rarity tiers.
-// Ex: [300, 400] -> NFTs would be classified into 3 tiers.
-//  Tier 2: ranks 1-300 (top 300)
-//  Tier 1: ranks 301-700 (next 400)
-//  Tier 0: ranks 701+ (remaining)
-const RarityRanks = [1, 10];
-
-// The weights used to calculate token allocation for each NFT based on its rarity tier derived from rank.
-// MUST always have one more weight than the number of RarityRanks.
-// NOTE: rarity_tier is used as the index for the weight so this should be in reverse order of RarityRanks.
-// Ex: If RarityRanks = [1, 10] then suppose RarityTierWeightsByRank = [1, 5, 10]
-//  Tier 2 (index 2): has a weight of 10
-//  Tier 1 (index 1): has a weight of 5
-//  Tier 0 (index 0): has a weight of 1
-const RarityTierWeightsByRank = [1, 5, 10];
-
-// The weights used to calculate token allocation for each NFT based on its rarity tier derived from percentile.
-// MUST always be equal to the number of RarityPercentiles.
-// Ex: If RarityPercentiles = [100, 75, 15, 6.5, 3.5] then suppose RarityTierWeightsByPercentile = [1, 5, 10, 20, 50]
-//  Tier 4 (index 4): has a weight of 50
-//  Tier 3 (index 3): has a weight of 20
-//  Tier 2 (index 2): has a weight of 10
-//  Tier 1 (index 1): has a weight of 5
-//  Tier 0 (index 0): has a weight of 1
-const RarityTierWeightsByPercentile = [1, 5, 10, 20, 50];
-
-const UserTierWeightsMap: Record<UserTierMap, number> = {
-  [UserTierMap.IncompleteUser]: 0,
-  [UserTierMap.BannedUser]: 0,
-  [UserTierMap.NewlyVerifiedWallet]: 1,
-  [UserTierMap.VerifiedWallet]: 1,
-  [UserTierMap.SocialVerified]: 1.25,
-  [UserTierMap.ChainVerified]: 1.5,
-  [UserTierMap.FullyVerified]: 1.75,
-  [UserTierMap.ManuallyVerified]: 2,
-  [UserTierMap.SystemUser]: 0,
-};
-
-const TokenSupply = 150_000_000;
-const EqualDistributionPercent = 0.6;
-const RarityDistributionPercent = 0.4;
+const UserTierWeightsMap: Record<UserTierMap, number> =
+  userTierWeights as Record<UserTierMap, number>;
 
 ////////////////// End Configuration //////////////////
 
@@ -113,9 +127,9 @@ async function calculateTraitRarity(trait_type: string, trait_value: string) {
     count: number;
   }>(
     `
-      SELECT COUNT(*) as count
-      FROM "NftSnapshot"
-      WHERE traits @> $1::jsonb;
+        SELECT COUNT(*) as count
+        FROM "NftSnapshot"
+        WHERE traits @> $1::jsonb;
     `,
     {
       type: QueryTypes.SELECT,
@@ -129,8 +143,8 @@ async function calculateTraitRarity(trait_type: string, trait_value: string) {
 
   const [{ count: numNFTs }] = await models.sequelize.query<{ count: number }>(
     `
-      SELECT COUNT(*) as count
-      FROM "NftSnapshot"
+        SELECT COUNT(*) as count
+        FROM "NftSnapshot"
     `,
     {
       type: QueryTypes.SELECT,
@@ -143,11 +157,12 @@ async function calculateTraitRarity(trait_type: string, trait_value: string) {
 }
 
 async function calculateNftRarity(tokenId: number) {
+  console.log(`Calculating rarity for NFT token: ${tokenId}`);
   const [{ traits }] = await models.sequelize.query<{ traits: NFTTrait[] }>(
     `
-      SELECT traits
-      FROM "NftSnapshot"
-      WHERE token_id = ${tokenId};
+        SELECT traits
+        FROM "NftSnapshot"
+        WHERE token_id = ${tokenId};
     `,
     {
       type: QueryTypes.SELECT,
@@ -169,9 +184,9 @@ async function updateAllNftRarity() {
   // Fetch all token IDs from the "NftSnapshot" table
   const tokenIds = await models.sequelize.query<{ token_id: number }>(
     `
-      SELECT token_id
-      FROM "NftSnapshot"
-      ORDER BY token_id;
+        SELECT token_id
+        FROM "NftSnapshot"
+        ORDER BY token_id;
     `,
     {
       type: QueryTypes.SELECT,
@@ -180,33 +195,55 @@ async function updateAllNftRarity() {
 
   console.log(`Found ${tokenIds.length} tokens to process`);
 
-  // Process tokens in batches to avoid overwhelming the database
-  let processedCount = 0;
+  // Calculate rarity for all tokens in parallel
+  const BATCH_SIZE = 50; // Process in batches to avoid overwhelming the system
+  const rarityUpdates: Array<{ token_id: number; rarity: number }> = [];
 
-  for (const { token_id } of tokenIds) {
-    const rarity = await calculateNftRarity(token_id);
-    // Update the calculated_rarity column for this token
-    await models.sequelize.query(
-      `
-        UPDATE "NftSnapshot"
-        SET calculated_rarity = :rarity,
-            updated_at        = NOW()
-        WHERE token_id = :tokenId;
-      `,
-      {
-        replacements: {
-          rarity: Math.round(rarity * 100) / 100,
-          tokenId: token_id,
-        }, // Round to 2 decimal places
-        type: QueryTypes.UPDATE,
-      },
+  for (let i = 0; i < tokenIds.length; i += BATCH_SIZE) {
+    const batch = tokenIds.slice(i, i + BATCH_SIZE);
+    console.log(
+      `Processing batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(tokenIds.length / BATCH_SIZE)}...`,
     );
 
-    processedCount++;
+    // Process batch in parallel
+    const batchPromises = batch.map(async ({ token_id }) => {
+      const rarity = await calculateNftRarity(token_id);
+      return {
+        token_id,
+        rarity: Math.round(rarity * 100) / 100, // Round to 2 decimal places
+      };
+    });
+
+    const batchResults = await Promise.all(batchPromises);
+    rarityUpdates.push(...batchResults);
+
+    console.log(
+      `Calculated rarity for ${rarityUpdates.length}/${tokenIds.length} tokens...`,
+    );
   }
 
+  // Perform batch update using a single SQL query
+  console.log('Performing batch update of rarity values...');
+  const updateCases = rarityUpdates
+    .map(({ token_id, rarity }) => `WHEN ${token_id} THEN ${rarity}`)
+    .join(' ');
+
+  const tokenIdsList = rarityUpdates.map(({ token_id }) => token_id).join(',');
+
+  await models.sequelize.query(
+    `
+        UPDATE "NftSnapshot"
+        SET calculated_rarity = CASE token_id ${updateCases} END,
+            updated_at        = NOW()
+        WHERE token_id IN (${tokenIdsList});
+    `,
+    {
+      type: QueryTypes.UPDATE,
+    },
+  );
+
   console.log(
-    `✅ NFT rarity calculation completed! Processed ${processedCount}/${tokenIds.length} tokens successfully.`,
+    `✅ NFT rarity calculation completed! Processed ${rarityUpdates.length}/${tokenIds.length} tokens successfully.`,
   );
 }
 
@@ -219,10 +256,10 @@ async function assignRarityTierByPercentile() {
     calculated_rarity: number;
   }>(
     `
-      SELECT token_id, calculated_rarity
-      FROM "NftSnapshot"
-      WHERE calculated_rarity IS NOT NULL
-      ORDER BY calculated_rarity DESC, token_id;
+        SELECT token_id, calculated_rarity
+        FROM "NftSnapshot"
+        WHERE calculated_rarity IS NOT NULL
+        ORDER BY calculated_rarity DESC, token_id;
     `,
     {
       type: QueryTypes.SELECT,
@@ -246,8 +283,8 @@ async function assignRarityTierByPercentile() {
   });
 
   // Assign rarity tiers
-  let processedCount = 0;
   const tierCounts = Array(RarityPercentiles.length).fill(0);
+  const tierUpdates: Array<{ token_id: number; rarityTier: number }> = [];
 
   for (const nft of nfts) {
     let rarityTier = 0; // Default to lowest tier
@@ -261,31 +298,30 @@ async function assignRarityTierByPercentile() {
     }
 
     tierCounts[rarityTier]++;
-
-    // Update the rarity_tier in the database
-    await models.sequelize.query(
-      `
-        UPDATE "NftSnapshot"
-        SET rarity_tier = :rarityTier,
-            updated_at  = NOW()
-        WHERE token_id = :tokenId;
-      `,
-      {
-        replacements: {
-          rarityTier,
-          tokenId: nft.token_id,
-        },
-        type: QueryTypes.UPDATE,
-      },
-    );
-
-    processedCount++;
-
-    // Log progress every 1000 tokens
-    if (processedCount % 1000 === 0) {
-      console.log(`Processed ${processedCount}/${totalNfts} tokens...`);
-    }
+    tierUpdates.push({ token_id: nft.token_id, rarityTier });
   }
+
+  // Perform batch update using a single SQL query
+  console.log('Performing batch update of rarity tiers...');
+  const updateCases = tierUpdates
+    .map(({ token_id, rarityTier }) => `WHEN ${token_id} THEN ${rarityTier}`)
+    .join(' ');
+
+  const tokenIdsList = tierUpdates.map(({ token_id }) => token_id).join(',');
+
+  await models.sequelize.query(
+    `
+        UPDATE "NftSnapshot"
+        SET rarity_tier = CASE token_id ${updateCases} END,
+            updated_at  = NOW()
+        WHERE token_id IN (${tokenIdsList});
+    `,
+    {
+      type: QueryTypes.UPDATE,
+    },
+  );
+
+  const processedCount = tierUpdates.length;
 
   console.log(
     '\n\nPercentile thresholds (Percentile %: Rarity Value):',
@@ -314,10 +350,10 @@ async function assignRarityTierByRank() {
     calculated_rarity: number;
   }>(
     `
-      SELECT token_id, calculated_rarity
-      FROM "NftSnapshot"
-      WHERE calculated_rarity IS NOT NULL
-      ORDER BY calculated_rarity DESC, token_id;
+        SELECT token_id, calculated_rarity
+        FROM "NftSnapshot"
+        WHERE calculated_rarity IS NOT NULL
+        ORDER BY calculated_rarity DESC, token_id;
     `,
     {
       type: QueryTypes.SELECT,
@@ -363,8 +399,8 @@ async function assignRarityTierByRank() {
   );
 
   // Assign rarity tiers
-  let processedCount = 0;
   const tierCounts = Array(RarityRanks.length + 1).fill(0); // +1 for tier 0
+  const tierUpdates: Array<{ token_id: number; rarityTier: number }> = [];
 
   for (let index = 0; index < nfts.length; index++) {
     const nft = nfts[index];
@@ -381,31 +417,30 @@ async function assignRarityTierByRank() {
     }
 
     tierCounts[rarityTier]++;
-
-    // Update the rarity_tier in the database
-    await models.sequelize.query(
-      `
-        UPDATE "NftSnapshot"
-        SET rarity_tier = :rarityTier,
-            updated_at  = NOW()
-        WHERE token_id = :tokenId;
-      `,
-      {
-        replacements: {
-          rarityTier,
-          tokenId: nft.token_id,
-        },
-        type: QueryTypes.UPDATE,
-      },
-    );
-
-    processedCount++;
-
-    // Log progress every 1000 tokens
-    if (processedCount % 1000 === 0) {
-      console.log(`Processed ${processedCount}/${nfts.length} tokens...`);
-    }
+    tierUpdates.push({ token_id: nft.token_id, rarityTier });
   }
+
+  // Perform batch update using a single SQL query
+  console.log('Performing batch update of rarity tiers...');
+  const updateCases = tierUpdates
+    .map(({ token_id, rarityTier }) => `WHEN ${token_id} THEN ${rarityTier}`)
+    .join(' ');
+
+  const tokenIdsList = tierUpdates.map(({ token_id }) => token_id).join(',');
+
+  await models.sequelize.query(
+    `
+        UPDATE "NftSnapshot"
+        SET rarity_tier = CASE token_id ${updateCases} END,
+            updated_at  = NOW()
+        WHERE token_id IN (${tokenIdsList});
+    `,
+    {
+      type: QueryTypes.UPDATE,
+    },
+  );
+
+  const processedCount = tierUpdates.length;
 
   console.log('\n\nRank-based tier assignment:', tierDescriptions.join(', '));
   console.log('\nRarity tier distribution:');
@@ -429,10 +464,10 @@ async function calculateEqualDistributionAllocations() {
     user_tier: number | null;
   }>(
     `
-      SELECT token_id, calculated_rarity, user_tier
-      FROM "NftSnapshot"
-      WHERE calculated_rarity IS NOT NULL
-      ORDER BY calculated_rarity DESC, token_id;
+        SELECT token_id, calculated_rarity, user_tier
+        FROM "NftSnapshot"
+        WHERE calculated_rarity IS NOT NULL
+        ORDER BY calculated_rarity DESC, token_id;
     `,
     {
       type: QueryTypes.SELECT,
@@ -462,9 +497,9 @@ async function calculateEqualDistributionAllocations() {
   }[] = [];
 
   for (const nft of nfts) {
-    // Get user tier weight, default to IncompleteUser (0) if no user_tier
-    const userTier = nft.user_tier ?? UserTierMap.IncompleteUser;
-    const weight = UserTierWeightsMap[userTier as UserTierMap] || 0;
+    // Get user tier weight, default to NewlyVerifiedWallet (1) if no user_tier
+    const userTier = nft.user_tier ?? UserTierMap.NewlyVerifiedWallet;
+    const weight = UserTierWeightsMap[userTier as UserTierMap];
     totalWeightSum += weight;
     nftWeights.push({
       token_id: nft.token_id,
@@ -479,7 +514,6 @@ async function calculateEqualDistributionAllocations() {
   }
 
   // Calculate allocations for each NFT based on weight percentage
-  let processedCount = 0;
   let totalAllocated = 0;
   const allocations: {
     token_id: number;
@@ -521,34 +555,27 @@ async function calculateEqualDistributionAllocations() {
     totalAllocated += 1;
   }
 
-  // Update the database with allocations
-  processedCount = 0;
-  for (const allocation of allocations) {
-    await models.sequelize.query(
-      `
+  // Update the database with allocations using batch update
+  console.log('Performing batch update of equal distribution allocations...');
+  const updateCases = allocations
+    .map(({ token_id, allocation }) => `WHEN ${token_id} THEN ${allocation}`)
+    .join(' ');
+
+  const tokenIdsList = allocations.map(({ token_id }) => token_id).join(',');
+
+  await models.sequelize.query(
+    `
         UPDATE "NftSnapshot"
-        SET equal_distribution_allocation = :allocation,
+        SET equal_distribution_allocation = CASE token_id ${updateCases} END,
             updated_at                    = NOW()
-        WHERE token_id = :tokenId;
-      `,
-      {
-        replacements: {
-          allocation: allocation.allocation,
-          tokenId: allocation.token_id,
-        },
-        type: QueryTypes.UPDATE,
-      },
-    );
+        WHERE token_id IN (${tokenIdsList});
+    `,
+    {
+      type: QueryTypes.UPDATE,
+    },
+  );
 
-    processedCount++;
-
-    // Log progress every 1000 tokens
-    if (processedCount % 1000 === 0) {
-      console.log(
-        `Processed ${processedCount}/${allocations.length} tokens...`,
-      );
-    }
-  }
+  const processedCount = allocations.length;
 
   if (totalAllocated !== totalEqualDistributionTokens) {
     throw new Error(
@@ -563,7 +590,7 @@ async function calculateEqualDistributionAllocations() {
   for (const allocation of allocations) {
     const nft = nfts.find((n) => n.token_id === allocation.token_id);
     if (nft) {
-      const tier = nft.user_tier ?? UserTierMap.IncompleteUser;
+      const tier = nft.user_tier ?? UserTierMap.NewlyVerifiedWallet;
       if (!tierSummary[tier]) {
         tierSummary[tier] = { count: 0, totalAllocation: 0 };
       }
@@ -589,12 +616,14 @@ async function calculateEqualDistributionAllocations() {
       );
       const tierWeight = UserTierWeightsMap[tier as UserTierMap] || 0;
       console.log(
-        `Tier ${tier} (weight: ${tierWeight}): ${summary.count} NFTs, ${summary.totalAllocation.toLocaleString()} tokens (avg: ${avgAllocation})`,
+        `Tier ${tier} (weight: ${tierWeight}): ${summary.count} NFTs, ` +
+          `${summary.totalAllocation.toLocaleString()} tokens (avg: ${avgAllocation})`,
       );
     });
 
   console.log(
-    `✅ Tier-weighted distribution allocation completed! Processed ${processedCount}/${allocations.length} tokens successfully.`,
+    `✅ Tier-weighted distribution allocation completed!` +
+      ` Processed ${processedCount}/${allocations.length} tokens successfully.`,
   );
 }
 
@@ -613,10 +642,11 @@ async function calculateRarityDistributionAllocation(
     user_tier: number | null;
   }>(
     `
-      SELECT token_id, calculated_rarity, rarity_tier, user_tier
-      FROM "NftSnapshot"
-      WHERE calculated_rarity IS NOT NULL AND rarity_tier IS NOT NULL
-      ORDER BY calculated_rarity DESC, token_id ASC;
+        SELECT token_id, calculated_rarity, rarity_tier, user_tier
+        FROM "NftSnapshot"
+        WHERE calculated_rarity IS NOT NULL
+          AND rarity_tier IS NOT NULL
+        ORDER BY calculated_rarity DESC, token_id;
     `,
     {
       type: QueryTypes.SELECT,
@@ -652,8 +682,8 @@ async function calculateRarityDistributionAllocation(
 
   for (const nft of nfts) {
     const rarityWeight = rarityWeights[nft.rarity_tier] || 0;
-    const userTier = nft.user_tier ?? UserTierMap.IncompleteUser;
-    const userTierWeight = UserTierWeightsMap[userTier as UserTierMap] || 0;
+    const userTier = nft.user_tier ?? UserTierMap.NewlyVerifiedWallet;
+    const userTierWeight = UserTierWeightsMap[userTier as UserTierMap];
 
     // Combined weight is the product of rarity weight and user tier weight
     // This gives higher allocations to both rare NFTs AND higher tier users
@@ -680,7 +710,6 @@ async function calculateRarityDistributionAllocation(
   );
 
   // Calculate allocations for each NFT based on combined weight percentage
-  let processedCount = 0;
   let totalAllocated = 0;
   const allocations: {
     token_id: number;
@@ -726,34 +755,27 @@ async function calculateRarityDistributionAllocation(
     totalAllocated += 1;
   }
 
-  // Update the database with allocations
-  processedCount = 0;
-  for (const allocation of allocations) {
-    await models.sequelize.query(
-      `
+  // Update the database with allocations using batch update
+  console.log('Performing batch update of rarity distribution allocations...');
+  const updateCases = allocations
+    .map(({ token_id, allocation }) => `WHEN ${token_id} THEN ${allocation}`)
+    .join(' ');
+
+  const tokenIdsList = allocations.map(({ token_id }) => token_id).join(',');
+
+  await models.sequelize.query(
+    `
         UPDATE "NftSnapshot"
-        SET rarity_distribution_allocation = :allocation,
+        SET rarity_distribution_allocation = CASE token_id ${updateCases} END,
             updated_at                     = NOW()
-        WHERE token_id = :tokenId;
-      `,
-      {
-        replacements: {
-          allocation: allocation.allocation,
-          tokenId: allocation.token_id,
-        },
-        type: QueryTypes.UPDATE,
-      },
-    );
+        WHERE token_id IN (${tokenIdsList});
+    `,
+    {
+      type: QueryTypes.UPDATE,
+    },
+  );
 
-    processedCount++;
-
-    // Log progress every 1000 tokens
-    if (processedCount % 1000 === 0) {
-      console.log(
-        `Processed ${processedCount}/${allocations.length} tokens...`,
-      );
-    }
-  }
+  const processedCount = allocations.length;
 
   if (totalAllocated !== totalRarityDistributionTokens) {
     throw new Error(
@@ -783,7 +805,7 @@ async function calculateRarityDistributionAllocation(
       rarityTierSummary[rarityTier].totalAllocation += allocation.allocation;
 
       // User tier summary
-      const userTier = nft.user_tier ?? UserTierMap.IncompleteUser;
+      const userTier = nft.user_tier ?? UserTierMap.NewlyVerifiedWallet;
       if (!userTierSummary[userTier]) {
         userTierSummary[userTier] = { count: 0, totalAllocation: 0 };
       }
@@ -831,12 +853,14 @@ async function calculateRarityDistributionAllocation(
       );
       const userTierWeight = UserTierWeightsMap[tier as UserTierMap] || 0;
       console.log(
-        `User Tier ${tier} (weight: ${userTierWeight}): ${summary.count} NFTs, ${summary.totalAllocation.toLocaleString()} tokens (avg: ${avgAllocation})`,
+        `User Tier ${tier} (weight: ${userTierWeight}): ${summary.count} NFTs, ` +
+          `${summary.totalAllocation.toLocaleString()} tokens (avg: ${avgAllocation})`,
       );
     });
 
   console.log(
-    `✅ Combined rarity and user tier distribution allocation completed! Processed ${processedCount}/${allocations.length} tokens successfully.`,
+    `✅ Combined rarity and user tier distribution allocation completed! ` +
+      `Processed ${processedCount}/${allocations.length} tokens successfully.`,
   );
 }
 
@@ -845,21 +869,29 @@ async function resolveUsers() {
 
   // Update user_id and user_tier by joining with Addresses and Users tables
   const updateQuery = `
-    UPDATE "NftSnapshot" 
-    SET 
-      user_id = u.id,
-      user_tier = u.tier,
-      updated_at = NOW()
-    FROM "Addresses" a
-    INNER JOIN "Users" u ON a.user_id = u.id
-    WHERE LOWER("NftSnapshot".holder_address) = LOWER(a.address)
-      AND ("NftSnapshot".user_id IS NULL OR "NftSnapshot".user_tier IS NULL);
+      UPDATE "NftSnapshot"
+      SET user_id    = u.id,
+          user_tier  = u.tier,
+          updated_at = NOW()
+      FROM "Addresses" a
+               INNER JOIN "Users" u ON a.user_id = u.id
+      WHERE LOWER("NftSnapshot".holder_address) = LOWER(a.address)
+        AND ("NftSnapshot".user_id IS NULL OR "NftSnapshot".user_tier IS NULL);
   `;
 
   try {
     const [, updatedRows] = await models.sequelize.query(updateQuery, {
       type: QueryTypes.UPDATE,
     });
+
+    await models.sequelize.query(
+      `
+          UPDATE "NftSnapshot"
+          SET user_tier = ${UserTierMap.NewlyVerifiedWallet}
+          WHERE user_tier is NULL;
+      `,
+      { type: QueryTypes.UPDATE },
+    );
 
     console.log(`✅ Updated ${updatedRows} NFT records with user information`);
 
@@ -883,9 +915,9 @@ async function resolveUsers() {
         token_id: number;
       }>(
         `
-          SELECT token_id
-          FROM "NftSnapshot"
-          WHERE user_tier IS NULL;
+            SELECT token_id
+            FROM "NftSnapshot"
+            WHERE user_tier IS NULL;
         `,
         {
           type: QueryTypes.SELECT,
@@ -896,37 +928,37 @@ async function resolveUsers() {
         `Found ${nftsWithoutTiers.length} NFTs without user tiers for random assignment`,
       );
 
-      // Assign random tiers
-      let randomAssignmentCount = 0;
+      // Assign random tiers using batch update
+      const randomTierUpdates: Array<{ token_id: number; tier: number }> = [];
+
       for (const nft of nftsWithoutTiers) {
         const randomTier =
           validTiers[Math.floor(Math.random() * validTiers.length)];
-
-        await models.sequelize.query(
-          `
-            UPDATE "NftSnapshot"
-            SET user_tier = :tier,
-                updated_at = NOW()
-            WHERE token_id = :tokenId;
-          `,
-          {
-            replacements: {
-              tier: randomTier,
-              tokenId: nft.token_id,
-            },
-            type: QueryTypes.UPDATE,
-          },
-        );
-
-        randomAssignmentCount++;
-
-        // Log progress every 1000 tokens
-        if (randomAssignmentCount % 1000 === 0) {
-          console.log(
-            `Assigned random tiers to ${randomAssignmentCount}/${nftsWithoutTiers.length} NFTs...`,
-          );
-        }
+        randomTierUpdates.push({ token_id: nft.token_id, tier: randomTier });
       }
+
+      console.log('Performing batch update of random user tiers...');
+      const updateCases = randomTierUpdates
+        .map(({ token_id, tier }) => `WHEN ${token_id} THEN ${tier}`)
+        .join(' ');
+
+      const tokenIdsList = randomTierUpdates
+        .map(({ token_id }) => token_id)
+        .join(',');
+
+      await models.sequelize.query(
+        `
+            UPDATE "NftSnapshot"
+            SET user_tier  = CASE token_id ${updateCases} END,
+                updated_at = NOW()
+            WHERE token_id IN (${tokenIdsList});
+        `,
+        {
+          type: QueryTypes.UPDATE,
+        },
+      );
+
+      const randomAssignmentCount = randomTierUpdates.length;
 
       console.log(
         `✅ Assigned random user tiers to ${randomAssignmentCount} NFTs for testing`,
@@ -935,13 +967,12 @@ async function resolveUsers() {
 
     // Get summary statistics
     const statsQuery = `
-      SELECT 
-        COUNT(*) as total_nfts,
-        COUNT(user_id) as nfts_with_users,
-        COUNT(*) - COUNT(user_id) as nfts_without_users,
-        COUNT(DISTINCT user_id) as unique_users,
-        COUNT(DISTINCT user_tier) as unique_tiers
-      FROM "NftSnapshot";
+        SELECT COUNT(*)                  as total_nfts,
+               COUNT(user_id)            as nfts_with_users,
+               COUNT(*) - COUNT(user_id) as nfts_without_users,
+               COUNT(DISTINCT user_id)   as unique_users,
+               COUNT(DISTINCT user_tier) as unique_tiers
+        FROM "NftSnapshot";
     `;
 
     const [stats] = await models.sequelize.query<{
@@ -967,14 +998,13 @@ async function resolveUsers() {
 
     // Show tier distribution for resolved users
     const tierDistributionQuery = `
-      SELECT 
-        user_tier,
-        COUNT(*) as nft_count,
-        COUNT(DISTINCT user_id) as user_count
-      FROM "NftSnapshot" 
-      WHERE user_id IS NOT NULL
-      GROUP BY user_tier
-      ORDER BY user_tier;
+        SELECT user_tier,
+               COUNT(*)                as nft_count,
+               COUNT(DISTINCT user_id) as user_count
+        FROM "NftSnapshot"
+        WHERE user_id IS NOT NULL
+        GROUP BY user_tier
+        ORDER BY user_tier;
     `;
 
     const tierStats = await models.sequelize.query<{
@@ -999,10 +1029,38 @@ async function resolveUsers() {
   }
 }
 
+// Clear specified columns from NftSnapshot table
+async function clearCalculatedColumns() {
+  console.log('Clearing calculated columns from NftSnapshot table...');
+
+  await models.sequelize.query(
+    `
+        UPDATE "NftSnapshot"
+        SET user_id                        = NULL,
+            user_tier                      = NULL,
+            calculated_rarity              = NULL,
+            rarity_tier                    = NULL,
+            equal_distribution_allocation  = NULL,
+            rarity_distribution_allocation = NULL,
+            total_token_allocation         = NULL,
+            updated_at                     = NOW();
+    `,
+    {
+      type: QueryTypes.UPDATE,
+    },
+  );
+
+  console.log('✅ Cleared calculated columns from NftSnapshot table');
+}
+
 // Parse command line arguments
-function parseArguments(): { tierAssignmentType: 'r' | 'p' } {
+function parseArguments(): {
+  tierAssignmentType: 'r' | 'p';
+  shouldClear: boolean;
+} {
   const args = process.argv.slice(2);
   let tierAssignmentType: 'r' | 'p' = 'p'; // Default to percentile
+  let shouldClear = false;
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '-t' && i + 1 < args.length) {
@@ -1014,19 +1072,26 @@ function parseArguments(): { tierAssignmentType: 'r' | 'p' } {
           'Invalid argument for -t. Use "r" for rank-based or "p" for percentile-based assignment.',
         );
       }
-      break;
+    } else if (args[i] === '--clear') {
+      shouldClear = true;
     }
   }
 
-  return { tierAssignmentType };
+  return { tierAssignmentType, shouldClear };
 }
 
 async function main() {
-  const { tierAssignmentType } = parseArguments();
+  const { tierAssignmentType, shouldClear } = parseArguments();
 
   console.log(
     `Using ${tierAssignmentType === 'r' ? 'rank-based' : 'percentile-based'} tier assignment`,
   );
+
+  // Clear calculated columns if --clear flag is provided
+  if (shouldClear) {
+    await clearCalculatedColumns();
+    console.log('\n');
+  }
 
   await updateAllNftRarity();
 

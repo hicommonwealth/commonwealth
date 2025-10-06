@@ -53,6 +53,20 @@ export async function magnaSync(
 ) {
   let created = 0;
   try {
+    // update unset user_ids for NFT holders
+    // this is because NFT holders
+    await models.sequelize.query(`
+      UPDATE "NftSnapshot" 
+      SET 
+        user_id = u.id,
+        user_tier = u.tier,
+        updated_at = NOW()
+      FROM "Addresses" a
+      INNER JOIN "Users" u ON a.user_id = u.id
+      WHERE LOWER("NftSnapshot".holder_address) = LOWER(a.address)
+        AND ("NftSnapshot".user_id IS NULL OR "NftSnapshot".user_tier IS NULL);
+    `);
+
     let found = true;
     while (found) {
       // Load next batch of allocations to sync with Magna
@@ -73,7 +87,7 @@ export async function magnaSync(
             JOIN "Users" U ON A.user_id = U.id
             LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
             LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
-            LEFT JOIN "nft_collection_data" N ON A.user_id = N.user_id
+            LEFT JOIN "NftSnapshot" N ON A.user_id = N.user_id
           WHERE
             A.address IS NOT NULL -- there is an address to sync
             AND A.magna_synced_at IS NULL -- and it hasn't been synced yet

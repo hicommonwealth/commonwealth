@@ -383,6 +383,26 @@ export async function signInUser({
       transaction,
     });
 
+    // recover deleted users
+    if (address && !newAddress && address.user_id === null) {
+      await models.Address.update(
+        {
+          user_id: signedInUser?.id ?? foundOrCreatedUser.id!,
+          wallet_id: payload.wallet_id,
+          verification_token: verificationData.verification_token,
+          verification_token_expires:
+            verificationData.verification_token_expires,
+          block_info: payload.block_info ?? null,
+          last_active: new Date(),
+          verified: new Date(),
+        },
+        {
+          where: { id: address.id, user_id: null },
+          transaction,
+        },
+      );
+    }
+
     await emitSignInEvents({
       newUser,
       user: signedInUser || foundOrCreatedUser,
