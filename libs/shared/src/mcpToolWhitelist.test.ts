@@ -7,9 +7,8 @@ import {
 
 describe('MCP Tool Whitelist', () => {
   test('should return whitelisted tools for known server', () => {
-    const tools = getWhitelistedTools('commonwealth-api');
-    expect(tools).toContain('getCommunityThreads');
-    expect(tools).toContain('getCommunityUsers');
+    const tools = getWhitelistedTools('for-testing-only');
+    expect(tools).toContain('getCount');
   });
 
   test('should return null for unknown server', () => {
@@ -23,20 +22,17 @@ describe('MCP Tool Whitelist', () => {
   });
 
   test('should check if tool is whitelisted correctly', () => {
-    expect(isToolWhitelisted('commonwealth-api', 'getCommunityThreads')).toBe(
-      true,
-    );
-    expect(isToolWhitelisted('commonwealth-api', 'nonExistentTool')).toBe(
+    expect(isToolWhitelisted('for-testing-only', 'getCount')).toBe(true);
+    expect(isToolWhitelisted('for-testing-only', 'nonExistentTool')).toBe(
       false,
     );
-    expect(isToolWhitelisted('unknown-server', 'anyTool')).toBe(true); // backward compatibility
+    expect(isToolWhitelisted('unknown-server', 'anyTool')).toBe(false);
     expect(isToolWhitelisted('disabled-server', 'anyTool')).toBe(false);
   });
 
   test('should have expected structure in whitelist', () => {
-    expect(MCP_TOOL_WHITELIST).toHaveProperty('commonwealth-api');
-    expect(MCP_TOOL_WHITELIST).toHaveProperty('google-sheets');
-    expect(MCP_TOOL_WHITELIST).toHaveProperty('klavis-integration');
-    expect(Array.isArray(MCP_TOOL_WHITELIST['commonwealth-api'])).toBe(true);
+    expect(MCP_TOOL_WHITELIST).toHaveProperty('for-testing-only');
+    expect(MCP_TOOL_WHITELIST).toHaveProperty('disabled-server');
+    expect(Array.isArray(MCP_TOOL_WHITELIST['for-testing-only'])).toBe(true);
   });
 });

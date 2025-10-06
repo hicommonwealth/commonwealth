@@ -4,38 +4,13 @@
  * This defines which tools are allowed for each MCP server handle.
  * Format: { "server-handle": ["tool1", "tool2", ...] }
  *
- * If a server handle is not listed here, all tools will be allowed (backward compatibility).
+ * If a server handle is not listed here, NO tools will be allowed (secure by default).
  * If a server handle is listed with an empty array, no tools will be allowed.
+ * To enable tools for a server, explicitly add them to the whitelist.
  */
 export const MCP_TOOL_WHITELIST: Record<string, string[]> = {
-  // Commonwealth API Server
-  'commonwealth-api': [
-    'getCommunityThreads',
-    'getCommunityUsers',
-    'createThread',
-    'getThreadComments',
-    'searchCommunities',
-    'getUserProfile',
-  ],
-
-  // Google Sheets Integration
-  'google-sheets': ['readSheet', 'writeSheet', 'createSheet', 'getSheetInfo'],
-
-  // Klavis Marketing Integration
-  'klavis-integration': [
-    'getCustomerData',
-    'createSegment',
-    'sendEmail',
-    'getEmailMetrics',
-  ],
-
-  // Example: Restricted server with limited tools
-  'restricted-server': ['readOnlyTool'],
-
-  // Example: Completely disabled server
+  'for-testing-only': ['getCount'],
   'disabled-server': [],
-
-  // Add more server configurations as needed...
 };
 
 /**
@@ -54,9 +29,9 @@ export function isToolWhitelisted(
 ): boolean {
   const whitelistedTools = getWhitelistedTools(serverHandle);
 
-  // If no whitelist exists, allow all tools (backward compatibility)
+  // If no whitelist exists, deny all tools (secure by default)
   if (!whitelistedTools) {
-    return true;
+    return false;
   }
 
   return whitelistedTools.includes(toolName);

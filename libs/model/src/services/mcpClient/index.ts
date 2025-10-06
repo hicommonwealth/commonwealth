@@ -20,9 +20,12 @@ function filterServersWithWhitelist(
   return servers.map((server) => {
     const whitelistedTools = getWhitelistedTools(server.handle);
 
-    // If no whitelist exists for this server, allow all tools (backward compatibility)
+    // If no whitelist exists for this server, deny all tools (secure by default)
     if (!whitelistedTools) {
-      return server;
+      return {
+        ...server,
+        tools: [],
+      };
     }
 
     // Filter the server's tools to only include whitelisted ones
