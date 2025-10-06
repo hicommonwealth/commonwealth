@@ -14,7 +14,7 @@ import { CWTag } from 'client/scripts/views/components/component_kit/new_designs
 import React, { useCallback, useMemo, useState } from 'react';
 import { GridComponents, VirtuosoGrid } from 'react-virtuoso';
 import { smartTrim } from 'shared/utils';
-import { PageLoading } from 'views/pages/loading';
+import { PageLoading } from '../../loading';
 import ProposalCard from './ProposalCard/ProposalCard';
 import { ProposalGridContainer } from './ProposalGridContainer/ProposalGridContainer';
 import { ProposalGridItem } from './ProposalGridItem.tsx/ProposalGridItem';

@@ -7,9 +7,9 @@ import {
   useCompletedCosmosProposalsQuery,
 } from 'client/scripts/state/api/proposals';
 import React, { useEffect, useState } from 'react';
-import { PageLoading } from 'views/pages/loading';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from '../404';
+import { PageLoading } from '../loading';
 import GovernanceCards from './GovernanceCards';
 import GovernanceHeader from './GovernanceHeader/GovernanceHeader';
 import './GovernancePage.scss';
