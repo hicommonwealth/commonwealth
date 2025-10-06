@@ -17,10 +17,7 @@ const ProposalsEmptyState = () => {
         Proposals
       </CWText>
       <CWText type="caption" className="empty-description">
-        There are no proposal tools
-      </CWText>
-      <CWText type="caption" className="empty-description">
-        linked to this community.
+        There are no proposal tools linked to this community.
       </CWText>
       <CWButton
         buttonType="primary"
