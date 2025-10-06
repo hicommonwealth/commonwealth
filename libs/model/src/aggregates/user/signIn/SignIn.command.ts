@@ -7,9 +7,9 @@ import { models } from '../../../database';
 import { mustExist } from '../../../middleware/guards';
 import { UserAttributes } from '../../../models/user';
 import {
-  type VerifiedAddress,
   verifyAddress,
   verifySessionSignature,
+  type VerifiedAddress,
 } from '../../../services/session';
 import { signInPrivy } from './privy';
 import { signInUser } from './utils';
