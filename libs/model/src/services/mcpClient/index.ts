@@ -1,4 +1,3 @@
-import { config } from '@hicommonwealth/core';
 import { MCPServer } from '@hicommonwealth/schemas';
 import {
   DEFAULT_COMPLETION_MODEL,
@@ -74,20 +73,20 @@ export function buildMCPClientOptions(
   // Apply whitelist filtering to mentioned servers
   const filteredServers = filterServersWithWhitelist(mentionedServers);
 
-  if (config.APP_ENV === 'local') {
-    console.log('mentionedServers: ', mentionedServers);
-    console.log('filteredServers: ', filteredServers);
-  }
+  // Build MCP tools array with allowed_tools filter for each server
+  const mcpTools = filteredServers.map((server) => ({
+    type: 'mcp' as const,
+    server_label: server.handle!,
+    server_url: server.server_url!,
+    allowed_tools: server.tools.map((tool) => tool.name),
+    require_approval: 'never' as const,
+    headers: server.headers,
+  }));
+
   return {
     model: DEFAULT_COMPLETION_MODEL,
     instructions: buildSystemPrompt(filteredServers),
-    tools: filteredServers.map((server) => ({
-      type: 'mcp',
-      server_label: server.handle!,
-      server_url: server.server_url!,
-      require_approval: 'never',
-      headers: server.headers,
-    })),
+    tools: mcpTools,
     input: userInput,
     previous_response_id: previousResponseId,
     stream: true,
