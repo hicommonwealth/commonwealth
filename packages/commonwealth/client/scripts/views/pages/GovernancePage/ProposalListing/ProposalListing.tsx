@@ -140,7 +140,7 @@ const ProposalListing = ({
 
   const rowData = useMemo(() => {
     if (!filteredProposals.length) return [];
-    
+
     return filteredProposals.map((proposal, idx) => ({
       key: `${proposal.title}-${idx}`,
       proposal: (
@@ -197,7 +197,7 @@ const ProposalListing = ({
 
   const TableComponent = useMemo(() => {
     return <CWTable key={`table-${snapshot.value}-${filter.value}`} columnInfo={columnInfo} rowData={rowData} />;
-  }, [rowData, columnInfo, snapshot.value, filter.value]);
+  }, [rowData, snapshot.value, filter.value]);
 
   if (chain === ChainBase.Ethereum && isSnapshotProposalsLoading) {
     return <LoadingIndicator message="Connecting to chain" />;
