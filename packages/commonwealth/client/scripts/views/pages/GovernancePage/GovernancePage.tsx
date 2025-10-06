@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import { CosmosProposal } from 'client/scripts/controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useInitChainIfNeeded } from 'client/scripts/hooks/useInitChainIfNeeded';
 import app from 'client/scripts/state';
@@ -85,8 +86,12 @@ const GovernancePage = () => {
         <GovernanceCards totalProposals={totalProposalsCount} />
         <ProposalListing
           chain={onCosmos ? ChainBase.CosmosSDK : ChainBase.Ethereum}
-          activeCosmosProposals={activeCosmosProposals as any}
-          completedCosmosProposals={completedCosmosProposals as any}
+          activeCosmosProposals={
+            activeCosmosProposals as CosmosProposal[] | undefined
+          }
+          completedCosmosProposals={
+            completedCosmosProposals as CosmosProposal[] | undefined
+          }
         />
       </div>
     </CWPageLayout>
