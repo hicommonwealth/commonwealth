@@ -2,21 +2,25 @@
  * MCP Tool Whitelist Configuration
  *
  * This defines which tools are allowed for each MCP server handle.
- * Format: { "server-handle": ["tool1", "tool2", ...] }
+ * Format: { "server-handle": ["tool1", "tool2", ...] } or { "server-handle": "*" }
  *
  * If a server handle is not listed here, NO tools will be allowed (secure by default).
  * If a server handle is listed with an empty array, no tools will be allowed.
- * To enable tools for a server, explicitly add them to the whitelist.
+ * If a server handle is set to '*', ALL tools will be allowed.
+ * Otherwise, explicitly list the tools in the whitelist array.
  */
-export const MCP_TOOL_WHITELIST: Record<string, string[]> = {
+export const MCP_TOOL_WHITELIST: Record<string, string[] | '*'> = {
   'for-testing-only': ['getCount'],
   'disabled-server': [],
+  common: '*',
 };
 
 /**
  * Get whitelisted tools for a specific server handle
  */
-export function getWhitelistedTools(serverHandle: string): string[] | null {
+export function getWhitelistedTools(
+  serverHandle: string,
+): string[] | '*' | null {
   return MCP_TOOL_WHITELIST[serverHandle] || null;
 }
 
@@ -32,6 +36,11 @@ export function isToolWhitelisted(
   // If no whitelist exists, deny all tools (secure by default)
   if (!whitelistedTools) {
     return false;
+  }
+
+  // If wildcard '*' is set, allow all tools
+  if (whitelistedTools === '*') {
+    return true;
   }
 
   return whitelistedTools.includes(toolName);

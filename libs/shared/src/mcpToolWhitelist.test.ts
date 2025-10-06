@@ -35,4 +35,15 @@ describe('MCP Tool Whitelist', () => {
     expect(MCP_TOOL_WHITELIST).toHaveProperty('disabled-server');
     expect(Array.isArray(MCP_TOOL_WHITELIST['for-testing-only'])).toBe(true);
   });
+
+  test('should return wildcard for server with * whitelist', () => {
+    const tools = getWhitelistedTools('common');
+    expect(tools).toBe('*');
+  });
+
+  test('should allow all tools when server has wildcard whitelist', () => {
+    expect(isToolWhitelisted('common', 'anyTool')).toBe(true);
+    expect(isToolWhitelisted('common', 'anotherTool')).toBe(true);
+    expect(isToolWhitelisted('common', 'somethingElse')).toBe(true);
+  });
 });
