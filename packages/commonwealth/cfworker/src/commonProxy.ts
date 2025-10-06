@@ -1,17 +1,16 @@
 export default {
-  async fetch(req: Request, env: Env): Promise<Response> {
+  async fetch(req: Request): Promise<Response> {
     const inUrl = new URL(req.url);
 
     // Replace hostname so the Host header will be common.xyz
     const outUrl = new URL(req.url);
-    const originUrl = new URL('common.xyz');
+    const originUrl = new URL('https://common.xyz');
     outUrl.hostname = originUrl.hostname;
     outUrl.protocol = originUrl.protocol;
 
-    // Copy headers and optionally forward client info
     const headers = new Headers(req.headers);
     headers.set('Origin', originUrl.origin);
-    headers.set('X-Forwarded-Host', inUrl.hostname);
+    headers.set('cf-original-host', inUrl.hostname);
 
     const outbound = new Request(outUrl.toString(), {
       method: req.method,
