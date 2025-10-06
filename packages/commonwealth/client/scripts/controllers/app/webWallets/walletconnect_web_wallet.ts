@@ -5,6 +5,7 @@ import type Web3 from 'web3';
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
 import { getCommunityByIdQuery } from 'state/api/communities/getCommuityById';
 import { userStore } from 'state/ui/user';
 import { hexToNumber } from 'web3-utils';
@@ -96,7 +97,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._enabled = false;
   }
 
-  public async enable() {
+  public async enable(forceChainId?: string) {
     console.log('Attempting to enable WalletConnect');
     this._enabling = true;
     this._chainInfo = app?.chain?.meta;
@@ -112,18 +113,26 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       >;
     }
 
-    const chainId = this._chainInfo?.ChainNode?.eth_chain_id || 1;
+    const MAINNET_ID = 1;
+    const BASE_ID = 8453;
+    const optionalChains = [MAINNET_ID, BASE_ID];
+    const chainId =
+      forceChainId || this._chainInfo?.ChainNode?.eth_chain_id || MAINNET_ID;
+    const chainIdNumber = parseInt(`${chainId}`, 10);
+    if (!optionalChains.includes(chainIdNumber))
+      optionalChains.push(chainIdNumber);
+
     const EthereumProvider = (await import('@walletconnect/ethereum-provider'))
       .default;
     this._provider = await EthereumProvider.init({
       projectId: '927f4643b1e10ad3dbdbdbdaf9c5fbbe',
-      chains: [chainId],
+      chains: [chainIdNumber],
       optionalMethods: ['eth_getBlockByNumber', 'eth_sendTransaction'],
       showQrModal: true,
     });
 
     await this._provider.connect({
-      chains: [chainId], // OPTIONAL chain ids
+      chains: [chainIdNumber],
     });
     // destroy pre-existing session if exists
     if (this._provider.wc?.connected) {
@@ -156,6 +165,68 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       await setActiveAccount(updatedAddress);
     });
     // TODO: chainChanged, disconnect events
+  }
+
+  public async switchNetwork(chainId?: string) {
+    if (!this._provider) {
+      throw new Error('WalletConnect provider not initialized');
+    }
+
+    const communityChain = chainId ?? this.getChainId();
+    const chainIdHex = `0x${parseInt(communityChain, 10).toString(16)}`;
+
+    try {
+      await this._provider.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chainIdHex }],
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (switchError: any) {
+      // add chain/network to wallet if not added yet
+      if (switchError.code === 4902) {
+        const nodes = await fetchCachedNodes();
+        const chainInfo = nodes?.find(
+          (n) => n.ethChainId === parseInt(communityChain, 10),
+        );
+        if (!chainInfo) {
+          throw new Error('Missing chain info to add network');
+        }
+
+        await this._provider.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: chainIdHex,
+              chainName: chainInfo.name || `Chain ${chainId}`,
+              nativeCurrency: {
+                name: 'ETH',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+              rpcUrls: [chainInfo.url],
+              blockExplorerUrls:
+                chainInfo.block_explorer || ''
+                  ? [chainInfo.block_explorer || '']
+                  : [],
+            },
+          ],
+        });
+      } else {
+        const nodes = await fetchCachedNodes();
+        const chainInfo = nodes?.find(
+          (n) => n.ethChainId === parseInt(communityChain, 10),
+        );
+        throw new Error(
+          // eslint-disable-next-line max-len
+          `Failed to switch network to ${chainInfo?.name} (${chainId}), please ensure the network is enabled in your wallet.`,
+        );
+      }
+    }
+
+    const Web3 = (await import('web3')).default;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this._web3 = new Web3(this._provider as any);
+    this._accounts = await this._web3.eth.getAccounts();
   }
 }
 
