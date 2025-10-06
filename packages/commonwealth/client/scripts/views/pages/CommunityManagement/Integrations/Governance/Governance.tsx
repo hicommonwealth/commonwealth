@@ -8,7 +8,7 @@ import './Governance.scss';
 
 const Governance = () => {
   const governancePageEnabled = useFlag('governancePage');
-  
+
   const [isEnabled, setIsEnabled] = useState(false);
 
   const handleToggle = () => {
@@ -30,8 +30,8 @@ const Governance = () => {
       </div>
 
       <CWText type="b1">
-        Enable your community members to access governance tools, proposals, and treasury 
-        information on this optional page. Simply toggle on to generate the page and make 
+        Enable your community members to access governance tools, proposals, and treasury
+        information on this optional page. Simply toggle on to generate the page and make
         it accessible within the sidebar, or toggle off to hide.
       </CWText>
 
