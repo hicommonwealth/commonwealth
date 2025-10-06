@@ -3,7 +3,7 @@ import {
   MCP_TOOL_WHITELIST,
   getWhitelistedTools,
   isToolWhitelisted,
-} from './mcpToolWhitelist';
+} from '../src/mcpToolWhitelist';
 
 describe('MCP Tool Whitelist', () => {
   test('should return whitelisted tools for known server', () => {
