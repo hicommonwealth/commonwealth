@@ -11,7 +11,6 @@ import {
 } from '@hicommonwealth/shared';
 import { Request, Response } from 'express';
 import { OpenAI } from 'openai';
-import { Op } from 'sequelize';
 import { config } from '../../config';
 import { extractOpenRouterError } from './utils';
 
@@ -31,7 +30,7 @@ type RequestBody = Omit<CompletionOptions, 'prompt'> & {
 const log = logger(import.meta);
 
 /**
- * Gets all available MCP servers for a community
+ * Gets all community-enabled MCP servers for a community
  * @param communityId The community ID
  * @returns Array of MCP servers with headers
  */
@@ -39,11 +38,13 @@ async function getAllMCPServers(
   communityId: string,
 ): Promise<CommonMCPServerWithHeaders[]> {
   const mcpServers = await models.MCPServer.scope('withPrivateData').findAll({
-    where: {
-      private_community_id: {
-        [Op.or]: [communityId, null],
+    include: [
+      {
+        model: models.MCPServerCommunity,
+        where: { community_id: communityId },
+        attributes: [], // Don't include the junction table data in results
       },
-    },
+    ],
   });
 
   return mcpServers.map((server) => ({

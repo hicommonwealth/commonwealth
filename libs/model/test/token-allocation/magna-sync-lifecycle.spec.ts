@@ -58,7 +58,7 @@ describe('MagnaSync Lifecycle', () => {
           reactions_score: 0,
           unadjusted_score: 0,
           adjusted_score: 0,
-          percent_score: 0,
+          percent_allocation: 0,
           token_allocation: chance.integer({ min: 0, max: 100 }),
         }),
       ),

@@ -43,6 +43,51 @@
       margin-bottom: 8px;
     }
 
+    .weighted-topic-info {
+      background-color: colors.$neutral-50;
+      padding: 12px 16px;
+      border-radius: 6px;
+      border-left: 3px solid colors.$primary-500;
+
+      .weighted-topic-header.Text {
+        color: colors.$neutral-600;
+        font-style: italic;
+        margin-bottom: 8px;
+      }
+
+      .token-info-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .token-symbol {
+          font-weight: 600;
+          color: colors.$primary-600;
+          background-color: colors.$primary-50;
+          padding: 4px 8px;
+          border-radius: 6px;
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          align-self: flex-start;
+          border: 1px solid colors.$primary-200;
+        }
+
+        .token-address {
+          font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code',
+            monospace;
+          color: colors.$neutral-700;
+          background-color: colors.$neutral-100;
+          padding: 6px 8px;
+          border-radius: 6px;
+          font-size: 11px;
+          word-break: break-all;
+          border: 1px solid colors.$neutral-200;
+          line-height: 1.4;
+        }
+      }
+    }
+
     .percentage-breakdown-section {
       background-color: colors.$neutral-100; // Light background for emphasis
       padding: 16px;
