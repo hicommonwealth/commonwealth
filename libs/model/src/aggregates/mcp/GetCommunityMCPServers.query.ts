@@ -1,5 +1,6 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { Op } from 'sequelize';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 
@@ -14,11 +15,33 @@ export function GetCommunityMCPServers(): Query<
 
       if (private_only) {
         // only return private servers for this community
+        // or public servers that are not associated with a community
+        // (for MCP Integration page)
         const mcpServers = await models.MCPServer.findAll({
-          where: { private_community_id: community_id },
+          where: {
+            [Op.or]: [
+              { private_community_id: community_id },
+              { private_community_id: null },
+            ],
+          },
+          include: [
+            {
+              model: models.User,
+              as: 'AuthUser',
+              attributes: ['id', 'profile'],
+              required: false,
+            },
+          ],
           order: [['name', 'ASC']],
         });
-        return mcpServers.map((server) => server.toJSON());
+        return mcpServers.map((server) => {
+          const serverJson = server.toJSON() as any;
+          const username = serverJson.AuthUser?.profile?.name;
+          return {
+            ...serverJson,
+            auth_username: username || null,
+          };
+        });
       } else {
         // otherwise, return only community-enabled servers (for mentions, etc.)
         const mcpServers = await models.MCPServer.findAll({
@@ -29,10 +52,23 @@ export function GetCommunityMCPServers(): Query<
               attributes: [],
               required: true,
             },
+            {
+              model: models.User,
+              as: 'AuthUser',
+              attributes: ['id', 'profile'],
+              required: false,
+            },
           ],
           order: [['name', 'ASC']],
         });
-        return mcpServers.map((server) => server.toJSON());
+        return mcpServers.map((server) => {
+          const serverJson = server.toJSON() as any;
+          const username = serverJson.AuthUser?.profile?.name;
+          return {
+            ...serverJson,
+            auth_username: username || null,
+          };
+        });
       }
     },
   };
