@@ -159,14 +159,9 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
           type="info"
           body={
             <div className="banner-content">
-              <h3 className="description">You do not have a COMMON claim.</h3>
-              <CWText>
-                This won&apos;t be the only opportunity to earn COMMON,
-                we&apos;ll have&nbsp;
-                <a href="#"> future community rewards to allocate.</a>
-              </CWText>
+              <h3 className="description">Login to check your COMMON Claim</h3>
               <CWButton
-                label="Login to stay updated"
+                label="Login to check"
                 onClick={() => setIsAuthModalOpen(true)}
               />
             </div>
@@ -185,9 +180,12 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     return null;
   }
 
-  // Logged-in user with zero allocation: show an informational banner
+  // Logged-in user with no claim address or zero allocation: show an informational banner
   const tokensNumber = Number(claimAddress?.tokens ?? 0);
-  if (user.isLoggedIn && claimAddress && tokensNumber <= 0) {
+  if (
+    user.isLoggedIn &&
+    (claimAddress === null || (claimAddress && tokensNumber <= 0))
+  ) {
     return (
       <div className="TokenClaimBanner">
         <CWBanner
@@ -390,9 +388,23 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
               onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
               label={
                 <p>
-                  I understand that once incentives are added, there are
-                  non-refundable and can NOT be withdrawn under any
-                  circumstances.
+                  I understand that by adding my address, I adhere to the{' '}
+                  <a
+                    href="/airdrop-terms.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    airdrop terms of service
+                  </a>{' '}
+                  and{' '}
+                  <a
+                    href="https://common.foundation/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    privacy policy
+                  </a>
+                  .
                 </p>
               }
             />
