@@ -159,14 +159,9 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
           type="info"
           body={
             <div className="banner-content">
-              <h3 className="description">You do not have a COMMON claim.</h3>
-              <CWText>
-                This won&apos;t be the only opportunity to earn COMMON,
-                we&apos;ll have&nbsp;
-                <a href="#"> future community rewards to allocate.</a>
-              </CWText>
+              <h3 className="description">Login to check your COMMON Claim</h3>
               <CWButton
-                label="Login to stay updated"
+                label="Login to check"
                 onClick={() => setIsAuthModalOpen(true)}
               />
             </div>
