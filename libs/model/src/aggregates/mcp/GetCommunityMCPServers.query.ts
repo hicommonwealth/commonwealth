@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
+import { withMCPAuthUsername } from '../../services/mcpServerHelpers';
 
 export function GetCommunityMCPServers(): Query<
   typeof schemas.GetCommunityMCPServers
@@ -24,9 +25,17 @@ export function GetCommunityMCPServers(): Query<
               { private_community_id: null },
             ],
           },
+          include: [
+            {
+              model: models.User,
+              as: 'AuthUser',
+              attributes: ['id', 'profile'],
+              required: false,
+            },
+          ],
           order: [['name', 'ASC']],
         });
-        return mcpServers.map((server) => server.toJSON());
+        return mcpServers.map((server) => withMCPAuthUsername(server));
       } else {
         // otherwise, return only community-enabled servers (for mentions, etc.)
         const mcpServers = await models.MCPServer.findAll({
@@ -37,10 +46,16 @@ export function GetCommunityMCPServers(): Query<
               attributes: [],
               required: true,
             },
+            {
+              model: models.User,
+              as: 'AuthUser',
+              attributes: ['id', 'profile'],
+              required: false,
+            },
           ],
           order: [['name', 'ASC']],
         });
-        return mcpServers.map((server) => server.toJSON());
+        return mcpServers.map((server) => withMCPAuthUsername(server));
       }
     },
   };

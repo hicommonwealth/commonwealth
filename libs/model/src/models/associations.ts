@@ -320,6 +320,11 @@ export const buildAssociations = (db: DB) => {
     },
   );
 
+  db.User.withMany(db.MCPServer, {
+    foreignKey: 'auth_user_id',
+    asOne: 'AuthUser',
+  });
+
   db.GovernanceProposal.withMany(db.ProposalVote, {
     foreignKey: ['eth_chain_id', 'proposal_id'],
     onDelete: 'CASCADE',
