@@ -181,8 +181,34 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     );
   }
 
-  if (!claimAddress?.tokens || isLoadingClaimAddress) {
+  if (isLoadingClaimAddress) {
     return null;
+  }
+
+  // Logged-in user with zero allocation: show an informational banner
+  const tokensNumber = Number(claimAddress?.tokens ?? 0);
+  if (user.isLoggedIn && claimAddress && tokensNumber <= 0) {
+    return (
+      <div className="TokenClaimBanner">
+        <CWBanner
+          type="info"
+          body={
+            <div className="banner-content">
+              <h3 className="description">No COMMON allocation at this time</h3>
+              <CWText>
+                This round recognizes earlier participation by community members
+                across activity, collectibles, and rewards history. Your account
+                isn’t included in this snapshot.
+              </CWText>
+              <CWText>
+                Keep participating—join communities, contribute, and watch for
+                future reward opportunities.
+              </CWText>
+            </div>
+          }
+        />
+      </div>
+    );
   }
 
   // Create the address form content to include in actions
@@ -241,7 +267,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   );
 
   const canClaim = !!claimAddress;
-  const hasClaimed = claimAddress.magna_claimed_at && txHash;
+  const hasClaimed = claimAddress?.magna_claimed_at && txHash;
   const isClaimAvailable = claimAddress?.magna_synced_at;
   const isReadyForClaimNow =
     isClaimAvailable &&
@@ -265,9 +291,9 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
           <div className="notice-text">
             <p className="base-notice">
               You claimed your tokens on{' '}
-              {claimAddress.magna_claimed_at && (
+              {claimAddress?.magna_claimed_at && (
                 <strong>
-                  {new Date(claimAddress.magna_claimed_at).toLocaleString()}
+                  {new Date(claimAddress?.magna_claimed_at).toLocaleString()}
                 </strong>
               )}
             </p>
@@ -393,12 +419,12 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   return canClaim ? (
     <div className="TokenClaimBanner">
       <CWBanner
-        type={claimAddress.address ? 'info' : 'error'}
+        type={claimAddress?.address ? 'info' : 'error'}
         body={
           <div className="banner-content">
-            <h3 className="description">{claimAddress.description}</h3>
+            <h3 className="description">{claimAddress?.description}</h3>
             <h2 className="token-balance">
-              You have {formattedClaimable} {claimAddress.token} tokens!
+              You have {formattedClaimable} {claimAddress?.token} tokens!
             </h2>
             {getClaimCopy()}
           </div>
