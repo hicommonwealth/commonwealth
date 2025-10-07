@@ -35,10 +35,12 @@ export const getBotUser = async (): Promise<BotUserWithAddress> => {
 };
 
 export const isBotAddress = async (addressId: number): Promise<boolean> => {
-  const address = await models.Address.findByPk(addressId);
-  if (!address) {
-    return false;
-  }
   const { user: botUser } = await getBotUser();
-  return address.user_id === botUser.id;
+  const address = await models.Address.findOne({
+    where: {
+      id: addressId,
+      user_id: botUser.id,
+    },
+  });
+  return !!address;
 };

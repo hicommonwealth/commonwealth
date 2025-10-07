@@ -1,41 +1,17 @@
-import { InvalidActor, stats, type Command } from '@hicommonwealth/core';
+import { stats, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authComment } from '../../middleware';
 import { mustBeAuthorizedComment } from '../../middleware/guards';
-import { isBotAddress } from '../../utils/botUser';
 
 export function DeleteComment(): Command<typeof schemas.DeleteComment> {
   return {
     ...schemas.DeleteComment,
-    auth: [authComment({ roles: ['admin', 'moderator', 'member'] })],
+    auth: [
+      authComment({ author: true, roles: ['admin', 'moderator', 'member'] }),
+    ],
     body: async ({ actor, context }) => {
-      const { comment, community_id, is_author, address } =
-        mustBeAuthorizedComment(actor, context);
-
-      const isAdmin = address.role === 'admin';
-      const isModerator = address.role === 'moderator';
-      let canDelete = is_author || isAdmin || isModerator;
-
-      // check if is AI-generated comment and user triggered it
-      if (!canDelete) {
-        const isAIComment = await isBotAddress(address.id!);
-        if (isAIComment) {
-          const aiToken = await models.AICompletionToken.findOne({
-            where: {
-              comment_id: comment.id,
-              user_id: actor.user.id,
-            },
-          });
-          if (aiToken) {
-            canDelete = true;
-          }
-        }
-      }
-
-      if (!canDelete) {
-        throw new InvalidActor(actor, 'Must be comment author or admin');
-      }
+      const { comment, community_id } = mustBeAuthorizedComment(actor, context);
 
       // == mutation transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {
