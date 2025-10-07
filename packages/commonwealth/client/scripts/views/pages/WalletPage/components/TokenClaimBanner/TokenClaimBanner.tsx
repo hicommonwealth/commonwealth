@@ -185,9 +185,12 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     return null;
   }
 
-  // Logged-in user with zero allocation: show an informational banner
+  // Logged-in user with no claim address or zero allocation: show an informational banner
   const tokensNumber = Number(claimAddress?.tokens ?? 0);
-  if (user.isLoggedIn && claimAddress && tokensNumber <= 0) {
+  if (
+    user.isLoggedIn &&
+    (claimAddress === null || (claimAddress && tokensNumber <= 0))
+  ) {
     return (
       <div className="TokenClaimBanner">
         <CWBanner
