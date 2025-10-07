@@ -281,9 +281,9 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     allocation.unlock_start_at;
 
   const getClaimCopy = () => {
-    // if (!canClaim) return null;
+    if (!canClaim) return null;
 
-    if (false) {
+    if (hasClaimed) {
       return (
         <div className="notice-section">
           <div className="notice-text">
@@ -313,7 +313,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
       );
     }
 
-    if (false) {
+    if (isClaimAvailable) {
       if (isReadyForClaimNow) {
         return (
           <div className="notice-section">
@@ -347,7 +347,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
         );
       }
 
-      if (false) {
+      if (isReadyForClaimAfterUnlock) {
         <div className="notice-section">
           <p>
             You can claim your tokens after{' '}
