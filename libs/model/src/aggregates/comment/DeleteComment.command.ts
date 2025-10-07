@@ -13,22 +13,21 @@ export function DeleteComment(): Command<typeof schemas.DeleteComment> {
       const { comment, community_id, is_author, address } =
         mustBeAuthorizedComment(actor, context);
 
-      // Check if user is authorized to delete this comment
-      // Allowed: comment author, admins, moderators, or user who triggered AI comment
       const isAdmin = address.role === 'admin';
       const isModerator = address.role === 'moderator';
       let canDelete = is_author || isAdmin || isModerator;
 
-      // If not already authorized, check if this is an AI-generated comment
-      // and if the current user triggered it
-      if (!canDelete && comment.address_id) {
-        const isAIComment = await isBotAddress(comment.address_id);
+      // check if is AI-generated comment and user triggered it
+      if (!canDelete) {
+        const isAIComment = await isBotAddress(address.id!);
         if (isAIComment) {
-          // Look up the AICompletionToken to see who triggered this comment
           const aiToken = await models.AICompletionToken.findOne({
-            where: { comment_id: comment.id },
+            where: {
+              comment_id: comment.id,
+              user_id: actor.user.id,
+            },
           });
-          if (aiToken && aiToken.user_id === actor.user.id) {
+          if (aiToken) {
             canDelete = true;
           }
         }

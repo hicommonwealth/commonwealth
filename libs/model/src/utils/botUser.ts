@@ -24,28 +24,21 @@ export const getBotUser = async (): Promise<BotUserWithAddress> => {
     ],
   });
 
-  if (!address || !address.User) {
-    throw new Error(
-      `Bot user with address ${botUserAddress} not found in database`,
-    );
+  if (!address) {
+    throw new Error(`Bot user with address ${botUserAddress} not found`);
   }
 
   return {
-    user: address.User! as UserInstance,
+    user: address.User as UserInstance,
     address,
   };
 };
 
-/**
- * Check if a given address_id belongs to the AI bot user
- */
-export const isBotAddress = async (address_id: number): Promise<boolean> => {
-  try {
-    const { user: botUser } = await getBotUser();
-    const address = await models.Address.findByPk(address_id);
-    return address?.user_id === botUser.id;
-  } catch (error) {
-    // If bot user is not configured or not found, return false
+export const isBotAddress = async (addressId: number): Promise<boolean> => {
+  const address = await models.Address.findByPk(addressId);
+  if (!address) {
     return false;
   }
+  const { user: botUser } = await getBotUser();
+  return address.user_id === botUser.id;
 };
