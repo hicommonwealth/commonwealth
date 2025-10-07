@@ -24,6 +24,12 @@ export function CreateKlavisMCPInstance(): Command<
         throw new Error('KLAVIS_API_KEY not configured');
       }
 
+      // Fetch user profile for description
+      const user = await models.User.findOne({
+        where: { id: actor.user.id },
+      });
+      const userName = user?.profile?.name || `user #${actor.user.id}`;
+
       try {
         const klavis = new KlavisClient({
           apiKey: config.KLAVIS.API_KEY,
@@ -59,7 +65,7 @@ export function CreateKlavisMCPInstance(): Command<
           case 'Google Sheets':
             await models.MCPServer.create({
               name: serverType,
-              description: `${serverType} connected by user #${actor.user.id}`,
+              description: `${serverType} connected by ${userName}`,
               handle: 'google_sheets',
               source: 'klavis',
               source_identifier: instance.instanceId,

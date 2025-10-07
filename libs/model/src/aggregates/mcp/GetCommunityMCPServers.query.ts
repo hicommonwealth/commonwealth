@@ -27,6 +27,7 @@ export function GetCommunityMCPServers(): Query<
               model: models.MCPServerCommunity,
               where: { community_id },
               attributes: [],
+              required: true,
             },
           ],
           order: [['name', 'ASC']],
