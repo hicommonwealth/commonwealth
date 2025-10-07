@@ -24,24 +24,9 @@ export function GetCommunityMCPServers(): Query<
               { private_community_id: null },
             ],
           },
-          include: [
-            {
-              model: models.User,
-              as: 'AuthUser',
-              attributes: ['id', 'profile'],
-              required: false,
-            },
-          ],
           order: [['name', 'ASC']],
         });
-        return mcpServers.map((server) => {
-          const serverJson = server.toJSON() as any;
-          const username = serverJson.AuthUser?.profile?.name;
-          return {
-            ...serverJson,
-            auth_username: username || null,
-          };
-        });
+        return mcpServers.map((server) => server.toJSON());
       } else {
         // otherwise, return only community-enabled servers (for mentions, etc.)
         const mcpServers = await models.MCPServer.findAll({
@@ -52,23 +37,10 @@ export function GetCommunityMCPServers(): Query<
               attributes: [],
               required: true,
             },
-            {
-              model: models.User,
-              as: 'AuthUser',
-              attributes: ['id', 'profile'],
-              required: false,
-            },
           ],
           order: [['name', 'ASC']],
         });
-        return mcpServers.map((server) => {
-          const serverJson = server.toJSON() as any;
-          const username = serverJson.AuthUser?.profile?.name;
-          return {
-            ...serverJson,
-            auth_username: username || null,
-          };
-        });
+        return mcpServers.map((server) => server.toJSON());
       }
     },
   };
