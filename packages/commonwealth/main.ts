@@ -256,7 +256,7 @@ export async function main(
     res.sendFile(`${__dirname}/firebase-messaging-sw.js`);
   });
 
-  app.use('/airdrop-terms', (req: Request, res: Response) => {
+  app.use('/airdrop-terms.pdf', (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/pdf');
     res.sendFile(`${__dirname}/airdrop-terms.pdf`);
   });
