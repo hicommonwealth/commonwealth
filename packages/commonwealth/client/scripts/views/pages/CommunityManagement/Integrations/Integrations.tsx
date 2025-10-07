@@ -7,7 +7,6 @@ import CustomTOS from './CustomTOS';
 import CustomURL from './CustomURL';
 import Directory from './Directory';
 import Discord from './Discord';
-import Governance from './Governance';
 import GoogleSheetsMCP from './GoogleSheetsMCP';
 import './Integrations.scss';
 import MCP from './MCP';
@@ -52,7 +51,6 @@ const Integrations = () => {
         <Webhooks />
         <CustomTOS />
         <CustomURL />
-        <Governance />
       </section>
     </CommunityManagementLayout>
   );
