@@ -281,9 +281,9 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     allocation.unlock_start_at;
 
   const getClaimCopy = () => {
-    if (!canClaim) return null;
+    // if (!canClaim) return null;
 
-    if (hasClaimed) {
+    if (false) {
       return (
         <div className="notice-section">
           <div className="notice-text">
@@ -313,7 +313,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
       );
     }
 
-    if (isClaimAvailable) {
+    if (false) {
       if (isReadyForClaimNow) {
         return (
           <div className="notice-section">
@@ -347,7 +347,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
         );
       }
 
-      if (isReadyForClaimAfterUnlock) {
+      if (false) {
         <div className="notice-section">
           <p>
             You can claim your tokens after{' '}
@@ -388,9 +388,23 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
               onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
               label={
                 <p>
-                  I understand that once incentives are added, there are
-                  non-refundable and can NOT be withdrawn under any
-                  circumstances.
+                  I understand that by adding my address, I adhere to the{' '}
+                  <a
+                    href="/airdrop-terms.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    airdrop terms of service
+                  </a>{' '}
+                  and{' '}
+                  <a
+                    href="https://common.foundation/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    privacy policy
+                  </a>
+                  .
                 </p>
               }
             />
