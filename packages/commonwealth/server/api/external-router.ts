@@ -32,6 +32,7 @@ import * as user from './user';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// trigger redeploy
 const {
   createCommunity,
   updateCommunity,
