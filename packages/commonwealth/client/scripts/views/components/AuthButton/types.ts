@@ -22,6 +22,7 @@ export type SubstrateWallets = 'polkadot';
 export type SolanaWallets = 'phantom' | 'backpack' | 'solflare';
 export type SuiWallets = 'sui-wallet' | 'suiet' | 'okx-wallet' | 'bitget';
 export type EVMWallets =
+  | 'base'
   | 'walletconnect'
   | 'metamask'
   | 'gate'
