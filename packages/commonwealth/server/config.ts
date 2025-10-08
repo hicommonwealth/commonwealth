@@ -77,7 +77,7 @@ const DEFAULTS = {
 
     // NFT allocation specific
     nft: {
-      tokenSupply: 150_000_000,
+      tokenSupply: 85_000_000,
       rarityPercentiles: [100, 75, 15, 6.5, 3.5],
       rarityRanks: [1, 10],
       rarityTierWeightsByRank: [1, 5, 10],
@@ -89,7 +89,7 @@ const DEFAULTS = {
     // Historic contribution scoring specific
     historic: {
       supply: {
-        total: 150_000_000,
+        total: 65_000_000,
         splits: {
           historical: 0.5,
           aura: 0.5,
