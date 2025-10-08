@@ -18,6 +18,7 @@ import { LoadingIndicator } from '../../../components/LoadingIndicator/LoadingIn
 import ProposalCard from './ProposalCard/ProposalCard';
 import { ProposalGridContainer } from './ProposalGridContainer/ProposalGridContainer';
 import { ProposalGridItem } from './ProposalGridItem.tsx/ProposalGridItem';
+import ProposalListingEmptyState from './ProposalListingEmptyState';
 import './ProposalListing.scss';
 
 type OptionType = {
@@ -239,12 +240,14 @@ const ProposalListing = ({
       </div>
 
       <div className="view-container">
-        {view === 'table' ? (
+        {unifiedProposals.length === 0 && snapshots.length === 0 ? (
+          <ProposalListingEmptyState />
+        ) : view === 'table' ? (
           filteredProposals.length > 0 ? (
             TableComponent
           ) : (
             <div style={{ padding: '20px', textAlign: 'center' }}>
-              <CWText>No proposals found</CWText>
+              <ProposalListingEmptyState />
             </div>
           )
         ) : (
