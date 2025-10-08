@@ -288,7 +288,7 @@ async function getHistoricalUserAllocations(): Promise<UserAllocationData[]> {
       FROM "HistoricalAllocations"
       WHERE token_allocation IS NOT NULL
         AND token_allocation > 0
-      ORDER BY token_allocation ASC;
+      ORDER BY token_allocation DESC;
     `,
     { type: QueryTypes.SELECT },
   );
@@ -673,7 +673,7 @@ async function getAuraUserAllocations(): Promise<UserAllocationData[]> {
       FROM "AuraAllocations"
       WHERE token_allocation IS NOT NULL
         AND token_allocation > 0
-      ORDER BY token_allocation ASC;
+      ORDER BY token_allocation DESC;
     `,
     { type: QueryTypes.SELECT },
   );
@@ -1573,22 +1573,40 @@ function calculateHistoricalCorrelationMatrix(
 }
 
 /**
- * Sample evenly-spaced data points from user allocation data
- * Returns exactly 100 evenly-spaced points for efficient rendering
+ * Sample data points from user allocation data with complete coverage of top allocations
+ * Takes ALL of the top 500 allocations, then uniformly samples the rest
+ * This ensures smooth visualization of the high-value tail of the distribution
  */
 function sampleUserAllocationData(
   data: UserAllocationData[],
   numSamples: number = 100,
+  topN: number = 500,
 ): UserAllocationData[] {
   if (data.length === 0) return [];
-  if (data.length <= numSamples) return data;
+  if (data.length <= topN) return data;
 
   const sampledData: UserAllocationData[] = [];
-  const step = (data.length - 1) / (numSamples - 1);
 
-  for (let i = 0; i < numSamples; i++) {
-    const index = Math.round(i * step);
-    sampledData.push(data[index]);
+  // Data is sorted in descending order, so top allocations are at the beginning
+  // Add ALL of the top N allocations (highest values)
+  for (let i = 0; i < topN; i++) {
+    sampledData.push(data[i]);
+  }
+
+  // Calculate how many samples we need from the remaining portion (lower allocations)
+  const numRemaining = data.length - topN;
+  const remainingSamples = Math.max(
+    numSamples - topN,
+    Math.floor(numRemaining / 100),
+  );
+
+  // Uniformly sample from the remaining portion (lower allocations)
+  if (numRemaining > 0 && remainingSamples > 0) {
+    const step = numRemaining / remainingSamples;
+    for (let i = 0; i < remainingSamples; i++) {
+      const index = topN + Math.min(Math.floor(i * step), numRemaining - 1);
+      sampledData.push(data[index]);
+    }
   }
 
   return sampledData;
@@ -1858,7 +1876,7 @@ function generateNftAllocationHTML(
     <div class="stats">
         <h2>Summary Statistics</h2>
         <p style="text-align: center; color: #666; font-size: 0.9em; margin-bottom: 15px;">
-            <em>Note: Charts display 100 evenly-spaced sample points for performance. Statistics show full dataset.</em>
+            <em>Note: Charts display all top 500 allocations plus sampled lower allocations for optimal visualization. Statistics show full dataset.</em>
         </p>
         <div class="stats-grid">
             <div class="stats-item">
@@ -2117,7 +2135,7 @@ function generateUserAllocationHTML(
     <div class="stats">
         <h2>Summary Statistics</h2>
         <p style="text-align: center; color: #666; font-size: 0.9em; margin-bottom: 15px;">
-            <em>Note: Charts display 100 evenly-spaced sample points for performance. Statistics show full dataset.</em>
+            <em>Note: Charts display all top 500 allocations plus sampled lower allocations for optimal visualization. Statistics show full dataset.</em>
         </p>
         <div class="stats-grid">
             <div class="stats-item">
@@ -2162,20 +2180,33 @@ function generateUserAllocationHTML(
     </div>
 
     <div class="chart-container">
-        <h2>User Allocation Distribution (Ordered from Least to Greatest)</h2>
+        <h2>Historical Allocations Distribution (Ordered from Greatest to Least)</h2>
         <div style="position: relative; height: 400px;">
-            <canvas id="allocationChart"></canvas>
+            <canvas id="historicalChart"></canvas>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h2>Aura Allocations Distribution (Ordered from Greatest to Least)</h2>
+        <div style="position: relative; height: 400px;">
+            <canvas id="auraChart"></canvas>
         </div>
     </div>
 
     <script>
-        const ctx = document.getElementById('allocationChart').getContext('2d');
-        
-        // Prepare sampled data for line chart (100 points each for performance)
+        // Prepare sampled data for line charts
         const historicalPoints = ${JSON.stringify(sampledHistoricalData.map((d) => ({ x: d.rank, y: d.allocation })))};
         const auraPoints = ${JSON.stringify(sampledAuraData.map((d) => ({ x: d.rank, y: d.allocation })))};
 
-        new Chart(ctx, {
+        // Calculate x-axis ranges with gap before rank 1
+        const historicalMaxRank = ${historicalData.length};
+        const auraMaxRank = ${auraData.length};
+        const historicalXMin = historicalMaxRank > 0 ? -historicalMaxRank * 0.02 : -10;
+        const auraXMin = auraMaxRank > 0 ? -auraMaxRank * 0.02 : -10;
+
+        // Historical Allocations Chart
+        const historicalCtx = document.getElementById('historicalChart').getContext('2d');
+        new Chart(historicalCtx, {
             type: 'scatter',
             data: {
                 datasets: [
@@ -2189,7 +2220,82 @@ function generateUserAllocationHTML(
                         borderWidth: 2,
                         showLine: true,
                         fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                interaction: {
+                    intersect: false,
+                    mode: 'point'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true
+                        }
                     },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                return 'Rank: ' + context[0].parsed.x.toLocaleString();
+                            },
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + ' tokens';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        min: historicalXMin,
+                        title: {
+                            display: true,
+                            text: 'User Rank (1 = Highest Allocation)',
+                            font: { size: 12 }
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value >= 0 ? value.toLocaleString() : '';
+                            }
+                        },
+                        grid: {
+                            display: true,
+                            color: '#e0e0e0'
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Token Allocation',
+                            font: { size: 12 }
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        },
+                        grid: {
+                            display: true,
+                            color: '#e0e0e0'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Aura Allocations Chart
+        const auraCtx = document.getElementById('auraChart').getContext('2d');
+        new Chart(auraCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [
                     {
                         label: 'Aura Allocations',
                         data: auraPoints,
@@ -2232,14 +2338,15 @@ function generateUserAllocationHTML(
                     x: {
                         type: 'linear',
                         position: 'bottom',
+                        min: auraXMin,
                         title: {
                             display: true,
-                            text: 'User Rank (Ordered by Allocation)',
+                            text: 'User Rank (1 = Highest Allocation)',
                             font: { size: 12 }
                         },
                         ticks: {
                             callback: function(value) {
-                                return value.toLocaleString();
+                                return value >= 0 ? value.toLocaleString() : '';
                             }
                         },
                         grid: {
@@ -2485,7 +2592,7 @@ async function main() {
             
             <a href="user-allocation-distribution.html" class="chart-link">
                 Historical & Aura - User Distribution<br>
-                <small>Line charts comparing Historical & Aura allocations</small>
+                <small>Separate line charts for Historical & Aura allocations</small>
             </a>
             
             <a href="lorenz-curves-gini-coefficients.html" class="chart-link">

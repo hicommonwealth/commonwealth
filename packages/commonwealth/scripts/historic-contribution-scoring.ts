@@ -880,18 +880,18 @@ async function main() {
     console.log('Claim addresses populated.');
 
     // Get the scores from the database
-    const historicScores = await models.sequelize.query<HistoricalAllocation>(
-      'SELECT * FROM "HistoricalAllocations" ORDER BY token_allocation DESC',
-      { type: QueryTypes.SELECT },
-    );
-    const auraScores = await models.sequelize.query<AuraAllocation>(
-      'SELECT * FROM "AuraAllocations" ORDER BY token_allocation DESC',
-      { type: QueryTypes.SELECT },
-    );
+    // const historicScores = await models.sequelize.query<HistoricalAllocation>(
+    //   'SELECT * FROM "HistoricalAllocations" ORDER BY token_allocation DESC',
+    //   { type: QueryTypes.SELECT },
+    // );
+    // const auraScores = await models.sequelize.query<AuraAllocation>(
+    //   'SELECT * FROM "AuraAllocations" ORDER BY token_allocation DESC',
+    //   { type: QueryTypes.SELECT },
+    // );
 
     // Write both CSV files
-    writeScoresToCSV(historicScores, config.historicalOutputPath);
-    writeScoresToCSV(auraScores, config.auraOutputPath);
+    // writeScoresToCSV(historicScores, config.historicalOutputPath);
+    // writeScoresToCSV(auraScores, config.auraOutputPath);
     process.exit(0);
   } catch (error) {
     console.error('Error:', error instanceof Error ? error.message : error);
