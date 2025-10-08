@@ -11,6 +11,7 @@
   "scripts": {
     "split-creator-referrer-xp-logs": "node --import=extensionless/register build/scripts/split-creator-referrer-xp-logs.js",
     "backfill-xp-logs-referral-fees": "node --import=extensionless/register build/scripts/backfill-xp-logs-referral-fees.js",
+    "copy-backfill-referrals": "node --import=extensionless/register build/scripts/copy-backfill-referrals.js",
     "async-delete-spam-comments": "tsx scripts/async-delete-spam-comments.ts",
     "async-delete-spam-threads": "tsx scripts/async-delete-spam-threads.ts",
     "add-component-showcase": "tsx ./scripts/add-component-showcase.ts",
@@ -100,7 +101,6 @@
     "@cosmjs/tendermint-rpc": "^0.31.3",
     "@cosmjs/utils": "^0.31.3",
     "@ethersproject/providers": "^5.7.2",
-    "csv-writer": "^1.6.0",
     "@farcaster/frame-sdk": "^0.0.26",
     "@hicommonwealth/adapters": "workspace:*",
     "@hicommonwealth/chains": "workspace:*",

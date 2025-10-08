@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import { notifySuccess } from 'client/scripts/controllers/app/notifications';
 import { formatAddressShort } from 'client/scripts/helpers';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import AddressInfo from 'client/scripts/models/AddressInfo';
@@ -158,14 +159,9 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
           type="info"
           body={
             <div className="banner-content">
-              <h3 className="description">You do not have a COMMON claim.</h3>
-              <CWText>
-                This won&apos;t be the only opportunity to earn COMMON,
-                we&apos;ll have&nbsp;
-                <a href="#"> future community rewards to allocate.</a>
-              </CWText>
+              <h3 className="description">Login to check your COMMON Claim</h3>
               <CWButton
-                label="Login to stay updated"
+                label="Login to check"
                 onClick={() => setIsAuthModalOpen(true)}
               />
             </div>
@@ -180,8 +176,37 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     );
   }
 
-  if (!claimAddress?.tokens || isLoadingClaimAddress) {
+  if (isLoadingClaimAddress) {
     return null;
+  }
+
+  // Logged-in user with no claim address or zero allocation: show an informational banner
+  const tokensNumber = Number(claimAddress?.tokens ?? 0);
+  if (
+    user.isLoggedIn &&
+    (claimAddress === null || (claimAddress && tokensNumber <= 0))
+  ) {
+    return (
+      <div className="TokenClaimBanner">
+        <CWBanner
+          type="info"
+          body={
+            <div className="banner-content">
+              <h3 className="description">No COMMON allocation at this time</h3>
+              <CWText>
+                This round recognizes earlier participation by community members
+                across activity, collectibles, and rewards history. Your account
+                isn’t included in this snapshot.
+              </CWText>
+              <CWText>
+                Keep participating—join communities, contribute, and watch for
+                future reward opportunities.
+              </CWText>
+            </div>
+          }
+        />
+      </div>
+    );
   }
 
   // Create the address form content to include in actions
@@ -230,7 +255,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
               className="copy-icon"
               onClick={() => {
                 void navigator.clipboard.writeText(selectedAddress.address);
-                // TODO: Add success toast
+                notifySuccess('Address copied to clipboard!');
               }}
             />
           )}
@@ -240,7 +265,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   );
 
   const canClaim = !!claimAddress;
-  const hasClaimed = claimAddress.magna_claimed_at && txHash;
+  const hasClaimed = claimAddress?.magna_claimed_at && txHash;
   const isClaimAvailable = claimAddress?.magna_synced_at;
   const isReadyForClaimNow =
     isClaimAvailable &&
@@ -264,16 +289,25 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
           <div className="notice-text">
             <p className="base-notice">
               You claimed your tokens on{' '}
-              {claimAddress.magna_claimed_at &&
-                new Date(claimAddress.magna_claimed_at).toLocaleString()}
+              {claimAddress?.magna_claimed_at && (
+                <strong>
+                  {new Date(claimAddress?.magna_claimed_at).toLocaleString()}
+                </strong>
+              )}
             </p>
-            <a
-              href={`https://basescan.org/tx/${txHash}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {txHash.slice(0, 6)}...{txHash.slice(-4)}
-            </a>
+            <CWButton
+              label="View transaction on BaseScan"
+              onClick={() =>
+                window.open(
+                  `https://basescan.org/tx/${txHash}`,
+                  '_blank',
+                  'noopener,noreferrer',
+                )
+              }
+              buttonType="secondary"
+              className="tx-link-button"
+              aria-label="View transaction on BaseScan"
+            />
           </div>
         </div>
       );
@@ -354,9 +388,23 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
               onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
               label={
                 <p>
-                  I understand that once incentives are added, there are
-                  non-refundable and can NOT be withdrawn under any
-                  circumstances.
+                  I understand that by adding my address, I adhere to the{' '}
+                  <a
+                    href="/airdrop-terms.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    airdrop terms of service
+                  </a>{' '}
+                  and{' '}
+                  <a
+                    href="https://common.foundation/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    privacy policy
+                  </a>
+                  .
                 </p>
               }
             />
@@ -383,12 +431,12 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   return canClaim ? (
     <div className="TokenClaimBanner">
       <CWBanner
-        type={claimAddress.address ? 'info' : 'error'}
+        type={claimAddress?.address ? 'info' : 'error'}
         body={
           <div className="banner-content">
-            <h3 className="description">{claimAddress.description}</h3>
+            <h3 className="description">{claimAddress?.description}</h3>
             <h2 className="token-balance">
-              You have {formattedClaimable} {claimAddress.token} tokens!
+              You have {formattedClaimable} {claimAddress?.token} tokens!
             </h2>
             {getClaimCopy()}
           </div>

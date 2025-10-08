@@ -114,6 +114,7 @@ const {
   MAGNA_UNLOCK_SCHEDULE_ID,
   MAGNA_UNLOCK_START_AT,
   MAGNA_BATCH_SIZE,
+  SLACK_WEBHOOK_URL_ALL_ENG,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -387,6 +388,11 @@ export const config = configure(
             ),
           }
         : undefined,
+    SLACK: {
+      CHANNELS: {
+        ALL_ENG: SLACK_WEBHOOK_URL_ALL_ENG,
+      },
+    },
   },
   z.object({
     SENDGRID: z.object({
@@ -809,5 +815,10 @@ export const config = configure(
         BATCH_SIZE: z.number(),
       })
       .optional(),
+    SLACK: z.object({
+      CHANNELS: z.object({
+        ALL_ENG: z.string().optional(),
+      }),
+    }),
   }),
 );

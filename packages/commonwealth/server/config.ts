@@ -42,7 +42,6 @@ const {
   RELEASER_API_KEY,
   RELEASER_WAIT_ONLY,
   RAILWAY_PUBLIC_DOMAIN,
-  SLACK_WEBHOOK_URL_ALL_ENG,
   OPENSEA_API_KEY,
   TOKEN_ALLOCATION_CONFIG,
 } = process.env;
@@ -214,11 +213,6 @@ export const config = configure(
       RELEASER_WAIT_ONLY: RELEASER_WAIT_ONLY === 'true',
       RAILWAY_PUBLIC_DOMAIN,
     },
-    SLACK: {
-      CHANNELS: {
-        ALL_ENG: SLACK_WEBHOOK_URL_ALL_ENG,
-      },
-    },
     OPENSEA_API_KEY,
     TOKEN_ALLOCATION: (() => {
       try {
@@ -381,11 +375,6 @@ export const config = configure(
           `When true, will not trigger a release but will await the result.`,
         ),
       RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
-    }),
-    SLACK: z.object({
-      CHANNELS: z.object({
-        ALL_ENG: z.string().optional(),
-      }),
     }),
     OPENSEA_API_KEY: z.string().optional(),
     TOKEN_ALLOCATION: z.object({
