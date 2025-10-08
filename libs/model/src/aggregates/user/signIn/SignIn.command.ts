@@ -6,7 +6,7 @@ import { config } from '../../../config';
 import { models } from '../../../database';
 import { mustExist } from '../../../middleware/guards';
 import { UserAttributes } from '../../../models/user';
-import { type VerifiedAddress, verifyAddress } from '../../../services/session';
+import { verifyAddress, type VerifiedAddress } from '../../../services/session';
 import { signInPrivy } from './privy';
 import { signInUser } from './utils';
 
