@@ -7,7 +7,7 @@ import {
   WebServices,
 } from '@hicommonwealth/core';
 import { config as model_config } from '@hicommonwealth/model';
-import { ChainBase, TwitterBotName } from '@hicommonwealth/shared';
+import { ChainBase, TwitterBotName, UserTierMap } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
@@ -42,6 +42,8 @@ const {
   RELEASER_API_KEY,
   RELEASER_WAIT_ONLY,
   RAILWAY_PUBLIC_DOMAIN,
+  OPENSEA_API_KEY,
+  TOKEN_ALLOCATION_CONFIG,
   MAINTENANCE_MODE_POLLING,
 } = process.env;
 
@@ -59,6 +61,46 @@ const DEFAULTS = {
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_IN: 60 * 60,
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_OUT: 60 * 60 * 2,
   CACHE_GET_COMMUNITIES_JOIN_COMMUNITY: 60 * 60 * 24,
+  TOKEN_ALLOCATION_CONFIG: {
+    // Shared configuration
+    userTierWeights: {
+      [UserTierMap.IncompleteUser]: 0,
+      [UserTierMap.BannedUser]: 0,
+      [UserTierMap.NewlyVerifiedWallet]: 1,
+      [UserTierMap.VerifiedWallet]: 1,
+      [UserTierMap.SocialVerified]: 2,
+      [UserTierMap.ChainVerified]: 3,
+      [UserTierMap.FullyVerified]: 4,
+      [UserTierMap.ManuallyVerified]: 5,
+      [UserTierMap.SystemUser]: 0,
+    },
+
+    // NFT allocation specific
+    nft: {
+      tokenSupply: 150_000_000,
+      rarityPercentiles: [100, 75, 15, 6.5, 3.5],
+      rarityRanks: [1, 10],
+      rarityTierWeightsByRank: [1, 5, 10],
+      rarityTierWeightsByPercentile: [1, 5, 10, 20, 50],
+      equalDistributionPercent: 0.6,
+      rarityDistributionPercent: 0.4,
+    },
+
+    // Historic contribution scoring specific
+    historic: {
+      supply: {
+        total: 150_000_000,
+        splits: {
+          historical: 0.5,
+          aura: 0.5,
+        },
+      },
+      decay: {
+        halfLifeDays: 365,
+        factor: Math.log(6) / 365, // ≈ 0.001899
+      },
+    },
+  },
 };
 
 export const config = configure(
@@ -172,6 +214,20 @@ export const config = configure(
       RELEASER_WAIT_ONLY: RELEASER_WAIT_ONLY === 'true',
       RAILWAY_PUBLIC_DOMAIN,
     },
+    OPENSEA_API_KEY,
+    TOKEN_ALLOCATION: (() => {
+      try {
+        return TOKEN_ALLOCATION_CONFIG
+          ? JSON.parse(TOKEN_ALLOCATION_CONFIG)
+          : DEFAULTS.TOKEN_ALLOCATION_CONFIG;
+      } catch (error) {
+        console.warn(
+          'Invalid TOKEN_ALLOCATION_CONFIG JSON, using defaults:',
+          error,
+        );
+        return DEFAULTS.TOKEN_ALLOCATION_CONFIG;
+      }
+    })(),
     MAINTENANCE_MODE_POLLING: MAINTENANCE_MODE_POLLING === 'true',
   },
   z.object({
@@ -321,6 +377,51 @@ export const config = configure(
           `When true, will not trigger a release but will await the result.`,
         ),
       RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
+    }),
+    OPENSEA_API_KEY: z.string().optional(),
+    TOKEN_ALLOCATION: z.object({
+      // Shared configuration
+      userTierWeights: z.record(z.string(), z.number()),
+
+      // NFT allocation specific
+      nft: z
+        .object({
+          tokenSupply: z.number().positive(),
+          rarityPercentiles: z.array(z.number()),
+          rarityRanks: z.array(z.number()),
+          rarityTierWeightsByRank: z.array(z.number()),
+          rarityTierWeightsByPercentile: z.array(z.number()),
+          equalDistributionPercent: z.number().min(0).max(1),
+          rarityDistributionPercent: z.number().min(0).max(1),
+        })
+        .refine(
+          (data) =>
+            data.equalDistributionPercent + data.rarityDistributionPercent ===
+            1,
+          {
+            message:
+              'equalDistributionPercent and rarityDistributionPercent must sum to 1',
+          },
+        ),
+
+      // Historic contribution scoring specific
+      historic: z.object({
+        supply: z.object({
+          total: z.number().positive(),
+          splits: z
+            .object({
+              historical: z.number().min(0).max(1),
+              aura: z.number().min(0).max(1),
+            })
+            .refine((data) => data.historical + data.aura === 1, {
+              message: 'historical and aura must sum to 1',
+            }),
+        }),
+        decay: z.object({
+          halfLifeDays: z.number().positive(),
+          factor: z.number().positive(),
+        }),
+      }),
     }),
     MAINTENANCE_MODE_POLLING: z.boolean(),
   }),

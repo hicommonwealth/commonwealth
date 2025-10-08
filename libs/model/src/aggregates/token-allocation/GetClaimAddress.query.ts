@@ -39,7 +39,7 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
         },
       );
 
-      if (!claimAddress || claimAddress.length === 0) return;
+      if (!claimAddress || claimAddress.length === 0) return null;
       if (claimAddress.length > 1) {
         // this will never happen but included for type-narrowing
         throw new InvalidState('Duplicate claim addresses found');
