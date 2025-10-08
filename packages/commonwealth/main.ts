@@ -99,19 +99,19 @@ function scheduleMaintenanceMode(timestamp: number): void {
 /**
  * Starts watching for maintenance mode timestamp changes
  */
-function startMaintenanceModeWatcher(): void {
+async function startMaintenanceModeWatcher(): Promise<void> {
   log.info('Starting maintenance mode timestamp watcher');
 
   // Initial check
-  getMaintenanceTimestamp().then((timestamp) => {
-    if (timestamp) {
-      scheduleMaintenanceMode(timestamp);
-    } else {
-      disableMaintenanceMode();
-    }
-  });
+  const _timestamp = await getMaintenanceTimestamp();
+  if (_timestamp) {
+    scheduleMaintenanceMode(_timestamp);
+  } else {
+    disableMaintenanceMode();
+  }
 
   // Watch for changes every 5 seconds
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   maintenanceWatcher = setInterval(async () => {
     try {
       const timestamp = await getMaintenanceTimestamp();
@@ -171,7 +171,7 @@ export async function main(
   );
 
   // Start maintenance mode watcher
-  startMaintenanceModeWatcher();
+  await startMaintenanceModeWatcher();
 
   const cacheDecorator = new CacheDecorator();
 
