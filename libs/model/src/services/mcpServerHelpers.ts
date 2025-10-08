@@ -7,12 +7,10 @@ export function withMCPAuthUsername(
 ): z.infer<typeof MCPServer> {
   const serverJson = server.toJSON() as any;
 
-  // Dynamically interpolate username in description
+  // Add auth_username as a dynamic property
   if (server.auth_user_id && serverJson.AuthUser) {
-    const userName =
+    serverJson.auth_username =
       serverJson.AuthUser.profile?.name || `user #${server.auth_user_id}`;
-    // Append username to the description
-    serverJson.description = `${serverJson.description} connected by ${userName}`;
   }
 
   // Remove AuthUser from response

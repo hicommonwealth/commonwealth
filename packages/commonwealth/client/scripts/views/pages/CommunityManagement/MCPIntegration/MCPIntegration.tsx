@@ -60,6 +60,9 @@ const MCPIntegration = () => {
         <div className="servers">
           {servers.map((server) => {
             const enabled = enabledIds.includes(server.id!);
+            const description = server.auth_username
+              ? `${server.description} connected by ${server.auth_username}`
+              : server.description;
             return (
               <CWCard
                 key={server.id}
@@ -74,7 +77,7 @@ const MCPIntegration = () => {
                     onChange={() => onToggle(server.id!, !enabled)}
                   />
                 </div>
-                <CWText type="b1">{server.description}</CWText>
+                <CWText type="b1">{description}</CWText>
               </CWCard>
             );
           })}

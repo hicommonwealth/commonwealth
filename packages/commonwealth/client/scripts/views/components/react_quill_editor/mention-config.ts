@@ -111,6 +111,7 @@ export type MCPServerSearchResult = {
   handle: string;
   type: 'mcp_server';
   created_at: string;
+  auth_username?: string;
 };
 
 export const getEntityTypeFromSearchResult = (
