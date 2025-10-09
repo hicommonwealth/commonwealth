@@ -44,8 +44,9 @@ class SignTokenClaim extends ContractBase {
       try {
         const fee = await this.web3.eth.getMaxPriorityFeePerGas();
         maxPriorityFeePerGas = fee.toString();
-      } catch {
-        maxPriorityFeePerGas = this.web3.utils.toWei('1', 'gwei');
+      } catch (error) {
+        console.error('Failed to calculate maxPriorityFeePerGas: ', error);
+        maxPriorityFeePerGas = this.web3.utils.toWei('2', 'gwei');
       }
 
       const block = await this.web3.eth.getBlock('pending');
@@ -60,9 +61,11 @@ class SignTokenClaim extends ContractBase {
         await this.web3.eth.getBalance(walletAddress)
       ).toString();
 
-      const gasLimitWithBuffer = (BigInt(gasLimit) * 120n) / 100n; // +20%
+      const magnaPlatformGasFee = this.web3.utils.toWei('0.0002', 'ether');
+      const gasLimitWithBuffer = (BigInt(gasLimit) * 120n) / 100n; // +20% gas buffer
       const requiredGasCost = (
-        gasLimitWithBuffer * BigInt(maxFeePerGas)
+        gasLimitWithBuffer * BigInt(maxFeePerGas) +
+        BigInt(magnaPlatformGasFee)
       ).toString();
 
       const hasEnoughBalance = BigInt(balance) >= BigInt(requiredGasCost);
@@ -71,6 +74,7 @@ class SignTokenClaim extends ContractBase {
       const requiredEth = parseFloat(
         this.web3.utils.fromWei(requiredGasCost, 'ether'),
       ).toFixed(8);
+
       const balanceEth = parseFloat(
         this.web3.utils.fromWei(balance, 'ether'),
       ).toFixed(8);
@@ -86,7 +90,8 @@ class SignTokenClaim extends ContractBase {
         requiredEth,
         balanceEth,
       };
-    } catch {
+    } catch (e) {
+      console.error('Gas estimation error: ', e, { 'revert reason': e?.data });
       // this shouldn't happen ideally
       // fallback values
       return {
@@ -114,8 +119,8 @@ class SignTokenClaim extends ContractBase {
     }
 
     const {
-      maxPriorityFeePerGas,
       maxFeePerGas,
+      maxPriorityFeePerGas,
       hasEnoughBalance,
       requiredEth,
       balanceEth,
@@ -143,7 +148,13 @@ class SignTokenClaim extends ContractBase {
         void this.web3.eth
           .sendTransaction(tx)
           .once('transactionHash', (hash) => resolve(hash as `0x${string}`))
-          .once('error', (err) => reject(err));
+          .once('error', (err) => {
+            console.error(err);
+            reject(err);
+          })
+          .catch((e) => {
+            console.error('Tx error: ', e);
+          });
       } catch (error) {
         reject(error);
       }
