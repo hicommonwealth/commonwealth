@@ -18,8 +18,8 @@ import { LoadingIndicator } from '../../../components/LoadingIndicator/LoadingIn
 import ProposalCard from './ProposalCard/ProposalCard';
 import { ProposalGridContainer } from './ProposalGridContainer/ProposalGridContainer';
 import { ProposalGridItem } from './ProposalGridItem.tsx/ProposalGridItem';
-import ProposalListingEmptyState from './ProposalListingEmptyState';
 import './ProposalListing.scss';
+import ProposalListingEmptyState from './ProposalListingEmptyState';
 
 type OptionType = {
   value: string;
@@ -147,9 +147,7 @@ const ProposalListing = ({
       proposal: (
         <div style={{ whiteSpace: 'nowrap' }}>
           <CWTag label={proposal.status} type="proposal" />
-          <CWText fontWeight="semiBold">
-            {smartTrim(proposal.title, 30)}
-          </CWText>
+          <CWText fontWeight="semiBold">{smartTrim(proposal.title, 30)}</CWText>
         </div>
       ),
       votes: (
@@ -197,7 +195,13 @@ const ProposalListing = ({
   }, []);
 
   const TableComponent = useMemo(() => {
-    return <CWTable key={`table-${snapshot.value}-${filter.value}`} columnInfo={columnInfo} rowData={rowData} />;
+    return (
+      <CWTable
+        key={`table-${snapshot.value}-${filter.value}`}
+        columnInfo={columnInfo}
+        rowData={rowData}
+      />
+    );
   }, [rowData, snapshot.value, filter.value]);
 
   if (chain === ChainBase.Ethereum && isSnapshotProposalsLoading) {
