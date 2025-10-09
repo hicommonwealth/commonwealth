@@ -61,46 +61,6 @@ const DEFAULTS = {
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_IN: 60 * 60,
   CACHE_GET_COMMUNITIES_TRENDING_SIGNED_OUT: 60 * 60 * 2,
   CACHE_GET_COMMUNITIES_JOIN_COMMUNITY: 60 * 60 * 24,
-  // TOKEN_ALLOCATION_CONFIG: {
-  //   // Shared configuration
-  //   userTierWeights: {
-  //     [UserTierMap.IncompleteUser]: 0,
-  //     [UserTierMap.BannedUser]: 0,
-  //     [UserTierMap.NewlyVerifiedWallet]: 1,
-  //     [UserTierMap.VerifiedWallet]: 1,
-  //     [UserTierMap.SocialVerified]: 2,
-  //     [UserTierMap.ChainVerified]: 3,
-  //     [UserTierMap.FullyVerified]: 4,
-  //     [UserTierMap.ManuallyVerified]: 5,
-  //     [UserTierMap.SystemUser]: 0,
-  //   },
-  //
-  //   // NFT allocation specific
-  //   nft: {
-  //     tokenSupply: 85_000_000,
-  //     rarityPercentiles: [100, 75, 15, 6.5, 3.5],
-  //     rarityRanks: [1, 10],
-  //     rarityTierWeightsByRank: [1, 5, 10],
-  //     rarityTierWeightsByPercentile: [1, 5, 10, 20, 50],
-  //     equalDistributionPercent: 0.6,
-  //     rarityDistributionPercent: 0.4,
-  //   },
-  //
-  //   // Historic contribution scoring specific
-  //   historic: {
-  //     supply: {
-  //       total: 65_000_000,
-  //       splits: {
-  //         historical: 0.5,
-  //         aura: 0.5,
-  //       },
-  //     },
-  //     decay: {
-  //       halfLifeDays: 365,
-  //       factor: Math.log(6) / 365, // ≈ 0.001899
-  //     },
-  //   },
-  // },
 };
 
 export const config = configure(
