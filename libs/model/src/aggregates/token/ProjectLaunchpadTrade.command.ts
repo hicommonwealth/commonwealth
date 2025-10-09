@@ -8,6 +8,7 @@ import { chainNodeMustExist } from '../../policies/utils/utils';
 import { setUserTier } from '../../utils/tiers';
 import { handleCapReached } from './utils';
 
+// force redeploy
 export function ProjectLaunchpadTrade(): Command<
   typeof schemas.ProjectLaunchpadTrade
 > {
