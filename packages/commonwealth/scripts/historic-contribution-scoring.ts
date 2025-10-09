@@ -10,7 +10,6 @@ import { config as envConfig } from '../server/config';
 
 if (!envConfig.TOKEN_ALLOCATION) {
   throw new Error('Token allocation configuration not set!');
-} else {
 }
 
 // Get configuration from centralized config
