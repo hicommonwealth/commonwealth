@@ -6,13 +6,18 @@ import { UserTierMap } from '@hicommonwealth/shared';
 import * as fs from 'fs';
 import * as path from 'path';
 import { QueryTypes } from 'sequelize';
-import { config } from '../server/config';
+import { config as envConfig } from '../server/config';
+
+if (!envConfig.TOKEN_ALLOCATION) {
+  throw new Error('Token allocation configuration not set!');
+} else {
+}
 
 // Get configuration from centralized config
 const {
   userTierWeights,
   historic: { supply: SUPPLY, decay: DECAY },
-} = config.TOKEN_ALLOCATION;
+} = envConfig.TOKEN_ALLOCATION;
 
 const UserTierWeightsMap: Record<UserTierMap, number> =
   userTierWeights as Record<UserTierMap, number>;
