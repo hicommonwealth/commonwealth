@@ -1,3 +1,4 @@
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import ContractBase from './ContractBase';
 
 class SignTokenClaim extends ContractBase {
@@ -153,6 +154,23 @@ class SignTokenClaim extends ContractBase {
           .once('error', (err) => {
             console.error(err);
             reject(err);
+          })
+          .then(async () => {
+            // add token to wallet
+            await this.web3?.currentProvider?.request({
+              method: 'wallet_watchAsset',
+              params: {
+                type: 'ERC20',
+                // `C` token
+                options: {
+                  address: '0xD7DA840121aeb9792b202bd84Db32B2816B30c0e',
+                  symbol: 'C',
+                  decimals: 18,
+                  chainId: parseInt(chainId),
+                  imgUrl: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
+                },
+              },
+            });
           })
           .catch((e) => {
             console.error('Tx error: ', e);
