@@ -360,7 +360,7 @@ export const useMention = ({
     const authUsername =
       'auth_username' in result ? result.auth_username : undefined;
     const description = authUsername
-      ? `${baseDescription} connected by ${authUsername}`
+      ? `${baseDescription}\n\nConnected by ${authUsername}`
       : baseDescription;
 
     const nameSpan = document.createElement('span');

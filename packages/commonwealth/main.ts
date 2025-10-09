@@ -1,13 +1,13 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
+import { cache, CacheNamespaces, logger, stats } from '@hicommonwealth/core';
 import { sequelize } from '@hicommonwealth/model/db';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
 import express, {
-  RequestHandler,
   json,
+  RequestHandler,
   urlencoded,
   type Request,
   type Response,
@@ -31,6 +31,124 @@ import setupServer from './server/scripts/setupServer';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const log = logger(import.meta);
+
+// Global maintenance mode state
+let isMaintenanceMode = false;
+let maintenanceTimeout: NodeJS.Timeout | null = null;
+let maintenanceWatcher: NodeJS.Timeout | null = null;
+
+async function getMaintenanceTimestamp(): Promise<number | null> {
+  try {
+    const timestampStr = await cache().getKey(
+      CacheNamespaces.MaintenanceMode,
+      'enabled',
+    );
+    if (!timestampStr) return null;
+
+    const timestamp = parseInt(timestampStr, 10);
+    return isNaN(timestamp) ? null : timestamp;
+  } catch (error) {
+    return null;
+  }
+}
+
+function enableMaintenanceMode(): void {
+  if (!isMaintenanceMode) {
+    isMaintenanceMode = true;
+    log.info('🔧 Maintenance mode ENABLED');
+  }
+}
+
+function disableMaintenanceMode(): void {
+  if (isMaintenanceMode) {
+    isMaintenanceMode = false;
+    log.info('✅ Maintenance mode DISABLED');
+  }
+}
+
+/**
+ * Schedules maintenance mode activation at a specific timestamp
+ */
+function scheduleMaintenanceMode(timestamp: number): void {
+  const now = Date.now();
+  const delay = timestamp - now;
+
+  if (delay <= 0) {
+    // Timestamp is in the past, enable immediately
+    enableMaintenanceMode();
+    return;
+  }
+
+  // Clear any existing timeout
+  if (maintenanceTimeout) {
+    clearTimeout(maintenanceTimeout);
+  }
+
+  const delaySeconds = Math.round(delay / 1000);
+  log.info(
+    `⏰ Maintenance mode scheduled for ${new Date(timestamp).toISOString()} (in ${delaySeconds} seconds)`,
+  );
+
+  maintenanceTimeout = setTimeout(() => {
+    enableMaintenanceMode();
+    maintenanceTimeout = null;
+  }, delay);
+}
+
+/**
+ * Starts watching for maintenance mode timestamp changes
+ */
+async function startMaintenanceModeWatcher(): Promise<void> {
+  log.info('Starting maintenance mode timestamp watcher');
+
+  // Initial check
+  const _timestamp = await getMaintenanceTimestamp();
+  if (_timestamp) {
+    scheduleMaintenanceMode(_timestamp);
+  } else {
+    disableMaintenanceMode();
+  }
+
+  // Watch for changes every 5 seconds
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  maintenanceWatcher = setInterval(async () => {
+    try {
+      const timestamp = await getMaintenanceTimestamp();
+
+      if (!timestamp) {
+        // Key was deleted, disable maintenance mode
+        if (maintenanceTimeout) {
+          clearTimeout(maintenanceTimeout);
+          maintenanceTimeout = null;
+          log.info('⏰ Scheduled maintenance mode cancelled');
+        }
+        disableMaintenanceMode();
+      } else {
+        // Check if this is a new timestamp
+        const now = Date.now();
+        if (timestamp > now && !maintenanceTimeout) {
+          // New future timestamp, schedule it
+          scheduleMaintenanceMode(timestamp);
+        } else if (timestamp <= now && !isMaintenanceMode) {
+          // Timestamp is in the past and we're not in maintenance mode
+          enableMaintenanceMode();
+        }
+      }
+    } catch (error) {
+      log.error('Error checking maintenance mode timestamp:', error);
+    }
+  }, 60_000); // Check every 60 seconds for key deletion
+}
+
+/**
+ * Serves the maintenance mode page
+ */
+function serveMaintenancePage(res: Response): void {
+  const maintenancePagePath = path.join(__dirname, 'maintenance.html');
+  res.status(503).sendFile(maintenancePagePath);
+}
+
 /**
  * Bootstraps express app
  */
@@ -46,12 +164,14 @@ export async function main(
     withPrerender?: boolean;
   },
 ) {
-  const log = logger(import.meta);
   log.info(
     `Node Option max-old-space-size set to: ${JSON.stringify(
       v8.getHeapStatistics().heap_size_limit / 1000000000,
     )} GB`,
   );
+
+  // Start maintenance mode watcher
+  await startMaintenanceModeWatcher();
 
   const cacheDecorator = new CacheDecorator();
 
@@ -221,6 +341,31 @@ export async function main(
 
   setupMiddleware();
   setupPassport();
+
+  // Maintenance mode middleware - check before all routes
+  app.use((req, res, next) => {
+    // Skip maintenance mode check for static assets and health checks
+    if (
+      req.path.startsWith('/assets') ||
+      req.path.startsWith('/brand_assets') ||
+      req.path === '/robots.txt' ||
+      req.path === '/blank.html' ||
+      req.path === '/manifest.json' ||
+      req.path === '/firebase-messaging-sw.js' ||
+      req.path.startsWith('/.well-known/') ||
+      req.path === '/health' ||
+      req.path === '/api/health'
+    ) {
+      return next();
+    }
+
+    // If in maintenance mode, serve maintenance page
+    if (isMaintenanceMode) {
+      return serveMaintenancePage(res);
+    }
+
+    next();
+  });
 
   setupAPI(app, cacheDecorator);
 

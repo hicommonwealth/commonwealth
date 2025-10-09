@@ -24,6 +24,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+
       > div:first-child {
         text-align: center;
         width: 100%;
@@ -86,6 +87,35 @@
 
           strong {
             font-weight: 600;
+          }
+        }
+
+        .claim-tx-data {
+          display: inline;
+          font-size: 14px;
+          text-align: left;
+          max-width: 80%;
+
+          p {
+            font-weight: bold;
+          }
+        }
+
+        .copyable-address {
+          background-color: rgb(226, 233, 233);
+          padding: 1px 8px;
+          border-radius: 6px;
+          cursor: pointer;
+          text-decoration: underline;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          transition: opacity 0.2s ease;
+          white-space: nowrap;
+          flex-shrink: 0;
+
+          &:hover {
+            opacity: 0.8;
           }
         }
       }
@@ -155,6 +185,7 @@
       .description {
         font-size: 14px;
       }
+
       .token-balance {
         font-size: 20px;
       }

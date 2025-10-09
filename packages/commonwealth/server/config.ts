@@ -44,6 +44,7 @@ const {
   RAILWAY_PUBLIC_DOMAIN,
   OPENSEA_API_KEY,
   TOKEN_ALLOCATION_CONFIG,
+  MAINTENANCE_MODE_POLLING,
 } = process.env;
 
 const DEFAULTS = {
@@ -76,7 +77,7 @@ const DEFAULTS = {
 
     // NFT allocation specific
     nft: {
-      tokenSupply: 150_000_000,
+      tokenSupply: 85_000_000,
       rarityPercentiles: [100, 75, 15, 6.5, 3.5],
       rarityRanks: [1, 10],
       rarityTierWeightsByRank: [1, 5, 10],
@@ -88,7 +89,7 @@ const DEFAULTS = {
     // Historic contribution scoring specific
     historic: {
       supply: {
-        total: 150_000_000,
+        total: 65_000_000,
         splits: {
           historical: 0.5,
           aura: 0.5,
@@ -227,6 +228,7 @@ export const config = configure(
         return DEFAULTS.TOKEN_ALLOCATION_CONFIG;
       }
     })(),
+    MAINTENANCE_MODE_POLLING: MAINTENANCE_MODE_POLLING === 'true',
   },
   z.object({
     DISABLE_SITEMAP: z.boolean(),
@@ -421,5 +423,6 @@ export const config = configure(
         }),
       }),
     }),
+    MAINTENANCE_MODE_POLLING: z.boolean(),
   }),
 );

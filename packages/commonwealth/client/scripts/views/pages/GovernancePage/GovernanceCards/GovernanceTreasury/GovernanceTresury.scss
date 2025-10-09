@@ -2,7 +2,7 @@
 @use '../../../../../styles/mixins/colors.module';
 
 .GovernanceTreassury {
-  width: 270px;
+  width: 250px;
   padding: 24px;
   background-color: colors.$white;
   border: 1px solid colors.$neutral-100;
@@ -18,7 +18,7 @@
     .address-details {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 2px;
 
       .address {
         background-color: colors.$neutral-200;
@@ -28,11 +28,10 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         width: 100px;
-        gap: 4px;
-        padding-left: 2px;
         display: flex;
         justify-content: center;
         align-items: center;
+        margin-left: 4px;
 
         .Icon {
           width: 16px;

@@ -192,17 +192,16 @@ async function recordXpsForQuest({
     );
     if (reward_amount <= 0) continue;
 
-    const shared_reward =
-      shared_with && (creator_user_id || referrer_user_id)
-        ? Math.round(reward_amount * action_meta.creator_reward_weight)
-        : null;
+    const shared_reward = shared_with
+      ? Math.round(reward_amount * action_meta.creator_reward_weight)
+      : null;
     const xp_points = reward_amount - (shared_reward ?? 0);
     const creator_xp_points = creator_user_id ? shared_reward : null;
     const referrer_fee = reward_amount * config.XP.REFERRER_FEE_RATIO;
     const referrer_xp_points = referrer_user_id
       ? creator_address
         ? referrer_fee
-        : (shared_reward ?? referrer_fee)
+        : shared_reward || referrer_fee
       : null;
     await models.sequelize.query(
       `

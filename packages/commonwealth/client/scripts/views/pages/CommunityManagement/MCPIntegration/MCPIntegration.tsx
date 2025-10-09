@@ -61,7 +61,7 @@ const MCPIntegration = () => {
           {servers.map((server) => {
             const enabled = enabledIds.includes(server.id!);
             const description = server.auth_username
-              ? `${server.description} connected by ${server.auth_username}`
+              ? `${server.description}\n\nConnected by ${server.auth_username}`
               : server.description;
             return (
               <CWCard
