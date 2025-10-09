@@ -68,6 +68,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const claimsEnabled = useFlag('claims');
   const {
     claim: claimToken,
+    claimTxData,
     isPending: isClaiming,
     transactionHash,
   } = useClaimTokenFlow();
@@ -344,6 +345,44 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                 disabled={isClaiming || isLoadingAllocation}
                 aria-label={`Claim to ${formatAddressShort(allocation.walletAddress, 6)}`}
               />
+              {claimTxData && (
+                <div className="claim-tx-data">
+                  <p>
+                    If you face issues with the claim process, complete a manual
+                    transaction to from your wallet with these steps
+                  </p>
+                  <ul style={{ listStyleType: 'disc' }}>
+                    <li>
+                      Enable <strong>&apos;Show hex data&apos;</strong> in your
+                      wallet settings.
+                    </li>
+                    <li>
+                      Send a transaction of 0.0003 ETH to{' '}
+                      <span
+                        className="copyable-address"
+                        onClick={() => {
+                          void navigator.clipboard.writeText(claimTxData.from);
+                          notifySuccess('Address copied to clipboard!');
+                        }}
+                      >
+                        {formatAddressShort(claimTxData.from, 4)}
+                        <CWIcon iconName="copy" iconSize="small" />
+                      </span>{' '}
+                      with hex data{' '}
+                      <span
+                        className="copyable-address"
+                        onClick={() => {
+                          void navigator.clipboard.writeText(claimTxData.data);
+                          notifySuccess('Hex data copied to clipboard!');
+                        }}
+                      >
+                        {formatAddressShort(claimTxData.data, 4)}
+                        <CWIcon iconName="copy" iconSize="small" />
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         );
