@@ -44,6 +44,7 @@ const {
   RAILWAY_PUBLIC_DOMAIN,
   OPENSEA_API_KEY,
   TOKEN_ALLOCATION_CONFIG,
+  MAINTENANCE_MODE_POLLING,
 } = process.env;
 
 const DEFAULTS = {
@@ -227,6 +228,7 @@ export const config = configure(
         return DEFAULTS.TOKEN_ALLOCATION_CONFIG;
       }
     })(),
+    MAINTENANCE_MODE_POLLING: MAINTENANCE_MODE_POLLING === 'true',
   },
   z.object({
     DISABLE_SITEMAP: z.boolean(),
@@ -421,5 +423,6 @@ export const config = configure(
         }),
       }),
     }),
+    MAINTENANCE_MODE_POLLING: z.boolean(),
   }),
 );
