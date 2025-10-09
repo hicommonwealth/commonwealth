@@ -33,10 +33,14 @@ class SignTokenClaim extends ContractBase {
     balanceEth: string | number;
   }> {
     try {
+      // Magna platform fee that needs to be sent with the transaction
+      const magnaPlatformFee = '200000000000000'; // 0.0002 ETH
+      // Estimate gas with the same parameters as the actual transaction
       const gasLimit = await this.web3.eth.estimateGas({
         from: walletAddress,
         to: contractAddress,
         data,
+        value: magnaPlatformFee, // Include the value to prevent contract reversion
       });
 
       let maxPriorityFeePerGas: string;
@@ -61,18 +65,16 @@ class SignTokenClaim extends ContractBase {
         await this.web3.eth.getBalance(walletAddress)
       ).toString();
 
-      const magnaPlatformGasFee = this.web3.utils.toWei('0.0002', 'ether');
+      // Calculate total cost: gas cost + magna platform fee
       const gasLimitWithBuffer = (BigInt(gasLimit) * 120n) / 100n; // +20% gas buffer
-      const requiredGasCost = (
-        gasLimitWithBuffer * BigInt(maxFeePerGas) +
-        BigInt(magnaPlatformGasFee)
-      ).toString();
+      const gasCost = gasLimitWithBuffer * BigInt(maxFeePerGas);
+      const totalRequiredCost = gasCost + BigInt(magnaPlatformFee);
 
-      const hasEnoughBalance = BigInt(balance) >= BigInt(requiredGasCost);
+      const hasEnoughBalance = BigInt(balance) >= totalRequiredCost;
 
       // format to ETH for readability
       const requiredEth = parseFloat(
-        this.web3.utils.fromWei(requiredGasCost, 'ether'),
+        this.web3.utils.fromWei(totalRequiredCost.toString(), 'ether'),
       ).toFixed(8);
 
       const balanceEth = parseFloat(
@@ -83,7 +85,7 @@ class SignTokenClaim extends ContractBase {
         gasLimit: gasLimit.toString(),
         maxFeePerGas,
         maxPriorityFeePerGas,
-        requiredGasCost,
+        requiredGasCost: totalRequiredCost.toString(),
         balance,
         hasEnoughBalance,
         // for ui
@@ -137,7 +139,7 @@ class SignTokenClaim extends ContractBase {
       from: walletAddress,
       to: this.tokenAddress,
       data, // magna sends the full abi-encoded calldata
-      value: '0x0', // idk what this does
+      value: '200000000000000', // fee from magna
       gas: gasLimit,
       maxFeePerGas,
       maxPriorityFeePerGas,
