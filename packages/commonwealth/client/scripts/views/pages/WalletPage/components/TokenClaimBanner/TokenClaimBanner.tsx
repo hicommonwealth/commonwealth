@@ -122,10 +122,40 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   // Countdown timer effect - updates every second
   useEffect(() => {
     const updateCountdown = () => {
-      const now = moment();
-      const nextHour = moment().add(1, 'hour').startOf('hour');
-      const duration = moment.duration(nextHour.diff(now));
+      // Get current time in ET (approximating with UTC-5 for EST)
+      // Note: This doesn't account for DST automatically
+      const nowET = moment().utcOffset(-5, true); // ET timezone
 
+      // Batch processing times in ET: 2am, 8am, 2pm, 8pm
+      const batchHours = [2, 8, 14, 20];
+
+      // Find next batch times
+      let nextBatchTime: moment.Moment | null = null;
+      const today = nowET.clone().startOf('day');
+
+      // Check today's batch times
+      for (const hour of batchHours) {
+        const batchTime = today.clone().hour(hour).minute(0).second(0);
+        if (batchTime.isAfter(nowET)) {
+          const hoursUntil = batchTime.diff(nowET, 'hours', true);
+          if (hoursUntil <= 6) {
+            nextBatchTime = batchTime;
+            break;
+          }
+        }
+      }
+
+      // If no suitable time today, check tomorrow's first batch time
+      if (!nextBatchTime) {
+        nextBatchTime = today
+          .clone()
+          .add(1, 'day')
+          .hour(batchHours[0])
+          .minute(0)
+          .second(0);
+      }
+
+      const duration = moment.duration(nextBatchTime.diff(nowET));
       const hours = Math.floor(duration.asHours());
       const minutes = duration.minutes();
       const seconds = duration.seconds();
