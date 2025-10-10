@@ -389,8 +389,8 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     allocation.magna_allocation_id &&
     allocation.walletAddress &&
     allocation.claimable > 0;
-  const isReadyForClaimAfterUnlock = true;
-  isClaimAvailable &&
+  const isReadyForClaimAfterUnlock =
+    isClaimAvailable &&
     !isReadyForClaimNow &&
     allocation &&
     allocation.claimable > 0 &&
@@ -603,10 +603,29 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
 
       // claim is available but we landed on an error case
       return (
-        <p>
-          Please contact tech@common.foundation or reach out in the Common
-          Discord if you need help.
-        </p>
+        <div className="notice-text">
+          <div className="error-notice">
+            <CWText type="h5" fontWeight="semiBold" className="error-title">
+              Unexpected Allocation State!
+            </CWText>
+            <CWText className="error-description">
+              Please contact&nbsp;
+              <a href="mailto:tech@common.foundation" className="contact-link">
+                tech@common.foundation
+              </a>
+              &nbsp; or reach out in the&nbsp;
+              <a
+                href="https://discord.gg/common"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-link"
+              >
+                Common Discord.
+              </a>
+              &nbsp;
+            </CWText>
+          </div>
+        </div>
       );
     }
 
