@@ -24,14 +24,23 @@ export const getBotUser = async (): Promise<BotUserWithAddress> => {
     ],
   });
 
-  if (!address || !address.User) {
-    throw new Error(
-      `Bot user with address ${botUserAddress} not found in database`,
-    );
+  if (!address) {
+    throw new Error(`Bot user with address ${botUserAddress} not found`);
   }
 
   return {
-    user: address.User! as UserInstance,
+    user: address.User as UserInstance,
     address,
   };
+};
+
+export const isBotAddress = async (addressId: number): Promise<boolean> => {
+  const { user: botUser } = await getBotUser();
+  const address = await models.Address.findOne({
+    where: {
+      id: addressId,
+      user_id: botUser.id,
+    },
+  });
+  return !!address;
 };

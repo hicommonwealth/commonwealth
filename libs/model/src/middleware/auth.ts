@@ -32,9 +32,10 @@ import { Op, QueryTypes } from 'sequelize';
 import { ZodType, z } from 'zod';
 import { models } from '../database';
 import { AddressInstance } from '../models';
+import { isBotAddress } from '../utils/botUser';
 import { BannedActor, NonMember, RejectedMember } from './errors';
 
-async function findComment(actor: Actor, comment_id: number) {
+async function findComment(comment_id: number) {
   const comment = await models.Comment.findOne({
     where: { id: comment_id },
     include: [
@@ -394,6 +395,29 @@ async function mustBeAuthorized(
     context!.is_collaborator = !!found;
     if (context!.is_collaborator) return;
     throw new InvalidActor(actor, 'Not authorized collaborator');
+  }
+
+  // Allows when the comment is AI-generated and the user triggered it
+  if (
+    context &&
+    'comment_id' in context &&
+    context.comment_id &&
+    'author_address_id' in context &&
+    context.author_address_id
+  ) {
+    const isAIComment = await isBotAddress(context.author_address_id);
+    if (isAIComment) {
+      const aiToken = await models.AICompletionToken.findOne({
+        where: {
+          comment_id: context.comment_id,
+          user_id: actor.user.id,
+        },
+      });
+      if (aiToken) {
+        context.is_author = true;
+        return;
+      }
+    }
   }
 
   // At this point, we know the actor is not the author of the entity
