@@ -45,6 +45,8 @@ export const GetAllocation = {
       walletAddress: EVM_ADDRESS_STRICT,
       token: z.string(),
       description: z.string(),
+      initial_percentage: z.number(),
+      cliff_date: z.date(),
       status: z.enum(AllocationStatus),
       amount: z.number(),
       funded: z.number(),
