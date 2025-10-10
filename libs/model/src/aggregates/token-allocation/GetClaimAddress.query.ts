@@ -22,11 +22,16 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
             A.magna_synced_at,
             A.magna_claimed_at,
             A.magna_claim_tx_hash,
-            COALESCE(HA.token_allocation, 0)::numeric + COALESCE(AA.token_allocation, 0)::numeric as tokens
+            A.magna_cliff_claimed_at,
+            A.magna_cliff_claim_tx_hash,
+            COALESCE(HA.token_allocation, 0)::numeric 
+            + COALESCE(AA.token_allocation, 0)::numeric
+            + COALESCE(NA.total_token_allocation, 0)::numeric as tokens
           FROM
             "ClaimAddresses" A
             LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
             LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
+            LEFT JOIN "NftSnapshot" NA ON A.user_id = NA.user_id
           WHERE
             A.user_id = :user_id
           LIMIT 1;
@@ -49,6 +54,8 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
         ...claimAddress[0],
         token: config.MAGNA?.TOKEN || '',
         description: config.MAGNA?.EVENT_DESC || '',
+        initial_percentage: config.MAGNA?.INITIAL_PERCENTAGE || 0,
+        cliff_date: config.MAGNA?.CLIFF_DATE || new Date(),
       };
     },
   };

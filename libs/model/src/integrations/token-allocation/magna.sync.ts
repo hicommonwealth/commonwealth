@@ -17,10 +17,10 @@ export type TokenAllocationSyncArgs = {
 };
 
 async function sendToSlack(created: number) {
-  const webhookUrl = config.SLACK.CHANNELS.ALL_ENG;
+  const webhookUrl = config.SLACK.CHANNELS.MAGNA_NOTIFS;
   if (!webhookUrl) {
     log.error(
-      'SLACK_WEBHOOK_URL_ALL_ENG is not set in the configuration. Cannot send Slack message.',
+      'SLACK_WEBHOOK_URL_MAGNA_NOTIFS is not set in the configuration. Cannot send Slack message.',
     );
     return;
   }
