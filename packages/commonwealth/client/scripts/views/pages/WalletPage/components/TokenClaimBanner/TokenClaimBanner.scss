@@ -382,6 +382,34 @@
           }
         }
 
+        .sync-countdown-notice {
+          padding: 0;
+          margin: 12px 0;
+
+          .sync-title {
+            font-size: 16px;
+            margin-bottom: 8px;
+          }
+
+          .sync-description {
+            font-size: 13px;
+            margin-bottom: 12px;
+          }
+
+          .countdown-timer {
+            padding: 12px 20px;
+
+            .timer-label {
+              font-size: 14px;
+              margin-bottom: 6px;
+            }
+
+            .timer-display {
+              font-size: 22px;
+            }
+          }
+        }
+
         .terms-section {
           padding: 10px;
           margin: 12px 0;
@@ -624,6 +652,49 @@
             strong {
               color: colors.$neutral-900;
               font-weight: 600;
+            }
+          }
+        }
+
+        .sync-countdown-notice {
+          padding: 0;
+          text-align: center;
+          margin: 16px 0;
+
+          .sync-title {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: colors.$neutral-900;
+          }
+
+          .sync-description {
+            font-size: 14px;
+            color: colors.$neutral-700;
+            line-height: 1.6;
+            margin-bottom: 16px;
+          }
+
+          .countdown-timer {
+            margin: 0;
+            padding: 16px 28px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            .timer-label {
+              font-size: 16px;
+              margin-bottom: 8px;
+              color: colors.$neutral-700;
+            }
+
+            .timer-display {
+              font-family: 'JetBrains Mono', 'Courier New', monospace;
+              font-size: 28px;
+              color: colors.$neutral-900;
+              letter-spacing: 0.1em;
+              line-height: 1;
             }
           }
         }

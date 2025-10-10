@@ -43,21 +43,6 @@ const formatTokenBalance = (balance: string | number): string => {
   });
 };
 
-const getNextSyncJobTime = () => {
-  const now = new Date();
-  const nextHour = new Date(now);
-  nextHour.setHours(now.getHours() + 1, 0, 0, 0); // Set to next hour on the hour
-  const timeLeftMs = nextHour.getTime() - now.getTime();
-  const timeLeftMinutes = Math.ceil(timeLeftMs / (1000 * 60));
-
-  const nextSyncJobTimeLeft =
-    timeLeftMinutes < 60
-      ? `${timeLeftMinutes} minute${timeLeftMinutes !== 1 ? 's' : ''}`
-      : // eslint-disable-next-line max-len
-        `${Math.floor(timeLeftMinutes / 60)} hour${Math.floor(timeLeftMinutes / 60) !== 1 ? 's' : ''} and ${timeLeftMinutes % 60} minute${timeLeftMinutes % 60 !== 1 ? 's' : ''}`;
-  return nextSyncJobTimeLeft;
-};
-
 const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const user = useUserStore();
   const [formattedClaimable, setFormattedClaimable] = useState<string>('0');
@@ -71,6 +56,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
   const [countdown, setCountdown] = useState<string>('00:00:00');
   const [unlockCountdown, setUnlockCountdown] = useState<string>('00:00:00');
+  const [syncCountdown, setSyncCountdown] = useState<string>('00:00:00');
   const claimsEnabled = useFlag('claims');
   const {
     claim: claimToken,
@@ -228,6 +214,32 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
 
     return () => clearInterval(interval);
   }, [allocation?.unlock_start_at]);
+
+  // Sync countdown timer effect - updates every second
+  useEffect(() => {
+    const updateSyncCountdown = () => {
+      const now = moment();
+      const nextHour = now.clone().add(1, 'hour').startOf('hour');
+      const duration = moment.duration(nextHour.diff(now));
+      const minutes = duration.minutes();
+      const seconds = duration.seconds();
+
+      const formattedTime = [
+        String(minutes).padStart(2, '0'),
+        String(seconds).padStart(2, '0'),
+      ].join(':');
+
+      setSyncCountdown(formattedTime);
+    };
+
+    // Update immediately
+    updateSyncCountdown();
+
+    // Then update every second
+    const interval = setInterval(updateSyncCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleClaimAddressUpdate = () => {
     if (selectedAddress) {
@@ -575,119 +587,138 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     }
 
     // Show ui to set address for claim
-    return (
-      <div className="notice-text">
-        <div className="banner-actions">
-          <div className="address-form-section">
-            <CWText
-              type="h5"
-              fontWeight="semiBold"
-              className="address-form-title"
-            >
-              Setup your claim address
-            </CWText>
-            <CWText className="address-form-description">
-              Select your EVM address where you&apos;d like to receive your
-              allocated tokens.
-            </CWText>
-            <div className="address-input-container">
-              <CWSelectList
-                components={{
-                  Option: (originalProps) =>
-                    CustomAddressOption({
-                      originalProps,
-                      selectedAddressValue: selectedAddress?.address || '',
-                    }),
-                }}
-                noOptionsMessage={() => 'No available addresses'}
-                placeholder="Select or paste your EVM address"
-                value={
-                  selectedAddress?.address
-                    ? convertAddressToDropdownOption(selectedAddress.address)
-                    : null
-                }
-                defaultValue={
-                  claimAddress?.address
-                    ? convertAddressToDropdownOption(claimAddress.address)
-                    : null
-                }
-                formatOptionLabel={(option) => (
-                  <CustomAddressOptionElement
-                    value={option.value}
-                    label={option.label}
-                    selectedAddressValue={selectedAddress?.address || ''}
-                  />
+    if (!selectedAddress || !selectedAddress?.address) {
+      return (
+        <div className="notice-text">
+          <div className="banner-actions">
+            <div className="address-form-section">
+              <CWText
+                type="h5"
+                fontWeight="semiBold"
+                className="address-form-title"
+              >
+                Setup your claim address
+              </CWText>
+              <CWText className="address-form-description">
+                Select your EVM address where you&apos;d like to receive your
+                allocated tokens.
+              </CWText>
+              <div className="address-input-container">
+                <CWSelectList
+                  components={{
+                    Option: (originalProps) =>
+                      CustomAddressOption({
+                        originalProps,
+                        selectedAddressValue: selectedAddress?.address || '',
+                      }),
+                  }}
+                  noOptionsMessage={() => 'No available addresses'}
+                  placeholder="Select or paste your EVM address"
+                  value={
+                    selectedAddress?.address
+                      ? convertAddressToDropdownOption(selectedAddress.address)
+                      : null
+                  }
+                  defaultValue={
+                    claimAddress?.address
+                      ? convertAddressToDropdownOption(claimAddress.address)
+                      : null
+                  }
+                  formatOptionLabel={(option) => (
+                    <CustomAddressOptionElement
+                      value={option.value}
+                      label={option.label}
+                      selectedAddressValue={selectedAddress?.address || ''}
+                    />
+                  )}
+                  isClearable={false}
+                  isSearchable={true}
+                  options={addressOptions}
+                  onChange={handleAddressChange}
+                  className="enhanced-address-select"
+                  aria-label="Select or enter your EVM address for token claiming"
+                />
+                {selectedAddress?.address && (
+                  <div className="address-actions">
+                    <CWIcon
+                      iconName="copy"
+                      iconSize="medium"
+                      className="copy-icon"
+                      onClick={() => {
+                        void navigator.clipboard.writeText(
+                          selectedAddress.address,
+                        );
+                        notifySuccess('Address copied to clipboard!');
+                      }}
+                    />
+                  </div>
                 )}
-                isClearable={false}
-                isSearchable={true}
-                options={addressOptions}
-                onChange={handleAddressChange}
-                className="enhanced-address-select"
-                aria-label="Select or enter your EVM address for token claiming"
-              />
-              {selectedAddress?.address && (
-                <div className="address-actions">
-                  <CWIcon
-                    iconName="copy"
-                    iconSize="medium"
-                    className="copy-icon"
-                    onClick={() => {
-                      void navigator.clipboard.writeText(
-                        selectedAddress.address,
-                      );
-                      notifySuccess('Address copied to clipboard!');
-                    }}
+              </div>
+              <div className="terms-and-button-section">
+                <div className="terms-checkbox-container">
+                  <CWCheckbox
+                    checked={isAcknowledged}
+                    onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
+                    label={
+                      <CWText className="terms-text">
+                        I understand that by adding my address, I adhere to
+                        the&nbsp;
+                        <a
+                          href="/airdrop-terms.pdf"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="terms-link"
+                        >
+                          airdrop terms of service
+                        </a>
+                        &nbsp;and&nbsp;
+                        <a
+                          href="https://common.foundation/privacy"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="terms-link"
+                        >
+                          privacy policy
+                        </a>
+                        .
+                      </CWText>
+                    }
                   />
                 </div>
-              )}
-            </div>
-            <div className="terms-and-button-section">
-              <div className="terms-checkbox-container">
-                <CWCheckbox
-                  checked={isAcknowledged}
-                  onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
-                  label={
-                    <CWText className="terms-text">
-                      I understand that by adding my address, I adhere to
-                      the&nbsp;
-                      <a
-                        href="/airdrop-terms.pdf"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="terms-link"
-                      >
-                        airdrop terms of service
-                      </a>
-                      &nbsp;and&nbsp;
-                      <a
-                        href="https://common.foundation/privacy"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="terms-link"
-                      >
-                        privacy policy
-                      </a>
-                      .
-                    </CWText>
-                  }
-                />
+                {isAcknowledged && (
+                  <CWButton
+                    label={isUpdating ? 'Saving...' : 'Save Address'}
+                    onClick={handleClaimAddressUpdate}
+                    disabled={isUpdating || !selectedAddress}
+                    buttonType="primary"
+                    buttonHeight="sm"
+                    className="save-address-button"
+                    aria-label="Save the selected address for token claiming"
+                  />
+                )}
               </div>
-              {isAcknowledged && (
-                <CWButton
-                  label={isUpdating ? 'Saving...' : 'Save Address'}
-                  onClick={handleClaimAddressUpdate}
-                  disabled={
-                    isUpdating ||
-                    !selectedAddress ||
-                    selectedAddress.address === claimAddress?.address
-                  }
-                  buttonType="primary"
-                  buttonHeight="sm"
-                  className="save-address-button"
-                  aria-label="Save the selected address for token claiming"
-                />
-              )}
             </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="notice-text">
+        <div className="sync-countdown-notice">
+          <CWText type="h5" fontWeight="semiBold" className="sync-title">
+            Sync Pending
+          </CWText>
+          <CWText className="sync-description">
+            We need to sync onchain with your saved address.
+          </CWText>
+          <div className="countdown-timer">
+            <CWText type="h4" fontWeight="medium" className="timer-label">
+              Next Sync In
+            </CWText>
+            <CWText type="h2" fontWeight="bold" className="timer-display">
+              {syncCountdown}
+            </CWText>
           </div>
         </div>
       </div>
