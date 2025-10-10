@@ -330,15 +330,15 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   );
 
   const canClaim = !!claimAddress;
-  const hasClaimed = claimAddress?.magna_claimed_at && txHash;
+  const hasClaimed = false; // claimAddress?.magna_claimed_at && txHash;
   const isClaimAvailable = true || claimAddress?.magna_synced_at;
   const isPendingClaimFunds = true || allocation?.status === 'PENDING_FUNDING';
   const isReadyForClaimNow = true;
-  // isClaimAvailable &&
-  // allocation &&
-  // allocation.magna_allocation_id &&
-  // allocation.walletAddress &&
-  // allocation.claimable > 0;
+  isClaimAvailable &&
+    allocation &&
+    allocation.magna_allocation_id &&
+    allocation.walletAddress &&
+    allocation.claimable > 0;
   const isReadyForClaimAfterUnlock =
     isClaimAvailable &&
     !isReadyForClaimNow &&
@@ -402,189 +402,173 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     if (isClaimAvailable) {
       if (isReadyForClaimNow) {
         return (
-          <div className="notice-section">
-            <div className="notice-text">
-              {isPendingClaimFunds ? (
-                <>
-                  <div className="countdown-timer">
-                    <CWText
-                      type="h4"
-                      fontWeight="medium"
-                      className="timer-label"
-                    >
-                      Claim In
-                    </CWText>
-                    <CWText
-                      type="h1"
-                      fontWeight="bold"
-                      className="timer-display"
-                    >
-                      {countdown}
-                    </CWText>
-                  </div>
-                  <p className="batch-processing-notice">
-                    Your claim request has been received. Claims are processed
-                    in batches, and your request is expected to be included in
-                    the next batch.
-                  </p>
-                </>
-              ) : (
-                <p style={{ textAlign: 'left' }}>
-                  <strong>Before Claiming</strong>
-                  <ul style={{ listStyleType: 'disc' }}>
-                    <li>
-                      Verify that you are on the <strong>common.xyz</strong>{' '}
-                      domain
-                    </li>
-                    <li>
-                      Your wallet is connected to the <strong>Base</strong>{' '}
-                      network
-                    </li>
-                    <li>Never approve unlimited token allowances</li>
-                  </ul>
-                </p>
-              )}
-              {!isPendingClaimFunds && (
-                <CWButton
-                  label={`Claim to ${formatAddressShort(
-                    allocation?.walletAddress || '',
-                    6,
-                  )}`}
-                  onClick={() => {
-                    if (allocation) {
-                      claimToken({
-                        allocation_id: allocation.magna_allocation_id,
-                      });
-                    }
-                  }}
-                  disabled={
-                    isClaiming || isLoadingAllocation || isPendingClaimFunds
-                  }
-                  aria-label={`Claim to ${formatAddressShort(
-                    allocation?.walletAddress || '',
-                    6,
-                  )}`}
-                />
-              )}
-              {claimTxData && (
-                <div className="claim-tx-data">
-                  <p>
-                    If you face issues with the claim process, complete a manual
-                    transaction to from your wallet with these steps
-                  </p>
-                  <ul style={{ listStyleType: 'disc' }}>
-                    <li>
-                      Enable <strong>&apos;Show hex data&apos;</strong> in your
-                      wallet settings.
-                    </li>
-                    <li>
-                      Send a transaction of 0.0003 ETH to{' '}
-                      <span
-                        className="copyable-address"
-                        onClick={() => {
-                          void navigator.clipboard.writeText(claimTxData.from);
-                          notifySuccess('Address copied to clipboard!');
-                        }}
-                      >
-                        {formatAddressShort(claimTxData.from, 4)}
-                        <CWIcon iconName="copy" iconSize="small" />
-                      </span>{' '}
-                      with hex data{' '}
-                      <span
-                        className="copyable-address"
-                        onClick={() => {
-                          void navigator.clipboard.writeText(claimTxData.data);
-                          notifySuccess('Hex data copied to clipboard!');
-                        }}
-                      >
-                        {formatAddressShort(claimTxData.data, 4)}
-                        <CWIcon iconName="copy" iconSize="small" />
-                      </span>
-                    </li>
-                  </ul>
+          <div className="notice-text">
+            {isPendingClaimFunds ? (
+              <>
+                <div className="countdown-timer">
+                  <CWText type="h4" fontWeight="medium" className="timer-label">
+                    Claim In
+                  </CWText>
+                  <CWText type="h1" fontWeight="bold" className="timer-display">
+                    {countdown}
+                  </CWText>
                 </div>
-              )}
-            </div>
+                <p className="batch-processing-notice">
+                  Your claim request has been received. Claims are processed in
+                  batches, and your request is expected to be included in the
+                  next batch.
+                </p>
+              </>
+            ) : (
+              <p style={{ textAlign: 'left' }}>
+                <strong>Before Claiming</strong>
+                <ul style={{ listStyleType: 'disc' }}>
+                  <li>
+                    Verify that you are on the <strong>common.xyz</strong>{' '}
+                    domain
+                  </li>
+                  <li>
+                    Your wallet is connected to the <strong>Base</strong>{' '}
+                    network
+                  </li>
+                  <li>Never approve unlimited token allowances</li>
+                </ul>
+              </p>
+            )}
+            {!isPendingClaimFunds && (
+              <CWButton
+                label={`Claim to ${formatAddressShort(
+                  allocation?.walletAddress || '',
+                  6,
+                )}`}
+                onClick={() => {
+                  if (allocation) {
+                    claimToken({
+                      allocation_id: allocation.magna_allocation_id,
+                    });
+                  }
+                }}
+                disabled={
+                  isClaiming || isLoadingAllocation || isPendingClaimFunds
+                }
+                aria-label={`Claim to ${formatAddressShort(
+                  allocation?.walletAddress || '',
+                  6,
+                )}`}
+              />
+            )}
+            {claimTxData && (
+              <div className="claim-tx-data">
+                <p>
+                  If you face issues with the claim process, complete a manual
+                  transaction to from your wallet with these steps
+                </p>
+                <ul style={{ listStyleType: 'disc' }}>
+                  <li>
+                    Enable <strong>&apos;Show hex data&apos;</strong> in your
+                    wallet settings.
+                  </li>
+                  <li>
+                    Send a transaction of 0.0003 ETH to{' '}
+                    <span
+                      className="copyable-address"
+                      onClick={() => {
+                        void navigator.clipboard.writeText(claimTxData.from);
+                        notifySuccess('Address copied to clipboard!');
+                      }}
+                    >
+                      {formatAddressShort(claimTxData.from, 4)}
+                      <CWIcon iconName="copy" iconSize="small" />
+                    </span>{' '}
+                    with hex data{' '}
+                    <span
+                      className="copyable-address"
+                      onClick={() => {
+                        void navigator.clipboard.writeText(claimTxData.data);
+                        notifySuccess('Hex data copied to clipboard!');
+                      }}
+                    >
+                      {formatAddressShort(claimTxData.data, 4)}
+                      <CWIcon iconName="copy" iconSize="small" />
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
         );
       }
 
       if (isReadyForClaimAfterUnlock) {
-        <div className="notice-section">
-          <p>
-            You can claim your tokens after{' '}
-            {allocation.unlock_start_at &&
-              new Date(allocation.unlock_start_at).toLocaleDateString()}
-          </p>
-        </div>;
+        <p>
+          You can claim your tokens after{' '}
+          {allocation.unlock_start_at &&
+            new Date(allocation.unlock_start_at).toLocaleDateString()}
+        </p>;
       }
 
       // claim is available but we landed on an error case
       return (
-        <div className="notice-section">
-          <p>
-            Please contact tech@common.foundation or reach out in the Common
-            Discord if you need help.
-          </p>
-        </div>
+        <p>
+          Please contact tech@common.foundation or reach out in the Common
+          Discord if you need help.
+        </p>
       );
     }
 
     // Show ui to set address for claim
     return (
-      <div className="notice-section">
-        <div className="notice-text">
-          <p className="base-notice">
-            We are going live on Base. You must set an EVM address to claim your
-            allocation.
-          </p>
-          <p className="base-notice">
-            Once you set an EVM address we need to sync onchain, we process
-            these syncs at the top of every hour. The next sync will happen in{' '}
-            {getNextSyncJobTime()}
-          </p>
-          <div className="banner-actions">
-            {addressFormContent}
-            <CWCheckbox
-              checked={isAcknowledged}
-              onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
-              label={
-                <p>
-                  I understand that by adding my address, I adhere to the{' '}
-                  <a
-                    href="/airdrop-terms.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    airdrop terms of service
-                  </a>{' '}
-                  and{' '}
-                  <a
-                    href="https://common.foundation/privacy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    privacy policy
-                  </a>
-                  .
-                </p>
+      <div className="notice-text">
+        <p className="base-notice">
+          We are going live on Base. You must set an EVM address to claim your
+          allocation.
+        </p>
+        <p className="base-notice">
+          Once you set an EVM address we need to sync onchain, we process these
+          syncs at the top of every hour. The next sync will happen in{' '}
+          {getNextSyncJobTime()}
+        </p>
+        <div className="banner-actions">
+          {addressFormContent}
+          <CWCheckbox
+            checked={isAcknowledged}
+            onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
+            label={
+              <p>
+                I understand that by adding my address, I adhere to the{' '}
+                <a
+                  href="/airdrop-terms.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  airdrop terms of service
+                </a>{' '}
+                and{' '}
+                <a
+                  href="https://common.foundation/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  privacy policy
+                </a>
+                .
+              </p>
+            }
+          />
+          {isAcknowledged && (
+            <CWButton
+              label={isUpdating ? 'Saving...' : 'Save address'}
+              onClick={handleClaimAddressUpdate}
+              disabled={
+                isUpdating ||
+                !selectedAddress ||
+                selectedAddress.address === claimAddress?.address
               }
+              buttonType="secondary"
+              buttonHeight="sm"
+              aria-label="Save the selected address for token claiming"
             />
-            {isAcknowledged && (
-              <CWButton
-                label={isUpdating ? 'Saving...' : 'Save address'}
-                onClick={handleClaimAddressUpdate}
-                disabled={
-                  isUpdating ||
-                  !selectedAddress ||
-                  selectedAddress.address === claimAddress?.address
-                }
-                buttonType="secondary"
-                buttonHeight="sm"
-                aria-label="Save the selected address for token claiming"
-              />
-            )}
-          </div>
+          )}
         </div>
       </div>
     );
