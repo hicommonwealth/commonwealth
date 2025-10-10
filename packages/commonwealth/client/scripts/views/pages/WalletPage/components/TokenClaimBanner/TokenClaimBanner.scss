@@ -6,13 +6,18 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding-top: 24px;
+  background: colors.$white;
+  border: 1px solid #1f5699;
+  border-radius: 8px;
+  overflow: hidden;
 
   // Override CWBanner styles for better layout
   .CWBanner {
     align-items: center;
     justify-content: center;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
 
     // Hide the type icon (checkmark/warning icon)
     .type-icon-container {
@@ -24,6 +29,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 0 !important;
+      background: transparent;
 
       > div:first-child {
         text-align: center;
@@ -36,24 +43,100 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
     width: 100%;
 
-    .token-balance {
-      font-size: 24px;
-      font-weight: bold;
-      margin: 0 0 8px 0;
-      color: inherit;
+    .hero-section {
+      width: 100%;
+      padding: 24px 32px;
+      background: linear-gradient(
+        135deg,
+        #1f5699 0%,
+        #2d6bb0 50%,
+        #1f5699 100%
+      );
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.1) 0%,
+          rgba(255, 255, 255, 0) 50%,
+          rgba(0, 0, 0, 0.05) 100%
+        );
+        pointer-events: none;
+      }
+
+      .description-text {
+        font-size: 36px;
+        text-align: center;
+        max-width: 800px;
+        line-height: 1.3;
+        margin: 0;
+        color: colors.$white;
+        position: relative;
+        z-index: 1;
+      }
+
+      .divider-line {
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.4) 50%,
+          transparent 100%
+        );
+        margin: 4px 0;
+        position: relative;
+        z-index: 1;
+      }
+
+      .token-balance-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        position: relative;
+        z-index: 1;
+
+        .balance-label {
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          opacity: 0.8;
+          font-weight: 600;
+          color: colors.$white;
+        }
+
+        .balance-amount {
+          font-size: 32px;
+          line-height: 1.1;
+          text-align: center;
+          color: colors.$white;
+        }
+      }
     }
 
     .notice-section {
       display: flex;
       justify-content: center;
+      padding: 12px 16px 20px 16px;
 
       .notice-text {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
         text-align: center;
         max-width: 600px;
         align-items: center;
@@ -117,6 +200,42 @@
           &:hover {
             opacity: 0.8;
           }
+        }
+
+        .countdown-timer {
+          margin: 12px 0;
+          padding: 16px 28px;
+          background: rgba(0, 0, 0, 0.05);
+          border-radius: 12px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+
+          .timer-label {
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+          }
+
+          .timer-display {
+            font-size: 56px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            letter-spacing: 0.05em;
+            color: inherit;
+            line-height: 1;
+          }
+        }
+
+        .batch-processing-notice {
+          font-size: 14px;
+          opacity: 0.85;
+          margin: 8px 0 0 0;
+          line-height: 1.5;
+          text-align: center;
+          max-width: 500px;
         }
       }
     }
@@ -182,12 +301,30 @@
   // Responsive design
   @include media_queries.smallInclusive {
     .banner-content {
-      .description {
-        font-size: 14px;
-      }
+      .hero-section {
+        padding: 20px 16px;
+        gap: 10px;
+        margin: 0;
 
-      .token-balance {
-        font-size: 20px;
+        .description-text {
+          font-size: 24px;
+          max-width: 100%;
+          line-height: 1.2;
+        }
+
+        .divider-line {
+          width: 50px;
+        }
+
+        .token-balance-container {
+          .balance-label {
+            font-size: 10px;
+          }
+
+          .balance-amount {
+            font-size: 24px;
+          }
+        }
       }
 
       .notice-section {
@@ -200,6 +337,24 @@
 
           .security-notice {
             font-size: 12px;
+          }
+
+          .countdown-timer {
+            padding: 14px 18px;
+            gap: 4px;
+
+            .timer-label {
+              font-size: 14px;
+            }
+
+            .timer-display {
+              font-size: 38px;
+            }
+          }
+
+          .batch-processing-notice {
+            font-size: 13px;
+            max-width: 100%;
           }
         }
       }

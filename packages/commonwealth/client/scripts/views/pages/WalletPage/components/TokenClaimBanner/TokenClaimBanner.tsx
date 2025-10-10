@@ -12,6 +12,7 @@ import {
 import CWBanner from 'client/scripts/views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { AuthModal } from 'client/scripts/views/modals/AuthModal';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -23,6 +24,7 @@ import {
   CustomAddressOptionElement,
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
+import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divider';
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import './TokenClaimBanner.scss';
 
@@ -65,6 +67,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     AddressInfo | undefined
   >(undefined);
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
+  const [countdown, setCountdown] = useState<string>('00:00:00');
   const claimsEnabled = useFlag('claims');
   const {
     claim: claimToken,
@@ -115,6 +118,34 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
       (claimAddress?.magna_claim_tx_hash as `0x${string}`) ?? transactionHash,
     );
   }, [claimAddress, evmAddresses, allocation, transactionHash]);
+
+  // Countdown timer effect - updates every second
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = moment();
+      const nextHour = moment().add(1, 'hour').startOf('hour');
+      const duration = moment.duration(nextHour.diff(now));
+
+      const hours = Math.floor(duration.asHours());
+      const minutes = duration.minutes();
+      const seconds = duration.seconds();
+
+      const formattedTime = [
+        String(hours).padStart(2, '0'),
+        String(minutes).padStart(2, '0'),
+        String(seconds).padStart(2, '0'),
+      ].join(':');
+      setCountdown(formattedTime);
+    };
+
+    // Update immediately
+    updateCountdown();
+
+    // Then update every second
+    const interval = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleClaimAddressUpdate = () => {
     if (selectedAddress) {
@@ -322,12 +353,29 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
           <div className="notice-section">
             <div className="notice-text">
               {isPendingClaimFunds ? (
-                <p className="base-notice">
-                  We have received your claim request and are processing it.
-                  These requests are processed multiple times a day. The next
-                  request will be processed in {getNextSyncJobTime()}.
-                  {/* TODO: This should be the ET time and not the sync time */}
-                </p>
+                <>
+                  <div className="countdown-timer">
+                    <CWText
+                      type="h4"
+                      fontWeight="medium"
+                      className="timer-label"
+                    >
+                      Claim In
+                    </CWText>
+                    <CWText
+                      type="h1"
+                      fontWeight="bold"
+                      className="timer-display"
+                    >
+                      {countdown}
+                    </CWText>
+                  </div>
+                  <p className="batch-processing-notice">
+                    Your claim request has been received. Claims are processed
+                    in batches, and your request is expected to be included in
+                    the next batch.
+                  </p>
+                </>
               ) : (
                 <p style={{ textAlign: 'left' }}>
                   <strong>Before Claiming</strong>
@@ -344,18 +392,28 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                   </ul>
                 </p>
               )}
-              <CWButton
-                label={`Claim to ${formatAddressShort(allocation?.walletAddress || '', 6)}`}
-                onClick={() => {
-                  claimToken({
-                    allocation_id: allocation.magna_allocation_id,
-                  });
-                }}
-                disabled={
-                  isClaiming || isLoadingAllocation || isPendingClaimFunds
-                }
-                aria-label={`Claim to ${formatAddressShort(allocation?.walletAddress || '', 6)}`}
-              />
+              {!isPendingClaimFunds && (
+                <CWButton
+                  label={`Claim to ${formatAddressShort(
+                    allocation?.walletAddress || '',
+                    6,
+                  )}`}
+                  onClick={() => {
+                    if (allocation) {
+                      claimToken({
+                        allocation_id: allocation.magna_allocation_id,
+                      });
+                    }
+                  }}
+                  disabled={
+                    isClaiming || isLoadingAllocation || isPendingClaimFunds
+                  }
+                  aria-label={`Claim to ${formatAddressShort(
+                    allocation?.walletAddress || '',
+                    6,
+                  )}`}
+                />
+              )}
               {claimTxData && (
                 <div className="claim-tx-data">
                   <p>
@@ -486,11 +544,35 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
         type={claimAddress?.address ? 'info' : 'error'}
         body={
           <div className="banner-content">
-            <h3 className="description">{claimAddress?.description}</h3>
-            <h2 className="token-balance">
-              You have {formattedClaimable} {claimAddress?.token} tokens!
-            </h2>
-            {getClaimCopy()}
+            <div className="hero-section">
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '4px',
+                  width: 'fit-content',
+                }}
+              >
+                <CWText
+                  type="h1"
+                  fontWeight="semiBold"
+                  className="description-text"
+                >
+                  {claimAddress?.description}
+                </CWText>
+                <CWDivider />
+              </div>
+              <div className="token-balance-container">
+                <CWText type="caption" className="balance-label">
+                  Your Allocation
+                </CWText>
+                <CWText type="h1" fontWeight="bold" className="balance-amount">
+                  {formattedClaimable} {claimAddress?.token} Tokens
+                </CWText>
+              </div>
+            </div>
+            <div className="notice-section">{getClaimCopy()}</div>
           </div>
         }
       />
