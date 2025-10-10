@@ -70,6 +70,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   >(undefined);
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
   const [countdown, setCountdown] = useState<string>('00:00:00');
+  const [unlockCountdown, setUnlockCountdown] = useState<string>('00:00:00');
   const claimsEnabled = useFlag('claims');
   const {
     claim: claimToken,
@@ -125,7 +126,6 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   useEffect(() => {
     const updateCountdown = () => {
       // Get current time in ET (approximating with UTC-5 for EST)
-      // Note: This doesn't account for DST automatically
       const nowET = moment().utcOffset(-5, true); // ET timezone
 
       // Batch processing times in ET: 2am, 8am, 2pm, 8pm
@@ -178,6 +178,56 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Separate unlock countdown timer effect
+  useEffect(() => {
+    if (!allocation?.unlock_start_at) {
+      setUnlockCountdown('00:00:00');
+      return;
+    }
+
+    const updateUnlockCountdown = () => {
+      const unlockTime = moment(allocation.unlock_start_at);
+      const now = moment();
+
+      if (unlockTime.isAfter(now)) {
+        const duration = moment.duration(unlockTime.diff(now));
+        const days = Math.floor(duration.asDays());
+        const hours = duration.hours();
+        const minutes = duration.minutes();
+        const seconds = duration.seconds();
+
+        // Format as DD:HH:MM:SS or HH:MM:SS if no days
+        let formattedTime;
+        if (days > 0) {
+          formattedTime = [
+            String(days).padStart(2, '0'),
+            String(hours).padStart(2, '0'),
+            String(minutes).padStart(2, '0'),
+            String(seconds).padStart(2, '0'),
+          ].join(':');
+        } else {
+          formattedTime = [
+            String(hours).padStart(2, '0'),
+            String(minutes).padStart(2, '0'),
+            String(seconds).padStart(2, '0'),
+          ].join(':');
+        }
+
+        setUnlockCountdown(formattedTime);
+      } else {
+        setUnlockCountdown('00:00:00');
+      }
+    };
+
+    // Update immediately
+    updateUnlockCountdown();
+
+    // Then update every second
+    const interval = setInterval(updateUnlockCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, [allocation?.unlock_start_at]);
 
   const handleClaimAddressUpdate = () => {
     if (selectedAddress) {
@@ -332,15 +382,15 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const canClaim = !!claimAddress;
   const hasClaimed = false; // claimAddress?.magna_claimed_at && txHash;
   const isClaimAvailable = true || claimAddress?.magna_synced_at;
-  const isPendingClaimFunds = true || allocation?.status === 'PENDING_FUNDING';
-  const isReadyForClaimNow = true;
-  isClaimAvailable &&
+  const isPendingClaimFunds = allocation?.status === 'PENDING_FUNDING';
+  const isReadyForClaimNow =
+    isClaimAvailable &&
     allocation &&
     allocation.magna_allocation_id &&
     allocation.walletAddress &&
     allocation.claimable > 0;
-  const isReadyForClaimAfterUnlock =
-    isClaimAvailable &&
+  const isReadyForClaimAfterUnlock = true;
+  isClaimAvailable &&
     !isReadyForClaimNow &&
     allocation &&
     allocation.claimable > 0 &&
@@ -420,91 +470,135 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                 </p>
               </>
             ) : (
-              <p style={{ textAlign: 'left' }}>
-                <strong>Before Claiming</strong>
-                <ul style={{ listStyleType: 'disc' }}>
-                  <li>
-                    Verify that you are on the <strong>common.xyz</strong>{' '}
-                    domain
-                  </li>
-                  <li>
-                    Your wallet is connected to the <strong>Base</strong>{' '}
-                    network
-                  </li>
-                  <li>Never approve unlimited token allowances</li>
-                </ul>
-              </p>
-            )}
-            {!isPendingClaimFunds && (
-              <CWButton
-                label={`Claim to ${formatAddressShort(
-                  allocation?.walletAddress || '',
-                  6,
-                )}`}
-                onClick={() => {
-                  if (allocation) {
-                    claimToken({
-                      allocation_id: allocation.magna_allocation_id,
-                    });
-                  }
-                }}
-                disabled={
-                  isClaiming || isLoadingAllocation || isPendingClaimFunds
-                }
-                aria-label={`Claim to ${formatAddressShort(
-                  allocation?.walletAddress || '',
-                  6,
-                )}`}
-              />
-            )}
-            {claimTxData && (
-              <div className="claim-tx-data">
-                <p>
-                  If you face issues with the claim process, complete a manual
-                  transaction to from your wallet with these steps
-                </p>
-                <ul style={{ listStyleType: 'disc' }}>
-                  <li>
-                    Enable <strong>&apos;Show hex data&apos;</strong> in your
-                    wallet settings.
-                  </li>
-                  <li>
-                    Send a transaction of 0.0003 ETH to{' '}
-                    <span
-                      className="copyable-address"
-                      onClick={() => {
-                        void navigator.clipboard.writeText(claimTxData.from);
-                        notifySuccess('Address copied to clipboard!');
-                      }}
-                    >
-                      {formatAddressShort(claimTxData.from, 4)}
-                      <CWIcon iconName="copy" iconSize="small" />
-                    </span>{' '}
-                    with hex data{' '}
-                    <span
-                      className="copyable-address"
-                      onClick={() => {
-                        void navigator.clipboard.writeText(claimTxData.data);
-                        notifySuccess('Hex data copied to clipboard!');
-                      }}
-                    >
-                      {formatAddressShort(claimTxData.data, 4)}
-                      <CWIcon iconName="copy" iconSize="small" />
-                    </span>
-                  </li>
-                </ul>
-              </div>
+              <>
+                <div className="claim-action-container">
+                  <div className="left-section">
+                    <div className="claim-instructions">
+                      <CWText
+                        type="h5"
+                        fontWeight="semiBold"
+                        className="instructions-title"
+                      >
+                        Before You Claim
+                      </CWText>
+                      <ol className="instructions-list">
+                        <li>
+                          <CWText>
+                            Verify you are on&nbsp;<strong>common.xyz</strong>
+                          </CWText>
+                        </li>
+                        <li>
+                          <CWText>
+                            Ensure your wallet is connected to&nbsp;
+                            <strong>Base network</strong>
+                          </CWText>
+                        </li>
+                        <li>
+                          <CWText>
+                            Never approve unlimited token allowances
+                          </CWText>
+                        </li>
+                      </ol>
+                    </div>
+                  </div>
+                  <CWButton
+                    label={`Claim to ${formatAddressShort(
+                      allocation?.walletAddress || '',
+                      6,
+                    )}`}
+                    onClick={() => {
+                      if (allocation) {
+                        claimToken({
+                          allocation_id: allocation.magna_allocation_id,
+                        });
+                      }
+                    }}
+                    disabled={
+                      isClaiming || isLoadingAllocation || isPendingClaimFunds
+                    }
+                    className="hero-colored-button"
+                    aria-label={`Claim to ${formatAddressShort(
+                      allocation?.walletAddress || '',
+                      6,
+                    )}`}
+                  />
+                </div>
+                {claimTxData && (
+                  <>
+                    <CWDivider />
+                    <div className="claim-action-container">
+                      <div className="left-section">
+                        <div className="claim-instructions">
+                          <CWText
+                            type="h5"
+                            fontWeight="semiBold"
+                            className="instructions-title"
+                          >
+                            If you face any issues, try a manual transaction
+                          </CWText>
+
+                          <ol className="instructions-list">
+                            <li>
+                              <CWText>
+                                Enable&nbsp;<strong>Show hex data</strong>
+                                &nbsp;in your wallet settings
+                              </CWText>
+                            </li>
+                            <li>
+                              <CWText>
+                                Send 0.0003 ETH to&nbsp;
+                                <span
+                                  className="copyable-address"
+                                  onClick={() => {
+                                    void navigator.clipboard.writeText(
+                                      claimTxData.from,
+                                    );
+                                    notifySuccess('Address copied!');
+                                  }}
+                                >
+                                  {formatAddressShort(claimTxData.from, 4)}
+                                  <CWIcon iconName="copy" iconSize="small" />
+                                </span>
+                                &nbsp;with hex data&nbsp;
+                                <span
+                                  className="copyable-address"
+                                  onClick={() => {
+                                    void navigator.clipboard.writeText(
+                                      claimTxData.data,
+                                    );
+                                    notifySuccess('Hex data copied!');
+                                  }}
+                                >
+                                  {formatAddressShort(claimTxData.data, 4)}
+                                  <CWIcon iconName="copy" iconSize="small" />
+                                </span>
+                              </CWText>
+                            </li>
+                          </ol>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </>
             )}
           </div>
         );
       }
 
       if (isReadyForClaimAfterUnlock) {
-        <p>
-          You can claim your tokens after{' '}
-          {allocation.unlock_start_at &&
-            new Date(allocation.unlock_start_at).toLocaleDateString()}
-        </p>;
+        return (
+          <div className="notice-text">
+            <div className="countdown-timer">
+              <CWText type="h4" fontWeight="medium" className="timer-label">
+                Your tokens will unlock in
+              </CWText>
+              <CWText type="h2" fontWeight="bold" className="timer-display">
+                {unlockCountdown}
+              </CWText>
+            </div>
+          </div>
+        );
       }
 
       // claim is available but we landed on an error case
