@@ -24,6 +24,10 @@ import { QueryTypes } from 'sequelize';
 import { config } from '../server/config';
 import { NFTTrait } from './get-nft-holder-snapshot';
 
+if (!config.TOKEN_ALLOCATION) {
+  throw new Error('Token allocation configuration not set!');
+}
+
 ////////////////// Configuration //////////////////
 
 // Higher tier is better i.e. rarer.
