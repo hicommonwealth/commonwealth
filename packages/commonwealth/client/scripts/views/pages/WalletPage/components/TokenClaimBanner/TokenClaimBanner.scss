@@ -7,9 +7,76 @@
   display: flex;
   flex-direction: column;
   background: colors.$white;
-  border: 1px solid #1f5699;
+  --color-in-progress: #1f5699;
+  --color-needs-action: #ffa500;
+  --color-completed: #008000;
+  border: 1px solid colors.$neutral-200;
   border-radius: 8px;
   overflow: hidden;
+
+  &.in-progress {
+    border-color: var(--color-in-progress);
+    background: linear-gradient(
+      to bottom,
+      rgba(31, 86, 153, 0.02) 0%,
+      colors.$white 100%
+    );
+
+    .hero-section {
+      background: linear-gradient(
+        135deg,
+        #1f5699 0%,
+        #2d6bb0 50%,
+        #1f5699 100%
+      ) !important;
+    }
+
+    .notice-section {
+      width: 100% !important;
+    }
+  }
+
+  &.needs-action {
+    border-color: var(--color-needs-action);
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 165, 0, 0.02) 0%,
+      colors.$white 100%
+    );
+  }
+
+  &.completed {
+    border-color: var(--color-completed);
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 128, 0, 0.02) 0%,
+      colors.$white 100%
+    );
+
+    .hero-section {
+      background: linear-gradient(
+        135deg,
+        #086b08 0%,
+        #00a000 50%,
+        #008000 100%
+      ) !important;
+    }
+  }
+
+  &.needs-action {
+    .hero-section {
+      background: linear-gradient(
+        135deg,
+        #ffa500 0%,
+        #ffb733 50%,
+        #ffa500 100%
+      );
+    }
+  }
+
+  .btn-border {
+    margin: 0 !important;
+  }
 
   // Override CWBanner styles for better layout
   .CWBanner {
@@ -50,9 +117,9 @@
       padding: 24px 32px;
       background: linear-gradient(
         135deg,
-        #1f5699 0%,
-        #2d6bb0 50%,
-        #1f5699 100%
+        colors.$neutral-400 0%,
+        colors.$neutral-500 50%,
+        colors.$neutral-400 100%
       );
       display: flex;
       flex-direction: column;
@@ -124,6 +191,53 @@
           line-height: 1.1;
           text-align: center;
           color: colors.$white;
+        }
+      }
+    }
+
+    .claimed-section {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+
+      .claimed-content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        width: 100%;
+
+        .claimed-info {
+          display: flex;
+          flex-direction: row;
+          align-items: flex-start;
+          flex: 1;
+
+          .claimed-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+
+            .claimed-title {
+              font-size: 20px;
+              text-align: left;
+              color: colors.$neutral-900;
+              margin: 0;
+            }
+
+            .claimed-date {
+              font-size: 15px;
+              text-align: left;
+              color: colors.$neutral-600;
+              margin: 0;
+            }
+          }
+        }
+
+        .Button {
+          flex-shrink: 0;
+          min-width: 140px;
         }
       }
     }
@@ -323,6 +437,38 @@
 
           .balance-amount {
             font-size: 24px;
+          }
+        }
+      }
+
+      .claimed-section {
+        .claimed-content {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 12px;
+          max-width: 100%;
+
+          .claimed-info {
+            justify-content: center;
+
+            .claimed-text {
+              .claimed-title {
+                font-size: 18px;
+                text-align: center;
+              }
+
+              .claimed-date {
+                font-size: 14px;
+                text-align: center;
+              }
+            }
+          }
+
+          .Button {
+            align-self: center;
+            min-width: auto;
+            width: 100%;
+            max-width: 300px;
           }
         }
       }

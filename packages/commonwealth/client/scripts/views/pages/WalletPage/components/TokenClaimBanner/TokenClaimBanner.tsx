@@ -25,6 +25,8 @@ import {
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
 import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divider';
+import clsx from 'clsx';
+// eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import './TokenClaimBanner.scss';
 
@@ -329,14 +331,14 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
 
   const canClaim = !!claimAddress;
   const hasClaimed = claimAddress?.magna_claimed_at && txHash;
-  const isClaimAvailable = claimAddress?.magna_synced_at;
-  const isPendingClaimFunds = allocation?.status === 'PENDING_FUNDING';
-  const isReadyForClaimNow =
-    isClaimAvailable &&
-    allocation &&
-    allocation.magna_allocation_id &&
-    allocation.walletAddress &&
-    allocation.claimable > 0;
+  const isClaimAvailable = true || claimAddress?.magna_synced_at;
+  const isPendingClaimFunds = true || allocation?.status === 'PENDING_FUNDING';
+  const isReadyForClaimNow = true;
+  // isClaimAvailable &&
+  // allocation &&
+  // allocation.magna_allocation_id &&
+  // allocation.walletAddress &&
+  // allocation.claimable > 0;
   const isReadyForClaimAfterUnlock =
     isClaimAvailable &&
     !isReadyForClaimNow &&
@@ -348,19 +350,39 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     if (!canClaim) return null;
 
     if (hasClaimed) {
+      const formatClaimDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const day = date.getDate();
+        const month = date.toLocaleDateString('en-US', { month: 'short' });
+        const year = date.getFullYear();
+        const time = date.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+        });
+        return `${day} ${month} ${year} @ ${time}`;
+      };
+
       return (
-        <div className="notice-section">
-          <div className="notice-text">
-            <p className="base-notice">
-              You claimed your tokens on{' '}
-              {claimAddress?.magna_claimed_at && (
-                <strong>
-                  {new Date(claimAddress?.magna_claimed_at).toLocaleString()}
-                </strong>
-              )}
-            </p>
+        <div className="claimed-section">
+          <div className="claimed-content">
+            <div className="claimed-info">
+              <div className="claimed-text">
+                <CWText
+                  type="h4"
+                  fontWeight="semiBold"
+                  className="claimed-title"
+                >
+                  Claim Completed
+                </CWText>
+                <CWText className="claimed-date">
+                  {claimAddress?.magna_claimed_at &&
+                    formatClaimDate(claimAddress.magna_claimed_at)}
+                </CWText>
+              </div>
+            </div>
             <CWButton
-              label="View transaction on BaseScan"
+              label="View Transaction"
               onClick={() =>
                 window.open(
                   `https://basescan.org/tx/${txHash}`,
@@ -369,7 +391,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                 )
               }
               buttonType="secondary"
-              className="tx-link-button"
+              iconRight="externalLink"
               aria-label="View transaction on BaseScan"
             />
           </div>
@@ -569,7 +591,13 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   };
 
   return canClaim ? (
-    <div className="TokenClaimBanner">
+    <div
+      className={clsx('TokenClaimBanner', {
+        'in-progress': isClaimAvailable,
+        'needs-action': !isClaimAvailable && !hasClaimed,
+        completed: hasClaimed,
+      })}
+    >
       <CWBanner
         type={claimAddress?.address ? 'info' : 'error'}
         body={
