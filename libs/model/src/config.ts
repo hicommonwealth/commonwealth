@@ -117,6 +117,7 @@ const {
   MAGNA_INITIAL_PERCENTAGE,
   MAGNA_CLIFF_DATE,
   SLACK_WEBHOOK_URL_ALL_ENG,
+  SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -397,6 +398,7 @@ export const config = configure(
     SLACK: {
       CHANNELS: {
         ALL_ENG: SLACK_WEBHOOK_URL_ALL_ENG,
+        MAGNA_NOTIFS: SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
       },
     },
   },
@@ -826,6 +828,7 @@ export const config = configure(
     SLACK: z.object({
       CHANNELS: z.object({
         ALL_ENG: z.string().optional(),
+        MAGNA_NOTIFS: z.string().optional(),
       }),
     }),
   }),
