@@ -85,6 +85,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     });
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
+  console.log('allocation => ', allocation);
 
   useEffect(() => {
     const addresses = new Map<string, AddressInfo>();
@@ -268,6 +269,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   const canClaim = !!claimAddress;
   const hasClaimed = claimAddress?.magna_claimed_at && txHash;
   const isClaimAvailable = claimAddress?.magna_synced_at;
+  const isPendingClaimFunds = allocation?.status === 'PENDING_FUNDING';
   const isReadyForClaimNow =
     isClaimAvailable &&
     allocation &&
@@ -319,29 +321,40 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
         return (
           <div className="notice-section">
             <div className="notice-text">
-              <p style={{ textAlign: 'left' }}>
-                <strong>Before Claiming</strong>
-                <ul style={{ listStyleType: 'disc' }}>
-                  <li>
-                    Verify that you are on the <strong>common.xyz</strong>{' '}
-                    domain
-                  </li>
-                  <li>
-                    Your wallet is connected to the <strong>Base</strong>{' '}
-                    network
-                  </li>
-                  <li>Never approve unlimited token allowances</li>
-                </ul>
-              </p>
+              {isPendingClaimFunds ? (
+                <p className="base-notice">
+                  We have received your claim request and are processing it.
+                  These requests are processed multiple times a day. The next
+                  request will be processed in {getNextSyncJobTime()}.
+                  {/* TODO: This should be the ET time and not the sync time */}
+                </p>
+              ) : (
+                <p style={{ textAlign: 'left' }}>
+                  <strong>Before Claiming</strong>
+                  <ul style={{ listStyleType: 'disc' }}>
+                    <li>
+                      Verify that you are on the <strong>common.xyz</strong>{' '}
+                      domain
+                    </li>
+                    <li>
+                      Your wallet is connected to the <strong>Base</strong>{' '}
+                      network
+                    </li>
+                    <li>Never approve unlimited token allowances</li>
+                  </ul>
+                </p>
+              )}
               <CWButton
-                label={`Claim to ${formatAddressShort(allocation.walletAddress, 6)}`}
+                label={`Claim to ${formatAddressShort(allocation?.walletAddress || '', 6)}`}
                 onClick={() => {
                   claimToken({
                     allocation_id: allocation.magna_allocation_id,
                   });
                 }}
-                disabled={isClaiming || isLoadingAllocation}
-                aria-label={`Claim to ${formatAddressShort(allocation.walletAddress, 6)}`}
+                disabled={
+                  isClaiming || isLoadingAllocation || isPendingClaimFunds
+                }
+                aria-label={`Claim to ${formatAddressShort(allocation?.walletAddress || '', 6)}`}
               />
               {claimTxData && (
                 <div className="claim-tx-data">
@@ -417,7 +430,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
           </p>
           <p className="base-notice">
             Once you set an EVM address we need to sync onchain, we process
-            these syncs at the top of every hour. You should be able to claim in{' '}
+            these syncs at the top of every hour. The next sync will happen in{' '}
             {getNextSyncJobTime()}
           </p>
           <div className="banner-actions">
