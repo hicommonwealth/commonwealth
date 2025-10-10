@@ -7,8 +7,8 @@
   display: flex;
   flex-direction: column;
   background: colors.$white;
+  --color-needs-action: #99251f;
   --color-in-progress: #1f5699;
-  --color-needs-action: #ffa500;
   --color-completed: #008000;
   border: 1px solid colors.$neutral-200;
   border-radius: 8px;
@@ -63,6 +63,15 @@
       rgba(255, 165, 0, 0.02) 0%,
       colors.$white 100%
     );
+
+    .hero-section {
+      background: linear-gradient(
+        135deg,
+        #99251f 0%,
+        #b03e2d 50%,
+        #99251f 100%
+      ) !important;
+    }
 
     .hero-colored-button {
       background: linear-gradient(
@@ -359,6 +368,76 @@
           }
         }
 
+        .address-setup-notice {
+          padding: 16px;
+          margin: 12px 0;
+
+          .setup-title {
+            font-size: 16px;
+            margin-bottom: 8px;
+          }
+
+          .setup-description {
+            font-size: 13px;
+          }
+        }
+
+        .terms-section {
+          padding: 10px;
+          margin: 12px 0;
+
+          .terms-text {
+            font-size: 12px;
+          }
+        }
+
+        .address-form-section {
+          margin: 12px 0;
+
+          .address-form-title {
+            font-size: 16px;
+          }
+
+          .address-form-description {
+            font-size: 13px;
+          }
+
+          .address-input-container {
+            gap: 8px;
+            max-width: 100%;
+
+            .enhanced-address-select {
+              .CWSelectList {
+                height: 44px;
+              }
+            }
+
+            .address-actions {
+              .copy-icon {
+                padding: 10px;
+                height: 44px;
+                width: 44px;
+              }
+            }
+          }
+        }
+
+        .terms-and-button-section {
+          margin: 12px 0;
+          gap: 12px;
+
+          .terms-checkbox-container {
+            .terms-text {
+              font-size: 13px;
+            }
+          }
+
+          .save-address-button {
+            align-self: stretch;
+            min-width: auto;
+          }
+        }
+
         .claim-tx-data {
           margin-bottom: 16px;
 
@@ -514,6 +593,215 @@
           }
         }
 
+        .address-setup-notice {
+          padding: 20px;
+          text-align: center;
+          background: linear-gradient(
+            135deg,
+            rgba(153, 37, 31, 0.08) 0%,
+            rgba(153, 37, 31, 0.02) 100%
+          );
+          border-radius: 8px;
+          border: 1px solid rgba(153, 37, 31, 0.2);
+          margin: 16px 0;
+
+          .setup-title {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: colors.$neutral-900;
+          }
+
+          .setup-description {
+            font-size: 14px;
+            color: colors.$neutral-700;
+            line-height: 1.6;
+            margin-bottom: 8px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            strong {
+              color: colors.$neutral-900;
+              font-weight: 600;
+            }
+          }
+        }
+
+        .terms-section {
+          margin: 16px 0;
+          padding: 12px;
+          background: rgba(0, 0, 0, 0.02);
+          border-radius: 6px;
+          border: 1px solid rgba(0, 0, 0, 0.05);
+
+          .terms-text {
+            font-size: 13px;
+            color: colors.$neutral-700;
+            line-height: 1.5;
+
+            .terms-link {
+              color: colors.$primary-600;
+              text-decoration: none;
+              font-weight: 500;
+              transition: color 0.2s ease;
+
+              &:hover {
+                color: colors.$primary-700;
+                text-decoration: underline;
+              }
+            }
+          }
+        }
+
+        .address-form-section {
+          margin: 16px 0;
+          padding: 0;
+
+          .address-form-title {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: colors.$neutral-900;
+          }
+
+          .address-form-description {
+            font-size: 14px;
+            color: colors.$neutral-700;
+            margin-bottom: 16px;
+            line-height: 1.5;
+          }
+
+          .address-input-container {
+            position: relative;
+            display: flex;
+            align-items: stretch;
+            gap: 12px;
+            max-width: 500px;
+
+            .CWSelectList {
+              min-width: 500px;
+
+              .SelectList {
+                min-width: 100%;
+              }
+            }
+
+            .enhanced-address-select {
+              flex: 1;
+              min-width: 0;
+
+              .CWSelectList {
+                border-radius: 8px;
+                border: 2px solid rgba(153, 37, 31, 0.2);
+                transition: border-color 0.2s ease;
+                height: 48px;
+                min-width: 400px;
+
+                .SelectList {
+                  min-width: 100%;
+                }
+
+                &:focus-within {
+                  border-color: rgba(153, 37, 31, 0.4);
+                  box-shadow: 0 0 0 3px rgba(153, 37, 31, 0.1);
+                }
+              }
+            }
+
+            .address-actions {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+
+              .copy-icon {
+                padding: 12px;
+                border-radius: 8px;
+                background: rgba(153, 37, 31, 0.1);
+                color: rgba(153, 37, 31, 0.8);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                height: 40px;
+                width: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                &:hover {
+                  background: rgba(153, 37, 31, 0.15);
+                  color: rgba(153, 37, 31, 1);
+                  transform: scale(1.05);
+                }
+              }
+            }
+          }
+        }
+
+        .terms-and-button-section {
+          margin: 16px 0;
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+
+          .terms-checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+
+            .terms-text {
+              font-size: 14px;
+              color: colors.$neutral-700;
+              line-height: 1.6;
+              display: inline;
+              text-align: left;
+
+              .terms-link {
+                color: colors.$primary-600;
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.2s ease;
+
+                &:hover {
+                  color: colors.$primary-700;
+                  text-decoration: underline;
+                }
+              }
+            }
+          }
+
+          .save-address-button {
+            align-self: flex-end;
+            min-width: 160px;
+            background: linear-gradient(
+              135deg,
+              #99251f 0%,
+              #b03e2d 50%,
+              #99251f 100%
+            ) !important;
+            color: colors.$white !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+
+            &:hover:not(:disabled) {
+              background: linear-gradient(
+                135deg,
+                #7d1f1a 0%,
+                #99251f 50%,
+                #7d1f1a 100%
+              ) !important;
+              transform: translateY(-1px);
+              box-shadow: 0 4px 12px rgba(153, 37, 31, 0.3);
+            }
+
+            &:disabled {
+              opacity: 0.6;
+              cursor: not-allowed;
+            }
+          }
+        }
+
         .countdown-timer {
           margin: 12px 0;
           padding: 16px 28px;
@@ -604,6 +892,7 @@
     gap: 12px;
     justify-content: center;
     flex-wrap: wrap;
+    width: 60%;
 
     .Button {
       min-width: 140px;

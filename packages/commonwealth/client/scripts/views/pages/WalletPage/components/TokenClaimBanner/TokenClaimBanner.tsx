@@ -324,64 +324,9 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     );
   }
 
-  // Create the address form content to include in actions
-  const addressFormContent = (
-    <div className="claim-address-body">
-      <div className="claim-address-row">
-        <div className="address-input-row">
-          <CWSelectList
-            components={{
-              Option: (originalProps) =>
-                CustomAddressOption({
-                  originalProps,
-                  selectedAddressValue: selectedAddress?.address || '',
-                }),
-            }}
-            noOptionsMessage={() => 'No available addresses'}
-            placeholder="Select or paste your EVM address"
-            value={
-              selectedAddress?.address
-                ? convertAddressToDropdownOption(selectedAddress.address)
-                : null
-            }
-            defaultValue={
-              claimAddress?.address
-                ? convertAddressToDropdownOption(claimAddress.address)
-                : null
-            }
-            formatOptionLabel={(option) => (
-              <CustomAddressOptionElement
-                value={option.value}
-                label={option.label}
-                selectedAddressValue={selectedAddress?.address || ''}
-              />
-            )}
-            label="Token Claim Address"
-            isClearable={false}
-            isSearchable={true}
-            options={addressOptions}
-            onChange={handleAddressChange}
-            aria-label="Select or enter your EVM address for token claiming"
-          />
-          {selectedAddress?.address && (
-            <CWIcon
-              iconName="copy"
-              iconSize="medium"
-              className="copy-icon"
-              onClick={() => {
-                void navigator.clipboard.writeText(selectedAddress.address);
-                notifySuccess('Address copied to clipboard!');
-              }}
-            />
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
   const canClaim = !!claimAddress;
   const hasClaimed = false; // claimAddress?.magna_claimed_at && txHash;
-  const isClaimAvailable = true || claimAddress?.magna_synced_at;
+  const isClaimAvailable = false; // claimAddress?.magna_synced_at;
   const isPendingClaimFunds = allocation?.status === 'PENDING_FUNDING';
   const isReadyForClaimNow =
     isClaimAvailable &&
@@ -396,7 +341,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     allocation.claimable > 0 &&
     allocation.unlock_start_at;
 
-  const getClaimCopy = () => {
+  const getClaimBody = () => {
     if (!canClaim) return null;
 
     if (hasClaimed) {
@@ -632,56 +577,118 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     // Show ui to set address for claim
     return (
       <div className="notice-text">
-        <p className="base-notice">
-          We are going live on Base. You must set an EVM address to claim your
-          allocation.
-        </p>
-        <p className="base-notice">
-          Once you set an EVM address we need to sync onchain, we process these
-          syncs at the top of every hour. The next sync will happen in{' '}
-          {getNextSyncJobTime()}
-        </p>
         <div className="banner-actions">
-          {addressFormContent}
-          <CWCheckbox
-            checked={isAcknowledged}
-            onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
-            label={
-              <p>
-                I understand that by adding my address, I adhere to the{' '}
-                <a
-                  href="/airdrop-terms.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  airdrop terms of service
-                </a>{' '}
-                and{' '}
-                <a
-                  href="https://common.foundation/privacy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  privacy policy
-                </a>
-                .
-              </p>
-            }
-          />
-          {isAcknowledged && (
-            <CWButton
-              label={isUpdating ? 'Saving...' : 'Save address'}
-              onClick={handleClaimAddressUpdate}
-              disabled={
-                isUpdating ||
-                !selectedAddress ||
-                selectedAddress.address === claimAddress?.address
-              }
-              buttonType="secondary"
-              buttonHeight="sm"
-              aria-label="Save the selected address for token claiming"
-            />
-          )}
+          <div className="address-form-section">
+            <CWText
+              type="h5"
+              fontWeight="semiBold"
+              className="address-form-title"
+            >
+              Setup your claim address
+            </CWText>
+            <CWText className="address-form-description">
+              Select your EVM address where you&apos;d like to receive your
+              allocated tokens.
+            </CWText>
+            <div className="address-input-container">
+              <CWSelectList
+                components={{
+                  Option: (originalProps) =>
+                    CustomAddressOption({
+                      originalProps,
+                      selectedAddressValue: selectedAddress?.address || '',
+                    }),
+                }}
+                noOptionsMessage={() => 'No available addresses'}
+                placeholder="Select or paste your EVM address"
+                value={
+                  selectedAddress?.address
+                    ? convertAddressToDropdownOption(selectedAddress.address)
+                    : null
+                }
+                defaultValue={
+                  claimAddress?.address
+                    ? convertAddressToDropdownOption(claimAddress.address)
+                    : null
+                }
+                formatOptionLabel={(option) => (
+                  <CustomAddressOptionElement
+                    value={option.value}
+                    label={option.label}
+                    selectedAddressValue={selectedAddress?.address || ''}
+                  />
+                )}
+                isClearable={false}
+                isSearchable={true}
+                options={addressOptions}
+                onChange={handleAddressChange}
+                className="enhanced-address-select"
+                aria-label="Select or enter your EVM address for token claiming"
+              />
+              {selectedAddress?.address && (
+                <div className="address-actions">
+                  <CWIcon
+                    iconName="copy"
+                    iconSize="medium"
+                    className="copy-icon"
+                    onClick={() => {
+                      void navigator.clipboard.writeText(
+                        selectedAddress.address,
+                      );
+                      notifySuccess('Address copied to clipboard!');
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="terms-and-button-section">
+              <div className="terms-checkbox-container">
+                <CWCheckbox
+                  checked={isAcknowledged}
+                  onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
+                  label={
+                    <CWText className="terms-text">
+                      I understand that by adding my address, I adhere to
+                      the&nbsp;
+                      <a
+                        href="/airdrop-terms.pdf"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="terms-link"
+                      >
+                        airdrop terms of service
+                      </a>
+                      &nbsp;and&nbsp;
+                      <a
+                        href="https://common.foundation/privacy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="terms-link"
+                      >
+                        privacy policy
+                      </a>
+                      .
+                    </CWText>
+                  }
+                />
+              </div>
+              {isAcknowledged && (
+                <CWButton
+                  label={isUpdating ? 'Saving...' : 'Save Address'}
+                  onClick={handleClaimAddressUpdate}
+                  disabled={
+                    isUpdating ||
+                    !selectedAddress ||
+                    selectedAddress.address === claimAddress?.address
+                  }
+                  buttonType="primary"
+                  buttonHeight="sm"
+                  className="save-address-button"
+                  aria-label="Save the selected address for token claiming"
+                />
+              )}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -727,7 +734,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                 </CWText>
               </div>
             </div>
-            <div className="notice-section">{getClaimCopy()}</div>
+            <div className="notice-section">{getClaimBody()}</div>
           </div>
         }
       />
