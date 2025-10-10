@@ -18,10 +18,18 @@ export const useClaimTokenFlow = () => {
   const claimToken = trpc.tokenAllocation.claimToken.useMutation();
   const updateClaimTransactionHash =
     trpc.tokenAllocation.updateClaimTransactionHash.useMutation();
+  const [claimTxData, setClaimTxData] = useState<{
+    from: string;
+    data: string;
+  }>();
 
   const claim = async (input: Parameters<typeof claimToken.mutateAsync>[0]) => {
     try {
       const data = await claimToken.mutateAsync(input);
+      setClaimTxData({
+        from: data.from,
+        data: data.data,
+      });
       // invalidate related queries
       utils.tokenAllocation.getClaimAddress.invalidate().catch(console.error);
       utils.tokenAllocation.getAllocation
@@ -84,6 +92,7 @@ export const useClaimTokenFlow = () => {
 
   return {
     claim,
+    claimTxData,
     transactionHash,
     isPending: claimToken.isPending || updateClaimTransactionHash.isPending,
   };

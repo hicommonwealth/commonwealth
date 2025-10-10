@@ -4,6 +4,7 @@ import { config } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import {
   buildMCPClientOptions,
+  withMCPAuthUsername,
   type CommonMCPServerWithHeaders,
 } from '@hicommonwealth/model/services';
 import OpenAI from 'openai';
@@ -42,21 +43,34 @@ const client = new OpenAI({
 });
 
 async function getAllServers(): Promise<CommonMCPServerWithHeaders[]> {
-  const dbServers = (
-    await models.MCPServer.scope('withPrivateData').findAll()
-  ).map((server) => ({
-    ...server.toJSON(),
-    server_url:
-      server.id === 1
-        ? `https://${MCP_DEMO_CLIENT_SERVER_URL}/mcp`
-        : server.server_url,
-    headers:
-      server.id === 1
-        ? {
-            Authorization: `Bearer ${MCP_KEY_BYPASS}`,
-          }
-        : undefined,
-  }));
+  const mcpServers = await models.MCPServer.scope('withPrivateData').findAll({
+    include: [
+      {
+        model: models.User,
+        as: 'AuthUser',
+        attributes: ['id', 'profile'],
+        required: false,
+      },
+    ],
+  });
+
+  const dbServers = mcpServers.map((server) => {
+    const serverJson = withMCPAuthUsername(server);
+
+    return {
+      ...serverJson,
+      server_url:
+        server.id === 1
+          ? `https://${MCP_DEMO_CLIENT_SERVER_URL}/mcp`
+          : serverJson.server_url,
+      headers:
+        server.id === 1
+          ? {
+              Authorization: `Bearer ${MCP_KEY_BYPASS}`,
+            }
+          : undefined,
+    };
+  });
 
   // Handle duplicate handles by adding number suffixes
   const handleCounts: Map<string, number> = new Map();

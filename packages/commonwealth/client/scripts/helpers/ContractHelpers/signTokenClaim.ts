@@ -1,3 +1,4 @@
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import ContractBase from './ContractBase';
 
 class SignTokenClaim extends ContractBase {
@@ -33,10 +34,14 @@ class SignTokenClaim extends ContractBase {
     balanceEth: string | number;
   }> {
     try {
+      // Magna platform fee that needs to be sent with the transaction
+      const magnaPlatformFee = '200000000000000'; // 0.0002 ETH
+      // Estimate gas with the same parameters as the actual transaction
       const gasLimit = await this.web3.eth.estimateGas({
         from: walletAddress,
         to: contractAddress,
         data,
+        value: magnaPlatformFee, // Include the value to prevent contract reversion
       });
 
       let maxPriorityFeePerGas: string;
@@ -44,8 +49,9 @@ class SignTokenClaim extends ContractBase {
       try {
         const fee = await this.web3.eth.getMaxPriorityFeePerGas();
         maxPriorityFeePerGas = fee.toString();
-      } catch {
-        maxPriorityFeePerGas = this.web3.utils.toWei('1', 'gwei');
+      } catch (error) {
+        console.error('Failed to calculate maxPriorityFeePerGas: ', error);
+        maxPriorityFeePerGas = this.web3.utils.toWei('2', 'gwei');
       }
 
       const block = await this.web3.eth.getBlock('pending');
@@ -60,17 +66,18 @@ class SignTokenClaim extends ContractBase {
         await this.web3.eth.getBalance(walletAddress)
       ).toString();
 
-      const gasLimitWithBuffer = (BigInt(gasLimit) * 120n) / 100n; // +20%
-      const requiredGasCost = (
-        gasLimitWithBuffer * BigInt(maxFeePerGas)
-      ).toString();
+      // Calculate total cost: gas cost + magna platform fee
+      const gasLimitWithBuffer = (BigInt(gasLimit) * 120n) / 100n; // +20% gas buffer
+      const gasCost = gasLimitWithBuffer * BigInt(maxFeePerGas);
+      const totalRequiredCost = gasCost + BigInt(magnaPlatformFee);
 
-      const hasEnoughBalance = BigInt(balance) >= BigInt(requiredGasCost);
+      const hasEnoughBalance = BigInt(balance) >= totalRequiredCost;
 
       // format to ETH for readability
       const requiredEth = parseFloat(
-        this.web3.utils.fromWei(requiredGasCost, 'ether'),
+        this.web3.utils.fromWei(totalRequiredCost.toString(), 'ether'),
       ).toFixed(8);
+
       const balanceEth = parseFloat(
         this.web3.utils.fromWei(balance, 'ether'),
       ).toFixed(8);
@@ -79,14 +86,15 @@ class SignTokenClaim extends ContractBase {
         gasLimit: gasLimit.toString(),
         maxFeePerGas,
         maxPriorityFeePerGas,
-        requiredGasCost,
+        requiredGasCost: totalRequiredCost.toString(),
         balance,
         hasEnoughBalance,
         // for ui
         requiredEth,
         balanceEth,
       };
-    } catch {
+    } catch (e) {
+      console.error('Gas estimation error: ', e, { 'revert reason': e?.data });
       // this shouldn't happen ideally
       // fallback values
       return {
@@ -114,8 +122,8 @@ class SignTokenClaim extends ContractBase {
     }
 
     const {
-      maxPriorityFeePerGas,
       maxFeePerGas,
+      maxPriorityFeePerGas,
       hasEnoughBalance,
       requiredEth,
       balanceEth,
@@ -132,7 +140,7 @@ class SignTokenClaim extends ContractBase {
       from: walletAddress,
       to: this.tokenAddress,
       data, // magna sends the full abi-encoded calldata
-      value: '0x0', // idk what this does
+      value: '200000000000000', // fee from magna
       gas: gasLimit,
       maxFeePerGas,
       maxPriorityFeePerGas,
@@ -143,7 +151,30 @@ class SignTokenClaim extends ContractBase {
         void this.web3.eth
           .sendTransaction(tx)
           .once('transactionHash', (hash) => resolve(hash as `0x${string}`))
-          .once('error', (err) => reject(err));
+          .once('error', (err) => {
+            console.error(err);
+            reject(err);
+          })
+          .then(async () => {
+            // add token to wallet
+            await this.web3?.currentProvider?.request({
+              method: 'wallet_watchAsset',
+              params: {
+                type: 'ERC20',
+                // `C` token
+                options: {
+                  address: '0xD7DA840121aeb9792b202bd84Db32B2816B30c0e',
+                  symbol: 'C',
+                  decimals: 18,
+                  chainId: parseInt(chainId),
+                  imgUrl: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
+                },
+              },
+            });
+          })
+          .catch((e) => {
+            console.error('Tx error: ', e);
+          });
       } catch (error) {
         reject(error);
       }
