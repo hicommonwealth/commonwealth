@@ -285,7 +285,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
         <CWBanner
           type="info"
           body={
-            <div className="banner-content">
+            <div className="general-notice">
               <h3 className="description">Login to check your COMMON Claim</h3>
               <CWButton
                 label="Login to check"
@@ -315,43 +315,44 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   ) {
     return (
       <div className="TokenClaimBanner">
-        <CWBanner
-          type="info"
-          body={
-            <div className="banner-content">
-              <h3 className="description">No COMMON allocation at this time</h3>
-              <CWText>
-                This round recognizes earlier participation by community members
-                across activity, collectibles, and rewards history. Your account
-                isn’t included in this snapshot.
-              </CWText>
-              <CWText>
-                Keep participating—join communities, contribute, and watch for
-                future reward opportunities.
-              </CWText>
-            </div>
-          }
-        />
+        <div className="notice-text">
+          <div className="no-allocation-notice">
+            <CWText
+              type="h5"
+              fontWeight="semiBold"
+              className="no-allocation-title"
+            >
+              No COMMON Allocation
+            </CWText>
+            <CWText className="no-allocation-description">
+              This round recognizes earlier participation by community members
+              across activity, collectibles, and rewards history. Your account
+              isn&apos;t included in this snapshot.
+            </CWText>
+            <CWText className="no-allocation-encouragement">
+              Keep participating, join communities, contribute, and watch for
+              future reward opportunities.
+            </CWText>
+          </div>
+        </div>
       </div>
     );
   }
 
   const canClaim = !!claimAddress;
-  const hasClaimed = false; // claimAddress?.magna_claimed_at && txHash;
-  const isClaimAvailable = false; // claimAddress?.magna_synced_at;
+  const hasClaimed = claimAddress?.magna_claimed_at && txHash;
+  const isClaimAvailable = claimAddress?.magna_synced_at;
   const isPendingClaimFunds = allocation?.status === 'PENDING_FUNDING';
   const isReadyForClaimNow =
     isClaimAvailable &&
-    allocation &&
-    allocation.magna_allocation_id &&
-    allocation.walletAddress &&
-    allocation.claimable > 0;
+    allocation?.magna_allocation_id &&
+    allocation?.walletAddress &&
+    (allocation?.claimable ?? 0) > 0;
   const isReadyForClaimAfterUnlock =
     isClaimAvailable &&
     !isReadyForClaimNow &&
-    allocation &&
-    allocation.claimable > 0 &&
-    allocation.unlock_start_at;
+    (allocation?.claimable ?? 0) > 0 &&
+    allocation?.unlock_start_at;
 
   const getClaimBody = () => {
     if (!canClaim) return null;
