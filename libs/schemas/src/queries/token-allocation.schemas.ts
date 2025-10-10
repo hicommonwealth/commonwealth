@@ -17,6 +17,8 @@ export const ClaimAddressView = z.object({
   address: EVM_ADDRESS_STRICT.nullish(),
   token: z.string(),
   description: z.string(),
+  initial_percentage: z.number(),
+  cliff_date: z.date(),
   tokens: z.coerce.number().nullish(),
   magna_allocation_id: z.string().nullish(),
   magna_synced_at: z
@@ -30,6 +32,12 @@ export const ClaimAddressView = z.object({
     .nullish()
     .describe('When the allocation was claimed by the user.'),
   magna_claim_tx_hash: z.string().nullish(),
+  magna_cliff_claimed_at: z
+    .date()
+    .or(z.string())
+    .nullish()
+    .describe('When the allocation was claimed by the user.'),
+  magna_cliff_claim_tx_hash: z.string().nullish(),
 });
 
 export const GetClaimAddress = {
