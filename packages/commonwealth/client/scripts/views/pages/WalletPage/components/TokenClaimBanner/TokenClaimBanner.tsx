@@ -717,7 +717,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
             <CWText type="h4" fontWeight="medium" className="timer-label">
               Next Sync In
             </CWText>
-            <CWText type="h2" fontWeight="bold" className="timer-display">
+            <CWText type="h1" fontWeight="bold" className="timer-display">
               {syncCountdown}
             </CWText>
           </div>
