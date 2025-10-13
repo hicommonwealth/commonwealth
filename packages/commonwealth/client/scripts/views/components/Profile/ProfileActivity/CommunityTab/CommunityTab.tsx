@@ -5,7 +5,6 @@ import { CWText } from '../../../component_kit/cw_text';
 import { CWTable } from '../../../component_kit/new_designs/CWTable';
 import { CommunityStake } from './CommunityStake/CommunityStake';
 import './CommunityTab.scss';
-import { LastActive } from './LastActive/LastActive';
 import { Role } from './Role/Role';
 
 type CommunityTabProps = {
@@ -32,12 +31,6 @@ export const CommunityTab = ({ communities }: CommunityTabProps) => {
       numeric: true,
       sortable: true,
     },
-    {
-      key: 'lastActive',
-      header: 'Last Active',
-      numeric: false,
-      sortable: true,
-    },
   ];
 
   const rowData = communities.map((community) => ({
@@ -49,6 +42,13 @@ export const CommunityTab = ({ communities }: CommunityTabProps) => {
             to={`/${community.id}`}
             className="community-info"
           >
+            {community.iconUrl && (
+              <img 
+                src={community.iconUrl} 
+                alt={`${community.name} icon`}
+                className="community-icon"
+              />
+            )}
             <CWText>{community.name}</CWText>
           </Link>
         </div>
@@ -56,7 +56,6 @@ export const CommunityTab = ({ communities }: CommunityTabProps) => {
     },
     stake: <CommunityStake communityId={community.id} />,
     role: <Role communityId={community.id} />,
-    lastActive: <LastActive communityId={community.id} />,
   }));
 
   return (
