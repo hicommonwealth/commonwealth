@@ -8,6 +8,7 @@ import type Comment from 'models/Comment';
 import type Thread from 'models/Thread';
 import type { IUniqueId } from 'models/interfaces';
 import useUserStore from 'state/ui/user';
+import type { UserCommunities } from 'state/ui/user/user';
 import { CWTab, CWTabsRow } from '../../component_kit/new_designs/CWTabs';
 import ProfileActivityContent, {
   ProfileActivityType,
@@ -21,12 +22,14 @@ type ProfileActivityProps = {
   comments: CommentWithAssociatedThread[];
   threads: Thread[];
   userId: number;
+  communities: UserCommunities[];
 };
 
 const ProfileActivity = ({
   comments,
   threads,
   userId,
+  communities,
 }: ProfileActivityProps) => {
   const newProfilePageEnabled = useFlag('newProfilePage');
   const xpEnabled = useFlag('xp');
@@ -80,7 +83,7 @@ const ProfileActivity = ({
               label={
                 <div className="tab-header">
                   Communities
-                  <div className="count">{user.communities.length}</div>
+                  <div className="count">{communities.length}</div>
                 </div>
               }
               onClick={() => {
@@ -108,6 +111,7 @@ const ProfileActivity = ({
           threads={threads}
           comments={comments}
           userId={userId}
+          communities={communities}
         />
       </div>
     </div>
