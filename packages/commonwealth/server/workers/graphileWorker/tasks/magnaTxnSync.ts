@@ -127,7 +127,8 @@ interface BlockByTimestampResponse {
  * Handles pagination if there are more results available
  */
 async function getWithdrawTransactionsForAddress(
-  client: ReturnType<typeof createPublicClient>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client: ReturnType<typeof createPublicClient<any, any, any, any>>,
   address: string,
   fromBlock: bigint,
 ): Promise<string[]> {
