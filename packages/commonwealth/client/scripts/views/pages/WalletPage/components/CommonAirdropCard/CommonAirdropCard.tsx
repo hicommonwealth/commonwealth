@@ -28,9 +28,9 @@ import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divi
 import clsx from 'clsx';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
-import './TokenClaimBanner.scss';
+import './CommonAirdropCard.scss';
 
-interface TokenClaimBannerProps {
+interface CommonAirdropCardProps {
   onConnectNewAddress?: () => void;
 }
 
@@ -43,7 +43,7 @@ const formatTokenBalance = (balance: string | number): string => {
   });
 };
 
-const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
+const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   const user = useUserStore();
   const [formattedClaimable, setFormattedClaimable] = useState<string>('0');
 
@@ -281,7 +281,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
 
   if (!user.isLoggedIn) {
     return (
-      <div className="TokenClaimBanner">
+      <div className="CommonAirdropCard">
         <CWBanner
           type="info"
           body={
@@ -314,7 +314,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     (claimAddress === null || (claimAddress && tokensNumber <= 0))
   ) {
     return (
-      <div className="TokenClaimBanner">
+      <div className="CommonAirdropCard">
         <div className="notice-text">
           <div className="no-allocation-notice">
             <CWText
@@ -750,7 +750,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
 
   return canClaim ? (
     <div
-      className={clsx('TokenClaimBanner', {
+      className={clsx('CommonAirdropCard', {
         'in-progress': isClaimAvailable,
         'needs-action': !isClaimAvailable && !hasClaimed,
         completed: hasClaimed,
@@ -802,4 +802,4 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   ) : null;
 };
 
-export default TokenClaimBanner;
+export default CommonAirdropCard;
