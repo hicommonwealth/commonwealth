@@ -1,13 +1,12 @@
 import { Query } from '@hicommonwealth/core';
-import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 
 export const GetUserCommunitiesSchema = {
-    input: z.object({
-        userId: z.number(),
-    }),
+  input: z.object({
+    userId: z.number(),
+  }),
   output: z.array(
     z.object({
       id: z.string(),
@@ -19,22 +18,20 @@ export const GetUserCommunitiesSchema = {
 };
 
 export function GetUserCommunities(): Query<typeof GetUserCommunitiesSchema> {
-    return {
-        ...GetUserCommunitiesSchema,
-        auth: [],
-        secure: false,
-        body: async ({ payload }) => {
-            const { userId } = payload;
+  return {
+    ...GetUserCommunitiesSchema,
+    auth: [],
+    secure: false,
+    body: async ({ payload }) => {
+      const { userId } = payload;
 
-            const communities = await models.sequelize.query<
-                {
-                    id: string;
-                    name: string;
-                    icon_url: string | null;
-                    starred_at: string | null;
-                }
-            >(
-                `
+      const communities = await models.sequelize.query<{
+        id: string;
+        name: string;
+        icon_url: string | null;
+        starred_at: string | null;
+      }>(
+        `
         SELECT DISTINCT
           c.id, c.name, c.icon_url,
           sc.updated_at as starred_at,
@@ -49,18 +46,18 @@ export function GetUserCommunities(): Query<typeof GetUserCommunitiesSchema> {
           sc.updated_at DESC NULLS LAST,
           c.created_at DESC;
         `,
-                {
-                    replacements: { user_id: userId },
-                    type: QueryTypes.SELECT,
-                },
-            );
-
-            return communities.map((community) => ({
-                id: community.id,
-                name: community.name,
-                iconUrl: community.icon_url || '',
-                isStarred: !!community.starred_at,
-            }));
+        {
+          replacements: { user_id: userId },
+          type: QueryTypes.SELECT,
         },
-    };
+      );
+
+      return communities.map((community) => ({
+        id: community.id,
+        name: community.name,
+        iconUrl: community.icon_url || '',
+        isStarred: !!community.starred_at,
+      }));
+    },
+  };
 }

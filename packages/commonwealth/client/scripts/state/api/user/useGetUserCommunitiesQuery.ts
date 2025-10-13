@@ -11,6 +11,6 @@ export const useGetUserCommunitiesQuery = ({
 }: UseGetUserCommunitiesQueryProps) => {
   return trpc.user.getUserCommunities.useQuery(
     { userId },
-    { enabled: enabled && !!userId }
+    { enabled: enabled && !!userId },
   );
 };

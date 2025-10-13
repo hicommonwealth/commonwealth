@@ -7,7 +7,6 @@ import clsx from 'clsx';
 import type Comment from 'models/Comment';
 import type Thread from 'models/Thread';
 import type { IUniqueId } from 'models/interfaces';
-import useUserStore from 'state/ui/user';
 import type { UserCommunities } from 'state/ui/user/user';
 import { CWTab, CWTabsRow } from '../../component_kit/new_designs/CWTabs';
 import ProfileActivityContent, {
@@ -37,7 +36,6 @@ const ProfileActivity = ({
   const [selectedActivity, setSelectedActivity] = useState(
     ProfileActivityType.Comments,
   );
-  const user = useUserStore();
 
   return (
     <div className="ProfileActivity">

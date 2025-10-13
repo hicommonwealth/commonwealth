@@ -38,13 +38,10 @@ export const CommunityTab = ({ communities }: CommunityTabProps) => {
       sortValue: community.name,
       customElement: (
         <div className="table-cell community-cell">
-          <Link
-            to={`/${community.id}`}
-            className="community-info"
-          >
+          <Link to={`/${community.id}`} className="community-info">
             {community.iconUrl && (
-              <img 
-                src={community.iconUrl} 
+              <img
+                src={community.iconUrl}
                 alt={`${community.name} icon`}
                 className="community-icon"
               />
