@@ -319,7 +319,8 @@ export const magnaTxnSyncTask = {
         );
 
         const txHashes = await getWithdrawTransactionsForAddress(
-          client,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          client as any,
           record.address,
           startBlock,
         );
