@@ -285,8 +285,9 @@
       }
 
       .diagonal-separator {
-        transform: rotate(21deg);
-        width: 2px;
+        transform: rotate(25deg);
+        width: 2.5px;
+        margin-left: -2px;
         height: 100%;
         background: rgba(255, 255, 255, 0.6);
       }
