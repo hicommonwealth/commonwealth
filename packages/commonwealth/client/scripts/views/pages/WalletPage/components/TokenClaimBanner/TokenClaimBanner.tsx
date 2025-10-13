@@ -739,31 +739,32 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
         body={
           <div className="banner-content">
             <div className="hero-section">
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  width: 'fit-content',
-                }}
-              >
-                <CWText
-                  type="h1"
-                  fontWeight="semiBold"
-                  className="description-text"
-                >
-                  {claimAddress?.description}
-                </CWText>
-                <CWDivider />
-              </div>
-              <div className="token-balance-container">
-                <CWText type="caption" className="balance-label">
-                  Your Allocation
-                </CWText>
-                <CWText type="h1" fontWeight="bold" className="balance-amount">
-                  {formattedClaimable} {claimAddress?.token} Tokens
-                </CWText>
+              <div className="header-content">
+                <div className="airdrop-title-section">
+                  <CWText
+                    type="h1"
+                    fontWeight="semiBold"
+                    className="description-text"
+                  >
+                    {claimAddress?.description}
+                  </CWText>
+                </div>
+                <div className="allocation-section-container">
+                  <div className="diagonal-separator"></div>
+                  <div className="diagonal-separator"></div>
+                  <div className="allocation-section">
+                    <CWText type="caption" className="balance-label">
+                      Your Allocation
+                    </CWText>
+                    <CWText
+                      type="h1"
+                      fontWeight="bold"
+                      className="balance-amount"
+                    >
+                      {formattedClaimable} {claimAddress?.token} Tokens
+                    </CWText>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="notice-section">{getClaimBody()}</div>

@@ -254,38 +254,49 @@
         pointer-events: none;
       }
 
+      .header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      .airdrop-title-section {
+        flex: 1;
+        display: flex;
+        align-items: center;
+      }
+
       .description-text {
         font-size: 36px;
-        text-align: center;
-        max-width: 800px;
+        text-align: left;
         line-height: 1.3;
         margin: 0;
         color: colors.$white;
-        position: relative;
-        z-index: 1;
       }
 
-      .divider-line {
-        width: 60px;
-        height: 2px;
-        background: linear-gradient(
-          90deg,
-          transparent 0%,
-          rgba(255, 255, 255, 0.4) 50%,
-          transparent 100%
-        );
-        margin: 4px 0;
-        position: relative;
-        z-index: 1;
+      .allocation-section-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        height: 100%;
       }
 
-      .token-balance-container {
+      .diagonal-separator {
+        transform: rotate(21deg);
+        width: 2px;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.6);
+      }
+
+      .allocation-section {
+        flex: 1;
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: flex-end;
         gap: 2px;
-        position: relative;
-        z-index: 1;
 
         .balance-label {
           font-size: 11px;
@@ -294,12 +305,13 @@
           opacity: 0.8;
           font-weight: 600;
           color: colors.$white;
+          text-align: right;
         }
 
         .balance-amount {
           font-size: 32px;
           line-height: 1.1;
-          text-align: center;
+          text-align: right;
           color: colors.$white;
         }
       }
@@ -1019,23 +1031,39 @@
         gap: 10px;
         margin: 0;
 
+        .header-content {
+          flex-direction: column;
+          gap: 16px;
+          min-height: auto;
+        }
+
+        .airdrop-title-section {
+          justify-content: center;
+        }
+
         .description-text {
           font-size: 24px;
           max-width: 100%;
           line-height: 1.2;
+          text-align: center;
         }
 
-        .divider-line {
-          width: 50px;
+        .diagonal-separator {
+          display: none;
         }
 
-        .token-balance-container {
+        .allocation-section {
+          align-items: center;
+          text-align: center;
+
           .balance-label {
             font-size: 10px;
+            text-align: center;
           }
 
           .balance-amount {
             font-size: 24px;
+            text-align: center;
           }
         }
       }
