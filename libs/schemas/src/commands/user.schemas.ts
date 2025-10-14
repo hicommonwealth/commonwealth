@@ -74,7 +74,7 @@ export const UpdateUser = {
     profile: UserProfile.extend({
       name: z
         .string()
-        .optional()
+        .nullish()
         .refine(
           (val) => {
             if (!val) return true;
