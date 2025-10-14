@@ -15,6 +15,7 @@ import { formatMarketCap } from 'helpers/formatting';
 import { useTokenPricing } from 'hooks/useTokenPricing';
 import Thread from 'models/Thread';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { getContentByUrl } from 'state/api/general/getContentByUrl';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { downloadDataAsFile } from 'utils/downloadDataAsFile';
@@ -92,8 +93,16 @@ export const ThreadOptions = ({
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   const userStore = useUserStore();
 
-  const handleDownloadMarkdown = () => {
-    downloadDataAsFile(thread.body, 'text/markdown', thread.title + '.md');
+  const handleDownloadMarkdown = async () => {
+    let body = thread.body;
+    if (thread.contentUrl) {
+      try {
+        body = await getContentByUrl({ contentUrl: thread.contentUrl });
+      } catch (e) {
+        console.error('Failed to fetch full thread body', e);
+      }
+    }
+    downloadDataAsFile(body, 'text/markdown', thread.title + '.md');
   };
 
   const permissions = Permissions.getMultipleActionsPermission({
