@@ -516,7 +516,7 @@ const ClaimCard = ({
     }
 
     // Show ui to set address for claim
-    if (!selectedAddress || !selectedAddress?.address) {
+    if (!selectedAddress || !selectedAddress?.address || !claimedToAddress) {
       return (
         <div className="notice-text">
           <div className="address-form-section">
