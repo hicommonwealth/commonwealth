@@ -19,7 +19,7 @@ export const useClaimTokenFlow = () => {
   const updateClaimTransactionHash =
     trpc.tokenAllocation.updateClaimTransactionHash.useMutation();
   const [claimTxData, setClaimTxData] = useState<{
-    from: string;
+    to: string;
     data: string;
   }>();
 
@@ -27,7 +27,7 @@ export const useClaimTokenFlow = () => {
     try {
       const data = await claimToken.mutateAsync(input);
       setClaimTxData({
-        from: data.from,
+        to: data.to,
         data: data.data,
       });
       // invalidate related queries

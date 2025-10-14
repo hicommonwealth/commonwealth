@@ -422,12 +422,12 @@ const ClaimCard = ({
                                   className="copyable-address"
                                   onClick={() => {
                                     void navigator.clipboard.writeText(
-                                      claimTxData.from,
+                                      claimTxData.to,
                                     );
                                     notifySuccess('Address copied!');
                                   }}
                                 >
-                                  {formatAddressShort(claimTxData.from, 4)}
+                                  {formatAddressShort(claimTxData.to, 4)}
                                   <CWIcon iconName="copy" iconSize="small" />
                                 </span>
                                 &nbsp;with hex data&nbsp;
