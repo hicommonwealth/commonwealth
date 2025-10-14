@@ -376,7 +376,7 @@ describe('MagnaTxnSync Task Tests', () => {
       expect(updated[0].magna_claim_tx_hash).toBeNull();
     });
 
-    test('should use the most recent transaction if multiple found', async () => {
+    test('should use the first transaction for initial claim if multiple found', async () => {
       const user = await models.User.create({
         email: 'test@example.com',
         profile: { name: 'Test User' },
@@ -400,15 +400,15 @@ describe('MagnaTxnSync Task Tests', () => {
         },
       );
 
-      const oldTxHash =
-        '0xold567890abcdef1234567890abcdef1234567890abcdef1234567890abc';
-      const newTxHash =
-        '0xnew567890abcdef1234567890abcdef1234567890abcdef1234567890abc';
+      const firstTxHash =
+        '0xfirst67890abcdef1234567890abcdef1234567890abcdef1234567890abc';
+      const secondTxHash =
+        '0xsecond7890abcdef1234567890abcdef1234567890abcdef1234567890abc';
 
       mockClient.request.mockResolvedValue({
         transfers: [
-          { hash: oldTxHash },
-          { hash: newTxHash }, // Most recent
+          { hash: firstTxHash }, // First (earliest)
+          { hash: secondTxHash }, // Second (later)
         ],
       });
 
@@ -435,8 +435,323 @@ describe('MagnaTxnSync Task Tests', () => {
         },
       );
 
-      // Should use the most recent (last) transaction
-      expect(updated[0].magna_claim_tx_hash).toBe(newTxHash);
+      // Should use the first (earliest) transaction for initial claim
+      expect(updated[0].magna_claim_tx_hash).toBe(firstTxHash);
+    });
+  });
+
+  describe('Cliff claim transaction processing', () => {
+    test('should process cliff claim transactions separately from initial claims', async () => {
+      const user = await models.User.create({
+        email: 'test@example.com',
+        profile: { name: 'Test User' },
+        tier: 1,
+      });
+
+      const testAddress = '0x1234567890123456789012345678901234567890';
+      await models.sequelize.query(
+        `
+          INSERT INTO "ClaimAddresses" 
+          (user_id, address, magna_cliff_claimed_at, magna_cliff_claim_data, created_at, updated_at)
+          VALUES (:user_id, :address, NOW(), :claim_data, NOW(), NOW())
+        `,
+        {
+          type: QueryTypes.INSERT,
+          replacements: {
+            user_id: user.id,
+            address: testAddress,
+            claim_data: '{"test": "cliff data"}',
+          },
+        },
+      );
+
+      const firstTxHash =
+        '0xfirst67890abcdef1234567890abcdef1234567890abcdef1234567890abc';
+      const secondTxHash =
+        '0xsecond7890abcdef1234567890abcdef1234567890abcdef1234567890abc';
+
+      mockClient.request.mockResolvedValue({
+        transfers: [
+          { hash: firstTxHash }, // Initial claim
+          { hash: secondTxHash }, // Cliff claim
+        ],
+      });
+
+      mockClient.getTransaction.mockImplementation(() => {
+        return Promise.resolve({
+          to: '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6',
+          input: '0x8612372a000000000000000000000000',
+        });
+      });
+
+      await magnaTxnSyncTask.fn();
+
+      const updated = await models.sequelize.query<{
+        magna_cliff_claim_tx_hash: string;
+      }>(
+        `
+          SELECT magna_cliff_claim_tx_hash 
+          FROM "ClaimAddresses" 
+          WHERE user_id = :user_id
+        `,
+        {
+          type: QueryTypes.SELECT,
+          replacements: { user_id: user.id },
+        },
+      );
+
+      // Should use the second transaction for cliff claim
+      expect(updated[0].magna_cliff_claim_tx_hash).toBe(secondTxHash);
+    });
+
+    test('should fail cliff claim processing if only one transaction found', async () => {
+      const user = await models.User.create({
+        email: 'test@example.com',
+        profile: { name: 'Test User' },
+        tier: 1,
+      });
+
+      const testAddress = '0x1234567890123456789012345678901234567890';
+      await models.sequelize.query(
+        `
+          INSERT INTO "ClaimAddresses" 
+          (user_id, address, magna_cliff_claimed_at, magna_cliff_claim_data, created_at, updated_at)
+          VALUES (:user_id, :address, NOW(), :claim_data, NOW(), NOW())
+        `,
+        {
+          type: QueryTypes.INSERT,
+          replacements: {
+            user_id: user.id,
+            address: testAddress,
+            claim_data: '{"test": "cliff data"}',
+          },
+        },
+      );
+
+      const singleTxHash =
+        '0xsingle7890abcdef1234567890abcdef1234567890abcdef1234567890abc';
+
+      mockClient.request.mockResolvedValue({
+        transfers: [
+          { hash: singleTxHash }, // Only one transaction
+        ],
+      });
+
+      mockClient.getTransaction.mockImplementation(() => {
+        return Promise.resolve({
+          to: '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6',
+          input: '0x8612372a000000000000000000000000',
+        });
+      });
+
+      await magnaTxnSyncTask.fn();
+
+      const updated = await models.sequelize.query<{
+        magna_cliff_claim_tx_hash: string | null;
+      }>(
+        `
+          SELECT magna_cliff_claim_tx_hash 
+          FROM "ClaimAddresses" 
+          WHERE user_id = :user_id
+        `,
+        {
+          type: QueryTypes.SELECT,
+          replacements: { user_id: user.id },
+        },
+      );
+
+      // Should not update with only one transaction
+      expect(updated[0].magna_cliff_claim_tx_hash).toBeNull();
+    });
+
+    test('should process both initial claim and cliff claim in sequence', async () => {
+      const user = await models.User.create({
+        email: 'test@example.com',
+        profile: { name: 'Test User' },
+        tier: 1,
+      });
+
+      const testAddress = '0x1234567890123456789012345678901234567890';
+      await models.sequelize.query(
+        `
+          INSERT INTO "ClaimAddresses" 
+          (user_id, address, magna_claimed_at, magna_claim_data, 
+           magna_cliff_claimed_at, magna_cliff_claim_data, created_at, updated_at)
+          VALUES (:user_id, :address, NOW(), :claim_data, NOW(), :cliff_claim_data, NOW(), NOW())
+        `,
+        {
+          type: QueryTypes.INSERT,
+          replacements: {
+            user_id: user.id,
+            address: testAddress,
+            claim_data: '{"test": "claim data"}',
+            cliff_claim_data: '{"test": "cliff data"}',
+          },
+        },
+      );
+
+      const firstTxHash =
+        '0xfirst67890abcdef1234567890abcdef1234567890abcdef1234567890abc';
+      const secondTxHash =
+        '0xsecond7890abcdef1234567890abcdef1234567890abcdef1234567890abc';
+
+      mockClient.request.mockResolvedValue({
+        transfers: [
+          { hash: firstTxHash }, // Initial claim
+          { hash: secondTxHash }, // Cliff claim
+        ],
+      });
+
+      mockClient.getTransaction.mockImplementation(() => {
+        return Promise.resolve({
+          to: '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6',
+          input: '0x8612372a000000000000000000000000',
+        });
+      });
+
+      await magnaTxnSyncTask.fn();
+
+      const updated = await models.sequelize.query<{
+        magna_claim_tx_hash: string;
+        magna_cliff_claim_tx_hash: string;
+      }>(
+        `
+          SELECT magna_claim_tx_hash, magna_cliff_claim_tx_hash 
+          FROM "ClaimAddresses" 
+          WHERE user_id = :user_id
+        `,
+        {
+          type: QueryTypes.SELECT,
+          replacements: { user_id: user.id },
+        },
+      );
+
+      // Should have both transactions indexed correctly
+      expect(updated[0].magna_claim_tx_hash).toBe(firstTxHash);
+      expect(updated[0].magna_cliff_claim_tx_hash).toBe(secondTxHash);
+    });
+
+    test('should skip cliff claims that already have tx hash', async () => {
+      const user = await models.User.create({
+        email: 'test@example.com',
+        profile: { name: 'Test User' },
+        tier: 1,
+      });
+
+      const existingTxHash =
+        '0xexisting1234567890abcdef1234567890abcdef1234567890abcdef123456';
+
+      await models.sequelize.query(
+        `
+          INSERT INTO "ClaimAddresses" 
+          (user_id, address, magna_cliff_claimed_at, magna_cliff_claim_data, 
+           magna_cliff_claim_tx_hash, created_at, updated_at)
+          VALUES (:user_id, :address, NOW(), :claim_data, :tx_hash, NOW(), NOW())
+        `,
+        {
+          type: QueryTypes.INSERT,
+          replacements: {
+            user_id: user.id,
+            address: '0x1234567890123456789012345678901234567890',
+            claim_data: '{"test": "data"}',
+            tx_hash: existingTxHash,
+          },
+        },
+      );
+
+      await magnaTxnSyncTask.fn();
+
+      // Should not make any API calls since the cliff claim already has a tx hash
+      expect(mockClient.request).not.toHaveBeenCalled();
+    });
+
+    test('should handle cliff claims with different timestamps correctly', async () => {
+      const user1 = await models.User.create({
+        email: 'test1@example.com',
+        profile: { name: 'Test User 1' },
+        tier: 1,
+      });
+
+      const user2 = await models.User.create({
+        email: 'test2@example.com',
+        profile: { name: 'Test User 2' },
+        tier: 1,
+      });
+
+      // Create two cliff claims with different timestamps
+      await models.sequelize.query(
+        `
+          INSERT INTO "ClaimAddresses" 
+          (user_id, address, magna_cliff_claimed_at, magna_cliff_claim_data, created_at, updated_at)
+          VALUES 
+            (:user_id1, :address1, :early_date, :claim_data, NOW(), NOW()),
+            (:user_id2, :address2, :late_date, :claim_data, NOW(), NOW())
+        `,
+        {
+          type: QueryTypes.INSERT,
+          replacements: {
+            user_id1: user1.id,
+            address1: '0x1111111111111111111111111111111111111111',
+            early_date: new Date('2024-01-01T00:00:00Z'),
+            user_id2: user2.id,
+            address2: '0x2222222222222222222222222222222222222222',
+            late_date: new Date('2024-06-01T00:00:00Z'),
+            claim_data: '{"test": "data"}',
+          },
+        },
+      );
+
+      const tx1First =
+        '0xtx1first890abcdef1234567890abcdef1234567890abcdef1234567890abc';
+      const tx1Second =
+        '0xtx1second90abcdef1234567890abcdef1234567890abcdef1234567890abc';
+      const tx2First =
+        '0xtx2first90abcdef1234567890abcdef1234567890abcdef1234567890abc';
+      const tx2Second =
+        '0xtx2second0abcdef1234567890abcdef1234567890abcdef1234567890abc';
+
+      mockClient.request.mockImplementation(({ params }: any) => {
+        const fromAddress = params[0].fromAddress;
+        if (fromAddress === '0x1111111111111111111111111111111111111111') {
+          return Promise.resolve({
+            transfers: [{ hash: tx1First }, { hash: tx1Second }],
+          });
+        } else {
+          return Promise.resolve({
+            transfers: [{ hash: tx2First }, { hash: tx2Second }],
+          });
+        }
+      });
+
+      mockClient.getTransaction.mockResolvedValue({
+        to: '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6',
+        input: '0x8612372a000000000000000000000000',
+      });
+
+      await magnaTxnSyncTask.fn();
+
+      // Verify both cliff claims were processed with the second transaction
+      const result1 = await models.sequelize.query<{
+        magna_cliff_claim_tx_hash: string;
+      }>(
+        `SELECT magna_cliff_claim_tx_hash FROM "ClaimAddresses" WHERE user_id = :user_id`,
+        {
+          type: QueryTypes.SELECT,
+          replacements: { user_id: user1.id },
+        },
+      );
+      expect(result1[0].magna_cliff_claim_tx_hash).toBe(tx1Second);
+
+      const result2 = await models.sequelize.query<{
+        magna_cliff_claim_tx_hash: string;
+      }>(
+        `SELECT magna_cliff_claim_tx_hash FROM "ClaimAddresses" WHERE user_id = :user_id`,
+        {
+          type: QueryTypes.SELECT,
+          replacements: { user_id: user2.id },
+        },
+      );
+      expect(result2[0].magna_cliff_claim_tx_hash).toBe(tx2Second);
     });
   });
 

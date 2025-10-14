@@ -18,7 +18,8 @@ const WITHDRAW_SELECTORS = [
 interface ClaimAddressRecord {
   user_id: number;
   address: string;
-  magna_claimed_at: Date;
+  magna_claimed_at: Date | null;
+  magna_cliff_claimed_at: Date | null;
 }
 
 // Alchemy API Types
@@ -253,6 +254,166 @@ async function getBlockNumberFromTimestamp(
   }
 }
 
+/**
+ * Processes claim addresses for a specific transaction type (initial claim or cliff claim)
+ */
+async function processTxnType(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client: ReturnType<typeof createPublicClient<any, any, any, any>>,
+  txnType: 'claim' | 'cliff',
+  alchemyApiKey: string,
+): Promise<{ successCount: number; failureCount: number }> {
+  const isCliff = txnType === 'cliff';
+  const logPrefix = isCliff ? 'Cliff Claim' : 'Initial Claim';
+
+  log.info(`Starting ${logPrefix} transaction indexing...`);
+
+  // Query for addresses that need this transaction type indexed
+  const query = isCliff
+    ? `
+      SELECT user_id, address, magna_cliff_claimed_at, magna_claimed_at
+      FROM "ClaimAddresses"
+      WHERE magna_cliff_claimed_at IS NOT NULL
+        AND magna_cliff_claim_data IS NOT NULL
+        AND magna_cliff_claim_tx_hash IS NULL
+        AND address IS NOT NULL
+      ORDER BY magna_cliff_claimed_at ASC
+    `
+    : `
+      SELECT user_id, address, magna_claimed_at, magna_cliff_claimed_at
+      FROM "ClaimAddresses"
+      WHERE magna_claimed_at IS NOT NULL
+        AND magna_claim_data IS NOT NULL
+        AND magna_claim_tx_hash IS NULL
+        AND address IS NOT NULL
+      ORDER BY magna_claimed_at ASC
+    `;
+
+  const claimAddresses = await models.sequelize.query<ClaimAddressRecord>(
+    query,
+    {
+      type: QueryTypes.SELECT,
+    },
+  );
+
+  if (claimAddresses.length === 0) {
+    log.info(`No ${logPrefix} addresses need transaction indexing`);
+    return { successCount: 0, failureCount: 0 };
+  }
+
+  log.info(
+    `Found ${claimAddresses.length} ${logPrefix} addresses to index transactions for`,
+  );
+
+  // Determine the earliest timestamp to start searching from
+  const earliestTimestamp = isCliff
+    ? claimAddresses[0].magna_cliff_claimed_at!
+    : claimAddresses[0].magna_claimed_at!;
+
+  const startBlock = await getBlockNumberFromTimestamp(
+    alchemyApiKey,
+    earliestTimestamp,
+  );
+
+  log.info(`Searching for ${logPrefix} transactions from block ${startBlock}`);
+
+  let successCount = 0;
+  let failureCount = 0;
+
+  for (const record of claimAddresses) {
+    try {
+      log.info(
+        `Processing ${logPrefix} for address ${record.address} (user ${record.user_id})`,
+      );
+
+      const txHashes = await getWithdrawTransactionsForAddress(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        client as any,
+        record.address,
+        startBlock,
+      );
+
+      if (txHashes.length === 0) {
+        log.warn(
+          `No withdraw transactions found for address ${record.address}`,
+        );
+        failureCount++;
+        continue;
+      }
+
+      // Determine which transaction to use:
+      // - For initial claim: use the first (earliest) transaction
+      // - For cliff claim: use the second transaction if available, otherwise warn
+      let txHash: string;
+
+      if (isCliff) {
+        if (txHashes.length < 2) {
+          log.warn(
+            `Expected 2 transactions for cliff claim but found ${txHashes.length} for address ${record.address}`,
+          );
+          failureCount++;
+          continue;
+        }
+        // Use the second (later) transaction for cliff claim
+        txHash = txHashes[1];
+      } else {
+        // Use the first (earliest) transaction for initial claim
+        txHash = txHashes[0];
+      }
+
+      log.info(
+        `Found ${logPrefix} withdraw transaction ${txHash} for address ${record.address}`,
+      );
+
+      const updateQuery = `
+        UPDATE "ClaimAddresses"
+        SET ${isCliff ? 'magna_cliff_claim_tx_hash' : 'magna_claim_tx_hash'} = :tx_hash,
+            updated_at                                                       = NOW()
+        WHERE user_id = :user_id
+          AND ${isCliff ? 'magna_cliff_claim_tx_hash' : 'magna_claim_tx_hash'} IS NULL
+      `;
+
+      const [, updated] = await models.sequelize.query(updateQuery, {
+        type: QueryTypes.UPDATE,
+        replacements: {
+          user_id: record.user_id,
+          tx_hash: txHash,
+        },
+      });
+
+      if (updated > 0) {
+        successCount++;
+        log.info(
+          `Successfully updated ${logPrefix} transaction hash for user ${record.user_id}`,
+        );
+      } else {
+        failureCount++;
+        log.warn(
+          `Failed to update ${logPrefix} transaction hash for user ${record.user_id}`,
+        );
+      }
+
+      // Add a small delay to avoid rate limiting
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    } catch (err) {
+      failureCount++;
+      log.error(
+        `Error processing ${logPrefix} for address ${record.address}`,
+        err as Error,
+        {
+          user_id: record.user_id,
+        },
+      );
+    }
+  }
+
+  log.info(
+    `${logPrefix} indexing completed! Success: ${successCount}, Failures: ${failureCount}`,
+  );
+
+  return { successCount, failureCount };
+}
+
 export const magnaTxnSyncTask = {
   input: TaskPayloads.MagnaTxnSync,
   fn: async () => {
@@ -278,110 +439,27 @@ export const magnaTxnSyncTask = {
       eth_chain_id: ValidChains.Base,
     });
 
-    const claimAddresses = await models.sequelize.query<ClaimAddressRecord>(
-      `
-        SELECT user_id, address, magna_claimed_at
-        FROM "ClaimAddresses"
-        WHERE magna_claimed_at IS NOT NULL
-          AND magna_claim_data IS NOT NULL
-          AND magna_claim_tx_hash IS NULL
-          AND address IS NOT NULL
-        ORDER BY magna_claimed_at ASC
-      `,
-      {
-        type: QueryTypes.SELECT,
-      },
-    );
-
-    if (claimAddresses.length === 0) {
-      log.info('No claim addresses need transaction indexing');
-      return;
-    }
-
-    log.info(
-      `Found ${claimAddresses.length} claim addresses to index transactions for`,
-    );
-
-    const earliestClaim = claimAddresses[0].magna_claimed_at;
-    const startBlock = await getBlockNumberFromTimestamp(
+    // Process initial claim transactions
+    const claimResults = await processTxnType(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      client as any,
+      'claim',
       config.ALCHEMY.APP_KEYS.PRIVATE,
-      earliestClaim,
     );
 
-    log.info(`Searching for transactions from block ${startBlock}`);
+    // Process cliff claim transactions
+    const cliffResults = await processTxnType(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      client as any,
+      'cliff',
+      config.ALCHEMY.APP_KEYS.PRIVATE,
+    );
 
-    let successCount = 0;
-    let failureCount = 0;
-
-    for (const record of claimAddresses) {
-      try {
-        log.info(
-          `Processing address ${record.address} for user ${record.user_id}`,
-        );
-
-        const txHashes = await getWithdrawTransactionsForAddress(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          client as any,
-          record.address,
-          startBlock,
-        );
-
-        if (txHashes.length === 0) {
-          log.warn(
-            `No withdraw transactions found for address ${record.address}`,
-          );
-          failureCount++;
-          continue;
-        }
-
-        // If multiple transactions found, use the most recent one
-        const txHash = txHashes[txHashes.length - 1];
-
-        log.info(
-          `Found withdraw transaction ${txHash} for address ${record.address}`,
-        );
-
-        const [, updated] = await models.sequelize.query(
-          `
-            UPDATE "ClaimAddresses"
-            SET magna_claim_tx_hash = :tx_hash,
-                updated_at          = NOW()
-            WHERE user_id = :user_id
-              AND magna_claim_tx_hash IS NULL
-          `,
-          {
-            type: QueryTypes.UPDATE,
-            replacements: {
-              user_id: record.user_id,
-              tx_hash: txHash,
-            },
-          },
-        );
-
-        if (updated > 0) {
-          successCount++;
-          log.info(
-            `Successfully updated transaction hash for user ${record.user_id}`,
-          );
-        } else {
-          failureCount++;
-          log.warn(
-            `Failed to update transaction hash for user ${record.user_id}`,
-          );
-        }
-
-        // Add a small delay to avoid rate limiting
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      } catch (err) {
-        failureCount++;
-        log.error(`Error processing address ${record.address}`, err as Error, {
-          user_id: record.user_id,
-        });
-      }
-    }
+    const totalSuccess = claimResults.successCount + cliffResults.successCount;
+    const totalFailures = claimResults.failureCount + cliffResults.failureCount;
 
     log.info(
-      `MagnaTxnSync job completed! Success: ${successCount}, Failures: ${failureCount}`,
+      `MagnaTxnSync job completed! Total Success: ${totalSuccess}, Total Failures: ${totalFailures}`,
     );
   },
 };
