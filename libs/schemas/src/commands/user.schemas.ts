@@ -74,9 +74,16 @@ export const UpdateUser = {
     profile: UserProfile.extend({
       name: z
         .string()
-        .refine((val) => !emojiRegex().test(val), {
-          message: 'name must not contain emojis',
-        }),
+        .optional()
+        .refine(
+          (val) => {
+            if (!val) return true;
+            else return !emojiRegex().test(val);
+          },
+          {
+            message: 'name must not contain emojis',
+          },
+        ),
     }),
   }),
   output: User,
