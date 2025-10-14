@@ -53,6 +53,12 @@ export const cronItems: Array<CustomCronItem | undefined> = [
         match: '0 * * * *', // every hour
       })
     : undefined,
+  config.MAGNA
+    ? buildCustomCronItem({
+        task: GraphileTaskNames.MagnaTxnSync,
+        match: '30 * * * *', // every hour at 30 minutes past (30 min after MagnaSync)
+      })
+    : undefined,
   buildCustomCronItem({
     task: GraphileTaskNames.RefreshMaterializedViews,
     match: '*/30 * * * *', // every 30 minutes
