@@ -12,14 +12,15 @@ import {
 } from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
 import React, { useCallback, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { GridComponents, VirtuosoGrid } from 'react-virtuoso';
 import { smartTrim } from 'shared/utils';
 import { LoadingIndicator } from '../../../components/LoadingIndicator/LoadingIndicator';
 import ProposalCard from './ProposalCard/ProposalCard';
 import { ProposalGridContainer } from './ProposalGridContainer/ProposalGridContainer';
 import { ProposalGridItem } from './ProposalGridItem.tsx/ProposalGridItem';
-import ProposalListingEmptyState from './ProposalListingEmptyState';
 import './ProposalListing.scss';
+import ProposalListingEmptyState from './ProposalListingEmptyState';
 
 type OptionType = {
   value: string;
@@ -29,6 +30,10 @@ type OptionType = {
 export interface UnifiedProposal {
   title: string;
   status: string;
+  id?: string;
+  proposalId?: string;
+  type?: 'cosmos' | 'snapshot';
+  snapshotId?: string;
 }
 
 const filterOptions: OptionType[] = [
@@ -98,12 +103,19 @@ const ProposalListing = ({
       return cosmosProposals.map((proposal) => ({
         title: proposal.title,
         status: proposal.data.state.status,
+        id: proposal.identifier,
+        proposalId: proposal.identifier,
+        type: 'cosmos' as const,
       }));
     } else if (chain === ChainBase.Ethereum) {
       if (snapshotProposals) {
         return snapshotProposals.map((proposal) => ({
           title: proposal.title,
           status: proposal.state,
+          id: proposal.id,
+          proposalId: proposal.id,
+          type: 'snapshot' as const,
+          snapshotId: snapshot.value,
         }));
       }
       return [];
@@ -139,6 +151,16 @@ const ProposalListing = ({
     return unifiedProposals;
   }, [unifiedProposals, filter]);
 
+  const getProposalUrl = useCallback(
+    (proposal: UnifiedProposal) => {
+      if (proposal.type === 'snapshot' && proposal.snapshotId) {
+        return `/${communityId}/proposal-details/${proposal.id}?snapshotId=${proposal.snapshotId}&type=snapshot`;
+      }
+      return `/proposal/${proposal.id || proposal.proposalId}`;
+    },
+    [communityId],
+  );
+
   const rowData = useMemo(() => {
     if (!filteredProposals.length) return [];
 
@@ -147,9 +169,14 @@ const ProposalListing = ({
       proposal: (
         <div style={{ whiteSpace: 'nowrap' }}>
           <CWTag label={proposal.status} type="proposal" />
-          <CWText fontWeight="semiBold">
-            {smartTrim(proposal.title, 30)}
-          </CWText>
+          <Link
+            to={getProposalUrl(proposal)}
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <CWText fontWeight="semiBold">
+              {smartTrim(proposal.title, 30)}
+            </CWText>
+          </Link>
         </div>
       ),
       votes: (
@@ -197,7 +224,13 @@ const ProposalListing = ({
   }, []);
 
   const TableComponent = useMemo(() => {
-    return <CWTable key={`table-${snapshot.value}-${filter.value}`} columnInfo={columnInfo} rowData={rowData} />;
+    return (
+      <CWTable
+        key={`table-${snapshot.value}-${filter.value}`}
+        columnInfo={columnInfo}
+        rowData={rowData}
+      />
+    );
   }, [rowData, snapshot.value, filter.value]);
 
   if (chain === ChainBase.Ethereum && isSnapshotProposalsLoading) {
@@ -260,7 +293,12 @@ const ProposalListing = ({
               } as GridComponents
             }
             itemContent={(_, item: UnifiedProposal) => (
-              <ProposalCard status={item.status} title={item.title} />
+              <Link
+                to={getProposalUrl(item)}
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <ProposalCard status={item.status} title={item.title} />
+              </Link>
             )}
           />
         )}
