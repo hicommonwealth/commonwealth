@@ -38,6 +38,9 @@ export const CreateCommunity = {
       })
       .refine((val) => !emojiRegex().test(val), {
         message: 'name must not contain emojis',
+      })
+      .refine((val) => !/common/i.test(val), {
+        message: 'Name must not contain the word "Common"',
       }),
     chain_node_id: PG_INT,
     description: z.string().optional(),

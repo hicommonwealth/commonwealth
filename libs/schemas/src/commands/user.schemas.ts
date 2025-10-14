@@ -83,6 +83,15 @@ export const UpdateUser = {
           {
             message: 'name must not contain emojis',
           },
+        )
+        .refine(
+          (val) => {
+            if (!val) return true;
+            else return !/common/i.test(val);
+          },
+          {
+            message: 'Username must not contain the word "Common"',
+          },
         ),
     }),
   }),
