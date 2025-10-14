@@ -1,8 +1,14 @@
 import { ValidChains } from '@hicommonwealth/evm-protocols';
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import emojiRegex from 'emoji-regex';
 import { z } from 'zod';
 import { AuthContext, VerifiedContext } from '../context';
-import { Address, EmailNotificationInterval, User } from '../entities';
+import {
+  Address,
+  EmailNotificationInterval,
+  User,
+  UserProfile,
+} from '../entities';
 
 export const SignIn = {
   input: z.object({
@@ -65,6 +71,13 @@ export const UpdateUser = {
     id: z.number(),
     promotional_emails_enabled: z.boolean().nullish(),
     tag_ids: z.number().array().nullish(),
+    profile: UserProfile.extend({
+      name: z
+        .string()
+        .refine((val) => !emojiRegex().test(val), {
+          message: 'name must not contain emojis',
+        }),
+    }),
   }),
   output: User,
   context: VerifiedContext,
