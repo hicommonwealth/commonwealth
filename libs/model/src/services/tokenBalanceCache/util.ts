@@ -46,7 +46,8 @@ async function fetchWithRetry(
       if (!isNaN(retryAfterValue)) {
         waitTime = retryAfterValue * 1000; // Convert to milliseconds
         log.info(
-          `Rate limited (429). Waiting ${retryAfterValue}s as specified by Retry-After header. Retry ${retryCount + 1}/${maxRetries}`,
+          `Rate limited (429). Waiting ${retryAfterValue}s as specified by` +
+            ` Retry-After header. Retry ${retryCount + 1}/${maxRetries}`,
         );
       } else {
         // If it's a date, calculate the difference
@@ -54,14 +55,16 @@ async function fetchWithRetry(
         const now = new Date();
         waitTime = Math.max(0, retryDate.getTime() - now.getTime());
         log.info(
-          `Rate limited (429). Waiting ${waitTime / 1000}s as specified by Retry-After header. Retry ${retryCount + 1}/${maxRetries}`,
+          `Rate limited (429). Waiting ${waitTime / 1000}s as specified by` +
+            ` Retry-After header. Retry ${retryCount + 1}/${maxRetries}`,
         );
       }
     } else {
       // Exponential backoff: 1s, 2s, 4s, 8s, 16s
       waitTime = Math.pow(2, retryCount) * 1000;
       log.info(
-        `Rate limited (429). Using exponential backoff: ${waitTime / 1000}s. Retry ${retryCount + 1}/${maxRetries}`,
+        `Rate limited (429). Using exponential backoff: ${waitTime / 1000}s.` +
+          ` Retry ${retryCount + 1}/${maxRetries}`,
       );
     }
 
