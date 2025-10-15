@@ -10,6 +10,24 @@ import { Balances, GetTendermintClientOptions } from './types';
 
 const log = logger(import.meta);
 
+interface JsonRpcRequest {
+  method: string;
+  params: Array<string | Record<string, string>>;
+  id: number;
+  jsonrpc: '2.0';
+}
+
+interface JsonRpcResponse {
+  jsonrpc: '2.0';
+  id: number;
+  result?: string;
+  error?: {
+    code: number;
+    message: string;
+    data?: unknown;
+  };
+}
+
 /**
  * Helper function to perform fetch with exponential backoff for 429 responses
  */
@@ -103,7 +121,7 @@ export async function evmOffChainRpcBatching(
   // maps an RPC request id to an address
   const idAddressMap: Balances = {};
   let failedAddresses: string[] = [];
-  const jsonPromises: Promise<any>[] = [];
+  const jsonPromises: Promise<JsonRpcResponse[]>[] = [];
 
   const chainNodeErrorMsg =
     `${failingChainNodeError} RPC batch request failed for method '${rpc.method}' ` +
@@ -113,7 +131,7 @@ export async function evmOffChainRpcBatching(
 
   // First, prepare all batch request payloads
   const batchPayloads: Array<{
-    rpcRequests: any[];
+    rpcRequests: JsonRpcRequest[];
     startIndex: number;
   }> = [];
   let id = 1;
@@ -125,13 +143,13 @@ export async function evmOffChainRpcBatching(
   ) {
     const endIndex = Math.min(startIndex + rpc.batchSize, addresses.length);
     const batchAddresses = addresses.slice(startIndex, endIndex);
-    const rpcRequests = [];
+    const rpcRequests: JsonRpcRequest[] = [];
     for (const address of batchAddresses) {
       rpcRequests.push({
         method: rpc.method,
         params: [rpc.getParams(address, source.contractAddress), 'latest'],
         id,
-        jsonrpc: '2.0',
+        jsonrpc: '2.0' as const,
       });
       idAddressMap[id] = address;
       ++id;
@@ -188,7 +206,16 @@ export async function evmOffChainRpcBatching(
       const msg = `RPC request failed on EVM chain id ${source.evmChainId}${
         source.contractAddress ? ` for token ${source.contractAddress}` : ''
       }.`;
-      log.error(msg, data.error);
+      log.error(msg, undefined, { rpcError: data.error });
+      continue;
+    }
+
+    if (!data.result) {
+      failedAddresses.push(idAddressMap[data.id]);
+      const msg = `RPC request returned no result on EVM chain id ${source.evmChainId}${
+        source.contractAddress ? ` for token ${source.contractAddress}` : ''
+      }.`;
+      log.error(msg);
       continue;
     }
 
