@@ -39,7 +39,7 @@ interface ClaimCardProps {
   allocationUnlocksAt?: string; // ISO timestamp if present
   allocationClaimedAt?: string; // ISO timestamp if present
   allocatedToAddress?: string;
-  shouldShowLockedCliffStateWhenClaimNotAvailable?: boolean;
+  mode: 'initial' | 'final';
   onConnectNewAddress?: () => void;
 }
 
@@ -59,7 +59,7 @@ const ClaimCard = ({
   allocationId,
   allocationUnlocksAt,
   allocationClaimedAt,
-  shouldShowLockedCliffStateWhenClaimNotAvailable,
+  mode,
   allocatedToAddress,
 }: ClaimCardProps) => {
   const user = useUserStore();
@@ -73,12 +73,10 @@ const ClaimCard = ({
     useState<string>('00:00:00');
   const [unlockCountdown, setUnlockCountdown] = useState<string>('00:00:00');
   const [syncCountdown, setSyncCountdown] = useState<string>('00:00:00');
-  const {
-    claim: claimToken,
-    claimTxData,
-    isPending: isClaiming,
-    initialClaimTxHash,
-  } = useClaimTokenFlow();
+  const claimTokenFlow = useClaimTokenFlow();
+  const claimTxData = claimTokenFlow.claimTxData;
+  const claimState =
+    mode === 'initial' ? claimTokenFlow.initial : claimTokenFlow.final;
   const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
@@ -100,8 +98,8 @@ const ClaimCard = ({
         evmAddresses.find((a) => a.address === claimedToAddress),
       );
     }
-    setTxHash((claimedTXHash as `0x${string}`) ?? initialClaimTxHash);
-  }, [claimedToAddress, claimedTXHash, evmAddresses, initialClaimTxHash]);
+    setTxHash((claimedTXHash as `0x${string}`) ?? claimState.txHash);
+  }, [claimedToAddress, claimedTXHash, evmAddresses, claimState.txHash]);
 
   // Countdown timer effect - updates every second
   useEffect(() => {
@@ -388,13 +386,15 @@ const ClaimCard = ({
                     )}`}
                     onClick={() => {
                       if (allocationId) {
-                        claimToken({
+                        claimState.claim({
                           allocation_id: allocationId,
                         });
                       }
                     }}
                     disabled={
-                      isClaiming || !allocatedToAddress || isPendingClaimFunds
+                      claimState.isPending ||
+                      !allocatedToAddress ||
+                      isPendingClaimFunds
                     }
                     className="hero-colored-button"
                     aria-label={`Claim to ${formatAddressShort(
@@ -524,8 +524,8 @@ const ClaimCard = ({
       );
     }
 
-    if (shouldShowLockedCliffStateWhenClaimNotAvailable) {
-      // This instance should be displayed without a countdown timer
+    if (mode === 'final') {
+      // This instance should be displayed without a countdown timer for cliff state
       return (
         <div className="notice-text">
           <div className="countdown-container countdown-in-progress">

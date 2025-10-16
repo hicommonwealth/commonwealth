@@ -33,15 +33,13 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const claimsEnabled = useFlag('claims');
-  const { initialClaimTxHash } = useClaimTokenFlow();
+  const { initial, final } = useClaimTokenFlow();
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
     useGetClaimAddressQuery({ enabled: user.isLoggedIn });
   const { data: allocation } = useGetAllocationQuery({
     magna_allocation_id: claimAddress?.magna_allocation_id,
     enabled:
-      !!claimAddress?.magna_allocation_id &&
-      !initialClaimTxHash &&
-      user.isLoggedIn,
+      !!claimAddress?.magna_allocation_id && !initial.txHash && user.isLoggedIn,
   });
   console.log('allocation => ', { allocation, claimAddress });
 
@@ -116,7 +114,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     initial: (() => {
       const initialTxHash =
         (claimAddress?.magna_claim_tx_hash as `0x${string}`) ||
-        initialClaimTxHash ||
+        initial.txHash ||
         null;
       const hasClaimed = !!(claimAddress?.magna_claimed_at && initialTxHash);
       const isReadyForClaimNow = !!(
@@ -139,10 +137,9 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       };
     })(),
     final: (() => {
-      const finalClaimTxHash = ''; // TODO: get this from somewhere
       const finalTxHash =
         (claimAddress?.magna_cliff_claim_tx_hash as `0x${string}`) ||
-        finalClaimTxHash ||
+        final.txHash ||
         null;
       const hasClaimed = !!(
         claimAddress?.magna_cliff_claimed_at && finalTxHash
@@ -247,6 +244,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 claimableTokens={initialClaimableTokens}
                 claimablePercentage={initialClaimablePercentage}
                 tokenSymbol={claimAddress?.token || ''}
+                mode="initial"
               />
               <ClaimCard
                 cardNumber={2}
@@ -269,7 +267,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 claimableTokens={finalClaimableTokens}
                 claimablePercentage={finalClaimablePercentage}
                 tokenSymbol={claimAddress?.token || ''}
-                shouldShowLockedCliffStateWhenClaimNotAvailable={true}
+                mode="final"
               />
             </div>
           </div>
