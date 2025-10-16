@@ -113,6 +113,10 @@ const WalletPage = () => {
           Wallet
         </CWText>
 
+        <CommonAirdropCard
+          onConnectNewAddress={() => setIsAuthModalOpen(true)}
+        />
+
         {/* visible only on mobile */}
         <div className="wallet-button-tabs">
           {Object.values(MobileTabType).map((type) => {
@@ -128,10 +132,6 @@ const WalletPage = () => {
             );
           })}
         </div>
-
-        <CommonAirdropCard
-          onConnectNewAddress={() => setIsAuthModalOpen(true)}
-        />
 
         {/* on mobile show only one card */}
         <div className="wallet-card-container">
