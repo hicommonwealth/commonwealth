@@ -42,6 +42,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       !transactionHash &&
       user.isLoggedIn,
   });
+  console.log('allocation => ', allocation);
 
   const txHash =
     (claimAddress?.magna_claim_tx_hash as `0x${string}`) ||
@@ -128,9 +129,13 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     (allocation?.claimable ?? 0) > 0 &&
     allocation?.unlock_start_at
   );
-  const claimableTokens = formatTokenBalance(
-    allocation?.claimable || allocation?.amount || claimAddress?.tokens || 0,
-  );
+  const tokensCount =
+    allocation?.claimable || allocation?.amount || claimAddress?.tokens || 0;
+  const claimableTokens = formatTokenBalance(tokensCount);
+  const initialClaimablePercentage =
+    (allocation?.initial_percentage || 0) * 100;
+  const initialClaimableTokens =
+    tokensCount * (allocation?.initial_percentage || 0);
 
   return canClaim ? (
     <div
@@ -187,6 +192,9 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
               allocationClaimedAt={claimAddress?.magna_claimed_at || undefined}
               allocatedToAddress={claimAddress?.address || ''}
               allocationId={claimAddress?.magna_allocation_id || undefined}
+              claimableTokens={initialClaimableTokens}
+              claimablePercentage={initialClaimablePercentage}
+              tokenSymbol={claimAddress?.token || ''}
             />
           </div>
         }

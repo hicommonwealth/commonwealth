@@ -30,6 +30,9 @@ interface ClaimCardProps {
   isPendingClaimFunds: boolean;
   isReadyForClaimNow: boolean;
   isReadyForClaimAfterUnlock: boolean;
+  claimableTokens: string | number;
+  claimablePercentage: number;
+  tokenSymbol: string;
   claimedTXHash?: string;
   claimedToAddress?: string;
   allocationId?: string;
@@ -47,6 +50,9 @@ const ClaimCard = ({
   isPendingClaimFunds,
   isReadyForClaimNow,
   isReadyForClaimAfterUnlock,
+  claimableTokens,
+  claimablePercentage,
+  tokenSymbol,
   claimedTXHash,
   claimedToAddress,
   allocationId,
@@ -656,7 +662,14 @@ const ClaimCard = ({
     <div className="notice-section-container">
       <div className="notice-section-count-container">
         <div className="notice-section-count-number">#{cardNumber}</div>
-        <div className="notice-section">{getCardBody()}</div>
+        <div className="notice-section-content">
+          <div className="banner">
+            <CWText type="buttonSm" fontWeight="semiBold" isCentered>
+              {claimablePercentage}% claim // {claimableTokens} {tokenSymbol}
+            </CWText>
+          </div>
+          <div className="notice-section">{getCardBody()}</div>
+        </div>
       </div>
     </div>
   );
