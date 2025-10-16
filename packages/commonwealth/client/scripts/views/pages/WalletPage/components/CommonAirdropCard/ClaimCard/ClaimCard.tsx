@@ -82,6 +82,7 @@ const ClaimCard = ({
   const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
+  const ethClaimAmount = 0.0003; // TODO: this should be corrected and based on the actual amount
 
   useEffect(() => {
     const addresses = new Map<string, AddressInfo>();
@@ -425,7 +426,7 @@ const ClaimCard = ({
                             </li>
                             <li>
                               <CWText>
-                                Send 0.0003 ETH to&nbsp;
+                                Send {ethClaimAmount} ETH to&nbsp;
                                 <span
                                   className="copyable-address"
                                   onClick={() => {
