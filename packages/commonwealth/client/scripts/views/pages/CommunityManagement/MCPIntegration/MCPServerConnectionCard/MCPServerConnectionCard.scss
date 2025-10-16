@@ -26,7 +26,13 @@
     color: colors.$neutral-600;
   }
 
-  .cw-button {
-    align-self: flex-start;
+  .button-container {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+
+    .cw-button {
+      align-self: flex-start;
+    }
   }
 }
