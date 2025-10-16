@@ -215,7 +215,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                       fontWeight="bold"
                       className="balance-amount"
                     >
-                      {claimableTokens} {claimAddress?.token} Tokens
+                      {`${claimableTokens} ${claimAddress?.token} ${tokensCount <= 1 ? 'Token' : 'Tokens'}`}
                     </CWText>
                   </div>
                 </div>
