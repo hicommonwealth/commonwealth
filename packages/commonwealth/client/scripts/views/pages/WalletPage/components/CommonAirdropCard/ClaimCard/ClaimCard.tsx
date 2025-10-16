@@ -39,6 +39,7 @@ interface ClaimCardProps {
   allocationUnlocksAt?: string; // ISO timestamp if present
   allocationClaimedAt?: string; // ISO timestamp if present
   allocatedToAddress?: string;
+  shouldShowLockedCliffStateWhenClaimNotAvailable?: boolean;
   onConnectNewAddress?: () => void;
 }
 
@@ -58,6 +59,7 @@ const ClaimCard = ({
   allocationId,
   allocationUnlocksAt,
   allocationClaimedAt,
+  shouldShowLockedCliffStateWhenClaimNotAvailable,
   allocatedToAddress,
 }: ClaimCardProps) => {
   const user = useUserStore();
@@ -516,6 +518,29 @@ const ClaimCard = ({
               </a>
               &nbsp;
             </CWText>
+          </div>
+        </div>
+      );
+    }
+
+    if (shouldShowLockedCliffStateWhenClaimNotAvailable) {
+      // This instance should be displayed without a countdown timer
+      return (
+        <div className="notice-text">
+          <div className="countdown-container countdown-in-progress">
+            <div className="countdown-left">
+              <CWText
+                type="h5"
+                fontWeight="semiBold"
+                className="countdown-title"
+              >
+                Tokens Locked
+              </CWText>
+              <CWText className="countdown-description">
+                Your tokens will be available for claiming once the initial
+                claim transaction is confirmed.
+              </CWText>
+            </div>
           </div>
         </div>
       );

@@ -269,6 +269,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 claimableTokens={finalClaimableTokens}
                 claimablePercentage={finalClaimablePercentage}
                 tokenSymbol={claimAddress?.token || ''}
+                shouldShowLockedCliffStateWhenClaimNotAvailable={true}
               />
             </div>
           </div>
