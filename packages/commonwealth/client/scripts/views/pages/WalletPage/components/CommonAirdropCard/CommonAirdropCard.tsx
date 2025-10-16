@@ -108,14 +108,17 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   }
 
   const canClaim = !!claimAddress;
-  const isClaimAvailable = !!claimAddress?.magna_synced_at;
-  const isPendingClaimFunds = !!(allocation?.status === 'PENDING_FUNDING');
+  const isPendingClaimFunds = !!(
+    allocation?.status === 'PENDING_FUNDING' ||
+    allocation?.status === 'NOT_STARTED'
+  );
   const claimSteps = {
     initial: (() => {
       const initialTxHash =
         (claimAddress?.magna_claim_tx_hash as `0x${string}`) ||
         initial.txHash ||
         null;
+      const isClaimAvailable = !!claimAddress?.magna_synced_at;
       const hasClaimed = !!(claimAddress?.magna_claimed_at && initialTxHash);
       const isReadyForClaimNow = !!(
         isClaimAvailable &&
@@ -132,6 +135,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       return {
         txHash: initialTxHash,
         hasClaimed,
+        isClaimAvailable,
         isReadyForClaimNow,
         isReadyForClaimAfterUnlock,
       };
@@ -147,6 +151,8 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       const hasCliffDatePassed =
         allocation?.cliff_date &&
         moment(allocation?.cliff_date).isBefore(moment());
+      const isClaimAvailable =
+        !!claimAddress?.magna_synced_at && !isPendingClaimFunds;
       const isReadyForClaimNow = !!(
         isClaimAvailable &&
         allocation?.magna_allocation_id &&
@@ -164,13 +170,17 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       return {
         txHash: finalTxHash,
         hasClaimed,
+        isClaimAvailable,
         isReadyForClaimNow,
         isReadyForClaimAfterUnlock,
       };
     })(),
   };
 
-  const tokensCount = allocation?.amount || 0;
+  const tokensCount = Math.max(
+    allocation?.amount || claimAddress?.tokens || 0,
+    0,
+  );
   const claimableTokens = formatTokenBalance(tokensCount);
   // NOTE: fallback to 0.25, as its done in API, update if changed in api
   const initialClaimPercentage = allocation?.initial_percentage || 0.25;
@@ -182,8 +192,10 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   return canClaim ? (
     <div
       className={clsx('CommonAirdropCard', {
-        'in-progress': isClaimAvailable,
-        'needs-action': !isClaimAvailable && !claimSteps.initial.hasClaimed,
+        'in-progress': claimSteps.initial.isClaimAvailable,
+        'needs-action':
+          !claimSteps.initial.isClaimAvailable &&
+          !claimSteps.initial.hasClaimed,
         completed: claimSteps.initial.hasClaimed && claimSteps.final.hasClaimed,
       })}
     >
@@ -224,7 +236,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
               <ClaimCard
                 cardNumber={1}
                 hasClaimed={claimSteps.initial.hasClaimed}
-                isClaimAvailable={isClaimAvailable}
+                isClaimAvailable={claimSteps.initial.isClaimAvailable}
                 isPendingClaimFunds={isPendingClaimFunds}
                 isReadyForClaimNow={claimSteps.initial.isReadyForClaimNow}
                 isReadyForClaimAfterUnlock={
@@ -248,7 +260,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
               <ClaimCard
                 cardNumber={2}
                 hasClaimed={claimSteps.final.hasClaimed}
-                isClaimAvailable={isClaimAvailable}
+                isClaimAvailable={claimSteps.final.isClaimAvailable}
                 isPendingClaimFunds={isPendingClaimFunds}
                 isReadyForClaimNow={claimSteps.final.isReadyForClaimNow}
                 isReadyForClaimAfterUnlock={
