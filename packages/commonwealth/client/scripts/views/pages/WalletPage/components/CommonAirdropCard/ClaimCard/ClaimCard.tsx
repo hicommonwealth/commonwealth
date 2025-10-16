@@ -39,6 +39,7 @@ interface ClaimCardProps {
   allocationUnlocksAt?: string; // ISO timestamp if present
   allocationClaimedAt?: string; // ISO timestamp if present
   allocatedToAddress?: string;
+  hasClaimableAmount?: boolean;
   mode: 'initial' | 'final';
   onConnectNewAddress?: () => void;
 }
@@ -60,6 +61,7 @@ const ClaimCard = ({
   allocationUnlocksAt,
   allocationClaimedAt,
   mode,
+  hasClaimableAmount,
   allocatedToAddress,
 }: ClaimCardProps) => {
   const user = useUserStore();
@@ -318,35 +320,52 @@ const ClaimCard = ({
       );
     }
 
+    // This instance should be displayed without a countdown timer for cliff state
+    const finalTokensLocked = (
+      <div className="notice-text">
+        <div className="countdown-container countdown-in-progress">
+          <div className="countdown-left">
+            <CWText type="h5" fontWeight="semiBold" className="countdown-title">
+              Tokens Locked
+            </CWText>
+            <CWText className="countdown-description">
+              Your tokens will be available for claiming once the initial claim
+              transaction is confirmed.
+            </CWText>
+          </div>
+        </div>
+      </div>
+    );
+
     if (isClaimAvailable) {
+      const pendingMagnaProcessing = (
+        <div className="countdown-container countdown-in-progress">
+          <div className="countdown-left">
+            <CWText type="h5" fontWeight="semiBold" className="countdown-title">
+              Claim Request Received
+            </CWText>
+            <CWText className="countdown-description">
+              Your claim request has been received. Claims are processed in
+              batches, and your request is expected to be included in the next
+              batch.
+            </CWText>
+          </div>
+          <div className="countdown-timer">
+            <CWText type="h4" fontWeight="medium" className="timer-label">
+              Claim In
+            </CWText>
+            <CWText type="h1" fontWeight="bold" className="timer-display">
+              {pendingSignatureCountdown}
+            </CWText>
+          </div>
+        </div>
+      );
+
       if (isReadyForClaimNow) {
         return (
           <div className="notice-text">
             {isPendingClaimFunds ? (
-              <div className="countdown-container countdown-in-progress">
-                <div className="countdown-left">
-                  <CWText
-                    type="h5"
-                    fontWeight="semiBold"
-                    className="countdown-title"
-                  >
-                    Claim Request Received
-                  </CWText>
-                  <CWText className="countdown-description">
-                    Your claim request has been received. Claims are processed
-                    in batches, and your request is expected to be included in
-                    the next batch.
-                  </CWText>
-                </div>
-                <div className="countdown-timer">
-                  <CWText type="h4" fontWeight="medium" className="timer-label">
-                    Claim In
-                  </CWText>
-                  <CWText type="h1" fontWeight="bold" className="timer-display">
-                    {pendingSignatureCountdown}
-                  </CWText>
-                </div>
-              </div>
+              pendingMagnaProcessing
             ) : (
               <>
                 <div className="claim-action-container">
@@ -496,6 +515,14 @@ const ClaimCard = ({
         );
       }
 
+      if (!hasClaimableAmount) {
+        if (mode === 'final') {
+          return finalTokensLocked;
+        } else {
+          return pendingMagnaProcessing;
+        }
+      }
+
       // claim is available but we landed on an error case
       return (
         <div className="notice-text">
@@ -525,26 +552,7 @@ const ClaimCard = ({
     }
 
     if (mode === 'final') {
-      // This instance should be displayed without a countdown timer for cliff state
-      return (
-        <div className="notice-text">
-          <div className="countdown-container countdown-in-progress">
-            <div className="countdown-left">
-              <CWText
-                type="h5"
-                fontWeight="semiBold"
-                className="countdown-title"
-              >
-                Tokens Locked
-              </CWText>
-              <CWText className="countdown-description">
-                Your tokens will be available for claiming once the initial
-                claim transaction is confirmed.
-              </CWText>
-            </div>
-          </div>
-        </div>
-      );
+      return finalTokensLocked;
     }
 
     // Show ui to set address for claim

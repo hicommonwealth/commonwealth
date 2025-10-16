@@ -231,6 +231,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 isReadyForClaimAfterUnlock={
                   claimSteps.initial.isReadyForClaimAfterUnlock
                 }
+                hasClaimableAmount={(allocation?.claimable || 0) > 0}
                 onConnectNewAddress={onConnectNewAddress}
                 claimedTXHash={claimSteps.initial.txHash || undefined}
                 claimedToAddress={claimAddress?.address || undefined}
@@ -254,6 +255,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 isReadyForClaimAfterUnlock={
                   claimSteps.final.isReadyForClaimAfterUnlock
                 }
+                hasClaimableAmount={(allocation?.claimable || 0) > 0}
                 onConnectNewAddress={onConnectNewAddress}
                 claimedTXHash={claimSteps.final.txHash || undefined}
                 claimedToAddress={claimAddress?.address || undefined}
