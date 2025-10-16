@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
+import moment from 'moment';
 import React, { useState } from 'react';
 import {
   useClaimTokenFlow,
@@ -32,22 +33,17 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const claimsEnabled = useFlag('claims');
-  const { transactionHash } = useClaimTokenFlow();
+  const { initialClaimTxHash } = useClaimTokenFlow();
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
     useGetClaimAddressQuery({ enabled: user.isLoggedIn });
   const { data: allocation } = useGetAllocationQuery({
     magna_allocation_id: claimAddress?.magna_allocation_id,
     enabled:
       !!claimAddress?.magna_allocation_id &&
-      !transactionHash &&
+      !initialClaimTxHash &&
       user.isLoggedIn,
   });
-  console.log('allocation => ', allocation);
-
-  const txHash =
-    (claimAddress?.magna_claim_tx_hash as `0x${string}`) ||
-    transactionHash ||
-    null;
+  console.log('allocation => ', { allocation, claimAddress });
 
   if (!claimsEnabled) {
     return <></>;
@@ -114,21 +110,69 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   }
 
   const canClaim = !!claimAddress;
-  const hasClaimed = !!(claimAddress?.magna_claimed_at && txHash);
   const isClaimAvailable = !!claimAddress?.magna_synced_at;
   const isPendingClaimFunds = !!(allocation?.status === 'PENDING_FUNDING');
-  const isReadyForClaimNow = !!(
-    isClaimAvailable &&
-    allocation?.magna_allocation_id &&
-    allocation?.walletAddress &&
-    (allocation?.claimable ?? 0) > 0
-  );
-  const isReadyForClaimAfterUnlock = !!(
-    isClaimAvailable &&
-    !isReadyForClaimNow &&
-    (allocation?.claimable ?? 0) > 0 &&
-    allocation?.unlock_start_at
-  );
+  const claimSteps = {
+    initial: (() => {
+      const initialTxHash =
+        (claimAddress?.magna_claim_tx_hash as `0x${string}`) ||
+        initialClaimTxHash ||
+        null;
+      const hasClaimed = !!(claimAddress?.magna_claimed_at && initialTxHash);
+      const isReadyForClaimNow = !!(
+        isClaimAvailable &&
+        allocation?.magna_allocation_id &&
+        allocation?.walletAddress &&
+        (allocation?.claimable ?? 0) > 0
+      );
+      const isReadyForClaimAfterUnlock = !!(
+        isClaimAvailable &&
+        !isReadyForClaimNow &&
+        (allocation?.claimable ?? 0) > 0 &&
+        allocation?.unlock_start_at
+      );
+      return {
+        txHash: initialTxHash,
+        hasClaimed,
+        isReadyForClaimNow,
+        isReadyForClaimAfterUnlock,
+      };
+    })(),
+    final: (() => {
+      const finalClaimTxHash = ''; // TODO: get this from somewhere
+      const finalTxHash =
+        (claimAddress?.magna_cliff_claim_tx_hash as `0x${string}`) ||
+        finalClaimTxHash ||
+        null;
+      const hasClaimed = !!(
+        claimAddress?.magna_cliff_claimed_at && finalTxHash
+      );
+      const hasCliffDatePassed =
+        allocation?.cliff_date &&
+        moment(allocation?.cliff_date).isBefore(moment());
+      const isReadyForClaimNow = !!(
+        isClaimAvailable &&
+        allocation?.magna_allocation_id &&
+        allocation?.walletAddress &&
+        (allocation?.claimable ?? 0) > 0 &&
+        hasCliffDatePassed
+      );
+      const isReadyForClaimAfterUnlock = !!(
+        isClaimAvailable &&
+        !isReadyForClaimNow &&
+        (allocation?.claimable ?? 0) > 0 &&
+        allocation?.unlock_start_at &&
+        !hasCliffDatePassed
+      );
+      return {
+        txHash: finalTxHash,
+        hasClaimed,
+        isReadyForClaimNow,
+        isReadyForClaimAfterUnlock,
+      };
+    })(),
+  };
+
   const tokensCount =
     allocation?.claimable || allocation?.amount || claimAddress?.tokens || 0;
   const claimableTokens = formatTokenBalance(tokensCount);
@@ -136,13 +180,16 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     (allocation?.initial_percentage || 0) * 100;
   const initialClaimableTokens =
     tokensCount * (allocation?.initial_percentage || 0);
+  const finalClaimablePercentage =
+    (1 - (allocation?.initial_percentage || 0)) * 100;
+  const finalClaimableTokens = tokensCount - initialClaimableTokens;
 
   return canClaim ? (
     <div
       className={clsx('CommonAirdropCard', {
         'in-progress': isClaimAvailable,
-        'needs-action': !isClaimAvailable && !hasClaimed,
-        completed: hasClaimed,
+        'needs-action': !isClaimAvailable && !claimSteps.initial.hasClaimed,
+        completed: claimSteps.initial.hasClaimed && claimSteps.final.hasClaimed,
       })}
     >
       <CWBanner
@@ -178,24 +225,52 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 </div>
               </div>
             </div>
-            <ClaimCard
-              cardNumber={1}
-              hasClaimed={hasClaimed}
-              isClaimAvailable={isClaimAvailable}
-              isPendingClaimFunds={isPendingClaimFunds}
-              isReadyForClaimNow={isReadyForClaimNow}
-              isReadyForClaimAfterUnlock={isReadyForClaimAfterUnlock}
-              onConnectNewAddress={onConnectNewAddress}
-              claimedTXHash={claimAddress?.magna_claim_tx_hash || undefined}
-              claimedToAddress={claimAddress?.address || undefined}
-              allocationUnlocksAt={allocation?.unlock_start_at || undefined}
-              allocationClaimedAt={claimAddress?.magna_claimed_at || undefined}
-              allocatedToAddress={claimAddress?.address || ''}
-              allocationId={claimAddress?.magna_allocation_id || undefined}
-              claimableTokens={initialClaimableTokens}
-              claimablePercentage={initialClaimablePercentage}
-              tokenSymbol={claimAddress?.token || ''}
-            />
+            <div className="notice-section-container">
+              <ClaimCard
+                cardNumber={1}
+                hasClaimed={claimSteps.initial.hasClaimed}
+                isClaimAvailable={isClaimAvailable}
+                isPendingClaimFunds={isPendingClaimFunds}
+                isReadyForClaimNow={claimSteps.initial.isReadyForClaimNow}
+                isReadyForClaimAfterUnlock={
+                  claimSteps.initial.isReadyForClaimAfterUnlock
+                }
+                onConnectNewAddress={onConnectNewAddress}
+                claimedTXHash={claimSteps.initial.txHash || undefined}
+                claimedToAddress={claimAddress?.address || undefined}
+                allocationUnlocksAt={allocation?.unlock_start_at || undefined}
+                allocationClaimedAt={
+                  claimAddress?.magna_claimed_at || undefined
+                }
+                allocatedToAddress={claimAddress?.address || ''}
+                allocationId={claimAddress?.magna_allocation_id || undefined}
+                claimableTokens={initialClaimableTokens}
+                claimablePercentage={initialClaimablePercentage}
+                tokenSymbol={claimAddress?.token || ''}
+              />
+              <ClaimCard
+                cardNumber={2}
+                hasClaimed={claimSteps.final.hasClaimed}
+                isClaimAvailable={isClaimAvailable}
+                isPendingClaimFunds={isPendingClaimFunds}
+                isReadyForClaimNow={claimSteps.final.isReadyForClaimNow}
+                isReadyForClaimAfterUnlock={
+                  claimSteps.final.isReadyForClaimAfterUnlock
+                }
+                onConnectNewAddress={onConnectNewAddress}
+                claimedTXHash={claimSteps.final.txHash || undefined}
+                claimedToAddress={claimAddress?.address || undefined}
+                allocationUnlocksAt={allocation?.cliff_date || undefined}
+                allocationClaimedAt={
+                  claimAddress?.magna_cliff_claimed_at || undefined
+                }
+                allocatedToAddress={claimAddress?.address || ''}
+                allocationId={claimAddress?.magna_allocation_id || undefined}
+                claimableTokens={finalClaimableTokens}
+                claimablePercentage={finalClaimablePercentage}
+                tokenSymbol={claimAddress?.token || ''}
+              />
+            </div>
           </div>
         }
       />

@@ -75,7 +75,7 @@ const ClaimCard = ({
     claim: claimToken,
     claimTxData,
     isPending: isClaiming,
-    transactionHash,
+    initialClaimTxHash,
   } = useClaimTokenFlow();
   const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
   const { mutate: updateClaimAddress, isPending: isUpdating } =
@@ -97,8 +97,8 @@ const ClaimCard = ({
         evmAddresses.find((a) => a.address === claimedToAddress),
       );
     }
-    setTxHash((claimedTXHash as `0x${string}`) ?? transactionHash);
-  }, [claimedToAddress, claimedTXHash, evmAddresses, transactionHash]);
+    setTxHash((claimedTXHash as `0x${string}`) ?? initialClaimTxHash);
+  }, [claimedToAddress, claimedTXHash, evmAddresses, initialClaimTxHash]);
 
   // Countdown timer effect - updates every second
   useEffect(() => {
@@ -659,17 +659,15 @@ const ClaimCard = ({
   };
 
   return (
-    <div className="notice-section-container">
-      <div className="notice-section-count-container">
-        <div className="notice-section-count-number">#{cardNumber}</div>
-        <div className="notice-section-content">
-          <div className="banner">
-            <CWText type="buttonSm" fontWeight="semiBold" isCentered>
-              {claimablePercentage}% claim // {claimableTokens} {tokenSymbol}
-            </CWText>
-          </div>
-          <div className="notice-section">{getCardBody()}</div>
+    <div className="notice-section-count-container">
+      <div className="notice-section-count-number">#{cardNumber}</div>
+      <div className="notice-section-content">
+        <div className="banner">
+          <CWText type="buttonSm" fontWeight="semiBold" isCentered>
+            {claimablePercentage}% claim // {claimableTokens} {tokenSymbol}
+          </CWText>
         </div>
+        <div className="notice-section">{getCardBody()}</div>
       </div>
     </div>
   );

@@ -57,19 +57,15 @@
 
   &.in-progress {
     border-color: var(--color-in-progress);
-    background: linear-gradient(
-      to bottom,
-      rgba(31, 86, 153, 0.02) 0%,
-      colors.$white 100%
-    );
+    background: linear-gradient(to bottom,
+        rgba(31, 86, 153, 0.02) 0%,
+        colors.$white 100%);
 
     .hero-section {
-      background: linear-gradient(
-        135deg,
-        #1f5699 0%,
-        #2d6bb0 50%,
-        #1f5699 100%
-      ) !important;
+      background: linear-gradient(135deg,
+          #1f5699 0%,
+          #2d6bb0 50%,
+          #1f5699 100%) !important;
     }
 
     .notice-section {
@@ -86,60 +82,48 @@
     }
 
     .hero-colored-button {
-      background: linear-gradient(
-        135deg,
-        #1f5699 0%,
-        #2d6bb0 50%,
-        #1f5699 100%
-      ) !important;
+      background: linear-gradient(135deg,
+          #1f5699 0%,
+          #2d6bb0 50%,
+          #1f5699 100%) !important;
       color: colors.$white !important;
       border: none !important;
 
       &:hover:not(:disabled) {
-        background: linear-gradient(
-          135deg,
-          #184a7f 0%,
-          #26599a 50%,
-          #184a7f 100%
-        ) !important;
+        background: linear-gradient(135deg,
+            #184a7f 0%,
+            #26599a 50%,
+            #184a7f 100%) !important;
       }
     }
   }
 
   &.needs-action {
     border-color: var(--color-needs-action);
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 165, 0, 0.02) 0%,
-      colors.$white 100%
-    );
+    background: linear-gradient(to bottom,
+        rgba(255, 165, 0, 0.02) 0%,
+        colors.$white 100%);
 
     .hero-section {
-      background: linear-gradient(
-        135deg,
-        #99251f 0%,
-        #b03e2d 50%,
-        #99251f 100%
-      ) !important;
+      background: linear-gradient(135deg,
+          #99251f 0%,
+          #b03e2d 50%,
+          #99251f 100%) !important;
     }
 
     .hero-colored-button {
-      background: linear-gradient(
-        135deg,
-        #ffa500 0%,
-        #ffb733 50%,
-        #ffa500 100%
-      ) !important;
+      background: linear-gradient(135deg,
+          #ffa500 0%,
+          #ffb733 50%,
+          #ffa500 100%) !important;
       color: colors.$white !important;
       border: none !important;
 
       &:hover:not(:disabled) {
-        background: linear-gradient(
-          135deg,
-          #e69500 0%,
-          #e6a530 50%,
-          #e69500 100%
-        ) !important;
+        background: linear-gradient(135deg,
+            #e69500 0%,
+            #e6a530 50%,
+            #e69500 100%) !important;
       }
     }
 
@@ -155,38 +139,30 @@
 
   &.completed {
     border-color: var(--color-completed);
-    background: linear-gradient(
-      to bottom,
-      rgba(0, 128, 0, 0.02) 0%,
-      colors.$white 100%
-    );
+    background: linear-gradient(to bottom,
+        rgba(0, 128, 0, 0.02) 0%,
+        colors.$white 100%);
 
     .hero-section {
-      background: linear-gradient(
-        135deg,
-        #086b08 0%,
-        #00a000 50%,
-        #008000 100%
-      ) !important;
+      background: linear-gradient(135deg,
+          #086b08 0%,
+          #00a000 50%,
+          #008000 100%) !important;
     }
 
     .hero-colored-button {
-      background: linear-gradient(
-        135deg,
-        #086b08 0%,
-        #00a000 50%,
-        #008000 100%
-      ) !important;
+      background: linear-gradient(135deg,
+          #086b08 0%,
+          #00a000 50%,
+          #008000 100%) !important;
       color: colors.$white !important;
       border: none !important;
 
       &:hover:not(:disabled) {
-        background: linear-gradient(
-          135deg,
-          #065505 0%,
-          #008a00 50%,
-          #006a00 100%
-        ) !important;
+        background: linear-gradient(135deg,
+            #065505 0%,
+            #008a00 50%,
+            #006a00 100%) !important;
       }
     }
 
@@ -202,12 +178,10 @@
 
   &.needs-action {
     .hero-section {
-      background: linear-gradient(
-        135deg,
-        #ffa500 0%,
-        #ffb733 50%,
-        #ffa500 100%
-      );
+      background: linear-gradient(135deg,
+          #ffa500 0%,
+          #ffb733 50%,
+          #ffa500 100%);
     }
   }
 
@@ -236,7 +210,7 @@
       padding: 0 !important;
       background: transparent;
 
-      > div:first-child {
+      >div:first-child {
         text-align: center;
         width: 100%;
       }
@@ -252,12 +226,10 @@
     .hero-section {
       width: 100%;
       padding: 24px 32px;
-      background: linear-gradient(
-        135deg,
-        colors.$neutral-400 0%,
-        colors.$neutral-500 50%,
-        colors.$neutral-400 100%
-      );
+      background: linear-gradient(135deg,
+          colors.$neutral-400 0%,
+          colors.$neutral-500 50%,
+          colors.$neutral-400 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -272,12 +244,10 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.1) 0%,
-          rgba(255, 255, 255, 0) 50%,
-          rgba(0, 0, 0, 0.05) 100%
-        );
+        background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.1) 0%,
+            rgba(255, 255, 255, 0) 50%,
+            rgba(0, 0, 0, 0.05) 100%);
         pointer-events: none;
       }
 
@@ -351,6 +321,16 @@
           color: colors.$white;
         }
       }
+    }
+
+    // ClaimCard-specific styles only
+    .notice-section-container {
+      width: 100% !important;
+      padding: 18px;
+      background-color: rgb(246 242 242 / 19%);
+      display: flex;
+      flex-direction: column;
+      gap: 16px !important;
     }
   }
 

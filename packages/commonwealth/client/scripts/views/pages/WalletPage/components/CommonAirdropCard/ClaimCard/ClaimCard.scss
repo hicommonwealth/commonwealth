@@ -2,21 +2,12 @@
 @use '../../../../../../styles/mixins/colors.module';
 @use '../../../../../../styles/mixins/media_queries';
 
-// ClaimCard-specific styles only
-.notice-section-container {
-  width: 100% !important;
-  padding: 18px;
-  background-color: rgb(246 242 242 / 19%);
-  display: flex;
-  flex-direction: column;
-  gap: 16px !important;
-}
-
 .notice-section-count-container {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  width: 100% !important;
 }
 
 .notice-section-count-number {

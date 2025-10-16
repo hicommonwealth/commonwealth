@@ -12,9 +12,9 @@ import { fetchNodes } from '../nodes';
 
 export const useClaimTokenFlow = () => {
   const utils = trpc.useUtils();
-  const [transactionHash, setTransactionHash] = useState<`0x${string}` | null>(
-    null,
-  );
+  const [initialClaimTxHash, setInitialClaimTxHash] = useState<
+    `0x${string}` | null
+  >(null);
   const claimToken = trpc.tokenAllocation.claimToken.useMutation();
   const updateClaimTransactionHash =
     trpc.tokenAllocation.updateClaimTransactionHash.useMutation();
@@ -82,7 +82,7 @@ export const useClaimTokenFlow = () => {
           }));
       }
       // update the UI
-      txHash && setTransactionHash(txHash);
+      txHash && setInitialClaimTxHash(txHash);
       notifySuccess('Token claimed successfully');
     } catch (error) {
       notifyError(error.message ?? 'Something went wrong');
@@ -93,7 +93,7 @@ export const useClaimTokenFlow = () => {
   return {
     claim,
     claimTxData,
-    transactionHash,
+    initialClaimTxHash,
     isPending: claimToken.isPending || updateClaimTransactionHash.isPending,
   };
 };
