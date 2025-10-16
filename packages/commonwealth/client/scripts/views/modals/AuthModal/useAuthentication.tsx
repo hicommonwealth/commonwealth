@@ -606,7 +606,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   // Handle Logic for creating a new account, including validating signature
   const onCreateNewAccount = async (session?: Session, account?: Account) => {
     try {
-      if (session && account)
+      if (session && account) {
         await signIn(session, {
           address: account.address,
           community_id: account.community.id,
@@ -614,6 +614,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           block_info: account.validationBlockInfo,
           referrer_address: refcode,
         });
+      }
       // @ts-expect-error StrictNullChecks
       await verifySession(session);
       // @ts-expect-error <StrictNullChecks>
@@ -736,6 +737,16 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         chainIdentifier,
       );
 
+      // TODO: remove
+      console.log('signin data => ', {
+        address,
+        community_id: chainIdentifier,
+        wallet_id: wallet.name,
+        block_info: validationBlockInfo
+          ? JSON.stringify(validationBlockInfo)
+          : null,
+        referrer_address: refcode,
+      });
       const {
         account: signingAccount,
         newlyCreated,
