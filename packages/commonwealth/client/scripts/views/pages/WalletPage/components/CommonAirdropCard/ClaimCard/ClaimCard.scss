@@ -26,6 +26,8 @@
   width: 100%;
   background: #ebe9e9;
   border-radius: 8px;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
 }
 
 .notice-section {
@@ -138,7 +140,7 @@
     }
 
     .timer-display {
-      font-size: 56px;
+      font-size: 48px;
       font-family: 'Monaco', 'Courier New', monospace;
       letter-spacing: 0.05em;
       color: inherit;
@@ -512,7 +514,7 @@
       }
 
       .timer-display {
-        font-size: 38px;
+        font-size: 32px;
       }
     }
   }
