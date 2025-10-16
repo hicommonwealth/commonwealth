@@ -157,8 +157,8 @@ export const FullUser = ({
         </>
       ) : (
         <>
-          <div className="profile-name">
-            {profile?.name}{' '}
+          <div className="profile-name">{profile?.name} </div>
+          <div className="profile-tier">
             <TrustLevelRole
               type="user"
               tier={profile?.tier || UserTierMap.IncompleteUser}
