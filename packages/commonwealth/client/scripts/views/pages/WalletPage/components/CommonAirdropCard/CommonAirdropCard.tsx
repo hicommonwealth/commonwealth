@@ -3,7 +3,6 @@ import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import React, { useState } from 'react';
 import {
-  useClaimTokenFlow,
   useGetAllocationQuery,
   useGetClaimAddressQuery,
 } from 'state/api/tokenAllocations';
@@ -14,6 +13,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { AuthModal } from 'views/modals/AuthModal';
 import ClaimCard from './ClaimCard';
 import './CommonAirdropCard.scss';
+import { useCommonAirdrop } from './useCommonAirdrop';
 
 interface CommonAirdropCardProps {
   onConnectNewAddress?: () => void;
@@ -33,7 +33,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const claimsEnabled = useFlag('claims');
-  const { initial, final } = useClaimTokenFlow();
+  const { initial, final } = useCommonAirdrop();
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
     useGetClaimAddressQuery({ enabled: user.isLoggedIn });
   const { data: allocation } = useGetAllocationQuery({

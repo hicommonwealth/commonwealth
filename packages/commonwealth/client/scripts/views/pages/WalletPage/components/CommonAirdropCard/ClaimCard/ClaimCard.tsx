@@ -1,19 +1,16 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import { notifySuccess } from 'client/scripts/controllers/app/notifications';
-import { formatAddressShort } from 'client/scripts/helpers';
-import AddressInfo from 'client/scripts/models/AddressInfo';
-import {
-  useClaimTokenFlow,
-  useUpdateClaimAddressMutation,
-} from 'client/scripts/state/api/tokenAllocations';
-import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divider';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { notifySuccess } from 'controllers/app/notifications';
+import { formatAddressShort } from 'helpers';
+import AddressInfo from 'models/AddressInfo';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
+import { useUpdateClaimAddressMutation } from 'state/api/tokenAllocations';
 import useUserStore from 'state/ui/user';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
   CustomAddressOption,
@@ -21,6 +18,7 @@ import {
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
+import { useCommonAirdrop } from '../useCommonAirdrop';
 import './ClaimCard.scss';
 
 interface ClaimCardProps {
@@ -75,10 +73,10 @@ const ClaimCard = ({
     useState<string>('00:00:00');
   const [unlockCountdown, setUnlockCountdown] = useState<string>('00:00:00');
   const [syncCountdown, setSyncCountdown] = useState<string>('00:00:00');
-  const claimTokenFlow = useClaimTokenFlow();
-  const claimTxData = claimTokenFlow.claimTxData;
+  const commonAirdrop = useCommonAirdrop();
+  const claimTxData = commonAirdrop.txData;
   const claimState =
-    mode === 'initial' ? claimTokenFlow.initial : claimTokenFlow.final;
+    mode === 'initial' ? commonAirdrop.initial : commonAirdrop.final;
   const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();

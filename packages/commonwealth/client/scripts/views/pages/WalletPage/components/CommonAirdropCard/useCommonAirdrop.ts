@@ -1,25 +1,46 @@
-import {
-  notifyError,
-  notifySuccess,
-} from 'client/scripts/controllers/app/notifications';
-import MagicWebWalletController from 'client/scripts/controllers/app/webWallets/MagicWebWallet';
-import SignTokenClaim from 'client/scripts/helpers/ContractHelpers/signTokenClaim';
-import { BASE_ID } from 'client/scripts/views/components/CommunityInformationForm/constants';
-import { useState } from 'react';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import MagicWebWalletController from 'controllers/app/webWallets/MagicWebWallet';
+import SignTokenClaim from 'helpers/ContractHelpers/signTokenClaim';
+import { fetchNodes } from 'state/api/nodes/fetchNodes';
+import { userStore } from 'state/ui/user';
+import { createBoundedUseStore } from 'state/ui/utils';
 import { trpc } from 'utils/trpcClient';
-import { userStore } from '../../ui/user';
-import { fetchNodes } from '../nodes';
+import { BASE_ID } from 'views/components/CommunityInformationForm/constants';
+import { devtools } from 'zustand/middleware';
+import { createStore } from 'zustand/vanilla';
 
-export const useClaimTokenFlow = () => {
-  const utils = trpc.useUtils();
-  const [claimTxData, setClaimTxData] = useState<{
+type CommonAirdropData = {
+  txData?: {
     to: string;
     data: string;
-  }>();
+  };
+  initialTxHash: `0x${string}` | null;
+  finalTxHash: `0x${string}` | null;
+};
 
-  const [initialClaimTxHash, setInitialClaimTxHash] = useState<
-    `0x${string}` | null
-  >(null);
+interface CommonAirdropState extends CommonAirdropData {
+  setData: (data: Partial<CommonAirdropData>) => void;
+}
+
+export const commonAirdropStore = createStore<CommonAirdropState>()(
+  devtools((set) => ({
+    txData: undefined,
+    initialTxHash: null,
+    finalTxHash: null,
+    setData: (data) => {
+      if (Object.keys(data).length > 0) {
+        set((state) => ({ ...state, ...data }));
+      }
+    },
+  })),
+);
+
+const useCommonAirdropStore = createBoundedUseStore(commonAirdropStore);
+
+export const useCommonAirdrop = () => {
+  const utils = trpc.useUtils();
+  const { txData, initialTxHash, finalTxHash, setData } =
+    useCommonAirdropStore();
   const claimInitialToken = trpc.tokenAllocation.claimToken.useMutation();
   const updateInitialClaimTxHash =
     trpc.tokenAllocation.updateClaimTransactionHash.useMutation();
@@ -28,9 +49,11 @@ export const useClaimTokenFlow = () => {
   ) => {
     try {
       const data = await claimInitialToken.mutateAsync(input);
-      setClaimTxData({
-        to: data.to,
-        data: data.data,
+      setData({
+        txData: {
+          to: data.to,
+          data: data.data,
+        },
       });
       // invalidate related queries
       utils.tokenAllocation.getClaimAddress.invalidate().catch(console.error);
@@ -84,7 +107,7 @@ export const useClaimTokenFlow = () => {
           }));
       }
       // update the UI
-      txHash && setInitialClaimTxHash(txHash);
+      txHash && setData({ initialTxHash: txHash });
       notifySuccess('Token claimed successfully');
     } catch (error) {
       notifyError(error.message ?? 'Something went wrong');
@@ -92,9 +115,6 @@ export const useClaimTokenFlow = () => {
     }
   };
 
-  const [finalClaimTxHash, setFinalClaimTxHash] = useState<
-    `0x${string}` | null
-  >(null);
   const claimFinalToken = trpc.tokenAllocation.claimTokenCliff.useMutation();
   const updateFinalClaimTxHash =
     trpc.tokenAllocation.updateClaimTransactionHash.useMutation();
@@ -103,9 +123,11 @@ export const useClaimTokenFlow = () => {
   ) => {
     try {
       const data = await claimFinalToken.mutateAsync(input);
-      setClaimTxData({
-        to: data.to,
-        data: data.data,
+      setData({
+        txData: {
+          to: data.to,
+          data: data.data,
+        },
       });
       // invalidate related queries
       utils.tokenAllocation.getClaimAddress.invalidate().catch(console.error);
@@ -159,7 +181,7 @@ export const useClaimTokenFlow = () => {
           }));
       }
       // update the UI
-      txHash && setFinalClaimTxHash(txHash);
+      txHash && setData({ finalTxHash: txHash });
       notifySuccess('Token claimed successfully');
     } catch (error) {
       notifyError(error.message ?? 'Something went wrong');
@@ -168,16 +190,16 @@ export const useClaimTokenFlow = () => {
   };
 
   return {
-    claimTxData,
+    txData,
     initial: {
       claim: claimInitial,
-      txHash: initialClaimTxHash,
+      txHash: initialTxHash,
       isPending:
         claimInitialToken.isPending || updateInitialClaimTxHash.isPending,
     },
     final: {
       claim: claimFinal,
-      txHash: finalClaimTxHash,
+      txHash: finalTxHash,
       isPending: claimFinalToken.isPending || updateFinalClaimTxHash.isPending,
     },
   };
