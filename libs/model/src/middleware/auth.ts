@@ -35,7 +35,7 @@ import { AddressInstance } from '../models';
 import { isBotAddress } from '../utils/botUser';
 import { BannedActor, NonMember, RejectedMember } from './errors';
 
-async function findComment(comment_id: number) {
+async function findComment(actor: Actor, comment_id: number) {
   const comment = await models.Comment.findOne({
     where: { id: comment_id },
     include: [
@@ -48,6 +48,23 @@ async function findComment(comment_id: number) {
   if (!comment)
     throw new InvalidInput('Must provide a valid comment id to authorize');
 
+  let is_ai_author = false;
+
+  // Check if this is an AI-generated comment and if the current user triggered it
+  const isAIComment = await isBotAddress(comment.address_id);
+  if (isAIComment && actor.user?.id) {
+    const aiToken = await models.AICompletionToken.findOne({
+      where: {
+        comment_id: comment_id,
+        user_id: actor.user.id,
+      },
+    });
+    // If the current user triggered the AI comment, treat them as the author
+    if (aiToken) {
+      is_ai_author = true;
+    }
+  }
+
   return {
     comment_id,
     comment,
@@ -55,6 +72,7 @@ async function findComment(comment_id: number) {
     community_id: comment.Thread!.community_id!,
     topic_id: comment.Thread!.topic_id ?? undefined,
     thread_id: comment.Thread!.id!,
+    is_ai_author,
   };
 }
 
@@ -397,29 +415,6 @@ async function mustBeAuthorized(
     throw new InvalidActor(actor, 'Not authorized collaborator');
   }
 
-  // Allows when the comment is AI-generated and the user triggered it
-  if (
-    context &&
-    'comment_id' in context &&
-    context.comment_id &&
-    'author_address_id' in context &&
-    context.author_address_id
-  ) {
-    const isAIComment = await isBotAddress(context.author_address_id);
-    if (isAIComment) {
-      const aiToken = await models.AICompletionToken.findOne({
-        where: {
-          comment_id: context.comment_id,
-          user_id: actor.user.id,
-        },
-      });
-      if (aiToken) {
-        context.is_author = true;
-        return;
-      }
-    }
-  }
-
   // At this point, we know the actor is not the author of the entity
   // and it's also not an admin, system actor, or collaborator...
   // This guard is used to enforce that the author is the only one who can
@@ -604,7 +599,7 @@ export function authComment({ action, author, roles }: AggregateAuthOptions) {
     (ctx as { context: CommentContext }).context = {
       ...auth,
       address,
-      is_author,
+      is_author: is_author || auth.is_ai_author,
     };
 
     await mustBeAuthorized(ctx, {
