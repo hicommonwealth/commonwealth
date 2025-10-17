@@ -141,6 +141,10 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       };
     })(),
     final: (() => {
+      const initialTxHash =
+        (claimAddress?.magna_claim_tx_hash as `0x${string}`) ||
+        initial.txHash ||
+        null;
       const finalTxHash =
         (claimAddress?.magna_cliff_claim_tx_hash as `0x${string}`) ||
         final.txHash ||
@@ -163,7 +167,8 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       const isReadyForClaimAfterUnlock = !!(
         isClaimAvailable &&
         !isReadyForClaimNow &&
-        (allocation?.claimable ?? 0) > 0 &&
+        initialTxHash && // 🚨 IMP: added this as a fallback to avoid potential bugs
+        // (allocation?.claimable ?? 0) > 0 && // 🚨 IMP: commenting this could be a potential bug
         allocation?.unlock_start_at &&
         !hasCliffDatePassed
       );
