@@ -403,9 +403,11 @@ const ClaimCard = ({
                     )}`}
                     onClick={() => {
                       if (allocationId) {
-                        claimState.claim({
-                          allocation_id: allocationId,
-                        });
+                        claimState
+                          .claim({
+                            allocation_id: allocationId,
+                          })
+                          .catch(console.error);
                       }
                     }}
                     disabled={
