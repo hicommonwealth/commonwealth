@@ -66,6 +66,26 @@ interface UserAllocationData {
   rank: number;
 }
 
+type BasicStats = {
+  count: number;
+  total: number;
+  mean: number;
+  median: number;
+  mode: number | null;
+  min: number;
+  max: number;
+  variance: number;
+  stdDev: number;
+  p10: number;
+  p25: number;
+  p50: number;
+  p75: number;
+  p90: number;
+  p95: number;
+  p99: number;
+  gini: number;
+};
+
 interface LorenzData {
   populationPercent: number;
   wealthPercent: number;
@@ -200,34 +220,220 @@ async function getEqualRarityDistribution(): Promise<
 }
 
 /**
- * Fetch user allocation data for NFT snapshots (summed per holder address)
+ * Fetch user allocation data for NFT snapshots (summed per user_id across all holder addresses)
  */
 async function getNftUserAllocations(): Promise<UserAllocationData[]> {
   console.log('Fetching NFT holder allocation data (per holder address)...');
 
   const results = await models.sequelize.query<{
-    holder_address: string;
-    user_id: number | null;
+    user_id: number;
     total_allocation: string;
   }>(
     `
       SELECT 
-        holder_address,
         user_id,
         SUM(total_token_allocation) as total_allocation
       FROM "NftSnapshot"
       WHERE total_token_allocation IS NOT NULL
-      GROUP BY holder_address, user_id
-      ORDER BY total_allocation ASC;
+        AND user_id IS NOT NULL
+      GROUP BY user_id
+      ORDER BY total_allocation DESC;
     `,
     { type: QueryTypes.SELECT },
   );
 
   return results.map((row, index) => ({
-    userId: row.user_id || 0, // Use 0 for holders without user_id
+    userId: row.user_id,
     allocation: parseFloat(row.total_allocation),
     rank: index + 1,
   }));
+}
+
+/**
+ * Fetch combined user allocations across NFT, Historical, and Aura sources.
+ * - Joins on user_id where available
+ * - Includes NFT holders with NULL user_id as independent users
+ * - Excludes zero allocations
+ * - Returns data sorted by allocation DESC with ranks assigned
+ */
+async function getCombinedUserAllocations(): Promise<UserAllocationData[]> {
+  console.log('Fetching Combined allocation data...');
+
+  // Per-user combined (user_id present in any table)
+  const perUser = await models.sequelize.query<{
+    user_id: number;
+    total_allocation: string;
+  }>(
+    `
+      WITH Aura AS (
+        SELECT user_id, token_allocation AS aura_allocation
+        FROM "AuraAllocations"
+        WHERE token_allocation > 0
+      ),
+      Historical AS (
+        SELECT user_id, token_allocation AS historical_allocation
+        FROM "HistoricalAllocations"
+        WHERE token_allocation > 0
+      ),
+      NftUser AS (
+        SELECT user_id, SUM(total_token_allocation) AS nft_allocation
+        FROM "NftSnapshot"
+        WHERE user_id IS NOT NULL
+        GROUP BY user_id
+      ),
+      AllUserIds AS (
+        SELECT user_id FROM Aura
+        UNION
+        SELECT user_id FROM Historical
+        UNION
+        SELECT user_id FROM NftUser
+      )
+      SELECT 
+        u.user_id,
+        COALESCE(n.nft_allocation, 0) + COALESCE(h.historical_allocation, 0) + COALESCE(a.aura_allocation, 0) AS total_allocation
+      FROM AllUserIds u
+      LEFT JOIN NftUser n ON u.user_id = n.user_id
+      LEFT JOIN Historical h ON u.user_id = h.user_id
+      LEFT JOIN Aura a ON u.user_id = a.user_id
+      WHERE (COALESCE(n.nft_allocation, 0) + COALESCE(h.historical_allocation, 0) + COALESCE(a.aura_allocation, 0)) > 0
+      ORDER BY total_allocation DESC;
+    `,
+    { type: QueryTypes.SELECT },
+  );
+
+  // NFT holders without user_id treated as new users
+  const nftNoUser = await models.sequelize.query<{
+    holder_address: string;
+    total_allocation: string;
+  }>(
+    `
+      SELECT 
+        holder_address,
+        SUM(total_token_allocation) AS total_allocation
+      FROM "NftSnapshot"
+      WHERE user_id IS NULL
+      GROUP BY holder_address
+      HAVING SUM(total_token_allocation) > 0
+      ORDER BY total_allocation DESC;
+    `,
+    { type: QueryTypes.SELECT },
+  );
+
+  const combined: UserAllocationData[] = [];
+  perUser.forEach((row) => {
+    combined.push({
+      userId: row.user_id,
+      allocation: parseFloat(row.total_allocation),
+      rank: 0,
+    });
+  });
+  // Assign a unique synthetic user id for each holder_address with NULL user_id
+  let syntheticId = -1;
+  const syntheticMap = new Map<string, number>();
+  nftNoUser.forEach((row) => {
+    let uid = syntheticMap.get(row.holder_address);
+    if (uid === undefined) {
+      uid = syntheticId; // negative ids to avoid collision with real user ids
+      syntheticMap.set(row.holder_address, uid);
+      syntheticId -= 1;
+    }
+    combined.push({
+      userId: uid,
+      allocation: parseFloat(row.total_allocation),
+      rank: 0,
+    });
+  });
+
+  // Sort DESC and assign ranks
+  combined.sort((a, b) => b.allocation - a.allocation);
+  combined.forEach((d, i) => (d.rank = i + 1));
+  return combined;
+}
+
+/**
+ * Compute basic statistics over an array of numbers.
+ * Mode is computed on values rounded to 2 decimals to reduce sparsity.
+ */
+function calculateBasicStats(values: number[]): BasicStats {
+  if (values.length === 0) {
+    return {
+      count: 0,
+      total: 0,
+      mean: 0,
+      median: 0,
+      mode: null,
+      min: 0,
+      max: 0,
+      variance: 0,
+      stdDev: 0,
+      p10: 0,
+      p25: 0,
+      p50: 0,
+      p75: 0,
+      p90: 0,
+      p95: 0,
+      p99: 0,
+      gini: 0,
+    };
+  }
+
+  const sorted = [...values].sort((a, b) => a - b);
+  const count = sorted.length;
+  const total = sorted.reduce((s, v) => s + v, 0);
+  const mean = total / count;
+  const median =
+    count % 2 === 0
+      ? (sorted[count / 2 - 1] + sorted[count / 2]) / 2
+      : sorted[Math.floor(count / 2)];
+  const min = sorted[0];
+  const max = sorted[count - 1];
+  const variance =
+    sorted.reduce((s, v) => s + (v - mean) * (v - mean), 0) / count;
+  const stdDev = Math.sqrt(variance);
+
+  const percentile = (p: number): number => {
+    if (count === 1) return sorted[0];
+    const idx = (p / 100) * (count - 1);
+    const lower = Math.floor(idx);
+    const upper = Math.ceil(idx);
+    const weight = idx - lower;
+    return sorted[lower] * (1 - weight) + sorted[upper] * weight;
+  };
+
+  // Mode on rounded (2 dp)
+  const freq = new Map<number, number>();
+  for (const v of values) {
+    const r = Math.round(v * 100) / 100;
+    freq.set(r, (freq.get(r) || 0) + 1);
+  }
+  let mode: number | null = null;
+  let best = 0;
+  for (const [val, c] of freq.entries()) {
+    if (c > best || (c === best && mode !== null && val < mode)) {
+      best = c;
+      mode = val;
+    }
+  }
+
+  return {
+    count,
+    total,
+    mean,
+    median,
+    mode,
+    min,
+    max,
+    variance,
+    stdDev,
+    p10: percentile(10),
+    p25: percentile(25),
+    p50: percentile(50),
+    p75: percentile(75),
+    p90: percentile(90),
+    p95: percentile(95),
+    p99: percentile(99),
+    gini: calculateGiniCoefficient(values),
+  };
 }
 
 /**
@@ -288,7 +494,7 @@ async function getHistoricalUserAllocations(): Promise<UserAllocationData[]> {
       FROM "HistoricalAllocations"
       WHERE token_allocation IS NOT NULL
         AND token_allocation > 0
-      ORDER BY token_allocation ASC;
+      ORDER BY token_allocation DESC;
     `,
     { type: QueryTypes.SELECT },
   );
@@ -673,7 +879,7 @@ async function getAuraUserAllocations(): Promise<UserAllocationData[]> {
       FROM "AuraAllocations"
       WHERE token_allocation IS NOT NULL
         AND token_allocation > 0
-      ORDER BY token_allocation ASC;
+      ORDER BY token_allocation DESC;
     `,
     { type: QueryTypes.SELECT },
   );
@@ -1573,22 +1779,40 @@ function calculateHistoricalCorrelationMatrix(
 }
 
 /**
- * Sample evenly-spaced data points from user allocation data
- * Returns exactly 100 evenly-spaced points for efficient rendering
+ * Sample data points from user allocation data with complete coverage of top allocations
+ * Takes ALL of the top 500 allocations, then uniformly samples the rest
+ * This ensures smooth visualization of the high-value tail of the distribution
  */
 function sampleUserAllocationData(
   data: UserAllocationData[],
   numSamples: number = 100,
+  topN: number = 500,
 ): UserAllocationData[] {
   if (data.length === 0) return [];
-  if (data.length <= numSamples) return data;
+  if (data.length <= topN) return data;
 
   const sampledData: UserAllocationData[] = [];
-  const step = (data.length - 1) / (numSamples - 1);
 
-  for (let i = 0; i < numSamples; i++) {
-    const index = Math.round(i * step);
-    sampledData.push(data[index]);
+  // Data is sorted in descending order, so top allocations are at the beginning
+  // Add ALL of the top N allocations (highest values)
+  for (let i = 0; i < topN; i++) {
+    sampledData.push(data[i]);
+  }
+
+  // Calculate how many samples we need from the remaining portion (lower allocations)
+  const numRemaining = data.length - topN;
+  const remainingSamples = Math.max(
+    numSamples - topN,
+    Math.floor(numRemaining / 100),
+  );
+
+  // Uniformly sample from the remaining portion (lower allocations)
+  if (numRemaining > 0 && remainingSamples > 0) {
+    const step = numRemaining / remainingSamples;
+    for (let i = 0; i < remainingSamples; i++) {
+      const index = topN + Math.min(Math.floor(i * step), numRemaining - 1);
+      sampledData.push(data[index]);
+    }
   }
 
   return sampledData;
@@ -1821,20 +2045,13 @@ function generateNftAllocationHTML(
   // Sample data to 100 points each for efficient rendering
   const sampledPerUserData = sampleUserAllocationData(perUserData, 100);
 
-  // Sample per-NFT data
-  const sampledPerNftData: Array<{ x: number; y: number; tier: number }> = [];
-  if (perNftData.length > 0) {
-    const step = perNftData.length <= 100 ? 1 : (perNftData.length - 1) / 99;
-    for (let i = 0; i < Math.min(100, perNftData.length); i++) {
-      const index = Math.round(i * step);
-      const nft = perNftData[index];
-      sampledPerNftData.push({
-        x: nft.rank,
-        y: nft.allocation,
-        tier: nft.rarityTier,
-      });
-    }
-  }
+  // Use ALL NFTs for the per-NFT chart (no sampling)
+  const allPerNftData: Array<{ x: number; y: number; tier: number }> =
+    perNftData.map((nft) => ({
+      x: nft.rank,
+      y: nft.allocation,
+      tier: nft.rarityTier,
+    }));
 
   return `
 <!DOCTYPE html>
@@ -1858,7 +2075,7 @@ function generateNftAllocationHTML(
     <div class="stats">
         <h2>Summary Statistics</h2>
         <p style="text-align: center; color: #666; font-size: 0.9em; margin-bottom: 15px;">
-            <em>Note: Charts display 100 evenly-spaced sample points for performance. Statistics show full dataset.</em>
+            <em>Note: Per NFT chart uses all NFTs. Per holder chart displays all top 500 holders plus a uniform sample of the rest for optimal visualization. Statistics show full dataset.</em>
         </p>
         <div class="stats-grid">
             <div class="stats-item">
@@ -1903,7 +2120,7 @@ function generateNftAllocationHTML(
     </div>
 
     <div class="chart-container">
-        <h2>NFT Allocations Per Holder (Ordered from Least to Greatest)</h2>
+        <h2>NFT Allocations Per Holder (Ordered from Greatest to Least)</h2>
         <div style="position: relative; height: 400px;">
             <canvas id="perUserChart"></canvas>
         </div>
@@ -1965,7 +2182,7 @@ function generateNftAllocationHTML(
                         position: 'bottom',
                         title: {
                             display: true,
-                            text: 'Holder Rank (Ordered by Total Allocation)',
+                            text: 'Holder Rank (1 = Highest Allocation)',
                             font: { size: 12 }
                         },
                         grid: { display: true, color: '#e0e0e0' }
@@ -1991,7 +2208,7 @@ function generateNftAllocationHTML(
 
         // Per NFT Chart
         const perNftCtx = document.getElementById('perNftChart').getContext('2d');
-        const perNftPoints = ${JSON.stringify(sampledPerNftData)};
+        const perNftPoints = ${JSON.stringify(allPerNftData)};
 
         // Color NFTs by rarity tier
         const tierColors = {
@@ -2117,7 +2334,7 @@ function generateUserAllocationHTML(
     <div class="stats">
         <h2>Summary Statistics</h2>
         <p style="text-align: center; color: #666; font-size: 0.9em; margin-bottom: 15px;">
-            <em>Note: Charts display 100 evenly-spaced sample points for performance. Statistics show full dataset.</em>
+            <em>Note: Charts display all top 500 allocations plus sampled lower allocations for optimal visualization. Statistics show full dataset.</em>
         </p>
         <div class="stats-grid">
             <div class="stats-item">
@@ -2162,20 +2379,33 @@ function generateUserAllocationHTML(
     </div>
 
     <div class="chart-container">
-        <h2>User Allocation Distribution (Ordered from Least to Greatest)</h2>
+        <h2>Historical Allocations Distribution (Ordered from Greatest to Least)</h2>
         <div style="position: relative; height: 400px;">
-            <canvas id="allocationChart"></canvas>
+            <canvas id="historicalChart"></canvas>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h2>Aura Allocations Distribution (Ordered from Greatest to Least)</h2>
+        <div style="position: relative; height: 400px;">
+            <canvas id="auraChart"></canvas>
         </div>
     </div>
 
     <script>
-        const ctx = document.getElementById('allocationChart').getContext('2d');
-        
-        // Prepare sampled data for line chart (100 points each for performance)
+        // Prepare sampled data for line charts
         const historicalPoints = ${JSON.stringify(sampledHistoricalData.map((d) => ({ x: d.rank, y: d.allocation })))};
         const auraPoints = ${JSON.stringify(sampledAuraData.map((d) => ({ x: d.rank, y: d.allocation })))};
 
-        new Chart(ctx, {
+        // Calculate x-axis ranges with gap before rank 1
+        const historicalMaxRank = ${historicalData.length};
+        const auraMaxRank = ${auraData.length};
+        const historicalXMin = historicalMaxRank > 0 ? -historicalMaxRank * 0.02 : -10;
+        const auraXMin = auraMaxRank > 0 ? -auraMaxRank * 0.02 : -10;
+
+        // Historical Allocations Chart
+        const historicalCtx = document.getElementById('historicalChart').getContext('2d');
+        new Chart(historicalCtx, {
             type: 'scatter',
             data: {
                 datasets: [
@@ -2189,7 +2419,82 @@ function generateUserAllocationHTML(
                         borderWidth: 2,
                         showLine: true,
                         fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                interaction: {
+                    intersect: false,
+                    mode: 'point'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true
+                        }
                     },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                return 'Rank: ' + context[0].parsed.x.toLocaleString();
+                            },
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + ' tokens';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        min: historicalXMin,
+                        title: {
+                            display: true,
+                            text: 'User Rank (1 = Highest Allocation)',
+                            font: { size: 12 }
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value >= 0 ? value.toLocaleString() : '';
+                            }
+                        },
+                        grid: {
+                            display: true,
+                            color: '#e0e0e0'
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Token Allocation',
+                            font: { size: 12 }
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        },
+                        grid: {
+                            display: true,
+                            color: '#e0e0e0'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Aura Allocations Chart
+        const auraCtx = document.getElementById('auraChart').getContext('2d');
+        new Chart(auraCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [
                     {
                         label: 'Aura Allocations',
                         data: auraPoints,
@@ -2232,14 +2537,15 @@ function generateUserAllocationHTML(
                     x: {
                         type: 'linear',
                         position: 'bottom',
+                        min: auraXMin,
                         title: {
                             display: true,
-                            text: 'User Rank (Ordered by Allocation)',
+                            text: 'User Rank (1 = Highest Allocation)',
                             font: { size: 12 }
                         },
                         ticks: {
                             callback: function(value) {
-                                return value.toLocaleString();
+                                return value >= 0 ? value.toLocaleString() : '';
                             }
                         },
                         grid: {
@@ -2270,6 +2576,125 @@ function generateUserAllocationHTML(
         });
     </script>
 </body>
+</html>`;
+}
+
+/**
+ * Generate HTML page for Combined Allocation stats and distribution
+ */
+function generateCombinedAllocationStatsHTML(
+  combinedData: UserAllocationData[],
+): string {
+  const allocations = combinedData.map((d) => d.allocation);
+  const stats = calculateBasicStats(allocations);
+  const sampledCombined = sampleUserAllocationData(combinedData, 100, 500);
+
+  const fmt = (n: number) => (Number.isFinite(n) ? n.toLocaleString() : '0');
+  const fmt2 = (n: number) => (Number.isFinite(n) ? n.toFixed(2) : '0.00');
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Combined Allocation - Summary Statistics & Distribution</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .chart-container { width: 100%; margin: 20px 0; }
+        .stats { margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 5px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .stats-item { text-align: center; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        h1 { text-align: center; color: #333; }
+        h2 { color: #666; margin-top: 30px; }
+        .note { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 15px; }
+    </style>
+    </head>
+    <body>
+      <h1>Combined Allocation - Summary Statistics & Distribution</h1>
+      <div class="stats">
+        <h2>Summary Statistics</h2>
+        <p class="note"><em>Only users with positive allocation are included. Chart shows all top 500 users plus a uniform sample of the rest; stats use the full dataset.</em></p>
+        <div class="stats-grid">
+          <div class="stats-item"><div><strong>Users</strong></div><div>${fmt(stats.count)}</div></div>
+          <div class="stats-item"><div><strong>Total</strong></div><div>${fmt(stats.total)} tokens</div></div>
+          <div class="stats-item"><div><strong>Mean</strong></div><div>${fmt2(stats.mean)} tokens</div></div>
+          <div class="stats-item"><div><strong>Median</strong></div><div>${fmt2(stats.median)} tokens</div></div>
+          <div class="stats-item"><div><strong>Mode</strong></div><div>${stats.mode !== null ? fmt2(stats.mode) : '—'} tokens</div></div>
+          <div class="stats-item"><div><strong>Min</strong></div><div>${fmt2(stats.min)} tokens</div></div>
+          <div class="stats-item"><div><strong>Max</strong></div><div>${fmt2(stats.max)} tokens</div></div>
+          <div class="stats-item"><div><strong>Std Dev</strong></div><div>${fmt2(stats.stdDev)} tokens</div></div>
+          <div class="stats-item"><div><strong>P10</strong></div><div>${fmt2(stats.p10)}</div></div>
+          <div class="stats-item"><div><strong>P25</strong></div><div>${fmt2(stats.p25)}</div></div>
+          <div class="stats-item"><div><strong>P50</strong></div><div>${fmt2(stats.p50)}</div></div>
+          <div class="stats-item"><div><strong>P75</strong></div><div>${fmt2(stats.p75)}</div></div>
+          <div class="stats-item"><div><strong>P90</strong></div><div>${fmt2(stats.p90)}</div></div>
+          <div class="stats-item"><div><strong>P95</strong></div><div>${fmt2(stats.p95)}</div></div>
+          <div class="stats-item"><div><strong>P99</strong></div><div>${fmt2(stats.p99)}</div></div>
+          <div class="stats-item"><div><strong>Gini</strong></div><div>${stats.gini.toFixed(3)}</div></div>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <h2>Combined Allocations Distribution (Ordered from Greatest to Least)</h2>
+        <div style="position: relative; height: 420px;">
+          <canvas id="combinedChart"></canvas>
+        </div>
+      </div>
+
+      <script>
+        const combinedPoints = ${JSON.stringify(sampledCombined.map((d) => ({ x: d.rank, y: d.allocation })))};
+        const combinedMaxRank = ${combinedData.length};
+        const combinedXMin = combinedMaxRank > 0 ? -combinedMaxRank * 0.02 : -10;
+
+        const ctx = document.getElementById('combinedChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'scatter',
+          data: {
+            datasets: [{
+              label: 'Combined Allocations',
+              data: combinedPoints,
+              borderColor: '#4BC0C0',
+              backgroundColor: '#4BC0C0',
+              pointRadius: 2,
+              pointHoverRadius: 4,
+              borderWidth: 2,
+              showLine: true,
+              fill: false
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: { intersect: false, mode: 'point' },
+            plugins: {
+              legend: { position: 'top', labels: { usePointStyle: true } },
+              tooltip: {
+                callbacks: {
+                  title: function(ctx) { return 'Rank: ' + ctx[0].parsed.x.toLocaleString(); },
+                  label: function(ctx) { return 'Allocation: ' + ctx.parsed.y.toLocaleString() + ' tokens'; }
+                }
+              }
+            },
+            scales: {
+              x: {
+                type: 'linear',
+                position: 'bottom',
+                min: combinedXMin,
+                title: { display: true, text: 'User Rank (1 = Highest Allocation)', font: { size: 12 } },
+                ticks: { callback: function(v) { return v >= 0 ? v.toLocaleString() : ''; } },
+                grid: { display: true, color: '#e0e0e0' }
+              },
+              y: {
+                type: 'linear', beginAtZero: true,
+                title: { display: true, text: 'Token Allocation', font: { size: 12 } },
+                ticks: { callback: function(v) { return v.toLocaleString(); } },
+                grid: { display: true, color: '#e0e0e0' }
+              }
+            }
+          }
+        });
+      </script>
+    </body>
 </html>`;
 }
 
@@ -2315,6 +2740,10 @@ async function main() {
     console.log(
       `- Historical correlation data users: ${historicalCorrelationData.length}`,
     );
+
+    // Combined allocations
+    const combinedUserData = await getCombinedUserAllocations();
+    console.log(`- Combined users: ${combinedUserData.length}`);
 
     // Calculate Gini coefficients and Lorenz curves
     console.log('\nCalculating Gini coefficients and Lorenz curves...');
@@ -2441,6 +2870,15 @@ async function main() {
     );
     console.log('Generated: correlation-matrix.html');
 
+    // 8. Combined Allocation stats & distribution
+    const combinedStatsHTML =
+      generateCombinedAllocationStatsHTML(combinedUserData);
+    fs.writeFileSync(
+      path.join(outputDir, 'combined-allocation-stats.html'),
+      combinedStatsHTML,
+    );
+    console.log('Generated: combined-allocation-stats.html');
+
     // Generate index file for easy navigation
     const indexHTML = `
 <!DOCTYPE html>
@@ -2485,7 +2923,7 @@ async function main() {
             
             <a href="user-allocation-distribution.html" class="chart-link">
                 Historical & Aura - User Distribution<br>
-                <small>Line charts comparing Historical & Aura allocations</small>
+                <small>Separate line charts for Historical & Aura allocations</small>
             </a>
             
             <a href="lorenz-curves-gini-coefficients.html" class="chart-link">
@@ -2501,6 +2939,10 @@ async function main() {
             <a href="correlation-matrix.html" class="chart-link">
                 Correlation Matrices<br>
                 <small>NFT, Aura, and Historical correlation analyses with key insights</small>
+            </a>
+            <a href="combined-allocation-stats.html" class="chart-link">
+                Combined Allocation - Stats & Distribution<br>
+                <small>Mean, median, percentiles, and distribution of total allocation</small>
             </a>
         </div>
 
@@ -2528,6 +2970,7 @@ async function main() {
     console.log(`   - lorenz-curves-gini-coefficients.html`);
     console.log(`   - nft-allocation-detailed.html`);
     console.log(`   - correlation-matrix.html`);
+    console.log(`   - combined-allocation-stats.html`);
   } catch (error) {
     console.error('Error generating charts:', error);
     throw error;

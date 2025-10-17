@@ -7,6 +7,7 @@
   border: 1px solid colors.$neutral-100;
   border-radius: 8px;
   background-color: colors.$white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
   .member-header {
     display: flex;

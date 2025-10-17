@@ -17,6 +17,8 @@ export function GetAllocation(): Query<typeof schemas.GetAllocation> {
           walletAddress: allocation.walletAddress as `0x${string}`,
           token: config.MAGNA?.TOKEN || '',
           description: config.MAGNA?.EVENT_DESC || '',
+          initial_percentage: config.MAGNA?.INITIAL_PERCENTAGE || 0,
+          cliff_date: config.MAGNA?.CLIFF_DATE || new Date(),
           status: allocation.status,
           amount: parseFloat(allocation.amount),
           funded: parseFloat(allocation.funded || '0'),

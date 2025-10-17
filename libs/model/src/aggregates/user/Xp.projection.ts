@@ -17,7 +17,10 @@ import { models } from '../../database';
 
 const log = logger(import.meta);
 
-async function getUserByAddressId(address_id: number) {
+async function getUserByAddressId(
+  address_id: number,
+  minTier = UserTierMap.NewlyVerifiedWallet,
+) {
   const addr = await models.Address.findOne({
     where: { id: address_id, is_banned: false },
     attributes: ['user_id'],
@@ -26,42 +29,47 @@ async function getUserByAddressId(address_id: number) {
         model: models.User,
         attributes: ['id'],
         required: true,
-        where: {
-          tier: { [Op.gt]: UserTierMap.BannedUser },
-        },
+        where: { tier: { [Op.gte]: minTier } },
       },
     ],
   });
   return addr?.user_id ?? undefined;
 }
 
-async function getUserByAddress(address: string) {
-  const addr = await models.Address.findOne({
-    where: {
-      [Op.and]: [
-        {
-          [Op.or]: [
-            { address: address.toLowerCase() },
-            { address: getEvmAddress(address) },
-          ],
-        },
-        { user_id: { [Op.not]: null } },
-        { is_banned: { [Op.eq]: false } },
-      ],
-    },
-    attributes: ['user_id'],
-    include: [
-      {
-        model: models.User,
-        attributes: ['id'],
-        required: true,
-        // don't reward unverified or banned users
-        where: { tier: { [Op.gt]: UserTierMap.BannedUser } },
+async function getUserByAddress(
+  address: string,
+  minTier = UserTierMap.NewlyVerifiedWallet,
+) {
+  try {
+    const validated = getEvmAddress(address);
+    const addr = await models.Address.findOne({
+      where: {
+        [Op.and]: [
+          {
+            [Op.or]: [
+              { address: address.toLowerCase() },
+              { address: validated },
+            ],
+          },
+          { user_id: { [Op.not]: null } },
+          { is_banned: { [Op.eq]: false } },
+        ],
       },
-    ],
-  });
-
-  return addr?.user_id ?? undefined;
+      attributes: ['user_id'],
+      include: [
+        {
+          model: models.User,
+          attributes: ['id'],
+          required: true,
+          where: { tier: { [Op.gte]: minTier } },
+        },
+      ],
+    });
+    return addr?.user_id ?? undefined;
+  } catch (err) {
+    log.error('Error validating address', err as Error);
+    return undefined;
+  }
 }
 
 /*
@@ -130,7 +138,7 @@ async function recordXpsForQuest({
     ? await getUserByAddress(creator_address)
     : null;
   const referrer_user_id = referrer_address
-    ? await getUserByAddress(referrer_address)
+    ? await getUserByAddress(referrer_address, UserTierMap.SocialVerified)
     : null;
 
   for (const action_meta of action_metas) {
@@ -193,11 +201,12 @@ async function recordXpsForQuest({
       ? Math.round(reward_amount * action_meta.creator_reward_weight)
       : null;
     const xp_points = reward_amount - (shared_reward ?? 0);
-    const creator_xp_points = creator_address ? shared_reward : null;
-    const referrer_xp_points = referrer_address
-      ? creator_xp_points
-        ? reward_amount * config.XP.REFERRER_FEE_RATIO
-        : shared_reward
+    const creator_xp_points = creator_user_id ? shared_reward : null;
+    const referrer_fee = reward_amount * config.XP.REFERRER_FEE_RATIO;
+    const referrer_xp_points = referrer_user_id
+      ? creator_address
+        ? referrer_fee
+        : shared_reward || referrer_fee
       : null;
     await models.sequelize.query(
       `
@@ -275,8 +284,8 @@ async function recordXpsForQuest({
           event_id,
           event_created_at,
           user_id,
-          creator_user_id,
-          referrer_user_id,
+          creator_user_id: creator_user_id || null,
+          referrer_user_id: referrer_user_id || null,
           xp_points,
           creator_xp_points,
           referrer_xp_points,

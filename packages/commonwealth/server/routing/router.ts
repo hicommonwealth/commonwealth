@@ -54,7 +54,7 @@ function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
     expressAdapter.query(Community.GetNamespaceMetadata()),
   );
   registerRoute(router, 'get', '/domain', async (req, res) => {
-    const hostname = req.headers['x-forwarded-host'] || req.hostname;
+    const hostname = req.headers['cf-original-host'] || req.hostname;
     // return the community id matching the hostname's custom domain
     try {
       const result = await query(Community.GetByDomain(), {

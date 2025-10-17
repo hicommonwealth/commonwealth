@@ -16,7 +16,7 @@
     "async-delete-spam-threads": "tsx scripts/async-delete-spam-threads.ts",
     "add-component-showcase": "tsx ./scripts/add-component-showcase.ts",
     "archive-outbox": "node --import=extensionless/register build/scripts/archive-outbox.js",
-    "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
+    "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json && cp maintenance.html build/maintenance.html",
     "build-contracts": "npx hardhat compile",
     "bundle": "NODE_OPTIONS=--max_old_space_size=8192 vite -c ./client/vite.config.ts build",
     "bundle-analyze": "npx vite-bundle-visualizer -c ./client/vite.config.ts",
