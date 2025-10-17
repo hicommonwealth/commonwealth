@@ -70,7 +70,6 @@ export function ProjectLaunchpadTrade(): Command<
                 address: trader_address,
                 user_id: { [Op.not]: null },
               },
-              attributes: ['user_id', 'verification_token'],
             });
             if (address) {
               await models.Address.findOrCreate({
@@ -83,9 +82,9 @@ export function ProjectLaunchpadTrade(): Command<
                   community_id: community.id,
                   address: trader_address,
                   user_id: address.user_id,
-                  role: 'member',
-                  ghost_address: false,
-                  is_banned: false,
+                  role: address.role ?? 'member',
+                  ghost_address: address.ghost_address ?? false,
+                  is_banned: address.is_banned ?? false,
                   verification_token: address.verification_token,
                 },
                 transaction,
