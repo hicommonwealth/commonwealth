@@ -392,8 +392,9 @@ export const TreeHierarchy = ({
     index: number,
   ) => {
     const isCommentAuthor = comment.address === user.activeAccount?.address;
-    const isTriggeredByCurrentUser =
-      comment.triggered_by_user_id && comment.triggered_by_user_id === user.id;
+    const isTriggeredByCurrentUser = !!(
+      comment.triggered_by_user_id && comment.triggered_by_user_id === user.id
+    );
 
     return (
       <div
