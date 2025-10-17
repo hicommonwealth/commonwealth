@@ -397,6 +397,8 @@ describe('Community lifecycle', () => {
         name: 'Private Test Server',
         handle: 'private-test',
         private_community_id: community.id,
+        server_url: 'https://private-mcp.example.com',
+        source_identifier: 'private-test',
       });
 
       if (!privateMcpServer) {
