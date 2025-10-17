@@ -145,6 +145,7 @@ export const CommentView = Comment.omit({
   profile_name: z.string().optional(),
   avatar_url: z.string().optional(),
   user_id: PG_INT,
+  triggered_by_user_id: PG_INT.nullish(),
   CommentVersionHistories: z.array(CommentVersionHistoryView).nullish(),
 });
 

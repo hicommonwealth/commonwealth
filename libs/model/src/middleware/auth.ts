@@ -32,6 +32,7 @@ import { Op, QueryTypes } from 'sequelize';
 import { ZodType, z } from 'zod';
 import { models } from '../database';
 import { AddressInstance } from '../models';
+import { isBotAddress } from '../utils/botUser';
 import { BannedActor, NonMember, RejectedMember } from './errors';
 
 async function findComment(actor: Actor, comment_id: number) {
@@ -47,6 +48,23 @@ async function findComment(actor: Actor, comment_id: number) {
   if (!comment)
     throw new InvalidInput('Must provide a valid comment id to authorize');
 
+  let is_ai_author = false;
+
+  // Check if this is an AI-generated comment and if the current user triggered it
+  const isAIComment = await isBotAddress(comment.address_id);
+  if (isAIComment && actor.user?.id) {
+    const aiToken = await models.AICompletionToken.findOne({
+      where: {
+        comment_id: comment_id,
+        user_id: actor.user.id,
+      },
+    });
+    // If the current user triggered the AI comment, treat them as the author
+    if (aiToken) {
+      is_ai_author = true;
+    }
+  }
+
   return {
     comment_id,
     comment,
@@ -54,6 +72,7 @@ async function findComment(actor: Actor, comment_id: number) {
     community_id: comment.Thread!.community_id!,
     topic_id: comment.Thread!.topic_id ?? undefined,
     thread_id: comment.Thread!.id!,
+    is_ai_author,
   };
 }
 
@@ -580,7 +599,7 @@ export function authComment({ action, author, roles }: AggregateAuthOptions) {
     (ctx as { context: CommentContext }).context = {
       ...auth,
       address,
-      is_author,
+      is_author: is_author || auth.is_ai_author,
     };
 
     await mustBeAuthorized(ctx, {

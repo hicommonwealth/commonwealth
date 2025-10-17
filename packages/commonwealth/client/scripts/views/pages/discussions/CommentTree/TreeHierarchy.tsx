@@ -1,8 +1,8 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
+  DEFAULT_AI_ASSISTANT_NAME,
   DEFAULT_COMPLETION_MODEL,
   DEFAULT_COMPLETION_MODEL_LABEL,
-  DEFAULT_AI_ASSISTANT_NAME,
   MAX_COMMENT_DEPTH,
 } from '@hicommonwealth/shared';
 import {
@@ -392,6 +392,9 @@ export const TreeHierarchy = ({
     index: number,
   ) => {
     const isCommentAuthor = comment.address === user.activeAccount?.address;
+    const isTriggeredByCurrentUser = !!(
+      comment.triggered_by_user_id && comment.triggered_by_user_id === user.id
+    );
 
     return (
       <div
@@ -420,7 +423,10 @@ export const TreeHierarchy = ({
             onEditConfirm={(newDelta) => onEditConfirm(comment, newDelta)}
             isSavingEdit={commentEdits?.[comment.id]?.isSavingEdit || false}
             isEditing={commentEdits?.[comment.id]?.isEditing || false}
-            canDelete={!isThreadLocked && (isCommentAuthor || isAdminOrMod)}
+            canDelete={
+              !isThreadLocked &&
+              (isCommentAuthor || isAdminOrMod || isTriggeredByCurrentUser)
+            }
             onReply={() => {
               onCommentReplyStart(comment.id, index);
             }}
@@ -430,7 +436,10 @@ export const TreeHierarchy = ({
             onDelete={() => onDelete(comment)}
             isSpam={!!comment.marked_as_spam_at}
             onSpamToggle={() => onSpamToggle(comment)}
-            canToggleSpam={!isThreadLocked && (isCommentAuthor || isAdminOrMod)}
+            canToggleSpam={
+              !isThreadLocked &&
+              (isCommentAuthor || isAdminOrMod || isTriggeredByCurrentUser)
+            }
             comment={comment}
             shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
             weightType={thread.topic?.weighted_voting as TopicWeightedVoting}
