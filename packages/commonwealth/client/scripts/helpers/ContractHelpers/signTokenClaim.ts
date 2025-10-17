@@ -44,15 +44,7 @@ class SignTokenClaim extends ContractBase {
         value: magnaPlatformFee, // Include the value to prevent contract reversion
       });
 
-      let maxPriorityFeePerGas: string;
-
-      try {
-        const fee = await this.web3.eth.getMaxPriorityFeePerGas();
-        maxPriorityFeePerGas = fee.toString();
-      } catch (error) {
-        console.error('Failed to calculate maxPriorityFeePerGas: ', error);
-        maxPriorityFeePerGas = this.web3.utils.toWei('2', 'gwei');
-      }
+      const maxPriorityFeePerGas = this.web3.utils.toWei('2', 'gwei');
 
       const block = await this.web3.eth.getBlock('pending');
       const baseFee = block.baseFeePerGas?.toString() ?? '0';

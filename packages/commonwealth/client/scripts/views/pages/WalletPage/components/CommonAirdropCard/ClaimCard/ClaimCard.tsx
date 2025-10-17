@@ -1,83 +1,86 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import { notifySuccess } from 'client/scripts/controllers/app/notifications';
-import { formatAddressShort } from 'client/scripts/helpers';
-import { useFlag } from 'client/scripts/hooks/useFlag';
-import AddressInfo from 'client/scripts/models/AddressInfo';
-import {
-  useClaimTokenFlow,
-  useGetAllocationQuery,
-  useGetClaimAddressQuery,
-  useUpdateClaimAddressMutation,
-} from 'client/scripts/state/api/tokenAllocations';
-import CWBanner from 'client/scripts/views/components/component_kit/new_designs/CWBanner';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import { AuthModal } from 'client/scripts/views/modals/AuthModal';
+import { notifySuccess } from 'controllers/app/notifications';
+import { formatAddressShort } from 'helpers';
+import AddressInfo from 'models/AddressInfo';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
+import { useUpdateClaimAddressMutation } from 'state/api/tokenAllocations';
 import useUserStore from 'state/ui/user';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from 'views/modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 // eslint-disable-next-line max-len
-import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divider';
-import clsx from 'clsx';
-// eslint-disable-next-line max-len
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
-import './TokenClaimBanner.scss';
+import { useCommonAirdrop } from '../useCommonAirdrop';
+import './ClaimCard.scss';
 
-interface TokenClaimBannerProps {
+interface ClaimCardProps {
+  hasClaimed: boolean;
+  cardNumber: number;
+  isClaimAvailable: boolean;
+  isPendingClaimFunds: boolean;
+  isReadyForClaimNow: boolean;
+  isReadyForClaimAfterUnlock: boolean;
+  claimableTokens: string | number;
+  claimablePercentage: number;
+  tokenSymbol: string;
+  claimedTXHash?: string;
+  claimedToAddress?: string;
+  allocationId?: string;
+  allocationUnlocksAt?: string; // ISO timestamp if present
+  allocationClaimedAt?: string; // ISO timestamp if present
+  allocatedToAddress?: string;
+  hasClaimableAmount?: boolean;
+  mode: 'initial' | 'final';
   onConnectNewAddress?: () => void;
 }
 
-// Format token balance with locale separators and 4 decimal places
-const formatTokenBalance = (balance: string | number): string => {
-  const numBalance = Number(balance);
-  return numBalance.toLocaleString(undefined, {
-    maximumFractionDigits: 4,
-    minimumFractionDigits: 0,
-  });
-};
-
-const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
+const ClaimCard = ({
+  onConnectNewAddress,
+  hasClaimed,
+  cardNumber,
+  isClaimAvailable,
+  isPendingClaimFunds,
+  isReadyForClaimNow,
+  isReadyForClaimAfterUnlock,
+  claimableTokens,
+  claimablePercentage,
+  tokenSymbol,
+  claimedTXHash,
+  claimedToAddress,
+  allocationId,
+  allocationUnlocksAt,
+  allocationClaimedAt,
+  mode,
+  hasClaimableAmount,
+  allocatedToAddress,
+}: ClaimCardProps) => {
   const user = useUserStore();
-  const [formattedClaimable, setFormattedClaimable] = useState<string>('0');
-
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   // token claim address
   const [evmAddresses, setEvmAddresses] = useState<AddressInfo[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<
     AddressInfo | undefined
   >(undefined);
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
-  const [countdown, setCountdown] = useState<string>('00:00:00');
+  const [pendingSignatureCountdown, setPendingSignatureCountdown] =
+    useState<string>('00:00:00');
   const [unlockCountdown, setUnlockCountdown] = useState<string>('00:00:00');
   const [syncCountdown, setSyncCountdown] = useState<string>('00:00:00');
-  const claimsEnabled = useFlag('claims');
-  const {
-    claim: claimToken,
-    claimTxData,
-    isPending: isClaiming,
-    transactionHash,
-  } = useClaimTokenFlow();
+  const commonAirdrop = useCommonAirdrop();
+  const claimTxData = commonAirdrop.txData;
+  const claimState =
+    mode === 'initial' ? commonAirdrop.initial : commonAirdrop.final;
   const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
-  const { data: claimAddress, isLoading: isLoadingClaimAddress } =
-    useGetClaimAddressQuery({ enabled: user.isLoggedIn });
-  const { data: allocation, isLoading: isLoadingAllocation } =
-    useGetAllocationQuery({
-      magna_allocation_id: claimAddress?.magna_allocation_id,
-      enabled:
-        !!claimAddress?.magna_allocation_id &&
-        !transactionHash &&
-        user.isLoggedIn,
-    });
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
-  console.log('allocation => ', allocation);
+  const ethClaimAmount = 0.0003; // TODO: this should be corrected and based on the actual amount
 
   useEffect(() => {
     const addresses = new Map<string, AddressInfo>();
@@ -90,23 +93,13 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
   }, [user]);
 
   useEffect(() => {
-    if (claimAddress?.address) {
+    if (claimedToAddress) {
       setSelectedAddress(
-        evmAddresses.find((a) => a.address === claimAddress?.address),
+        evmAddresses.find((a) => a.address === claimedToAddress),
       );
     }
-    setFormattedClaimable(
-      formatTokenBalance(
-        allocation?.claimable ||
-          allocation?.amount ||
-          claimAddress?.tokens ||
-          0,
-      ),
-    );
-    setTxHash(
-      (claimAddress?.magna_claim_tx_hash as `0x${string}`) ?? transactionHash,
-    );
-  }, [claimAddress, evmAddresses, allocation, transactionHash]);
+    setTxHash((claimedTXHash as `0x${string}`) ?? claimState.txHash);
+  }, [claimedToAddress, claimedTXHash, evmAddresses, claimState.txHash]);
 
   // Countdown timer effect - updates every second
   useEffect(() => {
@@ -153,7 +146,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
         String(minutes).padStart(2, '0'),
         String(seconds).padStart(2, '0'),
       ].join(':');
-      setCountdown(formattedTime);
+      setPendingSignatureCountdown(formattedTime);
     };
 
     // Update immediately
@@ -167,13 +160,13 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
 
   // Separate unlock countdown timer effect
   useEffect(() => {
-    if (!allocation?.unlock_start_at) {
+    if (!allocationUnlocksAt) {
       setUnlockCountdown('00:00:00');
       return;
     }
 
     const updateUnlockCountdown = () => {
-      const unlockTime = moment(allocation.unlock_start_at);
+      const unlockTime = moment(allocationUnlocksAt);
       const now = moment();
 
       if (unlockTime.isAfter(now)) {
@@ -213,7 +206,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     const interval = setInterval(updateUnlockCountdown, 1000);
 
     return () => clearInterval(interval);
-  }, [allocation?.unlock_start_at]);
+  }, [allocationUnlocksAt]);
 
   // Sync countdown timer effect - updates every second
   useEffect(() => {
@@ -275,88 +268,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     }
   };
 
-  if (!claimsEnabled) {
-    return <></>;
-  }
-
-  if (!user.isLoggedIn) {
-    return (
-      <div className="TokenClaimBanner">
-        <CWBanner
-          type="info"
-          body={
-            <div className="general-notice">
-              <h3 className="description">Login to check your COMMON Claim</h3>
-              <CWButton
-                label="Login to check"
-                onClick={() => setIsAuthModalOpen(true)}
-              />
-            </div>
-          }
-        />
-
-        <AuthModal
-          isOpen={isAuthModalOpen}
-          onClose={() => setIsAuthModalOpen(false)}
-        />
-      </div>
-    );
-  }
-
-  if (isLoadingClaimAddress) {
-    return null;
-  }
-
-  // Logged-in user with no claim address or zero allocation: show an informational banner
-  const tokensNumber = Number(claimAddress?.tokens ?? 0);
-  if (
-    user.isLoggedIn &&
-    (claimAddress === null || (claimAddress && tokensNumber <= 0))
-  ) {
-    return (
-      <div className="TokenClaimBanner">
-        <div className="notice-text">
-          <div className="no-allocation-notice">
-            <CWText
-              type="h5"
-              fontWeight="semiBold"
-              className="no-allocation-title"
-            >
-              No COMMON Allocation
-            </CWText>
-            <CWText className="no-allocation-description">
-              This round recognizes earlier participation by community members
-              across activity, collectibles, and rewards history. Your account
-              isn&apos;t included in this snapshot.
-            </CWText>
-            <CWText className="no-allocation-encouragement">
-              Keep participating, join communities, contribute, and watch for
-              future reward opportunities.
-            </CWText>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const canClaim = !!claimAddress;
-  const hasClaimed = claimAddress?.magna_claimed_at && txHash;
-  const isClaimAvailable = claimAddress?.magna_synced_at;
-  const isPendingClaimFunds = allocation?.status === 'PENDING_FUNDING';
-  const isReadyForClaimNow =
-    isClaimAvailable &&
-    allocation?.magna_allocation_id &&
-    allocation?.walletAddress &&
-    (allocation?.claimable ?? 0) > 0;
-  const isReadyForClaimAfterUnlock =
-    isClaimAvailable &&
-    !isReadyForClaimNow &&
-    (allocation?.claimable ?? 0) > 0 &&
-    allocation?.unlock_start_at;
-
-  const getClaimBody = () => {
-    if (!canClaim) return null;
-
+  const getCardBody = () => {
     if (hasClaimed) {
       const formatClaimDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -381,11 +293,10 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                   fontWeight="semiBold"
                   className="claimed-title"
                 >
-                  Claim Completed
+                  Claimed
                 </CWText>
                 <CWText className="claimed-date">
-                  {claimAddress?.magna_claimed_at &&
-                    formatClaimDate(claimAddress.magna_claimed_at)}
+                  {allocationClaimedAt && formatClaimDate(allocationClaimedAt)}
                 </CWText>
               </div>
             </div>
@@ -407,26 +318,52 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
       );
     }
 
+    // This instance should be displayed without a countdown timer for cliff state
+    const finalTokensLocked = (
+      <div className="notice-text">
+        <div className="countdown-container countdown-in-progress">
+          <div className="countdown-left">
+            <CWText type="h5" fontWeight="semiBold" className="countdown-title">
+              Tokens Locked
+            </CWText>
+            <CWText className="countdown-description">
+              Your tokens will be available for claiming once the initial claim
+              transaction is confirmed.
+            </CWText>
+          </div>
+        </div>
+      </div>
+    );
+
     if (isClaimAvailable) {
+      const pendingMagnaProcessing = (
+        <div className="countdown-container countdown-in-progress">
+          <div className="countdown-left">
+            <CWText type="h5" fontWeight="semiBold" className="countdown-title">
+              Claim Request Received
+            </CWText>
+            <CWText className="countdown-description">
+              Your claim request has been received. Claims are processed in
+              batches, and your request is expected to be included in the next
+              batch.
+            </CWText>
+          </div>
+          <div className="countdown-timer">
+            <CWText type="h4" fontWeight="medium" className="timer-label">
+              Claim In
+            </CWText>
+            <CWText type="h1" fontWeight="bold" className="timer-display">
+              {pendingSignatureCountdown}
+            </CWText>
+          </div>
+        </div>
+      );
+
       if (isReadyForClaimNow) {
         return (
           <div className="notice-text">
             {isPendingClaimFunds ? (
-              <>
-                <div className="countdown-timer">
-                  <CWText type="h4" fontWeight="medium" className="timer-label">
-                    Claim In
-                  </CWText>
-                  <CWText type="h1" fontWeight="bold" className="timer-display">
-                    {countdown}
-                  </CWText>
-                </div>
-                <p className="batch-processing-notice">
-                  Your claim request has been received. Claims are processed in
-                  batches, and your request is expected to be included in the
-                  next batch.
-                </p>
-              </>
+              pendingMagnaProcessing
             ) : (
               <>
                 <div className="claim-action-container">
@@ -461,22 +398,26 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                   </div>
                   <CWButton
                     label={`Claim to ${formatAddressShort(
-                      allocation?.walletAddress || '',
+                      allocatedToAddress || '',
                       6,
                     )}`}
                     onClick={() => {
-                      if (allocation) {
-                        claimToken({
-                          allocation_id: allocation.magna_allocation_id,
-                        });
+                      if (allocationId) {
+                        claimState
+                          .claim({
+                            allocation_id: allocationId,
+                          })
+                          .catch(console.error);
                       }
                     }}
                     disabled={
-                      isClaiming || isLoadingAllocation || isPendingClaimFunds
+                      claimState.isPending ||
+                      !allocatedToAddress ||
+                      isPendingClaimFunds
                     }
                     className="hero-colored-button"
                     aria-label={`Claim to ${formatAddressShort(
-                      allocation?.walletAddress || '',
+                      allocatedToAddress || '',
                       6,
                     )}`}
                   />
@@ -504,17 +445,17 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
                             </li>
                             <li>
                               <CWText>
-                                Send 0.0003 ETH to&nbsp;
+                                Send {ethClaimAmount} ETH to&nbsp;
                                 <span
                                   className="copyable-address"
                                   onClick={() => {
                                     void navigator.clipboard.writeText(
-                                      claimTxData.from,
+                                      claimTxData.to,
                                     );
                                     notifySuccess('Address copied!');
                                   }}
                                 >
-                                  {formatAddressShort(claimTxData.from, 4)}
+                                  {formatAddressShort(claimTxData.to, 4)}
                                   <CWIcon iconName="copy" iconSize="small" />
                                 </span>
                                 &nbsp;with hex data&nbsp;
@@ -547,16 +488,39 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
       if (isReadyForClaimAfterUnlock) {
         return (
           <div className="notice-text">
-            <div className="countdown-timer">
-              <CWText type="h4" fontWeight="medium" className="timer-label">
-                Your tokens will unlock in
-              </CWText>
-              <CWText type="h2" fontWeight="bold" className="timer-display">
-                {unlockCountdown}
-              </CWText>
+            <div className="countdown-container countdown-in-progress">
+              <div className="countdown-left">
+                <CWText
+                  type="h5"
+                  fontWeight="semiBold"
+                  className="countdown-title"
+                >
+                  Tokens Locked
+                </CWText>
+                <CWText className="countdown-description">
+                  Your tokens will be available for claiming once the unlock
+                  period completes.
+                </CWText>
+              </div>
+              <div className="countdown-timer">
+                <CWText type="h4" fontWeight="medium" className="timer-label">
+                  Unlocks In
+                </CWText>
+                <CWText type="h1" fontWeight="bold" className="timer-display">
+                  {unlockCountdown}
+                </CWText>
+              </div>
             </div>
           </div>
         );
+      }
+
+      if (!hasClaimableAmount) {
+        if (mode === 'final') {
+          return finalTokensLocked;
+        } else {
+          return pendingMagnaProcessing;
+        }
       }
 
       // claim is available but we landed on an error case
@@ -571,7 +535,7 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
               <a href="mailto:tech@common.foundation" className="contact-link">
                 tech@common.foundation
               </a>
-              &nbsp; or reach out in the&nbsp;
+              &nbsp;or reach out in the&nbsp;
               <a
                 href="https://discord.gg/common"
                 target="_blank"
@@ -587,117 +551,117 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
       );
     }
 
+    if (mode === 'final') {
+      return finalTokensLocked;
+    }
+
     // Show ui to set address for claim
-    if (!selectedAddress || !selectedAddress?.address) {
+    if (!selectedAddress || !selectedAddress?.address || !claimedToAddress) {
       return (
         <div className="notice-text">
-          <div className="banner-actions">
-            <div className="address-form-section">
-              <CWText
-                type="h5"
-                fontWeight="semiBold"
-                className="address-form-title"
-              >
-                Setup your claim address
-              </CWText>
-              <CWText className="address-form-description">
-                Select your EVM address where you&apos;d like to receive your
-                allocated tokens.
-              </CWText>
-              <div className="address-input-container">
-                <CWSelectList
-                  components={{
-                    Option: (originalProps) =>
-                      CustomAddressOption({
-                        originalProps,
-                        selectedAddressValue: selectedAddress?.address || '',
-                      }),
-                  }}
-                  noOptionsMessage={() => 'No available addresses'}
-                  placeholder="Select or paste your EVM address"
-                  value={
-                    selectedAddress?.address
-                      ? convertAddressToDropdownOption(selectedAddress.address)
-                      : null
-                  }
-                  defaultValue={
-                    claimAddress?.address
-                      ? convertAddressToDropdownOption(claimAddress.address)
-                      : null
-                  }
-                  formatOptionLabel={(option) => (
-                    <CustomAddressOptionElement
-                      value={option.value}
-                      label={option.label}
-                      selectedAddressValue={selectedAddress?.address || ''}
-                    />
-                  )}
-                  isClearable={false}
-                  isSearchable={true}
-                  options={addressOptions}
-                  onChange={handleAddressChange}
-                  className="enhanced-address-select"
-                  aria-label="Select or enter your EVM address for token claiming"
-                />
-                {selectedAddress?.address && (
-                  <div className="address-actions">
-                    <CWIcon
-                      iconName="copy"
-                      iconSize="medium"
-                      className="copy-icon"
-                      onClick={() => {
-                        void navigator.clipboard.writeText(
-                          selectedAddress.address,
-                        );
-                        notifySuccess('Address copied to clipboard!');
-                      }}
-                    />
-                  </div>
+          <div className="address-form-section">
+            <CWText
+              type="h5"
+              fontWeight="semiBold"
+              className="address-form-title"
+            >
+              Setup your claim address
+            </CWText>
+            <CWText className="address-form-description">
+              Select your EVM address where you&apos;d like to receive your
+              allocated tokens.
+            </CWText>
+            <div className="address-input-container">
+              <CWSelectList
+                components={{
+                  Option: (originalProps) =>
+                    CustomAddressOption({
+                      originalProps,
+                      selectedAddressValue: selectedAddress?.address || '',
+                    }),
+                }}
+                noOptionsMessage={() => 'No available addresses'}
+                placeholder="Select or paste your EVM address"
+                value={
+                  selectedAddress?.address
+                    ? convertAddressToDropdownOption(selectedAddress.address)
+                    : null
+                }
+                defaultValue={
+                  claimedToAddress
+                    ? convertAddressToDropdownOption(claimedToAddress)
+                    : null
+                }
+                formatOptionLabel={(option) => (
+                  <CustomAddressOptionElement
+                    value={option.value}
+                    label={option.label}
+                    selectedAddressValue={selectedAddress?.address || ''}
+                  />
                 )}
-              </div>
-              <div className="terms-and-button-section">
-                <div className="terms-checkbox-container">
-                  <CWCheckbox
-                    checked={isAcknowledged}
-                    onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
-                    label={
-                      <CWText className="terms-text">
-                        I understand that by adding my address, I adhere to
-                        the&nbsp;
-                        <a
-                          href="/airdrop-terms.pdf"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="terms-link"
-                        >
-                          airdrop terms of service
-                        </a>
-                        &nbsp;and&nbsp;
-                        <a
-                          href="https://common.foundation/privacy"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="terms-link"
-                        >
-                          privacy policy
-                        </a>
-                        .
-                      </CWText>
-                    }
+                isClearable={false}
+                isSearchable={true}
+                options={addressOptions}
+                onChange={handleAddressChange}
+                className="enhanced-address-select"
+                aria-label="Select or enter your EVM address for token claiming"
+              />
+              {selectedAddress?.address && (
+                <div className="address-actions">
+                  <CWIcon
+                    iconName="copy"
+                    iconSize="medium"
+                    className="copy-icon"
+                    onClick={() => {
+                      void navigator.clipboard.writeText(
+                        selectedAddress.address,
+                      );
+                      notifySuccess('Address copied to clipboard!');
+                    }}
                   />
                 </div>
-                {isAcknowledged && (
-                  <CWButton
-                    label={isUpdating ? 'Saving...' : 'Save Address'}
-                    onClick={handleClaimAddressUpdate}
-                    disabled={isUpdating || !selectedAddress}
-                    buttonType="primary"
-                    buttonHeight="sm"
-                    className="save-address-button"
-                    aria-label="Save the selected address for token claiming"
-                  />
-                )}
+              )}
+            </div>
+            <div className="terms-and-button-section">
+              <div className="terms-checkbox-container">
+                <CWCheckbox
+                  checked={isAcknowledged}
+                  onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
+                  label={
+                    <CWText className="terms-text">
+                      I understand that by adding my address, I adhere to
+                      the&nbsp;
+                      <a
+                        href="/airdrop-terms.pdf"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="terms-link"
+                      >
+                        airdrop terms of service
+                      </a>
+                      &nbsp;and&nbsp;
+                      <a
+                        href="https://common.foundation/privacy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="terms-link"
+                      >
+                        privacy policy
+                      </a>
+                      .
+                    </CWText>
+                  }
+                />
               </div>
+              <CWButton
+                label={isUpdating ? 'Saving...' : 'Save Address'}
+                onClick={handleClaimAddressUpdate}
+                disabled={!isAcknowledged || isUpdating || !selectedAddress}
+                buttonType="primary"
+                buttonHeight="sm"
+                className="save-address-button"
+                aria-label="Save the selected address for token claiming"
+              />
             </div>
           </div>
         </div>
@@ -706,13 +670,15 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
 
     return (
       <div className="notice-text">
-        <div className="sync-countdown-notice">
-          <CWText type="h5" fontWeight="semiBold" className="sync-title">
-            Sync Pending
-          </CWText>
-          <CWText className="sync-description">
-            We need to sync onchain with your saved address.
-          </CWText>
+        <div className="countdown-container countdown-needs-action">
+          <div className="countdown-left">
+            <CWText type="h5" fontWeight="semiBold" className="countdown-title">
+              Sync Pending
+            </CWText>
+            <CWText className="countdown-description">
+              We need to sync onchain with your saved address.
+            </CWText>
+          </div>
           <div className="countdown-timer">
             <CWText type="h4" fontWeight="medium" className="timer-label">
               Next Sync In
@@ -726,52 +692,19 @@ const TokenClaimBanner = ({ onConnectNewAddress }: TokenClaimBannerProps) => {
     );
   };
 
-  return canClaim ? (
-    <div
-      className={clsx('TokenClaimBanner', {
-        'in-progress': isClaimAvailable,
-        'needs-action': !isClaimAvailable && !hasClaimed,
-        completed: hasClaimed,
-      })}
-    >
-      <CWBanner
-        type={claimAddress?.address ? 'info' : 'error'}
-        body={
-          <div className="banner-content">
-            <div className="hero-section">
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  width: 'fit-content',
-                }}
-              >
-                <CWText
-                  type="h1"
-                  fontWeight="semiBold"
-                  className="description-text"
-                >
-                  {claimAddress?.description}
-                </CWText>
-                <CWDivider />
-              </div>
-              <div className="token-balance-container">
-                <CWText type="caption" className="balance-label">
-                  Your Allocation
-                </CWText>
-                <CWText type="h1" fontWeight="bold" className="balance-amount">
-                  {formattedClaimable} {claimAddress?.token} Tokens
-                </CWText>
-              </div>
-            </div>
-            <div className="notice-section">{getClaimBody()}</div>
-          </div>
-        }
-      />
+  return (
+    <div className="notice-section-count-container">
+      <div className="notice-section-count-number">#{cardNumber}</div>
+      <div className="notice-section-content">
+        <div className="banner">
+          <CWText type="buttonSm" fontWeight="semiBold" isCentered>
+            {claimablePercentage}% claim // {claimableTokens} {tokenSymbol}
+          </CWText>
+        </div>
+        <div className="notice-section">{getCardBody()}</div>
+      </div>
     </div>
-  ) : null;
+  );
 };
 
-export default TokenClaimBanner;
+export default ClaimCard;
