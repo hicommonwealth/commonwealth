@@ -10,6 +10,8 @@ import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import FloatingBubbles from 'views/components/FloatingBubbles';
+import StaggeredAnimation from 'views/components/StaggeredAnimation';
 import { AuthModal } from 'views/modals/AuthModal';
 import ClaimCard from './ClaimCard';
 import './CommonAirdropCard.scss';
@@ -209,6 +211,20 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         body={
           <div className="banner-content">
             <div className="hero-section">
+              <FloatingBubbles intensity="medium" speed="normal" />
+              <StaggeredAnimation
+                animationType="sparkle"
+                delay={0.3}
+                duration={6}
+                className="hero-sparkles"
+              >
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </StaggeredAnimation>
               <div className="header-content">
                 <div className="airdrop-title-section">
                   <CWText
