@@ -7,6 +7,7 @@ export * from './DeleteAddress.command';
 export * from './DeleteAllAddresses.command';
 export * from './DeleteCommunity.command';
 export * from './DeleteGroup.command';
+export * from './DeletePrivateMCPServer.command';
 export * from './GenerateStakeholderGroups.command';
 export * from './GetByDomain.query';
 export * from './GetCommunities.query';
