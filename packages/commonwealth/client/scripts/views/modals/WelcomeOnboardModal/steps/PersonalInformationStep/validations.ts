@@ -1,11 +1,11 @@
-import { emailValidationSchema } from 'helpers/formValidations/common';
-import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
+import {
+  emailValidationSchema,
+  usernameSchema,
+} from 'helpers/formValidations/common';
 import z from 'zod';
 
 export const personalInformationFormValidation = z.object({
-  username: z
-    .string({ error: VALIDATION_MESSAGES.NO_INPUT })
-    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+  username: usernameSchema,
   email: emailValidationSchema,
   enableAccountNotifications: z.boolean(),
   enableProductUpdates: z.boolean(),

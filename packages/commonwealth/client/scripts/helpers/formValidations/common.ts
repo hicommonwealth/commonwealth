@@ -1,3 +1,8 @@
+import {
+  COMMUNITY_NAME_ERROR,
+  COMMUNITY_NAME_REGEX,
+} from '@hicommonwealth/shared';
+import emojiRegex from 'emoji-regex';
 import { z } from 'zod';
 import { VALIDATION_MESSAGES } from './messages';
 
@@ -141,3 +146,27 @@ export const stringHasNumbersOnlyValidationSchema = z
     (value) => /^\d+$/.test(`${value}`), // checks for digits only
     { message: VALIDATION_MESSAGES.INVALID_INPUT },
   );
+
+export const communityNameSchema = z
+  .string({ error: VALIDATION_MESSAGES.NO_INPUT })
+  .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+  .max(255, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
+  .regex(COMMUNITY_NAME_REGEX, {
+    message: COMMUNITY_NAME_ERROR,
+  })
+  .refine((val) => !emojiRegex().test(val), {
+    message: 'Name must not contain emojis',
+  })
+  .refine((val) => !/common/i.test(val), {
+    message: 'Name must not contain the word "Common"',
+  });
+
+export const usernameSchema = z
+  .string({ error: VALIDATION_MESSAGES.NO_INPUT })
+  .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+  .refine((val) => !emojiRegex().test(val), {
+    message: 'Username must not contain emojis',
+  })
+  .refine((val) => !/common/i.test(val), {
+    message: 'Username must not contain the word "Common"',
+  });

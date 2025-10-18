@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 
 import { useFlag } from 'client/scripts/hooks/useFlag';
+import { communityNameSchema } from 'helpers/formValidations/common';
 import { useFetchPublicEnvVarQuery } from 'state/api/configuration';
 import {
   CWImageInput,
@@ -10,6 +11,7 @@ import {
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import type { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
@@ -77,6 +79,14 @@ const CommunityInformationForm = ({
         communityChainValidation,
       )
     : baseCommunityInformationFormValidationSchema;
+
+  const validateCommunityName = (
+    value: string,
+  ): [ValidationStatus, string] | [] => {
+    const res = communityNameSchema.safeParse(value);
+    if (res.success) return [];
+    return ['failure', JSON.parse(res.error.message)[0].message];
+  };
 
   const getChainOptions = () => {
     const mappedChainValue = (chainType) => ({
@@ -184,6 +194,7 @@ const CommunityInformationForm = ({
         customError={
           isCommunityNameTaken ? 'Community name is already taken' : ''
         }
+        inputValidationFn={validateCommunityName}
       />
 
       {withChainsConfig && (

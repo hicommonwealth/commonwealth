@@ -180,6 +180,7 @@
     "discord.js": "^14.16.2",
     "dompurify": "^2.5.8",
     "dotenv": "^16.0.3",
+    "emoji-regex": "^10.6.0",
     "esm-loader-css": "^1.0.6",
     "ethers": "5.7.2",
     "express": "^4.18.2",

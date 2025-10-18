@@ -22,6 +22,7 @@
   "dependencies": {
     "@hicommonwealth/evm-protocols": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
+    "emoji-regex": "^10.6.0",
     "zod": "catalog:"
   }
 }
