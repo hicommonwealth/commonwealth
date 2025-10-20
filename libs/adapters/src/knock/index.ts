@@ -111,8 +111,11 @@ export function KnockProvider(): NotificationsProvider {
       // Extract active workflow keys
       if (data.entries && Array.isArray(data.entries)) {
         const fetchedWorkflows = data.entries
-          .filter((workflow: any) => workflow.active === true)
-          .map((workflow: any) => workflow.key as WorkflowKeys);
+          .filter((workflow: { active: boolean }) => workflow.active)
+          .map(
+            (workflow: { key: string; active: boolean }) =>
+              workflow.key as WorkflowKeys,
+          );
 
         activeWorkflows = fetchedWorkflows;
         activeWorkflowsCacheTimestamp = Date.now();
