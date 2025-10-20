@@ -1,4 +1,4 @@
-import { DaysOfWeek } from '@knocklabs/node';
+import { DaysOfWeek } from '@hicommonwealth/core';
 import { config } from '../../config';
 
 function parseCustomDomain(customDomain: string) {

@@ -574,8 +574,8 @@ export enum KnockChannelIds {
 export type NotificationsProviderRecipient =
   | string
   | {
-      collection: string;
-      id: string;
+      collection?: string | undefined;
+      id?: string | undefined;
     };
 
 type BaseNotifProviderOptions = {
@@ -688,23 +688,29 @@ export type NotificationsProviderGetMessagesReturn = Array<{
   id: string;
   channel_id: string;
   recipient: NotificationsProviderRecipient;
-  tenant: string | null;
-  status: 'queued' | 'sent' | 'delivered' | 'undelivered' | 'not_sent';
-  read_at: string | null;
-  seen_at: string | null;
-  archived_at: string | null;
+  tenant?: string | null;
+  status:
+    | 'queued'
+    | 'sent'
+    | 'delivered'
+    | 'undelivered'
+    | 'not_sent'
+    | 'delivery_attempted'
+    | 'bounced';
+  read_at?: string | null;
+  seen_at?: string | null;
+  archived_at?: string | null;
   inserted_at: string;
   updated_at: string;
   source: {
     version_id: string;
     key: string;
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
+  data?: { [key: string]: unknown } | null;
   __cursor?: string;
 }>;
 
-const DaysOfWeek = {
+export const DaysOfWeek = {
   Mon: 'mon',
   Tue: 'tue',
   Wed: 'wed',
@@ -715,22 +721,19 @@ const DaysOfWeek = {
 } as const;
 
 export type NotificationsProviderScheduleRepeats = Array<{
-  frequency: z.infer<typeof EmailNotificationInterval>;
+  frequency: 'daily' | 'weekly' | 'monthly' | 'hourly';
   interval?: number;
-  day_of_month?: number;
-  days?:
-    | Array<(typeof DaysOfWeek)[keyof typeof DaysOfWeek]>
-    | 'weekdays'
-    | 'weekends';
-  hours?: number;
-  minutes?: number;
+  day_of_month?: number | null;
+  days?: Array<(typeof DaysOfWeek)[keyof typeof DaysOfWeek]> | null;
+  hours?: number | null;
+  minutes?: number | null;
 }>;
 
 export type NotificationsProviderSchedulesReturn = Array<{
   id: string;
   actor?: NotificationsProviderRecipient;
   recipient: NotificationsProviderRecipient;
-  data: Record<string, unknown>;
+  data: Record<string, unknown> | null | undefined;
   workflow: string;
   repeats: NotificationsProviderScheduleRepeats;
   last_occurrence_at?: Date;
@@ -794,12 +797,12 @@ export interface NotificationsProvider extends Disposable {
 
   identifyUser(options: IdentifyUserOptions): Promise<{
     id: string;
-    name?: string;
-    email?: string;
-    phone_number?: string;
-    avatar?: string;
-    created_at?: string;
-    updated_at?: string;
+    name?: string | null;
+    email?: string | null;
+    phone_number?: string | null;
+    avatar?: string | null;
+    created_at?: string | null;
+    updated_at?: string | null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   }>;

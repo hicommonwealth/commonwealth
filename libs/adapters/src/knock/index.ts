@@ -8,15 +8,16 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER } from '@hicommonwealth/shared';
-import { Knock, Schedule } from '@knocklabs/node';
-import { ScheduleRepeatProperties } from '@knocklabs/node/dist/src/resources/workflows/interfaces';
+// import { Knock, Schedule } from '@knocklabs/node';
+import Knock, { signUserToken } from '@knocklabs/node';
+// import { ScheduleRepeatProperties } from '@knocklabs/node/dist/src/resources/workflows/interfaces';
 import _ from 'lodash';
 import { config } from '../config';
 
 const log = logger(import.meta);
 
 function formatScheduleResponse(
-  schedules: Schedule[],
+  schedules: Knock.Schedule[],
 ): NotificationsProviderSchedulesReturn {
   return schedules.map((s) => ({
     id: s.id,
@@ -36,8 +37,14 @@ function formatScheduleResponse(
   }));
 }
 
+let activeWorkflows: WorkflowKeys[] | undefined = undefined;
+let activeWorkflowsCacheTimestamp: number | undefined = undefined;
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+
 export function KnockProvider(): NotificationsProvider {
-  const knock = new Knock(config.NOTIFICATIONS.KNOCK_SECRET_KEY);
+  const knock = new Knock({
+    apiKey: config.NOTIFICATIONS.KNOCK_SECRET_KEY,
+  });
 
   async function getExistingKnockTokensForUser(
     userId: number,
@@ -48,7 +55,8 @@ export function KnockProvider(): NotificationsProvider {
         `${userId}`,
         channelId,
       );
-      return channelData.data.tokens;
+      if ('tokens' in channelData.data) return channelData.data.tokens;
+      return [];
     } catch (e) {
       // the knock SDK says it returns '404' if the user does not have channel
       // data but the typescript SDK doesn't provide the status so there's no
@@ -65,6 +73,70 @@ export function KnockProvider(): NotificationsProvider {
 
       case 'APNS':
         return config.PUSH_NOTIFICATIONS.KNOCK_APNS_CHANNEL_ID;
+    }
+  }
+
+  async function isActiveWorkflow(workflowKey: WorkflowKeys): Promise<boolean> {
+    // Check if cache is still valid
+    const now = Date.now();
+    const isCacheValid =
+      activeWorkflows &&
+      activeWorkflowsCacheTimestamp &&
+      now - activeWorkflowsCacheTimestamp < CACHE_TTL_MS;
+
+    // Return cached result if available and not expired
+    if (isCacheValid && activeWorkflows!.includes(workflowKey)) return true;
+
+    try {
+      // Fetch workflows from Knock Management API
+      const response = await fetch('https://api.knock.app/v1/workflows', {
+        headers: {
+          Authorization: `Bearer ${config.NOTIFICATIONS.KNOCK_SECRET_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        log.error(
+          'Failed to fetch workflows from Knock Management API',
+          undefined,
+          {
+            status: response.status,
+            statusText: response.statusText,
+          },
+        );
+        return false;
+      }
+
+      const data = await response.json();
+
+      // Extract active workflow keys
+      if (data.entries && Array.isArray(data.entries)) {
+        const fetchedWorkflows = data.entries
+          .filter((workflow: any) => workflow.active === true)
+          .map((workflow: any) => workflow.key as WorkflowKeys);
+
+        activeWorkflows = fetchedWorkflows;
+        activeWorkflowsCacheTimestamp = Date.now();
+
+        log.info('Successfully fetched and cached active workflows', {
+          count: fetchedWorkflows.length,
+          workflows: fetchedWorkflows,
+          cacheExpiresAt: new Date(
+            activeWorkflowsCacheTimestamp + CACHE_TTL_MS,
+          ).toISOString(),
+        });
+
+        return fetchedWorkflows.includes(workflowKey);
+      }
+
+      return false;
+    } catch (error) {
+      log.error(
+        'Error fetching workflows from Knock Management API',
+        error as Error,
+      );
+      return false;
     }
   }
 
@@ -97,6 +169,11 @@ export function KnockProvider(): NotificationsProvider {
         return [];
       }
 
+      if (!(await isActiveWorkflow(options.key))) {
+        log.warn(`Workflow '${options.key}' is disabled on Knock!`);
+        return [];
+      }
+
       const recipientChunks = _.chunk(
         options.users,
         MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER,
@@ -125,7 +202,7 @@ export function KnockProvider(): NotificationsProvider {
     async getMessages(
       options: NotificationsProviderGetMessagesOptions,
     ): Promise<NotificationsProviderGetMessagesReturn> {
-      const res = await knock.users.getMessages(options.user_id, {
+      const res = await knock.users.listMessages(options.user_id, {
         page_size: options.page_size,
         channel_id: options.channel_id,
         after: options.cursor,
@@ -136,45 +213,41 @@ export function KnockProvider(): NotificationsProvider {
 
     async getSchedules(options): Promise<NotificationsProviderSchedulesReturn> {
       try {
-        const res = await knock.users.getSchedules(options.user_id, {
-          // @ts-expect-error Knock SDK doesn't support this option, but it works since the Knock API supports it
+        const res = await knock.users.listSchedules(options.user_id, {
           workflow: options.workflow_id,
         });
         return formatScheduleResponse(res.entries);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
-        if ('status' in e && e.status === 404) {
+      } catch (e) {
+        if (e instanceof Knock.APIError && e.status === 404) {
           return [];
         } else throw e;
       }
     },
 
     async createSchedules(options) {
-      const res = await knock.workflows.createSchedules(options.workflow_id, {
+      const res = await knock.schedules.create({
+        workflow: options.workflow_id,
         recipients: options.user_ids,
-        repeats: options.schedule as unknown as ScheduleRepeatProperties[],
+        repeats: options.schedule,
       });
       return formatScheduleResponse(res);
     },
 
     async updateSchedules(options) {
-      const res = await knock.workflows.updateSchedules({
+      const res = await knock.schedules.update({
         schedule_ids: options.schedule_ids,
-        repeats: options.schedule as ScheduleRepeatProperties[],
+        repeats: options.schedule,
       });
       return formatScheduleResponse(res);
     },
 
     async deleteSchedules(options) {
-      const res = await knock.workflows.deleteSchedules(options);
+      const res = await knock.schedules.delete(options);
       return new Set(res.map((s) => s.id));
     },
 
     async identifyUser(options) {
-      return await knock.users.identify(
-        options.user_id,
-        options.user_properties,
-      );
+      return knock.users.update(options.user_id, options.user_properties);
     },
 
     async registerClientRegistrationToken(
@@ -189,10 +262,12 @@ export function KnockProvider(): NotificationsProvider {
           userId,
           channelId,
         );
-        const tokens: ReadonlyArray<string> = [token, ...existingTokens];
+        const tokens: Array<string> = [token, ...existingTokens];
 
         await knock.users.setChannelData(`${userId}`, channelId, {
-          tokens,
+          data: {
+            tokens,
+          },
         });
         return true;
       } else {
@@ -214,12 +289,14 @@ export function KnockProvider(): NotificationsProvider {
           channelId,
         );
 
-        const tokens: ReadonlyArray<string> = existingTokens.filter(
+        const tokens: Array<string> = existingTokens.filter(
           (current) => current !== token,
         );
 
         await knock.users.setChannelData(`${userId}`, channelId, {
-          tokens,
+          data: {
+            tokens,
+          },
         });
         return true;
       } else {
@@ -232,7 +309,7 @@ export function KnockProvider(): NotificationsProvider {
       userId: number,
       expiresInSeconds: number,
     ): Promise<string> {
-      return await Knock.signUserToken(`${userId}`, {
+      return await signUserToken(`${userId}`, {
         signingKey: config.NOTIFICATIONS.KNOCK_SIGNING_KEY,
         expiresInSeconds,
       });

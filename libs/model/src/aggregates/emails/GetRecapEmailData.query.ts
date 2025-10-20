@@ -84,35 +84,35 @@ async function getMessages(userId: string): Promise<{
             event_name: EnrichedNotificationNames.CommentCreated,
             ...message.data,
             inserted_at: message.inserted_at,
-          });
+          } as DiscussionNotifications[number]);
           break;
         case WorkflowKeys.UserMentioned:
           discussion.push({
             event_name: EnrichedNotificationNames.UserMentioned,
             ...message.data,
             inserted_at: message.inserted_at,
-          });
+          } as DiscussionNotifications[number]);
           break;
         case WorkflowKeys.ChainProposals:
           governance.push({
             event_name: EnrichedNotificationNames.ChainProposal,
             ...message.data,
             inserted_at: message.inserted_at,
-          });
+          } as GovernanceNotifications[number]);
           break;
         case WorkflowKeys.SnapshotProposals:
           governance.push({
             event_name: EnrichedNotificationNames.SnapshotProposalCreated,
             ...message.data,
             inserted_at: message.inserted_at,
-          });
+          } as GovernanceNotifications[number]);
           break;
         case WorkflowKeys.CommunityStake:
           protocol.push({
             event_name: EnrichedNotificationNames.CommunityStakeTrade,
             ...message.data,
             inserted_at: message.inserted_at,
-          });
+          } as ProtocolNotifications[number]);
           break;
       }
     }
