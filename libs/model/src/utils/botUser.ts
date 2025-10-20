@@ -1,3 +1,4 @@
+import { logger } from '@hicommonwealth/core';
 import { config } from '../config';
 import { models } from '../database';
 import type { AddressInstance } from '../models/address';
