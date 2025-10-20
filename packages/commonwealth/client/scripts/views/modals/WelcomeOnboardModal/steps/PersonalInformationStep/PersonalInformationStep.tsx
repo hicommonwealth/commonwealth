@@ -1,5 +1,6 @@
 import { DEFAULT_NAME, WalletId } from '@hicommonwealth/shared';
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
+import { usernameSchema } from 'helpers/formValidations/common';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -19,6 +20,7 @@ import { generateUsername } from 'unique-username-generator';
 import { useDebounce } from 'usehooks-ts';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
+import type { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
   CWForm,
@@ -102,6 +104,12 @@ const PersonalInformationStep = ({
   const isUsernameTaken = existingUsernames.includes(
     currentUsername.toLowerCase(),
   );
+
+  const validateUsername = (value: string): [ValidationStatus, string] | [] => {
+    const res = usernameSchema.safeParse(value);
+    if (res.success) return [];
+    return ['failure', JSON.parse(res.error.message)[0].message];
+  };
 
   const handleGenerateUsername = () => {
     const randomUsername = generateUsername('', 2);
@@ -198,6 +206,7 @@ const PersonalInformationStep = ({
                   : ''
               }
               disabled={isUserNameChangeDisabled}
+              inputValidationFn={validateUsername}
             />
             <CWButton
               label="Generate new username"

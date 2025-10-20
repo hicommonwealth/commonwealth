@@ -1,6 +1,9 @@
 import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import { notifyError } from 'controllers/app/notifications';
-import { linkValidationSchema } from 'helpers/formValidations/common';
+import {
+  linkValidationSchema,
+  usernameSchema,
+} from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
 import { useFlag } from 'hooks/useFlag';
 import AddressInfo from 'models/AddressInfo';
@@ -11,6 +14,7 @@ import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useUserStore, { useUserAiSettingsStore } from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import ManageApiKey from 'views/components/EditProfile/ManageAPIKeys';
+import type { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
 import { PageNotFound } from '../../pages/404';
@@ -98,6 +102,12 @@ const EditProfile = () => {
     },
     [],
   );
+
+  const validateUsername = (value: string): [ValidationStatus, string] | [] => {
+    const res = usernameSchema.safeParse(value);
+    if (res.success) return [];
+    return ['failure', JSON.parse(res.error.message)[0].message];
+  };
 
   useEffect(() => {
     if (isLoadingProfile) return;
@@ -326,6 +336,7 @@ const EditProfile = () => {
                 // TODO: username generator like in PersonalInformationStep?
                 name="username"
                 hookToForm
+                inputValidationFn={validateUsername}
               />
               <CWTextInput
                 fullWidth
