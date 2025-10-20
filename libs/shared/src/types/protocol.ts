@@ -118,6 +118,7 @@ export enum WalletId {
   OkxWallet = 'okx-wallet',
   bitgetWallet = 'bitget',
   Gate = 'gate',
+  Base = 'base',
 }
 
 // Passed directly to Magic login.
