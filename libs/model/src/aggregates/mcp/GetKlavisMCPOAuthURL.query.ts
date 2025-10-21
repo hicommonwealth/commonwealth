@@ -59,7 +59,9 @@ export function GetKlavisMCPOAuthURL(): Query<
         const { oauthUrl } = await klavis.mcpServer.getOAuthUrl({
           serverName: existingServer.name as 'Google Sheets',
           instanceId: instance.instanceId,
-          redirectUrl: `${baseUrl}/api/integration/klavis/oauth-callback?instanceId=${instance.instanceId}&original_url=${original_url}`,
+          redirectUrl:
+            `${baseUrl}/api/integration/klavis/oauth-callback?` +
+            `instanceId=${instance.instanceId}&original_url=${original_url}`,
         });
 
         return {

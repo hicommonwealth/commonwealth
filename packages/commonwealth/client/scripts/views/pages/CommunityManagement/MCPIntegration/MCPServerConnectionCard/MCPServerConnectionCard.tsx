@@ -50,7 +50,7 @@ const MCPServerConnectionCard = ({
         setIsDeleting(false);
         notifySuccess(`${serverName} disconnected successfully`);
         // Invalidate the query to refresh the server list
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
           queryKey: [['mcp', 'getCommunityMcpServers']],
         });
       },
