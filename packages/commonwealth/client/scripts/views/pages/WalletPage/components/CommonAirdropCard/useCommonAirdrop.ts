@@ -46,7 +46,7 @@ export const useCommonAirdrop = () => {
     trpc.tokenAllocation.updateClaimTransactionHash.useMutation();
   const claimFinalToken = trpc.tokenAllocation.claimTokenCliff.useMutation();
   const updateFinalClaimTxHash =
-    trpc.tokenAllocation.updateClaimTransactionHash.useMutation();
+    trpc.tokenAllocation.updateClaimCliffTransactionHash.useMutation();
 
   const claimToken = (type: 'initial' | 'final') => {
     const claimFunction =
