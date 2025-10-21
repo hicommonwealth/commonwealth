@@ -702,7 +702,7 @@ const ClaimCard = ({
       <div className="notice-section-content">
         <div className="banner">
           <CWText type="buttonSm" fontWeight="semiBold" isCentered>
-            {claimablePercentage}% claim // {claimableTokens} {tokenSymbol}
+            {claimablePercentage}% tokens // {claimableTokens} {tokenSymbol}
           </CWText>
         </div>
         <div className="notice-section">{getCardBody()}</div>
