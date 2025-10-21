@@ -42,7 +42,7 @@ function parseArguments(): ScoringConfig {
   const args = process.argv.slice(2);
 
   // Default values
-  let historicalEndDate = '2025-10-01T12:00:00.000Z'; // Oct 1st at noon
+  let historicalEndDate = '2025-10-15T12:00:00.000Z'; // Oct 1st at noon
   let threadWeight = 10;
   let commentWeight = 5;
   let reactionWeight = 1;
