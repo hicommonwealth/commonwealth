@@ -118,7 +118,7 @@ const {
   MAGNA_CLIFF_DATE,
   SLACK_WEBHOOK_URL_ALL_ENG,
   SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
-  CLAIMS_API,
+  FLAG_CLAIMS,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -403,7 +403,7 @@ export const config = configure(
       },
     },
     CLAIMS: {
-      ENABLED: CLAIMS_API === 'true',
+      ENABLED: FLAG_CLAIMS === 'true',
     },
   },
   z.object({
