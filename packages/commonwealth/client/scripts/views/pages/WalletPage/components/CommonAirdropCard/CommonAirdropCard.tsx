@@ -191,8 +191,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       const isReadyForClaimAfterUnlock = !!(
         isClaimAvailable &&
         !isReadyForClaimNow &&
-        initialTxHash && // 🚨 IMP: added this as a fallback to avoid potential bugs
-        // (allocation?.claimable ?? 0) > 0 && // 🚨 IMP: commenting this could be a potential bug
+        (initialTxHash || (allocation?.claimable ?? 0) > 0) &&
         allocation?.unlock_start_at &&
         !hasCliffDatePassed
       );
