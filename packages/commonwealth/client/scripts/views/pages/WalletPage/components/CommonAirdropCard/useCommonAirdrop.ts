@@ -46,7 +46,7 @@ export const useCommonAirdrop = () => {
     trpc.tokenAllocation.updateClaimTransactionHash.useMutation();
   const claimFinalToken = trpc.tokenAllocation.claimTokenCliff.useMutation();
   const updateFinalClaimTxHash =
-    trpc.tokenAllocation.updateClaimTransactionHash.useMutation();
+    trpc.tokenAllocation.updateClaimCliffTransactionHash.useMutation();
 
   const claimToken = (type: 'initial' | 'final') => {
     const claimFunction =
@@ -57,6 +57,7 @@ export const useCommonAirdrop = () => {
       type === 'initial'
         ? updateInitialClaimTxHash.mutateAsync
         : updateFinalClaimTxHash.mutateAsync;
+
     return async (input: Parameters<typeof claimFunction>[0]) => {
       try {
         const data = await claimFunction(input);
@@ -93,6 +94,7 @@ export const useCommonAirdrop = () => {
               data.from,
               `${BASE_ID}`,
               data.data,
+              type === 'initial',
               controller.provider,
             );
           } else {
@@ -107,6 +109,7 @@ export const useCommonAirdrop = () => {
               data.from,
               `${baseNode.ethChainId}`,
               data.data,
+              type === 'initial',
             );
           }
           // at this point the claim transaction is signed!
