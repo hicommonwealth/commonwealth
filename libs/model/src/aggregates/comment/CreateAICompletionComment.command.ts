@@ -39,10 +39,11 @@ export function CreateAICompletionComment(): Command<
       }
 
       // Get the bot user with address
-      const { user: botUser, address: botUserAddress } = await getBotUser();
-      if (!botUser) {
+      const botUserData = await getBotUser();
+      if (!botUserData) {
         throw new InvalidState(CreateAICompletionCommentErrors.BotUserNotFound);
       }
+      const { user: botUser, address: botUserAddress } = botUserData;
 
       // Find the bot user's address in the specific community
       let botAddress = await models.Address.findOne({
