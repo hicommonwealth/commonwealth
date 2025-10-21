@@ -11,6 +11,8 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
     auth: [],
     secure: true,
     body: async ({ actor }) => {
+      if (!config.CLAIMS?.ENABLED) throw new InvalidState('Claims not enabled');
+
       const claimAddress = await models.sequelize.query<
         z.infer<typeof schemas.ClaimAddressView>
       >(
