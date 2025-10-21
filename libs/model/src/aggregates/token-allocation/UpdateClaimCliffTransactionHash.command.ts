@@ -11,12 +11,14 @@ export function UpdateClaimCliffTransactionHash(): Command<
     auth: [],
     secure: true,
     body: async ({ payload, actor }) => {
-      const { transaction_hash } = payload;
+      const { transaction_hash, transaction_at } = payload;
 
       const [, updated] = await models.sequelize.query(
         `
           UPDATE "ClaimAddresses"
-          SET magna_cliff_claim_tx_hash = :transaction_hash
+          SET 
+            magna_cliff_claim_tx_hash = :transaction_hash,
+            magna_cliff_claim_tx_at = :transaction_at
           WHERE
             user_id = :user_id
             AND magna_cliff_claimed_at IS NOT NULL
@@ -28,6 +30,7 @@ export function UpdateClaimCliffTransactionHash(): Command<
           replacements: {
             user_id: actor.user.id,
             transaction_hash,
+            transaction_at,
           },
         },
       );
