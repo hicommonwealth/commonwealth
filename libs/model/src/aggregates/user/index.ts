@@ -10,6 +10,7 @@ export * from './GetNewContent.query';
 export * from './GetStatus.query';
 export * from './GetUser.query';
 export * from './GetUserAddresses.query';
+export * from './GetUserCommunities.query';
 export * from './GetUserProfile.query';
 export * from './GetUserReferralFees.query';
 export * from './GetUserReferrals.query';
