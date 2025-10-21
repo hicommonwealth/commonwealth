@@ -11,7 +11,10 @@ export function UpdateClaimCliffTransactionHash(): Command<
     auth: [],
     secure: true,
     body: async ({ payload, actor }) => {
-      const { transaction_hash, transaction_at } = payload;
+      const { transaction_hash } = payload;
+
+      // TODO: validate tx
+      const transaction_at = new Date().toISOString();
 
       const [, updated] = await models.sequelize.query(
         `

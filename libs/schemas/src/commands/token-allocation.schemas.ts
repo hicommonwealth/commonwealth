@@ -26,7 +26,6 @@ export const ClaimToken = {
 export const UpdateClaimTransactionHash = {
   input: z.object({
     transaction_hash: EVM_TRANSACTION_HASH,
-    transaction_at: z.date(),
   }),
   output: z.boolean(),
 };
