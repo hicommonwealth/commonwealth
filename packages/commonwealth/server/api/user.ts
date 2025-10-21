@@ -58,6 +58,7 @@ export const trpcRouter = trpc.router({
   deleteApiKey: trpc.command(User.DeleteApiKey, trpc.Tag.User),
   getUserProfile: trpc.query(User.GetUserProfile, trpc.Tag.User),
   getUserAddresses: trpc.query(User.GetUserAddresses, trpc.Tag.User),
+  getUserCommunities: trpc.query(User.GetUserCommunities, trpc.Tag.User),
   searchUserProfiles: trpc.query(User.SearchUserProfiles, trpc.Tag.User),
   getUserReferrals: trpc.query(User.GetUserReferrals, trpc.Tag.User),
   getUserReferralFees: trpc.query(User.GetUserReferralFees, trpc.Tag.User),

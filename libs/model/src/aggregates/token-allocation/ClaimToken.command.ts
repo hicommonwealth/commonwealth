@@ -82,6 +82,11 @@ export function ClaimToken(): Command<typeof schemas.ClaimToken> {
             transaction_hash: null,
           };
         }
+
+        if (response?.error?.message?.includes('insufficient funds')) {
+          throw new InvalidState('Insufficient funds!', response.error);
+        }
+
         throw new InvalidState('Claim failed!', response.error);
       }
 

@@ -1,0 +1,175 @@
+@use '../../../styles/mixins/colors.module';
+
+.StaggeredAnimation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 2;
+
+  .staggered-item {
+    position: absolute;
+    pointer-events: none;
+    animation-fill-mode: both;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+
+    &.sparkle {
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 50%;
+        animation: sparklePulse 2s ease-in-out infinite;
+      }
+
+      &:nth-child(1) {
+        top: 15%;
+        left: 10%;
+        animation-name: sparkleFloat;
+      }
+
+      &:nth-child(2) {
+        top: 25%;
+        right: 15%;
+        animation-name: sparkleFloatReverse;
+      }
+
+      &:nth-child(3) {
+        top: 60%;
+        left: 20%;
+        animation-name: sparkleFloat;
+      }
+
+      &:nth-child(4) {
+        top: 70%;
+        right: 25%;
+        animation-name: sparkleFloatReverse;
+      }
+
+      &:nth-child(5) {
+        top: 40%;
+        left: 5%;
+        animation-name: sparkleFloat;
+      }
+
+      &:nth-child(6) {
+        top: 80%;
+        right: 10%;
+        animation-name: sparkleFloatReverse;
+      }
+    }
+
+    &.float {
+      animation-name: floatUp;
+    }
+
+    &.bounce {
+      animation-name: bounceIn;
+    }
+
+    &.fade {
+      animation-name: fadeInOut;
+    }
+  }
+}
+
+@keyframes sparkleFloat {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px) scale(1);
+    opacity: 0.8;
+  }
+  25% {
+    transform: translateY(-8px) translateX(4px) scale(1.1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-4px) translateX(-2px) scale(0.9);
+    opacity: 0.6;
+  }
+  75% {
+    transform: translateY(-12px) translateX(6px) scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes sparkleFloatReverse {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px) scale(1);
+    opacity: 0.8;
+  }
+  25% {
+    transform: translateY(-8px) translateX(-4px) scale(1.1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-4px) translateX(2px) scale(0.9);
+    opacity: 0.6;
+  }
+  75% {
+    transform: translateY(-12px) translateX(-6px) scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes sparklePulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.3;
+  }
+}
+
+@keyframes floatUp {
+  0%,
+  100% {
+    transform: translateY(0px);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-20px);
+    opacity: 1;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0) translateY(20px);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) translateY(-10px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0px);
+    opacity: 0.8;
+  }
+}
+
+@keyframes fadeInOut {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
