@@ -270,13 +270,15 @@ describe('Community lifecycle', () => {
     };
 
     const [server] = await seed('MCPServer', {
-      id: 1,
       name: 'mcp-server',
       description: 'A test MCP server',
       handle: 'mcp',
       source: 'test',
       server_url: 'https://mcp.example.com',
       source_identifier: 'test',
+      tools: [],
+      auth_required: true,
+      auth_completed: true,
     });
     mcpServer = server!;
   });
@@ -399,6 +401,9 @@ describe('Community lifecycle', () => {
         private_community_id: community.id,
         server_url: 'https://private-mcp.example.com',
         source_identifier: 'private-test',
+        tools: [],
+        auth_required: true,
+        auth_completed: true,
       });
 
       if (!privateMcpServer) {
