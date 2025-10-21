@@ -204,7 +204,6 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       };
     })(),
   };
-
   const tokensCount = Math.max(
     allocation?.amount || claimAddress?.tokens || 0,
     0,
