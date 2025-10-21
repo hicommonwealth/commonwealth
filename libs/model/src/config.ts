@@ -118,6 +118,7 @@ const {
   MAGNA_CLIFF_DATE,
   SLACK_WEBHOOK_URL_ALL_ENG,
   SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
+  CLAIMS_API,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -400,6 +401,9 @@ export const config = configure(
         ALL_ENG: SLACK_WEBHOOK_URL_ALL_ENG,
         MAGNA_NOTIFS: SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
       },
+    },
+    CLAIMS: {
+      ENABLED: CLAIMS_API === 'true',
     },
   },
   z.object({
@@ -830,6 +834,9 @@ export const config = configure(
         ALL_ENG: z.string().optional(),
         MAGNA_NOTIFS: z.string().optional(),
       }),
+    }),
+    CLAIMS: z.object({
+      ENABLED: z.boolean(),
     }),
   }),
 );
