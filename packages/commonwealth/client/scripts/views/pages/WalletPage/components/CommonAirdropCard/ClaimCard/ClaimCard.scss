@@ -8,6 +8,14 @@
   align-items: center;
   justify-content: center;
   width: 100% !important;
+
+  &.isCollapsed {
+    border: none !important;
+    .notice-section-count-number,
+    .notice-section-content > .banner {
+      display: none !important;
+    }
+  }
 }
 
 .notice-section-count-number {
@@ -243,9 +251,11 @@
 .error-notice {
   padding: 20px;
   text-align: center;
-  background: linear-gradient(135deg,
-      rgba(220, 53, 69, 0.08) 0%,
-      rgba(220, 53, 69, 0.02) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(220, 53, 69, 0.08) 0%,
+    rgba(220, 53, 69, 0.02) 100%
+  );
   border-radius: 8px;
   border: 1px solid rgba(220, 53, 69, 0.2);
   width: 100%;
@@ -409,10 +419,12 @@
   .save-address-button {
     align-self: flex-end;
     min-width: 160px;
-    background: linear-gradient(135deg,
-        #99251f 0%,
-        #b03e2d 50%,
-        #99251f 100%) !important;
+    background: linear-gradient(
+      135deg,
+      #99251f 0%,
+      #b03e2d 50%,
+      #99251f 100%
+    ) !important;
     color: colors.$white !important;
     border: none !important;
     border-radius: 8px !important;
@@ -420,10 +432,12 @@
     transition: all 0.2s ease !important;
 
     &:hover:not(:disabled) {
-      background: linear-gradient(135deg,
-          #7d1f1a 0%,
-          #99251f 50%,
-          #7d1f1a 100%) !important;
+      background: linear-gradient(
+        135deg,
+        #7d1f1a 0%,
+        #99251f 50%,
+        #7d1f1a 100%
+      ) !important;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(153, 37, 31, 0.3);
     }

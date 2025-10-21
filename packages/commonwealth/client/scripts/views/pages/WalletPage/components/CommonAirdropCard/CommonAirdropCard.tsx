@@ -43,7 +43,6 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     enabled:
       !!claimAddress?.magna_allocation_id && !initial.txHash && user.isLoggedIn,
   });
-  console.log('allocation => ', { allocation, claimAddress });
 
   if (!claimsEnabled) {
     return <></>;
@@ -114,6 +113,29 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     allocation?.status === 'PENDING_FUNDING' ||
     allocation?.status === 'NOT_STARTED'
   );
+  // 🚨 IMP/TODO: THESE DATES SHOULD BE THE TX DATES
+  const shouldCollapseClaimState = (() => {
+    if (!allocation?.cliff_date) {
+      return false;
+    }
+
+    const cliffDate = moment(allocation.cliff_date);
+    const now = moment();
+    const initialClaimedAt = claimAddress?.magna_claimed_at
+      ? moment(claimAddress.magna_claimed_at)
+      : null;
+
+    const cliffDatePassedButInitialClaimNotDone =
+      cliffDate.isBefore(now) && !claimAddress?.magna_claim_tx_hash;
+
+    const initialClaimCompletedAfterCliffDate =
+      initialClaimedAt && initialClaimedAt.isAfter(cliffDate);
+
+    return (
+      cliffDatePassedButInitialClaimNotDone ||
+      initialClaimCompletedAfterCliffDate
+    );
+  })();
   const claimSteps = {
     initial: (() => {
       const initialTxHash =
@@ -253,7 +275,58 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 </div>
               </div>
             </div>
-            <div className="notice-section-container">
+            {!shouldCollapseClaimState ? (
+              <div className="notice-section-container">
+                <ClaimCard
+                  cardNumber={1}
+                  hasClaimed={claimSteps.initial.hasClaimed}
+                  isClaimAvailable={claimSteps.initial.isClaimAvailable}
+                  isPendingClaimFunds={isPendingClaimFunds}
+                  isReadyForClaimNow={claimSteps.initial.isReadyForClaimNow}
+                  isReadyForClaimAfterUnlock={
+                    claimSteps.initial.isReadyForClaimAfterUnlock
+                  }
+                  hasClaimableAmount={(allocation?.claimable || 0) > 0}
+                  onConnectNewAddress={onConnectNewAddress}
+                  claimedTXHash={claimSteps.initial.txHash || undefined}
+                  claimedToAddress={claimAddress?.address || undefined}
+                  allocationUnlocksAt={allocation?.unlock_start_at || undefined}
+                  allocationClaimedAt={
+                    claimAddress?.magna_claimed_at || undefined
+                  }
+                  allocatedToAddress={claimAddress?.address || ''}
+                  allocationId={claimAddress?.magna_allocation_id || undefined}
+                  claimableTokens={initialClaimableTokens}
+                  claimablePercentage={initialClaimablePercentage}
+                  tokenSymbol={claimAddress?.token || ''}
+                  mode="initial"
+                />
+                <ClaimCard
+                  cardNumber={2}
+                  hasClaimed={claimSteps.final.hasClaimed}
+                  isClaimAvailable={claimSteps.final.isClaimAvailable}
+                  isPendingClaimFunds={isPendingClaimFunds}
+                  isReadyForClaimNow={claimSteps.final.isReadyForClaimNow}
+                  isReadyForClaimAfterUnlock={
+                    claimSteps.final.isReadyForClaimAfterUnlock
+                  }
+                  hasClaimableAmount={(allocation?.claimable || 0) > 0}
+                  onConnectNewAddress={onConnectNewAddress}
+                  claimedTXHash={claimSteps.final.txHash || undefined}
+                  claimedToAddress={claimAddress?.address || undefined}
+                  allocationUnlocksAt={allocation?.cliff_date || undefined}
+                  allocationClaimedAt={
+                    claimAddress?.magna_cliff_claimed_at || undefined
+                  }
+                  allocatedToAddress={claimAddress?.address || ''}
+                  allocationId={claimAddress?.magna_allocation_id || undefined}
+                  claimableTokens={finalClaimableTokens}
+                  claimablePercentage={finalClaimablePercentage}
+                  tokenSymbol={claimAddress?.token || ''}
+                  mode="final"
+                />
+              </div>
+            ) : (
               <ClaimCard
                 cardNumber={1}
                 hasClaimed={claimSteps.initial.hasClaimed}
@@ -277,32 +350,9 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 claimablePercentage={initialClaimablePercentage}
                 tokenSymbol={claimAddress?.token || ''}
                 mode="initial"
+                isCollapsed
               />
-              <ClaimCard
-                cardNumber={2}
-                hasClaimed={claimSteps.final.hasClaimed}
-                isClaimAvailable={claimSteps.final.isClaimAvailable}
-                isPendingClaimFunds={isPendingClaimFunds}
-                isReadyForClaimNow={claimSteps.final.isReadyForClaimNow}
-                isReadyForClaimAfterUnlock={
-                  claimSteps.final.isReadyForClaimAfterUnlock
-                }
-                hasClaimableAmount={(allocation?.claimable || 0) > 0}
-                onConnectNewAddress={onConnectNewAddress}
-                claimedTXHash={claimSteps.final.txHash || undefined}
-                claimedToAddress={claimAddress?.address || undefined}
-                allocationUnlocksAt={allocation?.cliff_date || undefined}
-                allocationClaimedAt={
-                  claimAddress?.magna_cliff_claimed_at || undefined
-                }
-                allocatedToAddress={claimAddress?.address || ''}
-                allocationId={claimAddress?.magna_allocation_id || undefined}
-                claimableTokens={finalClaimableTokens}
-                claimablePercentage={finalClaimablePercentage}
-                tokenSymbol={claimAddress?.token || ''}
-                mode="final"
-              />
-            </div>
+            )}
           </div>
         }
       />
