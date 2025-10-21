@@ -41,7 +41,7 @@ export function GetUserCommunities(): Query<typeof GetUserCommunitiesSchema> {
           JOIN "Addresses" a ON c.id = a.community_id and a.user_id = :user_id AND a.verified IS NOT NULL
           LEFT JOIN "StarredCommunities" sc ON c.id = sc.community_id AND sc.user_id = :user_id
         WHERE
-          c.active = true
+          c.active = true AND c.tier != 0
         ORDER BY
           sc.updated_at DESC NULLS LAST,
           c.created_at DESC;
