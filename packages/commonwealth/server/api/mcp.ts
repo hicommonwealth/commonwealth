@@ -6,5 +6,6 @@ export const trpcRouter = trpc.router({
     MCP.CreateKlavisMCPInstance,
     trpc.Tag.MCP,
   ),
+  getKlavisMCPOAuthURL: trpc.query(MCP.GetKlavisMCPOAuthURL, trpc.Tag.MCP),
   getCommunityMcpServers: trpc.query(MCP.GetCommunityMCPServers, trpc.Tag.MCP),
 });

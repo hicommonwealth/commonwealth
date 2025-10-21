@@ -26,6 +26,7 @@ import {
   CreateGroupErrors,
   DeleteGroup,
   DeleteGroupErrors,
+  DeletePrivateMCPServer,
   GetCommunities,
   GetCommunity,
   GetMembers,
@@ -269,13 +270,15 @@ describe('Community lifecycle', () => {
     };
 
     const [server] = await seed('MCPServer', {
-      id: 1,
       name: 'mcp-server',
       description: 'A test MCP server',
       handle: 'mcp',
       source: 'test',
       server_url: 'https://mcp.example.com',
       source_identifier: 'test',
+      tools: [],
+      auth_required: true,
+      auth_completed: true,
     });
     mcpServer = server!;
   });
@@ -388,6 +391,76 @@ describe('Community lifecycle', () => {
         created_at: expect.any(Date),
         updated_at: expect.any(Date),
       });
+    });
+
+    test('should delete private mcp server', async () => {
+      // Create a private MCP server for this community
+      const [privateMcpServer] = await seed('MCPServer', {
+        name: 'Private Test Server',
+        handle: 'private-test',
+        private_community_id: community.id,
+        server_url: 'https://private-mcp.example.com',
+        source_identifier: 'private-test',
+        tools: [],
+        auth_required: true,
+        auth_completed: true,
+      });
+
+      if (!privateMcpServer) {
+        throw new Error('Private MCP server not created');
+      }
+
+      // Associate it with the community
+      await command(SetCommunityMCPServers(), {
+        actor: superAdminActor,
+        payload: {
+          community_id: community.id,
+          mcp_server_ids: [privateMcpServer.id!],
+        },
+      });
+
+      // Delete the private server
+      const result = await command(DeletePrivateMCPServer(), {
+        actor: superAdminActor,
+        payload: {
+          community_id: community.id,
+          mcp_server_id: privateMcpServer.id!,
+        },
+      });
+      expect(result).to.toMatchObject(
+        _.omit(privateMcpServer, 'server_url', 'source_identifier'),
+      );
+
+      // Verify the server itself is deleted
+      const serverExists = await models.MCPServer.findOne({
+        where: { id: privateMcpServer.id },
+      });
+      expect(serverExists).to.be.null;
+
+      // Verify the association is also removed
+      const communityResult = await query(GetCommunity(), {
+        actor: superAdminActor,
+        payload: { id: community.id, include_mcp_servers: true },
+      });
+      const hasDeletedServer = communityResult?.MCPServerCommunities?.some(
+        (assoc) => assoc.mcp_server_id === privateMcpServer.id,
+      );
+      expect(hasDeletedServer).to.be.false;
+    });
+
+    test('should throw error when trying to delete non-private server', async () => {
+      // Try to delete a non-private server (mcpServer doesn't have private_community_id set)
+      await expect(
+        command(DeletePrivateMCPServer(), {
+          actor: superAdminActor,
+          payload: {
+            community_id: community.id,
+            mcp_server_id: mcpServer.id!,
+          },
+        }),
+      ).rejects.toThrow(
+        'MCP server is not a private server for this community',
+      );
     });
   });
 

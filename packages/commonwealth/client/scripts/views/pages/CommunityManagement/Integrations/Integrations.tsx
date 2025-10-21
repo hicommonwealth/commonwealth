@@ -7,7 +7,6 @@ import CustomTOS from './CustomTOS';
 import CustomURL from './CustomURL';
 import Directory from './Directory';
 import Discord from './Discord';
-import GoogleSheetsMCP from './GoogleSheetsMCP';
 import './Integrations.scss';
 import MCP from './MCP';
 import OnchainVerification from './OnchainVerification';
@@ -22,7 +21,6 @@ const Integrations = () => {
   const isEthereum = app.chain.meta.base === ChainBase.Ethereum;
 
   const isJudgementEnabled = useFlag('judgeContest');
-  const mcpGoogleSheetsEnabled = useFlag('mcpGoogleSheets');
   const mcpIntegrationsEnabled = useFlag('mcpIntegrationsEnabled');
 
   return (
@@ -47,7 +45,6 @@ const Integrations = () => {
         <Tokenization />
         {mcpIntegrationsEnabled && <MCP />}
         <Discord />
-        {mcpGoogleSheetsEnabled && <GoogleSheetsMCP />}
         <Webhooks />
         <CustomTOS />
         <CustomURL />

@@ -88,7 +88,9 @@ export function CreateKlavisMCPInstance(): Command<
           throw new Error(`Failed to create MCP instance: ${message}`);
         }
 
-        throw new Error('Failed to create MCP instance');
+        throw new Error(
+          `Failed to create MCP instance: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
       }
     },
   };
