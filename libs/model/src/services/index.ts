@@ -3,6 +3,7 @@ export * from './graphileWorker';
 export * from './knock';
 export * from './magna';
 export * from './mcpClient';
+export * from './mcpServerHelpers';
 export * from './openai';
 export * from './snapshot';
 export * from './solanaChainEvents';

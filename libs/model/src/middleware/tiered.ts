@@ -58,7 +58,7 @@ export function tiered({
 
     const user = await models.User.findOne({
       where: { id: actor.user.id },
-      attributes: ['id', 'tier', 'created_at'],
+      attributes: ['id', 'tier', 'created_at', 'wallet_verified'],
       include: [
         {
           model: models.Address,
@@ -74,15 +74,17 @@ export function tiered({
     // upgrade tier after a week
     let tier = user.tier;
     if (
-      tier === UserTierMap.NewlyVerifiedWallet &&
+      user.wallet_verified === false &&
       dayjs().diff(dayjs(user.created_at), 'weeks') >= 1
-    )
+    ) {
       tier = UserTierMap.VerifiedWallet;
-
+    }
     // WARNING: If router is not authenticated before this middleware this will incorrectly bump user tier
-    if (tier === UserTierMap.IncompleteUser)
+    if (tier === UserTierMap.IncompleteUser) {
       tier = UserTierMap.NewlyVerifiedWallet;
-    if (tier > user.tier)
+    }
+
+    if (tier != user.tier) {
       await models.sequelize.transaction(async (transaction) => {
         await setUserTier({
           userId: user.id!,
@@ -90,12 +92,14 @@ export function tiered({
           transaction,
         });
       });
+    }
 
-    if (tier < minTier)
+    if (tier < minTier) {
       throw new InvalidActor(
         actor,
         `Must be a user with tier above ${minTier}`,
       );
+    }
 
     // allow users with tiers above limits
     if (!hasTierRateLimits(tier)) return;

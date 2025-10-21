@@ -70,7 +70,7 @@ export function ProjectLaunchpadTrade(): Command<
                 address: trader_address,
                 user_id: { [Op.not]: null },
               },
-              attributes: ['user_id'],
+              attributes: ['user_id', 'verification_token'],
             });
             if (address) {
               await models.Address.findOrCreate({

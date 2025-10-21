@@ -1,4 +1,4 @@
-import { WalletId } from '@hicommonwealth/shared';
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import NewProfile from 'client/scripts/models/NewProfile';
 import {
@@ -53,10 +53,13 @@ const AddressItem = (props: AddressItemProps) => {
     <div className="AddressItem">
       <div className="address-section">
         <div className="address">
-          <CWCustomIcon
-            iconName={getChainIcon(addressInfo, fetchedCommunity?.base)}
-            iconSize="small"
-          />
+          {fetchedCommunity?.base &&
+            fetchedCommunity?.base !== ChainBase.Sui && (
+              <CWCustomIcon
+                iconName={getChainIcon(addressInfo, fetchedCommunity?.base)}
+                iconSize="small"
+              />
+            )}
           <CWIdentificationTag
             iconLeft={
               walletId === WalletId.Magic

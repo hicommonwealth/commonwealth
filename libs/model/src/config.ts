@@ -114,7 +114,10 @@ const {
   MAGNA_UNLOCK_SCHEDULE_ID,
   MAGNA_UNLOCK_START_AT,
   MAGNA_BATCH_SIZE,
+  MAGNA_INITIAL_PERCENTAGE,
+  MAGNA_CLIFF_DATE,
   SLACK_WEBHOOK_URL_ALL_ENG,
+  SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -371,7 +374,9 @@ export const config = configure(
       MAGNA_TOKEN &&
       MAGNA_TOKEN_ID &&
       MAGNA_UNLOCK_SCHEDULE_ID &&
-      MAGNA_UNLOCK_START_AT
+      MAGNA_UNLOCK_START_AT &&
+      MAGNA_INITIAL_PERCENTAGE &&
+      MAGNA_CLIFF_DATE
         ? {
             API_URL: MAGNA_API_URL,
             API_KEY: MAGNA_API_KEY,
@@ -382,6 +387,8 @@ export const config = configure(
             TOKEN_ID: MAGNA_TOKEN_ID,
             UNLOCK_SCHEDULE_ID: MAGNA_UNLOCK_SCHEDULE_ID,
             UNLOCK_START_AT: new Date(MAGNA_UNLOCK_START_AT),
+            INITIAL_PERCENTAGE: parseFloat(MAGNA_INITIAL_PERCENTAGE),
+            CLIFF_DATE: new Date(MAGNA_CLIFF_DATE),
             BATCH_SIZE: parseInt(
               MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE,
               10,
@@ -391,6 +398,7 @@ export const config = configure(
     SLACK: {
       CHANNELS: {
         ALL_ENG: SLACK_WEBHOOK_URL_ALL_ENG,
+        MAGNA_NOTIFS: SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
       },
     },
   },
@@ -812,12 +820,15 @@ export const config = configure(
         TOKEN_ID: z.uuid(),
         UNLOCK_SCHEDULE_ID: z.uuid(),
         UNLOCK_START_AT: z.date(),
+        INITIAL_PERCENTAGE: z.number().min(0.01).max(0.99),
+        CLIFF_DATE: z.date(),
         BATCH_SIZE: z.number(),
       })
       .optional(),
     SLACK: z.object({
       CHANNELS: z.object({
         ALL_ENG: z.string().optional(),
+        MAGNA_NOTIFS: z.string().optional(),
       }),
     }),
   }),

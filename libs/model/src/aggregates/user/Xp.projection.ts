@@ -40,31 +40,36 @@ async function getUserByAddress(
   address: string,
   minTier = UserTierMap.NewlyVerifiedWallet,
 ) {
-  const addr = await models.Address.findOne({
-    where: {
-      [Op.and]: [
-        {
-          [Op.or]: [
-            { address: address.toLowerCase() },
-            { address: getEvmAddress(address) },
-          ],
-        },
-        { user_id: { [Op.not]: null } },
-        { is_banned: { [Op.eq]: false } },
-      ],
-    },
-    attributes: ['user_id'],
-    include: [
-      {
-        model: models.User,
-        attributes: ['id'],
-        required: true,
-        where: { tier: { [Op.gte]: minTier } },
+  try {
+    const validated = getEvmAddress(address);
+    const addr = await models.Address.findOne({
+      where: {
+        [Op.and]: [
+          {
+            [Op.or]: [
+              { address: address.toLowerCase() },
+              { address: validated },
+            ],
+          },
+          { user_id: { [Op.not]: null } },
+          { is_banned: { [Op.eq]: false } },
+        ],
       },
-    ],
-  });
-
-  return addr?.user_id ?? undefined;
+      attributes: ['user_id'],
+      include: [
+        {
+          model: models.User,
+          attributes: ['id'],
+          required: true,
+          where: { tier: { [Op.gte]: minTier } },
+        },
+      ],
+    });
+    return addr?.user_id ?? undefined;
+  } catch (err) {
+    log.error('Error validating address', err as Error);
+    return undefined;
+  }
 }
 
 /*
@@ -279,8 +284,8 @@ async function recordXpsForQuest({
           event_id,
           event_created_at,
           user_id,
-          creator_user_id,
-          referrer_user_id,
+          creator_user_id: creator_user_id || null,
+          referrer_user_id: referrer_user_id || null,
           xp_points,
           creator_xp_points,
           referrer_xp_points,
