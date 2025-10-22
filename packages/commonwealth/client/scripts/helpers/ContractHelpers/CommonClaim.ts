@@ -124,7 +124,7 @@ class CommonClaim extends ContractBase {
           symbol: process.env.MAGNA_TOKEN,
           decimals: 18,
           chainId: parseInt(chainId),
-          imgUrl: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
+          image: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
         },
       },
     });
