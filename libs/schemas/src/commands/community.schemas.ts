@@ -175,6 +175,15 @@ export const SetCommunityMCPServers = {
   context: AuthContext,
 };
 
+export const DeletePrivateMCPServer = {
+  input: z.object({
+    community_id: z.string(),
+    mcp_server_id: z.number(),
+  }),
+  output: MCPServer,
+  context: AuthContext,
+};
+
 export const GenerateStakeholderGroups = {
   input: z.object({
     id: z.string(),

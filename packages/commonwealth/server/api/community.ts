@@ -240,6 +240,10 @@ export const trpcRouter = trpc.router({
     Community.SetCommunityMCPServers,
     trpc.Tag.Community,
   ),
+  deletePrivateMcpServer: trpc.command(
+    Community.DeletePrivateMCPServer,
+    trpc.Tag.Community,
+  ),
   getRoles: trpc.query(Community.GetRoles, trpc.Tag.Community),
   refreshWeightedVotes: trpc.command(
     Community.RefreshWeightedVotes,

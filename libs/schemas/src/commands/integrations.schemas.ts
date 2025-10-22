@@ -26,6 +26,25 @@ export const CreateKlavisMCPInstance = {
   context: AuthContext,
 };
 
+export const GetKlavisMCPOAuthURL = {
+  input: z.object({
+    server_name: z
+      .enum(['Google Sheets'])
+      .describe('The name/type of the MCP server'),
+    community_id: z
+      .string()
+      .describe('The ID of the community to verify association'),
+    original_url: z
+      .string()
+      .url()
+      .describe('The original page URL of the user'),
+  }),
+  output: z.object({
+    oauthUrl: z.string().describe('The OAuth URL for user authentication'),
+  }),
+  context: AuthContext,
+};
+
 export const KlavisOAuthCallback = {
   input: z.object({
     instanceId: z.string().describe('The unique identifier for the instance'),

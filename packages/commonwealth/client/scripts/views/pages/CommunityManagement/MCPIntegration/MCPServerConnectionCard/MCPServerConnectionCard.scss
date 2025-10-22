@@ -1,0 +1,38 @@
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+
+.MCPServerConnectionCard {
+  padding: 24px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .h4 {
+      color: colors.$neutral-900 !important;
+    }
+
+    .status {
+      color: colors.$neutral-500;
+    }
+  }
+
+  .card-description {
+    color: colors.$neutral-600;
+  }
+
+  .button-container {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+
+    .cw-button {
+      align-self: flex-start;
+    }
+  }
+}

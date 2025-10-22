@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import clsx from 'clsx';
 import { notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
 import AddressInfo from 'models/AddressInfo';
@@ -39,6 +40,7 @@ interface ClaimCardProps {
   allocatedToAddress?: string;
   hasClaimableAmount?: boolean;
   mode: 'initial' | 'final';
+  isCollapsed?: boolean;
   onConnectNewAddress?: () => void;
 }
 
@@ -61,6 +63,7 @@ const ClaimCard = ({
   mode,
   hasClaimableAmount,
   allocatedToAddress,
+  isCollapsed = false,
 }: ClaimCardProps) => {
   const user = useUserStore();
   // token claim address
@@ -80,7 +83,8 @@ const ClaimCard = ({
   const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
-  const ethClaimAmount = 0.0003; // TODO: this should be corrected and based on the actual amount
+  // TODO: this should be corrected and based on the actual amount
+  const ethClaimAmount = mode === 'initial' ? 0.0003 : 0.0001;
 
   useEffect(() => {
     const addresses = new Map<string, AddressInfo>();
@@ -693,12 +697,12 @@ const ClaimCard = ({
   };
 
   return (
-    <div className="notice-section-count-container">
+    <div className={clsx('notice-section-count-container', { isCollapsed })}>
       <div className="notice-section-count-number">#{cardNumber}</div>
       <div className="notice-section-content">
         <div className="banner">
           <CWText type="buttonSm" fontWeight="semiBold" isCentered>
-            {claimablePercentage}% claim // {claimableTokens} {tokenSymbol}
+            {claimablePercentage}% tokens // {claimableTokens} {tokenSymbol}
           </CWText>
         </div>
         <div className="notice-section">{getCardBody()}</div>

@@ -23,6 +23,7 @@ class SignTokenClaim extends ContractBase {
     contractAddress: string,
     walletAddress: string,
     data: string,
+    magnaPlatformFee?: string,
   ): Promise<{
     gasLimit: string;
     maxFeePerGas: string;
@@ -34,8 +35,6 @@ class SignTokenClaim extends ContractBase {
     balanceEth: string | number;
   }> {
     try {
-      // Magna platform fee that needs to be sent with the transaction
-      const magnaPlatformFee = '200000000000000'; // 0.0002 ETH
       // Estimate gas with the same parameters as the actual transaction
       const gasLimit = await this.web3.eth.estimateGas({
         from: walletAddress,
@@ -61,7 +60,9 @@ class SignTokenClaim extends ContractBase {
       // Calculate total cost: gas cost + magna platform fee
       const gasLimitWithBuffer = (BigInt(gasLimit) * 120n) / 100n; // +20% gas buffer
       const gasCost = gasLimitWithBuffer * BigInt(maxFeePerGas);
-      const totalRequiredCost = gasCost + BigInt(magnaPlatformFee);
+      const totalRequiredCost = magnaPlatformFee
+        ? gasCost + BigInt(magnaPlatformFee)
+        : gasCost;
 
       const hasEnoughBalance = BigInt(balance) >= totalRequiredCost;
 
@@ -106,12 +107,18 @@ class SignTokenClaim extends ContractBase {
     walletAddress: string,
     chainId: string,
     data: string,
+    hasMagnaPlatformFee: boolean,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     providerInstance?: any,
   ): Promise<`0x${string}`> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId, providerInstance);
     }
+
+    // Magna platform fee that needs to be sent with the transaction
+    const magnaPlatformFee = hasMagnaPlatformFee
+      ? '200000000000000'
+      : undefined; // 0.0002 ETH
 
     const {
       maxFeePerGas,
@@ -120,7 +127,12 @@ class SignTokenClaim extends ContractBase {
       requiredEth,
       balanceEth,
       gasLimit,
-    } = await this.estimateContractGas(this.tokenAddress, walletAddress, data);
+    } = await this.estimateContractGas(
+      this.tokenAddress,
+      walletAddress,
+      data,
+      magnaPlatformFee,
+    );
     if (!hasEnoughBalance) {
       throw new Error(
         `Not enough gas: requires ~${requiredEth} ETH for fees, but wallet only has ${balanceEth} ETH.
@@ -132,7 +144,7 @@ class SignTokenClaim extends ContractBase {
       from: walletAddress,
       to: this.tokenAddress,
       data, // magna sends the full abi-encoded calldata
-      value: '200000000000000', // fee from magna
+      value: magnaPlatformFee, // fee from magna
       gas: gasLimit,
       maxFeePerGas,
       maxPriorityFeePerGas,
