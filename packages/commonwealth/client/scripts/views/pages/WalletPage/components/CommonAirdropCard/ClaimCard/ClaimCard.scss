@@ -210,7 +210,12 @@
         gap: 4px;
 
         li {
+          text-align: left;
           padding-left: 4px;
+
+          .Text {
+            display: inline;
+          }
 
           .CWText {
             font-size: 14px;
@@ -562,6 +567,7 @@
       .claim-instructions {
         .instructions-title {
           font-size: 15px;
+          text-align: left;
         }
 
         .instructions-list {

@@ -1,4 +1,6 @@
 import clsx from 'clsx';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import CommonClaim from 'helpers/ContractHelpers/CommonClaim';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import React, { useState } from 'react';
@@ -35,7 +37,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const claimsEnabled = useFlag('claims');
-  const { initial, final } = useCommonAirdrop();
+  const { initial, final, getWalletProvider } = useCommonAirdrop();
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
     useGetClaimAddressQuery({ enabled: user.isLoggedIn });
   const { data: allocation } = useGetAllocationQuery({
@@ -108,12 +110,50 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     );
   }
 
+  const handleImportToken = async (claimFromAddress: string) => {
+    if (!claimFromAddress) {
+      notifyError('Set a claim address to import token!');
+      return;
+    }
+
+    try {
+      const { isMagicAddress, provider } =
+        await getWalletProvider(claimFromAddress);
+      if (isMagicAddress) {
+        // magic doesnt expose any api to import tokens to wallet, however if there
+        // are any tokens with > 0 value, it auto addes them to their wallet UI
+        notifySuccess('Imported to magic wallet');
+        return;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const contract = new CommonClaim(claimFromAddress, provider as any);
+      await contract.addTokenToWallet({
+        providerInstance: isMagicAddress ? provider : undefined,
+      });
+      notifySuccess('Imported to external wallet');
+    } catch (error) {
+      console.error('Failed to import token: ', error);
+      if (
+        error?.message?.toLowerCase().includes('not available') ||
+        error?.message?.toLowerCase().includes('unavailable') ||
+        error?.message?.toLowerCase().includes('not supported') ||
+        error?.message?.toLowerCase().includes('unsupported')
+      ) {
+        notifyError(
+          `Your wallet doesn't support token imports, please import manually`,
+        );
+        return;
+      }
+      notifyError('Failed to import token');
+    }
+  };
+
   const canClaim = !!claimAddress;
   const isPendingClaimFunds = !!(
     allocation?.status === 'PENDING_FUNDING' ||
     allocation?.status === 'NOT_STARTED'
   );
-  // 🚨 IMP/TODO: THESE DATES SHOULD BE THE TX DATES
   const shouldCollapseClaimState = (() => {
     if (!allocation?.cliff_date) {
       return false;
@@ -121,8 +161,8 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
 
     const cliffDate = moment(allocation.cliff_date);
     const now = moment();
-    const initialClaimedAt = claimAddress?.magna_claimed_at
-      ? moment(claimAddress.magna_claimed_at)
+    const initialClaimedAt = claimAddress?.magna_claim_tx_at
+      ? moment(claimAddress.magna_claim_tx_at)
       : null;
 
     const cliffDatePassedButInitialClaimNotDone =
@@ -156,12 +196,18 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         (allocation?.claimable ?? 0) > 0 &&
         allocation?.unlock_start_at
       );
+      const launchDateUTC = moment(process.env.MAGNA_CLAIM_LAUNCH_DATE);
+      const shouldWaitTillDate =
+        moment().isBefore(launchDateUTC) && claimAddress?.address
+          ? launchDateUTC
+          : undefined;
       return {
         txHash: initialTxHash,
         hasClaimed,
         isClaimAvailable,
         isReadyForClaimNow,
         isReadyForClaimAfterUnlock,
+        shouldWaitTillDate,
       };
     })(),
     final: (() => {
@@ -201,16 +247,18 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         isClaimAvailable,
         isReadyForClaimNow,
         isReadyForClaimAfterUnlock,
+        shouldWaitTillDate: undefined,
       };
     })(),
   };
+
   const tokensCount = Math.max(
     allocation?.amount || claimAddress?.tokens || 0,
     0,
   );
   const claimableTokens = formatTokenBalance(tokensCount);
-  // NOTE: fallback to 0.25, as its done in API, update if changed in api
-  const initialClaimPercentage = allocation?.initial_percentage || 0.25;
+  const initialClaimPercentage =
+    allocation?.initial_percentage || claimAddress?.initial_percentage;
   const initialClaimablePercentage = (initialClaimPercentage || 0) * 100;
   const initialClaimableTokens = tokensCount * (initialClaimPercentage || 0);
   const finalClaimablePercentage = (1 - (initialClaimPercentage || 0)) * 100;
@@ -223,7 +271,9 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         'needs-action':
           !claimSteps.initial.isClaimAvailable &&
           !claimSteps.initial.hasClaimed,
-        completed: claimSteps.initial.hasClaimed && claimSteps.final.hasClaimed,
+        completed: shouldCollapseClaimState
+          ? claimSteps.initial.hasClaimed
+          : claimSteps.initial.hasClaimed && claimSteps.final.hasClaimed,
       })}
     >
       <CWBanner
@@ -254,6 +304,17 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   >
                     {claimAddress?.description}
                   </CWText>
+                  <button
+                    className="add-to-wallet-button"
+                    onClick={() => {
+                      handleImportToken(claimAddress?.address as string).catch(
+                        console.error,
+                      );
+                    }}
+                  >
+                    <span className="button-icon">+</span>
+                    <span className="button-text">Add to wallet</span>
+                  </button>
                 </div>
                 <div className="allocation-section-container">
                   <div className="diagonal-separator"></div>
@@ -290,13 +351,14 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   claimedToAddress={claimAddress?.address || undefined}
                   allocationUnlocksAt={allocation?.unlock_start_at || undefined}
                   allocationClaimedAt={
-                    claimAddress?.magna_claimed_at || undefined
+                    claimAddress?.magna_claim_tx_at || undefined
                   }
                   allocatedToAddress={claimAddress?.address || ''}
                   allocationId={claimAddress?.magna_allocation_id || undefined}
                   claimableTokens={initialClaimableTokens}
                   claimablePercentage={initialClaimablePercentage}
                   tokenSymbol={claimAddress?.token || ''}
+                  shouldWaitTillDate={claimSteps.initial.shouldWaitTillDate}
                   mode="initial"
                 />
                 <ClaimCard
@@ -314,13 +376,14 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   claimedToAddress={claimAddress?.address || undefined}
                   allocationUnlocksAt={allocation?.cliff_date || undefined}
                   allocationClaimedAt={
-                    claimAddress?.magna_cliff_claimed_at || undefined
+                    claimAddress?.magna_cliff_claim_tx_at || undefined
                   }
                   allocatedToAddress={claimAddress?.address || ''}
                   allocationId={claimAddress?.magna_allocation_id || undefined}
                   claimableTokens={finalClaimableTokens}
                   claimablePercentage={finalClaimablePercentage}
                   tokenSymbol={claimAddress?.token || ''}
+                  shouldWaitTillDate={claimSteps.final.shouldWaitTillDate}
                   mode="final"
                 />
               </div>
@@ -340,13 +403,14 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 claimedToAddress={claimAddress?.address || undefined}
                 allocationUnlocksAt={allocation?.unlock_start_at || undefined}
                 allocationClaimedAt={
-                  claimAddress?.magna_claimed_at || undefined
+                  claimAddress?.magna_claim_tx_at || undefined
                 }
                 allocatedToAddress={claimAddress?.address || ''}
                 allocationId={claimAddress?.magna_allocation_id || undefined}
                 claimableTokens={initialClaimableTokens}
                 claimablePercentage={initialClaimablePercentage}
                 tokenSymbol={claimAddress?.token || ''}
+                shouldWaitTillDate={claimSteps.initial.shouldWaitTillDate}
                 mode="initial"
                 isCollapsed
               />
