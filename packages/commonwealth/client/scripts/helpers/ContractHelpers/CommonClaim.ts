@@ -3,6 +3,7 @@ import ContractBase from './ContractBase';
 
 class CommonClaim extends ContractBase {
   tokenAddress: string;
+  magnaPlatformFee = '200000000000000'; // 0.0002 ETH
 
   constructor(tokenAddress: string, rpc: string) {
     // empty abi to make the .filter in contract work
@@ -103,11 +104,28 @@ class CommonClaim extends ContractBase {
     }
   }
 
+  async addTokenToWallet(chainId: string) {
+    return await this.web3?.currentProvider?.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC20',
+        // `C` token
+        options: {
+          address: '0xD7DA840121aeb9792b202bd84Db32B2816B30c0e',
+          symbol: 'C',
+          decimals: 18,
+          chainId: parseInt(chainId),
+          imgUrl: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
+        },
+      },
+    });
+  }
+
   async sign(
     walletAddress: string,
     chainId: string,
     data: string,
-    hasMagnaPlatformFee: boolean,
+    includeMagnaPlatformFee: boolean,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     providerInstance?: any,
   ): Promise<`0x${string}`> {
@@ -116,9 +134,9 @@ class CommonClaim extends ContractBase {
     }
 
     // Magna platform fee that needs to be sent with the transaction
-    const magnaPlatformFee = hasMagnaPlatformFee
-      ? '200000000000000'
-      : undefined; // 0.0002 ETH
+    const magnaFee = includeMagnaPlatformFee
+      ? this.magnaPlatformFee
+      : undefined;
 
     const {
       maxFeePerGas,
@@ -131,7 +149,7 @@ class CommonClaim extends ContractBase {
       this.tokenAddress,
       walletAddress,
       data,
-      magnaPlatformFee,
+      magnaFee,
     );
     if (!hasEnoughBalance) {
       throw new Error(
@@ -144,7 +162,7 @@ class CommonClaim extends ContractBase {
       from: walletAddress,
       to: this.tokenAddress,
       data, // magna sends the full abi-encoded calldata
-      value: magnaPlatformFee, // fee from magna
+      value: magnaFee,
       gas: gasLimit,
       maxFeePerGas,
       maxPriorityFeePerGas,
@@ -161,20 +179,7 @@ class CommonClaim extends ContractBase {
           })
           .then(async () => {
             // add token to wallet
-            await this.web3?.currentProvider?.request({
-              method: 'wallet_watchAsset',
-              params: {
-                type: 'ERC20',
-                // `C` token
-                options: {
-                  address: '0xD7DA840121aeb9792b202bd84Db32B2816B30c0e',
-                  symbol: 'C',
-                  decimals: 18,
-                  chainId: parseInt(chainId),
-                  imgUrl: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
-                },
-              },
-            });
+            await this.addTokenToWallet(chainId);
           })
           .catch((e) => {
             console.error('Tx error: ', e);
