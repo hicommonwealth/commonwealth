@@ -2,8 +2,7 @@ import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
-import { validateClaimTxnHash } from '../../utils';
-//import { getTransaction } from '@hicommonwealth/evm-protocols';
+import { validateClaimTxnHash } from '../../utils/validateClaimTxnHash';
 
 export function UpdateClaimTransactionHash(): Command<
   typeof schemas.UpdateClaimTransactionHash
