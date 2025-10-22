@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import CommonClaim from 'helpers/ContractHelpers/CommonClaim';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
@@ -119,10 +119,18 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     try {
       const { isMagicAddress, provider } =
         await getWalletProvider(claimFromAddress);
+      if (isMagicAddress) {
+        // magic doesnt expose any api to import tokens to wallet, however if there
+        // are any tokens with > 0 value, it auto addes them to their wallet UI
+        notifySuccess('Imported to magic wallet');
+        return;
+      }
+
       const contract = new CommonClaim(claimFromAddress, provider as any);
       await contract.addTokenToWallet({
         providerInstance: isMagicAddress ? provider : undefined,
       });
+      notifySuccess('Imported to external wallet');
     } catch (error) {
       notifyError('Failed to import token');
       console.error('Failed to import token: ', error);
@@ -288,8 +296,8 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                       handleImportToken(claimAddress?.address as string)
                     }
                   >
-                    <span className="button-text">Add to wallet</span>
                     <span className="button-icon">+</span>
+                    <span className="button-text">Add to wallet</span>
                   </button>
                 </div>
                 <div className="allocation-section-container">

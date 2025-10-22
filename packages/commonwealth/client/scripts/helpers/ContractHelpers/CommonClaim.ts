@@ -119,7 +119,6 @@ class CommonClaim extends ContractBase {
       method: 'wallet_watchAsset',
       params: {
         type: 'ERC20',
-        // `C` token
         options: {
           address: process.env.MAGNA_TOKEN_ADDRESS,
           symbol: process.env.MAGNA_TOKEN,
@@ -189,7 +188,8 @@ class CommonClaim extends ContractBase {
           })
           .then(async () => {
             // add token to wallet
-            await this.addTokenToWallet({ chainId });
+            // this will fail for magic wallet, but thats an issue coz magic auto imports tokens with > 0 value
+            await this.addTokenToWallet({ chainId }).catch(() => null);
           })
           .catch((e) => {
             console.error('Tx error: ', e);
