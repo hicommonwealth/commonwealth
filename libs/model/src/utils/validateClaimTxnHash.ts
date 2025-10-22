@@ -28,5 +28,5 @@ export async function validateClaimTxnHash(txHash: `0x${string}`) {
     blockHash: txn.blockHash,
   });
 
-  return block.timestamp;
+  return new Date(Number(block.timestamp));
 }
