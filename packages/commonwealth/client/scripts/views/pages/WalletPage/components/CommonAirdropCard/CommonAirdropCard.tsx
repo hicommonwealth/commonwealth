@@ -129,10 +129,10 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         return;
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const contract = new CommonClaim(
         allocation?.tokenAddress,
         claimAddress?.token || 'C',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         provider as any,
       );
       await contract.addTokenToWallet({
