@@ -52,6 +52,7 @@ export async function magnaSync(
   breatherMs = 1000,
 ) {
   let created = 0;
+  let errors = 0;
   try {
     // update unset user_ids for NFT holders
     // this is because NFT holders
@@ -68,7 +69,7 @@ export async function magnaSync(
     `);
 
     let found = true;
-    while (found) {
+    while (found && errors < 3) {
       // Load next batch of allocations to sync with Magna
       const batch = await models.sequelize.query<TokenAllocationSyncArgs>(
         `
@@ -135,6 +136,7 @@ export async function magnaSync(
     }
   } catch (err) {
     log.error('Error syncing with Magna', err as Error);
+    errors++;
   }
   if (created > 0) await sendToSlack(created);
 }
