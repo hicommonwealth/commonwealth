@@ -306,11 +306,11 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   </CWText>
                   <button
                     className="add-to-wallet-button"
-                    onClick={() =>
+                    onClick={() => {
                       handleImportToken(claimAddress?.address as string).catch(
                         console.error,
-                      )
-                    }
+                      );
+                    }}
                   >
                     <span className="button-icon">+</span>
                     <span className="button-text">Add to wallet</span>
