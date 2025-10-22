@@ -132,8 +132,19 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       });
       notifySuccess('Imported to external wallet');
     } catch (error) {
-      notifyError('Failed to import token');
       console.error('Failed to import token: ', error);
+      if (
+        error?.message?.toLowerCase().includes('not available') ||
+        error?.message?.toLowerCase().includes('unavailable') ||
+        error?.message?.toLowerCase().includes('not supported') ||
+        error?.message?.toLowerCase().includes('unsupported')
+      ) {
+        notifyError(
+          `Your wallet doesn't support token imports, please import manually`,
+        );
+        return;
+      }
+      notifyError('Failed to import token');
     }
   };
 
