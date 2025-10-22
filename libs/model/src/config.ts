@@ -111,6 +111,7 @@ const {
   MAGNA_CONTRACT_ID,
   MAGNA_TOKEN,
   MAGNA_TOKEN_ID,
+  MAGNA_TOKEN_ADDRESS,
   MAGNA_UNLOCK_SCHEDULE_ID,
   MAGNA_UNLOCK_START_AT,
   MAGNA_BATCH_SIZE,
@@ -374,6 +375,7 @@ export const config = configure(
       MAGNA_CONTRACT_ID &&
       MAGNA_TOKEN &&
       MAGNA_TOKEN_ID &&
+      MAGNA_TOKEN_ADDRESS &&
       MAGNA_UNLOCK_SCHEDULE_ID &&
       MAGNA_UNLOCK_START_AT &&
       MAGNA_INITIAL_PERCENTAGE &&
@@ -386,6 +388,7 @@ export const config = configure(
             CONTRACT_ID: MAGNA_CONTRACT_ID,
             TOKEN: MAGNA_TOKEN,
             TOKEN_ID: MAGNA_TOKEN_ID,
+            TOKEN_ADDRESS: MAGNA_TOKEN_ADDRESS,
             UNLOCK_SCHEDULE_ID: MAGNA_UNLOCK_SCHEDULE_ID,
             UNLOCK_START_AT: new Date(MAGNA_UNLOCK_START_AT),
             INITIAL_PERCENTAGE: parseFloat(MAGNA_INITIAL_PERCENTAGE),
@@ -822,6 +825,7 @@ export const config = configure(
         CONTRACT_ID: z.uuid(),
         TOKEN: z.string().min(1),
         TOKEN_ID: z.uuid(),
+        TOKEN_ADDRESS: z.string().min(1),
         UNLOCK_SCHEDULE_ID: z.uuid(),
         UNLOCK_START_AT: z.date(),
         INITIAL_PERCENTAGE: z.number().min(0.01).max(0.99),
