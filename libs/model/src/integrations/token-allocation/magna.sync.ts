@@ -54,20 +54,6 @@ export async function magnaSync(
   let created = 0;
   let errors = 0;
   try {
-    // update unset user_ids for NFT holders
-    // this is because NFT holders
-    await models.sequelize.query(`
-      UPDATE "NftSnapshot" 
-      SET 
-        user_id = u.id,
-        user_tier = u.tier,
-        updated_at = NOW()
-      FROM "Addresses" a
-      INNER JOIN "Users" u ON a.user_id = u.id
-      WHERE LOWER("NftSnapshot".holder_address) = LOWER(a.address)
-        AND ("NftSnapshot".user_id IS NULL OR "NftSnapshot".user_tier IS NULL);
-    `);
-
     let found = true;
     while (found && errors < 3) {
       // Load next batch of allocations to sync with Magna
