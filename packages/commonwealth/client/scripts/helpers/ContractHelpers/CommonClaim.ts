@@ -3,12 +3,14 @@ import ContractBase from './ContractBase';
 
 class CommonClaim extends ContractBase {
   tokenAddress: string;
+  tokenSymbol: string;
   magnaPlatformFee = '200000000000000'; // 0.0002 ETH
 
-  constructor(tokenAddress: string, rpc: string) {
+  constructor(tokenAddress: string, tokenSymbol: string, rpc: string) {
     // empty abi to make the .filter in contract work
     super(tokenAddress, [], rpc);
     this.tokenAddress = tokenAddress;
+    this.tokenSymbol = tokenSymbol;
   }
 
   async initialize(
@@ -105,9 +107,13 @@ class CommonClaim extends ContractBase {
   }
 
   async addTokenToWallet({
+    address,
+    symbol,
     chainId = '8453',
     providerInstance,
   }: {
+    address?: string;
+    symbol?: string;
     chainId?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     providerInstance?: any;
@@ -121,8 +127,8 @@ class CommonClaim extends ContractBase {
       params: {
         type: 'ERC20',
         options: {
-          address: process.env.MAGNA_TOKEN_ADDRESS,
-          symbol: process.env.MAGNA_TOKEN,
+          address: address || this.tokenAddress,
+          symbol: symbol || this.tokenSymbol,
           decimals: 18,
           chainId: parseInt(chainId),
           image: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
@@ -194,7 +200,9 @@ class CommonClaim extends ContractBase {
           .then(async () => {
             // add token to wallet
             // this will fail for magic wallet, but thats an issue coz magic auto imports tokens with > 0 value
-            await this.addTokenToWallet({ chainId }).catch(() => null);
+            await this.addTokenToWallet({
+              chainId,
+            }).catch(() => null);
           })
           .catch((e) => {
             console.error('Tx error: ', e);

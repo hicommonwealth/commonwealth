@@ -37,9 +37,11 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const claimsEnabled = useFlag('claims');
-  const { initial, final, getWalletProvider } = useCommonAirdrop();
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
     useGetClaimAddressQuery({ enabled: user.isLoggedIn });
+  const { initial, final, getWalletProvider } = useCommonAirdrop({
+    tokenSymbol: claimAddress?.token || 'C',
+  });
   const { data: allocation } = useGetAllocationQuery({
     magna_allocation_id: claimAddress?.magna_allocation_id,
     enabled:
@@ -110,15 +112,16 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     );
   }
 
-  const handleImportToken = async (claimFromAddress: string) => {
-    if (!claimFromAddress) {
+  const handleImportToken = async () => {
+    if (!allocation?.tokenAddress) {
       notifyError('Set a claim address to import token!');
       return;
     }
 
     try {
-      const { isMagicAddress, provider } =
-        await getWalletProvider(claimFromAddress);
+      const { isMagicAddress, provider } = await getWalletProvider(
+        allocation?.tokenAddress,
+      );
       if (isMagicAddress) {
         // magic doesnt expose any api to import tokens to wallet, however if there
         // are any tokens with > 0 value, it auto addes them to their wallet UI
@@ -127,8 +130,14 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const contract = new CommonClaim(claimFromAddress, provider as any);
+      const contract = new CommonClaim(
+        allocation?.tokenAddress,
+        claimAddress?.token || 'C',
+        provider as any,
+      );
       await contract.addTokenToWallet({
+        address: allocation?.tokenAddress,
+        symbol: claimAddress?.token,
         providerInstance: isMagicAddress ? provider : undefined,
       });
       notifySuccess('Imported to external wallet');
@@ -196,7 +205,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         (allocation?.claimable ?? 0) > 0 &&
         allocation?.unlock_start_at
       );
-      const launchDateUTC = moment(process.env.MAGNA_CLAIM_LAUNCH_DATE);
+      const launchDateUTC = moment(allocation?.unlock_start_at);
       const shouldWaitTillDate =
         moment().isBefore(launchDateUTC) && claimAddress?.address
           ? launchDateUTC
@@ -307,9 +316,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   <button
                     className="add-to-wallet-button"
                     onClick={() => {
-                      handleImportToken(claimAddress?.address as string).catch(
-                        console.error,
-                      );
+                      handleImportToken().catch(console.error);
                     }}
                   >
                     <span className="button-icon">+</span>
