@@ -72,6 +72,12 @@ export async function magnaSync(
       // Load next batch of allocations to sync with Magna
       const batch = await models.sequelize.query<TokenAllocationSyncArgs>(
         `
+          WITH nft_data AS (
+            SELECT user_id, SUM(total_token_allocation) as total_token_allocation
+            FROM "NftSnapshot"
+            WHERE user_id IS NOT NULL
+            GROUP BY user_id
+          )
           SELECT
             :category || '-' || A.address as key,
             :category as category,
@@ -87,7 +93,7 @@ export async function magnaSync(
             JOIN "Users" U ON A.user_id = U.id
             LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
             LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
-            LEFT JOIN "NftSnapshot" N ON A.user_id = N.user_id
+            LEFT JOIN nft_data N ON A.user_id = N.user_id
           WHERE
             A.address IS NOT NULL -- there is an address to sync
             AND A.magna_synced_at IS NULL -- and it hasn't been synced yet

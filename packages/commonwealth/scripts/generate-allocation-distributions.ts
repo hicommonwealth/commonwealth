@@ -2308,6 +2308,9 @@ async function getTopCombinedAllocations(limit: number = 2000): Promise<
   Array<{
     user_id: number | null;
     user_tier: number | null;
+    historical_allocation: number;
+    aura_allocation: number;
+    nft_allocation: number;
     total_allocation: number;
     last_active: Date | null;
   }>
@@ -2317,6 +2320,9 @@ async function getTopCombinedAllocations(limit: number = 2000): Promise<
   const results = await models.sequelize.query<{
     user_id: number | null;
     user_tier: number | null;
+    historical_allocation: string;
+    aura_allocation: string;
+    nft_allocation: string;
     total_allocation: string;
     last_active: Date | null;
   }>(
@@ -2331,14 +2337,17 @@ async function getTopCombinedAllocations(limit: number = 2000): Promise<
         WHERE NS.user_id IS NOT NULL
         GROUP BY NS.user_id, NS.user_tier
       ), nft_wo_users AS (
-        SELECT NULL::INTEGER as user_id, NULL::INTEGER as user_tier, total_token_allocation as total_allocation, NULL::TIMESTAMP as last_active
+        SELECT NULL::INTEGER as user_id, NULL::INTEGER as user_tier, 0::NUMERIC as historical_allocation, 0::NUMERIC as aura_allocation, total_token_allocation as nft_allocation, total_token_allocation as total_allocation, NULL::TIMESTAMP as last_active
         FROM "NftSnapshot"
         WHERE user_id IS NULL
       ), allocations AS (
         SELECT U.id as user_id,
                U.tier as user_tier,
+               COALESCE(HA.token_allocation, 0) as historical_allocation,
+               COALESCE(AA.token_allocation, 0) as aura_allocation,
+               COALESCE(NU.total_allocation, 0) as nft_allocation,
                COALESCE(HA.token_allocation, 0) + COALESCE(AA.token_allocation, 0) + COALESCE(NU.total_allocation, 0) as total_allocation,
-               LAA.last_active                                                     as last_active
+               LAA.last_active as last_active
         FROM "Users" U
                  LEFT JOIN "HistoricalAllocations" HA ON HA.user_id = U.id
                  LEFT JOIN "AuraAllocations" AA ON AA.user_id = U.id
@@ -2365,6 +2374,9 @@ async function getTopCombinedAllocations(limit: number = 2000): Promise<
   return results.map((row) => ({
     user_id: row.user_id,
     user_tier: row.user_tier,
+    historical_allocation: parseFloat(row.historical_allocation),
+    aura_allocation: parseFloat(row.aura_allocation),
+    nft_allocation: parseFloat(row.nft_allocation),
     total_allocation: parseFloat(row.total_allocation),
     last_active: row.last_active,
   }));
@@ -2377,6 +2389,9 @@ function generateTopCombinedAllocationsHTML(
   data: Array<{
     user_id: number | null;
     user_tier: number | null;
+    historical_allocation: number;
+    aura_allocation: number;
+    nft_allocation: number;
     total_allocation: number;
     last_active: Date | null;
   }>,
@@ -2389,7 +2404,12 @@ function generateTopCombinedAllocationsHTML(
         row.user_tier !== null
           ? `${row.user_tier} (${TIER_NAMES[row.user_tier] || 'Unknown'})`
           : '-';
-      const allocation = Math.round(row.total_allocation).toLocaleString();
+      const historicalAllocation = Math.round(
+        row.historical_allocation,
+      ).toLocaleString();
+      const auraAllocation = Math.round(row.aura_allocation).toLocaleString();
+      const nftAllocation = Math.round(row.nft_allocation).toLocaleString();
+      const totalAllocation = Math.round(row.total_allocation).toLocaleString();
       const lastActive = row.last_active
         ? new Date(row.last_active).toLocaleDateString()
         : '-';
@@ -2399,7 +2419,10 @@ function generateTopCombinedAllocationsHTML(
           <td>${rank}</td>
           <td>${userId}</td>
           <td>${userTier}</td>
-          <td class="allocation-cell">${allocation}</td>
+          <td class="allocation-cell">${historicalAllocation}</td>
+          <td class="allocation-cell">${auraAllocation}</td>
+          <td class="allocation-cell">${nftAllocation}</td>
+          <td class="allocation-cell total-allocation">${totalAllocation}</td>
           <td>${lastActive}</td>
         </tr>
       `;
@@ -2410,6 +2433,12 @@ function generateTopCombinedAllocationsHTML(
     (sum, row) => sum + row.total_allocation,
     0,
   );
+  const totalHistorical = data.reduce(
+    (sum, row) => sum + row.historical_allocation,
+    0,
+  );
+  const totalAura = data.reduce((sum, row) => sum + row.aura_allocation, 0);
+  const totalNft = data.reduce((sum, row) => sum + row.nft_allocation, 0);
   const usersWithId = data.filter((row) => row.user_id !== null).length;
   const holdersWithoutId = data.filter((row) => row.user_id === null).length;
 
@@ -2420,13 +2449,15 @@ function generateTopCombinedAllocationsHTML(
     <title>Top ${data.length.toLocaleString()} Combined Allocations</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
-        .container { max-width: 1600px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 1800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         h1 { text-align: center; color: #333; margin-bottom: 30px; }
         .explanation { background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0; }
         .explanation h3 { margin-top: 0; color: #2c5aa0; }
         .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0; }
         .stats { padding: 15px; background: #f5f5f5; border-radius: 5px; text-align: center; }
         .stats-value { font-size: 1.5em; font-weight: bold; color: #007bff; }
+        .stats-breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; font-size: 0.9em; }
+        .stats-breakdown-item { padding: 8px; background: white; border-radius: 3px; }
         .table-container { overflow-x: auto; margin: 20px 0; }
         table { width: 100%; border-collapse: collapse; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         th, td { padding: 12px; text-align: left; border: 1px solid #ddd; }
@@ -2434,11 +2465,12 @@ function generateTopCombinedAllocationsHTML(
         tbody tr:nth-child(even) { background-color: #f8f9fa; }
         tbody tr:hover { background-color: #e9ecef; }
         .allocation-cell { text-align: right; font-weight: 600; }
+        .total-allocation { font-weight: bold; }
         td:nth-child(1) { text-align: center; font-weight: 500; }
-        td:nth-child(2), td:nth-child(5) { text-align: center; }
-        .rank-top10 { background-color: #ffd700 !important; }
-        .rank-top50 { background-color: #fffacd !important; }
-        .rank-top100 { background-color: #fff8dc !important; }
+        td:nth-child(2), td:nth-child(8) { text-align: center; }
+        .rank-top10 { background-color: #d4edda !important; }
+        .rank-top50 { background-color: #fff3cd !important; }
+        .rank-top100 { background-color: #ffe5cc !important; }
     </style>
     <script>
         // Add rank-based highlighting after page loads
@@ -2467,11 +2499,14 @@ function generateTopCombinedAllocationsHTML(
                 <li><strong>Rank:</strong> Position ordered by total allocation (1 = highest)</li>
                 <li><strong>User ID:</strong> The user's ID in the system (if available)</li>
                 <li><strong>User Tier:</strong> The user's verification tier (if available)</li>
-                <li><strong>Total Allocation:</strong> Sum of all tokens allocated from NFT, Historical, and Aura sources</li>
+                <li><strong>Historical Allocation:</strong> Tokens allocated based on historical activity (threads, comments)</li>
+                <li><strong>Aura Allocation:</strong> Tokens allocated based on Aura XP</li>
+                <li><strong>NFT Allocation:</strong> Tokens allocated to NFT holders</li>
+                <li><strong>Total Allocation:</strong> Sum of all tokens allocated from all sources</li>
                 <li><strong>Last Active:</strong> Date the user was last active (if available)</li>
             </ul>
-            <p><em>Note: Rows with "-" indicate data is not available for that field.</em></p>
-            <p><em>Highlighting: Top 10 (gold), Top 50 (light yellow), Top 100 (cream)</em></p>
+            <p><em>Note: Rows with "-" or "0" indicate data is not available or no allocation for that source.</em></p>
+            <p><em>Highlighting: Top 10 (light green), Top 50 (light yellow), Top 100 (light orange)</em></p>
         </div>
 
         <div class="stats-container">
@@ -2482,6 +2517,11 @@ function generateTopCombinedAllocationsHTML(
             <div class="stats">
                 <div class="stats-value">${Math.round(totalAllocation).toLocaleString()}</div>
                 <div>Total Tokens Allocated</div>
+                <div class="stats-breakdown">
+                    <div class="stats-breakdown-item">Historical: ${Math.round(totalHistorical).toLocaleString()}</div>
+                    <div class="stats-breakdown-item">Aura: ${Math.round(totalAura).toLocaleString()}</div>
+                    <div class="stats-breakdown-item">NFT: ${Math.round(totalNft).toLocaleString()}</div>
+                </div>
             </div>
             <div class="stats">
                 <div class="stats-value">${usersWithId.toLocaleString()} / ${holdersWithoutId.toLocaleString()}</div>
@@ -2496,6 +2536,9 @@ function generateTopCombinedAllocationsHTML(
                         <th>Rank</th>
                         <th>User ID</th>
                         <th>User Tier</th>
+                        <th>Historical Allocation</th>
+                        <th>Aura Allocation</th>
+                        <th>NFT Allocation</th>
                         <th>Total Allocation</th>
                         <th>Last Active</th>
                     </tr>
