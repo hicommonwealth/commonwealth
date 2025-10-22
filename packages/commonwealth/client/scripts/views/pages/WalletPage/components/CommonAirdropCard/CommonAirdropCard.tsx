@@ -1,4 +1,6 @@
 import clsx from 'clsx';
+import { notifyError } from 'controllers/app/notifications';
+import CommonClaim from 'helpers/ContractHelpers/CommonClaim';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import React, { useState } from 'react';
@@ -35,7 +37,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const claimsEnabled = useFlag('claims');
-  const { initial, final } = useCommonAirdrop();
+  const { initial, final, getWalletProvider } = useCommonAirdrop();
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
     useGetClaimAddressQuery({ enabled: user.isLoggedIn });
   const { data: allocation } = useGetAllocationQuery({
@@ -107,6 +109,25 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       </div>
     );
   }
+
+  const handleImportToken = async (claimFromAddress: string) => {
+    if (!claimFromAddress) {
+      notifyError('Set a claim address to import token!');
+      return;
+    }
+
+    try {
+      const { isMagicAddress, provider } =
+        await getWalletProvider(claimFromAddress);
+      const contract = new CommonClaim(claimFromAddress, provider as any);
+      await contract.addTokenToWallet({
+        providerInstance: isMagicAddress ? provider : undefined,
+      });
+    } catch (error) {
+      notifyError('Failed to import token');
+      console.error('Failed to import token: ', error);
+    }
+  };
 
   const canClaim = !!claimAddress;
   const isPendingClaimFunds = !!(
@@ -261,6 +282,15 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   >
                     {claimAddress?.description}
                   </CWText>
+                  <button
+                    className="add-to-wallet-button"
+                    onClick={() =>
+                      handleImportToken(claimAddress?.address as string)
+                    }
+                  >
+                    <span className="button-text">Add to wallet</span>
+                    <span className="button-icon">+</span>
+                  </button>
                 </div>
                 <div className="allocation-section-container">
                   <div className="diagonal-separator"></div>

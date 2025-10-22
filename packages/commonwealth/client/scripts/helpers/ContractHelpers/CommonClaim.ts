@@ -104,15 +104,25 @@ class CommonClaim extends ContractBase {
     }
   }
 
-  async addTokenToWallet(chainId: string) {
+  async addTokenToWallet({
+    chainId = '8453',
+    providerInstance,
+  }: {
+    chainId?: string;
+    providerInstance?: any;
+  }) {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true, chainId, providerInstance);
+    }
+
     return await this.web3?.currentProvider?.request({
       method: 'wallet_watchAsset',
       params: {
         type: 'ERC20',
         // `C` token
         options: {
-          address: '0xD7DA840121aeb9792b202bd84Db32B2816B30c0e',
-          symbol: 'C',
+          address: process.env.MAGNA_TOKEN_ADDRESS,
+          symbol: process.env.MAGNA_TOKEN,
           decimals: 18,
           chainId: parseInt(chainId),
           imgUrl: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
@@ -179,7 +189,7 @@ class CommonClaim extends ContractBase {
           })
           .then(async () => {
             // add token to wallet
-            await this.addTokenToWallet(chainId);
+            await this.addTokenToWallet({ chainId });
           })
           .catch((e) => {
             console.error('Tx error: ', e);
