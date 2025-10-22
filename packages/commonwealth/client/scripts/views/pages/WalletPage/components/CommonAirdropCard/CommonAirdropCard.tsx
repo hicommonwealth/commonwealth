@@ -244,12 +244,6 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       };
     })(),
   };
-  console.log('claimSteps => ', {
-    claimSteps,
-    allocation,
-    claimAddress,
-    shouldCollapseClaimState,
-  });
 
   const tokensCount = Math.max(
     allocation?.amount || claimAddress?.tokens || 0,
@@ -270,7 +264,9 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         'needs-action':
           !claimSteps.initial.isClaimAvailable &&
           !claimSteps.initial.hasClaimed,
-        completed: claimSteps.initial.hasClaimed && claimSteps.final.hasClaimed,
+        completed: shouldCollapseClaimState
+          ? claimSteps.initial.hasClaimed
+          : claimSteps.initial.hasClaimed && claimSteps.final.hasClaimed,
       })}
     >
       <CWBanner
