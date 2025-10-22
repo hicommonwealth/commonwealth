@@ -295,6 +295,7 @@ async function processTxnType(
   const query = isCliff
     ? `
       SELECT user_id, address, magna_cliff_claimed_at as claimed_at
+      FROM "ClaimAddresses"
       WHERE magna_cliff_claimed_at IS NOT NULL AND
             magna_cliff_claim_data IS NOT NULL AND
             (magna_cliff_claim_tx_finalized = FALSE OR magna_cliff_claim_tx_finalized IS NULL)
@@ -302,6 +303,7 @@ async function processTxnType(
   `
     : `
       SELECT user_id, address, magna_claimed_at as claimed_at
+      FROM "ClaimAddresses"
       WHERE magna_claimed_at IS NOT NULL AND
             magna_claim_data IS NOT NULL AND
             (magna_claim_tx_finalized = FALSE OR magna_claim_tx_finalized IS NULL)
