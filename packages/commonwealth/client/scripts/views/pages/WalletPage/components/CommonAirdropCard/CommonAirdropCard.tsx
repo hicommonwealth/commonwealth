@@ -153,7 +153,6 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     allocation?.status === 'PENDING_FUNDING' ||
     allocation?.status === 'NOT_STARTED'
   );
-  // 🚨 IMP/TODO: THESE DATES SHOULD BE THE TX DATES
   const shouldCollapseClaimState = (() => {
     if (!allocation?.cliff_date) {
       return false;
@@ -161,8 +160,8 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
 
     const cliffDate = moment(allocation.cliff_date);
     const now = moment();
-    const initialClaimedAt = claimAddress?.magna_claimed_at
-      ? moment(claimAddress.magna_claimed_at)
+    const initialClaimedAt = claimAddress?.magna_claim_tx_at
+      ? moment(claimAddress.magna_claim_tx_at)
       : null;
 
     const cliffDatePassedButInitialClaimNotDone =
@@ -349,7 +348,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   claimedToAddress={claimAddress?.address || undefined}
                   allocationUnlocksAt={allocation?.unlock_start_at || undefined}
                   allocationClaimedAt={
-                    claimAddress?.magna_claimed_at || undefined
+                    claimAddress?.magna_claim_tx_at || undefined
                   }
                   allocatedToAddress={claimAddress?.address || ''}
                   allocationId={claimAddress?.magna_allocation_id || undefined}
@@ -374,7 +373,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   claimedToAddress={claimAddress?.address || undefined}
                   allocationUnlocksAt={allocation?.cliff_date || undefined}
                   allocationClaimedAt={
-                    claimAddress?.magna_cliff_claimed_at || undefined
+                    claimAddress?.magna_cliff_claim_tx_at || undefined
                   }
                   allocatedToAddress={claimAddress?.address || ''}
                   allocationId={claimAddress?.magna_allocation_id || undefined}
@@ -401,7 +400,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 claimedToAddress={claimAddress?.address || undefined}
                 allocationUnlocksAt={allocation?.unlock_start_at || undefined}
                 allocationClaimedAt={
-                  claimAddress?.magna_claimed_at || undefined
+                  claimAddress?.magna_claim_tx_at || undefined
                 }
                 allocatedToAddress={claimAddress?.address || ''}
                 allocationId={claimAddress?.magna_allocation_id || undefined}
