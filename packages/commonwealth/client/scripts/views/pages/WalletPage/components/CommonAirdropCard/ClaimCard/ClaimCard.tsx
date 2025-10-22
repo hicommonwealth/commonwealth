@@ -83,8 +83,8 @@ const ClaimCard = ({
   const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
-  // TODO: this should be corrected and based on the actual amount
-  const ethClaimAmount = mode === 'initial' ? 0.0003 : 0.0001;
+  const ethClaimAmount =
+    claimTxData?.requiredEth || (mode === 'initial' ? 0.0003 : 0.0001);
 
   useEffect(() => {
     const addresses = new Map<string, AddressInfo>();
@@ -449,7 +449,20 @@ const ClaimCard = ({
                             </li>
                             <li>
                               <CWText>
-                                Send {ethClaimAmount} ETH to&nbsp;
+                                Send&nbsp;
+                                <span
+                                  className="copyable-address"
+                                  onClick={() => {
+                                    void navigator.clipboard.writeText(
+                                      ethClaimAmount.toString(),
+                                    );
+                                    notifySuccess('Amount copied!');
+                                  }}
+                                >
+                                  {ethClaimAmount}
+                                  <CWIcon iconName="copy" iconSize="small" />
+                                </span>
+                                &nbsp;ETH to&nbsp;
                                 <span
                                   className="copyable-address"
                                   onClick={() => {

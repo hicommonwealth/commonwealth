@@ -135,6 +135,7 @@ class CommonClaim extends ContractBase {
     chainId: string,
     data: string,
     includeMagnaPlatformFee: boolean,
+    onFeeEstimation?: (requiredEth: string | number) => void,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     providerInstance?: any,
   ): Promise<`0x${string}`> {
@@ -160,6 +161,9 @@ class CommonClaim extends ContractBase {
       data,
       magnaFee,
     );
+    if (onFeeEstimation) {
+      onFeeEstimation(requiredEth);
+    }
     if (!hasEnoughBalance) {
       throw new Error(
         `Not enough gas: requires ~${requiredEth} ETH for fees, but wallet only has ${balanceEth} ETH.

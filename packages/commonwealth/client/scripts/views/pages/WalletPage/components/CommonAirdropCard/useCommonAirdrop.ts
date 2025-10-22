@@ -13,6 +13,7 @@ type CommonAirdropData = {
   txData?: {
     to: string;
     data: string;
+    requiredEth?: string | number;
   };
   initialTxHash: `0x${string}` | null;
   finalTxHash: `0x${string}` | null;
@@ -108,6 +109,15 @@ export const useCommonAirdrop = () => {
             `${BASE_ID}`,
             data.data,
             type === 'initial',
+            (requiredEth: string | number) => {
+              setData({
+                txData: {
+                  to: data.to,
+                  data: data.data,
+                  requiredEth,
+                },
+              });
+            },
             isMagicAddress ? provider : undefined,
           );
           // at this point the claim transaction is signed!
