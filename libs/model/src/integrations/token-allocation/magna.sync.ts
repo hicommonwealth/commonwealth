@@ -78,7 +78,7 @@ export async function magnaSync(
             :description || ' for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
             A.user_id,
             A.address as wallet_address,
-            U.profile->>'name' as user_name,
+            COALESCE(U.profile->>'name', 'Anonymous-' || A.user_id) as user_name,
             COALESCE(HA.token_allocation, 0)::double precision 
             + COALESCE(AA.token_allocation, 0)::double precision
             + COALESCE(N.total_token_allocation, 0)::double precision as token_allocation
