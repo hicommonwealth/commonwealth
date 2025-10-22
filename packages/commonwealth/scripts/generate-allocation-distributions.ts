@@ -2554,6 +2554,102 @@ function generateTopCombinedAllocationsHTML(
 }
 
 /**
+ * Fetch allocation distribution by user activity recency and tier
+ */
+async function getAllocationByActivityAndTier(): Promise<
+  Array<{
+    activity_period: string;
+    user_tier: number;
+    total_allocation: number;
+    user_count: number;
+  }>
+> {
+  console.log(
+    'Fetching allocation distribution by activity period and user tier...',
+  );
+
+  const results = await models.sequelize.query<{
+    activity_period: string;
+    user_tier: number;
+    total_allocation: string;
+    user_count: number;
+  }>(
+    `
+      WITH last_active_address as (
+        SELECT user_id, MAX(last_active) as last_active
+        FROM "Addresses"
+        GROUP BY user_id
+      ), nft_users AS (
+        SELECT NS.user_id, NS.user_tier, SUM(NS.total_token_allocation) as total_allocation
+        FROM "NftSnapshot" NS
+        WHERE NS.user_id IS NOT NULL
+        GROUP BY NS.user_id, NS.user_tier
+      ), nft_wo_users AS (
+        SELECT NULL::INTEGER as user_id, 2 as user_tier, total_token_allocation as total_allocation, NULL::TIMESTAMP as last_active
+        FROM "NftSnapshot"
+        WHERE user_id IS NULL
+      ), allocations AS (
+        SELECT U.id as user_id,
+               U.tier as user_tier,
+               COALESCE(HA.token_allocation, 0) + COALESCE(AA.token_allocation, 0) + COALESCE(NU.total_allocation, 0) as total_allocation,
+               LAA.last_active as last_active
+        FROM "Users" U
+                 LEFT JOIN "HistoricalAllocations" HA ON HA.user_id = U.id
+                 LEFT JOIN "AuraAllocations" AA ON AA.user_id = U.id
+                 LEFT JOIN nft_users NU ON NU.user_id = U.id
+                 LEFT JOIN last_active_address LAA ON LAA.user_id = U.id
+        WHERE COALESCE(HA.token_allocation, 0) > 0
+           OR COALESCE(AA.token_allocation, 0) > 0
+           OR COALESCE(NU.total_allocation, 0) > 0
+        UNION ALL
+        SELECT *
+        FROM nft_wo_users
+      ), activity_categorized AS (
+        SELECT 
+          user_tier,
+          total_allocation,
+          CASE
+            WHEN last_active IS NULL THEN 'Never Active'
+            WHEN last_active >= NOW() - INTERVAL '1 day' THEN 'Last Day'
+            WHEN last_active >= NOW() - INTERVAL '1 week' THEN 'Last Week'
+            WHEN last_active >= NOW() - INTERVAL '1 month' THEN 'Last Month'
+            WHEN last_active >= NOW() - INTERVAL '3 months' THEN 'Last 3 Months'
+            WHEN last_active >= NOW() - INTERVAL '6 months' THEN 'Last 6 Months'
+            ELSE 'Over 6 Months Ago'
+          END as activity_period
+        FROM allocations
+      )
+      SELECT 
+        activity_period,
+        user_tier,
+        SUM(total_allocation) as total_allocation,
+        COUNT(*) as user_count
+      FROM activity_categorized
+      GROUP BY activity_period, user_tier
+      ORDER BY 
+        CASE activity_period
+          WHEN 'Last Day' THEN 1
+          WHEN 'Last Week' THEN 2
+          WHEN 'Last Month' THEN 3
+          WHEN 'Last 3 Months' THEN 4
+          WHEN 'Last 6 Months' THEN 5
+          WHEN 'Over 6 Months Ago' THEN 6
+          WHEN 'Never Active' THEN 7
+        END,
+        user_tier;
+    `,
+    { type: QueryTypes.SELECT },
+  );
+
+  return results.map((row) => ({
+    activity_period: row.activity_period,
+    user_tier: row.user_tier,
+    total_allocation: parseFloat(row.total_allocation),
+    user_count: row.user_count,
+  }));
+}
+
+/**
  * Fetch allocation distribution by percentile
  */
 async function getAllocationByPercentile(): Promise<
@@ -2647,6 +2743,225 @@ async function getAllocationByPercentile(): Promise<
     user_count: row.user_count,
     avg_allocation: parseFloat(row.avg_allocation),
   }));
+}
+
+/**
+ * Generate HTML for allocation distribution by activity period and user tier
+ */
+function generateAllocationByActivityAndTierHTML(
+  data: Array<{
+    activity_period: string;
+    user_tier: number;
+    total_allocation: number;
+    user_count: number;
+  }>,
+): string {
+  // Get unique activity periods and user tiers
+  const activityPeriods = [
+    'Last Day',
+    'Last Week',
+    'Last Month',
+    'Last 3 Months',
+    'Last 6 Months',
+    'Over 6 Months Ago',
+    'Never Active',
+  ];
+
+  const userTiers = Array.from(new Set(data.map((d) => d.user_tier))).sort(
+    (a, b) => b - a,
+  );
+
+  // Build datasets for each user tier
+  const datasets = userTiers.map((tier, index) => {
+    const tierData = activityPeriods.map((period) => {
+      const entry = data.find(
+        (d) => d.activity_period === period && d.user_tier === tier,
+      );
+      return entry ? Math.round(entry.total_allocation) : 0;
+    });
+
+    return {
+      label: TIER_NAMES[tier] || `Tier ${tier}`,
+      data: tierData,
+      backgroundColor: COLORS[index % COLORS.length],
+      borderColor: COLORS[index % COLORS.length],
+      borderWidth: 1,
+    };
+  });
+
+  // Calculate totals per period for the table
+  const periodTotals = activityPeriods.map((period) => {
+    const entries = data.filter((d) => d.activity_period === period);
+    return {
+      period,
+      total: entries.reduce((sum, e) => sum + e.total_allocation, 0),
+      users: entries.reduce((sum, e) => sum + Number(e.user_count), 0),
+    };
+  });
+
+  const grandTotal = periodTotals.reduce((sum, p) => sum + p.total, 0);
+  const totalUsers = periodTotals.reduce((sum, p) => sum + p.users, 0);
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Token Allocation by User Activity & Tier</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        .explanation { background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .explanation h3 { margin-top: 0; color: #2c5aa0; }
+        .stats-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+        .stats { padding: 15px; background: #f5f5f5; border-radius: 5px; text-align: center; }
+        .stats-value { font-size: 1.5em; font-weight: bold; color: #007bff; }
+        .chart-container { width: 100%; margin: 30px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: left; border: 1px solid #ddd; }
+        th { background-color: #007bff; color: white; font-weight: bold; }
+        tbody tr:nth-child(even) { background-color: #f8f9fa; }
+        tbody tr:hover { background-color: #e9ecef; }
+        .number-cell { text-align: right; }
+        .total-row { background-color: #e8f4f8 !important; font-weight: bold; border-top: 2px solid #007bff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Token Allocation by User Activity & Tier</h1>
+        
+        <div class="explanation">
+            <h3>Understanding the Data</h3>
+            <p>This chart shows how tokens are distributed based on when users were last active, broken down by user tier.</p>
+            <ul>
+                <li><strong>Activity Periods:</strong> Groupings based on the most recent activity timestamp from user addresses</li>
+                <li><strong>User Tiers:</strong> Verification/trust levels assigned to users</li>
+                <li><strong>Stacked Bars:</strong> Each segment represents a different user tier's contribution to that period</li>
+                <li><strong>Never Active:</strong> Users who have allocations but no recorded activity (includes NFT holders without user_id)</li>
+            </ul>
+            <p><em>Note: Activity is determined by the last_active timestamp from the Addresses table.</em></p>
+        </div>
+
+        <div class="stats-container">
+            <div class="stats">
+                <div class="stats-value">${totalUsers.toLocaleString()}</div>
+                <div>Total Recipients</div>
+            </div>
+            <div class="stats">
+                <div class="stats-value">${Math.round(grandTotal).toLocaleString()}</div>
+                <div>Total Tokens Allocated</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>Total Allocation by Activity Period (Stacked by User Tier)</h2>
+            <canvas id="activityChart"></canvas>
+        </div>
+
+        <h2>Detailed Breakdown</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Activity Period</th>
+                    <th class="number-cell">Total Allocation</th>
+                    <th class="number-cell">% of Total</th>
+                    <th class="number-cell">User Count</th>
+                    <th class="number-cell">Avg per User</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${periodTotals
+                  .map((row) => {
+                    const pctOfTotal =
+                      grandTotal > 0
+                        ? ((row.total / grandTotal) * 100).toFixed(2)
+                        : '0.00';
+                    const avgPerUser =
+                      row.users > 0 ? Math.round(row.total / row.users) : 0;
+                    return `
+                    <tr>
+                        <td>${row.period}</td>
+                        <td class="number-cell">${Math.round(row.total).toLocaleString()}</td>
+                        <td class="number-cell">${pctOfTotal}%</td>
+                        <td class="number-cell">${row.users.toLocaleString()}</td>
+                        <td class="number-cell">${avgPerUser.toLocaleString()}</td>
+                    </tr>
+                `;
+                  })
+                  .join('')}
+                <tr class="total-row">
+                    <td>TOTAL</td>
+                    <td class="number-cell">${Math.round(grandTotal).toLocaleString()}</td>
+                    <td class="number-cell">100.00%</td>
+                    <td class="number-cell">${totalUsers.toLocaleString()}</td>
+                    <td class="number-cell">${totalUsers > 0 ? Math.round(grandTotal / totalUsers).toLocaleString() : '0'}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ${JSON.stringify(activityPeriods)},
+                datasets: ${JSON.stringify(datasets)}
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y.toLocaleString();
+                                return label + ': ' + value + ' tokens';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        },
+                        title: {
+                            display: true,
+                            text: 'Activity Period',
+                            font: { size: 14 }
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Total Token Allocation',
+                            font: { size: 14 }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>`;
 }
 
 /**
@@ -3778,6 +4093,7 @@ async function main() {
       topCombinedData,
       percentileData,
       tierStatsData,
+      activityData,
     ] = await Promise.all([
       getNftTierDistribution(),
       getEqualRarityDistribution(),
@@ -3793,6 +4109,7 @@ async function main() {
       getTopCombinedAllocations(2000),
       getAllocationByPercentile(),
       getCombinedAllocationStatsByTier(),
+      getAllocationByActivityAndTier(),
     ]);
 
     console.log('\nData Summary:');
@@ -3811,6 +4128,7 @@ async function main() {
     console.log(`- Top combined allocations: ${topCombinedData.length}`);
     console.log(`- Percentile buckets: ${percentileData.length}`);
     console.log(`- User tier stats: ${tierStatsData.length} tiers`);
+    console.log(`- Activity & tier data points: ${activityData.length}`);
 
     // Calculate Gini coefficients and Lorenz curves
     console.log('\nCalculating Gini coefficients and Lorenz curves...');
@@ -4005,6 +4323,21 @@ async function main() {
       );
     }
 
+    // 13. Allocation by User Activity and Tier
+    if (activityData.length > 0) {
+      const activityHTML =
+        generateAllocationByActivityAndTierHTML(activityData);
+      fs.writeFileSync(
+        path.join(outputDir, 'allocation-by-activity-and-tier.html'),
+        activityHTML,
+      );
+      console.log('Generated: allocation-by-activity-and-tier.html');
+    } else {
+      console.log(
+        'Skipped: allocation-by-activity-and-tier.html (no data available)',
+      );
+    }
+
     // Generate index file for easy navigation
     const indexHTML = `
 <!DOCTYPE html>
@@ -4090,6 +4423,11 @@ async function main() {
                 Combined Allocation Statistics by Tier<br>
                 <small>Statistical measures (mean, median, mode, etc.) for each user tier</small>
             </a>
+            
+            <a href="allocation-by-activity-and-tier.html" class="chart-link">
+                Allocation by User Activity & Tier<br>
+                <small>Stacked bar chart showing token distribution by user activity recency and tier</small>
+            </a>
         </div>
 
         <div class="timestamp">
@@ -4121,6 +4459,7 @@ async function main() {
     console.log(`   - top-combined-allocations.html`);
     console.log(`   - allocation-by-percentile.html`);
     console.log(`   - combined-allocation-stats-by-tier.html`);
+    console.log(`   - allocation-by-activity-and-tier.html`);
   } catch (error) {
     console.error('Error generating charts:', error);
     throw error;
