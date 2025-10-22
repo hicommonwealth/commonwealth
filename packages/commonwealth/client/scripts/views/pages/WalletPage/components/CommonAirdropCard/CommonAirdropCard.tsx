@@ -204,13 +204,20 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       };
     })(),
   };
+  console.log('claimSteps => ', {
+    claimSteps,
+    allocation,
+    claimAddress,
+    shouldCollapseClaimState,
+  });
+
   const tokensCount = Math.max(
     allocation?.amount || claimAddress?.tokens || 0,
     0,
   );
   const claimableTokens = formatTokenBalance(tokensCount);
-  // NOTE: fallback to 0.25, as its done in API, update if changed in api
-  const initialClaimPercentage = allocation?.initial_percentage || 0.25;
+  const initialClaimPercentage =
+    allocation?.initial_percentage || claimAddress?.initial_percentage || 0.25; // NOTE: fallback to 0.25
   const initialClaimablePercentage = (initialClaimPercentage || 0) * 100;
   const initialClaimableTokens = tokensCount * (initialClaimPercentage || 0);
   const finalClaimablePercentage = (1 - (initialClaimPercentage || 0)) * 100;
