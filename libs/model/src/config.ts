@@ -823,9 +823,9 @@ export const config = configure(
         TOKEN: z.string().min(1),
         TOKEN_ID: z.uuid(),
         UNLOCK_SCHEDULE_ID: z.uuid(),
-        UNLOCK_START_AT: z.date(),
+        UNLOCK_START_AT: z.coerce.date(),
         INITIAL_PERCENTAGE: z.number().min(0.01).max(0.99),
-        CLIFF_DATE: z.date(),
+        CLIFF_DATE: z.coerce.date(),
         BATCH_SIZE: z.number(),
       })
       .optional(),
