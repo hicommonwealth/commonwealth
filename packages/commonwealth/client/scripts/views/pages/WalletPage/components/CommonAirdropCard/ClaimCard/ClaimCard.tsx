@@ -40,6 +40,7 @@ interface ClaimCardProps {
   allocatedToAddress?: string;
   hasClaimableAmount?: boolean;
   mode: 'initial' | 'final';
+  shouldWaitTillDate?: moment.Moment;
   isCollapsed?: boolean;
   onConnectNewAddress?: () => void;
 }
@@ -63,6 +64,7 @@ const ClaimCard = ({
   mode,
   hasClaimableAmount,
   allocatedToAddress,
+  shouldWaitTillDate,
   isCollapsed = false,
 }: ClaimCardProps) => {
   const user = useUserStore();
@@ -74,6 +76,7 @@ const ClaimCard = ({
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
   const [pendingSignatureCountdown, setPendingSignatureCountdown] =
     useState<string>('00:00:00');
+  const [launchCountdown, setLaunchCountdown] = useState<string>('00:00:00');
   const [unlockCountdown, setUnlockCountdown] = useState<string>('00:00:00');
   const [syncCountdown, setSyncCountdown] = useState<string>('00:00:00');
   const commonAirdrop = useCommonAirdrop();
@@ -161,6 +164,56 @@ const ClaimCard = ({
 
     return () => clearInterval(interval);
   }, []);
+
+  // Launch countdown timer effect - updates every second
+  useEffect(() => {
+    if (!shouldWaitTillDate) {
+      setLaunchCountdown('00:00:00');
+      return;
+    }
+
+    const updateLaunchCountdown = () => {
+      const nowET = moment().utcOffset(-5, true); // Current time in ET
+      const launchDateET = shouldWaitTillDate.clone().utcOffset(-5, true); // Convert to ET
+
+      if (launchDateET.isAfter(nowET)) {
+        const duration = moment.duration(launchDateET.diff(nowET));
+        const days = Math.floor(duration.asDays());
+        const hours = duration.hours();
+        const minutes = duration.minutes();
+        const seconds = duration.seconds();
+
+        // Format as DD:HH:MM:SS or HH:MM:SS if no days
+        let formattedTime;
+        if (days > 0) {
+          formattedTime = [
+            String(days).padStart(2, '0'),
+            String(hours).padStart(2, '0'),
+            String(minutes).padStart(2, '0'),
+            String(seconds).padStart(2, '0'),
+          ].join(':');
+        } else {
+          formattedTime = [
+            String(hours).padStart(2, '0'),
+            String(minutes).padStart(2, '0'),
+            String(seconds).padStart(2, '0'),
+          ].join(':');
+        }
+
+        setLaunchCountdown(formattedTime);
+      } else {
+        setLaunchCountdown('00:00:00');
+      }
+    };
+
+    // Update immediately
+    updateLaunchCountdown();
+
+    // Then update every second
+    const interval = setInterval(updateLaunchCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, [shouldWaitTillDate]);
 
   // Separate unlock countdown timer effect
   useEffect(() => {
@@ -273,20 +326,20 @@ const ClaimCard = ({
   };
 
   const getCardBody = () => {
-    if (hasClaimed) {
-      const formatClaimDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const day = date.getDate();
-        const month = date.toLocaleDateString('en-US', { month: 'short' });
-        const year = date.getFullYear();
-        const time = date.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-        });
-        return `${day} ${month} ${year} @ ${time}`;
-      };
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      const day = date.getDate();
+      const month = date.toLocaleDateString('en-US', { month: 'short' });
+      const year = date.getFullYear();
+      const time = date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+      return `${day} ${month} ${year} @ ${time}`;
+    };
 
+    if (hasClaimed) {
       return (
         <div className="claimed-section">
           <div className="claimed-content">
@@ -300,7 +353,7 @@ const ClaimCard = ({
                   Claimed
                 </CWText>
                 <CWText className="claimed-date">
-                  {allocationClaimedAt && formatClaimDate(allocationClaimedAt)}
+                  {allocationClaimedAt && formatDate(allocationClaimedAt)}
                 </CWText>
               </div>
             </div>
@@ -317,6 +370,30 @@ const ClaimCard = ({
               iconRight="externalLink"
               aria-label="View transaction on BaseScan"
             />
+          </div>
+        </div>
+      );
+    }
+
+    if (shouldWaitTillDate) {
+      return (
+        <div className="countdown-container countdown-in-progress">
+          <div className="countdown-left">
+            <CWText type="h5" fontWeight="semiBold" className="countdown-title">
+              Request Received
+            </CWText>
+            <CWText className="countdown-description">
+              Claims process will start on launch date at{' '}
+              {formatDate(shouldWaitTillDate.toISOString())}.
+            </CWText>
+          </div>
+          <div className="countdown-timer">
+            <CWText type="h4" fontWeight="medium" className="timer-label">
+              Come Back In
+            </CWText>
+            <CWText type="h1" fontWeight="bold" className="timer-display">
+              {launchCountdown}
+            </CWText>
           </div>
         </div>
       );

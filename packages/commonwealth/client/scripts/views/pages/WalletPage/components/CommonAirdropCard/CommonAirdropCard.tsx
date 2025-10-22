@@ -196,12 +196,18 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         (allocation?.claimable ?? 0) > 0 &&
         allocation?.unlock_start_at
       );
+      const launchDateUTC = moment(process.env.MAGNA_CLAIM_LAUNCH_DATE);
+      const shouldWaitTillDate =
+        moment().isBefore(launchDateUTC) && claimAddress?.address
+          ? launchDateUTC
+          : undefined;
       return {
         txHash: initialTxHash,
         hasClaimed,
         isClaimAvailable,
         isReadyForClaimNow,
         isReadyForClaimAfterUnlock,
+        shouldWaitTillDate,
       };
     })(),
     final: (() => {
@@ -241,6 +247,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         isClaimAvailable,
         isReadyForClaimNow,
         isReadyForClaimAfterUnlock,
+        shouldWaitTillDate: undefined,
       };
     })(),
   };
@@ -349,6 +356,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   claimableTokens={initialClaimableTokens}
                   claimablePercentage={initialClaimablePercentage}
                   tokenSymbol={claimAddress?.token || ''}
+                  shouldWaitTillDate={claimSteps.initial.shouldWaitTillDate}
                   mode="initial"
                 />
                 <ClaimCard
@@ -373,6 +381,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   claimableTokens={finalClaimableTokens}
                   claimablePercentage={finalClaimablePercentage}
                   tokenSymbol={claimAddress?.token || ''}
+                  shouldWaitTillDate={claimSteps.final.shouldWaitTillDate}
                   mode="final"
                 />
               </div>
@@ -399,6 +408,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 claimableTokens={initialClaimableTokens}
                 claimablePercentage={initialClaimablePercentage}
                 tokenSymbol={claimAddress?.token || ''}
+                shouldWaitTillDate={claimSteps.initial.shouldWaitTillDate}
                 mode="initial"
                 isCollapsed
               />
