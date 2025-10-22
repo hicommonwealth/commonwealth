@@ -63,6 +63,7 @@ export const GetAllocation = {
     .object({
       magna_allocation_id: z.uuid(),
       walletAddress: EVM_ADDRESS_STRICT,
+      tokenAddress: EVM_ADDRESS_STRICT,
       token: z.string(),
       description: z.string(),
       initial_percentage: z.number(),

@@ -15,6 +15,7 @@ export function GetAllocation(): Query<typeof schemas.GetAllocation> {
         return {
           magna_allocation_id: allocation.id,
           walletAddress: allocation.walletAddress as `0x${string}`,
+          tokenAddress: config.MAGNA?.TOKEN_ADDRESS as `0x${string}`,
           token: config.MAGNA?.TOKEN || '',
           description: config.MAGNA?.EVENT_DESC || '',
           initial_percentage: config.MAGNA?.INITIAL_PERCENTAGE || 0,

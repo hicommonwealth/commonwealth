@@ -31,7 +31,6 @@ interface ClaimCardProps {
   isReadyForClaimAfterUnlock: boolean;
   claimableTokens: string | number;
   claimablePercentage: number;
-  tokenSymbol: string;
   claimedTXHash?: string;
   claimedToAddress?: string;
   allocationId?: string;
@@ -40,6 +39,7 @@ interface ClaimCardProps {
   allocatedToAddress?: string;
   hasClaimableAmount?: boolean;
   mode: 'initial' | 'final';
+  tokenSymbol: string;
   shouldWaitTillDate?: moment.Moment;
   isCollapsed?: boolean;
   onConnectNewAddress?: () => void;
@@ -79,7 +79,7 @@ const ClaimCard = ({
   const [launchCountdown, setLaunchCountdown] = useState<string>('00:00:00');
   const [unlockCountdown, setUnlockCountdown] = useState<string>('00:00:00');
   const [syncCountdown, setSyncCountdown] = useState<string>('00:00:00');
-  const commonAirdrop = useCommonAirdrop();
+  const commonAirdrop = useCommonAirdrop({ tokenSymbol });
   const claimTxData = commonAirdrop.txData;
   const claimState =
     mode === 'initial' ? commonAirdrop.initial : commonAirdrop.final;

@@ -38,7 +38,7 @@ export const commonAirdropStore = createStore<CommonAirdropState>()(
 
 const useCommonAirdropStore = createBoundedUseStore(commonAirdropStore);
 
-export const useCommonAirdrop = () => {
+export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
   const utils = trpc.useUtils();
   const { txData, initialTxHash, finalTxHash, setData } =
     useCommonAirdropStore();
@@ -103,8 +103,12 @@ export const useCommonAirdrop = () => {
           const { isMagicAddress, provider } = await getWalletProvider(
             data.from,
           );
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const stc = new CommonClaim(data.to, provider as any);
+          const stc = new CommonClaim(
+            data.to,
+            tokenSymbol || 'C',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            provider as any,
+          );
           txHash = await stc.sign(
             data.from,
             `${BASE_ID}`,
