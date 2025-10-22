@@ -70,6 +70,12 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_GATE_WALLET': JSON.stringify(env.FLAG_GATE_WALLET),
     'process.env.FLAG_MOONPAY_FUNDS': JSON.stringify(env.FLAG_MOONPAY_FUNDS),
     'process.env.FLAG_CLAIMS': JSON.stringify(env.FLAG_CLAIMS),
+    // TODO: find a better way to inject this
+    'process.env.MAGNA_TOKEN': JSON.stringify(env.MAGNA_TOKEN),
+    'process.env.MAGNA_TOKEN_ADDRESS': JSON.stringify(env.MAGNA_TOKEN_ADDRESS),
+    'process.env.MAGNA_CLAIM_LAUNCH_DATE': JSON.stringify(
+      env.MAGNA_CLAIM_LAUNCH_DATE,
+    ),
   };
 
   return {

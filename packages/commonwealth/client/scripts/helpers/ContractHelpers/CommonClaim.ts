@@ -1,8 +1,9 @@
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import ContractBase from './ContractBase';
 
-class SignTokenClaim extends ContractBase {
+class CommonClaim extends ContractBase {
   tokenAddress: string;
+  magnaPlatformFee = '200000000000000'; // 0.0002 ETH
 
   constructor(tokenAddress: string, rpc: string) {
     // empty abi to make the .filter in contract work
@@ -103,11 +104,39 @@ class SignTokenClaim extends ContractBase {
     }
   }
 
+  async addTokenToWallet({
+    chainId = '8453',
+    providerInstance,
+  }: {
+    chainId?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any;
+  }) {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true, chainId, providerInstance);
+    }
+
+    return await this.web3?.currentProvider?.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC20',
+        options: {
+          address: process.env.MAGNA_TOKEN_ADDRESS,
+          symbol: process.env.MAGNA_TOKEN,
+          decimals: 18,
+          chainId: parseInt(chainId),
+          image: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
+        },
+      },
+    });
+  }
+
   async sign(
     walletAddress: string,
     chainId: string,
     data: string,
-    hasMagnaPlatformFee: boolean,
+    includeMagnaPlatformFee: boolean,
+    onFeeEstimation?: (requiredEth: string | number) => void,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     providerInstance?: any,
   ): Promise<`0x${string}`> {
@@ -116,9 +145,9 @@ class SignTokenClaim extends ContractBase {
     }
 
     // Magna platform fee that needs to be sent with the transaction
-    const magnaPlatformFee = hasMagnaPlatformFee
-      ? '200000000000000'
-      : undefined; // 0.0002 ETH
+    const magnaFee = includeMagnaPlatformFee
+      ? this.magnaPlatformFee
+      : undefined;
 
     const {
       maxFeePerGas,
@@ -131,8 +160,11 @@ class SignTokenClaim extends ContractBase {
       this.tokenAddress,
       walletAddress,
       data,
-      magnaPlatformFee,
+      magnaFee,
     );
+    if (onFeeEstimation) {
+      onFeeEstimation(requiredEth);
+    }
     if (!hasEnoughBalance) {
       throw new Error(
         `Not enough gas: requires ~${requiredEth} ETH for fees, but wallet only has ${balanceEth} ETH.
@@ -144,7 +176,7 @@ class SignTokenClaim extends ContractBase {
       from: walletAddress,
       to: this.tokenAddress,
       data, // magna sends the full abi-encoded calldata
-      value: magnaPlatformFee, // fee from magna
+      value: magnaFee,
       gas: gasLimit,
       maxFeePerGas,
       maxPriorityFeePerGas,
@@ -161,20 +193,8 @@ class SignTokenClaim extends ContractBase {
           })
           .then(async () => {
             // add token to wallet
-            await this.web3?.currentProvider?.request({
-              method: 'wallet_watchAsset',
-              params: {
-                type: 'ERC20',
-                // `C` token
-                options: {
-                  address: '0xD7DA840121aeb9792b202bd84Db32B2816B30c0e',
-                  symbol: 'C',
-                  decimals: 18,
-                  chainId: parseInt(chainId),
-                  imgUrl: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
-                },
-              },
-            });
+            // this will fail for magic wallet, but thats an issue coz magic auto imports tokens with > 0 value
+            await this.addTokenToWallet({ chainId }).catch(() => null);
           })
           .catch((e) => {
             console.error('Tx error: ', e);
@@ -186,4 +206,4 @@ class SignTokenClaim extends ContractBase {
   }
 }
 
-export default SignTokenClaim;
+export default CommonClaim;

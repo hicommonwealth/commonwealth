@@ -1,6 +1,6 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import MagicWebWalletController from 'controllers/app/webWallets/MagicWebWallet';
-import SignTokenClaim from 'helpers/ContractHelpers/signTokenClaim';
+import CommonClaim from 'helpers/ContractHelpers/CommonClaim';
 import { fetchNodes } from 'state/api/nodes/fetchNodes';
 import { userStore } from 'state/ui/user';
 import { createBoundedUseStore } from 'state/ui/utils';
@@ -13,6 +13,7 @@ type CommonAirdropData = {
   txData?: {
     to: string;
     data: string;
+    requiredEth?: string | number;
   };
   initialTxHash: `0x${string}` | null;
   finalTxHash: `0x${string}` | null;
@@ -48,6 +49,29 @@ export const useCommonAirdrop = () => {
   const updateFinalClaimTxHash =
     trpc.tokenAllocation.updateClaimCliffTransactionHash.useMutation();
 
+  const getWalletProvider = async (claimFromAddress: string) => {
+    const userAddresses = userStore.getState().addresses;
+    const isMagicAddress = userAddresses.some(
+      (addr) =>
+        addr.address.toLowerCase() === claimFromAddress.toLowerCase() &&
+        addr.walletId?.toLowerCase().includes('magic'),
+    );
+    const nodes = await fetchNodes();
+    if (isMagicAddress) {
+      const controller = new MagicWebWalletController();
+      await controller.enable(`${BASE_ID}`);
+
+      return { isMagicAddress, provider: controller.provider };
+    } else {
+      const baseNode = nodes?.find(
+        (node) => node.ethChainId === parseInt(BASE_ID),
+      );
+      if (!baseNode) throw new Error('Failed to find base node');
+
+      return { isMagicAddress: false, provider: baseNode.url };
+    }
+  };
+
   const claimToken = (type: 'initial' | 'final') => {
     const claimFunction =
       type === 'initial'
@@ -76,42 +100,27 @@ export const useCommonAirdrop = () => {
         let txHash = data.transaction_hash;
         // sign and persist transaction hash the first time
         if (!txHash) {
-          const userAddresses = userStore.getState().addresses;
-          const isMagicAddress = userAddresses.some(
-            (addr) =>
-              addr.address.toLowerCase() === data.from.toLowerCase() &&
-              addr.walletId?.toLowerCase().includes('magic'),
+          const { isMagicAddress, provider } = await getWalletProvider(
+            data.from,
           );
-          if (isMagicAddress) {
-            // Ensure nodes are fetched (kept for side effects if needed)
-            await fetchNodes();
-
-            const controller = new MagicWebWalletController();
-            await controller.enable(`${BASE_ID}`);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const stc = new SignTokenClaim(data.to, controller.provider as any);
-            txHash = await stc.sign(
-              data.from,
-              `${BASE_ID}`,
-              data.data,
-              type === 'initial',
-              controller.provider,
-            );
-          } else {
-            const nodes = await fetchNodes();
-            const baseNode = nodes?.find(
-              (node) => node.ethChainId === parseInt(BASE_ID),
-            );
-            if (!baseNode) throw new Error('Failed to find base node');
-
-            const stc = new SignTokenClaim(data.to, baseNode.url);
-            txHash = await stc.sign(
-              data.from,
-              `${baseNode.ethChainId}`,
-              data.data,
-              type === 'initial',
-            );
-          }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const stc = new CommonClaim(data.to, provider as any);
+          txHash = await stc.sign(
+            data.from,
+            `${BASE_ID}`,
+            data.data,
+            type === 'initial',
+            (requiredEth: string | number) => {
+              setData({
+                txData: {
+                  to: data.to,
+                  data: data.data,
+                  requiredEth,
+                },
+              });
+            },
+            isMagicAddress ? provider : undefined,
+          );
           // at this point the claim transaction is signed!
           // ...next line is best effort to persist the tx hash to complete the flow
           // ...if this fails, the user will have to claim again (is singing idempotent?)
@@ -137,6 +146,7 @@ export const useCommonAirdrop = () => {
 
   return {
     txData,
+    getWalletProvider,
     initial: {
       claim: claimInitial,
       txHash: initialTxHash,

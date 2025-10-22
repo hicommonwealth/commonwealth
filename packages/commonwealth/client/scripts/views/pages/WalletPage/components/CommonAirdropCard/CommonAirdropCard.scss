@@ -57,15 +57,19 @@
 
   &.in-progress {
     border-color: var(--color-in-progress);
-    background: linear-gradient(to bottom,
-        rgba(31, 86, 153, 0.02) 0%,
-        colors.$white 100%);
+    background: linear-gradient(
+      to bottom,
+      rgba(31, 86, 153, 0.02) 0%,
+      colors.$white 100%
+    );
 
     .hero-section {
-      background: linear-gradient(135deg,
-          #1f5699 0%,
-          #2d6bb0 50%,
-          #1f5699 100%) !important;
+      background: linear-gradient(
+        135deg,
+        #1f5699 0%,
+        #2d6bb0 50%,
+        #1f5699 100%
+      ) !important;
     }
 
     .notice-section {
@@ -82,48 +86,60 @@
     }
 
     .hero-colored-button {
-      background: linear-gradient(135deg,
-          #1f5699 0%,
-          #2d6bb0 50%,
-          #1f5699 100%) !important;
+      background: linear-gradient(
+        135deg,
+        #1f5699 0%,
+        #2d6bb0 50%,
+        #1f5699 100%
+      ) !important;
       color: colors.$white !important;
       border: none !important;
 
       &:hover:not(:disabled) {
-        background: linear-gradient(135deg,
-            #184a7f 0%,
-            #26599a 50%,
-            #184a7f 100%) !important;
+        background: linear-gradient(
+          135deg,
+          #184a7f 0%,
+          #26599a 50%,
+          #184a7f 100%
+        ) !important;
       }
     }
   }
 
   &.needs-action {
     border-color: var(--color-needs-action);
-    background: linear-gradient(to bottom,
-        rgba(255, 165, 0, 0.02) 0%,
-        colors.$white 100%);
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 165, 0, 0.02) 0%,
+      colors.$white 100%
+    );
 
     .hero-section {
-      background: linear-gradient(135deg,
-          #99251f 0%,
-          #b03e2d 50%,
-          #99251f 100%) !important;
+      background: linear-gradient(
+        135deg,
+        #99251f 0%,
+        #b03e2d 50%,
+        #99251f 100%
+      ) !important;
     }
 
     .hero-colored-button {
-      background: linear-gradient(135deg,
-          #ffa500 0%,
-          #ffb733 50%,
-          #ffa500 100%) !important;
+      background: linear-gradient(
+        135deg,
+        #ffa500 0%,
+        #ffb733 50%,
+        #ffa500 100%
+      ) !important;
       color: colors.$white !important;
       border: none !important;
 
       &:hover:not(:disabled) {
-        background: linear-gradient(135deg,
-            #e69500 0%,
-            #e6a530 50%,
-            #e69500 100%) !important;
+        background: linear-gradient(
+          135deg,
+          #e69500 0%,
+          #e6a530 50%,
+          #e69500 100%
+        ) !important;
       }
     }
 
@@ -139,30 +155,38 @@
 
   &.completed {
     border-color: var(--color-completed);
-    background: linear-gradient(to bottom,
-        rgba(0, 128, 0, 0.02) 0%,
-        colors.$white 100%);
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 128, 0, 0.02) 0%,
+      colors.$white 100%
+    );
 
     .hero-section {
-      background: linear-gradient(135deg,
-          #086b08 0%,
-          #00a000 50%,
-          #008000 100%) !important;
+      background: linear-gradient(
+        135deg,
+        #086b08 0%,
+        #00a000 50%,
+        #008000 100%
+      ) !important;
     }
 
     .hero-colored-button {
-      background: linear-gradient(135deg,
-          #086b08 0%,
-          #00a000 50%,
-          #008000 100%) !important;
+      background: linear-gradient(
+        135deg,
+        #086b08 0%,
+        #00a000 50%,
+        #008000 100%
+      ) !important;
       color: colors.$white !important;
       border: none !important;
 
       &:hover:not(:disabled) {
-        background: linear-gradient(135deg,
-            #065505 0%,
-            #008a00 50%,
-            #006a00 100%) !important;
+        background: linear-gradient(
+          135deg,
+          #065505 0%,
+          #008a00 50%,
+          #006a00 100%
+        ) !important;
       }
     }
 
@@ -178,10 +202,12 @@
 
   &.needs-action {
     .hero-section {
-      background: linear-gradient(135deg,
-          #ffa500 0%,
-          #ffb733 50%,
-          #ffa500 100%);
+      background: linear-gradient(
+        135deg,
+        #ffa500 0%,
+        #ffb733 50%,
+        #ffa500 100%
+      );
     }
   }
 
@@ -210,7 +236,7 @@
       padding: 0 !important;
       background: transparent;
 
-      >div:first-child {
+      > div:first-child {
         text-align: center;
         width: 100%;
       }
@@ -223,13 +249,79 @@
     align-items: center;
     width: 100%;
 
+    .add-to-wallet-button {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.9) !important;
+      backdrop-filter: blur(8px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.4) !important;
+      border-radius: 8px;
+      padding: 6px 12px;
+      opacity: 0.8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      color: colors.$neutral-600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+        'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+        'Helvetica Neue', sans-serif;
+      text-decoration: none;
+      outline: none;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.95);
+        // transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        color: colors.$neutral-700;
+        opacity: 1;
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        opacity: 1;
+      }
+
+      &:focus {
+        outline: 2px solid rgba(59, 130, 246, 0.5);
+        outline-offset: 2px;
+        opacity: 1;
+      }
+
+      .button-text {
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+      }
+
+      .button-icon {
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1;
+        color: colors.$neutral-500;
+        transition: all 0.2s ease;
+      }
+
+      &:hover .button-icon {
+        color: colors.$neutral-600;
+        transform: scale(1.05);
+      }
+    }
+
     .hero-section {
       width: 100%;
       padding: 24px 32px;
-      background: linear-gradient(135deg,
-          colors.$neutral-400 0%,
-          colors.$neutral-500 50%,
-          colors.$neutral-400 100%);
+      background: linear-gradient(
+        135deg,
+        colors.$neutral-400 0%,
+        colors.$neutral-500 50%,
+        colors.$neutral-400 100%
+      );
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -244,10 +336,12 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(135deg,
-            rgba(255, 255, 255, 0.1) 0%,
-            rgba(255, 255, 255, 0) 50%,
-            rgba(0, 0, 0, 0.05) 100%);
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.1) 0%,
+          rgba(255, 255, 255, 0) 50%,
+          rgba(0, 0, 0, 0.05) 100%
+        );
         pointer-events: none;
       }
 
@@ -259,9 +353,9 @@
       }
 
       .airdrop-title-section {
-        flex: 1;
         display: flex;
-        align-items: center;
+        width: fit-content !important;
+        flex-direction: column;
       }
 
       .description-text {
@@ -337,6 +431,23 @@
   // Responsive design
   @include media_queries.smallInclusive {
     .banner-content {
+      .add-to-wallet-button {
+        top: 16px;
+        right: 16px;
+        padding: 5px 10px;
+        font-size: 11px;
+        border-radius: 6px;
+        z-index: 100;
+
+        .button-text {
+          font-size: 11px;
+        }
+
+        .button-icon {
+          font-size: 12px;
+        }
+      }
+
       .hero-section {
         padding: 20px 16px;
         gap: 10px;

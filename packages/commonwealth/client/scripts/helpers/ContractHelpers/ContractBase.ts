@@ -43,7 +43,7 @@ abstract class ContractBase {
           )[0];
 
           // always re-enable wallet connect with new chainId
-          if (this.wallet.name === 'walletconnect' || !this.wallet.api) {
+          if (this.wallet?.name === 'walletconnect' || !this.wallet?.api) {
             await this.wallet.enable(chainId);
           }
           // @ts-expect-error StrictNullChecks
@@ -55,7 +55,7 @@ abstract class ContractBase {
         }
 
         this.web3 =
-          withWallet && this.wallet.name === 'walletconnect'
+          withWallet && this.wallet?.name === 'walletconnect'
             ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (this.wallet as any)._web3
             : new Web3(provider);
