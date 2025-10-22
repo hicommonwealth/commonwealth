@@ -281,11 +281,11 @@ export const NftSnapshot = (
       },
       created_at: {
         type: Sequelize.DATE,
-        allowNull: true,
+        allowNull: false,
       },
       updated_at: {
         type: Sequelize.DATE,
-        allowNull: true,
+        allowNull: false,
       },
     },
     {
