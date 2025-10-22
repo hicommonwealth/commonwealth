@@ -109,6 +109,7 @@ class CommonClaim extends ContractBase {
     providerInstance,
   }: {
     chainId?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     providerInstance?: any;
   }) {
     if (!this.initialized || !this.walletEnabled) {

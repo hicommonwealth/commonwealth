@@ -126,6 +126,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         return;
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const contract = new CommonClaim(claimFromAddress, provider as any);
       await contract.addTokenToWallet({
         providerInstance: isMagicAddress ? provider : undefined,
@@ -306,7 +307,9 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   <button
                     className="add-to-wallet-button"
                     onClick={() =>
-                      handleImportToken(claimAddress?.address as string)
+                      handleImportToken(claimAddress?.address as string).catch(
+                        console.error,
+                      )
                     }
                   >
                     <span className="button-icon">+</span>

@@ -103,6 +103,7 @@ export const useCommonAirdrop = () => {
           const { isMagicAddress, provider } = await getWalletProvider(
             data.from,
           );
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const stc = new CommonClaim(data.to, provider as any);
           txHash = await stc.sign(
             data.from,
