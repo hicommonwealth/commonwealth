@@ -1,7 +1,7 @@
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import ContractBase from './ContractBase';
 
-class SignTokenClaim extends ContractBase {
+class CommonClaim extends ContractBase {
   tokenAddress: string;
 
   constructor(tokenAddress: string, rpc: string) {
@@ -186,4 +186,4 @@ class SignTokenClaim extends ContractBase {
   }
 }
 
-export default SignTokenClaim;
+export default CommonClaim;

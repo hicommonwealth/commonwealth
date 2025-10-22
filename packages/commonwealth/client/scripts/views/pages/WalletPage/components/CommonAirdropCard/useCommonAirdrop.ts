@@ -1,6 +1,6 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import MagicWebWalletController from 'controllers/app/webWallets/MagicWebWallet';
-import SignTokenClaim from 'helpers/ContractHelpers/signTokenClaim';
+import CommonClaim from 'helpers/ContractHelpers/CommonClaim';
 import { fetchNodes } from 'state/api/nodes/fetchNodes';
 import { userStore } from 'state/ui/user';
 import { createBoundedUseStore } from 'state/ui/utils';
@@ -89,7 +89,7 @@ export const useCommonAirdrop = () => {
             const controller = new MagicWebWalletController();
             await controller.enable(`${BASE_ID}`);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const stc = new SignTokenClaim(data.to, controller.provider as any);
+            const stc = new CommonClaim(data.to, controller.provider as any);
             txHash = await stc.sign(
               data.from,
               `${BASE_ID}`,
@@ -104,7 +104,7 @@ export const useCommonAirdrop = () => {
             );
             if (!baseNode) throw new Error('Failed to find base node');
 
-            const stc = new SignTokenClaim(data.to, baseNode.url);
+            const stc = new CommonClaim(data.to, baseNode.url);
             txHash = await stc.sign(
               data.from,
               `${baseNode.ethChainId}`,
