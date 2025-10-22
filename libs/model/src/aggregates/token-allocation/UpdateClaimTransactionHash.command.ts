@@ -2,6 +2,7 @@ import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
+import { validateClaimTxnHash } from '../../utils';
 //import { getTransaction } from '@hicommonwealth/evm-protocols';
 
 export function UpdateClaimTransactionHash(): Command<
@@ -14,10 +15,7 @@ export function UpdateClaimTransactionHash(): Command<
     body: async ({ payload, actor }) => {
       const { transaction_hash } = payload;
 
-      // const tx = await getTransaction({
-      //   rpc: what's the best rpc to use here?
-      //   txHash: transaction_hash,
-      // });
+      const txnAt = await validateClaimTxnHash(transaction_hash);
 
       const [, updated] = await models.sequelize.query(
         `
@@ -36,7 +34,7 @@ export function UpdateClaimTransactionHash(): Command<
           replacements: {
             user_id: actor.user.id,
             transaction_hash,
-            transaction_at: new Date(),
+            transaction_at: txnAt,
           },
         },
       );

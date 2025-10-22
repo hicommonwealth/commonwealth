@@ -2,6 +2,7 @@ import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
+import { validateClaimTxnHash } from '../../utils/validateClaimTxnHash';
 
 export function UpdateClaimCliffTransactionHash(): Command<
   typeof schemas.UpdateClaimTransactionHash
@@ -13,8 +14,7 @@ export function UpdateClaimCliffTransactionHash(): Command<
     body: async ({ payload, actor }) => {
       const { transaction_hash } = payload;
 
-      // TODO: validate tx
-      const transaction_at = new Date().toISOString();
+      const txnAt = await validateClaimTxnHash(transaction_hash);
 
       const [, updated] = await models.sequelize.query(
         `
@@ -33,7 +33,7 @@ export function UpdateClaimCliffTransactionHash(): Command<
           replacements: {
             user_id: actor.user.id,
             transaction_hash,
-            transaction_at,
+            transaction_at: txnAt,
           },
         },
       );
