@@ -73,6 +73,9 @@ export default defineConfig(({ mode }) => {
     // TODO: find a better way to inject this
     'process.env.MAGNA_TOKEN': JSON.stringify(env.MAGNA_TOKEN),
     'process.env.MAGNA_TOKEN_ADDRESS': JSON.stringify(env.MAGNA_TOKEN_ADDRESS),
+    'process.env.MAGNA_CLAIM_LAUNCH_DATE': JSON.stringify(
+      env.MAGNA_CLAIM_LAUNCH_DATE,
+    ),
   };
 
   return {
