@@ -32,12 +32,24 @@ export const ClaimAddressView = z.object({
     .nullish()
     .describe('When the allocation was claimed by the user.'),
   magna_claim_tx_hash: z.string().nullish(),
+  magna_claim_tx_at: z
+    .date()
+    .or(z.string())
+    .nullish()
+    .describe('When the transaction was signed by the user.'),
+  magna_claim_tx_finalized: z.boolean().nullish(),
   magna_cliff_claimed_at: z
     .date()
     .or(z.string())
     .nullish()
     .describe('When the allocation was claimed by the user.'),
   magna_cliff_claim_tx_hash: z.string().nullish(),
+  magna_cliff_claim_tx_at: z
+    .date()
+    .or(z.string())
+    .nullish()
+    .describe('When the cliff transaction was signed by the user.'),
+  magna_cliff_claim_tx_finalized: z.boolean().nullish(),
 });
 
 export const GetClaimAddress = {

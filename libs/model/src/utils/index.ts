@@ -18,4 +18,5 @@ export * from './sanitizeQuillText';
 export * from './testChainNodeUtils';
 export * from './updateTags';
 export * from './utils';
+export * from './validateClaimTxnHash';
 export * from './validateGroupMembership';
