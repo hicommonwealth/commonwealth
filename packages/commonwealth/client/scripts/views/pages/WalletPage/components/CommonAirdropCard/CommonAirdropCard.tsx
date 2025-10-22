@@ -251,7 +251,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   );
   const claimableTokens = formatTokenBalance(tokensCount);
   const initialClaimPercentage =
-    allocation?.initial_percentage || claimAddress?.initial_percentage || 0.25; // NOTE: fallback to 0.25
+    allocation?.initial_percentage || claimAddress?.initial_percentage;
   const initialClaimablePercentage = (initialClaimPercentage || 0) * 100;
   const initialClaimableTokens = tokensCount * (initialClaimPercentage || 0);
   const finalClaimablePercentage = (1 - (initialClaimPercentage || 0)) * 100;
