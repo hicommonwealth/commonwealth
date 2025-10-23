@@ -15,6 +15,7 @@ export function ClaimTokenCliff(): Command<typeof schemas.ClaimToken> {
 
       // verify there is a valid claim
       const [claim] = await models.sequelize.query<{
+        address: string;
         magna_allocation_id: string;
         magna_claimed_at: Date | null;
         magna_claim_data: string | null;
@@ -25,6 +26,7 @@ export function ClaimTokenCliff(): Command<typeof schemas.ClaimToken> {
       }>(
         `
           SELECT
+            C.address,
             C.magna_allocation_id,
             C.magna_claimed_at,
             C.magna_claim_data,
@@ -56,7 +58,7 @@ export function ClaimTokenCliff(): Command<typeof schemas.ClaimToken> {
       if (!claim.magna_cliff_claimed_at || !claim.magna_cliff_claim_data) {
         // call the token allocation service
         const response = await claimAllocation(claim.magna_allocation_id, {
-          sender: actor.address!,
+          sender: claim.address,
         });
 
         if (
