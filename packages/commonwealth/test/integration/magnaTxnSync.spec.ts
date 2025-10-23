@@ -52,6 +52,7 @@ describe('MagnaTxnSync Task Tests', () => {
     mockClient = {
       request: vi.fn(),
       getTransaction: vi.fn(),
+      getBlockNumber: vi.fn().mockResolvedValue(BigInt(11000000)), // Mock current block number
     };
 
     vi.mocked(getPublicClient).mockReturnValue(mockClient as any);
@@ -89,6 +90,7 @@ describe('MagnaTxnSync Task Tests', () => {
     vi.clearAllMocks();
 
     // Re-setup mocks after clearAllMocks
+    mockClient.getBlockNumber = vi.fn().mockResolvedValue(BigInt(11000000));
     vi.mocked(getPublicClient).mockReturnValue(mockClient as any);
 
     vi.mocked(fetch).mockResolvedValue({
@@ -196,6 +198,7 @@ describe('MagnaTxnSync Task Tests', () => {
       mockClient.getTransaction.mockResolvedValue({
         to: '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6',
         input: '0x8612372a000000000000000000000000', // withdraw selector
+        blockNumber: BigInt(10000100),
       });
 
       await magnaTxnSyncTask.fn();
@@ -223,7 +226,7 @@ describe('MagnaTxnSync Task Tests', () => {
       expect(updated[0].magna_claim_tx_hash).toBe(mockTxHash);
     });
 
-    test('should skip addresses already with tx hash', async () => {
+    test('should skip addresses already finalized', async () => {
       const user = await models.User.create({
         email: 'test@example.com',
         profile: { name: 'Test User' },
@@ -233,8 +236,8 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_claimed_at, magna_claim_data, magna_claim_tx_hash, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), :claim_data, :tx_hash, NOW(), NOW())
+          (user_id, address, magna_claimed_at, magna_claim_data, magna_claim_tx_hash, magna_claim_tx_finalized, created_at, updated_at)
+          VALUES (:user_id, :address, NOW(), :claim_data, :tx_hash, TRUE, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
@@ -294,6 +297,7 @@ describe('MagnaTxnSync Task Tests', () => {
       mockClient.getTransaction.mockResolvedValue({
         to: '0xWRONGCONTRACT123456789012345678901234567890',
         input: '0x8612372a000000000000000000000000',
+        blockNumber: BigInt(10000100),
       });
 
       await magnaTxnSyncTask.fn();
@@ -355,6 +359,7 @@ describe('MagnaTxnSync Task Tests', () => {
       mockClient.getTransaction.mockResolvedValue({
         to: '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6',
         input: '0xWRONGFUNC000000000000000000000000', // not withdraw selector
+        blockNumber: BigInt(10000100),
       });
 
       await magnaTxnSyncTask.fn();
@@ -416,6 +421,7 @@ describe('MagnaTxnSync Task Tests', () => {
         return Promise.resolve({
           to: '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6',
           input: '0x8612372a000000000000000000000000',
+          blockNumber: BigInt(10000100),
         });
       });
 
@@ -481,6 +487,7 @@ describe('MagnaTxnSync Task Tests', () => {
         return Promise.resolve({
           to: '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6',
           input: '0x8612372a000000000000000000000000',
+          blockNumber: BigInt(10000100),
         });
       });
 
@@ -541,6 +548,7 @@ describe('MagnaTxnSync Task Tests', () => {
         return Promise.resolve({
           to: '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6',
           input: '0x8612372a000000000000000000000000',
+          blockNumber: BigInt(10000100),
         });
       });
 
@@ -606,6 +614,7 @@ describe('MagnaTxnSync Task Tests', () => {
         return Promise.resolve({
           to: '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6',
           input: '0x8612372a000000000000000000000000',
+          blockNumber: BigInt(10000100),
         });
       });
 
@@ -631,7 +640,7 @@ describe('MagnaTxnSync Task Tests', () => {
       expect(updated[0].magna_cliff_claim_tx_hash).toBe(secondTxHash);
     });
 
-    test('should skip cliff claims that already have tx hash', async () => {
+    test('should skip cliff claims that are already finalized', async () => {
       const user = await models.User.create({
         email: 'test@example.com',
         profile: { name: 'Test User' },
@@ -645,8 +654,8 @@ describe('MagnaTxnSync Task Tests', () => {
         `
           INSERT INTO "ClaimAddresses" 
           (user_id, address, magna_cliff_claimed_at, magna_cliff_claim_data, 
-           magna_cliff_claim_tx_hash, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), :claim_data, :tx_hash, NOW(), NOW())
+           magna_cliff_claim_tx_hash, magna_cliff_claim_tx_finalized, created_at, updated_at)
+          VALUES (:user_id, :address, NOW(), :claim_data, :tx_hash, TRUE, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
@@ -661,7 +670,7 @@ describe('MagnaTxnSync Task Tests', () => {
 
       await magnaTxnSyncTask.fn();
 
-      // Should not make any API calls since the cliff claim already has a tx hash
+      // Should not make any API calls since the cliff claim is already finalized
       expect(mockClient.request).not.toHaveBeenCalled();
     });
 
@@ -726,6 +735,7 @@ describe('MagnaTxnSync Task Tests', () => {
       mockClient.getTransaction.mockResolvedValue({
         to: '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6',
         input: '0x8612372a000000000000000000000000',
+        blockNumber: BigInt(10000100),
       });
 
       await magnaTxnSyncTask.fn();
@@ -879,6 +889,7 @@ describe('MagnaTxnSync Task Tests', () => {
       mockClient.getTransaction.mockResolvedValue({
         to: '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6',
         input: '0x8612372a000000000000000000000000',
+        blockNumber: BigInt(10000100),
       });
 
       await magnaTxnSyncTask.fn();

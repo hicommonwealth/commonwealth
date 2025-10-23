@@ -2302,6 +2302,1378 @@ function generateNftAllocationHTML(
 }
 
 /**
+ * Fetch top combined allocations including users and NFT holders without user_ids
+ */
+async function getTopCombinedAllocations(limit: number = 2000): Promise<
+  Array<{
+    user_id: number | null;
+    user_tier: number | null;
+    historical_allocation: number;
+    aura_allocation: number;
+    nft_allocation: number;
+    total_allocation: number;
+    last_active: Date | null;
+  }>
+> {
+  console.log(`Fetching top ${limit} combined allocations...`);
+
+  const results = await models.sequelize.query<{
+    user_id: number | null;
+    user_tier: number | null;
+    historical_allocation: string;
+    aura_allocation: string;
+    nft_allocation: string;
+    total_allocation: string;
+    last_active: Date | null;
+  }>(
+    `
+      WITH last_active_address as (
+        SELECT user_id, MAX(last_active) as last_active
+        FROM "Addresses"
+        GROUP BY user_id
+      ), nft_users AS (
+        SELECT NS.user_id, NS.user_tier, SUM(NS.total_token_allocation) as total_allocation
+        FROM "NftSnapshot" NS
+        WHERE NS.user_id IS NOT NULL
+        GROUP BY NS.user_id, NS.user_tier
+      ), nft_wo_users AS (
+        SELECT NULL::INTEGER as user_id, NULL::INTEGER as user_tier, 0::NUMERIC as historical_allocation, 0::NUMERIC as aura_allocation, total_token_allocation as nft_allocation, total_token_allocation as total_allocation, NULL::TIMESTAMP as last_active
+        FROM "NftSnapshot"
+        WHERE user_id IS NULL
+      ), allocations AS (
+        SELECT U.id as user_id,
+               U.tier as user_tier,
+               COALESCE(HA.token_allocation, 0) as historical_allocation,
+               COALESCE(AA.token_allocation, 0) as aura_allocation,
+               COALESCE(NU.total_allocation, 0) as nft_allocation,
+               COALESCE(HA.token_allocation, 0) + COALESCE(AA.token_allocation, 0) + COALESCE(NU.total_allocation, 0) as total_allocation,
+               LAA.last_active as last_active
+        FROM "Users" U
+                 LEFT JOIN "HistoricalAllocations" HA ON HA.user_id = U.id
+                 LEFT JOIN "AuraAllocations" AA ON AA.user_id = U.id
+                 LEFT JOIN nft_users NU ON NU.user_id = U.id
+                 LEFT JOIN last_active_address LAA ON LAA.user_id = U.id
+        WHERE COALESCE(HA.token_allocation, 0) > 0
+           OR COALESCE(AA.token_allocation, 0) > 0
+           OR COALESCE(NU.total_allocation, 0) > 0
+        UNION ALL
+        SELECT *
+        FROM nft_wo_users
+      )
+      SELECT *
+      FROM allocations
+      ORDER BY total_allocation DESC
+      LIMIT $1;
+    `,
+    {
+      type: QueryTypes.SELECT,
+      bind: [limit],
+    },
+  );
+
+  return results.map((row) => ({
+    user_id: row.user_id,
+    user_tier: row.user_tier,
+    historical_allocation: parseFloat(row.historical_allocation),
+    aura_allocation: parseFloat(row.aura_allocation),
+    nft_allocation: parseFloat(row.nft_allocation),
+    total_allocation: parseFloat(row.total_allocation),
+    last_active: row.last_active,
+  }));
+}
+
+/**
+ * Generate HTML for top combined allocations table
+ */
+function generateTopCombinedAllocationsHTML(
+  data: Array<{
+    user_id: number | null;
+    user_tier: number | null;
+    historical_allocation: number;
+    aura_allocation: number;
+    nft_allocation: number;
+    total_allocation: number;
+    last_active: Date | null;
+  }>,
+): string {
+  const tableRows = data
+    .map((row, index) => {
+      const rank = index + 1;
+      const userId = row.user_id !== null ? row.user_id : '-';
+      const userTier =
+        row.user_tier !== null
+          ? `${row.user_tier} (${TIER_NAMES[row.user_tier] || 'Unknown'})`
+          : '-';
+      const historicalAllocation = Math.round(
+        row.historical_allocation,
+      ).toLocaleString();
+      const auraAllocation = Math.round(row.aura_allocation).toLocaleString();
+      const nftAllocation = Math.round(row.nft_allocation).toLocaleString();
+      const totalAllocation = Math.round(row.total_allocation).toLocaleString();
+      const lastActive = row.last_active
+        ? new Date(row.last_active).toLocaleDateString()
+        : '-';
+
+      return `
+        <tr>
+          <td>${rank}</td>
+          <td>${userId}</td>
+          <td>${userTier}</td>
+          <td class="allocation-cell">${historicalAllocation}</td>
+          <td class="allocation-cell">${auraAllocation}</td>
+          <td class="allocation-cell">${nftAllocation}</td>
+          <td class="allocation-cell total-allocation">${totalAllocation}</td>
+          <td>${lastActive}</td>
+        </tr>
+      `;
+    })
+    .join('');
+
+  const totalAllocation = data.reduce(
+    (sum, row) => sum + row.total_allocation,
+    0,
+  );
+  const totalHistorical = data.reduce(
+    (sum, row) => sum + row.historical_allocation,
+    0,
+  );
+  const totalAura = data.reduce((sum, row) => sum + row.aura_allocation, 0);
+  const totalNft = data.reduce((sum, row) => sum + row.nft_allocation, 0);
+  const usersWithId = data.filter((row) => row.user_id !== null).length;
+  const holdersWithoutId = data.filter((row) => row.user_id === null).length;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Top ${data.length.toLocaleString()} Combined Allocations</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
+        .container { max-width: 1800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        .explanation { background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .explanation h3 { margin-top: 0; color: #2c5aa0; }
+        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0; }
+        .stats { padding: 15px; background: #f5f5f5; border-radius: 5px; text-align: center; }
+        .stats-value { font-size: 1.5em; font-weight: bold; color: #007bff; }
+        .stats-breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; font-size: 0.9em; }
+        .stats-breakdown-item { padding: 8px; background: white; border-radius: 3px; }
+        .table-container { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: left; border: 1px solid #ddd; }
+        th { background-color: #007bff; color: white; font-weight: bold; position: sticky; top: 0; z-index: 10; }
+        tbody tr:nth-child(even) { background-color: #f8f9fa; }
+        tbody tr:hover { background-color: #e9ecef; }
+        .allocation-cell { text-align: right; font-weight: 600; }
+        .total-allocation { font-weight: bold; }
+        td:nth-child(1) { text-align: center; font-weight: 500; }
+        td:nth-child(2), td:nth-child(8) { text-align: center; }
+        .rank-top10 { background-color: #d4edda !important; }
+        .rank-top50 { background-color: #fff3cd !important; }
+        .rank-top100 { background-color: #ffe5cc !important; }
+    </style>
+    <script>
+        // Add rank-based highlighting after page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach((row, index) => {
+                if (index < 10) {
+                    row.classList.add('rank-top10');
+                } else if (index < 50) {
+                    row.classList.add('rank-top50');
+                } else if (index < 100) {
+                    row.classList.add('rank-top100');
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Top ${data.length.toLocaleString()} Combined Allocations</h1>
+        
+        <div class="explanation">
+            <h3>Understanding the Data</h3>
+            <p>This table shows the top ${data.length.toLocaleString()} recipients by <strong>total combined allocation</strong> across all sources (NFT, Historical, and Aura).</p>
+            <ul>
+                <li><strong>Rank:</strong> Position ordered by total allocation (1 = highest)</li>
+                <li><strong>User ID:</strong> The user's ID in the system (if available)</li>
+                <li><strong>User Tier:</strong> The user's verification tier (if available)</li>
+                <li><strong>Historical Allocation:</strong> Tokens allocated based on historical activity (threads, comments)</li>
+                <li><strong>Aura Allocation:</strong> Tokens allocated based on Aura XP</li>
+                <li><strong>NFT Allocation:</strong> Tokens allocated to NFT holders</li>
+                <li><strong>Total Allocation:</strong> Sum of all tokens allocated from all sources</li>
+                <li><strong>Last Active:</strong> Date the user was last active (if available)</li>
+            </ul>
+            <p><em>Note: Rows with "-" or "0" indicate data is not available or no allocation for that source.</em></p>
+            <p><em>Highlighting: Top 10 (light green), Top 50 (light yellow), Top 100 (light orange)</em></p>
+        </div>
+
+        <div class="stats-container">
+            <div class="stats">
+                <div class="stats-value">${data.length.toLocaleString()}</div>
+                <div>Total Recipients</div>
+            </div>
+            <div class="stats">
+                <div class="stats-value">${Math.round(totalAllocation).toLocaleString()}</div>
+                <div>Total Tokens Allocated</div>
+                <div class="stats-breakdown">
+                    <div class="stats-breakdown-item">Historical: ${Math.round(totalHistorical).toLocaleString()}</div>
+                    <div class="stats-breakdown-item">Aura: ${Math.round(totalAura).toLocaleString()}</div>
+                    <div class="stats-breakdown-item">NFT: ${Math.round(totalNft).toLocaleString()}</div>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stats-value">${usersWithId.toLocaleString()} / ${holdersWithoutId.toLocaleString()}</div>
+                <div>Users with ID / Holders without ID</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>User ID</th>
+                        <th>User Tier</th>
+                        <th>Historical Allocation</th>
+                        <th>Aura Allocation</th>
+                        <th>NFT Allocation</th>
+                        <th>Total Allocation</th>
+                        <th>Last Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>`;
+}
+
+/**
+ * Fetch allocation distribution by user activity recency and tier
+ */
+async function getAllocationByActivityAndTier(): Promise<
+  Array<{
+    activity_period: string;
+    user_tier: number;
+    total_allocation: number;
+    user_count: number;
+  }>
+> {
+  console.log(
+    'Fetching allocation distribution by activity period and user tier...',
+  );
+
+  const results = await models.sequelize.query<{
+    activity_period: string;
+    user_tier: number;
+    total_allocation: string;
+    user_count: number;
+  }>(
+    `
+      WITH last_active_address as (
+        SELECT user_id, MAX(last_active) as last_active
+        FROM "Addresses"
+        GROUP BY user_id
+      ), nft_users AS (
+        SELECT NS.user_id, NS.user_tier, SUM(NS.total_token_allocation) as total_allocation
+        FROM "NftSnapshot" NS
+        WHERE NS.user_id IS NOT NULL
+        GROUP BY NS.user_id, NS.user_tier
+      ), nft_wo_users AS (
+        SELECT NULL::INTEGER as user_id, 2 as user_tier, total_token_allocation as total_allocation, NULL::TIMESTAMP as last_active
+        FROM "NftSnapshot"
+        WHERE user_id IS NULL
+      ), allocations AS (
+        SELECT U.id as user_id,
+               U.tier as user_tier,
+               COALESCE(HA.token_allocation, 0) + COALESCE(AA.token_allocation, 0) + COALESCE(NU.total_allocation, 0) as total_allocation,
+               LAA.last_active as last_active
+        FROM "Users" U
+                 LEFT JOIN "HistoricalAllocations" HA ON HA.user_id = U.id
+                 LEFT JOIN "AuraAllocations" AA ON AA.user_id = U.id
+                 LEFT JOIN nft_users NU ON NU.user_id = U.id
+                 LEFT JOIN last_active_address LAA ON LAA.user_id = U.id
+        WHERE COALESCE(HA.token_allocation, 0) > 0
+           OR COALESCE(AA.token_allocation, 0) > 0
+           OR COALESCE(NU.total_allocation, 0) > 0
+        UNION ALL
+        SELECT *
+        FROM nft_wo_users
+      ), activity_categorized AS (
+        SELECT 
+          user_tier,
+          total_allocation,
+          CASE
+            WHEN last_active IS NULL THEN 'Never Active'
+            WHEN last_active >= NOW() - INTERVAL '1 day' THEN 'Last Day'
+            WHEN last_active >= NOW() - INTERVAL '1 week' THEN 'Last Week'
+            WHEN last_active >= NOW() - INTERVAL '1 month' THEN 'Last Month'
+            WHEN last_active >= NOW() - INTERVAL '3 months' THEN 'Last 3 Months'
+            WHEN last_active >= NOW() - INTERVAL '6 months' THEN 'Last 6 Months'
+            ELSE 'Over 6 Months Ago'
+          END as activity_period
+        FROM allocations
+      )
+      SELECT 
+        activity_period,
+        user_tier,
+        SUM(total_allocation) as total_allocation,
+        COUNT(*) as user_count
+      FROM activity_categorized
+      GROUP BY activity_period, user_tier
+      ORDER BY 
+        CASE activity_period
+          WHEN 'Last Day' THEN 1
+          WHEN 'Last Week' THEN 2
+          WHEN 'Last Month' THEN 3
+          WHEN 'Last 3 Months' THEN 4
+          WHEN 'Last 6 Months' THEN 5
+          WHEN 'Over 6 Months Ago' THEN 6
+          WHEN 'Never Active' THEN 7
+        END,
+        user_tier;
+    `,
+    { type: QueryTypes.SELECT },
+  );
+
+  return results.map((row) => ({
+    activity_period: row.activity_period,
+    user_tier: row.user_tier,
+    total_allocation: parseFloat(row.total_allocation),
+    user_count: row.user_count,
+  }));
+}
+
+/**
+ * Fetch allocation distribution by percentile
+ */
+async function getAllocationByPercentile(): Promise<
+  Array<{
+    percentile_bucket: string;
+    total_allocation: number;
+    user_count: number;
+    avg_allocation: number;
+  }>
+> {
+  console.log('Fetching allocation distribution by percentile...');
+
+  const results = await models.sequelize.query<{
+    percentile_bucket: string;
+    total_allocation: string;
+    user_count: number;
+    avg_allocation: string;
+  }>(
+    `
+      WITH nft_users AS (
+        SELECT NS.user_id, NS.user_tier, SUM(NS.total_token_allocation) as total_allocation
+        FROM "NftSnapshot" NS
+        WHERE NS.user_id IS NOT NULL
+        GROUP BY NS.user_id, NS.user_tier
+      ), nft_wo_users AS (
+        SELECT NULL::INTEGER as user_id, NULL::INTEGER as user_tier, total_token_allocation as total_allocation
+        FROM "NftSnapshot"
+        WHERE user_id IS NULL
+      ), allocations AS (
+        SELECT U.id as user_id,
+               U.tier as user_tier,
+               COALESCE(HA.token_allocation, 0) + COALESCE(AA.token_allocation, 0) + COALESCE(NU.total_allocation, 0) as total_allocation
+        FROM "Users" U
+                 LEFT JOIN "HistoricalAllocations" HA ON HA.user_id = U.id
+                 LEFT JOIN "AuraAllocations" AA ON AA.user_id = U.id
+                 LEFT JOIN nft_users NU ON NU.user_id = U.id
+        WHERE COALESCE(HA.token_allocation, 0) > 0
+           OR COALESCE(AA.token_allocation, 0) > 0
+           OR COALESCE(NU.total_allocation, 0) > 0
+        UNION ALL
+        SELECT *
+        FROM nft_wo_users
+      ), ranked_allocations AS (
+        SELECT 
+          total_allocation,
+          ROW_NUMBER() OVER (ORDER BY total_allocation DESC) as rank,
+          COUNT(*) OVER () as total_count
+        FROM allocations
+        WHERE total_allocation > 0
+      ), percentile_allocations AS (
+        SELECT 
+          total_allocation,
+          (rank::NUMERIC / total_count * 100) as percentile,
+          CASE
+            WHEN (rank::NUMERIC / total_count * 100) <= 0.01 THEN 'Top 0.01%'
+            WHEN (rank::NUMERIC / total_count * 100) <= 0.099 THEN '0.01% - 0.099%'
+            WHEN (rank::NUMERIC / total_count * 100) <= 0.99 THEN '0.1% - 0.99%'
+            WHEN (rank::NUMERIC / total_count * 100) <= 4.99 THEN '1% - 4.99%'
+            WHEN (rank::NUMERIC / total_count * 100) <= 9.99 THEN '5% - 9.99%'
+            WHEN (rank::NUMERIC / total_count * 100) <= 24.99 THEN '10% - 24.99%'
+            WHEN (rank::NUMERIC / total_count * 100) <= 49.99 THEN '25% - 49.99%'
+            ELSE 'Bottom 50% - 100%'
+          END as percentile_bucket
+        FROM ranked_allocations
+      )
+      SELECT 
+        percentile_bucket,
+        SUM(total_allocation) as total_allocation,
+        COUNT(*) as user_count,
+        AVG(total_allocation) as avg_allocation
+      FROM percentile_allocations
+      GROUP BY percentile_bucket
+      ORDER BY 
+        CASE percentile_bucket
+          WHEN 'Top 0.01%' THEN 1
+          WHEN '0.01% - 0.099%' THEN 2
+          WHEN '0.1% - 0.99%' THEN 3
+          WHEN '1% - 4.99%' THEN 4
+          WHEN '5% - 9.99%' THEN 5
+          WHEN '10% - 24.99%' THEN 6
+          WHEN '25% - 49.99%' THEN 7
+          WHEN 'Bottom 50% - 100%' THEN 8
+        END;
+    `,
+    { type: QueryTypes.SELECT },
+  );
+
+  return results.map((row) => ({
+    percentile_bucket: row.percentile_bucket,
+    total_allocation: parseFloat(row.total_allocation),
+    user_count: row.user_count,
+    avg_allocation: parseFloat(row.avg_allocation),
+  }));
+}
+
+/**
+ * Generate HTML for allocation distribution by activity period and user tier
+ */
+function generateAllocationByActivityAndTierHTML(
+  data: Array<{
+    activity_period: string;
+    user_tier: number;
+    total_allocation: number;
+    user_count: number;
+  }>,
+): string {
+  // Get unique activity periods and user tiers
+  const activityPeriods = [
+    'Last Day',
+    'Last Week',
+    'Last Month',
+    'Last 3 Months',
+    'Last 6 Months',
+    'Over 6 Months Ago',
+    'Never Active',
+  ];
+
+  const userTiers = Array.from(new Set(data.map((d) => d.user_tier))).sort(
+    (a, b) => b - a,
+  );
+
+  // Build datasets for each user tier
+  const datasets = userTiers.map((tier, index) => {
+    const tierData = activityPeriods.map((period) => {
+      const entry = data.find(
+        (d) => d.activity_period === period && d.user_tier === tier,
+      );
+      return entry ? Math.round(entry.total_allocation) : 0;
+    });
+
+    return {
+      label: TIER_NAMES[tier] || `Tier ${tier}`,
+      data: tierData,
+      backgroundColor: COLORS[index % COLORS.length],
+      borderColor: COLORS[index % COLORS.length],
+      borderWidth: 1,
+    };
+  });
+
+  // Calculate totals per period for the table
+  const periodTotals = activityPeriods.map((period) => {
+    const entries = data.filter((d) => d.activity_period === period);
+    return {
+      period,
+      total: entries.reduce((sum, e) => sum + e.total_allocation, 0),
+      users: entries.reduce((sum, e) => sum + Number(e.user_count), 0),
+    };
+  });
+
+  const grandTotal = periodTotals.reduce((sum, p) => sum + p.total, 0);
+  const totalUsers = periodTotals.reduce((sum, p) => sum + p.users, 0);
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Token Allocation by User Activity & Tier</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        .explanation { background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .explanation h3 { margin-top: 0; color: #2c5aa0; }
+        .stats-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+        .stats { padding: 15px; background: #f5f5f5; border-radius: 5px; text-align: center; }
+        .stats-value { font-size: 1.5em; font-weight: bold; color: #007bff; }
+        .chart-container { width: 100%; margin: 30px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: left; border: 1px solid #ddd; }
+        th { background-color: #007bff; color: white; font-weight: bold; }
+        tbody tr:nth-child(even) { background-color: #f8f9fa; }
+        tbody tr:hover { background-color: #e9ecef; }
+        .number-cell { text-align: right; }
+        .total-row { background-color: #e8f4f8 !important; font-weight: bold; border-top: 2px solid #007bff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Token Allocation by User Activity & Tier</h1>
+        
+        <div class="explanation">
+            <h3>Understanding the Data</h3>
+            <p>This chart shows how tokens are distributed based on when users were last active, broken down by user tier.</p>
+            <ul>
+                <li><strong>Activity Periods:</strong> Groupings based on the most recent activity timestamp from user addresses</li>
+                <li><strong>User Tiers:</strong> Verification/trust levels assigned to users</li>
+                <li><strong>Stacked Bars:</strong> Each segment represents a different user tier's contribution to that period</li>
+                <li><strong>Never Active:</strong> Users who have allocations but no recorded activity (includes NFT holders without user_id)</li>
+            </ul>
+            <p><em>Note: Activity is determined by the last_active timestamp from the Addresses table.</em></p>
+        </div>
+
+        <div class="stats-container">
+            <div class="stats">
+                <div class="stats-value">${totalUsers.toLocaleString()}</div>
+                <div>Total Recipients</div>
+            </div>
+            <div class="stats">
+                <div class="stats-value">${Math.round(grandTotal).toLocaleString()}</div>
+                <div>Total Tokens Allocated</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>Total Allocation by Activity Period (Stacked by User Tier)</h2>
+            <canvas id="activityChart"></canvas>
+        </div>
+
+        <h2>Detailed Breakdown</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Activity Period</th>
+                    <th class="number-cell">Total Allocation</th>
+                    <th class="number-cell">% of Total</th>
+                    <th class="number-cell">User Count</th>
+                    <th class="number-cell">Avg per User</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${periodTotals
+                  .map((row) => {
+                    const pctOfTotal =
+                      grandTotal > 0
+                        ? ((row.total / grandTotal) * 100).toFixed(2)
+                        : '0.00';
+                    const avgPerUser =
+                      row.users > 0 ? Math.round(row.total / row.users) : 0;
+                    return `
+                    <tr>
+                        <td>${row.period}</td>
+                        <td class="number-cell">${Math.round(row.total).toLocaleString()}</td>
+                        <td class="number-cell">${pctOfTotal}%</td>
+                        <td class="number-cell">${row.users.toLocaleString()}</td>
+                        <td class="number-cell">${avgPerUser.toLocaleString()}</td>
+                    </tr>
+                `;
+                  })
+                  .join('')}
+                <tr class="total-row">
+                    <td>TOTAL</td>
+                    <td class="number-cell">${Math.round(grandTotal).toLocaleString()}</td>
+                    <td class="number-cell">100.00%</td>
+                    <td class="number-cell">${totalUsers.toLocaleString()}</td>
+                    <td class="number-cell">${totalUsers > 0 ? Math.round(grandTotal / totalUsers).toLocaleString() : '0'}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ${JSON.stringify(activityPeriods)},
+                datasets: ${JSON.stringify(datasets)}
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y.toLocaleString();
+                                return label + ': ' + value + ' tokens';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        },
+                        title: {
+                            display: true,
+                            text: 'Activity Period',
+                            font: { size: 14 }
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Total Token Allocation',
+                            font: { size: 14 }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>`;
+}
+
+/**
+ * Generate HTML for allocation distribution by percentile
+ */
+function generateAllocationByPercentileHTML(
+  data: Array<{
+    percentile_bucket: string;
+    total_allocation: number;
+    user_count: number;
+    avg_allocation: number;
+  }>,
+): string {
+  const labels = data.map((d) => d.percentile_bucket);
+  const totalAllocations = data.map((d) => Math.round(d.total_allocation));
+  const userCounts = data.map((d) => d.user_count);
+  const avgAllocations = data.map((d) => Math.round(d.avg_allocation));
+
+  const grandTotal = data.reduce((sum, d) => sum + d.total_allocation, 0);
+  const totalUsers = data.reduce((sum, d) => sum + Number(d.user_count), 0);
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Token Allocation Distribution by Percentile</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        .explanation { background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .explanation h3 { margin-top: 0; color: #2c5aa0; }
+        .stats-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+        .stats { padding: 15px; background: #f5f5f5; border-radius: 5px; text-align: center; }
+        .stats-value { font-size: 1.5em; font-weight: bold; color: #007bff; }
+        .chart-container { width: 100%; margin: 30px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: left; border: 1px solid #ddd; }
+        th { background-color: #007bff; color: white; font-weight: bold; }
+        tbody tr:nth-child(even) { background-color: #f8f9fa; }
+        tbody tr:hover { background-color: #e9ecef; }
+        .number-cell { text-align: right; }
+        .total-row { background-color: #e8f4f8 !important; font-weight: bold; border-top: 2px solid #007bff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Token Allocation Distribution by Percentile</h1>
+        
+        <div class="explanation">
+            <h3>Understanding the Distribution</h3>
+            <p>This chart shows how tokens are distributed across different percentile groups of recipients, ordered from highest to lowest allocation.</p>
+            <ul>
+                <li><strong>Top 0.01%:</strong> The top 0.01% of recipients by allocation amount</li>
+                <li><strong>Percentile Buckets:</strong> Recipients grouped by their rank percentile</li>
+                <li><strong>Total Allocation:</strong> Sum of all tokens allocated to recipients in that percentile bucket</li>
+                <li><strong>User Count:</strong> Number of recipients in that percentile bucket</li>
+                <li><strong>Average Allocation:</strong> Average tokens per recipient in that bucket</li>
+            </ul>
+            <p><em>Note: This analysis includes all allocations from NFT, Historical, and Aura sources.</em></p>
+        </div>
+
+        <div class="stats-container">
+            <div class="stats">
+                <div class="stats-value">${totalUsers.toLocaleString()}</div>
+                <div>Total Recipients</div>
+            </div>
+            <div class="stats">
+                <div class="stats-value">${Math.round(grandTotal).toLocaleString()}</div>
+                <div>Total Tokens Allocated</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>Total Allocation by Percentile</h2>
+            <canvas id="allocationChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>User Count by Percentile</h2>
+            <canvas id="userCountChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>Average Allocation by Percentile</h2>
+            <canvas id="avgAllocationChart"></canvas>
+        </div>
+
+        <h2>Detailed Breakdown</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Percentile Bucket</th>
+                    <th class="number-cell">Total Allocation</th>
+                    <th class="number-cell">% of Total</th>
+                    <th class="number-cell">User Count</th>
+                    <th class="number-cell">Avg Allocation</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data
+                  .map((row) => {
+                    const pctOfTotal = (
+                      (row.total_allocation / grandTotal) *
+                      100
+                    ).toFixed(2);
+                    return `
+                    <tr>
+                        <td>${row.percentile_bucket}</td>
+                        <td class="number-cell">${Math.round(row.total_allocation).toLocaleString()}</td>
+                        <td class="number-cell">${pctOfTotal}%</td>
+                        <td class="number-cell">${Number(row.user_count).toLocaleString()}</td>
+                        <td class="number-cell">${Math.round(row.avg_allocation).toLocaleString()}</td>
+                    </tr>
+                `;
+                  })
+                  .join('')}
+                <tr class="total-row">
+                    <td>TOTAL</td>
+                    <td class="number-cell">${Math.round(grandTotal).toLocaleString()}</td>
+                    <td class="number-cell">100.00%</td>
+                    <td class="number-cell">${totalUsers.toLocaleString()}</td>
+                    <td class="number-cell">${Math.round(grandTotal / totalUsers).toLocaleString()}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Total Allocation Chart
+        const allocationCtx = document.getElementById('allocationChart').getContext('2d');
+        new Chart(allocationCtx, {
+            type: 'bar',
+            data: {
+                labels: ${JSON.stringify(labels)},
+                datasets: [{
+                    label: 'Total Allocation',
+                    data: ${JSON.stringify(totalAllocations)},
+                    backgroundColor: '#007bff',
+                    borderColor: '#0056b3',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y.toLocaleString() + ' tokens';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Total Tokens'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+        });
+
+        // User Count Chart
+        const userCountCtx = document.getElementById('userCountChart').getContext('2d');
+        new Chart(userCountCtx, {
+            type: 'bar',
+            data: {
+                labels: ${JSON.stringify(labels)},
+                datasets: [{
+                    label: 'User Count',
+                    data: ${JSON.stringify(userCounts)},
+                    backgroundColor: '#28a745',
+                    borderColor: '#218838',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y.toLocaleString() + ' users';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Number of Users'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+        });
+
+        // Average Allocation Chart
+        const avgAllocationCtx = document.getElementById('avgAllocationChart').getContext('2d');
+        new Chart(avgAllocationCtx, {
+            type: 'bar',
+            data: {
+                labels: ${JSON.stringify(labels)},
+                datasets: [{
+                    label: 'Average Allocation',
+                    data: ${JSON.stringify(avgAllocations)},
+                    backgroundColor: '#ffc107',
+                    borderColor: '#e0a800',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y.toLocaleString() + ' tokens';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Average Tokens per User'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>`;
+}
+
+/**
+ * Fetch combined allocation statistics by user tier
+ */
+async function getCombinedAllocationStatsByTier(): Promise<
+  Array<{
+    user_tier: number;
+    user_count: number;
+    mean: number;
+    median: number;
+    mode: number | null;
+    min: number;
+    max: number;
+    std_dev: number;
+    total: number;
+  }>
+> {
+  console.log('Fetching combined allocation statistics by user tier...');
+
+  const results = await models.sequelize.query<{
+    user_tier: number;
+    user_count: number;
+    mean: string;
+    median: string;
+    mode: string | null;
+    min: string;
+    max: string;
+    std_dev: string;
+    total: string;
+  }>(
+    `
+      WITH nft_users AS (
+        SELECT NS.user_id, NS.user_tier, SUM(NS.total_token_allocation) as total_allocation
+        FROM "NftSnapshot" NS
+        WHERE NS.user_id IS NOT NULL
+        GROUP BY NS.user_id, NS.user_tier
+      ), nft_wo_users AS (
+        SELECT NULL::INTEGER as user_id, 2 as user_tier, total_token_allocation as total_allocation
+        FROM "NftSnapshot"
+        WHERE user_id IS NULL
+      ), allocations AS (
+        SELECT U.id as user_id,
+               U.tier as user_tier,
+               COALESCE(HA.token_allocation, 0) + COALESCE(AA.token_allocation, 0) + COALESCE(NU.total_allocation, 0) as total_allocation
+        FROM "Users" U
+                 LEFT JOIN "HistoricalAllocations" HA ON HA.user_id = U.id
+                 LEFT JOIN "AuraAllocations" AA ON AA.user_id = U.id
+                 LEFT JOIN nft_users NU ON NU.user_id = U.id
+        WHERE COALESCE(HA.token_allocation, 0) > 0
+           OR COALESCE(AA.token_allocation, 0) > 0
+           OR COALESCE(NU.total_allocation, 0) > 0
+        UNION ALL
+        SELECT *
+        FROM nft_wo_users
+      )
+      SELECT 
+        user_tier,
+        COUNT(*) as user_count,
+        AVG(total_allocation) as mean,
+        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY total_allocation) as median,
+        MODE() WITHIN GROUP (ORDER BY total_allocation) as mode,
+        MIN(total_allocation) as min,
+        MAX(total_allocation) as max,
+        STDDEV(total_allocation) as std_dev,
+        SUM(total_allocation) as total
+      FROM allocations
+      WHERE total_allocation > 0
+      GROUP BY user_tier
+      ORDER BY user_tier;
+    `,
+    { type: QueryTypes.SELECT },
+  );
+
+  return results.map((row) => ({
+    user_tier: row.user_tier,
+    user_count: row.user_count,
+    mean: parseFloat(row.mean),
+    median: parseFloat(row.median),
+    mode: row.mode ? parseFloat(row.mode) : null,
+    min: parseFloat(row.min),
+    max: parseFloat(row.max),
+    std_dev: parseFloat(row.std_dev),
+    total: parseFloat(row.total),
+  }));
+}
+
+/**
+ * Generate HTML for combined allocation statistics by user tier
+ */
+function generateCombinedAllocationStatsByTierHTML(
+  data: Array<{
+    user_tier: number;
+    user_count: number;
+    mean: number;
+    median: number;
+    mode: number | null;
+    min: number;
+    max: number;
+    std_dev: number;
+    total: number;
+  }>,
+): string {
+  const grandTotal = data.reduce((sum, row) => sum + row.total, 0);
+  const totalUsers = data.reduce((sum, row) => sum + Number(row.user_count), 0);
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Combined Allocation Statistics by User Tier</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        .explanation { background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .explanation h3 { margin-top: 0; color: #2c5aa0; }
+        .stats-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+        .stats { padding: 15px; background: #f5f5f5; border-radius: 5px; text-align: center; }
+        .stats-value { font-size: 1.5em; font-weight: bold; color: #007bff; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: left; border: 1px solid #ddd; }
+        th { background-color: #007bff; color: white; font-weight: bold; position: sticky; top: 0; }
+        tbody tr:nth-child(even) { background-color: #f8f9fa; }
+        tbody tr:hover { background-color: #e9ecef; }
+        .number-cell { text-align: right; }
+        .tier-cell { font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Combined Allocation Statistics by User Tier</h1>
+        
+        <div class="explanation">
+            <h3>Understanding the Statistics</h3>
+            <p>This table shows statistical measures for combined token allocations (NFT + Historical + Aura) grouped by user tier.</p>
+            <ul>
+                <li><strong>User Count:</strong> Number of recipients in this tier</li>
+                <li><strong>Mean:</strong> Average allocation per recipient in this tier</li>
+                <li><strong>Median:</strong> Middle value when allocations are sorted (50th percentile)</li>
+                <li><strong>Mode:</strong> Most frequently occurring allocation value</li>
+                <li><strong>Min/Max:</strong> Smallest and largest allocations in this tier</li>
+                <li><strong>Std Dev:</strong> Standard deviation showing spread of allocations</li>
+                <li><strong>Total:</strong> Sum of all allocations in this tier</li>
+            </ul>
+            <p><em>Note: Statistics include all recipients with allocations from any source (NFT, Historical, or Aura).</em></p>
+        </div>
+
+        <div class="stats-container">
+            <div class="stats">
+                <div class="stats-value">${totalUsers.toLocaleString()}</div>
+                <div>Total Recipients</div>
+            </div>
+            <div class="stats">
+                <div class="stats-value">${Math.round(grandTotal).toLocaleString()}</div>
+                <div>Total Tokens</div>
+            </div>
+        </div>
+
+        <h2>Statistics by User Tier</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>User Tier</th>
+                    <th class="number-cell">User Count</th>
+                    <th class="number-cell">Mean</th>
+                    <th class="number-cell">Median</th>
+                    <th class="number-cell">Mode</th>
+                    <th class="number-cell">Min</th>
+                    <th class="number-cell">Max</th>
+                    <th class="number-cell">Std Dev</th>
+                    <th class="number-cell">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data
+                  .map((row) => {
+                    return `
+                    <tr>
+                        <td class="tier-cell">${row.user_tier}</td>
+                        <td class="number-cell">${Number(row.user_count).toLocaleString()}</td>
+                        <td class="number-cell">${Math.round(row.mean).toLocaleString()}</td>
+                        <td class="number-cell">${Math.round(row.median).toLocaleString()}</td>
+                        <td class="number-cell">${row.mode !== null ? Math.round(row.mode).toLocaleString() : 'N/A'}</td>
+                        <td class="number-cell">${Math.round(row.min).toLocaleString()}</td>
+                        <td class="number-cell">${Math.round(row.max).toLocaleString()}</td>
+                        <td class="number-cell">${Math.round(row.std_dev).toLocaleString()}</td>
+                        <td class="number-cell">${Math.round(row.total).toLocaleString()}</td>
+                    </tr>
+                `;
+                  })
+                  .join('')}
+            </tbody>
+        </table>
+
+        <div class="explanation">
+            <h3>Interpretation Guide</h3>
+            <p><strong>Mean vs Median:</strong> If mean is significantly higher than median, the distribution is skewed by high outliers (wealthy recipients).</p>
+            <p><strong>Standard Deviation:</strong> Higher values indicate greater variation in allocations within the tier.</p>
+            <p><strong>Mode:</strong> May show "N/A" if no single value repeats (common with continuous allocation values).</p>
+        </div>
+    </div>
+</body>
+</html>`;
+}
+
+/**
+ * Fetch NFT allocation data grouped by user tier and rarity tier
+ */
+async function getNftAllocationByTiers(): Promise<{
+  userTiers: number[];
+  rarityTiers: number[];
+  allocationData: Array<{
+    user_tier: number;
+    rarity_tier: number;
+    avg_equal_allocation: number;
+    avg_rarity_allocation: number;
+    total_equal_allocation: number;
+    total_rarity_allocation: number;
+    nft_count: number;
+  }>;
+}> {
+  console.log('Fetching NFT allocation data by user tier and rarity tier...');
+
+  // Get all unique user tiers and rarity tiers
+  const [tierData] = await models.sequelize.query<{
+    user_tiers: number[];
+    rarity_tiers: number[];
+  }>(
+    `
+      SELECT 
+        ARRAY_AGG(DISTINCT user_tier ORDER BY user_tier DESC) as user_tiers,
+        ARRAY_AGG(DISTINCT rarity_tier ORDER BY rarity_tier DESC) as rarity_tiers
+      FROM "NftSnapshot"
+      WHERE user_tier IS NOT NULL AND rarity_tier IS NOT NULL;
+    `,
+    { type: QueryTypes.SELECT },
+  );
+
+  if (!tierData || !tierData.user_tiers || !tierData.rarity_tiers) {
+    return { userTiers: [], rarityTiers: [], allocationData: [] };
+  }
+
+  // Get aggregated allocation data grouped by user_tier and rarity_tier
+  const allocationData = await models.sequelize.query<{
+    user_tier: number;
+    rarity_tier: number;
+    avg_equal_allocation: string;
+    avg_rarity_allocation: string;
+    total_equal_allocation: string;
+    total_rarity_allocation: string;
+    nft_count: number;
+  }>(
+    `
+      SELECT 
+        user_tier,
+        rarity_tier,
+        AVG(equal_distribution_allocation) as avg_equal_allocation,
+        AVG(rarity_distribution_allocation) as avg_rarity_allocation,
+        SUM(equal_distribution_allocation) as total_equal_allocation,
+        SUM(rarity_distribution_allocation) as total_rarity_allocation,
+        COUNT(*) as nft_count
+      FROM "NftSnapshot"
+      WHERE user_tier IS NOT NULL 
+        AND rarity_tier IS NOT NULL
+        AND equal_distribution_allocation IS NOT NULL
+        AND rarity_distribution_allocation IS NOT NULL
+      GROUP BY user_tier, rarity_tier
+      ORDER BY user_tier DESC, rarity_tier DESC;
+    `,
+    { type: QueryTypes.SELECT },
+  );
+
+  return {
+    userTiers: tierData.user_tiers,
+    rarityTiers: tierData.rarity_tiers,
+    allocationData: allocationData.map((row) => ({
+      user_tier: row.user_tier,
+      rarity_tier: row.rarity_tier,
+      avg_equal_allocation: parseFloat(row.avg_equal_allocation),
+      avg_rarity_allocation: parseFloat(row.avg_rarity_allocation),
+      total_equal_allocation: parseFloat(row.total_equal_allocation),
+      total_rarity_allocation: parseFloat(row.total_rarity_allocation),
+      nft_count: row.nft_count,
+    })),
+  };
+}
+
+/**
+ * Generate HTML for NFT allocation tables by user tier and rarity tier
+ */
+function generateNftAllocationByTiersHTML(
+  userTiers: number[],
+  rarityTiers: number[],
+  allocationData: Array<{
+    user_tier: number;
+    rarity_tier: number;
+    avg_equal_allocation: number;
+    avg_rarity_allocation: number;
+    total_equal_allocation: number;
+    total_rarity_allocation: number;
+    nft_count: number;
+  }>,
+): string {
+  // Create a map for quick lookup
+  const allocationMap = new Map<string, (typeof allocationData)[0]>();
+  for (const row of allocationData) {
+    const key = `${row.user_tier}-${row.rarity_tier}`;
+    allocationMap.set(key, row);
+  }
+
+  // Generate table HTML for each user tier
+  const tierTables = userTiers
+    .map((userTier) => {
+      const userTierName = TIER_NAMES[userTier] || `User Tier ${userTier}`;
+      let userTierTotalEqual = 0;
+      let userTierTotalRarity = 0;
+      let userTierTotalNFTs = 0;
+
+      const rows = rarityTiers
+        .map((rarityTier) => {
+          const key = `${userTier}-${rarityTier}`;
+          const data = allocationMap.get(key);
+
+          if (data) {
+            userTierTotalEqual += data.total_equal_allocation;
+            userTierTotalRarity += data.total_rarity_allocation;
+            userTierTotalNFTs += Number(data.nft_count);
+
+            return `
+              <tr>
+                <td>${rarityTier}</td>
+                <td>${data.avg_equal_allocation.toFixed(2)}</td>
+                <td>${Math.round(data.total_equal_allocation).toLocaleString()}</td>
+                <td>${data.avg_rarity_allocation.toFixed(2)}</td>
+                <td>${Math.round(data.total_rarity_allocation).toLocaleString()}</td>
+                <td>${data.nft_count.toLocaleString()}</td>
+              </tr>
+            `;
+          } else {
+            return `
+              <tr class="empty-row">
+                <td>${rarityTier}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            `;
+          }
+        })
+        .join('');
+
+      return `
+        <div class="tier-section">
+          <h2>User Tier ${userTier} - ${userTierName}</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Rarity Tier</th>
+                <th>Avg Equal Distribution</th>
+                <th>Total Equal Distribution</th>
+                <th>Avg Rarity Distribution</th>
+                <th>Total Rarity Distribution</th>
+                <th>NFT Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+              <tr class="total-row">
+                <td><strong>TOTAL</strong></td>
+                <td>-</td>
+                <td><strong>${Math.round(userTierTotalEqual).toLocaleString()}</strong></td>
+                <td>-</td>
+                <td><strong>${Math.round(userTierTotalRarity).toLocaleString()}</strong></td>
+                <td><strong>${userTierTotalNFTs.toLocaleString()}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    })
+    .join('');
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NFT Allocations by User Tier and Rarity Tier</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        h2 { color: #007bff; margin-top: 40px; margin-bottom: 20px; }
+        .explanation { background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .explanation h3 { margin-top: 0; color: #2c5aa0; }
+        .tier-section { margin: 30px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: center; border: 1px solid #ddd; }
+        th { background-color: #007bff; color: white; font-weight: bold; }
+        tbody tr:nth-child(even):not(.total-row) { background-color: #f8f9fa; }
+        tbody tr:hover:not(.total-row) { background-color: #e9ecef; }
+        .empty-row { color: #999; font-style: italic; }
+        .total-row { background-color: #e8f4f8 !important; font-weight: bold; border-top: 2px solid #007bff; }
+        .total-row td { padding: 15px 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NFT Allocations by User Tier and Rarity Tier</h1>
+        
+        <div class="explanation">
+            <h3>Understanding the Tables</h3>
+            <p>Each table below represents a <strong>User Tier</strong> and shows how NFT allocations are distributed across different <strong>Rarity Tiers</strong> within that user tier.</p>
+            <ul>
+                <li><strong>Rarity Tier:</strong> The NFT's rarity classification (higher numbers = rarer NFTs)</li>
+                <li><strong>Avg Equal Distribution:</strong> Average tokens allocated per NFT using equal distribution method</li>
+                <li><strong>Total Equal Distribution:</strong> Sum of all tokens allocated using equal distribution method</li>
+                <li><strong>Avg Rarity Distribution:</strong> Average tokens allocated per NFT using rarity-based distribution</li>
+                <li><strong>Total Rarity Distribution:</strong> Sum of all tokens allocated using rarity-based distribution</li>
+                <li><strong>NFT Count:</strong> Number of NFTs in this user tier/rarity tier combination</li>
+            </ul>
+            <p><em>Note: Rows with dashes (-) indicate that no NFTs exist for that particular rarity tier within the user tier.</em></p>
+        </div>
+
+        ${tierTables}
+    </div>
+</body>
+</html>`;
+}
+
+/**
  * Generate HTML for user allocation distribution (line/scatter plot)
  */
 function generateUserAllocationHTML(
@@ -2705,7 +4077,7 @@ async function main() {
   console.log('Starting token allocation distribution visualization...\n');
 
   try {
-    // Fetch all data
+    // Fetch all data in parallel for maximum performance
     const [
       nftTierData,
       equalRarityData,
@@ -2716,6 +4088,12 @@ async function main() {
       nftCorrelationData,
       auraCorrelationData,
       historicalCorrelationData,
+      combinedUserData,
+      tierAllocationData,
+      topCombinedData,
+      percentileData,
+      tierStatsData,
+      activityData,
     ] = await Promise.all([
       getNftTierDistribution(),
       getEqualRarityDistribution(),
@@ -2726,6 +4104,12 @@ async function main() {
       getNftCorrelationData(),
       getAuraCorrelationData(),
       getHistoricalCorrelationData(),
+      getCombinedUserAllocations(),
+      getNftAllocationByTiers(),
+      getTopCombinedAllocations(2000),
+      getAllocationByPercentile(),
+      getCombinedAllocationStatsByTier(),
+      getAllocationByActivityAndTier(),
     ]);
 
     console.log('\nData Summary:');
@@ -2740,10 +4124,11 @@ async function main() {
     console.log(
       `- Historical correlation data users: ${historicalCorrelationData.length}`,
     );
-
-    // Combined allocations
-    const combinedUserData = await getCombinedUserAllocations();
     console.log(`- Combined users: ${combinedUserData.length}`);
+    console.log(`- Top combined allocations: ${topCombinedData.length}`);
+    console.log(`- Percentile buckets: ${percentileData.length}`);
+    console.log(`- User tier stats: ${tierStatsData.length} tiers`);
+    console.log(`- Activity & tier data points: ${activityData.length}`);
 
     // Calculate Gini coefficients and Lorenz curves
     console.log('\nCalculating Gini coefficients and Lorenz curves...');
@@ -2879,6 +4264,80 @@ async function main() {
     );
     console.log('Generated: combined-allocation-stats.html');
 
+    // 9. NFT Allocation by User Tier and Rarity Tier tables
+    if (
+      tierAllocationData.userTiers.length > 0 &&
+      tierAllocationData.rarityTiers.length > 0
+    ) {
+      const tierAllocationHTML = generateNftAllocationByTiersHTML(
+        tierAllocationData.userTiers,
+        tierAllocationData.rarityTiers,
+        tierAllocationData.allocationData,
+      );
+      fs.writeFileSync(
+        path.join(outputDir, 'nft-allocation-by-tiers.html'),
+        tierAllocationHTML,
+      );
+      console.log('Generated: nft-allocation-by-tiers.html');
+    } else {
+      console.log('Skipped: nft-allocation-by-tiers.html (no data available)');
+    }
+
+    // 10. Top Combined Allocations
+    if (topCombinedData.length > 0) {
+      const topCombinedHTML =
+        generateTopCombinedAllocationsHTML(topCombinedData);
+      fs.writeFileSync(
+        path.join(outputDir, 'top-combined-allocations.html'),
+        topCombinedHTML,
+      );
+      console.log('Generated: top-combined-allocations.html');
+    } else {
+      console.log('Skipped: top-combined-allocations.html (no data available)');
+    }
+
+    // 11. Allocation Distribution by Percentile
+    if (percentileData.length > 0) {
+      const percentileHTML = generateAllocationByPercentileHTML(percentileData);
+      fs.writeFileSync(
+        path.join(outputDir, 'allocation-by-percentile.html'),
+        percentileHTML,
+      );
+      console.log('Generated: allocation-by-percentile.html');
+    } else {
+      console.log('Skipped: allocation-by-percentile.html (no data available)');
+    }
+
+    // 12. Combined Allocation Statistics by User Tier
+    if (tierStatsData.length > 0) {
+      const tierStatsHTML =
+        generateCombinedAllocationStatsByTierHTML(tierStatsData);
+      fs.writeFileSync(
+        path.join(outputDir, 'combined-allocation-stats-by-tier.html'),
+        tierStatsHTML,
+      );
+      console.log('Generated: combined-allocation-stats-by-tier.html');
+    } else {
+      console.log(
+        'Skipped: combined-allocation-stats-by-tier.html (no data available)',
+      );
+    }
+
+    // 13. Allocation by User Activity and Tier
+    if (activityData.length > 0) {
+      const activityHTML =
+        generateAllocationByActivityAndTierHTML(activityData);
+      fs.writeFileSync(
+        path.join(outputDir, 'allocation-by-activity-and-tier.html'),
+        activityHTML,
+      );
+      console.log('Generated: allocation-by-activity-and-tier.html');
+    } else {
+      console.log(
+        'Skipped: allocation-by-activity-and-tier.html (no data available)',
+      );
+    }
+
     // Generate index file for easy navigation
     const indexHTML = `
 <!DOCTYPE html>
@@ -2944,6 +4403,31 @@ async function main() {
                 Combined Allocation - Stats & Distribution<br>
                 <small>Mean, median, percentiles, and distribution of total allocation</small>
             </a>
+            
+            <a href="nft-allocation-by-tiers.html" class="chart-link">
+                NFT Allocations - By User Tier & Rarity Tier<br>
+                <small>Detailed tables showing allocations for each user tier and rarity tier combination</small>
+            </a>
+            
+            <a href="top-combined-allocations.html" class="chart-link">
+                Top 2000 Combined Allocations<br>
+                <small>Ranked table of top recipients with user details and allocation totals</small>
+            </a>
+            
+            <a href="allocation-by-percentile.html" class="chart-link">
+                Allocation Distribution by Percentile<br>
+                <small>Bar charts showing token distribution across percentile buckets</small>
+            </a>
+            
+            <a href="combined-allocation-stats-by-tier.html" class="chart-link">
+                Combined Allocation Statistics by Tier<br>
+                <small>Statistical measures (mean, median, mode, etc.) for each user tier</small>
+            </a>
+            
+            <a href="allocation-by-activity-and-tier.html" class="chart-link">
+                Allocation by User Activity & Tier<br>
+                <small>Stacked bar chart showing token distribution by user activity recency and tier</small>
+            </a>
         </div>
 
         <div class="timestamp">
@@ -2971,6 +4455,11 @@ async function main() {
     console.log(`   - nft-allocation-detailed.html`);
     console.log(`   - correlation-matrix.html`);
     console.log(`   - combined-allocation-stats.html`);
+    console.log(`   - nft-allocation-by-tiers.html`);
+    console.log(`   - top-combined-allocations.html`);
+    console.log(`   - allocation-by-percentile.html`);
+    console.log(`   - combined-allocation-stats-by-tier.html`);
+    console.log(`   - allocation-by-activity-and-tier.html`);
   } catch (error) {
     console.error('Error generating charts:', error);
     throw error;

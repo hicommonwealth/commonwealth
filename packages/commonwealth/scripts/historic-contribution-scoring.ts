@@ -42,7 +42,7 @@ function parseArguments(): ScoringConfig {
   const args = process.argv.slice(2);
 
   // Default values
-  let historicalEndDate = '2025-10-01T12:00:00.000Z'; // Oct 1st at noon
+  let historicalEndDate = '2025-10-16T03:59:00.000Z';
   let threadWeight = 10;
   let commentWeight = 5;
   let reactionWeight = 1;
@@ -56,7 +56,7 @@ function parseArguments(): ScoringConfig {
   let minLength: number | undefined = 30;
   let historicalOrder: string = 'token_allocation DESC';
   let auraOrder: string = 'token_allocation DESC';
-  let auraEndDate: string = new Date().toISOString();
+  let auraEndDate: string = '2025-10-22T03:59:00.000Z';
   let setClaimAddresses = false;
   let topN: number | undefined = undefined;
   let supply = SUPPLY.total;
