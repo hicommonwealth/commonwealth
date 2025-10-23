@@ -440,7 +440,7 @@ async function getHistoricalTokenAllocations(
     INSERT INTO "HistoricalAllocations"
     WITH users AS (SELECT U.id AS user_id, U.created_at, U.tier
                    FROM "Users" U
-                   WHERE tier > 1),
+                   WHERE tier > 2),
          addresses AS (SELECT U.user_id AS user_id,
                               A.id      AS address_id,
                               A.address
@@ -590,6 +590,7 @@ async function getAuraTokenAllocations(
                               FROM "XpLogs" XL
                                      LEFT JOIN "Users" U ON XL.user_id = U.id
                               WHERE XL.created_at < :auraEndDate
+                                AND U.tier > 2
                               GROUP BY user_id, U.tier),
          creator_weighted_xp AS (SELECT creator_user_id,
                                         SUM(creator_xp_points) *
@@ -608,6 +609,7 @@ async function getAuraTokenAllocations(
                                  FROM "XpLogs" XL
                                         LEFT JOIN "Users" U ON XL.creator_user_id = U.id
                                  WHERE XL.created_at < :auraEndDate
+                                   AND U.tier > 2
                                  GROUP BY creator_user_id, U.tier),
          xp_sum AS (SELECT (SELECT SUM(weighted_xp_points) FROM user_weighted_xp) +
                            (SELECT SUM(weighted_creator_xp_points) FROM creator_weighted_xp) AS total_xp_awarded)
@@ -620,6 +622,7 @@ async function getAuraTokenAllocations(
     FROM "Users" U
            LEFT JOIN user_weighted_xp UWX ON UWX.user_id = U.id
            LEFT JOIN creator_weighted_xp CWX ON CWX.creator_user_id = U.id
+    WHERE U.tier > 2
     ORDER BY ${config.auraOrder} NULLS LAST
       ${config.topN ? `LIMIT :topN` : ''}
     ;

@@ -2650,6 +2650,88 @@ async function getAllocationByActivityAndTier(): Promise<
 }
 
 /**
+ * Fetch allocation distribution by user activity recency and tier (excluding NFT allocations)
+ */
+async function getAllocationByActivityAndTierExcludingNFT(): Promise<
+  Array<{
+    activity_period: string;
+    user_tier: number;
+    total_allocation: number;
+    user_count: number;
+  }>
+> {
+  console.log(
+    'Fetching allocation distribution by activity period and user tier (excluding NFT)...',
+  );
+
+  const results = await models.sequelize.query<{
+    activity_period: string;
+    user_tier: number;
+    total_allocation: string;
+    user_count: number;
+  }>(
+    `
+      WITH last_active_address as (
+        SELECT user_id, MAX(last_active) as last_active
+        FROM "Addresses"
+        GROUP BY user_id
+      ), allocations AS (
+        SELECT U.id as user_id,
+               U.tier as user_tier,
+               COALESCE(HA.token_allocation, 0) + COALESCE(AA.token_allocation, 0) as total_allocation,
+               LAA.last_active as last_active
+        FROM "Users" U
+                 LEFT JOIN "HistoricalAllocations" HA ON HA.user_id = U.id
+                 LEFT JOIN "AuraAllocations" AA ON AA.user_id = U.id
+                 LEFT JOIN last_active_address LAA ON LAA.user_id = U.id
+        WHERE COALESCE(HA.token_allocation, 0) > 0
+           OR COALESCE(AA.token_allocation, 0) > 0
+      ), activity_categorized AS (
+        SELECT 
+          user_tier,
+          total_allocation,
+          CASE
+            WHEN last_active IS NULL THEN 'Never Active'
+            WHEN last_active >= NOW() - INTERVAL '1 day' THEN 'Last Day'
+            WHEN last_active >= NOW() - INTERVAL '1 week' THEN 'Last Week'
+            WHEN last_active >= NOW() - INTERVAL '1 month' THEN 'Last Month'
+            WHEN last_active >= NOW() - INTERVAL '3 months' THEN 'Last 3 Months'
+            WHEN last_active >= NOW() - INTERVAL '6 months' THEN 'Last 6 Months'
+            ELSE 'Over 6 Months Ago'
+          END as activity_period
+        FROM allocations
+      )
+      SELECT 
+        activity_period,
+        user_tier,
+        SUM(total_allocation) as total_allocation,
+        COUNT(*) as user_count
+      FROM activity_categorized
+      GROUP BY activity_period, user_tier
+      ORDER BY 
+        CASE activity_period
+          WHEN 'Last Day' THEN 1
+          WHEN 'Last Week' THEN 2
+          WHEN 'Last Month' THEN 3
+          WHEN 'Last 3 Months' THEN 4
+          WHEN 'Last 6 Months' THEN 5
+          WHEN 'Over 6 Months Ago' THEN 6
+          WHEN 'Never Active' THEN 7
+        END,
+        user_tier;
+    `,
+    { type: QueryTypes.SELECT },
+  );
+
+  return results.map((row) => ({
+    activity_period: row.activity_period,
+    user_tier: row.user_tier,
+    total_allocation: parseFloat(row.total_allocation),
+    user_count: row.user_count,
+  }));
+}
+
+/**
  * Fetch allocation distribution by percentile
  */
 async function getAllocationByPercentile(): Promise<
@@ -2755,6 +2837,12 @@ function generateAllocationByActivityAndTierHTML(
     total_allocation: number;
     user_count: number;
   }>,
+  dataExcludingNFT: Array<{
+    activity_period: string;
+    user_tier: number;
+    total_allocation: number;
+    user_count: number;
+  }>,
 ): string {
   // Get unique activity periods and user tiers
   const activityPeriods = [
@@ -2771,7 +2859,7 @@ function generateAllocationByActivityAndTierHTML(
     (a, b) => b - a,
   );
 
-  // Build datasets for each user tier
+  // Build datasets for each user tier (including NFT)
   const datasets = userTiers.map((tier, index) => {
     const tierData = activityPeriods.map((period) => {
       const entry = data.find(
@@ -2789,7 +2877,29 @@ function generateAllocationByActivityAndTierHTML(
     };
   });
 
-  // Calculate totals per period for the table
+  // Build datasets for excluding NFT
+  const userTiersExcludingNFT = Array.from(
+    new Set(dataExcludingNFT.map((d) => d.user_tier)),
+  ).sort((a, b) => b - a);
+
+  const datasetsExcludingNFT = userTiersExcludingNFT.map((tier, index) => {
+    const tierData = activityPeriods.map((period) => {
+      const entry = dataExcludingNFT.find(
+        (d) => d.activity_period === period && d.user_tier === tier,
+      );
+      return entry ? Math.round(entry.total_allocation) : 0;
+    });
+
+    return {
+      label: TIER_NAMES[tier] || `Tier ${tier}`,
+      data: tierData,
+      backgroundColor: COLORS[index % COLORS.length],
+      borderColor: COLORS[index % COLORS.length],
+      borderWidth: 1,
+    };
+  });
+
+  // Calculate totals per period for the table (including NFT)
   const periodTotals = activityPeriods.map((period) => {
     const entries = data.filter((d) => d.activity_period === period);
     return {
@@ -2801,6 +2911,27 @@ function generateAllocationByActivityAndTierHTML(
 
   const grandTotal = periodTotals.reduce((sum, p) => sum + p.total, 0);
   const totalUsers = periodTotals.reduce((sum, p) => sum + p.users, 0);
+
+  // Calculate totals excluding NFT
+  const periodTotalsExcludingNFT = activityPeriods.map((period) => {
+    const entries = dataExcludingNFT.filter(
+      (d) => d.activity_period === period,
+    );
+    return {
+      period,
+      total: entries.reduce((sum, e) => sum + e.total_allocation, 0),
+      users: entries.reduce((sum, e) => sum + Number(e.user_count), 0),
+    };
+  });
+
+  const grandTotalExcludingNFT = periodTotalsExcludingNFT.reduce(
+    (sum, p) => sum + p.total,
+    0,
+  );
+  const totalUsersExcludingNFT = periodTotalsExcludingNFT.reduce(
+    (sum, p) => sum + p.users,
+    0,
+  );
 
   return `
 <!DOCTYPE html>
@@ -2833,12 +2964,13 @@ function generateAllocationByActivityAndTierHTML(
         
         <div class="explanation">
             <h3>Understanding the Data</h3>
-            <p>This chart shows how tokens are distributed based on when users were last active, broken down by user tier.</p>
+            <p>These charts show how tokens are distributed based on when users were last active, broken down by user tier.</p>
             <ul>
                 <li><strong>Activity Periods:</strong> Groupings based on the most recent activity timestamp from user addresses</li>
                 <li><strong>User Tiers:</strong> Verification/trust levels assigned to users</li>
                 <li><strong>Stacked Bars:</strong> Each segment represents a different user tier's contribution to that period</li>
-                <li><strong>Never Active:</strong> Users who have allocations but no recorded activity (includes NFT holders without user_id)</li>
+                <li><strong>Never Active:</strong> Users who have allocations but no recorded activity (includes NFT holders without user_id in first chart)</li>
+                <li><strong>Two Views:</strong> The first chart includes all allocations (Historical + Aura + NFT), while the second chart excludes NFT allocations to show only Historical and Aura distributions</li>
             </ul>
             <p><em>Note: Activity is determined by the last_active timestamp from the Addresses table.</em></p>
         </div>
@@ -2855,11 +2987,16 @@ function generateAllocationByActivityAndTierHTML(
         </div>
 
         <div class="chart-container">
-            <h2>Total Allocation by Activity Period (Stacked by User Tier)</h2>
+            <h2>Total Allocation by Activity Period (Stacked by User Tier) - Including NFT</h2>
             <canvas id="activityChart"></canvas>
         </div>
 
-        <h2>Detailed Breakdown</h2>
+        <div class="chart-container">
+            <h2>Total Allocation by Activity Period (Stacked by User Tier) - Excluding NFT</h2>
+            <canvas id="activityChartExcludingNFT"></canvas>
+        </div>
+
+        <h2>Detailed Breakdown (Including NFT)</h2>
         <table>
             <thead>
                 <tr>
@@ -2899,6 +3036,49 @@ function generateAllocationByActivityAndTierHTML(
                 </tr>
             </tbody>
         </table>
+
+        <h2>Detailed Breakdown (Excluding NFT)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Activity Period</th>
+                    <th class="number-cell">Total Allocation</th>
+                    <th class="number-cell">% of Total</th>
+                    <th class="number-cell">User Count</th>
+                    <th class="number-cell">Avg per User</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${periodTotalsExcludingNFT
+                  .map((row) => {
+                    const pctOfTotal =
+                      grandTotalExcludingNFT > 0
+                        ? ((row.total / grandTotalExcludingNFT) * 100).toFixed(
+                            2,
+                          )
+                        : '0.00';
+                    const avgPerUser =
+                      row.users > 0 ? Math.round(row.total / row.users) : 0;
+                    return `
+                    <tr>
+                        <td>${row.period}</td>
+                        <td class="number-cell">${Math.round(row.total).toLocaleString()}</td>
+                        <td class="number-cell">${pctOfTotal}%</td>
+                        <td class="number-cell">${row.users.toLocaleString()}</td>
+                        <td class="number-cell">${avgPerUser.toLocaleString()}</td>
+                    </tr>
+                `;
+                  })
+                  .join('')}
+                <tr class="total-row">
+                    <td>TOTAL</td>
+                    <td class="number-cell">${Math.round(grandTotalExcludingNFT).toLocaleString()}</td>
+                    <td class="number-cell">100.00%</td>
+                    <td class="number-cell">${totalUsersExcludingNFT.toLocaleString()}</td>
+                    <td class="number-cell">${totalUsersExcludingNFT > 0 ? Math.round(grandTotalExcludingNFT / totalUsersExcludingNFT).toLocaleString() : '0'}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <script>
@@ -2908,6 +3088,65 @@ function generateAllocationByActivityAndTierHTML(
             data: {
                 labels: ${JSON.stringify(activityPeriods)},
                 datasets: ${JSON.stringify(datasets)}
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y.toLocaleString();
+                                return label + ': ' + value + ' tokens';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        },
+                        title: {
+                            display: true,
+                            text: 'Activity Period',
+                            font: { size: 14 }
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Total Token Allocation',
+                            font: { size: 14 }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Second chart - Excluding NFT
+        const ctxExcludingNFT = document.getElementById('activityChartExcludingNFT').getContext('2d');
+        new Chart(ctxExcludingNFT, {
+            type: 'bar',
+            data: {
+                labels: ${JSON.stringify(activityPeriods)},
+                datasets: ${JSON.stringify(datasetsExcludingNFT)}
             },
             options: {
                 responsive: true,
@@ -4094,6 +4333,7 @@ async function main() {
       percentileData,
       tierStatsData,
       activityData,
+      activityDataExcludingNFT,
     ] = await Promise.all([
       getNftTierDistribution(),
       getEqualRarityDistribution(),
@@ -4110,6 +4350,7 @@ async function main() {
       getAllocationByPercentile(),
       getCombinedAllocationStatsByTier(),
       getAllocationByActivityAndTier(),
+      getAllocationByActivityAndTierExcludingNFT(),
     ]);
 
     console.log('\nData Summary:');
@@ -4129,6 +4370,9 @@ async function main() {
     console.log(`- Percentile buckets: ${percentileData.length}`);
     console.log(`- User tier stats: ${tierStatsData.length} tiers`);
     console.log(`- Activity & tier data points: ${activityData.length}`);
+    console.log(
+      `- Activity & tier data points (excluding NFT): ${activityDataExcludingNFT.length}`,
+    );
 
     // Calculate Gini coefficients and Lorenz curves
     console.log('\nCalculating Gini coefficients and Lorenz curves...');
@@ -4324,9 +4568,11 @@ async function main() {
     }
 
     // 13. Allocation by User Activity and Tier
-    if (activityData.length > 0) {
-      const activityHTML =
-        generateAllocationByActivityAndTierHTML(activityData);
+    if (activityData.length > 0 || activityDataExcludingNFT.length > 0) {
+      const activityHTML = generateAllocationByActivityAndTierHTML(
+        activityData,
+        activityDataExcludingNFT,
+      );
       fs.writeFileSync(
         path.join(outputDir, 'allocation-by-activity-and-tier.html'),
         activityHTML,
