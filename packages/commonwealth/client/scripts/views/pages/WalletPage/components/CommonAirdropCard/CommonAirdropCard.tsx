@@ -273,6 +273,12 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   const finalClaimablePercentage = (1 - (initialClaimPercentage || 0)) * 100;
   const finalClaimableTokens = tokensCount - initialClaimableTokens;
 
+  const allocatedAmountText = `${claimableTokens} ${claimAddress?.token}`;
+  const tokenOrTokensText = tokensCount <= 1 ? 'Token' : 'Tokens';
+  const allocatedAmountTextWithTokenOrTokens = `${allocatedAmountText} ${
+    allocatedAmountText.length > 3 ? '' : tokenOrTokensText
+  }`;
+
   return canClaim ? (
     <div
       className={clsx('CommonAirdropCard', {
@@ -335,7 +341,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                       fontWeight="bold"
                       className="balance-amount"
                     >
-                      {`${claimableTokens} ${claimAddress?.token} ${tokensCount <= 1 ? 'Token' : 'Tokens'}`}
+                      {allocatedAmountTextWithTokenOrTokens}
                     </CWText>
                   </div>
                 </div>
