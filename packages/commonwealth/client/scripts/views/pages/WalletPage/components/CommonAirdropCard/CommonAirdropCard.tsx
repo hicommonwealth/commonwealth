@@ -113,14 +113,14 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   }
 
   const handleImportToken = async () => {
-    if (!allocation?.tokenAddress) {
-      notifyError('Set a claim address to import token!');
+    if (!claimAddress?.token_address) {
+      notifyError('Failed to import token');
       return;
     }
 
     try {
       const { isMagicAddress, provider } = await getWalletProvider(
-        allocation?.tokenAddress,
+        claimAddress?.token_address,
       );
       if (isMagicAddress) {
         // magic doesnt expose any api to import tokens to wallet, however if there
@@ -130,13 +130,13 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       }
 
       const contract = new CommonClaim(
-        allocation?.tokenAddress,
+        claimAddress?.token_address,
         claimAddress?.token || 'C',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         provider as any,
       );
       await contract.addTokenToWallet({
-        address: allocation?.tokenAddress,
+        address: claimAddress?.token_address,
         symbol: claimAddress?.token,
         providerInstance: isMagicAddress ? provider : undefined,
       });
