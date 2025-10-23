@@ -26,6 +26,7 @@ interface ClaimCardProps {
   hasClaimed: boolean;
   cardNumber: number;
   isClaimAvailable: boolean;
+  isPendingBlockchainIndex: boolean;
   isPendingClaimFunds: boolean;
   isReadyForClaimNow: boolean;
   isReadyForClaimAfterUnlock: boolean;
@@ -50,6 +51,7 @@ const ClaimCard = ({
   hasClaimed,
   cardNumber,
   isClaimAvailable,
+  isPendingBlockchainIndex,
   isPendingClaimFunds,
   isReadyForClaimNow,
   isReadyForClaimAfterUnlock,
@@ -416,6 +418,28 @@ const ClaimCard = ({
       </div>
     );
 
+    if (isPendingBlockchainIndex) {
+      return (
+        <div className="notice-text">
+          <div className="countdown-container countdown-in-progress">
+            <div className="countdown-left">
+              <CWText
+                type="h5"
+                fontWeight="semiBold"
+                className="countdown-title"
+              >
+                Pending Blockchain Index
+              </CWText>
+              <CWText className="countdown-description">
+                Our systems are indexing the blockchain to confirm your
+                transaction.
+              </CWText>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     if (isClaimAvailable) {
       const pendingMagnaProcessing = (
         <div className="countdown-container countdown-in-progress">
@@ -483,10 +507,11 @@ const ClaimCard = ({
                       6,
                     )}`}
                     onClick={() => {
-                      if (allocationId) {
+                      if (allocationId && allocatedToAddress) {
                         claimState
                           .claim({
                             allocation_id: allocationId,
+                            claimAddress: allocatedToAddress,
                           })
                           .catch(console.error);
                       }

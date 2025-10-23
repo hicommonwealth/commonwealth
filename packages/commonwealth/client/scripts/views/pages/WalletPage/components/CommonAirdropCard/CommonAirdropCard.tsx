@@ -113,14 +113,14 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   }
 
   const handleImportToken = async () => {
-    if (!allocation?.tokenAddress) {
-      notifyError('Set a claim address to import token!');
+    if (!claimAddress?.token_address) {
+      notifyError('Failed to import token');
       return;
     }
 
     try {
       const { isMagicAddress, provider } = await getWalletProvider(
-        allocation?.tokenAddress,
+        claimAddress?.token_address,
       );
       if (isMagicAddress) {
         // magic doesnt expose any api to import tokens to wallet, however if there
@@ -130,13 +130,13 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
       }
 
       const contract = new CommonClaim(
-        allocation?.tokenAddress,
+        claimAddress?.token_address,
         claimAddress?.token || 'C',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         provider as any,
       );
       await contract.addTokenToWallet({
-        address: allocation?.tokenAddress,
+        address: claimAddress?.token_address,
         symbol: claimAddress?.token,
         providerInstance: isMagicAddress ? provider : undefined,
       });
@@ -193,6 +193,14 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         null;
       const isClaimAvailable = !!claimAddress?.magna_synced_at;
       const hasClaimed = !!(claimAddress?.magna_claimed_at && initialTxHash);
+      const isPendingBlockchainIndex = !!(
+        claimAddress?.magna_claimed_at &&
+        isClaimAvailable &&
+        allocation?.magna_allocation_id &&
+        allocation?.walletAddress &&
+        allocation?.claimable === 0 &&
+        !initialTxHash
+      );
       const isReadyForClaimNow = !!(
         isClaimAvailable &&
         allocation?.magna_allocation_id &&
@@ -215,6 +223,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         hasClaimed,
         isClaimAvailable,
         isReadyForClaimNow,
+        isPendingBlockchainIndex,
         isReadyForClaimAfterUnlock,
         shouldWaitTillDate,
       };
@@ -236,6 +245,14 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         moment(allocation?.cliff_date).isBefore(moment());
       const isClaimAvailable =
         !!claimAddress?.magna_synced_at && !isPendingClaimFunds;
+      const isPendingBlockchainIndex = !!(
+        claimAddress?.magna_cliff_claimed_at &&
+        isClaimAvailable &&
+        allocation?.magna_allocation_id &&
+        allocation?.walletAddress &&
+        allocation?.claimable === 0 &&
+        !finalTxHash
+      );
       const isReadyForClaimNow = !!(
         isClaimAvailable &&
         allocation?.magna_allocation_id &&
@@ -255,6 +272,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         hasClaimed,
         isClaimAvailable,
         isReadyForClaimNow,
+        isPendingBlockchainIndex,
         isReadyForClaimAfterUnlock,
         shouldWaitTillDate: undefined,
       };
@@ -272,6 +290,12 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   const initialClaimableTokens = tokensCount * (initialClaimPercentage || 0);
   const finalClaimablePercentage = (1 - (initialClaimPercentage || 0)) * 100;
   const finalClaimableTokens = tokensCount - initialClaimableTokens;
+
+  const allocatedAmountText = `${claimableTokens} ${claimAddress?.token}`;
+  const tokenOrTokensText = tokensCount <= 1 ? 'Token' : 'Tokens';
+  const allocatedAmountTextWithTokenOrTokens = `${allocatedAmountText} ${
+    allocatedAmountText.length > 3 ? '' : tokenOrTokensText
+  }`;
 
   return canClaim ? (
     <div
@@ -335,7 +359,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                       fontWeight="bold"
                       className="balance-amount"
                     >
-                      {`${claimableTokens} ${claimAddress?.token} ${tokensCount <= 1 ? 'Token' : 'Tokens'}`}
+                      {allocatedAmountTextWithTokenOrTokens}
                     </CWText>
                   </div>
                 </div>
@@ -347,6 +371,9 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   cardNumber={1}
                   hasClaimed={claimSteps.initial.hasClaimed}
                   isClaimAvailable={claimSteps.initial.isClaimAvailable}
+                  isPendingBlockchainIndex={
+                    claimSteps.initial.isPendingBlockchainIndex
+                  }
                   isPendingClaimFunds={isPendingClaimFunds}
                   isReadyForClaimNow={claimSteps.initial.isReadyForClaimNow}
                   isReadyForClaimAfterUnlock={
@@ -372,6 +399,9 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   cardNumber={2}
                   hasClaimed={claimSteps.final.hasClaimed}
                   isClaimAvailable={claimSteps.final.isClaimAvailable}
+                  isPendingBlockchainIndex={
+                    claimSteps.final.isPendingBlockchainIndex
+                  }
                   isPendingClaimFunds={isPendingClaimFunds}
                   isReadyForClaimNow={claimSteps.final.isReadyForClaimNow}
                   isReadyForClaimAfterUnlock={
@@ -399,6 +429,9 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 cardNumber={1}
                 hasClaimed={claimSteps.initial.hasClaimed}
                 isClaimAvailable={claimSteps.initial.isClaimAvailable}
+                isPendingBlockchainIndex={
+                  claimSteps.initial.isPendingBlockchainIndex
+                }
                 isPendingClaimFunds={isPendingClaimFunds}
                 isReadyForClaimNow={claimSteps.initial.isReadyForClaimNow}
                 isReadyForClaimAfterUnlock={
