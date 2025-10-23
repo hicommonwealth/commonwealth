@@ -507,10 +507,11 @@ const ClaimCard = ({
                       6,
                     )}`}
                     onClick={() => {
-                      if (allocationId) {
+                      if (allocationId && allocatedToAddress) {
                         claimState
                           .claim({
                             allocation_id: allocationId,
+                            claimAddress: allocatedToAddress,
                           })
                           .catch(console.error);
                       }
