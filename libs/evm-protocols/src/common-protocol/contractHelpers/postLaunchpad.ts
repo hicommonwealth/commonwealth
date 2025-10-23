@@ -71,7 +71,7 @@ export const launchPostToken = async (
         exchangeToken,
         initPurchaseAmount,
       )
-      .send({ from: walletAddress, value: 4.44e14 });
+      .send({ from: walletAddress, value: 1e15 });
     return txReceipt;
   } catch (error) {
     console.error('Error launching token:', error);
