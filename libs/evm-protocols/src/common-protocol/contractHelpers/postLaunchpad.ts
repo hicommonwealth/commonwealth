@@ -17,8 +17,9 @@ export const approveTokenTransfer = async (
     const allowance = await tokenContract.methods
       .allowance(walletAddress, spender)
       .call();
-    if (BigInt(allowance) < BigInt(amount)) {
-      await tokenContract.methods.approve(spender, amount).send({
+    const bigIntAmount = BigInt(Number(amount));
+    if (BigInt(allowance) < bigIntAmount) {
+      await tokenContract.methods.approve(spender, bigIntAmount).send({
         from: walletAddress,
       });
     }
