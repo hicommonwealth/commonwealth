@@ -216,8 +216,8 @@ type NftSnapshot = {
   equal_distribution_allocation: string | null;
   rarity_distribution_allocation: string | null;
   total_token_allocation: string | null;
-  created_at: Date;
-  updated_at: Date;
+  created_at: Date | null;
+  updated_at: Date | null;
 };
 
 export const NftSnapshot = (
