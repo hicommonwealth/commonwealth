@@ -8,8 +8,6 @@ import { config } from '../../../config';
 
 const log = logger(import.meta);
 
-const MAGNA_CONTRACT_ADDRESS = '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6';
-
 // Withdraw function selectors
 const WITHDRAW_SELECTORS = [
   '0x8612372a', // withdraw(uint256 withdrawalAmount,uint32 rootIndex,bytes decodableArgs,bytes32[] proof)
@@ -161,7 +159,7 @@ async function getWithdrawTransactionsForAddress(
     do {
       const params: AssetTransferParams = {
         fromAddress: address.toLowerCase(),
-        toAddress: MAGNA_CONTRACT_ADDRESS.toLowerCase(),
+        toAddress: config.MAGNA!.CONTRACT_ADDRESS.toLowerCase(),
         fromBlock: `0x${fromBlock.toString(16)}`,
         category: ['external'],
         withMetadata: true,
@@ -185,7 +183,8 @@ async function getWithdrawTransactionsForAddress(
               });
 
               if (
-                tx.to?.toLowerCase() === MAGNA_CONTRACT_ADDRESS.toLowerCase() &&
+                tx.to?.toLowerCase() ===
+                  config.MAGNA!.CONTRACT_ADDRESS.toLowerCase() &&
                 tx.input &&
                 tx.input.length > 10
               ) {
@@ -296,19 +295,19 @@ async function processTxnType(
     ? `
       SELECT user_id, address, magna_cliff_claimed_at as claimed_at
       FROM "ClaimAddresses"
-      WHERE magna_cliff_claimed_at IS NOT NULL AND
-            magna_cliff_claim_data IS NOT NULL AND
-            (magna_cliff_claim_tx_finalized = FALSE OR magna_cliff_claim_tx_finalized IS NULL)
+      WHERE magna_cliff_claimed_at IS NOT NULL
+        AND magna_cliff_claim_data IS NOT NULL
+        AND (magna_cliff_claim_tx_finalized = FALSE OR magna_cliff_claim_tx_finalized IS NULL)
       ORDER BY magna_cliff_claimed_at ASC;
-  `
+    `
     : `
       SELECT user_id, address, magna_claimed_at as claimed_at
       FROM "ClaimAddresses"
-      WHERE magna_claimed_at IS NOT NULL AND
-            magna_claim_data IS NOT NULL AND
-            (magna_claim_tx_finalized = FALSE OR magna_claim_tx_finalized IS NULL)
+      WHERE magna_claimed_at IS NOT NULL
+        AND magna_claim_data IS NOT NULL
+        AND (magna_claim_tx_finalized = FALSE OR magna_claim_tx_finalized IS NULL)
       ORDER BY magna_cliff_claimed_at ASC;
-  `;
+    `;
 
   const claimAddresses = await models.sequelize.query<ClaimAddressRecord>(
     query,
@@ -386,8 +385,8 @@ async function processTxnType(
 
       const updateQuery = `
         UPDATE "ClaimAddresses"
-        SET ${isCliff ? 'magna_cliff_claim_tx_hash' : 'magna_claim_tx_hash'} = :tx_hash,
-            updated_at                                                       = NOW(),
+        SET ${isCliff ? 'magna_cliff_claim_tx_hash' : 'magna_claim_tx_hash'}           = :tx_hash,
+            updated_at                                                                 = NOW(),
             ${isCliff ? 'magna_cliff_claim_tx_finalized' : 'magna_claim_tx_finalized'} = :tx_finalized
         WHERE user_id = :user_id;
       `;
@@ -438,6 +437,11 @@ export const magnaTxnSyncTask = {
   input: TaskPayloads.MagnaTxnSync,
   fn: async () => {
     log.info('Starting MagnaTxnSync job...');
+
+    if (!config.MAGNA) {
+      log.warn('Magna txn sync not enabled');
+      return;
+    }
 
     if (!config.ALCHEMY?.APP_KEYS?.PRIVATE) {
       log.error('Missing Alchemy private API key');

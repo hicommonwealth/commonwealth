@@ -117,6 +117,7 @@ const {
   MAGNA_BATCH_SIZE,
   MAGNA_INITIAL_PERCENTAGE,
   MAGNA_CLIFF_DATE,
+  MAGNA_CONTRACT_ADDRESS,
   SLACK_WEBHOOK_URL_ALL_ENG,
   SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
   FLAG_CLAIMS,
@@ -379,7 +380,8 @@ export const config = configure(
       MAGNA_UNLOCK_SCHEDULE_ID &&
       MAGNA_UNLOCK_START_AT &&
       MAGNA_INITIAL_PERCENTAGE &&
-      MAGNA_CLIFF_DATE
+      MAGNA_CLIFF_DATE &&
+      MAGNA_CONTRACT_ADDRESS
         ? {
             API_URL: MAGNA_API_URL,
             API_KEY: MAGNA_API_KEY,
@@ -397,6 +399,9 @@ export const config = configure(
               MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE,
               10,
             ),
+            CONTRACT_ADDRESS:
+              MAGNA_CONTRACT_ADDRESS ||
+              '0x45Bd2f58008b7D0942E36E6827A037eef60AF7D6',
           }
         : undefined,
     SLACK: {
@@ -831,6 +836,7 @@ export const config = configure(
         INITIAL_PERCENTAGE: z.number().min(0.01).max(0.99),
         CLIFF_DATE: z.date(),
         BATCH_SIZE: z.number(),
+        CONTRACT_ADDRESS: z.string(),
       })
       .optional(),
     SLACK: z.object({
