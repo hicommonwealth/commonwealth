@@ -61,7 +61,7 @@ export const useThreadTokenWidget = ({
   const chainRpc = tokenCommunity?.ChainNode?.url || '';
 
   const { data: launchpadToken } = useGetTokenByCommunityId({
-    community_id: tokenCommunity?.id,
+    community_id: tokenCommunity?.id as string,
     with_stats: false,
   });
 
