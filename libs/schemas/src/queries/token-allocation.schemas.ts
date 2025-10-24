@@ -19,7 +19,8 @@ export const ClaimAddressView = z.object({
   token_address: EVM_ADDRESS_STRICT.nullish(),
   description: z.string(),
   initial_percentage: z.number(),
-  cliff_date: z.date(),
+  unlock_start_at: z.date().or(z.string()).nullish(),
+  cliff_date: z.date().or(z.string()).nullish(),
   tokens: z.coerce.number().nullish(),
   magna_allocation_id: z.string().nullish(),
   magna_synced_at: z
