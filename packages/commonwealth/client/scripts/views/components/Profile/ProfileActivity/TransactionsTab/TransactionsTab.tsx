@@ -118,13 +118,12 @@ const TransactionsTab = ({
 
   const location = useLocation();
   const pathParts = location.pathname.split('/');
-  const user_id = parseInt(pathParts[pathParts.length - 1]);
+  const user = useUserStore();
+  const user_id = user.id ?? parseInt(pathParts[pathParts.length - 1]);
 
   const { data: launchpadData } = useGetLaunchpadTradesQuery({
     user_id,
   });
-
-  const user = useUserStore();
 
   const hasMagic = user.hasMagicWallet;
 
