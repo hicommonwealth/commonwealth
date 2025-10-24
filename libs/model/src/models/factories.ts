@@ -58,6 +58,7 @@ import {
   AuraAllocations,
   ClaimAddresses,
   HistoricalAllocations,
+  NftSnapshot,
 } from './token-allocation';
 import Topic from './topic';
 import TopicSubscription from './topic_subscription';
@@ -135,6 +136,7 @@ export const Factories = {
   XpLog,
   ThreadToken,
   ThreadTokenTrade,
+  NftSnapshot,
 };
 
 export type DB = {

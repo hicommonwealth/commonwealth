@@ -40,11 +40,14 @@ const useCommonAirdropStore = createBoundedUseStore(commonAirdropStore);
 
 export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
   const utils = trpc.useUtils();
+
   const { txData, initialTxHash, finalTxHash, setData } =
     useCommonAirdropStore();
+
   const claimInitialToken = trpc.tokenAllocation.claimToken.useMutation();
   const updateInitialClaimTxHash =
     trpc.tokenAllocation.updateClaimTransactionHash.useMutation();
+
   const claimFinalToken = trpc.tokenAllocation.claimTokenCliff.useMutation();
   const updateFinalClaimTxHash =
     trpc.tokenAllocation.updateClaimCliffTransactionHash.useMutation();
@@ -82,9 +85,16 @@ export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
         ? updateInitialClaimTxHash.mutateAsync
         : updateFinalClaimTxHash.mutateAsync;
 
-    return async (input: Parameters<typeof claimFunction>[0]) => {
+    return async (
+      input: Parameters<typeof claimFunction>[0] & { claimAddress: string },
+    ) => {
       try {
-        const data = await claimFunction(input);
+        userStore.setState({
+          addressSelectorSelectedAddress: input.claimAddress,
+        });
+        const data = await claimFunction({
+          allocation_id: input.allocation_id,
+        });
         setData({
           txData: {
             to: data.to,
@@ -142,6 +152,10 @@ export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
       } catch (error) {
         notifyError(error.message ?? 'Something went wrong');
         throw error; // let caller handle if needed
+      } finally {
+        userStore.setState({
+          addressSelectorSelectedAddress: undefined,
+        });
       }
     };
   };

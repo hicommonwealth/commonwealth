@@ -8,8 +8,6 @@ import { config } from '../../../config';
 
 const log = logger(import.meta);
 
-const MAGNA_CONTRACT_ADDRESS = '0xd7BFCe565E6C578Bd6B835ed5EDEC96e39eCfad6';
-
 // Withdraw function selectors
 const WITHDRAW_SELECTORS = [
   '0x8612372a', // withdraw(uint256 withdrawalAmount,uint32 rootIndex,bytes decodableArgs,bytes32[] proof)
@@ -18,8 +16,29 @@ const WITHDRAW_SELECTORS = [
 interface ClaimAddressRecord {
   user_id: number;
   address: string;
-  magna_claimed_at: Date | null;
-  magna_cliff_claimed_at: Date | null;
+  claimed_at: Date;
+}
+
+let currentBlockNumber: bigint = BigInt(0);
+
+async function isTxnFinal(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  client: ReturnType<typeof createPublicClient<any, any, any, any>>,
+  txnBlockNumber: bigint,
+): Promise<boolean> {
+  // initialize current block number
+  if (currentBlockNumber === BigInt(0)) {
+    currentBlockNumber = await client.getBlockNumber();
+  }
+
+  // check if txn is finalized
+  if (txnBlockNumber > currentBlockNumber + BigInt(500)) return true;
+  else {
+    // if not, refresh the current block number and check again
+    currentBlockNumber = await client.getBlockNumber();
+    if (txnBlockNumber > currentBlockNumber + BigInt(500)) return true;
+  }
+  return false;
 }
 
 // Alchemy API Types
@@ -132,15 +151,15 @@ async function getWithdrawTransactionsForAddress(
   client: ReturnType<typeof createPublicClient<any, any, any, any>>,
   address: string,
   fromBlock: bigint,
-): Promise<string[]> {
-  const txHashes: string[] = [];
+): Promise<{ txHash: string; txBlockNumber: bigint }[]> {
+  const txns: { txHash: string; txBlockNumber: bigint }[] = [];
   let pageKey: string | undefined;
 
   try {
     do {
       const params: AssetTransferParams = {
         fromAddress: address.toLowerCase(),
-        toAddress: MAGNA_CONTRACT_ADDRESS.toLowerCase(),
+        toAddress: config.MAGNA!.CONTRACT_ADDRESS.toLowerCase(),
         fromBlock: `0x${fromBlock.toString(16)}`,
         category: ['external'],
         withMetadata: true,
@@ -164,13 +183,17 @@ async function getWithdrawTransactionsForAddress(
               });
 
               if (
-                tx.to?.toLowerCase() === MAGNA_CONTRACT_ADDRESS.toLowerCase() &&
+                tx.to?.toLowerCase() ===
+                  config.MAGNA!.CONTRACT_ADDRESS.toLowerCase() &&
                 tx.input &&
                 tx.input.length > 10
               ) {
                 const selector = tx.input.slice(0, 10);
                 if (WITHDRAW_SELECTORS.includes(selector.toLowerCase())) {
-                  txHashes.push(txHash);
+                  txns.push({
+                    txHash: txHash,
+                    txBlockNumber: tx.blockNumber,
+                  });
                 }
               }
             } catch (err) {
@@ -197,7 +220,7 @@ async function getWithdrawTransactionsForAddress(
     );
   }
 
-  return txHashes;
+  return txns;
 }
 
 /**
@@ -268,25 +291,22 @@ async function processTxnType(
 
   log.info(`Starting ${logPrefix} transaction indexing...`);
 
-  // Query for addresses that need this transaction type indexed
   const query = isCliff
     ? `
-      SELECT user_id, address, magna_cliff_claimed_at, magna_claimed_at
+      SELECT user_id, address, magna_cliff_claimed_at as claimed_at
       FROM "ClaimAddresses"
       WHERE magna_cliff_claimed_at IS NOT NULL
         AND magna_cliff_claim_data IS NOT NULL
-        AND magna_cliff_claim_tx_hash IS NULL
-        AND address IS NOT NULL
-      ORDER BY magna_cliff_claimed_at ASC
+        AND (magna_cliff_claim_tx_finalized = FALSE OR magna_cliff_claim_tx_finalized IS NULL)
+      ORDER BY magna_cliff_claimed_at ASC;
     `
     : `
-      SELECT user_id, address, magna_claimed_at, magna_cliff_claimed_at
+      SELECT user_id, address, magna_claimed_at as claimed_at
       FROM "ClaimAddresses"
       WHERE magna_claimed_at IS NOT NULL
         AND magna_claim_data IS NOT NULL
-        AND magna_claim_tx_hash IS NULL
-        AND address IS NOT NULL
-      ORDER BY magna_claimed_at ASC
+        AND (magna_claim_tx_finalized = FALSE OR magna_claim_tx_finalized IS NULL)
+      ORDER BY magna_cliff_claimed_at ASC;
     `;
 
   const claimAddresses = await models.sequelize.query<ClaimAddressRecord>(
@@ -306,9 +326,7 @@ async function processTxnType(
   );
 
   // Determine the earliest timestamp to start searching from
-  const earliestTimestamp = isCliff
-    ? claimAddresses[0].magna_cliff_claimed_at!
-    : claimAddresses[0].magna_claimed_at!;
+  const earliestTimestamp = claimAddresses[0].claimed_at;
 
   const startBlock = await getBlockNumberFromTimestamp(
     alchemyApiKey,
@@ -326,14 +344,14 @@ async function processTxnType(
         `Processing ${logPrefix} for address ${record.address} (user ${record.user_id})`,
       );
 
-      const txHashes = await getWithdrawTransactionsForAddress(
+      const foundTxns = await getWithdrawTransactionsForAddress(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         client as any,
         record.address,
         startBlock,
       );
 
-      if (txHashes.length === 0) {
+      if (foundTxns.length === 0) {
         log.warn(
           `No withdraw transactions found for address ${record.address}`,
         );
@@ -344,40 +362,41 @@ async function processTxnType(
       // Determine which transaction to use:
       // - For initial claim: use the first (earliest) transaction
       // - For cliff claim: use the second transaction if available, otherwise warn
-      let txHash: string;
+      let txn: { txHash: string; txBlockNumber: bigint };
 
       if (isCliff) {
-        if (txHashes.length < 2) {
+        if (foundTxns.length < 2) {
           log.warn(
-            `Expected 2 transactions for cliff claim but found ${txHashes.length} for address ${record.address}`,
+            `Expected 2 transactions for cliff claim but found ${foundTxns.length} for address ${record.address}`,
           );
           failureCount++;
           continue;
         }
         // Use the second (later) transaction for cliff claim
-        txHash = txHashes[1];
+        txn = foundTxns[1];
       } else {
         // Use the first (earliest) transaction for initial claim
-        txHash = txHashes[0];
+        txn = foundTxns[0];
       }
 
       log.info(
-        `Found ${logPrefix} withdraw transaction ${txHash} for address ${record.address}`,
+        `Found ${logPrefix} withdraw transaction ${txn.txHash} for address ${record.address}`,
       );
 
       const updateQuery = `
         UPDATE "ClaimAddresses"
-        SET ${isCliff ? 'magna_cliff_claim_tx_hash' : 'magna_claim_tx_hash'} = :tx_hash,
-            updated_at                                                       = NOW()
-        WHERE user_id = :user_id
-          AND ${isCliff ? 'magna_cliff_claim_tx_hash' : 'magna_claim_tx_hash'} IS NULL
+        SET ${isCliff ? 'magna_cliff_claim_tx_hash' : 'magna_claim_tx_hash'}           = :tx_hash,
+            updated_at                                                                 = NOW(),
+            ${isCliff ? 'magna_cliff_claim_tx_finalized' : 'magna_claim_tx_finalized'} = :tx_finalized
+        WHERE user_id = :user_id;
       `;
 
       const [, updated] = await models.sequelize.query(updateQuery, {
         type: QueryTypes.UPDATE,
         replacements: {
           user_id: record.user_id,
-          tx_hash: txHash,
+          tx_hash: txn.txHash,
+          tx_finalized: await isTxnFinal(client, txn.txBlockNumber),
         },
       });
 
@@ -418,6 +437,11 @@ export const magnaTxnSyncTask = {
   input: TaskPayloads.MagnaTxnSync,
   fn: async () => {
     log.info('Starting MagnaTxnSync job...');
+
+    if (!config.MAGNA) {
+      log.warn('Magna txn sync not enabled');
+      return;
+    }
 
     if (!config.ALCHEMY?.APP_KEYS?.PRIVATE) {
       log.error('Missing Alchemy private API key');

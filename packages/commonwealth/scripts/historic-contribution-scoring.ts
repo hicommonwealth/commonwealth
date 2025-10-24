@@ -8,6 +8,26 @@ import * as path from 'path';
 import { QueryTypes } from 'sequelize';
 import { config as envConfig } from '../server/config';
 
+/**
+ * Executed these queries post-generation to remove unprofitable dust values.
+ *
+ * UPDATE "HistoricalAllocations" HA
+ * SET token_allocation = 0
+ * FROM "Users" U
+ *          LEFT JOIN "AuraAllocations" AA ON AA.user_id = U.id
+ * WHERE HA.user_id = U.id
+ *   AND U.tier IN (2, 3)
+ *   AND COALESCE(HA.token_allocation, 0) + COALESCE(AA.token_allocation, 0) < 1000;
+ *
+ * UPDATE "AuraAllocations" AA
+ * SET token_allocation = 0
+ * FROM "Users" U
+ *          LEFT JOIN "HistoricalAllocations" HA ON HA.user_id = U.id
+ * WHERE AA.user_id = U.id
+ *   AND U.tier IN (2, 3)
+ *   AND COALESCE(HA.token_allocation, 0) + COALESCE(AA.token_allocation, 0) < 1000;
+ */
+
 if (!envConfig.TOKEN_ALLOCATION) {
   throw new Error('Token allocation configuration not set!');
 }
@@ -42,7 +62,7 @@ function parseArguments(): ScoringConfig {
   const args = process.argv.slice(2);
 
   // Default values
-  let historicalEndDate = '2025-10-01T12:00:00.000Z'; // Oct 1st at noon
+  let historicalEndDate = '2025-10-16T03:59:00.000Z';
   let threadWeight = 10;
   let commentWeight = 5;
   let reactionWeight = 1;
@@ -56,7 +76,7 @@ function parseArguments(): ScoringConfig {
   let minLength: number | undefined = 30;
   let historicalOrder: string = 'token_allocation DESC';
   let auraOrder: string = 'token_allocation DESC';
-  let auraEndDate: string = new Date().toISOString();
+  let auraEndDate: string = '2025-10-22T03:59:00.000Z';
   let setClaimAddresses = false;
   let topN: number | undefined = undefined;
   let supply = SUPPLY.total;
@@ -550,9 +570,9 @@ async function getHistoricalTokenAllocations(
                                  LEFT JOIN comment_scores CS ON CS.user_id = U.user_id
                                  LEFT JOIN reaction_scores RS ON RS.user_id = U.user_id)
     SELECT *,
-           (adjusted_score / (SELECT SUM(adjusted_score) FROM final_scores)) * 100                              AS percent_allocation,
+           (adjusted_score / (SELECT SUM(adjusted_score) FROM final_scores)) * 100 AS percent_allocation,
            (adjusted_score / (SELECT SUM(adjusted_score) FROM final_scores)) *
-           ${historicalPoolTokens}::NUMERIC                                                                     AS token_allocation
+           ${historicalPoolTokens}::NUMERIC                                        AS token_allocation
     FROM final_scores
     ORDER BY ${config.historicalOrder} NULLS LAST
       ${config.topN ? `LIMIT :topN` : ''}
@@ -590,6 +610,7 @@ async function getAuraTokenAllocations(
                               FROM "XpLogs" XL
                                      LEFT JOIN "Users" U ON XL.user_id = U.id
                               WHERE XL.created_at < :auraEndDate
+                                AND U.tier > 1
                               GROUP BY user_id, U.tier),
          creator_weighted_xp AS (SELECT creator_user_id,
                                         SUM(creator_xp_points) *
@@ -608,6 +629,7 @@ async function getAuraTokenAllocations(
                                  FROM "XpLogs" XL
                                         LEFT JOIN "Users" U ON XL.creator_user_id = U.id
                                  WHERE XL.created_at < :auraEndDate
+                                   AND U.tier > 1
                                  GROUP BY creator_user_id, U.tier),
          xp_sum AS (SELECT (SELECT SUM(weighted_xp_points) FROM user_weighted_xp) +
                            (SELECT SUM(weighted_creator_xp_points) FROM creator_weighted_xp) AS total_xp_awarded)
@@ -620,6 +642,7 @@ async function getAuraTokenAllocations(
     FROM "Users" U
            LEFT JOIN user_weighted_xp UWX ON UWX.user_id = U.id
            LEFT JOIN creator_weighted_xp CWX ON CWX.creator_user_id = U.id
+    WHERE U.tier > 1
     ORDER BY ${config.auraOrder} NULLS LAST
       ${config.topN ? `LIMIT :topN` : ''}
     ;
@@ -698,10 +721,10 @@ async function distributeHistoricalRemainder(
 
   await models.sequelize.query(
     `
-    UPDATE "HistoricalAllocations"
-    SET token_allocation = token_allocation + 1
-    WHERE user_id IN (:userIds)
-  `,
+      UPDATE "HistoricalAllocations"
+      SET token_allocation = token_allocation + 1
+      WHERE user_id IN (:userIds)
+    `,
     {
       replacements: { userIds: topUsers.map((u) => u.user_id) },
       type: QueryTypes.UPDATE,
@@ -772,10 +795,10 @@ async function distributeAuraRemainder(config: ScoringConfig): Promise<void> {
 
   await models.sequelize.query(
     `
-        UPDATE "AuraAllocations"
-        SET token_allocation = token_allocation + 1
-        WHERE user_id IN (:userIds);
-      `,
+      UPDATE "AuraAllocations"
+      SET token_allocation = token_allocation + 1
+      WHERE user_id IN (:userIds);
+    `,
     {
       replacements: { userIds: topUsers.map((u) => u.user_id) },
       type: QueryTypes.UPDATE,
@@ -816,6 +839,34 @@ function writeScoresToCSV<T extends Record<string, unknown>>(
   fs.writeFileSync(outputPath, csvContent, 'utf8');
   console.log(`Scores written to: ${outputPath}`);
   console.log(`Total records processed: ${scores.length}`);
+}
+
+async function removeDustAllocations() {
+  await models.sequelize.query(
+    `
+      UPDATE "HistoricalAllocations" HA
+      SET token_allocation = 0
+      FROM "Users" U
+             LEFT JOIN "AuraAllocations" AA ON AA.user_id = U.id
+      WHERE HA.user_id = U.id
+        AND U.tier IN (2, 3)
+        AND COALESCE(HA.token_allocation, 0) + COALESCE(AA.token_allocation, 0) < 1000;
+    `,
+    { type: QueryTypes.UPDATE },
+  );
+
+  await models.sequelize.query(
+    `
+      UPDATE "AuraAllocations" AA
+      SET token_allocation = 0
+      FROM "Users" U
+             LEFT JOIN "HistoricalAllocations" HA ON HA.user_id = U.id
+      WHERE AA.user_id = U.id
+        AND U.tier IN (2, 3)
+        AND COALESCE(HA.token_allocation, 0) + COALESCE(AA.token_allocation, 0) < 1000;
+    `,
+    { type: QueryTypes.UPDATE },
+  );
 }
 
 async function main() {
@@ -876,6 +927,10 @@ async function main() {
     console.log('Distributing aura remainder...');
     await distributeAuraRemainder(config);
     console.log('Aura remainder distributed.');
+
+    console.log('Removing dust allocations...');
+    await removeDustAllocations();
+    console.log('Dust allocations removed');
 
     console.log('Populating claim addresses...');
     await populateClaimAddresses(config);
