@@ -91,8 +91,8 @@ export async function magnaSync(
         {
           type: QueryTypes.SELECT,
           replacements: {
-            category: config.MAGNA!.EVENT,
-            description: config.MAGNA!.EVENT_DESC,
+            category: config.MAGNA.EVENT,
+            description: config.MAGNA.EVENT_DESC,
             limit: batchSize,
           },
         },
