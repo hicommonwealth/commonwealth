@@ -101,11 +101,6 @@ export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
             data: data.data,
           },
         });
-        // invalidate related queries
-        utils.tokenAllocation.getClaimAddress.invalidate().catch(console.error);
-        utils.tokenAllocation.getAllocation
-          .invalidate({ magna_allocation_id: data.magna_allocation_id })
-          .catch(console.error);
 
         let txHash = data.transaction_hash;
         // sign and persist transaction hash the first time
@@ -150,9 +145,18 @@ export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
           });
         notifySuccess('Token claimed successfully');
       } catch (error) {
-        notifyError(error.message ?? 'Something went wrong');
+        if (error.message?.includes('BlockNotFound')) {
+          notifyError('Tx block index pending!');
+        } else {
+          notifyError(error.message ?? 'Something went wrong');
+        }
         throw error; // let caller handle if needed
       } finally {
+        // invalidate related queries
+        utils.tokenAllocation.getClaimAddress.invalidate().catch(console.error);
+        utils.tokenAllocation.getAllocation
+          .invalidate({ magna_allocation_id: input.allocation_id })
+          .catch(console.error);
         userStore.setState({
           addressSelectorSelectedAddress: undefined,
         });
