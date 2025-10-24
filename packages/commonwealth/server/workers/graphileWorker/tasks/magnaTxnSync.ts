@@ -151,8 +151,9 @@ async function getWithdrawTransactionsForAddress(
   client: ReturnType<typeof createPublicClient<any, any, any, any>>,
   address: string,
   fromBlock: bigint,
-): Promise<{ txHash: string; txBlockNumber: bigint }[]> {
-  const txns: { txHash: string; txBlockNumber: bigint }[] = [];
+): Promise<{ txHash: string; txBlockNumber: bigint; timestamp: bigint }[]> {
+  const txns: { txHash: string; txBlockNumber: bigint; timestamp: bigint }[] =
+    [];
   let pageKey: string | undefined;
 
   try {
@@ -193,6 +194,11 @@ async function getWithdrawTransactionsForAddress(
                   txns.push({
                     txHash: txHash,
                     txBlockNumber: tx.blockNumber,
+                    timestamp: (
+                      await client.getBlock({
+                        blockHash: tx.blockHash,
+                      })
+                    ).timestamp,
                   });
                 }
               }
@@ -362,7 +368,7 @@ async function processTxnType(
       // Determine which transaction to use:
       // - For initial claim: use the first (earliest) transaction
       // - For cliff claim: use the second transaction if available, otherwise warn
-      let txn: { txHash: string; txBlockNumber: bigint };
+      let txn: { txHash: string; txBlockNumber: bigint; timestamp: bigint };
 
       if (isCliff) {
         if (foundTxns.length < 2) {
@@ -387,7 +393,8 @@ async function processTxnType(
         UPDATE "ClaimAddresses"
         SET ${isCliff ? 'magna_cliff_claim_tx_hash' : 'magna_claim_tx_hash'}           = :tx_hash,
             updated_at                                                                 = NOW(),
-            ${isCliff ? 'magna_cliff_claim_tx_finalized' : 'magna_claim_tx_finalized'} = :tx_finalized
+            ${isCliff ? 'magna_cliff_claim_tx_finalized' : 'magna_claim_tx_finalized'} = :tx_finalized,
+            ${isCliff ? 'magna_cliff_claim_tx_at' : 'magna_claim_tx_at'}               = :tx_at
         WHERE user_id = :user_id;
       `;
 
@@ -397,6 +404,7 @@ async function processTxnType(
           user_id: record.user_id,
           tx_hash: txn.txHash,
           tx_finalized: await isTxnFinal(client, txn.txBlockNumber),
+          tx_at: new Date(Number(txn.timestamp) * 1000),
         },
       });
 
