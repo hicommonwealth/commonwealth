@@ -159,7 +159,7 @@ async function getWithdrawTransactionsForAddress(
     do {
       const params: AssetTransferParams = {
         fromAddress: address.toLowerCase(),
-        toAddress: config.MAGNA!.CONTRACT_ADDRESS.toLowerCase(),
+        toAddress: config.MAGNA.CONTRACT_ADDRESS.toLowerCase(),
         fromBlock: `0x${fromBlock.toString(16)}`,
         category: ['external'],
         withMetadata: true,
@@ -184,7 +184,7 @@ async function getWithdrawTransactionsForAddress(
 
               if (
                 tx.to?.toLowerCase() ===
-                  config.MAGNA!.CONTRACT_ADDRESS.toLowerCase() &&
+                  config.MAGNA.CONTRACT_ADDRESS.toLowerCase() &&
                 tx.input &&
                 tx.input.length > 10
               ) {
@@ -438,7 +438,7 @@ export const magnaTxnSyncTask = {
   fn: async () => {
     log.info('Starting MagnaTxnSync job...');
 
-    if (!config.MAGNA) {
+    if (!config.MAGNA.API_KEY) {
       log.warn('Magna txn sync not enabled');
       return;
     }

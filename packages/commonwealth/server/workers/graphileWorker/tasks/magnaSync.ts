@@ -17,13 +17,13 @@ async function callback({
     key,
     category,
     description,
-    contractId: config.MAGNA!.CONTRACT_ID,
-    tokenId: config.MAGNA!.TOKEN_ID,
+    contractId: config.MAGNA.CONTRACT_ID,
+    tokenId: config.MAGNA.TOKEN_ID,
     amount: token_allocation,
     walletAddress: wallet_address,
     stakeholder: { name: user_name },
-    unlockScheduleId: config.MAGNA!.UNLOCK_SCHEDULE_ID,
-    unlockStartAt: config.MAGNA!.UNLOCK_START_AT.toISOString(),
+    unlockScheduleId: config.MAGNA.UNLOCK_SCHEDULE_ID,
+    unlockStartAt: config.MAGNA.UNLOCK_START_AT.toISOString(),
   });
   // happy path
   if (response && response.isProcessed && response.result?.id)
@@ -46,12 +46,10 @@ async function callback({
 export const magnaSyncTask = {
   input: TaskPayloads.MagnaSync,
   fn: async () => {
-    if (!config.MAGNA) {
-      log.error('Missing Magna configuration');
-      return;
+    if (config.MAGNA.API_KEY) {
+      log.info('Starting MagnaSync job...');
+      await magnaSync(callback);
+      log.info('MagnaSync job completed!');
     }
-    log.info('Starting MagnaSync job...');
-    await magnaSync(callback);
-    log.info('MagnaSync job completed!');
   },
 };

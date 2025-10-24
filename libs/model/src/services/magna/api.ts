@@ -18,12 +18,12 @@ async function callMagnaApi<Body, Response>(
     method,
     headers: {
       'Content-Type': 'application/json',
-      'x-magna-api-token': config.MAGNA!.API_KEY,
+      'x-magna-api-token': config.MAGNA.API_KEY,
     },
     body: body ? JSON.stringify(body) : undefined,
   };
 
-  const response = await fetch(`${config.MAGNA!.API_URL}/${path}`, request);
+  const response = await fetch(`${config.MAGNA.API_URL}/${path}`, request);
   const json = await response.json();
 
   log.info(`${method} /${path}`, {
