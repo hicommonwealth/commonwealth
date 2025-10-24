@@ -130,19 +130,20 @@ export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
             },
             isMagicAddress ? provider : undefined,
           );
-          // at this point the claim transaction is signed!
-          // ...next line is best effort to persist the tx hash to complete the flow
-          // ...if this fails, the user will have to claim again (is singing idempotent?)
-          txHash &&
-            (await txHashUpdateFunction({
-              transaction_hash: txHash,
-            }));
         }
+        // at this point the claim transaction is signed!
         // update the UI
-        txHash &&
+        if (txHash) {
           setData({
             [type === 'initial' ? 'initialTxHash' : 'finalTxHash']: txHash,
           });
+
+          await new Promise((r) => setTimeout(r, 5000)); // wait 5 sec for the block to propagate
+
+          await txHashUpdateFunction({
+            transaction_hash: txHash,
+          });
+        }
         notifySuccess('Token claimed successfully');
       } catch (error) {
         if (error.message?.includes('BlockNotFound')) {
