@@ -163,6 +163,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     allocation?.status === 'PENDING_FUNDING' ||
     allocation?.status === 'NOT_STARTED'
   );
+  const unlockStartsAt = allocation?.unlock_start_at || `2025-10-27T13:00:00Z`;
   const shouldCollapseClaimState = (() => {
     if (!allocation?.cliff_date) {
       return false;
@@ -211,9 +212,9 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         isClaimAvailable &&
         !isReadyForClaimNow &&
         (allocation?.claimable ?? 0) > 0 &&
-        allocation?.unlock_start_at
+        unlockStartsAt
       );
-      const launchDateUTC = moment(allocation?.unlock_start_at);
+      const launchDateUTC = moment(unlockStartsAt);
       const shouldWaitTillDate =
         moment().isBefore(launchDateUTC) && claimAddress?.address
           ? launchDateUTC
@@ -264,7 +265,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         isClaimAvailable &&
         !isReadyForClaimNow &&
         (initialTxHash || (allocation?.claimable ?? 0) > 0) &&
-        allocation?.unlock_start_at &&
+        unlockStartsAt &&
         !hasCliffDatePassed
       );
       return {
@@ -383,7 +384,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   onConnectNewAddress={onConnectNewAddress}
                   claimedTXHash={claimSteps.initial.txHash || undefined}
                   claimedToAddress={claimAddress?.address || undefined}
-                  allocationUnlocksAt={allocation?.unlock_start_at || undefined}
+                  allocationUnlocksAt={unlockStartsAt || undefined}
                   allocationClaimedAt={
                     claimAddress?.magna_claim_tx_at || undefined
                   }
@@ -441,7 +442,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 onConnectNewAddress={onConnectNewAddress}
                 claimedTXHash={claimSteps.initial.txHash || undefined}
                 claimedToAddress={claimAddress?.address || undefined}
-                allocationUnlocksAt={allocation?.unlock_start_at || undefined}
+                allocationUnlocksAt={unlockStartsAt || undefined}
                 allocationClaimedAt={
                   claimAddress?.magna_claim_tx_at || undefined
                 }
