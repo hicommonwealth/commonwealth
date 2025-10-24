@@ -163,7 +163,10 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     allocation?.status === 'PENDING_FUNDING' ||
     allocation?.status === 'NOT_STARTED'
   );
-  const unlockStartsAt = allocation?.unlock_start_at || `2025-10-27T13:00:00Z`;
+  const unlockStartsAt =
+    allocation?.unlock_start_at ||
+    claimAddress?.unlock_start_at ||
+    `2025-10-27T13:00:00Z`;
   const shouldCollapseClaimState = (() => {
     if (!allocation?.cliff_date) {
       return false;
