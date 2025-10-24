@@ -385,7 +385,7 @@ const ClaimCard = ({
               Request Received
             </CWText>
             <CWText className="countdown-description">
-              Claims process will start on launch date at{' '}
+              Claims process will start approximately at&nbsp;
               {formatDate(shouldWaitTillDate.toISOString())}.
             </CWText>
           </div>
