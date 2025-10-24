@@ -379,7 +379,7 @@ const ClaimCard = ({
 
     if (shouldWaitTillDate) {
       return (
-        <div className="countdown-container countdown-in-progress">
+        <div className="countdown-container countdown-needs-action">
           <div className="countdown-left">
             <CWText type="h5" fontWeight="semiBold" className="countdown-title">
               Request Received
