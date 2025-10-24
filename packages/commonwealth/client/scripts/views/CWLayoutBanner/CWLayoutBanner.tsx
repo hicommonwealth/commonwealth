@@ -12,11 +12,11 @@ import './CWLayoutBanner.scss';
 const BANNERS = {
   COMMON_CLAIM: {
     headline:
-      '🎉 COMMON is Live. Check your potential claim on your rewards page',
+      '🎉 COMMON Claim Checker is Live. Check your potential claim on your rewards page',
     subText: undefined,
     cta: {
       type: 'secondary' as ButtonType,
-      label: 'Claim COMMON',
+      label: 'Register claim address',
       onClick: (navigate: ReturnType<typeof useCommonNavigate>) => {
         navigate('/wallet', {}, null);
       },
