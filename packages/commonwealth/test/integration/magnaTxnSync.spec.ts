@@ -75,6 +75,9 @@ describe('MagnaTxnSync Task Tests', () => {
       request: vi.fn(),
       getTransaction: vi.fn(),
       getBlockNumber: vi.fn().mockResolvedValue(BigInt(11000000)), // Mock current block number
+      getBlock: vi.fn().mockResolvedValue({
+        timestamp: BigInt(1704067200), // 2024-01-01T00:00:00Z in Unix timestamp
+      }),
     };
 
     vi.mocked(getPublicClient).mockReturnValue(mockClient as any);
@@ -148,6 +151,9 @@ describe('MagnaTxnSync Task Tests', () => {
 
     // Re-setup mocks after clearAllMocks
     mockClient.getBlockNumber = vi.fn().mockResolvedValue(BigInt(11000000));
+    mockClient.getBlock = vi.fn().mockResolvedValue({
+      timestamp: BigInt(1704067200), // 2024-01-01T00:00:00Z in Unix timestamp
+    });
     vi.mocked(getPublicClient).mockReturnValue(mockClient as any);
 
     vi.mocked(fetch).mockResolvedValue({
@@ -256,6 +262,7 @@ describe('MagnaTxnSync Task Tests', () => {
         to: TEST_MAGNA_CONTRACT_ADDRESS,
         input: '0x8612372a000000000000000000000000', // withdraw selector
         blockNumber: BigInt(10000100),
+        blockHash: '0xblockhash123456789',
       });
 
       await magnaTxnSyncTask.fn();
@@ -355,6 +362,7 @@ describe('MagnaTxnSync Task Tests', () => {
         to: '0xWRONGCONTRACT123456789012345678901234567890',
         input: '0x8612372a000000000000000000000000',
         blockNumber: BigInt(10000100),
+        blockHash: '0xblockhash123456789',
       });
 
       await magnaTxnSyncTask.fn();
@@ -417,6 +425,7 @@ describe('MagnaTxnSync Task Tests', () => {
         to: TEST_MAGNA_CONTRACT_ADDRESS,
         input: '0xWRONGFUNC000000000000000000000000', // not withdraw selector
         blockNumber: BigInt(10000100),
+        blockHash: '0xblockhash123456789',
       });
 
       await magnaTxnSyncTask.fn();
@@ -479,6 +488,7 @@ describe('MagnaTxnSync Task Tests', () => {
           to: TEST_MAGNA_CONTRACT_ADDRESS,
           input: '0x8612372a000000000000000000000000',
           blockNumber: BigInt(10000100),
+          blockHash: '0xblockhash123456789',
         });
       });
 
@@ -545,6 +555,7 @@ describe('MagnaTxnSync Task Tests', () => {
           to: TEST_MAGNA_CONTRACT_ADDRESS,
           input: '0x8612372a000000000000000000000000',
           blockNumber: BigInt(10000100),
+          blockHash: '0xblockhash123456789',
         });
       });
 
@@ -606,6 +617,7 @@ describe('MagnaTxnSync Task Tests', () => {
           to: TEST_MAGNA_CONTRACT_ADDRESS,
           input: '0x8612372a000000000000000000000000',
           blockNumber: BigInt(10000100),
+          blockHash: '0xblockhash123456789',
         });
       });
 
@@ -672,6 +684,7 @@ describe('MagnaTxnSync Task Tests', () => {
           to: TEST_MAGNA_CONTRACT_ADDRESS,
           input: '0x8612372a000000000000000000000000',
           blockNumber: BigInt(10000100),
+          blockHash: '0xblockhash123456789',
         });
       });
 
@@ -793,6 +806,7 @@ describe('MagnaTxnSync Task Tests', () => {
         to: TEST_MAGNA_CONTRACT_ADDRESS,
         input: '0x8612372a000000000000000000000000',
         blockNumber: BigInt(10000100),
+        blockHash: '0xblockhash123456789',
       });
 
       await magnaTxnSyncTask.fn();
@@ -947,6 +961,7 @@ describe('MagnaTxnSync Task Tests', () => {
         to: TEST_MAGNA_CONTRACT_ADDRESS,
         input: '0x8612372a000000000000000000000000',
         blockNumber: BigInt(10000100),
+        blockHash: '0xblockhash123456789',
       });
 
       await magnaTxnSyncTask.fn();
