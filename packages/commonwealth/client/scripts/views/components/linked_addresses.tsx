@@ -1,10 +1,13 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import './linked_addresses.scss';
 
 import { getChainIcon } from 'client/scripts/utils/chainUtils';
+import { notifyError } from 'controllers/app/notifications';
 import { formatAddressShort } from 'shared/utils';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { useGetClaimAddressQuery } from 'state/api/tokenAllocations';
+import useUserStore from 'state/ui/user';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import type AddressInfo from '../../models/AddressInfo';
 import type NewProfile from '../../models/NewProfile';
@@ -140,6 +143,14 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
   );
 
   const { profile, addresses, refreshProfiles } = props;
+  const user = useUserStore();
+  const { data: claimAddress } = useGetClaimAddressQuery({
+    enabled: user.isLoggedIn,
+  });
+  const normalizedClaimAddress = useMemo(
+    () => claimAddress?.address?.toLowerCase() ?? null,
+    [claimAddress?.address],
+  );
 
   const groupedAddresses = useMemo(() => {
     return addresses.reduce((acc: Record<string, AddressInfo[]>, addr) => {
@@ -149,44 +160,58 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
     }, {});
   }, [addresses]);
 
-  const rowData = Object.entries(groupedAddresses).map(
-    ([address, communities]) => {
-      const addressInfo = addresses.find((addr) => addr.address === address);
-      return {
-        address: addressInfo ? <Address addressInfo={addressInfo} /> : null,
-        communities: (
-          <div>
-            {communities.map((addr, index) => {
-              return (
+  const handleToggleRemoveModal = useCallback(
+    (
+      val: boolean,
+      selectedAddress: AddressInfo,
+      isBulkDelete: boolean,
+      community: string,
+    ) => {
+      if (
+        val &&
+        normalizedClaimAddress &&
+        selectedAddress?.address?.toLowerCase() === normalizedClaimAddress
+      ) {
+        notifyError(
+          'You cannot disconnect the address saved for claiming rewards.',
+        );
+        return;
+      }
+
+      setIsRemoveModalOpen(val);
+      setCurrentAddress(val ? selectedAddress : null);
+      setIsBulkDeleteState(val ? isBulkDelete : false);
+      setSelectedCommunity(val ? community : null);
+    },
+    [normalizedClaimAddress],
+  );
+
+  const rowData = useMemo(
+    () =>
+      Object.entries(groupedAddresses).map(([address, communities]) => {
+        const addressInfo = addresses.find((addr) => addr.address === address);
+        return {
+          address: addressInfo ? <Address addressInfo={addressInfo} /> : null,
+          communities: (
+            <div>
+              {communities.map((addr, index) => (
                 <AddressDetails
                   key={index}
                   profile={profile}
                   addressInfo={addr}
-                  toggleRemoveModal={(
-                    val: boolean,
-                    selectedAddress: AddressInfo,
-                    isBulkDelete: boolean = false,
-                    community,
-                  ) => {
-                    setIsRemoveModalOpen(val);
-                    setCurrentAddress(selectedAddress);
-                    setIsBulkDeleteState(isBulkDelete);
-                    setSelectedCommunity(community);
-                  }}
+                  toggleRemoveModal={handleToggleRemoveModal}
                 />
-              );
-            })}
-          </div>
-        ),
-      };
-    },
+              ))}
+            </div>
+          ),
+        };
+      }),
+    [addresses, groupedAddresses, handleToggleRemoveModal, profile],
   );
 
-  // Memoize CWTable to prevent unnecessary re-renders.
   const TableComponent = useMemo(() => {
     return <CWTable columnInfo={columnInfo} rowData={rowData} />;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addresses]);
+  }, [rowData]);
 
   return (
     <div>
