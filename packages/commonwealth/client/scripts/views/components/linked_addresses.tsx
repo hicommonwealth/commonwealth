@@ -147,10 +147,6 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
   const { data: claimAddress } = useGetClaimAddressQuery({
     enabled: user.isLoggedIn,
   });
-  const normalizedClaimAddress = useMemo(
-    () => claimAddress?.address?.toLowerCase() ?? null,
-    [claimAddress?.address],
-  );
 
   const groupedAddresses = useMemo(() => {
     return addresses.reduce((acc: Record<string, AddressInfo[]>, addr) => {
@@ -169,8 +165,9 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
     ) => {
       if (
         val &&
-        normalizedClaimAddress &&
-        selectedAddress?.address?.toLowerCase() === normalizedClaimAddress
+        claimAddress?.address &&
+        selectedAddress?.address?.toLowerCase() ===
+          claimAddress.address.toLowerCase()
       ) {
         notifyError(
           'You cannot disconnect the address saved for claiming rewards.',
@@ -183,7 +180,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
       setIsBulkDeleteState(val ? isBulkDelete : false);
       setSelectedCommunity(val ? community : null);
     },
-    [normalizedClaimAddress],
+    [claimAddress],
   );
 
   const rowData = useMemo(
