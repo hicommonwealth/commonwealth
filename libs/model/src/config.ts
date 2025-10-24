@@ -832,9 +832,9 @@ export const config = configure(
         TOKEN_ID: z.uuid(),
         TOKEN_ADDRESS: z.string().min(1),
         UNLOCK_SCHEDULE_ID: z.uuid(),
-        UNLOCK_START_AT: z.date(),
+        UNLOCK_START_AT: z.coerce.date(),
         INITIAL_PERCENTAGE: z.number().min(0.01).max(0.99),
-        CLIFF_DATE: z.date(),
+        CLIFF_DATE: z.coerce.date(),
         BATCH_SIZE: z.number(),
         CONTRACT_ADDRESS: z.string(),
       })
