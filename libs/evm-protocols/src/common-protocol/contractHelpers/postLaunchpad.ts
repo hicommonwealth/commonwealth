@@ -17,8 +17,9 @@ export const approveTokenTransfer = async (
     const allowance = await tokenContract.methods
       .allowance(walletAddress, spender)
       .call();
-    if (BigInt(allowance) < BigInt(amount)) {
-      await tokenContract.methods.approve(spender, amount).send({
+    const bigIntAmount = BigInt(Number(amount));
+    if (BigInt(allowance) < bigIntAmount) {
+      await tokenContract.methods.approve(spender, bigIntAmount).send({
         from: walletAddress,
       });
     }
@@ -70,7 +71,7 @@ export const launchPostToken = async (
         exchangeToken,
         initPurchaseAmount,
       )
-      .send({ from: walletAddress, value: 4.44e14 });
+      .send({ from: walletAddress, value: 1e15 });
     return txReceipt;
   } catch (error) {
     console.error('Error launching token:', error);
