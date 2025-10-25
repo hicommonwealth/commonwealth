@@ -1,8 +1,10 @@
-import { InvalidInput } from '@hicommonwealth/core';
 import { getPublicClient, ValidChains } from '@hicommonwealth/evm-protocols';
+import { ClaimTxStatus } from '@hicommonwealth/schemas';
 import { models } from '../database';
 
-export async function validateClaimTxnHash(txHash: `0x${string}`) {
+export async function validateClaimTxnHash(
+  txHash: `0x${string}`,
+): Promise<{ status: ClaimTxStatus; at: Date | null }> {
   const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
     where: {
       eth_chain_id: ValidChains.Base,
@@ -17,16 +19,16 @@ export async function validateClaimTxnHash(txHash: `0x${string}`) {
     eth_chain_id: ValidChains.Base,
   });
 
-  const txn = await client.getTransaction({
-    hash: txHash,
-  });
-  if (!txn || !txn.blockNumber) {
-    throw new InvalidInput('Transaction does not exist on-chain');
-  }
+  const [txn, receipt] = await Promise.all([
+    client.getTransaction({ hash: txHash }),
+    client.getTransactionReceipt({ hash: txHash }),
+  ]);
+  if (!txn || !receipt || !txn.blockNumber)
+    return { status: 'PENDING', at: null };
 
-  const block = await client.getBlock({
-    blockHash: txn.blockHash,
-  });
-
-  return new Date(1000 * Number(block.timestamp));
+  const block = await client.getBlock({ blockHash: txn.blockHash });
+  return {
+    status: receipt.status === 'reverted' ? 'FAILED' : 'CLAIMED',
+    at: new Date(1000 * Number(block.timestamp)),
+  };
 }

@@ -31,10 +31,12 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
             A.magna_claimed_at,
             A.magna_claim_tx_hash,
             A.magna_claim_tx_at,
+            A.magna_claim_tx_status,
             A.magna_claim_tx_finalized,
             A.magna_cliff_claimed_at,
             A.magna_cliff_claim_tx_hash,
             A.magna_cliff_claim_tx_at,
+            A.magna_cliff_claim_tx_status,
             A.magna_cliff_claim_tx_finalized,
             COALESCE(HA.token_allocation, 0)::numeric 
             + COALESCE(AA.token_allocation, 0)::numeric

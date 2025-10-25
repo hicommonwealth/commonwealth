@@ -1,3 +1,4 @@
+import { ClaimTxStatus } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { ModelInstance } from './types';
 
@@ -115,11 +116,13 @@ type ClaimAddress = {
   magna_claim_data: string | null;
   magna_claim_tx_hash: string | null;
   magna_claim_tx_at: Date | null;
+  magna_claim_tx_status: ClaimTxStatus | null;
   magna_claim_tx_finalized: boolean | null;
   magna_cliff_claimed_at: Date | null;
   magna_cliff_claim_data: string | null;
   magna_cliff_claim_tx_hash: string | null;
   magna_cliff_claim_tx_at: Date | null;
+  magna_cliff_claim_tx_status: ClaimTxStatus | null;
   magna_cliff_claim_tx_finalized: boolean | null;
   created_at: Date;
   updated_at: Date;
@@ -162,6 +165,10 @@ export const ClaimAddresses = (
         type: Sequelize.DATE,
         allowNull: true,
       },
+      magna_claim_tx_status: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       magna_claim_tx_finalized: {
         type: Sequelize.BOOLEAN,
         allowNull: true,
@@ -180,6 +187,10 @@ export const ClaimAddresses = (
       },
       magna_cliff_claim_tx_at: {
         type: Sequelize.DATE,
+        allowNull: true,
+      },
+      magna_cliff_claim_tx_status: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
       magna_cliff_claim_tx_finalized: {
