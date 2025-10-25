@@ -316,12 +316,10 @@ export async function signInUser({
 }) {
   let addressCount = 1;
   let transferredUser = false;
-  let address: AddressAttributes | undefined,
-    newAddress = false;
   let foundOrCreatedUser: UserAttributes | undefined;
   let newUser = false;
 
-  await models.sequelize.transaction(async (transaction) => {
+  const address = await models.sequelize.transaction(async (transaction) => {
     const userRes = await findOrCreateUser({
       address: payload.address,
       ssoInfo: verifiedSsoInfo,
@@ -373,7 +371,7 @@ export async function signInUser({
       verification_token_expires: verificationData.verification_token_expires,
       block_info: payload.block_info || null,
     };
-    await models.sequelize.query(
+    const [inserted] = await models.sequelize.query(
       `
     INSERT INTO "Addresses" (
       community_id,
@@ -410,21 +408,18 @@ export async function signInUser({
       NOW()
     )
     ON CONFLICT (community_id, address)
-    DO NOTHING;
+    DO NOTHING
+    RETURNING *;
   `,
       {
-        type: QueryTypes.SELECT,
         raw: true,
         replacements,
         transaction,
       },
     );
 
-    const [address] = await models.sequelize.query<AddressAttributes>(
-      `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-    SELECT * FROM "Addresses" WHERE community_id = :community_id AND address = :address;
-    `,
+    const [found] = await models.sequelize.query<AddressAttributes>(
+      `SELECT * FROM "Addresses" WHERE community_id = :community_id AND address = :address; `,
       {
         type: QueryTypes.SELECT,
         raw: true,
@@ -437,7 +432,7 @@ export async function signInUser({
     );
 
     // recover deleted users
-    if (address && !newAddress && address.user_id === null) {
+    if (found && !inserted && found.user_id === null) {
       await models.Address.update(
         {
           user_id: signedInUser?.id ?? foundOrCreatedUser.id!,
@@ -450,7 +445,7 @@ export async function signInUser({
           verified: new Date(),
         },
         {
-          where: { id: address.id, user_id: null },
+          where: { id: found.id, user_id: null },
           transaction,
         },
       );
@@ -460,8 +455,8 @@ export async function signInUser({
       newUser,
       user: signedInUser || foundOrCreatedUser,
       transferredUser,
-      address,
-      newAddress,
+      address: found,
+      newAddress: !!inserted,
       transaction,
       originalUserId: transferredUser ? foundOrCreatedUser.id : undefined,
       ethChainId,
@@ -473,6 +468,7 @@ export async function signInUser({
       },
       transaction,
     });
+    return { found, inserted };
   });
 
   if (!address || !foundOrCreatedUser)
@@ -481,8 +477,8 @@ export async function signInUser({
   return {
     user: signedInUser || foundOrCreatedUser,
     newUser,
-    address,
-    newAddress,
+    address: address.found,
+    newAddress: !!address.inserted,
     addressCount,
     transferredUser,
   };
