@@ -859,7 +859,12 @@ const ClaimCard = ({
       <div className="notice-section-content">
         <div className="banner">
           <CWText type="buttonSm" fontWeight="semiBold" isCentered>
-            {claimablePercentage}% tokens // {claimableTokens} {tokenSymbol}
+            {claimablePercentage}% tokens //&nbsp;
+            {`${claimableTokens}`.includes('.')
+              ? parseFloat(`${claimableTokens}`).toFixed(2)
+              : claimableTokens}
+            &nbsp;
+            {tokenSymbol}
           </CWText>
         </div>
         <div className="notice-section">{getCardBody()}</div>
