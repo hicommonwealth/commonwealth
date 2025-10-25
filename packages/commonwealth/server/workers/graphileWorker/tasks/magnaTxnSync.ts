@@ -21,7 +21,7 @@ interface ClaimAddressRecord {
 
 let currentBlockNumber: bigint = BigInt(0);
 
-async function isTxnFinal(
+export async function isTxnFinal(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client: ReturnType<typeof createPublicClient<any, any, any, any>>,
   txnBlockNumber: bigint,
@@ -32,11 +32,11 @@ async function isTxnFinal(
   }
 
   // check if txn is finalized
-  if (txnBlockNumber > currentBlockNumber + BigInt(500)) return true;
+  if (txnBlockNumber + BigInt(500) <= currentBlockNumber) return true;
   else {
     // if not, refresh the current block number and check again
     currentBlockNumber = await client.getBlockNumber();
-    if (txnBlockNumber > currentBlockNumber + BigInt(500)) return true;
+    if (txnBlockNumber + BigInt(500) <= currentBlockNumber) return true;
   }
   return false;
 }
