@@ -196,14 +196,19 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         initial.txHash ||
         null;
       const isClaimAvailable = !!claimAddress?.magna_synced_at;
-      const hasClaimed = !!(claimAddress?.magna_claimed_at && initialTxHash);
+      const hasClaimed = !!(
+        claimAddress?.magna_claimed_at &&
+        initialTxHash &&
+        claimAddress?.magna_claim_tx_finalized
+      );
       const isPendingBlockchainIndex = !!(
         claimAddress?.magna_claimed_at &&
         isClaimAvailable &&
         allocation?.magna_allocation_id &&
         allocation?.walletAddress &&
         allocation?.claimable === 0 &&
-        !initialTxHash
+        (!initialTxHash ||
+          (initialTxHash && !claimAddress?.magna_claim_tx_finalized))
       );
       const isReadyForClaimNow = !!(
         isClaimAvailable &&
@@ -242,7 +247,9 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         final.txHash ||
         null;
       const hasClaimed = !!(
-        claimAddress?.magna_cliff_claimed_at && finalTxHash
+        claimAddress?.magna_cliff_claimed_at &&
+        finalTxHash &&
+        claimAddress?.magna_cliff_claim_tx_finalized
       );
       const hasCliffDatePassed =
         allocation?.cliff_date &&
@@ -255,7 +262,8 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         allocation?.magna_allocation_id &&
         allocation?.walletAddress &&
         allocation?.claimable === 0 &&
-        !finalTxHash
+        (!finalTxHash ||
+          (finalTxHash && !claimAddress?.magna_cliff_claim_tx_finalized))
       );
       const isReadyForClaimNow = !!(
         isClaimAvailable &&

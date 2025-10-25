@@ -14,7 +14,9 @@ export function UpdateClaimCliffTransactionHash(): Command<
     body: async ({ payload, actor }) => {
       const { transaction_hash } = payload;
 
-      const txnAt = await validateClaimTxnHash(transaction_hash);
+      const txnAt = await validateClaimTxnHash(transaction_hash).catch(
+        () => null,
+      );
 
       const [, updated] = await models.sequelize.query(
         `
