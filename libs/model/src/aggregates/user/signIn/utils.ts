@@ -2,7 +2,7 @@ import { InvalidActor, logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
 import { BalanceSourceType, UserTierMap } from '@hicommonwealth/shared';
 import { User as PrivyUser } from '@privy-io/server-auth';
-import { Transaction } from 'sequelize';
+import { QueryTypes, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../../../config';
 import { models } from '../../../database';
@@ -363,25 +363,78 @@ export async function signInUser({
       transaction,
     });
 
-    [address, newAddress] = await models.Address.findOrCreate({
-      where: { community_id: payload.community_id, address: payload.address },
-      defaults: {
-        community_id: payload.community_id,
-        address: payload.address,
-        user_id: signedInUser?.id ?? foundOrCreatedUser.id!,
-        hex: payload.hex,
-        wallet_id: payload.wallet_id,
-        verification_token: verificationData.verification_token,
-        verification_token_expires: verificationData.verification_token_expires,
-        block_info: payload.block_info ?? null,
-        last_active: new Date(),
-        verified: new Date(),
-        role: 'member',
-        ghost_address: false,
-        is_banned: false,
+    const replacements = {
+      community_id: payload.community_id,
+      address: payload.address,
+      user_id: signedInUser?.id || foundOrCreatedUser.id!,
+      hex: payload.hex || null,
+      wallet_id: payload.wallet_id,
+      verification_token: verificationData.verification_token,
+      verification_token_expires: verificationData.verification_token_expires,
+      block_info: payload.block_info || null,
+    };
+    await models.sequelize.query(
+      `
+    INSERT INTO "Addresses" (
+      community_id,
+      address,
+      user_id,
+      hex,
+      wallet_id,
+      verification_token,
+      verification_token_expires,
+      block_info,
+      last_active,
+      verified,
+      role,
+      ghost_address,
+      is_banned,
+      created_at,
+      updated_at
+    )
+    VALUES (
+      :community_id, 
+      :address, 
+      :user_id, 
+      :hex, 
+      :wallet_id, 
+      :verification_token, 
+      :verification_token_expires, 
+      :block_info, 
+      NOW(), 
+      NOW(), 
+      'member', 
+      FALSE, 
+      FALSE, 
+      NOW(), 
+      NOW()
+    )
+    ON CONFLICT (community_id, address)
+    DO NOTHING;
+  `,
+      {
+        type: QueryTypes.SELECT,
+        raw: true,
+        replacements,
+        transaction,
       },
-      transaction,
-    });
+    );
+
+    const [address] = await models.sequelize.query<AddressAttributes>(
+      `
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+    SELECT * FROM "Addresses" WHERE community_id = :community_id AND address = :address;
+    `,
+      {
+        type: QueryTypes.SELECT,
+        raw: true,
+        replacements: {
+          community_id: payload.community_id,
+          address: payload.address,
+        },
+        transaction,
+      },
+    );
 
     // recover deleted users
     if (address && !newAddress && address.user_id === null) {
