@@ -38,7 +38,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const claimsEnabled = useFlag('claims');
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
-    useGetClaimAddressQuery({ enabled: user.isLoggedIn });
+    useGetClaimAddressQuery({ enabled: claimsEnabled && user.isLoggedIn });
   const { initial, final, getWalletProvider } = useCommonAirdrop({
     tokenSymbol: claimAddress?.token || 'C',
   });
