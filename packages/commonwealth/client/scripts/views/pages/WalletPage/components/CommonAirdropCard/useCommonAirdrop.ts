@@ -181,19 +181,44 @@ export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
   };
   const claimInitial = claimToken('initial');
   const claimFinal = claimToken('final');
-
+  const reCheckInitialStatus = () => {
+    return (
+      updateInitialClaimTxHash
+        // TODO: @Roger, sending nothing in payload, client may or maynot have tx hash
+        .mutateAsync()
+        .then(() => {
+          notifySuccess('Refresh queued!');
+          utils.tokenAllocation.invalidate().catch(console.error);
+        })
+        .catch(console.error)
+    );
+  };
+  const reCheckFinalStatus = () => {
+    return (
+      updateFinalClaimTxHash
+        // TODO: @Roger, sending nothing in payload, client may or maynot have tx hash
+        .mutateAsync()
+        .then(() => {
+          notifySuccess('Refresh queued!');
+          utils.tokenAllocation.invalidate().catch(console.error);
+        })
+        .catch(console.error)
+    );
+  };
   return {
     txData,
     getWalletProvider,
     initial: {
       claim: claimInitial,
       txHash: initialTxHash,
+      reCheckStatus: reCheckInitialStatus,
       isPending:
         claimInitialToken.isPending || updateInitialClaimTxHash.isPending,
     },
     final: {
       claim: claimFinal,
       txHash: finalTxHash,
+      reCheckStatus: reCheckFinalStatus,
       isPending: claimFinalToken.isPending || updateFinalClaimTxHash.isPending,
     },
   };

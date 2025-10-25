@@ -86,6 +86,10 @@ const ClaimCard = ({
   const claimTxData = commonAirdrop.txData;
   const claimState =
     mode === 'initial' ? commonAirdrop.initial : commonAirdrop.final;
+  const reCheckStatus =
+    mode === 'initial'
+      ? commonAirdrop.initial.reCheckStatus
+      : commonAirdrop.final.reCheckStatus;
   const [isAcknowledged, setIsAcknowledged] = useState<boolean>(false);
   const { mutate: updateClaimAddress, isPending: isUpdating } =
     useUpdateClaimAddressMutation();
@@ -482,6 +486,7 @@ const ClaimCard = ({
             'Your transaction failed on the blockchain. Please try again.',
         },
       };
+      const isPending = combinedTxStatus === 'PENDING';
       const isFailed = combinedTxStatus === 'FAILED';
       const copy = copies[combinedTxStatus] ?? copies.PENDING;
       return (
@@ -513,6 +518,17 @@ const ClaimCard = ({
                   buttonType="secondary"
                   iconRight="externalLink"
                   aria-label="View transaction on BaseScan"
+                />
+              )}
+              {isPending && (
+                <CWButton
+                  label="Recheck Status"
+                  onClick={() => {
+                    reCheckStatus().catch(console.error);
+                  }}
+                  buttonType="secondary"
+                  iconRight="arrowClockwise"
+                  aria-label="Recheck status"
                 />
               )}
               {isFailed && (
