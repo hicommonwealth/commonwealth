@@ -17,6 +17,12 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
         z.infer<typeof schemas.ClaimAddressView>
       >(
         `
+          WITH nft_data AS (
+            SELECT user_id, SUM(total_token_allocation) as total_token_allocation
+            FROM "NftSnapshot"
+            WHERE user_id IS NOT NULL
+            GROUP BY user_id
+          )
           SELECT
             A.user_id,
             A.address,
@@ -37,7 +43,7 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
             "ClaimAddresses" A
             LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
             LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
-            LEFT JOIN "NftSnapshot" NA ON A.user_id = NA.user_id
+            LEFT JOIN nft_data NA ON A.user_id = NA.user_id
           WHERE
             A.user_id = :user_id
           LIMIT 1;
