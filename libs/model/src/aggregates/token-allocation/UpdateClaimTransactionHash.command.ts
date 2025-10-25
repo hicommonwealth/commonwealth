@@ -13,15 +13,14 @@ export function UpdateClaimTransactionHash(): Command<
     secure: true,
     body: async ({ payload, actor }) => {
       const { transaction_hash } = payload;
-
-      const txnAt = await validateClaimTxnHash(transaction_hash);
-
-      const [, updated] = await models.sequelize.query(
+      const { status, at } = await validateClaimTxnHash(transaction_hash);
+      await models.sequelize.query(
         `
           UPDATE "ClaimAddresses"
           SET 
             magna_claim_tx_hash = :transaction_hash,
-            magna_claim_tx_at = :transaction_at
+            magna_claim_tx_at = :transaction_at,
+            magna_claim_tx_status = :transaction_status
           WHERE
             user_id = :user_id
             AND magna_claimed_at IS NOT NULL
@@ -33,12 +32,12 @@ export function UpdateClaimTransactionHash(): Command<
           replacements: {
             user_id: actor.user.id,
             transaction_hash,
-            transaction_at: txnAt,
+            transaction_at: at,
+            transaction_status: status,
           },
         },
       );
-
-      return updated > 0;
+      return { status, at };
     },
   };
 }

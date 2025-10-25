@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ClaimTxStatus } from '../queries/token-allocation.schemas';
 import { EVM_ADDRESS_STRICT, EVM_TRANSACTION_HASH } from '../utils';
 
 export const UpdateClaimAddress = {
@@ -27,5 +28,8 @@ export const UpdateClaimTransactionHash = {
   input: z.object({
     transaction_hash: EVM_TRANSACTION_HASH,
   }),
-  output: z.boolean(),
+  output: z.object({
+    status: z.enum(ClaimTxStatus),
+    at: z.date().or(z.string()).nullish(),
+  }),
 };

@@ -12,6 +12,9 @@ export const AllocationStatus = [
   'PENDING_FUNDING',
 ] as const;
 
+export const ClaimTxStatus = ['PENDING', 'CLAIMED', 'FAILED'] as const;
+export type ClaimTxStatus = (typeof ClaimTxStatus)[number];
+
 export const ClaimAddressView = z.object({
   user_id: PG_INT,
   address: EVM_ADDRESS_STRICT.nullish(),
@@ -39,6 +42,7 @@ export const ClaimAddressView = z.object({
     .or(z.string())
     .nullish()
     .describe('When the transaction was signed by the user.'),
+  magna_claim_tx_status: z.enum(ClaimTxStatus).nullish(),
   magna_claim_tx_finalized: z.boolean().nullish(),
   magna_cliff_claimed_at: z
     .date()
@@ -51,6 +55,7 @@ export const ClaimAddressView = z.object({
     .or(z.string())
     .nullish()
     .describe('When the cliff transaction was signed by the user.'),
+  magna_cliff_claim_tx_status: z.enum(ClaimTxStatus).nullish(),
   magna_cliff_claim_tx_finalized: z.boolean().nullish(),
 });
 
