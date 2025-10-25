@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@knocklabs/node':
-      specifier: ^0.6.13
-      version: 0.6.13
+      specifier: ^1.2.0
+      version: 1.20.0
     zod:
       specifier: ^4.1.1
       version: 4.1.1
@@ -58,7 +58,7 @@ importers:
         version: 0.1.3(source-map-support@0.5.21)(ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.12))(@types/node@20.12.10)(typescript@5.8.2))
       '@knocklabs/node':
         specifier: 'catalog:'
-        version: 0.6.13
+        version: 1.20.0
       '@openfeature/web-sdk':
         specifier: ^1.0.2
         version: 1.0.3(@openfeature/core@1.1.0)
@@ -325,7 +325,7 @@ importers:
         version: link:../shared
       '@knocklabs/node':
         specifier: 'catalog:'
-        version: 0.6.13
+        version: 1.20.0
       '@trpc/server':
         specifier: ^11.3.0
         version: 11.3.1(typescript@5.8.2)
@@ -599,7 +599,7 @@ importers:
         version: link:../shared
       '@knocklabs/node':
         specifier: 'catalog:'
-        version: 0.6.13
+        version: 1.20.0
       '@magic-sdk/admin':
         specifier: ^2.4.1
         version: 2.4.1(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
@@ -919,7 +919,7 @@ importers:
         version: 0.10.16(react@18.3.1)
       '@knocklabs/node':
         specifier: 'catalog:'
-        version: 0.6.13
+        version: 1.20.0
       '@knocklabs/react':
         specifier: ^0.2.32
         version: 0.2.32(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -5602,9 +5602,8 @@ packages:
   '@knocklabs/client@0.8.21':
     resolution: {integrity: sha512-uPaUAwbg9Bi0UIPIYOE4v4GiasKezZNQ/ge9KST2wlSHAfpKWrHf7s85H4mD7IGkVc0xkokF4RZ4lqr7cy48wg==}
 
-  '@knocklabs/node@0.6.13':
-    resolution: {integrity: sha512-XA6HWxIvLiCpRt5GisTFYDZuTuyrRR34XnFwPFPXPNTO1cKQOHLkQvyy7FzAOTD6/PVj1DM2Ge9HHij+Z64Rtg==}
-    engines: {node: '>=17.5.0'}
+  '@knocklabs/node@1.20.0':
+    resolution: {integrity: sha512-nmj6xhyUU6/EmgS9s0kNQv37WDo9X0Lx6lkfNgG7tHqVF+M3zFu/9tX8zvhlfQw0PqNl2gIzgtpbmg1JglFgGw==}
 
   '@knocklabs/react-core@0.2.28':
     resolution: {integrity: sha512-8nBJxXyNGwEFvwzBt0c70MzGhjXqNAL/KLGuh3WMHj37I2HUgDyzyLrLbQ7wqfZs/ku2qs99S5QhBukJmlIq9g==}
@@ -10223,6 +10222,7 @@ packages:
 
   '@walletconnect/ethereum-provider@2.21.3':
     resolution: {integrity: sha512-8LY7dpp994ZZc86/iIzOrNPhzuO1TdvNPDGnmCqY17XhR9aqhsrope/WupjpygeBCidBd8mlqx/hG8Rim6vsnQ==}
+    deprecated: 'Reliability and performance improvements. See: https://github.com/WalletConnect/walletconnect-monorepo/releases'
 
   '@walletconnect/events@1.0.1':
     resolution: {integrity: sha512-NPTqaoi0oPBVNuLv7qPaJazmGHs5JGyO8eEAk5VGKmJzDR7AHzD4k6ilox5kxk1iwiOnFopBOOMLs86Oa76HpQ==}
@@ -15175,6 +15175,9 @@ packages:
 
   jose@5.3.0:
     resolution: {integrity: sha512-IChe9AtAE79ru084ow8jzkN2lNrG3Ntfiv65Cvj9uOCE2m5LNsdHG+9EbxWxAoWRF9TgDOqLN5jm08++owDVRg==}
+
+  jose@6.1.0:
+    resolution: {integrity: sha512-TTQJyoEoKcC1lscpVDCSsVgYzUDg/0Bt3WE//WiTPK6uOCQC2KZS4MpugbMWt/zyjkopgZoXhZuCi00gLudfUA==}
 
   jotai@1.4.0:
     resolution: {integrity: sha512-CUB+A3N+WjtimZvtDnMXvVRognzKh86KB3rKnQlbRvpnmGYU+O9aOZMWSgTaxstXc4Y5GYy02LBEjiv4Rs8MAg==}
@@ -21726,8 +21729,8 @@ snapshots:
       '@aws-crypto/sha1-browser': 3.0.0
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.577.0
-      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/core': 3.576.0
       '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-bucket-endpoint': 3.577.0
@@ -21784,11 +21787,11 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sso-oidc@3.577.0':
+  '@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0)':
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/core': 3.576.0
       '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-host-header': 3.577.0
@@ -21827,6 +21830,7 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.8.1
     transitivePeerDependencies:
+      - '@aws-sdk/client-sts'
       - aws-crt
 
   '@aws-sdk/client-sso@3.577.0':
@@ -21872,11 +21876,11 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sts@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
+  '@aws-sdk/client-sts@3.577.0':
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.577.0
+      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/core': 3.576.0
       '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-host-header': 3.577.0
@@ -21915,7 +21919,6 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.8.1
     transitivePeerDependencies:
-      - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
   '@aws-sdk/core@3.576.0':
@@ -21949,7 +21952,7 @@ snapshots:
 
   '@aws-sdk/credential-provider-ini@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/credential-provider-env': 3.577.0
       '@aws-sdk/credential-provider-process': 3.577.0
       '@aws-sdk/credential-provider-sso': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
@@ -22006,7 +22009,7 @@ snapshots:
 
   '@aws-sdk/credential-provider-web-identity@3.577.0(@aws-sdk/client-sts@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
+      '@aws-sdk/client-sts': 3.577.0
       '@aws-sdk/types': 3.577.0
       '@smithy/property-provider': 3.0.0
       '@smithy/types': 3.0.0
@@ -22144,7 +22147,7 @@ snapshots:
 
   '@aws-sdk/token-providers@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sso-oidc': 3.577.0
+      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/types': 3.577.0
       '@smithy/property-provider': 3.0.0
       '@smithy/shared-ini-file-loader': 3.0.0
@@ -28663,9 +28666,9 @@ snapshots:
       - debug
       - react
 
-  '@knocklabs/node@0.6.13':
+  '@knocklabs/node@1.20.0':
     dependencies:
-      jose: 5.3.0
+      jose: 6.1.0
 
   '@knocklabs/react-core@0.2.28(react@18.3.1)':
     dependencies:
@@ -44003,6 +44006,8 @@ snapshots:
 
   jose@5.3.0: {}
 
+  jose@6.1.0: {}
+
   jotai@1.4.0(@babel/core@7.27.4)(@babel/template@7.27.2)(@urql/core@5.1.1(graphql@16.9.0))(immer@9.0.21)(react@18.3.1)(valtio@1.13.2(@types/react@18.3.3)(react@18.3.1))(wonka@6.3.5):
     dependencies:
       react: 18.3.1
@@ -51275,7 +51280,7 @@ snapshots:
       '@scure/bip32': 1.6.2
       '@scure/bip39': 1.5.4
       abitype: 1.0.8(typescript@5.8.2)(zod@4.1.1)
-      isows: 1.0.6(ws@8.18.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+      isows: 1.0.6(ws@8.18.2(bufferutil@4.0.8)(utf-8-validate@6.0.3))
       ox: 0.6.9(typescript@5.8.2)(zod@4.1.1)
       ws: 8.18.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
     optionalDependencies:
