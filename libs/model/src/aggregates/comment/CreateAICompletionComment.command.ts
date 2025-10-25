@@ -39,10 +39,11 @@ export function CreateAICompletionComment(): Command<
       }
 
       // Get the bot user with address
-      const { user: botUser, address: botUserAddress } = await getBotUser();
-      if (!botUser) {
+      const botUserData = await getBotUser();
+      if (!botUserData) {
         throw new InvalidState(CreateAICompletionCommentErrors.BotUserNotFound);
       }
+      const { user: botUser, address: botUserAddress } = botUserData;
 
       // Find the bot user's address in the specific community
       let botAddress = await models.Address.findOne({
@@ -141,9 +142,9 @@ export function CreateAICompletionComment(): Command<
         context: mockContext,
       });
 
-      // Mark the token as used after successful comment creation
+      // Mark the token as used and store the comment_id after successful comment creation
       await models.AICompletionToken.update(
-        { used_at: new Date() },
+        { used_at: new Date(), comment_id: result.id },
         { where: { id: completionToken.id } },
       );
 

@@ -1,4 +1,4 @@
-import { type Command, stats } from '@hicommonwealth/core';
+import { stats, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authComment } from '../../middleware';
@@ -7,7 +7,9 @@ import { mustBeAuthorizedComment } from '../../middleware/guards';
 export function DeleteComment(): Command<typeof schemas.DeleteComment> {
   return {
     ...schemas.DeleteComment,
-    auth: [authComment({ author: true, roles: ['admin', 'moderator'] })],
+    auth: [
+      authComment({ author: true, roles: ['admin', 'moderator', 'member'] }),
+    ],
     body: async ({ actor, context }) => {
       const { comment, community_id } = mustBeAuthorizedComment(actor, context);
 
