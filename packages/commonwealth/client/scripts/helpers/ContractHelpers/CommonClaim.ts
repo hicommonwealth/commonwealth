@@ -49,7 +49,7 @@ class CommonClaim extends ContractBase {
       const maxPriorityFeePerGas = this.web3.utils.toWei('2', 'gwei');
 
       const block = await this.web3.eth.getBlock('pending');
-      const baseFee = block.baseFeePerGas?.toString() ?? '0';
+      const baseFee = block?.baseFeePerGas?.toString() ?? '0';
 
       const maxFeePerGas = (
         BigInt(baseFee) + BigInt(maxPriorityFeePerGas)

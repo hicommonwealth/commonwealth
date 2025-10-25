@@ -113,23 +113,36 @@ const ClaimCard = ({
   // Countdown timer effect - updates every second
   useEffect(() => {
     const updateCountdown = () => {
-      // Get current time in ET (approximating with UTC-5 for EST)
-      const nowET = moment().utcOffset(-5, true); // ET timezone
+      // Get current time in user's local browser timezone
+      const nowLocal = moment();
+
+      // Get current ET offset (handles DST automatically)
+      // Create a date in ET timezone using native APIs
+      const nowDate = new Date();
+      const etString = nowDate.toLocaleString('en-US', {
+        timeZone: 'America/New_York',
+      });
+      const etDate = new Date(etString);
+
+      // Calculate the offset between ET and UTC
+      const etOffset = (etDate.getTime() - nowDate.getTime()) / 60000; // in minutes
+
+      // Get current time in ET
+      const nowET = moment().utcOffset(etOffset);
+      const todayET = nowET.clone().startOf('day');
 
       // Batch processing times in ET: 2am, 8am, 2pm, 8pm
       const batchHours = [2, 8, 14, 20];
 
-      // Find next batch times
       let nextBatchTime: moment.Moment | null = null;
-      const today = nowET.clone().startOf('day');
 
-      // Check today's batch times
+      // Check today's batch times in ET
       for (const hour of batchHours) {
-        const batchTime = today.clone().hour(hour).minute(0).second(0);
-        if (batchTime.isAfter(nowET)) {
-          const hoursUntil = batchTime.diff(nowET, 'hours', true);
+        const batchTimeET = todayET.clone().hour(hour).minute(0).second(0);
+        if (batchTimeET.isAfter(nowET)) {
+          const hoursUntil = batchTimeET.diff(nowET, 'hours', true);
           if (hoursUntil <= 6) {
-            nextBatchTime = batchTime;
+            nextBatchTime = batchTimeET;
             break;
           }
         }
@@ -137,7 +150,7 @@ const ClaimCard = ({
 
       // If no suitable time today, check tomorrow's first batch time
       if (!nextBatchTime) {
-        nextBatchTime = today
+        nextBatchTime = todayET
           .clone()
           .add(1, 'day')
           .hour(batchHours[0])
@@ -145,7 +158,8 @@ const ClaimCard = ({
           .second(0);
       }
 
-      const duration = moment.duration(nextBatchTime.diff(nowET));
+      // Calculate duration between local time and ET batch time
+      const duration = moment.duration(nextBatchTime.diff(nowLocal));
       const hours = Math.floor(duration.asHours());
       const minutes = duration.minutes();
       const seconds = duration.seconds();
@@ -175,11 +189,22 @@ const ClaimCard = ({
     }
 
     const updateLaunchCountdown = () => {
-      const nowET = moment().utcOffset(-5, true); // Current time in ET
-      const launchDateET = shouldWaitTillDate.clone().utcOffset(-5, true); // Convert to ET
+      // Get current time in user's local browser timezone
+      const nowLocal = moment();
 
-      if (launchDateET.isAfter(nowET)) {
-        const duration = moment.duration(launchDateET.diff(nowET));
+      // Get current ET offset (handles DST automatically)
+      const nowDate = new Date();
+      const etString = nowDate.toLocaleString('en-US', {
+        timeZone: 'America/New_York',
+      });
+      const etDate = new Date(etString);
+      const etOffset = (etDate.getTime() - nowDate.getTime()) / 60000;
+
+      // Convert launch date to ET
+      const launchDateET = shouldWaitTillDate.clone().utcOffset(etOffset);
+
+      if (launchDateET.isAfter(nowLocal)) {
+        const duration = moment.duration(launchDateET.diff(nowLocal));
         const days = Math.floor(duration.asDays());
         const hours = duration.hours();
         const minutes = duration.minutes();
@@ -225,11 +250,14 @@ const ClaimCard = ({
     }
 
     const updateUnlockCountdown = () => {
-      const unlockTime = moment(allocationUnlocksAt);
-      const now = moment();
+      // Get current time in user's local browser timezone
+      const nowLocal = moment();
 
-      if (unlockTime.isAfter(now)) {
-        const duration = moment.duration(unlockTime.diff(now));
+      // Parse the unlock time (assumed to be in ET timezone)
+      const unlockTime = moment(allocationUnlocksAt);
+
+      if (unlockTime.isAfter(nowLocal)) {
+        const duration = moment.duration(unlockTime.diff(nowLocal));
         const days = Math.floor(duration.asDays());
         const hours = duration.hours();
         const minutes = duration.minutes();
@@ -270,9 +298,23 @@ const ClaimCard = ({
   // Sync countdown timer effect - updates every second
   useEffect(() => {
     const updateSyncCountdown = () => {
-      const now = moment();
-      const nextHour = now.clone().add(1, 'hour').startOf('hour');
-      const duration = moment.duration(nextHour.diff(now));
+      // Get current time in user's local browser timezone
+      const nowLocal = moment();
+
+      // Get current ET offset (handles DST automatically)
+      const nowDate = new Date();
+      const etString = nowDate.toLocaleString('en-US', {
+        timeZone: 'America/New_York',
+      });
+      const etDate = new Date(etString);
+      const etOffset = (etDate.getTime() - nowDate.getTime()) / 60000;
+
+      // Get current time in ET
+      const nowET = moment().utcOffset(etOffset);
+      const nextHourET = nowET.clone().add(1, 'hour').startOf('hour');
+
+      // Calculate duration from local time to next hour in ET
+      const duration = moment.duration(nextHourET.diff(nowLocal));
       const minutes = duration.minutes();
       const seconds = duration.seconds();
 
