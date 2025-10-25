@@ -26,7 +26,7 @@ interface ClaimCardProps {
   hasClaimed: boolean;
   cardNumber: number;
   isClaimAvailable: boolean;
-  isPendingBlockchainIndex: boolean;
+  txStatus?: 'PENDING' | 'CLAIMED' | 'FAILED';
   isPendingClaimFunds: boolean;
   isReadyForClaimNow: boolean;
   isReadyForClaimAfterUnlock: boolean;
@@ -51,7 +51,7 @@ const ClaimCard = ({
   hasClaimed,
   cardNumber,
   isClaimAvailable,
-  isPendingBlockchainIndex,
+  txStatus,
   isPendingClaimFunds,
   isReadyForClaimNow,
   isReadyForClaimAfterUnlock,
@@ -81,6 +81,7 @@ const ClaimCard = ({
   const [launchCountdown, setLaunchCountdown] = useState<string>('00:00:00');
   const [unlockCountdown, setUnlockCountdown] = useState<string>('00:00:00');
   const [syncCountdown, setSyncCountdown] = useState<string>('00:00:00');
+  const [isRetryingFailedTx, setIsRetryingFailedTx] = useState(false);
   const commonAirdrop = useCommonAirdrop({ tokenSymbol });
   const claimTxData = commonAirdrop.txData;
   const claimState =
@@ -90,6 +91,8 @@ const ClaimCard = ({
     useUpdateClaimAddressMutation();
   const ethClaimAmount =
     claimTxData?.requiredEth || (mode === 'initial' ? 0.0003 : 0.0001);
+
+  const combinedTxStatus = commonAirdrop.txData?.status || txStatus;
 
   useEffect(() => {
     const addresses = new Map<string, AddressInfo>();
@@ -460,7 +463,27 @@ const ClaimCard = ({
       </div>
     );
 
-    if (isPendingBlockchainIndex) {
+    if (
+      combinedTxStatus &&
+      combinedTxStatus !== 'CLAIMED' &&
+      !isRetryingFailedTx
+    ) {
+      const copies = {
+        PENDING: {
+          title: txHash
+            ? 'Pending Block Confirmation'
+            : 'Pending Blockchain Index',
+          description:
+            'Our systems are indexing the blockchain to confirm your transaction.',
+        },
+        FAILED: {
+          title: 'Transaction Failed',
+          description:
+            'Your transaction failed on the blockchain. Please try again.',
+        },
+      };
+      const isFailed = combinedTxStatus === 'FAILED';
+      const copy = copies[combinedTxStatus] ?? copies.PENDING;
       return (
         <div className="notice-text">
           <div className="countdown-container countdown-in-progress">
@@ -470,12 +493,37 @@ const ClaimCard = ({
                 fontWeight="semiBold"
                 className="countdown-title"
               >
-                Pending Blockchain Index
+                {copy.title}
               </CWText>
               <CWText className="countdown-description">
-                Our systems are indexing the blockchain to confirm your
-                transaction.
+                {copy.description}
               </CWText>
+            </div>
+            <div className="countdown-right">
+              {txHash && (
+                <CWButton
+                  label="View Transaction"
+                  onClick={() =>
+                    window.open(
+                      `https://basescan.org/tx/${txHash}`,
+                      '_blank',
+                      'noopener,noreferrer',
+                    )
+                  }
+                  buttonType="secondary"
+                  iconRight="externalLink"
+                  aria-label="View transaction on BaseScan"
+                />
+              )}
+              {isFailed && (
+                <CWButton
+                  label="Retry Transaction"
+                  onClick={() => setIsRetryingFailedTx(true)}
+                  buttonType="secondary"
+                  iconRight="arrowClockwise"
+                  aria-label="Retry transaction"
+                />
+              )}
             </div>
           </div>
         </div>
@@ -506,7 +554,7 @@ const ClaimCard = ({
         </div>
       );
 
-      if (isReadyForClaimNow) {
+      if (isReadyForClaimNow || isRetryingFailedTx) {
         return (
           <div className="notice-text">
             {isPendingClaimFunds ? (
@@ -555,7 +603,8 @@ const ClaimCard = ({
                             allocation_id: allocationId,
                             claimAddress: allocatedToAddress,
                           })
-                          .catch(console.error);
+                          .catch(console.error)
+                          .finally(() => setIsRetryingFailedTx(false));
                       }
                     }}
                     disabled={

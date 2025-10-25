@@ -196,15 +196,21 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         initial.txHash ||
         null;
       const isClaimAvailable = !!claimAddress?.magna_synced_at;
-      const hasClaimed = !!(claimAddress?.magna_claimed_at && initialTxHash);
-      const isPendingBlockchainIndex = !!(
+      const hasClaimed = !!(
         claimAddress?.magna_claimed_at &&
+        initialTxHash &&
+        claimAddress?.magna_claim_tx_status === 'CLAIMED'
+      );
+      const txStatus =
+        claimAddress?.magna_claim_tx_status ||
+        (claimAddress?.magna_claimed_at &&
         isClaimAvailable &&
         allocation?.magna_allocation_id &&
         allocation?.walletAddress &&
         allocation?.claimable === 0 &&
         !initialTxHash
-      );
+          ? 'PENDING'
+          : undefined);
       const isReadyForClaimNow = !!(
         isClaimAvailable &&
         allocation?.magna_allocation_id &&
@@ -227,7 +233,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         hasClaimed,
         isClaimAvailable,
         isReadyForClaimNow,
-        isPendingBlockchainIndex,
+        txStatus,
         isReadyForClaimAfterUnlock,
         shouldWaitTillDate,
       };
@@ -242,21 +248,25 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         final.txHash ||
         null;
       const hasClaimed = !!(
-        claimAddress?.magna_cliff_claimed_at && finalTxHash
+        claimAddress?.magna_cliff_claimed_at &&
+        finalTxHash &&
+        claimAddress?.magna_cliff_claim_tx_status === 'CLAIMED'
       );
       const hasCliffDatePassed =
         allocation?.cliff_date &&
         moment(allocation?.cliff_date).isBefore(moment());
       const isClaimAvailable =
         !!claimAddress?.magna_synced_at && !isPendingClaimFunds;
-      const isPendingBlockchainIndex = !!(
-        claimAddress?.magna_cliff_claimed_at &&
+      const txStatus =
+        claimAddress?.magna_cliff_claim_tx_status ||
+        (claimAddress?.magna_cliff_claimed_at &&
         isClaimAvailable &&
         allocation?.magna_allocation_id &&
         allocation?.walletAddress &&
         allocation?.claimable === 0 &&
         !finalTxHash
-      );
+          ? 'PENDING'
+          : undefined);
       const isReadyForClaimNow = !!(
         isClaimAvailable &&
         allocation?.magna_allocation_id &&
@@ -276,7 +286,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         hasClaimed,
         isClaimAvailable,
         isReadyForClaimNow,
-        isPendingBlockchainIndex,
+        txStatus,
         isReadyForClaimAfterUnlock,
         shouldWaitTillDate: undefined,
       };
@@ -375,9 +385,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   cardNumber={1}
                   hasClaimed={claimSteps.initial.hasClaimed}
                   isClaimAvailable={claimSteps.initial.isClaimAvailable}
-                  isPendingBlockchainIndex={
-                    claimSteps.initial.isPendingBlockchainIndex
-                  }
+                  txStatus={claimSteps.initial.txStatus}
                   isPendingClaimFunds={isPendingClaimFunds}
                   isReadyForClaimNow={claimSteps.initial.isReadyForClaimNow}
                   isReadyForClaimAfterUnlock={
@@ -403,9 +411,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   cardNumber={2}
                   hasClaimed={claimSteps.final.hasClaimed}
                   isClaimAvailable={claimSteps.final.isClaimAvailable}
-                  isPendingBlockchainIndex={
-                    claimSteps.final.isPendingBlockchainIndex
-                  }
+                  txStatus={claimSteps.final.txStatus}
                   isPendingClaimFunds={isPendingClaimFunds}
                   isReadyForClaimNow={claimSteps.final.isReadyForClaimNow}
                   isReadyForClaimAfterUnlock={
@@ -433,9 +439,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 cardNumber={1}
                 hasClaimed={claimSteps.initial.hasClaimed}
                 isClaimAvailable={claimSteps.initial.isClaimAvailable}
-                isPendingBlockchainIndex={
-                  claimSteps.initial.isPendingBlockchainIndex
-                }
+                txStatus={claimSteps.initial.txStatus}
                 isPendingClaimFunds={isPendingClaimFunds}
                 isReadyForClaimNow={claimSteps.initial.isReadyForClaimNow}
                 isReadyForClaimAfterUnlock={

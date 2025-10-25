@@ -13,6 +13,7 @@ type CommonAirdropData = {
   txData?: {
     to: string;
     data: string;
+    status?: 'PENDING' | 'CLAIMED' | 'FAILED';
     requiredEth?: string | number;
   };
   initialTxHash: `0x${string}` | null;
@@ -88,6 +89,7 @@ export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
     return async (
       input: Parameters<typeof claimFunction>[0] & { claimAddress: string },
     ) => {
+      let _data = {};
       try {
         userStore.setState({
           addressSelectorSelectedAddress: input.claimAddress,
@@ -95,13 +97,13 @@ export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
         const data = await claimFunction({
           allocation_id: input.allocation_id,
         });
-        setData({
+        _data = {
           txData: {
             to: data.to,
             data: data.data,
           },
-        });
-
+        };
+        setData(_data);
         let txHash = data.transaction_hash;
         // sign and persist transaction hash the first time
         if (!txHash) {
@@ -120,13 +122,14 @@ export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
             data.data,
             type === 'initial',
             (requiredEth: string | number) => {
-              setData({
+              _data = {
                 txData: {
                   to: data.to,
                   data: data.data,
                   requiredEth,
                 },
-              });
+              };
+              setData(_data);
             },
             isMagicAddress ? provider : undefined,
           );
@@ -134,15 +137,27 @@ export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
         // at this point the claim transaction is signed!
         // update the UI
         if (txHash) {
-          setData({
+          _data = {
+            ..._data,
             [type === 'initial' ? 'initialTxHash' : 'finalTxHash']: txHash,
-          });
+          };
+          setData(_data);
 
           await new Promise((r) => setTimeout(r, 5000)); // wait 5 sec for the block to propagate
 
-          await txHashUpdateFunction({
+          const txHashUpdateResult = await txHashUpdateFunction({
             transaction_hash: txHash,
           });
+          if (txHashUpdateResult.status) {
+            _data = {
+              ..._data,
+              txData: {
+                ...((_data as unknown as CommonAirdropData)?.txData || {}),
+                status: txHashUpdateResult.status,
+              },
+            };
+            setData(_data);
+          }
         }
         notifySuccess('Token claimed successfully');
       } catch (error) {

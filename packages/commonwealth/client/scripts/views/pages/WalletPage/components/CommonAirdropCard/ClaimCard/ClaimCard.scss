@@ -120,6 +120,12 @@
     gap: 4px;
   }
 
+  .countdown-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
   .countdown-title {
     font-size: 18px;
     color: colors.$neutral-900;
