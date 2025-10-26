@@ -89,7 +89,7 @@ describe('MagnaSync Lifecycle', () => {
     });
     updates.forEach((update) => {
       expect(update.magna_allocation_id).toBe(
-        `${config.MAGNA.EVENT}-${update.address}`,
+        `${config.MAGNA.EVENT}-${update.user_id}`,
       );
     });
   });
