@@ -1,13 +1,17 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import MagicWebWalletController from 'controllers/app/webWallets/MagicWebWallet';
 import CommonClaim from 'helpers/ContractHelpers/CommonClaim';
+import { useEffect } from 'react';
 import { fetchNodes } from 'state/api/nodes/fetchNodes';
 import { userStore } from 'state/ui/user';
 import { createBoundedUseStore } from 'state/ui/utils';
 import { trpc } from 'utils/trpcClient';
+import { createPublicClient, http } from 'viem';
+import { base } from 'viem/chains';
 import { BASE_ID } from 'views/components/CommunityInformationForm/constants';
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
+import { getWithdrawTransactionsForAddress } from './util';
 
 type CommonAirdropData = {
   txData?: {
@@ -38,7 +42,19 @@ export const commonAirdropStore = createStore<CommonAirdropState>()(
 
 const useCommonAirdropStore = createBoundedUseStore(commonAirdropStore);
 
-export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
+export const useCommonAirdrop = ({
+  tokenSymbol,
+  userClaimAddress,
+  magnaContractAddress,
+  shouldCheckInitialTransactionStatus = false,
+  shouldCheckFinalTransactionStatus = false,
+}: {
+  tokenSymbol?: string;
+  userClaimAddress?: string;
+  magnaContractAddress?: string;
+  shouldCheckInitialTransactionStatus?: boolean;
+  shouldCheckFinalTransactionStatus?: boolean;
+}) => {
   const utils = trpc.useUtils();
 
   const { txData, initialTxHash, finalTxHash, setData } =
@@ -142,7 +158,7 @@ export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
 
           await txHashUpdateFunction({
             transaction_hash: txHash,
-          });
+          }).catch(console.error); // this shouldn't throw errors
         }
         notifySuccess('Token claimed successfully');
       } catch (error) {
@@ -153,11 +169,7 @@ export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
         }
         throw error; // let caller handle if needed
       } finally {
-        // invalidate related queries
-        utils.tokenAllocation.getClaimAddress.invalidate().catch(console.error);
-        utils.tokenAllocation.getAllocation
-          .invalidate({ magna_allocation_id: input.allocation_id })
-          .catch(console.error);
+        utils.tokenAllocation.invalidate().catch(console.error);
         userStore.setState({
           addressSelectorSelectedAddress: undefined,
         });
@@ -166,6 +178,63 @@ export const useCommonAirdrop = ({ tokenSymbol }: { tokenSymbol?: string }) => {
   };
   const claimInitial = claimToken('initial');
   const claimFinal = claimToken('final');
+
+  useEffect(() => {
+    if (
+      (!shouldCheckInitialTransactionStatus &&
+        !shouldCheckFinalTransactionStatus) ||
+      !userClaimAddress ||
+      !magnaContractAddress
+    ) {
+      return;
+    }
+
+    const checkTransactionStatus = async () => {
+      try {
+        // Fetch Base chain node to get RPC URL
+        const nodes = await fetchNodes();
+        const baseNode = nodes?.find(
+          (node) => node.ethChainId === parseInt(BASE_ID),
+        );
+
+        if (!baseNode?.url) {
+          console.error('Base node not found');
+          return;
+        }
+
+        // Create viem public client for Base chain
+        const client = createPublicClient({
+          chain: base,
+          transport: http(baseNode.url),
+        });
+
+        // Get the block number from when magna_claimed_at was set (we'll use recent blocks as fallback)
+        const currentBlock = await client.getBlockNumber();
+        const fromBlock = currentBlock - 10000n; // Check last ~10k blocks (~33 hours on Base)
+
+        // Fetch withdraw transactions for the user's claim address
+        const transactions = await getWithdrawTransactionsForAddress(
+          client,
+          magnaContractAddress, // contract address
+          userClaimAddress, // user's claim address
+          fromBlock,
+        );
+      } catch (error) {
+        console.error('Error checking transaction status:', error);
+      }
+    };
+
+    void checkTransactionStatus();
+  }, [
+    shouldCheckInitialTransactionStatus,
+    shouldCheckFinalTransactionStatus,
+    magnaContractAddress,
+    userClaimAddress,
+    setData,
+    utils?.tokenAllocation,
+    updateInitialClaimTxHash,
+    updateFinalClaimTxHash,
+  ]);
 
   return {
     txData,

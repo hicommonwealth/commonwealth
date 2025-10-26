@@ -41,6 +41,15 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     useGetClaimAddressQuery({ enabled: claimsEnabled && user.isLoggedIn });
   const { initial, final, getWalletProvider } = useCommonAirdrop({
     tokenSymbol: claimAddress?.token || 'C',
+    userClaimAddress: claimAddress?.address || undefined,
+    magnaContractAddress: claimAddress?.token_address || undefined,
+    shouldCheckInitialTransactionStatus: !!(
+      !claimAddress?.magna_claim_tx_hash && claimAddress?.magna_claimed_at
+    ),
+    shouldCheckFinalTransactionStatus: !!(
+      !claimAddress?.magna_cliff_claim_tx_hash &&
+      claimAddress?.magna_cliff_claimed_at
+    ),
   });
   const { data: allocation } = useGetAllocationQuery({
     magna_allocation_id: claimAddress?.magna_allocation_id,
