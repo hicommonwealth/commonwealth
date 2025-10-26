@@ -222,10 +222,7 @@ export const useCommonAirdrop = ({
           chain: base,
           transport: http(baseNode.url),
         });
-
-        // Get the block number from when magna_claimed_at was set (we'll use recent blocks as fallback)
-        const currentBlock = await client.getBlockNumber();
-        const fromBlock = currentBlock - BigInt(500_000); // Check last 500,000 blocks, TODO: adjust this
+        const fromBlock = 37384067n;
 
         // Fetch withdraw transactions for the user's claim address
         const transactions = await getWithdrawTransactionsForAddress(
