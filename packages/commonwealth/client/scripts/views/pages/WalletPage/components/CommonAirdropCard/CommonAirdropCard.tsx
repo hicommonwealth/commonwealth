@@ -39,15 +39,48 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   const claimsEnabled = useFlag('claims');
   const { data: claimAddress, isLoading: isLoadingClaimAddress } =
     useGetClaimAddressQuery({ enabled: claimsEnabled && user.isLoggedIn });
+  const shouldCollapseClaimState = (() => {
+    if (!claimAddress?.cliff_date) {
+      return false;
+    }
+
+    const cliffDate = moment(claimAddress.cliff_date);
+    const now = moment();
+    const initialClaimedAt = claimAddress?.magna_claim_tx_at
+      ? moment(claimAddress.magna_claim_tx_at)
+      : null;
+
+    const cliffDatePassedButInitialClaimNotDone =
+      cliffDate.isBefore(now) && !claimAddress?.magna_claim_tx_hash;
+
+    const initialClaimCompletedAfterCliffDate =
+      initialClaimedAt && initialClaimedAt.isAfter(cliffDate);
+
+    return (
+      cliffDatePassedButInitialClaimNotDone ||
+      initialClaimCompletedAfterCliffDate
+    );
+  })();
   const { initial, final, getWalletProvider } = useCommonAirdrop({
     tokenSymbol: claimAddress?.token || 'C',
+    userClaimAddress: claimAddress?.address || undefined,
+    magnaContractAddress: claimAddress?.contract_address || undefined,
+    shouldCheckInitialTransactionStatus: !!(
+      !claimAddress?.magna_claim_tx_hash && claimAddress?.magna_claimed_at
+    ),
+    shouldCheckFinalTransactionStatus: !!(
+      claimAddress?.magna_claim_tx_hash &&
+      claimAddress?.magna_claimed_at &&
+      !claimAddress?.magna_cliff_claim_tx_hash &&
+      claimAddress?.magna_cliff_claimed_at &&
+      !shouldCollapseClaimState
+    ),
   });
   const { data: allocation } = useGetAllocationQuery({
     magna_allocation_id: claimAddress?.magna_allocation_id,
     enabled:
       !!claimAddress?.magna_allocation_id && !initial.txHash && user.isLoggedIn,
   });
-
   if (!claimsEnabled) {
     return <></>;
   }
@@ -167,28 +200,6 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     allocation?.unlock_start_at ||
     claimAddress?.unlock_start_at ||
     `2025-10-27T13:00:00Z`;
-  const shouldCollapseClaimState = (() => {
-    if (!allocation?.cliff_date) {
-      return false;
-    }
-
-    const cliffDate = moment(allocation.cliff_date);
-    const now = moment();
-    const initialClaimedAt = claimAddress?.magna_claim_tx_at
-      ? moment(claimAddress.magna_claim_tx_at)
-      : null;
-
-    const cliffDatePassedButInitialClaimNotDone =
-      cliffDate.isBefore(now) && !claimAddress?.magna_claim_tx_hash;
-
-    const initialClaimCompletedAfterCliffDate =
-      initialClaimedAt && initialClaimedAt.isAfter(cliffDate);
-
-    return (
-      cliffDatePassedButInitialClaimNotDone ||
-      initialClaimCompletedAfterCliffDate
-    );
-  })();
   const claimSteps = {
     initial: (() => {
       const initialTxHash =
