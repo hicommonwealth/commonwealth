@@ -17,6 +17,7 @@ export const ClaimAddressView = z.object({
   address: EVM_ADDRESS_STRICT.nullish(),
   token: z.string(),
   token_address: EVM_ADDRESS_STRICT.nullish(),
+  contract_address: EVM_ADDRESS_STRICT.nullish(),
   description: z.string(),
   initial_percentage: z.number(),
   unlock_start_at: z.date().or(z.string()).nullish(),

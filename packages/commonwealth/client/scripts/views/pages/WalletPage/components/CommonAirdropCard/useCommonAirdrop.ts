@@ -20,7 +20,9 @@ type CommonAirdropData = {
     requiredEth?: string | number;
   };
   initialTxHash: `0x${string}` | null;
+  shouldRetryInitialTx: boolean;
   finalTxHash: `0x${string}` | null;
+  shouldRetryFinalTx: boolean;
 };
 
 interface CommonAirdropState extends CommonAirdropData {
@@ -32,6 +34,8 @@ export const commonAirdropStore = createStore<CommonAirdropState>()(
     txData: undefined,
     initialTxHash: null,
     finalTxHash: null,
+    shouldRetryInitialTx: false,
+    shouldRetryFinalTx: false,
     setData: (data) => {
       if (Object.keys(data).length > 0) {
         set((state) => ({ ...state, ...data }));
@@ -57,8 +61,14 @@ export const useCommonAirdrop = ({
 }) => {
   const utils = trpc.useUtils();
 
-  const { txData, initialTxHash, finalTxHash, setData } =
-    useCommonAirdropStore();
+  const {
+    txData,
+    initialTxHash,
+    finalTxHash,
+    shouldRetryInitialTx,
+    shouldRetryFinalTx,
+    setData,
+  } = useCommonAirdropStore();
 
   const claimInitialToken = trpc.tokenAllocation.claimToken.useMutation();
   const updateInitialClaimTxHash =
@@ -150,15 +160,19 @@ export const useCommonAirdrop = ({
         // at this point the claim transaction is signed!
         // update the UI
         if (txHash) {
-          setData({
-            [type === 'initial' ? 'initialTxHash' : 'finalTxHash']: txHash,
-          });
-
           await new Promise((r) => setTimeout(r, 5000)); // wait 5 sec for the block to propagate
 
           await txHashUpdateFunction({
             transaction_hash: txHash,
-          }).catch(console.error); // this shouldn't throw errors
+          })
+            .then(() => {
+              setData({
+                shouldRetryInitialTx: false,
+                shouldRetryFinalTx: false,
+                [type === 'initial' ? 'initialTxHash' : 'finalTxHash']: txHash,
+              });
+            })
+            .catch(console.error); // this shouldn't throw errors
         }
         notifySuccess('Token claimed successfully');
       } catch (error) {
@@ -184,11 +198,12 @@ export const useCommonAirdrop = ({
       (!shouldCheckInitialTransactionStatus &&
         !shouldCheckFinalTransactionStatus) ||
       !userClaimAddress ||
-      !magnaContractAddress
+      !magnaContractAddress ||
+      shouldRetryInitialTx ||
+      shouldRetryFinalTx
     ) {
       return;
     }
-
     const checkTransactionStatus = async () => {
       try {
         // Fetch Base chain node to get RPC URL
@@ -210,7 +225,7 @@ export const useCommonAirdrop = ({
 
         // Get the block number from when magna_claimed_at was set (we'll use recent blocks as fallback)
         const currentBlock = await client.getBlockNumber();
-        const fromBlock = currentBlock - 10000n; // Check last ~10k blocks (~33 hours on Base)
+        const fromBlock = currentBlock - BigInt(500_000); // Check last 500,000 blocks, TODO: adjust this
 
         // Fetch withdraw transactions for the user's claim address
         const transactions = await getWithdrawTransactionsForAddress(
@@ -219,13 +234,63 @@ export const useCommonAirdrop = ({
           userClaimAddress, // user's claim address
           fromBlock,
         );
+
+        // [0] is latest
+        transactions.sort((a, b) =>
+          Number(BigInt(b.timestamp) - BigInt(a.timestamp)),
+        );
+
+        if (transactions.length > 0) {
+          const revertedTx = transactions[0].status === 'reverted';
+
+          if (revertedTx) {
+            if (shouldCheckInitialTransactionStatus) {
+              setData({ shouldRetryInitialTx: true });
+            } else if (shouldCheckFinalTransactionStatus) {
+              setData({ shouldRetryFinalTx: true });
+            }
+          } else {
+            // Find successful transaction
+            const successfulTx = transactions.find(
+              (tx) => tx.status === 'success',
+            );
+            if (successfulTx) {
+              // Update with successful transaction hash
+              if (shouldCheckInitialTransactionStatus) {
+                setData({
+                  shouldRetryInitialTx: false,
+                  initialTxHash: successfulTx.txHash as `0x${string}`,
+                });
+                await updateInitialClaimTxHash.mutateAsync({
+                  transaction_hash: successfulTx.txHash as `0x${string}`,
+                });
+              } else if (shouldCheckFinalTransactionStatus) {
+                setData({
+                  shouldRetryFinalTx: false,
+                  finalTxHash: successfulTx.txHash as `0x${string}`,
+                });
+                await updateFinalClaimTxHash.mutateAsync({
+                  transaction_hash: successfulTx.txHash as `0x${string}`,
+                });
+              }
+
+              await utils.tokenAllocation.invalidate().catch(console.error);
+            }
+          }
+        }
       } catch (error) {
         console.error('Error checking transaction status:', error);
       }
     };
 
-    void checkTransactionStatus();
+    const interval = setInterval(checkTransactionStatus, 5_000); // every 5 seconds
+
+    return () => {
+      interval && clearInterval(interval);
+    };
   }, [
+    shouldRetryInitialTx,
+    shouldRetryFinalTx,
     shouldCheckInitialTransactionStatus,
     shouldCheckFinalTransactionStatus,
     magnaContractAddress,
@@ -244,11 +309,13 @@ export const useCommonAirdrop = ({
       txHash: initialTxHash,
       isPending:
         claimInitialToken.isPending || updateInitialClaimTxHash.isPending,
+      shouldRetry: shouldRetryInitialTx,
     },
     final: {
       claim: claimFinal,
       txHash: finalTxHash,
       isPending: claimFinalToken.isPending || updateFinalClaimTxHash.isPending,
+      shouldRetry: shouldRetryFinalTx,
     },
   };
 };

@@ -66,6 +66,7 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
         ...claimAddress[0],
         token: config.MAGNA.TOKEN,
         token_address: config.MAGNA.TOKEN_ADDRESS as `0x${string}`,
+        contract_address: config.MAGNA.CONTRACT_ADDRESS as `0x${string}`,
         description: config.MAGNA.EVENT_DESC,
         initial_percentage: config.MAGNA.INITIAL_PERCENTAGE,
         unlock_start_at: config.MAGNA.UNLOCK_START_AT,
