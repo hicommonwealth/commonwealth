@@ -1,5 +1,6 @@
 import { MAGNA_WITHDRAW_SELECTORS } from '@hicommonwealth/shared';
-import { createPublicClient } from 'viem';
+import { PublicClient, Transport } from 'viem';
+import { base } from 'viem/chains';
 
 // Alchemy API Types
 type AssetTransferCategory =
@@ -109,8 +110,7 @@ type TxnData = {
  * Handles pagination if there are more results available
  */
 export async function getWithdrawTransactionsForAddress(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  client: ReturnType<typeof createPublicClient<any, any, any, any>>,
+  client: PublicClient<Transport, typeof base>,
   contractAddress: string,
   address: string,
   fromBlock: bigint,
@@ -131,8 +131,10 @@ export async function getWithdrawTransactionsForAddress(
       };
 
       const response = (await client.request({
-        method: 'alchemy_getAssetTransfers',
-        params: [params],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        method: 'alchemy_getAssetTransfers' as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        params: [params] as any,
       })) as AssetTransfersResponse;
 
       if (response && response.transfers) {
