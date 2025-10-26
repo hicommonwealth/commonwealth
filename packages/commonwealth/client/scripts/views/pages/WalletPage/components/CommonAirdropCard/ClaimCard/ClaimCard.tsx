@@ -80,6 +80,7 @@ const ClaimCard = ({
     useState<string>('00:00:00');
   const [launchCountdown, setLaunchCountdown] = useState<string>('00:00:00');
   const [unlockCountdown, setUnlockCountdown] = useState<string>('00:00:00');
+  const [isRetryingClaim, setIsRetryingClaim] = useState<boolean>(false);
   const [syncCountdown, setSyncCountdown] = useState<string>('00:00:00');
   const commonAirdrop = useCommonAirdrop({ tokenSymbol });
   const claimTxData = commonAirdrop.txData;
@@ -460,7 +461,22 @@ const ClaimCard = ({
       </div>
     );
 
-    if (isPendingBlockchainIndex) {
+    if (isPendingBlockchainIndex && !isRetryingClaim) {
+      const copies = {
+        PENDING: {
+          title: 'Pending Blockchain Index',
+          description:
+            'Our systems are indexing the blockchain to confirm your transaction.',
+        },
+        FAILED: {
+          title: 'Transaction Failed',
+          description:
+            'Your transaction failed on the blockchain. Please try again.',
+        },
+      };
+
+      const copy = copies[claimState.shouldRetry ? 'FAILED' : 'PENDING'];
+
       return (
         <div className="notice-text">
           <div className="countdown-container countdown-in-progress">
@@ -470,19 +486,27 @@ const ClaimCard = ({
                 fontWeight="semiBold"
                 className="countdown-title"
               >
-                Pending Blockchain Index
+                {copy.title}
               </CWText>
               <CWText className="countdown-description">
-                Our systems are indexing the blockchain to confirm your
-                transaction.
+                {copy.description}
               </CWText>
             </div>
+            {claimState.shouldRetry && (
+              <CWButton
+                label="Retry Claim"
+                onClick={() => setIsRetryingClaim(true)}
+                buttonType="secondary"
+                iconRight="arrowClockwise"
+                aria-label="Retry claim"
+              />
+            )}
           </div>
         </div>
       );
     }
 
-    if (isClaimAvailable) {
+    if (isClaimAvailable || isRetryingClaim) {
       const pendingMagnaProcessing = (
         <div className="countdown-container countdown-in-progress">
           <div className="countdown-left">
@@ -506,10 +530,10 @@ const ClaimCard = ({
         </div>
       );
 
-      if (isReadyForClaimNow) {
+      if (isReadyForClaimNow || isRetryingClaim) {
         return (
           <div className="notice-text">
-            {isPendingClaimFunds ? (
+            {isPendingClaimFunds && !isRetryingClaim ? (
               pendingMagnaProcessing
             ) : (
               <>

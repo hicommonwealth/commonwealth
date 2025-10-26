@@ -74,3 +74,8 @@ export const UNLEASH_FRONTEND_SERVER_URL =
 
 export const SNAPSHOT_HUB_URL = 'https://hub.snapshot.org';
 export const COSMOS_REGISTRY_API = 'https://cosmoschains.thesilverfox.pro';
+
+// Withdraw function selectors
+export const MAGNA_WITHDRAW_SELECTORS = [
+  '0x8612372a', // withdraw(uint256 withdrawalAmount,uint32 rootIndex,bytes decodableArgs,bytes32[] proof)
+];

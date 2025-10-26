@@ -1,8 +1,10 @@
-import { type Command } from '@hicommonwealth/core';
+import { type Command, InvalidState, logger } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
 import { validateClaimTxnHash } from '../../utils/validateClaimTxnHash';
+
+const log = logger(import.meta);
 
 export function UpdateClaimTransactionHash(): Command<
   typeof schemas.UpdateClaimTransactionHash
@@ -14,7 +16,33 @@ export function UpdateClaimTransactionHash(): Command<
     body: async ({ payload, actor }) => {
       const { transaction_hash } = payload;
 
-      const txnAt = await validateClaimTxnHash(transaction_hash);
+      const claimAddress = await models.ClaimAddresses.findOne({
+        where: {
+          user_id: actor.user.id,
+        },
+      });
+
+      if (!claimAddress) {
+        log.error('Claim address not found for user', undefined, {
+          user_id: actor.user.id,
+        });
+        throw new InvalidState('Claim address not found');
+      }
+
+      if (claimAddress.magna_claim_tx_hash && claimAddress.magna_claim_tx_at) {
+        return false;
+      }
+
+      if (!claimAddress.address) {
+        throw new InvalidState(
+          'Cannot set transaction hash without a claim address',
+        );
+      }
+
+      const txnAt = await validateClaimTxnHash(
+        transaction_hash,
+        claimAddress.address,
+      );
 
       const [, updated] = await models.sequelize.query(
         `
