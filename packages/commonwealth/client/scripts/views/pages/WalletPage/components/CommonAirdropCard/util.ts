@@ -99,11 +99,6 @@ type TxnData = {
   status: 'reverted' | 'success' | 'pending';
 };
 
-// TODO: if getClaimAddress does not return a txnHash AND magna_claim_at (or cliff...) is set run getWithdrawTransactionsForAddress
-//  find first txn with 'status' successful -> this is initial txn
-//  if pending -> transaction is still processing -> wait X seconds -> call client.getTransactionReceipt again
-//  if reverted -> prompt user to re-sign new transaction
-
 /**
  * Fetches transaction history for an address from Alchemy API
  * Returns transactions that called the Magna contract's withdraw function

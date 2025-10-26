@@ -283,7 +283,9 @@ export const useCommonAirdrop = ({
       }
     };
 
-    const interval = setInterval(checkTransactionStatus, 5_000); // every 5 seconds
+    const interval = setInterval(() => {
+      checkTransactionStatus().catch(console.error);
+    }, 5_000); // every 5 seconds
 
     return () => {
       interval && clearInterval(interval);
