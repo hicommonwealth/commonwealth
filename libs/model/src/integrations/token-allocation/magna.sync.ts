@@ -66,7 +66,7 @@ export async function magnaSync(
             GROUP BY user_id
           )
           SELECT
-            :category || '-' || A.address as key,
+            :category || '-' || A.user_id as key,
             :category as category,
             :description || ' for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
             A.user_id,
