@@ -200,6 +200,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     allocation?.unlock_start_at ||
     claimAddress?.unlock_start_at ||
     `2025-10-27T13:00:00Z`;
+  const launchDateUTC = moment(unlockStartsAt);
   const claimSteps = {
     initial: (() => {
       const initialTxHash =
@@ -228,7 +229,6 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         (allocation?.claimable ?? 0) > 0 &&
         unlockStartsAt
       );
-      const launchDateUTC = moment(unlockStartsAt);
       const shouldWaitTillDate =
         moment().isBefore(launchDateUTC) && claimAddress?.address
           ? launchDateUTC

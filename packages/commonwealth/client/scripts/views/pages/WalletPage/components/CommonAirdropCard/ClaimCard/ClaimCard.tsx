@@ -82,6 +82,7 @@ const ClaimCard = ({
   const [unlockCountdown, setUnlockCountdown] = useState<string>('00:00:00');
   const [isRetryingClaim, setIsRetryingClaim] = useState<boolean>(false);
   const [syncCountdown, setSyncCountdown] = useState<string>('00:00:00');
+  const registrationEndDate = moment(allocationUnlocksAt).add(30, 'days');
   const commonAirdrop = useCommonAirdrop({ tokenSymbol });
   const claimTxData = commonAirdrop.txData;
   const claimState =
@@ -742,9 +743,37 @@ const ClaimCard = ({
 
     // Show ui to set address for claim
     if (!selectedAddress || !selectedAddress?.address || !claimedToAddress) {
+      const isRegistrationOpen = moment().isBefore(registrationEndDate);
+      const daysUntilRegistrationEnds = registrationEndDate.diff(
+        moment(),
+        'days',
+      );
+
       return (
         <div className="notice-text">
           <div className="address-form-section">
+            {isRegistrationOpen ? (
+              <div className="registration-notice">
+                <CWIcon iconName="infoEmpty" iconSize="small" />
+                <CWText type="caption" className="registration-deadline-text">
+                  Registration closes on{' '}
+                  {registrationEndDate.format('MMMM D, YYYY')} (
+                  {daysUntilRegistrationEnds > 0
+                    ? `${daysUntilRegistrationEnds} days remaining`
+                    : 'less than 1 day remaining'}
+                  ).
+                </CWText>
+              </div>
+            ) : (
+              <div className="registration-closed-notice">
+                <CWIcon iconName="cautionCircle" iconSize="small" />
+                <CWText type="caption" className="registration-closed-text">
+                  Registration period ended on{' '}
+                  {registrationEndDate.format('MMMM D, YYYY')}. Address
+                  registration is no longer available.
+                </CWText>
+              </div>
+            )}
             <CWText
               type="h5"
               fontWeight="semiBold"
@@ -766,7 +795,11 @@ const ClaimCard = ({
                     }),
                 }}
                 noOptionsMessage={() => 'No available addresses'}
-                placeholder="Select or paste your EVM address"
+                placeholder={
+                  isRegistrationOpen
+                    ? 'Select or paste your EVM address'
+                    : 'Registration closed'
+                }
                 value={
                   selectedAddress?.address
                     ? convertAddressToDropdownOption(selectedAddress.address)
@@ -786,6 +819,7 @@ const ClaimCard = ({
                 )}
                 isClearable={false}
                 isSearchable={true}
+                isDisabled={!isRegistrationOpen}
                 options={addressOptions}
                 onChange={handleAddressChange}
                 className="enhanced-address-select"
@@ -812,6 +846,7 @@ const ClaimCard = ({
                 <CWCheckbox
                   checked={isAcknowledged}
                   onChange={(e) => setIsAcknowledged(!!e?.target?.checked)}
+                  disabled={!isRegistrationOpen}
                   label={
                     <CWText className="terms-text">
                       I understand that by adding my address, I adhere to
@@ -839,9 +874,20 @@ const ClaimCard = ({
                 />
               </div>
               <CWButton
-                label={isUpdating ? 'Saving...' : 'Save Address'}
+                label={
+                  !isRegistrationOpen
+                    ? 'Registration Closed'
+                    : isUpdating
+                      ? 'Saving...'
+                      : 'Save Address'
+                }
                 onClick={handleClaimAddressUpdate}
-                disabled={!isAcknowledged || isUpdating || !selectedAddress}
+                disabled={
+                  !isRegistrationOpen ||
+                  !isAcknowledged ||
+                  isUpdating ||
+                  !selectedAddress
+                }
                 buttonType="primary"
                 buttonHeight="sm"
                 className="save-address-button"
