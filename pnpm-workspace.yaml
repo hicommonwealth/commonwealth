@@ -4,5 +4,5 @@ packages:
   - 'packages/load-testing'
 
 catalog:
-  '@knocklabs/node': ^0.6.13
+  '@knocklabs/node': ^1.2.0
   'zod': ^4.1.1
