@@ -84,6 +84,11 @@ export async function magnaSync(
           WHERE
             A.address IS NOT NULL -- there is an address to sync
             AND A.magna_synced_at IS NULL -- and it hasn't been synced yet
+            AND ( 
+              COALESCE(HA.token_allocation, 0)::double precision +
+              COALESCE(AA.token_allocation, 0)::double precision +
+              COALESCE(N.total_token_allocation, 0)::double precision
+            ) > 0
           ORDER BY
             A.user_id ASC
           LIMIT :limit
