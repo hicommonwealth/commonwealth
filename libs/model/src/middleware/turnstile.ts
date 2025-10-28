@@ -56,6 +56,9 @@ export function turnstile({
     actor,
     payload,
   }: Context<ZodObject<{ turnstile_token: ZodString }>, ZodType>) {
+    // System actors bypass turnstile checks
+    if (actor.is_system_actor) return;
+
     const turnstileSiteKey = TurnstileSecretMap[widgetName];
     if (config.APP_ENV === 'production' && !turnstileSiteKey)
       throw new Error('Turnstile site key not found');

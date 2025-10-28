@@ -54,6 +54,9 @@ export function tiered({
   minTier?: UserTierMap;
 }) {
   return async function ({ actor }: Context<ZodType, ZodType>) {
+    // System actors bypass all tier checks
+    if (actor.is_system_actor) return;
+
     if (!actor.user.id) throw new InvalidActor(actor, 'Must be a user');
 
     const user = await models.User.findOne({
