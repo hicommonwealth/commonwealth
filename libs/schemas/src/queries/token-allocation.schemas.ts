@@ -22,6 +22,7 @@ export const ClaimAddressView = z.object({
   initial_percentage: z.number(),
   unlock_start_at: z.date().or(z.string()).nullish(),
   cliff_date: z.date().or(z.string()).nullish(),
+  end_registration_date: z.date().or(z.string()).nullish(),
   tokens: z.coerce.number().nullish(),
   magna_allocation_id: z.string().nullish(),
   magna_synced_at: z
