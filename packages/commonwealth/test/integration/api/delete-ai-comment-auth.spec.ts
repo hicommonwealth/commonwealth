@@ -252,13 +252,14 @@ describe('Delete AI Comment Authorization', () => {
     const res = await DeleteComment(other_user, jwt_other, ai_comment_id2);
     const text = await res.text();
 
-    // Should fail with 401 Unauthorized since the user is not the author
+    // Should fail with 401 Unauthorized since the user is not the triggering user
     expect(res.status).toBe(401);
     const json = JSON.parse(text);
     // Check for error message - could be in 'error' or 'message' field
     const errorMessage = json.error || json.message;
     expect(errorMessage).toBeDefined();
-    expect(errorMessage).toContain('Not the author');
+    // Error could be about not having the right role or not being the author
+    expect(errorMessage).toMatch(/User is not|Not the author/);
   });
 
   it('should allow an admin to delete any AI comment', async () => {

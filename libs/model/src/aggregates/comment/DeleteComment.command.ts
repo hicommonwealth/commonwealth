@@ -7,9 +7,7 @@ import { mustBeAuthorizedComment } from '../../middleware/guards';
 export function DeleteComment(): Command<typeof schemas.DeleteComment> {
   return {
     ...schemas.DeleteComment,
-    auth: [
-      authComment({ author: true, roles: ['admin', 'moderator', 'member'] }),
-    ],
+    auth: [authComment({ author: true, roles: ['admin', 'moderator'] })],
     body: async ({ actor, context }) => {
       const { comment, community_id } = mustBeAuthorizedComment(actor, context);
 
