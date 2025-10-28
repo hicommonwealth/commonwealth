@@ -41,6 +41,12 @@
     }
   }
 
+  .token-symbol-price {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 4px;
+  }
+
   .pad-8 {
     padding: 0px 8px;
   }
