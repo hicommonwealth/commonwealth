@@ -196,6 +196,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     allocation?.status === 'PENDING_FUNDING' ||
     allocation?.status === 'NOT_STARTED'
   );
+  const isAllocationCancelled = allocation?.status === 'CANCELLED';
   const unlockStartsAt =
     allocation?.unlock_start_at ||
     claimAddress?.unlock_start_at ||
@@ -380,7 +381,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 </div>
               </div>
             </div>
-            {!shouldCollapseClaimState ? (
+            {!shouldCollapseClaimState && !isAllocationCancelled ? (
               <div className="notice-section-container">
                 <ClaimCard
                   cardNumber={1}
@@ -467,6 +468,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 tokenSymbol={claimAddress?.token || ''}
                 shouldWaitTillDate={claimSteps.initial.shouldWaitTillDate}
                 mode="initial"
+                isAllocationCancelled={isAllocationCancelled}
                 isCollapsed
               />
             )}
