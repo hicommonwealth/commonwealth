@@ -71,6 +71,7 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
         initial_percentage: config.MAGNA.INITIAL_PERCENTAGE,
         unlock_start_at: config.MAGNA.UNLOCK_START_AT,
         cliff_date: config.MAGNA.CLIFF_DATE,
+        end_registration_date: config.MAGNA.END_REGISTRATION_DATE || null,
       };
     },
   };

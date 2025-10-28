@@ -118,6 +118,7 @@ const {
   MAGNA_INITIAL_PERCENTAGE,
   MAGNA_CLIFF_DATE,
   MAGNA_CONTRACT_ADDRESS,
+  MAGNA_END_REGISTRATION_DATE,
   SLACK_WEBHOOK_URL_ALL_ENG,
   SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
   FLAG_CLAIMS,
@@ -386,6 +387,9 @@ export const config = configure(
       BATCH_SIZE: parseInt(MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE, 10),
       CONTRACT_ADDRESS:
         MAGNA_CONTRACT_ADDRESS || '0x45Bd2f58008b7D0942E36E6827A037eef60AF7D6',
+      END_REGISTRATION_DATE: MAGNA_END_REGISTRATION_DATE
+        ? new Date(MAGNA_END_REGISTRATION_DATE)
+        : undefined,
     },
     SLACK: {
       CHANNELS: {
@@ -819,6 +823,7 @@ export const config = configure(
       CLIFF_DATE: z.date(),
       BATCH_SIZE: z.number(),
       CONTRACT_ADDRESS: z.string(),
+      END_REGISTRATION_DATE: z.date().optional(),
     }),
     SLACK: z.object({
       CHANNELS: z.object({

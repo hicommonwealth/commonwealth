@@ -41,6 +41,7 @@ interface ClaimCardProps {
   hasClaimableAmount?: boolean;
   mode: 'initial' | 'final';
   tokenSymbol: string;
+  registrationEndDate?: moment.Moment;
   shouldWaitTillDate?: moment.Moment;
   isCollapsed?: boolean;
   onConnectNewAddress?: () => void;
@@ -66,6 +67,7 @@ const ClaimCard = ({
   mode,
   hasClaimableAmount,
   allocatedToAddress,
+  registrationEndDate,
   shouldWaitTillDate,
   isCollapsed = false,
 }: ClaimCardProps) => {
@@ -82,7 +84,6 @@ const ClaimCard = ({
   const [unlockCountdown, setUnlockCountdown] = useState<string>('00:00:00');
   const [isRetryingClaim, setIsRetryingClaim] = useState<boolean>(false);
   const [syncCountdown, setSyncCountdown] = useState<string>('00:00:00');
-  const registrationEndDate = moment(allocationUnlocksAt).add(30, 'days');
   const commonAirdrop = useCommonAirdrop({ tokenSymbol });
   const claimTxData = commonAirdrop.txData;
   const claimState =
@@ -744,7 +745,7 @@ const ClaimCard = ({
     // Show ui to set address for claim
     if (!selectedAddress || !selectedAddress?.address || !claimedToAddress) {
       const isRegistrationOpen = moment().isBefore(registrationEndDate);
-      const daysUntilRegistrationEnds = registrationEndDate.diff(
+      const daysUntilRegistrationEnds = registrationEndDate?.diff(
         moment(),
         'days',
       );
@@ -752,27 +753,34 @@ const ClaimCard = ({
       return (
         <div className="notice-text">
           <div className="address-form-section">
-            {isRegistrationOpen ? (
-              <div className="registration-notice">
-                <CWIcon iconName="infoEmpty" iconSize="small" />
-                <CWText type="caption" className="registration-deadline-text">
-                  Registration closes on{' '}
-                  {registrationEndDate.format('MMMM D, YYYY')} (
-                  {daysUntilRegistrationEnds > 0
-                    ? `${daysUntilRegistrationEnds} days remaining`
-                    : 'less than 1 day remaining'}
-                  ).
-                </CWText>
-              </div>
-            ) : (
-              <div className="registration-closed-notice">
-                <CWIcon iconName="cautionCircle" iconSize="small" />
-                <CWText type="caption" className="registration-closed-text">
-                  Registration period ended on{' '}
-                  {registrationEndDate.format('MMMM D, YYYY')}. Address
-                  registration is no longer available.
-                </CWText>
-              </div>
+            {registrationEndDate && (
+              <>
+                {isRegistrationOpen && daysUntilRegistrationEnds ? (
+                  <div className="registration-notice">
+                    <CWIcon iconName="infoEmpty" iconSize="small" />
+                    <CWText
+                      type="caption"
+                      className="registration-deadline-text"
+                    >
+                      Registration closes on{' '}
+                      {registrationEndDate.format('MMMM D, YYYY')} (
+                      {daysUntilRegistrationEnds > 0
+                        ? `${daysUntilRegistrationEnds} days remaining`
+                        : 'less than 1 day remaining'}
+                      ).
+                    </CWText>
+                  </div>
+                ) : (
+                  <div className="registration-closed-notice">
+                    <CWIcon iconName="cautionCircle" iconSize="small" />
+                    <CWText type="caption" className="registration-closed-text">
+                      Registration period ended on{' '}
+                      {registrationEndDate.format('MMMM D, YYYY')}. Address
+                      registration is no longer available.
+                    </CWText>
+                  </div>
+                )}
+              </>
             )}
             <CWText
               type="h5"
