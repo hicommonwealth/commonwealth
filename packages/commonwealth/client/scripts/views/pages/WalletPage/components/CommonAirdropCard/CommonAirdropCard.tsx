@@ -201,6 +201,9 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     claimAddress?.unlock_start_at ||
     `2025-10-27T13:00:00Z`;
   const launchDateUTC = moment(unlockStartsAt);
+  const registrationEndDate = claimAddress?.end_registration_date
+    ? moment(claimAddress?.end_registration_date)
+    : undefined;
   const claimSteps = {
     initial: (() => {
       const initialTxHash =
@@ -408,6 +411,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   claimablePercentage={initialClaimablePercentage}
                   tokenSymbol={claimAddress?.token || ''}
                   shouldWaitTillDate={claimSteps.initial.shouldWaitTillDate}
+                  registrationEndDate={registrationEndDate}
                   mode="initial"
                 />
                 <ClaimCard
@@ -466,6 +470,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 claimablePercentage={initialClaimablePercentage}
                 tokenSymbol={claimAddress?.token || ''}
                 shouldWaitTillDate={claimSteps.initial.shouldWaitTillDate}
+                registrationEndDate={registrationEndDate}
                 mode="initial"
                 isCollapsed
               />
