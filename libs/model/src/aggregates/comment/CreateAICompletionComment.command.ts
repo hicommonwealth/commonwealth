@@ -98,14 +98,6 @@ export function CreateAICompletionComment(): Command<
           parent_id: completionToken.parent_comment_id || undefined,
           body: completionToken.content,
         },
-        context: {
-          thread_id: completionToken.thread_id,
-          address: botAddress,
-          community_id: completionToken.community_id,
-          is_author: true,
-          is_collaborator: false,
-          thread,
-        },
       });
 
       // Mark the token as used and store the comment_id after successful comment creation
