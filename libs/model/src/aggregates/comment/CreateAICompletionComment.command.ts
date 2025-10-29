@@ -26,14 +26,19 @@ export function CreateAICompletionComment(): Command<
 
       // Find the token in the database
       const completionToken = await models.AICompletionToken.findOne({
-        where: { token, used_at: null },
+        where: { token },
       });
 
       if (!completionToken) {
         throw new InvalidState(CreateAICompletionCommentErrors.TokenNotFound);
       }
 
-      // Check if token has expired
+      if (completionToken.used_at) {
+        throw new InvalidState(
+          CreateAICompletionCommentErrors.TokenAlreadyUsed,
+        );
+      }
+
       if (new Date() > completionToken.expires_at) {
         throw new InvalidState(CreateAICompletionCommentErrors.TokenExpired);
       }
