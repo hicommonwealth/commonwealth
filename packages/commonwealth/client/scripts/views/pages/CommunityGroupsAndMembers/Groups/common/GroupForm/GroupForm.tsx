@@ -520,9 +520,9 @@ const GroupForm = ({
           const existingTopic = topicPermissionsToggleGroupSubForms.find(
             (existing) => existing.topic.id === Number(topic.value),
           );
-          const currentGroupTopic = (currentGroup?.topics || []).find(
-            (t) => t.id === Number(topic.value),
-          );
+          const currentGroupTopic = (currentGroup?.topics || [])
+            .filter((t) => t.id !== undefined)
+            .find((t) => t.id === Number(topic.value));
           return {
             topic: {
               id: Number(topic.value),
