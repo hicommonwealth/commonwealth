@@ -457,7 +457,7 @@ describe('Delete AI Comment Authorization', () => {
     }
   });
 
-  it("should NOT allow a user to delete another user's standard (non-AI) comment", async () => {
+  it("should NOT allow a user to delete another user's standard (non-AI) comment with BOT_USER_ADDRESS set", async () => {
     // Get the triggering user's address ID
     const triggeringUserAddressId = (
       await models.Address.findOne({
@@ -487,5 +487,53 @@ describe('Delete AI Comment Authorization', () => {
     const errorMessage = json.error || json.message;
     expect(errorMessage).toBeDefined();
     expect(errorMessage).toMatch(/User is not|Not the author/);
+  });
+
+  it("should NOT allow a user to delete another user's standard (non-AI) comment when BOT_USER_ADDRESS is NOT set", async () => {
+    // Save the current BOT_USER_ADDRESS value
+    const originalBotUserAddress = config.AI.BOT_USER_ADDRESS;
+
+    try {
+      // Unset the BOT_USER_ADDRESS to simulate the env variable not being set
+      config.AI.BOT_USER_ADDRESS = undefined;
+
+      // Get the triggering user's address ID
+      const triggeringUserAddressId = (
+        await models.Address.findOne({
+          where: {
+            user_id: triggering_user.user.id!,
+            community_id,
+          },
+        })
+      )?.id!;
+
+      // Create a standard comment by the triggering user
+      const [regular_comment] = await tester.seed('Comment', {
+        thread_id,
+        address_id: triggeringUserAddressId,
+        body: 'This is another comment by the triggering user',
+        reaction_weights_sum: '0',
+      });
+      const regular_comment_id = regular_comment!.id!;
+
+      // Try to delete with other_user (who is not the author)
+      const res = await DeleteComment(
+        other_user,
+        jwt_other,
+        regular_comment_id,
+      );
+      const text = await res.text();
+
+      // Should fail with 401 Unauthorized since the user is not the author
+      // This ensures normal authorization still works even without BOT_USER_ADDRESS set
+      expect(res.status).toBe(401);
+      const json = JSON.parse(text);
+      const errorMessage = json.error || json.message;
+      expect(errorMessage).toBeDefined();
+      expect(errorMessage).toMatch(/User is not|Not the author/);
+    } finally {
+      // Restore the original BOT_USER_ADDRESS value
+      config.AI.BOT_USER_ADDRESS = originalBotUserAddress;
+    }
   });
 });
