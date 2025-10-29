@@ -102,7 +102,7 @@ export function CreateAICompletionComment(): Command<
           thread_id: completionToken.thread_id,
           address: botAddress,
           community_id: completionToken.community_id,
-          is_author: false,
+          is_author: true,
           is_collaborator: false,
           thread,
         },
