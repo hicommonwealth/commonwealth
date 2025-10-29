@@ -39,6 +39,7 @@ interface ClaimCardProps {
   allocationClaimedAt?: string; // ISO timestamp if present
   allocatedToAddress?: string;
   hasClaimableAmount?: boolean;
+  isAllocationCancelled?: boolean;
   mode: 'initial' | 'final';
   tokenSymbol: string;
   registrationEndDate?: moment.Moment;
@@ -69,6 +70,7 @@ const ClaimCard = ({
   allocatedToAddress,
   registrationEndDate,
   shouldWaitTillDate,
+  isAllocationCancelled,
   isCollapsed = false,
 }: ClaimCardProps) => {
   const user = useUserStore();
@@ -385,6 +387,35 @@ const ClaimCard = ({
       });
       return `${day} ${month} ${year} @ ${time}`;
     };
+
+    if (isAllocationCancelled) {
+      return (
+        <div className="notice-text">
+          <div className="error-notice">
+            <CWText type="h5" fontWeight="semiBold" className="error-title">
+              Allocation Cancelled!
+            </CWText>
+            <CWText className="error-description">
+              You cannot claim this allocation as it has been cancelled. Please
+              contact support if you believe this is an error. Email at&nbsp;
+              <a href="mailto:tech@common.foundation" className="contact-link">
+                tech@common.foundation
+              </a>
+              &nbsp;or reach out in the&nbsp;
+              <a
+                href="https://discord.gg/common"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-link"
+              >
+                Common Discord.
+              </a>
+              &nbsp;
+            </CWText>
+          </div>
+        </div>
+      );
+    }
 
     if (hasClaimed) {
       return (
