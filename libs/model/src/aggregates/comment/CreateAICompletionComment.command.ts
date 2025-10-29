@@ -87,36 +87,25 @@ export function CreateAICompletionComment(): Command<
       const thread = await models.Thread.findByPk(completionToken.thread_id);
       mustExist('Thread', thread);
 
-      // Create a system actor for the bot user
-      const mockActor = systemActor({
-        address: botAddress.address,
-        id: botUser.id!,
-        email: botUser.email || 'ai-bot@common.xyz',
-      });
-
-      // Create a proper context that matches ThreadContext structure
-      const mockContext = {
-        thread_id: completionToken.thread_id,
-        address: botAddress,
-        community_id: completionToken.community_id,
-        is_author: false,
-        is_collaborator: false,
-        thread,
-      };
-
-      // Prepare the comment payload for CreateComment
-      const commentPayload = {
-        thread_id: completionToken.thread_id,
-        parent_id: completionToken.parent_comment_id || undefined,
-        body: completionToken.content,
-      };
-
-      // Use the existing CreateComment command
-      const createCommentCommand = CreateComment();
-      const result = await createCommentCommand.body({
-        actor: mockActor,
-        payload: commentPayload,
-        context: mockContext,
+      const result = await command(CreateComment(), {
+        actor: systemActor({
+          address: botAddress.address,
+          id: botUser.id!,
+          email: botUser.email || 'ai-bot@common.xyz',
+        }),
+        payload: {
+          thread_id: completionToken.thread_id,
+          parent_id: completionToken.parent_comment_id || undefined,
+          body: completionToken.content,
+        },
+        context: {
+          thread_id: completionToken.thread_id,
+          address: botAddress,
+          community_id: completionToken.community_id,
+          is_author: false,
+          is_collaborator: false,
+          thread,
+        },
       });
 
       // Mark the token as used and store the comment_id after successful comment creation
