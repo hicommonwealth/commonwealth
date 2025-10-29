@@ -1,4 +1,4 @@
-import { type Command, stats } from '@hicommonwealth/core';
+import { stats, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import { authComment } from '../../middleware';

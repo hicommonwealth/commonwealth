@@ -100,6 +100,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             CU.tier AS "user_tier",
             COALESCE(CU.profile->>'name', '${DEFAULT_NAME}') AS "profile_name",
             COALESCE(CU.profile->>'avatar_url', '${getRandomAvatar()}') AS "avatar_url",
+            AICT.user_id AS "triggered_by_user_id",
             CASE WHEN max(CVH.id) IS NOT NULL THEN
               json_agg(json_strip_nulls(json_build_object(
                   'id', CVH.id,
@@ -125,7 +126,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
                   'last_active', RA.last_active::text,
                   'profile_name', COALESCE(RU.profile->>'name', '${DEFAULT_NAME}'),
                   'avatar_url', COALESCE(RU.profile->>'avatar_url', '${getRandomAvatar()}')
-                )) 
+                ))
               ELSE '[]'::json
               END AS "reactions",
                 `
@@ -137,6 +138,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             JOIN "Addresses" AS CA ON C."address_id" = CA."id"
             JOIN "Users" AS CU ON CA."user_id" = CU."id"
             LEFT JOIN "CommentVersionHistories" AS CVH ON CVH."comment_id" = C."id"
+            LEFT JOIN "AICompletionTokens" AS AICT ON AICT."comment_id" = C."id"
             ${
               include_reactions
                 ? `
@@ -172,10 +174,11 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             CU.id,
             CU.tier,
             CU.profile->>'name',
-            CU.profile->>'avatar_url'
+            CU.profile->>'avatar_url',
+            AICT.user_id
         ORDER BY
             ${actualOrderBy}
-        LIMIT :limit OFFSET :offset;      
+        LIMIT :limit OFFSET :offset;
       `;
 
       const comments = await models.sequelize.query<

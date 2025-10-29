@@ -32,6 +32,7 @@ import { Op, QueryTypes } from 'sequelize';
 import { ZodType, z } from 'zod';
 import { models } from '../database';
 import { AddressInstance } from '../models';
+import { isBotAddress } from '../utils/botUser';
 import { BannedActor, NonMember, RejectedMember } from './errors';
 
 async function findComment(actor: Actor, comment_id: number) {
@@ -47,10 +48,37 @@ async function findComment(actor: Actor, comment_id: number) {
   if (!comment)
     throw new InvalidInput('Must provide a valid comment id to authorize');
 
+  let triggering_user_address_id: number | undefined = undefined;
+
+  // Check if this is an AI-generated comment and if the current user triggered it
+  const isAIComment = await isBotAddress(comment.address_id);
+  if (isAIComment && actor.user?.id) {
+    const aiToken = await models.AICompletionToken.findOne({
+      where: {
+        comment_id: comment_id,
+        user_id: actor.user.id,
+      },
+    });
+    // If the current user triggered the AI comment, find their address to treat them as the author
+    if (aiToken) {
+      const triggeringUserAddress = await models.Address.findOne({
+        where: {
+          user_id: actor.user.id,
+          community_id: comment.Thread!.community_id!,
+          address: actor.address,
+        },
+      });
+      if (triggeringUserAddress) {
+        triggering_user_address_id = triggeringUserAddress.id;
+      }
+    }
+  }
+
   return {
     comment_id,
     comment,
     author_address_id: comment.address_id,
+    triggering_user_address_id,
     community_id: comment.Thread!.community_id!,
     topic_id: comment.Thread!.topic_id ?? undefined,
     thread_id: comment.Thread!.id!,
@@ -570,17 +598,22 @@ export function authComment({ action, author, roles }: AggregateAuthOptions) {
     ctx: Context<typeof CommentContextInput, typeof CommentContext>,
   ) => {
     const auth = await findComment(ctx.actor, ctx.payload.comment_id);
+    // Use triggering user's address ID for AI comments, otherwise use the comment author's address ID
+    const authorAddressId =
+      auth.triggering_user_address_id ?? auth.author_address_id;
+
     const { address, is_author } = await findAddress(
       ctx.actor,
       auth.community_id,
       roles ?? ['admin', 'moderator', 'member'],
-      auth.author_address_id,
+      authorAddressId,
     );
 
     (ctx as { context: CommentContext }).context = {
       ...auth,
       address,
-      is_author,
+      // User is author if they match the address_id OR if they triggered the AI comment
+      is_author: is_author || !!auth.triggering_user_address_id,
     };
 
     await mustBeAuthorized(ctx, {
