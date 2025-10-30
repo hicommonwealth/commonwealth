@@ -198,12 +198,14 @@ const getRequirementSubFormSchema = (
   return requirementSubFormValidationSchema.omit({
     requirementTrustLevel: true,
     requirementCoinType: true,
+    requirementTokenId: !isTokenRequirement,
   });
 };
 
 const GroupForm = ({
   formType,
   onSubmit,
+  isSubmitting,
   initialValues = {},
   onDelete = () => {},
   allowedAddresses,
@@ -518,9 +520,9 @@ const GroupForm = ({
           const existingTopic = topicPermissionsToggleGroupSubForms.find(
             (existing) => existing.topic.id === Number(topic.value),
           );
-          const currentGroupTopic = (currentGroup?.topics || []).find(
-            (t) => t.id === Number(topic.value),
-          );
+          const currentGroupTopic = (currentGroup?.topics || [])
+            .filter((t) => t.id !== undefined)
+            .find((t) => t.id === Number(topic.value));
           return {
             topic: {
               id: Number(topic.value),
@@ -637,6 +639,7 @@ const GroupForm = ({
                     // @ts-expect-error <StrictNullChecks/>
                     defaultValues={subForm.defaultValues}
                     errors={subForm.errors}
+                    formIndex={index}
                     onChange={(val) => validateChangedValue(val, index)}
                     isRemoveable={index > 0}
                     onRemove={() => removeRequirementByIndex(index)}
@@ -858,6 +861,7 @@ const GroupForm = ({
                 type="submit"
                 buttonWidth="wide"
                 disabled={
+                  isSubmitting ||
                   isNameTaken ||
                   isProcessingProfileImage ||
                   (requirementSubForms.length === 0 &&
