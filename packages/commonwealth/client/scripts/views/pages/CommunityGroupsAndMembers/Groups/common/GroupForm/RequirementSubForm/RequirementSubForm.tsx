@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import { uuidv4 } from 'lib/util';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -29,6 +30,7 @@ const RequirementSubForm = ({
   isRemoveable = true,
   onChange = () => null,
 }: RequirementSubFormType) => {
+  const [instanceId] = useState(() => uuidv4());
   const [requirementType, setRequirementType] = useState('');
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
   const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
@@ -262,7 +264,7 @@ const RequirementSubForm = ({
               // ---
             />
             <CWTextInput
-              key={`${defaultValues.requirementAmount}-formIndex-${formIndex}-${Math.random()}`}
+              key={`${defaultValues.requirementAmount}-formIndex-${formIndex}-${instanceId}`}
               name="requirementAmount"
               alignLabelToRight
               label="Amount"
