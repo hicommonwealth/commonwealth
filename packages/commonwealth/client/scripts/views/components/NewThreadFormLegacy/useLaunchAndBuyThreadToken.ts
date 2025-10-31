@@ -213,7 +213,7 @@ export const useLaunchAndBuyThreadToken = ({
       if (tokenLaunchpad) {
         try {
           const amountOut = await tokenLaunchpad.getAmountOut(
-            '', // token address will be empty for launch
+            '0x0000000000000000000000000000000000000000', // token address will be empty for launch
             Math.floor(amountInWei),
             true,
             `${ethChainId}`,
