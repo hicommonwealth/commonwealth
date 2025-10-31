@@ -32,7 +32,7 @@ import { Op, QueryTypes } from 'sequelize';
 import { ZodType, z } from 'zod';
 import { models } from '../database';
 import { AddressInstance } from '../models';
-import { isBotAddress } from '../utils/botUser';
+import { isBotAddress, isBotUser } from '../utils/botUser';
 import { BannedActor, NonMember, RejectedMember } from './errors';
 
 async function findComment(actor: Actor, comment_id: number) {
@@ -288,6 +288,11 @@ async function checkGatedActions(
   action: GroupGatedActionKey,
   topic_id: number,
 ): Promise<void> {
+  // AI bot user bypasses all gating restrictions
+  if (actor.user.id && (await isBotUser(actor.user.id))) {
+    return;
+  }
+
   const [topic] = await models.sequelize.query<{
     topic_name: string;
     gates: Array<{
@@ -389,6 +394,9 @@ async function mustBeAuthorized(
 ) {
   // System actors are always allowed
   if (actor.is_system_actor) return;
+
+  // AI bot user bypasses all authorization checks including gating
+  if (actor.user.id && (await isBotUser(actor.user.id))) return;
 
   // Admins (and super admins) are always allowed to act on any entity
   if (actor.user.isAdmin || context!.address.role === 'admin') return;
