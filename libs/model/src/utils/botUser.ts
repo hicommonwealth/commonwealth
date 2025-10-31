@@ -52,3 +52,16 @@ export const isBotAddress = async (addressId: number): Promise<boolean> => {
   });
   return !!address;
 };
+
+export const isBotUser = async (userId: number): Promise<boolean> => {
+  try {
+    const botUser = await getBotUser();
+    if (!botUser) {
+      return false;
+    }
+    return botUser.user.id === userId;
+  } catch (error) {
+    // Bot user not configured or not found in database
+    return false;
+  }
+};
