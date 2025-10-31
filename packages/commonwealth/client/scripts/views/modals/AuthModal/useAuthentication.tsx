@@ -737,16 +737,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         chainIdentifier,
       );
 
-      // TODO: remove
-      console.log('signin data => ', {
-        address,
-        community_id: chainIdentifier,
-        wallet_id: wallet.name,
-        block_info: validationBlockInfo
-          ? JSON.stringify(validationBlockInfo)
-          : null,
-        referrer_address: refcode,
-      });
       const {
         account: signingAccount,
         newlyCreated,

@@ -19,7 +19,9 @@ class BaseWebWalletController implements IWebWallet<string> {
   private _enabling = false;
   private _accounts: string[];
   private _provider: Web3BaseProvider | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _web3: Web3 | any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _sdk: any;
 
   public readonly name = WalletId.Base;
