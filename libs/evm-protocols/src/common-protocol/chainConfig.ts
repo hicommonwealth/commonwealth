@@ -90,7 +90,7 @@ export const factoryContracts: FactoryContractsType = {
     VoteGovernance: '0x959982eFDa4ed7840a67CF56042e46ad16A1EF88',
     CommunityNominations: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
     TokenLaunchpad: '0x2518d4d38547953C6d96a9cDB76F25A0c0630c43',
-    TokenBondingCurve: '0x112eAB263b0eEe88b6996Ff4A03D9629dad8a2b8',
+    TokenBondingCurve: '0x815D6c411eeCaB081FF76dBcF05484B0991CE55C',
     chainId: 84532,
   },
   [ValidChains.Blast]: {
@@ -147,7 +147,7 @@ export const factoryContracts: FactoryContractsType = {
     // veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE',
     CommunityNominations: '0xDB04d3bdf53e3F7d2314d9C19Ec8420b2EeCda93',
     TokenLaunchpad: '0x2518d4d38547953C6d96a9cDB76F25A0c0630c43',
-    TokenBondingCurve: '0x112eAB263b0eEe88b6996Ff4A03D9629dad8a2b8',
+    TokenBondingCurve: '0x815D6c411eeCaB081FF76dBcF05484B0991CE55C',
     chainId: 31337,
   },
 };
