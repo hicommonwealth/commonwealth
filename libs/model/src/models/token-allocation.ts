@@ -137,6 +137,7 @@ export const ClaimAddresses = (
       address: {
         type: Sequelize.STRING,
         allowNull: true,
+        unique: true,
       },
       magna_allocation_id: {
         type: Sequelize.STRING,
@@ -199,6 +200,13 @@ export const ClaimAddresses = (
       timestamps: true,
       underscored: true,
       tableName: 'ClaimAddresses',
+      indexes: [
+        {
+          name: 'claimaddresses_address_unique',
+          unique: true,
+          fields: ['address'],
+        },
+      ],
     },
   );
 
