@@ -1,15 +1,27 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
 import { BalanceSourceType, GatedActionEnum } from '@hicommonwealth/shared';
 import Chance from 'chance';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { CreateComment } from '../../src/aggregates/comment';
 import { CreateGroup } from '../../src/aggregates/community';
 import { CreateThread } from '../../src/aggregates/thread';
+import { config } from '../../src/config';
 import { models } from '../../src/database';
 import { NonMember } from '../../src/middleware/errors';
+import { getBotUser } from '../../src/utils/botUser';
 import { seedCommunity } from '../utils/community-seeder';
 
 const chance = new Chance();
+
+// Generate a test-specific bot user address (not using the real env var)
+const TEST_BOT_USER_ADDRESS = `0x${chance.string({ length: 40, pool: 'abcdef0123456789' })}`;
+
+// Mock the config.AI.BOT_USER_ADDRESS to use our test value
+vi.spyOn(config.AI, 'BOT_USER_ADDRESS', 'get').mockReturnValue(
+  TEST_BOT_USER_ADDRESS,
+);
+
+const BOT_USER_ADDRESS = TEST_BOT_USER_ADDRESS;
 
 describe('Bot user permissions in gated topics', () => {
   let community_id: string;
@@ -104,10 +116,7 @@ describe('Bot user permissions in gated topics', () => {
     thread_id = thread!.id!;
 
     // Set up the bot user for testing (blank database)
-    const botUserAddress = process.env.AI_BOT_USER_ADDRESS;
-    if (!botUserAddress) {
-      throw new Error('AI_BOT_USER_ADDRESS environment variable is not set');
-    }
+    // BOT_USER_ADDRESS was set at the top of the file before imports
 
     // Create bot user from scratch for blank database
     const botUser = await models.User.create({
@@ -121,7 +130,7 @@ describe('Bot user permissions in gated topics', () => {
     // Create bot address in the test community
     const botAddress = await models.Address.create({
       user_id: botUser.id,
-      address: botUserAddress,
+      address: BOT_USER_ADDRESS,
       community_id: community_id,
       verified: new Date(),
       ghost_address: false,
@@ -138,6 +147,12 @@ describe('Bot user permissions in gated topics', () => {
       },
       address: botAddress.address,
     };
+
+    // Verify the bot user can be found via getBotUser()
+    const retrievedBotUser = await getBotUser();
+    expect(retrievedBotUser).toBeDefined();
+    expect(retrievedBotUser?.user.id).toBe(botUser.id);
+    expect(retrievedBotUser?.address.address).toBe(BOT_USER_ADDRESS);
   });
 
   afterAll(async () => {
