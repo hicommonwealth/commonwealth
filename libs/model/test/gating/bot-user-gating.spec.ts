@@ -7,7 +7,6 @@ import { CreateGroup } from '../../src/aggregates/community';
 import { CreateThread } from '../../src/aggregates/thread';
 import { models } from '../../src/database';
 import { NonMember } from '../../src/middleware/errors';
-import { getBotUser } from '../../src/utils/botUser';
 import { seedCommunity } from '../utils/community-seeder';
 
 const chance = new Chance();
@@ -104,69 +103,40 @@ describe('Bot user permissions in gated topics', () => {
     expect(thread).toBeDefined();
     thread_id = thread!.id!;
 
-    // Set up the bot user for testing
+    // Set up the bot user for testing (blank database)
     const botUserAddress = process.env.AI_BOT_USER_ADDRESS;
     if (!botUserAddress) {
       throw new Error('AI_BOT_USER_ADDRESS environment variable is not set');
     }
 
-    // Check if bot user exists, create if needed
-    let existingBotUser = await models.User.findOne({
-      where: { email: 'ai-bot@common.xyz' },
-      include: [
-        {
-          model: models.Address,
-          where: { community_id: community_id },
-          required: false,
-        },
-      ],
+    // Create bot user from scratch for blank database
+    const botUser = await models.User.create({
+      email: 'ai-bot@common.xyz',
+      emailVerified: true,
+      isAdmin: false,
+      profile: {},
+      tier: 0,
     });
 
-    if (!existingBotUser) {
-      existingBotUser = await models.User.create({
-        email: 'ai-bot@common.xyz',
-        emailVerified: true,
-        isAdmin: false,
-        profile: {},
-        tier: 0,
-      });
+    // Create bot address in the test community
+    const botAddress = await models.Address.create({
+      user_id: botUser.id,
+      address: botUserAddress,
+      community_id: community_id,
+      verified: new Date(),
+      ghost_address: false,
+      is_banned: false,
+      role: 'member',
+      verification_token: '1234567890',
+    });
 
-      await models.Address.create({
-        user_id: existingBotUser.id,
-        address: botUserAddress,
-        community_id: community_id,
-        verified: new Date(),
-        ghost_address: false,
-        is_banned: false,
-        role: 'member',
-        verification_token: '1234567890',
-      });
-    } else if (existingBotUser.Addresses?.length === 0) {
-      // Bot user exists but doesn't have an address in this community
-      await models.Address.create({
-        user_id: existingBotUser.id,
-        address: botUserAddress,
-        community_id: community_id,
-        verified: new Date(),
-        ghost_address: false,
-        is_banned: false,
-        role: 'member',
-        verification_token: '1234567890',
-      });
-    }
-
-    // Get the bot user to create bot actor
-    const botUser = await getBotUser();
-    if (!botUser) {
-      throw new Error('Bot user not configured for testing');
-    }
-
+    // Create bot actor for testing
     botActor = {
       user: {
-        id: botUser.user.id!,
-        email: botUser.user.email!,
+        id: botUser.id!,
+        email: botUser.email!,
       },
-      address: botUser.address.address,
+      address: botAddress.address,
     };
   });
 
