@@ -6,10 +6,56 @@ import type { UserInstance } from '../models/user';
 
 const log = logger(import.meta);
 
+// In-memory cache for bot user ID (no TTL since it's essentially static)
+let cachedBotUserId: number | null | undefined = undefined;
+
 export interface BotUserWithAddress {
   user: UserInstance;
   address: AddressInstance;
 }
+
+/**
+ * Get the cached bot user ID. This is more efficient than getBotUser()
+ * when you only need to check the user ID.
+ */
+const getBotUserId = async (): Promise<number | null> => {
+  // Return cached value if available
+  if (cachedBotUserId !== undefined) {
+    return cachedBotUserId;
+  }
+
+  const botUserAddress = config.AI.BOT_USER_ADDRESS;
+  if (!botUserAddress) {
+    return null;
+  }
+
+  // Cache miss - query DB and populate cache
+  try {
+    const address = await models.Address.findOne({
+      where: { address: botUserAddress },
+      include: [
+        {
+          model: models.User,
+          required: true,
+        },
+      ],
+    });
+
+    if (!address || !address.User?.id) {
+      throw new Error(`Bot user with address ${botUserAddress} not found`);
+    }
+
+    // Populate cache
+    cachedBotUserId = address.User.id;
+    return address.User.id;
+  } catch (error) {
+    log.error(
+      'Failed to get bot user ID',
+      error instanceof Error ? error : undefined,
+    );
+    return null;
+  }
+};
 
 export const getBotUser = async (): Promise<BotUserWithAddress | null> => {
   const botUserAddress = config.AI.BOT_USER_ADDRESS;
@@ -55,13 +101,17 @@ export const isBotAddress = async (addressId: number): Promise<boolean> => {
 
 export const isBotUser = async (userId: number): Promise<boolean> => {
   try {
-    const botUser = await getBotUser();
-    if (!botUser) {
+    const botUserId = await getBotUserId();
+    if (!botUserId) {
       return false;
     }
-    return botUser.user.id === userId;
+    return botUserId === userId;
   } catch (error) {
     // Bot user not configured or not found in database
+    log.error(
+      'Error checking if user is bot',
+      error instanceof Error ? error : undefined,
+    );
     return false;
   }
 };
