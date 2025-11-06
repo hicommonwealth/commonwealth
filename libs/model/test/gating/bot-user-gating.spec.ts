@@ -8,7 +8,7 @@ import { CreateThread } from '../../src/aggregates/thread';
 import { config } from '../../src/config';
 import { models } from '../../src/database';
 import { NonMember } from '../../src/middleware/errors';
-import { getBotUser } from '../../src/utils/botUser';
+import { clearBotUserCache, getBotUser } from '../../src/utils/botUser';
 import { seedCommunity } from '../utils/community-seeder';
 
 const chance = new Chance();
@@ -20,6 +20,9 @@ const TEST_BOT_USER_ADDRESS = `0x${chance.string({ length: 40, pool: 'abcdef0123
 vi.spyOn(config.AI, 'BOT_USER_ADDRESS', 'get').mockReturnValue(
   TEST_BOT_USER_ADDRESS,
 );
+
+// Clear the bot user cache to ensure the mock is used
+clearBotUserCache();
 
 const BOT_USER_ADDRESS = TEST_BOT_USER_ADDRESS;
 

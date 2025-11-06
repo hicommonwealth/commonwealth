@@ -15,6 +15,14 @@ export interface BotUserWithAddress {
 }
 
 /**
+ * Clear the bot user ID cache. This is useful for testing purposes
+ * when the bot user configuration changes during the test lifecycle.
+ */
+export const clearBotUserCache = (): void => {
+  cachedBotUserId = undefined;
+};
+
+/**
  * Get the cached bot user ID. This is more efficient than getBotUser()
  * when you only need to check the user ID.
  */
@@ -35,28 +43,24 @@ const getBotUserId = async (): Promise<number | null> => {
   try {
     const address = await models.Address.findOne({
       where: { address: botUserAddress },
-      include: [
-        {
-          model: models.User,
-          required: true,
-        },
-      ],
+      attributes: ['user_id'],
     });
 
-    if (!address || !address.User?.id) {
-      throw new Error(`Bot user with address ${botUserAddress} not found`);
+    if (!address || !address.user_id) {
+      // Don't cache - the address might be created later (e.g., in tests)
+      // Only return null for this request
+      return null;
     }
 
     // Populate cache
-    cachedBotUserId = address.User.id;
-    return address.User.id;
+    cachedBotUserId = address.user_id;
+    return address.user_id;
   } catch (error) {
     log.error(
       'Failed to get bot user ID',
       error instanceof Error ? error : undefined,
     );
-    // Cache null on error to avoid repeated failed DB queries
-    cachedBotUserId = null;
+    // Don't cache DB errors either - they might be transient
     return null;
   }
 };
