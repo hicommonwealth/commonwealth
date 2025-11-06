@@ -1,7 +1,7 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { GatedActionEnum, UserTierMap } from '@hicommonwealth/shared';
 import Chance from 'chance';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { CreateComment } from '../../src/aggregates/comment';
 import {
   CreateGroup,
@@ -13,13 +13,21 @@ import {
   GetThreads,
   SearchThreads,
 } from '../../src/aggregates/thread';
+import { config } from '../../src/config';
 import { models } from '../../src/database';
 import { systemActor } from '../../src/middleware/auth';
 import { NonMember, RejectedMember } from '../../src/middleware/errors';
-import { getBotUser } from '../../src/utils/botUser';
 import { seedCommunity } from '../utils/community-seeder';
 
 const chance = new Chance();
+
+// Generate a test-specific bot user address (not using the real env var)
+const TEST_BOT_USER_ADDRESS = '0xTestBotAddress123';
+
+// Mock the config.AI.BOT_USER_ADDRESS to use our test value
+vi.spyOn(config.AI, 'BOT_USER_ADDRESS', 'get').mockReturnValue(
+  TEST_BOT_USER_ADDRESS,
+);
 
 describe('Gating lifecycle', () => {
   let admin: Actor, member: Actor, rejected: Actor;
@@ -55,33 +63,30 @@ describe('Gating lifecycle', () => {
     rejected = actors.rejected;
 
     // Seed the bot user for testing (after community is created)
-    const botUserAddress = process.env.AI_BOT_USER_ADDRESS;
-    if (botUserAddress) {
-      const existingBotUser = await models.User.findOne({
-        where: { email: 'ai-bot@common.xyz' },
+    const existingBotUser = await models.User.findOne({
+      where: { email: 'ai-bot@common.xyz' },
+    });
+
+    if (!existingBotUser) {
+      const botUser = await models.User.create({
+        email: 'ai-bot@common.xyz',
+        emailVerified: true,
+        isAdmin: false,
+        profile: {},
+        tier: UserTierMap.ManuallyVerified,
       });
 
-      if (!existingBotUser) {
-        const botUser = await models.User.create({
-          email: 'ai-bot@common.xyz',
-          emailVerified: true,
-          isAdmin: false,
-          profile: {},
-          tier: UserTierMap.ManuallyVerified,
-        });
-
-        // Create a bot address in the test community (required since community_id cannot be null)
-        await models.Address.create({
-          user_id: botUser.id,
-          address: botUserAddress,
-          community_id: community_id,
-          verified: new Date(),
-          ghost_address: false,
-          is_banned: false,
-          role: 'member',
-          verification_token: '1234567890',
-        });
-      }
+      // Create a bot address in the test community (required since community_id cannot be null)
+      await models.Address.create({
+        user_id: botUser.id,
+        address: TEST_BOT_USER_ADDRESS,
+        community_id: community_id,
+        verified: new Date(),
+        ghost_address: false,
+        is_banned: false,
+        role: 'member',
+        verification_token: '1234567890',
+      });
     }
   });
 
@@ -497,25 +502,31 @@ describe('Gating lifecycle', () => {
         },
       });
 
-      // Get bot user
-      const botUser = await getBotUser();
-      if (!botUser) {
-        throw new Error('Bot user not configured for testing');
+      // Get bot user (directly from database, seeded in beforeAll)
+      const botUser = await models.User.findOne({
+        where: { email: 'ai-bot@common.xyz' },
+        include: [{ model: models.Address, required: true }],
+      });
+
+      if (!botUser || !botUser.Addresses || botUser.Addresses.length === 0) {
+        throw new Error('Bot user not seeded properly in test setup');
       }
 
+      const botAddress = botUser.Addresses[0];
+
       // Join community as bot if not already joined
-      const botAddress = await models.Address.findOne({
+      const botCommunityAddress = await models.Address.findOne({
         where: {
-          user_id: botUser.user.id,
+          user_id: botUser.id,
           community_id,
         },
       });
 
-      if (!botAddress) {
+      if (!botCommunityAddress) {
         // Create bot address in community
         await models.Address.create({
-          user_id: botUser.user.id,
-          address: botUser.address.address,
+          user_id: botUser.id,
+          address: botAddress.address,
           community_id,
           role: 'member',
           verified: new Date(),
@@ -527,10 +538,10 @@ describe('Gating lifecycle', () => {
       // Create bot actor (using regular actor, not system actor to test the bypass logic)
       const botActor: Actor = {
         user: {
-          id: botUser.user.id!,
-          email: botUser.user.email!,
+          id: botUser.id!,
+          email: botUser.email!,
         },
-        address: botUser.address.address,
+        address: botAddress.address,
       };
 
       // Bot should be able to comment even though the topic is gated
@@ -561,17 +572,23 @@ describe('Gating lifecycle', () => {
         },
       });
 
-      // Get bot user
-      const botUser = await getBotUser();
-      if (!botUser) {
-        throw new Error('Bot user not configured for testing');
+      // Get bot user (directly from database, seeded in beforeAll)
+      const botUser = await models.User.findOne({
+        where: { email: 'ai-bot@common.xyz' },
+        include: [{ model: models.Address, required: true }],
+      });
+
+      if (!botUser || !botUser.Addresses || botUser.Addresses.length === 0) {
+        throw new Error('Bot user not seeded properly in test setup');
       }
+
+      const botAddress = botUser.Addresses[0];
 
       // Create system actor for bot (this is how CreateAICompletionComment does it)
       const botSystemActor = systemActor({
-        address: botUser.address.address,
-        id: botUser.user.id!,
-        email: botUser.user.email || 'ai-bot@common.xyz',
+        address: botAddress.address,
+        id: botUser.id!,
+        email: botUser.email || 'ai-bot@common.xyz',
       });
 
       // System actor bot should be able to comment even though the topic is gated

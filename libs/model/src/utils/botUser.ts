@@ -26,6 +26,8 @@ const getBotUserId = async (): Promise<number | null> => {
 
   const botUserAddress = config.AI.BOT_USER_ADDRESS;
   if (!botUserAddress) {
+    // Cache null result to avoid repeated config checks
+    cachedBotUserId = null;
     return null;
   }
 
@@ -53,6 +55,8 @@ const getBotUserId = async (): Promise<number | null> => {
       'Failed to get bot user ID',
       error instanceof Error ? error : undefined,
     );
+    // Cache null on error to avoid repeated failed DB queries
+    cachedBotUserId = null;
     return null;
   }
 };
@@ -60,7 +64,8 @@ const getBotUserId = async (): Promise<number | null> => {
 export const getBotUser = async (): Promise<BotUserWithAddress | null> => {
   const botUserAddress = config.AI.BOT_USER_ADDRESS;
   if (!botUserAddress) {
-    log.error('AI_BOT_USER_ADDRESS environment variable is not set');
+    // AI bot feature is not configured - this is expected in many environments
+    log.debug('AI_BOT_USER_ADDRESS environment variable is not set');
     return null;
   }
 
@@ -87,7 +92,7 @@ export const getBotUser = async (): Promise<BotUserWithAddress | null> => {
 export const isBotAddress = async (addressId: number): Promise<boolean> => {
   const botUser = await getBotUser();
   if (!botUser) {
-    log.error('Bot user not found');
+    // Bot user not configured - not an error, just return false
     return false;
   }
   const address = await models.Address.findOne({
