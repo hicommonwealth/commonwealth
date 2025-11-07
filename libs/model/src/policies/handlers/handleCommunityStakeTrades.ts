@@ -66,6 +66,21 @@ export const handleCommunityStakeTrades: EventHandler<
     blockHash: payload.rawLog.blockHash,
   });
 
+  const stake = await models.CommunityStake.findOne({
+    where: {
+      stake_id: stakeInfo.stakeId,
+      community_id: community.id,
+    },
+  });
+  if (!stake) {
+    log.error('Stake not found', undefined, {
+      payload,
+      stakeInfo,
+      community,
+    });
+    return;
+  }
+
   await models.sequelize.transaction(async (transaction) => {
     await models.StakeTransaction.create(
       {
