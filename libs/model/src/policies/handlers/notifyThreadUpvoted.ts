@@ -41,7 +41,7 @@ export const notifyThreadUpvoted: EventHandler<
     return false;
   }
 
-  if (!threadAndAuthor.Address) {
+  if (!threadAndAuthor.Address?.address) {
     log.error('Thread author not found!', undefined, payload);
     return false;
   }
