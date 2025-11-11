@@ -207,17 +207,10 @@ export const useLaunchAndBuyThreadToken = ({
 
     try {
       setIsLoadingThreadFormTokenGain(true);
-      const inputAmount = parseFloat(amount);
-      const amountInWei = inputAmount * 1e18;
 
       if (tokenLaunchpad) {
         try {
-          const amountOut = await tokenLaunchpad.getAmountOut(
-            '0x0000000000000000000000000000000000000000', // token address will be empty for launch
-            Math.floor(amountInWei),
-            true,
-            `${ethChainId}`,
-          );
+          const amountOut = 1; // On launch will always be 1.
           setThreadFormTokenGainAmount(amountOut);
         } catch (error) {
           console.warn(
