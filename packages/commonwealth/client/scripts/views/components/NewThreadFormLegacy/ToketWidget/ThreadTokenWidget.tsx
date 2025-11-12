@@ -2,6 +2,7 @@ import { Community } from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useEffect, useMemo } from 'react';
 import { useCreateThreadTokenTradeMutation } from 'state/api/threads';
+import FractionalValue from 'views/components/FractionalValue';
 import { z } from 'zod';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
@@ -122,6 +123,7 @@ const ThreadTokenWidget = ({
 
   const safeCurrentAmount = currentAmount || '0';
   const safeCurrentTokenGainAmount = currentTokenGainAmount || 0;
+
   const safeSetCurrentAmount = setCurrentAmount || (() => {});
 
   useEffect(() => {
@@ -381,6 +383,11 @@ const ThreadTokenWidget = ({
 
   const shouldShowSellMode = !isThreadCreationMode;
 
+  const tokenSymbol =
+    isThreadCreationMode || !isSellMode
+      ? threadToken?.symbol || 'TOKEN'
+      : primaryTokenSymbol;
+
   return (
     <div className="ThreadTokenWidget">
       <div className="purchase-token-card">
@@ -473,20 +480,15 @@ const ThreadTokenWidget = ({
           <CWText type="caption" className="receive-label">
             You receive
           </CWText>
-          <CWText
+
+          <FractionalValue
+            value={safeCurrentTokenGainAmount}
+            currencySymbol={tokenSymbol}
+            symbolLast={true}
             type="caption"
             fontWeight="regular"
             className="receive-amount"
-          >
-            {currentIsLoadingTokenGain
-              ? 'Calculating...'
-              : // TODO: we can use fraction value comp here
-                `${safeCurrentTokenGainAmount.toFixed(8)} ${
-                  isThreadCreationMode || !isSellMode
-                    ? threadToken?.symbol || 'TOKEN'
-                    : primaryTokenSymbol
-                }`}
-          </CWText>
+          />
         </div>
 
         <CWButton
