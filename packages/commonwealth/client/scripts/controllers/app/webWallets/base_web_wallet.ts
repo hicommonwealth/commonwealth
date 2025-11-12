@@ -73,6 +73,10 @@ class BaseWebWalletController implements IWebWallet<string> {
   }
 
   public getSessionSigner() {
+    // base wallet accounts are smart-contract / passkey wallets - their `personal_sign` output is
+    // an ERC-4337 aggregator payload rather than a legacy 65-byte ECDSA signature. The server
+    // accounts for this by skipping the SIWE verification path for Base sessions until we have a
+    // way to verify the signature.
     return new SIWESigner({
       signer: {
         signMessage: (message) =>

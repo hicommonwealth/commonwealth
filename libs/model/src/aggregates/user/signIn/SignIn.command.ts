@@ -1,12 +1,16 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { WalletId } from '@hicommonwealth/shared';
+import { deserializeCanvas, WalletId } from '@hicommonwealth/shared';
 import crypto from 'crypto';
 import { config } from '../../../config';
 import { models } from '../../../database';
 import { mustExist } from '../../../middleware/guards';
 import { UserAttributes } from '../../../models/user';
-import { verifyAddress, type VerifiedAddress } from '../../../services/session';
+import {
+  verifyAddress,
+  verifySessionSignature,
+  type VerifiedAddress,
+} from '../../../services/session';
 import { signInPrivy } from './privy';
 import { signInUser } from './utils';
 
@@ -73,12 +77,12 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         });
       }
 
-      // TODO: fix session signing checks
-      // await verifySessionSignature(
-      //   deserializeCanvas(session),
-      //   encodedAddress,
-      //   ss58Prefix,
-      // );
+      await verifySessionSignature(
+        deserializeCanvas(session),
+        encodedAddress,
+        ss58Prefix,
+        { walletId: wallet_id },
+      );
 
       const verification_token = crypto.randomBytes(18).toString('hex');
       const verification_token_expires = new Date(
