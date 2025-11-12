@@ -1,4 +1,4 @@
-import { type Command } from '@hicommonwealth/core';
+import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
 import {
@@ -21,7 +21,7 @@ export function CreateAICompletionToken(): Command<
 
       const { parent_comment_id, content } = payload;
 
-      // Verify parent comment exists if specified
+      // Verify parent comment exists and was created by requester if specified
       let parentComment = null;
       if (parent_comment_id) {
         parentComment = await models.Comment.findOne({
@@ -29,8 +29,21 @@ export function CreateAICompletionToken(): Command<
             id: parent_comment_id,
             thread_id: thread.id,
           },
+          include: [
+            {
+              model: models.Address,
+              required: true,
+            },
+          ],
         });
         mustExist('Parent Comment', parentComment);
+
+        // Ensure the parent comment was created by the requesting user
+        if (parentComment.Address!.user_id !== actor.user.id) {
+          throw new InvalidState(
+            'Parent comment must be created by the requesting user',
+          );
+        }
       }
 
       // Calculate expiration time (server-controlled)
