@@ -178,6 +178,22 @@ export const CommentCard = ({
       threadId: comment.thread_id,
       existingNumberOfComments: 0,
     });
+
+  // Use refs to avoid including mutation functions in useEffect dependencies
+  const createAICompletionTokenRef = useRef(createAICompletionToken);
+  const createAICompletionCommentRef = useRef(createAICompletionComment);
+
+  useEffect(() => {
+    createAICompletionTokenRef.current = createAICompletionToken;
+    createAICompletionCommentRef.current = createAICompletionComment;
+  }, [createAICompletionToken, createAICompletionComment]);
+
+  // Use ref for generateCompletion to avoid effect re-runs
+  const generateCompletionRef = useRef(generateCompletion);
+  useEffect(() => {
+    generateCompletionRef.current = generateCompletion;
+  }, [generateCompletion]);
+
   const [commentText, setCommentText] = useState(comment.body);
   const commentBody = React.useMemo(() => {
     const rawContent = editDraft || commentText || comment.body;
@@ -263,7 +279,6 @@ export const CommentCard = ({
     if (!isStreamingAIReply || !streamingModelId) return;
 
     let mounted = true;
-    let finalText = '';
     let accumulatedText = '';
 
     const generateAIReply = async () => {
@@ -298,7 +313,7 @@ Community Description: ${communityDescription}`;
 
         setStreamingText('');
 
-        await generateCompletion(userPrompt, {
+        await generateCompletionRef.current(userPrompt, {
           systemPrompt: systemPrompt,
           model: streamingModelId as CompletionModel,
           stream: true,
@@ -307,39 +322,101 @@ Community Description: ${communityDescription}`;
             if (mounted) {
               accumulatedText += chunk;
               setStreamingText(accumulatedText);
-              finalText = accumulatedText;
             }
           },
           onComplete: async (completedText) => {
+            console.log('[AI Reply] onComplete triggered', {
+              mounted,
+              textLength: completedText?.length,
+              hasError: completedText?.startsWith('Error generating reply'),
+              threadId: comment.thread_id,
+              commentId: comment.id,
+              isRootComment,
+            });
+
+            // Early exit if component is unmounted
+            if (!mounted) {
+              console.log(
+                '[AI Reply] Component unmounted, skipping completion',
+              );
+              return;
+            }
+
             if (
-              mounted &&
               completedText &&
               !completedText.startsWith('Error generating reply')
             ) {
               try {
-                if (!user.activeAccount?.address) {
-                  throw new Error('No active user account found');
+                if (!activeUserAddress) {
+                  const errorMsg = 'No active user account found';
+                  console.error('[AI Reply] Token creation failed:', errorMsg);
+                  throw new Error(errorMsg);
                 }
 
+                console.log('[AI Reply] Creating AI completion token...', {
+                  thread_id: comment.thread_id,
+                  parent_comment_id: isRootComment ? undefined : comment.id,
+                  contentLength: completedText.length,
+                });
+
                 // Create AI completion token with the generated content
-                const tokenResponse = await createAICompletionToken({
+                const tokenResponse = await createAICompletionTokenRef.current({
                   thread_id: comment.thread_id,
                   parent_comment_id: isRootComment ? undefined : comment.id,
                   content: completedText,
                 });
 
-                // Immediately use the token to create the bot comment
-                await createAICompletionComment({
-                  token: tokenResponse.token,
+                console.log('[AI Reply] Token created successfully:', {
+                  tokenId: tokenResponse.id,
+                  expiresAt: tokenResponse.expires_at,
                 });
+
+                // Immediately use the token to create the bot comment
+                console.log('[AI Reply] Creating AI completion comment...');
+                const createdComment =
+                  await createAICompletionCommentRef.current({
+                    token: tokenResponse.token,
+                  });
+
+                console.log('[AI Reply] Comment created successfully:', {
+                  commentId: createdComment.id,
+                });
+
+                if (mounted) {
+                  setStreamingText('');
+                }
               } catch (error) {
-                console.error('Error creating AI completion comment:', error);
-                setStreamingText(
-                  `Failed to post reply from ${modelName || 'AI'}.`,
-                );
+                console.error('[AI Reply] Error in onComplete callback:', {
+                  error: error instanceof Error ? error.message : String(error),
+                  stack: error instanceof Error ? error.stack : undefined,
+                  threadId: comment.thread_id,
+                  commentId: comment.id,
+                  isRootComment,
+                  userAddress: activeUserAddress,
+                  mounted,
+                });
+
+                if (mounted) {
+                  setStreamingText(
+                    `Failed to post reply from ${modelName || 'AI'}: ${
+                      error instanceof Error ? error.message : String(error)
+                    }`,
+                  );
+                }
               }
+            } else {
+              console.warn('[AI Reply] onComplete called with invalid text:', {
+                textLength: completedText?.length,
+                startsWithError: completedText?.startsWith(
+                  'Error generating reply',
+                ),
+                text: completedText?.substring(0, 100),
+              });
             }
-            onStreamingCompleteRef.current?.();
+
+            if (mounted) {
+              onStreamingCompleteRef.current?.();
+            }
           },
           onError: (error) => {
             if (mounted) {
@@ -386,7 +463,6 @@ Community Description: ${communityDescription}`;
     comment.thread_id,
     comment.community_id,
     activeUserAddress,
-    generateCompletion,
     community,
   ]);
 

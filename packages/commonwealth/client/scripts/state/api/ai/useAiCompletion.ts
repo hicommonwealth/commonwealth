@@ -214,7 +214,28 @@ ${contextualData}
                 setCompletion(accumulatedText);
               }
 
-              options?.onComplete?.(accumulatedText);
+              console.log(
+                `[${requestId}] Calling onComplete callback with ${accumulatedText.length} characters`,
+              );
+              try {
+                await options?.onComplete?.(accumulatedText);
+                console.log(
+                  `[${requestId}] onComplete callback finished successfully`,
+                );
+              } catch (callbackError) {
+                console.error(`[${requestId}] Error in onComplete callback:`, {
+                  error:
+                    callbackError instanceof Error
+                      ? callbackError.message
+                      : String(callbackError),
+                  stack:
+                    callbackError instanceof Error
+                      ? callbackError.stack
+                      : undefined,
+                });
+                // Re-throw to be caught by outer catch
+                throw callbackError;
+              }
               break;
             }
 
@@ -258,9 +279,18 @@ ${contextualData}
         console.error(`[${requestId}] AI completion error:`, {
           error: tempError.message,
           stack: tempError.stack,
+          name: tempError.name,
         });
         setError(tempError);
-        options?.onError?.(tempError);
+
+        try {
+          options?.onError?.(tempError);
+        } catch (errorCallbackErr) {
+          console.error(
+            `[${requestId}] Error in onError callback:`,
+            errorCallbackErr,
+          );
+        }
       } finally {
         console.log(`[${requestId}] AI completion request finished`);
         setIsLoading(false);
