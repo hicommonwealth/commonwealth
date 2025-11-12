@@ -28,8 +28,8 @@
     "region": "us-east4-eqdc4a",
     "limitOverride": {
       "containers": {
-        "cpu": 1,
-        "memoryBytes": 1000000000
+        "cpu": 2,
+        "memoryBytes": 2500000000
       }
     }
   }

@@ -14,9 +14,25 @@ interface DlqSummary {
   last_failure: Date;
 }
 
-function formatSlackDate(d: Date): string {
-  const ts = Math.floor(new Date(d).getTime() / 1000);
-  return `<!date^${ts}^{date_short_pretty}|${d.toISOString().substring(0, 10)}>`;
+function formatDate(d: Date): string {
+  const now = new Date();
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const startOfInput = new Date(d);
+  startOfInput.setHours(0, 0, 0, 0);
+
+  const diffDays = Math.floor(
+    (startOfToday.getTime() - startOfInput.getTime()) / 86400000,
+  );
+
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+
+  return d.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
 async function sendToSlack(results: DlqSummary[]) {
@@ -30,7 +46,10 @@ async function sendToSlack(results: DlqSummary[]) {
   const allBlocks = [
     {
       type: 'section',
-      text: { type: 'mrkdwn', text: '*DLQ Event Summary*' },
+      text: {
+        type: 'mrkdwn',
+        text: '*DLQ Event Summary* (from Sep 1, 2025... ignoring notifications)',
+      },
     },
     { type: 'divider' },
   ];
@@ -44,9 +63,9 @@ async function sendToSlack(results: DlqSummary[]) {
     table +=
       '\n------------------------------------------------------------------------';
     for (const e of events) {
-      const first = formatSlackDate(new Date(e.first_failure));
-      const last = formatSlackDate(new Date(e.last_failure));
-      table += `${e.event_name.padEnd(32)}${String(e.count).padEnd(8)}${first.padEnd(16)} ${last.padEnd(16)}}\n`;
+      const first = formatDate(new Date(e.first_failure));
+      const last = formatDate(new Date(e.last_failure));
+      table += `${e.event_name.padEnd(32)}${String(e.count).padEnd(8)}${first.padEnd(16)}${last.padEnd(16)}\n`;
     }
     table += '```';
 
@@ -69,7 +88,7 @@ async function sendToSlack(results: DlqSummary[]) {
   for (let i = 0; i < allBlocks.length; i += chunkSize) {
     const chunk = allBlocks.slice(i, i + chunkSize);
     const payload = {
-      text: 'DLQ Event Summary', // fallback
+      text: 'DLQ Event Summary',
       blocks: chunk,
     };
 
@@ -108,6 +127,9 @@ async function main() {
         MIN(created_at) as first_failure,
         MAX(created_at) as last_failure
       FROM "Dlq"
+      WHERE 
+        created_at >= '2025-09-01' -- cutoff date
+        AND consumer NOT LIKE 'Notifications%'
       GROUP BY consumer, event_name, reason
       ORDER BY count DESC;
     `;

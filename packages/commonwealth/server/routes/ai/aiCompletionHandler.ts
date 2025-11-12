@@ -4,6 +4,7 @@ import { models } from '@hicommonwealth/model/db';
 import {
   buildMCPClientOptions,
   CommonMCPServerWithHeaders,
+  withMCPAuthUsername,
 } from '@hicommonwealth/model/services';
 import {
   CompletionOptions,
@@ -44,11 +45,17 @@ async function getAllMCPServers(
         where: { community_id: communityId },
         attributes: [], // Don't include the junction table data in results
       },
+      {
+        model: models.User,
+        as: 'AuthUser',
+        attributes: ['id', 'profile'],
+        required: false,
+      },
     ],
   });
 
   return mcpServers.map((server) => ({
-    ...server.toJSON(),
+    ...withMCPAuthUsername(server),
     headers: {}, // Add any necessary headers for authentication
   }));
 }

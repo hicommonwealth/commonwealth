@@ -12,6 +12,8 @@ const OPENSEA_API_KEY = config.OPENSEA_API_KEY;
 const COLLECTION_SLUG = 'lamumu-by-common';
 const CHAIN = 'ethereum';
 const DELAY_MS = 250; // Delay between API calls to respect rate limits
+const MAX_REQUESTS_PER_SECOND = 30;
+const MAX_REQUESTS_PER_MINUTE = 60;
 const TESTING_NFT_COUNT = 21;
 
 // Types
@@ -77,6 +79,60 @@ interface NFTCollectionRow {
     total_supply?: number;
     ranking_features?: Record<string, number> | null;
   }; // Keep as object for JSONB insertion
+}
+
+// Rate limiter class to enforce both per-second and per-minute limits
+class RateLimiter {
+  private requestTimestamps: number[] = [];
+  private maxPerSecond: number;
+  private maxPerMinute: number;
+
+  constructor(maxPerSecond: number, maxPerMinute: number) {
+    this.maxPerSecond = maxPerSecond;
+    this.maxPerMinute = maxPerMinute;
+  }
+
+  async waitForSlot(): Promise<void> {
+    const now = Date.now();
+
+    // Remove timestamps older than 1 minute
+    this.requestTimestamps = this.requestTimestamps.filter(
+      (timestamp) => now - timestamp < 60000,
+    );
+
+    // Check how many requests were made in the last second
+    const recentSecond = this.requestTimestamps.filter(
+      (timestamp) => now - timestamp < 1000,
+    ).length;
+
+    // Check how many requests were made in the last minute
+    const recentMinute = this.requestTimestamps.length;
+
+    // Calculate wait time needed
+    let waitTime = 0;
+
+    if (recentSecond >= this.maxPerSecond) {
+      // Need to wait until the oldest request in the last second is > 1s old
+      const oldestInSecond = this.requestTimestamps
+        .filter((timestamp) => now - timestamp < 1000)
+        .sort((a, b) => a - b)[0];
+      waitTime = Math.max(waitTime, 1000 - (now - oldestInSecond) + 10); // +10ms buffer
+    }
+
+    if (recentMinute >= this.maxPerMinute) {
+      // Need to wait until the oldest request is > 1min old
+      const oldest = this.requestTimestamps.sort((a, b) => a - b)[0];
+      waitTime = Math.max(waitTime, 60000 - (now - oldest) + 10); // +10ms buffer
+    }
+
+    if (waitTime > 0) {
+      console.log(`Rate limit: waiting ${waitTime}ms before next request`);
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
+    }
+
+    // Record this request
+    this.requestTimestamps.push(Date.now());
+  }
 }
 
 // Helper function to delay execution
@@ -164,7 +220,9 @@ async function fetchCollectionAssets(): Promise<NFTAsset[]> {
 async function fetchNFTDetails(
   contractAddress: string,
   tokenId: string,
+  rateLimiter: RateLimiter,
 ): Promise<NFTDetails | null> {
+  await rateLimiter.waitForSlot();
   const url = `https://api.opensea.io/api/v2/chain/${CHAIN}/contract/${contractAddress}/nfts/${tokenId}`;
 
   const response = await fetch(url, {
@@ -246,6 +304,15 @@ async function main() {
     return;
   }
 
+  // Initialize rate limiter
+  const rateLimiter = new RateLimiter(
+    MAX_REQUESTS_PER_SECOND,
+    MAX_REQUESTS_PER_MINUTE,
+  );
+  console.log(
+    `Rate limiter configured: ${MAX_REQUESTS_PER_SECOND} requests/second, ${MAX_REQUESTS_PER_MINUTE} requests/minute`,
+  );
+
   // Step 0: Clear table if --clear flag is provided
   if (shouldClearTable) {
     await clearNftSnapshotTable();
@@ -286,7 +353,11 @@ async function main() {
       `Processing NFT ${i + 1}/${unprocessedAssets.length}: ${asset.identifier}`,
     );
 
-    const details = await fetchNFTDetails(asset.contract, asset.identifier);
+    const details = await fetchNFTDetails(
+      asset.contract,
+      asset.identifier,
+      rateLimiter,
+    );
 
     // Save to database immediately after fetch
     await insertSingleNFTData(asset, details);
@@ -295,11 +366,6 @@ async function main() {
     console.log(
       `Progress: ${processedCount}/${unprocessedAssets.length} processed`,
     );
-
-    // Rate limiting delay
-    if (i < unprocessedAssets.length - 1) {
-      await delay(DELAY_MS);
-    }
   }
 
   console.log(`✅ Processing completed`);

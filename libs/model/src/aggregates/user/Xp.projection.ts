@@ -40,31 +40,36 @@ async function getUserByAddress(
   address: string,
   minTier = UserTierMap.NewlyVerifiedWallet,
 ) {
-  const addr = await models.Address.findOne({
-    where: {
-      [Op.and]: [
-        {
-          [Op.or]: [
-            { address: address.toLowerCase() },
-            { address: getEvmAddress(address) },
-          ],
-        },
-        { user_id: { [Op.not]: null } },
-        { is_banned: { [Op.eq]: false } },
-      ],
-    },
-    attributes: ['user_id'],
-    include: [
-      {
-        model: models.User,
-        attributes: ['id'],
-        required: true,
-        where: { tier: { [Op.gte]: minTier } },
+  try {
+    const validated = getEvmAddress(address);
+    const addr = await models.Address.findOne({
+      where: {
+        [Op.and]: [
+          {
+            [Op.or]: [
+              { address: address.toLowerCase() },
+              { address: validated },
+            ],
+          },
+          { user_id: { [Op.not]: null } },
+          { is_banned: { [Op.eq]: false } },
+        ],
       },
-    ],
-  });
-
-  return addr?.user_id ?? undefined;
+      attributes: ['user_id'],
+      include: [
+        {
+          model: models.User,
+          attributes: ['id'],
+          required: true,
+          where: { tier: { [Op.gte]: minTier } },
+        },
+      ],
+    });
+    return addr?.user_id ?? undefined;
+  } catch (err) {
+    log.error('Error validating address', err as Error);
+    return undefined;
+  }
 }
 
 /*
@@ -192,17 +197,16 @@ async function recordXpsForQuest({
     );
     if (reward_amount <= 0) continue;
 
-    const shared_reward =
-      shared_with && (creator_user_id || referrer_user_id)
-        ? Math.round(reward_amount * action_meta.creator_reward_weight)
-        : null;
+    const shared_reward = shared_with
+      ? Math.round(reward_amount * action_meta.creator_reward_weight)
+      : null;
     const xp_points = reward_amount - (shared_reward ?? 0);
     const creator_xp_points = creator_user_id ? shared_reward : null;
     const referrer_fee = reward_amount * config.XP.REFERRER_FEE_RATIO;
     const referrer_xp_points = referrer_user_id
       ? creator_address
         ? referrer_fee
-        : (shared_reward ?? referrer_fee)
+        : shared_reward || referrer_fee
       : null;
     await models.sequelize.query(
       `
@@ -268,7 +272,7 @@ async function recordXpsForQuest({
       xp_awarded = xp_awarded + :total_reward,
       end_date = CASE 
           WHEN (xp_awarded + :total_reward) >= max_xp_to_end
-          THEN NOW()
+          THEN :event_created_at
           ELSE end_date
         END
     WHERE id = :quest_id
@@ -280,8 +284,8 @@ async function recordXpsForQuest({
           event_id,
           event_created_at,
           user_id,
-          creator_user_id,
-          referrer_user_id,
+          creator_user_id: creator_user_id || null,
+          referrer_user_id: referrer_user_id || null,
           xp_points,
           creator_xp_points,
           referrer_xp_points,

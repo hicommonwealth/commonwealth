@@ -79,6 +79,15 @@ export default (
         type: Sequelize.DATE,
         allowNull: true,
       },
+      comment_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Comments',
+          key: 'id',
+        },
+        onDelete: 'CASCADE',
+      },
     },
     {
       timestamps: true,
@@ -92,6 +101,7 @@ export default (
         { fields: ['expires_at'] },
         { fields: ['used_at'] },
         { fields: ['thread_id'] },
+        { fields: ['comment_id'] },
       ],
     },
   );

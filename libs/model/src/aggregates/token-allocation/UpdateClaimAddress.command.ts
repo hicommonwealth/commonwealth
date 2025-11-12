@@ -42,25 +42,51 @@ export function UpdateClaimAddress(): Command<
           'Cannot update claim address. User mismatch.',
         );
 
-      const result = await models.sequelize.query<{ address: string }>(
-        `
-          INSERT INTO "ClaimAddresses" (user_id, address, created_at, updated_at)
-          SELECT :user_id, :address, NOW(), NOW()
-          ON CONFLICT (user_id) DO
-          UPDATE SET address = EXCLUDED.address, updated_at = NOW()
-          WHERE "ClaimAddresses".magna_synced_at IS NULL
-          RETURNING address;
-        `,
-        {
-          type: QueryTypes.SELECT,
-          replacements: {
+      let result: { address: string }[] | undefined;
+      await models.sequelize.transaction(async (transaction) => {
+        const addresses = await models.Address.findAll({
+          where: {
             user_id: addr.user_id,
-            address: addr.address,
           },
-        },
-      );
+        });
+        await models.sequelize.query(
+          `
+          UPDATE "NftSnapshot"
+          SET user_id = :userId
+          WHERE user_id IS NULL
+            AND LOWER(holder_address) IN (:addresses);
+        `,
+          {
+            type: QueryTypes.UPDATE,
+            replacements: {
+              userId: addr.user_id,
+              addresses: addresses.map((a) => a.address.toLowerCase()),
+            },
+            transaction,
+          },
+        );
 
-      if (result.length === 0)
+        result = await models.sequelize.query<{ address: string }>(
+          `
+            INSERT INTO "ClaimAddresses" (user_id, address, created_at, updated_at)
+            SELECT :user_id, :address, NOW(), NOW()
+            ON CONFLICT (user_id) DO UPDATE SET address = EXCLUDED.address,
+                                                updated_at = NOW()
+            WHERE "ClaimAddresses".magna_synced_at IS NULL
+            RETURNING address;
+          `,
+          {
+            type: QueryTypes.SELECT,
+            replacements: {
+              user_id: addr.user_id,
+              address: addr.address,
+            },
+            transaction,
+          },
+        );
+      });
+
+      if (!result || result.length === 0)
         throw new InvalidState(
           'Cannot update claim address after user has been synchronized with magna',
         );

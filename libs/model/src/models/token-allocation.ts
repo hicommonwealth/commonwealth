@@ -114,6 +114,13 @@ type ClaimAddress = {
   magna_claimed_at: Date | null;
   magna_claim_data: string | null;
   magna_claim_tx_hash: string | null;
+  magna_claim_tx_at: Date | null;
+  magna_claim_tx_finalized: boolean | null;
+  magna_cliff_claimed_at: Date | null;
+  magna_cliff_claim_data: string | null;
+  magna_cliff_claim_tx_hash: string | null;
+  magna_cliff_claim_tx_at: Date | null;
+  magna_cliff_claim_tx_finalized: boolean | null;
   created_at: Date;
   updated_at: Date;
 };
@@ -130,6 +137,7 @@ export const ClaimAddresses = (
       address: {
         type: Sequelize.STRING,
         allowNull: true,
+        unique: true,
       },
       magna_allocation_id: {
         type: Sequelize.STRING,
@@ -151,6 +159,34 @@ export const ClaimAddresses = (
         type: Sequelize.STRING,
         allowNull: true,
       },
+      magna_claim_tx_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      magna_claim_tx_finalized: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
+      magna_cliff_claimed_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      magna_cliff_claim_data: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      magna_cliff_claim_tx_hash: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      magna_cliff_claim_tx_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      magna_cliff_claim_tx_finalized: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -164,5 +200,105 @@ export const ClaimAddresses = (
       timestamps: true,
       underscored: true,
       tableName: 'ClaimAddresses',
+      indexes: [
+        {
+          name: 'claimaddresses_address_unique',
+          unique: true,
+          fields: ['address'],
+        },
+      ],
+    },
+  );
+
+type NftSnapshot = {
+  token_id: number;
+  user_id: number | null;
+  user_tier: number | null;
+  name: string | null;
+  holder_address: string;
+  opensea_url: string | null;
+  traits: Record<string, unknown>;
+  opensea_rarity: Record<string, unknown> | null;
+  calculated_rarity: number | null;
+  rarity_tier: number | null;
+  equal_distribution_allocation: string | null;
+  rarity_distribution_allocation: string | null;
+  total_token_allocation: string | null;
+  created_at: Date;
+  updated_at: Date;
+};
+
+export const NftSnapshot = (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ModelInstance<NftSnapshot>> =>
+  sequelize.define<ModelInstance<NftSnapshot>>(
+    'NftSnapshot',
+    {
+      token_id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        allowNull: false,
+      },
+      user_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      user_tier: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      name: {
+        type: Sequelize.STRING(500),
+        allowNull: true,
+      },
+      holder_address: {
+        type: Sequelize.STRING(42),
+        allowNull: false,
+      },
+      opensea_url: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      traits: {
+        type: Sequelize.JSONB,
+        allowNull: false,
+      },
+      opensea_rarity: {
+        type: Sequelize.JSONB,
+        allowNull: true,
+      },
+      calculated_rarity: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      rarity_tier: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      equal_distribution_allocation: {
+        type: Sequelize.DECIMAL,
+        allowNull: true,
+      },
+      rarity_distribution_allocation: {
+        type: Sequelize.DECIMAL,
+        allowNull: true,
+      },
+      total_token_allocation: {
+        type: Sequelize.DECIMAL,
+        allowNull: true,
+      },
+      created_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      updated_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+    },
+    {
+      timestamps: true,
+      underscored: true,
+      tableName: 'NftSnapshot',
     },
   );

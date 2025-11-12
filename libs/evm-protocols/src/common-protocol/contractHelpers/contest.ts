@@ -500,7 +500,7 @@ export const rollOverContest = async ({
       }
     }
 
-    let gasResult = BigInt(300000);
+    let gasResult = BigInt(400000);
     try {
       const res = await client.estimateGas({
         account: client.account,

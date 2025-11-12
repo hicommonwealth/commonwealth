@@ -1,8 +1,8 @@
-import { config } from '@hicommonwealth/core';
 import { MCPServer } from '@hicommonwealth/schemas';
 import {
   DEFAULT_COMPLETION_MODEL,
   MCP_MENTION_SYMBOL,
+  getWhitelistedTools,
 } from '@hicommonwealth/shared';
 import OpenAI from 'openai';
 import { z } from 'zod';
@@ -11,6 +11,33 @@ import { extractMCPMentions } from '../..';
 export type CommonMCPServerWithHeaders = z.infer<typeof MCPServer> & {
   headers?: Record<string, string>;
 };
+
+// Function to filter servers and their tools based on whitelist
+function filterServersWithWhitelist(
+  servers: CommonMCPServerWithHeaders[],
+): CommonMCPServerWithHeaders[] {
+  return servers.map((server) => {
+    const whitelistedTools = getWhitelistedTools(server.handle);
+
+    // If no whitelist exists for this server, deny all tools (secure by default)
+    if (!whitelistedTools) {
+      return {
+        ...server,
+        tools: [],
+      };
+    }
+
+    // Filter the server's tools to only include whitelisted ones
+    const filteredTools = server.tools.filter((tool) =>
+      whitelistedTools.includes(tool.name),
+    );
+
+    return {
+      ...server,
+      tools: filteredTools,
+    };
+  });
+}
 
 // build MCP agent system prompt from servers list
 const buildSystemPrompt = (
@@ -42,19 +69,24 @@ export function buildMCPClientOptions(
         mention.handle === server.handle && mention.id === String(server.id),
     ),
   );
-  if (config.APP_ENV === 'local') {
-    console.log('mentionedServers: ', mentionedServers);
-  }
+
+  // Apply whitelist filtering to mentioned servers
+  const filteredServers = filterServersWithWhitelist(mentionedServers);
+
+  // Build MCP tools array with allowed_tools filter for each server
+  const mcpTools = filteredServers.map((server) => ({
+    type: 'mcp' as const,
+    server_label: server.handle!,
+    server_url: server.server_url!,
+    allowed_tools: server.tools.map((tool) => tool.name),
+    require_approval: 'never' as const,
+    headers: server.headers,
+  }));
+
   return {
     model: DEFAULT_COMPLETION_MODEL,
-    instructions: buildSystemPrompt(mentionedServers),
-    tools: mentionedServers.map((server) => ({
-      type: 'mcp',
-      server_label: server.handle!,
-      server_url: server.server_url!,
-      require_approval: 'never',
-      headers: server.headers,
-    })),
+    instructions: buildSystemPrompt(filteredServers),
+    tools: mcpTools,
     input: userInput,
     previous_response_id: previousResponseId,
     stream: true,

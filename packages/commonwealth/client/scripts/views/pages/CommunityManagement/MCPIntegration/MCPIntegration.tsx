@@ -1,3 +1,4 @@
+import { DOCS_SUBDOMAIN } from '@hicommonwealth/shared';
 import React, { useCallback, useMemo } from 'react';
 import app from 'state';
 import {
@@ -13,9 +14,11 @@ import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import './MCPIntegration.scss';
+import MCPServerConnectionCard from './MCPServerConnectionCard';
 
 const MCPIntegration = () => {
   const communityId = app.activeChainId() || '';
+
   const { data: community } = useGetCommunityByIdQuery({
     id: communityId,
     enabled: !!communityId,
@@ -24,6 +27,7 @@ const MCPIntegration = () => {
 
   const { data: servers = [], isLoading } =
     useFetchMcpServersQuery(communityId);
+
   const utils = trpc.useUtils();
   const { mutateAsync: setServers, isPending } =
     useSetCommunityMcpServersMutation();
@@ -56,28 +60,63 @@ const MCPIntegration = () => {
   return (
     <CWPageLayout>
       <section className="MCPIntegration">
-        <CWText type="h2">Manage MCP Integrations</CWText>
-        <div className="servers">
-          {servers.map((server) => {
-            const enabled = enabledIds.includes(server.id!);
-            return (
-              <CWCard
-                key={server.id}
-                className="server-card"
-                elevation="elevation-1"
-              >
-                <div className="header">
-                  <CWText type="h4">{server.name}</CWText>
-                  <CWToggle
-                    checked={enabled}
-                    disabled={isPending}
-                    onChange={() => onToggle(server.id!, !enabled)}
-                  />
-                </div>
-                <CWText type="b1">{server.description}</CWText>
-              </CWCard>
-            );
-          })}
+        <div className="header-section">
+          <CWText type="h2">Manage MCP Integrations</CWText>
+          <CWText type="b1" className="description">
+            Enable or disable Model Context Protocol servers to control the AI
+            tools available in your community.{' '}
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://${DOCS_SUBDOMAIN}/commonwealth/ai-tools`}
+            >
+              Learn more
+            </a>
+            .
+          </CWText>
+        </div>
+
+        {/* MCP Server Connections */}
+        <MCPServerConnectionCard
+          communityId={communityId}
+          serverType="Google Sheets"
+          serverName="Google Sheets MCP"
+          description={
+            'Connect Google Sheets to enable AI-powered spreadsheet ' +
+            'interactions through the Model Context Protocol (MCP). This ' +
+            'allows AI assistants to read and manipulate your Google Sheets data.'
+          }
+        />
+
+        {/* Available MCP Servers */}
+        <div className="servers-section">
+          <CWText type="h3">Available MCP Servers</CWText>
+          <div className="servers">
+            {servers.map((server) => {
+              const enabled = enabledIds.includes(server.id!);
+              const description = server.auth_username
+                ? `${server.description}\n\nConnected by ${server.auth_username}`
+                : server.description;
+              return (
+                <CWCard
+                  key={server.id}
+                  className="server-card"
+                  elevation="elevation-1"
+                >
+                  <div className="header">
+                    <CWText type="h4">{server.name}</CWText>
+                    <CWToggle
+                      className="mcp-toggle"
+                      checked={enabled}
+                      disabled={isPending}
+                      onChange={() => onToggle(server.id!, !enabled)}
+                    />
+                  </div>
+                  <CWText type="b1">{description}</CWText>
+                </CWCard>
+              );
+            })}
+          </div>
         </div>
       </section>
     </CWPageLayout>

@@ -11,6 +11,7 @@ export const AICompletionToken = z.object({
   content: z.string(),
   expires_at: z.coerce.date(),
   used_at: z.coerce.date().nullish(),
+  comment_id: PG_INT.nullish(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });

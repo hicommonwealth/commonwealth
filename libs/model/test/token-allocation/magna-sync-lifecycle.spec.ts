@@ -3,6 +3,7 @@ import { UserTierMap } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { Op } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { config } from '../../src/config';
 import { models } from '../../src/database';
 import { magnaSync } from '../../src/integrations/token-allocation/magna.sync';
 import { CommunitySeedResult, seedCommunity } from '../utils';
@@ -88,7 +89,7 @@ describe('MagnaSync Lifecycle', () => {
     });
     updates.forEach((update) => {
       expect(update.magna_allocation_id).toBe(
-        `initial-airdrop-${update.address}`,
+        `${config.MAGNA.EVENT}-${update.user_id}`,
       );
     });
   });

@@ -30,8 +30,7 @@ export const handleReferralFeeDistributed: EventHandler<
   const referral = await models.Referral.findOne({
     where: { namespace_address, referrer_address },
   });
-  // enforce chain events in flow are processed in order
-  if (!referral) throw Error('Referral fee received out of order');
+  if (!referral) return; // ignore when referral not found...TODO: provide UI to recover referrals and fees
 
   const referrer_received_amount = fee_amount;
 

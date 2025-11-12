@@ -34,9 +34,10 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const communityId = app.activeChainId() || '';
-  const { mutateAsync: editGroup } = useEditGroupMutation({
-    communityId,
-  });
+  const { mutateAsync: editGroup, isPending: isUpdatingGroup } =
+    useEditGroupMutation({
+      communityId,
+    });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
     communityId,
     includeTopics: true,
@@ -190,6 +191,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
               notifyError('Failed to update group');
             });
         }}
+        isSubmitting={isUpdatingGroup}
         onDelete={() => setIsDeleteModalOpen(true)}
         allowedAddresses={allowedAddresses}
         setAllowedAddresses={setAllowedAddresses}

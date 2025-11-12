@@ -11,6 +11,7 @@ import {
   Roles,
   WalletId,
 } from '@hicommonwealth/shared';
+import emojiRegex from 'emoji-regex';
 import { z } from 'zod';
 import { AuthContext, TopicContext, VerifiedContext } from '../context';
 import { MCPServer } from '../entities';
@@ -34,6 +35,12 @@ export const CreateCommunity = {
       })
       .refine((data) => !data.includes(ALL_COMMUNITIES), {
         message: `String must not contain '${ALL_COMMUNITIES}'`,
+      })
+      .refine((val) => !emojiRegex().test(val), {
+        message: 'name must not contain emojis',
+      })
+      .refine((val) => !/common/i.test(val), {
+        message: 'Name must not contain the word "Common"',
       }),
     chain_node_id: PG_INT,
     description: z.string().optional(),
@@ -165,6 +172,15 @@ export const SetCommunityMCPServers = {
     mcp_server_ids: z.array(z.number()),
   }),
   output: z.array(MCPServer),
+  context: AuthContext,
+};
+
+export const DeletePrivateMCPServer = {
+  input: z.object({
+    community_id: z.string(),
+    mcp_server_id: z.number(),
+  }),
+  output: MCPServer,
   context: AuthContext,
 };
 

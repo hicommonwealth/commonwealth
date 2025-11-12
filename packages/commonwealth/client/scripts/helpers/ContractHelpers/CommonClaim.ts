@@ -1,12 +1,16 @@
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import ContractBase from './ContractBase';
 
-class SignTokenClaim extends ContractBase {
+class CommonClaim extends ContractBase {
   tokenAddress: string;
+  tokenSymbol: string;
+  magnaPlatformFee = '200000000000000'; // 0.0002 ETH
 
-  constructor(tokenAddress: string, rpc: string) {
+  constructor(tokenAddress: string, tokenSymbol: string, rpc: string) {
     // empty abi to make the .filter in contract work
     super(tokenAddress, [], rpc);
     this.tokenAddress = tokenAddress;
+    this.tokenSymbol = tokenSymbol;
   }
 
   async initialize(
@@ -22,6 +26,7 @@ class SignTokenClaim extends ContractBase {
     contractAddress: string,
     walletAddress: string,
     data: string,
+    magnaPlatformFee?: string,
   ): Promise<{
     gasLimit: string;
     maxFeePerGas: string;
@@ -33,23 +38,18 @@ class SignTokenClaim extends ContractBase {
     balanceEth: string | number;
   }> {
     try {
+      // Estimate gas with the same parameters as the actual transaction
       const gasLimit = await this.web3.eth.estimateGas({
         from: walletAddress,
         to: contractAddress,
         data,
+        value: magnaPlatformFee, // Include the value to prevent contract reversion
       });
 
-      let maxPriorityFeePerGas: string;
-
-      try {
-        const fee = await this.web3.eth.getMaxPriorityFeePerGas();
-        maxPriorityFeePerGas = fee.toString();
-      } catch {
-        maxPriorityFeePerGas = this.web3.utils.toWei('1', 'gwei');
-      }
+      const maxPriorityFeePerGas = this.web3.utils.toWei('2', 'gwei');
 
       const block = await this.web3.eth.getBlock('pending');
-      const baseFee = block.baseFeePerGas?.toString() ?? '0';
+      const baseFee = block?.baseFeePerGas?.toString() ?? '0';
 
       const maxFeePerGas = (
         BigInt(baseFee) + BigInt(maxPriorityFeePerGas)
@@ -60,17 +60,20 @@ class SignTokenClaim extends ContractBase {
         await this.web3.eth.getBalance(walletAddress)
       ).toString();
 
-      const gasLimitWithBuffer = (BigInt(gasLimit) * 120n) / 100n; // +20%
-      const requiredGasCost = (
-        gasLimitWithBuffer * BigInt(maxFeePerGas)
-      ).toString();
+      // Calculate total cost: gas cost + magna platform fee
+      const gasLimitWithBuffer = (BigInt(gasLimit) * 120n) / 100n; // +20% gas buffer
+      const gasCost = gasLimitWithBuffer * BigInt(maxFeePerGas);
+      const totalRequiredCost = magnaPlatformFee
+        ? gasCost + BigInt(magnaPlatformFee)
+        : gasCost;
 
-      const hasEnoughBalance = BigInt(balance) >= BigInt(requiredGasCost);
+      const hasEnoughBalance = BigInt(balance) >= totalRequiredCost;
 
       // format to ETH for readability
       const requiredEth = parseFloat(
-        this.web3.utils.fromWei(requiredGasCost, 'ether'),
+        this.web3.utils.fromWei(totalRequiredCost.toString(), 'ether'),
       ).toFixed(8);
+
       const balanceEth = parseFloat(
         this.web3.utils.fromWei(balance, 'ether'),
       ).toFixed(8);
@@ -79,14 +82,15 @@ class SignTokenClaim extends ContractBase {
         gasLimit: gasLimit.toString(),
         maxFeePerGas,
         maxPriorityFeePerGas,
-        requiredGasCost,
+        requiredGasCost: totalRequiredCost.toString(),
         balance,
         hasEnoughBalance,
         // for ui
         requiredEth,
         balanceEth,
       };
-    } catch {
+    } catch (e) {
+      console.error('Gas estimation error: ', e, { 'revert reason': e?.data });
       // this shouldn't happen ideally
       // fallback values
       return {
@@ -102,10 +106,43 @@ class SignTokenClaim extends ContractBase {
     }
   }
 
+  async addTokenToWallet({
+    address,
+    symbol,
+    chainId = '8453',
+    providerInstance,
+  }: {
+    address?: string;
+    symbol?: string;
+    chainId?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providerInstance?: any;
+  }) {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true, chainId, providerInstance);
+    }
+
+    return await this.web3?.currentProvider?.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC20',
+        options: {
+          address: address || this.tokenAddress,
+          symbol: symbol || this.tokenSymbol,
+          decimals: 18,
+          chainId: parseInt(chainId),
+          image: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
+        },
+      },
+    });
+  }
+
   async sign(
     walletAddress: string,
     chainId: string,
     data: string,
+    includeMagnaPlatformFee: boolean,
+    onFeeEstimation?: (requiredEth: string | number) => void,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     providerInstance?: any,
   ): Promise<`0x${string}`> {
@@ -113,14 +150,27 @@ class SignTokenClaim extends ContractBase {
       await this.initialize(true, chainId, providerInstance);
     }
 
+    // Magna platform fee that needs to be sent with the transaction
+    const magnaFee = includeMagnaPlatformFee
+      ? this.magnaPlatformFee
+      : undefined;
+
     const {
-      maxPriorityFeePerGas,
       maxFeePerGas,
+      maxPriorityFeePerGas,
       hasEnoughBalance,
       requiredEth,
       balanceEth,
       gasLimit,
-    } = await this.estimateContractGas(this.tokenAddress, walletAddress, data);
+    } = await this.estimateContractGas(
+      this.tokenAddress,
+      walletAddress,
+      data,
+      magnaFee,
+    );
+    if (onFeeEstimation) {
+      onFeeEstimation(requiredEth);
+    }
     if (!hasEnoughBalance) {
       throw new Error(
         `Not enough gas: requires ~${requiredEth} ETH for fees, but wallet only has ${balanceEth} ETH.
@@ -132,7 +182,7 @@ class SignTokenClaim extends ContractBase {
       from: walletAddress,
       to: this.tokenAddress,
       data, // magna sends the full abi-encoded calldata
-      value: '0x0', // idk what this does
+      value: magnaFee,
       gas: gasLimit,
       maxFeePerGas,
       maxPriorityFeePerGas,
@@ -143,7 +193,20 @@ class SignTokenClaim extends ContractBase {
         void this.web3.eth
           .sendTransaction(tx)
           .once('transactionHash', (hash) => resolve(hash as `0x${string}`))
-          .once('error', (err) => reject(err));
+          .once('error', (err) => {
+            console.error(err);
+            reject(err);
+          })
+          .then(async () => {
+            // add token to wallet
+            // this will fail for magic wallet, but thats an issue coz magic auto imports tokens with > 0 value
+            await this.addTokenToWallet({
+              chainId,
+            }).catch(() => null);
+          })
+          .catch((e) => {
+            console.error('Tx error: ', e);
+          });
       } catch (error) {
         reject(error);
       }
@@ -151,4 +214,4 @@ class SignTokenClaim extends ContractBase {
   }
 }
 
-export default SignTokenClaim;
+export default CommonClaim;

@@ -20,6 +20,7 @@ import {
 import useUserStore from 'state/ui/user';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { z } from 'zod';
+import useGetTokenByCommunityId from '../../../../state/api/tokens/getTokenByCommunityId';
 
 interface UseThreadTokenWidgetProps {
   tokenizedThreadsEnabled?: boolean;
@@ -59,13 +60,19 @@ export const useThreadTokenWidget = ({
   const ethChainId = tokenCommunity?.ChainNode?.eth_chain_id || 1;
   const chainRpc = tokenCommunity?.ChainNode?.url || '';
 
+  const { data: launchpadToken } = useGetTokenByCommunityId({
+    community_id: tokenCommunity?.id as string,
+    with_stats: false,
+  });
+
   const { data: tokenMetadata } = useTokenMetadataQuery({
     tokenId: primaryTokenAddress,
     nodeEthChainId: ethChainId,
-    apiEnabled: !!primaryTokenAddress && !!ethChainId,
+    apiEnabled: !!primaryTokenAddress && !!ethChainId && !launchpadToken,
   });
 
-  const primaryTokenSymbol = tokenMetadata?.symbol || 'ETH';
+  const primaryTokenSymbol =
+    launchpadToken?.symbol || tokenMetadata?.symbol || 'ETH';
 
   const { data: primaryTokenRateData } = useFetchTokenUsdRateQuery({
     tokenSymbol: primaryTokenSymbol,

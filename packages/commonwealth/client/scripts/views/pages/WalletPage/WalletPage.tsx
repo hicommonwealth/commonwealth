@@ -25,7 +25,7 @@ import { AuthModal } from '../../modals/AuthModal';
 import { PageNotFound } from '../404';
 import './WalletPage.scss';
 import { QuestSummaryCard, ReferralCard, WalletCard } from './cards';
-import TokenClaimBanner from './components/TokenClaimBanner';
+import CommonAirdropCard from './components/CommonAirdropCard';
 import { ReferralTable, TokenTXHistoryTable, XPEarningsTable } from './tables';
 import { MobileTabType, TableType } from './types';
 import {
@@ -96,7 +96,7 @@ const WalletPage = () => {
       return (
         <CWPageLayout className="WalletPageLayout">
           <section className="WalletPage">
-            <TokenClaimBanner
+            <CommonAirdropCard
               onConnectNewAddress={() => setIsAuthModalOpen(true)}
             />
           </section>
@@ -113,6 +113,10 @@ const WalletPage = () => {
           Wallet
         </CWText>
 
+        <CommonAirdropCard
+          onConnectNewAddress={() => setIsAuthModalOpen(true)}
+        />
+
         {/* visible only on mobile */}
         <div className="wallet-button-tabs">
           {Object.values(MobileTabType).map((type) => {
@@ -128,11 +132,6 @@ const WalletPage = () => {
             );
           })}
         </div>
-
-        {/* Token claim banner - full width above cards */}
-        <TokenClaimBanner
-          onConnectNewAddress={() => setIsAuthModalOpen(true)}
-        />
 
         {/* on mobile show only one card */}
         <div className="wallet-card-container">

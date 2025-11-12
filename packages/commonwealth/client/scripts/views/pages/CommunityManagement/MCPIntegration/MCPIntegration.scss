@@ -4,7 +4,37 @@
 .MCPIntegration {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
+
+  .header-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .description {
+      color: colors.$neutral-500;
+
+      a {
+        color: colors.$primary-500;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  .servers-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .h3 {
+      color: colors.$neutral-900;
+    }
+  }
 
   .servers {
     display: flex;
@@ -14,6 +44,7 @@
 
   .server-card {
     padding: 16px;
+    width: 100%;
 
     .header {
       display: flex;
@@ -28,6 +59,10 @@
 
     .b1 {
       color: colors.$neutral-500 !important;
+    }
+
+    .mcp-toggle {
+      margin-left: 15px;
     }
   }
 }

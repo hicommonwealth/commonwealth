@@ -40,13 +40,13 @@
         "restartPolicyMaxRetries": null,
         "multiRegionConfig": {
           "us-east4-eqdc4a": {
-            "numReplicas": 4
+            "numReplicas": 6
           }
         },
         "limitOverride": {
           "containers": {
-            "cpu": 2,
-            "memoryBytes": 5000000000
+            "cpu": 3,
+            "memoryBytes": 6000000000
           }
         },
         "overlapSeconds": 30,
