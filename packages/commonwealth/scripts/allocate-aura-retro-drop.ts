@@ -6,7 +6,6 @@ import { UserTierMap } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { config as envConfig } from '../server/config';
 
-//redeploy
 if (!envConfig.AURA_RETRO_DROP) {
   throw new Error('Aura retro drop configuration not set!');
 }
