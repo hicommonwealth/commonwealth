@@ -14,6 +14,10 @@ export type TokenAllocationSyncArgs = {
   user_name: string;
   wallet_address: string;
   token_allocation: number;
+  contract_id: string;
+  token_id: string;
+  schedule_id: string;
+  unlock_start_at: Date;
 };
 
 async function sendToSlack(created: number) {
@@ -66,9 +70,13 @@ export async function magnaSync(
             GROUP BY user_id
           )
           SELECT
-            :category || '-' || A.user_id as key,
-            :category as category,
-            :description || ' for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
+            CE.id || '-' || A.user_id as key,
+            CE.id as category,
+            CE.description || ' for ' || COALESCE(U.profile->>'name', 'Anonymous') as description,
+            CE.contract_id,
+            CE.token_id,
+            CE.unlock_schedule_id as schedule_id,
+            CE.unlock_start_at,
             A.user_id,
             A.address as wallet_address,
             COALESCE(U.profile->>'name', 'Anonymous-' || A.user_id) as user_name,
@@ -78,6 +86,7 @@ export async function magnaSync(
           FROM
             "ClaimAddresses" A -- this is the driving table with sync watermarks
             JOIN "Users" U ON A.user_id = U.id
+            JOIN "ClaimEvents" CE ON A.event_id = CE.id
             LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
             LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
             LEFT JOIN nft_data N ON A.user_id = N.user_id
@@ -96,8 +105,6 @@ export async function magnaSync(
         {
           type: QueryTypes.SELECT,
           replacements: {
-            category: config.MAGNA.EVENT,
-            description: config.MAGNA.EVENT_DESC,
             limit: batchSize,
           },
         },

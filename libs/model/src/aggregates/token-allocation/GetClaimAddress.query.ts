@@ -24,6 +24,15 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
             GROUP BY user_id
           )
           SELECT
+            CE.id as event_id,
+            CE.description,
+            CE.token,
+            CE.token_address,
+            CE.contract_address,
+            CE.initial_percentage::float8 as initial_percentage,
+            CE.unlock_start_at,
+            CE.cliff_date,
+            CE.end_registration_date,
             A.user_id,
             A.address,
             A.magna_allocation_id,
@@ -36,11 +45,12 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
             A.magna_cliff_claim_tx_hash,
             A.magna_cliff_claim_tx_at,
             A.magna_cliff_claim_tx_finalized,
-            COALESCE(HA.token_allocation, 0)::numeric 
-            + COALESCE(AA.token_allocation, 0)::numeric
-            + COALESCE(NA.total_token_allocation, 0)::numeric as tokens
+            COALESCE(HA.token_allocation, 0)::float8 
+            + COALESCE(AA.token_allocation, 0)::float8
+            + COALESCE(NA.total_token_allocation, 0)::float8 as tokens
           FROM
             "ClaimAddresses" A
+            JOIN "ClaimEvents" CE ON A.event_id = CE.id
             LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
             LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
             LEFT JOIN nft_data NA ON A.user_id = NA.user_id
@@ -55,24 +65,8 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
           },
         },
       );
-
       if (!claimAddress || claimAddress.length === 0) return null;
-      if (claimAddress.length > 1) {
-        // this will never happen but included for type-narrowing
-        throw new InvalidState('Duplicate claim addresses found');
-      }
-
-      return {
-        ...claimAddress[0],
-        token: config.MAGNA.TOKEN,
-        token_address: config.MAGNA.TOKEN_ADDRESS as `0x${string}`,
-        contract_address: config.MAGNA.CONTRACT_ADDRESS as `0x${string}`,
-        description: config.MAGNA.EVENT_DESC,
-        initial_percentage: config.MAGNA.INITIAL_PERCENTAGE,
-        unlock_start_at: config.MAGNA.UNLOCK_START_AT,
-        cliff_date: config.MAGNA.CLIFF_DATE,
-        end_registration_date: config.MAGNA.END_REGISTRATION_DATE || null,
-      };
+      return claimAddress;
     },
   };
 }

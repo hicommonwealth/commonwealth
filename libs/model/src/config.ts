@@ -106,19 +106,7 @@ const {
   AI_BOT_USER_ADDRESS,
   MAGNA_API_KEY,
   MAGNA_API_URL,
-  MAGNA_EVENT,
-  MAGNA_EVENT_DESC,
-  MAGNA_CONTRACT_ID,
-  MAGNA_TOKEN,
-  MAGNA_TOKEN_ID,
-  MAGNA_TOKEN_ADDRESS,
-  MAGNA_UNLOCK_SCHEDULE_ID,
-  MAGNA_UNLOCK_START_AT,
   MAGNA_BATCH_SIZE,
-  MAGNA_INITIAL_PERCENTAGE,
-  MAGNA_CLIFF_DATE,
-  MAGNA_CONTRACT_ADDRESS,
-  MAGNA_END_REGISTRATION_DATE,
   SLACK_WEBHOOK_URL_ALL_ENG,
   SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
   FLAG_CLAIMS,
@@ -372,24 +360,7 @@ export const config = configure(
     MAGNA: {
       API_URL: MAGNA_API_URL || 'https://api.test.magna.com',
       API_KEY: MAGNA_API_KEY || '', // This is the gateway to magna API integration, starting with syncing allocations
-      EVENT: MAGNA_EVENT || 'magna-test',
-      EVENT_DESC: MAGNA_EVENT_DESC || 'Magna Test Event',
-      CONTRACT_ID: MAGNA_CONTRACT_ID || '00000000-0000-0000-0000-000000000000',
-      TOKEN: MAGNA_TOKEN || 'COMMON',
-      TOKEN_ID: MAGNA_TOKEN_ID || '00000000-0000-0000-0000-000000000000',
-      TOKEN_ADDRESS:
-        MAGNA_TOKEN_ADDRESS || '0x0000000000000000000000000000000000000000',
-      UNLOCK_SCHEDULE_ID:
-        MAGNA_UNLOCK_SCHEDULE_ID || '00000000-0000-0000-0000-000000000000',
-      UNLOCK_START_AT: new Date(MAGNA_UNLOCK_START_AT || '2026-12-31'),
-      INITIAL_PERCENTAGE: parseFloat(MAGNA_INITIAL_PERCENTAGE || '0.5'),
-      CLIFF_DATE: new Date(MAGNA_CLIFF_DATE || '2026-12-31'),
       BATCH_SIZE: parseInt(MAGNA_BATCH_SIZE || DEFAULTS.MAGNA_BATCH_SIZE, 10),
-      CONTRACT_ADDRESS:
-        MAGNA_CONTRACT_ADDRESS || '0x45Bd2f58008b7D0942E36E6827A037eef60AF7D6',
-      END_REGISTRATION_DATE: MAGNA_END_REGISTRATION_DATE
-        ? new Date(MAGNA_END_REGISTRATION_DATE)
-        : undefined,
     },
     SLACK: {
       CHANNELS: {
@@ -811,19 +782,7 @@ export const config = configure(
     MAGNA: z.object({
       API_URL: z.url(),
       API_KEY: z.string(),
-      EVENT: z.string().min(5),
-      EVENT_DESC: z.string().min(5),
-      CONTRACT_ID: z.uuid(),
-      TOKEN: z.string().min(1),
-      TOKEN_ID: z.uuid(),
-      TOKEN_ADDRESS: z.string().min(1),
-      UNLOCK_SCHEDULE_ID: z.uuid(),
-      UNLOCK_START_AT: z.date(),
-      INITIAL_PERCENTAGE: z.number().min(0.01).max(0.99),
-      CLIFF_DATE: z.date(),
       BATCH_SIZE: z.number(),
-      CONTRACT_ADDRESS: z.string(),
-      END_REGISTRATION_DATE: z.date().optional(),
     }),
     SLACK: z.object({
       CHANNELS: z.object({
