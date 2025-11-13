@@ -1,5 +1,3 @@
-'use strict';
-
 /** @type {import('sequelize-cli').Migration} */
 export default {
   async up(queryInterface, Sequelize) {
@@ -129,10 +127,15 @@ export default {
         'claimaddresses_address_unique',
         { transaction },
       );
-      await queryInterface.addConstraint('ClaimAddresses', {
-        fields: ['event_id', 'address'],
-        type: 'UNIQUE',
+      await queryInterface.removeIndex(
+        'ClaimAddresses',
+        'claimaddresses_address_unique',
+        { transaction },
+      );
+      await queryInterface.addIndex('ClaimAddresses', ['event_id', 'address'], {
+        unique: true,
         name: 'claimaddresses_address_unique',
+        where: { address: { [Sequelize.Op.ne]: null } },
         transaction,
       });
     });
@@ -146,9 +149,13 @@ export default {
         'claimaddresses_address_unique',
         { transaction },
       );
-      await queryInterface.addConstraint('ClaimAddresses', {
-        fields: ['address'],
-        type: 'UNIQUE',
+      await queryInterface.removeIndex(
+        'ClaimAddresses',
+        'claimaddresses_address_unique',
+        { transaction },
+      );
+      await queryInterface.addIndex('ClaimAddresses', ['address'], {
+        unique: true,
         name: 'claimaddresses_address_unique',
         transaction,
       });

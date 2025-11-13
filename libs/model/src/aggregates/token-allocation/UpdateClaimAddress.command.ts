@@ -1,4 +1,4 @@
-import { type Command, InvalidActor, InvalidState } from '@hicommonwealth/core';
+import { InvalidActor, InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../../database';
@@ -11,7 +11,7 @@ export function UpdateClaimAddress(): Command<
     auth: [],
     secure: true,
     body: async ({ payload, actor }) => {
-      const { address } = payload;
+      const { event_id, address } = payload;
 
       const [addr] = await models.sequelize.query<{
         user_id: number;
@@ -68,16 +68,18 @@ export function UpdateClaimAddress(): Command<
 
         result = await models.sequelize.query<{ address: string }>(
           `
-            INSERT INTO "ClaimAddresses" (user_id, address, created_at, updated_at)
-            SELECT :user_id, :address, NOW(), NOW()
-            ON CONFLICT (user_id) DO UPDATE SET address = EXCLUDED.address,
-                                                updated_at = NOW()
-            WHERE "ClaimAddresses".magna_synced_at IS NULL
+            INSERT INTO "ClaimAddresses" (event_id, user_id, address, created_at, updated_at)
+            SELECT :event_id, :user_id, :address, NOW(), NOW()
+            ON CONFLICT (event_id, user_id) DO UPDATE SET address = EXCLUDED.address, updated_at = NOW()
+            WHERE 
+              "ClaimAddresses".event_id = :event_id AND
+              "ClaimAddresses".magna_synced_at IS NULL
             RETURNING address;
           `,
           {
             type: QueryTypes.SELECT,
             replacements: {
+              event_id,
               user_id: addr.user_id,
               address: addr.address,
             },

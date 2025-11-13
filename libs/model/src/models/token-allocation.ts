@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 import { ModelInstance } from './types';
 
 export type HistoricalAllocation = {
@@ -218,7 +218,6 @@ export const ClaimAddresses = (
       address: {
         type: Sequelize.STRING,
         allowNull: true,
-        unique: true,
       },
       magna_allocation_id: {
         type: Sequelize.STRING,
@@ -286,6 +285,7 @@ export const ClaimAddresses = (
           name: 'claimaddresses_address_unique',
           unique: true,
           fields: ['event_id', 'address'],
+          where: { address: { [Op.ne]: null } },
         },
       ],
     },
