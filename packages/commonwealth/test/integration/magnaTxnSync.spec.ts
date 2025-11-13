@@ -201,15 +201,31 @@ describe('MagnaTxnSync Task Tests', () => {
         tier: 1,
       });
 
+      await models.ClaimEvents.create({
+        id: 'test-event',
+        description: 'Test Event',
+        contract_id: '0x1234567890123456789012345678901234567890',
+        contract_address: '0x1234567890123456789012345678901234567890',
+        token: 'TEST',
+        token_id: 'abc123',
+        token_address: '0x1234567890123456789012345678901234567890',
+        unlock_schedule_id: 'abc123',
+        unlock_start_at: new Date(),
+        initial_percentage: 0.33,
+        cliff_date: new Date(),
+        end_registration_date: new Date(),
+      });
+
       // Create claim address that doesn't need processing (missing magna_claimed_at)
       await models.sequelize.query(
         `
-          INSERT INTO "ClaimAddresses" (user_id, address, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), NOW())
+          INSERT INTO "ClaimAddresses" (event_id, user_id, address, created_at, updated_at)
+          VALUES (:event_id, :user_id, :address, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id: user.id,
             address: '0x1234567890123456789012345678901234567890',
           },
@@ -232,12 +248,13 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), :claim_data, NOW(), NOW())
+          (event_id, user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
+          VALUES (:event_id, :user_id, :address, NOW(), :claim_data, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id: user.id,
             address: testAddress,
             claim_data: '{"test": "data"}',
@@ -279,7 +296,7 @@ describe('MagnaTxnSync Task Tests', () => {
         `
           SELECT magna_claim_tx_hash 
           FROM "ClaimAddresses" 
-          WHERE user_id = :user_id
+          WHERE event_id = 'test-event' AND user_id = :user_id
         `,
         {
           type: QueryTypes.SELECT,
@@ -300,12 +317,13 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_claimed_at, magna_claim_data, magna_claim_tx_hash, magna_claim_tx_finalized, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), :claim_data, :tx_hash, TRUE, NOW(), NOW())
+          (event_id, user_id, address, magna_claimed_at, magna_claim_data, magna_claim_tx_hash, magna_claim_tx_finalized, created_at, updated_at)
+          VALUES (:event_id, :user_id, :address, NOW(), :claim_data, :tx_hash, TRUE, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id: user.id,
             address: '0x1234567890123456789012345678901234567890',
             claim_data: '{"test": "data"}',
@@ -333,12 +351,13 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), :claim_data, NOW(), NOW())
+          (event_id, user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
+          VALUES (:event_id, :user_id, :address, NOW(), :claim_data, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id: user.id,
             address: testAddress,
             claim_data: '{"test": "data"}',
@@ -396,12 +415,13 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), :claim_data, NOW(), NOW())
+          (event_id, user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
+          VALUES (:event_id, :user_id, :address, NOW(), :claim_data, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id: user.id,
             address: testAddress,
             claim_data: '{"test": "data"}',
@@ -458,12 +478,13 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), :claim_data, NOW(), NOW())
+          (event_id, user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
+          VALUES (:event_id, :user_id, :address, NOW(), :claim_data, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id: user.id,
             address: testAddress,
             claim_data: '{"test": "data"}',
@@ -483,7 +504,7 @@ describe('MagnaTxnSync Task Tests', () => {
         ],
       });
 
-      mockClient.getTransaction.mockImplementation(({ hash }) => {
+      mockClient.getTransaction.mockImplementation(({}) => {
         return Promise.resolve({
           to: TEST_MAGNA_CONTRACT_ADDRESS,
           input: '0x8612372a000000000000000000000000',
@@ -525,12 +546,13 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_cliff_claimed_at, magna_cliff_claim_data, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), :claim_data, NOW(), NOW())
+          (event_id, user_id, address, magna_cliff_claimed_at, magna_cliff_claim_data, created_at, updated_at)
+          VALUES (:event_id, :user_id, :address, NOW(), :claim_data, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id: user.id,
             address: testAddress,
             claim_data: '{"test": "cliff data"}',
@@ -590,12 +612,13 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_cliff_claimed_at, magna_cliff_claim_data, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), :claim_data, NOW(), NOW())
+          (event_id, user_id, address, magna_cliff_claimed_at, magna_cliff_claim_data, created_at, updated_at)
+          VALUES (:event_id, :user_id, :address, NOW(), :claim_data, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id: user.id,
             address: testAddress,
             claim_data: '{"test": "cliff data"}',
@@ -652,13 +675,14 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_claimed_at, magna_claim_data, 
+          (event_id, user_id, address, magna_claimed_at, magna_claim_data, 
            magna_cliff_claimed_at, magna_cliff_claim_data, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), :claim_data, NOW(), :cliff_claim_data, NOW(), NOW())
+          VALUES (:event_id, :user_id, :address, NOW(), :claim_data, NOW(), :cliff_claim_data, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id: user.id,
             address: testAddress,
             claim_data: '{"test": "claim data"}',
@@ -723,13 +747,14 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_cliff_claimed_at, magna_cliff_claim_data, 
+          (event_id, user_id, address, magna_cliff_claimed_at, magna_cliff_claim_data, 
            magna_cliff_claim_tx_hash, magna_cliff_claim_tx_finalized, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), :claim_data, :tx_hash, TRUE, NOW(), NOW())
+          VALUES (:event_id, :user_id, :address, NOW(), :claim_data, :tx_hash, TRUE, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id: user.id,
             address: '0x1234567890123456789012345678901234567890',
             claim_data: '{"test": "data"}',
@@ -761,14 +786,15 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_cliff_claimed_at, magna_cliff_claim_data, created_at, updated_at)
+          (event_id, user_id, address, magna_cliff_claimed_at, magna_cliff_claim_data, created_at, updated_at)
           VALUES 
-            (:user_id1, :address1, :early_date, :claim_data, NOW(), NOW()),
-            (:user_id2, :address2, :late_date, :claim_data, NOW(), NOW())
+            (:event_id, :user_id1, :address1, :early_date, :claim_data, NOW(), NOW()),
+            (:event_id, :user_id2, :address2, :late_date, :claim_data, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id1: user1.id,
             address1: '0x1111111111111111111111111111111111111111',
             early_date: new Date('2024-01-01T00:00:00Z'),
@@ -847,12 +873,13 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), :claim_data, NOW(), NOW())
+          (event_id, user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
+          VALUES (:event_id, :user_id, :address, NOW(), :claim_data, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id: user.id,
             address: '0x1234567890123456789012345678901234567890',
             claim_data: '{"test": "data"}',
@@ -876,12 +903,13 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
-          VALUES (:user_id, :address, NOW(), :claim_data, NOW(), NOW())
+          (event_id, user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
+          VALUES (:event_id, :user_id, :address, NOW(), :claim_data, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id: user.id,
             address: '0x1234567890123456789012345678901234567890',
             claim_data: '{"test": "data"}',
@@ -924,14 +952,15 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
+          (event_id, user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
           VALUES 
-            (:user_id1, :address1, NOW(), :claim_data, NOW(), NOW()),
-            (:user_id2, :address2, NOW(), :claim_data, NOW(), NOW())
+            (:event_id, :user_id1, :address1, NOW(), :claim_data, NOW(), NOW()),
+            (:event_id, :user_id2, :address2, NOW(), :claim_data, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id1: user1.id,
             address1,
             user_id2: user2.id,
@@ -1010,14 +1039,15 @@ describe('MagnaTxnSync Task Tests', () => {
       await models.sequelize.query(
         `
           INSERT INTO "ClaimAddresses" 
-          (user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
+          (event_id, user_id, address, magna_claimed_at, magna_claim_data, created_at, updated_at)
           VALUES 
-            (:user_id1, :address1, :early_date, :claim_data, NOW(), NOW()),
-            (:user_id2, :address2, :late_date, :claim_data, NOW(), NOW())
+            (:event_id, :user_id1, :address1, :early_date, :claim_data, NOW(), NOW()),
+            (:event_id, :user_id2, :address2, :late_date, :claim_data, NOW(), NOW())
         `,
         {
           type: QueryTypes.INSERT,
           replacements: {
+            event_id: 'test-event',
             user_id1: user1.id,
             address1: '0x1111111111111111111111111111111111111111',
             early_date: new Date('2024-01-01T00:00:00Z'),
