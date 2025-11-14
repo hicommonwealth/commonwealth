@@ -57,6 +57,7 @@ import LaunchpadToken from './token';
 import {
   AuraAllocations,
   ClaimAddresses,
+  ClaimEvents,
   HistoricalAllocations,
   NftSnapshot,
 } from './token-allocation';
@@ -76,6 +77,7 @@ export const Factories = {
   AuraAllocations,
   ChainNode,
   ClaimAddresses,
+  ClaimEvents,
   Collaboration,
   Comment,
   CommentVersionHistory,

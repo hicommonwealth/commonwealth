@@ -17,6 +17,7 @@ interface ClaimAddressRecord {
   user_id: number;
   address: string;
   claimed_at: Date;
+  contract_address: string;
 }
 
 let currentBlockNumber: bigint = BigInt(0);
@@ -149,6 +150,7 @@ interface BlockByTimestampResponse {
 async function getWithdrawTransactionsForAddress(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client: ReturnType<typeof createPublicClient<any, any, any, any>>,
+  contractAddress: string,
   address: string,
   fromBlock: bigint,
 ): Promise<{ txHash: string; txBlockNumber: bigint; timestamp: bigint }[]> {
@@ -160,7 +162,7 @@ async function getWithdrawTransactionsForAddress(
     do {
       const params: AssetTransferParams = {
         fromAddress: address.toLowerCase(),
-        toAddress: config.MAGNA.CONTRACT_ADDRESS.toLowerCase(),
+        toAddress: contractAddress.toLowerCase(),
         fromBlock: `0x${fromBlock.toString(16)}`,
         category: ['external'],
         withMetadata: true,
@@ -184,8 +186,7 @@ async function getWithdrawTransactionsForAddress(
               });
 
               if (
-                tx.to?.toLowerCase() ===
-                  config.MAGNA.CONTRACT_ADDRESS.toLowerCase() &&
+                tx.to?.toLowerCase() === contractAddress.toLowerCase() &&
                 tx.input &&
                 tx.input.length > 10
               ) {
@@ -299,16 +300,16 @@ async function processTxnType(
 
   const query = isCliff
     ? `
-      SELECT user_id, address, magna_cliff_claimed_at as claimed_at
-      FROM "ClaimAddresses"
+      SELECT user_id, address, magna_cliff_claimed_at as claimed_at, CE.contract_address
+      FROM "ClaimAddresses" JOIN "ClaimEvents" CE ON "ClaimAddresses".event_id = CE.id
       WHERE magna_cliff_claimed_at IS NOT NULL
         AND magna_cliff_claim_data IS NOT NULL
         AND (magna_cliff_claim_tx_finalized = FALSE OR magna_cliff_claim_tx_finalized IS NULL)
       ORDER BY magna_cliff_claimed_at ASC;
     `
     : `
-      SELECT user_id, address, magna_claimed_at as claimed_at
-      FROM "ClaimAddresses"
+      SELECT user_id, address, magna_claimed_at as claimed_at, CE.contract_address
+      FROM "ClaimAddresses" JOIN "ClaimEvents" CE ON "ClaimAddresses".event_id = CE.id
       WHERE magna_claimed_at IS NOT NULL
         AND magna_claim_data IS NOT NULL
         AND (magna_claim_tx_finalized = FALSE OR magna_claim_tx_finalized IS NULL)
@@ -353,6 +354,7 @@ async function processTxnType(
       const foundTxns = await getWithdrawTransactionsForAddress(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         client as any,
+        record.contract_address,
         record.address,
         startBlock,
       );

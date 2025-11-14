@@ -144,7 +144,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
 
   const { profile, addresses, refreshProfiles } = props;
   const user = useUserStore();
-  const { data: claimAddress } = useGetClaimAddressQuery({
+  const { data: claimAddresses } = useGetClaimAddressQuery({
     enabled: user.isLoggedIn,
   });
 
@@ -163,12 +163,12 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
       isBulkDelete: boolean,
       community: string,
     ) => {
-      if (
-        val &&
-        claimAddress?.address &&
-        selectedAddress?.address?.toLowerCase() ===
-          claimAddress.address.toLowerCase()
-      ) {
+      const hasAddressInClaimAddresses = claimAddresses?.some(
+        (claimAddress) =>
+          claimAddress.address?.toLowerCase() ===
+          selectedAddress?.address?.toLowerCase(),
+      );
+      if (val && hasAddressInClaimAddresses) {
         notifyError(
           'You cannot disconnect the address saved for claiming rewards.',
         );
@@ -180,7 +180,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
       setIsBulkDeleteState(val ? isBulkDelete : false);
       setSelectedCommunity(val ? community : null);
     },
-    [claimAddress],
+    [claimAddresses],
   );
 
   const rowData = useMemo(

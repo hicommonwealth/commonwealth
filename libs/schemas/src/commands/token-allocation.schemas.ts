@@ -3,6 +3,7 @@ import { EVM_ADDRESS_STRICT, EVM_TRANSACTION_HASH } from '../utils';
 
 export const UpdateClaimAddress = {
   input: z.object({
+    event_id: z.string(),
     address: EVM_ADDRESS_STRICT,
   }),
   output: z.object({
