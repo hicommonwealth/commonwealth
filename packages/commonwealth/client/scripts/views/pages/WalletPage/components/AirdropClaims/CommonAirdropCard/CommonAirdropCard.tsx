@@ -360,6 +360,7 @@ const CommonAirdropCard = ({
                   shouldWaitTillDate={claimSteps.initial.shouldWaitTillDate}
                   registrationEndDate={registrationEndDate}
                   mode="initial"
+                  eventId={claimAddress?.event_id || ''}
                 />
                 <ClaimCard
                   cardNumber={2}
@@ -388,6 +389,7 @@ const CommonAirdropCard = ({
                   tokenSymbol={claimAddress?.token || ''}
                   shouldWaitTillDate={claimSteps.final.shouldWaitTillDate}
                   mode="final"
+                  eventId={claimAddress?.event_id || ''}
                 />
               </div>
             ) : (
@@ -421,6 +423,7 @@ const CommonAirdropCard = ({
                 mode="initial"
                 isAllocationCancelled={isAllocationCancelled}
                 isCollapsed
+                eventId={claimAddress?.event_id || ''}
               />
             )}
           </div>

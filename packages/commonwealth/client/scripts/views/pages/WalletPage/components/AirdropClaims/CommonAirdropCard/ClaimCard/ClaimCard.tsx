@@ -40,6 +40,7 @@ interface ClaimCardProps {
   allocatedToAddress?: string;
   hasClaimableAmount?: boolean;
   isAllocationCancelled?: boolean;
+  eventId: string;
   mode: 'initial' | 'final';
   tokenSymbol: string;
   registrationEndDate?: moment.Moment;
@@ -66,6 +67,7 @@ const ClaimCard = ({
   allocationUnlocksAt,
   allocationClaimedAt,
   mode,
+  eventId,
   hasClaimableAmount,
   allocatedToAddress,
   registrationEndDate,
@@ -343,6 +345,7 @@ const ClaimCard = ({
   const handleClaimAddressUpdate = () => {
     if (selectedAddress) {
       updateClaimAddress({
+        event_id: eventId,
         address: selectedAddress.address! as `0x${string}`,
       });
     }
