@@ -59,6 +59,109 @@ export function formatBigNumberShort(num: number, numDecimals: number): string {
 }
 
 /**
+ * Calculates the compound vote weight for multiple tokens.
+ *
+ * @param tokens - Array of token configurations with their balances
+ * @param weightType - The type of weighted voting
+ * @param decimalsOverride - Number of digits after decimal
+ * @returns The formatted compound vote weight string
+ */
+export const prettyCompoundVoteWeight = (
+  tokens: Array<{
+    wei: string;
+    tokenNumDecimals?: number | null | undefined;
+    multiplier?: number;
+    tokenSymbol?: string;
+  }>,
+  weightType?: TopicWeightedVoting | null | undefined,
+  decimalsOverride?: number,
+): string => {
+  if (!tokens || tokens.length === 0) {
+    return '0';
+  }
+
+  // Special handling for single token - use prettyVoteWeight directly
+  if (tokens.length === 1) {
+    const token = tokens[0];
+    return prettyVoteWeight(
+      token.wei,
+      token.tokenNumDecimals,
+      weightType,
+      token.multiplier || 1,
+      decimalsOverride,
+      token.tokenSymbol,
+    );
+  }
+
+  // For multiple tokens, we need to parse the formatted results and sum them
+  let totalNumericValue = 0;
+
+  for (const token of tokens) {
+    const formattedWeight = prettyVoteWeight(
+      token.wei,
+      token.tokenNumDecimals,
+      weightType,
+      token.multiplier || 1,
+      undefined, // Don't override decimals for individual calculations
+      token.tokenSymbol,
+    );
+
+    // Parse the formatted number back to numeric
+    // Handle special cases like "0.0…"
+    if (formattedWeight === '0.0…') {
+      // Add a very small amount
+      totalNumericValue += 0.0000001;
+    } else {
+      // Remove any suffixes (k, m, b, t) and parse
+      const match = formattedWeight.match(/^([\d.]+)([kmbt]?)$/);
+      if (match) {
+        let value = parseFloat(match[1]);
+        const suffix = match[2];
+
+        // Apply suffix multipliers
+        switch (suffix) {
+          case 'k':
+            value *= 1_000;
+            break;
+          case 'm':
+            value *= 1_000_000;
+            break;
+          case 'b':
+            value *= 1_000_000_000;
+            break;
+          case 't':
+            value *= 1_000_000_000_000;
+            break;
+        }
+
+        totalNumericValue += value;
+      }
+    }
+  }
+
+  // Format the total using the same logic as prettyVoteWeight
+  if (totalNumericValue === 0) {
+    return '0';
+  }
+  if (totalNumericValue < 0.000001) {
+    return '0.0…';
+  }
+
+  if (totalNumericValue >= 1000) {
+    return formatBigNumberShort(totalNumericValue, decimalsOverride || 2);
+  }
+
+  // For smaller numbers, format with appropriate decimals
+  let numDecimals = totalNumericValue > 10 ? 3 : 6;
+  if (typeof decimalsOverride === 'number') {
+    numDecimals = decimalsOverride;
+  }
+
+  // Remove trailing zeros after decimal
+  return totalNumericValue.toFixed(numDecimals).replace(/\.?0+$/, '');
+};
+
+/**
  * Converts a wei value to a human-readable vote weight string.
  *
  *  NOTE: if using a wei value from the backend, there's

@@ -1,7 +1,7 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import React from 'react';
 import { FarcasterEmbed } from 'react-farcaster-embed/dist/client';
-import { prettyVoteWeight } from 'shared/adapters/currency';
+import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
 import { Select } from 'views/components/Select';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -49,13 +49,17 @@ export const FarcasterEntriesList = ({
   }
 
   const getVoteCount = (entry) => {
-    return prettyVoteWeight(
-      entry.calculated_vote_weight,
-      contestDecimals,
+    return prettyCompoundVoteWeight(
+      [
+        {
+          wei: entry.calculated_vote_weight,
+          tokenNumDecimals: contestDecimals,
+          multiplier: voteWeightMultiplier,
+          tokenSymbol: contestTokenSymbol,
+        },
+      ],
       TopicWeightedVoting.ERC20,
-      voteWeightMultiplier,
       1,
-      contestTokenSymbol,
     );
   };
 

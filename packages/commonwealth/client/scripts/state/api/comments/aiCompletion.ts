@@ -2,12 +2,9 @@ import { trpc } from 'utils/trpcClient';
 
 // Types for AI completion token creation
 export interface CreateAICompletionTokenInput {
-  user_id: number;
-  community_id: string;
   thread_id: number;
   parent_comment_id?: number;
   content: string;
-  expires_in_minutes?: number;
 }
 
 export interface CreateAICompletionTokenResponse {
