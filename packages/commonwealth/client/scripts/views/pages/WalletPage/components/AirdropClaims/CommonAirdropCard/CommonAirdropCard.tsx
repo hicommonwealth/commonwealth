@@ -144,9 +144,7 @@ const CommonAirdropCard = ({
   );
   const isAllocationCancelled = allocation?.status === 'CANCELLED';
   const unlockStartsAt =
-    allocation?.unlock_start_at ||
-    claimAddress?.unlock_start_at ||
-    `2025-10-27T13:00:00Z`; // TODO: should this be changed @Roger?
+    allocation?.unlock_start_at || claimAddress?.unlock_start_at;
   const launchDateUTC = moment(unlockStartsAt);
   const registrationEndDate = claimAddress?.end_registration_date
     ? moment(claimAddress?.end_registration_date)
