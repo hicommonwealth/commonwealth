@@ -41,66 +41,20 @@ export function UpdateClaimAddress(): Command<
           'Cannot update claim address. User mismatch.',
         );
 
-      let result: { address: string }[] | undefined;
-      await models.sequelize.transaction(async (transaction) => {
-        const addresses = await models.Address.findAll({
-          where: {
+      const result = await models.sequelize.query<{ address: string }>(
+        ` UPDATE "ClaimAddresses"
+          SET address = :address, updated_at = NOW()
+          WHERE event_id = :event_id AND user_id = :user_id AND magna_synced_at IS NULL
+          RETURNING address;`,
+        {
+          type: QueryTypes.SELECT,
+          replacements: {
+            event_id,
             user_id: addr.user_id,
+            address: addr.address,
           },
-        });
-        await models.sequelize.query(
-          `
-          UPDATE "NftSnapshot"
-          SET user_id = :userId
-          WHERE user_id IS NULL
-            AND LOWER(holder_address) IN (:addresses);
-        `,
-          {
-            type: QueryTypes.UPDATE,
-            replacements: {
-              userId: addr.user_id,
-              addresses: addresses.map((a) => a.address.toLowerCase()),
-            },
-            transaction,
-          },
-        );
-        const [nft] = await models.sequelize.query<{
-          total_token_allocation: number;
-        }>(
-          `
-            SELECT SUM(total_token_allocation) as total_token_allocation
-            FROM "NftSnapshot"
-            WHERE user_id = :user_id
-          `,
-          {
-            type: QueryTypes.SELECT,
-            replacements: { user_id: addr.user_id },
-            transaction,
-          },
-        );
-
-        result = await models.sequelize.query<{ address: string }>(
-          `
-            INSERT INTO "ClaimAddresses" (event_id, user_id, address, aura, historic, nft, created_at, updated_at)
-            SELECT :event_id, :user_id, :address, 0, 0, :nft, NOW(), NOW()
-            ON CONFLICT (event_id, user_id) DO UPDATE SET address = EXCLUDED.address, updated_at = NOW()
-            WHERE 
-              "ClaimAddresses".event_id = :event_id AND
-              "ClaimAddresses".magna_synced_at IS NULL
-            RETURNING address;
-          `,
-          {
-            type: QueryTypes.SELECT,
-            replacements: {
-              event_id,
-              user_id: addr.user_id,
-              address: addr.address,
-              nft: nft?.total_token_allocation || 0,
-            },
-            transaction,
-          },
-        );
-      });
+        },
+      );
 
       if (!result || result.length === 0)
         throw new InvalidState(
