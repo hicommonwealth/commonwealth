@@ -61,6 +61,15 @@ describe('Token Allocation Lifecycle', () => {
         cliff_date: new Date(),
         end_registration_date: new Date(),
       });
+      await models.ClaimAddresses.create({
+        event_id: 'test-event',
+        user_id: community.actors.member.user.id!,
+        created_at: new Date(),
+        updated_at: new Date(),
+        aura: 1,
+        historic: 1,
+        nft: 0,
+      });
 
       const result = await command(UpdateClaimAddress(), {
         actor: community.actors.member,
