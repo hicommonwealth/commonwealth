@@ -194,6 +194,16 @@ export const CommentCard = ({
     generateCompletionRef.current = generateCompletion;
   }, [generateCompletion]);
 
+  // Track if an AI request is already in progress to prevent duplicate calls
+  // Using a ref keyed by comment ID to handle multiple comment cards
+  const isAIRequestInProgressRef = useRef<{
+    inProgress: boolean;
+    commentId: number | null;
+  }>({
+    inProgress: false,
+    commentId: null,
+  });
+
   const [commentText, setCommentText] = useState(comment.body);
   const commentBody = React.useMemo(() => {
     const rawContent = editDraft || commentText || comment.body;
@@ -278,6 +288,32 @@ export const CommentCard = ({
   useEffect(() => {
     if (!isStreamingAIReply || !streamingModelId) return;
 
+    // Prevent duplicate requests (e.g., from React StrictMode in development)
+    if (
+      isAIRequestInProgressRef.current.inProgress &&
+      isAIRequestInProgressRef.current.commentId === comment.id
+    ) {
+      console.log(
+        '[AI Reply] Request already in progress, skipping duplicate',
+        {
+          commentId: comment.id,
+          threadId: comment.thread_id,
+        },
+      );
+      return;
+    }
+
+    console.log('[AI Reply] Starting new request', {
+      commentId: comment.id,
+      threadId: comment.thread_id,
+      isRequestInProgress: isAIRequestInProgressRef.current.inProgress,
+      trackedCommentId: isAIRequestInProgressRef.current.commentId,
+    });
+
+    isAIRequestInProgressRef.current = {
+      inProgress: true,
+      commentId: comment.id,
+    };
     let mounted = true;
     let accumulatedText = '';
 
@@ -444,6 +480,12 @@ Community Description: ${communityDescription}`;
           );
           onStreamingCompleteRef.current?.();
         }
+      } finally {
+        // Reset the flag after request completes (success or error)
+        isAIRequestInProgressRef.current = {
+          inProgress: false,
+          commentId: null,
+        };
       }
     };
 
@@ -463,7 +505,8 @@ Community Description: ${communityDescription}`;
     comment.thread_id,
     comment.community_id,
     activeUserAddress,
-    community,
+    community?.name,
+    community?.description,
   ]);
 
   useEffect(() => {
