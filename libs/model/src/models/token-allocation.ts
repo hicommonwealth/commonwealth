@@ -186,6 +186,9 @@ type ClaimAddress = {
   event_id: string;
   user_id: number;
   address: string | null;
+  aura: number;
+  historic: number;
+  nft: number;
   magna_allocation_id: string | null;
   magna_synced_at: Date | null;
   magna_claimed_at: Date | null;
@@ -218,6 +221,18 @@ export const ClaimAddresses = (
       address: {
         type: Sequelize.STRING,
         allowNull: true,
+      },
+      aura: {
+        type: Sequelize.DECIMAL,
+        allowNull: false,
+      },
+      historic: {
+        type: Sequelize.DECIMAL,
+        allowNull: false,
+      },
+      nft: {
+        type: Sequelize.DECIMAL,
+        allowNull: false,
       },
       magna_allocation_id: {
         type: Sequelize.STRING,

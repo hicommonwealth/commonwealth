@@ -58,35 +58,9 @@ describe('MagnaSync Lifecycle', () => {
           address: `0x${chance.hash({ length: 40 })}`,
           created_at: new Date(),
           updated_at: new Date(),
-        }),
-      ),
-    );
-    // add historical allocations to all users
-    await Promise.all(
-      users.map((user) =>
-        models.HistoricalAllocations.create({
-          user_id: user.id!,
-          num_threads: 0,
-          thread_score: 0,
-          num_comments: 0,
-          comment_score: 0,
-          num_reactions: 0,
-          reactions_score: 0,
-          unadjusted_score: 0,
-          adjusted_score: 0,
-          percent_allocation: 0,
-          token_allocation: chance.integer({ min: 0, max: 100 }),
-        }),
-      ),
-    );
-    // add aura allocations to some users
-    await Promise.all(
-      users.slice(0, Math.floor(users.length * 0.8)).map((user) =>
-        models.AuraAllocations.create({
-          user_id: user.id!,
-          total_xp: chance.integer({ min: 0, max: 100 }),
-          percent_allocation: chance.integer({ min: 0, max: 100 }),
-          token_allocation: chance.integer({ min: 0, max: 100 }),
+          historic: chance.integer({ min: 0, max: 100 }),
+          aura: chance.integer({ min: 0, max: 100 }),
+          nft: chance.integer({ min: 0, max: 100 }),
         }),
       ),
     );

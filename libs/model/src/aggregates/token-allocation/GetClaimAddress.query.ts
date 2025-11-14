@@ -17,12 +17,6 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
         z.infer<typeof schemas.ClaimAddressView>
       >(
         `
-          WITH nft_data AS (
-            SELECT user_id, SUM(total_token_allocation) as total_token_allocation
-            FROM "NftSnapshot"
-            WHERE user_id IS NOT NULL
-            GROUP BY user_id
-          )
           SELECT
             CE.id as event_id,
             CE.description,
@@ -45,18 +39,13 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
             A.magna_cliff_claim_tx_hash,
             A.magna_cliff_claim_tx_at,
             A.magna_cliff_claim_tx_finalized,
-            COALESCE(HA.token_allocation, 0)::float8 
-            + COALESCE(AA.token_allocation, 0)::float8
-            + COALESCE(NA.total_token_allocation, 0)::float8 as tokens
+            A.aura + A.historic + A.nft as tokens
           FROM
-            "ClaimAddresses" A
-            JOIN "ClaimEvents" CE ON A.event_id = CE.id
-            LEFT JOIN "HistoricalAllocations" HA ON A.user_id = HA.user_id
-            LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
-            LEFT JOIN nft_data NA ON A.user_id = NA.user_id
+            "ClaimEvents" CE JOIN "ClaimAddresses" A ON A.event_id = CE.id
           WHERE
             A.user_id = :user_id
-          LIMIT 1;
+          ORDER BY
+            A.created_at DESC
         `,
         {
           type: QueryTypes.SELECT,

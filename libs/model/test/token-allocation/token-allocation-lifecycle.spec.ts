@@ -93,6 +93,9 @@ describe('Token Allocation Lifecycle', () => {
         magna_synced_at: new Date(),
         created_at: new Date(),
         updated_at: new Date(),
+        historic: 0,
+        aura: 1,
+        nft: 0,
       });
 
       expect(

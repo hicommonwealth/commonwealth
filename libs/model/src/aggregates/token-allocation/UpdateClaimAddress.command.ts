@@ -20,8 +20,7 @@ export function UpdateClaimAddress(): Command<
       }>(
         `
           SELECT A.user_id, A.address, C.id as community_id
-          FROM "Addresses" A
-                 LEFT JOIN "Communities" C ON C.id = A.community_id
+          FROM "Addresses" A LEFT JOIN "Communities" C ON C.id = A.community_id
           WHERE A.address = :address
             AND C.network = 'ethereum'
             AND C.base = 'ethereum'
@@ -65,11 +64,25 @@ export function UpdateClaimAddress(): Command<
             transaction,
           },
         );
+        const [nft] = await models.sequelize.query<{
+          total_token_allocation: number;
+        }>(
+          `
+            SELECT SUM(total_token_allocation) as total_token_allocation
+            FROM "NftSnapshot"
+            WHERE user_id = :user_id
+          `,
+          {
+            type: QueryTypes.SELECT,
+            replacements: { user_id: addr.user_id },
+            transaction,
+          },
+        );
 
         result = await models.sequelize.query<{ address: string }>(
           `
-            INSERT INTO "ClaimAddresses" (event_id, user_id, address, created_at, updated_at)
-            SELECT :event_id, :user_id, :address, NOW(), NOW()
+            INSERT INTO "ClaimAddresses" (event_id, user_id, address, aura, historic, nft, created_at, updated_at)
+            SELECT :event_id, :user_id, :address, 0, 0, :nft, NOW(), NOW()
             ON CONFLICT (event_id, user_id) DO UPDATE SET address = EXCLUDED.address, updated_at = NOW()
             WHERE 
               "ClaimAddresses".event_id = :event_id AND
@@ -82,6 +95,7 @@ export function UpdateClaimAddress(): Command<
               event_id,
               user_id: addr.user_id,
               address: addr.address,
+              nft: nft?.total_token_allocation || 0,
             },
             transaction,
           },

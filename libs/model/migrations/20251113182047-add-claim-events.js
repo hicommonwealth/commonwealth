@@ -138,6 +138,72 @@ export default {
         where: { address: { [Sequelize.Op.ne]: null } },
         transaction,
       });
+
+      // add fk constraint to claim events and user
+      await queryInterface.sequelize.query(
+        `
+          ALTER TABLE "ClaimAddresses" ADD CONSTRAINT "ClaimAddresses_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+          ALTER TABLE "ClaimAddresses" ADD CONSTRAINT "ClaimAddresses_event_id_fkey" FOREIGN KEY ("event_id") REFERENCES "ClaimEvents"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+        `,
+        { transaction },
+      );
+
+      // add aura, historic, nft columns to claim addresses
+      await queryInterface.addColumn(
+        'ClaimAddresses',
+        'aura',
+        {
+          type: Sequelize.DECIMAL,
+          allowNull: false,
+          defaultValue: 0,
+        },
+        { transaction },
+      );
+      await queryInterface.addColumn(
+        'ClaimAddresses',
+        'historic',
+        {
+          type: Sequelize.DECIMAL,
+          allowNull: false,
+          defaultValue: 0,
+        },
+        { transaction },
+      );
+      await queryInterface.addColumn(
+        'ClaimAddresses',
+        'nft',
+        {
+          type: Sequelize.DECIMAL,
+          allowNull: false,
+          defaultValue: 0,
+        },
+        { transaction },
+      );
+
+      // copy aura, historic, nft from existing allocations
+      await queryInterface.sequelize.query(
+        `
+          WITH nft_data AS (
+            SELECT user_id, SUM(total_token_allocation) as total_token_allocation
+            FROM "NftSnapshot"
+            WHERE user_id IS NOT NULL
+            GROUP BY user_id
+          )
+          UPDATE "ClaimAddresses" 
+          SET 
+            aura = COALESCE(AA.token_allocation, 0)::double precision, 
+            historic = COALESCE(HA.token_allocation, 0)::double precision,
+            nft = COALESCE(NA.total_token_allocation, 0)::double precision
+          FROM 
+            "ClaimAddresses" A
+            LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
+            LEFT JOIN "HistoricalAllocations" HA ON AA.user_id = HA.user_id
+            LEFT JOIN nft_data NA ON AA.user_id = NA.user_id
+          WHERE 
+            "ClaimAddresses".user_id = A.user_id;
+        `,
+        { transaction },
+      );
     });
   },
 
@@ -167,8 +233,28 @@ export default {
         { transaction },
       );
 
+      // remove fk constraint to claim events and user
+      await queryInterface.sequelize.query(
+        `
+          ALTER TABLE "ClaimAddresses" DROP CONSTRAINT "ClaimAddresses_event_id_fkey";
+          ALTER TABLE "ClaimAddresses" DROP CONSTRAINT "ClaimAddresses_user_id_fkey";
+        `,
+        { transaction },
+      );
+
       // remove event_id column
       await queryInterface.removeColumn('ClaimAddresses', 'event_id', {
+        transaction,
+      });
+
+      // remove nft, historic, aura columns
+      await queryInterface.removeColumn('ClaimAddresses', 'aura', {
+        transaction,
+      });
+      await queryInterface.removeColumn('ClaimAddresses', 'historic', {
+        transaction,
+      });
+      await queryInterface.removeColumn('ClaimAddresses', 'nft', {
         transaction,
       });
 
