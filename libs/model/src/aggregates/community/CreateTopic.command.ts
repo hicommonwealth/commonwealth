@@ -103,6 +103,25 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
             ? 9
             : payload.token_decimals;
 
+        // Handle secondary tokens - extract symbols for Sui tokens
+        let processedSecondaryTokens = payload.secondary_tokens;
+        if (
+          processedSecondaryTokens &&
+          processedSecondaryTokens.length > 0 &&
+          [
+            schemas.TopicWeightedVoting.SuiToken,
+            schemas.TopicWeightedVoting.SuiNFT,
+          ].includes(payload.weighted_voting)
+        ) {
+          processedSecondaryTokens = processedSecondaryTokens.map((token) => ({
+            ...token,
+            token_symbol:
+              token.token_symbol ||
+              extractTokenSymbolFromAddress(token.token_address) ||
+              '',
+          }));
+        }
+
         options = {
           ...options,
           weighted_voting: payload.weighted_voting,
@@ -111,6 +130,7 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
           token_decimals: tokenDecimals || undefined,
           vote_weight_multiplier: payload.vote_weight_multiplier || undefined,
           chain_node_id: payload.chain_node_id || undefined,
+          secondary_tokens: processedSecondaryTokens || undefined,
         };
       }
 

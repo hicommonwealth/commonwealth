@@ -2,6 +2,13 @@ import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 
+export const SecondaryToken = z.object({
+  token_address: z.string(),
+  token_symbol: z.string().optional(),
+  token_decimals: z.number().gte(0),
+  vote_weight_multiplier: z.number().gt(0),
+});
+
 export enum TopicWeightedVoting {
   Stake = 'stake',
   ERC20 = 'erc20',
@@ -63,6 +70,12 @@ export const Topic = z.object({
     .boolean()
     .optional()
     .describe('Allows a thread in this topic to be tokenized'),
+  secondary_tokens: z
+    .array(SecondaryToken)
+    .nullish()
+    .describe(
+      'Additional tokens with their own multipliers for compound voting',
+    ),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
