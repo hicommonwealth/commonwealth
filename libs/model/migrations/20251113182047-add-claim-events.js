@@ -200,6 +200,7 @@ export default {
             LEFT JOIN "HistoricalAllocations" HA ON AA.user_id = HA.user_id
             LEFT JOIN nft_data NA ON AA.user_id = NA.user_id
           WHERE 
+            "ClaimAddresses".event_id = 'common-airdrop' AND
             "ClaimAddresses".user_id = A.user_id;
         `,
         { transaction },
