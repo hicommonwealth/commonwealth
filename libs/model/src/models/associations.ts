@@ -215,6 +215,17 @@ export const buildAssociations = (db: DB) => {
     onDelete: 'CASCADE',
   });
 
+  db.ClaimEvents.withMany(db.ClaimAddresses, {
+    foreignKey: 'event_id',
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
+  db.User.withMany(db.ClaimAddresses, {
+    foreignKey: 'user_id',
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
+
   // Many-to-many associations (cross-references)
   db.Membership.withManyToMany(
     {
