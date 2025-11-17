@@ -179,32 +179,6 @@ export default {
         },
         { transaction },
       );
-
-      // copy aura, historic, nft from existing allocations
-      await queryInterface.sequelize.query(
-        `
-          WITH nft_data AS (
-            SELECT user_id, SUM(total_token_allocation) as total_token_allocation
-            FROM "NftSnapshot"
-            WHERE user_id IS NOT NULL
-            GROUP BY user_id
-          )
-          UPDATE "ClaimAddresses" 
-          SET 
-            aura = COALESCE(AA.token_allocation, 0)::double precision, 
-            historic = COALESCE(HA.token_allocation, 0)::double precision,
-            nft = COALESCE(NA.total_token_allocation, 0)::double precision
-          FROM 
-            "ClaimAddresses" A
-            LEFT JOIN "AuraAllocations" AA ON A.user_id = AA.user_id
-            LEFT JOIN "HistoricalAllocations" HA ON AA.user_id = HA.user_id
-            LEFT JOIN nft_data NA ON AA.user_id = NA.user_id
-          WHERE 
-            "ClaimAddresses".event_id = 'common-airdrop' AND
-            "ClaimAddresses".user_id = A.user_id;
-        `,
-        { transaction },
-      );
     });
   },
 
