@@ -73,7 +73,7 @@ export async function magnaSync(
             A.user_id,
             A.address as wallet_address,
             COALESCE(U.profile->>'name', 'Anonymous-' || A.user_id) as user_name,
-            A.aura + A.historic + A.nft as token_allocation
+            (A.aura + A.historic + A.nft)::double precision as token_allocation
           FROM
             "ClaimAddresses" A -- this is the driving table with sync watermarks
             JOIN "Users" U ON A.user_id = U.id
