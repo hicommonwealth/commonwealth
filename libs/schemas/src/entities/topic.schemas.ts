@@ -2,7 +2,7 @@ import { DISALLOWED_TOPIC_NAMES_REGEX } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 
-export const SecondaryToken = z.object({
+export const TopicToken = z.object({
   token_address: z.string(),
   token_symbol: z.string().optional(),
   token_decimals: z.number().gte(0),
@@ -71,7 +71,7 @@ export const Topic = z.object({
     .optional()
     .describe('Allows a thread in this topic to be tokenized'),
   secondary_tokens: z
-    .array(SecondaryToken)
+    .array(TopicToken)
     .nullish()
     .describe(
       'Additional tokens with their own multipliers for compound voting',
