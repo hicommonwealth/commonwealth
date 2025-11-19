@@ -107,13 +107,15 @@ export async function magnaSync(
               magna_allocation_id: allocationId,
               magna_synced_at: new Date(),
             },
-            { where: { user_id: args.user_id } },
+            { where: { event_id: args.category, user_id: args.user_id } },
           );
-          log.info(`Synced allocation for user ${args.user_id}`);
+          log.info(
+            `Synced allocation ${args.category} for user ${args.user_id}`,
+          );
           created++;
         } catch (err) {
           log.error(
-            `Failed to sync allocation for user ${args.user_id}:`,
+            `Failed to sync allocation ${args.category} for user ${args.user_id}:`,
             err as Error,
           );
         }
