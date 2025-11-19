@@ -88,7 +88,7 @@ const ClaimCard = ({
   const [unlockCountdown, setUnlockCountdown] = useState<string>('00:00:00');
   const [isRetryingClaim, setIsRetryingClaim] = useState<boolean>(false);
   const [syncCountdown, setSyncCountdown] = useState<string>('00:00:00');
-  const commonAirdrop = useCommonAirdrop({ tokenSymbol });
+  const commonAirdrop = useCommonAirdrop({ eventId, tokenSymbol });
   const claimTxData = commonAirdrop.txData;
   const claimState =
     mode === 'initial' ? commonAirdrop.initial : commonAirdrop.final;

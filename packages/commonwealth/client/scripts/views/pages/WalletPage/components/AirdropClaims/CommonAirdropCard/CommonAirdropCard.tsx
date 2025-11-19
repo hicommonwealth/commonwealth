@@ -71,6 +71,7 @@ const CommonAirdropCard = ({
     );
   })();
   const { initial, final, getWalletProvider } = useCommonAirdrop({
+    eventId: claimAddress?.event_id || '',
     tokenSymbol: claimAddress?.token || 'C',
     userClaimAddress: claimAddress?.address || undefined,
     magnaContractAddress: claimAddress?.contract_address || undefined,
