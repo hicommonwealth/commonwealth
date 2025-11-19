@@ -6,8 +6,10 @@ import {
   NAMESPACE_COMMUNITY_NOMINATION_TOKEN_ID,
   ZERO_ADDRESS,
 } from '@hicommonwealth/shared';
+import z from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
+import { ChainNodeAttributes } from '../models';
 import { contractHelpers } from '../services/commonProtocol';
 import { getBalances } from './tokenBalanceCache';
 import type { GetBalancesOptions } from './tokenBalanceCache/types';
@@ -276,29 +278,32 @@ export async function getWeightedSuiTokens(
   tokenAddress: string,
   chainNodeId: number,
   voteWeightMultiplier: number,
+  secondaryTokens?: z.infer<typeof TopicToken>[],
 ): Promise<bigint> {
   // Get the chain node to determine the network
   const chainNode = await models.ChainNode.findByPk(chainNodeId);
   mustExist('Chain Node', chainNode);
 
-  const balanceOptions: GetBalancesOptions = {
-    balanceSourceType: BalanceSourceType.SuiToken,
-    addresses: [address],
-    sourceOptions: {
-      // Use the network from the chain node's identifier for the network
-      suiNetwork: chainNode.name,
-      coinType: tokenAddress,
-    },
-    cacheRefresh: true,
-  };
+  let tokenBalance = await getSuiTokenBalance(chainNode, address, tokenAddress);
 
-  const balances = await getBalances(balanceOptions);
-  const tokenBalance = balances[address];
+  if (secondaryTokens && secondaryTokens.length > 0) {
+    for (const secondaryToken of secondaryTokens) {
+      const secondaryBalance = await getSuiTokenBalance(
+        chainNode,
+        address,
+        secondaryToken.token_address,
+      );
+      tokenBalance += secondaryBalance;
+    }
+  }
 
   if (BigInt(tokenBalance || 0) <= BigInt(0)) {
     throw new InvalidState('Insufficient Sui token balance');
   }
-  const result = calculateVoteWeight(tokenBalance, voteWeightMultiplier);
+  const result = calculateVoteWeight(
+    tokenBalance.toString(),
+    voteWeightMultiplier,
+  );
   return result || BigInt(0);
 }
 
@@ -334,6 +339,27 @@ export async function getWeightedSuiNFTs(
     voteWeightMultiplier,
   );
   return result || BigInt(0);
+}
+
+async function getSuiTokenBalance(
+  chainNode: ChainNodeAttributes,
+  address: string,
+  tokenAddress: string,
+): Promise<bigint> {
+  const balanceOptions: GetBalancesOptions = {
+    balanceSourceType: BalanceSourceType.SuiToken,
+    addresses: [address],
+    sourceOptions: {
+      // Use the network from the chain node's identifier for the network
+      suiNetwork: chainNode.name,
+      coinType: tokenAddress,
+    },
+    cacheRefresh: true,
+  };
+
+  const balances = await getBalances(balanceOptions);
+  const tokenBalance = balances[address];
+  return BigInt(tokenBalance || 0);
 }
 
 async function getSuiNFTBalance(
