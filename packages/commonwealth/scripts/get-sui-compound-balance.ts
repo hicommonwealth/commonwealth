@@ -5,8 +5,13 @@ import {
   getBalances,
   type GetBalancesOptions,
 } from '@hicommonwealth/model/tbc';
+import { ChainNode } from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import * as readline from 'readline';
+import { z } from 'zod';
+
+// Use ChainNodeAttributes type (plain data object, not Sequelize instance)
+type ChainNodeAttributes = z.infer<typeof ChainNode>;
 
 /**
  * Interactive CLI script to calculate compound balance for two SUI tokens
@@ -21,24 +26,60 @@ interface TokenBalance {
   symbol: string;
 }
 
-async function getSuiCoinBalance(
+/**
+ * Helper function to get SUI token balance for a single coin type
+ * Follows the pattern from getSuiNFTBalance in stakeHelper.ts
+ */
+async function getSuiTokenBalance(
+  chainNode: ChainNodeAttributes,
   address: string,
   coinType: string,
-  suiNetwork: string,
-  forceRefresh: boolean = true,
-): Promise<string> {
+): Promise<bigint> {
   const balanceOptions: GetBalancesOptions = {
     balanceSourceType: BalanceSourceType.SuiToken,
     addresses: [address],
     sourceOptions: {
-      suiNetwork,
+      suiNetwork: chainNode.name,
       coinType,
     },
-    cacheRefresh: forceRefresh,
+    cacheRefresh: true,
   };
 
   const balances = await getBalances(balanceOptions);
-  return balances[address] || '0';
+  const tokenBalance = balances[address];
+  return BigInt(tokenBalance || 0);
+}
+
+/**
+ * Helper function to calculate compound balance for multiple SUI tokens
+ * Follows the pattern from getWeightedSuiNFTs in stakeHelper.ts
+ */
+async function getCompoundSuiTokenBalance(
+  chainNode: ChainNodeAttributes,
+  address: string,
+  primaryCoinType: string,
+  secondaryCoinTypes: string[],
+): Promise<bigint> {
+  // Get primary token balance
+  let compoundBalance = await getSuiTokenBalance(
+    chainNode,
+    address,
+    primaryCoinType,
+  );
+
+  // Add secondary token balances
+  if (secondaryCoinTypes && secondaryCoinTypes.length > 0) {
+    for (const secondaryCoinType of secondaryCoinTypes) {
+      const secondaryBalance = await getSuiTokenBalance(
+        chainNode,
+        address,
+        secondaryCoinType,
+      );
+      compoundBalance += secondaryBalance;
+    }
+  }
+
+  return compoundBalance;
 }
 
 function extractSymbolFromCoinType(coinType: string): string {
@@ -93,13 +134,15 @@ async function getCompoundBalance(
   // Validate coin type formats
   if (!primaryCoinType.includes('::')) {
     throw new Error(
-      `Invalid primary coin type format: ${primaryCoinType}. Coin type should be in format: 0x<package>::<module>::<type>`,
+      `Invalid primary coin type format: ${primaryCoinType}. ` +
+        `Coin type should be in format: 0x<package>::<module>::<type>`,
     );
   }
 
   if (!secondaryCoinType.includes('::')) {
     throw new Error(
-      `Invalid secondary coin type format: ${secondaryCoinType}. Coin type should be in format: 0x<package>::<module>::<type>`,
+      `Invalid secondary coin type format: ${secondaryCoinType}. ` +
+        `Coin type should be in format: 0x<package>::<module>::<type>`,
     );
   }
 
@@ -113,41 +156,45 @@ async function getCompoundBalance(
 
   console.log(`\nFetching balances for address: ${address}\n`);
 
-  // Fetch both balances
-  const primaryBalance = await getSuiCoinBalance(
+  // Fetch individual balances for display
+  const primaryBalance = await getSuiTokenBalance(
+    suiChainNode,
     address,
     primaryCoinType,
-    suiChainNode.name,
   );
   const primarySymbol = extractSymbolFromCoinType(primaryCoinType);
   console.log(
-    `✓ Primary token (${primarySymbol}): ${formatCoinBalance(primaryBalance, primarySymbol)}`,
+    `✓ Primary token (${primarySymbol}): ${formatCoinBalance(primaryBalance.toString(), primarySymbol)}`,
   );
 
-  const secondaryBalance = await getSuiCoinBalance(
+  const secondaryBalance = await getSuiTokenBalance(
+    suiChainNode,
     address,
     secondaryCoinType,
-    suiChainNode.name,
   );
   const secondarySymbol = extractSymbolFromCoinType(secondaryCoinType);
   console.log(
-    `✓ Secondary token (${secondarySymbol}): ${formatCoinBalance(secondaryBalance, secondarySymbol)}`,
+    `✓ Secondary token (${secondarySymbol}): ${formatCoinBalance(secondaryBalance.toString(), secondarySymbol)}`,
   );
 
-  // Calculate compound balance (sum of both balances)
-  const compoundBalance = (
-    BigInt(primaryBalance) + BigInt(secondaryBalance)
-  ).toString();
+  // Calculate compound balance using helper function (follows pattern from getWeightedSuiNFTs)
+  const compoundBalanceBigInt = await getCompoundSuiTokenBalance(
+    suiChainNode,
+    address,
+    primaryCoinType,
+    [secondaryCoinType],
+  );
+  const compoundBalance = compoundBalanceBigInt.toString();
 
   return {
     primary: {
       coinType: primaryCoinType,
-      balance: primaryBalance,
+      balance: primaryBalance.toString(),
       symbol: primarySymbol,
     },
     secondary: {
       coinType: secondaryCoinType,
-      balance: secondaryBalance,
+      balance: secondaryBalance.toString(),
       symbol: secondarySymbol,
     },
     compound: {
@@ -308,22 +355,13 @@ async function main() {
   }
 }
 
-// Export functions for potential reuse
-export {
-  extractSymbolFromCoinType,
-  formatCoinBalance,
-  getCompoundBalance,
-  getSuiCoinBalance,
-};
-
-// Run the script if executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main()
-    .catch((error) => {
-      console.error('Script failed:', error);
-      process.exit(1);
-    })
-    .finally(() => {
-      return dispose();
-    });
-}
+main()
+  .then(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    dispose()('EXIT', true);
+  })
+  .catch((error) => {
+    console.error('Error in main execution:', error);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    dispose()('ERROR', true);
+  });
