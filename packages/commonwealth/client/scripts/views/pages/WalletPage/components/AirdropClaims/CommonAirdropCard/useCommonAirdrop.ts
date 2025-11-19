@@ -47,12 +47,14 @@ export const commonAirdropStore = createStore<CommonAirdropState>()(
 const useCommonAirdropStore = createBoundedUseStore(commonAirdropStore);
 
 export const useCommonAirdrop = ({
+  eventId,
   tokenSymbol,
   userClaimAddress,
   magnaContractAddress,
   shouldCheckInitialTransactionStatus = false,
   shouldCheckFinalTransactionStatus = false,
 }: {
+  eventId: string;
   tokenSymbol?: string;
   userClaimAddress?: string;
   magnaContractAddress?: string;
@@ -163,6 +165,7 @@ export const useCommonAirdrop = ({
           await new Promise((r) => setTimeout(r, 5000)); // wait 5 sec for the block to propagate
 
           await txHashUpdateFunction({
+            event_id: eventId,
             transaction_hash: txHash,
           })
             .then(() => {
@@ -259,6 +262,7 @@ export const useCommonAirdrop = ({
                   initialTxHash: successfulTx.txHash as `0x${string}`,
                 });
                 await updateInitialClaimTxHash.mutateAsync({
+                  event_id: eventId,
                   transaction_hash: successfulTx.txHash as `0x${string}`,
                 });
               } else if (shouldCheckFinalTransactionStatus) {
@@ -267,6 +271,7 @@ export const useCommonAirdrop = ({
                   finalTxHash: successfulTx.txHash as `0x${string}`,
                 });
                 await updateFinalClaimTxHash.mutateAsync({
+                  event_id: eventId,
                   transaction_hash: successfulTx.txHash as `0x${string}`,
                 });
               }
