@@ -40,7 +40,7 @@ import useTopicGating from 'hooks/useTopicGating';
 import { ThreadKind } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
-import { prettyVoteWeight } from 'shared/adapters/currency';
+import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useCreateThreadMutation, {
   buildCreateThreadInput,
@@ -295,13 +295,25 @@ const DiscussionsPage = () => {
 
   const voteWeight =
     isTopicWeighted && voteBalance
-      ? prettyVoteWeight(
-          formatDecimalToWei(voteBalance, topicObj!.token_decimals ?? 18),
-          topicObj!.token_decimals,
+      ? prettyCompoundVoteWeight(
+          [
+            {
+              wei: formatDecimalToWei(
+                voteBalance,
+                topicObj!.token_decimals ?? 18,
+              ),
+              tokenNumDecimals: topicObj!.token_decimals,
+              multiplier: topicObj!.vote_weight_multiplier || 1,
+              tokenSymbol: topicObj?.token_symbol || undefined,
+            },
+            ...(topicObj?.secondary_tokens || []).map((token) => ({
+              wei: '0', // TODO: fetch actual balance for secondary tokens
+              tokenNumDecimals: token.token_decimals,
+              multiplier: token.vote_weight_multiplier,
+              tokenSymbol: token.token_symbol,
+            })),
+          ],
           topicObj!.weighted_voting as TopicWeightedVoting,
-          topicObj!.vote_weight_multiplier || 1,
-          undefined,
-          topicObj?.token_symbol || undefined,
         )
       : '';
 

@@ -323,12 +323,9 @@ Community Description: ${communityDescription}`;
 
                 // Create AI completion token with the generated content
                 const tokenResponse = await createAICompletionToken({
-                  user_id: user.id,
-                  community_id: comment.community_id,
                   thread_id: comment.thread_id,
                   parent_comment_id: isRootComment ? undefined : comment.id,
                   content: completedText,
-                  expires_in_minutes: 60, // Token expires in 1 hour
                 });
 
                 // Immediately use the token to create the bot comment

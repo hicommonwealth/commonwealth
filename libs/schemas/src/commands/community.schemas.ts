@@ -224,6 +224,7 @@ export const CreateTopic = {
         vote_weight_multiplier: true,
         chain_node_id: true,
         allow_tokenized_threads: true,
+        secondary_tokens: true,
       }),
     ),
   output: z.object({

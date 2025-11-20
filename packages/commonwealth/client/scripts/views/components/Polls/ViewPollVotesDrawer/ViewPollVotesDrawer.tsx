@@ -1,7 +1,7 @@
 import { TopicWeightedVoting, VoteView } from '@hicommonwealth/schemas';
 import { APIOrderDirection } from 'helpers/constants';
 import React, { Dispatch, SetStateAction, useMemo } from 'react';
-import { prettyVoteWeight } from 'shared/adapters/currency';
+import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
 import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer, {
@@ -172,13 +172,17 @@ export const ViewPollVotesDrawer = ({
         // Use renamed prop
         ...opt,
         percentage: '0.00%',
-        voteWeightDisplay: prettyVoteWeight(
-          opt.totalWeightForOption.toString(),
-          tokenDecimals,
+        voteWeightDisplay: prettyCompoundVoteWeight(
+          [
+            {
+              wei: opt.totalWeightForOption.toString(),
+              tokenNumDecimals: tokenDecimals,
+              multiplier: 1,
+              tokenSymbol: tokenSymbol,
+            },
+          ],
           topicWeight,
-          1,
           undefined,
-          tokenSymbol,
         ),
       }));
     }
@@ -189,13 +193,17 @@ export const ViewPollVotesDrawer = ({
       return {
         ...opt,
         percentage: `${percentage}%`,
-        voteWeightDisplay: prettyVoteWeight(
-          opt.totalWeightForOption.toString(),
-          tokenDecimals,
+        voteWeightDisplay: prettyCompoundVoteWeight(
+          [
+            {
+              wei: opt.totalWeightForOption.toString(),
+              tokenNumDecimals: tokenDecimals,
+              multiplier: 1,
+              tokenSymbol: tokenSymbol,
+            },
+          ],
           topicWeight,
-          1,
           undefined,
-          tokenSymbol,
         ),
       };
     });
@@ -294,13 +302,17 @@ export const ViewPollVotesDrawer = ({
                     Total Weight
                   </CWText>
                   <CWText type="b2">
-                    {prettyVoteWeight(
-                      totalVoteWeightInPoll.toString(),
-                      tokenDecimals,
+                    {prettyCompoundVoteWeight(
+                      [
+                        {
+                          wei: totalVoteWeightInPoll.toString(),
+                          tokenNumDecimals: tokenDecimals,
+                          multiplier: 1,
+                          tokenSymbol: tokenSymbol,
+                        },
+                      ],
                       topicWeight,
-                      1,
                       6,
-                      tokenSymbol,
                     )}
                   </CWText>
                 </div>
