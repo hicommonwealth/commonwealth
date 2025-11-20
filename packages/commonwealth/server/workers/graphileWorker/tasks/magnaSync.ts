@@ -12,18 +12,22 @@ async function callback({
   user_name,
   wallet_address,
   token_allocation,
+  contract_id,
+  token_id,
+  schedule_id,
+  unlock_start_at,
 }: TokenAllocationSyncArgs): Promise<string> {
   const response = await createAllocation({
     key,
     category,
     description,
-    contractId: config.MAGNA.CONTRACT_ID,
-    tokenId: config.MAGNA.TOKEN_ID,
+    contractId: contract_id,
+    tokenId: token_id,
     amount: token_allocation,
     walletAddress: wallet_address,
     stakeholder: { name: user_name },
-    unlockScheduleId: config.MAGNA.UNLOCK_SCHEDULE_ID,
-    unlockStartAt: config.MAGNA.UNLOCK_START_AT.toISOString(),
+    unlockScheduleId: schedule_id,
+    unlockStartAt: unlock_start_at.toISOString(),
   });
   // happy path
   if (response && response.isProcessed && response.result?.id)
