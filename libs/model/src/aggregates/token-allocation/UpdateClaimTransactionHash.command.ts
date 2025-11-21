@@ -53,7 +53,7 @@ export function UpdateClaimTransactionHash(): Command<
             magna_claim_tx_at = :transaction_at
           WHERE
             event_id = :event_id
-            user_id = :user_id
+            AND user_id = :user_id
             AND magna_claimed_at IS NOT NULL
             AND magna_claim_data IS NOT NULL
             AND magna_claim_tx_hash IS NULL;
