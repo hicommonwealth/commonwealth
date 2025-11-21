@@ -30,6 +30,7 @@ type QuestListProps = {
 };
 
 const COMMON_X_OKX_QUEST_ID = -3;
+const COMMON_AURA_REWARDS_QUEST_ID = -100;
 
 const QuestList = ({
   minQuests = 8,
@@ -77,7 +78,10 @@ const QuestList = ({
   // visible in other places and user's cab still earn aura for it.
   const quests = (questsList?.pages || [])
     .flatMap((page) => page.results)
-    .filter((q) => q.id !== COMMON_X_OKX_QUEST_ID);
+    .filter(
+      (q) =>
+        ![COMMON_X_OKX_QUEST_ID, COMMON_AURA_REWARDS_QUEST_ID].includes(q.id),
+    );
 
   const { data: xpProgressions = [], isLoading: isLoadingXPProgression } =
     useGetXPs({
