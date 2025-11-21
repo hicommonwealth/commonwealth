@@ -7,14 +7,16 @@ import {
 } from 'openai/resources/index.mjs';
 import { config } from '../../config';
 import { models } from '../../database';
-import { LaunchpadTokenInstance } from '../../models/token';
 import {
   generateImage,
   ImageGenerationErrors,
 } from '../../utils/generateImage';
 
+type RecentSuggestion = { name: string; symbol: string };
+
 type GenerateTokenIdeaProps = {
   ideaPrompt?: string;
+  recentSuggestions?: RecentSuggestion[];
 };
 
 type TokenStyle = 'BRAINROT' | 'POLITICAL' | 'STARTUP';
@@ -230,6 +232,7 @@ const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
 
 const generateTokenIdea = async function* ({
   ideaPrompt,
+  recentSuggestions = [],
 }: GenerateTokenIdeaProps): AsyncGenerator {
   if (!config.OPENAI.API_KEY) {
     log.error(TokenErrors.OpenAINotConfigured);
@@ -249,28 +252,57 @@ const generateTokenIdea = async function* ({
   let tokenName = '';
   try {
     // generate a unique token name
-    let foundToken: LaunchpadTokenInstance | boolean | null = true;
-    while (foundToken) {
+    let nameUnique = false;
+    let attempts = 0;
+    while (!nameUnique) {
+      if (attempts++ > 5) {
+        throw new Error('failed to generate unique token name');
+      }
+
       tokenName = await chatWithOpenAI(
         TOKEN_AI_PROMPTS_CONFIG.name(ideaPrompt),
         openai,
       );
 
-      foundToken = await models.LaunchpadToken.findOne({
-        where: {
-          name: tokenName,
-        },
+      const nameConflict = await models.LaunchpadToken.findOne({
+        where: { name: tokenName },
       });
+
+      const recentConflict = recentSuggestions.some(
+        (s) => s.name.toLowerCase() === tokenName.toLowerCase(),
+      );
+
+      nameUnique = !nameConflict && !recentConflict;
     }
 
     log.info(`Generated name: "${tokenName}" (Style: ${selectedTokenStyle})`);
     yield 'event: name\n';
     yield `data: ${tokenName}\n\n`;
 
-    const tokenSymbol = await chatWithOpenAI(
-      TOKEN_AI_PROMPTS_CONFIG.symbol(),
-      openai,
-    );
+    // generate a unique token symbol
+    let tokenSymbol = '';
+    let symbolUnique = false;
+    attempts = 0;
+    while (!symbolUnique) {
+      if (attempts++ > 5) {
+        throw new Error('failed to generate unique token symbol');
+      }
+
+      tokenSymbol = await chatWithOpenAI(
+        TOKEN_AI_PROMPTS_CONFIG.symbol(),
+        openai,
+      );
+
+      const symbolConflict = await models.LaunchpadToken.findOne({
+        where: { symbol: tokenSymbol },
+      });
+
+      const recentSymbolConflict = recentSuggestions.some(
+        (s) => s.symbol.toUpperCase() === tokenSymbol.toUpperCase(),
+      );
+
+      symbolUnique = !symbolConflict && !recentSymbolConflict;
+    }
 
     log.info(
       `Generated symbol: "${tokenSymbol}" (Style: ${selectedTokenStyle})`,
