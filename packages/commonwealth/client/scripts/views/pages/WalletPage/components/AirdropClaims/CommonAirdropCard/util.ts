@@ -1,4 +1,5 @@
 import { MAGNA_WITHDRAW_SELECTORS } from '@hicommonwealth/shared';
+import { ethers } from 'ethers';
 import { PublicClient, Transport } from 'viem';
 import { base } from 'viem/chains';
 
@@ -109,6 +110,7 @@ export async function getWithdrawTransactionsForAddress(
   contractAddress: string,
   address: string,
   fromBlock: bigint,
+  amount: number,
 ): Promise<TxnData[]> {
   const txns: TxnData[] = [];
   let pageKey: string | undefined;
@@ -146,9 +148,37 @@ export async function getWithdrawTransactionsForAddress(
               if (!tx) {
                 throw new Error('Transaction not found');
               }
+              const iface = new ethers.utils.Interface([
+                'event Transfer(address indexed from, address indexed to, uint256 value)',
+              ]);
+              const humanAmount = (() => {
+                let temp: number | undefined;
+                for (const log of receipt?.logs || []) {
+                  if (
+                    log.topics[0] ===
+                    ethers.utils.id('Transfer(address,address,uint256)')
+                  ) {
+                    try {
+                      const parsed = iface.parseLog(log);
+
+                      const rawAmount = parsed.args.value;
+
+                      temp = Number(ethers.utils.formatUnits(rawAmount, 18));
+                    } catch (e) {
+                      // can be ignored since they are not transfer events.
+                    }
+                  }
+                }
+                return temp;
+              })();
+              if (!humanAmount) {
+                throw new Error('Failed to validate tx event');
+              }
 
               if (
                 tx.to?.toLowerCase() === contractAddress.toLowerCase() &&
+                Math.round(humanAmount * 100) / 100 ===
+                  Math.round(amount * 100) / 100 &&
                 tx.input &&
                 tx.input.length > 10
               ) {
