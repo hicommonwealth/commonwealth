@@ -318,8 +318,17 @@ export async function getWeightedSuiNFTs(
   const chainNode = await models.ChainNode.findByPk(chainNodeId);
   mustExist('Chain Node', chainNode);
 
-  let tokenBalance = await getSuiNFTBalance(chainNode, address, fullObjectType);
+  // Calculate vote weight for primary token
+  const primaryBalance = await getSuiNFTBalance(
+    chainNode,
+    address,
+    fullObjectType,
+  );
+  let totalVoteWeight =
+    calculateVoteWeight(primaryBalance.toString(), voteWeightMultiplier) ||
+    BigInt(0);
 
+  // Calculate vote weight for each secondary token using its own multiplier
   if (secondaryTokens && secondaryTokens.length > 0) {
     for (const secondaryToken of secondaryTokens) {
       const secondaryBalance = await getSuiNFTBalance(
@@ -327,18 +336,20 @@ export async function getWeightedSuiNFTs(
         address,
         secondaryToken.token_address,
       );
-      tokenBalance += secondaryBalance;
+      const secondaryVoteWeight =
+        calculateVoteWeight(
+          secondaryBalance.toString(),
+          secondaryToken.vote_weight_multiplier,
+        ) || BigInt(0);
+      totalVoteWeight += secondaryVoteWeight;
     }
   }
 
-  if (BigInt(tokenBalance || 0) <= BigInt(0)) {
+  if (totalVoteWeight <= BigInt(0)) {
     throw new InvalidState('Insufficient Sui NFT balance');
   }
-  const result = calculateVoteWeight(
-    tokenBalance.toString(),
-    voteWeightMultiplier,
-  );
-  return result || BigInt(0);
+
+  return totalVoteWeight;
 }
 
 async function getSuiTokenBalance(

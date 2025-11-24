@@ -9,15 +9,16 @@ import { ChainNode } from '@hicommonwealth/schemas';
 import { BalanceSourceType } from '@hicommonwealth/shared';
 import * as readline from 'readline';
 import { z } from 'zod';
+import { getWeightedSuiNFTs } from '../../../libs/model/src/services/stakeHelper';
 
 // Use ChainNodeAttributes type (plain data object, not Sequelize instance)
 type ChainNodeAttributes = z.infer<typeof ChainNode>;
 
 /**
- * Interactive CLI script to calculate compound balance for two SUI tokens
+ * Interactive CLI script to calculate compound balance for two SUI tokens with weighted voting
  * Usage: pnpm get-sui-compound-balance
  *
- * Or with arguments: pnpm get-sui-compound-balance <sui-address> <primary-coin-type> <secondary-coin-type>
+ * Or with arguments: pnpm get-sui-compound-balance <sui-address> <primary-coin-type> <secondary-coin-type> [multiplier]
  */
 
 interface TokenBalance {
@@ -36,11 +37,11 @@ async function getSuiTokenBalance(
   coinType: string,
 ): Promise<bigint> {
   const balanceOptions: GetBalancesOptions = {
-    balanceSourceType: BalanceSourceType.SuiToken,
+    balanceSourceType: BalanceSourceType.SuiNFT,
     addresses: [address],
     sourceOptions: {
       suiNetwork: chainNode.name,
-      coinType,
+      fullObjectType: coinType,
     },
     cacheRefresh: true,
   };
@@ -48,38 +49,6 @@ async function getSuiTokenBalance(
   const balances = await getBalances(balanceOptions);
   const tokenBalance = balances[address];
   return BigInt(tokenBalance || 0);
-}
-
-/**
- * Helper function to calculate compound balance for multiple SUI tokens
- * Follows the pattern from getWeightedSuiNFTs in stakeHelper.ts
- */
-async function getCompoundSuiTokenBalance(
-  chainNode: ChainNodeAttributes,
-  address: string,
-  primaryCoinType: string,
-  secondaryCoinTypes: string[],
-): Promise<bigint> {
-  // Get primary token balance
-  let compoundBalance = await getSuiTokenBalance(
-    chainNode,
-    address,
-    primaryCoinType,
-  );
-
-  // Add secondary token balances
-  if (secondaryCoinTypes && secondaryCoinTypes.length > 0) {
-    for (const secondaryCoinType of secondaryCoinTypes) {
-      const secondaryBalance = await getSuiTokenBalance(
-        chainNode,
-        address,
-        secondaryCoinType,
-      );
-      compoundBalance += secondaryBalance;
-    }
-  }
-
-  return compoundBalance;
 }
 
 function extractSymbolFromCoinType(coinType: string): string {
@@ -115,9 +84,8 @@ async function getCompoundBalance(
   address: string,
   primaryCoinType: string,
   secondaryCoinType: string,
+  multiplier: number = 1,
 ): Promise<{
-  primary: TokenBalance;
-  secondary: TokenBalance;
   compound: {
     balance: string;
     formatted: string;
@@ -154,49 +122,31 @@ async function getCompoundBalance(
   });
   mustExist('Sui Mainnet chain node not found', suiChainNode);
 
-  console.log(`\nFetching balances for address: ${address}\n`);
+  console.log(`\nFetching balances for address: ${address}`);
+  console.log(`Using multiplier: ${multiplier}\n`);
 
   // Fetch individual balances for display
-  const primaryBalance = await getSuiTokenBalance(
-    suiChainNode,
-    address,
-    primaryCoinType,
-  );
   const primarySymbol = extractSymbolFromCoinType(primaryCoinType);
-  console.log(
-    `✓ Primary token (${primarySymbol}): ${formatCoinBalance(primaryBalance.toString(), primarySymbol)}`,
-  );
-
-  const secondaryBalance = await getSuiTokenBalance(
-    suiChainNode,
-    address,
-    secondaryCoinType,
-  );
   const secondarySymbol = extractSymbolFromCoinType(secondaryCoinType);
-  console.log(
-    `✓ Secondary token (${secondarySymbol}): ${formatCoinBalance(secondaryBalance.toString(), secondarySymbol)}`,
-  );
 
-  // Calculate compound balance using helper function (follows pattern from getWeightedSuiNFTs)
-  const compoundBalanceBigInt = await getCompoundSuiTokenBalance(
-    suiChainNode,
+  // Calculate weighted compound balance using getWeightedSuiNFTs from stakeHelper
+  // This applies the multiplier to calculate vote weight
+  const compoundBalanceBigInt = await getWeightedSuiNFTs(
     address,
     primaryCoinType,
-    [secondaryCoinType],
+    suiChainNode.id!,
+    multiplier,
+    [
+      {
+        token_address: secondaryCoinType,
+        token_decimals: 0, // NFTs typically have 0 decimals
+        vote_weight_multiplier: multiplier,
+      },
+    ],
   );
   const compoundBalance = compoundBalanceBigInt.toString();
 
   return {
-    primary: {
-      coinType: primaryCoinType,
-      balance: primaryBalance.toString(),
-      symbol: primarySymbol,
-    },
-    secondary: {
-      coinType: secondaryCoinType,
-      balance: secondaryBalance.toString(),
-      symbol: secondarySymbol,
-    },
     compound: {
       balance: compoundBalance,
       formatted: formatCoinBalance(compoundBalance, 'TOTAL'),
@@ -236,26 +186,27 @@ async function interactiveMode() {
       'Enter secondary coin type (e.g., 0xPACKAGE::module::TYPE): ',
     );
 
+    const multiplierStr = await question(
+      rl,
+      'Enter vote weight multiplier (default 1): ',
+    );
+    const multiplier = multiplierStr.trim()
+      ? parseFloat(multiplierStr.trim())
+      : 1;
+
+    if (isNaN(multiplier) || multiplier < 0) {
+      throw new Error('Multiplier must be a positive number');
+    }
+
     console.log('\n--- Fetching balances... ---');
 
     const result = await getCompoundBalance(
       address.trim(),
       primaryCoinType.trim(),
       secondaryCoinType.trim(),
+      multiplier,
     );
 
-    console.log('\n=== Compound Balance Result ===\n');
-    console.log(`Primary (${result.primary.symbol}):`);
-    console.log(`  Raw: ${result.primary.balance}`);
-    console.log(
-      `  Formatted: ${formatCoinBalance(result.primary.balance, result.primary.symbol)}`,
-    );
-    console.log();
-    console.log(`Secondary (${result.secondary.symbol}):`);
-    console.log(`  Raw: ${result.secondary.balance}`);
-    console.log(
-      `  Formatted: ${formatCoinBalance(result.secondary.balance, result.secondary.symbol)}`,
-    );
     console.log();
     console.log('🎯 Compound Balance:');
     console.log(`  Raw: ${result.compound.balance}`);
@@ -271,7 +222,7 @@ async function commandLineMode() {
 
   if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
     console.log(`
-Usage: pnpm get-sui-compound-balance [<sui-address> <primary-coin-type> <secondary-coin-type>]
+Usage: pnpm get-sui-compound-balance [<sui-address> <primary-coin-type> <secondary-coin-type> [multiplier]]
 
 Interactive Mode (no arguments):
   The script will prompt you for the required information.
@@ -280,16 +231,24 @@ Command Line Mode (with arguments):
   sui-address          The Sui address to check balance for (0x followed by 64 hex characters)
   primary-coin-type    The primary coin type identifier (e.g., 0x<package>::<module>::<type>)
   secondary-coin-type  The secondary coin type identifier (e.g., 0x<package>::<module>::<type>)
+  multiplier           Vote weight multiplier (optional, default: 1)
 
 Examples:
   # Interactive mode
   pnpm get-sui-compound-balance
 
-  # Command line mode
+  # Command line mode with default multiplier (1)
   pnpm get-sui-compound-balance \\
     0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef \\
     0x4a5313fa76e8abad0f812467de9bd7188abefba666fe9e262a2ded0863d60ea8::mock_navx_token::MOCK_NAVX_TOKEN \\
     0x5e8e6924d9b6d8c1234567890abcdef1234567890abcdef1234567890abcdef::sui_coin::SUI_COIN
+
+  # Command line mode with custom multiplier
+  pnpm get-sui-compound-balance \\
+    0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef \\
+    0x4a5313fa76e8abad0f812467de9bd7188abefba666fe9e262a2ded0863d60ea8::mock_navx_token::MOCK_NAVX_TOKEN \\
+    0x5e8e6924d9b6d8c1234567890abcdef1234567890abcdef1234567890abcdef::sui_coin::SUI_COIN \\
+    2.5
 
 Environment Variables:
   RAW_OUTPUT=true    Output only the raw compound balance in smallest units (useful for programmatic use)
@@ -305,12 +264,19 @@ Environment Variables:
   const address = args[0];
   const primaryCoinType = args[1];
   const secondaryCoinType = args[2];
+  const multiplier = args[3] ? parseFloat(args[3]) : 1;
+
+  if (isNaN(multiplier) || multiplier < 0) {
+    console.error('Error: Multiplier must be a positive number');
+    throw new Error('Invalid multiplier');
+  }
 
   try {
     const result = await getCompoundBalance(
       address,
       primaryCoinType,
       secondaryCoinType,
+      multiplier,
     );
 
     if (process.env.RAW_OUTPUT === 'true') {
@@ -318,17 +284,6 @@ Environment Variables:
       console.log(result.compound.balance);
     } else {
       console.log('\n=== Compound Balance Result ===\n');
-      console.log(`Primary (${result.primary.symbol}):`);
-      console.log(`  Raw: ${result.primary.balance}`);
-      console.log(
-        `  Formatted: ${formatCoinBalance(result.primary.balance, result.primary.symbol)}`,
-      );
-      console.log();
-      console.log(`Secondary (${result.secondary.symbol}):`);
-      console.log(`  Raw: ${result.secondary.balance}`);
-      console.log(
-        `  Formatted: ${formatCoinBalance(result.secondary.balance, result.secondary.symbol)}`,
-      );
       console.log();
       console.log('🎯 Compound Balance:');
       console.log(`  Raw: ${result.compound.balance}`);
