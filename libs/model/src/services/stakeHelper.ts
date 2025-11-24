@@ -328,6 +328,8 @@ export async function getWeightedSuiNFTs(
     calculateVoteWeight(primaryBalance.toString(), voteWeightMultiplier) ||
     BigInt(0);
 
+  console.log(`Primary balance: ${primaryBalance}`);
+
   // Calculate vote weight for each secondary token using its own multiplier
   if (secondaryTokens && secondaryTokens.length > 0) {
     for (const secondaryToken of secondaryTokens) {
@@ -341,12 +343,10 @@ export async function getWeightedSuiNFTs(
           secondaryBalance.toString(),
           secondaryToken.vote_weight_multiplier,
         ) || BigInt(0);
+
+      console.log(`Secondary balance: ${secondaryBalance}`);
       totalVoteWeight += secondaryVoteWeight;
     }
-  }
-
-  if (totalVoteWeight <= BigInt(0)) {
-    throw new InvalidState('Insufficient Sui NFT balance');
   }
 
   return totalVoteWeight;

@@ -1,18 +1,8 @@
 import { dispose } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model/db';
 import { mustExist } from '@hicommonwealth/model/middleware';
-import {
-  getBalances,
-  type GetBalancesOptions,
-} from '@hicommonwealth/model/tbc';
-import { ChainNode } from '@hicommonwealth/schemas';
-import { BalanceSourceType } from '@hicommonwealth/shared';
 import * as readline from 'readline';
-import { z } from 'zod';
-import { getWeightedSuiNFTs } from '../../../libs/model/src/services/stakeHelper';
-
-// Use ChainNodeAttributes type (plain data object, not Sequelize instance)
-type ChainNodeAttributes = z.infer<typeof ChainNode>;
+import { getWeightedSuiTokens } from '../../../libs/model/src/services/stakeHelper';
 
 /**
  * Interactive CLI script to calculate compound balance for two SUI tokens with weighted voting
@@ -20,36 +10,6 @@ type ChainNodeAttributes = z.infer<typeof ChainNode>;
  *
  * Or with arguments: pnpm get-sui-compound-balance <sui-address> <primary-coin-type> <secondary-coin-type> [multiplier]
  */
-
-interface TokenBalance {
-  coinType: string;
-  balance: string;
-  symbol: string;
-}
-
-/**
- * Helper function to get SUI token balance for a single coin type
- * Follows the pattern from getSuiNFTBalance in stakeHelper.ts
- */
-async function getSuiTokenBalance(
-  chainNode: ChainNodeAttributes,
-  address: string,
-  coinType: string,
-): Promise<bigint> {
-  const balanceOptions: GetBalancesOptions = {
-    balanceSourceType: BalanceSourceType.SuiNFT,
-    addresses: [address],
-    sourceOptions: {
-      suiNetwork: chainNode.name,
-      fullObjectType: coinType,
-    },
-    cacheRefresh: true,
-  };
-
-  const balances = await getBalances(balanceOptions);
-  const tokenBalance = balances[address];
-  return BigInt(tokenBalance || 0);
-}
 
 function extractSymbolFromCoinType(coinType: string): string {
   // Extract the last part after :: as the symbol
@@ -129,9 +89,12 @@ async function getCompoundBalance(
   const primarySymbol = extractSymbolFromCoinType(primaryCoinType);
   const secondarySymbol = extractSymbolFromCoinType(secondaryCoinType);
 
-  // Calculate weighted compound balance using getWeightedSuiNFTs from stakeHelper
+  console.log(`Primary token: ${primarySymbol}`);
+  console.log(`Secondary token: ${secondarySymbol}`);
+
+  // Calculate weighted compound balance using getWeightedSuiTokens from stakeHelper
   // This applies the multiplier to calculate vote weight
-  const compoundBalanceBigInt = await getWeightedSuiNFTs(
+  const compoundBalanceBigInt = await getWeightedSuiTokens(
     address,
     primaryCoinType,
     suiChainNode.id!,
@@ -139,17 +102,17 @@ async function getCompoundBalance(
     [
       {
         token_address: secondaryCoinType,
-        token_decimals: 0, // NFTs typically have 0 decimals
+        token_decimals: 0,
         vote_weight_multiplier: multiplier,
+        token_symbol: secondarySymbol,
       },
     ],
   );
-  const compoundBalance = compoundBalanceBigInt.toString();
 
   return {
     compound: {
-      balance: compoundBalance,
-      formatted: formatCoinBalance(compoundBalance, 'TOTAL'),
+      balance: compoundBalanceBigInt.toString(),
+      formatted: formatCoinBalance(compoundBalanceBigInt.toString(), 'TOTAL'),
     },
   };
 }
