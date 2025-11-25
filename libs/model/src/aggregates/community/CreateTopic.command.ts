@@ -36,6 +36,8 @@ const Errors = {
   DefaultTemplateRequired: 'Default Template required',
   StakeNotAllowed:
     'Cannot create a staked topic if community has not enabled stake',
+  SuiTokenRequiredForSecondaryTokens:
+    'Sui token is required for secondary tokens',
 };
 
 export function CreateTopic(): Command<typeof schemas.CreateTopic> {
@@ -103,15 +105,21 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
             ? 9
             : payload.token_decimals;
 
-        // Handle secondary tokens - extract symbols for Sui tokens
+        // Must be sui token type to have secondary tokens
+        if (
+          payload.weighted_voting !== schemas.TopicWeightedVoting.SuiToken &&
+          payload.secondary_tokens &&
+          payload.secondary_tokens.length > 0
+        ) {
+          throw new InvalidInput(Errors.SuiTokenRequiredForSecondaryTokens);
+        }
+
+        // Handle secondary tokens - extract symbols for Sui tokens only (not NFTs)
         let processedSecondaryTokens = payload.secondary_tokens;
         if (
           processedSecondaryTokens &&
           processedSecondaryTokens.length > 0 &&
-          [
-            schemas.TopicWeightedVoting.SuiToken,
-            schemas.TopicWeightedVoting.SuiNFT,
-          ].includes(payload.weighted_voting)
+          payload.weighted_voting === schemas.TopicWeightedVoting.SuiToken
         ) {
           processedSecondaryTokens = processedSecondaryTokens.map((token) => ({
             ...token,

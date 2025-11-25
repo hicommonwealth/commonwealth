@@ -136,6 +136,7 @@ export async function getVotingWeight(
       topic.token_address!,
       chainNode.id!,
       topic.vote_weight_multiplier!,
+      topic.secondary_tokens ?? undefined,
     );
     if (numTokens === BigInt(0)) {
       throw new InvalidState('Insufficient Sui token balance');
@@ -154,7 +155,6 @@ export async function getVotingWeight(
       topic.token_address!,
       chainNode.id!,
       topic.vote_weight_multiplier!,
-      topic.secondary_tokens ?? undefined,
     );
     if (numTokens === BigInt(0)) {
       throw new InvalidState('Insufficient Sui NFT balance');
@@ -312,44 +312,20 @@ export async function getWeightedSuiNFTs(
   fullObjectType: string,
   chainNodeId: number,
   voteWeightMultiplier: number,
-  secondaryTokens?: z.infer<typeof TopicToken>[],
 ): Promise<bigint> {
   // Get the chain node to determine the network
   const chainNode = await models.ChainNode.findByPk(chainNodeId);
   mustExist('Chain Node', chainNode);
 
-  // Calculate vote weight for primary token
-  const primaryBalance = await getSuiNFTBalance(
-    chainNode,
-    address,
-    fullObjectType,
-  );
-  let totalVoteWeight =
-    calculateVoteWeight(primaryBalance.toString(), voteWeightMultiplier) ||
+  // Calculate vote weight for NFT
+  const nftBalance = await getSuiNFTBalance(chainNode, address, fullObjectType);
+  const voteWeight =
+    calculateVoteWeight(nftBalance.toString(), voteWeightMultiplier) ||
     BigInt(0);
 
-  console.log(`Primary balance: ${primaryBalance}`);
+  console.log(`NFT balance: ${nftBalance}`);
 
-  // Calculate vote weight for each secondary token using its own multiplier
-  if (secondaryTokens && secondaryTokens.length > 0) {
-    for (const secondaryToken of secondaryTokens) {
-      const secondaryBalance = await getSuiNFTBalance(
-        chainNode,
-        address,
-        secondaryToken.token_address,
-      );
-      const secondaryVoteWeight =
-        calculateVoteWeight(
-          secondaryBalance.toString(),
-          secondaryToken.vote_weight_multiplier,
-        ) || BigInt(0);
-
-      console.log(`Secondary balance: ${secondaryBalance}`);
-      totalVoteWeight += secondaryVoteWeight;
-    }
-  }
-
-  return totalVoteWeight;
+  return voteWeight;
 }
 
 async function getSuiTokenBalance(
