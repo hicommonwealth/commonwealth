@@ -10,6 +10,25 @@
     margin-top: 8px;
   }
 
+  .nft-config-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 0;
+
+    .nft-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .field-label {
+      color: var(--neutral-700);
+      font-weight: 500;
+      margin-top: 8px;
+    }
+  }
+
   .info {
     color: var(--neutral-500);
     margin-top: 8px;
