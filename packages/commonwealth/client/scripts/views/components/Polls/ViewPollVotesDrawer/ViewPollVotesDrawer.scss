@@ -58,7 +58,42 @@
       .token-info-stack {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 8px;
+
+        .token-entry {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          padding: 8px;
+          background-color: colors.$neutral-50;
+          border-radius: 6px;
+          border: 1px solid colors.$neutral-200;
+
+          .token-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+          }
+
+          .copy-button {
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: opacity 0.2s ease;
+            margin-top: 2px;
+
+            svg {
+              fill: colors.$neutral-500;
+              transition: fill 0.2s ease;
+            }
+
+            &:hover {
+              svg {
+                fill: colors.$neutral-700;
+              }
+            }
+          }
+        }
 
         .token-symbol {
           font-weight: 600;

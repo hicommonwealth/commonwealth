@@ -3,6 +3,8 @@ import { APIOrderDirection } from 'helpers/constants';
 import React, { Dispatch, SetStateAction, useMemo } from 'react';
 import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
 import app from 'state';
+import { saveToClipboard } from 'utils/clipboard';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer, {
   CWDrawerTopBar,
@@ -37,6 +39,13 @@ export type PollOptionSummary = {
   totalWeightForOption: string | number; // Sum of voting weights for this option.
 };
 
+type SecondaryToken = {
+  token_address: string;
+  token_symbol?: string;
+  token_decimals: number;
+  vote_weight_multiplier: number;
+};
+
 type ViewPollVotesDrawerProps = {
   header: string; // Drawer title, e.g., "Votes for 'Poll Question XYZ'"
   votes: VoterWithProfile[]; // Array of individual vote records, enriched with profiles.
@@ -48,6 +57,7 @@ type ViewPollVotesDrawerProps = {
   topicWeight?: TopicWeightedVoting | null | undefined; // For formatting vote weights
   tokenSymbol?: string; // Token symbol for Sui NAVX special handling
   tokenAddress?: string; // Token address for weighted voting display
+  secondaryTokens?: SecondaryToken[]; // Additional tokens for compound voting
   communityId: string; // Community context, potentially for fetching profiles or other details.
   onDownloadCsv: () => void; // Callback to trigger CSV download.
   isLoading?: boolean; // To show loading state for votes
@@ -120,6 +130,7 @@ export const ViewPollVotesDrawer = ({
   topicWeight,
   tokenSymbol,
   tokenAddress,
+  secondaryTokens,
   communityId,
   onDownloadCsv,
   isLoading = false,
@@ -236,16 +247,58 @@ export const ViewPollVotesDrawer = ({
                 Weighted by
               </CWText>
               <div className="token-info-stack">
-                {tokenSymbol ? (
-                  <span className="token-symbol">{tokenSymbol}</span>
-                ) : (
-                  <span className="token-symbol">
-                    {getTokenSymbolFallback(topicWeight)}
-                  </span>
-                )}
-                {tokenAddress && (
-                  <span className="token-address">{tokenAddress}</span>
-                )}
+                {/* Primary token */}
+                <div className="token-entry">
+                  <div className="token-info">
+                    {tokenSymbol ? (
+                      <span className="token-symbol">{tokenSymbol}</span>
+                    ) : (
+                      <span className="token-symbol">
+                        {getTokenSymbolFallback(topicWeight)}
+                      </span>
+                    )}
+                    {tokenAddress && (
+                      <span className="token-address">{tokenAddress}</span>
+                    )}
+                  </div>
+                  {tokenAddress && (
+                    <CWIconButton
+                      iconName="copy"
+                      iconSize="small"
+                      onClick={() => {
+                        saveToClipboard(tokenAddress, true).catch(
+                          console.error,
+                        );
+                      }}
+                      className="copy-button"
+                    />
+                  )}
+                </div>
+                {/* Secondary tokens */}
+                {secondaryTokens &&
+                  secondaryTokens.length > 0 &&
+                  secondaryTokens.map((token, idx) => (
+                    <div key={idx} className="token-entry">
+                      <div className="token-info">
+                        <span className="token-symbol">
+                          {token.token_symbol || token.token_address}
+                        </span>
+                        <span className="token-address">
+                          {token.token_address}
+                        </span>
+                      </div>
+                      <CWIconButton
+                        iconName="copy"
+                        iconSize="small"
+                        onClick={() => {
+                          saveToClipboard(token.token_address, true).catch(
+                            console.error,
+                          );
+                        }}
+                        className="copy-button"
+                      />
+                    </div>
+                  ))}
               </div>
             </div>
           )}
