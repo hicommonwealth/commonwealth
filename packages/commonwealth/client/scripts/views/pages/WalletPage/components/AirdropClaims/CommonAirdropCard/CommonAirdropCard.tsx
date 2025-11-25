@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import CommonClaim from 'helpers/ContractHelpers/CommonClaim';
 import moment from 'moment';
-import React from 'react';
+import React, { useRef } from 'react';
 import { useGetAllocationQuery } from 'state/api/tokenAllocations';
 import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -46,6 +46,7 @@ const CommonAirdropCard = ({
   claim,
 }: CommonAirdropCardProps) => {
   const user = useUserStore();
+  const amountRefs = useRef({ initial: 0, final: 0 });
 
   const claimAddress = claim;
   const shouldCollapseClaimState = (() => {
@@ -75,16 +76,8 @@ const CommonAirdropCard = ({
     tokenSymbol: claimAddress?.token || 'C',
     userClaimAddress: claimAddress?.address || undefined,
     magnaContractAddress: claimAddress?.contract_address || undefined,
-    shouldCheckInitialTransactionStatus: !!(
-      !claimAddress?.magna_claim_tx_hash && claimAddress?.magna_claimed_at
-    ),
-    shouldCheckFinalTransactionStatus: !!(
-      claimAddress?.magna_claim_tx_hash &&
-      claimAddress?.magna_claimed_at &&
-      !claimAddress?.magna_cliff_claim_tx_hash &&
-      claimAddress?.magna_cliff_claimed_at &&
-      !shouldCollapseClaimState
-    ),
+    shouldCheckInitialTxAmount: amountRefs.current.initial,
+    shouldCheckFinalTxAmount: amountRefs.current.final,
   });
   const { data: allocation } = useGetAllocationQuery({
     magna_allocation_id: claimAddress?.magna_allocation_id,
@@ -260,6 +253,19 @@ const CommonAirdropCard = ({
   const allocatedAmountTextWithTokenOrTokens = `${allocatedAmountText} ${
     allocatedAmountText.length > 3 ? '' : tokenOrTokensText
   }`;
+
+  amountRefs.current.initial =
+    !claimAddress?.magna_claim_tx_hash && claimAddress?.magna_claimed_at
+      ? initialClaimableTokens
+      : 0;
+  amountRefs.current.final =
+    claimAddress?.magna_claim_tx_hash &&
+    claimAddress?.magna_claimed_at &&
+    !claimAddress?.magna_cliff_claim_tx_hash &&
+    claimAddress?.magna_cliff_claimed_at &&
+    !shouldCollapseClaimState
+      ? finalClaimableTokens
+      : 0;
 
   return canClaim ? (
     <div
