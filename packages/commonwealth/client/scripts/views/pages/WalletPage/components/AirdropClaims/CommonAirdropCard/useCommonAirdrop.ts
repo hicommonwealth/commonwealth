@@ -47,17 +47,19 @@ export const commonAirdropStore = createStore<CommonAirdropState>()(
 const useCommonAirdropStore = createBoundedUseStore(commonAirdropStore);
 
 export const useCommonAirdrop = ({
+  eventId,
   tokenSymbol,
   userClaimAddress,
   magnaContractAddress,
-  shouldCheckInitialTransactionStatus = false,
-  shouldCheckFinalTransactionStatus = false,
+  shouldCheckInitialTxAmount = 0,
+  shouldCheckFinalTxAmount = 0,
 }: {
+  eventId: string;
   tokenSymbol?: string;
   userClaimAddress?: string;
   magnaContractAddress?: string;
-  shouldCheckInitialTransactionStatus?: boolean;
-  shouldCheckFinalTransactionStatus?: boolean;
+  shouldCheckInitialTxAmount?: number;
+  shouldCheckFinalTxAmount?: number;
 }) => {
   const utils = trpc.useUtils();
 
@@ -163,6 +165,7 @@ export const useCommonAirdrop = ({
           await new Promise((r) => setTimeout(r, 5000)); // wait 5 sec for the block to propagate
 
           await txHashUpdateFunction({
+            event_id: eventId,
             transaction_hash: txHash,
           })
             .then(() => {
@@ -195,8 +198,7 @@ export const useCommonAirdrop = ({
 
   useEffect(() => {
     if (
-      (!shouldCheckInitialTransactionStatus &&
-        !shouldCheckFinalTransactionStatus) ||
+      (!shouldCheckInitialTxAmount && !shouldCheckFinalTxAmount) ||
       !userClaimAddress ||
       !magnaContractAddress ||
       shouldRetryInitialTx ||
@@ -222,14 +224,17 @@ export const useCommonAirdrop = ({
           chain: base,
           transport: http(baseNode.url),
         });
-        const fromBlock = 37384067n;
+        const fromBlock = 30084067n;
 
         // Fetch withdraw transactions for the user's claim address
+        const amountToCheck =
+          shouldCheckInitialTxAmount || shouldCheckFinalTxAmount;
         const transactions = await getWithdrawTransactionsForAddress(
           client,
           magnaContractAddress, // contract address
           userClaimAddress, // user's claim address
           fromBlock,
+          amountToCheck,
         );
 
         // [0] is latest
@@ -241,9 +246,9 @@ export const useCommonAirdrop = ({
           const revertedTx = transactions[0].status === 'reverted';
 
           if (revertedTx) {
-            if (shouldCheckInitialTransactionStatus) {
+            if (shouldCheckInitialTxAmount) {
               setData({ shouldRetryInitialTx: true });
-            } else if (shouldCheckFinalTransactionStatus) {
+            } else if (shouldCheckFinalTxAmount) {
               setData({ shouldRetryFinalTx: true });
             }
           } else {
@@ -253,20 +258,22 @@ export const useCommonAirdrop = ({
             );
             if (successfulTx) {
               // Update with successful transaction hash
-              if (shouldCheckInitialTransactionStatus) {
+              if (shouldCheckInitialTxAmount) {
                 setData({
                   shouldRetryInitialTx: false,
                   initialTxHash: successfulTx.txHash as `0x${string}`,
                 });
                 await updateInitialClaimTxHash.mutateAsync({
+                  event_id: eventId,
                   transaction_hash: successfulTx.txHash as `0x${string}`,
                 });
-              } else if (shouldCheckFinalTransactionStatus) {
+              } else if (shouldCheckFinalTxAmount) {
                 setData({
                   shouldRetryFinalTx: false,
                   finalTxHash: successfulTx.txHash as `0x${string}`,
                 });
                 await updateFinalClaimTxHash.mutateAsync({
+                  event_id: eventId,
                   transaction_hash: successfulTx.txHash as `0x${string}`,
                 });
               }
@@ -288,10 +295,11 @@ export const useCommonAirdrop = ({
       interval && clearInterval(interval);
     };
   }, [
+    eventId,
     shouldRetryInitialTx,
     shouldRetryFinalTx,
-    shouldCheckInitialTransactionStatus,
-    shouldCheckFinalTransactionStatus,
+    shouldCheckInitialTxAmount,
+    shouldCheckFinalTxAmount,
     magnaContractAddress,
     userClaimAddress,
     setData,

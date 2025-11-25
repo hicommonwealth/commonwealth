@@ -169,6 +169,7 @@ export const ThreadPollCard = ({
         topicWeight={topicWeight}
         tokenAddress={thread?.topic?.token_address || undefined}
         tokenSymbol={thread?.topic?.token_symbol || undefined}
+        secondaryTokens={thread?.topic?.secondary_tokens || undefined}
         isLoadingVotes={isLoadingVotes}
         pollEnded={
           !!poll.ends_at && moment(poll.ends_at).isBefore(moment().utc())

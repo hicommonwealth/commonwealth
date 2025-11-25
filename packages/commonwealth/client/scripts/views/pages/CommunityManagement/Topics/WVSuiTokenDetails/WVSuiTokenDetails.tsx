@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import app from 'state';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -14,6 +15,12 @@ import { ValidationStatus } from 'views/components/component_kit/cw_validation_t
 import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
 import './WVSuiTokenDetails.scss';
 
+interface TokenConfig {
+  tokenAddress: string;
+  tokenDecimals: number;
+  voteWeightMultiplier: number;
+}
+
 interface WVSuiTokenDetailsProps {
   onStepChange: (step: CreateTopicStep) => void;
   onCreateTopic: (props: HandleCreateTopicProps) => Promise<void>;
@@ -23,9 +30,13 @@ const WVSuiTokenDetails = ({
   onStepChange,
   onCreateTopic,
 }: WVSuiTokenDetailsProps) => {
-  const [tokenAddress, setTokenAddress] = useState('');
-  const [tokenDecimals, setTokenDecimals] = useState(9);
-  const [multiplier, setMultiplier] = useState(1);
+  const [tokens, setTokens] = useState<TokenConfig[]>([
+    {
+      tokenAddress: '',
+      tokenDecimals: 9,
+      voteWeightMultiplier: 1,
+    },
+  ]);
   const [loading, setLoading] = useState(false);
 
   const chainNodeId = app?.chain?.meta?.ChainNode?.id;
@@ -54,21 +65,64 @@ const WVSuiTokenDetails = ({
     return ['success', 'Valid Sui address format'];
   };
 
+  const handleAddToken = () => {
+    setTokens([
+      ...tokens,
+      {
+        tokenAddress: '',
+        tokenDecimals: 9,
+        voteWeightMultiplier: 1,
+      },
+    ]);
+  };
+
+  const handleRemoveToken = (index: number) => {
+    setTokens(tokens.filter((_, i) => i !== index));
+  };
+
+  const handleTokenChange = (
+    index: number,
+    field: keyof TokenConfig,
+    value: string | number,
+  ) => {
+    const newTokens = [...tokens];
+    newTokens[index] = {
+      ...newTokens[index],
+      [field]: field === 'tokenAddress' ? value : Number(value),
+    };
+    setTokens(newTokens);
+  };
+
   const handleSubmit = async () => {
-    if (!tokenAddress || !chainNodeId) {
-      notifyError('Please fill in all required fields');
+    // Validate all tokens have required fields
+    const invalidTokens = tokens.filter(
+      (t) => !t.tokenAddress || t.voteWeightMultiplier <= 0,
+    );
+    if (invalidTokens.length > 0 || !chainNodeId) {
+      notifyError('Please fill in all required fields for each token');
       return;
     }
 
     setLoading(true);
     try {
+      // Use the first token as the primary token
+      const primaryToken = tokens[0];
+      const secondaryTokens = tokens.slice(1).map((t) => ({
+        token_address: t.tokenAddress,
+        token_symbol: '', // This will need to be fetched or provided later
+        token_decimals: t.tokenDecimals,
+        vote_weight_multiplier: t.voteWeightMultiplier,
+      }));
+
       await onCreateTopic({
         suiToken: {
-          tokenAddress,
-          tokenDecimals,
-          voteWeightMultiplier: multiplier,
+          tokenAddress: primaryToken.tokenAddress,
+          tokenDecimals: primaryToken.tokenDecimals,
+          voteWeightMultiplier: primaryToken.voteWeightMultiplier,
           chainNodeId,
           weightedVoting: TopicWeightedVoting.SuiToken,
+          secondaryTokens:
+            secondaryTokens.length > 0 ? secondaryTokens : undefined,
         },
       });
     } catch (err) {
@@ -90,53 +144,95 @@ const WVSuiTokenDetails = ({
 
       <CWDivider />
 
-      <CWText type="h4">Connect Sui Token</CWText>
-
-      <CWText type="h5">Coin Type</CWText>
+      <CWText type="h4">Connect Sui Tokens</CWText>
       <CWText type="b1" className="description">
-        Enter the Sui Coin Type (e.g.,
-        0xe1b45a0e641b9955a20aa0ad1c1f4ad86aad8afb07296d4085e349a50e90bdca::blue::BLUE)
+        You can configure multiple tokens. The vote weights from all tokens will
+        be summed together.
       </CWText>
-      <CWTextInput
-        value={tokenAddress}
-        onInput={(e) => setTokenAddress(e.target.value)}
-        placeholder="Enter Sui Coin Type"
-        fullWidth
-        inputValidationFn={validateSuiAddress}
+
+      {tokens.map((token, index) => (
+        <div key={index} className="token-config-section">
+          <div className="token-header">
+            <CWText type="h5">Token {index + 1}</CWText>
+            {tokens.length > 1 && (
+              <CWIconButton
+                iconName="close"
+                iconSize="small"
+                onClick={() => handleRemoveToken(index)}
+              />
+            )}
+          </div>
+
+          <CWText type="b2" className="field-label">
+            Coin Type
+          </CWText>
+          <CWText type="b1" className="description">
+            Enter the Sui Coin Type (e.g.,
+            0xe1b45a0e641b9955a20aa0ad1c1f4ad86aad8afb07296d4085e349a50e90bdca::blue::BLUE)
+          </CWText>
+          <CWTextInput
+            value={token.tokenAddress}
+            onInput={(e) =>
+              handleTokenChange(index, 'tokenAddress', e.target.value)
+            }
+            placeholder="Enter Sui Coin Type"
+            fullWidth
+            inputValidationFn={validateSuiAddress}
+          />
+
+          <CWText type="b2" className="field-label">
+            Token Decimals
+          </CWText>
+          <CWText type="b1" className="description">
+            Enter the number of decimals for the token
+          </CWText>
+          <CWTextInput
+            type="number"
+            min={0}
+            value={token.tokenDecimals}
+            onInput={(e) =>
+              handleTokenChange(index, 'tokenDecimals', e.target.value)
+            }
+            placeholder="Enter token decimals"
+          />
+
+          <CWText type="b2" className="field-label">
+            Vote weight multiplier
+          </CWText>
+          <div className="input-row">
+            <CWText type="b1" className="description">
+              1 token is equal to
+            </CWText>
+            <CWTextInput
+              type="number"
+              min={1}
+              isCompact
+              value={token.voteWeightMultiplier}
+              onInput={(e) =>
+                handleTokenChange(index, 'voteWeightMultiplier', e.target.value)
+              }
+            />
+            <CWText type="b1" className="description">
+              votes.
+            </CWText>
+          </div>
+          <CWText type="b1" className="description">
+            Vote weight per token held by the user will be{' '}
+            {token.voteWeightMultiplier || 0}.
+          </CWText>
+
+          {index < tokens.length - 1 && <CWDivider />}
+        </div>
+      ))}
+
+      <CWButton
+        type="button"
+        label="Add another token"
+        buttonType="tertiary"
+        onClick={handleAddToken}
+        iconLeft="plus"
+        disabled={loading}
       />
-
-      <CWText type="h5">Token Decimals</CWText>
-      <CWText type="b1" className="description">
-        Enter the number of decimals for the token
-      </CWText>
-      <CWTextInput
-        type="number"
-        min={0}
-        value={tokenDecimals}
-        onInput={(e) => setTokenDecimals(Number(e.target.value))}
-        placeholder="Enter token decimals"
-      />
-
-      <CWText type="h5">Vote weight multiplier</CWText>
-
-      <div className="input-row">
-        <CWText type="b1" className="description">
-          1 token is equal to
-        </CWText>
-        <CWTextInput
-          type="number"
-          min={1}
-          isCompact
-          value={multiplier}
-          onInput={(e) => setMultiplier(Number(e.target.value))}
-        />
-        <CWText type="b1" className="description">
-          votes.
-        </CWText>
-      </div>
-      <CWText type="b1" className="description">
-        Vote weight per token held by the user will be {multiplier || 0}.
-      </CWText>
 
       <CWText className="info" fontWeight="medium">
         Not sure?
@@ -161,7 +257,13 @@ const WVSuiTokenDetails = ({
           disabled={loading}
         />
         <CWButton
-          disabled={!tokenAddress || !multiplier || loading || !chainNodeId}
+          disabled={
+            tokens.some(
+              (t) => !t.tokenAddress || t.voteWeightMultiplier <= 0,
+            ) ||
+            loading ||
+            !chainNodeId
+          }
           type="button"
           buttonWidth="wide"
           label="Enable weighted voting for topic"

@@ -94,7 +94,7 @@ import CWIconButton from '../CWIconButton';
 import CWPopover, { usePopover } from '../CWPopover';
 
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { prettyVoteWeight } from 'shared/adapters/currency';
+import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
 import './CWTable.scss';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -198,13 +198,17 @@ export const CWTable = ({
                 return (
                   <div className="numeric">
                     {col.weightedVoting
-                      ? prettyVoteWeight(
-                          numericColVal,
-                          col.tokenDecimals,
+                      ? prettyCompoundVoteWeight(
+                          [
+                            {
+                              wei: numericColVal,
+                              tokenNumDecimals: col.tokenDecimals,
+                              multiplier: 1,
+                              tokenSymbol: col.tokenSymbol,
+                            },
+                          ],
                           col.weightedVoting,
-                          1,
                           undefined,
-                          col.tokenSymbol,
                         )
                       : numericColVal}
                   </div>

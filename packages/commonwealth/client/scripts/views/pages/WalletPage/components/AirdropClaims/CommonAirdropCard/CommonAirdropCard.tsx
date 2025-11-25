@@ -1,27 +1,36 @@
+import { ClaimAddressView } from '@hicommonwealth/schemas';
 import clsx from 'clsx';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import CommonClaim from 'helpers/ContractHelpers/CommonClaim';
-import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
-import React, { useState } from 'react';
-import {
-  useGetAllocationQuery,
-  useGetClaimAddressQuery,
-} from 'state/api/tokenAllocations';
+import React, { useRef } from 'react';
+import { useGetAllocationQuery } from 'state/api/tokenAllocations';
 import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import FloatingBubbles from 'views/components/FloatingBubbles';
 import StaggeredAnimation from 'views/components/StaggeredAnimation';
-import { AuthModal } from 'views/modals/AuthModal';
+import z from 'zod';
 import ClaimCard from './ClaimCard';
 import './CommonAirdropCard.scss';
 import { useCommonAirdrop } from './useCommonAirdrop';
 
-interface CommonAirdropCardProps {
+type ClaimAddress = Omit<
+  z.infer<typeof ClaimAddressView>,
+  | 'cliff_date'
+  | 'magna_claim_tx_at'
+  | 'magna_cliff_claim_tx_at'
+  | 'unlock_start_at'
+> & {
+  unlock_start_at: string | undefined;
+  cliff_date: string | undefined;
+  magna_claim_tx_at: string | undefined;
+  magna_cliff_claim_tx_at: string | undefined;
+};
+type CommonAirdropCardProps = {
   onConnectNewAddress?: () => void;
-}
+  claim: ClaimAddress;
+};
 
 // Format token balance with locale separators and 4 decimal places
 const formatTokenBalance = (balance: string | number): string => {
@@ -32,13 +41,14 @@ const formatTokenBalance = (balance: string | number): string => {
   });
 };
 
-const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
+const CommonAirdropCard = ({
+  onConnectNewAddress,
+  claim,
+}: CommonAirdropCardProps) => {
   const user = useUserStore();
+  const amountRefs = useRef({ initial: 0, final: 0 });
 
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const claimsEnabled = useFlag('claims');
-  const { data: claimAddress, isLoading: isLoadingClaimAddress } =
-    useGetClaimAddressQuery({ enabled: claimsEnabled && user.isLoggedIn });
+  const claimAddress = claim;
   const shouldCollapseClaimState = (() => {
     if (!claimAddress?.cliff_date) {
       return false;
@@ -62,88 +72,18 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
     );
   })();
   const { initial, final, getWalletProvider } = useCommonAirdrop({
+    eventId: claimAddress?.event_id || '',
     tokenSymbol: claimAddress?.token || 'C',
     userClaimAddress: claimAddress?.address || undefined,
     magnaContractAddress: claimAddress?.contract_address || undefined,
-    shouldCheckInitialTransactionStatus: !!(
-      !claimAddress?.magna_claim_tx_hash && claimAddress?.magna_claimed_at
-    ),
-    shouldCheckFinalTransactionStatus: !!(
-      claimAddress?.magna_claim_tx_hash &&
-      claimAddress?.magna_claimed_at &&
-      !claimAddress?.magna_cliff_claim_tx_hash &&
-      claimAddress?.magna_cliff_claimed_at &&
-      !shouldCollapseClaimState
-    ),
+    shouldCheckInitialTxAmount: amountRefs.current.initial,
+    shouldCheckFinalTxAmount: amountRefs.current.final,
   });
   const { data: allocation } = useGetAllocationQuery({
     magna_allocation_id: claimAddress?.magna_allocation_id,
     enabled:
       !!claimAddress?.magna_allocation_id && !initial.txHash && user.isLoggedIn,
   });
-  if (!claimsEnabled) {
-    return <></>;
-  }
-
-  if (!user.isLoggedIn) {
-    return (
-      <div className="CommonAirdropCard">
-        <CWBanner
-          type="info"
-          body={
-            <div className="general-notice">
-              <h3 className="description">Login to check your COMMON Claim</h3>
-              <CWButton
-                label="Login to check"
-                onClick={() => setIsAuthModalOpen(true)}
-              />
-            </div>
-          }
-        />
-
-        <AuthModal
-          isOpen={isAuthModalOpen}
-          onClose={() => setIsAuthModalOpen(false)}
-        />
-      </div>
-    );
-  }
-
-  if (isLoadingClaimAddress) {
-    return null;
-  }
-
-  // Logged-in user with no claim address or zero allocation: show an informational banner
-  const tokensNumber = Number(claimAddress?.tokens ?? 0);
-  if (
-    user.isLoggedIn &&
-    (claimAddress === null || (claimAddress && tokensNumber <= 0))
-  ) {
-    return (
-      <div className="CommonAirdropCard">
-        <div className="notice-text">
-          <div className="no-allocation-notice">
-            <CWText
-              type="h5"
-              fontWeight="semiBold"
-              className="no-allocation-title"
-            >
-              No COMMON Allocation
-            </CWText>
-            <CWText className="no-allocation-description">
-              This round recognizes earlier participation by community members
-              across activity, collectibles, and rewards history. Your account
-              isn&apos;t included in this snapshot.
-            </CWText>
-            <CWText className="no-allocation-encouragement">
-              Keep participating, join communities, contribute, and watch for
-              future reward opportunities.
-            </CWText>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const handleImportToken = async () => {
     if (!claimAddress?.token_address) {
@@ -198,9 +138,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   );
   const isAllocationCancelled = allocation?.status === 'CANCELLED';
   const unlockStartsAt =
-    allocation?.unlock_start_at ||
-    claimAddress?.unlock_start_at ||
-    `2025-10-27T13:00:00Z`;
+    allocation?.unlock_start_at || claimAddress?.unlock_start_at;
   const launchDateUTC = moment(unlockStartsAt);
   const registrationEndDate = claimAddress?.end_registration_date
     ? moment(claimAddress?.end_registration_date)
@@ -260,8 +198,8 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
         claimAddress?.magna_cliff_claimed_at && finalTxHash
       );
       const hasCliffDatePassed =
-        allocation?.cliff_date &&
-        moment(allocation?.cliff_date).isBefore(moment());
+        claimAddress?.cliff_date &&
+        moment(claimAddress?.cliff_date).isBefore(moment());
       const isClaimAvailable =
         !!claimAddress?.magna_synced_at && !isPendingClaimFunds;
       const isPendingBlockchainIndex = !!(
@@ -304,7 +242,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   );
   const claimableTokens = formatTokenBalance(tokensCount);
   const initialClaimPercentage =
-    allocation?.initial_percentage || claimAddress?.initial_percentage;
+    claimAddress?.initial_percentage || claimAddress?.initial_percentage;
   const initialClaimablePercentage = (initialClaimPercentage || 0) * 100;
   const initialClaimableTokens = tokensCount * (initialClaimPercentage || 0);
   const finalClaimablePercentage = (1 - (initialClaimPercentage || 0)) * 100;
@@ -315,6 +253,19 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
   const allocatedAmountTextWithTokenOrTokens = `${allocatedAmountText} ${
     allocatedAmountText.length > 3 ? '' : tokenOrTokensText
   }`;
+
+  amountRefs.current.initial =
+    !claimAddress?.magna_claim_tx_hash && claimAddress?.magna_claimed_at
+      ? initialClaimableTokens
+      : 0;
+  amountRefs.current.final =
+    claimAddress?.magna_claim_tx_hash &&
+    claimAddress?.magna_claimed_at &&
+    !claimAddress?.magna_cliff_claim_tx_hash &&
+    claimAddress?.magna_cliff_claimed_at &&
+    !shouldCollapseClaimState
+      ? finalClaimableTokens
+      : 0;
 
   return canClaim ? (
     <div
@@ -414,6 +365,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   shouldWaitTillDate={claimSteps.initial.shouldWaitTillDate}
                   registrationEndDate={registrationEndDate}
                   mode="initial"
+                  eventId={claimAddress?.event_id || ''}
                 />
                 <ClaimCard
                   cardNumber={2}
@@ -431,7 +383,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   onConnectNewAddress={onConnectNewAddress}
                   claimedTXHash={claimSteps.final.txHash || undefined}
                   claimedToAddress={claimAddress?.address || undefined}
-                  allocationUnlocksAt={allocation?.cliff_date || undefined}
+                  allocationUnlocksAt={claimAddress?.cliff_date || undefined}
                   allocationClaimedAt={
                     claimAddress?.magna_cliff_claim_tx_at || undefined
                   }
@@ -442,6 +394,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                   tokenSymbol={claimAddress?.token || ''}
                   shouldWaitTillDate={claimSteps.final.shouldWaitTillDate}
                   mode="final"
+                  eventId={claimAddress?.event_id || ''}
                 />
               </div>
             ) : (
@@ -475,6 +428,7 @@ const CommonAirdropCard = ({ onConnectNewAddress }: CommonAirdropCardProps) => {
                 mode="initial"
                 isAllocationCancelled={isAllocationCancelled}
                 isCollapsed
+                eventId={claimAddress?.event_id || ''}
               />
             )}
           </div>
