@@ -370,14 +370,6 @@ Community Description: ${communityDescription}`;
               isRootComment,
             });
 
-            // Early exit if component is unmounted
-            if (!mounted) {
-              console.log(
-                '[AI Reply] Component unmounted, skipping completion',
-              );
-              return;
-            }
-
             if (
               completedText &&
               !completedText.startsWith('Error generating reply')
@@ -450,9 +442,7 @@ Community Description: ${communityDescription}`;
               });
             }
 
-            if (mounted) {
-              onStreamingCompleteRef.current?.();
-            }
+            onStreamingCompleteRef.current?.();
           },
           onError: (error) => {
             if (mounted) {
