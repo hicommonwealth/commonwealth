@@ -1,0 +1,4 @@
+python-telegram-bot[ext]
+python-dotenv
+# Add your chosen LLM library later, e.g., openai or google-generativeai
+# Add database library later, e.g., SQLAlchemy or sqlite3 (built-in) 
