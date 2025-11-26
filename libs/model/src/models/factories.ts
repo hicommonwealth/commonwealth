@@ -29,6 +29,7 @@ import GroupGatedAction from './groupGatedAction';
 import GroupSnapshot from './groupSnapshot';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LaunchpadTrade from './launchpad_trade';
+import { CommunityMarket, Market } from './market';
 import MCPServer from './mcp_server';
 import MCPServerCommunity from './mcp_server_community';
 import Membership from './membership';
@@ -86,6 +87,7 @@ export const Factories = {
   CommunityAlert,
   CommunityGoalMeta,
   CommunityGoalReached,
+  CommunityMarket,
   CommunityStake,
   CommunityTags,
   CommunityDirectoryTags,
@@ -104,6 +106,7 @@ export const Factories = {
   HistoricalAllocations,
   LastProcessedEvmBlock,
   LaunchpadTrade,
+  Market,
   MCPServer,
   MCPServerCommunity,
   Membership,
