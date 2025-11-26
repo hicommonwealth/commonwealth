@@ -9,6 +9,16 @@ import {
 
 const DEFAULT_TOKEN_EXPIRATION_MINUTES = 60; // 1 hour
 
+/**
+ * Sanitizes comment content by converting markdown links to plain text.
+ * e.g. "[/Google Sheets](/mcp-server/google_sheets/16)" → "Google Sheets"
+ */
+function sanitizeCommentContent(content: string): string {
+  return content.replace(/\[([^\]]+)\]\([^)]+\)/g, (_, text: string) =>
+    text.replace(/^\//, ''),
+  );
+}
+
 export function CreateAICompletionToken(): Command<
   typeof schemas.CreateAICompletionToken
 > {
@@ -53,12 +63,14 @@ export function CreateAICompletionToken(): Command<
       );
 
       // Create the token
+      const sanitizedContent = sanitizeCommentContent(content);
+      console.log('sanitized content: ', sanitizedContent);
       const tokenRecord = await models.AICompletionToken.create({
         user_id: actor.user.id!,
         community_id,
         thread_id: thread.id!,
         parent_comment_id,
-        content,
+        content: sanitizedContent,
         expires_at,
       });
 

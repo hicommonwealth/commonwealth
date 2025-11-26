@@ -150,6 +150,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           allServers,
         );
         useMCPPath = mentionedMCPServers.length > 0;
+        console.log('mentionedMCPServers: ', mentionedMCPServers);
 
         if (useMCPPath) {
           const extractedMentions = extractMCPMentions(finalUserPrompt);
@@ -157,6 +158,10 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
             `[${requestId}] MCP path enabled with mentions: ${extractedMentions
               .map((m) => `${m.handle}(${m.id})`)
               .join(', ')}`,
+          );
+          console.log(
+            'extractedMentions: ',
+            JSON.stringify(extractedMentions, null, 2),
           );
         }
       } catch (mcpError) {
@@ -255,6 +260,8 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           mentionedMCPServers,
           null, // no previous response ID for now
         );
+
+        console.log('mcpOptions: ', JSON.stringify(mcpOptions, null, 2));
 
         // Override any model settings to ensure consistency
         mcpOptions.model = model || DEFAULT_COMPLETION_MODEL;
