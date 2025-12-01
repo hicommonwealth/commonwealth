@@ -17,6 +17,7 @@ export interface CreateThreadTokenProps {
   chainRpc: string;
   paymentTokenAddress: string;
   ethChainId: number;
+  connectorWeight?: number;
 }
 
 export const createThreadToken = async ({
@@ -31,6 +32,7 @@ export const createThreadToken = async ({
   paymentTokenAddress,
   ethChainId,
   chainRpc,
+  connectorWeight,
 }: CreateThreadTokenProps) => {
   mustBeProtocolChainId(ethChainId);
 
@@ -64,6 +66,7 @@ export const createThreadToken = async ({
       initPurchaseAmount,
       authorAddress,
       communityTreasuryAddress,
+      connectorWeight,
     );
   } catch (error) {
     console.error('Error in createThreadToken:', {
