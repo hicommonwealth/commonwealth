@@ -141,7 +141,15 @@ const UniswapTradeModal = ({
     (value) => typeof value === 'number',
   ) as number[];
 
-  if (!supportedChainIds.includes(ethChainId!)) {
+  // Add Soneium (1868) to supported chains as it's supported by Uniswap API
+  // even if not yet in the SupportedChainId enum from the widget package
+  const additionalSupportedChains = [1868]; // Soneium
+  const allSupportedChainIds = [
+    ...supportedChainIds,
+    ...additionalSupportedChains,
+  ];
+
+  if (!allSupportedChainIds.includes(ethChainId!)) {
     return (
       <CWModal
         open={isOpen}
