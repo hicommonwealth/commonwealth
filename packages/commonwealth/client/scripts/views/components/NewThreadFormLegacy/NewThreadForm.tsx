@@ -82,6 +82,7 @@ import {
 import { useAIFeatureEnabled } from 'state/ui/user';
 import { ExtendedPoll, LocalPoll, parseCustomDuration } from 'utils/polls';
 // eslint-disable-next-line max-len
+import { WEI_PER_ETHER } from '@hicommonwealth/shared';
 import { useFetchTokenUsdRateQuery as useFetchToken } from 'state/api/communityStake';
 import useFetchTokenUsdRateQuery from 'state/api/communityStake/fetchTokenUsdRate';
 import { useGetLaunchpadPriceQuery } from 'state/api/tokens/getLaunchpadPrice';
@@ -391,7 +392,7 @@ export const NewThreadForm = forwardRef<
 
     const { data: externalUsdPrice, isLoading: isLoadingETHToCurrencyRate } =
       useFetchTokenUsdRateQuery({
-        tokenContractAddress: communityToken!.token_address || '',
+        tokenContractAddress: communityToken?.token_address || '',
         enabled: !!communityToken,
       });
 
@@ -413,7 +414,8 @@ export const NewThreadForm = forwardRef<
       ethToCurrencyRateData?.data?.data?.amount || '0',
     );
 
-    const launchpadPriceUsd = Number(launchpadPriceEth || '0') * ethToUsdRate;
+    const launchpadPriceUsd =
+      (Number(launchpadPriceEth || '0') / WEI_PER_ETHER) * ethToUsdRate;
 
     const finalPrice = tokenToUsdRate || launchpadPriceUsd || 0;
     const connectorWeight = calculateConnectorWeightFromUsdPrice(finalPrice);
