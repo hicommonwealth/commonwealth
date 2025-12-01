@@ -397,7 +397,6 @@ export const NewThreadForm = forwardRef<
 
     const tokenToUsdRate = parseFloat(externalUsdPrice?.data?.data?.amount);
 
-    console.log('tokenToUsdRate', tokenToUsdRate);
     const { data: launchpadPriceEth } = useGetLaunchpadPriceQuery(
       chainRpc,
       ethChainId,
