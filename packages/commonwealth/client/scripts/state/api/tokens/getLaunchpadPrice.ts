@@ -16,10 +16,7 @@ export const useGetLaunchpadPriceQuery = (
 
   const contractAddress = getFactoryContract(ethChainId).LPBondingCurve;
   const web3 = new Web3(rpc);
-  const contract = new web3.eth.Contract(
-    LPBondingCurveAbi as any,
-    contractAddress,
-  );
+  const contract = new web3.eth.Contract(LPBondingCurveAbi, contractAddress);
 
   return useQuery({
     queryKey: ['launchpadPrice', tokenAddress, amountIn, isBuy],
@@ -28,10 +25,6 @@ export const useGetLaunchpadPriceQuery = (
     queryFn: async () => {
       const price = contract.methods.getPrice(tokenAddress, amountIn, isBuy);
       return (await price.call()) as bigint;
-    },
-    retry: (failureCount, error) => {
-      if ((error as any)?.data?.code === 'UNAUTHORIZED') return false;
-      return failureCount < 2;
     },
   });
 };
