@@ -17,6 +17,7 @@ export function GetMarkets(): Query<typeof schemas.GetMarkets> {
         `
         SELECT
           m.id,
+          m.provider,
           m.slug,
           m.question,
           m.category,

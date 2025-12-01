@@ -43,6 +43,13 @@ describe('Market lifecycle', () => {
       },
     });
     expect(markets.length).toBe(1);
+    expect(markets[0].slug).toBe('polymarket-usdt-eth');
+    expect(markets[0].provider).toBe('polymarket');
+    expect(markets[0].question).toBe('What is the price of USDT in ETH?');
+    expect(markets[0].category).toBe('cryptocurrency');
+    expect(markets[0].start_time).toBeInstanceOf(Date);
+    expect(markets[0].end_time).toBeInstanceOf(Date);
+    expect(markets[0].status).toBe('open');
   });
 
   it('should unsubscribe from a market', async () => {
