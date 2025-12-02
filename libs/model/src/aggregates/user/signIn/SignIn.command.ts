@@ -81,6 +81,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         deserializeCanvas(session),
         encodedAddress,
         ss58Prefix,
+        { walletId: wallet_id },
       );
 
       const verification_token = crypto.randomBytes(18).toString('hex');

@@ -87,6 +87,7 @@
   },
   "dependencies": {
     "@atomone/govgen-types-long": "^0.3.9",
+    "@base-org/account": "^2.4.0",
     "@canvas-js/chain-ethereum": "^0.13.14",
     "@canvas-js/chain-solana": "^0.13.14",
     "@canvas-js/gossiplog": "^0.13.14",

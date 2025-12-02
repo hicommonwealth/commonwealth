@@ -64,7 +64,9 @@ const AddressItem = (props: AddressItemProps) => {
             iconLeft={
               walletId === WalletId.Magic
                 ? getSsoIconName(walletSsoSource)
-                : walletId
+                : walletId === 'base'
+                  ? 'basewallet'
+                  : walletId
             }
             address={`\u2022 ${formatAddressShort(address)}`}
           />
