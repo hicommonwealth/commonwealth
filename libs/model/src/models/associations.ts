@@ -314,6 +314,11 @@ export const buildAssociations = (db: DB) => {
     },
   );
 
+  db.CommunityMarket.withManyToMany(
+    { model: db.Community },
+    { model: db.Market },
+  );
+
   db.LaunchpadToken.withMany(db.LaunchpadTrade, {
     foreignKey: 'token_address',
   });

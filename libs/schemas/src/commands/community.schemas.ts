@@ -17,6 +17,7 @@ import { AuthContext, TopicContext, VerifiedContext } from '../context';
 import { MCPServer } from '../entities';
 import { Community } from '../entities/community.schemas';
 import { Group, Requirement } from '../entities/group.schemas';
+import { MarketStatus, Markets } from '../entities/market.schemas';
 import { PinnedToken } from '../entities/pinned-token.schemas';
 import { StakeTransaction } from '../entities/stake.schemas';
 import { Tags } from '../entities/tag.schemas';
@@ -522,4 +523,28 @@ export const RefreshWeightedVotes = {
     community_id: z.string(),
   }),
   context: TopicContext,
+};
+
+export const SubscribeMarket = {
+  input: z.object({
+    community_id: z.string(),
+    provider: z.enum(Markets),
+    slug: z.string(),
+    question: z.string(),
+    category: z.string(),
+    start_time: z.coerce.date(),
+    end_time: z.coerce.date(),
+    status: z.enum(MarketStatus),
+  }),
+  output: z.boolean(),
+  context: AuthContext,
+};
+
+export const UnsubscribeMarket = {
+  input: z.object({
+    community_id: z.string(),
+    slug: z.string(),
+  }),
+  output: z.boolean(),
+  context: AuthContext,
 };

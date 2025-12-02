@@ -15,6 +15,7 @@ import {
   ContestManager,
   ExtendedCommunity,
   Group,
+  Market,
   Membership,
   MembershipRejectReason,
   PinnedTokenWithPrices,
@@ -456,4 +457,16 @@ export const GetNamespaceMetadata = {
 export const GetByDomain = {
   input: z.object({ custom_domain: z.string() }),
   output: z.object({ community_id: z.string().optional() }),
+};
+
+export const MarketView = Market.extend({
+  created_at: z.coerce.date().or(z.string()),
+  updated_at: z.coerce.date().or(z.string()),
+});
+
+export const GetMarkets = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.array(MarketView),
 };
