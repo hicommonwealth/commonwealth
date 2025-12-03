@@ -113,7 +113,7 @@ const ConnectTokenStep = ({
           </CWText>
         </div>
         <CWRadioButton
-          value={`${baseNode.id}`}
+          value={`${baseNode?.id}`}
           checked
           name="chainNodeId"
           hookToForm

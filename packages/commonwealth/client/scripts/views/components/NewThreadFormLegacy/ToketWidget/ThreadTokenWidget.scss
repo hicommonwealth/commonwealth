@@ -115,6 +115,27 @@
           font-size: 12px;
           margin-left: 4px;
         }
+
+        .currency-dropdown-trigger {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 4px;
+          border-radius: 4px;
+          transition: background-color 0.2s ease;
+
+          &:hover {
+            background-color: colors.$neutral-100;
+          }
+
+          &:focus {
+            outline: none;
+            background-color: colors.$neutral-100;
+          }
+        }
       }
     }
 
