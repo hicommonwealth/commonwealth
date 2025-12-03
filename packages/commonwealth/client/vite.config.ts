@@ -133,6 +133,15 @@ export default defineConfig(({ mode }) => {
         'moment/moment',
       ],
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          // Ensure SASS can resolve relative imports correctly
+          api: 'modern-compiler',
+          loadPaths: [path.resolve(projectRootDir, 'scripts')],
+        },
+      },
+    },
     build: {
       outDir: '../build',
       // UNISWAP_WIDGET_HACK: this is needed by @uniswap to resolved multiple dependencies issues with peer-deps
@@ -189,11 +198,6 @@ export default defineConfig(({ mode }) => {
           // see: https://github.com/Uniswap/widgets/issues/593#issuecomment-1777415001 for more details
           find: '~@fontsource/inter',
           replacement: '@fontsource/inter',
-        },
-        {
-          // matches only non-relative paths that end with .scss
-          find: /^([^.].*)\.scss$/,
-          replacement: path.resolve(projectRootDir, 'styles', '$1.scss'),
         },
         {
           // resolves assets/

@@ -5,4 +5,7 @@ packages:
 
 catalog:
   '@knocklabs/node': ^0.6.13
-  'zod': ^4.1.1
+  zod: ^4.1.1
+  rollbar: ^2.26.5
+  axios: ^1.13.2
+  express: ^4.22.1

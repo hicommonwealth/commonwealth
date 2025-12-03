@@ -8,70 +8,66 @@ import { describe, expect, test, vi } from 'vitest';
 import { setupCommonwealthE2E } from './integrationUtils/mainSetup';
 
 describe('End to end event tests', () => {
-  test(
-    'Token trade happy path',
-    async () => {
-      const { web3, anvilAccounts, contractAddresses } =
-        await setupCommonwealthE2E();
+  test('Token trade happy path', { timeout: 1000000 }, async () => {
+    const { web3, anvilAccounts, contractAddresses } =
+      await setupCommonwealthE2E();
 
-      const launchpadFactory = new web3.eth.Contract(
-        LaunchpadAbi,
-        contractAddresses.Launchpad,
-      );
+    const launchpadFactory = new web3.eth.Contract(
+      LaunchpadAbi,
+      contractAddresses.Launchpad,
+    );
 
-      await launchToken(
-        launchpadFactory,
-        'testToken',
-        'test',
-        [],
-        [],
-        web3.utils.toWei(1e9, 'ether'),
-        anvilAccounts[0].address,
-        830000,
-        contractAddresses.TokenCommunityManager,
-      );
+    await launchToken(
+      launchpadFactory,
+      'testToken',
+      'test',
+      [],
+      [],
+      web3.utils.toWei(1e9, 'ether'),
+      anvilAccounts[0].address,
+      830000,
+      contractAddresses.TokenCommunityManager,
+    );
 
-      let token = await models.LaunchpadToken.findOne({
-        where: { name: 'testToken' },
-      });
-      await vi.waitFor(
-        async () => {
-          token = await models.LaunchpadToken.findOne({
-            where: { name: 'testToken' },
-          });
-          expect(token).toBeTruthy();
-        },
-        {
-          timeout: 100000,
-          interval: 500,
-        },
-      );
+    let token = await models.LaunchpadToken.findOne({
+      where: { name: 'testToken' },
+    });
+    await vi.waitFor(
+      async () => {
+        token = await models.LaunchpadToken.findOne({
+          where: { name: 'testToken' },
+        });
+        expect(token).toBeTruthy();
+      },
+      {
+        timeout: 100000,
+        interval: 500,
+      },
+    );
 
-      const lpBondingCurveFactory = new web3.eth.Contract(
-        LPBondingCurveAbi,
-        contractAddresses.LPBondingCurve,
-      );
+    const lpBondingCurveFactory = new web3.eth.Contract(
+      LPBondingCurveAbi,
+      contractAddresses.LPBondingCurve,
+    );
 
-      await buyToken(
-        lpBondingCurveFactory,
-        token!.token_address,
-        anvilAccounts[0].address,
-        100,
-      );
+    await buyToken(
+      lpBondingCurveFactory,
+      token!.token_address,
+      anvilAccounts[0].address,
+      100,
+    );
 
-      await vi.waitFor(
-        async () => {
-          const launchpadTrade = await models.LaunchpadTrade.findOne({
-            where: { token_address: token!.token_address, is_buy: true },
-          });
-          expect(launchpadTrade).toBeTruthy();
-        },
-        {
-          timeout: 100000,
-          interval: 500,
-        },
-      );
-    },
-    { timeout: 1000000 },
-  );
+    await vi.waitFor(
+      async () => {
+        const launchpadTrade = await models.LaunchpadTrade.findOne({
+          where: { token_address: token!.token_address, is_buy: true },
+        });
+        expect(launchpadTrade).toBeTruthy();
+      },
+      {
+        timeout: 100000,
+        interval: 500,
+      },
+    );
+  });
 });
