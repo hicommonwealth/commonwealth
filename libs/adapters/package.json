@@ -41,7 +41,7 @@
     "pg": "^8.11.3",
     "rascal": "^20.1.1",
     "redis": "4.7.0",
-    "rollbar": "^2.6.1",
+    "rollbar": "catalog:",
     "swagger-ui-express": "^5.0.0",
     "trpc-to-openapi": "^3.0.1",
     "typescript-logging": "^0.6.4",
