@@ -27,7 +27,7 @@
     "@viem/anvil": "^0.0.10",
     "axios": "catalog:",
     "cors": "^2.8.5",
-    "express": "^4.18.2",
+    "express": "catalog:",
     "morgan": "^1.10.0",
     "pino-http": "^9.0.0",
     "viem": "^2.23.2",
