@@ -198,6 +198,7 @@ describe('Native ETH weighted voting lifecycle', () => {
 
   test(
     'should recalculate vote weights for threads and comments after ETH balance changes',
+    { timeout: 120_000 },
     async () => {
       // Get initial ETH balances for all member accounts
       const initialBalances = await Promise.all(
@@ -408,6 +409,5 @@ describe('Native ETH weighted voting lifecycle', () => {
         expectedCommentWeightSum,
       );
     },
-    { timeout: 120_000 },
   );
 });

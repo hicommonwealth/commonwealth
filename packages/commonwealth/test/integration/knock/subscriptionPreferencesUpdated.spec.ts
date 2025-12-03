@@ -26,16 +26,17 @@ import z from 'zod';
 
 function SpyNotificationsProvider(stubs?: {
   triggerWorkflowStub?: Mock<
-    [],
-    Promise<PromiseSettledResult<{ workflow_run_id: string }>[]>
+    () => Promise<PromiseSettledResult<{ workflow_run_id: string }>[]>
   >;
-  getMessagesStub?: Mock<[], Promise<NotificationsProviderGetMessagesReturn>>;
-  getSchedulesStub?: Mock<[], Promise<NotificationsProviderSchedulesReturn>>;
-  createSchedulesStub?: Mock<[], Promise<NotificationsProviderSchedulesReturn>>;
-  deleteSchedulesStub?: Mock<[], Promise<Set<string>>>;
-  identifyUserStub?: Mock<[], Promise<{ id: string }>>;
-  registerClientRegistrationToken?: Mock<[], Promise<boolean>>;
-  unregisterClientRegistrationToken?: Mock<[], Promise<boolean>>;
+  getMessagesStub?: Mock<() => Promise<NotificationsProviderGetMessagesReturn>>;
+  getSchedulesStub?: Mock<() => Promise<NotificationsProviderSchedulesReturn>>;
+  createSchedulesStub?: Mock<
+    () => Promise<NotificationsProviderSchedulesReturn>
+  >;
+  deleteSchedulesStub?: Mock<() => Promise<Set<string>>>;
+  identifyUserStub?: Mock<() => Promise<{ id: string }>>;
+  registerClientRegistrationToken?: Mock<() => Promise<boolean>>;
+  unregisterClientRegistrationToken?: Mock<() => Promise<boolean>>;
 }): NotificationsProvider {
   return {
     name: 'SpyNotificationsProvider',
@@ -47,7 +48,8 @@ function SpyNotificationsProvider(stubs?: {
     createSchedules:
       stubs?.createSchedulesStub || vi.fn(() => Promise.resolve([])),
     deleteSchedules:
-      stubs?.deleteSchedulesStub || vi.fn(() => Promise.resolve(new Set())),
+      stubs?.deleteSchedulesStub ||
+      vi.fn(() => Promise.resolve(new Set<string>())),
     updateSchedules: vi.fn(() => Promise.resolve([])),
     identifyUser:
       stubs?.identifyUserStub || vi.fn(() => Promise.resolve({ id: '' })),
