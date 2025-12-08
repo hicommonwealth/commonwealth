@@ -42,7 +42,7 @@ class ContextAggregator {
     try {
       // Get user profile and bio
       const userQuery = `
-        SELECT 
+        SELECT
           profile->>'name' as name,
           profile->>'bio' as bio,
           created_at
@@ -61,7 +61,7 @@ class ContextAggregator {
 
       // Get most liked comments
       const commentsQuery = `
-        SELECT 
+        SELECT
           C.body,
           C.created_at,
           T.title as thread_title,
@@ -72,11 +72,11 @@ class ContextAggregator {
         JOIN "Threads" T ON C.thread_id = T.id
         JOIN "Communities" COM ON T.community_id = COM.id
         LEFT JOIN (
-          SELECT 
+          SELECT
             comment_id,
             COUNT(*) as like_count
-          FROM "Reactions" 
-          WHERE reaction = 'like' 
+          FROM "Reactions"
+          WHERE reaction = 'like'
             AND comment_id IS NOT NULL
           GROUP BY comment_id
         ) like_counts ON C.id = like_counts.comment_id
@@ -142,7 +142,7 @@ class ContextAggregator {
     try {
       // Get topic details
       const topicQuery = `
-        SELECT 
+        SELECT
           T.name,
           T.description,
           T.created_at,
@@ -164,7 +164,7 @@ class ContextAggregator {
 
       // Get recent threads in this topic
       const threadsQuery = `
-        SELECT 
+        SELECT
           title,
           created_at,
           LEFT(body, 200) as body_preview
@@ -232,7 +232,7 @@ class ContextAggregator {
     try {
       // Get thread details
       const threadQuery = `
-        SELECT 
+        SELECT
           T.title,
           T.body,
           T.created_at,
@@ -263,7 +263,7 @@ class ContextAggregator {
 
       // Get recent comments
       const commentsQuery = `
-        SELECT 
+        SELECT
           C.body,
           C.created_at,
           U.profile->>'name' as author_name
@@ -336,7 +336,7 @@ class ContextAggregator {
     try {
       // Get community details with stats
       const communityQuery = `
-        SELECT 
+        SELECT
           C.name,
           C.description,
           C.created_at,
@@ -359,7 +359,7 @@ class ContextAggregator {
 
       // Get recent activity (threads)
       const recentThreadsQuery = `
-        SELECT 
+        SELECT
           title,
           created_at,
           TOP.name as topic_name
@@ -447,6 +447,108 @@ class ContextAggregator {
       };
     }
   }
+
+  async aggregateMCPServerContext(
+    mcpServerId: string,
+    mcpServerName: string,
+  ): Promise<ContextResult> {
+    try {
+      // Get MCP server details
+      const serverQuery = `
+        SELECT
+          M.id,
+          M.name,
+          M.description,
+          M.handle,
+          M.source,
+          M.tools,
+          M.auth_required,
+          M.auth_completed,
+          M.created_at,
+          C.name as community_name
+        FROM "MCPServers" M
+        LEFT JOIN "MCPServerCommunities" MSC ON M.id = MSC.mcp_server_id
+        LEFT JOIN "Communities" C ON MSC.community_id = C.id
+        WHERE M.id = $mcpServerId
+        LIMIT 1
+      `;
+
+      const [serverResult] = await models.sequelize.query<{
+        id: number;
+        name: string;
+        description: string;
+        handle: string;
+        source: string;
+        tools: Array<{ name: string; description: string }>;
+        auth_required: boolean;
+        auth_completed: boolean;
+        created_at: Date;
+        community_name: string | null;
+      }>(serverQuery, {
+        bind: { mcpServerId },
+        type: QueryTypes.SELECT,
+      });
+
+      // Format context
+      let contextData = `MCP Server: ${mcpServerName}\n`;
+
+      if (serverResult) {
+        contextData += `Handle: ${serverResult.handle}\n`;
+        contextData += `Source: ${serverResult.source}\n`;
+
+        if (serverResult.description) {
+          contextData += `Description: ${serverResult.description.slice(0, CONTEXT_CONFIG.MAX_DESCRIPTION_LENGTH)}\n`;
+        }
+
+        if (serverResult.community_name) {
+          contextData += `Community: ${serverResult.community_name}\n`;
+        }
+
+        contextData += `Created: ${this.formatDate(serverResult.created_at)}\n`;
+        contextData += `Auth Required: ${serverResult.auth_required ? 'Yes' : 'No'}\n`;
+
+        if (serverResult.auth_required) {
+          contextData += `Auth Status: ${serverResult.auth_completed ? 'Completed' : 'Pending'}\n`;
+        }
+
+        // List available tools
+        if (serverResult.tools && serverResult.tools.length > 0) {
+          contextData += `\nAvailable Tools (${serverResult.tools.length}):\n`;
+          serverResult.tools.slice(0, 10).forEach((tool, index) => {
+            contextData += `${index + 1}. ${tool.name}`;
+            if (tool.description) {
+              const desc = tool.description.slice(0, 100);
+              contextData += `: ${desc}${tool.description.length > 100 ? '...' : ''}`;
+            }
+            contextData += '\n';
+          });
+
+          if (serverResult.tools.length > 10) {
+            contextData += `... and ${serverResult.tools.length - 10} more tools\n`;
+          }
+        } else {
+          contextData += `\nNo tools available.\n`;
+        }
+      } else {
+        contextData += `(Server details not found)\n`;
+      }
+
+      return {
+        entityType: 'mcp_server',
+        entityId: mcpServerId,
+        entityName: mcpServerName,
+        contextData: contextData.slice(0, CONTEXT_CONFIG.MAX_CONTEXT_LENGTH),
+      };
+    } catch (error) {
+      console.error('Error aggregating MCP server context:', error);
+      return {
+        entityType: 'mcp_server',
+        entityId: mcpServerId,
+        entityName: mcpServerName,
+        contextData: `MCP Server: ${mcpServerName} (context unavailable)`,
+      };
+    }
+  }
 }
 
 export function AggregateContext(): Query<typeof schemas.AggregateContext> {
@@ -460,7 +562,13 @@ export function AggregateContext(): Query<typeof schemas.AggregateContext> {
       // Parse the mentions JSON string
       let mentions: Array<{
         id: string;
-        type: 'user' | 'topic' | 'thread' | 'community' | 'proposal';
+        type:
+          | 'user'
+          | 'topic'
+          | 'thread'
+          | 'community'
+          | 'proposal'
+          | 'mcp_server';
         name: string;
       }>;
 
@@ -508,6 +616,12 @@ export function AggregateContext(): Query<typeof schemas.AggregateContext> {
             break;
           case 'proposal':
             result = aggregator.aggregateProposalContext(
+              mention.id,
+              mention.name,
+            );
+            break;
+          case 'mcp_server':
+            result = await aggregator.aggregateMCPServerContext(
               mention.id,
               mention.name,
             );
