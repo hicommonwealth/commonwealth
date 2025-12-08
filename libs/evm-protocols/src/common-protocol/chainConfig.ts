@@ -16,6 +16,7 @@ export enum ValidChains {
   SKALE_TEST = 974399131,
   // SKALE = 1564830818,
   Anvil = 31337,
+  Soneium = 1868,
 }
 
 const chains = Object.entries(ValidChains)
