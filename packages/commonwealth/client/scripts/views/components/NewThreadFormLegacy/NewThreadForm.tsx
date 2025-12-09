@@ -401,7 +401,7 @@ export const NewThreadForm = forwardRef<
     const { data: launchpadPriceEth } = useGetLaunchpadPriceQuery(
       chainRpc,
       ethChainId,
-      communityToken!.token_address || '',
+      communityToken?.token_address || '',
       !!externalUsdPrice && !isLoadingETHToCurrencyRate,
     );
 
@@ -710,7 +710,7 @@ export const NewThreadForm = forwardRef<
 
     useEffect(() => {
       refreshTopics().catch(console.error);
-    }, [refreshTopics]);
+    }, [refreshTopics, selectedCommunityId]);
 
     const handleKeyDown = useCallback(
       (event: React.KeyboardEvent<HTMLDivElement>) => {
