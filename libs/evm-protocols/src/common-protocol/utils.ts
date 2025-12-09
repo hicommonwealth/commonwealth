@@ -29,6 +29,7 @@ import {
   arbitrum,
   base,
   baseSepolia,
+  soneium,
   blast,
   bsc,
   linea,
@@ -260,6 +261,7 @@ export const ViemChains: Record<ValidChains, Chain> = {
   [ValidChains.BSC]: bsc,
   [ValidChains.Anvil]: anvil,
   [ValidChains.SKALE_TEST]: skaleCalypsoTestnet,
+  [ValidChains.Soneium]: soneium,
 };
 
 export type EvmProtocolChain = {

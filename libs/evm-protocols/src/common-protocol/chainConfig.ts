@@ -1,6 +1,6 @@
 import * as govAbis from '@commonxyz/common-governance-abis';
 import * as abis from '@commonxyz/common-protocol-abis';
-import { ZERO_ADDRESS } from 'shared/src/constants';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 
 // Chains with deployed namespace factories. As new chains are enabled, add here.
 
