@@ -4,11 +4,9 @@ import { notifyError } from 'controllers/app/notifications';
 import { isCommandClick } from 'helpers';
 import Account from 'models/Account';
 import Thread from 'models/Thread';
-import type { DeltaStatic } from 'quill';
+import { DeltaStatic } from 'quill';
 import React, { forwardRef, useCallback, useEffect, useState } from 'react';
-import { useAiCompletion } from 'state/api/ai';
-import { generateCommentPrompt } from 'state/api/ai/prompts';
-import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
+import { AICompletionType, useAiCompletion } from 'state/api/ai';
 import { useAIFeatureEnabled, useUserAiSettingsStore } from 'state/ui/user';
 import { useTurnstile } from 'views/components/useTurnstile';
 import { User } from 'views/components/user/user';
@@ -47,7 +45,7 @@ export type CommentEditorProps = {
   replyingToAuthor?: string;
   streamingReplyIds?: number[];
   thread?: Thread;
-  parentCommentText?: string;
+  parentCommentId?: number;
   triggerImageModalOpen?: boolean;
   placeholder?: string;
   webSearchEnabled?: boolean;
@@ -75,7 +73,7 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
       onAiReply,
       onCommentCreated,
       thread,
-      parentCommentText,
+      parentCommentId,
       triggerImageModalOpen,
       placeholder,
       webSearchEnabled,
@@ -111,52 +109,42 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
       action: 'create-comment',
     });
 
-    // Fetch community details
-    const { data: community } = useGetCommunityByIdQuery({
-      id: thread?.communityId || '',
-      enabled: !!thread?.communityId,
-    });
-
     const handleCommentWithAI = () => {
+      const effectiveCommunityId = communityId || thread?.communityId;
+
+      if (!effectiveCommunityId) {
+        notifyError('Community ID is required for AI comment generation');
+        return;
+      }
+
       setIsSubmitDisabled(true);
       let text = '';
       setContentDelta(text);
 
-      // Construct extended context with community details
-      const communityName = community?.name || 'this community';
-      const communityDescription =
-        community?.description || 'No specific description provided.';
-      const extendedContext = `Extended Community Context:
-Community Name: ${communityName}
-Community Description: ${communityDescription}`;
-
-      const originalContext = `Thread Title: ${thread?.title || ''}
-${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}`;
-
-      const context = `${extendedContext}\n\nOriginal Context (Thread and Parent Comment):\n${originalContext.trim()}`;
-
-      const { systemPrompt, userPrompt } = generateCommentPrompt(context);
-
-      generateCompletion(userPrompt, {
-        model: DEFAULT_COMPLETION_MODEL,
-        stream: true,
-        systemPrompt,
-        includeContextualMentions: true,
-        communityId: communityId || thread?.communityId,
-        onError: (error) => {
-          console.error('Error generating AI comment:', error);
-          notifyError('Failed to generate AI comment');
-          setIsSubmitDisabled(false);
+      generateCompletion(
+        {
+          communityId: effectiveCommunityId,
+          completionType: AICompletionType.Comment,
+          parentCommentId,
+          model: DEFAULT_COMPLETION_MODEL,
+          stream: true,
         },
-        onChunk: (chunk) => {
-          text += chunk;
-          text = text.trim();
-          setContentDelta(text);
+        {
+          onError: (error) => {
+            console.error('Error generating AI comment:', error);
+            notifyError('Failed to generate AI comment');
+            setIsSubmitDisabled(false);
+          },
+          onChunk: (chunk) => {
+            text += chunk;
+            text = text.trim();
+            setContentDelta(text);
+          },
+          onComplete: () => {
+            setIsSubmitDisabled(false);
+          },
         },
-        onComplete: () => {
-          setIsSubmitDisabled(false);
-        },
-      }).catch((error) => {
+      ).catch((error) => {
         console.error('Failed to generate comment:', error);
         setIsSubmitDisabled(false);
       });

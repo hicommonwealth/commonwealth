@@ -11,11 +11,10 @@ import {
   UserTierMap,
   verify,
 } from '@hicommonwealth/shared';
-import { useAiCompletion } from 'client/scripts/state/api/ai';
+import { AICompletionType, useAiCompletion } from 'client/scripts/state/api/ai';
 import clsx from 'clsx';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
-import { generateCommentPrompt } from 'state/api/ai/prompts';
 import { useCreateCommentMutation } from 'state/api/comments';
 import {
   useCreateAICompletionCommentMutation,
@@ -146,7 +145,7 @@ export const CommentCard = ({
   onStreamingComplete,
   tokenNumDecimals,
   tokenSymbol,
-  isRootComment,
+  isRootComment: _isRootComment,
   threadContext,
   threadTitle,
   permissions,
@@ -297,7 +296,6 @@ export const CommentCard = ({
         '[AI Reply] Request already in progress, skipping duplicate',
         {
           commentId: comment.id,
-          threadId: comment.thread_id,
         },
       );
       return;
@@ -305,7 +303,6 @@ export const CommentCard = ({
 
     console.log('[AI Reply] Starting new request', {
       commentId: comment.id,
-      threadId: comment.thread_id,
       isRequestInProgress: isAIRequestInProgressRef.current.inProgress,
       trackedCommentId: isAIRequestInProgressRef.current.commentId,
     });
@@ -340,123 +337,124 @@ Community Description: ${communityDescription}`;
           .filter(Boolean)
           .join('\n\n');
 
-        const contextText =
-          `${extendedCommunityContext}\n\n` +
-          `Original Context (Thread and Parent Comment):\n` +
-          `${originalContext.trim()}`;
-
-        const { userPrompt, systemPrompt } = generateCommentPrompt(contextText);
-
         setStreamingText('');
 
-        await generateCompletionRef.current(userPrompt, {
-          systemPrompt: systemPrompt,
-          model: streamingModelId as CompletionModel,
-          stream: true,
-          communityId: comment.community_id,
-          onChunk: (chunk) => {
-            if (mounted) {
-              accumulatedText += chunk;
-              setStreamingText(accumulatedText);
-            }
+        await generateCompletionRef.current(
+          {
+            communityId: comment.community_id,
+            completionType: AICompletionType.Comment,
+            parentCommentId: comment.id,
+            model: streamingModelId as CompletionModel,
+            stream: true,
           },
-          onComplete: async (completedText) => {
-            console.log('[AI Reply] onComplete triggered', {
-              mounted,
-              textLength: completedText?.length,
-              hasError: completedText?.startsWith('Error generating reply'),
-              threadId: comment.thread_id,
-              commentId: comment.id,
-              isRootComment,
-            });
+          {
+            onChunk: (chunk) => {
+              if (mounted) {
+                accumulatedText += chunk;
+                setStreamingText(accumulatedText);
+              }
+            },
+            onComplete: async (completedText) => {
+              console.log('[AI Reply] onComplete triggered', {
+                mounted,
+                textLength: completedText?.length,
+                hasError: completedText?.startsWith('Error generating reply'),
+                commentId: comment.id,
+              });
 
-            if (
-              completedText &&
-              !completedText.startsWith('Error generating reply')
-            ) {
-              try {
-                if (!activeUserAddress) {
-                  const errorMsg = 'No active user account found';
-                  console.error('[AI Reply] Token creation failed:', errorMsg);
-                  throw new Error(errorMsg);
-                }
+              if (
+                completedText &&
+                !completedText.startsWith('Error generating reply')
+              ) {
+                try {
+                  if (!activeUserAddress) {
+                    const errorMsg = 'No active user account found';
+                    console.error(
+                      '[AI Reply] Token creation failed:',
+                      errorMsg,
+                    );
+                    throw new Error(errorMsg);
+                  }
 
-                console.log('[AI Reply] Creating AI completion token...', {
-                  thread_id: comment.thread_id,
-                  parent_comment_id: isRootComment ? undefined : comment.id,
-                  contentLength: completedText.length,
-                });
-
-                // Create AI completion token with the generated content
-                const tokenResponse = await createAICompletionTokenRef.current({
-                  thread_id: comment.thread_id,
-                  parent_comment_id: isRootComment ? undefined : comment.id,
-                  content: completedText,
-                });
-
-                console.log('[AI Reply] Token created successfully:', {
-                  tokenId: tokenResponse.id,
-                  expiresAt: tokenResponse.expires_at,
-                });
-
-                // Immediately use the token to create the bot comment
-                console.log('[AI Reply] Creating AI completion comment...');
-                const createdComment =
-                  await createAICompletionCommentRef.current({
-                    token: tokenResponse.token,
+                  console.log('[AI Reply] Creating AI completion token...', {
+                    comment_id: comment.id,
+                    contentLength: completedText.length,
                   });
 
-                console.log('[AI Reply] Comment created successfully:', {
-                  commentId: createdComment.id,
-                });
+                  // Create AI completion token with the generated content
+                  // Thread ID is inferred from the parent comment's thread on the server
+                  const tokenResponse =
+                    await createAICompletionTokenRef.current({
+                      comment_id: comment.id,
+                      content: completedText,
+                    });
 
-                if (mounted) {
-                  setStreamingText('');
-                }
-              } catch (error) {
-                console.error('[AI Reply] Error in onComplete callback:', {
-                  error: error instanceof Error ? error.message : String(error),
-                  stack: error instanceof Error ? error.stack : undefined,
-                  threadId: comment.thread_id,
-                  commentId: comment.id,
-                  isRootComment,
-                  userAddress: activeUserAddress,
-                  mounted,
-                });
+                  console.log('[AI Reply] Token created successfully:', {
+                    tokenId: tokenResponse.id,
+                    expiresAt: tokenResponse.expires_at,
+                  });
 
-                if (mounted) {
-                  setStreamingText(
-                    `Failed to post reply from ${modelName || 'AI'}: ${
-                      error instanceof Error ? error.message : String(error)
-                    }`,
-                  );
+                  // Immediately use the token to create the bot comment
+                  console.log('[AI Reply] Creating AI completion comment...');
+                  const createdComment =
+                    await createAICompletionCommentRef.current({
+                      token: tokenResponse.token,
+                    });
+
+                  console.log('[AI Reply] Comment created successfully:', {
+                    commentId: createdComment.id,
+                  });
+
+                  if (mounted) {
+                    setStreamingText('');
+                  }
+                } catch (error) {
+                  console.error('[AI Reply] Error in onComplete callback:', {
+                    error:
+                      error instanceof Error ? error.message : String(error),
+                    stack: error instanceof Error ? error.stack : undefined,
+                    commentId: comment.id,
+                    userAddress: activeUserAddress,
+                    mounted,
+                  });
+
+                  if (mounted) {
+                    setStreamingText(
+                      `Failed to post reply from ${modelName || 'AI'}: ${
+                        error instanceof Error ? error.message : String(error)
+                      }`,
+                    );
+                  }
                 }
+              } else {
+                console.warn(
+                  '[AI Reply] onComplete called with invalid text:',
+                  {
+                    textLength: completedText?.length,
+                    startsWithError: completedText?.startsWith(
+                      'Error generating reply',
+                    ),
+                    text: completedText?.substring(0, 100),
+                  },
+                );
               }
-            } else {
-              console.warn('[AI Reply] onComplete called with invalid text:', {
-                textLength: completedText?.length,
-                startsWithError: completedText?.startsWith(
-                  'Error generating reply',
-                ),
-                text: completedText?.substring(0, 100),
-              });
-            }
 
-            onStreamingCompleteRef.current?.();
-          },
-          onError: (error) => {
-            if (mounted) {
-              console.error(
-                `Error streaming for model ${streamingModelId}:`,
-                error,
-              );
-              setStreamingText(
-                `Error generating reply from ${modelName || 'AI'}.`,
-              );
               onStreamingCompleteRef.current?.();
-            }
+            },
+            onError: (error) => {
+              if (mounted) {
+                console.error(
+                  `Error streaming for model ${streamingModelId}:`,
+                  error,
+                );
+                setStreamingText(
+                  `Error generating reply from ${modelName || 'AI'}.`,
+                );
+                onStreamingCompleteRef.current?.();
+              }
+            },
           },
-        });
+        );
 
         // Token creation and comment posting is now handled in onComplete callback above
       } catch (error) {
@@ -487,12 +485,10 @@ Community Description: ${communityDescription}`;
     isStreamingAIReply,
     streamingModelId,
     modelName,
-    isRootComment,
     threadContext,
     threadTitle,
     parentCommentText,
     comment.id,
-    comment.thread_id,
     comment.community_id,
     activeUserAddress,
     community?.name,

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ThreadContext } from '../context';
+import { CommentContext } from '../context';
 import { Comment } from '../entities';
 import { PG_INT } from '../utils';
 
@@ -13,8 +13,8 @@ export const CreateAICompletionComment = {
 
 export const CreateAICompletionToken = {
   input: z.object({
-    thread_id: PG_INT,
-    parent_comment_id: PG_INT.optional(),
+    // Thread ID is inferred from the parent comment's thread
+    comment_id: PG_INT,
     content: z.string().min(1),
   }),
   output: z.object({
@@ -22,5 +22,5 @@ export const CreateAICompletionToken = {
     expires_at: z.coerce.date(),
     id: PG_INT.optional(),
   }),
-  context: ThreadContext,
+  context: CommentContext,
 };

@@ -1,9 +1,9 @@
 import { trpc } from 'utils/trpcClient';
 
 // Types for AI completion token creation
+// Thread ID is inferred from the parent comment's thread on the server
 export interface CreateAICompletionTokenInput {
-  thread_id: number;
-  parent_comment_id?: number;
+  comment_id: number; // The parent comment we're replying to
   content: string;
 }
 

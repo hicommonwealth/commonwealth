@@ -1,13 +1,19 @@
 import { logger } from '@hicommonwealth/core';
-import { extractMCPMentions } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import {
+  AICompletionType,
+  buildContextFromEntityIds,
   buildMCPClientOptions,
   CommonMCPServerWithHeaders,
+  formatContextForPrompt,
+  generateCommentPrompt,
+  generatePollPrompt,
+  generateThreadPrompt,
+  StructuredPrompt,
   withMCPAuthUsername,
 } from '@hicommonwealth/model/services';
 import {
-  CompletionOptions,
+  CompletionModel,
   DEFAULT_COMPLETION_MODEL,
 } from '@hicommonwealth/shared';
 import { Request, Response } from 'express';
@@ -15,25 +21,32 @@ import { OpenAI } from 'openai';
 import { config } from '../../config';
 import { extractOpenRouterError } from './utils';
 
-// Define a more specific type for the structured prompt
-interface StructuredPrompt {
-  userPrompt: string;
-  systemPrompt?: string;
-}
+/**
+ * Request body for AI completion - uses entity IDs for secure context building
+ */
+interface AICompletionRequestBody {
+  // Required
+  communityId: string;
+  completionType: AICompletionType;
 
-// Define a type for the request body that can handle both string and structured prompt
-type RequestBody = Omit<CompletionOptions, 'prompt'> & {
-  prompt: string | StructuredPrompt;
-  contextualMentions?: boolean;
-  communityId?: string;
-};
+  // Entity IDs for context building (verified server-side)
+  // Thread ID is inferred from the parent comment's thread
+  parentCommentId?: number;
+  topicId?: number;
+
+  // Model configuration
+  model?: CompletionModel;
+  temperature?: number;
+  maxTokens?: number;
+  stream?: boolean;
+  useOpenRouter?: boolean;
+  useWebSearch?: boolean;
+}
 
 const log = logger(import.meta);
 
 /**
  * Gets all community-enabled MCP servers for a community
- * @param communityId The community ID
- * @returns Array of MCP servers with headers
  */
 async function getAllMCPServers(
   communityId: string,
@@ -43,7 +56,7 @@ async function getAllMCPServers(
       {
         model: models.MCPServerCommunity,
         where: { community_id: communityId },
-        attributes: [], // Don't include the junction table data in results
+        attributes: [],
       },
       {
         model: models.User,
@@ -56,121 +69,114 @@ async function getAllMCPServers(
 
   return mcpServers.map((server) => ({
     ...withMCPAuthUsername(server),
-    headers: {}, // Add any necessary headers for authentication
+    headers: {},
   }));
 }
 
 /**
- * Finds MCP servers that are mentioned in the text
- * @param text The text to parse
- * @param allServers All available MCP servers for the community
- * @returns Array of mentioned MCP servers
+ * Generates prompt based on completion type and context
  */
-function findMentionedMCPServers(
-  text: string,
-  allServers: CommonMCPServerWithHeaders[],
-): CommonMCPServerWithHeaders[] {
-  const extractedMentions = extractMCPMentions(text);
-
-  if (extractedMentions.length === 0) {
-    return [];
+function generatePromptForType(
+  completionType: AICompletionType,
+  contextString: string,
+): StructuredPrompt {
+  switch (completionType) {
+    case AICompletionType.Thread:
+      return generateThreadPrompt(contextString);
+    case AICompletionType.Comment:
+      return generateCommentPrompt(contextString);
+    case AICompletionType.Poll:
+      return generatePollPrompt(contextString);
+    default:
+      throw new Error(`Unknown completion type: ${completionType}`);
   }
-
-  // Match extracted mentions with available servers by handle and id
-  return allServers.filter((server) =>
-    extractedMentions.some(
-      (mention) =>
-        mention.handle === server.handle && mention.id === String(server.id),
-    ),
-  );
 }
 
 export const aiCompletionHandler = async (req: Request, res: Response) => {
   const requestId = Math.random().toString(36).substr(2, 9);
   log.info(`[${requestId}] AI completion request started`, {
     model: req.body?.model || DEFAULT_COMPLETION_MODEL,
+    completionType: req.body?.completionType,
     stream: req.body?.stream !== false,
-    userAgent: req.headers['user-agent'],
-    contentLength: req.headers['content-length'],
   });
 
   try {
     const {
-      prompt: initialPrompt,
-      systemPrompt: initialSystemPrompt,
+      communityId,
+      completionType,
+      parentCommentId,
+      topicId,
       model = DEFAULT_COMPLETION_MODEL,
       temperature,
       maxTokens = 1000,
       stream = true,
       useOpenRouter = false,
       useWebSearch = false,
-      communityId,
-    } = req.body as RequestBody;
+    } = req.body as AICompletionRequestBody;
 
-    let finalUserPrompt: string;
-    let finalSystemPrompt: string | undefined;
+    // Validate required fields
+    if (!communityId) {
+      return res.status(400).json({
+        error: 'communityId is required',
+      });
+    }
 
-    // Check if initialPrompt is an object with userPrompt and systemPrompt properties
-    if (
-      typeof initialPrompt === 'object' &&
-      initialPrompt !== null &&
-      typeof (initialPrompt as StructuredPrompt).userPrompt === 'string'
-    ) {
-      finalUserPrompt = (initialPrompt as StructuredPrompt).userPrompt;
-      // Use systemPrompt from the object if available, otherwise fallback to initialSystemPrompt (top-level)
-      finalSystemPrompt =
-        (initialPrompt as StructuredPrompt).systemPrompt || initialSystemPrompt;
-    } else if (typeof initialPrompt === 'string') {
-      // This is the originally expected correct case
-      finalUserPrompt = initialPrompt;
-      finalSystemPrompt = initialSystemPrompt;
-    } else {
+    if (!completionType) {
+      return res.status(400).json({
+        error: 'completionType is required',
+      });
+    }
+
+    // Validate completion type (ThreadTitle is not supported - use client-side extraction)
+    const validCompletionTypes = [
+      AICompletionType.Thread,
+      AICompletionType.Comment,
+      AICompletionType.Poll,
+    ];
+    if (!validCompletionTypes.includes(completionType)) {
+      return res.status(400).json({
+        error: `Invalid completionType. Must be one of: ${validCompletionTypes.join(', ')}`,
+      });
+    }
+
+    // Build context from entity IDs (this verifies they belong to the community)
+    // Thread ID is inferred from the parent comment's thread
+    let contextData;
+    try {
+      contextData = await buildContextFromEntityIds(communityId, {
+        parentCommentId,
+        topicId,
+      });
+    } catch (contextError) {
+      log.error(`[${requestId}] Error building context:`, contextError);
       return res.status(400).json({
         error:
-          'Invalid prompt format. Prompt must be a string or a structured object.',
+          contextError instanceof Error
+            ? contextError.message
+            : 'Failed to build context from provided entity IDs',
       });
     }
 
-    // Validate inputs (now using finalUserPrompt)
-    if (!finalUserPrompt) {
-      return res.status(400).json({
-        error: 'User prompt content is required and could not be determined.',
-      });
-    }
+    // Format context for prompt
+    const contextString = formatContextForPrompt(contextData);
 
-    // Check for MCP mentions and determine if we should use MCP path
+    // Generate prompts based on completion type
+    const { systemPrompt, userPrompt } = generatePromptForType(
+      completionType,
+      contextString,
+    );
+
+    log.info(`[${requestId}] Generated prompts for ${completionType}`, {
+      contextLength: contextString.length,
+      systemPromptLength: systemPrompt.length,
+      userPromptLength: userPrompt.length,
+    });
+
+    // Check for MCP servers in the community (for potential future MCP integration)
     let useMCPPath = false;
     let mentionedMCPServers: CommonMCPServerWithHeaders[] = [];
 
-    if (communityId) {
-      try {
-        const allServers = await getAllMCPServers(communityId);
-        mentionedMCPServers = findMentionedMCPServers(
-          finalUserPrompt,
-          allServers,
-        );
-        useMCPPath = mentionedMCPServers.length > 0;
-        console.log('mentionedMCPServers: ', mentionedMCPServers);
-
-        if (useMCPPath) {
-          const extractedMentions = extractMCPMentions(finalUserPrompt);
-          log.info(
-            `[${requestId}] MCP path enabled with mentions: ${extractedMentions
-              .map((m) => `${m.handle}(${m.id})`)
-              .join(', ')}`,
-          );
-          console.log(
-            'extractedMentions: ',
-            JSON.stringify(extractedMentions, null, 2),
-          );
-        }
-      } catch (mcpError) {
-        log.error(`[${requestId}] Error checking MCP servers:`, mcpError);
-        // Continue with regular path if MCP check fails
-      }
-    }
-
-    // MCP path only supports OpenAI, not OpenRouter
+    // MCP path only supports OpenAI
     if (
       useMCPPath &&
       (useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true')
@@ -180,7 +186,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       });
     }
 
-    // Choose between OpenAI and OpenRouter (unless using MCP path)
+    // Choose between OpenAI and OpenRouter
     const useOR = useMCPPath
       ? false
       : useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true';
@@ -199,14 +205,10 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     let addOpenAiWebSearchOptions = false;
 
     if (useOR) {
-      // OpenRouter: append :online if web search is enabled
       if (useWebSearch) {
         modelId = `${model}:online`;
-      } else {
-        modelId = model;
       }
     } else {
-      // OpenAI: only gpt-4o or gpt-4o-mini support web search
       if (useWebSearch) {
         if (model === 'gpt-4o') {
           modelId = 'gpt-4o-search-preview';
@@ -220,22 +222,16 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
               'Web search is only supported for gpt-4o and gpt-4o-mini with OpenAI',
           });
         }
-      } else {
-        modelId = model;
-        addOpenAiWebSearchOptions = false;
       }
     }
 
-    // Log the final model, provider, and web search status
-    log.info(
-      `AI completion request:
+    log.info(`AI completion request:
       \n modelId=${modelId},
       \n provider=${useOR ? 'OpenRouter' : 'OpenAI'},
       \n webSearch=${!!useWebSearch}
-      \n contextualMentions=${!!(finalSystemPrompt && finalSystemPrompt.includes('CONTEXTUAL INFORMATION:'))}`,
-    );
+      \n completionType=${completionType}`);
 
-    // Initialize client
+    // Initialize OpenAI client
     const openAIConfig = {
       apiKey,
       ...(useOR && { baseURL: 'https://openrouter.ai/api/v1' }),
@@ -247,28 +243,20 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
 
     const openai = new OpenAI(openAIConfig);
 
-    // Handle MCP path separately with OpenAI responses API
-    if (useMCPPath) {
+    // Handle MCP path (reserved for future use)
+    if (useMCPPath && mentionedMCPServers.length > 0) {
       log.info(
         `[${requestId}] Using MCP path with ${mentionedMCPServers.length} servers`,
       );
 
       try {
-        // Build MCP client options
         const mcpOptions = buildMCPClientOptions(
-          finalUserPrompt,
+          userPrompt,
           mentionedMCPServers,
-          null, // no previous response ID for now
+          null,
         );
 
-        console.log('mcpOptions: ', JSON.stringify(mcpOptions, null, 2));
-
-        // Override any model settings to ensure consistency
         mcpOptions.model = model || DEFAULT_COMPLETION_MODEL;
-        // Note: OpenAI Responses API doesn't support temperature or max_tokens
-        // These parameters are controlled by the model's default settings
-
-        // Force streaming for MCP path to match expected behavior
         mcpOptions.stream = true;
 
         log.info(
@@ -276,7 +264,6 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
         );
 
         if (stream) {
-          // Set proper headers for streaming
           res.setHeader('Content-Type', 'text/plain');
           res.setHeader('Cache-Control', 'no-cache');
           res.setHeader('X-Accel-Buffering', 'no');
@@ -298,17 +285,9 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
                 try {
                   res.write(contentToStream);
                   if (res.flush) res.flush();
-
-                  if (chunkCount % 10 === 0) {
-                    log.info(`[${requestId}] MCP streaming progress`, {
-                      chunkCount,
-                      totalContentLength,
-                      lastChunkSize: contentToStream.length,
-                    });
-                  }
                 } catch (writeError) {
                   log.error(
-                    `[${requestId}] Error writing MCP chunk ${chunkCount}:`,
+                    `[${requestId}] Error writing MCP chunk:`,
                     writeError,
                   );
                   throw writeError;
@@ -317,7 +296,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
             }
           }
 
-          log.info(`[${requestId}] MCP streaming completed successfully`, {
+          log.info(`[${requestId}] MCP streaming completed`, {
             totalChunks: chunkCount,
             totalContentLength,
           });
@@ -325,24 +304,19 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           res.end();
           return;
         } else {
-          // For non-streaming MCP requests, we still need to use the streaming API
-          // and collect the full response
           const response = await openai.responses.create(mcpOptions);
 
           let responseText = '';
           for await (const event of response) {
             if (event.type === 'response.output_text.delta') {
-              const deltaText = event.delta || '';
-              responseText += deltaText;
+              responseText += event.delta || '';
             }
           }
 
-          const finalResponse =
-            responseText ||
-            'I apologize, but I was unable to generate a response.';
-
           res.json({
-            completion: finalResponse,
+            completion:
+              responseText ||
+              'I apologize, but I was unable to generate a response.',
           });
           return;
         }
@@ -363,31 +337,21 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       }
     }
 
+    // Standard completion path
     if (stream) {
       log.info(`[${requestId}] Setting up streaming response`);
 
-      // Set proper headers for streaming
       res.setHeader('Content-Type', 'text/plain');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('X-Accel-Buffering', 'no');
 
-      log.info(`[${requestId}] Streaming headers set`, {
-        headers: {
-          'Content-Type': res.getHeader('Content-Type'),
-          'Cache-Control': res.getHeader('Cache-Control'),
-          'X-Accel-Buffering': res.getHeader('X-Accel-Buffering'),
-        },
-      });
-
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
-        if (finalSystemPrompt) {
-          messages.push({ role: 'system', content: finalSystemPrompt });
+        if (systemPrompt) {
+          messages.push({ role: 'system', content: systemPrompt });
         }
-        messages.push({ role: 'user', content: finalUserPrompt });
+        messages.push({ role: 'user', content: userPrompt });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const streamConfig: OpenAI.Chat.ChatCompletionCreateParamsStreaming = {
           model: modelId,
           messages,
@@ -410,11 +374,8 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           messageCount: messages.length,
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const streamResponse =
           await openai.chat.completions.create(streamConfig);
-
-        log.info(`[${requestId}] OpenAI stream created successfully`);
 
         let chunkCount = 0;
         let totalContentLength = 0;
@@ -422,53 +383,14 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
         for await (const chunk of streamResponse) {
           chunkCount++;
           const choice = chunk.choices?.[0];
-
-          if (choice) {
-            let annotationsFoundInChunk = false;
-            // Check for annotations on delta (OpenRouter might put them here)
-            if (
-              choice.delta &&
-              (choice.delta as { annotations?: unknown }).annotations
-            ) {
-              annotationsFoundInChunk = true;
-            }
-            // Check for annotations directly on the choice object (less common for streaming delta but good to cover)
-            if ((choice as { annotations?: unknown }).annotations) {
-              annotationsFoundInChunk = true;
-            }
-            // If OpenRouter nests a full message object within delta, check there too
-            if (
-              choice.delta &&
-              (choice.delta as { message?: { annotations?: unknown } })
-                .message &&
-              (choice.delta as { message?: { annotations?: unknown } }).message
-                ?.annotations
-            ) {
-              annotationsFoundInChunk = true;
-            }
-
-            if (annotationsFoundInChunk) {
-              log.info(
-                `[${requestId}] Annotations found in chunk ${chunkCount}`,
-              );
-            }
-          }
-
           const contentToStream = choice?.delta?.content || '';
+
           if (contentToStream) {
             totalContentLength += contentToStream.length;
 
             try {
               res.write(contentToStream);
-              if (res.flush) res.flush(); // Force flush for immediate client update
-
-              if (chunkCount % 10 === 0) {
-                log.info(`[${requestId}] Streaming progress`, {
-                  chunkCount,
-                  totalContentLength,
-                  lastChunkSize: contentToStream.length,
-                });
-              }
+              if (res.flush) res.flush();
             } catch (writeError) {
               log.error(
                 `[${requestId}] Error writing chunk ${chunkCount}:`,
@@ -476,8 +398,6 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
               );
               throw writeError;
             }
-          } else if (chunkCount % 20 === 0) {
-            log.info(`[${requestId}] Empty chunk ${chunkCount} received`);
           }
         }
 
@@ -487,58 +407,40 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
         });
 
         res.end();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (streamError: unknown) {
-        log.error(
-          `[${requestId}] Streaming error occurred:`,
-          streamError as Error,
-        );
+        log.error(`[${requestId}] Streaming error:`, streamError as Error);
 
-        // Check for OpenRouter-specific error format
         const orError = extractOpenRouterError(streamError);
         if (orError) {
-          log.error(
-            `[${requestId}] OpenRouter error:`,
-            new Error(orError.message),
-          );
-
           if (!res.headersSent) {
             return res.status(orError.code || 500).json({
               error: orError.message,
               metadata: orError.metadata,
             });
           }
-
           res.write(`\nError: ${orError.message}`);
           return res.end();
         }
 
-        // Handle other errors
         if (!res.headersSent) {
           const error = streamError as Error & { status?: number };
-          log.error(`[${requestId}] Unhandled streaming error:`, error);
-
           return res.status(error.status || 500).json({
             error: error.message || 'Streaming failed',
             status: error.status || 500,
           });
         }
 
-        log.error(
-          `[${requestId}] Error during streaming with headers already sent`,
-        );
         res.write('\nError during streaming');
         res.end();
       }
     } else {
-      // Handle regular response
+      // Non-streaming response
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
-        if (finalSystemPrompt) {
-          messages.push({ role: 'system', content: finalSystemPrompt });
+        if (systemPrompt) {
+          messages.push({ role: 'system', content: systemPrompt });
         }
-        messages.push({ role: 'user', content: finalUserPrompt });
+        messages.push({ role: 'user', content: userPrompt });
 
         const completion = await openai.chat.completions.create({
           model: modelId,
@@ -555,22 +457,6 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
             addOpenAiWebSearchOptions && { web_search_options: {} }),
         });
 
-        // Log the entire first choice message object from the AI
-        if (
-          completion.choices &&
-          completion.choices.length > 0 &&
-          completion.choices[0].message
-        ) {
-          const message = completion.choices[0]
-            .message as OpenAI.Chat.ChatCompletionMessage & {
-            annotations?: unknown;
-          };
-          if (message.annotations) {
-            // Specifically log annotations if present in the non-streaming message
-            // Use index signature access to safely access potential custom 'annotations' field
-          }
-        }
-
         const responseText = completion.choices[0]?.message?.content || '';
         const messageForResponse = completion.choices[0]
           ?.message as OpenAI.Chat.ChatCompletionMessage & {
@@ -585,9 +471,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           responsePayload.annotations = annotations;
         }
         res.json(responsePayload);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (completionError: unknown) {
-        // Check for OpenRouter-specific error format
         const orError = extractOpenRouterError(completionError);
         if (orError) {
           return res.status(orError.code || 500).json({
@@ -596,7 +480,6 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           });
         }
 
-        // Handle other errors
         const error = completionError as Error & { status?: number };
         return res.status(error.status || 500).json({
           error: error.message || 'Completion failed',
@@ -604,9 +487,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
         });
       }
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: unknown) {
-    // Extract useful information for the client
     const err = error as Error & { status?: number };
     const statusCode = err.status || 500;
     const errorMessage =
@@ -619,10 +500,6 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
         error: errorMessage,
         status: statusCode,
       });
-    } else {
-      log.error(
-        `[${requestId}] Cannot send error response - headers already sent`,
-      );
     }
   } finally {
     log.info(`[${requestId}] AI completion request ended`);
