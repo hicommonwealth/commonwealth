@@ -201,7 +201,7 @@ describe('Pinned token lifecycle', () => {
           contract_address: ethMainnetUSDC,
         },
       }),
-    ).rejects.toThrow(PinTokenErrors.OnlyBaseSupport);
+    ).rejects.toThrow(PinTokenErrors.OnlyBaseOrSoneiumSupport);
 
     await models.ChainNode.update(
       {
