@@ -1,5 +1,5 @@
 import { command, logger } from '@hicommonwealth/core';
-import { Comment, Community } from '@hicommonwealth/model';
+import { Comment, Community, extractMCPMentions } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import { systemActor } from '@hicommonwealth/model/middleware';
 import {
@@ -29,6 +29,7 @@ const DEFAULT_TOKEN_EXPIRATION_MINUTES = 60; // 1 hour (for audit token record)
 interface AICommentCreationResult {
   success: boolean;
   commentId?: number;
+  comment?: Record<string, unknown>;
   error?: string;
 }
 
@@ -125,12 +126,53 @@ async function createAIComment(
       { where: { id: tokenRecord.id } },
     );
 
+    // Fetch the full comment with associated data for the UI
+    const fullComment = await models.Comment.findOne({
+      where: { id: result!.id },
+      include: [
+        {
+          model: models.Address,
+          include: [
+            {
+              model: models.User,
+              as: 'User',
+              attributes: ['id', 'profile'],
+            },
+          ],
+        },
+      ],
+    });
+
+    // Build the comment view object that matches CommentsView schema
+    const commentView = fullComment
+      ? {
+          ...fullComment.toJSON(),
+          community_id: communityId,
+          address: fullComment.Address?.address || botAddress.address,
+          profile_name:
+            (fullComment.Address?.User as { profile?: { name?: string } })
+              ?.profile?.name || 'AI Assistant',
+          avatar_url:
+            (
+              fullComment.Address?.User as {
+                profile?: { avatar_url?: string };
+              }
+            )?.profile?.avatar_url || null,
+          user_id: botUser.id,
+          reactions: [],
+        }
+      : null;
+
     log.info('AI comment created successfully', {
       commentId: result!.id,
       tokenId: tokenRecord.id,
     });
 
-    return { success: true, commentId: result!.id };
+    return {
+      success: true,
+      commentId: result!.id,
+      comment: commentView as unknown as Record<string, unknown>,
+    };
   } catch (error) {
     log.error('Failed to create AI comment', error as Error);
     return { success: false, error: 'Failed to create AI comment' };
@@ -258,6 +300,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     // For Comment completions, validate user and parent comment ownership BEFORE streaming
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let parentCommentThreadId: number | undefined;
+    let parentCommentBody: string | undefined;
 
     if (completionType === AICompletionType.Comment) {
       if (!parentCommentId) {
@@ -301,6 +344,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       }
 
       parentCommentThreadId = parentComment.thread_id;
+      parentCommentBody = parentComment.body;
       log.info(`[${requestId}] Validated parent comment ownership`, {
         parentCommentId,
         userId,
@@ -342,12 +386,34 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     });
 
     // Check for MCP servers in the community (for potential future MCP integration)
-    let useMCPPath = false;
     let mentionedMCPServers: CommonMCPServerWithHeaders[] = [];
+
+    // Extract MCP mentions from parent comment and match against available servers
+    if (parentCommentBody) {
+      const extractedMentions = extractMCPMentions(parentCommentBody);
+      if (extractedMentions.length > 0) {
+        const allServers = await getAllMCPServers(communityId);
+        mentionedMCPServers = allServers.filter((server) =>
+          extractedMentions.some(
+            (mention) =>
+              mention.handle === server.handle &&
+              mention.id === String(server.id),
+          ),
+        );
+        if (mentionedMCPServers.length > 0) {
+          log.info(
+            `[${requestId}] Found ${mentionedMCPServers.length} mentioned MCP servers`,
+            {
+              serverHandles: mentionedMCPServers.map((s) => s.handle),
+            },
+          );
+        }
+      }
+    }
 
     // MCP path only supports OpenAI
     if (
-      useMCPPath &&
+      mentionedMCPServers.length > 0 &&
       (useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true')
     ) {
       return res.status(400).json({
@@ -355,10 +421,12 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       });
     }
 
-    // Choose between OpenAI and OpenRouter
-    const useOR = useMCPPath
-      ? false
-      : useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true';
+    // Choose between OpenAI and OpenRouter (if MCP servers are mentioned, use OpenAI)
+    const useOR =
+      mentionedMCPServers.length > 0
+        ? false
+        : useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true';
+
     const apiKey = useOR
       ? config.OPENAI.OPENROUTER_API_KEY
       : config.OPENAI.API_KEY;
@@ -412,8 +480,8 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
 
     const openai = new OpenAI(openAIConfig);
 
-    // Handle MCP path (reserved for future use)
-    if (useMCPPath && mentionedMCPServers.length > 0) {
+    // Handle MCP path
+    if (mentionedMCPServers.length > 0) {
       log.info(
         `[${requestId}] Using MCP path with ${mentionedMCPServers.length} servers`,
       );
@@ -441,6 +509,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
 
           let chunkCount = 0;
           let totalContentLength = 0;
+          let accumulatedText = '';
 
           for await (const event of response) {
             chunkCount++;
@@ -450,6 +519,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
 
               if (contentToStream) {
                 totalContentLength += contentToStream.length;
+                accumulatedText += contentToStream;
 
                 try {
                   res.write(contentToStream);
@@ -470,6 +540,36 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
             totalContentLength,
           });
 
+          // For Comment completions, create the AI comment and send JSON payload
+          if (
+            completionType === AICompletionType.Comment &&
+            parentCommentId &&
+            parentCommentThreadId &&
+            userId &&
+            accumulatedText
+          ) {
+            const commentResult = await createAIComment(
+              userId,
+              communityId,
+              parentCommentThreadId,
+              parentCommentId,
+              accumulatedText,
+            );
+
+            if (commentResult.success && commentResult.comment) {
+              log.info(`[${requestId}] Created AI comment via MCP path`, {
+                commentId: commentResult.commentId,
+              });
+              // Send delimiter and JSON payload for the created comment
+              res.write('\n__COMMENT_PAYLOAD__\n');
+              res.write(JSON.stringify(commentResult.comment));
+            } else {
+              log.error(
+                `[${requestId}] Failed to create AI comment via MCP path: ${commentResult.error}`,
+              );
+            }
+          }
+
           res.end();
           return;
         } else {
@@ -482,11 +582,46 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
             }
           }
 
-          res.json({
+          const responsePayload: {
+            completion: string;
+            commentCreated?: boolean;
+            commentId?: number;
+          } = {
             completion:
               responseText ||
               'I apologize, but I was unable to generate a response.',
-          });
+          };
+
+          // For Comment completions, create the AI comment directly (ownership was validated earlier)
+          if (
+            completionType === AICompletionType.Comment &&
+            parentCommentId &&
+            parentCommentThreadId &&
+            userId &&
+            responseText
+          ) {
+            const commentResult = await createAIComment(
+              userId,
+              communityId,
+              parentCommentThreadId,
+              parentCommentId,
+              responseText,
+            );
+
+            if (commentResult.success) {
+              responsePayload.commentCreated = true;
+              responsePayload.commentId = commentResult.commentId;
+              log.info(`[${requestId}] Created AI comment via MCP path`, {
+                commentId: commentResult.commentId,
+              });
+            } else {
+              log.error(
+                `[${requestId}] Failed to create AI comment via MCP path: ${commentResult.error}`,
+              );
+            }
+          }
+
+          res.json(responsePayload);
           return;
         }
       } catch (mcpError) {
@@ -577,7 +712,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           totalContentLength,
         });
 
-        // For Comment completions, create the AI comment directly (ownership was validated earlier)
+        // For Comment completions, create the AI comment and send JSON payload
         if (
           completionType === AICompletionType.Comment &&
           parentCommentId &&
@@ -593,10 +728,13 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
             accumulatedText,
           );
 
-          if (commentResult.success) {
+          if (commentResult.success && commentResult.comment) {
             log.info(`[${requestId}] Created AI comment`, {
               commentId: commentResult.commentId,
             });
+            // Send delimiter and JSON payload for the created comment
+            res.write('\n__COMMENT_PAYLOAD__\n');
+            res.write(JSON.stringify(commentResult.comment));
           } else {
             log.error(
               `[${requestId}] Failed to create AI comment: ${commentResult.error}`,

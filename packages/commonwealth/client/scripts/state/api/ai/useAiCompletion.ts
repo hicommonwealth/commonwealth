@@ -16,9 +16,15 @@ export enum AICompletionType {
   Poll = 'poll',
 }
 
+// Delimiter sent by backend after streaming content before JSON payload
+const COMMENT_PAYLOAD_DELIMITER = '\n__COMMENT_PAYLOAD__\n';
+
 interface AiCompletionOptions extends Partial<CompletionOptions> {
   onChunk?: (chunk: string) => void;
-  onComplete?: (fullText: string) => void;
+  onComplete?: (
+    fullText: string,
+    commentPayload?: Record<string, unknown>,
+  ) => void;
   onError?: (error: Error) => void;
 }
 
@@ -135,26 +141,52 @@ export const useAiCompletion = () => {
           const reader = response.body.getReader();
           const decoder = new TextDecoder();
 
-          let buffer = '';
           let chunkCount = 0;
+          let fullStreamContent = '';
 
           while (true) {
             const { done, value } = await reader.read();
             chunkCount++;
 
             if (done) {
-              console.log(`[${requestId}] Streaming completed`, {
-                totalChunks: chunkCount,
-                totalLength: accumulatedText.length,
-              });
+              // Check for comment payload delimiter
+              let commentPayload: Record<string, unknown> | undefined;
+              let displayText = fullStreamContent;
 
-              if (buffer.length > 0) {
-                accumulatedText += buffer;
-                setCompletion(accumulatedText);
+              if (fullStreamContent.includes(COMMENT_PAYLOAD_DELIMITER)) {
+                const delimiterIndex = fullStreamContent.indexOf(
+                  COMMENT_PAYLOAD_DELIMITER,
+                );
+                displayText = fullStreamContent.substring(0, delimiterIndex);
+                const jsonPayload = fullStreamContent
+                  .substring(delimiterIndex + COMMENT_PAYLOAD_DELIMITER.length)
+                  .trim();
+
+                try {
+                  commentPayload = JSON.parse(jsonPayload);
+                  console.log(`[${requestId}] Parsed comment payload`, {
+                    commentId: commentPayload?.id,
+                  });
+                } catch (parseError) {
+                  console.error(
+                    `[${requestId}] Failed to parse comment payload:`,
+                    parseError,
+                    { jsonPayload: jsonPayload.substring(0, 100) },
+                  );
+                }
               }
 
+              accumulatedText = displayText;
+              setCompletion(displayText);
+
+              console.log(`[${requestId}] Streaming completed`, {
+                totalChunks: chunkCount,
+                totalLength: displayText.length,
+                hasCommentPayload: !!commentPayload,
+              });
+
               try {
-                await options?.onComplete?.(accumulatedText);
+                await options?.onComplete?.(displayText, commentPayload);
               } catch (callbackError) {
                 console.error(`[${requestId}] Error in onComplete callback:`, {
                   error:
@@ -174,10 +206,32 @@ export const useAiCompletion = () => {
               throw new Error(chunk.substring(8));
             }
 
-            buffer += chunk;
-            accumulatedText += chunk;
+            fullStreamContent += chunk;
+
+            // Only update displayed text up to the delimiter if it appears mid-stream
+            let displayChunk = chunk;
+            if (fullStreamContent.includes(COMMENT_PAYLOAD_DELIMITER)) {
+              const delimiterIndex = fullStreamContent.indexOf(
+                COMMENT_PAYLOAD_DELIMITER,
+              );
+              const preDelimiterContent = fullStreamContent.substring(
+                0,
+                delimiterIndex,
+              );
+              // Calculate what portion of the current chunk should be displayed
+              const previousDisplayedLength = accumulatedText.length;
+              displayChunk = preDelimiterContent.substring(
+                previousDisplayedLength,
+              );
+              accumulatedText = preDelimiterContent;
+            } else {
+              accumulatedText = fullStreamContent;
+            }
+
             setCompletion(accumulatedText);
-            options?.onChunk?.(chunk);
+            if (displayChunk) {
+              options?.onChunk?.(displayChunk);
+            }
           }
         } else {
           const data = await response.json();

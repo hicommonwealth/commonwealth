@@ -22,6 +22,7 @@ import { Virtuoso } from 'react-virtuoso';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
+import { trpc } from 'utils/trpcClient';
 import { CreateComment } from 'views/components/Comments/CreateComment';
 import { WithActiveStickyComment } from 'views/components/StickEditorContainer/context/WithActiveStickyComment';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -93,6 +94,7 @@ export const TreeHierarchy = ({
   const user = useUserStore();
   const communityId = app.activeChainId() || '';
   const { selectedModels } = useUserAiSettingsStore();
+  const utils = trpc.useUtils();
 
   const isChatMode = commentFilters.sortType === 'oldest';
   const previousChatModeRef = useRef(isChatMode);
@@ -197,6 +199,77 @@ export const TreeHierarchy = ({
       unregister();
     };
   }, [handleGenerateAIReply]);
+
+  // Add a new AI comment directly to the cache without refetching
+  const addCommentToCache = useCallback(
+    (commentPayload: Record<string, unknown>) => {
+      if (!commentPayload || !commentPayload.id) {
+        console.warn('[TreeHierarchy] Invalid comment payload received');
+        return;
+      }
+
+      // Use the parent_id from the comment payload to update the correct cache
+      const commentParentId = commentPayload.parent_id as number | undefined;
+      const isChatModeQuery =
+        commentFilters.sortType === 'oldest' && commentParentId === undefined;
+
+      console.log('[TreeHierarchy] Adding comment to cache', {
+        commentId: commentPayload.id,
+        parentId: commentParentId,
+      });
+
+      // Update the infinite query cache to include the new comment
+      utils.comment.getComments.setInfiniteData(
+        {
+          thread_id: parseInt(`${thread.id}`) || 0,
+          comment_id: undefined,
+          include_reactions: true,
+          parent_id: commentParentId,
+          include_spam_comments: commentFilters.includeSpam,
+          order_by: commentFilters.sortType,
+          is_chat_mode: isChatModeQuery,
+        },
+        (oldData) => {
+          if (!oldData) {
+            console.log('[TreeHierarchy] No existing cache data found');
+            return oldData;
+          }
+
+          // Add the new comment to the first page's results
+          const newPages = oldData.pages.map((page, index) => {
+            if (index === 0) {
+              // Check if comment already exists to avoid duplicates
+              const exists = page.results.some(
+                (c: { id: number }) => c.id === commentPayload.id,
+              );
+              if (exists) {
+                console.log('[TreeHierarchy] Comment already exists in cache');
+                return page;
+              }
+
+              console.log('[TreeHierarchy] Adding comment to first page');
+              return {
+                ...page,
+                results: [commentPayload as CommentViewParams, ...page.results],
+              };
+            }
+            return page;
+          });
+
+          return {
+            ...oldData,
+            pages: newPages,
+          };
+        },
+      );
+    },
+    [
+      utils.comment.getComments,
+      thread.id,
+      commentFilters.includeSpam,
+      commentFilters.sortType,
+    ],
+  );
 
   useRunOnceOnCondition({
     callback: () => {
@@ -324,7 +397,11 @@ export const TreeHierarchy = ({
                 isRootComment={true}
                 threadContext={thread.body}
                 threadTitle={thread.title}
-                onStreamingComplete={() => {
+                onStreamingComplete={(commentPayload) => {
+                  // Add comment to cache if payload received, then remove streaming instance
+                  if (commentPayload) {
+                    addCommentToCache(commentPayload);
+                  }
                   setStreamingInstances((prev) =>
                     prev.filter(
                       (si) =>
@@ -509,7 +586,11 @@ export const TreeHierarchy = ({
                 modelName={instance.modelName}
                 parentCommentText={comment.body}
                 threadContext={thread.body}
-                onStreamingComplete={() => {
+                onStreamingComplete={(commentPayload) => {
+                  // Add comment to cache if payload received, then remove streaming instance
+                  if (commentPayload) {
+                    addCommentToCache(commentPayload);
+                  }
                   setStreamingInstances((prev) =>
                     prev.filter(
                       (si) =>
