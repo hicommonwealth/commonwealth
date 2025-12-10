@@ -49,6 +49,9 @@ interface CompletionError {
 /**
  * Hook for streaming AI completions from the server
  * Uses entity IDs for secure server-side context building
+ *
+ * For Comment completions, the server automatically creates the AI comment
+ * after the completion finishes - no additional client action needed.
  */
 export const useAiCompletion = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -185,6 +188,7 @@ export const useAiCompletion = () => {
 
           accumulatedText = data.completion || '';
           setCompletion(accumulatedText);
+
           options?.onComplete?.(accumulatedText);
         }
       } catch (err) {

@@ -16,10 +16,6 @@ import clsx from 'clsx';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCreateCommentMutation } from 'state/api/comments';
-import {
-  useCreateAICompletionCommentMutation,
-  useCreateAICompletionTokenMutation,
-} from 'state/api/comments/aiCompletion';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore, { useAIFeatureEnabled } from 'state/ui/user';
@@ -169,24 +165,6 @@ export const CommentCard = ({
     existingNumberOfComments: 0,
   });
 
-  const { mutateAsync: createAICompletionToken } =
-    useCreateAICompletionTokenMutation();
-  const { mutateAsync: createAICompletionComment } =
-    useCreateAICompletionCommentMutation({
-      communityId: comment.community_id,
-      threadId: comment.thread_id,
-      existingNumberOfComments: 0,
-    });
-
-  // Use refs to avoid including mutation functions in useEffect dependencies
-  const createAICompletionTokenRef = useRef(createAICompletionToken);
-  const createAICompletionCommentRef = useRef(createAICompletionComment);
-
-  useEffect(() => {
-    createAICompletionTokenRef.current = createAICompletionToken;
-    createAICompletionCommentRef.current = createAICompletionComment;
-  }, [createAICompletionToken, createAICompletionComment]);
-
   // Use ref for generateCompletion to avoid effect re-runs
   const generateCompletionRef = useRef(generateCompletion);
   useEffect(() => {
@@ -282,8 +260,6 @@ export const CommentCard = ({
     onStreamingCompleteRef.current = onStreamingComplete;
   }, [onStreamingComplete]);
 
-  const activeUserAddress = user.activeAccount?.address;
-
   useEffect(() => {
     if (!isStreamingAIReply || !streamingModelId) return;
 
@@ -362,69 +338,16 @@ Community Description: ${communityDescription}`;
                 commentId: comment.id,
               });
 
+              // Server creates the AI comment automatically, just clear the streaming text
               if (
                 completedText &&
                 !completedText.startsWith('Error generating reply')
               ) {
-                try {
-                  if (!activeUserAddress) {
-                    const errorMsg = 'No active user account found';
-                    console.error(
-                      '[AI Reply] Token creation failed:',
-                      errorMsg,
-                    );
-                    throw new Error(errorMsg);
-                  }
-
-                  console.log('[AI Reply] Creating AI completion token...', {
-                    comment_id: comment.id,
-                    contentLength: completedText.length,
-                  });
-
-                  // Create AI completion token with the generated content
-                  // Thread ID is inferred from the parent comment's thread on the server
-                  const tokenResponse =
-                    await createAICompletionTokenRef.current({
-                      comment_id: comment.id,
-                      content: completedText,
-                    });
-
-                  console.log('[AI Reply] Token created successfully:', {
-                    tokenId: tokenResponse.id,
-                    expiresAt: tokenResponse.expires_at,
-                  });
-
-                  // Immediately use the token to create the bot comment
-                  console.log('[AI Reply] Creating AI completion comment...');
-                  const createdComment =
-                    await createAICompletionCommentRef.current({
-                      token: tokenResponse.token,
-                    });
-
-                  console.log('[AI Reply] Comment created successfully:', {
-                    commentId: createdComment.id,
-                  });
-
-                  if (mounted) {
-                    setStreamingText('');
-                  }
-                } catch (error) {
-                  console.error('[AI Reply] Error in onComplete callback:', {
-                    error:
-                      error instanceof Error ? error.message : String(error),
-                    stack: error instanceof Error ? error.stack : undefined,
-                    commentId: comment.id,
-                    userAddress: activeUserAddress,
-                    mounted,
-                  });
-
-                  if (mounted) {
-                    setStreamingText(
-                      `Failed to post reply from ${modelName || 'AI'}: ${
-                        error instanceof Error ? error.message : String(error)
-                      }`,
-                    );
-                  }
+                console.log(
+                  '[AI Reply] Completion finished, server created comment',
+                );
+                if (mounted) {
+                  setStreamingText('');
                 }
               } else {
                 console.warn(
@@ -490,7 +413,6 @@ Community Description: ${communityDescription}`;
     parentCommentText,
     comment.id,
     comment.community_id,
-    activeUserAddress,
     community?.name,
     community?.description,
   ]);

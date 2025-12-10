@@ -1,5 +1,7 @@
-import { logger } from '@hicommonwealth/core';
+import { command, logger } from '@hicommonwealth/core';
+import { Comment, Community } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
+import { systemActor } from '@hicommonwealth/model/middleware';
 import {
   AICompletionType,
   buildContextFromEntityIds,
@@ -9,6 +11,7 @@ import {
   generateCommentPrompt,
   generatePollPrompt,
   generateThreadPrompt,
+  getBotUser,
   StructuredPrompt,
   withMCPAuthUsername,
 } from '@hicommonwealth/model/services';
@@ -20,6 +23,119 @@ import { Request, Response } from 'express';
 import { OpenAI } from 'openai';
 import { config } from '../../config';
 import { extractOpenRouterError } from './utils';
+
+const DEFAULT_TOKEN_EXPIRATION_MINUTES = 60; // 1 hour (for audit token record)
+
+interface AICommentCreationResult {
+  success: boolean;
+  commentId?: number;
+  error?: string;
+}
+
+/**
+ * Creates an AI-generated comment as the bot user
+ * This handles: getting bot user, joining community if needed, creating the comment, and storing the token
+ */
+async function createAIComment(
+  userId: number,
+  communityId: string,
+  threadId: number,
+  parentCommentId: number,
+  content: string,
+): Promise<AICommentCreationResult> {
+  try {
+    // Calculate expiration time for token record
+    const expires_at = new Date();
+    expires_at.setMinutes(
+      expires_at.getMinutes() + DEFAULT_TOKEN_EXPIRATION_MINUTES,
+    );
+
+    // Create the token record first (for audit trail)
+    const tokenRecord = await models.AICompletionToken.create({
+      user_id: userId,
+      community_id: communityId,
+      thread_id: threadId,
+      parent_comment_id: parentCommentId,
+      content,
+      expires_at,
+    });
+
+    // Get the bot user with address
+    const botUserData = await getBotUser();
+    if (!botUserData) {
+      log.error('Bot user not found for AI comment creation');
+      return { success: false, error: 'Bot user not configured' };
+    }
+    const { user: botUser, address: botUserAddress } = botUserData;
+
+    // Find the bot user's address in the specific community
+    let botAddress = await models.Address.findOne({
+      where: {
+        user_id: botUser.id,
+        community_id: communityId,
+      },
+    });
+
+    if (!botAddress) {
+      // Join community using the bot's primary address
+      const botActor = systemActor({
+        address: botUserAddress.address,
+        id: botUser.id!,
+        email: botUser.email || 'ai-bot@common.xyz',
+      });
+
+      await command(Community.JoinCommunity(), {
+        actor: botActor,
+        payload: { community_id: communityId },
+      });
+
+      // Fetch the newly created address
+      botAddress = await models.Address.findOne({
+        where: {
+          user_id: botUser.id,
+          community_id: communityId,
+        },
+      });
+
+      if (!botAddress) {
+        log.error(`Failed to create bot address in community: ${communityId}`);
+        return { success: false, error: 'Failed to join community as bot' };
+      }
+    }
+
+    // Create comment as bot user
+    const result = await command(Comment.CreateComment(), {
+      actor: {
+        user: {
+          id: botUser.id!,
+          email: botUser.email!,
+        },
+        address: botAddress.address,
+      },
+      payload: {
+        thread_id: threadId,
+        parent_id: parentCommentId,
+        body: content,
+      },
+    });
+
+    // Mark the token as used and store the comment_id
+    await models.AICompletionToken.update(
+      { used_at: new Date(), comment_id: result!.id },
+      { where: { id: tokenRecord.id } },
+    );
+
+    log.info('AI comment created successfully', {
+      commentId: result!.id,
+      tokenId: tokenRecord.id,
+    });
+
+    return { success: true, commentId: result!.id };
+  } catch (error) {
+    log.error('Failed to create AI comment', error as Error);
+    return { success: false, error: 'Failed to create AI comment' };
+  }
+}
 
 /**
  * Request body for AI completion - uses entity IDs for secure context building
@@ -115,27 +231,80 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     } = req.body as AICompletionRequestBody;
 
     // Validate required fields
+    const userId = (req.user as any)?.id;
+    if (!userId) {
+      return res.status(401).json({
+        error: 'User authentication required',
+      });
+    }
+
     if (!communityId) {
       return res.status(400).json({
         error: 'communityId is required',
       });
     }
-
-    if (!completionType) {
-      return res.status(400).json({
-        error: 'completionType is required',
-      });
-    }
-
     // Validate completion type (ThreadTitle is not supported - use client-side extraction)
     const validCompletionTypes = [
       AICompletionType.Thread,
       AICompletionType.Comment,
       AICompletionType.Poll,
     ];
-    if (!validCompletionTypes.includes(completionType)) {
+    if (!completionType || !validCompletionTypes.includes(completionType)) {
       return res.status(400).json({
         error: `Invalid completionType. Must be one of: ${validCompletionTypes.join(', ')}`,
+      });
+    }
+
+    // For Comment completions, validate user and parent comment ownership BEFORE streaming
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let parentCommentThreadId: number | undefined;
+
+    if (completionType === AICompletionType.Comment) {
+      if (!parentCommentId) {
+        return res.status(400).json({
+          error: 'parentCommentId is required for Comment completions',
+        });
+      }
+
+      // Fetch the parent comment to verify ownership
+      const parentComment = await models.Comment.findByPk(parentCommentId);
+      if (!parentComment) {
+        return res.status(404).json({
+          error: 'Parent comment not found',
+        });
+      }
+
+      // Fetch the thread to verify community
+      const thread = await models.Thread.findByPk(parentComment.thread_id);
+      if (!thread) {
+        return res.status(404).json({
+          error: 'Thread not found for parent comment',
+        });
+      }
+
+      // Verify the comment belongs to the specified community
+      if (thread.community_id !== communityId) {
+        return res.status(400).json({
+          error: 'Parent comment does not belong to the specified community',
+        });
+      }
+
+      // Fetch the comment author's address to verify ownership
+      const commentAuthorAddress = await models.Address.findByPk(
+        parentComment.address_id,
+      );
+
+      if (commentAuthorAddress?.user_id !== userId) {
+        return res.status(403).json({
+          error: 'Parent comment must be created by the requesting user',
+        });
+      }
+
+      parentCommentThreadId = parentComment.thread_id;
+      log.info(`[${requestId}] Validated parent comment ownership`, {
+        parentCommentId,
+        userId,
+        threadId: parentCommentThreadId,
       });
     }
 
@@ -379,6 +548,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
 
         let chunkCount = 0;
         let totalContentLength = 0;
+        let accumulatedText = '';
 
         for await (const chunk of streamResponse) {
           chunkCount++;
@@ -387,6 +557,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
 
           if (contentToStream) {
             totalContentLength += contentToStream.length;
+            accumulatedText += contentToStream;
 
             try {
               res.write(contentToStream);
@@ -405,6 +576,33 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           totalChunks: chunkCount,
           totalContentLength,
         });
+
+        // For Comment completions, create the AI comment directly (ownership was validated earlier)
+        if (
+          completionType === AICompletionType.Comment &&
+          parentCommentId &&
+          parentCommentThreadId &&
+          userId &&
+          accumulatedText
+        ) {
+          const commentResult = await createAIComment(
+            userId,
+            communityId,
+            parentCommentThreadId,
+            parentCommentId,
+            accumulatedText,
+          );
+
+          if (commentResult.success) {
+            log.info(`[${requestId}] Created AI comment`, {
+              commentId: commentResult.commentId,
+            });
+          } else {
+            log.error(
+              `[${requestId}] Failed to create AI comment: ${commentResult.error}`,
+            );
+          }
+        }
 
         res.end();
       } catch (streamError: unknown) {
@@ -464,12 +662,47 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
         };
         const annotations = messageForResponse?.annotations;
 
-        const responsePayload: { completion: string; annotations?: unknown } = {
+        const responsePayload: {
+          completion: string;
+          annotations?: unknown;
+          commentCreated?: boolean;
+          commentId?: number;
+        } = {
           completion: responseText,
         };
         if (annotations) {
           responsePayload.annotations = annotations;
         }
+
+        // For Comment completions, create the AI comment directly (ownership was validated earlier)
+        if (
+          completionType === AICompletionType.Comment &&
+          parentCommentId &&
+          parentCommentThreadId &&
+          userId &&
+          responseText
+        ) {
+          const commentResult = await createAIComment(
+            userId,
+            communityId,
+            parentCommentThreadId,
+            parentCommentId,
+            responseText,
+          );
+
+          if (commentResult.success) {
+            responsePayload.commentCreated = true;
+            responsePayload.commentId = commentResult.commentId;
+            log.info(`[${requestId}] Created AI comment`, {
+              commentId: commentResult.commentId,
+            });
+          } else {
+            log.error(
+              `[${requestId}] Failed to create AI comment: ${commentResult.error}`,
+            );
+          }
+        }
+
         res.json(responsePayload);
       } catch (completionError: unknown) {
         const orError = extractOpenRouterError(completionError);

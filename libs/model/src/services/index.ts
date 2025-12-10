@@ -1,3 +1,4 @@
+export * from '../utils/botUser';
 export * from './aiPrompts';
 export * from './evmChainEvents';
 export * from './graphileWorker';
