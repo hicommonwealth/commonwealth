@@ -23,7 +23,17 @@ export const useGetLaunchpadPriceQuery = (
     : null;
 
   return useQuery({
-    queryKey: ['launchpadPrice', tokenAddress, amountIn, isBuy, contract],
+    // contract is derived from ethChainId, rpc, and contractAddress (all in queryKey)
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: [
+      'launchpadPrice',
+      ethChainId,
+      rpc,
+      contractAddress,
+      tokenAddress,
+      amountIn,
+      isBuy,
+    ],
     staleTime: PRICE_STALE_TIME,
     enabled: !!contract && !!tokenAddress && enabled,
     queryFn: async () => {
