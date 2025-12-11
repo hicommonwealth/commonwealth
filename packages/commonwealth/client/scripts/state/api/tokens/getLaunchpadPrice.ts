@@ -20,17 +20,34 @@ export const useGetLaunchpadPriceQuery = (
       ethChainId,
     )
   ) {
-    const contractAddress = getFactoryContract(ethChainId).LPBondingCurve;
+    const contractAddress = tokenAddress
+      ? getFactoryContract(ethChainId).LPBondingCurve
+      : null;
     const web3 = new Web3(rpc);
-    contract = new web3.eth.Contract(LPBondingCurveAbi, contractAddress);
+    contract = contractAddress
+      ? new web3.eth.Contract(LPBondingCurveAbi, contractAddress)
+      : null;
   }
+
   return useQuery({
-    queryKey: ['launchpadPrice', tokenAddress, amountIn, isBuy],
+    // contract is derived from ethChainId, rpc, and contractAddress (all in queryKey)
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: [
+      'launchpadPrice',
+      ethChainId,
+      rpc,
+      tokenAddress,
+      amountIn,
+      isBuy,
+    ],
     staleTime: PRICE_STALE_TIME,
     enabled: !!contract && !!tokenAddress && enabled,
     queryFn: async () => {
-      const price = contract.methods.getPrice(tokenAddress, amountIn, isBuy);
-      return (await price.call()) as bigint;
+      const price =
+        contract &&
+        contract.methods &&
+        contract.methods.getPrice(tokenAddress, amountIn, isBuy);
+      return (await price?.call()) as bigint | undefined;
     },
   });
 };
