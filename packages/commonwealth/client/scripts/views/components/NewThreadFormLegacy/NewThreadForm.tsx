@@ -401,7 +401,7 @@ export const NewThreadForm = forwardRef<
     const { data: launchpadPriceEth } = useGetLaunchpadPriceQuery(
       chainRpc,
       ethChainId,
-      communityToken!.token_address || '',
+      communityToken?.token_address || '',
       !!externalUsdPrice && !isLoadingETHToCurrencyRate,
     );
 
