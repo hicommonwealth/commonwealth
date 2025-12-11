@@ -3,6 +3,7 @@ import {
   DEFAULT_COMPLETION_MODEL,
   MCP_MENTION_SYMBOL,
   getWhitelistedTools,
+  sanitizeContent,
 } from '@hicommonwealth/shared';
 import OpenAI from 'openai';
 import { z } from 'zod';
@@ -25,6 +26,11 @@ function filterServersWithWhitelist(
         ...server,
         tools: [],
       };
+    }
+
+    // If wildcard '*' is set, allow all tools
+    if (whitelistedTools === '*') {
+      return server;
     }
 
     // Filter the server's tools to only include whitelisted ones
@@ -87,7 +93,7 @@ export function buildMCPClientOptions(
     model: DEFAULT_COMPLETION_MODEL,
     instructions: buildSystemPrompt(filteredServers),
     tools: mcpTools,
-    input: userInput,
+    input: sanitizeContent(userInput),
     previous_response_id: previousResponseId,
     stream: true,
   };

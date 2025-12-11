@@ -202,6 +202,11 @@ async function handleMCPCompletion(
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('X-Accel-Buffering', 'no');
 
+    console.log(
+      '[aiCompletionHandler] MCP options',
+      JSON.stringify(mcpOptions, null, 2),
+    );
+
     const response = await openai.responses.create(mcpOptions);
     let chunkCount = 0;
     let totalContentLength = 0;
