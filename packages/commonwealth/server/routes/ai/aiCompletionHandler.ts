@@ -1,19 +1,11 @@
-import { command, logger } from '@hicommonwealth/core';
-import { Comment, Community, extractMCPMentions } from '@hicommonwealth/model';
+import { logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model/db';
-import { systemActor } from '@hicommonwealth/model/middleware';
 import {
   AICompletionType,
   buildContextFromEntityIds,
   buildMCPClientOptions,
   CommonMCPServerWithHeaders,
   formatContextForPrompt,
-  generateCommentPrompt,
-  generatePollPrompt,
-  generateThreadPrompt,
-  getBotUser,
-  StructuredPrompt,
-  withMCPAuthUsername,
 } from '@hicommonwealth/model/services';
 import {
   CompletionModel,
@@ -21,178 +13,28 @@ import {
 } from '@hicommonwealth/shared';
 import { Request, Response } from 'express';
 import { OpenAI } from 'openai';
-import { config } from '../../config';
+import {
+  createOpenAIClient,
+  generatePromptForType,
+  getApiKey,
+  getOpenRouterHeaders,
+  selectModel,
+  shouldUseOpenRouter,
+} from './completionUtils';
+import { createAIComment } from './createAIComment';
+import { getMentionedMCPServers } from './mcpUtils';
 import { extractOpenRouterError } from './utils';
 
-const DEFAULT_TOKEN_EXPIRATION_MINUTES = 60; // 1 hour (for audit token record)
-
-interface AICommentCreationResult {
-  success: boolean;
-  commentId?: number;
-  comment?: Record<string, unknown>;
-  error?: string;
-}
-
-/**
- * Creates an AI-generated comment as the bot user
- * This handles: getting bot user, joining community if needed, creating the comment, and storing the token
- */
-async function createAIComment(
-  userId: number,
-  communityId: string,
-  threadId: number,
-  parentCommentId: number,
-  content: string,
-): Promise<AICommentCreationResult> {
-  try {
-    // Calculate expiration time for token record
-    const expires_at = new Date();
-    expires_at.setMinutes(
-      expires_at.getMinutes() + DEFAULT_TOKEN_EXPIRATION_MINUTES,
-    );
-
-    // Create the token record first (for audit trail)
-    const tokenRecord = await models.AICompletionToken.create({
-      user_id: userId,
-      community_id: communityId,
-      thread_id: threadId,
-      parent_comment_id: parentCommentId,
-      content,
-      expires_at,
-    });
-
-    // Get the bot user with address
-    const botUserData = await getBotUser();
-    if (!botUserData) {
-      log.error('Bot user not found for AI comment creation');
-      return { success: false, error: 'Bot user not configured' };
-    }
-    const { user: botUser, address: botUserAddress } = botUserData;
-
-    // Find the bot user's address in the specific community
-    let botAddress = await models.Address.findOne({
-      where: {
-        user_id: botUser.id,
-        community_id: communityId,
-      },
-    });
-
-    if (!botAddress) {
-      // Join community using the bot's primary address
-      const botActor = systemActor({
-        address: botUserAddress.address,
-        id: botUser.id!,
-        email: botUser.email || 'ai-bot@common.xyz',
-      });
-
-      await command(Community.JoinCommunity(), {
-        actor: botActor,
-        payload: { community_id: communityId },
-      });
-
-      // Fetch the newly created address
-      botAddress = await models.Address.findOne({
-        where: {
-          user_id: botUser.id,
-          community_id: communityId,
-        },
-      });
-
-      if (!botAddress) {
-        log.error(`Failed to create bot address in community: ${communityId}`);
-        return { success: false, error: 'Failed to join community as bot' };
-      }
-    }
-
-    // Create comment as bot user
-    const result = await command(Comment.CreateComment(), {
-      actor: {
-        user: {
-          id: botUser.id!,
-          email: botUser.email!,
-        },
-        address: botAddress.address,
-      },
-      payload: {
-        thread_id: threadId,
-        parent_id: parentCommentId,
-        body: content,
-      },
-    });
-
-    // Mark the token as used and store the comment_id
-    await models.AICompletionToken.update(
-      { used_at: new Date(), comment_id: result!.id },
-      { where: { id: tokenRecord.id } },
-    );
-
-    // Fetch the full comment with associated data for the UI
-    const fullComment = await models.Comment.findOne({
-      where: { id: result!.id },
-      include: [
-        {
-          model: models.Address,
-          include: [
-            {
-              model: models.User,
-              as: 'User',
-              attributes: ['id', 'profile'],
-            },
-          ],
-        },
-      ],
-    });
-
-    // Build the comment view object that matches CommentsView schema
-    const commentView = fullComment
-      ? {
-          ...fullComment.toJSON(),
-          community_id: communityId,
-          address: fullComment.Address?.address || botAddress.address,
-          profile_name:
-            (fullComment.Address?.User as { profile?: { name?: string } })
-              ?.profile?.name || 'AI Assistant',
-          avatar_url:
-            (
-              fullComment.Address?.User as {
-                profile?: { avatar_url?: string };
-              }
-            )?.profile?.avatar_url || null,
-          user_id: botUser.id,
-          reactions: [],
-        }
-      : null;
-
-    log.info('AI comment created successfully', {
-      commentId: result!.id,
-      tokenId: tokenRecord.id,
-    });
-
-    return {
-      success: true,
-      commentId: result!.id,
-      comment: commentView as unknown as Record<string, unknown>,
-    };
-  } catch (error) {
-    log.error('Failed to create AI comment', error as Error);
-    return { success: false, error: 'Failed to create AI comment' };
-  }
-}
+const log = logger(import.meta);
 
 /**
  * Request body for AI completion - uses entity IDs for secure context building
  */
 interface AICompletionRequestBody {
-  // Required
   communityId: string;
   completionType: AICompletionType;
-
-  // Entity IDs for context building (verified server-side)
-  // Thread ID is inferred from the parent comment's thread
   parentCommentId?: number;
   topicId?: number;
-
-  // Model configuration
   model?: CompletionModel;
   temperature?: number;
   maxTokens?: number;
@@ -201,55 +43,459 @@ interface AICompletionRequestBody {
   useWebSearch?: boolean;
 }
 
-const log = logger(import.meta);
-
 /**
- * Gets all community-enabled MCP servers for a community
+ * Validates the request body and returns parsed values or an error response
  */
-async function getAllMCPServers(
-  communityId: string,
-): Promise<CommonMCPServerWithHeaders[]> {
-  const mcpServers = await models.MCPServer.scope('withPrivateData').findAll({
-    include: [
-      {
-        model: models.MCPServerCommunity,
-        where: { community_id: communityId },
-        attributes: [],
-      },
-      {
-        model: models.User,
-        as: 'AuthUser',
-        attributes: ['id', 'profile'],
-        required: false,
-      },
-    ],
-  });
+async function validateRequest(
+  req: Request,
+  res: Response,
+): Promise<
+  | {
+      valid: false;
+    }
+  | {
+      valid: true;
+      userId: number;
+      communityId: string;
+      completionType: AICompletionType;
+      parentCommentId?: number;
+      parentCommentThreadId?: number;
+      parentCommentBody?: string;
+      topicId?: number;
+      model: CompletionModel;
+      temperature?: number;
+      maxTokens: number;
+      stream: boolean;
+      useOpenRouter: boolean;
+      useWebSearch: boolean;
+    }
+> {
+  const {
+    communityId,
+    completionType,
+    parentCommentId,
+    topicId,
+    model = DEFAULT_COMPLETION_MODEL,
+    temperature,
+    maxTokens = 1000,
+    stream = true,
+    useOpenRouter = false,
+    useWebSearch = false,
+  } = req.body as AICompletionRequestBody;
 
-  return mcpServers.map((server) => ({
-    ...withMCPAuthUsername(server),
-    headers: {},
-  }));
+  // Validate user authentication
+  const userId = (req.user as { id?: number })?.id;
+  if (!userId) {
+    res.status(401).json({ error: 'User authentication required' });
+    return { valid: false };
+  }
+
+  // Validate community ID
+  if (!communityId) {
+    res.status(400).json({ error: 'communityId is required' });
+    return { valid: false };
+  }
+
+  // Validate completion type
+  const validCompletionTypes = [
+    AICompletionType.Thread,
+    AICompletionType.Comment,
+    AICompletionType.Poll,
+  ];
+  if (!completionType || !validCompletionTypes.includes(completionType)) {
+    res.status(400).json({
+      error: `Invalid completionType. Must be one of: ${validCompletionTypes.join(', ')}`,
+    });
+    return { valid: false };
+  }
+
+  // For Comment completions, validate parent comment ownership
+  let parentCommentThreadId: number | undefined;
+  let parentCommentBody: string | undefined;
+
+  if (completionType === AICompletionType.Comment) {
+    if (!parentCommentId) {
+      res.status(400).json({
+        error: 'parentCommentId is required for Comment completions',
+      });
+      return { valid: false };
+    }
+
+    const parentComment = await models.Comment.findByPk(parentCommentId);
+    if (!parentComment) {
+      res.status(404).json({ error: 'Parent comment not found' });
+      return { valid: false };
+    }
+
+    const thread = await models.Thread.findByPk(parentComment.thread_id);
+    if (!thread) {
+      res.status(404).json({ error: 'Thread not found for parent comment' });
+      return { valid: false };
+    }
+
+    if (thread.community_id !== communityId) {
+      res.status(400).json({
+        error: 'Parent comment does not belong to the specified community',
+      });
+      return { valid: false };
+    }
+
+    const commentAuthorAddress = await models.Address.findByPk(
+      parentComment.address_id,
+    );
+    if (commentAuthorAddress?.user_id !== userId) {
+      res.status(403).json({
+        error: 'Parent comment must be created by the requesting user',
+      });
+      return { valid: false };
+    }
+
+    parentCommentThreadId = parentComment.thread_id;
+    parentCommentBody = parentComment.body;
+  }
+
+  return {
+    valid: true,
+    userId,
+    communityId,
+    completionType,
+    parentCommentId,
+    parentCommentThreadId,
+    parentCommentBody,
+    topicId,
+    model,
+    temperature,
+    maxTokens,
+    stream,
+    useOpenRouter,
+    useWebSearch,
+  };
 }
 
 /**
- * Generates prompt based on completion type and context
+ * Handles MCP-based completion (streaming and non-streaming)
  */
-function generatePromptForType(
+async function handleMCPCompletion(
+  requestId: string,
+  res: Response,
+  openai: OpenAI,
+  mcpServers: CommonMCPServerWithHeaders[],
+  userPrompt: string,
+  model: CompletionModel,
+  stream: boolean,
   completionType: AICompletionType,
-  contextString: string,
-): StructuredPrompt {
-  switch (completionType) {
-    case AICompletionType.Thread:
-      return generateThreadPrompt(contextString);
-    case AICompletionType.Comment:
-      return generateCommentPrompt(contextString);
-    case AICompletionType.Poll:
-      return generatePollPrompt(contextString);
-    default:
-      throw new Error(`Unknown completion type: ${completionType}`);
+  userId: number,
+  communityId: string,
+  parentCommentId?: number,
+  parentCommentThreadId?: number,
+): Promise<void> {
+  const mcpOptions = buildMCPClientOptions(userPrompt, mcpServers, null);
+  mcpOptions.model = model;
+  mcpOptions.stream = true;
+
+  log.info(
+    `[${requestId}] Creating MCP response with model: ${mcpOptions.model}`,
+  );
+
+  if (stream) {
+    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('X-Accel-Buffering', 'no');
+
+    const response = await openai.responses.create(mcpOptions);
+    let chunkCount = 0;
+    let totalContentLength = 0;
+    let accumulatedText = '';
+
+    for await (const event of response) {
+      chunkCount++;
+      if (event.type === 'response.output_text.delta') {
+        const contentToStream = event.delta || '';
+        if (contentToStream) {
+          totalContentLength += contentToStream.length;
+          accumulatedText += contentToStream;
+          res.write(contentToStream);
+          if (res.flush) res.flush();
+        }
+      }
+    }
+
+    log.info(`[${requestId}] MCP streaming completed`, {
+      totalChunks: chunkCount,
+      totalContentLength,
+    });
+
+    // Create AI comment for Comment completions
+    if (
+      completionType === AICompletionType.Comment &&
+      parentCommentId &&
+      parentCommentThreadId &&
+      accumulatedText
+    ) {
+      const commentResult = await createAIComment(
+        userId,
+        communityId,
+        parentCommentThreadId,
+        parentCommentId,
+        accumulatedText,
+      );
+
+      if (commentResult.success && commentResult.comment) {
+        log.info(`[${requestId}] Created AI comment via MCP path`, {
+          commentId: commentResult.commentId,
+        });
+        res.write('\n__COMMENT_PAYLOAD__\n');
+        res.write(JSON.stringify(commentResult.comment));
+      } else {
+        log.error(
+          `[${requestId}] Failed to create AI comment via MCP path: ${commentResult.error}`,
+        );
+      }
+    }
+
+    res.end();
+  } else {
+    const response = await openai.responses.create(mcpOptions);
+    let responseText = '';
+
+    for await (const event of response) {
+      if (event.type === 'response.output_text.delta') {
+        responseText += event.delta || '';
+      }
+    }
+
+    const responsePayload: {
+      completion: string;
+      commentCreated?: boolean;
+      commentId?: number;
+    } = {
+      completion:
+        responseText || 'I apologize, but I was unable to generate a response.',
+    };
+
+    if (
+      completionType === AICompletionType.Comment &&
+      parentCommentId &&
+      parentCommentThreadId &&
+      responseText
+    ) {
+      const commentResult = await createAIComment(
+        userId,
+        communityId,
+        parentCommentThreadId,
+        parentCommentId,
+        responseText,
+      );
+
+      if (commentResult.success) {
+        responsePayload.commentCreated = true;
+        responsePayload.commentId = commentResult.commentId;
+        log.info(`[${requestId}] Created AI comment via MCP path`, {
+          commentId: commentResult.commentId,
+        });
+      } else {
+        log.error(
+          `[${requestId}] Failed to create AI comment via MCP path: ${commentResult.error}`,
+        );
+      }
+    }
+
+    res.json(responsePayload);
   }
 }
 
+/**
+ * Handles standard streaming completion
+ */
+async function handleStreamingCompletion(
+  requestId: string,
+  res: Response,
+  openai: OpenAI,
+  modelId: string,
+  systemPrompt: string,
+  userPrompt: string,
+  temperature: number | undefined,
+  maxTokens: number,
+  useOpenRouter: boolean,
+  addOpenAiWebSearchOptions: boolean,
+  completionType: AICompletionType,
+  userId: number,
+  communityId: string,
+  parentCommentId?: number,
+  parentCommentThreadId?: number,
+): Promise<void> {
+  res.setHeader('Content-Type', 'text/plain');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('X-Accel-Buffering', 'no');
+
+  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
+  if (systemPrompt) {
+    messages.push({ role: 'system', content: systemPrompt });
+  }
+  messages.push({ role: 'user', content: userPrompt });
+
+  const streamConfig: OpenAI.Chat.ChatCompletionCreateParamsStreaming = {
+    model: modelId,
+    messages,
+    temperature,
+    max_tokens: maxTokens,
+    stream: true,
+    ...(useOpenRouter && { extra_headers: getOpenRouterHeaders() }),
+    ...(!useOpenRouter &&
+      addOpenAiWebSearchOptions && { web_search_options: {} }),
+  };
+
+  log.info(`[${requestId}] Starting OpenAI streaming request`, {
+    model: streamConfig.model,
+    maxTokens: streamConfig.max_tokens,
+    messageCount: messages.length,
+  });
+
+  const streamResponse = await openai.chat.completions.create(streamConfig);
+
+  let chunkCount = 0;
+  let totalContentLength = 0;
+  let accumulatedText = '';
+
+  for await (const chunk of streamResponse) {
+    chunkCount++;
+    const choice = chunk.choices?.[0];
+    const contentToStream = choice?.delta?.content || '';
+
+    if (contentToStream) {
+      totalContentLength += contentToStream.length;
+      accumulatedText += contentToStream;
+      res.write(contentToStream);
+      if (res.flush) res.flush();
+    }
+  }
+
+  log.info(`[${requestId}] Streaming completed successfully`, {
+    totalChunks: chunkCount,
+    totalContentLength,
+  });
+
+  // Create AI comment for Comment completions
+  if (
+    completionType === AICompletionType.Comment &&
+    parentCommentId &&
+    parentCommentThreadId &&
+    accumulatedText
+  ) {
+    const commentResult = await createAIComment(
+      userId,
+      communityId,
+      parentCommentThreadId,
+      parentCommentId,
+      accumulatedText,
+    );
+
+    if (commentResult.success && commentResult.comment) {
+      log.info(`[${requestId}] Created AI comment`, {
+        commentId: commentResult.commentId,
+      });
+      res.write('\n__COMMENT_PAYLOAD__\n');
+      res.write(JSON.stringify(commentResult.comment));
+    } else {
+      log.error(
+        `[${requestId}] Failed to create AI comment: ${commentResult.error}`,
+      );
+    }
+  }
+
+  res.end();
+}
+
+/**
+ * Handles standard non-streaming completion
+ */
+async function handleNonStreamingCompletion(
+  requestId: string,
+  res: Response,
+  openai: OpenAI,
+  modelId: string,
+  systemPrompt: string,
+  userPrompt: string,
+  temperature: number | undefined,
+  maxTokens: number,
+  useOpenRouter: boolean,
+  addOpenAiWebSearchOptions: boolean,
+  completionType: AICompletionType,
+  userId: number,
+  communityId: string,
+  parentCommentId?: number,
+  parentCommentThreadId?: number,
+): Promise<void> {
+  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
+  if (systemPrompt) {
+    messages.push({ role: 'system', content: systemPrompt });
+  }
+  messages.push({ role: 'user', content: userPrompt });
+
+  const completion = await openai.chat.completions.create({
+    model: modelId,
+    messages,
+    temperature,
+    max_tokens: maxTokens,
+    ...(useOpenRouter && { extra_headers: getOpenRouterHeaders() }),
+    ...(!useOpenRouter &&
+      addOpenAiWebSearchOptions && { web_search_options: {} }),
+  });
+
+  const responseText = completion.choices[0]?.message?.content || '';
+  const messageForResponse = completion.choices[0]
+    ?.message as OpenAI.Chat.ChatCompletionMessage & {
+    annotations?: unknown;
+  };
+  const annotations = messageForResponse?.annotations;
+
+  const responsePayload: {
+    completion: string;
+    annotations?: unknown;
+    commentCreated?: boolean;
+    commentId?: number;
+  } = {
+    completion: responseText,
+  };
+
+  if (annotations) {
+    responsePayload.annotations = annotations;
+  }
+
+  // Create AI comment for Comment completions
+  if (
+    completionType === AICompletionType.Comment &&
+    parentCommentId &&
+    parentCommentThreadId &&
+    responseText
+  ) {
+    const commentResult = await createAIComment(
+      userId,
+      communityId,
+      parentCommentThreadId,
+      parentCommentId,
+      responseText,
+    );
+
+    if (commentResult.success) {
+      responsePayload.commentCreated = true;
+      responsePayload.commentId = commentResult.commentId;
+      log.info(`[${requestId}] Created AI comment`, {
+        commentId: commentResult.commentId,
+      });
+    } else {
+      log.error(
+        `[${requestId}] Failed to create AI comment: ${commentResult.error}`,
+      );
+    }
+  }
+
+  res.json(responsePayload);
+}
+
+/**
+ * Main AI completion handler
+ */
 export const aiCompletionHandler = async (req: Request, res: Response) => {
   const requestId = Math.random().toString(36).substr(2, 9);
   log.info(`[${requestId}] AI completion request started`, {
@@ -259,101 +505,35 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
   });
 
   try {
+    // Validate request
+    const validation = await validateRequest(req, res);
+    if (!validation.valid) {
+      return;
+    }
+
     const {
+      userId,
       communityId,
       completionType,
       parentCommentId,
+      parentCommentThreadId,
+      parentCommentBody,
       topicId,
-      model = DEFAULT_COMPLETION_MODEL,
+      model,
       temperature,
-      maxTokens = 1000,
-      stream = true,
-      useOpenRouter = false,
-      useWebSearch = false,
-    } = req.body as AICompletionRequestBody;
+      maxTokens,
+      stream,
+      useOpenRouter,
+      useWebSearch,
+    } = validation;
 
-    // Validate required fields
-    const userId = (req.user as any)?.id;
-    if (!userId) {
-      return res.status(401).json({
-        error: 'User authentication required',
-      });
-    }
+    log.info(`[${requestId}] Validated parent comment ownership`, {
+      parentCommentId,
+      userId,
+      threadId: parentCommentThreadId,
+    });
 
-    if (!communityId) {
-      return res.status(400).json({
-        error: 'communityId is required',
-      });
-    }
-    // Validate completion type (ThreadTitle is not supported - use client-side extraction)
-    const validCompletionTypes = [
-      AICompletionType.Thread,
-      AICompletionType.Comment,
-      AICompletionType.Poll,
-    ];
-    if (!completionType || !validCompletionTypes.includes(completionType)) {
-      return res.status(400).json({
-        error: `Invalid completionType. Must be one of: ${validCompletionTypes.join(', ')}`,
-      });
-    }
-
-    // For Comment completions, validate user and parent comment ownership BEFORE streaming
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let parentCommentThreadId: number | undefined;
-    let parentCommentBody: string | undefined;
-
-    if (completionType === AICompletionType.Comment) {
-      if (!parentCommentId) {
-        return res.status(400).json({
-          error: 'parentCommentId is required for Comment completions',
-        });
-      }
-
-      // Fetch the parent comment to verify ownership
-      const parentComment = await models.Comment.findByPk(parentCommentId);
-      if (!parentComment) {
-        return res.status(404).json({
-          error: 'Parent comment not found',
-        });
-      }
-
-      // Fetch the thread to verify community
-      const thread = await models.Thread.findByPk(parentComment.thread_id);
-      if (!thread) {
-        return res.status(404).json({
-          error: 'Thread not found for parent comment',
-        });
-      }
-
-      // Verify the comment belongs to the specified community
-      if (thread.community_id !== communityId) {
-        return res.status(400).json({
-          error: 'Parent comment does not belong to the specified community',
-        });
-      }
-
-      // Fetch the comment author's address to verify ownership
-      const commentAuthorAddress = await models.Address.findByPk(
-        parentComment.address_id,
-      );
-
-      if (commentAuthorAddress?.user_id !== userId) {
-        return res.status(403).json({
-          error: 'Parent comment must be created by the requesting user',
-        });
-      }
-
-      parentCommentThreadId = parentComment.thread_id;
-      parentCommentBody = parentComment.body;
-      log.info(`[${requestId}] Validated parent comment ownership`, {
-        parentCommentId,
-        userId,
-        threadId: parentCommentThreadId,
-      });
-    }
-
-    // Build context from entity IDs (this verifies they belong to the community)
-    // Thread ID is inferred from the parent comment's thread
+    // Build context from entity IDs
     let contextData;
     try {
       contextData = await buildContextFromEntityIds(communityId, {
@@ -370,10 +550,8 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       });
     }
 
-    // Format context for prompt
+    // Generate prompts
     const contextString = formatContextForPrompt(contextData);
-
-    // Generate prompts based on completion type
     const { systemPrompt, userPrompt } = generatePromptForType(
       completionType,
       contextString,
@@ -385,82 +563,41 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       userPromptLength: userPrompt.length,
     });
 
-    // Check for MCP servers in the community (for potential future MCP integration)
-    let mentionedMCPServers: CommonMCPServerWithHeaders[] = [];
+    // Check for MCP server mentions
+    const mentionedMCPServers = await getMentionedMCPServers(
+      communityId,
+      parentCommentBody,
+      requestId,
+    );
 
-    // Extract MCP mentions from parent comment and match against available servers
-    if (parentCommentBody) {
-      const extractedMentions = extractMCPMentions(parentCommentBody);
-      if (extractedMentions.length > 0) {
-        const allServers = await getAllMCPServers(communityId);
-        mentionedMCPServers = allServers.filter((server) =>
-          extractedMentions.some(
-            (mention) =>
-              mention.handle === server.handle &&
-              mention.id === String(server.id),
-          ),
-        );
-        if (mentionedMCPServers.length > 0) {
-          log.info(
-            `[${requestId}] Found ${mentionedMCPServers.length} mentioned MCP servers`,
-            {
-              serverHandles: mentionedMCPServers.map((s) => s.handle),
-            },
-          );
-        }
-      }
-    }
+    // Determine provider (MCP requires OpenAI)
+    const useOR = shouldUseOpenRouter(
+      useOpenRouter,
+      mentionedMCPServers.length > 0,
+    );
 
     // MCP path only supports OpenAI
-    if (
-      mentionedMCPServers.length > 0 &&
-      (useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true')
-    ) {
+    if (mentionedMCPServers.length > 0 && useOR) {
       return res.status(400).json({
         error: 'MCP features are only available with OpenAI, not OpenRouter',
       });
     }
 
-    // Choose between OpenAI and OpenRouter (if MCP servers are mentioned, use OpenAI)
-    const useOR =
-      mentionedMCPServers.length > 0
-        ? false
-        : useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true';
-
-    const apiKey = useOR
-      ? config.OPENAI.OPENROUTER_API_KEY
-      : config.OPENAI.API_KEY;
-
+    // Validate API key
+    const apiKey = getApiKey(useOR);
     if (!apiKey) {
       return res.status(500).json({
         error: `${useOR ? 'OpenRouter' : 'OpenAI'} API key not configured`,
       });
     }
 
-    // Model selection logic based on useWebSearch flag
-    let modelId: string = model;
-    let addOpenAiWebSearchOptions = false;
-
-    if (useOR) {
-      if (useWebSearch) {
-        modelId = `${model}:online`;
-      }
-    } else {
-      if (useWebSearch) {
-        if (model === 'gpt-4o') {
-          modelId = 'gpt-4o-search-preview';
-          addOpenAiWebSearchOptions = true;
-        } else if (model === 'gpt-4o-mini') {
-          modelId = 'gpt-4o-mini-search-preview';
-          addOpenAiWebSearchOptions = true;
-        } else {
-          return res.status(400).json({
-            error:
-              'Web search is only supported for gpt-4o and gpt-4o-mini with OpenAI',
-          });
-        }
-      }
+    // Select model based on configuration
+    const modelSelection = selectModel(model, useOR, useWebSearch);
+    if (modelSelection.error) {
+      return res.status(400).json({ error: modelSelection.error });
     }
+
+    const { modelId, addOpenAiWebSearchOptions } = modelSelection;
 
     log.info(`AI completion request:
       \n modelId=${modelId},
@@ -468,17 +605,8 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       \n webSearch=${!!useWebSearch}
       \n completionType=${completionType}`);
 
-    // Initialize OpenAI client
-    const openAIConfig = {
-      apiKey,
-      ...(useOR && { baseURL: 'https://openrouter.ai/api/v1' }),
-      ...(config.OPENAI.ORGANIZATION &&
-        !useOR && {
-          organization: config.OPENAI.ORGANIZATION,
-        }),
-    };
-
-    const openai = new OpenAI(openAIConfig);
+    // Create OpenAI client
+    const openai = createOpenAIClient(useOR);
 
     // Handle MCP path
     if (mentionedMCPServers.length > 0) {
@@ -487,143 +615,21 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       );
 
       try {
-        const mcpOptions = buildMCPClientOptions(
-          userPrompt,
+        await handleMCPCompletion(
+          requestId,
+          res,
+          openai,
           mentionedMCPServers,
-          null,
+          userPrompt,
+          model,
+          stream,
+          completionType,
+          userId,
+          communityId,
+          parentCommentId,
+          parentCommentThreadId,
         );
-
-        mcpOptions.model = model || DEFAULT_COMPLETION_MODEL;
-        mcpOptions.stream = true;
-
-        log.info(
-          `[${requestId}] Creating MCP response with model: ${mcpOptions.model}`,
-        );
-
-        if (stream) {
-          res.setHeader('Content-Type', 'text/plain');
-          res.setHeader('Cache-Control', 'no-cache');
-          res.setHeader('X-Accel-Buffering', 'no');
-
-          const response = await openai.responses.create(mcpOptions);
-
-          let chunkCount = 0;
-          let totalContentLength = 0;
-          let accumulatedText = '';
-
-          for await (const event of response) {
-            chunkCount++;
-
-            if (event.type === 'response.output_text.delta') {
-              const contentToStream = event.delta || '';
-
-              if (contentToStream) {
-                totalContentLength += contentToStream.length;
-                accumulatedText += contentToStream;
-
-                try {
-                  res.write(contentToStream);
-                  if (res.flush) res.flush();
-                } catch (writeError) {
-                  log.error(
-                    `[${requestId}] Error writing MCP chunk:`,
-                    writeError,
-                  );
-                  throw writeError;
-                }
-              }
-            }
-          }
-
-          log.info(`[${requestId}] MCP streaming completed`, {
-            totalChunks: chunkCount,
-            totalContentLength,
-          });
-
-          // For Comment completions, create the AI comment and send JSON payload
-          if (
-            completionType === AICompletionType.Comment &&
-            parentCommentId &&
-            parentCommentThreadId &&
-            userId &&
-            accumulatedText
-          ) {
-            const commentResult = await createAIComment(
-              userId,
-              communityId,
-              parentCommentThreadId,
-              parentCommentId,
-              accumulatedText,
-            );
-
-            if (commentResult.success && commentResult.comment) {
-              log.info(`[${requestId}] Created AI comment via MCP path`, {
-                commentId: commentResult.commentId,
-              });
-              // Send delimiter and JSON payload for the created comment
-              res.write('\n__COMMENT_PAYLOAD__\n');
-              res.write(JSON.stringify(commentResult.comment));
-            } else {
-              log.error(
-                `[${requestId}] Failed to create AI comment via MCP path: ${commentResult.error}`,
-              );
-            }
-          }
-
-          res.end();
-          return;
-        } else {
-          const response = await openai.responses.create(mcpOptions);
-
-          let responseText = '';
-          for await (const event of response) {
-            if (event.type === 'response.output_text.delta') {
-              responseText += event.delta || '';
-            }
-          }
-
-          const responsePayload: {
-            completion: string;
-            commentCreated?: boolean;
-            commentId?: number;
-          } = {
-            completion:
-              responseText ||
-              'I apologize, but I was unable to generate a response.',
-          };
-
-          // For Comment completions, create the AI comment directly (ownership was validated earlier)
-          if (
-            completionType === AICompletionType.Comment &&
-            parentCommentId &&
-            parentCommentThreadId &&
-            userId &&
-            responseText
-          ) {
-            const commentResult = await createAIComment(
-              userId,
-              communityId,
-              parentCommentThreadId,
-              parentCommentId,
-              responseText,
-            );
-
-            if (commentResult.success) {
-              responsePayload.commentCreated = true;
-              responsePayload.commentId = commentResult.commentId;
-              log.info(`[${requestId}] Created AI comment via MCP path`, {
-                commentId: commentResult.commentId,
-              });
-            } else {
-              log.error(
-                `[${requestId}] Failed to create AI comment via MCP path: ${commentResult.error}`,
-              );
-            }
-          }
-
-          res.json(responsePayload);
-          return;
-        }
+        return;
       } catch (mcpError) {
         log.error(`[${requestId}] Error in MCP path:`, mcpError);
 
@@ -645,104 +651,24 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     if (stream) {
       log.info(`[${requestId}] Setting up streaming response`);
 
-      res.setHeader('Content-Type', 'text/plain');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('X-Accel-Buffering', 'no');
-
       try {
-        const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
-        if (systemPrompt) {
-          messages.push({ role: 'system', content: systemPrompt });
-        }
-        messages.push({ role: 'user', content: userPrompt });
-
-        const streamConfig: OpenAI.Chat.ChatCompletionCreateParamsStreaming = {
-          model: modelId,
-          messages,
+        await handleStreamingCompletion(
+          requestId,
+          res,
+          openai,
+          modelId,
+          systemPrompt,
+          userPrompt,
           temperature,
-          max_tokens: maxTokens,
-          stream: true,
-          ...(useOR && {
-            extra_headers: {
-              'HTTP-Referer': 'https://common.xyz',
-              'X-Title': 'Common',
-            },
-          }),
-          ...(!useOR &&
-            addOpenAiWebSearchOptions && { web_search_options: {} }),
-        };
-
-        log.info(`[${requestId}] Starting OpenAI streaming request`, {
-          model: streamConfig.model,
-          maxTokens: streamConfig.max_tokens,
-          messageCount: messages.length,
-        });
-
-        const streamResponse =
-          await openai.chat.completions.create(streamConfig);
-
-        let chunkCount = 0;
-        let totalContentLength = 0;
-        let accumulatedText = '';
-
-        for await (const chunk of streamResponse) {
-          chunkCount++;
-          const choice = chunk.choices?.[0];
-          const contentToStream = choice?.delta?.content || '';
-
-          if (contentToStream) {
-            totalContentLength += contentToStream.length;
-            accumulatedText += contentToStream;
-
-            try {
-              res.write(contentToStream);
-              if (res.flush) res.flush();
-            } catch (writeError) {
-              log.error(
-                `[${requestId}] Error writing chunk ${chunkCount}:`,
-                writeError,
-              );
-              throw writeError;
-            }
-          }
-        }
-
-        log.info(`[${requestId}] Streaming completed successfully`, {
-          totalChunks: chunkCount,
-          totalContentLength,
-        });
-
-        // For Comment completions, create the AI comment and send JSON payload
-        if (
-          completionType === AICompletionType.Comment &&
-          parentCommentId &&
-          parentCommentThreadId &&
-          userId &&
-          accumulatedText
-        ) {
-          const commentResult = await createAIComment(
-            userId,
-            communityId,
-            parentCommentThreadId,
-            parentCommentId,
-            accumulatedText,
-          );
-
-          if (commentResult.success && commentResult.comment) {
-            log.info(`[${requestId}] Created AI comment`, {
-              commentId: commentResult.commentId,
-            });
-            // Send delimiter and JSON payload for the created comment
-            res.write('\n__COMMENT_PAYLOAD__\n');
-            res.write(JSON.stringify(commentResult.comment));
-          } else {
-            log.error(
-              `[${requestId}] Failed to create AI comment: ${commentResult.error}`,
-            );
-          }
-        }
-
-        res.end();
+          maxTokens,
+          useOR,
+          addOpenAiWebSearchOptions,
+          completionType,
+          userId,
+          communityId,
+          parentCommentId,
+          parentCommentThreadId,
+        );
       } catch (streamError: unknown) {
         log.error(`[${requestId}] Streaming error:`, streamError as Error);
 
@@ -770,78 +696,24 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
         res.end();
       }
     } else {
-      // Non-streaming response
       try {
-        const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
-        if (systemPrompt) {
-          messages.push({ role: 'system', content: systemPrompt });
-        }
-        messages.push({ role: 'user', content: userPrompt });
-
-        const completion = await openai.chat.completions.create({
-          model: modelId,
-          messages,
+        await handleNonStreamingCompletion(
+          requestId,
+          res,
+          openai,
+          modelId,
+          systemPrompt,
+          userPrompt,
           temperature,
-          max_tokens: maxTokens,
-          ...(useOR && {
-            extra_headers: {
-              'HTTP-Referer': 'https://common.xyz',
-              'X-Title': 'Common',
-            },
-          }),
-          ...(!useOR &&
-            addOpenAiWebSearchOptions && { web_search_options: {} }),
-        });
-
-        const responseText = completion.choices[0]?.message?.content || '';
-        const messageForResponse = completion.choices[0]
-          ?.message as OpenAI.Chat.ChatCompletionMessage & {
-          annotations?: unknown;
-        };
-        const annotations = messageForResponse?.annotations;
-
-        const responsePayload: {
-          completion: string;
-          annotations?: unknown;
-          commentCreated?: boolean;
-          commentId?: number;
-        } = {
-          completion: responseText,
-        };
-        if (annotations) {
-          responsePayload.annotations = annotations;
-        }
-
-        // For Comment completions, create the AI comment directly (ownership was validated earlier)
-        if (
-          completionType === AICompletionType.Comment &&
-          parentCommentId &&
-          parentCommentThreadId &&
-          userId &&
-          responseText
-        ) {
-          const commentResult = await createAIComment(
-            userId,
-            communityId,
-            parentCommentThreadId,
-            parentCommentId,
-            responseText,
-          );
-
-          if (commentResult.success) {
-            responsePayload.commentCreated = true;
-            responsePayload.commentId = commentResult.commentId;
-            log.info(`[${requestId}] Created AI comment`, {
-              commentId: commentResult.commentId,
-            });
-          } else {
-            log.error(
-              `[${requestId}] Failed to create AI comment: ${commentResult.error}`,
-            );
-          }
-        }
-
-        res.json(responsePayload);
+          maxTokens,
+          useOR,
+          addOpenAiWebSearchOptions,
+          completionType,
+          userId,
+          communityId,
+          parentCommentId,
+          parentCommentThreadId,
+        );
       } catch (completionError: unknown) {
         const orError = extractOpenRouterError(completionError);
         if (orError) {
