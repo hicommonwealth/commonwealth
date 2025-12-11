@@ -1,5 +1,5 @@
 import { LPBondingCurveAbi } from '@commonxyz/common-protocol-abis';
-import { getFactoryContract } from '@hicommonwealth/evm-protocols';
+import { getFactoryContract, ValidChains } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
 import Web3 from 'web3';
 
@@ -14,13 +14,20 @@ export const useGetLaunchpadPriceQuery = (
   const isBuy = true;
   const amountIn = 1;
 
-  const contractAddress = tokenAddress
-    ? getFactoryContract(ethChainId).LPBondingCurve
-    : null;
-  const web3 = new Web3(rpc);
-  const contract = contractAddress
-    ? new web3.eth.Contract(LPBondingCurveAbi, contractAddress)
-    : null;
+  let contract;
+  if (
+    [ValidChains.Anvil, ValidChains.Base, ValidChains.SepoliaBase].includes(
+      ethChainId,
+    )
+  ) {
+    const contractAddress = tokenAddress
+      ? getFactoryContract(ethChainId).LPBondingCurve
+      : null;
+    const web3 = new Web3(rpc);
+    contract = contractAddress
+      ? new web3.eth.Contract(LPBondingCurveAbi, contractAddress)
+      : null;
+  }
 
   return useQuery({
     // contract is derived from ethChainId, rpc, and contractAddress (all in queryKey)
@@ -29,7 +36,6 @@ export const useGetLaunchpadPriceQuery = (
       'launchpadPrice',
       ethChainId,
       rpc,
-      contractAddress,
       tokenAddress,
       amountIn,
       isBuy,
