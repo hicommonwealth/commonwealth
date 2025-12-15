@@ -180,6 +180,13 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'Coinbase',
   },
+  base: {
+    icon: {
+      name: 'basewallet',
+      isCustom: true,
+    },
+    label: 'Base Wallet',
+  },
   terrastation: {
     icon: {
       name: 'terrastation',

@@ -354,6 +354,7 @@ export const iconLookup = {
 
 export const customIconLookup = {
   base: CustomIcons.CWBase,
+  basewallet: CustomIcons.CWBaseWallet,
   blast: CustomIcons.CWBlast,
   binance: CustomIcons.CWBinance,
   google: Icons.CWGoogle,
