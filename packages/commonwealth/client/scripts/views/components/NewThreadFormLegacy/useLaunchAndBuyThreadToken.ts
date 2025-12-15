@@ -52,6 +52,7 @@ export const launchAndBuyThreadTokenUtility = async ({
   linkSpecificAddressToSpecificCommunity,
   tokenGainAmount = 0,
   amount = '0',
+  connectorWeight = 840000,
 }: {
   threadId: number;
   threadTitle: string;
@@ -72,6 +73,7 @@ export const launchAndBuyThreadTokenUtility = async ({
   ) => Promise<unknown>;
   tokenGainAmount?: number;
   amount?: string;
+  connectorWeight?: number;
 }) => {
   if (!selectedAddress) {
     throw new Error('Please connect your wallet first');
@@ -115,6 +117,7 @@ export const launchAndBuyThreadTokenUtility = async ({
       paymentTokenAddress: primaryTokenAddress,
       ethChainId,
       chainRpc,
+      connectorWeight,
     };
 
     const createTokenReceipt = await createThreadToken(createTokenPayload);
