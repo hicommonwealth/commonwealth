@@ -18,12 +18,14 @@ export interface AICommentCreationResult {
 /**
  * Creates an AI-generated comment as the bot user
  * This handles: getting bot user, joining community if needed, creating the comment, and storing the token
+ *
+ * @param parentCommentId - The parent comment ID for nested replies, or null for root-level comments
  */
 export async function createAIComment(
   userId: number,
   communityId: string,
   threadId: number,
-  parentCommentId: number,
+  parentCommentId: number | null,
   content: string,
 ): Promise<AICommentCreationResult> {
   try {
@@ -38,7 +40,7 @@ export async function createAIComment(
       user_id: userId,
       community_id: communityId,
       thread_id: threadId,
-      parent_comment_id: parentCommentId,
+      parent_comment_id: parentCommentId ?? undefined,
       content,
       expires_at,
     });
@@ -87,6 +89,7 @@ export async function createAIComment(
     }
 
     // Create comment as bot user
+    // parent_id is undefined for root-level comments, or the parent comment ID for nested replies
     const result = await command(Comment.CreateComment(), {
       actor: {
         user: {
@@ -97,7 +100,7 @@ export async function createAIComment(
       },
       payload: {
         thread_id: threadId,
-        parent_id: parentCommentId,
+        parent_id: parentCommentId ?? undefined,
         body: content,
       },
     });

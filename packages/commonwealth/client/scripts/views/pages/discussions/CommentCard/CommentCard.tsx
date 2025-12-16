@@ -142,7 +142,7 @@ export const CommentCard = ({
   onStreamingComplete,
   tokenNumDecimals,
   tokenSymbol,
-  isRootComment: _isRootComment,
+  isRootComment,
   threadContext,
   threadTitle,
   permissions,
@@ -300,11 +300,15 @@ export const CommentCard = ({
       try {
         setStreamingText('');
 
+        // For root-level AI comments (isRootComment), pass threadId instead of parentCommentId
+        // The comment.id is actually the thread ID in this case
         await generateCompletionRef.current(
           {
             communityId: comment.community_id,
             completionType: AICompletionType.Comment,
-            parentCommentId: comment.id,
+            ...(isRootComment
+              ? { threadId: comment.id }
+              : { parentCommentId: comment.id }),
             model: streamingModelId as CompletionModel,
             stream: true,
           },

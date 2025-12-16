@@ -34,6 +34,7 @@ interface AICompletionRequestBody {
   communityId: string;
   completionType: AICompletionType;
   parentCommentId?: number;
+  threadId?: number; // For root-level AI comments (no parent comment)
   topicId?: number;
   model?: CompletionModel;
   temperature?: number;
@@ -60,6 +61,7 @@ async function validateRequest(
       completionType: AICompletionType;
       parentCommentId?: number;
       parentCommentThreadId?: number;
+      threadId?: number; // For root-level AI comments
       parentCommentBody?: string;
       topicId?: number;
       model: CompletionModel;
@@ -74,6 +76,7 @@ async function validateRequest(
     communityId,
     completionType,
     parentCommentId,
+    threadId,
     topicId,
     model = DEFAULT_COMPLETION_MODEL,
     temperature,
@@ -109,49 +112,74 @@ async function validateRequest(
     return { valid: false };
   }
 
-  // For Comment completions, validate parent comment ownership
+  // For Comment completions, validate either parent comment or thread
   let parentCommentThreadId: number | undefined;
+  let validatedThreadId: number | undefined;
   let parentCommentBody: string | undefined;
 
   if (completionType === AICompletionType.Comment) {
-    if (!parentCommentId) {
+    // Two valid paths:
+    // 1. parentCommentId provided - AI replies to existing comment (MCP mention flow)
+    // 2. threadId provided - AI creates root-level comment on thread (initial AI comment)
+
+    if (parentCommentId) {
+      // Path 1: Replying to an existing comment
+      const parentComment = await models.Comment.findByPk(parentCommentId);
+      if (!parentComment) {
+        res.status(404).json({ error: 'Parent comment not found' });
+        return { valid: false };
+      }
+
+      const thread = await models.Thread.findByPk(parentComment.thread_id);
+      if (!thread) {
+        res.status(404).json({ error: 'Thread not found for parent comment' });
+        return { valid: false };
+      }
+
+      if (thread.community_id !== communityId) {
+        res.status(400).json({
+          error: 'Parent comment does not belong to the specified community',
+        });
+        return { valid: false };
+      }
+
+      const commentAuthorAddress = await models.Address.findByPk(
+        parentComment.address_id,
+      );
+      if (commentAuthorAddress?.user_id !== userId) {
+        res.status(403).json({
+          error: 'Parent comment must be created by the requesting user',
+        });
+        return { valid: false };
+      }
+
+      parentCommentThreadId = parentComment.thread_id;
+      parentCommentBody = parentComment.body;
+    } else if (threadId) {
+      // Path 2: Creating root-level AI comment on thread (no parent comment)
+      const thread = await models.Thread.findByPk(threadId);
+      if (!thread) {
+        res.status(404).json({ error: 'Thread not found' });
+        return { valid: false };
+      }
+
+      if (thread.community_id !== communityId) {
+        res.status(400).json({
+          error: 'Thread does not belong to the specified community',
+        });
+        return { valid: false };
+      }
+
+      validatedThreadId = threadId;
+      // For root-level comments, we use the thread body as context
+      parentCommentBody = thread.body;
+    } else {
       res.status(400).json({
-        error: 'parentCommentId is required for Comment completions',
+        error:
+          'Either parentCommentId or threadId is required for Comment completions',
       });
       return { valid: false };
     }
-
-    const parentComment = await models.Comment.findByPk(parentCommentId);
-    if (!parentComment) {
-      res.status(404).json({ error: 'Parent comment not found' });
-      return { valid: false };
-    }
-
-    const thread = await models.Thread.findByPk(parentComment.thread_id);
-    if (!thread) {
-      res.status(404).json({ error: 'Thread not found for parent comment' });
-      return { valid: false };
-    }
-
-    if (thread.community_id !== communityId) {
-      res.status(400).json({
-        error: 'Parent comment does not belong to the specified community',
-      });
-      return { valid: false };
-    }
-
-    const commentAuthorAddress = await models.Address.findByPk(
-      parentComment.address_id,
-    );
-    if (commentAuthorAddress?.user_id !== userId) {
-      res.status(403).json({
-        error: 'Parent comment must be created by the requesting user',
-      });
-      return { valid: false };
-    }
-
-    parentCommentThreadId = parentComment.thread_id;
-    parentCommentBody = parentComment.body;
   }
 
   return {
@@ -161,6 +189,7 @@ async function validateRequest(
     completionType,
     parentCommentId,
     parentCommentThreadId,
+    threadId: validatedThreadId,
     parentCommentBody,
     topicId,
     model,
@@ -187,7 +216,7 @@ async function handleMCPCompletion(
   userId: number,
   communityId: string,
   parentCommentId?: number,
-  parentCommentThreadId?: number,
+  effectiveThreadId?: number,
 ): Promise<void> {
   const mcpOptions = buildMCPClientOptions(userPrompt, mcpServers, null);
   mcpOptions.model = model;
@@ -231,17 +260,17 @@ async function handleMCPCompletion(
     });
 
     // Create AI comment for Comment completions
+    // Supports both reply to comment (parentCommentId) and root-level comment (no parentCommentId)
     if (
       completionType === AICompletionType.Comment &&
-      parentCommentId &&
-      parentCommentThreadId &&
+      effectiveThreadId &&
       accumulatedText
     ) {
       const commentResult = await createAIComment(
         userId,
         communityId,
-        parentCommentThreadId,
-        parentCommentId,
+        effectiveThreadId,
+        parentCommentId ?? null,
         accumulatedText,
       );
 
@@ -278,17 +307,17 @@ async function handleMCPCompletion(
         responseText || 'I apologize, but I was unable to generate a response.',
     };
 
+    // Supports both reply to comment (parentCommentId) and root-level comment (no parentCommentId)
     if (
       completionType === AICompletionType.Comment &&
-      parentCommentId &&
-      parentCommentThreadId &&
+      effectiveThreadId &&
       responseText
     ) {
       const commentResult = await createAIComment(
         userId,
         communityId,
-        parentCommentThreadId,
-        parentCommentId,
+        effectiveThreadId,
+        parentCommentId ?? null,
         responseText,
       );
 
@@ -327,7 +356,7 @@ async function handleStreamingCompletion(
   userId: number,
   communityId: string,
   parentCommentId?: number,
-  parentCommentThreadId?: number,
+  effectiveThreadId?: number,
 ): Promise<void> {
   res.setHeader('Content-Type', 'text/plain');
   res.setHeader('Cache-Control', 'no-cache');
@@ -381,17 +410,17 @@ async function handleStreamingCompletion(
   });
 
   // Create AI comment for Comment completions
+  // Supports both reply to comment (parentCommentId) and root-level comment (no parentCommentId)
   if (
     completionType === AICompletionType.Comment &&
-    parentCommentId &&
-    parentCommentThreadId &&
+    effectiveThreadId &&
     accumulatedText
   ) {
     const commentResult = await createAIComment(
       userId,
       communityId,
-      parentCommentThreadId,
-      parentCommentId,
+      effectiveThreadId,
+      parentCommentId ?? null,
       accumulatedText,
     );
 
@@ -429,7 +458,7 @@ async function handleNonStreamingCompletion(
   userId: number,
   communityId: string,
   parentCommentId?: number,
-  parentCommentThreadId?: number,
+  effectiveThreadId?: number,
 ): Promise<void> {
   const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
   if (systemPrompt) {
@@ -468,17 +497,17 @@ async function handleNonStreamingCompletion(
   }
 
   // Create AI comment for Comment completions
+  // Supports both reply to comment (parentCommentId) and root-level comment (no parentCommentId)
   if (
     completionType === AICompletionType.Comment &&
-    parentCommentId &&
-    parentCommentThreadId &&
+    effectiveThreadId &&
     responseText
   ) {
     const commentResult = await createAIComment(
       userId,
       communityId,
-      parentCommentThreadId,
-      parentCommentId,
+      effectiveThreadId,
+      parentCommentId ?? null,
       responseText,
     );
 
@@ -522,6 +551,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       completionType,
       parentCommentId,
       parentCommentThreadId,
+      threadId,
       parentCommentBody,
       topicId,
       model,
@@ -531,6 +561,11 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       useOpenRouter,
       useWebSearch,
     } = validation;
+
+    // Determine the effective thread ID for AI comment creation
+    // For replies to comments: use parentCommentThreadId
+    // For root-level comments: use threadId directly
+    const effectiveThreadId = parentCommentThreadId || threadId;
 
     log.info(`[${requestId}] Validated parent comment ownership`, {
       parentCommentId,
@@ -632,7 +667,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           userId,
           communityId,
           parentCommentId,
-          parentCommentThreadId,
+          effectiveThreadId,
         );
         return;
       } catch (mcpError) {
@@ -672,7 +707,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           userId,
           communityId,
           parentCommentId,
-          parentCommentThreadId,
+          effectiveThreadId,
         );
       } catch (streamError: unknown) {
         log.error(`[${requestId}] Streaming error:`, streamError as Error);
@@ -717,7 +752,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           userId,
           communityId,
           parentCommentId,
-          parentCommentThreadId,
+          effectiveThreadId,
         );
       } catch (completionError: unknown) {
         const orError = extractOpenRouterError(completionError);

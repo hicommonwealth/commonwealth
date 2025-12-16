@@ -30,12 +30,15 @@ interface AiCompletionOptions extends Partial<CompletionOptions> {
 
 /**
  * Input for generating AI completions using entity IDs
- * Thread ID is inferred from the parent comment's thread on the server
+ * For Comment completions, either parentCommentId or threadId must be provided:
+ * - parentCommentId: AI replies to an existing comment
+ * - threadId: AI creates a root-level comment on the thread
  */
 export interface AICompletionInput {
   communityId: string;
   completionType: AICompletionType;
   parentCommentId?: number;
+  threadId?: number; // For root-level AI comments (no parent comment)
   topicId?: number;
   model?: CompletionModel;
   temperature?: number;
@@ -85,6 +88,7 @@ export const useAiCompletion = () => {
           communityId: input.communityId,
           completionType: input.completionType,
           parentCommentId: input.parentCommentId,
+          threadId: input.threadId,
           topicId: input.topicId,
           model: input.model || options?.model || DEFAULT_COMPLETION_MODEL,
           temperature:
