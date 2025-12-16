@@ -277,7 +277,10 @@ export const TreeHierarchy = ({
       const commentView = transformCommentToView(commentPayload);
 
       // Try to add to the comment's parent cache first (where it belongs)
-      const commentParentId = commentView.parent_id as number | undefined;
+      // Note: Server returns null for root-level comments, but cache uses undefined
+      const rawParentId = commentView.parent_id as number | null | undefined;
+      const commentParentId =
+        rawParentId === null ? undefined : (rawParentId as number | undefined);
       const isChatModeForParent =
         commentFilters.sortType === 'oldest' && commentParentId === undefined;
 
