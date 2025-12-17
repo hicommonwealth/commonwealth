@@ -111,6 +111,9 @@ const AdminContestsPage = lazy(
 const ManageContest = lazy(
   () => import('views/pages/CommunityManagement/Contests/ManageContest'),
 );
+const MarketsPage = lazy(
+  () => import('views/pages/CommunityManagement/Markets/MarketsPage'),
+);
 const Contests = lazy(() => import('views/pages/Contests'));
 const ContestPage = lazy(() => import('views/pages/ContestPage'));
 
@@ -622,6 +625,13 @@ const CommonDomainRoutes = () => [
     key="/:scope/manage/contests/:contestAddress"
     path="/:scope/manage/contests/:contestAddress"
     element={withLayout(ManageContest, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/manage/markets"
+    path="/:scope/manage/markets"
+    element={withLayout(MarketsPage, {
       scoped: true,
     })}
   />,
