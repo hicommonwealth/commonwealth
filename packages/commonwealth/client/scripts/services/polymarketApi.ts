@@ -1,0 +1,49 @@
+import {
+  Market,
+  MarketFilters,
+} from '../views/components/MarketIntegrations/types';
+
+const POLYMARKET_API_BASE_URL = 'https://gamma-api.polymarket.com';
+
+export async function discoverPolymarketMarkets(
+  filters: MarketFilters,
+): Promise<Market[]> {
+  try {
+    const url = new URL(`${POLYMARKET_API_BASE_URL}/markets`);
+    url.searchParams.append('closed', 'false'); // Only fetch open markets
+    // NOTE: Polymarket doesn't seem to have server-side filtering via query params for public endpoints.
+    // All filtering will be done client-side in useMarketData.ts.
+    const response = await fetch(url.toString());
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Transform Polymarket data to our common Market interface
+    const transformedMarkets: Market[] = data.map((polymarketMarket: any) => ({
+      id: polymarketMarket.id,
+      provider: 'polymarket',
+      slug: polymarketMarket.slug,
+      question: polymarketMarket.question,
+      category: polymarketMarket.category || 'Uncategorized',
+      status: polymarketMarket.closed ? 'closed' : 'open',
+      startTime: polymarketMarket.startDate
+        ? new Date(polymarketMarket.startDate)
+        : null,
+      endTime: polymarketMarket.endDate
+        ? new Date(polymarketMarket.endDate)
+        : null,
+      imageUrl: polymarketMarket.image || null, // Add image URL
+      outcomes: polymarketMarket.outcomes || [], // Add outcomes
+      ticker: polymarketMarket.id, // Using id as ticker
+      title: polymarketMarket.question, // Using question as title
+    }));
+
+    return transformedMarkets;
+  } catch (error) {
+    console.error('Error fetching Polymarket markets:', error);
+    return [];
+  }
+}

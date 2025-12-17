@@ -1,33 +1,34 @@
 import React from 'react';
-import { MarketListItem } from './MarketListItem';
+import { MarketCard } from './MarketCard';
+import './MarketList.scss';
 import { Market } from './types';
 
 interface MarketListProps {
   markets: Market[];
-  selectedMarkets: Set<string>;
   savedMarketIds: Set<string>;
-  onSelectionChange: (marketId: string, isSelected: boolean) => void;
+  onSubscribe: (market: Market) => void;
+  onUnsubscribe: (market: Market) => void;
 }
 
 export function MarketList({
   markets,
-  selectedMarkets,
   savedMarketIds,
-  onSelectionChange,
+  onSubscribe,
+  onUnsubscribe,
 }: MarketListProps) {
   if (markets.length === 0) {
     return <p>No markets found.</p>;
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+    <div className="market-list">
       {markets.map((market) => (
-        <MarketListItem
+        <MarketCard
           key={market.id}
           market={market}
-          isSelected={selectedMarkets.has(market.id)}
-          isSaved={savedMarketIds.has(market.id)}
-          onSelectionChange={onSelectionChange}
+          isSubscribed={savedMarketIds.has(market.id)}
+          onSubscribe={onSubscribe}
+          onUnsubscribe={onUnsubscribe}
         />
       ))}
     </div>

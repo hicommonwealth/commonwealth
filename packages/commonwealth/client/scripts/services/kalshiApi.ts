@@ -8,50 +8,82 @@ const KALSHI_API_BASE_URL = 'https://api.elections.kalshi.com/trade-api/v2';
 export async function discoverKalshiMarkets(
   filters: MarketFilters,
 ): Promise<Market[]> {
-  const url = new URL(`${KALSHI_API_BASE_URL}/markets`);
-  url.searchParams.append('limit', '100'); // Fetch up to 100 markets
+  const eventsUrl = new URL(`${KALSHI_API_BASE_URL}/events`);
+  eventsUrl.searchParams.append('limit', '200'); // Fetch up to 200 events
+  eventsUrl.searchParams.append('status', 'open'); // Only fetch open events
 
-  // Map filters to Kalshi API parameters
-  if (filters.search) {
-    url.searchParams.append('tickers', filters.search); // Assuming search maps to tickers
-    // Kalshi API also has event_ticker and series_ticker. For simplicity, we'll use tickers for now.
-  }
-  // No direct mapping for 'category' filter in current Kalshi API spec, would need to filter client-side or use a different endpoint.
-
-  // NOTE: This initial implementation assumes public markets do not require authentication.
-  // If the API requires authentication even for public market data, API keys (e.g., KALSHI_API_KEY)
-  // would need to be set in environment variables and passed as headers.
-  // Example: headers: { 'Authorization': `Bearer ${process.env.KALSHI_API_KEY}` }
+  // NOTE: Kalshi /events endpoint does not support search by ticker or category.
+  // We will fetch all open events and then filter client-side if needed.
 
   try {
-    const response = await fetch(url.toString());
-    if (!response.ok) {
-      const errorData = await response.json();
+    const eventsResponse = await fetch(eventsUrl.toString());
+    if (!eventsResponse.ok) {
+      const errorData = await eventsResponse.json();
       throw new Error(
-        `Kalshi API error: ${response.status} - ${errorData.message || response.statusText}`,
+        `Kalshi Events API error: ${eventsResponse.status} - ${errorData.message || eventsResponse.statusText}`,
       );
     }
-    const data = await response.json();
+    const eventsData = await eventsResponse.json();
 
-    // Transform Kalshi market data to our common Market interface
-    const transformedMarkets: Market[] = data.markets.map(
-      (kalshiMarket: any) => ({
-        id: kalshiMarket.ticker, // Use ticker as ID for Kalshi markets
-        provider: 'kalshi',
-        slug: kalshiMarket.ticker, // Use ticker as slug
-        question: kalshiMarket.title,
-        category: kalshiMarket.category || 'Uncategorized', // Kalshi market might have a category
-        status: kalshiMarket.status,
-        startTime: kalshiMarket.open_time
-          ? new Date(kalshiMarket.open_time)
-          : null,
-        endTime: kalshiMarket.close_time
-          ? new Date(kalshiMarket.close_time)
-          : null,
+    const transformedEvents: Market[] = await Promise.all(
+      eventsData.events.map(async (event: any) => {
+        // Now fetch markets (bets/outcomes) for each event
+        const marketsUrl = new URL(`${KALSHI_API_BASE_URL}/markets`);
+        marketsUrl.searchParams.append('event_ticker', event.event_ticker);
+        marketsUrl.searchParams.append('status', 'open'); // Only fetch open bets for the event
+
+        const marketsResponse = await fetch(marketsUrl.toString());
+        if (!marketsResponse.ok) {
+          console.warn(
+            `Kalshi Markets API error for event ${event.event_ticker}: ${marketsResponse.status}`,
+          );
+          return null; // Skip this event if we can't get its markets
+        }
+        const marketsData = await marketsResponse.json();
+
+        // Extract relevant info from the first market (bet) for dates and image, as they should be consistent across bets of an event
+        const firstMarket = marketsData.markets && marketsData.markets[0];
+
+        return {
+          id: event.event_ticker, // Use event_ticker as the ID for the grouped market
+          provider: 'kalshi',
+          slug: event.event_ticker, // Use event_ticker as slug
+          question: event.title, // Use event title as the main question
+          category: event.category || 'Uncategorized',
+          status: event.status || firstMarket?.status || 'open', // Fallback to first market's status
+          startTime: firstMarket?.open_time
+            ? new Date(firstMarket.open_time)
+            : null,
+          endTime: firstMarket?.close_time
+            ? new Date(firstMarket.close_time)
+            : null,
+          imageUrl: firstMarket?.image_url || null, // Image from the first market
+          outcomes: marketsData.markets?.map((m: any) => m.title) || [], // Use individual market titles as outcomes
+          ticker: event.event_ticker,
+          title: event.title,
+        };
       }),
     );
 
-    return transformedMarkets;
+    // Filter out any null entries that might have resulted from failed markets API calls
+    const filteredEvents = transformedEvents.filter(
+      (market) => market !== null,
+    ) as Market[];
+
+    // Apply client-side filtering for search and category as /events endpoint doesn't support them
+    let finalFilteredMarkets = filteredEvents;
+    if (filters.search) {
+      finalFilteredMarkets = finalFilteredMarkets.filter((market) =>
+        market.question.toLowerCase().includes(filters.search.toLowerCase()),
+      );
+    }
+    if (filters.category !== 'all') {
+      finalFilteredMarkets = finalFilteredMarkets.filter(
+        (market) => market.category === filters.category,
+      );
+    }
+
+    return finalFilteredMarkets;
   } catch (error) {
     console.error('Error fetching Kalshi markets:', error);
     throw error;

@@ -4,7 +4,7 @@ import { MarketList } from './MarketList';
 import { useMarketData } from './useMarketData';
 
 interface MarketSelectorProps {
-  communityId: number;
+  communityId: string;
 }
 
 export function MarketSelector({ communityId }: MarketSelectorProps) {
@@ -12,36 +12,32 @@ export function MarketSelector({ communityId }: MarketSelectorProps) {
     filters,
     setFilters,
     markets,
+    categories,
     isLoading,
-    selectedMarkets,
-    handleSelectionChange,
     savedMarketIds,
-    saveSelection,
+    onSubscribe,
+    onUnsubscribe,
     isSaving,
   } = useMarketData(communityId);
 
   return (
     <div>
       <h2>Find Markets</h2>
-      <MarketFilters filters={filters} onFiltersChange={setFilters} />
+      <MarketFilters
+        filters={filters}
+        onFiltersChange={setFilters}
+        categories={categories}
+      />
       {isLoading ? (
         <p>Loading markets...</p>
       ) : (
         <MarketList
           markets={markets}
-          selectedMarkets={selectedMarkets}
           savedMarketIds={savedMarketIds}
-          onSelectionChange={handleSelectionChange}
+          onSubscribe={onSubscribe}
+          onUnsubscribe={onUnsubscribe}
         />
       )}
-      <div style={{ marginTop: '1rem' }}>
-        <button
-          onClick={saveSelection}
-          disabled={selectedMarkets.size === 0 || isSaving}
-        >
-          {isSaving ? 'Saving...' : `Save ${selectedMarkets.size} Markets`}
-        </button>
-      </div>
     </div>
   );
 }

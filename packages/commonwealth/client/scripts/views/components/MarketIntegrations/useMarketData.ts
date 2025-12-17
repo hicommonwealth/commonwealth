@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { discoverKalshiMarkets } from '../../../services/kalshiApi'; // Corrected import path
+import { discoverKalshiMarkets } from '../../../services/kalshiApi';
+import { discoverPolymarketMarkets } from '../../../services/polymarketApi';
 import { trpc } from '../../../utils/trpcClient';
 import { Market, MarketFilters } from './types';
 
@@ -8,6 +9,7 @@ export function useMarketData(communityId: string) {
   const [filters, setFilters] = useState<MarketFilters>({
     search: '',
     provider: 'all',
+    category: 'all',
   });
   const [selectedMarkets, setSelectedMarkets] = useState<Set<string>>(
     new Set(),
@@ -24,14 +26,27 @@ export function useMarketData(communityId: string) {
     useQuery<Market[], Error>({
       queryKey: ['kalshiMarkets', filters],
       queryFn: () => discoverKalshiMarkets(filters),
-      enabled: filters.provider === 'all' || filters.provider === 'kalshi', // Only fetch if Kalshi is selected or all providers
+      enabled: filters.provider === 'all' || filters.provider === 'kalshi',
+    });
+
+  // Fetch discovered markets from Polymarket API
+  const { data: discoveredPolymarketMarkets, isLoading: isLoadingPolymarket } =
+    useQuery<Market[], Error>({
+      queryKey: ['polymarketMarkets', filters],
+      queryFn: () => discoverPolymarketMarkets(filters),
+      enabled: filters.provider === 'all' || filters.provider === 'polymarket',
     });
 
   const discoveredMarkets = useMemo(() => {
-    // For now, only Kalshi markets are discovered.
-    // If other providers were integrated, their discovered markets would be combined here.
-    return discoveredKalshiMarkets || [];
-  }, [discoveredKalshiMarkets]);
+    const kalshiMarkets = discoveredKalshiMarkets || [];
+    const polymarketMarkets = discoveredPolymarketMarkets || [];
+    return [...kalshiMarkets, ...polymarketMarkets];
+  }, [discoveredKalshiMarkets, discoveredPolymarketMarkets]);
+
+  const categories = useMemo(() => {
+    const allCategories = discoveredMarkets.map((market) => market.category);
+    return ['all', ...Array.from(new Set(allCategories))];
+  }, [discoveredMarkets]);
 
   const savedMarketIds = useMemo(() => {
     return new Set(savedMarkets?.map((m) => m.id) ?? []);
@@ -49,6 +64,11 @@ export function useMarketData(communityId: string) {
     if (filters.provider !== 'all') {
       filtered = filtered.filter(
         (market) => market.provider === filters.provider,
+      );
+    }
+    if (filters.category !== 'all') {
+      filtered = filtered.filter(
+        (market) => market.category === filters.category,
       );
     }
 
@@ -69,36 +89,38 @@ export function useMarketData(communityId: string) {
 
   const { mutate: subscribeMarket, isPending: isSubscribing } =
     trpc.community.subscribeMarket.useMutation();
+  const { mutate: unsubscribeMarket, isPending: isUnsubscribing } =
+    trpc.community.unsubscribeMarket.useMutation();
 
-  const saveSelection = () => {
-    const marketsToSave = (discoveredMarkets || []).filter((market) =>
-      selectedMarkets.has(market.id),
-    );
-
-    marketsToSave.forEach((market) => {
-      subscribeMarket({
-        community_id: communityId,
-        provider: market.provider,
-        slug: market.slug,
-        question: market.question,
-        category: market.category,
-        start_time: market.startTime,
-        end_time: market.endTime,
-        status: market.status as 'open',
-      });
+  const onSubscribe = (market: Market) => {
+    subscribeMarket({
+      community_id: communityId,
+      provider: market.provider,
+      slug: market.slug,
+      question: market.question,
+      category: market.category,
+      start_time: market.startTime,
+      end_time: market.endTime,
+      status: market.status as 'open',
     });
-    setSelectedMarkets(new Set());
+  };
+
+  const onUnsubscribe = (market: Market) => {
+    unsubscribeMarket({
+      community_id: communityId,
+      slug: market.slug,
+    });
   };
 
   return {
     filters,
     setFilters,
     markets: filteredDiscoveredMarkets,
-    isLoading: isLoadingKalshi || isLoadingSaved,
-    selectedMarkets,
-    handleSelectionChange,
+    categories,
+    isLoading: isLoadingKalshi || isLoadingSaved || isLoadingPolymarket,
     savedMarketIds,
-    saveSelection,
-    isSaving: isSubscribing,
+    onSubscribe,
+    onUnsubscribe,
+    isSaving: isSubscribing || isUnsubscribing,
   };
 }

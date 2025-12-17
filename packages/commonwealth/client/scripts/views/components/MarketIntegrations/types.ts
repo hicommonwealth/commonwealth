@@ -1,4 +1,4 @@
-export const MARKET_PROVIDERS = ['kalshi'] as const; // Removed 'polymarket'
+export const MARKET_PROVIDERS = ['kalshi', 'polymarket'] as const;
 export type MarketProvider = (typeof MARKET_PROVIDERS)[number];
 
 export interface Market {
@@ -10,6 +10,8 @@ export interface Market {
   status: string;
   startTime: Date | null; // Kalshi uses 'open_time'
   endTime: Date | null; // Kalshi uses 'close_time'
+  imageUrl?: string; // Optional image URL for the market
+  outcomes?: string[]; // Optional array of outcomes/bets for the market
   // Adding more fields that might be useful from Kalshi response
   ticker: string; // Raw ticker from Kalshi
   title: string; // Raw title from Kalshi
@@ -20,4 +22,5 @@ export interface Market {
 export interface MarketFilters {
   search: string;
   provider: MarketProvider | 'all';
+  category: string | 'all';
 }
