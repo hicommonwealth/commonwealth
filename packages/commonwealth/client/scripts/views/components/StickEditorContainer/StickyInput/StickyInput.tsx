@@ -199,10 +199,12 @@ const StickyInput = (props: StickyInputProps) => {
 
         setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
       } else {
+        // For drafting a comment on a thread, pass threadId for root-level comments
         await generateCompletion(
           {
             communityId,
             completionType: AICompletionType.Comment,
+            threadId: originalThread?.id,
             model: modelToUse,
             stream: true,
             useWebSearch: webSearchEnabled,

@@ -121,11 +121,13 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
       let text = '';
       setContentDelta(text);
 
+      // For drafting a comment: if parentCommentId is provided, reply to that comment
+      // Otherwise, use threadId for root-level comment drafting
       generateCompletion(
         {
           communityId: effectiveCommunityId,
           completionType: AICompletionType.Comment,
-          parentCommentId,
+          ...(parentCommentId ? { parentCommentId } : { threadId: thread?.id }),
           model: DEFAULT_COMPLETION_MODEL,
           stream: true,
         },
