@@ -617,7 +617,7 @@ export const NewThreadForm = forwardRef<
             topicId: threadTopic?.id,
             model: DEFAULT_COMPLETION_MODEL,
             stream: true,
-            useWebSearch: effectiveWebSearchEnabled,
+            webSearchEnabled: effectiveWebSearchEnabled,
           },
           {
             onError: (error) => {

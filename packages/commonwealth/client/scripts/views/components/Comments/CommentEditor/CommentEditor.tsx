@@ -130,6 +130,7 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
           ...(parentCommentId ? { parentCommentId } : { threadId: thread?.id }),
           model: DEFAULT_COMPLETION_MODEL,
           stream: true,
+          webSearchEnabled: effectiveWebSearchEnabled,
         },
         {
           onError: (error) => {

@@ -41,7 +41,7 @@ interface AICompletionRequestBody {
   maxTokens?: number;
   stream?: boolean;
   useOpenRouter?: boolean;
-  useWebSearch?: boolean;
+  webSearchEnabled?: boolean;
 }
 
 /**
@@ -69,7 +69,7 @@ async function validateRequest(
       maxTokens: number;
       stream: boolean;
       useOpenRouter: boolean;
-      useWebSearch: boolean;
+      webSearchEnabled: boolean;
     }
 > {
   const {
@@ -83,7 +83,7 @@ async function validateRequest(
     maxTokens = 1000,
     stream = true,
     useOpenRouter = false,
-    useWebSearch = false,
+    webSearchEnabled = false,
   } = req.body as AICompletionRequestBody;
 
   // Validate user authentication
@@ -197,7 +197,7 @@ async function validateRequest(
     maxTokens,
     stream,
     useOpenRouter,
-    useWebSearch,
+    webSearchEnabled,
   };
 }
 
@@ -559,7 +559,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       maxTokens,
       stream,
       useOpenRouter,
-      useWebSearch,
+      webSearchEnabled,
     } = validation;
 
     // Determine the effective thread ID for AI comment creation
@@ -632,7 +632,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     }
 
     // Select model based on configuration
-    const modelSelection = selectModel(model, useOR, useWebSearch);
+    const modelSelection = selectModel(model, useOR, webSearchEnabled);
     if (modelSelection.error) {
       return res.status(400).json({ error: modelSelection.error });
     }
@@ -642,7 +642,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
     log.info(`AI completion request:
       \n modelId=${modelId},
       \n provider=${useOR ? 'OpenRouter' : 'OpenAI'},
-      \n webSearch=${!!useWebSearch}
+      \n webSearchEnabled=${!!webSearchEnabled}
       \n completionType=${completionType}`);
 
     // Create OpenAI client

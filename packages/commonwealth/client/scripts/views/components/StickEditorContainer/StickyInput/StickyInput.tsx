@@ -176,7 +176,7 @@ const StickyInput = (props: StickyInputProps) => {
             completionType: AICompletionType.Thread,
             model: modelToUse,
             stream: true,
-            useWebSearch: webSearchEnabled,
+            webSearchEnabled: webSearchEnabled,
           },
           {
             onError: (error) => {
@@ -207,7 +207,7 @@ const StickyInput = (props: StickyInputProps) => {
             threadId: originalThread?.id,
             model: modelToUse,
             stream: true,
-            useWebSearch: webSearchEnabled,
+            webSearchEnabled: webSearchEnabled,
           },
           {
             onError: (error) => {

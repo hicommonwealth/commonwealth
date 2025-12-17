@@ -45,7 +45,7 @@ export interface AICompletionInput {
   maxTokens?: number;
   stream?: boolean;
   useOpenRouter?: boolean;
-  useWebSearch?: boolean;
+  webSearchEnabled?: boolean;
 }
 
 interface CompletionError {
@@ -98,7 +98,7 @@ export const useAiCompletion = () => {
           maxTokens: input.maxTokens || options?.maxTokens,
           stream: streamMode,
           useOpenRouter: input.useOpenRouter || options?.useOpenRouter,
-          useWebSearch: input.useWebSearch || options?.useWebSearch,
+          webSearchEnabled: input.webSearchEnabled || options?.webSearchEnabled,
           jwt: userStore.getState().jwt,
         };
 

@@ -40,17 +40,17 @@ export interface ModelSelectionResult {
 export function selectModel(
   model: CompletionModel,
   useOpenRouter: boolean,
-  useWebSearch: boolean,
+  webSearchEnabled: boolean,
 ): ModelSelectionResult {
   let modelId: string = model;
   let addOpenAiWebSearchOptions = false;
 
   if (useOpenRouter) {
-    if (useWebSearch) {
+    if (webSearchEnabled) {
       modelId = `${model}:online`;
     }
   } else {
-    if (useWebSearch) {
+    if (webSearchEnabled) {
       if (model === 'gpt-4o') {
         modelId = 'gpt-4o-search-preview';
         addOpenAiWebSearchOptions = true;
