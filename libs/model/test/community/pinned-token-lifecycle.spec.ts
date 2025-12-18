@@ -223,11 +223,11 @@ describe('Pinned token lifecycle', () => {
         actor: adminActor,
         payload: {
           community_id: community_id!,
-          chain_node_id: chain_node_id!,
+          chain_node_id: 2,
           contract_address: ethMainnetUSDC,
         },
       }),
-    ).rejects.toThrow(PinTokenErrors.NotSupported);
+    ).rejects.toThrow(PinTokenErrors.OnlyBaseOrSoneiumSupport);
 
     await models.ChainNode.update(
       {
