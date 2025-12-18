@@ -11,12 +11,6 @@ export interface Market {
   startTime: Date | null; // Kalshi uses 'open_time'
   endTime: Date | null; // Kalshi uses 'close_time'
   imageUrl?: string; // Optional image URL for the market
-  outcomes?: string[]; // Optional array of outcomes/bets for the market
-  // Adding more fields that might be useful from Kalshi response
-  ticker: string; // Raw ticker from Kalshi
-  title: string; // Raw title from Kalshi
-  // open_time: string; // Raw open_time from Kalshi
-  // close_time: string; // Raw close_time from Kalshi
 }
 
 export interface MarketFilters {

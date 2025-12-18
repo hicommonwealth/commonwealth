@@ -27,10 +27,6 @@ export const MarketCard = ({
     }
   };
 
-  const formatMarketDate = (date: Date | null) => {
-    return date ? new Date(date).toLocaleDateString() : 'N/A';
-  };
-
   return (
     <CWCard className="market-card" elevation="elevation-1" interactive>
       {market.imageUrl && (
@@ -48,21 +44,20 @@ export const MarketCard = ({
         </CWText>
       </div>
       <div className="market-card__body">
-        {market.outcomes && market.outcomes.length > 0 && (
-          <CWText type="b3">Outcomes: {market.outcomes.join(', ')}</CWText>
-        )}
-        <CWText type="b3">Provider: {market.provider}</CWText>
-        <CWText type="b3">Category: {market.category}</CWText>
-        <CWText type="b3">Status: {market.status}</CWText>
-        <CWText type="b3">
-          Start Time: {formatMarketDate(market.startTime)}
-        </CWText>
-        <CWText type="b3">End Time: {formatMarketDate(market.endTime)}</CWText>
+        <CWText>Provider: {market.provider}</CWText>
+        <CWText>Category: {market.category}</CWText>
       </div>
       <div className="market-card__footer">
-        <button onClick={handleToggleSubscription}>
-          {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
-        </button>
+        {isSubscribed ? (
+          <button
+            style={{ backgroundColor: 'red' }}
+            onClick={handleToggleSubscription}
+          >
+            Unsubscribe
+          </button>
+        ) : (
+          <button onClick={handleToggleSubscription}>Subscribe</button>
+        )}
       </div>
     </CWCard>
   );

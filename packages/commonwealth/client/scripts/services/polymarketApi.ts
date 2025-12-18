@@ -11,17 +11,15 @@ export async function discoverPolymarketMarkets(
   try {
     const url = new URL(`${POLYMARKET_API_BASE_URL}/markets`);
     url.searchParams.append('closed', 'false'); // Only fetch open markets
-    // NOTE: Polymarket doesn't seem to have server-side filtering via query params for public endpoints.
-    // All filtering will be done client-side in useMarketData.ts.
-    const response = await fetch(url.toString());
+    // TODO: apply filters
 
+    console.log(url.toString());
+    const response = await fetch(url.toString());
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
-
-    // Transform Polymarket data to our common Market interface
     const transformedMarkets: Market[] = data.map((polymarketMarket: any) => ({
       id: polymarketMarket.id,
       provider: 'polymarket',

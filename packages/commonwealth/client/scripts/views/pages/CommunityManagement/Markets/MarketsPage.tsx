@@ -7,7 +7,7 @@ const MarketsPage = () => {
   const communityId = app.activeChainId();
 
   if (!communityId) {
-    return <p>Loading community...</p>;
+    return <></>;
   }
 
   return (

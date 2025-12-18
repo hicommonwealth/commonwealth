@@ -11,9 +11,8 @@ export function useMarketData(communityId: string) {
     provider: 'all',
     category: 'all',
   });
-  const [selectedMarkets, setSelectedMarkets] = useState<Set<string>>(
-    new Set(),
-  );
+
+  const trpcUtils = trpc.useUtils();
 
   // Fetch markets already saved to the community
   const { data: savedMarkets, isLoading: isLoadingSaved } =
@@ -49,7 +48,9 @@ export function useMarketData(communityId: string) {
   }, [discoveredMarkets]);
 
   const savedMarketIds = useMemo(() => {
-    return new Set(savedMarkets?.map((m) => m.id) ?? []);
+    return savedMarkets
+      ? new Set<string>(savedMarkets.map((m) => m.slug))
+      : new Set<string>();
   }, [savedMarkets]);
 
   const filteredDiscoveredMarkets = useMemo(() => {
@@ -75,18 +76,6 @@ export function useMarketData(communityId: string) {
     return filtered;
   }, [discoveredMarkets, filters]);
 
-  const handleSelectionChange = (marketId: string, isSelected: boolean) => {
-    setSelectedMarkets((prev) => {
-      const newSelection = new Set(prev);
-      if (isSelected) {
-        newSelection.add(marketId);
-      } else {
-        newSelection.delete(marketId);
-      }
-      return newSelection;
-    });
-  };
-
   const { mutate: subscribeMarket, isPending: isSubscribing } =
     trpc.community.subscribeMarket.useMutation();
   const { mutate: unsubscribeMarket, isPending: isUnsubscribing } =
@@ -99,10 +88,11 @@ export function useMarketData(communityId: string) {
       slug: market.slug,
       question: market.question,
       category: market.category,
-      start_time: market.startTime,
-      end_time: market.endTime,
+      start_time: market.startTime ?? new Date(), // TODO: make sure we have a start time
+      end_time: market.endTime ?? new Date(), // TODO: make sure we have an end time
       status: market.status as 'open',
     });
+    trpcUtils.community.getMarkets.invalidate({ community_id: communityId });
   };
 
   const onUnsubscribe = (market: Market) => {
@@ -110,6 +100,7 @@ export function useMarketData(communityId: string) {
       community_id: communityId,
       slug: market.slug,
     });
+    trpcUtils.community.getMarkets.invalidate({ community_id: communityId });
   };
 
   return {

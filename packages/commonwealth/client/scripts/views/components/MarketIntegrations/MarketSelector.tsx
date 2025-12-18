@@ -17,7 +17,6 @@ export function MarketSelector({ communityId }: MarketSelectorProps) {
     savedMarketIds,
     onSubscribe,
     onUnsubscribe,
-    isSaving,
   } = useMarketData(communityId);
 
   return (
