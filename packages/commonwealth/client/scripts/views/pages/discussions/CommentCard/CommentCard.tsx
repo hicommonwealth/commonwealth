@@ -19,6 +19,7 @@ import { useCreateCommentMutation } from 'state/api/comments';
 import useGetCommunityByIdQuery from 'state/api/communities/getCommuityById';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore, { useAIFeatureEnabled } from 'state/ui/user';
+import { useUserAiSettingsStore } from 'state/ui/user/userAiSettings';
 import { trpc } from 'utils/trpcClient';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
@@ -160,6 +161,7 @@ export const CommentCard = ({
   });
 
   const { isAIEnabled } = useAIFeatureEnabled();
+  const { webSearchEnabled } = useUserAiSettingsStore();
 
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: comment.thread_id,
@@ -311,6 +313,7 @@ export const CommentCard = ({
               : { parentCommentId: comment.id }),
             model: streamingModelId as CompletionModel,
             stream: true,
+            webSearchEnabled,
           },
           {
             onChunk: (chunk) => {
@@ -430,6 +433,7 @@ export const CommentCard = ({
     modelName,
     comment.id,
     comment.community_id,
+    webSearchEnabled,
   ]);
 
   const displayText = isStreamingAIReply ? streamingText : comment.body;

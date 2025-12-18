@@ -12,8 +12,11 @@ interface UserAiSettingsStore {
   aiInteractionsToggleEnabled: boolean;
   // AI reply toggle in thread / comment creation page - personal preference
   aiCommentsToggleEnabled: boolean;
+  // Web search toggle for AI replies - enables real-time web search
+  webSearchEnabled: boolean;
   setAIInteractionsToggleEnabled: (enabled: boolean) => void;
   setAICommentsToggleEnabled: (enabled: boolean) => void;
+  setWebSearchEnabled: (enabled: boolean) => void;
   selectedModels: AIModelOption[];
   setSelectedModels: (models: AIModelOption[]) => void;
 }
@@ -23,11 +26,15 @@ const userAiSettingsStore = createStore<UserAiSettingsStore>()(
     (set) => ({
       aiInteractionsToggleEnabled: true,
       aiCommentsToggleEnabled: true,
+      webSearchEnabled: false,
       setAIInteractionsToggleEnabled: (enabled: boolean) => {
         set({ aiInteractionsToggleEnabled: enabled });
       },
       setAICommentsToggleEnabled: (enabled: boolean) => {
         set({ aiCommentsToggleEnabled: enabled });
+      },
+      setWebSearchEnabled: (enabled: boolean) => {
+        set({ webSearchEnabled: enabled });
       },
       selectedModels: [],
       setSelectedModels: (models) => set({ selectedModels: models }),
@@ -38,6 +45,7 @@ const userAiSettingsStore = createStore<UserAiSettingsStore>()(
       partialize: (state) => ({
         aiInteractionsToggleEnabled: state.aiInteractionsToggleEnabled,
         aiCommentsToggleEnabled: state.aiCommentsToggleEnabled,
+        webSearchEnabled: state.webSearchEnabled,
         selectedModels: state.selectedModels,
       }),
     },

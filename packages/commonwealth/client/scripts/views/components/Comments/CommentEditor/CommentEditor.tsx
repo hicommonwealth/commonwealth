@@ -83,20 +83,24 @@ const CommentEditor = forwardRef<unknown, CommentEditorProps>(
     _ref,
   ) => {
     const { isAIEnabled } = useAIFeatureEnabled();
-    const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
-      useUserAiSettingsStore();
+    const {
+      aiCommentsToggleEnabled,
+      setAICommentsToggleEnabled,
+      webSearchEnabled: storeWebSearchEnabled,
+      setWebSearchEnabled: setStoreWebSearchEnabled,
+    } = useUserAiSettingsStore();
 
     const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
 
     const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-    const [localWebSearchEnabled, setLocalWebSearchEnabled] = useState(false);
+    // Use prop if provided, otherwise use store value (shared with CommentCard AI auto-reply)
     const effectiveWebSearchEnabled =
       typeof webSearchEnabled === 'boolean'
         ? webSearchEnabled
-        : localWebSearchEnabled;
+        : storeWebSearchEnabled;
     const effectiveSetWebSearchEnabled =
-      setWebSearchEnabled || setLocalWebSearchEnabled;
+      setWebSearchEnabled || setStoreWebSearchEnabled;
 
     const { generateCompletion } = useAiCompletion();
 

@@ -82,6 +82,8 @@ const StickyInput = (props: StickyInputProps) => {
     setAICommentsToggleEnabled,
     selectedModels,
     setSelectedModels,
+    webSearchEnabled,
+    setWebSearchEnabled,
   } = useUserAiSettingsStore();
 
   const effectiveAiCommentsToggleEnabled =
@@ -95,7 +97,6 @@ const StickyInput = (props: StickyInputProps) => {
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [webSearchEnabled, setWebSearchEnabled] = useState(false);
   const [justClosedMentionDropdown, setJustClosedMentionDropdown] =
     useState(false);
 
