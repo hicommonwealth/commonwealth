@@ -11,8 +11,7 @@ import './CWLayoutBanner.scss';
 
 const BANNERS = {
   COMMON_CLAIM: {
-    headline:
-      '🎉 COMMON is Live. Check your potential claim on your rewards page',
+    headline: 'Complete your COMMON claim from the rewards page',
     subText: undefined,
     cta: {
       type: 'secondary' as ButtonType,
