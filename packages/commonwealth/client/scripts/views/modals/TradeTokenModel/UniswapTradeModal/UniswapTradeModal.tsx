@@ -1,7 +1,7 @@
+import { SupportedChainId, SwapWidget } from '@commonxyz/uniswap-widgets';
+import '@commonxyz/uniswap-widgets/fonts.css';
 import { getChainName, ValidChains } from '@hicommonwealth/evm-protocols';
 import { ChainBase } from '@hicommonwealth/shared';
-import { SupportedChainId, SwapWidget } from '@uniswap/widgets';
-import '@uniswap/widgets/fonts.css';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
 import NodeInfo, { ChainNode } from 'models/NodeInfo';
