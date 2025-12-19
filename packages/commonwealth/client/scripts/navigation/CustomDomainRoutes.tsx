@@ -85,6 +85,7 @@ const CommunityOnchainVerificationIntegration = lazy(
   () =>
     import('views/pages/CommunityManagement/OnchainVerificationIntegration'),
 );
+const MarketsAppPage = lazy(() => import('views/pages/MarketsAppPage'));
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -396,6 +397,13 @@ const CustomDomainRoutes = () => {
       key="/manage/integrations/onchain-verification"
       path="/manage/integrations/onchain-verification"
       element={withLayout(CommunityOnchainVerificationIntegration, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/markets-app"
+      path="/markets-app"
+      element={withLayout(MarketsAppPage, {
         scoped: true,
       })}
     />,

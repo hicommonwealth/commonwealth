@@ -165,6 +165,10 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     [{ path: '/directory' }, { path: ':scope/directory' }],
     location,
   );
+  const matchesMarketsAppRoute = matchRoutes(
+    [{ path: '/markets-app' }, { path: ':scope/markets-app' }],
+    location,
+  );
 
   // ---------- Build Section Props ---------- //
 
@@ -313,6 +317,23 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     },
   };
 
+  const marketsData: SectionGroupAttrs = {
+    title: 'Markets',
+    containsChildren: false,
+    displayData: null,
+    hasDefaultToggle: false,
+    isActive: !!matchesMarketsAppRoute,
+    isVisible: true, // Always visible for now
+    isUpdated: true,
+    onClick: (e, toggle: boolean) => {
+      e.preventDefault();
+      resetSidebarState();
+      handleRedirectClicks(navigate, e, `/markets-app`, communityId, () => {
+        setGovernanceToggleTree('children.Markets.toggledState', toggle);
+      });
+    },
+  };
+
   // Directory
   const directoryData: SectionGroupAttrs = {
     title: 'Directory',
@@ -336,11 +357,12 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     snapshotData,
     proposalsData,
     questsData,
+    marketsData,
     directoryData,
   ];
 
   if (!hasProposals)
-    governanceGroupData = [membersData, questsData, directoryData];
+    governanceGroupData = [membersData, questsData, marketsData, directoryData];
   if (isContestAvailable) {
     governanceGroupData.push(contestData);
   }
