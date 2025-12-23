@@ -281,17 +281,17 @@ export const ViewPollVotesDrawer = ({
                     <div key={idx} className="token-entry">
                       <div className="token-info">
                         <span className="token-symbol">
-                          {token.token_symbol || token.token_address}
+                          {token.token_symbol || token?.token_address}
                         </span>
                         <span className="token-address">
-                          {token.token_address}
+                          {token?.token_address}
                         </span>
                       </div>
                       <CWIconButton
                         iconName="copy"
                         iconSize="small"
                         onClick={() => {
-                          saveToClipboard(token.token_address, true).catch(
+                          saveToClipboard(token?.token_address, true).catch(
                             console.error,
                           );
                         }}

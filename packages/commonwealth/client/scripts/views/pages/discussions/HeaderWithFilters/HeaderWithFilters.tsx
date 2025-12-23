@@ -362,11 +362,11 @@ export const HeaderWithFilters = ({
                 selectedTopic.secondary_tokens.map((token, idx) => (
                   <div key={idx} className="token-entry">
                     <span className="token-symbol">
-                      + {token.token_symbol || token.token_address}
+                      + {token.token_symbol || token?.token_address}
                     </span>
                   </div>
                 ))}
-              {selectedTopic.token_address && (
+              {selectedTopic?.token_address && (
                 <div className="token-address-button-container">
                   <CWIconButton
                     iconName="infoEmpty"
@@ -424,7 +424,7 @@ export const HeaderWithFilters = ({
                                   </div>
                                 )}
                                 <div className="token-address-text">
-                                  {token.token_address}
+                                  {token?.token_address}
                                 </div>
                               </div>
                               <CWIconButton
@@ -432,7 +432,7 @@ export const HeaderWithFilters = ({
                                 iconSize="small"
                                 onClick={() => {
                                   saveToClipboard(
-                                    token.token_address,
+                                    token?.token_address,
                                     true,
                                   ).catch(console.error);
                                 }}

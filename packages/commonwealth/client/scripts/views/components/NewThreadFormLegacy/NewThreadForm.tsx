@@ -78,6 +78,10 @@ import {
 import { useAIFeatureEnabled } from 'state/ui/user';
 import { ExtendedPoll, LocalPoll, parseCustomDuration } from 'utils/polls';
 // eslint-disable-next-line max-len
+import { WEI_PER_ETHER } from '@hicommonwealth/shared';
+import { useFetchTokenUsdRateQuery as useFetchToken } from 'state/api/communityStake';
+import useFetchTokenUsdRateQuery from 'state/api/communityStake/fetchTokenUsdRate';
+import { useGetLaunchpadPriceQuery } from 'state/api/tokens/getLaunchpadPrice';
 import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import ProposalVotesDrawer from '../../pages/NewProposalViewPage/ProposalVotesDrawer/ProposalVotesDrawer';
 import { useCosmosProposal } from '../../pages/NewProposalViewPage/useCosmosProposal';
@@ -114,6 +118,30 @@ import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 import { launchAndBuyThreadTokenUtility } from './useLaunchAndBuyThreadToken';
 
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
+
+function calculateConnectorWeightFromUsdPrice(usdPrice: number): number {
+  if (usdPrice === 0) {
+    return 830000;
+  }
+  const initialBalance = BigInt(Math.floor((100 / usdPrice) * 1e18));
+  const graduationBalance = BigInt(Math.floor((1000 / usdPrice) * 1e18));
+  const launchpadLiquidity = BigInt(200_000_000) * BigInt(1e18);
+  const initialSupply = BigInt(1_000_000_000) * BigInt(1e18);
+
+  const supplyNum = Number(initialSupply) / 1e18;
+  const liquidityNum = Number(launchpadLiquidity) / 1e18;
+  const depositNum = Number(graduationBalance - initialBalance) / 1e18;
+  const balanceNum = Number(initialBalance) / 1e18;
+
+  const connectorRatio = 1 + depositNum / balanceNum;
+  const tokenRatio = liquidityNum / supplyNum + 1;
+
+  const w = Math.floor(
+    (1_000_000 * Math.log(tokenRatio)) / Math.log(connectorRatio),
+  );
+
+  return Math.max(10000, Math.min(1000000, w));
+}
 
 interface NewThreadFormProps {
   onCancel?: (e: React.MouseEvent | undefined) => void;
@@ -357,6 +385,36 @@ export const NewThreadForm = forwardRef<
       with_stats: true,
       enabled: !!selectedCommunityId,
     });
+
+    const { data: externalUsdPrice, isLoading: isLoadingETHToCurrencyRate } =
+      useFetchTokenUsdRateQuery({
+        tokenContractAddress: communityToken?.token_address || '',
+        enabled: !!communityToken,
+      });
+
+    const tokenToUsdRate = parseFloat(externalUsdPrice?.data?.data?.amount);
+
+    const { data: launchpadPriceEth } = useGetLaunchpadPriceQuery(
+      chainRpc,
+      ethChainId,
+      communityToken?.token_address || '',
+      !!externalUsdPrice && !isLoadingETHToCurrencyRate,
+    );
+
+    const { data: ethToCurrencyRateData } = useFetchToken({
+      tokenSymbol: 'ETH',
+      enabled: !!launchpadPriceEth,
+    });
+
+    const ethToUsdRate = parseFloat(
+      ethToCurrencyRateData?.data?.data?.amount || '0',
+    );
+
+    const launchpadPriceUsd =
+      (Number(launchpadPriceEth || '0') / WEI_PER_ETHER) * ethToUsdRate;
+
+    const finalPrice = tokenToUsdRate || launchpadPriceUsd || 0;
+    const connectorWeight = calculateConnectorWeightFromUsdPrice(finalPrice);
 
     const handleNewThreadCreation = useCallback(async () => {
       if (!community || !userSelectedAddress || !selectedCommunityId) {
@@ -648,7 +706,7 @@ export const NewThreadForm = forwardRef<
 
     useEffect(() => {
       refreshTopics().catch(console.error);
-    }, [refreshTopics]);
+    }, [refreshTopics, selectedCommunityId]);
 
     const handleKeyDown = useCallback(
       (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -905,6 +963,7 @@ export const NewThreadForm = forwardRef<
               linkSpecificAddressToSpecificCommunity,
               tokenGainAmount: tokenGainAmount,
               amount: amount,
+              connectorWeight,
             });
 
             notifySuccess('Thread created and token launched successfully!');
