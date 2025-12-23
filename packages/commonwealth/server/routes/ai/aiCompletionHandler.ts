@@ -22,7 +22,7 @@ import {
   shouldUseOpenRouter,
 } from './completionUtils';
 import { createAIComment } from './createAIComment';
-import { getMentionedMCPServers } from './mcpUtils';
+import { getMentionedMCPServersWithAncestors } from './mcpUtils';
 import { extractOpenRouterError } from './utils';
 
 const log = logger(import.meta);
@@ -146,9 +146,19 @@ async function validateRequest(
       const commentAuthorAddress = await models.Address.findByPk(
         parentComment.address_id,
       );
-      if (commentAuthorAddress?.user_id !== userId) {
+
+      // Check if the parent comment is from the AI bot
+      const { isBotAddress: checkBotAddress } = await import(
+        '@hicommonwealth/model/services'
+      );
+      const isParentFromBot = await checkBotAddress(parentComment.address_id);
+
+      // Allow if: user created the comment, OR the parent is from the AI bot
+      // This enables replying to AI bot comments to continue the conversation
+      if (commentAuthorAddress?.user_id !== userId && !isParentFromBot) {
         res.status(403).json({
-          error: 'Parent comment must be created by the requesting user',
+          error:
+            'Parent comment must be created by the requesting user or be an AI bot comment',
         });
         return { valid: false };
       }
@@ -603,10 +613,12 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       userPromptLength: userPrompt.length,
     });
 
-    // Check for MCP server mentions
-    const mentionedMCPServers = await getMentionedMCPServers(
+    // Check for MCP server mentions in the user's comment and ancestor comments
+    // This enables conversation continuity when replying to AI bot comments
+    const mentionedMCPServers = await getMentionedMCPServersWithAncestors(
       communityId,
       parentCommentBody,
+      parentCommentId,
       requestId,
     );
 
