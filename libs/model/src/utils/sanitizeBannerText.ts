@@ -3,16 +3,14 @@ import sanitizeHtml from 'sanitize-html';
 /**
  * Configuration for sanitizing community banner text.
  *
- * The banner should only support basic text formatting - no images, embeds,
- * or other content that could:
- * - Disrupt page layout with large elements
- * - Make external requests that could track user IP addresses
- * - Execute scripts or other potentially harmful content
+ * The banner should only support basic text formatting
  *
  * Allowed tags are restricted to basic text formatting only:
  * - Text formatting: b, strong, i, em, u, s, strike
  * - Structure: p, br, span
  * - Links: a (with href only, validated to prevent javascript: URLs)
+ *
+ * Inline CSS (style attributes) are explicitly blocked on all elements.
  */
 const BANNER_SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
   allowedTags: [
@@ -39,9 +37,11 @@ const BANNER_SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
     'a',
   ],
   allowedAttributes: {
-    // Only allow href on anchor tags, no other attributes
+    // Only allow href on anchor tags, no other attributes (style is explicitly excluded)
     a: ['href'],
   },
+  // Explicitly block all inline CSS styles on all elements
+  allowedStyles: {},
   allowedSchemes: ['http', 'https', 'mailto'],
   // Disallow any potentially dangerous URL schemes
   disallowedTagsMode: 'discard',
