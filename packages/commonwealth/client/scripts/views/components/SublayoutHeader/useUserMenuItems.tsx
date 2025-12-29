@@ -109,7 +109,7 @@ const useUserMenuItems = ({
 
   const handleLogout = useCallback(async () => {
     try {
-      await axios.get(`${SERVER_URL}/logout`);
+      await axios.post(`${SERVER_URL}/logout`);
       await initAppState();
       await resetWalletConnectSession();
       for (const signer of getSessionSigners()) {
