@@ -4,16 +4,16 @@ import {
 } from 'client/scripts/controllers/app/notifications';
 import app from 'client/scripts/state';
 import { trpc } from 'client/scripts/utils/trpcClient';
-import { CWCard } from 'client/scripts/views/components/component_kit/cw_card';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'client/scripts/views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import CWPageLayout from 'client/scripts/views/components/component_kit/new_designs/CWPageLayout';
 import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
 import React from 'react';
 
-import './MarketsAppPage.scss'; // Import the new SCSS file
+import './MarketsAppPage.scss';
 
-const MarketsAppPage: React.FC = () => {
+const MarketsAppPage = () => {
   const community_id = app.activeChainId() || '';
   const utils = trpc.useUtils();
   const {
@@ -44,43 +44,118 @@ const MarketsAppPage: React.FC = () => {
     unsubscribeMarketMutation.mutate({ community_id, slug });
   };
 
+  const getStatusTagType = (status: string): 'active' | 'new' | 'info' => {
+    switch (status) {
+      case 'open':
+        return 'active';
+      case 'closed':
+        return 'new';
+      case 'settled':
+        return 'info';
+      default:
+        return 'info';
+    }
+  };
+
+  const formatDate = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(dateObj);
+  };
+
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-full">
-        <CWCircleMultiplySpinner />
-      </div>
+      <CWPageLayout>
+        <section className="MarketsAppPage">
+          <div className="markets-loading">
+            <CWCircleMultiplySpinner />
+          </div>
+        </section>
+      </CWPageLayout>
     );
   }
 
   if (error) {
     notifyError(`Error fetching markets: ${error.message}`);
-    return null;
+    return (
+      <CWPageLayout>
+        <section className="MarketsAppPage">
+          <div className="markets-header">
+            <CWText type="h3" fontWeight="bold" className="markets-title">
+              Markets
+            </CWText>
+            <CWText type="b1" className="markets-subtitle">
+              Track and manage your subscribed prediction markets
+            </CWText>
+          </div>
+        </section>
+      </CWPageLayout>
+    );
   }
 
   return (
-    <div>
-      <CWText type="h4" fontWeight="semiBold" className="mb-4">
-        Markets
-      </CWText>
-      <div className="px-4">
-        {' '}
-        {/* Outer padding */}
-        <div className="markets-grid-container">
-          {markets &&
-            markets.map((market) => (
-              <CWCard
-                key={market.id}
-                elevation="elevation-2"
-                className="p-4 flex flex-col justify-between h-full w-full"
-              >
-                <div className="flex flex-col h-full">
-                  <div className="flex-grow">
-                    <div className="flex items-center justify-between mb-2">
-                      <CWTag type="info" label={market.category} />
+    <CWPageLayout>
+      <section className="MarketsAppPage">
+        <div className="markets-header">
+          <CWText type="h3" fontWeight="bold" className="markets-title">
+            Markets
+          </CWText>
+          <CWText type="b1" className="markets-subtitle">
+            Track and manage your subscribed prediction markets
+          </CWText>
+        </div>
+
+        {(markets && markets?.length === 0) || !markets ? (
+          <div className="markets-empty-state">
+            <CWText type="h5" className="empty-state-title">
+              No markets subscribed
+            </CWText>
+            <CWText type="b2" className="empty-state-description">
+              You haven&apos;t subscribed to any markets yet. Explore markets to
+              get started.
+            </CWText>
+          </div>
+        ) : (
+          <div className="markets-grid-container">
+            {markets.map((market) => (
+              <div key={market.id} className="market-card">
+                <div className="market-card-content">
+                  <div className="market-card-header">
+                    <div className="market-tags">
+                      <CWTag
+                        type="info"
+                        label={market.category}
+                        classNames="category-tag"
+                      />
+                      <CWTag
+                        type={getStatusTagType(market.status)}
+                        label={market.status.toUpperCase()}
+                        classNames="status-tag"
+                      />
                     </div>
-                    <CWText fontWeight="semiBold">{market.question}</CWText>
+                    <div className="market-provider">
+                      <span className="provider-badge">{market.provider}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-end mt-4">
+
+                  <div className="market-question">
+                    <CWText fontWeight="semiBold" type="h5">
+                      {market.question}
+                    </CWText>
+                  </div>
+
+                  <div className="market-date-chip">
+                    <CWTag
+                      type="info"
+                      label={`From ${formatDate(market.start_time)} to ${formatDate(market.end_time)}`}
+                      classNames="date-tag"
+                    />
+                  </div>
+
+                  <div className="market-card-footer">
                     <CWButton
                       label="Unsubscribe"
                       onClick={() => handleUnsubscribe(market.slug)}
@@ -89,14 +164,12 @@ const MarketsAppPage: React.FC = () => {
                     />
                   </div>
                 </div>
-              </CWCard>
+              </div>
             ))}
-        </div>
-      </div>
-      {markets && markets.length === 0 && (
-        <CWText>No markets subscribed.</CWText>
-      )}
-    </div>
+          </div>
+        )}
+      </section>
+    </CWPageLayout>
   );
 };
 
