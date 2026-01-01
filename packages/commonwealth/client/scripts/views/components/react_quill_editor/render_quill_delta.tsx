@@ -1,6 +1,7 @@
 import { preprocessQuillDeltaForRendering } from '@hicommonwealth/shared';
 import { loadScript } from 'helpers';
 import React, { ReactElement } from 'react';
+import { isValidImageUrl } from './utils';
 
 type TempList = Array<
   Array<{
@@ -186,9 +187,12 @@ export const renderQuillDelta = (
       })
     : consolidateOrderedLists(groups).map((group) => {
         const renderChild = (child, ii) => {
-          // handle images
+          // handle images - only render if URL passes validation
           if (child.insert?.image) {
-            return <img key={ii} src={child.insert?.image} alt="image" />;
+            if (!isValidImageUrl(child.insert.image)) {
+              return null;
+            }
+            return <img key={ii} src={child.insert.image} alt="image" />;
           }
 
           // handle video

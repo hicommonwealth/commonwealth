@@ -1,10 +1,25 @@
 import { Icon, IconProps } from '@phosphor-icons/react';
 import axios from 'axios';
+import DOMPurify from 'dompurify';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 
 export const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
+
+// Regex to validate image URLs - must be http(s) with valid image extension
+export const IMAGE_URL_REGEX =
+  /^https?:\/\/([\w-]+\.)+[\w-]+(\/[\w./%-]*)?\/[\w-]+\.(jpg|jpeg|png|gif)(\?[^\s]*)?$/i;
+
+/**
+ * Validates that an image URL matches the expected format for rendered images.
+ * Only allows http/https URLs with valid image extensions (jpg, jpeg, png, gif).
+ */
+export const isValidImageUrl = (url: string): boolean => {
+  if (!url || typeof url !== 'string') return false;
+  console.log('hello image:', url);
+  return IMAGE_URL_REGEX.test(url);
+};
 
 // createDeltaFromText returns a new DeltaStatic object from a string
 export const createDeltaFromText = (
@@ -221,6 +236,36 @@ export const RTFtoMD = (delta: DeltaStatic) => {
   return mdDelta as SerializableDeltaStatic;
 };
 
+/**
+ * Sanitizes HTML content using DOMPurify with image URL validation.
+ * Images with invalid URLs (not matching IMAGE_URL_REGEX) will be removed.
+ * @param html The HTML string to sanitize.
+ * @param config The DOMPurify config to use.
+ * @returns The sanitized HTML string with invalid images removed.
+ */
+export const sanitizeHTMLWithImageValidation = (
+  html: string,
+  config: typeof dompurifyConfig | typeof dompurifyConfigForHTML,
+): string => {
+  // Add a hook to validate image src attributes
+  DOMPurify.addHook('uponSanitizeElement', (node, data) => {
+    if (data.tagName === 'img') {
+      const src = (node as HTMLImageElement).getAttribute('src');
+      if (!src || !isValidImageUrl(src)) {
+        // Remove invalid images by clearing the node
+        node.parentNode?.removeChild(node);
+      }
+    }
+  });
+
+  const result = DOMPurify.sanitize(html, config);
+
+  // Remove the hook after sanitization to avoid affecting other calls
+  DOMPurify.removeHook('uponSanitizeElement');
+
+  return result;
+};
+
 export const dompurifyConfig = {
   ALLOWED_TAGS: [
     'a',
@@ -367,4 +412,24 @@ export const getImageUrlsFromMarkdown = (markdown: string): string[] => {
     }
   }
   return urls;
+};
+
+/**
+ * Sanitizes markdown by removing images with invalid URLs.
+ * Images that don't match the IMAGE_URL_REGEX will be removed from the markdown.
+ * @param markdown The markdown string to sanitize.
+ * @returns The sanitized markdown string with invalid images removed.
+ */
+export const sanitizeMarkdownImages = (markdown: string): string => {
+  if (!markdown) {
+    return markdown;
+  }
+  // Regex to find Markdown images: ![alt text](url) or ![alt text](url "title")
+  const imageRegex = /!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
+  return markdown.replace(imageRegex, (match, altText, url) => {
+    if (isValidImageUrl(url)) {
+      return match; // Keep valid images
+    }
+    return ''; // Remove invalid images
+  });
 };

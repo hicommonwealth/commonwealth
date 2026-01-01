@@ -1,5 +1,4 @@
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
-import DOMPurify from 'dompurify';
 import { loadScript } from 'helpers';
 import { twitterLinkRegex } from 'helpers/constants';
 import _ from 'lodash';
@@ -25,6 +24,8 @@ import {
   dompurifyConfig,
   dompurifyConfigForHTML,
   fetchTwitterEmbedInfo,
+  isValidImageUrl,
+  sanitizeHTMLWithImageValidation,
 } from './utils';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
@@ -45,6 +46,10 @@ markdownRenderer.image = (href, title, text) => {
     if (hash) {
       href = `https://ipfs.io/ipfs/${hash}`;
     }
+  }
+  // Only render images with valid URLs
+  if (!isValidImageUrl(href)) {
+    return '';
   }
   return `<img alt="${text}" src="${href}"/>`;
 };
@@ -108,9 +113,9 @@ export const MarkdownFormattedText = ({
   const unsanitizedHTML = marked.parse(truncatedDoc);
 
   const sanitizedHTML: string = useMemo(() => {
-    return hideFormatting || searchTerm
-      ? DOMPurify.sanitize(unsanitizedHTML, dompurifyConfig)
-      : DOMPurify.sanitize(unsanitizedHTML, dompurifyConfigForHTML);
+    const config =
+      hideFormatting || searchTerm ? dompurifyConfig : dompurifyConfigForHTML;
+    return sanitizeHTMLWithImageValidation(unsanitizedHTML, config);
   }, [hideFormatting, searchTerm, unsanitizedHTML]);
   // finalDoc is the rendered content which may include search term highlights
   const finalDoc = useMemo(() => {
