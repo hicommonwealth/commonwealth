@@ -19,7 +19,6 @@ export const IMAGE_URL_REGEX = new RegExp(
  */
 export const isValidImageUrl = (url: string): boolean => {
   if (!url || typeof url !== 'string') return false;
-  console.log('hello image:', url);
   return IMAGE_URL_REGEX.test(url);
 };
 
