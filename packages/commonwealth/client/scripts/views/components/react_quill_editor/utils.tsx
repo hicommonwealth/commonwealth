@@ -5,15 +5,17 @@ import type { DeltaStatic } from 'quill';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 
-export const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
+export const VALID_IMAGE_TYPES = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
 
 // Regex to validate image URLs - must be http(s) with valid image extension
-export const IMAGE_URL_REGEX =
-  /^https?:\/\/([\w-]+\.)+[\w-]+(\/[\w./%-]*)?\/[\w-]+\.(jpg|jpeg|png|gif)(\?[^\s]*)?$/i;
+export const IMAGE_URL_REGEX = new RegExp(
+  `^https?:\\/\\/([\\w-]+\\.)+[\\w-]+(\\/[\\w./%!-]*)?\\/[\\w-]+\\.(${VALID_IMAGE_TYPES.join('|')})(\\?[^\\s]*)?$`,
+  'i',
+);
 
 /**
  * Validates that an image URL matches the expected format for rendered images.
- * Only allows http/https URLs with valid image extensions (jpg, jpeg, png, gif).
+ * Only allows http/https URLs with valid image extensions.
  */
 export const isValidImageUrl = (url: string): boolean => {
   if (!url || typeof url !== 'string') return false;
