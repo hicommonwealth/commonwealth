@@ -74,7 +74,8 @@
     "dump-db": "chmod u+x scripts/dump-db.sh && ./scripts/dump-db.sh",
     "reset-db": "chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh",
     "cancel-active-contests": "tsx scripts/cancel-active-contests.ts",
-    "create-neon-branch": "chmod u+x scripts/create-neon-branch.sh && ./scripts/create-neon-branch.sh"
+    "create-neon-branch": "chmod u+x scripts/create-neon-branch.sh && ./scripts/create-neon-branch.sh",
+    "sanitize-banners": "tsx scripts/sanitize-existing-banners.ts"
   },
   "dependencies": {
     "@canvas-js/chain-ethereum": "^0.13.14",
@@ -119,12 +120,14 @@
     "sequelize": "^6.32.1",
     "umzug": "^3.7.0",
     "unique-username-generator": "^1.3.0",
+    "sanitize-html": "^2.14.0",
     "uuid": "^9.0.1",
     "viem": "^2.23.2",
     "web3-utils": "^4.2.2",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@types/sanitize-html": "^2.13.0",
     "randexp": "^0.5.3",
     "sequelize-cli": "^6.6.3",
     "tsx": "^4.7.2"
