@@ -155,10 +155,10 @@ echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Extract metadata from the generated issue
-TYPE=$(grep "^\*\*Type:\*\*" "$TEMP_FILE" | sed 's/^**Type:** //' | awk '{print $1}')
-PRIORITY=$(grep "^\*\*Priority:\*\*" "$TEMP_FILE" | sed 's/^**Priority:** //' | awk '{print $1}')
-RISK=$(grep "^\*\*Risk:\*\*" "$TEMP_FILE" | sed 's/^**Risk:** //' | awk '{print $1}')
-CATEGORY=$(grep "^\*\*Category:\*\*" "$TEMP_FILE" | sed 's/^**Category:** //' | awk '{print $1}')
+TYPE=$(grep "^\*\*Type:\*\*" "$TEMP_FILE" | sed 's/^\*\*Type:\*\* //' | awk '{print $1}')
+PRIORITY=$(grep "^\*\*Priority:\*\*" "$TEMP_FILE" | sed 's/^\*\*Priority:\*\* //' | awk '{print $1}')
+RISK=$(grep "^\*\*Risk:\*\*" "$TEMP_FILE" | sed 's/^\*\*Risk:\*\* //' | awk '{print $1}')
+CATEGORY=$(grep "^\*\*Category:\*\*" "$TEMP_FILE" | sed 's/^\*\*Category:\*\* //' | awk '{print $1}')
 
 # Extract title from description (first line after ## Description)
 TITLE=$(awk '/^## Description/{getline; print; exit}' "$TEMP_FILE" | sed 's/^\[//' | sed 's/\]$//')
