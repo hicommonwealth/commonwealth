@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "setup": "pnpm install; if [ -f \"$CONDUCTOR_ROOT_PATH/.env\" ]; then ln -sf \"$CONDUCTOR_ROOT_PATH/.env\" .env; elif [ ! -f .env ]; then cp .env.example .env; fi; docker-compose up -d; pnpm migrate-db",
+    "setup": "pnpm install; if [ -f \"$CONDUCTOR_ROOT_PATH/.env\" ]; then ln -sf \"$CONDUCTOR_ROOT_PATH/.env\" .env; elif [ ! -f .env ]; then cp .env.example .env; fi; docker-compose up -d; for i in {1..30}; do docker exec cw_postgres pg_isready -U commonwealth >/dev/null 2>&1 && break; sleep 2; done; docker exec cw_postgres pg_isready -U commonwealth >/dev/null 2>&1 || (echo \"Postgres not ready\" && exit 1); pnpm migrate-db",
     "run": "pnpm start-all"
   },
   "runScriptMode": "nonconcurrent"
