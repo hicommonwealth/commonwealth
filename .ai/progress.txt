@@ -55,5 +55,13 @@ Each AI run should append an entry with:
   * Test direct URL access to /markets-app and /:scope/manage/markets when flag is disabled
   * Confirm routes properly return 404 or redirect when flag is off
 - Commit: 14779d72899558242378b4e6006a004d7e9ed438
+- Follow-up fix for React Hooks error:
+  * Converted Router from a function to a React component
+  * Router now returns <RouterProvider> directly instead of router config object
+  * Moved useFlag('markets') call to Router component where hooks are properly called
+  * Updated App.tsx to use <Router /> as component instead of router()
+  * Passed marketsEnabled as parameter to CommonDomainRoutes/CustomDomainRoutes
+  * Fixed "Rendered more hooks than during the previous render" error
+  * Commit: f3910b09be
 
 ---
