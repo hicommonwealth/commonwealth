@@ -30,6 +30,7 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_NEW_EDITOR': JSON.stringify(env.FLAG_NEW_EDITOR),
     'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
     'process.env.FLAG_LAUNCHPAD': JSON.stringify(env.FLAG_LAUNCHPAD),
+    'process.env.FLAG_MARKETS': JSON.stringify(env.FLAG_MARKETS),
     'process.env.FLAG_NEW_CONTEST_PAGE': JSON.stringify(
       env.FLAG_NEW_CONTEST_PAGE,
     ),

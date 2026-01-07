@@ -1,7 +1,8 @@
-import { Query } from '@hicommonwealth/core';
+import { InvalidState, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
+import { config } from '../../config';
 import { models } from '../../database';
 
 export function GetMarkets(): Query<typeof schemas.GetMarkets> {
@@ -9,6 +10,10 @@ export function GetMarkets(): Query<typeof schemas.GetMarkets> {
     ...schemas.GetMarkets,
     auth: [],
     body: async ({ payload }) => {
+      if (!config.MARKETS?.ENABLED) {
+        throw new InvalidState('Markets not enabled');
+      }
+
       const { community_id } = payload;
 
       const markets = await models.sequelize.query<

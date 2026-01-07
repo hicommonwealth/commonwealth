@@ -25,6 +25,7 @@ const featureFlags = {
   contestDev: buildFlag(process.env.FLAG_CONTEST_DEV),
   newEditor: buildFlag(process.env.FLAG_NEW_EDITOR),
   launchpad: buildFlag(process.env.FLAG_LAUNCHPAD),
+  markets: buildFlag(process.env.FLAG_MARKETS),
   newContestPage: buildFlag(process.env.FLAG_NEW_CONTEST_PAGE),
   referrals: buildFlag(process.env.FLAG_REFERRALS),
   mobileDownload: buildFlag(process.env.FLAG_MOBILE_DOWNLOAD),

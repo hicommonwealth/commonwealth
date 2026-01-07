@@ -2,6 +2,8 @@ import path from 'path';
 import { beforeAll } from 'vitest';
 import { bootstrap_testing } from './tester';
 
+process.env.FLAG_MARKETS = process.env.FLAG_MARKETS ?? 'true';
+
 beforeAll(async ({ name }) => {
   const lcsuite = name.includes('-lifecycle');
   if (lcsuite) {

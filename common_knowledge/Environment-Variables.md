@@ -39,6 +39,7 @@ If you add a new environment variable, you must add documentation here. Please d
 - [ETH_ALCHEMY_API_KEY](#eth_alchemy_api_key)
 - [ETH_RPC](#eth_rpc)
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
+- [FLAG_MARKETS](#flag_markets)
 - [FLAG_NEW_CREATE_COMMUNITY](#flag_new_create_community)
 - [HEROKU_APP_NAME](#heroku_app_name)
 - [IS_CI](#is_ci)
@@ -211,6 +212,10 @@ Owner: Ian Rowan
 Optional. Defaults to 5 minutes (300 seconds).
 This is number, in seconds. It configures the length of time we will use a community-maintained public endpoint if a given ChainNode fails.
 After this time, the server will try the original DB endpoint again.
+
+## FLAG_MARKETS
+
+Boolean toggle enabling prediction markets functionality (UI + API). When `false`, prediction markets features are disabled.
 
 ## FLAG_NEW_CREATE_COMMUNITY
 
