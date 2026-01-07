@@ -6,7 +6,7 @@ export const LogLevels = [
   'error',
   'fatal',
 ] as const;
-export type LogLevel = typeof LogLevels[number];
+export type LogLevel = (typeof LogLevels)[number];
 
 export const ExitCodes = ['UNIT_TEST', 'ERROR', 'EXIT'] as const;
 /**
@@ -15,4 +15,4 @@ export const ExitCodes = ['UNIT_TEST', 'ERROR', 'EXIT'] as const;
  * - `ERROR` exit on errors
  * - `EXIT` normal exit signal
  */
-export type ExitCode = typeof ExitCodes[number];
+export type ExitCode = (typeof ExitCodes)[number];
