@@ -5,7 +5,7 @@ import {
   notifySuccess,
 } from 'controllers/app/notifications';
 import NodeInfo from 'models/NodeInfo';
-import React from 'react';
+import React, { useState } from 'react';
 import app from 'state';
 import {
   usePinTokenToCommunityMutation,
@@ -35,6 +35,18 @@ const ConnectTokenStep = ({
   const baseNode = nodes?.find(
     (n) => n.ethChainId === ValidChains.Base,
   ) as NodeInfo; // this is expected to exist
+  const soneiumNode = nodes?.find(
+    (n) => n.ethChainId === ValidChains.Soneium,
+  ) as NodeInfo; // this is expected to exist
+
+  const [selectedChainNodeId, setSelectedChainNodeId] = useState(
+    `${baseNode?.id}`,
+  );
+
+  const nodeEthChainId =
+    ((parseInt(selectedChainNodeId) || 0) === baseNode.id
+      ? baseNode?.ethChainId
+      : soneiumNode?.ethChainId) || 0;
 
   const {
     debouncedTokenValue,
@@ -44,7 +56,7 @@ const ConnectTokenStep = ({
     tokenMetadataLoading,
     tokenValue,
   } = useTokenFinder({
-    nodeEthChainId: baseNode?.ethChainId || 0,
+    nodeEthChainId,
   });
 
   const { mutateAsync: pinToken, isPending: isPinningToken } =
@@ -59,6 +71,10 @@ const ConnectTokenStep = ({
     tokenMetadataLoading || isPinningToken || isUnpinningToken;
 
   const areActionsDisabled = !!getTokenError() || isActionPending;
+
+  const handleWatch = (values: ConnectTokenStepSubmitValues) => {
+    setSelectedChainNodeId(values.chainNodeId);
+  };
 
   const handleSubmit = (values: ConnectTokenStepSubmitValues) => {
     if (areActionsDisabled) return;
@@ -101,8 +117,9 @@ const ConnectTokenStep = ({
       onSubmit={handleSubmit}
       className="ConnectTokenStep"
       initialValues={{
-        chainNodeId: baseNode?.id,
+        chainNodeId: selectedChainNodeId,
       }}
+      onWatch={handleWatch}
     >
       <div className="chain-selector">
         <div className="header">
@@ -113,11 +130,16 @@ const ConnectTokenStep = ({
           </CWText>
         </div>
         <CWRadioButton
-          value={`${baseNode.id}`}
-          checked
+          value={`${baseNode?.id}`}
           name="chainNodeId"
           hookToForm
           label="BASE"
+        />
+        <CWRadioButton
+          value={`${soneiumNode?.id}`}
+          name="chainNodeId"
+          hookToForm
+          label="Soneium"
         />
       </div>
       <div className="token-finder-container">
@@ -141,8 +163,16 @@ const ConnectTokenStep = ({
           fullWidth
           placeholder="Please enter primary token address"
           tokenAddress={tokenValue}
-          chainName={baseNode.name}
-          chainEthId={baseNode.ethChainId}
+          chainName={
+            selectedChainNodeId === `${soneiumNode?.id}`
+              ? soneiumNode?.name
+              : baseNode?.name
+          }
+          chainEthId={
+            selectedChainNodeId === `${soneiumNode?.id}`
+              ? soneiumNode?.ethChainId
+              : baseNode?.ethChainId
+          }
         />
       </div>
       <CWDivider />
