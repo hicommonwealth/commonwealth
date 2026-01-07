@@ -70,5 +70,7 @@ Each AI run should append an entry with:
   * Added validation to UnsubscribeMarket command - throws InvalidState when flag disabled
   * Ensures markets API cannot be accessed by bypassing frontend controls
   * Commit: c3b3dfafe8
+  * Fix: Added MARKETS to Zod schema validation to resolve undefined config error
+  * Commit: 3e54e37d98
 
 ---
