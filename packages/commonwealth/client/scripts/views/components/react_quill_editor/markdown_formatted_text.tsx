@@ -1,4 +1,4 @@
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import { isValidImageUrl, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import DOMPurify from 'dompurify';
 import { loadScript } from 'helpers';
 import { twitterLinkRegex } from 'helpers/constants';
@@ -40,6 +40,10 @@ markdownRenderer.link = (href, title, text) => {
 };
 
 markdownRenderer.image = (href, title, text) => {
+  if (!isValidImageUrl(href)) {
+    return '';
+  }
+
   if (href?.startsWith('ipfs://')) {
     const hash = href.split('ipfs://')[1];
     if (hash) {
