@@ -797,5 +797,8 @@ export const config = configure(
     CLAIMS: z.object({
       ENABLED: z.boolean(),
     }),
+    MARKETS: z.object({
+      ENABLED: z.boolean(),
+    }),
   }),
 );
