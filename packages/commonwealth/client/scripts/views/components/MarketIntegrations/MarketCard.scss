@@ -1,0 +1,81 @@
+@use '../../../styles/shared.scss';
+@use '../../../styles/mixins/border_radius';
+@use '../../../styles/mixins/colors.module';
+@use '../../../styles/mixins/elevation';
+
+.market-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  // Override default CWCard styles for a darker theme
+  border: 1px solid colors.$neutral-700; // Subtle dark border
+  color: colors.$white; // Light text for contrast
+  padding: 1rem; // Add back padding that was commented out
+  height: 100%;
+
+  &__image-container {
+    width: calc(100% + 2rem); // Span full width including padding
+    margin: -1rem -1rem 1rem -1rem; // Adjust margins to align with card edges
+    height: 120px; // Fixed height for images
+    overflow: hidden; // Hide overflow for images
+    border-top-left-radius: border_radius.$border-radius-md;
+    border-top-right-radius: border_radius.$border-radius-md;
+
+    .market-card__image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; // Cover the container while maintaining aspect ratio
+    }
+  }
+
+  &__header {
+    margin-bottom: 0.75rem; // Increased margin for spacing
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid colors.$neutral-700; // Darker subtle separator
+
+    .CWText {
+      color: colors.$white; // Ensure title is white
+      font-size: 1.1rem; // Slightly larger for prominence
+    }
+  }
+
+  &__body {
+    flex-grow: 1;
+    margin-bottom: 1rem; // Increased margin
+    font-size: 0.85rem; // Slightly smaller details
+    color: colors.$neutral-300; // Lighter grey for details
+
+    .CWText {
+      margin-bottom: 0.4rem; // Spacing between details
+      color: colors.$neutral-300; // Ensure detail text is light grey
+    }
+  }
+
+  &__footer {
+    margin-top: auto;
+    padding-top: 1rem; // Increased padding
+    border-top: 1px solid colors.$neutral-700; // Darker subtle separator
+
+    button {
+      width: 100%;
+      padding: 0.75rem; // More padding for larger button
+      border-radius: border_radius.$border-radius-md;
+      border: none; // Remove border, use background color
+      background-color: colors.$primary-500;
+      color: colors.$white;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem; // Slightly larger text
+
+      &:hover {
+        background-color: colors.$primary-600;
+      }
+
+      &:disabled {
+        background-color: colors.$neutral-700; // Darker disabled background
+        color: colors.$neutral-500; // Muted disabled text
+        cursor: not-allowed;
+      }
+    }
+  }
+}
