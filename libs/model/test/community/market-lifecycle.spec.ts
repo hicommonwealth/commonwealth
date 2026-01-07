@@ -12,12 +12,16 @@ describe('Market lifecycle', () => {
   let adminActor: Actor;
 
   beforeAll(async () => {
+    // Enable markets feature flag for tests
+    process.env.FLAG_MARKETS = 'true';
+
     const { community, actors } = await seedCommunity({ roles: ['admin'] });
     community_id = community.id;
     adminActor = actors.admin;
   });
 
   afterAll(async () => {
+    delete process.env.FLAG_MARKETS;
     await dispose()();
   });
 

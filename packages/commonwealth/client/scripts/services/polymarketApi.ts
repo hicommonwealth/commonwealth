@@ -5,6 +5,9 @@ import {
 
 const POLYMARKET_API_BASE_URL = 'https://gamma-api.polymarket.com';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type PolymarketMarketResponse = any;
+
 export async function discoverPolymarketMarkets(
   filters: MarketFilters,
 ): Promise<Market[]> {
@@ -21,7 +24,7 @@ export async function discoverPolymarketMarkets(
 
     const data = await response.json();
     const transformedMarkets: Market[] = data.map(
-      (polymarketMarket: unknown) => ({
+      (polymarketMarket: PolymarketMarketResponse) => ({
         id: polymarketMarket.id,
         provider: 'polymarket',
         slug: polymarketMarket.slug,
