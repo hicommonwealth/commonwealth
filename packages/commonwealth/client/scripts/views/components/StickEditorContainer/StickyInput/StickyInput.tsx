@@ -575,6 +575,10 @@ const StickyInput = (props: StickyInputProps) => {
                 webSearchEnabled={webSearchEnabled}
                 setWebSearchEnabled={setWebSearchEnabled}
                 communityId={props.communityId}
+                isTurnstileEnabled={isTurnstileEnabled}
+                turnstileToken={turnstileToken}
+                resetTurnstile={resetTurnstile}
+                TurnstileWidget={TurnstileWidget}
               />
             )}
           </div>
