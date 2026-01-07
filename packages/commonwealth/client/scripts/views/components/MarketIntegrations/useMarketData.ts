@@ -92,7 +92,9 @@ export function useMarketData(communityId: string) {
       end_time: market.endTime ?? new Date(), // TODO: make sure we have an end time
       status: market.status as 'open',
     });
-    trpcUtils.community.getMarkets.invalidate({ community_id: communityId });
+    void trpcUtils.community.getMarkets.invalidate({
+      community_id: communityId,
+    });
   };
 
   const onUnsubscribe = (market: Market) => {
@@ -100,7 +102,9 @@ export function useMarketData(communityId: string) {
       community_id: communityId,
       slug: market.slug,
     });
-    trpcUtils.community.getMarkets.invalidate({ community_id: communityId });
+    void trpcUtils.community.getMarkets.invalidate({
+      community_id: communityId,
+    });
   };
 
   return {

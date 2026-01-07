@@ -20,24 +20,26 @@ export async function discoverPolymarketMarkets(
     }
 
     const data = await response.json();
-    const transformedMarkets: Market[] = data.map((polymarketMarket: any) => ({
-      id: polymarketMarket.id,
-      provider: 'polymarket',
-      slug: polymarketMarket.slug,
-      question: polymarketMarket.question,
-      category: polymarketMarket.category || 'Uncategorized',
-      status: polymarketMarket.closed ? 'closed' : 'open',
-      startTime: polymarketMarket.startDate
-        ? new Date(polymarketMarket.startDate)
-        : null,
-      endTime: polymarketMarket.endDate
-        ? new Date(polymarketMarket.endDate)
-        : null,
-      imageUrl: polymarketMarket.image || null, // Add image URL
-      outcomes: polymarketMarket.outcomes || [], // Add outcomes
-      ticker: polymarketMarket.id, // Using id as ticker
-      title: polymarketMarket.question, // Using question as title
-    }));
+    const transformedMarkets: Market[] = data.map(
+      (polymarketMarket: unknown) => ({
+        id: polymarketMarket.id,
+        provider: 'polymarket',
+        slug: polymarketMarket.slug,
+        question: polymarketMarket.question,
+        category: polymarketMarket.category || 'Uncategorized',
+        status: polymarketMarket.closed ? 'closed' : 'open',
+        startTime: polymarketMarket.startDate
+          ? new Date(polymarketMarket.startDate)
+          : null,
+        endTime: polymarketMarket.endDate
+          ? new Date(polymarketMarket.endDate)
+          : null,
+        imageUrl: polymarketMarket.image || null, // Add image URL
+        outcomes: polymarketMarket.outcomes || [], // Add outcomes
+        ticker: polymarketMarket.id, // Using id as ticker
+        title: polymarketMarket.question, // Using question as title
+      }),
+    );
 
     return transformedMarkets;
   } catch (error) {
