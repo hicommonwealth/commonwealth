@@ -12,7 +12,7 @@ const log = logger(import.meta);
 export const PinTokenErrors = {
   NotSupported: 'Pinned tokens only supported on Alchemy supported chains',
   FailedToFetchPrice: 'Failed to fetch token price',
-  OnlyBaseSupport: 'Only Base (ETH) chain supported',
+  OnlyBaseOrSoneiumSupport: `Only Base (Id: ${ValidChains.Base}) or Soneium (Id: ${ValidChains.Soneium}) chain supported`,
   LaunchpadTokenFound: (communityId: string) =>
     `Community ${communityId} has an attached launchpad token`,
 };
@@ -33,8 +33,13 @@ export function PinToken(): Command<typeof schemas.PinToken> {
       );
       mustExist('ChainNode', chainNode);
 
-      if (chainNode.eth_chain_id !== ValidChains.Base)
-        throw new InvalidState(PinTokenErrors.OnlyBaseSupport);
+      if (
+        ![ValidChains.Base, ValidChains.Soneium].includes(
+          chainNode.eth_chain_id!,
+        )
+      ) {
+        throw new InvalidState(PinTokenErrors.OnlyBaseOrSoneiumSupport);
+      }
 
       const community = await models.Community.findOne({
         where: {
@@ -59,7 +64,9 @@ export function PinToken(): Command<typeof schemas.PinToken> {
       if (
         !chainNode.url.includes('alchemy') ||
         !chainNode.private_url?.includes('alchemy') ||
-        !chainNode.alchemy_metadata?.price_api_supported
+        // for soneium alchemy returns price_not_supported: true, but does return price data
+        // when called by alchemyGetTokenPrices, skipping price_not_supported=true checks
+        !chainNode.alchemy_metadata
       ) {
         throw new InvalidState(PinTokenErrors.NotSupported);
       }

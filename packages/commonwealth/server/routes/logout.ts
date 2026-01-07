@@ -9,7 +9,7 @@ const logout = (req: Request, res: Response) => {
   req.logout(() => {});
   req.session.destroy(() => {
     res.clearCookie('connect.sid');
-    res.redirect('/');
+    res.json({ success: true });
   });
 };
 
