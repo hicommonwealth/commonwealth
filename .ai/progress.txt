@@ -29,3 +29,31 @@ Each AI run should append an entry with:
 - Commit: (to be added by next commit)
 
 ---
+
+[2026-01-07] Feature Flag: FLAG_MARKETS for Prediction Markets Visibility Control
+- Completed GitHub issue #13265
+- Added FLAG_MARKETS feature flag to control visibility of prediction markets functionality across the application
+- Key implementation decisions:
+  * FLAG_MARKETS already defined in feature-flags.ts using buildFlag helper (line 52)
+  * FLAG_MARKETS already exposed in vite.config.ts (line 73)
+  * Routes already conditionally rendered in navigation files using spread operator pattern
+  * Updated governance_section.tsx to use marketsEnabled flag for Markets menu item visibility
+  * Updated AdminSection.tsx to use marketsEnabled flag for Market Integrations menu visibility
+  * Added FLAG_MARKETS to .env.example with default value of false for safe rollout
+- Files changed:
+  * packages/commonwealth/client/scripts/views/components/sidebar/governance_section.tsx - Added useFlag('markets') and set isVisible: marketsEnabled for Markets menu
+  * packages/commonwealth/client/scripts/views/components/sidebar/AdminSection/AdminSection.tsx - Added useFlag('markets') import and set isVisible: marketsEnabled for Market Integrations menu
+  * .env.example - Added FLAG_MARKETS documentation in Feature Flags section
+- Tests:
+  * Type checking shows pre-existing Soneium-related errors (not introduced by this change)
+  * Linting shows pre-existing warnings in market integration files (not introduced by this change)
+  * Unit tests require database connection (not available in current environment)
+  * Manual verification required: test with FLAG_MARKETS=true and FLAG_MARKETS=false
+- Concerns for reviewers:
+  * Verify Markets menu in Apps section hides when FLAG_MARKETS=false
+  * Verify Market Integrations in Admin Capabilities section hides when FLAG_MARKETS=false
+  * Test direct URL access to /markets-app and /:scope/manage/markets when flag is disabled
+  * Confirm routes properly return 404 or redirect when flag is off
+- Commit: (to be added after this update)
+
+---

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { handleRedirectClicks } from 'helpers';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
@@ -10,6 +11,7 @@ import { useSidebarTreeToggle } from '../useSidebarTreeToggle';
 
 const AdminSection = () => {
   const communityId = app.activeChainId() || '';
+  const marketsEnabled = useFlag('markets');
 
   const navigate = useCommonNavigate();
   const location = useLocation();
@@ -103,7 +105,7 @@ const AdminSection = () => {
       displayData: null,
       hasDefaultToggle: false,
       isActive: !!matchesMarketIntegrationsRoute,
-      isVisible: true,
+      isVisible: marketsEnabled,
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();

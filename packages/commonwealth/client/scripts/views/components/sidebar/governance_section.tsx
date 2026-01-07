@@ -59,6 +59,7 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
   const xpEnabled = useFlag('xp');
+  const marketsEnabled = useFlag('markets');
 
   const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({
@@ -323,7 +324,7 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     displayData: null,
     hasDefaultToggle: false,
     isActive: !!matchesMarketsAppRoute,
-    isVisible: true, // Always visible for now
+    isVisible: marketsEnabled,
     isUpdated: true,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
