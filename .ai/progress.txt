@@ -1,0 +1,31 @@
+# AI Workflow Progress Log
+
+This file tracks AI-assisted development work on Commonwealth.
+Each AI run should append an entry with:
+- Date and feature description
+- GitHub issue reference
+- Key implementation decisions
+- Files changed
+- Tests added/updated
+- Concerns for reviewers
+- Commit hash
+
+---
+
+[2026-01-06] Initial Setup: GitHub-First AI Workflow with Automatic Branching
+- Migrated from prd.json to GitHub Issues as single source of truth
+- Created .ai/run.sh with automatic branch creation and management
+- Implemented branch naming convention: <author>/<type>-<issue-number>-<title-slug>
+- Author determination: AI_AUTHOR_INITIALS env var > git config user.initials > derived from git user.name
+- Created .ai/setup-labels.sh for label setup (includes type:* labels)
+- Created .github/ISSUE_TEMPLATE/ai-task.md template with type labels
+- Created .ai/create-ticket.sh - AI-powered ticket generator from descriptions
+- Created .ai/quickstart.md - Quick start guide for new developers
+- Updated readme with comprehensive workflow guide and branching strategy
+- Branch creation logic: detects author, type from labels, generates slug from title
+- Handles edge cases: existing branches, non-master starting point, manual branches
+- Ticket generator: analyzes description, infers metadata, generates compliant issues
+- Example branches: ro/feature-1234-add-user-auth, ro/fix-5678-button-alignment
+- Commit: (to be added by next commit)
+
+---
