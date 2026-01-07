@@ -63,5 +63,12 @@ Each AI run should append an entry with:
   * Passed marketsEnabled as parameter to CommonDomainRoutes/CustomDomainRoutes
   * Fixed "Rendered more hooks than during the previous render" error
   * Commit: f3910b09be
+- Backend API validation:
+  * Added FLAG_MARKETS to backend config (libs/model/src/config.ts)
+  * Added validation to GetMarkets query - throws InvalidState when flag disabled
+  * Added validation to SubscribeMarket command - throws InvalidState when flag disabled
+  * Added validation to UnsubscribeMarket command - throws InvalidState when flag disabled
+  * Ensures markets API cannot be accessed by bypassing frontend controls
+  * Commit: c3b3dfafe8
 
 ---
