@@ -54,6 +54,6 @@ Each AI run should append an entry with:
   * Verify Market Integrations in Admin Capabilities section hides when FLAG_MARKETS=false
   * Test direct URL access to /markets-app and /:scope/manage/markets when flag is disabled
   * Confirm routes properly return 404 or redirect when flag is off
-- Commit: (to be added after this update)
+- Commit: 14779d72899558242378b4e6006a004d7e9ed438
 
 ---
