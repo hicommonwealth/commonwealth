@@ -32,29 +32,12 @@ git config --get user.initials
 # Install all packages
 pnpm install
 
-# Bootstrap test database
-pnpm -F commonwealth bootstrap-test-db
-
 # Verify everything works
 pnpm -r check-types
 pnpm lint-branch-warnings
 ```
 
-### 3. Set Up GitHub Labels
-
-```bash
-# One-time setup - creates all required labels
-./ai/setup-labels.sh
-```
-
-This creates labels for:
-- Workflow status: `ai-ready`, `ai-in-progress`, `ai-completed`, `ai-blocked`
-- Priority: `priority:critical`, `priority:high`, `priority:medium`, `priority:low`
-- Risk: `risk:low`, `risk:medium`, `risk:high`
-- Type: `type:feature`, `type:fix`, `type:refactor`, `type:chore`, `type:docs`, `type:test`
-- Area: `area:ui`, `area:api`, `area:database`, `area:workers`, etc.
-
-### 4. Authenticate with GitHub
+### 3. Authenticate with GitHub
 
 ```bash
 # If not already authenticated
@@ -155,6 +138,8 @@ pnpm start
 
 # Run tests
 pnpm -F commonwealth test-unit
+pnpm -F model test
+etc...
 ```
 
 ### 3. Push and Create PR
@@ -229,24 +214,6 @@ The script automatically:
 - Determines type from issue labels (`type:feature`, `type:fix`, etc.)
 - Generates slug from issue title
 - Creates and checks out the branch
-
----
-
-## File Structure
-
-```
-.ai/
-├── readme.md              # Full documentation
-├── quickstart.md          # This guide
-├── run.sh                 # Main workflow script
-├── create-ticket.sh       # AI-powered ticket generator
-├── setup-labels.sh        # One-time label setup
-└── progress.txt           # Execution history
-
-.github/
-└── ISSUE_TEMPLATE/
-    └── ai-task.md         # Issue template
-```
 
 ---
 
@@ -359,15 +326,6 @@ git checkout master && git pull
 3. **Create your first issue**: `./ai/create-ticket.sh "Your idea"`
 4. **Run the workflow**: `./ai/run.sh <issue-number>`
 5. **Join the team workflow**: Help refine and improve the process!
-
----
-
-## Getting Help
-
-- **Workflow questions**: See `.ai/readme.md`
-- **Commonwealth patterns**: See `CLAUDE.md`
-- **GitHub CLI help**: `gh help`
-- **Report issues**: [GitHub Issues](https://github.com/hicommonwealth/commonwealth/issues)
 
 ---
 

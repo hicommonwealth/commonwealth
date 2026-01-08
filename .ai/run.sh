@@ -128,8 +128,16 @@ elif echo "$ISSUE_LABELS" | grep -q "type:test"; then
 fi
 
 # Create branch name slug from issue title
-# Convert to lowercase, replace spaces with hyphens, remove special chars
-TITLE_SLUG=$(echo "$ISSUE_TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9 -]//g' | sed 's/ \+/-/g' | cut -c1-50)
+# Convert to lowercase, replace spaces with hyphens, remove special chars, truncate reasonably
+TITLE_SLUG=$(echo "$ISSUE_TITLE" | \
+    tr '[:upper:]' '[:lower:]' | \
+    sed 's/[^a-z0-9 -]//g' | \
+    sed 's/ \+/ /g' | \
+    sed 's/ /-/g' | \
+    sed 's/-\+/-/g' | \
+    sed 's/^-//;s/-$//' | \
+    cut -c1-40 | \
+    sed 's/-$//')
 BRANCH_NAME="${AUTHOR}/${BRANCH_TYPE}-${ISSUE_NUM}-${TITLE_SLUG}"
 
 # Check current branch
@@ -173,7 +181,7 @@ INSTRUCTIONS:
 
 1. Implement the task described in the GitHub issue above. Follow the implementation steps if provided.
    - Read existing code before making changes (NEVER propose changes to unread files)
-   - Follow Commonwealth patterns from CLAUDE.md
+   - Follow patterns from CLAUDE.md
    - Use existing abstractions before creating new ones
    - Respect package boundaries
 
@@ -181,6 +189,7 @@ INSTRUCTIONS:
    - Run: pnpm -r check-types (must pass)
    - Run: pnpm lint-branch-warnings (must pass)
    - Run: pnpm -F commonwealth test-unit (must pass for changed modules)
+   - Run: pnpm -F model test-select {test-name} (must pass for changed modules)
    - For API/database changes, run integration tests
    - Show the output of these commands
 
