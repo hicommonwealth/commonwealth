@@ -128,8 +128,16 @@ elif echo "$ISSUE_LABELS" | grep -q "type:test"; then
 fi
 
 # Create branch name slug from issue title
-# Convert to lowercase, replace spaces with hyphens, remove special chars
-TITLE_SLUG=$(echo "$ISSUE_TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9 -]//g' | sed 's/ \+/-/g' | cut -c1-50)
+# Convert to lowercase, replace spaces with hyphens, remove special chars, truncate reasonably
+TITLE_SLUG=$(echo "$ISSUE_TITLE" | \
+    tr '[:upper:]' '[:lower:]' | \
+    sed 's/[^a-z0-9 -]//g' | \
+    sed 's/ \+/ /g' | \
+    sed 's/ /-/g' | \
+    sed 's/-\+/-/g' | \
+    sed 's/^-//;s/-$//' | \
+    cut -c1-40 | \
+    sed 's/-$//')
 BRANCH_NAME="${AUTHOR}/${BRANCH_TYPE}-${ISSUE_NUM}-${TITLE_SLUG}"
 
 # Check current branch
