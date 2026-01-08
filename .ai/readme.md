@@ -4,41 +4,6 @@
 
 > **New developer?** See [`.ai/quickstart.md`](quickstart.md) for detailed setup instructions.
 
-```bash
-# First-time setup
-git config --global user.initials ro  # Set your initials (e.g., "ro" for Roger Oliver)
-./ai/setup-labels.sh                  # Create GitHub labels (one-time)
-
-# Create AI-generated issue (recommended)
-./ai/create-ticket.sh "Add feature flag to hide markets functionality"
-./ai/create-ticket.sh "Fix button alignment on mobile devices"
-
-# Or create issue manually at .github/ISSUE_TEMPLATE/ai-task.md
-# Add labels: ai-ready, type:feature, priority:high, area:ui
-
-# Run AI workflow (from master branch)
-git checkout master && git pull
-./ai/run.sh 1234              # AI auto-creates ro/feature-1234-title-slug branch
-./ai/run.sh --auto            # AI auto-selects highest priority issue
-
-# After AI completes
-git diff HEAD~1               # Review changes
-pnpm start                    # Test manually
-git push -u origin $(git branch --show-current)
-gh pr create --fill           # Create PR
-```
-
-**Files:**
-- `.ai/readme.md` - This comprehensive guide
-- `.ai/quickstart.md` - Quick start guide for new developers
-- `.ai/run.sh` - Main workflow script
-- `.ai/create-ticket.sh` - AI-powered ticket generator
-- `.ai/setup-labels.sh` - One-time GitHub label setup
-- `.ai/progress.txt` - AI execution history
-- `.github/ISSUE_TEMPLATE/ai-task.md` - Issue template
-
----
-
 ## Purpose
 
 This directory defines a **shared AI-assisted workflow** for evolving the Commonwealth codebase. The goal is to empower a small team to work effectively on an existing, non-AI-first codebase by:
@@ -95,6 +60,7 @@ Every AI-assisted task follows this sequence:
 
    # Unit tests (must pass for changed modules)
    pnpm -F commonwealth test-unit
+   pnpm -F model test-select {test-name}
 
    # Integration tests (when touching API/database)
    pnpm -F commonwealth test-integration
@@ -716,85 +682,6 @@ pnpm build           # ✓ or ✗ visible (for critical changes)
 - All AI runs tracked in progress.txt
 - Git blame shows AI commits clearly
 - PRs document "AI-generated, human-reviewed"
-
----
-
-## Quick Start Guide
-
-### First-Time Setup
-
-> **New to this workflow?** See [`.ai/quickstart.md`](.ai/quickstart.md) for a step-by-step guide.
-
-1. **Configure your initials**
-   ```bash
-   git config --global user.initials ro  # Replace "ro" with your initials
-   ```
-
-2. **Install dependencies and verify environment**
-   ```bash
-   pnpm install
-   pnpm -F commonwealth bootstrap-test-db
-   pnpm -r check-types
-   pnpm lint-branch-warnings
-   ```
-
-3. **Set up GitHub labels** (one-time)
-   ```bash
-   ./ai/setup-labels.sh
-   ```
-
-4. **Create your first issue**
-
-   **Option A: Use AI to generate a compliant issue (Recommended)**
-   ```bash
-   ./ai/create-ticket.sh "Add a feature flag to hide the markets functionality"
-   ```
-
-   **Option B: Create manually**
-   - Go to GitHub Issues
-   - Click "New Issue"
-   - Select "AI-Assisted Task" template
-   - Fill in the details following the template
-   - Add labels: `ai-ready`, `type:feature`, `priority:high`, `risk:low`, `area:ui`
-
-5. **Run the AI workflow**
-   ```bash
-   # Make sure you're on master/main
-   git checkout master
-   git pull origin master
-
-   # Run AI - it will automatically create the branch
-   ./ai/run.sh <issue-number>  # Creates ro/feature-1234-title-slug
-   # or: ./ai/run.sh --auto     # Auto-selects issue and creates branch
-   ```
-
-### Daily Workflow
-
-```bash
-# 1. Start from master and pull latest
-git checkout master
-git pull origin master
-
-# 2. Run AI - it auto-creates branch and does the work
-./ai/run.sh 1234         # Creates ro/feature-1234-title-slug automatically
-./ai/run.sh --auto       # Auto-selects issue and creates branch
-
-# 3. Review AI's work
-git branch               # Verify you're on ro/feature-1234-title-slug
-git diff HEAD~1          # See changes
-git log -1 --stat        # See commit details
-gh issue view 1234       # See AI's completion comment
-
-# 4. Test manually (if needed)
-pnpm start               # Visit localhost:8080
-pnpm -F commonwealth test-unit
-
-# 5. Push and create PR
-git push -u origin $(git branch --show-current)
-gh pr create --fill      # Auto-fills from issue
-
-# 6. After PR is merged, issue closes automatically
-```
 
 ---
 

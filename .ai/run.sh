@@ -173,7 +173,7 @@ INSTRUCTIONS:
 
 1. Implement the task described in the GitHub issue above. Follow the implementation steps if provided.
    - Read existing code before making changes (NEVER propose changes to unread files)
-   - Follow Commonwealth patterns from CLAUDE.md
+   - Follow patterns from CLAUDE.md
    - Use existing abstractions before creating new ones
    - Respect package boundaries
 
@@ -181,6 +181,7 @@ INSTRUCTIONS:
    - Run: pnpm -r check-types (must pass)
    - Run: pnpm lint-branch-warnings (must pass)
    - Run: pnpm -F commonwealth test-unit (must pass for changed modules)
+   - Run: pnpm -F model test-select {test-name} (must pass for changed modules)
    - For API/database changes, run integration tests
    - Show the output of these commands
 
