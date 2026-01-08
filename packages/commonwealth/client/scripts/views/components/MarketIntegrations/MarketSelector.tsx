@@ -1,6 +1,9 @@
 import React from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { MarketFilters } from './MarketFilters';
 import { MarketList } from './MarketList';
+import './MarketSelector.scss';
 import { useMarketData } from './useMarketData';
 
 interface MarketSelectorProps {
@@ -20,15 +23,26 @@ export function MarketSelector({ communityId }: MarketSelectorProps) {
   } = useMarketData(communityId);
 
   return (
-    <div>
-      <h2>Find Markets</h2>
+    <section className="MarketSelector">
+      <div className="markets-header">
+        <CWText type="h3" fontWeight="bold" className="markets-title">
+          Find Markets
+        </CWText>
+        <CWText type="b1" className="markets-subtitle">
+          Discover and subscribe to prediction markets from multiple providers
+        </CWText>
+      </div>
+
       <MarketFilters
         filters={filters}
         onFiltersChange={setFilters}
         categories={categories}
       />
+
       {isLoading ? (
-        <p>Loading markets...</p>
+        <div className="markets-loading">
+          <CWCircleMultiplySpinner />
+        </div>
       ) : (
         <MarketList
           markets={markets}
@@ -37,6 +51,6 @@ export function MarketSelector({ communityId }: MarketSelectorProps) {
           onUnsubscribe={onUnsubscribe}
         />
       )}
-    </div>
+    </section>
   );
 }
