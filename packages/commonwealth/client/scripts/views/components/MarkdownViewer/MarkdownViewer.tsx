@@ -47,6 +47,7 @@ export const MarkdownViewer = memo(function MarkdownViewer(
 
   const [userExpand, setUserExpand] = useState<boolean>(false);
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const imagePreviewHandler = useCallback(async (imageSource: string) => {
     if (!isValidImageUrl(imageSource)) {
       return TRANSPARENT_PIXEL;
