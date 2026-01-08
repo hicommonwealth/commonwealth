@@ -123,28 +123,21 @@ import { launchAndBuyThreadTokenUtility } from './useLaunchAndBuyThreadToken';
 
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
+// using sigmoid function
 function calculateConnectorWeightFromUsdPrice(usdPrice: number): number {
   if (usdPrice === 0) {
-    return 830000;
+    return 500000;
   }
-  const initialBalance = BigInt(Math.floor((100 / usdPrice) * 1e18));
-  const graduationBalance = BigInt(Math.floor((1000 / usdPrice) * 1e18));
-  const launchpadLiquidity = BigInt(200_000_000) * BigInt(1e18);
-  const initialSupply = BigInt(1_000_000_000) * BigInt(1e18);
+  const MIN = 50000;
+  const MAX = 100000;
 
-  const supplyNum = Number(initialSupply) / 1e18;
-  const liquidityNum = Number(launchpadLiquidity) / 1e18;
-  const depositNum = Number(graduationBalance - initialBalance) / 1e18;
-  const balanceNum = Number(initialBalance) / 1e18;
+  const steepness = 2.5;
+  const log10Midpoint = 1.5; // log10 midpoint (~$32)
 
-  const connectorRatio = 1 + depositNum / balanceNum;
-  const tokenRatio = liquidityNum / supplyNum + 1;
+  const x = Math.log10(Math.max(usdPrice, 1));
+  const sigma = 1 / (1 + Math.exp(-steepness * (x - log10Midpoint)));
 
-  const w = Math.floor(
-    (1_000_000 * Math.log(tokenRatio)) / Math.log(connectorRatio),
-  );
-
-  return Math.max(10000, Math.min(1000000, w));
+  return MIN + (MAX - MIN) * sigma;
 }
 
 interface NewThreadFormProps {
