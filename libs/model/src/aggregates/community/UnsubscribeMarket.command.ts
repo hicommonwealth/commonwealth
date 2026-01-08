@@ -1,5 +1,6 @@
-import { Command } from '@hicommonwealth/core';
+import { Command, InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { config } from '../../config';
 import { models } from '../../database';
 import { authRoles, mustExist } from '../../middleware';
 
@@ -8,6 +9,10 @@ export function UnsubscribeMarket(): Command<typeof schemas.UnsubscribeMarket> {
     ...schemas.UnsubscribeMarket,
     auth: [authRoles('admin')],
     body: async ({ payload }) => {
+      if (!config.MARKETS.ENABLED) {
+        throw new InvalidState('Markets feature is not enabled');
+      }
+
       const { community_id, slug } = payload;
 
       const market = await models.Market.findOne({ where: { slug } });

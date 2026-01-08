@@ -49,6 +49,7 @@ const featureFlags = {
   gateWallet: buildFlag(process.env.FLAG_GATE_WALLET),
   moonpayFunds: buildFlag(process.env.FLAG_MOONPAY_FUNDS),
   claims: buildFlag(process.env.FLAG_CLAIMS),
+  markets: buildFlag(process.env.FLAG_MARKETS),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

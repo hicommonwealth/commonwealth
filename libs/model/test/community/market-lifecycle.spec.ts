@@ -1,11 +1,15 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   GetMarkets,
   SubscribeMarket,
   UnsubscribeMarket,
 } from '../../src/aggregates/community';
+import { config } from '../../src/config';
 import { seedCommunity } from '../utils';
+
+// Mock the config.MARKETS.ENABLED to be true for these tests
+vi.spyOn(config.MARKETS, 'ENABLED', 'get').mockReturnValue(true);
 
 describe('Market lifecycle', () => {
   let community_id: string | undefined;

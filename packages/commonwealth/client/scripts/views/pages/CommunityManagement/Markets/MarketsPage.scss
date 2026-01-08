@@ -1,0 +1,15 @@
+@use '../../../../styles/mixins/colors.module';
+
+.markets-page-container {
+  color: colors.$white;
+  min-height: 100vh; // Ensure it covers the full viewport height
+  padding: 1rem; // Add some padding around the content
+
+  h1 {
+    color: colors.$white; // Ensure heading is white
+  }
+
+  p {
+    color: colors.$neutral-300; // Muted text for descriptions
+  }
+}

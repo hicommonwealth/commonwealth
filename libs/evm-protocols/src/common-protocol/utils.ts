@@ -29,13 +29,13 @@ import {
   arbitrum,
   base,
   baseSepolia,
-  soneium,
   blast,
   bsc,
   linea,
   mainnet,
   optimism,
   skaleCalypsoTestnet,
+  soneium,
 } from 'viem/chains';
 import Web3, { AbiInput, TransactionReceipt, Web3 as Web3Type } from 'web3';
 import * as AbiCoder from 'web3-eth-abi';
