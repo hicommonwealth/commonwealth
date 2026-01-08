@@ -137,7 +137,7 @@ function calculateConnectorWeightFromUsdPrice(usdPrice: number): number {
   const x = Math.log10(Math.max(usdPrice, 1));
   const sigma = 1 / (1 + Math.exp(-steepness * (x - log10Midpoint)));
 
-  return MIN + (MAX - MIN) * sigma;
+  return Math.round(MIN + (MAX - MIN) * sigma);
 }
 
 interface NewThreadFormProps {
