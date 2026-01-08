@@ -74,3 +74,35 @@ Each AI run should append an entry with:
   * Commit: 3e54e37d98
 
 ---
+
+[2026-01-08] Refactor: Refactored betting markets admin components to align with community market design patterns
+- Completed GitHub issue #13274
+- Key implementation decisions:
+  * Aligned admin components with MarketsAppPage styling and component patterns (light theme)
+  * Used CW component kit components (CWText, CWButton, CWTag, CWTextInput, CWSelectList, CWCircleMultiplySpinner)
+  * Applied light theme styling matching MarketsAppPage: white backgrounds (#ffffff), dark text (#1a1a1a, #212529), light borders (#e9ecef)
+  * Maintained consistent card styling with hover effects, rounded corners, and gradient provider badges
+  * Implemented proper empty state handling with descriptive messages
+  * Used responsive grid layout (2 columns on desktop, 1 on mobile)
+  * Applied proper status tag color coding (active, new, info)
+  * Added proper date formatting matching MarketsAppPage patterns
+  * Replaced inline styles and native HTML elements with CW component kit
+- Files changed:
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketSelector.tsx (refactored to use CW components and proper layout)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketSelector.scss (created new styles matching MarketsAppPage light theme)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketFilters.tsx (refactored to use CWTextInput and CWSelectList with react-select API)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketFilters.scss (created responsive filter layout)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketCard.tsx (refactored to match MarketsAppPage card design with tags, badges, and CWButton)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketCard.scss (completely rewritten to match MarketsAppPage light theme styling)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketList.tsx (added proper empty state with CWText)
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/MarketList.scss (updated grid layout and added empty state styles with light theme)
+  * packages/commonwealth/client/scripts/views/pages/CommunityManagement/Markets/MarketsPage.scss (simplified to match overall structure)
+- Tests: All unit tests pass (70 tests in commonwealth package)
+- Type checking: No type errors in modified files (pre-existing unrelated errors in model package about Soneium property)
+- Linting: All checks pass
+- Concerns for reviewers:
+  * Verify visual consistency between admin and community market views
+  * Test responsive behavior on mobile devices
+  * Confirm light theme colors match design system and are consistent
+  * Validate that status tag colors align with UX expectations
+  * Check that CWSelectList dropdowns work correctly with react-select API

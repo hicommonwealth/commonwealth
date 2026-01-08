@@ -1,81 +1,94 @@
-@use '../../../styles/shared.scss';
-@use '../../../styles/mixins/border_radius';
-@use '../../../styles/mixins/colors.module';
-@use '../../../styles/mixins/elevation';
-
 .market-card {
+  background: #ffffff;
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  // Override default CWCard styles for a darker theme
-  border: 1px solid colors.$neutral-700; // Subtle dark border
-  color: colors.$white; // Light text for contrast
-  padding: 1rem; // Add back padding that was commented out
-  height: 100%;
 
-  &__image-container {
-    width: calc(100% + 2rem); // Span full width including padding
-    margin: -1rem -1rem 1rem -1rem; // Adjust margins to align with card edges
-    height: 120px; // Fixed height for images
-    overflow: hidden; // Hide overflow for images
-    border-top-left-radius: border_radius.$border-radius-md;
-    border-top-right-radius: border_radius.$border-radius-md;
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    border-color: #dee2e6;
+  }
 
-    .market-card__image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover; // Cover the container while maintaining aspect ratio
+  .market-card-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 20px;
+  }
+
+  .market-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 4px;
+
+    .market-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      flex: 1;
+
+      .category-tag {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 6px;
+      }
+
+      .status-tag {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .date-tag {
+        font-size: 11px;
+        font-weight: 500;
+        padding: 4px 10px;
+        border-radius: 6px;
+      }
+    }
+
+    .market-provider {
+      .provider-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #ffffff;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+      }
     }
   }
 
-  &__header {
-    margin-bottom: 0.75rem; // Increased margin for spacing
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid colors.$neutral-700; // Darker subtle separator
-
-    .CWText {
-      color: colors.$white; // Ensure title is white
-      font-size: 1.1rem; // Slightly larger for prominence
+  .market-question {
+    h5 {
+      color: #212529;
+      line-height: 1.5;
+      font-size: 18px;
+      margin: 0;
     }
   }
 
-  &__body {
-    flex-grow: 1;
-    margin-bottom: 1rem; // Increased margin
-    font-size: 0.85rem; // Slightly smaller details
-    color: colors.$neutral-300; // Lighter grey for details
-
-    .CWText {
-      margin-bottom: 0.4rem; // Spacing between details
-      color: colors.$neutral-300; // Ensure detail text is light grey
-    }
-  }
-
-  &__footer {
+  .market-card-footer {
     margin-top: auto;
-    padding-top: 1rem; // Increased padding
-    border-top: 1px solid colors.$neutral-700; // Darker subtle separator
-
-    button {
-      width: 100%;
-      padding: 0.75rem; // More padding for larger button
-      border-radius: border_radius.$border-radius-md;
-      border: none; // Remove border, use background color
-      background-color: colors.$primary-500;
-      color: colors.$white;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.95rem; // Slightly larger text
-
-      &:hover {
-        background-color: colors.$primary-600;
-      }
-
-      &:disabled {
-        background-color: colors.$neutral-700; // Darker disabled background
-        color: colors.$neutral-500; // Muted disabled text
-        cursor: not-allowed;
-      }
-    }
+    padding-top: 16px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: flex-end;
   }
 }
