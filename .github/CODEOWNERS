@@ -4,21 +4,21 @@
 # Code owner changes must be reviewed by Dillon
 /.github/CODEOWNERS @dillchen
 
-/deploy @Rotorsoft @timolegros @kurtassad @rbennettcw
+/deploy @Rotorsoft @timolegros @kurtassad @rbentcw
 
 # Changes to CI or code/deployment processes must be reviewed by the Platform team
-.github @timolegros @kurtassad @Rotorsoft @rbennettcw
-.husky @timolegros @kurtassad @Rotorsoft @rbennettcw
-/scripts/ @timolegros @kurtassad @Rotorsoft @rbennettcw
+.github @timolegros @kurtassad @Rotorsoft @rbentcw
+.husky @timolegros @kurtassad @Rotorsoft @rbentcw
+/scripts/ @timolegros @kurtassad @Rotorsoft @rbentcw
 
 # Libs
-/libs/ @timolegros @Rotorsoft @kurtassad @rbennettcw
+/libs/ @timolegros @Rotorsoft @kurtassad @rbentcw
 /libs/sitemaps/ @kurtassad
 /libs/evm-testing/ @timolegros
 /libs/evm-protocols/ @timolegros
 
 # Packages
-/packages/commonwealth/ @timolegros @Rotorsoft @kurtassad @rbennettcw
+/packages/commonwealth/ @timolegros @Rotorsoft @kurtassad @rbentcw
 /packages/commonwealth/client @mzparacha @masvelio
 /packages/commonwealth/load-testing/ @timolegros
 

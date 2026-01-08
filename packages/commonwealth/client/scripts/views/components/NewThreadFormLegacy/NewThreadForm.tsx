@@ -703,7 +703,7 @@ export const NewThreadForm = forwardRef<
 
     useEffect(() => {
       refreshTopics().catch(console.error);
-    }, [refreshTopics]);
+    }, [refreshTopics, selectedCommunityId]);
 
     const handleKeyDown = useCallback(
       (event: React.KeyboardEvent<HTMLDivElement>) => {

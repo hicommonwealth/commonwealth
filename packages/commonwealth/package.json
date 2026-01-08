@@ -153,7 +153,7 @@
     "@terra-money/wallet-provider": "^3.11.2",
     "@trpc/client": "^11.3.0",
     "@trpc/react-query": "^11.3.0",
-    "@uniswap/widgets": "^2.59.0",
+    "@commonxyz/uniswap-widgets": "1.0.0",
     "@viem/anvil": "^0.0.10",
     "@walletconnect/ethereum-provider": "^2.10.1",
     "@walletconnect/modal": "^2.4.6",

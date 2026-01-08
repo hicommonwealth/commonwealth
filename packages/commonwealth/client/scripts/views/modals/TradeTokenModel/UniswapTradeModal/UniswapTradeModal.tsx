@@ -1,12 +1,15 @@
-import { getChainName } from '@hicommonwealth/evm-protocols';
+import { SupportedChainId, SwapWidget } from '@commonxyz/uniswap-widgets';
+import '@commonxyz/uniswap-widgets/fonts.css';
+import { getChainName, ValidChains } from '@hicommonwealth/evm-protocols';
 import { ChainBase } from '@hicommonwealth/shared';
-import { SupportedChainId, SwapWidget } from '@uniswap/widgets';
-import '@uniswap/widgets/fonts.css';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useNetworkSwitching } from 'hooks/useNetworkSwitching';
 import NodeInfo, { ChainNode } from 'models/NodeInfo';
-import React, { useEffect, useState } from 'react';
-import { useGetCommunityByIdQuery } from 'state/api/communities';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  useGetCommunityByIdQuery,
+  useGetPinnedTokenByCommunityId,
+} from 'state/api/communities';
 import { fetchNodes } from 'state/api/nodes';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -39,10 +42,26 @@ const UniswapTradeModal = ({
     enabled: !!tradeConfig.token.community_id,
     includeNodeInfo: true,
   });
-  const ethChainId = tokenCommunity?.ChainNode?.eth_chain_id;
-  const networkName = tokenCommunity?.ChainNode?.name;
-  const rpcUrl = tokenCommunity?.ChainNode?.url;
-  const blockExplorerUrl = tokenCommunity?.ChainNode?.block_explorer;
+
+  const { data: communityPinnedTokens } = useGetPinnedTokenByCommunityId({
+    community_ids: tradeConfig.token.community_id
+      ? [tradeConfig.token.community_id]
+      : [],
+    with_chain_node: true,
+    enabled: !!tradeConfig.token.community_id,
+  });
+  const communityPinnedToken = communityPinnedTokens?.[0];
+
+  const ethChainId =
+    communityPinnedToken?.ChainNode?.eth_chain_id ||
+    tokenCommunity?.ChainNode?.eth_chain_id;
+  const networkName =
+    communityPinnedToken?.ChainNode?.name || tokenCommunity?.ChainNode?.name;
+  const rpcUrl =
+    communityPinnedToken?.ChainNode?.url || tokenCommunity?.ChainNode?.url;
+  const blockExplorerUrl =
+    communityPinnedToken?.ChainNode?.block_explorer ||
+    tokenCommunity?.ChainNode?.block_explorer;
 
   const { uniswapWidget, isMagicUser, isMagicConfigured } =
     useUniswapTradeModal({
@@ -50,9 +69,13 @@ const UniswapTradeModal = ({
       ethChainId,
       rpcUrl,
       blockExplorerUrl,
-      node: tokenCommunity?.ChainNode
-        ? new NodeInfo(tokenCommunity.ChainNode as ChainNode)
-        : undefined,
+      node:
+        communityPinnedToken?.ChainNode || tokenCommunity?.ChainNode
+          ? new NodeInfo(
+              (communityPinnedToken?.ChainNode ||
+                tokenCommunity?.ChainNode) as ChainNode,
+            )
+          : undefined,
     });
 
   const { currentChain, isWrongNetwork, promptNetworkSwitch } =
@@ -131,7 +154,39 @@ const UniswapTradeModal = ({
   useEffect(() => {
     fetchNodes().then(setNodes).catch(console.error);
   }, []);
-  const jsonRpcUrlMap = formatJsonRpcMap(nodes);
+
+  // Ensure jsonRpcUrlMap includes the current chain's RPC URL
+  // This is critical for chains like Soneium that might not be in the nodes list
+  // IMPORTANT: Initialize with current chain FIRST to ensure it's always present
+  // before the widget tries to access it during initialization
+  const jsonRpcUrlMap = useMemo(() => {
+    // Start with nodes map (if available)
+    const map: { [chainId: number]: string[] } = formatJsonRpcMap(nodes) || {};
+
+    // ALWAYS ensure current chain's RPC URL is in the map (highest priority)
+    // This must be done even if nodes haven't loaded yet
+    if (ethChainId && rpcUrl) {
+      const urls = rpcUrl
+        .split(',')
+        .map((url) => url.trim())
+        .filter(Boolean);
+      if (urls.length > 0) {
+        // Override with current chain's RPC URL to ensure it's always correct
+        map[ethChainId] = urls;
+      }
+    }
+
+    return map;
+  }, [nodes, ethChainId, rpcUrl]);
+
+  // Ensure the map has the current chain before rendering the widget
+  const isJsonRpcUrlMapReady = useMemo(() => {
+    if (!ethChainId || !rpcUrl) {
+      return false;
+    }
+    // Check if the map has the current chain ID
+    return !!jsonRpcUrlMap[ethChainId] && jsonRpcUrlMap[ethChainId].length > 0;
+  }, [jsonRpcUrlMap, ethChainId, rpcUrl]);
 
   const logo =
     (tradeConfig.token as ExternalToken).logo ||
@@ -141,7 +196,15 @@ const UniswapTradeModal = ({
     (value) => typeof value === 'number',
   ) as number[];
 
-  if (!supportedChainIds.includes(ethChainId!)) {
+  // Add Soneium (1868) to supported chains as it's supported by Uniswap API
+  // even if not yet in the SupportedChainId enum from the widget package
+  const additionalSupportedChains = [ValidChains.Soneium]; // Soneium
+  const allSupportedChainIds = [
+    ...supportedChainIds,
+    ...additionalSupportedChains,
+  ];
+
+  if (!allSupportedChainIds.includes(ethChainId!)) {
     return (
       <CWModal
         open={isOpen}
@@ -241,10 +304,11 @@ const UniswapTradeModal = ({
                 className="Uniswap"
                 onClick={isWrongNetwork ? promptNetworkSwitch : undefined}
               >
-                {!uniswapWidget.isReady ? (
+                {!uniswapWidget.isReady || !isJsonRpcUrlMapReady ? (
                   <CWCircleMultiplySpinner />
                 ) : (
                   <SwapWidget
+                    key={`swap-widget-${ethChainId}-${isJsonRpcUrlMapReady}`}
                     className={`uniswap-widget-wrapper ${isWrongNetwork ? 'disabled-overlay' : ''}`}
                     tokenList={uniswapWidget.tokensList}
                     routerUrl={uniswapWidget.routerURLs.default}

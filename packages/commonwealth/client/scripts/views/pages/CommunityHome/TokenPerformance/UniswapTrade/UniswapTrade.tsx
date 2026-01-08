@@ -1,6 +1,6 @@
+import { SwapWidget } from '@commonxyz/uniswap-widgets';
+import '@commonxyz/uniswap-widgets/fonts.css';
 import { ChainBase } from '@hicommonwealth/shared';
-import { SwapWidget } from '@uniswap/widgets';
-import '@uniswap/widgets/fonts.css';
 import TokenIcon from 'client/scripts/views/modals/TradeTokenModel/TokenIcon';
 import {
   ExternalToken,

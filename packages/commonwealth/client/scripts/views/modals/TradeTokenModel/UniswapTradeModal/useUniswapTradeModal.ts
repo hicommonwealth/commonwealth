@@ -1,3 +1,4 @@
+import { Theme } from '@commonxyz/uniswap-widgets';
 import { Web3Provider } from '@ethersproject/providers';
 import { getChainHex } from '@hicommonwealth/evm-protocols';
 import {
@@ -5,7 +6,6 @@ import {
   UNISWAP_CONVENIENCE_FEE_PERCENT,
   UNISWAP_CONVENIENCE_FEE_RECIPIENT_ADDRESS,
 } from '@hicommonwealth/shared';
-import { Theme } from '@uniswap/widgets';
 import { isMagicUser as checkIfMagicUser } from 'client/scripts/utils/magicNetworkUtils';
 import MagicWebWalletController from 'controllers/app/webWallets/MagicWebWallet';
 import WebWalletController from 'controllers/app/web_wallets';
