@@ -29,35 +29,44 @@ import {
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 
-const markdownRenderer = new marked.Renderer();
+// Custom renderer extension - must be applied AFTER other extensions to take precedence
+const customRendererExtension = {
+  renderer: {
+    link(href: string, title: string | null | undefined, text: string) {
+      return `<a ${
+        href.indexOf(`://${PRODUCTION_DOMAIN}/`) !== -1 && 'target="_blank"'
+      } ${
+        OPEN_LINKS_IN_NEW_TAB ? 'target="_blank"' : ''
+      } href="${href}">${text}</a>`;
+    },
+    image(href: string, title: string | null | undefined, text: string) {
+      if (!isValidImageUrl(href)) {
+        return '';
+      }
 
-markdownRenderer.link = (href, title, text) => {
-  return `<a ${
-    href.indexOf(`://${PRODUCTION_DOMAIN}/`) !== -1 && 'target="_blank"'
-  } ${
-    OPEN_LINKS_IN_NEW_TAB ? 'target="_blank"' : ''
-  } href="${href}">${text}</a>`;
+      let finalHref = href;
+      if (finalHref?.startsWith('ipfs://')) {
+        const hash = finalHref.split('ipfs://')[1];
+        if (hash) {
+          finalHref = `https://ipfs.io/ipfs/${hash}`;
+        }
+      }
+      return `<img alt="${text}" src="${finalHref}"/>`;
+    },
+  },
 };
 
-markdownRenderer.image = (href, title, text) => {
-  if (!isValidImageUrl(href)) {
-    return '';
-  }
-
-  if (href?.startsWith('ipfs://')) {
-    const hash = href.split('ipfs://')[1];
-    if (hash) {
-      href = `https://ipfs.io/ipfs/${hash}`;
-    }
-  }
-  return `<img alt="${text}" src="${href}"/>`;
-};
+// Apply extensions first, then our custom renderer LAST so it takes precedence
 marked
   .setOptions({
-    renderer: markdownRenderer,
     gfm: true, // use github flavored markdown
   })
-  .use(markedFootnote(), markedSmartypants(), markedXhtml());
+  .use(
+    markedFootnote(),
+    markedSmartypants(),
+    markedXhtml(),
+    customRendererExtension,
+  );
 
 type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
