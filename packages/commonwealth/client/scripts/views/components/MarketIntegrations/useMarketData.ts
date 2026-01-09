@@ -1,7 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { discoverKalshiMarkets } from '../../../services/kalshiApi';
-import { discoverPolymarketMarkets } from '../../../services/polymarketApi';
+import { useDiscoverExternalMarketsQuery } from 'state/api/markets';
 import { trpc } from '../../../utils/trpcClient';
 import { Market, MarketFilters } from './types';
 
@@ -20,30 +18,16 @@ export function useMarketData(communityId: string) {
       community_id: communityId,
     });
 
-  // Fetch discovered markets from Kalshi API
-  const { data: discoveredKalshiMarkets, isLoading: isLoadingKalshi } =
-    useQuery<Market[], Error>({
-      queryKey: ['kalshiMarkets', filters],
-      queryFn: () => discoverKalshiMarkets(filters),
-      enabled: filters.provider === 'all' || filters.provider === 'kalshi',
+  // Fetch discovered markets from external APIs via backend proxy
+  const { data: discoveredMarkets, isLoading: isLoadingDiscovered } =
+    useDiscoverExternalMarketsQuery({
+      filters,
     });
-
-  // Fetch discovered markets from Polymarket API
-  const { data: discoveredPolymarketMarkets, isLoading: isLoadingPolymarket } =
-    useQuery<Market[], Error>({
-      queryKey: ['polymarketMarkets', filters],
-      queryFn: () => discoverPolymarketMarkets(filters),
-      enabled: filters.provider === 'all' || filters.provider === 'polymarket',
-    });
-
-  const discoveredMarkets = useMemo(() => {
-    const kalshiMarkets = discoveredKalshiMarkets || [];
-    const polymarketMarkets = discoveredPolymarketMarkets || [];
-    return [...kalshiMarkets, ...polymarketMarkets];
-  }, [discoveredKalshiMarkets, discoveredPolymarketMarkets]);
 
   const categories = useMemo(() => {
-    const allCategories = discoveredMarkets.map((market) => market.category);
+    const allCategories = (discoveredMarkets || []).map(
+      (market) => market.category,
+    );
     return ['all', ...Array.from(new Set(allCategories))];
   }, [discoveredMarkets]);
 
@@ -52,29 +36,6 @@ export function useMarketData(communityId: string) {
       ? new Set<string>(savedMarkets.map((m) => m.slug))
       : new Set<string>();
   }, [savedMarkets]);
-
-  const filteredDiscoveredMarkets = useMemo(() => {
-    // Client-side filtering if 'tickers' parameter is not sufficient or if 'title' needs to be searched
-    let filtered = discoveredMarkets;
-
-    if (filters.search) {
-      filtered = filtered.filter((market) =>
-        market.question.toLowerCase().includes(filters.search.toLowerCase()),
-      );
-    }
-    if (filters.provider !== 'all') {
-      filtered = filtered.filter(
-        (market) => market.provider === filters.provider,
-      );
-    }
-    if (filters.category !== 'all') {
-      filtered = filtered.filter(
-        (market) => market.category === filters.category,
-      );
-    }
-
-    return filtered;
-  }, [discoveredMarkets, filters]);
 
   const { mutate: subscribeMarket, isPending: isSubscribing } =
     trpc.community.subscribeMarket.useMutation();
@@ -110,9 +71,9 @@ export function useMarketData(communityId: string) {
   return {
     filters,
     setFilters,
-    markets: filteredDiscoveredMarkets,
+    markets: discoveredMarkets || [],
     categories,
-    isLoading: isLoadingKalshi || isLoadingSaved || isLoadingPolymarket,
+    isLoading: isLoadingDiscovered || isLoadingSaved,
     savedMarketIds,
     onSubscribe,
     onUnsubscribe,
