@@ -110,6 +110,7 @@ const {
   SLACK_WEBHOOK_URL_ALL_ENG,
   SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
   FLAG_CLAIMS,
+  FLAG_MARKETS,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -370,6 +371,9 @@ export const config = configure(
     },
     CLAIMS: {
       ENABLED: FLAG_CLAIMS === 'true',
+    },
+    MARKETS: {
+      ENABLED: FLAG_MARKETS === 'true',
     },
   },
   z.object({
@@ -791,6 +795,9 @@ export const config = configure(
       }),
     }),
     CLAIMS: z.object({
+      ENABLED: z.boolean(),
+    }),
+    MARKETS: z.object({
       ENABLED: z.boolean(),
     }),
   }),

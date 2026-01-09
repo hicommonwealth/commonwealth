@@ -1,5 +1,6 @@
 import * as govAbis from '@commonxyz/common-governance-abis';
 import * as abis from '@commonxyz/common-protocol-abis';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 
 // Chains with deployed namespace factories. As new chains are enabled, add here.
 
@@ -16,6 +17,7 @@ export enum ValidChains {
   SKALE_TEST = 974399131,
   // SKALE = 1564830818,
   Anvil = 31337,
+  Soneium = 1868,
 }
 
 const chains = Object.entries(ValidChains)
@@ -151,6 +153,11 @@ export const factoryContracts: FactoryContractsType = {
     TokenLaunchpad: '0x1fB82e534F0E81527970BFA3096ED1b728922ff8',
     TokenBondingCurve: '0x3b3A346A679fd721710D778551766A71482926dd',
     chainId: 31337,
+  },
+  [ValidChains.Soneium]: {
+    NamespaceFactory: ZERO_ADDRESS,
+    CommunityStake: ZERO_ADDRESS,
+    chainId: 1868,
   },
 };
 

@@ -1,5 +1,6 @@
-import { Command } from '@hicommonwealth/core';
+import { Command, InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { config } from '../../config';
 import { models } from '../../database';
 import { authRoles } from '../../middleware';
 
@@ -8,6 +9,10 @@ export function SubscribeMarket(): Command<typeof schemas.SubscribeMarket> {
     ...schemas.SubscribeMarket,
     auth: [authRoles('admin')],
     body: async ({ payload }) => {
+      if (!config.MARKETS.ENABLED) {
+        throw new InvalidState('Markets feature is not enabled');
+      }
+
       const {
         community_id,
         provider,

@@ -59,6 +59,7 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
   const xpEnabled = useFlag('xp');
+  const marketsEnabled = useFlag('markets');
 
   const communityId = app.activeChainId() || '';
   const { data: community } = useGetCommunityByIdQuery({
@@ -163,6 +164,10 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
   );
   const matchesDirectoryRoute = matchRoutes(
     [{ path: '/directory' }, { path: ':scope/directory' }],
+    location,
+  );
+  const matchesMarketsAppRoute = matchRoutes(
+    [{ path: '/markets-app' }, { path: ':scope/markets-app' }],
     location,
   );
 
@@ -313,6 +318,23 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     },
   };
 
+  const marketsData: SectionGroupAttrs = {
+    title: 'Markets',
+    containsChildren: false,
+    displayData: null,
+    hasDefaultToggle: false,
+    isActive: !!matchesMarketsAppRoute,
+    isVisible: marketsEnabled,
+    isUpdated: true,
+    onClick: (e, toggle: boolean) => {
+      e.preventDefault();
+      resetSidebarState();
+      handleRedirectClicks(navigate, e, `/markets-app`, communityId, () => {
+        setGovernanceToggleTree('children.Markets.toggledState', toggle);
+      });
+    },
+  };
+
   // Directory
   const directoryData: SectionGroupAttrs = {
     title: 'Directory',
@@ -336,11 +358,12 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     snapshotData,
     proposalsData,
     questsData,
+    marketsData,
     directoryData,
   ];
 
   if (!hasProposals)
-    governanceGroupData = [membersData, questsData, directoryData];
+    governanceGroupData = [membersData, questsData, marketsData, directoryData];
   if (isContestAvailable) {
     governanceGroupData.push(contestData);
   }

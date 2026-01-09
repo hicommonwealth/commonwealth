@@ -76,6 +76,7 @@ const baseActivityQuery = `
           WHERE
             C.thread_id = T.id
             AND C.deleted_at IS NULL
+            AND C.marked_as_spam_at IS NULL
         ) C WHERE C.rn <= :comment_limit), '[]') as comments
   FROM
     gated_output T
@@ -104,6 +105,11 @@ WITH output_with_topics AS (
     JOIN "Communities" C ON C.id = T.community_id 
   WHERE
     T.id IN (:threadIds)
+    AND T.deleted_at IS NULL
+    AND T.archived_at IS NULL
+    AND T.marked_as_spam_at IS NULL
+    AND C.active IS TRUE
+    AND C.tier != ${CommunityTierMap.SpamCommunity}
     ${community_id ? 'AND T.community_id = :community_id' : ''}
     ${search ? 'AND T.title ILIKE :search' : ''}
 ),
