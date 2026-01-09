@@ -147,3 +147,12 @@ Each AI run should append an entry with:
   * Added discoverExternalMarkets endpoint to community tRPC router
   * Updated frontend useDiscoverPolymarketMarketsQuery to use tRPC proxy instead of direct fetch
   * Commit: d75672d776
+- Unified all market providers through backend proxy:
+  * Extended DiscoverExternalMarkets to support all providers (kalshi, polymarket, all)
+  * Added filters (search, category) and limit parameter to API
+  * Server-side filtering applied after fetching from external APIs
+  * Created single useDiscoverExternalMarketsQuery hook replacing separate Kalshi/Polymarket hooks
+  * Removed client-side discoverKalshiMarkets.ts and discoverPolymarketMarkets.ts
+  * Removed kalshi/polymarket endpoints from client config.ts (now only on backend)
+  * Simplified useMarketData.ts - no more client-side filtering needed
+  * Commit: b10692a4ae

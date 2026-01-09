@@ -486,7 +486,10 @@ export const ExternalMarket = z.object({
 
 export const DiscoverExternalMarkets = {
   input: z.object({
-    provider: z.enum(['polymarket']),
+    provider: z.enum([...Markets, 'all']),
+    limit: z.number().min(1).max(200).optional().default(200),
+    search: z.string().optional(),
+    category: z.string().optional(),
   }),
   output: z.array(ExternalMarket),
 };

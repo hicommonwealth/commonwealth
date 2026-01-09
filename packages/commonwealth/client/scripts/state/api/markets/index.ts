@@ -1,10 +1,3 @@
-import useDiscoverKalshiMarketsQuery, {
-  discoverKalshiMarkets,
-} from './discoverKalshiMarkets';
-import useDiscoverPolymarketMarketsQuery from './discoverPolymarketMarkets';
+import useDiscoverExternalMarketsQuery from './discoverExternalMarkets';
 
-export {
-  discoverKalshiMarkets,
-  useDiscoverKalshiMarketsQuery,
-  useDiscoverPolymarketMarketsQuery,
-};
+export { useDiscoverExternalMarketsQuery };
