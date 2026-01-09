@@ -138,3 +138,12 @@ Each AI run should append an entry with:
   * Test search filtering across both providers
   * Check browser console for any API errors or CORS issues
 - Commit: 5a6a55cef6
+- Follow-up fix for Polymarket CORS issue:
+  * Polymarket API (gamma-api.polymarket.com) does not include CORS headers, blocking browser requests
+  * Kalshi API works fine in browser (has Access-Control-Allow-Origin header)
+  * Solution: Created backend proxy endpoint for Polymarket API calls
+  * Added DiscoverExternalMarkets schema and ExternalMarket type to @hicommonwealth/schemas
+  * Created DiscoverExternalMarkets.query.ts in model package to proxy Polymarket API
+  * Added discoverExternalMarkets endpoint to community tRPC router
+  * Updated frontend useDiscoverPolymarketMarketsQuery to use tRPC proxy instead of direct fetch
+  * Commit: d75672d776

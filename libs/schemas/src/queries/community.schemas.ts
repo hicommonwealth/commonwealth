@@ -16,6 +16,7 @@ import {
   ExtendedCommunity,
   Group,
   Market,
+  Markets,
   Membership,
   MembershipRejectReason,
   PinnedTokenWithPrices,
@@ -469,4 +470,23 @@ export const GetMarkets = {
     community_id: z.string(),
   }),
   output: z.array(MarketView),
+};
+
+export const ExternalMarket = z.object({
+  id: z.string(),
+  provider: z.enum(Markets),
+  slug: z.string(),
+  question: z.string(),
+  category: z.string(),
+  status: z.string(),
+  startTime: z.coerce.date().nullable(),
+  endTime: z.coerce.date().nullable(),
+  imageUrl: z.string().optional(),
+});
+
+export const DiscoverExternalMarkets = {
+  input: z.object({
+    provider: z.enum(['polymarket']),
+  }),
+  output: z.array(ExternalMarket),
 };
