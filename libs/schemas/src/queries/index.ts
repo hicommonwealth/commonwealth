@@ -9,7 +9,6 @@ export * from './mcp-server.schemas';
 export * from './pagination';
 export * from './poll.schemas';
 export * from './quest.schemas';
-export * from './search.schemas';
 export * from './subscription.schemas';
 export * from './super-admin.schemas';
 export * from './tag.schemas';
