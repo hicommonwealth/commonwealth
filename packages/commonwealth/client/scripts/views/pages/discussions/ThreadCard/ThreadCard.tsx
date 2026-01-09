@@ -1,4 +1,8 @@
-import { ActionGroups, GatedActionEnum } from '@hicommonwealth/shared';
+import {
+  ActionGroups,
+  GatedActionEnum,
+  isValidImageUrl,
+} from '@hicommonwealth/shared';
 import { useShowImage } from 'client/scripts/hooks/useShowImage';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
@@ -296,7 +300,7 @@ export const ThreadCard = ({
                   cutoffLines={cutoffLines}
                 />
               )}
-              {threadImage && (
+              {threadImage && isValidImageUrl(threadImage) && (
                 <div className="card-image-container">
                   <img src={threadImage} alt="Thread content" />
                 </div>
