@@ -28,3 +28,4 @@ tracing
 latest.dump
 **/allocation-distribution
 .playwright-mcp/
+.github/pr-screenshots/
