@@ -327,7 +327,7 @@ export const CommentCard = ({
                 setStreamingText(accumulatedText);
               }
             },
-            onComplete: async (completedText, commentPayload) => {
+            onComplete: (completedText, commentPayload) => {
               // Check ref state before processing completion
               if (
                 !streamingStateRef.current.inProgress ||

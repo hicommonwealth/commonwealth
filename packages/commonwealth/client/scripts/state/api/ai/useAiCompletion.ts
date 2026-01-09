@@ -24,7 +24,7 @@ interface AiCompletionOptions extends Partial<CompletionOptions> {
   onComplete?: (
     fullText: string,
     commentPayload?: Record<string, unknown>,
-  ) => void;
+  ) => void | Promise<void>;
   onError?: (error: Error) => void;
 }
 

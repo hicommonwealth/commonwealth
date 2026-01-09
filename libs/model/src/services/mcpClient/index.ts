@@ -53,7 +53,8 @@ const buildSystemPrompt = (
 Available MCP servers and their mention handles:
 ${allServers.map((server) => `- ${MCP_MENTION_SYMBOL}${server.handle}: ${server.name} - ${server.description}`).join('\n')}
 
-When a user mentions an MCP server by name in the parent comment, you should use the MCP tools from that specific server to help answer their question. Multiple servers can be mentioned in a single message.
+When a user mentions an MCP server by name in the parent comment, you should use the MCP tools from \
+that specific server to help answer their question. Multiple servers can be mentioned in a single message.
 
 If no specific server is mentioned, you can provide general assistance based on your knowledge, but you won't have access to real-time data from the MCP servers.
 
