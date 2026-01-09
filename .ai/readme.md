@@ -66,8 +66,8 @@ Every AI-assisted task follows this sequence:
    pnpm -F commonwealth test-integration
    ```
    - **No green checkmarks = incomplete work** – Fix issues before proceeding
-   - Add tests for new functionality (unit tests minimum)
-   - Verify in browser for UI changes (when applicable)
+   - **Add tests for new functionality** – Unit tests are required (see [Unit Test Requirements](#unit-test-requirements-for-new-functionality))
+   - **Generate UI screenshots for significant UI changes** – Use Playwright MCP (see [UI Screenshot Requirements](#ui-screenshot-requirements))
 
 ### 4. **Update Documentation**
    - Update GitHub issue with completion comment
@@ -95,6 +95,30 @@ Every AI-assisted task follows this sequence:
      ```
    - Types: `feat`, `fix`, `refactor`, `test`, `chore`, `docs`
    - **Never commit failing types or tests**
+
+### 6. **Create Pull Request**
+   - Push branch: `git push -u origin <branch-name>`
+   - Create PR with `gh pr create`
+   - **IMPORTANT:** PR body MUST include `Closes #<issue-number>` to auto-close the issue when merged
+   - PR format:
+     ```markdown
+     ## Summary
+     - Brief description of what was implemented
+     - Key changes made
+
+     ## Test Plan
+     - [ ] Unit tests pass (`pnpm -F commonwealth test-unit`)
+     - [ ] Type checks pass (`pnpm -r check-types`)
+     - [ ] Manual verification: <steps to verify>
+
+     ## Screenshots (if UI changes)
+     ![Description](screenshot-path.png)
+
+     Closes #<issue-number>
+
+     🤖 Generated with [Claude Code](https://claude.ai/code)
+     ```
+   - The `Closes #` keyword triggers GitHub's auto-close feature when PR is merged
 
 ---
 
@@ -342,6 +366,248 @@ Commonwealth's size requires pragmatic test coverage:
 - **Integration tests:** None needed (UI-only change)
 - **Manual verification:** Check localhost:8080, verify markets hidden
 ```
+
+---
+
+## Unit Test Requirements for New Functionality
+
+When adding new functionality, you **MUST** add corresponding unit tests. This ensures code quality and prevents regressions.
+
+### When to Add Unit Tests
+
+Unit tests are **required** for:
+- New utility functions or helpers
+- New business logic (calculations, transformations, validations)
+- New hooks (React custom hooks)
+- New state management logic (Zustand stores)
+- New API endpoint handlers
+- Bug fixes (add regression test to prevent recurrence)
+
+### Project Test Patterns
+
+**Test Framework:** Vitest (for all unit tests)
+
+**Test File Naming:**
+- Place test files next to the code they test OR in the appropriate `test/unit/` directory
+- Name pattern: `<filename>.spec.ts` or `<filename>.test.ts`
+
+**Test Structure (follow existing patterns):**
+```typescript
+import { describe, expect, test, beforeEach, afterEach, vi } from 'vitest';
+
+describe('FunctionOrComponentName', () => {
+  // Setup if needed
+  beforeEach(() => {
+    // Reset state, mocks, etc.
+  });
+
+  test('should describe expected behavior', () => {
+    // Arrange
+    const input = 'test input';
+
+    // Act
+    const result = functionUnderTest(input);
+
+    // Assert
+    expect(result).to.equal('expected output');
+  });
+
+  test('should handle edge case: specific scenario', () => {
+    // Test edge cases
+  });
+});
+```
+
+**Test Location by Package:**
+- `packages/commonwealth/test/unit/` - Frontend utilities, hooks, helpers
+- `libs/model/test/` - Model logic, policies, lifecycle tests
+- `libs/adapters/test/` - Adapter implementations
+- `libs/schemas/test/` - Schema validations
+
+**Running Tests:**
+```bash
+# Run all unit tests
+pnpm -F commonwealth test-unit
+
+# Run specific test file
+pnpm -F commonwealth test-select packages/commonwealth/test/unit/path/to/test.spec.ts
+
+# Run tests in watch mode
+pnpm -F commonwealth test-select:watch
+
+# Run model tests
+pnpm -F model test-select libs/model/test/path/to/test.spec.ts
+```
+
+### Test Writing Guidelines
+
+1. **Test behaviors, not implementation** – Focus on what the code does, not how
+2. **Start with happy path** – Test the main use case first
+3. **Cover edge cases** – Empty inputs, null values, boundary conditions
+4. **Use descriptive test names** – `should return empty array when no items match filter`
+5. **Keep tests fast** – Unit tests should run in < 100ms each
+6. **Mock external dependencies** – Use `vi.mock()` for external modules
+7. **Match existing patterns** – Look at similar tests in the codebase first
+
+### Example: Adding Tests for a New Utility Function
+
+If you add a new function in `client/scripts/helpers/formatCurrency.ts`:
+
+```typescript
+// packages/commonwealth/test/unit/helpers/formatCurrency.spec.ts
+import { formatCurrency } from 'helpers/formatCurrency';
+import { describe, expect, test } from 'vitest';
+
+describe('formatCurrency', () => {
+  test('should format USD amounts with dollar sign', () => {
+    expect(formatCurrency(1000, 'USD')).to.equal('$1,000.00');
+  });
+
+  test('should format large numbers with appropriate separators', () => {
+    expect(formatCurrency(1000000, 'USD')).to.equal('$1,000,000.00');
+  });
+
+  test('should handle zero amount', () => {
+    expect(formatCurrency(0, 'USD')).to.equal('$0.00');
+  });
+
+  test('should handle negative amounts', () => {
+    expect(formatCurrency(-500, 'USD')).to.equal('-$500.00');
+  });
+});
+```
+
+---
+
+## UI Screenshot Requirements
+
+When making **significant UI changes**, you must capture screenshots to document the visual changes for PR review. Use Playwright MCP to generate these screenshots.
+
+### When to Capture Screenshots
+
+Screenshots are **required** for:
+- New pages or major page sections
+- Significant layout changes
+- New components that affect user workflows
+- Visual bug fixes (before/after)
+- Changes to navigation or user flows
+
+Screenshots are **optional** for:
+- Minor styling tweaks (color, spacing adjustments)
+- Backend-only changes
+- Non-visual code changes
+
+### How to Capture Screenshots with Playwright MCP
+
+**Prerequisites:**
+- Local development server running (`pnpm start`)
+- Playwright MCP tools available
+
+**Process:**
+
+1. **Start the development server** (if not already running):
+   ```bash
+   pnpm start
+   # Wait for "Compiled successfully" message
+   ```
+
+2. **Navigate to the relevant page:**
+   ```
+   Use browser_navigate to go to http://localhost:8080/<path>
+   ```
+
+3. **Capture the screenshot:**
+   ```
+   Use browser_take_screenshot with descriptive filename
+   ```
+
+4. **For user flows, capture each step:**
+   - Initial state
+   - After user interaction (click, form fill, etc.)
+   - Final state
+
+**Screenshot Naming Convention:**
+```
+<feature>-<state>-<description>.png
+
+Examples:
+- markets-page-initial.png
+- markets-page-after-filter.png
+- user-profile-edit-modal.png
+- dark-mode-toggle-enabled.png
+```
+
+**Screenshot Storage:**
+- **IMPORTANT:** Screenshots must NOT be committed to the repository
+- Upload screenshots directly to GitHub by attaching them to PR comments
+- Use the GitHub-hosted URL (format: `https://github.com/user-attachments/assets/...`) in PR descriptions
+- Reference screenshots in `.ai/progress.txt` by their GitHub URLs
+
+### Example: Documenting a UI Flow
+
+For a feature that adds a new "Markets" page:
+
+```
+1. Navigate to http://localhost:8080/markets
+2. Take screenshot: markets-page-initial.png
+3. Click on a market item
+4. Take screenshot: markets-page-detail-view.png
+5. Apply a filter
+6. Take screenshot: markets-page-filtered.png
+```
+
+**Playwright MCP Commands:**
+```
+browser_navigate: {"url": "http://localhost:8080/markets"}
+browser_snapshot: {} (to see current state and element refs)
+browser_take_screenshot: {"filename": "markets-page-initial.png"}
+browser_click: {"element": "Filter button", "ref": "<ref-from-snapshot>"}
+browser_take_screenshot: {"filename": "markets-page-filtered.png"}
+```
+
+### Including Screenshots in PRs
+
+When the PR contains significant UI changes:
+
+1. **Upload screenshots to GitHub:**
+   - Take screenshots using Playwright MCP `browser_take_screenshot`
+   - Screenshots are saved to a temporary location (do NOT commit to repo)
+   - Create a comment on the PR and drag-drop/paste the screenshot images
+   - GitHub automatically uploads and generates URLs like: `https://github.com/user-attachments/assets/<uuid>`
+   - Copy these GitHub-hosted URLs for use in PR description
+
+2. **Reference in progress.txt (using GitHub URLs):**
+   ```
+   [2025-01-09] Feature: Add markets page
+   - Screenshots uploaded to GitHub:
+     - Initial: https://github.com/user-attachments/assets/abc123...
+     - Filtered: https://github.com/user-attachments/assets/def456...
+   - UI flow documented for reviewer
+   ```
+
+3. **Mention in commit message:**
+   ```
+   feat: add markets page with filtering
+
+   - New /markets route with filterable list
+   - Screenshots attached to PR for visual review
+   ```
+
+4. **Add to PR description (using GitHub-hosted URLs):**
+   ```markdown
+   ## Screenshots
+
+   ### Markets Page - Initial View
+   ![Initial](https://github.com/user-attachments/assets/abc123-uuid-here)
+
+   ### Markets Page - With Filter Applied
+   ![Filtered](https://github.com/user-attachments/assets/def456-uuid-here)
+   ```
+
+**Why GitHub-hosted URLs?**
+- Keeps the repository clean (no binary files bloating git history)
+- Screenshots persist as long as the PR/issue exists
+- No need to manage screenshot directories or cleanup
 
 ---
 
