@@ -156,3 +156,9 @@ Each AI run should append an entry with:
   * Removed kalshi/polymarket endpoints from client config.ts (now only on backend)
   * Simplified useMarketData.ts - no more client-side filtering needed
   * Commit: b10692a4ae
+- Fixed Polymarket API to use /events endpoint (not /markets):
+  * /markets returns individual outcomes (e.g., 10 deportation buckets as separate items)
+  * /events returns grouped events (single "How many will Trump deport?" event)
+  * Added active=true filter to only return active events
+  * Both APIs now return unique, open events without duplicates
+  * Commit: 052c07c9c9

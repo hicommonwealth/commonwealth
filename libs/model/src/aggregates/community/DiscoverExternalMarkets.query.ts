@@ -3,17 +3,18 @@ import * as schemas from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { config } from '../../config';
 
-const POLYMARKET_API_URL = 'https://gamma-api.polymarket.com/markets';
+// Use /events endpoint for grouped markets (not /markets which returns individual outcomes)
+const POLYMARKET_API_URL = 'https://gamma-api.polymarket.com/events';
 const KALSHI_API_URL = 'https://api.elections.kalshi.com/trade-api/v2/events';
 
 type ExternalMarket = z.infer<typeof schemas.ExternalMarket>;
 
-interface PolymarketMarketResponse {
+interface PolymarketEventResponse {
   id: string;
   slug: string;
-  question: string;
-  category?: string;
+  title: string;
   closed?: boolean;
+  active?: boolean;
   startDate?: string;
   endDate?: string;
   image?: string;
@@ -30,11 +31,10 @@ interface KalshiEventsResponse {
   events: KalshiEvent[];
 }
 
-async function fetchPolymarketMarkets(
-  limit: number,
-): Promise<ExternalMarket[]> {
+async function fetchPolymarketEvents(limit: number): Promise<ExternalMarket[]> {
   const url = new URL(POLYMARKET_API_URL);
   url.searchParams.append('closed', 'false');
+  url.searchParams.append('active', 'true');
   url.searchParams.append('limit', String(limit));
 
   const response = await fetch(url.toString());
@@ -42,7 +42,7 @@ async function fetchPolymarketMarkets(
     throw new InvalidState(`Polymarket API error: ${response.status}`);
   }
 
-  const data: PolymarketMarketResponse[] = await response.json();
+  const data: PolymarketEventResponse[] = await response.json();
 
   if (!Array.isArray(data)) {
     console.error(
@@ -52,20 +52,20 @@ async function fetchPolymarketMarkets(
     return [];
   }
 
-  return data.map((market) => ({
-    id: market.id,
+  return data.map((event) => ({
+    id: event.id,
     provider: 'polymarket' as const,
-    slug: market.slug,
-    question: market.question,
-    category: market.category || 'Uncategorized',
-    status: market.closed ? 'closed' : 'open',
-    startTime: market.startDate ? new Date(market.startDate) : null,
-    endTime: market.endDate ? new Date(market.endDate) : null,
-    imageUrl: market.image || undefined,
+    slug: event.slug,
+    question: event.title,
+    category: 'Uncategorized', // Events endpoint doesn't include category
+    status: event.closed ? 'closed' : 'open',
+    startTime: event.startDate ? new Date(event.startDate) : null,
+    endTime: event.endDate ? new Date(event.endDate) : null,
+    imageUrl: event.image || undefined,
   }));
 }
 
-async function fetchKalshiMarkets(limit: number): Promise<ExternalMarket[]> {
+async function fetchKalshiEvents(limit: number): Promise<ExternalMarket[]> {
   const url = new URL(KALSHI_API_URL);
   url.searchParams.append('limit', String(limit));
   url.searchParams.append('status', 'open');
@@ -129,12 +129,12 @@ export function DiscoverExternalMarkets(): Query<
       let markets: ExternalMarket[] = [];
 
       if (provider === 'polymarket' || provider === 'all') {
-        const polymarketMarkets = await fetchPolymarketMarkets(limit);
+        const polymarketMarkets = await fetchPolymarketEvents(limit);
         markets = markets.concat(polymarketMarkets);
       }
 
       if (provider === 'kalshi' || provider === 'all') {
-        const kalshiMarkets = await fetchKalshiMarkets(limit);
+        const kalshiMarkets = await fetchKalshiEvents(limit);
         markets = markets.concat(kalshiMarkets);
       }
 
