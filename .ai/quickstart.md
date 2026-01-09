@@ -103,6 +103,8 @@ AI will automatically:
 - Find the highest priority `ai-ready` issue
 - Create branch: `ro/feature-1234-title-slug`
 - Implement the feature
+- **Add unit tests** for new functionality
+- **Capture UI screenshots** for significant UI changes (using Playwright MCP)
 - Run tests and type checks
 - Commit changes
 - Update GitHub issue
@@ -127,7 +129,23 @@ git log -1 --stat
 gh issue view <issue-number>
 ```
 
-### 2. Test Manually (if needed)
+### 2. Review Unit Tests and Screenshots
+
+```bash
+# Check if new tests were added
+git diff HEAD~1 --name-only | grep '.spec.ts'
+
+# Run the new tests
+pnpm -F commonwealth test-unit
+
+# Check for captured screenshots (if UI changes)
+ls *.png 2>/dev/null || echo "No screenshots in current directory"
+
+# Review progress notes for details
+cat .ai/progress.txt | tail -30
+```
+
+### 3. Test Manually (if needed)
 
 ```bash
 # Start the application
@@ -142,20 +160,35 @@ pnpm -F model test
 etc...
 ```
 
-### 3. Push and Create PR
+### 4. Push and Create PR
 
 ```bash
 # Push your branch
 git push -u origin $(git branch --show-current)
 
-# Create PR (auto-fills from issue)
-gh pr create --fill
+# Create PR with proper format (MUST include "Closes #<issue-number>")
+gh pr create --title "feat: description of changes" --body "$(cat <<'EOF'
+## Summary
+- Brief description of changes
 
-# Or create PR with custom details
-gh pr create
+## Test Plan
+- [ ] Unit tests pass
+- [ ] Type checks pass
+- [ ] Manual verification completed
+
+Closes #<issue-number>
+
+🤖 Generated with Claude Code
+EOF
+)"
+
+# Or use --fill for simple PRs (manually add "Closes #" to description)
+gh pr create --fill
 ```
 
-### 4. Merge After Review
+**IMPORTANT:** Always include `Closes #<issue-number>` in the PR body to auto-close the GitHub issue when merged.
+
+### 5. Merge After Review
 
 - Wait for human review
 - Address any feedback
@@ -190,9 +223,9 @@ git branch
 git diff HEAD~1
 git log -1
 
-# Push and PR
+# Push and PR (include "Closes #<issue>" in PR body)
 git push -u origin $(git branch --show-current)
-gh pr create --fill
+gh pr create --fill  # Add "Closes #1234" to PR description
 ```
 
 ---
@@ -279,12 +312,14 @@ git checkout master && git pull
 ./ai/run.sh 1234
 
 # AI creates: ro/feature-1234-add-dark-mode-toggle
-# AI implements, tests, and commits
+# AI implements, adds tests, captures screenshots, and commits
 
 # Review and push
 git diff HEAD~1
 git push -u origin ro/feature-1234-add-dark-mode-toggle
-gh pr create --fill
+
+# Create PR with Closes # to auto-close issue
+gh pr create --title "feat: add dark mode toggle" --body "Closes #1234"
 ```
 
 ### Example 2: Fix a Bug

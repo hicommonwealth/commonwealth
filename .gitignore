@@ -27,3 +27,4 @@ external-openapi.json
 tracing
 latest.dump
 **/allocation-distribution
+.playwright-mcp/
