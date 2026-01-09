@@ -138,12 +138,11 @@ git diff HEAD~1 --name-only | grep '.spec.ts'
 # Run the new tests
 pnpm -F commonwealth test-unit
 
-# Check for captured screenshots (if UI changes)
-ls *.png 2>/dev/null || echo "No screenshots in current directory"
-
-# Review progress notes for details
+# Review progress notes for details (screenshots will be uploaded to PR after creation)
 cat .ai/progress.txt | tail -30
 ```
+
+**Note:** Screenshots are NOT committed to the repository. After creating the PR, add screenshots as a PR comment - GitHub will host them and generate URLs to use in the PR description.
 
 ### 3. Test Manually (if needed)
 

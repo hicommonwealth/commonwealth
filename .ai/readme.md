@@ -538,9 +538,10 @@ Examples:
 ```
 
 **Screenshot Storage:**
-- Save screenshots to a temporary location or attach to PR
-- Include screenshots in PR description or as PR comments
-- Reference screenshots in `.ai/progress.txt`
+- **IMPORTANT:** Screenshots must NOT be committed to the repository
+- Upload screenshots directly to GitHub by attaching them to PR comments
+- Use the GitHub-hosted URL (format: `https://github.com/user-attachments/assets/...`) in PR descriptions
+- Reference screenshots in `.ai/progress.txt` by their GitHub URLs
 
 ### Example: Documenting a UI Flow
 
@@ -568,31 +569,45 @@ browser_take_screenshot: {"filename": "markets-page-filtered.png"}
 
 When the PR contains significant UI changes:
 
-1. **Reference in progress.txt:**
+1. **Upload screenshots to GitHub:**
+   - Take screenshots using Playwright MCP `browser_take_screenshot`
+   - Screenshots are saved to a temporary location (do NOT commit to repo)
+   - Create a comment on the PR and drag-drop/paste the screenshot images
+   - GitHub automatically uploads and generates URLs like: `https://github.com/user-attachments/assets/<uuid>`
+   - Copy these GitHub-hosted URLs for use in PR description
+
+2. **Reference in progress.txt (using GitHub URLs):**
    ```
    [2025-01-09] Feature: Add markets page
-   - Screenshots captured: markets-page-initial.png, markets-page-detail.png
+   - Screenshots uploaded to GitHub:
+     - Initial: https://github.com/user-attachments/assets/abc123...
+     - Filtered: https://github.com/user-attachments/assets/def456...
    - UI flow documented for reviewer
    ```
 
-2. **Mention in commit message:**
+3. **Mention in commit message:**
    ```
    feat: add markets page with filtering
 
    - New /markets route with filterable list
-   - Screenshots attached for visual review
+   - Screenshots attached to PR for visual review
    ```
 
-3. **Add to PR description:**
+4. **Add to PR description (using GitHub-hosted URLs):**
    ```markdown
    ## Screenshots
 
    ### Markets Page - Initial View
-   ![Initial](./screenshots/markets-page-initial.png)
+   ![Initial](https://github.com/user-attachments/assets/abc123-uuid-here)
 
    ### Markets Page - With Filter Applied
-   ![Filtered](./screenshots/markets-page-filtered.png)
+   ![Filtered](https://github.com/user-attachments/assets/def456-uuid-here)
    ```
+
+**Why GitHub-hosted URLs?**
+- Keeps the repository clean (no binary files bloating git history)
+- Screenshots persist as long as the PR/issue exists
+- No need to manage screenshot directories or cleanup
 
 ---
 

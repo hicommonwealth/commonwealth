@@ -210,7 +210,10 @@ INSTRUCTIONS:
    - Use browser_snapshot to see current state and get element refs
    - Use browser_take_screenshot with descriptive filename (e.g., feature-page-initial.png)
    - For user flows, capture before/after states of interactions
-   - Reference screenshots in progress.txt and PR description
+   - IMPORTANT: Screenshots must NOT be committed to the repository
+   - After creating the PR, add screenshots as a PR comment (drag-drop/paste)
+   - GitHub will host the images and generate URLs (https://github.com/user-attachments/assets/...)
+   - Use these GitHub-hosted URLs in the PR description and progress.txt
 
 4. Validate that your implementation is correct:
    - Run: pnpm -r check-types (must pass)
@@ -226,7 +229,7 @@ INSTRUCTIONS:
    - Key implementation decisions made
    - Files changed (main areas)
    - Tests added/updated (specify new test files created)
-   - Screenshots captured (if UI changes)
+   - Screenshots captured (if UI changes) - note: add GitHub URLs after uploading to PR
    - Any concerns for reviewers
    - Commit hash (after committing)
 
@@ -237,7 +240,7 @@ INSTRUCTIONS:
    - Summary of changes
    - Files/areas affected
    - Tests: <test coverage added>
-   - Screenshots: <list if applicable>
+   - Screenshots: attached to PR (if applicable)
 
    🤖 Generated with Claude Code
    Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
@@ -252,7 +255,8 @@ INSTRUCTIONS:
    - Push the branch: git push -u origin <branch-name>
    - Create PR using: gh pr create --title '<type>: <description>' --body '...'
    - PR body MUST include 'Closes #${ISSUE_NUM}' to auto-close the issue when merged
-   - Include a summary section, test plan, and screenshots (if applicable)
+   - Include a summary section, test plan, and screenshots section (if UI changes)
+   - For screenshots: After creating PR, add a comment with images attached, then edit PR description to include GitHub-hosted URLs
    - Example PR body format:
      ## Summary
      - Brief description of changes
@@ -272,6 +276,7 @@ CRITICAL RULES:
 - Match existing code style and patterns
 - ADD UNIT TESTS when creating new functionality
 - CAPTURE SCREENSHOTS when making significant UI changes
+- NEVER COMMIT SCREENSHOTS TO THE REPO - upload to GitHub via PR comments instead
 "
 
 # Check if Claude succeeded
