@@ -22,7 +22,7 @@ import {
   shouldUseOpenRouter,
 } from './completionUtils';
 import { createAIComment } from './createAIComment';
-import { getMentionedMCPServersWithAncestors } from './mcpUtils';
+import { getMentionedMCPServers } from './mcpUtils';
 import { extractOpenRouterError } from './utils';
 
 const log = logger(import.meta);
@@ -613,12 +613,10 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       userPromptLength: userPrompt.length,
     });
 
-    // Check for MCP server mentions in the user's comment and ancestor comments
-    // This enables conversation continuity when replying to AI bot comments
-    const mentionedMCPServers = await getMentionedMCPServersWithAncestors(
+    // Check for MCP server mentions in the user's comment
+    const mentionedMCPServers = await getMentionedMCPServers(
       communityId,
       parentCommentBody,
-      parentCommentId,
       requestId,
     );
 
