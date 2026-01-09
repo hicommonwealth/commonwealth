@@ -48,6 +48,14 @@ export const ExternalEndpoints = {
     url: SNAPSHOT_HUB_URL,
     graphql: SNAPSHOT_HUB_URL + '/graphql',
   },
+  kalshi: {
+    baseUrl: 'https://api.elections.kalshi.com/trade-api/v2',
+    events: 'https://api.elections.kalshi.com/trade-api/v2/events',
+  },
+  polymarket: {
+    baseUrl: 'https://gamma-api.polymarket.com',
+    markets: 'https://gamma-api.polymarket.com/markets',
+  },
 };
 
 export const SERVER_URL = '/api';

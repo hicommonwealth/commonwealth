@@ -106,3 +106,35 @@ Each AI run should append an entry with:
   * Confirm light theme colors match design system and are consistent
   * Validate that status tag colors align with UX expectations
   * Check that CWSelectList dropdowns work correctly with react-select API
+
+---
+
+[2026-01-09] Refactor: Market discovery APIs to state/api/markets pattern
+- Completed GitHub issue #13288
+- Key implementation decisions:
+  * Moved market discovery functions from client/scripts/services/ to client/scripts/state/api/markets/
+  * Created React Query hooks (useDiscoverKalshiMarketsQuery, useDiscoverPolymarketMarketsQuery) following existing patterns from communities/, snapshots/, communityStake/
+  * Added Kalshi and Polymarket API endpoints to ExternalEndpoints in config.ts
+  * Added proper TypeScript interfaces for API responses (KalshiEvent, PolymarketMarketResponse)
+  * Improved Polymarket error handling with array validation and proper error logging
+  * Added limit parameter (200) to Polymarket API to match Kalshi behavior
+  * Each hook exports both the raw fetch function (discoverKalshiMarkets, discoverPolymarketMarkets) and the hook (useDiscoverKalshiMarketsQuery, useDiscoverPolymarketMarketsQuery)
+  * Set 5-minute stale time for both APIs to balance freshness with performance
+  * Removed the now-empty client/scripts/services/ directory
+- Files changed:
+  * packages/commonwealth/client/scripts/state/api/config.ts - Added kalshi and polymarket to ExternalEndpoints
+  * packages/commonwealth/client/scripts/state/api/markets/discoverKalshiMarkets.ts - New file with typed Kalshi API hook
+  * packages/commonwealth/client/scripts/state/api/markets/discoverPolymarketMarkets.ts - New file with typed Polymarket API hook
+  * packages/commonwealth/client/scripts/state/api/markets/index.ts - Barrel export for markets module
+  * packages/commonwealth/client/scripts/views/components/MarketIntegrations/useMarketData.ts - Updated imports to use new hooks
+  * packages/commonwealth/client/scripts/services/kalshiApi.ts - Deleted
+  * packages/commonwealth/client/scripts/services/polymarketApi.ts - Deleted
+- Tests: No unit tests added (external API integrations, manual verification required)
+- Type checking: No market-related type errors (pre-existing Soneium errors unrelated to changes)
+- Linting: All checks pass
+- Concerns for reviewers:
+  * Verify Kalshi markets load correctly in the Markets page UI
+  * Verify Polymarket markets load correctly (improved error handling should help debug issues)
+  * Test search filtering across both providers
+  * Check browser console for any API errors or CORS issues
+- Commit: 5a6a55cef6

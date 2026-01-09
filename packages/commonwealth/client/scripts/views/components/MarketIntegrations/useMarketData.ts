@@ -1,7 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { discoverKalshiMarkets } from '../../../services/kalshiApi';
-import { discoverPolymarketMarkets } from '../../../services/polymarketApi';
+import {
+  useDiscoverKalshiMarketsQuery,
+  useDiscoverPolymarketMarketsQuery,
+} from 'state/api/markets';
 import { trpc } from '../../../utils/trpcClient';
 import { Market, MarketFilters } from './types';
 
@@ -22,17 +23,15 @@ export function useMarketData(communityId: string) {
 
   // Fetch discovered markets from Kalshi API
   const { data: discoveredKalshiMarkets, isLoading: isLoadingKalshi } =
-    useQuery<Market[], Error>({
-      queryKey: ['kalshiMarkets', filters],
-      queryFn: () => discoverKalshiMarkets(filters),
+    useDiscoverKalshiMarketsQuery({
+      filters,
       enabled: filters.provider === 'all' || filters.provider === 'kalshi',
     });
 
   // Fetch discovered markets from Polymarket API
   const { data: discoveredPolymarketMarkets, isLoading: isLoadingPolymarket } =
-    useQuery<Market[], Error>({
-      queryKey: ['polymarketMarkets', filters],
-      queryFn: () => discoverPolymarketMarkets(filters),
+    useDiscoverPolymarketMarketsQuery({
+      filters,
       enabled: filters.provider === 'all' || filters.provider === 'polymarket',
     });
 
