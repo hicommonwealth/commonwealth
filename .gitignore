@@ -27,3 +27,9 @@ external-openapi.json
 tracing
 latest.dump
 **/allocation-distribution
+# Playwright MCP screenshots (upload to GitHub PR comments instead of committing)
+.playwright-mcp/
+.github/pr-screenshots/
+**/screenshots/
+*-screenshot.png
+*-screenshot-*.png

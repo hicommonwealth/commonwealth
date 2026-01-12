@@ -162,3 +162,24 @@ Each AI run should append an entry with:
   * Added active=true filter to only return active events
   * Both APIs now return unique, open events without duplicates
   * Commit: 052c07c9c9
+
+[2026-01-09] Feature: Automated PR creation script
+- Completed GitHub issue #13290
+- Created .ai/create-pr.sh script that automates GitHub PR creation from current branch
+- Key implementation decisions:
+  * Followed existing .ai/ script patterns (colors, gh CLI checks, error handling)
+  * Used grep for ticket extraction instead of bash regex for macOS compatibility (bash 3.2)
+  * Supports multiple branch naming conventions: author/type-number-desc, type/number-desc, number-desc
+  * Uses GitHub CLI (gh) for all GitHub operations (PR creation, issue lookup, assignments)
+  * Generates PR body with "Closes #ticket" reference following GitHub conventions
+  * Auto-assigns PR and referenced issue to executing user (@me)
+  * Includes comprehensive error handling: gh not installed, not authenticated, detached HEAD, existing PR, uncommitted changes
+- Files changed:
+  * .ai/create-pr.sh (new file - 310 lines)
+  * .ai/progress.txt (updated with progress notes)
+- Tests: Script tested with --help flag, dry-run mode, and branch extraction verification
+- Concerns for reviewers:
+  * Script requires gh CLI to be installed and authenticated
+  * PR title defaults to issue title if available, otherwise derived from branch name
+  * The script is interactive and requires user confirmation before creating PR
+- Commit: 979ff661dc
