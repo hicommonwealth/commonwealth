@@ -1,0 +1,6 @@
+# Progress Log
+
+This file tracks AI-assisted development progress.
+Each entry documents: date, feature, decisions, files changed, tests, and concerns.
+
+---

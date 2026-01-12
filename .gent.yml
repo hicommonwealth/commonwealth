@@ -1,0 +1,70 @@
+# Gent Configuration
+# See https://github.com/rotorsoft/gent for documentation
+version: 1
+
+# GitHub settings
+github:
+  labels:
+    workflow:
+      ready: 'ai-ready'
+      in_progress: 'ai-in-progress'
+      completed: 'ai-completed'
+      blocked: 'ai-blocked'
+    types:
+      - feature
+      - fix
+      - refactor
+      - chore
+      - docs
+      - test
+    priorities:
+      - critical
+      - high
+      - medium
+      - low
+    risks:
+      - low
+      - medium
+      - high
+    areas:
+      - ui
+      - api
+      - database
+      - workers
+      - shared
+      - testing
+      - infra
+
+# Branch naming convention
+branch:
+  pattern: '{author}/{type}-{issue}-{slug}'
+  author_source: 'git' # git | env | prompt
+  author_env_var: 'GENT_AUTHOR'
+
+# Progress tracking
+progress:
+  file: 'progress.txt'
+  archive_threshold: 500
+  archive_dir: '.gent/archive'
+
+# Claude settings
+claude:
+  permission_mode: 'acceptEdits'
+  agent_file: 'AGENT.md'
+
+# Gemini settings
+gemini:
+  sandbox_mode: 'on'
+  agent_file: 'AGENT.md'
+
+# AI provider settings
+ai:
+  provider: 'claude' # claude | gemini
+  # fallback_provider: "gemini"  # optional fallback when rate limited
+  auto_fallback: true # automatically switch to fallback on rate limit
+
+# Validation commands (run before commit)
+validation:
+  - 'npm run typecheck'
+  - 'npm run lint'
+  - 'npm run test'
