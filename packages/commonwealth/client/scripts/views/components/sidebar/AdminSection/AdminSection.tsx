@@ -29,10 +29,6 @@ const AdminSection = () => {
     [{ path: '/manage/integrations' }, { path: ':scope/manage/integrations' }],
     location,
   );
-  const matchesMarketIntegrationsRoute = matchRoutes(
-    [{ path: '/manage/markets' }, { path: ':scope/manage/markets' }],
-    location,
-  );
   const matchesCommunityTopicsRoute = matchRoutes(
     [{ path: '/manage/topics' }, { path: ':scope/manage/topics' }],
     location,
@@ -95,28 +91,6 @@ const AdminSection = () => {
           communityId,
           () => {
             setToggleTree(`children.integrations.toggledState`, toggle);
-          },
-        );
-      },
-    },
-    {
-      title: 'Market Integrations',
-      containsChildren: false,
-      displayData: null,
-      hasDefaultToggle: false,
-      isActive: !!matchesMarketIntegrationsRoute,
-      isVisible: marketsEnabled,
-      isUpdated: false,
-      onClick: (e, toggle: boolean) => {
-        e.preventDefault();
-        resetSidebarState();
-        handleRedirectClicks(
-          navigate,
-          e,
-          `/manage/markets`,
-          communityId,
-          () => {
-            setToggleTree(`children.marketIntegrations.toggledState`, toggle);
           },
         );
       },
