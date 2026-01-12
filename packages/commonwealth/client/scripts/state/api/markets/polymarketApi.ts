@@ -1,7 +1,7 @@
 import {
   Market,
   MarketFilters,
-} from '../views/components/MarketIntegrations/types';
+} from 'client/scripts/views/components/MarketIntegrations/types';
 
 const POLYMARKET_API_BASE_URL = 'https://gamma-api.polymarket.com';
 

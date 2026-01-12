@@ -1,7 +1,7 @@
 import {
   Market,
   MarketFilters,
-} from '../views/components/MarketIntegrations/types';
+} from 'client/scripts/views/components/MarketIntegrations/types';
 
 const KALSHI_API_BASE_URL = 'https://api.elections.kalshi.com/trade-api/v2';
 

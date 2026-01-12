@@ -650,8 +650,8 @@ const CommonDomainRoutes = (marketsEnabled: boolean) => {
     ...(marketsEnabled
       ? [
           <Route
-            key="/:scope/manage/markets"
-            path="/:scope/manage/markets"
+            key="/:scope/manage/integrations/markets"
+            path="/:scope/manage/integrations/markets"
             element={withLayout(MarketsPage, {
               scoped: true,
             })}

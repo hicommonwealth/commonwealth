@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import { discoverKalshiMarkets } from 'client/scripts/state/api/markets/kalshiApi';
+import { discoverPolymarketMarkets } from 'client/scripts/state/api/markets/polymarketApi';
 import { useMemo, useState } from 'react';
-import { discoverKalshiMarkets } from '../../../services/kalshiApi';
-import { discoverPolymarketMarkets } from '../../../services/polymarketApi';
 import { trpc } from '../../../utils/trpcClient';
 import { Market, MarketFilters } from './types';
 
