@@ -4,13 +4,11 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import CWTab from 'views/components/component_kit/new_designs/CWTabs/CWTab';
 import CWTabsRow from 'views/components/component_kit/new_designs/CWTabs/CWTabsRow';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import CreateCommunityButton from 'views/components/sidebar/CreateCommunityButton';
 import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/index';
 import { useFetchGlobalActivityQuery } from '../../../state/api/feeds/fetchUserActivity';
 import { trpc } from '../../../utils/trpcClient';
@@ -25,6 +23,7 @@ import IdeaLaunchpad from './IdeaLaunchpad';
 import QuestList from './QuestList';
 import { ThreadFeed } from './ThreadFeed/ThreadFeed';
 import TokensList from './TokensList';
+F;
 
 const ExplorePage = () => {
   const containerRef = useRef();
@@ -82,21 +81,6 @@ const ExplorePage = () => {
     <CWPageLayout ref={containerRef} className="ExplorePageLayout">
       <div className="ExplorePage">
         <div className="header-section">
-          <div className="description">
-            <CWText
-              type="h1"
-              {...(launchpadEnabled && { fontWeight: 'semiBold' })}
-            >
-              Explore {launchpadEnabled ? '' : 'Communities'}
-            </CWText>
-
-            <div className="actions">
-              {!launchpadEnabled && (
-                <CreateCommunityButton buttonHeight="med" withIcon />
-              )}
-            </div>
-          </div>
-
           <IdeaLaunchpad />
 
           <CWTextInput

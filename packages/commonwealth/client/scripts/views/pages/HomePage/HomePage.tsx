@@ -5,7 +5,6 @@ import React, { useRef, useState } from 'react';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
-import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import IdeaLaunchpad from '../ExplorePage/IdeaLaunchpad';
@@ -37,14 +36,6 @@ const HomePage = () => {
     <CWPageLayout ref={containerRef} className="ExplorePageLayout">
       <div className="HomePage">
         <div className="header-section">
-          <div className="description">
-            <CWText
-              type="h1"
-              {...(homePageEnabled && { fontWeight: 'semiBold' })}
-            >
-              Home
-            </CWText>
-          </div>
           <IdeaLaunchpad />
           {mobileDownloadEnabled && <IOSBanner />}
         </div>
