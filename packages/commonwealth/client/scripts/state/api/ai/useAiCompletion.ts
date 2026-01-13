@@ -26,6 +26,7 @@ interface AiCompletionOptions extends Partial<CompletionOptions> {
     commentPayload?: Record<string, unknown>,
   ) => void | Promise<void>;
   onError?: (error: Error) => void;
+  webSearchEnabled?: boolean;
 }
 
 /**

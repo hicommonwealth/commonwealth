@@ -365,7 +365,7 @@ const StickyInput = (props: StickyInputProps) => {
 
   const handleToggleWebSearch = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setWebSearchEnabled((prev) => !prev);
+    setWebSearchEnabled(!webSearchEnabled);
   };
 
   const renderStickyInput = () => {

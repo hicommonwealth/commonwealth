@@ -212,7 +212,6 @@ export const CreateComment = ({
       handleIsReplying={handleIsReplying}
       replyingToAuthor={replyingToAuthor}
       thread={rootThread}
-      parentCommentText={parentCommentText}
       communityId={app.activeChainId() || ''}
     />
   ) : (
