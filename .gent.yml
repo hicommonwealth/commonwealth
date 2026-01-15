@@ -57,14 +57,18 @@ gemini:
   sandbox_mode: 'on'
   agent_file: 'AGENT.md'
 
+# Codex settings
+codex:
+  agent_file: 'AGENT.md'
+
 # AI provider settings
 ai:
-  provider: 'claude' # claude | gemini
+  provider: 'claude' # claude | gemini | codex
   # fallback_provider: "gemini"  # optional fallback when rate limited
   auto_fallback: true # automatically switch to fallback on rate limit
 
 # Validation commands (run before commit)
 validation:
-  - 'npm run typecheck'
-  - 'npm run lint'
-  - 'npm run test'
+  - pnpm -r check-types
+  - pnpm lint-branch-warnings
+  - pnpm -r lint-diff
