@@ -535,6 +535,7 @@ export const SubscribeMarket = {
     start_time: z.coerce.date(),
     end_time: z.coerce.date(),
     status: z.enum(MarketStatus),
+    image_url: z.string().nullish(),
   }),
   output: z.boolean(),
   context: AuthContext,

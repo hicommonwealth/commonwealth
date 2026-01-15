@@ -29,6 +29,7 @@ export function GetMarkets(): Query<typeof schemas.GetMarkets> {
           m.start_time,
           m.end_time,
           m.status,
+          m.image_url,
           m.created_at,
           m.updated_at
         FROM 

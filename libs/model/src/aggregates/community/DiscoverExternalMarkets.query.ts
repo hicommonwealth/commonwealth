@@ -22,7 +22,9 @@ interface PolymarketEventResponse {
 
 interface KalshiEvent {
   event_ticker: string;
+  series_ticker: string;
   title: string;
+  sub_title?: string;
   category?: string;
   status?: string;
 }
@@ -89,6 +91,8 @@ async function fetchKalshiEvents(limit: number): Promise<ExternalMarket[]> {
     status: event.status || 'open',
     startTime: null,
     endTime: null,
+    imageUrl: `https://d1lvyva3zy5u58.cloudfront.net/series-images-webp/${event.series_ticker}.webp`,
+    subTitle: event.sub_title,
   }));
 }
 

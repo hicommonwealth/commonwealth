@@ -482,6 +482,7 @@ export const ExternalMarket = z.object({
   startTime: z.coerce.date().nullable(),
   endTime: z.coerce.date().nullable(),
   imageUrl: z.string().optional(),
+  subTitle: z.string().optional(),
 });
 
 export const DiscoverExternalMarkets = {
