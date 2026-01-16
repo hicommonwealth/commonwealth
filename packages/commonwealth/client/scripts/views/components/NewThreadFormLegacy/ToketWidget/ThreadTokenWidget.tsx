@@ -244,7 +244,7 @@ const ThreadTokenWidget = ({
 
     try {
       const amountInWei = parseFloat(safeCurrentAmount) * 1e18;
-      const minAmountOut = safeCurrentTokenGainAmount * 0.95 * 1e18;
+      const minAmountOut = Math.round(safeCurrentTokenGainAmount * 0.95 * 1e18);
 
       const payload = {
         chainRpc,
