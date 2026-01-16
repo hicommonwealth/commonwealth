@@ -183,3 +183,11 @@ Each AI run should append an entry with:
   * PR title defaults to issue title if available, otherwise derived from branch name
   * The script is interactive and requires user confirmation before creating PR
 - Commit: 979ff661dc
+
+---
+
+[2026-01-12] #13294 feat: add external links to betting market cards
+- Files: types.ts, MarketCard.tsx, MarketCard.scss, MarketsAppPage.tsx, MarketsAppPage.scss, getExternalMarketUrl.spec.ts
+- Changes: Added clickable external links to provider pills on both admin MarketCard and MarketsAppPage. Users can navigate to Polymarket/Kalshi pages.
+- Decisions: URL format: Polymarket `/event/{slug}`, Kalshi `/markets/{base_ticker}/{title_slug}/{full_ticker}` (extracts base ticker, slugifies title)
+- Issues: None

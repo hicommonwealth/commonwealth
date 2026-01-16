@@ -1,9 +1,10 @@
 import React from 'react';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './MarketCard.scss';
-import { Market } from './types';
+import { getExternalMarketUrl, Market } from './types';
 
 interface MarketCardProps {
   market: Market;
@@ -66,7 +67,20 @@ export const MarketCard = ({
             />
           </div>
           <div className="market-provider">
-            <span className="provider-badge">{market.provider}</span>
+            <a
+              href={getExternalMarketUrl(
+                market.provider,
+                market.slug,
+                market.question,
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="provider-link"
+              aria-label={`View on ${market.provider}`}
+            >
+              <span className="provider-badge">{market.provider}</span>
+              <CWIcon iconName="externalLink" iconSize="small" />
+            </a>
           </div>
         </div>
 

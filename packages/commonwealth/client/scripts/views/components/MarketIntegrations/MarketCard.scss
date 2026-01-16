@@ -60,6 +60,27 @@
     }
 
     .market-provider {
+      .provider-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+          opacity: 0.85;
+
+          .Icon {
+            transform: translateX(1px) translateY(-1px);
+          }
+        }
+
+        .Icon {
+          color: #667eea;
+          transition: transform 0.2s ease;
+        }
+      }
+
       .provider-badge {
         display: inline-block;
         padding: 6px 12px;

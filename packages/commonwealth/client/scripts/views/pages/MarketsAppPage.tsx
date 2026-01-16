@@ -4,11 +4,13 @@ import {
 } from 'client/scripts/controllers/app/notifications';
 import app from 'client/scripts/state';
 import { trpc } from 'client/scripts/utils/trpcClient';
+import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'client/scripts/views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWPageLayout from 'client/scripts/views/components/component_kit/new_designs/CWPageLayout';
 import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
+import { getExternalMarketUrl } from 'client/scripts/views/components/MarketIntegrations/types';
 import React from 'react';
 
 import './MarketsAppPage.scss';
@@ -137,7 +139,22 @@ const MarketsAppPage = () => {
                       />
                     </div>
                     <div className="market-provider">
-                      <span className="provider-badge">{market.provider}</span>
+                      <a
+                        href={getExternalMarketUrl(
+                          market.provider,
+                          market.slug,
+                          market.question,
+                        )}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="provider-link"
+                        aria-label={`View on ${market.provider}`}
+                      >
+                        <span className="provider-badge">
+                          {market.provider}
+                        </span>
+                        <CWIcon iconName="externalLink" iconSize="small" />
+                      </a>
                     </div>
                   </div>
 
