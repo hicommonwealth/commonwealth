@@ -22,10 +22,11 @@ export function SubscribeMarket(): Command<typeof schemas.SubscribeMarket> {
         start_time,
         end_time,
         status,
+        image_url,
       } = payload;
 
       await models.sequelize.transaction(async (transaction) => {
-        const [market] = await models.Market.findOrCreate({
+        const [market, created] = await models.Market.findOrCreate({
           defaults: {
             provider,
             slug,
@@ -34,12 +35,19 @@ export function SubscribeMarket(): Command<typeof schemas.SubscribeMarket> {
             start_time,
             end_time,
             status,
+            image_url: image_url ?? null,
             created_at: new Date(),
             updated_at: new Date(),
           },
           where: { slug },
           transaction,
         });
+
+        // Update image_url if market already existed and we have a new image
+        if (!created && image_url && market.image_url !== image_url) {
+          await market.update({ image_url }, { transaction });
+        }
+
         await models.CommunityMarket.create(
           {
             community_id,

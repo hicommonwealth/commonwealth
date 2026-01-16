@@ -16,6 +16,7 @@ export const Market = z.object({
   start_time: z.coerce.date().describe('The start time of the market'),
   end_time: z.coerce.date().describe('The end time of the market'),
   status: z.enum(MarketStatus).describe('The status of the market'),
+  image_url: z.string().nullish().describe('The image URL for the market'),
   created_at: z.coerce
     .date()
     .optional()

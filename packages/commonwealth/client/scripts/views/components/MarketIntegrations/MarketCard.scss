@@ -1,115 +1,159 @@
 .market-card {
   background: #ffffff;
-  border-radius: 16px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
   overflow: hidden;
-  height: 100%;
   display: flex;
   flex-direction: column;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-    border-color: #dee2e6;
+    border-color: #d1d5db;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  &.subscribed {
+    border-color: #10b981;
+    background: linear-gradient(to bottom, #ecfdf5, #ffffff 40px);
+  }
+
+  .market-card-image {
+    position: relative;
+    width: 100%;
+    height: 140px;
+    background: #f3f4f6;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .provider-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: capitalize;
+      text-decoration: none;
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+      backdrop-filter: blur(4px);
+
+      &:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+
+      .Icon {
+        width: 12px;
+        height: 12px;
+      }
+
+      // Polymarket brand colors
+      &.provider-polymarket {
+        background: rgba(0, 0, 0, 0.75);
+        color: #ffffff;
+      }
+
+      // Kalshi brand colors
+      &.provider-kalshi {
+        background: rgba(37, 99, 235, 0.9);
+        color: #ffffff;
+      }
+    }
   }
 
   .market-card-content {
-    padding: 24px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    gap: 20px;
-  }
-
-  .market-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex: 1;
     gap: 12px;
-    margin-bottom: 4px;
-
-    .market-tags {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      flex: 1;
-
-      .category-tag {
-        font-size: 12px;
-        font-weight: 600;
-        padding: 4px 12px;
-        border-radius: 6px;
-      }
-
-      .status-tag {
-        font-size: 11px;
-        font-weight: 700;
-        padding: 4px 10px;
-        border-radius: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .date-tag {
-        font-size: 11px;
-        font-weight: 500;
-        padding: 4px 10px;
-        border-radius: 6px;
-      }
-    }
-
-    .market-provider {
-      .provider-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        text-decoration: none;
-        transition: opacity 0.2s ease;
-
-        &:hover {
-          opacity: 0.85;
-
-          .Icon {
-            transform: translateX(1px) translateY(-1px);
-          }
-        }
-
-        .Icon {
-          color: #667eea;
-          transition: transform 0.2s ease;
-        }
-      }
-
-      .provider-badge {
-        display: inline-block;
-        padding: 6px 12px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: #ffffff;
-        border-radius: 8px;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
-      }
-    }
   }
 
-  .market-question {
+  .market-card-question {
+    flex: 1;
+
     h5 {
-      color: #212529;
-      line-height: 1.5;
-      font-size: 18px;
       margin: 0;
+      font-size: 15px;
+      line-height: 1.4;
+      color: #111827;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
   }
 
-  .market-card-footer {
-    margin-top: auto;
-    padding-top: 16px;
-    border-top: 1px solid #e9ecef;
+  .market-card-info {
     display: flex;
-    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+
+    .info-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: #6b7280;
+
+      .Icon {
+        width: 14px;
+        height: 14px;
+        color: #9ca3af;
+      }
+
+      &.date {
+        color: #374151;
+      }
+
+      &.category {
+        padding: 2px 8px;
+        background: #f3f4f6;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      &.status {
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+        text-transform: capitalize;
+
+        &.status-open {
+          background: #dcfce7;
+          color: #166534;
+        }
+
+        &.status-closed {
+          background: #fee2e2;
+          color: #991b1b;
+        }
+
+        &.status-settled {
+          background: #e0e7ff;
+          color: #3730a3;
+        }
+      }
+    }
+  }
+
+  .market-card-actions {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
   }
 }
