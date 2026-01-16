@@ -594,3 +594,11 @@ export const CountAggregatorKeys = {
   CommunityProfileCount: 'community_profile_count_changed',
   CommunityThreadCount: 'community_thread_count_changed',
 };
+
+/**
+ * Sanitizes content by removing the /number suffix from markdown links.
+ * e.g. "[/Google Sheets](/mcp-server/google_sheets/16)" → "[/Google Sheets](/mcp-server/google_sheets)"
+ */
+export function sanitizeContent(content: string): string {
+  return content.replace(/\[([^\]]+)\]\(([^)]+)\/\d+\)/g, '[$1]($2)');
+}

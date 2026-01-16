@@ -13,11 +13,7 @@ import React, {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { useAiCompletion } from 'state/api/ai';
-import {
-  generateCommentPrompt,
-  generateThreadPrompt,
-} from 'state/api/ai/prompts';
+import { AICompletionType, useAiCompletion } from 'state/api/ai';
 import useSidebarStore from 'state/ui/sidebar';
 import { useAIFeatureEnabled, useUserAiSettingsStore } from 'state/ui/user';
 import { AIModelSelector } from 'views/components/AIModelSelector';
@@ -73,7 +69,6 @@ const StickyInput = (props: StickyInputProps) => {
     setContentDelta,
     contentDelta,
     thread: originalThread,
-    parentCommentText,
     canComment,
     handleIsReplying,
   } = props;
@@ -87,6 +82,8 @@ const StickyInput = (props: StickyInputProps) => {
     setAICommentsToggleEnabled,
     selectedModels,
     setSelectedModels,
+    webSearchEnabled,
+    setWebSearchEnabled,
   } = useUserAiSettingsStore();
 
   const effectiveAiCommentsToggleEnabled =
@@ -100,7 +97,6 @@ const StickyInput = (props: StickyInputProps) => {
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const [openModalOnExpand, setOpenModalOnExpand] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [webSearchEnabled, setWebSearchEnabled] = useState(false);
   const [justClosedMentionDropdown, setJustClosedMentionDropdown] =
     useState(false);
 
@@ -161,61 +157,69 @@ const StickyInput = (props: StickyInputProps) => {
   const handleGenerateAIContent = useCallback(async () => {
     if (!effectiveAiCommentsToggleEnabled) return;
 
+    const communityId = props.communityId;
+    if (!communityId) {
+      notifyError('Community ID is required for AI content generation');
+      return;
+    }
+
     setIsGenerating(true);
     bodyAccumulatedRef.current = '';
     const modelToUse = getCompletionModelValue(selectedModels[0]);
 
     try {
       if (mode === 'thread') {
-        const { systemPrompt, userPrompt } = generateThreadPrompt('');
         let lastUpdateTime = Date.now();
 
-        await generateCompletion(userPrompt, {
-          model: modelToUse,
-          stream: true,
-          systemPrompt,
-          useWebSearch: webSearchEnabled,
-          includeContextualMentions: true,
-          communityId: props.communityId,
-          onError: (error) => {
-            console.error('Error generating AI thread:', error);
-            notifyError('Failed to generate AI thread content');
+        await generateCompletion(
+          {
+            communityId,
+            completionType: AICompletionType.Thread,
+            model: modelToUse,
+            stream: true,
+            webSearchEnabled: webSearchEnabled,
           },
-          onChunk: (chunk) => {
-            bodyAccumulatedRef.current += chunk;
+          {
+            onError: (error) => {
+              console.error('Error generating AI thread:', error);
+              notifyError('Failed to generate AI thread content');
+            },
+            onChunk: (chunk) => {
+              bodyAccumulatedRef.current += chunk;
 
-            const currentTime = Date.now();
-            if (currentTime - lastUpdateTime >= 500) {
-              setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
-              lastUpdateTime = currentTime;
-            }
+              const currentTime = Date.now();
+              if (currentTime - lastUpdateTime >= 500) {
+                setContentDelta(
+                  createDeltaFromText(bodyAccumulatedRef.current),
+                );
+                lastUpdateTime = currentTime;
+              }
+            },
           },
-        });
+        );
 
         setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
       } else {
-        const context = `
-          Thread: ${originalThread?.title || ''}
-          ${parentCommentText ? `Parent Comment: ${parentCommentText}` : ''}
-        `;
-
-        const { systemPrompt, userPrompt } = generateCommentPrompt(context);
-
-        await generateCompletion(userPrompt, {
-          model: modelToUse,
-          stream: true,
-          systemPrompt,
-          useWebSearch: webSearchEnabled,
-          includeContextualMentions: true,
-          communityId: props.communityId,
-          onError: (error) => {
-            console.error('Error generating AI comment:', error);
+        // For drafting a comment on a thread, pass threadId for root-level comments
+        await generateCompletion(
+          {
+            communityId,
+            completionType: AICompletionType.Comment,
+            threadId: originalThread?.id,
+            model: modelToUse,
+            stream: true,
+            webSearchEnabled: webSearchEnabled,
           },
-          onChunk: (chunk) => {
-            bodyAccumulatedRef.current += chunk;
-            setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
+          {
+            onError: (error) => {
+              console.error('Error generating AI comment:', error);
+            },
+            onChunk: (chunk) => {
+              bodyAccumulatedRef.current += chunk;
+              setContentDelta(createDeltaFromText(bodyAccumulatedRef.current));
+            },
           },
-        });
+        );
       }
     } catch (error) {
       console.error('Error generating AI content:', error);
@@ -227,7 +231,6 @@ const StickyInput = (props: StickyInputProps) => {
     generateCompletion,
     mode,
     originalThread,
-    parentCommentText,
     setContentDelta,
     webSearchEnabled,
     selectedModels,
@@ -362,7 +365,7 @@ const StickyInput = (props: StickyInputProps) => {
 
   const handleToggleWebSearch = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setWebSearchEnabled((prev) => !prev);
+    setWebSearchEnabled(!webSearchEnabled);
   };
 
   const renderStickyInput = () => {

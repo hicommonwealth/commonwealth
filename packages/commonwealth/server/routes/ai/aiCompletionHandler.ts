@@ -1,344 +1,685 @@
 import { logger } from '@hicommonwealth/core';
-import { extractMCPMentions } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import {
+  AICompletionType,
+  buildContextFromEntityIds,
   buildMCPClientOptions,
   CommonMCPServerWithHeaders,
-  withMCPAuthUsername,
+  formatContextForPrompt,
 } from '@hicommonwealth/model/services';
 import {
-  CompletionOptions,
+  CompletionModel,
   DEFAULT_COMPLETION_MODEL,
 } from '@hicommonwealth/shared';
 import { Request, Response } from 'express';
 import { OpenAI } from 'openai';
-import { config } from '../../config';
+import {
+  createOpenAIClient,
+  generatePromptForType,
+  getApiKey,
+  getOpenRouterHeaders,
+  selectModel,
+  shouldUseOpenRouter,
+} from './completionUtils';
+import { createAIComment } from './createAIComment';
+import { getMentionedMCPServers } from './mcpUtils';
 import { extractOpenRouterError } from './utils';
-
-// Define a more specific type for the structured prompt
-interface StructuredPrompt {
-  userPrompt: string;
-  systemPrompt?: string;
-}
-
-// Define a type for the request body that can handle both string and structured prompt
-type RequestBody = Omit<CompletionOptions, 'prompt'> & {
-  prompt: string | StructuredPrompt;
-  contextualMentions?: boolean;
-  communityId?: string;
-};
 
 const log = logger(import.meta);
 
 /**
- * Gets all community-enabled MCP servers for a community
- * @param communityId The community ID
- * @returns Array of MCP servers with headers
+ * Request body for AI completion - uses entity IDs for secure context building
  */
-async function getAllMCPServers(
-  communityId: string,
-): Promise<CommonMCPServerWithHeaders[]> {
-  const mcpServers = await models.MCPServer.scope('withPrivateData').findAll({
-    include: [
-      {
-        model: models.MCPServerCommunity,
-        where: { community_id: communityId },
-        attributes: [], // Don't include the junction table data in results
-      },
-      {
-        model: models.User,
-        as: 'AuthUser',
-        attributes: ['id', 'profile'],
-        required: false,
-      },
-    ],
-  });
-
-  return mcpServers.map((server) => ({
-    ...withMCPAuthUsername(server),
-    headers: {}, // Add any necessary headers for authentication
-  }));
+interface AICompletionRequestBody {
+  communityId: string;
+  completionType: AICompletionType;
+  parentCommentId?: number;
+  threadId?: number; // For root-level AI comments (no parent comment)
+  topicId?: number;
+  model?: CompletionModel;
+  temperature?: number;
+  maxTokens?: number;
+  stream?: boolean;
+  useOpenRouter?: boolean;
+  webSearchEnabled?: boolean;
 }
 
 /**
- * Finds MCP servers that are mentioned in the text
- * @param text The text to parse
- * @param allServers All available MCP servers for the community
- * @returns Array of mentioned MCP servers
+ * Validates the request body and returns parsed values or an error response
  */
-function findMentionedMCPServers(
-  text: string,
-  allServers: CommonMCPServerWithHeaders[],
-): CommonMCPServerWithHeaders[] {
-  const extractedMentions = extractMCPMentions(text);
+async function validateRequest(
+  req: Request,
+  res: Response,
+): Promise<
+  | {
+      valid: false;
+    }
+  | {
+      valid: true;
+      userId: number;
+      communityId: string;
+      completionType: AICompletionType;
+      parentCommentId?: number;
+      parentCommentThreadId?: number;
+      threadId?: number; // For root-level AI comments
+      parentCommentBody?: string;
+      topicId?: number;
+      model: CompletionModel;
+      temperature?: number;
+      maxTokens: number;
+      stream: boolean;
+      useOpenRouter: boolean;
+      webSearchEnabled: boolean;
+    }
+> {
+  const {
+    communityId,
+    completionType,
+    parentCommentId,
+    threadId,
+    topicId,
+    model = DEFAULT_COMPLETION_MODEL,
+    temperature,
+    maxTokens = 1000,
+    stream = true,
+    useOpenRouter = false,
+    webSearchEnabled = false,
+  } = req.body as AICompletionRequestBody;
 
-  if (extractedMentions.length === 0) {
-    return [];
+  // Validate user authentication
+  const userId = (req.user as { id?: number })?.id;
+  if (!userId) {
+    res.status(401).json({ error: 'User authentication required' });
+    return { valid: false };
   }
 
-  // Match extracted mentions with available servers by handle and id
-  return allServers.filter((server) =>
-    extractedMentions.some(
-      (mention) =>
-        mention.handle === server.handle && mention.id === String(server.id),
-    ),
-  );
+  // Validate community ID
+  if (!communityId) {
+    res.status(400).json({ error: 'communityId is required' });
+    return { valid: false };
+  }
+
+  // Validate completion type
+  const validCompletionTypes = [
+    AICompletionType.Thread,
+    AICompletionType.Comment,
+    AICompletionType.Poll,
+  ];
+  if (!completionType || !validCompletionTypes.includes(completionType)) {
+    res.status(400).json({
+      error: `Invalid completionType. Must be one of: ${validCompletionTypes.join(', ')}`,
+    });
+    return { valid: false };
+  }
+
+  // For Comment completions, validate either parent comment or thread
+  let parentCommentThreadId: number | undefined;
+  let validatedThreadId: number | undefined;
+  let parentCommentBody: string | undefined;
+
+  if (completionType === AICompletionType.Comment) {
+    // Two valid paths:
+    // 1. parentCommentId provided - AI replies to existing comment (MCP mention flow)
+    // 2. threadId provided - AI creates root-level comment on thread (initial AI comment)
+
+    if (parentCommentId) {
+      // Path 1: Replying to an existing comment
+      const parentComment = await models.Comment.findByPk(parentCommentId);
+      if (!parentComment) {
+        res.status(404).json({ error: 'Parent comment not found' });
+        return { valid: false };
+      }
+
+      const thread = await models.Thread.findByPk(parentComment.thread_id);
+      if (!thread) {
+        res.status(404).json({ error: 'Thread not found for parent comment' });
+        return { valid: false };
+      }
+
+      if (thread.community_id !== communityId) {
+        res.status(400).json({
+          error: 'Parent comment does not belong to the specified community',
+        });
+        return { valid: false };
+      }
+
+      const commentAuthorAddress = await models.Address.findByPk(
+        parentComment.address_id,
+      );
+
+      // Check if the parent comment is from the AI bot
+      const { isBotAddress: checkBotAddress } = await import(
+        '@hicommonwealth/model/services'
+      );
+      const isParentFromBot = await checkBotAddress(parentComment.address_id);
+
+      // Allow if: user created the comment, OR the parent is from the AI bot
+      // This enables replying to AI bot comments to continue the conversation
+      if (commentAuthorAddress?.user_id !== userId && !isParentFromBot) {
+        res.status(403).json({
+          error:
+            'Parent comment must be created by the requesting user or be an AI bot comment',
+        });
+        return { valid: false };
+      }
+
+      parentCommentThreadId = parentComment.thread_id;
+      parentCommentBody = parentComment.body;
+    } else if (threadId) {
+      // Path 2: Creating root-level AI comment on thread (no parent comment)
+      const thread = await models.Thread.findByPk(threadId);
+      if (!thread) {
+        res.status(404).json({ error: 'Thread not found' });
+        return { valid: false };
+      }
+
+      if (thread.community_id !== communityId) {
+        res.status(400).json({
+          error: 'Thread does not belong to the specified community',
+        });
+        return { valid: false };
+      }
+
+      validatedThreadId = threadId;
+      // For root-level comments, we use the thread body as context
+      parentCommentBody = thread.body;
+    } else {
+      res.status(400).json({
+        error:
+          'Either parentCommentId or threadId is required for Comment completions',
+      });
+      return { valid: false };
+    }
+  }
+
+  return {
+    valid: true,
+    userId,
+    communityId,
+    completionType,
+    parentCommentId,
+    parentCommentThreadId,
+    threadId: validatedThreadId,
+    parentCommentBody,
+    topicId,
+    model,
+    temperature,
+    maxTokens,
+    stream,
+    useOpenRouter,
+    webSearchEnabled,
+  };
 }
 
+/**
+ * Handles MCP-based completion (streaming and non-streaming)
+ */
+async function handleMCPCompletion(
+  requestId: string,
+  res: Response,
+  openai: OpenAI,
+  mcpServers: CommonMCPServerWithHeaders[],
+  userPrompt: string,
+  model: CompletionModel,
+  stream: boolean,
+  completionType: AICompletionType,
+  userId: number,
+  communityId: string,
+  parentCommentId?: number,
+  effectiveThreadId?: number,
+): Promise<void> {
+  const mcpOptions = buildMCPClientOptions(userPrompt, mcpServers, null);
+  mcpOptions.model = model;
+  mcpOptions.stream = true;
+
+  log.info(
+    `[${requestId}] Creating MCP response with model: ${mcpOptions.model}`,
+  );
+
+  if (stream) {
+    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('X-Accel-Buffering', 'no');
+
+    console.log(
+      '[aiCompletionHandler] MCP options',
+      JSON.stringify(mcpOptions, null, 2),
+    );
+
+    const response = await openai.responses.create(mcpOptions);
+    let chunkCount = 0;
+    let totalContentLength = 0;
+    let accumulatedText = '';
+
+    for await (const event of response) {
+      chunkCount++;
+      if (event.type === 'response.output_text.delta') {
+        const contentToStream = event.delta || '';
+        if (contentToStream) {
+          totalContentLength += contentToStream.length;
+          accumulatedText += contentToStream;
+          res.write(contentToStream);
+          if (res.flush) res.flush();
+        }
+      }
+    }
+
+    log.info(`[${requestId}] MCP streaming completed`, {
+      totalChunks: chunkCount,
+      totalContentLength,
+    });
+
+    // Create AI comment for Comment completions
+    // Supports both reply to comment (parentCommentId) and root-level comment (no parentCommentId)
+    if (
+      completionType === AICompletionType.Comment &&
+      effectiveThreadId &&
+      accumulatedText
+    ) {
+      const commentResult = await createAIComment(
+        userId,
+        communityId,
+        effectiveThreadId,
+        parentCommentId ?? null,
+        accumulatedText,
+      );
+
+      if (commentResult.success && commentResult.comment) {
+        log.info(`[${requestId}] Created AI comment via MCP path`, {
+          commentId: commentResult.commentId,
+        });
+        res.write('\n__COMMENT_PAYLOAD__\n');
+        res.write(JSON.stringify(commentResult.comment));
+      } else {
+        log.error(
+          `[${requestId}] Failed to create AI comment via MCP path: ${commentResult.error}`,
+        );
+      }
+    }
+
+    res.end();
+  } else {
+    const response = await openai.responses.create(mcpOptions);
+    let responseText = '';
+
+    for await (const event of response) {
+      if (event.type === 'response.output_text.delta') {
+        responseText += event.delta || '';
+      }
+    }
+
+    const responsePayload: {
+      completion: string;
+      commentCreated?: boolean;
+      commentId?: number;
+    } = {
+      completion:
+        responseText || 'I apologize, but I was unable to generate a response.',
+    };
+
+    // Supports both reply to comment (parentCommentId) and root-level comment (no parentCommentId)
+    if (
+      completionType === AICompletionType.Comment &&
+      effectiveThreadId &&
+      responseText
+    ) {
+      const commentResult = await createAIComment(
+        userId,
+        communityId,
+        effectiveThreadId,
+        parentCommentId ?? null,
+        responseText,
+      );
+
+      if (commentResult.success) {
+        responsePayload.commentCreated = true;
+        responsePayload.commentId = commentResult.commentId;
+        log.info(`[${requestId}] Created AI comment via MCP path`, {
+          commentId: commentResult.commentId,
+        });
+      } else {
+        log.error(
+          `[${requestId}] Failed to create AI comment via MCP path: ${commentResult.error}`,
+        );
+      }
+    }
+
+    res.json(responsePayload);
+  }
+}
+
+/**
+ * Handles standard streaming completion
+ */
+async function handleStreamingCompletion(
+  requestId: string,
+  res: Response,
+  openai: OpenAI,
+  modelId: string,
+  systemPrompt: string,
+  userPrompt: string,
+  temperature: number | undefined,
+  maxTokens: number,
+  useOpenRouter: boolean,
+  addOpenAiWebSearchOptions: boolean,
+  completionType: AICompletionType,
+  userId: number,
+  communityId: string,
+  parentCommentId?: number,
+  effectiveThreadId?: number,
+): Promise<void> {
+  res.setHeader('Content-Type', 'text/plain');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('X-Accel-Buffering', 'no');
+
+  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
+  if (systemPrompt) {
+    messages.push({ role: 'system', content: systemPrompt });
+  }
+  messages.push({ role: 'user', content: userPrompt });
+
+  const streamConfig: OpenAI.Chat.ChatCompletionCreateParamsStreaming = {
+    model: modelId,
+    messages,
+    temperature,
+    max_tokens: maxTokens,
+    stream: true,
+    ...(useOpenRouter && { extra_headers: getOpenRouterHeaders() }),
+    ...(!useOpenRouter &&
+      addOpenAiWebSearchOptions && { web_search_options: {} }),
+  };
+
+  log.info(`[${requestId}] Starting OpenAI streaming request`, {
+    model: streamConfig.model,
+    maxTokens: streamConfig.max_tokens,
+    messageCount: messages.length,
+  });
+
+  const streamResponse = await openai.chat.completions.create(streamConfig);
+
+  let chunkCount = 0;
+  let totalContentLength = 0;
+  let accumulatedText = '';
+
+  for await (const chunk of streamResponse) {
+    chunkCount++;
+    const choice = chunk.choices?.[0];
+    const contentToStream = choice?.delta?.content || '';
+
+    if (contentToStream) {
+      totalContentLength += contentToStream.length;
+      accumulatedText += contentToStream;
+      res.write(contentToStream);
+      if (res.flush) res.flush();
+    }
+  }
+
+  log.info(`[${requestId}] Streaming completed successfully`, {
+    totalChunks: chunkCount,
+    totalContentLength,
+  });
+
+  // Create AI comment for Comment completions
+  // Supports both reply to comment (parentCommentId) and root-level comment (no parentCommentId)
+  if (
+    completionType === AICompletionType.Comment &&
+    effectiveThreadId &&
+    accumulatedText
+  ) {
+    const commentResult = await createAIComment(
+      userId,
+      communityId,
+      effectiveThreadId,
+      parentCommentId ?? null,
+      accumulatedText,
+    );
+
+    if (commentResult.success && commentResult.comment) {
+      log.info(`[${requestId}] Created AI comment`, {
+        commentId: commentResult.commentId,
+      });
+      res.write('\n__COMMENT_PAYLOAD__\n');
+      res.write(JSON.stringify(commentResult.comment));
+    } else {
+      log.error(
+        `[${requestId}] Failed to create AI comment: ${commentResult.error}`,
+      );
+    }
+  }
+
+  res.end();
+}
+
+/**
+ * Handles standard non-streaming completion
+ */
+async function handleNonStreamingCompletion(
+  requestId: string,
+  res: Response,
+  openai: OpenAI,
+  modelId: string,
+  systemPrompt: string,
+  userPrompt: string,
+  temperature: number | undefined,
+  maxTokens: number,
+  useOpenRouter: boolean,
+  addOpenAiWebSearchOptions: boolean,
+  completionType: AICompletionType,
+  userId: number,
+  communityId: string,
+  parentCommentId?: number,
+  effectiveThreadId?: number,
+): Promise<void> {
+  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
+  if (systemPrompt) {
+    messages.push({ role: 'system', content: systemPrompt });
+  }
+  messages.push({ role: 'user', content: userPrompt });
+
+  const completion = await openai.chat.completions.create({
+    model: modelId,
+    messages,
+    temperature,
+    max_tokens: maxTokens,
+    ...(useOpenRouter && { extra_headers: getOpenRouterHeaders() }),
+    ...(!useOpenRouter &&
+      addOpenAiWebSearchOptions && { web_search_options: {} }),
+  });
+
+  const responseText = completion.choices[0]?.message?.content || '';
+  const messageForResponse = completion.choices[0]
+    ?.message as OpenAI.Chat.ChatCompletionMessage & {
+    annotations?: unknown;
+  };
+  const annotations = messageForResponse?.annotations;
+
+  const responsePayload: {
+    completion: string;
+    annotations?: unknown;
+    commentCreated?: boolean;
+    commentId?: number;
+  } = {
+    completion: responseText,
+  };
+
+  if (annotations) {
+    responsePayload.annotations = annotations;
+  }
+
+  // Create AI comment for Comment completions
+  // Supports both reply to comment (parentCommentId) and root-level comment (no parentCommentId)
+  if (
+    completionType === AICompletionType.Comment &&
+    effectiveThreadId &&
+    responseText
+  ) {
+    const commentResult = await createAIComment(
+      userId,
+      communityId,
+      effectiveThreadId,
+      parentCommentId ?? null,
+      responseText,
+    );
+
+    if (commentResult.success) {
+      responsePayload.commentCreated = true;
+      responsePayload.commentId = commentResult.commentId;
+      log.info(`[${requestId}] Created AI comment`, {
+        commentId: commentResult.commentId,
+      });
+    } else {
+      log.error(
+        `[${requestId}] Failed to create AI comment: ${commentResult.error}`,
+      );
+    }
+  }
+
+  res.json(responsePayload);
+}
+
+/**
+ * Main AI completion handler
+ */
 export const aiCompletionHandler = async (req: Request, res: Response) => {
   const requestId = Math.random().toString(36).substr(2, 9);
   log.info(`[${requestId}] AI completion request started`, {
     model: req.body?.model || DEFAULT_COMPLETION_MODEL,
+    completionType: req.body?.completionType,
     stream: req.body?.stream !== false,
-    userAgent: req.headers['user-agent'],
-    contentLength: req.headers['content-length'],
   });
 
   try {
+    // Validate request
+    const validation = await validateRequest(req, res);
+    if (!validation.valid) {
+      return;
+    }
+
     const {
-      prompt: initialPrompt,
-      systemPrompt: initialSystemPrompt,
-      model = DEFAULT_COMPLETION_MODEL,
-      temperature,
-      maxTokens = 1000,
-      stream = true,
-      useOpenRouter = false,
-      useWebSearch = false,
+      userId,
       communityId,
-    } = req.body as RequestBody;
+      completionType,
+      parentCommentId,
+      parentCommentThreadId,
+      threadId,
+      parentCommentBody,
+      topicId,
+      model,
+      temperature,
+      maxTokens,
+      stream,
+      useOpenRouter,
+      webSearchEnabled,
+    } = validation;
 
-    let finalUserPrompt: string;
-    let finalSystemPrompt: string | undefined;
+    // Determine the effective thread ID for AI comment creation
+    // For replies to comments: use parentCommentThreadId
+    // For root-level comments: use threadId directly
+    const effectiveThreadId = parentCommentThreadId || threadId;
 
-    // Check if initialPrompt is an object with userPrompt and systemPrompt properties
-    if (
-      typeof initialPrompt === 'object' &&
-      initialPrompt !== null &&
-      typeof (initialPrompt as StructuredPrompt).userPrompt === 'string'
-    ) {
-      finalUserPrompt = (initialPrompt as StructuredPrompt).userPrompt;
-      // Use systemPrompt from the object if available, otherwise fallback to initialSystemPrompt (top-level)
-      finalSystemPrompt =
-        (initialPrompt as StructuredPrompt).systemPrompt || initialSystemPrompt;
-    } else if (typeof initialPrompt === 'string') {
-      // This is the originally expected correct case
-      finalUserPrompt = initialPrompt;
-      finalSystemPrompt = initialSystemPrompt;
-    } else {
+    log.info(`[${requestId}] Validated parent comment ownership`, {
+      parentCommentId,
+      userId,
+      threadId: parentCommentThreadId,
+    });
+
+    // Build context from entity IDs
+    let contextData;
+    try {
+      contextData = await buildContextFromEntityIds(communityId, {
+        parentCommentId,
+        topicId,
+      });
+    } catch (contextError) {
+      log.error(`[${requestId}] Error building context:`, contextError);
       return res.status(400).json({
         error:
-          'Invalid prompt format. Prompt must be a string or a structured object.',
+          contextError instanceof Error
+            ? contextError.message
+            : 'Failed to build context from provided entity IDs',
       });
     }
 
-    // Validate inputs (now using finalUserPrompt)
-    if (!finalUserPrompt) {
-      return res.status(400).json({
-        error: 'User prompt content is required and could not be determined.',
-      });
-    }
+    // Generate prompts
+    const contextString = formatContextForPrompt(contextData);
+    const { systemPrompt, userPrompt } = generatePromptForType(
+      completionType,
+      contextString,
+    );
 
-    // Check for MCP mentions and determine if we should use MCP path
-    let useMCPPath = false;
-    let mentionedMCPServers: CommonMCPServerWithHeaders[] = [];
+    log.info(`[${requestId}] Generated prompts for ${completionType}`, {
+      contextLength: contextString.length,
+      systemPromptLength: systemPrompt.length,
+      userPromptLength: userPrompt.length,
+    });
 
-    if (communityId) {
-      try {
-        const allServers = await getAllMCPServers(communityId);
-        mentionedMCPServers = findMentionedMCPServers(
-          finalUserPrompt,
-          allServers,
-        );
-        useMCPPath = mentionedMCPServers.length > 0;
+    // Check for MCP server mentions in the user's comment
+    const mentionedMCPServers = await getMentionedMCPServers(
+      communityId,
+      parentCommentBody,
+      requestId,
+    );
 
-        if (useMCPPath) {
-          const extractedMentions = extractMCPMentions(finalUserPrompt);
-          log.info(
-            `[${requestId}] MCP path enabled with mentions: ${extractedMentions
-              .map((m) => `${m.handle}(${m.id})`)
-              .join(', ')}`,
-          );
-        }
-      } catch (mcpError) {
-        log.error(`[${requestId}] Error checking MCP servers:`, mcpError);
-        // Continue with regular path if MCP check fails
-      }
-    }
+    // Determine provider (MCP requires OpenAI)
+    const useOR = shouldUseOpenRouter(
+      useOpenRouter,
+      mentionedMCPServers.length > 0,
+    );
 
-    // MCP path only supports OpenAI, not OpenRouter
-    if (
-      useMCPPath &&
-      (useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true')
-    ) {
+    // MCP path only supports OpenAI
+    if (mentionedMCPServers.length > 0 && useOR) {
       return res.status(400).json({
         error: 'MCP features are only available with OpenAI, not OpenRouter',
       });
     }
 
-    // Choose between OpenAI and OpenRouter (unless using MCP path)
-    const useOR = useMCPPath
-      ? false
-      : useOpenRouter || config.OPENAI.USE_OPENROUTER === 'true';
-    const apiKey = useOR
-      ? config.OPENAI.OPENROUTER_API_KEY
-      : config.OPENAI.API_KEY;
-
+    // Validate API key
+    const apiKey = getApiKey(useOR);
     if (!apiKey) {
       return res.status(500).json({
         error: `${useOR ? 'OpenRouter' : 'OpenAI'} API key not configured`,
       });
     }
 
-    // Model selection logic based on useWebSearch flag
-    let modelId: string = model;
-    let addOpenAiWebSearchOptions = false;
-
-    if (useOR) {
-      // OpenRouter: append :online if web search is enabled
-      if (useWebSearch) {
-        modelId = `${model}:online`;
-      } else {
-        modelId = model;
-      }
-    } else {
-      // OpenAI: only gpt-4o or gpt-4o-mini support web search
-      if (useWebSearch) {
-        if (model === 'gpt-4o') {
-          modelId = 'gpt-4o-search-preview';
-          addOpenAiWebSearchOptions = true;
-        } else if (model === 'gpt-4o-mini') {
-          modelId = 'gpt-4o-mini-search-preview';
-          addOpenAiWebSearchOptions = true;
-        } else {
-          return res.status(400).json({
-            error:
-              'Web search is only supported for gpt-4o and gpt-4o-mini with OpenAI',
-          });
-        }
-      } else {
-        modelId = model;
-        addOpenAiWebSearchOptions = false;
-      }
+    // Select model based on configuration
+    const modelSelection = selectModel(model, useOR, webSearchEnabled);
+    if (modelSelection.error) {
+      return res.status(400).json({ error: modelSelection.error });
     }
 
-    // Log the final model, provider, and web search status
-    log.info(
-      `AI completion request:
+    const { modelId, addOpenAiWebSearchOptions } = modelSelection;
+
+    log.info(`AI completion request:
       \n modelId=${modelId},
       \n provider=${useOR ? 'OpenRouter' : 'OpenAI'},
-      \n webSearch=${!!useWebSearch}
-      \n contextualMentions=${!!(finalSystemPrompt && finalSystemPrompt.includes('CONTEXTUAL INFORMATION:'))}`,
-    );
+      \n webSearchEnabled=${!!webSearchEnabled}
+      \n completionType=${completionType}`);
 
-    // Initialize client
-    const openAIConfig = {
-      apiKey,
-      ...(useOR && { baseURL: 'https://openrouter.ai/api/v1' }),
-      ...(config.OPENAI.ORGANIZATION &&
-        !useOR && {
-          organization: config.OPENAI.ORGANIZATION,
-        }),
-    };
+    // Create OpenAI client
+    const openai = createOpenAIClient(useOR);
 
-    const openai = new OpenAI(openAIConfig);
-
-    // Handle MCP path separately with OpenAI responses API
-    if (useMCPPath) {
+    // Handle MCP path
+    if (mentionedMCPServers.length > 0) {
       log.info(
         `[${requestId}] Using MCP path with ${mentionedMCPServers.length} servers`,
       );
 
       try {
-        // Build MCP client options
-        const mcpOptions = buildMCPClientOptions(
-          finalUserPrompt,
+        await handleMCPCompletion(
+          requestId,
+          res,
+          openai,
           mentionedMCPServers,
-          null, // no previous response ID for now
+          userPrompt,
+          model,
+          stream,
+          completionType,
+          userId,
+          communityId,
+          parentCommentId,
+          effectiveThreadId,
         );
-
-        // Override any model settings to ensure consistency
-        mcpOptions.model = model || DEFAULT_COMPLETION_MODEL;
-        // Note: OpenAI Responses API doesn't support temperature or max_tokens
-        // These parameters are controlled by the model's default settings
-
-        // Force streaming for MCP path to match expected behavior
-        mcpOptions.stream = true;
-
-        log.info(
-          `[${requestId}] Creating MCP response with model: ${mcpOptions.model}`,
-        );
-
-        if (stream) {
-          // Set proper headers for streaming
-          res.setHeader('Content-Type', 'text/plain');
-          res.setHeader('Cache-Control', 'no-cache');
-          res.setHeader('X-Accel-Buffering', 'no');
-
-          const response = await openai.responses.create(mcpOptions);
-
-          let chunkCount = 0;
-          let totalContentLength = 0;
-
-          for await (const event of response) {
-            chunkCount++;
-
-            if (event.type === 'response.output_text.delta') {
-              const contentToStream = event.delta || '';
-
-              if (contentToStream) {
-                totalContentLength += contentToStream.length;
-
-                try {
-                  res.write(contentToStream);
-                  if (res.flush) res.flush();
-
-                  if (chunkCount % 10 === 0) {
-                    log.info(`[${requestId}] MCP streaming progress`, {
-                      chunkCount,
-                      totalContentLength,
-                      lastChunkSize: contentToStream.length,
-                    });
-                  }
-                } catch (writeError) {
-                  log.error(
-                    `[${requestId}] Error writing MCP chunk ${chunkCount}:`,
-                    writeError,
-                  );
-                  throw writeError;
-                }
-              }
-            }
-          }
-
-          log.info(`[${requestId}] MCP streaming completed successfully`, {
-            totalChunks: chunkCount,
-            totalContentLength,
-          });
-
-          res.end();
-          return;
-        } else {
-          // For non-streaming MCP requests, we still need to use the streaming API
-          // and collect the full response
-          const response = await openai.responses.create(mcpOptions);
-
-          let responseText = '';
-          for await (const event of response) {
-            if (event.type === 'response.output_text.delta') {
-              const deltaText = event.delta || '';
-              responseText += deltaText;
-            }
-          }
-
-          const finalResponse =
-            responseText ||
-            'I apologize, but I was unable to generate a response.';
-
-          res.json({
-            completion: finalResponse,
-          });
-          return;
-        }
+        return;
       } catch (mcpError) {
         log.error(`[${requestId}] Error in MCP path:`, mcpError);
 
@@ -356,231 +697,74 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
       }
     }
 
+    // Standard completion path
     if (stream) {
       log.info(`[${requestId}] Setting up streaming response`);
 
-      // Set proper headers for streaming
-      res.setHeader('Content-Type', 'text/plain');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('X-Accel-Buffering', 'no');
-
-      log.info(`[${requestId}] Streaming headers set`, {
-        headers: {
-          'Content-Type': res.getHeader('Content-Type'),
-          'Cache-Control': res.getHeader('Cache-Control'),
-          'X-Accel-Buffering': res.getHeader('X-Accel-Buffering'),
-        },
-      });
-
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
-        if (finalSystemPrompt) {
-          messages.push({ role: 'system', content: finalSystemPrompt });
-        }
-        messages.push({ role: 'user', content: finalUserPrompt });
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const streamConfig: OpenAI.Chat.ChatCompletionCreateParamsStreaming = {
-          model: modelId,
-          messages,
+        await handleStreamingCompletion(
+          requestId,
+          res,
+          openai,
+          modelId,
+          systemPrompt,
+          userPrompt,
           temperature,
-          max_tokens: maxTokens,
-          stream: true,
-          ...(useOR && {
-            extra_headers: {
-              'HTTP-Referer': 'https://common.xyz',
-              'X-Title': 'Common',
-            },
-          }),
-          ...(!useOR &&
-            addOpenAiWebSearchOptions && { web_search_options: {} }),
-        };
-
-        log.info(`[${requestId}] Starting OpenAI streaming request`, {
-          model: streamConfig.model,
-          maxTokens: streamConfig.max_tokens,
-          messageCount: messages.length,
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const streamResponse =
-          await openai.chat.completions.create(streamConfig);
-
-        log.info(`[${requestId}] OpenAI stream created successfully`);
-
-        let chunkCount = 0;
-        let totalContentLength = 0;
-
-        for await (const chunk of streamResponse) {
-          chunkCount++;
-          const choice = chunk.choices?.[0];
-
-          if (choice) {
-            let annotationsFoundInChunk = false;
-            // Check for annotations on delta (OpenRouter might put them here)
-            if (
-              choice.delta &&
-              (choice.delta as { annotations?: unknown }).annotations
-            ) {
-              annotationsFoundInChunk = true;
-            }
-            // Check for annotations directly on the choice object (less common for streaming delta but good to cover)
-            if ((choice as { annotations?: unknown }).annotations) {
-              annotationsFoundInChunk = true;
-            }
-            // If OpenRouter nests a full message object within delta, check there too
-            if (
-              choice.delta &&
-              (choice.delta as { message?: { annotations?: unknown } })
-                .message &&
-              (choice.delta as { message?: { annotations?: unknown } }).message
-                ?.annotations
-            ) {
-              annotationsFoundInChunk = true;
-            }
-
-            if (annotationsFoundInChunk) {
-              log.info(
-                `[${requestId}] Annotations found in chunk ${chunkCount}`,
-              );
-            }
-          }
-
-          const contentToStream = choice?.delta?.content || '';
-          if (contentToStream) {
-            totalContentLength += contentToStream.length;
-
-            try {
-              res.write(contentToStream);
-              if (res.flush) res.flush(); // Force flush for immediate client update
-
-              if (chunkCount % 10 === 0) {
-                log.info(`[${requestId}] Streaming progress`, {
-                  chunkCount,
-                  totalContentLength,
-                  lastChunkSize: contentToStream.length,
-                });
-              }
-            } catch (writeError) {
-              log.error(
-                `[${requestId}] Error writing chunk ${chunkCount}:`,
-                writeError,
-              );
-              throw writeError;
-            }
-          } else if (chunkCount % 20 === 0) {
-            log.info(`[${requestId}] Empty chunk ${chunkCount} received`);
-          }
-        }
-
-        log.info(`[${requestId}] Streaming completed successfully`, {
-          totalChunks: chunkCount,
-          totalContentLength,
-        });
-
-        res.end();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (streamError: unknown) {
-        log.error(
-          `[${requestId}] Streaming error occurred:`,
-          streamError as Error,
+          maxTokens,
+          useOR,
+          addOpenAiWebSearchOptions,
+          completionType,
+          userId,
+          communityId,
+          parentCommentId,
+          effectiveThreadId,
         );
+      } catch (streamError: unknown) {
+        log.error(`[${requestId}] Streaming error:`, streamError as Error);
 
-        // Check for OpenRouter-specific error format
         const orError = extractOpenRouterError(streamError);
         if (orError) {
-          log.error(
-            `[${requestId}] OpenRouter error:`,
-            new Error(orError.message),
-          );
-
           if (!res.headersSent) {
             return res.status(orError.code || 500).json({
               error: orError.message,
               metadata: orError.metadata,
             });
           }
-
           res.write(`\nError: ${orError.message}`);
           return res.end();
         }
 
-        // Handle other errors
         if (!res.headersSent) {
           const error = streamError as Error & { status?: number };
-          log.error(`[${requestId}] Unhandled streaming error:`, error);
-
           return res.status(error.status || 500).json({
             error: error.message || 'Streaming failed',
             status: error.status || 500,
           });
         }
 
-        log.error(
-          `[${requestId}] Error during streaming with headers already sent`,
-        );
         res.write('\nError during streaming');
         res.end();
       }
     } else {
-      // Handle regular response
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
-        if (finalSystemPrompt) {
-          messages.push({ role: 'system', content: finalSystemPrompt });
-        }
-        messages.push({ role: 'user', content: finalUserPrompt });
-
-        const completion = await openai.chat.completions.create({
-          model: modelId,
-          messages,
+        await handleNonStreamingCompletion(
+          requestId,
+          res,
+          openai,
+          modelId,
+          systemPrompt,
+          userPrompt,
           temperature,
-          max_tokens: maxTokens,
-          ...(useOR && {
-            extra_headers: {
-              'HTTP-Referer': 'https://common.xyz',
-              'X-Title': 'Common',
-            },
-          }),
-          ...(!useOR &&
-            addOpenAiWebSearchOptions && { web_search_options: {} }),
-        });
-
-        // Log the entire first choice message object from the AI
-        if (
-          completion.choices &&
-          completion.choices.length > 0 &&
-          completion.choices[0].message
-        ) {
-          const message = completion.choices[0]
-            .message as OpenAI.Chat.ChatCompletionMessage & {
-            annotations?: unknown;
-          };
-          if (message.annotations) {
-            // Specifically log annotations if present in the non-streaming message
-            // Use index signature access to safely access potential custom 'annotations' field
-          }
-        }
-
-        const responseText = completion.choices[0]?.message?.content || '';
-        const messageForResponse = completion.choices[0]
-          ?.message as OpenAI.Chat.ChatCompletionMessage & {
-          annotations?: unknown;
-        };
-        const annotations = messageForResponse?.annotations;
-
-        const responsePayload: { completion: string; annotations?: unknown } = {
-          completion: responseText,
-        };
-        if (annotations) {
-          responsePayload.annotations = annotations;
-        }
-        res.json(responsePayload);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          maxTokens,
+          useOR,
+          addOpenAiWebSearchOptions,
+          completionType,
+          userId,
+          communityId,
+          parentCommentId,
+          effectiveThreadId,
+        );
       } catch (completionError: unknown) {
-        // Check for OpenRouter-specific error format
         const orError = extractOpenRouterError(completionError);
         if (orError) {
           return res.status(orError.code || 500).json({
@@ -589,7 +773,6 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
           });
         }
 
-        // Handle other errors
         const error = completionError as Error & { status?: number };
         return res.status(error.status || 500).json({
           error: error.message || 'Completion failed',
@@ -597,9 +780,7 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
         });
       }
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: unknown) {
-    // Extract useful information for the client
     const err = error as Error & { status?: number };
     const statusCode = err.status || 500;
     const errorMessage =
@@ -612,10 +793,6 @@ export const aiCompletionHandler = async (req: Request, res: Response) => {
         error: errorMessage,
         status: statusCode,
       });
-    } else {
-      log.error(
-        `[${requestId}] Cannot send error response - headers already sent`,
-      );
     }
   } finally {
     log.info(`[${requestId}] AI completion request ended`);

@@ -3,6 +3,7 @@ import {
   DEFAULT_COMPLETION_MODEL,
   MCP_MENTION_SYMBOL,
   getWhitelistedTools,
+  sanitizeContent,
 } from '@hicommonwealth/shared';
 import OpenAI from 'openai';
 import { z } from 'zod';
@@ -27,6 +28,11 @@ function filterServersWithWhitelist(
       };
     }
 
+    // If wildcard '*' is set, allow all tools
+    if (whitelistedTools === '*') {
+      return server;
+    }
+
     // Filter the server's tools to only include whitelisted ones
     const filteredTools = server.tools.filter((tool) =>
       whitelistedTools.includes(tool.name),
@@ -47,7 +53,8 @@ const buildSystemPrompt = (
 Available MCP servers and their mention handles:
 ${allServers.map((server) => `- ${MCP_MENTION_SYMBOL}${server.handle}: ${server.name} - ${server.description}`).join('\n')}
 
-When a user mentions a server using the format [${MCP_MENTION_SYMBOL}ServerName](/mcp-server/handle/id), you should use the MCP tools from that specific server to help answer their question. Multiple servers can be mentioned in a single message.
+When a user mentions an MCP server by name in the parent comment, you should use the MCP tools from \
+that specific server to help answer their question. Multiple servers can be mentioned in a single message.
 
 If no specific server is mentioned, you can provide general assistance based on your knowledge, but you won't have access to real-time data from the MCP servers.
 
@@ -87,7 +94,7 @@ export function buildMCPClientOptions(
     model: DEFAULT_COMPLETION_MODEL,
     instructions: buildSystemPrompt(filteredServers),
     tools: mcpTools,
-    input: userInput,
+    input: sanitizeContent(userInput),
     previous_response_id: previousResponseId,
     stream: true,
   };

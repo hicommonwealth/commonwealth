@@ -18,6 +18,7 @@ export const MCP_TOOL_WHITELIST: Record<string, string[] | '*'> = {
     // 'google_sheets_write_to_cell',
     'google_sheets_get_spreadsheet',
     'google_sheets_list_all_sheets',
+    'google_sheets_list_spreadsheets',
   ],
 };
 

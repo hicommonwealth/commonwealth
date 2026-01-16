@@ -54,7 +54,7 @@ type PollEditorModalProps = {
   thread?: Thread;
   pollData?: string;
   isAIresponseCompleted: boolean;
-  onGeneratePoll: () => void;
+  onGeneratePoll?: () => void;
   setLocalPoll?: SetLocalPolls;
 };
 
