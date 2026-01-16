@@ -1,3 +1,4 @@
+import { isValidImageUrl } from '@hicommonwealth/shared';
 import {
   codeBlockPlugin,
   codeMirrorPlugin,
@@ -11,7 +12,7 @@ import {
   tablePlugin,
   thematicBreakPlugin,
 } from 'commonwealth-mdxeditor';
-import React, { memo, ReactNode, useState } from 'react';
+import React, { memo, ReactNode, useCallback, useState } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { useMarkdownEditorErrorHandler } from 'views/components/MarkdownEditor/useMarkdownEditorErrorHandler';
 import { codeBlockLanguages } from 'views/components/MarkdownEditor/utils/codeBlockLanguages';
@@ -19,6 +20,9 @@ import { useComputeMarkdownWithCutoff } from 'views/components/MarkdownViewer/us
 
 import clsx from 'clsx';
 import './MarkdownViewer.scss';
+
+const TRANSPARENT_PIXEL =
+  'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
 export type MarkdownStr = string;
 
@@ -43,6 +47,14 @@ export const MarkdownViewer = memo(function MarkdownViewer(
 
   const [userExpand, setUserExpand] = useState<boolean>(false);
 
+  // eslint-disable-next-line @typescript-eslint/require-await
+  const imagePreviewHandler = useCallback(async (imageSource: string) => {
+    if (!isValidImageUrl(imageSource)) {
+      return TRANSPARENT_PIXEL;
+    }
+    return imageSource;
+  }, []);
+
   return (
     <div className={clsx('MarkdownViewer', className)}>
       <MDXEditor
@@ -60,7 +72,7 @@ export const MarkdownViewer = memo(function MarkdownViewer(
           codeMirrorPlugin({
             codeBlockLanguages,
           }),
-          imagePlugin(),
+          imagePlugin({ imagePreviewHandler }),
           tablePlugin(),
           thematicBreakPlugin(),
           frontmatterPlugin(),
