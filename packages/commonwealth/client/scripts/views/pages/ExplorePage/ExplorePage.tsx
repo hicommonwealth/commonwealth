@@ -23,7 +23,6 @@ import IdeaLaunchpad from './IdeaLaunchpad';
 import QuestList from './QuestList';
 import { ThreadFeed } from './ThreadFeed/ThreadFeed';
 import TokensList from './TokensList';
-F;
 
 const ExplorePage = () => {
   const containerRef = useRef();
