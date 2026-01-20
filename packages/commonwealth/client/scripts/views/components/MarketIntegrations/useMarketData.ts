@@ -12,17 +12,37 @@ export function useMarketData(communityId: string) {
 
   const trpcUtils = trpc.useUtils();
 
-  // Fetch markets already saved to the community
-  const { data: savedMarkets, isLoading: isLoadingSaved } =
-    trpc.community.getMarkets.useQuery({
-      community_id: communityId,
-    });
+  const { data: savedMarketsData, isLoading: isLoadingSaved } =
+    trpc.community.getMarkets.useInfiniteQuery(
+      {
+        community_id: communityId,
+        limit: 50, // Fetch more to check subscriptions
+      },
+      {
+        enabled: !!communityId,
+        initialCursor: 1,
+        getNextPageParam: (lastPage) => {
+          const nextPageNum = lastPage.page + 1;
+          if (nextPageNum <= lastPage.totalPages) {
+            return nextPageNum;
+          }
+          return undefined;
+        },
+      },
+    );
 
-  // Fetch discovered markets from external APIs via backend proxy
-  const { data: discoveredMarkets, isLoading: isLoadingDiscovered } =
-    useDiscoverExternalMarketsQuery({
-      filters,
-    });
+  const savedMarkets = savedMarketsData?.pages.flatMap((page) => page.results);
+
+  const {
+    data: discoveredMarkets,
+    isLoading: isLoadingDiscovered,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useDiscoverExternalMarketsQuery({
+    filters,
+    limit: 20, // Use consistent pagination
+  });
 
   const categories = useMemo(() => {
     const allCategories = (discoveredMarkets || []).map(
@@ -32,7 +52,7 @@ export function useMarketData(communityId: string) {
   }, [discoveredMarkets]);
 
   const savedMarketIds = useMemo(() => {
-    return savedMarkets
+    return savedMarkets && savedMarkets.length > 0
       ? new Set<string>(savedMarkets.map((m) => m.slug))
       : new Set<string>();
   }, [savedMarkets]);
@@ -78,5 +98,8 @@ export function useMarketData(communityId: string) {
     onSubscribe,
     onUnsubscribe,
     isSaving: isSubscribing || isUnsubscribing,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
   };
 }

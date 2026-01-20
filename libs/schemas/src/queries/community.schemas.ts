@@ -466,10 +466,12 @@ export const MarketView = Market.extend({
 });
 
 export const GetMarkets = {
-  input: z.object({
+  input: PaginationParamsSchema.extend({
     community_id: z.string(),
   }),
-  output: z.array(MarketView),
+  output: PaginatedResultSchema.extend({
+    results: z.array(MarketView),
+  }),
 };
 
 export const ExternalMarket = z.object({
@@ -485,11 +487,12 @@ export const ExternalMarket = z.object({
 });
 
 export const DiscoverExternalMarkets = {
-  input: z.object({
+  input: PaginationParamsSchema.extend({
     provider: z.enum([...Markets, 'all']),
-    limit: z.number().min(1).max(200).optional().default(200),
     search: z.string().optional(),
     category: z.string().optional(),
   }),
-  output: z.array(ExternalMarket),
+  output: PaginatedResultSchema.extend({
+    results: z.array(ExternalMarket),
+  }),
 };

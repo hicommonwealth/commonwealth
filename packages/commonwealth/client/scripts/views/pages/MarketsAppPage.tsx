@@ -19,23 +19,37 @@ const MarketsAppPage = () => {
   const community_id = app.activeChainId() || '';
   const utils = trpc.useUtils();
   const {
-    data: markets,
-    isLoading,
+    data: marketsData,
+    isInitialLoading,
     error,
-  } = trpc.community.getMarkets.useQuery(
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = trpc.community.getMarkets.useInfiniteQuery(
     {
       community_id,
+      limit: 20,
     },
     {
       enabled: !!community_id,
+      initialCursor: 1,
+      getNextPageParam: (lastPage) => {
+        const nextPageNum = lastPage.page + 1;
+        if (nextPageNum <= lastPage.totalPages) {
+          return nextPageNum;
+        }
+        return undefined;
+      },
     },
   );
+
+  const markets = marketsData?.pages.flatMap((page) => page.results) || [];
 
   const unsubscribeMarketMutation =
     trpc.community.unsubscribeMarket.useMutation({
       onSuccess: () => {
         notifySuccess('Unsubscribed from market successfully!');
-        utils.community.getMarkets.invalidate({ community_id });
+        void utils.community.getMarkets.invalidate({ community_id });
       },
       onError: (err) => {
         notifyError(`Failed to unsubscribe: ${err.message}`);
@@ -68,7 +82,7 @@ const MarketsAppPage = () => {
     }).format(dateObj);
   };
 
-  if (isLoading) {
+  if (isInitialLoading) {
     return (
       <CWPageLayout>
         <section className="MarketsAppPage">
@@ -121,69 +135,88 @@ const MarketsAppPage = () => {
             </CWText>
           </div>
         ) : (
-          <div className="markets-grid-container">
-            {markets.map((market) => (
-              <div key={market.id} className="market-card">
-                <div className="market-card-content">
-                  <div className="market-card-header">
-                    <div className="market-tags">
+          <>
+            <div className="markets-grid-container">
+              {markets.map((market) => (
+                <div key={market.id} className="market-card">
+                  <div className="market-card-content">
+                    <div className="market-card-header">
+                      <div className="market-tags">
+                        <CWTag
+                          type="info"
+                          label={market.category}
+                          classNames="category-tag"
+                        />
+                        <CWTag
+                          type={getStatusTagType(market.status)}
+                          label={market.status.toUpperCase()}
+                          classNames="status-tag"
+                        />
+                      </div>
+                      <div className="market-provider">
+                        <a
+                          href={getExternalMarketUrl(
+                            market.provider,
+                            market.slug,
+                            market.question,
+                          )}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="provider-link"
+                          aria-label={`View on ${market.provider}`}
+                        >
+                          <span className="provider-badge">
+                            {market.provider}
+                          </span>
+                          <CWIcon iconName="externalLink" iconSize="small" />
+                        </a>
+                      </div>
+                    </div>
+
+                    <div className="market-question">
+                      <CWText fontWeight="semiBold" type="h5">
+                        {market.question}
+                      </CWText>
+                    </div>
+
+                    <div className="market-date-chip">
                       <CWTag
                         type="info"
-                        label={market.category}
-                        classNames="category-tag"
-                      />
-                      <CWTag
-                        type={getStatusTagType(market.status)}
-                        label={market.status.toUpperCase()}
-                        classNames="status-tag"
+                        label={`From ${formatDate(market.start_time)} to ${formatDate(market.end_time)}`}
+                        classNames="date-tag"
                       />
                     </div>
-                    <div className="market-provider">
-                      <a
-                        href={getExternalMarketUrl(
-                          market.provider,
-                          market.slug,
-                          market.question,
-                        )}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="provider-link"
-                        aria-label={`View on ${market.provider}`}
-                      >
-                        <span className="provider-badge">
-                          {market.provider}
-                        </span>
-                        <CWIcon iconName="externalLink" iconSize="small" />
-                      </a>
+
+                    <div className="market-card-footer">
+                      <CWButton
+                        label="Unsubscribe"
+                        onClick={() => handleUnsubscribe(market.slug)}
+                        buttonType="destructive"
+                        disabled={unsubscribeMarketMutation.isPending}
+                      />
                     </div>
-                  </div>
-
-                  <div className="market-question">
-                    <CWText fontWeight="semiBold" type="h5">
-                      {market.question}
-                    </CWText>
-                  </div>
-
-                  <div className="market-date-chip">
-                    <CWTag
-                      type="info"
-                      label={`From ${formatDate(market.start_time)} to ${formatDate(market.end_time)}`}
-                      classNames="date-tag"
-                    />
-                  </div>
-
-                  <div className="market-card-footer">
-                    <CWButton
-                      label="Unsubscribe"
-                      onClick={() => handleUnsubscribe(market.slug)}
-                      buttonType="destructive"
-                      disabled={unsubscribeMarketMutation.isPending}
-                    />
                   </div>
                 </div>
+              ))}
+            </div>
+            {isFetchingNextPage && (
+              <div className="markets-loading">
+                <CWCircleMultiplySpinner />
               </div>
-            ))}
-          </div>
+            )}
+            {hasNextPage && !isFetchingNextPage && (
+              <div className="load-more-container">
+                <CWButton
+                  label="See more"
+                  buttonType="tertiary"
+                  containerClassName="ml-auto"
+                  onClick={() => {
+                    void fetchNextPage();
+                  }}
+                />
+              </div>
+            )}
+          </>
         )}
       </section>
     </CWPageLayout>

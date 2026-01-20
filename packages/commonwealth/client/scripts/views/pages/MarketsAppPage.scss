@@ -65,6 +65,13 @@
     }
   }
 
+  .load-more-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 24px 0;
+  }
+
   .market-card {
     background: #ffffff;
     border-radius: 16px;

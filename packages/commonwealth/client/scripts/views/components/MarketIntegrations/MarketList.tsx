@@ -11,12 +11,12 @@ interface MarketListProps {
   onUnsubscribe: (market: Market) => void;
 }
 
-export function MarketList({
+export const MarketList = ({
   markets,
   savedMarketIds,
   onSubscribe,
   onUnsubscribe,
-}: MarketListProps) {
+}: MarketListProps) => {
   if (markets.length === 0) {
     return (
       <div className="markets-empty-state">
@@ -36,11 +36,11 @@ export function MarketList({
         <MarketCard
           key={market.id}
           market={market}
-          isSubscribed={savedMarketIds.has(market.id)}
+          isSubscribed={savedMarketIds.has(market.slug)}
           onSubscribe={onSubscribe}
           onUnsubscribe={onUnsubscribe}
         />
       ))}
     </div>
   );
-}
+};

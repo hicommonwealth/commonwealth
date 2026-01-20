@@ -124,24 +124,39 @@ export function DiscoverExternalMarkets(): Query<
         throw new InvalidState('Markets feature is not enabled');
       }
 
-      const { provider, limit = 200, search, category } = payload;
+      const {
+        provider,
+        limit = 20,
+        cursor = 1,
+        search,
+        category,
+      } = payload;
 
-      let markets: ExternalMarket[] = [];
+      const fetchLimit = 500;
+      let allMarkets: ExternalMarket[] = [];
 
       if (provider === 'polymarket' || provider === 'all') {
-        const polymarketMarkets = await fetchPolymarketEvents(limit);
-        markets = markets.concat(polymarketMarkets);
+        const polymarketMarkets = await fetchPolymarketEvents(fetchLimit);
+        allMarkets = allMarkets.concat(polymarketMarkets);
       }
 
       if (provider === 'kalshi' || provider === 'all') {
-        const kalshiMarkets = await fetchKalshiEvents(limit);
-        markets = markets.concat(kalshiMarkets);
+        const kalshiMarkets = await fetchKalshiEvents(fetchLimit);
+        allMarkets = allMarkets.concat(kalshiMarkets);
       }
 
-      // Apply filters server-side
-      markets = applyFilters(markets, search, category);
+      const filteredMarkets = applyFilters(allMarkets, search, category);
 
-      return markets;
+      const offset = limit * (cursor - 1);
+      const paginatedMarkets = filteredMarkets.slice(
+        offset,
+        offset + limit,
+      );
+
+      return schemas.buildPaginatedResponse(paginatedMarkets, filteredMarkets.length, {
+        limit,
+        cursor,
+      });
     },
   };
 }
