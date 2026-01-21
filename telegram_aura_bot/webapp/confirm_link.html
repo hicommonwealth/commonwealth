@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirm Link</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        background-color: var(--tg-theme-bg-color, white);
+        color: var(--tg-theme-text-color, black);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 90vh;
+        text-align: center;
+        flex-direction: column;
+      }
+      #message {
+        font-size: 1.2em;
+        margin-bottom: 20px;
+      }
+      .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border-left-color: var(--tg-theme-button-color, #3390ec);
+        animation: spin 1s ease infinite;
+        margin-bottom: 20px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading">
+      <div class="spinner"></div>
+      <div id="message">Confirming Telegram link...</div>
+    </div>
+    <div id="success" class="hidden">
+      <div id="message">✅ Success! Account linked. Closing window...</div>
+    </div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+      const tg = window.Telegram.WebApp;
+
+      function getTokenFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('token');
+      }
+
+      function showSuccessAndClose() {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('success').classList.remove('hidden');
+        // Close the Mini App window after a short delay
+        setTimeout(() => {
+          tg.close();
+        }, 2500); // 2.5 seconds delay
+      }
+
+      function handleError(message) {
+        document.getElementById('loading').classList.add('hidden');
+        const successDiv = document.getElementById('success');
+        successDiv.innerHTML = `<div id="message">❌ Error: ${message}. Please try again via the bot.</div>`;
+        successDiv.classList.remove('hidden');
+        // Optional: Close after a longer delay on error?
+        setTimeout(() => {
+          tg.close();
+        }, 5000); // 5 seconds delay
+      }
+
+      // --- Main Execution ---
+      tg.ready(); // Make sure WebApp is ready
+      tg.expand(); // Expand the Mini App window
+
+      const token = getTokenFromUrl();
+
+      if (token) {
+        // Send the token back to the bot backend
+        tg.sendData(token);
+        // Simulate confirmation success visually after a short delay
+        // The actual confirmation happens when the bot receives the sendData message
+        setTimeout(() => {
+          showSuccessAndClose();
+        }, 1500); // 1.5 second delay for visual feedback
+      } else {
+        // Handle case where token is missing in URL
+        handleError('Missing confirmation token.');
+        console.error('No token found in URL parameters.');
+      }
+    </script>
+  </body>
+</html>
