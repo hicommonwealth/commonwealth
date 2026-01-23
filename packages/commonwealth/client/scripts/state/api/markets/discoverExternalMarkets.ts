@@ -34,6 +34,7 @@ const useDiscoverExternalMarketsQuery = ({
     startTime: market.startTime ? new Date(market.startTime) : null,
     endTime: market.endTime ? new Date(market.endTime) : null,
     imageUrl: market.imageUrl,
+    subTitle: market.subTitle,
   }));
 
   return {

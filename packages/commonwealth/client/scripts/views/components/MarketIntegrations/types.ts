@@ -11,6 +11,7 @@ export interface Market {
   startTime: Date | null; // Kalshi uses 'open_time'
   endTime: Date | null; // Kalshi uses 'close_time'
   imageUrl?: string; // Optional image URL for the market
+  subTitle?: string; // Kalshi uses 'sub_title' for date info like "Before 2099"
 }
 
 export interface MarketFilters {

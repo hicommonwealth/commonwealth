@@ -37,6 +37,7 @@ describe('Market lifecycle', () => {
         start_time: new Date(),
         end_time: new Date(),
         status: 'open',
+        image_url: 'https://example.com/market-image.png',
       },
     });
 
@@ -54,6 +55,7 @@ describe('Market lifecycle', () => {
     expect(markets[0].start_time).toBeInstanceOf(Date);
     expect(markets[0].end_time).toBeInstanceOf(Date);
     expect(markets[0].status).toBe('open');
+    expect(markets[0].image_url).toBe('https://example.com/market-image.png');
   });
 
   it('should unsubscribe from a market', async () => {
