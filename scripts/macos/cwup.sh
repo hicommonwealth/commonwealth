@@ -1,43 +1,27 @@
 #!/bin/bash
 set -e
 
-# ---- Build custom Postgres image ----
-#echo "🧱 Building cw-postgres image from cwpg-dockerfile..."
-#container build -t cw-postgres -f cwpg-dockerfile .
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 ensure_network() {
   local name=$1
 
-  local inspect_output
-  if ! inspect_output=$(container network inspect "$name" 2>/dev/null); then
-    echo "➕ Creating network $name..."
-    container network create "$name"
-    return
-  fi
-
-  if [ -z "$inspect_output" ] || [ "$inspect_output" = "[]" ]; then
-    echo "➕ Creating network $name..."
-    container network create "$name"
-  else
+  if container network inspect "$name" >/dev/null 2>&1; then
     echo "✓ Network $name exists"
+  else
+    echo "➕ Creating network $name..."
+    container network create "$name"
   fi
 }
 
 ensure_volume() {
   local name=$1
 
-  local inspect_output
-  if ! inspect_output=$(container volume inspect "$name" 2>/dev/null); then
-    echo "➕ Creating volume $name..."
-    container volume create "$name"
-    return
-  fi
-
-  if [ -z "$inspect_output" ] || [ "$inspect_output" = "[]" ]; then
-    echo "➕ Creating volume $name..."
-    container volume create "$name"
-  else
+  if container volume inspect "$name" >/dev/null 2>&1; then
     echo "✓ Volume $name exists"
+  else
+    echo "➕ Creating volume $name..."
+    container volume create "$name"
   fi
 }
 
@@ -69,6 +53,21 @@ start_container() {
   fi
 }
 
+ensure_image() {
+  local name=$1
+  local dockerfile=$2
+
+  if container image inspect "$name" >/dev/null 2>&1; then
+    echo "✓ Image $name exists"
+  else
+    echo "🧱 Building image $name..."
+    container build -t "$name" -f "$dockerfile" "$SCRIPT_DIR"
+  fi
+}
+
+# ---- Build custom images ----
+ensure_image cw-postgres "$SCRIPT_DIR/cwpg-dockerfile"
+
 # ---- Create network and volumes ----
 ensure_network cw-net
 ensure_volume cw-rmq-data
@@ -82,5 +81,6 @@ start_container cw-pg --network cw-net -p 5432:5432 \
   -e POSTGRES_USER=commonwealth \
   -e POSTGRES_PASSWORD=edgeware \
   -e POSTGRES_DB=commonwealth \
+  -e PGDATA=/var/lib/postgresql/pgdata \
   -v cw-pg-data:/var/lib/postgresql/pgdata \
   cw-postgres
