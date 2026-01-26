@@ -1,23 +1,22 @@
-import {
-  notifyError,
-  notifySuccess,
-} from 'client/scripts/controllers/app/notifications';
-import app from 'client/scripts/state';
-import { trpc } from 'client/scripts/utils/trpcClient';
-import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'client/scripts/views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import CWPageLayout from 'client/scripts/views/components/component_kit/new_designs/CWPageLayout';
-import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
-import { getExternalMarketUrl } from 'client/scripts/views/components/MarketIntegrations/types';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React from 'react';
-
+import app from 'state';
+import { trpc } from 'utils/trpcClient';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import {
+  MarketCard,
+  MarketCardData,
+} from 'views/components/MarketIntegrations/MarketCard';
+import { MarketProvider } from 'views/components/MarketIntegrations/types';
 import './MarketsAppPage.scss';
 
 const MarketsAppPage = () => {
   const community_id = app.activeChainId() || '';
   const utils = trpc.useUtils();
+
   const {
     data: marketsData,
     isInitialLoading,
@@ -56,31 +55,23 @@ const MarketsAppPage = () => {
       },
     });
 
-  const handleUnsubscribe = (slug: string) => {
-    unsubscribeMarketMutation.mutate({ community_id, slug });
+  const handleUnsubscribe = (market: MarketCardData) => {
+    unsubscribeMarketMutation.mutate({ community_id, slug: market.slug });
   };
 
-  const getStatusTagType = (status: string): 'active' | 'new' | 'info' => {
-    switch (status) {
-      case 'open':
-        return 'active';
-      case 'closed':
-        return 'new';
-      case 'settled':
-        return 'info';
-      default:
-        return 'info';
-    }
-  };
-
-  const formatDate = (date: Date | string) => {
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    }).format(dateObj);
-  };
+  // Convert backend market data to MarketCardData format
+  const toMarketCardData = (
+    market: NonNullable<typeof markets>[number],
+  ): MarketCardData => ({
+    slug: market.slug,
+    provider: market.provider as MarketProvider,
+    question: market.question,
+    category: market.category,
+    status: market.status,
+    imageUrl: market.image_url,
+    startTime: market.start_time,
+    endTime: market.end_time,
+  });
 
   if (isInitialLoading) {
     return (
@@ -136,67 +127,15 @@ const MarketsAppPage = () => {
           </div>
         ) : (
           <>
-            <div className="markets-grid-container">
+            <div className="markets-grid">
               {markets.map((market) => (
-                <div key={market.id} className="market-card">
-                  <div className="market-card-content">
-                    <div className="market-card-header">
-                      <div className="market-tags">
-                        <CWTag
-                          type="info"
-                          label={market.category}
-                          classNames="category-tag"
-                        />
-                        <CWTag
-                          type={getStatusTagType(market.status)}
-                          label={market.status.toUpperCase()}
-                          classNames="status-tag"
-                        />
-                      </div>
-                      <div className="market-provider">
-                        <a
-                          href={getExternalMarketUrl(
-                            market.provider,
-                            market.slug,
-                            market.question,
-                          )}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="provider-link"
-                          aria-label={`View on ${market.provider}`}
-                        >
-                          <span className="provider-badge">
-                            {market.provider}
-                          </span>
-                          <CWIcon iconName="externalLink" iconSize="small" />
-                        </a>
-                      </div>
-                    </div>
-
-                    <div className="market-question">
-                      <CWText fontWeight="semiBold" type="h5">
-                        {market.question}
-                      </CWText>
-                    </div>
-
-                    <div className="market-date-chip">
-                      <CWTag
-                        type="info"
-                        label={`From ${formatDate(market.start_time)} to ${formatDate(market.end_time)}`}
-                        classNames="date-tag"
-                      />
-                    </div>
-
-                    <div className="market-card-footer">
-                      <CWButton
-                        label="Unsubscribe"
-                        onClick={() => handleUnsubscribe(market.slug)}
-                        buttonType="destructive"
-                        disabled={unsubscribeMarketMutation.isPending}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <MarketCard
+                  key={market.slug}
+                  market={toMarketCardData(market)}
+                  isSubscribed={true}
+                  onUnsubscribe={handleUnsubscribe}
+                  isLoading={unsubscribeMarketMutation.isPending}
+                />
               ))}
             </div>
             {isFetchingNextPage && (

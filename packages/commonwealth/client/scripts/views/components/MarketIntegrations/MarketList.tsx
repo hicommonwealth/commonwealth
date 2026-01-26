@@ -1,6 +1,6 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { MarketCard } from './MarketCard';
+import { MarketCard, MarketCardData, toMarketCardData } from './MarketCard';
 import './MarketList.scss';
 import { Market } from './types';
 
@@ -30,15 +30,26 @@ export const MarketList = ({
     );
   }
 
+  // Wrap handlers to convert MarketCardData back to Market
+  const handleSubscribe = (cardData: MarketCardData) => {
+    const market = markets.find((m) => m.slug === cardData.slug);
+    if (market) onSubscribe(market);
+  };
+
+  const handleUnsubscribe = (cardData: MarketCardData) => {
+    const market = markets.find((m) => m.slug === cardData.slug);
+    if (market) onUnsubscribe(market);
+  };
+
   return (
     <div className="market-list">
       {markets.map((market) => (
         <MarketCard
-          key={market.id}
-          market={market}
+          key={market.slug}
+          market={toMarketCardData(market)}
           isSubscribed={savedMarketIds.has(market.slug)}
-          onSubscribe={onSubscribe}
-          onUnsubscribe={onUnsubscribe}
+          onSubscribe={handleSubscribe}
+          onUnsubscribe={handleUnsubscribe}
         />
       ))}
     </div>

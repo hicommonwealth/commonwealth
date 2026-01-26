@@ -22,7 +22,9 @@ interface PolymarketEventResponse {
 
 interface KalshiEvent {
   event_ticker: string;
+  series_ticker: string;
   title: string;
+  sub_title?: string;
   category?: string;
   status?: string;
 }
@@ -89,6 +91,8 @@ async function fetchKalshiEvents(limit: number): Promise<ExternalMarket[]> {
     status: event.status || 'open',
     startTime: null,
     endTime: null,
+    imageUrl: `https://d1lvyva3zy5u58.cloudfront.net/series-images-webp/${event.series_ticker}.webp`,
+    subTitle: event.sub_title,
   }));
 }
 
@@ -124,13 +128,7 @@ export function DiscoverExternalMarkets(): Query<
         throw new InvalidState('Markets feature is not enabled');
       }
 
-      const {
-        provider,
-        limit = 20,
-        cursor = 1,
-        search,
-        category,
-      } = payload;
+      const { provider, limit = 20, cursor = 1, search, category } = payload;
 
       const fetchLimit = 500;
       let allMarkets: ExternalMarket[] = [];
@@ -148,15 +146,16 @@ export function DiscoverExternalMarkets(): Query<
       const filteredMarkets = applyFilters(allMarkets, search, category);
 
       const offset = limit * (cursor - 1);
-      const paginatedMarkets = filteredMarkets.slice(
-        offset,
-        offset + limit,
-      );
+      const paginatedMarkets = filteredMarkets.slice(offset, offset + limit);
 
-      return schemas.buildPaginatedResponse(paginatedMarkets, filteredMarkets.length, {
-        limit,
-        cursor,
-      });
+      return schemas.buildPaginatedResponse(
+        paginatedMarkets,
+        filteredMarkets.length,
+        {
+          limit,
+          cursor,
+        },
+      );
     },
   };
 }

@@ -58,9 +58,21 @@ export function useMarketData(communityId: string) {
   }, [savedMarkets]);
 
   const { mutate: subscribeMarket, isPending: isSubscribing } =
-    trpc.community.subscribeMarket.useMutation();
+    trpc.community.subscribeMarket.useMutation({
+      onSuccess: () => {
+        void trpcUtils.community.getMarkets.invalidate({
+          community_id: communityId,
+        });
+      },
+    });
   const { mutate: unsubscribeMarket, isPending: isUnsubscribing } =
-    trpc.community.unsubscribeMarket.useMutation();
+    trpc.community.unsubscribeMarket.useMutation({
+      onSuccess: () => {
+        void trpcUtils.community.getMarkets.invalidate({
+          community_id: communityId,
+        });
+      },
+    });
 
   const onSubscribe = (market: Market) => {
     subscribeMarket({
@@ -72,9 +84,7 @@ export function useMarketData(communityId: string) {
       start_time: market.startTime ?? new Date(), // TODO: make sure we have a start time
       end_time: market.endTime ?? new Date(), // TODO: make sure we have an end time
       status: market.status as 'open',
-    });
-    void trpcUtils.community.getMarkets.invalidate({
-      community_id: communityId,
+      image_url: market.imageUrl,
     });
   };
 
@@ -82,9 +92,6 @@ export function useMarketData(communityId: string) {
     unsubscribeMarket({
       community_id: communityId,
       slug: market.slug,
-    });
-    void trpcUtils.community.getMarkets.invalidate({
-      community_id: communityId,
     });
   };
 
