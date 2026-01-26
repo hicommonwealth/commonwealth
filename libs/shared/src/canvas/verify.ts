@@ -1,5 +1,6 @@
 import type { Session } from '@canvas-js/interfaces';
 import { ed25519 } from '@canvas-js/signatures';
+import { verifyPersonalMessageSignature } from '@mysten/sui/verify';
 
 import assert from 'assert';
 
@@ -8,9 +9,34 @@ import { getAddressFromDid, getSessionSignerForDid } from './signers';
 import { CanvasSignedData, CanvasSignedDataOption } from './types';
 import { assertMatches } from './utils';
 
+/**
+ * Sui authorization data containing message and signature
+ */
+type SuiAuthorizationData = {
+  message: string;
+  signature: string;
+};
+
 export const verifySession = async (session: Session) => {
-  // Skip verification for Sui DIDs since we don't have a proper Canvas.js signer implementation yet
+  // Special handling for Sui wallet sessions - verify signature cryptographically
   if (session.did?.startsWith('did:pkh:sui:')) {
+    const suiAuthData = session.authorizationData as
+      | SuiAuthorizationData
+      | undefined;
+    assert(
+      suiAuthData?.message && suiAuthData?.signature,
+      'Missing Sui session authorizationData (message or signature)',
+    );
+
+    const messageBytes = new TextEncoder().encode(suiAuthData.message);
+
+    // The signature from the client is hex-encoded
+    const isValid = await verifyPersonalMessageSignature(
+      messageBytes,
+      suiAuthData.signature,
+    );
+
+    assert(isValid, 'Invalid Sui session signature');
     return;
   }
 
