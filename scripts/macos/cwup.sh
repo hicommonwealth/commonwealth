@@ -6,9 +6,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ensure_network() {
   local name=$1
 
-  if container network inspect "$name" >/dev/null 2>&1; then
+  # Check if network truly exists (both listable and inspectable)
+  local exists=false
+  if container network ls --format '{{.Name}}' 2>/dev/null | grep -qx "$name"; then
+    if container network inspect "$name" >/dev/null 2>&1; then
+      exists=true
+    fi
+  fi
+
+  if [ "$exists" = true ]; then
     echo "✓ Network $name exists"
   else
+    # Remove any stale references before creating
+    container network rm "$name" 2>/dev/null || true
     echo "➕ Creating network $name..."
     container network create "$name"
   fi
@@ -82,5 +92,5 @@ start_container cw-pg --network cw-net -p 5432:5432 \
   -e POSTGRES_PASSWORD=edgeware \
   -e POSTGRES_DB=commonwealth \
   -e PGDATA=/var/lib/postgresql/pgdata \
-  -v cw-pg-data:/var/lib/postgresql/pgdata \
+  -v cw-pg-data:/var/lib/postgresql \
   cw-postgres
