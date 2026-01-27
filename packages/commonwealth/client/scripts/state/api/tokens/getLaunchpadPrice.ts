@@ -30,8 +30,6 @@ export const useGetLaunchpadPriceQuery = (
   }
 
   return useQuery({
-    // contract is derived from ethChainId, rpc, and contractAddress (all in queryKey)
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       'launchpadPrice',
       ethChainId,
@@ -39,15 +37,25 @@ export const useGetLaunchpadPriceQuery = (
       tokenAddress,
       amountIn,
       isBuy,
+      contract,
     ],
     staleTime: PRICE_STALE_TIME,
     enabled: !!contract && !!tokenAddress && enabled,
     queryFn: async () => {
-      const price =
-        contract &&
-        contract.methods &&
-        contract.methods.getPrice(tokenAddress, amountIn, isBuy);
-      return (await price?.call()) as bigint | undefined;
+      if (!contract) return undefined;
+
+      const tokensOut: bigint = BigInt(
+        await contract.methods.getPrice(tokenAddress, amountIn, isBuy).call(),
+      );
+
+      if (tokensOut === 0n) return undefined;
+
+      const pricePerTokenWei = 1n / tokensOut;
+
+      return {
+        tokensOut,
+        pricePerTokenWei,
+      };
     },
   });
 };
