@@ -1,5 +1,7 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import React, { useState } from 'react';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect, useMemo } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { trpc } from 'utils/trpcClient';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -23,7 +25,33 @@ type TabType = 'discover' | 'my-markets';
 const MarketsAppPage = () => {
   const community_id = app.activeChainId() || '';
   const utils = trpc.useUtils();
-  const [activeTab, setActiveTab] = useState<TabType>('discover');
+  const navigate = useCommonNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  const activeTab = useMemo<TabType>(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'discover' || tabParam === 'my-markets') {
+      return tabParam;
+    }
+    return 'my-markets'; // Default to 'my-markets'
+  }, [searchParams]);
+
+  // Set default tab in URL if not present
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (!tabParam || (tabParam !== 'discover' && tabParam !== 'my-markets')) {
+      const params = new URLSearchParams(searchParams);
+      params.set('tab', 'my-markets');
+      navigate(`${location.pathname}?${params.toString()}`, {}, null);
+    }
+  }, [searchParams, location.pathname, navigate]);
+
+  const setActiveTab = (newTab: TabType) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', newTab);
+    navigate(`${location.pathname}?${params.toString()}`, {}, null);
+  };
 
   const {
     data: marketsData,
@@ -113,14 +141,14 @@ const MarketsAppPage = () => {
 
         <CWTabsRow className="markets-tabs">
           <CWTab
-            label="Discover"
-            isSelected={activeTab === 'discover'}
-            onClick={() => setActiveTab('discover')}
-          />
-          <CWTab
             label="My Markets"
             isSelected={activeTab === 'my-markets'}
             onClick={() => setActiveTab('my-markets')}
+          />
+          <CWTab
+            label="Discover"
+            isSelected={activeTab === 'discover'}
+            onClick={() => setActiveTab('discover')}
           />
         </CWTabsRow>
 
