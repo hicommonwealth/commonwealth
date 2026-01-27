@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import Web3 from 'web3';
 
 const PRICE_STALE_TIME = 5000;
+const PRECISION = 10n ** 18n;
 
 export const useGetLaunchpadPriceQuery = (
   rpc: string,
@@ -30,6 +31,8 @@ export const useGetLaunchpadPriceQuery = (
   }
 
   return useQuery({
+    // contract is derived from ethChainId, rpc, and contractAddress (all in queryKey)
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       'launchpadPrice',
       ethChainId,
@@ -37,7 +40,6 @@ export const useGetLaunchpadPriceQuery = (
       tokenAddress,
       amountIn,
       isBuy,
-      contract,
     ],
     staleTime: PRICE_STALE_TIME,
     enabled: !!contract && !!tokenAddress && enabled,
@@ -50,12 +52,7 @@ export const useGetLaunchpadPriceQuery = (
 
       if (tokensOut === 0n) return undefined;
 
-      const pricePerTokenWei = 1n / tokensOut;
-
-      return {
-        tokensOut,
-        pricePerTokenWei,
-      };
+      return (PRECISION * 1n) / tokensOut;
     },
   });
 };

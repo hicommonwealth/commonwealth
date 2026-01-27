@@ -400,7 +400,7 @@ export const NewThreadForm = forwardRef<
     const { data: launchpadPriceEth } = useGetLaunchpadPriceQuery(
       chainRpc,
       ethChainId,
-      communityToken!.token_address || '',
+      communityToken?.token_address || '',
       !!externalUsdPrice && !isLoadingETHToCurrencyRate,
     );
 
@@ -417,6 +417,7 @@ export const NewThreadForm = forwardRef<
       (Number(launchpadPriceEth || '0') / WEI_PER_ETHER) * ethToUsdRate;
 
     const finalPrice = tokenToUsdRate || launchpadPriceUsd || 0;
+
     const connectorWeight = calculateConnectorWeightFromUsdPrice(finalPrice);
 
     const handleNewThreadCreation = useCallback(async () => {
