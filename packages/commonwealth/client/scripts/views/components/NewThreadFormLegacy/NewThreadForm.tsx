@@ -123,28 +123,25 @@ import { launchAndBuyThreadTokenUtility } from './useLaunchAndBuyThreadToken';
 
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
+// using sigmoid function
 function calculateConnectorWeightFromUsdPrice(usdPrice: number): number {
-  if (usdPrice === 0) {
-    return 830000;
-  }
-  const initialBalance = BigInt(Math.floor((100 / usdPrice) * 1e18));
-  const graduationBalance = BigInt(Math.floor((1000 / usdPrice) * 1e18));
-  const launchpadLiquidity = BigInt(200_000_000) * BigInt(1e18);
-  const initialSupply = BigInt(1_000_000_000) * BigInt(1e18);
+  const MIN = 50_000;
+  const MAX = 100_000;
 
-  const supplyNum = Number(initialSupply) / 1e18;
-  const liquidityNum = Number(launchpadLiquidity) / 1e18;
-  const depositNum = Number(graduationBalance - initialBalance) / 1e18;
-  const balanceNum = Number(initialBalance) / 1e18;
+  const P1 = 0.00003;
+  const W1 = 50_000;
 
-  const connectorRatio = 1 + depositNum / balanceNum;
-  const tokenRatio = liquidityNum / supplyNum + 1;
+  const P2 = 0.00006;
+  const W2 = 65_000;
 
-  const w = Math.floor(
-    (1_000_000 * Math.log(tokenRatio)) / Math.log(connectorRatio),
-  );
+  if (usdPrice <= 0) return W1;
+  if (usdPrice <= P1) return W1;
 
-  return Math.max(10000, Math.min(1000000, w));
+  const t = (Math.log(usdPrice) - Math.log(P1)) / (Math.log(P2) - Math.log(P1));
+
+  const weight = W1 + t * (W2 - W1);
+
+  return Math.round(Math.min(MAX, Math.max(MIN, weight)));
 }
 
 interface NewThreadFormProps {
@@ -418,6 +415,7 @@ export const NewThreadForm = forwardRef<
       (Number(launchpadPriceEth || '0') / WEI_PER_ETHER) * ethToUsdRate;
 
     const finalPrice = tokenToUsdRate || launchpadPriceUsd || 0;
+
     const connectorWeight = calculateConnectorWeightFromUsdPrice(finalPrice);
 
     const handleNewThreadCreation = useCallback(async () => {
