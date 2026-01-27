@@ -125,25 +125,23 @@ const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 
 // using sigmoid function
 function calculateConnectorWeightFromUsdPrice(usdPrice: number): number {
-  const MIN = 50000;
-  const MAX = 100000;
-  const MIDPOINT_USD = 3e-5;
+  const MIN = 50_000;
+  const MAX = 100_000;
 
-  if (usdPrice === 0) {
-    return Math.round((MIN + MAX) / 2);
-  }
+  const P1 = 0.00003;
+  const W1 = 50_000;
 
-  if (usdPrice >= 10) {
-    return MAX;
-  }
+  const P2 = 0.00006;
+  const W2 = 65_000;
 
-  const steepness = 10;
-  const log10Midpoint = Math.log10(MIDPOINT_USD);
+  if (usdPrice <= 0) return W1;
+  if (usdPrice <= P1) return W1;
 
-  const x = Math.log10(Math.max(usdPrice, 1));
-  const sigma = 1 / (1 + Math.exp(-steepness * (x - log10Midpoint)));
+  const t = (Math.log(usdPrice) - Math.log(P1)) / (Math.log(P2) - Math.log(P1));
 
-  return Math.round(MIN + (MAX - MIN) * sigma);
+  const weight = W1 + t * (W2 - W1);
+
+  return Math.round(Math.min(MAX, Math.max(MIN, weight)));
 }
 
 interface NewThreadFormProps {
