@@ -36,6 +36,8 @@ const MarketsList = ({
     search: searchText || '',
     provider: 'all',
     category: 'all',
+    status: 'all',
+    sortOrder: 'newest',
   });
 
   useEffect(() => {

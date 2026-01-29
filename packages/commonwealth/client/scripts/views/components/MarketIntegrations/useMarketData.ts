@@ -8,6 +8,8 @@ export function useMarketData(communityId: string) {
     search: '',
     provider: 'all',
     category: 'all',
+    status: 'all',
+    sortOrder: 'newest',
   });
 
   const trpcUtils = trpc.useUtils();
@@ -44,12 +46,36 @@ export function useMarketData(communityId: string) {
     limit: 20, // Use consistent pagination
   });
 
+  // Fetch all categories from an unfiltered query (completely independent of current filters)
+  // This ensures all categories remain visible in the dropdown even when filters are applied
+  // We use a separate query key by always using 'all' for category and status, and empty search
+  const { data: allMarketsForCategories } = useDiscoverExternalMarketsQuery({
+    filters: {
+      search: '',
+      provider: filters.provider,
+      category: 'all',
+      status: 'all',
+      sortOrder: 'newest',
+    },
+    limit: 500, // Fetch more to get all categories
+    enabled: !!communityId, // Only enable if we have a communityId
+  });
+
   const categories = useMemo(() => {
-    const allCategories = (discoveredMarkets || []).map(
-      (market) => market.category,
-    );
-    return ['all', ...Array.from(new Set(allCategories))];
-  }, [discoveredMarkets]);
+    // Always use the unfiltered categories query - never fall back to filtered discoveredMarkets
+    // This ensures categories don't disappear when a category filter is applied
+    // If allMarketsForCategories hasn't loaded yet, return empty array (will show 'all' only)
+    if (!allMarketsForCategories || allMarketsForCategories.length === 0) {
+      return ['all'];
+    }
+
+    const allCategories = allMarketsForCategories
+      .map((market) => market.category)
+      .filter((cat) => cat && cat.trim() !== ''); // Filter out empty/null categories
+
+    const uniqueCategories = Array.from(new Set(allCategories)).sort();
+    return ['all', ...uniqueCategories];
+  }, [allMarketsForCategories]); // Only depend on allMarketsForCategories, not discoveredMarkets
 
   const savedMarketIds = useMemo(() => {
     return savedMarkets && savedMarkets.length > 0

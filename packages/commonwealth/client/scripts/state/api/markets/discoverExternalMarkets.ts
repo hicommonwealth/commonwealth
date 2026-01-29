@@ -21,6 +21,8 @@ const useDiscoverExternalMarketsQuery = ({
       provider: filters.provider,
       search: filters.search || undefined,
       category: filters.category !== 'all' ? filters.category : undefined,
+      status: filters.status !== 'all' ? filters.status : undefined,
+      sortOrder: filters.sortOrder,
       limit,
     },
     {

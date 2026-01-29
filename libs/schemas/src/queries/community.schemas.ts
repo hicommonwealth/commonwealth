@@ -492,6 +492,14 @@ export const DiscoverExternalMarkets = {
     provider: z.enum([...Markets, 'all']),
     search: z.string().optional(),
     category: z.string().optional(),
+    status: z
+      .enum(['open', 'closed', 'settled', 'all'])
+      .optional()
+      .default('all'),
+    sortOrder: z
+      .enum(['newest', 'oldest', 'ending-soon', 'starting-soon'])
+      .optional()
+      .default('newest'),
   }),
   output: PaginatedResultSchema.extend({
     results: z.array(ExternalMarket),
