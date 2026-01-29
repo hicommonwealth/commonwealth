@@ -134,7 +134,7 @@ function calculateConnectorWeightFromUsdPrice(usdPrice: number): number {
   const P2 = 0.00006;
   const W2 = 65_000;
 
-  if (usdPrice <= 0) return W1;
+  if (!usdPrice || usdPrice <= 0) return W1;
   if (usdPrice <= P1) return W1;
 
   const t = (Math.log(usdPrice) - Math.log(P1)) / (Math.log(P2) - Math.log(P1));
@@ -479,7 +479,7 @@ export const NewThreadForm = forwardRef<
           kind: threadKind,
           stage: ThreadStage.Discussion,
           communityId: selectedCommunityId,
-          communityBase: community.base,
+          communityBase: community?.base,
           title: effectiveTitle,
           topic: threadTopic,
           body: effectiveBody,
