@@ -461,7 +461,7 @@ jobs:
         run: |
           pnpm -F commonwealth bootstrap-test-db &&
           (cd packages/commonwealth && SERVICE=web node --import=extensionless/register --enable-source-maps ./build/server.js) &
-          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-visual)
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-visual:update)
 
       - name: Upload visual regression artifacts
         if: always()
