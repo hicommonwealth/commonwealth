@@ -40,6 +40,7 @@ const UserDropdown = ({ onAuthModalOpen }: UserDropdownProps) => {
         <button
           className={clsx('UserDropdownTriggerButton', { isOpen })}
           onClick={onClick}
+          data-testid="user-menu"
         >
           <User
             avatarSize={24}

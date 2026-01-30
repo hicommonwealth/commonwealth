@@ -105,6 +105,7 @@ const AuthModal = ({
       className="AuthModal"
       content={getActiveModalComponent()}
       isFullScreen={isWindowSmallInclusive}
+      data-testid="auth-modal"
     />
   );
 };
