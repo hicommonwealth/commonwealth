@@ -1,6 +1,14 @@
 import type { Topic } from '../../../models/Topic';
 import type { ThreadKind } from '../../../models/types';
 
+export type ProposalState = {
+  identifier: string;
+  source: string;
+  title: string;
+  proposalId: string;
+  snapshotIdentifier?: string;
+};
+
 export type NewThreadFormType = {
   threadKind: ThreadKind;
   threadTitle: string;
