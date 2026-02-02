@@ -1,12 +1,15 @@
 import useForceRerender from 'hooks/useForceRerender';
 import { useEffect } from 'react';
 
-interface UseRerenderProps {
+interface UseContestCardRerenderProps {
   isActive?: boolean;
   interval: number;
 }
 
-const useRerender = ({ isActive, interval }: UseRerenderProps) => {
+const useContestCardRerender = ({
+  isActive,
+  interval,
+}: UseContestCardRerenderProps) => {
   const forceRerender = useForceRerender();
 
   useEffect(() => {
@@ -25,4 +28,4 @@ const useRerender = ({ isActive, interval }: UseRerenderProps) => {
   }, [forceRerender, interval, isActive]);
 };
 
-export default useRerender;
+export default useContestCardRerender;
