@@ -19,6 +19,8 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [ ] 1.4 Delete permanently-flagged legacy code (batch 2)
 - [ ] 1.5 Consolidate useForceRerender + useRerender
 - [ ] 1.6 Audit and clean dead model/store files
+- [ ] 1.7 Remove Privy auth layer (revert to Magic-only flow)
+- [ ] 1.8 Remove React Native layer (mobile bridge + MobileAppRedirect)
 
 ### EPIC-2: Shared Infrastructure
 - [ ] 2.1 Set up component test infrastructure
@@ -292,7 +294,7 @@ One smoke test per migrated feature page -- renders without crash with mock prov
 ### Epic Dependency Chain + Parallelism Summary
 
 ```
-EPIC-1: Dead Code Deletion ──────────────────── 6 tickets, ALL parallel (6 engineers)
+EPIC-1: Dead Code Deletion ──────────────────── 8 tickets, ALL parallel (8 engineers)
     |
     v
 EPIC-2: Shared Infrastructure ───────────────── 12 tickets, max 4 parallel lanes
@@ -310,7 +312,7 @@ EPIC-5: Enforce Boundaries ─────────────────�
 EPIC-6: Kill views/ + Final Cleanup ────────── 11 tickets, max 4 parallel lanes
 ```
 
-**Total: 58 tickets. Max theoretical parallelism: 7 engineers.**
+**Total: 60 tickets. Max theoretical parallelism: 8 engineers.**
 **Critical path (longest sequential chain): 1.x → 2.2 → 2.4 → 2.7 → 3.1 → 3.3 → 4.11 → 4.16 → 5.1 → 5.4 → 6.1 → 6.7 → 6.11**
 
 ---
@@ -319,16 +321,18 @@ EPIC-6: Kill views/ + Final Cleanup ────────── 11 tickets, m
 
 #### EPIC-1 DAG: Dead Code Deletion
 ```
-All 6 tickets run in parallel (no dependencies between them):
+All 8 tickets run in parallel (no dependencies between them):
 
      ┌── 1.1 (dead dev pages)
      ├── 1.2 (momentUpdateLocale)
      ├── 1.3 (zero-import components batch 1)
 START┼── 1.4 (permanently-flagged legacy) ⚠ needs product sign-off
      ├── 1.5 (consolidate useForceRerender)
-     └── 1.6 (dead models/stores)
+     ├── 1.6 (dead models/stores)
+     ├── 1.7 (remove Privy layer)
+     └── 1.8 (remove React Native layer)
 
-Parallelism: 6 lanes → 6 engineers can work simultaneously
+Parallelism: 8 lanes → 8 engineers can work simultaneously
 Sequential depth: 1 (one layer)
 ```
 
@@ -502,13 +506,13 @@ Sequential depth: 7 layers (6.1 → 6.2 → 6.3 → 6.7 → 6.8 → 6.9 → 6.11
 
 | Epic | Tickets | Max Parallel Lanes | Sequential Depth | Bottleneck |
 |------|---------|-------------------|-----------------|------------|
-| 1: Dead Code | 6 | **6** | 1 | Product sign-off on 1.4 |
+| 1: Dead Code | 8 | **8** | 1 | Product sign-off on 1.4 |
 | 2: Shared Infra | 12 | **4** | 4 | 2.2 (aliases) gates everything |
 | 3: Normalize | 8 | **6** | 2 | 3.1 (useCommunityContests) gates 3.3-3.5 |
 | 4: Feature Migration | 17 | **7** | 4 waves | 4.11 (Discussions) has most blockers |
 | 5: Boundaries | 4 | **1** | 4 | Sequential by nature |
 | 6: Kill views/ | 11 | **4** | 7 | 6.1 (component_kit, 8k LOC) |
-| **Total** | **58** | **7 peak** | -- | -- |
+| **Total** | **60** | **8 peak** | -- | -- |
 
 ### EPIC-1: Dead Code Deletion
 
@@ -548,11 +552,26 @@ EPIC-1: Dead Code Deletion
 │   blocked-by: none
 │   reviewer: frontend
 │
-└── 1.6: Audit and clean dead model/store files [PARALLEL]
-    files: models/SearchQuery.ts, SearchResult.ts, stores/IdStore.ts,
-           PersistentStore.ts, ProposalStore.ts (grep-verify each)
-    ~200-500 LOC delete
-    blocked-by: none
+├── 1.6: Audit and clean dead model/store files [PARALLEL]
+│   files: models/SearchQuery.ts, SearchResult.ts, stores/IdStore.ts,
+│          PersistentStore.ts, ProposalStore.ts (grep-verify each)
+│   ~200-500 LOC delete
+│   blocked-by: none
+│   reviewer: frontend
+│
+├── 1.7: Remove Privy auth layer (revert to Magic-only flow) [PARALLEL]
+│   files: shared/components/Privy/, auth provider wiring, env flags, package deps
+│   remove: Privy SDK usage + Privy-specific UI flows
+│   ~800-1200 LOC delete
+│   blocked-by: product sign-off (confirm Magic-only auth)
+│   reviewer: frontend
+│
+└── 1.8: Remove React Native layer (mobile bridge + MobileAppRedirect) [PARALLEL]
+    files: hooks/mobile/useMobileRPCSender.ts, useMobileRPCEventReceiver.ts,
+           hooks/useReactNativeWebView.ts, MobileAppRedirect page + routes
+    remove: RN WebView postMessage bridge + isMobileApp() detection
+    ~500-1200 LOC delete
+    blocked-by: product sign-off (mobile app sunset)
     reviewer: frontend
 ```
 
