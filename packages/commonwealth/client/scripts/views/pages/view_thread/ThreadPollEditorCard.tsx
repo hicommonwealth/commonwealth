@@ -1,7 +1,6 @@
 import { DEFAULT_COMPLETION_MODEL } from '@hicommonwealth/shared';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
-import { useAiCompletion } from 'client/scripts/state/api/ai';
-import { generatePollPrompt } from 'client/scripts/state/api/ai/prompts';
+import { AICompletionType, useAiCompletion } from 'client/scripts/state/api/ai';
 import React, { useState } from 'react';
 import { useAIFeatureEnabled } from 'state/ui/user';
 import { SetLocalPolls } from 'utils/polls';
@@ -9,8 +8,6 @@ import type Thread from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import { getTextFromDelta } from '../../components/react_quill_editor';
-import { serializeDelta } from '../../components/react_quill_editor/utils';
 import { PollEditorModal } from '../../modals/poll_editor_modal';
 import './poll_cards.scss';
 
@@ -28,8 +25,6 @@ export const ThreadPollEditorCard = ({
   threadAlreadyHasPolling,
   setLocalPoll,
   isCreateThreadPage = false,
-  threadTitle,
-  threadContentDelta,
 }: ThreadPollEditorCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pollData, setPollData] = useState<string>();
@@ -38,54 +33,46 @@ export const ThreadPollEditorCard = ({
 
   const { generateCompletion } = useAiCompletion();
   const { isAIEnabled } = useAIFeatureEnabled();
-  const DEFAULT_THREAD_TITLE = 'Untitled Discussion';
-  const DEFAULT_THREAD_BODY = 'No content provided.';
+
   const handleGeneratePoll = () => {
-    setIsAIresponseCompleted(false);
-    setPollData('');
-    let effectiveTitle;
-    let effectiveBody;
+    const communityId = thread?.communityId;
 
-    if (isCreateThreadPage && threadContentDelta && threadTitle) {
-      effectiveTitle = isAIEnabled
-        ? threadTitle?.trim() || DEFAULT_THREAD_TITLE
-        : threadTitle;
-
-      effectiveBody = isAIEnabled
-        ? getTextFromDelta(threadContentDelta).trim()
-          ? serializeDelta(threadContentDelta)
-          : DEFAULT_THREAD_BODY
-        : serializeDelta(threadContentDelta);
+    if (!communityId) {
+      notifyError('Community ID is required for poll generation');
+      return;
     }
 
+    setIsAIresponseCompleted(false);
+    setPollData('');
+
     let text = '';
-    const context = `
-    Thread: ${thread?.title || effectiveTitle || ''}
-    body ${thread?.body || effectiveBody || ''}
-    `;
 
-    setPollData(text);
-    const { systemPrompt, userPrompt } = generatePollPrompt(context);
-
-    generateCompletion(userPrompt, {
-      model: DEFAULT_COMPLETION_MODEL,
-      stream: true,
-      systemPrompt,
-      communityId: thread?.communityId,
-      onError: (error) => {
-        console.error('Error generating Poll:', error);
-        notifyError('Failed to generate  Poll');
+    generateCompletion(
+      {
+        communityId,
+        completionType: AICompletionType.Poll,
+        threadId: thread?.id,
+        model: DEFAULT_COMPLETION_MODEL,
+        stream: true,
       },
-      onChunk: (chunk) => {
-        text += chunk;
-        text = text.trim();
-        setPollData(text);
+      {
+        onError: (error) => {
+          console.error('Error generating Poll:', error);
+          notifyError('Failed to generate Poll');
+          setIsAIresponseCompleted(true);
+        },
+        onChunk: (chunk) => {
+          text += chunk;
+          text = text.trim();
+          setPollData(text);
+        },
+        onComplete: () => {
+          setIsAIresponseCompleted(true);
+        },
       },
-      onComplete: () => {
-        setIsAIresponseCompleted(true);
-      },
-    }).catch((error) => {
+    ).catch((error) => {
       console.error('Failed to generate poll:', error);
+      setIsAIresponseCompleted(true);
     });
   };
 
@@ -125,7 +112,7 @@ export const ThreadPollEditorCard = ({
             }}
             pollData={pollData}
             isAIresponseCompleted={isAIresponseCompleted}
-            onGeneratePoll={handleGeneratePoll}
+            onGeneratePoll={isAIEnabled ? handleGeneratePoll : undefined}
             setLocalPoll={setLocalPoll}
           />
         }

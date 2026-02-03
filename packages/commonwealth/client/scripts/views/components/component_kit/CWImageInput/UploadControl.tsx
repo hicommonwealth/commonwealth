@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
-import { generateImagePromptWithContext } from 'state/api/ai/prompts';
+import { generateImagePromptFromReferenceTexts } from 'state/api/ai/prompts';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
 import { CWButton } from '../new_designs/CWButton';
@@ -261,7 +261,7 @@ export const UploadControl = ({
                       e.stopPropagation();
                       imagePrompt.trim() &&
                         generateImage({
-                          prompt: generateImagePromptWithContext(
+                          prompt: generateImagePromptFromReferenceTexts(
                             imagePrompt,
                             referenceTexts,
                             !!referenceImageUrls &&
@@ -310,7 +310,7 @@ export const UploadControl = ({
               e.preventDefault();
               e.stopPropagation();
               generateImage({
-                prompt: generateImagePromptWithContext(
+                prompt: generateImagePromptFromReferenceTexts(
                   imagePrompt,
                   referenceTexts,
                   !!referenceImageUrls && referenceImageUrls.length > 0,
@@ -369,7 +369,7 @@ export const UploadControl = ({
               onClick={() => {
                 imagePrompt.trim() &&
                   generateImage({
-                    prompt: generateImagePromptWithContext(
+                    prompt: generateImagePromptFromReferenceTexts(
                       imagePrompt,
                       referenceTexts,
                       !!referenceImageUrls && referenceImageUrls.length > 0,

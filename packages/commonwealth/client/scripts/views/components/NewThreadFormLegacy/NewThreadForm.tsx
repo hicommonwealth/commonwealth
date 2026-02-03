@@ -38,11 +38,7 @@ import React, {
 } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
-import { useAiCompletion } from 'state/api/ai';
-import {
-  generateThreadPrompt,
-  generateThreadTitlePrompt,
-} from 'state/api/ai/prompts';
+import { AICompletionType, useAiCompletion } from 'state/api/ai';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
@@ -623,85 +619,85 @@ export const NewThreadForm = forwardRef<
     const contestTopicAffordanceVisible =
       isContestAvailable && hasTopicOngoingContest;
 
+    // Extracts a title from generated content (first meaningful line, limited to 100 chars)
+    const extractTitleFromContent = (content: string): string => {
+      if (!content.trim()) return 'New Thread';
+
+      // Remove markdown headers and get the first meaningful line
+      const lines = content.split('\n').filter((line) => {
+        const trimmed = line.trim();
+        // Skip empty lines and lines that are just markdown formatting
+        return (
+          trimmed.length > 0 &&
+          !trimmed.match(/^[#*_\-=]+$/) && // Skip lines that are just symbols
+          !trimmed.startsWith('![') // Skip image markdown
+        );
+      });
+
+      if (lines.length === 0) return 'New Thread';
+
+      // Get first line and clean it up
+      let title = lines[0]
+        .replace(/^#+\s*/, '') // Remove markdown headers
+        .replace(/^\*+\s*/, '') // Remove leading asterisks
+        .replace(/\*+$/, '') // Remove trailing asterisks
+        .trim();
+
+      // Limit to 100 characters
+      if (title.length > 100) {
+        title = title.substring(0, 97) + '...';
+      }
+
+      return title || 'New Thread';
+    };
+
     const handleGenerateAIThread = async () => {
+      const effectiveCommunityId = communityId || selectedCommunityId;
+
+      if (!effectiveCommunityId) {
+        notifyError('Community ID is required for AI thread generation');
+        return;
+      }
+
       setIsGenerating(true);
       setThreadTitle('');
       setThreadContentDelta(createDeltaFromText(''));
       bodyAccumulatedRef.current = '';
 
-      const recentThreadsContext = recentThreads?.pages[0]?.results
-        .map((thread) => {
-          return (
-            `Title: ${thread.title}\nBody: ${thread.body}\n` +
-            `Topic: ${thread.topic?.name || 'N/A'}\nCommunity: ${thread.community_id || 'N/A'}`
-          );
-        })
-        .join('\n\n');
-
       try {
-        const { systemPrompt: bodySystemPrompt, userPrompt: bodyUserPrompt } =
-          generateThreadPrompt(
-            recentThreadsContext || 'Suggest a new discussion topic.',
-          );
-
-        await generateCompletion(bodyUserPrompt, {
-          model: DEFAULT_COMPLETION_MODEL,
-          stream: true,
-          systemPrompt: bodySystemPrompt,
-          includeContextualMentions: true,
-          communityId: communityId || selectedCommunityId,
-          onError: (error) => {
-            console.error('Error generating AI thread body:', error);
-            notifyError('Failed to generate AI thread content');
-            setIsGenerating(false);
+        // Generate thread body
+        await generateCompletion(
+          {
+            communityId: effectiveCommunityId,
+            completionType: AICompletionType.Thread,
+            topicId: threadTopic?.id,
+            model: DEFAULT_COMPLETION_MODEL,
+            stream: true,
+            webSearchEnabled: effectiveWebSearchEnabled,
           },
-          onChunk: (chunk) => {
-            bodyAccumulatedRef.current += chunk;
-            setThreadContentDelta(
-              createDeltaFromText(bodyAccumulatedRef.current.trimStart()),
-            );
+          {
+            onError: (error) => {
+              console.error('Error generating AI thread body:', error);
+              notifyError('Failed to generate AI thread content');
+              setIsGenerating(false);
+            },
+            onChunk: (chunk) => {
+              bodyAccumulatedRef.current += chunk;
+              setThreadContentDelta(
+                createDeltaFromText(bodyAccumulatedRef.current.trimStart()),
+              );
+            },
+            onComplete: (generatedBody) => {
+              // Extract title from the generated body client-side
+              const extractedTitle = extractTitleFromContent(generatedBody);
+              setThreadTitle(extractedTitle);
+              setIsGenerating(false);
+            },
           },
-          onComplete: (generatedBody) => {
-            const {
-              systemPrompt: titleSystemPrompt,
-              userPrompt: titleUserPrompt,
-            } = generateThreadTitlePrompt(generatedBody.trim() || 'New Thread');
-
-            void (async () => {
-              try {
-                await generateCompletion(titleUserPrompt, {
-                  model: DEFAULT_COMPLETION_MODEL,
-                  stream: false,
-                  systemPrompt: titleSystemPrompt,
-                  includeContextualMentions: true,
-                  communityId: communityId || selectedCommunityId,
-                  onComplete(fullTitle) {
-                    setThreadTitle(fullTitle.trim());
-                    setIsGenerating(false);
-                  },
-                  onError: (titleError) => {
-                    console.error(
-                      'Error generating AI thread title:',
-                      titleError,
-                    );
-                    notifyError('Failed to generate AI thread title');
-                    setIsGenerating(false);
-                  },
-                });
-              } catch (error) {
-                console.error(
-                  'Error awaiting title generation in AI thread:',
-                  error,
-                );
-                notifyError('Failed to initiate AI thread title generation');
-                setIsGenerating(false);
-              }
-            })();
-          },
-        });
+        );
       } catch (error) {
         console.error('Error in AI thread generation process:', error);
-        notifyError('Failed to generate AI thread content or title');
+        notifyError('Failed to generate AI thread content');
         setIsGenerating(false);
       }
     };

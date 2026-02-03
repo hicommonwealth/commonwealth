@@ -22,6 +22,7 @@ import { Virtuoso } from 'react-virtuoso';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
+import { trpc } from 'utils/trpcClient';
 import { CreateComment } from 'views/components/Comments/CreateComment';
 import { WithActiveStickyComment } from 'views/components/StickEditorContainer/context/WithActiveStickyComment';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -93,6 +94,7 @@ export const TreeHierarchy = ({
   const user = useUserStore();
   const communityId = app.activeChainId() || '';
   const { selectedModels } = useUserAiSettingsStore();
+  const utils = trpc.useUtils();
 
   const isChatMode = commentFilters.sortType === 'oldest';
   const previousChatModeRef = useRef(isChatMode);
@@ -197,6 +199,203 @@ export const TreeHierarchy = ({
       unregister();
     };
   }, [handleGenerateAIReply]);
+
+  // Transform CreateComment output to CommentsView format for cache
+  const transformCommentToView = useCallback(
+    (payload: Record<string, unknown>): CommentViewParams => {
+      // Helper to convert Date to ISO string
+      const toDateString = (val: unknown): string | null | undefined => {
+        if (val === null || val === undefined) return val;
+        if (val instanceof Date) return val.toISOString();
+        return val as string;
+      };
+
+      // Extract Address data (may be nested from CreateComment output)
+      const rawAddress = payload.Address as Record<string, unknown> | undefined;
+
+      // Transform Address dates if present
+      const transformedAddress = rawAddress
+        ? {
+            ...rawAddress,
+            created_at: toDateString(rawAddress.created_at),
+            updated_at: toDateString(rawAddress.updated_at),
+          }
+        : undefined;
+
+      const addressData = transformedAddress as
+        | {
+            address?: string;
+            user_id?: number;
+            User?: {
+              id?: number;
+              profile?: { name?: string; avatar_url?: string };
+            };
+          }
+        | undefined;
+
+      return {
+        ...payload,
+        // Flatten address fields for CommentsView schema
+        address: addressData?.address || (payload.address as string) || '',
+        profile_name:
+          addressData?.User?.profile?.name ||
+          (payload.profile_name as string) ||
+          undefined,
+        avatar_url:
+          addressData?.User?.profile?.avatar_url ||
+          (payload.avatar_url as string) ||
+          undefined,
+        user_id:
+          addressData?.user_id ||
+          addressData?.User?.id ||
+          (payload.user_id as number) ||
+          0,
+        // Ensure reactions array exists
+        reactions: (payload.reactions as unknown[]) || [],
+        // Convert date fields to strings (server may return Date objects)
+        created_at: toDateString(payload.created_at),
+        updated_at: toDateString(payload.updated_at),
+        deleted_at: toDateString(payload.deleted_at),
+        marked_as_spam_at: toDateString(payload.marked_as_spam_at),
+        last_active: toDateString(payload.last_active),
+        // Include transformed Address
+        Address: transformedAddress,
+      } as CommentViewParams;
+    },
+    [],
+  );
+
+  // Add a new AI comment directly to the cache without refetching
+  const addCommentToCache = useCallback(
+    (commentPayload: Record<string, unknown>) => {
+      if (!commentPayload || !commentPayload.id) {
+        console.warn('[TreeHierarchy] Invalid comment payload received');
+        return;
+      }
+
+      // Transform to CommentsView format
+      const commentView = transformCommentToView(commentPayload);
+
+      // Try to add to the comment's parent cache first (where it belongs)
+      // Note: Server returns null for root-level comments, but cache uses undefined
+      const rawParentId = commentView.parent_id as number | null | undefined;
+      const commentParentId =
+        rawParentId === null ? undefined : (rawParentId as number | undefined);
+      const isChatModeForParent =
+        commentFilters.sortType === 'oldest' && commentParentId === undefined;
+
+      console.log('[TreeHierarchy] Adding comment to cache', {
+        commentId: commentView.id,
+        parentId: commentParentId,
+        currentViewParentId: parentComment?.id,
+      });
+
+      let cacheFound = false;
+
+      // First, try the exact parent cache (where the reply belongs)
+      utils.comment.getComments.setInfiniteData(
+        {
+          thread_id: parseInt(`${thread.id}`) || 0,
+          comment_id: undefined,
+          include_reactions: true,
+          parent_id: commentParentId,
+          include_spam_comments: commentFilters.includeSpam,
+          order_by: commentFilters.sortType,
+          is_chat_mode: isChatModeForParent,
+        },
+        (oldData) => {
+          if (!oldData) {
+            return oldData;
+          }
+
+          cacheFound = true;
+          console.log('[TreeHierarchy] Found parent cache, adding comment');
+
+          const newPages = oldData.pages.map((page, index) => {
+            if (index === 0) {
+              const exists = page.results.some(
+                (c: { id: number }) => c.id === commentView.id,
+              );
+              if (exists) {
+                return page;
+              }
+              return {
+                ...page,
+                results: [
+                  commentView as (typeof page.results)[number],
+                  ...page.results,
+                ],
+              };
+            }
+            return page;
+          });
+
+          return { ...oldData, pages: newPages };
+        },
+      );
+
+      // If parent cache wasn't found but we're at a different view level,
+      // try the current view's cache (parent_id matches current view)
+      if (!cacheFound && commentParentId !== parentComment?.id) {
+        const currentViewParentId = parentComment?.id;
+        const isChatModeForView =
+          commentFilters.sortType === 'oldest' &&
+          currentViewParentId === undefined;
+
+        utils.comment.getComments.setInfiniteData(
+          {
+            thread_id: parseInt(`${thread.id}`) || 0,
+            comment_id: undefined,
+            include_reactions: true,
+            parent_id: currentViewParentId,
+            include_spam_comments: commentFilters.includeSpam,
+            order_by: commentFilters.sortType,
+            is_chat_mode: isChatModeForView,
+          },
+          (oldData) => {
+            if (!oldData) {
+              return oldData;
+            }
+
+            cacheFound = true;
+            console.log(
+              '[TreeHierarchy] Found current view cache, updating parent reply count',
+            );
+
+            // Update the parent comment's reply_count in the cache
+            const newPages = oldData.pages.map((page) => ({
+              ...page,
+              results: page.results.map((comment) => {
+                if (comment.id === commentParentId) {
+                  return {
+                    ...comment,
+                    reply_count: (comment.reply_count || 0) + 1,
+                  };
+                }
+                return comment;
+              }),
+            }));
+
+            return { ...oldData, pages: newPages };
+          },
+        );
+      }
+
+      if (!cacheFound) {
+        console.log(
+          '[TreeHierarchy] No cache found for comment, it will appear on next load',
+        );
+      }
+    },
+    [
+      utils.comment.getComments,
+      thread.id,
+      commentFilters.includeSpam,
+      commentFilters.sortType,
+      transformCommentToView,
+      parentComment?.id,
+    ],
+  );
 
   useRunOnceOnCondition({
     callback: () => {
@@ -324,7 +523,11 @@ export const TreeHierarchy = ({
                 isRootComment={true}
                 threadContext={thread.body}
                 threadTitle={thread.title}
-                onStreamingComplete={() => {
+                onStreamingComplete={(commentPayload) => {
+                  // Add comment to cache if payload received, then remove streaming instance
+                  if (commentPayload) {
+                    addCommentToCache(commentPayload);
+                  }
                   setStreamingInstances((prev) =>
                     prev.filter(
                       (si) =>
@@ -509,7 +712,11 @@ export const TreeHierarchy = ({
                 modelName={instance.modelName}
                 parentCommentText={comment.body}
                 threadContext={thread.body}
-                onStreamingComplete={() => {
+                onStreamingComplete={(commentPayload) => {
+                  // Add comment to cache if payload received, then remove streaming instance
+                  if (commentPayload) {
+                    addCommentToCache(commentPayload);
+                  }
                   setStreamingInstances((prev) =>
                     prev.filter(
                       (si) =>
