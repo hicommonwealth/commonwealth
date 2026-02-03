@@ -8,8 +8,6 @@ This plan covers four deliverables:
 3. **Full ASCII DAG** -- epic-to-ticket dependency graph
 4. **Deeper architectural refactors** -- structural problems beyond file moves (global `app` singleton, code splitting, controllers/, legacy stores/models, CSS scoping, tRPC completion)
 
-## Status (as of 260203)
-
 Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in parentheses and PR URL: `(YYMMDD) PR https://github.com/org/repo/pull/NNNNN — summary`.
 
 ### EPIC-1: Dead Code Deletion
@@ -83,13 +81,6 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [ ] 6.9 Delete old helpers/, hooks/, utils/, controllers/, stores/ dirs
 - [ ] 6.10 Update vite.config.ts to remove legacy aliases
 - [ ] 6.11 Final circular dependency audit + cleanup
-
----
-
-## PR Log (append-only)
-
-- 260202 PR https://github.com/hicommonwealth/commonwealth/pull/13323 — 1.1 Delete dead internal dev-tool pages (remove markdown demo routes/pages + samples)
-- 260203 PR https://github.com/hicommonwealth/commonwealth/pull/13326 — 1.6 Audit and clean dead model/store files (remove unused SearchResult/PersistentStore/IdStore + move clearLocalStorage)
 
 ## 1. Hooks/Utils Extraction Spec
 
