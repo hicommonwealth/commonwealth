@@ -69,10 +69,21 @@ async function fetchPolymarketEvents(limit: number): Promise<ExternalMarket[]> {
 
 async function fetchKalshiEvents(limit: number): Promise<ExternalMarket[]> {
   const url = new URL(KALSHI_API_URL);
-  url.searchParams.append('limit', String(limit));
-  url.searchParams.append('status', 'open');
 
-  const response = await fetch(url.toString());
+  // Kalshi API default limit is 100, max is typically 100
+  // Use cursor-based pagination if we need more than 100 items
+  const kalshiLimit = Math.min(limit, 100);
+  if (kalshiLimit > 0 && kalshiLimit < 100) {
+    // Only add limit if it's less than default (100) to avoid potential issues
+    url.searchParams.append('limit', String(kalshiLimit));
+  }
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      Accept: 'application/json',
+    },
+  });
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new InvalidState(
@@ -82,7 +93,13 @@ async function fetchKalshiEvents(limit: number): Promise<ExternalMarket[]> {
 
   const data: KalshiEventsResponse = await response.json();
 
-  return data.events.map((event) => ({
+  // Filter for open events client-side if API doesn't support status parameter
+  const events = data.events || [];
+  const openEvents = events.filter(
+    (event) => !event.status || event.status === 'open',
+  );
+
+  return openEvents.slice(0, limit).map((event) => ({
     id: event.event_ticker,
     provider: 'kalshi' as const,
     slug: event.event_ticker,
