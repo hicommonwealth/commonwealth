@@ -7,7 +7,7 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import { PageNotFound } from 'views/pages/404';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal';
 import IdeaLaunchpad from '../ExplorePage/IdeaLaunchpad';
 import { TrendingCommunitiesPreview } from '../user_dashboard/TrendingCommunitiesPreview/TrendingCommunitiesPreview';
 import ActiveContestList from './ActiveContestList/ActiveContestList';
