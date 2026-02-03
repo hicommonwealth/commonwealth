@@ -7,7 +7,6 @@ import commonLogo from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
 import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import useRerender from 'hooks/useRerender';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useCancelContestMutation from 'state/api/contests/cancelContest';
@@ -38,6 +37,7 @@ import { useFlag } from 'hooks/useFlag';
 import { smartTrim } from 'shared/utils';
 import { PrizeDisplay } from 'views/components/PrizeDisplay';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
+import useContestCardRerender from './useContestCardRerender';
 
 import './ContestCard.scss';
 
@@ -122,7 +122,7 @@ const ContestCard = ({
     },
   });
 
-  useRerender({ isActive, interval: 6000 });
+  useContestCardRerender({ isActive, interval: 6000 });
 
   const { isWindowMediumSmallInclusive } = useBrowserWindow({});
 

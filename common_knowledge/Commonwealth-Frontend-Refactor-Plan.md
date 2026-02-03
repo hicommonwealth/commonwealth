@@ -16,7 +16,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 1.2 Delete dead helper: momentUpdateLocale.ts (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13324 — remove unused momentUpdateLocale helper
 - [ ] 1.3 Delete confirmed zero-import components (batch 1)
 - [x] 1.4 Delete permanently-flagged legacy code (batch 2) (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13327 — remove newEditor flag + drop NewThreadFormModern path
-- [ ] 1.5 Consolidate useForceRerender + useRerender
+- [x] 1.5 Consolidate useForceRerender + useRerender (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13325 — keep hooks separate; move useRerender to ContestCard + rename to useContestCardRerender
 - [x] 1.6 Audit and clean dead model/store files (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13326 — remove unused SearchResult/PersistentStore/IdStore + move clearLocalStorage
 - [ ] 1.7 Remove Privy auth layer (revert to Magic-only flow)
 - [ ] 1.8 Remove React Native layer (mobile bridge + MobileAppRedirect)
