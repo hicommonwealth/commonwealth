@@ -9,16 +9,15 @@ This plan covers four deliverables:
 4. **Deeper architectural refactors** -- structural problems beyond file moves (global `app` singleton, code splitting, controllers/, legacy stores/models, CSS scoping, tRPC completion)
 
 ## Status
-
 Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in parentheses and PR URL: `(YYMMDD) PR https://github.com/org/repo/pull/NNNNN — summary`.
 
 ### EPIC-1: Dead Code Deletion
 - [x] 1.1 Delete dead internal dev-tool pages (260202) PR https://github.com/hicommonwealth/commonwealth/pull/13323 — remove internal markdown demo routes/pages + samples
-- [ ] 1.2 Delete dead helper: momentUpdateLocale.ts
+- [x] 1.2 Delete dead helper: momentUpdateLocale.ts (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13324 — remove unused momentUpdateLocale helper
 - [ ] 1.3 Delete confirmed zero-import components (batch 1)
 - [x] 1.4 Delete permanently-flagged legacy code (batch 2) (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13327 — remove newEditor flag + drop NewThreadFormModern path
 - [ ] 1.5 Consolidate useForceRerender + useRerender
-- [ ] 1.6 Audit and clean dead model/store files
+- [x] 1.6 Audit and clean dead model/store files (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13326 — remove unused SearchResult/PersistentStore/IdStore + move clearLocalStorage
 - [ ] 1.7 Remove Privy auth layer (revert to Magic-only flow)
 - [ ] 1.8 Remove React Native layer (mobile bridge + MobileAppRedirect)
 
