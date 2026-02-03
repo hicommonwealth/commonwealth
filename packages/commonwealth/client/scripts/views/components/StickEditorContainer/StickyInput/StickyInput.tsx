@@ -33,7 +33,7 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import {
   NewThreadForm,
   NewThreadFormHandles,
-} from 'views/components/NewThreadFormLegacy/NewThreadForm';
+} from 'views/components/NewThreadForm/NewThreadForm';
 import {
   createDeltaFromText,
   ReactQuillEditor,

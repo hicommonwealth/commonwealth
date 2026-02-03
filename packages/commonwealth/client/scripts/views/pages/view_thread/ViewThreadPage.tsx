@@ -48,8 +48,8 @@ import useUserStore, {
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
-import { ThreadTokenWidget } from 'views/components/NewThreadFormLegacy/ToketWidget';
-import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
+import { ThreadTokenWidget } from 'views/components/NewThreadForm/ToketWidget';
+import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
