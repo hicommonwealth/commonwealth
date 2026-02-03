@@ -13,12 +13,6 @@ body,
   display: flex;
 }
 
-// disable misc buttons on mobile for now.
-#mava,
-.ReactQueryDevtools * {
-  display: none;
-}
-
 .mdxeditor-container {
   outline: 1px solid colors.$neutral-200;
   border-radius: 4px;
