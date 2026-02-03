@@ -57,7 +57,7 @@ export function useMarketData(communityId: string) {
       status: 'all',
       sortOrder: 'newest',
     },
-    limit: 500, // Fetch more to get all categories
+    limit: 50, // Maximum allowed by schema - should be enough to get most categories
     enabled: !!communityId, // Only enable if we have a communityId
   });
 

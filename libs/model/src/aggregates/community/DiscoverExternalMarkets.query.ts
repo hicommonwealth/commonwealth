@@ -100,6 +100,7 @@ function applyFilters(
   markets: ExternalMarket[],
   search?: string,
   category?: string,
+  status?: string,
 ): ExternalMarket[] {
   let filtered = markets;
 
@@ -114,7 +115,51 @@ function applyFilters(
     filtered = filtered.filter((market) => market.category === category);
   }
 
+  if (status && status !== 'all') {
+    filtered = filtered.filter((market) => market.status === status);
+  }
+
   return filtered;
+}
+
+function sortMarkets(
+  markets: ExternalMarket[],
+  sortOrder: 'newest' | 'oldest' | 'ending-soon' | 'starting-soon' = 'newest',
+): ExternalMarket[] {
+  const sorted = [...markets];
+
+  switch (sortOrder) {
+    case 'newest':
+      return sorted.sort((a, b) => {
+        const aTime = a.startTime?.getTime() || 0;
+        const bTime = b.startTime?.getTime() || 0;
+        return bTime - aTime; // Descending (newest first)
+      });
+
+    case 'oldest':
+      return sorted.sort((a, b) => {
+        const aTime = a.startTime?.getTime() || 0;
+        const bTime = b.startTime?.getTime() || 0;
+        return aTime - bTime; // Ascending (oldest first)
+      });
+
+    case 'ending-soon':
+      return sorted.sort((a, b) => {
+        const aTime = a.endTime?.getTime() || Number.MAX_SAFE_INTEGER;
+        const bTime = b.endTime?.getTime() || Number.MAX_SAFE_INTEGER;
+        return aTime - bTime; // Ascending (ending soon first)
+      });
+
+    case 'starting-soon':
+      return sorted.sort((a, b) => {
+        const aTime = a.startTime?.getTime() || Number.MAX_SAFE_INTEGER;
+        const bTime = b.startTime?.getTime() || Number.MAX_SAFE_INTEGER;
+        return aTime - bTime; // Ascending (starting soon first)
+      });
+
+    default:
+      return sorted;
+  }
 }
 
 export function DiscoverExternalMarkets(): Query<
@@ -128,7 +173,15 @@ export function DiscoverExternalMarkets(): Query<
         throw new InvalidState('Markets feature is not enabled');
       }
 
-      const { provider, limit = 20, cursor = 1, search, category } = payload;
+      const {
+        provider,
+        limit = 20,
+        cursor = 1,
+        search,
+        category,
+        status = 'all',
+        sortOrder = 'newest',
+      } = payload;
 
       const fetchLimit = 500;
       let allMarkets: ExternalMarket[] = [];
@@ -143,10 +196,16 @@ export function DiscoverExternalMarkets(): Query<
         allMarkets = allMarkets.concat(kalshiMarkets);
       }
 
-      const filteredMarkets = applyFilters(allMarkets, search, category);
+      const filteredMarkets = applyFilters(
+        allMarkets,
+        search,
+        category,
+        status,
+      );
+      const sortedMarkets = sortMarkets(filteredMarkets, sortOrder);
 
       const offset = limit * (cursor - 1);
-      const paginatedMarkets = filteredMarkets.slice(offset, offset + limit);
+      const paginatedMarkets = sortedMarkets.slice(offset, offset + limit);
 
       return schemas.buildPaginatedResponse(
         paginatedMarkets,
