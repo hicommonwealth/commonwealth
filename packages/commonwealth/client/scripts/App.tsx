@@ -7,7 +7,6 @@ import React, { StrictMode } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
-import { DisableMavaOnMobile } from 'views/components/DisableMavaOnMobile';
 import ForceMobileAuth from 'views/components/ForceMobileAuth';
 import MoonPayProvider from 'views/components/MoonPayProvider';
 import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
@@ -26,7 +25,6 @@ const App = () => {
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
           <trpc.Provider client={trpcClient} queryClient={queryClient}>
-            <DisableMavaOnMobile />
             <ReactNativeLogForwarder />
             <FarcasterFrameProvider>
               {/*@ts-expect-error StrictNullChecks*/}
