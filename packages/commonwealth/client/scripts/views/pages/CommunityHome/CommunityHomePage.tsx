@@ -1,8 +1,4 @@
 import { ContentType } from '@hicommonwealth/shared';
-import app from 'client/scripts/state';
-import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
-import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
-import useUserStore from 'client/scripts/state/ui/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { findDenominationString } from 'helpers/findDenomination';
 import {
@@ -13,21 +9,25 @@ import {
 import { useFlag } from 'hooks/useFlag';
 import type { DeltaStatic } from 'quill';
 import React, { useRef, useState } from 'react';
+import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
 import useCreateThreadMutation, {
   buildCreateThreadInput,
 } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
+import useUserStore from 'state/ui/user';
+import { StickyInput } from 'views/components/StickEditorContainer';
+import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   createDeltaFromText,
   getTextFromDelta,
 } from 'views/components/react_quill_editor';
-import { StickyInput } from 'views/components/StickEditorContainer';
-import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import ActiveContestList from '../HomePage/ActiveContestList/ActiveContestList';
 import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';
 import XpQuestList from '../HomePage/XpQuestList/XpQuestList';
@@ -38,6 +38,7 @@ import TokenPerformance from './TokenPerformance/TokenPerformance';
 // eslint-disable-next-line max-len
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
+import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 
 const CommunityHome = () => {
   const user = useUserStore();
@@ -59,6 +60,8 @@ const CommunityHome = () => {
 
   const { mutateAsync: createThread, isPending: isCreatingThread } =
     useCreateThreadMutation({ communityId });
+
+  const { communityToken } = useTokenTradeWidget();
 
   const {
     setModeOfManageCommunityStakeModal,
@@ -159,7 +162,7 @@ const CommunityHome = () => {
             communityIdFilter={chain}
           />
           <ActiveContestList isCommunityHomePage />
-          <CommunityTransactions />
+          {communityToken && <CommunityTransactions />}
           {xpEnabled && <XpQuestList communityIdFilter={chain} />}
           <CWModal
             size="small"
