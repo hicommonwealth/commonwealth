@@ -12,7 +12,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 
 ### EPIC-1: Dead Code Deletion
 - [x] 1.1 Delete dead internal dev-tool pages (260202) PR https://github.com/hicommonwealth/commonwealth/pull/13323 — remove internal markdown demo routes/pages + samples
-- [ ] 1.2 Delete dead helper: momentUpdateLocale.ts
+- [x] 1.2 Delete dead helper: momentUpdateLocale.ts (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13324 — remove unused momentUpdateLocale helper
 - [ ] 1.3 Delete confirmed zero-import components (batch 1)
 - [ ] 1.4 Delete permanently-flagged legacy code (batch 2)
 - [ ] 1.5 Consolidate useForceRerender + useRerender
