@@ -17,9 +17,6 @@ const useContestCardRerender = ({
       return;
     }
 
-    // Trigger an immediate rerender, then continue on the interval.
-    forceRerender();
-
     const intervalId = setInterval(() => {
       forceRerender();
     }, interval);
