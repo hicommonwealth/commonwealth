@@ -20,6 +20,8 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 1.6 Audit and clean dead model/store files (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13326 — remove unused SearchResult/PersistentStore/IdStore + move clearLocalStorage
 - [ ] 1.7 Remove Privy auth layer (revert to Magic-only flow)
 - [ ] 1.8 Remove React Native layer (mobile bridge + MobileAppRedirect)
+- [ ] 1.9 Remove always-on feature flags and dead code
+- [ ] 1.10 Remove MDX editor (commonwealth-mdxeditor)
 
 ### EPIC-2: Shared Infrastructure
 - [ ] 2.1 Set up component test infrastructure
@@ -291,7 +293,7 @@ One smoke test per migrated feature page -- renders without crash with mock prov
 ### Epic Dependency Chain + Parallelism Summary
 
 ```
-EPIC-1: Dead Code Deletion ──────────────────── 8 tickets, ALL parallel (8 engineers)
+EPIC-1: Dead Code Deletion ──────────────────── 10 tickets, ALL parallel (10 engineers)
     |
     v
 EPIC-2: Shared Infrastructure ───────────────── 12 tickets, max 4 parallel lanes
@@ -309,7 +311,7 @@ EPIC-5: Enforce Boundaries ─────────────────�
 EPIC-6: Kill views/ + Final Cleanup ────────── 11 tickets, max 4 parallel lanes
 ```
 
-**Total: 60 tickets. Max theoretical parallelism: 8 engineers.**
+**Total: 62 tickets. Max theoretical parallelism: 10 engineers.**
 **Critical path (longest sequential chain): 1.x → 2.2 → 2.4 → 2.7 → 3.1 → 3.3 → 4.11 → 4.16 → 5.1 → 5.4 → 6.1 → 6.7 → 6.11**
 
 ---
@@ -318,7 +320,7 @@ EPIC-6: Kill views/ + Final Cleanup ────────── 11 tickets, m
 
 #### EPIC-1 DAG: Dead Code Deletion
 ```
-All 8 tickets run in parallel (no dependencies between them):
+All 10 tickets run in parallel (no dependencies between them):
 
      ┌── 1.1 (dead dev pages)
      ├── 1.2 (momentUpdateLocale)
@@ -327,9 +329,11 @@ START┼── 1.4 (permanently-flagged legacy) ⚠ needs product sign-off
      ├── 1.5 (consolidate useForceRerender)
      ├── 1.6 (dead models/stores)
      ├── 1.7 (remove Privy layer)
-     └── 1.8 (remove React Native layer)
+     ├── 1.8 (remove React Native layer)
+     ├── 1.9 (remove always-on feature flags + dead code)
+     └── 1.10 (remove MDX editor: commonwealth-mdxeditor)
 
-Parallelism: 8 lanes → 8 engineers can work simultaneously
+Parallelism: 10 lanes → 10 engineers can work simultaneously
 Sequential depth: 1 (one layer)
 ```
 
@@ -503,13 +507,13 @@ Sequential depth: 7 layers (6.1 → 6.2 → 6.3 → 6.7 → 6.8 → 6.9 → 6.11
 
 | Epic | Tickets | Max Parallel Lanes | Sequential Depth | Bottleneck |
 |------|---------|-------------------|-----------------|------------|
-| 1: Dead Code | 8 | **8** | 1 | Product sign-off on 1.4 |
+| 1: Dead Code | 10 | **10** | 1 | Product sign-off on 1.4 |
 | 2: Shared Infra | 12 | **4** | 4 | 2.2 (aliases) gates everything |
 | 3: Normalize | 8 | **6** | 2 | 3.1 (useCommunityContests) gates 3.3-3.5 |
 | 4: Feature Migration | 17 | **7** | 4 waves | 4.11 (Discussions) has most blockers |
 | 5: Boundaries | 4 | **1** | 4 | Sequential by nature |
 | 6: Kill views/ | 11 | **4** | 7 | 6.1 (component_kit, 8k LOC) |
-| **Total** | **60** | **8 peak** | -- | -- |
+| **Total** | **62** | **10 peak** | -- | -- |
 
 ### EPIC-1: Dead Code Deletion
 
@@ -563,12 +567,26 @@ EPIC-1: Dead Code Deletion
 │   blocked-by: product sign-off (confirm Magic-only auth)
 │   reviewer: frontend
 │
-└── 1.8: Remove React Native layer (mobile bridge + MobileAppRedirect) [PARALLEL]
-    files: hooks/mobile/useMobileRPCSender.ts, useMobileRPCEventReceiver.ts,
-           hooks/useReactNativeWebView.ts, MobileAppRedirect page + routes
-    remove: RN WebView postMessage bridge + isMobileApp() detection
-    ~500-1200 LOC delete
-    blocked-by: product sign-off (mobile app sunset)
+├── 1.8: Remove React Native layer (mobile bridge + MobileAppRedirect) [PARALLEL]
+│   files: hooks/mobile/useMobileRPCSender.ts, useMobileRPCEventReceiver.ts,
+│          hooks/useReactNativeWebView.ts, MobileAppRedirect page + routes
+│   remove: RN WebView postMessage bridge + isMobileApp() detection
+│   ~500-1200 LOC delete
+│   blocked-by: product sign-off (mobile app sunset)
+│   reviewer: frontend
+│
+├── 1.9: Remove always-on feature flags and dead code [PARALLEL]
+│   files: grep for always-on flags + guarded branches; delete unused toggles
+│   remove: flag definitions + dead branches
+│   ~LOC delete: TBD (audit)
+│   blocked-by: TBD (confirm always-on flags)
+│   reviewer: frontend
+│
+└── 1.10: Remove MDX editor (commonwealth-mdxeditor) [PARALLEL]
+    files: grep for commonwealth-mdxeditor references + editor wiring
+    remove: package dependency + integration points
+    ~LOC delete: TBD (audit)
+    blocked-by: TBD (confirm removal/replacement)
     reviewer: frontend
 ```
 
