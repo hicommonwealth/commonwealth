@@ -10,10 +10,10 @@ This plan covers four deliverables:
 
 ## Status (as of 260202)
 
-Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in parentheses: `(YYMMDD)`.
+Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in parentheses and PR URL: `(YYMMDD) PR https://github.com/org/repo/pull/NNNNN — summary`.
 
 ### EPIC-1: Dead Code Deletion
-- [ ] 1.1 Delete dead internal dev-tool pages
+- [x] 1.1 Delete dead internal dev-tool pages (260202) PR https://github.com/hicommonwealth/commonwealth/pull/13323 — remove internal markdown demo routes/pages + samples
 - [ ] 1.2 Delete dead helper: momentUpdateLocale.ts
 - [ ] 1.3 Delete confirmed zero-import components (batch 1)
 - [ ] 1.4 Delete permanently-flagged legacy code (batch 2)
@@ -85,6 +85,10 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [ ] 6.11 Final circular dependency audit + cleanup
 
 ---
+
+## PR Log (append-only)
+
+- 260202 PR https://github.com/hicommonwealth/commonwealth/pull/13323 — 1.1 Delete dead internal dev-tool pages (remove markdown demo routes/pages + samples)
 
 ## 1. Hooks/Utils Extraction Spec
 
