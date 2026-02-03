@@ -15,7 +15,7 @@ import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/ind
 import { useFetchGlobalActivityQuery } from '../../../state/api/feeds/fetchUserActivity';
 import { trpc } from '../../../utils/trpcClient';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal';
 import XPTable from '../Leaderboard/XPTable/XPTable';
 import AllTabContent from './AllTabContent';
 import CommunitiesList from './CommunitiesList';

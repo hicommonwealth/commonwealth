@@ -27,7 +27,7 @@ import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
+import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal';
 import ActiveContestList from '../HomePage/ActiveContestList/ActiveContestList';
 import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';
 import XpQuestList from '../HomePage/XpQuestList/XpQuestList';
