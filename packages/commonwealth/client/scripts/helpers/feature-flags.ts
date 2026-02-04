@@ -37,7 +37,6 @@ const featureFlags = {
   judgeContest: buildFlag(process.env.FLAG_JUDGE_CONTEST),
   trustLevel: buildFlag(process.env.FLAG_TRUST_LEVEL),
   tokenizedThreads: buildFlag(process.env.FLAG_TOKENIZED_THREADS),
-  partnershipWallet: buildFlag(process.env.FLAG_PARTNERSHIP_WALLET),
   newProfilePage: buildFlag(process.env.FLAG_NEW_PROFILE_PAGE),
   privateTopics: buildFlag(process.env.FLAG_PRIVATE_TOPICS),
   crecimientoHackathon: buildFlag(process.env.FLAG_CRECIMIENTO_HACKATHON),

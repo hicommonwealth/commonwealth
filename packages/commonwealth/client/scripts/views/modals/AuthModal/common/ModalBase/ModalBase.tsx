@@ -107,7 +107,6 @@ const ModalBase = ({
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
 
-  const partnershipWalletEnabled = useFlag('partnershipWallet');
   const gateWalletEnabled = useFlag('gateWallet');
   const binanceWebEnabled = useFlag('binanceWeb');
   const crecimientoHackathonEnabled = useFlag('crecimientoHackathon');
@@ -212,14 +211,11 @@ const ModalBase = ({
       configEvmWallets.push('gate');
     }
 
-    // Add partnership wallets if enabled
-    if (partnershipWalletEnabled) {
-      if (isOkxWalletAvailable) {
-        configEvmWallets.push('okx');
-      }
-      if (isBinanceWalletAvailable) {
-        configEvmWallets.push('binance');
-      }
+    if (isOkxWalletAvailable) {
+      configEvmWallets.push('okx');
+    }
+    if (isBinanceWalletAvailable) {
+      configEvmWallets.push('binance');
     }
 
     // Add Binance wallet if feature flag is enabled (and not already added)
@@ -236,15 +232,10 @@ const ModalBase = ({
     // Add other EVM wallets (excluding ones already handled above)
     evmWallets.forEach((wallet) => {
       if (!configEvmWallets.includes(wallet)) {
-        // Skip OKX wallet if partnership flag is not enabled
-        if (wallet === 'okx' && !partnershipWalletEnabled) {
-          return;
-        }
-        // Skip Binance wallet (Chrome extension) if neither partnership nor binanceWeb flag is enabled
+        // Skip Binance wallet (Chrome extension) if binanceWeb flag is disabled
         // App browser version (window.ethereum.isBinance) is always available
         if (
           wallet === 'binance' &&
-          !partnershipWalletEnabled &&
           !binanceWebEnabled &&
           !(typeof window !== 'undefined' && window?.ethereum?.isBinance)
         ) {

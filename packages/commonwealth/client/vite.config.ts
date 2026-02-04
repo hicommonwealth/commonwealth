@@ -46,9 +46,6 @@ export default defineConfig(({ mode }) => {
       env.FLAG_TOKENIZED_THREADS,
     ),
     'process.env.FLAG_TRUST_LEVEL': JSON.stringify(env.FLAG_TRUST_LEVEL),
-    'process.env.FLAG_PARTNERSHIP_WALLET': JSON.stringify(
-      env.FLAG_PARTNERSHIP_WALLET,
-    ),
     'process.env.FLAG_NEW_PROFILE_PAGE': JSON.stringify(
       env.FLAG_NEW_PROFILE_PAGE,
     ),
