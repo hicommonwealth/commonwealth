@@ -15,6 +15,7 @@ import { models } from '@hicommonwealth/model/db';
 import { config } from 'server/config';
 import { rascalConsumerMap } from './rascalConsumerMap';
 import { relayForever } from './relayForever';
+import { isShutdownInProgress, registerWorker } from './workerLifecycle';
 
 const log = logger(import.meta);
 
@@ -76,7 +77,7 @@ export async function bootstrapBindings(options?: {
 export async function bootstrapRelayer(
   maxRelayIterations?: number,
 ): Promise<void> {
-  setInterval(() => {
+  const statsInterval = setInterval(() => {
     // Report Outbox stats once per minute
     models.Outbox.count({
       where: { relayed: false },
@@ -89,11 +90,20 @@ export async function bootstrapRelayer(
       });
   }, 60_000);
 
+  // Register cleanup for the stats interval
+  registerWorker('message-relayer-stats', () => {
+    clearInterval(statsInterval);
+  });
+
+  // Note: relayForever checks isShutdownInProgress() and will stop on its own
   relayForever(maxRelayIterations).catch((err) => {
-    log.fatal(
-      'Unknown fatal error requires immediate attention. Restart REQUIRED!',
-      err,
-    );
+    // Only log fatal if not during shutdown
+    if (!isShutdownInProgress()) {
+      log.fatal(
+        'Unknown fatal error requires immediate attention. Restart REQUIRED!',
+        err,
+      );
+    }
   });
 }
 
@@ -101,6 +111,7 @@ export function bootstrapContestRolloverLoop() {
   log.info('Starting rollover loop');
 
   const loop = async () => {
+    if (isShutdownInProgress()) return;
     try {
       await handleEvent(ContestWorker(), {
         id: 0,
@@ -113,7 +124,12 @@ export function bootstrapContestRolloverLoop() {
   };
 
   // TODO: move to external service triggered via scheduler?
-  setInterval(() => {
+  const rolloverInterval = setInterval(() => {
     loop().catch(console.error);
   }, 1_000 * 60);
+
+  registerWorker('contest-rollover-loop', () => {
+    clearInterval(rolloverInterval);
+    log.info('Contest rollover loop stopped');
+  });
 }

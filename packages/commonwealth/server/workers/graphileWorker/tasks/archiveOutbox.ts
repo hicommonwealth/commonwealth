@@ -1,14 +1,17 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
 import { config } from '@hicommonwealth/model';
 import { TaskPayloads } from '@hicommonwealth/model/services';
-import { execSync } from 'child_process';
+import { exec } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
 import { QueryTypes } from 'sequelize';
+import { promisify } from 'util';
 import { createGzip } from 'zlib';
+
+const execAsync = promisify(exec);
 
 const log = logger(import.meta);
 
-function dumpTablesSync(table: string, outputFile: string): boolean {
+async function dumpTable(table: string, outputFile: string): Promise<boolean> {
   const databaseUrl = config.DB.URI;
 
   if (!databaseUrl) {
@@ -19,8 +22,7 @@ function dumpTablesSync(table: string, outputFile: string): boolean {
   const cmd = `PGSSLMODE=allow pg_dump -t ${table} -f ${outputFile} -d ${databaseUrl}`;
 
   try {
-    // execSync returns stdout as Buffer by default, convert it to string if needed
-    execSync(cmd).toString();
+    await execAsync(cmd);
     return true;
   } catch (error) {
     log.error(`Failed to dump Outbox child partition table`, error, {
@@ -148,7 +150,7 @@ const archiveOutbox = async () => {
     const compressedName = getCompressedDumpName(dumpName);
 
     log.info(`Dumping table`, { table });
-    const res = dumpTablesSync(table, dumpName);
+    const res = await dumpTable(table, dumpName);
     if (!res) continue;
     log.info(`Dump complete`, { dumpName });
 
