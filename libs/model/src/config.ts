@@ -109,7 +109,6 @@ const {
   MAGNA_BATCH_SIZE,
   SLACK_WEBHOOK_URL_ALL_ENG,
   SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
-  FLAG_CLAIMS,
   FLAG_MARKETS,
 } = process.env;
 
@@ -368,9 +367,6 @@ export const config = configure(
         ALL_ENG: SLACK_WEBHOOK_URL_ALL_ENG,
         MAGNA_NOTIFS: SLACK_WEBHOOK_URL_MAGNA_NOTIFS,
       },
-    },
-    CLAIMS: {
-      ENABLED: FLAG_CLAIMS === 'true',
     },
     MARKETS: {
       ENABLED: FLAG_MARKETS === 'true',
@@ -793,9 +789,6 @@ export const config = configure(
         ALL_ENG: z.string().optional(),
         MAGNA_NOTIFS: z.string().optional(),
       }),
-    }),
-    CLAIMS: z.object({
-      ENABLED: z.boolean(),
     }),
     MARKETS: z.object({
       ENABLED: z.boolean(),

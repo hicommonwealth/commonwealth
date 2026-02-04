@@ -1,8 +1,7 @@
-import { InvalidState, type Query } from '@hicommonwealth/core';
+import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
-import { config } from '../../config';
 import { models } from '../../database';
 
 export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
@@ -11,8 +10,6 @@ export function GetClaimAddress(): Query<typeof schemas.GetClaimAddress> {
     auth: [],
     secure: true,
     body: async ({ actor }) => {
-      if (!config.CLAIMS?.ENABLED) throw new InvalidState('Claims not enabled');
-
       const claimAddress = await models.sequelize.query<
         z.infer<typeof schemas.ClaimAddressView>
       >(

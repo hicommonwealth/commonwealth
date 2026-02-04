@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
 import { useGetLaunchpadTradesQuery } from 'state/api/tokens';
 import {
   useGetUserReferralFeesQuery,
@@ -22,7 +21,6 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import { AuthModal } from '../../modals/AuthModal';
-import { PageNotFound } from '../404';
 import './WalletPage.scss';
 import { QuestSummaryCard, ReferralCard, WalletCard } from './cards';
 import AirdropClaims from './components/AirdropClaims/AirdropClaims';
@@ -41,7 +39,6 @@ type GetLaunchpadTradesOutput = z.infer<typeof GetLaunchpadTrades.output>;
 
 const WalletPage = () => {
   const user = useUserStore();
-  const claimsEnabled = useFlag('claims');
   const navigate = useCommonNavigate();
 
   const [mobileTab, setMobileTab] = useState<MobileTabType>(getInitialTab());
@@ -90,18 +87,13 @@ const WalletPage = () => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
 
   if (!user.isLoggedIn) {
-    if (claimsEnabled) {
-      return (
-        <CWPageLayout className="WalletPageLayout">
-          <section className="WalletPage">
-            <AirdropClaims
-              onConnectNewAddress={() => setIsAuthModalOpen(true)}
-            />
-          </section>
-        </CWPageLayout>
-      );
-    }
-    return <PageNotFound />;
+    return (
+      <CWPageLayout className="WalletPageLayout">
+        <section className="WalletPage">
+          <AirdropClaims onConnectNewAddress={() => setIsAuthModalOpen(true)} />
+        </section>
+      </CWPageLayout>
+    );
   }
 
   return (
