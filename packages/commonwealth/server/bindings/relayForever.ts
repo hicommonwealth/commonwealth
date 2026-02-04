@@ -2,6 +2,7 @@ import { broker, logger } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model/db';
 import { config } from '../config';
 import { relay } from './relay';
+import { isShutdownInProgress } from './workerLifecycle';
 
 const INITIAL_ERROR_TIMEOUT = 2_000;
 
@@ -11,7 +12,7 @@ export async function relayForever(maxIterations?: number) {
   const brokerInstance = broker();
   let iteration = 0;
   let errorTimeout = INITIAL_ERROR_TIMEOUT;
-  while (true) {
+  while (!isShutdownInProgress()) {
     if (typeof maxIterations === 'number' && iteration >= maxIterations) {
       break;
     }
@@ -49,4 +50,6 @@ export async function relayForever(maxIterations?: number) {
       iteration += 1;
     }
   }
+
+  log.info('Message relayer stopped');
 }
