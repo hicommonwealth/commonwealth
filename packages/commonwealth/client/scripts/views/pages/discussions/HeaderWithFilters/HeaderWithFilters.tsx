@@ -345,51 +345,108 @@ export const HeaderWithFilters = ({
             Weighted by
           </CWText>
           <div className="token-info-stack">
-            {selectedTopic.token_symbol ? (
-              <span className="token-symbol">{selectedTopic.token_symbol}</span>
-            ) : (
-              <span className="token-symbol">
-                {getTokenSymbolFallback(selectedTopic.weighted_voting)}
-              </span>
-            )}
-            {selectedTopic.token_address && (
-              <div className="token-address-button-container">
-                <CWIconButton
-                  iconName="infoEmpty"
-                  iconSize="small"
-                  onClick={tokenAddressPopover.handleInteraction}
-                  className="token-info-button"
-                />
-                <CWPopover
-                  title={
-                    selectedTopic.weighted_voting ===
-                      TopicWeightedVoting.SuiToken ||
-                    selectedTopic.weighted_voting === TopicWeightedVoting.SuiNFT
-                      ? 'Object Type'
-                      : 'Token Address'
-                  }
-                  body={
-                    <div className="token-address-popover-content">
-                      <div className="token-address-text">
-                        {selectedTopic.token_address}
+            {/* Primary token */}
+            <div className="token-entry">
+              {selectedTopic.token_symbol ? (
+                <span className="token-symbol">
+                  {selectedTopic.token_symbol}
+                </span>
+              ) : (
+                <span className="token-symbol">
+                  {getTokenSymbolFallback(selectedTopic.weighted_voting)}
+                </span>
+              )}
+              {/* Secondary tokens */}
+              {selectedTopic.secondary_tokens &&
+                selectedTopic.secondary_tokens.length > 0 &&
+                selectedTopic.secondary_tokens.map((token, idx) => (
+                  <div key={idx} className="token-entry">
+                    <span className="token-symbol">
+                      + {token.token_symbol || token?.token_address}
+                    </span>
+                  </div>
+                ))}
+              {selectedTopic?.token_address && (
+                <div className="token-address-button-container">
+                  <CWIconButton
+                    iconName="infoEmpty"
+                    iconSize="small"
+                    onClick={tokenAddressPopover.handleInteraction}
+                    className="token-info-button"
+                  />
+                  <CWPopover
+                    title={
+                      selectedTopic.weighted_voting ===
+                        TopicWeightedVoting.SuiToken ||
+                      selectedTopic.weighted_voting ===
+                        TopicWeightedVoting.SuiNFT
+                        ? 'Object Types'
+                        : 'Token Addresses'
+                    }
+                    body={
+                      <div className="token-addresses-popover-container">
+                        {/* Primary token address */}
+                        <div className="token-address-popover-content">
+                          <div className="token-address-section">
+                            {selectedTopic.token_symbol && (
+                              <div className="token-label">
+                                {selectedTopic.token_symbol}
+                              </div>
+                            )}
+                            <div className="token-address-text">
+                              {selectedTopic.token_address}
+                            </div>
+                          </div>
+                          <CWIconButton
+                            iconName="copy"
+                            iconSize="small"
+                            onClick={() => {
+                              saveToClipboard(
+                                selectedTopic.token_address!,
+                                true,
+                              ).catch(console.error);
+                            }}
+                            className="copy-button"
+                          />
+                        </div>
+                        {/* Secondary token addresses */}
+                        {selectedTopic.secondary_tokens &&
+                          selectedTopic.secondary_tokens.length > 0 &&
+                          selectedTopic.secondary_tokens.map((token, idx) => (
+                            <div
+                              key={idx}
+                              className="token-address-popover-content"
+                            >
+                              <div className="token-address-section">
+                                {token.token_symbol && (
+                                  <div className="token-label">
+                                    {token.token_symbol}
+                                  </div>
+                                )}
+                                <div className="token-address-text">
+                                  {token?.token_address}
+                                </div>
+                              </div>
+                              <CWIconButton
+                                iconName="copy"
+                                iconSize="small"
+                                onClick={() => {
+                                  saveToClipboard(
+                                    token?.token_address,
+                                    true,
+                                  ).catch(console.error);
+                                }}
+                                className="copy-button"
+                              />
+                            </div>
+                          ))}
                       </div>
-                      <CWIconButton
-                        iconName="copy"
-                        iconSize="small"
-                        onClick={() => {
-                          saveToClipboard(
-                            selectedTopic.token_address!,
-                            true,
-                          ).catch(console.error);
-                        }}
-                        className="copy-button"
-                      />
-                    </div>
-                  }
-                  {...tokenAddressPopover}
-                />
-              </div>
-            )}
+                    }
+                    {...tokenAddressPopover}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

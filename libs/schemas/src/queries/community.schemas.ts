@@ -15,6 +15,8 @@ import {
   ContestManager,
   ExtendedCommunity,
   Group,
+  Market,
+  Markets,
   Membership,
   MembershipRejectReason,
   PinnedTokenWithPrices,
@@ -456,4 +458,50 @@ export const GetNamespaceMetadata = {
 export const GetByDomain = {
   input: z.object({ custom_domain: z.string() }),
   output: z.object({ community_id: z.string().optional() }),
+};
+
+export const MarketView = Market.extend({
+  created_at: z.coerce.date().or(z.string()),
+  updated_at: z.coerce.date().or(z.string()),
+});
+
+export const GetMarkets = {
+  input: PaginationParamsSchema.extend({
+    community_id: z.string(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(MarketView),
+  }),
+};
+
+export const ExternalMarket = z.object({
+  id: z.string(),
+  provider: z.enum(Markets),
+  slug: z.string(),
+  question: z.string(),
+  category: z.string(),
+  status: z.string(),
+  startTime: z.coerce.date().nullable(),
+  endTime: z.coerce.date().nullable(),
+  imageUrl: z.string().optional(),
+  subTitle: z.string().optional(),
+});
+
+export const DiscoverExternalMarkets = {
+  input: PaginationParamsSchema.extend({
+    provider: z.enum([...Markets, 'all']),
+    search: z.string().optional(),
+    category: z.string().optional(),
+    status: z
+      .enum(['open', 'closed', 'settled', 'all'])
+      .optional()
+      .default('all'),
+    sortOrder: z
+      .enum(['newest', 'oldest', 'ending-soon', 'starting-soon'])
+      .optional()
+      .default('newest'),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(ExternalMarket),
+  }),
 };

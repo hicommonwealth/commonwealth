@@ -126,11 +126,15 @@ export const TokenTradeWidget = ({
               />
             </CWText>
           </div>
-          <CWText type="h3" fontWeight="bold" className="pad-8">
+          <CWText
+            type="h3"
+            fontWeight="bold"
+            className="token-symbol-price pad-8"
+          >
             <CWText type="h3" fontWeight="bold">
               {communityToken.symbol}
             </CWText>
-            <CWText type="h3" fontWeight="bold" className="ml-auto">
+            <CWText type="h3" fontWeight="bold">
               {currencySymbol}
               <FractionalValue
                 value={

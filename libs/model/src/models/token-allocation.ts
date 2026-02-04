@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 import { ModelInstance } from './types';
 
 export type HistoricalAllocation = {
@@ -106,9 +106,89 @@ export const AuraAllocations = (
     },
   );
 
+type ClaimEvent = {
+  id: string;
+  description: string;
+  contract_id: string;
+  contract_address: string;
+  token: string;
+  token_id: string;
+  token_address: string;
+  unlock_schedule_id: string;
+  unlock_start_at: Date;
+  initial_percentage: number;
+  cliff_date: Date;
+  end_registration_date: Date;
+};
+export const ClaimEvents = (
+  sequelize: Sequelize.Sequelize,
+): Sequelize.ModelStatic<ModelInstance<ClaimEvent>> =>
+  sequelize.define<ModelInstance<ClaimEvent>>(
+    'ClaimEvents',
+    {
+      id: {
+        type: Sequelize.STRING,
+        primaryKey: true,
+      },
+      description: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      contract_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      contract_address: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      token: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      token_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      token_address: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      unlock_schedule_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      unlock_start_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      initial_percentage: {
+        type: Sequelize.DECIMAL,
+        allowNull: false,
+      },
+      cliff_date: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      end_registration_date: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+    },
+    {
+      timestamps: false,
+      underscored: true,
+      tableName: 'ClaimEvents',
+    },
+  );
+
 type ClaimAddress = {
+  event_id: string;
   user_id: number;
   address: string | null;
+  aura: number;
+  historic: number;
+  nft: number;
   magna_allocation_id: string | null;
   magna_synced_at: Date | null;
   magna_claimed_at: Date | null;
@@ -130,6 +210,10 @@ export const ClaimAddresses = (
   sequelize.define<ModelInstance<ClaimAddress>>(
     'ClaimAddresses',
     {
+      event_id: {
+        type: Sequelize.STRING,
+        primaryKey: true,
+      },
       user_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -137,6 +221,18 @@ export const ClaimAddresses = (
       address: {
         type: Sequelize.STRING,
         allowNull: true,
+      },
+      aura: {
+        type: Sequelize.DECIMAL,
+        allowNull: false,
+      },
+      historic: {
+        type: Sequelize.DECIMAL,
+        allowNull: false,
+      },
+      nft: {
+        type: Sequelize.DECIMAL,
+        allowNull: false,
       },
       magna_allocation_id: {
         type: Sequelize.STRING,
@@ -199,6 +295,14 @@ export const ClaimAddresses = (
       timestamps: true,
       underscored: true,
       tableName: 'ClaimAddresses',
+      indexes: [
+        {
+          name: 'claimaddresses_address_unique',
+          unique: true,
+          fields: ['event_id', 'address'],
+          where: { address: { [Op.ne]: null } },
+        },
+      ],
     },
   );
 

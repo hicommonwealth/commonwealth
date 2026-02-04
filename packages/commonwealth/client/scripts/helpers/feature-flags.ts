@@ -23,7 +23,6 @@ const buildFlag = (env: string | undefined) => {
 // vite.config.ts (locally) or in Unleash (remote apps) or they won't be passed to the frontend.
 const featureFlags = {
   contestDev: buildFlag(process.env.FLAG_CONTEST_DEV),
-  newEditor: buildFlag(process.env.FLAG_NEW_EDITOR),
   launchpad: buildFlag(process.env.FLAG_LAUNCHPAD),
   newContestPage: buildFlag(process.env.FLAG_NEW_CONTEST_PAGE),
   referrals: buildFlag(process.env.FLAG_REFERRALS),
@@ -47,8 +46,10 @@ const featureFlags = {
   mcpGoogleSheets: buildFlag(process.env.FLAG_MCP_GOOGLE_SHEETS),
   mcpIntegrationsEnabled: buildFlag(process.env.FLAG_MCP_INTEGRATIONS_ENABLED),
   gateWallet: buildFlag(process.env.FLAG_GATE_WALLET),
+  binanceWeb: buildFlag(process.env.FLAG_BINANCE_WEB),
   moonpayFunds: buildFlag(process.env.FLAG_MOONPAY_FUNDS),
   claims: buildFlag(process.env.FLAG_CLAIMS),
+  markets: buildFlag(process.env.FLAG_MARKETS),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

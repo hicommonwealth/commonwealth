@@ -1,4 +1,8 @@
-import { ActionGroups, GatedActionEnum } from '@hicommonwealth/shared';
+import {
+  ActionGroups,
+  GatedActionEnum,
+  isValidImageUrl,
+} from '@hicommonwealth/shared';
 import { useShowImage } from 'client/scripts/hooks/useShowImage';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
@@ -296,7 +300,7 @@ export const ThreadCard = ({
                   cutoffLines={cutoffLines}
                 />
               )}
-              {threadImage && (
+              {threadImage && isValidImageUrl(threadImage) && (
                 <div className="card-image-container">
                   <img src={threadImage} alt="Thread content" />
                 </div>
@@ -397,7 +401,10 @@ export const ThreadCard = ({
       thread?.recentComments?.length > 0 ? (
         <div className={clsx('RecentComments', { hideReactionButton })}>
           {[...(thread?.recentComments || [])]
-            ?.filter((recentComment) => !recentComment.deleted)
+            ?.filter(
+              (recentComment) =>
+                !recentComment.deleted && !recentComment.markedAsSpamAt,
+            )
             ?.slice?.(0, maxRecentCommentsToDisplay)
             ?.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
             ?.map((recentComment) => (

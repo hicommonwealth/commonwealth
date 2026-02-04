@@ -249,4 +249,14 @@ export const trpcRouter = trpc.router({
     Community.RefreshWeightedVotes,
     trpc.Tag.Community,
   ),
+  subscribeMarket: trpc.command(Community.SubscribeMarket, trpc.Tag.Community),
+  unsubscribeMarket: trpc.command(
+    Community.UnsubscribeMarket,
+    trpc.Tag.Community,
+  ),
+  getMarkets: trpc.query(Community.GetMarkets, trpc.Tag.Community),
+  discoverExternalMarkets: trpc.query(
+    Community.DiscoverExternalMarkets,
+    trpc.Tag.Community,
+  ),
 });

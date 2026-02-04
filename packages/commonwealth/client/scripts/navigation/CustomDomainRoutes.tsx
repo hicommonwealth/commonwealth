@@ -85,6 +85,7 @@ const CommunityOnchainVerificationIntegration = lazy(
   () =>
     import('views/pages/CommunityManagement/OnchainVerificationIntegration'),
 );
+const MarketsAppPage = lazy(() => import('views/pages/MarketsAppPage'));
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -124,7 +125,7 @@ const newProposalViewPage = lazy(
   () => import('../views/pages/NewProposalViewPage'),
 );
 
-const CustomDomainRoutes = () => {
+const CustomDomainRoutes = (marketsEnabled: boolean) => {
   return [
     <Route
       key="/"
@@ -399,6 +400,17 @@ const CustomDomainRoutes = () => {
         scoped: true,
       })}
     />,
+    ...(marketsEnabled
+      ? [
+          <Route
+            key="/markets-app"
+            path="/markets-app"
+            element={withLayout(MarketsAppPage, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : []),
     <Route
       key="/manage/integrations/token"
       path="/manage/integrations/token"

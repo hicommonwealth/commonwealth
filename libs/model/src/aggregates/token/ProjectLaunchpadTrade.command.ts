@@ -29,9 +29,32 @@ export function ProjectLaunchpadTrade(): Command<
 
       const output: z.infer<(typeof schemas.ProjectLaunchpadTrade)['output']> =
         {};
-
       const token_address = token_address_unformatted.toLowerCase();
       const chainNode = await chainNodeMustExist(eth_chain_id);
+
+      const token = await models.LaunchpadToken.findOne({
+        where: { token_address },
+        attributes: ['namespace'],
+      });
+      if (!token) return output; // ignore if token not found
+
+      const community = await models.Community.findOne({
+        where: { namespace: token.namespace },
+        attributes: ['id'],
+      });
+      const user_addr = await models.Address.scope('withPrivateData').findOne({
+        where: {
+          address: trader_address,
+          user_id: { [Op.not]: null },
+        },
+        attributes: [
+          'user_id',
+          'role',
+          'ghost_address',
+          'is_banned',
+          'verification_token',
+        ],
+      });
 
       await models.sequelize.transaction(async (transaction) => {
         await models.LaunchpadTrade.findOrCreate({
@@ -53,45 +76,26 @@ export function ProjectLaunchpadTrade(): Command<
         });
 
         // auto-join community after trades
-        const token = await models.LaunchpadToken.findOne({
-          where: { token_address },
-          attributes: ['namespace'],
-        });
-        if (token) {
-          const community = await models.Community.findOne({
-            where: { namespace: token.namespace },
-            attributes: ['id'],
+        if (community && user_addr) {
+          output.community_id = community.id;
+          await models.Address.findOrCreate({
+            where: {
+              community_id: community.id,
+              address: trader_address,
+            },
+            defaults: {
+              community_id: community.id,
+              address: trader_address,
+              user_id: user_addr.user_id,
+              role: user_addr.role ?? 'member',
+              ghost_address: user_addr.ghost_address ?? false,
+              is_banned: user_addr.is_banned ?? false,
+              verification_token: user_addr.verification_token,
+            },
+            transaction,
           });
-          if (community) {
-            output.community_id = community.id;
-            // find user_id from address
-            const address = await models.Address.findOne({
-              where: {
-                address: trader_address,
-                user_id: { [Op.not]: null },
-              },
-            });
-            if (address) {
-              await models.Address.findOrCreate({
-                where: {
-                  community_id: community.id,
-                  address: trader_address,
-                  user_id: address.user_id,
-                },
-                defaults: {
-                  community_id: community.id,
-                  address: trader_address,
-                  user_id: address.user_id,
-                  role: address.role ?? 'member',
-                  ghost_address: address.ghost_address ?? false,
-                  is_banned: address.is_banned ?? false,
-                  verification_token: address.verification_token,
-                },
-                transaction,
-              });
-            }
-          }
         }
+
         await setUserTier({
           userAddress: trader_address,
           newTier: UserTierMap.ChainVerified,

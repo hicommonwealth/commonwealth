@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import { uuidv4 } from 'lib/util';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -22,12 +23,14 @@ import './RequirementSubForm.scss';
 import { GroupTrustLevelOptions } from './helpers';
 
 const RequirementSubForm = ({
+  formIndex,
   errors,
   defaultValues = {},
   onRemove = () => null,
   isRemoveable = true,
   onChange = () => null,
 }: RequirementSubFormType) => {
+  const [instanceId] = useState(() => uuidv4());
   const [requirementType, setRequirementType] = useState('');
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
   const is1155Requirement = requirementType === ERC_SPECIFICATIONS.ERC_1155;
@@ -109,7 +112,7 @@ const RequirementSubForm = ({
     <div className="RequirementSubForm">
       <div className="row-1">
         <CWSelectList
-          key={defaultValues?.requirementType?.value}
+          key={`${defaultValues?.requirementType?.value}-formIndex-${formIndex}`}
           name="requirementType"
           label="Requirement type"
           placeholder="Requirement type"
@@ -141,7 +144,7 @@ const RequirementSubForm = ({
       {requirementType &&
         (!isTrustLevelRequirement ? (
           <div
-            key={defaultValues?.requirementType?.value}
+            key={`${defaultValues?.requirementType?.value}-formIndex-${formIndex}`}
             className={getClasses<{
               'cols-3'?: boolean;
               'cols-4'?: boolean;
@@ -160,7 +163,7 @@ const RequirementSubForm = ({
             })}
           >
             <CWSelectList
-              key={defaultValues?.requirementChain?.value}
+              key={`${defaultValues?.requirementChain?.value}-formIndex-${formIndex}`}
               name="requirementChain"
               label="Chain"
               placeholder="Chain"
@@ -197,7 +200,7 @@ const RequirementSubForm = ({
               !isSuiTokenRequirement &&
               !isSuiNftRequirement && (
                 <CWTextInput
-                  key={defaultValues.requirementContractAddress}
+                  key={`${defaultValues.requirementContractAddress}-formIndex-${formIndex}`}
                   name="requirementContractAddress"
                   label="Contract Address"
                   placeholder="Input contract address"
@@ -217,7 +220,7 @@ const RequirementSubForm = ({
               )}
             {isSuiTokenRequirement && (
               <CWTextInput
-                key={defaultValues.requirementCoinType}
+                key={`${defaultValues.requirementCoinType}-formIndex-${formIndex}`}
                 name="requirementCoinType"
                 label="Coin Type"
                 placeholder="e.g. 0x2::sui::SUI"
@@ -236,7 +239,7 @@ const RequirementSubForm = ({
               />
             )}
             <CWSelectList
-              key={defaultValues?.requirementCondition?.value}
+              key={`${defaultValues?.requirementCondition?.value}-formIndex-${formIndex}`}
               name="requirementCondition"
               label="Condition"
               placeholder="Condition"
@@ -261,7 +264,7 @@ const RequirementSubForm = ({
               // ---
             />
             <CWTextInput
-              key={defaultValues.requirementAmount}
+              key={`${defaultValues.requirementAmount}-formIndex-${formIndex}-${instanceId}`}
               name="requirementAmount"
               alignLabelToRight
               label="Amount"
@@ -280,7 +283,7 @@ const RequirementSubForm = ({
             />
             {is1155Requirement && (
               <CWTextInput
-                key={defaultValues.requirementTokenId}
+                key={`${defaultValues.requirementTokenId}-formIndex-${formIndex}`}
                 name="requirementTokenId"
                 label="ID"
                 placeholder="ID"
@@ -298,7 +301,7 @@ const RequirementSubForm = ({
             )}
             {isSuiNftRequirement && (
               <CWTextInput
-                key={defaultValues.requirementContractAddress}
+                key={`${defaultValues.requirementContractAddress}-formIndex-${formIndex}`}
                 name="requirementContractAddress"
                 label="Collection ID"
                 placeholder="e.g. 0x123...::nft_collection::NFT"
@@ -318,9 +321,12 @@ const RequirementSubForm = ({
             )}
           </div>
         ) : (
-          <div className="rows-1" key={defaultValues?.requirementType?.value}>
+          <div
+            className="rows-1"
+            key={`${defaultValues?.requirementType?.value}-formIndex-${formIndex}`}
+          >
             <CWSelectList
-              key={defaultValues?.requirementTrustLevel?.value}
+              key={`${defaultValues?.requirementTrustLevel?.value}-formIndex-${formIndex}`}
               name="requirementTrustLevel"
               label="Trust level"
               placeholder="Trust level"

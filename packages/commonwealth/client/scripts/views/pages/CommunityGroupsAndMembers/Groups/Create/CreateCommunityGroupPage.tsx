@@ -23,9 +23,10 @@ const CreateCommunityGroupPage = () => {
   const { setShouldShowGroupMutationBannerForCommunity } =
     useGroupMutationBannerStore();
   const communityId = app.activeChainId() || '';
-  const { mutateAsync: createGroup } = useCreateGroupMutation({
-    communityId,
-  });
+  const { mutateAsync: createGroup, isPending: isCreatingGroup } =
+    useCreateGroupMutation({
+      communityId,
+    });
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -62,6 +63,7 @@ const CreateCommunityGroupPage = () => {
           notifyError('Failed to create group');
         }
       }}
+      isSubmitting={isCreatingGroup}
       allowedAddresses={allowedAddresses}
       setAllowedAddresses={setAllowedAddresses}
     />

@@ -109,6 +109,7 @@ const ModalBase = ({
 
   const partnershipWalletEnabled = useFlag('partnershipWallet');
   const gateWalletEnabled = useFlag('gateWallet');
+  const binanceWebEnabled = useFlag('binanceWeb');
   const crecimientoHackathonEnabled = useFlag('crecimientoHackathon');
 
   const [isSMSAllowed, setIsSMSAllowed] = useState(false);
@@ -221,13 +222,31 @@ const ModalBase = ({
       }
     }
 
+    // Add Binance wallet if feature flag is enabled (and not already added)
+    // This applies to Chrome extension version (window.binancew3w.ethereum)
+    // App browser version (window.ethereum.isBinance) doesn't need feature flag
+    if (
+      isBinanceWalletAvailable &&
+      binanceWebEnabled &&
+      !configEvmWallets.includes('binance')
+    ) {
+      configEvmWallets.push('binance');
+    }
+
     // Add other EVM wallets (excluding ones already handled above)
     evmWallets.forEach((wallet) => {
       if (!configEvmWallets.includes(wallet)) {
-        // Skip partnership wallets if not enabled
+        // Skip OKX wallet if partnership flag is not enabled
+        if (wallet === 'okx' && !partnershipWalletEnabled) {
+          return;
+        }
+        // Skip Binance wallet (Chrome extension) if neither partnership nor binanceWeb flag is enabled
+        // App browser version (window.ethereum.isBinance) is always available
         if (
-          (wallet === 'okx' || wallet === 'binance') &&
-          !partnershipWalletEnabled
+          wallet === 'binance' &&
+          !partnershipWalletEnabled &&
+          !binanceWebEnabled &&
+          !(typeof window !== 'undefined' && window?.ethereum?.isBinance)
         ) {
           return;
         }
@@ -337,7 +356,12 @@ const ModalBase = ({
 
       return 0;
     });
-  }, [showAuthOptionTypesFor, showAuthOptionFor, shouldShowSSOOptions, ssoOptions]);
+  }, [
+    showAuthOptionTypesFor,
+    showAuthOptionFor,
+    shouldShowSSOOptions,
+    ssoOptions,
+  ]);
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {

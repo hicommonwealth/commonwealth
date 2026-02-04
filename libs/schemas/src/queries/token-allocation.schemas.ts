@@ -13,14 +13,17 @@ export const AllocationStatus = [
 ] as const;
 
 export const ClaimAddressView = z.object({
+  event_id: z.string(),
   user_id: PG_INT,
   address: EVM_ADDRESS_STRICT.nullish(),
   token: z.string(),
   token_address: EVM_ADDRESS_STRICT.nullish(),
+  contract_address: EVM_ADDRESS_STRICT.nullish(),
   description: z.string(),
   initial_percentage: z.number(),
   unlock_start_at: z.date().or(z.string()).nullish(),
   cliff_date: z.date().or(z.string()).nullish(),
+  end_registration_date: z.date().or(z.string()).nullish(),
   tokens: z.coerce.number().nullish(),
   magna_allocation_id: z.string().nullish(),
   magna_synced_at: z
@@ -56,7 +59,7 @@ export const ClaimAddressView = z.object({
 
 export const GetClaimAddress = {
   input: z.void(),
-  output: ClaimAddressView.nullish(),
+  output: ClaimAddressView.array().nullish(),
 };
 
 export const GetAllocation = {
@@ -65,11 +68,6 @@ export const GetAllocation = {
     .object({
       magna_allocation_id: z.uuid(),
       walletAddress: EVM_ADDRESS_STRICT,
-      tokenAddress: EVM_ADDRESS_STRICT,
-      token: z.string(),
-      description: z.string(),
-      initial_percentage: z.number(),
-      cliff_date: z.date(),
       status: z.enum(AllocationStatus),
       amount: z.number(),
       funded: z.number(),

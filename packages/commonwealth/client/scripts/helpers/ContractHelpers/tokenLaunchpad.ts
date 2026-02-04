@@ -59,6 +59,7 @@ class TokenLaunchpad extends ContractBase {
     initPurchaseAmount: number,
     authorAddress: string,
     communityTreasuryAddress: string,
+    connectorWeight = 830000,
   ) {
     try {
       if (!this.initialized || !this.walletEnabled) {
@@ -73,7 +74,7 @@ class TokenLaunchpad extends ContractBase {
         [authorAddress, communityTreasuryAddress],
         this.web3.utils.toWei('1000000000', 'ether'), // Default 1B tokens
         walletAddress,
-        830000,
+        connectorWeight,
         threadId,
         exchangeToken,
         initPurchaseAmount,

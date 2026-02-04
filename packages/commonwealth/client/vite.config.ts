@@ -27,7 +27,6 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_MOBILE_DOWNLOAD': JSON.stringify(
       env.FLAG_MOBILE_DOWNLOAD,
     ),
-    'process.env.FLAG_NEW_EDITOR': JSON.stringify(env.FLAG_NEW_EDITOR),
     'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
     'process.env.FLAG_LAUNCHPAD': JSON.stringify(env.FLAG_LAUNCHPAD),
     'process.env.FLAG_NEW_CONTEST_PAGE': JSON.stringify(
@@ -68,8 +67,10 @@ export default defineConfig(({ mode }) => {
       env.FLAG_MCP_INTEGRATIONS_ENABLED,
     ),
     'process.env.FLAG_GATE_WALLET': JSON.stringify(env.FLAG_GATE_WALLET),
+    'process.env.FLAG_BINANCE_WEB': JSON.stringify(env.FLAG_BINANCE_WEB),
     'process.env.FLAG_MOONPAY_FUNDS': JSON.stringify(env.FLAG_MOONPAY_FUNDS),
     'process.env.FLAG_CLAIMS': JSON.stringify(env.FLAG_CLAIMS),
+    'process.env.FLAG_MARKETS': JSON.stringify(env.FLAG_MARKETS),
   };
 
   return {

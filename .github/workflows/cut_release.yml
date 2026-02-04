@@ -21,7 +21,7 @@ jobs:
         run: |
           git fetch origin beta production
           # returns nonzero if there are commits in beta not in production
-          if git log --oneline origin/production..origin/beta | grep .; then
+          if git log --oneline origin/beta..origin/master | grep .; then
             echo "ahead=true" >> $GITHUB_OUTPUT
           else
             echo "ahead=false" >> $GITHUB_OUTPUT

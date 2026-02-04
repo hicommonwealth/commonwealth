@@ -1,0 +1,36 @@
+@use '../../../styles/mixins/media_queries';
+
+.market-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+
+  @include media_queries.smallInclusive {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.markets-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 32px;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  .empty-state-title {
+    margin-bottom: 12px;
+    color: #495057;
+    font-size: 24px;
+  }
+
+  .empty-state-description {
+    color: #6c757d;
+    max-width: 400px;
+    line-height: 1.6;
+  }
+}

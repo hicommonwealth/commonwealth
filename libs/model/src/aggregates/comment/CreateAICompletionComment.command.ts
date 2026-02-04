@@ -8,11 +8,8 @@ import { JoinCommunity } from '../community';
 import { CreateComment } from './CreateComment.command';
 
 export const CreateAICompletionCommentErrors = {
-  TokenNotFound: 'AI completion token not found',
   TokenExpired: 'AI completion token has expired',
   TokenAlreadyUsed: 'AI completion token has already been used',
-  BotUserNotFound: 'AI bot user not found',
-  BotAddressNotFound: 'Bot user address not found in community',
 };
 
 export function CreateAICompletionComment(): Command<
@@ -26,23 +23,24 @@ export function CreateAICompletionComment(): Command<
 
       // Find the token in the database
       const completionToken = await models.AICompletionToken.findOne({
-        where: { token, used_at: null },
+        where: { token },
       });
+      mustExist('AI Completion Token', completionToken);
 
-      if (!completionToken) {
-        throw new InvalidState(CreateAICompletionCommentErrors.TokenNotFound);
+      if (completionToken.used_at) {
+        throw new InvalidState(
+          CreateAICompletionCommentErrors.TokenAlreadyUsed,
+        );
       }
 
-      // Check if token has expired
       if (new Date() > completionToken.expires_at) {
         throw new InvalidState(CreateAICompletionCommentErrors.TokenExpired);
       }
 
       // Get the bot user with address
-      const { user: botUser, address: botUserAddress } = await getBotUser();
-      if (!botUser) {
-        throw new InvalidState(CreateAICompletionCommentErrors.BotUserNotFound);
-      }
+      const botUserData = await getBotUser();
+      mustExist('Bot User', botUserData);
+      const { user: botUser, address: botUserAddress } = botUserData;
 
       // Find the bot user's address in the specific community
       let botAddress = await models.Address.findOne({
@@ -66,84 +64,34 @@ export function CreateAICompletionComment(): Command<
         });
 
         // Fetch the newly created address
-        const newBotAddress = await models.Address.findOne({
+        botAddress = await models.Address.findOne({
           where: {
             user_id: botUser.id,
             community_id: completionToken.community_id,
           },
         });
-
-        if (!newBotAddress) {
-          throw new InvalidState(
-            CreateAICompletionCommentErrors.BotAddressNotFound,
-          );
-        }
-
-        botAddress = newBotAddress;
+        mustExist('Bot Address', botAddress);
       }
 
-      // Get the thread to use as context
-      const thread = await models.Thread.findByPk(completionToken.thread_id);
-      mustExist('Thread', thread);
-
-      // Create a system actor for the bot user
-      const mockActor = systemActor({
-        address: botAddress.address,
-        id: botUser.id!,
-        email: botUser.email || 'ai-bot@common.xyz',
-      });
-
-      // Create a proper context that matches ThreadContext structure
-      const mockContext = {
-        thread_id: completionToken.thread_id,
-        address: {
+      // Create comment as bot user
+      const result = await command(CreateComment(), {
+        actor: {
+          user: {
+            id: botUser.id!,
+            email: botUser.email!,
+          },
           address: botAddress.address,
-          community_id: completionToken.community_id,
-          ghost_address: botAddress.ghost_address || false,
-          role: botAddress.role || ('member' as const),
-          is_banned: botAddress.is_banned || false,
-          id: botAddress.id!,
-          user_id: botUser.id!,
-          created_at: botAddress.created_at,
-          updated_at: botAddress.updated_at,
-          last_active: botAddress.last_active,
-          verification_token: botAddress.verification_token,
-          verified: botAddress.verified,
-          verification_token_expires: botAddress.verification_token_expires,
-          block_info: botAddress.block_info,
-          hex: botAddress.hex,
-          wallet_id: botAddress.wallet_id,
-          oauth_provider: botAddress.oauth_provider,
-          oauth_email: botAddress.oauth_email,
-          oauth_email_verified: botAddress.oauth_email_verified,
-          oauth_username: botAddress.oauth_username,
-          oauth_phone_number: botAddress.oauth_phone_number,
-          oauth_user_id: botAddress.oauth_user_id,
         },
-        community_id: completionToken.community_id,
-        is_author: false,
-        is_collaborator: false,
-        thread,
-      };
-
-      // Prepare the comment payload for CreateComment
-      const commentPayload = {
-        thread_id: completionToken.thread_id,
-        parent_id: completionToken.parent_comment_id || undefined,
-        body: completionToken.content,
-      };
-
-      // Use the existing CreateComment command
-      const createCommentCommand = CreateComment();
-      const result = await createCommentCommand.body({
-        actor: mockActor,
-        payload: commentPayload,
-        context: mockContext,
+        payload: {
+          thread_id: completionToken.thread_id,
+          parent_id: completionToken.parent_comment_id!,
+          body: completionToken.content,
+        },
       });
 
-      // Mark the token as used after successful comment creation
+      // Mark the token as used and store the comment_id after successful comment creation
       await models.AICompletionToken.update(
-        { used_at: new Date() },
+        { used_at: new Date(), comment_id: result.id },
         { where: { id: completionToken.id } },
       );
 

@@ -4,7 +4,7 @@ import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import React, { Dispatch, SetStateAction } from 'react';
-import { prettyVoteWeight } from 'shared/adapters/currency';
+import { prettyCompoundVoteWeight } from 'shared/adapters/currency';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
@@ -195,13 +195,17 @@ export const ViewUpvotesDrawer = ({
                     Total
                   </CWText>
                   <CWText type="b2">
-                    {prettyVoteWeight(
-                      getVoteWeightTotal(reactorData).toString(),
-                      tokenDecimals,
+                    {prettyCompoundVoteWeight(
+                      [
+                        {
+                          wei: getVoteWeightTotal(reactorData).toString(),
+                          tokenNumDecimals: tokenDecimals,
+                          multiplier: 1,
+                          tokenSymbol: tokenSymbol,
+                        },
+                      ],
                       topicWeight,
-                      1,
                       6,
-                      tokenSymbol,
                     )}
                   </CWText>
                 </div>

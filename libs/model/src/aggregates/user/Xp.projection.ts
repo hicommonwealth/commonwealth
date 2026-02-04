@@ -272,7 +272,7 @@ async function recordXpsForQuest({
       xp_awarded = xp_awarded + :total_reward,
       end_date = CASE 
           WHEN (xp_awarded + :total_reward) >= max_xp_to_end
-          THEN NOW()
+          THEN :event_created_at
           ELSE end_date
         END
     WHERE id = :quest_id

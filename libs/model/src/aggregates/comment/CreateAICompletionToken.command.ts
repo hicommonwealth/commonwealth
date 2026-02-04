@@ -1,77 +1,62 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../../database';
+import {
+  authThread,
+  mustBeAuthorizedThread,
+  mustExist,
+} from '../../middleware';
 
-export const CreateAICompletionTokenErrors = {
-  ThreadNotFound: 'Thread not found',
-  CommunityNotFound: 'Community not found',
-  ParentCommentNotFound: 'Parent comment not found',
-  UserNotFound: 'User not found',
-};
+const DEFAULT_TOKEN_EXPIRATION_MINUTES = 60; // 1 hour
 
 export function CreateAICompletionToken(): Command<
   typeof schemas.CreateAICompletionToken
 > {
   return {
     ...schemas.CreateAICompletionToken,
-    auth: [], // Handled at the endpoint level where this is called
-    body: async ({ payload }) => {
-      const {
-        user_id,
-        community_id,
-        thread_id,
-        parent_comment_id,
-        content,
-        expires_in_minutes,
-      } = payload;
+    auth: [authThread({})],
+    secure: true,
+    body: async ({ actor, payload, context }) => {
+      const { thread, community_id } = mustBeAuthorizedThread(actor, context);
 
-      // Verify user exists
-      const user = await models.User.findByPk(user_id);
-      if (!user) {
-        throw new InvalidState(CreateAICompletionTokenErrors.UserNotFound);
-      }
+      const { parent_comment_id, content } = payload;
 
-      // Verify thread exists and belongs to the community
-      const thread = await models.Thread.findOne({
-        where: {
-          id: thread_id,
-          community_id: community_id,
-        },
-      });
-      if (!thread) {
-        throw new InvalidState(CreateAICompletionTokenErrors.ThreadNotFound);
-      }
-
-      // Verify community exists
-      const community = await models.Community.findByPk(community_id);
-      if (!community) {
-        throw new InvalidState(CreateAICompletionTokenErrors.CommunityNotFound);
-      }
-
-      // Verify parent comment exists if specified
+      // Verify parent comment exists and was created by requester if specified
+      let parentComment = null;
       if (parent_comment_id) {
-        const parentComment = await models.Comment.findOne({
+        parentComment = await models.Comment.findOne({
           where: {
             id: parent_comment_id,
-            thread_id: thread_id,
+            thread_id: thread.id,
           },
+          include: [
+            {
+              model: models.Address,
+              required: true,
+            },
+          ],
         });
-        if (!parentComment) {
+        mustExist('Parent Comment', parentComment);
+
+        // Ensure the parent comment was created by the requesting user
+        if (parentComment.Address!.user_id !== actor.user.id) {
           throw new InvalidState(
-            CreateAICompletionTokenErrors.ParentCommentNotFound,
+            'Parent comment must be created by the requesting user',
           );
         }
       }
 
-      // Calculate expiration time
+      // Calculate expiration time (server-controlled)
       const expires_at = new Date();
-      expires_at.setMinutes(expires_at.getMinutes() + expires_in_minutes);
+      expires_at.setMinutes(
+        expires_at.getMinutes() + DEFAULT_TOKEN_EXPIRATION_MINUTES,
+      );
 
       // Create the token
       const tokenRecord = await models.AICompletionToken.create({
-        user_id,
+        user_id: actor.user.id!,
         community_id,
-        thread_id,
+        thread_id: thread.id!,
         parent_comment_id,
         content,
         expires_at,

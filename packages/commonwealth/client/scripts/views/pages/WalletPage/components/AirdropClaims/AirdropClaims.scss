@@ -1,0 +1,85 @@
+@use '../../../../../styles/shared';
+@use '../../../../../styles/mixins/colors.module';
+@use '../../../../../styles/mixins/media_queries';
+
+.AirdropClaims {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: colors.$white;
+  --color-needs-action: #99251f;
+  --color-in-progress: #1f5699;
+  --color-completed: #008000;
+  border: 1px solid colors.$neutral-200;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .general-notice {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    border: 1px solid var(--color-in-progress);
+    border-radius: 8px;
+  }
+
+  .no-allocation-notice {
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    .no-allocation-title {
+      font-size: 18px;
+      margin-bottom: 12px;
+      color: colors.$neutral-900;
+    }
+
+    .no-allocation-description {
+      font-size: 14px;
+      color: colors.$neutral-700;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .no-allocation-encouragement {
+      font-size: 14px;
+      color: colors.$neutral-600;
+      line-height: 1.6;
+      font-style: italic;
+    }
+  }
+
+  // Override CWBanner styles for better layout
+  .CWBanner {
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+
+    // Hide the type icon (checkmark/warning icon)
+    .type-icon-container {
+      display: none;
+    }
+
+    .content-container {
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 !important;
+      background: transparent;
+
+      > div:first-child {
+        text-align: center;
+        width: 100%;
+      }
+    }
+  }
+}
