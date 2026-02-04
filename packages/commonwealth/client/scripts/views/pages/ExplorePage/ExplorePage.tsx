@@ -1,4 +1,5 @@
 import { findDenominationString } from 'helpers/findDenomination';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -20,12 +21,14 @@ import CommunitiesList from './CommunitiesList';
 import ExploreContestList from './ExploreContestList';
 import './ExplorePage.scss';
 import IdeaLaunchpad from './IdeaLaunchpad';
+import MarketsList from './MarketsList';
 import QuestList from './QuestList';
 import { ThreadFeed } from './ThreadFeed/ThreadFeed';
 import TokensList from './TokensList';
 
 const ExplorePage = () => {
   const containerRef = useRef();
+  const marketsEnabled = useFlag('markets');
   const navigate = useCommonNavigate();
   const [searchParams] = useSearchParams();
   const [searchText, setSearchText] = useState<string>('');
@@ -39,6 +42,7 @@ const ExplorePage = () => {
     { value: 'threads', label: 'Threads' },
     { value: 'quests', label: 'Quests' },
     { value: 'tokens', label: 'Tokens' },
+    ...(marketsEnabled ? [{ value: 'markets', label: 'Markets' }] : []),
   ];
 
   // Add state for tracking active tab
@@ -146,6 +150,13 @@ const ExplorePage = () => {
               onClearSearch={() => setSearchText('')}
             />
           </div>
+        )}
+        {marketsEnabled && activeTab === 'markets' && (
+          <MarketsList
+            hideHeader
+            searchText={searchText}
+            onClearSearch={() => setSearchText('')}
+          />
         )}
 
         {/* All tab - show all content types */}

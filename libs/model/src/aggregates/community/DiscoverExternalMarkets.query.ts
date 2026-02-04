@@ -69,10 +69,21 @@ async function fetchPolymarketEvents(limit: number): Promise<ExternalMarket[]> {
 
 async function fetchKalshiEvents(limit: number): Promise<ExternalMarket[]> {
   const url = new URL(KALSHI_API_URL);
-  url.searchParams.append('limit', String(limit));
-  url.searchParams.append('status', 'open');
 
-  const response = await fetch(url.toString());
+  // Kalshi API default limit is 100, max is typically 100
+  // Use cursor-based pagination if we need more than 100 items
+  const kalshiLimit = Math.min(limit, 100);
+  if (kalshiLimit > 0 && kalshiLimit < 100) {
+    // Only add limit if it's less than default (100) to avoid potential issues
+    url.searchParams.append('limit', String(kalshiLimit));
+  }
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      Accept: 'application/json',
+    },
+  });
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new InvalidState(
@@ -82,7 +93,13 @@ async function fetchKalshiEvents(limit: number): Promise<ExternalMarket[]> {
 
   const data: KalshiEventsResponse = await response.json();
 
-  return data.events.map((event) => ({
+  // Filter for open events client-side if API doesn't support status parameter
+  const events = data.events || [];
+  const openEvents = events.filter(
+    (event) => !event.status || event.status === 'open',
+  );
+
+  return openEvents.slice(0, limit).map((event) => ({
     id: event.event_ticker,
     provider: 'kalshi' as const,
     slug: event.event_ticker,
@@ -100,6 +117,7 @@ function applyFilters(
   markets: ExternalMarket[],
   search?: string,
   category?: string,
+  status?: string,
 ): ExternalMarket[] {
   let filtered = markets;
 
@@ -114,7 +132,51 @@ function applyFilters(
     filtered = filtered.filter((market) => market.category === category);
   }
 
+  if (status && status !== 'all') {
+    filtered = filtered.filter((market) => market.status === status);
+  }
+
   return filtered;
+}
+
+function sortMarkets(
+  markets: ExternalMarket[],
+  sortOrder: 'newest' | 'oldest' | 'ending-soon' | 'starting-soon' = 'newest',
+): ExternalMarket[] {
+  const sorted = [...markets];
+
+  switch (sortOrder) {
+    case 'newest':
+      return sorted.sort((a, b) => {
+        const aTime = a.startTime?.getTime() || 0;
+        const bTime = b.startTime?.getTime() || 0;
+        return bTime - aTime; // Descending (newest first)
+      });
+
+    case 'oldest':
+      return sorted.sort((a, b) => {
+        const aTime = a.startTime?.getTime() || 0;
+        const bTime = b.startTime?.getTime() || 0;
+        return aTime - bTime; // Ascending (oldest first)
+      });
+
+    case 'ending-soon':
+      return sorted.sort((a, b) => {
+        const aTime = a.endTime?.getTime() || Number.MAX_SAFE_INTEGER;
+        const bTime = b.endTime?.getTime() || Number.MAX_SAFE_INTEGER;
+        return aTime - bTime; // Ascending (ending soon first)
+      });
+
+    case 'starting-soon':
+      return sorted.sort((a, b) => {
+        const aTime = a.startTime?.getTime() || Number.MAX_SAFE_INTEGER;
+        const bTime = b.startTime?.getTime() || Number.MAX_SAFE_INTEGER;
+        return aTime - bTime; // Ascending (starting soon first)
+      });
+
+    default:
+      return sorted;
+  }
 }
 
 export function DiscoverExternalMarkets(): Query<
@@ -128,24 +190,48 @@ export function DiscoverExternalMarkets(): Query<
         throw new InvalidState('Markets feature is not enabled');
       }
 
-      const { provider, limit = 200, search, category } = payload;
+      const {
+        provider,
+        limit = 20,
+        cursor = 1,
+        search,
+        category,
+        status = 'all',
+        sortOrder = 'newest',
+      } = payload;
 
-      let markets: ExternalMarket[] = [];
+      const fetchLimit = 500;
+      let allMarkets: ExternalMarket[] = [];
 
       if (provider === 'polymarket' || provider === 'all') {
-        const polymarketMarkets = await fetchPolymarketEvents(limit);
-        markets = markets.concat(polymarketMarkets);
+        const polymarketMarkets = await fetchPolymarketEvents(fetchLimit);
+        allMarkets = allMarkets.concat(polymarketMarkets);
       }
 
       if (provider === 'kalshi' || provider === 'all') {
-        const kalshiMarkets = await fetchKalshiEvents(limit);
-        markets = markets.concat(kalshiMarkets);
+        const kalshiMarkets = await fetchKalshiEvents(fetchLimit);
+        allMarkets = allMarkets.concat(kalshiMarkets);
       }
 
-      // Apply filters server-side
-      markets = applyFilters(markets, search, category);
+      const filteredMarkets = applyFilters(
+        allMarkets,
+        search,
+        category,
+        status,
+      );
+      const sortedMarkets = sortMarkets(filteredMarkets, sortOrder);
 
-      return markets;
+      const offset = limit * (cursor - 1);
+      const paginatedMarkets = sortedMarkets.slice(offset, offset + limit);
+
+      return schemas.buildPaginatedResponse(
+        paginatedMarkets,
+        filteredMarkets.length,
+        {
+          limit,
+          cursor,
+        },
+      );
     },
   };
 }

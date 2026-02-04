@@ -1,3 +1,4 @@
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { MutableRefObject } from 'react';
 import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
@@ -7,6 +8,7 @@ import TrendingThreadList from '../../HomePage/TrendingThreadList/TrendingThread
 import XPTable from '../../Leaderboard/XPTable/XPTable';
 import { TrendingCommunitiesPreview } from '../../user_dashboard/TrendingCommunitiesPreview';
 import ExploreContestList from '../ExploreContestList';
+import MarketsList from '../MarketsList';
 import QuestList from '../QuestList';
 import TokensList from '../TokensList';
 import './AllTabContent.scss';
@@ -22,6 +24,7 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
   searchText,
   onClearSearch,
 }) => {
+  const marketsEnabled = useFlag('markets');
   const navigate = useCommonNavigate();
 
   return (
@@ -77,6 +80,24 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
           />
         </div>
       </div>
+
+      {/* Markets section */}
+      {marketsEnabled && (
+        <div className="section-container">
+          <CWSectionHeader
+            title="Markets"
+            seeAllText="See all markets"
+            onSeeAllClick={() => navigate('/explore?tab=markets')}
+          />
+          <MarketsList
+            hideHeader
+            hideFilters
+            hideSearchTag
+            searchText={searchText}
+            onClearSearch={onClearSearch}
+          />
+        </div>
+      )}
 
       {/* Contests section */}
       <div className="section-container">
