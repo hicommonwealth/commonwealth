@@ -4,6 +4,7 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
+import { formatSequelizePagination } from '../../utils/paginationUtils';
 
 export function GetMarkets(): Query<typeof schemas.GetMarkets> {
   return {
@@ -14,7 +15,31 @@ export function GetMarkets(): Query<typeof schemas.GetMarkets> {
         throw new InvalidState('Markets feature is not enabled');
       }
 
-      const { community_id } = payload;
+      const { community_id, limit = 20, cursor = 1 } = payload;
+
+      const countResult = await models.sequelize.query<{ count: string }>(
+        `
+        SELECT COUNT(*) as count
+        FROM 
+          "CommunityMarkets" cm
+          JOIN "Markets" m ON cm.market_id = m.id
+        WHERE 
+          cm.community_id = :community_id
+      `,
+        {
+          replacements: { community_id },
+          type: QueryTypes.SELECT,
+        },
+      );
+
+      const totalResults = parseInt(countResult[0]?.count || '0', 10);
+
+      const pagination = formatSequelizePagination({
+        limit,
+        cursor,
+        order_by: 'm.created_at',
+        order_direction: 'DESC',
+      });
 
       const markets = await models.sequelize.query<
         z.infer<typeof schemas.MarketView>
@@ -37,14 +62,23 @@ export function GetMarkets(): Query<typeof schemas.GetMarkets> {
           JOIN "Markets" m ON cm.market_id = m.id
         WHERE 
           cm.community_id = :community_id
+        ORDER BY m.created_at DESC
+        LIMIT :limit OFFSET :offset
       `,
         {
-          replacements: { community_id },
+          replacements: {
+            community_id,
+            limit: pagination.limit,
+            offset: pagination.offset,
+          },
           type: QueryTypes.SELECT,
         },
       );
 
-      return markets;
+      return schemas.buildPaginatedResponse(markets, totalResults, {
+        limit,
+        cursor,
+      });
     },
   };
 }

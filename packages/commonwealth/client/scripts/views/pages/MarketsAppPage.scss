@@ -31,6 +31,11 @@
     }
   }
 
+  .markets-tabs {
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+
   .markets-empty-state {
     display: flex;
     flex-direction: column;
@@ -64,5 +69,12 @@
       grid-template-columns: 1fr;
       gap: 16px;
     }
+  }
+
+  .load-more-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 24px 0;
   }
 }

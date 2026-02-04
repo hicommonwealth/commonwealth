@@ -14,10 +14,20 @@ export interface Market {
   subTitle?: string; // Kalshi uses 'sub_title' for date info like "Before 2099"
 }
 
+export type MarketStatus = 'open' | 'closed' | 'settled' | 'all';
+
+export type MarketSortOrder =
+  | 'newest'
+  | 'oldest'
+  | 'ending-soon'
+  | 'starting-soon';
+
 export interface MarketFilters {
   search: string;
   provider: MarketProvider | 'all';
   category: string | 'all';
+  status: MarketStatus;
+  sortOrder: MarketSortOrder;
 }
 
 /**

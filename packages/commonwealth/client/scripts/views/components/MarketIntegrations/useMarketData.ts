@@ -8,31 +8,77 @@ export function useMarketData(communityId: string) {
     search: '',
     provider: 'all',
     category: 'all',
+    status: 'all',
+    sortOrder: 'newest',
   });
 
   const trpcUtils = trpc.useUtils();
 
-  // Fetch markets already saved to the community
-  const { data: savedMarkets, isLoading: isLoadingSaved } =
-    trpc.community.getMarkets.useQuery({
-      community_id: communityId,
-    });
+  const { data: savedMarketsData, isLoading: isLoadingSaved } =
+    trpc.community.getMarkets.useInfiniteQuery(
+      {
+        community_id: communityId,
+        limit: 50, // Fetch more to check subscriptions
+      },
+      {
+        enabled: !!communityId,
+        initialCursor: 1,
+        getNextPageParam: (lastPage) => {
+          const nextPageNum = lastPage.page + 1;
+          if (nextPageNum <= lastPage.totalPages) {
+            return nextPageNum;
+          }
+          return undefined;
+        },
+      },
+    );
 
-  // Fetch discovered markets from external APIs via backend proxy
-  const { data: discoveredMarkets, isLoading: isLoadingDiscovered } =
-    useDiscoverExternalMarketsQuery({
-      filters,
-    });
+  const savedMarkets = savedMarketsData?.pages.flatMap((page) => page.results);
+
+  const {
+    data: discoveredMarkets,
+    isLoading: isLoadingDiscovered,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useDiscoverExternalMarketsQuery({
+    filters,
+    limit: 20, // Use consistent pagination
+  });
+
+  // Fetch all categories from an unfiltered query (completely independent of current filters)
+  // This ensures all categories remain visible in the dropdown even when filters are applied
+  // We use a separate query key by always using 'all' for category and status, and empty search
+  const { data: allMarketsForCategories } = useDiscoverExternalMarketsQuery({
+    filters: {
+      search: '',
+      provider: filters.provider,
+      category: 'all',
+      status: 'all',
+      sortOrder: 'newest',
+    },
+    limit: 50, // Maximum allowed by schema - should be enough to get most categories
+    enabled: !!communityId, // Only enable if we have a communityId
+  });
 
   const categories = useMemo(() => {
-    const allCategories = (discoveredMarkets || []).map(
-      (market) => market.category,
-    );
-    return ['all', ...Array.from(new Set(allCategories))];
-  }, [discoveredMarkets]);
+    // Always use the unfiltered categories query - never fall back to filtered discoveredMarkets
+    // This ensures categories don't disappear when a category filter is applied
+    // If allMarketsForCategories hasn't loaded yet, return empty array (will show 'all' only)
+    if (!allMarketsForCategories || allMarketsForCategories.length === 0) {
+      return ['all'];
+    }
+
+    const allCategories = allMarketsForCategories
+      .map((market) => market.category)
+      .filter((cat) => cat && cat.trim() !== ''); // Filter out empty/null categories
+
+    const uniqueCategories = Array.from(new Set(allCategories)).sort();
+    return ['all', ...uniqueCategories];
+  }, [allMarketsForCategories]); // Only depend on allMarketsForCategories, not discoveredMarkets
 
   const savedMarketIds = useMemo(() => {
-    return savedMarkets
+    return savedMarkets && savedMarkets.length > 0
       ? new Set<string>(savedMarkets.map((m) => m.slug))
       : new Set<string>();
   }, [savedMarkets]);
@@ -85,5 +131,8 @@ export function useMarketData(communityId: string) {
     onSubscribe,
     onUnsubscribe,
     isSaving: isSubscribing || isUnsubscribing,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
   };
 }
