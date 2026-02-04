@@ -1,5 +1,4 @@
 import { WalletId } from '@hicommonwealth/shared';
-import { useFlag } from 'hooks/useFlag';
 import React, { useEffect, useState } from 'react';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useGetEthereumBalanceQuery } from 'state/api/tokens';
@@ -22,7 +21,6 @@ const MagicWalletManager = ({
   userSelectedAddress,
   selectedNetworkChainId,
 }: MagicWalletManagerProps) => {
-  const moonpayFundsEnabled = useFlag('moonpayFunds');
   const user = useUserStore();
   const [isFundsModalOpen, setIsFundsModalOpen] = useState(false);
 
@@ -74,10 +72,7 @@ const MagicWalletManager = ({
         )}
       </CWText>
       <CWText type="caption" isCentered>
-        {moonpayFundsEnabled
-          ? `Deposit, and manage funds for your magic wallet via Magic and
-            Moonpay.`
-          : `Manage funds for your Magic wallet.`}
+        Deposit, and manage funds for your magic wallet via Magic and Moonpay.
       </CWText>
       <CWButton
         iconLeft="walletNew"

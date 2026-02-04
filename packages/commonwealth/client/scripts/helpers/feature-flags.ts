@@ -43,7 +43,6 @@ const featureFlags = {
   mcpGoogleSheets: buildFlag(process.env.FLAG_MCP_GOOGLE_SHEETS),
   mcpIntegrationsEnabled: buildFlag(process.env.FLAG_MCP_INTEGRATIONS_ENABLED),
   binanceWeb: buildFlag(process.env.FLAG_BINANCE_WEB),
-  moonpayFunds: buildFlag(process.env.FLAG_MOONPAY_FUNDS),
   claims: buildFlag(process.env.FLAG_CLAIMS),
   markets: buildFlag(process.env.FLAG_MARKETS),
 };
