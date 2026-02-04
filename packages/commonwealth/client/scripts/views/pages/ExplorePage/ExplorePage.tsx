@@ -1,5 +1,4 @@
 import { findDenominationString } from 'helpers/findDenomination';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -27,7 +26,6 @@ import TokensList from './TokensList';
 
 const ExplorePage = () => {
   const containerRef = useRef();
-  const questsEnabled = useFlag('xp');
   const navigate = useCommonNavigate();
   const [searchParams] = useSearchParams();
   const [searchText, setSearchText] = useState<string>('');
@@ -39,7 +37,7 @@ const ExplorePage = () => {
     { value: 'users', label: 'Users' },
     { value: 'contests', label: 'Contests' },
     { value: 'threads', label: 'Threads' },
-    ...(questsEnabled ? [{ value: 'quests', label: 'Quests' }] : []),
+    { value: 'quests', label: 'Quests' },
     { value: 'tokens', label: 'Tokens' },
   ];
 
@@ -117,15 +115,13 @@ const ExplorePage = () => {
             onClearSearch={() => setSearchText('')}
           />
         )}
-        {questsEnabled
-          ? activeTab === 'quests' && (
-              <QuestList
-                hideHeader
-                searchText={searchText}
-                onClearSearch={() => setSearchText('')}
-              />
-            )
-          : null}
+        {activeTab === 'quests' && (
+          <QuestList
+            hideHeader
+            searchText={searchText}
+            onClearSearch={() => setSearchText('')}
+          />
+        )}
         {activeTab === 'contests' && (
           <ExploreContestList
             hideHeader

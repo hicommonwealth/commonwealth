@@ -1,5 +1,4 @@
 import { QuestActionMeta } from '@hicommonwealth/schemas';
-import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -20,8 +19,6 @@ interface XpQuestListProps {
 
 const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
   const navigate = useCommonNavigate();
-  const xpEnabled = useFlag('xp');
-
   const { data: questsList, isInitialLoading } = useFetchQuestsQuery({
     community_id: communityIdFilter,
     cursor: 1,
@@ -29,7 +26,6 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
     // dont show system quests in quest lists for communities
     include_system_quests: communityIdFilter ? false : true,
     end_after: moment().startOf('week').toDate(),
-    enabled: xpEnabled,
   });
 
   let quests = (questsList?.pages || []).flatMap((page) => page.results);
@@ -45,8 +41,6 @@ const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
   const handleLeaderboardClick = () => {
     navigate('/leaderboard', {}, null);
   };
-
-  if (!xpEnabled) return <></>;
 
   return (
     <div className="XpQuestList">

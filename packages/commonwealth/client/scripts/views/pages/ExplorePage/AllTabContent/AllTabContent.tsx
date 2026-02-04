@@ -1,4 +1,3 @@
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { MutableRefObject } from 'react';
 import { useFetchGlobalActivityQuery } from 'state/api/feeds/fetchUserActivity';
@@ -23,7 +22,6 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
   searchText,
   onClearSearch,
 }) => {
-  const questsEnabled = useFlag('xp');
   const navigate = useCommonNavigate();
 
   return (
@@ -62,25 +60,23 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
       </div>
 
       {/* Quests section */}
-      {questsEnabled && (
-        <div className="section-container">
-          <CWSectionHeader
-            title="Quests"
-            seeAllText="See all quests"
-            onSeeAllClick={() => navigate('/explore?tab=quests')}
+      <div className="section-container">
+        <CWSectionHeader
+          title="Quests"
+          seeAllText="See all quests"
+          onSeeAllClick={() => navigate('/explore?tab=quests')}
+        />
+        <div className="horizontal-scroll-container">
+          <QuestList
+            hideHeader
+            hideFilters
+            hideSeeMore
+            hideSearchTag
+            searchText={searchText}
+            onClearSearch={onClearSearch}
           />
-          <div className="horizontal-scroll-container">
-            <QuestList
-              hideHeader
-              hideFilters
-              hideSeeMore
-              hideSearchTag
-              searchText={searchText}
-              onClearSearch={onClearSearch}
-            />
-          </div>
         </div>
-      )}
+      </div>
 
       {/* Contests section */}
       <div className="section-container">

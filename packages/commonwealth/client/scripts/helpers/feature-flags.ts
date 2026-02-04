@@ -26,7 +26,6 @@ const featureFlags = {
   mobileDownload: buildFlag(process.env.FLAG_MOBILE_DOWNLOAD),
   onchainReferrals: buildFlag(process.env.FLAG_ONCHAIN_REFERRALS),
   newMobileNav: buildFlag(process.env.FLAG_NEW_MOBILE_NAV),
-  xp: buildFlag(process.env.FLAG_XP),
   growl: buildFlag(process.env.FLAG_GROWL),
   homePage: buildFlag(process.env.FLAG_HOMEPAGE),
   governancePage: buildFlag(process.env.FLAG_NEW_GOVERNANCE_PAGE),

@@ -41,7 +41,6 @@ type GetLaunchpadTradesOutput = z.infer<typeof GetLaunchpadTrades.output>;
 
 const WalletPage = () => {
   const user = useUserStore();
-  const xpEnabled = useFlag('xp');
   const claimsEnabled = useFlag('claims');
   const navigate = useCommonNavigate();
 
@@ -117,7 +116,6 @@ const WalletPage = () => {
         {/* visible only on mobile */}
         <div className="wallet-button-tabs">
           {Object.values(MobileTabType).map((type) => {
-            if (type === MobileTabType.Quests && !xpEnabled) return null;
             return (
               <CWMobileTab
                 key={type}
@@ -145,26 +143,23 @@ const WalletPage = () => {
             />
           )}
 
-          {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) &&
-            xpEnabled && <QuestSummaryCard />}
+          {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) && (
+            <QuestSummaryCard />
+          )}
         </div>
 
         <div className="wallet-tab-container">
           <CWTabsRow>
-            {Object.values(TableType).map((type) =>
-              type === TableType.XPEarnings && !xpEnabled ? (
-                <></>
-              ) : (
-                <CWTab
-                  key={type}
-                  label={type}
-                  isSelected={tableTab === type}
-                  onClick={() => {
-                    setTableTab(type);
-                  }}
-                />
-              ),
-            )}
+            {Object.values(TableType).map((type) => (
+              <CWTab
+                key={type}
+                label={type}
+                isSelected={tableTab === type}
+                onClick={() => {
+                  setTableTab(type);
+                }}
+              />
+            ))}
           </CWTabsRow>
         </div>
 
@@ -177,7 +172,7 @@ const WalletPage = () => {
         {tableTab === TableType.Referrals && (
           <ReferralTable referrals={referrals} isLoading={isReferralsLoading} />
         )}
-        {xpEnabled && tableTab === TableType.XPEarnings && (
+        {tableTab === TableType.XPEarnings && (
           <XPEarningsTable userId={user.id} />
         )}
       </section>

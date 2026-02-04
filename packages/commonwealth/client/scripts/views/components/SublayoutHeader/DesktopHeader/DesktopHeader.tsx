@@ -22,7 +22,6 @@ import {
   fetchCachedNodes,
   useFetchNodesQuery,
 } from 'client/scripts/state/api/nodes';
-import { useFlag } from 'hooks/useFlag';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
@@ -44,7 +43,6 @@ const baseNodeId = 1358;
 
 const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const navigate = useCommonNavigate();
-  const xpEnabled = useFlag('xp');
   const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
     useSidebarStore();
   const user = useUserStore();
@@ -121,7 +119,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
               isLoggedIn: user.isLoggedIn,
             })}
           >
-            {xpEnabled && <XPProgressIndicator />}
+            <XPProgressIndicator />
             <CreateContentPopover />
             {!isWindowSmallInclusive(window.innerWidth) && (
               <CWTooltip

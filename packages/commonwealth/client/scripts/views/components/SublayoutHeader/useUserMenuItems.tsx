@@ -74,7 +74,6 @@ const useUserMenuItems = ({
     recheck: isMenuOpen,
   });
 
-  const xpEnabled = useFlag('xp');
   const privyEnabled = useFlag('privy');
 
   const { authenticated, logout } = usePrivy();
@@ -325,15 +324,11 @@ const useUserMenuItems = ({
             null,
           ),
       },
-      ...(xpEnabled
-        ? [
-            {
-              type: 'default',
-              label: 'Leaderboard',
-              onClick: () => navigate(`/leaderboard`, {}, null),
-            },
-          ]
-        : []),
+      {
+        type: 'default',
+        label: 'Leaderboard',
+        onClick: () => navigate(`/leaderboard`, {}, null),
+      },
       {
         type: 'default',
         label: 'Notification settings',
