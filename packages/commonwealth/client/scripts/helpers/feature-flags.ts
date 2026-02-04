@@ -35,7 +35,6 @@ const featureFlags = {
   judgeContest: buildFlag(process.env.FLAG_JUDGE_CONTEST),
   tokenizedThreads: buildFlag(process.env.FLAG_TOKENIZED_THREADS),
   newProfilePage: buildFlag(process.env.FLAG_NEW_PROFILE_PAGE),
-  privateTopics: buildFlag(process.env.FLAG_PRIVATE_TOPICS),
   crecimientoHackathon: buildFlag(process.env.FLAG_CRECIMIENTO_HACKATHON),
   mcpGoogleSheets: buildFlag(process.env.FLAG_MCP_GOOGLE_SHEETS),
   mcpIntegrationsEnabled: buildFlag(process.env.FLAG_MCP_INTEGRATIONS_ENABLED),
