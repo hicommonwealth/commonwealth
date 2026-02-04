@@ -20,7 +20,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 1.6 Audit and clean dead model/store files (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13326 — remove unused SearchResult/PersistentStore/IdStore + move clearLocalStorage
 - [ ] 1.7 Remove Privy auth layer (revert to Magic-only flow)
 - [ ] 1.8 Remove React Native layer (mobile bridge + MobileAppRedirect)
-- [ ] 1.9 Remove always-on feature flags and dead code
+- [x] 1.9 Remove always-on feature flags and dead code (260204) PR https://github.com/hicommonwealth/commonwealth/pull/13340 — remove always-on flags + dead code; preserve markets gating; drop knockPushNotifications doc example
 - [ ] 1.10 Remove MDX editor (commonwealth-mdxeditor)
 
 ### EPIC-2: Shared Infrastructure
