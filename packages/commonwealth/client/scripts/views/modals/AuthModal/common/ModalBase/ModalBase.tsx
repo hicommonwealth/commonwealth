@@ -107,7 +107,6 @@ const ModalBase = ({
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
 
-  const gateWalletEnabled = useFlag('gateWallet');
   const binanceWebEnabled = useFlag('binanceWeb');
   const crecimientoHackathonEnabled = useFlag('crecimientoHackathon');
 
@@ -207,7 +206,7 @@ const ModalBase = ({
     }
 
     // Add gate wallet if available and enabled
-    if (isGateWalletAvailable && gateWalletEnabled) {
+    if (isGateWalletAvailable) {
       configEvmWallets.push('gate');
     }
 
@@ -239,10 +238,6 @@ const ModalBase = ({
           !binanceWebEnabled &&
           !(typeof window !== 'undefined' && window?.ethereum?.isBinance)
         ) {
-          return;
-        }
-        // Skip gate wallet if not enabled
-        if (wallet === 'gate' && !gateWalletEnabled) {
           return;
         }
         configEvmWallets.push(wallet);

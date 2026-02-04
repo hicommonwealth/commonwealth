@@ -42,7 +42,6 @@ const featureFlags = {
   crecimientoHackathon: buildFlag(process.env.FLAG_CRECIMIENTO_HACKATHON),
   mcpGoogleSheets: buildFlag(process.env.FLAG_MCP_GOOGLE_SHEETS),
   mcpIntegrationsEnabled: buildFlag(process.env.FLAG_MCP_INTEGRATIONS_ENABLED),
-  gateWallet: buildFlag(process.env.FLAG_GATE_WALLET),
   binanceWeb: buildFlag(process.env.FLAG_BINANCE_WEB),
   moonpayFunds: buildFlag(process.env.FLAG_MOONPAY_FUNDS),
   claims: buildFlag(process.env.FLAG_CLAIMS),
