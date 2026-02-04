@@ -4,7 +4,7 @@ vi.spyOn(tokenBalanceCache, 'getBalances').mockResolvedValue({});
 
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type { Session, SessionSigner } from '@canvas-js/interfaces';
-import { type Actor, command, dispose } from '@hicommonwealth/core';
+import { command, dispose, type Actor } from '@hicommonwealth/core';
 import {
   bech32ToHex,
   CANVAS_TOPIC,
@@ -170,7 +170,7 @@ const getVerifiedUserInfoMockFn: typeof ssoVerificationUtils.getVerifiedUserInfo
 
 describe('SignIn Lifecycle', async () => {
   const [evmSigner, , cosmosSigner, substrateSigner, solanaSigner] =
-    await getSessionSigners();
+    getSessionSigners();
 
   const mmPrivySigner = await createSIWESigner(8453);
   const externalWalletPrivyUser = await createPrivyUser(

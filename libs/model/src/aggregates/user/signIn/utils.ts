@@ -371,7 +371,7 @@ export async function signInUser({
       verification_token_expires: verificationData.verification_token_expires,
       block_info: payload.block_info || null,
     };
-    const [inserted] = await models.sequelize.query(
+    const [addresses] = await models.sequelize.query(
       `
     INSERT INTO "Addresses" (
       community_id,
@@ -417,6 +417,7 @@ export async function signInUser({
         transaction,
       },
     );
+    const newAddress = addresses.length > 0;
 
     const [found] = await models.sequelize.query<AddressAttributes>(
       `SELECT * FROM "Addresses" WHERE community_id = :community_id AND address = :address; `,
@@ -432,7 +433,7 @@ export async function signInUser({
     );
 
     // recover deleted users
-    if (found && !inserted && found.user_id === null) {
+    if (found && !newAddress && found.user_id === null) {
       await models.Address.update(
         {
           user_id: signedInUser?.id ?? foundOrCreatedUser.id!,
@@ -456,7 +457,7 @@ export async function signInUser({
       user: signedInUser || foundOrCreatedUser,
       transferredUser,
       address: found,
-      newAddress: !!inserted,
+      newAddress,
       transaction,
       originalUserId: transferredUser ? foundOrCreatedUser.id : undefined,
       ethChainId,
@@ -468,7 +469,7 @@ export async function signInUser({
       },
       transaction,
     });
-    return { found, inserted };
+    return { found, newAddress };
   });
 
   if (!address || !foundOrCreatedUser)
@@ -478,7 +479,7 @@ export async function signInUser({
     user: signedInUser || foundOrCreatedUser,
     newUser,
     address: address.found,
-    newAddress: !!address.inserted,
+    newAddress: address.newAddress,
     addressCount,
     transferredUser,
   };
