@@ -48,8 +48,6 @@ const EditProfile = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
-  const trustLevelEnabled = useFlag('trustLevel');
-
   const [profile, setProfile] = useState<NewProfile>();
   const [avatarUrl, setAvatarUrl] = useState<string>();
   const [addresses, setAddresses] = useState<AddressInfo[]>();
@@ -372,19 +370,17 @@ const EditProfile = () => {
                 canAddLinks={links.length <= 5}
               />
             </ProfileSection>
-            {trustLevelEnabled && (
-              <ProfileSection
-                title="User Verification"
-                description="Verification helps build a trusted
+            <ProfileSection
+              title="User Verification"
+              description="Verification helps build a trusted
               ecosystem where members can interact with confidence.
               As you progress throught verification levels,
               you'll gain increased capabilities and recognition
               within the community.
               "
-              >
-                <UserTrustLevel />
-              </ProfileSection>
-            )}
+            >
+              <UserTrustLevel />
+            </ProfileSection>
 
             <ProfileSection
               title="Personalize Your Profile"
