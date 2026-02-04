@@ -17,7 +17,6 @@ const MobileNavigation = () => {
   const location = useLocation();
   const user = useUserStore();
   const newMobileNav = useFlag('newMobileNav');
-  const rewardsEnabled = useFlag('rewardsPage');
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const navigationRef = useRef<HTMLDivElement>(null);
@@ -58,7 +57,7 @@ const MobileNavigation = () => {
           },
         ]
       : []),
-    ...(user.isLoggedIn && rewardsEnabled
+    ...(user.isLoggedIn
       ? [
           {
             type: 'wallet' as const,

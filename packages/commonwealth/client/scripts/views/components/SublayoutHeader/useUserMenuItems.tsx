@@ -74,7 +74,6 @@ const useUserMenuItems = ({
     recheck: isMenuOpen,
   });
 
-  const rewardsEnabled = useFlag('rewardsPage');
   const referralsEnabled = useFlag('referrals');
   const xpEnabled = useFlag('xp');
   const privyEnabled = useFlag('privy');
@@ -326,9 +325,7 @@ const useUserMenuItems = ({
         label: 'My transactions',
         onClick: () =>
           navigate(
-            rewardsEnabled
-              ? `/wallet?tab=${mobileTabParam[MobileTabType.WalletBalance]}`
-              : `/myTransactions`,
+            `/wallet?tab=${mobileTabParam[MobileTabType.WalletBalance]}`,
             {},
             null,
           ),

@@ -44,7 +44,6 @@ const baseNodeId = 1358;
 
 const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const navigate = useCommonNavigate();
-  const rewardsEnabled = useFlag('rewardsPage');
   const xpEnabled = useFlag('xp');
   const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
     useSidebarStore();
@@ -162,39 +161,37 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
             <>
               <KnockNotifications />
 
-              {rewardsEnabled && (
-                <div className="rewards-button">
-                  <CWTooltip
-                    content="Wallet and rewards"
-                    placement="bottom"
-                    renderTrigger={(handleInteraction) => (
-                      <div
-                        className="rewards-button-container"
-                        onClick={() => navigate('/wallet', {}, null)}
-                        onMouseEnter={handleInteraction}
-                        onMouseLeave={handleInteraction}
-                      >
-                        <CWIconButton
-                          iconName="cardholder"
-                          weight="fill"
-                          iconButtonTheme="black"
-                        />
-                        <FormattedDisplayNumber
-                          value={balance}
-                          options={{ decimals: 3, useShortSuffixes: false }}
-                          className="mr-1"
-                          type="caption"
-                          fontWeight="medium"
-                        />
-                        <CWText type="caption" className="ml-1">
-                          ETH
-                        </CWText>
-                        <CWCustomIcon iconName="base" iconSize="xs" />
-                      </div>
-                    )}
-                  />
-                </div>
-              )}
+              <div className="rewards-button">
+                <CWTooltip
+                  content="Wallet and rewards"
+                  placement="bottom"
+                  renderTrigger={(handleInteraction) => (
+                    <div
+                      className="rewards-button-container"
+                      onClick={() => navigate('/wallet', {}, null)}
+                      onMouseEnter={handleInteraction}
+                      onMouseLeave={handleInteraction}
+                    >
+                      <CWIconButton
+                        iconName="cardholder"
+                        weight="fill"
+                        iconButtonTheme="black"
+                      />
+                      <FormattedDisplayNumber
+                        value={balance}
+                        options={{ decimals: 3, useShortSuffixes: false }}
+                        className="mr-1"
+                        type="caption"
+                        fontWeight="medium"
+                      />
+                      <CWText type="caption" className="ml-1">
+                        ETH
+                      </CWText>
+                      <CWCustomIcon iconName="base" iconSize="xs" />
+                    </div>
+                  )}
+                />
+              </div>
             </>
           )}
         </div>

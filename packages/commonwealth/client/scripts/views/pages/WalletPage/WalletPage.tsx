@@ -41,7 +41,6 @@ type GetLaunchpadTradesOutput = z.infer<typeof GetLaunchpadTrades.output>;
 
 const WalletPage = () => {
   const user = useUserStore();
-  const rewardsEnabled = useFlag('rewardsPage');
   const xpEnabled = useFlag('xp');
   const claimsEnabled = useFlag('claims');
   const navigate = useCommonNavigate();
@@ -91,7 +90,7 @@ const WalletPage = () => {
 
   const { isWindowSmallInclusive } = useBrowserWindow({});
 
-  if (!user.isLoggedIn || !rewardsEnabled) {
+  if (!user.isLoggedIn) {
     if (claimsEnabled) {
       return (
         <CWPageLayout className="WalletPageLayout">
