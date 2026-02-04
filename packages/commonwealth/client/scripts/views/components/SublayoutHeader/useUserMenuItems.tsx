@@ -74,7 +74,6 @@ const useUserMenuItems = ({
     recheck: isMenuOpen,
   });
 
-  const referralsEnabled = useFlag('referrals');
   const xpEnabled = useFlag('xp');
   const privyEnabled = useFlag('privy');
 
@@ -309,17 +308,13 @@ const useUserMenuItems = ({
             },
           ]
         : []),
-      ...(referralsEnabled
-        ? [
-            {
-              type: 'default',
-              label: 'Get referral link',
-              onClick: () => {
-                onReferralItemClick?.();
-              },
-            },
-          ]
-        : []),
+      {
+        type: 'default',
+        label: 'Get referral link',
+        onClick: () => {
+          onReferralItemClick?.();
+        },
+      },
       {
         type: 'default',
         label: 'My transactions',

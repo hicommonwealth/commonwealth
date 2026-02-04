@@ -24,7 +24,6 @@ const buildFlag = (env: string | undefined) => {
 const featureFlags = {
   contestDev: buildFlag(process.env.FLAG_CONTEST_DEV),
   launchpad: buildFlag(process.env.FLAG_LAUNCHPAD),
-  referrals: buildFlag(process.env.FLAG_REFERRALS),
   mobileDownload: buildFlag(process.env.FLAG_MOBILE_DOWNLOAD),
   onchainReferrals: buildFlag(process.env.FLAG_ONCHAIN_REFERRALS),
   newMobileNav: buildFlag(process.env.FLAG_NEW_MOBILE_NAV),
