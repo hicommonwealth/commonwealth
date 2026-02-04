@@ -10,7 +10,6 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import CWTab from 'views/components/component_kit/new_designs/CWTabs/CWTab';
 import CWTabsRow from 'views/components/component_kit/new_designs/CWTabs/CWTabsRow';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import CreateCommunityButton from 'views/components/sidebar/CreateCommunityButton';
 import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/index';
 import { useFetchGlobalActivityQuery } from '../../../state/api/feeds/fetchUserActivity';
 import { trpc } from '../../../utils/trpcClient';
@@ -28,7 +27,6 @@ import TokensList from './TokensList';
 
 const ExplorePage = () => {
   const containerRef = useRef();
-  const launchpadEnabled = useFlag('launchpad');
   const questsEnabled = useFlag('xp');
   const navigate = useCommonNavigate();
   const [searchParams] = useSearchParams();
@@ -42,7 +40,7 @@ const ExplorePage = () => {
     { value: 'contests', label: 'Contests' },
     { value: 'threads', label: 'Threads' },
     ...(questsEnabled ? [{ value: 'quests', label: 'Quests' }] : []),
-    ...(launchpadEnabled ? [{ value: 'tokens', label: 'Tokens' }] : []),
+    { value: 'tokens', label: 'Tokens' },
   ];
 
   // Add state for tracking active tab
@@ -83,18 +81,9 @@ const ExplorePage = () => {
       <div className="ExplorePage">
         <div className="header-section">
           <div className="description">
-            <CWText
-              type="h1"
-              {...(launchpadEnabled && { fontWeight: 'semiBold' })}
-            >
-              Explore {launchpadEnabled ? '' : 'Communities'}
+            <CWText type="h1" fontWeight="semiBold">
+              Explore
             </CWText>
-
-            <div className="actions">
-              {!launchpadEnabled && (
-                <CreateCommunityButton buttonHeight="med" withIcon />
-              )}
-            </div>
           </div>
 
           <IdeaLaunchpad />
@@ -121,15 +110,13 @@ const ExplorePage = () => {
         </div>
 
         {/* Conditionally render content based on active tab */}
-        {launchpadEnabled
-          ? activeTab === 'tokens' && (
-              <TokensList
-                hideHeader
-                searchText={searchText}
-                onClearSearch={() => setSearchText('')}
-              />
-            )
-          : null}
+        {activeTab === 'tokens' && (
+          <TokensList
+            hideHeader
+            searchText={searchText}
+            onClearSearch={() => setSearchText('')}
+          />
+        )}
         {questsEnabled
           ? activeTab === 'quests' && (
               <QuestList

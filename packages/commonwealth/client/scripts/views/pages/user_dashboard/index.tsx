@@ -52,8 +52,6 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
   }, []);
   const { isAddedToHomeScreen } = useAppStatus();
 
-  const launchpadEnabled = useFlag('launchpad');
-
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.DASHBOARD_VIEW,
@@ -150,12 +148,12 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
           </div>
           {isWindowExtraSmall ? (
             <>
-              {launchpadEnabled && <LaunchTokenCard />}
+              <LaunchTokenCard />
               <TrendingCommunitiesPreview />
             </>
           ) : (
             <div className="featured-cards">
-              {launchpadEnabled && <LaunchTokenCard />}
+              <LaunchTokenCard />
               <TrendingCommunitiesPreview />
             </div>
           )}

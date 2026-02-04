@@ -28,7 +28,6 @@ export default defineConfig(({ mode }) => {
       env.FLAG_MOBILE_DOWNLOAD,
     ),
     'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
-    'process.env.FLAG_LAUNCHPAD': JSON.stringify(env.FLAG_LAUNCHPAD),
     'process.env.FLAG_ONCHAIN_REFERRALS': JSON.stringify(
       env.FLAG_ONCHAIN_REFERRALS,
     ),

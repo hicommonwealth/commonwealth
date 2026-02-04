@@ -23,7 +23,6 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
   searchText,
   onClearSearch,
 }) => {
-  const launchpadEnabled = useFlag('launchpad');
   const questsEnabled = useFlag('xp');
   const navigate = useCommonNavigate();
 
@@ -37,23 +36,21 @@ const AllTabContent: React.FC<AllTabContentProps> = ({
         />
       )}
 
-      {launchpadEnabled && (
-        <div className="section-container">
-          <CWSectionHeader
-            title="Tokens"
-            seeAllText="See all tokens"
-            onSeeAllClick={() => navigate('/explore?tab=tokens')}
-          />
-          <TokensList
-            hideHeader
-            hideFilters
-            hideSeeMore
-            hideSearchTag
-            searchText={searchText}
-            onClearSearch={onClearSearch}
-          />
-        </div>
-      )}
+      <div className="section-container">
+        <CWSectionHeader
+          title="Tokens"
+          seeAllText="See all tokens"
+          onSeeAllClick={() => navigate('/explore?tab=tokens')}
+        />
+        <TokensList
+          hideHeader
+          hideFilters
+          hideSeeMore
+          hideSearchTag
+          searchText={searchText}
+          onClearSearch={onClearSearch}
+        />
+      </div>
 
       {/* Communities section */}
       <div className="section-container">
