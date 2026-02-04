@@ -31,7 +31,6 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_ONCHAIN_REFERRALS': JSON.stringify(
       env.FLAG_ONCHAIN_REFERRALS,
     ),
-    'process.env.FLAG_HOMEPAGE': JSON.stringify(env.FLAG_HOMEPAGE),
     'process.env.FLAG_NEW_GOVERNANCE_PAGE': JSON.stringify(
       env.FLAG_NEW_GOVERNANCE_PAGE,
     ),
