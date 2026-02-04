@@ -71,8 +71,6 @@ const EditProfile = () => {
 
   const { aiInteractionsToggleEnabled, setAIInteractionsToggleEnabled } =
     useUserAiSettingsStore();
-  const aiCommentsFeatureEnabled = useFlag('aiComments');
-
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
     usePreferenceTags();
 
@@ -450,40 +448,31 @@ const EditProfile = () => {
               title="Beta Features"
               description="Enable experimental features and help us test new functionality."
             >
-              {aiCommentsFeatureEnabled ? (
-                <div className="beta-features-section">
-                  <div className="beta-feature-item">
-                    <div className="beta-feature-header">
-                      <CWText type="h4" fontWeight="semiBold">
-                        AI Assistant
-                      </CWText>
-                      <CWToggle
-                        className="ai-toggle"
-                        checked={aiInteractionsToggleEnabled}
-                        onChange={() =>
-                          setAIInteractionsToggleEnabled(
-                            !aiInteractionsToggleEnabled,
-                          )
-                        }
-                        icon="sparkle"
-                        iconColor="#757575"
-                      />
-                    </div>
-                    <CWText type="b1" className="beta-feature-description">
-                      Enable AI-powered features including AI replies to
-                      comments and smart content generation. This is an
-                      experimental feature and may be updated or changed at any
-                      time.
+              <div className="beta-features-section">
+                <div className="beta-feature-item">
+                  <div className="beta-feature-header">
+                    <CWText type="h4" fontWeight="semiBold">
+                      AI Assistant
                     </CWText>
+                    <CWToggle
+                      className="ai-toggle"
+                      checked={aiInteractionsToggleEnabled}
+                      onChange={() =>
+                        setAIInteractionsToggleEnabled(
+                          !aiInteractionsToggleEnabled,
+                        )
+                      }
+                      icon="sparkle"
+                      iconColor="#757575"
+                    />
                   </div>
-                </div>
-              ) : (
-                <div className="beta-features-section">
-                  <CWText type="b1">
-                    No beta features are available for your community.
+                  <CWText type="b1" className="beta-feature-description">
+                    Enable AI-powered features including AI replies to comments
+                    and smart content generation. This is an experimental
+                    feature and may be updated or changed at any time.
                   </CWText>
                 </div>
-              )}
+              </div>
             </ProfileSection>
             <ManageApiKey />
             {actionButtons}
