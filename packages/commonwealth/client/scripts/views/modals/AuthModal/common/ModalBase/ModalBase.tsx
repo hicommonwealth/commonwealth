@@ -95,6 +95,7 @@ const ModalBase = ({
   triggerOpenEVMWalletsSubModal,
   isUserFromWebView = false,
 }: ModalBaseProps) => {
+  const mobileApp = isUserFromWebView;
   const copy = MODAL_COPY[layoutType];
 
   const partnershipWalletEnabled = useFlag('partnershipWallet');

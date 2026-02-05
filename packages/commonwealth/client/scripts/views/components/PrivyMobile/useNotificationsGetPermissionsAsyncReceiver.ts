@@ -5,19 +5,19 @@ type PermissionStatus = {
 };
 
 export function useNotificationsGetPermissionsAsyncReceiver() {
-  return useCallback(async (_input: {}): Promise<PermissionStatus> => {
+  return useCallback((_input: {}): Promise<PermissionStatus> => {
     if (typeof Notification === 'undefined') {
-      return { status: 'denied' };
+      return Promise.resolve({ status: 'denied' });
     }
 
     const permission = Notification.permission;
-    return {
+    return Promise.resolve({
       status:
         permission === 'granted'
           ? 'granted'
           : permission === 'denied'
             ? 'denied'
             : 'undetermined',
-    };
+    });
   }, []);
 }

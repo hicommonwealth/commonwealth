@@ -8,7 +8,7 @@ type Input = {
  * Legacy mobile app logout hook (no-op on web).
  */
 export function usePrivyMobileLogout() {
-  return useCallback(async (_input: Input): Promise<{}> => {
-    return {};
+  return useCallback((_input: Input): Promise<{}> => {
+    return Promise.resolve({});
   }, []);
 }
