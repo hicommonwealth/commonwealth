@@ -1,7 +1,9 @@
 import { InvalidState, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../../config';
+import { models } from '../../database';
 
 // Use /events endpoint for grouped markets (not /markets which returns individual outcomes)
 const POLYMARKET_API_URL = 'https://gamma-api.polymarket.com/events';
@@ -64,6 +66,7 @@ async function fetchPolymarketEvents(limit: number): Promise<ExternalMarket[]> {
     startTime: event.startDate ? new Date(event.startDate) : null,
     endTime: event.endDate ? new Date(event.endDate) : null,
     imageUrl: event.image || undefined,
+    is_subscribed: false, // Will be updated based on subscription status
   }));
 }
 
@@ -110,6 +113,7 @@ async function fetchKalshiEvents(limit: number): Promise<ExternalMarket[]> {
     endTime: null,
     imageUrl: `https://d1lvyva3zy5u58.cloudfront.net/series-images-webp/${event.series_ticker}.webp`,
     subTitle: event.sub_title,
+    is_subscribed: false, // Will be updated based on subscription status
   }));
 }
 
@@ -198,6 +202,7 @@ export function DiscoverExternalMarkets(): Query<
         category,
         status = 'all',
         sortOrder = 'newest',
+        community_id,
       } = payload;
 
       const fetchLimit = 500;
@@ -212,6 +217,47 @@ export function DiscoverExternalMarkets(): Query<
         const kalshiMarkets = await fetchKalshiEvents(fetchLimit);
         allMarkets = allMarkets.concat(kalshiMarkets);
       }
+
+      // Determine which markets are subscribed based on context
+      // 1. Site admin (no community_id): check if market is globally featured (in global view)
+      // 2. Community admin (with community_id): check if market is subscribed to this community (in subscribed view)
+      let subscribedSlugs = new Set<string>();
+
+      if (community_id) {
+        // For community admins: check if markets are subscribed to this community
+        const subscribedMarkets = await models.sequelize.query<{
+          slug: string;
+        }>(
+          `
+          SELECT m.slug
+          FROM "CommunityMarkets" cm
+          JOIN "Markets" m ON cm.market_id = m.id
+          WHERE cm.community_id = :community_id
+        `,
+          {
+            replacements: { community_id },
+            type: QueryTypes.SELECT,
+          },
+        );
+        subscribedSlugs = new Set(subscribedMarkets.map((m) => m.slug));
+      } else {
+        // For site admins: check if markets are globally featured (in global view)
+        const globallyFeaturedMarkets = await models.Market.findAll({
+          where: {
+            is_globally_featured: true,
+            ...(provider && provider !== 'all' ? { provider } : {}),
+          },
+          attributes: ['slug'],
+          limit: fetchLimit,
+        });
+        subscribedSlugs = new Set(globallyFeaturedMarkets.map((m) => m.slug));
+      }
+
+      // Add is_subscribed flag to each market based on context
+      allMarkets = allMarkets.map((market) => ({
+        ...market,
+        is_subscribed: subscribedSlugs.has(market.slug),
+      }));
 
       const filteredMarkets = applyFilters(
         allMarkets,

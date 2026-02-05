@@ -50,6 +50,11 @@ export const Market = (
         type: Sequelize.STRING(2048),
         allowNull: true,
       },
+      is_globally_featured: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,

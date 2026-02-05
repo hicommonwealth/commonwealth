@@ -1,3 +1,4 @@
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect } from 'react';
 import Permissions from 'utils/Permissions';
@@ -27,6 +28,7 @@ import UserTier from './UserTier';
 
 const AdminPanelPage = () => {
   const navigate = useCommonNavigate();
+  const marketsEnabled = useFlag('markets');
 
   useEffect(() => {
     if (!Permissions.isSiteAdmin()) {
@@ -44,6 +46,13 @@ const AdminPanelPage = () => {
           iconRight="arrowRightPhosphor"
           onClick={() => navigate('/createQuest')}
         />
+        {marketsEnabled && (
+          <CWButton
+            label="Manage Markets"
+            iconRight="arrowRightPhosphor"
+            onClick={() => navigate('/manageMarkets')}
+          />
+        )}
         <CWDivider />
         <CWText type="h2">Site Analytics</CWText>
         <Analytics />
