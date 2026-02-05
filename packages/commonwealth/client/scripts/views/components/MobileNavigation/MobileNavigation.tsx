@@ -94,7 +94,11 @@ const MobileNavigation = () => {
   return (
     <>
       {newMobileNav && !shouldHideQuickPost && <QuickPostButton />}
-      <div className="MobileNavigation" ref={navigationRef}>
+      <div
+        className="MobileNavigation"
+        ref={navigationRef}
+        data-testid="mobile-nav"
+      >
         <div id="MobileNavigationHead">
           {/*react portal container for anyone that wants to put content*/}
           {/*into the bottom nav.*/}

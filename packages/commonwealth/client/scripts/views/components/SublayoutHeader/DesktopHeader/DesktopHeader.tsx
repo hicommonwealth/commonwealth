@@ -78,7 +78,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const balance = ethBalance === '0.' ? '0' : ethBalance;
 
   return (
-    <div className="DesktopHeader">
+    <div className="DesktopHeader" data-testid="header">
       <div className="header-left">
         <CWIconButton
           iconName="commonLogo"

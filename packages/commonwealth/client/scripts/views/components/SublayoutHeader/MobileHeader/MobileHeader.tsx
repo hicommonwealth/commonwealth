@@ -75,7 +75,7 @@ const MobileHeader = ({
 
   return (
     <>
-      <div className="MobileHeader">
+      <div className="MobileHeader" data-testid="header">
         {shouldShowCollapsableSidebarButton && (
           <CollapsableSidebarButton
             onMobile={onMobile}
