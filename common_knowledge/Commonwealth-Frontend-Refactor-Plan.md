@@ -19,7 +19,7 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 - [x] 1.5 Consolidate useForceRerender + useRerender (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13325 — keep hooks separate; move useRerender to ContestCard + rename to useContestCardRerender
 - [x] 1.6 Audit and clean dead model/store files (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13326 — remove unused SearchResult/PersistentStore/IdStore + move clearLocalStorage
 - [ ] 1.7 Remove Privy auth layer (revert to Magic-only flow)
-- [ ] 1.8 Remove React Native layer (mobile bridge + MobileAppRedirect)
+- [x] 1.8 Remove React Native layer (mobile bridge + MobileAppRedirect) (260205) PR https://github.com/hicommonwealth/commonwealth/pull/13347 — remove RN bridge + mobile app routes/CTA + mobile-only helpers
 - [ ] 1.9 Remove always-on feature flags and dead code
 - [ ] 1.10 Remove MDX editor (commonwealth-mdxeditor)
 
@@ -329,7 +329,7 @@ START┼── 1.4 (permanently-flagged legacy) ⚠ needs product sign-off
      ├── 1.5 (consolidate useForceRerender)
      ├── 1.6 (dead models/stores)
      ├── 1.7 (remove Privy layer)
-     ├── 1.8 (remove React Native layer)
+     ├── 1.8 (remove React Native layer) [DONE 260205]
      ├── 1.9 (remove always-on feature flags + dead code)
      └── 1.10 (remove MDX editor: commonwealth-mdxeditor)
 
@@ -574,6 +574,7 @@ EPIC-1: Dead Code Deletion
 │   ~500-1200 LOC delete
 │   blocked-by: product sign-off (mobile app sunset)
 │   reviewer: frontend
+│   status: DONE (260205) PR https://github.com/hicommonwealth/commonwealth/pull/13347
 │
 ├── 1.9: Remove always-on feature flags and dead code [PARALLEL]
 │   files: grep for always-on flags + guarded branches; delete unused toggles
