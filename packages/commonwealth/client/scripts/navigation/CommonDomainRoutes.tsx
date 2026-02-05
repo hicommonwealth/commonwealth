@@ -3,8 +3,6 @@ import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { SignIn } from 'views/components/SignIn/SignIn';
 import { withLayout } from 'views/Layout';
-import { MobileSignIn } from 'views/modals/MobileSignIn/MobileSignIn';
-import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
 import ExportPrivateKeyFromMagic from '../views/components/ExportPrivateKeyFromMagic';
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
@@ -140,20 +138,12 @@ const CommunityHomePage = lazy(
 );
 const GovernancePage = lazy(() => import('../views/pages/GovernancePage'));
 
-const OnBoardingPage = lazy(() => import('../views/pages/OnBoarding'));
-
 const newProposalViewPage = lazy(
   () => import('../views/pages/NewProposalViewPage'),
 );
 
 const CommonDomainRoutes = (marketsEnabled: boolean) => {
   return [
-    <Route
-      key="mobile-app-redirect"
-      path="/_internal/mobile-app-redirect"
-      element={<MobileAppRedirect />}
-    />,
-
     <Route
       key="ExportPrivateKeyFromMagic"
       path="/export-magic"
@@ -166,7 +156,6 @@ const CommonDomainRoutes = (marketsEnabled: boolean) => {
       element={withLayout(SignIn, { type: 'common' })}
     />,
 
-    <Route key="/onboarding" path="/onboarding" element={<OnBoardingPage />} />,
     <Route
       key="/"
       path="/"
@@ -176,12 +165,6 @@ const CommonDomainRoutes = (marketsEnabled: boolean) => {
       key="/home"
       path="/home"
       element={withLayout(HomePage, { type: 'common' })}
-    />,
-
-    <Route
-      key="/mobile-signin"
-      path="/mobile-signin"
-      element={withLayout(MobileSignIn, { type: 'common' })}
     />,
 
     <Route

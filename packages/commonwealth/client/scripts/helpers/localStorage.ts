@@ -5,7 +5,6 @@ export enum LocalStorageKeys {
   HasSeenOnboarding = 'has-seen-onboarding',
   HasSeenNotifications = 'has-seen-notifications',
   DarkModeState = 'dark-mode-state',
-  HasMobileAppOnboarded = 'has-mobile-app-onboarded',
 }
 
 export const getLocalStorageItem = (key: LocalStorageKeys) => {

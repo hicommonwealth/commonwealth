@@ -1,13 +1,14 @@
-import { useMobileRPCSender } from 'hooks/mobile/useMobileRPCSender';
+import { useCallback } from 'react';
 
 type Input = {
   error?: string;
 };
 
 /**
- * Get privy to sign a message, in react-native, then return the message into
- * the browser.
+ * Legacy mobile app logout hook (no-op on web).
  */
 export function usePrivyMobileLogout() {
-  return useMobileRPCSender<Input, {}>({ type: 'privy.logout' });
+  return useCallback(async (_input: Input): Promise<{}> => {
+    return {};
+  }, []);
 }
