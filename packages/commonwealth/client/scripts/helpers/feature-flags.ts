@@ -35,7 +35,6 @@ const featureFlags = {
   homePage: buildFlag(process.env.FLAG_HOMEPAGE),
   aiComments: buildFlag(process.env.FLAG_AI_COMMENTS),
   governancePage: buildFlag(process.env.FLAG_NEW_GOVERNANCE_PAGE),
-  privy: buildFlag(process.env.FLAG_PRIVY),
   judgeContest: buildFlag(process.env.FLAG_JUDGE_CONTEST),
   trustLevel: buildFlag(process.env.FLAG_TRUST_LEVEL),
   tokenizedThreads: buildFlag(process.env.FLAG_TOKENIZED_THREADS),

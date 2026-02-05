@@ -5,7 +5,6 @@ import {
   getSessionSigners,
   WalletId,
 } from '@hicommonwealth/shared';
-import { usePrivy } from '@privy-io/react-auth';
 import axios from 'axios';
 import {
   LocalStorageKeys,
@@ -33,7 +32,6 @@ import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
-import { usePrivyMobileLogout } from 'views/components/PrivyMobile/usePrivyMobileLogout';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { MobileTabType } from '../../pages/WalletPage/types';
 import { mobileTabParam } from '../../pages/WalletPage/utils';
@@ -77,11 +75,6 @@ const useUserMenuItems = ({
   const rewardsEnabled = useFlag('rewardsPage');
   const referralsEnabled = useFlag('referrals');
   const xpEnabled = useFlag('xp');
-  const privyEnabled = useFlag('privy');
-
-  const { authenticated, logout } = usePrivy();
-  const privyMobileLogout = usePrivyMobileLogout();
-
   const userData = useUserStore();
   const hasMagic = userData.hasMagicWallet;
 
@@ -115,14 +108,6 @@ const useUserMenuItems = ({
       for (const signer of getSessionSigners()) {
         signer.target.clear();
       }
-      if (privyEnabled && authenticated) {
-        await logout();
-      }
-
-      // when in the mobile, app, logout there too. It's safe to call this
-      // when not in the mobile app.
-      privyMobileLogout({}).catch(console.error);
-
       notifySuccess('Signed out');
       darkModeStore.getState().reCalculateDarkMode();
       setLocalStorageItem(LocalStorageKeys.HasSeenNotifications, 'true');
@@ -131,7 +116,7 @@ const useUserMenuItems = ({
       notifyError('Something went wrong during logging out.');
       window.location.reload();
     }
-  }, [authenticated, logout, privyEnabled, privyMobileLogout]);
+  }, []);
 
   useEffect(() => {
     // if a user is in a stake enabled community without membership, set first user address as active that
