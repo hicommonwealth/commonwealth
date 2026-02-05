@@ -74,9 +74,6 @@ const useUserMenuItems = ({
     recheck: isMenuOpen,
   });
 
-  const rewardsEnabled = useFlag('rewardsPage');
-  const referralsEnabled = useFlag('referrals');
-  const xpEnabled = useFlag('xp');
   const privyEnabled = useFlag('privy');
 
   const { authenticated, logout } = usePrivy();
@@ -310,38 +307,28 @@ const useUserMenuItems = ({
             },
           ]
         : []),
-      ...(referralsEnabled
-        ? [
-            {
-              type: 'default',
-              label: 'Get referral link',
-              onClick: () => {
-                onReferralItemClick?.();
-              },
-            },
-          ]
-        : []),
+      {
+        type: 'default',
+        label: 'Get referral link',
+        onClick: () => {
+          onReferralItemClick?.();
+        },
+      },
       {
         type: 'default',
         label: 'My transactions',
         onClick: () =>
           navigate(
-            rewardsEnabled
-              ? `/wallet?tab=${mobileTabParam[MobileTabType.WalletBalance]}`
-              : `/myTransactions`,
+            `/wallet?tab=${mobileTabParam[MobileTabType.WalletBalance]}`,
             {},
             null,
           ),
       },
-      ...(xpEnabled
-        ? [
-            {
-              type: 'default',
-              label: 'Leaderboard',
-              onClick: () => navigate(`/leaderboard`, {}, null),
-            },
-          ]
-        : []),
+      {
+        type: 'default',
+        label: 'Leaderboard',
+        onClick: () => navigate(`/leaderboard`, {}, null),
+      },
       {
         type: 'default',
         label: 'Notification settings',

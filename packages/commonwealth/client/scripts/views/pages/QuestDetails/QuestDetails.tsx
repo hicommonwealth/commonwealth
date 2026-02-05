@@ -8,7 +8,6 @@ import {
   QuestAction as QuestActionType,
   XPLog,
 } from 'helpers/quest';
-import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -50,17 +49,15 @@ const QuestDetails = ({ id }: { id: number }) => {
   const questId = parseInt(`${id}`) || 0;
   const navigate = useCommonNavigate();
   const user = useUserStore();
-  const xpEnabled = useFlag('xp');
-
   const { data: quest, isLoading } = useGetQuestByIdQuery({
     quest_id: questId,
-    enabled: !!(xpEnabled && questId),
+    enabled: !!questId,
   });
 
   const { data: xpProgressions = [] } = useGetXPs({
     user_id: user.id,
     quest_id: questId,
-    enabled: user.isLoggedIn && xpEnabled,
+    enabled: user.isLoggedIn,
   });
 
   const [authModalConfig, setAuthModalConfig] = useState<{
@@ -105,7 +102,7 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const popoverProps = usePopover();
 
-  if (!xpEnabled || !questId) {
+  if (!questId) {
     return <PageNotFound />;
   }
 

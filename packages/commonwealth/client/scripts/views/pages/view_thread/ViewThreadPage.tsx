@@ -47,7 +47,7 @@ import useUserStore, {
 } from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
+import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallback';
 import { ThreadTokenWidget } from 'views/components/NewThreadForm/ToketWidget';
 import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context';
@@ -971,7 +971,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 </>
               ) : (
                 <>
-                  <MarkdownViewerUsingQuillOrNewEditor
+                  <MarkdownViewerWithFallback
                     key={threadBody}
                     markdown={threadBody || ''}
                     cutoffLines={50}

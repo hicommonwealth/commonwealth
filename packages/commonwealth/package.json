@@ -168,7 +168,6 @@
     "bs58": "^4.0.1",
     "buffer": "^6.0.3",
     "clsx": "^1.2.1",
-    "commonwealth-mdxeditor": "^0.0.8",
     "compression": "^1.7.4",
     "connect-session-sequelize": "^7.1.1",
     "cookie-parser": "^1.4.4",

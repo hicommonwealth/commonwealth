@@ -4,7 +4,7 @@ export type DeviceOrientation = 'vertical' | 'horizontal';
 
 function useDeviceOrientation(): DeviceOrientation {
   if (window.innerHeight > window.innerWidth) return 'vertical';
-  else return 'horizontal';
+  return 'horizontal';
 }
 
 /**

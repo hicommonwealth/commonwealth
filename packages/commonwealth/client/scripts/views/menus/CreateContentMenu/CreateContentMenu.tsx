@@ -3,7 +3,6 @@ import {
   ChainNetwork,
   PRODUCTION_DOMAIN,
 } from '@hicommonwealth/shared';
-import { useFlag } from 'hooks/useFlag';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -43,7 +42,6 @@ const getCreateContentMenuItems = (
     options?: NavigateOptions & { action?: string },
     prefix?: null | string,
   ) => void,
-  launchpadEnabled: boolean,
   createDiscordBotConfig?: ReturnType<
     typeof useCreateDiscordBotConfigMutation
   >['mutateAsync'],
@@ -91,18 +89,14 @@ const getCreateContentMenuItems = (
       : [];
 
   const getUniversalCreateItems = (): PopoverMenuItem[] => [
-    ...(launchpadEnabled
-      ? [
-          {
-            type: 'element',
-            element: (
-              <div onClick={resetSidebarState} key="token-launch-wrapper">
-                <TokenLaunchButton key={2} buttonHeight="sm" />
-              </div>
-            ),
-          } as PopoverMenuItem,
-        ]
-      : []),
+    {
+      type: 'element',
+      element: (
+        <div onClick={resetSidebarState} key="token-launch-wrapper">
+          <TokenLaunchButton key={2} buttonHeight="sm" />
+        </div>
+      ),
+    } as PopoverMenuItem,
     {
       type: 'element',
       element: (
@@ -201,8 +195,6 @@ export const CreateContentSidebar = ({
   const { mutateAsync: createDiscordBotConfig } =
     useCreateDiscordBotConfigMutation();
 
-  const launchpadEnabled = useFlag('launchpad');
-
   return (
     <CWSidebarMenu
       className={getClasses<{
@@ -229,7 +221,6 @@ export const CreateContentSidebar = ({
       }}
       menuItems={getCreateContentMenuItems(
         navigate,
-        launchpadEnabled,
         createDiscordBotConfig,
       )}
     />
@@ -240,8 +231,6 @@ export const CreateContentSidebar = ({
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
-
-  const launchpadEnabled = useFlag('launchpad');
 
   if (
     !user.isLoggedIn ||
@@ -254,7 +243,7 @@ export const CreateContentPopover = () => {
 
   return (
     <PopoverMenu
-      menuItems={getCreateContentMenuItems(navigate, launchpadEnabled)}
+      menuItems={getCreateContentMenuItems(navigate)}
       className="create-content-popover"
       renderTrigger={(onClick, isMenuOpen) => (
         <CWTooltip

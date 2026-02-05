@@ -1,4 +1,3 @@
-import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import useUserStore from 'state/ui/user';
 import { saveToClipboard } from 'utils/clipboard';
@@ -19,8 +18,6 @@ export const SharePopover = ({
   buttonLabel,
 }: SharePopoverProps) => {
   const user = useUserStore();
-  const referralsEnabled = useFlag('referrals');
-
   const defaultRenderTrigger = (
     onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   ) => (
@@ -36,15 +33,11 @@ export const SharePopover = ({
   );
 
   const handleCopy = async () => {
-    if (referralsEnabled) {
-      const refLink =
-        // TODO: @Marcin to check address access (referral link creation) + related changes in this file
-        linkToShare +
-        (user.activeAccount ? `?refcode=${user.activeAccount.address}` : '');
-      await saveToClipboard(refLink, true);
-    } else {
-      await saveToClipboard(linkToShare, true);
-    }
+    const refLink =
+      // TODO: @Marcin to check address access (referral link creation) + related changes in this file
+      linkToShare +
+      (user.activeAccount ? `?refcode=${user.activeAccount.address}` : '');
+    await saveToClipboard(refLink, true);
   };
 
   return (

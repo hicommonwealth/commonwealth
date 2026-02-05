@@ -14,10 +14,7 @@ import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useGetThreadToken from 'state/api/tokens/getThreadToken';
 import useUserStore from 'state/ui/user';
-import {
-  default as MarkdownViewerUsingQuillOrNewEditor,
-  default as MarkdownViewerWithFallback,
-} from 'views/components/MarkdownViewerWithFallback';
+import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallback';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { ThreadTokenDrawer } from 'views/components/ThreadTokenDrawer';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
@@ -278,7 +275,7 @@ export const ThreadCard = ({
               })}
             >
               {!isCardView ? (
-                <MarkdownViewerUsingQuillOrNewEditor
+                <MarkdownViewerWithFallback
                   markdown={
                     !removeImagesFromMarkDown
                       ? thread.body
