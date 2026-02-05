@@ -97,7 +97,6 @@ export default defineConfig(({ mode }) => {
         '@atomone/govgen-types-long/govgen/gov/v1beta1/query',
         'react-virtuoso',
         'bn.js',
-        'commonwealth-mdxeditor',
         'quill-magic-url',
         'react-beautiful-dnd',
         'react-quill',
