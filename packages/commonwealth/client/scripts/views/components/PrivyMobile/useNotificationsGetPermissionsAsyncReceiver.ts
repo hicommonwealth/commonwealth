@@ -1,11 +1,23 @@
-import { useMobileRPCSender } from 'hooks/mobile/useMobileRPCSender';
+import { useCallback } from 'react';
 
 type PermissionStatus = {
   status: 'granted' | 'denied' | 'undetermined';
 };
 
 export function useNotificationsGetPermissionsAsyncReceiver() {
-  return useMobileRPCSender<{}, PermissionStatus>({
-    type: 'Notifications.getPermissionsAsync',
-  });
+  return useCallback((_input: {}): Promise<PermissionStatus> => {
+    if (typeof Notification === 'undefined') {
+      return Promise.resolve({ status: 'denied' });
+    }
+
+    const permission = Notification.permission;
+    return Promise.resolve({
+      status:
+        permission === 'granted'
+          ? 'granted'
+          : permission === 'denied'
+            ? 'denied'
+            : 'undetermined',
+    });
+  }, []);
 }
