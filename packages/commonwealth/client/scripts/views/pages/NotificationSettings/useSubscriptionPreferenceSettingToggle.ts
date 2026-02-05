@@ -15,7 +15,9 @@ export function useSubscriptionPreferenceSettingToggle(
 
   const requestPermissions = useCallback(async () => {
     if (!('Notification' in window)) {
-      return { status: 'denied' as const };
+      // Mobile webview clients handle permissions via the native bridge.
+      // Don't block preference toggles when Notifications API is unavailable.
+      return { status: 'granted' as const };
     }
 
     const status = await Notification.requestPermission();
