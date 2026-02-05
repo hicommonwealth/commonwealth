@@ -295,38 +295,28 @@ const useUserMenuItems = ({
             },
           ]
         : []),
-      ...(referralsEnabled
-        ? [
-            {
-              type: 'default',
-              label: 'Get referral link',
-              onClick: () => {
-                onReferralItemClick?.();
-              },
-            },
-          ]
-        : []),
+      {
+        type: 'default',
+        label: 'Get referral link',
+        onClick: () => {
+          onReferralItemClick?.();
+        },
+      },
       {
         type: 'default',
         label: 'My transactions',
         onClick: () =>
           navigate(
-            rewardsEnabled
-              ? `/wallet?tab=${mobileTabParam[MobileTabType.WalletBalance]}`
-              : `/myTransactions`,
+            `/wallet?tab=${mobileTabParam[MobileTabType.WalletBalance]}`,
             {},
             null,
           ),
       },
-      ...(xpEnabled
-        ? [
-            {
-              type: 'default',
-              label: 'Leaderboard',
-              onClick: () => navigate(`/leaderboard`, {}, null),
-            },
-          ]
-        : []),
+      {
+        type: 'default',
+        label: 'Leaderboard',
+        onClick: () => navigate(`/leaderboard`, {}, null),
+      },
       {
         type: 'default',
         label: 'Notification settings',

@@ -1,7 +1,0 @@
-@use '../../../../styles/shared';
-@use '../../../../styles/mixins/colors.module';
-
-.ListButtonActive {
-  font-weight: bold;
-  background-color: colors.$neutral-100;
-}

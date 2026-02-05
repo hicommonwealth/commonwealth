@@ -5,7 +5,6 @@ import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import { PageNotFound } from 'client/scripts/views/pages/404';
 import { findDenominationString } from 'helpers/findDenomination';
-import { useFlag } from 'hooks/useFlag';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
@@ -48,7 +47,6 @@ export const CommunitySection = ({
   showSkeleton,
   isInsideCommunity,
 }: CommunitySectionProps) => {
-  const launchpadEnabled = useFlag('launchpad');
   const [profile, setProfile] = useState<NewProfile>();
   const [errorCode, setErrorCode] = useState<ProfileError>(ProfileError.None);
 
@@ -167,7 +165,7 @@ export const CommunitySection = ({
           </>
         )}
 
-        {launchpadEnabled && <TokenTradeWidget />}
+        <TokenTradeWidget />
 
         <CWDivider />
         <DiscussionSection

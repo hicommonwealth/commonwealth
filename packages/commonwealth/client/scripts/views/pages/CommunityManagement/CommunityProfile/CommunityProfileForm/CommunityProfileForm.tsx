@@ -62,8 +62,6 @@ const CommunityProfileForm = () => {
     }[]
   >([]);
 
-  const aiCommentsFeatureEnabled = useFlag('aiComments');
-
   const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isCommunityLoading } =
     useGetCommunityByIdQuery({
@@ -431,23 +429,21 @@ const CommunityProfileForm = () => {
             />
           </section>
 
-          {aiCommentsFeatureEnabled && (
-            <section className="ai-features-section">
-              <div className="header">
-                <CWText type="h4">Enable AI Features</CWText>
-                <div className="controls">
-                  <CWText type="b1">
-                    Control AI functionality for your community. When disabled,
-                    AI features like smart replies, comment suggestions and AI
-                    assistants will be hidden from all community members,
-                    regardless of their personal settings.
-                  </CWText>
+          <section className="ai-features-section">
+            <div className="header">
+              <CWText type="h4">Enable AI Features</CWText>
+              <div className="controls">
+                <CWText type="b1">
+                  Control AI functionality for your community. When disabled,
+                  AI features like smart replies, comment suggestions and AI
+                  assistants will be hidden from all community members,
+                  regardless of their personal settings.
+                </CWText>
 
-                  <CWToggle name="aiFeaturesEnabled" hookToForm size="large" />
-                </div>
+                <CWToggle name="aiFeaturesEnabled" hookToForm size="large" />
               </div>
-            </section>
-          )}
+            </div>
+          </section>
 
           <section className="default-page-section">
             <div className="header">
