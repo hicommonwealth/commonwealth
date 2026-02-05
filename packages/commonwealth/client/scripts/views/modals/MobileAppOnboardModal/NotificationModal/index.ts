@@ -1,1 +1,0 @@
-export { NotificationModal } from './NotificationModal';

@@ -5,29 +5,39 @@ import { useSubscriptionPreferences } from 'state/api/trpc/subscription/useSubsc
 import { useUpdateSubscriptionPreferencesMutation } from 'state/api/trpc/subscription/useUpdateSubscriptionPreferencesMutation';
 // eslint-disable-next-line max-len
 import useUserStore from 'state/ui/user';
-// eslint-disable-next-line max-len
-import { useNotificationsRequestPermissionsAsyncReceiver } from 'views/components/PrivyMobile/useNotificationsRequestPermissionsAsyncReceiver';
 import { SubscriptionPrefType } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSetting';
 
 export function useSubscriptionPreferenceSettingToggle(
   prefs: SubscriptionPrefType[],
 ) {
   const subscriptionPreferences = useSubscriptionPreferences();
-
-  const requestPermissions = useNotificationsRequestPermissionsAsyncReceiver();
-
   const { mutateAsync: updateSubscriptionPreferences } =
     useUpdateSubscriptionPreferencesMutation();
   const user = useUserStore();
 
+  const requestPermissions = useCallback(async () => {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      return 'denied' as NotificationPermission;
+    }
+
+    if (Notification.permission === 'granted') {
+      return Notification.permission;
+    }
+
+    try {
+      return await Notification.requestPermission();
+    } catch (error) {
+      console.error('Failed to request notification permissions', error);
+      return Notification.permission;
+    }
+  }, []);
+
   return useCallback(
     async (activate: boolean) => {
       if (activate) {
-        // *** we have to first request permissions if we're activating.
-        const { status: notificationPermissions } = await requestPermissions(
-          {},
-        );
-        if (notificationPermissions !== 'granted') {
+        // We have to request permissions if we're activating.
+        const notificationPermission = await requestPermissions();
+        if (notificationPermission !== 'granted') {
           return;
         }
       }

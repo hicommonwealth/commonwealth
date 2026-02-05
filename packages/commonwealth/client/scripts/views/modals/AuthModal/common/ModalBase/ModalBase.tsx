@@ -4,7 +4,6 @@ import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import useFarcasterStore from 'client/scripts/state/ui/farcaster';
 import clsx from 'clsx';
-import { isMobileApp } from 'hooks/useReactNativeWebView';
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
@@ -55,7 +54,6 @@ const MODAL_COPY = {
   },
 };
 
-const mobileApp = isMobileApp();
 
 const SMS_ALLOWED_COUNTRIES = ['US', 'CA', 'AS', 'GU', 'MP', 'PR', 'VI'];
 
@@ -128,10 +126,10 @@ const ModalBase = ({
 
   const ssoOptions = useMemo(
     () =>
-      (mobileApp ? SSO_OPTIONS_MOBILE : SSO_OPTIONS_DEFAULT).filter(
+      (isUserFromWebView ? SSO_OPTIONS_MOBILE : SSO_OPTIONS_DEFAULT).filter(
         (opt) => opt !== 'SMS' || isSMSAllowed,
       ),
-    [isSMSAllowed],
+    [isSMSAllowed, isUserFromWebView],
   );
 
   const { farcasterContext, signInToFarcasterFrame } = useFarcasterStore();
@@ -340,7 +338,7 @@ const ModalBase = ({
     setActiveTabIndex((prevActiveTab) => {
       if (!shouldShowSSOOptions && prevActiveTab === 1) return 0;
 
-      if (isMobileApp()) return 1;
+      if (isUserFromWebView) return 1;
 
       if (showAuthOptionFor) {
         return ssoOptions.includes(showAuthOptionFor as AuthSSOs) ? 1 : 0;
@@ -361,6 +359,7 @@ const ModalBase = ({
     showAuthOptionFor,
     shouldShowSSOOptions,
     ssoOptions,
+    isUserFromWebView,
   ]);
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
