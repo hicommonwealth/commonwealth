@@ -11,7 +11,6 @@ import {
   renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
 import { useMutualConnectionsQuery } from 'client/scripts/state/api/user';
-import { useFlag } from 'hooks/useFlag';
 import useFetchProfileByIdQuery from 'state/api/profiles/fetchProfileById';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
@@ -32,7 +31,6 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const navigate = useNavigate();
   const user = useUserStore();
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
-  const referralsEnabled = useFlag('referrals');
   const [isMutualCommunitiesModalOpen, setIsMutualCommunitiesModalOpen] =
     useState(false);
 
@@ -96,7 +94,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
           <TrustLevelRole type="user" tier={profile.tier} />
         </CWText>
 
-        {referralsEnabled && isCurrentUser && (
+        {isCurrentUser && (
           <CWButton
             buttonType="tertiary"
             buttonHeight="sm"

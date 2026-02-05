@@ -1,6 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
-import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { AuthModal } from 'views/modals/AuthModal';
@@ -10,8 +9,6 @@ import TokenLaunchDrawer from './TokenLaunchDrawer';
 const IdeaLaunchpad = () => {
   const user = useUserStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const launchpadEnabled = useFlag('launchpad');
-
   const [initialIdeaPrompt, setInitialIdeaPrompt] = useState<string>('');
   const [shouldGenerateIdeaOnDrawerOpen, setShouldGenerateIdeaOnDrawerOpen] =
     useState(false);
@@ -28,8 +25,6 @@ const IdeaLaunchpad = () => {
       setIsAuthModalOpen(!user.isLoggedIn);
     }
   };
-
-  if (!launchpadEnabled) return <></>;
 
   return (
     <>

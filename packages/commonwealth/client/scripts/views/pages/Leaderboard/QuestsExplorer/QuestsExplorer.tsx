@@ -1,5 +1,4 @@
 import { QuestActionMeta } from '@hicommonwealth/schemas';
-import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -14,14 +13,11 @@ import './QuestsExplorer.scss';
 
 const QuestsExplorer = () => {
   const navigate = useCommonNavigate();
-  const xpEnabled = useFlag('xp');
-
   const { data: questsList, isInitialLoading } = useFetchQuestsQuery({
     cursor: 1,
     limit: 2,
     end_after: moment().startOf('week').toDate(),
     include_system_quests: true,
-    enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
 

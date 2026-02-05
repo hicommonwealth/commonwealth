@@ -1,4 +1,3 @@
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import React from 'react';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -9,10 +8,9 @@ import './CreateQuest.scss';
 import QuestForm from './QuestForm';
 
 const CreateQuest = () => {
-  const xpEnabled = useFlag('xp');
   const user = useUserStore();
 
-  if (!xpEnabled || !user.isLoggedIn || !Permissions.isSiteAdmin())
+  if (!user.isLoggedIn || !Permissions.isSiteAdmin())
     return <PageNotFound />;
 
   return (

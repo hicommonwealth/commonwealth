@@ -1,5 +1,4 @@
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import { Link } from 'node_modules/react-router-dom/dist';
@@ -26,14 +25,13 @@ const QuestSummaryCard = () => {
   const [activeTab, setActiveTab] = useState<QuestTimeline>(
     QuestTimeline.Active,
   );
-  const xpEnabled = useFlag('xp');
   const user = useUserStore();
 
   // Get user's XP rank
   const { data: userRankData } = useGetXPsRanked({
     user_id: user.id,
     limit: 1,
-    enabled: xpEnabled && !!user.id,
+    enabled: !!user.id,
   });
 
   const userRank = userRankData?.pages?.[0]?.results?.[0]?.rank;
@@ -47,7 +45,6 @@ const QuestSummaryCard = () => {
     end_after: moment().startOf('week').toDate(),
     // only show system quests in non-auth state
     include_system_quests: true,
-    enabled: xpEnabled,
   });
 
   const {
@@ -59,7 +56,6 @@ const QuestSummaryCard = () => {
     end_before: moment().startOf('week').toDate(),
     // only show system quests in non-auth state
     include_system_quests: true,
-    enabled: xpEnabled,
   });
 
   const handleSeeAllClick = () => {
@@ -76,8 +72,6 @@ const QuestSummaryCard = () => {
   const questList = isShowingActiveQuests
     ? (onGoingQuestsList?.pages || []).flatMap((page) => page.results)
     : (endedQuestsList?.pages || []).flatMap((page) => page.results);
-
-  if (!xpEnabled) return <></>;
 
   return (
     <RewardsCard
