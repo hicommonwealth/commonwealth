@@ -156,7 +156,8 @@ const QuestList = ({
           })}
         >
           <CWText type="h2" className="empty-quests" isCentered>
-            No quests found
+            No quests yet. Contact your community admin or reach out to the
+            Common team to launch a native quest.
           </CWText>
         </div>
       ) : (
