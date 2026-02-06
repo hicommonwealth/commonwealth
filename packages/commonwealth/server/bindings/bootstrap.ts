@@ -14,7 +14,7 @@ import { ContestWorker } from '@hicommonwealth/model';
 import { models } from '@hicommonwealth/model/db';
 import { config } from 'server/config';
 import { rascalConsumerMap } from './rascalConsumerMap';
-import { relayForever } from './relayForever';
+import { relayForever, waitForOutboxTable } from './relayForever';
 import { isShutdownInProgress, registerWorker } from './workerLifecycle';
 
 const log = logger(import.meta);
@@ -94,6 +94,10 @@ export async function bootstrapRelayer(
   registerWorker('message-relayer-stats', () => {
     clearInterval(statsInterval);
   });
+
+  // Wait for the Outbox table to be accessible before starting the relay loop.
+  // This gates the health check (isServiceHealthy) on database readiness.
+  await waitForOutboxTable();
 
   // Note: relayForever checks isShutdownInProgress() and will stop on its own
   relayForever(maxRelayIterations).catch((err) => {
