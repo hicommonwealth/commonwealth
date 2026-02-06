@@ -87,7 +87,7 @@ ensure_volume_dir "$VOLUME_BASE/cw-pg-data"
 chmod -R 777 "$VOLUME_BASE/cw-rmq-data" "$VOLUME_BASE/cw-redis-data" "$VOLUME_BASE/cw-pg-data" || true
 
 # ---- Start containers ----
-start_container cw-rmq --network cw-net -p 5672:5672 -p 15672:15672 -v "$VOLUME_BASE/cw-rmq-data:/var/lib/rabbitmq/mnesia" rabbitmq:3.11.7-management
+start_container cw-rmq --network cw-net -p 5672:5672 -p 15672:15672 -u 999:999 -v "$VOLUME_BASE/cw-rmq-data:/var/lib/rabbitmq/mnesia" rabbitmq:3.11.7-management
 start_container cw-redis --network cw-net -p 6379:6379 -v "$VOLUME_BASE/cw-redis-data:/data" redis:latest
 start_container cw-pg --network cw-net -p 5432:5432 \
   -e POSTGRES_USER=commonwealth \

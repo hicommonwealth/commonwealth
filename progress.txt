@@ -4,4 +4,4 @@
 - Decisions: Used Promise.all for parallel worker startup; 30s timeout for graceful shutdown; workers check isShutdownInProgress() flag.
 [2026-02-06] #13352 fix: use bind mounts for macos volumes
 - Files: scripts/macos/cwup.sh, scripts/macos/cwdown.sh
-- Changes: Switched macOS cwup.sh volumes to bind mounts under ~/.container-volumes with directory creation and permissive chmod for local dev; cwdown now removes those host directories.
+- Changes: Switched macOS cwup.sh volumes to bind mounts under ~/.container-volumes with directory creation and permissive chmod for local dev; run RabbitMQ as uid 999 to avoid chown failures; cwdown now removes those host directories.
