@@ -2,7 +2,10 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import './linked_addresses.scss';
 
-import { getChainIcon, getWalletIconName } from 'client/scripts/utils/chainUtils';
+import {
+  getChainIcon,
+  getWalletIconName,
+} from 'client/scripts/utils/chainUtils';
 import { notifyError } from 'controllers/app/notifications';
 import { formatAddressShort } from 'shared/utils';
 import { useGetCommunityByIdQuery } from 'state/api/communities';

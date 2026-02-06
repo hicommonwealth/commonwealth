@@ -66,9 +66,7 @@ async function getGoogleUser(token: string): Promise<VerifiedUserInfo> {
 
 // Assume email returned by magic is unverified
 // Apple doesn't have an endpoint from which we can fetch user info to check email
-function getAppleUser(
-  magicData?: MagicUserMetadata,
-): VerifiedUserInfo {
+function getAppleUser(magicData?: MagicUserMetadata): VerifiedUserInfo {
   const email = magicData?.email;
   if (!email) {
     throw new Error('Email address associated with Apple account not found');
@@ -80,9 +78,7 @@ function getAppleUser(
   };
 }
 
-function getSmsUser(
-  magicData?: MagicUserMetadata,
-): VerifiedUserInfo {
+function getSmsUser(magicData?: MagicUserMetadata): VerifiedUserInfo {
   const phoneNumber = magicData?.phoneNumber;
   if (!phoneNumber) {
     throw new Error('No phone number found in magic metadata');
@@ -99,9 +95,7 @@ function getFarcasterUser(): VerifiedUserInfo {
   };
 }
 
-function getEmailUser(
-  magicData?: MagicUserMetadata,
-): VerifiedUserInfo {
+function getEmailUser(magicData?: MagicUserMetadata): VerifiedUserInfo {
   const email = magicData?.email;
   if (!email) {
     throw new Error('Email address not found');

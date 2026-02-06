@@ -93,7 +93,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const user = useUserStore();
   const { data: configurationData } = useFetchPublicEnvVarQuery();
 
-
   const isWalletConnectEnabled = _.some(
     wallets,
     (w) =>

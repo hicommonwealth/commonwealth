@@ -118,8 +118,7 @@ const ModalBase = ({
   }, []);
 
   const ssoOptions = useMemo(
-    () =>
-      SSO_OPTIONS_DEFAULT.filter((opt) => opt !== 'SMS' || isSMSAllowed),
+    () => SSO_OPTIONS_DEFAULT.filter((opt) => opt !== 'SMS' || isSMSAllowed),
     [isSMSAllowed],
   );
 

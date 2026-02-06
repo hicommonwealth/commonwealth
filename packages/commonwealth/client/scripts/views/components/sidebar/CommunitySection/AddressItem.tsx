@@ -14,7 +14,10 @@ import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
-import { getChainIcon, getWalletIconName } from 'client/scripts/utils/chainUtils';
+import {
+  getChainIcon,
+  getWalletIconName,
+} from 'client/scripts/utils/chainUtils';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import { formatAddressShort } from 'shared/utils';
 import { CWIdentificationTag } from '../../component_kit/new_designs/CWIdentificationTag';
