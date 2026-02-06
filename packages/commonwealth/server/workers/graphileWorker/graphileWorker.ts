@@ -16,14 +16,25 @@ import {
   GraphileTaskNames,
   preset,
 } from '@hicommonwealth/model/services';
-import { Task, parseCronItems, run } from 'graphile-worker';
+import { Runner, Task, parseCronItems, run } from 'graphile-worker';
 import { config } from '../../config';
 import { cronItems } from './cronJobs';
 import { graphileTasks, taskFactory } from './tasks';
 
 const log = logger(import.meta);
 
-export async function startGraphileWorker(initAdapters: boolean = false) {
+export interface GraphileWorkerOptions {
+  initAdapters?: boolean;
+  onRunnerCreated?: (runner: Runner) => void;
+}
+
+export async function startGraphileWorker(
+  options: GraphileWorkerOptions | boolean = false,
+) {
+  // Support legacy boolean parameter for backwards compatibility
+  const { initAdapters, onRunnerCreated } =
+    typeof options === 'boolean' ? { initAdapters: options } : options;
+
   await disableService();
   if (initAdapters) {
     if (!config.CACHE.REDIS_URL) {
@@ -49,7 +60,7 @@ export async function startGraphileWorker(initAdapters: boolean = false) {
       throw new Error(`Cron job task not found: ${cronJob.task}`);
   }
 
-  await run({
+  const runner = await run({
     parsedCronItems: parseCronItems(
       cronItems.filter((x): x is CustomCronItem => x !== undefined),
     ),
@@ -62,11 +73,16 @@ export async function startGraphileWorker(initAdapters: boolean = false) {
       {} as Record<GraphileTaskNames, Task>,
     ),
   });
+
+  // Allow caller to register the runner for lifecycle management
+  onRunnerCreated?.(runner);
+
   log.info('Graphile Worker started');
+  return runner;
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
-  startGraphileWorker(true).catch((err) => {
+  startGraphileWorker({ initAdapters: true }).catch((err) => {
     log.fatal('A fatal error occurred with the Graphile Worker', err);
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispose()('ERROR', true);

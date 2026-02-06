@@ -10,7 +10,6 @@ import {
   RATE_LIMIT_MESSAGE,
   RateLimitErrorType,
 } from 'helpers/rateLimit';
-import { useFlag } from 'hooks/useFlag';
 import type { DeltaStatic } from 'quill';
 import React, { useRef, useState } from 'react';
 import useCreateThreadMutation, {
@@ -43,7 +42,6 @@ const CommunityHome = () => {
   const user = useUserStore();
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const xpEnabled = useFlag('xp');
   const chain = app.chain.meta.id;
 
   const communityId = app.activeChainId() || '';
@@ -160,7 +158,7 @@ const CommunityHome = () => {
           />
           <ActiveContestList isCommunityHomePage />
           <CommunityTransactions />
-          {xpEnabled && <XpQuestList communityIdFilter={chain} />}
+          <XpQuestList communityIdFilter={chain} />
           <CWModal
             size="small"
             content={

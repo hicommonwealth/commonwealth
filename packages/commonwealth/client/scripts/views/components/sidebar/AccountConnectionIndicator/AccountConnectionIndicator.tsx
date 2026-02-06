@@ -1,4 +1,3 @@
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import NewProfile from 'client/scripts/models/NewProfile';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
@@ -34,7 +33,6 @@ const AccountConnectionIndicator = ({
   isInsideCommunity,
 }: AccountConnectionIndicatorProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
-  const referralsEnabled = useFlag('referrals');
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
   const [isHovering, setIsHovering] = useState(false);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
@@ -70,16 +68,14 @@ const AccountConnectionIndicator = ({
               />
             </div>
 
-            {referralsEnabled && (
-              <CWButton
-                buttonType="tertiary"
-                buttonHeight="sm"
-                buttonWidth="full"
-                label="Get referral link"
-                className="referral-link-button"
-                onClick={() => setIsInviteLinkModalOpen(true)}
-              />
-            )}
+            <CWButton
+              buttonType="tertiary"
+              buttonHeight="sm"
+              buttonWidth="full"
+              label="Get referral link"
+              className="referral-link-button"
+              onClick={() => setIsInviteLinkModalOpen(true)}
+            />
           </div>
         )}
 

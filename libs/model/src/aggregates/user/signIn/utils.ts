@@ -1,7 +1,6 @@
 import { InvalidActor, logger } from '@hicommonwealth/core';
 import { SignIn } from '@hicommonwealth/schemas';
 import { BalanceSourceType, UserTierMap } from '@hicommonwealth/shared';
-import { User as PrivyUser } from '@privy-io/server-auth';
 import { QueryTypes, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../../../config';
@@ -131,7 +130,6 @@ export async function findOrCreateUser({
   transaction,
   ssoInfo,
   referrer_address,
-  privyUserId,
   hex,
   signedInUser,
   ethChainId,
@@ -140,7 +138,6 @@ export async function findOrCreateUser({
   transaction: Transaction;
   ssoInfo?: VerifiedUserInfo;
   referrer_address?: string | null;
-  privyUserId?: string;
   hex?: string;
   signedInUser?: UserAttributes | null;
   ethChainId?: number;
@@ -153,9 +150,7 @@ export async function findOrCreateUser({
     : await findUserByAddressOrHex(hex ? { hex } : { address }, transaction);
 
   const tier =
-    privyUserId &&
-    ssoInfo &&
-    (!('emailVerified' in ssoInfo) || ssoInfo.emailVerified)
+    ssoInfo && (!('emailVerified' in ssoInfo) || ssoInfo.emailVerified)
       ? UserTierMap.SocialVerified
       : await checkNativeWalletBalance(address, foundUser, ethChainId);
 
@@ -166,7 +161,6 @@ export async function findOrCreateUser({
 
   if (signedInUser?.id) {
     const values: Partial<UserAttributes> = {};
-    if (!signedInUser.privy_id && privyUserId) values.privy_id = privyUserId;
     await setUserTier({
       userId: signedInUser.id!,
       newTier: tier,
@@ -175,7 +169,6 @@ export async function findOrCreateUser({
     await updateUser(signedInUser.id, values);
   } else if (foundUser?.id) {
     const values: Partial<UserAttributes> = {};
-    if (!foundUser.privy_id && privyUserId) values.privy_id = privyUserId;
     await setUserTier({
       userId: foundUser.id!,
       newTier: tier,
@@ -208,14 +201,13 @@ export async function findOrCreateUser({
     };
   }
 
-  // New user signing in (Privy or native wallet)
+  // New user signing in with a native wallet
   // if (!foundUser && !signedInUser)
   const user = await models.User.create(
     {
       email: null,
       profile: {},
       referred_by_address: referrer_address ?? null,
-      privy_id: privyUserId ?? null,
       tier,
     },
     { transaction },
@@ -299,7 +291,6 @@ async function transferAddressOwnership({
 export async function signInUser({
   payload,
   verificationData,
-  privyUser,
   verifiedSsoInfo,
   signedInUser,
   ethChainId,
@@ -309,7 +300,6 @@ export async function signInUser({
     verification_token: string;
     verification_token_expires: Date;
   };
-  privyUser?: PrivyUser;
   verifiedSsoInfo?: VerifiedUserInfo;
   signedInUser?: UserAttributes | null;
   ethChainId?: number;
@@ -324,7 +314,6 @@ export async function signInUser({
       address: payload.address,
       ssoInfo: verifiedSsoInfo,
       referrer_address: payload.referrer_address,
-      privyUserId: privyUser?.id,
       hex: payload.hex,
       transaction,
       signedInUser,

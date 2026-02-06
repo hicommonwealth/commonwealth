@@ -50,7 +50,6 @@ import { saveToClipboard } from 'utils/clipboard';
 import { StickyInput } from 'views/components/StickEditorContainer';
 import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 // eslint-disable-next-line max-len
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
 import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import TokenBanner from 'views/components/TokenBanner';
@@ -87,8 +86,6 @@ const VIEWS = [
 ];
 
 const DiscussionsPage = () => {
-  const privateTopicsEnabled = useFlag('privateTopics');
-
   const [selectedView, setSelectedView] = useState<string>();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -403,12 +400,7 @@ const DiscussionsPage = () => {
     }
   };
 
-  if (
-    privateTopicsEnabled &&
-    isPrivateTopic &&
-    !isAllowedMember &&
-    !bypassGating
-  ) {
+  if (isPrivateTopic && !isAllowedMember && !bypassGating) {
     return (
       <StickCommentProvider mode="thread">
         <CWPageLayout ref={containerRef} className="DiscussionsPageLayout">

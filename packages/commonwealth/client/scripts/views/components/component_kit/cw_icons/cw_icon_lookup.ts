@@ -392,7 +392,6 @@ export const customIconLookup = {
   apple: CustomIcons.CWApple,
   farcaster: CustomIcons.CWFarcaster,
   SMS: withPhosphorIcon(ChatTextIcon),
-  privy: CustomIcons.CWPrivy,
   okx: CustomIcons.CWOKX,
   twitterIcon: CustomIcons.CWTwitter,
   envelope: CustomIcons.CWEnvelop,

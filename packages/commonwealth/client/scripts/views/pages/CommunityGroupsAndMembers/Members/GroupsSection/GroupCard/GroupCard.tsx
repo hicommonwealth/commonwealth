@@ -1,5 +1,4 @@
 import { UserFriendlyActionMap } from '@hicommonwealth/shared';
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import React, { useState } from 'react';
@@ -31,7 +30,6 @@ const GroupCard = ({
   onEditClick = () => {},
   profiles,
 }: GroupCardProps) => {
-  const privateTopicsEnabled = useFlag('privateTopics');
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [currentAllowlistPage, setCurrentAllowlistPage] = useState(1);
 
@@ -172,7 +170,7 @@ const GroupCard = ({
                   <CWText type="b2" className="topic-name">
                     <span className="topic-name-flex">
                       {t.name}
-                      {privateTopicsEnabled && t.is_private && (
+                      {t.is_private && (
                         <CWIcon
                           iconName="lockedNew"
                           iconSize="small"

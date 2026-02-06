@@ -11,7 +11,6 @@ import {
   verifySessionSignature,
   type VerifiedAddress,
 } from '../../../services/session';
-import { signInPrivy } from './privy';
 import { signInUser } from './utils';
 
 /**
@@ -55,6 +54,9 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       if (!actor.user.id || !actor.user.auth) throw Error('Invalid address');
 
       const { wallet_id, session } = payload;
+      if (wallet_id === WalletId.Privy) {
+        throw new Error('Privy auth is disabled. Please update your client.');
+      }
       const {
         base,
         encodedAddress,
@@ -101,10 +103,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         signedInUser: user,
         ethChainId: ethChainId ?? undefined,
       };
-      const res =
-        wallet_id === WalletId.Privy
-          ? await signInPrivy(args)
-          : await signInUser(args);
+      const res = await signInUser(args);
 
       const addr = await models.Address.scope('withPrivateData').findOne({
         where: {

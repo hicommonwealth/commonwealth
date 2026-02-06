@@ -58,7 +58,6 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
 
   const navigate = useCommonNavigate();
   const location = useLocation();
-  const xpEnabled = useFlag('xp');
   const marketsEnabled = useFlag('markets');
 
   const communityId = app.activeChainId() || '';
@@ -307,7 +306,7 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     displayData: null,
     hasDefaultToggle: false,
     isActive: !!matchesQuestsRoute,
-    isVisible: xpEnabled,
+    isVisible: true,
     isUpdated: true,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();

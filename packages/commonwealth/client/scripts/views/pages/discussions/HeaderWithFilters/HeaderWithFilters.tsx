@@ -21,7 +21,7 @@ import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import ContestCard from 'views/components/ContestCard';
-import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
+import MarkdownViewerWithFallback from 'views/components/MarkdownViewerWithFallback';
 import { Select } from 'views/components/Select';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
@@ -455,7 +455,7 @@ export const HeaderWithFilters = ({
         {selectedTopic?.description &&
           views &&
           views[1].value !== selectedView && (
-            <MarkdownViewerUsingQuillOrNewEditor
+            <MarkdownViewerWithFallback
               markdown={selectedTopic.description}
               className="subheader-text"
             />

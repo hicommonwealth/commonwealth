@@ -4,7 +4,6 @@ import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/c
 import clsx from 'clsx';
 import { APIOrderDirection } from 'helpers/constants';
 import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
-import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -36,8 +35,6 @@ const TrendingTokensList = ({
 }: TrendingTokensListProps) => {
   const user = useUserStore();
   const navigate = useCommonNavigate();
-  const launchpadEnabled = useFlag('launchpad');
-
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
     isOpen: boolean;
     tradeConfig?: {
@@ -65,7 +62,6 @@ const TrendingTokensList = ({
     })(),
     order_direction: APIOrderDirection.Desc,
     is_graduated: variant === 'graduated',
-    enabled: launchpadEnabled,
   });
   const tokens = (tokensList?.pages || [])
     .flatMap((page) => page.results)
@@ -99,8 +95,6 @@ const TrendingTokensList = ({
     });
   };
 
-  if (!launchpadEnabled) return <></>;
-
   return (
     <div className="TokensList">
       <div className="heading-container">
@@ -115,9 +109,7 @@ const TrendingTokensList = ({
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
-        <div
-          className={clsx('empty-placeholder', { 'my-16': launchpadEnabled })}
-        >
+        <div className={clsx('empty-placeholder', 'my-16')}>
           <CWText type="h3">
             No tokens found. Launch a new token&nbsp;
             <Link to="/createTokenCommunity">here</Link>.

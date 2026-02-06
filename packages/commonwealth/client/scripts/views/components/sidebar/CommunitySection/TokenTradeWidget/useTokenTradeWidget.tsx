@@ -1,5 +1,4 @@
 import { generateBlobImageFromAlphabet } from 'helpers/image';
-import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useMemo, useState } from 'react';
 import app from 'state';
@@ -12,7 +11,6 @@ import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/ty
 import { ExternalToken } from 'views/modals/TradeTokenModel/UniswapTradeModal/types';
 
 export const useTokenTradeWidget = () => {
-  const launchpadEnabled = useFlag('launchpad');
   const [
     generatedFallbackImageForPinnedToken,
     setGeneratedFallbackImageForPinnedToken,
@@ -23,7 +21,7 @@ export const useTokenTradeWidget = () => {
     useGetTokenByCommunityId({
       community_id: communityId,
       with_stats: true,
-      enabled: !!communityId && launchpadEnabled,
+      enabled: !!communityId,
     });
 
   const { data: communityPinnedTokens, isLoading: isLoadingPinnedToken } =
@@ -46,7 +44,7 @@ export const useTokenTradeWidget = () => {
       : null;
   }, [communityPinnedToken, tokenMetadata]);
   const isLoadingToken =
-    (launchpadEnabled && isLoadingLaunchpadToken) ||
+    isLoadingLaunchpadToken ||
     (isLoadingPinnedToken && !communityLaunchpadToken) ||
     (isLoadingTokenMetadata && communityPinnedToken);
 

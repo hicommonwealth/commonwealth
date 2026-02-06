@@ -45,7 +45,6 @@ const TokensList = ({
   hideSearchTag,
 }: TokensListProps) => {
   const navigate = useCommonNavigate();
-  const launchpadEnabled = useFlag('launchpad');
   const tokenizedThreadsEnabled = useFlag('tokenizedThreads');
 
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
@@ -93,7 +92,6 @@ const TokensList = ({
         filters.withTokenSortOrder || TokenSortDirections.Descending
       ],
     is_graduated: filters.isGraduated,
-    enabled: launchpadEnabled,
   });
   const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
 
@@ -138,8 +136,6 @@ const TokensList = ({
       } as TradingConfig,
     });
   };
-
-  if (!launchpadEnabled) return <></>;
 
   return (
     <div className="TokensList">
@@ -191,11 +187,7 @@ const TokensList = ({
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
-        <div
-          className={clsx('empty-placeholder', {
-            'my-16': launchpadEnabled,
-          })}
-        >
+        <div className={clsx('empty-placeholder', 'my-16')}>
           <CWText type="h2">
             No tokens found
             <br />

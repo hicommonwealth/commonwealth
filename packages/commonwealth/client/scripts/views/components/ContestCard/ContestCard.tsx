@@ -33,7 +33,6 @@ import {
 import ContestAlert from './ContestAlert';
 
 import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
-import { useFlag } from 'hooks/useFlag';
 import { smartTrim } from 'shared/utils';
 import { PrizeDisplay } from 'views/components/PrizeDisplay';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
@@ -112,8 +111,6 @@ const ContestCard = ({
 
   const { mutateAsync: cancelContest } = useCancelContestMutation();
   const { mutateAsync: deleteContest } = useDeleteContestMutation();
-
-  const newContestPage = useFlag('newContestPage');
 
   const isActive = isContestActive({
     contest: {
@@ -216,14 +213,7 @@ const ContestCard = ({
   };
 
   const handleLeaderboardClick = () => {
-    // after removing feature flag, we can remove the isFarcaster check as well
-    newContestPage || isFarcaster
-      ? navigate(`/contests/${address}`, {}, community?.id)
-      : navigate(
-          `/discussions?featured=mostLikes&contest=${address}`,
-          {},
-          community?.id,
-        );
+    navigate(`/contests/${address}`, {}, community?.id);
   };
 
   const handleFundClick = () => {

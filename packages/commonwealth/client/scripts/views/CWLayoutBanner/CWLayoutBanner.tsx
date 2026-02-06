@@ -1,4 +1,3 @@
-import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { CWMessageBanner } from '../components/component_kit/cw_banner';
@@ -30,7 +29,6 @@ const CWLayoutBanner = () => {
   const [isHidden, setIsHidden] = useState(
     localStorage.getItem(key)?.toLowerCase() === 'true',
   );
-  const claimsEnabled = useFlag('claims');
   const navigate = useCommonNavigate();
 
   const handleClose = () => {
@@ -38,7 +36,7 @@ const CWLayoutBanner = () => {
     localStorage.setItem(key, 'true');
   };
 
-  if (isHidden || !claimsEnabled) return <></>;
+  if (isHidden) return <></>;
 
   return (
     <CWMessageBanner

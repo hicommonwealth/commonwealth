@@ -18,8 +18,6 @@ import MobileSearchModal from 'views/modals/MobileSearchModal';
 import useUserMenuItems from '../useUserMenuItems';
 
 import { DOCS_SUBDOMAIN } from '@hicommonwealth/shared';
-import { useFlag } from 'hooks/useFlag';
-import DownloadMobileApp from 'views/components/DownloadMobileApp';
 import XPProgressIndicator, {
   XPProgressIndicatorMode,
 } from '../XPProgressIndicator';
@@ -40,7 +38,6 @@ const MobileHeader = ({
   const [isModalOpen, isSetModalOpen] = useState(false);
   const { menuVisible } = useSidebarStore();
   const userData = useUserStore();
-  const xpEnabled = useFlag('xp');
   const user = userData.addresses?.[0];
   const { isInviteLinkModalOpen, setIsInviteLinkModalOpen } =
     useInviteLinkModal();
@@ -84,9 +81,7 @@ const MobileHeader = ({
         )}
 
         <div className="right-side">
-          {xpEnabled && (
-            <XPProgressIndicator mode={XPProgressIndicatorMode.Compact} />
-          )}
+          <XPProgressIndicator mode={XPProgressIndicatorMode.Compact} />
 
           {magnifyingGlassVisible && (
             <CWIconButton
@@ -95,8 +90,6 @@ const MobileHeader = ({
               onClick={() => isSetModalOpen(true)}
             />
           )}
-
-          <DownloadMobileApp />
 
           {userData.isLoggedIn && (
             <div onClick={() => setIsUserDrawerOpen(true)}>
