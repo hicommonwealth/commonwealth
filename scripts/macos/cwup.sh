@@ -24,14 +24,14 @@ ensure_network() {
   fi
 }
 
-ensure_volume() {
-  local name=$1
+ensure_volume_dir() {
+  local path=$1
 
-  if container volume inspect "$name" >/dev/null 2>&1; then
-    echo "✓ Volume $name exists"
+  if [ -d "$path" ]; then
+    echo "✓ Volume dir $path exists"
   else
-    echo "➕ Creating volume $name..."
-    container volume create "$name"
+    echo "➕ Creating volume dir $path..."
+    mkdir -p "$path"
   fi
 }
 
@@ -80,17 +80,18 @@ ensure_image cw-postgres "$SCRIPT_DIR/cwpg-dockerfile"
 
 # ---- Create network and volumes ----
 ensure_network cw-net
-ensure_volume cw-rmq-data
-ensure_volume cw-redis-data
-ensure_volume cw-pg-data
+VOLUME_BASE="$HOME/.container-volumes"
+ensure_volume_dir "$VOLUME_BASE/cw-rmq-data"
+ensure_volume_dir "$VOLUME_BASE/cw-redis-data"
+ensure_volume_dir "$VOLUME_BASE/cw-pg-data"
 
 # ---- Start containers ----
-start_container cw-rmq --network cw-net -p 5672:5672 -p 15672:15672 -v cw-rmq-data:/var/lib/rabbitmq/mnesia rabbitmq:3.11.7-management
-start_container cw-redis --network cw-net -p 6379:6379 -v cw-redis-data:/data redis:latest
+start_container cw-rmq --network cw-net -p 5672:5672 -p 15672:15672 -v "$VOLUME_BASE/cw-rmq-data:/var/lib/rabbitmq/mnesia" rabbitmq:3.11.7-management
+start_container cw-redis --network cw-net -p 6379:6379 -v "$VOLUME_BASE/cw-redis-data:/data" redis:latest
 start_container cw-pg --network cw-net -p 5432:5432 \
   -e POSTGRES_USER=commonwealth \
   -e POSTGRES_PASSWORD=edgeware \
   -e POSTGRES_DB=commonwealth \
   -e PGDATA=/var/lib/postgresql/pgdata \
-  -v cw-pg-data:/var/lib/postgresql \
+  -v "$VOLUME_BASE/cw-pg-data:/var/lib/postgresql" \
   cw-postgres

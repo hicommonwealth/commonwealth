@@ -2,3 +2,6 @@
 - Files: server.ts, bootstrap.ts, relayForever.ts, graphileWorker.ts, workerLifecycle.ts, workerLifecycle.spec.ts, archiveOutbox.ts
 - Changes: Added workerLifecycle module for coordinating worker shutdown. Workers register cleanup functions called on SIGTERM/SIGINT. Workers start in background to avoid blocking server. Fixed blocking execSync in archiveOutbox by converting to async exec.
 - Decisions: Used Promise.all for parallel worker startup; 30s timeout for graceful shutdown; workers check isShutdownInProgress() flag.
+[2026-02-06] #13352 fix: move container volumes to user-owned paths
+- Files: scripts/macos/cwup.sh, scripts/macos/cwdown.sh, docker-compose.yml, .gitignore
+- Changes: Switched macOS scripts and docker-compose to bind mounts under ~/.container-volumes and updated cleanup and ignores to match.
