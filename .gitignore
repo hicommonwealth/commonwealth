@@ -12,11 +12,6 @@ node_modules/
 *.postgres
 *.rabbitmq
 redis-data
-.postgres/
-.rabbitmq/
-redis-data/
-.container-volumes/
-~/.container-volumes/
 **/.nyc_output
 **/dependency-graph.svg
 .ghostal

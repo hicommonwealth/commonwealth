@@ -5,3 +5,6 @@
 [2026-02-06] #13352 fix: move container volumes to user-owned paths
 - Files: scripts/macos/cwup.sh, scripts/macos/cwdown.sh, docker-compose.yml, .gitignore
 - Changes: Switched macOS scripts and docker-compose to bind mounts under ~/.container-volumes and updated cleanup and ignores to match.
+[2026-02-06] #13352 fix: limit volume path changes to cwup.sh
+- Files: scripts/macos/cwup.sh, scripts/macos/cwdown.sh, docker-compose.yml, .gitignore
+- Changes: Reverted compose/cwdown/gitignore adjustments so only cwup.sh uses ~/.container-volumes bind mounts.

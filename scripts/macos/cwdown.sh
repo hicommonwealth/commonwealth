@@ -8,6 +8,6 @@ container rm -f cw-rmq || true
 
 echo "Removing network and volumes..."
 container network rm cw-net || true
-rm -rf "$HOME/.container-volumes/cw-pg-data" || true
-rm -rf "$HOME/.container-volumes/cw-rmq-data" || true
-rm -rf "$HOME/.container-volumes/cw-redis-data" || true
+container volume rm cw-pg-data || true
+container volume rm cw-rmq-data || true
+container volume rm cw-redis-data || true

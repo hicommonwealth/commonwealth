@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: edgeware
       POSTGRES_DB: commonwealth
     volumes:
-      - ~/.container-volumes/cw-postgres:/var/lib/postgresql/data
+      - .postgres:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U commonwealth']
       interval: 5s
@@ -29,7 +29,7 @@ services:
     #   RABBITMQ_DEFAULT_USER: commonwealth
     #   RABBITMQ_DEFAULT_PASS: edgeware
     volumes:
-      - '~/.container-volumes/cw-rabbitmq:/var/lib/rabbitmq/mnesia/'
+      - '.rabbitmq:/var/lib/rabbitmq/mnesia/'
     ports:
       - 5672:5672
       - 15672:15672
@@ -42,7 +42,7 @@ services:
     ports:
       - 6379:6379
     volumes:
-      - ~/.container-volumes/cw-redis:/data
+      - ./redis-data:/data
     networks:
       - cw-network
 
