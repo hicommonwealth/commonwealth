@@ -2,15 +2,6 @@
 - Files: server.ts, bootstrap.ts, relayForever.ts, graphileWorker.ts, workerLifecycle.ts, workerLifecycle.spec.ts, archiveOutbox.ts
 - Changes: Added workerLifecycle module for coordinating worker shutdown. Workers register cleanup functions called on SIGTERM/SIGINT. Workers start in background to avoid blocking server. Fixed blocking execSync in archiveOutbox by converting to async exec.
 - Decisions: Used Promise.all for parallel worker startup; 30s timeout for graceful shutdown; workers check isShutdownInProgress() flag.
-[2026-02-06] #13352 fix: move container volumes to user-owned paths
-- Files: scripts/macos/cwup.sh, scripts/macos/cwdown.sh, docker-compose.yml, .gitignore
-- Changes: Switched macOS scripts and docker-compose to bind mounts under ~/.container-volumes and updated cleanup and ignores to match.
-[2026-02-06] #13352 fix: limit volume path changes to cwup.sh
-- Files: scripts/macos/cwup.sh, scripts/macos/cwdown.sh, docker-compose.yml, .gitignore
-- Changes: Reverted compose/cwdown/gitignore adjustments so only cwup.sh uses ~/.container-volumes bind mounts.
-[2026-02-06] #13352 fix: keep container volumes with created base dir
-- Files: scripts/macos/cwup.sh
-- Changes: Restored named volumes and ensured ~/.container-volumes exists before creating volumes and mounting bind paths.
 [2026-02-06] #13352 fix: use bind mounts for macos volumes
-- Files: scripts/macos/cwup.sh
-- Changes: Replaced named volume creation with host directory creation under ~/.container-volumes and bind mounts to those paths.
+- Files: scripts/macos/cwup.sh, scripts/macos/cwdown.sh
+- Changes: Switched macOS cwup.sh volumes to bind mounts under ~/.container-volumes with directory creation and permissive chmod for local dev; cwdown now removes those host directories.

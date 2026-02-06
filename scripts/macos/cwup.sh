@@ -84,6 +84,7 @@ VOLUME_BASE="$HOME/.container-volumes"
 ensure_volume_dir "$VOLUME_BASE/cw-rmq-data"
 ensure_volume_dir "$VOLUME_BASE/cw-redis-data"
 ensure_volume_dir "$VOLUME_BASE/cw-pg-data"
+chmod -R 777 "$VOLUME_BASE/cw-rmq-data" "$VOLUME_BASE/cw-redis-data" "$VOLUME_BASE/cw-pg-data" || true
 
 # ---- Start containers ----
 start_container cw-rmq --network cw-net -p 5672:5672 -p 15672:15672 -v "$VOLUME_BASE/cw-rmq-data:/var/lib/rabbitmq/mnesia" rabbitmq:3.11.7-management
