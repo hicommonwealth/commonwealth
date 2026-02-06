@@ -14,8 +14,6 @@ import {
   AuthWallets,
   EVMWallets,
 } from 'views/components/AuthButton/types';
-import { PrivyEmailDialog } from 'views/components/Privy/dialogs/PrivyEmailDialog';
-import { PrivySMSDialog } from 'views/components/Privy/dialogs/PrivySMSDialog';
 import { CWIcon } from '../../../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import {
@@ -100,6 +98,10 @@ const ModalBase = ({
 
   const binanceWebEnabled = useFlag('binanceWeb');
   const crecimientoHackathonEnabled = useFlag('crecimientoHackathon');
+  const isBinanceProvider = () =>
+    typeof window !== 'undefined' &&
+    (window.ethereum as { isBinance?: boolean } | undefined)?.isBinance ===
+      true;
 
   const [isSMSAllowed, setIsSMSAllowed] = useState(false);
 
@@ -116,8 +118,7 @@ const ModalBase = ({
   }, []);
 
   const ssoOptions = useMemo(
-    () =>
-      SSO_OPTIONS_DEFAULT.filter((opt) => opt !== 'SMS' || isSMSAllowed),
+    () => SSO_OPTIONS_DEFAULT.filter((opt) => opt !== 'SMS' || isSMSAllowed),
     [isSMSAllowed],
   );
 
@@ -225,7 +226,7 @@ const ModalBase = ({
         if (
           wallet === 'binance' &&
           !binanceWebEnabled &&
-          !(typeof window !== 'undefined' && window?.ethereum?.isBinance)
+          !isBinanceProvider()
         ) {
           return;
         }
@@ -392,8 +393,6 @@ const ModalBase = ({
 
   return (
     <>
-      <PrivySMSDialog />
-      <PrivyEmailDialog />
       <section className="ModalBase">
         {!isUserFromWebView && (
           <CWIcon iconName="close" onClick={onClose} className="close-btn" />

@@ -27,7 +27,6 @@ const featureFlags = {
   onchainReferrals: buildFlag(process.env.FLAG_ONCHAIN_REFERRALS),
   growl: buildFlag(process.env.FLAG_GROWL),
   governancePage: buildFlag(process.env.FLAG_NEW_GOVERNANCE_PAGE),
-  privy: buildFlag(process.env.FLAG_PRIVY),
   judgeContest: buildFlag(process.env.FLAG_JUDGE_CONTEST),
   tokenizedThreads: buildFlag(process.env.FLAG_TOKENIZED_THREADS),
   newProfilePage: buildFlag(process.env.FLAG_NEW_PROFILE_PAGE),
