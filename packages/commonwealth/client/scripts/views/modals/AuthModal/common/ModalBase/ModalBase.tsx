@@ -98,6 +98,10 @@ const ModalBase = ({
 
   const binanceWebEnabled = useFlag('binanceWeb');
   const crecimientoHackathonEnabled = useFlag('crecimientoHackathon');
+  const isBinanceProvider = () =>
+    typeof window !== 'undefined' &&
+    (window.ethereum as { isBinance?: boolean } | undefined)?.isBinance ===
+      true;
 
   const [isSMSAllowed, setIsSMSAllowed] = useState(false);
 
@@ -223,7 +227,7 @@ const ModalBase = ({
         if (
           wallet === 'binance' &&
           !binanceWebEnabled &&
-          !(typeof window !== 'undefined' && window?.ethereum?.isBinance)
+          !isBinanceProvider()
         ) {
           return;
         }

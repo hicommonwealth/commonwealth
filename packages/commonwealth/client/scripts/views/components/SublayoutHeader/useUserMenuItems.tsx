@@ -15,7 +15,6 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { getUniqueUserAddresses } from 'helpers/user';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
@@ -72,9 +71,6 @@ const useUserMenuItems = ({
     recheck: isMenuOpen,
   });
 
-  const rewardsEnabled = useFlag('rewardsPage');
-  const referralsEnabled = useFlag('referrals');
-  const xpEnabled = useFlag('xp');
   const userData = useUserStore();
   const hasMagic = userData.hasMagicWallet;
 

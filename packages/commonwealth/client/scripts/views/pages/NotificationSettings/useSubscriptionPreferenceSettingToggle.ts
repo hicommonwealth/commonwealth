@@ -32,9 +32,7 @@ export function useSubscriptionPreferenceSettingToggle(
     async (activate: boolean) => {
       if (activate) {
         // *** we have to first request permissions if we're activating.
-        const { status: notificationPermissions } = await requestPermissions(
-          {},
-        );
+        const { status: notificationPermissions } = await requestPermissions();
         if (notificationPermissions !== 'granted') {
           return;
         }
