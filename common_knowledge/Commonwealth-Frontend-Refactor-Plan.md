@@ -14,14 +14,14 @@ Legend: [ ] Not started, [~] In progress, [x] Done. Add a completion date in par
 ### EPIC-1: Dead Code Deletion
 - [x] 1.1 Delete dead internal dev-tool pages (260202) PR https://github.com/hicommonwealth/commonwealth/pull/13323 — remove internal markdown demo routes/pages + samples
 - [x] 1.2 Delete dead helper: momentUpdateLocale.ts (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13324 — remove unused momentUpdateLocale helper
-- [ ] 1.3 Delete confirmed zero-import components (batch 1)
+- [x] 1.3 Delete confirmed zero-import components (batch 1) (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13332 — remove dead client files
 - [x] 1.4 Delete permanently-flagged legacy code (batch 2) (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13327 — remove newEditor flag + drop NewThreadFormModern path
 - [x] 1.5 Consolidate useForceRerender + useRerender (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13325 — keep hooks separate; move useRerender to ContestCard + rename to useContestCardRerender
 - [x] 1.6 Audit and clean dead model/store files (260203) PR https://github.com/hicommonwealth/commonwealth/pull/13326 — remove unused SearchResult/PersistentStore/IdStore + move clearLocalStorage
-- [ ] 1.7 Remove Privy auth layer (revert to Magic-only flow)
+- [x] 1.7 Remove Privy auth layer (revert to Magic-only flow) (260205) PR https://github.com/hicommonwealth/commonwealth/pull/13348 — remove privy auth layer
 - [x] 1.8 Remove React Native layer (mobile bridge + MobileAppRedirect) (260205) PR https://github.com/hicommonwealth/commonwealth/pull/13347 — remove RN bridge + mobile app routes/CTA + mobile-only helpers
 - [x] 1.9 Remove always-on feature flags and dead code (260204) PR https://github.com/hicommonwealth/commonwealth/pull/13340 — remove always-on flags + dead code; preserve markets gating; drop knockPushNotifications doc example
-- [ ] 1.10 Remove MDX editor (commonwealth-mdxeditor)
+- [x] 1.10 Remove MDX editor (commonwealth-mdxeditor) (260205) PR https://github.com/hicommonwealth/commonwealth/pull/13338 — remove mdx editor
 
 ### EPIC-2: Shared Infrastructure
 - [ ] 2.1 Set up component test infrastructure

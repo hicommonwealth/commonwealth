@@ -6,7 +6,6 @@ import { useUpdateSubscriptionPreferencesMutation } from 'state/api/trpc/subscri
 // eslint-disable-next-line max-len
 import useUserStore from 'state/ui/user';
 // eslint-disable-next-line max-len
-import { useNotificationsRequestPermissionsAsyncReceiver } from 'views/components/PrivyMobile/useNotificationsRequestPermissionsAsyncReceiver';
 import { SubscriptionPrefType } from 'views/pages/NotificationSettings/useSubscriptionPreferenceSetting';
 
 export function useSubscriptionPreferenceSettingToggle(
@@ -14,7 +13,16 @@ export function useSubscriptionPreferenceSettingToggle(
 ) {
   const subscriptionPreferences = useSubscriptionPreferences();
 
-  const requestPermissions = useNotificationsRequestPermissionsAsyncReceiver();
+  const requestPermissions = useCallback(async () => {
+    if (!('Notification' in window)) {
+      // Mobile webview clients handle permissions via the native bridge.
+      // Don't block preference toggles when Notifications API is unavailable.
+      return { status: 'granted' as const };
+    }
+
+    const status = await Notification.requestPermission();
+    return { status: status === 'default' ? 'undetermined' : status };
+  }, []);
 
   const { mutateAsync: updateSubscriptionPreferences } =
     useUpdateSubscriptionPreferencesMutation();
@@ -24,9 +32,7 @@ export function useSubscriptionPreferenceSettingToggle(
     async (activate: boolean) => {
       if (activate) {
         // *** we have to first request permissions if we're activating.
-        const { status: notificationPermissions } = await requestPermissions(
-          {},
-        );
+        const { status: notificationPermissions } = await requestPermissions();
         if (notificationPermissions !== 'granted') {
           return;
         }

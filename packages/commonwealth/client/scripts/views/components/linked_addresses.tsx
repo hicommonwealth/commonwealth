@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import './linked_addresses.scss';
 
-import { getChainIcon } from 'client/scripts/utils/chainUtils';
+import { getChainIcon, getWalletIconName } from 'client/scripts/utils/chainUtils';
 import { notifyError } from 'controllers/app/notifications';
 import { formatAddressShort } from 'shared/utils';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -44,7 +44,7 @@ type LinkedAddressesProps = {
 };
 
 const Address = ({ addressInfo }: AddressProps) => {
-  const { address, walletId, community } = addressInfo;
+  const { address, walletId, walletSsoSource, community } = addressInfo;
 
   // Get community data to determine chain base
   const { data: fetchedCommunity } = useGetCommunityByIdQuery({
@@ -60,7 +60,7 @@ const Address = ({ addressInfo }: AddressProps) => {
           iconSize="small"
         />
         <CWIdentificationTag
-          iconLeft={walletId}
+          iconLeft={getWalletIconName(walletId, walletSsoSource)}
           address={`\u2022 ${formatAddressShort(address)}`}
         />
       </div>
