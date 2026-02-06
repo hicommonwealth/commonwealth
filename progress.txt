@@ -8,3 +8,9 @@
 [2026-02-06] #13352 fix: limit volume path changes to cwup.sh
 - Files: scripts/macos/cwup.sh, scripts/macos/cwdown.sh, docker-compose.yml, .gitignore
 - Changes: Reverted compose/cwdown/gitignore adjustments so only cwup.sh uses ~/.container-volumes bind mounts.
+[2026-02-06] #13352 fix: keep container volumes with created base dir
+- Files: scripts/macos/cwup.sh
+- Changes: Restored named volumes and ensured ~/.container-volumes exists before creating volumes and mounting bind paths.
+[2026-02-06] #13352 fix: use bind mounts for macos volumes
+- Files: scripts/macos/cwup.sh
+- Changes: Replaced named volume creation with host directory creation under ~/.container-volumes and bind mounts to those paths.
