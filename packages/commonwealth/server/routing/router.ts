@@ -170,7 +170,17 @@ function setupRouter(app: Express, cacheDecorator: CacheDecorator) {
           ? req.body?.ideaPrompt
           : undefined;
 
-      const ideaGenerator = generateTokenIdea({ ideaPrompt });
+      const recentSuggestions = Array.isArray(req.body?.recentSuggestions)
+        ? req.body.recentSuggestions.filter(
+            (s: any) =>
+              s && typeof s.name === 'string' && typeof s.symbol === 'string',
+          )
+        : [];
+
+      const ideaGenerator = generateTokenIdea({
+        ideaPrompt,
+        recentSuggestions,
+      });
 
       for await (const chunk of ideaGenerator) {
         if ((chunk as { error?: string }).error) {
