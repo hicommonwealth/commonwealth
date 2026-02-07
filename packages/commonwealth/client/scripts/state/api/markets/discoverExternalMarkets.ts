@@ -9,15 +9,18 @@ interface UseDiscoverExternalMarketsQueryProps {
   filters: MarketFilters;
   limit?: number;
   enabled?: boolean;
+  communityId?: string;
 }
 
 const useDiscoverExternalMarketsQuery = ({
   filters,
   limit = 20,
   enabled = true,
+  communityId,
 }: UseDiscoverExternalMarketsQueryProps) => {
   const query = trpc.community.discoverExternalMarkets.useInfiniteQuery(
     {
+      ...(communityId ? { community_id: communityId } : {}),
       provider: filters.provider,
       search: filters.search || undefined,
       category: filters.category !== 'all' ? filters.category : undefined,

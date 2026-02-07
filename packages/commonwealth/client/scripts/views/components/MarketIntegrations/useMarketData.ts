@@ -3,7 +3,7 @@ import { useDiscoverExternalMarketsQuery } from 'state/api/markets';
 import { trpc } from '../../../utils/trpcClient';
 import { Market, MarketFilters } from './types';
 
-export function useMarketData(communityId: string) {
+export function useMarketData(communityId?: string) {
   const [filters, setFilters] = useState<MarketFilters>({
     search: '',
     provider: 'all',
@@ -17,11 +17,11 @@ export function useMarketData(communityId: string) {
   const { data: savedMarketsData, isLoading: isLoadingSaved } =
     trpc.community.getMarkets.useInfiniteQuery(
       {
-        community_id: communityId,
+        ...(communityId ? { community_id: communityId } : {}),
         limit: 50, // Fetch more to check subscriptions
       },
       {
-        enabled: !!communityId,
+        enabled: true,
         initialCursor: 1,
         getNextPageParam: (lastPage) => {
           const nextPageNum = lastPage.page + 1;
@@ -44,6 +44,7 @@ export function useMarketData(communityId: string) {
   } = useDiscoverExternalMarketsQuery({
     filters,
     limit: 20, // Use consistent pagination
+    communityId,
   });
 
   // Fetch all categories from an unfiltered query (completely independent of current filters)
@@ -58,7 +59,8 @@ export function useMarketData(communityId: string) {
       sortOrder: 'newest',
     },
     limit: 50, // Maximum allowed by schema - should be enough to get most categories
-    enabled: !!communityId, // Only enable if we have a communityId
+    enabled: true,
+    communityId,
   });
 
   const categories = useMemo(() => {
@@ -86,23 +88,29 @@ export function useMarketData(communityId: string) {
   const { mutate: subscribeMarket, isPending: isSubscribing } =
     trpc.community.subscribeMarket.useMutation({
       onSuccess: () => {
-        void trpcUtils.community.getMarkets.invalidate({
-          community_id: communityId,
-        });
+        void trpcUtils.community.getMarkets.invalidate(
+          communityId ? { community_id: communityId } : {},
+        );
+        void trpcUtils.community.discoverExternalMarkets.invalidate(
+          communityId ? { community_id: communityId } : {},
+        );
       },
     });
   const { mutate: unsubscribeMarket, isPending: isUnsubscribing } =
     trpc.community.unsubscribeMarket.useMutation({
       onSuccess: () => {
-        void trpcUtils.community.getMarkets.invalidate({
-          community_id: communityId,
-        });
+        void trpcUtils.community.getMarkets.invalidate(
+          communityId ? { community_id: communityId } : {},
+        );
+        void trpcUtils.community.discoverExternalMarkets.invalidate(
+          communityId ? { community_id: communityId } : {},
+        );
       },
     });
 
   const onSubscribe = (market: Market) => {
     subscribeMarket({
-      community_id: communityId,
+      ...(communityId ? { community_id: communityId } : {}),
       provider: market.provider,
       slug: market.slug,
       question: market.question,
@@ -116,7 +124,7 @@ export function useMarketData(communityId: string) {
 
   const onUnsubscribe = (market: Market) => {
     unsubscribeMarket({
-      community_id: communityId,
+      ...(communityId ? { community_id: communityId } : {}),
       slug: market.slug,
     });
   };

@@ -11,6 +11,7 @@ export * from './groupSnapshot.schemas';
 export * from './integrations.schemas';
 export * from './load-testing.schemas';
 export * from './magic.schemas';
+export * from './market.schemas';
 export * from './poll.schemas';
 export * from './quest.schemas';
 export * from './snapshot.schemas';

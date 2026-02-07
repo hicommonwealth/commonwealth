@@ -467,7 +467,10 @@ export const MarketView = Market.extend({
 
 export const GetMarkets = {
   input: PaginationParamsSchema.extend({
-    community_id: z.string(),
+    community_id: z
+      .string()
+      .optional()
+      .describe('If provided, returns markets subscribed to that community.'),
   }),
   output: PaginatedResultSchema.extend({
     results: z.array(MarketView),
@@ -485,6 +488,11 @@ export const ExternalMarket = z.object({
   endTime: z.coerce.date().nullable(),
   imageUrl: z.string().optional(),
   subTitle: z.string().optional(),
+  is_subscribed: z
+    .boolean()
+    .describe(
+      'Whether this market is already subscribed (globally or to the specified community)',
+    ),
 });
 
 export const DiscoverExternalMarkets = {
@@ -500,6 +508,12 @@ export const DiscoverExternalMarkets = {
       .enum(['newest', 'oldest', 'ending-soon', 'starting-soon'])
       .optional()
       .default('newest'),
+    community_id: z
+      .string()
+      .optional()
+      .describe(
+        'Community ID. If provided, checks subscription status for this community. If not provided (site admin), checks global subscription status.',
+      ),
   }),
   output: PaginatedResultSchema.extend({
     results: z.array(ExternalMarket),
