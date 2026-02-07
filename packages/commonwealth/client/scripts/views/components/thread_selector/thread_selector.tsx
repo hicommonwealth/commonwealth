@@ -27,7 +27,7 @@ export const ThreadSelector = ({
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const communityId = app.activeChainId() || '';
-  const queryEnabled = debouncedSearchTerm?.trim().length > 0 && !!communityId;
+  const queryEnabled = debouncedSearchTerm?.trim().length >= 3 && !!communityId;
 
   const { data: threadsData, isLoading } = useSearchThreadsQuery({
     community_id: communityId,

@@ -68,9 +68,10 @@ const LeaderboardSection = () => {
     include_roles: true,
     order_by: 'earnings' as MemberResultsOrderBy,
     order_direction: APIOrderDirection.Desc,
-    ...(debouncedSearchTerm && {
-      search: debouncedSearchTerm,
-    }),
+    ...(debouncedSearchTerm &&
+      debouncedSearchTerm.length >= 3 && {
+        search: debouncedSearchTerm,
+      }),
   });
 
   const formattedMembers =
