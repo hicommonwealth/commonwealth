@@ -44,7 +44,10 @@ export const useMemberData = ({
     order_by: tableState.orderBy,
     // @ts-expect-error StrictNullChecks
     order_direction: tableState.orderDirection as 'ASC' | 'DESC',
-    search: debouncedSearchTerm,
+    ...(debouncedSearchTerm &&
+      debouncedSearchTerm.length >= 3 && {
+        search: debouncedSearchTerm,
+      }),
     community_id: communityId,
     include_roles: true,
     ...(membershipsFilter && {

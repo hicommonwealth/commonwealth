@@ -318,7 +318,7 @@ export const GetActiveThreads = {
 export const SearchThreads = {
   input: PaginationParamsSchema.extend({
     community_id: z.string(),
-    search_term: z.string(),
+    search_term: z.string().min(3),
     thread_title_only: z.coerce.boolean().default(false),
     include_count: z.coerce.boolean().default(false),
     order_by: z

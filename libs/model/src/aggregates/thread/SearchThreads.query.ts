@@ -71,8 +71,7 @@ WHERE
 ),
 ${buildGatedOutput(actor)}  
 SELECT
-  T.*,
-  COUNT(*) OVER()::INTEGER AS total_count
+  T.*${include_count ? `,\n  COUNT(*) OVER()::INTEGER AS total_count` : ''}
 FROM
   gated_output T
 ORDER BY

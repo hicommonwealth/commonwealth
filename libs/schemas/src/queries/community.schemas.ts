@@ -148,7 +148,7 @@ export const GetCommunityStake = {
 
 export const GetCommunityMembers = {
   input: PaginationParamsSchema.extend({
-    search: z.string().optional(),
+    search: z.string().min(3).optional(),
     community_id: z.string(),
     include_roles: z.boolean().optional(),
     memberships: z

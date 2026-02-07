@@ -46,7 +46,7 @@ const useSearchResults = (
     orderBy: APIOrderBy.Rank,
     orderDirection: APIOrderDirection.Desc,
   };
-  const queryEnabled = debouncedSearchTerm.length > 0 && !!communityId;
+  const queryEnabled = debouncedSearchTerm.length >= 3 && !!communityId;
 
   const { data: threadsData } = useSearchThreadsQuery({
     ...{

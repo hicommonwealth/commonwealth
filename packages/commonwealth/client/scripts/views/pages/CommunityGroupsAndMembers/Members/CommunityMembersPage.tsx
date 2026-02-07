@@ -169,9 +169,10 @@ const CommunityMembersPage = () => {
       ? 'last_active'
       : tableState.orderBy) as MemberResultsOrderBy,
     order_direction: tableState.orderDirection as APIOrderDirection,
-    ...(debouncedSearchTerm && {
-      search: debouncedSearchTerm,
-    }),
+    ...(debouncedSearchTerm &&
+      debouncedSearchTerm.length >= 3 && {
+        search: debouncedSearchTerm,
+      }),
     community_id: communityId,
     include_roles: true,
     ...(membershipsFilter && {
